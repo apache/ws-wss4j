@@ -334,21 +334,11 @@ public class WSEncryptBody extends WSBaseMessage {
 				"invalidX509Data", new Object[]{"for Encryption"});
 		}
 		remoteCert = certs[0];
+		String certUri = "EncId-" + remoteCert.hashCode();
 		if (tlog.isDebugEnabled()) {
 			t2 = System.currentTimeMillis();
 		}
-		Cipher cipher = null;
-		if (keyEncAlgo.equalsIgnoreCase(WSConstants.KEYTRANSPORT_RSA15)) {
-			cipher = Cipher.getInstance("RSA/ECB/PKCS1PADDING","BC");
-		} 
-		else if (keyEncAlgo.equalsIgnoreCase(WSConstants.KEYTRANSPORT_RSAOEP)) {
-			cipher = Cipher.getInstance("RSA/NONE/OAEPPADDING","BC");
-		}
-		else {
-			throw new WSSecurityException
-					(WSSecurityException.UNSUPPORTED_ALGORITHM,
-							"unsupportedKeyTransp", new Object[]{keyEncAlgo});
-		}
+		Cipher cipher = WSSecurityUtil.getCiperInstance(keyEncAlgo);
 		cipher.init(Cipher.ENCRYPT_MODE, remoteCert);
 		byte[] encKey = symmetricKey.getEncoded();
 		if (doDebug) {
@@ -392,34 +382,62 @@ public class WSEncryptBody extends WSBaseMessage {
 		Element keyInfo = createKeyInfo(doc, xencEncryptedKey);
 		SecurityTokenReference secToken = new SecurityTokenReference(doc);
 
-		if (keyIdentifierType == WSConstants.X509_KEY_IDENTIFIER) {
-			secToken.setKeyIdentifier(remoteCert); 
-			// build a key id class??
-        } else if (keyIdentifierType == WSConstants.SKI_KEY_IDENTIFIER) {
-            secToken.setKeyIdentifierSKI(remoteCert,crypto);
-		} else if (keyIdentifierType == WSConstants.ISSUER_SERIAL) {
-			secToken.setX509IssuerSerial(
-				new XMLX509IssuerSerial(doc, remoteCert));
-		} else if (keyIdentifierType == WSConstants.BST_DIRECT_REFERENCE) {
-			Reference ref = new Reference(doc);
-			String certUri = "id-" + remoteCert.hashCode();
-			ref.setURI("#" + certUri);
-			secToken.setReference(ref);
-			BinarySecurity token = null;
-			token = new X509Security(doc);
-			((X509Security) token).setX509Certificate(remoteCert);
-			token.setID(certUri);
-			WSSecurityUtil.prependChildElement(
-				doc,
-				wsseSecurity,
-				token.getElement(),
-				false);
+		switch (keyIdentifierType) {
+			case WSConstants.X509_KEY_IDENTIFIER :
+				secToken.setKeyIdentifier(remoteCert);
+				// build a key id class??
+				break;
+			case WSConstants.SKI_KEY_IDENTIFIER_DIRECT :
+				{
+					X509Security x509token = new X509Security(doc);
+					x509token.setX509Certificate(remoteCert);
+					x509token.setID(certUri);
+					WSSecurityUtil.prependChildElement(
+						doc,
+						wsseSecurity,
+						x509token.getElement(),
+						false);
+					// fall thru
+				}
+
+			case WSConstants.SKI_KEY_IDENTIFIER :
+				secToken.setKeyIdentifierSKI(remoteCert, crypto);
+				break;
+			case WSConstants.ISSUER_SERIAL_DIRECT :
+				{
+					X509Security x509token = new X509Security(doc);
+					x509token.setX509Certificate(remoteCert);
+					x509token.setID(certUri);
+					WSSecurityUtil.prependChildElement(
+						doc,
+						wsseSecurity,
+						x509token.getElement(),
+						false);
+					// fall thru
+				}
+			case WSConstants.ISSUER_SERIAL :
+				secToken.setX509IssuerSerial(
+					new XMLX509IssuerSerial(doc, remoteCert));
+				break;
+			case WSConstants.BST_DIRECT_REFERENCE :
+				Reference ref = new Reference(doc);
+				ref.setURI("#" + certUri);
+				secToken.setReference(ref);
+				BinarySecurity bstToken = null;
+				bstToken = new X509Security(doc);
+				((X509Security) bstToken).setX509Certificate(remoteCert);
+				bstToken.setID(certUri);
+				WSSecurityUtil.prependChildElement(
+					doc,
+					wsseSecurity,
+					bstToken.getElement(),
+					false);
+				break;
+			default :
+				throw new WSSecurityException(
+					WSSecurityException.FAILURE,
+					"unsupportedKeyId");
 		}
-		else {
-			throw new WSSecurityException(
-				WSSecurityException.FAILURE,
-				"unsupportedKeyId");
-		}			
 		WSSecurityUtil.appendChildElement(doc, keyInfo, secToken.getElement());
 		Element xencCipherValue = createCipherValue(doc, xencEncryptedKey);
 		xencCipherValue.appendChild(keyText);

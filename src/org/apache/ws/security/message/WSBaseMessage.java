@@ -277,4 +277,5 @@ public class WSBaseMessage {
 		}
 		return securityHeader;
 	}
+
 }

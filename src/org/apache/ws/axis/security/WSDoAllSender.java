@@ -352,6 +352,7 @@ public class WSDoAllSender extends BasicHandler {
 			XMLUtils.outputDOM(doc, os, true);
 			String osStr = os.toString();
 			if (doDebug) {
+				log.debug("Send request:");
 				log.debug(osStr);
 			}
 			sPart.setCurrentMessage(osStr, SOAPPart.FORM_STRING);
@@ -501,9 +502,11 @@ public class WSDoAllSender extends BasicHandler {
 			}
 			encKeyId = I.intValue();
 			if (!(encKeyId == WSConstants.ISSUER_SERIAL
+				|| encKeyId == WSConstants.ISSUER_SERIAL_DIRECT
 				|| encKeyId == WSConstants.X509_KEY_IDENTIFIER
-                || encKeyId == WSConstants.SKI_KEY_IDENTIFIER
-                || encKeyId == WSConstants.BST_DIRECT_REFERENCE
+				|| encKeyId == WSConstants.SKI_KEY_IDENTIFIER
+				|| encKeyId == WSConstants.SKI_KEY_IDENTIFIER_DIRECT
+				|| encKeyId == WSConstants.BST_DIRECT_REFERENCE
 				|| encKeyId == WSConstants.EMBEDDED_KEYNAME)) {
 				throw new AxisFault("WSDoAllSender: Encryption: illegal key identification");
 			}

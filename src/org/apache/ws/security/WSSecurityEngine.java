@@ -649,18 +649,7 @@ public class WSSecurityEngine {
             throw new WSSecurityException
                     (WSSecurityException.UNSUPPORTED_ALGORITHM, "noEncAlgo");
         }
-        Cipher cipher = null;
-        if (keyEncAlgo.equalsIgnoreCase(WSConstants.KEYTRANSPORT_RSA15)) {
-            cipher = Cipher.getInstance("RSA/ECB/PKCS1PADDING","BC");
-        } 
-        else if (keyEncAlgo.equalsIgnoreCase(WSConstants.KEYTRANSPORT_RSAOEP)) {
-			cipher = Cipher.getInstance("RSA/NONE/OAEPPADDING","BC");
-        }
-        else {
-            throw new WSSecurityException
-                    (WSSecurityException.UNSUPPORTED_ALGORITHM,
-                            "unsupportedKeyTransp", new Object[]{keyEncAlgo});
-        }
+		Cipher cipher = WSSecurityUtil.getCiperInstance(keyEncAlgo);
         /*
          * Well, we can decrypt the session (symmetric) key. Now lookup CipherValue, this is the value of the
          * encrypted session key (session key usually is a symmetrical key that encrypts

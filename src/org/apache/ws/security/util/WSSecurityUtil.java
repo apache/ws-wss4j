@@ -20,6 +20,7 @@ package org.apache.ws.security.util;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.SOAPConstants;
 import org.apache.ws.security.SOAP11Constants;
 import org.apache.ws.security.SOAP12Constants;
@@ -35,6 +36,10 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
 
+import javax.crypto.Cipher;
+import javax.crypto.NoSuchPaddingException;
+import java.security.NoSuchProviderException;
+import java.security.NoSuchAlgorithmException;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.DESedeKeySpec;
@@ -596,4 +601,37 @@ public class WSSecurityUtil {
     	}
     }
 
+	public static Cipher getCiperInstance(String cipherAlgo)
+		throws WSSecurityException {
+		Cipher cipher = null;
+		try {
+			if (cipherAlgo.equalsIgnoreCase(WSConstants.KEYTRANSPORT_RSA15)) {
+				cipher = Cipher.getInstance("RSA/ECB/PKCS1PADDING", "BC");
+			} else if (
+				cipherAlgo.equalsIgnoreCase(WSConstants.KEYTRANSPORT_RSAOEP)) {
+				cipher = Cipher.getInstance("RSA/NONE/OAEPPADDING", "BC");
+			} else {
+				throw new WSSecurityException(
+					WSSecurityException.UNSUPPORTED_ALGORITHM,
+					"unsupportedKeyTransp",
+					new Object[] { cipherAlgo });
+			}
+		} catch (NoSuchPaddingException ex) {
+			throw new WSSecurityException(
+				WSSecurityException.UNSUPPORTED_ALGORITHM,
+				"unsupportedKeyTransp",
+				new Object[] { "No such padding: " + cipherAlgo });
+		} catch (NoSuchProviderException ex) {
+			throw new WSSecurityException(
+				WSSecurityException.UNSUPPORTED_ALGORITHM,
+				"unsupportedKeyTransp",
+				new Object[] { "no provider: "+ cipherAlgo });
+		} catch (NoSuchAlgorithmException ex) {
+			throw new WSSecurityException(
+				WSSecurityException.UNSUPPORTED_ALGORITHM,
+				"unsupportedKeyTransp",
+				new Object[] { "No such algorithm: " + cipherAlgo });
+		}
+		return cipher;
+	}
 }

@@ -245,7 +245,7 @@ public class WSSignEnvelope extends WSBaseMessage {
          */
 
         KeyInfo info = sig.getKeyInfo();
-		String keyInfoUri = "id-" + info.hashCode();
+		String keyInfoUri = "SignId-" + info.hashCode();
 		info.setId(keyInfoUri);
 
 		if( tlog.isDebugEnabled() ) {
@@ -262,7 +262,7 @@ public class WSSignEnvelope extends WSBaseMessage {
 			parts.add(encP);
 		}
 
-		String certUri = "id-" + certs[0].hashCode();
+		String certUri = "SignId-" + certs[0].hashCode();
 		
 		Transforms transforms = null;
 		
@@ -357,10 +357,7 @@ public class WSSignEnvelope extends WSBaseMessage {
 			}
 			case WSConstants.ISSUER_SERIAL :
 				XMLX509IssuerSerial data =
-					new XMLX509IssuerSerial(
-						doc,
-						certs[0].getIssuerDN().getName(),
-						certs[0].getSerialNumber());
+					new XMLX509IssuerSerial(doc, certs[0]);
 				secRef.setX509IssuerSerial(data);
 				break;
 			case WSConstants.X509_KEY_IDENTIFIER :
