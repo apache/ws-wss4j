@@ -20,7 +20,6 @@ package org.apache.ws.axis.oasis;
 import org.apache.axis.utils.Options;
 import org.apache.ws.axis.oasis.ping.PingPort;
 import org.apache.ws.axis.oasis.ping.PingServiceLocator;
-import org.apache.ws.axis.oasis.ping.TicketType;
 
 /**
  * Class Scenario2
@@ -80,18 +79,17 @@ public class Scenario2 {
          */
 
         // perform call
-        TicketType ticket = new TicketType("scenario2");
-        javax.xml.rpc.holders.StringHolder text =
-                new javax.xml.rpc.holders.StringHolder("Scenario 2 text");
+        String text =
+                new String("Scenario 2 text");
 
-        port.ping(text, ticket);
-        System.out.println(text.value);
+        port.ping(text);
+        System.out.println(text);
 
         if (opts.isFlagSet('t') > 0) {
             long startTime = System.currentTimeMillis();
 
             for (int i = 0; i < 20; i++) {
-                port.ping(text, ticket);
+                port.ping(text);
             }
 
             long endTime = System.currentTimeMillis();

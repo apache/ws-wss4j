@@ -89,7 +89,7 @@
       value="org.apache.ws.axis.oasis.PWCallback"/>
     <parameter name="signatureKeyIdentifier" value="DirectReference" />
     <parameter name="signaturePropFile" value="crypto.properties" />
-    <parameter name="signatureParts" value="{}{http://xmlsoap.org/Ping}ticket" />    
+    <parameter name="signatureParts" value="{}{http://xmlsoap.org/Ping}text" />    
    </handler>
    <handler type="java:org.apache.ws.axis.security.WSDoAllSender" >
     <parameter name="action" value="Signature"/>

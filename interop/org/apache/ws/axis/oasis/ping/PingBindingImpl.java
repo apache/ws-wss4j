@@ -35,12 +35,10 @@ import java.util.Vector;
 
 public class PingBindingImpl
 	implements org.apache.ws.axis.oasis.ping.PingPort {
-	public void ping(
-		javax.xml.rpc.holders.StringHolder text,
-		org.apache.ws.axis.oasis.ping.TicketType ticket)
+	public String ping(
+		String text)
 		throws java.rmi.RemoteException {
-		// text.value = "Echo " + text.value.trim();
-		text.value = "Echo " + text.value;
+		text = "Echo " + text;
 		MessageContext msgContext = MessageContext.getCurrentContext();
 		Message reqMsg = msgContext.getRequestMessage();
 
@@ -65,6 +63,7 @@ public class PingBindingImpl
 				}
 			}
 		}
+        return text;
 	}
 
 }

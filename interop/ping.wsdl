@@ -15,6 +15,7 @@
         <attribute ref="wsu:Id"/>
       </complexType>
       -->
+      <!--
       <complexType name="ticketType">
         <xsd:simpleContent>
           <xsd:extension base="xsd:string">
@@ -23,11 +24,14 @@
         </xsd:simpleContent>
       </complexType>      
       <element name="ticket" type="tns:ticketType"/>
+      -->
       <element name="text" type="xsd:string" nillable="true"/>
       <complexType name="ping">
         <sequence>
           <element ref="tns:text" />
+          <!--
           <element ref="tns:ticket" minOccurs="0" />
+          -->
         </sequence>
       </complexType>
       <complexType name="pingResponse">
