@@ -45,6 +45,7 @@ import org.w3c.dom.Document;
 import javax.security.auth.callback.CallbackHandler;
 import javax.xml.soap.SOAPHeader;
 import javax.xml.soap.SOAPHeaderElement;
+import javax.xml.namespace.QName;
 import java.io.ByteArrayOutputStream;
 import java.math.BigInteger;
 import java.security.cert.X509Certificate;
@@ -54,6 +55,7 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.TimeZone;
 import java.util.Vector;
+import java.util.ArrayList;
 
 public class WSDoAllReceiver extends BasicHandler {
 	static Log log = LogFactory.getLog(WSDoAllReceiver.class.getName());
@@ -176,6 +178,18 @@ public class WSDoAllReceiver extends BasicHandler {
 			}
 		}
 
+        /*
+         * save the processed-header flags
+         */ 
+        ArrayList processedHeaders = new ArrayList();
+        Iterator iterator = sm.getSOAPEnvelope().getHeaders().iterator();
+        while (iterator.hasNext()) {
+            org.apache.axis.message.SOAPHeaderElement tempHeader = (org.apache.axis.message.SOAPHeaderElement) iterator.next();
+            if (tempHeader.isProcessed()) {
+                processedHeaders.add(tempHeader.getQName());
+            }
+        }        
+        
 		/*
 		 * If we had some security processing, get the original
 		 * SOAP part of Axis' message and replace it with new SOAP
@@ -191,6 +205,16 @@ public class WSDoAllReceiver extends BasicHandler {
 			log.debug(org.apache.axis.utils.XMLUtils.PrettyDocumentToString(doc));
 		}
 		
+		/*
+         * set the original processed-header flags
+         */
+        iterator = processedHeaders.iterator();
+        while (iterator.hasNext()) {
+            QName qname = (QName) iterator.next();
+            org.apache.axis.message.SOAPHeaderElement tempHeader = (org.apache.axis.message.SOAPHeaderElement) sm.getSOAPEnvelope().getHeadersByName(qname.getNamespaceURI(),qname.getLocalPart()); 
+			tempHeader.setProcessed(true);
+		}        
+
 		/*
 		 * After setting the new current message, probably modified because
 		 * of decryption, we need to locate the security header. That is,
