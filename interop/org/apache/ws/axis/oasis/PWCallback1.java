@@ -72,6 +72,8 @@ public class PWCallback1 implements CallbackHandler {
                     pc.setPassword("interop");
                 } else if(pc.getIdentifer().equals("86ab6c4828bcde6983d81b2b59ff426c_a8272f6f-2c94-436e-aa71-d8d2be4647f6")) {
                     pc.setPassword("interop");
+                } else if(pc.getIdentifer().equals("Ron")) {
+                    pc.setPassword("noR");
                 } else {
                     pc.setPassword("sirhC");
                 }
