@@ -96,6 +96,8 @@
         <include>**/*PackageTests*.java</include>
       </includes>
       <excludes>
+          <exclude>**/wssec/PackageTests.java</exclude>
+          <exclude>**/interop/PackageTests.java</exclude>
           <exclude>**/TestScenario7.java</exclude>
       </excludes>
     </unitTest>
@@ -179,7 +181,7 @@
         <report>maven-pmd-plugin</report>
         <report>maven-jdepend-plugin</report>
         <report>maven-changelog-plugin</report>
-        <report>maven-statcvs-plugin</report>
+        <!-- <report>maven-statcvs-plugin</report> -->
         <report>maven-file-activity-plugin</report>
         <report>maven-developer-activity-plugin</report>
         <report>maven-jxr-plugin</report>

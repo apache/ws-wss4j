@@ -347,13 +347,7 @@ org.apache.ws.axis.security.util
     <target name="compile.tests"
         depends="compile.interops"
         if="junit.present">
-        <!--
-        <ant dir="${dir.test}/secconv"
-            antfile="build.xml"
-            target="compile"
-            inheritAll="false">
-        </ant>
-        -->
+
         <javac srcdir="${dir.test}" destdir="${build.classes}" debug="on">
             <classpath refid="classpath.test"/>
             <exclude name="**/secconv/*.java"/>
