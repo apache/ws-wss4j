@@ -412,17 +412,17 @@ public class WSDoAllConstants {
 	 * Specific parameter for UsernameToken action to define the encoding
 	 * of the passowrd.
 	 * <p/>
-	 * The parameter can be set to either {@link WSConstants#PASSWORD_DIGEST}
-	 * or to {@link WSConstants#PASSWORD_TEXT}.
+	 * The parameter can be set to either {@link WSConstants#PW_DIGEST}
+	 * or to {@link WSConstants#PW_TEXT}.
 	 * <p/>
 	 * The application may set this parameter using the following method:
 	 * <pre>
-	 * call.setProperty(WSDoAllConstants.PASSWORD_TYPE, WSConstants.PASSWORD_DIGEST);
+	 * call.setProperty(WSDoAllConstants.PASSWORD_TYPE, WSConstants.PW_DIGEST);
 	 * </pre>
 	 * However, the parameter in the WSDD deployment file overwrites the
 	 * property setting (deployment setting overwrites application setting).
 	 * <p/>
-	 * The default setting is PASSWORD_DIGEST.
+	 * The default setting is PW_DIGEST.
 	 */
 	public static final String PASSWORD_TYPE = "passwordType";
 

@@ -86,6 +86,7 @@ public interface WSConstants {
 	 * <p/>
 	 * This is a required method as defined by WS Specification, Username token profile.
 	 */
+	public static final String PW_DIGEST = "PasswordDigest";
 	public static final String PASSWORD_DIGEST = WSSE_NS + "#PasswordDigest";
 
 	/**
@@ -94,6 +95,8 @@ public interface WSConstants {
 	* <p/>
 	* This is a required method as defined by WS Specification, Username token profile.
 	*/
+	public static final String PW_TEXT = "PasswordText";
+
 	public static final String PASSWORD_TEXT = WSSE_NS + "#PasswordText";
 
 	/**

@@ -142,13 +142,8 @@ public class UsernameToken {
             hashed = false;
         } else {
             hashed = true;
-            
-            if (elementNonce == null) {
-            	addNonce(doc);
-            } 
-			if (elementCreated == null) {
-				addCreated(doc);
-			}            
+           	addNonce(doc);
+			addCreated(doc);
        }
     }
 
@@ -156,6 +151,9 @@ public class UsernameToken {
 	 * Creates and adds a Nonce element to this UsernameToken
 	 */
 	public void addNonce(Document doc) {
+		if (elementNonce != null) {
+			return;
+		}
 		byte[] nonceValue = new byte[16];
 		random.nextBytes(nonceValue);
 		this.elementNonce = doc.createElementNS(WSConstants.WSSE_NS, "wsse:" + WSConstants.NONCE_LN);
@@ -168,6 +166,9 @@ public class UsernameToken {
 	 * Creates and adds a Created element to this UsernameToken
 	 */
 	public void addCreated(Document doc) {
+		if (elementCreated != null) {
+			return;
+		}
 		SimpleDateFormat zulu = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
 		zulu.setTimeZone(TimeZone.getTimeZone("GMT"));
 		Calendar rightNow = Calendar.getInstance();

@@ -232,19 +232,20 @@ public class WSDoAllSender extends BasicHandler {
 					WSSAddUsernameToken builder =
 						new WSSAddUsernameToken(actor, mu);
 					builder.setPasswordType(pwType);
+					// add the UsernameToken to the SOAP Enevelope
+					builder.build(doc, username, password);
 
 					if (utElements != null && utElements.length > 0) {
 						for (int j = 0; j < utElements.length; j++) {
-							if (utElements[i].equals("Nonce")) {
+							utElements[j].trim();
+							if (utElements[j].equals("Nonce")) {
 								builder.addNonce(doc);
 							}
-							if (utElements[i].equals("Created")) {
+							if (utElements[j].equals("Created")) {
 								builder.addCreated(doc);
 							}
 						}
 					}
-					// add the UsernameToken to the SOAP Enevelope
-					builder.build(doc, username, password);
 					break;
 
 				case WSConstants.ENCR :
@@ -418,11 +419,17 @@ public class WSDoAllSender extends BasicHandler {
 			pwType =
 				(String) msgContext.getProperty(WSDoAllConstants.PASSWORD_TYPE);
 		}
+		if (pwType != null) {
+			pwType =
+				pwType.equals(WSConstants.PW_TEXT)
+					? WSConstants.PASSWORD_TEXT
+					: WSConstants.PASSWORD_DIGEST;
+		}
 		String tmpS = null;
-		if ((tmpS = (String) getOption(WSDoAllConstants.PASSWORD_TYPE))
+		if ((tmpS = (String) getOption(WSDoAllConstants.ADD_UT_ELEMENTS))
 			== null) {
 			tmpS =
-				(String) msgContext.getProperty(WSDoAllConstants.PASSWORD_TYPE);
+				(String) msgContext.getProperty(WSDoAllConstants.ADD_UT_ELEMENTS);
 		}
 		if (tmpS != null) {
 			utElements = tmpS.split(" ");
