@@ -1,0 +1,52 @@
+<!-- Use this file to deploy some handlers/chains and services      -->
+<!-- Two ways to do this:                                           -->
+<!--   java org.apache.axis.client.AdminClient deploy.wsdd          -->
+<!--      after the axis server is running                          -->
+<!-- or                                                             -->
+<!--   java org.apache.axis.utils.Admin client|server deploy.wsdd   -->
+<!--      from the same directory that the Axis engine runs         -->
+
+<deployment
+    xmlns="http://xml.apache.org/axis/wsdd/"
+    xmlns:java="http://xml.apache.org/axis/wsdd/providers/java">
+
+  <!-- Services from EchoService WSDL service -->
+
+   <service name="EchoInterop" provider="java:RPC" style="document" use="literal">
+      <parameter name="wsdlTargetNamespace" value="http://fabrikam.com/examples"/>
+      <parameter name="wsdlServiceElement" value="EchoService"/>
+      <parameter name="wsdlServicePort" value="EchoInterop"/>
+      <parameter name="className" value="org.apache.trust.secconv.axis.fabrikam.examples.EchoInteropBindingImpl"/>
+      <parameter name="wsdlPortType" value="EchoPort"/>
+      <operation name="echoMyData" qname="echoMyData" soapAction="" >
+        <parameter qname="pns:MyData" xmlns:pns="http://fabrikam.com/examples" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema" mode="INOUT"/>
+      </operation>
+      <parameter name="allowedMethods" value="echoMyData"/>
+
+
+<requestFlow>
+   <handler type="java:org.apache.ws.axis.security.conversation.ConversationServerHandler" >
+	<!--Key configuration-->
+	<parameter name="keyFrequency" value="1" />
+	<parameter name="useFixedKeyLegnth" value="true" />
+	<parameter name="keyLegnth" value="24" />
+	<parameter name="derivedKeyAction" value="Encrypt"/>
+     	<parameter name="passwordCallbackClass" value="org.apache.ws.axis.oasis.PWCallback"/>
+	<parameter name="decryptionPropFile" value="crypto.properties"/>
+    </handler> 
+  </requestFlow>
+   <responseFlow>
+   <handler type="java:org.apache.ws.axis.security.conversation.ConversationServerHandler" >
+   	<!--Key configuration-->
+	<parameter name="keyFrequency" value="1" />
+	<parameter name="useFixedKeyLegnth" value="true" />
+	<parameter name="keyLegnth" value="24" />
+	<parameter name="derivedKeyAction" value="Encrypt"/>
+
+<parameter name="dkEncryptionAlgorithm" value="http://www.w3.org/2001/04/xmlenc#aes128-cbc"/>
+
+   </handler>
+</responseFlow>
+
+  </service>
+</deployment>
