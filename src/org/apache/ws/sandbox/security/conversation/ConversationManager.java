@@ -274,13 +274,13 @@ public class ConversationManager {
 
         if (ref == null) {
             throw new WSSecurityException(WSSecurityException.FAILURE,
-                    "Invalid Data",
+                    "invalidData",
                     new Object[]{"For symmeric key signatures - Reference object must be provided"});
         }
 
         if (sk == null) {
             throw new WSSecurityException(WSSecurityException.FAILURE,
-                    "Invalid Data",
+                    "invalidData",
                     new Object[]{"For symmeric key signatures - Reference object must be provided"});
         }
         String sigAlgo = XMLSignature.ALGO_ID_MAC_HMAC_SHA1;
