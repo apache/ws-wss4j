@@ -717,7 +717,7 @@ public class WSSecurityEngine {
          */
 		else if (secRef.containsKeyIdentifier()) {
 			X509Certificate[] certs = secRef.getKeyIdentifier(crypto);
-            if (certs == null || certs.length == 0 || certs[0] == null) {
+            if (certs == null || certs.length != 1 || certs[0] == null) {
                 throw new WSSecurityException(WSSecurityException.FAILURE,
 					"invalidX509Data", new Object[]{"for decryption (KeyId)"});
             }
@@ -727,6 +727,7 @@ public class WSSecurityEngine {
              */
             alias = crypto.getAliasForX509Cert(certs[0]);
             if (doDebug) {
+            	log.debug("cert: " + certs[0]);
 				log.debug("KeyIdentifier Alias: " + alias);
             }
 		} else if (secRef.containsReference()) {

@@ -46,6 +46,7 @@ public class WSBaseMessage {
 	protected String password = null;
 	protected int keyIdentifierType = WSConstants.ISSUER_SERIAL;
 	protected Vector parts = null;
+	protected int timeToLive = 300;		// time between Created and Expires
 	
 	protected boolean doDebug = false;
 
@@ -87,6 +88,17 @@ public class WSBaseMessage {
 		actor = act;
 	}
 
+	/**
+	 * Set the time to live.
+	 * This is the time difference in seconds between the <code>Created</code>
+	 * and the <code>Expires</code> in <code>Timestamp</code>.
+	 * <p/>
+	 * 
+	 * @param ttl The time to live in second
+	 */
+	public void setTimeToLive(int ttl) {
+		timeToLive = ttl;
+	}
 	/**
 	 * Set which parts of the message to encrypt/sign.
 	 * <p/>
@@ -240,11 +252,26 @@ public class WSBaseMessage {
 				zulu.setTimeZone(TimeZone.getTimeZone("GMT"));
 				Calendar rightNow = Calendar.getInstance();
 
-				Element elementCreated = doc.createElementNS(WSConstants.WSU_NS, "wsu:" + WSConstants.CREATED_LN);
-				WSSecurityUtil.setNamespace(elementTime, WSConstants.WSU_NS, WSConstants.WSU_PREFIX);				
+				Element elementCreated =
+					doc.createElementNS(
+						WSConstants.WSU_NS,
+						WSConstants.WSU_PREFIX + ":" + WSConstants.CREATED_LN);
+				WSSecurityUtil.setNamespace(elementCreated, WSConstants.WSU_NS, WSConstants.WSU_PREFIX);				
 				elementCreated.appendChild(doc.createTextNode(zulu.format(rightNow.getTime())));
 				
+				long currentTime = rightNow.getTimeInMillis();
+				currentTime += timeToLive * 1000;
+				rightNow.setTimeInMillis(currentTime);
+				
+				Element elementExpires =
+					doc.createElementNS(
+						WSConstants.WSU_NS,
+						WSConstants.WSU_PREFIX + ":" + WSConstants.EXPIRES_LN);
+				WSSecurityUtil.setNamespace(elementExpires, WSConstants.WSU_NS, WSConstants.WSU_PREFIX);				
+				elementExpires.appendChild(doc.createTextNode(zulu.format(rightNow.getTime())));
+
 				elementTime.appendChild(elementCreated);
+				elementTime.appendChild(elementExpires);
 				securityHeader.appendChild(elementTime);
 			}
 		}

@@ -503,7 +503,7 @@ public class WSDoAllSender extends BasicHandler {
 			if (!(encKeyId == WSConstants.ISSUER_SERIAL
 				|| encKeyId == WSConstants.X509_KEY_IDENTIFIER
                 || encKeyId == WSConstants.SKI_KEY_IDENTIFIER
-                || encKeyId == WSConstants.SKI_KEY_IDENTIFIER_DIRECT
+                || encKeyId == WSConstants.BST_DIRECT_REFERENCE
 				|| encKeyId == WSConstants.EMBEDDED_KEYNAME)) {
 				throw new AxisFault("WSDoAllSender: Encryption: illegal key identification");
 			}

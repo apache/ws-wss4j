@@ -270,6 +270,7 @@ public class WSSignEnvelope extends WSBaseMessage {
 			WSEncryptionPart encPart = (WSEncryptionPart)parts.get(part);
 			String elemName = encPart.getName();
 			String nmSpace = encPart.getNamespace();
+			log.debug("parts: '" + elemName +"', "+nmSpace);
 
 		/*
 	 	 * Set up the elements to sign. 
@@ -291,7 +292,8 @@ public class WSSignEnvelope extends WSBaseMessage {
 					sig.addDocument("#" + keyInfoUri, transforms);
 				}
 			}
-			else if (elemName.equals("STRTransform")) {
+			else if (elemName.equals("STRTransform")) { // STRTransform
+				log.debug("in STRTRANSFORM");
 				Element ctx = createSTRParameter(doc);	// This element shall conatin the arg to STR
 				transforms = new Transforms(doc);
 				transforms.addTransform(STRTransform.implementedTransformURI, ctx);

@@ -210,7 +210,7 @@ public class SecurityTokenReference {
 		Element keyId =
 			doc.createElementNS(WSConstants.WSSE_NS, "wsse:KeyIdentifier");
 		keyId.setAttributeNS(null, "ValueType", SKI_URI);
-		//keyId.setAttributeNS(null, "EncodingType", BinarySecurity.BASE64_ENCODING);
+		keyId.setAttributeNS(null, "EncodingType", BinarySecurity.BASE64_ENCODING);
 		keyId.appendChild(skiText);
 		Element elem = getFirstElement();
 		if (elem != null) {

@@ -64,7 +64,7 @@ public class TestWSSecurity2 extends TestCase implements CallbackHandler {
             "</soapenv:Envelope>";
 
     static final WSSecurityEngine secEngine = new WSSecurityEngine();
-    static final Crypto crypto = CryptoFactory.getInstance();
+    static final Crypto crypto = CryptoFactory.getInstance("cryptoSKI.properties");
     MessageContext msgContext;
     Message message;
 
@@ -136,7 +136,7 @@ public class TestWSSecurity2 extends TestCase implements CallbackHandler {
         SOAPEnvelope unsignedEnvelope = message.getSOAPEnvelope();
         SOAPEnvelope envelope = null;
         WSEncryptBody builder = new WSEncryptBody();
-        builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e");
+        builder.setUserInfo("wss4jcert");
 		builder.setKeyIdentifierType(WSConstants.X509_KEY_IDENTIFIER);
         Document doc = unsignedEnvelope.getAsDocument();
         log.info("Before Encryption Triple DES....");
@@ -198,12 +198,12 @@ public class TestWSSecurity2 extends TestCase implements CallbackHandler {
 	 * <p/>
 	 * 
 	 * @throws Exception Thrown when there is any problem in signing or verification
-	 *
+	 */
  	public void testEncryptionDecryptionOAEP() throws Exception {
 		SOAPEnvelope unsignedEnvelope = message.getSOAPEnvelope();
 		SOAPEnvelope envelope = null;
 		WSEncryptBody builder = new WSEncryptBody();
-		builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e");
+		builder.setUserInfo("wss4jcert");
 		builder.setKeyIdentifierType(WSConstants.X509_KEY_IDENTIFIER);
 		builder.setKeyEnc(WSConstants.KEYTRANSPORT_RSAOEP);
 		Document doc = unsignedEnvelope.getAsDocument();
@@ -222,7 +222,6 @@ public class TestWSSecurity2 extends TestCase implements CallbackHandler {
 		verify(encryptedDoc);
 
 	}
-	*/
 	
     /**
      * Verifies the soap envelope

@@ -50,6 +50,7 @@ public interface WSConstants {
     public static final String PASSWORD_TYPE_ATTR = "Type";
     public static final String NONCE_LN = "Nonce";
     public static final String CREATED_LN = "Created";
+	public static final String EXPIRES_LN ="Expires";
 
 	//
 	// SOAP-ENV Namespaces
