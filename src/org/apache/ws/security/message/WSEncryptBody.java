@@ -332,12 +332,19 @@ public class WSEncryptBody extends WSBaseMessage {
 			String xencEncryptedDataId = null;
 
 			// get the encrypted data element
-			body =
-				(Element) WSSecurityUtil.findElement(
-					envelope,
-					"EncryptedData",
-					WSConstants.ENC_NS);
-			xencEncryptedDataId = "EncDataId-" + body.hashCode();
+			body = envelope;
+			while (xencEncryptedDataId == null) {
+				body = 
+					(Element) WSSecurityUtil.findNextElement(
+						envelope,
+						"EncryptedData",
+						WSConstants.ENC_NS,
+						body);
+				String tempId = "EncDataId-" + body.hashCode();
+				if (!encDataRefs.contains("#" + tempId)) {
+					xencEncryptedDataId = tempId;
+				}
+			}
 			body.setAttribute("Id", xencEncryptedDataId);
 
 			encDataRefs.add(new String("#" + xencEncryptedDataId));
