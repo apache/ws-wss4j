@@ -30,14 +30,14 @@ import org.apache.axis.handlers.BasicHandler;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.axis.security.util.AxisUtil;
-import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.SOAPConstants;
+import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSecurityEngine;
-import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.WSSecurityEngineResult;
-import org.apache.ws.security.util.WSSecurityUtil;
+import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
+import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.xml.security.utils.XMLUtils;
 import org.w3c.dom.Document;
 
@@ -69,7 +69,7 @@ public class WSDoAllReceiver extends BasicHandler {
 	 * Axis calls invoke to handle a message.
 	 * <p/>
 	 * 
-	 * @param msgContext message context.
+	 * @param mc message context.
 	 * @throws AxisFault 
 	 */
 	public void invoke(MessageContext mc) throws AxisFault {
@@ -177,12 +177,11 @@ public class WSDoAllReceiver extends BasicHandler {
 		
 		ByteArrayOutputStream os = new ByteArrayOutputStream();
 		XMLUtils.outputDOM(doc, os, true);
-		String osStr = os.toString();
+        sPart.setCurrentMessage(os.toByteArray(), SOAPPart.FORM_BYTES);
 		if (doDebug) {
-			log.debug("Processed received SOAP request");
+            log.debug("Processed received SOAP request");
 			log.debug(org.apache.axis.utils.XMLUtils.PrettyDocumentToString(doc));
 		}
-		sPart.setCurrentMessage(osStr, SOAPPart.FORM_STRING);
 		
 		/*
 		 * After setting the new current message, probably modified because

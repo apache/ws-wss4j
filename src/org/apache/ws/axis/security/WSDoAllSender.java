@@ -67,8 +67,6 @@ public class WSDoAllSender extends BasicHandler {
 
 	private MessageContext msgContext = null;
 
-	private int securityAction = WSConstants.NO_SECURITY;
-
 	private boolean noSerialization = false;
 	
 	private SOAPConstants soapConstants = null;
@@ -110,7 +108,7 @@ public class WSDoAllSender extends BasicHandler {
 	 * Axis calls invoke to handle a message.
 	 * <p/>
 	 * 
-	 * @param msgContext message context.
+	 * @param mc message context.
 	 * @throws AxisFault 
 	 */
 	public void invoke(MessageContext mc) throws AxisFault {
