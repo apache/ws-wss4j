@@ -1,0 +1,19 @@
+<deployment xmlns="http://xml.apache.org/axis/wsdd/"
+            xmlns:java="http://xml.apache.org/axis/wsdd/providers/java">
+
+  <!-- define the logging handler configuration -->
+ <handler name="track" type="java:org.apache.ws.axis.security.WSSecurityVerifyHandler">
+ </handler>
+
+ <!-- define the service, using the log handler we just defined -->
+ <service name="http://localhost:8080/LogTestService" provider="java:RPC">
+  <requestFlow>
+   <handler type="track"/>
+  </requestFlow>
+
+  <parameter name="className" value="org.apache.ws.axis.samples.wssec.security.Service"/>
+  <parameter name="allowedMethods" value="*"/>
+ </service>
+
+</deployment>
+

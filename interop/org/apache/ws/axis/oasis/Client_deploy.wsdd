@@ -1,0 +1,151 @@
+<deployment xmlns="http://xml.apache.org/axis/wsdd/"
+            xmlns:java="http://xml.apache.org/axis/wsdd/providers/java">
+
+ <!-- define the service, using the WSDoAllSender security handler in request flow -->
+ <service name="Ping1">
+  <requestFlow>
+   <handler type="java:org.apache.ws.axis.security.WSDoAllSender" >
+    <parameter name="user" value="werner"/>
+    <parameter name="passwordCallbackClass" 
+      value="org.apache.ws.axis.oasis.PWCallback"/>
+    <parameter name="action" value="UsernameToken"/>
+    <parameter name="passwordType" value="PasswordText" />
+   </handler>
+  </requestFlow>
+  </service>
+
+ <service name="Ping2">
+  <requestFlow>
+   <handler type="java:org.apache.ws.axis.security.WSDoAllSender" >
+    <parameter name="action" value="UsernameToken Encrypt"/>
+    <parameter name="user" value="werner"/>
+    <parameter name="passwordCallbackClass" 
+      value="org.apache.ws.axis.oasis.PWCallback"/>
+    <parameter name="passwordType" value="PasswordText" />
+    <parameter name="addUTElement" value="Nonce Created" />
+    <parameter name="encryptionPropFile" value="crypto.properties" />
+    <parameter name="encryptionKeyIdentifier" value="X509KeyIdentifier" />
+    <parameter name="encryptionUser" value="16c73ab6-b892-458f-abf5-2f875f74882e" />
+    <parameter name="encryptionParts" value="{Element}{http://schemas.xmlsoap.org/ws/2002/07/secext}UsernameToken" />  
+   </handler>
+  </requestFlow>
+  </service>
+  
+ <service name="Ping3">
+  <requestFlow>
+   <handler type="java:org.apache.ws.axis.security.WSDoAllSender" >
+    <parameter name="action" value="Signature Encrypt"/>
+    <parameter name="user" value="16c73ab6-b892-458f-abf5-2f875f74882e"/>
+    <parameter name="passwordCallbackClass" 
+      value="org.apache.ws.axis.oasis.PWCallback"/>
+    <parameter name="signatureKeyIdentifier" value="DirectReference" />
+    <parameter name="signaturePropFile" value="crypto.properties" />
+    <parameter name="encryptionKeyIdentifier" value="X509KeyIdentifier" />
+    <parameter name="encryptionUser" value="16c73ab6-b892-458f-abf5-2f875f74882e" />
+   </handler>
+  </requestFlow>
+  <responseFlow>
+   <handler name="DoSecurityReceiver" type="java:org.apache.ws.axis.security.WSDoAllReceiver">
+    <parameter name="passwordCallbackClass" 
+      value="org.apache.ws.axis.oasis.PWCallback"/>
+    <parameter name="action" value="Signature Encrypt"/>
+    <parameter name="signaturePropFile" value="crypto.properties" />
+   </handler>
+  </responseFlow>
+  </service>
+
+ <service name="Ping4">
+  <requestFlow>
+   <handler type="java:org.apache.ws.axis.security.WSDoAllSender" >
+    <parameter name="action" value="Signature Encrypt"/>
+    <parameter name="user" value="16c73ab6-b892-458f-abf5-2f875f74882e"/>
+    <parameter name="passwordCallbackClass" 
+      value="org.apache.ws.axis.oasis.PWCallback"/>
+    <parameter name="signatureKeyIdentifier" value="DirectReference" />
+    <parameter name="signaturePropFile" value="crypto.properties" />
+    <parameter name="encryptionKeyIdentifier" value="EmbeddedKeyName" />
+    <parameter name="EmbeddedKeyCallbackClass" 
+      value="org.apache.ws.axis.oasis.PWCallback" />
+   </handler>
+  </requestFlow>
+  <responseFlow>
+   <handler type="java:org.apache.ws.axis.security.WSDoAllReceiver">
+    <parameter name="passwordCallbackClass" 
+      value="org.apache.ws.axis.oasis.PWCallback"/>
+    <parameter name="action" value="Signature Encrypt"/>
+    <parameter name="signaturePropFile" value="crypto.properties" />
+   </handler>
+  </responseFlow>
+  
+  </service>
+
+ <service name="Ping5">
+  <requestFlow>
+   <handler type="java:org.apache.ws.axis.security.WSDoAllSender" >
+    <parameter name="action" value="Signature NoSerialization"/>
+    <parameter name="user" value="16c73ab6-b892-458f-abf5-2f875f74882e"/>
+    <parameter name="passwordCallbackClass" 
+      value="org.apache.ws.axis.oasis.PWCallback"/>
+    <parameter name="signatureKeyIdentifier" value="DirectReference" />
+    <parameter name="signaturePropFile" value="crypto.properties" />
+    <parameter name="signatureParts" value="{}{http://xmlsoap.org/Ping}ticket" />    
+   </handler>
+   <handler type="java:org.apache.ws.axis.security.WSDoAllSender" >
+    <parameter name="action" value="Signature"/>
+    <parameter name="user" value="16c73ab6-b892-458f-abf5-2f875f74882e"/>
+    <parameter name="passwordCallbackClass" 
+      value="org.apache.ws.axis.oasis.PWCallback"/>
+    <parameter name="signatureKeyIdentifier" value="X509KeyIdentifier" />
+    <parameter name="signaturePropFile" value="crypto.properties" />
+   </handler>  
+  </requestFlow>
+  </service>
+
+ <service name="Ping6">
+  <requestFlow>
+   <handler type="java:org.apache.ws.axis.security.WSDoAllSender" >
+    <parameter name="action" value="Encrypt Signature"/>
+    <parameter name="user" value="16c73ab6-b892-458f-abf5-2f875f74882e"/>
+    <parameter name="passwordCallbackClass" 
+      value="org.apache.ws.axis.oasis.PWCallback"/>
+    <parameter name="signatureKeyIdentifier" value="DirectReference" />
+    <parameter name="signaturePropFile" value="crypto.properties" />
+    <parameter name="encryptionKeyIdentifier" value="X509KeyIdentifier" />
+    <parameter name="encryptionUser" value="16c73ab6-b892-458f-abf5-2f875f74882e" />
+   </handler>
+  </requestFlow>
+  <responseFlow>
+   <handler name="DoSecurityReceiver" type="java:org.apache.ws.axis.security.WSDoAllReceiver">
+    <parameter name="passwordCallbackClass" value="org.apache.ws.axis.oasis.PWCallback"/>
+    <parameter name="action" value="Encrypt Signature"/>
+    <parameter name="signaturePropFile" value="crypto.properties" />
+   </handler>
+  </responseFlow>
+  </service>
+
+ <service name="Ping7">
+  <requestFlow>
+   <handler type="java:org.apache.ws.axis.security.WSDoAllSender" >
+    <parameter name="action" value="Signature Encrypt"/>
+    <parameter name="user" value="16c73ab6-b892-458f-abf5-2f875f74882e"/>
+    <parameter name="passwordCallbackClass" 
+      value="org.apache.ws.axis.oasis.PWCallback"/>
+    <parameter name="signatureKeyIdentifier" value="DirectReference" />
+    <parameter name="signatureParts"
+      value="{}{http://schemas.xmlsoap.org/soap/envelope/}Body; STRTransform" />
+    <parameter name="signaturePropFile" value="crypto.properties" />
+    <parameter name="encryptionKeyIdentifier" value="X509KeyIdentifier" />
+    <parameter name="encryptionUser" value="16c73ab6-b892-458f-abf5-2f875f74882e" />
+   </handler>
+  </requestFlow>
+  <responseFlow>
+   <handler name="DoSecurityReceiver" type="java:org.apache.ws.axis.security.WSDoAllReceiver">
+    <parameter name="passwordCallbackClass" 
+      value="org.apache.ws.axis.oasis.PWCallback"/>
+    <parameter name="action" value="Signature Encrypt"/>
+    <parameter name="signaturePropFile" value="crypto.properties" />
+   </handler>
+  </responseFlow>
+  </service>
+  
+</deployment>

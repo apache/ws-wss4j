@@ -1,0 +1,11 @@
+<deployment xmlns="http://xml.apache.org/axis/wsdd/"
+            xmlns:java="http://xml.apache.org/axis/wsdd/providers/java">
+
+ <!-- define the service, using the log handler we just defined -->
+ <service name="http://localhost:8080/LogTestService2" provider="java:RPC">
+  <parameter name="className" value="org.apache.ws.axis.samples.wssec.security2.Service"/>
+  <parameter name="allowedMethods" value="*"/>
+ </service>
+
+</deployment>
+

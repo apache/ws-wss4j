@@ -1,0 +1,11 @@
+<undeployment xmlns="http://xml.apache.org/axis/wsdd/"
+            xmlns:java="http://xml.apache.org/axis/wsdd/providers/java">
+ <globalConfiguration>
+  <requestFlow>
+   <!-- define the client Signing handler configuration -->
+   <handler type="java:org.apache.ws.security.WSSecuritySigningHandler">
+   </handler>
+  </requestFlow>
+ </globalConfiguration>
+</undeployment>
+
