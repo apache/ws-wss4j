@@ -367,6 +367,7 @@ org.apache.ws.axis.security.util
         <!-- Compile the java code from ${dir.src} into ${build.classes} -->
         <javac srcdir="${dir.samples}"
             debug="on"
+            source="1.4"
             destdir="${build.classes}">
             <classpath refid="classpath.library"/>
         </javac>

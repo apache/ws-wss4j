@@ -243,9 +243,9 @@ public class InteropHandshaker {
 				throw new RuntimeException("Cannot load properties: " + propFilename);
 			}
 			this.options = new Hashtable();
-			Enumeration enum = properties.keys();
-			while(enum.hasMoreElements()) {
-				String key = (String)enum.nextElement();
+			Enumeration enumKeys = properties.keys();
+			while(enumKeys.hasMoreElements()) {
+				String key = (String)enumKeys.nextElement();
 				this.options.put(key,properties.getProperty(key));
 			}
 		}
