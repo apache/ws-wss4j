@@ -651,10 +651,10 @@ public class WSSecurityEngine {
         }
         Cipher cipher = null;
         if (keyEncAlgo.equalsIgnoreCase(WSConstants.KEYTRANSPORT_RSA15)) {
-            cipher = Cipher.getInstance("RSA");
+            cipher = Cipher.getInstance("RSA/ECB/PKCS1PADDING","BC");
         } 
         else if (keyEncAlgo.equalsIgnoreCase(WSConstants.KEYTRANSPORT_RSAOEP)) {
-			cipher = Cipher.getInstance("RSA/NONE/OAEPPADDING");
+			cipher = Cipher.getInstance("RSA/NONE/OAEPPADDING","BC");
         }
         else {
             throw new WSSecurityException
