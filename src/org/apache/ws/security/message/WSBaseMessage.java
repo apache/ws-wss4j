@@ -254,6 +254,7 @@ public class WSBaseMessage {
                     WSSecurityUtil.findWsseSecurityHeaderBlock(wssConfig,
                             doc,
                             doc.getDocumentElement(),
+                            actor,
                             true);
 
             String soapPrefix =

@@ -651,7 +651,7 @@ public class WSSecurityUtil {
     }
 
     /**
-     * find the ws-security header block
+     * find the first ws-security header block
      * <p/>
      *
      * @param doc
@@ -660,24 +660,35 @@ public class WSSecurityUtil {
      * @return
      */
     public static Element findWsseSecurityHeaderBlock(WSSConfig wssConfig, Document doc, Element envelope, boolean doCreate) {
+        return findWsseSecurityHeaderBlock(wssConfig, doc, envelope, null, doCreate);
+    }
+
+    /**
+     * find a ws-security header block for a given actor
+     * <p/>
+     *
+     * @param doc
+     * @param envelope
+     * @param actor
+     * @param doCreate
+     * @return
+     */
+    public static Element findWsseSecurityHeaderBlock(WSSConfig wssConfig,
+                                                      Document doc,
+                                                      Element envelope,
+                                                      String actor,
+                                                      boolean doCreate) {
         SOAPConstants sc = getSOAPConstants(envelope);
+        Element wsseSecurity = getSecurityHeader(wssConfig, doc, actor, sc);
+        if (wsseSecurity != null) {
+            return wsseSecurity;
+        }
         Element header = findChildElement(envelope, sc.getEnvelopeURI(), sc.getHeaderQName().getLocalPart());
         if (header == null) {
             if (doCreate) {
                 header = createElementInSameNamespace(envelope, sc.getHeaderQName().getLocalPart());
                 header = prependChildElement(doc, envelope, header, true);
             }
-        }
-        Element wsseSecurity = null;
-        if (wssConfig.getProcessNonCompliantMessages()) {
-            for (int i = 0; wsseSecurity == null && i < WSConstants.WSSE_NS_ARRAY.length; ++i) {
-                wsseSecurity = findChildElement(header, WSConstants.WSSE_NS_ARRAY[i], "Security");
-            }
-        } else {
-            wsseSecurity = findChildElement(header, wssConfig.getWsseNS(), "Security");
-        }
-        if (wsseSecurity != null) {
-            return wsseSecurity;
         }
         if (doCreate) {
             wsseSecurity = header.getOwnerDocument().createElementNS(wssConfig.getWsseNS(), "wsse:Security");
