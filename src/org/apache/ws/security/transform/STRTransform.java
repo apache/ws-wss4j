@@ -22,6 +22,7 @@ import org.apache.ws.security.WSDocInfoStore;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.message.token.SecurityTokenReference;
 import org.apache.ws.security.message.token.X509Security;
+import org.apache.ws.security.message.token.BinarySecurity;
 import org.apache.ws.security.util.WSSecurityUtil;
 
 
@@ -46,8 +47,11 @@ import javax.xml.transform.TransformerException;
 
 import java.security.cert.X509Certificate;
 
+import java.io.PrintWriter;
+
 import org.xml.sax.SAXException;
 import org.w3c.dom.Node;
+import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Document;
@@ -234,6 +238,9 @@ public class STRTransform extends TransformSpi {
 			 * Convert resulting STR result doc into NodeList, then c14n
 			 */
 			XMLUtils.circumventBug2650(doc); // This is needed
+			org.apache.axis.utils.XMLUtils.PrettyDocumentToWriter(doc, new PrintWriter(System.out));
+
+/*
 
 			nodeList =
 				XPathAPI.selectNodeList(
@@ -243,7 +250,9 @@ public class STRTransform extends TransformSpi {
 			buf =
 				canon.canonicalizeXPathNodeSet(
 					XMLUtils.convertNodelistToSet(nodeList));
-
+*/
+			buf =
+				canon.canonicalizeSubtree(doc);
 			if (doDebug) {
 				bos = new ByteArrayOutputStream(buf.length);
 				bos.write(buf, 0, buf.length);
@@ -276,15 +285,10 @@ public class STRTransform extends TransformSpi {
 		 * contains the implementation of the key storage to use. To locate
 		 * a BST inside a document check if a BST was already found and the 
 		 * element stored in WSDocInfo.
-		 * 
-		 * As per OASIS WS specification this shall be a X509SubjectKeyIdentifier
-		 * (SKI) that points to a security token.
-		 * (are other reference types also possible/allowed?)
-		 * 
 		 *
-		 * Forth step: after security token was located, prepare it. Either
-		 * return BinarySecurityToken or wrap the located token
-		 * in a newly created BST element as specified in WS Specification.
+		 * Forth step: after security token was located, prepare it. Wrap the 
+		 * located token in a newly created BST element as specified in WSS 
+		 * Specification.
 		 * 
 		 * Note: every element (also newly created elements) belong to the
 		 * document defined by the doc parameter. This is the main SOAP document
@@ -306,10 +310,13 @@ public class STRTransform extends TransformSpi {
 			if (doDebug) {
 				log.debug("STR: Reference");
 			}
-			tokElement = secRef.getTokenElement(secRef, doc);
+			Element elem = secRef.getTokenElement(secRef, doc);
 			if (tokElement == null) {
 				throw new CanonicalizationException("empty");
 			}
+			X509Security x509token = new X509Security(elem);
+			X509Certificate cert = x509token.getX509Certificate(wsDocInfo.getCrypto());
+			tokElement = createBST(doc, cert, secRefE);
 		} 
 		/*
 		 * second case: IssuerSerial, first try to get embedded 
@@ -320,17 +327,19 @@ public class STRTransform extends TransformSpi {
 			if (doDebug) {
 				log.debug("STR: IssuerSerial");
 			}
+			X509Certificate cert = null;
 			X509Security x509token = secRef.getEmbeddedTokenFromIS(doc, wsDocInfo.getCrypto());
 			if (x509token != null) {
-				tokElement = x509token.getElement();
+				cert = x509token.getX509Certificate(wsDocInfo.getCrypto());
 			}
 			else {
 				X509Certificate[] certs = secRef.getX509IssuerSerial(wsDocInfo.getCrypto());
 				if (certs == null || certs.length == 0 || certs[0] == null) {
 					throw new CanonicalizationException("empty");
 				}
-				tokElement = createBST(doc, certs[0], secRefE);
+				cert = certs[0];
 			}	
+			tokElement = createBST(doc, cert, secRefE);
 		}
 		/*
 		 * third case: KeyIdentifier, must be SKI, first try to get embedded 
@@ -342,17 +351,19 @@ public class STRTransform extends TransformSpi {
 			if (doDebug) {
 				log.debug("STR: KeyIdentifier");
 			}
+			X509Certificate cert = null;
 			X509Security x509token = secRef.getEmbeddedTokenFromSKI(doc, wsDocInfo.getCrypto());
 			if (x509token != null) {
-				tokElement = x509token.getElement();
+				cert = x509token.getX509Certificate(wsDocInfo.getCrypto());
 			}
 			else {
 				X509Certificate[] certs = secRef.getKeyIdentifier(wsDocInfo.getCrypto());
 				if (certs == null || certs.length == 0 || certs[0] == null) {
 					throw new CanonicalizationException("empty");
 				}
-				tokElement = createBST(doc, certs[0], secRefE);
+				cert = certs[0];
 			}
+			tokElement = createBST(doc, cert, secRefE);
 		}
 		return (Element) tokElement;
 	}
@@ -369,8 +380,9 @@ public class STRTransform extends TransformSpi {
 				WSConstants.WSSE_NS,
 				prefix + ":BinarySecurityToken");
 		WSSecurityUtil.setNamespace(elem, WSConstants.WSSE_NS, prefix);
-
+		elem.setAttributeNS(WSConstants.XMLNS_NS, "xmlns", "");
 		elem.setAttributeNS(null, "ValueType", X509Security.TYPE);
+		// elem.setAttributeNS(null, "EncodingType", BinarySecurity.BASE64_ENCODING);
 		Text certText = doc.createTextNode(Base64.encode(data));
 		// Text certText = doc.createTextNode(data);
 		elem.appendChild(certText);
