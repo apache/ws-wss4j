@@ -48,6 +48,7 @@ public class WSUsernameTokenPrincipal implements Principal, java.io.Serializable
      */
     private String name = null;
     private String nonce = null;
+    private String password = null;
     private String createdTime = null;
     private boolean digest = false;
 
@@ -86,6 +87,28 @@ public class WSUsernameTokenPrincipal implements Principal, java.io.Serializable
      */
     public boolean isPasswordDigest() {
         return digest;
+    }
+
+    /**
+     * Set the WSUsernameToken password for this <code>WSUsernameTokenPrincipal</code>.
+     * <p/>
+     * <p/>
+     *
+     * @param password
+     */
+    public void setPassword(String password) {
+        this.password = nonce;
+    }
+
+    /**
+     * Return the WSUsernameToken password for this <code>WSUsernameTokenPrincipal</code>.
+     * <p/>
+     * <p/>
+     *
+     * @return the WSUsernameToken password for this <code>WSUsernameTokenPrincipal</code>
+     */
+    public String getPassword() {
+        return password;
     }
 
     /**

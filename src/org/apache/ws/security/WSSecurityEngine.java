@@ -756,53 +756,49 @@ public class WSSecurityEngine {
     public WSUsernameTokenPrincipal handleUsernameToken(Element token, CallbackHandler cb) throws WSSecurityException {
         UsernameToken ut = new UsernameToken(wssConfig, token);
         String user = ut.getName();
-        if (doDebug) {
-            log.debug("UsernameToken user " + user);
-        }
-        WSPasswordCallback pwCb = new WSPasswordCallback(user, WSPasswordCallback.USERNAME_TOKEN);
-        Callback[] callbacks = new Callback[1];
-        callbacks[0] = pwCb;
-        try {
-            cb.handle(callbacks);
-        } catch (IOException e) {
-            throw new WSSecurityException(WSSecurityException.FAILURE,
-                    "noPassword",
-                    new Object[]{user});
-        } catch (UnsupportedCallbackException e) {
-            throw new WSSecurityException(WSSecurityException.FAILURE,
-                    "noPassword",
-                    new Object[]{user});
-        }
-        String origPassword = pwCb.getPassword();
-        if (doDebug) {
-            log.debug("UsernameToken password " + origPassword);
-        }
-        if (origPassword == null) {
-            throw new WSSecurityException(WSSecurityException.FAILURE,
-                    "noPassword", new Object[]{user});
-        }
         String password = ut.getPassword();
-        boolean result = false;
-        WSUsernameTokenPrincipal principal = new WSUsernameTokenPrincipal(user, ut.isHashed());
         String nonce = ut.getNonce();
         String createdTime = ut.getCreated();
-        principal.setNonce(nonce);
-        principal.setCreatedTime(createdTime);
+        if (doDebug) {
+            log.debug("UsernameToken user " + user);
+            log.debug("UsernameToken password " + password);
+        }
         if (ut.isHashed()) {
+            WSPasswordCallback pwCb = new WSPasswordCallback(user, WSPasswordCallback.USERNAME_TOKEN);
+            Callback[] callbacks = new Callback[1];
+            callbacks[0] = pwCb;
+            try {
+                cb.handle(callbacks);
+            } catch (IOException e) {
+                throw new WSSecurityException(WSSecurityException.FAILURE,
+                        "noPassword",
+                        new Object[]{user});
+            } catch (UnsupportedCallbackException e) {
+                throw new WSSecurityException(WSSecurityException.FAILURE,
+                        "noPassword",
+                        new Object[]{user});
+            }
+            String origPassword = pwCb.getPassword();
+            if (doDebug) {
+                log.debug("UsernameToken callback password " + origPassword);
+            }
+            if (origPassword == null) {
+                throw new WSSecurityException(WSSecurityException.FAILURE,
+                        "noPassword", new Object[]{user});
+            }
             if (nonce != null && createdTime != null) {
                 String passDigest = UsernameToken.doPasswordDigest(nonce, createdTime, origPassword);
-                if (passDigest.equals(password)) {
-                    result = true;
+                if (!passDigest.equals(password)) {
+                    throw new WSSecurityException(WSSecurityException.FAILED_AUTHENTICATION);
                 }
             }
-        } else {
-            if (origPassword.equals(password)) {
-                result = true;
-            }
         }
-        if (!result) {
-            throw new WSSecurityException(WSSecurityException.FAILED_AUTHENTICATION);
-        }
+
+        WSUsernameTokenPrincipal principal = new WSUsernameTokenPrincipal(user, ut.isHashed());
+        principal.setNonce(nonce);
+        principal.setPassword(password);
+        principal.setCreatedTime(createdTime);
+
         return principal;
     }
 
