@@ -40,10 +40,13 @@ import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
 import java.security.cert.CertPath;
+import java.security.cert.CertPathValidator;
+import java.security.cert.CertPathValidatorException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
+import java.security.cert.PKIXParameters;
 import java.security.cert.X509Certificate;
 import java.util.Enumeration;
 import java.util.Iterator;
@@ -345,7 +348,6 @@ public class Merlin implements Crypto {
 	 */
 
 	public String getAliasForX509Cert(byte[] skiBytes) throws WSSecurityException {
-		String certIssuer[] = null;
 		Certificate cert = null;
 		boolean found = false;
 
@@ -533,7 +535,6 @@ public class Merlin implements Crypto {
 		byte data[] = null;
 		byte abyte0[] = null;
 		if (cert.getVersion() < 3) {
-			Object exArgs[] = { new Integer(cert.getVersion())};
 			throw new WSSecurityException(
 				1,
 				"noSKIHandling",
@@ -606,9 +607,6 @@ public class Merlin implements Crypto {
 	
 	/**
 	 * Uses the CertPath API to validate a given certificate chain
-	 * <p/>
-	 * TODO: Change hardcoded use of BC CertPathValidator to flexible
-	 * configuration via crypto.properties
 	 * 
 	 * @param certs      Certificate chain to validate
 	 * @return           true if the certificate chain is valid, false otherwise
@@ -617,21 +615,20 @@ public class Merlin implements Crypto {
 	public boolean validateCertPath(X509Certificate[] certs) throws WSSecurityException {	
 
 		try {
+			// Generate cert path
 			java.util.List certList = java.util.Arrays.asList(certs);
-			org.bouncycastle.jce.cert.CertPath cp = org.bouncycastle.jce.cert.CertificateFactory.getInstance("X.509", "BC").generateCertPath(certList);
-		
-			// Trust anchor is the last certificate in the chain
-			X509Certificate ca = certs[certs.length-1];
-				
-			// Set the parameters, do not check any revocation list		
-			org.bouncycastle.jce.cert.TrustAnchor anchor = new org.bouncycastle.jce.cert.TrustAnchor(ca, null);
-			org.bouncycastle.jce.cert.PKIXParameters param = new org.bouncycastle.jce.cert.PKIXParameters(java.util.Collections.singleton(anchor));
+			CertPath path = this.getCertificateFactory().generateCertPath(certList);
+
+			// Use the certificates in the keystore as TrustAnchors
+			PKIXParameters param = new PKIXParameters(this.keystore);
+
+			// Do not check a revocation list
 			param.setRevocationEnabled(false);
-				
-			// Verify the trust path using the above settings
-			org.bouncycastle.jce.cert.CertPathValidator cpv = org.bouncycastle.jce.cert.CertPathValidator.getInstance("PKIX", "BC");
-			org.bouncycastle.jce.cert.PKIXCertPathValidatorResult result = (org.bouncycastle.jce.cert.PKIXCertPathValidatorResult) cpv.validate(cp, param);
-		} catch (NoSuchProviderException ex) {
+
+			// Verify the trust path using the above settings			
+			CertPathValidator certPathValidator = CertPathValidator.getInstance("PKIX");
+			certPathValidator.validate(path, param);
+		} catch (NoSuchAlgorithmException ex) {
 			throw new WSSecurityException(
 				WSSecurityException.FAILURE,
 				"certpath",
@@ -649,17 +646,20 @@ public class Merlin implements Crypto {
 				"certpath",
 				new Object[] { ex.getMessage()},
 				(Throwable) ex);
-		} catch (NoSuchAlgorithmException ex) {
+		} catch (CertPathValidatorException ex) {
 			throw new WSSecurityException(
 				WSSecurityException.FAILURE,
 				"certpath",
 				new Object[] { ex.getMessage()},
 				(Throwable) ex);
-		} catch (org.bouncycastle.jce.cert.CertPathValidatorException e) {
-			// The certificate chain could not be validated
-			return false;
+		} catch (KeyStoreException ex) {
+			throw new WSSecurityException(
+				WSSecurityException.FAILURE,
+				"certpath",
+				new Object[] { ex.getMessage()},
+				(Throwable) ex);
 		}
-
+		
 		return true;
 	}
 
@@ -679,7 +679,6 @@ public class Merlin implements Crypto {
 		Vector aliases = new Vector();
 		 
 		Certificate cert = null;
-		X509Certificate x509cert = null;
 		
 		// The DN to search the keystore for
 		Vector subjectRDN = splitAndTrim(subjectDN);
@@ -721,4 +720,5 @@ public class Merlin implements Crypto {
 		return result;
 	}
 }
+
 
