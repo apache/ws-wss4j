@@ -17,6 +17,8 @@
 
 package org.apache.ws.security;
 
+import org.apache.xml.security.c14n.Canonicalizer;
+import org.apache.xml.security.signature.XMLSignature;
 import org.apache.xml.security.utils.EncryptionConstants;
 
 /**
@@ -148,6 +150,27 @@ public interface WSConstants {
 	 * This is a optional method as defined by XML encryption.
 	 */
     public static final String AES_192 = EncryptionConstants.ALGO_ID_BLOCKCIPHER_AES192;
+
+    /**
+     * Sets the {@link org.apache.ws.security.message.WSSignEnvelope#build(Document, Crypto) signature}
+     * method to use DSA with SHA1 (DSS) to sign data.
+     * <p/>
+     * This is a required method as defined by XML signature. 
+     */
+    public static final String DSA = XMLSignature.ALGO_ID_SIGNATURE_DSA;
+
+    /**
+     * Sets the {@link org.apache.ws.security.message.WSSignEnvelope#build(Document, Crypto) signature}
+     * method to use RSA with SHA to sign data.
+     * <p/>
+     * This is a recommended method as defined by XML signature. 
+     */
+    public static final String RSA = XMLSignature.ALGO_ID_SIGNATURE_RSA_SHA1;
+
+    public static final String C14N_OMIT_COMMENTS = Canonicalizer.ALGO_ID_C14N_OMIT_COMMENTS;
+    public static final String C14N_WITH_COMMENTS = Canonicalizer.ALGO_ID_C14N_WITH_COMMENTS;
+    public static final String C14N_EXCL_OMIT_COMMENTS = Canonicalizer.ALGO_ID_C14N_EXCL_OMIT_COMMENTS;
+    public static final String C14N_EXCL_WITH_COMMENTS = Canonicalizer.ALGO_ID_C14N_EXCL_WITH_COMMENTS;
 
     /**
      * Sets the {@link org.apache.ws.security.message.WSSignEnvelope#build(Document, Crypto) signing} 

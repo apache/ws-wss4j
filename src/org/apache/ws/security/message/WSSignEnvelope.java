@@ -59,6 +59,8 @@ public class WSSignEnvelope extends WSBaseMessage {
 
     
 	protected boolean useSingleCert = true;
+    protected String sigAlgo = XMLSignature.ALGO_ID_SIGNATURE_RSA;
+    protected String canonAlgo = Canonicalizer.ALGO_ID_C14N_EXCL_OMIT_COMMENTS; 
 
 	static {
 		Transform.init();
@@ -117,6 +119,64 @@ public class WSSignEnvelope extends WSBaseMessage {
 	public boolean isUseSingleCertificate() {
 		return this.useSingleCert;
 	}
+    
+    /**
+     * Set the name of the signature encryption algorithm to use
+     * <p/>
+     * If the algorithm is not set then Triple RSA is used.
+     * Refer to WSConstants which algorithms are supported.
+     * <p/>
+     * 
+     * @param algo Is the name of the signature algorithm
+     * @see WSConstants#RSA
+     * @see WSConstants#DSA
+     */
+    public void setSignatureAlgorithm(String algo) {
+        sigAlgo = algo;
+    }
+    
+    /**
+     * Get the name of the signature algorithm that is being used
+     * <p/>
+     * If the algorithm is not set then RSA is default.
+     * <p/>
+     * 
+     * @return
+     */
+    public String getSignatureAlgorithm() {
+        return sigAlgo;
+    }
+
+    /**
+     * Set the canonicalization method to use.
+     * <p/>
+     * If the canonicalization method is not set then the recommended
+     * Exclusive XML Canonicalization is used by default
+     * Refer to WSConstants which algorithms are supported.
+     * <p/>
+     * 
+     * @param algo Is the name of the signature algorithm
+     * @see WSConstants#C14N_OMIT_COMMENTS
+     * @see WSConstants#C14N_WITH_COMMENTS
+     * @see WSConstants#C14N_EXCL_OMIT_COMMENTS
+     * @see WSConstants#C14N_EXCL_WITH_COMMENTS
+     */
+    public void setSigCanonicalization(String algo) {
+        canonAlgo = algo;
+    }
+    
+    /**
+     * Get the canonicalization method.
+     * <p/>
+     * If the canonicalization method was not set then
+     * Exclusive XML Canonicalization is used by default.
+     * <p/>
+     * 
+     * @return
+     */
+    public String getSigCanonicalization() {
+        return canonAlgo;
+    }
 
     /**
      * Builds a signed soap envelope.
@@ -156,8 +216,7 @@ public class WSSignEnvelope extends WSBaseMessage {
         // Set the id of the elements to be used as digest source
 		// String id = setBodyID(doc);
         XMLSignature sig = null;
-        sig = new XMLSignature(doc, null, XMLSignature.ALGO_ID_SIGNATURE_RSA,
-                Canonicalizer.ALGO_ID_C14N_EXCL_OMIT_COMMENTS);
+        sig = new XMLSignature(doc, null, sigAlgo, canonAlgo);
         /*
          * If we don't generate a new Transforms for each addDocument
          * here, then only the last Transforms is put into the
