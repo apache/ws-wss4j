@@ -297,7 +297,10 @@ public class WSConstants {
 	 * Refer to WS Security specification X509 profile
 	 */
 	public static final int EMBEDDED_KEYNAME = 5;
-
+    /**
+     * Embeds a keyinfo/wsse:SecurityTokenReference into EncryptedData element.
+     */
+	public static final int EMBED_SECURITY_TOKEN_REF = 6;
     
 	public static final int NO_SECURITY = 0;
 	public static final int UT = 0x1; // perform UsernameToken only

@@ -77,6 +77,11 @@ public class WSEncryptBody extends WSBaseMessage {
 	 * Parent node to which the EncryptedKeyElement should be added.
 	 */
 	protected Element parentNode = null;
+	
+	/**
+	 * SecurityTokenReference to be inserted into EncryptedData/keyInfo element.
+	 */
+	protected SecurityTokenReference securityTokenReference = null;
 
 	/**
 	 * Constructor.
@@ -265,7 +270,7 @@ public class WSEncryptBody extends WSBaseMessage {
 	public Document build(Document doc, Crypto crypto) throws WSSecurityException {
 		doDebug = log.isDebugEnabled();
 
-		if (keyIdentifierType == WSConstants.EMBEDDED_KEYNAME) {
+		if (keyIdentifierType == WSConstants.EMBEDDED_KEYNAME||keyIdentifierType== WSConstants.EMBED_SECURITY_TOKEN_REF) {
 			return buildEmbedded(doc, crypto);
 		}
 
@@ -594,9 +599,24 @@ public class WSEncryptBody extends WSBaseMessage {
 			boolean content = modifier.equals("Content") ? true : false;
 			String xencEncryptedDataId = "EncDataId-" + body.hashCode();
 
-			KeyInfo keyInfo = new KeyInfo(doc);
+            KeyInfo keyInfo = null;
+			if(this.keyIdentifierType==WSConstants.EMBEDDED_KEYNAME){
+				keyInfo = new KeyInfo(doc);
 			keyInfo.addKeyName(embeddedKeyName == null ? user : embeddedKeyName);
-
+			}else if(this.keyIdentifierType==WSConstants.EMBED_SECURITY_TOKEN_REF){ 
+				/* This means that we want to embed a <wsse:SecurityTokenReference> 
+				 * into keyInfo element.
+				 * If we need this functionality, this.secRef MUST be set before 
+				 * calling the build(doc, crypto) method.
+				 * So if secRef is null then throw an exception. 
+				 */
+				 if(this.securityTokenReference==null){
+					throw new WSSecurityException(WSSecurityException.SECURITY_TOKEN_UNAVAILABLE,"You must set keyInfo element, if the keyIdentifier ==EMBED_SECURITY_TOKEN_REF");
+				 }else{
+					keyInfo = new KeyInfo(doc);
+				    keyInfo.addUnknownElement(securityTokenReference.getElement());
+				 }
+			}   
 			/*
 			 * Forth step: encrypt data, and set neccessary attributes in
 			 * xenc:EncryptedData
@@ -740,6 +760,20 @@ public class WSEncryptBody extends WSBaseMessage {
      */
     public SecretKey getSymmetricKey() {
         return symmetricKey;
+    }
+
+    /**
+     * @return
+     */
+    public SecurityTokenReference getSecurityTokenReference() {
+        return securityTokenReference;
+    }
+
+    /**
+     * @param reference
+     */
+    public void setSecurityTokenReference(SecurityTokenReference reference) {
+        securityTokenReference = reference;
     }
 
 }
