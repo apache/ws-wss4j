@@ -57,7 +57,7 @@ import java.util.Vector;
  */
 public class Merlin implements Crypto {
     private static Log log = LogFactory.getLog(Merlin.class);
-    private static CertificateFactory certFact;
+    protected static CertificateFactory certFact;
     protected Properties properties = null;
     protected KeyStore keystore = null;
 
