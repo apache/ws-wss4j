@@ -145,7 +145,7 @@ public class ConversationEngine {
 
     public Vector processSecConvHeader(Document doc,
                                        String actor,
-                                       DerivedKeyCallbackHandler cb)
+                                       DerivedKeyCallbackHandler dkcb, String callback)
             throws ConversationException {
 
         doDebug = log.isDebugEnabled();
@@ -192,7 +192,7 @@ public class ConversationEngine {
                 }
 
                 try {
-                    convResult = processConvHeader(elem, doc, cb);
+                    convResult = processConvHeader(elem, doc, dkcb, callback);
                 } catch (WSSecurityException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
@@ -214,7 +214,7 @@ public class ConversationEngine {
 
     protected Vector processConvHeader(Element securityHeader,
                                        Document doc,
-                                       DerivedKeyCallbackHandler dkcbHandler)
+                                       DerivedKeyCallbackHandler dkcbHandler, String callback)
             throws ConversationException, WSSecurityException {
 
         long t0 = 0, t1 = 0, t2 = 0;
@@ -247,7 +247,7 @@ public class ConversationEngine {
                 }
 
                 returnResults.add(this.handleRequestedSecurityTokenResponse((Element) elem,
-                        dkcbHandler));
+                        dkcbHandler, callback));
 
             } else if (el.equals(SIGNATURE)) {
                 if (doDebug) {
@@ -280,7 +280,7 @@ public class ConversationEngine {
     }
 
     public ConvEngineResult handleRequestedSecurityTokenResponse(Element eleSTRes,
-                                                                 DerivedKeyCallbackHandler dkcbHandler)
+                                                                 DerivedKeyCallbackHandler dkcbHandler, String callback)
             throws ConversationException {
         String uuid = null;
         RequestSecurityTokenResponse stRes = null;
@@ -302,7 +302,7 @@ public class ConversationEngine {
             RequestedProofToken proofToken = stRes.getRequestedProofToken();
             //TODO:: romove the hard coded decryption
                 
-            proofToken.doDecryption("org.apache.ws.axis.oasis.PWCallback",
+            proofToken.doDecryption(callback,
                     loadEncryptionCrypto());
 
             SecurityContextInfo scInfo = null;
