@@ -336,7 +336,19 @@ public class Merlin implements Crypto {
      * See comment above
      */
     public String getAliasForX509Cert(Certificate cert) throws Exception {
-        return keystore.getCertificateAlias(cert);
+        String alias = keystore.getCertificateAlias(cert);
+        if(alias != null)
+            return alias;
+        // Use brute force search
+        Enumeration e = keystore.aliases();
+        while(e.hasMoreElements()) {
+            alias = (String)e.nextElement();
+            X509Certificate cert2 = (X509Certificate) keystore.getCertificate(alias);
+            if(cert2.equals(cert)) {
+                return alias;
+            }
+        }        
+        return null;
     }
 
     /**
