@@ -25,7 +25,7 @@
       <parameter name="allowedMethods" value="ping"/>
   <requestFlow>
    <handler type="java:org.apache.ws.axis.security.WSDoAllReceiver">
-    <parameter name="passwordCallbackClass" value="org.apache.ws.axis.oasis.PWCallback"/>
+    <parameter name="passwordCallbackClass" value="org.apache.ws.axis.oasis.PWCallback1"/>
     <parameter name="action" value="UsernameToken"/>
    </handler>
   </requestFlow>

@@ -5,9 +5,9 @@
  <service name="Ping1">
   <requestFlow>
    <handler type="java:org.apache.ws.axis.security.WSDoAllSender" >
-    <parameter name="user" value="werner"/>
+    <parameter name="user" value="Chris"/>
     <parameter name="passwordCallbackClass" 
-      value="org.apache.ws.axis.oasis.PWCallback"/>
+      value="org.apache.ws.axis.oasis.PWCallback1"/>
     <parameter name="action" value="UsernameToken"/>
     <parameter name="passwordType" value="PasswordText" />
    </handler>

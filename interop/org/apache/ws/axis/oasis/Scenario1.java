@@ -18,6 +18,8 @@
 package org.apache.ws.axis.oasis;
 
 import org.apache.axis.utils.Options;
+import org.apache.axis.client.Stub;
+import org.apache.axis.client.Call;
 import org.apache.ws.axis.oasis.ping.PingPort;
 import org.apache.ws.axis.oasis.ping.PingServiceLocator;
 import org.apache.ws.axis.oasis.ping.TicketType;
@@ -82,7 +84,7 @@ public class Scenario1 {
         // perform call
         TicketType ticket = new TicketType("scenario1");
         javax.xml.rpc.holders.StringHolder text =
-                new javax.xml.rpc.holders.StringHolder("Scenario 1 text");
+                new javax.xml.rpc.holders.StringHolder("WSS4J");
 
         port.ping(text, ticket);
         System.out.println(text.value);

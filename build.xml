@@ -232,6 +232,7 @@ org.apache.ws.axis.security.util
             <fileset dir="." includes="before*.xml"/>
             <fileset dir="." includes="after*.xml"/>
             <fileset dir="." includes="signed*.xml"/>
+            <fileset dir="." includes="server*.wsdd"/>
             <fileset dir="." includes="client*.wsdd"/>
         </delete>
     </target>

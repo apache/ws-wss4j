@@ -57,7 +57,7 @@
   <binding name="PingBinding" type="tns:PingPort">
     <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
     <operation name="Ping">
-      <soap:operation/>
+      <soap:operation soapAction="Ping"/>
       <input>
         <soap:body use="literal"/>
       </input>
