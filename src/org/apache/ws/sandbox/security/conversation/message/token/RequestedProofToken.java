@@ -171,8 +171,6 @@ public class RequestedProofToken {
 //                        "RequestedProofToken")
 //                    .item(0)));
             wsEncrypt.build(doc, crypto);
-            this.sharedSecret = wsEncrypt.getSymmetricKey().getEncoded();
-            log.debug(" RequestedProofToken, encryption ,Shared secret is :: " + new String(this.sharedSecret));
         } catch (WSSecurityException e) {
             e.printStackTrace();
         }

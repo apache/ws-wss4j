@@ -73,13 +73,13 @@ public class WSSecurityUtil {
      * @return the <code>wsse:Security</code> element or
      *         <code>null</code> if not such element found
      */
-    public static Element getSecurityHeader(WSSConfig wssConfig, Document doc, String actor, SOAPConstants sc) {
-
-    	// TODO skip non-element element, e.g. comments.
-    	Element soapHeaderElement =
-                (Element) getDirectChild(doc.getFirstChild(),
-                        sc.getHeaderQName().getLocalPart(),
-                        sc.getEnvelopeURI());
+    public static Element getSecurityHeader(
+        WSSConfig wssConfig, Document doc, String actor, SOAPConstants sc) {
+        // TODO skip non-element element, e.g. comments.
+        Element soapHeaderElement =
+            (Element) getDirectChild(doc.getFirstChild(),
+                                     sc.getHeaderQName().getLocalPart(),
+                                     sc.getEnvelopeURI());
 
         if (soapHeaderElement == null) { // no SOAP header at all
             return null;

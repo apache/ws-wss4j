@@ -268,12 +268,13 @@ public class WSEncryptBody extends WSBaseMessage {
      *               Certificates
      * @return the SOAP envelope with encrypted Body as <code>Document
      *         </code>
-     * @throws Exception
+     * @throws WSSecurityException
      */
     public Document build(Document doc, Crypto crypto) throws WSSecurityException {
         doDebug = log.isDebugEnabled();
 
-        if (keyIdentifierType == WSConstants.EMBEDDED_KEYNAME || keyIdentifierType == WSConstants.EMBED_SECURITY_TOKEN_REF) {
+        if (keyIdentifierType == WSConstants.EMBEDDED_KEYNAME ||
+            keyIdentifierType == WSConstants.EMBED_SECURITY_TOKEN_REF) {
             return buildEmbedded(doc, crypto);
         }
 
@@ -286,80 +287,21 @@ public class WSEncryptBody extends WSBaseMessage {
         }
 
         /*
-         * First step: set the encryption encoding namespace in the SOAP:Envelope
-         */
-        Element envelope = doc.getDocumentElement();
-        envelope.setAttributeNS(WSConstants.XMLNS_NS,
-                "xmlns:" + WSConstants.ENC_PREFIX,
-                WSConstants.ENC_NS);
-
-        SOAPConstants soapConstants = WSSecurityUtil.getSOAPConstants(envelope);
-
-        /*
          * Second step: generate a symmetric key (session key) for
          * this alogrithm, and set the cipher into encryption mode.
          */
         // This variable is made a classs attribute :: SecretKey symmetricKey = null;
-        KeyGenerator keyGen = getKeyGenerator();
-        symmetricKey = keyGen.generateKey();
-        XMLCipher xmlCipher = null;
-        try {
-            xmlCipher = XMLCipher.getInstance(symEncAlgo);
-        } catch (XMLEncryptionException e3) {
-            throw new WSSecurityException(WSSecurityException.UNSUPPORTED_ALGORITHM, null, null, e3);
+        SecretKey encryptionKey = this.symmetricKey;
+        if (encryptionKey == null) {
+            KeyGenerator keyGen = getKeyGenerator();
+            encryptionKey = keyGen.generateKey();
+        }
+        Vector encDataRefs = doEncryption(doc, encryptionKey);
+
+        if (tlog.isDebugEnabled()) {
+            t1 = System.currentTimeMillis();
         }
 
-        // if no encryption parts set - use the default
-        if (parts == null) {
-            parts = new Vector();
-            WSEncryptionPart encP =
-                    new WSEncryptionPart(soapConstants.getBodyQName().getLocalPart(),
-                            soapConstants.getEnvelopeURI(),
-                            "Content");
-            parts.add(encP);
-        }
-
-        Vector encDataRefs = new Vector();
-
-        for (int part = 0; part < parts.size(); part++) {
-            WSEncryptionPart encPart = (WSEncryptionPart) parts.get(part);
-            String elemName = encPart.getName();
-            String nmSpace = encPart.getNamespace();
-            String modifier = encPart.getEncModifier();
-            /*
-             * Third step: get the data to encrypt.
-             */
-            Element body =
-                    (Element) WSSecurityUtil.findElement(envelope,
-                            elemName,
-                            nmSpace);
-            if (body == null) {
-                throw new WSSecurityException(WSSecurityException.FAILURE,
-                        "noEncElement",
-                        new Object[]{"{" + nmSpace + "}" + elemName});
-            }
-
-            boolean content = modifier.equals("Content") ? true : false;
-            String xencEncryptedDataId = "EncDataId-" + body.hashCode();
-
-            /*
-             * Forth step: encrypt data, and set neccessary attributes in
-             * xenc:EncryptedData
-             */
-            try {
-                xmlCipher.init(XMLCipher.ENCRYPT_MODE, symmetricKey);
-                EncryptedData encData = xmlCipher.getEncryptedData();
-                encData.setId(xencEncryptedDataId);
-                xmlCipher.doFinal(doc, body, content);
-            } catch (Exception e2) {
-                throw new WSSecurityException(WSSecurityException.FAILED_ENC_DEC, null, null, e2);
-            }
-            if (tlog.isDebugEnabled()) {
-                t1 = System.currentTimeMillis();
-            }
-
-            encDataRefs.add(new String("#" + xencEncryptedDataId));
-        }
         /*
          * At this point data is encrypted with the symmetric key and can be
          * referenced via the above Id
@@ -393,7 +335,7 @@ public class WSEncryptBody extends WSBaseMessage {
         } catch (InvalidKeyException e) {
             throw new WSSecurityException(WSSecurityException.FAILED_ENC_DEC, null, null, e);
         }
-        byte[] encKey = symmetricKey.getEncoded();
+        byte[] encKey = encryptionKey.getEncoded();
         if (doDebug) {
             log.debug("cipher blksize: "
                     + cipher.getBlockSize()
@@ -483,7 +425,8 @@ public class WSEncryptBody extends WSBaseMessage {
         }
         KeyInfo keyInfo = new KeyInfo(doc);
         keyInfo.addUnknownElement(secToken.getElement());
-        WSSecurityUtil.appendChildElement(doc, xencEncryptedKey, keyInfo.getElement());
+        WSSecurityUtil.appendChildElement(
+                doc, xencEncryptedKey, keyInfo.getElement());
 
         Element xencCipherValue = createCipherValue(doc, xencEncryptedKey);
         xencCipherValue.appendChild(keyText);
@@ -501,25 +444,17 @@ public class WSEncryptBody extends WSBaseMessage {
         return doc;
     }
 
-    private Document buildEmbedded(Document doc, Crypto crypto)
+    private Vector doEncryption(Document doc, SecretKey encryptionKey)
+        throws WSSecurityException {
+        return doEncryption(doc, encryptionKey, null);
+    }
+
+    private Vector doEncryption(Document doc,
+                                SecretKey encryptionKey,
+                                KeyInfo keyInfo)
             throws WSSecurityException {
-        doDebug = log.isDebugEnabled();
-
-        long t0 = 0, t1 = 0, t2 = 0, t3 = 0;
-        if (tlog.isDebugEnabled()) {
-            t0 = System.currentTimeMillis();
-        }
-        if (doDebug) {
-            log.debug("Beginning Encryption embedded...");
-        }
-
-        if (embeddedKey == null) {
-            throw new WSSecurityException(WSSecurityException.FAILURE,
-                    "noKeySupplied");
-        }
-
         /*
-         * First step: set the encoding namespace in the SOAP:Envelope
+         * First step: set the encryption encoding namespace in the SOAP:Envelope
          */
         Element envelope = doc.getDocumentElement();
         envelope.setAttributeNS(WSConstants.XMLNS_NS,
@@ -527,20 +462,12 @@ public class WSEncryptBody extends WSBaseMessage {
                 WSConstants.ENC_NS);
 
         SOAPConstants soapConstants = WSSecurityUtil.getSOAPConstants(envelope);
-        /*
-         * Second step: generate a symmetric key from the specified
-         * key (password) for this alogrithm, and set the cipher into
-         * encryption mode.
-         */
-        if (symmetricKey == null) {
-            symmetricKey = WSSecurityUtil.prepareSecretKey(symEncAlgo,
-                                                           embeddedKey);
-        }
+
         XMLCipher xmlCipher = null;
         try {
             xmlCipher = XMLCipher.getInstance(symEncAlgo);
-        } catch (XMLEncryptionException e1) {
-            throw new WSSecurityException(WSSecurityException.UNSUPPORTED_ALGORITHM, null, null, e1);
+        } catch (XMLEncryptionException e3) {
+            throw new WSSecurityException(WSSecurityException.UNSUPPORTED_ALGORITHM, null, null, e3);
         }
 
         // if no encryption parts set - use the default
@@ -554,8 +481,6 @@ public class WSEncryptBody extends WSBaseMessage {
         }
 
         Vector encDataRefs = new Vector();
-
-        Element tmpE = null;
 
         for (int part = 0; part < parts.size(); part++) {
             WSEncryptionPart encPart = (WSEncryptionPart) parts.get(part);
@@ -572,49 +497,86 @@ public class WSEncryptBody extends WSBaseMessage {
             if (body == null) {
                 throw new WSSecurityException(WSSecurityException.FAILURE,
                         "noEncElement",
-                        new Object[]{nmSpace, elemName});
+                        new Object[]{"{" + nmSpace + "}" + elemName});
             }
 
             boolean content = modifier.equals("Content") ? true : false;
             String xencEncryptedDataId = "EncDataId-" + body.hashCode();
 
-            KeyInfo keyInfo = null;
-            if (this.keyIdentifierType == WSConstants.EMBEDDED_KEYNAME) {
-                keyInfo = new KeyInfo(doc);
-                keyInfo.addKeyName(embeddedKeyName == null ? user : embeddedKeyName);
-            } else if (this.keyIdentifierType == WSConstants.EMBED_SECURITY_TOKEN_REF) {
-                /* This means that we want to embed a <wsse:SecurityTokenReference>
-                 * into keyInfo element.
-                 * If we need this functionality, this.secRef MUST be set before
-                 * calling the build(doc, crypto) method.
-                 * So if secRef is null then throw an exception.
-                 */
-                if (this.securityTokenReference == null) {
-                    throw new WSSecurityException(WSSecurityException.SECURITY_TOKEN_UNAVAILABLE, "You must set keyInfo element, if the keyIdentifier ==EMBED_SECURITY_TOKEN_REF");
-                } else {
-                    keyInfo = new KeyInfo(doc);
-                    keyInfo.addUnknownElement(securityTokenReference.getElement());
-                }
-            }
             /*
              * Forth step: encrypt data, and set neccessary attributes in
              * xenc:EncryptedData
              */
             try {
-                xmlCipher.init(XMLCipher.ENCRYPT_MODE, symmetricKey);
+                xmlCipher.init(XMLCipher.ENCRYPT_MODE, encryptionKey);
                 EncryptedData encData = xmlCipher.getEncryptedData();
                 encData.setId(xencEncryptedDataId);
                 encData.setKeyInfo(keyInfo);
                 xmlCipher.doFinal(doc, body, content);
-            } catch (Exception e) {
-                throw new WSSecurityException(WSSecurityException.FAILED_ENC_DEC, null, null, e);
+            } catch (Exception e2) {
+                throw new WSSecurityException(WSSecurityException.FAILED_ENC_DEC, null, null, e2);
             }
-            if (tlog.isDebugEnabled()) {
-                t1 = System.currentTimeMillis();
-            }
-            // remember references
             encDataRefs.add(new String("#" + xencEncryptedDataId));
         }
+        return encDataRefs;
+    }
+
+    private Document buildEmbedded(Document doc, Crypto crypto)
+            throws WSSecurityException {
+        doDebug = log.isDebugEnabled();
+
+        long t0 = 0, t1 = 0;
+        if (tlog.isDebugEnabled()) {
+            t0 = System.currentTimeMillis();
+        }
+        if (doDebug) {
+            log.debug("Beginning Encryption embedded...");
+        }
+
+        if (embeddedKey == null) {
+            throw new WSSecurityException(WSSecurityException.FAILURE,
+                    "noKeySupplied");
+        }
+
+        /*
+         * Second step: generate a symmetric key from the specified
+         * key (password) for this alogrithm, and set the cipher into
+         * encryption mode.
+         */
+        SecretKey encryptionKey = this.symmetricKey;
+        if (encryptionKey == null) {
+            encryptionKey = WSSecurityUtil.prepareSecretKey(symEncAlgo,
+                                                            embeddedKey);
+        }
+
+        KeyInfo keyInfo = null;
+        if (this.keyIdentifierType == WSConstants.EMBEDDED_KEYNAME) {
+            keyInfo = new KeyInfo(doc);
+            keyInfo.addKeyName(embeddedKeyName == null ? user : embeddedKeyName);
+        } else if (this.keyIdentifierType == WSConstants.EMBED_SECURITY_TOKEN_REF) {
+            /* This means that we want to embed a <wsse:SecurityTokenReference>
+            * into keyInfo element.
+            * If we need this functionality, this.secRef MUST be set before
+            * calling the build(doc, crypto) method.
+            * So if secRef is null then throw an exception.
+            */
+            if (this.securityTokenReference == null) {
+                throw new WSSecurityException(
+                        WSSecurityException.SECURITY_TOKEN_UNAVAILABLE,
+                        "You must set keyInfo element, if the keyIdentifier " +
+                        "== EMBED_SECURITY_TOKEN_REF");
+            } else {
+                keyInfo = new KeyInfo(doc);
+                Element tmpE = securityTokenReference.getElement();
+                tmpE.setAttributeNS(WSConstants.XMLNS_NS,
+                        "xmlns:" + tmpE.getPrefix(),
+                        tmpE.getNamespaceURI());
+                keyInfo.addUnknownElement(securityTokenReference.getElement());
+            }
+        }
+
+        Vector encDataRefs = doEncryption(doc, encryptionKey, keyInfo);
+
         /*
          * At this point data is encrypted with the symmetric key and can be
          * referenced via the above Id
@@ -628,7 +590,7 @@ public class WSEncryptBody extends WSBaseMessage {
          */
         Element wsseSecurity = insertSecurityHeader(doc);
 
-        tmpE = doc.createElement("temp");
+        Element tmpE = doc.createElement("temp");
         Element refList = createDataRefList(doc, tmpE, encDataRefs);
         WSSecurityUtil.prependChildElement(doc, wsseSecurity, refList, true);
 

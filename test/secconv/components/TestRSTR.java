@@ -215,10 +215,6 @@ public class TestRSTR extends TestCase implements CallbackHandler{
 		RequestedProofToken reqProof = stRes.getRequestedProofToken();
         
 	    reqProof.doEncryptProof(doc, this.crypto, "16c73ab6-b892-458f-abf5-2f875f74882e");
-	    byte[] symKey = reqProof.getSharedSecret();
-		if(symKey==null){
-	    	throw new Exception("Cannot get the symmetric key used to produce <ds:EncryptedData>");
-	    }
 			    
 		/*
 		 * convert the resulting document into a message first. The toSOAPMessage()

@@ -61,7 +61,7 @@ public class WSBaseMessage {
      * @param actor The actor name of the <code>wsse:Security</code> header
      */
     public WSBaseMessage(String actor) {
-        setActor(actor);
+        this(actor, true);
     }
 
     /**

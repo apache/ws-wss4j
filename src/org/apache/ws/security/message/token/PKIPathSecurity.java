@@ -41,10 +41,14 @@ public class PKIPathSecurity extends BinarySecurity {
      *
      * @throws WSSecurityException
      */
-    public PKIPathSecurity(WSSConfig wssConfig, Element elem) throws WSSecurityException {
+    public PKIPathSecurity(WSSConfig wssConfig, Element elem)
+        throws WSSecurityException {
         super(wssConfig, elem);
         if (!getValueType().equals(getType(wssConfig))) {
-            throw new WSSecurityException(WSSecurityException.INVALID_SECURITY_TOKEN, "invalidValueType", new Object[]{getType(wssConfig), getValueType()});
+            throw new WSSecurityException(
+                WSSecurityException.INVALID_SECURITY_TOKEN,
+                "invalidValueType",
+                new Object[]{getType(wssConfig), getValueType()});
         }
     }
 
@@ -62,11 +66,12 @@ public class PKIPathSecurity extends BinarySecurity {
      * <p/>
      *
      * @param reverse
+     * @param crypto
      * @return
-     * @throws GeneralSecurityException
-     * @throws IOException
+     * @throws WSSecurityException
      */
-    public X509Certificate[] getX509Certificates(boolean reverse, Crypto crypto) throws WSSecurityException {
+    public X509Certificate[] getX509Certificates(boolean reverse, Crypto crypto)
+        throws WSSecurityException {
         byte[] data = getToken();
         if (data == null) {
             return null;
@@ -82,10 +87,13 @@ public class PKIPathSecurity extends BinarySecurity {
      *
      * @param certs
      * @param reverse
-     * @throws CertificateEncodingException
-     * @throws IOException
+     * @param crypto
+     * @throws WSSecurityException
      */
-    public void setX509Certificates(X509Certificate[] certs, boolean reverse, Crypto crypto) throws WSSecurityException {
+    public void setX509Certificates(X509Certificate[] certs,
+                                    boolean reverse,
+                                    Crypto crypto)
+        throws WSSecurityException {
         if (certs == null) {
             throw new WSSecurityException(WSSecurityException.FAILURE,
                     "noCert");

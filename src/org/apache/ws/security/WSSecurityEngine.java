@@ -1151,7 +1151,7 @@ public class WSSecurityEngine {
                 if (tmpE.getLocalName().equals("DataReference")) {
                     dataRefURI = ((Element) tmpE).getAttribute("URI");
                     decryptDataRef(doc, dataRefURI, decryptedBytes);
-                } 
+                }
             }
         }
 
@@ -1183,12 +1183,12 @@ public class WSSecurityEngine {
         }
 
         boolean content = isContent(encBodyData);
-        ;
 
         // get the encryprion method
         String symEncAlgo = getEncAlgo(encBodyData);
 
-        SecretKey symmetricKey = WSSecurityUtil.prepareSecretKey(symEncAlgo, decryptedBytes);
+        SecretKey symmetricKey = WSSecurityUtil.prepareSecretKey(
+            symEncAlgo, decryptedBytes);
 
         // initialize Cipher ....
         XMLCipher xmlCipher = null;
@@ -1269,7 +1269,7 @@ public class WSSecurityEngine {
 
         Element tmpE =
                 (Element) WSSecurityUtil.findElement((Node) encBodyData,
-                        "KeyName",
+                        "KeyInfo",
                         WSConstants.SIG_NS);
 
         SecretKey symmetricKey = getSharedKey(tmpE, symEncAlgo, cb);
@@ -1335,11 +1335,15 @@ public class WSSecurityEngine {
         return symEncAlgo;
     }
 
-    protected SecretKey getSharedKey(Element keyNmElem,
-                                   String algorithm,
-                                   CallbackHandler cb)
+    protected SecretKey getSharedKey(Element keyInfoElem,
+                                     String algorithm,
+                                     CallbackHandler cb)
             throws WSSecurityException {
         String keyName = null;
+        Element keyNmElem =
+            (Element) WSSecurityUtil.getDirectChild(keyInfoElem,
+                                                    "KeyName",
+                                                    WSConstants.SIG_NS);
         if (keyNmElem != null) {
             keyNmElem.normalize();
             Node tmpN;

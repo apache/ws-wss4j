@@ -45,6 +45,11 @@ import org.apache.xml.security.signature.XMLSignatureException;
 import org.apache.xml.security.transforms.Transform;
 import org.apache.xml.security.transforms.TransformationException;
 import org.apache.xml.security.transforms.Transforms;
+import org.apache.xml.security.transforms.params.InclusiveNamespaces;
+import org.apache.xml.security.utils.XMLUtils;
+import org.apache.xml.security.utils.Constants;
+import org.apache.xml.security.algorithms.SignatureAlgorithm;
+
 import org.opensaml.SAMLAssertion;
 import org.opensaml.SAMLException;
 import org.opensaml.SAMLObject;
@@ -52,10 +57,14 @@ import org.opensaml.SAMLSubject;
 import org.opensaml.SAMLSubjectStatement;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NamedNodeMap;
 
 import java.security.cert.X509Certificate;
 import java.util.Iterator;
 import java.util.Vector;
+import java.util.Set;
+import java.util.HashSet;
 
 /**
  * Signs a SOAP envelope according to WS Specification, X509 profile, and adds
@@ -85,7 +94,6 @@ public class WSSignEnvelope extends WSBaseMessage {
                     "org.apache.ws.security.transform.STRTransform");
         } catch (Exception ex) {
         }
-        ;
     }
 
     /**
@@ -207,7 +215,7 @@ public class WSSignEnvelope extends WSBaseMessage {
      * @param crypto An instance of the Crypto API to handle keystore and
      *               certificates
      * @return A signed SOAP envelope as <code>Document</code>
-     * @throws Exception
+     * @throws WSSecurityException
      */
 public Document build(Document doc, Crypto crypto)
             throws WSSecurityException {
@@ -236,7 +244,7 @@ public Document build(Document doc, Crypto crypto)
         // Set the id of the elements to be used as digest source
         // String id = setBodyID(doc);
         String certUri = null;
-        X509Certificate[] certs = null;        
+        X509Certificate[] certs = null;
         if (keyIdentifierType != WSConstants.UT_SIGNING) {
             certs = crypto.getCertificates(user);
             if (certs == null || certs.length <= 0) {
@@ -260,12 +268,44 @@ public Document build(Document doc, Crypto crypto)
             }
         }
         XMLSignature sig = null;
-        try {
-            sig = new XMLSignature(doc, null, sigAlgo, canonAlgo);
-        } catch (XMLSecurityException e) {
-            log.error("", e);
-            throw new WSSecurityException(WSSecurityException.FAILED_SIGNATURE,
+
+        if (canonAlgo.equals(WSConstants.C14N_EXCL_OMIT_COMMENTS)) {
+            Element canonElem = XMLUtils.createElementInSignatureSpace(
+                doc,
+                Constants._TAG_CANONICALIZATIONMETHOD);
+
+            canonElem.setAttributeNS(
+                null,
+                Constants._ATT_ALGORITHM,
+                canonAlgo);
+
+            Set prefixes = getInclusivePrefixes(securityHeader, false);
+
+            InclusiveNamespaces inclusiveNamespaces = new InclusiveNamespaces(
+                doc, prefixes);
+
+            canonElem.appendChild(inclusiveNamespaces.getElement());
+
+            try {
+                SignatureAlgorithm signatureAlgorithm =
+                    new SignatureAlgorithm(doc, sigAlgo);
+                sig = new XMLSignature(
+                    doc, null, signatureAlgorithm.getElement(), canonElem);
+            } catch (XMLSecurityException e) {
+                log.error("", e);
+                throw new WSSecurityException(
+                    WSSecurityException.FAILED_SIGNATURE,
                     "noXMLSig");
+            }
+        } else {
+            try {
+                sig = new XMLSignature(doc, null, sigAlgo, canonAlgo);
+            } catch (XMLSecurityException e) {
+                log.error("", e);
+                throw new WSSecurityException(
+                    WSSecurityException.FAILED_SIGNATURE,
+                    "noXMLSig");
+            }
         }
         /*
          * If we don't generate a new Transforms for each addDocument here, then
@@ -310,16 +350,23 @@ public Document build(Document doc, Crypto crypto)
              * the token itself. If its a direct reference sign the token,
              * otherwise sign the KeyInfo Element. "STRTransform": Setup the
              * ds:Reference to use STR Transform
-             *  
+             *
              */
             try {
                 if (elemName.equals("Token")) {
                     transforms = new Transforms(doc);
                     transforms.addTransform(Transforms.TRANSFORM_C14N_EXCL_OMIT_COMMENTS);
-                    if (keyIdentifierType
-                            == WSConstants.BST_DIRECT_REFERENCE) {
+                    if (keyIdentifierType == WSConstants.BST_DIRECT_REFERENCE) {
+                        transforms.item(0).getElement().appendChild(
+                            new InclusiveNamespaces(
+                                doc, getInclusivePrefixes(
+                                    securityHeader)).getElement());
                         sig.addDocument("#" + certUri, transforms);
                     } else {
+                        transforms.item(0).getElement().appendChild(
+                            new InclusiveNamespaces(
+                                doc, getInclusivePrefixes(
+                                    info.getElement())).getElement());
                         sig.addDocument("#" + keyInfoUri, transforms);
                     }
                 } else if (elemName.equals("STRTransform")) { // STRTransform
@@ -340,6 +387,9 @@ public Document build(Document doc, Crypto crypto)
                     }
                     transforms = new Transforms(doc);
                     transforms.addTransform(Transforms.TRANSFORM_C14N_EXCL_OMIT_COMMENTS);
+                    transforms.item(0).getElement().appendChild(
+                      new InclusiveNamespaces(
+                          doc, getInclusivePrefixes(body)).getElement());
                     sig.addDocument("#" + setWsuId(body), transforms);
                 }
             } catch (TransformationException e1) {
@@ -364,7 +414,7 @@ public Document build(Document doc, Crypto crypto)
         if (tlog.isDebugEnabled()) {
             t2 = System.currentTimeMillis();
         }
-        
+
         byte[] secretKey = null;
         switch (keyIdentifierType) {
             case WSConstants.BST_DIRECT_REFERENCE:
@@ -415,7 +465,7 @@ public Document build(Document doc, Crypto crypto)
                 secRef.setReference(refUt);
                 secretKey = usernameToken.getSecretKey();
                 break;
-            
+
             default :
                 throw new WSSecurityException(WSSecurityException.FAILURE,
                         "unsupportedKeyId");
@@ -538,8 +588,8 @@ public Document build(Document doc, Crypto crypto)
             wsDocInfo.setCrypto(issuerCrypto);
         }
         /*
-         * in case of key holder: 
-         * - get the user's certificate that _must_ be included in the SAML 
+         * in case of key holder:
+         * - get the user's certificate that _must_ be included in the SAML
          * token. To ensure the cert integrity the SAML token must be signed
          * (by the issuer). Just check if its signed, but
          * don't verify this SAML token's signature here (maybe later).
@@ -629,11 +679,11 @@ public Document build(Document doc, Crypto crypto)
         /*
          * If the sender vouches, then we must sign the SAML token _and_ at
          * least one part of the message (usually the SOAP body). To do so we
-         * need to 
+         * need to
          * - put in a reference to the SAML token. Thus we create a STR
-         *   and insert it into the wsse:Security header 
-         * - set a reference of the created STR to the signature and use STR 
-         *   Transfrom during the signature 
+         *   and insert it into the wsse:Security header
+         * - set a reference of the created STR to the signature and use STR
+         *   Transfrom during the signature
          */
         Transforms transforms = null;
         SecurityTokenReference secRefSaml = null;
@@ -669,7 +719,7 @@ public Document build(Document doc, Crypto crypto)
                  * reference sign the token, otherwise sign the KeyInfo
                  * Element. "STRTransform": Setup the ds:Reference to use STR
                  * Transform
-                 *  
+                 *
                  */
                 if (elemName.equals("Token")) {
                     transforms = new Transforms(doc);
@@ -832,5 +882,59 @@ public Document build(Document doc, Crypto crypto)
                 Canonicalizer.ALGO_ID_C14N_EXCL_OMIT_COMMENTS);
         transformParam.appendChild(canonElem);
         return transformParam;
+    }
+
+    protected Set getInclusivePrefixes(Element target) {
+        return getInclusivePrefixes(target, true);
+    }
+
+    protected Set getInclusivePrefixes(Element target, boolean excludeVisible) {
+        Set result = new HashSet();
+        Node parent = target;
+        NamedNodeMap attributes;
+        Node attribute;
+        while (! (parent.getParentNode() instanceof Document)) {
+            parent = parent.getParentNode();
+            attributes = parent.getAttributes();
+            for (int i = 0; i < attributes.getLength(); i++) {
+                attribute = attributes.item(i);
+                if (attribute.getNamespaceURI() != null &&
+                    attribute.getNamespaceURI().equals(
+                        org.apache.ws.security.WSConstants.XMLNS_NS)) {
+                    if (attribute.getNodeName().equals("xmlns")) {
+                        result.add("#default");
+                    } else {
+                        result.add(attribute.getLocalName());
+                    }
+                }
+            }
+        }
+
+        if (excludeVisible == true) {
+            attributes = target.getAttributes();
+            for (int i = 0; i < attributes.getLength(); i++) {
+                attribute = attributes.item(i);
+                if (attribute.getNamespaceURI() != null &&
+                    attribute.getNamespaceURI().equals(
+                        org.apache.ws.security.WSConstants.XMLNS_NS)) {
+                    if (attribute.getNodeName().equals("xmlns")) {
+                        result.remove("#default");
+                    } else {
+                        result.remove(attribute.getLocalName());
+                    }
+                }
+                if (attribute.getPrefix() != null) {
+                    result.remove(attribute.getPrefix());
+                }
+            }
+
+            if (target.getPrefix() == null) {
+                result.remove("#default");
+            } else {
+                result.remove(target.getPrefix());
+            }
+        }
+
+        return result;
     }
 }
