@@ -111,6 +111,23 @@ public class WSDoAllReceiver extends BasicHandler {
 			log.debug("Header found: " + headerElement.getLocalName());
 		}
 
+		/*
+		 * If no security header found, then also action must be defined
+		 * as NO_SECURITY, otherwise its a fault 
+		 */
+		if (headerElement == null) {
+			// TODO: if no header - check if message is a response _and_ is a SOAP fault
+			// in this case don't modify anything, just return for default processing
+			if (doAction == WSConstants.NO_SECURITY) {
+				return;
+			} else {
+				throw new AxisFault("WSDoAllReceiver: Request does not contain required Security header");
+			}
+		} else {
+			((org.apache.axis.message.SOAPHeaderElement) headerElement)
+						.setProcessed(true);
+		}
+
 		Document doc = null;
 		try {
 			doc = sm.getSOAPEnvelope().getAsDocument();
@@ -121,20 +138,6 @@ public class WSDoAllReceiver extends BasicHandler {
 			throw new AxisFault(
 				"WSDoAllReceiver: cannot convert into document",
 				ex);
-		}
-		/*
-		 * If no security header found, then also action must be defined
-		 * as NO_SECURITY, otherwise its a fault 
-		 */
-		if (headerElement == null) {
-			if (doAction == WSConstants.NO_SECURITY) {
-				return;
-			} else {
-				throw new AxisFault("WSDoAllReceiver: Request does not contain required Security header");
-			}
-		} else {
-			((org.apache.axis.message.SOAPHeaderElement) headerElement)
-						.setProcessed(true);
 		}
 
 		/*
