@@ -187,7 +187,7 @@ public class UsernameToken {
             return;
         }
         SimpleDateFormat zulu = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-        zulu.setTimeZone(TimeZone.getTimeZone("GMT"));
+        zulu.setTimeZone(TimeZone.getTimeZone("UTC"));
         Calendar rightNow = Calendar.getInstance();
         this.elementCreated = doc.createElementNS(wssConfig.getWsuNS(), "wsu:" + WSConstants.CREATED_LN);
         WSSecurityUtil.setNamespace(this.elementCreated, wssConfig.getWsuNS(), WSConstants.WSU_PREFIX);

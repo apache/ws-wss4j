@@ -70,19 +70,21 @@ public class Timestamp {
         for (Node currentChild = element.getFirstChild();
              currentChild != null;
              currentChild = currentChild.getNextSibling()) {
-            if (WSConstants.CREATED_LN.equals(currentChild.getLocalName()) &&
-                    wssConfig.getWsuNS().equals(currentChild.getNamespaceURI())) {
-                strCreated = ((Text) ((Element) currentChild).getFirstChild()).getData();
-            } else if (WSConstants.EXPIRES_LN.equals(currentChild.getLocalName()) &&
-                    wssConfig.getWsuNS().equals(currentChild.getNamespaceURI())) {
-                strExpires = ((Text) ((Element) currentChild).getFirstChild()).getData();
-            } else {
-                customElements.add((Element) currentChild);
+            if (currentChild instanceof Element) {
+                if (WSConstants.CREATED_LN.equals(currentChild.getLocalName()) &&
+                        wssConfig.getWsuNS().equals(currentChild.getNamespaceURI())) {
+                    strCreated = ((Text) ((Element) currentChild).getFirstChild()).getData();
+                } else if (WSConstants.EXPIRES_LN.equals(currentChild.getLocalName()) &&
+                        wssConfig.getWsuNS().equals(currentChild.getNamespaceURI())) {
+                    strExpires = ((Text) ((Element) currentChild).getFirstChild()).getData();
+                } else {
+                    customElements.add((Element) currentChild);
+                }
             }
         }
 
         SimpleDateFormat zulu = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-        zulu.setTimeZone(TimeZone.getTimeZone("GMT"));
+        zulu.setTimeZone(TimeZone.getTimeZone("UTC"));
 
         try {
             created.setTime(zulu.parse(strCreated));
@@ -116,7 +118,7 @@ public class Timestamp {
                 WSConstants.WSU_PREFIX);
 
         SimpleDateFormat zulu = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-        zulu.setTimeZone(TimeZone.getTimeZone("GMT"));
+        zulu.setTimeZone(TimeZone.getTimeZone("UTC"));
         Calendar rightNow = Calendar.getInstance();
 
         elementCreated =
