@@ -4,6 +4,9 @@
 <service name="WSConvScenario1">
   <requestFlow>
    <handler type="java:org.apache.ws.axis.security.conversation.ConversationClientHandler" >
+	
+   <parameter name="passwordCallbackClass" 
+      value="secconv.scenarios.ping.PWCallback"/>
 	<parameter name="sctEstablishmentMtd" value="DirectGenerated"/>
 	<parameter name="trustEnable" value="false" /> 
       <!--certifcates-->
@@ -24,6 +27,10 @@
   </requestFlow>
    <responseFlow>
    <handler type="java:org.apache.ws.axis.security.conversation.ConversationClientHandler">
+   
+   <parameter name="passwordCallbackClass" 
+      value="secconv.scenarios.ping.PWCallback"/>
+    
 	<!--certifcates-->
 	<parameter name="serverPropFile" value="crypto.properties" />
 	<parameter name="serverAlias" value="16c73ab6-b892-458f-abf5-2f875f74882e"/>

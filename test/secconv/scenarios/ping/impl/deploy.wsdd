@@ -25,6 +25,10 @@
 
 <requestFlow>
    <handler type="java:org.apache.ws.axis.security.conversation.ConversationServerHandler" >
+   
+   <parameter name="passwordCallbackClass" 
+      value="secconv.scenarios.ping.PWCallback"/>
+   
       <!--Monitor configuration-->
 	<parameter name="reapFrequency" value="1000" />
 	<parameter name="sessionDuration" value="150000" />
@@ -38,6 +42,10 @@
   </requestFlow>
    <responseFlow>
    <handler type="java:org.apache.ws.axis.security.conversation.ConversationServerHandler" >
+   
+   <parameter name="passwordCallbackClass" 
+      value="secconv.scenarios.ping.PWCallback"/>
+
    	<!--Key configuration-->
 	<parameter name="keyFrequency" value="1" />
 	<parameter name="useFixedKeyLegnth" value="true" />
