@@ -646,13 +646,14 @@ public class WSSecurityUtil {
     }
     	
     public static SOAPConstants getSOAPConstants(Element startElement) {
-    	if (getPrefixNS(WSConstants.URI_SOAP12_ENV, startElement) != null) {
-    		return new SOAP12Constants();
-    	}
-    	else {
-    		return new SOAP11Constants();
-    	}
-    }
+		Document doc = startElement.getOwnerDocument();
+		String ns = doc.getDocumentElement().getNamespaceURI();
+		if (WSConstants.URI_SOAP12_ENV.equals(ns)) {
+			return new SOAP12Constants();
+		} else {
+			return new SOAP11Constants();
+		}
+	}
 
 	public static Cipher getCiperInstance(String cipherAlgo)
 		throws WSSecurityException {
