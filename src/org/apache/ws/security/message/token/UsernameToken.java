@@ -434,7 +434,7 @@ public class UsernameToken {
             byte[] password = getPassword().getBytes("UTF-8");
             byte[] label = "WS-Security".getBytes("UTF-8");
 //            byte[] nonce = Base64.decode(getNonce());
-            byte[] nonce = Base64.decode(getNonce());
+            byte[] nonce = getNonce().getBytes();
             byte[] created = getCreated().getBytes("UTF-8");
             byte[] seed = new byte[label.length + nonce.length + created.length];
             int i = 0;
