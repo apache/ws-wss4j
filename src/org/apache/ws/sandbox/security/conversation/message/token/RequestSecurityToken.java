@@ -14,132 +14,88 @@
  *  limitations under the License.
  *
  */
+
+
+
 package org.apache.ws.security.conversation.message.token;
 
+
+/**
+ * @author Dimuthu Leelarathne
+ * @version 1.0
+ */
+
+import org.apache.axis.components.logger.LogFactory;
+import org.apache.commons.logging.Log;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.trust.TrustConstants;
+import org.apache.ws.security.util.DOM2Writer;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import javax.xml.soap.SOAPElement;
-import javax.xml.soap.SOAPMessage;
+import javax.xml.namespace.QName;
+import javax.xml.soap.*;
+import org.apache.ws.security.trust.TrustConstants;
 
-/**
- * Class RequestSecurityToken
- */
 public class RequestSecurityToken {
 
-    /**
-     * Field message
-     */
-    private SOAPMessage message;
+	private static Log log =
+				LogFactory.getLog(RequestSecurityTokenResponse.class.getName());
 
-    /**
-     * Field reqType
-     */
-    private String reqType;
+		private Element element = null;
+		
+	public static final QName TOKEN =
+			new QName(
+				TrustConstants.WST_NS,
+				TrustConstants.REQUEST_SECURITY_TOKEN_LN,
+				TrustConstants.WST_PREFIX);
 
-    /**
-     * Field tokenType
-     */
-    private String tokenType;
 
-    /**
-     * Field doc
-     */
-    private Document doc;
+  public RequestSecurityToken(Element elem) throws WSSecurityException{
+  	//TODO :: Support only for SCT - for now
+	this.element = elem;
+	QName el =
+		new QName(
+			this.element.getNamespaceURI(),
+			this.element.getLocalName());
+	if (!el.equals(TOKEN)) {
+		throw new WSSecurityException(
+			WSSecurityException.INVALID_SECURITY_TOKEN,
+			"badTokenType00",
+			new Object[] { el });
+	}
 
-    /**
-     * Field token
-     */
-    private Element token;
+  }
 
-    /**
-     * Constructor RequestSecurityToken
-     * 
-     * @param element 
-     * @throws WSSecurityException 
-     */
-    public RequestSecurityToken(Element element) throws WSSecurityException {
-        // TODO :: Support only for SCT - for now
-        token = (Element) WSSecurityUtil.getDirectChild(element,
-                TrustConstants.SECURITY_CONTEXT_TOKEN_LN, WSConstants.WSSE_NS);
-        SecurityContextToken sct = new SecurityContextToken(token);
-    }
 
-    /**
-     * Constructor RequestSecurityToken
-     * 
-     * @param message   
-     * @param tokenType 
-     * @param reqType   
-     * @throws Exception 
-     */
-    public RequestSecurityToken(SOAPMessage message, String tokenType, String reqType)
-            throws Exception {
-        this.message = message;
-        this.tokenType = tokenType;
-        this.reqType = reqType;
-        this.processDocuement();
-    }
+  public Element getElement() {
+	  return element;
+  }
+  public void setElement(Element element) {
+	  this.element = element;
+  }
 
-    /**
-     * Method processDocuement
-     * 
-     * @throws Exception 
-     */
-    private void processDocuement() throws Exception {
-        // SOAPElement reqSecToken = this.message.getSOAPPart().getEnvelope().getBody().addChildElement("RequestSecurityToken");
-        this.message.getSOAPPart().getEnvelope().getBody().detachNode();
-        SOAPElement reqSecToken =
-                this.message.getSOAPPart().getEnvelope().addBody().addChildElement("RequestSecurityToken");
-        System.out.println("Body : "
-                + this.message.getSOAPPart().getEnvelope().getBody().toString());
+  public String toString() {
+	  return DOM2Writer.nodeToString((Node) this.element);
+  }
+  public void addToken(Element childToken) {
+	  this.element.appendChild(childToken);
+  }
 
-        // Creating the TokenType element
-        SOAPElement tokenTypeElement = reqSecToken.addChildElement("TokenType");
-        tokenTypeElement.addTextNode(this.tokenType);
+  public void removeToken(Element childToken) {
+	  this.element.removeChild(childToken);
+  }
+//  
+//  //TODO @context - added by kau
+//   public void setContext(String context){
+//	   this.element.setAttribute("Context", context);
+//   }
+//	
+//   public String getContext(){
+//	   return this.element.getAttribute("Context");
+//   }
 
-        // Creating the RequestType element
-        SOAPElement requestTypeElement =
-                reqSecToken.addChildElement("RequestType");
-        requestTypeElement.addTextNode(this.reqType);
-        System.out.println("My Body : " + this.message.getSOAPPart().getEnvelope().getBody());
-    }
 
-    // public RequestSecurityToken(Document doc,String tokenType, String reqType) throws Exception{
-    // this.doc = doc;
-    // this.tokenType = tokenType;
-    // this.reqType = reqType;
-    // this.processDocuement();
-    // }
-    // 
-    // private void processDocuement() throws Exception{
-    // SOAPConstants soapConstants = WSSecurityUtil.getSOAPConstants(doc.getDocumentElement());
-    // Element bodyElement =
-    // (Element) WSSecurityUtil.getDirectChild(
-    // doc.getFirstChild(),
-    // soapConstants.getBodyQName().getLocalPart(),
-    // soapConstants.getEnvelopeURI());
-    // if (bodyElement == null) {
-    // throw new Exception("SOAP Body Element node not found");
-    // }
-    // 
-    // Element reqSecToken = doc.createElement("RequestSecurityToken");
-    // 
-    // //Creating the TokenType element
-    // Element tokenTypeElement = doc.createElement("TokenType");
-    // tokenTypeElement.appendChild(doc.createTextNode(this.tokenType));
-    // 
-    // //Creating the RequestType element
-    // Element requestTypeElement = doc.createElement("RequestType");
-    // requestTypeElement.appendChild(doc.createTextNode(this.reqType));
-    // 
-    // //Adding the elements into RequestSecurityToken element
-    // reqSecToken.appendChild(tokenTypeElement);
-    // reqSecToken.appendChild(requestTypeElement);
-    // 
-    // }
+
 }
