@@ -7,6 +7,7 @@
 package secconv.scenarios;
 
 
+import secconv.scenarios.ping.WSConvScenario1;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
@@ -42,11 +43,11 @@ public class TestSecConvScen1 extends TestCase {
 		 * @param args command line args
 		 */
 		public static void main(String[] args) throws Exception {
-			//Scenario1.main(args);
+			WSConvScenario1.main(args);
 		}
 
-		public void testScenario1() throws Exception {
-			//Scenario1.main(new String[]{"-lhttp://localhost:8080/axis/services/Ping1"});
+		public void testWSSecConvScen1() throws Exception {
+			WSConvScenario1.main(new String[]{"-lhttp://localhost:8080/axis/services/WSConvScenario1"});
 		}
 	
 	

@@ -24,7 +24,7 @@ public class PackageTests extends TestCase{
 
 		public static Test suite() {
 			TestSuite suite = new TestSuite();
-		  	//suite.addTestSuite(TestWSTest.class);
+		  	suite.addTestSuite(TestSecConvScen1.class);
 			return suite;
 		}
 
