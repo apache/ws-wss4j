@@ -93,6 +93,19 @@ public class WSDoAllSender extends BasicHandler {
 	X509Certificate encCert = null;
 
 	/**
+	 * Initialize data fields from previous use in case of cached object.
+     * Axis may cache the handler object, thus weneed to intiailize (reset)
+     * some data fields. In particular remove old elements from the
+     * vectors. The other fields are initialized implictly using the
+     * lookup of the WSDD parameter (getOption()) and properties.
+	 *
+	 */
+	private void initialize() {
+		signatureParts.removeAllElements();
+		encryptParts.removeAllElements();
+	}
+	
+	/**
 	 * Axis calls invoke to handle a message.
 	 * <p/>
 	 * 
@@ -107,6 +120,9 @@ public class WSDoAllSender extends BasicHandler {
 				"WSDoAllSender: enter invoke() with msg type: "
 					+ mc.getCurrentMessage().getMessageType());
 		}
+		
+		initialize();
+		
 		noSerialization = false;
 		msgContext = mc;
 		/*
