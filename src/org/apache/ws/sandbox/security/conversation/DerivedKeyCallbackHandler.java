@@ -17,7 +17,6 @@
 package org.apache.ws.security.conversation;
 
 import org.apache.ws.security.WSPasswordCallback;
-import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.conversation.message.info.DerivedKeyInfo;
 import org.apache.ws.security.conversation.message.info.SecurityContextInfo;
 

@@ -17,11 +17,6 @@
 
 package org.apache.ws.axis.security.conversation;
 
-import java.io.ByteArrayOutputStream;
-
-import javax.xml.soap.SOAPException;
-import javax.xml.soap.SOAPHeader;
-
 import org.apache.axis.AxisFault;
 import org.apache.axis.Message;
 import org.apache.axis.MessageContext;
@@ -39,14 +34,7 @@ import org.apache.ws.security.conversation.ConversationUtil;
 import org.apache.ws.security.conversation.DerivedKeyCallbackHandler;
 import org.apache.ws.security.conversation.message.info.SecurityContextInfo;
 import org.apache.ws.security.conversation.message.token.DerivedKeyToken;
-import org
-    .apache
-    .ws
-    .security
-    .conversation
-    .message
-    .token
-    .RequestSecurityTokenResponse;
+import org.apache.ws.security.conversation.message.token.RequestSecurityTokenResponse;
 import org.apache.ws.security.conversation.message.token.RequestedProofToken;
 import org.apache.ws.security.conversation.message.token.SecurityContextToken;
 import org.apache.ws.security.message.token.Reference;
@@ -56,6 +44,10 @@ import org.apache.xml.security.utils.XMLUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+
+import javax.xml.soap.SOAPException;
+import javax.xml.soap.SOAPHeader;
+import java.io.ByteArrayOutputStream;
 
 /**
  * @author Dimuthu, Kau

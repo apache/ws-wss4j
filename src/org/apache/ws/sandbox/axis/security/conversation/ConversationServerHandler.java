@@ -17,13 +17,6 @@
 
 package org.apache.ws.axis.security.conversation;
 
-import java.io.ByteArrayOutputStream;
-import java.util.Iterator;
-
-import javax.xml.soap.SOAPException;
-import javax.xml.soap.SOAPHeader;
-import javax.xml.soap.SOAPHeaderElement;
-
 import org.apache.axis.AxisFault;
 import org.apache.axis.Message;
 import org.apache.axis.MessageContext;
@@ -42,14 +35,7 @@ import org.apache.ws.security.conversation.ConversationUtil;
 import org.apache.ws.security.conversation.DerivedKeyCallbackHandler;
 import org.apache.ws.security.conversation.message.info.SecurityContextInfo;
 import org.apache.ws.security.conversation.message.token.DerivedKeyToken;
-import org
-    .apache
-    .ws
-    .security
-    .conversation
-    .message
-    .token
-    .RequestSecurityTokenResponse;
+import org.apache.ws.security.conversation.message.token.RequestSecurityTokenResponse;
 import org.apache.ws.security.conversation.message.token.RequestedProofToken;
 import org.apache.ws.security.conversation.message.token.SecurityContextToken;
 import org.apache.ws.security.message.token.Reference;
@@ -59,8 +45,13 @@ import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.xml.security.utils.XMLUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import javax.xml.soap.SOAPException;
+import javax.xml.soap.SOAPHeader;
+import javax.xml.soap.SOAPHeaderElement;
+import java.io.ByteArrayOutputStream;
+import java.util.Iterator;
 
 /**
  * Serverside handler that implements WS-Secure Conversation for Axis.

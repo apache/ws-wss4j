@@ -17,10 +17,9 @@
 
 package org.apache.ws.axis.security.saml;
 
-import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.axis.MessageContext;
 import org.apache.axis.handlers.BasicHandler;
-
+import org.apache.ws.security.components.crypto.Crypto;
 import org.opensaml.SAMLAssertion;
 import org.w3c.dom.Document;
 

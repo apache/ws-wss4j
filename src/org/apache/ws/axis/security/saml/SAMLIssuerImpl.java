@@ -16,21 +16,17 @@
  */
 package org.apache.ws.axis.security.saml;
 
-import java.io.IOException;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.axis.MessageContext;
 import org.apache.axis.handlers.BasicHandler;
-
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
-
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.keys.KeyInfo;
 import org.apache.xml.security.keys.content.X509Data;
 import org.apache.xml.security.signature.XMLSignature;
-
 import org.opensaml.SAMLAssertion;
 import org.opensaml.SAMLAuthenticationStatement;
 import org.opensaml.SAMLException;
@@ -39,12 +35,12 @@ import org.opensaml.SAMLStatement;
 import org.opensaml.SAMLSubject;
 import org.w3c.dom.Document;
 
+import java.io.IOException;
 import java.security.cert.X509Certificate;
-
-import java.util.Properties;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
+import java.util.Properties;
 
 /**
  * Builds a WS SAML Assertion and inserts it into the SOAP Envelope. Refer to

@@ -19,22 +19,21 @@ package org.apache.ws.security.message;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.SOAPConstants;
+import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSEncryptionPart;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.message.token.BinarySecurity;
+import org.apache.ws.security.message.token.Reference;
 import org.apache.ws.security.message.token.SecurityTokenReference;
 import org.apache.ws.security.message.token.X509Security;
 import org.apache.ws.security.util.WSSecurityUtil;
-import org.apache.ws.security.message.token.Reference;
-
-import org.apache.xml.security.encryption.XMLCipher;
 import org.apache.xml.security.encryption.EncryptedData;
+import org.apache.xml.security.encryption.XMLCipher;
 import org.apache.xml.security.encryption.XMLEncryptionException;
-import org.apache.xml.security.keys.content.x509.XMLX509IssuerSerial;
 import org.apache.xml.security.keys.KeyInfo;
+import org.apache.xml.security.keys.content.x509.XMLX509IssuerSerial;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Text;
@@ -44,7 +43,6 @@ import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
-
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;

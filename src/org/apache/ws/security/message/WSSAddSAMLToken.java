@@ -21,7 +21,6 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.opensaml.SAMLAssertion;
 import org.opensaml.SAMLException;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 

@@ -24,11 +24,11 @@ import org.apache.axis.SOAPPart;
 import org.apache.axis.handlers.BasicHandler;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.ws.axis.security.saml.SAMLIssuerFactory;
 import org.apache.ws.axis.security.saml.SAMLIssuer;
+import org.apache.ws.axis.security.saml.SAMLIssuerFactory;
 import org.apache.ws.axis.security.util.AxisUtil;
-import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.SOAPConstants;
+import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSEncryptionPart;
 import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSecurityEngine;
@@ -38,24 +38,20 @@ import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.message.WSAddTimestamp;
 import org.apache.ws.security.message.WSEncryptBody;
+import org.apache.ws.security.message.WSSAddSAMLToken;
 import org.apache.ws.security.message.WSSAddUsernameToken;
 import org.apache.ws.security.message.WSSignEnvelope;
-import org.apache.ws.security.message.WSSAddSAMLToken;
-import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.ws.security.util.StringUtil;
+import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.xml.security.utils.XMLUtils;
-
 import org.opensaml.SAMLAssertion;
-
 import org.w3c.dom.Document;
 
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
-
-import java.security.cert.X509Certificate;
-
 import java.io.ByteArrayOutputStream;
 import java.io.UnsupportedEncodingException;
+import java.security.cert.X509Certificate;
 import java.util.Hashtable;
 import java.util.Vector;
 

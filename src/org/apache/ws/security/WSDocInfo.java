@@ -34,8 +34,8 @@ package org.apache.ws.security;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.w3c.dom.Element;
 
-import java.util.Vector;
 import java.util.Enumeration;
+import java.util.Vector;
 
 public class WSDocInfo {
 	int hash;

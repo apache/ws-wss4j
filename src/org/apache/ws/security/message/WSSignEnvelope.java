@@ -19,44 +19,42 @@ package org.apache.ws.security.message;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.SOAPConstants;
-import org.apache.ws.security.WSEncryptionPart;
-import org.apache.ws.security.WSSecurityException;
+import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDocInfo;
 import org.apache.ws.security.WSDocInfoStore;
-import org.apache.ws.security.transform.STRTransform;
+import org.apache.ws.security.WSEncryptionPart;
+import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.message.token.BinarySecurity;
 import org.apache.ws.security.message.token.PKIPathSecurity;
 import org.apache.ws.security.message.token.Reference;
 import org.apache.ws.security.message.token.SecurityTokenReference;
 import org.apache.ws.security.message.token.X509Security;
+import org.apache.ws.security.transform.STRTransform;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.xml.security.c14n.Canonicalizer;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.keys.KeyInfo;
-import org.apache.xml.security.keys.content.x509.XMLX509IssuerSerial;
-import org.apache.xml.security.keys.content.x509.XMLX509Certificate;
 import org.apache.xml.security.keys.content.X509Data;
+import org.apache.xml.security.keys.content.x509.XMLX509Certificate;
+import org.apache.xml.security.keys.content.x509.XMLX509IssuerSerial;
 import org.apache.xml.security.signature.XMLSignature;
 import org.apache.xml.security.signature.XMLSignatureException;
+import org.apache.xml.security.transforms.Transform;
 import org.apache.xml.security.transforms.TransformationException;
 import org.apache.xml.security.transforms.Transforms;
-import org.apache.xml.security.transforms.Transform;
-
 import org.opensaml.SAMLAssertion;
-import org.opensaml.SAMLObject;
-import org.opensaml.SAMLSubjectStatement;
 import org.opensaml.SAMLException;
+import org.opensaml.SAMLObject;
 import org.opensaml.SAMLSubject;
-
+import org.opensaml.SAMLSubjectStatement;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import java.security.cert.X509Certificate;
-import java.util.Vector;
 import java.util.Iterator;
+import java.util.Vector;
 
 /**
  * Signs a SOAP envelope according to WS Specification, X509 profile, and adds

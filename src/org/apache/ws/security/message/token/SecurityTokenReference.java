@@ -19,24 +19,22 @@ package org.apache.ws.security.message.token;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDocInfo;
 import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.util.DOM2Writer;
+import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.keys.content.x509.XMLX509IssuerSerial;
 import org.apache.xml.security.utils.Base64;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Text;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.w3c.dom.Text;
 
 import javax.xml.namespace.QName;
-
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 

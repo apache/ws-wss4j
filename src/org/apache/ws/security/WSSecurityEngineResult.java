@@ -17,13 +17,12 @@
 
 package org.apache.ws.security;
 
+import org.apache.ws.security.message.token.Timestamp;
 import org.opensaml.SAMLAssertion;
+
 import java.security.Principal;
 import java.security.cert.X509Certificate;
-
 import java.util.Vector;
-
-import org.apache.ws.security.message.token.Timestamp;
 
 /**
  * @author Werner Dittmann (Werner.Dittmann@siemens.com)

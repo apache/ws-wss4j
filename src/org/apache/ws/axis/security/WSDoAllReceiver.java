@@ -37,8 +37,8 @@ import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
-import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.ws.security.message.token.Timestamp;
+import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.xml.security.utils.XMLUtils;
 import org.w3c.dom.Document;
 

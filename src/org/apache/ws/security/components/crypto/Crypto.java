@@ -21,11 +21,11 @@ import org.apache.ws.security.WSSecurityException;
 
 import java.io.InputStream;
 import java.math.BigInteger;
-import java.security.PrivateKey;
 import java.security.KeyStore;
+import java.security.PrivateKey;
 import java.security.cert.Certificate;
-import java.security.cert.X509Certificate;
 import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
 
 /**
  * Crypto.
