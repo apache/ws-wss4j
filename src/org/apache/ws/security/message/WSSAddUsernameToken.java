@@ -104,7 +104,6 @@ public class WSSAddUsernameToken extends WSBaseMessage {
      * @param username The username to set in the UsernameToken
      * @param password The password of the user
      * @return Document with UsernameToken added
-     * @throws Exception 
      */
     public Document build(Document doc, String username, String password) { // throws Exception {
         log.debug("Begin add username token...");

@@ -44,6 +44,8 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
+import org.opensaml.SAMLAssertion;
+import org.opensaml.SAMLException;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -109,6 +111,10 @@ public class WSSecurityEngine {
 	 * <code>wsu:Timestamp</code> as defined by OASIS WS Security specification,
 	 */
 	protected static final QName TIMESTAMP = new QName(WSConstants.WSU_NS, WSConstants.TIMESTAMP_TOKEN_LN);
+    /**
+     * <code>saml:Assertion</code> as defined by SAML specification
+     */
+    protected static final QName SAML_TOKEN = new QName(WSConstants.SAML_NS, WSConstants.ASSERTION_LN);
   
     static {
         org.apache.xml.security.Init.init();
@@ -249,7 +255,7 @@ public class WSSecurityEngine {
      * 						verified. The functions returns <code>null</code> if no
      * 						Signature or UsernameToken were found and only a decryption 
      * 						was done.
-     * @throws Exception 
+     * @throws WSSecurityException 
      */
     protected Vector processSecurityHeader(Element securityHeader, 
     									   CallbackHandler cb,
@@ -353,6 +359,13 @@ public class WSSecurityEngine {
 						lastPrincipalFound,
 						WSConstants.UT,
 						null));
+           } else if (el.equals(SAML_TOKEN)) {
+               if (doDebug) {
+                   log.debug("Found SAML Assertion element");
+               }
+               handleSAMLToken((Element) elem);
+               returnResults.add(0,
+                       new WSSecurityEngineResult(null, WSConstants.ST, null));
 			} else if (el.equals(TIMESTAMP)) {
 				if (doDebug) {
 					log.debug("Found Timestamp list element");
@@ -649,6 +662,25 @@ public class WSSecurityEngine {
         return principal;
     }
 
+    public void handleSAMLToken(Element token) throws WSSecurityException {
+        boolean result = false;
+        SAMLAssertion assertion = null;
+        try {
+            assertion = new SAMLAssertion(token);
+            result = true;
+            if (doDebug) {
+                log.debug("SAML Assertion issuer " + assertion.getIssuer());
+            }
+        } catch (SAMLException e) {
+            // TODO: Fix me.
+            e.printStackTrace();  
+        }
+        if (!result) {
+            throw new WSSecurityException(WSSecurityException.FAILED_AUTHENTICATION);
+        }
+        return;
+    }
+    
     public void handleEncryptedKey(Element xencEncryptedKey, CallbackHandler cb, Crypto crypto) throws WSSecurityException {
 		long t0=0, t1=0, t2=0;
 		if( tlog.isDebugEnabled() ) {

@@ -56,9 +56,14 @@ public class WSDoAllConstants {
 	public static final String NO_SECURITY = "NoSecurity";
 
 	/**
-	 * Perform a UsernameToken identifiaction only. 
+	 * Perform a UsernameToken identification only. 
 	 */
 	public static final String USERNAME_TOKEN = "UsernameToken";
+
+    /**
+     * Perform a SAML Token identification only. 
+     */
+    public static final String SAML_TOKEN = "SAMLToken";
 
 	/**
 	 * Perform a Signature only. 

@@ -87,6 +87,10 @@ public class WSConstants {
     public static final String CREATED_LN = "Created";
 	public static final String EXPIRES_LN ="Expires";
 
+    public static final String SAML_NS = "urn:oasis:names:tc:SAML:1.0:assertion";
+    public static final String SAMLP_NS = "urn:oasis:names:tc:SAML:1.0:protocol";
+    public static final String ASSERTION_LN = "Assertion";
+    
 	//
 	// SOAP-ENV Namespaces
 	//
@@ -287,6 +291,7 @@ public class WSConstants {
 	public static final int UT = 0x1; // perform UsernameToken only
 	public static final int SIGN = 0x2; // Perform Signature
 	public static final int ENCR = 0x4; // Perform Encryption
+    public static final int ST = 0x8; // perform SAMLToken only
 
 	public static final int NO_SERIALIZE = 0x100;
 	public static final int SERIALIZE = 0x200;

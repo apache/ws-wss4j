@@ -67,6 +67,7 @@ Build Instructions:
         <property name="dir.doc" value="./doc"/>
         <property name="dir.dist" value="./dist"/>
         <property name="dir.libs" value="./lib"/>
+        <property name="dir.endorsed.libs" value="./endorsed"/>
         <property name="dir.src" value="./src"/>
         <property name="dir.samples" value="./samples"/>
         <property name="dir.test" value="./test"/>
@@ -101,6 +102,10 @@ Build Instructions:
          -->
         <path id="classpath.libraries" description="3rd party libs">
             <fileset dir="${dir.libs}">
+                <include name="**/*.jar"/>
+                <!-- <pathelement path="${java.class.path}"/> -->
+            </fileset>
+            <fileset dir="${dir.endorsed.libs}">
                 <include name="**/*.jar"/>
                 <!-- <pathelement path="${java.class.path}"/> -->
             </fileset>
@@ -391,6 +396,7 @@ org.apache.ws.axis.security.util
     <target name="start-functional-test-http-server" if="junit.present">
         <echo message="Starting http server."/>
         <java classname="org.apache.axis.transport.http.SimpleAxisServer" fork="yes" dir="${build.dir}">
+            <jvmarg value="-Djava.endorsed.dirs=${basedir}/endorsed"/>
             <classpath refid="classpath.library"/>
         </java>
     </target>
@@ -442,9 +448,7 @@ org.apache.ws.axis.security.util
             haltonfailure="yes"
             fork="yes"
             dir="${basedir}">
-            <!-- See if this helps with Gump test failures -->
-            <sysproperty key="build.clonevm" value="true"/>
-
+            <jvmarg value="-Djava.endorsed.dirs=${basedir}/endorsed"/>
             <jvmarg value="-Dhttp.proxyHost=${http.proxyHost}"/>
             <jvmarg value="-Dhttp.proxyPort=${http.proxyPort}"/>
             <jvmarg value="-Dhttp.nonProxyHosts=${http.nonProxyHosts}"/>

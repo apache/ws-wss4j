@@ -175,4 +175,11 @@
   </responseFlow>
   </service>
 
+ <service name="STPing1">
+  <requestFlow>
+   <handler type="java:org.apache.ws.axis.security.WSDoAllSender" >
+    <parameter name="action" value="SAMLToken"/>
+   </handler>
+  </requestFlow>
+  </service>
  </deployment>

@@ -57,6 +57,7 @@ public class PackageTests extends TestCase {
         suite.addTestSuite(TestScenario5.class);
    		suite.addTestSuite(TestScenario6.class); 
 		suite.addTestSuite(TestScenario7.class); 
+        suite.addTestSuite(TestSTScenario1.class);
         return suite;
     }
 

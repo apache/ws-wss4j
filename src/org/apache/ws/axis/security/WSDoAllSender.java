@@ -37,6 +37,7 @@ import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.message.WSEncryptBody;
 import org.apache.ws.security.message.WSSAddUsernameToken;
 import org.apache.ws.security.message.WSSignEnvelope;
+import org.apache.ws.security.message.WSSAddSAMLToken;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.ws.security.util.StringUtil;
 import org.apache.xml.security.utils.XMLUtils;
@@ -246,107 +247,20 @@ public class WSDoAllSender extends BasicHandler {
 			String password = null;
 			switch (actionToDo) {
 				case WSConstants.UT :
-					password =
-						getPassword(
-							username,
-							actionToDo,
-							WSDoAllConstants.PW_CALLBACK_CLASS,
-							WSDoAllConstants.PW_CALLBACK_REF)
-							.getPassword();
-
-					WSSAddUsernameToken builder =
-						new WSSAddUsernameToken(actor, mu);
-					builder.setPasswordType(pwType);
-					// add the UsernameToken to the SOAP Enevelope
-					builder.build(doc, username, password);
-
-					if (utElements != null && utElements.length > 0) {
-						for (int j = 0; j < utElements.length; j++) {
-							utElements[j].trim();
-							if (utElements[j].equals("Nonce")) {
-								builder.addNonce(doc);
-							}
-							if (utElements[j].equals("Created")) {
-								builder.addCreated(doc);
-							}
-						}
-					}
-					break;
+                    performUTAction(actionToDo, mu, doc);
+                    break;
 
 				case WSConstants.ENCR :
-					WSEncryptBody wsEncrypt = new WSEncryptBody(actor, mu);
-					if (encKeyId != 0) {
-						wsEncrypt.setKeyIdentifierType(encKeyId);
-					}
-					if (encKeyId == WSConstants.EMBEDDED_KEYNAME) {
-                        String encKeyName = null;
-						if ((encKeyName =
-							(String) getOption(WSDoAllConstants.ENC_KEY_NAME))
-							== null) {
-							encKeyName =
-								(String) msgContext.getProperty(
-									WSDoAllConstants.ENC_KEY_NAME);
-						}
-                        wsEncrypt.setEmbeddedKeyName(encKeyName);
-						byte[] embeddedKey =
-							getPassword(
-								encUser,
-								actionToDo,
-								WSDoAllConstants.ENC_CALLBACK_CLASS,
-								WSDoAllConstants.ENC_CALLBACK_REF)
-								.getKey();
-						wsEncrypt.setKey(embeddedKey);
-					}
-					if (encSymmAlgo != null) {
-						wsEncrypt.setSymmetricEncAlgorithm(encSymmAlgo);
-					}
-					if (encKeyTransport != null) {
-						wsEncrypt.setKeyEnc(encKeyTransport);
-					}
-					wsEncrypt.setUserInfo(encUser);
-					wsEncrypt.setUseThisCert(encCert);
-					if (encryptParts.size() > 0) {
-						wsEncrypt.setParts(encryptParts);
-					}
-					try {
-						wsEncrypt.build(doc, encCrypto);
-					} catch (WSSecurityException e) {
-						throw new AxisFault(
-							"WSDoAllSender: Encryption: error during message processing"
-								+ e);
-					}
-					break;
+                    performENCRAction(mu, actionToDo, doc);
+                    break;
 
 				case WSConstants.SIGN :
-					password =
-						getPassword(
-							username,
-							actionToDo,
-							WSDoAllConstants.PW_CALLBACK_CLASS,
-							WSDoAllConstants.PW_CALLBACK_REF)
-							.getPassword();
+                    performSIGNAction(actionToDo, mu, doc);
+                    break;
 
-					WSSignEnvelope wsSign = new WSSignEnvelope(actor, mu);
-					if (sigKeyId != 0) {
-						wsSign.setKeyIdentifierType(sigKeyId);
-					}
-					if (sigAlgorithm != null) {
-						wsSign.setSignatureAlgorithm(sigAlgorithm);
-					}
-
-					wsSign.setUserInfo(username, password);
-					if (signatureParts.size() > 0) {
-						wsSign.setParts(signatureParts);
-					}
-
-					try {
-						wsSign.build(doc, sigCrypto);
-					} catch (WSSecurityException e) {
-						throw new AxisFault(
-							"WSDoAllSender: Signature: error during message procesing"
-								+ e);
-					}
-					break;
+                case WSConstants.ST :
+                    performSTAction(actionToDo, mu, doc);
+                    break;
 
 				case WSConstants.NO_SERIALIZE :
 					noSerialization = true;
@@ -390,8 +304,121 @@ public class WSDoAllSender extends BasicHandler {
 			log.debug("WSDoAllSender: exit invoke()");
 		}
 	}
-	
-	/**
+
+    private void performSIGNAction(int actionToDo, boolean mu, Document doc) throws AxisFault {
+        String password;
+        password =
+                getPassword(username,
+                        actionToDo,
+                        WSDoAllConstants.PW_CALLBACK_CLASS,
+                        WSDoAllConstants.PW_CALLBACK_REF)
+                .getPassword();
+
+        WSSignEnvelope wsSign = new WSSignEnvelope(actor, mu);
+        if (sigKeyId != 0) {
+            wsSign.setKeyIdentifierType(sigKeyId);
+        }
+        if (sigAlgorithm != null) {
+            wsSign.setSignatureAlgorithm(sigAlgorithm);
+        }
+
+        wsSign.setUserInfo(username, password);
+        if (signatureParts.size() > 0) {
+            wsSign.setParts(signatureParts);
+        }
+
+        try {
+            wsSign.build(doc, sigCrypto);
+        } catch (WSSecurityException e) {
+            throw new AxisFault("WSDoAllSender: Signature: error during message procesing"
+                    + e);
+        }
+    }
+
+    private void performENCRAction(boolean mu, int actionToDo, Document doc) throws AxisFault {
+        WSEncryptBody wsEncrypt = new WSEncryptBody(actor, mu);
+        if (encKeyId != 0) {
+            wsEncrypt.setKeyIdentifierType(encKeyId);
+        }
+        if (encKeyId == WSConstants.EMBEDDED_KEYNAME) {
+            String encKeyName = null;
+            if ((encKeyName =
+                    (String) getOption(WSDoAllConstants.ENC_KEY_NAME))
+                    == null) {
+                encKeyName =
+                        (String) msgContext.getProperty(WSDoAllConstants.ENC_KEY_NAME);
+            }
+            wsEncrypt.setEmbeddedKeyName(encKeyName);
+            byte[] embeddedKey =
+                    getPassword(encUser,
+                            actionToDo,
+                            WSDoAllConstants.ENC_CALLBACK_CLASS,
+                            WSDoAllConstants.ENC_CALLBACK_REF)
+                    .getKey();
+            wsEncrypt.setKey(embeddedKey);
+        }
+        if (encSymmAlgo != null) {
+            wsEncrypt.setSymmetricEncAlgorithm(encSymmAlgo);
+        }
+        if (encKeyTransport != null) {
+            wsEncrypt.setKeyEnc(encKeyTransport);
+        }
+        wsEncrypt.setUserInfo(encUser);
+        wsEncrypt.setUseThisCert(encCert);
+        if (encryptParts.size() > 0) {
+            wsEncrypt.setParts(encryptParts);
+        }
+        try {
+            wsEncrypt.build(doc, encCrypto);
+        } catch (WSSecurityException e) {
+            throw new AxisFault("WSDoAllSender: Encryption: error during message processing"
+                    + e);
+        }
+    }
+
+    private void performUTAction(int actionToDo, boolean mu, Document doc) throws AxisFault {
+        String password;
+        password =
+                getPassword(username,
+                        actionToDo,
+                        WSDoAllConstants.PW_CALLBACK_CLASS,
+                        WSDoAllConstants.PW_CALLBACK_REF)
+                .getPassword();
+
+        WSSAddUsernameToken builder =
+                new WSSAddUsernameToken(actor, mu);
+        builder.setPasswordType(pwType);
+        // add the UsernameToken to the SOAP Enevelope
+        builder.build(doc, username, password);
+
+        if (utElements != null && utElements.length > 0) {
+            for (int j = 0; j < utElements.length; j++) {
+                utElements[j].trim();
+                if (utElements[j].equals("Nonce")) {
+                    builder.addNonce(doc);
+                }
+                if (utElements[j].equals("Created")) {
+                    builder.addCreated(doc);
+                }
+            }
+        }
+    }
+
+    private void performSTAction(int actionToDo, boolean mu, Document doc) throws AxisFault {
+        WSSAddSAMLToken builder =
+                new WSSAddSAMLToken(actor, mu);
+
+        // add the SAMLAssertion Token to the SOAP Enevelope
+        builder.build(doc, username);
+
+        if (utElements != null && utElements.length > 0) {
+            for (int j = 0; j < utElements.length; j++) {
+                utElements[j].trim();
+            }
+        }
+    }
+
+    /**
 	 * Hook to allow subclasses to load their Signature Crypto however they see fit.
 	 */
 	protected Crypto loadSignatureCrypto() throws AxisFault {

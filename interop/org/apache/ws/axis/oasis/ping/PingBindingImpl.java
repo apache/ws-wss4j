@@ -59,7 +59,7 @@ public class PingBindingImpl
 			for (int j = 0; j < wsSecEngineResults.size(); j++) {
 				WSSecurityEngineResult wser =
 					(WSSecurityEngineResult) wsSecEngineResults.get(j);
-				if (wser.getAction() != WSConstants.ENCR) {
+				if (wser.getAction() != WSConstants.ENCR && wser.getPrincipal() != null) {
 					System.out.println(wser.getPrincipal().getName());
 				}
 			}
