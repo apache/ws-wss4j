@@ -31,8 +31,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.axis.security.util.AxisUtil;
 import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.SOAPConstants;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSSecurityEngineResult;
+import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.xml.security.utils.XMLUtils;
@@ -94,12 +96,29 @@ public class WSDoAllReceiver extends BasicHandler {
 			doc = sm.getSOAPEnvelope().getAsDocument();
 			if (doDebug) {
 				log.debug("Received SOAP request: ");
-				log.debug(sm.getSOAPPartAsString());
+				log.debug(org.apache.axis.utils.XMLUtils.PrettyDocumentToString(doc));
 			}
 		} catch (Exception ex) {
 			throw new AxisFault(
 				"WSDoAllReceiver: cannot convert into document",
 				ex);
+		}
+		/*
+		 * Check if it's a response and if its a fault. Don't
+		 * process faults.
+		 */
+		String msgType = sm.getMessageType();
+		if (msgType != null && msgType.equals(Message.RESPONSE)) {
+			SOAPConstants soapConstants =
+				WSSecurityUtil.getSOAPConstants(doc.getDocumentElement());
+			if (WSSecurityUtil
+				.findElement(
+					doc.getDocumentElement(),
+					"Fault",
+					soapConstants.getEnvelopeURI())
+				!= null) {
+				return;
+			}
 		}
 
 		/*
@@ -139,8 +158,6 @@ public class WSDoAllReceiver extends BasicHandler {
 				ex);
 		}
 		if (wsResult == null) {			// no security header found
-			// TODO: if no header - check if message is a response _and_ is a SOAP fault
-			// in this case don't modify anything, just return for default processing
 			if (doAction == WSConstants.NO_SECURITY) {
 				return;
 			} else {
@@ -159,8 +176,8 @@ public class WSDoAllReceiver extends BasicHandler {
 		XMLUtils.outputDOM(doc, os, true);
 		String osStr = os.toString();
 		if (doDebug) {
-			log.debug("Processed SOAP request");
-			log.debug(osStr);
+			log.debug("Processed received SOAP request");
+			log.debug(org.apache.axis.utils.XMLUtils.PrettyDocumentToString(doc));
 		}
 		sPart.setCurrentMessage(osStr, SOAPPart.FORM_STRING);
 		
