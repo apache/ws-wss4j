@@ -91,7 +91,7 @@ public class UsernameToken {
             throw new WSSecurityException(WSSecurityException.INVALID_SECURITY_TOKEN, "badTokenType01", new Object[]{el});
         }
         String type = elementPassword.getAttribute("Type");
-        if (type.equals("wsse:" + WSConstants.PASSWORD_DIGEST)) {
+        if (type.equals(WSConstants.PASSWORD_DIGEST)) {
             hashed = true;
 			if (elementNonce == null || elementCreated == null) {
 				throw new WSSecurityException(WSSecurityException.INVALID_SECURITY_TOKEN, "badTokenType01", new Object[]{el});
@@ -140,10 +140,8 @@ public class UsernameToken {
         
         if (passwordType.equals(WSConstants.PASSWORD_TEXT)) {
             hashed = false;
-            this.elementPassword.setAttribute("Type", "wsse:" + WSConstants.PASSWORD_TEXT);
         } else {
             hashed = true;
-            this.elementPassword.setAttribute("Type", "wsse:" + WSConstants.PASSWORD_DIGEST);
             
             if (elementNonce == null) {
             	addNonce(doc);
@@ -294,7 +292,7 @@ public class UsernameToken {
         try {
             if (!hashed) {
                 node.setData(pwd);
-                this.elementPassword.setAttribute("Type", "wsse:PasswordText");
+                this.elementPassword.setAttribute("Type", WSConstants.PASSWORD_TEXT);
             } else {
                 byte[] b1 = Base64.decode(getNonce());
                 byte[] b2 = getCreated().getBytes("UTF-8");
@@ -315,7 +313,7 @@ public class UsernameToken {
                 sha.reset();
                 sha.update(b4);
                 node.setData(Base64.encode(sha.digest()));
-                this.elementPassword.setAttribute("Type", "wsse:PasswordDigest");
+                this.elementPassword.setAttribute("Type", WSConstants.PASSWORD_DIGEST);
             }
         } catch (Exception e) {
             e.printStackTrace();

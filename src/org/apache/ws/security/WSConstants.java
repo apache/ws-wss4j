@@ -86,7 +86,7 @@ public interface WSConstants {
 	 * <p/>
 	 * This is a required method as defined by WS Specification, Username token profile.
 	 */
-	public static final String PASSWORD_DIGEST = "PasswordDigest";
+	public static final String PASSWORD_DIGEST = WSSE_NS + "#PasswordDigest";
 
 	/**
 	* Sets the {@link org.apache.ws.security.message.WSSAddUsernameToken#build(Document, String, String) UserNameToken}
@@ -94,7 +94,7 @@ public interface WSConstants {
 	* <p/>
 	* This is a required method as defined by WS Specification, Username token profile.
 	*/
-	public static final String PASSWORD_TEXT = "PasswordText";
+	public static final String PASSWORD_TEXT = WSSE_NS + "#PasswordText";
 
 	/**
 	 * Sets the {@link org.apache.ws.security.message.WSEncryptBody#build(Document, Crypto) encryption}
