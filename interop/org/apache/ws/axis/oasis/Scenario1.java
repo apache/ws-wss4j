@@ -84,8 +84,8 @@ public class Scenario1 {
         String text =
                 new String("WSS4J");
 
-        port.ping(text);
-        System.out.println(text);
+        // port.ping(text);
+        System.out.println(port.ping(text));
 
         if (opts.isFlagSet('t') > 0) {
             long startTime = System.currentTimeMillis();

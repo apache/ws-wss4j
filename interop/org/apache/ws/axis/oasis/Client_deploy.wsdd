@@ -46,7 +46,7 @@
    </handler>
   </requestFlow>
   <responseFlow>
-   <handler name="DoSecurityReceiver" type="java:org.apache.ws.axis.security.WSDoAllReceiver">
+   <handler type="java:org.apache.ws.axis.security.WSDoAllReceiver">
     <parameter name="passwordCallbackClass" 
       value="org.apache.ws.axis.oasis.PWCallback"/>
     <parameter name="action" value="Signature Encrypt"/>
@@ -116,7 +116,7 @@
    </handler>
   </requestFlow>
   <responseFlow>
-   <handler name="DoSecurityReceiver" type="java:org.apache.ws.axis.security.WSDoAllReceiver">
+   <handler type="java:org.apache.ws.axis.security.WSDoAllReceiver">
     <parameter name="passwordCallbackClass" value="org.apache.ws.axis.oasis.PWCallback"/>
     <parameter name="action" value="Encrypt Signature"/>
     <parameter name="signaturePropFile" value="crypto.properties" />
@@ -140,7 +140,7 @@
    </handler>
   </requestFlow>
   <responseFlow>
-   <handler name="DoSecurityReceiver" type="java:org.apache.ws.axis.security.WSDoAllReceiver">
+   <handler type="java:org.apache.ws.axis.security.WSDoAllReceiver">
     <parameter name="passwordCallbackClass" 
       value="org.apache.ws.axis.oasis.PWCallback"/>
     <parameter name="action" value="Signature Encrypt"/>

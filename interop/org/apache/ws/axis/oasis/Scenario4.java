@@ -82,8 +82,7 @@ public class Scenario4 {
         String text =
                 new String("Scenario 4 text");
 
-        port.ping(text);
-        System.out.println(text);
+        System.out.println(port.ping(text));
 
         if (opts.isFlagSet('t') > 0) {
             long startTime = System.currentTimeMillis();
