@@ -43,13 +43,13 @@ Build Instructions:
         <property name='product.name' value='wss4j'/>
         <property name='product.shortname' value='wss4j'/>
 
-        <property name='product.version.major' value='0'/>
-        <property name='product.version.minor' value='9'/>
-        <property name='product.version.level' value='D'/>
+        <property name='product.version.major' value='1'/>
+        <property name='product.version.minor' value='0'/>
+        <property name='product.version.level' value='Beta'/>
         <property name='product.Version' value='${product.version.major}.${product.version.minor}.${product.version.level}'/>
         <property name='product.version' value='${product.version.major}.${product.version.minor}.${product.version.level}'/>
         <property name='product_version' value='${product.version.major}_${product.version.minor}_${product.version.level}'/>
-        <property name="year" value="2003"/>
+        <property name="year" value="2004"/>
         <property name="copyright" value="Copyright &#169; ${year} Apache WS-Security Project. All Rights Reserved."/>
 
         <!-- Give user a chance to override without editing this file
