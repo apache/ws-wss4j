@@ -73,10 +73,12 @@ Build Instructions:
         <property name="dir.keys" value="./keys"/>
         <property name="dir.specs" value="./specs"/>
         <property name="dir.interop" value="./interop"/>
+        <property name="dir.webapp" location="./webapps/axis" />
 
         <property name="build.dir" value="./build"/>
         <property name="build.classes" value="${build.dir}/classes"/>
         <property name="build.work" value="${build.dir}/work"/>
+        <property name="build.webapp" location="${build.dir}/webapps/axis"/>
 
         <property name="jar.library" value="${product.shortname}.jar"/>
 
@@ -559,4 +561,50 @@ org.apache.ws.axis.security.util
             <param name="cvsweb" expression="http://cvs.sourceforge.net/viewcvs.py/wss4j/"/>
         </style>
     </target>
+
+  <!-- =================================================================== -->
+  <!-- Creates a war file for interop testing                              -->
+  <!-- =================================================================== -->
+  <target name="interop-war" depends="test"
+      description="Create the web application" >
+    <mkdir dir="${build.webapp}"/>
+    <copy todir="${build.webapp}">
+      <fileset dir="${dir.webapp}"/>
+    </copy>
+    <copy todir="${build.webapp}/WEB-INF/lib">
+      <fileset dir="${dir.libs}">
+        <include name="*.jar"/>
+      </fileset>
+    </copy>
+    <copy todir="${build.webapp}/WEB-INF">
+      <fileset dir="${build.dir}">
+        <include name="*.wsdd"/>
+      </fileset>
+    </copy>
+    <copy todir="${build.webapp}/WEB-INF/classes/">
+      <fileset dir="${build.classes}"/>
+    </copy>
+    <copy todir="${build.webapp}/WEB-INF/classes/">
+      <fileset dir=".">
+          <include name="client-config.wsdd"/>
+      </fileset>
+    </copy>
+    <delete>
+      <fileset dir="${build.webapp}" includes="**/CVS"/>
+    </delete>
+    <path id="deploy_xml_files">
+        <fileset dir="${build.work}">
+            <include name="**/deploy.wsdd"/>
+        </fileset>
+    </path>
+    <property name="deploy_xml_property" refid="deploy_xml_files"/>
+    <java classname="org.apache.axis.utils.Admin" fork="yes" dir="${build.webapp}/WEB-INF">
+        <classpath refid="classpath.library"/>
+        <arg line="server"/>
+        <arg line="${deploy_xml_property}"/>
+    </java>
+
+    <jar jarfile="${build.dir}/axis.war" basedir="${build.webapp}"/>
+  </target>
+
 </project>
