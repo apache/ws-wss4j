@@ -47,8 +47,8 @@
        the connection element has the form:
        scm:<system>:<system specific connection string> -->
   <repository>
-    <connection>scm:cvs:pserver:anoncvs@cvs.apache.org:/home/cvspublic:ws-fx/wss4j/</connection>
-    <url>http://cvs.apache.org/viewcvs.cgi/ws-fx/wss4j/</url>
+    <connection>scm:subversion:http://svn.apache.org/repos/asf/webservices/scout/trunk</connection>
+    <url>http://svn.apache.org/viewcvs.cgi/webservices/scout/trunk/?root=Apache-SVN</url>
   </repository>
 
   <!-- any mailing lists for the project -->

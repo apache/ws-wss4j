@@ -6,35 +6,13 @@
  */
 package org.apache.ws.axis.security.trust.secconv.interop;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.security.InvalidKeyException;
-import java.security.cert.CertificateException;
-import java.security.cert.CertificateFactory;
-import java.security.cert.X509Certificate;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Date;
-import java.util.Hashtable;
-import java.util.Properties;
-
-import javax.crypto.BadPaddingException;
-import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.ws.security.SOAPConstants;
 import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.message.WSEncryptBody;
-import org.apache.ws.security.message.token.SecurityTokenReference;
 import org.apache.ws.security.saml.SAMLIssuer;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.xml.security.keys.KeyInfo;
@@ -51,8 +29,25 @@ import org.opensaml.SAMLSubject;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Text;
-
 import sun.security.util.DerValue;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.security.InvalidKeyException;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Date;
+import java.util.Hashtable;
+import java.util.Properties;
 
 /**
  * This issues signed SAML tokens using the STS's certificate and includes the secret key encrypted by the 
@@ -73,13 +68,13 @@ public class InteropSAMLIssuerImpl implements SAMLIssuer {
 	private Properties properties = null;
 
 	private Crypto issuerCrypto = null;
+    private Crypto userCrypto = null;
 	private String issuerKeyPassword = null;
 	private String issuerKeyName = null;
 
 	private boolean senderVouches = true;
 
 	private String[] confirmationMethods = new String[1];
-	private Crypto userCrypto = null;
 	private String username = null;
     
 	private String epr = null;
@@ -456,7 +451,7 @@ public class InteropSAMLIssuerImpl implements SAMLIssuer {
 			Element xencEncryptedKey = WSEncryptBody.createEnrcyptedKey(doc, WSConstants.KEYTRANSPORT_RSAOEP);
 			
 			X509Data x509Data = new X509Data(doc);
-			x509Data.addSKI(getSKIBytesFromCert(remoteCert));
+			x509Data.addSKI(issuerCrypto.getSKIBytesFromCert(remoteCert));
 			
 			KeyInfo keyInfo = new KeyInfo(doc);
 			keyInfo.addUnknownElement(x509Data.getElement());

@@ -24,7 +24,6 @@ import org.apache.commons.discovery.resource.DiscoverResources;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSSecurityException;
-import sun.security.util.DerValue;
 
 import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
@@ -546,66 +545,26 @@ public class Merlin implements Crypto {
      */
     public byte[] getSKIBytesFromCert(X509Certificate cert)
             throws WSSecurityException {
+        /*
+         * Gets the DER-encoded OCTET string for the extension value (extnValue)
+         * identified by the passed-in oid String. The oid string is
+         * represented by a set of positive whole numbers separated by periods.
+         */
+        byte[] derEncodedValue = cert.getExtensionValue(SKI_OID);
 
-        byte data[] = null;
-        byte abyte0[] = null;
         if (cert.getVersion() < 3) {
             throw new WSSecurityException(1,
                     "noSKIHandling",
                     new Object[]{"Wrong certificate version (<3)"});
         }
 
-        /*
-         * Gets the DER-encoded OCTET string for the extension value (extnValue)
-         * identified by the passed-in oid String. The oid string is
-         * represented by a set of positive whole numbers separated by periods.
-         */
-        data = cert.getExtensionValue(SKI_OID);
-
-        if (data == null) {
-            throw new WSSecurityException(WSSecurityException.UNSUPPORTED_SECURITY_TOKEN,
-                    "noSKIHandling",
-                    new Object[]{"No extension data"});
-        }
-        DerValue derValue = null;
-        try {
-            derValue = new DerValue(data);
-        } catch (IOException e) {
-            throw new WSSecurityException(WSSecurityException.UNSUPPORTED_SECURITY_TOKEN,
-                    "noSKIHandling",
-                    new Object[]{"cannot read SKI value"});
-        }
-
-        if (derValue == null) {
-            throw new WSSecurityException(WSSecurityException.UNSUPPORTED_SECURITY_TOKEN,
-                    "noSKIHandling",
-                    new Object[]{"No DER value"});
-        }
-        if (derValue.tag != DerValue.tag_OctetString) {
-            throw new WSSecurityException(WSSecurityException.UNSUPPORTED_SECURITY_TOKEN,
-                    "noSKIHandling",
-                    new Object[]{"No octet string"});
-        }
-        byte[] extensionValue = null;
-        try {
-            extensionValue = derValue.getOctetString();
-        } catch (IOException e1) {
-            throw new WSSecurityException(WSSecurityException.UNSUPPORTED_SECURITY_TOKEN,
-                    "noSKIHandling",
-                    new Object[]{"cannot read SKI value as octet data"});
-        }
-
         /**
-         * Strip away first two bytes from the DerValue (tag and length)
+         * Strip away first four bytes from the DerValue (tag and length of
+         * ExtensionValue OCTET STRING and KeyIdentifier OCTET STRING)
          */
-        abyte0 = new byte[extensionValue.length - 2];
-
-        System.arraycopy(extensionValue, 2, abyte0, 0, abyte0.length);
-
-        /*
         byte abyte0[] = new byte[derEncodedValue.length - 4];
+
         System.arraycopy(derEncodedValue, 4, abyte0, 0, abyte0.length);
-        */
         return abyte0;
     }
 
