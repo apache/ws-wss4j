@@ -107,7 +107,6 @@ public class STSManager {
             
             this.issuerClassName = (String) hashOps.get(TrustConstants.ISSUER_CLASS);
             log.debug("Issuer class" + this.issuerClassName);
-            
             //Create the instance of the issue/renew/validate class  
             Class wClass = null;
             try {
@@ -131,8 +130,10 @@ public class STSManager {
                 res = stissuer.issue(req, res);
 
             } catch (java.lang.Exception e) {
+                System.out.println(e.getMessage());
                 throw new WSTrustException("STSManager: could not issue a token " + stissuer,
                         e);
+                        
             }
 
             /********************************************************************

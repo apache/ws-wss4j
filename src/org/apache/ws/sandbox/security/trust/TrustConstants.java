@@ -46,6 +46,7 @@ public class TrustConstants {
     public static final String RENEWING_LN = "Renewing";
     public static final String ALLOWPOSTDATING_LN = "AllowPostdating";
     public static final String APPLIESTO_LN = "AppliesTo";
+    public static final String BINARY_SECRET_LN= "BinarySecret";
 
     public static final String REQUEST_SECURITY_TOKEN_LN = "RequestSecurityToken";
     public static final String REQUESTED_SECURITY_TOKEN_LN = "RequestedSecurityToken";
@@ -75,12 +76,12 @@ public class TrustConstants {
     public static final String WST_PREFIX = "wst";
     public static final String WSP_PREFIX = "wsp";
 
-    //For STS there should be an issuer class specified in the server-config.wsdd
-    public static final String ISSUER_CLASS = "issuerClass";
-    //    For STS there should be a renewer class specified in the server-config.wsdd
-    public static final String RENEWER_CLASS = "renewerClass";
-    //    For STS there should be a validator class specified in the server-config.wsdd
-    public static final String VALIDATOR_CLASS = "validatorClass";
+    //For STS there should be an issuer class specified in the STS.properties
+    public static final String ISSUER_CLASS = "org.apache.ws.axis.security.trust.service.SecurityTokenService.issuerClass";
+    //    For STS there should be a renewer class specified in the STS.properties
+    public static final String RENEWER_CLASS = "org.apache.ws.axis.security.trust.service.SecurityTokenService.renewerClass";
+    //    For STS there should be a validator class specified in the STS.properties
+    public static final String VALIDATOR_CLASS = "org.apache.ws.axis.security.trust.service.SecurityTokenService.validatorClass";
 
     //In the request, The token type can be specified in the client-config
     public static final String TOKEN_TYPE = "TokenType";
