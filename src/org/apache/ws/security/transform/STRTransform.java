@@ -238,7 +238,11 @@ public class STRTransform extends TransformSpi {
 			 * Convert resulting STR result doc into NodeList, then c14n
 			 */
 			XMLUtils.circumventBug2650(doc); // This is needed
-			org.apache.axis.utils.XMLUtils.PrettyDocumentToWriter(doc, new PrintWriter(System.out));
+			if (doDebug) {
+				org.apache.axis.utils.XMLUtils.PrettyDocumentToWriter(
+					doc,
+					new PrintWriter(System.out));
+			}
 
 /*
 
