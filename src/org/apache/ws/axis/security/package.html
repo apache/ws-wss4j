@@ -418,8 +418,8 @@ SOAP requests:
 This simple deployment descriptor signs and encrypts the SOAP Body part.
 The only new parameter, <code>signaturePropFile</code>, specifies the
 name of the signature crypto property file to use. Because no 
-<code>encryptionPropFile</code> is declared the handler users the signature
-property file also to get the encryption certificate. The same holds true for
+<code>encryptionPropFile</code> is declared the handler also uses the signature
+property file to get the encryption certificate. The same holds true for
 the username. The password callback class must return a password
 to get the user's private key (the keystore is defined in the crypto
 property file) that WSS4J uses to generate the signature. The encryption
