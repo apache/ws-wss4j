@@ -112,7 +112,7 @@ public class WSSAddUsernameToken extends WSBaseMessage {
         ut = new UsernameToken(doc, passwordType);
         ut.setName(username);
         ut.setPassword(password);
-        WSSecurityUtil.appendChildElement(doc, securityHeader, ut.getElement());
+        WSSecurityUtil.prependChildElement(doc, securityHeader, ut.getElement(), true);
         return doc;
     }
 
