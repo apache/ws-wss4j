@@ -47,6 +47,7 @@ import org.apache.ws.security.conversation.ConversationUtil;
 import org.apache.ws.security.conversation.DerivedKeyCallbackHandler;
 import org.apache.ws.security.conversation.message.info.DerivedKeyInfo;
 import org.apache.ws.security.conversation.message.token.SecurityContextToken;
+import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.message.token.SecurityTokenReference;
 import org.apache.ws.security.util.StringUtil;
 import org.apache.ws.security.util.WSSecurityUtil;
@@ -138,17 +139,17 @@ public class ConversationServerHandler extends BasicHandler {
             e.printStackTrace();
         }
 		
-		if((this.configurator = (HashMap)msg.getProperty("PolicyObject"))==null){
-			log.debug("ConversationServerHandler :: I am configuring");
-		       initSessionInfo(); // load values to this.configurator from wsdd
-		}
+//		if((this.configurator = (HashMap)msg.getProperty("PolicyObject"))==null){
+//			log.debug("ConversationServerHandler :: I am configuring");
+//		       initSessionInfo(); // load values to this.configurator from wsdd
+//		}
 		
 		soapConstants = WSSecurityUtil.getSOAPConstants(doc.getDocumentElement());
         ConversationEngine eng = new ConversationEngine(this.configurator);
          
         try {
         	//TODO :: Process results and fix the scratch
-            Vector results = eng.processSecConvHeader(doc, "", dkcbHandler);
+            Vector results = eng.processSecConvHeader(doc, "", dkcbHandler, (String)this.configurator.get(WSHandlerConstants.PW_CALLBACK_CLASS));
 			ConvEngineResult convResult  = null;
 			String uuid = "";
 			
@@ -441,6 +442,15 @@ private void initSessionInfo() throws AxisFault {
 		} else {
 			// TODO :: add all the "MUST" parameters for variable keys
 		}
+	
+		if ((tmpStr =
+			(String) getOption(WSHandlerConstants.PW_CALLBACK_CLASS))
+			!= null) {
+		   	   	this.configurator.put(WSHandlerConstants.PW_CALLBACK_CLASS, tmpStr);
+		}else{
+			throw new AxisFault("Set the pass word call back class.....");
+		}
+		
 	}
 
 }

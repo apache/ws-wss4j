@@ -56,6 +56,7 @@ import org.apache.ws.security.conversation.message.token.RequestSecurityTokenRes
 import org.apache.ws.security.conversation.message.token.RequestedProofToken;
 import org.apache.ws.security.conversation.message.token.RequestedSecurityToken;
 import org.apache.ws.security.conversation.message.token.SecurityContextToken;
+import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.message.token.SecurityTokenReference;
 //import org.apache.ws.security.trust.TrustCommunicator;
 import org.apache.ws.security.trust.TrustConstants;
@@ -106,7 +107,10 @@ public class ConversationClientHandler extends BasicHandler {
     private static boolean isConfigured = false;
     private boolean readCrypto = false;
 
-	private String appliesTo = null; 
+	private String appliesTo = null;
+	
+	private boolean isSessionInfoConfigured = false;
+	 
     private HashMap configurator;
 
     int[] actionsInt;
@@ -254,7 +258,10 @@ public class ConversationClientHandler extends BasicHandler {
     private void doResponse(MessageContext msgContext)
         throws AxisFault { //for incoming message
         Document doc = null;
-
+		if(!isSessionInfoConfigured){
+			initSessionInfo();
+			isSessionInfoConfigured = true;
+		}
         Message message = msgContext.getCurrentMessage();
         SOAPPart sPart = (org.apache.axis.SOAPPart) message.getSOAPPart();
 //        if (!this.readCrypto) {
@@ -274,18 +281,14 @@ public class ConversationClientHandler extends BasicHandler {
          *Add them to the convSession.
          */
 
-        if ((this.configurator =
-            (HashMap) msgContext.getProperty("PolicyObject"))
-            == null) {
-            initSessionInfo();
-            // load values to this.configurator from wsdd
-        }
+        
         
         
         try{
         ConversationEngine convEng = new ConversationEngine(this.configurator);
-		Vector results = convEng.processSecConvHeader(doc, "", dkcbHandler);
-	    ConvEngineResult convResult  = null;
+		Vector results = convEng.processSecConvHeader(doc, "", dkcbHandler, (String)this.configurator.get(WSHandlerConstants.PW_CALLBACK_CLASS));
+		
+		ConvEngineResult convResult  = null;
 		//String uuid = "";
         
         
@@ -726,6 +729,14 @@ public class ConversationClientHandler extends BasicHandler {
                 // TODO :: add all the "MUST" parameters for variable keys
             }
         }
+        
+		if ((tmpStr =
+					(String) getOption(WSHandlerConstants.PW_CALLBACK_CLASS))
+					!= null) {
+						this.configurator.put(WSHandlerConstants.PW_CALLBACK_CLASS, tmpStr);
+				}else{
+					throw new AxisFault("Set the pass word call back class.....");
+				} 
 
     }
 
