@@ -407,34 +407,34 @@ public class WSEncryptBody extends WSBaseMessage {
 				secToken.setKeyIdentifier(remoteCert);
 				// build a key id class??
 				break;
-			case WSConstants.SKI_KEY_IDENTIFIER_DIRECT :
-				{
-					X509Security x509token = new X509Security(doc);
-					x509token.setX509Certificate(remoteCert);
-					x509token.setID(certUri);
-					WSSecurityUtil.prependChildElement(
-						doc,
-						wsseSecurity,
-						x509token.getElement(),
-						false);
-					// fall thru
-				}
+//			case WSConstants.SKI_KEY_IDENTIFIER_DIRECT :
+//				{
+//					X509Security x509token = new X509Security(doc);
+//					x509token.setX509Certificate(remoteCert);
+//					x509token.setID(certUri);
+//					WSSecurityUtil.prependChildElement(
+//						doc,
+//						wsseSecurity,
+//						x509token.getElement(),
+//						false);
+//					// fall thru
+//				}
 
 			case WSConstants.SKI_KEY_IDENTIFIER :
 				secToken.setKeyIdentifierSKI(remoteCert, crypto);
 				break;
-			case WSConstants.ISSUER_SERIAL_DIRECT :
-				{
-					X509Security x509token = new X509Security(doc);
-					x509token.setX509Certificate(remoteCert);
-					x509token.setID(certUri);
-					WSSecurityUtil.prependChildElement(
-						doc,
-						wsseSecurity,
-						x509token.getElement(),
-						false);
-					// fall thru
-				}
+//			case WSConstants.ISSUER_SERIAL_DIRECT :
+//				{
+//					X509Security x509token = new X509Security(doc);
+//					x509token.setX509Certificate(remoteCert);
+//					x509token.setID(certUri);
+//					WSSecurityUtil.prependChildElement(
+//						doc,
+//						wsseSecurity,
+//						x509token.getElement(),
+//						false);
+//					// fall thru
+//				}
 			case WSConstants.ISSUER_SERIAL :
 				secToken.setX509IssuerSerial(
 					new XMLX509IssuerSerial(doc, remoteCert));

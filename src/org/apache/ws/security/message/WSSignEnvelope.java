@@ -345,18 +345,18 @@ public class WSSignEnvelope extends WSBaseMessage {
 					false);
 				wsDocInfo.setBst(bstToken.getElement());
 				break;
-			case WSConstants.ISSUER_SERIAL_DIRECT : {
-				X509Security x509token = new X509Security(doc);
-				x509token.setX509Certificate(certs[0]);
-				x509token.setID(certUri);
-				WSSecurityUtil.prependChildElement(
-					doc,
-					securityHeader,
-					x509token.getElement(),
-					false);
-				wsDocInfo.setBst(x509token.getElement());
-				// fall thru
-			}
+//			case WSConstants.ISSUER_SERIAL_DIRECT : {
+//				X509Security x509token = new X509Security(doc);
+//				x509token.setX509Certificate(certs[0]);
+//				x509token.setID(certUri);
+//				WSSecurityUtil.prependChildElement(
+//					doc,
+//					securityHeader,
+//					x509token.getElement(),
+//					false);
+//				wsDocInfo.setBst(x509token.getElement());
+//				// fall thru
+//			}
 			case WSConstants.ISSUER_SERIAL :
 				XMLX509IssuerSerial data =
 					new XMLX509IssuerSerial(doc, certs[0]);
@@ -365,18 +365,18 @@ public class WSSignEnvelope extends WSBaseMessage {
 			case WSConstants.X509_KEY_IDENTIFIER :
 				secRef.setKeyIdentifier(certs[0]);
 				break;
-			case WSConstants.SKI_KEY_IDENTIFIER_DIRECT : {
-				X509Security x509token = new X509Security(doc);
-				x509token.setX509Certificate(certs[0]);
-				x509token.setID(certUri);
-				WSSecurityUtil.prependChildElement(
-					doc,
-					securityHeader,
-					x509token.getElement(),
-					false);
-				wsDocInfo.setBst(x509token.getElement());
-				// fall thru
-			}
+//			case WSConstants.SKI_KEY_IDENTIFIER_DIRECT : {
+//				X509Security x509token = new X509Security(doc);
+//				x509token.setX509Certificate(certs[0]);
+//				x509token.setID(certUri);
+//				WSSecurityUtil.prependChildElement(
+//					doc,
+//					securityHeader,
+//					x509token.getElement(),
+//					false);
+//				wsDocInfo.setBst(x509token.getElement());
+//				// fall thru
+//			}
 			case WSConstants.SKI_KEY_IDENTIFIER :
 				secRef.setKeyIdentifierSKI(certs[0], crypto);
 				break;
