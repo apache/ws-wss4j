@@ -17,6 +17,7 @@
 
 package org.apache.ws.security;
 
+import org.opensaml.SAMLAssertion;
 import java.security.Principal;
 import java.security.cert.X509Certificate;
 
@@ -29,18 +30,23 @@ public class WSSecurityEngineResult {
 	private int action;
 	private Principal principal;
 	private X509Certificate cert;
+	private SAMLAssertion assertion;
 
-	WSSecurityEngineResult(
-		Principal princ,
-		int act,
-		X509Certificate certificate) {
+    WSSecurityEngineResult(int act, SAMLAssertion ass) {
+		principal = null;
+        cert = null;
+		action = act;
+		assertion = ass;
+	}
+
+    WSSecurityEngineResult(Principal princ, int act, X509Certificate certificate) {
 		principal = princ;
 		action = act;
 		cert = certificate;
 	}
 	/**
-	 * @return the actions vector. These actions were performed
-	 * by the the security engine.
+	 * @return the actions vector. These actions were performed by the the
+	 *         security engine.
 	 */
 	public int getAction() {
 		return action;
@@ -61,4 +67,10 @@ public class WSSecurityEngineResult {
 		return cert;
 	}
 
+	/**
+	 * @return Returns the assertion.
+	 */
+	public SAMLAssertion getAssertion() {
+		return assertion;
+	}
 }

@@ -369,10 +369,10 @@ public class WSSecurityEngine {
                if (doDebug) {
                    log.debug("Found SAML Assertion element");
                }
-               handleSAMLToken((Element) elem);
+               SAMLAssertion assertion = handleSAMLToken((Element) elem);
                wsDocInfo.setAssertion((Element) elem);
                returnResults.add(0,
-                       new WSSecurityEngineResult(null, WSConstants.ST_UNSIGNED, null));
+                       new WSSecurityEngineResult(WSConstants.ST_UNSIGNED, assertion));
 			} else if (el.equals(TIMESTAMP)) {
 				if (doDebug) {
 					log.debug("Found Timestamp list element");
@@ -763,7 +763,7 @@ public class WSSecurityEngine {
         return principal;
     }
 
-    public void handleSAMLToken(Element token) throws WSSecurityException {
+    public SAMLAssertion handleSAMLToken(Element token) throws WSSecurityException {
         boolean result = false;
         SAMLAssertion assertion = null;
         try {
@@ -773,13 +773,13 @@ public class WSSecurityEngine {
                 log.debug("SAML Assertion issuer " + assertion.getIssuer());
             }
         } catch (SAMLException e) {
-            // TODO: Fix me.
-            e.printStackTrace();  
+            throw new WSSecurityException(WSSecurityException.FAILURE,
+                    "invalidSAMLsecurity", null, e);  
         }
         if (!result) {
             throw new WSSecurityException(WSSecurityException.FAILED_AUTHENTICATION);
         }
-        return;
+        return assertion;
     }
     
     public void handleEncryptedKey(Element xencEncryptedKey, CallbackHandler cb, Crypto crypto) throws WSSecurityException {
