@@ -615,18 +615,17 @@ data:
         }
         System.out.println("Number of results: " + results.size());
         for (int i = 0; i &lt; results.size(); i++) {
-            WSDoAllReceiverResult rResult = (WSDoAllReceiverResult)results.get(i);
-            String actor = rResult.getActor();
-            Vector principals = rResult.getPrincipals();
-            Vector actions = rResult.getActions();
-
-            // Note: an encryption action does not have an associated principal
-            // only Signature and UsernameToken actions return a principal
-            for (int j = 0; j &lt; principals.size(); j++) {
-                if (((Integer)actions.get(j)).intValue() != WSConstants.ENCR) {
-                    System.out.println(((Principal)principals.get(j)).getName());
+            WSHandlerResult hResult = (WSHandlerResult)results.get(i);
+            String actor = hResult.getActor();
+            Vector hResults = hResult.getResults();
+            for (int j = 0; j < hResults.size(); j++) {
+              	WSSecurityEngineResult eResult = (WSSecurityEngineResult) hResults.get(j);
+	            // Note: an encryption action does not have an associated principal
+    	        // only Signature and UsernameToken actions return a principal
+                if (eResult.getAction() != WSConstants.ENCR) {
+                    System.out.println(eResult.getPrincipal().getName());
                 }
-            }		
+            }
         }
     }
 </pre>
