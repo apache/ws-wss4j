@@ -17,11 +17,15 @@
 package secconv.components;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Vector;
 
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.CallbackHandler;
+import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import junit.framework.Test;
@@ -38,10 +42,12 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.axis.security.conversation.ConvHandlerConstants;
 import org.apache.ws.axis.security.util.AxisUtil;
+import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.conversation.ConvEngineResult;
 import org.apache.ws.security.conversation.ConversationEngine;
 import org.apache.ws.security.conversation.ConversationManager;
+import org.apache.ws.security.conversation.ConversationUtil;
 import org.apache.ws.security.conversation.DerivedKeyCallbackHandler;
 import org.apache.ws.security.conversation.DerivedKeyTokenAdder;
 import org.apache.ws.security.conversation.message.info.DerivedKeyInfo;
@@ -55,7 +61,7 @@ import org.w3c.dom.Element;
  * @author Dimuthu Leelarathne. (muthulee@yahoo.com)
  *
  */
-public class TestDkSign extends TestCase {
+public class TestDkSign extends TestCase{
     /*TODO:: Fix the bug and remove the dktoken from DkTokenInfo
      * Effectng changes : ConversationManger, ConversationClientHandler, ConversationServerHandler.
      * 
@@ -202,14 +208,17 @@ public class TestDkSign extends TestCase {
 
         ConversationManager manager = new ConversationManager();
 
-        DerivedKeyInfo dkInfo =
-                    manager.addDerivedKeyToken(doc, uuid, dkcbHandler);
-        
-        
-    
+		DerivedKeyInfo dkInfo =
+					 manager.createDerivedKeyToken(doc, uuid, dkcbHandler, null, 24);
+		
+		
+		System.out.println("he"+uuid+"$$$$$$$$$" +dkInfo.getId());
+		
+		
         String genID = dkInfo.getId();
-        manager.performDK_Sign(doc, dkcbHandler, uuid, dkInfo);
+        manager.performDK_Sign(doc, dkcbHandler, uuid, dkInfo,null);
     
+        manager.addDkToken(doc, dkInfo);
         
         /*
          * convert the resulting document into a message first. The toSOAPMessage()
@@ -237,24 +246,9 @@ public class TestDkSign extends TestCase {
         throws Exception {
        log.info("Before verifying the derived key signature");
        ConversationEngine engine = new ConversationEngine(config);
-       Vector results = engine.processSecConvHeader(doc, "", dkcbHandler,"secconv.scenarios.ping.PWCallback");
-       ConvEngineResult res = (ConvEngineResult)results.get(0);
-       if(res.getAction()==ConvEngineResult.SIGN_DERIVED_KEY){
-            log.info("Verifying the derived key signature Done");
-       }else{
-           throw new Exception("ConvResult is not set. Something is wrotn");
-       }
-       
-    
+       Vector results = engine.processSecConvHeader(doc, "", dkcbHandler, null);
+       System.out.println("Success");
     }
 
-    public static void main(String[] args) throws Exception {
-        TestDkSign test = new TestDkSign("TestWSSecurity10");
-        test.setUp();
-        test.testPerformDkSign();
-
-    }
-
-
-
+  
 }

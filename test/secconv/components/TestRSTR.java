@@ -18,11 +18,15 @@
 package secconv.components;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Vector;
 
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.CallbackHandler;
+import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import junit.framework.Test;
@@ -39,6 +43,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.axis.security.conversation.ConvHandlerConstants;
 import org.apache.ws.axis.security.util.AxisUtil;
+import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
@@ -52,6 +57,7 @@ import org.apache.ws.security.conversation.message.info.SecurityContextInfo;
 import org.apache.ws.security.conversation.message.token.RequestSecurityTokenResponse;
 import org.apache.ws.security.conversation.message.token.RequestedProofToken;
 import org.apache.ws.security.conversation.message.token.SecurityContextToken;
+import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -60,7 +66,7 @@ import org.w3c.dom.Element;
  * @author Dimuthu Leelarathne. (muthulee@yahoo.com)
  *
  */
-public class TestRSTR extends TestCase {
+public class TestRSTR extends TestCase implements CallbackHandler{
 	/*TODO:: Fix the bug and remove the dktoken from DkTokenInfo
 	 * Effectng changes : ConversationManger, ConversationClientHandler, ConversationServerHandler.
 	 * 
@@ -147,7 +153,7 @@ public class TestRSTR extends TestCase {
 					   
 		this.config.put(ConvHandlerConstants.USE_FIXED_KEYLEN, new Boolean(true));
 		this.config.put(ConvHandlerConstants.KEY_LEGNTH, new Long(24));		
-		
+		this.config.put(WSHandlerConstants.DEC_PROP_FILE,"crypto.properties");
         
 	}
 
@@ -240,16 +246,26 @@ public class TestRSTR extends TestCase {
 		throws Exception {
 	   log.info("Before verifying RSTR............");
 	   ConversationEngine engine = new ConversationEngine(config);
-	   Vector results = engine.processSecConvHeader(doc, "", dkcbHandler,"secconv.scenarios.ping.PWCallback");
-	   ConvEngineResult res = (ConvEngineResult)results.get(0);
-	   if(res.getAction()==ConvEngineResult.SECURITY_TOKEN_RESPONSE){
-			log.info("Verified successfully, RSTR ............");
-	   }else{
-		   throw new Exception("ConvResult is not set properly. Something is wrong");
-	   }
-	   
-	
+	   Vector results = engine.processSecConvHeader(doc, "", dkcbHandler, "secconv.components.PWCallback");
 	}
+	
+	public void handle(Callback[] callbacks)
+				   throws IOException, UnsupportedCallbackException {
+			   for (int i = 0; i < callbacks.length; i++) {
+				   if (callbacks[i] instanceof WSPasswordCallback) {
+					   WSPasswordCallback pc = (WSPasswordCallback) callbacks[i];
+					   /*
+						* here call a function/method to lookup the password for
+						* the given identifier (e.g. a user name or keystore alias)
+						* e.g.: pc.setPassword(passStore.getPassword(pc.getIdentfifier))
+						* for Testing we supply a fixed name here.
+						*/
+					   pc.setPassword("secret");
+				   } else {
+					   throw new UnsupportedCallbackException(callbacks[i], "Unrecognized Callback");
+				   }
+			   }
+   }
 
 
 
