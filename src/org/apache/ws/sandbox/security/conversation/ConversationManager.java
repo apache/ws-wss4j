@@ -199,7 +199,7 @@ public class ConversationManager {
          * step 4 : Setting encryption parts
          */
          wsEncrypt.setParts(parts);  
-         System.out.println("Fix me");
+        
          wsEncrypt.setSymmetricEncAlgorithm(symAlgo);
          
         try {
