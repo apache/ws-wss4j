@@ -415,26 +415,39 @@ public class UsernameToken {
      *           username token
      */
     public void setID(String id) {
-        String prefix = WSSecurityUtil.setNamespace(this.element, wssConfig.getWsuNS(), WSConstants.WSU_PREFIX);
-        this.element.setAttributeNS(wssConfig.getWsuNS(), prefix + ":Id", id);
+		String prefix = WSSecurityUtil.setNamespace(this.element, wssConfig
+				.getWsuNS(), WSConstants.WSU_PREFIX);
+		this.element.setAttributeNS(wssConfig.getWsuNS(), prefix + ":Id", id);
     }
 
     /**
      * Gets the secret key as per WS-Trust spec.
-     * This function is not yet used because the WS Security specifications do not
-     * require such trust keys.
+     * This mthod uses default setting to generate the secret key. These
+     * default values are suitable for .NET WSE.
      *
      * @return a secret key constructed from information conatined in
      *         this username token
      */
     public byte[] getSecretKey() {
+		return getSecretKey(WSConstants.WSE_DERIVED_KEY_LEN,
+				WSConstants.LABEL_FOR_DERIVED_KEY);
+	}
+    
+    /**
+     * Gets the secret key as per WS-Trust spec.
+     *
+     * @param keylen How many bytes to generate for the key
+     * @param labelString the label used to generate the seed
+     * @return a secret key constructed from information conatined in
+     *         this username token 
+     */
+    public byte[] getSecretKey(int keylen, String labelString) {
         byte[] key = null;
         try {
             Mac mac = Mac.getInstance("HMACSHA1");
             byte[] password = getPassword().getBytes("UTF-8");
-            byte[] label = "WS-Security".getBytes("UTF-8");
-//            byte[] nonce = Base64.decode(getNonce());
-            byte[] nonce = getNonce().getBytes();
+            byte[] label = labelString.getBytes("UTF-8");
+            byte[] nonce = Base64.decode(getNonce());
             byte[] created = getCreated().getBytes("UTF-8");
             byte[] seed = new byte[label.length + nonce.length + created.length];
             int i = 0;
@@ -448,15 +461,16 @@ public class UsernameToken {
             for (i = 0; i < created.length; i++) {
                 seed[count++] = created[i];
             }
-            key = P_hash(password, seed, mac, 128);
-            /*
-            System.out.println("password   :" + Base64.encode(password));
-            System.out.println("label      :" + Base64.encode(label));
-            System.out.println("nonce      :" + Base64.encode(nonce));
-            System.out.println("created    :" + Base64.encode(created));
-            System.out.println("seed       :" + Base64.encode(seed));
-            System.out.println("Key        :" + Base64.encode(key));
-            */
+            key = P_hash(password, seed, mac, keylen);
+            
+            if (log.isDebugEnabled()) {
+				log.debug("password   :" + Base64.encode(password));
+				log.debug("label      :" + Base64.encode(label));
+				log.debug("nonce      :" + Base64.encode(nonce));
+				log.debug("created    :" + Base64.encode(created));
+				log.debug("seed       :" + Base64.encode(seed));
+				log.debug("Key        :" + Base64.encode(key));
+			}
         } catch (Exception e) {
             return null;
         }
@@ -464,50 +478,50 @@ public class UsernameToken {
     }
 
     /**
-     * P_hash defined in RFC for TLS.
+     * P_hash as defined in RFC 2246 for TLS.
      * <p/>
      *
-     * @param secret
-     * @param seed
-     * @param mac
-     * @param required
+     * @param secret is the key for the HMAC
+     * @param seed the seed value to start the generation - A(0)
+     * @param mac the HMAC algorithm
+     * @param required number of bytes to generate
      * @return a byte array that conatins a secrect key
      * @throws Exception
      */
-    private static byte[] P_hash(byte[] secret, byte[] seed, Mac mac, int required) throws Exception {
-        byte[] out = new byte[required];
-        int offset = 0, tocpy;
-        byte[] A, tmp;
-        A = seed;
-        while (required > 0) {
-            SecretKeySpec key = new SecretKeySpec(secret, "HMACSHA1");
-            mac.init(key);
-            mac.update(A);
-            A = mac.doFinal();
-            mac.reset();
-            mac.init(key);
-            mac.update(A);
-            mac.update(seed);
-            tmp = mac.doFinal();
-            tocpy = min(required, tmp.length);
-            System.arraycopy(tmp, 0, out, offset, tocpy);
-            offset += tocpy;
-            required -= tocpy;
-        }
-        return out;
-    }
+    private static byte[] P_hash(byte[] secret, byte[] seed, Mac mac,
+			int required) throws Exception {
+		byte[] out = new byte[required];
+		int offset = 0, tocpy;
+		byte[] A, tmp;
+		/*
+		 * A(0) is the seed
+		 */
+		A = seed;
+		SecretKeySpec key = new SecretKeySpec(secret, "HMACSHA1");
+		mac.init(key);
+		while (required > 0) {
+			mac.update(A);
+			A = mac.doFinal();
+			mac.update(A);
+			mac.update(seed);
+			tmp = mac.doFinal();
+			tocpy = min(required, tmp.length);
+			System.arraycopy(tmp, 0, out, offset, tocpy);
+			offset += tocpy;
+			required -= tocpy;
+		}
+		return out;
+	}
     
-    /*
-    public static void main(String[] args) throws Exception {
-        byte[] secret = Base64.decode("A4BKgeqUKi9VDwWyYPDrskwCwEQ5RIqH");
-        byte[] seed = Base64.decode("bWFzdGVyIHNlY3JldAAAAAAAAAAAAAAAAAAAAAAy+BE8DDEUf+XnAynZEVU0PUQR4QHesAbNCmt8/Ry6NqBELuBAiZV4Z0FuCT58Fi8=");
-        int required = 48;
-        Mac mac = Mac.getInstance("HMACSHA1");
-        byte[] out = UsernameToken.P_hash(secret, seed, mac, 48);
-        System.out.println(Base64.encode(out));
-        //UCbz0pT2DxRfx4IpY6iWRE0KCa4Fg9JKNRlrxE8AtjNjb1NEK17NI6XdrMRMOKM2
-    }
-    */
+/*
+ * public static void main(String[] args) throws Exception { byte[] secret =
+ * Base64.decode("A4BKgeqUKi9VDwWyYPDrskwCwEQ5RIqH"); byte[] seed =
+ * Base64.decode("bWFzdGVyIHNlY3JldAAAAAAAAAAAAAAAAAAAAAAy+BE8DDEUf+XnAynZEVU0PUQR4QHesAbNCmt8/Ry6NqBELuBAiZV4Z0FuCT58Fi8=");
+ * int required = 48; Mac mac = Mac.getInstance("HMACSHA1"); byte[] out =
+ * UsernameToken.P_hash(secret, seed, mac, 48);
+ * System.out.println(Base64.encode(out));
+ * //UCbz0pT2DxRfx4IpY6iWRE0KCa4Fg9JKNRlrxE8AtjNjb1NEK17NI6XdrMRMOKM2 }
+ */
 
     /**
      * helper method.
