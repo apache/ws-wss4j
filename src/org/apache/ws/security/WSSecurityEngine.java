@@ -363,10 +363,6 @@ public class WSSecurityEngine {
                 if (doDebug) {
                     log.debug("Found UsernameToken list element");
                 }
-                if (cb == null) {
-                    throw new WSSecurityException(WSSecurityException.FAILURE,
-                            "noCallback");
-                }
                 lastPrincipalFound = handleUsernameToken((Element) elem, cb);
                 returnResults.add(0, new WSSecurityEngineResult(WSConstants.UT,
                         lastPrincipalFound, null, null));
@@ -814,6 +810,11 @@ public class WSSecurityEngine {
             log.debug("UsernameToken password " + password);
         }
         if (ut.isHashed()) {
+            if (cb == null) {
+                throw new WSSecurityException(WSSecurityException.FAILURE,
+                        "noCallback");
+            }
+        	
             WSPasswordCallback pwCb = new WSPasswordCallback(user, WSPasswordCallback.USERNAME_TOKEN);
             Callback[] callbacks = new Callback[1];
             callbacks[0] = pwCb;

@@ -100,7 +100,7 @@ public class UsernameToken {
             elementNonce = (Element) WSSecurityUtil.getDirectChild(element, "Nonce", wssConfig.getWsseNS());
             elementCreated = (Element) WSSecurityUtil.getDirectChild(element, "Created", wssConfig.getWsuNS());
         }
-        if (elementUsername == null || elementPassword == null) {
+        if (elementUsername == null) {
             throw new WSSecurityException(WSSecurityException.INVALID_SECURITY_TOKEN, "badTokenType01", new Object[]{el});
         }
         String type = elementPassword.getAttribute("Type");
