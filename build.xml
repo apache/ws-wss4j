@@ -141,12 +141,7 @@ Build Instructions:
 
         <patternset id="distFiles">
             <include name="build.xml"/>
-            <include name="INSTALL"/>
-            <include name="keys.asc"/>
             <include name="LICENSE.txt"/>
-            <include name="README"/>
-            <include name="Readme.html"/>
-            <include name="TODO"/>
         </patternset>
 
         <patternset id="srcFiles">
@@ -314,7 +309,7 @@ org.apache.ws.axis.security.util
 
     <!-- Collections -->
     <target name="gump" 
-            depends="clean,javadoc,jar,test" 
+            depends="clean,javadoc,compile,test" 
             description="Target for the gump run"/>
 
     <target name="compile" 
@@ -517,9 +512,8 @@ org.apache.ws.axis.security.util
             />
     </target>
 
-<!--    <target name="dist" depends="gump" description="Build zip file for distro"> -->
-
-    <target name="dist" depends="init" description="Build zip file for distro">
+    <target name="dist" depends="gump" description="Build zip file for distro">
+<!--     <target name="dist" depends="init" description="Build zip file for distro"> -->
         <mkdir dir="${dir.dist}"/>
         <jar jarfile="${dir.dist}/${jar.library}"
             basedir="${build.classes}"
@@ -535,6 +529,14 @@ org.apache.ws.axis.security.util
 	  <delete file="${dir.dist}/${jar.library}" />
     </target>
 
+    <target name="srcdist" depends="init" description="Build source zip file for distro">
+        <mkdir dir="${dir.dist}"/>
+        <zip destfile="${dir.dist}/${product.shortname}-${product.version}-src.zip">
+            <zipfileset prefix="wss4j" dir="."
+                includes="src/** LICENSE.txt build.xml "/>
+        </zip>
+    </target>
+
     <target name="fixcrlf"
         description="Fixes CRLF">
         <fixcrlf srcdir="."
@@ -547,6 +549,7 @@ org.apache.ws.axis.security.util
             />
     </target>
 
+	<!-- This target is outdated
     <target name="changelog"
         depends="prepare"
         description="Generate the changelog for WSS4J project">
@@ -561,6 +564,7 @@ org.apache.ws.axis.security.util
             <param name="cvsweb" expression="http://cvs.sourceforge.net/viewcvs.py/wss4j/"/>
         </style>
     </target>
+    -->
 
   <!-- =================================================================== -->
   <!-- Creates a war file for interop testing                              -->
