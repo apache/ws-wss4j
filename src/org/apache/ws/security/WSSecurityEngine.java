@@ -633,7 +633,7 @@ public class WSSecurityEngine {
 		throws WSSecurityException {
         BinarySecurity token = createSecurityToken(elem);
         if (token instanceof PKIPathSecurity) {
-            return ((PKIPathSecurity) token).getX509Certificates(true, crypto);
+            return ((PKIPathSecurity) token).getX509Certificates(false, crypto);
         } else if (token instanceof X509Security) {
             X509Certificate cert = ((X509Security) token).getX509Certificate(crypto);
 			X509Certificate[] certs = new X509Certificate[1];

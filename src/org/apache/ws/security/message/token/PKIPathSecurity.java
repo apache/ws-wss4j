@@ -97,6 +97,6 @@ public class PKIPathSecurity extends BinarySecurity {
     }
     
     public static String getType(WSSConfig wssConfig) {
-        return wssConfig.getWsseNS() + "#" + X509PKI_PATH;
+        return WSConstants.X509TOKEN_NS + "#" + X509PKI_PATH;
     }
 }
