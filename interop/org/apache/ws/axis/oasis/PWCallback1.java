@@ -68,6 +68,10 @@ public class PWCallback1 implements CallbackHandler {
                  */
                 if (pc.getUsage() == WSPasswordCallback.KEY_NAME) {
                     pc.setKey(key);
+                } else if(pc.getIdentifer().equals("7706c71b0628d6ecc85ea1e8ad62be60_a8272f6f-2c94-436e-aa71-d8d2be4647f6")) {
+                    pc.setPassword("interop");
+                } else if(pc.getIdentifer().equals("86ab6c4828bcde6983d81b2b59ff426c_a8272f6f-2c94-436e-aa71-d8d2be4647f6")) {
+                    pc.setPassword("interop");
                 } else {
                     pc.setPassword("sirhC");
                 }

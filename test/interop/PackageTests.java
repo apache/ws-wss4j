@@ -49,6 +49,7 @@ public class PackageTests extends TestCase {
 
     public static Test suite() {
         TestSuite suite = new TestSuite();
+        suite.addTestSuite(TestInteropKeys.class);
         suite.addTestSuite(TestScenario1.class);
         suite.addTestSuite(TestScenario2.class);
         suite.addTestSuite(TestScenario3.class);

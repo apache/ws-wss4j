@@ -81,7 +81,11 @@ public class Merlin implements Crypto {
         } catch (Exception e) {
             throw new CredentialException(3, "proxyNotFound", new Object[]{getProxyKeyStore(this.properties)});
         }
-        load(is);
+        try {
+            load(is);
+        } finally {
+            is.close();
+        }
     }
 
     /**

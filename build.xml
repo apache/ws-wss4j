@@ -254,6 +254,11 @@ org.apache.ws.axis.security.util
             <classpath refid="classpath.test"/>
         </available>
 
+        <available property="jdk15.present" classname="java.lang.instrument.Instrumentation">
+            <!-- check whether JDK15 is available -->
+            <classpath refid="classpath.test"/>
+        </available>
+
         <available property="bc.present" classname="org.bouncycastle.jce.provider.BouncyCastleProvider">
             <!-- check whether BouncyCastle is available -->
             <classpath refid="classpath.test"/>
@@ -262,6 +267,7 @@ org.apache.ws.axis.security.util
         <echo message="--- Flags (Note: If the {property name} is displayed, "/>
         <echo message="           then the component is not present)"/>
         <echo message="jdk14.present=${jdk14.present}"/>
+        <echo message="jdk15.present=${jdk15.present}"/>
         <echo message="bc.present=${bc.present}"/>
 
     </target>
@@ -399,7 +405,7 @@ org.apache.ws.axis.security.util
         </java>
     </target>
 
-    <target name="interopTests" depends="init">
+    <target name="interopTests" depends="init" if="jdk15.present">
         <echo message="Running system tests - BEGIN..."/>
 
         <path id="deploy.xml.files">
@@ -417,7 +423,7 @@ org.apache.ws.axis.security.util
             <fileset dir="${dir.keys}" includes="**"/>
         </copy>
         <copy todir="${build.dir}/interop">
-            <fileset dir="${dir.interop}" includes="*.pfx"/>
+            <fileset dir="${dir.interop}" includes="*.jks"/>
         </copy>
         
         <property name="deploy.xml.property" refid="deploy.xml.files"/>
