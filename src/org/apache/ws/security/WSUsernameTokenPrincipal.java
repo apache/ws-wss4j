@@ -97,7 +97,7 @@ public class WSUsernameTokenPrincipal implements Principal, java.io.Serializable
      * @param password
      */
     public void setPassword(String password) {
-        this.password = nonce;
+        this.password = password;
     }
 
     /**
