@@ -32,9 +32,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
 import java.security.GeneralSecurityException;
+import java.security.InvalidAlgorithmParameterException;
 import java.security.Key;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
 import java.security.cert.CertPath;
@@ -584,5 +586,122 @@ public class Merlin implements Crypto {
     {
         return this.keystore;
     }
+	
+	/**
+	 * Uses the CertPath API to validate a given certificate chain
+	 * <p/>
+	 * TODO: Change hardcoded use of BC CertPathValidator to flexible
+	 * configuration via crypto.properties
+	 * 
+	 * @param certs      Certificate chain to validate
+	 * @return           true if the certificate chain is valid, false otherwise
+	 * @throws WSSecurityException
+	 */
+	public boolean validateCertPath(X509Certificate[] certs) throws WSSecurityException {	
+
+		try {
+			java.util.List certList = java.util.Arrays.asList(certs);
+			org.bouncycastle.jce.cert.CertPath cp = org.bouncycastle.jce.cert.CertificateFactory.getInstance("X.509", "BC").generateCertPath(certList);
+		
+			// Trust anchor is the last certificate in the chain
+			X509Certificate ca = certs[certs.length-1];
+				
+			// Set the parameters, do not check any revocation list		
+			org.bouncycastle.jce.cert.TrustAnchor anchor = new org.bouncycastle.jce.cert.TrustAnchor(ca, null);
+			org.bouncycastle.jce.cert.PKIXParameters param = new org.bouncycastle.jce.cert.PKIXParameters(java.util.Collections.singleton(anchor));
+			param.setRevocationEnabled(false);
+				
+			// Verify the trust path using the above settings
+			org.bouncycastle.jce.cert.CertPathValidator cpv = org.bouncycastle.jce.cert.CertPathValidator.getInstance("PKIX", "BC");
+			org.bouncycastle.jce.cert.PKIXCertPathValidatorResult result = (org.bouncycastle.jce.cert.PKIXCertPathValidatorResult) cpv.validate(cp, param);
+		} catch (NoSuchProviderException ex) {
+			throw new WSSecurityException(
+				WSSecurityException.FAILURE,
+				"certpath",
+				new Object[] { ex.getMessage()},
+				(Throwable) ex);
+		} catch (CertificateException ex) {
+			throw new WSSecurityException(
+				WSSecurityException.FAILURE,
+				"certpath",
+				new Object[] { ex.getMessage()},
+				(Throwable) ex);
+		} catch (InvalidAlgorithmParameterException ex) {
+			throw new WSSecurityException(
+				WSSecurityException.FAILURE,
+				"certpath",
+				new Object[] { ex.getMessage()},
+				(Throwable) ex);
+		} catch (NoSuchAlgorithmException ex) {
+			throw new WSSecurityException(
+				WSSecurityException.FAILURE,
+				"certpath",
+				new Object[] { ex.getMessage()},
+				(Throwable) ex);
+		} catch (org.bouncycastle.jce.cert.CertPathValidatorException e) {
+			// The certificate chain could not be validated
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Lookup X509 Certificates in the keystore according to a given DN of the subject of the certificate
+	 * <p/>
+	 * The search gets all alias names of the keystore and gets the certificate (chain)
+	 * for each alias. Then the DN of the certificate is compared with the parameters.
+	 * 
+	 * @param subjectDN  The DN of subject to look for in the keystore 
+	 * @return 			 Vector with all alias of certificates with the same DN as given in the parameters
+	 * @throws WSSecurityException
+	 */	
+	public String[] getAliasesForDN(String subjectDN) throws WSSecurityException {
+		
+		// Store the aliases found
+		Vector aliases = new Vector();
+		 
+		Certificate cert = null;
+		X509Certificate x509cert = null;
+		
+		// The DN to search the keystore for
+		Vector subjectRDN = splitAndTrim(subjectDN);
+
+		// Look at every certificate in the keystore
+		try {
+			for (Enumeration e = keystore.aliases(); e.hasMoreElements();) {
+				String alias = (String) e.nextElement();
+				
+				Certificate[] certs = keystore.getCertificateChain(alias);
+				if (certs == null || certs.length == 0) {
+					// no cert chain, so lets check if getCertificate gives us a  result.
+					cert = keystore.getCertificate(alias);
+					if (cert == null) {
+						return null;
+					}
+					certs = new Certificate[] { cert };
+				} else {
+					cert = certs[0];
+				}
+				if (cert instanceof X509Certificate) {
+					Vector foundRDN = splitAndTrim(((X509Certificate) cert).getSubjectDN().getName());
+	
+					if (subjectRDN.equals(foundRDN)) {
+						aliases.add(alias);
+					}
+				}
+			}
+		} catch (KeyStoreException e) {
+			throw new WSSecurityException(
+				WSSecurityException.FAILURE,
+				"keystore");	
+		}
+		
+		// Convert the vector into an array
+		String[] result = new String[aliases.size()];
+		for (int i=0; i < aliases.size(); i++) result[i] = (String) aliases.elementAt(i);
+		
+		return result;
+	}
 }
 

@@ -20,6 +20,7 @@ package org.apache.ws.security.util;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.SOAPConstants;
 import org.apache.ws.security.SOAP11Constants;
@@ -39,6 +40,7 @@ import org.w3c.dom.Text;
 import javax.crypto.Cipher;
 import javax.crypto.NoSuchPaddingException;
 
+import java.util.Vector;
 import java.security.InvalidKeyException;
 import java.security.NoSuchProviderException;
 import java.security.NoSuchAlgorithmException;
@@ -638,5 +640,28 @@ public class WSSecurityUtil {
 				new Object[] { "No such algorithm: " + cipherAlgo });
 		}
 		return cipher;
+	}
+
+	/**
+	 * Fetch the result of a given action from a given result vector 
+	 * <p/>
+	 * 
+	 * @param wsResultVector    The result vector to fetch an action from
+	 * @param action            The action to fetch 
+	 * @return                  The result fetched from the result vector, null if the result could not be found 
+	 */	
+	public static WSSecurityEngineResult fetchActionResult(Vector wsResultVector, int action) {
+		WSSecurityEngineResult wsResult = null;
+		
+		// Find the part of the security result that matches the given action
+		
+		for (int i = 0; i < wsResultVector.size(); i++) {
+			// Check the result of every action whether it matches the given action
+			if (((WSSecurityEngineResult)wsResultVector.get(i)).getAction() == action) {
+				wsResult = (WSSecurityEngineResult)wsResultVector.get(i);
+			}
+		}
+	
+		return wsResult;
 	}
 }

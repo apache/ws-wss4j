@@ -163,4 +163,23 @@ public interface Crypto {
      */
     public CertificateFactory getCertificateFactory() throws WSSecurityException;
 
+	/**
+	 * Uses the CertPath API to validate a given certificate chain
+	 * <p/>
+	 * 
+	 * @param certs      Certificate chain to validate
+	 * @return           true if the certificate chain is valid, false otherwise
+	 * @throws WSSecurityException
+	 */
+	public boolean validateCertPath(X509Certificate[] certs) throws WSSecurityException;
+
+	/**
+	 * Lookup X509 Certificates in the keystore according to a given DN of the subject of the certificate
+	 * <p/>
+	 * 
+	 * @param subjectDN  The DN of subject to look for in the keystore 
+	 * @return 			 Vector with all alias of certificates with the same DN as given in the parameters
+	 * @throws WSSecurityException
+	 */
+	public String[] getAliasesForDN(String subjectDN) throws WSSecurityException;
 }

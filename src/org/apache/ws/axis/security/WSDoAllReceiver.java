@@ -45,6 +45,8 @@ import javax.security.auth.callback.CallbackHandler;
 import javax.xml.soap.SOAPHeader;
 import javax.xml.soap.SOAPHeaderElement;
 import java.io.ByteArrayOutputStream;
+import java.math.BigInteger;
+import java.security.cert.X509Certificate;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Vector;
@@ -216,6 +218,29 @@ public class WSDoAllReceiver extends BasicHandler {
 		((org.apache.axis.message.SOAPHeaderElement) headerElement).setProcessed(true);
 
 		/*
+		 * Now we can check the certificate used to sign the message.
+		 * In the following implementation the certificate is only trusted
+		 * if either it itself or the certificate of the issuer is installed
+		 * in the keystore.
+		 * 
+		 * Note: the method verifyTrust(X509Certificate) allows custom
+		 * implementations with other validation algorithms for subclasses.
+		 */
+
+		// Extract the signature action result from the action vector
+		WSSecurityEngineResult actionResult = WSSecurityUtil.fetchActionResult(wsResult, WSConstants.SIGN);
+		
+		if (actionResult != null) {
+			X509Certificate returnCert = actionResult.getCertificate();
+
+			if (returnCert != null) {
+				if (!verifyTrust(returnCert)) {
+					throw new AxisFault("WSDoAllReceiver: The certificate used for the signature is not trusted");
+				}
+			}
+		}
+
+		/*
 	 	 * now check the security actions: do they match, in right order?
 	 	 */
 		int resultActions = wsResult.size();
@@ -357,4 +382,166 @@ public class WSDoAllReceiver extends BasicHandler {
 		return cbHandler;
 	}
 
+	/**
+	 * Evaluate whether a given certificate should be trusted.
+	 * Hook to allow subclasses to implement custom validation methods however they see fit.
+	 * <p/>
+	 * Policy used in this implementation:
+	 * 1. Search the keystore for the transmitted certificate
+	 * 2. Search the keystore for a connection to the transmitted certificate
+	 *    (that is, search for certificate(s) of the issuer of the transmitted certificate
+	 * 3. Verify the trust path for those certificates found because the search for the issuer might be fooled by a phony DN (String!)
+	 * 
+	 * @param cert       the certificate that should be validated against the keystore
+	 * @return 			 true if the certificate is trusted, false if not (AxisFault is thrown for exceptions during CertPathValidation)
+	 * @throws AxisFault
+	 */
+	private boolean verifyTrust(X509Certificate cert) throws AxisFault {
+
+		// If no certificate was transmitted, do not trust the signature 
+		if (cert == null) {
+			return false;
+		}
+
+		String[] aliases = null;
+		String alias = null;
+		X509Certificate[] certs;
+	
+		String subjectString = cert.getSubjectDN().getName();
+		String issuerString = cert.getIssuerDN().getName();
+		BigInteger issuerSerial = cert.getSerialNumber();
+
+		if (doDebug) {
+			log.debug("WSDoAllReceiver: Transmitted certificate has subject " + subjectString);
+			log.debug("WSDoAllReceiver: Transmitted certificate has issuer " + issuerString + " (serial " + issuerSerial + ")");
+		}
+
+		// FIRST step
+		// Search the keystore for the transmitted certificate
+	
+		// Search the keystore for the alias of the transmitted certificate
+		try {
+			alias = sigCrypto.getAliasForX509Cert(issuerString, issuerSerial);
+		} catch (WSSecurityException ex) {
+			throw new AxisFault("WSDoAllReceiver: Could not get alias for certificate with " + subjectString, ex);
+		}
+
+		if (alias != null) {
+			// Retrieve the certificate for the alias from the keystore 
+			try {
+				certs = sigCrypto.getCertificates(alias);
+			} catch (WSSecurityException ex) {
+				throw new AxisFault("WSDoAllReceiver: Could not get certificates for alias " + alias, ex);
+			}
+
+			// If certificates have been found, the certificates must be compared
+			// to ensure againgst phony DNs (compare encoded form including signature)
+			if (certs != null && certs.length > 0 && cert.equals(certs[0])) {
+				if (doDebug) {
+					log.debug("Direct trust for certificate with " + subjectString);
+				}
+				return true;
+			}
+		} else {
+			if (doDebug) {
+				log.debug("No alias found for subject from issuer with " + issuerString + " (serial " + issuerSerial + ")");
+			}
+		}
+
+		// SECOND step
+		// Search for the issuer of the transmitted certificate in the keystore
+
+		// Search the keystore for the alias of the transmitted certificates issuer
+		try {
+			aliases = sigCrypto.getAliasesForDN(issuerString);
+		} catch (WSSecurityException ex) {
+			throw new AxisFault("WSDoAllReceiver: Could not get alias for certificate with " + issuerString, ex);
+		}
+
+		// If the alias has not been found, the issuer is not in the keystore
+		// As a direct result, do not trust the transmitted certificate
+		if (aliases == null || aliases.length < 1) {
+			if (doDebug) {
+				log.debug("No aliases found in keystore for issuer " + issuerString + " of certificate for " + subjectString);
+			}
+			return false;
+		}
+
+		// THIRD step
+		// Check the certificate trust path for every alias of the issuer found in the keystore 
+		for (int i = 0; i < aliases.length; i++) { 
+			alias = aliases[i];
+
+			if (doDebug) {
+				log.debug("Preparing to validate certificate path with alias " + alias + " for issuer " + issuerString);
+			}
+
+			// Retrieve the certificate(s) for the alias from the keystore 
+			try {
+				certs = sigCrypto.getCertificates(alias);
+			} catch (WSSecurityException ex) {
+				throw new AxisFault("WSDoAllReceiver: Could not get certificates for alias " + alias, ex);
+			}
+		
+			// If no certificates have been found, there has to be an error:
+			// The keystore can find an alias but no certificate(s)
+			if (certs == null | certs.length < 1) {
+				throw new AxisFault("WSDoAllReceiver: Could not get certificates for alias " + alias);
+			}
+	
+			// Form a certificate chain from the transmitted certificate
+			// and the certificate(s) of the issuer from the keystore
+
+			// First, create new array 
+			X509Certificate[] x509certs = new X509Certificate[certs.length + 1];
+
+			/* The following conversion into provider specific format seems not to be necessary
+				// Create new certificate, possibly provider-specific
+				try {
+					cert = sigCrypto.loadCertificate(new ByteArrayInputStream(cert.getEncoded()));
+				} catch (CertificateEncodingException ex) {
+					throw new AxisFault("WSDoAllReceiver: Combination of subject and issuers certificates failed", ex);
+				} catch (WSSecurityException ex) {
+					throw new AxisFault("WSDoAllReceiver: Combination of subject and issuers certificates failed", ex);
+				}
+			*/
+			
+			// Then add the first certificate ...
+			x509certs[0] = cert;
+			
+			// ... and the other certificates
+			for (int j=0; j < certs.length; j++) {
+				cert = certs[i];
+
+				/* The following conversion into provider specific format seems not to be necessary
+					// Create new certificate, possibly provider-specific
+					try {
+						cert = sigCrypto.loadCertificate(new ByteArrayInputStream(cert.getEncoded()));
+					} catch (CertificateEncodingException ex) {
+						throw new AxisFault("WSDoAllReceiver: Combination of subject and issuers certificates failed", ex);
+					} catch (WSSecurityException ex) {
+						throw new AxisFault("WSDoAllReceiver: Combination of subject and issuers certificates failed", ex);
+					}
+				*/
+
+				x509certs[certs.length + j] = cert;
+			}
+			certs = x509certs;
+
+			// Use the validation method from the crypto to check whether the subjects certificate was really signed by the issuer stated in the certificate 
+			try {
+				if (sigCrypto.validateCertPath(certs)) {
+					if (doDebug) {
+						log.debug("WSDoAllReceiver: Certificate path has been verified for certificate with subject " + subjectString);
+					}
+					return true;
+				}
+			} catch (WSSecurityException ex) {
+				throw new AxisFault("WSDoAllReceiver: Certificate path verification failed for certificate with subject " + subjectString, ex);
+			}
+		}
+		
+		log.debug("WSDoAllReceiver: Certificate path could not be verified for certificate with subject " + subjectString);		
+		return false;
+	}
 }
