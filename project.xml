@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml version="1.0"?>
+
 <project>
 
   <!-- the version of maven's project object model -->
@@ -47,14 +48,14 @@
        the connection element has the form:
        scm:<system>:<system specific connection string> -->
   <repository>
-    <connection>scm:subversion:http://svn.apache.org/repos/asf/webservices/scout/trunk</connection>
-    <url>http://svn.apache.org/viewcvs.cgi/webservices/scout/trunk/?root=Apache-SVN</url>
+    <connection>scm:cvs:pserver:anoncvs@cvs.apache.org:/home/cvspublic:ws-fx/wss4j</connection>
+    <url>http://cvs.apache.org/viewcvs.cgi/ws-fx/wss4j/</url>
   </repository>
 
   <!-- any mailing lists for the project -->
     <mailingLists>
         <mailingList>
-            <name>WS-FX Developer List</name>
+            <name>WSFX Developer List</name>
             <subscribe>fx-dev-subscribe@ws.apache.org</subscribe>
             <unsubscribe>fx-dev-unsubscribe@ws.apache.org</unsubscribe>
             <archive>http://nagoya.apache.org/eyebrowse/SummarizeList?listId=221</archive>
@@ -189,5 +190,6 @@
         <!-- <report>maven-junit-report-plugin</report> -->
         <!-- <report>maven-clover-plugin</report> -->
     </reports>
+    
 </project>
 
