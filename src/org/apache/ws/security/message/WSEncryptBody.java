@@ -74,6 +74,11 @@ public class WSEncryptBody extends WSBaseMessage {
     protected SecretKey symmetricKey = null;
 
     /**
+     * Symmetric key that's actually used.
+     */
+    protected SecretKey encryptionKey = null;
+
+    /**
      * Parent node to which the EncryptedKeyElement should be added.
      */
     protected Element parentNode = null;
@@ -291,12 +296,12 @@ public class WSEncryptBody extends WSBaseMessage {
          * this alogrithm, and set the cipher into encryption mode.
          */
         // This variable is made a classs attribute :: SecretKey symmetricKey = null;
-        SecretKey encryptionKey = this.symmetricKey;
+        this.encryptionKey = this.symmetricKey;
         if (encryptionKey == null) {
             KeyGenerator keyGen = getKeyGenerator();
-            encryptionKey = keyGen.generateKey();
+            this.encryptionKey = keyGen.generateKey();
         }
-        Vector encDataRefs = doEncryption(doc, encryptionKey);
+        Vector encDataRefs = doEncryption(doc, this.encryptionKey);
 
         if (tlog.isDebugEnabled()) {
             t1 = System.currentTimeMillis();
@@ -335,7 +340,7 @@ public class WSEncryptBody extends WSBaseMessage {
         } catch (InvalidKeyException e) {
             throw new WSSecurityException(WSSecurityException.FAILED_ENC_DEC, null, null, e);
         }
-        byte[] encKey = encryptionKey.getEncoded();
+        byte[] encKey = this.encryptionKey.getEncoded();
         if (doDebug) {
             log.debug("cipher blksize: "
                     + cipher.getBlockSize()
@@ -543,10 +548,11 @@ public class WSEncryptBody extends WSBaseMessage {
          * key (password) for this alogrithm, and set the cipher into
          * encryption mode.
          */
-        SecretKey encryptionKey = this.symmetricKey;
-        if (encryptionKey == null) {
-            encryptionKey = WSSecurityUtil.prepareSecretKey(symEncAlgo,
-                                                            embeddedKey);
+        this.encryptionKey = this.symmetricKey;
+        if (this.encryptionKey == null) {
+            this.encryptionKey = WSSecurityUtil.prepareSecretKey(
+                    symEncAlgo,
+                    embeddedKey);
         }
 
         KeyInfo keyInfo = null;
@@ -575,7 +581,7 @@ public class WSEncryptBody extends WSBaseMessage {
             }
         }
 
-        Vector encDataRefs = doEncryption(doc, encryptionKey, keyInfo);
+        Vector encDataRefs = doEncryption(doc, this.encryptionKey, keyInfo);
 
         /*
          * At this point data is encrypted with the symmetric key and can be
@@ -698,6 +704,16 @@ public class WSEncryptBody extends WSBaseMessage {
      */
     public void setSymmetricKey(SecretKey key) {
         this.symmetricKey = key;
+    }
+
+    /**
+     * Get the symmetric key used for subscription. This may be the same as
+     * the symmetric key.
+     *
+     * @return The symmetric key
+     */
+    public SecretKey getEncryptionKey() {
+        return this.encryptionKey;
     }
 
     /**

@@ -70,7 +70,6 @@ public class RequestedProofToken {
      * Constructor.
      *
      * @param doc    is the SOAP envelop.
-     * @param secret is the secret.
      * @throws WSSecurityException
      */
     public RequestedProofToken(Document doc) throws WSSecurityException {
@@ -163,7 +162,7 @@ public class RequestedProofToken {
             wsEncrypt.setParentNode(this.element);
             if (this.sharedSecret != null) {
                 //wsEncrypt.setSymmetricKey(WSSecurityUtil.prepareSecretKey(WSConstants.TRIPLE_DES, this.sharedSecret));//TODO
-            }         
+            }
 //            wsEncrypt.setParentNode(
 //                (Element) (doc
 //                    .getElementsByTagNameNS(
@@ -171,6 +170,7 @@ public class RequestedProofToken {
 //                        "RequestedProofToken")
 //                    .item(0)));
             wsEncrypt.build(doc, crypto);
+            this.sharedSecret = wsEncrypt.getEncryptionKey().getEncoded();
         } catch (WSSecurityException e) {
             e.printStackTrace();
         }
@@ -235,7 +235,7 @@ public class RequestedProofToken {
 
         /*
          * Second step: generate a symmetric key (session key) for
-         * this alogrithm, and set the cipher into encryption mode. 
+         * this alogrithm, and set the cipher into encryption mode.
          */
         KeyGenerator keyGen = null;
         try {
@@ -259,7 +259,7 @@ public class RequestedProofToken {
          * the generated symmetric (session) key.
          * Up to now we support RSA 1-5 as public key algorithm
          */
-        
+
         X509Certificate remoteCert = null;
         X509Certificate[] certs = crypto.getCertificates(user);
         if (certs == null || certs.length <= 0) {
