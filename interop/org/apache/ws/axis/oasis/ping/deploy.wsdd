@@ -99,13 +99,13 @@
   <responseFlow>
    <handler type="java:org.apache.ws.axis.security.WSDoAllSender" >
     <parameter name="action" value="Signature Encrypt"/>
-    <parameter name="user" value="86ab6c4828bcde6983d81b2b59ff426c_a8272f6f-2c94-436e-aa71-d8d2be4647f6"/>
+    <parameter name="user" value="7706c71b0628d6ecc85ea1e8ad62be60_a8272f6f-2c94-436e-aa71-d8d2be4647f6"/>
     <parameter name="passwordCallbackClass" 
       value="org.apache.ws.axis.oasis.PWCallback1"/>
     <parameter name="signatureKeyIdentifier" value="DirectReference" />
-    <parameter name="signaturePropFile" value="wsstest2.properties" />
+    <parameter name="signaturePropFile" value="wsstest1.properties" />
     <parameter name="encryptionKeyIdentifier" value="SKIKeyIdentifier" />
-    <parameter name="encryptionUser" value="86ab6c4828bcde6983d81b2b59ff426c_a8272f6f-2c94-436e-aa71-d8d2be4647f6" />
+    <parameter name="encryptionUser" value="7706c71b0628d6ecc85ea1e8ad62be60_a8272f6f-2c94-436e-aa71-d8d2be4647f6" />
    </handler>
   </responseFlow>
   </service>
@@ -143,7 +143,7 @@
     <parameter name="user" value="86ab6c4828bcde6983d81b2b59ff426c_a8272f6f-2c94-436e-aa71-d8d2be4647f6"/>
     <parameter name="passwordCallbackClass" 
       value="org.apache.ws.axis.oasis.PWCallback1"/>
-    <parameter name="signatureKeyIdentifier" value="DirectReference" />
+    <parameter name="signatureKeyIdentifier" value="SKIKeyIdentifier" />
     <parameter name="signaturePropFile" value="wsstest2.properties" />
     <parameter name="encryptionKeyIdentifier" value="EmbeddedKeyName" />
     <parameter name="EmbeddedKeyCallbackClass" 
@@ -212,13 +212,13 @@
   <responseFlow>
    <handler type="java:org.apache.ws.axis.security.WSDoAllSender" >
     <parameter name="action" value="Encrypt Signature"/>
-    <parameter name="user" value="86ab6c4828bcde6983d81b2b59ff426c_a8272f6f-2c94-436e-aa71-d8d2be4647f6"/>
+    <parameter name="user" value="7706c71b0628d6ecc85ea1e8ad62be60_a8272f6f-2c94-436e-aa71-d8d2be4647f6"/>
     <parameter name="passwordCallbackClass" 
       value="org.apache.ws.axis.oasis.PWCallback1"/>
     <parameter name="signatureKeyIdentifier" value="SKIKeyIdentifier" />
-    <parameter name="signaturePropFile" value="wsstest2.properties" />
+    <parameter name="signaturePropFile" value="wsstest1.properties" />
     <parameter name="encryptionKeyIdentifier" value="DirectReference" />
-    <parameter name="encryptionUser" value="86ab6c4828bcde6983d81b2b59ff426c_a8272f6f-2c94-436e-aa71-d8d2be4647f6" />
+    <parameter name="encryptionUser" value="7706c71b0628d6ecc85ea1e8ad62be60_a8272f6f-2c94-436e-aa71-d8d2be4647f6" />
    </handler>
   </responseFlow>
   </service>
