@@ -38,7 +38,8 @@ public class WSSAddUsernameToken extends WSBaseMessage {
     private String passwordType = WSConstants.PASSWORD_DIGEST;
 
     private UsernameToken ut = null;
-
+    private String id = null;
+    
     /**
      * Constructor.
      */
@@ -109,6 +110,24 @@ public class WSSAddUsernameToken extends WSBaseMessage {
     }
 
     /**
+     * set the id
+     * @param id
+     */ 
+    public void setId(String id) {
+        this.id = id;
+        if (ut != null)
+            ut.setID(id);
+    }
+
+    /**
+     * get the id
+     * @return
+     */ 
+    public String getId() {
+        return id;
+    }
+
+    /**
      * Adds a new <code>UsernameToken</code> to a soap envelope.
      * <p/>
      * A complete <code>UsernameToken</code> is constructed and added to
@@ -125,6 +144,8 @@ public class WSSAddUsernameToken extends WSBaseMessage {
         ut = new UsernameToken(wssConfig, doc, passwordType);
         ut.setName(username);
         ut.setPassword(password);
+        if (id != null)
+            ut.setID(id);
         WSSecurityUtil.prependChildElement(doc, securityHeader, ut.getElement(), true);
         return doc;
     }
