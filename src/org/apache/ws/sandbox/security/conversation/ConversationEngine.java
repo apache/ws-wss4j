@@ -1011,11 +1011,13 @@ public class ConversationEngine {
     
     
     }
-    /** 
-     * Taken from WSSecurity Engine
-     * @param encBodyData
-     * @return
-     */
+   /**
+    * 
+    * Taken from WSSecurityEngine 
+    * 
+    * @param encBodyData
+    * @return
+    */
     private boolean isContent(Node encBodyData) {
         /*
          * Depending on the encrypted data type (Content or Element) the encBodyData either

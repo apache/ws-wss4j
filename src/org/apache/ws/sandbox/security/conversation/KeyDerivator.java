@@ -199,7 +199,7 @@ public class KeyDerivator {
                     "Offset : " + offset);
         } else if (convSession.getKeyLength() != -1) { //Session is configured to use fixed size keys
             if (generation == -1){
-          		log.debug("Generation set to zero");
+          		System.out.println("Generation set to zero");
           		generation = 0;   
           return (int)convSession.getKeyLength() * generation;
 //                throw new ConversationException("Generation value is not avaliable (fixed size keys are used: " +
