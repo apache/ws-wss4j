@@ -600,7 +600,9 @@ public class WSSecurityUtil {
     }
     	
     public static SOAPConstants getSOAPConstants(Element startElement) {
-    	if (getPrefixNS(WSConstants.URI_SOAP12_ENV, startElement) != null) {
+        Document doc = startElement.getOwnerDocument();
+        String ns = doc.getDocumentElement().getNamespaceURI();
+    	if (WSConstants.URI_SOAP12_ENV.equals(ns)) {
     		return new SOAP12Constants();
     	}
     	else {
