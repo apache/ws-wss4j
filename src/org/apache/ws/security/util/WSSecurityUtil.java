@@ -74,7 +74,9 @@ public class WSSecurityUtil {
      *         <code>null</code> if not such element found
      */
     public static Element getSecurityHeader(WSSConfig wssConfig, Document doc, String actor, SOAPConstants sc) {
-        Element soapHeaderElement =
+
+    	// TODO skip non-element element, e.g. comments.
+    	Element soapHeaderElement =
                 (Element) getDirectChild(doc.getFirstChild(),
                         sc.getHeaderQName().getLocalPart(),
                         sc.getEnvelopeURI());
