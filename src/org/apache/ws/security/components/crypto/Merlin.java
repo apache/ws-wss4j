@@ -177,6 +177,9 @@ public class Merlin implements Crypto {
      * @return		The private key
      */
     public PrivateKey getPrivateKey(String alias, String password) throws Exception {
+        if(alias == null) {
+            throw new Exception("alias is null");
+        }
         boolean b = keystore.isKeyEntry(alias);
         if (!b) {
             log.error("Cannot find key for alias: " + alias);

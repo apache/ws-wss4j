@@ -153,6 +153,7 @@ public class WSDoAllReceiver extends BasicHandler {
 					sigCrypto,
 					decCrypto);
 		} catch (Exception ex) {
+            ex.printStackTrace();
 			throw new AxisFault(
 				"WSDoAllReceiver: security processing failed",
 				ex);
