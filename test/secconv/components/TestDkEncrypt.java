@@ -239,7 +239,7 @@ public class TestDkEncrypt extends TestCase {
         throws Exception {
        log.info("Before verifying the derived key signature");
 	   ConversationEngine engine = new ConversationEngine(config);
-	   Vector results = engine.processSecConvHeader(doc, "", dkcbHandler);
+	   Vector results = engine.processSecConvHeader(doc, "", dkcbHandler,"secconv.scenarios.ping.PWCallback");
 	   ConvEngineResult res = (ConvEngineResult)results.get(0);
 	   if(res.getAction()==ConvEngineResult.ENCRYPT_DERIVED_KEY){
 			log.info("Verifying the derived key signature Done");

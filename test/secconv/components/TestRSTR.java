@@ -240,7 +240,7 @@ public class TestRSTR extends TestCase {
 		throws Exception {
 	   log.info("Before verifying RSTR............");
 	   ConversationEngine engine = new ConversationEngine(config);
-	   Vector results = engine.processSecConvHeader(doc, "", dkcbHandler);
+	   Vector results = engine.processSecConvHeader(doc, "", dkcbHandler,"secconv.scenarios.ping.PWCallback");
 	   ConvEngineResult res = (ConvEngineResult)results.get(0);
 	   if(res.getAction()==ConvEngineResult.SECURITY_TOKEN_RESPONSE){
 			log.info("Verified successfully, RSTR ............");
