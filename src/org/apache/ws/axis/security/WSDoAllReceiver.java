@@ -33,6 +33,7 @@ import org.apache.ws.axis.security.util.AxisUtil;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.SOAPConstants;
 import org.apache.ws.security.WSSecurityEngine;
+import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.ws.security.components.crypto.Crypto;
@@ -152,7 +153,7 @@ public class WSDoAllReceiver extends BasicHandler {
 					cbHandler,
 					sigCrypto,
 					decCrypto);
-		} catch (Exception ex) {
+		} catch (WSSecurityException ex) {
             ex.printStackTrace();
 			throw new AxisFault(
 				"WSDoAllReceiver: security processing failed",

@@ -44,6 +44,11 @@ public class Reference {
      * @throws WSSecurityException 
      */
     public Reference(Element elem) throws WSSecurityException {
+        if (elem == null) {
+            throw new WSSecurityException(
+                WSSecurityException.INVALID_SECURITY,
+                "noReference");
+        }
         this.element = elem;
         QName el = new QName(this.element.getNamespaceURI(), this.element.getLocalName());
         if (!el.equals(TOKEN)) {

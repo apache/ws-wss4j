@@ -19,12 +19,11 @@ package org.apache.ws.security.message.token;
 
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.components.crypto.CryptoFactory;
+import org.apache.ws.security.components.crypto.Crypto;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import java.io.IOException;
-import java.security.GeneralSecurityException;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 
@@ -71,13 +70,13 @@ public class PKIPathSecurity extends BinarySecurity {
      * @throws GeneralSecurityException 
      * @throws IOException              
      */
-    public X509Certificate[] getX509Certificates(boolean reverse) throws GeneralSecurityException, IOException {
+    public X509Certificate[] getX509Certificates(boolean reverse, Crypto crypto) throws WSSecurityException {
         byte[] data = getToken();
         if (data == null) {
             return null;
         }
         X509Certificate[] certs = null;
-        certs = CryptoFactory.getInstance().getX509Certificates(data, reverse);
+        certs = crypto.getX509Certificates(data, reverse);
         return certs;
     }
 
@@ -90,11 +89,11 @@ public class PKIPathSecurity extends BinarySecurity {
      * @throws CertificateEncodingException 
      * @throws IOException                  
      */
-    public void setX509Certificates(X509Certificate[] certs, boolean reverse) throws CertificateEncodingException, IOException {
+    public void setX509Certificates(X509Certificate[] certs, boolean reverse, Crypto crypto) throws CertificateEncodingException, IOException {
         if (certs == null) {
             throw new IllegalArgumentException("data == null");
         }
-        byte[] data = CryptoFactory.getInstance().getCertificateData(reverse, certs);
+        byte[] data = crypto.getCertificateData(reverse, certs);
         setToken(data);
     }
 }

@@ -17,13 +17,12 @@
 
 package org.apache.ws.security.components.crypto;
 
-import java.io.IOException;
+import org.apache.ws.security.WSSecurityException;
+
 import java.io.InputStream;
 import java.math.BigInteger;
-import java.security.GeneralSecurityException;
 import java.security.PrivateKey;
 import java.security.cert.Certificate;
-import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 
 /**
@@ -41,7 +40,7 @@ public interface Crypto {
      * @throws GeneralSecurityException 
      * @return	Returns a X509 certificate
      */
-    X509Certificate loadCertificate(InputStream in) throws GeneralSecurityException;
+    X509Certificate loadCertificate(InputStream in) throws WSSecurityException;
 
     /**
      * Construct an array of X509Certificate's from the byte array.
@@ -55,7 +54,7 @@ public interface Crypto {
      * @return		An array of X509 certificates, ordered according to
      * the reverse flag
      */
-    X509Certificate[] getX509Certificates(byte[] data, boolean reverse) throws IOException, GeneralSecurityException;
+    X509Certificate[] getX509Certificates(byte[] data, boolean reverse) throws WSSecurityException;
 
     /**
      * get a byte array given an array of X509 certificates.
@@ -69,7 +68,7 @@ public interface Crypto {
      * @return		The byte array for the certficates ordered according
      * to the reverse flag
      */
-    byte[] getCertificateData(boolean reverse, X509Certificate[] certs) throws IOException, CertificateEncodingException;
+    byte[] getCertificateData(boolean reverse, X509Certificate[] certs) throws WSSecurityException;
 
     /**
      * Gets the private key identified by <code>alias</> and <code>password</code>.
@@ -92,7 +91,7 @@ public interface Crypto {
      * @return Array of X509 certificates for this alias name, or
      *         null if this alias does not exist in the keystore
      */
-    public X509Certificate[] getCertificates(String alias) throws Exception;
+    public X509Certificate[] getCertificates(String alias) throws WSSecurityException;
 
     /**
      * Return a X509 Certificate alias in the keystore according to a given Certificate
@@ -109,7 +108,7 @@ public interface Crypto {
     /*
      * See comment above
      */
-    public String getAliasForX509Cert(Certificate cert) throws Exception;
+    public String getAliasForX509Cert(Certificate cert) throws WSSecurityException;
 
     /**
      * Search a X509 Certificate in the keystore according to a given serial number and
@@ -124,7 +123,7 @@ public interface Crypto {
      * @return alias name of the certificate that matches serialNumber and issuer name
      *         or null if no such certificate was found.
      */
-    public String getAliasForX509Cert(String issuer, BigInteger serialNumber) throws Exception;
+    public String getAliasForX509Cert(String issuer, BigInteger serialNumber) throws WSSecurityException;
 
 	/**
 	 * Lookup a X509 Certificate in the keystore according to a given 
@@ -138,7 +137,7 @@ public interface Crypto {
 	 * @return alias name of the certificate that matches serialNumber and issuer name
 	 *         or null if no such certificate was found.
 	 */
-	public String getAliasForX509Cert(byte[] skiBytes) throws Exception;
+	public String getAliasForX509Cert(byte[] skiBytes) throws WSSecurityException;
 	/**
 	 * Reads the SubjectKeyIdentifier information from the certificate. 
 	 * <p/> 
@@ -146,6 +145,6 @@ public interface Crypto {
 	 * @param cert       The certificate to read SKI
 	 * @return 			 The byte array conating the binary SKI data
 	 */
-	public byte[] getSKIBytesFromCert(X509Certificate cert)	throws CredentialException, IOException;
+	public byte[] getSKIBytesFromCert(X509Certificate cert)	throws WSSecurityException;
 
 }

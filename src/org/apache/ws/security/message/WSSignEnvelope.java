@@ -331,7 +331,8 @@ public class WSSignEnvelope extends WSBaseMessage {
 					bstToken = new PKIPathSecurity(doc);
 					((PKIPathSecurity) bstToken).setX509Certificates(
 						certs,
-						true);
+						true,
+						crypto);
 				} else {
 					bstToken = new X509Security(doc);
 					((X509Security) bstToken).setX509Certificate(certs[0]);

@@ -24,7 +24,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import java.io.ByteArrayInputStream;
-import java.security.GeneralSecurityException;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 
@@ -75,14 +74,17 @@ public class X509Security extends BinarySecurity {
      * 			element data
      * @throws GeneralSecurityException 
      */
-    public X509Certificate getX509Certificate(Crypto crypto) throws GeneralSecurityException {
+    public X509Certificate getX509Certificate(Crypto crypto) throws WSSecurityException {
     	if (cachedCert != null) {
     		return cachedCert;
     	}
         byte[] data = getToken();
-        if (data == null) {
-            return null;
-        }
+		if (data == null) {
+			throw new WSSecurityException(
+				WSSecurityException.FAILURE,
+				"invalidCertData",
+				new Object[] { new Integer(0)});
+		}
         ByteArrayInputStream in = new ByteArrayInputStream(data);
 		cachedCert = crypto.loadCertificate(in);
         return cachedCert;

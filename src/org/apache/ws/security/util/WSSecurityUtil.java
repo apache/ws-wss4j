@@ -38,8 +38,12 @@ import org.w3c.dom.Text;
 
 import javax.crypto.Cipher;
 import javax.crypto.NoSuchPaddingException;
+
+import java.security.InvalidKeyException;
 import java.security.NoSuchProviderException;
 import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
+
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.DESedeKeySpec;
@@ -573,12 +577,30 @@ public class WSSecurityUtil {
         return nsContext;
     }
     
-    public static SecretKey prepareSecretKey (String symEncAlgo, byte[] rawKey) throws Exception {
+    public static SecretKey prepareSecretKey (String symEncAlgo, byte[] rawKey) throws WSSecurityException {
     	SecretKey symmetricKey = null;
 		if (symEncAlgo.equalsIgnoreCase(WSConstants.TRIPLE_DES)) {
-			DESedeKeySpec keySpec = new DESedeKeySpec(rawKey);
-			SecretKeyFactory keyFactory = SecretKeyFactory.getInstance("DESede");
-			symmetricKey = keyFactory.generateSecret(keySpec);
+			try {
+				DESedeKeySpec keySpec = new DESedeKeySpec(rawKey);
+				SecretKeyFactory keyFactory =
+					SecretKeyFactory.getInstance("DESede");
+				symmetricKey = keyFactory.generateSecret(keySpec);
+			} catch (InvalidKeyException e) {
+				throw new WSSecurityException(
+					WSSecurityException.UNSUPPORTED_ALGORITHM,
+					"unsupportedSymKey",
+					new Object[] { "Invalid key for: " + symEncAlgo });
+			} catch (NoSuchAlgorithmException e) {
+				throw new WSSecurityException(
+					WSSecurityException.UNSUPPORTED_ALGORITHM,
+					"unsupportedSymKey",
+					new Object[] { "No such algorithm: " + symEncAlgo });
+			} catch (InvalidKeySpecException e) {
+				throw new WSSecurityException(
+					WSSecurityException.UNSUPPORTED_ALGORITHM,
+					"unsupportedSymKey",
+					new Object[] { "Invalid key spec for: " + symEncAlgo });
+			}
 		} else if (symEncAlgo.equalsIgnoreCase(WSConstants.AES_128)) {
 			SecretKeySpec keySpec = new SecretKeySpec(rawKey, "AES128");
 			symmetricKey = (SecretKey) keySpec;
