@@ -299,7 +299,7 @@ public class WSEncryptBody extends WSBaseMessage {
          * Second step: generate a symmetric key (session key) for
          * this alogrithm, and set the cipher into encryption mode.
          */
-        SecretKey symmetricKey = null;
+        // This variable is made a classs attribute :: SecretKey symmetricKey = null;
         KeyGenerator keyGen = getKeyGenerator();
         symmetricKey = keyGen.generateKey();
         XMLCipher xmlCipher = null;
