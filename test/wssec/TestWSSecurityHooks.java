@@ -181,7 +181,7 @@ public class TestWSSecurityHooks extends TestCase implements CallbackHandler
    public class TestCryptoImpl extends Merlin {
       TestCryptoImpl(KeyStore ks) throws Exception {
          super(null);
-         assertNotNull(keystore);
+         assertNotNull(ks);
          setKeyStore(ks);
       }
    }
