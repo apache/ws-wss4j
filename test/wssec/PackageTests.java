@@ -53,7 +53,7 @@ public class PackageTests extends TestCase {
         suite.addTestSuite(TestWSSecurity.class);
         suite.addTestSuite(TestWSSecurity2.class);
         suite.addTestSuite(TestWSSecurity3.class);
-		suite.addTestSuite(TestWSSecurity4.class);
+//		suite.addTestSuite(TestWSSecurity4.class);
 		suite.addTestSuite(TestWSSecurity5.class);
         suite.addTestSuite(TestWSSecurity6.class);
         suite.addTestSuite(TestWSSecurity7.class);

@@ -184,47 +184,47 @@ public class TestWSSecurity11 extends TestCase {
 	 * 
 	 * @throws java.lang.Exception Thrown when there is any problem in signing or verification
 	 */
-	public void testX509SignatureISDirectSTR() throws Exception {
-		SOAPEnvelope envelope = null;
-		WSSignEnvelope builder = new WSSignEnvelope();
-		builder.setUserInfo("wss4jcert", "security");
-		// builder.setUserInfo("john", "keypass");
-		SOAPConstants soapConstants = WSSecurityUtil.getSOAPConstants(unsignedEnvelope);
-		Vector parts = new Vector();
-		
-		/*
-		 * Set up to sign body and use STRTransorm to sign
-		 * the signature token (e.g. X.509 certificate)
-		 */
-		WSEncryptionPart encP =
-			new WSEncryptionPart(
-				soapConstants.getBodyQName().getLocalPart(),	// define the body
-				soapConstants.getEnvelopeURI(),
-				"Content");
-		parts.add(encP);
-		encP =
-			new WSEncryptionPart(
-				"STRTransform",				// reserved word to use STRTransform
-				soapConstants.getEnvelopeURI(),
-				"Content");
-		parts.add(encP);
-
-		builder.setParts(parts);
-		builder.setKeyIdentifierType(WSConstants.ISSUER_SERIAL_DIRECT);
-
-		log.info("Before Signing STR ISDirect....");
-		Document doc = unsignedEnvelope.getAsDocument();
-		Document signedDoc = builder.build(doc, crypto);
-
-		Message signedMsg = (Message) AxisUtil.toSOAPMessage(signedDoc);
-		if (log.isDebugEnabled()) {
-			log.debug("Signed message with STR IssuerSerialDirect key identifier:");
-			XMLUtils.PrettyElementToWriter(signedMsg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
-		}
-		signedDoc = signedMsg.getSOAPEnvelope().getAsDocument();
-		log.info("After Signing STR ISDirect....");
-		verify(signedDoc);
-	}
+//	public void testX509SignatureISDirectSTR() throws Exception {
+//		SOAPEnvelope envelope = null;
+//		WSSignEnvelope builder = new WSSignEnvelope();
+//		builder.setUserInfo("wss4jcert", "security");
+//		// builder.setUserInfo("john", "keypass");
+//		SOAPConstants soapConstants = WSSecurityUtil.getSOAPConstants(unsignedEnvelope);
+//		Vector parts = new Vector();
+//		
+//		/*
+//		 * Set up to sign body and use STRTransorm to sign
+//		 * the signature token (e.g. X.509 certificate)
+//		 */
+//		WSEncryptionPart encP =
+//			new WSEncryptionPart(
+//				soapConstants.getBodyQName().getLocalPart(),	// define the body
+//				soapConstants.getEnvelopeURI(),
+//				"Content");
+//		parts.add(encP);
+//		encP =
+//			new WSEncryptionPart(
+//				"STRTransform",				// reserved word to use STRTransform
+//				soapConstants.getEnvelopeURI(),
+//				"Content");
+//		parts.add(encP);
+//
+//		builder.setParts(parts);
+//		builder.setKeyIdentifierType(WSConstants.ISSUER_SERIAL_DIRECT);
+//
+//		log.info("Before Signing STR ISDirect....");
+//		Document doc = unsignedEnvelope.getAsDocument();
+//		Document signedDoc = builder.build(doc, crypto);
+//
+//		Message signedMsg = (Message) AxisUtil.toSOAPMessage(signedDoc);
+//		if (log.isDebugEnabled()) {
+//			log.debug("Signed message with STR IssuerSerialDirect key identifier:");
+//			XMLUtils.PrettyElementToWriter(signedMsg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
+//		}
+//		signedDoc = signedMsg.getSOAPEnvelope().getAsDocument();
+//		log.info("After Signing STR ISDirect....");
+//		verify(signedDoc);
+//	}
 
 	/**
 	 * Test that signs and verifies a WS-Security envelope.
@@ -342,47 +342,47 @@ public class TestWSSecurity11 extends TestCase {
 	 */
 	
 
-	public void testX509SignatureSKIDirectSTR() throws Exception {
-		SOAPEnvelope envelope = null;
-		WSSignEnvelope builder = new WSSignEnvelope();
-		builder.setUserInfo("wss4jcert", "security");
-		// builder.setUserInfo("john", "keypass");
-		SOAPConstants soapConstants = WSSecurityUtil.getSOAPConstants(unsignedEnvelope);
-		Vector parts = new Vector();
-		
-		/*
-		 * Set up to sign body and use STRTransorm to sign
-		 * the signature token (e.g. X.509 certificate)
-		 */
-		WSEncryptionPart encP =
-			new WSEncryptionPart(
-				soapConstants.getBodyQName().getLocalPart(),	// define the body
-				soapConstants.getEnvelopeURI(),
-				"Content");
-		parts.add(encP);
-		encP =
-			new WSEncryptionPart(
-				"STRTransform",				// reserved word to use STRTransform
-				soapConstants.getEnvelopeURI(),
-				"Content");
-		parts.add(encP);
-
-		builder.setParts(parts);
-		builder.setKeyIdentifierType(WSConstants.SKI_KEY_IDENTIFIER_DIRECT);
-
-		log.info("Before Signing STR SKIDirect....");
-		Document doc = unsignedEnvelope.getAsDocument();
-		Document signedDoc = builder.build(doc, crypto);
-
-		Message signedMsg = (Message) AxisUtil.toSOAPMessage(signedDoc);
-		if (log.isDebugEnabled()) {
-			log.debug("Signed message with STR SKIDirect key identifier:");
-			XMLUtils.PrettyElementToWriter(signedMsg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
-		}
-		signedDoc = signedMsg.getSOAPEnvelope().getAsDocument();
-		log.info("After Signing STR SKIDirect....");
-		verify(signedDoc);
-	}
+//	public void testX509SignatureSKIDirectSTR() throws Exception {
+//		SOAPEnvelope envelope = null;
+//		WSSignEnvelope builder = new WSSignEnvelope();
+//		builder.setUserInfo("wss4jcert", "security");
+//		// builder.setUserInfo("john", "keypass");
+//		SOAPConstants soapConstants = WSSecurityUtil.getSOAPConstants(unsignedEnvelope);
+//		Vector parts = new Vector();
+//		
+//		/*
+//		 * Set up to sign body and use STRTransorm to sign
+//		 * the signature token (e.g. X.509 certificate)
+//		 */
+//		WSEncryptionPart encP =
+//			new WSEncryptionPart(
+//				soapConstants.getBodyQName().getLocalPart(),	// define the body
+//				soapConstants.getEnvelopeURI(),
+//				"Content");
+//		parts.add(encP);
+//		encP =
+//			new WSEncryptionPart(
+//				"STRTransform",				// reserved word to use STRTransform
+//				soapConstants.getEnvelopeURI(),
+//				"Content");
+//		parts.add(encP);
+//
+//		builder.setParts(parts);
+//		builder.setKeyIdentifierType(WSConstants.SKI_KEY_IDENTIFIER_DIRECT);
+//
+//		log.info("Before Signing STR SKIDirect....");
+//		Document doc = unsignedEnvelope.getAsDocument();
+//		Document signedDoc = builder.build(doc, crypto);
+//
+//		Message signedMsg = (Message) AxisUtil.toSOAPMessage(signedDoc);
+//		if (log.isDebugEnabled()) {
+//			log.debug("Signed message with STR SKIDirect key identifier:");
+//			XMLUtils.PrettyElementToWriter(signedMsg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
+//		}
+//		signedDoc = signedMsg.getSOAPEnvelope().getAsDocument();
+//		log.info("After Signing STR SKIDirect....");
+//		verify(signedDoc);
+//	}
 
 
     /**

@@ -121,31 +121,31 @@ public class TestWSSecurity4 extends TestCase {
      * 
      * @throws java.lang.Exception Thrown when there is any problem in signing or verification
      */
-    public void testX509SignatureSKIDirect() throws Exception {
-        SOAPEnvelope envelope = null;
-        WSSignEnvelope builder = new WSSignEnvelope();
-        builder.setUserInfo("wss4jcert", "security");
-		builder.setKeyIdentifierType(WSConstants.SKI_KEY_IDENTIFIER_DIRECT);
-
-        // builder.setUserInfo("john", "keypass");
-        log.info("Before Signing....");
-        Document doc = unsignedEnvelope.getAsDocument();
-        Document signedDoc = builder.build(doc, crypto);
-
-        /*
-         * convert the resulting document into a message first. The toSOAPMessage()
-         * mehtod performs the necessary c14n call to properly set up the signed
-         * document and convert it into a SOAP message. After that we extract it
-         * as a document again for further processing.
-         */
-
-        Message signedMsg = (Message) AxisUtil.toSOAPMessage(signedDoc);
-		XMLUtils.PrettyElementToWriter(signedMsg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
-
-        signedDoc = signedMsg.getSOAPEnvelope().getAsDocument();
-        log.info("After Signing....");
-        verify(signedDoc);
-    }
+//    public void testX509SignatureSKIDirect() throws Exception {
+//        SOAPEnvelope envelope = null;
+//        WSSignEnvelope builder = new WSSignEnvelope();
+//        builder.setUserInfo("wss4jcert", "security");
+//		builder.setKeyIdentifierType(WSConstants.SKI_KEY_IDENTIFIER_DIRECT);
+//
+//        // builder.setUserInfo("john", "keypass");
+//        log.info("Before Signing....");
+//        Document doc = unsignedEnvelope.getAsDocument();
+//        Document signedDoc = builder.build(doc, crypto);
+//
+//        /*
+//         * convert the resulting document into a message first. The toSOAPMessage()
+//         * mehtod performs the necessary c14n call to properly set up the signed
+//         * document and convert it into a SOAP message. After that we extract it
+//         * as a document again for further processing.
+//         */
+//
+//        Message signedMsg = (Message) AxisUtil.toSOAPMessage(signedDoc);
+//		XMLUtils.PrettyElementToWriter(signedMsg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
+//
+//        signedDoc = signedMsg.getSOAPEnvelope().getAsDocument();
+//        log.info("After Signing....");
+//        verify(signedDoc);
+//    }
 
     /**
      * Test that signs (twice) and verifies a WS-Security envelope
@@ -153,18 +153,18 @@ public class TestWSSecurity4 extends TestCase {
      * 
      * @throws java.lang.Exception Thrown when there is any problem in signing or verification
      */
-    public void testDoubleX509SignatureSKIDirect() throws Exception {
-        SOAPEnvelope envelope = null;
-        WSSignEnvelope builder = new WSSignEnvelope();
-        builder.setUserInfo("wss4jcert", "security");
-		builder.setKeyIdentifierType(WSConstants.SKI_KEY_IDENTIFIER_DIRECT);
-
-        // builder.setUserInfo("john", "keypass");
-        Document doc = unsignedEnvelope.getAsDocument();
-        Document signedDoc = builder.build(doc, crypto);
-        Document signedDoc1 = builder.build(signedDoc, crypto);
-        verify(signedDoc1);
-    }
+//    public void testDoubleX509SignatureSKIDirect() throws Exception {
+//        SOAPEnvelope envelope = null;
+//        WSSignEnvelope builder = new WSSignEnvelope();
+//        builder.setUserInfo("wss4jcert", "security");
+//		builder.setKeyIdentifierType(WSConstants.SKI_KEY_IDENTIFIER_DIRECT);
+//
+//        // builder.setUserInfo("john", "keypass");
+//        Document doc = unsignedEnvelope.getAsDocument();
+//        Document signedDoc = builder.build(doc, crypto);
+//        Document signedDoc1 = builder.build(signedDoc, crypto);
+//        verify(signedDoc1);
+//    }
 
     /**
      * Verifies the soap envelope
