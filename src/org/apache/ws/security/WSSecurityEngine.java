@@ -865,7 +865,7 @@ public class WSSecurityEngine {
             throw new WSSecurityException
                     (WSSecurityException.UNSUPPORTED_ALGORITHM, "noEncAlgo");
         }
-		Cipher cipher = WSSecurityUtil.getCiperInstance(keyEncAlgo);
+		Cipher cipher = WSSecurityUtil.getCipherInstance(keyEncAlgo);
         /*
          * Well, we can decrypt the session (symmetric) key. Now lookup CipherValue, this is the value of the
          * encrypted session key (session key usually is a symmetrical key that encrypts

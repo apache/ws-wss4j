@@ -655,7 +655,7 @@ public class WSSecurityUtil {
 		}
 	}
 
-	public static Cipher getCiperInstance(String cipherAlgo)
+	public static Cipher getCipherInstance(String cipherAlgo)
 		throws WSSecurityException {
 		Cipher cipher = null;
 		try {
