@@ -158,7 +158,7 @@ public class WSSecurityEngine {
     }
 
     /**
-     * Singleton instance of security engine.
+     * Get a singleton instance of security engine.
      * <p/>
      *
      * @return ws-security engine.
@@ -166,6 +166,21 @@ public class WSSecurityEngine {
     public synchronized static WSSecurityEngine getInstance() {
         if (engine == null) {
             engine = new WSSecurityEngine();
+        }
+        return engine;
+    }
+
+    /**
+	 * Get a singleton instance of security engine with specified configuration
+	 * settings. <p/>
+	 * 
+	 * @param wssConfig
+	 *            the configuration parameters to use.
+	 * @return ws-security engine.
+	 */
+    public synchronized static WSSecurityEngine getInstance(WSSConfig wssConfig) {
+        if (engine == null) {
+            engine = new WSSecurityEngine(wssConfig);
         }
         return engine;
     }
