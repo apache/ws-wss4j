@@ -64,7 +64,7 @@
    <handler type="java:org.apache.ws.axis.security.WSDoAllReceiver">
     <parameter name="passwordCallbackClass" value="org.apache.ws.axis.oasis.PWCallback1"/>
     <parameter name="action" value="UsernameToken Encrypt"/>
-    <parameter name="decryptionPropFile" value="wsstest2.properties" />
+    <parameter name="decryptionPropFile" value="wsstest.properties" />
    </handler>
   </requestFlow>
   </service>
@@ -93,7 +93,7 @@
    <handler type="java:org.apache.ws.axis.security.WSDoAllReceiver">
     <parameter name="passwordCallbackClass" value="org.apache.ws.axis.oasis.PWCallback1"/>
     <parameter name="action" value="Signature Encrypt"/>
-    <parameter name="signaturePropFile" value="wsstest2.properties" />
+    <parameter name="signaturePropFile" value="wsstest.properties" />
    </handler>
   </requestFlow>
   <responseFlow>
@@ -103,7 +103,7 @@
     <parameter name="passwordCallbackClass" 
       value="org.apache.ws.axis.oasis.PWCallback1"/>
     <parameter name="signatureKeyIdentifier" value="DirectReference" />
-    <parameter name="signaturePropFile" value="wsstest1.properties" />
+    <parameter name="signaturePropFile" value="wsstest.properties" />
     <parameter name="encryptionKeyIdentifier" value="SKIKeyIdentifier" />
     <parameter name="encryptionUser" value="7706c71b0628d6ecc85ea1e8ad62be60_a8272f6f-2c94-436e-aa71-d8d2be4647f6" />
    </handler>
@@ -134,7 +134,7 @@
    <handler type="java:org.apache.ws.axis.security.WSDoAllReceiver">
     <parameter name="passwordCallbackClass" value="org.apache.ws.axis.oasis.PWCallback1"/>
     <parameter name="action" value="Signature Encrypt"/>
-    <parameter name="signaturePropFile" value="wsstest2.properties" />
+    <parameter name="signaturePropFile" value="wsstest.properties" />
    </handler>
   </requestFlow>
   <responseFlow>
@@ -144,7 +144,7 @@
     <parameter name="passwordCallbackClass" 
       value="org.apache.ws.axis.oasis.PWCallback1"/>
     <parameter name="signatureKeyIdentifier" value="SKIKeyIdentifier" />
-    <parameter name="signaturePropFile" value="wsstest2.properties" />
+    <parameter name="signaturePropFile" value="wsstest.properties" />
     <parameter name="encryptionKeyIdentifier" value="EmbeddedKeyName" />
     <parameter name="EmbeddedKeyCallbackClass" 
       value="org.apache.ws.axis.oasis.PWCallback1" />
@@ -177,7 +177,7 @@
    <handler type="java:org.apache.ws.axis.security.WSDoAllReceiver">
     <parameter name="passwordCallbackClass" value="org.apache.ws.axis.oasis.PWCallback1"/>
     <parameter name="action" value="Signature Signature"/>
-    <parameter name="signaturePropFile" value="wsstest2.properties" />
+    <parameter name="signaturePropFile" value="wsstest.properties" />
    </handler>
   </requestFlow>
   </service>
@@ -206,7 +206,7 @@
    <handler type="java:org.apache.ws.axis.security.WSDoAllReceiver">
     <parameter name="passwordCallbackClass" value="org.apache.ws.axis.oasis.PWCallback1"/>
     <parameter name="action" value="Encrypt Signature"/>
-    <parameter name="signaturePropFile" value="wsstest2.properties" />
+    <parameter name="signaturePropFile" value="wsstest.properties" />
    </handler>
   </requestFlow>
   <responseFlow>
@@ -216,7 +216,7 @@
     <parameter name="passwordCallbackClass" 
       value="org.apache.ws.axis.oasis.PWCallback1"/>
     <parameter name="signatureKeyIdentifier" value="SKIKeyIdentifier" />
-    <parameter name="signaturePropFile" value="wsstest1.properties" />
+    <parameter name="signaturePropFile" value="wsstest.properties" />
     <parameter name="encryptionKeyIdentifier" value="DirectReference" />
     <parameter name="encryptionUser" value="7706c71b0628d6ecc85ea1e8ad62be60_a8272f6f-2c94-436e-aa71-d8d2be4647f6" />
    </handler>
@@ -248,8 +248,8 @@
    <handler type="java:org.apache.ws.axis.security.WSDoAllReceiver">
     <parameter name="passwordCallbackClass" value="org.apache.ws.axis.oasis.PWCallback1"/>
     <parameter name="action" value="Signature Encrypt"/>
-    <parameter name="signaturePropFile" value="wsstest1.properties" />
-    <parameter name="decryptionPropFile" value="wsstest2.properties" />
+    <parameter name="signaturePropFile" value="wsstest.properties" />
+    <parameter name="decryptionPropFile" value="wsstest.properties" />
    </handler>
   </requestFlow>
   <responseFlow>
@@ -259,8 +259,8 @@
     <parameter name="passwordCallbackClass" 
       value="org.apache.ws.axis.oasis.PWCallback1"/>
     <parameter name="signatureKeyIdentifier" value="SKIKeyIdentifier" />
-    <parameter name="signaturePropFile" value="wsstest2.properties" />
-    <parameter name="encryptionPropFile" value="wsstest1.properties" />
+    <parameter name="signaturePropFile" value="wsstest.properties" />
+    <parameter name="encryptionPropFile" value="wsstest.properties" />
     <parameter name="encryptionKeyIdentifier" value="DirectReference" />
     <parameter name="encryptionUser" value="7706c71b0628d6ecc85ea1e8ad62be60_a8272f6f-2c94-436e-aa71-d8d2be4647f6" />
    </handler>

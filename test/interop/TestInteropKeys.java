@@ -38,7 +38,7 @@ public class TestInteropKeys extends TestCase {
     }
 
     public void testInteropKeys1() throws Exception {
-        Crypto c = CryptoFactory.getInstance("wsstest1.properties");
+        Crypto c = CryptoFactory.getInstance("wsstest.properties");
         X509Certificate[] certs = c.getCertificates("7706c71b0628d6ecc85ea1e8ad62be60_a8272f6f-2c94-436e-aa71-d8d2be4647f6");
         assertTrue(certs != null);
         assertTrue(certs[0] != null);
@@ -47,7 +47,7 @@ public class TestInteropKeys extends TestCase {
     }
 
     public void testInteropKeys2() throws Exception {
-        Crypto c = CryptoFactory.getInstance("wsstest2.properties");
+        Crypto c = CryptoFactory.getInstance("wsstest.properties");
         X509Certificate[] certs = c.getCertificates("86ab6c4828bcde6983d81b2b59ff426c_a8272f6f-2c94-436e-aa71-d8d2be4647f6");
         assertTrue(certs != null);
         assertTrue(certs[0] != null);
