@@ -41,7 +41,7 @@ import java.util.Vector;
 public class WSBaseMessage {
 	private static Log log = LogFactory.getLog(WSBaseMessage.class.getName());
 	protected String actor = null;
-	protected String mustunderstand = "true";
+	protected boolean mustunderstand = true;
 	protected String user = null;
 	protected String password = null;
 	protected int keyIdentifierType = WSConstants.ISSUER_SERIAL;
@@ -103,7 +103,7 @@ public class WSBaseMessage {
 	 * @param mu Set <code>mustUnderstand</code> to true or false
 	 */
 	public void setMustUnderstand(boolean mu) {
-		mustunderstand = mu ? "true" : null;
+		mustunderstand = mu;
 	}
 
 	/**
@@ -226,11 +226,11 @@ public class WSBaseMessage {
 						+ soapConstants.getRoleAttributeQName().getLocalPart(),
 					actor);
 			}
-			if (mustunderstand != null) {
+			if (mustunderstand) {
 				securityHeader.setAttributeNS(
 					soapConstants.getEnvelopeURI(),
 					soapPrefix + ":" + WSConstants.ATTR_MUST_UNDERSTAND,
-					mustunderstand);
+					soapConstants.getMustunderstand());
 			}
 			if (timestamp) {
 				Element elementTime = doc.createElementNS(WSConstants.WSU_NS, "wsu:Timestamp");

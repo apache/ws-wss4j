@@ -100,9 +100,10 @@ public class WSDoAllReceiver extends BasicHandler {
 
 		SOAPHeaderElement headerElement = null;
 		while (headers.hasNext()) {
-			headerElement = (SOAPHeaderElement) headers.next();
-			if (headerElement.getLocalName().equals(WSConstants.WSSE_LN)
-				&& headerElement.getNamespaceURI().equals(WSConstants.WSSE_NS)) {
+			SOAPHeaderElement hE = (SOAPHeaderElement) headers.next();
+			if (hE.getLocalName().equals(WSConstants.WSSE_LN)
+				&& hE.getNamespaceURI().equals(WSConstants.WSSE_NS)) {
+				headerElement = hE;
 				break;
 			}
 		}
@@ -123,10 +124,7 @@ public class WSDoAllReceiver extends BasicHandler {
 			} else {
 				throw new AxisFault("WSDoAllReceiver: Request does not contain required Security header");
 			}
-		} else {
-			((org.apache.axis.message.SOAPHeaderElement) headerElement)
-						.setProcessed(true);
-		}
+		} 
 
 		Document doc = null;
 		try {
@@ -186,17 +184,35 @@ public class WSDoAllReceiver extends BasicHandler {
 			log.debug(osStr);
 		}
 		sPart.setCurrentMessage(osStr, SOAPPart.FORM_STRING);
+		
+		/*
+		 * After setting the new current message, probably modified because
+		 * of decryption, we need to redo the security header locate. That is,
+		 * we force Axis (with getSOAPEnvelope()) to parse the string, build 
+		 * the new header. Then we examine again, look up the security header 
+		 * (as above when checking for security) and set the header as 
+		 * processed.
+		 */
 
-		/*		
 		try {
-			AxisUtil.updateSOAPMessage(doc, sm);
-			
+			sHeader = sm.getSOAPEnvelope().getHeader();
 		} catch (Exception ex) {
-			throw new AxisFault(
-				"WSDoAllReceiver: cannot update processed message",
-				ex);
+			throw new AxisFault("WSDoAllReceiver: cannot get SOAP header", ex);
 		}
-		*/
+
+		headers = sHeader.examineHeaderElements(actor);
+
+		headerElement = null;
+		while (headers.hasNext()) {
+			SOAPHeaderElement hE = (SOAPHeaderElement) headers.next();
+			if (hE.getLocalName().equals(WSConstants.WSSE_LN)
+				&& hE.getNamespaceURI().equals(WSConstants.WSSE_NS)) {
+				headerElement = hE;
+				break;
+			}
+		}
+		((org.apache.axis.message.SOAPHeaderElement) headerElement).setProcessed(true);
+
 		Vector resultActions = wsResult.getActions();
 		int size = actions.size();
 		if (size != resultActions.size()) {

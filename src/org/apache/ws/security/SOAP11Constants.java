@@ -58,4 +58,11 @@ public class SOAP11Constants implements SOAPConstants {
     public String getNextRoleURI() {
         return WSConstants.URI_SOAP11_NEXT_ACTOR;
     }
+	/**
+	 * Obtain the Mustunderstand string
+	 */
+	public String getMustunderstand() {
+		return "1";
+	}
+
 }

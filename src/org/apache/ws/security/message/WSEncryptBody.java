@@ -340,7 +340,18 @@ public class WSEncryptBody extends WSBaseMessage {
 							"unsupportedKeyTransp", new Object[]{keyEncAlgo});
 		}
 		cipher.init(Cipher.ENCRYPT_MODE, remoteCert);
-		byte[] encryptedKey = cipher.doFinal(symmetricKey.getEncoded());
+		byte[] encKey = symmetricKey.getEncoded();
+		if (doDebug) {
+			log.debug("cipher blksize: " + cipher.getBlockSize() + 
+					  ", symm key length: " + encKey.length);
+		}
+		if (cipher.getBlockSize() < encKey.length) {
+			throw new WSSecurityException(
+				WSSecurityException.FAILURE,
+				"unsupportedKeyTransp",
+				new Object[] { "public key algorithm to weak to encrypt smmetric key" });
+		}
+		byte[] encryptedKey = cipher.doFinal(encKey);
 		Text keyText =
 			WSSecurityUtil.createBase64EncodedTextNode(doc, encryptedKey);
 
