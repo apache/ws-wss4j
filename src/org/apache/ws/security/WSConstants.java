@@ -26,6 +26,7 @@ import org.apache.xml.security.utils.EncryptionConstants;
  */
 public interface WSConstants {
     public static final String WSSE_NS = "http://www.docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd";
+    public static final String USERNAMETOKEN_NS = "http://www.docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0";
     public static final String WSSE_PREFIX = "wsse";
     public static final String WSSE_LN = "Security";
     public static final String WSU_NS = "http://www.docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd";
@@ -99,7 +100,7 @@ public interface WSConstants {
 	*/
 	public static final String PW_TEXT = "PasswordText";
 
-	public static final String PASSWORD_TEXT = WSSE_NS + "#PasswordText";
+	public static final String PASSWORD_TEXT = USERNAMETOKEN_NS + "#PasswordText";
 
 	/**
 	 * Sets the {@link org.apache.ws.security.message.WSEncryptBody#build(Document, Crypto) encryption}
