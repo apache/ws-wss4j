@@ -54,6 +54,7 @@ import java.security.cert.X509Certificate;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.TimeZone;
@@ -228,10 +229,13 @@ public class WSDoAllReceiver extends BasicHandler {
             iterator = processedHeaders.iterator();
             while (iterator.hasNext()) {
                 QName qname = (QName) iterator.next();
-                org.apache.axis.message.SOAPHeaderElement tempHeader = (org.apache.axis.message.SOAPHeaderElement) sm
-                        .getSOAPEnvelope().getHeadersByName(
-                                qname.getNamespaceURI(), qname.getLocalPart());
-                tempHeader.setProcessed(true);
+                Enumeration headersByName = sm.getSOAPEnvelope().getHeadersByName(
+                        qname.getNamespaceURI(), qname.getLocalPart());
+                while (headersByName.hasMoreElements()) {
+                    org.apache.axis.message.SOAPHeaderElement tempHeader = 
+                        (org.apache.axis.message.SOAPHeaderElement) headersByName.nextElement();
+                    tempHeader.setProcessed(true);
+                }
             }
 
             /*
