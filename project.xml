@@ -93,7 +93,7 @@
 
     <unitTest>
       <includes>
-        <include>**/*Test*.java</include>
+        <include>**/*PackageTests*.java</include>
       </includes>
       <excludes>
           <exclude>**/TestScenario7.java</exclude>
@@ -184,7 +184,7 @@
         <report>maven-developer-activity-plugin</report>
         <report>maven-jxr-plugin</report>
         <report>maven-javadoc-plugin</report>
-        <report>maven-junit-report-plugin</report>
+        <!-- <report>maven-junit-report-plugin</report> -->
         <!-- <report>maven-clover-plugin</report> -->
     </reports>
 </project>

@@ -48,6 +48,11 @@
                 package="org.apache.ws.axis.oasis.ping"/>
         </axis-wsdl2java>
 
+        <copy todir="target/classes" overwrite="yes">
+          <fileset dir="${dir.interop}/${server}">
+            <include name="*.properties"/>
+          </fileset>
+        </copy>
         <copy todir="${dir.work}/${server}" overwrite="yes">
           <fileset dir="${dir.interop}/${server}">
             <include name="*.java"/>
