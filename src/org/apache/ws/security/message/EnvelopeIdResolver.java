@@ -27,7 +27,7 @@ import org.apache.xml.security.utils.XMLUtils;
 import org.apache.xml.security.utils.resolver.ResourceResolverException;
 import org.apache.xml.security.utils.resolver.ResourceResolverSpi;
 import org.apache.xml.utils.URI;
-import org.apache.xpath.CachedXPathAPI;
+// import org.apache.xpath.CachedXPathAPI;
 import org.apache.xpath.XPathAPI;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
@@ -96,7 +96,7 @@ public class EnvelopeIdResolver extends ResourceResolverSpi {
 
 		// Xalan fix for catching all namespaces
 		XMLUtils.circumventBug2650(doc);
-		CachedXPathAPI cXPathAPI = new CachedXPathAPI();
+//		CachedXPathAPI cXPathAPI = new CachedXPathAPI();
 
 		/*
 		 * URI="#chapter1"
@@ -122,9 +122,9 @@ public class EnvelopeIdResolver extends ResourceResolverSpi {
 				BaseURI);
 		}
 		String cId = selectedElem.getAttributeNS(WSConstants.WSU_NS, "Id");
-		if ((cId == null) || (cId.length() == 0)) {
-			cId = selectedElem.getAttributeNS(WSConstants.SOAP_SEC_NS, "id");
-		}
+//		if ((cId == null) || (cId.length() == 0)) {
+//			cId = selectedElem.getAttributeNS(WSConstants.SOAP_SEC_NS, "id");
+//		}
 		/*
 		 * If Body Id match fails, look for a generic Id (without a namespace)
 		 * that matches the URI. If that lookup fails, try to get a namespace

@@ -18,8 +18,8 @@ public class Todolist {
 	 * 
 	 * TODO: Clean up exception handling, remap to WSSecurityException, avoid generic Exception.
 	 * TODO: make Cipher provider configurable
-	 * TODO: new function to perform Certificate handover from request to response according to Kojira's
-	 * 		 explanation
+	 * DONE: new function to perform Certificate handover from request to response according to Kojira's
+	 * 		 explanation. Werner, checkin March, 24
 	 * TODO: Better texts for the Exception, see OASIS WSS specs for recommended fault strings
 	 *  
 	 */

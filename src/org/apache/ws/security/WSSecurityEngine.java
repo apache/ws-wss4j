@@ -53,7 +53,6 @@ import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.xml.namespace.QName;
-//import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -1042,7 +1041,7 @@ public class WSSecurityEngine {
 			typeStr= tmpE.getAttribute("Type");
 		} 
 		if (typeStr != null) {
-			content = typeStr.equals("http://www.w3.org/2001/04/xmlenc#Content") ? true : false;
+			content = typeStr.equals(WSConstants.ENC_NS + "Content") ? true : false;
 		}
 		return content;
 	}

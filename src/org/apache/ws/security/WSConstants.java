@@ -40,7 +40,7 @@ public interface WSConstants {
     public static final String ENC_PREFIX = "xenc";
     public static final String ENC_KEY_LN = "EncryptedKey";
     public static final String REF_LIST_LN = "ReferenceList";
-    public static final String SOAP_SEC_NS = "http://schemas.xmlsoap.org/soap/security/2000-12";
+//    public static final String SOAP_SEC_NS = "http://schemas.xmlsoap.org/soap/security/2000-12";
     public static final String XMLNS_NS = "http://www.w3.org/2000/xmlns/";
     public static final String XML_NS = "http://www.w3.org/XML/1998/namespace";
     public static final String USERNAME_TOKEN_LN = "UsernameToken";
@@ -59,8 +59,6 @@ public interface WSConstants {
 								"http://schemas.xmlsoap.org/soap/envelope/" ;
 	public static final String URI_SOAP12_ENV =
 								   "http://www.w3.org/2003/05/soap-envelope";
-	// public static final String URI_DEFAULT_SOAP_ENV =
-		// DEFAULT_SOAP_VERSION.getEnvelopeURI();
 
 	public static final String[] URIS_SOAP_ENV = {
 		URI_SOAP11_ENV,
