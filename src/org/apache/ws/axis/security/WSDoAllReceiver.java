@@ -59,7 +59,7 @@ public class WSDoAllReceiver extends BasicHandler {
 	static Log log = LogFactory.getLog(WSDoAllReceiver.class.getName());
 	static final WSSecurityEngine secEngine = new WSSecurityEngine();
 
-	private boolean doDebug = true;
+	private boolean doDebug = false;
 
 	private static Hashtable cryptos = new Hashtable(5);
 
