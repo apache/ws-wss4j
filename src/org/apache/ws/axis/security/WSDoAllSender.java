@@ -486,13 +486,18 @@ public class WSDoAllSender extends BasicHandler {
 		if (assertion == null) {
 			throw new AxisFault("WSDoAllSender: Signed SAML: no SAML token received");
 		}
-		String issuerKeyName = saml.getIssuerKeyName();
-		String issuerKeyPW = saml.getIssuerKeyPassword();
-		Crypto issuerCrypto = saml.getIssuerCrypto();
+		String issuerKeyName = null;
+		String issuerKeyPW = null;
+		Crypto issuerCrypto = null;
 
 		WSSignEnvelope wsSign = new WSSignEnvelope(actor, mu);
 		String password = null;
-		if (saml.isSenderVouches() == false) {
+		if (saml.isSenderVouches()) {
+			issuerKeyName = saml.getIssuerKeyName();
+			issuerKeyPW = saml.getIssuerKeyPassword();
+			issuerCrypto = saml.getIssuerCrypto();
+		}
+		else {		    
 			password =
 				getPassword(
 					username,
@@ -501,6 +506,9 @@ public class WSDoAllSender extends BasicHandler {
 					WSDoAllConstants.PW_CALLBACK_REF)
 					.getPassword();
 			wsSign.setUserInfo(username, password);
+		}
+		if (sigKeyId != 0) {
+			wsSign.setKeyIdentifierType(sigKeyId);
 		}
 		try {
 			wsSign.build(

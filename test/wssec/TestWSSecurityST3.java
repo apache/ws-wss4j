@@ -142,7 +142,7 @@ public class TestWSSecurityST3 extends TestCase implements CallbackHandler {
 
         Document doc = unsignedEnvelope.getAsDocument();
         
-        SAMLIssuer saml = SAMLIssuerFactory.getInstance("saml3.properties");
+        SAMLIssuer saml = SAMLIssuerFactory.getInstance("saml4.properties");
         // Provide info to SAML issuer that it can construct a Holder-of-key
         // SAML token.
         saml.setInstanceDoc(doc);

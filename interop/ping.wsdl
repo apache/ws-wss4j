@@ -85,5 +85,12 @@
         <port name="STPing1" binding="tns:PingBinding">
             <soap:address location="http://localhost:9080/pingservice/STPing1"/>
         </port>
+        <port name="STPing3" binding="tns:PingBinding">
+            <soap:address location="http://localhost:9080/pingservice/STPing3"/>
+        </port>
+        <port name="STPing4" binding="tns:PingBinding">
+            <soap:address location="http://localhost:9080/pingservice/STPing4"/>
+        </port>
+        
     </service>
 </definitions>

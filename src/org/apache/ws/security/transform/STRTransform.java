@@ -36,6 +36,7 @@ import org.apache.xml.security.c14n.CanonicalizationException;
 import org.apache.xml.security.c14n.InvalidCanonicalizerException;
 import org.apache.xml.security.transforms.TransformSpi;
 import org.apache.xml.security.utils.Base64;
+// import org.apache.xml.security.utils.XMLUtils;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -148,25 +149,17 @@ public class STRTransform extends TransformSpi {
 			 */
 
 			String canonAlgo = null;
-			if (this
-				._transformObject
-				.length(WSConstants.WSSE_NS, "TransformationParameters")
-				== 1) {
-				Element tmpE =
-					this._transformObject.getChildElementLocalName(
-						0,
-						WSConstants.WSSE_NS,
-						"TransformationParameters");
-				Element canonElem =
-					(Element) WSSecurityUtil.getDirectChild(
-						tmpE,
-						"CanonicalizationMethod",
-						WSConstants.SIG_NS);
-				canonAlgo = canonElem.getAttribute("Algorithm");
-				if (doDebug) {
-					log.debug("CanonAlgo: " + canonAlgo);
-				}
-			}
+			if (this._transformObject.length(WSConstants.WSSE_NS,
+                    "TransformationParameters") == 1) {
+                Element tmpE = this._transformObject.getChildElementLocalName(
+                        0, WSConstants.WSSE_NS, "TransformationParameters");
+                Element canonElem = (Element) WSSecurityUtil.getDirectChild(
+                        tmpE, "CanonicalizationMethod", WSConstants.SIG_NS);
+                canonAlgo = canonElem.getAttribute("Algorithm");
+                if (doDebug) {
+                    log.debug("CanonAlgo: " + canonAlgo);
+                }
+            }
 			Canonicalizer canon = Canonicalizer.getInstance(canonAlgo);
 			byte buf[] = canon.canonicalizeXPathNodeSet(input.getNodeSet());
 
@@ -174,18 +167,18 @@ public class STRTransform extends TransformSpi {
 			bos.write(buf, 0, buf.length);
 
 			if (doDebug) {
-				log.debug("canon bos: " + bos.toString());
-			}
+                log.debug("canon bos: " + bos.toString());
+            }
 
-			DocumentBuilderFactory dfactory =
-				DocumentBuilderFactory.newInstance();
-			dfactory.setValidating(false);
-			dfactory.setNamespaceAware(true);
+            DocumentBuilderFactory dfactory = DocumentBuilderFactory
+                    .newInstance();
+            dfactory.setValidating(false);
+            dfactory.setNamespaceAware(true);
 
-			DocumentBuilder db = dfactory.newDocumentBuilder();
+            DocumentBuilder db = dfactory.newDocumentBuilder();
 
-			Document doc =
-				db.parse(new ByteArrayInputStream(bos.toByteArray()));
+            Document doc = db
+                    .parse(new ByteArrayInputStream(bos.toByteArray()));
 
 			/*
 			 * Second step: find the STR element inside the resulting XML doc,
@@ -220,19 +213,46 @@ public class STRTransform extends TransformSpi {
 			str = (Element) doc.importNode(str, true);
 
 			Node parent = tmpEl.getParentNode(); // point to document node
-			parent.replaceChild(str, tmpEl); // replace STR with new node
+//			parent.replaceChild(str, tmpEl); // replace STR with new node
+//
 
-			// XMLUtils.circumventBug2650(doc); // This is not needed in this case
+            /*
+             * Alert: Hacks ahead  
+             * 
+             * TODO: Rework theses hacks after c14n was updated.
+             */
+
+            /*
+             * HACK 1:
+             * Create a top level fake element with a defined default namespace
+             * setting (urn:X). Replace the STR node with this fake element that
+             * is now the top level element. Append our result element to the
+             * fake element, then call c14n. This forces the c14n to insert
+             * xmlns="" if necessary. However, before we handover the result we
+             * have to remove the fake element. See string buffer operation
+             * below.
+             */
+			Element tmpEl1 = doc.createElement("temp");
+			tmpEl1.setAttributeNS(WSConstants.XMLNS_NS, "xmlns", "urn:X");
+			parent.replaceChild(tmpEl1, tmpEl); // replace STR with new node
+
+			tmpEl1.appendChild(str);
+			// End of HACK 1
+            
+			// XMLUtils.circumventBug2650(doc); // No longer needed???
 			
 			/*
 			 * C14n with specified algorithm. According to WSS Specification.
 			 */
 			buf = canon.canonicalizeSubtree(doc, "#default");
 
-			// prepare a BOS for debug output and the following hack. If the
-			// problem with c14n mehtod is solved then just :
+			// If the problem with c14n method is solved then just do:
+            
 			/* return new XMLSignatureInput(buf); */
 			
+            /*
+             * HACK 2
+             */
 			bos = new ByteArrayOutputStream(buf.length);
 			bos.write(buf, 0, buf.length);
 
@@ -241,31 +261,18 @@ public class STRTransform extends TransformSpi {
 			}
 
 			/*
-			 * This is a *HACK* - we need to know how to augment the
-			 * above called c14n to leave the xmlns="" in.
-			 * Thus - insert with string buffer operations. Be careful
-			 * to insert as first namespace attribute or before any
-			 * other attribute if there is no namespace attribute.
-			 * 
-			 * TODO: This hack need to be checked/validated.
+             * Here we delete the previously inserted fake element from the
+             * serialized XML.
 			 */
-			StringBuffer bf = new StringBuffer(bos.toString());			
-			int idx = bf.indexOf("BinarySecurityToken");
-			if (idx < 0) 
-			    idx = bf.indexOf("Assertion");
-			int idx1 = bf.indexOf("xmlns", idx);		// look up for a namespace attr
-			if (idx1 < 0) {								// none found, locate first attr
-				idx1 = bf.indexOf("ValueType", idx);
-				if (idx1 < 0)
-				    idx1 = bf.indexOf("AssertionID", idx);
-			}
-			if (idx1 >= 0)
-				bf.insert(idx1, "xmlns=\"\" ");				// insert first
+			StringBuffer bf = new StringBuffer(bos.toString());
+			String bf1 = bf.substring("<temp xmlns=\"urn:X\">".length(),bf.length()-"</temp>".length());
+
 			if (doDebug) {
 				log.debug("last result: ");
-				log.debug(bf.toString());
+				log.debug(bf1.toString());
 			}
-			return new XMLSignatureInput(bf.toString().getBytes());
+			return new XMLSignatureInput(bf1.getBytes());
+            // End of HACK 2
 
 		} catch (IOException ex) {
 			throw new CanonicalizationException("empty", ex);

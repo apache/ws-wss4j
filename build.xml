@@ -382,8 +382,9 @@ org.apache.ws.axis.security.util
         </ant>
     </target>
 
+<!-- depends="compile, unitTests" -->
     <target name="systemTests"
-        depends="compile, unitTests"
+                depends="compile, unitTests"
         if="junit.present"
         description="Runs all JUnit tests">
         <runaxisfunctionaltests
@@ -479,6 +480,7 @@ org.apache.ws.axis.security.util
             <!-- See if this helps with Gump test failures -->
             <sysproperty key="build.clonevm" value="true"/>
 
+            <jvmarg value="-Djava.endorsed.dirs=${basedir}/endorsed"/>
             <jvmarg value="-Dhttp.proxyHost=${http.proxyHost}"/>
             <jvmarg value="-Dhttp.proxyPort=${http.proxyPort}"/>
             <jvmarg value="-Dhttp.nonProxyHosts=${http.nonProxyHosts}"/>

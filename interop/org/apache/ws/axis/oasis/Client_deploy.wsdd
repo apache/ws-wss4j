@@ -178,8 +178,66 @@
  <service name="STPing1">
   <requestFlow>
    <handler type="java:org.apache.ws.axis.security.WSDoAllSender" >
-    <parameter name="action" value="SAMLToken"/>
+    <parameter name="action" value="SAMLTokenUnsigned"/>
+    <parameter name="samlPropFile" value="saml.properties"/>
+    
    </handler>
   </requestFlow>
   </service>
+  
+  <!--
+    The saml3.properties file defines a SAML token with "sender vouches"
+    option. Thus no further user specific data is required here. The
+    SAML issuer takes all the data from its data store (for the bare bone
+    SAML issuer included here: these data is in the saml properties file).
+    The SAML issuer uses its own certificate to sign, own certificate store,
+    etc.
+    
+    The DoAllSender then gets the issuer's data (key name, key password)
+    and forwards it to the SignEnvelope. The SignEnvelope now signs the
+    SAML token _and_ at least one part of the message (SOAP Body if nothing
+    was specified, or the specified part).
+   --> 
+   <service name="STPing3">
+  <requestFlow>
+   <handler type="java:org.apache.ws.axis.security.WSDoAllSender" >
+    <parameter name="action" value="SAMLTokenSigned"/>
+    <parameter name="samlPropFile" value="saml3.properties"/>
+    <parameter name="signatureKeyIdentifier" value="DirectReference" />
+   </handler>
+  </requestFlow>
+  </service>
+  
+  <!--
+    The saml4.properties file defines a SAML token with "holder-of-key"
+    option. Because the DoAllSender handler acts as both, user and requestor,
+    we need the user specific data here. The handler gets this information,
+    forwards it to our (bare bone) SAML issuer. The SAML issuer creates
+    the SAML token and includes the user's certificate, and signs the
+    whole token with its certificate / Private Key.
+    
+    DoAllSender forwards the user's information to SignEnvelope that uses
+    this to sign the message (SOAP Body if nothing was specified, or the 
+    specified part). Because the issuer signed the SAML token the user's
+    certificate (contained in the token) can be trusted.
+   --> 
+   <service name="STPing4">
+  <requestFlow>
+   <handler type="java:org.apache.ws.axis.security.WSDoAllSender" >
+    <parameter name="action" value="SAMLTokenSigned"/>
+    <parameter name="samlPropFile" value="saml4.properties"/>
+    <parameter name="signatureKeyIdentifier" value="DirectReference" />
+    <parameter name="user" value="16c73ab6-b892-458f-abf5-2f875f74882e"/>
+    <parameter name="passwordCallbackClass" value="org.apache.ws.axis.oasis.PWCallback"/>
+    <parameter name="signaturePropFile" value="crypto.properties" />    
+    <parameter name="signatureKeyIdentifier" value="DirectReference" />
+   </handler>
+  </requestFlow>
+  </service>
+  
+ <transport name="java" pivot="java:org.apache.axis.transport.java.JavaSender"/>
+ <transport name="http" pivot="java:org.apache.axis.transport.http.CommonsHTTPSender"/>
+ <transport name="local" pivot="java:org.apache.axis.transport.local.LocalSender"/>
+  
+  
  </deployment>

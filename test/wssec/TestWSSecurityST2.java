@@ -138,8 +138,7 @@ public class TestWSSecurityST2 extends TestCase implements CallbackHandler {
      */
     public void testSAMLSignedSenderVouches() throws Exception {
         SOAPEnvelope unsignedEnvelope = message.getSOAPEnvelope();
-        SOAPEnvelope envelope = null;
-        SAMLIssuer saml = SAMLIssuerFactory.getInstance("saml.properties");
+        SAMLIssuer saml = SAMLIssuerFactory.getInstance("saml3.properties");
 
         SAMLAssertion assertion = saml.newAssertion();
 
@@ -149,8 +148,9 @@ public class TestWSSecurityST2 extends TestCase implements CallbackHandler {
         WSSignEnvelope wsSign = new WSSignEnvelope();
         wsSign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
 
-        Document doc = unsignedEnvelope.getAsDocument();
         log.info("Before SAMLSignedSenderVouches....");
+        
+        Document doc = unsignedEnvelope.getAsDocument();
         
         Document signedDoc = wsSign.build(doc, null, assertion, issuerCrypto, issuerKeyName, issuerKeyPW);
         log.info("After SAMLSignedSenderVouches....");
