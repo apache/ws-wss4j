@@ -17,13 +17,17 @@
 
 package org.apache.ws.security.components.crypto;
 
+import org.apache.commons.discovery.Resource;
+import org.apache.commons.discovery.ResourceIterator;
+import org.apache.commons.discovery.jdk.JDKHooks;
+import org.apache.commons.discovery.resource.DiscoverResources;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.ws.security.util.StringUtil;
 import org.apache.ws.security.WSSecurityException;
+import org.apache.ws.security.util.StringUtil;
+import sun.security.util.DerValue;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -46,8 +50,6 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Vector;
 
-import sun.security.util.DerValue;
-
 
 /**
  * JDK1.4 based implementation of Crypto (uses keystore).
@@ -66,7 +68,8 @@ public class Merlin implements Crypto {
      * <p/>
      * 
      * @param properties 
-     * @throws Exception 
+     * @throws CredentialException 
+     * @throws IOException 
      */
     public Merlin(Properties properties) throws CredentialException, IOException {
         /*
@@ -78,12 +81,35 @@ public class Merlin implements Crypto {
             return;
         }
         this.properties = properties;
-        FileInputStream is = null;
-        try {
-            is = new FileInputStream(getProxyKeyStore(this.properties));
-        } catch (Exception e) {
-            throw new CredentialException(3, "proxyNotFound", new Object[]{getProxyKeyStore(this.properties)});
+        String location = this.properties.getProperty("org.apache.ws.security.crypto.merlin.file");        
+        InputStream is = null;
+
+        /**
+         * Look for the keystore in classpaths
+         */ 
+        DiscoverResources disc = new DiscoverResources();
+        disc.addClassLoader( JDKHooks.getJDKHooks().getThreadContextClassLoader() );
+        disc.addClassLoader( this.getClass().getClassLoader() );
+        ResourceIterator iterator = disc.findResources(location);
+        if(iterator.hasNext()) {
+            Resource resource = iterator.nextResource();
+            is = resource.getResourceAsStream();
+        } 
+        
+        /**
+         * If we don't find it, then look on the file system.
+         */ 
+        if (is == null) {
+            try {
+                is = new FileInputStream(location);
+            } catch (Exception e) {
+                throw new CredentialException(3, "proxyNotFound", new Object[]{location});
+            }
         }
+         
+        /**
+         * Load the keystore
+         */ 
         try {
             load(is);
         } finally {
@@ -97,7 +123,7 @@ public class Merlin implements Crypto {
      * 
      * @return	Returns a <code>CertificateFactory</code> to construct
      * 			X509 certficates
-     * @throws	GeneralSecurityException
+     * @throws	WSSecurityException
      */
     private static synchronized CertificateFactory getCertificateFactory() throws WSSecurityException {
         if (certFact == null) {
@@ -120,7 +146,7 @@ public class Merlin implements Crypto {
      * 
      * @param in	The <code>InputStream</code> array containg the X509 data
      * @return		Returns a X509 certificate
-     * @throws 		GeneralSecurityException 
+     * @throws 		WSSecurityException 
      */
     public X509Certificate loadCertificate(InputStream in) throws WSSecurityException {
 		X509Certificate cert = null;
@@ -145,8 +171,7 @@ public class Merlin implements Crypto {
      *                the last in the array
      * @return		An array of X509 certificates, ordered according to
      * 				the reverse flag
-     * @throws GeneralSecurityException 
-     * @throws IOException              
+     * @throws WSSecurityException 
      */
     public X509Certificate[] getX509Certificates(byte[] data, boolean reverse)
             throws WSSecurityException {
@@ -174,8 +199,7 @@ public class Merlin implements Crypto {
      * @param reverse If set the first certificate in the array data will
      *                the last in the byte array
      * @param certs   The certificates to convert
-     * @throws IOException                  
-     * @throws CertificateEncodingException 
+     * @throws WSSecurityException                  
      * @return		The byte array for the certficates ordered according
      * to the reverse flag
      */
@@ -326,7 +350,7 @@ public class Merlin implements Crypto {
 	 * @param skiBytes       The SKI info bytes
 	 * @return alias name of the certificate that matches serialNumber and issuer name
 	 *         or null if no such certificate was found.
-     * @exception if problems during keystore handling or wrong certificate (no SKI data)
+     * @exception WSSecurityException if problems during keystore handling or wrong certificate (no SKI data)
 	 */
 
 	public String getAliasForX509Cert(byte[] skiBytes) throws WSSecurityException {
@@ -454,7 +478,7 @@ public class Merlin implements Crypto {
      * <p/>
      * 
      * @param input <code>InputStream</code> to read from
-     * @throws Exception 
+     * @throws CredentialException 
      */
     public void load(InputStream input) throws CredentialException {
         if (input == null) {
@@ -487,6 +511,8 @@ public class Merlin implements Crypto {
         }
     }
 
+    static String SKI_OID = "2.5.29.14";
+
 	/**
 	 * Reads the SubjectKeyIdentifier information from the certificate. 
 	 * <p/> 
@@ -494,7 +520,6 @@ public class Merlin implements Crypto {
 	 * @param cert       The certificate to read SKI
 	 * @return 			 The byte array conating the binary SKI data
 	 */
-	static String SKI_OID = "2.5.29.14";
 	public byte[] getSKIBytesFromCert(X509Certificate cert)
 		throws WSSecurityException {
 
@@ -566,34 +591,5 @@ public class Merlin implements Crypto {
 		*/
 		return abyte0;
 	}
-
-
-    /**
-     * location of the key store.
-     * <p/>
-     * 
-     * @param properties 
-     * @return 
-     */
-    private static String getProxyKeyStore(Properties properties) {
-        String location = properties.getProperty("org.apache.ws.security.crypto.merlin.file");
-        if (location != null) {
-            return location;
-        } else {
-            return getProxyDefaultKeyStore();
-        }
-    }
-
-    /**
-     * get the default location.
-     * <p/>
-     * 
-     * @return 
-     */
-    private static String getProxyDefaultKeyStore() {
-        String dir = System.getProperty("user.home");
-        File f = new File(dir, "x509.keystore");
-        return f.getAbsolutePath();
-    }
 }
 

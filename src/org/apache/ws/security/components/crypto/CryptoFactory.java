@@ -84,7 +84,7 @@ public abstract class CryptoFactory {
      * is loaded with the <code>Loader.getResource()</code> method.
      * <p/>
      * 
-     * @param propFile The name of the property file to load
+     * @param propFilename The name of the property file to load
      * @return The cyrpto implementation that was defined
      */
     public static Crypto getInstance(String propFilename) {

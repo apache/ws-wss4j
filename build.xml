@@ -485,6 +485,7 @@ org.apache.ws.axis.security.util
             <batchtest todir="${build.dir}/test-reports">
                 <fileset dir="${build.classes}">
                     <include name="**/wssec/PackageTests.class"/>
+                    <include name="**/components/PackageTests.class"/>
                 </fileset>
             </batchtest>
         </junit>
@@ -593,6 +594,12 @@ org.apache.ws.axis.security.util
           <include name="client-config.wsdd"/>
       </fileset>
     </copy>
+    <copy todir="${build.webapp}/WEB-INF/classes/interop">
+        <fileset dir="${dir.interop}">
+            <include name="**/interop.jks"/>
+        </fileset>
+    </copy>
+
     <delete>
       <fileset dir="${build.webapp}" includes="**/CVS"/>
     </delete>
