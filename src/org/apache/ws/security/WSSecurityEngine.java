@@ -43,7 +43,6 @@ import org.apache.xml.security.signature.Reference;
 import org.apache.xml.security.signature.XMLSignatureException;
 import org.apache.xml.security.utils.Base64;
 
-import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -178,12 +177,9 @@ public class WSSecurityEngine {
      * 					encryption and {@link UsernameToken} handling
      * @param crypto	the object that implements the access to the keystore and the
      * 					handling of certificates.
-     * @return			a validated principal if a the SOAP enevlope conatined a signature
-     * 					or a UsernameToken and signature or UsernameToken were successfully
-     * 					verified. The functions returns <code>null</code> if no
-     * 					Signature or UeernameToken were found and only a decryption 
-     * 					was done  
-     * @throws Exception 
+     * @return			a result vector
+     * @throws WSSecurityException 
+     * @see WSSecurityEngine#processSecurityHeader(Element securityHeader, CallbackHandler cb,Crypto sigCrypto, Crypto decCrypto)
      */
 	public Vector processSecurityHeader(
 		Document doc,
@@ -194,6 +190,27 @@ public class WSSecurityEngine {
 		return processSecurityHeader(doc, actor, cb, crypto, crypto);
 	}
 	
+    /**
+     * Process the security header given the soap envelope as W3C document.
+     * <p/>
+     * This is the main entry point to verify or decrypt a SOAP enevelope.
+     * First check if a <code>wsse:Security</code> is availabe with the
+     * defined actor.
+     * 
+     * @param doc		the SOAP envelope as {@link Document}
+     * @param actor		the engine works on behalf of this <code>actor</code>. Refer
+     * 					to the SOAP specification about <code>actor</code> or <code>role
+     * 					</code>
+     * @param cb		a callback hander to the caller to resolve passwords during
+     * 					encryption and {@link UsernameToken} handling
+     * @param sigCrypto	the object that implements the access to the keystore and the
+     * 					handling of certificates for Signature
+     * @param decCrypto	the object that implements the access to the keystore and the
+     * 					handling of certificates for Decryption
+     * @return			a result vector
+     * @throws WSSecurityException 
+     * @see WSSecurityEngine#processSecurityHeader(Element securityHeader, CallbackHandler cb,Crypto sigCrypto, Crypto decCrypto)
+     */
 	public Vector processSecurityHeader(
 		Document doc,
 		String actor,
@@ -210,69 +227,53 @@ public class WSSecurityEngine {
         if (actor == null) {
             actor = "";
         }
-        NodeList list = doc.getElementsByTagNameNS(WSConstants.WSSE_NS, WSConstants.WSSE_LN);
-        int len = list.getLength();
-        if (len == 0) {		// No Security headers found
-            return null;
-        }
-        if (doDebug) {
-			log.debug("Found WS-Security header(s): " + len);
-        }
-        Element elem = null;
-        Attr attr = null;
-        String headerActor = null;
 		Vector wsResult = null;
 		SOAPConstants sc = WSSecurityUtil.getSOAPConstants(doc.getDocumentElement());
-
-        for (int i = 0; i < len; i++) {
-            elem = (Element) list.item(i);
-            attr = elem.getAttributeNodeNS(sc.getEnvelopeURI(), sc.getRoleAttributeQName().getLocalPart());
-            if (attr != null) {
-                headerActor = attr.getValue();
-            }
-            if ((headerActor == null) || (headerActor.length() == 0) ||
-            	headerActor.equalsIgnoreCase(actor) ||
-       			headerActor.equals(sc.getNextRoleURI())) {
-       			if (doDebug) {
-                	log.debug("Processing WS-Security header for '" + actor + "' actor.");
-       			}
-                wsResult = processSecurityHeader(elem, cb, sigCrypto, decCrypto);
-            }
-        }
+        Element elem = WSSecurityUtil.getSecurityHeader(doc, actor, sc);
+        if (elem != null) {
+			if (doDebug) {
+				log.debug("Processing WS-Security header for '" + actor
+						+ "' actor.");
+			}
+			wsResult = processSecurityHeader(elem, cb, sigCrypto, decCrypto);
+		}
         return wsResult;
     }
 
     /**
-     * Process the security header given the <code>wsse:Security</code> DOM Element.
-     * <p/>
-     * This function loops over all direct child elements of the
-     * <code>wsse:Security</code> header. If it finds a knwon element, it transfers
-     * control to the appropriate handling function. The mehtod processes the
-     * known child elements in the same order as they appear in the
-     * <code>wsse:Security</code> element. This is in accordance to the
-     * WS Security specification. 
-     * <p/>
-     * Currently the functions can handle the following child elements:
-     * here:
-     * <ul>
-     * <li> {@link #SIGNATURE <code>ds:Signature</code>} </li>
-     * <li> {@link #ENCRYPTED_KEY <code>xenc:EncryptedKey</code>} </li>
-     * <li> {@link #USERNAME_TOKEN <code>wsse:UsernameToken</code>} </li>
-     * </ul>
-     * <p/>
-     * 
-     * @param securityHeader the <code>wsse:Security</code> header element
-     * @param cb            a callback hander to the caller to resolve passwords during
-     * 						encryption and {@link UsernameToken} handling
-     * @param crypto		the object that implements the access to the keystore and the
-     * 						handling of certificates.
-     * @return				a validated principal if a the SOAP enevlope conatined a signature
-     * 						or a UsernameToken and signature or UsernameToken were successfully
-     * 						verified. The functions returns <code>null</code> if no
-     * 						Signature or UsernameToken were found and only a decryption 
-     * 						was done.
-     * @throws WSSecurityException 
-     */
+	 * Process the security header given the <code>wsse:Security</code> DOM
+	 * Element. <p/>This function loops over all direct child elements of the
+	 * <code>wsse:Security</code> header. If it finds a knwon element, it
+	 * transfers control to the appropriate handling function. The mehtod
+	 * processes the known child elements in the same order as they appear in
+	 * the <code>wsse:Security</code> element. This is in accordance to the WS
+	 * Security specification. <p/>Currently the functions can handle the
+	 * following child elements: here:
+	 * <ul>
+	 * <li>{@link #SIGNATURE <code>ds:Signature</code>}</li>
+	 * <li>{@link #ENCRYPTED_KEY <code>xenc:EncryptedKey</code>}</li>
+	 * <li>{@link #USERNAME_TOKEN <code>wsse:UsernameToken</code>}</li>
+	 * </ul>
+	 * <p/>
+	 * 
+	 * @param securityHeader
+	 *            the <code>wsse:Security</code> header element
+	 * @param cb
+	 *            a callback hander to the caller to resolve passwords during
+	 *            encryption and {@link UsernameToken}handling
+	 * @param sigCrypto
+	 *            the object that implements the access to the keystore and the
+	 *            handling of certificates used for Signature
+	 * @param decCrypto
+	 *            the object that implements the access to the keystore and the
+	 *            handling of certificates used for Decryption
+	 * @return a Vector of {@link WSSecurityEngineResult}. Each element in the
+	 * 			the Vector represents the result of a security action. The elements
+	 * 			are ordered according to the sequence of the security actions in the
+	 * 			wsse:Signature header. The Vector maybe empty if no security processing 
+	 * 			was performed.
+	 * @throws WSSecurityException
+	 */
     protected Vector processSecurityHeader(Element securityHeader, 
     									   CallbackHandler cb,
     									   Crypto sigCrypto,
@@ -422,8 +423,7 @@ public class WSSecurityEngine {
      * here:
      * <ul>
      * <li> A URI reference to a binary security token contained in the <code>wsse:Security
-     * 		</code> header. The {@link #getTokenElement(SecurityTokenReference)} 
-     * 		dereferences and returns the security token. If the derefenced token is
+     * 		</code> header.  If the derefenced token is
      * 		of the correct type the contained certificate is extracted.
      * </li>
      * <li> Issuer name an serial number of the certificate. In this case the method
@@ -434,13 +434,15 @@ public class WSSecurityEngine {
      * The methods checks is the certificate is valid and calls the
      * {@link XMLSignature#checkSignatureValue(X509Certificate) verfication} function.
      * 
-     * @param sig 		the XMLSignature element that contains the parsed <code>
-     * 					ds:Signature</code> elements.
+     * @param elem 		the XMLSignature DOM Element.
      * @param crypto	the object that implements the access to the keystore and the
      * 					handling of certificates.
      * @param returnCert verifyXMLSignature stores the certificate in the first
      * 					entry of this array. Ther caller may then further validate
-     * 					the certificate 
+     * 					the certificate
+     * @param returnQname verifyXMLSignature store the Qnames of all signed elements
+     * 					in this Vector ordered according the sequence in the Signature
+     * 					header.
      * @return 			the subject principal of the validated X509 certificate (the
      * 					authenticated subject). The calling function may use this
      * 					principal for further authentication or authorization. 
