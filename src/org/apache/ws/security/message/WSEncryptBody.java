@@ -31,8 +31,10 @@ import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.ws.security.message.token.Reference;
 
 import org.apache.xml.security.encryption.XMLCipher;
+import org.apache.xml.security.encryption.EncryptedData;
 import org.apache.xml.security.encryption.XMLEncryptionException;
 import org.apache.xml.security.keys.content.x509.XMLX509IssuerSerial;
+import org.apache.xml.security.keys.KeyInfo;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Text;
@@ -275,7 +277,6 @@ public class WSEncryptBody extends WSBaseMessage {
 		XMLCipher xmlCipher = null;
 		try {
 			xmlCipher = XMLCipher.getInstance(symEncAlgo);
-			xmlCipher.init(XMLCipher.ENCRYPT_MODE, symmetricKey);
 		} catch (XMLEncryptionException e3) {
 			throw new WSSecurityException(
 				WSSecurityException.UNSUPPORTED_ALGORITHM, null, null, e3);
@@ -315,12 +316,16 @@ public class WSEncryptBody extends WSBaseMessage {
 			}
 
 			boolean content = modifier.equals("Content") ? true : false;
+			String xencEncryptedDataId = "EncDataId-" + body.hashCode();
 
 			/*
 			 * Forth step: encrypt data, and set neccessary attributes in
 			 * xenc:EncryptedData
 			 */
 			try {
+				xmlCipher.init(XMLCipher.ENCRYPT_MODE, symmetricKey);
+				EncryptedData encData = xmlCipher.getEncryptedData();
+				encData.setId(xencEncryptedDataId);
 				xmlCipher.doFinal(doc, body, content);
 			} catch (Exception e2) {
 				throw new WSSecurityException(
@@ -329,23 +334,6 @@ public class WSEncryptBody extends WSBaseMessage {
 			if (tlog.isDebugEnabled()) {
 				t1 = System.currentTimeMillis();
 			}
-			String xencEncryptedDataId = null;
-
-			// get the encrypted data element
-			body = envelope;
-			while (xencEncryptedDataId == null) {
-				body = 
-					(Element) WSSecurityUtil.findNextElement(
-						envelope,
-						"EncryptedData",
-						WSConstants.ENC_NS,
-						body);
-				String tempId = "EncDataId-" + body.hashCode();
-				if (!encDataRefs.contains("#" + tempId)) {
-					xencEncryptedDataId = tempId;
-				}
-			}
-			body.setAttribute("Id", xencEncryptedDataId);
 
 			encDataRefs.add(new String("#" + xencEncryptedDataId));
 		}
@@ -438,7 +426,6 @@ public class WSEncryptBody extends WSBaseMessage {
 			xencEncryptedKey,
 			true);
 
-		Element keyInfo = createKeyInfo(doc, xencEncryptedKey);
 		SecurityTokenReference secToken = new SecurityTokenReference(doc);
 
 		switch (keyIdentifierType) {
@@ -476,7 +463,10 @@ public class WSEncryptBody extends WSBaseMessage {
 					WSSecurityException.FAILURE,
 					"unsupportedKeyId");
 		}
-		WSSecurityUtil.appendChildElement(doc, keyInfo, secToken.getElement());
+		KeyInfo keyInfo = new KeyInfo(doc);
+		keyInfo.addUnknownElement(secToken.getElement());
+		WSSecurityUtil.appendChildElement(doc, xencEncryptedKey, keyInfo.getElement());
+
 		Element xencCipherValue = createCipherValue(doc, xencEncryptedKey);
 		xencCipherValue.appendChild(keyText);
 		createDataRefList(doc, xencEncryptedKey, encDataRefs);
@@ -534,7 +524,6 @@ public class WSEncryptBody extends WSBaseMessage {
 		XMLCipher xmlCipher = null;
 		try {
 			xmlCipher = XMLCipher.getInstance(symEncAlgo);
-			xmlCipher.init(XMLCipher.ENCRYPT_MODE, symmetricKey);
 		} catch (XMLEncryptionException e1) {
 			throw new WSSecurityException(
 				WSSecurityException.UNSUPPORTED_ALGORITHM, null, null, e1);
@@ -576,12 +565,20 @@ public class WSEncryptBody extends WSBaseMessage {
 			}
 
 			boolean content = modifier.equals("Content") ? true : false;
+			String xencEncryptedDataId = "EncDataId-" + body.hashCode();
 
+			KeyInfo keyInfo = new KeyInfo(doc);
+			keyInfo.addKeyName(embeddedKeyName == null ? user : embeddedKeyName);
+			
 			/*
 			 * Forth step: encrypt data, and set neccessary attributes in
 			 * xenc:EncryptedData
 			 */
 			try {
+				xmlCipher.init(XMLCipher.ENCRYPT_MODE, symmetricKey);
+				EncryptedData encData = xmlCipher.getEncryptedData();
+				encData.setId(xencEncryptedDataId);
+				encData.setKeyInfo(keyInfo);
 				xmlCipher.doFinal(doc, body, content);
 			} catch (Exception e) {
 				throw new WSSecurityException(
@@ -590,43 +587,8 @@ public class WSEncryptBody extends WSBaseMessage {
 			if (tlog.isDebugEnabled()) {
 				t1 = System.currentTimeMillis();
 			}
-			String xencEncryptedDataId = null;
-
-			// get the encrypted data element
-			body =
-				(Element) WSSecurityUtil.findElement(
-					envelope,
-					"EncryptedData",
-					WSConstants.ENC_NS);
-			xencEncryptedDataId = "id-" + body.hashCode();
-			body.setAttribute("Id", xencEncryptedDataId);
-
 			// remember references
 			encDataRefs.add(new String("#" + xencEncryptedDataId));
-
-			tmpE = doc.createElement("temp");
-			Element keyInfo = createKeyInfo(doc, tmpE);
-			tmpE =
-				(Element) WSSecurityUtil.findElement(
-					body,
-					"CipherData",
-					WSConstants.ENC_NS);
-
-			// KeyInfo before CipherValue
-			body.insertBefore(keyInfo, tmpE);
-			Element keyName =
-				doc.createElementNS(
-					WSConstants.SIG_NS,
-					WSConstants.SIG_PREFIX + ":KeyName");
-			WSSecurityUtil.setNamespace(
-				keyName,
-				WSConstants.SIG_NS,
-				WSConstants.SIG_PREFIX);
-			WSSecurityUtil.appendChildElement(doc, keyInfo, keyName);
-			Text keyText =
-				doc.createTextNode(
-					embeddedKeyName == null ? user : embeddedKeyName);
-			keyName.appendChild(keyText);
 		}
 		/*
 		 * At this point data is encrypted with the symmetric key and can be 
@@ -699,19 +661,6 @@ public class WSEncryptBody extends WSBaseMessage {
 		encryptionMethod.setAttributeNS(null, "Algorithm", keyTransportAlgo);
 		WSSecurityUtil.appendChildElement(doc, encryptedKey, encryptionMethod);
 		return encryptedKey;
-	}
-
-	public static Element createKeyInfo(Document doc, Element encryptedKey) {
-		Element keyInfo =
-			doc.createElementNS(
-				WSConstants.SIG_NS,
-				WSConstants.SIG_PREFIX + ":KeyInfo");
-		WSSecurityUtil.setNamespace(
-			keyInfo,
-			WSConstants.SIG_NS,
-			WSConstants.SIG_PREFIX);
-		WSSecurityUtil.appendChildElement(doc, encryptedKey, keyInfo);
-		return keyInfo;
 	}
 
 	public static Element createCipherValue(

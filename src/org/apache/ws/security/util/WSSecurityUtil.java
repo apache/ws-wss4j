@@ -172,44 +172,21 @@ public class WSSecurityUtil {
 	 * @return				The found element or <code>null</code>
 	 */
 	public static Node findElement(Node startNode, String name, String namespace) {
-		return findNextElement(startNode, name, namespace, null);
-	}
 
-	/**
-	 * Returns the next element that matches <code>name</code> and 
-	 * <code>namespace</code>.
-	 * <p/>
-	 * This is a replacement for a XPath lookup <code>//name</code> with
-	 * the given namespace. It's somewhat faster than XPath, and we do
-	 * not deal with prefixes, just with the real namespace URI  
-	 * 
-	 * @param startRoot		Where to start the search
-	 * @param name			Local name of the element
-	 * @param namespace		Namespace URI of the element
-	 * @param startNode		Element found in the previous call
-	 * @return				The found element or <code>null</code>
-	 */
-	public static Node findNextElement(Node startRoot, String name, String namespace, Node startNode) {
-
-		if (startRoot == null) {
+		/*
+		 * Replace the formely recursive implementation
+		 * with a depth-first-loop lookup
+		 */
+		if (startNode == null) {
 			return null;
 		}
+		Node startParent = startNode.getParentNode();
 		Node processedNode = null;
 		
-		if (startNode == null) {
-			// if no previous hit is given, begin with the overall startNode (i.e. startRoot)
-			startNode = startRoot;
-		} else {
-			// if a previous hit is given, ignore this node 
-			processedNode = startNode;
-		}
-		Node startParent = startRoot.getParentNode();
-
 		while (startNode != null) {
 			// start node processing at this point
 			if (startNode.getNodeType() == Node.ELEMENT_NODE
-				&& startNode.getLocalName().equals(name)
-				&& startNode != processedNode) {
+				&& startNode.getLocalName().equals(name)) {
 				String ns = startNode.getNamespaceURI();
 				if (ns != null && ns.equals(namespace)) {
 					return startNode;
@@ -240,41 +217,6 @@ public class WSSecurityUtil {
 			}
 		}
 		return null;
-
-		/*
-		 * Replace the recursive implementation with a depth-first lookup loop 
-		 
-		if (node.getNodeType() != Node.ELEMENT_NODE) {
-			return null;
-		}
-		if (node.getLocalName().equals(name)
-			&& node.getNamespaceURI().equals(namespace)) {
-			return node;
-		}
-		Node found = null;
-		for (Node sibling = node.getNextSibling();
-			sibling != null;
-			sibling = sibling.getNextSibling()) {
-			if (sibling.getNodeType() != Node.ELEMENT_NODE) {
-				continue;
-			}
-			if ((found = findElement(sibling, name, namespace)) != null) {
-				return found;
-			}
-		}
-
-		if (found == null) {
-			for (Node child = node.getFirstChild();
-				child != null;
-				child = child.getNextSibling()) {
-				if (child.getNodeType() != Node.ELEMENT_NODE) {
-					continue;
-				}
-				return findElement(child, name, namespace);
-			}
-		}
-		return found;
-		*/
 	}
 
     /**
