@@ -17,6 +17,16 @@
 
 package org.apache.ws.security.conversation;
 
+import java.util.HashMap;
+import java.util.Vector;
+
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.CallbackHandler;
+import javax.security.auth.callback.UnsupportedCallbackException;
+import javax.xml.namespace.QName;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.axis.security.conversation.ConvHandlerConstants;
@@ -33,14 +43,7 @@ import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.conversation.message.info.DerivedKeyInfo;
 import org.apache.ws.security.conversation.message.info.SecurityContextInfo;
 import org.apache.ws.security.conversation.message.token.DerivedKeyToken;
-import org
-    .apache
-    .ws
-    .security
-    .conversation
-    .message
-    .token
-    .RequestSecurityTokenResponse;
+import org.apache.ws.security.conversation.message.token.RequestSecurityTokenResponse;
 import org.apache.ws.security.conversation.message.token.RequestedProofToken;
 import org.apache.ws.security.conversation.message.token.SecurityContextToken;
 import org.apache.ws.security.handler.WSHandlerConstants;
@@ -57,33 +60,12 @@ import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.keys.KeyInfo;
 import org.apache.xml.security.signature.XMLSignature;
 import org.apache.xml.security.signature.XMLSignatureException;
-import org.apache.xml.security.utils.XMLUtils;
-import org.opensaml.SAMLAssertion;
-import org.opensaml.SAMLAuthenticationStatement;
-import org.opensaml.SAMLException;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
-
-import com.sun.rsasign.t;
-
-import javax.crypto.KeyGenerator;
-import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
-import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.callback.UnsupportedCallbackException;
-import javax.xml.namespace.QName;
-
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Vector;
 
 /**
  * Conversation Engine follows the basic structure of SecurityEngine<link>
