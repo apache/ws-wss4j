@@ -35,6 +35,8 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
 
+import sun.security.x509.KeyIdentifier;
+
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 
@@ -277,6 +279,23 @@ public class SecurityTokenReference {
             this.element.appendChild(keyId);
         }
     }
+    
+	public void setSAMLKeyIdentifier(String keyIdVal)
+			throws WSSecurityException {
+		Document doc = this.element.getOwnerDocument();
+		Element keyId =
+				doc.createElementNS(wssConfig.getWsseNS(), "wsse:KeyIdentifier");
+			keyId.setAttributeNS(wssConfig.getWsseNS(),
+					"ValueType",
+					"http://docs.oasis-open.org/wss/2004/XX/oasis-2004XX-wss-saml-token-profile-1.0#SAMLAssertionID");
+		keyId.appendChild(doc.createTextNode(keyIdVal));
+		Element elem = getFirstElement();
+		if (elem != null) {
+			this.element.replaceChild(keyId, elem);
+		} else {
+			this.element.appendChild(keyId);
+		}
+	}
 
     /**
      * Gets the KeyIdentifer.
