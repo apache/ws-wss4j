@@ -283,7 +283,7 @@ public class BouncyCastle implements Crypto {
                 try {
                     return Base64.decode(buf.toString());
                 } catch (Base64DecodingException e) {
-                    throw new Exception("Unable to decode Base64 encoded data", e);
+                    throw new CredentialException(CredentialException.DEFECTIVE, "badBase64Data", e);
                 }
             }
             buf.append(s);

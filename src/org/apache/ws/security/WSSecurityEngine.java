@@ -48,7 +48,6 @@ import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.x500.X500Principal;
 import javax.xml.namespace.QName;
 import java.io.ByteArrayInputStream;
 import java.lang.reflect.Constructor;
@@ -406,7 +405,7 @@ public class WSSecurityEngine {
      * 					principal for further authentication or authorization. 
      * @throws Exception 
      */
-    protected X500Principal verifyXMLSignature(XMLSignature sig, Crypto crypto) throws Exception {
+    protected Principal verifyXMLSignature(XMLSignature sig, Crypto crypto) throws Exception {
         if (doDebug) {
 			log.debug("Verify XML Signature");
         }
@@ -456,7 +455,7 @@ public class WSSecurityEngine {
 					", prepare-cert= " + (t1-t0) +
 					", verify= " + (t2-t1));
 				}        			
-				return certs[0].getSubjectX500Principal();
+				return certs[0].getSubjectDN();
 			}
         }
 		throw new WSSecurityException(WSSecurityException.FAILED_CHECK);

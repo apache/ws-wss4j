@@ -36,6 +36,7 @@ import org.apache.ws.security.message.WSEncryptBody;
 import org.apache.ws.security.message.WSSAddUsernameToken;
 import org.apache.ws.security.message.WSSignEnvelope;
 import org.apache.ws.security.util.WSSecurityUtil;
+import org.apache.ws.security.util.StringUtil;
 import org.apache.xml.security.utils.XMLUtils;
 import org.w3c.dom.Document;
 
@@ -432,7 +433,7 @@ public class WSDoAllSender extends BasicHandler {
 				(String) msgContext.getProperty(WSDoAllConstants.ADD_UT_ELEMENTS);
 		}
 		if (tmpS != null) {
-			utElements = tmpS.split(" ");
+			utElements = StringUtil.split(tmpS,' ');
 		}
 	}
 
@@ -662,10 +663,10 @@ public class WSDoAllSender extends BasicHandler {
 	private void splitEncParts(String tmpS, Vector encryptParts)
 		throws AxisFault {
 		WSEncryptionPart encPart = null;
-		String[] rawParts = tmpS.split(";");
+		String[] rawParts = StringUtil.split(tmpS,';');
 
 		for (int i = 0; i < rawParts.length; i++) {
-			String[] partDef = rawParts[i].split("}");
+			String[] partDef = StringUtil.split(rawParts[i],'}');
 
 			if (partDef.length == 1) {
 				if (doDebug) {

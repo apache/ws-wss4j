@@ -545,7 +545,7 @@ public class WSSecurityUtil {
         try {
             return XPathAPI.selectSingleNode(contextNode, xpath, nsContext);
         } catch (TransformerException e) {
-            throw new Exception("Unable to resolve XPath", e);
+            throw new Exception("Unable to resolve XPath");
         }
     }
 

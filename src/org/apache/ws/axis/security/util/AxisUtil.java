@@ -20,6 +20,7 @@ package org.apache.ws.axis.security.util;
 import org.apache.axis.AxisFault;
 import org.apache.ws.axis.security.WSDoAllConstants;
 import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.util.StringUtil;
 import org.apache.xml.security.c14n.Canonicalizer;
 import org.w3c.dom.Document;
 
@@ -118,7 +119,7 @@ public class AxisUtil {
 		if (action == null) {
 			return doAction;
 		}
-		String single[] = action.split(" ");
+		String single[] = StringUtil.split(action,' ');
 		for (int i = 0; i < single.length; i++) {
 			if (single[i].equals(WSDoAllConstants.NO_SECURITY)) {
 				doAction = WSConstants.NO_SECURITY;

@@ -19,6 +19,7 @@ package org.apache.ws.security.components.crypto;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.ws.security.util.StringUtil;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -189,7 +190,7 @@ public class Merlin implements Crypto {
 
 
 	private String[] splitAndTrim(String inString) {
-		String result[] = inString.split(",");
+		String result[] = StringUtil.split(inString,',');
 		for (int i = 0; i < result.length; i++) {
 			result[i] = result[i].trim();
 		}
