@@ -634,9 +634,9 @@ public class WSDoAllConstants {
 		keyIdentifier.put(
 			"IssuerSerial",
 			new Integer(WSConstants.ISSUER_SERIAL));
-		keyIdentifier.put(
-			"IssuerSerialDirect",
-			new Integer(WSConstants.ISSUER_SERIAL_DIRECT));
+//		keyIdentifier.put(
+//			"IssuerSerialDirect",
+//			new Integer(WSConstants.ISSUER_SERIAL_DIRECT));
 		keyIdentifier.put(
 			"X509KeyIdentifier",
 			new Integer(WSConstants.X509_KEY_IDENTIFIER));
@@ -646,9 +646,9 @@ public class WSDoAllConstants {
 		keyIdentifier.put(
 			"EmbeddedKeyName",
 			new Integer(WSConstants.EMBEDDED_KEYNAME));
-		keyIdentifier.put(
-			"SKIKeyIdentifierDirect",
-			new Integer(WSConstants.SKI_KEY_IDENTIFIER_DIRECT));
+//		keyIdentifier.put(
+//			"SKIKeyIdentifierDirect",
+//			new Integer(WSConstants.SKI_KEY_IDENTIFIER_DIRECT));
 
 	}
 
