@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<document><properties><title>WSS4J Documentation</title></properties><body><section name="Apache WSS4J"></section><section name=""><subsection name="Contents"><ul>
+  <li><a href="#What_is_WSS4J">What is WSS4J?</a></li>
+  <li><a href="#WS-Security%20Features">WS-Security Features</a></li>
+  <li><a href="#WSS4J_Use_Cases">WSS4J Use Cases</a></li>
+  <ul>
+    <li>WSS4J API</li>
+    <li>WSS4J on Axis<br></br>
+    </li>
+  </ul>
+</ul><br></br></subsection></section><section name=""><subsection name="What is WSS4J?"><p style="margin-left: 40px;"> 
+Apache WSS4J is an implementation of the
+OASIS Web Services Security (WS-Security) from <a href="http://www.oasis-open.org/committees/tc_home.php?wg_abbrev=wss">OASIS
+Web Services Security TC</a>. WSS4J is a primarily a Java library that can be used to sign and verify SOAP Messages 
+with WS-Security information. WSS4J will use Apache Axis and Apache XML-Security projects and will be interoperable 
+with JAX-RPC based server/clients and .NET server/clients.
+<br></br>
+</p><p style="margin-left: 40px;">WSS4J implements<br></br>
+</p><ul style="margin-left: 40px;">
+  <li><a href="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0.pdf">OASIS
+Web Serives Security: SOAP Message Security 1.0 Standard 200401, March
+2004</a></li>
+  <li><a href="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0.pdf">Username
+Token profile V1.0</a></li>
+  <li><a href="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0.pdf">X.509
+Token Profile V1.0</a></li>
+</ul><div style="margin-left: 40px;">WSS4J can also be configured to emulate
+previous WSS spec implementations with older namespaces, such as
+WebSphere 5.1 and WebLogic 8.1 SP2.<br></br>
+</div></subsection><subsection name="WS-Security Features"><p style="margin-left: 40px;">WSS4J can generate and process the
+following SOAP Bindings:<br></br>
+</p><ul>
+  <ul>
+    <li>XML Security<br></br>
+    </li>
+    <ul>
+      <li>XML Signature</li>
+    </ul>
+    <ul>
+      <li>XML Encryption</li>
+    </ul>
+    <li>Tokens</li>
+    <ul>
+      <li>Username
+Tokens</li>
+      <li>Timestamps</li>
+    </ul>
+    <ul>
+      <li>SAML Tokens</li>
+    </ul>
+  </ul>
+</ul><div style="margin-left: 40px;">WSS4J supports X.509 binary
+certificates and certificate paths.<br></br>
+<br></br>
+</div><p style="margin-left: 40px;"></p></subsection><subsection name="WSS4J Use Cases"></subsection><subsection name="WSS4J API"><p style="margin-left: 40px;">Please refer to the <a href="api.html">API
+Overview</a>
+for details.<br></br>
+<br></br>
+</p></subsection><subsection name="WSS4J on Axis"><p style="margin-left: 40px;">Please refer to the the <a href="axis.html">Axis
+Deployment Tutorial</a> for a short tutorial and <a href="package.html">Axis Deployment Examples</a> for more details.<br></br>
+</p><br></br></subsection></section></body></document>

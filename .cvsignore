@@ -3,3 +3,4 @@ target
 build.properties
 junit*.properties
 *.log
+*.wsdd
