@@ -196,7 +196,7 @@ public class WSBaseMessage {
             id = WSSecurityUtil.getAttributeValueWSU(bodyElement, "Id", null);
         }
         if (wssConfig.getProcessNonCompliantMessages() ||
-            !wssConfig.isBodyIdQualified()) {
+            !wssConfig.isTargetIdQualified()) {
             if ((id == null) || (id.length() == 0)) {
                 id = bodyElement.getAttribute("Id");
             }
@@ -205,7 +205,7 @@ public class WSBaseMessage {
         }
 		if ((id == null) || (id.length() == 0)) {
 			id = "id-" + Integer.toString(bodyElement.hashCode());
-            if (wssConfig.isBodyIdQualified()) {
+            if (wssConfig.isTargetIdQualified()) {
                 String prefix =
                     WSSecurityUtil.setNamespace(
                         bodyElement,

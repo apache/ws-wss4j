@@ -39,7 +39,7 @@ public class WSSConfig {
     protected String wsu_ns = WSConstants.WSU_NS_OASIS_1_0;
     protected boolean qualifyBSTAttributes = false;
     protected boolean prefixBSTValues = false;
-    protected boolean bodyIdQualified = true;
+    protected boolean targetIdQualified = true;
     protected boolean processNonCompliantMessages = true;
     public static final int TIMESTAMP_IN_SECURITY_ELEMENT = 1;
     public static final int TIMESTAMP_IN_HEADER_ELEMENT   = 2;
@@ -140,18 +140,18 @@ public class WSSConfig {
     /**
      *  default value is true.
      *  <p/>
-     *  returns true if the Id attribute placed in the SOAP Body is
+     *  returns true if the Id attribute placed in the signature target element is
      *  qualified with the wsu namespace.
      */
-    public boolean isBodyIdQualified() {
-        return bodyIdQualified;
+    public boolean isTargetIdQualified() {
+        return targetIdQualified;
     }
     /**
-     *  Sets an option whether the Id attribute placed in the SOAP Body should be
+     *  Sets an option whether the Id attribute placed in the signature target should be
      *  qualified with the wsu namespace.
      */
-    public void setBodyIdQualified(boolean qualifyBodyIdAttribute) {
-        bodyIdQualified = qualifyBodyIdAttribute;
+    public void setTargetIdQualified(boolean qualifyTargetIdAttribute) {
+        targetIdQualified = qualifyTargetIdAttribute;
     }
     /**
      *  default value is TIMESTAMP_IN_SECURITY_ELEMENT (following OASIS 2003 and 2004 specs).
