@@ -422,6 +422,22 @@ public class Merlin implements Crypto {
     }
 
     /**
+     * Retrieves the alias name of the default certificate which has been
+     * specified as a property. This should be the certificate that is used for
+     * signature and encryption. This alias corresponds to the certificate that
+     * should be used whenever KeyInfo is not poresent in a signed or
+     * an encrypted message. May return null.
+     * 
+     * @return alias name of the default X509 certificate
+     */
+    public String getDefaultX509Alias() {
+        if (properties == null) {
+            return null;
+        }
+        return properties.getProperty("org.apache.ws.security.crypto.merlin.keystore.alias");
+    }
+    
+    /**
      * Gets the list of certificates for a given alias. 
      * <p/>
      * 

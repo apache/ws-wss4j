@@ -38,9 +38,18 @@ import javax.xml.namespace.QName;
 public class BinarySecurity {
     public static final QName TOKEN = new QName(WSConstants.WSSE_NS, "BinarySecurityToken");
     public static final QName TOKEN_KI = new QName(WSConstants.WSSE_NS, "KeyIdentifier");
-    public static final String BASE64_ENCODING = WSConstants.SOAPMESSAGE_NS + "#Base64Binary";
+    public static final String BASE64_BINARY = "Base64Binary";
+    public static String BASE64_ENCODING = null; // set in a static block later 
     protected Element element = null;
 
+    static {
+        if (WSConstants.COMPLIANCE_MODE <= WSConstants.OASIS_2002_12) {
+            BASE64_ENCODING = WSConstants.WSSE_PREFIX + ":" + BASE64_BINARY;
+        } else {
+            BASE64_ENCODING = WSConstants.SOAPMESSAGE_NS + "#Base64Binary";
+        }
+    }
+    
     /**
      * Constructor.
      * <p/>
@@ -54,7 +63,7 @@ public class BinarySecurity {
         if (!el.equals(TOKEN) && !el.equals(TOKEN_KI)) {
             throw new WSSecurityException(WSSecurityException.INVALID_SECURITY_TOKEN, "badTokenType", new Object[]{el});
         }
-        if (!getEncodingType().equals(BASE64_ENCODING)) {
+        if (!getEncodingType().endsWith(BASE64_BINARY)) {
             throw new WSSecurityException(WSSecurityException.INVALID_SECURITY_TOKEN, "badEncoding", new Object[]{getEncodingType()});
         }
     }
@@ -79,7 +88,13 @@ public class BinarySecurity {
      * @return 
      */
     public String getValueType() {
-        return this.element.getAttribute("ValueType");
+        String valueType = this.element.getAttribute("ValueType");
+        // also attempt to get the attribute in case it was qualified
+        // NYI: still need to check for all supported namespaces here
+        if (valueType.length() == 0) {
+            valueType = element.getAttributeNS(WSConstants.WSSE_NS, "ValueType");
+        }
+        return valueType;
     }
 
     /**
@@ -89,7 +104,11 @@ public class BinarySecurity {
      * @param type 
      */
     protected void setValueType(String type) {
-        this.element.setAttributeNS(null, "ValueType", type);
+        if (WSConstants.COMPLIANCE_MODE <= WSConstants.OASIS_2002_12) {
+            this.element.setAttributeNS(WSConstants.WSSE_NS, WSConstants.WSSE_PREFIX + ":ValueType", type);
+        } else {
+            this.element.setAttributeNS(null, "ValueType", type);
+        }
     }
 
     /**
@@ -99,7 +118,13 @@ public class BinarySecurity {
      * @return 
      */
     public String getEncodingType() {
-        return this.element.getAttribute("EncodingType");
+        String encodingType = this.element.getAttribute("EncodingType");
+        // attempt to get the attribute in case it was qualified
+        // NYI: still need to check for all supported namespaces here
+        if (encodingType.length() == 0) {
+            encodingType = this.element.getAttributeNS(WSConstants.WSSE_NS, "EncodingType");
+        }
+        return encodingType;
     }
 
     /**
@@ -109,7 +134,11 @@ public class BinarySecurity {
      * @param encoding 
      */
     protected void setEncodingType(String encoding) {
-        this.element.setAttributeNS(null, "EncodingType", encoding);
+        if (WSConstants.COMPLIANCE_MODE <= WSConstants.OASIS_2002_12) {
+            this.element.setAttributeNS(WSConstants.WSSE_NS, WSConstants.WSSE_PREFIX + ":EncodingType", encoding);
+        } else {
+            this.element.setAttributeNS(null, "EncodingType", encoding);
+        }
     }
 
     /**

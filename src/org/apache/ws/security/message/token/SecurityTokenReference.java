@@ -53,7 +53,7 @@ public class SecurityTokenReference {
 
 	public static final QName TOKEN =
 		new QName(WSConstants.WSSE_NS, "SecurityTokenReference");
-	public static final String SKI_URI = WSConstants.X509TOKEN_NS + "#X509SubjectKeyIdentifier";
+    public static final String SKI_URI = WSConstants.X509TOKEN_NS + "#X509SubjectKeyIdentifier";
 	protected Element element = null;
 	private XMLX509IssuerSerial issuerSerial = null;
 	private byte[] skiBytes = null;
@@ -190,8 +190,13 @@ public class SecurityTokenReference {
 		Text certText = doc.createTextNode(Base64.encode(data));
 		Element keyId =
 			doc.createElementNS(WSConstants.WSSE_NS, "wsse:KeyIdentifier");
-		keyId.setAttributeNS(null, "ValueType", X509Security.TYPE);
-		keyId.setAttributeNS(null, "EncodingType",  BinarySecurity.BASE64_ENCODING);
+		if (WSConstants.COMPLIANCE_MODE <= WSConstants.OASIS_2002_12) {
+		    keyId.setAttributeNS(WSConstants.WSSE_NS, WSConstants.WSSE_PREFIX + ":ValueType", X509Security.TYPE);
+		    keyId.setAttributeNS(WSConstants.WSSE_NS, WSConstants.WSSE_PREFIX + ":EncodingType",  BinarySecurity.BASE64_ENCODING);
+        } else {
+            keyId.setAttributeNS(null, "ValueType", X509Security.TYPE);
+            keyId.setAttributeNS(null, "EncodingType",  BinarySecurity.BASE64_ENCODING);
+        }
 		keyId.appendChild(certText);
 		Element elem = getFirstElement();
 		if (elem != null) {
@@ -215,8 +220,13 @@ public class SecurityTokenReference {
 		org.w3c.dom.Text skiText = doc.createTextNode(Base64.encode(data));
 		Element keyId =
 			doc.createElementNS(WSConstants.WSSE_NS, "wsse:KeyIdentifier");
-		keyId.setAttributeNS(null, "ValueType", SKI_URI);
-		keyId.setAttributeNS(null, "EncodingType", BinarySecurity.BASE64_ENCODING);
+        if (WSConstants.COMPLIANCE_MODE <= WSConstants.OASIS_2002_12) {
+            keyId.setAttributeNS(WSConstants.WSSE_NS, WSConstants.WSSE_PREFIX + ":ValueType", SKI_URI);
+            keyId.setAttributeNS(WSConstants.WSSE_NS, WSConstants.WSSE_PREFIX + ":EncodingType", BinarySecurity.BASE64_ENCODING);
+        } else {
+            keyId.setAttributeNS(null, "ValueType", SKI_URI);
+            keyId.setAttributeNS(null, "EncodingType", BinarySecurity.BASE64_ENCODING);
+        }
 		keyId.appendChild(skiText);
 		Element elem = getFirstElement();
 		if (elem != null) {
@@ -237,7 +247,12 @@ public class SecurityTokenReference {
 		X509Security token = null;
 		Element elem = getFirstElement();
 		String value = elem.getAttribute("ValueType");
-		if (value.equals(X509Security.TYPE)) {
+        // attempt to get the attribute if it was qualified
+        // NYI iterate through all the possible namespaces
+        if (value.length() == 0) {
+            value = elem.getAttributeNS(WSConstants.WSSE_NS, "ValueType");
+        }
+		if (value.endsWith(X509Security.X509_V3)) {
 			token = new X509Security(elem);
 			if (token != null) {
 				X509Certificate cert = token.getX509Certificate(crypto);

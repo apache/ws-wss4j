@@ -34,14 +34,23 @@ import java.security.cert.X509Certificate;
  * @author Davanum Srinivas (dims@yahoo.com).
  */
 public class X509Security extends BinarySecurity {
-    public static final String TYPE = WSConstants.X509TOKEN_NS + "#X509v3";
-	
+    public static String TYPE = null; // set later in a static block
+    public static final String X509_V3 = "X509v3";
+   
 	/*
 	 * Stores the associated X.509 Certificate. This saves numerous
 	 * crypto loadCertificate operations
 	 */
 	private X509Certificate cachedCert = null;
 
+    static {
+        if (WSConstants.COMPLIANCE_MODE <= WSConstants.OASIS_2002_12) {
+            TYPE = WSConstants.WSSE_PREFIX + ":" + X509_V3;
+        } else {
+            TYPE = WSConstants.X509TOKEN_NS + "#" + X509_V3;
+        }
+    }
+    
     /**
      * This constructor creates a new X509 certificate object and initializes
      * it from the data containe in the element. 
@@ -51,7 +60,7 @@ public class X509Security extends BinarySecurity {
      */
     public X509Security(Element elem) throws WSSecurityException {
         super(elem);
-        if (!getValueType().equals(TYPE)) {
+        if (!getValueType().endsWith(X509_V3)) {
             throw new WSSecurityException(WSSecurityException.INVALID_SECURITY_TOKEN, "invalidValueType", new Object[]{TYPE, getValueType()});
         }
     }

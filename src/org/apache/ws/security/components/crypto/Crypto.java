@@ -126,19 +126,31 @@ public interface Crypto {
      */
     public String getAliasForX509Cert(String issuer, BigInteger serialNumber) throws WSSecurityException;
 
-	/**
-	 * Lookup a X509 Certificate in the keystore according to a given 
-	 * SubjectKeyIdentifier.
-	 * <p/>
-	 * The search gets all alias names of the keystore and gets the certificate chain
-	 * or certificate for each alias. Then the SKI for each user certificate 
-	 * is compared with the SKI parameter.
-	 * 
-	 * @param skiBytes       The SKI info bytes
-	 * @return alias name of the certificate that matches serialNumber and issuer name
-	 *         or null if no such certificate was found.
-	 */
-	public String getAliasForX509Cert(byte[] skiBytes) throws WSSecurityException;
+    /**
+     * Lookup a X509 Certificate in the keystore according to a given 
+     * SubjectKeyIdentifier.
+     * <p/>
+     * The search gets all alias names of the keystore and gets the certificate chain
+     * or certificate for each alias. Then the SKI for each user certificate 
+     * is compared with the SKI parameter.
+     * 
+     * @param skiBytes       The SKI info bytes
+     * @return alias name of the certificate that matches serialNumber and issuer name
+     *         or null if no such certificate was found.
+     */
+    public String getAliasForX509Cert(byte[] skiBytes) throws WSSecurityException;
+
+    /**
+     * Retrieves the alias name of the default certificate which has been
+     * specified as a property. This should be the certificate that is used for
+     * signature and encryption. This alias corresponds to the certificate that
+     * should be used whenever KeyInfo is not poresent in a signed or
+     * an encrypted message. May return null.
+     * 
+     * @return alias name of the default X509 certificate.
+     */
+    public String getDefaultX509Alias();
+    
 	/**
 	 * Reads the SubjectKeyIdentifier information from the certificate. 
 	 * <p/> 
