@@ -183,7 +183,21 @@ public interface WSConstants {
      */
     public static final int ISSUER_SERIAL = 2;
 
-    /**
+	/**
+	* Sets the {@link org.apache.ws.security.message.WSSignEnvelope#build(Document, Crypto) signing} 
+	* or the {@link org.apache.ws.security.message.WSEncryptBody#build(Document, Crypto) encryption}
+	* method to send the issuer name and the serial number of a
+	* certificate to the receiver.  
+	* <p/>
+	* In contrast to {@link #ISSUER_SERIAL} this operation also stores the 
+	* refreneced certificate as a BinarySecurityToken in the message.
+	* 
+	* <p/>
+	* Please refer to WS Security specification X509 profile, chapter 3.3.3
+	* 
+	*/
+   public static final int ISSUER_SERIAL_DIRECT = 7;
+   /**
      * Sets the {@link org.apache.ws.security.message.WSEncryptBody#build(Document, Crypto) encryption}
      * method to send the certificate used to encrypt the symmetric key.  
 	 * <p/>
@@ -206,7 +220,7 @@ public interface WSConstants {
      * the signing certificate.   
      * <p/>
      * Refer to WS Security specification X509 profile, chapter 3.3.1
-     * This identification token is not yet supported by WSS4J. The
+     * This identification token is not yet fully tested by WSS4J. The
      * WsDoAllSender does not include the X.509 certificate as
      * <code>BinarySecurityToken</code> in the request message.
      */
@@ -219,7 +233,7 @@ public interface WSConstants {
 	 * the signing certificate.   
 	 * <p/>
 	 * Refer to WS Security specification X509 profile, chapter 3.3.1
-	 * This identification token is not yet supported by WSS4J.
+	 * This identification token is not yet fully tested by WSS4J.
 	 * This option orders the WsDoAllSender to include the X.509
 	 * certificate as a <code>BinarySecurityToken</code> 
 	 * in the request message.

@@ -443,6 +443,7 @@ public class WSDoAllSender extends BasicHandler {
 			}
 			sigKeyId = I.intValue();
 			if (!(sigKeyId == WSConstants.ISSUER_SERIAL
+				|| sigKeyId == WSConstants.ISSUER_SERIAL_DIRECT
 				|| sigKeyId == WSConstants.BST_DIRECT_REFERENCE
 				|| sigKeyId == WSConstants.X509_KEY_IDENTIFIER
 				|| sigKeyId == WSConstants.SKI_KEY_IDENTIFIER

@@ -23,7 +23,6 @@ import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.message.EnvelopeIdResolver;
 import org.apache.ws.security.message.token.BinarySecurity;
 import org.apache.ws.security.message.token.PKIPathSecurity;
-import org.apache.ws.security.message.token.Reference;
 import org.apache.ws.security.message.token.SecurityTokenReference;
 import org.apache.ws.security.message.token.UsernameToken;
 import org.apache.ws.security.message.token.X509Security;
@@ -429,7 +428,7 @@ public class WSSecurityEngine {
             }
             SecurityTokenReference secRef = new SecurityTokenReference((Element) node);
             if (secRef.containsReference()) {
-                Element token = getTokenElement(secRef);
+                Element token = secRef.getTokenElement(secRef, secRef.getElement().getOwnerDocument());
 
                 // at this point ... check token type: Binary
                 QName el = new QName(token.getNamespaceURI(), token.getLocalName());
@@ -440,30 +439,15 @@ public class WSSecurityEngine {
                             "unsupportedToken", null);
                 }
             } else if (secRef.containsX509IssuerSerial()) {
-                XMLX509IssuerSerial issuerSerial = secRef.getX509IssuerSerial();
-                String alias = crypto.getAliasForX509Cert(issuerSerial.getIssuerName(),
-                        issuerSerial.getSerialNumber());
-                if (doDebug) {
-					log.info("Verify X509IssuerSerial alias: " + alias);
-                }
-                certs = crypto.getCertificates(alias);
-            } else if (secRef.containsKeyIdentifier()) {
-				BinarySecurity token = secRef.getKeyIdentifier(crypto);
-				if (!(token instanceof X509Security)) {
-					throw new 
-						WSSecurityException(
-							WSSecurityException.UNSUPPORTED_SECURITY_TOKEN,
-							"unsupportedBinaryTokenType", new Object[]{"for verify"});
-				}
-				X509Certificate cert = ((X509Security) token).getX509Certificate(crypto);
-				certs = new X509Certificate[1];
-				certs[0] = cert;
+                certs = secRef.getX509IssuerSerial(crypto);
+			} else if (secRef.containsKeyIdentifier()) {
+				certs = secRef.getKeyIdentifier(crypto);
             }
         }
 		if( tlog.isDebugEnabled() ) {
 			t1=System.currentTimeMillis();
 		}                
-        if (certs.length > 0 && certs[0] != null) {
+        if (certs != null && certs.length > 0 && certs[0] != null) {
 			certs[0].checkValidity();
 			if (sigCheck && sig.checkSignatureValue(certs[0])) {
 				if( tlog.isDebugEnabled() ) {
@@ -529,39 +513,7 @@ public class WSSecurityEngine {
         return certs;
     }
 
-    /**
-     * Gets the signing token element, which usually is a <code>BinarySecurityToken
-     * </code>. 
-     * The method gets the URI attribute of the {@link Reference} contained in
-     * the {@link SecurityTokenReference} and tries to find the referenced
-     * Element in the document.
-     * 
-     * @param secRef 	<code>SecurityTokenReference</code> that contains a <code>Reference
-     * 					</code> to a binary security token
-     * @return Element 	containing the signing token, must be a BinarySecurityToken
-     * @throws Exception When either no <code>Reference</code> element, or the found
-     *                   reference contains no URI, or the referenced signing not found.
-     */
-    public Element getTokenElement(SecurityTokenReference secRef) throws Exception {
-        Reference ref = secRef.getReference();
-        if (ref == null) {
-            throw new WSSecurityException(WSSecurityException.INVALID_SECURITY, "noReference");
-        }
-        String uri = ref.getURI();
-        if (doDebug) {
-			log.debug("Token reference uri: " + uri);
-        }
-        if (uri == null) {
-            throw new WSSecurityException(WSSecurityException.INVALID_SECURITY, "badReferenceURI");
-        }
-        Element tokElement = WSSecurityUtil.getElementByWsuId(secRef.getElement().getOwnerDocument(), uri);
-        if (tokElement == null) {
-            throw new WSSecurityException(WSSecurityException.SECURITY_TOKEN_UNAVAILABLE,
-                    "noToken", new Object[]{uri});
-        }
-        return tokElement;
-    }
-
+    
     /**
      * Extracts the certificate(s) from the token reference.
      * <p/>
@@ -589,31 +541,6 @@ public class WSSecurityEngine {
                     "unhandledToken", new Object[]{token.getClass().getName()});
         }
     }
-
-    /*
-     * Replaces all Text nodes that start with "\n " or "\n\n" with
-     * "\n" This is only used by signature callback.
-     * There is a bug somewhere in serliazation/deserialization code
-     * that appends spaces to \n Text nodes for no reason breaking
-     * the signature stuff.
-     * <p/>
-     * 
-     * Not used anymore
-     * 
-     * @param node 
-
-    private static void normalize(Node node) {
-        if (node.getNodeType() == Node.TEXT_NODE) {
-            String data = ((Text) node).getData();
-            if ((data.length() > 1) && (data.charAt(0) == 10) && ((data.charAt(1) == 10) || (data.charAt(1) == 32))) {
-                ((Text) node).setData("\n");
-            }
-        }
-        for (Node currentChild = node.getFirstChild(); currentChild != null; currentChild = currentChild.getNextSibling()) {
-            normalize(currentChild);
-        }
-    }
-     */
     
     /**
      * Checks the <code>element</code> and creates an appropriate binary security object.
@@ -774,9 +701,7 @@ public class WSSecurityEngine {
          * This method is recommended by OASIS WS-S specification, X509 profile
          */
         if (secRef.containsX509IssuerSerial()) {
-            XMLX509IssuerSerial issuerSerial = secRef.getX509IssuerSerial();
-            alias = crypto.getAliasForX509Cert(issuerSerial.getIssuerName(),
-                    issuerSerial.getSerialNumber());
+            alias = secRef.getX509IssuerSerialAlias(crypto);
             if (doDebug) {
 				log.debug("X509IssuerSerial alias: " + alias);
             }
@@ -788,13 +713,8 @@ public class WSSecurityEngine {
          * This method is _not_recommended by OASIS WS-S specification, X509 profile
          */
 		else if (secRef.containsKeyIdentifier()) {
-            BinarySecurity token = secRef.getKeyIdentifier(crypto);
-            if (!(token instanceof X509Security)) {
-                throw new WSSecurityException(WSSecurityException.UNSUPPORTED_SECURITY_TOKEN,
-                        "unsupportedBinaryTokenType", new Object[]{"for decryption"});
-            }
-            X509Certificate cert = ((X509Security) token).getX509Certificate(crypto);
-            if (cert == null) {
+			X509Certificate[] certs = secRef.getKeyIdentifier(crypto);
+            if (certs == null || certs.length == 0 || certs[0] == null) {
                 throw new WSSecurityException(WSSecurityException.FAILURE,
 					"invalidX509Data", new Object[]{"for decryption (KeyId)"});
             }
@@ -802,12 +722,12 @@ public class WSSecurityEngine {
              * Here we have the certificate. Now find the alias for it. Needed to identify
              * the private key associated with this certificate
              */
-            alias = crypto.getAliasForX509Cert(cert);
+            alias = crypto.getAliasForX509Cert(certs[0]);
             if (doDebug) {
 				log.debug("KeyIdentifier Alias: " + alias);
             }
 		} else if (secRef.containsReference()) {
-			Element bstElement = getTokenElement(secRef);
+			Element bstElement = secRef.getTokenElement(secRef, secRef.getElement().getOwnerDocument());
 
 			// at this point ... check token type: Binary
 			QName el =

@@ -48,6 +48,11 @@ import javax.xml.transform.TransformerException;
  */
 public class WSSecurityUtil {
     private static Log log = LogFactory.getLog(WSSecurityUtil.class);
+    private static boolean doDebug = false;
+    
+	static {
+		doDebug = log.isDebugEnabled();
+	}
 
     /**
      * Returns the first WS-Security header element for a given actor. 
@@ -588,5 +593,5 @@ public class WSSecurityUtil {
     		return new SOAP11Constants();
     	}
     }
-    	
+
 }

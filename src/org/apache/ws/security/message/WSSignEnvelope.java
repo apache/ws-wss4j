@@ -245,46 +245,72 @@ public class WSSignEnvelope extends WSBaseMessage {
 		if (tlog.isDebugEnabled() ) {
 			t2=System.currentTimeMillis();
 		}
-        if (keyIdentifierType == WSConstants.BST_DIRECT_REFERENCE) {
-            Reference ref = new Reference(doc);
-            ref.setURI("#" + certUri);
-            secRef.setReference(ref);
-            BinarySecurity token = null;
-            if (!useSingleCert) {
-                token = new PKIPathSecurity(doc);
-                ((PKIPathSecurity) token).setX509Certificates(certs, true);
-            } else {
-                token = new X509Security(doc);
-                ((X509Security) token).setX509Certificate(certs[0]);
-            }
-            token.setID(certUri);
-            WSSecurityUtil.prependChildElement(doc, securityHeader, token.getElement(), false);
-            wsDocInfo.setBst(token.getElement());
-        } else if (keyIdentifierType == WSConstants.ISSUER_SERIAL) {
-            XMLX509IssuerSerial data = new XMLX509IssuerSerial(doc,
-                    certs[0].getIssuerDN().getName(),
-                    certs[0].getSerialNumber());
-            secRef.setX509IssuerSerial(data);
-        } else if (keyIdentifierType == WSConstants.X509_KEY_IDENTIFIER) {
-			secRef.setKeyIdentifier(certs[0]);
-		} else if (keyIdentifierType == WSConstants.SKI_KEY_IDENTIFIER_DIRECT) {
-			secRef.setKeyIdentifierSKI(certs[0]);
-			X509Security token = new X509Security(doc);
-			token.setX509Certificate(certs[0]);
-			token.setID(certUri);
-			WSSecurityUtil.prependChildElement(
-				doc,
-				securityHeader,
-				token.getElement(),
-				false);
-			wsDocInfo.setBst(token.getElement());
-		} else if (keyIdentifierType == WSConstants.SKI_KEY_IDENTIFIER) {
-			secRef.setKeyIdentifierSKI(certs[0]);
-        } else {
-			throw new WSSecurityException(
-				WSSecurityException.FAILURE,
-				"unsupportedKeyId");
-        }
+		switch (keyIdentifierType) {
+			case WSConstants.BST_DIRECT_REFERENCE :
+				Reference ref = new Reference(doc);
+				ref.setURI("#" + certUri);
+				secRef.setReference(ref);
+				BinarySecurity bstToken = null;
+				if (!useSingleCert) {
+					bstToken = new PKIPathSecurity(doc);
+					((PKIPathSecurity) bstToken).setX509Certificates(
+						certs,
+						true);
+				} else {
+					bstToken = new X509Security(doc);
+					((X509Security) bstToken).setX509Certificate(certs[0]);
+				}
+				bstToken.setID(certUri);
+				WSSecurityUtil.prependChildElement(
+					doc,
+					securityHeader,
+					bstToken.getElement(),
+					false);
+				wsDocInfo.setBst(bstToken.getElement());
+				break;
+			case WSConstants.ISSUER_SERIAL_DIRECT : {
+				X509Security x509token = new X509Security(doc);
+				x509token.setX509Certificate(certs[0]);
+				x509token.setID(certUri);
+				WSSecurityUtil.prependChildElement(
+					doc,
+					securityHeader,
+					x509token.getElement(),
+					false);
+				wsDocInfo.setBst(x509token.getElement());
+				// fall thru
+			}
+			case WSConstants.ISSUER_SERIAL :
+				XMLX509IssuerSerial data =
+					new XMLX509IssuerSerial(
+						doc,
+						certs[0].getIssuerDN().getName(),
+						certs[0].getSerialNumber());
+				secRef.setX509IssuerSerial(data);
+				break;
+			case WSConstants.X509_KEY_IDENTIFIER :
+				secRef.setKeyIdentifier(certs[0]);
+				break;
+			case WSConstants.SKI_KEY_IDENTIFIER_DIRECT : {
+				X509Security x509token = new X509Security(doc);
+				x509token.setX509Certificate(certs[0]);
+				x509token.setID(certUri);
+				WSSecurityUtil.prependChildElement(
+					doc,
+					securityHeader,
+					x509token.getElement(),
+					false);
+				wsDocInfo.setBst(x509token.getElement());
+				// fall thru
+			}
+			case WSConstants.SKI_KEY_IDENTIFIER :
+				secRef.setKeyIdentifierSKI(certs[0]);
+				break;
+			default :
+				throw new WSSecurityException(
+					WSSecurityException.FAILURE,
+					"unsupportedKeyId");
+		}
 		if (tlog.isDebugEnabled() ) {
 			t3=System.currentTimeMillis();
 		}

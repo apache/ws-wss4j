@@ -185,13 +185,13 @@ public class Merlin implements Crypto {
     }
 
 
-    private String[] splitAndTrim(String inString) {
-	String result[] = inString.split(",");
-	for (int i = 0; i < result.length; i++) {
-	    result[i] = result[i].trim();
+	private String[] splitAndTrim(String inString) {
+		String result[] = inString.split(",");
+		for (int i = 0; i < result.length; i++) {
+			result[i] = result[i].trim();
+		}
+		return result;
 	}
-	return result;
-    }
 
     private boolean equalsStringArray(String[] in1, String[] in2) {
         if (in1.length != in2.length) {

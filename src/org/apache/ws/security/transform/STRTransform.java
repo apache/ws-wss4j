@@ -21,9 +21,8 @@ import org.apache.ws.security.WSDocInfo;
 import org.apache.ws.security.WSDocInfoStore;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.message.token.Reference;
 import org.apache.ws.security.message.token.SecurityTokenReference;
-
+import org.apache.ws.security.message.token.X509Security;
 import org.apache.ws.security.util.WSSecurityUtil;
 
 
@@ -258,11 +257,13 @@ public class STRTransform extends TransformSpi {
 			throw new CanonicalizationException("empty", ex);
 		} catch (TransformerException ex) {
 			throw new CanonicalizationException("empty", ex);
+		} catch (Exception ex) {
+			throw new CanonicalizationException("empty", ex);
 		}
 	}
 
 	private Element dereferenceSTR(Document doc, Element tmpE)
-		throws WSSecurityException {
+		throws Exception {
 
 		/*
 		 * Third step: locate the security token referenced by the STR
@@ -298,23 +299,43 @@ public class STRTransform extends TransformSpi {
 		 * WS specification (main document)
 		 */
 		if (secRef.containsReference()) {
-			log.debug("Found str reference");
-			Reference ref = secRef.getReference();
-			String uri = ref.getURI();
 			if (doDebug) {
-				log.debug("Token reference uri: " + uri);
+				log.debug("Found str reference");
 			}
-			if (uri == null) {
-				throw new WSSecurityException(
-					WSSecurityException.INVALID_SECURITY,
-					"badReferenceURI");
+			tokElement = secRef.getTokenElement(secRef, doc);
+			/*
+			 * second case: IssuerSerial, first try to get embedded 
+			 * certificate, if that fails, lookup in keystore, wrap
+			 * in BST according to specification
+			 */
+		} else if (secRef.containsX509IssuerSerial()) {
+			if (doDebug) {
+				log.debug("STR issuerSerial embedded");
 			}
-			tokElement = WSSecurityUtil.getElementByWsuId(doc, uri);
-			if (tokElement == null) {
-				throw new WSSecurityException(
-					WSSecurityException.SECURITY_TOKEN_UNAVAILABLE,
-					"noToken",
-					new Object[] { uri });
+			X509Security x509token = secRef.getEmbeddedTokenFromIS(doc, wsDocInfo.getCrypto());
+			if (x509token != null) {
+				tokElement = x509token.getElement();
+			}
+			else {
+				return null; //TODO: handle certificate from keystore, binary
+			}	
+		}
+		/*
+		 * third case: IKeyIdentifier, must be SKI, first try to get embedded 
+		 * certificate, if that fails, lookup in keystore, wrap
+		 * in BST according to specification. No other KeyIdentifier
+		 * type handled here - just SKI
+		 */
+		else if (secRef.containsKeyIdentifier()) {
+			if (doDebug) {
+				log.debug("KeyIdentifier issuerSerial embedded");
+			}
+			X509Security x509token = secRef.getEmbeddedTokenFromSKI(doc, wsDocInfo.getCrypto());
+			if (x509token != null) {
+				tokElement = x509token.getElement();
+			}
+			else {
+				return null; //TODO: handle certificate from keystore, binary
 			}
 		}
 		return (Element) tokElement;

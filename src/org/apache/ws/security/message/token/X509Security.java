@@ -37,6 +37,12 @@ import java.security.cert.X509Certificate;
  */
 public class X509Security extends BinarySecurity {
     public static final QName TYPE = new QName(WSConstants.WSSE_NS, "X509v3");
+	
+	/*
+	 * Stores the associated X.509 Certificate. This saves numerous
+	 * crypto loadCertificate operations
+	 */
+	private X509Certificate cachedCert = null;
 
     /**
      * This constructor creates a new X509 certificate object and initializes
@@ -71,12 +77,16 @@ public class X509Security extends BinarySecurity {
      * @throws GeneralSecurityException 
      */
     public X509Certificate getX509Certificate(Crypto crypto) throws GeneralSecurityException {
+    	if (cachedCert != null) {
+    		return cachedCert;
+    	}
         byte[] data = getToken();
         if (data == null) {
             return null;
         }
         ByteArrayInputStream in = new ByteArrayInputStream(data);
-        return crypto.loadCertificate(in);
+		cachedCert = crypto.loadCertificate(in);
+        return cachedCert;
     }
 
     /**
@@ -92,6 +102,7 @@ public class X509Security extends BinarySecurity {
         if (cert == null) {
             throw new IllegalArgumentException("data == null");
         }
+        cachedCert = cert;
         setToken(cert.getEncoded());
     }
 }
