@@ -108,7 +108,7 @@ public class WSSecurityEngine {
 	/**
 	 * <code>wsu:Timestamp</code> as defined by OASIS WS Security specification,
 	 */
-	protected static final QName TIMESTAMP = new QName(WSConstants.WSU_NS, "wsu:Timestamp");
+	protected static final QName TIMESTAMP = new QName(WSConstants.WSU_NS, WSConstants.TIMESTAMP_TOKEN_LN);
 
 
     static {

@@ -45,6 +45,7 @@ public interface WSConstants {
     public static final String XML_NS = "http://www.w3.org/XML/1998/namespace";
     public static final String USERNAME_TOKEN_LN = "UsernameToken";
     public static final String BINARY_TOKEN_LN = "BinarySecurityToken";
+    public static final String TIMESTAMP_TOKEN_LN = "Timestamp";
     public static final String USERNAME_LN = "Username";
     public static final String PASSWORD_LN = "Password";
     public static final String PASSWORD_TYPE_ATTR = "Type";

@@ -46,8 +46,8 @@ public class WSBaseMessage {
 	protected String password = null;
 	protected int keyIdentifierType = WSConstants.ISSUER_SERIAL;
 	protected Vector parts = null;
-	protected int timeToLive = 300;		// time between Created and Expires
-	
+	protected int timeToLive = 300; // time between Created and Expires
+
 	protected boolean doDebug = false;
 
 	/**
@@ -163,7 +163,8 @@ public class WSBaseMessage {
 	 * @throws Exception 
 	 */
 	protected String setBodyID(Document doc) throws Exception {
-		SOAPConstants soapConstants = WSSecurityUtil.getSOAPConstants(doc.getDocumentElement());
+		SOAPConstants soapConstants =
+			WSSecurityUtil.getSOAPConstants(doc.getDocumentElement());
 		Element bodyElement =
 			(Element) WSSecurityUtil.getDirectChild(
 				doc.getFirstChild(),
@@ -174,7 +175,7 @@ public class WSBaseMessage {
 		}
 		return setWsuId(bodyElement);
 	}
-	
+
 	protected String setWsuId(Element bodyElement) {
 		String id = bodyElement.getAttributeNS(WSConstants.WSU_NS, "Id");
 		if ((id == null) || (id.length() == 0)) {
@@ -215,20 +216,22 @@ public class WSBaseMessage {
 	 * @return		A <code>wsse:Security</code> element
 	 */
 	protected Element insertSecurityHeader(Document doc, boolean timestamp) {
-		SOAPConstants soapConstants = WSSecurityUtil.getSOAPConstants(doc.getDocumentElement());
+		SOAPConstants soapConstants =
+			WSSecurityUtil.getSOAPConstants(doc.getDocumentElement());
 		// lookup a security header block that matches actor
 		Element securityHeader =
 			WSSecurityUtil.getSecurityHeader(doc, actor, soapConstants);
-		if (securityHeader == null) { 			// create if nothing found
+		if (securityHeader == null) { // create if nothing found
 			securityHeader =
 				WSSecurityUtil.findWsseSecurityHeaderBlock(
 					doc,
 					doc.getDocumentElement(),
 					true);
-					
+
 			String soapPrefix =
-				WSSecurityUtil.getPrefix(soapConstants.getEnvelopeURI(),
-														 securityHeader);
+				WSSecurityUtil.getPrefix(
+					soapConstants.getEnvelopeURI(),
+					securityHeader);
 			if (actor != null && actor.length() > 0) {
 				// Check for SOAP 1.2 here and use "role" instead of "actor"
 				securityHeader.setAttributeNS(
@@ -245,10 +248,19 @@ public class WSBaseMessage {
 					soapConstants.getMustunderstand());
 			}
 			if (timestamp) {
-				Element elementTime = doc.createElementNS(WSConstants.WSU_NS, "wsu:Timestamp");
-				WSSecurityUtil.setNamespace(elementTime, WSConstants.WSU_NS, WSConstants.WSU_PREFIX);
+				Element elementTime =
+					doc.createElementNS(
+						WSConstants.WSU_NS,
+						WSConstants.WSU_PREFIX
+							+ ":"
+							+ WSConstants.TIMESTAMP_TOKEN_LN);
+				WSSecurityUtil.setNamespace(
+					elementTime,
+					WSConstants.WSU_NS,
+					WSConstants.WSU_PREFIX);
 
-				SimpleDateFormat zulu = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+				SimpleDateFormat zulu =
+					new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
 				zulu.setTimeZone(TimeZone.getTimeZone("GMT"));
 				Calendar rightNow = Calendar.getInstance();
 
@@ -256,19 +268,27 @@ public class WSBaseMessage {
 					doc.createElementNS(
 						WSConstants.WSU_NS,
 						WSConstants.WSU_PREFIX + ":" + WSConstants.CREATED_LN);
-				WSSecurityUtil.setNamespace(elementCreated, WSConstants.WSU_NS, WSConstants.WSU_PREFIX);				
-				elementCreated.appendChild(doc.createTextNode(zulu.format(rightNow.getTime())));
-				
+				WSSecurityUtil.setNamespace(
+					elementCreated,
+					WSConstants.WSU_NS,
+					WSConstants.WSU_PREFIX);
+				elementCreated.appendChild(
+					doc.createTextNode(zulu.format(rightNow.getTime())));
+
 				long currentTime = rightNow.getTimeInMillis();
 				currentTime += timeToLive * 1000;
 				rightNow.setTimeInMillis(currentTime);
-				
+
 				Element elementExpires =
 					doc.createElementNS(
 						WSConstants.WSU_NS,
 						WSConstants.WSU_PREFIX + ":" + WSConstants.EXPIRES_LN);
-				WSSecurityUtil.setNamespace(elementExpires, WSConstants.WSU_NS, WSConstants.WSU_PREFIX);				
-				elementExpires.appendChild(doc.createTextNode(zulu.format(rightNow.getTime())));
+				WSSecurityUtil.setNamespace(
+					elementExpires,
+					WSConstants.WSU_NS,
+					WSConstants.WSU_PREFIX);
+				elementExpires.appendChild(
+					doc.createTextNode(zulu.format(rightNow.getTime())));
 
 				elementTime.appendChild(elementCreated);
 				elementTime.appendChild(elementExpires);
