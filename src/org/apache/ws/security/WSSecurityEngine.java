@@ -66,6 +66,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.security.InvalidKeyException;
 import java.security.Principal;
+import java.security.PrivateKey;
 import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
@@ -604,8 +605,8 @@ public class WSSecurityEngine {
      * @return an array of X509 certificates
      * @throws WSSecurityException
      */
-    protected X509Certificate[] getCertificatesTokenReference(Element elem,
-                                                              Crypto crypto)
+    public X509Certificate[] getCertificatesTokenReference(Element elem,
+                                                           Crypto crypto)
             throws WSSecurityException {
         BinarySecurity token = createSecurityToken(elem);
         if (token instanceof PKIPathSecurity) {
@@ -843,6 +844,14 @@ public class WSSecurityEngine {
     }
 
     public void handleEncryptedKey(Element xencEncryptedKey, CallbackHandler cb, Crypto crypto) throws WSSecurityException {
+        handleEncryptedKey(xencEncryptedKey, cb, crypto, null);
+    }
+
+    public void handleEncryptedKey(Element xencEncryptedKey, PrivateKey privatekey) throws WSSecurityException {
+        handleEncryptedKey(xencEncryptedKey, null, null, privatekey);
+    }
+
+    public void handleEncryptedKey(Element xencEncryptedKey, CallbackHandler cb, Crypto crypto, PrivateKey privateKey) throws WSSecurityException {
         long t0 = 0, t1 = 0, t2 = 0;
         if (tlog.isDebugEnabled()) {
             t0 = System.currentTimeMillis();
@@ -885,160 +894,166 @@ public class WSSecurityEngine {
         // here get the reference to the private key / shared secret key.
         // Shared secret key not yet supported
         // see check above ... maybe later
-        Element keyInfo = (Element) WSSecurityUtil.getDirectChild((Node) xencEncryptedKey,
-                "KeyInfo", WSConstants.SIG_NS);
-        String alias;
-        if (keyInfo != null) {
-            Element secRefToken;
-            if (wssConfig.getProcessNonCompliantMessages()) {
-                secRefToken = (Element) WSSecurityUtil.getDirectChildWSSE(keyInfo,
-                        "SecurityTokenReference");
-            } else {
-                secRefToken = (Element) WSSecurityUtil.getDirectChild(keyInfo,
-                        "SecurityTokenReference", wssConfig.getWsseNS());
-            }
-            if (secRefToken == null) {
-                secRefToken = (Element) WSSecurityUtil.getDirectChild(keyInfo,
-                        "KeyName", WSConstants.SIG_NS);
-            }
-            if (secRefToken == null) {
-                throw new WSSecurityException
-                        (WSSecurityException.INVALID_SECURITY, "noSecTokRef");
-            }
-            SecurityTokenReference secRef = new SecurityTokenReference(wssConfig, secRefToken);
-            /*
-             * Well, at this point there are several ways to get the key. Try to handle all of them :-).
-             */
-            alias = null;
-            /*
-             * handle X509IssuerSerial here. First check if all elements are available,
-             * get the appropriate data, check if all data is available.
-             * If all is ok up to that point, look up the certificate alias according
-             * to issuer name and serial number.
-             * This method is recommended by OASIS WS-S specification, X509 profile
-             */
-            if (secRef.containsX509IssuerSerial()) {
-                alias = secRef.getX509IssuerSerialAlias(crypto);
-                if (doDebug) {
-                    log.debug("X509IssuerSerial alias: " + alias);
+        if (privateKey == null) {
+            Element keyInfo = (Element) WSSecurityUtil.getDirectChild((Node) xencEncryptedKey,
+                    "KeyInfo", WSConstants.SIG_NS);
+            String alias;
+            if (keyInfo != null) {
+                Element secRefToken;
+                if (wssConfig.getProcessNonCompliantMessages()) {
+                    secRefToken = (Element) WSSecurityUtil.getDirectChildWSSE(keyInfo,
+                            "SecurityTokenReference");
+                } else {
+                    secRefToken = (Element) WSSecurityUtil.getDirectChild(keyInfo,
+                            "SecurityTokenReference", wssConfig.getWsseNS());
                 }
-            }
-            /*
-             * If wsse:KeyIdentifier found, then the public key of the attached cert was used to
-             * encrypt the session (symmetric) key that encrypts the data. Extract the certificate
-             * using the BinarySecurity token (was enhanced to handle KeyIdentifier too).
-             * This method is _not_recommended by OASIS WS-S specification, X509 profile
-             */
-            else if (secRef.containsKeyIdentifier()) {
-                X509Certificate[] certs = secRef.getKeyIdentifier(crypto);
-                if (certs == null || certs.length != 1 || certs[0] == null) {
-                    throw new WSSecurityException(WSSecurityException.FAILURE,
-                            "invalidX509Data", new Object[]{"for decryption (KeyId)"});
+                if (secRefToken == null) {
+                    secRefToken = (Element) WSSecurityUtil.getDirectChild(keyInfo,
+                            "KeyName", WSConstants.SIG_NS);
+                }
+                if (secRefToken == null) {
+                    throw new WSSecurityException
+                            (WSSecurityException.INVALID_SECURITY, "noSecTokRef");
+                }
+                SecurityTokenReference secRef = new SecurityTokenReference(wssConfig, secRefToken);
+                /*
+                * Well, at this point there are several ways to get the key. Try to handle all of them :-).
+                */
+                alias = null;
+                /*
+                * handle X509IssuerSerial here. First check if all elements are available,
+                * get the appropriate data, check if all data is available.
+                * If all is ok up to that point, look up the certificate alias according
+                * to issuer name and serial number.
+                * This method is recommended by OASIS WS-S specification, X509 profile
+                */
+                if (secRef.containsX509IssuerSerial()) {
+                    alias = secRef.getX509IssuerSerialAlias(crypto);
+                    if (doDebug) {
+                        log.debug("X509IssuerSerial alias: " + alias);
+                    }
                 }
                 /*
-                 * Here we have the certificate. Now find the alias for it. Needed to identify
-                 * the private key associated with this certificate
-                 */
-                alias = crypto.getAliasForX509Cert(certs[0]);
-                if (doDebug) {
-                    log.debug("cert: " + certs[0]);
-                    log.debug("KeyIdentifier Alias: " + alias);
-                }
-            } else if (secRef.containsReference()) {
-                Element bstElement = secRef.getTokenElement(doc, null);
-
-                // at this point ... check token type: Binary
-                QName el =
-                        new QName(bstElement.getNamespaceURI(),
-                                bstElement.getLocalName());
-                if (el.equals(binaryToken)) {
-                    X509Security token = null;
-                    String value = bstElement.getAttribute(VALUE_TYPE);
-                    // attempt to get attribute in case it is qualified
-                    if (wssConfig.getProcessNonCompliantMessages()) {
-                        for (int i = 0; i < WSConstants.WSSE_NS_ARRAY.length && value.length() == 0; ++i) {
-                            String ns = WSConstants.WSSE_NS_ARRAY[i];
-                            value = bstElement.getAttributeNS(ns, VALUE_TYPE);
-                        }
-                    }
-                    if (!value.endsWith(X509Security.X509_V3)
-                            || ((token = new X509Security(wssConfig, bstElement)) == null)) {
-                        throw new WSSecurityException(WSSecurityException.UNSUPPORTED_SECURITY_TOKEN,
-                                "unsupportedBinaryTokenType",
-                                new Object[]{"for decryption (BST)"});
-                    }
-                    X509Certificate cert = token.getX509Certificate(crypto);
-                    if (cert == null) {
+                * If wsse:KeyIdentifier found, then the public key of the attached cert was used to
+                * encrypt the session (symmetric) key that encrypts the data. Extract the certificate
+                * using the BinarySecurity token (was enhanced to handle KeyIdentifier too).
+                * This method is _not_recommended by OASIS WS-S specification, X509 profile
+                */
+                else if (secRef.containsKeyIdentifier()) {
+                    X509Certificate[] certs = secRef.getKeyIdentifier(crypto);
+                    if (certs == null || certs.length != 1 || certs[0] == null) {
                         throw new WSSecurityException(WSSecurityException.FAILURE,
-                                "invalidX509Data",
-                                new Object[]{"for decryption"});
+                                "invalidX509Data", new Object[]{"for decryption (KeyId)"});
                     }
                     /*
-                     * Here we have the certificate. Now find the alias for it. Needed to identify
-                     * the private key associated with this certificate
-                     */
-                    alias = crypto.getAliasForX509Cert(cert);
+                    * Here we have the certificate. Now find the alias for it. Needed to identify
+                    * the private key associated with this certificate
+                    */
+                    alias = crypto.getAliasForX509Cert(certs[0]);
                     if (doDebug) {
-                        log.debug("BST Alias: " + alias);
+                        log.debug("cert: " + certs[0]);
+                        log.debug("KeyIdentifier Alias: " + alias);
+                    }
+                } else if (secRef.containsReference()) {
+                    Element bstElement = secRef.getTokenElement(doc, null);
+
+                    // at this point ... check token type: Binary
+                    QName el =
+                            new QName(bstElement.getNamespaceURI(),
+                                    bstElement.getLocalName());
+                    if (el.equals(binaryToken)) {
+                        X509Security token = null;
+                        String value = bstElement.getAttribute(VALUE_TYPE);
+                        // attempt to get attribute in case it is qualified
+                        if (wssConfig.getProcessNonCompliantMessages()) {
+                            for (int i = 0; i < WSConstants.WSSE_NS_ARRAY.length && value.length() == 0; ++i) {
+                                String ns = WSConstants.WSSE_NS_ARRAY[i];
+                                value = bstElement.getAttributeNS(ns, VALUE_TYPE);
+                            }
+                        }
+                        if (!value.endsWith(X509Security.X509_V3)
+                                || ((token = new X509Security(wssConfig, bstElement)) == null)) {
+                            throw new WSSecurityException(WSSecurityException.UNSUPPORTED_SECURITY_TOKEN,
+                                    "unsupportedBinaryTokenType",
+                                    new Object[]{"for decryption (BST)"});
+                        }
+                        X509Certificate cert = token.getX509Certificate(crypto);
+                        if (cert == null) {
+                            throw new WSSecurityException(WSSecurityException.FAILURE,
+                                    "invalidX509Data",
+                                    new Object[]{"for decryption"});
+                        }
+                        /*
+                        * Here we have the certificate. Now find the alias for it. Needed to identify
+                        * the private key associated with this certificate
+                        */
+                        alias = crypto.getAliasForX509Cert(cert);
+                        if (doDebug) {
+                            log.debug("BST Alias: " + alias);
+                        }
+                    } else {
+                        throw new WSSecurityException(WSSecurityException.INVALID_SECURITY,
+                                "unsupportedToken",
+                                null);
+                    }
+                } else if (secRef.containsKeyName()) {
+                    // alias = secRef.getX509IssuerSerialAlias(crypto);
+                    //alias = secRef.getKeyNameValue();
+
+                    // System.out.println("alias=" + alias);
+                    alias = crypto.getAliasForX509Cert(secRef.getKeyNameValue());
+                    if (doDebug) {
+                        log.debug("KeyName alias: " + alias);
                     }
                 } else {
-                    throw new WSSecurityException(WSSecurityException.INVALID_SECURITY,
-                            "unsupportedToken",
-                            null);
+                    throw new WSSecurityException(WSSecurityException.FAILURE, "unsupportedKeyId");
                 }
-            } else if (secRef.containsKeyName()) {
-                // alias = secRef.getX509IssuerSerialAlias(crypto);
-                //alias = secRef.getKeyNameValue();
-                
-                // System.out.println("alias=" + alias);
-                alias = crypto.getAliasForX509Cert(secRef.getKeyNameValue());
-                if (doDebug) {
-                    log.debug("KeyName alias: " + alias);
-                }
+            } else if (crypto.getDefaultX509Alias() != null) {
+                alias = crypto.getDefaultX509Alias();
             } else {
-                throw new WSSecurityException(WSSecurityException.FAILURE, "unsupportedKeyId");
+                throw new WSSecurityException
+                        (WSSecurityException.INVALID_SECURITY, "noKeyinfo");
             }
-        } else if (crypto.getDefaultX509Alias() != null) {
-            alias = crypto.getDefaultX509Alias();
-        } else {
-            throw new WSSecurityException
-                    (WSSecurityException.INVALID_SECURITY, "noKeyinfo");
-        }
-        /*
-          * At this point we have all information necessary to decrypt the session
-          * key:
-          * - the Cipher object intialized with the correct methods
-          * - The data that holds the encrypted session key
-          * - the alias name for the private key
-          *
-         * Now use the callback here to get password that enables
-          * us to read the private key
-         */
-        WSPasswordCallback pwCb = new WSPasswordCallback(alias, WSPasswordCallback.DECRYPT);
-        Callback[] callbacks = new Callback[1];
-        callbacks[0] = pwCb;
-        try {
-            cb.handle(callbacks);
-        } catch (IOException e) {
-            throw new WSSecurityException(WSSecurityException.FAILURE,
-                    "noPassword",
-                    new Object[]{alias});
-        } catch (UnsupportedCallbackException e) {
-            throw new WSSecurityException(WSSecurityException.FAILURE,
-                    "noPassword",
-                    new Object[]{alias});
-        }
-        String password = pwCb.getPassword();
-        if (password == null) {
-            throw new WSSecurityException(WSSecurityException.FAILURE,
-                    "noPassword", new Object[]{alias});
+            /*
+            * At this point we have all information necessary to decrypt the session
+            * key:
+            * - the Cipher object intialized with the correct methods
+            * - The data that holds the encrypted session key
+            * - the alias name for the private key
+            *
+            * Now use the callback here to get password that enables
+            * us to read the private key
+            */
+            WSPasswordCallback pwCb = new WSPasswordCallback(alias, WSPasswordCallback.DECRYPT);
+            Callback[] callbacks = new Callback[1];
+            callbacks[0] = pwCb;
+            try {
+                cb.handle(callbacks);
+            } catch (IOException e) {
+                throw new WSSecurityException(WSSecurityException.FAILURE,
+                        "noPassword",
+                        new Object[]{alias});
+            } catch (UnsupportedCallbackException e) {
+                throw new WSSecurityException(WSSecurityException.FAILURE,
+                        "noPassword",
+                        new Object[]{alias});
+            }
+            String password = pwCb.getPassword();
+            if (password == null) {
+                throw new WSSecurityException(WSSecurityException.FAILURE,
+                        "noPassword", new Object[]{alias});
+            }
+
+            try {
+                privateKey = crypto.getPrivateKey(alias, password);
+            } catch (Exception e) {
+                throw new WSSecurityException(WSSecurityException.FAILED_ENC_DEC, null, null, e);
+            }
         }
 
         try {
             cipher.init(Cipher.DECRYPT_MODE,
-                    crypto.getPrivateKey(alias, password));
-        } catch (InvalidKeyException e1) {
-            throw new WSSecurityException(WSSecurityException.FAILED_ENC_DEC, null, null, e1);
+                        privateKey);
         } catch (Exception e1) {
             throw new WSSecurityException(WSSecurityException.FAILED_ENC_DEC, null, null, e1);
         }
@@ -1171,9 +1186,9 @@ public class WSSecurityEngine {
         }
     }
 
-    private void decryptDataRefEmbedded(Document doc,
-                                        String dataRefURI,
-                                        CallbackHandler cb)
+    public void decryptDataRefEmbedded(Document doc,
+                                       String dataRefURI,
+                                       CallbackHandler cb)
             throws WSSecurityException {
 
         if (doDebug) {
