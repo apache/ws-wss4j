@@ -123,11 +123,11 @@ public class TestWSSecurity12 extends TestCase {
      * 
      * @throws java.lang.Exception Thrown when there is any problem in signing or verification
      */
-    public void testX509SignatureDSA_SKIDirect() throws Exception {
+    public void testX509SignatureDSA_SKI() throws Exception {
         SOAPEnvelope envelope = null;
         WSSignEnvelope builder = new WSSignEnvelope();
         builder.setUserInfo("wss4jcertDSA", "security");
-		builder.setKeyIdentifierType(WSConstants.SKI_KEY_IDENTIFIER_DIRECT);
+		builder.setKeyIdentifierType(WSConstants.SKI_KEY_IDENTIFIER);
 		builder.setSignatureAlgorithm(XMLSignature.ALGO_ID_SIGNATURE_DSA);
 		
         // builder.setUserInfo("john", "keypass");
@@ -144,7 +144,7 @@ public class TestWSSecurity12 extends TestCase {
 
         Message signedMsg = (Message) AxisUtil.toSOAPMessage(signedDoc);
 		if (log.isDebugEnabled()) {
-			log.debug("Signed message with SKI_DASDirect key identifier:");
+			log.debug("Signed message with DSA_SKI key identifier:");
 			XMLUtils.PrettyElementToWriter(signedMsg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
 		}
 
@@ -228,26 +228,6 @@ public class TestWSSecurity12 extends TestCase {
 		log.info("After SigningRSA_Autodetect....");
 		verify(signedDoc);
 	}
-
-    /**
-     * Test that signs (twice) and verifies a WS-Security envelope
-     * <p/>
-     * 
-     * @throws java.lang.Exception Thrown when there is any problem in signing or verification
-     *
-    public void testDoubleX509SignatureSKIDirect() throws Exception {
-        SOAPEnvelope envelope = null;
-        WSSignEnvelope builder = new WSSignEnvelope();
-        builder.setUserInfo("wss4jcert", "security");
-		builder.setKeyIdentifierType(WSConstants.SKI_KEY_IDENTIFIER_DIRECT);
-
-        // builder.setUserInfo("john", "keypass");
-        Document doc = unsignedEnvelope.getAsDocument();
-        Document signedDoc = builder.build(doc, crypto);
-        Document signedDoc1 = builder.build(signedDoc, crypto);
-        verify(signedDoc1);
-    }
-	*/
     
     /**
      * Verifies the soap envelope
