@@ -14,7 +14,6 @@
  *  limitations under the License.
  *
  */
-
 package wssec;
 
 import junit.framework.Test;
@@ -22,8 +21,8 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 import org.apache.axis.Message;
 import org.apache.axis.MessageContext;
-import org.apache.axis.client.AxisClient;
 import org.apache.axis.utils.XMLUtils;
+import org.apache.axis.client.AxisClient;
 import org.apache.axis.configuration.NullProvider;
 import org.apache.axis.message.SOAPEnvelope;
 import org.apache.commons.logging.Log;
@@ -36,6 +35,8 @@ import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.message.WSSignEnvelope;
 import org.w3c.dom.Document;
 
+import org.apache.xml.security.signature.XMLSignature;
+
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.PrintWriter;
@@ -46,13 +47,14 @@ import java.io.PrintWriter;
  * <p/>
  * 
  * @author Davanum Srinivas (dims@yahoo.com)
+ * @author Werner Dittmann (Werner.Dittmann@siemens.com)
  */
-public class TestWSSecurity extends TestCase {
-    private static Log log = LogFactory.getLog(TestWSSecurity.class);
+public class TestWSSecurity12 extends TestCase {
+    private static Log log = LogFactory.getLog(TestWSSecurity12.class);
     static final String NS = "http://www.w3.org/2000/09/xmldsig#";
     static final String soapMsg = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + "<SOAP-ENV:Envelope xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" + "<SOAP-ENV:Body>" + "<add xmlns=\"http://ws.apache.org/counter/counter_port_type\">" + "<value xmlns=\"\">15</value>" + "</add>" + "</SOAP-ENV:Body>\r\n       \r\n" + "</SOAP-ENV:Envelope>";
     static final WSSecurityEngine secEngine = new WSSecurityEngine();
-    static final Crypto crypto = CryptoFactory.getInstance();
+    static final Crypto crypto = CryptoFactory.getInstance("cryptoSKI.properties");
 
     MessageContext msgContext;
     SOAPEnvelope unsignedEnvelope;
@@ -63,7 +65,7 @@ public class TestWSSecurity extends TestCase {
      * 
      * @param name name of the test
      */
-    public TestWSSecurity(String name) {
+    public TestWSSecurity12(String name) {
         super(name);
     }
 
@@ -74,7 +76,7 @@ public class TestWSSecurity extends TestCase {
      * @return a junit test suite
      */
     public static Test suite() {
-        return new TestSuite(TestWSSecurity.class);
+        return new TestSuite(TestWSSecurity12.class);
     }
 
     /**
@@ -114,19 +116,22 @@ public class TestWSSecurity extends TestCase {
     }
 
     /**
-     * Test that signs and verifies a WS-Security envelope.
-     * The test uses the IssuerSerial key identifier type. 
+     * Test that signs and verifies a WS-Security envelope using SubjectKeyIdentifier.
+     * This test uses the SubjectKeyIdentifier to identify the certificate. It
+     * uses the Direct version, that is it embedds the certificate in the message.
      * <p/>
      * 
      * @throws java.lang.Exception Thrown when there is any problem in signing or verification
      */
-    public void testX509SignatureIS() throws Exception {
+    public void testX509SignatureDSA_SKIDirect() throws Exception {
         SOAPEnvelope envelope = null;
         WSSignEnvelope builder = new WSSignEnvelope();
-        builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
-        builder.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
+        builder.setUserInfo("wss4jcertDSA", "security");
+		builder.setKeyIdentifierType(WSConstants.SKI_KEY_IDENTIFIER_DIRECT);
+		builder.setSignatureAlgorithm(XMLSignature.ALGO_ID_SIGNATURE_DSA);
+		
         // builder.setUserInfo("john", "keypass");
-        log.info("Before Signing IS....");
+        log.info("Before SigningDSA_SKIDirect....");
         Document doc = unsignedEnvelope.getAsDocument();
         Document signedDoc = builder.build(doc, crypto);
 
@@ -138,66 +143,114 @@ public class TestWSSecurity extends TestCase {
          */
 
         Message signedMsg = (Message) AxisUtil.toSOAPMessage(signedDoc);
-        if (log.isDebugEnabled()) {
-        	log.debug("Signed message with IssuerSerial key identifier:");
+		if (log.isDebugEnabled()) {
+			log.debug("Signed message with SKI_DASDirect key identifier:");
 			XMLUtils.PrettyElementToWriter(signedMsg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
-        }
+		}
+
         signedDoc = signedMsg.getSOAPEnvelope().getAsDocument();
-        log.info("After Signing IS....");
+        log.info("After SigningDSA_SKIDirect....");
         verify(signedDoc);
     }
 
 	/**
-	 * Test that signs and verifies a WS-Security envelope.
-	 * The test uses the IssuerSerialDirect key identifier type. With
-	 * this key identifier the signing functions inserts the certificate
-	 * into the message.  
+	 * Test that signs and verifies a WS-Security envelope using SubjectKeyIdentifier.
+	 * This test uses the SubjectKeyIdentifier to identify the certificate. 
+	 * It gets a certificate with a DSA public key algo to sign, WSSignEnvelope shall
+	 * detect the algo and set the signature algo accordingly.
 	 * <p/>
-	 * TODO: use another certificate that is not stored in the keystore.
 	 * 
 	 * @throws java.lang.Exception Thrown when there is any problem in signing or verification
 	 */
-	public void testX509SignatureISDirect() throws Exception {
+	public void testX509SignatureDSA_Autodetect() throws Exception {
 		SOAPEnvelope envelope = null;
 		WSSignEnvelope builder = new WSSignEnvelope();
-		builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
-		builder.setKeyIdentifierType(WSConstants.ISSUER_SERIAL_DIRECT);
+		builder.setUserInfo("wss4jcertDSA", "security");
+		builder.setKeyIdentifierType(WSConstants.SKI_KEY_IDENTIFIER);
+		
 		// builder.setUserInfo("john", "keypass");
-		log.info("Before Signing ISDirect....");
+		log.info("Before SigningDSA_Autodetect....");
 		Document doc = unsignedEnvelope.getAsDocument();
 		Document signedDoc = builder.build(doc, crypto);
 
+		/*
+		 * convert the resulting document into a message first. The toSOAPMessage()
+		 * mehtod performs the necessary c14n call to properly set up the signed
+		 * document and convert it into a SOAP message. After that we extract it
+		 * as a document again for further processing.
+		 */
+
 		Message signedMsg = (Message) AxisUtil.toSOAPMessage(signedDoc);
 		if (log.isDebugEnabled()) {
-			log.debug("Signed message with IssuerSerialDirect key identifier:");
+			log.debug("Signed message with DSA_Autodetect:");
 			XMLUtils.PrettyElementToWriter(signedMsg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
 		}
+
 		signedDoc = signedMsg.getSOAPEnvelope().getAsDocument();
-		log.info("After Signing ISDirect....");
+		log.info("After SigningDSA_Autodetect....");
+		verify(signedDoc);
+	}
+
+	/**
+	 * Test that signs and verifies a WS-Security envelope using SubjectKeyIdentifier.
+	 * This test uses the SubjectKeyIdentifier to identify the certificate. 
+	 * It gets a certificate with a RSA public key algo to sign, WSSignEnvelope shall
+	 * detect the algo and set the signature algo accordingly.
+	 * <p/>
+	 * 
+	 * @throws java.lang.Exception Thrown when there is any problem in signing or verification
+	 */
+	public void testX509SignatureRSA_Autodetect() throws Exception {
+		SOAPEnvelope envelope = null;
+		WSSignEnvelope builder = new WSSignEnvelope();
+		builder.setUserInfo("wss4jcert", "security");
+		builder.setKeyIdentifierType(WSConstants.SKI_KEY_IDENTIFIER);
+		
+		// builder.setUserInfo("john", "keypass");
+		log.info("Before SigningRSA_Autodetect....");
+		Document doc = unsignedEnvelope.getAsDocument();
+		Document signedDoc = builder.build(doc, crypto);
+
+		/*
+		 * convert the resulting document into a message first. The toSOAPMessage()
+		 * mehtod performs the necessary c14n call to properly set up the signed
+		 * document and convert it into a SOAP message. After that we extract it
+		 * as a document again for further processing.
+		 */
+
+		Message signedMsg = (Message) AxisUtil.toSOAPMessage(signedDoc);
+		if (log.isDebugEnabled()) {
+			log.debug("Signed message with RSA Autodetect:");
+			XMLUtils.PrettyElementToWriter(signedMsg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
+		}
+
+		signedDoc = signedMsg.getSOAPEnvelope().getAsDocument();
+		log.info("After SigningRSA_Autodetect....");
 		verify(signedDoc);
 	}
 
     /**
-     * Test that signs (twice) and verifies a WS-Security envelope.
-     * The test uses the IssuerSerial key identifier type.
+     * Test that signs (twice) and verifies a WS-Security envelope
      * <p/>
      * 
      * @throws java.lang.Exception Thrown when there is any problem in signing or verification
-     */
-    public void testDoubleX509SignatureIS() throws Exception {
+     *
+    public void testDoubleX509SignatureSKIDirect() throws Exception {
         SOAPEnvelope envelope = null;
         WSSignEnvelope builder = new WSSignEnvelope();
-        builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+        builder.setUserInfo("wss4jcert", "security");
+		builder.setKeyIdentifierType(WSConstants.SKI_KEY_IDENTIFIER_DIRECT);
+
         // builder.setUserInfo("john", "keypass");
         Document doc = unsignedEnvelope.getAsDocument();
         Document signedDoc = builder.build(doc, crypto);
         Document signedDoc1 = builder.build(signedDoc, crypto);
         verify(signedDoc1);
     }
-
+	*/
+    
     /**
-     * Verifies the soap envelope.
-     * This method verfies all the signature generated. 
+     * Verifies the soap envelope
      * 
      * @param env soap envelope
      * @throws java.lang.Exception Thrown when there is a problem in verification
