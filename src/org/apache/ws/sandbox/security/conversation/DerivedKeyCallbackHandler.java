@@ -68,8 +68,10 @@ public class DerivedKeyCallbackHandler implements CallbackHandler {
      *                               The receiver should decrypt the message with that derived key. Therefore if the session is expired
      *                               that fact will  be only evident at this point where, the derived key is being added into the relevant session.
      */
-    public void addDerivedKey(String uuid, DerivedKeyInfo dkInfo)
+    public void addDerivedKey(String identifier, DerivedKeyInfo dkInfo)
             throws ConversationException {
+		String[] arr = ConversationUtil.getUuidAndDerivedKeyTokenId(identifier);
+		String uuid = arr[0];
         ConversationSession convSess =
                 (ConversationSession) this.conversationSessionTable.get(uuid);
         if (convSess != null) {
@@ -97,14 +99,14 @@ public class DerivedKeyCallbackHandler implements CallbackHandler {
             String keyId = pc.getIdentifer();
 
             // This will not be kept static
-            KeyDerivator kd = new KeyDerivator(true, 16);
-            try {
-                kd.generateKey(this.conversationSessionTable, keyId);
-            } catch (ConversationException ex1) {
-            } catch (WSSecurityException ex1) {
-            }
-
-            // KeyDerivator.generateKey(this.conversationSessionTable, keyId);
+//            KeyDerivator kd = new KeyDerivator(true, 16);
+//            try {
+//                kd.generateKey(this.conversationSessionTable, keyId);
+//            } catch (ConversationException ex1) {
+//            } catch (WSSecurityException ex1) {
+//            }
+//
+//            // KeyDerivator.generateKey(this.conversationSessionTable, keyId);
             pc.setPassword("security");
 
             /** Field key */

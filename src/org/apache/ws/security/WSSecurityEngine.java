@@ -93,6 +93,10 @@ public class WSSecurityEngine {
     private static Map tokenImpl = new Hashtable();
     private static boolean sigCheck = true;
     private static WSSecurityEngine engine = null;
+	/**
+	 * The symmetric key.
+	 */
+	private byte[] decryptedBytes = null;
     
     private boolean doDebug = false;
     /**
@@ -992,8 +996,7 @@ public class WSSecurityEngine {
                     "noPassword", new Object[]{alias});
         }
         
-		byte[] decryptedBytes = null;
-
+		
 		try {
 			cipher.init(
 				Cipher.DECRYPT_MODE,
@@ -1311,4 +1314,11 @@ public class WSSecurityEngine {
 				e);
 			}
 	}
+    /**
+     * @return
+     */
+    public byte[] getDecryptedBytes() {
+        return decryptedBytes;
+    }
+
 }

@@ -105,7 +105,7 @@ public class DerivedKeyToken {
                         "wsc:"
                 + ConversationConstants.DERIVED_KEY_TOKEN_LN);
         WSSecurityUtil.setNamespace(this.element, ConversationConstants.WSC_NS,
-                WSConstants.WSSE_PREFIX);
+		ConversationConstants.WSC_PREFIX);
     }
 
     /**

@@ -42,13 +42,13 @@ public class RequestedProofToken {
      * Field log
      */
     private static Log log =
-            LogFactory.getLog(RequestedProofToken.class.getName());
+        LogFactory.getLog(RequestedProofToken.class.getName());
 
     /**
      * Field TOKEN
      */
-    public static final QName TOKEN = new QName(WSConstants.WSSE_NS,
-            "RequestedProofToken");
+    public static final QName TOKEN =
+        new QName(WSConstants.WSSE_NS, "RequestedProofToken");
 
     /**
      * Field proofEle
@@ -113,7 +113,9 @@ public class RequestedProofToken {
      * @throws WSSecurityException 
      */
     public RequestedProofToken(Document doc) throws WSSecurityException {
-        this.proofEle = doc.createElementNS(WSConstants.WSSE_NS,
+        this.proofEle =
+            doc.createElementNS(
+                WSConstants.WSSE_NS,
                 "wsse:RequestedProofToken");
         System.out.println("RequestedProofToken....... created .....");
     }
@@ -128,9 +130,10 @@ public class RequestedProofToken {
         doDebug = log.isDebugEnabled();
         QName el = new QName(elem.getNamespaceURI(), elem.getLocalName());
         if (!el.equals(TOKEN)) {
-            throw new WSSecurityException(WSSecurityException.FAILURE,
-                    "badElement", new Object[]{TOKEN,
-                                               el});
+            throw new WSSecurityException(
+                WSSecurityException.FAILURE,
+                "badElement",
+                new Object[] { TOKEN, el });
         }
         this.proofEle = elem;
     }
@@ -143,15 +146,19 @@ public class RequestedProofToken {
      * @throws WSSecurityException 
      */
     public void doDecryption(String callback, Crypto crypto)
-            throws WSSecurityException {
+        throws WSSecurityException {
         WSSecurityEngine secEngine = new WSSecurityEngine();
         CallbackHandler cbHandler;
 
         // Element
-        NodeList ndList = this.proofEle.getElementsByTagNameNS("http://www.w3.org/2001/04/xmlenc#", "EncryptedKey");
+        NodeList ndList =
+            this.proofEle.getElementsByTagNameNS(
+                "http://www.w3.org/2001/04/xmlenc#",
+                "EncryptedKey");
         if (ndList.getLength() < 1) {
-            throw new WSSecurityException(WSSecurityException.SECURITY_TOKEN_UNAVAILABLE,
-                    "RequestedProofToken is empty");
+            throw new WSSecurityException(
+                WSSecurityException.SECURITY_TOKEN_UNAVAILABLE,
+                "RequestedProofToken is empty");
         }
 
         // CbHandler :: taken from WSSecurityEngine class
@@ -160,21 +167,25 @@ public class RequestedProofToken {
             try {
                 cbClass = java.lang.Class.forName(callback);
             } catch (ClassNotFoundException e) {
-                throw new WSSecurityException(WSSecurityException.FAILED_ENC_DEC,
-                        "RequestedProofToken: cannot load password callback class: "
+                throw new WSSecurityException(
+                    WSSecurityException.FAILED_ENC_DEC,
+                    "RequestedProofToken: cannot load password callback class: "
                         + callback);
             }
             try {
                 cbHandler = (CallbackHandler) cbClass.newInstance();
             } catch (java.lang.Exception e) {
-                throw new WSSecurityException(WSSecurityException.FAILED_ENC_DEC,
-                        "RequestedProofToken: cannot create instance of password callback: "
+                throw new WSSecurityException(
+                    WSSecurityException.FAILED_ENC_DEC,
+                    "RequestedProofToken: cannot create instance of password callback: "
                         + callback);
             }
-            secEngine.handleEncryptedKey((Element) ndList.item(0), cbHandler,
-                    crypto);
+            secEngine.handleEncryptedKey(
+                (Element) ndList.item(0),
+                cbHandler,
+                crypto);
 
-            // this.sharedSecret=secEngine.getDecryptedBytes();
+            this.sharedSecret = secEngine.getDecryptedBytes();
             System.out.println(new String(this.sharedSecret));
         } else {
             System.out.println("Do somehting....... Decryption problem");
@@ -186,28 +197,27 @@ public class RequestedProofToken {
      * 
      * @param doc 
      */
-    public void doEncryptProof(Document doc) {
-        // throws WSSecurityException {
+    public void doEncryptProof(Document doc) throws WSSecurityException {
         WSEncryptBody wsEncrypt = new WSEncryptBody();
 
-        // try {
-        Crypto crypto;
-        crypto = CryptoFactory.getInstance("crypto.properties");
-        wsEncrypt.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
-        wsEncrypt.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e");
+        try {
+            Crypto crypto;
+            crypto = CryptoFactory.getInstance("crypto.properties");
+            wsEncrypt.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
+            wsEncrypt.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e");
 
-        // wsEncrypt.setParentNode(
-        // (Element) (doc
-        // .getElementsByTagNameNS(
-        // WSConstants.WSSE_NS,
-        // "RequestedProofToken")
-        // .item(0)));
-        // wsEncrypt.build(doc, crypto);
-        // // this.sharedSecret=wsEncrypt.getSymmetricKey().getEncoded();
-        // System.out.println(new String(sharedSecret));
-        // } catch (WSSecurityException e) {
-        // e.printStackTrace();
-        // }
+            wsEncrypt.setParentNode(
+                (Element) (doc
+                    .getElementsByTagNameNS(
+                        WSConstants.WSSE_NS,
+                        "RequestedProofToken")
+                    .item(0)));
+            wsEncrypt.build(doc, crypto);
+            this.sharedSecret = wsEncrypt.getSymmetricKey().getEncoded();
+
+        } catch (WSSecurityException e) {
+            e.printStackTrace();
+        }
     }
 
     /**

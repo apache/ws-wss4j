@@ -119,10 +119,9 @@ public class ConversationUtil {
      */
     public static String genericID() {
         try {
-            SecureRandom random = SecureRandom.getInstance("SHA1PRNG");
-            byte[] genIDValue = new byte[6];
-            random.nextBytes(genIDValue);
-            return new String(genIDValue);
+          	SecureRandom random = SecureRandom.getInstance("SHA1PRNG");
+		 	int i = random.nextInt(2367);
+		 	return String.valueOf(i);
         } catch (NoSuchAlgorithmException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
