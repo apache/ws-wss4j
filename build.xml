@@ -405,7 +405,7 @@ org.apache.ws.axis.security.util
         </java>
     </target>
 
-    <target name="interopTests" depends="init" if="jdk15.present">
+    <target name="interopTests" depends="init">
         <echo message="Running system tests - BEGIN..."/>
 
         <path id="deploy.xml.files">
