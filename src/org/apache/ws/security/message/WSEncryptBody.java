@@ -707,8 +707,8 @@ public class WSEncryptBody extends WSBaseMessage {
     }
 
     /**
-     * Get the symmetric key used for subscription. This may be the same as
-     * the symmetric key.
+     * Get the symmetric key used for encryption. This may be the same as
+     * the symmetric key field.
      *
      * @return The symmetric key
      */
