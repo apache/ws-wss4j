@@ -55,8 +55,8 @@ public class TestScenario6 extends TestCase {
      * 
      * @param args command line args
      */
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
+    public static void main(String[] args) throws Exception {
+        Scenario6.main(args);
     }
 
     public void testScenario6() throws Exception {

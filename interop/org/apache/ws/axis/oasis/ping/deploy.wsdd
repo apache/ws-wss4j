@@ -53,24 +53,25 @@
 
   <requestFlow>
    <handler type="java:org.apache.ws.axis.security.WSDoAllReceiver">
-    <parameter name="passwordCallbackClass" value="org.apache.ws.axis.oasis.PWCallback"/>
+    <parameter name="passwordCallbackClass" value="org.apache.ws.axis.oasis.PWCallback1"/>
     <parameter name="action" value="Signature Encrypt"/>
-    <parameter name="signaturePropFile" value="crypto.properties" />
+    <parameter name="signaturePropFile" value="wsstest2.properties" />
    </handler>
   </requestFlow>
   <responseFlow>
    <handler type="java:org.apache.ws.axis.security.WSDoAllSender" >
     <parameter name="action" value="Signature Encrypt"/>
-    <parameter name="user" value="16c73ab6-b892-458f-abf5-2f875f74882e"/>
+    <parameter name="user" value="86ab6c4828bcde6983d81b2b59ff426c_a8272f6f-2c94-436e-aa71-d8d2be4647f6"/>
     <parameter name="passwordCallbackClass" 
-      value="org.apache.ws.axis.oasis.PWCallback"/>
+      value="org.apache.ws.axis.oasis.PWCallback1"/>
     <parameter name="signatureKeyIdentifier" value="DirectReference" />
-    <parameter name="signaturePropFile" value="crypto.properties" />
-    <parameter name="encryptionKeyIdentifier" value="X509KeyIdentifier" />
-    <parameter name="encryptionUser" value="16c73ab6-b892-458f-abf5-2f875f74882e" />
+    <parameter name="signaturePropFile" value="wsstest2.properties" />
+    <parameter name="encryptionKeyIdentifier" value="SKIKeyIdentifier" />
+    <parameter name="encryptionUser" value="86ab6c4828bcde6983d81b2b59ff426c_a8272f6f-2c94-436e-aa71-d8d2be4647f6" />
    </handler>
   </responseFlow>
   </service>
+    
   <service name="Ping4" provider="java:RPC" style="wrapped" use="literal">
       <parameter name="wsdlTargetNamespace" value="http://xmlsoap.org/Ping"/>
       <parameter name="wsdlServiceElement" value="PingService"/>

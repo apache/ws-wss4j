@@ -94,7 +94,7 @@ public class Merlin implements Crypto {
      */
     private static synchronized CertificateFactory getCertificateFactory() throws GeneralSecurityException {
         if (certFact == null) {
-            certFact = CertificateFactory.getInstance("X.509");
+            certFact = CertificateFactory.getInstance("X.509","BC");
         }
         return certFact;
     }
