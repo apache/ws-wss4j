@@ -279,7 +279,6 @@ public class WSS4JHandler implements Handler {
          * may be used for encryption too.
          */
         if ((doAction & WSConstants.SIGN) == WSConstants.SIGN) {
-            sigCrypto = loadSignatureCrypto();
             decodeSignatureParameter();
         }
         /*
@@ -962,6 +961,36 @@ handle response
          * here, but we call the load crypto hook rather than just changing the visibility
          * of this method to maintain parity with WSS4JHandler.
          */
+
+        String tmpS = null;
+        if ((tmpS = (String) handlerInfo.getHandlerConfig().get(WSHandlerConstants.SIG_KEY_ID)) == null) {
+            tmpS = (String) msgContext.getProperty(WSHandlerConstants.SIG_KEY_ID);
+        }
+        if (tmpS != null) {
+            Integer I = (Integer) WSHandlerConstants.keyIdentifier.get(tmpS);
+            if (I == null) {
+                throw new JAXRPCException("WSS4JHandler: Signature: unknown key identification");
+            }
+            sigKeyId = I.intValue();
+            if (!(sigKeyId == WSConstants.ISSUER_SERIAL
+                    || sigKeyId == WSConstants.BST_DIRECT_REFERENCE
+                    || sigKeyId == WSConstants.X509_KEY_IDENTIFIER
+                    || sigKeyId == WSConstants.SKI_KEY_IDENTIFIER)) {
+                throw new JAXRPCException("WSS4JHandler: Signature: illegal key identification");
+            }
+        }
+        if ((sigAlgorithm = (String) handlerInfo.getHandlerConfig().get(WSHandlerConstants.SIG_ALGO))
+                == null) {
+            tmpS = (String) msgContext.getProperty(WSHandlerConstants.SIG_ALGO);
+        }
+        if ((tmpS = (String) handlerInfo.getHandlerConfig().get(WSHandlerConstants.SIGNATURE_PARTS))
+                == null) {
+            tmpS =
+                    (String) msgContext.getProperty(WSHandlerConstants.SIGNATURE_PARTS);
+        }
+        if (tmpS != null) {
+            splitEncParts(tmpS, signatureParts);
+        }
     }
 
     /*
