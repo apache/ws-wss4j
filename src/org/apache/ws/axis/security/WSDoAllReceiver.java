@@ -38,6 +38,7 @@ import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.util.WSSecurityUtil;
+import org.apache.ws.security.message.token.Timestamp;
 import org.apache.xml.security.utils.XMLUtils;
 import org.w3c.dom.Document;
 
@@ -47,8 +48,11 @@ import javax.xml.soap.SOAPHeaderElement;
 import java.io.ByteArrayOutputStream;
 import java.math.BigInteger;
 import java.security.cert.X509Certificate;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.TimeZone;
 import java.util.Vector;
 
 public class WSDoAllReceiver extends BasicHandler {
@@ -66,6 +70,9 @@ public class WSDoAllReceiver extends BasicHandler {
 
 	Crypto decCrypto = null;
 	String decPropFile = null;
+
+	/* TODO: Make timeToLive (receiver) configurable in the config file */
+	protected int timeToLive = 60; // Timestamp: time in seconds the receiver accepts between creation and reception
 
 	/**
 	 * Axis calls invoke to handle a message.
@@ -236,6 +243,28 @@ public class WSDoAllReceiver extends BasicHandler {
 			if (returnCert != null) {
 				if (!verifyTrust(returnCert)) {
 					throw new AxisFault("WSDoAllReceiver: The certificate used for the signature is not trusted");
+				}
+			}
+		}
+
+		/*
+		 * Perform further checks on the timestamp that was transmitted in the header.
+		 * In the following implementation the timestamp is valid if it was
+		 * created after (now-ttl), where ttl is set on server side, not by the client. 
+		 * 
+		 * Note: the method verifyTimestamp(Timestamp) allows custom
+		 * implementations with other validation algorithms for subclasses.
+		 */
+		 
+		// Extract the timestamp action result from the action vector
+		actionResult = WSSecurityUtil.fetchActionResult(wsResult, WSConstants.TS);
+		
+		if (actionResult != null) {
+			Timestamp timestamp = actionResult.getTimestamp();
+
+			if (timestamp != null) {
+				if (!verifyTimestamp(timestamp, timeToLive)) {
+					throw new AxisFault("WSDoAllReceiver: The timestamp could not be validated");
 				}
 			}
 		}
@@ -543,5 +572,52 @@ public class WSDoAllReceiver extends BasicHandler {
 		
 		log.debug("WSDoAllReceiver: Certificate path could not be verified for certificate with subject " + subjectString);		
 		return false;
+	}
+
+	/**
+	 * Evaluate whether a timestamp is considered valid on receiverside.
+	 * Hook to allow subclasses to implement custom validation methods however they see fit.
+	 * <p/>
+	 * Policy used in this implementation:
+	 * 1. The receiver can set its own time to live (besides from that set on sender side) 
+	 * 2. If the message was created before (now-ttl) the message is rejected
+	 * 
+	 * @param timestamp  the timestamp that is validated
+	 * @param timeToLive the limit on receiverside, the timestamp is validated against
+	 * @return 			 true if the timestamp is before (now-timeToLive), false otherwise
+	 * @throws AxisFault
+	 */
+	protected boolean verifyTimestamp(Timestamp timestamp, int timeToLive) throws AxisFault {
+
+		// Calculate the time that is allowed for the message to travel 
+		Calendar validCreation = Calendar.getInstance();
+		long currentTime = validCreation.getTimeInMillis();
+		currentTime -= timeToLive * 1000;
+		validCreation.setTimeInMillis(currentTime);		
+
+		if (doDebug) {
+			log.debug("Preparing to verify the timestamp");
+			SimpleDateFormat zulu = new SimpleDateFormat(
+					"yyyy-MM-dd'T'HH:mm:ss'Z'");
+			zulu.setTimeZone(TimeZone.getTimeZone("GMT"));
+			log.debug("Validation of Timestamp: Current time is "
+					+ zulu.format(Calendar.getInstance().getTime()));
+			log.debug("Validation of Timestamp: Valid creation is "
+					+ zulu.format(validCreation.getTime()));
+			log.debug("Validation of Timestamp: Timestamp created is "
+					+ zulu.format(timestamp.getCreated().getTime()));
+		}
+		// Validate the time it took the message to travel
+		//        if (timestamp.getCreated().before(validCreation) ||
+		// !timestamp.getCreated().equals(validCreation)) {
+		if (!timestamp.getCreated().after(validCreation)) {
+			if (doDebug) {
+				log.debug("Validation of Timestamp: The message was created too long ago");
+			}
+			return false;
+		}
+		
+		log.debug("Validation of Timestamp: Everything is ok");
+		return true;
 	}
 }

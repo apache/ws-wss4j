@@ -130,7 +130,7 @@ public class TestWSSecurity11 extends TestCase {
         WSSignEnvelope builder = new WSSignEnvelope();
         builder.setUserInfo("wss4jcert", "security");
         // builder.setUserInfo("john", "keypass");
-		SOAPConstants soapConstants = WSSecurityUtil.getSOAPConstants(unsignedEnvelope);
+		SOAPConstants soapConstants = WSSecurityUtil.getSOAPConstants(unsignedEnvelope.getAsDOM());
 		Vector parts = new Vector();
 		
 		/*
@@ -242,7 +242,7 @@ public class TestWSSecurity11 extends TestCase {
 		WSSignEnvelope builder = new WSSignEnvelope();
 		builder.setUserInfo("wss4jcert", "security");
 		// builder.setUserInfo("john", "keypass");
-		SOAPConstants soapConstants = WSSecurityUtil.getSOAPConstants(unsignedEnvelope);
+		SOAPConstants soapConstants = WSSecurityUtil.getSOAPConstants(unsignedEnvelope.getAsDOM());
 		Vector parts = new Vector();
 		
 		/*
@@ -295,7 +295,7 @@ public class TestWSSecurity11 extends TestCase {
 		WSSignEnvelope builder = new WSSignEnvelope();
 		builder.setUserInfo("wss4jcert", "security");
 		// builder.setUserInfo("john", "keypass");
-		SOAPConstants soapConstants = WSSecurityUtil.getSOAPConstants(unsignedEnvelope);
+		SOAPConstants soapConstants = WSSecurityUtil.getSOAPConstants(unsignedEnvelope.getAsDOM());
 		Vector parts = new Vector();
 		
 		/*

@@ -25,9 +25,6 @@ import org.apache.ws.security.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.TimeZone;
 import java.util.Vector;
 
 /**
@@ -215,7 +212,7 @@ public class WSBaseMessage {
 	 * @param doc 	A SOAP envelope as <code>Document</code>
 	 * @return		A <code>wsse:Security</code> element
 	 */
-	protected Element insertSecurityHeader(Document doc, boolean timestamp) {
+	protected Element insertSecurityHeader(Document doc) {
 		SOAPConstants soapConstants =
 			WSSecurityUtil.getSOAPConstants(doc.getDocumentElement());
 		// lookup a security header block that matches actor
@@ -246,53 +243,6 @@ public class WSBaseMessage {
 					soapConstants.getEnvelopeURI(),
 					soapPrefix + ":" + WSConstants.ATTR_MUST_UNDERSTAND,
 					soapConstants.getMustunderstand());
-			}
-			if (timestamp) {
-				Element elementTime =
-					doc.createElementNS(
-						WSConstants.WSU_NS,
-						WSConstants.WSU_PREFIX
-							+ ":"
-							+ WSConstants.TIMESTAMP_TOKEN_LN);
-				WSSecurityUtil.setNamespace(
-					elementTime,
-					WSConstants.WSU_NS,
-					WSConstants.WSU_PREFIX);
-
-				SimpleDateFormat zulu =
-					new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-				zulu.setTimeZone(TimeZone.getTimeZone("GMT"));
-				Calendar rightNow = Calendar.getInstance();
-
-				Element elementCreated =
-					doc.createElementNS(
-						WSConstants.WSU_NS,
-						WSConstants.WSU_PREFIX + ":" + WSConstants.CREATED_LN);
-				WSSecurityUtil.setNamespace(
-					elementCreated,
-					WSConstants.WSU_NS,
-					WSConstants.WSU_PREFIX);
-				elementCreated.appendChild(
-					doc.createTextNode(zulu.format(rightNow.getTime())));
-
-				long currentTime = rightNow.getTimeInMillis();
-				currentTime += timeToLive * 1000;
-				rightNow.setTimeInMillis(currentTime);
-
-				Element elementExpires =
-					doc.createElementNS(
-						WSConstants.WSU_NS,
-						WSConstants.WSU_PREFIX + ":" + WSConstants.EXPIRES_LN);
-				WSSecurityUtil.setNamespace(
-					elementExpires,
-					WSConstants.WSU_NS,
-					WSConstants.WSU_PREFIX);
-				elementExpires.appendChild(
-					doc.createTextNode(zulu.format(rightNow.getTime())));
-
-				elementTime.appendChild(elementCreated);
-				elementTime.appendChild(elementExpires);
-				securityHeader.appendChild(elementTime);
 			}
 		}
 		return securityHeader;

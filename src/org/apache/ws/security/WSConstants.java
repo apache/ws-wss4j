@@ -301,7 +301,8 @@ public class WSConstants {
 	 */
     public static final int ST_UNSIGNED = 0x8; // perform SAMLToken unsigned
     public static final int ST_SIGNED = 0x10; // perform SAMLToken signed
-    
+
+	public static final int TS = 0x20; // insert Timestamp
 
 	public static final int NO_SERIALIZE = 0x100;
 	public static final int SERIALIZE = 0x200;

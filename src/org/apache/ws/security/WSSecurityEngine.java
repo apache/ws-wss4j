@@ -21,6 +21,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.message.EnvelopeIdResolver;
+import org.apache.ws.security.message.token.Timestamp;
 import org.apache.ws.security.message.token.BinarySecurity;
 import org.apache.ws.security.message.token.PKIPathSecurity;
 import org.apache.ws.security.message.token.SecurityTokenReference;
@@ -68,8 +69,11 @@ import java.security.Principal;
 import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Hashtable;
 import java.util.Map;
+import java.util.TimeZone;
 import java.util.Vector;
 import java.util.Iterator;
 
@@ -380,6 +384,13 @@ public class WSSecurityEngine {
 				/*
 				 * Decode Timestamp, add the found time (created/expiry) to result
 				 */
+				Timestamp timestamp = new Timestamp((Element) elem);
+				handleTimestamp(timestamp);
+				returnResults.add(
+					0,
+					new WSSecurityEngineResult(
+							WSConstants.TS,
+							timestamp));
             } else {
             	/*
             	 * Add check for a BinarySecurityToken, add info to WSDocInfo. If BST is
@@ -781,6 +792,27 @@ public class WSSecurityEngine {
         }
         return assertion;
     }
+
+	public void handleTimestamp(Timestamp timestamp) throws WSSecurityException {
+		if (doDebug) {
+			log.debug("Preparing to verify the timestamp");
+
+			SimpleDateFormat zulu = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+			zulu.setTimeZone(TimeZone.getTimeZone("GMT"));
+			
+			log.debug("Current time: " + zulu.format(Calendar.getInstance().getTime()));
+			log.debug("Timestamp created: " + zulu.format(timestamp.getCreated().getTime()));
+			log.debug("Timestamp expires: " + zulu.format(timestamp.getExpires().getTime()));
+		}
+		
+		// Validate whether the security semantics have expired
+		Calendar rightNow = Calendar.getInstance();
+		if (timestamp.getExpires().before(rightNow)) {
+			throw new WSSecurityException(WSSecurityException.INVALID_SECURITY, "invalidTimestamp", new Object[] {"The security semantics of message have expired"});
+		}
+
+		return;
+	}
     
     public void handleEncryptedKey(Element xencEncryptedKey, CallbackHandler cb, Crypto crypto) throws WSSecurityException {
 		long t0=0, t1=0, t2=0;

@@ -85,6 +85,11 @@ public class WSDoAllConstants {
 	public static final String ENCRYPT = "Encrypt";
 
 	/**
+	 * Add a timestamp to the security header. 
+	 */
+	public static final String TIMESTAMP = "Timestamp";
+
+	/**
 	 * Supress the serialization of the SOAP message.
 	 * <p/>
 	 * Usually the handler serializes the processed SOAP message into a string

@@ -36,6 +36,7 @@ import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
+import org.apache.ws.security.message.WSAddTimestamp;
 import org.apache.ws.security.message.WSEncryptBody;
 import org.apache.ws.security.message.WSSAddUsernameToken;
 import org.apache.ws.security.message.WSSignEnvelope;
@@ -106,6 +107,9 @@ public class WSDoAllSender extends BasicHandler {
 	Vector encryptParts = new Vector();
 
 	X509Certificate encCert = null;
+
+	/* TODO: Make timeToLive (sender) configurable in the config file */
+	protected int timeToLive = 300; // Timestamp: time in seconds the receiver accepts between creation and reception
 
 	/**
 	 * Initialize data fields from previous use in case of cached object. Axis
@@ -288,6 +292,10 @@ public class WSDoAllSender extends BasicHandler {
 
 				case WSConstants.ST_UNSIGNED :
 					performSTAction(actionToDo, mu, doc);
+					break;
+
+				case WSConstants.TS :
+					performTSAction(actionToDo, mu, doc);
 					break;
 
 				case WSConstants.NO_SERIALIZE :
@@ -523,6 +531,13 @@ public class WSDoAllSender extends BasicHandler {
 				"WSDoAllSender: Signed SAML: error during message processing"
 					+ e);
 		}
+	}
+
+	private void performTSAction(int actionToDo, boolean mu, Document doc) throws AxisFault {
+		WSAddTimestamp timeStampBuilder =
+			new WSAddTimestamp(actor, mu);
+		// add the Timestamp to the SOAP Enevelope
+		timeStampBuilder.build(doc, timeToLive);
 	}
 
 	/**

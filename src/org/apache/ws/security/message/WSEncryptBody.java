@@ -418,7 +418,7 @@ public class WSEncryptBody extends WSBaseMessage {
 		 * 6) The last step sets up the reference list that pints to the encrypted
 		 *    data that was encrypted with this encrypted session key :-)
 		 */
-		Element wsseSecurity = insertSecurityHeader(doc, true);
+		Element wsseSecurity = insertSecurityHeader(doc);
 		Element xencEncryptedKey = createEnrcyptedKey(doc, keyEncAlgo);
 		WSSecurityUtil.prependChildElement(
 			doc,
@@ -601,7 +601,7 @@ public class WSEncryptBody extends WSBaseMessage {
 		 * 2) The last step sets up the reference list that pints to the encrypted
 		 *    data that was encrypted with this encrypted session key :-)
 		 */
-		Element wsseSecurity = insertSecurityHeader(doc, true);
+		Element wsseSecurity = insertSecurityHeader(doc);
 
 		tmpE = doc.createElement("temp");
 		Element refList = createDataRefList(doc, tmpE, encDataRefs);

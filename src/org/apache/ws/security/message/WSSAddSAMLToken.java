@@ -83,7 +83,7 @@ public class WSSAddSAMLToken extends WSBaseMessage {
 		log.debug("Begin add SAMLAssertion token...");
 		try {
 			Element element = (Element) assertion.toDOM(doc);
-			Element securityHeader = insertSecurityHeader(doc, false);
+			Element securityHeader = insertSecurityHeader(doc);
 			WSSecurityUtil.prependChildElement(
 				doc,
 				securityHeader,

@@ -21,6 +21,7 @@ import org.opensaml.SAMLAssertion;
 import java.security.Principal;
 import java.security.cert.X509Certificate;
 
+import org.apache.ws.security.message.token.Timestamp;
 
 /**
  * @author Werner Dittmann (Werner.Dittmann@siemens.com)
@@ -31,6 +32,7 @@ public class WSSecurityEngineResult {
 	private Principal principal;
 	private X509Certificate cert;
 	private SAMLAssertion assertion;
+	private Timestamp timestamp;
 
     WSSecurityEngineResult(int act, SAMLAssertion ass) {
 		principal = null;
@@ -44,6 +46,14 @@ public class WSSecurityEngineResult {
 		action = act;
 		cert = certificate;
 	}
+
+	WSSecurityEngineResult(
+		int act,
+		Timestamp tstamp) {
+		action = act;
+		timestamp = tstamp;
+	}
+
 	/**
 	 * @return the actions vector. These actions were performed by the the
 	 *         security engine.
@@ -73,4 +83,11 @@ public class WSSecurityEngineResult {
 	public SAMLAssertion getAssertion() {
 		return assertion;
 	}
+
+	/**
+	 * @return the timestamp found
+	 */
+	public Timestamp getTimestamp() {
+		return timestamp;
+	}	
 }

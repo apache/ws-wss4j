@@ -107,7 +107,7 @@ public class WSSAddUsernameToken extends WSBaseMessage {
      */
     public Document build(Document doc, String username, String password) { // throws Exception {
         log.debug("Begin add username token...");
-		Element securityHeader = insertSecurityHeader(doc, false);
+		Element securityHeader = insertSecurityHeader(doc);
         ut = new UsernameToken(doc, passwordType);
         ut.setName(username);
         ut.setPassword(password);

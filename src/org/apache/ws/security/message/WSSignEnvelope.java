@@ -220,7 +220,7 @@ public class WSSignEnvelope extends WSBaseMessage {
 		Element envelope = doc.getDocumentElement();
 		SOAPConstants soapConstants = WSSecurityUtil.getSOAPConstants(envelope);
 
-		Element securityHeader = insertSecurityHeader(doc, true);
+		Element securityHeader = insertSecurityHeader(doc);
 
 		// Set the id of the elements to be used as digest source
 		// String id = setBodyID(doc);
@@ -526,7 +526,7 @@ public class WSSignEnvelope extends WSBaseMessage {
 		Element envelope = doc.getDocumentElement();
 		SOAPConstants soapConstants = WSSecurityUtil.getSOAPConstants(envelope);
 
-		Element securityHeader = insertSecurityHeader(doc, true);
+		Element securityHeader = insertSecurityHeader(doc);
 		X509Certificate[] certs = null;
 
 		if (senderVouches) {
