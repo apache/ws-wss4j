@@ -20,6 +20,7 @@ package org.apache.ws.axis.oasis;
 import org.apache.axis.utils.Options;
 import org.apache.ws.axis.oasis.ping.PingPort;
 import org.apache.ws.axis.oasis.ping.PingServiceLocator;
+import org.apache.ws.axis.oasis.ping.TicketType;
 
 import javax.xml.rpc.holders.StringHolder;
 
@@ -82,15 +83,18 @@ public class Scenario5 {
 
         // perform call
         StringHolder text =
-                new StringHolder("WSS4J - Scenario 5 text");
-        port.ping(null, text);
+                new StringHolder("WSS4J - Scenario 5 - text");
+        TicketType type = 
+                new TicketType("WSS4J - Scenario 5 - TicketType");
+        
+        port.ping(type, text);
         System.out.println(text.value);
 
         if (opts.isFlagSet('t') > 0) {
             long startTime = System.currentTimeMillis();
 
             for (int i = 0; i < 20; i++) {
-                port.ping(null, text);
+                port.ping(type, text);
             }
 
             long endTime = System.currentTimeMillis();
