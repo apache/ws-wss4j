@@ -18,7 +18,7 @@
   <!--
    Directory of the generated Java files
   -->
-  <property name="sec" value="org/apache/ws/axis/samples/doall/axisSec" />
+  <property name="sec" value="org/apache/ws/axis/samples/wssec/doall/axisSec" />
 
     <path id="classpath.libraries" description=" 3rd party and Axis libs">
       <fileset dir="${dir.libs}">
