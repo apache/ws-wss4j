@@ -1,6 +1,22 @@
 <deployment xmlns="http://xml.apache.org/axis/wsdd/"
             xmlns:java="http://xml.apache.org/axis/wsdd/providers/java">
 
+ <!--
+ Usage of cert/key identifiers (parameter: user / encryptionUser):
+ For the interop tests we have two different certificate/key pairs:
+ Server certificate: 
+ 	contained in WSSTest2.pfx
+ 	identified with: 86ab6c4828bcde6983d81b2b59ff426c_a8272f6f-2c94-436e-aa71-d8d2be4647f6
+ Client certificate:
+    contained in WSStest1.pfx
+    identified with: 7706c71b0628d6ecc85ea1e8ad62be60_a8272f6f-2c94-436e-aa71-d8d2be4647f6
+ 
+ The Server uses it's certificate/private key to sign its request, the client
+ uses the server's certificate/pub key to encrypt requests
+
+ The client uses it's certificate/private key to sign its request, the server 
+ uses the client's certificate/pub key to encrypt responses-
+ -->
  <!-- define the service, using the WSDoAllSender security handler in request flow -->
  <service name="Ping1">
   <requestFlow>
@@ -25,6 +41,7 @@
     <parameter name="addUTElements" value="Nonce Created" />
     <parameter name="encryptionPropFile" value="wsstest.properties" />
     <parameter name="encryptionKeyIdentifier" value="SKIKeyIdentifier" />
+    <!-- Use the Server's cert/key to encrypt the request -->
     <parameter name="encryptionUser" value="86ab6c4828bcde6983d81b2b59ff426c_a8272f6f-2c94-436e-aa71-d8d2be4647f6" />
     <parameter name="encryptionParts" 
       value="{Element}{http://www.docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd}UsernameToken" />  
@@ -36,7 +53,8 @@
   <requestFlow>
    <handler type="java:org.apache.ws.axis.security.WSDoAllSender" >
     <parameter name="action" value="Signature Encrypt"/>
-    <parameter name="user" value="86ab6c4828bcde6983d81b2b59ff426c_a8272f6f-2c94-436e-aa71-d8d2be4647f6"/>
+    <!-- Use the Client's cert/key to sign the request -->
+    <parameter name="user" value="7706c71b0628d6ecc85ea1e8ad62be60_a8272f6f-2c94-436e-aa71-d8d2be4647f6"/>
     <parameter name="passwordCallbackClass" 
       value="org.apache.ws.axis.oasis.PWCallback1"/>
     <parameter name="signatureKeyIdentifier" value="DirectReference" />
@@ -59,7 +77,8 @@
   <requestFlow>
    <handler type="java:org.apache.ws.axis.security.WSDoAllSender" >
     <parameter name="action" value="Signature Encrypt"/>
-    <parameter name="user" value="86ab6c4828bcde6983d81b2b59ff426c_a8272f6f-2c94-436e-aa71-d8d2be4647f6"/>
+    <!-- Use the Client's cert/key to sign the request -->
+    <parameter name="user" value="7706c71b0628d6ecc85ea1e8ad62be60_a8272f6f-2c94-436e-aa71-d8d2be4647f6"/>
     <parameter name="passwordCallbackClass" 
       value="org.apache.ws.axis.oasis.PWCallback1"/>
     <parameter name="signatureKeyIdentifier" value="DirectReference" />
@@ -85,7 +104,8 @@
   <requestFlow>
    <handler type="java:org.apache.ws.axis.security.WSDoAllSender" >
     <parameter name="action" value="Signature NoSerialization"/>
-    <parameter name="user" value="86ab6c4828bcde6983d81b2b59ff426c_a8272f6f-2c94-436e-aa71-d8d2be4647f6"/>
+    <!-- Use the Client's cert/key to sign the request -->
+    <parameter name="user" value="7706c71b0628d6ecc85ea1e8ad62be60_a8272f6f-2c94-436e-aa71-d8d2be4647f6"/>
     <parameter name="passwordCallbackClass" 
       value="org.apache.ws.axis.oasis.PWCallback1"/>
     <parameter name="signatureKeyIdentifier" value="DirectReference" />
@@ -94,7 +114,8 @@
    </handler>
    <handler type="java:org.apache.ws.axis.security.WSDoAllSender" >
     <parameter name="action" value="Signature"/>
-    <parameter name="user" value="86ab6c4828bcde6983d81b2b59ff426c_a8272f6f-2c94-436e-aa71-d8d2be4647f6"/>
+    <!-- Use the Client's cert/key to sign the request -->
+    <parameter name="user" value="7706c71b0628d6ecc85ea1e8ad62be60_a8272f6f-2c94-436e-aa71-d8d2be4647f6"/>
     <parameter name="passwordCallbackClass" 
       value="org.apache.ws.axis.oasis.PWCallback1"/>
     <parameter name="signatureKeyIdentifier" value="SKIKeyIdentifier" />
@@ -107,12 +128,14 @@
   <requestFlow>
    <handler type="java:org.apache.ws.axis.security.WSDoAllSender" >
     <parameter name="action" value="Encrypt Signature"/>
-    <parameter name="user" value="86ab6c4828bcde6983d81b2b59ff426c_a8272f6f-2c94-436e-aa71-d8d2be4647f6"/>
+    <!-- Use the Client's cert/key to sign the request -->
+    <parameter name="user" value="7706c71b0628d6ecc85ea1e8ad62be60_a8272f6f-2c94-436e-aa71-d8d2be4647f6"/>
     <parameter name="passwordCallbackClass" 
       value="org.apache.ws.axis.oasis.PWCallback1"/>
     <parameter name="signatureKeyIdentifier" value="DirectReference" />
     <parameter name="signaturePropFile" value="wsstest.properties" />
     <parameter name="encryptionKeyIdentifier" value="SKIKeyIdentifier" />
+    <!-- Use the Server's cert/key to encrypt the request -->
     <parameter name="encryptionUser" value="86ab6c4828bcde6983d81b2b59ff426c_a8272f6f-2c94-436e-aa71-d8d2be4647f6" />
    </handler>
   </requestFlow>
