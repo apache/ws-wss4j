@@ -23,12 +23,14 @@ import junit.framework.TestSuite;
 import org.apache.axis.Message;
 import org.apache.axis.MessageContext;
 import org.apache.axis.client.AxisClient;
+import org.apache.axis.utils.XMLUtils;
 import org.apache.axis.configuration.NullProvider;
 import org.apache.axis.message.SOAPEnvelope;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.axis.security.util.AxisUtil;
 import org.apache.ws.security.WSSecurityEngine;
+import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.message.WSSignEnvelope;
@@ -36,6 +38,8 @@ import org.w3c.dom.Document;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.io.PrintWriter;
+
 
 /**
  * WS-Security Test Case
@@ -110,17 +114,19 @@ public class TestWSSecurity extends TestCase {
     }
 
     /**
-     * Test that signs and verifies a WS-Security envelope
+     * Test that signs and verifies a WS-Security envelope.
+     * The test uses the IssuerSerial key identifier type. 
      * <p/>
      * 
      * @throws java.lang.Exception Thrown when there is any problem in signing or verification
      */
-    public void testX509Signature() throws Exception {
+    public void testX509SignatureIS() throws Exception {
         SOAPEnvelope envelope = null;
         WSSignEnvelope builder = new WSSignEnvelope();
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+        builder.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
         // builder.setUserInfo("john", "keypass");
-        log.info("Before Signing....");
+        log.info("Before Signing IS....");
         Document doc = unsignedEnvelope.getAsDocument();
         Document signedDoc = builder.build(doc, crypto);
 
@@ -132,18 +138,52 @@ public class TestWSSecurity extends TestCase {
          */
 
         Message signedMsg = (Message) AxisUtil.toSOAPMessage(signedDoc);
+        if (log.isDebugEnabled()) {
+        	log.debug("Signed message with IssuerSerial key identifier:");
+			XMLUtils.PrettyElementToWriter(signedMsg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
+        }
         signedDoc = signedMsg.getSOAPEnvelope().getAsDocument();
-        log.info("After Signing....");
+        log.info("After Signing IS....");
         verify(signedDoc);
     }
 
+	/**
+	 * Test that signs and verifies a WS-Security envelope.
+	 * The test uses the IssuerSerialDirect key identifier type. With
+	 * this key identifier the signing functions inserts the certificate
+	 * into the message.  
+	 * <p/>
+	 * TODO: use another certificate that is not stored in the keystore.
+	 * 
+	 * @throws java.lang.Exception Thrown when there is any problem in signing or verification
+	 */
+	public void testX509SignatureISDirect() throws Exception {
+		SOAPEnvelope envelope = null;
+		WSSignEnvelope builder = new WSSignEnvelope();
+		builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+		builder.setKeyIdentifierType(WSConstants.ISSUER_SERIAL_DIRECT);
+		// builder.setUserInfo("john", "keypass");
+		log.info("Before Signing ISDirect....");
+		Document doc = unsignedEnvelope.getAsDocument();
+		Document signedDoc = builder.build(doc, crypto);
+
+		Message signedMsg = (Message) AxisUtil.toSOAPMessage(signedDoc);
+		if (log.isDebugEnabled()) {
+			log.debug("Signed message with IssuerSerialDirect key identifier:");
+			XMLUtils.PrettyElementToWriter(signedMsg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
+		}
+		signedDoc = signedMsg.getSOAPEnvelope().getAsDocument();
+		log.info("After Signing ISDirect....");
+		verify(signedDoc);
+	}
     /**
-     * Test that signs (twice) and verifies a WS-Security envelope
+     * Test that signs (twice) and verifies a WS-Security envelope.
+     * The test uses the IssuerSerial key identifier type.
      * <p/>
      * 
      * @throws java.lang.Exception Thrown when there is any problem in signing or verification
      */
-    public void testDoubleX509Signature() throws Exception {
+    public void testDoubleX509SignatureIS() throws Exception {
         SOAPEnvelope envelope = null;
         WSSignEnvelope builder = new WSSignEnvelope();
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
@@ -155,7 +195,8 @@ public class TestWSSecurity extends TestCase {
     }
 
     /**
-     * Verifies the soap envelope
+     * Verifies the soap envelope.
+     * This method verfies all the signature generated. 
      * 
      * @param env soap envelope
      * @throws java.lang.Exception Thrown when there is a problem in verification

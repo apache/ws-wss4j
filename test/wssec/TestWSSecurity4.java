@@ -52,7 +52,7 @@ public class TestWSSecurity4 extends TestCase {
     static final String NS = "http://www.w3.org/2000/09/xmldsig#";
     static final String soapMsg = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + "<SOAP-ENV:Envelope xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" + "<SOAP-ENV:Body>" + "<add xmlns=\"http://ws.apache.org/counter/counter_port_type\">" + "<value xmlns=\"\">15</value>" + "</add>" + "</SOAP-ENV:Body>\r\n       \r\n" + "</SOAP-ENV:Envelope>";
     static final WSSecurityEngine secEngine = new WSSecurityEngine();
-    static final Crypto crypto = CryptoFactory.getInstance();
+    static final Crypto crypto = CryptoFactory.getInstance("cryptoSKI.properties");
 
     MessageContext msgContext;
     SOAPEnvelope unsignedEnvelope;
@@ -114,7 +114,9 @@ public class TestWSSecurity4 extends TestCase {
     }
 
     /**
-     * Test that signs and verifies a WS-Security envelope
+     * Test that signs and verifies a WS-Security envelope using SubjectKeyIdentifier.
+     * This test uses the SubjectKeyIdentifier to identify the certificate. It
+     * uses the Direct version, that is it embedds the certificate in the message.
      * <p/>
      * 
      * @throws java.lang.Exception Thrown when there is any problem in signing or verification
@@ -122,7 +124,7 @@ public class TestWSSecurity4 extends TestCase {
     public void testX509SignatureSKIDirect() throws Exception {
         SOAPEnvelope envelope = null;
         WSSignEnvelope builder = new WSSignEnvelope();
-        builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+        builder.setUserInfo("wss4jcert", "security");
 		builder.setKeyIdentifierType(WSConstants.SKI_KEY_IDENTIFIER_DIRECT);
 
         // builder.setUserInfo("john", "keypass");
@@ -154,7 +156,7 @@ public class TestWSSecurity4 extends TestCase {
     public void testDoubleX509SignatureSKIDirect() throws Exception {
         SOAPEnvelope envelope = null;
         WSSignEnvelope builder = new WSSignEnvelope();
-        builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+        builder.setUserInfo("wss4jcert", "security");
 		builder.setKeyIdentifierType(WSConstants.SKI_KEY_IDENTIFIER_DIRECT);
 
         // builder.setUserInfo("john", "keypass");

@@ -32,6 +32,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.ws.axis.security.util.AxisUtil;
 import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSecurityEngine;
+import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.message.WSEncryptBody;
@@ -57,7 +58,7 @@ public class TestWSSecurity8 extends TestCase implements CallbackHandler {
     static final String soapMsg = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
             "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" +
             "   <soapenv:Body>" +
-            "      <ns1:testMethod xmlns:ns1=\"http://axis/service/security/test6/LogTestService6\"></ns1:testMethod>" +
+            "      <ns1:testMethod xmlns:ns1=\"http://axis/service/security/test6/LogTestService8\"></ns1:testMethod>" +
             "   </soapenv:Body>" +
             "</soapenv:Envelope>";
 
@@ -123,37 +124,49 @@ public class TestWSSecurity8 extends TestCase implements CallbackHandler {
     }
 
     /**
-     * Test that encrypts and signs a WS-Security envelope, then performs
-     * verification and decryption
+     * Test that first signs, then encrypts a WS-Security envelope.
+     * The test uses the IssuerSerial key identifier to get the keys for
+     * signature and encryption. Encryption uses 3DES.
      * <p/>
      * 
      * @throws Exception Thrown when there is any problem in signing, encryption,
      *                   decryption, or verification
      */
-    public void testSigningEncryption() throws Exception {
+    public void testSigningEncryptionIS3DES() throws Exception {
         SOAPEnvelope unsignedEnvelope = message.getSOAPEnvelope();
         SOAPEnvelope envelope = null;
+        
         WSEncryptBody encrypt = new WSEncryptBody();
-        WSSignEnvelope sign = new WSSignEnvelope();
         encrypt.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e");
+		encrypt.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
+		encrypt.setSymmetricEncAlgorithm(WSConstants.TRIPLE_DES);
+
+		WSSignEnvelope sign = new WSSignEnvelope();
         sign.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
-        log.info("Before Encryption....");
+		sign.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
+
+        log.info("Before Sign/Encryption....");
         Document doc = unsignedEnvelope.getAsDocument();
 		Document signedDoc = sign.build(doc, crypto);
         Document encryptedSignedDoc = encrypt.build(signedDoc, crypto);
         /*
          * convert the resulting document into a message first. The toSOAPMessage()
-         * mehtod performs the necessary c14n call to properly set up the signed
+         * method performs the necessary c14n call to properly set up the signed
          * document and convert it into a SOAP message. After that we extract it
          * as a document again for further processing.
          */
 
 		Message encryptedMsg = (Message) AxisUtil.toSOAPMessage(encryptedSignedDoc);
+		if (log.isDebugEnabled()) {
+			log.debug("Signed and encrypted message with IssuerSerial key identifier (both), 3DES:");
+			XMLUtils.PrettyElementToWriter(encryptedMsg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
+		}
+		
 		String s = encryptedMsg.getSOAPPartAsString();
 		((SOAPPart)message.getSOAPPart()).setCurrentMessage(s, SOAPPart.FORM_STRING);
 		        
 		Document encryptedSignedDoc1 = message.getSOAPEnvelope().getAsDocument();
-        log.info("After Encryption....");
+        log.info("After Sign/Encryption....");
         verify(encryptedSignedDoc1);
     }
 
@@ -167,7 +180,10 @@ public class TestWSSecurity8 extends TestCase implements CallbackHandler {
     private void verify(Document doc) throws Exception {
         secEngine.processSecurityHeader(doc, null, this, crypto);
         AxisUtil.updateSOAPMessage(doc, message);
-        XMLUtils.PrettyElementToWriter(message.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
+		if (log.isDebugEnabled()) {
+			log.debug("Verfied and decrypted message:");
+			XMLUtils.PrettyElementToWriter(message.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
+		}
     }
 
     public void handle(Callback[] callbacks)

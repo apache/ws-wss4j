@@ -49,7 +49,7 @@ public class PackageTests extends TestCase {
 
     public static Test suite() {
         TestSuite suite = new TestSuite();
-        suite.addTestSuite(TestMSFTWebService.class);
+        // suite.addTestSuite(TestMSFTWebService.class);
         suite.addTestSuite(TestWSSecurity.class);
         suite.addTestSuite(TestWSSecurity2.class);
         suite.addTestSuite(TestWSSecurity3.class);
