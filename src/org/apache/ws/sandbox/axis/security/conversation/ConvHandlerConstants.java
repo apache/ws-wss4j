@@ -17,6 +17,7 @@
 
 package org.apache.ws.axis.security.conversation;
 
+
 import org.apache.ws.security.conversation.ConversationConstants;
 
 import java.util.Hashtable;
@@ -50,6 +51,7 @@ public class ConvHandlerConstants {
     public static final String TRUST_ENABLE = "trustEnable";
 
     public static final String SCT_ESTABLISH_MTD = "sctEstablishmentMtd";
+    public static final String STS_REQUSTOR_TYPE = "stsRequestorType";
 
     public static final String VERIFY_TRUST = "verifyTrust";
 
@@ -58,12 +60,36 @@ public class ConvHandlerConstants {
     public static final String DK_ACTION = "derivedKeyAction";
     public static final String APPLIES_TO_VAL = "appliesToValue";
 
-    public static final String STS_ADDRESS = "stsAddress";
-    public static final String CONV_CALLBACK = "convCBHandler";
-
     public static Map sctEstablishmentMapper = new Hashtable();
     
-    /**
+    public static Map requesterTypeMapper = new Hashtable();
+    //TODO::Remove the below line
+	public static final String CONV_CALLBACK = "pwcallback";
+	
+	/**
+	 * Which algorithm to be used for encryption as in AES or DES and so on
+	 * 
+	 * @see WSConstants#TRIPLE_DES
+     * @see WSConstants#AES_128
+     * @see WSConstants#AES_192
+     * @see WSConstants#AES_256
+	 */
+	public static final String DK_ENC_ALGO = "dkEncryptionAlgorithm";
+	
+	
+    
+    /*
+     * Constants needed for trust
+     */
+	public static final String STS_ADDRESS = "stsAddress";
+	public static final String SERVICE_EPR = "serviceEPR";
+    
+    
+    public static final String TOKEN_TRUST_VERIFY = "verifyToken";
+    
+    public static final String DK_CB_HANDLER = "DkcbHandler";
+    
+    /*
      * Mapps the strings to internally used integers.
      */
     static {
@@ -71,6 +97,15 @@ public class ConvHandlerConstants {
                 new Integer(ConversationConstants.DIRECT_GENERATED));
         sctEstablishmentMapper.put("STSGenerated",
                 new Integer(ConversationConstants.STS_GENERATED));
+		sctEstablishmentMapper.put("STSRequestToken",
+						new Integer(ConversationConstants.STSREQUEST_TOKEN));
+		sctEstablishmentMapper.put("InteropHandshake",
+								new Integer(ConversationConstants.INTEROP_SCENE1));
+		
+   
+    
+		
     }
+    
 
 }

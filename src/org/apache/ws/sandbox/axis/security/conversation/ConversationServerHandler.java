@@ -43,14 +43,19 @@ import org.apache.ws.security.conversation.ConversationConstants;
 import org.apache.ws.security.conversation.ConversationEngine;
 import org.apache.ws.security.conversation.ConversationException;
 import org.apache.ws.security.conversation.ConversationManager;
+import org.apache.ws.security.conversation.ConversationSession;
 import org.apache.ws.security.conversation.ConversationUtil;
 import org.apache.ws.security.conversation.DerivedKeyCallbackHandler;
 import org.apache.ws.security.conversation.message.info.DerivedKeyInfo;
 import org.apache.ws.security.conversation.message.token.SecurityContextToken;
 import org.apache.ws.security.handler.WSHandlerConstants;
+import org.apache.ws.security.message.token.Reference;
 import org.apache.ws.security.message.token.SecurityTokenReference;
+import org.apache.ws.security.trust.TrustEngine;
+import org.apache.ws.security.trust.WSTrustException;
 import org.apache.ws.security.util.StringUtil;
 import org.apache.ws.security.util.WSSecurityUtil;
+
 import org.apache.xml.security.utils.XMLUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -79,6 +84,13 @@ public class ConversationServerHandler extends BasicHandler {
     private int[] actionsInt = null;       
     
     private boolean isSessionInfoConfigured = false;
+    
+    private boolean isInitTrustVerified = false;
+    
+    private Vector sigParts=null;
+    private Vector encParts=null;
+    
+    private int keyLen =-1;
     
     public ConversationServerHandler() {
         log.debug("ConversationServerHandler :: created");
@@ -117,18 +129,11 @@ public class ConversationServerHandler extends BasicHandler {
     		initSessionInfo();
     		isSessionInfoConfigured = true;
     	}
-    		
+    	
+    	    		
         Document doc = null;
         Message message = msg.getCurrentMessage();
         
-        Boolean verify_trust = new Boolean((String)getOption(ConvHandlerConstants.VERIFY_TRUST));
-        
-        if(verify_trust.booleanValue()==true){
-			String trustPropFile = (String)getOption(ConvHandlerConstants.TRUST_ENGINE_PROP);
-          
-        }
-        
-
         // Get the soap message as a Docuemnt
         SOAPPart sPart = (org.apache.axis.SOAPPart) message.getSOAPPart();
         try {
@@ -146,9 +151,34 @@ public class ConversationServerHandler extends BasicHandler {
 		
 		soapConstants = WSSecurityUtil.getSOAPConstants(doc.getDocumentElement());
         ConversationEngine eng = new ConversationEngine(this.configurator);
+        
+//		try {
+//            boolean trustEngineResult = false;
+//            		if(!isInitTrustVerified){
+//            		String tmpStr = null;
+//            			if ((tmpStr = (String) getOption(ConvHandlerConstants.TOKEN_TRUST_VERIFY))
+//            						!= null) {
+//            			if(Boolean.getBoolean(tmpStr)){
+//            			  String trustPropFile = (String) getOption(ConvHandlerConstants.TRUST_ENGINE_PROP);
+//            			  TrustEngine trstEngine = new TrustEngine(trustPropFile);
+//            			  System.out.println("call the engine here ...");
+//            			  trustEngineResult=true;
+//            			}
+//            			isInitTrustVerified = true;
+//                        }
+//            		}  
+//            if(trustEngineResult){
+//                 //getUUID and proof of possession
+//                 //add it to the derived key token
+//            }
+//        } catch (WSTrustException e2) {
+//            // TODO Auto-generated catch block
+//            e2.printStackTrace();
+//        }
+        
+        
          
         try {
-        	//TODO :: Process results and fix the scratch
             Vector results = eng.processSecConvHeader(doc, "", dkcbHandler, (String)this.configurator.get(WSHandlerConstants.PW_CALLBACK_CLASS));
 			ConvEngineResult convResult  = null;
 			String uuid = "";
@@ -184,29 +214,29 @@ public class ConversationServerHandler extends BasicHandler {
 				
 				case ConvEngineResult.ENCRYPT_DERIVED_KEY :
 				log.debug("ConversationServerHandler :: Found dk_encrypt result"); 				
-				    if(stk.isEmpty()){
-				    	throw new AxisFault("Action mismatch");
-				    }
-				    
-				    act =((Integer)stk.pop()).intValue();
-				    if(act == ConversationConstants.DK_ENCRYPT){
-				    	//fine do nothing
-				    }else{
-				    	throw new AxisFault("Mismatch action order");
-				    }
+//				    if(stk.isEmpty()){
+//				    	throw new AxisFault("Action mismatch");
+//				    }
+//				    
+//				    act =((Integer)stk.pop()).intValue();
+//				    if(act == ConversationConstants.DK_ENCRYPT){
+//				    	//fine do nothing
+//				    }else{
+//				    	throw new AxisFault("Mismatch action order");
+//				    }
 				break;
 				
 				case ConvEngineResult.SIGN_DERIVED_KEY :
 				log.debug("ConversationServerHandler :: Found dk_sign result");
-					if(stk.isEmpty()){
-						throw new AxisFault("Action mismatch");
-					}
-					act =((Integer)stk.pop()).intValue();
-					if(act == ConversationConstants.DK_SIGN){
-					    //fine do nothing
-					}else{
-						throw new AxisFault("Mismatch action order");
-					}
+//					if(stk.isEmpty()){
+//						throw new AxisFault("Action mismatch");
+//					}
+//					act =((Integer)stk.pop()).intValue();
+//					if(act == ConversationConstants.DK_SIGN){
+//					    //fine do nothing
+//					}else{
+//						throw new AxisFault("Mismatch action order");
+//					}
 				break;
 				
 				case ConvEngineResult.SCT :
@@ -217,41 +247,33 @@ public class ConversationServerHandler extends BasicHandler {
 				}
 				}
 			
-			if(uuid.equals("")){
-				throw new AxisFault("ConversationServerHandler :: Cannot find Session.");
+			if(uuid.equals("")||(uuid==null)){
+				//throw new AxisFault("ConversationServerHandler :: Cannot find Session.");
+			}else{
+				msg.setProperty(ConversationConstants.IDENTIFIER,uuid);	
 			}
-		    
-		    if(!rstr){
-		    if(!stk.isEmpty()){
-			  throw new AxisFault("Action mismatch. Required action missing");
-			}
-            }
-			msg.setProperty(ConversationConstants.IDENTIFIER,uuid);
-        
-        
-        
-//        NodeList ndlist = doc.getElementsByTagNameNS(ConversationConstants.WSC_NS,"SecurityContextToken");
-//        
-//       try {
-//             SecurityContextToken sct = new SecurityContextToken((Element)ndlist.item(0));
-//		msg.setProperty(ConversationConstants.IDENTIFIER,uuid);
-//        } catch (WSSecurityException e2) {
-//            // TODO Auto-generated catch block
-//            e2.printStackTrace();
-//        }
-        
+			
+//		    
+//		    if(!rstr){
+//		    if(!stk.isEmpty()){
+//			  throw new AxisFault("Action mismatch. Required action missing");
+//			}
+//            }
+		
         
         } catch (ConversationException e1) {
             e1.printStackTrace();
             throw new AxisFault("CovnersationServerHandler :: "+e1.getMessage());
         }
 
+
+        
         // Replace sPart with the new sPart.
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         XMLUtils.outputDOM(doc, os, true);
         String osStr = os.toString();
         sPart.setCurrentMessage(osStr, SOAPPart.FORM_STRING);
-
+		        
         //Following sets the headers as processed.
         SOAPHeader sHeader = null;
         try {
@@ -282,7 +304,8 @@ public class ConversationServerHandler extends BasicHandler {
                     .SOAPHeaderElement) headerElement)
                     .setProcessed(
             true);
-
+            
+		msg.setProperty(ConvHandlerConstants.DK_CB_HANDLER,dkcbHandler);
     } //do request
 
 	  /**
@@ -309,9 +332,12 @@ public class ConversationServerHandler extends BasicHandler {
         SOAPPart sPart = (org.apache.axis.SOAPPart) message.getSOAPPart();
 
         try {
+	       if ((doc = (Document) msg.getProperty(WSHandlerConstants.SND_SECURITY))
+						   == null) {
             doc =
                 ((org.apache.axis.message.SOAPEnvelope) sPart.getEnvelope())
                     .getAsDocument();
+		    }
         } catch (Exception e) {
             e.printStackTrace();
             throw new AxisFault("CovnersationServerHandler :: "+e.getMessage());
@@ -322,13 +348,15 @@ public class ConversationServerHandler extends BasicHandler {
         
         if (uuid == null) {
         	//TODO :: throw exception
-            System.out.println("UUID NULl line :: 221");
+            System.out.println("UUID NULl line :: 346");
         }
         
   
 		try {
-
-			  //add the relavent SCT
+           ConversationSession session = dkcbHandler.getSession(uuid);  
+             
+             if(session.isAddBase2Message()){
+              //add the relavent SCT
 			  Element securityHeader =
 				  WSSecurityUtil.findWsseSecurityHeaderBlock(WSSConfig.getDefaultWSConfig(),
 					  doc,
@@ -338,16 +366,32 @@ public class ConversationServerHandler extends BasicHandler {
 				  doc,
 				  securityHeader,
 				  (new SecurityContextToken(doc, uuid)).getElement());
-			  ConversationManager manager = new ConversationManager();
+             }
+             	  
+			 ConversationManager manager = new ConversationManager();
 			  
 			  for (int i = 0; i < this.actionsInt.length; i++) {
+				  
 				  // Derrive the token
+				 SecurityTokenReference stRef2Base = null;
+				 if(session.getRef2Base()==null){
+				      //do nothing
+				 }else{
+				     stRef2Base = new SecurityTokenReference(WSSConfig.getDefaultWSConfig(),doc);
+				     Reference ref = new Reference(WSSConfig.getDefaultWSConfig(),doc);
+				     Reference oldRef = session.getRef2Base();
+				     
+				    ref.setURI(oldRef.getURI());
+				    ref.setValueType(oldRef.getValueType());
+				    stRef2Base.setReference(ref);
+				 }		  
 				  DerivedKeyInfo dkInfo =
-					  manager.addDerivedKeyToken(doc, uuid, dkcbHandler);
+					  manager.createDerivedKeyToken(doc, uuid, dkcbHandler,stRef2Base, keyLen);
 
 				  String genID = dkInfo.getId();
 				  SecurityTokenReference stRef =
 					  dkInfo.getSecTokRef2DkToken();
+					  
 				  if (actionsInt[i] == ConversationConstants.DK_ENCRYPT) {
 					  manager.performDK_ENCR(
 						  ConversationUtil.generateIdentifier(uuid, genID),
@@ -355,10 +399,14 @@ public class ConversationServerHandler extends BasicHandler {
 						  true,
 						  doc,
 						  stRef,
-						  dkcbHandler);
+						  dkcbHandler, this.encParts, (String)this.configurator.get(ConvHandlerConstants.DK_ENC_ALGO));
+						  
 				  } else if(actionsInt[i]==ConversationConstants.DK_SIGN){
-					  manager.performDK_Sign(doc, dkcbHandler, uuid, dkInfo);
+					  //TODO
+					  manager.performDK_Sign(doc, dkcbHandler, uuid, dkInfo,this.sigParts);
 				  }
+				  
+				  manager.addDkToken(doc,dkInfo);
 
 			  }
 		  } catch (ConversationException e1) {
@@ -416,42 +464,58 @@ private void initSessionInfo() throws AxisFault {
 		}
 
 	}
+	
 	if ((tmpStr =
-		(String) getOption(ConvHandlerConstants.USE_FIXED_KEYLEN))
-		!= null) {
-		log.debug("Boolean FixedKeyLegnth is set ::" + tmpStr);
-
-		Boolean fixed = new Boolean(tmpStr);
-		this.configurator.put(ConvHandlerConstants.USE_FIXED_KEYLEN, fixed);
-
-		if (fixed.booleanValue()) {
-			//Following has to be specified.
-			if ((tmpStr =
+			(String) getOption(ConvHandlerConstants.SEVER_PROP_FILE))
+			!= null) {
+		this.configurator.put(ConvHandlerConstants.SEVER_PROP_FILE, tmpStr);    
+	}
+	
+	
+		if ((tmpStr =
 				(String) getOption(ConvHandlerConstants.KEY_LEGNTH))
 				!= null) {
-
 				log.debug("Key Frequency is set ::" + tmpStr);
-				this.configurator.put(
-					ConvHandlerConstants.KEY_LEGNTH,
-					new Long(tmpStr));
-
-			} else {
-				throw new AxisFault("If fixed keys are set then set the key legnth too.");
-			}
-
-		} else {
-			// TODO :: add all the "MUST" parameters for variable keys
+			this.keyLen=Integer.parseInt(tmpStr);
+			this.configurator.put(ConvHandlerConstants.KEY_LEGNTH, new Long(tmpStr));
 		}
-	
+		
+		
 		if ((tmpStr =
 			(String) getOption(WSHandlerConstants.PW_CALLBACK_CLASS))
 			!= null) {
 		   	   	this.configurator.put(WSHandlerConstants.PW_CALLBACK_CLASS, tmpStr);
 		}else{
-			throw new AxisFault("Set the pass word call back class.....");
+			log.debug("Set the pass word call back class.");
 		}
 		
-	}
+		if ((tmpStr =
+					(String) getOption(WSHandlerConstants.SIGNATURE_PARTS))
+					!= null) {
+			this.sigParts = new Vector();			
+		   this.splitEncParts(tmpStr,sigParts);
+		}
+		
+		if ((tmpStr =(String) getOption(WSHandlerConstants.ENCRYPTION_PARTS))
+							!= null) {
+					this.encParts = new Vector();			
+				   this.splitEncParts(tmpStr,encParts);
+		}
+		
+		
+		
+		if((tmpStr =(String) getOption(WSHandlerConstants.DEC_PROP_FILE))!= null) {
+				this.configurator.put(WSHandlerConstants.DEC_PROP_FILE, tmpStr);
+				System.out.println("Decryption properties read");
+		}
+		
+		if((tmpStr =(String) getOption(ConvHandlerConstants.DK_ENC_ALGO))!= null) {
+				this.configurator.put(ConvHandlerConstants.DK_ENC_ALGO, tmpStr);
+		}
+		
+		
+		
+	
 
 }
  
