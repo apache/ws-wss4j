@@ -65,6 +65,7 @@ Build Instructions:
         <property name="http.proxyPassword" value=""/>
 
         <property name="dir.doc" value="./doc"/>
+        <property name="dir.dist" value="./dist"/>
         <property name="dir.libs" value="./lib"/>
         <property name="dir.src" value="./src"/>
         <property name="dir.samples" value="./samples"/>
@@ -408,12 +409,12 @@ org.apache.ws.axis.security.util
     <target name="interopTests" depends="init">
         <echo message="Running system tests - BEGIN..."/>
 
-        <path id="deploy.xml.files">
+        <path id="deploy_xml_files">
             <fileset dir="${build.work}">
                 <include name="**/deploy.wsdd"/>
             </fileset>
         </path>
-        <path id="undeploy.xml.files">
+        <path id="undeploy_xml_files">
             <fileset dir="${build.work}">
                 <include name="**/undeploy.wsdd"/>
             </fileset>
@@ -426,8 +427,8 @@ org.apache.ws.axis.security.util
             <fileset dir="${dir.interop}" includes="*.jks"/>
         </copy>
         
-        <property name="deploy.xml.property" refid="deploy.xml.files"/>
-        <property name="undeploy.xml.property" refid="undeploy.xml.files"/>
+        <property name="deploy_xml_property" refid="deploy_xml_files"/>
+        <property name="undeploy_xml_property" refid="undeploy_xml_files"/>
 
         <java classname="org.apache.axis.utils.Admin" fork="true">
             <classpath refid="classpath.library"/>
@@ -437,7 +438,7 @@ org.apache.ws.axis.security.util
         
         <java classname="org.apache.axis.client.AdminClient" fork="yes">
             <classpath refid="classpath.library"/>
-            <arg line="${deploy.xml.property}"/>
+            <arg line="${deploy_xml_property}"/>
         </java>
 
         <junit printsummary="yes"
@@ -463,7 +464,7 @@ org.apache.ws.axis.security.util
 
         <java classname="org.apache.axis.client.AdminClient" fork="yes">
             <classpath refid="classpath.library"/>
-            <arg line="${undeploy.xml.property}"/>
+            <arg line="${undeploy_xml_property}"/>
         </java>
         
         <echo message="Running system tests - END..."/>
@@ -514,14 +515,22 @@ org.apache.ws.axis.security.util
             />
     </target>
 
-    <target name="dist" depends="gump" description="Build zip file for distro">
+<!--    <target name="dist" depends="gump" description="Build zip file for distro"> -->
+
+    <target name="dist" depends="init" description="Build zip file for distro">
         <mkdir dir="${dir.dist}"/>
+        <jar jarfile="${dir.dist}/${jar.library}"
+            basedir="${build.classes}"
+            includes="**/apache/**/security/**"  />
         <zip destfile="${dir.dist}/${product.shortname}-${product.version}.zip">
             <zipfileset prefix="wss4j" dir="."
-                excludes="**/*.zip, **/junit*properties, build/**, dist/**, tools/**, specs/**, keys/**, before*.xml, after*.xml, signed*.xml"/>
+                includes="keys/**, interop/**, test/**, samples/**"/>
+            <zipfileset prefix="wss4j/classes" dir="${build.classes}"
+                includes="interop/**, wssec/**, org/**/oasis/**, org/**/samples/**"/>
             <zipfileset prefix="wss4j/api" dir="${build.javadoc}"/>
-            <zipfileset fullpath="wss4j/${product.shortname}-${product.version}.jar" dir="${build.dir}" includes="${product.shortname}-{product.version}.jar"/>
+            <zipfileset fullpath="wss4j/${jar.library}" dir="${dir.dist}" includes="${jar.library}"/>
         </zip>
+	  <delete file="${dir.dist}/${jar.library}" />
     </target>
 
     <target name="fixcrlf"
