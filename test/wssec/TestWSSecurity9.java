@@ -26,6 +26,7 @@ import org.apache.axis.SOAPPart;
 import org.apache.axis.client.AxisClient;
 import org.apache.axis.configuration.NullProvider;
 import org.apache.axis.message.SOAPEnvelope;
+import org.apache.axis.utils.XMLUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.axis.security.util.AxisUtil;
@@ -45,7 +46,7 @@ import java.io.ByteArrayInputStream;
 // import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-// import java.io.PrintWriter;
+import java.io.PrintWriter;
 
 /**
  * WS-Security Test Case
@@ -170,6 +171,10 @@ public class TestWSSecurity9 extends TestCase implements CallbackHandler {
          */
 
 		Message encryptedMsg = (Message) AxisUtil.toSOAPMessage(encryptedSignedDoc);
+		if (log.isDebugEnabled()) {
+			log.debug("Encrypted message, RSA-OAEP keytransport, 3DES:");
+			XMLUtils.PrettyElementToWriter(encryptedMsg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
+		}
 		String s = encryptedMsg.getSOAPPartAsString();
 		((SOAPPart)message.getSOAPPart()).setCurrentMessage(s, SOAPPart.FORM_STRING);
 		        
