@@ -48,6 +48,7 @@ import javax.security.auth.callback.CallbackHandler;
 import java.security.cert.X509Certificate;
 
 import java.io.ByteArrayOutputStream;
+import java.io.UnsupportedEncodingException;
 import java.util.Hashtable;
 import java.util.Vector;
 
@@ -360,13 +361,7 @@ public class WSDoAllSender extends BasicHandler {
 		 * The outputDOM() method performs the necessary c14n call. After 
 		 * that we extract it as a string for further processing.
 		 * 
-		 * Set the resulting string as the new SOAP message.
-		 * 
-		 * NOTE: must be set as FORM_STRING, otherwise Axis will serialize
-		 * the message again. That could change the content of the message
-		 * and therefore invalidates a signature. It would also not work
-		 * if the SOAP request contains attachements because Axis couldn't
-		 * find the references and so on...
+		 * Set the resulting byte array as the new SOAP message.
 		 * 
 		 * If noSerialization is false, this handler shall be the last 
 		 * (or only) one in a handler chain. 
@@ -380,12 +375,17 @@ public class WSDoAllSender extends BasicHandler {
 		} else {
 			ByteArrayOutputStream os = new ByteArrayOutputStream();
 			XMLUtils.outputDOM(doc, os, true);
-			String osStr = os.toString();
-			if (doDebug) {
+            sPart.setCurrentMessage(os.toByteArray(), SOAPPart.FORM_BYTES);
+            if (doDebug) {
+                String osStr = null;
+                try {
+                    osStr = os.toString("UTF-8");
+                } catch (UnsupportedEncodingException e) {
+                    osStr = os.toString();
+                }
 				log.debug("Send request:");
 				log.debug(osStr);
 			}
-			sPart.setCurrentMessage(osStr, SOAPPart.FORM_STRING);
 			msgContext.setProperty(WSDoAllConstants.SND_SECURITY, null);
 		}
 		if (doDebug) {
