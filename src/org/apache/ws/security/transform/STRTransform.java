@@ -65,7 +65,7 @@ public class STRTransform extends TransformSpi {
 
 	/** Field implementedTransformURI */
 	public static final String implementedTransformURI =
-		"http://www.docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#STR-Transform";
+		"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#STR-Transform";
 
 
 	private static Log log = LogFactory.getLog(STRTransform.class.getName());
