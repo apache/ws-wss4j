@@ -69,6 +69,12 @@
             <email>dims@yahoo.com</email>
             <organization></organization>
         </developer>
+        <developer>
+            <name>Werner Dittmann</name>
+            <id>werner</id>
+            <email>werner@apache.org</email>
+            <organization></organization>
+        </developer>
   </developers>
 
     <licenses>
