@@ -192,8 +192,13 @@ public class WSDoAllSender extends BasicHandler {
 			 */
 			reqData.username = (String) getOption(WSHandlerConstants.USER);
 			if (reqData.username == null || reqData.username.equals("")) {
-				reqData.username = reqData.msgContext.getUsername();
-				reqData.msgContext.setUsername(null);
+                String username = (String) reqData.msgContext.getProperty(WSHandlerConstants.USER);
+                if (username != null) {
+                    reqData.username = username;
+                } else {
+                    reqData.username = reqData.msgContext.getUsername();
+                    reqData.msgContext.setUsername(null);
+                }
 			}
 			/*
 			 * Now we perform some set-up for UsernameToken and Signature
