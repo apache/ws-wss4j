@@ -22,12 +22,6 @@ import org.w3c.dom.Document;
 
 import java.util.Properties;
 
-/**
- * @author Ruchith
- *         <p/>
- *         To change the template for this generated type comment go to
- *         Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
- */
 public class IssuerVerifier implements STVerifier {
 
     public IssuerVerifier(Properties prop) {

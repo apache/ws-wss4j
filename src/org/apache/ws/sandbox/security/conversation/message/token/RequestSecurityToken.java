@@ -17,11 +17,6 @@
 
 package org.apache.ws.security.conversation.message.token;
 
-/**
- * @author Dimuthu Leelarathne
- * @version 1.0
- */
-
 import org.apache.axis.components.logger.LogFactory;
 import org.apache.commons.logging.Log;
 import org.apache.ws.security.WSSecurityException;

@@ -1,5 +1,3 @@
-package org.apache.ws.security.conversation.message.token;
-
 /*
  * Copyright  2003-2004 The Apache Software Foundation.
  *
@@ -16,14 +14,8 @@ package org.apache.ws.security.conversation.message.token;
  *  limitations under the License.
  *
  */
-/**
- * <p>Title: </p>
- * <p>Description: </p>
- * <p>Copyright: Copyright (c) 2004</p>
- * <p>Company: </p>
- * @author Malinda Kaushalye
- * @version 1.0
- */
+
+package org.apache.ws.security.conversation.message.token;
 
 import org.apache.axis.components.logger.LogFactory;
 import org.apache.commons.logging.Log;
