@@ -59,7 +59,7 @@ public class Merlin implements Crypto {
     private static Log log = LogFactory.getLog(Merlin.class);
     private static CertificateFactory certFact;
     private Properties properties = null;
-    private KeyStore keystore = null;
+    protected KeyStore keystore = null;
 
     /**
      * Constructor.
@@ -68,7 +68,7 @@ public class Merlin implements Crypto {
      * @param properties 
      * @throws Exception 
      */
-    public Merlin(Properties properties) throws Exception {
+    public Merlin(Properties properties) throws CredentialException, IOException {
         /*
          * if no properties .. just return an instance, the rest will be
          * done later or this instance is just used to handle certificate
@@ -456,7 +456,7 @@ public class Merlin implements Crypto {
      * @param input <code>InputStream</code> to read from
      * @throws Exception 
      */
-    public void load(InputStream input) throws Exception {
+    public void load(InputStream input) throws CredentialException {
         if (input == null) {
             throw new IllegalArgumentException("input stream cannot be null");
         }
