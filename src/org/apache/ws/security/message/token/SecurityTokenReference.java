@@ -542,7 +542,17 @@ public class SecurityTokenReference {
 	* 			the <code>SecurtityTokenReference</code> 
 	 */
 	public int lengthKeyIdentifier() {
-		return this.length(wssConfig.getWsseNS(), "KeyIdentifier");
+        if (wssConfig.getProcessNonCompliantMessages()) {
+            for (int i = 0; i < WSConstants.WSSE_NS_ARRAY.length; ++i) {
+                int len = this.length(WSConstants.WSSE_NS_ARRAY[i], "KeyIdentifier");
+                if (len > 0) {
+                    return len;
+                }
+            }
+        } else {
+            return this.length(wssConfig.getWsseNS(), "KeyIdentifier");
+        }
+        return 0;
 	}
 
 	/**
