@@ -52,7 +52,7 @@
  <service name="Ping3">
   <requestFlow>
    <handler type="java:org.apache.ws.axis.security.WSDoAllSender" >
-    <parameter name="action" value="Signature Encrypt"/>
+    <parameter name="action" value="Signature Encrypt Timestamp"/>
     <!-- Use the Client's cert/key to sign the request -->
     <parameter name="user" value="7706c71b0628d6ecc85ea1e8ad62be60_a8272f6f-2c94-436e-aa71-d8d2be4647f6"/>
     <parameter name="passwordCallbackClass" 
@@ -67,7 +67,7 @@
    <handler type="java:org.apache.ws.axis.security.WSDoAllReceiver">
     <parameter name="passwordCallbackClass" 
       value="org.apache.ws.axis.oasis.PWCallback1"/>
-    <parameter name="action" value="Signature Encrypt"/>
+    <parameter name="action" value="Signature Encrypt Timestamp"/>
     <parameter name="signaturePropFile" value="wsstest.properties" />
    </handler>
   </responseFlow>
@@ -76,7 +76,7 @@
  <service name="Ping4">
   <requestFlow>
    <handler type="java:org.apache.ws.axis.security.WSDoAllSender" >
-    <parameter name="action" value="Signature Encrypt"/>
+    <parameter name="action" value="Signature Encrypt Timestamp"/>
     <!-- Use the Client's cert/key to sign the request -->
     <parameter name="user" value="7706c71b0628d6ecc85ea1e8ad62be60_a8272f6f-2c94-436e-aa71-d8d2be4647f6"/>
     <parameter name="passwordCallbackClass" 
@@ -93,7 +93,7 @@
    <handler type="java:org.apache.ws.axis.security.WSDoAllReceiver">
     <parameter name="passwordCallbackClass" 
       value="org.apache.ws.axis.oasis.PWCallback"/>
-    <parameter name="action" value="Signature Encrypt"/>
+    <parameter name="action" value="Signature Encrypt Timestamp"/>
     <parameter name="signaturePropFile" value="wsstest.properties" />
    </handler>
   </responseFlow>
@@ -113,7 +113,7 @@
     <parameter name="signatureParts" value="{}{http://xmlsoap.org/Ping}ticket" />    
    </handler>
    <handler type="java:org.apache.ws.axis.security.WSDoAllSender" >
-    <parameter name="action" value="Signature"/>
+    <parameter name="action" value="Signature Timestamp"/>
     <!-- Use the Client's cert/key to sign the request -->
     <parameter name="user" value="7706c71b0628d6ecc85ea1e8ad62be60_a8272f6f-2c94-436e-aa71-d8d2be4647f6"/>
     <parameter name="passwordCallbackClass" 
@@ -127,7 +127,7 @@
  <service name="Ping6">
   <requestFlow>
    <handler type="java:org.apache.ws.axis.security.WSDoAllSender" >
-    <parameter name="action" value="Encrypt Signature"/>
+    <parameter name="action" value="Encrypt Signature Timestamp"/>
     <!-- Use the Client's cert/key to sign the request -->
     <parameter name="user" value="7706c71b0628d6ecc85ea1e8ad62be60_a8272f6f-2c94-436e-aa71-d8d2be4647f6"/>
     <parameter name="passwordCallbackClass" 
@@ -142,7 +142,7 @@
   <responseFlow>
    <handler type="java:org.apache.ws.axis.security.WSDoAllReceiver">
     <parameter name="passwordCallbackClass" value="org.apache.ws.axis.oasis.PWCallback1"/>
-    <parameter name="action" value="Encrypt Signature"/>
+    <parameter name="action" value="Encrypt Signature Timestamp"/>
     <parameter name="signaturePropFile" value="wsstest.properties" />
    </handler>
   </responseFlow>
@@ -152,7 +152,7 @@
  <service name="Ping7">
   <requestFlow>
    <handler type="java:org.apache.ws.axis.security.WSDoAllSender" >
-    <parameter name="action" value="Signature Encrypt"/>
+    <parameter name="action" value="Signature Encrypt Timestamp"/>
     <parameter name="user" value="7706c71b0628d6ecc85ea1e8ad62be60_a8272f6f-2c94-436e-aa71-d8d2be4647f6"/>
     <parameter name="passwordCallbackClass" value="org.apache.ws.axis.oasis.PWCallback1"/>
     <parameter name="signatureKeyIdentifier" value="DirectReference" />
@@ -168,7 +168,7 @@
    <handler type="java:org.apache.ws.axis.security.WSDoAllReceiver">
     <parameter name="passwordCallbackClass" 
       value="org.apache.ws.axis.oasis.PWCallback1"/>
-    <parameter name="action" value="Signature Encrypt"/>
+    <parameter name="action" value="Signature Encrypt Timestamp"/>
     <parameter name="signaturePropFile" value="wsstest.properties" />
     <parameter name="decryptionPropFile" value="wsstest.properties" />
    </handler>
@@ -178,7 +178,7 @@
  <service name="STPing1">
   <requestFlow>
    <handler type="java:org.apache.ws.axis.security.WSDoAllSender" >
-    <parameter name="action" value="SAMLTokenUnsigned"/>
+    <parameter name="action" value="Timestamp SAMLTokenUnsigned"/>
     <parameter name="samlPropFile" value="saml.properties"/>
     
    </handler>
@@ -201,7 +201,7 @@
    <service name="STPing3">
   <requestFlow>
    <handler type="java:org.apache.ws.axis.security.WSDoAllSender" >
-    <parameter name="action" value="SAMLTokenSigned"/>
+    <parameter name="action" value="Timestamp SAMLTokenSigned"/>
     <parameter name="samlPropFile" value="saml3.properties"/>
     <parameter name="signatureKeyIdentifier" value="DirectReference" />
    </handler>
@@ -224,7 +224,7 @@
    <service name="STPing4">
   <requestFlow>
    <handler type="java:org.apache.ws.axis.security.WSDoAllSender" >
-    <parameter name="action" value="SAMLTokenSigned"/>
+    <parameter name="action" value="Timestamp SAMLTokenSigned"/>
     <parameter name="samlPropFile" value="saml4.properties"/>
     <parameter name="signatureKeyIdentifier" value="DirectReference" />
     <parameter name="user" value="16c73ab6-b892-458f-abf5-2f875f74882e"/>

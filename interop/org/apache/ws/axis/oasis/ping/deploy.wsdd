@@ -92,13 +92,13 @@
   <requestFlow>
    <handler type="java:org.apache.ws.axis.security.WSDoAllReceiver">
     <parameter name="passwordCallbackClass" value="org.apache.ws.axis.oasis.PWCallback1"/>
-    <parameter name="action" value="Signature Encrypt"/>
+    <parameter name="action" value="Signature Encrypt Timestamp"/>
     <parameter name="signaturePropFile" value="wsstest.properties" />
    </handler>
   </requestFlow>
   <responseFlow>
    <handler type="java:org.apache.ws.axis.security.WSDoAllSender" >
-    <parameter name="action" value="Signature Encrypt"/>
+    <parameter name="action" value="Signature Encrypt Timestamp"/>
     <!-- Use the Server's cert/key to sign the response -->
     <parameter name="user" value="86ab6c4828bcde6983d81b2b59ff426c_a8272f6f-2c94-436e-aa71-d8d2be4647f6"/>
     <parameter name="passwordCallbackClass" 
@@ -135,13 +135,13 @@
   <requestFlow>
    <handler type="java:org.apache.ws.axis.security.WSDoAllReceiver">
     <parameter name="passwordCallbackClass" value="org.apache.ws.axis.oasis.PWCallback1"/>
-    <parameter name="action" value="Signature Encrypt"/>
+    <parameter name="action" value="Signature Encrypt Timestamp"/>
     <parameter name="signaturePropFile" value="wsstest.properties" />
    </handler>
   </requestFlow>
   <responseFlow>
    <handler type="java:org.apache.ws.axis.security.WSDoAllSender" >
-    <parameter name="action" value="Signature Encrypt"/>
+    <parameter name="action" value="Signature Encrypt Timestamp"/>
     <!-- Use the Server's cert/key to sign the response -->
     <parameter name="user" value="86ab6c4828bcde6983d81b2b59ff426c_a8272f6f-2c94-436e-aa71-d8d2be4647f6"/>
     <parameter name="passwordCallbackClass" 
@@ -179,7 +179,7 @@
   <requestFlow>
    <handler type="java:org.apache.ws.axis.security.WSDoAllReceiver">
     <parameter name="passwordCallbackClass" value="org.apache.ws.axis.oasis.PWCallback1"/>
-    <parameter name="action" value="Signature Signature"/>
+    <parameter name="action" value="Signature Signature Timestamp"/>
     <parameter name="signaturePropFile" value="wsstest.properties" />
    </handler>
   </requestFlow>
@@ -208,13 +208,13 @@
   <requestFlow>
    <handler type="java:org.apache.ws.axis.security.WSDoAllReceiver">
     <parameter name="passwordCallbackClass" value="org.apache.ws.axis.oasis.PWCallback1"/>
-    <parameter name="action" value="Encrypt Signature"/>
+    <parameter name="action" value="Encrypt Signature Timestamp"/>
     <parameter name="signaturePropFile" value="wsstest.properties" />
    </handler>
   </requestFlow>
   <responseFlow>
    <handler type="java:org.apache.ws.axis.security.WSDoAllSender" >
-    <parameter name="action" value="Encrypt Signature"/>
+    <parameter name="action" value="Encrypt Signature Timestamp"/>
     <!-- Use the Server's cert/key to sign the response -->
     <parameter name="user" value="86ab6c4828bcde6983d81b2b59ff426c_a8272f6f-2c94-436e-aa71-d8d2be4647f6"/>
     <parameter name="passwordCallbackClass" 
@@ -252,14 +252,14 @@
   <requestFlow>
    <handler type="java:org.apache.ws.axis.security.WSDoAllReceiver">
     <parameter name="passwordCallbackClass" value="org.apache.ws.axis.oasis.PWCallback1"/>
-    <parameter name="action" value="Signature Encrypt"/>
+    <parameter name="action" value="Signature Encrypt Timestamp"/>
     <parameter name="signaturePropFile" value="wsstest.properties" />
     <parameter name="decryptionPropFile" value="wsstest.properties" />
    </handler>
   </requestFlow>
   <responseFlow>
    <handler type="java:org.apache.ws.axis.security.WSDoAllSender" >
-    <parameter name="action" value="Signature Encrypt"/>
+    <parameter name="action" value="Signature Encrypt Timestamp"/>
     <!-- Use the Server's cert/key to sign the response -->
     <parameter name="user" value="86ab6c4828bcde6983d81b2b59ff426c_a8272f6f-2c94-436e-aa71-d8d2be4647f6"/>
     <parameter name="passwordCallbackClass" 
@@ -296,7 +296,7 @@
             />
         <requestFlow>
             <handler type="java:org.apache.ws.axis.security.WSDoAllReceiver">
-                <parameter name="action" value="SAMLTokenUnsigned"/>
+                <parameter name="action" value="Timestamp SAMLTokenUnsigned"/>
             </handler>
         </requestFlow>
     </service>
@@ -333,7 +333,7 @@
 
         <requestFlow>
             <handler type="java:org.apache.ws.axis.security.WSDoAllReceiver">
-                <parameter name="action" value="Signature SAMLTokenUnsigned"/>
+                <parameter name="action" value="Timestamp Signature SAMLTokenUnsigned"/>
                 <parameter name="signaturePropFile" value="crypto.properties" />
                 
             </handler>
@@ -371,7 +371,7 @@
 		 -->
         <requestFlow>
             <handler type="java:org.apache.ws.axis.security.WSDoAllReceiver">
-                <parameter name="action" value="Signature SAMLTokenUnsigned"/>
+                <parameter name="action" value="Timestamp Signature SAMLTokenUnsigned"/>
 			    <parameter name="signaturePropFile" value="crypto.properties" />
                 
             </handler>
