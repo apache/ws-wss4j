@@ -73,7 +73,7 @@ public class Scenario7 {
             throw new javax.xml.rpc.ServiceException(e);
         }
 
-        PingPort port = (PingPort) service.getPing6(endpoint);
+        PingPort port = (PingPort) service.getPing7(endpoint);
 
         /*
          *     At this point all preparations are done. Using the port we can
