@@ -16,23 +16,11 @@
  */
 package wssec;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PrintWriter;
-
-import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.callback.UnsupportedCallbackException;
-
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
-
 import org.apache.axis.Message;
 import org.apache.axis.MessageContext;
-import org.apache.axis.SOAPPart;
 import org.apache.axis.client.AxisClient;
 import org.apache.axis.configuration.NullProvider;
 import org.apache.axis.message.SOAPEnvelope;
@@ -51,16 +39,23 @@ import org.apache.ws.security.message.WSSAddUsernameToken;
 import org.apache.ws.security.message.token.Reference;
 import org.apache.ws.security.message.token.SecurityTokenReference;
 import org.apache.ws.security.util.WSSecurityUtil;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.CallbackHandler;
+import javax.security.auth.callback.UnsupportedCallbackException;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintWriter;
 
 /**
  * TestCase10 for testing HMAC_SHA1 in wss4j.
  * Based on TestCase9.
- * 
+ *
  * The objective of this TestCase is to test the HMAC_SHA1 signature.
- * 
+ *
  *  @author Dimuthu Leelarathne. (muthulee@yahoo.com)
  */
 public class TestWSSecurity10 extends TestCase implements CallbackHandler {
@@ -84,7 +79,7 @@ public class TestWSSecurity10 extends TestCase implements CallbackHandler {
     /**
      * TestWSSecurity constructor
      * <p/>
-     * 
+     *
      * @param name name of the test
      */
     public TestWSSecurity10(String name) {
@@ -94,7 +89,7 @@ public class TestWSSecurity10 extends TestCase implements CallbackHandler {
     /**
      * JUnit suite
      * <p/>
-     * 
+     *
      * @return a junit test suite
      */
     public static Test suite() {
@@ -104,7 +99,7 @@ public class TestWSSecurity10 extends TestCase implements CallbackHandler {
     /**
      * Main method
      * <p/>
-     * 
+     *
      * @param args command line args
      */
     //     public static void main(String[] args) {
@@ -114,7 +109,7 @@ public class TestWSSecurity10 extends TestCase implements CallbackHandler {
     /**
      * Setup method
      * <p/>
-     * 
+     *
      * @throws Exception Thrown when there is a problem in setup
      */
     protected void setUp() throws Exception {
@@ -126,7 +121,7 @@ public class TestWSSecurity10 extends TestCase implements CallbackHandler {
     /**
      * Constructs a soap envelope
      * <p/>
-     * 
+     *
      * @return soap envelope
      * @throws Exception if there is any problem constructing the soap envelope
      */
@@ -141,7 +136,7 @@ public class TestWSSecurity10 extends TestCase implements CallbackHandler {
      * Test that encrypts and signs a WS-Security envelope, then performs
      * verification and decryption.
      * <p/>
-     * 
+     *
      * @throws Exception Thrown when there is any problem in signing, encryption,
      *                   decryption, or verification
      */
@@ -172,7 +167,7 @@ public class TestWSSecurity10 extends TestCase implements CallbackHandler {
         builder.build(doc, username, password);
 
         //Step 2
-        // I should add wsu:Id here but I am not adding it since 
+        // I should add wsu:Id here but I am not adding it since
         Element usrEle =
             (Element) (doc
                 .getElementsByTagNameNS(WSConstants.WSSE_NS, "UsernameToken")
@@ -180,7 +175,7 @@ public class TestWSSecurity10 extends TestCase implements CallbackHandler {
         String idValue = "1234";
         usrEle.setAttribute("Id", idValue);
 
-        //Step 3 :: 
+        //Step 3 ::
         Reference ref = new Reference(WSSConfig.getDefaultWSConfig(), doc);
         ref.setURI("#" + idValue);
         ref.setValueType("UsernameToken");
@@ -210,7 +205,7 @@ public class TestWSSecurity10 extends TestCase implements CallbackHandler {
          */
 
         Message signedMsg = (Message) AxisUtil.toSOAPMessage(encDoc);
-        
+
         XMLUtils.PrettyElementToWriter(signedMsg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
         log.info("Encryption Done\n");
     //    verifyEMBED_SECURITY_TOKEN_REF(signedMsg.getSOAPEnvelope().getAsDocument());
@@ -219,8 +214,8 @@ public class TestWSSecurity10 extends TestCase implements CallbackHandler {
     /**
      * Verifies the soap envelope
      * <p/>
-     * 
-     * @param doc 
+     *
+     * @param doc
      * @throws Exception Thrown when there is a problem in verification
      */
     private void verifyEMBED_SECURITY_TOKEN_REF(Document doc)

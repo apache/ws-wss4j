@@ -413,11 +413,12 @@ public class WSEncryptBody extends WSBaseMessage {
             case WSConstants.BST_DIRECT_REFERENCE:
                 Reference ref = new Reference(wssConfig, doc);
                 ref.setURI("#" + certUri);
-                secToken.setReference(ref);
                 BinarySecurity bstToken = null;
                 bstToken = new X509Security(wssConfig, doc);
                 ((X509Security) bstToken).setX509Certificate(remoteCert);
                 bstToken.setID(certUri);
+                ref.setValueType(bstToken.getValueType());
+                secToken.setReference(ref);
                 WSSecurityUtil.prependChildElement(doc,
                         wsseSecurity,
                         bstToken.getElement(),

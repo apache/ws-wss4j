@@ -85,7 +85,7 @@ public class X509Security extends BinarySecurity {
      *
      * @return the X509 certificate converted from the base 64 encoded
      *         element data
-     * @throws GeneralSecurityException
+     * @throws WSSecurityException
      */
     public X509Certificate getX509Certificate(Crypto crypto) throws WSSecurityException {
         if (cachedCert != null) {
@@ -109,7 +109,7 @@ public class X509Security extends BinarySecurity {
      * node of the element
      *
      * @param cert the X509 certificate to store in the element
-     * @throws CertificateEncodingException
+     * @throws WSSecurityException
      */
     public void setX509Certificate(X509Certificate cert)
             throws WSSecurityException {

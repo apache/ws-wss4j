@@ -328,13 +328,14 @@ public class RequestedProofToken {
                 break;
 
             case WSConstants.BST_DIRECT_REFERENCE:
-                Reference ref = new Reference(WSSConfig.getDefaultWSConfig(), doc);
-                ref.setURI("#" + certUri);
-                secToken.setReference(ref);
                 BinarySecurity bstToken = null;
                 bstToken = new X509Security(WSSConfig.getDefaultWSConfig(), doc);
                 ((X509Security) bstToken).setX509Certificate(remoteCert);
                 bstToken.setID(certUri);
+                Reference ref = new Reference(WSSConfig.getDefaultWSConfig(), doc);
+                ref.setURI("#" + certUri);
+                ref.setValueType(bstToken.getValueType());
+                secToken.setReference(ref);
 //                WSSecurityUtil.prependChildElement(
 //                    doc,
 //                    wsseSecurity,

@@ -420,7 +420,6 @@ public Document build(Document doc, Crypto crypto)
             case WSConstants.BST_DIRECT_REFERENCE:
                 Reference ref = new Reference(wssConfig, doc);
                 ref.setURI("#" + certUri);
-                secRef.setReference(ref);
                 BinarySecurity bstToken = null;
                 if (!useSingleCert) {
                     bstToken = new PKIPathSecurity(wssConfig, doc);
@@ -431,6 +430,8 @@ public Document build(Document doc, Crypto crypto)
                     bstToken = new X509Security(wssConfig, doc);
                     ((X509Security) bstToken).setX509Certificate(certs[0]);
                 }
+                ref.setValueType(bstToken.getValueType());
+                secRef.setReference(ref);
                 bstToken.setID(certUri);
                 WSSecurityUtil.prependChildElement(doc,
                         securityHeader,
@@ -786,6 +787,7 @@ public Document build(Document doc, Crypto crypto)
                 WSSecurityUtil.prependChildElement(doc, securityHeader,
                         bstToken.getElement(), false);
                 wsDocInfo.setBst(bstToken.getElement());
+                ref.setValueType(bstToken.getValueType());
             } else {
                 ref.setURI("#" + assertion.getId());
                 ref.setValueType(WSConstants.WSS_SAML_NS
