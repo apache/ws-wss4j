@@ -21,6 +21,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.conversation.message.info.DerivedKeyInfo;
 import org.apache.ws.security.conversation.message.info.SecurityContextInfo;
+import org.apache.ws.security.message.token.Reference;
 
 import java.util.Hashtable;
 
@@ -63,6 +64,10 @@ public class ConversationSession {
      * Last time the session was used/modified
      */
     private long lastTouched;
+    
+    private boolean addBase2Message = true;
+    
+    private Reference ref2Base = null;
 
     /**
      * Creates a new conversation session for a gien security context
@@ -158,6 +163,34 @@ public class ConversationSession {
      */
     public long getLastTouched() {
         return this.lastTouched;
+    }
+
+    /**
+     * @return
+     */
+    public boolean isAddBase2Message() {
+        return addBase2Message;
+    }
+
+    /**
+     * @return
+     */
+    public Reference getRef2Base() {
+        return ref2Base;
+    }
+
+    /**
+     * @param b
+     */
+    public void setAddBase2Message(boolean b) {
+        addBase2Message = b;
+    }
+
+    /**
+     * @param reference
+     */
+    public void setRef2Base(Reference reference) {
+        ref2Base = reference;
     }
 
 }

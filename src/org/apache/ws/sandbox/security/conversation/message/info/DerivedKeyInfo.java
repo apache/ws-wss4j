@@ -45,8 +45,10 @@ public class DerivedKeyInfo {
     private int usageCount;
     private SecurityTokenReference secTokenRef;
     private SecurityTokenReference secTokRef2DkToken;
+    private DerivedKeyToken dkTok = null;
 
     public DerivedKeyInfo(DerivedKeyToken dkt) throws WSSecurityException {
+    	this.dkTok=dkt;
         this.properties = dkt.getProperties();
         this.generation = dkt.getGeneration();
         this.offset = dkt.getOffset();
@@ -107,4 +109,18 @@ public class DerivedKeyInfo {
     public SecurityTokenReference getSecTokRef2DkToken() {
         return secTokRef2DkToken;
     }
+    /**
+     * @return
+     */
+    public DerivedKeyToken getDkTok() {
+        return dkTok;
+    }
+
+    /**
+     * @param token
+     */
+    public void setDkTok(DerivedKeyToken token) {
+        dkTok = token;
+    }
+
 }

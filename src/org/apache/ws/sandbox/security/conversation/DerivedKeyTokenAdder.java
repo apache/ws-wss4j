@@ -40,8 +40,8 @@ public class DerivedKeyTokenAdder extends WSBaseMessage {
 
         // log.debug("Begin add username token...");
         Element securityHeader = insertSecurityHeader(doc);
-        WSSecurityUtil.appendChildElement(doc, securityHeader,
-                dkToken.getElement());
+        WSSecurityUtil.prependChildElement(doc, securityHeader,
+                dkToken.getElement(),false);
         return doc;
     }
 }

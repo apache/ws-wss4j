@@ -70,19 +70,19 @@ public class ConversationManager {
     protected String canonAlgo = Canonicalizer.ALGO_ID_C14N_EXCL_OMIT_COMMENTS;
 
     /**
-     * Adds Derived key tokens to the header of the SOAP message, given the
-     * following parameters.
-     *
-     * @param doc
-     * @param uuid
-     * @param dkcbHandler
-     * @param genID
-     * @throws WSSecurityException
-     * @throws ConversationException
-     */
-    public DerivedKeyInfo addDerivedKeyToken(Document doc,
+      * Adds Derived key tokens to the header of the SOAP message, given the
+      * following parameters.
+      * @param doc
+      * @param uuid
+      * @param dkcbHandler
+      * @param stRef2Base -SecurityTOkenReference to the token, from which the derived
+      *                    key is derived from
+      * @return
+      * @throws ConversationException
+      */
+     public DerivedKeyInfo createDerivedKeyToken(Document doc,
                                              String uuid,
-                                             DerivedKeyCallbackHandler dkcbHandler)
+                                             DerivedKeyCallbackHandler dkcbHandler,SecurityTokenReference stRef2Base, int keyLen )
             throws ConversationException {
         String genID = ConversationUtil.genericID();
         
@@ -90,10 +90,10 @@ public class ConversationManager {
          * This metod is 4-step procedure. 
          */
          
-        // step 1 : Creating wsse:Reference
+        // step 1 : Creating wsse:Reference to DerivedKeyToken
         Reference ref = new Reference(WSSConfig.getDefaultWSConfig(), doc);
         ref.setURI("#" + genID);
-        ref.setValueType("DerivedKeyToken");
+        ref.setValueType("http://schemas.xmlsoap.org/ws/2004/04/security/sc/dk");
         SecurityTokenReference stRef = new SecurityTokenReference(WSSConfig.getDefaultWSConfig(), doc);
         stRef.setReference(ref);
 
@@ -103,16 +103,18 @@ public class ConversationManager {
 
         // step 2 :Create the DerriveToken
         DerivedKeyToken dtoken = new DerivedKeyToken(doc);
-        dtoken.setLabel(doc, "WSSecureConversationWSSecureConversation");
-        dtoken.setNonce(doc, "nonce.....");
+		if(stRef2Base != null){
+			dtoken.setSecuityTokenReference(doc, stRef2Base);
+		}
+        dtoken.setLabel(doc, "WS-SecureConversationWS-SecureConversation");
+        dtoken.setNonce(doc, ConversationUtil.generateNonce(128));
         dtoken.setID(genID);
-
-        if (dkcbHandler.getDerivedKeyLength(uuid) == -1) {
-            //key legnth is varing
-        } else {
-            dtoken.setGeneration(doc, this.generation);
-        }
-
+		//System.out.println("Fix me here ....");
+		
+		if(keyLen!=-1){
+		   dtoken.setLength(doc,keyLen);
+		}
+        
         //step 3 :add the derived key token infomation into the dkcbHandler
         DerivedKeyInfo dkInfo = null;
         try {
@@ -124,12 +126,16 @@ public class ConversationManager {
             throw new ConversationException("ConversationManager:: Cannot add Derived key token to the envelope");
         }
 
-        //step 4 : add the token to the soap message
-        DerivedKeyTokenAdder adder = new DerivedKeyTokenAdder();
-        adder.build(doc, dtoken);
-        return dkInfo;
+               
+		return dkInfo;
 
     }
+    
+    
+    public void addDkToken(Document doc, DerivedKeyInfo info){
+    	  DerivedKeyTokenAdder adder = new DerivedKeyTokenAdder();
+    	  adder.build(doc, info.getDkTok());
+    }		  
 
     /**
      * Manages derived key encryption.
@@ -138,7 +144,7 @@ public class ConversationManager {
      * @param actor
      * @param mu
      * @param doc
-     * @param secRef
+     * @param secRef - SecurityTokenReference pointing to the derived Key
      * @param dkcbHandler
      * @throws ConversationException
      */
@@ -147,7 +153,8 @@ public class ConversationManager {
                                boolean mu,
                                Document doc,
                                SecurityTokenReference secRef,
-                               DerivedKeyCallbackHandler dkcbHandler)
+                               DerivedKeyCallbackHandler dkcbHandler, Vector parts,
+                               String symAlgo)
             throws ConversationException {
         WSEncryptBody wsEncrypt = new WSEncryptBody(actor, mu);
 
@@ -156,14 +163,14 @@ public class ConversationManager {
          * Rest is as same as EMBEDDED_KEYNAME , i.e. we want to encrypt the message
          * using a symmetric key and the result would be an <EncryptedData> element.
          * Steps are
-         * step 1: Adding SecurityTokenReference to wsEncrypt
+         * step 1: Adding SecurityTokenReference pointing to DkToken
          * step 2: Adding the key into wsEncrypt
          * step 3: Setting the user.
          */
         wsEncrypt.setKeyIdentifierType(WSConstants.EMBED_SECURITY_TOKEN_REF);
-
+		
         /*
-         * step 1: Adding SecurityTokenReference.
+         * step 1: Adding SecurityTokenReference pointing to DkToken.
          */
         wsEncrypt.setSecurityTokenReference(secRef);
 
@@ -187,10 +194,18 @@ public class ConversationManager {
          * step 3: set the user.
          */
         wsEncrypt.setUserInfo(encUser);
-
+        
+        /*
+         * step 4 : Setting encryption parts
+         */
+         wsEncrypt.setParts(parts);  
+        
+         wsEncrypt.setSymmetricEncAlgorithm(symAlgo);
+         
         try {
             wsEncrypt.build(doc, null);
         } catch (WSSecurityException e) {
+        	e.printStackTrace();
             throw new ConversationException("ConversationManager :: Encryption: error during message processing");
         }
 
@@ -208,7 +223,7 @@ public class ConversationManager {
     public void performDK_Sign(Document doc,
                                DerivedKeyCallbackHandler dkcbHandler,
                                String uuid,
-                               DerivedKeyInfo dkSigInfo)
+                               DerivedKeyInfo dkSigInfo, Vector parts)
             throws ConversationException {
         //            Signing....
         //        HMAC_SignVerify sign = new HMAC_SignVerify();
@@ -216,6 +231,7 @@ public class ConversationManager {
 
         String sigUser =
                 ConversationUtil.generateIdentifier(uuid, dkSigInfo.getId());
+        System.out.println("Signature user is ::"+sigUser);
         WSPasswordCallback pwCb =
                 new WSPasswordCallback(sigUser, WSPasswordCallback.UNKNOWN);
         Callback[] callbacks = new Callback[1];
@@ -228,7 +244,7 @@ public class ConversationManager {
         }
         try {
             Reference ref = dkSigInfo.getSecTokRef2DkToken().getReference();
-            this.build(doc, ref, pwCb.getKey(), null);
+            this.build(doc, ref, pwCb.getKey(), parts);
         } catch (WSSecurityException e1) {
             e1.printStackTrace();
             throw new ConversationException("ConversationManager :: Error performing signature.");
@@ -268,6 +284,7 @@ public class ConversationManager {
                     new Object[]{"For symmeric key signatures - Reference object must be provided"});
         }
         String sigAlgo = XMLSignature.ALGO_ID_MAC_HMAC_SHA1;
+        log.debug("Key is "+new String(sk));
 
         SecretKey sharedKey = new SecretKeySpec(sk, sigAlgo);
 
@@ -379,10 +396,9 @@ public class ConversationManager {
          * -Append the signature element.
          * -Apped the KeyInfo element
          */
-        WSSecurityUtil.prependChildElement(doc,
+        WSSecurityUtil.appendChildElement(doc,
                 securityHeader,
-                sig.getElement(),
-                false);
+                sig.getElement());
 
         /*
          * Put the "Reference object" into secRef in KeyInfo

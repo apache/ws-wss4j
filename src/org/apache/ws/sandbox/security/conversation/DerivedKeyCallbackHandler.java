@@ -95,6 +95,16 @@ public class DerivedKeyCallbackHandler implements CallbackHandler {
         }
 
     }
+    
+    public static ConversationSession getSession(String uuid) throws ConversationException{
+		ConversationSession session = (ConversationSession) conversationSessionTable.get(uuid);
+				if (session != null) {
+					return session;
+				} else {
+					return null;
+				}
+
+    }
 
     /**
      * If the Label element is not available in a DerivedKeyToken element then
@@ -116,7 +126,8 @@ public class DerivedKeyCallbackHandler implements CallbackHandler {
             throw new ConversationException("The key size cannot be set: No such context/session");
         }
     }
-
+    
+   
     /**
      * Adds a derived key into a session identified by the uuid
      *

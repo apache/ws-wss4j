@@ -129,7 +129,9 @@ public class DerivedKeyToken {
      * @param ref Security token reference
      */
     public void setSecuityTokenReference(Document doc, SecurityTokenReference ref) {
-        WSSecurityUtil.appendChildElement(doc, this.element, ref.getElement());
+        this.elementSecurityTokenReference = ref.getElement();
+        //WSSecurityUtil.appendChildElement(doc, this.element, ref.getElement());
+        this.element.appendChild(ref.getElement());
     }
 
     /**

@@ -96,7 +96,8 @@ public class ConversationConstants {
 
     public static final int DIRECT_GENERATED = 1;
     public static final int STS_GENERATED = 2;
-    public static final int WS_GENERATED = 3;
+    public static final int STSREQUEST_TOKEN = 3;
+    public static final int INTEROP_SCENE1 = 4;
 
     public static final String IDENTIFIER = "SCT_Identifier";
 

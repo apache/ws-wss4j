@@ -70,46 +70,46 @@ public class KeyDerivator {
         DerivedKeyInfo dkInfo = (DerivedKeyInfo) convSession.getDerivedKeys().get(derivedKeyTokenId);
         SecurityTokenReference secTokRef = dkInfo.getSecurityTokenReference();
         log.debug("KeyDerivator: deriveKey: security token reference: " + secTokRef);
-        if (secTokRef != null) {
-            if (secTokRef.toString().equals("<wsse:SecurityTokenReference/>")) {//No security token reference
-                log.debug("KeyDerivator: deriveKey: No security token refernece available");
-                return deriveTokenFromContext(convSession, dkInfo);
-            } else {
-                String contextIdentifier = convSession.getContextInfo().getIdentifier();
-
-                String wsuId = secTokRef.getReference().getURI();
-
-                Element sctEle = WSSecurityUtil.getElementByWsuId(WSSConfig.getDefaultWSConfig(), secTokRef.getElement().getOwnerDocument(), wsuId);
-
-                try {
-                    SecurityContextToken sct = new SecurityContextToken(sctEle);
-                    if (contextIdentifier.equals(sct.getIdentifier()))
-                        return deriveTokenFromContext(convSession, dkInfo);
-                    else
-                        throw new ConversationException("Derivation source cannot be determined");
-                } catch (WSSecurityException secEx) {
-                    /** @todo Supporting other tokens other than SCT as the derivation source */
-                    //Here we should check whether it is some other type of a token
-                    //E.g. DerivedKeyToken
-                }
-
-                if (secTokRef.getReference().getURI().equals(contextIdentifier)) { //If the reference is to the SecurityContextToken
-                    return deriveTokenFromContext(convSession, dkInfo);
-                } else {
-                    //Derive from some other security token other than the relevent security context
-                    /** @todo Derive from some other security token other than the relevent security context
-                     * For example this can be another DerivedKeyToken
-                     * */
-                    throw new ConversationException("KeyDerivator:  Deriving from some " +
-                            "other security token other than the " +
-                            "relevent security context: Not implemented :-(");
-
-                }
-            }
-        } else { //There is no SecurityTokenRefernece
+//        if (secTokRef != null) {
+//            if (secTokRef.toString().equals("<wsse:SecurityTokenReference/>")) {//No security token reference
+//                log.debug("KeyDerivator: deriveKey: No security token refernece available");
+//                return deriveTokenFromContext(convSession, dkInfo);
+//            } else {
+//                String contextIdentifier = convSession.getContextInfo().getIdentifier();
+//
+//                String wsuId = secTokRef.getReference().getURI();
+//
+//                Element sctEle = WSSecurityUtil.getElementByWsuId(WSSConfig.getDefaultWSConfig(), secTokRef.getElement().getOwnerDocument(), wsuId);
+//
+//                try {
+//                    SecurityContextToken sct = new SecurityContextToken(sctEle);
+//                    if (contextIdentifier.equals(sct.getIdentifier()))
+//                        return deriveTokenFromContext(convSession, dkInfo);
+//                    else
+//                        throw new ConversationException("Derivation source cannot be determined");
+//                } catch (WSSecurityException secEx) {
+//                    /** @todo Supporting other tokens other than SCT as the derivation source */
+//                    //Here we should check whether it is some other type of a token
+//                    //E.g. DerivedKeyToken
+//                }
+//
+//                if (secTokRef.getReference().getURI().equals(contextIdentifier)) { //If the reference is to the SecurityContextToken
+//                    return deriveTokenFromContext(convSession, dkInfo);
+//                } else {
+//                    //Derive from some other security token other than the relevent security context
+//                    /** @todo Derive from some other security token other than the relevent security context
+//                     * For example this can be another DerivedKeyToken
+//                     * */
+//                    throw new ConversationException("KeyDerivator:  Deriving from some " +
+//                            "other security token other than the " +
+//                            "relevent security context: Not implemented :-(");
+//
+//                }
+//            }
+//        } else { //There is no SecurityTokenRefernece
             log.debug("KeyDerivator: deriveKey: No security token refernece available");
             return deriveTokenFromContext(convSession, dkInfo);
-        }
+  //      }
 
     }
 
@@ -198,11 +198,15 @@ public class KeyDerivator {
                     "Generation : " + generation +
                     "Offset : " + offset);
         } else if (convSession.getKeyLength() != -1) { //Session is configured to use fixed size keys
-            if (generation == -1)
-                throw new ConversationException("Generation value is not avaliable (fixed size keys are used: " +
-                        "Key size : " + convSession.getKeyLength() + ")");
-            else
+            if (generation == -1){
+          		log.debug("Generation set to zero");
+          		generation = 0;   
+          return (int)convSession.getKeyLength() * generation;
+//                throw new ConversationException("Generation value is not avaliable (fixed size keys are used: " +
+//                        "Key size : " + convSession.getKeyLength() + ")");
+            }else{
                 return (int) convSession.getKeyLength() * generation;
+            }    
         } else if (offset != -1) { //Fixed size keys are NOT used: The length and offset values should be available in the DKT
             return offset;
         } else if (generation != -1) { //Here length should be specified in the DKT

@@ -81,7 +81,18 @@ public class SecurityContextInfo {
         this.frequency = frequency; // frequency of refreshing the derrived key
         /** @todo get the values of other elements (any elements) of SCT*/
     }
+    
+    
+	public SecurityContextInfo(String uuid,
+								   byte[] sharedSecret,
+								   int frequency) throws WSSecurityException {
 
+			this.sharedSecret = sharedSecret;
+			this.identifier = uuid;
+			this.frequency = frequency; // frequency of refreshing the derrived key
+			/** @todo get the values of other elements (any elements) of SCT*/
+	}
+     
     /**
      * @return
      */

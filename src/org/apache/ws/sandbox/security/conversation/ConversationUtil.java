@@ -43,7 +43,7 @@ public class ConversationUtil {
     private static final String ID_SEPARATER = "$$$$";
 
     /**
-     * Genearets the nonce for a given length.
+     * Genearets the nonce for a given bit length.
      */
     public static String generateNonce(int length) {
         SecureRandom random = null;
@@ -53,7 +53,7 @@ public class ConversationUtil {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        byte[] nonceValue = new byte[length];
+        byte[] nonceValue = new byte[length/8];
         random.nextBytes(nonceValue);
         return Base64.encode(nonceValue);
     }

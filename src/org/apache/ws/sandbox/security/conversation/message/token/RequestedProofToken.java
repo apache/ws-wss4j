@@ -134,7 +134,7 @@ public class RequestedProofToken {
             } catch (java.lang.Exception e) {
                 throw new WSSecurityException(WSSecurityException.FAILED_ENC_DEC,
                         "RequestedProofToken: cannot create instance of password callback: "
-                        + callback);
+                        + callback +":: ErrMsg "+e.getMessage());
             }
             secEngine.handleEncryptedKey((Element) ndList.item(0),
                     cbHandler,
