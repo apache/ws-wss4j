@@ -482,11 +482,12 @@ public class WSSecurityEngine {
 		} else if (secRef.containsKeyIdentifier()) {
 			certs = secRef.getKeyIdentifier(crypto);
 		}
-		//        }
 		if (tlog.isDebugEnabled()) {
 			t1 = System.currentTimeMillis();
 		}
-		//        if (certs != null && certs.length > 0 && certs[0] != null) {
+		if (certs == null || certs.length == 0 || certs[0] == null) {
+			throw new WSSecurityException(WSSecurityException.FAILED_CHECK);
+		}
 		try {
 			certs[0].checkValidity();
 		} catch (CertificateExpiredException e) {
@@ -518,8 +519,6 @@ public class WSSecurityEngine {
 		} catch (XMLSignatureException e1) {
 			throw new WSSecurityException(WSSecurityException.FAILED_CHECK);
 		}
-		// }
-		//		throw new WSSecurityException(WSSecurityException.FAILED_CHECK);
 	}
     
     /**
