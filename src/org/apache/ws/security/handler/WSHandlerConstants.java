@@ -98,6 +98,7 @@ public class WSHandlerConstants {
      */
     public static final String NO_SERIALIZATION = "NoSerialization";
 
+    public static final String SIGN_WITH_UT_KEY = "UsernameTokenSignature";
     /**
      * This is an interal property name to support handler chaining.
      * The Axis WSS4J handlers use this message context property to

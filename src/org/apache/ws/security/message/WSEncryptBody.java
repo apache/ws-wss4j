@@ -336,7 +336,7 @@ public class WSEncryptBody extends WSBaseMessage {
             if (body == null) {
                 throw new WSSecurityException(WSSecurityException.FAILURE,
                         "noEncElement",
-                        new Object[]{nmSpace, elemName});
+                        new Object[]{"{" + nmSpace + "}" + elemName});
             }
 
             boolean content = modifier.equals("Content") ? true : false;

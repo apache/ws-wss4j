@@ -47,12 +47,15 @@ import org.apache.ws.security.message.WSSAddUsernameToken;
 import org.apache.ws.security.message.WSSignEnvelope;
 import org.apache.ws.security.util.StringUtil;
 import org.apache.ws.security.util.WSSecurityUtil;
+import org.apache.xml.security.signature.XMLSignature;
 import org.apache.xml.security.utils.XMLUtils;
 import org.opensaml.SAMLAssertion;
 import org.w3c.dom.Document;
 
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
+import javax.xml.rpc.JAXRPCException;
+
 import java.io.ByteArrayOutputStream;
 import java.io.UnsupportedEncodingException;
 import java.security.cert.X509Certificate;
@@ -175,7 +178,7 @@ public class WSDoAllSender extends BasicHandler {
          * functions. No need to do it for encryption only. Check if username
          * is available and then get a passowrd.
          */
-        if ((doAction & (WSConstants.SIGN | WSConstants.UT)) != 0) {
+        if ((doAction & (WSConstants.SIGN | WSConstants.UT | WSConstants.UT_SIGN)) != 0) {
             /*
              * We need a username - if none throw an AxisFault. For encryption
              * there is a specific parameter to get a username.
@@ -230,6 +233,13 @@ public class WSDoAllSender extends BasicHandler {
          * Now get the action specific parameters.
          */
         if ((doAction & WSConstants.UT) == WSConstants.UT) {
+            decodeUTParameter();
+        }
+        /*
+         * Here we have action, username, password, and actor, mustUnderstand.
+         * Now get the action specific parameters.
+         */
+        if ((doAction & WSConstants.UT_SIGN) == WSConstants.UT_SIGN) {
             decodeUTParameter();
         }
         /*
@@ -293,7 +303,11 @@ public class WSDoAllSender extends BasicHandler {
                     performTSAction(actionToDo, mu, doc);
                     break;
 
-                case WSConstants.NO_SERIALIZE:
+    			case WSConstants.UT_SIGN:
+    				performUT_SIGNAction(actionToDo, mu, doc);
+    				break;
+
+    			case WSConstants.NO_SERIALIZE:
                     noSerialization = true;
                     break;
             }
@@ -434,6 +448,33 @@ public class WSDoAllSender extends BasicHandler {
             }
         }
     }
+
+    private void performUT_SIGNAction(int actionToDo, boolean mu, Document doc)
+			throws AxisFault {
+		String password;
+		password = getPassword(username, actionToDo,
+				WSHandlerConstants.PW_CALLBACK_CLASS,
+				WSHandlerConstants.PW_CALLBACK_REF).getPassword();
+
+		WSSAddUsernameToken builder = new WSSAddUsernameToken(actor, mu);
+		builder.setPasswordType(WSConstants.PASSWORD_TEXT);
+		builder.preSetUsernameToken(doc, username, password);
+		builder.addCreated(doc);
+		builder.addNonce(doc);
+
+		WSSignEnvelope sign = new WSSignEnvelope(actor, mu);
+		sign.setUsernameToken(builder);
+		sign.setKeyIdentifierType(WSConstants.UT_SIGNING);
+		sign.setSignatureAlgorithm(XMLSignature.ALGO_ID_MAC_HMAC_SHA1);
+		try {
+			sign.build(doc, null);
+		} catch (WSSecurityException e) {
+			throw new AxisFault("WSDoAllSender: Error during Signatur with UsernameToken secret"
+					+ e);
+		}
+		builder.build(doc, null, null);
+	}
+
 
     private void performSTAction(int actionToDo, boolean mu, Document doc)
             throws AxisFault {
@@ -808,7 +849,8 @@ public class WSDoAllSender extends BasicHandler {
         int reason = 0;
 
         switch (doAction) {
-            case WSConstants.UT:
+        case WSConstants.UT:
+        case WSConstants.UT_SIGN:
                 reason = WSPasswordCallback.USERNAME_TOKEN;
                 break;
             case WSConstants.SIGN:

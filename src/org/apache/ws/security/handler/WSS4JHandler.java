@@ -38,6 +38,7 @@ import org.apache.ws.security.saml.SAMLIssuer;
 import org.apache.ws.security.saml.SAMLIssuerFactory;
 import org.apache.ws.security.util.StringUtil;
 import org.apache.ws.security.util.WSSecurityUtil;
+import org.apache.xml.security.signature.XMLSignature;
 import org.opensaml.SAMLAssertion;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -221,7 +222,7 @@ public class WSS4JHandler implements Handler {
          * functions. No need to do it for encryption only. Check if username
          * is available and then get a passowrd.
          */
-        if ((doAction & (WSConstants.SIGN | WSConstants.UT)) != 0) {
+        if ((doAction & (WSConstants.SIGN | WSConstants.UT | WSConstants.UT_SIGN)) != 0) {
             /*
              * We need a username - if none throw an JAXRPCException. For encryption
              * there is a specific parameter to get a username.
@@ -275,6 +276,13 @@ public class WSS4JHandler implements Handler {
             decodeUTParameter();
         }
         /*
+         * Here we have action, username, password, and actor, mustUnderstand.
+         * Now get the action specific parameters.
+         */
+        if ((doAction & WSConstants.UT_SIGN) == WSConstants.UT_SIGN) {
+            decodeUTParameter();
+        }
+        /*
          * Get and check the Signature specific parameters first because they
          * may be used for encryption too.
          */
@@ -309,49 +317,53 @@ public class WSS4JHandler implements Handler {
             }
 
             switch (actionToDo) {
-                case WSConstants.UT:
-                    performUTAction(actionToDo, mu, doc);
-                    break;
+			case WSConstants.UT:
+				performUTAction(actionToDo, mu, doc);
+				break;
 
-                case WSConstants.ENCR:
-                    performENCRAction(mu, actionToDo, doc);
-                    break;
+			case WSConstants.ENCR:
+				performENCRAction(mu, actionToDo, doc);
+				break;
 
-                case WSConstants.SIGN:
-                    performSIGNAction(actionToDo, mu, doc);
-                    break;
+			case WSConstants.SIGN:
+				performSIGNAction(actionToDo, mu, doc);
+				break;
 
-                case WSConstants.ST_SIGNED:
-                    performST_SIGNAction(actionToDo, mu, doc);
-                    break;
+			case WSConstants.ST_SIGNED:
+				performST_SIGNAction(actionToDo, mu, doc);
+				break;
 
-                case WSConstants.ST_UNSIGNED:
-                    performSTAction(mu, doc);
-                    break;
+			case WSConstants.ST_UNSIGNED:
+				performSTAction(mu, doc);
+				break;
 
-                case WSConstants.TS:
-                    performTSAction(mu, doc);
-                    break;
+			case WSConstants.TS:
+				performTSAction(mu, doc);
+				break;
 
-                case WSConstants.NO_SERIALIZE:
-                    noSerialization = true;
-                    break;
-            }
+			case WSConstants.UT_SIGN:
+				performUT_SIGNAction(actionToDo, mu, doc);
+				break;
+
+			case WSConstants.NO_SERIALIZE:
+				noSerialization = true;
+				break;
+			}
         }
 
         /*
-         * If required convert the resulting document into a message first. The
-         * outputDOM() method performs the necessary c14n call. After that we
-         * extract it as a string for further processing.
-         *
-         * Set the resulting byte array as the new SOAP message.
-         *
-         * If noSerialization is false, this handler shall be the last (or
-         * only) one in a handler chain. If noSerialization is true, just set
-         * the processed Document in the transfer property. The next Axis WSS4J
-         * handler takes it and performs additional security processing steps.
-         *
-         */
+		 * If required convert the resulting document into a message first. The
+		 * outputDOM() method performs the necessary c14n call. After that we
+		 * extract it as a string for further processing.
+		 * 
+		 * Set the resulting byte array as the new SOAP message.
+		 * 
+		 * If noSerialization is false, this handler shall be the last (or only)
+		 * one in a handler chain. If noSerialization is true, just set the
+		 * processed Document in the transfer property. The next Axis WSS4J
+		 * handler takes it and performs additional security processing steps.
+		 *  
+		 */
         if (noSerialization) {
             msgContext.setProperty(WSHandlerConstants.SND_SECURITY, doc);
         } else {
@@ -1086,6 +1098,32 @@ handle response
         }
     }
 
+    private void performUT_SIGNAction(int actionToDo, boolean mu, Document doc)
+			throws JAXRPCException {
+		String password;
+		password = getPassword(username, actionToDo,
+				WSHandlerConstants.PW_CALLBACK_CLASS,
+				WSHandlerConstants.PW_CALLBACK_REF).getPassword();
+
+		WSSAddUsernameToken builder = new WSSAddUsernameToken(actor, mu);
+		builder.setPasswordType(WSConstants.PASSWORD_TEXT);
+        builder.preSetUsernameToken(doc, username, password);
+        builder.addCreated(doc);
+        builder.addNonce(doc);
+        
+        WSSignEnvelope sign = new WSSignEnvelope(actor, mu);
+        sign.setUsernameToken(builder);
+        sign.setKeyIdentifierType(WSConstants.UT_SIGNING);
+        sign.setSignatureAlgorithm(XMLSignature.ALGO_ID_MAC_HMAC_SHA1);
+        try {
+			sign.build(doc, null);
+		} catch (WSSecurityException e) {
+            throw new JAXRPCException("WSS4JHandler: Error during Signatur with UsernameToken secret"
+                    + e);
+		}
+		builder.build(doc, null, null);		
+	}
+
     private void performSTAction(boolean mu, Document doc)
             throws JAXRPCException {
         WSSAddSAMLToken builder = new WSSAddSAMLToken(actor, mu);
@@ -1220,6 +1258,9 @@ handle response
             } else if (single[i].equals(WSHandlerConstants.NO_SERIALIZATION)) {
                 doAction |= WSConstants.NO_SERIALIZE;
                 actions.add(new Integer(WSConstants.NO_SERIALIZE));
+            } else if (single[i].equals(WSHandlerConstants.SIGN_WITH_UT_KEY)) {
+                doAction |= WSConstants.UT_SIGN;
+                actions.add(new Integer(WSConstants.UT_SIGN));
             } else {
                 throw new JAXRPCException("WSS4JHandler: Unknown action defined" + single[i]);
             }
@@ -1524,7 +1565,8 @@ handle response
         int reason = 0;
 
         switch (doAction) {
-            case WSConstants.UT:
+        case WSConstants.UT:
+        case WSConstants.UT_SIGN:
                 reason = WSPasswordCallback.USERNAME_TOKEN;
                 break;
             case WSConstants.SIGN:

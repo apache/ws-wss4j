@@ -49,6 +49,23 @@
   </requestFlow>
   </service>
   
+ <service name="Ping2a">
+  <requestFlow>
+   <handler type="java:org.apache.ws.axis.security.WSDoAllSender" >
+    <parameter name="action" value="UsernameTokenSignature Encrypt Timestamp"/>
+    <parameter name="user" value="Chris"/>
+    <parameter name="passwordCallbackClass" 
+      value="org.apache.ws.axis.oasis.PWCallback1"/>
+    <parameter name="encryptionPropFile" value="wsstest.properties" />
+    <parameter name="encryptionKeyIdentifier" value="SKIKeyIdentifier" />
+    <!-- Use the Server's cert/key to encrypt the request -->
+    <parameter name="encryptionUser" value="c82f74d031dabf9d7546f40ad07c32c0_1e149434-9d3a-4adc-9284-4cfdc595012f" />
+    <parameter name="encryptionParts" 
+      value="{Element}{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd}UsernameToken" />  
+   </handler>
+  </requestFlow>
+  </service>
+
  <service name="Ping3">
   <requestFlow>
    <handler type="java:org.apache.ws.axis.security.WSDoAllSender" >

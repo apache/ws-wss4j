@@ -300,9 +300,18 @@ public class WSConstants {
      * Embeds a keyinfo/wsse:SecurityTokenReference into EncryptedData element.
      */
     public static final int EMBED_SECURITY_TOKEN_REF = 6;
+    
+    /**
+     * <code>UT_SIGNING</code> is used interally only to set a specific Signature
+     * behaviour.
+     * 
+     * The signing token is constructed from values in the UsernameToken according
+     * to WS-Trust specification.
+     */
+    public static final int UT_SIGNING = 7;
 
     public static final int NO_SECURITY = 0;
-    public static final int UT = 0x1; // perform UsernameToken only
+    public static final int UT = 0x1; // perform UsernameToken
     public static final int SIGN = 0x2; // Perform Signature
     public static final int ENCR = 0x4; // Perform Encryption
 
@@ -315,6 +324,7 @@ public class WSConstants {
     public static final int ST_SIGNED = 0x10; // perform SAMLToken signed
 
     public static final int TS = 0x20; // insert Timestamp
+    public static final int UT_SIGN = 0x40; // perform sinagture with UT secrect key
 
     public static final int NO_SERIALIZE = 0x100;
     public static final int SERIALIZE = 0x200;

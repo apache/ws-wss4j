@@ -64,7 +64,6 @@ import javax.xml.namespace.QName;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.security.InvalidKeyException;
 import java.security.Principal;
 import java.security.PrivateKey;
 import java.security.cert.CertificateExpiredException;
@@ -90,7 +89,6 @@ public class WSSecurityEngine {
             LogFactory.getLog("org.apache.ws.security.TIME");
 
     private static final Class[] constructorType = {WSSConfig.class, org.w3c.dom.Element.class};
-    private static boolean sigCheck = true;
     private static WSSecurityEngine engine = null;
     /**
      * The symmetric key.
@@ -316,22 +314,27 @@ public class WSSecurityEngine {
                 if (doDebug) {
                     log.debug("Found signature element");
                 }
-                if (sigCrypto == null) {
-                    throw new WSSecurityException(WSSecurityException.FAILURE,
-                            "noSigCryptoFile");
-                }
                 WSDocInfoStore.store(wsDocInfo);
                 X509Certificate[] returnCert = new X509Certificate[1];
                 Vector returnQname[] = new Vector[1];
                 try {
-                    lastPrincipalFound = verifyXMLSignature((Element) elem, sigCrypto, returnCert, returnQname);
-                } catch (WSSecurityException ex) {
-                    throw ex;
-                } finally {
-                    WSDocInfoStore.delete(wsDocInfo);
-                }
-                returnResults.add(0, new WSSecurityEngineResult(WSConstants.SIGN, lastPrincipalFound, returnCert[0],
-                        returnQname[0]));
+					lastPrincipalFound = verifyXMLSignature((Element) elem,
+							sigCrypto, returnCert, returnQname);
+				} catch (WSSecurityException ex) {
+					throw ex;
+				} finally {
+					WSDocInfoStore.delete(wsDocInfo);
+				}
+                if (lastPrincipalFound instanceof WSUsernameTokenPrincipal) {
+					returnResults.add(0, new WSSecurityEngineResult(
+							WSConstants.UT_SIGN, lastPrincipalFound, null,
+							returnQname[0]));
+
+				} else {
+					returnResults.add(0, new WSSecurityEngineResult(
+							WSConstants.SIGN, lastPrincipalFound,
+							returnCert[0], returnQname[0]));
+				}
             } else if (el.equals(ENCRYPTED_KEY)) {
                 if (doDebug) {
                     log.debug("Found encrypted key element");
@@ -476,135 +479,181 @@ public class WSSecurityEngine {
 
         X509Certificate[] certs = null;
         KeyInfo info = sig.getKeyInfo();
-        if (/*crypto.getDefaultX509Alias() == null &&*/ info != null) {
-            Node node;
-            if (wssConfig.getProcessNonCompliantMessages()) {
-                node = WSSecurityUtil.getDirectChildWSSE(info.getElement(),
-                        SecurityTokenReference.SECURITY_TOKEN_REFERENCE);
-            } else {
-                node = WSSecurityUtil.getDirectChild(info.getElement(),
-                        SecurityTokenReference.SECURITY_TOKEN_REFERENCE,
-                        wssConfig.getWsseNS());
-            }
-            if (node == null) {
-                throw new WSSecurityException(WSSecurityException.INVALID_SECURITY,
-                        "unsupportedKeyInfo");
-            }
-            SecurityTokenReference secRef =
-                    new SecurityTokenReference(wssConfig, (Element) node);
+        byte[] secretKey = null;
+        UsernameToken ut = null;
+        
+        if (info != null) {
+			Node node;
+			if (wssConfig.getProcessNonCompliantMessages()) {
+				node = WSSecurityUtil.getDirectChildWSSE(info.getElement(),
+						SecurityTokenReference.SECURITY_TOKEN_REFERENCE);
+			} else {
+				node = WSSecurityUtil.getDirectChild(info.getElement(),
+						SecurityTokenReference.SECURITY_TOKEN_REFERENCE,
+						wssConfig.getWsseNS());
+			}
+			if (node == null) {
+				throw new WSSecurityException(
+						WSSecurityException.INVALID_SECURITY,
+						"unsupportedKeyInfo");
+			}
+			SecurityTokenReference secRef = new SecurityTokenReference(
+					wssConfig, (Element) node);
 
-            int docHash = elem.getOwnerDocument().hashCode();
-            if (doDebug) {
-                log.debug("XML Verify doc: " + docHash);
-            }
+			int docHash = elem.getOwnerDocument().hashCode();
+			/*
+			 * Her we get some information about the document that is being
+			 * processed, in partucular the crypto implementation, and already
+			 * detected BST that may be used later during dereferencing.
+			 */
+			WSDocInfo wsDocInfo = WSDocInfoStore.lookup(docHash);
 
-            /*
-             * Her we get some information about the document that is being processed,
-             * in partucular the crypto implementation, and already detected BST that
-             * may be used later during dereferencing.
-             */
-            WSDocInfo wsDocInfo = WSDocInfoStore.lookup(docHash);
-
-            if (secRef.containsReference()) {
-                Element token = secRef.getTokenElement(elem.getOwnerDocument(), wsDocInfo);
-                // at this point ... check token type: Binary
-                QName el = new QName(token.getNamespaceURI(), token.getLocalName());
-                if (token.getLocalName().equals(binaryToken.getLocalPart())) { // the namespace has already been checked
-                    certs = getCertificatesTokenReference((Element) token, crypto);
-                } else if (el.equals(SAML_TOKEN)) {
-                    certs = getCertificatesFromSAML((Element) token, crypto);
-                } else {
-                    throw new WSSecurityException(WSSecurityException.INVALID_SECURITY,
-                            "unsupportedKeyInfo", new Object[]{el.toString()});
-                }
-            } else if (secRef.containsX509IssuerSerial()) {
-                certs = secRef.getX509IssuerSerial(crypto);
-            } else if (secRef.containsKeyIdentifier()) {
-                certs = secRef.getKeyIdentifier(crypto);
-            } else {
-                throw new WSSecurityException(WSSecurityException.INVALID_SECURITY,
-                        "unsupportedKeyInfo", new Object[]{node.toString()});
-            }
-        } else if (crypto.getDefaultX509Alias() != null) {
-            certs = crypto.getCertificates(crypto.getDefaultX509Alias());
-        } else {
-            throw new WSSecurityException(WSSecurityException.INVALID_SECURITY,
-                    "unsupportedKeyInfo");
-        }
-        if (tlog.isDebugEnabled()) {
+			if (secRef.containsReference()) {
+				Element token = secRef.getTokenElement(elem.getOwnerDocument(),
+						wsDocInfo);
+				/*
+				 * at this point check token type: UsernameToken, Binary, SAML
+				 * Crypto required only for Binary and SAML
+				 */
+				QName el = new QName(token.getNamespaceURI(), token
+						.getLocalName());
+				if (token.getLocalName().equals(UsernameToken.TOKEN)) {
+			        ut = new UsernameToken(wssConfig, token);
+			        secretKey = ut.getSecretKey();
+				} else {
+					if (crypto == null) {
+						throw new WSSecurityException(WSSecurityException.FAILURE,
+								"noSigCryptoFile");
+					}
+					if (token.getLocalName().equals(binaryToken.getLocalPart())) {
+						certs = getCertificatesTokenReference((Element) token,
+								crypto);
+					} else if (el.equals(SAML_TOKEN)) {
+						certs = getCertificatesFromSAML((Element) token, crypto);
+					} else {
+						throw new WSSecurityException(
+								WSSecurityException.INVALID_SECURITY,
+								"unsupportedKeyInfo", new Object[] { el
+										.toString() });
+					}
+				}
+			} else if (secRef.containsX509IssuerSerial()) {
+				certs = secRef.getX509IssuerSerial(crypto);
+			} else if (secRef.containsKeyIdentifier()) {
+				certs = secRef.getKeyIdentifier(crypto);
+			} else {
+				throw new WSSecurityException(
+						WSSecurityException.INVALID_SECURITY,
+						"unsupportedKeyInfo", new Object[] { node.toString() });
+			}
+		} else {
+			if (crypto == null) {
+				throw new WSSecurityException(WSSecurityException.FAILURE,
+						"noSigCryptoFile");
+			}
+			if (crypto.getDefaultX509Alias() != null) {
+				certs = crypto.getCertificates(crypto.getDefaultX509Alias());
+			} else {
+				throw new WSSecurityException(
+						WSSecurityException.INVALID_SECURITY,
+						"unsupportedKeyInfo");
+			}
+		}
+		if (tlog.isDebugEnabled()) {
             t1 = System.currentTimeMillis();
         }
-        if (certs == null || certs.length == 0 || certs[0] == null) {
+        if ((certs == null || certs.length == 0 || certs[0] == null) && secretKey == null) {
             throw new WSSecurityException(WSSecurityException.FAILED_CHECK);
         }
+        if (certs != null) {
+			try {
+				certs[0].checkValidity();
+			} catch (CertificateExpiredException e) {
+				throw new WSSecurityException(WSSecurityException.FAILED_CHECK,
+						"invalidCert");
+			} catch (CertificateNotYetValidException e) {
+				throw new WSSecurityException(WSSecurityException.FAILED_CHECK,
+						"invalidCert");
+			}
+		}
         try {
-            certs[0].checkValidity();
-        } catch (CertificateExpiredException e) {
-            throw new WSSecurityException(WSSecurityException.FAILED_CHECK,
-                    "invalidCert");
-        } catch (CertificateNotYetValidException e) {
-            throw new WSSecurityException(WSSecurityException.FAILED_CHECK,
-                    "invalidCert");
-        }
-        try {
-            if (sigCheck && sig.checkSignatureValue(certs[0])) {
-                if (tlog.isDebugEnabled()) {
-                    t2 = System.currentTimeMillis();
-                    tlog.debug("Verify: total= "
-                            + (t2 - t0)
-                            + ", prepare-cert= "
-                            + (t1 - t0)
-                            + ", verify= "
-                            + (t2 - t1));
-                }
-                /*
-                 * Now dig into the Signature element to get the elements that this
-                 * Signature covers. Build the QName of these Elements and return
-                 * them to caller
-                 */
-                SignedInfo si = sig.getSignedInfo();
-                int numReferences = si.getLength();
-                Vector qvec = new Vector(numReferences);
-                for (int i = 0; i < numReferences; i++) {
-                    Reference siRef;
-                    try {
-                        siRef = si.item(i);
-                    } catch (XMLSecurityException e3) {
-                        throw new WSSecurityException(WSSecurityException.FAILED_CHECK);
-                        // TODO Auto-generated catch block
-                        // e3.printStackTrace();
-                    }
-                    String uri = siRef.getURI();
-                    Element se = WSSecurityUtil.getElementByWsuId(wssConfig, elem.getOwnerDocument(), uri);
-                    if (se == null) {
-                        se = WSSecurityUtil.getElementByGenId(elem.getOwnerDocument(), uri);
-                    }
-                    if (se == null) {
-                        throw new WSSecurityException(WSSecurityException.FAILED_CHECK);
-                    }
-                    QName qn = new QName(se.getNamespaceURI(), se.getLocalName());
-                    qvec.add(qn);
-                }
-                returnQname[0] = qvec;
-                returnCert[0] = certs[0];
-                return certs[0].getSubjectDN();
-            } else {
-                throw new WSSecurityException(WSSecurityException.FAILED_CHECK);
-            }
-        } catch (XMLSignatureException e1) {
-            throw new WSSecurityException(WSSecurityException.FAILED_CHECK);
-        }
-    }
+			boolean signatureOk = false;
+			if (certs != null) {
+				signatureOk = sig.checkSignatureValue(certs[0]);
+			} else {
+				signatureOk = sig.checkSignatureValue(sig
+						.createSecretKey(secretKey));
+			}
+			if (signatureOk) {
+				if (tlog.isDebugEnabled()) {
+					t2 = System.currentTimeMillis();
+					tlog.debug("Verify: total= " + (t2 - t0)
+							+ ", prepare-cert= " + (t1 - t0) + ", verify= "
+							+ (t2 - t1));
+				}
+				/*
+				 * Now dig into the Signature element to get the elements that
+				 * this Signature covers. Build the QName of these Elements and
+				 * return them to caller
+				 */
+				SignedInfo si = sig.getSignedInfo();
+				int numReferences = si.getLength();
+				Vector qvec = new Vector(numReferences);
+				for (int i = 0; i < numReferences; i++) {
+					Reference siRef;
+					try {
+						siRef = si.item(i);
+					} catch (XMLSecurityException e3) {
+						throw new WSSecurityException(
+								WSSecurityException.FAILED_CHECK);
+					}
+					String uri = siRef.getURI();
+					Element se = WSSecurityUtil.getElementByWsuId(wssConfig,
+							elem.getOwnerDocument(), uri);
+					if (se == null) {
+						se = WSSecurityUtil.getElementByGenId(elem
+								.getOwnerDocument(), uri);
+					}
+					if (se == null) {
+						throw new WSSecurityException(
+								WSSecurityException.FAILED_CHECK);
+					}
+					QName qn = new QName(se.getNamespaceURI(), se
+							.getLocalName());
+					qvec.add(qn);
+				}
+				returnQname[0] = qvec;
+				if (certs != null) {
+					returnCert[0] = certs[0];
+					return certs[0].getSubjectDN();
+				} else {
+					WSUsernameTokenPrincipal principal = new WSUsernameTokenPrincipal(
+							ut.getName(), ut.isHashed());
+					principal.setNonce(ut.getNonce());
+					principal.setPassword(ut.getPassword());
+					principal.setCreatedTime(ut.getCreated());
+					return principal;
+				}
+			} else {
+				throw new WSSecurityException(WSSecurityException.FAILED_CHECK);
+			}
+		} catch (XMLSignatureException e1) {
+			throw new WSSecurityException(WSSecurityException.FAILED_CHECK);
+		} catch (XMLSecurityException e1) {
+			throw new WSSecurityException(WSSecurityException.FAILED_CHECK);
+		}
+	}
 
     /**
-     * Extracts the certificate(s) from the Binary Security token reference.
-     * <p/>
-     *
-     * @param elem The element containing the binary security token. This
-     *             is either X509 certificate(s) or a PKIPath.
-     * @return an array of X509 certificates
-     * @throws WSSecurityException
-     */
+	 * Extracts the certificate(s) from the Binary Security token reference.
+	 * <p/>
+	 * 
+	 * @param elem
+	 *            The element containing the binary security token. This is
+	 *            either X509 certificate(s) or a PKIPath.
+	 * @return an array of X509 certificates
+	 * @throws WSSecurityException
+	 */
     public X509Certificate[] getCertificatesTokenReference(Element elem,
                                                            Crypto crypto)
             throws WSSecurityException {

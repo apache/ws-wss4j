@@ -67,6 +67,9 @@
         <port name="Ping2" binding="tns:PingBinding">
             <soap:address location="http://localhost:9080/pingservice/Ping2"/>
         </port>
+        <port name="Ping2a" binding="tns:PingBinding">
+            <soap:address location="http://localhost:9080/pingservice/Ping2a"/>
+        </port>
         <port name="Ping3" binding="tns:PingBinding">
             <soap:address location="http://localhost:9080/pingservice/Ping3"/>
         </port>

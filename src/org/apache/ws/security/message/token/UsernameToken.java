@@ -60,7 +60,6 @@ public class UsernameToken {
     protected Element elementCreated = null;
     protected boolean hashed = true;
     private static SecureRandom random = null;
-    String password = null;
     protected WSSConfig wssConfig = WSSConfig.getDefaultWSConfig();
     
     public static String TOKEN = "UsernameToken";
@@ -302,7 +301,6 @@ public class UsernameToken {
      * @param pwd the password to use
      */
     public void setPassword(String pwd) {
-        this.password = pwd;
         if (pwd == null) {
             throw new IllegalArgumentException("pwd == null");
         }
@@ -433,7 +431,7 @@ public class UsernameToken {
         byte[] key = null;
         try {
             Mac mac = Mac.getInstance("HMACSHA1");
-            byte[] password = this.password.getBytes("UTF-8");
+            byte[] password = getPassword().getBytes("UTF-8");
             byte[] label = "WS-Security".getBytes("UTF-8");
             byte[] nonce = Base64.decode(getNonce());
             byte[] created = getCreated().getBytes("UTF-8");
@@ -450,14 +448,16 @@ public class UsernameToken {
                 seed[count++] = created[i];
             }
             key = P_hash(password, seed, mac, 128);
+            /*
             System.out.println("password   :" + Base64.encode(password));
             System.out.println("label      :" + Base64.encode(label));
             System.out.println("nonce      :" + Base64.encode(nonce));
             System.out.println("created    :" + Base64.encode(created));
             System.out.println("seed       :" + Base64.encode(seed));
             System.out.println("Key        :" + Base64.encode(key));
+            */
         } catch (Exception e) {
-            e.printStackTrace();
+            return null;
         }
         return key;
     }

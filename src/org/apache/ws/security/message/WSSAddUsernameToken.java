@@ -119,6 +119,9 @@ public class WSSAddUsernameToken extends WSBaseMessage {
             ut.setID(id);
     }
 
+    public byte[] getSecretKey() {
+    	return ut.getSecretKey();
+    }
     /**
      * get the id
      * @return
@@ -127,6 +130,12 @@ public class WSSAddUsernameToken extends WSBaseMessage {
         return id;
     }
 
+    public Document preSetUsernameToken(Document doc, String username, String password) {
+        ut = new UsernameToken(wssConfig, doc, passwordType);
+        ut.setName(username);
+        ut.setPassword(password);
+        return doc;
+    }
     /**
      * Adds a new <code>UsernameToken</code> to a soap envelope.
      * <p/>
@@ -141,9 +150,9 @@ public class WSSAddUsernameToken extends WSBaseMessage {
     public Document build(Document doc, String username, String password) { // throws Exception {
         log.debug("Begin add username token...");
         Element securityHeader = insertSecurityHeader(doc);
-        ut = new UsernameToken(wssConfig, doc, passwordType);
-        ut.setName(username);
-        ut.setPassword(password);
+        if (ut == null) {
+        	preSetUsernameToken(doc, username, password);
+        }
         if (id != null)
             ut.setID(id);
         WSSecurityUtil.prependChildElement(doc, securityHeader, ut.getElement(), true);

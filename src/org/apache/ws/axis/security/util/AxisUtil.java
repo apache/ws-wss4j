@@ -20,7 +20,6 @@ package org.apache.ws.axis.security.util;
 import org.apache.axis.AxisFault;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.util.StringUtil;
 import org.apache.xml.security.c14n.Canonicalizer;
 import org.w3c.dom.Document;
@@ -109,7 +108,7 @@ public class AxisUtil {
             throws AxisFault {
 
         int doAction = 0;
-
+        
         if (action == null) {
             return doAction;
         }
@@ -139,6 +138,9 @@ public class AxisUtil {
             } else if (single[i].equals(WSHandlerConstants.NO_SERIALIZATION)) {
                 doAction |= WSConstants.NO_SERIALIZE;
                 actions.add(new Integer(WSConstants.NO_SERIALIZE));
+            } else if (single[i].equals(WSHandlerConstants.SIGN_WITH_UT_KEY)) {
+                doAction |= WSConstants.UT_SIGN;
+                actions.add(new Integer(WSConstants.UT_SIGN));
             } else {
                 throw new AxisFault("WSDoAllSender: Unknown action defined" + single[i]);
             }
