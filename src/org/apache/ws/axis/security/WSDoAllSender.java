@@ -30,6 +30,8 @@ import org.apache.ws.security.SOAPConstants;
 import org.apache.ws.security.WSEncryptionPart;
 import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSecurityEngine;
+import org.apache.ws.security.WSSecurityEngineResult;
+import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.message.WSEncryptBody;
@@ -42,6 +44,9 @@ import org.w3c.dom.Document;
 
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
+
+import java.security.cert.X509Certificate;
+
 import java.io.ByteArrayOutputStream;
 import java.util.Hashtable;
 import java.util.Vector;
@@ -67,6 +72,8 @@ public class WSDoAllSender extends BasicHandler {
 	
 	private SOAPConstants soapConstants = null;
 	
+	String actor = null;
+	
 	String username = null;
 
 	String pwType = null;
@@ -83,6 +90,7 @@ public class WSDoAllSender extends BasicHandler {
 	String encKeyTransport = null;
 	String encUser = null;
 	Vector encryptParts = new Vector();
+	X509Certificate encCert = null;
 
 	/**
 	 * Axis calls invoke to handle a message.
@@ -95,7 +103,9 @@ public class WSDoAllSender extends BasicHandler {
 
 		doDebug = log.isDebugEnabled();
 		if (doDebug) {
-			log.debug("WSDoAllSender: enter invoke()");
+			log.debug(
+				"WSDoAllSender: enter invoke() with msg type: "
+					+ mc.getCurrentMessage().getMessageType());
 		}
 		noSerialization = false;
 		msgContext = mc;
@@ -117,7 +127,6 @@ public class WSDoAllSender extends BasicHandler {
 
 		boolean mu = decodeMustUnderstand();
 
-		String actor = null;
 		if ((actor = (String) getOption(WSDoAllConstants.ACTOR)) == null) {
 			actor = (String) msgContext.getProperty(WSDoAllConstants.ACTOR);
 		}
@@ -256,9 +265,13 @@ public class WSDoAllSender extends BasicHandler {
 					}
 					if (encKeyId == WSConstants.EMBEDDED_KEYNAME) {
                         String encKeyName = null;
-                        if ((encKeyName = (String) getOption(WSDoAllConstants.ENC_KEY_NAME)) == null) {
-                            encKeyName = (String) msgContext.getProperty(WSDoAllConstants.ENC_KEY_NAME);
-                        }
+						if ((encKeyName =
+							(String) getOption(WSDoAllConstants.ENC_KEY_NAME))
+							== null) {
+							encKeyName =
+								(String) msgContext.getProperty(
+									WSDoAllConstants.ENC_KEY_NAME);
+						}
                         wsEncrypt.setEmbeddedKeyName(encKeyName);
 						byte[] embeddedKey =
 							getPassword(
@@ -276,12 +289,13 @@ public class WSDoAllSender extends BasicHandler {
 						wsEncrypt.setKeyEnc(encKeyTransport);
 					}
 					wsEncrypt.setUserInfo(encUser);
+					wsEncrypt.setUseThisCert(encCert);
 					if (encryptParts.size() > 0) {
 						wsEncrypt.setParts(encryptParts);
 					}
 					try {
 						wsEncrypt.build(doc, encCrypto);
-					} catch (Exception e) {
+					} catch (WSSecurityException e) {
 						throw new AxisFault(
 							"WSDoAllSender: Encryption: error during message processing"
 								+ e);
@@ -312,7 +326,7 @@ public class WSDoAllSender extends BasicHandler {
 
 					try {
 						wsSign.build(doc, sigCrypto);
-					} catch (Exception e) {
+					} catch (WSSecurityException e) {
 						throw new AxisFault(
 							"WSDoAllSender: Signature: error during message procesing"
 								+ e);
@@ -452,11 +466,9 @@ public class WSDoAllSender extends BasicHandler {
 			}
 			sigKeyId = I.intValue();
 			if (!(sigKeyId == WSConstants.ISSUER_SERIAL
-				|| sigKeyId == WSConstants.ISSUER_SERIAL_DIRECT
 				|| sigKeyId == WSConstants.BST_DIRECT_REFERENCE
 				|| sigKeyId == WSConstants.X509_KEY_IDENTIFIER
-				|| sigKeyId == WSConstants.SKI_KEY_IDENTIFIER
-				|| sigKeyId == WSConstants.SKI_KEY_IDENTIFIER_DIRECT)) {
+				|| sigKeyId == WSConstants.SKI_KEY_IDENTIFIER)) {
 				throw new AxisFault("WSDoAllSender: Signature: illegal key identification");
 			}
 		}
@@ -488,6 +500,14 @@ public class WSDoAllSender extends BasicHandler {
 			throw new AxisFault("WSDoAllSender: Encryption: no username");
 		}
 		/*
+		String msgType = msgContext.getCurrentMessage().getMessageType();
+		if (msgType != null && msgType.equals(Message.RESPONSE)) {
+			handleSpecialUser(encUser);
+		}
+		*/
+		handleSpecialUser(encUser);		
+
+		/*
 		 * If the following parameters are no used (they return null)
 		 * then the default values of WSS4J are used.
 		 */
@@ -502,10 +522,8 @@ public class WSDoAllSender extends BasicHandler {
 			}
 			encKeyId = I.intValue();
 			if (!(encKeyId == WSConstants.ISSUER_SERIAL
-				|| encKeyId == WSConstants.ISSUER_SERIAL_DIRECT
 				|| encKeyId == WSConstants.X509_KEY_IDENTIFIER
 				|| encKeyId == WSConstants.SKI_KEY_IDENTIFIER
-				|| encKeyId == WSConstants.SKI_KEY_IDENTIFIER_DIRECT
 				|| encKeyId == WSConstants.BST_DIRECT_REFERENCE
 				|| encKeyId == WSConstants.EMBEDDED_KEYNAME)) {
 				throw new AxisFault("WSDoAllSender: Encryption: illegal key identification");
@@ -675,29 +693,38 @@ public class WSDoAllSender extends BasicHandler {
 
 			if (partDef.length == 1) {
 				if (doDebug) {
-					log.debug("single partDef: " + partDef[0]);
+					log.debug("single partDef: '" + partDef[0] + "'");
 				}
-				partDef[0].trim();
 				encPart =
 					new WSEncryptionPart(
-						partDef[0],
+						partDef[0].trim(),
 						soapConstants.getEnvelopeURI(),
 						"Content");
 			} else if (partDef.length == 3) {
-				partDef[0].trim();
-				String mode = partDef[0].substring(1);
-				if (mode.length() == 0) {
+				String mode = partDef[0].trim();
+				if (mode.length() <= 1) {
 					mode = "Content";
 				}
-				partDef[1].trim();
-				String nmSpace = partDef[1].substring(1);
-				if (nmSpace.length() == 0) {
+				else {
+					mode = mode.substring(1);
+				}
+				String nmSpace = partDef[1].trim();
+				if (nmSpace.length() <= 1) {
 					nmSpace = soapConstants.getEnvelopeURI();
+				}
+				else {
+					nmSpace = nmSpace.substring(1);
 				}
 				String element = partDef[2].trim();
 				if (doDebug) {
 					log.debug(
-						"partDefs:" + mode + "," + nmSpace + "," + element);
+						"partDefs: '"
+							+ mode
+							+ "' ,'"
+							+ nmSpace
+							+ "' ,'"
+							+ element
+							+ "'");
 				}
 				encPart = new WSEncryptionPart(element, nmSpace, mode);
 			} else {
@@ -708,4 +735,41 @@ public class WSDoAllSender extends BasicHandler {
 		}
 	}
 
+	private void handleSpecialUser(String encUser) {
+		if (!WSDoAllConstants.USE_REQ_SIG_CERT.equals(encUser)) {
+			return;
+		}
+		Vector results = null;
+		if ((results =
+			(Vector) msgContext.getProperty(WSDoAllConstants.RECV_RESULTS))
+			== null) {
+			return;
+		}
+		/*
+		 * Scan the results for a matching actor. Use results only
+		 * if the receiving Actor and the sending Actor match.
+		 */
+		for (int i = 0; i < results.size(); i++) {
+			WSDoAllReceiverResult rResult =
+				(WSDoAllReceiverResult) results.get(i);
+			String hActor = rResult.getActor();
+			if (!WSSecurityUtil.isActorEqual(actor, hActor)) {
+				continue;
+			}			
+			Vector wsSecEngineResults = rResult.getResults();
+			/*
+			 * Scan the results for the first Signature action. Use
+			 * the certificate of this Signature to set the certificate
+			 * for the encryption action :-).
+			 */
+			for (int j = 0; j < wsSecEngineResults.size(); j++) {
+				WSSecurityEngineResult wser =
+					(WSSecurityEngineResult) wsSecEngineResults.get(j);
+				if (wser.getAction() == WSConstants.SIGN) {
+					encCert = wser.getCertificate();
+					return;
+				}
+			}
+		}
+	}
 }

@@ -93,13 +93,31 @@ public class WSSecurityUtil {
             elem = (Element) list.item(i);
             attr = elem.getAttributeNodeNS(sc.getEnvelopeURI(), sc.getRoleAttributeQName().getLocalPart());
             hActor = (attr != null) ? attr.getValue() : null;
-            if ((((hActor == null) || (hActor.length() == 0)) && 
-            	((actor == null) || (actor.length() == 0))) || 
-            	((hActor != null) && (actor != null) && hActor.equalsIgnoreCase(actor))) {
+            if (WSSecurityUtil.isActorEqual(actor, hActor)) {
                 return elem;
             }
         }
         return null;
+    }
+ 
+ 	/**
+ 	 * Compares two actor strings and returns true if these are equal.
+ 	 * Takes care of the null length strings and uses ignore case.
+ 	 *  
+ 	 * @param actor
+ 	 * @param hActor
+ 	 * @return
+ 	 */
+    public static boolean isActorEqual(String actor, String hActor) {
+		if ((((hActor == null) || (hActor.length() == 0))
+			&& ((actor == null) || (actor.length() == 0)))
+			|| ((hActor != null)
+				&& (actor != null)
+				&& hActor.equalsIgnoreCase(actor))) {
+			return true;
+		} else {
+			return false;
+		}
     }
 
     /**

@@ -34,9 +34,6 @@ import org.apache.xml.security.exceptions.Base64DecodingException;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.transforms.Transform;
 import org.apache.xml.security.keys.KeyInfo;
-//import org.apache.xml.security.keys.content.X509Data;
-//import org.apache.xml.security.keys.content.x509.XMLX509Certificate;
-//import org.apache.xml.security.keys.content.x509.XMLX509IssuerSerial;
 import org.apache.xml.security.signature.XMLSignature;
 import org.apache.xml.security.signature.XMLSignatureException;
 import org.apache.xml.security.utils.Base64;
@@ -168,22 +165,26 @@ public class WSSecurityEngine {
      * 					was done  
      * @throws Exception 
      */
-	public Vector processSecurityHeader(Document doc, 
-										   String actor, 
-										   CallbackHandler cb, 
-										   Crypto crypto) throws WSSecurityException {
-		return processSecurityHeader(doc, actor, cb, crypto, crypto);	
+	public Vector processSecurityHeader(
+		Document doc,
+		String actor,
+		CallbackHandler cb,
+		Crypto crypto)
+		throws WSSecurityException {
+		return processSecurityHeader(doc, actor, cb, crypto, crypto);
 	}
 	
-	public Vector processSecurityHeader(Document doc, 
-										   String actor, 
-										   CallbackHandler cb, 
-										   Crypto sigCrypto, 
-										   Crypto decCrypto) throws WSSecurityException {
-										   	
+	public Vector processSecurityHeader(
+		Document doc,
+		String actor,
+		CallbackHandler cb,
+		Crypto sigCrypto,
+		Crypto decCrypto)
+		throws WSSecurityException {
+
 		doDebug = log.isDebugEnabled();
 		if (doDebug) {
-			log.debug("WSSecurityEnging: enter processSecurityHeader()");
+			log.debug("enter processSecurityHeader()");
 		}
 										   	
         if (actor == null) {
@@ -410,6 +411,9 @@ public class WSSecurityEngine {
      * 					ds:Signature</code> elements.
      * @param crypto	the object that implements the access to the keystore and the
      * 					handling of certificates.
+     * @param returnCert verifyXMLSignature stores the certificate in the first
+     * 					entry of this array. Ther caller may then further validate
+     * 					the certificate 
      * @return 			the subject principal of the validated X509 certificate (the
      * 					authenticated subject). The calling function may use this
      * 					principal for further authentication or authorization. 
@@ -432,11 +436,17 @@ public class WSSecurityEngine {
 		try {
 			sig = new XMLSignature(elem, null);
 		} catch (XMLSignatureException e2) {
-            throw new WSSecurityException(WSSecurityException.FAILED_CHECK, "noXMLSig");
+			throw new WSSecurityException(
+				WSSecurityException.FAILED_CHECK,
+				"noXMLSig");
 		} catch (XMLSecurityException e2) {
-            throw new WSSecurityException(WSSecurityException.FAILED_CHECK, "noXMLSig");
+			throw new WSSecurityException(
+				WSSecurityException.FAILED_CHECK,
+				"noXMLSig");
 		} catch (IOException e2) {
-            throw new WSSecurityException(WSSecurityException.FAILED_CHECK, "noXMLSig");
+			throw new WSSecurityException(
+				WSSecurityException.FAILED_CHECK,
+				"noXMLSig");
 		}
 
 		sig.addResourceResolver(EnvelopeIdResolver.getInstance());
@@ -444,9 +454,6 @@ public class WSSecurityEngine {
         X509Certificate[] certs = null;
 		KeyInfo info = sig.getKeyInfo();
 
-		//        if (info.containsX509Data()) {
-		//            certs = getCertificatesX509Data(info, crypto);
-		//        } else {
 		Node node =
 			WSSecurityUtil.getDirectChild(
 				info.getElement(),
@@ -455,8 +462,7 @@ public class WSSecurityEngine {
 		if (node == null) {
 			throw new WSSecurityException(
 				WSSecurityException.INVALID_SECURITY,
-				"unsupportedKeyInfo",
-				null);
+				"unsupportedKeyInfo");
 		}
 		SecurityTokenReference secRef =
 			new SecurityTokenReference((Element) node);
@@ -470,8 +476,7 @@ public class WSSecurityEngine {
 			} else {
 				throw new WSSecurityException(
 					WSSecurityException.INVALID_SECURITY,
-					"unsupportedToken",
-					null);
+					"unsupportedToken", new Object[] { el.toString()});
 			}
 		} else if (secRef.containsX509IssuerSerial()) {
 			certs = secRef.getX509IssuerSerial(crypto);
@@ -517,58 +522,6 @@ public class WSSecurityEngine {
 		// }
 		//		throw new WSSecurityException(WSSecurityException.FAILED_CHECK);
 	}
-
-    /**
-     * Get an array of certificates from data contained in {@link KeyInfo}. 
-     * <p/>
-     * The {@link XMLSignature} parses the <code>ds:KeyInfo</code> element and
-     * create a <KeyInfo</code> object. This method handles the standard
-     * <code>ds:KeyInfo</code> element and does not support the WS Security 
-     * extensions.
-     * <p/>
-     * Currently supports only the <code>wsse:IssuerSerial</code> reference or
-     * a directly included certificate.
-     * <p/>
-     * 
-     * @param info 		KeyInfo object created by {@link XMLSignature} during parsing
-     * @return 			an array of X509Certificate certificates.
-     * @throws Exception Thrown when there is a problem in getting the certificates.
-     */
-//    protected X509Certificate[] getCertificatesX509Data(KeyInfo info, Crypto crypto) throws Exception {
-//        int len = info.lengthX509Data();
-//        if (len != 1) {
-//            throw new WSSecurityException(WSSecurityException.FAILURE,
-//                    "invalidX509Data", new Object[]{new Integer(len)});
-//        }
-//        X509Data data = info.itemX509Data(0);
-//        int certLen = 0;
-//        X509Certificate[] certs = null;
-//        if (data.containsCertificate()) {
-//            certLen = data.lengthCertificate();
-//            if (certLen <= 0) {
-//                throw new WSSecurityException(WSSecurityException.FAILURE,
-//                        "invalidCertData", new Object[]{new Integer(certLen)});
-//            }
-//            certs = new X509Certificate[certLen];
-//            XMLX509Certificate xmlCert;
-//            ByteArrayInputStream input;
-//            for (int i = 0; i < certLen; i++) {
-//                xmlCert = data.itemCertificate(i);
-//                input = new ByteArrayInputStream(xmlCert.getCertificateBytes());
-//                certs[i] = crypto.loadCertificate(input);
-//            }
-//        } else if (data.containsIssuerSerial()) {
-//            XMLX509IssuerSerial issuerSerial = data.itemIssuerSerial(0);
-//            String alias = crypto.getAliasForX509Cert(issuerSerial.getIssuerName(),
-//                    issuerSerial.getSerialNumber());
-//            if (doDebug) {
-//				log.info("Verify X509IssuerSerial alias: " + alias);
-//            }
-//            certs = crypto.getCertificates(alias);
-//        }
-//        return certs;
-//    }
-
     
     /**
      * Extracts the certificate(s) from the token reference.

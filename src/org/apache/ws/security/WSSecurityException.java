@@ -37,7 +37,8 @@ public class WSSecurityException extends RemoteException {
     public static final int FAILED_AUTHENTICATION = 5;
     public static final int FAILED_CHECK = 6;
     public static final int SECURITY_TOKEN_UNAVAILABLE = 7;
-    public static final int FAILED_ENC_DEC = 8;
+	public static final int FAILED_ENC_DEC = 8;
+	public static final int FAILED_SIGNATURE = 9;
     private static ResourceBundle resources;
 
     static {

@@ -34,9 +34,12 @@ import org.apache.ws.security.message.token.SecurityTokenReference;
 import org.apache.ws.security.message.token.X509Security;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.xml.security.c14n.Canonicalizer;
+import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.keys.KeyInfo;
 import org.apache.xml.security.keys.content.x509.XMLX509IssuerSerial;
 import org.apache.xml.security.signature.XMLSignature;
+import org.apache.xml.security.signature.XMLSignatureException;
+import org.apache.xml.security.transforms.TransformationException;
 import org.apache.xml.security.transforms.Transforms;
 import org.apache.xml.security.transforms.Transform;
 import org.w3c.dom.Document;
@@ -190,7 +193,7 @@ public class WSSignEnvelope extends WSBaseMessage {
      * @return 			A signed SOAP envelope as <code>Document</code>
      * @throws Exception 
      */
-    public Document build(Document doc, Crypto crypto) throws Exception {
+    public Document build(Document doc, Crypto crypto) throws WSSecurityException {
     	doDebug = log.isDebugEnabled();
     	
 		long t0=0, t1=0, t2=0, t3=0, t4=0;
@@ -230,12 +233,20 @@ public class WSSignEnvelope extends WSBaseMessage {
 				sigAlgo = XMLSignature.ALGO_ID_SIGNATURE_RSA;
 			}
 			else {
-				throw new WSSecurityException(WSSecurityException.FAILURE,
-						"invalidX509Data", new Object[]{"for Signature - unkown public key Algo"});
+				throw new WSSecurityException(
+					WSSecurityException.FAILURE,
+					"invalidX509Data",
+					new Object[] { "for Signature - unkown public key Algo" });
 			}
 		}
         XMLSignature sig = null;
-        sig = new XMLSignature(doc, null, sigAlgo, canonAlgo);
+		try {
+			sig = new XMLSignature(doc, null, sigAlgo, canonAlgo);
+		} catch (XMLSecurityException e) {
+			throw new WSSecurityException(
+				WSSecurityException.FAILED_SIGNATURE,
+				"noXMLSig");
+		}
         /*
          * If we don't generate a new Transforms for each addDocument
          * here, then only the last Transforms is put into the
@@ -285,33 +296,49 @@ public class WSSignEnvelope extends WSBaseMessage {
 	 	 * "STRTransform": Setup the ds:Reference to use STR Transform
 	 	 * 
 	 	 */			
-			if (elemName.equals("Token")) {
-				transforms = new Transforms(doc);
-				transforms.addTransform(Transforms.TRANSFORM_C14N_EXCL_OMIT_COMMENTS);
-				if (keyIdentifierType == WSConstants.BST_DIRECT_REFERENCE) {
-					sig.addDocument("#" + certUri, transforms);
+			try {
+				if (elemName.equals("Token")) {
+					transforms = new Transforms(doc);
+					transforms.addTransform(
+						Transforms.TRANSFORM_C14N_EXCL_OMIT_COMMENTS);
+					if (keyIdentifierType
+						== WSConstants.BST_DIRECT_REFERENCE) {
+						sig.addDocument("#" + certUri, transforms);
+					} else {
+						sig.addDocument("#" + keyInfoUri, transforms);
+					}
+				} else if (elemName.equals("STRTransform")) { // STRTransform
+					Element ctx = createSTRParameter(doc);
+					transforms = new Transforms(doc);
+					transforms.addTransform(
+						STRTransform.implementedTransformURI,
+						ctx);
+					sig.addDocument("#" + strUri, transforms);
+				} else {
+					Element body =
+						(Element) WSSecurityUtil.findElement(
+							envelope,
+							elemName,
+							nmSpace);
+					if (body == null) {
+						throw new WSSecurityException(
+							WSSecurityException.FAILURE,
+							"noEncElement",
+							new Object[] { nmSpace + ", " + elemName });
+					}
+					transforms = new Transforms(doc);
+					transforms.addTransform(
+						Transforms.TRANSFORM_C14N_EXCL_OMIT_COMMENTS);
+					sig.addDocument("#" + setWsuId(body), transforms);
 				}
-				else {
-					sig.addDocument("#" + keyInfoUri, transforms);
-				}
-			}
-			else if (elemName.equals("STRTransform")) { // STRTransform
-				Element ctx = createSTRParameter(doc);	// This element shall conatin the arg to STR
-				transforms = new Transforms(doc);
-				transforms.addTransform(STRTransform.implementedTransformURI, ctx);
-				sig.addDocument("#" + strUri, transforms);
-			}
-			else {
-				Element body = (Element) WSSecurityUtil.findElement(envelope, elemName, nmSpace);
-				if (body == null) {
-					throw new WSSecurityException(
-						WSSecurityException.FAILURE,
-						"noEncElement",
-						new Object[] { nmSpace, elemName });
-				}
-				transforms = new Transforms(doc);
-				transforms.addTransform(Transforms.TRANSFORM_C14N_EXCL_OMIT_COMMENTS);
-				sig.addDocument("#" + setWsuId(body), transforms);
+			} catch (TransformationException e1) {
+				throw new WSSecurityException(
+					WSSecurityException.FAILED_SIGNATURE,
+					"noXMLSig", null, e1);
+			} catch (XMLSignatureException e1) {
+				throw new WSSecurityException(
+					WSSecurityException.FAILED_SIGNATURE,
+					"noXMLSig", null, e1);
 			}
 		}
  
@@ -345,41 +372,21 @@ public class WSSignEnvelope extends WSBaseMessage {
 					false);
 				wsDocInfo.setBst(bstToken.getElement());
 				break;
-//			case WSConstants.ISSUER_SERIAL_DIRECT : {
-//				X509Security x509token = new X509Security(doc);
-//				x509token.setX509Certificate(certs[0]);
-//				x509token.setID(certUri);
-//				WSSecurityUtil.prependChildElement(
-//					doc,
-//					securityHeader,
-//					x509token.getElement(),
-//					false);
-//				wsDocInfo.setBst(x509token.getElement());
-//				// fall thru
-//			}
+
 			case WSConstants.ISSUER_SERIAL :
 				XMLX509IssuerSerial data =
 					new XMLX509IssuerSerial(doc, certs[0]);
 				secRef.setX509IssuerSerial(data);
 				break;
+
 			case WSConstants.X509_KEY_IDENTIFIER :
 				secRef.setKeyIdentifier(certs[0]);
 				break;
-//			case WSConstants.SKI_KEY_IDENTIFIER_DIRECT : {
-//				X509Security x509token = new X509Security(doc);
-//				x509token.setX509Certificate(certs[0]);
-//				x509token.setID(certUri);
-//				WSSecurityUtil.prependChildElement(
-//					doc,
-//					securityHeader,
-//					x509token.getElement(),
-//					false);
-//				wsDocInfo.setBst(x509token.getElement());
-//				// fall thru
-//			}
+
 			case WSConstants.SKI_KEY_IDENTIFIER :
 				secRef.setKeyIdentifierSKI(certs[0], crypto);
 				break;
+
 			default :
 				throw new WSSecurityException(
 					WSSecurityException.FAILURE,
@@ -393,12 +400,20 @@ public class WSSignEnvelope extends WSBaseMessage {
 		WSDocInfoStore.store(wsDocInfo);
 		try {
 			sig.sign(crypto.getPrivateKey(user, password));
-		}
-		catch (Exception ex) {
-			throw ex;
-		}
-		finally {
-			WSDocInfoStore.delete(wsDocInfo); 
+		} catch (XMLSignatureException e1) {
+			throw new WSSecurityException(
+				WSSecurityException.FAILED_SIGNATURE,
+				null,
+				null,
+				e1);
+		} catch (Exception e1) {
+			throw new WSSecurityException(
+				WSSecurityException.FAILED_SIGNATURE,
+				null,
+				null,
+				e1);
+		} finally {
+			WSDocInfoStore.delete(wsDocInfo);
 		}
 		if (tlog.isDebugEnabled() ) {
 			t4=System.currentTimeMillis();
@@ -434,7 +449,10 @@ public class WSSignEnvelope extends WSBaseMessage {
 			WSConstants.SIG_NS,
 			WSConstants.SIG_PREFIX);
 			
-		canonElem.setAttributeNS(null, "Algorithm", Canonicalizer.ALGO_ID_C14N_EXCL_OMIT_COMMENTS);
+		canonElem.setAttributeNS(
+			null,
+			"Algorithm",
+			Canonicalizer.ALGO_ID_C14N_EXCL_OMIT_COMMENTS);
 		transformParam.appendChild(canonElem);
 		return transformParam;
     }

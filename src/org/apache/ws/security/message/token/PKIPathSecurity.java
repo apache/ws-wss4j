@@ -23,8 +23,6 @@ import org.apache.ws.security.components.crypto.Crypto;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import java.io.IOException;
-import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 
 /**
@@ -89,9 +87,11 @@ public class PKIPathSecurity extends BinarySecurity {
      * @throws CertificateEncodingException 
      * @throws IOException                  
      */
-    public void setX509Certificates(X509Certificate[] certs, boolean reverse, Crypto crypto) throws CertificateEncodingException, IOException {
+    public void setX509Certificates(X509Certificate[] certs, boolean reverse, Crypto crypto) throws WSSecurityException {
         if (certs == null) {
-            throw new IllegalArgumentException("data == null");
+			throw new WSSecurityException(
+				WSSecurityException.FAILURE,
+				"noCert");
         }
         byte[] data = crypto.getCertificateData(reverse, certs);
         setToken(data);

@@ -290,6 +290,12 @@ public class WSDoAllConstants {
 	public static final String ENCRYPTION_USER = "encryptionUser";
 	
 	/**
+	 * This is a special user name. Specifying this name as {@link ENCRYPTION_USER}
+	 * triggers a special action to get the public key to use for encryption. 
+	 */
+	public static final String USE_REQ_SIG_CERT = "useReqSigCert";
+	
+	/**
 	 * This parameter works in the same way as {@link #PW_CALLBACK_CLASS} but
 	 * the Axis WSS4J handler uses it to get the key associated with a key name.
 	 */
@@ -634,9 +640,6 @@ public class WSDoAllConstants {
 		keyIdentifier.put(
 			"IssuerSerial",
 			new Integer(WSConstants.ISSUER_SERIAL));
-//		keyIdentifier.put(
-//			"IssuerSerialDirect",
-//			new Integer(WSConstants.ISSUER_SERIAL_DIRECT));
 		keyIdentifier.put(
 			"X509KeyIdentifier",
 			new Integer(WSConstants.X509_KEY_IDENTIFIER));
@@ -646,9 +649,6 @@ public class WSDoAllConstants {
 		keyIdentifier.put(
 			"EmbeddedKeyName",
 			new Integer(WSConstants.EMBEDDED_KEYNAME));
-//		keyIdentifier.put(
-//			"SKIKeyIdentifierDirect",
-//			new Integer(WSConstants.SKI_KEY_IDENTIFIER_DIRECT));
 
 	}
 

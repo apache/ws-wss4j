@@ -246,19 +246,10 @@ public class SecurityTokenReference {
 				return certs;
 			}
 		} else if (value.equals(SKI_URI)) {
-//			token = getEmbeddedTokenFromSKI(element.getOwnerDocument(), crypto);
-//			if (token != null) {
-//				X509Certificate cert = token.getX509Certificate(crypto);
-//				X509Certificate[] certs = new X509Certificate[1];
-//				certs[0] = cert;
-//				return certs;
-//			}
-//			else {
-				String alias = getX509SKIAlias(crypto);
-				if (alias != null) {
-					return crypto.getCertificates(alias);
-				}
-//			}
+			String alias = getX509SKIAlias(crypto);
+			if (alias != null) {
+				return crypto.getCertificates(alias);
+			}
 		}
 		return null;
 	}
@@ -296,67 +287,6 @@ public class SecurityTokenReference {
 		return skiBytes;
 	}
 
-//	public X509Security getEmbeddedTokenFromSKI(Document doc, Crypto crypto)
-//		throws Exception {
-//
-//		if (doDebug) {
-//			log.debug("getCertFromSKI: enter");
-//		}
-//		X509Security found = null;
-//
-//		if (skiBytes == null) {
-//			skiBytes = getSKIBytes();
-//			if (skiBytes == null) {
-//				return null;
-//			}
-//		}
-//		if (doDebug) {
-//			log.debug("Cert SKI: got SKI bytes");
-//		}
-//		NodeList nl =
-//			doc.getElementsByTagNameNS(
-//				WSConstants.WSSE_NS,
-//				"BinarySecurityToken");
-//
-//		int nlLength = nl.getLength();
-//		for (int i = 0; i < nlLength && found == null; i++) {
-//			if (doDebug) {
-//				log.debug("Cert SKI: processing BST " + i);
-//			}
-//			Element bstElement = (Element) nl.item(i);
-//			String value = bstElement.getAttribute("ValueType");
-//			if (!value.equals(X509Security.TYPE)) {
-//				continue;
-//			}
-//			X509Security token = new X509Security(bstElement);
-//			X509Certificate cert = token.getX509Certificate(crypto);
-//			if (cert == null) {
-//				continue;
-//			}
-//			if (doDebug) {
-//				log.debug("Cert SKI: got cert from BST");
-//			}
-//			byte data[] = crypto.getSKIBytesFromCert(cert);
-//			if (data.length != skiBytes.length) {
-//				continue;
-//			}
-//			if (doDebug) {
-//				log.debug("Cert SKI: got SKI bytes from embedded cert");
-//			}
-//			for (int ii = 0; ii < data.length; ii++) {
-//				if (data[ii] != skiBytes[ii]) {
-//					token = null;
-//					break;
-//				}
-//			}
-//			if (doDebug && token != null) {
-//				log.debug("Cert SKI: found embedded BST");
-//			}
-//			found = token;
-//		}
-//		return found;
-//	}
-
 	/*
 	 * Here the methods that handle the IssuerSerial key identifiaton
 	 */
@@ -386,14 +316,6 @@ public class SecurityTokenReference {
 	 */
 	public X509Certificate[] getX509IssuerSerial(Crypto crypto)
 		throws WSSecurityException {
-//		X509Security token =
-//			getEmbeddedTokenFromIS(element.getOwnerDocument(), crypto);
-//		if (token != null) {
-//			X509Certificate cert = token.getX509Certificate(crypto);
-//			X509Certificate[] certs = new X509Certificate[1];
-//			certs[0] = cert;
-//			return certs;
-//		}
 		String alias = getX509IssuerSerialAlias(crypto);
 		if (alias != null) {
 			return crypto.getCertificates(alias);
@@ -431,70 +353,6 @@ public class SecurityTokenReference {
 		}
 		return alias;
 	}
-
-//	public X509Security getEmbeddedTokenFromIS(
-//		Document doc,
-//		Crypto crypto)
-//		throws WSSecurityException {
-//
-//		if (doDebug) {
-//			log.debug("getEmbeddedCertFromIS: enter");
-//		}
-//
-//		if (issuerSerial == null) {
-//			issuerSerial = getIssuerSerial();
-//			if (issuerSerial == null) {
-//				return null;
-//			}
-//		}
-//		NodeList nl =
-//			doc.getElementsByTagNameNS(
-//				WSConstants.WSSE_NS,
-//				"BinarySecurityToken");
-//
-//		int nlLength = nl.getLength();
-//		for (int i = 0; i < nlLength; i++) {
-//			if (doDebug) {
-//				log.debug("Cert IS: processing BST " + i);
-//			}
-//			Element bstElement = (Element) nl.item(i);
-//			String value = bstElement.getAttribute("ValueType");
-//			if (!value.equals(X509Security.TYPE)) {
-//				continue;
-//			}
-//
-//			X509Security token = new X509Security(bstElement);
-//			X509Certificate cert = token.getX509Certificate(crypto);
-//			if (cert == null) {
-//				continue;
-//			}
-//			if (doDebug) {
-//				log.debug("Cert IS: got cert from BST: " + cert);
-//			}
-//			/*
-//			 * Note: the direct compar of IssuerName/Name may fail because
-//			 * of different name formats (addittional blanks). may be replaced
-//			 * with soultion in Merlin.java (getAliasForX509Cert(...) )
-//			 */
-//			if ((cert
-//				.getSerialNumber()
-//				.compareTo(issuerSerial.getSerialNumber())
-//				== 0)
-//				&& (cert
-//					.getIssuerDN()
-//					.getName()
-//					.equals(issuerSerial.getIssuerName()))) {
-//				if (doDebug) {
-//					log.debug("Cert IS: found embedded BST");
-//				}
-//				return token;
-//			}
-//		}
-//		if (doDebug) {
-//			log.debug("Cert IS: no embedded BST found");
-//		}
-//		return null;
-//	}
 
 	private XMLX509IssuerSerial getIssuerSerial() throws WSSecurityException {
 		if (issuerSerial != null) {

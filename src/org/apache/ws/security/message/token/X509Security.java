@@ -99,11 +99,20 @@ public class X509Security extends BinarySecurity {
      * @param cert the X509 certificate to store in the element
      * @throws CertificateEncodingException 
      */
-    public void setX509Certificate(X509Certificate cert) throws CertificateEncodingException {
-        if (cert == null) {
-            throw new IllegalArgumentException("data == null");
-        }
-        cachedCert = cert;
-        setToken(cert.getEncoded());
-    }
+	public void setX509Certificate(X509Certificate cert)
+		throws WSSecurityException {
+		if (cert == null) {
+			throw new WSSecurityException(
+				WSSecurityException.FAILURE,
+				"noCert");
+		}
+		cachedCert = cert;
+		try {
+			setToken(cert.getEncoded());
+		} catch (CertificateEncodingException e) {
+			throw new WSSecurityException(
+				WSSecurityException.SECURITY_TOKEN_UNAVAILABLE,
+				"encodeError");
+		}
+	}
 }

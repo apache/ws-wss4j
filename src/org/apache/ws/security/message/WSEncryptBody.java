@@ -31,14 +31,20 @@ import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.ws.security.message.token.Reference;
 
 import org.apache.xml.security.encryption.XMLCipher;
+import org.apache.xml.security.encryption.XMLEncryptionException;
 import org.apache.xml.security.keys.content.x509.XMLX509IssuerSerial;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Text;
 
+import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
+
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
 import java.util.Vector;
 
@@ -233,7 +239,7 @@ public class WSEncryptBody extends WSBaseMessage {
 	 * 					</code>
 	 * @throws Exception 
 	 */
-	public Document build(Document doc, Crypto crypto) throws Exception {
+	public Document build(Document doc, Crypto crypto) throws WSSecurityException {
 		doDebug = log.isDebugEnabled();
 
 		if (keyIdentifierType == WSConstants.EMBEDDED_KEYNAME) {
@@ -266,10 +272,14 @@ public class WSEncryptBody extends WSBaseMessage {
 		SecretKey symmetricKey = null;
 		KeyGenerator keyGen = getKeyGenerator();
 		symmetricKey = keyGen.generateKey();
-		XMLCipher xmlCipher =
-			XMLCipher.getInstance(symEncAlgo /*, encCanonAlgo */
-		);
-		xmlCipher.init(XMLCipher.ENCRYPT_MODE, symmetricKey);
+		XMLCipher xmlCipher = null;
+		try {
+			xmlCipher = XMLCipher.getInstance(symEncAlgo);
+			xmlCipher.init(XMLCipher.ENCRYPT_MODE, symmetricKey);
+		} catch (XMLEncryptionException e3) {
+			throw new WSSecurityException(
+				WSSecurityException.UNSUPPORTED_ALGORITHM, null, null, e3);
+		}
 
 		// if no encryption parts set - use the default
 		if (parts == null) {
@@ -310,7 +320,12 @@ public class WSEncryptBody extends WSBaseMessage {
 			 * Forth step: encrypt data, and set neccessary attributes in
 			 * xenc:EncryptedData
 			 */
-			xmlCipher.doFinal(doc, body, content);
+			try {
+				xmlCipher.doFinal(doc, body, content);
+			} catch (Exception e2) {
+				throw new WSSecurityException(
+					WSSecurityException.FAILED_ENC_DEC, null, null, e2);
+			}
 			if (tlog.isDebugEnabled()) {
 				t1 = System.currentTimeMillis();
 			}
@@ -356,7 +371,12 @@ public class WSEncryptBody extends WSBaseMessage {
 			t2 = System.currentTimeMillis();
 		}
 		Cipher cipher = WSSecurityUtil.getCiperInstance(keyEncAlgo);
-		cipher.init(Cipher.ENCRYPT_MODE, remoteCert);
+		try {
+			cipher.init(Cipher.ENCRYPT_MODE, remoteCert);
+		} catch (InvalidKeyException e) {
+			throw new WSSecurityException(
+				WSSecurityException.FAILED_ENC_DEC, null, null, e);
+		}
 		byte[] encKey = symmetricKey.getEncoded();
 		if (doDebug) {
 			log.debug(
@@ -369,9 +389,21 @@ public class WSEncryptBody extends WSBaseMessage {
 			throw new WSSecurityException(
 				WSSecurityException.FAILURE,
 				"unsupportedKeyTransp",
-				new Object[] { "public key algorithm to weak to encrypt smmetric key" });
+				new Object[] { "public key algorithm too weak to encrypt symmetric key" });
 		}
-		byte[] encryptedKey = cipher.doFinal(encKey);
+		byte[] encryptedKey = null;
+		try {
+			encryptedKey = cipher.doFinal(encKey);
+		} catch (IllegalStateException e1) {
+			throw new WSSecurityException(
+				WSSecurityException.FAILED_ENC_DEC, null, null, e1);
+		} catch (IllegalBlockSizeException e1) {
+			throw new WSSecurityException(
+				WSSecurityException.FAILED_ENC_DEC, null, null, e1);
+		} catch (BadPaddingException e1) {
+			throw new WSSecurityException(
+				WSSecurityException.FAILED_ENC_DEC, null, null, e1);
+		}
 		Text keyText =
 			WSSecurityUtil.createBase64EncodedTextNode(doc, encryptedKey);
 
@@ -407,38 +439,16 @@ public class WSEncryptBody extends WSBaseMessage {
 				secToken.setKeyIdentifier(remoteCert);
 				// build a key id class??
 				break;
-//			case WSConstants.SKI_KEY_IDENTIFIER_DIRECT :
-//				{
-//					X509Security x509token = new X509Security(doc);
-//					x509token.setX509Certificate(remoteCert);
-//					x509token.setID(certUri);
-//					WSSecurityUtil.prependChildElement(
-//						doc,
-//						wsseSecurity,
-//						x509token.getElement(),
-//						false);
-//					// fall thru
-//				}
 
 			case WSConstants.SKI_KEY_IDENTIFIER :
 				secToken.setKeyIdentifierSKI(remoteCert, crypto);
 				break;
-//			case WSConstants.ISSUER_SERIAL_DIRECT :
-//				{
-//					X509Security x509token = new X509Security(doc);
-//					x509token.setX509Certificate(remoteCert);
-//					x509token.setID(certUri);
-//					WSSecurityUtil.prependChildElement(
-//						doc,
-//						wsseSecurity,
-//						x509token.getElement(),
-//						false);
-//					// fall thru
-//				}
+
 			case WSConstants.ISSUER_SERIAL :
 				secToken.setX509IssuerSerial(
 					new XMLX509IssuerSerial(doc, remoteCert));
 				break;
+
 			case WSConstants.BST_DIRECT_REFERENCE :
 				Reference ref = new Reference(doc);
 				ref.setURI("#" + certUri);
@@ -453,6 +463,7 @@ public class WSEncryptBody extends WSBaseMessage {
 					bstToken.getElement(),
 					false);
 				break;
+
 			default :
 				throw new WSSecurityException(
 					WSSecurityException.FAILURE,
@@ -477,7 +488,7 @@ public class WSEncryptBody extends WSBaseMessage {
 	}
 
 	private Document buildEmbedded(Document doc, Crypto crypto)
-		throws Exception {
+		throws WSSecurityException {
 		doDebug = log.isDebugEnabled();
 
 		long t0 = 0, t1 = 0, t2 = 0, t3 = 0;
@@ -513,8 +524,14 @@ public class WSEncryptBody extends WSBaseMessage {
 
 		symmetricKey = WSSecurityUtil.prepareSecretKey(symEncAlgo, embeddedKey);
 
-		XMLCipher xmlCipher = XMLCipher.getInstance(symEncAlgo);
-		xmlCipher.init(XMLCipher.ENCRYPT_MODE, symmetricKey);
+		XMLCipher xmlCipher = null;
+		try {
+			xmlCipher = XMLCipher.getInstance(symEncAlgo);
+			xmlCipher.init(XMLCipher.ENCRYPT_MODE, symmetricKey);
+		} catch (XMLEncryptionException e1) {
+			throw new WSSecurityException(
+				WSSecurityException.UNSUPPORTED_ALGORITHM, null, null, e1);
+		}
 
 		// if no encryption parts set - use the default
 		if (parts == null) {
@@ -557,7 +574,12 @@ public class WSEncryptBody extends WSBaseMessage {
 			 * Forth step: encrypt data, and set neccessary attributes in
 			 * xenc:EncryptedData
 			 */
-			xmlCipher.doFinal(doc, body, content);
+			try {
+				xmlCipher.doFinal(doc, body, content);
+			} catch (Exception e) {
+				throw new WSSecurityException(
+					WSSecurityException.FAILED_ENC_DEC, null, null, e);
+			}
 			if (tlog.isDebugEnabled()) {
 				t1 = System.currentTimeMillis();
 			}
@@ -622,18 +644,23 @@ public class WSEncryptBody extends WSBaseMessage {
 		return doc;
 	}
 
-	private KeyGenerator getKeyGenerator() throws Exception {
+	private KeyGenerator getKeyGenerator() throws WSSecurityException {
 		KeyGenerator keyGen = null;
-		if (symEncAlgo.equalsIgnoreCase(WSConstants.TRIPLE_DES)) {
-			keyGen = KeyGenerator.getInstance("DESede");
-		} else if (symEncAlgo.equalsIgnoreCase(WSConstants.AES_128)) {
-			keyGen = KeyGenerator.getInstance("2.16.840.1.101.3.4.1.2");
-		} else if (symEncAlgo.equalsIgnoreCase(WSConstants.AES_192)) {
-			keyGen = KeyGenerator.getInstance("2.16.840.1.101.3.4.1.22");
-		} else if (symEncAlgo.equalsIgnoreCase(WSConstants.AES_256)) {
-			keyGen = KeyGenerator.getInstance("2.16.840.1.101.3.4.1.42");
-		} else {
-			return null;
+		try {
+			if (symEncAlgo.equalsIgnoreCase(WSConstants.TRIPLE_DES)) {
+				keyGen = KeyGenerator.getInstance("DESede");
+			} else if (symEncAlgo.equalsIgnoreCase(WSConstants.AES_128)) {
+				keyGen = KeyGenerator.getInstance("2.16.840.1.101.3.4.1.2");
+			} else if (symEncAlgo.equalsIgnoreCase(WSConstants.AES_192)) {
+				keyGen = KeyGenerator.getInstance("2.16.840.1.101.3.4.1.22");
+			} else if (symEncAlgo.equalsIgnoreCase(WSConstants.AES_256)) {
+				keyGen = KeyGenerator.getInstance("2.16.840.1.101.3.4.1.42");
+			} else {
+				return null;
+			}
+		} catch (NoSuchAlgorithmException e) {
+			throw new WSSecurityException(
+				WSSecurityException.UNSUPPORTED_ALGORITHM, null, null, e);
 		}
 		return keyGen;
 	}
