@@ -311,7 +311,7 @@ public class STRTransform extends TransformSpi {
 				log.debug("STR: Reference");
 			}
 			Element elem = secRef.getTokenElement(secRef, doc);
-			if (tokElement == null) {
+			if (elem == null) {
 				throw new CanonicalizationException("empty");
 			}
 			X509Security x509token = new X509Security(elem);
