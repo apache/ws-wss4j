@@ -21,6 +21,8 @@ import org.apache.axis.utils.Options;
 import org.apache.ws.axis.oasis.ping.PingPort;
 import org.apache.ws.axis.oasis.ping.PingServiceLocator;
 
+import javax.xml.rpc.holders.StringHolder;
+
 /**
  * Class Tester
  */
@@ -79,17 +81,16 @@ public class Tester {
          */
 
         // perform call
-        String text =
-                new String("Scenario 1 text");
-
-        port.ping(text);
-        System.out.println(text);
+        StringHolder text =
+                new StringHolder("WSS4J - Tester text");
+        port.ping(null, text);
+        System.out.println(text.value);
 
         if (opts.isFlagSet('t') > 0) {
             long startTime = System.currentTimeMillis();
 
             for (int i = 0; i < 20; i++) {
-                port.ping(text);
+                port.ping(null, text);
             }
 
             long endTime = System.currentTimeMillis();

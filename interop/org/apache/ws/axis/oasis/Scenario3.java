@@ -21,6 +21,8 @@ import org.apache.axis.utils.Options;
 import org.apache.ws.axis.oasis.ping.PingPort;
 import org.apache.ws.axis.oasis.ping.PingServiceLocator;
 
+import javax.xml.rpc.holders.StringHolder;
+
 /**
  * Class Scenario3
  */
@@ -79,15 +81,16 @@ public class Scenario3 {
          */
 
         // perform call
-        String text =
-                new String("Scenario 3 text");
+        StringHolder text =
+                new StringHolder("WSS4J - Scenario 3 text");
+        port.ping(null, text);
+        System.out.println(text.value);
 
-        System.out.println(port.ping(text));
         if (opts.isFlagSet('t') > 0) {
             long startTime = System.currentTimeMillis();
 
             for (int i = 0; i < 20; i++) {
-                port.ping(text);
+                port.ping(null, text);
             }
 
             long endTime = System.currentTimeMillis();

@@ -30,15 +30,17 @@ import org.apache.ws.axis.security.WSDoAllConstants;
 import org.apache.ws.axis.security.WSDoAllReceiverResult;
 import org.apache.ws.security.WSConstants;
 
+import javax.xml.rpc.holders.StringHolder;
 import java.security.Principal;
 import java.util.Vector;
 
 public class PingBindingImpl
 	implements org.apache.ws.axis.oasis.ping.PingPort {
-	public String ping(
-		String text)
+	public void ping(
+            org.apache.ws.axis.oasis.ping.TicketType pingTicket, 
+		StringHolder text)
 		throws java.rmi.RemoteException {
-		text = "Echo " + text;
+		text.value = "Echo " + text;
 		MessageContext msgContext = MessageContext.getCurrentContext();
 		Message reqMsg = msgContext.getRequestMessage();
 
@@ -63,7 +65,6 @@ public class PingBindingImpl
 				}
 			}
 		}
-        return text;
 	}
 
 }
