@@ -279,12 +279,14 @@ public Document build(Document doc, Crypto crypto)
                 Constants._ATT_ALGORITHM,
                 canonAlgo);
 
-            Set prefixes = getInclusivePrefixes(securityHeader, false);
+            if (wssConfig.isWsiBSPCompliant()) {
+                Set prefixes = getInclusivePrefixes(securityHeader, false);
 
-            InclusiveNamespaces inclusiveNamespaces = new InclusiveNamespaces(
-                doc, prefixes);
+                InclusiveNamespaces inclusiveNamespaces =
+                        new InclusiveNamespaces(doc, prefixes);
 
-            canonElem.appendChild(inclusiveNamespaces.getElement());
+                canonElem.appendChild(inclusiveNamespaces.getElement());
+            }
 
             try {
                 SignatureAlgorithm signatureAlgorithm =
@@ -357,16 +359,20 @@ public Document build(Document doc, Crypto crypto)
                     transforms = new Transforms(doc);
                     transforms.addTransform(Transforms.TRANSFORM_C14N_EXCL_OMIT_COMMENTS);
                     if (keyIdentifierType == WSConstants.BST_DIRECT_REFERENCE) {
-                        transforms.item(0).getElement().appendChild(
-                            new InclusiveNamespaces(
-                                doc, getInclusivePrefixes(
-                                    securityHeader)).getElement());
+                        if (wssConfig.isWsiBSPCompliant()) {
+                            transforms.item(0).getElement().appendChild(
+                                    new InclusiveNamespaces(
+                                            doc, getInclusivePrefixes(
+                                                    securityHeader)).getElement());
+                        }
                         sig.addDocument("#" + certUri, transforms);
                     } else {
-                        transforms.item(0).getElement().appendChild(
-                            new InclusiveNamespaces(
-                                doc, getInclusivePrefixes(
-                                    info.getElement())).getElement());
+                        if (wssConfig.isWsiBSPCompliant()) {
+                            transforms.item(0).getElement().appendChild(
+                                    new InclusiveNamespaces(
+                                            doc, getInclusivePrefixes(
+                                                    info.getElement())).getElement());
+                        }
                         sig.addDocument("#" + keyInfoUri, transforms);
                     }
                 } else if (elemName.equals("STRTransform")) { // STRTransform
@@ -386,10 +392,13 @@ public Document build(Document doc, Crypto crypto)
                                 new Object[]{nmSpace + ", " + elemName});
                     }
                     transforms = new Transforms(doc);
-                    transforms.addTransform(Transforms.TRANSFORM_C14N_EXCL_OMIT_COMMENTS);
-                    transforms.item(0).getElement().appendChild(
-                      new InclusiveNamespaces(
-                          doc, getInclusivePrefixes(body)).getElement());
+                    transforms.addTransform(
+                            Transforms.TRANSFORM_C14N_EXCL_OMIT_COMMENTS);
+                    if (wssConfig.isWsiBSPCompliant()) {
+                        transforms.item(0).getElement().appendChild(
+                                new InclusiveNamespaces(
+                                        doc, getInclusivePrefixes(body)).getElement());
+                    }
                     sig.addDocument("#" + setWsuId(body), transforms);
                 }
             } catch (TransformationException e1) {
@@ -525,7 +534,7 @@ public Document build(Document doc, Crypto crypto)
      * @param issuerKeyName Private key to use in case of "sender-Vouches"
      * @param issuerKeyPW   Password for issuer private key
      * @return A signed SOAP envelope as <code>Document</code>
-     * @throws Exception
+     * @throws WSSecurityException
      */
     public Document build(Document doc, Crypto userCrypto,
             SAMLAssertion assertion, Crypto issuerCrypto, String issuerKeyName,

@@ -1,19 +1,19 @@
 /*
- * Copyright  2003-2004 The Apache Software Foundation.
- *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- *
- */
+* Copyright  2003-2004 The Apache Software Foundation.
+*
+*  Licensed under the Apache License, Version 2.0 (the "License");
+*  you may not use this file except in compliance with the License.
+*  You may obtain a copy of the License at
+*
+*      http://www.apache.org/licenses/LICENSE-2.0
+*
+*  Unless required by applicable law or agreed to in writing, software
+*  distributed under the License is distributed on an "AS IS" BASIS,
+*  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+*  See the License for the specific language governing permissions and
+*  limitations under the License.
+*
+*/
 
 package org.apache.ws.security.handler;
 
@@ -188,8 +188,8 @@ public class WSS4JHandler implements Handler {
         initialize();
         noSerialization = false;
         /*
-         * Get the action first.
-         */
+        * Get the action first.
+        */
         Vector actions = new Vector();
         String action = null;
         if ((action = (String) handlerInfo.getHandlerConfig().get(WSHandlerConstants.ACTION)) == null) {
@@ -209,24 +209,24 @@ public class WSS4JHandler implements Handler {
             actor = (String) msgContext.getProperty(WSHandlerConstants.ACTOR);
         }
         /*
-         * For every action we need a username, so get this now. The username
-         * defined in the deployment descriptor takes precedence.
-         */
+        * For every action we need a username, so get this now. The username
+        * defined in the deployment descriptor takes precedence.
+        */
         username = (String) handlerInfo.getHandlerConfig().get(WSHandlerConstants.USER);
         if (username == null || username.equals("")) {
             username = (String) msgContext.getProperty(WSHandlerConstants.USER);
             msgContext.setProperty(WSHandlerConstants.USER, null);
         }
         /*
-         * Now we perform some set-up for UsernameToken and Signature
-         * functions. No need to do it for encryption only. Check if username
-         * is available and then get a passowrd.
-         */
+        * Now we perform some set-up for UsernameToken and Signature
+        * functions. No need to do it for encryption only. Check if username
+        * is available and then get a passowrd.
+        */
         if ((doAction & (WSConstants.SIGN | WSConstants.UT | WSConstants.UT_SIGN)) != 0) {
             /*
-             * We need a username - if none throw an JAXRPCException. For encryption
-             * there is a specific parameter to get a username.
-             */
+            * We need a username - if none throw an JAXRPCException. For encryption
+            * there is a specific parameter to get a username.
+            */
             if (username == null || username.equals("")) {
                 throw new JAXRPCException("WSS4JHandler: Empty username for specified action");
             }
@@ -236,27 +236,27 @@ public class WSS4JHandler implements Handler {
             log.debug("Actor: " + actor + ", mu: " + mu);
         }
         /*
-         * Now get the SOAP part from the request message and convert it into a
-         * Document.
-         *
-         * This forces Axis to serialize the SOAP request into FORM_STRING.
-         * This string is converted into a document.
-         *
-         * During the FORM_STRING serialization Axis performs multi-ref of
-         * complex data types (if requested), generates and inserts references
-         * for attachements and so on. The resulting Document MUST be the
-         * complete and final SOAP request as Axis would send it over the wire.
-         * Therefore this must shall be the last (or only) handler in a chain.
-         *
-         * Now we can perform our security operations on this request.
-         */
+        * Now get the SOAP part from the request message and convert it into a
+        * Document.
+        *
+        * This forces Axis to serialize the SOAP request into FORM_STRING.
+        * This string is converted into a document.
+        *
+        * During the FORM_STRING serialization Axis performs multi-ref of
+        * complex data types (if requested), generates and inserts references
+        * for attachements and so on. The resulting Document MUST be the
+        * complete and final SOAP request as Axis would send it over the wire.
+        * Therefore this must shall be the last (or only) handler in a chain.
+        *
+        * Now we can perform our security operations on this request.
+        */
         Document doc = null;
         SOAPMessage message = msgContext.getMessage();
 
         /*
-         * If the message context property conatins a document then this is a
-         * chained handler.
-         */
+        * If the message context property conatins a document then this is a
+        * chained handler.
+        */
         SOAPPart sPart = message.getSOAPPart();
         if ((doc = (Document) msgContext.getProperty(WSHandlerConstants.SND_SECURITY))
                 == null) {
@@ -269,47 +269,47 @@ public class WSS4JHandler implements Handler {
         soapConstants =
                 WSSecurityUtil.getSOAPConstants(doc.getDocumentElement());
         /*
-         * Here we have action, username, password, and actor, mustUnderstand.
-         * Now get the action specific parameters.
-         */
+        * Here we have action, username, password, and actor, mustUnderstand.
+        * Now get the action specific parameters.
+        */
         if ((doAction & WSConstants.UT) == WSConstants.UT) {
             decodeUTParameter();
         }
         /*
-         * Here we have action, username, password, and actor, mustUnderstand.
-         * Now get the action specific parameters.
-         */
+        * Here we have action, username, password, and actor, mustUnderstand.
+        * Now get the action specific parameters.
+        */
         if ((doAction & WSConstants.UT_SIGN) == WSConstants.UT_SIGN) {
             decodeUTParameter();
             decodeSignatureParameter();
         }
         /*
-         * Get and check the Signature specific parameters first because they
-         * may be used for encryption too.
-         */
+        * Get and check the Signature specific parameters first because they
+        * may be used for encryption too.
+        */
         if ((doAction & WSConstants.SIGN) == WSConstants.SIGN) {
             decodeSignatureParameter();
         }
         /*
-         * If we need to handle signed SAML token then we need may of the
-         * Signature parameters. The handle procedure loads the signature
-         * crypto file on demand, thus don't do it here.
-         */
+        * If we need to handle signed SAML token then we need may of the
+        * Signature parameters. The handle procedure loads the signature
+        * crypto file on demand, thus don't do it here.
+        */
         if ((doAction & WSConstants.ST_SIGNED) == WSConstants.ST_SIGNED) {
             decodeSignatureParameter();
         }
         /*
-         * Set and check the encryption specific parameters, if necessary take
-         * over signature parameters username and crypto instance.
-         */
+        * Set and check the encryption specific parameters, if necessary take
+        * over signature parameters username and crypto instance.
+        */
         if ((doAction & WSConstants.ENCR) == WSConstants.ENCR) {
             encCrypto = loadEncryptionCrypto();
             decodeEncryptionParameter();
         }
         /*
-         * Here we have all necessary information to perform the requested
-         * action(s).
-         */
+        * Here we have all necessary information to perform the requested
+        * action(s).
+        */
         for (int i = 0; i < actions.size(); i++) {
 
             int actionToDo = ((Integer) actions.get(i)).intValue();
@@ -318,53 +318,53 @@ public class WSS4JHandler implements Handler {
             }
 
             switch (actionToDo) {
-			case WSConstants.UT:
-				performUTAction(actionToDo, mu, doc);
-				break;
+                case WSConstants.UT:
+                    performUTAction(actionToDo, mu, doc);
+                    break;
 
-			case WSConstants.ENCR:
-				performENCRAction(mu, actionToDo, doc);
-				break;
+                case WSConstants.ENCR:
+                    performENCRAction(mu, actionToDo, doc);
+                    break;
 
-			case WSConstants.SIGN:
-				performSIGNAction(actionToDo, mu, doc);
-				break;
+                case WSConstants.SIGN:
+                    performSIGNAction(actionToDo, mu, doc);
+                    break;
 
-			case WSConstants.ST_SIGNED:
-				performST_SIGNAction(actionToDo, mu, doc);
-				break;
+                case WSConstants.ST_SIGNED:
+                    performST_SIGNAction(actionToDo, mu, doc);
+                    break;
 
-			case WSConstants.ST_UNSIGNED:
-				performSTAction(mu, doc);
-				break;
+                case WSConstants.ST_UNSIGNED:
+                    performSTAction(mu, doc);
+                    break;
 
-			case WSConstants.TS:
-				performTSAction(mu, doc);
-				break;
+                case WSConstants.TS:
+                    performTSAction(mu, doc);
+                    break;
 
-			case WSConstants.UT_SIGN:
-				performUT_SIGNAction(actionToDo, mu, doc);
-				break;
+                case WSConstants.UT_SIGN:
+                    performUT_SIGNAction(actionToDo, mu, doc);
+                    break;
 
-			case WSConstants.NO_SERIALIZE:
-				noSerialization = true;
-				break;
-			}
+                case WSConstants.NO_SERIALIZE:
+                    noSerialization = true;
+                    break;
+            }
         }
 
         /*
-		 * If required convert the resulting document into a message first. The
-		 * outputDOM() method performs the necessary c14n call. After that we
-		 * extract it as a string for further processing.
-		 * 
-		 * Set the resulting byte array as the new SOAP message.
-		 * 
-		 * If noSerialization is false, this handler shall be the last (or only)
-		 * one in a handler chain. If noSerialization is true, just set the
-		 * processed Document in the transfer property. The next Axis WSS4J
-		 * handler takes it and performs additional security processing steps.
-		 *  
-		 */
+        * If required convert the resulting document into a message first. The
+        * outputDOM() method performs the necessary c14n call. After that we
+        * extract it as a string for further processing.
+        *
+        * Set the resulting byte array as the new SOAP message.
+        *
+        * If noSerialization is false, this handler shall be the last (or only)
+        * one in a handler chain. If noSerialization is true, just set the
+        * processed Document in the transfer property. The next Axis WSS4J
+        * handler takes it and performs additional security processing steps.
+        *
+        */
         if (noSerialization) {
             msgContext.setProperty(WSHandlerConstants.SND_SECURITY, doc);
         } else {
@@ -422,9 +422,9 @@ handle response
                     ex);
         }
         /*
-         * Check if it's a fault. Don't process faults.
-         *
-         */
+        * Check if it's a fault. Don't process faults.
+        *
+        */
         SOAPConstants soapConstants =
                 WSSecurityUtil.getSOAPConstants(doc.getDocumentElement());
         if (WSSecurityUtil
@@ -436,18 +436,18 @@ handle response
         }
 
         /*
-         * To check a UsernameToken or to decrypt an encrypted message we need
-         * a password.
-         */
+        * To check a UsernameToken or to decrypt an encrypted message we need
+        * a password.
+        */
         CallbackHandler cbHandler = null;
         if ((doAction & (WSConstants.ENCR | WSConstants.UT)) != 0) {
             cbHandler = getPasswordCB();
         }
 
         /*
-         * Get and check the Signature specific parameters first because they
-         * may be used for encryption too.
-         */
+        * Get and check the Signature specific parameters first because they
+        * may be used for encryption too.
+        */
 
         if ((doAction & WSConstants.SIGN) == WSConstants.SIGN) {
             decodeSignatureParameter();
@@ -479,10 +479,10 @@ handle response
         }
 
         /*
-         * If we had some security processing, get the original
-         * SOAP part of Axis' message and replace it with new SOAP
-         * part. This new part may contain decrypted elements.
-         */
+        * If we had some security processing, get the original
+        * SOAP part of Axis' message and replace it with new SOAP
+        * part. This new part may contain decrypted elements.
+        */
 
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         documentToStream(doc, os);
@@ -497,16 +497,16 @@ handle response
         }
 
         /*
-         * After setting the new current message, probably modified because
-         * of decryption, we need to locate the security header. That is,
-         * we force Axis (with getSOAPEnvelope()) to parse the string, build
-         * the new header. Then we examine, look up the security header
-         * and set the header as processed.
-         *
-         * Please note: find all header elements that contain the same
-         * actor that was given to processSecurityHeader(). Then
-         * check if there is a security header with this actor.
-         */
+        * After setting the new current message, probably modified because
+        * of decryption, we need to locate the security header. That is,
+        * we force Axis (with getSOAPEnvelope()) to parse the string, build
+        * the new header. Then we examine, look up the security header
+        * and set the header as processed.
+        *
+        * Please note: find all header elements that contain the same
+        * actor that was given to processSecurityHeader(). Then
+        * check if there is a security header with this actor.
+        */
 
         SOAPHeader sHeader = null;
         try {
@@ -533,14 +533,14 @@ handle response
         headerElement.setMustUnderstand(false); // is this sufficient?
 
         /*
-         * Now we can check the certificate used to sign the message.
-         * In the following implementation the certificate is only trusted
-         * if either it itself or the certificate of the issuer is installed
-         * in the keystore.
-         *
-         * Note: the method verifyTrust(X509Certificate) allows custom
-         * implementations with other validation algorithms for subclasses.
-         */
+        * Now we can check the certificate used to sign the message.
+        * In the following implementation the certificate is only trusted
+        * if either it itself or the certificate of the issuer is installed
+        * in the keystore.
+        *
+        * Note: the method verifyTrust(X509Certificate) allows custom
+        * implementations with other validation algorithms for subclasses.
+        */
 
         // Extract the signature action result from the action vector
 
@@ -557,13 +557,13 @@ handle response
         }
 
         /*
-         * Perform further checks on the timestamp that was transmitted in the header.
-         * In the following implementation the timestamp is valid if it was
-         * created after (now-ttl), where ttl is set on server side, not by the client.
-         *
-         * Note: the method verifyTimestamp(Timestamp) allows custom
-         * implementations with other validation algorithms for subclasses.
-         */
+        * Perform further checks on the timestamp that was transmitted in the header.
+        * In the following implementation the timestamp is valid if it was
+        * created after (now-ttl), where ttl is set on server side, not by the client.
+        *
+        * Note: the method verifyTimestamp(Timestamp) allows custom
+        * implementations with other validation algorithms for subclasses.
+        */
 
         // Extract the timestamp action result from the action vector
         actionResult = WSSecurityUtil.fetchActionResult(wsResult, WSConstants.TS);
@@ -598,8 +598,8 @@ handle response
         }
 
         /*
-          * now check the security actions: do they match, in right order?
-          */
+        * now check the security actions: do they match, in right order?
+        */
         int resultActions = wsResult.size();
         int size = actions.size();
         if (size != resultActions) {
@@ -613,10 +613,10 @@ handle response
         }
 
         /*
-         * All ok up to this point. Now construct and setup the
-         * security result structure. The service may fetch this
-         * and check it.
-         */
+        * All ok up to this point. Now construct and setup the
+        * security result structure. The service may fetch this
+        * and check it.
+        */
         Vector results = null;
         if ((results = (Vector) mc.getProperty(WSHandlerConstants.RECV_RESULTS))
                 == null) {
@@ -831,14 +831,14 @@ handle response
             X509Certificate[] x509certs = new X509Certificate[certs.length + 1];
 
             /* The following conversion into provider specific format seems not to be necessary
-                // Create new certificate, possibly provider-specific
-                try {
-                    cert = sigCrypto.loadCertificate(new ByteArrayInputStream(cert.getEncoded()));
-                } catch (CertificateEncodingException ex) {
-                    throw new JAXRPCException("WSS4JHandler: Combination of subject and issuers certificates failed", ex);
-                } catch (WSSecurityException ex) {
-                    throw new JAXRPCException("WSS4JHandler: Combination of subject and issuers certificates failed", ex);
-                }
+            // Create new certificate, possibly provider-specific
+            try {
+            cert = sigCrypto.loadCertificate(new ByteArrayInputStream(cert.getEncoded()));
+            } catch (CertificateEncodingException ex) {
+            throw new JAXRPCException("WSS4JHandler: Combination of subject and issuers certificates failed", ex);
+            } catch (WSSecurityException ex) {
+            throw new JAXRPCException("WSS4JHandler: Combination of subject and issuers certificates failed", ex);
+            }
             */
 
             // Then add the first certificate ...
@@ -849,14 +849,14 @@ handle response
                 cert = certs[i];
 
                 /* The following conversion into provider specific format seems not to be necessary
-                    // Create new certificate, possibly provider-specific
-                    try {
-                        cert = sigCrypto.loadCertificate(new ByteArrayInputStream(cert.getEncoded()));
-                    } catch (CertificateEncodingException ex) {
-                        throw new JAXRPCException("WSS4JHandler: Combination of subject and issuers certificates failed", ex);
-                    } catch (WSSecurityException ex) {
-                        throw new JAXRPCException("WSS4JHandler: Combination of subject and issuers certificates failed", ex);
-                    }
+                // Create new certificate, possibly provider-specific
+                try {
+                cert = sigCrypto.loadCertificate(new ByteArrayInputStream(cert.getEncoded()));
+                } catch (CertificateEncodingException ex) {
+                throw new JAXRPCException("WSS4JHandler: Combination of subject and issuers certificates failed", ex);
+                } catch (WSSecurityException ex) {
+                throw new JAXRPCException("WSS4JHandler: Combination of subject and issuers certificates failed", ex);
+                }
                 */
 
                 x509certs[certs.length + j] = cert;
@@ -971,9 +971,9 @@ handle response
     private void decodeSignatureParameter() throws JAXRPCException {
         sigCrypto = loadSignatureCrypto();
         /* There are currently no other signature parameters that need to be handled
-         * here, but we call the load crypto hook rather than just changing the visibility
-         * of this method to maintain parity with WSS4JHandler.
-         */
+        * here, but we call the load crypto hook rather than just changing the visibility
+        * of this method to maintain parity with WSS4JHandler.
+        */
 
         String tmpS = null;
         if ((tmpS = (String) handlerInfo.getHandlerConfig().get(WSHandlerConstants.SIG_KEY_ID)) == null) {
@@ -1007,16 +1007,16 @@ handle response
     }
 
     /*
-     * Set and check the decryption specific parameters, if necessary
-     * take over signatur crypto instance.
-     */
+    * Set and check the decryption specific parameters, if necessary
+    * take over signatur crypto instance.
+    */
 
     private void decodeDecryptionParameter() throws JAXRPCException {
         decCrypto = loadDecryptionCrypto();
         /* There are currently no other decryption parameters that need to be handled
-         * here, but we call the load crypto hook rather than just changing the visibility
-         * of this method to maintain parity with WSS4JHandler.
-         */
+        * here, but we call the load crypto hook rather than just changing the visibility
+        * of this method to maintain parity with WSS4JHandler.
+        */
     }
 
     /**
@@ -1100,18 +1100,18 @@ handle response
     }
 
     private void performUT_SIGNAction(int actionToDo, boolean mu, Document doc)
-			throws JAXRPCException {
-		String password;
-		password = getPassword(username, actionToDo,
-				WSHandlerConstants.PW_CALLBACK_CLASS,
-				WSHandlerConstants.PW_CALLBACK_REF).getPassword();
+            throws JAXRPCException {
+        String password;
+        password = getPassword(username, actionToDo,
+                WSHandlerConstants.PW_CALLBACK_CLASS,
+                WSHandlerConstants.PW_CALLBACK_REF).getPassword();
 
-		WSSAddUsernameToken builder = new WSSAddUsernameToken(actor, mu);
-		builder.setPasswordType(WSConstants.PASSWORD_TEXT);
+        WSSAddUsernameToken builder = new WSSAddUsernameToken(actor, mu);
+        builder.setPasswordType(WSConstants.PASSWORD_TEXT);
         builder.preSetUsernameToken(doc, username, password);
         builder.addCreated(doc);
         builder.addNonce(doc);
-        
+
         WSSignEnvelope sign = new WSSignEnvelope(actor, mu);
         sign.setUsernameToken(builder);
         if (signatureParts.size() > 0) {
@@ -1120,13 +1120,13 @@ handle response
         sign.setKeyIdentifierType(WSConstants.UT_SIGNING);
         sign.setSignatureAlgorithm(XMLSignature.ALGO_ID_MAC_HMAC_SHA1);
         try {
-			sign.build(doc, null);
-		} catch (WSSecurityException e) {
+            sign.build(doc, null);
+        } catch (WSSecurityException e) {
             throw new JAXRPCException("WSS4JHandler: Error during Signatur with UsernameToken secret"
                     + e);
-		}
-		builder.build(doc, null, null);		
-	}
+        }
+        builder.build(doc, null, null);
+    }
 
     private void performSTAction(boolean mu, Document doc)
             throws JAXRPCException {
@@ -1324,9 +1324,9 @@ handle response
     protected Crypto loadEncryptionCrypto() throws JAXRPCException {
         Crypto crypto = null;
         /*
-         * Get encryption crypto property file. If non specified take crypto
-         * instance from signature, if that fails: throw fault
-         */
+        * Get encryption crypto property file. If non specified take crypto
+        * instance from signature, if that fails: throw fault
+        */
         String encPropFile = null;
         if ((encPropFile = (String) handlerInfo.getHandlerConfig().get(WSHandlerConstants.ENC_PROP_FILE))
                 == null) {
@@ -1355,16 +1355,16 @@ handle response
             throw new JAXRPCException("WSS4JHandler: Encryption: no username");
         }
         /*
-         * String msgType = msgContext.getCurrentMessage().getMessageType(); if
-         * (msgType != null && msgType.equals(Message.RESPONSE)) {
-         * handleSpecialUser(encUser); }
-         */
+        * String msgType = msgContext.getCurrentMessage().getMessageType(); if
+        * (msgType != null && msgType.equals(Message.RESPONSE)) {
+        * handleSpecialUser(encUser); }
+        */
         handleSpecialUser(encUser);
 
         /*
-         * If the following parameters are no used (they return null) then the
-         * default values of WSS4J are used.
-         */
+        * If the following parameters are no used (they return null) then the
+        * default values of WSS4J are used.
+        */
         String tmpS = null;
         if ((tmpS = (String) handlerInfo.getHandlerConfig().get(WSHandlerConstants.ENC_KEY_ID)) == null) {
             tmpS = (String) msgContext.getProperty(WSHandlerConstants.ENC_KEY_ID);
@@ -1415,9 +1415,9 @@ handle response
             return;
         }
         /*
-         * Scan the results for a matching actor. Use results only if the
-         * receiving Actor and the sending Actor match.
-         */
+        * Scan the results for a matching actor. Use results only if the
+        * receiving Actor and the sending Actor match.
+        */
         for (int i = 0; i < results.size(); i++) {
             WSHandlerResult rResult =
                     (WSHandlerResult) results.get(i);
@@ -1427,10 +1427,10 @@ handle response
             }
             Vector wsSecEngineResults = rResult.getResults();
             /*
-             * Scan the results for the first Signature action. Use the
-             * certificate of this Signature to set the certificate for the
-             * encryption action :-).
-             */
+            * Scan the results for the first Signature action. Use the
+            * certificate of this Signature to set the certificate for the
+            * encryption action :-).
+            */
             for (int j = 0; j < wsSecEngineResults.size(); j++) {
                 WSSecurityEngineResult wser =
                         (WSSecurityEngineResult) wsSecEngineResults.get(j);
@@ -1569,8 +1569,8 @@ handle response
         int reason = 0;
 
         switch (doAction) {
-        case WSConstants.UT:
-        case WSConstants.UT_SIGN:
+            case WSConstants.UT:
+            case WSConstants.UT_SIGN:
                 reason = WSPasswordCallback.USERNAME_TOKEN;
                 break;
             case WSConstants.SIGN:
@@ -1584,8 +1584,8 @@ handle response
         Callback[] callbacks = new Callback[1];
         callbacks[0] = pwCb;
         /*
-         * Call back the application to get the password
-         */
+        * Call back the application to get the password
+        */
         try {
             cbHandler.handle(callbacks);
         } catch (java.lang.Exception e) {

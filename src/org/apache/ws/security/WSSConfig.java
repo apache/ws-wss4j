@@ -41,6 +41,7 @@ public class WSSConfig {
     protected boolean qualifyBSTAttributes = false;
     protected boolean prefixBSTValues = false;
     protected boolean targetIdQualified = true;
+    protected boolean wsiBSPCompliant = false;
     protected boolean processNonCompliantMessages = true;
     public static final int TIMESTAMP_IN_SECURITY_ELEMENT = 1;
     public static final int TIMESTAMP_IN_HEADER_ELEMENT = 2;
@@ -203,5 +204,24 @@ public class WSSConfig {
      */
     public void setProcessNonCompliantMessages(boolean attemptProcess) {
         processNonCompliantMessages = attemptProcess;
+    }
+
+    /**
+     * Checks if we are in WS-I Basic Security Profile compliance mode
+     *
+     * @return
+     */
+    public boolean isWsiBSPCompliant() {
+        return wsiBSPCompliant;
+    }
+
+    /**
+     * Set the WS-I Basic Security Profile compliance mode. The default is
+     * false (dues to .Net interop problems).
+     *
+     * @param wsiBSPCompliant
+     */
+    public void setWsiBSPCompliant(boolean wsiBSPCompliant) {
+        this.wsiBSPCompliant = wsiBSPCompliant;
     }
 }
