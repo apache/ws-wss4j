@@ -67,8 +67,6 @@ public class WSDoAllReceiver extends BasicHandler {
 
     private static Hashtable cryptos = new Hashtable(5);
 
-    private MessageContext msgContext = null;
-
     Crypto sigCrypto = null;
     String sigPropFile = null;
 
@@ -84,13 +82,12 @@ public class WSDoAllReceiver extends BasicHandler {
      * @param mc message context.
      * @throws AxisFault
      */
-    public void invoke(MessageContext mc) throws AxisFault {
+    public void invoke(MessageContext msgContext) throws AxisFault {
 
         if (doDebug) {
             log.debug("WSDoAllReceiver: enter invoke() with msg type: "
-                    + mc.getCurrentMessage().getMessageType());
+                    + msgContext.getCurrentMessage().getMessageType());
         }
-        msgContext = mc;
 
         Vector actions = new Vector();
         String action = null;
@@ -139,7 +136,7 @@ public class WSDoAllReceiver extends BasicHandler {
          */
         CallbackHandler cbHandler = null;
         if ((doAction & (WSConstants.ENCR | WSConstants.UT)) != 0) {
-            cbHandler = getPasswordCB();
+            cbHandler = getPasswordCB(msgContext);
         }
 
         /*
@@ -148,11 +145,11 @@ public class WSDoAllReceiver extends BasicHandler {
          */
 
         if ((doAction & WSConstants.SIGN) == WSConstants.SIGN) {
-            decodeSignatureParameter();
+            decodeSignatureParameter(msgContext);
         }
 
         if ((doAction & WSConstants.ENCR) == WSConstants.ENCR) {
-            decodeDecryptionParameter();
+            decodeDecryptionParameter(msgContext);
         }
 
         Vector wsResult = null;
@@ -330,10 +327,10 @@ public class WSDoAllReceiver extends BasicHandler {
          * and check it.
          */
         Vector results = null;
-        if ((results = (Vector) mc.getProperty(WSHandlerConstants.RECV_RESULTS))
+        if ((results = (Vector) msgContext.getProperty(WSHandlerConstants.RECV_RESULTS))
                 == null) {
             results = new Vector();
-            mc.setProperty(WSHandlerConstants.RECV_RESULTS, results);
+            msgContext.setProperty(WSHandlerConstants.RECV_RESULTS, results);
         }
         WSHandlerResult rResult =
                 new WSHandlerResult(actor,
@@ -347,7 +344,7 @@ public class WSDoAllReceiver extends BasicHandler {
     /**
      * Hook to allow subclasses to load their Signature Crypto however they see fit.
      */
-    protected Crypto loadSignatureCrypto() throws AxisFault {
+    protected Crypto loadSignatureCrypto(final MessageContext msgContext) throws AxisFault {
         Crypto crypto = null;
         if ((sigPropFile = (String) getOption(WSHandlerConstants.SIG_PROP_FILE))
                 == null) {
@@ -368,7 +365,7 @@ public class WSDoAllReceiver extends BasicHandler {
     /**
      * Hook to allow subclasses to load their Decryption Crypto however they see fit.
      */
-    protected Crypto loadDecryptionCrypto() throws AxisFault {
+    protected Crypto loadDecryptionCrypto(final MessageContext msgContext) throws AxisFault {
         Crypto crypto = null;
         if ((decPropFile = (String) getOption(WSHandlerConstants.DEC_PROP_FILE))
                 == null) {
@@ -386,8 +383,8 @@ public class WSDoAllReceiver extends BasicHandler {
         return crypto;
     }
 
-    private void decodeSignatureParameter() throws AxisFault {
-        sigCrypto = loadSignatureCrypto();
+    private void decodeSignatureParameter(final MessageContext msgContext) throws AxisFault {
+        sigCrypto = loadSignatureCrypto(msgContext);
         /* There are currently no other signature parameters that need to be handled 
          * here, but we call the load crypto hook rather than just changing the visibility
          * of this method to maintain parity with WSDoAllSender.
@@ -399,8 +396,8 @@ public class WSDoAllReceiver extends BasicHandler {
      * take over signatur crypto instance.
      */ 
 
-    private void decodeDecryptionParameter() throws AxisFault {
-        decCrypto = loadDecryptionCrypto();
+    private void decodeDecryptionParameter(final MessageContext msgContext) throws AxisFault {
+        decCrypto = loadDecryptionCrypto(msgContext);
         /* There are currently no other decryption parameters that need to be handled 
          * here, but we call the load crypto hook rather than just changing the visibility
          * of this method to maintain parity with WSDoAllSender.
@@ -411,7 +408,7 @@ public class WSDoAllReceiver extends BasicHandler {
      * Get the password callback class and get an instance
      * <p/>
      */
-    private CallbackHandler getPasswordCB() throws AxisFault {
+    private CallbackHandler getPasswordCB(final MessageContext msgContext) throws AxisFault {
 
         String callback = null;
         CallbackHandler cbHandler = null;
