@@ -31,6 +31,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.TimeZone;
+import java.util.Date;
 import java.util.Vector;
 
 /**
@@ -130,9 +131,9 @@ public class Timestamp {
         elementCreated.appendChild(doc.createTextNode(zulu.format(rightNow.getTime())));
         element.appendChild(elementCreated);
         if (ttl != 0) {
-            long currentTime = rightNow.getTimeInMillis();
+            long currentTime = rightNow.getTime().getTime();
             currentTime += ttl * 1000;
-            rightNow.setTimeInMillis(currentTime);
+            rightNow.setTime(new Date(currentTime));
 
             elementExpires =
                     doc.createElementNS(wssConfig.getWsuNS(),
