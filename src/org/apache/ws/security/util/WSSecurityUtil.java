@@ -264,7 +264,7 @@ public class WSSecurityUtil {
      * @return 
      */
     public static String setNamespace(Element element, String namespace, String prefix) {
-        String pre = getPrefix(namespace, element);
+        String pre = getPrefixNS(namespace, element);
         if (pre != null) {
             return pre;
         }
@@ -274,7 +274,7 @@ public class WSSecurityUtil {
 
     /* ** The following methods were copied over from aixs.utils.XMLUtils and adapted */
 
-    public static String getPrefix(String uri, Node e) {
+    public static String getPrefixNS(String uri, Node e) {
         while (e != null && (e.getNodeType() == Element.ELEMENT_NODE)) {
             NamedNodeMap attrs = e.getAttributes();
             for (int n = 0; n < attrs.getLength(); n++) {
@@ -352,7 +352,7 @@ public class WSSecurityUtil {
      */
     public static String getStringForQName(QName qname, Element e) {
         String uri = qname.getNamespaceURI();
-        String prefix = getPrefix(uri, e);
+        String prefix = getPrefixNS(uri, e);
         if (prefix == null) {
             int i = 1;
             prefix = "ns" + i;
@@ -633,7 +633,7 @@ public class WSSecurityUtil {
     }
     	
     public static SOAPConstants getSOAPConstants(Element startElement) {
-    	if (getPrefix(WSConstants.URI_SOAP12_ENV, startElement) != null) {
+    	if (getPrefixNS(WSConstants.URI_SOAP12_ENV, startElement) != null) {
     		return new SOAP12Constants();
     	}
     	else {

@@ -376,7 +376,7 @@ public class STRTransform extends TransformSpi {
 		Element secRefE)
 		throws Exception {
 		byte data[] = cert.getEncoded();
-		String prefix = WSSecurityUtil.getPrefix(WSConstants.WSSE_NS, secRefE);
+		String prefix = WSSecurityUtil.getPrefixNS(WSConstants.WSSE_NS, secRefE);
 		Element elem =
 			doc.createElementNS(
 				WSConstants.WSSE_NS,

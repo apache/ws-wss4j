@@ -177,14 +177,14 @@ public class WSBaseMessage {
 	}
 
 	protected String setWsuId(Element bodyElement) {
+        String prefix =
+            WSSecurityUtil.setNamespace(
+                bodyElement,
+                WSConstants.WSU_NS,
+                WSConstants.WSU_PREFIX);
 		String id = bodyElement.getAttributeNS(WSConstants.WSU_NS, "Id");
 		if ((id == null) || (id.length() == 0)) {
 			id = "id-" + Integer.toString(bodyElement.hashCode());
-			String prefix =
-				WSSecurityUtil.setNamespace(
-					bodyElement,
-					WSConstants.WSU_NS,
-					WSConstants.WSU_PREFIX);
 			bodyElement.setAttributeNS(WSConstants.WSU_NS, prefix + ":Id", id);
 		}
 		return id;
@@ -229,7 +229,7 @@ public class WSBaseMessage {
 					true);
 
 			String soapPrefix =
-				WSSecurityUtil.getPrefix(
+				WSSecurityUtil.getPrefixNS(
 					soapConstants.getEnvelopeURI(),
 					securityHeader);
 			if (actor != null && actor.length() > 0) {
