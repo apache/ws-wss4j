@@ -85,12 +85,12 @@ import java.util.Vector;
  * @author Werner Dittmann (Werner.Dittmann@siemens.com).
  */
 public class WSSecurityEngine {
+    private static final String VALUE_TYPE = "ValueType";
     private static Log log = LogFactory.getLog(WSSecurityEngine.class.getName());
 	private static Log tlog =
 		LogFactory.getLog("org.apache.ws.security.TIME");
 
-    private static final Class[] constructorType = {org.w3c.dom.Element.class};
-    private static Map tokenImpl = new Hashtable();
+    private static final Class[] constructorType = {WSSConfig.class, org.w3c.dom.Element.class};
     private static boolean sigCheck = true;
     private static WSSecurityEngine engine = null;
 	/**
@@ -99,14 +99,19 @@ public class WSSecurityEngine {
 	private byte[] decryptedBytes = null;
 
     private boolean doDebug = false;
+    protected WSSConfig wssConfig = WSSConfig.getDefaultWSConfig();
     /**
      * <code>wsse:BinarySecurityToken</code> as defined by WS Security specification
      */
-    protected static final QName BINARY_TOKEN = new QName(WSConstants.WSSE_NS, WSConstants.BINARY_TOKEN_LN);
+    protected QName binaryToken;
 	/**
 	 * <code>wsse:UsernameToken</code> as defined by WS Security specification
 	 */
-    protected static final QName USERNAME_TOKEN = new QName(WSConstants.WSSE_NS, WSConstants.USERNAME_TOKEN_LN);
+    protected QName usernameToken;
+    /**
+     * <code>wsu:Timestamp</code> as defined by OASIS WS Security specification,
+     */
+    protected QName timeStamp;
 	/**
 	 * <code>ds:Signature</code> as defined by XML Signature specification,
 	 * enhanced by WS Security specification
@@ -121,10 +126,6 @@ public class WSSecurityEngine {
 	 * <code>xenc:ReferenceList</code> as defined by XML Encryption specification,
 	 */
     protected static final QName REFERENCE_LIST = new QName(WSConstants.ENC_NS, WSConstants.REF_LIST_LN);
-	/**
-	 * <code>wsu:Timestamp</code> as defined by OASIS WS Security specification,
-	 */
-	protected static final QName TIMESTAMP = new QName(WSConstants.WSU_NS, WSConstants.TIMESTAMP_TOKEN_LN);
     /**
      * <code>saml:Assertion</code> as defined by SAML specification
      */
@@ -138,14 +139,24 @@ public class WSSecurityEngine {
                     + " had to be added to the java.security.Security");
             java.security.Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
         }
-        tokenImpl.put(PKIPathSecurity.TYPE, PKIPathSecurity.class);
-        tokenImpl.put(X509Security.TYPE, X509Security.class);
 		Transform.init();
 		try {
 			Transform.register(STRTransform.implementedTransformURI,
 				"org.apache.ws.security.transform.STRTransform");
 		} catch (Exception ex) {
 		};
+    }
+
+    public WSSecurityEngine() {
+        this(WSSConfig.getDefaultWSConfig());
+    }
+
+    public WSSecurityEngine(WSSConfig wssConfig) {
+        this.wssConfig = wssConfig;
+        binaryToken = new QName(wssConfig.getWsseNS(), WSConstants.BINARY_TOKEN_LN);
+        usernameToken = new QName(wssConfig.getWsseNS(), WSConstants.USERNAME_TOKEN_LN);
+        timeStamp = new QName(wssConfig.getWsuNS(), WSConstants.TIMESTAMP_TOKEN_LN);
+
     }
 
     /**
@@ -228,7 +239,7 @@ public class WSSecurityEngine {
         }
 		Vector wsResult = null;
 		SOAPConstants sc = WSSecurityUtil.getSOAPConstants(doc.getDocumentElement());
-        Element elem = WSSecurityUtil.getSecurityHeader(doc, actor, sc);
+        Element elem = WSSecurityUtil.getSecurityHeader(wssConfig, doc, actor, sc);
         if (elem != null) {
 			if (doDebug) {
 				log.debug("Processing WS-Security header for '" + actor
@@ -356,7 +367,7 @@ public class WSSecurityEngine {
                 handleReferenceList((Element) elem, cb);
 				returnResults.add(0, new WSSecurityEngineResult(
 						WSConstants.ENCR, null, null, null));
-           } else if (el.equals(USERNAME_TOKEN)) {
+           } else if (el.equals(usernameToken)) {
 				if (doDebug) {
 					log.debug("Found UsernameToken list element");
 				}
@@ -375,14 +386,14 @@ public class WSSecurityEngine {
                wsDocInfo.setAssertion((Element) elem);
                returnResults.add(0,
                        new WSSecurityEngineResult(WSConstants.ST_UNSIGNED, assertion));
-			} else if (el.equals(TIMESTAMP)) {
+			} else if (el.equals(timeStamp)) {
 				if (doDebug) {
 					log.debug("Found Timestamp list element");
 				}
 				/*
 				 * Decode Timestamp, add the found time (created/expiry) to result
 				 */
-				Timestamp timestamp = new Timestamp((Element) elem);
+				Timestamp timestamp = new Timestamp(wssConfig, (Element) elem);
 				handleTimestamp(timestamp);
 				returnResults.add(
 					0,
@@ -475,23 +486,29 @@ public class WSSecurityEngine {
 					"noXMLSig");
 		}
 
-		sig.addResourceResolver(EnvelopeIdResolver.getInstance());
+		sig.addResourceResolver(EnvelopeIdResolver.getInstance(wssConfig));
 
         X509Certificate[] certs = null;
 		KeyInfo info = sig.getKeyInfo();
         if (/*crypto.getDefaultX509Alias() == null &&*/ info != null) {
-    		Node node =
-    			WSSecurityUtil.getDirectChild(
-    				info.getElement(),
-    				SecurityTokenReference.TOKEN.getLocalPart(),
-    				SecurityTokenReference.TOKEN.getNamespaceURI());
+            Node node;
+            if (wssConfig.getProcessNonCompliantMessages()) {
+        		node = WSSecurityUtil.getDirectChildWSSE(
+        				info.getElement(),
+        				SecurityTokenReference.SECURITY_TOKEN_REFERENCE);
+            } else {
+                node = WSSecurityUtil.getDirectChild(
+                        info.getElement(),
+                        SecurityTokenReference.SECURITY_TOKEN_REFERENCE,
+                        wssConfig.getWsseNS());
+            }
     		if (node == null) {
     			throw new WSSecurityException(
     				WSSecurityException.INVALID_SECURITY,
     				"unsupportedKeyInfo");
     		}
     		SecurityTokenReference secRef =
-    			new SecurityTokenReference((Element) node);
+    			new SecurityTokenReference(wssConfig, (Element)node);
 
 			int docHash = elem.getOwnerDocument().hashCode();
 			if (doDebug) {
@@ -507,23 +524,26 @@ public class WSSecurityEngine {
 
     		if (secRef.containsReference()) {
     			Element token = secRef.getTokenElement(elem.getOwnerDocument(), wsDocInfo);
-
     			// at this point ... check token type: Binary
     			QName el = new QName(token.getNamespaceURI(), token.getLocalName());
-    			if (el.equals(BINARY_TOKEN)) {
+    			if (token.getLocalName().equals(binaryToken.getLocalPart())) { // the namespace has already been checked
     				certs = getCertificatesTokenReference((Element) token, crypto);
     			}else if (el.equals(SAML_TOKEN)) {
     			    certs = getCertificatesFromSAML((Element) token, crypto);
     			} else {
     				throw new WSSecurityException(
     					WSSecurityException.INVALID_SECURITY,
-    					"unsupportedToken", new Object[] { el.toString()});
+    					"unsupportedKeyInfo", new Object[] { el.toString()});
     			}
     		} else if (secRef.containsX509IssuerSerial()) {
     			certs = secRef.getX509IssuerSerial(crypto);
     		} else if (secRef.containsKeyIdentifier()) {
     			certs = secRef.getKeyIdentifier(crypto);
-    		}
+    		} else {
+                throw new WSSecurityException(
+                        WSSecurityException.INVALID_SECURITY,
+                        "unsupportedKeyInfo", new Object[] { node.toString()});
+            }
         } else if (crypto.getDefaultX509Alias() != null) {
             certs = crypto.getCertificates(crypto.getDefaultX509Alias());
         } else {
@@ -577,7 +597,7 @@ public class WSSecurityEngine {
 						// e3.printStackTrace();
 					}
 					String uri = siRef.getURI();
-					Element se = WSSecurityUtil.getElementByWsuId(elem.getOwnerDocument(), uri);
+					Element se = WSSecurityUtil.getElementByWsuId(wssConfig, elem.getOwnerDocument(), uri);
 					if (se == null) {
 						se = WSSecurityUtil.getElementByGenId(elem.getOwnerDocument(), uri);
 					}
@@ -715,9 +735,23 @@ public class WSSecurityEngine {
      * @throws 		WSSecurityException
      */
     private BinarySecurity createSecurityToken(Element element) throws WSSecurityException {
-        BinarySecurity token = new BinarySecurity(element);
+        BinarySecurity token = new BinarySecurity(wssConfig, element);
         String type = token.getValueType();
-        Class clazz = (Class) tokenImpl.get(type);
+        Class clazz = null;
+        if (wssConfig.getProcessNonCompliantMessages() ||
+            wssConfig.isBSTValuesPrefixed()) {
+            if (type.endsWith(X509Security.X509_V3)) {
+                clazz = X509Security.class;
+            } else if (type.endsWith(PKIPathSecurity.X509PKI_PATH)) {
+                clazz = PKIPathSecurity.class;
+            }
+        } else {
+            if (type.equals(X509Security.getType(wssConfig))) {
+                clazz = X509Security.class;
+            } else if (type.equals(PKIPathSecurity.getType(wssConfig))) {
+                clazz = PKIPathSecurity.class;
+            }
+        }
         if (clazz == null) {
             throw new WSSecurityException(WSSecurityException.UNSUPPORTED_SECURITY_TOKEN,
                     "unsupportedBinaryTokenType", new Object[]{type});
@@ -728,7 +762,7 @@ public class WSSecurityEngine {
                 throw new WSSecurityException(WSSecurityException.FAILURE,
 					"invalidConstructor", new Object[]{clazz});
             }
-            return (BinarySecurity) constructor.newInstance(new Object[]{element});
+            return (BinarySecurity) constructor.newInstance(new Object[]{wssConfig, element});
         } catch (InvocationTargetException e) {
             Throwable ee = e.getTargetException();
             if (ee instanceof WSSecurityException) {
@@ -746,7 +780,7 @@ public class WSSecurityEngine {
     }
 
     public WSUsernameTokenPrincipal handleUsernameToken(Element token, CallbackHandler cb) throws WSSecurityException {
-        UsernameToken ut = new UsernameToken(token);
+        UsernameToken ut = new UsernameToken(wssConfig, token);
         String user = ut.getName();
         if (doDebug) {
 			log.debug("UsernameToken user " + user);
@@ -848,7 +882,7 @@ public class WSSecurityEngine {
         // need to have it to find the encryped data elements in the envelope
         Document doc = xencEncryptedKey.getOwnerDocument();
         Element envelope = doc.getDocumentElement();
-        Element nsContext = WSSecurityUtil.createNamespaceContext(doc);
+        Element nsContext = WSSecurityUtil.createNamespaceContext(wssConfig, doc);
 
         // lookup xenc:EncryptionMethod, get the Algorithm attribute to determine
         // how the key was encrypted. Then check if we support the algorithm
@@ -887,13 +921,23 @@ public class WSSecurityEngine {
                 "KeyInfo", WSConstants.SIG_NS);
         String alias;
         if (keyInfo != null) {
-            Element secRefToken = (Element) WSSecurityUtil.getDirectChild((Node) keyInfo,
-                    "SecurityTokenReference", WSConstants.WSSE_NS);
+            Element secRefToken;
+            if (wssConfig.getProcessNonCompliantMessages()) {
+                secRefToken = (Element)WSSecurityUtil.getDirectChildWSSE(keyInfo,
+                        "SecurityTokenReference");
+            } else {
+                secRefToken = (Element) WSSecurityUtil.getDirectChild(keyInfo,
+                        "SecurityTokenReference", wssConfig.getWsseNS());
+            }
+            if (secRefToken == null) {
+                secRefToken = (Element)WSSecurityUtil.getDirectChild(keyInfo,
+                        "KeyName", WSConstants.SIG_NS);
+            }
             if (secRefToken == null) {
                 throw new WSSecurityException
                         (WSSecurityException.INVALID_SECURITY, "noSecTokRef");
             }
-            SecurityTokenReference secRef = new SecurityTokenReference(secRefToken);
+            SecurityTokenReference secRef = new SecurityTokenReference(wssConfig, secRefToken);
             /*
              * Well, at this point there are several ways to get the key. Try to handle all of them :-).
              */
@@ -940,16 +984,18 @@ public class WSSecurityEngine {
     				new QName(
     					bstElement.getNamespaceURI(),
     					bstElement.getLocalName());
-    			if (el.equals(BINARY_TOKEN)) {
+    			if (el.equals(binaryToken)) {
     				X509Security token = null;
-    				String value = bstElement.getAttribute("ValueType");
+    				String value = bstElement.getAttribute(VALUE_TYPE);
                     // attempt to get attribute in case it is qualified
-                    // NYI: need to iterate through all valid namespaces
-                    if (value.length() == 0) {
-                        value = bstElement.getAttributeNS(WSConstants.WSSE_NS, "ValueType");
+                    if (wssConfig.getProcessNonCompliantMessages()) {
+                        for (int i = 0; i < WSConstants.WSSE_NS_ARRAY.length && value.length() == 0; ++i) {
+                            String ns = WSConstants.WSSE_NS_ARRAY[i];
+                            value = bstElement.getAttributeNS(ns, VALUE_TYPE);
+                        }
                     }
     				if (!value.endsWith(X509Security.X509_V3)
-    					|| ((token = new X509Security(bstElement)) == null)) {
+    					|| ((token = new X509Security(wssConfig, bstElement)) == null)) {
     					throw new WSSecurityException(
     						WSSecurityException.UNSUPPORTED_SECURITY_TOKEN,
     						"unsupportedBinaryTokenType",
@@ -976,7 +1022,16 @@ public class WSSecurityEngine {
     					"unsupportedToken",
     					null);
     			}
-    		} else {
+    		} else if (secRef.containsKeyName()) {
+                // alias = secRef.getX509IssuerSerialAlias(crypto);
+                //alias = secRef.getKeyNameValue();
+                
+                // System.out.println("alias=" + alias);
+                alias = crypto.getAliasForX509Cert(secRef.getKeyNameValue());
+                if (doDebug) {
+                    log.debug("KeyName alias: " + alias);
+                }
+            } else {
     			throw new WSSecurityException(
     				WSSecurityException.FAILURE, "unsupportedKeyId");
     		}
@@ -1094,7 +1149,7 @@ public class WSSecurityEngine {
 		 * try the generic lookup to find Id="someURI"
 		 */
 		Element encBodyData = null;
-		if ((encBodyData = WSSecurityUtil.getElementByWsuId(doc, dataRefURI)) == null) {
+		if ((encBodyData = WSSecurityUtil.getElementByWsuId(wssConfig, doc, dataRefURI)) == null) {
 			encBodyData = WSSecurityUtil.getElementByGenId(doc, dataRefURI);
 		}
 		if (encBodyData == null) {
@@ -1178,7 +1233,7 @@ public class WSSecurityEngine {
 		 * try the generic lookup to find Id="someURI"
 		 */
 		Element encBodyData = null;
-		if ((encBodyData = WSSecurityUtil.getElementByWsuId(doc, dataRefURI)) == null) {
+		if ((encBodyData = WSSecurityUtil.getElementByWsuId(wssConfig, doc, dataRefURI)) == null) {
 			encBodyData = WSSecurityUtil.getElementByGenId(doc, dataRefURI);
 		}
 		if (encBodyData == null) {

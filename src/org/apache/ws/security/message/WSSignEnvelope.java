@@ -19,6 +19,7 @@ package org.apache.ws.security.message;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.SOAPConstants;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDocInfo;
@@ -113,6 +114,20 @@ public class WSSignEnvelope extends WSBaseMessage {
 		super(actor, mu);
 	}
 
+    /**
+     * Constructor. <p/>
+     * 
+     * @param wssConfig
+     *            Configuration options for processing and building security headers 
+     * @param actor
+     *            The actor name of the <code>wsse:Security</code> header
+     * @param mu
+     *            Set <code>mustUnderstand</code> to true or false
+     */
+    public WSSignEnvelope(WSSConfig wssConfig, String actor, boolean mu) {
+        super(wssConfig, actor, mu);
+    }
+    
 	/**
 	 * set the single cert flag. <p/>
 	 * 
@@ -262,7 +277,7 @@ public class WSSignEnvelope extends WSBaseMessage {
 		String keyInfoUri = "KeyId-" + info.hashCode();
 		info.setId(keyInfoUri);
 
-		SecurityTokenReference secRef = new SecurityTokenReference(doc);
+		SecurityTokenReference secRef = new SecurityTokenReference(wssConfig, doc);
 		String strUri = "STRId-" + secRef.hashCode();
 		secRef.setID(strUri);
 
@@ -348,7 +363,7 @@ public class WSSignEnvelope extends WSBaseMessage {
 			}
 		}
 
-		sig.addResourceResolver(EnvelopeIdResolver.getInstance());
+		sig.addResourceResolver(EnvelopeIdResolver.getInstance(wssConfig));
 
 		WSSecurityUtil.prependChildElement(
 			doc,
@@ -360,18 +375,18 @@ public class WSSignEnvelope extends WSBaseMessage {
 		}
 		switch (keyIdentifierType) {
 			case WSConstants.BST_DIRECT_REFERENCE :
-				Reference ref = new Reference(doc);
+				Reference ref = new Reference(wssConfig, doc);
 				ref.setURI("#" + certUri);
 				secRef.setReference(ref);
 				BinarySecurity bstToken = null;
 				if (!useSingleCert) {
-					bstToken = new PKIPathSecurity(doc);
+					bstToken = new PKIPathSecurity(wssConfig, doc);
 					((PKIPathSecurity) bstToken).setX509Certificates(
 						certs,
 						true,
 						crypto);
 				} else {
-					bstToken = new X509Security(doc);
+					bstToken = new X509Security(wssConfig, doc);
 					((X509Security) bstToken).setX509Certificate(certs[0]);
 				}
 				bstToken.setID(certUri);
@@ -606,7 +621,7 @@ public class WSSignEnvelope extends WSBaseMessage {
 		String keyInfoUri = "KeyId-" + info.hashCode();
 		info.setId(keyInfoUri);
 
-		SecurityTokenReference secRef = new SecurityTokenReference(doc);
+		SecurityTokenReference secRef = new SecurityTokenReference(wssConfig, doc);
 		String strUri = "STRId-" + secRef.hashCode();
 		secRef.setID(strUri);
 
@@ -640,11 +655,11 @@ public class WSSignEnvelope extends WSBaseMessage {
 
 		try {
 			if (senderVouches) {
-				secRefSaml = new SecurityTokenReference(doc);
+				secRefSaml = new SecurityTokenReference(wssConfig, doc);
 				String strSamlUri = "STRSAMLId-" + secRefSaml.hashCode();
 				secRefSaml.setID(strSamlUri);
 				// Decouple Refernce/KeyInfo setup - quick shot here
-				Reference ref = new Reference(doc);
+				Reference ref = new Reference(wssConfig, doc);
 				ref.setURI("#" + assertion.getId());
 				ref.setValueType(
 					WSConstants.WSS_SAML_NS + WSConstants.WSS_SAML_ASSERTION);
@@ -721,7 +736,7 @@ public class WSSignEnvelope extends WSBaseMessage {
 				e1);
 		}
 
-		sig.addResourceResolver(EnvelopeIdResolver.getInstance());
+		sig.addResourceResolver(EnvelopeIdResolver.getInstance(wssConfig));
 
 		/*
 		 * The order to prepend is:
@@ -742,11 +757,11 @@ public class WSSignEnvelope extends WSBaseMessage {
 		}
 		switch (keyIdentifierType) {
 			case WSConstants.BST_DIRECT_REFERENCE :
-				Reference ref = new Reference(doc);
+				Reference ref = new Reference(wssConfig, doc);
 				if (senderVouches) {
 					ref.setURI("#" + certUri);
 					BinarySecurity bstToken = null;
-					bstToken = new X509Security(doc);
+					bstToken = new X509Security(wssConfig, doc);
 					((X509Security) bstToken).setX509Certificate(certs[0]);
 					bstToken.setID(certUri);
 					WSSecurityUtil.prependChildElement(
@@ -859,12 +874,12 @@ public class WSSignEnvelope extends WSBaseMessage {
 	private Element createSTRParameter(Document doc) {
 		Element transformParam =
 			doc.createElementNS(
-				WSConstants.WSSE_NS,
+				wssConfig.getWsseNS(),
 				WSConstants.WSSE_PREFIX + ":TransformationParameters");
 
 		WSSecurityUtil.setNamespace(
 			transformParam,
-			WSConstants.WSSE_NS,
+            wssConfig.getWsseNS(),
 			WSConstants.WSSE_PREFIX);
 
 		Element canonElem =

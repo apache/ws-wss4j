@@ -19,6 +19,8 @@ package org.apache.ws.security.message;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.ws.security.SOAPConstants;
+import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.message.token.Timestamp;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.w3c.dom.Document;
@@ -64,21 +66,38 @@ public class WSAddTimestamp extends WSBaseMessage {
     }
 
     /**
+     * Constructor.
+     * <p/>
+     * @param wssConfig Configuration options for processing and building security headers
+     * @param actor The name of the actor of the <code>wsse:Security</code> header
+     * @param mu    Set <code>mustUnderstand</code> to true or false
+     */
+    public WSAddTimestamp(WSSConfig wssConfig, String actor, boolean mu) {
+        super(wssConfig, actor, mu);
+    }
+    
+    /**
      * Adds a new <code>Timestamp</code> to a soap envelope.
      * <p/>
      * A complete <code>Timestamp</code> is constructed and added to
      * the <code>wsse:Security</code> header. 
      * 
      * @param doc      The SOAP enevlope as W3C document
-     * @param ttl      This is the time difference in seconds between the <code>Created</code> and the <code>Expires</code> in <code>Timestamp</code>
+     * @param ttl      This is the time difference in seconds between the <code>Created</code> and the <code>Expires</code> in <code>Timestamp</code>, set to zero if <code>Expires</code> should not be added.
      * @return Document with Timestamp added
      * @throws Exception 
      */
     public Document build(Document doc, int ttl) { 
         log.debug("Begin add timestamp...");
-		Element securityHeader = insertSecurityHeader(doc);
-        ts = new Timestamp(doc, ttl);
-        WSSecurityUtil.prependChildElement(doc, securityHeader, ts.getElement(), true);
+  		Element securityHeader = insertSecurityHeader(doc);
+        Element target;
+  		if (wssConfig.getTimestampLocation() == WSSConfig.TIMESTAMP_IN_SECURITY_ELEMENT) {
+  		    target = securityHeader;
+        } else {
+            target = (Element)securityHeader.getParentNode();
+        }
+        ts = new Timestamp(wssConfig, doc, ttl);
+        WSSecurityUtil.prependChildElement(doc, target, ts.getElement(), true);
         return doc;
     }
 

@@ -56,6 +56,11 @@ public class WSConstants {
     public static final String WSSE_NS_OASIS_2003_06 = "http://schemas.xmlsoap.org/ws/2003/06/secext";
     public static final String WSSE_NS_OASIS_1_0 = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd";
     public static String WSSE_NS = WSSE_NS_OASIS_1_0;
+    public static final String[] WSSE_NS_ARRAY =
+        new String[] { WSSE_NS_OASIS_1_0,
+                       WSSE_NS_OASIS_2003_06,
+                       WSSE_NS_OASIS_2002_12,
+                       WSSE_NS_OASIS_2002_07 };
     public static final String USERNAMETOKEN_NS = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0";
     public static final String SOAPMESSAGE_NS = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0";
     public static final String X509TOKEN_NS = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0";
@@ -66,6 +71,11 @@ public class WSConstants {
     public static final String WSU_NS_OASIS_2003_06 = "http://schemas.xmlsoap.org/ws/2003/06/utility";
     public static final String WSU_NS_OASIS_1_0 = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd";
     public static String WSU_NS = WSU_NS_OASIS_1_0;
+    public static final String[] WSU_NS_ARRAY =
+        new String[] { WSU_NS_OASIS_1_0,
+                       WSU_NS_OASIS_2003_06,
+                       WSU_NS_OASIS_2002_12,
+                       WSU_NS_OASIS_2002_07 };
     public static final String WSU_PREFIX = "wsu";
     public static final String SIG_NS = "http://www.w3.org/2000/09/xmldsig#";
     public static final String SIG_PREFIX = "ds";

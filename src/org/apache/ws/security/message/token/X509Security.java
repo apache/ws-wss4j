@@ -17,6 +17,7 @@
 
 package org.apache.ws.security.message.token;
 
+import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
@@ -34,7 +35,7 @@ import java.security.cert.X509Certificate;
  * @author Davanum Srinivas (dims@yahoo.com).
  */
 public class X509Security extends BinarySecurity {
-    public static String TYPE = null; // set later in a static block
+    private String type;
     public static final String X509_V3 = "X509v3";
    
 	/*
@@ -42,26 +43,24 @@ public class X509Security extends BinarySecurity {
 	 * crypto loadCertificate operations
 	 */
 	private X509Certificate cachedCert = null;
-
-    static {
-        if (WSConstants.COMPLIANCE_MODE <= WSConstants.OASIS_2002_12) {
-            TYPE = WSConstants.WSSE_PREFIX + ":" + X509_V3;
-        } else {
-            TYPE = WSConstants.X509TOKEN_NS + "#" + X509_V3;
-        }
-    }
-    
+   
     /**
      * This constructor creates a new X509 certificate object and initializes
      * it from the data containe in the element. 
      * 
+     * @param wssConfig Configuration options for processing and building the <code>wsse:Security</code> header
      * @param elem 	the element containing the X509 certificate data
      * @throws WSSecurityException 
      */
-    public X509Security(Element elem) throws WSSecurityException {
-        super(elem);
+    public X509Security(WSSConfig wssConfig, Element elem) throws WSSecurityException {
+        super(wssConfig, elem);
+        if (wssConfig.isBSTValuesPrefixed()) {
+            type = WSConstants.WSSE_PREFIX + ":" + X509_V3;
+        } else {
+            type = WSConstants.X509TOKEN_NS + "#" + X509_V3;
+        }
         if (!getValueType().endsWith(X509_V3)) {
-            throw new WSSecurityException(WSSecurityException.INVALID_SECURITY_TOKEN, "invalidValueType", new Object[]{TYPE, getValueType()});
+            throw new WSSecurityException(WSSecurityException.INVALID_SECURITY_TOKEN, "invalidValueType", new Object[]{type, getValueType()});
         }
     }
 
@@ -70,9 +69,14 @@ public class X509Security extends BinarySecurity {
      * 
      * @param doc 
      */
-    public X509Security(Document doc) {
-        super(doc);
-        setValueType(TYPE);
+    public X509Security(WSSConfig wssConfig, Document doc) {
+        super(wssConfig, doc);
+        if (wssConfig.isBSTValuesPrefixed()) {
+            type = WSConstants.WSSE_PREFIX + ":" + X509_V3;
+        } else {
+            type = WSConstants.X509TOKEN_NS + "#" + X509_V3;
+        }
+        setValueType(type);
     }
 
     /**
@@ -124,4 +128,11 @@ public class X509Security extends BinarySecurity {
 				"encodeError");
 		}
 	}
+    public static String getType(WSSConfig wssConfig) {
+        if (wssConfig.isBSTValuesPrefixed()) {
+            return WSConstants.WSSE_PREFIX + ":" + X509_V3;
+        } else {
+            return WSConstants.X509TOKEN_NS + "#" + X509_V3;
+        }
+    }
 }

@@ -88,7 +88,7 @@ public class AxisUtil {
 	 * @param actor 
 	 * @return 
 	 * @throws SOAPException 
-	 */
+	 *
 	public static SOAPHeaderElement getSecurityHeader(
 		SOAPEnvelope env,
 		String actor)
@@ -109,7 +109,7 @@ public class AxisUtil {
 			}
 		}
 		return null;
-	}
+	}*/
 
 	static public int decodeAction(String action, Vector actions)
 		throws AxisFault {

@@ -19,6 +19,7 @@ package org.apache.ws.security.message;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.SOAPConstants;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSEncryptionPart;
@@ -105,6 +106,18 @@ public class WSEncryptBody extends WSBaseMessage {
 		super(actor, mu);
 	}
 
+    /**
+     * Constructor.
+     * <p/>
+     * 
+     * @param wssConfig Configuration options for processing and building the <code>wsse:Security</code> header
+     * @param actor The actor name of the <code>wsse:Security</code> header
+     * @param mu    Set <code>mustUnderstand</code> to true or false
+     */
+    public WSEncryptBody(WSSConfig wssConfig, String actor, boolean mu) {
+        super(wssConfig, actor, mu);
+    }
+    
 	/**
 	 * Sets the key to use during embedded encryption.
 	 * <p/>
@@ -440,8 +453,8 @@ public class WSEncryptBody extends WSBaseMessage {
 						parentNode,
 						xencEncryptedKey,
 						true);
-		}
-		SecurityTokenReference secToken = new SecurityTokenReference(doc);
+		} 
+        SecurityTokenReference secToken = new SecurityTokenReference(wssConfig, doc);
 
 		switch (keyIdentifierType) {
 			case WSConstants.X509_KEY_IDENTIFIER :
@@ -459,11 +472,11 @@ public class WSEncryptBody extends WSBaseMessage {
 				break;
 
 			case WSConstants.BST_DIRECT_REFERENCE :
-				Reference ref = new Reference(doc);
+				Reference ref = new Reference(wssConfig, doc);
 				ref.setURI("#" + certUri);
 				secToken.setReference(ref);
 				BinarySecurity bstToken = null;
-				bstToken = new X509Security(doc);
+				bstToken = new X509Security(wssConfig, doc);
 				((X509Security) bstToken).setX509Certificate(remoteCert);
 				bstToken.setID(certUri);
 				WSSecurityUtil.prependChildElement(

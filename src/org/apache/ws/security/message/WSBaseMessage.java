@@ -19,6 +19,7 @@ package org.apache.ws.security.message;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.SOAPConstants;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.util.WSSecurityUtil;
@@ -44,6 +45,7 @@ public class WSBaseMessage {
 	protected int keyIdentifierType = WSConstants.ISSUER_SERIAL;
 	protected Vector parts = null;
 	protected int timeToLive = 300; // time between Created and Expires
+    protected WSSConfig wssConfig = WSSConfig.getDefaultWSConfig();
 
 	protected boolean doDebug = false;
 
@@ -71,9 +73,22 @@ public class WSBaseMessage {
 	 * @param mu    Set <code>mustUnderstand</code> to true or false
 	 */
 	public WSBaseMessage(String actor, boolean mu) {
-		setActor(actor);
-		setMustUnderstand(mu);
+		this(WSSConfig.getDefaultWSConfig(), actor, mu);
 	}
+
+    /**
+     * Constructor.
+     * <p/>
+     * 
+     * @param wssConfig configuration options for processing and building security headers
+     * @param actor The actor name of the <code>wsse:Security</code> header
+     * @param mu    Set <code>mustUnderstand</code> to true or false
+     */
+    public WSBaseMessage(WSSConfig wssConfig, String actor, boolean mu) {
+        this.wssConfig = wssConfig;
+        setActor(actor);
+        setMustUnderstand(mu);
+    }
 
 	/**
 	 * set actor name.
@@ -174,15 +189,32 @@ public class WSBaseMessage {
 	}
 
 	protected String setWsuId(Element bodyElement) {
-        String prefix =
-            WSSecurityUtil.setNamespace(
-                bodyElement,
-                WSConstants.WSU_NS,
-                WSConstants.WSU_PREFIX);
-		String id = bodyElement.getAttributeNS(WSConstants.WSU_NS, "Id");
+		String id = null;
+        // try to get a differently qualified Id in case it was created with
+        // an older spec namespace
+        if (wssConfig.getProcessNonCompliantMessages()) {
+            id = WSSecurityUtil.getAttributeValueWSU(bodyElement, "Id", null);
+        }
+        if (wssConfig.getProcessNonCompliantMessages() ||
+            !wssConfig.isBodyIdQualified()) {
+            if ((id == null) || (id.length() == 0)) {
+                id = bodyElement.getAttribute("Id");
+            }
+        } else {
+            id = bodyElement.getAttributeNS(wssConfig.getWsuNS(), "Id");
+        }
 		if ((id == null) || (id.length() == 0)) {
 			id = "id-" + Integer.toString(bodyElement.hashCode());
-			bodyElement.setAttributeNS(WSConstants.WSU_NS, prefix + ":Id", id);
+            if (wssConfig.isBodyIdQualified()) {
+                String prefix =
+                    WSSecurityUtil.setNamespace(
+                        bodyElement,
+                        wssConfig.getWsuNS(),
+                        WSConstants.WSU_PREFIX);
+                bodyElement.setAttributeNS(wssConfig.getWsuNS(), prefix + ":Id", id);
+            } else {
+                bodyElement.setAttributeNS(null, "Id", id);
+            }
 		}
 		return id;
 	}
@@ -217,10 +249,10 @@ public class WSBaseMessage {
 			WSSecurityUtil.getSOAPConstants(doc.getDocumentElement());
 		// lookup a security header block that matches actor
 		Element securityHeader =
-			WSSecurityUtil.getSecurityHeader(doc, actor, soapConstants);
+			WSSecurityUtil.getSecurityHeader(wssConfig, doc, actor, soapConstants);
 		if (securityHeader == null) { // create if nothing found
 			securityHeader =
-				WSSecurityUtil.findWsseSecurityHeaderBlock(
+				WSSecurityUtil.findWsseSecurityHeaderBlock(wssConfig,
 					doc,
 					doc.getDocumentElement(),
 					true);

@@ -19,6 +19,7 @@ package org.apache.ws.security.message.token;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDocInfo;
 import org.apache.ws.security.WSSecurityException;
@@ -48,14 +49,14 @@ public class SecurityTokenReference {
 	private static Log log =
 		LogFactory.getLog(SecurityTokenReference.class.getName());
 	private static Log tlog = LogFactory.getLog("org.apache.ws.security.TIME");
-
-	public static final QName TOKEN =
-		new QName(WSConstants.WSSE_NS, "SecurityTokenReference");
+	public static final String SECURITY_TOKEN_REFERENCE = "SecurityTokenReference";
+    public static final String KEY_NAME = "KeyName";
 	public static final String SKI_URI =
 		WSConstants.X509TOKEN_NS + "#X509SubjectKeyIdentifier";
 	protected Element element = null;
 	private XMLX509IssuerSerial issuerSerial = null;
 	private byte[] skiBytes = null;
+    protected WSSConfig wssConfig = WSSConfig.getDefaultWSConfig();
 
 	private static boolean doDebug = false;
 
@@ -63,35 +64,47 @@ public class SecurityTokenReference {
 	 * Constructor.
 	 * <p/>
 	 * 
+     * @param wssConfig
 	 * @param elem 
 	 * @throws WSSecurityException 
 	 */
-	public SecurityTokenReference(Element elem) throws WSSecurityException {
+	public SecurityTokenReference(WSSConfig wssConfig, Element elem) throws WSSecurityException {
 		doDebug = log.isDebugEnabled();
 		this.element = elem;
-		QName el =
-			new QName(
-				this.element.getNamespaceURI(),
-				this.element.getLocalName());
-		if (!el.equals(TOKEN)) {
-			throw new WSSecurityException(
-				WSSecurityException.FAILURE,
-				"badElement",
-				new Object[] { TOKEN, el });
-		}
+        this.wssConfig = wssConfig;
+        boolean goodElement = false;
+        if (SECURITY_TOKEN_REFERENCE.equals(element.getLocalName())) {
+            if (wssConfig.getProcessNonCompliantMessages()) {
+                for (int i = 0; !goodElement && i < WSConstants.WSSE_NS_ARRAY.length; ++i) {
+                    goodElement =  WSConstants.WSSE_NS_ARRAY[i].equals(element.getNamespaceURI());
+                }
+            } else {
+                goodElement =  wssConfig.getWsseNS().equals(element.getNamespaceURI());
+            }
+        } else if (KEY_NAME.equals(element.getLocalName())) {
+            goodElement =  WSConstants.SIG_NS.equals(element.getNamespaceURI());
+        }
+        if (!goodElement) {
+            throw new WSSecurityException(
+                WSSecurityException.FAILURE,
+                "badElement",
+                null);
+        }
 	}
 
 	/**
 	 * Constructor.
 	 * <p/>
 	 * 
+     * @param wssConfig
 	 * @param doc 
 	 */
-	public SecurityTokenReference(Document doc) {
+	public SecurityTokenReference(WSSConfig wssConfig, Document doc) {
 		doDebug = log.isDebugEnabled();
+        this.wssConfig = wssConfig;
 		this.element =
 			doc.createElementNS(
-				WSConstants.WSSE_NS,
+				wssConfig.getWsseNS(),
 				"wsse:SecurityTokenReference");
 	}
 
@@ -124,7 +137,7 @@ public class SecurityTokenReference {
 	 */
 	public Reference getReference() throws WSSecurityException {
 		Element elem = getFirstElement();
-		return new Reference(elem);
+		return new Reference(wssConfig, elem);
 	}
 
 	/**
@@ -174,7 +187,7 @@ public class SecurityTokenReference {
 			}
 			tokElement = sa;
 		} else {
-			tokElement = WSSecurityUtil.getElementByWsuId(doc, uri);
+			tokElement = WSSecurityUtil.getElementByWsuId(wssConfig, doc, uri);
 		}
 		if (tokElement == null) {
 			throw new WSSecurityException(
@@ -211,22 +224,22 @@ public class SecurityTokenReference {
 		}
 		Text certText = doc.createTextNode(Base64.encode(data));
 		Element keyId =
-			doc.createElementNS(WSConstants.WSSE_NS, "wsse:KeyIdentifier");
-		if (WSConstants.COMPLIANCE_MODE <= WSConstants.OASIS_2002_12) {
+			doc.createElementNS(wssConfig.getWsseNS(), "wsse:KeyIdentifier");
+		if (wssConfig.isBSTAttributesQualified()) {
 			keyId.setAttributeNS(
-				WSConstants.WSSE_NS,
+				wssConfig.getWsseNS(),
 				WSConstants.WSSE_PREFIX + ":ValueType",
-				X509Security.TYPE);
+				X509Security.getType(wssConfig));
 			keyId.setAttributeNS(
-				WSConstants.WSSE_NS,
+				wssConfig.getWsseNS(),
 				WSConstants.WSSE_PREFIX + ":EncodingType",
-				BinarySecurity.BASE64_ENCODING);
+				BinarySecurity.getBase64EncodingValue(wssConfig));
 		} else {
-			keyId.setAttributeNS(null, "ValueType", X509Security.TYPE);
+			keyId.setAttributeNS(null, "ValueType", X509Security.getType(wssConfig));
 			keyId.setAttributeNS(
 				null,
 				"EncodingType",
-				BinarySecurity.BASE64_ENCODING);
+				BinarySecurity.getBase64EncodingValue(wssConfig));
 		}
 		keyId.appendChild(certText);
 		Element elem = getFirstElement();
@@ -251,22 +264,22 @@ public class SecurityTokenReference {
 		byte data[] = crypto.getSKIBytesFromCert(cert);
 		org.w3c.dom.Text skiText = doc.createTextNode(Base64.encode(data));
 		Element keyId =
-			doc.createElementNS(WSConstants.WSSE_NS, "wsse:KeyIdentifier");
-		if (WSConstants.COMPLIANCE_MODE <= WSConstants.OASIS_2002_12) {
+			doc.createElementNS(wssConfig.getWsseNS(), "wsse:KeyIdentifier");
+		if (wssConfig.isBSTAttributesQualified()) {
 			keyId.setAttributeNS(
-				WSConstants.WSSE_NS,
+                wssConfig.getWsseNS(),
 				WSConstants.WSSE_PREFIX + ":ValueType",
 				SKI_URI);
 			keyId.setAttributeNS(
-				WSConstants.WSSE_NS,
+                wssConfig.getWsseNS(),
 				WSConstants.WSSE_PREFIX + ":EncodingType",
-				BinarySecurity.BASE64_ENCODING);
+				BinarySecurity.getBase64EncodingValue(wssConfig));
 		} else {
 			keyId.setAttributeNS(null, "ValueType", SKI_URI);
 			keyId.setAttributeNS(
 				null,
 				"EncodingType",
-				BinarySecurity.BASE64_ENCODING);
+				BinarySecurity.getBase64EncodingValue(wssConfig));
 		}
 		keyId.appendChild(skiText);
 		Element elem = getFirstElement();
@@ -291,11 +304,12 @@ public class SecurityTokenReference {
 		String value = elem.getAttribute("ValueType");
 		// attempt to get the attribute if it was qualified
 		// NYI iterate through all the possible namespaces
-		if (value.length() == 0) {
-			value = elem.getAttributeNS(WSConstants.WSSE_NS, "ValueType");
+		if (value.length() == 0 &&
+            (wssConfig.getProcessNonCompliantMessages() || wssConfig.isBSTAttributesQualified())) {
+            value = WSSecurityUtil.getAttributeValueWSSE(elem, "ValueType", null);
 		}
 		if (value.endsWith(X509Security.X509_V3)) {
-			token = new X509Security(elem);
+			token = new X509Security(wssConfig, elem);
 			if (token != null) {
 				X509Certificate cert = token.getX509Certificate(crypto);
 				X509Certificate[] certs = new X509Certificate[1];
@@ -449,7 +463,20 @@ public class SecurityTokenReference {
 		}
 		return null;
 	}
-
+    /**
+     * Method containsKeyName
+     * 
+     * @return  true if the <code>SecurtityTokenReference</code> contains 
+     *          a <code>wsse:KeyName</code> element
+     */
+    public boolean containsKeyName() {
+        return element.getLocalName().equals(KEY_NAME);
+    }
+    
+    public String getKeyNameValue() {
+        return element.getFirstChild().getNodeValue();
+    }
+    
 	/**
 	 * Method containsReference
 	 * 
@@ -467,7 +494,15 @@ public class SecurityTokenReference {
 	 *			the <code>SecurtityTokenReference</code> 
 	 */
 	public int lengthReference() {
-		return this.length(WSConstants.WSSE_NS, "Reference");
+        if (wssConfig.getProcessNonCompliantMessages()) {
+            int length = 0;
+            for (int i = 0; length == 0 && i < WSConstants.WSSE_NS_ARRAY.length; ++i) {
+                length = this.length(WSConstants.WSSE_NS_ARRAY[i], "Reference");
+            }
+            return length;
+        } else {
+            return this.length(wssConfig.getWsseNS(), "Reference");
+        }
 	}
 
 	/**
@@ -507,7 +542,7 @@ public class SecurityTokenReference {
 	* 			the <code>SecurtityTokenReference</code> 
 	 */
 	public int lengthKeyIdentifier() {
-		return this.length(WSConstants.WSSE_NS, "KeyIdentifier");
+		return this.length(wssConfig.getWsseNS(), "KeyIdentifier");
 	}
 
 	/**
@@ -550,16 +585,6 @@ public class SecurityTokenReference {
 	}
 
 	/**
-	 * get the id.
-	 * <p/>
-	 * 
-	 * @return 
-	 */
-	public String getID() {
-		return this.element.getAttributeNS(WSConstants.WSU_NS, "Id");
-	}
-
-	/**
 	 * set the id.
 	 * <p/>
 	 * 
@@ -569,9 +594,9 @@ public class SecurityTokenReference {
 		String prefix =
 			WSSecurityUtil.setNamespace(
 				this.element,
-				WSConstants.WSU_NS,
+				wssConfig.getWsuNS(),
 				WSConstants.WSU_PREFIX);
-		this.element.setAttributeNS(WSConstants.WSU_NS, prefix + ":Id", id);
+		this.element.setAttributeNS(wssConfig.getWsuNS(), prefix + ":Id", id);
 	}
 
 	/**

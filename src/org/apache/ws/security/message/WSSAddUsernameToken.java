@@ -19,6 +19,7 @@ package org.apache.ws.security.message;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.message.token.UsernameToken;
 import org.apache.ws.security.util.WSSecurityUtil;
@@ -65,6 +66,18 @@ public class WSSAddUsernameToken extends WSBaseMessage {
         super(actor, mu);
     }
 
+    /**
+     * Constructor.
+     * <p/>
+     * 
+     * @param wssConfig Configuration options for processing and building the <code>wsse:Security</code> header
+     * @param actor The name of the actor of the <code>wsse:Security</code> header
+     * @param mu    Set <code>mustUnderstand</code> to true or false
+     */
+    public WSSAddUsernameToken(WSSConfig wssConfig, String actor, boolean mu) {
+        super(wssConfig, actor, mu);
+    }
+
 	/**
 	 * Defines how to construct the password element of the 
 	 * <code>UsernameToken</code>. 
@@ -108,7 +121,7 @@ public class WSSAddUsernameToken extends WSBaseMessage {
     public Document build(Document doc, String username, String password) { // throws Exception {
         log.debug("Begin add username token...");
 		Element securityHeader = insertSecurityHeader(doc);
-        ut = new UsernameToken(doc, passwordType);
+        ut = new UsernameToken(wssConfig, doc, passwordType);
         ut.setName(username);
         ut.setPassword(password);
         WSSecurityUtil.prependChildElement(doc, securityHeader, ut.getElement(), true);

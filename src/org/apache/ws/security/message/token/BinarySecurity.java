@@ -17,6 +17,7 @@
 
 package org.apache.ws.security.message.token;
 
+import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.util.DOM2Writer;
@@ -36,19 +37,10 @@ import javax.xml.namespace.QName;
  * @author Davanum Srinivas (dims@yahoo.com).
  */
 public class BinarySecurity {
-    public static final QName TOKEN = new QName(WSConstants.WSSE_NS, "BinarySecurityToken");
-    public static final QName TOKEN_KI = new QName(WSConstants.WSSE_NS, "KeyIdentifier");
     public static final String BASE64_BINARY = "Base64Binary";
-    public static String BASE64_ENCODING = null; // set in a static block later 
+    private String base64Encoding;
     protected Element element = null;
-
-    static {
-        if (WSConstants.COMPLIANCE_MODE <= WSConstants.OASIS_2002_12) {
-            BASE64_ENCODING = WSConstants.WSSE_PREFIX + ":" + BASE64_BINARY;
-        } else {
-            BASE64_ENCODING = WSConstants.SOAPMESSAGE_NS + "#Base64Binary";
-        }
-    }
+    protected WSSConfig wssConfig = WSSConfig.getDefaultWSConfig();
     
     /**
      * Constructor.
@@ -57,10 +49,25 @@ public class BinarySecurity {
      * @param elem 
      * @throws WSSecurityException 
      */
-    public BinarySecurity(Element elem) throws WSSecurityException {
+    public BinarySecurity(WSSConfig wssConfig, Element elem) throws WSSecurityException {
         this.element = elem;
-        QName el = new QName(this.element.getNamespaceURI(), this.element.getLocalName());
-        if (!el.equals(TOKEN) && !el.equals(TOKEN_KI)) {
+        this.wssConfig = wssConfig;
+        base64Encoding = getBase64EncodingValue(wssConfig);
+        boolean nsOK = false;
+        if (wssConfig.getProcessNonCompliantMessages()) {
+            for (int i = 0; i < WSConstants.WSSE_NS_ARRAY.length; ++i) {
+                if (WSConstants.WSSE_NS_ARRAY[i].equals(element.getNamespaceURI())) {
+                    nsOK = true;
+                    break;
+                }
+            }
+        } else if (wssConfig.getWsseNS().equals(element.getNamespaceURI())) {
+            nsOK = true;
+        }
+        if (!nsOK ||
+            !(element.getLocalName().equals("BinarySecurityToken") ||
+              element.getLocalName().equals("KeyIdentifier"))) {
+            QName el = new QName(this.element.getNamespaceURI(), this.element.getLocalName());
             throw new WSSecurityException(WSSecurityException.INVALID_SECURITY_TOKEN, "badTokenType", new Object[]{el});
         }
         if (!getEncodingType().endsWith(BASE64_BINARY)) {
@@ -74,10 +81,12 @@ public class BinarySecurity {
      * 
      * @param doc 
      */
-    public BinarySecurity(Document doc) {
-        this.element = doc.createElementNS(WSConstants.WSSE_NS, "wsse:BinarySecurityToken");
-        WSSecurityUtil.setNamespace(this.element, WSConstants.WSSE_NS, WSConstants.WSSE_PREFIX);
-        setEncodingType(BASE64_ENCODING);
+    public BinarySecurity(WSSConfig wssConfig, Document doc) {
+        this.wssConfig = wssConfig;
+        base64Encoding = getBase64EncodingValue(wssConfig);
+        this.element = doc.createElementNS(wssConfig.getWsseNS(), "wsse:BinarySecurityToken");
+        WSSecurityUtil.setNamespace(this.element, wssConfig.getWsseNS(), WSConstants.WSSE_PREFIX);
+        setEncodingType(base64Encoding);
         this.element.appendChild(doc.createTextNode(""));
     }
 
@@ -89,10 +98,9 @@ public class BinarySecurity {
      */
     public String getValueType() {
         String valueType = this.element.getAttribute("ValueType");
-        // also attempt to get the attribute in case it was qualified
-        // NYI: still need to check for all supported namespaces here
-        if (valueType.length() == 0) {
-            valueType = element.getAttributeNS(WSConstants.WSSE_NS, "ValueType");
+        if (valueType.length() == 0 &&
+            (wssConfig.getProcessNonCompliantMessages() || wssConfig.isBSTAttributesQualified())) {
+            valueType = WSSecurityUtil.getAttributeValueWSSE(element, "ValueType", null);
         }
         return valueType;
     }
@@ -104,8 +112,8 @@ public class BinarySecurity {
      * @param type 
      */
     protected void setValueType(String type) {
-        if (WSConstants.COMPLIANCE_MODE <= WSConstants.OASIS_2002_12) {
-            this.element.setAttributeNS(WSConstants.WSSE_NS, WSConstants.WSSE_PREFIX + ":ValueType", type);
+        if (wssConfig.isBSTAttributesQualified()) {
+            this.element.setAttributeNS(wssConfig.getWsseNS(), WSConstants.WSSE_PREFIX + ":ValueType", type);
         } else {
             this.element.setAttributeNS(null, "ValueType", type);
         }
@@ -119,10 +127,9 @@ public class BinarySecurity {
      */
     public String getEncodingType() {
         String encodingType = this.element.getAttribute("EncodingType");
-        // attempt to get the attribute in case it was qualified
-        // NYI: still need to check for all supported namespaces here
-        if (encodingType.length() == 0) {
-            encodingType = this.element.getAttributeNS(WSConstants.WSSE_NS, "EncodingType");
+        if (encodingType.length() == 0 &&
+            (wssConfig.getProcessNonCompliantMessages() || wssConfig.isBSTAttributesQualified())) {
+            encodingType = WSSecurityUtil.getAttributeValueWSSE(element, "EncodingType", null);
         }
         return encodingType;
     }
@@ -134,8 +141,8 @@ public class BinarySecurity {
      * @param encoding 
      */
     protected void setEncodingType(String encoding) {
-        if (WSConstants.COMPLIANCE_MODE <= WSConstants.OASIS_2002_12) {
-            this.element.setAttributeNS(WSConstants.WSSE_NS, WSConstants.WSSE_PREFIX + ":EncodingType", encoding);
+        if (wssConfig.isBSTAttributesQualified()) {
+            this.element.setAttributeNS(wssConfig.getWsseNS(), WSConstants.WSSE_PREFIX + ":EncodingType", encoding);
         } else {
             this.element.setAttributeNS(null, "EncodingType", encoding);
         }
@@ -201,7 +208,7 @@ public class BinarySecurity {
      * @return 
      */
     public String getID() {
-        return this.element.getAttributeNS(WSConstants.WSU_NS, "Id");
+        return this.element.getAttributeNS(wssConfig.getWsuNS(), "Id");
     }
 
     /**
@@ -211,8 +218,8 @@ public class BinarySecurity {
      * @param id 
      */
     public void setID(String id) {
-        String prefix = WSSecurityUtil.setNamespace(this.element, WSConstants.WSU_NS, WSConstants.WSU_PREFIX);
-        this.element.setAttributeNS(WSConstants.WSU_NS, prefix + ":Id", id);
+        String prefix = WSSecurityUtil.setNamespace(this.element, wssConfig.getWsuNS(), WSConstants.WSU_PREFIX);
+        this.element.setAttributeNS(wssConfig.getWsuNS(), prefix + ":Id", id);
     }
 
     /**
@@ -223,5 +230,12 @@ public class BinarySecurity {
      */
     public String toString() {
         return DOM2Writer.nodeToString((Node) this.element);
+    }
+    public static String getBase64EncodingValue(WSSConfig wssConfig) {
+        if (wssConfig.isBSTValuesPrefixed()) {
+            return WSConstants.WSSE_PREFIX + ":" + BASE64_BINARY;
+        } else {
+            return WSConstants.SOAPMESSAGE_NS + "#" + BASE64_BINARY;
+        }
     }
 }

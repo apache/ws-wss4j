@@ -16,6 +16,7 @@
  */
 package org.apache.ws.security.conversation.message.token;
 
+import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.conversation.ConversationConstants;
@@ -167,7 +168,7 @@ public class DerivedKeyToken {
     public SecurityTokenReference getSecuityTokenReference()
             throws WSSecurityException {
         if (this.elementSecurityTokenReference != null) {
-            return new SecurityTokenReference(this.elementSecurityTokenReference);
+            return new SecurityTokenReference(WSSConfig.getDefaultWSConfig(), this.elementSecurityTokenReference);
         }
         return null;
     }

@@ -17,6 +17,7 @@
 
 package org.apache.ws.security.message.token;
 
+import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
@@ -32,19 +33,18 @@ import java.security.cert.X509Certificate;
  * @author Davanum Srinivas (dims@yahoo.com).
  */
 public class PKIPathSecurity extends BinarySecurity {
-    public static final String TYPE = WSConstants.WSSE_NS + "#X509PKIPathv1";
+    public static final String X509PKI_PATH = "X509PKIPathv1";
 
     /**
      * Constructor.
      * <p/>
      * 
-     * @param elem 
      * @throws WSSecurityException 
      */
-    public PKIPathSecurity(Element elem) throws WSSecurityException {
-        super(elem);
-        if (!getValueType().equals(TYPE)) {
-            throw new WSSecurityException(WSSecurityException.INVALID_SECURITY_TOKEN, "invalidValueType", new Object[]{TYPE, getValueType()});
+    public PKIPathSecurity(WSSConfig wssConfig, Element elem) throws WSSecurityException {
+        super(wssConfig, elem);
+        if (!getValueType().equals(getType(wssConfig))) {
+            throw new WSSecurityException(WSSecurityException.INVALID_SECURITY_TOKEN, "invalidValueType", new Object[]{getType(wssConfig), getValueType()});
         }
     }
 
@@ -52,11 +52,10 @@ public class PKIPathSecurity extends BinarySecurity {
      * Constructor.
      * <p/>
      * 
-     * @param doc 
      */
-    public PKIPathSecurity(Document doc) {
-        super(doc);
-        setValueType(TYPE);
+    public PKIPathSecurity(WSSConfig wssConfig, Document doc) {
+        super(wssConfig, doc);
+        setValueType(getType(wssConfig));
     }
 
     /**
@@ -95,5 +94,9 @@ public class PKIPathSecurity extends BinarySecurity {
         }
         byte[] data = crypto.getCertificateData(reverse, certs);
         setToken(data);
+    }
+    
+    public static String getType(WSSConfig wssConfig) {
+        return wssConfig.getWsseNS() + "#" + X509PKI_PATH;
     }
 }

@@ -19,6 +19,7 @@ package org.apache.ws.security.util;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.SOAP11Constants;
 import org.apache.ws.security.SOAP12Constants;
 import org.apache.ws.security.SOAPConstants;
@@ -71,21 +72,32 @@ public class WSSecurityUtil {
      * @return the <code>wsse:Security</code> element or
      * 			<code>null</code> if not such element found
      */
-    public static Element getSecurityHeader(Document doc,
-                                            String actor,
-                                            SOAPConstants sc) {
-        Element soapHeaderElement =
-            (Element) getDirectChild(doc.getFirstChild(),
-                                     sc.getHeaderQName().getLocalPart(),
-                                     sc.getEnvelopeURI());
+    public static Element getSecurityHeader(WSSConfig wssConfig, Document doc, String actor, SOAPConstants sc) {
+		Element soapHeaderElement =
+			(Element) getDirectChild(doc.getFirstChild(),
+				sc.getHeaderQName().getLocalPart(),
+				sc.getEnvelopeURI());
+
         if (soapHeaderElement == null) { // no SOAP header at all
             return null;
         }
 
         // get all wsse:Security nodes
-        NodeList list = soapHeaderElement.getElementsByTagNameNS(
-            WSConstants.WSSE_NS, WSConstants.WSSE_LN);
-        int len = list.getLength();
+        NodeList list = null;
+        int len = 0;
+        if (wssConfig.getProcessNonCompliantMessages()) {
+            for (int i = 0; len == 0 && i < WSConstants.WSSE_NS_ARRAY.length; ++i) {
+                list = soapHeaderElement.getElementsByTagNameNS(WSConstants.WSSE_NS_ARRAY[i], WSConstants.WSSE_LN);
+                len = list.getLength();
+            }
+        } else {
+            list = soapHeaderElement.getElementsByTagNameNS(wssConfig.getWsseNS(), WSConstants.WSSE_LN);
+        }
+        if (list == null) {
+            return null;
+        } else {
+            len = list.getLength();
+        }
         Element elem;
         Attr attr;
         String hActor;
@@ -142,6 +154,81 @@ public class WSSecurityUtil {
                      }
              }
         return null;
+    }
+
+    /**
+     * Gets a direct child with specified localname and one of the WSSE
+     * namespaces.
+     * <p/>
+     * 
+     * @param fNode            the node where to start the search
+     * @param localName        local name of the child to get
+     * @return the node or <code>null</code> if not such node found
+     */
+    public static Node getDirectChildWSSE(Node fNode, String localName) {
+            Node child = null;
+            for (int i = 0; child == null && i < WSConstants.WSSE_NS_ARRAY.length; ++i) {
+                child = getDirectChild(fNode, localName, WSConstants.WSSE_NS_ARRAY[i]);
+            }
+            return child;
+    }
+
+    /**
+     * Gets a direct child with specified localname and one of the WSU namespaces.
+     * <p/>
+     * 
+     * @param fNode            the node where to start the search
+     * @param localName        local name of the child to get
+     * @return the node or <code>null</code> if not such node found
+     */
+    public static Node getDirectChildWSU(Node fNode, String localName) {
+        Node child = null;
+        for (int i = 0; child == null && i < WSConstants.WSU_NS_ARRAY.length; ++i) {
+            child = getDirectChild(fNode, localName, WSConstants.WSU_NS_ARRAY[i]);
+        }
+        return child;
+    }
+
+    /**
+     * Gets the attribute value with specified localname and WSU namespace.
+     * <p/>
+     * 
+     * @param element          the Element which contains the attribute
+     * @param attrName         local name of the attribute
+     * @param wsuNamespace     the WSU namespace of the attribute to get.
+     *                         Pass null to try all WSU namespaces
+     */
+    public static String getAttributeValueWSU(Element element, String attrName, String wsuNamespace) {
+        if (wsuNamespace == null) {
+            String value = null;
+            for (int i = 0; (value == null || value.length() == 0) && i < WSConstants.WSU_NS_ARRAY.length; ++i) {
+                value = element.getAttributeNS(WSConstants.WSU_NS_ARRAY[i], attrName);
+            }
+            return value;
+        } else {
+            return element.getAttributeNS(wsuNamespace, attrName);
+        }
+    }
+
+    /**
+     * Gets the attribute value with specified localname and WSSE namespace.
+     * <p/>
+     * 
+     * @param element          the Element which contains the attribute
+     * @param attrName         local name of the attribute
+     * @param wsseNamespace    the WSSE namespace of the attribute to get.
+     *                         Pass null to try all WSSE namespaces
+     */
+    public static String getAttributeValueWSSE(Element element, String attrName, String wsseNamespace) {
+        if (wsseNamespace == null) {
+            String value = null;
+            for (int i = 0; (value == null || value.length() == 0) && i < WSConstants.WSSE_NS_ARRAY.length; ++i) {
+                value = element.getAttributeNS(WSConstants.WSSE_NS_ARRAY[i], attrName);
+            }
+            return value;
+        } else {
+            return element.getAttributeNS(wsseNamespace, attrName);
+        }
     }
 
     /**
@@ -406,12 +493,13 @@ public class WSSecurityUtil {
     /**
      * Search for an element given its wsu:id.
      * <p/>
-     *
+     * 
+     * @param wssConfig
      * @param doc
-     * @param id
-     * @return
+     * @param id  
+     * @return 
      */
-    public static Element getElementByWsuId(Document doc, String id) {
+    public static Element getElementByWsuId(WSSConfig wssConfig, Document doc, String id) {
         if (id == null) {
             return null;
         }
@@ -420,48 +508,58 @@ public class WSSecurityUtil {
             return null;
         }
         id = id.substring(1);
-        return WSSecurityUtil.findElementById(doc.getDocumentElement(),
-                                              id, WSConstants.WSU_NS);
+        if (wssConfig.getProcessNonCompliantMessages()) {
+            Element element = null;
+            for (int i = 0; element == null && i < WSConstants.WSU_NS_ARRAY.length; ++i) {
+                element = WSSecurityUtil.findElementById(doc.getDocumentElement(), id, WSConstants.WSU_NS_ARRAY[i]);
+            }
+            return element;
+        } else {
+        	return WSSecurityUtil.findElementById(doc.getDocumentElement(), id, wssConfig.getWsuNS());
+        }
+
     }
 
-    /**
-     * Search for an element given its generic id.
-     * <p/>
-     *
-     * @param doc
-     * @param id
-     * @return
-     */
-    public static Element getElementByGenId(Document doc, String id) {
-        if (id == null) {
-            return null;
-        }
-        id = id.trim();
-        if ((id.length() == 0) || (id.charAt(0) != '#')) {
-            return null;
-        }
-        id = id.substring(1);
-        return WSSecurityUtil.findElementById(doc.getDocumentElement(),
-                                              id, null);
-    }
+	/**
+	 * Search for an element given its generic id.
+	 * <p/>
+	 * 
+	 * @param doc 
+	 * @param id  
+	 * @return 
+	 */
+	public static Element getElementByGenId(Document doc, String id) {
+		if (id == null) {
+			return null;
+		}
+		id = id.trim();
+		if ((id.length() == 0) || (id.charAt(0) != '#')) {
+			return null;
+		}
+		id = id.substring(1);
+        	return WSSecurityUtil.findElementById(doc.getDocumentElement(), id, null);
+	}
+
     /**
      * Create a BinarySecurityToken element
      * <p/>
      *
      * @param doc
      * @param wsuIdVal
+     * @param wssConfig
      * @return
      */
     public static Element createBinarySecurityToken(Document doc,
-                                                    String wsuIdVal) {
-        Element retVal = doc.createElementNS(WSConstants.WSSE_NS,
+                                                    String wsuIdVal,
+                                                    WSSConfig wssConfig) {
+        Element retVal = doc.createElementNS(wssConfig.getWsseNS(),
                                              "wsse:BinarySecurityToken");
         retVal.setAttributeNS(WSConstants.XMLNS_NS,
-                              "xmlns:wsu", WSConstants.WSU_NS);
+                              "xmlns:wsu", wssConfig.getWsuNS());
         retVal.setAttributeNS(WSConstants.WSU_NS, "wsu:Id", wsuIdVal);
-        retVal.setAttributeNS(null, "ValueType", X509Security.TYPE);
+        retVal.setAttributeNS(null, "ValueType", X509Security.getType(wssConfig));
         retVal.setAttributeNS(null, "EncodingType",
-                              BinarySecurity.BASE64_ENCODING);
+                    BinarySecurity.getBase64EncodingValue(wssConfig));
         return retVal;
     }
 
@@ -559,18 +657,15 @@ public class WSSecurityUtil {
     /**
      * find the ws-security header block
      * <p/>
-     *
-     * @param doc
-     * @param envelope
-     * @param doCreate
-     * @return
+     * 
+     * @param doc      
+     * @param envelope 
+     * @param doCreate 
+     * @return 
      */
-    public static Element findWsseSecurityHeaderBlock(Document doc,
-                                                      Element envelope,
-                                                      boolean doCreate) {
-        SOAPConstants sc = getSOAPConstants(envelope);
-        Element header = findChildElement(envelope, sc.getEnvelopeURI(),
-                                          sc.getHeaderQName().getLocalPart());
+    public static Element findWsseSecurityHeaderBlock(WSSConfig wssConfig, Document doc, Element envelope, boolean doCreate) {
+    	SOAPConstants sc = getSOAPConstants(envelope);
+        Element header = findChildElement(envelope, sc.getEnvelopeURI(), sc.getHeaderQName().getLocalPart());
         if (header == null) {
             if (doCreate) {
                 header = createElementInSameNamespace(
@@ -578,16 +673,20 @@ public class WSSecurityUtil {
                 header = prependChildElement(doc, envelope, header, true);
             }
         }
-        Element wsseSecurity = findChildElement(
-            header, WSConstants.WSSE_NS, "Security");
+        Element wsseSecurity = null;
+        if (wssConfig.getProcessNonCompliantMessages()) {
+            for (int i = 0; wsseSecurity == null && i < WSConstants.WSSE_NS_ARRAY.length; ++i) {
+                wsseSecurity = findChildElement(header, WSConstants.WSSE_NS_ARRAY[i], "Security");
+            }
+        } else {
+            wsseSecurity = findChildElement(header, wssConfig.getWsseNS(), "Security");
+        }
         if (wsseSecurity != null) {
             return wsseSecurity;
         }
         if (doCreate) {
-            wsseSecurity = header.getOwnerDocument().createElementNS(
-                WSConstants.WSSE_NS, "wsse:Security");
-            wsseSecurity.setAttributeNS(WSConstants.XMLNS_NS, "xmlns:wsse",
-                                        WSConstants.WSSE_NS);
+            wsseSecurity = header.getOwnerDocument().createElementNS(wssConfig.getWsseNS(), "wsse:Security");
+            wsseSecurity.setAttributeNS(WSConstants.XMLNS_NS, "xmlns:wsse", wssConfig.getWsseNS());
             return prependChildElement(doc, header, wsseSecurity, true);
         }
         return null;
@@ -631,19 +730,14 @@ public class WSSecurityUtil {
      * @param doc
      * @return
      */
-    public static Element createNamespaceContext(Document doc) {
-        SOAPConstants sc = getSOAPConstants(doc.getDocumentElement());
+    public static Element createNamespaceContext(WSSConfig wssConfig, Document doc) {
+		SOAPConstants sc = getSOAPConstants(doc.getDocumentElement());
         Element nsContext = doc.createElementNS(null, "namespaceContext");
-        nsContext.setAttributeNS(WSConstants.XMLNS_NS,
-                                 "xmlns:env", sc.getEnvelopeURI());
-        nsContext.setAttributeNS(WSConstants.XMLNS_NS,
-                                 "xmlns:wsse", WSConstants.WSSE_NS);
-        nsContext.setAttributeNS(WSConstants.XMLNS_NS,
-                                 "xmlns:wsu", WSConstants.WSU_NS);
-        nsContext.setAttributeNS(WSConstants.XMLNS_NS,
-                                 "xmlns:ds", WSConstants.SIG_NS);
-        nsContext.setAttributeNS(WSConstants.XMLNS_NS,
-                                 "xmlns:xenc", WSConstants.ENC_NS);
+        nsContext.setAttributeNS(WSConstants.XMLNS_NS, "xmlns:env", sc.getEnvelopeURI());
+        nsContext.setAttributeNS(WSConstants.XMLNS_NS, "xmlns:wsse", wssConfig.getWsseNS());
+        nsContext.setAttributeNS(WSConstants.XMLNS_NS, "xmlns:wsu", wssConfig.getWsuNS());
+        nsContext.setAttributeNS(WSConstants.XMLNS_NS, "xmlns:ds", WSConstants.SIG_NS);
+        nsContext.setAttributeNS(WSConstants.XMLNS_NS, "xmlns:xenc", WSConstants.ENC_NS);
         return nsContext;
     }
 

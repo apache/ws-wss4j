@@ -112,6 +112,20 @@ public interface Crypto {
     public String getAliasForX509Cert(Certificate cert) throws WSSecurityException;
 
     /**
+     * Lookup a X509 Certificate in the keystore according to a given
+     * the issuer of a Certficate.
+     * <p/>
+     * The search gets all alias names of the keystore and gets the certificate chain
+     * for each alias. Then the Issuer fo each certificate of the chain
+     * is compared with the parameters.
+     * 
+     * @param issuer       The issuer's name for the certificate
+     * @return alias name of the certificate that matches the issuer name
+     *         or null if no such certificate was found.
+     */
+    public String getAliasForX509Cert(String issuer) throws WSSecurityException;
+    
+    /**
      * Search a X509 Certificate in the keystore according to a given serial number and
      * the issuer of a Certficate.
      * <p/>

@@ -270,6 +270,22 @@ public class Merlin implements Crypto {
         java.util.Collections.sort(vr);
 		return vr;
 	}
+    /**
+     * Lookup a X509 Certificate in the keystore according to a given
+     * the issuer of a Certficate.
+     * <p/>
+     * The search gets all alias names of the keystore and gets the certificate chain
+     * for each alias. Then the Issuer fo each certificate of the chain
+     * is compared with the parameters.
+     * 
+     * @param issuer       The issuer's name for the certificate
+     * @return alias name of the certificate that matches the issuer name
+     *         or null if no such certificate was found.
+     */
+    public String getAliasForX509Cert(String issuer)
+            throws WSSecurityException {
+        return getAliasForX509Cert(issuer, null, false);
+    }
 
     /**
      * Lookup a X509 Certificate in the keystore according to a given serial number and
@@ -284,7 +300,10 @@ public class Merlin implements Crypto {
      * @return alias name of the certificate that matches serialNumber and issuer name
      *         or null if no such certificate was found.
      */
-
+    public String getAliasForX509Cert(String issuer, BigInteger serialNumber)
+            throws WSSecurityException {
+        return getAliasForX509Cert(issuer, serialNumber, true);
+    }
 
     /*
      * need to check if "getCertificateChain" also finds certificates that are
@@ -294,45 +313,47 @@ public class Merlin implements Crypto {
      * (this should work as well).
      * --- remains to be tested in several ways --
      */
-    public String getAliasForX509Cert(String issuer, BigInteger serialNumber)
+    private String getAliasForX509Cert(String issuer, BigInteger serialNumber,
+                                       boolean useSerialNumber)
             throws WSSecurityException {
         Vector issuerRDN = splitAndTrim(issuer);
         X509Certificate x509cert = null;
         Vector certRDN = null;
-		Certificate cert = null;
+        Certificate cert = null;
 
-		try {
-			for (Enumeration e = keystore.aliases(); e.hasMoreElements();) {
-				String alias = (String) e.nextElement();
-				Certificate[] certs = keystore.getCertificateChain(alias);
-				if (certs == null || certs.length == 0) {
-					// no cert chain, so lets check if getCertificate gives us a  result.
-					cert = keystore.getCertificate(alias);
-					if (cert == null) {
-						return null;
-					}
-				} else {
-					cert = certs[0];
-				}
-				if (!(cert instanceof X509Certificate)) {
-					continue;
-				}
-				x509cert = (X509Certificate) cert;
-				if (x509cert.getSerialNumber().compareTo(serialNumber) == 0) {
-					certRDN = splitAndTrim(x509cert.getIssuerDN().getName());
-					if (certRDN.equals(issuerRDN)) {
-						return alias;
-					}
-				}
-			}
-		} catch (KeyStoreException e) {
+        try {
+            for (Enumeration e = keystore.aliases(); e.hasMoreElements();) {
+                String alias = (String) e.nextElement();
+                Certificate[] certs = keystore.getCertificateChain(alias);
+                if (certs == null || certs.length == 0) {
+                    // no cert chain, so lets check if getCertificate gives us a  result.
+                    cert = keystore.getCertificate(alias);
+                    if (cert == null) {
+                        return null;
+                    }
+                } else {
+                    cert = certs[0];
+                }
+                if (!(cert instanceof X509Certificate)) {
+                    continue;
+                }
+                x509cert = (X509Certificate) cert;
+                if (!useSerialNumber ||
+                    useSerialNumber && x509cert.getSerialNumber().compareTo(serialNumber) == 0) {
+                    certRDN = splitAndTrim(x509cert.getIssuerDN().getName());
+                    if (certRDN.equals(issuerRDN)) {
+                        return alias;
+                    }
+                }
+            }
+        } catch (KeyStoreException e) {
             throw new WSSecurityException(
                 WSSecurityException.FAILURE,
                 "keystore");
-		}
+        }
         return null;
     }
-
+    
 	/**
 	 * Lookup a X509 Certificate in the keystore according to a given 
 	 * SubjectKeyIdentifier.

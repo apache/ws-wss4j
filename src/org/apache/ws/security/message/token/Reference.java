@@ -17,6 +17,7 @@
 
 package org.apache.ws.security.message.token;
 
+import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.util.DOM2Writer;
@@ -33,45 +34,58 @@ import javax.xml.namespace.QName;
  * @author Davanum Srinivas (dims@yahoo.com).
  */
 public class Reference {
-	public static final QName TOKEN =
-		new QName(WSConstants.WSSE_NS, "Reference");
-	protected Element element = null;
+	public static final String TOKEN_LNAME = "Reference";
+    protected Element element = null;
+    protected WSSConfig wssConfig;
 
 	/**
 	 * Constructor.
 	 * <p/>
 	 * 
+     * @param wssConfig
 	 * @param elem 
 	 * @throws WSSecurityException 
 	 */
-	public Reference(Element elem) throws WSSecurityException {
+	public Reference(WSSConfig wssConfig, Element elem) throws WSSecurityException {
 		if (elem == null) {
 			throw new WSSecurityException(
 				WSSecurityException.INVALID_SECURITY,
 				"noReference");
 		}
 		this.element = elem;
-		QName el =
-			new QName(
-				this.element.getNamespaceURI(),
-				this.element.getLocalName());
-		if (!el.equals(TOKEN)) {
-			throw new WSSecurityException(
-				WSSecurityException.FAILURE,
-				"badElement",
-				new Object[] { TOKEN, el });
-		}
+        this.wssConfig = wssConfig;
+        boolean nsOK = false;
+        if (wssConfig.getProcessNonCompliantMessages()) {
+            for (int i = 0; i < WSConstants.WSSE_NS_ARRAY.length; ++i) {
+                if (WSConstants.WSSE_NS_ARRAY[i].equals(element.getNamespaceURI())) {
+                    nsOK = true;
+                    break;
+                }
+            }
+        } else if (wssConfig.getWsseNS().equals(element.getNamespaceURI())) {
+            nsOK = true;
+        }
+        if (!nsOK || !element.getLocalName().equals(TOKEN_LNAME)) {
+            QName el = new QName(this.element.getNamespaceURI(), this.element.getLocalName());
+            QName token = new QName(wssConfig.getWsseNS(), TOKEN_LNAME);
+            throw new WSSecurityException(
+                    WSSecurityException.FAILURE,
+                    "badElement",
+                    new Object[] { token, el });
+        }
 	}
 
 	/**
 	 * Constructor.
 	 * <p/>
 	 * 
+     * @param wssConfig
 	 * @param doc 
 	 */
-	public Reference(Document doc) {
-		this.element =
-			doc.createElementNS(WSConstants.WSSE_NS, "wsse:Reference");
+	public Reference(WSSConfig wssConfig, Document doc) {
+		this.wssConfig = wssConfig;
+        this.element =
+			doc.createElementNS(wssConfig.getWsseNS(), "wsse:" + TOKEN_LNAME);
 	}
 
 	/**

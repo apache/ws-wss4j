@@ -24,6 +24,7 @@ import org.apache.axis.SOAPPart;
 import org.apache.axis.handlers.BasicHandler;
 import org.apache.ws.axis.security.WSDoAllConstants;
 import org.apache.ws.axis.security.WSDoAllSender;
+import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSSecurityException;
@@ -242,6 +243,7 @@ public class ConversationServerHandler extends BasicHandler {
             //add the relavent SCT
             Element securityHeader =
                 WSSecurityUtil.findWsseSecurityHeaderBlock(
+                    WSSConfig.getDefaultWSConfig(),
                     doc,
                     doc.getDocumentElement(),
                     false);
@@ -259,10 +261,10 @@ public class ConversationServerHandler extends BasicHandler {
             sPart.setCurrentMessage(osStr, SOAPPart.FORM_STRING);
 
             //Creating wsse:Reference
-            Reference ref = new Reference(doc);
+            Reference ref = new Reference(WSSConfig.getDefaultWSConfig(), doc);
             ref.setURI("#" + genID);
             ref.setValueType("DerivedKeyToken");
-            SecurityTokenReference stRef = new SecurityTokenReference(doc);
+            SecurityTokenReference stRef = new SecurityTokenReference(WSSConfig.getDefaultWSConfig(),doc);
             stRef.setReference(ref);
 
             //set mesage properties
