@@ -148,6 +148,7 @@
     <parameter name="encryptionKeyIdentifier" value="EmbeddedKeyName" />
     <parameter name="EmbeddedKeyCallbackClass" 
       value="org.apache.ws.axis.oasis.PWCallback1" />
+    <parameter name="EmbeddedKeyName" value="SessionKey" />
    </handler>
   </responseFlow>
   </service>
@@ -176,7 +177,7 @@
    <handler type="java:org.apache.ws.axis.security.WSDoAllReceiver">
     <parameter name="passwordCallbackClass" value="org.apache.ws.axis.oasis.PWCallback"/>
     <parameter name="action" value="Signature Signature"/>
-    <parameter name="signaturePropFile" value="crypto.properties" />
+    <parameter name="signaturePropFile" value="wsstest2.properties" />
    </handler>
   </requestFlow>
   </service>
