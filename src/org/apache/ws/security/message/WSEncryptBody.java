@@ -68,6 +68,16 @@ public class WSEncryptBody extends WSBaseMessage {
 	protected byte[] embeddedKey = null;
 	protected String embeddedKeyName = null;
 	protected X509Certificate useThisCert = null;
+	
+	/**
+	 * Symmetric key used in the EncrytpedKey. 
+	 */
+	protected SecretKey symmetricKey=null;
+	
+	/**
+	 * Parent node to which the EncryptedKeyElement should be added.
+	 */
+	protected Element parentNode = null;
 
 	/**
 	 * Constructor.
@@ -420,12 +430,19 @@ public class WSEncryptBody extends WSBaseMessage {
 		 */
 		Element wsseSecurity = insertSecurityHeader(doc);
 		Element xencEncryptedKey = createEnrcyptedKey(doc, keyEncAlgo);
+		if(parentNode==null){		
 		WSSecurityUtil.prependChildElement(
 			doc,
 			wsseSecurity,
 			xencEncryptedKey,
 			true);
-
+		}else{
+			WSSecurityUtil.prependChildElement(
+						doc,
+						parentNode,
+						xencEncryptedKey,
+						true);
+		} 
 		SecurityTokenReference secToken = new SecurityTokenReference(doc);
 
 		switch (keyIdentifierType) {
@@ -517,8 +534,7 @@ public class WSEncryptBody extends WSBaseMessage {
 		 * key (password) for this alogrithm, and set the cipher into 
 		 * encryption mode. 
 		 */
-		SecretKey symmetricKey = null;
-
+		
 		symmetricKey = WSSecurityUtil.prepareSecretKey(symEncAlgo, embeddedKey);
 
 		XMLCipher xmlCipher = null;
@@ -699,4 +715,20 @@ public class WSEncryptBody extends WSBaseMessage {
 		WSSecurityUtil.appendChildElement(doc, encryptedKey, referenceList);
 		return referenceList;
 	}
+	
+	/**
+	 * Sets the parent node of the EncryptedKeyElement
+	 * @param element
+	 */
+	public void setParentNode(Element element) {
+		parentNode = element;
+	}
+
+    /**
+     * @return
+     */
+    public SecretKey getSymmetricKey() {
+        return symmetricKey;
+    }
+
 }
