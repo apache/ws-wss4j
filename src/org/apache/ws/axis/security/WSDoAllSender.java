@@ -24,8 +24,8 @@ import org.apache.axis.SOAPPart;
 import org.apache.axis.handlers.BasicHandler;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.ws.axis.security.saml.SAMLIssuer;
-import org.apache.ws.axis.security.saml.SAMLIssuerFactory;
+import org.apache.ws.security.saml.SAMLIssuer;
+import org.apache.ws.security.saml.SAMLIssuerFactory;
 import org.apache.ws.axis.security.util.AxisUtil;
 import org.apache.ws.security.SOAPConstants;
 import org.apache.ws.security.WSConstants;
@@ -34,6 +34,8 @@ import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
+import org.apache.ws.security.saml.SAMLIssuer;
+import org.apache.ws.security.saml.SAMLIssuerFactory;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.message.WSAddTimestamp;
@@ -443,8 +445,6 @@ public class WSDoAllSender extends BasicHandler {
                     (String) msgContext.getProperty(WSDoAllConstants.SAML_PROP_FILE);
         }
         SAMLIssuer saml = SAMLIssuerFactory.getInstance(samlPropFile);
-        saml.setAxisMsg(msgContext);
-        saml.setAxisHandler(this);
         saml.setUsername(username);
         SAMLAssertion assertion = saml.newAssertion();
 
@@ -467,8 +467,6 @@ public class WSDoAllSender extends BasicHandler {
         } catch (AxisFault ex) {
         }
         SAMLIssuer saml = SAMLIssuerFactory.getInstance(samlPropFile);
-        saml.setAxisMsg(msgContext);
-        saml.setAxisHandler(this);
         saml.setUsername(username);
         saml.setUserCrypto(crypto);
         saml.setInstanceDoc(doc);

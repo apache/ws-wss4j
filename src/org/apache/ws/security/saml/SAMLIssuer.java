@@ -15,10 +15,8 @@
  *
  */
 
-package org.apache.ws.axis.security.saml;
+package org.apache.ws.security.saml;
 
-import org.apache.axis.MessageContext;
-import org.apache.axis.handlers.BasicHandler;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.opensaml.SAMLAssertion;
 import org.w3c.dom.Document;
@@ -37,17 +35,9 @@ public interface SAMLIssuer {
      * <p/>
      * A complete <code>SAMLAssertion</code> is constructed.
      *
-     * @param doc        The SOAP enevlope as W3C document
-     * @param msgContext the Axis message context to get message specific
-     *                   parameter
      * @return SAMLAssertion
      */
     public SAMLAssertion newAssertion();
-
-    /**
-     * @param axisMsg The axisMsg to set.
-     */
-    public void setAxisMsg(MessageContext axisMsgCtx);
 
     /**
      * @param userCrypto The userCrypto to set.
@@ -58,11 +48,6 @@ public interface SAMLIssuer {
      * @param username The username to set.
      */
     public void setUsername(String username);
-
-    /**
-     * @param axisHandler The axisHandler to set.
-     */
-    public void setAxisHandler(BasicHandler axisHandler);
 
     /**
      * @return Returns the issuerCrypto.

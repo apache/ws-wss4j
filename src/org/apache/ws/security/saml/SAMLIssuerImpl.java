@@ -14,13 +14,12 @@
  *  limitations under the License.
  *
  */
-package org.apache.ws.axis.security.saml;
+package org.apache.ws.security.saml;
 
-import org.apache.axis.MessageContext;
-import org.apache.axis.handlers.BasicHandler;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSSecurityException;
+import org.apache.ws.security.saml.SAMLIssuer;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.xml.security.exceptions.XMLSecurityException;
@@ -35,7 +34,6 @@ import org.opensaml.SAMLStatement;
 import org.opensaml.SAMLSubject;
 import org.w3c.dom.Document;
 
-import java.io.IOException;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.Collection;
@@ -52,14 +50,9 @@ public class SAMLIssuerImpl implements SAMLIssuer {
 
     private static Log log = LogFactory.getLog(SAMLIssuerImpl.class.getName());
 
-    private static final int sign = 1;
-    private static final int verify = 2;
-
     private SAMLAssertion sa = null;
 
     private Document instanceDoc = null;
-
-    private int state = 0;
 
     private Properties properties = null;
 
@@ -70,10 +63,8 @@ public class SAMLIssuerImpl implements SAMLIssuer {
     private boolean senderVouches = true;
 
     private String[] confirmationMethods = new String[1];
-    private MessageContext axisMsgCtx = null;
     private Crypto userCrypto = null;
     private String username = null;
-    private BasicHandler axisHandler = null;
 
     /**
      * Constructor.
@@ -81,7 +72,7 @@ public class SAMLIssuerImpl implements SAMLIssuer {
     public SAMLIssuerImpl() {
     }
 
-    public SAMLIssuerImpl(Properties prop) throws IOException {
+    public SAMLIssuerImpl(Properties prop) {
         /*
          * if no properties .. just return an instance, the rest will be done
          * later or this instance is just used to handle certificate
@@ -120,12 +111,10 @@ public class SAMLIssuerImpl implements SAMLIssuer {
      * <p/>
      * A complete <code>SAMLAssertion</code> is constructed.
      *
-     * @param doc The SOAP enevlope as W3C document
      * @return SAMLAssertion
      */
     public SAMLAssertion newAssertion() { // throws Exception {
         log.debug("Begin add SAMLAssertion token...");
-        state = sign;
 
         /*
          * if (senderVouches == false && userCrypto == null) { throw
@@ -218,13 +207,6 @@ public class SAMLIssuerImpl implements SAMLIssuer {
     }
 
     /**
-     * @param axisMsg The axisMsg to set.
-     */
-    public void setAxisMsg(MessageContext axisMsgCtx) {
-        this.axisMsgCtx = axisMsgCtx;
-    }
-
-    /**
      * @param userCrypto The userCrypto to set.
      */
     public void setUserCrypto(Crypto userCrypto) {
@@ -236,13 +218,6 @@ public class SAMLIssuerImpl implements SAMLIssuer {
      */
     public void setUsername(String username) {
         this.username = username;
-    }
-
-    /**
-     * @param axisHandler The axisHandler to set.
-     */
-    public void setAxisHandler(BasicHandler axisHandler) {
-        this.axisHandler = axisHandler;
     }
 
     /**
