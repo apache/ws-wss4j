@@ -280,24 +280,13 @@ public class WSSecurityEngine {
             	if (doDebug) {
                 	log.debug("Found signature element");
             	}
-				long t00=0, t01=0;
-				if( tlog.isDebugEnabled() ) {
-					t00=System.currentTimeMillis();
-				}
-                XMLSignature sig = new XMLSignature((Element) elem, null);
-				if( tlog.isDebugEnabled() ) {
-					t01=System.currentTimeMillis();
-					tlog.debug("newXMLSig(elem)= " + (t01-t00));
-				}
-                sig.addResourceResolver(EnvelopeIdResolver.getInstance());
-
 				if (sigCrypto == null) {
 					throw new WSSecurityException(WSSecurityException.FAILURE, 
 												  "noSigCryptoFile");
 				}
 				WSDocInfoStore.store(wsDocInfo);
 				try {
-					lastPrincipalFound = verifyXMLSignature(sig, sigCrypto);
+					lastPrincipalFound = verifyXMLSignature((Element) elem, sigCrypto);
 				}
 				catch (Exception ex) {
 					throw ex;
@@ -405,14 +394,19 @@ public class WSSecurityEngine {
      * 					principal for further authentication or authorization. 
      * @throws Exception 
      */
-    protected Principal verifyXMLSignature(XMLSignature sig, Crypto crypto) throws Exception {
+    protected Principal verifyXMLSignature(Element elem, Crypto crypto) throws Exception {
         if (doDebug) {
 			log.debug("Verify XML Signature");
         }
 		long t0=0, t1=0, t2=0;
 		if( tlog.isDebugEnabled() ) {
 			t0=System.currentTimeMillis();
-		}        
+		}
+
+		XMLSignature sig = new XMLSignature(elem, null);
+
+		sig.addResourceResolver(EnvelopeIdResolver.getInstance());
+		
         X509Certificate[] certs = null;
         KeyInfo info = sig.getKeyInfo();
         if (info.containsX509Data()) {
