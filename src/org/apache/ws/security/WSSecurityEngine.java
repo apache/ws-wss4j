@@ -828,8 +828,7 @@ public class WSSecurityEngine {
 			}
 		} else {
 			throw new WSSecurityException(
-				WSSecurityException.FAILURE,
-				"unsupportedKeyId");
+				WSSecurityException.FAILURE, "unsupportedKeyId");
 		}
 
         /*
@@ -872,38 +871,23 @@ public class WSSecurityEngine {
 				crypto.getPrivateKey(alias, password));
 		} catch (InvalidKeyException e1) {
 			throw new WSSecurityException(
-				WSSecurityException.UNSUPPORTED_ALGORITHM,
-				null,
-				null,
-				e1);
+				WSSecurityException.FAILED_ENC_DEC, null, null, e1);
 		} catch (Exception e1) {
 			throw new WSSecurityException(
-				WSSecurityException.UNSUPPORTED_ALGORITHM,
-				null,
-				null,
-				e1);
+				WSSecurityException.FAILED_ENC_DEC, null, null, e1);
 		}
 		try {
 			decryptedBytes =
 				cipher.doFinal(getDecodedBase64EncodedData(xencCipherValue));
 		} catch (IllegalStateException e2) {
 			throw new WSSecurityException(
-				WSSecurityException.UNSUPPORTED_ALGORITHM,
-				null,
-				null,
-				e2);
+				WSSecurityException.FAILED_ENC_DEC, null, null, e2);
 		} catch (IllegalBlockSizeException e2) {
 			throw new WSSecurityException(
-				WSSecurityException.UNSUPPORTED_ALGORITHM,
-				null,
-				null,
-				e2);
+				WSSecurityException.FAILED_ENC_DEC, null, null, e2);
 		} catch (BadPaddingException e2) {
 			throw new WSSecurityException(
-				WSSecurityException.UNSUPPORTED_ALGORITHM,
-				null,
-				null,
-				e2);
+				WSSecurityException.FAILED_ENC_DEC, null, null, e2);
 		}
 
 		if (tlog.isDebugEnabled()) {
