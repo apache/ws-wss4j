@@ -20,7 +20,6 @@ package interop;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
-import org.apache.ws.axis.oasis.Scenario1;
 import org.apache.ws.axis.oasis.STScenario1;
 
 /**

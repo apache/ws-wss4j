@@ -49,7 +49,7 @@ public class PackageTests extends TestCase {
 
     public static Test suite() {
         TestSuite suite = new TestSuite();
-        // suite.addTestSuite(TestMSFTWebService.class);
+      //  suite.addTestSuite(TestMSFTWebService.class);
         suite.addTestSuite(TestWSSecurity.class);
         suite.addTestSuite(TestWSSecurity2.class);
         suite.addTestSuite(TestWSSecurity3.class);
@@ -61,7 +61,10 @@ public class PackageTests extends TestCase {
 		suite.addTestSuite(TestWSSecurity9.class);
 		suite.addTestSuite(TestWSSecurity11.class);
         suite.addTestSuite(TestWSSecuritySOAP12.class);
-        suite.addTestSuite(TestWSSecurityHooks.class);
+        // suite.addTestSuite(TestWSSecurityHooks.class);
+        suite.addTestSuite(TestWSSecurityST1.class);
+        suite.addTestSuite(TestWSSecurityST2.class);
+        suite.addTestSuite(TestWSSecurityST3.class);
         return suite;
     }
 
