@@ -60,7 +60,7 @@ import java.util.Vector;
 public class Merlin implements Crypto {
     private static Log log = LogFactory.getLog(Merlin.class);
     private static CertificateFactory certFact;
-    private Properties properties = null;
+    protected Properties properties = null;
     protected KeyStore keystore = null;
 
     /**
@@ -125,7 +125,7 @@ public class Merlin implements Crypto {
      * 			X509 certficates
      * @throws	WSSecurityException
      */
-    private static synchronized CertificateFactory getCertificateFactory() throws WSSecurityException {
+    public synchronized CertificateFactory getCertificateFactory() throws WSSecurityException {
         if (certFact == null) {
 			try {
 				certFact = CertificateFactory.getInstance("X.509","BC");
@@ -591,5 +591,10 @@ public class Merlin implements Crypto {
 		*/
 		return abyte0;
 	}
+
+    public KeyStore getKeyStore()
+    {
+        return this.keystore;
+    }
 }
 

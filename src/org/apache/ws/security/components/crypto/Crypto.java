@@ -22,8 +22,10 @@ import org.apache.ws.security.WSSecurityException;
 import java.io.InputStream;
 import java.math.BigInteger;
 import java.security.PrivateKey;
+import java.security.KeyStore;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
+import java.security.cert.CertificateFactory;
 
 /**
  * Crypto.
@@ -36,9 +38,9 @@ public interface Crypto {
      * load a X509Certificate from the input stream.
      * <p/>
      * 
-     * @param The <code>InputStream</code> array containg the X509 data
-     * @throws GeneralSecurityException 
-     * @return	Returns a X509 certificate
+     * @param in The <code>InputStream</code> array containg the X509 data
+     * @throws WSSecurityException
+     * @return	An X509 certificate
      */
     X509Certificate loadCertificate(InputStream in) throws WSSecurityException;
 
@@ -49,8 +51,7 @@ public interface Crypto {
      * @param data    The <code>byte</code> array containg the X509 data
      * @param reverse If set the first certificate in input data will
      *                the last in the array
-     * @throws IOException              
-     * @throws GeneralSecurityException 
+     * @throws WSSecurityException
      * @return		An array of X509 certificates, ordered according to
      * the reverse flag
      */
@@ -63,8 +64,8 @@ public interface Crypto {
      * @param reverse If set the first certificate in the array data will
      *                the last in the byte array
      * @param certs   The certificates to convert
-     * @throws IOException                  
-     * @throws CertificateEncodingException 
+
+     * @throws WSSecurityException
      * @return		The byte array for the certficates ordered according
      * to the reverse flag
      */
@@ -146,5 +147,20 @@ public interface Crypto {
 	 * @return 			 The byte array conating the binary SKI data
 	 */
 	public byte[] getSKIBytesFromCert(X509Certificate cert)	throws WSSecurityException;
+
+    /**
+     * Gets the Keystore that was loaded by the underlying implementation
+     *
+     * @return the Keystore
+     */
+    public KeyStore getKeyStore();
+
+    /**
+     * Gets the CertificateFactory instantiated by the underlying implementation
+     *
+     * @return the CertificateFactory
+     * @throws WSSecurityException
+     */
+    public CertificateFactory getCertificateFactory() throws WSSecurityException;
 
 }
