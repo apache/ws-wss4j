@@ -31,7 +31,7 @@ public interface WSConstants {
     public static final String X509TOKEN_NS = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0";
     public static final String WSSE_PREFIX = "wsse";
     public static final String WSSE_LN = "Security";
-    public static final String WSU_NS = "http://www.docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd";
+    public static final String WSU_NS = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd";
     public static final String WSU_PREFIX = "wsu";
     public static final String SIG_NS = "http://www.w3.org/2000/09/xmldsig#";
     public static final String SIG_PREFIX = "ds";
