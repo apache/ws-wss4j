@@ -132,7 +132,7 @@ public class WSConstants {
 	 * This is a required method as defined by WS Specification, Username token profile.
 	 */
 	public static final String PW_DIGEST = "PasswordDigest";
-	public static final String PASSWORD_DIGEST = WSSE_NS + "#PasswordDigest";
+	public static final String PASSWORD_DIGEST = USERNAMETOKEN_NS + "#PasswordDigest";
 
 	/**
 	* Sets the {@link org.apache.ws.security.message.WSSAddUsernameToken#build(Document, String, String) UserNameToken}
