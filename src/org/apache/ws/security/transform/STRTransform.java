@@ -309,7 +309,7 @@ public class STRTransform extends TransformSpi {
 			if (doDebug) {
 				log.debug("STR: Reference");
 			}
-			tokElement = secRef.getTokenElement(secRef, doc);
+			tokElement = secRef.getTokenElement(doc);
 			if (tokElement == null) {
 				throw new CanonicalizationException("empty");
 			}

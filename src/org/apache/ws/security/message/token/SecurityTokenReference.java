@@ -132,15 +132,17 @@ public class SecurityTokenReference {
 	 * the {@link SecurityTokenReference} and tries to find the referenced
 	 * Element in the document.
 	 * 
-	 * @param secRef 	<code>SecurityTokenReference</code> that contains a <code>Reference
-	 * 					</code> to a binary security token
+	 * @param doc 		the document that contains the binary security token
+	 * 					element. This could be different from the document
+	 * 					that contains the SecurityTokenReference (STR). See
+	 * 					STRTransform.derefenceBST() method
 	 * @return Element 	containing the signing token, must be a BinarySecurityToken
 	 * @throws Exception When either no <code>Reference</code> element, or the found
 	 *                   reference contains no URI, or the referenced signing not found.
 	 */
-	public Element getTokenElement(SecurityTokenReference secRef, Document doc)
+	public Element getTokenElement(Document doc)
 		throws WSSecurityException {
-		Reference ref = secRef.getReference();
+		Reference ref = getReference();
 		if (ref == null) {
 			throw new WSSecurityException(
 				WSSecurityException.INVALID_SECURITY,

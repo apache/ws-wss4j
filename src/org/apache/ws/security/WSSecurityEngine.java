@@ -421,7 +421,7 @@ public class WSSecurityEngine {
             }
             SecurityTokenReference secRef = new SecurityTokenReference((Element) node);
             if (secRef.containsReference()) {
-                Element token = secRef.getTokenElement(secRef, secRef.getElement().getOwnerDocument());
+                Element token = secRef.getTokenElement(elem.getOwnerDocument());
 
                 // at this point ... check token type: Binary
                 QName el = new QName(token.getNamespaceURI(), token.getLocalName());
@@ -714,7 +714,7 @@ public class WSSecurityEngine {
 				log.debug("KeyIdentifier Alias: " + alias);
             }
 		} else if (secRef.containsReference()) {
-			Element bstElement = secRef.getTokenElement(secRef, secRef.getElement().getOwnerDocument());
+			Element bstElement = secRef.getTokenElement(doc);
 
 			// at this point ... check token type: Binary
 			QName el =

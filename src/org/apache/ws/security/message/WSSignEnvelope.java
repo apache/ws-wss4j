@@ -274,7 +274,6 @@ public class WSSignEnvelope extends WSBaseMessage {
 			WSEncryptionPart encPart = (WSEncryptionPart)parts.get(part);
 			String elemName = encPart.getName();
 			String nmSpace = encPart.getNamespace();
-			log.debug("parts: '" + elemName +"', "+nmSpace);
 
 		/*
 	 	 * Set up the elements to sign. 
