@@ -36,6 +36,8 @@ import org.w3c.dom.NodeList;
 import javax.xml.namespace.QName;
 import java.security.cert.X509Certificate;
 
+import sun.security.util.DerValue;
+
 
 /**
  * Security Token Reference.
@@ -141,8 +143,64 @@ public class SecurityTokenReference {
 	 */
 	public void setKeyIdentifierSKI(X509Certificate cert) throws Exception {
 		Document doc = this.element.getOwnerDocument();
-		byte data[] = XMLX509SKI.getSKIBytesFromCert(cert);
-		org.w3c.dom.Text skiText = doc.createTextNode(Base64.encode(data));
+		String SKI_OID = "2.5.29.14";
+
+		byte data[] = null;
+		byte abyte0[] = null;
+		if (cert.getVersion() < 3) {
+			Object exArgs[] = { new Integer(cert.getVersion())};
+			throw new WSSecurityException(
+				WSSecurityException.FAILURE,
+				"noSKIHandling",
+				new Object[] { "Wrong certificate version (<3)" });
+		}
+
+		/*
+		 * Gets the DER-encoded OCTET string for the extension value (extnValue)
+		 * identified by the passed-in oid String. The oid string is
+		 * represented by a set of positive whole numbers separated by periods.
+		 */
+		data = cert.getExtensionValue(SKI_OID);
+
+		if (data == null) {
+			throw new WSSecurityException(
+				WSSecurityException.FAILURE,
+				"noSKIHandling",
+				new Object[] { "No extension data" });
+		}
+		DerValue dervalue = new DerValue(data);
+
+		if (dervalue == null) {
+			throw new WSSecurityException(
+				WSSecurityException.FAILURE,
+				"noSKIHandling",
+				new Object[] { "No DER value" });
+		}
+		if (dervalue.tag != DerValue.tag_OctetString) {
+			throw new WSSecurityException(
+				WSSecurityException.FAILURE,
+				"noSKIHandling",
+				new Object[] { "No octet string" });
+		}
+		byte[] extensionValue = dervalue.getOctetString();
+
+		/**
+		 * Strip away first two bytes from the DerValue (tag and length)
+		 */
+		abyte0 = new byte[extensionValue.length - 2];
+
+		System.arraycopy(extensionValue, 2, abyte0, 0, abyte0.length);
+
+		/*
+		byte abyte0[] = new byte[derEncodedValue.length - 4];
+		System.arraycopy(derEncodedValue, 4, abyte0, 0, abyte0.length);
+		*/
+		if (doDebug) {
+			log.debug("Base64 of SKI is " + Base64.encode(abyte0));
+		}
+
+		// byte data[] = XMLX509SKI.getSKIBytesFromCert(cert);
+		org.w3c.dom.Text skiText = doc.createTextNode(Base64.encode(abyte0));
 		Element keyId = doc.createElementNS(WSConstants.WSSE_NS, "wsse:KeyIdentifier");
 		keyId.setAttributeNS(null, "ValueType", "wsse:X509SubjectKeyIdentifier");
 		keyId.setAttributeNS(null, "EncodingType", "wsse:Base64Binary");
