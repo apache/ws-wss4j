@@ -108,7 +108,6 @@ public class WSDoAllSender extends BasicHandler {
 
 	X509Certificate encCert = null;
 
-	/* TODO: Make timeToLive (sender) configurable in the config file */
 	protected int timeToLive = 300; // Timestamp: time in seconds the receiver accepts between creation and reception
 
 	/**
@@ -534,10 +533,29 @@ public class WSDoAllSender extends BasicHandler {
 	}
 
 	private void performTSAction(int actionToDo, boolean mu, Document doc) throws AxisFault {
+        String ttl = null;
+        if ((ttl =
+            (String) getOption(WSDoAllConstants.TTL_TIMESTAMP))
+            == null) {
+            ttl =
+                (String) msgContext.getProperty(
+                    WSDoAllConstants.TTL_TIMESTAMP);
+        }
+        int ttl_i = 0;
+        if (ttl != null) {
+        	try {
+				ttl_i = Integer.parseInt(ttl);
+			} catch (NumberFormatException e) {
+				ttl_i = timeToLive;
+            }
+        }
+        if (ttl_i <= 0) {
+        	ttl_i = timeToLive;   
+        }
 		WSAddTimestamp timeStampBuilder =
 			new WSAddTimestamp(actor, mu);
 		// add the Timestamp to the SOAP Enevelope
-		timeStampBuilder.build(doc, timeToLive);
+		timeStampBuilder.build(doc, ttl_i);
 	}
 
 	/**

@@ -61,26 +61,22 @@ public class WSDoAllConstants {
 	public static final String USERNAME_TOKEN = "UsernameToken";
 
     /**
-     * Perform a SAML Token identification only. 
+     * Perform a SAML Token identification. 
      */
 	public static final String SAML_TOKEN_UNSIGNED = "SAMLTokenUnsigned";
 	public static final String SAML_TOKEN_SIGNED = "SAMLTokenSigned";
 
 	/**
-	 * Perform a Signature only. 
+	 * Perform Signature. 
 	 * The signature specific parameters define how to sign, which keys
 	 * to use, and so on
 	 */
 	public static final String SIGNATURE = "Signature";
 
 	/**
-	 * Perform Encryption only. 
+	 * Perform Encryption. 
 	 * The encryption specific parameters define how to encrypt, which keys
 	 * to use, and so on. 
-	 * <p/>
-	 * NOTE: the function encrypts the whole first child <code>Element</code> 
-	 * of the SOAP body. Encryption does not yet support tag specific
-	 * encryption.
 	 */
 	public static final String ENCRYPT = "Encrypt";
 
@@ -99,7 +95,7 @@ public class WSDoAllConstants {
 	 * Axis message context with the property name <code>SND_SECURITY</code>.
 	 * <p/>
 	 * A chained handler can retrieve the SOAP message and process it. The
-	 * last handler in the chain must set the process SOAP message as
+	 * last handler in the chain must set the processed SOAP message as
 	 * current message in Axis message context.
 	 * 
 	 */
@@ -350,8 +346,10 @@ public class WSDoAllConstants {
 	org.apache.ws.security.crypto.provider
 	org.apache.ws.security.crypto.merlin.file
 	org.apache.ws.security.crypto.merlin.keystore.type
+    org.apache.ws.security.crypto.merlin.keystore.provider
 	org.apache.ws.security.crypto.merlin.keystore.password
-	org.apache.ws.security.crypto.merlin.keystore.pwcallback
+    org.apache.ws.security.crypto.merlin.keystore.alias
+    org.apache.ws.security.crypto.merlin.cert.provider
 	 * </pre>
 	 * The entries are:
 	 * <ul>
@@ -359,11 +357,9 @@ public class WSDoAllConstants {
 	 * 	description above 
 	 * </li>
 	 * <li><code>org.apache.ws.security.crypto.merlin.file</code>
-	 * The path to the keystore file. This file is <b>not</b> loaded with a
-	 * classloader, thus this is either an absolute or relative path into the
-	 * filesystem. A relative path is always relative to the current working
-	 * directory. The default <code>Merlin</code> implementation uses the
-	 * java <code>FileInputStream</code> to open the keystore.
+	 * The path to the keystore file. At first the classloader tries to load
+     * this file, if this fails the implementations performs a file system
+     * lookup.
 	 * </li>
 	 * <li><code>org.apache.ws.security.crypto.merlin.keystore.type</code>
 	 * The keystore type, for example <code>JKS</code> for the Java key store.
@@ -373,18 +369,6 @@ public class WSDoAllConstants {
 	 * <li><code>org.apache.ws.security.crypto.merlin.keystore.password</code>
 	 * The password to read the keystore. If this property is not set, then
 	 * the <code>pwcallback</code>property must be defined.
-	 * </li>
-	 * <li><code>org.apache.ws.security.crypto.merlin.keystore.pwcallback
-	 * </code>. Defines a class that implements the 
-	 * {@link javax.security.auth.callback.CallbackHandler} interface.
-	 * <p/>
-	 * The callback function
-	 * {@link javax.security.auth.callback.CallbackHandler#handle(Callback[])}
-	 * of this class gets an array of 
-	 * {@link org.apache.ws.security.WSPasswordCallback} objects. Only
-	 * the first entry of the array is used.
-	 * The object contains the the string "keystore" as identifier. 
-	 * The callback handler must set the keystore's password before it returns.
 	 * </li>
 	 * </ul>
 	 * The application may set this parameter using the following method:
@@ -621,8 +605,25 @@ public class WSDoAllConstants {
 	 * <code>Content</code> mode
 	 */
 	public static final String ENCRYPTION_PARTS = "encryptionParts";
-	
+    
+    /**
+     * The name of the SAML Issuer factory property file. 
+     * The classloader loads this file. Therefore it must be accessible
+     * via the classpath.
+     */
 	public static final String SAML_PROP_FILE = "samlPropFile";
+    
+    /**
+     * Time-To-Live is the time difference between creation and expiry time in
+     * the WSS Timestamp.
+     * The time-to-live in seconds. After this time the SOAP request is
+     * invalid (at least the security data shall be treated this way).
+     * <p/>
+     * If this parameter is not defined, contains a value less or equal
+     * zero, or an illegal format the Axis driver uses a default TTL of
+     * 300 seconds (5 minutes). 
+     */
+    public static final String TTL_TIMESTAMP ="timeToLive";
 
 	/**
 	 * Define the parameter values to set the key identifier types. These are:

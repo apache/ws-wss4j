@@ -71,8 +71,7 @@ public class WSDoAllReceiver extends BasicHandler {
 	Crypto decCrypto = null;
 	String decPropFile = null;
 
-	/* TODO: Make timeToLive (receiver) configurable in the config file */
-	protected int timeToLive = 60; // Timestamp: time in seconds the receiver accepts between creation and reception
+	protected int timeToLive = 300; // Timestamp: time in seconds the receiver accepts between creation and reception
 
 	/**
 	 * Axis calls invoke to handle a message.
@@ -263,6 +262,26 @@ public class WSDoAllReceiver extends BasicHandler {
 			Timestamp timestamp = actionResult.getTimestamp();
 
 			if (timestamp != null) {
+                String ttl = null;
+                if ((ttl =
+                    (String) getOption(WSDoAllConstants.TTL_TIMESTAMP))
+                    == null) {
+                    ttl =
+                        (String) msgContext.getProperty(
+                            WSDoAllConstants.TTL_TIMESTAMP);
+                }
+                int ttl_i = 0;
+                if (ttl != null) {
+                    try {
+                        ttl_i = Integer.parseInt(ttl);
+                    } catch (NumberFormatException e) {
+                        ttl_i = timeToLive;
+                    }
+                }
+                if (ttl_i <= 0) {
+                    ttl_i = timeToLive;   
+                }
+
 				if (!verifyTimestamp(timestamp, timeToLive)) {
 					throw new AxisFault("WSDoAllReceiver: The timestamp could not be validated");
 				}
