@@ -23,7 +23,6 @@ import org.apache.ws.security.components.crypto.Crypto;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import javax.xml.namespace.QName;
 import java.io.ByteArrayInputStream;
 import java.security.GeneralSecurityException;
 import java.security.cert.CertificateEncodingException;
@@ -36,7 +35,7 @@ import java.security.cert.X509Certificate;
  * @author Davanum Srinivas (dims@yahoo.com).
  */
 public class X509Security extends BinarySecurity {
-    public static final QName TYPE = new QName(WSConstants.WSSE_NS, "X509v3");
+    public static final String TYPE = WSConstants.WSSE_NS + "#X509v3";
 	
 	/*
 	 * Stores the associated X.509 Certificate. This saves numerous

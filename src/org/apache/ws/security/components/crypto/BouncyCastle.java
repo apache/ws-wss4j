@@ -417,6 +417,14 @@ public class BouncyCastle implements Crypto {
     public PrivateKey getPrivateKey(String alias, String password) throws Exception {
         throw new RuntimeException("Not Yet Implemented");
     }
+    
+	public byte[] getSKIBytesFromCert(X509Certificate cert)	throws CredentialException, IOException {
+		throw new RuntimeException("Not Yet Implemented");
+	}
+
+	public String getAliasForX509Cert(byte[] skiBytes) throws Exception {
+		throw new RuntimeException("Not Yet Implemented");
+	}
 
     /**
      * get the name of the file where the key/certificate information is stored.

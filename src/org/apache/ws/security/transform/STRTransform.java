@@ -20,7 +20,6 @@ package org.apache.ws.security.transform;
 import org.apache.ws.security.WSDocInfo;
 import org.apache.ws.security.WSDocInfoStore;
 import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.message.token.SecurityTokenReference;
 import org.apache.ws.security.message.token.X509Security;
 import org.apache.ws.security.util.WSSecurityUtil;
@@ -37,6 +36,7 @@ import org.apache.xml.security.c14n.CanonicalizationException;
 import org.apache.xml.security.c14n.InvalidCanonicalizerException;
 import org.apache.xml.security.transforms.TransformSpi;
 import org.apache.xml.security.utils.XMLUtils;
+import org.apache.xml.security.utils.Base64;
 import org.apache.xpath.XPathAPI;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -44,11 +44,14 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
+import java.security.cert.X509Certificate;
+
 import org.xml.sax.SAXException;
 import org.w3c.dom.Node;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Document;
+import org.w3c.dom.Text;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -64,7 +67,8 @@ public class STRTransform extends TransformSpi {
 
 	/** Field implementedTransformURI */
 	public static final String implementedTransformURI =
-		"http://schemas.xmlsoap.org/2003/06/STR-Transform";
+		"http://www.docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd#STRTransform";
+
 
 	private static Log log = LogFactory.getLog(STRTransform.class.getName());
 	private static boolean doDebug = false;
@@ -213,7 +217,7 @@ public class STRTransform extends TransformSpi {
 				str = dereferenceSTR(thisDoc, (Element) tmpEl);
 				/*
 				 * Keep in mind: the returned element belong to "thisDoc", thus
-				 * import it to "doc" before replace it.
+				 * import it to "doc" before replacing it.
 				 */
 
 				/*
@@ -262,7 +266,7 @@ public class STRTransform extends TransformSpi {
 		}
 	}
 
-	private Element dereferenceSTR(Document doc, Element tmpE)
+	private Element dereferenceSTR(Document doc, Element secRefE)
 		throws Exception {
 
 		/*
@@ -279,12 +283,12 @@ public class STRTransform extends TransformSpi {
 		 * 
 		 *
 		 * Forth step: after security token was located, prepare it. Either
-		 * return BinarySeciurityToken or wrap the located token
+		 * return BinarySecurityToken or wrap the located token
 		 * in a newly created BST element as specified in WS Specification.
 		 * 
-		 * Note: every element (also newly created elemets) belong to the
-		 * document defined by the parameter. This is the main SOAP document
-		 * and _not_ the document part that is to be signed/verified. Thus
+		 * Note: every element (also newly created elements) belong to the
+		 * document defined by the doc parameter. This is the main SOAP document
+		 * (thisDoc) and _not_ the document part that is to be signed/verified. Thus
 		 * the caller must import the returned element into the document 
 		 * part that is signed/verified.
 		 * 
@@ -292,7 +296,7 @@ public class STRTransform extends TransformSpi {
 		SecurityTokenReference secRef = null;
 		Element tokElement = null;
 		
-		secRef = new SecurityTokenReference(tmpE);
+		secRef = new SecurityTokenReference(secRefE);
 		
 		/*
 		 * First case: direct reference, according to chap 7.2 of OASIS
@@ -300,44 +304,76 @@ public class STRTransform extends TransformSpi {
 		 */
 		if (secRef.containsReference()) {
 			if (doDebug) {
-				log.debug("Found str reference");
+				log.debug("STR: Reference");
 			}
 			tokElement = secRef.getTokenElement(secRef, doc);
-			/*
-			 * second case: IssuerSerial, first try to get embedded 
-			 * certificate, if that fails, lookup in keystore, wrap
-			 * in BST according to specification
-			 */
-		} else if (secRef.containsX509IssuerSerial()) {
+			if (tokElement == null) {
+				throw new CanonicalizationException("empty");
+			}
+		} 
+		/*
+		 * second case: IssuerSerial, first try to get embedded 
+		 * certificate, if that fails, lookup in keystore, wrap
+		 * in BST according to specification
+		 */
+		else if (secRef.containsX509IssuerSerial()) {
 			if (doDebug) {
-				log.debug("STR issuerSerial embedded");
+				log.debug("STR: IssuerSerial");
 			}
 			X509Security x509token = secRef.getEmbeddedTokenFromIS(doc, wsDocInfo.getCrypto());
 			if (x509token != null) {
 				tokElement = x509token.getElement();
 			}
 			else {
-				return null; //TODO: handle certificate from keystore, binary
+				X509Certificate[] certs = secRef.getX509IssuerSerial(wsDocInfo.getCrypto());
+				if (certs == null || certs.length == 0 || certs[0] == null) {
+					throw new CanonicalizationException("empty");
+				}
+				tokElement = createBST(doc, certs[0], secRefE);
 			}	
 		}
 		/*
-		 * third case: IKeyIdentifier, must be SKI, first try to get embedded 
+		 * third case: KeyIdentifier, must be SKI, first try to get embedded 
 		 * certificate, if that fails, lookup in keystore, wrap
 		 * in BST according to specification. No other KeyIdentifier
 		 * type handled here - just SKI
 		 */
 		else if (secRef.containsKeyIdentifier()) {
 			if (doDebug) {
-				log.debug("KeyIdentifier issuerSerial embedded");
+				log.debug("STR: KeyIdentifier");
 			}
 			X509Security x509token = secRef.getEmbeddedTokenFromSKI(doc, wsDocInfo.getCrypto());
 			if (x509token != null) {
 				tokElement = x509token.getElement();
 			}
 			else {
-				return null; //TODO: handle certificate from keystore, binary
+				X509Certificate[] certs = secRef.getKeyIdentifier(wsDocInfo.getCrypto());
+				if (certs == null || certs.length == 0 || certs[0] == null) {
+					throw new CanonicalizationException("empty");
+				}
+				tokElement = createBST(doc, certs[0], secRefE);
 			}
 		}
 		return (Element) tokElement;
+	}
+	
+	private Element createBST(
+		Document doc,
+		X509Certificate cert,
+		Element secRefE)
+		throws Exception {
+		byte data[] = cert.getEncoded();
+		String prefix = WSSecurityUtil.getPrefix(WSConstants.WSSE_NS, secRefE);
+		Element elem =
+			doc.createElementNS(
+				WSConstants.WSSE_NS,
+				prefix + ":BinarySecurityToken");
+		WSSecurityUtil.setNamespace(elem, WSConstants.WSSE_NS, prefix);
+
+		elem.setAttributeNS(null, "ValueType", X509Security.TYPE);
+		Text certText = doc.createTextNode(Base64.encode(data));
+		// Text certText = doc.createTextNode(data);
+		elem.appendChild(certText);
+		return elem;
 	}
 }

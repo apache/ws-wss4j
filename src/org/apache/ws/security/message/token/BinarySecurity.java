@@ -38,7 +38,7 @@ import javax.xml.namespace.QName;
 public class BinarySecurity {
     public static final QName TOKEN = new QName(WSConstants.WSSE_NS, "BinarySecurityToken");
     public static final QName TOKEN_KI = new QName(WSConstants.WSSE_NS, "KeyIdentifier");
-    public static final QName BASE64_ENCODING = new QName(WSConstants.WSSE_NS, "Base64Binary");
+    public static final String BASE64_ENCODING = WSConstants.WSSE_NS + "#Base64Binary";
     protected Element element = null;
 
     /**
@@ -78,9 +78,8 @@ public class BinarySecurity {
      * 
      * @return 
      */
-    public QName getValueType() {
-        String value = this.element.getAttribute("ValueType");
-        return WSSecurityUtil.getQNameFromString(value, this.element);
+    public String getValueType() {
+        return this.element.getAttribute("ValueType");
     }
 
     /**
@@ -89,8 +88,8 @@ public class BinarySecurity {
      * 
      * @param type 
      */
-    protected void setValueType(QName type) {
-        this.element.setAttributeNS(null, "ValueType", WSSecurityUtil.getStringForQName(type, this.element));
+    protected void setValueType(String type) {
+        this.element.setAttributeNS(null, "ValueType", type);
     }
 
     /**
@@ -99,9 +98,8 @@ public class BinarySecurity {
      * 
      * @return 
      */
-    public QName getEncodingType() {
-        String value = this.element.getAttribute("EncodingType");
-        return WSSecurityUtil.getQNameFromString(value, this.element);
+    public String getEncodingType() {
+        return this.element.getAttribute("EncodingType");
     }
 
     /**
@@ -110,8 +108,8 @@ public class BinarySecurity {
      * 
      * @param encoding 
      */
-    protected void setEncodingType(QName encoding) {
-        this.element.setAttributeNS(null, "EncodingType", WSSecurityUtil.getStringForQName(encoding, this.element));
+    protected void setEncodingType(String encoding) {
+        this.element.setAttributeNS(null, "EncodingType", encoding);
     }
 
     /**

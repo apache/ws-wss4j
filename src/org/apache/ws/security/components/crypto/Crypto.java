@@ -126,4 +126,26 @@ public interface Crypto {
      */
     public String getAliasForX509Cert(String issuer, BigInteger serialNumber) throws Exception;
 
+	/**
+	 * Lookup a X509 Certificate in the keystore according to a given 
+	 * SubjectKeyIdentifier.
+	 * <p/>
+	 * The search gets all alias names of the keystore and gets the certificate chain
+	 * or certificate for each alias. Then the SKI for each user certificate 
+	 * is compared with the SKI parameter.
+	 * 
+	 * @param skiBytes       The SKI info bytes
+	 * @return alias name of the certificate that matches serialNumber and issuer name
+	 *         or null if no such certificate was found.
+	 */
+	public String getAliasForX509Cert(byte[] skiBytes) throws Exception;
+	/**
+	 * Reads the SubjectKeyIdentifier information from the certificate. 
+	 * <p/> 
+	 * 
+	 * @param cert       The certificate to read SKI
+	 * @return 			 The byte array conating the binary SKI data
+	 */
+	public byte[] getSKIBytesFromCert(X509Certificate cert)	throws CredentialException, IOException;
+
 }

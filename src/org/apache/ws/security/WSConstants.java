@@ -23,10 +23,10 @@ import org.apache.xml.security.utils.EncryptionConstants;
  * Constants in WS-Security spec.
  */
 public interface WSConstants {
-    public static final String WSSE_NS = "http://schemas.xmlsoap.org/ws/2002/07/secext";
+    public static final String WSSE_NS = "http://www.docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd";
     public static final String WSSE_PREFIX = "wsse";
     public static final String WSSE_LN = "Security";
-    public static final String WSU_NS = "http://schemas.xmlsoap.org/ws/2002/07/utility";
+    public static final String WSU_NS = "http://www.docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd";
     public static final String WSU_PREFIX = "wsu";
     public static final String SIG_NS = "http://www.w3.org/2000/09/xmldsig#";
     public static final String SIG_PREFIX = "ds";

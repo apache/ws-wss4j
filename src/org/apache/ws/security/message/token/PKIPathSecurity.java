@@ -23,7 +23,6 @@ import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import javax.xml.namespace.QName;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.cert.CertificateEncodingException;
@@ -36,7 +35,7 @@ import java.security.cert.X509Certificate;
  * @author Davanum Srinivas (dims@yahoo.com).
  */
 public class PKIPathSecurity extends BinarySecurity {
-    public static final QName TYPE = new QName(WSConstants.WSSE_NS, "PKIPath");
+    public static final String TYPE = WSConstants.WSSE_NS + "#X509PKIPathv1";
 
     /**
      * Constructor.

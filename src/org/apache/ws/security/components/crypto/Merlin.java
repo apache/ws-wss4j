@@ -41,6 +41,9 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Vector;
 
+import sun.security.util.DerValue;
+
+
 /**
  * JDK1.4 based implementation of Crypto (uses keystore).
  * <p/>
@@ -239,24 +242,84 @@ public class Merlin implements Crypto {
         String issuerSplit[] = splitAndTrim(issuer);
         X509Certificate x509cert = null;
         String certIssuer[] = null;
-        for (Enumeration e = keystore.aliases(); e.hasMoreElements();) {
-            String alias = (String) e.nextElement();
-            Certificate[] certs = keystore.getCertificateChain(alias);
-            for (int i = 0; i < certs.length; i++) {
-                if (!(certs[i] instanceof X509Certificate)) {
-                    continue;
-                }
-                x509cert = (X509Certificate) certs[i];
-                if (x509cert.getSerialNumber().compareTo(serialNumber) == 0) {
-                    certIssuer = splitAndTrim(x509cert.getIssuerDN().getName());
-                    if (equalsStringArray(issuerSplit, certIssuer)) {
-                        return alias;
-                    }
-                }
-            }
-        }
+		Certificate cert = null;
+
+		for (Enumeration e = keystore.aliases(); e.hasMoreElements();) {
+			String alias = (String) e.nextElement();
+			Certificate[] certs = keystore.getCertificateChain(alias);
+			if (certs == null || certs.length == 0) {
+				// no cert chain, so lets check if getCertificate gives us a  result.
+				cert = keystore.getCertificate(alias);
+				if (cert == null) {
+					return null;
+				}
+			} else {
+				cert = certs[0];
+			}
+			if (!(cert instanceof X509Certificate)) {
+				continue;
+			}
+			x509cert = (X509Certificate) cert;
+			if (x509cert.getSerialNumber().compareTo(serialNumber) == 0) {
+				certIssuer = splitAndTrim(x509cert.getIssuerDN().getName());
+				if (equalsStringArray(issuerSplit, certIssuer)) {
+					return alias;
+				}
+			}
+		}
         return null;
     }
+
+	/**
+	 * Lookup a X509 Certificate in the keystore according to a given 
+	 * SubjectKeyIdentifier.
+	 * <p/>
+	 * The search gets all alias names of the keystore and gets the certificate chain
+	 * or certificate for each alias. Then the SKI for each user certificate 
+	 * is compared with the SKI parameter.
+	 * 
+	 * @param skiBytes       The SKI info bytes
+	 * @return alias name of the certificate that matches serialNumber and issuer name
+	 *         or null if no such certificate was found.
+	 */
+
+	public String getAliasForX509Cert(byte[] skiBytes) throws Exception {
+		String certIssuer[] = null;
+		Certificate cert = null;
+		boolean found = false;
+
+		for (Enumeration e = keystore.aliases(); e.hasMoreElements();) {
+			String alias = (String) e.nextElement();
+			Certificate[] certs = keystore.getCertificateChain(alias);
+			if (certs == null || certs.length == 0) {
+				// no cert chain, so lets check if getCertificate gives us a  result.
+				cert = keystore.getCertificate(alias);
+				if (cert == null) {
+					return null;
+				}
+			} else {
+				cert = certs[0];
+			}
+			if (!(cert instanceof X509Certificate)) {
+				continue;
+			}
+			byte[] data = getSKIBytesFromCert((X509Certificate) cert);
+			if (data.length != skiBytes.length) {
+				continue;
+			}
+			for (int ii = 0; ii < data.length; ii++) {
+				if (data[ii] != skiBytes[ii]) {
+					found = false;
+					break;
+				}
+				found = true;
+			}
+			if (found) {
+				return alias;
+			}
+		}
+		return null;
+	}
 
     /**
      * Return a X509 Certificate alias in the keystore according to a given Certificate
@@ -336,6 +399,71 @@ public class Merlin implements Crypto {
             throw new CredentialException(-1, "error00", e);
         }
     }
+
+	/**
+	 * Reads the SubjectKeyIdentifier information from the certificate. 
+	 * <p/> 
+	 * 
+	 * @param cert       The certificate to read SKI
+	 * @return 			 The byte array conating the binary SKI data
+	 */
+	static String SKI_OID = "2.5.29.14";
+	public byte[] getSKIBytesFromCert(X509Certificate cert)
+		throws CredentialException, IOException {
+
+		byte data[] = null;
+		byte abyte0[] = null;
+		if (cert.getVersion() < 3) {
+			Object exArgs[] = { new Integer(cert.getVersion())};
+			throw new CredentialException(
+				1,
+				"noSKIHandling",
+				new Object[] { "Wrong certificate version (<3)" });
+		}
+
+		/*
+		 * Gets the DER-encoded OCTET string for the extension value (extnValue)
+		 * identified by the passed-in oid String. The oid string is
+		 * represented by a set of positive whole numbers separated by periods.
+		 */
+		data = cert.getExtensionValue(SKI_OID);
+
+		if (data == null) {
+			throw new CredentialException(
+				1,
+				"noSKIHandling",
+				new Object[] { "No extension data" });
+		}
+		DerValue dervalue = new DerValue(data);
+
+		if (dervalue == null) {
+			throw new CredentialException(
+				1,
+				"noSKIHandling",
+				new Object[] { "No DER value" });
+		}
+		if (dervalue.tag != DerValue.tag_OctetString) {
+			throw new CredentialException(
+				1,
+				"noSKIHandling",
+				new Object[] { "No octet string" });
+		}
+		byte[] extensionValue = dervalue.getOctetString();
+
+		/**
+		 * Strip away first two bytes from the DerValue (tag and length)
+		 */
+		abyte0 = new byte[extensionValue.length - 2];
+
+		System.arraycopy(extensionValue, 2, abyte0, 0, abyte0.length);
+
+		/*
+		byte abyte0[] = new byte[derEncodedValue.length - 4];
+		System.arraycopy(derEncodedValue, 4, abyte0, 0, abyte0.length);
+		*/
+		return abyte0;
+	}
+
 
     /**
      * location of the key store.

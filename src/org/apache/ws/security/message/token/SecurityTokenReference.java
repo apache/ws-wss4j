@@ -35,9 +35,7 @@ import org.w3c.dom.NodeList;
 
 import javax.xml.namespace.QName;
 import java.security.cert.X509Certificate;
-import java.io.IOException;
 
-import sun.security.util.DerValue;
 
 /**
  * Security Token Reference.
@@ -52,8 +50,10 @@ public class SecurityTokenReference {
 
 	public static final QName TOKEN =
 		new QName(WSConstants.WSSE_NS, "SecurityTokenReference");
+	public static final String SKI_URI = WSConstants.WSSE_NS + "#X509SubjectKeyIdentifier";
 	protected Element element = null;
 	private XMLX509IssuerSerial issuerSerial = null;
+	private byte[] skiBytes = null;
 
 	private static boolean doDebug = false;
 
@@ -184,8 +184,8 @@ public class SecurityTokenReference {
 		Text certText = doc.createTextNode(Base64.encode(data));
 		Element keyId =
 			doc.createElementNS(WSConstants.WSSE_NS, "wsse:KeyIdentifier");
-		keyId.setAttributeNS(null, "ValueType", "wsse:X509v3");
-		keyId.setAttributeNS(null, "EncodingType", "wsse:Base64Binary");
+		keyId.setAttributeNS(null, "ValueType", X509Security.TYPE);
+		keyId.setAttributeNS(null, "EncodingType",  BinarySecurity.BASE64_ENCODING);
 		keyId.appendChild(certText);
 		Element elem = getFirstElement();
 		if (elem != null) {
@@ -201,18 +201,16 @@ public class SecurityTokenReference {
 	 * in the <code>wsse:SecurityTokenReference</code> element.
 	 * 
 	 * @param cert is the X509 certficate to get the SKI
+	 * @param crypto is the Crypto implementation. Used to read SKI info bytes from certificate
 	 */
-	public void setKeyIdentifierSKI(X509Certificate cert) throws Exception {
+	public void setKeyIdentifierSKI(X509Certificate cert, Crypto crypto) throws Exception {
 		Document doc = this.element.getOwnerDocument();
-		byte data[] = getSKIBytesFromCert(cert);
+		byte data[] = crypto.getSKIBytesFromCert(cert);
 		org.w3c.dom.Text skiText = doc.createTextNode(Base64.encode(data));
 		Element keyId =
 			doc.createElementNS(WSConstants.WSSE_NS, "wsse:KeyIdentifier");
-		keyId.setAttributeNS(
-			null,
-			"ValueType",
-			"wsse:X509SubjectKeyIdentifier");
-		keyId.setAttributeNS(null, "EncodingType", "wsse:Base64Binary");
+		keyId.setAttributeNS(null, "ValueType", SKI_URI);
+		keyId.setAttributeNS(null, "EncodingType", BinarySecurity.BASE64_ENCODING);
 		keyId.appendChild(skiText);
 		Element elem = getFirstElement();
 		if (elem != null) {
@@ -233,20 +231,63 @@ public class SecurityTokenReference {
 		X509Security token = null;
 		Element elem = getFirstElement();
 		String value = elem.getAttribute("ValueType");
-		if (value.equals("wsse:X509v3")) {
+		if (value.equals(X509Security.TYPE)) {
 			token = new X509Security(elem);
-		} else if (value.equals("wsse:X509SubjectKeyIdentifier")) {
+			if (token != null) {
+				X509Certificate cert = token.getX509Certificate(crypto);
+				X509Certificate[] certs = new X509Certificate[1];
+				certs[0] = cert;
+				return certs;
+			}
+		} else if (value.equals(SKI_URI)) {
 			token = getEmbeddedTokenFromSKI(element.getOwnerDocument(), crypto);
-			if (token == null) { // TODO: get cert from key store using SKI
+			if (token != null) {
+				X509Certificate cert = token.getX509Certificate(crypto);
+				X509Certificate[] certs = new X509Certificate[1];
+				certs[0] = cert;
+				return certs;
+			}
+			else {
+				String alias = getX509SKIAlias(crypto);
+				if (alias != null) {
+					return crypto.getCertificates(alias);
+				}
 			}
 		}
-		if (token != null) {
-			X509Certificate cert = token.getX509Certificate(crypto);
-			X509Certificate[] certs = new X509Certificate[1];
-			certs[0] = cert;
-			return certs;
-		}
 		return null;
+	}
+	
+	public String getX509SKIAlias(Crypto crypto) throws Exception {
+		if (skiBytes == null) {
+			skiBytes = getSKIBytes();
+			if (skiBytes == null) {
+				return null;
+			}
+		}
+		String alias =
+			crypto.getAliasForX509Cert(skiBytes);
+		if (doDebug) {
+			log.info("X509 SKI alias: " + alias);
+		}
+		return alias;
+	}
+
+	public byte[] getSKIBytes() {
+		if (skiBytes != null) {
+			return skiBytes;
+		} 
+		Node node = getFirstElement().getFirstChild();
+		if (node == null) {
+			return null;
+		}
+		if (node.getNodeType() == Node.TEXT_NODE) {
+			try {
+				skiBytes = Base64.decode(((Text) node).getData());
+			} catch (Exception e) {
+				return null;
+			}
+		}
+		return skiBytes;
 	}
 
 	public X509Security getEmbeddedTokenFromSKI(Document doc, Crypto crypto)
@@ -257,15 +298,9 @@ public class SecurityTokenReference {
 		}
 		X509Security found = null;
 
-		byte[] skiBytes = null;
-		Node node = getFirstElement().getFirstChild();
-		if (node == null) {
-			return null;
-		}
-		if (node.getNodeType() == Node.TEXT_NODE) {
-			try {
-				skiBytes = Base64.decode(((Text) node).getData());
-			} catch (Exception e) {
+		if (skiBytes == null) {
+			skiBytes = getSKIBytes();
+			if (skiBytes == null) {
 				return null;
 			}
 		}
@@ -284,7 +319,7 @@ public class SecurityTokenReference {
 			}
 			Element bstElement = (Element) nl.item(i);
 			String value = bstElement.getAttribute("ValueType");
-			if (!value.equals("wsse:X509v3")) {
+			if (!value.equals(X509Security.TYPE)) {
 				continue;
 			}
 			X509Security token = new X509Security(bstElement);
@@ -295,7 +330,7 @@ public class SecurityTokenReference {
 			if (doDebug) {
 				log.debug("Cert SKI: got cert from BST");
 			}
-			byte data[] = getSKIBytesFromCert(cert);
+			byte data[] = crypto.getSKIBytesFromCert(cert);
 			if (data.length != skiBytes.length) {
 				continue;
 			}
@@ -308,73 +343,12 @@ public class SecurityTokenReference {
 					break;
 				}
 			}
-			if (doDebug) {
-				log.debug("Cert SKI: found embedded BST: " + token);
+			if (doDebug && token != null) {
+				log.debug("Cert SKI: found embedded BST");
 			}
 			found = token;
 		}
 		return found;
-	}
-
-
-	static String SKI_OID = "2.5.29.14";
-	public byte[] getSKIBytesFromCert(X509Certificate cert)
-		throws WSSecurityException, IOException {
-
-		byte data[] = null;
-		byte abyte0[] = null;
-		if (cert.getVersion() < 3) {
-			Object exArgs[] = { new Integer(cert.getVersion())};
-			throw new WSSecurityException(
-				WSSecurityException.FAILURE,
-				"noSKIHandling",
-				new Object[] { "Wrong certificate version (<3)" });
-		}
-
-		/*
-		 * Gets the DER-encoded OCTET string for the extension value (extnValue)
-		 * identified by the passed-in oid String. The oid string is
-		 * represented by a set of positive whole numbers separated by periods.
-		 */
-		data = cert.getExtensionValue(SKI_OID);
-
-		if (data == null) {
-			throw new WSSecurityException(
-				WSSecurityException.FAILURE,
-				"noSKIHandling",
-				new Object[] { "No extension data" });
-		}
-		DerValue dervalue = new DerValue(data);
-
-		if (dervalue == null) {
-			throw new WSSecurityException(
-				WSSecurityException.FAILURE,
-				"noSKIHandling",
-				new Object[] { "No DER value" });
-		}
-		if (dervalue.tag != DerValue.tag_OctetString) {
-			throw new WSSecurityException(
-				WSSecurityException.FAILURE,
-				"noSKIHandling",
-				new Object[] { "No octet string" });
-		}
-		byte[] extensionValue = dervalue.getOctetString();
-
-		/**
-		 * Strip away first two bytes from the DerValue (tag and length)
-		 */
-		abyte0 = new byte[extensionValue.length - 2];
-
-		System.arraycopy(extensionValue, 2, abyte0, 0, abyte0.length);
-
-		/*
-		byte abyte0[] = new byte[derEncodedValue.length - 4];
-		System.arraycopy(derEncodedValue, 4, abyte0, 0, abyte0.length);
-		*/
-		if (doDebug) {
-			log.debug("Base64 of SKI is " + Base64.encode(abyte0));
-		}
-		return abyte0;
 	}
 
 	/*
@@ -398,18 +372,14 @@ public class SecurityTokenReference {
 
 	/**
 	 * Gets the certificate identified with X509 issuerSerial data.
-	 * This method first tries to get the certificate from the keystore.
-	 * If this fails it checks if the certificate is embedded in the
-	 * message.
+	 * This method first tries to get the embedded certificate.
+	 * If this fails it checks if the certificate is  in the
+	 * keystore.
 	 * 
 	 * @return a certificate array or null if nothing found
 	 */
 	public X509Certificate[] getX509IssuerSerial(Crypto crypto)
 		throws Exception {
-		String alias = getX509IssuerSerialAlias(crypto);
-		if (alias != null) {
-			return crypto.getCertificates(alias);
-		}
 		X509Security token =
 			getEmbeddedTokenFromIS(element.getOwnerDocument(), crypto);
 		if (token != null) {
@@ -417,6 +387,10 @@ public class SecurityTokenReference {
 			X509Certificate[] certs = new X509Certificate[1];
 			certs[0] = cert;
 			return certs;
+		}
+		String alias = getX509IssuerSerialAlias(crypto);
+		if (alias != null) {
+			return crypto.getCertificates(alias);
 		}
 		return null;
 	}
@@ -439,7 +413,7 @@ public class SecurityTokenReference {
 				issuerSerial.getIssuerName(),
 				issuerSerial.getSerialNumber());
 		if (doDebug) {
-			log.info("Verify X509IssuerSerial alias: " + alias);
+			log.info("X509IssuerSerial alias: " + alias);
 		}
 		return alias;
 	}
@@ -471,7 +445,7 @@ public class SecurityTokenReference {
 			}
 			Element bstElement = (Element) nl.item(i);
 			String value = bstElement.getAttribute("ValueType");
-			if (!value.equals("wsse:X509v3")) {
+			if (!value.equals(X509Security.TYPE)) {
 				continue;
 			}
 
@@ -481,7 +455,7 @@ public class SecurityTokenReference {
 				continue;
 			}
 			if (doDebug) {
-				log.debug("Cert IS: got cert from BST");
+				log.debug("Cert IS: got cert from BST: " + cert);
 			}
 			/*
 			 * Note: the direct compar of IssuerName/Name may fail because
@@ -501,6 +475,9 @@ public class SecurityTokenReference {
 				}
 				return token;
 			}
+		}
+		if (doDebug) {
+			log.debug("Cert IS: no embedded BST found");
 		}
 		return null;
 	}

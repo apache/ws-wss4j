@@ -304,7 +304,7 @@ public class WSSignEnvelope extends WSBaseMessage {
 				// fall thru
 			}
 			case WSConstants.SKI_KEY_IDENTIFIER :
-				secRef.setKeyIdentifierSKI(certs[0]);
+				secRef.setKeyIdentifierSKI(certs[0], crypto);
 				break;
 			default :
 				throw new WSSecurityException(
@@ -360,9 +360,8 @@ public class WSSignEnvelope extends WSBaseMessage {
 			WSConstants.SIG_NS,
 			WSConstants.SIG_PREFIX);
 			
-		canonElem.setAttributeNS(null, "Algorithm", "http://www.w3.org/TR/2001/REC-xml-c14n-20010315");
+		canonElem.setAttributeNS(null, "Algorithm", Canonicalizer.ALGO_ID_C14N_EXCL_OMIT_COMMENTS);
 		transformParam.appendChild(canonElem);
 		return transformParam;
     }
-
 }

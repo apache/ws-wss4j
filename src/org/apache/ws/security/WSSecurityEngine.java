@@ -554,7 +554,7 @@ public class WSSecurityEngine {
      */
     private BinarySecurity createSecurityToken(Element element) throws WSSecurityException {
         BinarySecurity token = new BinarySecurity(element);
-        QName type = token.getValueType();
+        String type = token.getValueType();
         Class clazz = (Class) tokenImpl.get(type);
         if (clazz == null) {
             throw new WSSecurityException(WSSecurityException.UNSUPPORTED_SECURITY_TOKEN,
