@@ -281,6 +281,7 @@ public class WSS4JHandler implements Handler {
          */
         if ((doAction & WSConstants.UT_SIGN) == WSConstants.UT_SIGN) {
             decodeUTParameter();
+            decodeSignatureParameter();
         }
         /*
          * Get and check the Signature specific parameters first because they
@@ -1113,6 +1114,9 @@ handle response
         
         WSSignEnvelope sign = new WSSignEnvelope(actor, mu);
         sign.setUsernameToken(builder);
+        if (signatureParts.size() > 0) {
+            sign.setParts(signatureParts);
+        }
         sign.setKeyIdentifierType(WSConstants.UT_SIGNING);
         sign.setSignatureAlgorithm(XMLSignature.ALGO_ID_MAC_HMAC_SHA1);
         try {

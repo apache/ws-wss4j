@@ -241,7 +241,8 @@ public class WSDoAllSender extends BasicHandler {
          */
         if ((doAction & WSConstants.UT_SIGN) == WSConstants.UT_SIGN) {
             decodeUTParameter();
-        }
+            decodeSignatureParameter();
+       }
         /*
          * Get and check the Signature specific parameters first because they
          * may be used for encryption too.
@@ -463,6 +464,9 @@ public class WSDoAllSender extends BasicHandler {
 		builder.addNonce(doc);
 
 		WSSignEnvelope sign = new WSSignEnvelope(actor, mu);
+        if (signatureParts.size() > 0) {
+            sign.setParts(signatureParts);
+        }
 		sign.setUsernameToken(builder);
 		sign.setKeyIdentifierType(WSConstants.UT_SIGNING);
 		sign.setSignatureAlgorithm(XMLSignature.ALGO_ID_MAC_HMAC_SHA1);
