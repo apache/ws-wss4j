@@ -751,17 +751,8 @@ public class WSSecurityUtil {
     }
 
     public static SecretKey prepareSecretKey(String symEncAlgo,
-                                             byte[] rawKey)
-            throws WSSecurityException {
-
-        JCEMapper.ProviderIdClass providerID = JCEMapper.translateURItoJCEID(symEncAlgo);
-        if (providerID == null) {
-            throw new WSSecurityException(WSSecurityException.UNSUPPORTED_ALGORITHM,
-                    "unsupportedSymKey",
-                    new Object[]{"No provider for: " + symEncAlgo});
-        }
-
-        SecretKeySpec keySpec = new SecretKeySpec(rawKey, JCEMapper.getJCEKeyAlgorithmFromURI(symEncAlgo, providerID.getProviderId()));
+                                             byte[] rawKey) {
+        SecretKeySpec keySpec = new SecretKeySpec(rawKey, JCEMapper.getJCEKeyAlgorithmFromURI(symEncAlgo));
         return (SecretKey) keySpec;
     }
 

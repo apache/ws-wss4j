@@ -33,6 +33,7 @@ import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.signature.XMLSignatureInput;
 import org.apache.xml.security.transforms.TransformSpi;
 import org.apache.xml.security.utils.Base64;
+import org.apache.xml.security.utils.XMLUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -145,8 +146,13 @@ public class STRTransform extends TransformSpi {
             String canonAlgo = null;
             if (this._transformObject.length(WSConstants.WSSE_NS,
                     "TransformationParameters") == 1) {
-                Element tmpE = this._transformObject.getChildElementLocalName(0, WSConstants.WSSE_NS, "TransformationParameters");
-                Element canonElem = (Element) WSSecurityUtil.getDirectChild(tmpE, "CanonicalizationMethod", WSConstants.SIG_NS);
+                Element tmpE = XMLUtils.selectNode(this._transformObject.getElement().getFirstChild(),
+                        WSConstants.WSSE_NS,
+                        "TransformationParameters",
+                        0);
+                Element canonElem = (Element) WSSecurityUtil.getDirectChild(tmpE,
+                        "CanonicalizationMethod",
+                        WSConstants.SIG_NS);
                 canonAlgo = canonElem.getAttribute("Algorithm");
                 if (doDebug) {
                     log.debug("CanonAlgo: " + canonAlgo);

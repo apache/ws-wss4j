@@ -311,8 +311,6 @@ public class WSSecurityEngine {
         NodeList list = securityHeader.getChildNodes();
         int len = list.getLength();
         Node elem;
-        String localName = null;
-        String namespace = null;
         Principal lastPrincipalFound = null;
         if (tlog.isDebugEnabled()) {
             t1 = System.currentTimeMillis();
@@ -457,7 +455,7 @@ public class WSSecurityEngine {
      * @return the subject principal of the validated X509 certificate (the
      *         authenticated subject). The calling function may use this
      *         principal for further authentication or authorization.
-     * @throws Exception
+     * @throws WSSecurityException
      */
     protected Principal verifyXMLSignature(Element elem,
                                            Crypto crypto,
@@ -481,10 +479,7 @@ public class WSSecurityEngine {
         } catch (XMLSecurityException e2) {
             throw new WSSecurityException(WSSecurityException.FAILED_CHECK,
                     "noXMLSig");
-        } catch (IOException e2) {
-            throw new WSSecurityException(WSSecurityException.FAILED_CHECK,
-                    "noXMLSig");
-        }
+        } 
 
         sig.addResourceResolver(EnvelopeIdResolver.getInstance(wssConfig));
 
@@ -927,8 +922,6 @@ public class WSSecurityEngine {
         }
         // need to have it to find the encryped data elements in the envelope
         Document doc = xencEncryptedKey.getOwnerDocument();
-        Element envelope = doc.getDocumentElement();
-        Element nsContext = WSSecurityUtil.createNamespaceContext(wssConfig, doc);
 
         // lookup xenc:EncryptionMethod, get the Algorithm attribute to determine
         // how the key was encrypted. Then check if we support the algorithm
@@ -1144,7 +1137,6 @@ public class WSSecurityEngine {
          * Now lookup the references that are encrypted with this key
          */
         String dataRefURI = null;
-        String keyRefURI = null;
         Element refList = (Element) WSSecurityUtil.getDirectChild((Node) xencEncryptedKey,
                 "ReferenceList", WSConstants.ENC_NS);
         if (refList != null) {
@@ -1159,9 +1151,7 @@ public class WSSecurityEngine {
                 if (tmpE.getLocalName().equals("DataReference")) {
                     dataRefURI = ((Element) tmpE).getAttribute("URI");
                     decryptDataRef(doc, dataRefURI, decryptedBytes);
-                } else if (tmpE.getLocalName().equals("KeyReference")) {
-                    keyRefURI = ((Element) tmpE).getAttribute("URI");
-                }
+                } 
             }
         }
 
@@ -1246,8 +1236,6 @@ public class WSSecurityEngine {
             if (tmpE.getLocalName().equals("DataReference")) {
                 String dataRefURI = ((Element) tmpE).getAttribute("URI");
                 decryptDataRefEmbedded(doc, dataRefURI, cb);
-            } else if (tmpE.getLocalName().equals("KeyReference")) {
-                String keyRefURI = ((Element) tmpE).getAttribute("URI");
             }
         }
     }
@@ -1388,12 +1376,10 @@ public class WSSecurityEngine {
     }
 
     /**
-     * Put description here.
-     * <p/>
-     *
+     * Method getDecodedBase64EncodedData
      * @param element
      * @return
-     * @throws Exception
+     * @throws WSSecurityException
      */
     public static byte[] getDecodedBase64EncodedData(Element element) throws WSSecurityException {
         StringBuffer sb = new StringBuffer();

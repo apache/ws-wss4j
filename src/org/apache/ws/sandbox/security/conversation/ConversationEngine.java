@@ -95,6 +95,16 @@ public class ConversationEngine {
 
     private boolean doDebug = false;
 
+    static {
+        org.apache.xml.security.Init.init();
+        String Id = "BC";
+        if (java.security.Security.getProvider(Id) == null) {
+            log.debug("The provider " + Id
+                    + " had to be added to the java.security.Security");
+            java.security.Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
+        }
+    }
+    
     /**
      * <code>wsc:DerivedKeyToken</code> as defined in WS Secure Conversation specification.
      */
@@ -389,10 +399,7 @@ public class ConversationEngine {
             throw new ConversationException("noXMLSig");
         } catch (XMLSecurityException e2) {
             throw new ConversationException("noXMLSig");
-        } catch (IOException e2) {
-            throw new ConversationException("noXMLSig");
         }
-
         String sigMethodURI = sig.getSignedInfo().getSignatureMethodURI();
         //verifying the sinature
         if (sigMethodURI.equals(XMLSignature.ALGO_ID_MAC_HMAC_SHA1)) {

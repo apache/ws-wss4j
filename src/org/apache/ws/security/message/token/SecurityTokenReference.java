@@ -151,7 +151,7 @@ public class SecurityTokenReference {
      *            that contains the SecurityTokenReference (STR). See
      *            STRTransform.derefenceBST() method
      * @return Element     containing the signing token, must be a BinarySecurityToken
-     * @throws Exception When either no <code>Reference</code> element, or the found
+     * @throws WSSecurityException When either no <code>Reference</code> element, or the found
      *                   reference contains no URI, or the referenced signing not found.
      */
     public Element getTokenElement(Document doc, WSDocInfo docInfo)
@@ -414,16 +414,8 @@ public class SecurityTokenReference {
                 return null;
             }
         }
-        String alias = null;
-        try {
-            alias =
-                    crypto.getAliasForX509Cert(issuerSerial.getIssuerName(),
-                            issuerSerial.getSerialNumber());
-        } catch (XMLSecurityException e) {
-            throw new WSSecurityException(WSSecurityException.SECURITY_TOKEN_UNAVAILABLE,
-                    "noToken",
-                    new Object[]{"Issuer/Serial data unavailabe"});
-        }
+        String alias = crypto.getAliasForX509Cert(issuerSerial.getIssuerName(),
+                issuerSerial.getSerialNumber());
         if (doDebug) {
             log.info("X509IssuerSerial alias: " + alias);
         }
