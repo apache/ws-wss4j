@@ -39,7 +39,8 @@ public class PingBindingImpl
 		javax.xml.rpc.holders.StringHolder text,
 		org.apache.ws.axis.oasis.ping.TicketType ticket)
 		throws java.rmi.RemoteException {
-		text.value = "Echo " + text.value.trim();
+		// text.value = "Echo " + text.value.trim();
+		text.value = "Echo " + text.value;
 		MessageContext msgContext = MessageContext.getCurrentContext();
 		Message reqMsg = msgContext.getRequestMessage();
 
@@ -51,15 +52,18 @@ public class PingBindingImpl
 		}
 		System.out.println("Number of results: " + results.size());
 		for (int i = 0; i < results.size(); i++) {
-			WSDoAllReceiverResult rResult = (WSDoAllReceiverResult)results.get(i);
+			WSDoAllReceiverResult rResult =
+				(WSDoAllReceiverResult) results.get(i);
 			Vector principals = rResult.getPrincipals();
 			Vector actions = rResult.getActions();
-			
+
 			for (int j = 0; j < principals.size(); j++) {
-				if (((Integer)actions.get(j)).intValue() != WSConstants.ENCR) {
-					System.out.println(((Principal)principals.get(j)).getName());
+				if (((Integer) actions.get(j)).intValue()
+					!= WSConstants.ENCR) {
+					System.out.println(
+						((Principal) principals.get(j)).getName());
 				}
-			}			
+			}
 		}
 	}
 
