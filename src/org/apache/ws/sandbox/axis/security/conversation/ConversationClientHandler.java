@@ -65,10 +65,12 @@ import org.apache.ws.security.conversation.message.token.SecurityContextToken;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.message.token.SecurityTokenReference;
 //import org.apache.ws.security.trust.TrustCommunicator;
+import org.apache.ws.security.transform.STRTransform;
 import org.apache.ws.security.trust.TrustConstants;
 import org.apache.ws.security.trust.message.token.TokenType;
 import org.apache.ws.security.util.StringUtil;
 import org.apache.ws.security.util.WSSecurityUtil;
+import org.apache.xml.security.transforms.Transform;
 import org.apache.xml.security.utils.XMLUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -126,6 +128,18 @@ public class ConversationClientHandler extends BasicHandler {
     int[] actionsInt;
     static {
         org.apache.xml.security.Init.init();
+        String Id = "BC";
+        if (java.security.Security.getProvider(Id) == null) {
+            log.debug("The provider " + Id
+                    + " had to be added to the java.security.Security");
+            java.security.Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
+        }
+        Transform.init();
+        try {
+            Transform.register(STRTransform.implementedTransformURI,
+                    "org.apache.ws.security.transform.STRTransform");
+        } catch (Exception ex) {
+        }
     }
 
     public ConversationClientHandler() throws AxisFault {

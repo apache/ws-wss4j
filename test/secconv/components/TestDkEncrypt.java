@@ -17,15 +17,11 @@
 package secconv.components;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Vector;
 
-import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import junit.framework.Test;
@@ -36,26 +32,25 @@ import org.apache.axis.Message;
 import org.apache.axis.MessageContext;
 import org.apache.axis.client.AxisClient;
 import org.apache.axis.configuration.NullProvider;
-//import org.apache.axis.encoding.Callback;
 import org.apache.axis.message.SOAPEnvelope;
 import org.apache.axis.utils.XMLUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.axis.security.conversation.ConvHandlerConstants;
 import org.apache.ws.axis.security.util.AxisUtil;
-import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSConfig;
-import org.apache.ws.security.conversation.ConvEngineResult;
 import org.apache.ws.security.conversation.ConversationEngine;
 import org.apache.ws.security.conversation.ConversationManager;
 import org.apache.ws.security.conversation.ConversationUtil;
 import org.apache.ws.security.conversation.DerivedKeyCallbackHandler;
-import org.apache.ws.security.conversation.DerivedKeyTokenAdder;
 import org.apache.ws.security.conversation.message.info.DerivedKeyInfo;
 import org.apache.ws.security.conversation.message.info.SecurityContextInfo;
 import org.apache.ws.security.conversation.message.token.SecurityContextToken;
 import org.apache.ws.security.message.token.SecurityTokenReference;
+import org.apache.ws.security.transform.STRTransform;
 import org.apache.ws.security.util.WSSecurityUtil;
+import org.apache.xml.security.transforms.Transform;
+import org.apache.xml.security.utils.EncryptionConstants;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -86,7 +81,19 @@ public class TestDkEncrypt extends TestCase{
     HashMap config;
     
     static{
-    org.apache.xml.security.Init.init();
+        org.apache.xml.security.Init.init();
+        String Id = "BC";
+        if (java.security.Security.getProvider(Id) == null) {
+            log.debug("The provider " + Id
+                    + " had to be added to the java.security.Security");
+            java.security.Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
+        }
+        Transform.init();
+        try {
+            Transform.register(STRTransform.implementedTransformURI,
+                    "org.apache.ws.security.transform.STRTransform");
+        } catch (Exception ex) {
+        }
     }
     //sharedSecret = "SriLankaSriLankaSriLanka".getBytes();
 
@@ -184,6 +191,7 @@ public class TestDkEncrypt extends TestCase{
      */
     public void testPerformDkEncrypt() throws Exception {
 
+    	
         SOAPEnvelope unsignedEnvelope = message.getSOAPEnvelope();
         SOAPEnvelope envelope = null;
 
@@ -217,7 +225,8 @@ public class TestDkEncrypt extends TestCase{
 		SecurityTokenReference secTokRef = dkInfo.getSecTokRef2DkToken();
 		
 		//manager.performDK_ENCR(ConversationUtil.generateIdentifier(uuid, dkInfo.getId()), "", true, doc, secTokRef, dkcbHandler);
-	    manager.performDK_ENCR(ConversationUtil.generateIdentifier(uuid, dkInfo.getId()), "", true, doc, secTokRef, dkcbHandler, null, "http://www.w3.org/2001/04/xmlenc#tripledes-cbc");
+		
+	    manager.performDK_ENCR(ConversationUtil.generateIdentifier(uuid, dkInfo.getId()), "", true, doc, secTokRef, dkcbHandler, null, EncryptionConstants.ALGO_ID_BLOCKCIPHER_TRIPLEDES);
 	    
 	    manager.addDkToken(doc, dkInfo);
 	    
@@ -233,7 +242,14 @@ public class TestDkEncrypt extends TestCase{
         XMLUtils.PrettyElementToWriter(
             signedMsg.getSOAPEnvelope().getAsDOM(),
             new PrintWriter(System.out));
-        verifyDkSign(doc);
+        dkDecrypt(doc);
+        
+        System.out.println("----------------Dercypted Messsage----------------");
+        signedMsg = (Message) AxisUtil.toSOAPMessage(doc);
+
+        XMLUtils.PrettyElementToWriter(
+            signedMsg.getSOAPEnvelope().getAsDOM(),
+            new PrintWriter(System.out));
     }
 
     /**
@@ -243,12 +259,12 @@ public class TestDkEncrypt extends TestCase{
      * @param doc 
      * @throws Exception Thrown when there is a problem in verification
      */
-    private void verifyDkSign(Document doc)
+    private void dkDecrypt(Document doc)
         throws Exception {
        log.info("Before verifying the derived key signature");
 	   ConversationEngine engine = new ConversationEngine(config);
 	   Vector results = engine.processSecConvHeader(doc, "", dkcbHandler,null);
-	
+	   
     }
 
 }

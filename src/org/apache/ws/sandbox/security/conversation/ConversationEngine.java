@@ -68,6 +68,8 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
 
+import com.sun.rsasign.t;
+
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
@@ -340,6 +342,7 @@ public class ConversationEngine {
         try {
             if (verifyTrust) {
                 TrustEngine trstEngine = new TrustEngine(this.trustPropFile);
+                
                 // TODO :: Verify trust......
                 System.out.println("...........Verifying trust.........");
 
@@ -399,7 +402,7 @@ public class ConversationEngine {
             throw new ConversationException("noXMLSig");
         } catch (XMLSecurityException e2) {
             throw new ConversationException("noXMLSig");
-        }
+        } 
         String sigMethodURI = sig.getSignedInfo().getSignatureMethodURI();
         //verifying the sinature
         if (sigMethodURI.equals(XMLSignature.ALGO_ID_MAC_HMAC_SHA1)) {
@@ -542,7 +545,7 @@ public class ConversationEngine {
 
 
 		WSSecurityEngine eng = new WSSecurityEngine();
-        boolean content = this.isContent(encBodyData);
+        boolean content = this.isContent(encBodyData);//Whether content encryption or element encryption
 
         if (content) {
             encBodyData = (Element) encBodyData.getParentNode();
@@ -579,7 +582,9 @@ public class ConversationEngine {
             String valueType = ref.getValueType();
             //  System.out.println("ref.getURI()" + ref.getURI());
 
-            if (valueType.equals("http://schemas.xmlsoap.org/ws/2004/04/security/sc/dk")) {
+            //If the reference type is a derived key token
+            if (valueType.equals(ConversationConstants.VALUE_TYPE_DERIVED_KEY)) {
+            	//Get hold of the DerivedKeyToken 'Element'
                 Element ele =
                     WSSecurityUtil.getElementByWsuId(
                         WSSConfig.getDefaultWSConfig(),
@@ -591,9 +596,9 @@ public class ConversationEngine {
                 String uuid = null;
                 DerivedKeyToken dkToken = null;
                 try {
-                    dkToken = new DerivedKeyToken(ele);
+                    dkToken = new DerivedKeyToken(ele);  //Cover the 'Element' into 'DerivedKeyToken' object
                     if (dkToken.getSecuityTokenReference() == null) {
-                        //if dkToken doesn't have a STR
+                        //if dkToken doesn't have a STR find a SecurityContextToken in the SOAP Envelope
                         SecurityContextToken secContextTk =
                             ConversationUtil.getSCT(dkToken);
                         uuid = secContextTk.getIdentifier();
@@ -655,15 +660,13 @@ public class ConversationEngine {
 							}
 
                         }else{
-                            throw new ConversationException("Don't know how to process here");
+                            throw new ConversationException("Cannot handle this type of security token reference: " + dkToken.getSecuityTokenReference().getReference().getValueType());
                         }
                     } //////end :if dkToken has a STR
                     //TODO :: Ask ruchith to throw correct exception
                 } catch (WSSecurityException e2) {
-                    // TODO Auto-generated catch block
                     e2.printStackTrace();
                 } catch (ConversationException e2) {
-                    // TODO Auto-generated catch block
                     e2.printStackTrace();
                 }
 
@@ -1013,9 +1016,6 @@ public class ConversationEngine {
 			e1.printStackTrace();
 			throw new ConversationException("Cannot find passwordcallback");
 		}
-
-
-
 
     }
    /**

@@ -17,15 +17,11 @@
 package secconv.components;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Vector;
 
-import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import junit.framework.Test;
@@ -42,18 +38,16 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.axis.security.conversation.ConvHandlerConstants;
 import org.apache.ws.axis.security.util.AxisUtil;
-import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSConfig;
-import org.apache.ws.security.conversation.ConvEngineResult;
 import org.apache.ws.security.conversation.ConversationEngine;
 import org.apache.ws.security.conversation.ConversationManager;
-import org.apache.ws.security.conversation.ConversationUtil;
 import org.apache.ws.security.conversation.DerivedKeyCallbackHandler;
-import org.apache.ws.security.conversation.DerivedKeyTokenAdder;
 import org.apache.ws.security.conversation.message.info.DerivedKeyInfo;
 import org.apache.ws.security.conversation.message.info.SecurityContextInfo;
 import org.apache.ws.security.conversation.message.token.SecurityContextToken;
+import org.apache.ws.security.transform.STRTransform;
 import org.apache.ws.security.util.WSSecurityUtil;
+import org.apache.xml.security.transforms.Transform;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -84,7 +78,19 @@ public class TestDkSign extends TestCase{
     HashMap config;
     
     static{
-    org.apache.xml.security.Init.init();
+        org.apache.xml.security.Init.init();
+        String Id = "BC";
+        if (java.security.Security.getProvider(Id) == null) {
+            log.debug("The provider " + Id
+                    + " had to be added to the java.security.Security");
+            java.security.Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
+        }
+        Transform.init();
+        try {
+            Transform.register(STRTransform.implementedTransformURI,
+                    "org.apache.ws.security.transform.STRTransform");
+        } catch (Exception ex) {
+        }
     }
     //sharedSecret = "SriLankaSriLankaSriLanka".getBytes();
 

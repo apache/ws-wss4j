@@ -26,6 +26,10 @@ public class ConversationConstants {
      */
     public final static String WSC_NS =
             "http://schemas.xmlsoap.org/ws/2004/04/sc";
+    
+    
+    public final static String VALUE_TYPE_DERIVED_KEY = "http://schemas.xmlsoap.org/ws/2004/04/security/sc/dk";
+    
 
     /**
      * Field WSC_PREFIX
