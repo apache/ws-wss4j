@@ -329,6 +329,12 @@ public class WSConstants {
     public static final int NO_SERIALIZE = 0x100;
     public static final int SERIALIZE = 0x200;
 
+    /**
+     * Length of UsernameToken derived key used by .NET WSE to sign a message.
+     */
+    public static final int WSE_DERIVED_KEY_LEN = 16;
+    public static final String LABEL_FOR_DERIVED_KEY = "WS-Security";
+    
     static {
         setComplianceMode();
     }
