@@ -51,6 +51,8 @@ public class PackageTests extends TestCase {
         TestSuite suite = new TestSuite();
       //  suite.addTestSuite(TestMSFTWebService.class);
         suite.addTestSuite(TestDkSign.class);
+        suite.addTestSuite(TestRSTR.class);
+        suite.addTestSuite(TestDkEncrypt.class);
         return suite;
     }
 
