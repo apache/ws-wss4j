@@ -29,9 +29,10 @@ import org.apache.axis.MessageContext;
 import org.apache.ws.axis.security.WSDoAllConstants;
 import org.apache.ws.axis.security.WSDoAllReceiverResult;
 import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.WSSecurityEngineResult;
+
 
 import javax.xml.rpc.holders.StringHolder;
-import java.security.Principal;
 import java.util.Vector;
 
 public class PingBindingImpl
@@ -53,14 +54,13 @@ public class PingBindingImpl
 		for (int i = 0; i < results.size(); i++) {
 			WSDoAllReceiverResult rResult =
 				(WSDoAllReceiverResult) results.get(i);
-			Vector principals = rResult.getPrincipals();
-			Vector actions = rResult.getActions();
+			Vector wsSecEngineResults = rResult.getResults();
 
-			for (int j = 0; j < principals.size(); j++) {
-				if (((Integer) actions.get(j)).intValue()
-					!= WSConstants.ENCR) {
-					System.out.println(
-						((Principal) principals.get(j)).getName());
+			for (int j = 0; j < wsSecEngineResults.size(); j++) {
+				WSSecurityEngineResult wser =
+					(WSSecurityEngineResult) wsSecEngineResults.get(j);
+				if (wser.getAction() != WSConstants.ENCR) {
+					System.out.println(wser.getPrincipal().getName());
 				}
 			}
 		}

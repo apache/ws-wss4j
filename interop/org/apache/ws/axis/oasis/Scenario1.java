@@ -18,8 +18,6 @@
 package org.apache.ws.axis.oasis;
 
 import org.apache.axis.utils.Options;
-import org.apache.axis.client.Stub;
-import org.apache.axis.client.Call;
 import org.apache.ws.axis.oasis.ping.PingPort;
 import org.apache.ws.axis.oasis.ping.PingServiceLocator;
 
