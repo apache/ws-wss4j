@@ -163,7 +163,7 @@ public class ConversationServerHandler extends BasicHandler {
 
                 SecurityContextInfo scInfo =
                     new SecurityContextInfo(SCT, proofToken, 1);
-                scInfo.setSharedSecret(proofToken.getSharedSecret());
+                //scInfo.setSharedSecret(proofToken.getSharedSecret());
                 dkcbHandler.addSecurtiyContext("uuid:secureZone", scInfo);
 
                 //Set the stuff in msgContext.

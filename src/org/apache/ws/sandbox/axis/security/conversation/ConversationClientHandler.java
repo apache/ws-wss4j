@@ -175,7 +175,7 @@ public class ConversationClientHandler extends BasicHandler {
 
                 //Now encrypting with the base token 
                 RequestedProofToken reqProof = stRes.getRequestedProofToken();
-                reqProof.doEncryptProof(doc);
+                //reqProof.doEncryptProof(doc);
 
                 SecurityContextInfo info =
                     new SecurityContextInfo(
