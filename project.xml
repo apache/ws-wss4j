@@ -76,6 +76,12 @@
             <email>werner@apache.org</email>
             <organization></organization>
         </developer>
+        <developer>
+            <name>Ias</name>
+            <id>ias</id>
+            <email>ias@apache.org</email>
+            <organization></organization>
+        </developer>
   </developers>
 
     <licenses>
