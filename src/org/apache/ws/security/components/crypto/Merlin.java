@@ -264,6 +264,7 @@ public class Merlin implements Crypto {
 		while (nmTokens.hasMoreTokens()) {
 			vr.add(nmTokens.nextToken());
 		}
+        java.util.Collections.sort(vr);
 		return vr;
 	}
 
