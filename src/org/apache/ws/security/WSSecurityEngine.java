@@ -638,12 +638,12 @@ public class WSSecurityEngine {
         // lookup xenc:EncryptionMethod, get the Algorithm attribute to determine
         // how the key was encrypted. Then check if we support the algorithm
 
-        Element tmpE = null;	// short living Element used for lookups only
+        Node tmpE = null;	// short living Element used for lookups only
         tmpE = (Element) WSSecurityUtil.getDirectChild((Node) xencEncryptedKey,
                 "EncryptionMethod", WSConstants.ENC_NS);
         String keyEncAlgo = null;
         if (tmpE != null) {
-            keyEncAlgo = tmpE.getAttribute("Algorithm");
+            keyEncAlgo = ((Element)tmpE).getAttribute("Algorithm");
         }
         if (keyEncAlgo == null) {
             throw new WSSecurityException
@@ -740,7 +740,7 @@ public class WSSecurityEngine {
 			if (el.equals(BINARY_TOKEN)) {
 				X509Security token = null;
 				String value = bstElement.getAttribute("ValueType");
-				if (!value.equals("wsse:X509v3")
+				if (!value.equals(X509Security.TYPE)
 					|| ((token = new X509Security(bstElement)) == null)) {
 					throw new WSSecurityException(
 						WSSecurityException.UNSUPPORTED_SECURITY_TOKEN,
@@ -810,8 +810,8 @@ public class WSSecurityEngine {
         Element refList = (Element) WSSecurityUtil.getDirectChild((Node) xencEncryptedKey,
                 "ReferenceList", WSConstants.ENC_NS);
         if (refList != null) {
-            for (tmpE = (Element)refList.getFirstChild();
-            	 tmpE != null; tmpE = (Element)tmpE.getNextSibling()) {
+            for (tmpE = refList.getFirstChild();
+            	 tmpE != null; tmpE = tmpE.getNextSibling()) {
             	if (tmpE.getNodeType() != Node.ELEMENT_NODE) {
             		continue;
             	}
@@ -819,11 +819,11 @@ public class WSSecurityEngine {
             		continue;
             	}
             	if (tmpE.getLocalName().equals("DataReference")) {
-					dataRefURI = tmpE.getAttribute("URI");
+					dataRefURI = ((Element)tmpE).getAttribute("URI");
 					decryptDataRef(doc, dataRefURI, decryptedBytes);
             	}
             	else if (tmpE.getLocalName().equals("KeyReference")) {
-					keyRefURI = tmpE.getAttribute("URI");
+					keyRefURI = ((Element)tmpE).getAttribute("URI");
             	}
             }
         }
