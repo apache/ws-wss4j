@@ -620,7 +620,7 @@ data:
             Vector hResults = hResult.getResults();
             for (int j = 0; j < hResults.size(); j++) {
               	WSSecurityEngineResult eResult = (WSSecurityEngineResult) hResults.get(j);
-	            // Note: an encryption action does not have an associated principal
+                // Note: an encryption action does not have an associated principal
     	        // only Signature and UsernameToken actions return a principal
                 if (eResult.getAction() != WSConstants.ENCR) {
                     System.out.println(eResult.getPrincipal().getName());
