@@ -33,76 +33,104 @@ import javax.xml.namespace.QName;
  * @author Davanum Srinivas (dims@yahoo.com).
  */
 public class Reference {
-    public static final QName TOKEN = new QName(WSConstants.WSSE_NS, "Reference");
-    protected Element element = null;
+	public static final QName TOKEN =
+		new QName(WSConstants.WSSE_NS, "Reference");
+	protected Element element = null;
 
-    /**
-     * Constructor.
-     * <p/>
-     * 
-     * @param elem 
-     * @throws WSSecurityException 
-     */
-    public Reference(Element elem) throws WSSecurityException {
-        if (elem == null) {
-            throw new WSSecurityException(
-                WSSecurityException.INVALID_SECURITY,
-                "noReference");
-        }
-        this.element = elem;
-        QName el = new QName(this.element.getNamespaceURI(), this.element.getLocalName());
-        if (!el.equals(TOKEN)) {
-            throw new WSSecurityException(WSSecurityException.FAILURE, "badElement", new Object[]{TOKEN, el});
-        }
-    }
+	/**
+	 * Constructor.
+	 * <p/>
+	 * 
+	 * @param elem 
+	 * @throws WSSecurityException 
+	 */
+	public Reference(Element elem) throws WSSecurityException {
+		if (elem == null) {
+			throw new WSSecurityException(
+				WSSecurityException.INVALID_SECURITY,
+				"noReference");
+		}
+		this.element = elem;
+		QName el =
+			new QName(
+				this.element.getNamespaceURI(),
+				this.element.getLocalName());
+		if (!el.equals(TOKEN)) {
+			throw new WSSecurityException(
+				WSSecurityException.FAILURE,
+				"badElement",
+				new Object[] { TOKEN, el });
+		}
+	}
 
-    /**
-     * Constructor.
-     * <p/>
-     * 
-     * @param doc 
-     */
-    public Reference(Document doc) {
-        this.element = doc.createElementNS(WSConstants.WSSE_NS, "wsse:Reference");
-    }
+	/**
+	 * Constructor.
+	 * <p/>
+	 * 
+	 * @param doc 
+	 */
+	public Reference(Document doc) {
+		this.element =
+			doc.createElementNS(WSConstants.WSSE_NS, "wsse:Reference");
+	}
 
-    /**
-     * get the dom element.
-     * <p/>
-     * 
-     * @return 
-     */
-    public Element getElement() {
-        return this.element;
-    }
+	/**
+	 * get the dom element.
+	 * <p/>
+	 * 
+	 * @return 
+	 */
+	public Element getElement() {
+		return this.element;
+	}
 
-    /**
-     * get the URI.
-     * <p/>
-     * 
-     * @return 
-     */
-    public String getURI() {
-        return this.element.getAttribute("URI");
-    }
+	/**
+	 * get the URI.
+	 * <p/>
+	 * 
+	 * @return 
+	 */
+	public String getValueType() {
+		return this.element.getAttribute("ValueType");
+	}
 
-    /**
-     * set the URI.
-     * <p/>
-     * 
-     * @param uri 
-     */
-    public void setURI(String uri) {
-        this.element.setAttribute("URI", uri);
-    }
+	/**
+	 * get the URI.
+	 * <p/>
+	 * 
+	 * @return 
+	 */
+	public String getURI() {
+		return this.element.getAttribute("URI");
+	}
 
-    /**
-     * return the string representation.
-     * <p/>
-     * 
-     * @return 
-     */
-    public String toString() {
-        return DOM2Writer.nodeToString((Node) this.element);
-    }
+	/**
+	 * set the Value type.
+	 * <p/>
+	 * 
+	 * @param valueType
+	 */
+	public void setValueType(String valueType) {
+		this.element.setAttribute("ValueType", valueType);
+	}
+
+	/**
+	 * set the URI.
+	 * <p/>
+	 * 
+	 * @param uri 
+	 */
+	public void setURI(String uri) {
+		this.element.setAttribute("URI", uri);
+	}
+
+	/**
+	 * return the string representation.
+	 * <p/>
+	 * 
+	 * @return 
+	 */
+	public String toString() {
+		return DOM2Writer.nodeToString((Node) this.element);
+	}
 }

@@ -90,6 +90,8 @@ public class WSConstants {
     public static final String SAML_NS = "urn:oasis:names:tc:SAML:1.0:assertion";
     public static final String SAMLP_NS = "urn:oasis:names:tc:SAML:1.0:protocol";
     public static final String ASSERTION_LN = "Assertion";
+    public static final String WSS_SAML_NS = "http://docs.oasis-open.org/wss/2004/XX/oasis-2004XX-wss-saml-token-profile-1.0#";
+    public static final String WSS_SAML_ASSERTION =	"SAMLAssertion-1.1";
     
 	//
 	// SOAP-ENV Namespaces
@@ -291,7 +293,15 @@ public class WSConstants {
 	public static final int UT = 0x1; // perform UsernameToken only
 	public static final int SIGN = 0x2; // Perform Signature
 	public static final int ENCR = 0x4; // Perform Encryption
-    public static final int ST = 0x8; // perform SAMLToken only
+	
+	/*
+	 * Attention: the signed/Unsigned types identify if WSS4J uses
+	 * the SAML token for signature, signature key or not. It does
+	 * not mean if the token contains an enveloped signature.
+	 */
+    public static final int ST_UNSIGNED = 0x8; // perform SAMLToken unsigned
+    public static final int ST_SIGNED = 0x10; // perform SAMLToken signed
+    
 
 	public static final int NO_SERIALIZE = 0x100;
 	public static final int SERIALIZE = 0x200;

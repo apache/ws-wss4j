@@ -19,7 +19,7 @@ package org.apache.ws.security;
 
 /**
  * WSDocInfo holds information about the document to process. Together
- * with the WSDocInfoStore it provides a method to store access document
+ * with the WSDocInfoStore it provides a method to store and access document
  * information about BinarySecurityToken, used Crypto, and others.
  * </p>
  * Using the Document's hash a caller can identify a document and get
@@ -41,6 +41,7 @@ public class WSDocInfo {
 	int hash;
 	Crypto crypto = null;
 	Vector bst = null;
+	Element assertion = null;
 
 	public WSDocInfo(int hash) {
 		this.hash = hash;
@@ -52,6 +53,7 @@ public class WSDocInfo {
 	 */
 	public void clear() {
 		crypto = null;
+		assertion = null;
 		if (bst != null && bst.size() > 0) {
 			bst.removeAllElements();
 		}
@@ -112,4 +114,16 @@ public class WSDocInfo {
 		this.crypto = crypto;
 	}
 
+    /**
+     * @return Returns the assertion.
+     */
+    public Element getAssertion() {
+        return assertion;
+    }
+    /**
+     * @param assertion The assertion to set.
+     */
+    public void setAssertion(Element assertion) {
+        this.assertion = assertion;
+    }
 }

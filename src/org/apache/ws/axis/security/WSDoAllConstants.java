@@ -63,7 +63,8 @@ public class WSDoAllConstants {
     /**
      * Perform a SAML Token identification only. 
      */
-    public static final String SAML_TOKEN = "SAMLToken";
+	public static final String SAML_TOKEN_UNSIGNED = "SAMLTokenUnsigned";
+	public static final String SAML_TOKEN_SIGNED = "SAMLTokenSigned";
 
 	/**
 	 * Perform a Signature only. 
@@ -615,6 +616,8 @@ public class WSDoAllConstants {
 	 * <code>Content</code> mode
 	 */
 	public static final String ENCRYPTION_PARTS = "encryptionParts";
+	
+	public static final String SAML_PROP_FILE = "samlPropFile";
 
 	/**
 	 * Define the parameter values to set the key identifier types. These are:

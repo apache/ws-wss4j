@@ -34,6 +34,8 @@ import org.apache.xml.security.exceptions.Base64DecodingException;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.transforms.Transform;
 import org.apache.xml.security.keys.KeyInfo;
+import org.apache.xml.security.keys.content.x509.XMLX509Certificate;
+import org.apache.xml.security.keys.content.X509Data;
 import org.apache.xml.security.signature.XMLSignature;
 import org.apache.xml.security.signature.XMLSignatureException;
 import org.apache.xml.security.utils.Base64;
@@ -46,6 +48,9 @@ import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
 import org.opensaml.SAMLAssertion;
 import org.opensaml.SAMLException;
+import org.opensaml.SAMLSubjectStatement;
+import org.opensaml.SAMLSubject;
+import org.opensaml.SAMLObject;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -66,6 +71,7 @@ import java.security.cert.X509Certificate;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.Vector;
+import java.util.Iterator;
 
 /**
  * WS-Security Engine.
@@ -364,8 +370,9 @@ public class WSSecurityEngine {
                    log.debug("Found SAML Assertion element");
                }
                handleSAMLToken((Element) elem);
+               wsDocInfo.setAssertion((Element) elem);
                returnResults.add(0,
-                       new WSSecurityEngineResult(null, WSConstants.ST, null));
+                       new WSSecurityEngineResult(null, WSConstants.ST_UNSIGNED, null));
 			} else if (el.equals(TIMESTAMP)) {
 				if (doDebug) {
 					log.debug("Found Timestamp list element");
@@ -477,13 +484,28 @@ public class WSSecurityEngine {
     		}
     		SecurityTokenReference secRef =
     			new SecurityTokenReference((Element) node);
+
+			int docHash = elem.getOwnerDocument().hashCode();
+			if (doDebug) {
+				log.debug("XML Verify doc: " + docHash);
+			}
+			
+			/*
+			 * Her we get some information about the document that is being processed,
+			 * in partucular the crypto implementation, and already detected BST that
+			 * may be used later during dereferencing. 
+			 */
+			WSDocInfo wsDocInfo = WSDocInfoStore.lookup(docHash);
+    		
     		if (secRef.containsReference()) {
-    			Element token = secRef.getTokenElement(elem.getOwnerDocument());
+    			Element token = secRef.getTokenElement(elem.getOwnerDocument(), wsDocInfo);
     
     			// at this point ... check token type: Binary
     			QName el = new QName(token.getNamespaceURI(), token.getLocalName());
     			if (el.equals(BINARY_TOKEN)) {
     				certs = getCertificatesTokenReference((Element) token, crypto);
+    			}else if (el.equals(SAML_TOKEN)) {
+    			    certs = getCertificatesFromSAML((Element) token, crypto);
     			} else {
     				throw new WSSecurityException(
     					WSSecurityException.INVALID_SECURITY,
@@ -540,7 +562,7 @@ public class WSSecurityEngine {
 	}
     
     /**
-     * Extracts the certificate(s) from the token reference.
+     * Extracts the certificate(s) from the Binary Security token reference.
      * <p/>
      * 
      * @param elem		The element containing the binary security token. This
@@ -566,6 +588,85 @@ public class WSSecurityEngine {
         }
     }
     
+    /**
+     * Extracts the certificate(s) from the SAML token reference.
+     * <p/>
+     * 
+     * @param elem		The element containing the SAML token. 
+     * @return 			an array of X509 certificates
+     * @throws 			WSSecurityException
+     */
+	protected X509Certificate[] getCertificatesFromSAML (
+			Element elem,
+			Crypto crypto)
+			throws WSSecurityException {
+	    
+        /*
+         * Get some information about the SAML token content. This controls how
+         * to deal with the whole stuff. First get the Authentication statement
+         * (includes Subject), then get the _first_ confirmation method only.
+         */
+	    SAMLAssertion assertion;
+        try {
+            assertion = new SAMLAssertion(elem);
+        }
+        catch (SAMLException e) {
+            throw new WSSecurityException(WSSecurityException.FAILURE,
+                    "invalidSAMLToken", new Object[] { "for Signature (cannot parse)"});
+        }
+        SAMLSubjectStatement samlSubjS = null;
+        Iterator it = assertion.getStatements();
+        while (it.hasNext()) {
+            SAMLObject so = (SAMLObject) it.next();
+            if (so instanceof SAMLSubjectStatement) {
+                samlSubjS = (SAMLSubjectStatement) so;
+                break;
+            }
+        }
+        SAMLSubject samlSubj = null;
+        if (samlSubjS != null) {
+            samlSubj = samlSubjS.getSubject();
+        }
+        if (samlSubj == null) {
+            throw new WSSecurityException(WSSecurityException.FAILURE,
+                    "invalidSAMLToken", new Object[] { "for Signature (no Subject)"});
+        }
+
+//        String confirmMethod = null;
+//        it = samlSubj.getConfirmationMethods();
+//        if (it.hasNext()) {
+//            confirmMethod = (String) it.next();
+//        }
+//        boolean senderVouches = false;
+//        if (SAMLSubject.CONF_SENDER_VOUCHES.equals(confirmMethod)) {
+//            senderVouches = true;
+//        }
+        Element e = samlSubj.getKeyInfo();
+        X509Certificate[] certs = null;
+        try {
+            KeyInfo ki = new KeyInfo(e, null);
+
+            if (ki.containsX509Data()) {
+                X509Data data = ki.itemX509Data(0);
+                XMLX509Certificate certElem = null;
+                if (data != null && data.containsCertificate()) {
+                    certElem = data.itemCertificate(0);
+                }
+                if (certElem != null) {
+                    X509Certificate cert = certElem.getX509Certificate();
+                    certs = new X509Certificate[1];
+                    certs[0] = cert;
+                }
+            }
+            // TODO: get alias name for cert, check against username set by caller
+        }
+        catch (XMLSecurityException e3) {
+            throw new WSSecurityException(WSSecurityException.FAILURE,
+                    "invalidSAMLsecurity",
+                    new Object[] { "cannot get certificate (key holder)"});
+        }
+        return certs;
+	}
     /**
      * Checks the <code>element</code> and creates appropriate binary security object.
      * 
@@ -774,7 +875,7 @@ public class WSSecurityEngine {
     				log.debug("KeyIdentifier Alias: " + alias);
                 }
     		} else if (secRef.containsReference()) {
-    			Element bstElement = secRef.getTokenElement(doc);
+    			Element bstElement = secRef.getTokenElement(doc, null);
     
     			// at this point ... check token type: Binary
     			QName el =

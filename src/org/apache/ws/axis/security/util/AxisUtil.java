@@ -133,9 +133,12 @@ public class AxisUtil {
 			} else if (single[i].equals(WSDoAllConstants.ENCRYPT)) {
 				doAction |= WSConstants.ENCR;
 				actions.add(new Integer(WSConstants.ENCR));
-            } else if (single[i].equals(WSDoAllConstants.SAML_TOKEN)) {
-                doAction |= WSConstants.ST;
-                actions.add(new Integer(WSConstants.ST));
+            } else if (single[i].equals(WSDoAllConstants.SAML_TOKEN_UNSIGNED)) {
+                doAction |= WSConstants.ST_UNSIGNED;
+                actions.add(new Integer(WSConstants.ST_UNSIGNED));
+            } else if (single[i].equals(WSDoAllConstants.SAML_TOKEN_SIGNED)) {
+                doAction |= WSConstants.ST_SIGNED;
+                actions.add(new Integer(WSConstants.ST_SIGNED));
 			} else if (single[i].equals(WSDoAllConstants.NO_SERIALIZATION)) {
 				doAction |= WSConstants.NO_SERIALIZE;
 				actions.add(new Integer(WSConstants.NO_SERIALIZE));

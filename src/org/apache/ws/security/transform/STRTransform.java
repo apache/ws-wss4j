@@ -241,7 +241,7 @@ public class STRTransform extends TransformSpi {
 			}
 
 			/*
-			 * This is a HACK - we need to know how to augment the
+			 * This is a *HACK* - we need to know how to augment the
 			 * above called c14n to leave the xmlns="" in.
 			 * Thus - insert with string buffer operations. Be careful
 			 * to insert as first namespace attribute or before any
@@ -251,11 +251,16 @@ public class STRTransform extends TransformSpi {
 			 */
 			StringBuffer bf = new StringBuffer(bos.toString());			
 			int idx = bf.indexOf("BinarySecurityToken");
+			if (idx < 0) 
+			    idx = bf.indexOf("Assertion");
 			int idx1 = bf.indexOf("xmlns", idx);		// look up for a namespace attr
 			if (idx1 < 0) {								// none found, locate first attr
 				idx1 = bf.indexOf("ValueType", idx);
+				if (idx1 < 0)
+				    idx1 = bf.indexOf("AssertionID", idx);
 			}
-			bf.insert(idx1, "xmlns=\"\" ");				// insert first
+			if (idx1 >= 0)
+				bf.insert(idx1, "xmlns=\"\" ");				// insert first
 			if (doDebug) {
 				log.debug("last result: ");
 				log.debug(bf.toString());
@@ -309,7 +314,7 @@ public class STRTransform extends TransformSpi {
 			if (doDebug) {
 				log.debug("STR: Reference");
 			}
-			tokElement = secRef.getTokenElement(doc);
+			tokElement = secRef.getTokenElement(doc, wsDocInfo);
 			if (tokElement == null) {
 				throw new CanonicalizationException("empty");
 			}
