@@ -893,15 +893,19 @@ public class WSSecurityEngine {
         return;
     }
 
-    public void handleEncryptedKey(Element xencEncryptedKey, CallbackHandler cb, Crypto crypto) throws WSSecurityException {
-        handleEncryptedKey(xencEncryptedKey, cb, crypto, null);
-    }
+    public void handleEncryptedKey(Element xencEncryptedKey,
+			CallbackHandler cb, Crypto crypto) throws WSSecurityException {
+		handleEncryptedKey(xencEncryptedKey, cb, crypto, null);
+	}
 
-    public void handleEncryptedKey(Element xencEncryptedKey, PrivateKey privatekey) throws WSSecurityException {
-        handleEncryptedKey(xencEncryptedKey, null, null, privatekey);
-    }
+	public void handleEncryptedKey(Element xencEncryptedKey,
+			PrivateKey privatekey) throws WSSecurityException {
+		handleEncryptedKey(xencEncryptedKey, null, null, privatekey);
+	}
 
-    public void handleEncryptedKey(Element xencEncryptedKey, CallbackHandler cb, Crypto crypto, PrivateKey privateKey) throws WSSecurityException {
+    public void handleEncryptedKey(Element xencEncryptedKey,
+			CallbackHandler cb, Crypto crypto, PrivateKey privateKey)
+			throws WSSecurityException {
         long t0 = 0, t1 = 0, t2 = 0;
         if (tlog.isDebugEnabled()) {
             t0 = System.currentTimeMillis();
@@ -967,8 +971,9 @@ public class WSSecurityEngine {
                 }
                 SecurityTokenReference secRef = new SecurityTokenReference(wssConfig, secRefToken);
                 /*
-                * Well, at this point there are several ways to get the key. Try to handle all of them :-).
-                */
+				 * Well, at this point there are several ways to get the key.
+				 * Try to handle all of them :-).
+				 */
                 alias = null;
                 /*
                 * handle X509IssuerSerial here. First check if all elements are available,
@@ -1047,10 +1052,6 @@ public class WSSecurityEngine {
                                 null);
                     }
                 } else if (secRef.containsKeyName()) {
-                    // alias = secRef.getX509IssuerSerialAlias(crypto);
-                    //alias = secRef.getKeyNameValue();
-
-                    // System.out.println("alias=" + alias);
                     alias = crypto.getAliasForX509Cert(secRef.getKeyNameValue());
                     if (doDebug) {
                         log.debug("KeyName alias: " + alias);
