@@ -51,7 +51,7 @@ public class UsernameToken {
     private static Log log = LogFactory.getLog(UsernameToken.class.getName());
 
     public QName token;
-	public static final String PASSWORD_TYPE = "passwordType";
+    public static final String PASSWORD_TYPE = "passwordType";
 
     protected Element element = null;
     protected Element elementUsername = null;
@@ -162,54 +162,54 @@ public class UsernameToken {
         }
      }
 
-	/**
-	 * Creates and adds a Nonce element to this UsernameToken
-	 */
-	public void addNonce(Document doc) {
-		if (elementNonce != null) {
-			return;
-		}
-		byte[] nonceValue = new byte[16];
-		random.nextBytes(nonceValue);
-		this.elementNonce = doc.createElementNS(wssConfig.getWsseNS(), "wsse:" + WSConstants.NONCE_LN);
-		WSSecurityUtil.setNamespace(this.elementNonce, wssConfig.getWsseNS(), WSConstants.WSSE_PREFIX);
-		this.elementNonce.appendChild(doc.createTextNode(Base64.encode(nonceValue)));
-		element.appendChild(elementNonce);
-	}
-	
-	/**
-	 * Creates and adds a Created element to this UsernameToken
-	 */
-	public void addCreated(Document doc) {
-		if (elementCreated != null) {
-			return;
-		}
-		SimpleDateFormat zulu = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-		zulu.setTimeZone(TimeZone.getTimeZone("GMT"));
-		Calendar rightNow = Calendar.getInstance();
-		this.elementCreated = doc.createElementNS(wssConfig.getWsuNS(), "wsu:" + WSConstants.CREATED_LN);
-		WSSecurityUtil.setNamespace(this.elementCreated, wssConfig.getWsuNS(), WSConstants.WSU_PREFIX);
-		this.elementCreated.appendChild(doc.createTextNode(zulu.format(rightNow.getTime())));
-		element.appendChild(elementCreated);
-	}
-	
+    /**
+     * Creates and adds a Nonce element to this UsernameToken
+     */
+    public void addNonce(Document doc) {
+        if (elementNonce != null) {
+            return;
+        }
+        byte[] nonceValue = new byte[16];
+        random.nextBytes(nonceValue);
+        this.elementNonce = doc.createElementNS(wssConfig.getWsseNS(), "wsse:" + WSConstants.NONCE_LN);
+        WSSecurityUtil.setNamespace(this.elementNonce, wssConfig.getWsseNS(), WSConstants.WSSE_PREFIX);
+        this.elementNonce.appendChild(doc.createTextNode(Base64.encode(nonceValue)));
+        element.appendChild(elementNonce);
+    }
+    
+    /**
+     * Creates and adds a Created element to this UsernameToken
+     */
+    public void addCreated(Document doc) {
+        if (elementCreated != null) {
+            return;
+        }
+        SimpleDateFormat zulu = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+        zulu.setTimeZone(TimeZone.getTimeZone("GMT"));
+        Calendar rightNow = Calendar.getInstance();
+        this.elementCreated = doc.createElementNS(wssConfig.getWsuNS(), "wsu:" + WSConstants.CREATED_LN);
+        WSSecurityUtil.setNamespace(this.elementCreated, wssConfig.getWsuNS(), WSConstants.WSU_PREFIX);
+        this.elementCreated.appendChild(doc.createTextNode(zulu.format(rightNow.getTime())));
+        element.appendChild(elementCreated);
+    }
+    
     /**
      * Get the user name.
      * 
      * @return the data from the user name element.
      */
     public String getName() {
-		if (this.elementUsername != null) {
-        	return getFirstNode(this.elementUsername).getData();
-		}
-		return null;
+        if (this.elementUsername != null) {
+            return getFirstNode(this.elementUsername).getData();
+        }
+        return null;
     }
 
     /**
      * Set the user name.
      * 
-     * @param name	sets a text node containing the use name into
-     * 				the user name element.
+     * @param name    sets a text node containing the use name into
+     *                 the user name element.
      */
     public void setName(String name) {
         Text node = getFirstNode(this.elementUsername);
@@ -222,18 +222,18 @@ public class UsernameToken {
      * @return the data from the nonce element.
      */
     public String getNonce() {
-    	if (this.elementNonce != null) {
-	        return getFirstNode(this.elementNonce).getData();
-		}
-		return null;
-	}
+        if (this.elementNonce != null) {
+            return getFirstNode(this.elementNonce).getData();
+        }
+        return null;
+    }
 
     /**
      * Set the nonce.
      * <p/>
      * 
      * @param nonce sets a text node containing the nonce data into
-     * 				the nonce element.
+     *                 the nonce element.
      */
     public void setNonce(String nonce) {
         Text node = getFirstNode(this.elementNonce);
@@ -246,17 +246,17 @@ public class UsernameToken {
      * @return the data from the created time element.
      */
     public String getCreated() {
-		if (this.elementCreated != null) {
-			return getFirstNode(this.elementCreated).getData();
-		}
-		return null;
+        if (this.elementCreated != null) {
+            return getFirstNode(this.elementCreated).getData();
+        }
+        return null;
     }
 
     /**
      * Set the created timestamp.
      * 
-     * @param created 	sets a text node containing the created time data into
-     * 					the created time element.
+     * @param created     sets a text node containing the created time data into
+     *                     the created time element.
      */
     public void setCreated(String created) {
         Text node = getFirstNode(this.elementCreated);
@@ -278,14 +278,14 @@ public class UsernameToken {
         return node.getData();
     }
 
-	/**
-	 * Get the hashed inidicator.
-	 * If the indicator is <code>true> the password of the 
-	 * <code>UsernameToken</code> was encoded using 
-	 * {@link WSConstants#PASSWORD_DIGEST}
-	 * 
-	 * @return the hashed indicator.
-	 */
+    /**
+     * Get the hashed inidicator.
+     * If the indicator is <code>true> the password of the 
+     * <code>UsernameToken</code> was encoded using 
+     * {@link WSConstants#PASSWORD_DIGEST}
+     * 
+     * @return the hashed indicator.
+     */
     public boolean isHashed() {
         return hashed;
     }
@@ -368,8 +368,8 @@ public class UsernameToken {
      * Returns the first text node of an element.
      * 
      * @param e the element to get the node from
-     * @return	the first text node or <code>null</code> if node
-     * 			is null or is not a text node
+     * @return    the first text node or <code>null</code> if node
+     *             is null or is not a text node
      */
     private Text getFirstNode(Element e) {
         Node node = e.getFirstChild();
@@ -397,8 +397,8 @@ public class UsernameToken {
     /**
      * Gets the id.
      * 
-     * @return 	the value of the <code>wsu:Id</code> attribute of this
-     * 			username token 
+     * @return     the value of the <code>wsu:Id</code> attribute of this
+     *             username token 
      */
     public String getID() {
         if (wssConfig.getProcessNonCompliantMessages()) {
@@ -411,8 +411,8 @@ public class UsernameToken {
     /**
      * Set the id of this username token.
      * 
-     * @param	id the value for the <code>wsu:Id</code> attribute of this
-     * 			username token
+     * @param    id the value for the <code>wsu:Id</code> attribute of this
+     *             username token
      */
     public void setID(String id) {
         String prefix = WSSecurityUtil.setNamespace(this.element, wssConfig.getWsuNS(), WSConstants.WSU_PREFIX);
@@ -424,8 +424,8 @@ public class UsernameToken {
      * This function is not yet used because the WS Security specifications do not
      * require such trust keys.
      * 
-     * @return	a secret key constructed from information conatined in
-     * 			this username token
+     * @return    a secret key constructed from information conatined in
+     *             this username token
      */
     public byte[] getSecretKey() {
         byte[] key = null;

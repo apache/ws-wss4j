@@ -40,7 +40,7 @@ public interface Crypto {
      * 
      * @param in The <code>InputStream</code> array containg the X509 data
      * @throws WSSecurityException
-     * @return	An X509 certificate
+     * @return    An X509 certificate
      */
     X509Certificate loadCertificate(InputStream in) throws WSSecurityException;
 
@@ -52,7 +52,7 @@ public interface Crypto {
      * @param reverse If set the first certificate in input data will
      *                the last in the array
      * @throws WSSecurityException
-     * @return		An array of X509 certificates, ordered according to
+     * @return        An array of X509 certificates, ordered according to
      * the reverse flag
      */
     X509Certificate[] getX509Certificates(byte[] data, boolean reverse) throws WSSecurityException;
@@ -66,7 +66,7 @@ public interface Crypto {
      * @param certs   The certificates to convert
 
      * @throws WSSecurityException
-     * @return		The byte array for the certficates ordered according
+     * @return        The byte array for the certficates ordered according
      * to the reverse flag
      */
     byte[] getCertificateData(boolean reverse, X509Certificate[] certs) throws WSSecurityException;
@@ -78,7 +78,7 @@ public interface Crypto {
      * @param alias    The alias (<code>KeyStore</code>) of the key owner
      * @param password The password needed to access the private key
      * @throws Exception 
-     * @return		The private key
+     * @return        The private key
      */
     public PrivateKey getPrivateKey(String alias, String password) throws Exception;
 
@@ -165,14 +165,14 @@ public interface Crypto {
      */
     public String getDefaultX509Alias();
     
-	/**
-	 * Reads the SubjectKeyIdentifier information from the certificate. 
-	 * <p/> 
-	 * 
-	 * @param cert       The certificate to read SKI
-	 * @return 			 The byte array conating the binary SKI data
-	 */
-	public byte[] getSKIBytesFromCert(X509Certificate cert)	throws WSSecurityException;
+    /**
+     * Reads the SubjectKeyIdentifier information from the certificate. 
+     * <p/> 
+     * 
+     * @param cert       The certificate to read SKI
+     * @return              The byte array conating the binary SKI data
+     */
+    public byte[] getSKIBytesFromCert(X509Certificate cert)    throws WSSecurityException;
 
     /**
      * Gets the Keystore that was loaded by the underlying implementation
@@ -189,23 +189,23 @@ public interface Crypto {
      */
     public CertificateFactory getCertificateFactory() throws WSSecurityException;
 
-	/**
-	 * Uses the CertPath API to validate a given certificate chain
-	 * <p/>
-	 * 
-	 * @param certs      Certificate chain to validate
-	 * @return           true if the certificate chain is valid, false otherwise
-	 * @throws WSSecurityException
-	 */
-	public boolean validateCertPath(X509Certificate[] certs) throws WSSecurityException;
+    /**
+     * Uses the CertPath API to validate a given certificate chain
+     * <p/>
+     * 
+     * @param certs      Certificate chain to validate
+     * @return           true if the certificate chain is valid, false otherwise
+     * @throws WSSecurityException
+     */
+    public boolean validateCertPath(X509Certificate[] certs) throws WSSecurityException;
 
-	/**
-	 * Lookup X509 Certificates in the keystore according to a given DN of the subject of the certificate
-	 * <p/>
-	 * 
-	 * @param subjectDN  The DN of subject to look for in the keystore 
-	 * @return 			 Vector with all alias of certificates with the same DN as given in the parameters
-	 * @throws WSSecurityException
-	 */
-	public String[] getAliasesForDN(String subjectDN) throws WSSecurityException;
+    /**
+     * Lookup X509 Certificates in the keystore according to a given DN of the subject of the certificate
+     * <p/>
+     * 
+     * @param subjectDN  The DN of subject to look for in the keystore 
+     * @return              Vector with all alias of certificates with the same DN as given in the parameters
+     * @throws WSSecurityException
+     */
+    public String[] getAliasesForDN(String subjectDN) throws WSSecurityException;
 }

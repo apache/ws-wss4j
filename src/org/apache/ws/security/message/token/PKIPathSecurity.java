@@ -88,9 +88,9 @@ public class PKIPathSecurity extends BinarySecurity {
      */
     public void setX509Certificates(X509Certificate[] certs, boolean reverse, Crypto crypto) throws WSSecurityException {
         if (certs == null) {
-			throw new WSSecurityException(
-				WSSecurityException.FAILURE,
-				"noCert");
+            throw new WSSecurityException(
+                WSSecurityException.FAILURE,
+                "noCert");
         }
         byte[] data = crypto.getCertificateData(reverse, certs);
         setToken(data);

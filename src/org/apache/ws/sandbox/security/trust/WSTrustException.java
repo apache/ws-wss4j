@@ -27,63 +27,63 @@ import java.util.ResourceBundle;
  * Exception class for WS-Trust implementation. 
  */
 public class WSTrustException extends RemoteException{
-	public static final int PASSWORD_DOESNOT_MATCH = 0;
-	private static ResourceBundle resources;
-	
-	static {
-		try {
-			resources = ResourceBundle.getBundle("org.apache.ws.security.trust.errors");
-		} catch (MissingResourceException e) {
-			throw new RuntimeException(e.getMessage());
-		}
-	}
+    public static final int PASSWORD_DOESNOT_MATCH = 0;
+    private static ResourceBundle resources;
+    
+    static {
+        try {
+            resources = ResourceBundle.getBundle("org.apache.ws.security.trust.errors");
+        } catch (MissingResourceException e) {
+            throw new RuntimeException(e.getMessage());
+        }
+    }
 
 
-	/**
-	 * 
-	 */
-	public WSTrustException() {
-		super();
-	
-	}
+    /**
+     * 
+     */
+    public WSTrustException() {
+        super();
+    
+    }
 
-	/**
-	 * @param s
-	 */
-	public WSTrustException(String s) {
-		super(s);
-		
-	}
+    /**
+     * @param s
+     */
+    public WSTrustException(String s) {
+        super(s);
+        
+    }
 
-	/**
-	 * @param s
-	 * @param ex
-	 */
-	public WSTrustException(String s, Throwable ex) {
-		super(s, ex);
-	
-	}
-	/**
-	 * Constructor
-	 * 
-	 * @param errorCode
-	 */
-	public WSTrustException(int errorCode) {
-		super(getMessage(errorCode,null,null));
-		
-	}
-	
-	private static String getMessage(int errorCode, String msgId, Object[] args) {
-		String msg = null;
-		try {
-			msg = resources.getString(String.valueOf(errorCode));
-			if (msgId != null) {
-				return msg += (" (" + MessageFormat.format(resources.getString(msgId), args) + ")");
-			}
-		} catch (MissingResourceException e) {
-			throw new RuntimeException("Undefined '" + msgId + "' resource property");
-		}
-		return msg;
-	}
+    /**
+     * @param s
+     * @param ex
+     */
+    public WSTrustException(String s, Throwable ex) {
+        super(s, ex);
+    
+    }
+    /**
+     * Constructor
+     * 
+     * @param errorCode
+     */
+    public WSTrustException(int errorCode) {
+        super(getMessage(errorCode,null,null));
+        
+    }
+    
+    private static String getMessage(int errorCode, String msgId, Object[] args) {
+        String msg = null;
+        try {
+            msg = resources.getString(String.valueOf(errorCode));
+            if (msgId != null) {
+                return msg += (" (" + MessageFormat.format(resources.getString(msgId), args) + ")");
+            }
+        } catch (MissingResourceException e) {
+            throw new RuntimeException("Undefined '" + msgId + "' resource property");
+        }
+        return msg;
+    }
 
 }

@@ -32,60 +32,60 @@ import org.w3c.dom.Document;
 
 public interface SAMLIssuer {
 
-	/**
-	 * Creates a new <code>SAMLAssertion</code>.
-	 * <p/>
-	 * A complete <code>SAMLAssertion</code> is constructed.
-	 * 
-	 * @param doc      The SOAP enevlope as W3C document
-	 * @param msgContext the Axis message context to get message specific
-	 * 			parameter
-	 * @return SAMLAssertion
-	 */
-	public SAMLAssertion newAssertion();
+    /**
+     * Creates a new <code>SAMLAssertion</code>.
+     * <p/>
+     * A complete <code>SAMLAssertion</code> is constructed.
+     * 
+     * @param doc      The SOAP enevlope as W3C document
+     * @param msgContext the Axis message context to get message specific
+     *             parameter
+     * @return SAMLAssertion
+     */
+    public SAMLAssertion newAssertion();
 
-	/**
-	 * @param axisMsg The axisMsg to set.
-	 */
-	public void setAxisMsg(MessageContext axisMsgCtx);
+    /**
+     * @param axisMsg The axisMsg to set.
+     */
+    public void setAxisMsg(MessageContext axisMsgCtx);
 
-	/**
-	 * @param userCrypto The userCrypto to set.
-	 */
-	public void setUserCrypto(Crypto userCrypto);
+    /**
+     * @param userCrypto The userCrypto to set.
+     */
+    public void setUserCrypto(Crypto userCrypto);
 
-	/**
-	 * @param username The username to set.
-	 */
-	public void setUsername(String username);
+    /**
+     * @param username The username to set.
+     */
+    public void setUsername(String username);
 
-	/**
-	 * @param axisHandler The axisHandler to set.
-	 */
-	public void setAxisHandler(BasicHandler axisHandler);
+    /**
+     * @param axisHandler The axisHandler to set.
+     */
+    public void setAxisHandler(BasicHandler axisHandler);
 
-	/**
-	 * @return Returns the issuerCrypto.
-	 */
-	public Crypto getIssuerCrypto();
+    /**
+     * @return Returns the issuerCrypto.
+     */
+    public Crypto getIssuerCrypto();
 
-	/**
-	 * @return Returns the issuerKeyName.
-	 */
-	public String getIssuerKeyName();
+    /**
+     * @return Returns the issuerKeyName.
+     */
+    public String getIssuerKeyName();
 
-	/**
-	 * @return Returns the issuerKeyPassword.
-	 */
-	public String getIssuerKeyPassword();
+    /**
+     * @return Returns the issuerKeyPassword.
+     */
+    public String getIssuerKeyPassword();
 
-	/**
-	 * @return Returns the senderVouches.
-	 */
-	public boolean isSenderVouches();
+    /**
+     * @return Returns the senderVouches.
+     */
+    public boolean isSenderVouches();
 
-	/**
-	 * @param instanceDoc The instanceDoc to set.
-	 */
-	public void setInstanceDoc(Document instanceDoc);
+    /**
+     * @param instanceDoc The instanceDoc to set.
+     */
+    public void setInstanceDoc(Document instanceDoc);
 }

@@ -51,175 +51,175 @@ import org.apache.commons.logging.LogFactory;
  * 
  */
 public class STSManager {
-	static Log log = LogFactory.getLog(STSManager.class.getName());
-	//Following worker classes are defined in the server-config.wsdd
-	String issuerClassName = null;
-	String renewerClassName = null;
-	String validatorClassName = null;
-	//To keep the class name of the worker (issuer, renewer or validater)
-	String requestType = "";
-	String tokenType = "";
-	Hashtable hashOps;
+    static Log log = LogFactory.getLog(STSManager.class.getName());
+    //Following worker classes are defined in the server-config.wsdd
+    String issuerClassName = null;
+    String renewerClassName = null;
+    String validatorClassName = null;
+    //To keep the class name of the worker (issuer, renewer or validater)
+    String requestType = "";
+    String tokenType = "";
+    Hashtable hashOps;
 
 /**
  * 
  * @param hashOps set of parameters coming from STSServerHandler.
  */
-	public STSManager(Hashtable hashOps) {		
-		this.hashOps=hashOps;		
-	}
-	
-	/**
-	 * Handle the request and build the Response Envelope
-	 * 
-	 * 
-	 * 
-	 * Handle the request and build the Response Envelope
-	 * @param req request message envelop as a DOM Document
-	 * @param res response message envelop as a DOM Document
-	 * @return modified response message envelop as a DOM Document 
-	 * Note : 
-	 * (may not need to use since response message envelop is passed as a reference)
-	 */
-	public Document handleRequest(Document req, Document res)
-		throws WSTrustException {
+    public STSManager(Hashtable hashOps) {        
+        this.hashOps=hashOps;        
+    }
+    
+    /**
+     * Handle the request and build the Response Envelope
+     * 
+     * 
+     * 
+     * Handle the request and build the Response Envelope
+     * @param req request message envelop as a DOM Document
+     * @param res response message envelop as a DOM Document
+     * @return modified response message envelop as a DOM Document 
+     * Note : 
+     * (may not need to use since response message envelop is passed as a reference)
+     */
+    public Document handleRequest(Document req, Document res)
+        throws WSTrustException {
 
-		RequestResolver requestResolver = new RequestResolver(req);
+        RequestResolver requestResolver = new RequestResolver(req);
 
-		try {
-			log.debug("STS Manager resolving the request");
-			RequestInfo requestInfo = requestResolver.resolve();			
-			this.requestType = requestInfo.getRequestType();			
-			//this.tokenType = requestInfo.getTokenType();//we may need to have <wsp:Applies> to override the <wst:TokenType>
-			log.debug("STS Manager resolving completed");
-		} catch (WSSecurityException wsEx) {
-			
-			//wsEx.printStackTrace();
-			throw new WSTrustException(
-				"STSManager: cannot resolve the request: ",
-				wsEx);
-		}
-		/********************************************************************
-		 * Issue
-		 */
-		if (this.requestType.equals(TrustConstants.ISSUE_SECURITY_TOKEN)) {
-			//issue	
-			
-			//get the woker class name
-			
-			this.issuerClassName =(String)hashOps.get(TrustConstants.ISSUER_CLASS);
-			log.debug("Issuer class"+this.issuerClassName);
-			
-			//Create the instance of the issue/renew/validate class  
-			Class wClass = null;
-			try {
-				wClass = java.lang.Class.forName(issuerClassName);
-			} catch (ClassNotFoundException e) {
-				throw new WSTrustException(
-					"STSManager: cannot load security token class: ",
-					e);
-			}			
-			STIssuer stissuer = null;
-			try {
-				//Create a new instance of the STIssuer
-				stissuer = (STIssuer) wClass.newInstance();
+        try {
+            log.debug("STS Manager resolving the request");
+            RequestInfo requestInfo = requestResolver.resolve();            
+            this.requestType = requestInfo.getRequestType();            
+            //this.tokenType = requestInfo.getTokenType();//we may need to have <wsp:Applies> to override the <wst:TokenType>
+            log.debug("STS Manager resolving completed");
+        } catch (WSSecurityException wsEx) {
+            
+            //wsEx.printStackTrace();
+            throw new WSTrustException(
+                "STSManager: cannot resolve the request: ",
+                wsEx);
+        }
+        /********************************************************************
+         * Issue
+         */
+        if (this.requestType.equals(TrustConstants.ISSUE_SECURITY_TOKEN)) {
+            //issue    
+            
+            //get the woker class name
+            
+            this.issuerClassName =(String)hashOps.get(TrustConstants.ISSUER_CLASS);
+            log.debug("Issuer class"+this.issuerClassName);
+            
+            //Create the instance of the issue/renew/validate class  
+            Class wClass = null;
+            try {
+                wClass = java.lang.Class.forName(issuerClassName);
+            } catch (ClassNotFoundException e) {
+                throw new WSTrustException(
+                    "STSManager: cannot load security token class: ",
+                    e);
+            }            
+            STIssuer stissuer = null;
+            try {
+                //Create a new instance of the STIssuer
+                stissuer = (STIssuer) wClass.newInstance();
 
-			} catch (java.lang.Exception e) {
-				throw new WSTrustException(
-					"STSManager: cannot create instance of security token issuer: "
-						+ stissuer,
-					e);
-			}
+            } catch (java.lang.Exception e) {
+                throw new WSTrustException(
+                    "STSManager: cannot create instance of security token issuer: "
+                        + stissuer,
+                    e);
+            }
 
-			try {
-				res = stissuer.issue(req, res);
+            try {
+                res = stissuer.issue(req, res);
 
-			} catch (java.lang.Exception e) {
-				throw new WSTrustException(
-					"STSManager: could not issue a token " + stissuer,
-					e);
-			}
+            } catch (java.lang.Exception e) {
+                throw new WSTrustException(
+                    "STSManager: could not issue a token " + stissuer,
+                    e);
+            }
 
-			/********************************************************************
-			 * Renew
-			 */
-		} else if (	this.requestType.equals(
-			  TrustConstants.RENEW_SECURITY_TOKEN)) { //renew	
-	//					get the woker class name
-			  this.renewerClassName =(String)hashOps.get(TrustConstants.RENEWER_CLASS);
-			  log.debug("renewer  class"+this.renewerClassName);
-			  //Create the instance of the issue/renew/validate class  
-			  Class wClass = null;
-			  try {
-				  wClass = java.lang.Class.forName(renewerClassName);
-			  } catch (ClassNotFoundException e) {
-				  throw new WSTrustException(
-					  "STSManager: cannot load security token class: ",
-					  e);
-			  }				
-			STRenewer stRenewer = null;
-			try {
-				//Create a new instance of the STIssuer
-				stRenewer = (STRenewer) wClass.newInstance();
+            /********************************************************************
+             * Renew
+             */
+        } else if (    this.requestType.equals(
+              TrustConstants.RENEW_SECURITY_TOKEN)) { //renew    
+    //                    get the woker class name
+              this.renewerClassName =(String)hashOps.get(TrustConstants.RENEWER_CLASS);
+              log.debug("renewer  class"+this.renewerClassName);
+              //Create the instance of the issue/renew/validate class  
+              Class wClass = null;
+              try {
+                  wClass = java.lang.Class.forName(renewerClassName);
+              } catch (ClassNotFoundException e) {
+                  throw new WSTrustException(
+                      "STSManager: cannot load security token class: ",
+                      e);
+              }                
+            STRenewer stRenewer = null;
+            try {
+                //Create a new instance of the STIssuer
+                stRenewer = (STRenewer) wClass.newInstance();
 
-			} catch (java.lang.Exception e) {
-				throw new WSTrustException(
-					"STSManager: cannot create instance of security token renewer: "
-						+ stRenewer,
-					e);
-			}
+            } catch (java.lang.Exception e) {
+                throw new WSTrustException(
+                    "STSManager: cannot create instance of security token renewer: "
+                        + stRenewer,
+                    e);
+            }
 
-			try {
-				res = stRenewer.renew(req, res);
+            try {
+                res = stRenewer.renew(req, res);
 
-			} catch (java.lang.Exception e) {
-				throw new WSTrustException(
-					"STSManager: could not renew the token " + stRenewer,
-					e);
-			}
-		/********************************************************************
-		 * validate
-		 */
-		} else if (
-			this.requestType.equals(
-				TrustConstants.VALIDATE_SECURITY_TOKEN)) { //validate	
-//					get the woker class name
-			  this.validatorClassName =(String)hashOps.get(TrustConstants.VALIDATOR_CLASS);
-			  log.debug("validatorClassName "+this.validatorClassName);
-			  //Create the instance of the issue/renew/validate class  
-			  Class wClass = null;
-			  try {
-				  wClass = java.lang.Class.forName(validatorClassName);
-			  } catch (ClassNotFoundException e) {
-				  throw new WSTrustException(
-					  "STSManager: cannot load security token class: ",
-					  e);
-			  }				
-			STValidator stValidator = null;
-			try {
-				//Create a new instance of the STIssuer
-				stValidator = (STValidator) wClass.newInstance();
+            } catch (java.lang.Exception e) {
+                throw new WSTrustException(
+                    "STSManager: could not renew the token " + stRenewer,
+                    e);
+            }
+        /********************************************************************
+         * validate
+         */
+        } else if (
+            this.requestType.equals(
+                TrustConstants.VALIDATE_SECURITY_TOKEN)) { //validate    
+//                    get the woker class name
+              this.validatorClassName =(String)hashOps.get(TrustConstants.VALIDATOR_CLASS);
+              log.debug("validatorClassName "+this.validatorClassName);
+              //Create the instance of the issue/renew/validate class  
+              Class wClass = null;
+              try {
+                  wClass = java.lang.Class.forName(validatorClassName);
+              } catch (ClassNotFoundException e) {
+                  throw new WSTrustException(
+                      "STSManager: cannot load security token class: ",
+                      e);
+              }                
+            STValidator stValidator = null;
+            try {
+                //Create a new instance of the STIssuer
+                stValidator = (STValidator) wClass.newInstance();
 
-			} catch (java.lang.Exception e) {
-				throw new WSTrustException(
-					"STSManager: cannot create instance of security token validator: "
-						+ stValidator,
-					e);
-			}
-			try {
+            } catch (java.lang.Exception e) {
+                throw new WSTrustException(
+                    "STSManager: cannot create instance of security token validator: "
+                        + stValidator,
+                    e);
+            }
+            try {
 
-				res = stValidator.validate(req, res);
+                res = stValidator.validate(req, res);
 
-			} catch (java.lang.Exception e) {
-				throw new WSTrustException(
-					"STSManager: could not validate the token " + stValidator,
-					e);
-			}
-		} else {
-			throw new WSTrustException("STSManager: Cannot Identify the Request Type ");
+            } catch (java.lang.Exception e) {
+                throw new WSTrustException(
+                    "STSManager: could not validate the token " + stValidator,
+                    e);
+            }
+        } else {
+            throw new WSTrustException("STSManager: Cannot Identify the Request Type ");
 
-		}		
-		return res;
-	}
+        }        
+        return res;
+    }
 
 }

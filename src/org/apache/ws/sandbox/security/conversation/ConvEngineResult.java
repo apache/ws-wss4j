@@ -21,19 +21,19 @@ package org.apache.ws.security.conversation;
  *
  */
 public class ConvEngineResult {
-	public static final int SECURITY_TOKEN_RESPONSE = 1;
-	public static final int SIGN_DERIVED_KEY = 2;
-	public static final int ENCRYPT_DERIVED_KEY =3;
-	public static final int TRUST_VERIFIED = 4;
-	public static final int SCT = 5;
-	
-	private String uuid=null;
-	byte[] keyAssociated = null;
-	private int Action;
-	
-	public ConvEngineResult(int Act){
+    public static final int SECURITY_TOKEN_RESPONSE = 1;
+    public static final int SIGN_DERIVED_KEY = 2;
+    public static final int ENCRYPT_DERIVED_KEY =3;
+    public static final int TRUST_VERIFIED = 4;
+    public static final int SCT = 5;
+    
+    private String uuid=null;
+    byte[] keyAssociated = null;
+    private int Action;
+    
+    public ConvEngineResult(int Act){
                  this.Action = Act;
-	}
+    }
 
 
     /**

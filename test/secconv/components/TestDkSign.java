@@ -56,10 +56,10 @@ import org.w3c.dom.Element;
  *
  */
 public class TestDkSign extends TestCase {
-	/*TODO:: Fix the bug and remove the dktoken from DkTokenInfo
-	 * Effectng changes : ConversationManger, ConversationClientHandler, ConversationServerHandler.
-	 * 
-	 */
+    /*TODO:: Fix the bug and remove the dktoken from DkTokenInfo
+     * Effectng changes : ConversationManger, ConversationClientHandler, ConversationServerHandler.
+     * 
+     */
 
     private static Log log = LogFactory.getLog(TestDkSign.class);
 
@@ -108,9 +108,9 @@ public class TestDkSign extends TestCase {
      * 
      * @param args command line args
      */
-    //	 public static void main(String[] args) {
-    //		 junit.textui.TestRunner.run(suite());
-    //	 }
+    //     public static void main(String[] args) {
+    //         junit.textui.TestRunner.run(suite());
+    //     }
 
     /**
      * Setup method
@@ -127,7 +127,7 @@ public class TestDkSign extends TestCase {
         dkcbHandler = new DerivedKeyCallbackHandler();
         SecurityContextToken secConTok = this.getSCT();
         uuid = secConTok.getIdentifier();
-		SecurityContextInfo info = new SecurityContextInfo(secConTok,"DumbShredSecret".getBytes(),1);
+        SecurityContextInfo info = new SecurityContextInfo(secConTok,"DumbShredSecret".getBytes(),1);
         dkcbHandler.addSecurtiyContext(uuid, info);
         dkcbHandler.setDerivedKeyLength(uuid, 24);
         dkcbHandler.setLabelForSession(
@@ -135,13 +135,13 @@ public class TestDkSign extends TestCase {
             "WSSecureConversationWSSecureConversation");
         
         //setting up the configurator.
-		config = new HashMap();
-		config.put(ConvHandlerConstants.KEY_FREQ,
-					   new Integer(1));
-					   
-		this.config.put(ConvHandlerConstants.USE_FIXED_KEYLEN, new Boolean(true));
-		this.config.put(ConvHandlerConstants.KEY_LEGNTH, new Long(24));		
-		
+        config = new HashMap();
+        config.put(ConvHandlerConstants.KEY_FREQ,
+                       new Integer(1));
+                       
+        this.config.put(ConvHandlerConstants.USE_FIXED_KEYLEN, new Boolean(true));
+        this.config.put(ConvHandlerConstants.KEY_LEGNTH, new Long(24));        
+        
         
     }
 
@@ -202,15 +202,15 @@ public class TestDkSign extends TestCase {
 
         ConversationManager manager = new ConversationManager();
 
-		DerivedKeyInfo dkInfo =
-					manager.addDerivedKeyToken(doc, uuid, dkcbHandler);
-		
-		
-	
+        DerivedKeyInfo dkInfo =
+                    manager.addDerivedKeyToken(doc, uuid, dkcbHandler);
+        
+        
+    
         String genID = dkInfo.getId();
-		manager.performDK_Sign(doc, dkcbHandler, uuid, dkInfo);
-	
-	    
+        manager.performDK_Sign(doc, dkcbHandler, uuid, dkInfo);
+    
+        
         /*
          * convert the resulting document into a message first. The toSOAPMessage()
          * mehtod performs the necessary c14n call to properly set up the signed
@@ -236,16 +236,16 @@ public class TestDkSign extends TestCase {
     private void verifyDkSign(Document doc)
         throws Exception {
        log.info("Before verifying the derived key signature");
-	   ConversationEngine engine = new ConversationEngine(config);
-	   Vector results = engine.processSecConvHeader(doc, "", dkcbHandler);
-	   ConvEngineResult res = (ConvEngineResult)results.get(0);
-	   if(res.getAction()==ConvEngineResult.SIGN_DERIVED_KEY){
-			log.info("Verifying the derived key signature Done");
-	   }else{
-	       throw new Exception("ConvResult is not set. Something is wrotn");
-	   }
-	   
-	
+       ConversationEngine engine = new ConversationEngine(config);
+       Vector results = engine.processSecConvHeader(doc, "", dkcbHandler);
+       ConvEngineResult res = (ConvEngineResult)results.get(0);
+       if(res.getAction()==ConvEngineResult.SIGN_DERIVED_KEY){
+            log.info("Verifying the derived key signature Done");
+       }else{
+           throw new Exception("ConvResult is not set. Something is wrotn");
+       }
+       
+    
     }
 
     public static void main(String[] args) throws Exception {

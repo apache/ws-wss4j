@@ -147,8 +147,8 @@ public abstract class CryptoFactory {
             properties.load(url.openStream());
         } catch (Exception e) {
             log.debug("Cannot find crypto property file: " + propFilename);
-			throw new RuntimeException("CryptoFactory: Cannot load properties: "+
-				propFilename); 
+            throw new RuntimeException("CryptoFactory: Cannot load properties: "+
+                propFilename); 
         }
         return properties;
     }

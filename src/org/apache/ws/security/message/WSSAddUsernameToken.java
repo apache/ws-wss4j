@@ -78,14 +78,14 @@ public class WSSAddUsernameToken extends WSBaseMessage {
         super(wssConfig, actor, mu);
     }
 
-	/**
-	 * Defines how to construct the password element of the 
-	 * <code>UsernameToken</code>. 
-	 * 
-	 * @param pwType 	contains the password type. Only allowed values are 
-	 * 					{@link WSConstants#PASSWORD_DIGEST} and 
-	 * 					{@link WSConstants#PASSWORD_TEXT}.
-	 */
+    /**
+     * Defines how to construct the password element of the 
+     * <code>UsernameToken</code>. 
+     * 
+     * @param pwType     contains the password type. Only allowed values are 
+     *                     {@link WSConstants#PASSWORD_DIGEST} and 
+     *                     {@link WSConstants#PASSWORD_TEXT}.
+     */
     public void setPasswordType(String pwType) {
         if (pwType == null) {
             passwordType = WSConstants.PASSWORD_DIGEST;
@@ -94,19 +94,19 @@ public class WSSAddUsernameToken extends WSBaseMessage {
         }
     }
 
-	/**
-	 * Creates and adds a Nonce element to the UsernameToken
-	 */
-	public void addNonce(Document doc) {
-		ut.addNonce(doc);
-	}
+    /**
+     * Creates and adds a Nonce element to the UsernameToken
+     */
+    public void addNonce(Document doc) {
+        ut.addNonce(doc);
+    }
 
-	/**
-	 * Creates and adds a Created element to the UsernameToken
-	 */
-	public void addCreated(Document doc) {
-		ut.addCreated(doc);
-	}
+    /**
+     * Creates and adds a Created element to the UsernameToken
+     */
+    public void addCreated(Document doc) {
+        ut.addCreated(doc);
+    }
     /**
      * Adds a new <code>UsernameToken</code> to a soap envelope.
      * <p/>
@@ -120,7 +120,7 @@ public class WSSAddUsernameToken extends WSBaseMessage {
      */
     public Document build(Document doc, String username, String password) { // throws Exception {
         log.debug("Begin add username token...");
-		Element securityHeader = insertSecurityHeader(doc);
+        Element securityHeader = insertSecurityHeader(doc);
         ut = new UsernameToken(wssConfig, doc, passwordType);
         ut.setName(username);
         ut.setPassword(password);

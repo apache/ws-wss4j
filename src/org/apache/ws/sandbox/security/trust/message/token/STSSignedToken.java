@@ -35,8 +35,8 @@ import org.w3c.dom.Element;
  * According to the public key algorithm the signature algorithm is recognized. 
  * There are two such algorithms that are supported here.
  * They are 
-		1.	http://www.w3.org/2000/09/xmldsig#dsa-sha1
-		2.	http://www.w3.org/2000/09/xmldsig#rsa-sha1
+        1.    http://www.w3.org/2000/09/xmldsig#dsa-sha1
+        2.    http://www.w3.org/2000/09/xmldsig#rsa-sha1
  * 
  * If the public key algorithm is not supported then a <code>WSSecurityException</code> is thrown.
  * Else it creates an <code>XMLSignature</code> and signs it using private key of the Security Token Service
@@ -46,8 +46,8 @@ import org.w3c.dom.Element;
 
 
 public class STSSignedToken {
-	
-	private Element element;	
+    
+    private Element element;    
 /**
  * 
  * @param docTobeSigned the document to be signed
@@ -56,51 +56,51 @@ public class STSSignedToken {
  * @param password password of that particular certificate of the keystore
  * @throws WSSecurityException
  */
-	public STSSignedToken(Document docTobeSigned,Crypto crypto,String alias,String password)throws WSSecurityException{
-		
-		X509Certificate[] certs=crypto.getCertificates(alias);
-		
-		String pubKeyAlgo = certs[0].getPublicKey().getAlgorithm();
-		String sigAlgo="";
-		String canonAlgo=Canonicalizer.ALGO_ID_C14N_EXCL_OMIT_COMMENTS;
-		
-	
-		if (pubKeyAlgo.equalsIgnoreCase("DSA")) {
-			sigAlgo = XMLSignature.ALGO_ID_SIGNATURE_DSA;
-		} else if (pubKeyAlgo.equalsIgnoreCase("RSA")) {
-			sigAlgo = XMLSignature.ALGO_ID_SIGNATURE_RSA;
-		} else {
-			throw new WSSecurityException(
-				WSSecurityException.FAILURE,
-				"invalidX509Data",
-				new Object[] { "for Signature - unkown public key Algo" });
-		}
-		
-		XMLSignature sig = null;
-				try {
-					sig = new XMLSignature(docTobeSigned, null, sigAlgo, canonAlgo);
-					sig.addKeyInfo(certs[0]);
-					sig.sign(crypto.getPrivateKey(alias,password));					
-				} catch (XMLSecurityException e) {
-					throw new WSSecurityException(
-						WSSecurityException.FAILED_SIGNATURE,
-						"UserNAmeTokenIssuer:signature over token failed");
-				
-				} catch (Exception e1) {
-					throw new WSSecurityException(
-						WSSecurityException.FAILED_SIGNATURE,
-						"UserNAmeTokenIssuer:signature over token failed. General exception-kau");
-				}
-			
-		this.element=sig.getElement();			
-	}
-	
-	
-	/**
-	 * @return the signature element
-	 */
-	public Element getElement() {
-		return element;
-	}
+    public STSSignedToken(Document docTobeSigned,Crypto crypto,String alias,String password)throws WSSecurityException{
+        
+        X509Certificate[] certs=crypto.getCertificates(alias);
+        
+        String pubKeyAlgo = certs[0].getPublicKey().getAlgorithm();
+        String sigAlgo="";
+        String canonAlgo=Canonicalizer.ALGO_ID_C14N_EXCL_OMIT_COMMENTS;
+        
+    
+        if (pubKeyAlgo.equalsIgnoreCase("DSA")) {
+            sigAlgo = XMLSignature.ALGO_ID_SIGNATURE_DSA;
+        } else if (pubKeyAlgo.equalsIgnoreCase("RSA")) {
+            sigAlgo = XMLSignature.ALGO_ID_SIGNATURE_RSA;
+        } else {
+            throw new WSSecurityException(
+                WSSecurityException.FAILURE,
+                "invalidX509Data",
+                new Object[] { "for Signature - unkown public key Algo" });
+        }
+        
+        XMLSignature sig = null;
+                try {
+                    sig = new XMLSignature(docTobeSigned, null, sigAlgo, canonAlgo);
+                    sig.addKeyInfo(certs[0]);
+                    sig.sign(crypto.getPrivateKey(alias,password));                    
+                } catch (XMLSecurityException e) {
+                    throw new WSSecurityException(
+                        WSSecurityException.FAILED_SIGNATURE,
+                        "UserNAmeTokenIssuer:signature over token failed");
+                
+                } catch (Exception e1) {
+                    throw new WSSecurityException(
+                        WSSecurityException.FAILED_SIGNATURE,
+                        "UserNAmeTokenIssuer:signature over token failed. General exception-kau");
+                }
+            
+        this.element=sig.getElement();            
+    }
+    
+    
+    /**
+     * @return the signature element
+     */
+    public Element getElement() {
+        return element;
+    }
 
 }

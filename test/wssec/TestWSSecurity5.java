@@ -135,37 +135,37 @@ public class TestWSSecurity5 extends TestCase implements CallbackHandler {
          */
 
         Message signedMsg = (Message) AxisUtil.toSOAPMessage(signedDoc);
-		if (log.isDebugEnabled()) {
-			log.debug("Message with UserNameToken PW Digest:");
-			XMLUtils.PrettyElementToWriter(signedMsg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
-		}
+        if (log.isDebugEnabled()) {
+            log.debug("Message with UserNameToken PW Digest:");
+            XMLUtils.PrettyElementToWriter(signedMsg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
+        }
         signedDoc = signedMsg.getSOAPEnvelope().getAsDocument();
         log.info("After adding UsernameToken PW Digest....");
         verify(signedDoc);
     }
 
-	/**
-	 * Test that adds a UserNameToken with password text to a WS-Security envelope
-	 * <p/>
-	 * 
-	 * @throws java.lang.Exception Thrown when there is any problem in signing or verification
-	 */
-	public void testUsernameTokenText() throws Exception {
-		SOAPEnvelope envelope = null;
-		WSSAddUsernameToken builder = new WSSAddUsernameToken();
-		builder.setPasswordType(WSConstants.PASSWORD_TEXT);
-		log.info("Before adding UsernameToken PW Text....");
-		Document doc = unsignedEnvelope.getAsDocument();
-		Document signedDoc = builder.build(doc, "wernerd", "verySecret");
-		Message signedMsg = (Message) AxisUtil.toSOAPMessage(signedDoc);
-		if (log.isDebugEnabled()) {
-			log.debug("Message with UserNameToken PW Text:");
-			XMLUtils.PrettyElementToWriter(signedMsg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
-		}
-		signedDoc = signedMsg.getSOAPEnvelope().getAsDocument();
-		log.info("After adding UsernameToken PW Text....");
-		verify(signedDoc);
-	}
+    /**
+     * Test that adds a UserNameToken with password text to a WS-Security envelope
+     * <p/>
+     * 
+     * @throws java.lang.Exception Thrown when there is any problem in signing or verification
+     */
+    public void testUsernameTokenText() throws Exception {
+        SOAPEnvelope envelope = null;
+        WSSAddUsernameToken builder = new WSSAddUsernameToken();
+        builder.setPasswordType(WSConstants.PASSWORD_TEXT);
+        log.info("Before adding UsernameToken PW Text....");
+        Document doc = unsignedEnvelope.getAsDocument();
+        Document signedDoc = builder.build(doc, "wernerd", "verySecret");
+        Message signedMsg = (Message) AxisUtil.toSOAPMessage(signedDoc);
+        if (log.isDebugEnabled()) {
+            log.debug("Message with UserNameToken PW Text:");
+            XMLUtils.PrettyElementToWriter(signedMsg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
+        }
+        signedDoc = signedMsg.getSOAPEnvelope().getAsDocument();
+        log.info("After adding UsernameToken PW Text....");
+        verify(signedDoc);
+    }
     /**
      * Verifies the soap envelope
      * <p/>

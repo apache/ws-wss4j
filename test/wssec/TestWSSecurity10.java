@@ -107,9 +107,9 @@ public class TestWSSecurity10 extends TestCase implements CallbackHandler {
      * 
      * @param args command line args
      */
-    //	 public static void main(String[] args) {
-    //		 junit.textui.TestRunner.run(suite());
-    //	 }
+    //     public static void main(String[] args) {
+    //         junit.textui.TestRunner.run(suite());
+    //     }
 
     /**
      * Setup method
@@ -212,8 +212,8 @@ public class TestWSSecurity10 extends TestCase implements CallbackHandler {
         Message signedMsg = (Message) AxisUtil.toSOAPMessage(encDoc);
         
         XMLUtils.PrettyElementToWriter(signedMsg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
-		log.info("Encryption Done\n");
-	//	verifyEMBED_SECURITY_TOKEN_REF(signedMsg.getSOAPEnvelope().getAsDocument());
+        log.info("Encryption Done\n");
+    //    verifyEMBED_SECURITY_TOKEN_REF(signedMsg.getSOAPEnvelope().getAsDocument());
     }
 
     /**

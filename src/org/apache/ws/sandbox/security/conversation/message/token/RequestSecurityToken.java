@@ -40,60 +40,60 @@ import org.apache.ws.security.trust.TrustConstants;
 
 public class RequestSecurityToken {
 
-	private static Log log =
-				LogFactory.getLog(RequestSecurityTokenResponse.class.getName());
+    private static Log log =
+                LogFactory.getLog(RequestSecurityTokenResponse.class.getName());
 
-		private Element element = null;
-		
-	public static final QName TOKEN =
-			new QName(
-				TrustConstants.WST_NS,
-				TrustConstants.REQUEST_SECURITY_TOKEN_LN,
-				TrustConstants.WST_PREFIX);
+        private Element element = null;
+        
+    public static final QName TOKEN =
+            new QName(
+                TrustConstants.WST_NS,
+                TrustConstants.REQUEST_SECURITY_TOKEN_LN,
+                TrustConstants.WST_PREFIX);
 
 
   public RequestSecurityToken(Element elem) throws WSSecurityException{
-  	//TODO :: Support only for SCT - for now
-	this.element = elem;
-	QName el =
-		new QName(
-			this.element.getNamespaceURI(),
-			this.element.getLocalName());
-	if (!el.equals(TOKEN)) {
-		throw new WSSecurityException(
-			WSSecurityException.INVALID_SECURITY_TOKEN,
-			"badTokenType00",
-			new Object[] { el });
-	}
+      //TODO :: Support only for SCT - for now
+    this.element = elem;
+    QName el =
+        new QName(
+            this.element.getNamespaceURI(),
+            this.element.getLocalName());
+    if (!el.equals(TOKEN)) {
+        throw new WSSecurityException(
+            WSSecurityException.INVALID_SECURITY_TOKEN,
+            "badTokenType00",
+            new Object[] { el });
+    }
 
   }
 
 
   public Element getElement() {
-	  return element;
+      return element;
   }
   public void setElement(Element element) {
-	  this.element = element;
+      this.element = element;
   }
 
   public String toString() {
-	  return DOM2Writer.nodeToString((Node) this.element);
+      return DOM2Writer.nodeToString((Node) this.element);
   }
   public void addToken(Element childToken) {
-	  this.element.appendChild(childToken);
+      this.element.appendChild(childToken);
   }
 
   public void removeToken(Element childToken) {
-	  this.element.removeChild(childToken);
+      this.element.removeChild(childToken);
   }
 //  
 //  //TODO @context - added by kau
 //   public void setContext(String context){
-//	   this.element.setAttribute("Context", context);
+//       this.element.setAttribute("Context", context);
 //   }
-//	
+//    
 //   public String getContext(){
-//	   return this.element.getAttribute("Context");
+//       return this.element.getAttribute("Context");
 //   }
 
 

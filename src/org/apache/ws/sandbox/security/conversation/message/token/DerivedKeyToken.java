@@ -78,7 +78,7 @@ public class DerivedKeyToken {
    * @param doc THe DOM document
    */
   public DerivedKeyToken(Document doc) {
-  	log.debug("DerivedKeyToken: created");
+      log.debug("DerivedKeyToken: created");
     this.element = doc.createElementNS(ConversationConstants.WSC_NS,
                                        "wsc:" +
                                        ConversationConstants.
@@ -93,7 +93,7 @@ public class DerivedKeyToken {
    * @throws WSSecurityException If the element is not a derived key token
    */
   public DerivedKeyToken(Element elem) throws WSSecurityException {
-	log.debug("DerivedKeyToken: created : element constructor");
+    log.debug("DerivedKeyToken: created : element constructor");
     this.element = elem;
     QName el = new QName(this.element.getNamespaceURI(),
                          this.element.getLocalName());
@@ -373,8 +373,8 @@ public class DerivedKeyToken {
    * Returns the first text node of an element.
    *
    * @param e the element to get the node from
-   * @return	the first text node or <code>null</code> if node
-   * 			is null or is not a text node
+   * @return    the first text node or <code>null</code> if node
+   *             is null or is not a text node
    */
   private Text getFirstNode(Element e) {
     Node node = e.getFirstChild();
@@ -402,8 +402,8 @@ public class DerivedKeyToken {
   /**
    * Gets the id.
    *
-   * @return 	the value of the <code>wsu:Id</code> attribute of this
-   * 			DerivedKeyToken
+   * @return     the value of the <code>wsu:Id</code> attribute of this
+   *             DerivedKeyToken
    */
   public String getID() {
     return this.element.getAttributeNS(WSConstants.WSU_NS, "Id");
@@ -412,8 +412,8 @@ public class DerivedKeyToken {
   /**
    * Set the id of this derived key token.
    *
-   * @param	id the value for the <code>wsu:Id</code> attribute of this
-   * 			DerivgedKeyToken
+   * @param    id the value for the <code>wsu:Id</code> attribute of this
+   *             DerivgedKeyToken
    */
   public void setID(String id) {
     String prefix = WSSecurityUtil.setNamespace(this.element,
@@ -425,8 +425,8 @@ public class DerivedKeyToken {
   /**
    * Gets the derivattion algorithm
    *
-   * @return 	the value of the <code>wsc:Algorithm</code> attribute of this
-   * 			DerivedKeyToken
+   * @return     the value of the <code>wsc:Algorithm</code> attribute of this
+   *             DerivedKeyToken
    */
   public String getAlgorithm() {
     String algo = this.element.getAttributeNS(ConversationConstants.WSC_NS,
@@ -442,8 +442,8 @@ public class DerivedKeyToken {
   /**
    * Set the derivattion algorithm of this derived key token.
    *
-   * @param	derivattion algorithm the value for the <code>wsu:Algorithm</code> attribute of this
-   * 			DerivgedKeyToken
+   * @param    derivattion algorithm the value for the <code>wsu:Algorithm</code> attribute of this
+   *             DerivgedKeyToken
    */
   public void setAlgorithm(String algo) {
     String prefix = WSSecurityUtil.setNamespace(this.element,

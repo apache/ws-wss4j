@@ -68,20 +68,20 @@ public class TestWSSecurity9 extends TestCase implements CallbackHandler {
     MessageContext msgContext;
     Message message;
 
-	private static final byte[] key = {
-		(byte)0x31, (byte)0xfd,
-		(byte)0xcb, (byte)0xda,
-		(byte)0xfb, (byte)0xcd,
-		(byte)0x6b, (byte)0xa8,
-		(byte)0xe6, (byte)0x19,
-		(byte)0xa7, (byte)0xbf,
-		(byte)0x51, (byte)0xf7,
-		(byte)0xc7, (byte)0x3e,
-		(byte)0x80, (byte)0xae,
-		(byte)0x98, (byte)0x51,
-		(byte)0xc8, (byte)0x51,
-		(byte)0x34, (byte)0x04,
-	};
+    private static final byte[] key = {
+        (byte)0x31, (byte)0xfd,
+        (byte)0xcb, (byte)0xda,
+        (byte)0xfb, (byte)0xcd,
+        (byte)0x6b, (byte)0xa8,
+        (byte)0xe6, (byte)0x19,
+        (byte)0xa7, (byte)0xbf,
+        (byte)0x51, (byte)0xf7,
+        (byte)0xc7, (byte)0x3e,
+        (byte)0x80, (byte)0xae,
+        (byte)0x98, (byte)0x51,
+        (byte)0xc8, (byte)0x51,
+        (byte)0x34, (byte)0x04,
+    };
 
 
     /**
@@ -155,13 +155,13 @@ public class TestWSSecurity9 extends TestCase implements CallbackHandler {
         WSSignEnvelope sign = new WSSignEnvelope();
         
         encrypt.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e");
-		encrypt.setKeyIdentifierType(WSConstants.EMBEDDED_KEYNAME);
-		encrypt.setKey(key);
+        encrypt.setKeyIdentifierType(WSConstants.EMBEDDED_KEYNAME);
+        encrypt.setKey(key);
 
         sign.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         log.info("Before Encryption....");
         Document doc = unsignedEnvelope.getAsDocument();
-		Document signedDoc = sign.build(doc, crypto);
+        Document signedDoc = sign.build(doc, crypto);
         Document encryptedSignedDoc = encrypt.build(signedDoc, crypto);
         /*
          * convert the resulting document into a message first. The toSOAPMessage()
@@ -170,15 +170,15 @@ public class TestWSSecurity9 extends TestCase implements CallbackHandler {
          * as a document again for further processing.
          */
 
-		Message encryptedMsg = (Message) AxisUtil.toSOAPMessage(encryptedSignedDoc);
-		if (log.isDebugEnabled()) {
-			log.debug("Encrypted message, RSA-OAEP keytransport, 3DES:");
-			XMLUtils.PrettyElementToWriter(encryptedMsg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
-		}
-		String s = encryptedMsg.getSOAPPartAsString();
-		((SOAPPart)message.getSOAPPart()).setCurrentMessage(s, SOAPPart.FORM_STRING);
-		        
-		Document encryptedSignedDoc1 = message.getSOAPEnvelope().getAsDocument();
+        Message encryptedMsg = (Message) AxisUtil.toSOAPMessage(encryptedSignedDoc);
+        if (log.isDebugEnabled()) {
+            log.debug("Encrypted message, RSA-OAEP keytransport, 3DES:");
+            XMLUtils.PrettyElementToWriter(encryptedMsg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
+        }
+        String s = encryptedMsg.getSOAPPartAsString();
+        ((SOAPPart)message.getSOAPPart()).setCurrentMessage(s, SOAPPart.FORM_STRING);
+                
+        Document encryptedSignedDoc1 = message.getSOAPEnvelope().getAsDocument();
         log.info("After Encryption....");
         verify(encryptedSignedDoc1);
     }
@@ -195,31 +195,31 @@ public class TestWSSecurity9 extends TestCase implements CallbackHandler {
         AxisUtil.updateSOAPMessage(doc, message);
     }
     
-	/* (non-Javadoc)
-	 * @see javax.security.auth.callback.CallbackHandler#handle(javax.security.auth.callback.Callback[])
-	 */
-	public void handle(Callback[] callbacks)
-		throws IOException, UnsupportedCallbackException {
-		for (int i = 0; i < callbacks.length; i++) {
-			if (callbacks[i] instanceof WSPasswordCallback) {
-				WSPasswordCallback pc = (WSPasswordCallback) callbacks[i];
-				/*
-				 * here call a function/method to lookup the password for
-				 * the given identifier (e.g. a user name or keystore alias)
-				 * e.g.: pc.setPassword(passStore.getPassword(pc.getIdentfifier))
-				 * for Testing we supply a fixed name here.
-				 */
-				if (pc.getUsage() == WSPasswordCallback.KEY_NAME) {
-					pc.setKey(key);
-				}
-				else {
-					pc.setPassword("security");
-				}
-			} else {
-				throw new UnsupportedCallbackException(
-					callbacks[i],
-					"Unrecognized Callback");
-			}
-		}
-	}
+    /* (non-Javadoc)
+     * @see javax.security.auth.callback.CallbackHandler#handle(javax.security.auth.callback.Callback[])
+     */
+    public void handle(Callback[] callbacks)
+        throws IOException, UnsupportedCallbackException {
+        for (int i = 0; i < callbacks.length; i++) {
+            if (callbacks[i] instanceof WSPasswordCallback) {
+                WSPasswordCallback pc = (WSPasswordCallback) callbacks[i];
+                /*
+                 * here call a function/method to lookup the password for
+                 * the given identifier (e.g. a user name or keystore alias)
+                 * e.g.: pc.setPassword(passStore.getPassword(pc.getIdentfifier))
+                 * for Testing we supply a fixed name here.
+                 */
+                if (pc.getUsage() == WSPasswordCallback.KEY_NAME) {
+                    pc.setKey(key);
+                }
+                else {
+                    pc.setPassword("security");
+                }
+            } else {
+                throw new UnsupportedCallbackException(
+                    callbacks[i],
+                    "Unrecognized Callback");
+            }
+        }
+    }
 }

@@ -53,7 +53,7 @@ import org.w3c.dom.Element;
  * This class helps handlers to carry on conversation. 
  * 
  * It performes functionalities
- * 	1) Adding derived Keys
+ *     1) Adding derived Keys
  *  2) Signing using derived keys
  *  3) Encrypting using derive keys
  * 
@@ -216,8 +216,8 @@ public class ConversationManager {
         String uuid,
         DerivedKeyInfo dkSigInfo)
         throws ConversationException {
-        //			Signing....
-        //		HMAC_SignVerify sign = new HMAC_SignVerify();
+        //            Signing....
+        //        HMAC_SignVerify sign = new HMAC_SignVerify();
         String sigAlgo = XMLSignature.ALGO_ID_MAC_HMAC_SHA1;
 
         String sigUser =
@@ -242,17 +242,17 @@ public class ConversationManager {
 
     }
 
-	/**
-	 * The method is coded such that it can be plugged into WSSignEnvelope.
-	 * Performs HMAC_SHA1 signature.
-	 * needed.
-	 * @param doc
-	 * @param ref
-	 * @param sk
-	 * @param parts
-	 * @return
-	 * @throws WSSecurityException
-	 */
+    /**
+     * The method is coded such that it can be plugged into WSSignEnvelope.
+     * Performs HMAC_SHA1 signature.
+     * needed.
+     * @param doc
+     * @param ref
+     * @param sk
+     * @param parts
+     * @return
+     * @throws WSSecurityException
+     */
     public Document build(Document doc, Reference ref, byte[] sk, Vector parts)
         throws WSSecurityException {
         boolean doDebug = log.isDebugEnabled();
@@ -458,8 +458,8 @@ public class ConversationManager {
     }
 
     /*
-    	 * Extracted from org.apache.ws.security.message.WSSignEnvelope.java
-    	 */
+         * Extracted from org.apache.ws.security.message.WSSignEnvelope.java
+         */
 
     protected String setWsuId(Element bodyElement) {
         String prefix =

@@ -31,10 +31,10 @@ import org.w3c.dom.Document;
 public class IssuerVerifier implements STVerifier {
 
 
-	public IssuerVerifier(Properties prop) {
-		
-	}
-	
+    public IssuerVerifier(Properties prop) {
+        
+    }
+    
     /* (non-Javadoc)
      * @see org.apache.ws.security.trust.verify.STVerifier#verify(org.w3c.dom.Document)
      */

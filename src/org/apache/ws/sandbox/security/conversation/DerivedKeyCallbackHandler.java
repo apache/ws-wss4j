@@ -46,7 +46,7 @@ public class DerivedKeyCallbackHandler implements CallbackHandler{
 
 
   static {
-  	log.debug("DerivedKeyCallbackHandler: Creating a session monitor");
+      log.debug("DerivedKeyCallbackHandler: Creating a session monitor");
     try {
       SessionMonitor sm = new SessionMonitor(conversationSessionTable);
       sm.start();
@@ -79,7 +79,7 @@ public class DerivedKeyCallbackHandler implements CallbackHandler{
    */
   public static void setDerivedKeyLength(String uuid, long keyLength) throws
       ConversationException {
-	log.debug("DerivedKeyCallbackHandler: setting derived key length: " + keyLength);
+    log.debug("DerivedKeyCallbackHandler: setting derived key length: " + keyLength);
     ConversationSession session = (ConversationSession)conversationSessionTable.get(uuid);
     if(session != null) {
       session.setKeyLength(keyLength);
@@ -89,17 +89,17 @@ public class DerivedKeyCallbackHandler implements CallbackHandler{
 
   }
 
-	//Dimuthu's COnversation manager requires this method
-	public static long getDerivedKeyLength(String uuid) throws ConversationException {
-		ConversationSession session = (ConversationSession)conversationSessionTable.get(uuid);
-		if(session != null) {
-		  return session.getKeyLength();
-		} else {
-		  throw new ConversationException("The key size cannot be retrieved: No such context/session");
-		}
+    //Dimuthu's COnversation manager requires this method
+    public static long getDerivedKeyLength(String uuid) throws ConversationException {
+        ConversationSession session = (ConversationSession)conversationSessionTable.get(uuid);
+        if(session != null) {
+          return session.getKeyLength();
+        } else {
+          throw new ConversationException("The key size cannot be retrieved: No such context/session");
+        }
 
 
-	}
+    }
 
   /**
    * If the Label element is not available in a DerivedKeyToken element then
@@ -133,7 +133,7 @@ public class DerivedKeyCallbackHandler implements CallbackHandler{
    * that fact will  be only evident at this point where, the derived key is being added into the relevant session.
    */
   public void addDerivedKey(String uuid, DerivedKeyInfo dkInfo) throws ConversationException{
-	log.debug("DerivedKeyCallbackHandler: Adding derived key Id: " + dkInfo.getId() + " to session: " + uuid);
+    log.debug("DerivedKeyCallbackHandler: Adding derived key Id: " + dkInfo.getId() + " to session: " + uuid);
     ConversationSession convSess = (ConversationSession)conversationSessionTable.get(uuid);
     if(convSess != null) {
       ( (ConversationSession)conversationSessionTable.get(uuid)).
@@ -158,7 +158,7 @@ public class DerivedKeyCallbackHandler implements CallbackHandler{
       WSPasswordCallback pc = (WSPasswordCallback) callbacks[i];
 
       String keyId = pc.getIdentifer();
-	  log.debug("DerivedKeyCallbackHandler: Requesting key for callback id: " + keyId);
+      log.debug("DerivedKeyCallbackHandler: Requesting key for callback id: " + keyId);
         //This will not be kept static
         //Thisis instanciated all teh time
         //So if the keying information(fixed size or not) changes during the session that can be supported

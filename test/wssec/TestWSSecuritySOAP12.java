@@ -135,10 +135,10 @@ public class TestWSSecuritySOAP12 extends TestCase {
          */
 
         Message signedMsg = (Message) AxisUtil.toSOAPMessage(signedDoc);
-		if (log.isDebugEnabled()) {
-			log.debug("Signed message SOAP 1.2:");
-			XMLUtils.PrettyElementToWriter(signedMsg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
-		}
+        if (log.isDebugEnabled()) {
+            log.debug("Signed message SOAP 1.2:");
+            XMLUtils.PrettyElementToWriter(signedMsg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
+        }
         signedDoc = signedMsg.getSOAPEnvelope().getAsDocument();
         log.info("After Signing....");
         verify(signedDoc);

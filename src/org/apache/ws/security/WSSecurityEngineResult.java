@@ -28,75 +28,75 @@ import java.util.Vector;
  * @author Werner Dittmann (Werner.Dittmann@siemens.com)
  */
 public class WSSecurityEngineResult {
-	
-	private int action;
-	private Principal principal;
-	private X509Certificate cert;
-	private SAMLAssertion assertion;
-	private Timestamp timestamp;
-	private Vector signedElementQnames;
+    
+    private int action;
+    private Principal principal;
+    private X509Certificate cert;
+    private SAMLAssertion assertion;
+    private Timestamp timestamp;
+    private Vector signedElementQnames;
 
     WSSecurityEngineResult(int act, SAMLAssertion ass) {
-		principal = null;
+        principal = null;
         cert = null;
-		action = act;
-		assertion = ass;
-	}
+        action = act;
+        assertion = ass;
+    }
 
     WSSecurityEngineResult(int act, Principal princ, X509Certificate certificate, Vector elemQnames) {
-		principal = princ;
-		action = act;
-		cert = certificate;
-		signedElementQnames = elemQnames;
-	}
+        principal = princ;
+        action = act;
+        cert = certificate;
+        signedElementQnames = elemQnames;
+    }
 
-	WSSecurityEngineResult(
-		int act,
-		Timestamp tstamp) {
-		action = act;
-		timestamp = tstamp;
-	}
+    WSSecurityEngineResult(
+        int act,
+        Timestamp tstamp) {
+        action = act;
+        timestamp = tstamp;
+    }
 
-	/**
-	 * @return the actions vector. These actions were performed by the the
-	 *         security engine.
-	 */
-	public int getAction() {
-		return action;
-	}
+    /**
+     * @return the actions vector. These actions were performed by the the
+     *         security engine.
+     */
+    public int getAction() {
+        return action;
+    }
 
-	/**
-	 * @return the principals found if UsernameToken or Signature
-	 * processing were done
-	 */
-	public Principal getPrincipal() {
-		return principal;
-	}
-	/**
-	 * @return the Certificate found if Signature
-	 * processing were done
-	 */
-	public X509Certificate getCertificate() {
-		return cert;
-	}
+    /**
+     * @return the principals found if UsernameToken or Signature
+     * processing were done
+     */
+    public Principal getPrincipal() {
+        return principal;
+    }
+    /**
+     * @return the Certificate found if Signature
+     * processing were done
+     */
+    public X509Certificate getCertificate() {
+        return cert;
+    }
 
-	/**
-	 * @return Returns the assertion.
-	 */
-	public SAMLAssertion getAssertion() {
-		return assertion;
-	}
+    /**
+     * @return Returns the assertion.
+     */
+    public SAMLAssertion getAssertion() {
+        return assertion;
+    }
 
-	/**
-	 * @return the timestamp found
-	 */
-	public Timestamp getTimestamp() {
-		return timestamp;
-	}	
-	/**
-	 * @return Returns the signedElementQnames.
-	 */
-	public Vector getSignedElementQnames() {
-		return signedElementQnames;
-	}
+    /**
+     * @return the timestamp found
+     */
+    public Timestamp getTimestamp() {
+        return timestamp;
+    }    
+    /**
+     * @return Returns the signedElementQnames.
+     */
+    public Vector getSignedElementQnames() {
+        return signedElementQnames;
+    }
 }

@@ -26,12 +26,12 @@ import org.apache.ws.security.trust.TrustConstants;
  * 
  */
 public class RequestInfo {
-	
+    
 private String requestType;
 private String tokenType;
 private String baseType;
 private String appliesTo;
-	
+    
 public static final String ISSUE=TrustConstants.ISSUE_SECURITY_TOKEN;
 public static final String RENEW=TrustConstants.RENEW_SECURITY_TOKEN;
 public static final String VALIDATE=TrustConstants.VALIDATE_SECURITY_TOKEN;
@@ -40,58 +40,58 @@ public static final String X509="X509Certificate";
 public static final String USERNAME="UsernameToken";
 public static final String SAML="SAML";
 public static final String CUSTOM="CustomToken";
-	/**
-	 * 
-	 */
-	public RequestInfo() {
+    /**
+     * 
+     */
+    public RequestInfo() {
 
-	}
-	/**
-	 * Constructor for RequestInfo
-	 * @param requestType
-	 * @param tokenType
-	 * @param baseType
-	 * @param appliesTo
-	 */
-	public RequestInfo(String requestType,String tokenType,String baseType,String appliesTo) {
-		this(requestType,tokenType,baseType);
-		this.appliesTo=appliesTo;
-	}
-	
-	/**
-	 * Constructor for RequestInfo
-	 * @param requestType
-	 * @param tokenType
-	 * @param baseType
-	 */
-	public RequestInfo(String requestType,String tokenType,String baseType) {
-		this(requestType,tokenType);
-		this.baseType=baseType;
-	}
-	
-	/**
-	 * Constructor for RequestInfo
-	 * @param requestType
-	 * @param tokenType
-	 */
-	public RequestInfo(String requestType,String tokenType) {
-		this(requestType);
-		this.tokenType=tokenType;		
-	}
-	/**
-	 * Constructor for RequestInfo
-	 * @param requestType
-	 */
-	public RequestInfo(String requestType) {		
-		this.requestType=requestType;
-	}
+    }
+    /**
+     * Constructor for RequestInfo
+     * @param requestType
+     * @param tokenType
+     * @param baseType
+     * @param appliesTo
+     */
+    public RequestInfo(String requestType,String tokenType,String baseType,String appliesTo) {
+        this(requestType,tokenType,baseType);
+        this.appliesTo=appliesTo;
+    }
+    
+    /**
+     * Constructor for RequestInfo
+     * @param requestType
+     * @param tokenType
+     * @param baseType
+     */
+    public RequestInfo(String requestType,String tokenType,String baseType) {
+        this(requestType,tokenType);
+        this.baseType=baseType;
+    }
+    
+    /**
+     * Constructor for RequestInfo
+     * @param requestType
+     * @param tokenType
+     */
+    public RequestInfo(String requestType,String tokenType) {
+        this(requestType);
+        this.tokenType=tokenType;        
+    }
+    /**
+     * Constructor for RequestInfo
+     * @param requestType
+     */
+    public RequestInfo(String requestType) {        
+        this.requestType=requestType;
+    }
 
 /**
  * get RequestType
  * @return
  */
 public String getRequestType() {
-	return requestType;
+    return requestType;
 }
 
 /**
@@ -99,7 +99,7 @@ public String getRequestType() {
  * @return
  */
 public String getTokenType() {
-	return tokenType;
+    return tokenType;
 }
 
 /**
@@ -107,7 +107,7 @@ public String getTokenType() {
  * @param string
  */
 public void setRequestType(String string) {
-	this.requestType = string;
+    this.requestType = string;
 }
 
 /**
@@ -115,7 +115,7 @@ public void setRequestType(String string) {
  * @param string
  */
 public void setTokenType(String string) {
-	tokenType = string;
+    tokenType = string;
 }
 
 /**
@@ -123,7 +123,7 @@ public void setTokenType(String string) {
  * @return
  */
 public String getBaseType() {
-	return baseType;
+    return baseType;
 }
 
 /**
@@ -131,7 +131,7 @@ public String getBaseType() {
  * @param string
  */
 public void setBaseType(String string) {
-	baseType = string;
+    baseType = string;
 }
 
 /**
@@ -139,7 +139,7 @@ public void setBaseType(String string) {
  * @return
  */
 public String getAppliesTo() {
-	return appliesTo;
+    return appliesTo;
 }
 
 /**
@@ -147,7 +147,7 @@ public String getAppliesTo() {
  * @param string
  */
 public void setAppliesTo(String string) {
-	appliesTo = string;
+    appliesTo = string;
 }
 
 }

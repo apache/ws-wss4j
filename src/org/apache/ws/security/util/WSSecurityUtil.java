@@ -70,13 +70,13 @@ public class WSSecurityUtil {
      * @param doc
      * @param actor
      * @return the <code>wsse:Security</code> element or
-     * 			<code>null</code> if not such element found
+     *             <code>null</code> if not such element found
      */
     public static Element getSecurityHeader(WSSConfig wssConfig, Document doc, String actor, SOAPConstants sc) {
-		Element soapHeaderElement =
-			(Element) getDirectChild(doc.getFirstChild(),
-				sc.getHeaderQName().getLocalPart(),
-				sc.getEnvelopeURI());
+        Element soapHeaderElement =
+            (Element) getDirectChild(doc.getFirstChild(),
+                sc.getHeaderQName().getLocalPart(),
+                sc.getEnvelopeURI());
 
         if (soapHeaderElement == null) { // no SOAP header at all
             return null;
@@ -237,7 +237,7 @@ public class WSSecurityUtil {
      *
      * @param doc
      * @return the body element or <code>null</code> if document does not
-     * 			contain a SOAP body
+     *             contain a SOAP body
      */
     public static Element findBodyElement(Document doc, SOAPConstants sc) {
         Element soapBodyElement =
@@ -256,10 +256,10 @@ public class WSSecurityUtil {
      * the given namespace. It's somewhat faster than XPath, and we do
      * not deal with prefixes, just with the real namespace URI
      *
-     * @param startNode		Where to start the search
-     * @param name			Local name of the element
-     * @param namespace		Namespace URI of the element
-     * @return				The found element or <code>null</code>
+     * @param startNode        Where to start the search
+     * @param name            Local name of the element
+     * @param namespace        Namespace URI of the element
+     * @return                The found element or <code>null</code>
      */
     public static Node findElement(Node startNode,
                                    String name,
@@ -319,10 +319,10 @@ public class WSSecurityUtil {
      * the given namespace. It's somewhat faster than XPath, and we do
      * not deal with prefixes, just with the real namespace URI
      *
-     * @param startNode		Where to start the search
-     * @param value			Value of the Id attribute
-     * @param namespace		Namespace URI of the Id
-     * @return				The found element or <code>null</code>
+     * @param startNode        Where to start the search
+     * @param value            Value of the Id attribute
+     * @param namespace        Namespace URI of the Id
+     * @return                The found element or <code>null</code>
      */
     public static Element findElementById(Node startNode,
                                           String value,
@@ -515,30 +515,30 @@ public class WSSecurityUtil {
             }
             return element;
         } else {
-        	return WSSecurityUtil.findElementById(doc.getDocumentElement(), id, wssConfig.getWsuNS());
+            return WSSecurityUtil.findElementById(doc.getDocumentElement(), id, wssConfig.getWsuNS());
         }
 
     }
 
-	/**
-	 * Search for an element given its generic id.
-	 * <p/>
-	 * 
-	 * @param doc 
-	 * @param id  
-	 * @return 
-	 */
-	public static Element getElementByGenId(Document doc, String id) {
-		if (id == null) {
-			return null;
-		}
-		id = id.trim();
-		if ((id.length() == 0) || (id.charAt(0) != '#')) {
-			return null;
-		}
-		id = id.substring(1);
-        	return WSSecurityUtil.findElementById(doc.getDocumentElement(), id, null);
-	}
+    /**
+     * Search for an element given its generic id.
+     * <p/>
+     * 
+     * @param doc 
+     * @param id  
+     * @return 
+     */
+    public static Element getElementByGenId(Document doc, String id) {
+        if (id == null) {
+            return null;
+        }
+        id = id.trim();
+        if ((id.length() == 0) || (id.charAt(0) != '#')) {
+            return null;
+        }
+        id = id.substring(1);
+            return WSSecurityUtil.findElementById(doc.getDocumentElement(), id, null);
+    }
 
     /**
      * Create a BinarySecurityToken element
@@ -664,7 +664,7 @@ public class WSSecurityUtil {
      * @return 
      */
     public static Element findWsseSecurityHeaderBlock(WSSConfig wssConfig, Document doc, Element envelope, boolean doCreate) {
-    	SOAPConstants sc = getSOAPConstants(envelope);
+        SOAPConstants sc = getSOAPConstants(envelope);
         Element header = findChildElement(envelope, sc.getEnvelopeURI(), sc.getHeaderQName().getLocalPart());
         if (header == null) {
             if (doCreate) {
@@ -731,7 +731,7 @@ public class WSSecurityUtil {
      * @return
      */
     public static Element createNamespaceContext(WSSConfig wssConfig, Document doc) {
-		SOAPConstants sc = getSOAPConstants(doc.getDocumentElement());
+        SOAPConstants sc = getSOAPConstants(doc.getDocumentElement());
         Element nsContext = doc.createElementNS(null, "namespaceContext");
         nsContext.setAttributeNS(WSConstants.XMLNS_NS, "xmlns:env", sc.getEnvelopeURI());
         nsContext.setAttributeNS(WSConstants.XMLNS_NS, "xmlns:wsse", wssConfig.getWsseNS());

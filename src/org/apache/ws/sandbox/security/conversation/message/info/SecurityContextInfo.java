@@ -28,7 +28,7 @@ import org.apache.commons.logging.LogFactory;
  * @author Ruchith
  */
 public class SecurityContextInfo {
-	
+    
   private Log log = LogFactory.getLog(SecurityContextInfo.class.getName());
 
   /**
@@ -61,7 +61,7 @@ public class SecurityContextInfo {
     this.sharedSecret = requestedProofToken.getSharedSecret();
     this.identifier = securityContextToken.getIdentifier();
     this.frequency = frequency; // frequency of refreshing the derrived key
-	log.debug("SecurityContextInfo: created. SCT Identifier: " + identifier);
+    log.debug("SecurityContextInfo: created. SCT Identifier: " + identifier);
     /** @todo get the values of other elements (any elements) of SCT*/
   }
 

@@ -26,5 +26,5 @@ import org.w3c.dom.Document;
  * define its own way of issuing (i.e constructing the response) tokens
  */
 public interface STIssuer {
-	public Document issue(Document req,Document res)throws Exception;
+    public Document issue(Document req,Document res)throws Exception;
 }

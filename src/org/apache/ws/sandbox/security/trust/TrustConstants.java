@@ -73,42 +73,42 @@ public class TrustConstants {
 //  public static final URI ISSUE_SECURITY_TOKEN_URI = new URI("http://schemas.xmlsoap.org/ws/2004/04/security/trust/Issue");
 //  public static final URI RENEW_SECURITY_TOKEN_URI = new URI("http://schemas.xmlsoap.org/ws/2004/04/security/trust/Renew");
 //  public static final URI VALIDATE_SECURITY_TOKEN_URI = new URI("http://schemas.xmlsoap.org/ws/2004/04/security/trust/Validate"); 
-	public static final String WST_NS = "http://schemas.xmlsoap.org/ws/2004/04/trust";
-	public static final String WSP_NS = "http://schemas.xmlsoap.org/ws/2002/12/policy";
-	
-	public static final String WST_PREFIX = "wst";
-	public static final String WSP_PREFIX = "wsp";
-	
-	//For STS there should be an issuer class specified in the server-config.wsdd
-	public static final String ISSUER_CLASS = "issuerClass";
-	//	For STS there should be a renewer class specified in the server-config.wsdd
-	public static final String RENEWER_CLASS = "renewerClass";
-	//	For STS there should be a validator class specified in the server-config.wsdd
-	public static final String VALIDATOR_CLASS = "validatorClass";
-	
-	//In the request, The token type can be specified in the client-config
-	public static final String TOKEN_TYPE="TokenType";	
-	//The request type , issue/renew or validate 
-	public static final String REQUEST_TYPE="RequestType";
-	
-//	...commented.... no need of having these params.
+    public static final String WST_NS = "http://schemas.xmlsoap.org/ws/2004/04/trust";
+    public static final String WSP_NS = "http://schemas.xmlsoap.org/ws/2002/12/policy";
+    
+    public static final String WST_PREFIX = "wst";
+    public static final String WSP_PREFIX = "wsp";
+    
+    //For STS there should be an issuer class specified in the server-config.wsdd
+    public static final String ISSUER_CLASS = "issuerClass";
+    //    For STS there should be a renewer class specified in the server-config.wsdd
+    public static final String RENEWER_CLASS = "renewerClass";
+    //    For STS there should be a validator class specified in the server-config.wsdd
+    public static final String VALIDATOR_CLASS = "validatorClass";
+    
+    //In the request, The token type can be specified in the client-config
+    public static final String TOKEN_TYPE="TokenType";    
+    //The request type , issue/renew or validate 
+    public static final String REQUEST_TYPE="RequestType";
+    
+//    ...commented.... no need of having these params.
 // architectural change in the STSClientHandler. Now we have more distributed requesters....
-//	//basedon params
-//	public static final String BASED_ON="BasedOn";
-//	//based on values
-//	public static final String BASED_ON_X509="X509Certificate";
-//	public static final String BASED_ON_USERNAME_TOKEN="UsernameToken";
-//	public static final String BASED_ON_SAML="SAML";
-	
-	//for BASED_ON_X509
-	public static final String BASE_CERT_FILE="BaseCertFile";
-	public static final String USER="user";//alias of the certificate
-	
-	//for BASED_ON_USERNAME_TOKEN
-	public static final String UNT_USER="UNTUser";
-	public static final String UNT_PWCALLBACK_CLASS="passwordCallbackClass";
-	
-	//requester class
-	public static final String REQUESTER_CLASS="requesterClass";
+//    //basedon params
+//    public static final String BASED_ON="BasedOn";
+//    //based on values
+//    public static final String BASED_ON_X509="X509Certificate";
+//    public static final String BASED_ON_USERNAME_TOKEN="UsernameToken";
+//    public static final String BASED_ON_SAML="SAML";
+    
+    //for BASED_ON_X509
+    public static final String BASE_CERT_FILE="BaseCertFile";
+    public static final String USER="user";//alias of the certificate
+    
+    //for BASED_ON_USERNAME_TOKEN
+    public static final String UNT_USER="UNTUser";
+    public static final String UNT_PWCALLBACK_CLASS="passwordCallbackClass";
+    
+    //requester class
+    public static final String REQUESTER_CLASS="requesterClass";
  }
 

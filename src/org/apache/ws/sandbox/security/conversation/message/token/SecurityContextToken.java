@@ -115,8 +115,8 @@ public class SecurityContextToken {
   /**
    * Set the identifier.
    *
-   * @param name	sets a text node containing the identifier into
-   * 				the identifier element.
+   * @param name    sets a text node containing the identifier into
+   *                 the identifier element.
    */
   public void setIdentifier(Document doc, String uuid) {
     Text node = getFirstNode(this.elementIdentifier);
@@ -130,7 +130,7 @@ public class SecurityContextToken {
    */
   public String getIdentifier() {
     if (this.elementIdentifier != null) {
-    	//System.out.println("In !=null "+ this.elementIdentifier.getFirstChild().toString());
+        //System.out.println("In !=null "+ this.elementIdentifier.getFirstChild().toString());
       return getFirstNode(this.elementIdentifier).getData();
     }
     return null;
@@ -144,8 +144,8 @@ public class SecurityContextToken {
    * Returns the first text node of an element.
    *
    * @param e the element to get the node from
-   * @return	the first text node or <code>null</code> if node
-   * 			is null or is not a text node
+   * @return    the first text node or <code>null</code> if node
+   *             is null or is not a text node
    */
   private Text getFirstNode(Element e) {
     Node node = e.getFirstChild();
@@ -173,8 +173,8 @@ public class SecurityContextToken {
   /**
    * Gets the id.
    *
-   * @return 	the value of the <code>wsu:Id</code> attribute of this
-   * 			SecurityContextToken
+   * @return     the value of the <code>wsu:Id</code> attribute of this
+   *             SecurityContextToken
    */
   public String getID() {
     return this.element.getAttributeNS(WSConstants.WSU_NS, "Id");
@@ -183,8 +183,8 @@ public class SecurityContextToken {
   /**
    * Set the id of this security context token.
    *
-   * @param	id the value for the <code>wsu:Id</code> attribute of this
-   * 			SecurityContextToken
+   * @param    id the value for the <code>wsu:Id</code> attribute of this
+   *             SecurityContextToken
    */
   public void setID(String id) {
     String prefix = WSSecurityUtil.setNamespace(this.element,

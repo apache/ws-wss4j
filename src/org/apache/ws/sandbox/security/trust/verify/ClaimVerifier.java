@@ -29,10 +29,10 @@ import org.w3c.dom.Document;
  * Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
  */
 public class ClaimVerifier implements STVerifier {
-	
-	public ClaimVerifier(Properties prop) {
-		
-	}
+    
+    public ClaimVerifier(Properties prop) {
+        
+    }
 
     /* (non-Javadoc)
      * @see org.apache.ws.security.trust.verify.STVerifier#verify(org.w3c.dom.Document)

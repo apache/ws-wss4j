@@ -137,7 +137,7 @@ public class TestWSSecurity2 extends TestCase implements CallbackHandler {
         SOAPEnvelope envelope = null;
         WSEncryptBody builder = new WSEncryptBody();
         builder.setUserInfo("wss4jcert");
-		builder.setKeyIdentifierType(WSConstants.X509_KEY_IDENTIFIER);
+        builder.setKeyIdentifierType(WSConstants.X509_KEY_IDENTIFIER);
         Document doc = unsignedEnvelope.getAsDocument();
         log.info("Before Encryption Triple DES....");
         Document encryptedDoc = builder.build(doc, crypto);
@@ -147,15 +147,15 @@ public class TestWSSecurity2 extends TestCase implements CallbackHandler {
          * convert the resulting document into a message first. The toSOAPMessage()
          * method performs the necessary c14n call to properly set up the signed
          * document and convert it into a SOAP message. Check that the contents can't
-	 	 * be read (cheching if we can find a specific substring). After that we extract it
+          * be read (cheching if we can find a specific substring). After that we extract it
          * as a document again for further processing.
          */
 
         Message encryptedMsg = (Message) AxisUtil.toSOAPMessage(encryptedDoc);
-		if (log.isDebugEnabled()) {
-			log.debug("Encrypted message, RSA-15 keytransport, 3DES:");
-			XMLUtils.PrettyElementToWriter(encryptedMsg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
-		}
+        if (log.isDebugEnabled()) {
+            log.debug("Encrypted message, RSA-15 keytransport, 3DES:");
+            XMLUtils.PrettyElementToWriter(encryptedMsg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
+        }
         String encryptedString = encryptedMsg.getSOAPPartAsString();
         assertTrue(encryptedString.indexOf("LogTestService2") == -1 ? true : false);
         encryptedDoc = encryptedMsg.getSOAPEnvelope().getAsDocument();
@@ -168,61 +168,61 @@ public class TestWSSecurity2 extends TestCase implements CallbackHandler {
          * setup are ok.
          */
         message = getSOAPMessage(); // create fresh message envrionment
-		builder.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
+        builder.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
         builder.setSymmetricEncAlgorithm(WSConstants.AES_128);
-		Vector parts = new Vector();
-		WSEncryptionPart encP =
-			new WSEncryptionPart("testMethod", "uri:LogTestService2", "Element");
-		parts.add(encP);
+        Vector parts = new Vector();
+        WSEncryptionPart encP =
+            new WSEncryptionPart("testMethod", "uri:LogTestService2", "Element");
+        parts.add(encP);
         builder.setParts(parts);
         unsignedEnvelope = message.getSOAPEnvelope();
         doc = unsignedEnvelope.getAsDocument();
         log.info("Before Encryption AES 128/RSA-15....");
         encryptedDoc = builder.build(doc, crypto);
         log.info("After Encryption AES 128/RSA-15....");
-	    encryptedMsg = (Message) AxisUtil.toSOAPMessage(encryptedDoc);
-		if (log.isDebugEnabled()) {
-			log.debug("Encrypted message, RSA-15 keytransport, AES 128:");
-			XMLUtils.PrettyElementToWriter(encryptedMsg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
-		}
+        encryptedMsg = (Message) AxisUtil.toSOAPMessage(encryptedDoc);
+        if (log.isDebugEnabled()) {
+            log.debug("Encrypted message, RSA-15 keytransport, AES 128:");
+            XMLUtils.PrettyElementToWriter(encryptedMsg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
+        }
         encryptedString = encryptedMsg.getSOAPPartAsString();
         assertTrue(encryptedString.indexOf("LogTestService2") == -1 ? true : false);
         encryptedDoc = encryptedMsg.getSOAPEnvelope().getAsDocument();
         verify(encryptedDoc);
     }
 
-	/**
-	 * Test that encrypt and decrypt a WS-Security envelope.
-	 * This test uses the RSA OAEP alogrithm to transport (wrap) the symmetric
-	 * key.
-	 * <p/>
-	 * 
-	 * @throws Exception Thrown when there is any problem in signing or verification
-	 */
- 	public void testEncryptionDecryptionOAEP() throws Exception {
-		SOAPEnvelope unsignedEnvelope = message.getSOAPEnvelope();
-		SOAPEnvelope envelope = null;
-		WSEncryptBody builder = new WSEncryptBody();
-		builder.setUserInfo("wss4jcert");
-		builder.setKeyIdentifierType(WSConstants.X509_KEY_IDENTIFIER);
-		builder.setKeyEnc(WSConstants.KEYTRANSPORT_RSAOEP);
-		Document doc = unsignedEnvelope.getAsDocument();
-		log.info("Before Encryption Triple DES/RSA-OAEP....");
-		Document encryptedDoc = builder.build(doc, crypto);
-		log.info("After Encryption Triple DES/RSA-OAEP....");
+    /**
+     * Test that encrypt and decrypt a WS-Security envelope.
+     * This test uses the RSA OAEP alogrithm to transport (wrap) the symmetric
+     * key.
+     * <p/>
+     * 
+     * @throws Exception Thrown when there is any problem in signing or verification
+     */
+     public void testEncryptionDecryptionOAEP() throws Exception {
+        SOAPEnvelope unsignedEnvelope = message.getSOAPEnvelope();
+        SOAPEnvelope envelope = null;
+        WSEncryptBody builder = new WSEncryptBody();
+        builder.setUserInfo("wss4jcert");
+        builder.setKeyIdentifierType(WSConstants.X509_KEY_IDENTIFIER);
+        builder.setKeyEnc(WSConstants.KEYTRANSPORT_RSAOEP);
+        Document doc = unsignedEnvelope.getAsDocument();
+        log.info("Before Encryption Triple DES/RSA-OAEP....");
+        Document encryptedDoc = builder.build(doc, crypto);
+        log.info("After Encryption Triple DES/RSA-OAEP....");
 
-		Message encryptedMsg = (Message) AxisUtil.toSOAPMessage(encryptedDoc);
-		if (log.isDebugEnabled()) {
-			log.debug("Encrypted message, RSA-OAEP keytransport, 3DES:");
-			XMLUtils.PrettyElementToWriter(encryptedMsg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
-		}
-		String encryptedString = encryptedMsg.getSOAPPartAsString();
-		assertTrue(encryptedString.indexOf("LogTestService2") == -1 ? true : false);
-		encryptedDoc = encryptedMsg.getSOAPEnvelope().getAsDocument();
-		verify(encryptedDoc);
+        Message encryptedMsg = (Message) AxisUtil.toSOAPMessage(encryptedDoc);
+        if (log.isDebugEnabled()) {
+            log.debug("Encrypted message, RSA-OAEP keytransport, 3DES:");
+            XMLUtils.PrettyElementToWriter(encryptedMsg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
+        }
+        String encryptedString = encryptedMsg.getSOAPPartAsString();
+        assertTrue(encryptedString.indexOf("LogTestService2") == -1 ? true : false);
+        encryptedDoc = encryptedMsg.getSOAPEnvelope().getAsDocument();
+        verify(encryptedDoc);
 
-	}
-	
+    }
+    
     /**
      * Verifies the soap envelope
      * <p/>

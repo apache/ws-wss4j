@@ -152,15 +152,15 @@ public class TestWSSecurityST1 extends TestCase implements CallbackHandler {
          * convert the resulting document into a message first. The toSOAPMessage()
          * method performs the necessary c14n call to properly set up the signed
          * document and convert it into a SOAP message. Check that the contents can't
-	 	 * be read (cheching if we can find a specific substring). After that we extract it
+          * be read (cheching if we can find a specific substring). After that we extract it
          * as a document again for further processing.
          */
 
         Message signedMsg = (Message) AxisUtil.toSOAPMessage(signedDoc);
-		if (log.isDebugEnabled()) {
-			log.debug("Unsigned SAML message (sender vouches):");
-			XMLUtils.PrettyElementToWriter(signedMsg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
-		}
+        if (log.isDebugEnabled()) {
+            log.debug("Unsigned SAML message (sender vouches):");
+            XMLUtils.PrettyElementToWriter(signedMsg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
+        }
         String encryptedString = signedMsg.getSOAPPartAsString();
         signedDoc = signedMsg.getSOAPEnvelope().getAsDocument();
         verify(signedDoc);

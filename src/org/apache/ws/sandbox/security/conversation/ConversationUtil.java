@@ -46,15 +46,15 @@ public class ConversationUtil {
    *
    */
   public static String generateNonce(int length) {
-	SecureRandom random=null;
-	try {
-		random = SecureRandom.getInstance("SHA1PRNG");
-	} catch (NoSuchAlgorithmException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-	}
-	byte[] nonceValue = new byte[length];
-	random.nextBytes(nonceValue);
+    SecureRandom random=null;
+    try {
+        random = SecureRandom.getInstance("SHA1PRNG");
+    } catch (NoSuchAlgorithmException e) {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+    }
+    byte[] nonceValue = new byte[length];
+    random.nextBytes(nonceValue);
     return Base64.encode(nonceValue);
   }
 
@@ -104,23 +104,23 @@ public class ConversationUtil {
    * @return generated identifier string
    */
   public static String generateIdentifier(String uuid, String derivedKeyTokenId) {
-  	log.debug("ConversationUtil: Generating identifier. session id: " + uuid + ", dkt id: " + derivedKeyTokenId);
+      log.debug("ConversationUtil: Generating identifier. session id: " + uuid + ", dkt id: " + derivedKeyTokenId);
     return uuid + ConversationUtil.ID_SEPARATER + derivedKeyTokenId;
   }
 
 
   public static String generateUuid(){
-  	//This is wrong 
-  	//Replace this with the proper code for Uuid generation
-	SecureRandom random=null;
-	try {
-		random = SecureRandom.getInstance("SHA1PRNG");
-	} catch (NoSuchAlgorithmException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-	}
-	byte[] nonceValue = new byte[32];
-	random.nextBytes(nonceValue);
+      //This is wrong 
+      //Replace this with the proper code for Uuid generation
+    SecureRandom random=null;
+    try {
+        random = SecureRandom.getInstance("SHA1PRNG");
+    } catch (NoSuchAlgorithmException e) {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+    }
+    byte[] nonceValue = new byte[32];
+    random.nextBytes(nonceValue);
     return Base64.encode(nonceValue);
   }
 
@@ -143,31 +143,31 @@ public class ConversationUtil {
   }
 
   /**
-	* The method takes in a DerivedKetToken and returns the uuid of the corresponding SCT.
-	* There can be serveral cases.
-	* Case 1: If there is only one SCT in the owner docuemter it is the corresponding SCT
-	* Case 2: If there are two resolve them by Id
-	* Case 3: The corresponding SCT can be mentioned in properties as well.
-	* @param dkToken
-	* @return
-	*/
+    * The method takes in a DerivedKetToken and returns the uuid of the corresponding SCT.
+    * There can be serveral cases.
+    * Case 1: If there is only one SCT in the owner docuemter it is the corresponding SCT
+    * Case 2: If there are two resolve them by Id
+    * Case 3: The corresponding SCT can be mentioned in properties as well.
+    * @param dkToken
+    * @return
+    */
 
-	public static SecurityContextToken getSCT(DerivedKeyToken dkToken) throws ConversationException{
-			//TODO : Case 2 and Case 3 throw proper exception
-			String uuid = null;
-			Document doc = dkToken.getElement().getOwnerDocument();
-			NodeList ndList = doc.getElementsByTagNameNS(ConversationConstants.WSC_NS, ConversationConstants.SECURITY_CONTEXT_TOKEN_LN);
-			if(ndList.getLength()==0){
-					throw new ConversationException("Cannot find SCT");
-			}
-			try {
-			 Element ele = (Element)ndList.item(0);
-				SecurityContextToken sct = new SecurityContextToken(ele);
-				return sct;
-		 } catch (WSSecurityException e) {
-			 //e.printStackTrace();
-			 throw new ConversationException(e.getMessage());
-		 }
-	}
+    public static SecurityContextToken getSCT(DerivedKeyToken dkToken) throws ConversationException{
+            //TODO : Case 2 and Case 3 throw proper exception
+            String uuid = null;
+            Document doc = dkToken.getElement().getOwnerDocument();
+            NodeList ndList = doc.getElementsByTagNameNS(ConversationConstants.WSC_NS, ConversationConstants.SECURITY_CONTEXT_TOKEN_LN);
+            if(ndList.getLength()==0){
+                    throw new ConversationException("Cannot find SCT");
+            }
+            try {
+             Element ele = (Element)ndList.item(0);
+                SecurityContextToken sct = new SecurityContextToken(ele);
+                return sct;
+         } catch (WSSecurityException e) {
+             //e.printStackTrace();
+             throw new ConversationException(e.getMessage());
+         }
+    }
 
 }

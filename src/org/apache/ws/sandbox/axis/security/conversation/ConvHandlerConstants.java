@@ -30,54 +30,54 @@ import org.apache.ws.security.conversation.ConversationConstants;
  */
 public class ConvHandlerConstants {
 
-	public static final String SEVER_PROP_FILE = "serverPropFile"; 
-	public static final String REQUESTOR_PROP_FILE = "requestorPropFile";
-	public static final String STS_PROP_FILE = "trustServicePropFile";
-	
-	public static final String REAP_FREQ = "reapFrequency"; 
-	public static final String SESSION_DURATION= "sessionDuration";
-	
-	public static final String KEY_FREQ ="keyFrequency";
-	public static final String USE_FIXED_KEYLEN="useFixedKeyLegnth";
-	
-	public static final String KEY_LEGNTH="keyLegnth";
-	public static final String GENERATION ="generation";
-	
-	public static final String SEVER_ALIAS ="serverAlias";
-	public static final String REQ_ALIAS = "requestorAlias";
-	
-	public static final String SIGN_PARTS = "signatureParts";
-	
-	public static final String TRUST_ENABLE="trustEnable";
-	
-	public static final String SCT_ESTABLISH_MTD = "sctEstablishmentMtd";
-	
-	public static final String VERIFY_TRUST="verifyTrust";
-	
-	public static final String TRUST_ENGINE_PROP = "trustEngineProperties";
+    public static final String SEVER_PROP_FILE = "serverPropFile"; 
+    public static final String REQUESTOR_PROP_FILE = "requestorPropFile";
+    public static final String STS_PROP_FILE = "trustServicePropFile";
+    
+    public static final String REAP_FREQ = "reapFrequency"; 
+    public static final String SESSION_DURATION= "sessionDuration";
+    
+    public static final String KEY_FREQ ="keyFrequency";
+    public static final String USE_FIXED_KEYLEN="useFixedKeyLegnth";
+    
+    public static final String KEY_LEGNTH="keyLegnth";
+    public static final String GENERATION ="generation";
+    
+    public static final String SEVER_ALIAS ="serverAlias";
+    public static final String REQ_ALIAS = "requestorAlias";
+    
+    public static final String SIGN_PARTS = "signatureParts";
+    
+    public static final String TRUST_ENABLE="trustEnable";
+    
+    public static final String SCT_ESTABLISH_MTD = "sctEstablishmentMtd";
+    
+    public static final String VERIFY_TRUST="verifyTrust";
+    
+    public static final String TRUST_ENGINE_PROP = "trustEngineProperties";
 
-	public static final String DK_ACTION="derivedKeyAction";
-	public static final String APPLIES_TO_VAL="appliesToValue";	
-	
-	public static final String STS_ADDRESS = "stsAddress";
-	public static final String CONV_CALLBACK = "convCBHandler";
-	
-	public static Map sctEstablishmentMapper = new Hashtable();
-	
-	/**
-	 * Mapps the strings to internally used integers.
-	 */
-	static{
-		sctEstablishmentMapper.put(
-					"DirectGenerated",
-					new Integer(ConversationConstants.DIRECT_GENERATED));
-		sctEstablishmentMapper.put(
-					"STSGenerated",
-					new Integer(ConversationConstants.STS_GENERATED));
-	}
-	
-	
-	
-	
-	
+    public static final String DK_ACTION="derivedKeyAction";
+    public static final String APPLIES_TO_VAL="appliesToValue";    
+    
+    public static final String STS_ADDRESS = "stsAddress";
+    public static final String CONV_CALLBACK = "convCBHandler";
+    
+    public static Map sctEstablishmentMapper = new Hashtable();
+    
+    /**
+     * Mapps the strings to internally used integers.
+     */
+    static{
+        sctEstablishmentMapper.put(
+                    "DirectGenerated",
+                    new Integer(ConversationConstants.DIRECT_GENERATED));
+        sctEstablishmentMapper.put(
+                    "STSGenerated",
+                    new Integer(ConversationConstants.STS_GENERATED));
+    }
+    
+    
+    
+    
+    
 }

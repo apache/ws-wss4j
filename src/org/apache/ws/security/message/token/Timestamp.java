@@ -48,134 +48,134 @@ import java.util.Vector;
  */
 public class Timestamp {
 
-	protected Element element = null;
-	protected Element elementCreated = null;	
-	protected Element elementExpires = null;	
-	protected Vector customElements = null;
-	
-	protected Calendar created;
-	protected Calendar expires;
-	
-	/**
+    protected Element element = null;
+    protected Element elementCreated = null;    
+    protected Element elementExpires = null;    
+    protected Vector customElements = null;
+    
+    protected Calendar created;
+    protected Calendar expires;
+    
+    /**
      * Constructs a <code>Timestamp</code> object and parses the
      * <code>wsu:Timestamp</code> element to initialize it.
      * 
-     * @param elem 		the <code>wsu:Timestamp</code> element that
-     * 					contains the timestamp data
-	 */
-	public Timestamp(WSSConfig wssConfig, Element element) throws WSSecurityException {
+     * @param elem         the <code>wsu:Timestamp</code> element that
+     *                     contains the timestamp data
+     */
+    public Timestamp(WSSConfig wssConfig, Element element) throws WSSecurityException {
 
-		customElements = new Vector();
+        customElements = new Vector();
 
-		String strCreated = "";
-		String strExpires = "";
-		
-		created = Calendar.getInstance();
-		expires = Calendar.getInstance();
+        String strCreated = "";
+        String strExpires = "";
+        
+        created = Calendar.getInstance();
+        expires = Calendar.getInstance();
 
-		for (Node currentChild = element.getFirstChild();
-			currentChild != null;
-			currentChild = currentChild.getNextSibling()) {
-			if (WSConstants.CREATED_LN.equals(currentChild.getLocalName()) &&
+        for (Node currentChild = element.getFirstChild();
+            currentChild != null;
+            currentChild = currentChild.getNextSibling()) {
+            if (WSConstants.CREATED_LN.equals(currentChild.getLocalName()) &&
                     wssConfig.getWsuNS().equals(currentChild.getNamespaceURI())) {
-				strCreated = ((Text) ((Element) currentChild).getFirstChild()).getData();
-			} else if (WSConstants.EXPIRES_LN.equals(currentChild.getLocalName()) &&
+                strCreated = ((Text) ((Element) currentChild).getFirstChild()).getData();
+            } else if (WSConstants.EXPIRES_LN.equals(currentChild.getLocalName()) &&
                     wssConfig.getWsuNS().equals(currentChild.getNamespaceURI())) {
-				strExpires = ((Text) ((Element) currentChild).getFirstChild()).getData();
-			} else {
-				customElements.add((Element) currentChild);
-			}
-		}
-		
-		SimpleDateFormat zulu = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-		zulu.setTimeZone(TimeZone.getTimeZone("GMT"));
-	
-		try {
-			created.setTime(zulu.parse(strCreated));
-			expires.setTime(zulu.parse(strExpires));
-		} catch (ParseException e) {
-			throw new WSSecurityException(
-				WSSecurityException.INVALID_SECURITY, 
-				"invalidTimestamp",
-				null, e);
-		}
-	}
-
-	/**
-	 * Constructs a <code>Timestamp</code> object according 
-	 * to the defined parameters.
-	 * <p/>
-	 * 
-	 * @param doc 			the SOAP envelope as <code>Document</code>
-	 * @param ttl			the time to live (validity of the security semantics) in seconds
-	 */
-	 public Timestamp(WSSConfig wssConfig, Document doc, int ttl) {
-
-		customElements = new Vector();
-		
-		element =
-			doc.createElementNS(
-                wssConfig.getWsuNS(),
-				WSConstants.WSU_PREFIX
-					+ ":"
-					+ WSConstants.TIMESTAMP_TOKEN_LN);
-		WSSecurityUtil.setNamespace(
-			element,
-            wssConfig.getWsuNS(),
-			WSConstants.WSU_PREFIX);
-		
-		SimpleDateFormat zulu = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-		zulu.setTimeZone(TimeZone.getTimeZone("GMT"));
-		Calendar rightNow = Calendar.getInstance();
-
-		elementCreated =
-			doc.createElementNS(
-                    wssConfig.getWsuNS(),
-				WSConstants.WSU_PREFIX + ":" + WSConstants.CREATED_LN);
-		WSSecurityUtil.setNamespace(
-			elementCreated,
-            wssConfig.getWsuNS(),
-			WSConstants.WSU_PREFIX);
-		elementCreated.appendChild(
-			doc.createTextNode(zulu.format(rightNow.getTime())));
-		element.appendChild(elementCreated);
-		if (ttl != 0) {
-    		long currentTime = rightNow.getTimeInMillis();
-    		currentTime += ttl * 1000;
-    		rightNow.setTimeInMillis(currentTime);
-    		
-    		elementExpires =
-    			doc.createElementNS(
-                    wssConfig.getWsuNS(),
-    				WSConstants.WSU_PREFIX + ":" + WSConstants.EXPIRES_LN);
-    		WSSecurityUtil.setNamespace(
-    			elementExpires,
-                wssConfig.getWsuNS(),
-    			WSConstants.WSU_PREFIX);
-    		elementExpires.appendChild(
-    			doc.createTextNode(zulu.format(rightNow.getTime())));
-    		element.appendChild(elementExpires);
+                strExpires = ((Text) ((Element) currentChild).getFirstChild()).getData();
+            } else {
+                customElements.add((Element) currentChild);
+            }
         }
-	}
+        
+        SimpleDateFormat zulu = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+        zulu.setTimeZone(TimeZone.getTimeZone("GMT"));
+    
+        try {
+            created.setTime(zulu.parse(strCreated));
+            expires.setTime(zulu.parse(strExpires));
+        } catch (ParseException e) {
+            throw new WSSecurityException(
+                WSSecurityException.INVALID_SECURITY, 
+                "invalidTimestamp",
+                null, e);
+        }
+    }
 
-	/**
-	 * Returns the dom element of this <code>Timestamp</code> object.
-	 * 
-	 * @return the <code>wsse:UsernameToken</code> element
-	 */
-	public Element getElement() {
-		return this.element;
-	}
+    /**
+     * Constructs a <code>Timestamp</code> object according 
+     * to the defined parameters.
+     * <p/>
+     * 
+     * @param doc             the SOAP envelope as <code>Document</code>
+     * @param ttl            the time to live (validity of the security semantics) in seconds
+     */
+     public Timestamp(WSSConfig wssConfig, Document doc, int ttl) {
 
-	/**
-	 * Returns the string representation of the token.
-	 * 
-	 * @return a XML string representation
-	 */
-	public String toString() {
-		return DOM2Writer.nodeToString((Node) this.element);
-	}
-	
+        customElements = new Vector();
+        
+        element =
+            doc.createElementNS(
+                wssConfig.getWsuNS(),
+                WSConstants.WSU_PREFIX
+                    + ":"
+                    + WSConstants.TIMESTAMP_TOKEN_LN);
+        WSSecurityUtil.setNamespace(
+            element,
+            wssConfig.getWsuNS(),
+            WSConstants.WSU_PREFIX);
+        
+        SimpleDateFormat zulu = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+        zulu.setTimeZone(TimeZone.getTimeZone("GMT"));
+        Calendar rightNow = Calendar.getInstance();
+
+        elementCreated =
+            doc.createElementNS(
+                    wssConfig.getWsuNS(),
+                WSConstants.WSU_PREFIX + ":" + WSConstants.CREATED_LN);
+        WSSecurityUtil.setNamespace(
+            elementCreated,
+            wssConfig.getWsuNS(),
+            WSConstants.WSU_PREFIX);
+        elementCreated.appendChild(
+            doc.createTextNode(zulu.format(rightNow.getTime())));
+        element.appendChild(elementCreated);
+        if (ttl != 0) {
+            long currentTime = rightNow.getTimeInMillis();
+            currentTime += ttl * 1000;
+            rightNow.setTimeInMillis(currentTime);
+            
+            elementExpires =
+                doc.createElementNS(
+                    wssConfig.getWsuNS(),
+                    WSConstants.WSU_PREFIX + ":" + WSConstants.EXPIRES_LN);
+            WSSecurityUtil.setNamespace(
+                elementExpires,
+                wssConfig.getWsuNS(),
+                WSConstants.WSU_PREFIX);
+            elementExpires.appendChild(
+                doc.createTextNode(zulu.format(rightNow.getTime())));
+            element.appendChild(elementExpires);
+        }
+    }
+
+    /**
+     * Returns the dom element of this <code>Timestamp</code> object.
+     * 
+     * @return the <code>wsse:UsernameToken</code> element
+     */
+    public Element getElement() {
+        return this.element;
+    }
+
+    /**
+     * Returns the string representation of the token.
+     * 
+     * @return a XML string representation
+     */
+    public String toString() {
+        return DOM2Writer.nodeToString((Node) this.element);
+    }
+    
     /**
      * Get the time of creation.
      * <p/>
@@ -186,30 +186,30 @@ public class Timestamp {
         return created;
     }
 
-	/**
-	 * Get the time of expiration.
-	 * <p/>
-	 * 
-	 * @return 
-	 */
-	public Calendar getExpires() {
-		return expires;
-	}
+    /**
+     * Get the time of expiration.
+     * <p/>
+     * 
+     * @return 
+     */
+    public Calendar getExpires() {
+        return expires;
+    }
 
-	/**
-	 * Creates and adds a custom element to this Timestamp
-	 */
-	public void addCustomElement(Document doc, Element customElement) {
-		customElements.add(customElement);
-		element.appendChild(customElement);
-	}
+    /**
+     * Creates and adds a custom element to this Timestamp
+     */
+    public void addCustomElement(Document doc, Element customElement) {
+        customElements.add(customElement);
+        element.appendChild(customElement);
+    }
 
-	/**
-	 * Get the the custom elements from this Timestamp
-	 * 
-	 * @return the vector containing the custom elements.
-	 */
-	public Vector getCustomElements() {
-		return this.customElements;
-	}
+    /**
+     * Get the the custom elements from this Timestamp
+     * 
+     * @return the vector containing the custom elements.
+     */
+    public Vector getCustomElements() {
+        return this.customElements;
+    }
 }

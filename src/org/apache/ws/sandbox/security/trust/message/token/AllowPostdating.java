@@ -29,74 +29,74 @@ import org.w3c.dom.Text;
  * @author Malinda Kaushalye
  * AllowPostdating element
  * 
- * This element indicates that returned tokens should allow requests for postdated	tokens.
+ * This element indicates that returned tokens should allow requests for postdated    tokens.
  * 
  *
  */
 public class AllowPostdating {
-	public static final QName TOKEN = new QName(TrustConstants.WST_NS, TrustConstants.ALLOWPOSTDATING_LN,TrustConstants.WST_PREFIX);
-			Element element=null;
-	
-		
-			/**
-			 * Constructor for AllowPostdating
-			 * @param elem
-			 * @throws WSSecurityException
-			 */	
-			public AllowPostdating(Element elem) throws WSSecurityException {	
-				this.element = elem;
-				 QName el = new QName(this.element.getNamespaceURI(), this.element.getLocalName());
-				 if (!el.equals(TOKEN)) {
-					 throw new WSSecurityException(WSSecurityException.INVALID_SECURITY_TOKEN, "badTokenType", new Object[]{el});
-				 } 
+    public static final QName TOKEN = new QName(TrustConstants.WST_NS, TrustConstants.ALLOWPOSTDATING_LN,TrustConstants.WST_PREFIX);
+            Element element=null;
+    
+        
+            /**
+             * Constructor for AllowPostdating
+             * @param elem
+             * @throws WSSecurityException
+             */    
+            public AllowPostdating(Element elem) throws WSSecurityException {    
+                this.element = elem;
+                 QName el = new QName(this.element.getNamespaceURI(), this.element.getLocalName());
+                 if (!el.equals(TOKEN)) {
+                     throw new WSSecurityException(WSSecurityException.INVALID_SECURITY_TOKEN, "badTokenType", new Object[]{el});
+                 } 
 
-			}
-			/**
-			 * Constructor for AllowPostdating
-			 * 
-			 * @param doc
-			 */
-			public AllowPostdating(Document doc) {
-				this.element = doc.createElementNS(TOKEN.getNamespaceURI(), TOKEN.getPrefix()+":"+TOKEN.getLocalPart());
-				WSSecurityUtil.setNamespace(this.element, TrustConstants.WST_NS, TrustConstants.WST_PREFIX);
-				this.element.appendChild(doc.createTextNode(""));
-	
-			}
+            }
+            /**
+             * Constructor for AllowPostdating
+             * 
+             * @param doc
+             */
+            public AllowPostdating(Document doc) {
+                this.element = doc.createElementNS(TOKEN.getNamespaceURI(), TOKEN.getPrefix()+":"+TOKEN.getLocalPart());
+                WSSecurityUtil.setNamespace(this.element, TrustConstants.WST_NS, TrustConstants.WST_PREFIX);
+                this.element.appendChild(doc.createTextNode(""));
+    
+            }
 
 
-			/**
-			 * get the first Node of the element
-			 * @return
-			 */
-			public Text getFirstNode() {
-				Node node = this.element.getFirstChild();
-				return ((node != null) && node instanceof Text) ? (Text) node : null;
-			}
-	
+            /**
+             * get the first Node of the element
+             * @return
+             */
+            public Text getFirstNode() {
+                Node node = this.element.getFirstChild();
+                return ((node != null) && node instanceof Text) ? (Text) node : null;
+            }
+    
 
-			/**
-			 * getthe AllowPostdating element
-			 * @return
-			 */
-			public Element getElement() {
-				return element;
-			}
+            /**
+             * getthe AllowPostdating element
+             * @return
+             */
+            public Element getElement() {
+                return element;
+            }
 
-			/**
-			 * Set the AllowPostdating element
-			 * @param element
-			 */
-			public void setElement(Element element) {
-				this.element = element;
-			}
+            /**
+             * Set the AllowPostdating element
+             * @param element
+             */
+            public void setElement(Element element) {
+                this.element = element;
+            }
 
-	
-			/**
-			 * to get the element as a String
-			 */
-			public String toString() {
-			  return DOM2Writer.nodeToString((Node)this.element);
-			}
-		
+    
+            /**
+             * to get the element as a String
+             */
+            public String toString() {
+              return DOM2Writer.nodeToString((Node)this.element);
+            }
+        
 
 }

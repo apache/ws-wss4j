@@ -43,8 +43,8 @@ public class KeyDerivator {
 
   public byte[] generateKey(Hashtable sessionTable, String identifier) throws
       WSSecurityException, ConversationException, WSSecurityException {
-	
-	log.debug("KeyDerivator: Inside generate key");
+    
+    log.debug("KeyDerivator: Inside generate key");
     String[] uuidAndDerivedKeyTokenId = ConversationUtil.
         getUuidAndDerivedKeyTokenId(identifier);
     //Get the session from teh session table
@@ -76,44 +76,44 @@ public class KeyDerivator {
     log.debug("KeyDerivator: deriveKey: security token reference: " + secTokRef);
     if (secTokRef != null ) {
       if(secTokRef.toString().equals("<wsse:SecurityTokenReference/>")) {//No security token reference
-		log.debug("KeyDerivator: deriveKey: No security token refernece available");
-		return deriveTokenFromContext(convSession, dkInfo);
+        log.debug("KeyDerivator: deriveKey: No security token refernece available");
+        return deriveTokenFromContext(convSession, dkInfo);
       } else { 
-		String contextIdentifier = convSession.getContextInfo().getIdentifier();
+        String contextIdentifier = convSession.getContextInfo().getIdentifier();
 
-		String wsuId = secTokRef.getReference().getURI();
+        String wsuId = secTokRef.getReference().getURI();
 
-		Element sctEle = WSSecurityUtil.getElementByWsuId(WSSConfig.getDefaultWSConfig(),secTokRef.getElement().getOwnerDocument(),wsuId);
+        Element sctEle = WSSecurityUtil.getElementByWsuId(WSSConfig.getDefaultWSConfig(),secTokRef.getElement().getOwnerDocument(),wsuId);
       
-		try {
-		  SecurityContextToken sct = new SecurityContextToken(sctEle);
-		  if(contextIdentifier.equals(sct.getIdentifier()))
-			return deriveTokenFromContext(convSession,dkInfo);
-		  else
-			throw new ConversationException("Derivation source cannot be determined");
-		} catch (WSSecurityException secEx) {
-		  /** @todo Supporting other tokens other than SCT as the derivation source */
-		  //Here we should check whether it is some other type of a token
-		  //E.g. DerivedKeyToken
-		}
+        try {
+          SecurityContextToken sct = new SecurityContextToken(sctEle);
+          if(contextIdentifier.equals(sct.getIdentifier()))
+            return deriveTokenFromContext(convSession,dkInfo);
+          else
+            throw new ConversationException("Derivation source cannot be determined");
+        } catch (WSSecurityException secEx) {
+          /** @todo Supporting other tokens other than SCT as the derivation source */
+          //Here we should check whether it is some other type of a token
+          //E.g. DerivedKeyToken
+        }
 
-		if (secTokRef.getReference().getURI().equals(contextIdentifier)) { //If the reference is to the SecurityContextToken
-		  return deriveTokenFromContext(convSession, dkInfo);
-		}
-		else {
-		  //Derive from some other security token other than the relevent security context
-		  /** @todo Derive from some other security token other than the relevent security context
-		   * For example this can be another DerivedKeyToken
-		   * */
-		  throw new ConversationException("KeyDerivator:  Deriving from some " +
-										  "other security token other than the " +
-			  "relevent security context: Not implemented :-(");
+        if (secTokRef.getReference().getURI().equals(contextIdentifier)) { //If the reference is to the SecurityContextToken
+          return deriveTokenFromContext(convSession, dkInfo);
+        }
+        else {
+          //Derive from some other security token other than the relevent security context
+          /** @todo Derive from some other security token other than the relevent security context
+           * For example this can be another DerivedKeyToken
+           * */
+          throw new ConversationException("KeyDerivator:  Deriving from some " +
+                                          "other security token other than the " +
+              "relevent security context: Not implemented :-(");
 
-		}
+        }
       }
     }
     else { //There is no SecurityTokenRefernece
-	  log.debug("KeyDerivator: deriveKey: No security token refernece available");
+      log.debug("KeyDerivator: deriveKey: No security token refernece available");
       return deriveTokenFromContext(convSession, dkInfo);
     }
 
@@ -129,8 +129,8 @@ public class KeyDerivator {
   private byte[] deriveTokenFromContext(ConversationSession convSession,
                                         DerivedKeyInfo dkInfo) throws
       ConversationException {
-	
-	log.debug("KeyDerivator: deriving key from contecxt :" + convSession.getContextInfo().getIdentifier() + " for dkt: " + dkInfo.getId());
+    
+    log.debug("KeyDerivator: deriving key from contecxt :" + convSession.getContextInfo().getIdentifier() + " for dkt: " + dkInfo.getId());
     byte[] secret = convSession.getContextInfo().getSharedSecret(); //Shared secret
     String labelAndNonce = getLabelAndNonce(convSession, dkInfo); //Label and nonce
     long keyLength = getKeyLength(convSession, dkInfo); //Length of the key to generated
@@ -152,7 +152,7 @@ public class KeyDerivator {
     String label, nonce;
     if((label = dkInfo.getLabel()) != null || (label = convSession.getLabel()) != null) {
       if((nonce = dkInfo.getNonce()) != null) {
-		log.debug("KeyDerivator: Inside get label and nocne : " + label + nonce);
+        log.debug("KeyDerivator: Inside get label and nocne : " + label + nonce);
         return label+nonce;
       } else {
         throw new ConversationException("Nonce value not available");
@@ -174,11 +174,11 @@ public class KeyDerivator {
 
     long length;
     if ( (length = dkInfo.getLength()) != -1) { //If the length info is there in the token return it
-		log.debug("KeyDerivator: Inside get length: " + length);
+        log.debug("KeyDerivator: Inside get length: " + length);
       return length;
     }
     else if ( (length = convSession.getKeyLength()) != -1) { //Get length info from the session
-	  log.debug("KeyDerivator: Inside get length: " + length);
+      log.debug("KeyDerivator: Inside get length: " + length);
       return length;
     }
     else {

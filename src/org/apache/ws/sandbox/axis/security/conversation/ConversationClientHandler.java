@@ -245,7 +245,7 @@ public class ConversationClientHandler extends BasicHandler {
                 tmpE = (Element) ndList.item(i);
                 tmpDKT = new DerivedKeyToken(tmpE);
                 tmpID = tmpDKT.getID();
-                //Add to the conv Session .... :-)					        
+                //Add to the conv Session .... :-)                            
             }
 
             secEng.processSecurityHeader(doc, "", this.dkcbHandler, null);

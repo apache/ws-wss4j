@@ -38,81 +38,81 @@ import java.util.Enumeration;
 import java.util.Vector;
 
 public class WSDocInfo {
-	int hash;
-	Crypto crypto = null;
-	Vector bst = null;
-	Element assertion = null;
+    int hash;
+    Crypto crypto = null;
+    Vector bst = null;
+    Element assertion = null;
 
-	public WSDocInfo(int hash) {
-		this.hash = hash;
-	}
+    public WSDocInfo(int hash) {
+        this.hash = hash;
+    }
 
-	/**
-	 * Clears the info data except the hash code
-	 * 
-	 */
-	public void clear() {
-		crypto = null;
-		assertion = null;
-		if (bst != null && bst.size() > 0) {
-			bst.removeAllElements();
-		}
-		bst = null;
-	}
-	/**
-	 * Get a BinarySecurityToken for the given Id
-	 * 
-	 * @param uri is the relative uri (starts with #) of the id
-	 * @return the BST element or null if nothing found
-	 */
-	public Element getBst(String uri) {
-		String id = uri.substring(1);
-		Element elem = null;
+    /**
+     * Clears the info data except the hash code
+     * 
+     */
+    public void clear() {
+        crypto = null;
+        assertion = null;
+        if (bst != null && bst.size() > 0) {
+            bst.removeAllElements();
+        }
+        bst = null;
+    }
+    /**
+     * Get a BinarySecurityToken for the given Id
+     * 
+     * @param uri is the relative uri (starts with #) of the id
+     * @return the BST element or null if nothing found
+     */
+    public Element getBst(String uri) {
+        String id = uri.substring(1);
+        Element elem = null;
 
-		if (bst != null) {
-			for (Enumeration e = bst.elements(); e.hasMoreElements();) {
-				elem = (Element) e.nextElement();
-				String cId = elem.getAttribute("Id");
-				if (id.equals(cId)) {
-					break;
-				}
-			}
-		}
-		return elem;
-	}
+        if (bst != null) {
+            for (Enumeration e = bst.elements(); e.hasMoreElements();) {
+                elem = (Element) e.nextElement();
+                String cId = elem.getAttribute("Id");
+                if (id.equals(cId)) {
+                    break;
+                }
+            }
+        }
+        return elem;
+    }
 
-	/**
-	 * @return the signature crypto class used to process
-	 * 			the signature/verfiy 
-	 */
-	public Crypto getCrypto() {
-		return crypto;
-	}
+    /**
+     * @return the signature crypto class used to process
+     *             the signature/verfiy 
+     */
+    public Crypto getCrypto() {
+        return crypto;
+    }
 
-	/**
-	 * @return the hash value of the document
-	 */
-	public int getHash() {
-		return hash;
-	}
+    /**
+     * @return the hash value of the document
+     */
+    public int getHash() {
+        return hash;
+    }
 
-	/**
-	 * @param elem	is the BinarySecurityToken to store
-	 */
-	public void setBst(Element elem) {
-		if (bst == null) {
-			bst = new Vector();
-		}
-		bst.add(elem);
-	}
+    /**
+     * @param elem    is the BinarySecurityToken to store
+     */
+    public void setBst(Element elem) {
+        if (bst == null) {
+            bst = new Vector();
+        }
+        bst.add(elem);
+    }
 
-	/**
-	 * @param crypto is the signature crypto class used to
-	 * 				process signature/verify
-	 */
-	public void setCrypto(Crypto crypto) {
-		this.crypto = crypto;
-	}
+    /**
+     * @param crypto is the signature crypto class used to
+     *                 process signature/verify
+     */
+    public void setCrypto(Crypto crypto) {
+        this.crypto = crypto;
+    }
 
     /**
      * @return Returns the assertion.

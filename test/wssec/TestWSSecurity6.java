@@ -149,9 +149,9 @@ public class TestWSSecurity6 extends TestCase implements CallbackHandler {
          */
 
         Message encryptedMsg = (Message) AxisUtil.toSOAPMessage(encryptedSignedDoc);
-		String s = encryptedMsg.getSOAPPartAsString();
-		((SOAPPart)message.getSOAPPart()).setCurrentMessage(s, SOAPPart.FORM_STRING);
-		        
+        String s = encryptedMsg.getSOAPPartAsString();
+        ((SOAPPart)message.getSOAPPart()).setCurrentMessage(s, SOAPPart.FORM_STRING);
+                
         Document encryptedSignedDoc1 = message.getSOAPEnvelope().getAsDocument();
         log.info("After Encryption....");
         verify(encryptedSignedDoc1);

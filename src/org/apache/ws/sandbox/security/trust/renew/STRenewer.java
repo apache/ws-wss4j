@@ -25,5 +25,5 @@ import org.w3c.dom.Document;
  * Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
  */
 public interface STRenewer {
-	public Document renew(Document req,Document res)throws Exception;
+    public Document renew(Document req,Document res)throws Exception;
 }

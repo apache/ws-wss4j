@@ -21,34 +21,34 @@ package org.apache.ws.security;
  * @author Werner Dittmann (Werner.Dittmann@siemens.com)
  */
 public class WSEncryptionPart {
-	
-	private String name;
-	private String namespace;
-	private String encModifier;
+    
+    private String name;
+    private String namespace;
+    private String encModifier;
 
-	public WSEncryptionPart(String nm, String nmspace, String encMod) {
-		name = nm;
-		namespace = nmspace;
-		encModifier = encMod;
-	}
-	/**
-	 * @return the local name of the element to encrypt.
-	 */
-	public String getName() {
-		return name;
-	}
+    public WSEncryptionPart(String nm, String nmspace, String encMod) {
+        name = nm;
+        namespace = nmspace;
+        encModifier = encMod;
+    }
+    /**
+     * @return the local name of the element to encrypt.
+     */
+    public String getName() {
+        return name;
+    }
 
-	/**
-	 * @return the namespace of the element to encrypt
-	 */
-	public String getNamespace() {
-		return namespace;
-	}
+    /**
+     * @return the namespace of the element to encrypt
+     */
+    public String getNamespace() {
+        return namespace;
+    }
 
-	/**
-	 * @return the encryption modifier
-	 */
-	public String getEncModifier() {
-		return encModifier;
-	}
+    /**
+     * @return the encryption modifier
+     */
+    public String getEncModifier() {
+        return encModifier;
+    }
 }

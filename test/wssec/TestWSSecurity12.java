@@ -127,9 +127,9 @@ public class TestWSSecurity12 extends TestCase {
         SOAPEnvelope envelope = null;
         WSSignEnvelope builder = new WSSignEnvelope();
         builder.setUserInfo("wss4jcertDSA", "security");
-		builder.setKeyIdentifierType(WSConstants.SKI_KEY_IDENTIFIER);
-		builder.setSignatureAlgorithm(XMLSignature.ALGO_ID_SIGNATURE_DSA);
-		
+        builder.setKeyIdentifierType(WSConstants.SKI_KEY_IDENTIFIER);
+        builder.setSignatureAlgorithm(XMLSignature.ALGO_ID_SIGNATURE_DSA);
+        
         // builder.setUserInfo("john", "keypass");
         log.info("Before SigningDSA_SKIDirect....");
         Document doc = unsignedEnvelope.getAsDocument();
@@ -143,91 +143,91 @@ public class TestWSSecurity12 extends TestCase {
          */
 
         Message signedMsg = (Message) AxisUtil.toSOAPMessage(signedDoc);
-		if (log.isDebugEnabled()) {
-			log.debug("Signed message with DSA_SKI key identifier:");
-			XMLUtils.PrettyElementToWriter(signedMsg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
-		}
+        if (log.isDebugEnabled()) {
+            log.debug("Signed message with DSA_SKI key identifier:");
+            XMLUtils.PrettyElementToWriter(signedMsg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
+        }
 
         signedDoc = signedMsg.getSOAPEnvelope().getAsDocument();
         log.info("After SigningDSA_SKIDirect....");
         verify(signedDoc);
     }
 
-	/**
-	 * Test that signs and verifies a WS-Security envelope using SubjectKeyIdentifier.
-	 * This test uses the SubjectKeyIdentifier to identify the certificate. 
-	 * It gets a certificate with a DSA public key algo to sign, WSSignEnvelope shall
-	 * detect the algo and set the signature algo accordingly.
-	 * <p/>
-	 * 
-	 * @throws java.lang.Exception Thrown when there is any problem in signing or verification
-	 */
-	public void testX509SignatureDSA_Autodetect() throws Exception {
-		SOAPEnvelope envelope = null;
-		WSSignEnvelope builder = new WSSignEnvelope();
-		builder.setUserInfo("wss4jcertDSA", "security");
-		builder.setKeyIdentifierType(WSConstants.SKI_KEY_IDENTIFIER);
-		
-		// builder.setUserInfo("john", "keypass");
-		log.info("Before SigningDSA_Autodetect....");
-		Document doc = unsignedEnvelope.getAsDocument();
-		Document signedDoc = builder.build(doc, crypto);
+    /**
+     * Test that signs and verifies a WS-Security envelope using SubjectKeyIdentifier.
+     * This test uses the SubjectKeyIdentifier to identify the certificate. 
+     * It gets a certificate with a DSA public key algo to sign, WSSignEnvelope shall
+     * detect the algo and set the signature algo accordingly.
+     * <p/>
+     * 
+     * @throws java.lang.Exception Thrown when there is any problem in signing or verification
+     */
+    public void testX509SignatureDSA_Autodetect() throws Exception {
+        SOAPEnvelope envelope = null;
+        WSSignEnvelope builder = new WSSignEnvelope();
+        builder.setUserInfo("wss4jcertDSA", "security");
+        builder.setKeyIdentifierType(WSConstants.SKI_KEY_IDENTIFIER);
+        
+        // builder.setUserInfo("john", "keypass");
+        log.info("Before SigningDSA_Autodetect....");
+        Document doc = unsignedEnvelope.getAsDocument();
+        Document signedDoc = builder.build(doc, crypto);
 
-		/*
-		 * convert the resulting document into a message first. The toSOAPMessage()
-		 * mehtod performs the necessary c14n call to properly set up the signed
-		 * document and convert it into a SOAP message. After that we extract it
-		 * as a document again for further processing.
-		 */
+        /*
+         * convert the resulting document into a message first. The toSOAPMessage()
+         * mehtod performs the necessary c14n call to properly set up the signed
+         * document and convert it into a SOAP message. After that we extract it
+         * as a document again for further processing.
+         */
 
-		Message signedMsg = (Message) AxisUtil.toSOAPMessage(signedDoc);
-		if (log.isDebugEnabled()) {
-			log.debug("Signed message with DSA_Autodetect:");
-			XMLUtils.PrettyElementToWriter(signedMsg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
-		}
+        Message signedMsg = (Message) AxisUtil.toSOAPMessage(signedDoc);
+        if (log.isDebugEnabled()) {
+            log.debug("Signed message with DSA_Autodetect:");
+            XMLUtils.PrettyElementToWriter(signedMsg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
+        }
 
-		signedDoc = signedMsg.getSOAPEnvelope().getAsDocument();
-		log.info("After SigningDSA_Autodetect....");
-		verify(signedDoc);
-	}
+        signedDoc = signedMsg.getSOAPEnvelope().getAsDocument();
+        log.info("After SigningDSA_Autodetect....");
+        verify(signedDoc);
+    }
 
-	/**
-	 * Test that signs and verifies a WS-Security envelope using SubjectKeyIdentifier.
-	 * This test uses the SubjectKeyIdentifier to identify the certificate. 
-	 * It gets a certificate with a RSA public key algo to sign, WSSignEnvelope shall
-	 * detect the algo and set the signature algo accordingly.
-	 * <p/>
-	 * 
-	 * @throws java.lang.Exception Thrown when there is any problem in signing or verification
-	 */
-	public void testX509SignatureRSA_Autodetect() throws Exception {
-		SOAPEnvelope envelope = null;
-		WSSignEnvelope builder = new WSSignEnvelope();
-		builder.setUserInfo("wss4jcert", "security");
-		builder.setKeyIdentifierType(WSConstants.SKI_KEY_IDENTIFIER);
-		
-		// builder.setUserInfo("john", "keypass");
-		log.info("Before SigningRSA_Autodetect....");
-		Document doc = unsignedEnvelope.getAsDocument();
-		Document signedDoc = builder.build(doc, crypto);
+    /**
+     * Test that signs and verifies a WS-Security envelope using SubjectKeyIdentifier.
+     * This test uses the SubjectKeyIdentifier to identify the certificate. 
+     * It gets a certificate with a RSA public key algo to sign, WSSignEnvelope shall
+     * detect the algo and set the signature algo accordingly.
+     * <p/>
+     * 
+     * @throws java.lang.Exception Thrown when there is any problem in signing or verification
+     */
+    public void testX509SignatureRSA_Autodetect() throws Exception {
+        SOAPEnvelope envelope = null;
+        WSSignEnvelope builder = new WSSignEnvelope();
+        builder.setUserInfo("wss4jcert", "security");
+        builder.setKeyIdentifierType(WSConstants.SKI_KEY_IDENTIFIER);
+        
+        // builder.setUserInfo("john", "keypass");
+        log.info("Before SigningRSA_Autodetect....");
+        Document doc = unsignedEnvelope.getAsDocument();
+        Document signedDoc = builder.build(doc, crypto);
 
-		/*
-		 * convert the resulting document into a message first. The toSOAPMessage()
-		 * mehtod performs the necessary c14n call to properly set up the signed
-		 * document and convert it into a SOAP message. After that we extract it
-		 * as a document again for further processing.
-		 */
+        /*
+         * convert the resulting document into a message first. The toSOAPMessage()
+         * mehtod performs the necessary c14n call to properly set up the signed
+         * document and convert it into a SOAP message. After that we extract it
+         * as a document again for further processing.
+         */
 
-		Message signedMsg = (Message) AxisUtil.toSOAPMessage(signedDoc);
-		if (log.isDebugEnabled()) {
-			log.debug("Signed message with RSA Autodetect:");
-			XMLUtils.PrettyElementToWriter(signedMsg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
-		}
+        Message signedMsg = (Message) AxisUtil.toSOAPMessage(signedDoc);
+        if (log.isDebugEnabled()) {
+            log.debug("Signed message with RSA Autodetect:");
+            XMLUtils.PrettyElementToWriter(signedMsg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
+        }
 
-		signedDoc = signedMsg.getSOAPEnvelope().getAsDocument();
-		log.info("After SigningRSA_Autodetect....");
-		verify(signedDoc);
-	}
+        signedDoc = signedMsg.getSOAPEnvelope().getAsDocument();
+        log.info("After SigningRSA_Autodetect....");
+        verify(signedDoc);
+    }
     
     /**
      * Verifies the soap envelope

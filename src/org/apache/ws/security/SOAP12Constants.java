@@ -63,11 +63,11 @@ public class SOAP12Constants implements SOAPConstants {
     public String getNextRoleURI() {
         return WSConstants.URI_SOAP12_NEXT_ROLE;
     }
-	/**
-	 * Obtain the Mustunderstand string
-	 */
-	public String getMustunderstand() {
-		return "true";
-	}
+    /**
+     * Obtain the Mustunderstand string
+     */
+    public String getMustunderstand() {
+        return "true";
+    }
 
 }

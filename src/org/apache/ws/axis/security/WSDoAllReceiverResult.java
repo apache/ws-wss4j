@@ -23,27 +23,27 @@ import java.util.Vector;
  * @author Werner Dittmann (Werner.Dittmann@Siemens.com)
  */
 public class WSDoAllReceiverResult {
-	private String actor;
-	private Vector wsSecurityResults;
+    private String actor;
+    private Vector wsSecurityResults;
 
 
-	WSDoAllReceiverResult(String actor, Vector wsResults) {
-		this.actor = actor;
-		this.wsSecurityResults = wsResults;
-	}
+    WSDoAllReceiverResult(String actor, Vector wsResults) {
+        this.actor = actor;
+        this.wsSecurityResults = wsResults;
+    }
 
-	/**
-	 * @return
-	 */
-	public String getActor() {
-		return actor;
-	}
+    /**
+     * @return
+     */
+    public String getActor() {
+        return actor;
+    }
 
-	/**
-	 * @return
-	 */
-	public Vector getResults() {
-		return wsSecurityResults;
-	}
+    /**
+     * @return
+     */
+    public Vector getResults() {
+        return wsSecurityResults;
+    }
 
 }

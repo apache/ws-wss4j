@@ -26,12 +26,12 @@ import org.apache.ws.security.trust.WSTrustException;;
  * This is the interface for three verifiers used by the Trust engine 
  */
 public interface STVerifier {
-	/**
-	 * Verification for the Trust engine
-	 * @param doc The request document
-	 * @param porp configuration information
-	 * @return Verified/NOT ?
-	 * @throws TrustException
-	 */
-	public boolean verify(Document doc) throws WSTrustException;
+    /**
+     * Verification for the Trust engine
+     * @param doc The request document
+     * @param porp configuration information
+     * @return Verified/NOT ?
+     * @throws TrustException
+     */
+    public boolean verify(Document doc) throws WSTrustException;
 }

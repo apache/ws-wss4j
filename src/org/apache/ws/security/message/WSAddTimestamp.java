@@ -36,7 +36,7 @@ import org.w3c.dom.Element;
 public class WSAddTimestamp extends WSBaseMessage {
     private static Log log = LogFactory.getLog(WSAddTimestamp.class.getName());
     
-	private Timestamp ts = null;
+    private Timestamp ts = null;
 
     /**
      * Constructor.
@@ -89,10 +89,10 @@ public class WSAddTimestamp extends WSBaseMessage {
      */
     public Document build(Document doc, int ttl) { 
         log.debug("Begin add timestamp...");
-  		Element securityHeader = insertSecurityHeader(doc);
+          Element securityHeader = insertSecurityHeader(doc);
         Element target;
-  		if (wssConfig.getTimestampLocation() == WSSConfig.TIMESTAMP_IN_SECURITY_ELEMENT) {
-  		    target = securityHeader;
+          if (wssConfig.getTimestampLocation() == WSSConfig.TIMESTAMP_IN_SECURITY_ELEMENT) {
+              target = securityHeader;
         } else {
             target = (Element)securityHeader.getParentNode();
         }

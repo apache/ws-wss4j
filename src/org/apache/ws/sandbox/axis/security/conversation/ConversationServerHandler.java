@@ -61,7 +61,7 @@ import java.util.Iterator;
  *
  * Each application has a set of policies on how it should be accessed.
  * This handler facilitates one of the following two types of base tokens for a service 
- * 	1) username token.
+ *     1) username token.
  *  2) X509 certificates.
  */
 public class ConversationServerHandler extends BasicHandler {
@@ -87,8 +87,8 @@ public class ConversationServerHandler extends BasicHandler {
 
     /**
      * Method looks for a SCT in the SOAP envelope, 
-     * <li>		Case 1 :: if it is available then this is the first round.<\li>
-     * <li>		Case 2 :: if it is not available check for derived keys<\li>
+     * <li>        Case 1 :: if it is available then this is the first round.<\li>
+     * <li>        Case 2 :: if it is not available check for derived keys<\li>
      * 
      * Case 1 :: Creating a new conversation session and add it to the <code>DerivedKeyCallBackHandler</code> 
      * 
@@ -109,14 +109,14 @@ public class ConversationServerHandler extends BasicHandler {
                 ((org.apache.axis.message.SOAPEnvelope) sPart.getEnvelope())
                     .getAsDocument();
 
-            //Now search for a SCT in the Security header.		
+            //Now search for a SCT in the Security header.        
             NodeList list =
                 doc.getElementsByTagNameNS(
                     WSConstants.WSSE_NS,
                     TrustConstants.SECURITY_CONTEXT_TOKEN_RESPONSE_LN);
             int len = list.getLength();
             if (len == 0) { // No SCT is found
-                //	TODO:: Look for derived keys and do the decryption
+                //    TODO:: Look for derived keys and do the decryption
                 try {
                     NodeList ndList =
                         doc.getElementsByTagNameNS(
@@ -129,7 +129,7 @@ public class ConversationServerHandler extends BasicHandler {
                         tmpE = (Element) ndList.item(i);
                         tmpDKT = new DerivedKeyToken(tmpE);
                         tmpID = tmpDKT.getID();
-                        //Add to the conv Session .... :-)					        
+                        //Add to the conv Session .... :-)                            
                     }
                     WSSecurityEngine secEng = new WSSecurityEngine();
                     secEng.processSecurityHeader(
@@ -224,7 +224,7 @@ public class ConversationServerHandler extends BasicHandler {
         Document doc = null;
         Message message = msg.getCurrentMessage();
         String uuid, identifier;
-        //	Code to get the soap message as a Docuemnt
+        //    Code to get the soap message as a Docuemnt
         SOAPPart sPart = (org.apache.axis.SOAPPart) message.getSOAPPart();
         try {
 

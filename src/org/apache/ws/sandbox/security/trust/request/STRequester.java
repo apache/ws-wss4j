@@ -28,13 +28,13 @@ import org.w3c.dom.Document;
  * 
  */
 public interface STRequester {
-	/**
-	 * Modify request according to the given options
-	 *  
-	 * @param req full Envelop of the SOAP request as a Dom document
-	 * @param hashOps all the paramaeters in the .wsdd file as a hash map
-	 * @return modified request docment.
-	 * @throws WSTrustException
-	 */
-	public Document request(Document req,Hashtable hashOps) throws WSTrustException;
+    /**
+     * Modify request according to the given options
+     *  
+     * @param req full Envelop of the SOAP request as a Dom document
+     * @param hashOps all the paramaeters in the .wsdd file as a hash map
+     * @return modified request docment.
+     * @throws WSTrustException
+     */
+    public Document request(Document req,Hashtable hashOps) throws WSTrustException;
 }

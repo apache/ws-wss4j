@@ -33,39 +33,39 @@ import org.w3c.dom.Element;
  */
 public class WSSAddSAMLToken extends WSBaseMessage {
 
-	private static Log log = LogFactory.getLog(WSSAddSAMLToken.class.getName());
+    private static Log log = LogFactory.getLog(WSSAddSAMLToken.class.getName());
 
-	/**
-	 * Constructor.
-	 */
-	public WSSAddSAMLToken() {
-	}
+    /**
+     * Constructor.
+     */
+    public WSSAddSAMLToken() {
+    }
 
-	/**
-	 * Constructor. 
-	 * <p/>
-	 * 
-	 * @param actor
-	 *            the name of the actor of the <code>wsse:Security</code>
-	 *            header
-	 */
-	public WSSAddSAMLToken(String actor) {
-		super(actor);
-	}
+    /**
+     * Constructor. 
+     * <p/>
+     * 
+     * @param actor
+     *            the name of the actor of the <code>wsse:Security</code>
+     *            header
+     */
+    public WSSAddSAMLToken(String actor) {
+        super(actor);
+    }
 
-	/**
-	 * Constructor. 
-	 * <p/>
-	 * 
-	 * @param actor
-	 *            The name of the actor of the <code>wsse:Security</code>
-	 *            header
-	 * @param mu
-	 *            Set <code>mustUnderstand</code> to true or false
-	 */
-	public WSSAddSAMLToken(String actor, boolean mu) {
-		super(actor, mu);
-	}
+    /**
+     * Constructor. 
+     * <p/>
+     * 
+     * @param actor
+     *            The name of the actor of the <code>wsse:Security</code>
+     *            header
+     * @param mu
+     *            Set <code>mustUnderstand</code> to true or false
+     */
+    public WSSAddSAMLToken(String actor, boolean mu) {
+        super(actor, mu);
+    }
 
     /**
      * Constructor. 
@@ -83,32 +83,32 @@ public class WSSAddSAMLToken extends WSBaseMessage {
         super(wssConfig, actor, mu);
     }
 
-	/**
-	 * Adds a new <code>SAMLAssertion</code> to a soap envelope. 
-	 * <p/>
-	 * A complete <code>SAMLAssertion</code> is added to the
-	 * <code>wsse:Security</code> header.
-	 * 
-	 * @param doc
-	 *            The SOAP enevlope as W3C document
-	 * @param username
-	 *            The username to set in the UsernameToken
-	 * @return Document with UsernameToken added
-	 */
-	public Document build(Document doc, SAMLAssertion assertion) {
-		log.debug("Begin add SAMLAssertion token...");
-		try {
-			Element element = (Element) assertion.toDOM(doc);
-			Element securityHeader = insertSecurityHeader(doc);
-			WSSecurityUtil.prependChildElement(
-				doc,
-				securityHeader,
-				element,
-				true);
-		} catch (SAMLException ex) {
-			ex.printStackTrace();
-			throw new RuntimeException(ex.toString());
-		}
-		return doc;
-	}
+    /**
+     * Adds a new <code>SAMLAssertion</code> to a soap envelope. 
+     * <p/>
+     * A complete <code>SAMLAssertion</code> is added to the
+     * <code>wsse:Security</code> header.
+     * 
+     * @param doc
+     *            The SOAP enevlope as W3C document
+     * @param username
+     *            The username to set in the UsernameToken
+     * @return Document with UsernameToken added
+     */
+    public Document build(Document doc, SAMLAssertion assertion) {
+        log.debug("Begin add SAMLAssertion token...");
+        try {
+            Element element = (Element) assertion.toDOM(doc);
+            Element securityHeader = insertSecurityHeader(doc);
+            WSSecurityUtil.prependChildElement(
+                doc,
+                securityHeader,
+                element,
+                true);
+        } catch (SAMLException ex) {
+            ex.printStackTrace();
+            throw new RuntimeException(ex.toString());
+        }
+        return doc;
+    }
 }

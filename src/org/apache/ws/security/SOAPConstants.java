@@ -63,10 +63,10 @@ public interface SOAPConstants extends Serializable {
      */ 
     public String getNextRoleURI();
     
-	/**
-	 * Obtain the "next" role/actor URI
-	 */ 
-	public String getMustunderstand();
+    /**
+     * Obtain the "next" role/actor URI
+     */ 
+    public String getMustunderstand();
 
 
 

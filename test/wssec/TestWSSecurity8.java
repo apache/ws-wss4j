@@ -138,16 +138,16 @@ public class TestWSSecurity8 extends TestCase implements CallbackHandler {
         
         WSEncryptBody encrypt = new WSEncryptBody();
         encrypt.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e");
-		encrypt.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
-		encrypt.setSymmetricEncAlgorithm(WSConstants.TRIPLE_DES);
+        encrypt.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
+        encrypt.setSymmetricEncAlgorithm(WSConstants.TRIPLE_DES);
 
-		WSSignEnvelope sign = new WSSignEnvelope();
+        WSSignEnvelope sign = new WSSignEnvelope();
         sign.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
-		sign.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
+        sign.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
 
         log.info("Before Sign/Encryption....");
         Document doc = unsignedEnvelope.getAsDocument();
-		Document signedDoc = sign.build(doc, crypto);
+        Document signedDoc = sign.build(doc, crypto);
         Document encryptedSignedDoc = encrypt.build(signedDoc, crypto);
         /*
          * convert the resulting document into a message first. The toSOAPMessage()
@@ -156,16 +156,16 @@ public class TestWSSecurity8 extends TestCase implements CallbackHandler {
          * as a document again for further processing.
          */
 
-		Message encryptedMsg = (Message) AxisUtil.toSOAPMessage(encryptedSignedDoc);
-		if (log.isDebugEnabled()) {
-			log.debug("Signed and encrypted message with IssuerSerial key identifier (both), 3DES:");
-			XMLUtils.PrettyElementToWriter(encryptedMsg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
-		}
-		
-		String s = encryptedMsg.getSOAPPartAsString();
-		((SOAPPart)message.getSOAPPart()).setCurrentMessage(s, SOAPPart.FORM_STRING);
-		        
-		Document encryptedSignedDoc1 = message.getSOAPEnvelope().getAsDocument();
+        Message encryptedMsg = (Message) AxisUtil.toSOAPMessage(encryptedSignedDoc);
+        if (log.isDebugEnabled()) {
+            log.debug("Signed and encrypted message with IssuerSerial key identifier (both), 3DES:");
+            XMLUtils.PrettyElementToWriter(encryptedMsg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
+        }
+        
+        String s = encryptedMsg.getSOAPPartAsString();
+        ((SOAPPart)message.getSOAPPart()).setCurrentMessage(s, SOAPPart.FORM_STRING);
+                
+        Document encryptedSignedDoc1 = message.getSOAPEnvelope().getAsDocument();
         log.info("After Sign/Encryption....");
         verify(encryptedSignedDoc1);
     }
@@ -180,10 +180,10 @@ public class TestWSSecurity8 extends TestCase implements CallbackHandler {
     private void verify(Document doc) throws Exception {
         secEngine.processSecurityHeader(doc, null, this, crypto);
         AxisUtil.updateSOAPMessage(doc, message);
-		if (log.isDebugEnabled()) {
-			log.debug("Verfied and decrypted message:");
-			XMLUtils.PrettyElementToWriter(message.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
-		}
+        if (log.isDebugEnabled()) {
+            log.debug("Verfied and decrypted message:");
+            XMLUtils.PrettyElementToWriter(message.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
+        }
     }
 
     public void handle(Callback[] callbacks)

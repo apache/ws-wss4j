@@ -140,9 +140,9 @@ public class SessionMonitor extends Thread {
                 lastReaped = now;
             }
             try {
-				sleep(reapPeriodicity/2);
+                sleep(reapPeriodicity/2);
             } catch (InterruptedException e) {
-            	log.debug(e.getMessage());
+                log.debug(e.getMessage());
             }
 
         }

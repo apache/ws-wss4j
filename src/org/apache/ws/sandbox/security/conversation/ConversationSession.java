@@ -31,7 +31,7 @@ import org.apache.ws.security.conversation.message.info.SecurityContextInfo;
 
 public class ConversationSession {
 
-	private Log log = LogFactory.getLog(ConversationSession.class.getName());
+    private Log log = LogFactory.getLog(ConversationSession.class.getName());
 
   /**
    * The security context info of this session
@@ -69,7 +69,7 @@ public class ConversationSession {
    * @param contextInfo The security context info
    */
   public ConversationSession(SecurityContextInfo contextInfo) {
-  	log.debug("Conversation Session : created. Identifier :" + contextInfo.getIdentifier());
+      log.debug("Conversation Session : created. Identifier :" + contextInfo.getIdentifier());
     this.contextInfo = contextInfo;
     this.derivedKeys = new Hashtable();
     touch();

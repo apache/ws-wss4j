@@ -121,7 +121,7 @@ public class TestWSSecurity4 extends TestCase {
 //        SOAPEnvelope envelope = null;
 //        WSSignEnvelope builder = new WSSignEnvelope();
 //        builder.setUserInfo("wss4jcert", "security");
-//		builder.setKeyIdentifierType(WSConstants.SKI_KEY_IDENTIFIER_DIRECT);
+//        builder.setKeyIdentifierType(WSConstants.SKI_KEY_IDENTIFIER_DIRECT);
 //
 //        // builder.setUserInfo("john", "keypass");
 //        log.info("Before Signing....");
@@ -136,7 +136,7 @@ public class TestWSSecurity4 extends TestCase {
 //         */
 //
 //        Message signedMsg = (Message) AxisUtil.toSOAPMessage(signedDoc);
-//		XMLUtils.PrettyElementToWriter(signedMsg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
+//        XMLUtils.PrettyElementToWriter(signedMsg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
 //
 //        signedDoc = signedMsg.getSOAPEnvelope().getAsDocument();
 //        log.info("After Signing....");
@@ -153,7 +153,7 @@ public class TestWSSecurity4 extends TestCase {
 //        SOAPEnvelope envelope = null;
 //        WSSignEnvelope builder = new WSSignEnvelope();
 //        builder.setUserInfo("wss4jcert", "security");
-//		builder.setKeyIdentifierType(WSConstants.SKI_KEY_IDENTIFIER_DIRECT);
+//        builder.setKeyIdentifierType(WSConstants.SKI_KEY_IDENTIFIER_DIRECT);
 //
 //        // builder.setUserInfo("john", "keypass");
 //        Document doc = unsignedEnvelope.getAsDocument();

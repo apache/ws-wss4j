@@ -36,34 +36,34 @@ import javax.xml.rpc.holders.StringHolder;
 import java.util.Vector;
 
 public class PingBindingImpl
-	implements org.apache.ws.axis.oasis.ping.PingPort {
-	public void ping(
+    implements org.apache.ws.axis.oasis.ping.PingPort {
+    public void ping(
             org.apache.ws.axis.oasis.ping.TicketType pingTicket, 
-		StringHolder text)
-		throws java.rmi.RemoteException {
-		MessageContext msgContext = MessageContext.getCurrentContext();
-		Message reqMsg = msgContext.getRequestMessage();
+        StringHolder text)
+        throws java.rmi.RemoteException {
+        MessageContext msgContext = MessageContext.getCurrentContext();
+        Message reqMsg = msgContext.getRequestMessage();
 
-		Vector results = null;
-		if ((results =
-			(Vector) msgContext.getProperty(WSDoAllConstants.RECV_RESULTS))
-			== null) {
-			System.out.println("No security results!!");
-		}
-		System.out.println("Number of results: " + results.size());
-		for (int i = 0; i < results.size(); i++) {
-			WSDoAllReceiverResult rResult =
-				(WSDoAllReceiverResult) results.get(i);
-			Vector wsSecEngineResults = rResult.getResults();
+        Vector results = null;
+        if ((results =
+            (Vector) msgContext.getProperty(WSDoAllConstants.RECV_RESULTS))
+            == null) {
+            System.out.println("No security results!!");
+        }
+        System.out.println("Number of results: " + results.size());
+        for (int i = 0; i < results.size(); i++) {
+            WSDoAllReceiverResult rResult =
+                (WSDoAllReceiverResult) results.get(i);
+            Vector wsSecEngineResults = rResult.getResults();
 
-			for (int j = 0; j < wsSecEngineResults.size(); j++) {
-				WSSecurityEngineResult wser =
-					(WSSecurityEngineResult) wsSecEngineResults.get(j);
-				if (wser.getAction() != WSConstants.ENCR && wser.getPrincipal() != null) {
-					System.out.println(wser.getPrincipal().getName());
-				}
-			}
-		}
-	}
+            for (int j = 0; j < wsSecEngineResults.size(); j++) {
+                WSSecurityEngineResult wser =
+                    (WSSecurityEngineResult) wsSecEngineResults.get(j);
+                if (wser.getAction() != WSConstants.ENCR && wser.getPrincipal() != null) {
+                    System.out.println(wser.getPrincipal().getName());
+                }
+            }
+        }
+    }
 
 }

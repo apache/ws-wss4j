@@ -37,140 +37,140 @@ import org.w3c.dom.Node;
  *
  */
 public class BaseToken {
-	public static final QName TOKEN = new QName(TrustConstants.WST_NS,TrustConstants.BASE_LN,TrustConstants.WST_PREFIX);
-	Element element;
-	
+    public static final QName TOKEN = new QName(TrustConstants.WST_NS,TrustConstants.BASE_LN,TrustConstants.WST_PREFIX);
+    Element element;
+    
 
-	/**
-	 * Constructor for Base
-	 * @param elem
-	 * @throws WSSecurityException
-	 */
-	public BaseToken(Element elem) throws WSSecurityException {
-		this.element = elem;
-		QName el =
-			new QName(
-				this.element.getNamespaceURI(),
-				this.element.getLocalName());
-		if (!el.equals(TOKEN)) {
-			
-			throw new WSSecurityException(
-				WSSecurityException.INVALID_SECURITY_TOKEN,
-				"badTokenType:base",
-				new Object[] { el });
-		}
-		
-	}
-	/**
-	 * Constructor for Base
-	 * @param doc
-	 */
-	public BaseToken(Document doc) {
-		this.element =
-			doc.createElementNS(
-				TOKEN.getNamespaceURI(),
-		TOKEN.getPrefix() + ":"+TOKEN.getLocalPart());
-		WSSecurityUtil.setNamespace(
-			this.element,
-			TOKEN.getNamespaceURI(),
-			TrustConstants.WST_PREFIX);
-		this.element.appendChild(doc.createTextNode(""));
-	}
+    /**
+     * Constructor for Base
+     * @param elem
+     * @throws WSSecurityException
+     */
+    public BaseToken(Element elem) throws WSSecurityException {
+        this.element = elem;
+        QName el =
+            new QName(
+                this.element.getNamespaceURI(),
+                this.element.getLocalName());
+        if (!el.equals(TOKEN)) {
+            
+            throw new WSSecurityException(
+                WSSecurityException.INVALID_SECURITY_TOKEN,
+                "badTokenType:base",
+                new Object[] { el });
+        }
+        
+    }
+    /**
+     * Constructor for Base
+     * @param doc
+     */
+    public BaseToken(Document doc) {
+        this.element =
+            doc.createElementNS(
+                TOKEN.getNamespaceURI(),
+        TOKEN.getPrefix() + ":"+TOKEN.getLocalPart());
+        WSSecurityUtil.setNamespace(
+            this.element,
+            TOKEN.getNamespaceURI(),
+            TrustConstants.WST_PREFIX);
+        this.element.appendChild(doc.createTextNode(""));
+    }
 
-	/**
-	 * Return the binary security token of the base token if any
-	 * @return 
-	 * @throws WSSecurityException
-	 */
-	public BinarySecurity getBinarySecurityToken() throws WSSecurityException {
-		BinarySecurity binarySecToken;
+    /**
+     * Return the binary security token of the base token if any
+     * @return 
+     * @throws WSSecurityException
+     */
+    public BinarySecurity getBinarySecurityToken() throws WSSecurityException {
+        BinarySecurity binarySecToken;
 
-		binarySecToken = null;
-		String firstChild = this.element.getFirstChild().getLocalName();
+        binarySecToken = null;
+        String firstChild = this.element.getFirstChild().getLocalName();
 
-		if ("BinarySecurityToken" == firstChild) {
-			
-			binarySecToken =
-				new BinarySecurity(WSSConfig.getDefaultWSConfig(),(Element) this.element.getFirstChild());
-			return binarySecToken;
-		} else if ("SecurityTokenReference" == firstChild) {
-			
-			SecurityTokenReference secTokRef =
-				new SecurityTokenReference(WSSConfig.getDefaultWSConfig(),
-					(Element) this.element.getFirstChild());
-			binarySecToken =
-				new BinarySecurity(WSSConfig.getDefaultWSConfig(),
-					secTokRef.getTokenElement(
-						element.getOwnerDocument(),
-						null));
-			return binarySecToken;
-		} else {
-			throw new WSSecurityException(
-				WSSecurityException.INVALID_SECURITY_TOKEN,
-				"badTokenType");
-		}
+        if ("BinarySecurityToken" == firstChild) {
+            
+            binarySecToken =
+                new BinarySecurity(WSSConfig.getDefaultWSConfig(),(Element) this.element.getFirstChild());
+            return binarySecToken;
+        } else if ("SecurityTokenReference" == firstChild) {
+            
+            SecurityTokenReference secTokRef =
+                new SecurityTokenReference(WSSConfig.getDefaultWSConfig(),
+                    (Element) this.element.getFirstChild());
+            binarySecToken =
+                new BinarySecurity(WSSConfig.getDefaultWSConfig(),
+                    secTokRef.getTokenElement(
+                        element.getOwnerDocument(),
+                        null));
+            return binarySecToken;
+        } else {
+            throw new WSSecurityException(
+                WSSecurityException.INVALID_SECURITY_TOKEN,
+                "badTokenType");
+        }
 
-	}
-	/**
-	 * Currently support only direct reference
-	 * @param binarySecurity
-	 * @param asReference
-	 */
-	public void setBinarySecurityToken(BinarySecurity binarySecurity) {
-		Element elem = getFirstElement();
-		if (elem != null) {
-			this.element.replaceChild(binarySecurity.getElement(), elem);
-		} else {
-			this.element.appendChild(binarySecurity.getElement());
-		}
-	}
+    }
+    /**
+     * Currently support only direct reference
+     * @param binarySecurity
+     * @param asReference
+     */
+    public void setBinarySecurityToken(BinarySecurity binarySecurity) {
+        Element elem = getFirstElement();
+        if (elem != null) {
+            this.element.replaceChild(binarySecurity.getElement(), elem);
+        } else {
+            this.element.appendChild(binarySecurity.getElement());
+        }
+    }
 
-	/**
-	 * get the first child element.
-	 * 
-	 * @return the first <code>Element</code> child node
-	 */
-	public Element getFirstElement() {
-		for (Node currentChild = this.element.getFirstChild();
-			currentChild != null;
-			currentChild = currentChild.getNextSibling()) {
-			if (currentChild instanceof Element) {
-				return (Element) currentChild;
-			}
-		}
-		return null;
-	}
+    /**
+     * get the first child element.
+     * 
+     * @return the first <code>Element</code> child node
+     */
+    public Element getFirstElement() {
+        for (Node currentChild = this.element.getFirstChild();
+            currentChild != null;
+            currentChild = currentChild.getNextSibling()) {
+            if (currentChild instanceof Element) {
+                return (Element) currentChild;
+            }
+        }
+        return null;
+    }
 
-	/**
-	 * @return
-	 */
-	public Element getElement() {
-		return this.element;
-	}
+    /**
+     * @return
+     */
+    public Element getElement() {
+        return this.element;
+    }
 
-	/**
-	 * @param element
-	 */
-	public void setElement(Element element) {
-		this.element = element;
-	}
+    /**
+     * @param element
+     */
+    public void setElement(Element element) {
+        this.element = element;
+    }
 
-	public String toString() {
-		return DOM2Writer.nodeToString((Node) this.element);
-	}
-	/**
-	 * Other tokens can be added through this method
-	 * @param childToken
-	 */
-	public void addToken(Element childToken) {
-		this.element.appendChild(childToken);
-	}
-	/**
-	 * Tokens can be removed through this method
-	 * @param childToken
-	 */
-	public void removeToken(Element childToken) {
-		this.element.removeChild(childToken);
-	}
+    public String toString() {
+        return DOM2Writer.nodeToString((Node) this.element);
+    }
+    /**
+     * Other tokens can be added through this method
+     * @param childToken
+     */
+    public void addToken(Element childToken) {
+        this.element.appendChild(childToken);
+    }
+    /**
+     * Tokens can be removed through this method
+     * @param childToken
+     */
+    public void removeToken(Element childToken) {
+        this.element.removeChild(childToken);
+    }
 
 }

@@ -88,8 +88,8 @@ public class ConversationEngine {
     private boolean doDebug = false;
 
     /**
-    		 * <code>wsc:DerivedKeyToken</code> as defined in WS Secure Conversation specification.
-    		 */
+             * <code>wsc:DerivedKeyToken</code> as defined in WS Secure Conversation specification.
+             */
     protected static final QName DERIVEDKEY_TOKEN =
         new QName(
             ConversationConstants.WSC_NS,
@@ -139,12 +139,12 @@ public class ConversationEngine {
     
         this.configurator = config;
         Boolean bool = null;
-		if((bool=(Boolean)configurator.get(ConvHandlerConstants.VERIFY_TRUST))==null){
+        if((bool=(Boolean)configurator.get(ConvHandlerConstants.VERIFY_TRUST))==null){
         
-        }else{	
+        }else{    
            this.verifyTrust=bool.booleanValue();
            if(verifyTrust){
-			this.trustPropFile=(String)configurator.get(ConvHandlerConstants.TRUST_ENGINE_PROP);
+            this.trustPropFile=(String)configurator.get(ConvHandlerConstants.TRUST_ENGINE_PROP);
            }    
         }
     }
@@ -268,8 +268,8 @@ public class ConversationEngine {
                 }
                
                 returnResults.add(this.handleRequestedSecurityTokenResponse(
-				(Element) elem,
-				dkcbHandler));
+                (Element) elem,
+                dkcbHandler));
 
             } else if (el.equals(SIGNATURE)) {
                 if (doDebug) {
@@ -290,11 +290,11 @@ public class ConversationEngine {
                     returnResults.add(tmpVec.get(j));
                 }
             } else if(el.equals(SCT)){
-            	SecurityContextToken sct = new SecurityContextToken((Element)elem);
-            	String uuid = sct.getIdentifier();
-				ConvEngineResult convResult = new ConvEngineResult(ConvEngineResult.SCT);
-            	convResult.setUuid(uuid);
-            	returnResults.add(convResult);
+                SecurityContextToken sct = new SecurityContextToken((Element)elem);
+                String uuid = sct.getIdentifier();
+                ConvEngineResult convResult = new ConvEngineResult(ConvEngineResult.SCT);
+                convResult.setUuid(uuid);
+                returnResults.add(convResult);
             }
 
         }
@@ -350,7 +350,7 @@ public class ConversationEngine {
                     }
                 
                     log.debug(" Done SecurityToekenResponse Handled");
-					ConvEngineResult res = new ConvEngineResult(
+                    ConvEngineResult res = new ConvEngineResult(
                             ConvEngineResult.SECURITY_TOKEN_RESPONSE);
                     res.setUuid(uuid);
                     return res;
@@ -359,7 +359,7 @@ public class ConversationEngine {
             } catch (WSTrustException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
-			    throw new ConversationException("");
+                throw new ConversationException("");
             } catch (WSSecurityException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
@@ -462,7 +462,7 @@ public class ConversationEngine {
             } 
             
             Element tmpE = null;
-			log.debug("ConversationEngine :: Going to figure out the key to decrypt");
+            log.debug("ConversationEngine :: Going to figure out the key to decrypt");
             byte[] decryptedBytes = null;
            
             /*Decryption is performed in 3 major steps
@@ -471,7 +471,7 @@ public class ConversationEngine {
             
             //Step 1 : Get the key from SecurityTokenReference.
             
-			log.debug("ConversationEngine:: Going to look for SecurityTokenReference");
+            log.debug("ConversationEngine:: Going to look for SecurityTokenReference");
            
             if ((tmpE =
                 (Element) WSSecurityUtil.findElement(
@@ -479,10 +479,10 @@ public class ConversationEngine {
                     "SecurityTokenReference",
                     WSConstants.WSSE_NS))
                 != null) {
-			  SecurityTokenReference secRef =
-								   new SecurityTokenReference(WSSConfig.getDefaultWSConfig(),tmpE);
+              SecurityTokenReference secRef =
+                                   new SecurityTokenReference(WSSConfig.getDefaultWSConfig(),tmpE);
            
-				try {
+                try {
                     convResult =
                         this.handleSecurityTokenReference(
                             secRef,
@@ -533,7 +533,7 @@ public class ConversationEngine {
         }
 
         public ConvEngineResult handleSecurityTokenReference(
-	        SecurityTokenReference secRef,
+            SecurityTokenReference secRef,
             DerivedKeyCallbackHandler dkcbHandler)
             throws ConversationException {
 
@@ -601,15 +601,15 @@ public class ConversationEngine {
                     throw new ConversationException("ConversationEngine :: SecurityTokenRerence doesn't contain refernce");
                 }
             } else {
-				throw new ConversationException("ConversationEngine ::SecurityTokenRerence doesn't contain refernce");
+                throw new ConversationException("ConversationEngine ::SecurityTokenRerence doesn't contain refernce");
             }
 
         } /**
-           	 *
-           	 * @param sig - XML Signature obeject containing the XMLSignature element.
-           	 * @param cb - Callback handler to get the symmetric key.
-           	 * @return
-           	 */
+                *
+                * @param sig - XML Signature obeject containing the XMLSignature element.
+                * @param cb - Callback handler to get the symmetric key.
+                * @return
+                */
         private ConvEngineResult verifiyXMLHMac_SHA1_Signarue(
             XMLSignature sig,
             DerivedKeyCallbackHandler dkcbHandler)
@@ -640,7 +640,7 @@ public class ConversationEngine {
                 WSSecurityUtil.getDirectChild(
                     info.getElement(),
                     SecurityTokenReference.SECURITY_TOKEN_REFERENCE,
-				    wssConfig.getWsseNS());
+                    wssConfig.getWsseNS());
             if (node == null) {
                 throw new WSSecurityException(
                     WSSecurityException.INVALID_SECURITY,
@@ -734,7 +734,7 @@ public class ConversationEngine {
                             "password call bac in DerivedKeyTokenHandler failed");
                     }
                     
-					convResult.setKeyAssociated(keyBytes);
+                    convResult.setKeyAssociated(keyBytes);
                     SecretKey symetricKey =
                         new SecretKeySpec(
                             keyBytes,

@@ -26,10 +26,10 @@ import org.w3c.dom.Document;
  * @author Ruchith
  */
 public class SignatureVerifier implements STVerifier {
-	
-	public SignatureVerifier(Properties prop) {
-		
-	}
+    
+    public SignatureVerifier(Properties prop) {
+        
+    }
 
     /* (non-Javadoc)
      * @see org.apache.ws.security.trust.verify.STVerifier#verify(org.w3c.dom.Document)

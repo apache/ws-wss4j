@@ -38,18 +38,18 @@ public class X509Security extends BinarySecurity {
     private String type;
     public static final String X509_V3 = "X509v3";
    
-	/*
-	 * Stores the associated X.509 Certificate. This saves numerous
-	 * crypto loadCertificate operations
-	 */
-	private X509Certificate cachedCert = null;
+    /*
+     * Stores the associated X.509 Certificate. This saves numerous
+     * crypto loadCertificate operations
+     */
+    private X509Certificate cachedCert = null;
    
     /**
      * This constructor creates a new X509 certificate object and initializes
      * it from the data containe in the element. 
      * 
      * @param wssConfig Configuration options for processing and building the <code>wsse:Security</code> header
-     * @param elem 	the element containing the X509 certificate data
+     * @param elem     the element containing the X509 certificate data
      * @throws WSSecurityException 
      */
     public X509Security(WSSConfig wssConfig, Element elem) throws WSSecurityException {
@@ -83,23 +83,23 @@ public class X509Security extends BinarySecurity {
      * Gets the X509Certificate certificate.
      * <p/>
      * 
-     * @return	the X509 certificate converted from the base 64 encoded
-     * 			element data
+     * @return    the X509 certificate converted from the base 64 encoded
+     *             element data
      * @throws GeneralSecurityException 
      */
     public X509Certificate getX509Certificate(Crypto crypto) throws WSSecurityException {
-    	if (cachedCert != null) {
-    		return cachedCert;
-    	}
+        if (cachedCert != null) {
+            return cachedCert;
+        }
         byte[] data = getToken();
-		if (data == null) {
-			throw new WSSecurityException(
-				WSSecurityException.FAILURE,
-				"invalidCertData",
-				new Object[] { new Integer(0)});
-		}
+        if (data == null) {
+            throw new WSSecurityException(
+                WSSecurityException.FAILURE,
+                "invalidCertData",
+                new Object[] { new Integer(0)});
+        }
         ByteArrayInputStream in = new ByteArrayInputStream(data);
-		cachedCert = crypto.loadCertificate(in);
+        cachedCert = crypto.loadCertificate(in);
         return cachedCert;
     }
 
@@ -112,22 +112,22 @@ public class X509Security extends BinarySecurity {
      * @param cert the X509 certificate to store in the element
      * @throws CertificateEncodingException 
      */
-	public void setX509Certificate(X509Certificate cert)
-		throws WSSecurityException {
-		if (cert == null) {
-			throw new WSSecurityException(
-				WSSecurityException.FAILURE,
-				"noCert");
-		}
-		cachedCert = cert;
-		try {
-			setToken(cert.getEncoded());
-		} catch (CertificateEncodingException e) {
-			throw new WSSecurityException(
-				WSSecurityException.SECURITY_TOKEN_UNAVAILABLE,
-				"encodeError");
-		}
-	}
+    public void setX509Certificate(X509Certificate cert)
+        throws WSSecurityException {
+        if (cert == null) {
+            throw new WSSecurityException(
+                WSSecurityException.FAILURE,
+                "noCert");
+        }
+        cachedCert = cert;
+        try {
+            setToken(cert.getEncoded());
+        } catch (CertificateEncodingException e) {
+            throw new WSSecurityException(
+                WSSecurityException.SECURITY_TOKEN_UNAVAILABLE,
+                "encodeError");
+        }
+    }
     public static String getType(WSSConfig wssConfig) {
         if (wssConfig.isBSTValuesPrefixed()) {
             return WSConstants.WSSE_PREFIX + ":" + X509_V3;

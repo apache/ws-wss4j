@@ -30,26 +30,26 @@ import java.io.IOException;
 
 public class PWCallback implements CallbackHandler {
 
-	/* (non-Javadoc)
-	 * @see javax.security.auth.callback.CallbackHandler#handle(javax.security.auth.callback.Callback[])
-	 */
-	public void handle(Callback[] callbacks)
-		throws IOException, UnsupportedCallbackException {
-		for (int i = 0; i < callbacks.length; i++) {
-			if (callbacks[i] instanceof WSPasswordCallback) {
-				WSPasswordCallback pc = (WSPasswordCallback) callbacks[i];
-				/*
-				 * here call a function/method to lookup the password for
-				 * the given identifier (e.g. a user name or keystore alias)
-				 * e.g.: pc.setPassword(passStore.getPassword(pc.getIdentfifier))
-				 * for Testing we supply a fixed name here.
-				 */
-				pc.setPassword("security");
-			} else {
-				throw new UnsupportedCallbackException(
-					callbacks[i],
-					"Unrecognized Callback");
-			}
-		}
-	}
+    /* (non-Javadoc)
+     * @see javax.security.auth.callback.CallbackHandler#handle(javax.security.auth.callback.Callback[])
+     */
+    public void handle(Callback[] callbacks)
+        throws IOException, UnsupportedCallbackException {
+        for (int i = 0; i < callbacks.length; i++) {
+            if (callbacks[i] instanceof WSPasswordCallback) {
+                WSPasswordCallback pc = (WSPasswordCallback) callbacks[i];
+                /*
+                 * here call a function/method to lookup the password for
+                 * the given identifier (e.g. a user name or keystore alias)
+                 * e.g.: pc.setPassword(passStore.getPassword(pc.getIdentfifier))
+                 * for Testing we supply a fixed name here.
+                 */
+                pc.setPassword("security");
+            } else {
+                throw new UnsupportedCallbackException(
+                    callbacks[i],
+                    "Unrecognized Callback");
+            }
+        }
+    }
 }

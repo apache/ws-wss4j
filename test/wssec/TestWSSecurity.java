@@ -139,43 +139,43 @@ public class TestWSSecurity extends TestCase {
 
         Message signedMsg = (Message) AxisUtil.toSOAPMessage(signedDoc);
         if (log.isDebugEnabled()) {
-        	log.debug("Signed message with IssuerSerial key identifier:");
-			XMLUtils.PrettyElementToWriter(signedMsg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
+            log.debug("Signed message with IssuerSerial key identifier:");
+            XMLUtils.PrettyElementToWriter(signedMsg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
         }
         signedDoc = signedMsg.getSOAPEnvelope().getAsDocument();
         log.info("After Signing IS....");
         verify(signedDoc);
     }
 
-	/**
-	 * Test that signs and verifies a WS-Security envelope.
-	 * The test uses the IssuerSerialDirect key identifier type. With
-	 * this key identifier the signing functions inserts the certificate
-	 * into the message.  
-	 * <p/>
-	 * TODO: use another certificate that is not stored in the keystore.
-	 * 
-	 * @throws java.lang.Exception Thrown when there is any problem in signing or verification
-	 */
-//	public void testX509SignatureISDirect() throws Exception {
-//		SOAPEnvelope envelope = null;
-//		WSSignEnvelope builder = new WSSignEnvelope();
-//		builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
-//		builder.setKeyIdentifierType(WSConstants.ISSUER_SERIAL_DIRECT);
-//		// builder.setUserInfo("john", "keypass");
-//		log.info("Before Signing ISDirect....");
-//		Document doc = unsignedEnvelope.getAsDocument();
-//		Document signedDoc = builder.build(doc, crypto);
+    /**
+     * Test that signs and verifies a WS-Security envelope.
+     * The test uses the IssuerSerialDirect key identifier type. With
+     * this key identifier the signing functions inserts the certificate
+     * into the message.  
+     * <p/>
+     * TODO: use another certificate that is not stored in the keystore.
+     * 
+     * @throws java.lang.Exception Thrown when there is any problem in signing or verification
+     */
+//    public void testX509SignatureISDirect() throws Exception {
+//        SOAPEnvelope envelope = null;
+//        WSSignEnvelope builder = new WSSignEnvelope();
+//        builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+//        builder.setKeyIdentifierType(WSConstants.ISSUER_SERIAL_DIRECT);
+//        // builder.setUserInfo("john", "keypass");
+//        log.info("Before Signing ISDirect....");
+//        Document doc = unsignedEnvelope.getAsDocument();
+//        Document signedDoc = builder.build(doc, crypto);
 //
-//		Message signedMsg = (Message) AxisUtil.toSOAPMessage(signedDoc);
-//		if (log.isDebugEnabled()) {
-//			log.debug("Signed message with IssuerSerialDirect key identifier:");
-//			XMLUtils.PrettyElementToWriter(signedMsg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
-//		}
-//		signedDoc = signedMsg.getSOAPEnvelope().getAsDocument();
-//		log.info("After Signing ISDirect....");
-//		verify(signedDoc);
-//	}
+//        Message signedMsg = (Message) AxisUtil.toSOAPMessage(signedDoc);
+//        if (log.isDebugEnabled()) {
+//            log.debug("Signed message with IssuerSerialDirect key identifier:");
+//            XMLUtils.PrettyElementToWriter(signedMsg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
+//        }
+//        signedDoc = signedMsg.getSOAPEnvelope().getAsDocument();
+//        log.info("After Signing ISDirect....");
+//        verify(signedDoc);
+//    }
 
     /**
      * Test that signs (twice) and verifies a WS-Security envelope.
