@@ -237,15 +237,15 @@ public class STRTransform extends TransformSpi {
 			/*
 			 * Convert resulting STR result doc into NodeList, then c14n
 			 */
-			XMLUtils.circumventBug2650(doc); // This is needed
+			// XMLUtils.circumventBug2650(doc); // This is needed???? not in every case
+
 			if (doDebug) {
+				log.debug("result doc: ");
 				org.apache.axis.utils.XMLUtils.PrettyDocumentToWriter(
 					doc,
 					new PrintWriter(System.out));
 			}
-
-/*
-
+			/*
 			nodeList =
 				XPathAPI.selectNodeList(
 					doc.getDocumentElement(),
@@ -253,16 +253,69 @@ public class STRTransform extends TransformSpi {
 
 			buf =
 				canon.canonicalizeXPathNodeSet(
-					XMLUtils.convertNodelistToSet(nodeList));
-*/
+					XMLUtils.convertNodelistToSet(nodeList),"#default");
+
+
+			*/
 			buf =
-				canon.canonicalizeSubtree(doc);
+				canon.canonicalizeSubtree(doc, "#default");
 			if (doDebug) {
 				bos = new ByteArrayOutputStream(buf.length);
 				bos.write(buf, 0, buf.length);
 				log.debug("result bos: " + bos.toString());
 			}
-			return new XMLSignatureInput(buf);
+			/*
+			 * !!!!!!!! HACK ALERT --- here the hack starts
+			 */
+			StringBuffer bf = new StringBuffer(bos.toString());
+			int idx = bf.indexOf("BinarySecurityToken");
+			idx = bf.indexOf("xmlns", idx);
+			bf.insert(idx, "xmlns=\"\" ");
+			if (doDebug) {
+				log.debug("last result: ");
+				log.debug(bf.toString());
+			}
+			return new XMLSignatureInput(bf.toString().getBytes());
+			/*
+			 * !!!!!!!  ---Here the HACK ends
+			 */
+			// return new XMLSignatureInput(buf);
+
+			/*
+			Document doc2 = db.parse(new ByteArrayInputStream(buf));
+			XMLUtils.circumventBug2650(doc2); // This is needed
+			
+			NodeList nodeList2 =
+				doc2.getElementsByTagNameNS(
+					WSConstants.WSSE_NS,
+					"BinarySecurityToken");
+
+			int length2 = nodeList2.getLength();
+			if (length2 > 0) {
+				Element elem = (Element) nodeList2.item(0);
+				elem.setAttributeNS(WSConstants.XMLNS_NS, "xmlns", "");
+			}
+			/
+			nodeList2 =
+				doc2.getElementsByTagNameNS(WSConstants.SIG_NS, "KeyInfo");
+			length2 = nodeList2.getLength();
+			if (length2 > 0) {
+				Element elem = (Element) nodeList2.item(0);
+				elem.setAttributeNS(WSConstants.XMLNS_NS, "xmlns", "");
+			}
+			/
+			if (doDebug) {
+				log.debug("result doc2: ");
+				org.apache.axis.utils.XMLUtils.PrettyDocumentToWriter(
+					doc2,
+					new PrintWriter(System.out));
+			}
+			nodeList =
+				XPathAPI.selectNodeList(
+					doc2,
+					Canonicalizer.XPATH_C14N_WITH_COMMENTS_SINGLE_NODE);		
+			return new XMLSignatureInput(XMLUtils.convertNodelistToSet(nodeList));
+			*/
 
 		} catch (IOException ex) {
 			throw new CanonicalizationException("empty", ex);
@@ -387,7 +440,7 @@ public class STRTransform extends TransformSpi {
 		elem.setAttributeNS(WSConstants.XMLNS_NS, "xmlns", "");
 		elem.setAttributeNS(null, "ValueType", X509Security.TYPE);
 		// elem.setAttributeNS(null, "EncodingType", BinarySecurity.BASE64_ENCODING);
-		Text certText = doc.createTextNode(Base64.encode(data));
+		Text certText = doc.createTextNode(Base64.encode(data, 0));
 		// Text certText = doc.createTextNode(data);
 		elem.appendChild(certText);
 		return elem;
