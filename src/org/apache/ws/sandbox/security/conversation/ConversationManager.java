@@ -170,7 +170,7 @@ public class ConversationManager {
         /*
          * step 1: Adding SecurityTokenReference.
          */
-        wsEncrypt.setSecurityTokenReference(secRef);
+        // TODO : Uncoment  this. wsEncrypt.setSecurityTokenReference(secRef);
 
         /*
          * step 2: Generating the key, and setting it in the the wsEncrypt
