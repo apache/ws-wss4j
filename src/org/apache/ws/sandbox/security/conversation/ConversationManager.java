@@ -160,12 +160,12 @@ public class ConversationManager {
          * step 2: Adding the key into wsEncrypt
          * step 3: Setting the user.
          */
-        //TODO: Uncomment this. wsEncrypt.setKeyIdentifierType(WSConstants.EMBED_SECURITY_TOKEN_REF);
+        wsEncrypt.setKeyIdentifierType(WSConstants.EMBED_SECURITY_TOKEN_REF);
 
         /*
          * step 1: Adding SecurityTokenReference.
          */
-        // TODO : Uncoment  this. wsEncrypt.setSecurityTokenReference(secRef);
+        wsEncrypt.setSecurityTokenReference(secRef);
 
         /*
          * step 2: Generating the key, and setting it in the the wsEncrypt
@@ -186,7 +186,7 @@ public class ConversationManager {
         /*
          * step 3: set the user.
          */
-        //wsEncrypt.setUserInfo(encUser);
+        wsEncrypt.setUserInfo(encUser);
 
         try {
             wsEncrypt.build(doc, null);
