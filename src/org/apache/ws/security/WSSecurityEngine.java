@@ -652,7 +652,11 @@ public class WSSecurityEngine {
         Cipher cipher = null;
         if (keyEncAlgo.equalsIgnoreCase(WSConstants.KEYTRANSPORT_RSA15)) {
             cipher = Cipher.getInstance("RSA");
-        } else {
+        } 
+        else if (keyEncAlgo.equalsIgnoreCase(WSConstants.KEYTRANSPORT_RSAOEP)) {
+			cipher = Cipher.getInstance("RSA/NONE/OAEPPADDING");
+        }
+        else {
             throw new WSSecurityException
                     (WSSecurityException.UNSUPPORTED_ALGORITHM,
                             "unsupportedKeyTransp", new Object[]{keyEncAlgo});

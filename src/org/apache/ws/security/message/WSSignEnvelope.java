@@ -59,7 +59,7 @@ public class WSSignEnvelope extends WSBaseMessage {
 
     
 	protected boolean useSingleCert = true;
-    protected String sigAlgo = XMLSignature.ALGO_ID_SIGNATURE_RSA;
+    protected String sigAlgo = null;
     protected String canonAlgo = Canonicalizer.ALGO_ID_C14N_EXCL_OMIT_COMMENTS; 
 
 	static {
@@ -215,6 +215,25 @@ public class WSSignEnvelope extends WSBaseMessage {
 
         // Set the id of the elements to be used as digest source
 		// String id = setBodyID(doc);
+		X509Certificate[] certs = crypto.getCertificates(user);
+		if (certs == null || certs.length <= 0) {
+			throw new WSSecurityException(WSSecurityException.FAILURE,
+					"invalidX509Data", new Object[]{"for Signature"});
+		}
+		if (sigAlgo == null) {
+			String pubKeyAlgo = certs[0].getPublicKey().getAlgorithm();
+			log.debug("automatic sig algo detection: " + pubKeyAlgo);
+			if (pubKeyAlgo.equalsIgnoreCase("DSA")) {
+				sigAlgo = XMLSignature.ALGO_ID_SIGNATURE_DSA;
+			}
+			else if (pubKeyAlgo.equalsIgnoreCase("RSA")) {
+				sigAlgo = XMLSignature.ALGO_ID_SIGNATURE_RSA;
+			}
+			else {
+				throw new WSSecurityException(WSSecurityException.FAILURE,
+						"invalidX509Data", new Object[]{"for Signature - unkown public key Algo"});
+			}
+		}
         XMLSignature sig = null;
         sig = new XMLSignature(doc, null, sigAlgo, canonAlgo);
         /*
@@ -229,11 +248,6 @@ public class WSSignEnvelope extends WSBaseMessage {
 		String keyInfoUri = "id-" + info.hashCode();
 		info.setId(keyInfoUri);
 
-        X509Certificate[] certs = crypto.getCertificates(user);
-        if (certs == null || certs.length <= 0) {
-            throw new WSSecurityException(WSSecurityException.FAILURE,
-                    "invalidX509Data", new Object[]{"for Signature"});
-        }
 		if( tlog.isDebugEnabled() ) {
 			t1=System.currentTimeMillis();
 		}

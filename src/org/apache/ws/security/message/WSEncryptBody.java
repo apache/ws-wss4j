@@ -56,7 +56,7 @@ public class WSEncryptBody extends WSBaseMessage {
 	private static Log tlog = LogFactory.getLog("org.apache.ws.security.TIME");
 
 	protected String symEncAlgo = WSConstants.TRIPLE_DES;
-	protected String keyTransportAlgo = WSConstants.KEYTRANSPORT_RSA15;
+	protected String keyEncAlgo = WSConstants.KEYTRANSPORT_RSA15;
 	protected String encCanonAlgo = null;
 	protected byte[] embeddedKey = null;
 
@@ -99,6 +99,19 @@ public class WSEncryptBody extends WSBaseMessage {
 		this.embeddedKey = key;
 	}
 
+	/**
+	 * Sets the algorithm to encode the symmetric key. 
+	 * <p/>
+	 * Default is the <code>WSConstants.KEYTRANSPORT_RSA15</code>
+	 * algorithm.
+	 * 
+	 * @param keyEnc specifies the key encoding algorithm.
+	 * @see WSConstants.KEYTRANSPORT_RSA15
+	 * @see WSConstants.KEYTRANSPORT_RSAOEP
+	 */
+	public void setKeyEnc(String keyEnc) {
+		keyEncAlgo = keyEnc;
+	}
 	/**
 	 * Set the user name to get the encryption certificate. The public
 	 * key of this certificate is used, thus no password necessary.
@@ -314,7 +327,18 @@ public class WSEncryptBody extends WSBaseMessage {
 		if (tlog.isDebugEnabled()) {
 			t2 = System.currentTimeMillis();
 		}
-		Cipher cipher = Cipher.getInstance("RSA");
+		Cipher cipher = null;
+		if (keyEncAlgo.equalsIgnoreCase(WSConstants.KEYTRANSPORT_RSA15)) {
+			cipher = Cipher.getInstance("RSA");
+		} 
+		else if (keyEncAlgo.equalsIgnoreCase(WSConstants.KEYTRANSPORT_RSAOEP)) {
+			cipher = Cipher.getInstance("RSA/NONE/OAEPPADDING");
+		}
+		else {
+			throw new WSSecurityException
+					(WSSecurityException.UNSUPPORTED_ALGORITHM,
+							"unsupportedKeyTransp", new Object[]{keyEncAlgo});
+		}
 		cipher.init(Cipher.ENCRYPT_MODE, remoteCert);
 		byte[] encryptedKey = cipher.doFinal(symmetricKey.getEncoded());
 		Text keyText =
@@ -337,7 +361,7 @@ public class WSEncryptBody extends WSBaseMessage {
 		 *    data that was encrypted with this encrypted session key :-)
 		 */
 		Element wsseSecurity = insertSecurityHeader(doc, true);
-		Element xencEncryptedKey = createEnrcyptedKey(doc, keyTransportAlgo);
+		Element xencEncryptedKey = createEnrcyptedKey(doc, keyEncAlgo);
 		WSSecurityUtil.prependChildElement(
 			doc,
 			wsseSecurity,

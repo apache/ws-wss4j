@@ -267,13 +267,9 @@ public class WSDoAllSender extends BasicHandler {
 					if (encSymmAlgo != null) {
 						wsEncrypt.setSymmetricEncAlgorithm(encSymmAlgo);
 					}
-					/* 
-					 * Enable this later
-					 
 					if (encKeyTransport != null) {
-						wsEncrypt.setKeyTransport(encKeyTransport);
+						wsEncrypt.setKeyEnc(encKeyTransport);
 					}
-					*/
 					wsEncrypt.setUserInfo(encUser);
 					if (encryptParts.size() > 0) {
 						wsEncrypt.setParts(encryptParts);
@@ -300,11 +296,10 @@ public class WSDoAllSender extends BasicHandler {
 					if (sigKeyId != 0) {
 						wsSign.setKeyIdentifierType(sigKeyId);
 					}
-					/*
 					if (sigAlgorithm != null) {
-						wsSign.setSignatureAlgorithm(sigAlogorithm);
+						wsSign.setSignatureAlgorithm(sigAlgorithm);
 					}
-					*/
+
 					wsSign.setUserInfo(username, password);
 					if (signatureParts.size() > 0) {
 						wsSign.setParts(signatureParts);
