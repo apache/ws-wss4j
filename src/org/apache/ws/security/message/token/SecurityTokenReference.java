@@ -29,13 +29,7 @@ import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.keys.content.x509.XMLX509IssuerSerial;
 import org.apache.xml.security.utils.Base64;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.w3c.dom.Text;
-
-import sun.security.x509.KeyIdentifier;
+import org.w3c.dom.*;
 
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
@@ -279,7 +273,7 @@ public class SecurityTokenReference {
             this.element.appendChild(keyId);
         }
     }
-    
+
 	public void setSAMLKeyIdentifier(String keyIdVal)
 			throws WSSecurityException {
 		Document doc = this.element.getOwnerDocument();
@@ -414,8 +408,10 @@ public class SecurityTokenReference {
                 return null;
             }
         }
+
         String alias = crypto.getAliasForX509Cert(issuerSerial.getIssuerName(),
                 issuerSerial.getSerialNumber());
+
         if (doDebug) {
             log.info("X509IssuerSerial alias: " + alias);
         }

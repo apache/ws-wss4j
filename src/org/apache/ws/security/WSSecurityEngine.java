@@ -173,7 +173,7 @@ public class WSSecurityEngine {
     /**
 	 * Get a singleton instance of security engine with specified configuration
 	 * settings. <p/>
-	 * 
+	 *
 	 * @param wssConfig
 	 *            the configuration parameters to use.
 	 * @return ws-security engine.
@@ -479,7 +479,7 @@ public class WSSecurityEngine {
         } catch (XMLSecurityException e2) {
             throw new WSSecurityException(WSSecurityException.FAILED_CHECK,
                     "noXMLSig");
-        } 
+        }
 
         sig.addResourceResolver(EnvelopeIdResolver.getInstance(wssConfig));
 
@@ -487,7 +487,7 @@ public class WSSecurityEngine {
         KeyInfo info = sig.getKeyInfo();
         byte[] secretKey = null;
         UsernameToken ut = null;
-        
+
         if (info != null) {
 			Node node;
 			if (wssConfig.getProcessNonCompliantMessages()) {
@@ -653,7 +653,7 @@ public class WSSecurityEngine {
     /**
 	 * Extracts the certificate(s) from the Binary Security token reference.
 	 * <p/>
-	 * 
+	 *
 	 * @param elem
 	 *            The element containing the binary security token. This is
 	 *            either X509 certificate(s) or a PKIPath.
@@ -824,7 +824,7 @@ public class WSSecurityEngine {
                 throw new WSSecurityException(WSSecurityException.FAILURE,
                         "noCallback");
             }
-        	
+
             WSPasswordCallback pwCb = new WSPasswordCallback(user, WSPasswordCallback.USERNAME_TOKEN);
             Callback[] callbacks = new Callback[1];
             callbacks[0] = pwCb;
@@ -1272,9 +1272,7 @@ public class WSSecurityEngine {
                         "KeyName",
                         WSConstants.SIG_NS);
 
-        byte[] decryptedBytes = getSharedKey(tmpE, cb);
-
-        SecretKey symmetricKey = WSSecurityUtil.prepareSecretKey(symEncAlgo, decryptedBytes);
+        SecretKey symmetricKey = getSharedKey(tmpE, symEncAlgo, cb);
 
         // initialize Cipher ....
         XMLCipher xmlCipher = null;
@@ -1337,7 +1335,9 @@ public class WSSecurityEngine {
         return symEncAlgo;
     }
 
-    private byte[] getSharedKey(Element keyNmElem, CallbackHandler cb)
+    protected SecretKey getSharedKey(Element keyNmElem,
+                                   String algorithm,
+                                   CallbackHandler cb)
             throws WSSecurityException {
         String keyName = null;
         if (keyNmElem != null) {
@@ -1352,7 +1352,8 @@ public class WSSecurityEngine {
             throw new WSSecurityException(WSSecurityException.INVALID_SECURITY,
                     "noKeyname");
         }
-        WSPasswordCallback pwCb = new WSPasswordCallback(keyName, WSPasswordCallback.KEY_NAME);
+        WSPasswordCallback pwCb = new WSPasswordCallback(
+                keyName, WSPasswordCallback.KEY_NAME);
         Callback[] callbacks = new Callback[1];
         callbacks[0] = pwCb;
         try {
@@ -1372,7 +1373,7 @@ public class WSSecurityEngine {
                     "noPassword",
                     new Object[]{keyName});
         }
-        return decryptedBytes;
+        return WSSecurityUtil.prepareSecretKey(algorithm, decryptedBytes);
     }
 
     /**

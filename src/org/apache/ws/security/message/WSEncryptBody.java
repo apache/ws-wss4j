@@ -532,9 +532,10 @@ public class WSEncryptBody extends WSBaseMessage {
          * key (password) for this alogrithm, and set the cipher into
          * encryption mode.
          */
-
-        symmetricKey = WSSecurityUtil.prepareSecretKey(symEncAlgo, embeddedKey);
-
+        if (symmetricKey == null) {
+            symmetricKey = WSSecurityUtil.prepareSecretKey(symEncAlgo,
+                                                           embeddedKey);
+        }
         XMLCipher xmlCipher = null;
         try {
             xmlCipher = XMLCipher.getInstance(symEncAlgo);
@@ -582,11 +583,11 @@ public class WSEncryptBody extends WSBaseMessage {
                 keyInfo = new KeyInfo(doc);
                 keyInfo.addKeyName(embeddedKeyName == null ? user : embeddedKeyName);
             } else if (this.keyIdentifierType == WSConstants.EMBED_SECURITY_TOKEN_REF) {
-                /* This means that we want to embed a <wsse:SecurityTokenReference> 
+                /* This means that we want to embed a <wsse:SecurityTokenReference>
                  * into keyInfo element.
-                 * If we need this functionality, this.secRef MUST be set before 
+                 * If we need this functionality, this.secRef MUST be set before
                  * calling the build(doc, crypto) method.
-                 * So if secRef is null then throw an exception. 
+                 * So if secRef is null then throw an exception.
                  */
                 if (this.securityTokenReference == null) {
                     throw new WSSecurityException(WSSecurityException.SECURITY_TOKEN_UNAVAILABLE, "You must set keyInfo element, if the keyIdentifier ==EMBED_SECURITY_TOKEN_REF");
@@ -594,7 +595,7 @@ public class WSEncryptBody extends WSBaseMessage {
                     keyInfo = new KeyInfo(doc);
                     keyInfo.addUnknownElement(securityTokenReference.getElement());
                 }
-            }   
+            }
             /*
              * Forth step: encrypt data, and set neccessary attributes in
              * xenc:EncryptedData
@@ -727,6 +728,14 @@ public class WSEncryptBody extends WSBaseMessage {
      */
     public SecretKey getSymmetricKey() {
         return symmetricKey;
+    }
+
+    /**
+     * Set the symmetric key to be used for encryption
+     * @param key
+     */
+    public void setSymmetricKey(SecretKey key) {
+        this.symmetricKey = key;
     }
 
     /**

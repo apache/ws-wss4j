@@ -301,7 +301,7 @@ public class ConversationEngine {
                 if (doDebug) {
                     log.debug("Found Signature element");
                 }
-                
+
                 ConvEngineResult convResult =
                     this.VerifySignature((Element) elem, dkcbHandler);
                 returnResults.add(convResult);
@@ -364,7 +364,7 @@ public class ConversationEngine {
                     uuid,
                     ((Long) configurator.get(ConvHandlerConstants.KEY_LEGNTH))
                         .longValue());
-          
+
             log.debug(" Done SecurityToekenResponse Handled");
             ConvEngineResult res =
                 new ConvEngineResult(ConvEngineResult.SECURITY_TOKEN_RESPONSE);
@@ -524,7 +524,7 @@ public class ConversationEngine {
         String symEncAlgo = getEncAlgo(encBodyData);
         SecretKey symmetricKey =
             WSSecurityUtil.prepareSecretKey(symEncAlgo, decryptedBytes);
-        
+
 
         // Step 3 :: initialize Cipher ....
         XMLCipher xmlCipher = null;
@@ -538,18 +538,18 @@ public class ConversationEngine {
                 null,
                 e1);
         }
-        
-        
-     
+
+
+
 		WSSecurityEngine eng = new WSSecurityEngine();
         boolean content = this.isContent(encBodyData);
-        
+
         if (content) {
             encBodyData = (Element) encBodyData.getParentNode();
         }else{
         	System.out.println("Not content:-)");
         }
-        
+
         try {
             xmlCipher.doFinal(doc, encBodyData, content);
         } catch (Exception e) {
@@ -593,7 +593,7 @@ public class ConversationEngine {
                 try {
                     dkToken = new DerivedKeyToken(ele);
                     if (dkToken.getSecuityTokenReference() == null) {
-                        //if dkToken doesn't have a STR                    
+                        //if dkToken doesn't have a STR
                         SecurityContextToken secContextTk =
                             ConversationUtil.getSCT(dkToken);
                         uuid = secContextTk.getIdentifier();
@@ -606,7 +606,7 @@ public class ConversationEngine {
                             dkToken.getSecuityTokenReference();
                         if (str2Base.containsReference()) {
                             Reference ref2Base = str2Base.getReference();
-                          
+
                             if (ref2Base
                                 .getValueType()
                                 .equals("http://docs.oasis-open.org/wss/2004/XX/oasis-2004XX-wss-saml-token-profile-1.0#SAMLAssertionID")) {
@@ -617,7 +617,7 @@ public class ConversationEngine {
                                  * -add the derived key token to dkcbHandler.
                                  */
                                uuid = ref2Base.getURI();
-                     		   if(dkcbHandler.getSession(uuid)==null){	 
+                     		   if(dkcbHandler.getSession(uuid)==null){
 						   	       byte[] key = handleSAML(ref2Base.getElement().getOwnerDocument(), uuid);
 								   System.out.println("I am here :-)");
 								   SecurityContextInfo sctInfo = new SecurityContextInfo(
@@ -627,21 +627,21 @@ public class ConversationEngine {
 								   dkcbHandler.addSecurtiyContext(
 																	   uuid,
 																	   sctInfo);
-							   }		
+							   }
 									DerivedKeyInfo dkInfo = new DerivedKeyInfo(dkToken);
 									dkcbHandler.addDerivedKey(uuid, dkInfo);
-                            } 
-                            
-                            
-                            
-                            //TODO :: Add other tokens else if      
+                            }
+
+
+
+                            //TODO :: Add other tokens else if
                         } else if(str2Base.containsKeyIdentifier()){
                         	Element elem = str2Base.getFirstElement();
                         	//.getKeyIdentifier()System.out.println("KeyIdentifier :: He ehee ........");
 							String value = elem.getAttribute("ValueType");
 							if("http://docs.oasis-open.org/wss/2004/XX/oasis-2004XX-wss-saml-token-profile-1.0#SAMLAssertionID".equals(value)){
 								uuid = ((Text)elem.getChildNodes().item(0)).getNodeValue();
-								if(dkcbHandler.getSession(uuid)==null){	 
+								if(dkcbHandler.getSession(uuid)==null){
 									   byte[] key = handleSAML(elem.getOwnerDocument(), uuid);
 									   System.out.println("UUID of SAML is"+uuid);
 									   SecurityContextInfo sctInfo = new SecurityContextInfo(
@@ -649,16 +649,16 @@ public class ConversationEngine {
 																									   key,
 																									   1);
 									   dkcbHandler.addSecurtiyContext(uuid,sctInfo);
-								}		
+								}
 								DerivedKeyInfo dkInfo = new DerivedKeyInfo(dkToken);
 								dkcbHandler.addDerivedKey(uuid, dkInfo);
 							}
-                        	
+
                         }else{
                             throw new ConversationException("Don't know how to process here");
                         }
                     } //////end :if dkToken has a STR
-                    //TODO :: Ask ruchith to throw correct exception    
+                    //TODO :: Ask ruchith to throw correct exception
                 } catch (WSSecurityException e2) {
                     // TODO Auto-generated catch block
                     e2.printStackTrace();
@@ -704,9 +704,9 @@ public class ConversationEngine {
         XMLSignature sig,
         DerivedKeyCallbackHandler dkcbHandler)
         throws WSSecurityException {
-        
+
         log.debug("Verifying HMAC-SHA1 Signature......");
-	    	
+
         String userName = null;
         long t0 = 0, t1 = 0, t2 = 0;
         if (tlog.isDebugEnabled()) {
@@ -721,7 +721,7 @@ public class ConversationEngine {
                                   * from the verifyXMLSignature() method.
                                   *
                                   */
-       
+
         sig.addResourceResolver(
             EnvelopeIdResolver.getInstance(WSSConfig.getDefaultWSConfig()));
         KeyInfo info = sig.getKeyInfo();
@@ -764,12 +764,12 @@ public class ConversationEngine {
             if (el.equals(DERIVEDKEY_TOKEN)) {
                 DerivedKeyToken dkToken = new DerivedKeyToken(token);
                 DerivedKeyInfo dkInfo = null;
-                
+
 				String uuid = null;
-                
+
                 try {
 					if (dkToken.getSecuityTokenReference() == null) {
-						//if dkToken doesn't have a STR                    
+						//if dkToken doesn't have a STR
 						SecurityContextToken secContextTk =
 							ConversationUtil.getSCT(dkToken);
 						uuid = secContextTk.getIdentifier();
@@ -793,7 +793,7 @@ public class ConversationEngine {
 								 * -add the derived key token to dkcbHandler.
 								 */
 								uuid = ref2Base.getURI();
-								if(dkcbHandler.getSession(uuid)==null){	 
+								if(dkcbHandler.getSession(uuid)==null){
 									byte[] key = handleSAML(docSig, uuid);
 									System.out.println("I am here :-)");
 									SecurityContextInfo sctInfo =
@@ -804,31 +804,31 @@ public class ConversationEngine {
 									dkcbHandler.addSecurtiyContext(
 										uuid,
 									sctInfo);
-								}		
+								}
 									dkInfo = new DerivedKeyInfo(dkToken);
 									dkcbHandler.addDerivedKey(uuid, dkInfo);
-								}					
+								}
 						} else if(str2Base.containsKeyIdentifier()){
 													Element elem = str2Base.getFirstElement();
 													//.getKeyIdentifier()System.out.println("KeyIdentifier :: He ehee ........");
 													String value = elem.getAttribute("ValueType");
 								if("http://docs.oasis-open.org/wss/2004/XX/oasis-2004XX-wss-saml-token-profile-1.0#SAMLAssertionID".equals(value)){
 									uuid = ((Text)elem.getChildNodes().item(0)).getNodeValue();
-									if(dkcbHandler.getSession(uuid)==null){	 
+									if(dkcbHandler.getSession(uuid)==null){
 									   byte[] key = handleSAML(elem.getOwnerDocument(), uuid);
 									   System.out.println("UUID of SAML is"+uuid);
 									   SecurityContextInfo sctInfo = new SecurityContextInfo(uuid,key,1);
 									   dkcbHandler.addSecurtiyContext(uuid,sctInfo);
-							    }		
+							    }
 								dkInfo = new DerivedKeyInfo(dkToken);
 								dkcbHandler.addDerivedKey(uuid, dkInfo);
 								}
-	                        
+
 						} else {
 							throw new ConversationException("Don't know how to process here");
 						}
-						
-					}		
+
+					}
                 //String uuid = "aNewUuid";
                 String dkId = dkToken.getID();
                 userName = ConversationUtil.generateIdentifier(uuid, dkId);
@@ -843,11 +843,11 @@ public class ConversationEngine {
                 } catch (ConversationException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
-                //TODO :: Ask ruchith to throw correct exception    
+                //TODO :: Ask ruchith to throw correct exception
 				} catch (WSSecurityException e2) {
 					// TODO Auto-generated catch block
 					e2.printStackTrace();
-				} 
+				}
 
 
             } else if (el.equals(SCT_TOKEN)) {
@@ -948,46 +948,46 @@ public class ConversationEngine {
         return symEncAlgo;
     } //TODO :: Remove this. Temporary method.
 
-   
+
 	private Crypto loadDecryptionCrypto() {
 			Crypto crypto = null;
 			String encPropFile = (String)configurator.get(WSHandlerConstants.DEC_PROP_FILE);
 			crypto = CryptoFactory.getInstance(encPropFile);
 			return crypto;
 		}
-    
+
     /**
      * This method will be scrapped after the re-architecture.
      * Not so elegant work-around.
      *
      */
     private byte[] handleSAML(Document doc, String assertionId) throws ConversationException{
-    	
+
     	try {
             Crypto crypto = this.loadDecryptionCrypto();
             //get the security header block
             //get the saml assertion
-            
+
             Element ele=WSSecurityUtil.findWsseSecurityHeaderBlock(WSSConfig.getDefaultWSConfig(), doc, doc.getDocumentElement(), false);
             Element samEle =(Element)WSSecurityUtil.getDirectChild(ele, "Assertion", "urn:oasis:names:tc:SAML:1.0:assertion" );
 //            SAMLAssertion assertion = new SAMLAssertion(samEle);
-//            
+//
 //            Iterator itr = assertion.getStatements();
-//            
+//
 //           	SAMLAuthenticationStatement auth = (SAMLAuthenticationStatement)itr.next();
 //           	Element eleEnc = auth.getSubject().getConfirmationData();
-//            
+//
 
 			Element eleEnc = (Element)samEle.getElementsByTagNameNS("http://www.w3.org/2001/04/xmlenc#","EncryptedKey").item(0);
             String cb = (String)this.configurator.get(WSHandlerConstants.PW_CALLBACK_CLASS);
-            
+
             CallbackHandler cbHandler = null;
 			if (cb != null) {
 				Class cbClass = null;
 					try {
 						cbClass = java.lang.Class.forName(cb);
 				         cbHandler = (CallbackHandler) cbClass.newInstance();
-                        
+
 					} catch (ClassNotFoundException e) {
 						throw new ConversationException("Cannot find passwordcallback");
 					} catch (InstantiationException e2) {
@@ -997,31 +997,31 @@ public class ConversationEngine {
 						// TODO Auto-generated catch block
 						e2.printStackTrace();
 					}
-				
+
 			}else{
 				throw new ConversationException("Cannot find passwordcallback");
 			}
-            
+
             WSSecurityEngine eng = new WSSecurityEngine();
-            eng.handleEncryptedKey(eleEnc, cbHandler, crypto);	
-            byte[] key = eng.getDecryptedBytes();    
-            
+            eng.handleEncryptedKey(eleEnc, cbHandler, crypto);
+            byte[] key = eng.getDecryptedBytes();
+
             return key;
-            
+
     	}catch (WSSecurityException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 			throw new ConversationException("Cannot find passwordcallback");
 		}
-    	
-    	   	
-    
-    
+
+
+
+
     }
    /**
-    * 
-    * Taken from WSSecurityEngine 
-    * 
+    *
+    * Taken from WSSecurityEngine
+    *
     * @param encBodyData
     * @return
     */
@@ -1047,5 +1047,5 @@ public class ConversationEngine {
         }
         return content;
     }
-    
+
 }

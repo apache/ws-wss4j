@@ -752,7 +752,8 @@ public class WSSecurityUtil {
 
     public static SecretKey prepareSecretKey(String symEncAlgo,
                                              byte[] rawKey) {
-        SecretKeySpec keySpec = new SecretKeySpec(rawKey, JCEMapper.getJCEKeyAlgorithmFromURI(symEncAlgo));
+        SecretKeySpec keySpec = new SecretKeySpec(
+            rawKey, JCEMapper.getJCEKeyAlgorithmFromURI(symEncAlgo));
         return (SecretKey) keySpec;
     }
 

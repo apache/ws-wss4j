@@ -100,7 +100,9 @@ public class STRTransform extends TransformSpi {
      * @throws InvalidCanonicalizerException
      */
     protected XMLSignatureInput enginePerformTransform(XMLSignatureInput input)
-            throws IOException, CanonicalizationException, InvalidCanonicalizerException {
+            throws IOException,
+                   CanonicalizationException,
+                   InvalidCanonicalizerException {
 
         doDebug = log.isDebugEnabled();
 
@@ -111,18 +113,19 @@ public class STRTransform extends TransformSpi {
         try {
 
             /*
-             * Get the main document, that is the complete SOAP request document
+             * Get the main document, that is the complete SOAP
+             * request document
              */
             Document thisDoc = this._transformObject.getDocument();
             int docHash = thisDoc.hashCode();
             if (doDebug) {
                 log.debug("doc: " + thisDoc.toString() + ", " + docHash);
             }
-            
+
             /*
-             * Her we get some information about the document that is being processed,
-             * in partucular the crypto implementation, and already detected BST that
-             * may be used later during dereferencing. 
+             * Here we get some information about the document that is being
+             * processed, in partucular the crypto implementation, and already
+             * detected BST that may be used later during dereferencing.
              */
             wsDocInfo = WSDocInfoStore.lookup(docHash);
             if (wsDocInfo == null) {
@@ -130,29 +133,27 @@ public class STRTransform extends TransformSpi {
             }
 
             /*
-             * According to the OASIS WS Specification 
+             * According to the OASIS WS Specification
              * "Web Services Security: SOAP Message Security 1.0"
              * Monday, 19 January 2004, chapter 8.3 describes that
-             * the input node set must be processed bythe c14n that 
-             * is specified in the argument element of the STRTransform 
+             * the input node set must be processed bythe c14n that
+             * is specified in the argument element of the STRTransform
              * element.
-             * 
-             * First step: Get the required c14n argument. After that, get 
+             *
+             * First step: Get the required c14n argument. After that, get
              * the c14n, feed the node set into c14n and get back the byte[].
-             * The byte[] contains the XML doc part to be 
+             * The byte[] contains the XML doc part to be
              * signed or verified. Then reparse the byte[] to get the DOM.
              */
 
             String canonAlgo = null;
             if (this._transformObject.length(WSConstants.WSSE_NS,
                     "TransformationParameters") == 1) {
-                Element tmpE = XMLUtils.selectNode(this._transformObject.getElement().getFirstChild(),
-                        WSConstants.WSSE_NS,
-                        "TransformationParameters",
-                        0);
-                Element canonElem = (Element) WSSecurityUtil.getDirectChild(tmpE,
-                        "CanonicalizationMethod",
-                        WSConstants.SIG_NS);
+                Element tmpE = XMLUtils.selectNode(
+                        this._transformObject.getElement().getFirstChild(),
+                        WSConstants.WSSE_NS, "TransformationParameters", 0);
+                Element canonElem = (Element) WSSecurityUtil.getDirectChild(
+                    tmpE, "CanonicalizationMethod", WSConstants.SIG_NS);
                 canonAlgo = canonElem.getAttribute("Algorithm");
                 if (doDebug) {
                     log.debug("CanonAlgo: " + canonAlgo);
@@ -180,7 +181,7 @@ public class STRTransform extends TransformSpi {
 
             /*
              * Second step: find the STR element inside the resulting XML doc,
-             * check if STR contains some reference to an security token. 
+             * check if STR contains some reference to an security token.
              */
 
             NodeList nodeList =
@@ -195,7 +196,8 @@ public class STRTransform extends TransformSpi {
             /*
              * Third and forth step are performed by derefenceSTR()
              */
-            SecurityTokenReference secRef = new SecurityTokenReference(WSSConfig.getDefaultWSConfig(), tmpEl);
+            SecurityTokenReference secRef = new SecurityTokenReference(
+                WSSConfig.getDefaultWSConfig(), tmpEl);
 
             str = dereferenceSTR(thisDoc, secRef);
             /*
@@ -205,7 +207,7 @@ public class STRTransform extends TransformSpi {
              * Fifth step: replace the STR with the above created/copied BST, feed
              * this result in the specified c14n method and return this to
              * the caller.
-             * 
+             *
              */
             str = (Element) doc.importNode(str, true);
 
@@ -214,8 +216,8 @@ public class STRTransform extends TransformSpi {
 //
 
             /*
-             * Alert: Hacks ahead  
-             * 
+             * Alert: Hacks ahead
+             *
              * TODO: Rework theses hacks after c14n was updated.
              */
 
@@ -235,18 +237,18 @@ public class STRTransform extends TransformSpi {
 
             tmpEl1.appendChild(str);
             // End of HACK 1
-            
+
             // XMLUtils.circumventBug2650(doc); // No longer needed???
-            
+
             /*
              * C14n with specified algorithm. According to WSS Specification.
              */
             buf = canon.canonicalizeSubtree(doc, "#default");
 
             // If the problem with c14n method is solved then just do:
-            
+
             /* return new XMLSignatureInput(buf); */
-            
+
             /*
              * HACK 2
              */
@@ -291,24 +293,24 @@ public class STRTransform extends TransformSpi {
 
         /*
          * Third step: locate the security token referenced by the STR
-         * element. Either the Token is contained in the document as a 
-         * BinarySecurityToken or stored in some key storage. 
+         * element. Either the Token is contained in the document as a
+         * BinarySecurityToken or stored in some key storage.
          *
          * Forth step: after security token was located, prepare it. If its
          * reference via a direct reference, i.e. a relative URI that references
          * the BST directly in the message then just return that element.
-         * Otherwise wrap the located token in a newly created BST element 
+         * Otherwise wrap the located token in a newly created BST element
          * as described in WSS Specification.
-         * 
+         *
          * Note: every element (also newly created elements) belong to the
          * document defined by the doc parameter. This is the main SOAP document
          * (thisDoc) and _not_ the document part that is to be signed/verified. Thus
-         * the caller must import the returned element into the document 
+         * the caller must import the returned element into the document
          * part that is signed/verified.
-         * 
+         *
          */
         Element tokElement = null;
-        
+
         /*
          * First case: direct reference, according to chap 7.2 of OASIS
          * WS specification (main document). Only in this case return
@@ -322,9 +324,9 @@ public class STRTransform extends TransformSpi {
             if (tokElement == null) {
                 throw new CanonicalizationException("empty");
             }
-        } 
+        }
         /*
-         * second case: IssuerSerial, first try to get embedded 
+         * second case: IssuerSerial, first try to get embedded
          * certificate, if that fails, lookup in keystore, wrap
          * in BST according to specification
          */
@@ -349,7 +351,7 @@ public class STRTransform extends TransformSpi {
             tokElement = createBST(doc, cert, secRef.getElement());
         }
         /*
-         * third case: KeyIdentifier, must be SKI, first try to get embedded 
+         * third case: KeyIdentifier, must be SKI, first try to get embedded
          * certificate, if that fails, lookup in keystore, wrap
          * in BST according to specification. No other KeyIdentifier
          * type handled here - just SKI
