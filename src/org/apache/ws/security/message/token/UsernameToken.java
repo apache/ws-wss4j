@@ -62,6 +62,8 @@ public class UsernameToken {
     private static SecureRandom random = null;
     String password = null;
     protected WSSConfig wssConfig = WSSConfig.getDefaultWSConfig();
+    
+    public static String TOKEN = "UsernameToken";
 
     static {
         try {
@@ -83,7 +85,7 @@ public class UsernameToken {
     public UsernameToken(WSSConfig wssConfig, Element elem) throws WSSecurityException {
         this.element = elem;
         this.wssConfig = wssConfig;
-        token = new QName(wssConfig.getWsseNS(), "UsernameToken");
+        token = new QName(wssConfig.getWsseNS(), TOKEN);
         QName el = new QName(this.element.getNamespaceURI(), this.element.getLocalName());
         if (!el.equals(token)) {
             throw new WSSecurityException(WSSecurityException.INVALID_SECURITY_TOKEN, "badTokenType00", new Object[]{el});

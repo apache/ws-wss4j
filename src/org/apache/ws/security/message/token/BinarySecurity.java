@@ -42,6 +42,7 @@ public class BinarySecurity {
     protected Element element = null;
     protected WSSConfig wssConfig = WSSConfig.getDefaultWSConfig();
 
+    public static String TOKEN = "BinarySecurityToken";
     /**
      * Constructor.
      * <p/>
@@ -65,7 +66,7 @@ public class BinarySecurity {
             nsOK = true;
         }
         if (!nsOK ||
-                !(element.getLocalName().equals("BinarySecurityToken") ||
+                !(element.getLocalName().equals(TOKEN) ||
                 element.getLocalName().equals("KeyIdentifier"))) {
             QName el = new QName(this.element.getNamespaceURI(), this.element.getLocalName());
             throw new WSSecurityException(WSSecurityException.INVALID_SECURITY_TOKEN, "badTokenType", new Object[]{el});
