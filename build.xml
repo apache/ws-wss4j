@@ -416,8 +416,8 @@ org.apache.ws.axis.security.util
         <copy todir="${build.dir}/keys">
             <fileset dir="${dir.keys}" includes="**"/>
         </copy>
-        <copy todir="${build.dir}/specs">
-            <fileset dir="${dir.specs}" includes="*.pfx"/>
+        <copy todir="${build.dir}/interop">
+            <fileset dir="${dir.interop}" includes="*.pfx"/>
         </copy>
         
         <property name="deploy.xml.property" refid="deploy.xml.files"/>

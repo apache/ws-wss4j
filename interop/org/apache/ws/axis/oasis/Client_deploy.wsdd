@@ -20,12 +20,12 @@
     <parameter name="action" value="UsernameToken Encrypt"/>
     <parameter name="user" value="Chris"/>
     <parameter name="passwordCallbackClass" 
-      value="org.apache.ws.axis.oasis.PWCallback"/>
+      value="org.apache.ws.axis.oasis.PWCallback1"/>
     <parameter name="passwordType" value="PasswordText" />
     <parameter name="addUTElements" value="Nonce Created" />
     <parameter name="encryptionPropFile" value="wsstest2.properties" />
     <parameter name="encryptionKeyIdentifier" value="SKIKeyIdentifier" />
-    <parameter name="encryptionUser" value="{4A309A0F-CCAB-4858-85CA-AFBA92B43B05}" />
+    <parameter name="encryptionUser" value="86ab6c4828bcde6983d81b2b59ff426c_a8272f6f-2c94-436e-aa71-d8d2be4647f6" />
     <parameter name="encryptionParts" 
       value="{Element}{http://www.docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd}UsernameToken" />  
    </handler>
