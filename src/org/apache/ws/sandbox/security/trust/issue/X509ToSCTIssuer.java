@@ -23,7 +23,7 @@ import org.apache.ws.security.conversation.message.token.RequestedProofToken;
 import org.apache.ws.security.conversation.message.token.RequestedSecurityToken;
 import org.apache.ws.security.message.token.BinarySecurity;
 import org.apache.ws.security.message.token.X509Security;
-//import org.apache.ws.security.trust.STSUtil;
+import org.apache.ws.security.trust.STSUtil;
 import org.apache.ws.security.trust.TrustConstants;
 import org.apache.ws.security.trust.WSTrustException;
 import org.apache.ws.security.trust.message.token.BaseToken;
@@ -69,7 +69,7 @@ public abstract class X509ToSCTIssuer implements STIssuer {
 		Element elemBase=(Element)WSSecurityUtil.findElement(req,BaseToken.TOKEN.getLocalPart(),BaseToken.TOKEN.getNamespaceURI());
 		BaseToken base=new BaseToken(elemBase);		
 		
-		//BinarySecurity binarySecurity=STSUtil.findBinarySecurityToken(req);
+		BinarySecurity binarySecurity=STSUtil.findBinarySecurityToken(req);
 		//x509=new X509Security(binarySecurity.getElement());
 		Element sct=this.getSecuritContextToken(res,x509);		
 		
