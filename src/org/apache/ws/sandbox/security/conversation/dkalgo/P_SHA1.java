@@ -40,10 +40,10 @@ package org.apache.ws.security.conversation.dkAlgo;
  * @version 1.0
  */
 
-import org.apache.ws.security.conversation.ConversationException;
-
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
+
+import org.apache.ws.security.conversation.ConversationException;
 
 public class P_SHA1
         implements DerivationAlgorithm {
@@ -55,9 +55,13 @@ public class P_SHA1
                             long length) throws ConversationException {
         try {
             Mac mac = Mac.getInstance("HmacSHA1");
-            byte[] key = new String(P_hash(secret, labelAndNonce.getBytes(), mac,
-                    (offset + (int) length))).substring(offset,
-                            (int) length).getBytes();
+            
+            byte[] tempBytes = P_hash(secret, labelAndNonce.getBytes(), mac,(offset + (int) length));
+            
+            byte[] key = new byte[(int)length];
+            
+            for(int i = 0; i < key.length; i++)
+            	key[i] = tempBytes[i+offset];
 
             return key;
         } catch (Exception ex) {
