@@ -116,6 +116,13 @@ public abstract class CryptoFactory {
             Constructor c = cryptogenClass.getConstructor(classes);
             crypto = (Crypto) c.newInstance(new Object[]{properties});
             return crypto;
+        } catch (java.lang.reflect.InvocationTargetException e) {
+            if(e.getCause() != null) {
+                e.getCause().printStackTrace();
+                log.error(e.getCause());
+            }
+            e.printStackTrace();
+            log.error(e);
         } catch (java.lang.Exception e) {
             e.printStackTrace();
             log.error(e);
