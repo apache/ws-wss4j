@@ -81,7 +81,7 @@ import java.util.Iterator;
 /**
  * WS-Security Engine.
  * <p/>
- * 
+ *
  * @author Davanum Srinivas (dims@yahoo.com).
  * @author Werner Dittmann (Werner.Dittmann@siemens.com).
  */
@@ -98,7 +98,7 @@ public class WSSecurityEngine {
 	 * The symmetric key.
 	 */
 	private byte[] decryptedBytes = null;
-    
+
     private boolean doDebug = false;
     /**
      * <code>wsse:BinarySecurityToken</code> as defined by WS Security specification
@@ -130,7 +130,7 @@ public class WSSecurityEngine {
      * <code>saml:Assertion</code> as defined by SAML specification
      */
     protected static final QName SAML_TOKEN = new QName(WSConstants.SAML_NS, WSConstants.ASSERTION_LN);
-  
+
     static {
         org.apache.xml.security.Init.init();
         String Id = "BC";
@@ -152,7 +152,7 @@ public class WSSecurityEngine {
     /**
      * Singleton instance of security engine.
      * <p/>
-     * 
+     *
      * @return ws-security engine.
      */
     public synchronized static WSSecurityEngine getInstance() {
@@ -168,7 +168,7 @@ public class WSSecurityEngine {
      * This is the main entry point to verify or decrypt a SOAP enevelope.
      * First check if a <code>wsse:Security</code> is availabe with the
      * defined actor.
-     * 
+     *
      * @param doc		the SOAP envelope as {@link Document}
      * @param actor		the engine works on behalf of this <code>actor</code>. Refer
      * 					to the SOAP specification about <code>actor</code> or <code>role
@@ -178,7 +178,7 @@ public class WSSecurityEngine {
      * @param crypto	the object that implements the access to the keystore and the
      * 					handling of certificates.
      * @return			a result vector
-     * @throws WSSecurityException 
+     * @throws WSSecurityException
      * @see WSSecurityEngine#processSecurityHeader(Element securityHeader, CallbackHandler cb,Crypto sigCrypto, Crypto decCrypto)
      */
 	public Vector processSecurityHeader(
@@ -189,14 +189,14 @@ public class WSSecurityEngine {
 		throws WSSecurityException {
 		return processSecurityHeader(doc, actor, cb, crypto, crypto);
 	}
-	
+
     /**
      * Process the security header given the soap envelope as W3C document.
      * <p/>
      * This is the main entry point to verify or decrypt a SOAP enevelope.
      * First check if a <code>wsse:Security</code> is availabe with the
      * defined actor.
-     * 
+     *
      * @param doc		the SOAP envelope as {@link Document}
      * @param actor		the engine works on behalf of this <code>actor</code>. Refer
      * 					to the SOAP specification about <code>actor</code> or <code>role
@@ -208,7 +208,7 @@ public class WSSecurityEngine {
      * @param decCrypto	the object that implements the access to the keystore and the
      * 					handling of certificates for Decryption
      * @return			a result vector
-     * @throws WSSecurityException 
+     * @throws WSSecurityException
      * @see WSSecurityEngine#processSecurityHeader(Element securityHeader, CallbackHandler cb,Crypto sigCrypto, Crypto decCrypto)
      */
 	public Vector processSecurityHeader(
@@ -223,7 +223,7 @@ public class WSSecurityEngine {
 		if (doDebug) {
 			log.debug("enter processSecurityHeader()");
 		}
-										   	
+
         if (actor == null) {
             actor = "";
         }
@@ -255,7 +255,7 @@ public class WSSecurityEngine {
 	 * <li>{@link #USERNAME_TOKEN <code>wsse:UsernameToken</code>}</li>
 	 * </ul>
 	 * <p/>
-	 * 
+	 *
 	 * @param securityHeader
 	 *            the <code>wsse:Security</code> header element
 	 * @param cb
@@ -270,15 +270,15 @@ public class WSSecurityEngine {
 	 * @return a Vector of {@link WSSecurityEngineResult}. Each element in the
 	 * 			the Vector represents the result of a security action. The elements
 	 * 			are ordered according to the sequence of the security actions in the
-	 * 			wsse:Signature header. The Vector maybe empty if no security processing 
+	 * 			wsse:Signature header. The Vector maybe empty if no security processing
 	 * 			was performed.
 	 * @throws WSSecurityException
 	 */
-    protected Vector processSecurityHeader(Element securityHeader, 
+    protected Vector processSecurityHeader(Element securityHeader,
     									   CallbackHandler cb,
     									   Crypto sigCrypto,
     									   Crypto decCrypto) throws WSSecurityException {
- 
+
 		long t0=0, t1=0, t2=0;
 		if( tlog.isDebugEnabled() ) {
 			t0=System.currentTimeMillis();
@@ -286,11 +286,11 @@ public class WSSecurityEngine {
 		/*
 		 * Gather some info about the document to process and store
 		 * it for retrival. Store the implemenation of signature crypto
-		 * (no need for encryption --- yet) 
+		 * (no need for encryption --- yet)
 		 */
 		WSDocInfo wsDocInfo = new WSDocInfo(securityHeader.getOwnerDocument().hashCode());
 		wsDocInfo.setCrypto(sigCrypto);
-				
+
         NodeList list = securityHeader.getChildNodes();
         int len = list.getLength();
         Node elem;
@@ -301,7 +301,7 @@ public class WSSecurityEngine {
 			t1=System.currentTimeMillis();
 		}
 		Vector returnResults = new Vector();
-		
+
         for (int i = 0; i < len; i++) {
             elem = list.item(i);
             if (elem.getNodeType() != Node.ELEMENT_NODE) {
@@ -313,7 +313,7 @@ public class WSSecurityEngine {
                 	log.debug("Found signature element");
             	}
 				if (sigCrypto == null) {
-					throw new WSSecurityException(WSSecurityException.FAILURE, 
+					throw new WSSecurityException(WSSecurityException.FAILURE,
 												  "noSigCryptoFile");
 				}
 				WSDocInfoStore.store(wsDocInfo);
@@ -326,7 +326,7 @@ public class WSSecurityEngine {
 					throw ex;
 				}
 				finally {
-					WSDocInfoStore.delete(wsDocInfo);        
+					WSDocInfoStore.delete(wsDocInfo);
 				}
 				returnResults.add(0, new WSSecurityEngineResult(
 						WSConstants.SIGN, lastPrincipalFound, returnCert[0],
@@ -336,11 +336,11 @@ public class WSSecurityEngine {
 					log.debug("Found encrypted key element");
             	}
 				if (decCrypto == null) {
-					throw new WSSecurityException(WSSecurityException.FAILURE, 
+					throw new WSSecurityException(WSSecurityException.FAILURE,
 												  "noDecCryptoFile");
 				}
 				if (cb == null) {
-					throw new WSSecurityException(WSSecurityException.FAILURE, 
+					throw new WSSecurityException(WSSecurityException.FAILURE,
 												  "noCallback");
 				}
                 handleEncryptedKey((Element) elem, cb, decCrypto);
@@ -351,7 +351,7 @@ public class WSSecurityEngine {
 					log.debug("Found reference list element");
             	}
 				if (cb == null) {
-					throw new WSSecurityException(WSSecurityException.FAILURE, 
+					throw new WSSecurityException(WSSecurityException.FAILURE,
 												  "noCallback");
 				}
                 handleReferenceList((Element) elem, cb);
@@ -362,7 +362,7 @@ public class WSSecurityEngine {
 					log.debug("Found UsernameToken list element");
 				}
 				if (cb == null) {
-					throw new WSSecurityException(WSSecurityException.FAILURE, 
+					throw new WSSecurityException(WSSecurityException.FAILURE,
 												  "noCallback");
 				}
                 lastPrincipalFound = handleUsernameToken((Element) elem, cb);
@@ -413,8 +413,8 @@ public class WSSecurityEngine {
     /**
      * Verify the WS-Security signature.
      * <p/>
-     * The functions at first checks if then <code>KeyInfo</code> that is 
-     * contained in the signature contains standard X509 data. If yes then 
+     * The functions at first checks if then <code>KeyInfo</code> that is
+     * contained in the signature contains standard X509 data. If yes then
      * get the certificate data via the standard <code>KeyInfo</code> methods.
      * <p/>
      * Otherwise, if the <code>KeyInfo</code> info does not contain X509 data, check
@@ -433,7 +433,7 @@ public class WSSecurityEngine {
      * <p/>
      * The methods checks is the certificate is valid and calls the
      * {@link XMLSignature#checkSignatureValue(X509Certificate) verfication} function.
-     * 
+     *
      * @param elem 		the XMLSignature DOM Element.
      * @param crypto	the object that implements the access to the keystore and the
      * 					handling of certificates.
@@ -445,8 +445,8 @@ public class WSSecurityEngine {
      * 					header.
      * @return 			the subject principal of the validated X509 certificate (the
      * 					authenticated subject). The calling function may use this
-     * 					principal for further authentication or authorization. 
-     * @throws Exception 
+     * 					principal for further authentication or authorization.
+     * @throws Exception
      */
 	protected Principal verifyXMLSignature(
 		Element elem,
@@ -477,7 +477,7 @@ public class WSSecurityEngine {
 		}
 
 		sig.addResourceResolver(EnvelopeIdResolver.getInstance());
-		
+
         X509Certificate[] certs = null;
 		KeyInfo info = sig.getKeyInfo();
         if (/*crypto.getDefaultX509Alias() == null &&*/ info != null) {
@@ -498,17 +498,17 @@ public class WSSecurityEngine {
 			if (doDebug) {
 				log.debug("XML Verify doc: " + docHash);
 			}
-			
+
 			/*
 			 * Her we get some information about the document that is being processed,
 			 * in partucular the crypto implementation, and already detected BST that
-			 * may be used later during dereferencing. 
+			 * may be used later during dereferencing.
 			 */
 			WSDocInfo wsDocInfo = WSDocInfoStore.lookup(docHash);
-    		
+
     		if (secRef.containsReference()) {
     			Element token = secRef.getTokenElement(elem.getOwnerDocument(), wsDocInfo);
-    
+
     			// at this point ... check token type: Binary
     			QName el = new QName(token.getNamespaceURI(), token.getLocalName());
     			if (el.equals(BINARY_TOKEN)) {
@@ -563,7 +563,7 @@ public class WSSecurityEngine {
 				/*
 				 * Now dig into the Signature element to get the elements that this
 				 * Signature covers. Build the QName of these Elements and return
-				 * them to caller 
+				 * them to caller
 				 */
 				SignedInfo si = sig.getSignedInfo();
 				int numReferences = si.getLength();
@@ -580,10 +580,10 @@ public class WSSecurityEngine {
 					String uri = siRef.getURI();
 					Element se = WSSecurityUtil.getElementByWsuId(elem.getOwnerDocument(), uri);
 					if (se == null) {
-						se = WSSecurityUtil.getElementByGenId(elem.getOwnerDocument(), uri);						
+						se = WSSecurityUtil.getElementByGenId(elem.getOwnerDocument(), uri);
 					}
 					if (se == null) {
-						throw new WSSecurityException(WSSecurityException.FAILED_CHECK);						
+						throw new WSSecurityException(WSSecurityException.FAILED_CHECK);
 					}
 					QName qn = new QName(se.getNamespaceURI(), se.getLocalName());
 					qvec.add(qn);
@@ -598,11 +598,11 @@ public class WSSecurityEngine {
 			throw new WSSecurityException(WSSecurityException.FAILED_CHECK);
 		}
 	}
-    
+
     /**
      * Extracts the certificate(s) from the Binary Security token reference.
      * <p/>
-     * 
+     *
      * @param elem		The element containing the binary security token. This
      * 					is either X509 certificate(s) or a PKIPath.
      * @return 			an array of X509 certificates
@@ -625,12 +625,12 @@ public class WSSecurityEngine {
                     "unhandledToken", new Object[]{token.getClass().getName()});
         }
     }
-    
+
     /**
      * Extracts the certificate(s) from the SAML token reference.
      * <p/>
-     * 
-     * @param elem		The element containing the SAML token. 
+     *
+     * @param elem		The element containing the SAML token.
      * @return 			an array of X509 certificates
      * @throws 			WSSecurityException
      */
@@ -638,7 +638,7 @@ public class WSSecurityEngine {
 			Element elem,
 			Crypto crypto)
 			throws WSSecurityException {
-	    
+
         /*
          * Get some information about the SAML token content. This controls how
          * to deal with the whole stuff. First get the Authentication statement
@@ -707,13 +707,13 @@ public class WSSecurityEngine {
 	}
     /**
      * Checks the <code>element</code> and creates appropriate binary security object.
-     * 
+     *
      * @param element The XML element that contains either a <code>BinarySecurityToken
      * </code> or a <code>PKIPath</code> element. Other element types a not
      * supported
      * @return 		the BinarySecurity object, either a <code>X509Security</code> or a
      * 				<code>PKIPathSecurity</code> object.
-     * @throws 		WSSecurityException 
+     * @throws 		WSSecurityException
      */
     private BinarySecurity createSecurityToken(Element element) throws WSSecurityException {
         BinarySecurity token = new BinarySecurity(element);
@@ -726,7 +726,7 @@ public class WSSecurityEngine {
         try {
             Constructor constructor = clazz.getConstructor(constructorType);
             if (constructor == null) {
-                throw new WSSecurityException(WSSecurityException.FAILURE, 
+                throw new WSSecurityException(WSSecurityException.FAILURE,
 					"invalidConstructor", new Object[]{clazz});
             }
             return (BinarySecurity) constructor.newInstance(new Object[]{element});
@@ -812,7 +812,7 @@ public class WSSecurityEngine {
             }
         } catch (SAMLException e) {
             throw new WSSecurityException(WSSecurityException.FAILURE,
-                    "invalidSAMLsecurity", null, e);  
+                    "invalidSAMLsecurity", null, e);
         }
         if (!result) {
             throw new WSSecurityException(WSSecurityException.FAILED_AUTHENTICATION);
@@ -826,12 +826,12 @@ public class WSSecurityEngine {
 
 			SimpleDateFormat zulu = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
 			zulu.setTimeZone(TimeZone.getTimeZone("GMT"));
-			
+
 			log.debug("Current time: " + zulu.format(Calendar.getInstance().getTime()));
 			log.debug("Timestamp created: " + zulu.format(timestamp.getCreated().getTime()));
 			log.debug("Timestamp expires: " + zulu.format(timestamp.getExpires().getTime()));
 		}
-		
+
 		// Validate whether the security semantics have expired
 		Calendar rightNow = Calendar.getInstance();
 		if (timestamp.getExpires().before(rightNow)) {
@@ -840,12 +840,12 @@ public class WSSecurityEngine {
 
 		return;
 	}
-    
+
     public void handleEncryptedKey(Element xencEncryptedKey, CallbackHandler cb, Crypto crypto) throws WSSecurityException {
 		long t0=0, t1=0, t2=0;
 		if( tlog.isDebugEnabled() ) {
 			t0=System.currentTimeMillis();
-		}        
+		}
         // need to have it to find the encryped data elements in the envelope
         Document doc = xencEncryptedKey.getOwnerDocument();
         Element envelope = doc.getDocumentElement();
@@ -881,7 +881,7 @@ public class WSSecurityEngine {
             throw new WSSecurityException
                     (WSSecurityException.INVALID_SECURITY, "noCipher");
         }
-        // here get the reference to the private key / shared secret key. 
+        // here get the reference to the private key / shared secret key.
         // Shared secret key not yet supported
         // see check above ... maybe later
         Element keyInfo = (Element) WSSecurityUtil.getDirectChild((Node) xencEncryptedKey,
@@ -935,7 +935,7 @@ public class WSSecurityEngine {
                 }
     		} else if (secRef.containsReference()) {
     			Element bstElement = secRef.getTokenElement(doc, null);
-    
+
     			// at this point ... check token type: Binary
     			QName el =
     				new QName(
@@ -989,7 +989,7 @@ public class WSSecurityEngine {
         }
         /*
 	 	 * At this point we have all information necessary to decrypt the session
-	 	 * key: 
+	 	 * key:
 	 	 * - the Cipher object intialized with the correct methods
 	 	 * - The data that holds the encrypted session key
 	 	 * - the alias name for the private key
@@ -1018,8 +1018,8 @@ public class WSSecurityEngine {
             throw new WSSecurityException(WSSecurityException.FAILURE,
                     "noPassword", new Object[]{alias});
         }
-        
-		
+
+
 		try {
 			cipher.init(
 				Cipher.DECRYPT_MODE,
@@ -1053,7 +1053,7 @@ public class WSSecurityEngine {
          * to W3C XML-Enc this key is used to decrypt _any_ references contained in
          * the reference list
 		 * Now lookup the references that are encrypted with this key
-         */ 
+         */
         String dataRefURI = null;
         String keyRefURI = null;
         Element refList = (Element) WSSecurityUtil.getDirectChild((Node) xencEncryptedKey,
@@ -1079,10 +1079,10 @@ public class WSSecurityEngine {
 
 		if (tlog.isDebugEnabled()) {
 			t2=System.currentTimeMillis();
-			tlog.debug("XMLDecrypt: total= " + (t2-t0) + 
+			tlog.debug("XMLDecrypt: total= " + (t2-t0) +
 			", get-sym-key= " + (t1-t0) +
 			", decrypt= " + (t2-t1));
-		}        
+		}
         return;
     }
 
@@ -1134,7 +1134,7 @@ public class WSSecurityEngine {
 
 	/**
 	 * Dereferences and decodes encrypted data elements.
-	 * 
+	 *
 	 * @param elem  contains the <code>ReferenceList</code> to the
 	 * 				encrypted data elements
 	 * @param cb	the callback handler to get the key for a key name
@@ -1200,7 +1200,7 @@ public class WSSecurityEngine {
 				WSConstants.SIG_NS);
 
 		byte[]decryptedBytes = getSharedKey(tmpE, cb);
-		
+
 		SecretKey symmetricKey = WSSecurityUtil.prepareSecretKey(symEncAlgo, decryptedBytes);
 
 		// initialize Cipher ....
@@ -1233,14 +1233,14 @@ public class WSSecurityEngine {
 		 * immediatly if its already the correct element.
 		 * Then we can get the Type attribute.
 		 */
-		
+
 		Element tmpE = (Element) WSSecurityUtil.findElement(encBodyData,
 				"EncryptedData", WSConstants.ENC_NS);
 		String typeStr = null;
 		boolean content = true;
 		if (tmpE != null) {
 			typeStr= tmpE.getAttribute("Type");
-		} 
+		}
 		if (typeStr != null) {
 			content = typeStr.equals(WSConstants.ENC_NS + "Content") ? true : false;
 		}
@@ -1310,10 +1310,10 @@ public class WSSecurityEngine {
     /**
      * Put description here.
      * <p/>
-     * 
-     * @param element 
-     * @return 
-     * @throws Exception 
+     *
+     * @param element
+     * @return
+     * @throws Exception
      */
 	public static byte[] getDecodedBase64EncodedData(Element element) throws WSSecurityException {
 		StringBuffer sb = new StringBuffer();

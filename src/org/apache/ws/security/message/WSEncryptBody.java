@@ -51,10 +51,10 @@ import java.security.cert.X509Certificate;
 import java.util.Vector;
 
 /**
- * Encrypts a SOAP body inside a SOAP envelope according to WS Specification, 
+ * Encrypts a SOAP body inside a SOAP envelope according to WS Specification,
  * X509 profile, and adds the encryption data.
  * <p/>
- * 
+ *
  * @author Davanum Srinivas (dims@yahoo.com).
  * @author Werner Dittmann (Werner.Dittmann@siemens.com).
  */
@@ -68,12 +68,12 @@ public class WSEncryptBody extends WSBaseMessage {
 	protected byte[] embeddedKey = null;
 	protected String embeddedKeyName = null;
 	protected X509Certificate useThisCert = null;
-	
+
 	/**
-	 * Symmetric key used in the EncrytpedKey. 
+	 * Symmetric key used in the EncrytpedKey.
 	 */
 	protected SecretKey symmetricKey=null;
-	
+
 	/**
 	 * Parent node to which the EncryptedKeyElement should be added.
 	 */
@@ -88,8 +88,8 @@ public class WSEncryptBody extends WSBaseMessage {
 	/**
 	 * Constructor.
 	 * <p/>
-	 * 
-	 * @param actor The actor name of the <code>wsse:Security</code> 
+	 *
+	 * @param actor The actor name of the <code>wsse:Security</code>
 	 * 				header
 	 */
 	public WSEncryptBody(String actor) {
@@ -99,7 +99,7 @@ public class WSEncryptBody extends WSBaseMessage {
 	/**
 	 * Constructor.
 	 * <p/>
-	 * 
+	 *
 	 * @param actor The actor name of the <code>wsse:Security</code> header
 	 * @param mu    Set <code>mustUnderstand</code> to true or false
 	 */
@@ -108,9 +108,9 @@ public class WSEncryptBody extends WSBaseMessage {
 	}
 
 	/**
-	 * Sets the key to use during embedded encryption. 
+	 * Sets the key to use during embedded encryption.
 	 * <p/>
-	 * 
+	 *
 	 * @param key to use during encryption. The key must fit the
 	 * 			  selected symmetrical encryption algorithm
 	 */
@@ -119,11 +119,11 @@ public class WSEncryptBody extends WSBaseMessage {
 	}
 
 	/**
-	 * Sets the algorithm to encode the symmetric key. 
+	 * Sets the algorithm to encode the symmetric key.
 	 * <p/>
 	 * Default is the <code>WSConstants.KEYTRANSPORT_RSA15</code>
 	 * algorithm.
-	 * 
+	 *
 	 * @param keyEnc specifies the key encoding algorithm.
 	 * @see WSConstants.KEYTRANSPORT_RSA15
 	 * @see WSConstants.KEYTRANSPORT_RSAOEP
@@ -136,8 +136,8 @@ public class WSEncryptBody extends WSBaseMessage {
 	 * key of this certificate is used, thus no password necessary.
 	 * The user name is a keystore alias usually.
 	 * <p/>
-	 * 
-	 * @param user 
+	 *
+	 * @param user
 	 */
 	public void setUserInfo(String user) {
 		this.user = user;
@@ -155,8 +155,8 @@ public class WSEncryptBody extends WSBaseMessage {
 	 * Set the X509 Certificate to use for encryption.
 	 * If this is set <b>and</b> the key identifier is set
 	 * to <code>DirectReference</code> then use this certificate
-	 * to get the public key for encryption. 
-	 * 
+	 * to get the public key for encryption.
+	 *
 	 * @param cert is the X509 certificate to use for encryption
 	 */
 	public void setUseThisCert(X509Certificate cert) {
@@ -170,7 +170,7 @@ public class WSEncryptBody extends WSBaseMessage {
 	 * is not set then Triple DES is used. Refer to
 	 * WSConstants which algorithms are supported.
 	 * <p/>
-	 * 
+	 *
 	 * @param algo Is the name of the encyrption algorithm
 	 * @see WSConstants#TRIPLE_DES
 	 * @see WSConstants#AES_128
@@ -185,13 +185,13 @@ public class WSEncryptBody extends WSBaseMessage {
 	 * Set the name of an optional canonicalization algorithm to use
 	 * before encryption
 	 * <p/>
-	 * This c14n alogrithm is used to serialize the data before 
+	 * This c14n alogrithm is used to serialize the data before
 	 * encryption, i.e. the SOAP Body. If the algorithm
 	 * is not set then a standard serialization is used (provided
 	 * by XMLCipher, usually a XMLSerializer according to DOM 3
 	 * specification).
 	 * <p/>
-	 * 
+	 *
 	 * @param algo Is the name of the canonicalization algorithm
 	 */
 	public void setEncCanonicalization(String algo) {
@@ -205,8 +205,8 @@ public class WSEncryptBody extends WSBaseMessage {
 	 * the data, i.e. the SOAP Body. Refer to
 	 * WSConstants which algorithms are supported.
 	 * <p/>
-	 * 
-	 * @return 	the name of the currently selected symmetric encryption 
+	 *
+	 * @return 	the name of the currently selected symmetric encryption
 	 * 			algorithm
 	 * @see WSConstants#TRIPLE_DES
 	 * @see WSConstants#AES_128
@@ -225,31 +225,31 @@ public class WSEncryptBody extends WSBaseMessage {
 	 * <ul>
 	 * <li>	First step: set the encoding namespace in the SOAP:Envelope </li>
 	 * <li>	Second step: generate a symmetric key (session key) for
-	 *		the selected symmetric encryption alogrithm, and set the cipher 
-	 *		into encryption mode.  
+	 *		the selected symmetric encryption alogrithm, and set the cipher
+	 *		into encryption mode.
 	 * </li>
 	 * <li> Third step: get the data to encrypt.
-	 *		We always encrypt the complete first child element of 
-	 *		the SOAP Body element 
+	 *		We always encrypt the complete first child element of
+	 *		the SOAP Body element
 	 * </li>
 	 * <li>	Forth step: encrypt data, and set neccessary attributes in
 	 * 		<code>xenc:EncryptedData</code>
 	 *	</li>
-	 * <li>	Fifth step: get the certificate that contains the public key for 
+	 * <li>	Fifth step: get the certificate that contains the public key for
 	 * 		the	public key algorithm that will encrypt the generated symmetric
 	 * 		(session) key. Up to now we support RSA 1-5 as public key
-	 * 		 algorithm. 
+	 * 		 algorithm.
 	 * </li>
 	 * <li>	Sixth step: setup the <code>wsse:Security</code> header block </li>
 	 * </ul>
-	 * 
+	 *
 	 * @param doc    	the SOAP envelope as <code>Document</code> with
 	 * 					plaintext Body
 	 * @param crypto 	an instance of the Crypto API to handle keystore and
 	 * 					Certificates
 	 * @return 			the SOAP envelope with encrypted Body as <code>Document
 	 * 					</code>
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	public Document build(Document doc, Crypto crypto) throws WSSecurityException {
 		doDebug = log.isDebugEnabled();
@@ -279,7 +279,7 @@ public class WSEncryptBody extends WSBaseMessage {
 
 		/*
 		 * Second step: generate a symmetric key (session key) for
-		 * this alogrithm, and set the cipher into encryption mode. 
+		 * this alogrithm, and set the cipher into encryption mode.
 		 */
 		SecretKey symmetricKey = null;
 		KeyGenerator keyGen = getKeyGenerator();
@@ -348,7 +348,7 @@ public class WSEncryptBody extends WSBaseMessage {
 			encDataRefs.add(new String("#" + xencEncryptedDataId));
 		}
 		/*
-		 * At this point data is encrypted with the symmetric key and can be 
+		 * At this point data is encrypted with the symmetric key and can be
 		 * referenced via the above Id
 		 */
 
@@ -430,7 +430,7 @@ public class WSEncryptBody extends WSBaseMessage {
 		 */
 		Element wsseSecurity = insertSecurityHeader(doc);
 		Element xencEncryptedKey = createEnrcyptedKey(doc, keyEncAlgo);
-		if(parentNode==null){		
+		if(parentNode==null){
 		WSSecurityUtil.prependChildElement(
 			doc,
 			wsseSecurity,
@@ -442,7 +442,7 @@ public class WSEncryptBody extends WSBaseMessage {
 						parentNode,
 						xencEncryptedKey,
 						true);
-		} 
+		}
 		SecurityTokenReference secToken = new SecurityTokenReference(doc);
 
 		switch (keyIdentifierType) {
@@ -531,10 +531,10 @@ public class WSEncryptBody extends WSBaseMessage {
 		SOAPConstants soapConstants = WSSecurityUtil.getSOAPConstants(envelope);
 		/*
 		 * Second step: generate a symmetric key from the specified
-		 * key (password) for this alogrithm, and set the cipher into 
-		 * encryption mode. 
+		 * key (password) for this alogrithm, and set the cipher into
+		 * encryption mode.
 		 */
-		
+
 		symmetricKey = WSSecurityUtil.prepareSecretKey(symEncAlgo, embeddedKey);
 
 		XMLCipher xmlCipher = null;
@@ -585,7 +585,7 @@ public class WSEncryptBody extends WSBaseMessage {
 
 			KeyInfo keyInfo = new KeyInfo(doc);
 			keyInfo.addKeyName(embeddedKeyName == null ? user : embeddedKeyName);
-			
+
 			/*
 			 * Forth step: encrypt data, and set neccessary attributes in
 			 * xenc:EncryptedData
@@ -607,7 +607,7 @@ public class WSEncryptBody extends WSBaseMessage {
 			encDataRefs.add(new String("#" + xencEncryptedDataId));
 		}
 		/*
-		 * At this point data is encrypted with the symmetric key and can be 
+		 * At this point data is encrypted with the symmetric key and can be
 		 * referenced via the above Id
 		 */
 
@@ -652,10 +652,10 @@ public class WSEncryptBody extends WSBaseMessage {
 
 	/**
 	 * Create DOM subtree for <code>xenc:EncryptedKey</code>
-	 * 
-	 * @param doc      			the SOAP enevelope parent document       
+	 *
+	 * @param doc      			the SOAP enevelope parent document
 	 * @param keyTransportAlgo	specifies which alogrithm to use to encrypt the
-	 * 							symmetric key 
+	 * 							symmetric key
 	 * @return 					an <code>xenc:EncryptedKey</code> element
 	 */
 	public static Element createEnrcyptedKey(
@@ -715,7 +715,7 @@ public class WSEncryptBody extends WSBaseMessage {
 		WSSecurityUtil.appendChildElement(doc, encryptedKey, referenceList);
 		return referenceList;
 	}
-	
+
 	/**
 	 * Sets the parent node of the EncryptedKeyElement
 	 * @param element
