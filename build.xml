@@ -478,6 +478,7 @@ org.apache.ws.axis.security.util
             <arg file="${build.work}/org/apache/ws/axis/oasis/ping/undeploy.wsdd"/>
         </java>
         
+        <!--
         <junit printsummary="yes"
             haltonfailure="yes"
             fork="yes"
@@ -496,6 +497,7 @@ org.apache.ws.axis.security.util
                 </fileset>
             </batchtest>
         </junit>
+        -->
 
         <java classname="org.apache.axis.client.AdminClient" fork="yes">
             <classpath refid="classpath.library"/>

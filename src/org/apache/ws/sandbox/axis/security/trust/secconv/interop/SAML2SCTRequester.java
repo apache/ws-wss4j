@@ -300,17 +300,17 @@ public class SAML2SCTRequester implements RST_Requester {
             WSEncryptionPart msgidP =
                     new WSEncryptionPart(
                             Constants.MESSAGE_ID,
-                            Constants.NS_URI_ADDRESSING,
+                            Constants.NS_URI_ADDRESSING_DEFAULT,
                             "Content");
             WSEncryptionPart actionP =
                     new WSEncryptionPart(
                             Constants.ACTION,
-                            Constants.NS_URI_ADDRESSING,
+                            Constants.NS_URI_ADDRESSING_DEFAULT,
                             "Content");
             WSEncryptionPart toP =
                     new WSEncryptionPart(
                             Constants.TO,
-                            Constants.NS_URI_ADDRESSING,
+                            Constants.NS_URI_ADDRESSING_DEFAULT,
                             "Content");
             WSEncryptionPart timestampP =
                     new WSEncryptionPart(
