@@ -15,9 +15,8 @@
  *
  */
 
-package org.apache.ws.axis.security;
+package org.apache.ws.security.handler;
 
-import org.apache.axis.Constants;
 import org.apache.ws.security.WSConstants;
 
 import java.util.Hashtable;
@@ -26,7 +25,7 @@ import java.util.Map;
 /**
  * @author Werner Dittmann (Werner.Dittmann@siemens.com)
  */
-public class WSDoAllConstants {
+public class WSHandlerConstants {
 
     /**
      * The action parameter in the WSDD configuration file. The
@@ -112,7 +111,7 @@ public class WSDoAllConstants {
      * The actor name of the <code>wsse:Security</code> header.
      * <p/>
      * If this parameter is omitted, the actor name is not set. Please
-     * refer to {@link Constants#ATTR_ACTOR} and {@link Constants#ATTR_ROLE}
+     * refer to {@link org.apache.axis.Constants#ATTR_ACTOR} and {@link org.apache.axis.Constants#ATTR_ROLE}
      * about the parameter names. They are set to <code>"actor"</code>
      * and <code>"role"</code> respectively.
      * <p/>
@@ -126,16 +125,16 @@ public class WSDoAllConstants {
      * However, the parameter in the WSDD deployment file overwrites the
      * property setting (deployment setting overwrites application setting).
      *
-     * @see Constants#URI_SOAP11_NEXT_ACTOR
-     * @see Constants#URI_SOAP12_NEXT_ROLE
+     * @see org.apache.axis.Constants#URI_SOAP11_NEXT_ACTOR
+     * @see org.apache.axis.Constants#URI_SOAP12_NEXT_ROLE
      */
-    public static final String ACTOR = Constants.ATTR_ACTOR;
+    public static final String ACTOR = "actor";
 
     /**
      * The role name of the <code>wsse:Security</code> header.
      * This is used for SOAP 1.2. Refer also to {@link #ACTOR}.
      */
-    public static final String ROLE = Constants.ATTR_ROLE;
+    public static final String ROLE = "role";
 
     /**
      * Sets the <code>mustUnderstand</code> flag.
@@ -154,10 +153,10 @@ public class WSDoAllConstants {
      * <p/>
      * The default setting is <code>true</code>
      * <p/>
-     * Please refer to {@link Constants#ATTR_MUST_UNDERSTAND}
+     * Please refer to {@link org.apache.axis.Constants#ATTR_MUST_UNDERSTAND}
      * about the parameter name (<code>"mustUnderstand"</code>).
      */
-    public static final String MUST_UNDERSTAND = Constants.ATTR_MUST_UNDERSTAND;
+    public static final String MUST_UNDERSTAND = "mustUnderstand";
 
     /**
      * The user's name. It is used differently by the WS Security functions.
@@ -228,7 +227,7 @@ public class WSDoAllConstants {
      * {@link javax.security.auth.callback.CallbackHandler} interface.
      * <p/>
      * The callback function
-     * {@link javax.security.auth.callback.CallbackHandler#handle(Callback[])}
+     * {@link javax.security.auth.callback.CallbackHandler#handle(javax.security.auth.callback.Callback[])}
      * gets an array of {@link org.apache.ws.security.WSPasswordCallback}
      * objects. Only the first entry of the array is used. This object
      * contains the username/keyname as identifier. The callback handler must
@@ -629,13 +628,9 @@ public class WSDoAllConstants {
      * </li>
      * <li><code>IssuerSerial</code> for {@link WSConstants#ISSUER_SERIAL}
      * </li>
-     * <li><code>IssuerSerialDirect</code> for {@link WSConstants#ISSUER_SERIAL_DIRECT}
-     * </li>
      * <li><code>X509KeyIdentifier</code> for {@link WSConstants#X509_KEY_IDENTIFIER}
      * </li>
      * <li><code>SKIKeyIdentifier</code> for {@link WSConstants#SKI_KEY_IDENTIFIER}
-     * </li>
-     * <li><code>SKIKeyIdentifierDirect</code> for {@link WSConstants#SKI_KEY_IDENTIFIER_DIRECT}
      * </li>
      * <li><code>EmbeddedKeyName</code> for {@link WSConstants#EMBEDDED_KEYNAME}
      * </li>

@@ -34,10 +34,11 @@ import org.apache.axis.client.AxisClient;
 import org.apache.axis.configuration.NullProvider;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.ws.axis.security.WSDoAllConstants;
+import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.axis.security.WSDoAllReceiver;
 import org.apache.ws.axis.security.WSDoAllSender;
 import org.apache.ws.security.WSPasswordCallback;
+import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.Merlin;
 
@@ -92,7 +93,7 @@ public class TestWSSecurityHooks extends TestCase implements CallbackHandler
       AxisClient tmpEngine = new AxisClient(new NullProvider());
       mc = new MessageContext(tmpEngine);
       mc.setCurrentMessage(getSOAPMessage(soapMessage));
-      mc.setProperty(WSDoAllConstants.PW_CALLBACK_REF, this);
+      mc.setProperty(WSHandlerConstants.PW_CALLBACK_REF, this);
       keystore = loadKeyStore();
    }
 
@@ -125,7 +126,7 @@ public class TestWSSecurityHooks extends TestCase implements CallbackHandler
    public void testSenderLoadEncryptionHook() throws Exception {
       TestSenderImpl sender = new TestSenderImpl();
       // decodeEcnryptionParameter() is rather insistant on having a user (anyUser)
-      sender.setOption(WSDoAllConstants.ENCRYPTION_USER, "anyUserWillDo");
+      sender.setOption(WSHandlerConstants.ENCRYPTION_USER, "anyUserWillDo");
       // we have to coerce a value into this field or we'll get a bunch of NPEs when calling decodeSignatureParameter
       PrivilegedAccessor.setValue(sender, "msgContext", mc);
       PrivilegedAccessor.invokeMethod(sender, "decodeEncryptionParameter", new Object[] {});
@@ -145,11 +146,11 @@ public class TestWSSecurityHooks extends TestCase implements CallbackHandler
    public void testRoundTripWithHooks() throws Exception {
       // Setup our sender to Encrypt and Sign a soap message
       TestSenderImpl sender = new TestSenderImpl();
-      sender.setOption(WSDoAllConstants.ACTOR, "test");
-      sender.setOption(WSDoAllConstants.USER, "16c73ab6-b892-458f-abf5-2f875f74882e");
-      sender.setOption(WSDoAllConstants.ACTION, "Encrypt Signature");
-      sender.setOption(WSDoAllConstants.SIG_KEY_ID, "DirectReference");
-      sender.setOption(WSDoAllConstants.ENC_KEY_ID, "X509KeyIdentifier");
+      sender.setOption(WSHandlerConstants.ACTOR, "test");
+      sender.setOption(WSHandlerConstants.USER, "16c73ab6-b892-458f-abf5-2f875f74882e");
+      sender.setOption(WSHandlerConstants.ACTION, "Encrypt Signature");
+      sender.setOption(WSHandlerConstants.SIG_KEY_ID, "DirectReference");
+      sender.setOption(WSHandlerConstants.ENC_KEY_ID, "X509KeyIdentifier");
       sender.invoke(mc);
       
       // Make sure that at least SOMETHING happened
@@ -163,8 +164,8 @@ public class TestWSSecurityHooks extends TestCase implements CallbackHandler
       
       // Setup our receiver for the decryption / signature validation
       TestReceiverImpl receiver = new TestReceiverImpl();
-      receiver.setOption(WSDoAllConstants.ACTOR, "test");
-      receiver.setOption(WSDoAllConstants.ACTION, "Encrypt Signature");
+      receiver.setOption(WSHandlerConstants.ACTOR, "test");
+      receiver.setOption(WSHandlerConstants.ACTION, "Encrypt Signature");
       receiver.invoke(mc);
    }
    

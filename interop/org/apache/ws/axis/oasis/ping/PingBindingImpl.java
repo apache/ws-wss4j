@@ -26,11 +26,11 @@ package org.apache.ws.axis.oasis.ping;
 
 import org.apache.axis.Message;
 import org.apache.axis.MessageContext;
-import org.apache.ws.axis.security.WSDoAllConstants;
-import org.apache.ws.axis.security.WSDoAllReceiverResult;
+import org.apache.ws.security.handler.WSHandlerConstants;
+import org.apache.ws.security.handler.WSHandlerResult;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSecurityEngineResult;
-
+import org.apache.ws.security.handler.WSHandlerResult;
 
 import javax.xml.rpc.holders.StringHolder;
 import java.util.Vector;
@@ -46,14 +46,14 @@ public class PingBindingImpl
 
         Vector results = null;
         if ((results =
-            (Vector) msgContext.getProperty(WSDoAllConstants.RECV_RESULTS))
+            (Vector) msgContext.getProperty(WSHandlerConstants.RECV_RESULTS))
             == null) {
             System.out.println("No security results!!");
         }
         System.out.println("Number of results: " + results.size());
         for (int i = 0; i < results.size(); i++) {
-            WSDoAllReceiverResult rResult =
-                (WSDoAllReceiverResult) results.get(i);
+            WSHandlerResult rResult =
+                (WSHandlerResult) results.get(i);
             Vector wsSecEngineResults = rResult.getResults();
 
             for (int j = 0; j < wsSecEngineResults.size(); j++) {

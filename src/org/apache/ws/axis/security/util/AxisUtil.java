@@ -18,8 +18,9 @@
 package org.apache.ws.axis.security.util;
 
 import org.apache.axis.AxisFault;
-import org.apache.ws.axis.security.WSDoAllConstants;
+import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.util.StringUtil;
 import org.apache.xml.security.c14n.Canonicalizer;
 import org.w3c.dom.Document;
@@ -114,28 +115,28 @@ public class AxisUtil {
         }
         String single[] = StringUtil.split(action, ' ');
         for (int i = 0; i < single.length; i++) {
-            if (single[i].equals(WSDoAllConstants.NO_SECURITY)) {
+            if (single[i].equals(WSHandlerConstants.NO_SECURITY)) {
                 doAction = WSConstants.NO_SECURITY;
                 return doAction;
-            } else if (single[i].equals(WSDoAllConstants.USERNAME_TOKEN)) {
+            } else if (single[i].equals(WSHandlerConstants.USERNAME_TOKEN)) {
                 doAction |= WSConstants.UT;
                 actions.add(new Integer(WSConstants.UT));
-            } else if (single[i].equals(WSDoAllConstants.SIGNATURE)) {
+            } else if (single[i].equals(WSHandlerConstants.SIGNATURE)) {
                 doAction |= WSConstants.SIGN;
                 actions.add(new Integer(WSConstants.SIGN));
-            } else if (single[i].equals(WSDoAllConstants.ENCRYPT)) {
+            } else if (single[i].equals(WSHandlerConstants.ENCRYPT)) {
                 doAction |= WSConstants.ENCR;
                 actions.add(new Integer(WSConstants.ENCR));
-            } else if (single[i].equals(WSDoAllConstants.SAML_TOKEN_UNSIGNED)) {
+            } else if (single[i].equals(WSHandlerConstants.SAML_TOKEN_UNSIGNED)) {
                 doAction |= WSConstants.ST_UNSIGNED;
                 actions.add(new Integer(WSConstants.ST_UNSIGNED));
-            } else if (single[i].equals(WSDoAllConstants.SAML_TOKEN_SIGNED)) {
+            } else if (single[i].equals(WSHandlerConstants.SAML_TOKEN_SIGNED)) {
                 doAction |= WSConstants.ST_SIGNED;
                 actions.add(new Integer(WSConstants.ST_SIGNED));
-            } else if (single[i].equals(WSDoAllConstants.TIMESTAMP)) {
+            } else if (single[i].equals(WSHandlerConstants.TIMESTAMP)) {
                 doAction |= WSConstants.TS;
                 actions.add(new Integer(WSConstants.TS));
-            } else if (single[i].equals(WSDoAllConstants.NO_SERIALIZATION)) {
+            } else if (single[i].equals(WSHandlerConstants.NO_SERIALIZATION)) {
                 doAction |= WSConstants.NO_SERIALIZE;
                 actions.add(new Integer(WSConstants.NO_SERIALIZE));
             } else {

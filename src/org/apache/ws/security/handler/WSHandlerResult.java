@@ -15,34 +15,40 @@
  *
  */
 
-package org.apache.ws.axis.security;
+package org.apache.ws.security.handler;
 
 import java.util.Vector;
 
 /**
  * @author Werner Dittmann (Werner.Dittmann@Siemens.com)
  */
-public class WSDoAllReceiverResult {
+public class WSHandlerResult {
     private String actor;
     private Vector wsSecurityResults;
 
-    WSDoAllReceiverResult(String actor, Vector wsResults) {
+    /**
+     * constructor
+     * @param actor
+     * @param wsResults
+     */ 
+    public WSHandlerResult(String actor, Vector wsResults) {
         this.actor = actor;
         this.wsSecurityResults = wsResults;
     }
 
     /**
-     * @return
+     * gets the actor
+     * @return actor
      */
     public String getActor() {
         return actor;
     }
 
     /**
-     * @return
+     * gets the the security results
+     * @return vector
      */
     public Vector getResults() {
         return wsSecurityResults;
     }
-
 }

@@ -48,7 +48,7 @@ import javax.security.auth.callback.Callback;
  * associated with the identifier. WSS4J uses this key to encrypt or
  * decrypt parts of the SOAP request. Note, the key must match the
  * symmetric encryption/decryption algorithm specified (refer to
- * {@link org.apache.ws.axis.security.WSDoAllConstants# ENC_SYM_ALGO}).</li>
+ * {@link org.apache.ws.security.handler.WSHandlerConstants# ENC_SYM_ALGO}).</li>
  * </ul>
  *
  * @author Werner Dittmann (Werner.Dittmann@siemens.com).

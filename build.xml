@@ -472,6 +472,31 @@ org.apache.ws.axis.security.util
             </batchtest>
         </junit>
 
+        <java classname="org.apache.axis.utils.Admin" fork="true">
+            <classpath refid="classpath.library"/>
+            <arg value="client"/>
+            <arg file="${build.work}/org/apache/ws/axis/oasis/ping/undeploy.wsdd"/>
+        </java>
+        
+        <junit printsummary="yes"
+            haltonfailure="yes"
+            fork="yes"
+            dir="${basedir}">
+            <jvmarg value="-Djava.endorsed.dirs=${basedir}/endorsed"/>
+            <jvmarg value="-Dhttp.proxyHost=${http.proxyHost}"/>
+            <jvmarg value="-Dhttp.proxyPort=${http.proxyPort}"/>
+            <jvmarg value="-Dhttp.nonProxyHosts=${http.nonProxyHosts}"/>
+            <jvmarg value="-Dhttp.proxyUser=${http.proxyUser}"/>
+            <jvmarg value="-Dhttp.proxyPassword=${http.proxyPassword}"/>
+            <classpath refid="classpath.test"/>
+            <formatter type="xml"/>
+            <batchtest todir="${build.dir}/test-reports">
+                <fileset dir="${build.classes}">
+                    <include name="**/interop/TestJAXRPCHandler.class"/>
+                </fileset>
+            </batchtest>
+        </junit>
+
         <java classname="org.apache.axis.client.AdminClient" fork="yes">
             <classpath refid="classpath.library"/>
             <arg line="${undeploy_xml_property}"/>

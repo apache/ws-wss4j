@@ -35,6 +35,8 @@ import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
+import org.apache.ws.security.handler.WSHandlerResult;
+import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.message.token.Timestamp;
@@ -92,15 +94,15 @@ public class WSDoAllReceiver extends BasicHandler {
 
         Vector actions = new Vector();
         String action = null;
-        if ((action = (String) getOption(WSDoAllConstants.ACTION)) == null) {
-            action = (String) msgContext.getProperty(WSDoAllConstants.ACTION);
+        if ((action = (String) getOption(WSHandlerConstants.ACTION)) == null) {
+            action = (String) msgContext.getProperty(WSHandlerConstants.ACTION);
         }
         if (action == null) {
             throw new AxisFault("WSDoAllReceiver: No action defined");
         }
         int doAction = AxisUtil.decodeAction(action, actions);
 
-        String actor = (String) getOption(WSDoAllConstants.ACTOR);
+        String actor = (String) getOption(WSHandlerConstants.ACTOR);
 
         Message sm = msgContext.getCurrentMessage();
         Document doc = null;
@@ -284,10 +286,10 @@ public class WSDoAllReceiver extends BasicHandler {
             if (timestamp != null) {
                 String ttl = null;
                 if ((ttl =
-                        (String) getOption(WSDoAllConstants.TTL_TIMESTAMP))
+                        (String) getOption(WSHandlerConstants.TTL_TIMESTAMP))
                         == null) {
                     ttl =
-                            (String) msgContext.getProperty(WSDoAllConstants.TTL_TIMESTAMP);
+                            (String) msgContext.getProperty(WSHandlerConstants.TTL_TIMESTAMP);
                 }
                 int ttl_i = 0;
                 if (ttl != null) {
@@ -328,13 +330,13 @@ public class WSDoAllReceiver extends BasicHandler {
          * and check it.
          */
         Vector results = null;
-        if ((results = (Vector) mc.getProperty(WSDoAllConstants.RECV_RESULTS))
+        if ((results = (Vector) mc.getProperty(WSHandlerConstants.RECV_RESULTS))
                 == null) {
             results = new Vector();
-            mc.setProperty(WSDoAllConstants.RECV_RESULTS, results);
+            mc.setProperty(WSHandlerConstants.RECV_RESULTS, results);
         }
-        WSDoAllReceiverResult rResult =
-                new WSDoAllReceiverResult(actor,
+        WSHandlerResult rResult =
+                new WSHandlerResult(actor,
                         wsResult);
         results.add(0, rResult);
         if (doDebug) {
@@ -347,10 +349,10 @@ public class WSDoAllReceiver extends BasicHandler {
      */
     protected Crypto loadSignatureCrypto() throws AxisFault {
         Crypto crypto = null;
-        if ((sigPropFile = (String) getOption(WSDoAllConstants.SIG_PROP_FILE))
+        if ((sigPropFile = (String) getOption(WSHandlerConstants.SIG_PROP_FILE))
                 == null) {
             sigPropFile =
-                    (String) msgContext.getProperty(WSDoAllConstants.SIG_PROP_FILE);
+                    (String) msgContext.getProperty(WSHandlerConstants.SIG_PROP_FILE);
         }
         if (sigPropFile != null) {
             if ((crypto = (Crypto) cryptos.get(sigPropFile)) == null) {
@@ -368,10 +370,10 @@ public class WSDoAllReceiver extends BasicHandler {
      */
     protected Crypto loadDecryptionCrypto() throws AxisFault {
         Crypto crypto = null;
-        if ((decPropFile = (String) getOption(WSDoAllConstants.DEC_PROP_FILE))
+        if ((decPropFile = (String) getOption(WSHandlerConstants.DEC_PROP_FILE))
                 == null) {
             decPropFile =
-                    (String) msgContext.getProperty(WSDoAllConstants.DEC_PROP_FILE);
+                    (String) msgContext.getProperty(WSHandlerConstants.DEC_PROP_FILE);
         }
         if (decPropFile != null) {
             if ((crypto = (Crypto) cryptos.get(decPropFile)) == null) {
@@ -413,10 +415,10 @@ public class WSDoAllReceiver extends BasicHandler {
 
         String callback = null;
         CallbackHandler cbHandler = null;
-        if ((callback = (String) getOption(WSDoAllConstants.PW_CALLBACK_CLASS))
+        if ((callback = (String) getOption(WSHandlerConstants.PW_CALLBACK_CLASS))
                 == null) {
             callback =
-                    (String) msgContext.getProperty(WSDoAllConstants.PW_CALLBACK_CLASS);
+                    (String) msgContext.getProperty(WSHandlerConstants.PW_CALLBACK_CLASS);
         }
         if (callback != null) {
             Class cbClass = null;
@@ -436,7 +438,7 @@ public class WSDoAllReceiver extends BasicHandler {
             }
         } else {
             cbHandler =
-                    (CallbackHandler) msgContext.getProperty(WSDoAllConstants.PW_CALLBACK_REF);
+                    (CallbackHandler) msgContext.getProperty(WSHandlerConstants.PW_CALLBACK_REF);
             if (cbHandler == null) {
                 throw new AxisFault("WSDoAllReceiver: no reference in callback property");
             }
