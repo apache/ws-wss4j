@@ -36,8 +36,6 @@ import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.handler.WSHandlerResult;
 import org.apache.ws.security.handler.WSHandlerConstants;
-import org.apache.ws.security.saml.SAMLIssuer;
-import org.apache.ws.security.saml.SAMLIssuerFactory;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.message.WSAddTimestamp;
@@ -54,7 +52,6 @@ import org.w3c.dom.Document;
 
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
-import javax.xml.rpc.JAXRPCException;
 
 import java.io.ByteArrayOutputStream;
 import java.io.UnsupportedEncodingException;
@@ -69,60 +66,78 @@ public class WSDoAllSender extends BasicHandler {
 
     static Log log = LogFactory.getLog(WSDoAllSender.class.getName());
 
-    static final WSSecurityEngine secEngine = new WSSecurityEngine();
+    static final WSSecurityEngine secEngine = WSSecurityEngine.getInstance();
 
-    private boolean doDebug = true;
+    private static boolean doDebug = true;
 
     private static Hashtable cryptos = new Hashtable(5);
+    
+    /**
+     * This nested private class hold per request data.
+     * 
+     * @author wdi
+     */
+    private class RequestData {
+        MessageContext msgContext = null;
 
-    private MessageContext msgContext = null;
+        boolean noSerialization = false;
 
-    private boolean noSerialization = false;
+        SOAPConstants soapConstants = null;
 
-    private SOAPConstants soapConstants = null;
+        String actor = null;
 
-    String actor = null;
+        String username = null;
 
-    String username = null;
+        String pwType = null;
 
-    String pwType = null;
+        String[] utElements = null;
 
-    String[] utElements = null;
+        Crypto sigCrypto = null;
 
-    Crypto sigCrypto = null;
+        int sigKeyId = 0;
 
-    int sigKeyId = 0;
+        String sigAlgorithm = null;
 
-    String sigAlgorithm = null;
+        Vector signatureParts = new Vector();
 
-    Vector signatureParts = new Vector();
+        Crypto encCrypto = null;
 
-    Crypto encCrypto = null;
+        int encKeyId = 0;
 
-    int encKeyId = 0;
+        String encSymmAlgo = null;
 
-    String encSymmAlgo = null;
+        String encKeyTransport = null;
 
-    String encKeyTransport = null;
+        String encUser = null;
 
-    String encUser = null;
+        Vector encryptParts = new Vector();
 
-    Vector encryptParts = new Vector();
+        X509Certificate encCert = null;
 
-    X509Certificate encCert = null;
-
-    protected int timeToLive = 300; // Timestamp: time in seconds the receiver accepts between creation and reception
+        int timeToLive = 300; 	// Timestamp: time in seconds between creation 
+								// and expiery
+        void clear() {
+        	soapConstants = null;
+        	actor = username = pwType = sigAlgorithm = encSymmAlgo = encKeyTransport = encUser = null;
+        	sigCrypto = encCrypto = null;
+        	signatureParts.clear();
+        	encryptParts.clear();
+        	signatureParts = encryptParts = null;
+        	encCert = null;
+        	utElements = null;
+        }
+    }
 
     /**
      * Initialize data fields from previous use in case of cached object. Axis
-     * may cache the handler object, thus weneed to intiailize (reset) some
+     * may cache the handler object, thus we need to intiailize (reset) some
      * data fields. In particular remove old elements from the vectors. The
      * other fields are initialized implictly using the lookup of the WSDD
      * parameter (getOption()) and properties.
      */
-    private void initialize() {
-        signatureParts.removeAllElements();
-        encryptParts.removeAllElements();
+    private RequestData initialize() {
+    	RequestData reqData = new RequestData();
+    	return reqData;
     }
 
     /**
@@ -133,339 +148,355 @@ public class WSDoAllSender extends BasicHandler {
      */
     public void invoke(MessageContext mc) throws AxisFault {
 
-        doDebug = log.isDebugEnabled();
-        if (doDebug) {
-            log.debug("WSDoAllSender: enter invoke() with msg type: "
-                    + mc.getCurrentMessage().getMessageType());
-        }
+		doDebug = log.isDebugEnabled();
+		if (doDebug) {
+			log.debug("WSDoAllSender: enter invoke() with msg type: "
+					+ mc.getCurrentMessage().getMessageType());
+		}
 
-        initialize();
+		RequestData reqData = initialize();
 
-        noSerialization = false;
-        msgContext = mc;
-        /*
-         * Get the action first.
-         */
-        Vector actions = new Vector();
-        String action = null;
-        if ((action = (String) getOption(WSHandlerConstants.ACTION)) == null) {
-            action = (String) msgContext.getProperty(WSHandlerConstants.ACTION);
-        }
-        if (action == null) {
-            throw new AxisFault("WSDoAllReceiver: No action defined");
-        }
-        int doAction = AxisUtil.decodeAction(action, actions);
-        if (doAction == WSConstants.NO_SECURITY) {
-            return;
-        }
+		reqData.noSerialization = false;
+		reqData.msgContext = mc;
+		/*
+		 * The overall try, just to have a finally at the end to perform some
+		 * housekeeping.
+		 */
+		try {
+			/*
+			 * Get the action first.
+			 */
+			Vector actions = new Vector();
+			String action = null;
+			if ((action = (String) getOption(WSHandlerConstants.ACTION)) == null) {
+				action = (String) reqData.msgContext
+						.getProperty(WSHandlerConstants.ACTION);
+			}
+			if (action == null) {
+				throw new AxisFault("WSDoAllReceiver: No action defined");
+			}
+			int doAction = AxisUtil.decodeAction(action, actions);
+			if (doAction == WSConstants.NO_SECURITY) {
+				return;
+			}
 
-        boolean mu = decodeMustUnderstand();
+			boolean mu = decodeMustUnderstand(reqData);
 
-        if ((actor = (String) getOption(WSHandlerConstants.ACTOR)) == null) {
-            actor = (String) msgContext.getProperty(WSHandlerConstants.ACTOR);
-        }
-        /*
-         * For every action we need a username, so get this now. The username
-         * defined in the deployment descriptor takes precedence.
-         */
-        username = (String) getOption(WSHandlerConstants.USER);
-        if (username == null || username.equals("")) {
-            username = msgContext.getUsername();
-            msgContext.setUsername(null);
-        }
-        /*
-         * Now we perform some set-up for UsernameToken and Signature
-         * functions. No need to do it for encryption only. Check if username
-         * is available and then get a passowrd.
-         */
-        if ((doAction & (WSConstants.SIGN | WSConstants.UT | WSConstants.UT_SIGN)) != 0) {
-            /*
-             * We need a username - if none throw an AxisFault. For encryption
-             * there is a specific parameter to get a username.
-             */
-            if (username == null || username.equals("")) {
-                throw new AxisFault("WSDoAllSender: Empty username for specified action");
-            }
-        }
-        if (doDebug) {
-            log.debug("Action: " + doAction);
-            log.debug("Actor: " + actor + ", mu: " + mu);
-        }
-        /*
-         * Now get the SOAP part from the request message and convert it into a
-         * Document.
-         * 
-         * This forces Axis to serialize the SOAP request into FORM_STRING.
-         * This string is converted into a document.
-         * 
-         * During the FORM_STRING serialization Axis performs multi-ref of
-         * complex data types (if requested), generates and inserts references
-         * for attachements and so on. The resulting Document MUST be the
-         * complete and final SOAP request as Axis would send it over the wire.
-         * Therefore this must shall be the last (or only) handler in a chain.
-         * 
-         * Now we can perform our security operations on this request.
-         */
-        Document doc = null;
-        Message message = msgContext.getCurrentMessage();
+			if ((reqData.actor = (String) getOption(WSHandlerConstants.ACTOR)) == null) {
+				reqData.actor = (String) reqData.msgContext
+						.getProperty(WSHandlerConstants.ACTOR);
+			}
+			/*
+			 * For every action we need a username, so get this now. The
+			 * username defined in the deployment descriptor takes precedence.
+			 */
+			reqData.username = (String) getOption(WSHandlerConstants.USER);
+			if (reqData.username == null || reqData.username.equals("")) {
+				reqData.username = reqData.msgContext.getUsername();
+				reqData.msgContext.setUsername(null);
+			}
+			/*
+			 * Now we perform some set-up for UsernameToken and Signature
+			 * functions. No need to do it for encryption only. Check if
+			 * username is available and then get a passowrd.
+			 */
+			if ((doAction & (WSConstants.SIGN | WSConstants.UT | WSConstants.UT_SIGN)) != 0) {
+				/*
+				 * We need a username - if none throw an AxisFault. For
+				 * encryption there is a specific parameter to get a username.
+				 */
+				if (reqData.username == null || reqData.username.equals("")) {
+					throw new AxisFault(
+							"WSDoAllSender: Empty username for specified action");
+				}
+			}
+			if (doDebug) {
+				log.debug("Action: " + doAction);
+				log.debug("Actor: " + reqData.actor + ", mu: " + mu);
+			}
+			/*
+			 * Now get the SOAP part from the request message and convert it
+			 * into a Document.
+			 * 
+			 * This forces Axis to serialize the SOAP request into FORM_STRING.
+			 * This string is converted into a document.
+			 * 
+			 * During the FORM_STRING serialization Axis performs multi-ref of
+			 * complex data types (if requested), generates and inserts
+			 * references for attachements and so on. The resulting Document
+			 * MUST be the complete and final SOAP request as Axis would send it
+			 * over the wire. Therefore this must shall be the last (or only)
+			 * handler in a chain.
+			 * 
+			 * Now we can perform our security operations on this request.
+			 */
+			Document doc = null;
+			Message message = reqData.msgContext.getCurrentMessage();
 
-        /*
-         * If the message context property conatins a document then this is a
-         * chained handler.
-         */
-        SOAPPart sPart = (org.apache.axis.SOAPPart) message.getSOAPPart();
-        if ((doc =
-                (Document) msgContext.getProperty(WSHandlerConstants.SND_SECURITY))
-                == null) {
-            try {
-                doc =
-                        ((org.apache.axis.message.SOAPEnvelope) sPart
-                        .getEnvelope())
-                        .getAsDocument();
-            } catch (Exception e) {
-                throw new AxisFault("WSDoAllSender: cannot get SOAP envlope from message" + e);
-            }
-        }
-        soapConstants =
-                WSSecurityUtil.getSOAPConstants(doc.getDocumentElement());
-        /*
-         * Here we have action, username, password, and actor, mustUnderstand.
-         * Now get the action specific parameters.
-         */
-        if ((doAction & WSConstants.UT) == WSConstants.UT) {
-            decodeUTParameter();
-        }
-        /*
-         * Here we have action, username, password, and actor, mustUnderstand.
-         * Now get the action specific parameters.
-         */
-        if ((doAction & WSConstants.UT_SIGN) == WSConstants.UT_SIGN) {
-            decodeUTParameter();
-            decodeSignatureParameter();
-       }
-        /*
-         * Get and check the Signature specific parameters first because they
-         * may be used for encryption too.
-         */
-        if ((doAction & WSConstants.SIGN) == WSConstants.SIGN) {
-            sigCrypto = loadSignatureCrypto();
-            decodeSignatureParameter();
-        }
-        /*
-         * If we need to handle signed SAML token then we need may of the
-         * Signature parameters. The handle procedure loads the signature 
-         * crypto file on demand, thus don't do it here.
-         */
-        if ((doAction & WSConstants.ST_SIGNED) == WSConstants.ST_SIGNED) {
-            decodeSignatureParameter();
-        }
-        /*
-         * Set and check the encryption specific parameters, if necessary take
-         * over signature parameters username and crypto instance.
-         */
-        if ((doAction & WSConstants.ENCR) == WSConstants.ENCR) {
-            encCrypto = loadEncryptionCrypto();
-            decodeEncryptionParameter();
-        }
-        /*
-         * Here we have all necessary information to perform the requested
-         * action(s).
-         */
-        for (int i = 0; i < actions.size(); i++) {
+			/*
+			 * If the message context property conatins a document then this is
+			 * a chained handler.
+			 */
+			SOAPPart sPart = (org.apache.axis.SOAPPart) message.getSOAPPart();
+			if ((doc = (Document) reqData.msgContext
+					.getProperty(WSHandlerConstants.SND_SECURITY)) == null) {
+				try {
+					doc = ((org.apache.axis.message.SOAPEnvelope) sPart
+							.getEnvelope()).getAsDocument();
+				} catch (Exception e) {
+					throw new AxisFault(
+							"WSDoAllSender: cannot get SOAP envlope from message"
+									+ e);
+				}
+			}
+			reqData.soapConstants = WSSecurityUtil.getSOAPConstants(doc
+					.getDocumentElement());
+			/*
+			 * Here we have action, username, password, and actor,
+			 * mustUnderstand. Now get the action specific parameters.
+			 */
+			if ((doAction & WSConstants.UT) == WSConstants.UT) {
+				decodeUTParameter(reqData);
+			}
+			/*
+			 * Here we have action, username, password, and actor,
+			 * mustUnderstand. Now get the action specific parameters.
+			 */
+			if ((doAction & WSConstants.UT_SIGN) == WSConstants.UT_SIGN) {
+				decodeUTParameter(reqData);
+				decodeSignatureParameter(reqData);
+			}
+			/*
+			 * Get and check the Signature specific parameters first because
+			 * they may be used for encryption too.
+			 */
+			if ((doAction & WSConstants.SIGN) == WSConstants.SIGN) {
+				reqData.sigCrypto = loadSignatureCrypto(reqData);
+				decodeSignatureParameter(reqData);
+			}
+			/*
+			 * If we need to handle signed SAML token then we need may of the
+			 * Signature parameters. The handle procedure loads the signature
+			 * crypto file on demand, thus don't do it here.
+			 */
+			if ((doAction & WSConstants.ST_SIGNED) == WSConstants.ST_SIGNED) {
+				decodeSignatureParameter(reqData);
+			}
+			/*
+			 * Set and check the encryption specific parameters, if necessary
+			 * take over signature parameters username and crypto instance.
+			 */
+			if ((doAction & WSConstants.ENCR) == WSConstants.ENCR) {
+				reqData.encCrypto = loadEncryptionCrypto(reqData);
+				decodeEncryptionParameter(reqData);
+			}
+			/*
+			 * Here we have all necessary information to perform the requested
+			 * action(s).
+			 */
+			for (int i = 0; i < actions.size(); i++) {
 
-            int actionToDo = ((Integer) actions.get(i)).intValue();
-            if (doDebug) {
-                log.debug("Performing Action: " + actionToDo);
-            }
+				int actionToDo = ((Integer) actions.get(i)).intValue();
+				if (doDebug) {
+					log.debug("Performing Action: " + actionToDo);
+				}
 
-            String password = null;
-            switch (actionToDo) {
-                case WSConstants.UT:
-                    performUTAction(actionToDo, mu, doc);
-                    break;
+				String password = null;
+				switch (actionToDo) {
+				case WSConstants.UT:
+					performUTAction(actionToDo, mu, doc, reqData);
+					break;
 
-                case WSConstants.ENCR:
-                    performENCRAction(mu, actionToDo, doc);
-                    break;
+				case WSConstants.ENCR:
+					performENCRAction(mu, actionToDo, doc, reqData);
+					break;
 
-                case WSConstants.SIGN:
-                    performSIGNAction(actionToDo, mu, doc);
-                    break;
+				case WSConstants.SIGN:
+					performSIGNAction(actionToDo, mu, doc, reqData);
+					break;
 
-                case WSConstants.ST_SIGNED:
-                    performST_SIGNAction(actionToDo, mu, doc);
-                    break;
+				case WSConstants.ST_SIGNED:
+					performST_SIGNAction(actionToDo, mu, doc, reqData);
+					break;
 
-                case WSConstants.ST_UNSIGNED:
-                    performSTAction(actionToDo, mu, doc);
-                    break;
+				case WSConstants.ST_UNSIGNED:
+					performSTAction(actionToDo, mu, doc, reqData);
+					break;
 
-                case WSConstants.TS:
-                    performTSAction(actionToDo, mu, doc);
-                    break;
+				case WSConstants.TS:
+					performTSAction(actionToDo, mu, doc, reqData);
+					break;
 
-    			case WSConstants.UT_SIGN:
-    				performUT_SIGNAction(actionToDo, mu, doc);
-    				break;
+				case WSConstants.UT_SIGN:
+					performUT_SIGNAction(actionToDo, mu, doc, reqData);
+					break;
 
-    			case WSConstants.NO_SERIALIZE:
-                    noSerialization = true;
-                    break;
-            }
-        }
+				case WSConstants.NO_SERIALIZE:
+					reqData.noSerialization = true;
+					break;
+				}
+			}
 
-        /*
-         * If required convert the resulting document into a message first. The
-         * outputDOM() method performs the necessary c14n call. After that we
-         * extract it as a string for further processing.
-         * 
-         * Set the resulting byte array as the new SOAP message.
-         * 
-         * If noSerialization is false, this handler shall be the last (or
-         * only) one in a handler chain. If noSerialization is true, just set
-         * the processed Document in the transfer property. The next Axis WSS4J
-         * handler takes it and performs additional security processing steps.
-         *  
-         */
-        if (noSerialization) {
-            msgContext.setProperty(WSHandlerConstants.SND_SECURITY, doc);
-        } else {
-            ByteArrayOutputStream os = new ByteArrayOutputStream();
-            XMLUtils.outputDOM(doc, os, true);
-            sPart.setCurrentMessage(os.toByteArray(), SOAPPart.FORM_BYTES);
-            if (doDebug) {
-                String osStr = null;
-                try {
-                    osStr = os.toString("UTF-8");
-                } catch (UnsupportedEncodingException e) {
-                    osStr = os.toString();
-                }
-                log.debug("Send request:");
-                log.debug(osStr);
-            }
-            msgContext.setProperty(WSHandlerConstants.SND_SECURITY, null);
-        }
-        if (doDebug) {
-            log.debug("WSDoAllSender: exit invoke()");
-        }
-    }
+			/*
+			 * If required convert the resulting document into a message first.
+			 * The outputDOM() method performs the necessary c14n call. After
+			 * that we extract it as a string for further processing.
+			 * 
+			 * Set the resulting byte array as the new SOAP message.
+			 * 
+			 * If noSerialization is false, this handler shall be the last (or
+			 * only) one in a handler chain. If noSerialization is true, just
+			 * set the processed Document in the transfer property. The next
+			 * Axis WSS4J handler takes it and performs additional security
+			 * processing steps.
+			 *  
+			 */
+			if (reqData.noSerialization) {
+				reqData.msgContext.setProperty(WSHandlerConstants.SND_SECURITY,
+						doc);
+			} else {
+				ByteArrayOutputStream os = new ByteArrayOutputStream();
+				XMLUtils.outputDOM(doc, os, true);
+				sPart.setCurrentMessage(os.toByteArray(), SOAPPart.FORM_BYTES);
+				if (doDebug) {
+					String osStr = null;
+					try {
+						osStr = os.toString("UTF-8");
+					} catch (UnsupportedEncodingException e) {
+						osStr = os.toString();
+					}
+					log.debug("Send request:");
+					log.debug(osStr);
+				}
+				reqData.msgContext.setProperty(WSHandlerConstants.SND_SECURITY,
+						null);
+			}
+			if (doDebug) {
+				log.debug("WSDoAllSender: exit invoke()");
+			}
+		} finally {
+			reqData.clear();
+			reqData = null;
+		}
+	}
 
-    private void performSIGNAction(int actionToDo, boolean mu, Document doc)
+    private void performSIGNAction(int actionToDo, boolean mu, Document doc, RequestData reqData)
             throws AxisFault {
         String password;
         password =
-                getPassword(username,
+                getPassword(reqData.username,
                         actionToDo,
                         WSHandlerConstants.PW_CALLBACK_CLASS,
-                        WSHandlerConstants.PW_CALLBACK_REF)
+                        WSHandlerConstants.PW_CALLBACK_REF, reqData)
                 .getPassword();
 
-        WSSignEnvelope wsSign = new WSSignEnvelope(actor, mu);
-        if (sigKeyId != 0) {
-            wsSign.setKeyIdentifierType(sigKeyId);
+        WSSignEnvelope wsSign = new WSSignEnvelope(reqData.actor, mu);
+        if (reqData.sigKeyId != 0) {
+            wsSign.setKeyIdentifierType(reqData.sigKeyId);
         }
-        if (sigAlgorithm != null) {
-            wsSign.setSignatureAlgorithm(sigAlgorithm);
+        if (reqData.sigAlgorithm != null) {
+            wsSign.setSignatureAlgorithm(reqData.sigAlgorithm);
         }
 
-        wsSign.setUserInfo(username, password);
-        if (signatureParts.size() > 0) {
-            wsSign.setParts(signatureParts);
+        wsSign.setUserInfo(reqData.username, password);
+        if (reqData.signatureParts.size() > 0) {
+            wsSign.setParts(reqData.signatureParts);
         }
 
         try {
-            wsSign.build(doc, sigCrypto);
+            wsSign.build(doc, reqData.sigCrypto);
         } catch (WSSecurityException e) {
             throw new AxisFault("WSDoAllSender: Signature: error during message procesing" + e);
         }
     }
 
-    private void performENCRAction(boolean mu, int actionToDo, Document doc)
+    private void performENCRAction(boolean mu, int actionToDo, Document doc, RequestData reqData)
             throws AxisFault {
-        WSEncryptBody wsEncrypt = new WSEncryptBody(actor, mu);
-        if (encKeyId != 0) {
-            wsEncrypt.setKeyIdentifierType(encKeyId);
+        WSEncryptBody wsEncrypt = new WSEncryptBody(reqData.actor, mu);
+        if (reqData.encKeyId != 0) {
+            wsEncrypt.setKeyIdentifierType(reqData.encKeyId);
         }
-        if (encKeyId == WSConstants.EMBEDDED_KEYNAME) {
+        if (reqData.encKeyId == WSConstants.EMBEDDED_KEYNAME) {
             String encKeyName = null;
             if ((encKeyName =
                     (String) getOption(WSHandlerConstants.ENC_KEY_NAME))
                     == null) {
                 encKeyName =
-                        (String) msgContext.getProperty(WSHandlerConstants.ENC_KEY_NAME);
+                        (String) reqData.msgContext.getProperty(WSHandlerConstants.ENC_KEY_NAME);
             }
             wsEncrypt.setEmbeddedKeyName(encKeyName);
             byte[] embeddedKey =
-                    getPassword(encUser,
+                    getPassword(reqData.encUser,
                             actionToDo,
                             WSHandlerConstants.ENC_CALLBACK_CLASS,
-                            WSHandlerConstants.ENC_CALLBACK_REF)
+                            WSHandlerConstants.ENC_CALLBACK_REF, reqData)
                     .getKey();
             wsEncrypt.setKey(embeddedKey);
         }
-        if (encSymmAlgo != null) {
-            wsEncrypt.setSymmetricEncAlgorithm(encSymmAlgo);
+        if (reqData.encSymmAlgo != null) {
+            wsEncrypt.setSymmetricEncAlgorithm(reqData.encSymmAlgo);
         }
-        if (encKeyTransport != null) {
-            wsEncrypt.setKeyEnc(encKeyTransport);
+        if (reqData.encKeyTransport != null) {
+            wsEncrypt.setKeyEnc(reqData.encKeyTransport);
         }
-        wsEncrypt.setUserInfo(encUser);
-        wsEncrypt.setUseThisCert(encCert);
-        if (encryptParts.size() > 0) {
-            wsEncrypt.setParts(encryptParts);
+        wsEncrypt.setUserInfo(reqData.encUser);
+        wsEncrypt.setUseThisCert(reqData.encCert);
+        if (reqData.encryptParts.size() > 0) {
+            wsEncrypt.setParts(reqData.encryptParts);
         }
         try {
-            wsEncrypt.build(doc, encCrypto);
+            wsEncrypt.build(doc, reqData.encCrypto);
         } catch (WSSecurityException e) {
             throw new AxisFault("WSDoAllSender: Encryption: error during message processing"
                     + e);
         }
     }
 
-    private void performUTAction(int actionToDo, boolean mu, Document doc)
+    private void performUTAction(int actionToDo, boolean mu, Document doc, RequestData reqData)
             throws AxisFault {
         String password;
         password =
-                getPassword(username,
+                getPassword(reqData.username,
                         actionToDo,
                         WSHandlerConstants.PW_CALLBACK_CLASS,
-                        WSHandlerConstants.PW_CALLBACK_REF)
+                        WSHandlerConstants.PW_CALLBACK_REF, reqData)
                 .getPassword();
 
-        WSSAddUsernameToken builder = new WSSAddUsernameToken(actor, mu);
-        builder.setPasswordType(pwType);
+        WSSAddUsernameToken builder = new WSSAddUsernameToken(reqData.actor, mu);
+        builder.setPasswordType(reqData.pwType);
         // add the UsernameToken to the SOAP Enevelope
-        builder.build(doc, username, password);
+        builder.build(doc, reqData.username, password);
 
-        if (utElements != null && utElements.length > 0) {
-            for (int j = 0; j < utElements.length; j++) {
-                utElements[j].trim();
-                if (utElements[j].equals("Nonce")) {
+        if (reqData.utElements != null && reqData.utElements.length > 0) {
+            for (int j = 0; j < reqData.utElements.length; j++) {
+            	reqData.utElements[j].trim();
+                if (reqData.utElements[j].equals("Nonce")) {
                     builder.addNonce(doc);
                 }
-                if (utElements[j].equals("Created")) {
+                if (reqData.utElements[j].equals("Created")) {
                     builder.addCreated(doc);
                 }
+                reqData.utElements[j] = null;
             }
         }
     }
 
-    private void performUT_SIGNAction(int actionToDo, boolean mu, Document doc)
+    private void performUT_SIGNAction(int actionToDo, boolean mu, Document doc, RequestData reqData)
 			throws AxisFault {
 		String password;
-		password = getPassword(username, actionToDo,
+		password = getPassword(reqData.username, actionToDo,
 				WSHandlerConstants.PW_CALLBACK_CLASS,
-				WSHandlerConstants.PW_CALLBACK_REF).getPassword();
+				WSHandlerConstants.PW_CALLBACK_REF, reqData).getPassword();
 
-		WSSAddUsernameToken builder = new WSSAddUsernameToken(actor, mu);
+		WSSAddUsernameToken builder = new WSSAddUsernameToken(reqData.actor, mu);
 		builder.setPasswordType(WSConstants.PASSWORD_TEXT);
-		builder.preSetUsernameToken(doc, username, password);
+		builder.preSetUsernameToken(doc, reqData.username, password);
 		builder.addCreated(doc);
 		builder.addNonce(doc);
 
-		WSSignEnvelope sign = new WSSignEnvelope(actor, mu);
-        if (signatureParts.size() > 0) {
-            sign.setParts(signatureParts);
+		WSSignEnvelope sign = new WSSignEnvelope(reqData.actor, mu);
+        if (reqData.signatureParts.size() > 0) {
+            sign.setParts(reqData.signatureParts);
         }
 		sign.setUsernameToken(builder);
 		sign.setKeyIdentifierType(WSConstants.UT_SIGNING);
@@ -480,41 +511,41 @@ public class WSDoAllSender extends BasicHandler {
 	}
 
 
-    private void performSTAction(int actionToDo, boolean mu, Document doc)
+    private void performSTAction(int actionToDo, boolean mu, Document doc, RequestData reqData)
             throws AxisFault {
-        WSSAddSAMLToken builder = new WSSAddSAMLToken(actor, mu);
+        WSSAddSAMLToken builder = new WSSAddSAMLToken(reqData.actor, mu);
 
         String samlPropFile = null;
         if ((samlPropFile =
                 (String) getOption(WSHandlerConstants.SAML_PROP_FILE))
                 == null) {
             samlPropFile =
-                    (String) msgContext.getProperty(WSHandlerConstants.SAML_PROP_FILE);
+                    (String) reqData.msgContext.getProperty(WSHandlerConstants.SAML_PROP_FILE);
         }
         SAMLIssuer saml = SAMLIssuerFactory.getInstance(samlPropFile);
-        saml.setUsername(username);
+        saml.setUsername(reqData.username);
         SAMLAssertion assertion = saml.newAssertion();
 
         // add the SAMLAssertion Token to the SOAP Enevelope
         builder.build(doc, assertion);
     }
 
-    private void performST_SIGNAction(int actionToDo, boolean mu, Document doc)
+    private void performST_SIGNAction(int actionToDo, boolean mu, Document doc, RequestData reqData)
             throws AxisFault {
         String samlPropFile = null;
         if ((samlPropFile =
                 (String) getOption(WSHandlerConstants.SAML_PROP_FILE))
                 == null) {
             samlPropFile =
-                    (String) msgContext.getProperty(WSHandlerConstants.SAML_PROP_FILE);
+                    (String) reqData.msgContext.getProperty(WSHandlerConstants.SAML_PROP_FILE);
         }
         Crypto crypto = null;
         try {
-            crypto = loadSignatureCrypto();
+            crypto = loadSignatureCrypto(reqData);
         } catch (AxisFault ex) {
         }
         SAMLIssuer saml = SAMLIssuerFactory.getInstance(samlPropFile);
-        saml.setUsername(username);
+        saml.setUsername(reqData.username);
         saml.setUserCrypto(crypto);
         saml.setInstanceDoc(doc);
 
@@ -526,7 +557,7 @@ public class WSDoAllSender extends BasicHandler {
         String issuerKeyPW = null;
         Crypto issuerCrypto = null;
 
-        WSSignEnvelope wsSign = new WSSignEnvelope(actor, mu);
+        WSSignEnvelope wsSign = new WSSignEnvelope(reqData.actor, mu);
         String password = null;
         if (saml.isSenderVouches()) {
             issuerKeyName = saml.getIssuerKeyName();
@@ -534,15 +565,15 @@ public class WSDoAllSender extends BasicHandler {
             issuerCrypto = saml.getIssuerCrypto();
         } else {
             password =
-                    getPassword(username,
+                    getPassword(reqData.username,
                             actionToDo,
                             WSHandlerConstants.PW_CALLBACK_CLASS,
-                            WSHandlerConstants.PW_CALLBACK_REF)
+                            WSHandlerConstants.PW_CALLBACK_REF, reqData)
                     .getPassword();
-            wsSign.setUserInfo(username, password);
+            wsSign.setUserInfo(reqData.username, password);
         }
-        if (sigKeyId != 0) {
-            wsSign.setKeyIdentifierType(sigKeyId);
+        if (reqData.sigKeyId != 0) {
+            wsSign.setKeyIdentifierType(reqData.sigKeyId);
         }
         try {
             wsSign.build(doc,
@@ -557,27 +588,27 @@ public class WSDoAllSender extends BasicHandler {
         }
     }
 
-    private void performTSAction(int actionToDo, boolean mu, Document doc) throws AxisFault {
+    private void performTSAction(int actionToDo, boolean mu, Document doc, RequestData reqData) throws AxisFault {
         String ttl = null;
         if ((ttl =
                 (String) getOption(WSHandlerConstants.TTL_TIMESTAMP))
                 == null) {
             ttl =
-                    (String) msgContext.getProperty(WSHandlerConstants.TTL_TIMESTAMP);
+                    (String) reqData.msgContext.getProperty(WSHandlerConstants.TTL_TIMESTAMP);
         }
         int ttl_i = 0;
         if (ttl != null) {
             try {
                 ttl_i = Integer.parseInt(ttl);
             } catch (NumberFormatException e) {
-                ttl_i = timeToLive;
+                ttl_i = reqData.timeToLive;
             }
         }
         if (ttl_i <= 0) {
-            ttl_i = timeToLive;
+            ttl_i = reqData.timeToLive;
         }
         WSAddTimestamp timeStampBuilder =
-                new WSAddTimestamp(actor, mu);
+                new WSAddTimestamp(reqData.actor, mu);
         // add the Timestamp to the SOAP Enevelope
         timeStampBuilder.build(doc, ttl_i);
     }
@@ -586,7 +617,7 @@ public class WSDoAllSender extends BasicHandler {
      * Hook to allow subclasses to load their Signature Crypto however they see
      * fit.
      */
-    protected Crypto loadSignatureCrypto() throws AxisFault {
+    protected Crypto loadSignatureCrypto(RequestData reqData) throws AxisFault {
         Crypto crypto = null;
         /*
          * Get crypto property file for signature. If none specified throw
@@ -596,7 +627,7 @@ public class WSDoAllSender extends BasicHandler {
         if ((sigPropFile = (String) getOption(WSHandlerConstants.SIG_PROP_FILE))
                 == null) {
             sigPropFile =
-                    (String) msgContext.getProperty(WSHandlerConstants.SIG_PROP_FILE);
+                    (String) reqData.msgContext.getProperty(WSHandlerConstants.SIG_PROP_FILE);
         }
         if (sigPropFile != null) {
             if ((crypto = (Crypto) cryptos.get(sigPropFile)) == null) {
@@ -613,7 +644,7 @@ public class WSDoAllSender extends BasicHandler {
      * Hook to allow subclasses to load their Encryption Crypto however they
      * see fit.
      */
-    protected Crypto loadEncryptionCrypto() throws AxisFault {
+    protected Crypto loadEncryptionCrypto(RequestData reqData) throws AxisFault {
         Crypto crypto = null;
         /*
          * Get encryption crypto property file. If non specified take crypto
@@ -623,28 +654,28 @@ public class WSDoAllSender extends BasicHandler {
         if ((encPropFile = (String) getOption(WSHandlerConstants.ENC_PROP_FILE))
                 == null) {
             encPropFile =
-                    (String) msgContext.getProperty(WSHandlerConstants.ENC_PROP_FILE);
+                    (String) reqData.msgContext.getProperty(WSHandlerConstants.ENC_PROP_FILE);
         }
         if (encPropFile != null) {
             if ((crypto = (Crypto) cryptos.get(encPropFile)) == null) {
                 crypto = CryptoFactory.getInstance(encPropFile);
                 cryptos.put(encPropFile, crypto);
             }
-        } else if ((crypto = sigCrypto) == null) {
+        } else if ((crypto = reqData.sigCrypto) == null) {
             throw new AxisFault("WSDoAllSender: Encryption: no crypto property file");
         }
         return crypto;
     }
 
-    private void decodeUTParameter() throws AxisFault {
-        if ((pwType = (String) getOption(WSHandlerConstants.PASSWORD_TYPE))
+    private void decodeUTParameter(RequestData reqData) throws AxisFault {
+        if ((reqData.pwType = (String) getOption(WSHandlerConstants.PASSWORD_TYPE))
                 == null) {
-            pwType =
-                    (String) msgContext.getProperty(WSHandlerConstants.PASSWORD_TYPE);
+        	reqData.pwType =
+                    (String) reqData.msgContext.getProperty(WSHandlerConstants.PASSWORD_TYPE);
         }
-        if (pwType != null) {
-            pwType =
-                    pwType.equals(WSConstants.PW_TEXT)
+        if (reqData.pwType != null) {
+        	reqData.pwType =
+        		reqData.pwType.equals(WSConstants.PW_TEXT)
                     ? WSConstants.PASSWORD_TEXT
                     : WSConstants.PASSWORD_DIGEST;
         }
@@ -652,53 +683,53 @@ public class WSDoAllSender extends BasicHandler {
         if ((tmpS = (String) getOption(WSHandlerConstants.ADD_UT_ELEMENTS))
                 == null) {
             tmpS =
-                    (String) msgContext.getProperty(WSHandlerConstants.ADD_UT_ELEMENTS);
+                    (String) reqData.msgContext.getProperty(WSHandlerConstants.ADD_UT_ELEMENTS);
         }
         if (tmpS != null) {
-            utElements = StringUtil.split(tmpS, ' ');
+        	reqData.utElements = StringUtil.split(tmpS, ' ');
         }
     }
 
-    private void decodeSignatureParameter() throws AxisFault {
+    private void decodeSignatureParameter(RequestData reqData) throws AxisFault {
         String tmpS = null;
         if ((tmpS = (String) getOption(WSHandlerConstants.SIG_KEY_ID)) == null) {
-            tmpS = (String) msgContext.getProperty(WSHandlerConstants.SIG_KEY_ID);
+            tmpS = (String) reqData.msgContext.getProperty(WSHandlerConstants.SIG_KEY_ID);
         }
         if (tmpS != null) {
             Integer I = (Integer) WSHandlerConstants.keyIdentifier.get(tmpS);
             if (I == null) {
                 throw new AxisFault("WSDoAllSender: Signature: unknown key identification");
             }
-            sigKeyId = I.intValue();
-            if (!(sigKeyId == WSConstants.ISSUER_SERIAL
-                    || sigKeyId == WSConstants.BST_DIRECT_REFERENCE
-                    || sigKeyId == WSConstants.X509_KEY_IDENTIFIER
-                    || sigKeyId == WSConstants.SKI_KEY_IDENTIFIER)) {
+            reqData.sigKeyId = I.intValue();
+            if (!(reqData.sigKeyId == WSConstants.ISSUER_SERIAL
+                    || reqData.sigKeyId == WSConstants.BST_DIRECT_REFERENCE
+                    || reqData.sigKeyId == WSConstants.X509_KEY_IDENTIFIER
+                    || reqData.sigKeyId == WSConstants.SKI_KEY_IDENTIFIER)) {
                 throw new AxisFault("WSDoAllSender: Signature: illegal key identification");
             }
         }
-        if ((sigAlgorithm = (String) getOption(WSHandlerConstants.SIG_ALGO))
+        if ((reqData.sigAlgorithm = (String) getOption(WSHandlerConstants.SIG_ALGO))
                 == null) {
-            tmpS = (String) msgContext.getProperty(WSHandlerConstants.SIG_ALGO);
+            tmpS = (String) reqData.msgContext.getProperty(WSHandlerConstants.SIG_ALGO);
         }
         if ((tmpS = (String) getOption(WSHandlerConstants.SIGNATURE_PARTS))
                 == null) {
             tmpS =
-                    (String) msgContext.getProperty(WSHandlerConstants.SIGNATURE_PARTS);
+                    (String) reqData.msgContext.getProperty(WSHandlerConstants.SIGNATURE_PARTS);
         }
         if (tmpS != null) {
-            splitEncParts(tmpS, signatureParts);
+            splitEncParts(tmpS, reqData.signatureParts, reqData);
         }
     }
 
-    private void decodeEncryptionParameter() throws AxisFault {
-        if ((encUser = (String) getOption(WSHandlerConstants.ENCRYPTION_USER))
+    private void decodeEncryptionParameter(RequestData reqData) throws AxisFault {
+        if ((reqData.encUser = (String) getOption(WSHandlerConstants.ENCRYPTION_USER))
                 == null) {
-            encUser =
-                    (String) msgContext.getProperty(WSHandlerConstants.ENCRYPTION_USER);
+        	reqData.encUser =
+                    (String) reqData.msgContext.getProperty(WSHandlerConstants.ENCRYPTION_USER);
         }
 
-        if (encUser == null && (encUser = username) == null) {
+        if (reqData.encUser == null && (reqData.encUser = reqData.username) == null) {
             throw new AxisFault("WSDoAllSender: Encryption: no username");
         }
         /*
@@ -706,7 +737,7 @@ public class WSDoAllSender extends BasicHandler {
          * (msgType != null && msgType.equals(Message.RESPONSE)) {
          * handleSpecialUser(encUser); }
          */
-        handleSpecialUser(encUser);
+        handleSpecialUser(reqData);
 
         /*
          * If the following parameters are no used (they return null) then the
@@ -714,51 +745,51 @@ public class WSDoAllSender extends BasicHandler {
          */
         String tmpS = null;
         if ((tmpS = (String) getOption(WSHandlerConstants.ENC_KEY_ID)) == null) {
-            tmpS = (String) msgContext.getProperty(WSHandlerConstants.ENC_KEY_ID);
+            tmpS = (String) reqData.msgContext.getProperty(WSHandlerConstants.ENC_KEY_ID);
         }
         if (tmpS != null) {
             Integer I = (Integer) WSHandlerConstants.keyIdentifier.get(tmpS);
             if (I == null) {
                 throw new AxisFault("WSDoAllSender: Encryption: unknown key identification");
             }
-            encKeyId = I.intValue();
-            if (!(encKeyId == WSConstants.ISSUER_SERIAL
-                    || encKeyId == WSConstants.X509_KEY_IDENTIFIER
-                    || encKeyId == WSConstants.SKI_KEY_IDENTIFIER
-                    || encKeyId == WSConstants.BST_DIRECT_REFERENCE
-                    || encKeyId == WSConstants.EMBEDDED_KEYNAME)) {
+            reqData.encKeyId = I.intValue();
+            if (!(reqData.encKeyId == WSConstants.ISSUER_SERIAL
+                    || reqData.encKeyId == WSConstants.X509_KEY_IDENTIFIER
+                    || reqData.encKeyId == WSConstants.SKI_KEY_IDENTIFIER
+                    || reqData.encKeyId == WSConstants.BST_DIRECT_REFERENCE
+                    || reqData.encKeyId == WSConstants.EMBEDDED_KEYNAME)) {
                 throw new AxisFault("WSDoAllSender: Encryption: illegal key identification");
             }
         }
-        if ((encSymmAlgo = (String) getOption(WSHandlerConstants.ENC_SYM_ALGO))
+        if ((reqData.encSymmAlgo = (String) getOption(WSHandlerConstants.ENC_SYM_ALGO))
                 == null) {
-            encSymmAlgo =
-                    (String) msgContext.getProperty(WSHandlerConstants.ENC_SYM_ALGO);
+        	reqData.encSymmAlgo =
+                    (String) reqData.msgContext.getProperty(WSHandlerConstants.ENC_SYM_ALGO);
         }
-        if ((encKeyTransport =
+        if ((reqData.encKeyTransport =
                 (String) getOption(WSHandlerConstants.ENC_KEY_TRANSPORT))
                 == null) {
-            encKeyTransport =
-                    (String) msgContext.getProperty(WSHandlerConstants.ENC_KEY_TRANSPORT);
+        	reqData.encKeyTransport =
+                    (String) reqData.msgContext.getProperty(WSHandlerConstants.ENC_KEY_TRANSPORT);
         }
         if ((tmpS = (String) getOption(WSHandlerConstants.ENCRYPTION_PARTS))
                 == null) {
             tmpS =
-                    (String) msgContext.getProperty(WSHandlerConstants.ENCRYPTION_PARTS);
+                    (String) reqData.msgContext.getProperty(WSHandlerConstants.ENCRYPTION_PARTS);
         }
         if (tmpS != null) {
-            splitEncParts(tmpS, encryptParts);
+            splitEncParts(tmpS, reqData.encryptParts, reqData);
         }
     }
 
-    private boolean decodeMustUnderstand() throws AxisFault {
+    private boolean decodeMustUnderstand(RequestData reqData) throws AxisFault {
         boolean mu = true;
         String mustUnderstand = null;
         if ((mustUnderstand =
                 (String) getOption(WSHandlerConstants.MUST_UNDERSTAND))
                 == null) {
             mustUnderstand =
-                    (String) msgContext.getProperty(WSHandlerConstants.MUST_UNDERSTAND);
+                    (String) reqData.msgContext.getProperty(WSHandlerConstants.MUST_UNDERSTAND);
         }
         if (mustUnderstand != null) {
             if (mustUnderstand.equals("0") || mustUnderstand.equals("false")) {
@@ -781,7 +812,8 @@ public class WSDoAllSender extends BasicHandler {
     private WSPasswordCallback getPassword(String username,
                                            int doAction,
                                            String clsProp,
-                                           String refProp)
+                                           String refProp,
+										   RequestData reqData)
             throws AxisFault {
         WSPasswordCallback pwCb = null;
         String password = null;
@@ -789,7 +821,7 @@ public class WSDoAllSender extends BasicHandler {
         CallbackHandler cbHandler = null;
 
         if ((callback = (String) getOption(clsProp)) == null) {
-            callback = (String) msgContext.getProperty(clsProp);
+            callback = (String) reqData.msgContext.getProperty(clsProp);
         }
         if (callback != null) { // we have a password callback class
             pwCb = readPwViaCallbackClass(callback, username, doAction);
@@ -797,16 +829,16 @@ public class WSDoAllSender extends BasicHandler {
                 throw new AxisFault("WSDoAllSender: password callback class provided null or empty password");
             }
         } else if (
-                (cbHandler = (CallbackHandler) msgContext.getProperty(refProp))
+                (cbHandler = (CallbackHandler) reqData.msgContext.getProperty(refProp))
                 != null) {
             pwCb = performCallback(cbHandler, username, doAction);
             if ((pwCb.getPassword() == null) && (pwCb.getKey() == null)) {
                 throw new AxisFault("WSDoAllSender: password callback provided null or empty password");
             }
-        } else if ((password = msgContext.getPassword()) == null) {
+        } else if ((password = reqData.msgContext.getPassword()) == null) {
             throw new AxisFault("WSDoAllSender: application provided null or empty password");
         } else {
-            msgContext.setPassword(null);
+        	reqData.msgContext.setPassword(null);
             pwCb = new WSPasswordCallback("", WSPasswordCallback.UNKNOWN);
             pwCb.setPassword(password);
         }
@@ -878,7 +910,7 @@ public class WSDoAllSender extends BasicHandler {
         return pwCb;
     }
 
-    private void splitEncParts(String tmpS, Vector encryptParts)
+    private void splitEncParts(String tmpS, Vector parts, RequestData reqData)
             throws AxisFault {
         WSEncryptionPart encPart = null;
         String[] rawParts = StringUtil.split(tmpS, ';');
@@ -892,7 +924,7 @@ public class WSDoAllSender extends BasicHandler {
                 }
                 encPart =
                         new WSEncryptionPart(partDef[0].trim(),
-                                soapConstants.getEnvelopeURI(),
+                        		reqData.soapConstants.getEnvelopeURI(),
                                 "Content");
             } else if (partDef.length == 3) {
                 String mode = partDef[0].trim();
@@ -903,7 +935,7 @@ public class WSDoAllSender extends BasicHandler {
                 }
                 String nmSpace = partDef[1].trim();
                 if (nmSpace.length() <= 1) {
-                    nmSpace = soapConstants.getEnvelopeURI();
+                    nmSpace = reqData.soapConstants.getEnvelopeURI();
                 } else {
                     nmSpace = nmSpace.substring(1);
                 }
@@ -921,17 +953,17 @@ public class WSDoAllSender extends BasicHandler {
             } else {
                 throw new AxisFault("WSDoAllSender: wrong part definition: " + tmpS);
             }
-            encryptParts.add(encPart);
+            parts.add(encPart);
         }
     }
 
-    private void handleSpecialUser(String encUser) {
-        if (!WSHandlerConstants.USE_REQ_SIG_CERT.equals(encUser)) {
+    private void handleSpecialUser(RequestData reqData) {
+        if (!WSHandlerConstants.USE_REQ_SIG_CERT.equals(reqData.encUser)) {
             return;
         }
         Vector results = null;
         if ((results =
-                (Vector) msgContext.getProperty(WSHandlerConstants.RECV_RESULTS))
+                (Vector) reqData.msgContext.getProperty(WSHandlerConstants.RECV_RESULTS))
                 == null) {
             return;
         }
@@ -943,7 +975,7 @@ public class WSDoAllSender extends BasicHandler {
             WSHandlerResult rResult =
                     (WSHandlerResult) results.get(i);
             String hActor = rResult.getActor();
-            if (!WSSecurityUtil.isActorEqual(actor, hActor)) {
+            if (!WSSecurityUtil.isActorEqual(reqData.actor, hActor)) {
                 continue;
             }
             Vector wsSecEngineResults = rResult.getResults();
@@ -956,7 +988,7 @@ public class WSDoAllSender extends BasicHandler {
                 WSSecurityEngineResult wser =
                         (WSSecurityEngineResult) wsSecEngineResults.get(j);
                 if (wser.getAction() == WSConstants.SIGN) {
-                    encCert = wser.getCertificate();
+                	reqData.encCert = wser.getCertificate();
                     return;
                 }
             }
