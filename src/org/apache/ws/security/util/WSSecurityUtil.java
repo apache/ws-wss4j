@@ -24,6 +24,7 @@ import org.apache.ws.security.SOAPConstants;
 import org.apache.ws.security.SOAP11Constants;
 import org.apache.ws.security.SOAP12Constants;
 import org.apache.ws.security.message.token.X509Security;
+import org.apache.ws.security.message.token.BinarySecurity;
 import org.apache.xml.security.utils.Base64;
 import org.apache.xpath.XPathAPI;
 import org.w3c.dom.Attr;
@@ -404,7 +405,7 @@ public class WSSecurityUtil {
         retVal.setAttributeNS(WSConstants.XMLNS_NS, "xmlns:wsu", WSConstants.WSU_NS);
         retVal.setAttributeNS(WSConstants.WSU_NS, "wsu:Id", wsuIdVal);
         retVal.setAttributeNS(null, "ValueType", X509Security.TYPE);
-        retVal.setAttributeNS(null, "EncodingType", "wsse:Base64Binary");
+        retVal.setAttributeNS(null, "EncodingType", BinarySecurity.BASE64_ENCODING);
         return retVal;
     }
 
