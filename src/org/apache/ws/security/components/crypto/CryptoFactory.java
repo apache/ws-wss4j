@@ -116,16 +116,9 @@ public abstract class CryptoFactory {
             Constructor c = cryptogenClass.getConstructor(classes);
             crypto = (Crypto) c.newInstance(new Object[]{properties});
             return crypto;
-        } catch (java.lang.reflect.InvocationTargetException e) {
-            if(e.getCause() != null) {
-                e.getCause().printStackTrace();
-                log.error(e.getCause());
-            }
-            e.printStackTrace();
-            log.error(e);
         } catch (java.lang.Exception e) {
             e.printStackTrace();
-            log.error(e);
+            log.error("Unable to instantiate (1): " + cryptoClassName, e);
         }
         try {
             // try to instantiate the Crypto subclass
@@ -133,7 +126,7 @@ public abstract class CryptoFactory {
             return crypto;
         } catch (java.lang.Exception e) {
             e.printStackTrace();
-            log.error(e);
+            log.error("Unable to instantiate (2): " + cryptoClassName, e);
             throw new RuntimeException(cryptoClassName + " cannot create instance");
         }
     }
