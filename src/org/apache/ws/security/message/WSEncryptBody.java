@@ -59,7 +59,8 @@ public class WSEncryptBody extends WSBaseMessage {
 	protected String keyEncAlgo = WSConstants.KEYTRANSPORT_RSA15;
 	protected String encCanonAlgo = null;
 	protected byte[] embeddedKey = null;
-
+    protected String embeddedKeyName = null;
+            
 	/**
 	 * Constructor.
 	 */
@@ -123,6 +124,15 @@ public class WSEncryptBody extends WSBaseMessage {
 	public void setUserInfo(String user) {
 		this.user = user;
 	}
+
+
+    /**
+     * Set the key name for EMBEDDED_KEYNAME
+     * @param embeddedKeyName
+     */ 
+    public void setEmbeddedKeyName(String embeddedKeyName) {
+        this.embeddedKeyName = embeddedKeyName;
+    }
 
 	/**
 	 * Set the name of the symmetric encryption algorithm to use
@@ -542,7 +552,7 @@ public class WSEncryptBody extends WSBaseMessage {
 				WSConstants.SIG_NS,
 				WSConstants.SIG_PREFIX);
 			WSSecurityUtil.appendChildElement(doc, keyInfo, keyName);
-			Text keyText = doc.createTextNode(user);
+			Text keyText = doc.createTextNode(embeddedKeyName == null ? user : embeddedKeyName);
 			keyName.appendChild(keyText);
 		}
 		/*

@@ -255,6 +255,11 @@ public class WSDoAllSender extends BasicHandler {
 						wsEncrypt.setKeyIdentifierType(encKeyId);
 					}
 					if (encKeyId == WSConstants.EMBEDDED_KEYNAME) {
+                        String encKeyName = null;
+                        if ((encKeyName = (String) getOption(WSDoAllConstants.ENC_KEY_NAME)) == null) {
+                            encKeyName = (String) msgContext.getProperty(WSDoAllConstants.ENC_KEY_NAME);
+                        }
+                        wsEncrypt.setEmbeddedKeyName(encKeyName);
 						byte[] embeddedKey =
 							getPassword(
 								encUser,

@@ -38,7 +38,7 @@ import javax.xml.namespace.QName;
 public class BinarySecurity {
     public static final QName TOKEN = new QName(WSConstants.WSSE_NS, "BinarySecurityToken");
     public static final QName TOKEN_KI = new QName(WSConstants.WSSE_NS, "KeyIdentifier");
-    public static final String BASE64_ENCODING = WSConstants.WSSE_NS + "#Base64Binary";
+    public static final String BASE64_ENCODING = WSConstants.SOAPMESSAGE_NS + "#Base64Binary";
     protected Element element = null;
 
     /**

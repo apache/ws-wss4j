@@ -889,10 +889,10 @@ public class WSSecurityEngine {
 
 		Document doc = elem.getOwnerDocument();
 
-		Element tmpE = null;
-		for (tmpE = (Element) elem.getFirstChild();
+		Node tmpE = null;
+		for (tmpE = elem.getFirstChild();
 			tmpE != null;
-			tmpE = (Element) tmpE.getNextSibling()) {
+			tmpE = tmpE.getNextSibling()) {
 			if (tmpE.getNodeType() != Node.ELEMENT_NODE) {
 				continue;
 			}
@@ -900,10 +900,10 @@ public class WSSecurityEngine {
 				continue;
 			}
 			if (tmpE.getLocalName().equals("DataReference")) {
-				String dataRefURI = tmpE.getAttribute("URI");
+				String dataRefURI = ((Element)tmpE).getAttribute("URI");
 				decryptDataRefEmbedded(doc, dataRefURI, cb);
 			} else if (tmpE.getLocalName().equals("KeyReference")) {
-				String keyRefURI = tmpE.getAttribute("URI");
+				String keyRefURI = ((Element) tmpE).getAttribute("URI");
 			}
 		}
 	}

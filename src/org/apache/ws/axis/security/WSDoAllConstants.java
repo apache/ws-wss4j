@@ -301,6 +301,11 @@ public class WSDoAllConstants {
 	 */
 	public static final String ENC_CALLBACK_REF = "EmbeddedKeyCallbackRef";
 
+    /**
+     * Text of the key name that needs to be sent
+     */ 
+    public static final String ENC_KEY_NAME = "EmbeddedKeyName";
+    
 	/**
 	 * The name of the crypto propterty file to use for SOAP Signature.
 	 * <p/>
