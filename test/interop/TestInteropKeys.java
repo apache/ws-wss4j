@@ -39,19 +39,19 @@ public class TestInteropKeys extends TestCase {
 
     public void testInteropKeys1() throws Exception {
         Crypto c = CryptoFactory.getInstance("wsstest.properties");
-        X509Certificate[] certs = c.getCertificates("7706c71b0628d6ecc85ea1e8ad62be60_a8272f6f-2c94-436e-aa71-d8d2be4647f6");
+        X509Certificate[] certs = c.getCertificates("1fb7623be7b2f4831ffc3f3741fa09dd_1e149434-9d3a-4adc-9284-4cfdc595012f");
         assertTrue(certs != null);
         assertTrue(certs[0] != null);
-        PrivateKey privKey = c.getPrivateKey("7706c71b0628d6ecc85ea1e8ad62be60_a8272f6f-2c94-436e-aa71-d8d2be4647f6","interop");
+        PrivateKey privKey = c.getPrivateKey("1fb7623be7b2f4831ffc3f3741fa09dd_1e149434-9d3a-4adc-9284-4cfdc595012f","interop");
         assertTrue(privKey != null);
     }
 
     public void testInteropKeys2() throws Exception {
         Crypto c = CryptoFactory.getInstance("wsstest.properties");
-        X509Certificate[] certs = c.getCertificates("86ab6c4828bcde6983d81b2b59ff426c_a8272f6f-2c94-436e-aa71-d8d2be4647f6");
+        X509Certificate[] certs = c.getCertificates("c82f74d031dabf9d7546f40ad07c32c0_1e149434-9d3a-4adc-9284-4cfdc595012f");
         assertTrue(certs != null);
         assertTrue(certs[0] != null);
-        PrivateKey privKey = c.getPrivateKey("86ab6c4828bcde6983d81b2b59ff426c_a8272f6f-2c94-436e-aa71-d8d2be4647f6","interop");
+        PrivateKey privKey = c.getPrivateKey("c82f74d031dabf9d7546f40ad07c32c0_1e149434-9d3a-4adc-9284-4cfdc595012f","interop");
         assertTrue(privKey != null);
     }
 }
