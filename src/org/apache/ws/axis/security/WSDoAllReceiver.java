@@ -71,7 +71,6 @@ public class WSDoAllReceiver extends BasicHandler {
 	 */
 	public void invoke(MessageContext mc) throws AxisFault {
 
-		// doDebug = log.isDebugEnabled();
 		if (doDebug) {
 			log.debug("WSDoAllReceiver: enter invoke()");
 		}
@@ -86,50 +85,15 @@ public class WSDoAllReceiver extends BasicHandler {
 			throw new AxisFault("WSDoAllReceiver: No action defined");
 		}
 		int doAction = AxisUtil.decodeAction(action, actions);
+		
+		String actor = (String) getOption(WSDoAllConstants.ACTOR);
 
 		Message sm = msgContext.getCurrentMessage();
-		SOAPHeader sHeader = null;
-		try {
-			sHeader = sm.getSOAPEnvelope().getHeader();
-		} catch (Exception ex) {
-			throw new AxisFault("WSDoAllReceiver: cannot get SOAP header", ex);
-		}
-
-		String actor = (String) getOption(WSDoAllConstants.ACTOR);
-		Iterator headers = sHeader.examineHeaderElements(actor);
-
-		SOAPHeaderElement headerElement = null;
-		while (headers.hasNext()) {
-			SOAPHeaderElement hE = (SOAPHeaderElement) headers.next();
-			if (hE.getLocalName().equals(WSConstants.WSSE_LN)
-				&& hE.getNamespaceURI().equals(WSConstants.WSSE_NS)) {
-				headerElement = hE;
-				break;
-			}
-		}
-
-		if (doDebug && headerElement != null) {
-			log.debug("Header found: " + headerElement.getLocalName());
-		}
-
-		/*
-		 * If no security header found, then also action must be defined
-		 * as NO_SECURITY, otherwise its a fault 
-		 */
-		if (headerElement == null) {
-			// TODO: if no header - check if message is a response _and_ is a SOAP fault
-			// in this case don't modify anything, just return for default processing
-			if (doAction == WSConstants.NO_SECURITY) {
-				return;
-			} else {
-				throw new AxisFault("WSDoAllReceiver: Request does not contain required Security header");
-			}
-		} 
-
 		Document doc = null;
 		try {
 			doc = sm.getSOAPEnvelope().getAsDocument();
 			if (doDebug) {
+				log.debug("Received SOAP request: ");
 				log.debug(sm.getSOAPPartAsString());
 			}
 		} catch (Exception ex) {
@@ -174,35 +138,54 @@ public class WSDoAllReceiver extends BasicHandler {
 				"WSDoAllReceiver: security processing failed",
 				ex);
 		}
+		if (wsResult == null) {			// no security header found
+			// TODO: if no header - check if message is a response _and_ is a SOAP fault
+			// in this case don't modify anything, just return for default processing
+			if (doAction == WSConstants.NO_SECURITY) {
+				return;
+			} else {
+				throw new AxisFault("WSDoAllReceiver: Request does not contain required Security header");
+			}
+		}
 
+		/*
+		 * If we had some security processing, get the original
+		 * SOAP part of Axis' message and replace it with new SOAP
+		 * part. This new part may contain decrypted elements.
+		 */
 		SOAPPart sPart = (org.apache.axis.SOAPPart) sm.getSOAPPart();
 		
 		ByteArrayOutputStream os = new ByteArrayOutputStream();
 		XMLUtils.outputDOM(doc, os, true);
 		String osStr = os.toString();
 		if (doDebug) {
+			log.debug("Processed SOAP request");
 			log.debug(osStr);
 		}
 		sPart.setCurrentMessage(osStr, SOAPPart.FORM_STRING);
 		
 		/*
 		 * After setting the new current message, probably modified because
-		 * of decryption, we need to redo the security header locate. That is,
+		 * of decryption, we need to locate the security header. That is,
 		 * we force Axis (with getSOAPEnvelope()) to parse the string, build 
-		 * the new header. Then we examine again, look up the security header 
-		 * (as above when checking for security) and set the header as 
-		 * processed.
+		 * the new header. Then we examine, look up the security header 
+		 * and set the header as processed.
+		 * 
+		 * Please note: find all header elements that contain the same
+		 * actor that was given to processSecurityHeader(). Then
+		 * check if there is a security header with this actor.
 		 */
 
+		SOAPHeader sHeader = null;
 		try {
 			sHeader = sm.getSOAPEnvelope().getHeader();
 		} catch (Exception ex) {
 			throw new AxisFault("WSDoAllReceiver: cannot get SOAP header", ex);
 		}
 
-		headers = sHeader.examineHeaderElements(actor);
+		Iterator headers = sHeader.examineHeaderElements(actor);
 
-		headerElement = null;
+		SOAPHeaderElement headerElement = null;
 		while (headers.hasNext()) {
 			SOAPHeaderElement hE = (SOAPHeaderElement) headers.next();
 			if (hE.getLocalName().equals(WSConstants.WSSE_LN)
@@ -213,6 +196,9 @@ public class WSDoAllReceiver extends BasicHandler {
 		}
 		((org.apache.axis.message.SOAPHeaderElement) headerElement).setProcessed(true);
 
+		/*
+	 	 * now check the security actions: do they match, in right order?
+	 	 */
 		Vector resultActions = wsResult.getActions();
 		int size = actions.size();
 		if (size != resultActions.size()) {
@@ -224,6 +210,12 @@ public class WSDoAllReceiver extends BasicHandler {
 				throw new AxisFault("WSDoAllReceiver: security processing failed (actions mismatch)");
 			}
 		}
+		
+		/*
+		 * All ok up to this point. Now construct and setup the
+		 * security result structure. The service may fetch this
+		 * and check it.
+		 */
 		Vector results = null;
 		if ((results = (Vector) mc.getProperty(WSDoAllConstants.RECV_RESULTS))
 			== null) {
