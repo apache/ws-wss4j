@@ -21,8 +21,9 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import org.apache.ws.axis.security.saml.SAMLIssuerFactory;
-import org.apache.ws.axis.security.saml.SAMLIssuer;
+import org.apache.ws.security.saml.SAMLIssuerFactory;
+import org.apache.ws.security.saml.SAMLIssuer;
+import org.apache.ws.security.saml.SAMLIssuerFactory;
 
 import org.apache.axis.Message;
 import org.apache.axis.MessageContext;

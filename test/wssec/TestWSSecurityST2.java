@@ -21,8 +21,8 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import org.apache.ws.axis.security.saml.SAMLIssuerFactory;
-import org.apache.ws.axis.security.saml.SAMLIssuer;
+import org.apache.ws.security.saml.SAMLIssuerFactory;
+import org.apache.ws.security.saml.SAMLIssuer;
 
 import org.apache.axis.Message;
 import org.apache.axis.MessageContext;
@@ -36,6 +36,7 @@ import org.apache.ws.axis.security.util.AxisUtil;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSecurityEngine;
+import org.apache.ws.security.saml.SAMLIssuer;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.message.WSSignEnvelope;
