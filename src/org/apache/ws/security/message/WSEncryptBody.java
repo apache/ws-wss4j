@@ -311,7 +311,7 @@ public class WSEncryptBody extends WSBaseMessage {
 					envelope,
 					"EncryptedData",
 					"http://www.w3.org/2001/04/xmlenc#");
-			xencEncryptedDataId = "id-" + body.hashCode();
+			xencEncryptedDataId = "EncDataId-" + body.hashCode();
 			body.setAttribute("Id", xencEncryptedDataId);
 
 			encDataRefs.add(new String("#" + xencEncryptedDataId));
@@ -334,7 +334,7 @@ public class WSEncryptBody extends WSBaseMessage {
 				"invalidX509Data", new Object[]{"for Encryption"});
 		}
 		remoteCert = certs[0];
-		String certUri = "EncId-" + remoteCert.hashCode();
+		String certUri = "EncCertId-" + remoteCert.hashCode();
 		if (tlog.isDebugEnabled()) {
 			t2 = System.currentTimeMillis();
 		}

@@ -245,9 +245,15 @@ public class WSSignEnvelope extends WSBaseMessage {
          */
 
         KeyInfo info = sig.getKeyInfo();
-		String keyInfoUri = "SignId-" + info.hashCode();
+		String keyInfoUri = "KeyId-" + info.hashCode();
 		info.setId(keyInfoUri);
+		
+		SecurityTokenReference secRef = new SecurityTokenReference(doc);
+		String strUri = "STRId-" + secRef.hashCode();
+		secRef.setID(strUri);
 
+		String certUri = "CertId-" + certs[0].hashCode();
+		
 		if( tlog.isDebugEnabled() ) {
 			t1=System.currentTimeMillis();
 		}
@@ -262,8 +268,6 @@ public class WSSignEnvelope extends WSBaseMessage {
 			parts.add(encP);
 		}
 
-		String certUri = "SignId-" + certs[0].hashCode();
-		
 		Transforms transforms = null;
 		
 		for (int part = 0; part < parts.size(); part++) {
@@ -293,11 +297,10 @@ public class WSSignEnvelope extends WSBaseMessage {
 				}
 			}
 			else if (elemName.equals("STRTransform")) { // STRTransform
-				log.debug("in STRTRANSFORM");
 				Element ctx = createSTRParameter(doc);	// This element shall conatin the arg to STR
 				transforms = new Transforms(doc);
 				transforms.addTransform(STRTransform.implementedTransformURI, ctx);
-				sig.addDocument("#" + keyInfoUri, transforms);
+				sig.addDocument("#" + strUri, transforms);
 			}
 			else {
 				Element body = (Element) WSSecurityUtil.findElement(envelope, elemName, nmSpace);
@@ -316,7 +319,6 @@ public class WSSignEnvelope extends WSBaseMessage {
         sig.addResourceResolver(EnvelopeIdResolver.getInstance());
         
         WSSecurityUtil.prependChildElement(doc, securityHeader, sig.getElement(), false);
-        SecurityTokenReference secRef = new SecurityTokenReference(doc);
 		if (tlog.isDebugEnabled() ) {
 			t2=System.currentTimeMillis();
 		}

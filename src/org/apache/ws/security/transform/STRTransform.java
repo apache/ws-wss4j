@@ -22,7 +22,6 @@ import org.apache.ws.security.WSDocInfoStore;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.message.token.SecurityTokenReference;
 import org.apache.ws.security.message.token.X509Security;
-import org.apache.ws.security.message.token.BinarySecurity;
 import org.apache.ws.security.util.WSSecurityUtil;
 
 
@@ -36,9 +35,7 @@ import org.apache.xml.security.c14n.Canonicalizer;
 import org.apache.xml.security.c14n.CanonicalizationException;
 import org.apache.xml.security.c14n.InvalidCanonicalizerException;
 import org.apache.xml.security.transforms.TransformSpi;
-import org.apache.xml.security.utils.XMLUtils;
 import org.apache.xml.security.utils.Base64;
-import org.apache.xpath.XPathAPI;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -47,11 +44,8 @@ import javax.xml.transform.TransformerException;
 
 import java.security.cert.X509Certificate;
 
-import java.io.PrintWriter;
-
 import org.xml.sax.SAXException;
 import org.w3c.dom.Node;
-import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Document;
@@ -203,119 +197,70 @@ public class STRTransform extends TransformSpi {
 					WSConstants.WSSE_NS,
 					"SecurityTokenReference");
 
-			int length = nodeList.getLength();
-
 			Element str = null;
-			/*
-			 * loop over all STR elements
-			 */
-			for (int i = 0; i < length; i++) {
-				Element tmpEl = (Element) nodeList.item(i);
-				if (doDebug) {
-					log.debug("STR: " + tmpEl.toString());
-				}
-				/*
-				 * Third and forht step are performed by derefenceSTR()
-				 */
-
-				str = dereferenceSTR(thisDoc, (Element) tmpEl);
-				/*
-				 * Keep in mind: the returned element belong to "thisDoc", thus
-				 * import it to "doc" before replacing it.
-				 */
-
-				/*
-				 * Fifth step: replace the STR with the above created/copied BST, feed
-				 * this result in the specified c14n method and return this to
-				 * the caller.
-				 * 
-				 */
-				str = (Element) doc.importNode(str, true);
-				Node parent = tmpEl.getParentNode();
-				parent.replaceChild(str, tmpEl);
+			Element tmpEl = (Element) nodeList.item(0);
+			if (doDebug) {
+				log.debug("STR: " + tmpEl.toString());
 			}
 			/*
-			 * Convert resulting STR result doc into NodeList, then c14n
+			 * Third and forht step are performed by derefenceSTR()
 			 */
-			// XMLUtils.circumventBug2650(doc); // This is needed???? not in every case
+			SecurityTokenReference secRef = new SecurityTokenReference(tmpEl);
+
+			str = dereferenceSTR(thisDoc, secRef);
+			/*
+			 * Keep in mind: the returned element belong to "thisDoc", thus
+			 * import it to "doc" before replacing it.
+			 *
+			 * Fifth step: replace the STR with the above created/copied BST, feed
+			 * this result in the specified c14n method and return this to
+			 * the caller.
+			 * 
+			 */
+			str = (Element) doc.importNode(str, true);
+
+			Node parent = tmpEl.getParentNode(); // point to document node
+			parent.replaceChild(str, tmpEl); // replace STR with new node
+
+			// XMLUtils.circumventBug2650(doc); // This is not needed in this case
+			
+			/*
+			 * C14n with specified algorithm. According to WSS Specification.
+			 */
+			buf = canon.canonicalizeSubtree(doc, "#default");
+
+			// prepare a BOS for debug output and the following hack. If the
+			// problem with c14n mehtod is solved then just :
+			/* return new XMLSignatureInput(buf); */
+			
+			bos = new ByteArrayOutputStream(buf.length);
+			bos.write(buf, 0, buf.length);
 
 			if (doDebug) {
-				log.debug("result doc: ");
-				org.apache.axis.utils.XMLUtils.PrettyDocumentToWriter(
-					doc,
-					new PrintWriter(System.out));
+				log.debug("after c14n: " + bos.toString());
 			}
+
 			/*
-			nodeList =
-				XPathAPI.selectNodeList(
-					doc.getDocumentElement(),
-					Canonicalizer.XPATH_C14N_WITH_COMMENTS_SINGLE_NODE);
-
-			buf =
-				canon.canonicalizeXPathNodeSet(
-					XMLUtils.convertNodelistToSet(nodeList),"#default");
-
-
-			*/
-			buf =
-				canon.canonicalizeSubtree(doc, "#default");
-			if (doDebug) {
-				bos = new ByteArrayOutputStream(buf.length);
-				bos.write(buf, 0, buf.length);
-				log.debug("result bos: " + bos.toString());
-			}
-			/*
-			 * !!!!!!!! HACK ALERT --- here the hack starts
+			 * This is a HACK - we need to know how to augment the
+			 * above called c14n to leave the xmlns="" in.
+			 * Thus - insert with string buffer operations. Be careful
+			 * to insert as first namespace attribute or before any
+			 * other attribute if there is no namespace attribute.
+			 * 
+			 * TODO: This hack need to be checked/validated.
 			 */
-			StringBuffer bf = new StringBuffer(bos.toString());
+			StringBuffer bf = new StringBuffer(bos.toString());			
 			int idx = bf.indexOf("BinarySecurityToken");
-			idx = bf.indexOf("xmlns", idx);
-			bf.insert(idx, "xmlns=\"\" ");
+			int idx1 = bf.indexOf("xmlns", idx);		// look up for a namespace attr
+			if (idx1 < 0) {								// none found, locate first attr
+				idx1 = bf.indexOf("ValueType", idx);
+			}
+			bf.insert(idx1, "xmlns=\"\" ");				// insert first
 			if (doDebug) {
 				log.debug("last result: ");
 				log.debug(bf.toString());
 			}
 			return new XMLSignatureInput(bf.toString().getBytes());
-			/*
-			 * !!!!!!!  ---Here the HACK ends
-			 */
-			// return new XMLSignatureInput(buf);
-
-			/*
-			Document doc2 = db.parse(new ByteArrayInputStream(buf));
-			XMLUtils.circumventBug2650(doc2); // This is needed
-			
-			NodeList nodeList2 =
-				doc2.getElementsByTagNameNS(
-					WSConstants.WSSE_NS,
-					"BinarySecurityToken");
-
-			int length2 = nodeList2.getLength();
-			if (length2 > 0) {
-				Element elem = (Element) nodeList2.item(0);
-				elem.setAttributeNS(WSConstants.XMLNS_NS, "xmlns", "");
-			}
-			/
-			nodeList2 =
-				doc2.getElementsByTagNameNS(WSConstants.SIG_NS, "KeyInfo");
-			length2 = nodeList2.getLength();
-			if (length2 > 0) {
-				Element elem = (Element) nodeList2.item(0);
-				elem.setAttributeNS(WSConstants.XMLNS_NS, "xmlns", "");
-			}
-			/
-			if (doDebug) {
-				log.debug("result doc2: ");
-				org.apache.axis.utils.XMLUtils.PrettyDocumentToWriter(
-					doc2,
-					new PrintWriter(System.out));
-			}
-			nodeList =
-				XPathAPI.selectNodeList(
-					doc2,
-					Canonicalizer.XPATH_C14N_WITH_COMMENTS_SINGLE_NODE);		
-			return new XMLSignatureInput(XMLUtils.convertNodelistToSet(nodeList));
-			*/
 
 		} catch (IOException ex) {
 			throw new CanonicalizationException("empty", ex);
@@ -332,20 +277,19 @@ public class STRTransform extends TransformSpi {
 		}
 	}
 
-	private Element dereferenceSTR(Document doc, Element secRefE)
+	private Element dereferenceSTR(Document doc, SecurityTokenReference secRef)
 		throws Exception {
 
 		/*
 		 * Third step: locate the security token referenced by the STR
 		 * element. Either the Token is contained in the document as a 
-		 * BinarySecurityToken or stored in some key storage. The WSDocInfo
-		 * contains the implementation of the key storage to use. To locate
-		 * a BST inside a document check if a BST was already found and the 
-		 * element stored in WSDocInfo.
+		 * BinarySecurityToken or stored in some key storage. 
 		 *
-		 * Forth step: after security token was located, prepare it. Wrap the 
-		 * located token in a newly created BST element as specified in WSS 
-		 * Specification.
+		 * Forth step: after security token was located, prepare it. If its
+		 * reference via a direct reference, i.e. a relative URI that references
+		 * the BST directly in the message then just return that element.
+		 * Otherwise wrap the located token in a newly created BST element 
+		 * as described in WSS Specification.
 		 * 
 		 * Note: every element (also newly created elements) belong to the
 		 * document defined by the doc parameter. This is the main SOAP document
@@ -354,26 +298,21 @@ public class STRTransform extends TransformSpi {
 		 * part that is signed/verified.
 		 * 
 		 */
-		SecurityTokenReference secRef = null;
-		Element tokElement = null;
-		
-		secRef = new SecurityTokenReference(secRefE);
+		 Element tokElement = null;
 		
 		/*
 		 * First case: direct reference, according to chap 7.2 of OASIS
-		 * WS specification (main document)
+		 * WS specification (main document). Only in this case return
+		 * a true reference to the BST. Copying is done by the caller.
 		 */
 		if (secRef.containsReference()) {
 			if (doDebug) {
 				log.debug("STR: Reference");
 			}
-			Element elem = secRef.getTokenElement(secRef, doc);
-			if (elem == null) {
+			tokElement = secRef.getTokenElement(secRef, doc);
+			if (tokElement == null) {
 				throw new CanonicalizationException("empty");
 			}
-			X509Security x509token = new X509Security(elem);
-			X509Certificate cert = x509token.getX509Certificate(wsDocInfo.getCrypto());
-			tokElement = createBST(doc, cert, secRefE);
 		} 
 		/*
 		 * second case: IssuerSerial, first try to get embedded 
@@ -385,7 +324,10 @@ public class STRTransform extends TransformSpi {
 				log.debug("STR: IssuerSerial");
 			}
 			X509Certificate cert = null;
-			X509Security x509token = secRef.getEmbeddedTokenFromIS(doc, wsDocInfo.getCrypto());
+			X509Security x509token = null;
+			// Disable check for embedded, always get from store (comment from Merlin,
+			// Betrust)
+			// x509token = secRef.getEmbeddedTokenFromIS(doc, wsDocInfo.getCrypto());
 			if (x509token != null) {
 				cert = x509token.getX509Certificate(wsDocInfo.getCrypto());
 			}
@@ -396,7 +338,7 @@ public class STRTransform extends TransformSpi {
 				}
 				cert = certs[0];
 			}	
-			tokElement = createBST(doc, cert, secRefE);
+			tokElement = createBST(doc, cert, secRef.getElement());
 		}
 		/*
 		 * third case: KeyIdentifier, must be SKI, first try to get embedded 
@@ -409,7 +351,10 @@ public class STRTransform extends TransformSpi {
 				log.debug("STR: KeyIdentifier");
 			}
 			X509Certificate cert = null;
-			X509Security x509token = secRef.getEmbeddedTokenFromSKI(doc, wsDocInfo.getCrypto());
+			X509Security x509token = null;
+			// Disable check for embedded, always get from store (comment from Merlin,
+			// Betrust)
+			// x509token = secRef.getEmbeddedTokenFromSKI(doc, wsDocInfo.getCrypto());
 			if (x509token != null) {
 				cert = x509token.getX509Certificate(wsDocInfo.getCrypto());
 			}
@@ -420,7 +365,7 @@ public class STRTransform extends TransformSpi {
 				}
 				cert = certs[0];
 			}
-			tokElement = createBST(doc, cert, secRefE);
+			tokElement = createBST(doc, cert, secRef.getElement());
 		}
 		return (Element) tokElement;
 	}
@@ -439,9 +384,7 @@ public class STRTransform extends TransformSpi {
 		WSSecurityUtil.setNamespace(elem, WSConstants.WSSE_NS, prefix);
 		elem.setAttributeNS(WSConstants.XMLNS_NS, "xmlns", "");
 		elem.setAttributeNS(null, "ValueType", X509Security.TYPE);
-		// elem.setAttributeNS(null, "EncodingType", BinarySecurity.BASE64_ENCODING);
-		Text certText = doc.createTextNode(Base64.encode(data, 0));
-		// Text certText = doc.createTextNode(data);
+		Text certText = doc.createTextNode(Base64.encode(data, 0));  // no line wrap
 		elem.appendChild(certText);
 		return elem;
 	}

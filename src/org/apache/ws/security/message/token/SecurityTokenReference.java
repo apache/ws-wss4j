@@ -502,7 +502,7 @@ public class SecurityTokenReference {
 	 * 
 	 * @return the first <code>Element</code> child node
 	 */
-	private Element getFirstElement() {
+	public Element getFirstElement() {
 		for (Node currentChild = this.element.getFirstChild();
 			currentChild != null;
 			currentChild = currentChild.getNextSibling()) {
@@ -629,7 +629,8 @@ public class SecurityTokenReference {
 	 * @param id 
 	 */
 	public void setID(String id) {
-		this.element.setAttributeNS(WSConstants.WSU_NS, "wsu:Id", id);
+		String prefix = WSSecurityUtil.setNamespace(this.element, WSConstants.WSU_NS, WSConstants.WSU_PREFIX);
+		this.element.setAttributeNS(WSConstants.WSU_NS, prefix+":Id", id);
 	}
 
 	/**
