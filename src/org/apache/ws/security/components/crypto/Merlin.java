@@ -24,7 +24,6 @@ import org.apache.commons.discovery.resource.DiscoverResources;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.util.StringUtil;
 import sun.security.util.DerValue;
 
 import java.io.ByteArrayInputStream;
@@ -49,7 +48,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 import java.util.Vector;
-
 
 /**
  * JDK1.4 based implementation of Crypto (uses keystore).
@@ -128,7 +126,13 @@ public class Merlin implements Crypto {
     public synchronized CertificateFactory getCertificateFactory() throws WSSecurityException {
         if (certFact == null) {
 			try {
-				certFact = CertificateFactory.getInstance("X.509","BC");
+	            String provider = properties.getProperty("org.apache.ws.security.crypto.merlin.cert.provider");
+	            if(provider == null || provider.length() == 0) {
+	            	certFact = CertificateFactory.getInstance("X.509");
+	            }
+	            else {
+	            	certFact = CertificateFactory.getInstance("X.509", provider);
+	            }
 			} catch (CertificateException e) {
                 throw new WSSecurityException(WSSecurityException.SECURITY_TOKEN_UNAVAILABLE,
                         "unsupportedCertType");
@@ -251,31 +255,15 @@ public class Merlin implements Crypto {
     }
 
 
-	private String[] splitAndTrim(String inString) {
-		String result[] = StringUtil.split(inString,',');
-		for (int i = 0; i < result.length; i++) {
-			result[i] = result[i].trim();
-		}
-		return result;
-	}
+	private Vector splitAndTrim(String inString) {
+		X509NameTokenizer nmTokens = new X509NameTokenizer(inString);
+		Vector vr = new Vector();
 
-    private boolean equalsStringArray(String[] in1, String[] in2) {
-        if (in1.length != in2.length) {
-            return false;
-        }
-        for (int i = 0; i < in1.length; i++) {
-            if (in1[i] != null) {
-                if (!(in1[i].equals(in2[i]))) {
-                    return false;
-                }
-            }
-            // come here if in1[i] is null, check in2[i]
-            else if (in2[i] != null) {
-                return false;
-            }
-        }
-        return true;
-    }
+		while (nmTokens.hasMoreTokens()) {
+			vr.add(nmTokens.nextToken());
+		}
+		return vr;
+	}
 
     /**
      * Lookup a X509 Certificate in the keystore according to a given serial number and
@@ -302,9 +290,9 @@ public class Merlin implements Crypto {
      */
     public String getAliasForX509Cert(String issuer, BigInteger serialNumber)
             throws WSSecurityException {
-        String issuerSplit[] = splitAndTrim(issuer);
+        Vector issuerRDN = splitAndTrim(issuer);
         X509Certificate x509cert = null;
-        String certIssuer[] = null;
+        Vector certRDN = null;
 		Certificate cert = null;
 
 		try {
@@ -325,8 +313,8 @@ public class Merlin implements Crypto {
 				}
 				x509cert = (X509Certificate) cert;
 				if (x509cert.getSerialNumber().compareTo(serialNumber) == 0) {
-					certIssuer = splitAndTrim(x509cert.getIssuerDN().getName());
-					if (equalsStringArray(issuerSplit, certIssuer)) {
+					certRDN = splitAndTrim(x509cert.getIssuerDN().getName());
+					if (certRDN.equals(issuerRDN)) {
 						return alias;
 					}
 				}
