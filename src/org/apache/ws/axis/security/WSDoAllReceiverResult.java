@@ -24,20 +24,12 @@ import java.util.Vector;
  */
 public class WSDoAllReceiverResult {
 	private String actor;
-	private Vector actions;
-	private Vector principals;
+	private Vector wsSecurityResults;
 
 
-	WSDoAllReceiverResult(String actor, Vector actions, Vector principals) {
+	WSDoAllReceiverResult(String actor, Vector wsResults) {
 		this.actor = actor;
-		this.actions = actions;
-		this.principals = principals;
-	}
-	/**
-	 * @return
-	 */
-	public Vector getActions() {
-		return actions;
+		this.wsSecurityResults = wsResults;
 	}
 
 	/**
@@ -50,8 +42,8 @@ public class WSDoAllReceiverResult {
 	/**
 	 * @return
 	 */
-	public Vector getPrincipals() {
-		return principals;
+	public Vector getResults() {
+		return wsSecurityResults;
 	}
 
 }

@@ -143,7 +143,7 @@ public class WSDoAllReceiver extends BasicHandler {
 			decodeDecryptionParameter();
 		}
 
-		WSSecurityEngineResult wsResult = null;
+		Vector wsResult = null;
 		try {
 			wsResult =
 				secEngine.processSecurityHeader(
@@ -198,7 +198,7 @@ public class WSDoAllReceiver extends BasicHandler {
 		try {
 			sHeader = sm.getSOAPEnvelope().getHeader();
 		} catch (Exception ex) {
-			throw new AxisFault("WSDoAllReceiver: cannot get SOAP header", ex);
+			throw new AxisFault("WSDoAllReceiver: cannot get SOAP header after security processing", ex);
 		}
 
 		Iterator headers = sHeader.examineHeaderElements(actor);
@@ -217,14 +217,14 @@ public class WSDoAllReceiver extends BasicHandler {
 		/*
 	 	 * now check the security actions: do they match, in right order?
 	 	 */
-		Vector resultActions = wsResult.getActions();
+		int resultActions = wsResult.size();
 		int size = actions.size();
-		if (size != resultActions.size()) {
+		if (size != resultActions) {
 			throw new AxisFault("WSDoAllReceiver: security processing failed (actions number mismatch)");
 		}
 		for (int i = 0; i < size; i++) {
 			if (((Integer) actions.get(i)).intValue()
-				!= ((Integer) resultActions.get(i)).intValue()) {
+				!= ((WSSecurityEngineResult)wsResult.get(i)).getAction()) {
 				throw new AxisFault("WSDoAllReceiver: security processing failed (actions mismatch)");
 			}
 		}
@@ -238,14 +238,13 @@ public class WSDoAllReceiver extends BasicHandler {
 		if ((results = (Vector) mc.getProperty(WSDoAllConstants.RECV_RESULTS))
 			== null) {
 			results = new Vector();
+			mc.setProperty(WSDoAllConstants.RECV_RESULTS, results);
 		}
 		WSDoAllReceiverResult rResult =
 			new WSDoAllReceiverResult(
 				actor,
-				resultActions,
-				wsResult.getPrincipals());
-		results.add(rResult);
-		mc.setProperty(WSDoAllConstants.RECV_RESULTS, results);
+				wsResult);
+		results.add(0, rResult);
 		if (doDebug) {
 			log.debug("WSDoAllReceiver: exit invoke()");
 		}

@@ -42,7 +42,6 @@ import javax.crypto.SecretKey;
 import java.security.cert.X509Certificate;
 import java.util.Vector;
 
-
 /**
  * Encrypts a SOAP body inside a SOAP envelope according to WS Specification, 
  * X509 profile, and adds the encryption data.
@@ -59,8 +58,9 @@ public class WSEncryptBody extends WSBaseMessage {
 	protected String keyEncAlgo = WSConstants.KEYTRANSPORT_RSA15;
 	protected String encCanonAlgo = null;
 	protected byte[] embeddedKey = null;
-    protected String embeddedKeyName = null;
-            
+	protected String embeddedKeyName = null;
+	protected X509Certificate useThisCert = null;
+
 	/**
 	 * Constructor.
 	 */
@@ -125,15 +125,25 @@ public class WSEncryptBody extends WSBaseMessage {
 		this.user = user;
 	}
 
+	/**
+	 * Set the key name for EMBEDDED_KEYNAME
+	 * @param embeddedKeyName
+	 */
+	public void setEmbeddedKeyName(String embeddedKeyName) {
+		this.embeddedKeyName = embeddedKeyName;
+	}
 
-    /**
-     * Set the key name for EMBEDDED_KEYNAME
-     * @param embeddedKeyName
-     */ 
-    public void setEmbeddedKeyName(String embeddedKeyName) {
-        this.embeddedKeyName = embeddedKeyName;
-    }
-
+	/**
+	 * Set the X509 Certificate to use for encryption.
+	 * If this is set <b>and</b> the key identifier is set
+	 * to <code>DirectReference</code> then use this certificate
+	 * to get the public key for encryption. 
+	 * 
+	 * @param cert is the X509 certificate to use for encryption
+	 */
+	public void setUseThisCert(X509Certificate cert) {
+		useThisCert = cert;
+	}
 	/**
 	 * Set the name of the symmetric encryption algorithm to use
 	 * <p/>
@@ -169,7 +179,6 @@ public class WSEncryptBody extends WSBaseMessage {
 	public void setEncCanonicalization(String algo) {
 		encCanonAlgo = algo;
 	}
-
 
 	/**
 	 * Get the name of symmetric encryption algorithm to use
@@ -248,7 +257,7 @@ public class WSEncryptBody extends WSBaseMessage {
 			"xmlns:" + WSConstants.ENC_PREFIX,
 			WSConstants.ENC_NS);
 
-		SOAPConstants soapConstants = WSSecurityUtil.getSOAPConstants(envelope);			
+		SOAPConstants soapConstants = WSSecurityUtil.getSOAPConstants(envelope);
 
 		/*
 		 * Second step: generate a symmetric key (session key) for
@@ -257,7 +266,9 @@ public class WSEncryptBody extends WSBaseMessage {
 		SecretKey symmetricKey = null;
 		KeyGenerator keyGen = getKeyGenerator();
 		symmetricKey = keyGen.generateKey();
-		XMLCipher xmlCipher = XMLCipher.getInstance(symEncAlgo/*, encCanonAlgo */);
+		XMLCipher xmlCipher =
+			XMLCipher.getInstance(symEncAlgo /*, encCanonAlgo */
+		);
 		xmlCipher.init(XMLCipher.ENCRYPT_MODE, symmetricKey);
 
 		// if no encryption parts set - use the default
@@ -310,7 +321,7 @@ public class WSEncryptBody extends WSBaseMessage {
 				(Element) WSSecurityUtil.findElement(
 					envelope,
 					"EncryptedData",
-					"http://www.w3.org/2001/04/xmlenc#");
+					WSConstants.ENC_NS);
 			xencEncryptedDataId = "EncDataId-" + body.hashCode();
 			body.setAttribute("Id", xencEncryptedDataId);
 
@@ -328,12 +339,18 @@ public class WSEncryptBody extends WSBaseMessage {
 		 * Up to now we support RSA 1-5 as public key algorithm
 		 */
 		X509Certificate remoteCert = null;
-		X509Certificate[] certs = crypto.getCertificates(user);
-		if (certs == null || certs.length <= 0) {
-			throw new WSSecurityException(WSSecurityException.FAILURE,
-				"invalidX509Data", new Object[]{"for Encryption"});
+		if (useThisCert != null) {
+			remoteCert = useThisCert;
+		} else {
+			X509Certificate[] certs = crypto.getCertificates(user);
+			if (certs == null || certs.length <= 0) {
+				throw new WSSecurityException(
+					WSSecurityException.FAILURE,
+					"invalidX509Data",
+					new Object[] { "for Encryption" });
+			}
+			remoteCert = certs[0];
 		}
-		remoteCert = certs[0];
 		String certUri = "EncCertId-" + remoteCert.hashCode();
 		if (tlog.isDebugEnabled()) {
 			t2 = System.currentTimeMillis();
@@ -342,8 +359,11 @@ public class WSEncryptBody extends WSBaseMessage {
 		cipher.init(Cipher.ENCRYPT_MODE, remoteCert);
 		byte[] encKey = symmetricKey.getEncoded();
 		if (doDebug) {
-			log.debug("cipher blksize: " + cipher.getBlockSize() + 
-					  ", symm key length: " + encKey.length);
+			log.debug(
+				"cipher blksize: "
+					+ cipher.getBlockSize()
+					+ ", symm key length: "
+					+ encKey.length);
 		}
 		if (cipher.getBlockSize() < encKey.length) {
 			throw new WSSecurityException(
@@ -456,7 +476,8 @@ public class WSEncryptBody extends WSBaseMessage {
 		return doc;
 	}
 
-	private Document buildEmbedded(Document doc, Crypto crypto) throws Exception {
+	private Document buildEmbedded(Document doc, Crypto crypto)
+		throws Exception {
 		doDebug = log.isDebugEnabled();
 
 		long t0 = 0, t1 = 0, t2 = 0, t3 = 0;
@@ -466,7 +487,7 @@ public class WSEncryptBody extends WSBaseMessage {
 		if (doDebug) {
 			log.debug("Beginning Encryption embedded...");
 		}
-				
+
 		if (embeddedKey == null) {
 			throw new WSSecurityException(
 				WSSecurityException.FAILURE,
@@ -491,7 +512,7 @@ public class WSEncryptBody extends WSBaseMessage {
 		SecretKey symmetricKey = null;
 
 		symmetricKey = WSSecurityUtil.prepareSecretKey(symEncAlgo, embeddedKey);
-		
+
 		XMLCipher xmlCipher = XMLCipher.getInstance(symEncAlgo);
 		xmlCipher.init(XMLCipher.ENCRYPT_MODE, symmetricKey);
 
@@ -547,7 +568,7 @@ public class WSEncryptBody extends WSBaseMessage {
 				(Element) WSSecurityUtil.findElement(
 					envelope,
 					"EncryptedData",
-					"http://www.w3.org/2001/04/xmlenc#");
+					WSConstants.ENC_NS);
 			xencEncryptedDataId = "id-" + body.hashCode();
 			body.setAttribute("Id", xencEncryptedDataId);
 
@@ -560,17 +581,22 @@ public class WSEncryptBody extends WSBaseMessage {
 				(Element) WSSecurityUtil.findElement(
 					body,
 					"CipherData",
-					"http://www.w3.org/2001/04/xmlenc#");
+					WSConstants.ENC_NS);
 
 			// KeyInfo before CipherValue
 			body.insertBefore(keyInfo, tmpE);
-			Element keyName = doc.createElementNS(WSConstants.SIG_NS, "ds:KeyName");
+			Element keyName =
+				doc.createElementNS(
+					WSConstants.SIG_NS,
+					WSConstants.SIG_PREFIX + ":KeyName");
 			WSSecurityUtil.setNamespace(
-				keyInfo,
+				keyName,
 				WSConstants.SIG_NS,
 				WSConstants.SIG_PREFIX);
 			WSSecurityUtil.appendChildElement(doc, keyInfo, keyName);
-			Text keyText = doc.createTextNode(embeddedKeyName == null ? user : embeddedKeyName);
+			Text keyText =
+				doc.createTextNode(
+					embeddedKeyName == null ? user : embeddedKeyName);
 			keyName.appendChild(keyText);
 		}
 		/*
@@ -589,7 +615,7 @@ public class WSEncryptBody extends WSBaseMessage {
 		tmpE = doc.createElement("temp");
 		Element refList = createDataRefList(doc, tmpE, encDataRefs);
 		WSSecurityUtil.prependChildElement(doc, wsseSecurity, refList, true);
-		
+
 		if (tlog.isDebugEnabled()) {
 			tlog.debug("EncryptBody embedded: symm-enc= " + (t1 - t0));
 		}
@@ -624,20 +650,28 @@ public class WSEncryptBody extends WSBaseMessage {
 		Document doc,
 		String keyTransportAlgo) {
 		Element encryptedKey =
-			doc.createElementNS(WSConstants.ENC_NS, "xenc:EncryptedKey");
-		encryptedKey.setAttributeNS(
-			WSConstants.XMLNS_NS,
-			"xmlns:xenc",
-			WSConstants.ENC_NS);
+			doc.createElementNS(
+				WSConstants.ENC_NS,
+				WSConstants.ENC_PREFIX + ":EncryptedKey");
+
+		WSSecurityUtil.setNamespace(
+			encryptedKey,
+			WSConstants.ENC_NS,
+			WSConstants.ENC_PREFIX);
 		Element encryptionMethod =
-			doc.createElementNS(WSConstants.ENC_NS, "xenc:EncryptionMethod");
+			doc.createElementNS(
+				WSConstants.ENC_NS,
+				WSConstants.ENC_PREFIX + ":EncryptionMethod");
 		encryptionMethod.setAttributeNS(null, "Algorithm", keyTransportAlgo);
 		WSSecurityUtil.appendChildElement(doc, encryptedKey, encryptionMethod);
 		return encryptedKey;
 	}
 
 	public static Element createKeyInfo(Document doc, Element encryptedKey) {
-		Element keyInfo = doc.createElementNS(WSConstants.SIG_NS, "ds:KeyInfo");
+		Element keyInfo =
+			doc.createElementNS(
+				WSConstants.SIG_NS,
+				WSConstants.SIG_PREFIX + ":KeyInfo");
 		WSSecurityUtil.setNamespace(
 			keyInfo,
 			WSConstants.SIG_NS,
@@ -650,9 +684,13 @@ public class WSEncryptBody extends WSBaseMessage {
 		Document doc,
 		Element encryptedKey) {
 		Element cipherData =
-			doc.createElementNS(WSConstants.ENC_NS, "xenc:CipherData");
+			doc.createElementNS(
+				WSConstants.ENC_NS,
+				WSConstants.ENC_PREFIX + ":CipherData");
 		Element cipherValue =
-			doc.createElementNS(WSConstants.ENC_NS, "xenc:CipherValue");
+			doc.createElementNS(
+				WSConstants.ENC_NS,
+				WSConstants.ENC_PREFIX + ":CipherValue");
 		cipherData.appendChild(cipherValue);
 		WSSecurityUtil.appendChildElement(doc, encryptedKey, cipherData);
 		return cipherValue;
@@ -663,11 +701,15 @@ public class WSEncryptBody extends WSBaseMessage {
 		Element encryptedKey,
 		Vector encDataRefs) {
 		Element referenceList =
-			doc.createElementNS(WSConstants.ENC_NS, "xenc:ReferenceList");
+			doc.createElementNS(
+				WSConstants.ENC_NS,
+				WSConstants.ENC_PREFIX + ":ReferenceList");
 		for (int i = 0; i < encDataRefs.size(); i++) {
 			String dataReferenceUri = (String) encDataRefs.get(i);
 			Element dataReference =
-				doc.createElementNS(WSConstants.ENC_NS, "xenc:DataReference");
+				doc.createElementNS(
+					WSConstants.ENC_NS,
+					WSConstants.ENC_PREFIX + ":DataReference");
 			dataReference.setAttributeNS(null, "URI", dataReferenceUri);
 			referenceList.appendChild(dataReference);
 		}

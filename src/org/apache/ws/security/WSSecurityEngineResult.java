@@ -17,34 +17,48 @@
 
 package org.apache.ws.security;
 
-import java.util.Vector;
+import java.security.Principal;
+import java.security.cert.X509Certificate;
+
 
 /**
  * @author Werner Dittmann (Werner.Dittmann@siemens.com)
  */
 public class WSSecurityEngineResult {
 	
-	private Vector actions;
-	private Vector principals;
+	private int action;
+	private Principal principal;
+	private X509Certificate cert;
 
-	WSSecurityEngineResult(Vector princ, Vector act) {
-		principals = princ;
-		actions = act;
+	WSSecurityEngineResult(
+		Principal princ,
+		int act,
+		X509Certificate certificate) {
+		principal = princ;
+		action = act;
+		cert = certificate;
 	}
 	/**
 	 * @return the actions vector. These actions were performed
 	 * by the the security engine.
 	 */
-	public Vector getActions() {
-		return actions;
+	public int getAction() {
+		return action;
 	}
 
 	/**
 	 * @return the principals found if UsernameToken or Signature
 	 * processing were done
 	 */
-	public Vector getPrincipals() {
-		return principals;
+	public Principal getPrincipal() {
+		return principal;
+	}
+	/**
+	 * @return the Certificate found if Signature
+	 * processing were done
+	 */
+	public X509Certificate getCertificate() {
+		return cert;
 	}
 
 }

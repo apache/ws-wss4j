@@ -157,14 +157,14 @@ public class WSSecurityEngine {
      * 					was done  
      * @throws Exception 
      */
-	public WSSecurityEngineResult processSecurityHeader(Document doc, 
+	public Vector processSecurityHeader(Document doc, 
 										   String actor, 
 										   CallbackHandler cb, 
 										   Crypto crypto) throws Exception {
 		return processSecurityHeader(doc, actor, cb, crypto, crypto);	
 	}
 	
-	public WSSecurityEngineResult processSecurityHeader(Document doc, 
+	public Vector processSecurityHeader(Document doc, 
 										   String actor, 
 										   CallbackHandler cb, 
 										   Crypto sigCrypto, 
@@ -189,7 +189,7 @@ public class WSSecurityEngine {
         Element elem = null;
         Attr attr = null;
         String headerActor = null;
-		WSSecurityEngineResult wsResult = null;
+		Vector wsResult = null;
 		SOAPConstants sc = WSSecurityUtil.getSOAPConstants(doc.getDocumentElement());
 
         for (int i = 0; i < len; i++) {
@@ -241,7 +241,7 @@ public class WSSecurityEngine {
      * 						was done.
      * @throws Exception 
      */
-    protected WSSecurityEngineResult processSecurityHeader(Element securityHeader, 
+    protected Vector processSecurityHeader(Element securityHeader, 
     									   CallbackHandler cb,
     									   Crypto sigCrypto,
     									   Crypto decCrypto) throws Exception {
@@ -267,8 +267,7 @@ public class WSSecurityEngine {
 		if( tlog.isDebugEnabled() ) {
 			t1=System.currentTimeMillis();
 		}
-		Vector actions = new Vector();
-		Vector principals = new Vector();
+		Vector returnResults = new Vector();
 		
         for (int i = 0; i < len; i++) {
             elem = list.item(i);
@@ -285,8 +284,9 @@ public class WSSecurityEngine {
 												  "noSigCryptoFile");
 				}
 				WSDocInfoStore.store(wsDocInfo);
+				X509Certificate[] returnCert = new X509Certificate[1];
 				try {
-					lastPrincipalFound = verifyXMLSignature((Element) elem, sigCrypto);
+					lastPrincipalFound = verifyXMLSignature((Element) elem, sigCrypto, returnCert);
 				}
 				catch (Exception ex) {
 					throw ex;
@@ -294,8 +294,12 @@ public class WSSecurityEngine {
 				finally {
 					WSDocInfoStore.delete(wsDocInfo);        
 				}
-				actions.add(0, new Integer(WSConstants.SIGN));
-				principals.add(0, lastPrincipalFound);
+				returnResults.add(
+					0,
+					new WSSecurityEngineResult(
+						lastPrincipalFound,
+						WSConstants.SIGN,
+						returnCert[0]));
             } else if (el.equals(ENCRYPTED_KEY)) {
             	if (doDebug) {
 					log.debug("Found encrypted key element");
@@ -309,8 +313,9 @@ public class WSSecurityEngine {
 												  "noCallback");
 				}
                 handleEncryptedKey((Element) elem, cb, decCrypto);
-				actions.add(0, new Integer(WSConstants.ENCR));
-				principals.add(0, null);
+				returnResults.add(
+					0,
+					new WSSecurityEngineResult(null, WSConstants.ENCR, null));
             } else if (el.equals(REFERENCE_LIST)) {
             	if (doDebug) {
 					log.debug("Found reference list element");
@@ -320,8 +325,9 @@ public class WSSecurityEngine {
 												  "noCallback");
 				}
                 handleReferenceList((Element) elem, cb);
-				actions.add(0, new Integer(WSConstants.ENCR));
-				principals.add(0, null);
+				returnResults.add(
+					0,
+					new WSSecurityEngineResult(null, WSConstants.ENCR, null));
            } else if (el.equals(USERNAME_TOKEN)) {
 				if (doDebug) {
 					log.debug("Found UsernameToken list element");
@@ -331,8 +337,12 @@ public class WSSecurityEngine {
 												  "noCallback");
 				}
                 lastPrincipalFound = handleUsernameToken((Element) elem, cb);
-				actions.add(0, new Integer(WSConstants.UT));
-				principals.add(0, lastPrincipalFound);
+				returnResults.add(
+					0,
+					new WSSecurityEngineResult(
+						lastPrincipalFound,
+						WSConstants.UT,
+						null));
 			} else if (el.equals(TIMESTAMP)) {
 				if (doDebug) {
 					log.debug("Found Timestamp list element");
@@ -357,7 +367,7 @@ public class WSSecurityEngine {
 			", prepare= " + (t1-t0) +
 			", handle= " + (t2-t1));
 		}
-        return new WSSecurityEngineResult(principals, actions);
+        return returnResults;
     }
 
     /**
@@ -394,7 +404,11 @@ public class WSSecurityEngine {
      * 					principal for further authentication or authorization. 
      * @throws Exception 
      */
-    protected Principal verifyXMLSignature(Element elem, Crypto crypto) throws Exception {
+	protected Principal verifyXMLSignature(
+		Element elem,
+		Crypto crypto,
+		X509Certificate[] returnCert)
+		throws Exception {
         if (doDebug) {
 			log.debug("Verify XML Signature");
         }
@@ -448,7 +462,8 @@ public class WSSecurityEngine {
 					tlog.debug("Verify: total= " + (t2-t0) + 
 					", prepare-cert= " + (t1-t0) +
 					", verify= " + (t2-t1));
-				}        			
+				}
+				returnCert[0] = certs[0];
 				return certs[0].getSubjectDN();
 			}
         }
