@@ -24,7 +24,7 @@ import java.io.Serializable;
  * An interface definining SOAP constants.  This allows various parts of the
  * engine to avoid hardcoding dependence on a particular SOAP version and its
  * associated URIs, etc.
- *
+ * <p/>
  * This might be fleshed out later to encapsulate factories for behavioral
  * objects which act differently depending on the SOAP version, but for now
  * it just supplies common namespaces + QNames.
@@ -33,9 +33,13 @@ import java.io.Serializable;
  * @author Andras Avar (andras.avar@nokia.com)
  */
 public interface SOAPConstants extends Serializable {
-    /** SOAP 1.1 constants - thread-safe and shared */
+    /**
+     * SOAP 1.1 constants - thread-safe and shared
+     */
     public SOAP11Constants SOAP11_CONSTANTS = new SOAP11Constants();
-    /** SOAP 1.2 constants - thread-safe and shared */
+    /**
+     * SOAP 1.2 constants - thread-safe and shared
+     */
     public SOAP12Constants SOAP12_CONSTANTS = new SOAP12Constants();
 
     /**
@@ -60,14 +64,12 @@ public interface SOAPConstants extends Serializable {
 
     /**
      * Obtain the "next" role/actor URI
-     */ 
+     */
     public String getNextRoleURI();
-    
+
     /**
      * Obtain the "next" role/actor URI
-     */ 
+     */
     public String getMustunderstand();
-
-
 
 }

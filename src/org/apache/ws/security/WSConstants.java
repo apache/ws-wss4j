@@ -47,6 +47,7 @@ public class WSConstants {
      * Using {@link #OASIS_2002} enhances chances of interoperability with other
      * WSS implementations that do not fully adhere to the OASIS v1.0 March 2004
      * specs yet.
+     *
      * @param specs instructs WSS4J on which standard to follow
      */
     public static final int COMPLIANCE_MODE = OASIS_1_0;
@@ -57,10 +58,10 @@ public class WSConstants {
     public static final String WSSE_NS_OASIS_1_0 = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd";
     public static String WSSE_NS = WSSE_NS_OASIS_1_0;
     public static final String[] WSSE_NS_ARRAY =
-        new String[] { WSSE_NS_OASIS_1_0,
-                       WSSE_NS_OASIS_2003_06,
-                       WSSE_NS_OASIS_2002_12,
-                       WSSE_NS_OASIS_2002_07 };
+            new String[]{WSSE_NS_OASIS_1_0,
+                         WSSE_NS_OASIS_2003_06,
+                         WSSE_NS_OASIS_2002_12,
+                         WSSE_NS_OASIS_2002_07};
     public static final String USERNAMETOKEN_NS = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0";
     public static final String SOAPMESSAGE_NS = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0";
     public static final String X509TOKEN_NS = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0";
@@ -72,10 +73,10 @@ public class WSConstants {
     public static final String WSU_NS_OASIS_1_0 = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd";
     public static String WSU_NS = WSU_NS_OASIS_1_0;
     public static final String[] WSU_NS_ARRAY =
-        new String[] { WSU_NS_OASIS_1_0,
-                       WSU_NS_OASIS_2003_06,
-                       WSU_NS_OASIS_2002_12,
-                       WSU_NS_OASIS_2002_07 };
+            new String[]{WSU_NS_OASIS_1_0,
+                         WSU_NS_OASIS_2003_06,
+                         WSU_NS_OASIS_2002_12,
+                         WSU_NS_OASIS_2002_07};
     public static final String WSU_PREFIX = "wsu";
     public static final String SIG_NS = "http://www.w3.org/2000/09/xmldsig#";
     public static final String SIG_PREFIX = "ds";
@@ -95,21 +96,21 @@ public class WSConstants {
     public static final String PASSWORD_TYPE_ATTR = "Type";
     public static final String NONCE_LN = "Nonce";
     public static final String CREATED_LN = "Created";
-    public static final String EXPIRES_LN ="Expires";
+    public static final String EXPIRES_LN = "Expires";
 
     public static final String SAML_NS = "urn:oasis:names:tc:SAML:1.0:assertion";
     public static final String SAMLP_NS = "urn:oasis:names:tc:SAML:1.0:protocol";
     public static final String ASSERTION_LN = "Assertion";
     public static final String WSS_SAML_NS = "http://docs.oasis-open.org/wss/2004/XX/oasis-2004XX-wss-saml-token-profile-1.0#";
-    public static final String WSS_SAML_ASSERTION =    "SAMLAssertion-1.1";
-    
+    public static final String WSS_SAML_ASSERTION = "SAMLAssertion-1.1";
+
     //
     // SOAP-ENV Namespaces
     //
     public static final String URI_SOAP11_ENV =
-                                "http://schemas.xmlsoap.org/soap/envelope/" ;
+            "http://schemas.xmlsoap.org/soap/envelope/";
     public static final String URI_SOAP12_ENV =
-                                   "http://www.w3.org/2003/05/soap-envelope";
+            "http://www.w3.org/2003/05/soap-envelope";
 
     public static final String[] URIS_SOAP_ENV = {
         URI_SOAP11_ENV,
@@ -118,26 +119,25 @@ public class WSConstants {
 
     // Misc SOAP Namespaces / URIs
     public static final String URI_SOAP11_NEXT_ACTOR =
-                                     "http://schemas.xmlsoap.org/soap/actor/next" ;
+            "http://schemas.xmlsoap.org/soap/actor/next";
     public static final String URI_SOAP12_NEXT_ROLE =
-                                     "http://www.w3.org/2003/05/soap-envelope/role/next";
+            "http://www.w3.org/2003/05/soap-envelope/role/next";
     public static final String URI_SOAP12_NONE_ROLE =
-                         "http://www.w3.org/2003/05/soap-envelope/role/none";
+            "http://www.w3.org/2003/05/soap-envelope/role/none";
     public static final String URI_SOAP12_ULTIMATE_ROLE =
-             "http://www.w3.org/2003/05/soap-envelope/role/ultimateReceiver";
+            "http://www.w3.org/2003/05/soap-envelope/role/ultimateReceiver";
 
-    public static final String ELEM_ENVELOPE = "Envelope" ;
-    public static final String ELEM_HEADER   = "Header" ;
-    public static final String ELEM_BODY     = "Body" ;
+    public static final String ELEM_ENVELOPE = "Envelope";
+    public static final String ELEM_HEADER = "Header";
+    public static final String ELEM_BODY = "Body";
 
-    public static final String ATTR_MUST_UNDERSTAND = "mustUnderstand" ;
-    public static final String ATTR_ACTOR           = "actor" ;
-    public static final String ATTR_ROLE            = "role" ;
-
+    public static final String ATTR_MUST_UNDERSTAND = "mustUnderstand";
+    public static final String ATTR_ACTOR = "actor";
+    public static final String ATTR_ROLE = "role";
 
     /**
      * Sets the {@link org.apache.ws.security.message.WSSAddUsernameToken#build(Document, String, String) UserNameToken}
-     * method to use a password digest to send the password information 
+     * method to use a password digest to send the password information
      * <p/>
      * This is a required method as defined by WS Specification, Username token profile.
      */
@@ -145,18 +145,18 @@ public class WSConstants {
     public static final String PASSWORD_DIGEST = USERNAMETOKEN_NS + "#PasswordDigest";
 
     /**
-    * Sets the {@link org.apache.ws.security.message.WSSAddUsernameToken#build(Document, String, String) UserNameToken}
-    * method to send the password in clear 
-    * <p/>
-    * This is a required method as defined by WS Specification, Username token profile.
-    */
+     * Sets the {@link org.apache.ws.security.message.WSSAddUsernameToken#build(Document, String, String) UserNameToken}
+     * method to send the password in clear
+     * <p/>
+     * This is a required method as defined by WS Specification, Username token profile.
+     */
     public static final String PW_TEXT = "PasswordText";
 
     public static final String PASSWORD_TEXT = USERNAMETOKEN_NS + "#PasswordText";
 
     /**
      * Sets the {@link org.apache.ws.security.message.WSEncryptBody#build(Document, Crypto) encryption}
-     * method to encrypt the symmetric data encryption key with the RSA algoritm. 
+     * method to encrypt the symmetric data encryption key with the RSA algoritm.
      * <p/>
      * This is a required method as defined by XML encryption.
      */
@@ -168,7 +168,7 @@ public class WSConstants {
      * <p/>
      * This is a required method as defined by XML encryption.
      * <p/>
-     * NOTE: This algorithm is not yet supported by WSS4J 
+     * NOTE: This algorithm is not yet supported by WSS4J
      */
     public static final String KEYTRANSPORT_RSAOEP = EncryptionConstants.ALGO_ID_KEYTRANSPORT_RSAOAEP;
 
@@ -208,7 +208,7 @@ public class WSConstants {
      * Sets the {@link org.apache.ws.security.message.WSSignEnvelope#build(Document, Crypto) signature}
      * method to use DSA with SHA1 (DSS) to sign data.
      * <p/>
-     * This is a required method as defined by XML signature. 
+     * This is a required method as defined by XML signature.
      */
     public static final String DSA = XMLSignature.ALGO_ID_SIGNATURE_DSA;
 
@@ -216,7 +216,7 @@ public class WSConstants {
      * Sets the {@link org.apache.ws.security.message.WSSignEnvelope#build(Document, Crypto) signature}
      * method to use RSA with SHA to sign data.
      * <p/>
-     * This is a recommended method as defined by XML signature. 
+     * This is a recommended method as defined by XML signature.
      */
     public static final String RSA = XMLSignature.ALGO_ID_SIGNATURE_RSA_SHA1;
 
@@ -226,18 +226,18 @@ public class WSConstants {
     public static final String C14N_EXCL_WITH_COMMENTS = Canonicalizer.ALGO_ID_C14N_EXCL_WITH_COMMENTS;
 
     /**
-     * Sets the {@link org.apache.ws.security.message.WSSignEnvelope#build(Document, Crypto) signing} 
-     * method to send the signing certificate as a 
-     * <code>BinarySecurityToken</code>. 
+     * Sets the {@link org.apache.ws.security.message.WSSignEnvelope#build(Document, Crypto) signing}
+     * method to send the signing certificate as a
+     * <code>BinarySecurityToken</code>.
      * <p/>
-     * The signing method takes the signing certificate, converts it to a 
-     * <code>BinarySecurityToken</code>, puts it in the security header, 
+     * The signing method takes the signing certificate, converts it to a
+     * <code>BinarySecurityToken</code>, puts it in the security header,
      * and inserts a <code>Reference</code> to the binary security token
      * into the <code>wsse:SecurityReferenceToken</code>. Thus the whole
      * signing certificate is transfered to the receiver.
-     * The X509 profile recommends to use {@link #ISSUER_SERIAL} instead 
+     * The X509 profile recommends to use {@link #ISSUER_SERIAL} instead
      * of sending the whole certificate.
-     * <p/> 
+     * <p/>
      * Please refer to WS Security specification X509 profile, chapter 3.3.2
      * and to WS Security specification, chapter 7.2
      * <p/>
@@ -246,43 +246,42 @@ public class WSConstants {
     public static final int BST_DIRECT_REFERENCE = 1;
 
     /**
-     * Sets the {@link org.apache.ws.security.message.WSSignEnvelope#build(Document, Crypto) signing} 
+     * Sets the {@link org.apache.ws.security.message.WSSignEnvelope#build(Document, Crypto) signing}
      * or the {@link org.apache.ws.security.message.WSEncryptBody#build(Document, Crypto) encryption}
      * method to send the issuer name and the serial number of a
-     * certificate to the receiver.  
+     * certificate to the receiver.
      * <p/>
-     * In contrast to {@link #BST_DIRECT_REFERENCE} only the issuer name 
+     * In contrast to {@link #BST_DIRECT_REFERENCE} only the issuer name
      * and the serial number of the signiung certificate are sent to the
      * receiver. This reduces the amount of data being sent. The ecnryption
      * method uses the private key associated with this certificate to encrypt
      * the symmetric key used to encrypt data.
      * <p/>
      * Please refer to WS Security specification X509 profile, chapter 3.3.3
-     * 
      */
     public static final int ISSUER_SERIAL = 2;
 
-   /**
+    /**
      * Sets the {@link org.apache.ws.security.message.WSEncryptBody#build(Document, Crypto) encryption}
-     * method to send the certificate used to encrypt the symmetric key.  
+     * method to send the certificate used to encrypt the symmetric key.
      * <p/>
      * The encryption method uses the private key associated with this certificate
-     * to encrypr the symmetric key used to encrypt data. The certificate is 
-     * converted into a <code>KeyIdentfier</code> token and sent to the receiver. 
+     * to encrypr the symmetric key used to encrypt data. The certificate is
+     * converted into a <code>KeyIdentfier</code> token and sent to the receiver.
      * Thus the complete certificate data is transfered to receiver.
-     * The X509 profile recommends to use {@link #ISSUER_SERIAL} instead 
+     * The X509 profile recommends to use {@link #ISSUER_SERIAL} instead
      * of sending the whole certificate.
-     * 
-     * <p/> 
+     * <p/>
+     * <p/>
      * Please refer to WS Security specification X509 profile, chapter 7.3
      */
     public static final int X509_KEY_IDENTIFIER = 3;
     /**
-     * Sets the 
+     * Sets the
      * {@link org.apache.ws.security.message.WSSignEnvelope#build(Document, Crypto)
-     *  signing}
+     * signing}
      * method to send a <code>SubjectKeyIdentifier</code> to identify
-     * the signing certificate.   
+     * the signing certificate.
      * <p/>
      * Refer to WS Security specification X509 profile, chapter 3.3.1
      * This identification token is not yet fully tested by WSS4J. The
@@ -290,9 +289,9 @@ public class WSConstants {
      * <code>BinarySecurityToken</code> in the request message.
      */
     public static final int SKI_KEY_IDENTIFIER = 4;
-      
+
     /**
-     * Embeds a keyinfo/key name into the EncryptedData element.  
+     * Embeds a keyinfo/key name into the EncryptedData element.
      * <p/>
      * Refer to WS Security specification X509 profile
      */
@@ -301,12 +300,12 @@ public class WSConstants {
      * Embeds a keyinfo/wsse:SecurityTokenReference into EncryptedData element.
      */
     public static final int EMBED_SECURITY_TOKEN_REF = 6;
-    
+
     public static final int NO_SECURITY = 0;
     public static final int UT = 0x1; // perform UsernameToken only
     public static final int SIGN = 0x2; // Perform Signature
     public static final int ENCR = 0x4; // Perform Encryption
-    
+
     /*
      * Attention: the signed/Unsigned types identify if WSS4J uses
      * the SAML token for signature, signature key or not. It does
@@ -319,11 +318,11 @@ public class WSConstants {
 
     public static final int NO_SERIALIZE = 0x100;
     public static final int SERIALIZE = 0x200;
-    
+
     static {
         setComplianceMode();
     }
-    
+
     /**
      * init various constants to the chosen compliance mode
      */

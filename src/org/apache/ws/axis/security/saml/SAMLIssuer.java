@@ -26,7 +26,7 @@ import org.w3c.dom.Document;
 /**
  * Builds a WS SAML Assertion and inserts it into the SOAP Envelope.
  * Refer to the WS specification, SAML Token profile
- * 
+ *
  * @author Davanum Srinivas (dims@yahoo.com).
  */
 
@@ -36,10 +36,10 @@ public interface SAMLIssuer {
      * Creates a new <code>SAMLAssertion</code>.
      * <p/>
      * A complete <code>SAMLAssertion</code> is constructed.
-     * 
-     * @param doc      The SOAP enevlope as W3C document
+     *
+     * @param doc        The SOAP enevlope as W3C document
      * @param msgContext the Axis message context to get message specific
-     *             parameter
+     *                   parameter
      * @return SAMLAssertion
      */
     public SAMLAssertion newAssertion();

@@ -23,17 +23,17 @@ package org.apache.ws.security.conversation.sessions;
  * @version 1.0
  */
 
-import java.net.URL;
-import java.util.Enumeration;
-import java.util.Hashtable;
-import java.util.Properties;
-import java.util.Vector;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.conversation.ConversationException;
 import org.apache.ws.security.conversation.ConversationSession;
 import org.apache.ws.security.util.Loader;
+
+import java.net.URL;
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.Properties;
+import java.util.Vector;
 
 public class SessionMonitor extends Thread {
 
@@ -62,25 +62,18 @@ public class SessionMonitor extends Thread {
     private long lastReaped = System.currentTimeMillis();
 
     public SessionMonitor(Hashtable sessionTable)
-        throws ConversationException {
+            throws ConversationException {
         //this.setPriority(Thread.MAX_PRIORITY);
         try {
             Properties prop = getProperties("SessionMonitor.properties");
             this.reapPeriodicity =
-                Long.parseLong(
-                    prop.getProperty(
-                        "org.apache.ws.security.converasation.session.reapPeriodicity"));
+                    Long.parseLong(prop.getProperty("org.apache.ws.security.converasation.session.reapPeriodicity"));
             this.sessionLifetime =
-                Long.parseLong(
-                    prop.getProperty(
-                        "org.apache.ws.security.converasation.session.sessionLifetime"));
-            log.debug(
-                "Reap periodicity from prop file: " + this.reapPeriodicity);
-            log.debug(
-                "Session lifetime from prop file: " + this.sessionLifetime);
+                    Long.parseLong(prop.getProperty("org.apache.ws.security.converasation.session.sessionLifetime"));
+            log.debug("Reap periodicity from prop file: " + this.reapPeriodicity);
+            log.debug("Session lifetime from prop file: " + this.sessionLifetime);
         } catch (Exception e) {
-            log.debug(
-                "SessionMonitor: Cannot load SessionMonitor.properties using defaults: \n"
+            log.debug("SessionMonitor: Cannot load SessionMonitor.properties using defaults: \n"
                     + "org.apache.ws.security.converasation.session.reapInterval="
                     + 60000
                     + "org.apache.ws.security.converasation.session.sessionLifetime"
@@ -95,10 +88,10 @@ public class SessionMonitor extends Thread {
     /**
      * STOLEN FROM  org.apache.ws.security.components.crypto.CryptoFactory
      * Gets the properties for SessionMonitor
-     * The functions loads the property file via 
+     * The functions loads the property file via
      * {@link Loader.getResource(String)}, thus the property file
-     * should be accesible via the classpath 
-     * 
+     * should be accesible via the classpath
+     *
      * @param propFilename the properties file to load
      * @return a <code>Properties</code> object loaded from the filename
      */
@@ -109,10 +102,8 @@ public class SessionMonitor extends Thread {
             properties.load(url.openStream());
             log.debug("SessionMonitor.properties found");
         } catch (Exception e) {
-            log.debug(
-                "Cannot find SessionMonitor property file: " + propFilename);
-            throw new RuntimeException(
-                "SessionMonitor: Cannot load properties: " + propFilename);
+            log.debug("Cannot find SessionMonitor property file: " + propFilename);
+            throw new RuntimeException("SessionMonitor: Cannot load properties: " + propFilename);
         }
         return properties;
     }
@@ -120,7 +111,7 @@ public class SessionMonitor extends Thread {
     public void run() {
         while (true) {
             long now = System.currentTimeMillis();
-            log.debug("Diff: " + (now -(lastReaped+ reapPeriodicity)));
+            log.debug("Diff: " + (now - (lastReaped + reapPeriodicity)));
             if (now > (lastReaped + reapPeriodicity)) {
                 log.debug("Special:Ruchith:Waiting to get session");
                 synchronized (this.sessionTable) {
@@ -129,7 +120,7 @@ public class SessionMonitor extends Thread {
                     while (keys.hasMoreElements()) {
                         String tempId = (String) keys.nextElement();
                         ConversationSession session =
-                            (ConversationSession) this.sessionTable.get(tempId);
+                                (ConversationSession) this.sessionTable.get(tempId);
                         synchronized (session) {
                             log.debug("Session: " + tempId);
                             if (this.isExpirable(session))
@@ -140,7 +131,7 @@ public class SessionMonitor extends Thread {
                 lastReaped = now;
             }
             try {
-                sleep(reapPeriodicity/2);
+                sleep(reapPeriodicity / 2);
             } catch (InterruptedException e) {
                 log.debug(e.getMessage());
             }

@@ -26,7 +26,7 @@ import java.net.URL;
 /**
  * Load resources (or images) from various sources.
  * <p/>
- * 
+ *
  * @author Davanum Srinivas (dims@yahoo.com).
  */
 public class Loader {
@@ -46,9 +46,9 @@ public class Loader {
      * built-in class loader in JDK 1.1.
      * </ol>
      * <p/>
-     * 
-     * @param resource 
-     * @return 
+     *
+     * @param resource
+     * @return
      */
     static public URL getResource(String resource) {
         ClassLoader classLoader = null;
@@ -79,10 +79,10 @@ public class Loader {
     /**
      * Get the Thread context class loader.
      * <p/>
-     * 
-     * @return 
-     * @throws IllegalAccessException    
-     * @throws InvocationTargetException 
+     *
+     * @return
+     * @throws IllegalAccessException
+     * @throws InvocationTargetException
      */
     private static ClassLoader getTCL() throws IllegalAccessException, InvocationTargetException {
         return Thread.currentThread().getContextClassLoader();
@@ -93,10 +93,10 @@ public class Loader {
      * <code>Thread</code> <code>contextClassLoader</code> if that
      * fails try Class.forname.
      * <p/>
-     * 
-     * @param clazz 
-     * @return 
-     * @throws ClassNotFoundException 
+     *
+     * @param clazz
+     * @return
+     * @throws ClassNotFoundException
      */
     static public Class loadClass(String clazz) throws ClassNotFoundException {
         try {

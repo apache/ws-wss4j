@@ -19,11 +19,11 @@ package org.apache.ws.security.util;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.SOAP11Constants;
 import org.apache.ws.security.SOAP12Constants;
 import org.apache.ws.security.SOAPConstants;
 import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.message.token.BinarySecurity;
@@ -70,13 +70,13 @@ public class WSSecurityUtil {
      * @param doc
      * @param actor
      * @return the <code>wsse:Security</code> element or
-     *             <code>null</code> if not such element found
+     *         <code>null</code> if not such element found
      */
     public static Element getSecurityHeader(WSSConfig wssConfig, Document doc, String actor, SOAPConstants sc) {
         Element soapHeaderElement =
-            (Element) getDirectChild(doc.getFirstChild(),
-                sc.getHeaderQName().getLocalPart(),
-                sc.getEnvelopeURI());
+                (Element) getDirectChild(doc.getFirstChild(),
+                        sc.getHeaderQName().getLocalPart(),
+                        sc.getEnvelopeURI());
 
         if (soapHeaderElement == null) { // no SOAP header at all
             return null;
@@ -103,8 +103,7 @@ public class WSSecurityUtil {
         String hActor;
         for (int i = 0; i < len; i++) {
             elem = (Element) list.item(i);
-            attr = elem.getAttributeNodeNS(
-                sc.getEnvelopeURI(), sc.getRoleAttributeQName().getLocalPart());
+            attr = elem.getAttributeNodeNS(sc.getEnvelopeURI(), sc.getRoleAttributeQName().getLocalPart());
             hActor = (attr != null) ? attr.getValue() : null;
             if (WSSecurityUtil.isActorEqual(actor, hActor)) {
                 return elem;
@@ -123,14 +122,14 @@ public class WSSecurityUtil {
      */
     public static boolean isActorEqual(String actor, String hActor) {
         if ((((hActor == null) || (hActor.length() == 0))
-             && ((actor == null) || (actor.length() == 0)))
-            || ((hActor != null)
+                && ((actor == null) || (actor.length() == 0)))
+                || ((hActor != null)
                 && (actor != null)
                 && hActor.equalsIgnoreCase(actor))) {
-                    return true;
-                } else {
-                    return false;
-                }
+            return true;
+        } else {
+            return false;
+        }
     }
 
     /**
@@ -148,11 +147,11 @@ public class WSSecurityUtil {
         for (Node currentChild = fNode.getFirstChild();
              currentChild != null;
              currentChild = currentChild.getNextSibling()) {
-                 if (localName.equals(currentChild.getLocalName()) &&
-                     namespace.equals(currentChild.getNamespaceURI())) {
-                         return currentChild;
-                     }
-             }
+            if (localName.equals(currentChild.getLocalName()) &&
+                    namespace.equals(currentChild.getNamespaceURI())) {
+                return currentChild;
+            }
+        }
         return null;
     }
 
@@ -160,25 +159,25 @@ public class WSSecurityUtil {
      * Gets a direct child with specified localname and one of the WSSE
      * namespaces.
      * <p/>
-     * 
-     * @param fNode            the node where to start the search
-     * @param localName        local name of the child to get
+     *
+     * @param fNode     the node where to start the search
+     * @param localName local name of the child to get
      * @return the node or <code>null</code> if not such node found
      */
     public static Node getDirectChildWSSE(Node fNode, String localName) {
-            Node child = null;
-            for (int i = 0; child == null && i < WSConstants.WSSE_NS_ARRAY.length; ++i) {
-                child = getDirectChild(fNode, localName, WSConstants.WSSE_NS_ARRAY[i]);
-            }
-            return child;
+        Node child = null;
+        for (int i = 0; child == null && i < WSConstants.WSSE_NS_ARRAY.length; ++i) {
+            child = getDirectChild(fNode, localName, WSConstants.WSSE_NS_ARRAY[i]);
+        }
+        return child;
     }
 
     /**
      * Gets a direct child with specified localname and one of the WSU namespaces.
      * <p/>
-     * 
-     * @param fNode            the node where to start the search
-     * @param localName        local name of the child to get
+     *
+     * @param fNode     the node where to start the search
+     * @param localName local name of the child to get
      * @return the node or <code>null</code> if not such node found
      */
     public static Node getDirectChildWSU(Node fNode, String localName) {
@@ -192,11 +191,11 @@ public class WSSecurityUtil {
     /**
      * Gets the attribute value with specified localname and WSU namespace.
      * <p/>
-     * 
-     * @param element          the Element which contains the attribute
-     * @param attrName         local name of the attribute
-     * @param wsuNamespace     the WSU namespace of the attribute to get.
-     *                         Pass null to try all WSU namespaces
+     *
+     * @param element      the Element which contains the attribute
+     * @param attrName     local name of the attribute
+     * @param wsuNamespace the WSU namespace of the attribute to get.
+     *                     Pass null to try all WSU namespaces
      */
     public static String getAttributeValueWSU(Element element, String attrName, String wsuNamespace) {
         if (wsuNamespace == null) {
@@ -213,11 +212,11 @@ public class WSSecurityUtil {
     /**
      * Gets the attribute value with specified localname and WSSE namespace.
      * <p/>
-     * 
-     * @param element          the Element which contains the attribute
-     * @param attrName         local name of the attribute
-     * @param wsseNamespace    the WSSE namespace of the attribute to get.
-     *                         Pass null to try all WSSE namespaces
+     *
+     * @param element       the Element which contains the attribute
+     * @param attrName      local name of the attribute
+     * @param wsseNamespace the WSSE namespace of the attribute to get.
+     *                      Pass null to try all WSSE namespaces
      */
     public static String getAttributeValueWSSE(Element element, String attrName, String wsseNamespace) {
         if (wsseNamespace == null) {
@@ -237,14 +236,13 @@ public class WSSecurityUtil {
      *
      * @param doc
      * @return the body element or <code>null</code> if document does not
-     *             contain a SOAP body
+     *         contain a SOAP body
      */
     public static Element findBodyElement(Document doc, SOAPConstants sc) {
         Element soapBodyElement =
-            (Element) WSSecurityUtil.getDirectChild(
-                doc.getFirstChild(),
-                sc.getBodyQName().getLocalPart(),
-                sc.getEnvelopeURI());
+                (Element) WSSecurityUtil.getDirectChild(doc.getFirstChild(),
+                        sc.getBodyQName().getLocalPart(),
+                        sc.getEnvelopeURI());
         return soapBodyElement;
     }
 
@@ -256,10 +254,10 @@ public class WSSecurityUtil {
      * the given namespace. It's somewhat faster than XPath, and we do
      * not deal with prefixes, just with the real namespace URI
      *
-     * @param startNode        Where to start the search
-     * @param name            Local name of the element
-     * @param namespace        Namespace URI of the element
-     * @return                The found element or <code>null</code>
+     * @param startNode Where to start the search
+     * @param name      Local name of the element
+     * @param namespace Namespace URI of the element
+     * @return The found element or <code>null</code>
      */
     public static Node findElement(Node startNode,
                                    String name,
@@ -278,17 +276,17 @@ public class WSSecurityUtil {
         while (startNode != null) {
             // start node processing at this point
             if (startNode.getNodeType() == Node.ELEMENT_NODE
-                && startNode.getLocalName().equals(name)) {
-                    String ns = startNode.getNamespaceURI();
-                    if (ns != null && ns.equals(namespace)) {
-                        return startNode;
-                    }
-
-                    if ((namespace == null || namespace.length() == 0)
-                        && (ns == null || ns.length() == 0)) {
-                            return startNode;
-                        }
+                    && startNode.getLocalName().equals(name)) {
+                String ns = startNode.getNamespaceURI();
+                if (ns != null && ns.equals(namespace)) {
+                    return startNode;
                 }
+
+                if ((namespace == null || namespace.length() == 0)
+                        && (ns == null || ns.length() == 0)) {
+                    return startNode;
+                }
+            }
             processedNode = startNode;
             startNode = startNode.getFirstChild();
 
@@ -319,10 +317,10 @@ public class WSSecurityUtil {
      * the given namespace. It's somewhat faster than XPath, and we do
      * not deal with prefixes, just with the real namespace URI
      *
-     * @param startNode        Where to start the search
-     * @param value            Value of the Id attribute
-     * @param namespace        Namespace URI of the Id
-     * @return                The found element or <code>null</code>
+     * @param startNode Where to start the search
+     * @param value     Value of the Id attribute
+     * @param namespace Namespace URI of the Id
+     * @return The found element or <code>null</code>
      */
     public static Element findElementById(Node startNode,
                                           String value,
@@ -343,9 +341,9 @@ public class WSSecurityUtil {
             if (startNode.getNodeType() == Node.ELEMENT_NODE) {
                 Element se = (Element) startNode;
                 if (se.hasAttributeNS(namespace, "Id") &&
-                    value.equals(se.getAttributeNS(namespace, "Id"))) {
-                        return se;
-                    }
+                        value.equals(se.getAttributeNS(namespace, "Id"))) {
+                    return se;
+                }
             }
 
             processedNode = startNode;
@@ -370,8 +368,6 @@ public class WSSecurityUtil {
         return null;
     }
 
-
-
     /**
      * set the namespace if it is not set already.
      * <p/>
@@ -389,7 +385,7 @@ public class WSSecurityUtil {
             return pre;
         }
         element.setAttributeNS(WSConstants.XMLNS_NS,
-                               "xmlns:" + prefix, namespace);
+                "xmlns:" + prefix, namespace);
         return prefix;
     }
 
@@ -402,9 +398,9 @@ public class WSSecurityUtil {
                 Attr a = (Attr) attrs.item(n);
                 String name;
                 if ((name = a.getName()).startsWith("xmlns:") &&
-                    a.getNodeValue().equals(uri)) {
-                        return name.substring(6);
-                    }
+                        a.getNodeValue().equals(uri)) {
+                    return name.substring(6);
+                }
             }
             e = e.getParentNode();
         }
@@ -418,7 +414,7 @@ public class WSSecurityUtil {
                 attr = ((Element) e).getAttributeNode("xmlns");
             } else {
                 attr = ((Element) e).getAttributeNodeNS(WSConstants.XMLNS_NS,
-                                                        prefix);
+                        prefix);
             }
             if (attr != null) return attr.getValue();
             e = e.getParentNode();
@@ -484,7 +480,7 @@ public class WSSecurityUtil {
                 prefix = "ns" + i;
             }
             e.setAttributeNS(WSConstants.XMLNS_NS,
-                             "xmlns:" + prefix, uri);
+                    "xmlns:" + prefix, uri);
         }
         return prefix + ":" + qname.getLocalPart();
     }
@@ -493,11 +489,11 @@ public class WSSecurityUtil {
     /**
      * Search for an element given its wsu:id.
      * <p/>
-     * 
+     *
      * @param wssConfig
      * @param doc
-     * @param id  
-     * @return 
+     * @param id
+     * @return
      */
     public static Element getElementByWsuId(WSSConfig wssConfig, Document doc, String id) {
         if (id == null) {
@@ -523,10 +519,10 @@ public class WSSecurityUtil {
     /**
      * Search for an element given its generic id.
      * <p/>
-     * 
-     * @param doc 
-     * @param id  
-     * @return 
+     *
+     * @param doc
+     * @param id
+     * @return
      */
     public static Element getElementByGenId(Document doc, String id) {
         if (id == null) {
@@ -537,7 +533,7 @@ public class WSSecurityUtil {
             return null;
         }
         id = id.substring(1);
-            return WSSecurityUtil.findElementById(doc.getDocumentElement(), id, null);
+        return WSSecurityUtil.findElementById(doc.getDocumentElement(), id, null);
     }
 
     /**
@@ -553,13 +549,13 @@ public class WSSecurityUtil {
                                                     String wsuIdVal,
                                                     WSSConfig wssConfig) {
         Element retVal = doc.createElementNS(wssConfig.getWsseNS(),
-                                             "wsse:BinarySecurityToken");
+                "wsse:BinarySecurityToken");
         retVal.setAttributeNS(WSConstants.XMLNS_NS,
-                              "xmlns:wsu", wssConfig.getWsuNS());
+                "xmlns:wsu", wssConfig.getWsuNS());
         retVal.setAttributeNS(WSConstants.WSU_NS, "wsu:Id", wsuIdVal);
         retVal.setAttributeNS(null, "ValueType", X509Security.getType(wssConfig));
         retVal.setAttributeNS(null, "EncodingType",
-                    BinarySecurity.getBase64EncodingValue(wssConfig));
+                BinarySecurity.getBase64EncodingValue(wssConfig));
         return retVal;
     }
 
@@ -601,7 +597,7 @@ public class WSSecurityUtil {
             if (child.getNodeType() == Node.ELEMENT_NODE) {
                 Element elementChild = (Element) child;
                 if (namespaceUri.equals(elementChild.getNamespaceURI()) &&
-                    localName.equals(elementChild.getLocalName())) {
+                        localName.equals(elementChild.getLocalName())) {
                     return elementChild;
                 }
             }
@@ -657,19 +653,18 @@ public class WSSecurityUtil {
     /**
      * find the ws-security header block
      * <p/>
-     * 
-     * @param doc      
-     * @param envelope 
-     * @param doCreate 
-     * @return 
+     *
+     * @param doc
+     * @param envelope
+     * @param doCreate
+     * @return
      */
     public static Element findWsseSecurityHeaderBlock(WSSConfig wssConfig, Document doc, Element envelope, boolean doCreate) {
         SOAPConstants sc = getSOAPConstants(envelope);
         Element header = findChildElement(envelope, sc.getEnvelopeURI(), sc.getHeaderQName().getLocalPart());
         if (header == null) {
             if (doCreate) {
-                header = createElementInSameNamespace(
-                    envelope, sc.getHeaderQName().getLocalPart());
+                header = createElementInSameNamespace(envelope, sc.getHeaderQName().getLocalPart());
                 header = prependChildElement(doc, envelope, header, true);
             }
         }
@@ -741,22 +736,18 @@ public class WSSecurityUtil {
         return nsContext;
     }
 
-    public static SecretKey prepareSecretKey (String symEncAlgo,
-                                              byte[] rawKey)
-        throws WSSecurityException {
+    public static SecretKey prepareSecretKey(String symEncAlgo,
+                                             byte[] rawKey)
+            throws WSSecurityException {
 
-        JCEMapper.ProviderIdClass providerID = JCEMapper.translateURItoJCEID(
-            symEncAlgo);
-        if(providerID == null) {
-            throw new WSSecurityException(
-                WSSecurityException.UNSUPPORTED_ALGORITHM,
-                "unsupportedSymKey",
-                new Object[] { "No provider for: " + symEncAlgo });
+        JCEMapper.ProviderIdClass providerID = JCEMapper.translateURItoJCEID(symEncAlgo);
+        if (providerID == null) {
+            throw new WSSecurityException(WSSecurityException.UNSUPPORTED_ALGORITHM,
+                    "unsupportedSymKey",
+                    new Object[]{"No provider for: " + symEncAlgo});
         }
 
-        SecretKeySpec keySpec = new SecretKeySpec(
-            rawKey, JCEMapper.getJCEKeyAlgorithmFromURI(
-                symEncAlgo, providerID.getProviderId()));
+        SecretKeySpec keySpec = new SecretKeySpec(rawKey, JCEMapper.getJCEKeyAlgorithmFromURI(symEncAlgo, providerID.getProviderId()));
         return (SecretKey) keySpec;
     }
 
@@ -771,35 +762,31 @@ public class WSSecurityUtil {
     }
 
     public static Cipher getCipherInstance(String cipherAlgo)
-        throws WSSecurityException {
+            throws WSSecurityException {
         Cipher cipher = null;
         try {
             if (cipherAlgo.equalsIgnoreCase(WSConstants.KEYTRANSPORT_RSA15)) {
                 cipher = Cipher.getInstance("RSA/ECB/PKCS1PADDING", "BC");
             } else if (
-                cipherAlgo.equalsIgnoreCase(WSConstants.KEYTRANSPORT_RSAOEP)) {
-                    cipher = Cipher.getInstance("RSA/NONE/OAEPPADDING", "BC");
-                } else {
-                    throw new WSSecurityException(
-                        WSSecurityException.UNSUPPORTED_ALGORITHM,
+                    cipherAlgo.equalsIgnoreCase(WSConstants.KEYTRANSPORT_RSAOEP)) {
+                cipher = Cipher.getInstance("RSA/NONE/OAEPPADDING", "BC");
+            } else {
+                throw new WSSecurityException(WSSecurityException.UNSUPPORTED_ALGORITHM,
                         "unsupportedKeyTransp",
-                        new Object[] { cipherAlgo });
-                }
+                        new Object[]{cipherAlgo});
+            }
         } catch (NoSuchPaddingException ex) {
-            throw new WSSecurityException(
-                WSSecurityException.UNSUPPORTED_ALGORITHM,
-                "unsupportedKeyTransp",
-                new Object[] { "No such padding: " + cipherAlgo });
+            throw new WSSecurityException(WSSecurityException.UNSUPPORTED_ALGORITHM,
+                    "unsupportedKeyTransp",
+                    new Object[]{"No such padding: " + cipherAlgo});
         } catch (NoSuchProviderException ex) {
-            throw new WSSecurityException(
-                WSSecurityException.UNSUPPORTED_ALGORITHM,
-                "unsupportedKeyTransp",
-                new Object[] { "no provider: "+ cipherAlgo });
+            throw new WSSecurityException(WSSecurityException.UNSUPPORTED_ALGORITHM,
+                    "unsupportedKeyTransp",
+                    new Object[]{"no provider: " + cipherAlgo});
         } catch (NoSuchAlgorithmException ex) {
-            throw new WSSecurityException(
-                WSSecurityException.UNSUPPORTED_ALGORITHM,
-                "unsupportedKeyTransp",
-                new Object[] { "No such algorithm: " + cipherAlgo });
+            throw new WSSecurityException(WSSecurityException.UNSUPPORTED_ALGORITHM,
+                    "unsupportedKeyTransp",
+                    new Object[]{"No such algorithm: " + cipherAlgo});
         }
         return cipher;
     }
@@ -813,16 +800,15 @@ public class WSSecurityUtil {
      * @return The result fetched from the result vector, null if the result
      *         could not be found
      */
-    public static WSSecurityEngineResult fetchActionResult(
-        Vector wsResultVector, int action) {
+    public static WSSecurityEngineResult fetchActionResult(Vector wsResultVector, int action) {
         WSSecurityEngineResult wsResult = null;
 
         // Find the part of the security result that matches the given action
 
         for (int i = 0; i < wsResultVector.size(); i++) {
             // Check the result of every action whether it matches the given action
-            if (((WSSecurityEngineResult)wsResultVector.get(i)).getAction() == action) {
-                wsResult = (WSSecurityEngineResult)wsResultVector.get(i);
+            if (((WSSecurityEngineResult) wsResultVector.get(i)).getAction() == action) {
+                wsResult = (WSSecurityEngineResult) wsResultVector.get(i);
             }
         }
 

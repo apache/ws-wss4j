@@ -71,9 +71,7 @@ import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Hashtable;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.TimeZone;
 import java.util.Vector;
 
@@ -88,7 +86,7 @@ public class WSSecurityEngine {
     private static final String VALUE_TYPE = "ValueType";
     private static Log log = LogFactory.getLog(WSSecurityEngine.class.getName());
     private static Log tlog =
-        LogFactory.getLog("org.apache.ws.security.TIME");
+            LogFactory.getLog("org.apache.ws.security.TIME");
 
     private static final Class[] constructorType = {WSSConfig.class, org.w3c.dom.Element.class};
     private static boolean sigCheck = true;
@@ -142,9 +140,10 @@ public class WSSecurityEngine {
         Transform.init();
         try {
             Transform.register(STRTransform.implementedTransformURI,
-                "org.apache.ws.security.transform.STRTransform");
+                    "org.apache.ws.security.transform.STRTransform");
         } catch (Exception ex) {
-        };
+        }
+        ;
     }
 
     public WSSecurityEngine() {
@@ -179,24 +178,23 @@ public class WSSecurityEngine {
      * First check if a <code>wsse:Security</code> is availabe with the
      * defined actor.
      *
-     * @param doc        the SOAP envelope as {@link Document}
-     * @param actor        the engine works on behalf of this <code>actor</code>. Refer
-     *                     to the SOAP specification about <code>actor</code> or <code>role
-     *                     </code>
-     * @param cb        a callback hander to the caller to resolve passwords during
-     *                     encryption and {@link UsernameToken} handling
-     * @param crypto    the object that implements the access to the keystore and the
-     *                     handling of certificates.
-     * @return            a result vector
+     * @param doc    the SOAP envelope as {@link Document}
+     * @param actor  the engine works on behalf of this <code>actor</code>. Refer
+     *               to the SOAP specification about <code>actor</code> or <code>role
+     *               </code>
+     * @param cb     a callback hander to the caller to resolve passwords during
+     *               encryption and {@link UsernameToken} handling
+     * @param crypto the object that implements the access to the keystore and the
+     *               handling of certificates.
+     * @return a result vector
      * @throws WSSecurityException
      * @see WSSecurityEngine#processSecurityHeader(Element securityHeader, CallbackHandler cb,Crypto sigCrypto, Crypto decCrypto)
      */
-    public Vector processSecurityHeader(
-        Document doc,
-        String actor,
-        CallbackHandler cb,
-        Crypto crypto)
-        throws WSSecurityException {
+    public Vector processSecurityHeader(Document doc,
+                                        String actor,
+                                        CallbackHandler cb,
+                                        Crypto crypto)
+            throws WSSecurityException {
         return processSecurityHeader(doc, actor, cb, crypto, crypto);
     }
 
@@ -207,27 +205,26 @@ public class WSSecurityEngine {
      * First check if a <code>wsse:Security</code> is availabe with the
      * defined actor.
      *
-     * @param doc        the SOAP envelope as {@link Document}
-     * @param actor        the engine works on behalf of this <code>actor</code>. Refer
-     *                     to the SOAP specification about <code>actor</code> or <code>role
-     *                     </code>
+     * @param doc       the SOAP envelope as {@link Document}
+     * @param actor     the engine works on behalf of this <code>actor</code>. Refer
+     *                  to the SOAP specification about <code>actor</code> or <code>role
+     *                  </code>
      * @param cb        a callback hander to the caller to resolve passwords during
-     *                     encryption and {@link UsernameToken} handling
-     * @param sigCrypto    the object that implements the access to the keystore and the
-     *                     handling of certificates for Signature
-     * @param decCrypto    the object that implements the access to the keystore and the
-     *                     handling of certificates for Decryption
-     * @return            a result vector
+     *                  encryption and {@link UsernameToken} handling
+     * @param sigCrypto the object that implements the access to the keystore and the
+     *                  handling of certificates for Signature
+     * @param decCrypto the object that implements the access to the keystore and the
+     *                  handling of certificates for Decryption
+     * @return a result vector
      * @throws WSSecurityException
      * @see WSSecurityEngine#processSecurityHeader(Element securityHeader, CallbackHandler cb,Crypto sigCrypto, Crypto decCrypto)
      */
-    public Vector processSecurityHeader(
-        Document doc,
-        String actor,
-        CallbackHandler cb,
-        Crypto sigCrypto,
-        Crypto decCrypto)
-        throws WSSecurityException {
+    public Vector processSecurityHeader(Document doc,
+                                        String actor,
+                                        CallbackHandler cb,
+                                        Crypto sigCrypto,
+                                        Crypto decCrypto)
+            throws WSSecurityException {
 
         doDebug = log.isDebugEnabled();
         if (doDebug) {
@@ -266,22 +263,18 @@ public class WSSecurityEngine {
      * </ul>
      * <p/>
      *
-     * @param securityHeader
-     *            the <code>wsse:Security</code> header element
-     * @param cb
-     *            a callback hander to the caller to resolve passwords during
-     *            encryption and {@link UsernameToken}handling
-     * @param sigCrypto
-     *            the object that implements the access to the keystore and the
-     *            handling of certificates used for Signature
-     * @param decCrypto
-     *            the object that implements the access to the keystore and the
-     *            handling of certificates used for Decryption
+     * @param securityHeader the <code>wsse:Security</code> header element
+     * @param cb             a callback hander to the caller to resolve passwords during
+     *                       encryption and {@link UsernameToken}handling
+     * @param sigCrypto      the object that implements the access to the keystore and the
+     *                       handling of certificates used for Signature
+     * @param decCrypto      the object that implements the access to the keystore and the
+     *                       handling of certificates used for Decryption
      * @return a Vector of {@link WSSecurityEngineResult}. Each element in the
-     *             the Vector represents the result of a security action. The elements
-     *             are ordered according to the sequence of the security actions in the
-     *             wsse:Signature header. The Vector maybe empty if no security processing
-     *             was performed.
+     *         the Vector represents the result of a security action. The elements
+     *         are ordered according to the sequence of the security actions in the
+     *         wsse:Signature header. The Vector maybe empty if no security processing
+     *         was performed.
      * @throws WSSecurityException
      */
     protected Vector processSecurityHeader(Element securityHeader,
@@ -289,9 +282,9 @@ public class WSSecurityEngine {
                                            Crypto sigCrypto,
                                            Crypto decCrypto) throws WSSecurityException {
 
-        long t0=0, t1=0, t2=0;
-        if( tlog.isDebugEnabled() ) {
-            t0=System.currentTimeMillis();
+        long t0 = 0, t1 = 0, t2 = 0;
+        if (tlog.isDebugEnabled()) {
+            t0 = System.currentTimeMillis();
         }
         /*
          * Gather some info about the document to process and store
@@ -307,8 +300,8 @@ public class WSSecurityEngine {
         String localName = null;
         String namespace = null;
         Principal lastPrincipalFound = null;
-        if( tlog.isDebugEnabled() ) {
-            t1=System.currentTimeMillis();
+        if (tlog.isDebugEnabled()) {
+            t1 = System.currentTimeMillis();
         }
         Vector returnResults = new Vector();
 
@@ -324,22 +317,19 @@ public class WSSecurityEngine {
                 }
                 if (sigCrypto == null) {
                     throw new WSSecurityException(WSSecurityException.FAILURE,
-                                                  "noSigCryptoFile");
+                            "noSigCryptoFile");
                 }
                 WSDocInfoStore.store(wsDocInfo);
                 X509Certificate[] returnCert = new X509Certificate[1];
                 Vector returnQname[] = new Vector[1];
                 try {
                     lastPrincipalFound = verifyXMLSignature((Element) elem, sigCrypto, returnCert, returnQname);
-                }
-                catch (WSSecurityException ex) {
+                } catch (WSSecurityException ex) {
                     throw ex;
-                }
-                finally {
+                } finally {
                     WSDocInfoStore.delete(wsDocInfo);
                 }
-                returnResults.add(0, new WSSecurityEngineResult(
-                        WSConstants.SIGN, lastPrincipalFound, returnCert[0],
+                returnResults.add(0, new WSSecurityEngineResult(WSConstants.SIGN, lastPrincipalFound, returnCert[0],
                         returnQname[0]));
             } else if (el.equals(ENCRYPTED_KEY)) {
                 if (doDebug) {
@@ -347,45 +337,43 @@ public class WSSecurityEngine {
                 }
                 if (decCrypto == null) {
                     throw new WSSecurityException(WSSecurityException.FAILURE,
-                                                  "noDecCryptoFile");
+                            "noDecCryptoFile");
                 }
                 if (cb == null) {
                     throw new WSSecurityException(WSSecurityException.FAILURE,
-                                                  "noCallback");
+                            "noCallback");
                 }
                 handleEncryptedKey((Element) elem, cb, decCrypto);
-                returnResults.add(0, new WSSecurityEngineResult(
-                        WSConstants.ENCR, null, null, null));
+                returnResults.add(0, new WSSecurityEngineResult(WSConstants.ENCR, null, null, null));
             } else if (el.equals(REFERENCE_LIST)) {
                 if (doDebug) {
                     log.debug("Found reference list element");
                 }
                 if (cb == null) {
                     throw new WSSecurityException(WSSecurityException.FAILURE,
-                                                  "noCallback");
+                            "noCallback");
                 }
                 handleReferenceList((Element) elem, cb);
-                returnResults.add(0, new WSSecurityEngineResult(
-                        WSConstants.ENCR, null, null, null));
-           } else if (el.equals(usernameToken)) {
+                returnResults.add(0, new WSSecurityEngineResult(WSConstants.ENCR, null, null, null));
+            } else if (el.equals(usernameToken)) {
                 if (doDebug) {
                     log.debug("Found UsernameToken list element");
                 }
                 if (cb == null) {
                     throw new WSSecurityException(WSSecurityException.FAILURE,
-                                                  "noCallback");
+                            "noCallback");
                 }
                 lastPrincipalFound = handleUsernameToken((Element) elem, cb);
                 returnResults.add(0, new WSSecurityEngineResult(WSConstants.UT,
                         lastPrincipalFound, null, null));
-           } else if (el.equals(SAML_TOKEN)) {
-               if (doDebug) {
-                   log.debug("Found SAML Assertion element");
-               }
-               SAMLAssertion assertion = handleSAMLToken((Element) elem);
-               wsDocInfo.setAssertion((Element) elem);
-               returnResults.add(0,
-                       new WSSecurityEngineResult(WSConstants.ST_UNSIGNED, assertion));
+            } else if (el.equals(SAML_TOKEN)) {
+                if (doDebug) {
+                    log.debug("Found SAML Assertion element");
+                }
+                SAMLAssertion assertion = handleSAMLToken((Element) elem);
+                wsDocInfo.setAssertion((Element) elem);
+                returnResults.add(0,
+                        new WSSecurityEngineResult(WSConstants.ST_UNSIGNED, assertion));
             } else if (el.equals(timeStamp)) {
                 if (doDebug) {
                     log.debug("Found Timestamp list element");
@@ -395,11 +383,9 @@ public class WSSecurityEngine {
                  */
                 Timestamp timestamp = new Timestamp(wssConfig, (Element) elem);
                 handleTimestamp(timestamp);
-                returnResults.add(
-                    0,
-                    new WSSecurityEngineResult(
-                            WSConstants.TS,
-                            timestamp));
+                returnResults.add(0,
+                        new WSSecurityEngineResult(WSConstants.TS,
+                                timestamp));
             } else {
                 /*
                  * Add check for a BinarySecurityToken, add info to WSDocInfo. If BST is
@@ -407,15 +393,15 @@ public class WSSecurityEngine {
                  * bit) the processing of STR Transform.
                  */
                 if (doDebug) {
-                       log.debug("Unknown Element: " + elem.getLocalName() + " " + elem.getNamespaceURI());
+                    log.debug("Unknown Element: " + elem.getLocalName() + " " + elem.getNamespaceURI());
                 }
             }
         }
-        if( tlog.isDebugEnabled() ) {
-            t2=System.currentTimeMillis();
-            tlog.debug("processHeader: total= " + (t2-t0) +
-            ", prepare= " + (t1-t0) +
-            ", handle= " + (t2-t1));
+        if (tlog.isDebugEnabled()) {
+            t2 = System.currentTimeMillis();
+            tlog.debug("processHeader: total= " + (t2 - t0) +
+                    ", prepare= " + (t1 - t0) +
+                    ", handle= " + (t2 - t1));
         }
         return returnResults;
     }
@@ -433,43 +419,42 @@ public class WSSecurityEngine {
      * here:
      * <ul>
      * <li> A URI reference to a binary security token contained in the <code>wsse:Security
-     *         </code> header.  If the derefenced token is
-     *         of the correct type the contained certificate is extracted.
+     * </code> header.  If the derefenced token is
+     * of the correct type the contained certificate is extracted.
      * </li>
      * <li> Issuer name an serial number of the certificate. In this case the method
-     *         looks up the certificate in the keystore via the <code>crypto</code> parameter.
+     * looks up the certificate in the keystore via the <code>crypto</code> parameter.
      * </li>
      * </ul>
      * <p/>
      * The methods checks is the certificate is valid and calls the
      * {@link XMLSignature#checkSignatureValue(X509Certificate) verfication} function.
      *
-     * @param elem         the XMLSignature DOM Element.
-     * @param crypto    the object that implements the access to the keystore and the
-     *                     handling of certificates.
-     * @param returnCert verifyXMLSignature stores the certificate in the first
-     *                     entry of this array. Ther caller may then further validate
-     *                     the certificate
+     * @param elem        the XMLSignature DOM Element.
+     * @param crypto      the object that implements the access to the keystore and the
+     *                    handling of certificates.
+     * @param returnCert  verifyXMLSignature stores the certificate in the first
+     *                    entry of this array. Ther caller may then further validate
+     *                    the certificate
      * @param returnQname verifyXMLSignature store the Qnames of all signed elements
-     *                     in this Vector ordered according the sequence in the Signature
-     *                     header.
-     * @return             the subject principal of the validated X509 certificate (the
-     *                     authenticated subject). The calling function may use this
-     *                     principal for further authentication or authorization.
+     *                    in this Vector ordered according the sequence in the Signature
+     *                    header.
+     * @return the subject principal of the validated X509 certificate (the
+     *         authenticated subject). The calling function may use this
+     *         principal for further authentication or authorization.
      * @throws Exception
      */
-    protected Principal verifyXMLSignature(
-        Element elem,
-        Crypto crypto,
-        X509Certificate[] returnCert,
-        Vector[] returnQname)
-        throws WSSecurityException {
+    protected Principal verifyXMLSignature(Element elem,
+                                           Crypto crypto,
+                                           X509Certificate[] returnCert,
+                                           Vector[] returnQname)
+            throws WSSecurityException {
         if (doDebug) {
             log.debug("Verify XML Signature");
         }
-        long t0=0, t1=0, t2=0;
-        if( tlog.isDebugEnabled() ) {
-            t0=System.currentTimeMillis();
+        long t0 = 0, t1 = 0, t2 = 0;
+        if (tlog.isDebugEnabled()) {
+            t0 = System.currentTimeMillis();
         }
 
         XMLSignature sig = null;
@@ -493,22 +478,19 @@ public class WSSecurityEngine {
         if (/*crypto.getDefaultX509Alias() == null &&*/ info != null) {
             Node node;
             if (wssConfig.getProcessNonCompliantMessages()) {
-                node = WSSecurityUtil.getDirectChildWSSE(
-                        info.getElement(),
+                node = WSSecurityUtil.getDirectChildWSSE(info.getElement(),
                         SecurityTokenReference.SECURITY_TOKEN_REFERENCE);
             } else {
-                node = WSSecurityUtil.getDirectChild(
-                        info.getElement(),
+                node = WSSecurityUtil.getDirectChild(info.getElement(),
                         SecurityTokenReference.SECURITY_TOKEN_REFERENCE,
                         wssConfig.getWsseNS());
             }
             if (node == null) {
-                throw new WSSecurityException(
-                    WSSecurityException.INVALID_SECURITY,
-                    "unsupportedKeyInfo");
+                throw new WSSecurityException(WSSecurityException.INVALID_SECURITY,
+                        "unsupportedKeyInfo");
             }
             SecurityTokenReference secRef =
-                new SecurityTokenReference(wssConfig, (Element)node);
+                    new SecurityTokenReference(wssConfig, (Element) node);
 
             int docHash = elem.getOwnerDocument().hashCode();
             if (doDebug) {
@@ -528,21 +510,19 @@ public class WSSecurityEngine {
                 QName el = new QName(token.getNamespaceURI(), token.getLocalName());
                 if (token.getLocalName().equals(binaryToken.getLocalPart())) { // the namespace has already been checked
                     certs = getCertificatesTokenReference((Element) token, crypto);
-                }else if (el.equals(SAML_TOKEN)) {
+                } else if (el.equals(SAML_TOKEN)) {
                     certs = getCertificatesFromSAML((Element) token, crypto);
                 } else {
-                    throw new WSSecurityException(
-                        WSSecurityException.INVALID_SECURITY,
-                        "unsupportedKeyInfo", new Object[] { el.toString()});
+                    throw new WSSecurityException(WSSecurityException.INVALID_SECURITY,
+                            "unsupportedKeyInfo", new Object[]{el.toString()});
                 }
             } else if (secRef.containsX509IssuerSerial()) {
                 certs = secRef.getX509IssuerSerial(crypto);
             } else if (secRef.containsKeyIdentifier()) {
                 certs = secRef.getKeyIdentifier(crypto);
             } else {
-                throw new WSSecurityException(
-                        WSSecurityException.INVALID_SECURITY,
-                        "unsupportedKeyInfo", new Object[] { node.toString()});
+                throw new WSSecurityException(WSSecurityException.INVALID_SECURITY,
+                        "unsupportedKeyInfo", new Object[]{node.toString()});
             }
         } else if (crypto.getDefaultX509Alias() != null) {
             certs = crypto.getCertificates(crypto.getDefaultX509Alias());
@@ -559,20 +539,17 @@ public class WSSecurityEngine {
         try {
             certs[0].checkValidity();
         } catch (CertificateExpiredException e) {
-            throw new WSSecurityException(
-                WSSecurityException.FAILED_CHECK,
-                "invalidCert");
+            throw new WSSecurityException(WSSecurityException.FAILED_CHECK,
+                    "invalidCert");
         } catch (CertificateNotYetValidException e) {
-            throw new WSSecurityException(
-                WSSecurityException.FAILED_CHECK,
-                "invalidCert");
+            throw new WSSecurityException(WSSecurityException.FAILED_CHECK,
+                    "invalidCert");
         }
         try {
             if (sigCheck && sig.checkSignatureValue(certs[0])) {
                 if (tlog.isDebugEnabled()) {
                     t2 = System.currentTimeMillis();
-                    tlog.debug(
-                        "Verify: total= "
+                    tlog.debug("Verify: total= "
                             + (t2 - t0)
                             + ", prepare-cert= "
                             + (t1 - t0)
@@ -622,15 +599,14 @@ public class WSSecurityEngine {
      * Extracts the certificate(s) from the Binary Security token reference.
      * <p/>
      *
-     * @param elem        The element containing the binary security token. This
-     *                     is either X509 certificate(s) or a PKIPath.
-     * @return             an array of X509 certificates
-     * @throws             WSSecurityException
+     * @param elem The element containing the binary security token. This
+     *             is either X509 certificate(s) or a PKIPath.
+     * @return an array of X509 certificates
+     * @throws WSSecurityException
      */
-    protected X509Certificate[] getCertificatesTokenReference(
-        Element elem,
-        Crypto crypto)
-        throws WSSecurityException {
+    protected X509Certificate[] getCertificatesTokenReference(Element elem,
+                                                              Crypto crypto)
+            throws WSSecurityException {
         BinarySecurity token = createSecurityToken(elem);
         if (token instanceof PKIPathSecurity) {
             return ((PKIPathSecurity) token).getX509Certificates(false, crypto);
@@ -649,13 +625,12 @@ public class WSSecurityEngine {
      * Extracts the certificate(s) from the SAML token reference.
      * <p/>
      *
-     * @param elem        The element containing the SAML token.
-     * @return             an array of X509 certificates
-     * @throws             WSSecurityException
+     * @param elem The element containing the SAML token.
+     * @return an array of X509 certificates
+     * @throws WSSecurityException
      */
-    protected X509Certificate[] getCertificatesFromSAML (
-            Element elem,
-            Crypto crypto)
+    protected X509Certificate[] getCertificatesFromSAML(Element elem,
+                                                        Crypto crypto)
             throws WSSecurityException {
 
         /*
@@ -666,10 +641,9 @@ public class WSSecurityEngine {
         SAMLAssertion assertion;
         try {
             assertion = new SAMLAssertion(elem);
-        }
-        catch (SAMLException e) {
+        } catch (SAMLException e) {
             throw new WSSecurityException(WSSecurityException.FAILURE,
-                    "invalidSAMLToken", new Object[] { "for Signature (cannot parse)"});
+                    "invalidSAMLToken", new Object[]{"for Signature (cannot parse)"});
         }
         SAMLSubjectStatement samlSubjS = null;
         Iterator it = assertion.getStatements();
@@ -686,7 +660,7 @@ public class WSSecurityEngine {
         }
         if (samlSubj == null) {
             throw new WSSecurityException(WSSecurityException.FAILURE,
-                    "invalidSAMLToken", new Object[] { "for Signature (no Subject)"});
+                    "invalidSAMLToken", new Object[]{"for Signature (no Subject)"});
         }
 
 //        String confirmMethod = null;
@@ -716,30 +690,30 @@ public class WSSecurityEngine {
                 }
             }
             // TODO: get alias name for cert, check against username set by caller
-        }
-        catch (XMLSecurityException e3) {
+        } catch (XMLSecurityException e3) {
             throw new WSSecurityException(WSSecurityException.FAILURE,
                     "invalidSAMLsecurity",
-                    new Object[] { "cannot get certificate (key holder)"});
+                    new Object[]{"cannot get certificate (key holder)"});
         }
         return certs;
     }
+
     /**
      * Checks the <code>element</code> and creates appropriate binary security object.
      *
      * @param element The XML element that contains either a <code>BinarySecurityToken
-     * </code> or a <code>PKIPath</code> element. Other element types a not
-     * supported
-     * @return         the BinarySecurity object, either a <code>X509Security</code> or a
-     *                 <code>PKIPathSecurity</code> object.
-     * @throws         WSSecurityException
+     *                </code> or a <code>PKIPath</code> element. Other element types a not
+     *                supported
+     * @return the BinarySecurity object, either a <code>X509Security</code> or a
+     *         <code>PKIPathSecurity</code> object.
+     * @throws WSSecurityException
      */
     private BinarySecurity createSecurityToken(Element element) throws WSSecurityException {
         BinarySecurity token = new BinarySecurity(wssConfig, element);
         String type = token.getValueType();
         Class clazz = null;
         if (wssConfig.getProcessNonCompliantMessages() ||
-            wssConfig.isBSTValuesPrefixed()) {
+                wssConfig.isBSTValuesPrefixed()) {
             if (type.endsWith(X509Security.X509_V3)) {
                 clazz = X509Security.class;
             } else if (type.endsWith(PKIPathSecurity.X509PKI_PATH)) {
@@ -760,7 +734,7 @@ public class WSSecurityEngine {
             Constructor constructor = clazz.getConstructor(constructorType);
             if (constructor == null) {
                 throw new WSSecurityException(WSSecurityException.FAILURE,
-                    "invalidConstructor", new Object[]{clazz});
+                        "invalidConstructor", new Object[]{clazz});
             }
             return (BinarySecurity) constructor.newInstance(new Object[]{wssConfig, element});
         } catch (InvocationTargetException e) {
@@ -791,15 +765,13 @@ public class WSSecurityEngine {
         try {
             cb.handle(callbacks);
         } catch (IOException e) {
-            throw new WSSecurityException(
-                WSSecurityException.FAILURE,
-                "noPassword",
-                new Object[] { user });
+            throw new WSSecurityException(WSSecurityException.FAILURE,
+                    "noPassword",
+                    new Object[]{user});
         } catch (UnsupportedCallbackException e) {
-            throw new WSSecurityException(
-                WSSecurityException.FAILURE,
-                "noPassword",
-                new Object[] { user });
+            throw new WSSecurityException(WSSecurityException.FAILURE,
+                    "noPassword",
+                    new Object[]{user});
         }
         String origPassword = pwCb.getPassword();
         if (doDebug) {
@@ -868,16 +840,16 @@ public class WSSecurityEngine {
         // Validate whether the security semantics have expired
         Calendar rightNow = Calendar.getInstance();
         if (timestamp.getExpires().before(rightNow)) {
-            throw new WSSecurityException(WSSecurityException.INVALID_SECURITY, "invalidTimestamp", new Object[] {"The security semantics of message have expired"});
+            throw new WSSecurityException(WSSecurityException.INVALID_SECURITY, "invalidTimestamp", new Object[]{"The security semantics of message have expired"});
         }
 
         return;
     }
 
     public void handleEncryptedKey(Element xencEncryptedKey, CallbackHandler cb, Crypto crypto) throws WSSecurityException {
-        long t0=0, t1=0, t2=0;
-        if( tlog.isDebugEnabled() ) {
-            t0=System.currentTimeMillis();
+        long t0 = 0, t1 = 0, t2 = 0;
+        if (tlog.isDebugEnabled()) {
+            t0 = System.currentTimeMillis();
         }
         // need to have it to find the encryped data elements in the envelope
         Document doc = xencEncryptedKey.getOwnerDocument();
@@ -892,7 +864,7 @@ public class WSSecurityEngine {
                 "EncryptionMethod", WSConstants.ENC_NS);
         String keyEncAlgo = null;
         if (tmpE != null) {
-            keyEncAlgo = ((Element)tmpE).getAttribute("Algorithm");
+            keyEncAlgo = ((Element) tmpE).getAttribute("Algorithm");
         }
         if (keyEncAlgo == null) {
             throw new WSSecurityException
@@ -923,14 +895,14 @@ public class WSSecurityEngine {
         if (keyInfo != null) {
             Element secRefToken;
             if (wssConfig.getProcessNonCompliantMessages()) {
-                secRefToken = (Element)WSSecurityUtil.getDirectChildWSSE(keyInfo,
+                secRefToken = (Element) WSSecurityUtil.getDirectChildWSSE(keyInfo,
                         "SecurityTokenReference");
             } else {
                 secRefToken = (Element) WSSecurityUtil.getDirectChild(keyInfo,
                         "SecurityTokenReference", wssConfig.getWsseNS());
             }
             if (secRefToken == null) {
-                secRefToken = (Element)WSSecurityUtil.getDirectChild(keyInfo,
+                secRefToken = (Element) WSSecurityUtil.getDirectChild(keyInfo,
                         "KeyName", WSConstants.SIG_NS);
             }
             if (secRefToken == null) {
@@ -965,7 +937,7 @@ public class WSSecurityEngine {
                 X509Certificate[] certs = secRef.getKeyIdentifier(crypto);
                 if (certs == null || certs.length != 1 || certs[0] == null) {
                     throw new WSSecurityException(WSSecurityException.FAILURE,
-                        "invalidX509Data", new Object[]{"for decryption (KeyId)"});
+                            "invalidX509Data", new Object[]{"for decryption (KeyId)"});
                 }
                 /*
                  * Here we have the certificate. Now find the alias for it. Needed to identify
@@ -981,9 +953,8 @@ public class WSSecurityEngine {
 
                 // at this point ... check token type: Binary
                 QName el =
-                    new QName(
-                        bstElement.getNamespaceURI(),
-                        bstElement.getLocalName());
+                        new QName(bstElement.getNamespaceURI(),
+                                bstElement.getLocalName());
                 if (el.equals(binaryToken)) {
                     X509Security token = null;
                     String value = bstElement.getAttribute(VALUE_TYPE);
@@ -995,18 +966,16 @@ public class WSSecurityEngine {
                         }
                     }
                     if (!value.endsWith(X509Security.X509_V3)
-                        || ((token = new X509Security(wssConfig, bstElement)) == null)) {
-                        throw new WSSecurityException(
-                            WSSecurityException.UNSUPPORTED_SECURITY_TOKEN,
-                            "unsupportedBinaryTokenType",
-                            new Object[] { "for decryption (BST)" });
+                            || ((token = new X509Security(wssConfig, bstElement)) == null)) {
+                        throw new WSSecurityException(WSSecurityException.UNSUPPORTED_SECURITY_TOKEN,
+                                "unsupportedBinaryTokenType",
+                                new Object[]{"for decryption (BST)"});
                     }
                     X509Certificate cert = token.getX509Certificate(crypto);
                     if (cert == null) {
-                        throw new WSSecurityException(
-                            WSSecurityException.FAILURE,
-                            "invalidX509Data",
-                            new Object[] { "for decryption" });
+                        throw new WSSecurityException(WSSecurityException.FAILURE,
+                                "invalidX509Data",
+                                new Object[]{"for decryption"});
                     }
                     /*
                      * Here we have the certificate. Now find the alias for it. Needed to identify
@@ -1017,10 +986,9 @@ public class WSSecurityEngine {
                         log.debug("BST Alias: " + alias);
                     }
                 } else {
-                    throw new WSSecurityException(
-                        WSSecurityException.INVALID_SECURITY,
-                        "unsupportedToken",
-                        null);
+                    throw new WSSecurityException(WSSecurityException.INVALID_SECURITY,
+                            "unsupportedToken",
+                            null);
                 }
             } else if (secRef.containsKeyName()) {
                 // alias = secRef.getX509IssuerSerialAlias(crypto);
@@ -1032,14 +1000,13 @@ public class WSSecurityEngine {
                     log.debug("KeyName alias: " + alias);
                 }
             } else {
-                throw new WSSecurityException(
-                    WSSecurityException.FAILURE, "unsupportedKeyId");
+                throw new WSSecurityException(WSSecurityException.FAILURE, "unsupportedKeyId");
             }
-        } else if (crypto.getDefaultX509Alias() != null){
+        } else if (crypto.getDefaultX509Alias() != null) {
             alias = crypto.getDefaultX509Alias();
         } else {
             throw new WSSecurityException
-            (WSSecurityException.INVALID_SECURITY, "noKeyinfo");
+                    (WSSecurityException.INVALID_SECURITY, "noKeyinfo");
         }
         /*
           * At this point we have all information necessary to decrypt the session
@@ -1057,15 +1024,13 @@ public class WSSecurityEngine {
         try {
             cb.handle(callbacks);
         } catch (IOException e) {
-            throw new WSSecurityException(
-                WSSecurityException.FAILURE,
-                "noPassword",
-                new Object[] { alias });
+            throw new WSSecurityException(WSSecurityException.FAILURE,
+                    "noPassword",
+                    new Object[]{alias});
         } catch (UnsupportedCallbackException e) {
-            throw new WSSecurityException(
-                WSSecurityException.FAILURE,
-                "noPassword",
-                new Object[] { alias });
+            throw new WSSecurityException(WSSecurityException.FAILURE,
+                    "noPassword",
+                    new Object[]{alias});
         }
         String password = pwCb.getPassword();
         if (password == null) {
@@ -1073,30 +1038,23 @@ public class WSSecurityEngine {
                     "noPassword", new Object[]{alias});
         }
 
-
         try {
-            cipher.init(
-                Cipher.DECRYPT_MODE,
-                crypto.getPrivateKey(alias, password));
+            cipher.init(Cipher.DECRYPT_MODE,
+                    crypto.getPrivateKey(alias, password));
         } catch (InvalidKeyException e1) {
-            throw new WSSecurityException(
-                WSSecurityException.FAILED_ENC_DEC, null, null, e1);
+            throw new WSSecurityException(WSSecurityException.FAILED_ENC_DEC, null, null, e1);
         } catch (Exception e1) {
-            throw new WSSecurityException(
-                WSSecurityException.FAILED_ENC_DEC, null, null, e1);
+            throw new WSSecurityException(WSSecurityException.FAILED_ENC_DEC, null, null, e1);
         }
         try {
             decryptedBytes =
-                cipher.doFinal(getDecodedBase64EncodedData(xencCipherValue));
+                    cipher.doFinal(getDecodedBase64EncodedData(xencCipherValue));
         } catch (IllegalStateException e2) {
-            throw new WSSecurityException(
-                WSSecurityException.FAILED_ENC_DEC, null, null, e2);
+            throw new WSSecurityException(WSSecurityException.FAILED_ENC_DEC, null, null, e2);
         } catch (IllegalBlockSizeException e2) {
-            throw new WSSecurityException(
-                WSSecurityException.FAILED_ENC_DEC, null, null, e2);
+            throw new WSSecurityException(WSSecurityException.FAILED_ENC_DEC, null, null, e2);
         } catch (BadPaddingException e2) {
-            throw new WSSecurityException(
-                WSSecurityException.FAILED_ENC_DEC, null, null, e2);
+            throw new WSSecurityException(WSSecurityException.FAILED_ENC_DEC, null, null, e2);
         }
 
         if (tlog.isDebugEnabled()) {
@@ -1122,20 +1080,19 @@ public class WSSecurityEngine {
                     continue;
                 }
                 if (tmpE.getLocalName().equals("DataReference")) {
-                    dataRefURI = ((Element)tmpE).getAttribute("URI");
+                    dataRefURI = ((Element) tmpE).getAttribute("URI");
                     decryptDataRef(doc, dataRefURI, decryptedBytes);
-                }
-                else if (tmpE.getLocalName().equals("KeyReference")) {
-                    keyRefURI = ((Element)tmpE).getAttribute("URI");
+                } else if (tmpE.getLocalName().equals("KeyReference")) {
+                    keyRefURI = ((Element) tmpE).getAttribute("URI");
                 }
             }
         }
 
         if (tlog.isDebugEnabled()) {
-            t2=System.currentTimeMillis();
-            tlog.debug("XMLDecrypt: total= " + (t2-t0) +
-            ", get-sym-key= " + (t1-t0) +
-            ", decrypt= " + (t2-t1));
+            t2 = System.currentTimeMillis();
+            tlog.debug("XMLDecrypt: total= " + (t2 - t0) +
+                    ", get-sym-key= " + (t1 - t0) +
+                    ", decrypt= " + (t2 - t1));
         }
         return;
     }
@@ -1154,11 +1111,12 @@ public class WSSecurityEngine {
         }
         if (encBodyData == null) {
             throw new WSSecurityException
-            (WSSecurityException.INVALID_SECURITY,
-                    "dataRef", new Object[] {dataRefURI});
+                    (WSSecurityException.INVALID_SECURITY,
+                            "dataRef", new Object[]{dataRefURI});
         }
 
-        boolean content = isContent(encBodyData);;
+        boolean content = isContent(encBodyData);
+        ;
 
         // get the encryprion method
         String symEncAlgo = getEncAlgo(encBodyData);
@@ -1171,39 +1129,37 @@ public class WSSecurityEngine {
             xmlCipher = XMLCipher.getInstance(symEncAlgo);
             xmlCipher.init(XMLCipher.DECRYPT_MODE, symmetricKey);
         } catch (XMLEncryptionException e) {
-            throw new WSSecurityException(
-                WSSecurityException.UNSUPPORTED_ALGORITHM, null, null, e);
+            throw new WSSecurityException(WSSecurityException.UNSUPPORTED_ALGORITHM, null, null, e);
         }
 
         if (content) {
-            encBodyData = (Element)encBodyData.getParentNode();
+            encBodyData = (Element) encBodyData.getParentNode();
         }
         try {
             xmlCipher.doFinal(doc, encBodyData, content);
         } catch (Exception e1) {
-            throw new WSSecurityException(
-                WSSecurityException.FAILED_ENC_DEC, null, null, e1);
+            throw new WSSecurityException(WSSecurityException.FAILED_ENC_DEC, null, null, e1);
         }
     }
 
     /**
      * Dereferences and decodes encrypted data elements.
      *
-     * @param elem  contains the <code>ReferenceList</code> to the
-     *                 encrypted data elements
-     * @param cb    the callback handler to get the key for a key name
-     *                 stored if <code>KeyInfo</code> inside the encrypted
-     *                 data elements
+     * @param elem contains the <code>ReferenceList</code> to the
+     *             encrypted data elements
+     * @param cb   the callback handler to get the key for a key name
+     *             stored if <code>KeyInfo</code> inside the encrypted
+     *             data elements
      */
     private void handleReferenceList(Element elem, CallbackHandler cb)
-        throws WSSecurityException {
+            throws WSSecurityException {
 
         Document doc = elem.getOwnerDocument();
 
         Node tmpE = null;
         for (tmpE = elem.getFirstChild();
-            tmpE != null;
-            tmpE = tmpE.getNextSibling()) {
+             tmpE != null;
+             tmpE = tmpE.getNextSibling()) {
             if (tmpE.getNodeType() != Node.ELEMENT_NODE) {
                 continue;
             }
@@ -1211,7 +1167,7 @@ public class WSSecurityEngine {
                 continue;
             }
             if (tmpE.getLocalName().equals("DataReference")) {
-                String dataRefURI = ((Element)tmpE).getAttribute("URI");
+                String dataRefURI = ((Element) tmpE).getAttribute("URI");
                 decryptDataRefEmbedded(doc, dataRefURI, cb);
             } else if (tmpE.getLocalName().equals("KeyReference")) {
                 String keyRefURI = ((Element) tmpE).getAttribute("URI");
@@ -1219,11 +1175,10 @@ public class WSSecurityEngine {
         }
     }
 
-    private void decryptDataRefEmbedded(
-        Document doc,
-        String dataRefURI,
-        CallbackHandler cb)
-        throws WSSecurityException {
+    private void decryptDataRefEmbedded(Document doc,
+                                        String dataRefURI,
+                                        CallbackHandler cb)
+            throws WSSecurityException {
 
         if (doDebug) {
             log.debug("Embedded found data refernce: " + dataRefURI);
@@ -1238,8 +1193,8 @@ public class WSSecurityEngine {
         }
         if (encBodyData == null) {
             throw new WSSecurityException
-            (WSSecurityException.INVALID_SECURITY,
-                    "dataRef", new Object[] {dataRefURI});
+                    (WSSecurityException.INVALID_SECURITY,
+                            "dataRef", new Object[]{dataRefURI});
         }
 
         boolean content = isContent(encBodyData);
@@ -1248,12 +1203,11 @@ public class WSSecurityEngine {
         String symEncAlgo = getEncAlgo(encBodyData);
 
         Element tmpE =
-            (Element) WSSecurityUtil.findElement(
-                (Node) encBodyData,
-                "KeyName",
-                WSConstants.SIG_NS);
+                (Element) WSSecurityUtil.findElement((Node) encBodyData,
+                        "KeyName",
+                        WSConstants.SIG_NS);
 
-        byte[]decryptedBytes = getSharedKey(tmpE, cb);
+        byte[] decryptedBytes = getSharedKey(tmpE, cb);
 
         SecretKey symmetricKey = WSSecurityUtil.prepareSecretKey(symEncAlgo, decryptedBytes);
 
@@ -1263,18 +1217,16 @@ public class WSSecurityEngine {
             xmlCipher = XMLCipher.getInstance(symEncAlgo);
             xmlCipher.init(XMLCipher.DECRYPT_MODE, symmetricKey);
         } catch (XMLEncryptionException e1) {
-            throw new WSSecurityException(
-                WSSecurityException.UNSUPPORTED_ALGORITHM, null, null, e1);
+            throw new WSSecurityException(WSSecurityException.UNSUPPORTED_ALGORITHM, null, null, e1);
         }
 
         if (content) {
-            encBodyData = (Element)encBodyData.getParentNode();
+            encBodyData = (Element) encBodyData.getParentNode();
         }
         try {
             xmlCipher.doFinal(doc, encBodyData, content);
         } catch (Exception e) {
-            throw new WSSecurityException(
-                WSSecurityException.FAILED_ENC_DEC, null, null, e);
+            throw new WSSecurityException(WSSecurityException.FAILED_ENC_DEC, null, null, e);
         }
     }
 
@@ -1293,7 +1245,7 @@ public class WSSecurityEngine {
         String typeStr = null;
         boolean content = true;
         if (tmpE != null) {
-            typeStr= tmpE.getAttribute("Type");
+            typeStr = tmpE.getAttribute("Type");
         }
         if (typeStr != null) {
             content = typeStr.equals(WSConstants.ENC_NS + "Content") ? true : false;
@@ -1321,20 +1273,19 @@ public class WSSecurityEngine {
     }
 
     private byte[] getSharedKey(Element keyNmElem, CallbackHandler cb)
-        throws WSSecurityException {
+            throws WSSecurityException {
         String keyName = null;
         if (keyNmElem != null) {
             keyNmElem.normalize();
             Node tmpN;
             if ((tmpN = keyNmElem.getFirstChild()) != null
-                && tmpN.getNodeType() == Node.TEXT_NODE) {
+                    && tmpN.getNodeType() == Node.TEXT_NODE) {
                 keyName = tmpN.getNodeValue();
             }
         }
         if (keyName == null) {
-            throw new WSSecurityException(
-                WSSecurityException.INVALID_SECURITY,
-                "noKeyname");
+            throw new WSSecurityException(WSSecurityException.INVALID_SECURITY,
+                    "noKeyname");
         }
         WSPasswordCallback pwCb = new WSPasswordCallback(keyName, WSPasswordCallback.KEY_NAME);
         Callback[] callbacks = new Callback[1];
@@ -1342,25 +1293,23 @@ public class WSSecurityEngine {
         try {
             cb.handle(callbacks);
         } catch (IOException e) {
-            throw new WSSecurityException(
-                WSSecurityException.FAILURE,
-                "noPassword",
-                new Object[] { keyName });
+            throw new WSSecurityException(WSSecurityException.FAILURE,
+                    "noPassword",
+                    new Object[]{keyName});
         } catch (UnsupportedCallbackException e) {
-            throw new WSSecurityException(
-                WSSecurityException.FAILURE,
-                "noPassword",
-                new Object[] { keyName });
+            throw new WSSecurityException(WSSecurityException.FAILURE,
+                    "noPassword",
+                    new Object[]{keyName});
         }
-        byte[]decryptedBytes = pwCb.getKey();
+        byte[] decryptedBytes = pwCb.getKey();
         if (decryptedBytes == null) {
-            throw new WSSecurityException(
-                WSSecurityException.FAILURE,
-                "noPassword",
-                new Object[] { keyName });
+            throw new WSSecurityException(WSSecurityException.FAILURE,
+                    "noPassword",
+                    new Object[]{keyName});
         }
         return decryptedBytes;
     }
+
     /**
      * Put description here.
      * <p/>
@@ -1382,13 +1331,13 @@ public class WSSecurityEngine {
         try {
             return Base64.decode(encodedData);
         } catch (Base64DecodingException e) {
-            throw new WSSecurityException(
-                WSSecurityException.FAILURE,
-                null,
-                null,
-                e);
-            }
+            throw new WSSecurityException(WSSecurityException.FAILURE,
+                    null,
+                    null,
+                    e);
+        }
     }
+
     /**
      * @return
      */

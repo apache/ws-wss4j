@@ -24,8 +24,8 @@ import org.apache.axis.SOAPPart;
 import org.apache.axis.handlers.BasicHandler;
 import org.apache.ws.axis.security.WSDoAllConstants;
 import org.apache.ws.axis.security.WSDoAllSender;
-import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
@@ -33,7 +33,6 @@ import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.conversation.ConversationManager;
 import org.apache.ws.security.conversation.ConversationUtil;
 import org.apache.ws.security.conversation.DerivedKeyCallbackHandler;
-import org.apache.ws.security.conversation.message.info.SecurityContextInfo;
 import org.apache.ws.security.conversation.message.token.DerivedKeyToken;
 import org.apache.ws.security.conversation.message.token.RequestSecurityTokenResponse;
 import org.apache.ws.security.conversation.message.token.RequestedProofToken;
@@ -52,7 +51,6 @@ import java.io.ByteArrayOutputStream;
 
 /**
  * @author Dimuthu, Kau
- *
  */
 
 public class ConversationClientHandler extends BasicHandler {
@@ -80,12 +78,13 @@ public class ConversationClientHandler extends BasicHandler {
     }
 
     /**
-     * Do request method behaves in two different was according to the fact that  
+     * Do request method behaves in two different was according to the fact that
      * <li>the Token is in memory</li>
      * <li>the Token is not in memory</li>
-     * 
+     * <p/>
      * <b>If Token is in memory </b> then conversation carried out using it
      * <b>If Token is not in memory </b> then message is signed using clients public key and enrypted using server's public key
+     *
      * @param msg
      * @throws AxisFault
      */
@@ -102,7 +101,7 @@ public class ConversationClientHandler extends BasicHandler {
         try {
             //take the SOAP message as document
             doc =
-                ((org.apache.axis.message.SOAPEnvelope) sPart.getEnvelope())
+                    ((org.apache.axis.message.SOAPEnvelope) sPart.getEnvelope())
                     .getAsDocument();
 
             //check whether the token is in memory
@@ -113,19 +112,17 @@ public class ConversationClientHandler extends BasicHandler {
                 //add DerivedKeyTokens
                 String genID = ConversationUtil.genericID();
                 ConversationManager conMan = new ConversationManager();
-              //  conMan.addDerivedKeyToken(doc, uuid, dkcbHandler, genID);
+                //  conMan.addDerivedKeyToken(doc, uuid, dkcbHandler, genID);
 
                 //add the SCT with just identifier 
                 Element securityHeader =
-                    WSSecurityUtil.findWsseSecurityHeaderBlock(
-                        WSSConfig.getDefaultWSConfig(),
-                        doc,
-                        doc.getDocumentElement(),
-                        false);
-                WSSecurityUtil.appendChildElement(
-                    doc,
-                    securityHeader,
-                    (new SecurityContextToken(doc, uuid)).getElement());
+                        WSSecurityUtil.findWsseSecurityHeaderBlock(WSSConfig.getDefaultWSConfig(),
+                                doc,
+                                doc.getDocumentElement(),
+                                false);
+                WSSecurityUtil.appendChildElement(doc,
+                        securityHeader,
+                        (new SecurityContextToken(doc, uuid)).getElement());
 
                 //set the SOAP message with DKTOkens as the current message               
                 ByteArrayOutputStream os = new ByteArrayOutputStream();
@@ -137,22 +134,18 @@ public class ConversationClientHandler extends BasicHandler {
                 Reference ref = new Reference(WSSConfig.getDefaultWSConfig(), doc);
                 ref.setURI("#" + genID);
                 ref.setValueType("DerivedKeyToken");
-                SecurityTokenReference stRef = new SecurityTokenReference(WSSConfig.getDefaultWSConfig(),doc);
+                SecurityTokenReference stRef = new SecurityTokenReference(WSSConfig.getDefaultWSConfig(), doc);
                 stRef.setReference(ref);
 
                 //set mesage properties
-                msg.setProperty(
-                    WSDoAllConstants.ENC_PROP_FILE,
-                    "crypto.properties");
+                msg.setProperty(WSDoAllConstants.ENC_PROP_FILE,
+                        "crypto.properties");
                 msg.setProperty(WSDoAllConstants.ENC_KEY_ID, "EmbeddedKeyName");
-                msg.setProperty(
-                    WSDoAllConstants.ENC_KEY_NAME,
-                    stRef.toString());
-                msg.setUsername(
-                    ConversationUtil.generateIdentifier(uuid, genID));
-                msg.setProperty(
-                    WSDoAllConstants.ENC_CALLBACK_REF,
-                    this.dkcbHandler);
+                msg.setProperty(WSDoAllConstants.ENC_KEY_NAME,
+                        stRef.toString());
+                msg.setUsername(ConversationUtil.generateIdentifier(uuid, genID));
+                msg.setProperty(WSDoAllConstants.ENC_CALLBACK_REF,
+                        this.dkcbHandler);
                 msg.setProperty(WSDoAllConstants.ACTION, "Encrypt");
 
                 WSDoAllSender wsd = new WSDoAllSender();
@@ -184,7 +177,7 @@ public class ConversationClientHandler extends BasicHandler {
 //                            .getSecurityContextToken(),
 //                        reqProof,
 //                        1);
-           //     dkcbHandler.addSecurtiyContext(uuid, info);
+                //     dkcbHandler.addSecurtiyContext(uuid, info);
 
                 ByteArrayOutputStream os = new ByteArrayOutputStream();
                 XMLUtils.outputDOM(doc, os, true);
@@ -212,7 +205,7 @@ public class ConversationClientHandler extends BasicHandler {
      * @throws AxisFault
      */
     private void doResponse(MessageContext msgContext)
-        throws AxisFault { //for incoming message
+            throws AxisFault { //for incoming message
         Document doc = null;
         Message message = msgContext.getCurrentMessage();
         //TODO :: Check ........
@@ -221,12 +214,11 @@ public class ConversationClientHandler extends BasicHandler {
 
         try {
             doc =
-                ((org.apache.axis.message.SOAPEnvelope) sPart.getEnvelope())
+                    ((org.apache.axis.message.SOAPEnvelope) sPart.getEnvelope())
                     .getAsDocument();
 
         } catch (Exception e) {
-            throw new AxisFault(
-                "WSDoAllSender: cannot get SOAP envlope from message" + e);
+            throw new AxisFault("WSDoAllSender: cannot get SOAP envlope from message" + e);
         }
 
         /*Get the derved key tokens.
@@ -235,9 +227,8 @@ public class ConversationClientHandler extends BasicHandler {
          */
         try {
             NodeList ndList =
-                doc.getElementsByTagNameNS(
-                    WSConstants.WSSE_NS,
-                    "DerivedKeyToken");
+                    doc.getElementsByTagNameNS(WSConstants.WSSE_NS,
+                            "DerivedKeyToken");
             Element tmpE;
             DerivedKeyToken tmpDKT;
             String tmpID;
@@ -258,7 +249,7 @@ public class ConversationClientHandler extends BasicHandler {
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         XMLUtils.outputDOM(doc, os, true);
         sPart.setCurrentMessage(os.toByteArray(), SOAPPart.FORM_BYTES);
-   
+
     } //do response done 
 
     /**

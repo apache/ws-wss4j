@@ -23,7 +23,6 @@ import org.apache.ws.security.WSConstants;
 import java.util.Hashtable;
 import java.util.Map;
 
-
 /**
  * @author Werner Dittmann (Werner.Dittmann@siemens.com)
  */
@@ -34,9 +33,9 @@ public class WSDoAllConstants {
      * handler uses tha value of this parameter to determine how
      * to process the SOAP Envelope. For example:
      * <pre>
-          &lt;handler type="java:org.apache.ws.axis.security.WSDoAllSender">
-            &lt;parameter name="action" value="UsernameToken"/>
-            ...
+     * &lt;handler type="java:org.apache.ws.axis.security.WSDoAllSender">
+     * &lt;parameter name="action" value="UsernameToken"/>
+     * ...
      * </pre>
      * orders the handler to attach a <code>UsernameToken</code> to the SOAP
      * enevelope. It is a blank speararted list of actions to perform.
@@ -51,37 +50,37 @@ public class WSDoAllConstants {
     public static final String ACTION = "action";
 
     /**
-     * Perform nothing. 
+     * Perform nothing.
      */
     public static final String NO_SECURITY = "NoSecurity";
 
     /**
-     * Perform a UsernameToken identification only. 
+     * Perform a UsernameToken identification only.
      */
     public static final String USERNAME_TOKEN = "UsernameToken";
 
     /**
-     * Perform a SAML Token identification. 
+     * Perform a SAML Token identification.
      */
     public static final String SAML_TOKEN_UNSIGNED = "SAMLTokenUnsigned";
     public static final String SAML_TOKEN_SIGNED = "SAMLTokenSigned";
 
     /**
-     * Perform Signature. 
+     * Perform Signature.
      * The signature specific parameters define how to sign, which keys
      * to use, and so on
      */
     public static final String SIGNATURE = "Signature";
 
     /**
-     * Perform Encryption. 
+     * Perform Encryption.
      * The encryption specific parameters define how to encrypt, which keys
-     * to use, and so on. 
+     * to use, and so on.
      */
     public static final String ENCRYPT = "Encrypt";
 
     /**
-     * Add a timestamp to the security header. 
+     * Add a timestamp to the security header.
      */
     public static final String TIMESTAMP = "Timestamp";
 
@@ -97,7 +96,6 @@ public class WSDoAllConstants {
      * A chained handler can retrieve the SOAP message and process it. The
      * last handler in the chain must set the processed SOAP message as
      * current message in Axis message context.
-     * 
      */
     public static final String NO_SERIALIZATION = "NoSerialization";
 
@@ -127,7 +125,7 @@ public class WSDoAllConstants {
      * </pre>
      * However, the parameter in the WSDD deployment file overwrites the
      * property setting (deployment setting overwrites application setting).
-     * 
+     *
      * @see Constants#URI_SOAP11_NEXT_ACTOR
      * @see Constants#URI_SOAP12_NEXT_ROLE
      */
@@ -164,26 +162,26 @@ public class WSDoAllConstants {
     /**
      * The user's name. It is used differently by the WS Security functions.
      * <ul>
-     * <li>The <i>UsernameToken</i> function sets this name in the 
+     * <li>The <i>UsernameToken</i> function sets this name in the
      * <code>UsernameToken</code>.
-     * </li> 
+     * </li>
      * <li>The <i>Signing</i> function uses this name as the alias name
      * in the keystore to get user's certificate and private key to
      * perform signing.
      * </li>
      * <li>The <i>encryption</i>
      * functions uses this parameter as fallback if {@link #ENCRYPTION_USER}
-     * is not used. 
+     * is not used.
      * </li>
      * </ul>
      * It is also possible to set the user's name and the according password
      * via the call function, for example:
      * <pre>
-     ...
-     call.setUsername("name");
-     call.setPassword("WSS4Java");
-     ...
-       </pre>
+     * ...
+     * call.setUsername("name");
+     * call.setPassword("WSS4Java");
+     * ...
+     * </pre>
      * The user parameter in the deployment descritor (WSDD) file overwrites
      * the application's setting.
      * </p>
@@ -206,32 +204,32 @@ public class WSDoAllConstants {
      * to construct a username token or to sign a message.
      * <ul>
      * <li> A class that implements a callback interface (see below). The
-     *         handler loads this class and calls the callback method. This 
-     *         class must have a public default constructor with not parameters.
+     * handler loads this class and calls the callback method. This
+     * class must have a public default constructor with not parameters.
      * </li>
-     * <li> The application (or a preceeding handler) sets a reference to an 
-     *         object that implements the callback interface
+     * <li> The application (or a preceeding handler) sets a reference to an
+     * object that implements the callback interface
      * </li>
-     * <li> The application sets the password directly using the 
-     *         <code>setPassword</code> function of the <code>Call</code>.
-     * </ul> 
-     * The callback class or callback object must implement specific password 
+     * <li> The application sets the password directly using the
+     * <code>setPassword</code> function of the <code>Call</code>.
+     * </ul>
+     * The callback class or callback object must implement specific password
      * getter methods, for example reading a database or directory.
      * <p/>
-     * The handler first checks if it can get a the password via a callback 
-     * class. If that fails it checks if it can get the password from the 
-     * object reference, if that also fails the handler tries the password 
+     * The handler first checks if it can get a the password via a callback
+     * class. If that fails it checks if it can get the password from the
+     * object reference, if that also fails the handler tries the password
      * property.
      * <p/>
-     * The following parameter defines a class that implements a callback 
-     * handler interface. The handler loads the class and calls the callback 
-     * handler method to get the password. The callback 
-     * class needs to implement the 
+     * The following parameter defines a class that implements a callback
+     * handler interface. The handler loads the class and calls the callback
+     * handler method to get the password. The callback
+     * class needs to implement the
      * {@link javax.security.auth.callback.CallbackHandler} interface.
      * <p/>
      * The callback function
      * {@link javax.security.auth.callback.CallbackHandler#handle(Callback[])}
-     * gets an array of {@link org.apache.ws.security.WSPasswordCallback} 
+     * gets an array of {@link org.apache.ws.security.WSPasswordCallback}
      * objects. Only the first entry of the array is used. This object
      * contains the username/keyname as identifier. The callback handler must
      * set the password or key associated with this identifier before it returns.
@@ -243,7 +241,7 @@ public class WSDoAllConstants {
      * However, the parameter in the WSDD deployment file overwrites the
      * property setting (deployment setting overwrites application setting).
      * <p/>
-     * Refer also to comment in {@link #USER} about HTTP authentication 
+     * Refer also to comment in {@link #USER} about HTTP authentication
      * functions.
      */
     public static final String PW_CALLBACK_CLASS = "passwordCallbackClass";
@@ -276,7 +274,7 @@ public class WSDoAllConstants {
      * <p/>
      * If <b>only</b> encryption of the SOAP body data is requested,
      * it is recommended to use this parameter to define the username.
-     * The application can then use the standard user and password 
+     * The application can then use the standard user and password
      * functions (see example at {@link #USER} to enable HTTP authentication
      * functions.
      * <p/>
@@ -295,13 +293,13 @@ public class WSDoAllConstants {
      * property setting (deployment setting overwrites application setting).
      */
     public static final String ENCRYPTION_USER = "encryptionUser";
-    
+
     /**
      * This is a special user name. Specifying this name as {@link ENCRYPTION_USER}
-     * triggers a special action to get the public key to use for encryption. 
+     * triggers a special action to get the public key to use for encryption.
      */
     public static final String USE_REQ_SIG_CERT = "useReqSigCert";
-    
+
     /**
      * This parameter works in the same way as {@link #PW_CALLBACK_CLASS} but
      * the Axis WSS4J handler uses it to get the key associated with a key name.
@@ -316,45 +314,45 @@ public class WSDoAllConstants {
 
     /**
      * Text of the key name that needs to be sent
-     */ 
+     */
     public static final String ENC_KEY_NAME = "EmbeddedKeyName";
-    
+
     /**
      * The name of the crypto propterty file to use for SOAP Signature.
      * <p/>
      * The classloader loads this file. Therefore it must be accessible
      * via the classpath.
      * <p/>
-     * To locate the implementation of the 
-     * {@link org.apache.ws.security.components.crypto.Crypto Crypto} 
+     * To locate the implementation of the
+     * {@link org.apache.ws.security.components.crypto.Crypto Crypto}
      * interface implementation the property file must contain the property
      * <code>org.apache.ws.security.crypto.provider</code>. The value of
      * this property is the classname of the implementation class.
      * <p/>
      * The following line defines the standard implementation:
      * <pre>
-    org.apache.ws.security.crypto.provider=org.apache.ws.security.components.crypto.Merlin
+     * org.apache.ws.security.crypto.provider=org.apache.ws.security.components.crypto.Merlin
      * </pre>
      * The other contents of the property file depend on the implementation
      * of the {@link org.apache.ws.security.components.crypto.Crypto Crypto}
-     * interface implementation. 
+     * interface implementation.
      * <p/>
-     * The property file of the standard implementation 
-     * {@link org.apache.ws.security.components.crypto.Merlin} uses 
+     * The property file of the standard implementation
+     * {@link org.apache.ws.security.components.crypto.Merlin} uses
      * the following properties:
      * <pre>
-    org.apache.ws.security.crypto.provider
-    org.apache.ws.security.crypto.merlin.file
-    org.apache.ws.security.crypto.merlin.keystore.type
-    org.apache.ws.security.crypto.merlin.keystore.provider
-    org.apache.ws.security.crypto.merlin.keystore.password
-    org.apache.ws.security.crypto.merlin.keystore.alias
-    org.apache.ws.security.crypto.merlin.cert.provider
+     * org.apache.ws.security.crypto.provider
+     * org.apache.ws.security.crypto.merlin.file
+     * org.apache.ws.security.crypto.merlin.keystore.type
+     * org.apache.ws.security.crypto.merlin.keystore.provider
+     * org.apache.ws.security.crypto.merlin.keystore.password
+     * org.apache.ws.security.crypto.merlin.keystore.alias
+     * org.apache.ws.security.crypto.merlin.cert.provider
      * </pre>
      * The entries are:
      * <ul>
-     * <li> <code>org.apache.ws.security.crypto.provider</code> see 
-     *     description above 
+     * <li> <code>org.apache.ws.security.crypto.provider</code> see
+     * description above
      * </li>
      * <li><code>org.apache.ws.security.crypto.merlin.file</code>
      * The path to the keystore file. At first the classloader tries to load
@@ -407,7 +405,7 @@ public class WSDoAllConstants {
      * However, the parameter in the WSDD deployment file overwrites the
      * property setting (deployment setting overwrites application setting).
      * <p/>
-     * If this parameter is not used, but the signature crypto property 
+     * If this parameter is not used, but the signature crypto property
      * file is defined (combined Encryption/Signature action), then the
      * encryption function uses that file. Otherwise the handler throws
      * an <code>AxisFault</code>.
@@ -438,11 +436,10 @@ public class WSDoAllConstants {
      * The value of this parameter is a list of element names that are added
      * to the UsernameToken. The names of the list a separated by spaces.
      * <p/>
-     * The list may containe the names <code>nonce</code> and 
+     * The list may containe the names <code>nonce</code> and
      * <code>created</code> only. Use this option if the password type is
      * <code>passwordText</code> and the handler shall add the <code>Nonce</code>
-     * and/or <code>Created</code> elements. 
-     * 
+     * and/or <code>Created</code> elements.
      */
     public static final String ADD_UT_ELEMENTS = "addUTElements";
 
@@ -483,18 +480,18 @@ public class WSDoAllConstants {
      * the format of the value string.
      * <p/>
      * If this parameter is not specified the handler signs the SOAP Body
-     * by default. 
+     * by default.
      * <p/>
-     * The WS Security specifications define several formats to transfer the 
+     * The WS Security specifications define several formats to transfer the
      * signature tokens (certificates) or  references to these tokens.
      * Thus, the plain element name <code>Token</code>
-     * signs the token and takes care of the different format. 
+     * signs the token and takes care of the different format.
      * <p/>
      * To sign the SOAP body <b>and</b> the signature token the value of this
      * parameter must contain:
      * <pre>
-     * &lt;parameter name="signatureParts" 
-     *   value="{}{http://schemas.xmlsoap.org/soap/envelope/}Body; Token" /> 
+     * &lt;parameter name="signatureParts"
+     *   value="{}{http://schemas.xmlsoap.org/soap/envelope/}Body; Token" />
      * </pre>
      * If there is no other element in the request with a local name of
      * <code>Body</code> then the SOAP namespace identifier can be empty
@@ -514,9 +511,9 @@ public class WSDoAllConstants {
      * However, the parameter in the WSDD deployment file overwrites the
      * property setting (deployment setting overwrites application setting).
      * <p/>
-     * If this parameter is not used, but the signature crypto property 
+     * If this parameter is not used, but the signature crypto property
      * file is defined (combined Encryption/Signature action), then the
-     * encryption function uses signature property file. Otherwise the 
+     * encryption function uses signature property file. Otherwise the
      * handler throws an <code>AxisFault</code>.
      */
     public static final String ENC_PROP_FILE = "encryptionPropFile";
@@ -542,7 +539,7 @@ public class WSDoAllConstants {
      * following alorithms: {@link WSConstants#TRIPLE_DES},
      * {@link WSConstants#AES_128}, {@link WSConstants#AES_256},
      * and {@link WSConstants#AES_192}. Except for AES 192 all of these
-     * algorithms are required by the XML Encryption specification. 
+     * algorithms are required by the XML Encryption specification.
      * <p/>
      * The application may set this parameter using the following method:
      * <pre>
@@ -565,27 +562,27 @@ public class WSDoAllConstants {
      * property setting (deployment setting overwrites application setting).
      */
     public static final String ENC_KEY_TRANSPORT =
-        "encryptionKeyTransportAlgorithm";
+            "encryptionKeyTransportAlgorithm";
 
     /**
      * Parameter to define which parts of the request shall be encrypted.
      * <p/>
-     * The value of this parameter is a list of semi-colon separated 
+     * The value of this parameter is a list of semi-colon separated
      * element names that identify the elements to encrypt. An encryption mode
-     * specifier and a namespace identification, each inside a pair of curly 
+     * specifier and a namespace identification, each inside a pair of curly
      * brackets, may preceed each element name.
-     * 
+     * <p/>
      * The encryption mode specifier is either <code>{Content}</code> or
-     * <code>{Element}</code>. Please refer to the W3C XML Encryption 
+     * <code>{Element}</code>. Please refer to the W3C XML Encryption
      * specification about the differences between Element and Content
      * encryption. The encryption mode defaults to <code>Content</code>
      * if it is omitted. Example of a list:
      * <pre>
-     * &lt;parameter name="encryptionParts" 
-     *   value="{Content}{http://example.org/paymentv2}CreditCard; 
+     * &lt;parameter name="encryptionParts"
+     *   value="{Content}{http://example.org/paymentv2}CreditCard;
      *             {Element}{}UserName" />
      * </pre>
-     * The the first entry of the list identifies the element 
+     * The the first entry of the list identifies the element
      * <code>CreditCard</code> in the namespace
      * <code>http://example.org/paymentv2</code>, and will encrypt its content.
      * Be aware that the element name, the namespace identifier, and the
@@ -597,7 +594,7 @@ public class WSDoAllConstants {
      * <p/>
      * An empty encryption mode defaults to <code>Content</code>, an empty
      * namespace identifier defaults to the SOAP namespace.
-     * The second line of the example defines <code>Element</code> as 
+     * The second line of the example defines <code>Element</code> as
      * encryption mode for an <code>UserName</code> element in the SOAP
      * namespace.
      * <p/>
@@ -605,14 +602,14 @@ public class WSDoAllConstants {
      * <code>Content</code> mode
      */
     public static final String ENCRYPTION_PARTS = "encryptionParts";
-    
+
     /**
-     * The name of the SAML Issuer factory property file. 
+     * The name of the SAML Issuer factory property file.
      * The classloader loads this file. Therefore it must be accessible
      * via the classpath.
      */
     public static final String SAML_PROP_FILE = "samlPropFile";
-    
+
     /**
      * Time-To-Live is the time difference between creation and expiry time in
      * the WSS Timestamp.
@@ -621,9 +618,9 @@ public class WSDoAllConstants {
      * <p/>
      * If this parameter is not defined, contains a value less or equal
      * zero, or an illegal format the Axis driver uses a default TTL of
-     * 300 seconds (5 minutes). 
+     * 300 seconds (5 minutes).
      */
-    public static final String TTL_TIMESTAMP ="timeToLive";
+    public static final String TTL_TIMESTAMP = "timeToLive";
 
     /**
      * Define the parameter values to set the key identifier types. These are:
@@ -643,26 +640,21 @@ public class WSDoAllConstants {
      * <li><code>EmbeddedKeyName</code> for {@link WSConstants#EMBEDDED_KEYNAME}
      * </li>
      * </ul
-     * See {@link #SIG_KEY_ID} {@link #ENC_KEY_ID}. 
+     * See {@link #SIG_KEY_ID} {@link #ENC_KEY_ID}.
      */
     public static Map keyIdentifier = new Hashtable();
 
     static {
-        keyIdentifier.put(
-            "DirectReference",
-            new Integer(WSConstants.BST_DIRECT_REFERENCE));
-        keyIdentifier.put(
-            "IssuerSerial",
-            new Integer(WSConstants.ISSUER_SERIAL));
-        keyIdentifier.put(
-            "X509KeyIdentifier",
-            new Integer(WSConstants.X509_KEY_IDENTIFIER));
-        keyIdentifier.put(
-            "SKIKeyIdentifier",
-            new Integer(WSConstants.SKI_KEY_IDENTIFIER));
-        keyIdentifier.put(
-            "EmbeddedKeyName",
-            new Integer(WSConstants.EMBEDDED_KEYNAME));
+        keyIdentifier.put("DirectReference",
+                new Integer(WSConstants.BST_DIRECT_REFERENCE));
+        keyIdentifier.put("IssuerSerial",
+                new Integer(WSConstants.ISSUER_SERIAL));
+        keyIdentifier.put("X509KeyIdentifier",
+                new Integer(WSConstants.X509_KEY_IDENTIFIER));
+        keyIdentifier.put("SKIKeyIdentifier",
+                new Integer(WSConstants.SKI_KEY_IDENTIFIER));
+        keyIdentifier.put("EmbeddedKeyName",
+                new Integer(WSConstants.EMBEDDED_KEYNAME));
 
     }
 

@@ -15,7 +15,6 @@
  *
  */
 package org.apache.ws.security.trust.message.token;
-import javax.xml.namespace.QName;
 
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.trust.TrustConstants;
@@ -25,51 +24,57 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.Text;
+
+import javax.xml.namespace.QName;
+
 /**
  * @author Malinda Kaushalye
- *
- * RequestType token
+ *         <p/>
+ *         RequestType token
  */
 public class RequestType {
-    public static final QName TOKEN = new QName(TrustConstants.WST_NS, TrustConstants.REQUEST_TYPE_LN,TrustConstants.WST_PREFIX);
-    Element element=null;
+    public static final QName TOKEN = new QName(TrustConstants.WST_NS, TrustConstants.REQUEST_TYPE_LN, TrustConstants.WST_PREFIX);
+    Element element = null;
 
     /**
      * Constructor for RequestType
+     *
      * @param elem
      * @throws WSSecurityException
-     */    
-    public RequestType(Element elem) throws WSSecurityException {    
+     */
+    public RequestType(Element elem) throws WSSecurityException {
         this.element = elem;
-         QName el = new QName(this.element.getNamespaceURI(), this.element.getLocalName());
-         if (!el.equals(TOKEN)) {
-             throw new WSSecurityException(WSSecurityException.INVALID_SECURITY_TOKEN, "badTokenType", new Object[]{el});
-         }
+        QName el = new QName(this.element.getNamespaceURI(), this.element.getLocalName());
+        if (!el.equals(TOKEN)) {
+            throw new WSSecurityException(WSSecurityException.INVALID_SECURITY_TOKEN, "badTokenType", new Object[]{el});
+        }
 
     }
+
     /**
      * Constructor for RequestType
+     *
      * @param doc
      */
     public RequestType(Document doc) {
-        this.element = doc.createElementNS(TOKEN.getNamespaceURI(), TOKEN.getPrefix()+":"+TOKEN.getLocalPart());
+        this.element = doc.createElementNS(TOKEN.getNamespaceURI(), TOKEN.getPrefix() + ":" + TOKEN.getLocalPart());
         WSSecurityUtil.setNamespace(this.element, TrustConstants.WST_NS, TrustConstants.WST_PREFIX);
         this.element.appendChild(doc.createTextNode(""));
     }
-    
-    
+
     /**
      * get the First Node
+     *
      * @return
      */
     public Text getFirstNode() {
         Node node = this.element.getFirstChild();
         return ((node != null) && node instanceof Text) ? (Text) node : null;
     }
-        
-        
+
     /**
      * get the element
+     *
      * @return
      */
     public Element getElement() {
@@ -78,34 +83,38 @@ public class RequestType {
 
     /**
      * set the element
+     *
      * @param element
      */
     public void setElement(Element element) {
         this.element = element;
     }
+
     /**
      * Sets the text node
+     *
      * @param val
      */
-    public void setValue(String val){    
+    public void setValue(String val) {
         this.element.appendChild(element.getOwnerDocument().createTextNode(val));
     }
-    
-    
+
     public String toString() {
-      return DOM2Writer.nodeToString((Node)this.element);
+        return DOM2Writer.nodeToString((Node) this.element);
     }
+
     /**
      * return the value of the text node
+     *
      * @return
      */
-    public String getValue(){
-        String val="";
-        if(this.element.getFirstChild().getNodeType()!=Node.TEXT_NODE){
+    public String getValue() {
+        String val = "";
+        if (this.element.getFirstChild().getNodeType() != Node.TEXT_NODE) {
             return null;
         }
-        val=this.element.getFirstChild().getNodeValue();        
-        return val;    
+        val = this.element.getFirstChild().getNodeValue();
+        return val;
     }
 
 }

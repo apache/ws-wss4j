@@ -38,7 +38,7 @@ import java.util.ArrayList;
  * <p/>
  * Accordingly, this stack is implemented as a single array, will null
  * values used to indicate frame boundaries.
- * 
+ *
  * @author James Snell
  * @author Glen Daniels (gdaniels@apache.org)
  * @author Sam Ruby (rubys@us.ibm.com)
@@ -199,8 +199,7 @@ public class NSStack {
         // If defaults are OK, and the given NS is the current default,
         // return "" as the prefix to favor defaults where possible.
         if (!noDefault && currentDefaultNS > 0 && stack[currentDefaultNS] != null &&
-                namespaceURI.equals(
-                        stack[currentDefaultNS].getNamespaceURI()))
+                namespaceURI.equals(stack[currentDefaultNS].getNamespaceURI()))
             return "";
         for (int cursor = top; cursor > 0; cursor--) {
             Mapping map = stack[cursor];

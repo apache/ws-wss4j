@@ -23,13 +23,13 @@ import java.util.ResourceBundle;
 
 /**
  * @author Malinda Kaushalye
- *
- * Exception class for WS-Trust implementation. 
+ *         <p/>
+ *         Exception class for WS-Trust implementation.
  */
-public class WSTrustException extends RemoteException{
+public class WSTrustException extends RemoteException {
     public static final int PASSWORD_DOESNOT_MATCH = 0;
     private static ResourceBundle resources;
-    
+
     static {
         try {
             resources = ResourceBundle.getBundle("org.apache.ws.security.trust.errors");
@@ -38,13 +38,12 @@ public class WSTrustException extends RemoteException{
         }
     }
 
-
     /**
      * 
      */
     public WSTrustException() {
         super();
-    
+
     }
 
     /**
@@ -52,7 +51,7 @@ public class WSTrustException extends RemoteException{
      */
     public WSTrustException(String s) {
         super(s);
-        
+
     }
 
     /**
@@ -61,18 +60,19 @@ public class WSTrustException extends RemoteException{
      */
     public WSTrustException(String s, Throwable ex) {
         super(s, ex);
-    
+
     }
+
     /**
      * Constructor
-     * 
+     *
      * @param errorCode
      */
     public WSTrustException(int errorCode) {
-        super(getMessage(errorCode,null,null));
-        
+        super(getMessage(errorCode, null, null));
+
     }
-    
+
     private static String getMessage(int errorCode, String msgId, Object[] args) {
         String msg = null;
         try {

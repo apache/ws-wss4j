@@ -19,9 +19,8 @@ package org.apache.ws.security.message;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.SOAPConstants;
-import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.xml.security.signature.XMLSignatureInput;
 import org.apache.xml.security.utils.XMLUtils;
@@ -41,12 +40,12 @@ import java.util.Set;
  * XML-Security resolver that is used for resolving same-document URI like URI="#id".
  * It is desgined to only work with SOAPEnvelopes.
  * <p/>
- * 
+ *
  * @author Davanum Srinivas (dims@yahoo.com).
  */
 public class EnvelopeIdResolver extends ResourceResolverSpi {
     private static Log log =
-        LogFactory.getLog(EnvelopeIdResolver.class.getName());
+            LogFactory.getLog(EnvelopeIdResolver.class.getName());
     private static Log tlog = LogFactory.getLog("org.apache.ws.security.TIME");
 
     private static EnvelopeIdResolver resolver = null;
@@ -57,8 +56,8 @@ public class EnvelopeIdResolver extends ResourceResolverSpi {
     /**
      * Singleton instance of the resolver.
      * <p/>
-     * 
-     * @return 
+     *
+     * @return
      */
     public synchronized static ResourceResolverSpi getInstance(WSSConfig wssConfig) {
         // instance comparison, should be same instance most of the time
@@ -72,18 +71,18 @@ public class EnvelopeIdResolver extends ResourceResolverSpi {
     private EnvelopeIdResolver(WSSConfig wssConfig) {
         this.wssConfig = wssConfig;
     }
-    
+
     /**
      * This is the workhorse method used to resolve resources.
      * <p/>
-     * 
-     * @param uri     
-     * @param BaseURI 
-     * @return 
-     * @throws ResourceResolverException 
+     *
+     * @param uri
+     * @param BaseURI
+     * @return
+     * @throws ResourceResolverException
      */
     public XMLSignatureInput engineResolve(Attr uri, String BaseURI)
-        throws ResourceResolverException {
+            throws ResourceResolverException {
 
         doDebug = log.isDebugEnabled();
 
@@ -112,19 +111,18 @@ public class EnvelopeIdResolver extends ResourceResolverSpi {
          * attributes -- but not comments.
          */
          
-         /*
-          * First lookup the SOAP Body element (processed by default) and
-          * check if it contains an Id and if it matches
-          */
+        /*
+         * First lookup the SOAP Body element (processed by default) and
+         * check if it contains an Id and if it matches
+         */
         String id = uriNodeValue.substring(1);
         SOAPConstants sc = WSSecurityUtil.getSOAPConstants(doc.getDocumentElement());
         Element selectedElem = WSSecurityUtil.findBodyElement(doc, sc);
         if (selectedElem == null) {
-            throw new ResourceResolverException(
-                "generic.EmptyMessage",
-                new Object[] { "Body element not found" },
-                uri,
-                BaseURI);
+            throw new ResourceResolverException("generic.EmptyMessage",
+                    new Object[]{"Body element not found"},
+                    uri,
+                    BaseURI);
         }
         String cId = selectedElem.getAttributeNS(wssConfig.getWsuNS(), "Id");
 
@@ -141,11 +139,10 @@ public class EnvelopeIdResolver extends ResourceResolverSpi {
                 cId = selectedElem.getAttribute("Id");
             }
             if (cId == null) {
-                throw new ResourceResolverException(
-                    "generic.EmptyMessage",
-                    new Object[] { "Id not found" },
-                    uri,
-                    BaseURI);
+                throw new ResourceResolverException("generic.EmptyMessage",
+                        new Object[]{"Id not found"},
+                        uri,
+                        BaseURI);
             }
         }
 
@@ -172,10 +169,10 @@ public class EnvelopeIdResolver extends ResourceResolverSpi {
      * This method helps the ResourceResolver to decide whether a
      * ResourceResolverSpi is able to perform the requested action.
      * <p/>
-     * 
-     * @param uri     
-     * @param BaseURI 
-     * @return 
+     *
+     * @param uri
+     * @param BaseURI
+     * @return
      */
     public boolean engineCanResolve(Attr uri, String BaseURI) {
         if (uri == null) {
@@ -184,13 +181,14 @@ public class EnvelopeIdResolver extends ResourceResolverSpi {
         String uriNodeValue = uri.getNodeValue();
         return uriNodeValue.startsWith("#");
     }
+
     /**
-      * Dereferences a same-document URI fragment.
-      *
-      * @param node the node (document or element) referenced by the
-      *   URI fragment. If null, returns an empty set.
-      * @return a set of nodes (minus any comment nodes)
-      */
+     * Dereferences a same-document URI fragment.
+     *
+     * @param node the node (document or element) referenced by the
+     *             URI fragment. If null, returns an empty set.
+     * @return a set of nodes (minus any comment nodes)
+     */
     private Set dereferenceSameDocumentURI(Node node) {
         Set nodeSet = new HashSet();
         if (node != null) {
@@ -203,30 +201,27 @@ public class EnvelopeIdResolver extends ResourceResolverSpi {
      * Recursively traverses the subtree, and returns an XPath-equivalent
      * node-set of all nodes traversed, excluding any comment nodes.
      *
-     * @param node the node to traverse
+     * @param node    the node to traverse
      * @param nodeSet the set of nodes traversed so far
-     * @param the previous sibling node
+     * @param the     previous sibling node
      */
-    private void nodeSetMinusCommentNodes(
-        Node node,
-        Set nodeSet,
-        Node prevSibling) {
+    private void nodeSetMinusCommentNodes(Node node,
+                                          Set nodeSet,
+                                          Node prevSibling) {
         if (doDebug) {
-            log.debug(
-                "Tag: "
+            log.debug("Tag: "
                     + node.getNodeName()
                     + ", '"
                     + node.getNodeValue()
                     + "'");
         }
         switch (node.getNodeType()) {
-            case Node.ELEMENT_NODE :
+            case Node.ELEMENT_NODE:
                 NamedNodeMap attrs = node.getAttributes();
                 if (attrs != null) {
                     for (int i = 0; i < attrs.getLength(); i++) {
                         if (doDebug) {
-                            log.debug(
-                                "Attr: "
+                            log.debug("Attr: "
                                     + attrs.item(i).getNodeName()
                                     + ", '"
                                     + attrs.item(i).getNodeValue()
@@ -238,23 +233,23 @@ public class EnvelopeIdResolver extends ResourceResolverSpi {
                 nodeSet.add(node);
                 Node pSibling = null;
                 for (Node child = node.getFirstChild();
-                    child != null;
-                    child = child.getNextSibling()) {
+                     child != null;
+                     child = child.getNextSibling()) {
                     nodeSetMinusCommentNodes(child, nodeSet, pSibling);
                     pSibling = child;
                 }
                 break;
-            case Node.TEXT_NODE :
-            case Node.CDATA_SECTION_NODE :
+            case Node.TEXT_NODE:
+            case Node.CDATA_SECTION_NODE:
                 // emulate XPath which only returns the first node in
                 // contiguous text/cdata nodes
                 if (prevSibling != null
-                    && (prevSibling.getNodeType() == Node.TEXT_NODE
+                        && (prevSibling.getNodeType() == Node.TEXT_NODE
                         || prevSibling.getNodeType()
-                            == Node.CDATA_SECTION_NODE)) {
+                        == Node.CDATA_SECTION_NODE)) {
                     return;
                 }
-            case Node.PROCESSING_INSTRUCTION_NODE :
+            case Node.PROCESSING_INSTRUCTION_NODE:
                 nodeSet.add(node);
         }
     }

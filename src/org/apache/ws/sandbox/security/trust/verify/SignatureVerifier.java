@@ -17,25 +17,25 @@
 
 package org.apache.ws.security.trust.verify;
 
-import java.util.Properties;
-
 import org.apache.ws.security.trust.WSTrustException;
 import org.w3c.dom.Document;
+
+import java.util.Properties;
 
 /**
  * @author Ruchith
  */
 public class SignatureVerifier implements STVerifier {
-    
+
     public SignatureVerifier(Properties prop) {
-        
+
     }
 
     /* (non-Javadoc)
      * @see org.apache.ws.security.trust.verify.STVerifier#verify(org.w3c.dom.Document)
      */
     public boolean verify(Document doc)
-        throws WSTrustException {
+            throws WSTrustException {
         // TODO Signature verification
         return true;
     }

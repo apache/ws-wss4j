@@ -17,8 +17,8 @@
 
 package org.apache.ws.security.message.token;
 
-import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.w3c.dom.Document;
@@ -31,26 +31,26 @@ import java.security.cert.X509Certificate;
 /**
  * X509 Security Token.
  * <p/>
- * 
+ *
  * @author Davanum Srinivas (dims@yahoo.com).
  */
 public class X509Security extends BinarySecurity {
     private String type;
     public static final String X509_V3 = "X509v3";
-   
+
     /*
      * Stores the associated X.509 Certificate. This saves numerous
      * crypto loadCertificate operations
      */
     private X509Certificate cachedCert = null;
-   
+
     /**
      * This constructor creates a new X509 certificate object and initializes
-     * it from the data containe in the element. 
-     * 
+     * it from the data containe in the element.
+     *
      * @param wssConfig Configuration options for processing and building the <code>wsse:Security</code> header
-     * @param elem     the element containing the X509 certificate data
-     * @throws WSSecurityException 
+     * @param elem      the element containing the X509 certificate data
+     * @throws WSSecurityException
      */
     public X509Security(WSSConfig wssConfig, Element elem) throws WSSecurityException {
         super(wssConfig, elem);
@@ -66,8 +66,8 @@ public class X509Security extends BinarySecurity {
 
     /**
      * This constructor creates a new X509 certificate element.
-     * 
-     * @param doc 
+     *
+     * @param doc
      */
     public X509Security(WSSConfig wssConfig, Document doc) {
         super(wssConfig, doc);
@@ -82,10 +82,10 @@ public class X509Security extends BinarySecurity {
     /**
      * Gets the X509Certificate certificate.
      * <p/>
-     * 
-     * @return    the X509 certificate converted from the base 64 encoded
-     *             element data
-     * @throws GeneralSecurityException 
+     *
+     * @return the X509 certificate converted from the base 64 encoded
+     *         element data
+     * @throws GeneralSecurityException
      */
     public X509Certificate getX509Certificate(Crypto crypto) throws WSSecurityException {
         if (cachedCert != null) {
@@ -93,10 +93,9 @@ public class X509Security extends BinarySecurity {
         }
         byte[] data = getToken();
         if (data == null) {
-            throw new WSSecurityException(
-                WSSecurityException.FAILURE,
-                "invalidCertData",
-                new Object[] { new Integer(0)});
+            throw new WSSecurityException(WSSecurityException.FAILURE,
+                    "invalidCertData",
+                    new Object[]{new Integer(0)});
         }
         ByteArrayInputStream in = new ByteArrayInputStream(data);
         cachedCert = crypto.loadCertificate(in);
@@ -107,27 +106,26 @@ public class X509Security extends BinarySecurity {
      * Sets the X509Certificate.
      * This functions takes the X509 certificate, gets the data from it as
      * encoded bytes, and sets the data as base 64 encoded data in the text
-     * node of the element 
-     * 
+     * node of the element
+     *
      * @param cert the X509 certificate to store in the element
-     * @throws CertificateEncodingException 
+     * @throws CertificateEncodingException
      */
     public void setX509Certificate(X509Certificate cert)
-        throws WSSecurityException {
+            throws WSSecurityException {
         if (cert == null) {
-            throw new WSSecurityException(
-                WSSecurityException.FAILURE,
-                "noCert");
+            throw new WSSecurityException(WSSecurityException.FAILURE,
+                    "noCert");
         }
         cachedCert = cert;
         try {
             setToken(cert.getEncoded());
         } catch (CertificateEncodingException e) {
-            throw new WSSecurityException(
-                WSSecurityException.SECURITY_TOKEN_UNAVAILABLE,
-                "encodeError");
+            throw new WSSecurityException(WSSecurityException.SECURITY_TOKEN_UNAVAILABLE,
+                    "encodeError");
         }
     }
+
     public static String getType(WSSConfig wssConfig) {
         if (wssConfig.isBSTValuesPrefixed()) {
             return WSConstants.WSSE_PREFIX + ":" + X509_V3;

@@ -11,9 +11,9 @@ package org.apache.ws.security.conversation.dkAlgo;
  HMAC_SHA-1(secret, A(3) + seed) + ...
  <i>Where + indicates concatenation.</i>
  <br>
-   A() is defined as:
-       A(0) = seed
-       A(i) = HMAC_SHA-1(secret, A(i-1))
+ A() is defined as:
+ A(0) = seed
+ A(i) = HMAC_SHA-1(secret, A(i-1))
  <br>
  <i>Source : RFC 2246 - The TLS Protocol Version 1.0
  Section 5. HMAC and the pseudorandom function</i>
@@ -23,68 +23,68 @@ package org.apache.ws.security.conversation.dkAlgo;
  * @version 1.0
  */
 
+import org.apache.ws.security.conversation.ConversationException;
+
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
-import org.apache.ws.security.conversation.ConversationException;
-
 public class P_SHA1
-    implements DerivationAlgorithm {
+        implements DerivationAlgorithm {
 
-  private byte[] secret;
-  private String seed;
+    private byte[] secret;
+    private String seed;
 
-  public byte[] createKey(byte[] secret, String labelAndNonce, int offset,
-                          long length) throws ConversationException {
-    try {
-      Mac mac = Mac.getInstance("HmacSHA1");
-      byte[] key = new String(P_hash(secret, labelAndNonce.getBytes(), mac,
-                                     (offset + (int) length))).substring(offset,
-          (int) length).getBytes();
+    public byte[] createKey(byte[] secret, String labelAndNonce, int offset,
+                            long length) throws ConversationException {
+        try {
+            Mac mac = Mac.getInstance("HmacSHA1");
+            byte[] key = new String(P_hash(secret, labelAndNonce.getBytes(), mac,
+                    (offset + (int) length))).substring(offset,
+                            (int) length).getBytes();
 
-      return key;
+            return key;
+        } catch (Exception ex) {
+            throw new ConversationException("Key Derivation : P_SHA-1: " +
+                    ex.getMessage());
+        }
     }
-    catch (Exception ex) {
-      throw new ConversationException("Key Derivation : P_SHA-1: " +
-                                      ex.getMessage());
-    }
-  }
 
-  /**
-   * Stolen from WSUsernameToken  :-)
-   * @param secret
-   * @param seed
-   * @param mac
-   * @param required
-   * @return
-   * @throws java.lang.Exception
-   */
-  private static byte[] P_hash(byte[] secret, byte[] seed, Mac mac,
-                               int required) throws Exception {
-    byte[] out = new byte[required];
-    int offset = 0, tocpy;
-    byte[] A, tmp;
-    A = seed;
-    while (required > 0) {
-      SecretKeySpec key = new SecretKeySpec(secret, "HMACSHA1");
-      mac.init(key);
-      mac.update(A);
-      A = mac.doFinal();
-      mac.reset();
-      mac.init(key);
-      mac.update(A);
-      mac.update(seed);
-      tmp = mac.doFinal();
-      tocpy = min(required, tmp.length);
-      System.arraycopy(tmp, 0, out, offset, tocpy);
-      offset += tocpy;
-      required -= tocpy;
+    /**
+     * Stolen from WSUsernameToken  :-)
+     *
+     * @param secret
+     * @param seed
+     * @param mac
+     * @param required
+     * @return
+     * @throws java.lang.Exception
+     */
+    private static byte[] P_hash(byte[] secret, byte[] seed, Mac mac,
+                                 int required) throws Exception {
+        byte[] out = new byte[required];
+        int offset = 0, tocpy;
+        byte[] A, tmp;
+        A = seed;
+        while (required > 0) {
+            SecretKeySpec key = new SecretKeySpec(secret, "HMACSHA1");
+            mac.init(key);
+            mac.update(A);
+            A = mac.doFinal();
+            mac.reset();
+            mac.init(key);
+            mac.update(A);
+            mac.update(seed);
+            tmp = mac.doFinal();
+            tocpy = min(required, tmp.length);
+            System.arraycopy(tmp, 0, out, offset, tocpy);
+            offset += tocpy;
+            required -= tocpy;
+        }
+        return out;
     }
-    return out;
-  }
 
-  private static int min(int a, int b) {
-    return (a > b) ? b : a;
-  }
+    private static int min(int a, int b) {
+        return (a > b) ? b : a;
+    }
 
 }

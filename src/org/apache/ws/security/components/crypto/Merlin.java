@@ -57,7 +57,7 @@ import java.util.Vector;
 /**
  * JDK1.4 based implementation of Crypto (uses keystore).
  * <p/>
- * 
+ *
  * @author Davanum Srinivas (dims@yahoo.com).
  */
 public class Merlin implements Crypto {
@@ -69,10 +69,10 @@ public class Merlin implements Crypto {
     /**
      * Constructor.
      * <p/>
-     * 
-     * @param properties 
-     * @throws CredentialException 
-     * @throws IOException 
+     *
+     * @param properties
+     * @throws CredentialException
+     * @throws IOException
      */
     public Merlin(Properties properties) throws CredentialException, IOException {
         /*
@@ -84,17 +84,17 @@ public class Merlin implements Crypto {
             return;
         }
         this.properties = properties;
-        String location = this.properties.getProperty("org.apache.ws.security.crypto.merlin.file");        
+        String location = this.properties.getProperty("org.apache.ws.security.crypto.merlin.file");
         InputStream is = null;
 
         /**
          * Look for the keystore in classpaths
          */ 
         DiscoverResources disc = new DiscoverResources();
-        disc.addClassLoader( JDKHooks.getJDKHooks().getThreadContextClassLoader() );
-        disc.addClassLoader( this.getClass().getClassLoader() );
+        disc.addClassLoader(JDKHooks.getJDKHooks().getThreadContextClassLoader());
+        disc.addClassLoader(this.getClass().getClassLoader());
         ResourceIterator iterator = disc.findResources(location);
-        if(iterator.hasNext()) {
+        if (iterator.hasNext()) {
             Resource resource = iterator.nextResource();
             is = resource.getResourceAsStream();
         } 
@@ -123,19 +123,18 @@ public class Merlin implements Crypto {
     /**
      * Singleton certificate factory for this Crypto instance.
      * <p/>
-     * 
-     * @return    Returns a <code>CertificateFactory</code> to construct
-     *             X509 certficates
-     * @throws    WSSecurityException
+     *
+     * @return Returns a <code>CertificateFactory</code> to construct
+     *         X509 certficates
+     * @throws WSSecurityException
      */
     public synchronized CertificateFactory getCertificateFactory() throws WSSecurityException {
         if (certFact == null) {
             try {
                 String provider = properties.getProperty("org.apache.ws.security.crypto.merlin.cert.provider");
-                if(provider == null || provider.length() == 0) {
+                if (provider == null || provider.length() == 0) {
                     certFact = CertificateFactory.getInstance("X.509");
-                }
-                else {
+                } else {
                     certFact = CertificateFactory.getInstance("X.509", provider);
                 }
             } catch (CertificateException e) {
@@ -152,21 +151,19 @@ public class Merlin implements Crypto {
     /**
      * load a X509Certificate from the input stream.
      * <p/>
-     * 
-     * @param in    The <code>InputStream</code> array containg the X509 data
-     * @return        Returns a X509 certificate
-     * @throws         WSSecurityException 
+     *
+     * @param in The <code>InputStream</code> array containg the X509 data
+     * @return Returns a X509 certificate
+     * @throws WSSecurityException
      */
     public X509Certificate loadCertificate(InputStream in) throws WSSecurityException {
         X509Certificate cert = null;
         try {
             cert =
-                (X509Certificate) getCertificateFactory().generateCertificate(
-                    in);
+                    (X509Certificate) getCertificateFactory().generateCertificate(in);
         } catch (CertificateException e) {
-            throw new WSSecurityException(
-                WSSecurityException.SECURITY_TOKEN_UNAVAILABLE,
-                "parseError");
+            throw new WSSecurityException(WSSecurityException.SECURITY_TOKEN_UNAVAILABLE,
+                    "parseError");
         }
         return cert;
     }
@@ -174,13 +171,13 @@ public class Merlin implements Crypto {
     /**
      * Construct an array of X509Certificate's from the byte array.
      * <p/>
-     * 
+     *
      * @param data    The <code>byte</code> array containg the X509 data
      * @param reverse If set the first certificate in input data will
      *                the last in the array
-     * @return        An array of X509 certificates, ordered according to
-     *                 the reverse flag
-     * @throws WSSecurityException 
+     * @return An array of X509 certificates, ordered according to
+     *         the reverse flag
+     * @throws WSSecurityException
      */
     public X509Certificate[] getX509Certificates(byte[] data, boolean reverse)
             throws WSSecurityException {
@@ -204,13 +201,13 @@ public class Merlin implements Crypto {
     /**
      * get a byte array given an array of X509 certificates.
      * <p/>
-     * 
+     *
      * @param reverse If set the first certificate in the array data will
      *                the last in the byte array
      * @param certs   The certificates to convert
-     * @throws WSSecurityException                  
-     * @return        The byte array for the certficates ordered according
-     * to the reverse flag
+     * @return The byte array for the certficates ordered according
+     *         to the reverse flag
+     * @throws WSSecurityException
      */
     public byte[] getCertificateData(boolean reverse, X509Certificate[] certs)
             throws WSSecurityException {
@@ -237,14 +234,14 @@ public class Merlin implements Crypto {
     /**
      * Gets the private key identified by <code>alias</> and <code>password</code>.
      * <p/>
-     * 
+     *
      * @param alias    The alias (<code>KeyStore</code>) of the key owner
      * @param password The password needed to access the private key
-     * @throws Exception 
-     * @return        The private key
+     * @return The private key
+     * @throws Exception
      */
     public PrivateKey getPrivateKey(String alias, String password) throws Exception {
-        if(alias == null) {
+        if (alias == null) {
             throw new Exception("alias is null");
         }
         boolean b = keystore.isKeyEntry(alias);
@@ -259,7 +256,6 @@ public class Merlin implements Crypto {
         return (PrivateKey) keyTmp;
     }
 
-
     private Vector splitAndTrim(String inString) {
         X509NameTokenizer nmTokens = new X509NameTokenizer(inString);
         Vector vr = new Vector();
@@ -270,6 +266,7 @@ public class Merlin implements Crypto {
         java.util.Collections.sort(vr);
         return vr;
     }
+
     /**
      * Lookup a X509 Certificate in the keystore according to a given
      * the issuer of a Certficate.
@@ -277,8 +274,8 @@ public class Merlin implements Crypto {
      * The search gets all alias names of the keystore and gets the certificate chain
      * for each alias. Then the Issuer fo each certificate of the chain
      * is compared with the parameters.
-     * 
-     * @param issuer       The issuer's name for the certificate
+     *
+     * @param issuer The issuer's name for the certificate
      * @return alias name of the certificate that matches the issuer name
      *         or null if no such certificate was found.
      */
@@ -294,7 +291,7 @@ public class Merlin implements Crypto {
      * The search gets all alias names of the keystore and gets the certificate chain
      * for each alias. Then the SerialNumber and Issuer fo each certificate of the chain
      * is compared with the parameters.
-     * 
+     *
      * @param issuer       The issuer's name for the certificate
      * @param serialNumber The serial number of the certificate from the named issuer
      * @return alias name of the certificate that matches serialNumber and issuer name
@@ -339,7 +336,7 @@ public class Merlin implements Crypto {
                 }
                 x509cert = (X509Certificate) cert;
                 if (!useSerialNumber ||
-                    useSerialNumber && x509cert.getSerialNumber().compareTo(serialNumber) == 0) {
+                        useSerialNumber && x509cert.getSerialNumber().compareTo(serialNumber) == 0) {
                     certRDN = splitAndTrim(x509cert.getIssuerDN().getName());
                     if (certRDN.equals(issuerRDN)) {
                         return alias;
@@ -347,25 +344,24 @@ public class Merlin implements Crypto {
                 }
             }
         } catch (KeyStoreException e) {
-            throw new WSSecurityException(
-                WSSecurityException.FAILURE,
-                "keystore");
+            throw new WSSecurityException(WSSecurityException.FAILURE,
+                    "keystore");
         }
         return null;
     }
-    
+
     /**
-     * Lookup a X509 Certificate in the keystore according to a given 
+     * Lookup a X509 Certificate in the keystore according to a given
      * SubjectKeyIdentifier.
      * <p/>
      * The search gets all alias names of the keystore and gets the certificate chain
-     * or certificate for each alias. Then the SKI for each user certificate 
+     * or certificate for each alias. Then the SKI for each user certificate
      * is compared with the SKI parameter.
-     * 
-     * @param skiBytes       The SKI info bytes
+     *
+     * @param skiBytes The SKI info bytes
      * @return alias name of the certificate that matches serialNumber and issuer name
      *         or null if no such certificate was found.
-     * @exception WSSecurityException if problems during keystore handling or wrong certificate (no SKI data)
+     * @throws WSSecurityException if problems during keystore handling or wrong certificate (no SKI data)
      */
 
     public String getAliasForX509Cert(byte[] skiBytes) throws WSSecurityException {
@@ -404,9 +400,8 @@ public class Merlin implements Crypto {
                 }
             }
         } catch (KeyStoreException e) {
-            throw new WSSecurityException(
-                WSSecurityException.FAILURE,
-                "keystore");
+            throw new WSSecurityException(WSSecurityException.FAILURE,
+                    "keystore");
         }
         return null;
     }
@@ -414,33 +409,32 @@ public class Merlin implements Crypto {
     /**
      * Return a X509 Certificate alias in the keystore according to a given Certificate
      * <p/>
-     * 
+     *
      * @param cert The certificate to lookup
      * @return alias name of the certificate that matches the given certificate
      *         or null if no such certificate was found.
      */
-    
+
     /*
      * See comment above
      */
     public String getAliasForX509Cert(Certificate cert) throws WSSecurityException {
         try {
             String alias = keystore.getCertificateAlias(cert);
-            if(alias != null)
+            if (alias != null)
                 return alias;
             // Use brute force search
             Enumeration e = keystore.aliases();
-            while(e.hasMoreElements()) {
-                alias = (String)e.nextElement();
+            while (e.hasMoreElements()) {
+                alias = (String) e.nextElement();
                 X509Certificate cert2 = (X509Certificate) keystore.getCertificate(alias);
-                if(cert2.equals(cert)) {
+                if (cert2.equals(cert)) {
                     return alias;
                 }
-            }        
+            }
         } catch (KeyStoreException e) {
-            throw new WSSecurityException(
-                WSSecurityException.FAILURE,
-                "keystore");
+            throw new WSSecurityException(WSSecurityException.FAILURE,
+                    "keystore");
         }
         return null;
     }
@@ -451,7 +445,7 @@ public class Merlin implements Crypto {
      * signature and encryption. This alias corresponds to the certificate that
      * should be used whenever KeyInfo is not poresent in a signed or
      * an encrypted message. May return null.
-     * 
+     *
      * @return alias name of the default X509 certificate
      */
     public String getDefaultX509Alias() {
@@ -460,17 +454,18 @@ public class Merlin implements Crypto {
         }
         return properties.getProperty("org.apache.ws.security.crypto.merlin.keystore.alias");
     }
-    
+
     /**
-     * Gets the list of certificates for a given alias. 
+     * Gets the list of certificates for a given alias.
      * <p/>
-     * 
+     *
      * @param alias Lookup certificate chain for this alias
      * @return Array of X509 certificates for this alias name, or
      *         null if this alias does not exist in the keystore
      */
     public X509Certificate[] getCertificates(String alias) throws WSSecurityException {
-        Certificate[] certs = null;;
+        Certificate[] certs = null;
+        ;
         try {
             certs = keystore.getCertificateChain(alias);
             if (certs == null || certs.length == 0) {
@@ -482,9 +477,8 @@ public class Merlin implements Crypto {
                 certs = new Certificate[]{cert};
             }
         } catch (KeyStoreException e) {
-            throw new WSSecurityException(
-                WSSecurityException.FAILURE,
-                "keystore");
+            throw new WSSecurityException(WSSecurityException.FAILURE,
+                    "keystore");
         }
         X509Certificate[] x509certs = new X509Certificate[certs.length];
         for (int i = 0; i < certs.length; i++) {
@@ -494,21 +488,21 @@ public class Merlin implements Crypto {
     }
 
     /**
-     * A Hook for subclasses to set the keystore without having to 
+     * A Hook for subclasses to set the keystore without having to
      * load it from an <code>InputStream</code>.
+     *
      * @param ks existing keystore
      */
-    public void setKeyStore(KeyStore ks)
-    {
+    public void setKeyStore(KeyStore ks) {
         keystore = ks;
     }
-    
+
     /**
      * Loads the the keystore from an <code>InputStream </code>.
      * <p/>
-     * 
+     *
      * @param input <code>InputStream</code> to read from
-     * @throws CredentialException 
+     * @throws CredentialException
      */
     public void load(InputStream input) throws CredentialException {
         if (input == null) {
@@ -516,19 +510,19 @@ public class Merlin implements Crypto {
         }
         try {
             String provider = properties.getProperty("org.apache.ws.security.crypto.merlin.keystore.provider");
-            if(provider == null || provider.length() == 0) {
+            if (provider == null || provider.length() == 0) {
                 keystore = KeyStore.getInstance
                         (properties.getProperty("org.apache.ws.security.crypto.merlin.keystore.type",
                                 KeyStore.getDefaultType()));
             } else {
                 keystore = KeyStore.getInstance
                         (properties.getProperty("org.apache.ws.security.crypto.merlin.keystore.type",
-                                KeyStore.getDefaultType()),provider);
+                                KeyStore.getDefaultType()), provider);
             }
-            String password = 
-                properties.getProperty("org.apache.ws.security.crypto.merlin.keystore.password",
-                                       "security");
-            keystore.load(input, (password == null || password.length()==0) ? new char[0] : password.toCharArray());
+            String password =
+                    properties.getProperty("org.apache.ws.security.crypto.merlin.keystore.password",
+                            "security");
+            keystore.load(input, (password == null || password.length() == 0) ? new char[0] : password.toCharArray());
         } catch (IOException e) {
             e.printStackTrace();
             throw new CredentialException(3, "ioError00", e);
@@ -544,22 +538,21 @@ public class Merlin implements Crypto {
     static String SKI_OID = "2.5.29.14";
 
     /**
-     * Reads the SubjectKeyIdentifier information from the certificate. 
-     * <p/> 
-     * 
-     * @param cert       The certificate to read SKI
-     * @return              The byte array conating the binary SKI data
+     * Reads the SubjectKeyIdentifier information from the certificate.
+     * <p/>
+     *
+     * @param cert The certificate to read SKI
+     * @return The byte array conating the binary SKI data
      */
     public byte[] getSKIBytesFromCert(X509Certificate cert)
-        throws WSSecurityException {
+            throws WSSecurityException {
 
         byte data[] = null;
         byte abyte0[] = null;
         if (cert.getVersion() < 3) {
-            throw new WSSecurityException(
-                1,
-                "noSKIHandling",
-                new Object[] { "Wrong certificate version (<3)" });
+            throw new WSSecurityException(1,
+                    "noSKIHandling",
+                    new Object[]{"Wrong certificate version (<3)"});
         }
 
         /*
@@ -570,41 +563,36 @@ public class Merlin implements Crypto {
         data = cert.getExtensionValue(SKI_OID);
 
         if (data == null) {
-            throw new WSSecurityException(
-                WSSecurityException.UNSUPPORTED_SECURITY_TOKEN,
-                "noSKIHandling",
-                new Object[] { "No extension data" });
+            throw new WSSecurityException(WSSecurityException.UNSUPPORTED_SECURITY_TOKEN,
+                    "noSKIHandling",
+                    new Object[]{"No extension data"});
         }
         DerValue derValue = null;
         try {
             derValue = new DerValue(data);
         } catch (IOException e) {
-            throw new WSSecurityException(
-                WSSecurityException.UNSUPPORTED_SECURITY_TOKEN,
-                "noSKIHandling",
-                new Object[] { "cannot read SKI value" });
+            throw new WSSecurityException(WSSecurityException.UNSUPPORTED_SECURITY_TOKEN,
+                    "noSKIHandling",
+                    new Object[]{"cannot read SKI value"});
         }
 
         if (derValue == null) {
-            throw new WSSecurityException(
-                WSSecurityException.UNSUPPORTED_SECURITY_TOKEN,
-                "noSKIHandling",
-                new Object[] { "No DER value" });
+            throw new WSSecurityException(WSSecurityException.UNSUPPORTED_SECURITY_TOKEN,
+                    "noSKIHandling",
+                    new Object[]{"No DER value"});
         }
         if (derValue.tag != DerValue.tag_OctetString) {
-            throw new WSSecurityException(
-                WSSecurityException.UNSUPPORTED_SECURITY_TOKEN,
-                "noSKIHandling",
-                new Object[] { "No octet string" });
+            throw new WSSecurityException(WSSecurityException.UNSUPPORTED_SECURITY_TOKEN,
+                    "noSKIHandling",
+                    new Object[]{"No octet string"});
         }
         byte[] extensionValue = null;
         try {
             extensionValue = derValue.getOctetString();
         } catch (IOException e1) {
-            throw new WSSecurityException(
-                WSSecurityException.UNSUPPORTED_SECURITY_TOKEN,
-                "noSKIHandling",
-                new Object[] { "cannot read SKI value as octet data" });
+            throw new WSSecurityException(WSSecurityException.UNSUPPORTED_SECURITY_TOKEN,
+                    "noSKIHandling",
+                    new Object[]{"cannot read SKI value as octet data"});
         }
 
         /**
@@ -621,19 +609,18 @@ public class Merlin implements Crypto {
         return abyte0;
     }
 
-    public KeyStore getKeyStore()
-    {
+    public KeyStore getKeyStore() {
         return this.keystore;
     }
-    
+
     /**
      * Uses the CertPath API to validate a given certificate chain
-     * 
-     * @param certs      Certificate chain to validate
-     * @return           true if the certificate chain is valid, false otherwise
+     *
+     * @param certs Certificate chain to validate
+     * @return true if the certificate chain is valid, false otherwise
      * @throws WSSecurityException
      */
-    public boolean validateCertPath(X509Certificate[] certs) throws WSSecurityException {    
+    public boolean validateCertPath(X509Certificate[] certs) throws WSSecurityException {
 
         try {
             // Generate cert path
@@ -650,37 +637,32 @@ public class Merlin implements Crypto {
             CertPathValidator certPathValidator = CertPathValidator.getInstance("PKIX");
             certPathValidator.validate(path, param);
         } catch (NoSuchAlgorithmException ex) {
-            throw new WSSecurityException(
-                WSSecurityException.FAILURE,
-                "certpath",
-                new Object[] { ex.getMessage()},
-                (Throwable) ex);
+            throw new WSSecurityException(WSSecurityException.FAILURE,
+                    "certpath",
+                    new Object[]{ex.getMessage()},
+                    (Throwable) ex);
         } catch (CertificateException ex) {
-            throw new WSSecurityException(
-                WSSecurityException.FAILURE,
-                "certpath",
-                new Object[] { ex.getMessage()},
-                (Throwable) ex);
+            throw new WSSecurityException(WSSecurityException.FAILURE,
+                    "certpath",
+                    new Object[]{ex.getMessage()},
+                    (Throwable) ex);
         } catch (InvalidAlgorithmParameterException ex) {
-            throw new WSSecurityException(
-                WSSecurityException.FAILURE,
-                "certpath",
-                new Object[] { ex.getMessage()},
-                (Throwable) ex);
+            throw new WSSecurityException(WSSecurityException.FAILURE,
+                    "certpath",
+                    new Object[]{ex.getMessage()},
+                    (Throwable) ex);
         } catch (CertPathValidatorException ex) {
-            throw new WSSecurityException(
-                WSSecurityException.FAILURE,
-                "certpath",
-                new Object[] { ex.getMessage()},
-                (Throwable) ex);
+            throw new WSSecurityException(WSSecurityException.FAILURE,
+                    "certpath",
+                    new Object[]{ex.getMessage()},
+                    (Throwable) ex);
         } catch (KeyStoreException ex) {
-            throw new WSSecurityException(
-                WSSecurityException.FAILURE,
-                "certpath",
-                new Object[] { ex.getMessage()},
-                (Throwable) ex);
+            throw new WSSecurityException(WSSecurityException.FAILURE,
+                    "certpath",
+                    new Object[]{ex.getMessage()},
+                    (Throwable) ex);
         }
-        
+
         return true;
     }
 
@@ -689,16 +671,16 @@ public class Merlin implements Crypto {
      * <p/>
      * The search gets all alias names of the keystore and gets the certificate (chain)
      * for each alias. Then the DN of the certificate is compared with the parameters.
-     * 
-     * @param subjectDN  The DN of subject to look for in the keystore 
-     * @return              Vector with all alias of certificates with the same DN as given in the parameters
+     *
+     * @param subjectDN The DN of subject to look for in the keystore
+     * @return Vector with all alias of certificates with the same DN as given in the parameters
      * @throws WSSecurityException
-     */    
+     */
     public String[] getAliasesForDN(String subjectDN) throws WSSecurityException {
-        
+
         // Store the aliases found
         Vector aliases = new Vector();
-         
+
         Certificate cert = null;
         
         // The DN to search the keystore for
@@ -708,7 +690,7 @@ public class Merlin implements Crypto {
         try {
             for (Enumeration e = keystore.aliases(); e.hasMoreElements();) {
                 String alias = (String) e.nextElement();
-                
+
                 Certificate[] certs = keystore.getCertificateChain(alias);
                 if (certs == null || certs.length == 0) {
                     // no cert chain, so lets check if getCertificate gives us a  result.
@@ -716,28 +698,27 @@ public class Merlin implements Crypto {
                     if (cert == null) {
                         return null;
                     }
-                    certs = new Certificate[] { cert };
+                    certs = new Certificate[]{cert};
                 } else {
                     cert = certs[0];
                 }
                 if (cert instanceof X509Certificate) {
                     Vector foundRDN = splitAndTrim(((X509Certificate) cert).getSubjectDN().getName());
-    
+
                     if (subjectRDN.equals(foundRDN)) {
                         aliases.add(alias);
                     }
                 }
             }
         } catch (KeyStoreException e) {
-            throw new WSSecurityException(
-                WSSecurityException.FAILURE,
-                "keystore");    
+            throw new WSSecurityException(WSSecurityException.FAILURE,
+                    "keystore");
         }
         
         // Convert the vector into an array
         String[] result = new String[aliases.size()];
-        for (int i=0; i < aliases.size(); i++) result[i] = (String) aliases.elementAt(i);
-        
+        for (int i = 0; i < aliases.size(); i++) result[i] = (String) aliases.elementAt(i);
+
         return result;
     }
 }

@@ -1,4 +1,5 @@
 package org.apache.ws.security.conversation.message.token;
+
 /*
  * Copyright  2003-2004 The Apache Software Foundation.
  *
@@ -24,10 +25,6 @@ package org.apache.ws.security.conversation.message.token;
  * @version 1.0
  */
 
-import java.io.ByteArrayOutputStream;
-
-import javax.xml.namespace.QName;
-
 import org.apache.axis.components.logger.LogFactory;
 import org.apache.commons.logging.Log;
 import org.apache.ws.security.WSSConfig;
@@ -40,6 +37,9 @@ import org.apache.xml.security.utils.XMLUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+
+import javax.xml.namespace.QName;
+import java.io.ByteArrayOutputStream;
 
 public class RequestSecurityTokenResponse {
     private static Log log =
@@ -54,100 +54,94 @@ public class RequestSecurityTokenResponse {
     private Element lifeTime = null;
 
     public static final QName TOKEN =
-        new QName(
-            TrustConstants.WST_NS,
-            TrustConstants.REQUEST_SECURITY_TOKEN_RESPONSE_LN,
-            TrustConstants.WST_PREFIX);
+            new QName(TrustConstants.WST_NS,
+                    TrustConstants.REQUEST_SECURITY_TOKEN_RESPONSE_LN,
+                    TrustConstants.WST_PREFIX);
     //
     /**
      * Constructor
+     *
      * @param doc
      * @throws java.lang.Exception
      */
     public RequestSecurityTokenResponse(Document doc) throws Exception {
         this.element =
-            doc.createElementNS(
+                doc.createElementNS(TOKEN.getNamespaceURI(),
+                        TOKEN.getPrefix() + ":" + TOKEN.getLocalPart());
+        WSSecurityUtil.setNamespace(this.element,
                 TOKEN.getNamespaceURI(),
-                TOKEN.getPrefix() + ":" + TOKEN.getLocalPart());
-        WSSecurityUtil.setNamespace(
-            this.element,
-            TOKEN.getNamespaceURI(),
-            TrustConstants.WST_PREFIX);
+                TrustConstants.WST_PREFIX);
         this.element.appendChild(doc.createTextNode(""));
 
     }
-    
 
     /**
-         * Constructor
-         * @param doc
-         * @throws java.lang.Exception
-         */
-        public RequestSecurityTokenResponse(Document doc, boolean generateChildren) throws Exception {
-            this(doc);
-          if(generateChildren){
-                this.requestedSecurityToken=new RequestedSecurityToken(doc,true);
-                this.requestedProofToken =new RequestedProofToken(doc);
-                this.element.appendChild(requestedSecurityToken.getElement());//ruchith
-                this.element.appendChild(requestedProofToken.getElement());//dimuthu
-          }
+     * Constructor
+     *
+     * @param doc
+     * @throws java.lang.Exception
+     */
+    public RequestSecurityTokenResponse(Document doc, boolean generateChildren) throws Exception {
+        this(doc);
+        if (generateChildren) {
+            this.requestedSecurityToken = new RequestedSecurityToken(doc, true);
+            this.requestedProofToken = new RequestedProofToken(doc);
+            this.element.appendChild(requestedSecurityToken.getElement());//ruchith
+            this.element.appendChild(requestedProofToken.getElement());//dimuthu
         }
-
+    }
 
     /**
      * To create a RequestSecurityTokenResponse token form an element passed
+     *
      * @param elem
      * @throws WSSecurityException
      */
     public RequestSecurityTokenResponse(Element elem)
-        throws WSSecurityException {
+            throws WSSecurityException {
         this.element = elem;
         QName el =
-            new QName(
-                this.element.getNamespaceURI(),
-                this.element.getLocalName());
+                new QName(this.element.getNamespaceURI(),
+                        this.element.getLocalName());
         if (!el.equals(TOKEN)) {
-            throw new WSSecurityException(
-                WSSecurityException.INVALID_SECURITY_TOKEN,
-                "badTokenType00",
-                new Object[] { el });
+            throw new WSSecurityException(WSSecurityException.INVALID_SECURITY_TOKEN,
+                    "badTokenType00",
+                    new Object[]{el});
         }
 
         //System.out.println("RequestSecurityTokenResponse created");
 
     }
+
     /**
      * May not be usefull in future developments.
-        * Always try to use parseChildElements as false 
+     * Always try to use parseChildElements as false
+     *
      * @param elem
      * @param setChildElement
      * @throws WSSecurityException
      */
-    public RequestSecurityTokenResponse(
-        Element elem,
-        boolean parseChildElements)
-        throws WSSecurityException {
+    public RequestSecurityTokenResponse(Element elem,
+                                        boolean parseChildElements)
+            throws WSSecurityException {
         this(elem);
         if (!parseChildElements) {
             return;
         }
         Element elemTemp;
-                
+
         this.tokenType =
-            (Element) WSSecurityUtil.getDirectChild(
-                elem.getOwnerDocument(),
-                TokenType.TOKEN.getLocalPart(),
-                TokenType.TOKEN.getNamespaceURI());
-        
-        if((elemTemp=(Element) WSSecurityUtil.getDirectChild(
-                                                    //elem.getOwnerDocument(),
-                                                    elem,
-                                                    RequestedSecurityToken.TOKEN.getLocalPart(),
-                                                    RequestedSecurityToken.TOKEN.getNamespaceURI()))!=null)
-                                                    {
-                                                        this.requestedSecurityToken =
-                                                            new RequestedSecurityToken(elemTemp, true);    
-                                                    }
+                (Element) WSSecurityUtil.getDirectChild(elem.getOwnerDocument(),
+                        TokenType.TOKEN.getLocalPart(),
+                        TokenType.TOKEN.getNamespaceURI());
+
+        if ((elemTemp = (Element) WSSecurityUtil.getDirectChild(//elem.getOwnerDocument(),
+                elem,
+                RequestedSecurityToken.TOKEN.getLocalPart(),
+                RequestedSecurityToken.TOKEN.getNamespaceURI())) != null) {
+            this.requestedSecurityToken =
+                    new RequestedSecurityToken(elemTemp, true);
+        }
 //            this.requestedSecurityToken =
 //                new RequestedSecurityToken(
 //                    (Element) WSSecurityUtil.getDirectChild(
@@ -155,15 +149,13 @@ public class RequestSecurityTokenResponse {
 //                        RequestedSecurityToken.TOKEN.getLocalPart(),
 //                        RequestedSecurityToken.TOKEN.getNamespaceURI()));
 
-        if((elemTemp=(Element) WSSecurityUtil.getDirectChild(
-                                                    //elem.getOwnerDocument(),
-                                                    elem,
-                                                    RequestedProofToken.TOKEN.getLocalPart(),
-                                                    RequestedProofToken.TOKEN.getNamespaceURI()))!=null)
-                                                    {
-                                                        this.requestedProofToken =
-                                                            new RequestedProofToken(elemTemp);    
-                                                    }
+        if ((elemTemp = (Element) WSSecurityUtil.getDirectChild(//elem.getOwnerDocument(),
+                elem,
+                RequestedProofToken.TOKEN.getLocalPart(),
+                RequestedProofToken.TOKEN.getNamespaceURI())) != null) {
+            this.requestedProofToken =
+                    new RequestedProofToken(elemTemp);
+        }
 //        this.requestedProofToken =
 //            new RequestedProofToken(
 //                (Element) WSSecurityUtil.getDirectChild(
@@ -176,18 +168,18 @@ public class RequestSecurityTokenResponse {
 
     }
 
-    public void setContext(String context){
+    public void setContext(String context) {
         this.element.setAttribute("Context", context);
     }
-    
-    public String getContext(){
+
+    public String getContext() {
         return this.element.getAttribute("Context");
     }
-
 
     public Element getElement() {
         return element;
     }
+
     public void setElement(Element element) {
         this.element = element;
     }
@@ -195,6 +187,7 @@ public class RequestSecurityTokenResponse {
     public String toString() {
         return DOM2Writer.nodeToString((Node) this.element);
     }
+
     public void addToken(Element childToken) {
         this.element.appendChild(childToken);
     }
@@ -216,18 +209,17 @@ public class RequestSecurityTokenResponse {
     public RequestedSecurityToken getRequestedSecurityToken() {
         return requestedSecurityToken;
     }
-    
-    public void build(Document doc){
-              Element securityHeader = WSSecurityUtil.findWsseSecurityHeaderBlock(WSSConfig.getDefaultWSConfig() ,doc, doc.getDocumentElement(), true);
-              WSSecurityUtil.appendChildElement(doc, securityHeader, this.element);
+
+    public void build(Document doc) {
+        Element securityHeader = WSSecurityUtil.findWsseSecurityHeaderBlock(WSSConfig.getDefaultWSConfig(), doc, doc.getDocumentElement(), true);
+        WSSecurityUtil.appendChildElement(doc, securityHeader, this.element);
 //              WSSecurityUtil.setNamespace(securityHeader, WSConstants.WSU_NS,
         //                                          WSConstants.WSU_PREFIX);
-           if(log.isInfoEnabled()){
+        if (log.isInfoEnabled()) {
             ByteArrayOutputStream os = new ByteArrayOutputStream();
             XMLUtils.outputDOM(doc, os, true);
             String osStr = os.toString();
-            }
-  }
-
+        }
+    }
 
 }

@@ -43,19 +43,19 @@ import org.apache.xml.security.utils.XMLUtils;
 import org.w3c.dom.Document;
 
 import javax.security.auth.callback.CallbackHandler;
+import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPHeader;
 import javax.xml.soap.SOAPHeaderElement;
-import javax.xml.namespace.QName;
 import java.io.ByteArrayOutputStream;
 import java.math.BigInteger;
 import java.security.cert.X509Certificate;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.TimeZone;
 import java.util.Vector;
-import java.util.ArrayList;
 
 public class WSDoAllReceiver extends BasicHandler {
     static Log log = LogFactory.getLog(WSDoAllReceiver.class.getName());
@@ -78,9 +78,9 @@ public class WSDoAllReceiver extends BasicHandler {
     /**
      * Axis calls invoke to handle a message.
      * <p/>
-     * 
+     *
      * @param mc message context.
-     * @throws AxisFault 
+     * @throws AxisFault
      */
     public void invoke(MessageContext mc) throws AxisFault {
 
@@ -99,7 +99,7 @@ public class WSDoAllReceiver extends BasicHandler {
             throw new AxisFault("WSDoAllReceiver: No action defined");
         }
         int doAction = AxisUtil.decodeAction(action, actions);
-        
+
         String actor = (String) getOption(WSDoAllConstants.ACTOR);
 
         Message sm = msgContext.getCurrentMessage();
@@ -111,9 +111,8 @@ public class WSDoAllReceiver extends BasicHandler {
                 log.debug(org.apache.axis.utils.XMLUtils.PrettyDocumentToString(doc));
             }
         } catch (Exception ex) {
-            throw new AxisFault(
-                "WSDoAllReceiver: cannot convert into document",
-                ex);
+            throw new AxisFault("WSDoAllReceiver: cannot convert into document",
+                    ex);
         }
         /*
          * Check if it's a response and if its a fault. Don't
@@ -122,13 +121,12 @@ public class WSDoAllReceiver extends BasicHandler {
         String msgType = sm.getMessageType();
         if (msgType != null && msgType.equals(Message.RESPONSE)) {
             SOAPConstants soapConstants =
-                WSSecurityUtil.getSOAPConstants(doc.getDocumentElement());
+                    WSSecurityUtil.getSOAPConstants(doc.getDocumentElement());
             if (WSSecurityUtil
-                .findElement(
-                    doc.getDocumentElement(),
-                    "Fault",
-                    soapConstants.getEnvelopeURI())
-                != null) {
+                    .findElement(doc.getDocumentElement(),
+                            "Fault",
+                            soapConstants.getEnvelopeURI())
+                    != null) {
                 return;
             }
         }
@@ -149,7 +147,7 @@ public class WSDoAllReceiver extends BasicHandler {
 
         if ((doAction & WSConstants.SIGN) == WSConstants.SIGN) {
             decodeSignatureParameter();
-        } 
+        }
 
         if ((doAction & WSConstants.ENCR) == WSConstants.ENCR) {
             decodeDecryptionParameter();
@@ -158,17 +156,15 @@ public class WSDoAllReceiver extends BasicHandler {
         Vector wsResult = null;
         try {
             wsResult =
-                secEngine.processSecurityHeader(
-                    doc,
-                    actor,
-                    cbHandler,
-                    sigCrypto,
-                    decCrypto);
+                    secEngine.processSecurityHeader(doc,
+                            actor,
+                            cbHandler,
+                            sigCrypto,
+                            decCrypto);
         } catch (WSSecurityException ex) {
             ex.printStackTrace();
-            throw new AxisFault(
-                "WSDoAllReceiver: security processing failed",
-                ex);
+            throw new AxisFault("WSDoAllReceiver: security processing failed",
+                    ex);
         }
         if (wsResult == null) {            // no security header found
             if (doAction == WSConstants.NO_SECURITY) {
@@ -196,7 +192,7 @@ public class WSDoAllReceiver extends BasicHandler {
          * part. This new part may contain decrypted elements.
          */
         SOAPPart sPart = (org.apache.axis.SOAPPart) sm.getSOAPPart();
-        
+
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         XMLUtils.outputDOM(doc, os, true);
         sPart.setCurrentMessage(os.toByteArray(), SOAPPart.FORM_BYTES);
@@ -211,7 +207,7 @@ public class WSDoAllReceiver extends BasicHandler {
         iterator = processedHeaders.iterator();
         while (iterator.hasNext()) {
             QName qname = (QName) iterator.next();
-            org.apache.axis.message.SOAPHeaderElement tempHeader = (org.apache.axis.message.SOAPHeaderElement) sm.getSOAPEnvelope().getHeadersByName(qname.getNamespaceURI(),qname.getLocalPart()); 
+            org.apache.axis.message.SOAPHeaderElement tempHeader = (org.apache.axis.message.SOAPHeaderElement) sm.getSOAPEnvelope().getHeadersByName(qname.getNamespaceURI(), qname.getLocalPart());
             tempHeader.setProcessed(true);
         }        
 
@@ -240,7 +236,7 @@ public class WSDoAllReceiver extends BasicHandler {
         while (headers.hasNext()) {
             SOAPHeaderElement hE = (SOAPHeaderElement) headers.next();
             if (hE.getLocalName().equals(WSConstants.WSSE_LN)
-                && hE.getNamespaceURI().equals(WSConstants.WSSE_NS)) {
+                    && hE.getNamespaceURI().equals(WSConstants.WSSE_NS)) {
                 headerElement = hE;
                 break;
             }
@@ -259,7 +255,7 @@ public class WSDoAllReceiver extends BasicHandler {
 
         // Extract the signature action result from the action vector
         WSSecurityEngineResult actionResult = WSSecurityUtil.fetchActionResult(wsResult, WSConstants.SIGN);
-        
+
         if (actionResult != null) {
             X509Certificate returnCert = actionResult.getCertificate();
 
@@ -281,18 +277,17 @@ public class WSDoAllReceiver extends BasicHandler {
          
         // Extract the timestamp action result from the action vector
         actionResult = WSSecurityUtil.fetchActionResult(wsResult, WSConstants.TS);
-        
+
         if (actionResult != null) {
             Timestamp timestamp = actionResult.getTimestamp();
 
             if (timestamp != null) {
                 String ttl = null;
                 if ((ttl =
-                    (String) getOption(WSDoAllConstants.TTL_TIMESTAMP))
-                    == null) {
+                        (String) getOption(WSDoAllConstants.TTL_TIMESTAMP))
+                        == null) {
                     ttl =
-                        (String) msgContext.getProperty(
-                            WSDoAllConstants.TTL_TIMESTAMP);
+                            (String) msgContext.getProperty(WSDoAllConstants.TTL_TIMESTAMP);
                 }
                 int ttl_i = 0;
                 if (ttl != null) {
@@ -303,7 +298,7 @@ public class WSDoAllReceiver extends BasicHandler {
                     }
                 }
                 if (ttl_i <= 0) {
-                    ttl_i = timeToLive;   
+                    ttl_i = timeToLive;
                 }
 
                 if (!verifyTimestamp(timestamp, timeToLive)) {
@@ -322,7 +317,7 @@ public class WSDoAllReceiver extends BasicHandler {
         }
         for (int i = 0; i < size; i++) {
             if (((Integer) actions.get(i)).intValue()
-                != ((WSSecurityEngineResult)wsResult.get(i)).getAction()) {
+                    != ((WSSecurityEngineResult) wsResult.get(i)).getAction()) {
                 throw new AxisFault("WSDoAllReceiver: security processing failed (actions mismatch)");
             }
         }
@@ -334,29 +329,28 @@ public class WSDoAllReceiver extends BasicHandler {
          */
         Vector results = null;
         if ((results = (Vector) mc.getProperty(WSDoAllConstants.RECV_RESULTS))
-            == null) {
+                == null) {
             results = new Vector();
             mc.setProperty(WSDoAllConstants.RECV_RESULTS, results);
         }
         WSDoAllReceiverResult rResult =
-            new WSDoAllReceiverResult(
-                actor,
-                wsResult);
+                new WSDoAllReceiverResult(actor,
+                        wsResult);
         results.add(0, rResult);
         if (doDebug) {
             log.debug("WSDoAllReceiver: exit invoke()");
         }
-    } 
-    
+    }
+
     /**
      * Hook to allow subclasses to load their Signature Crypto however they see fit.
      */
     protected Crypto loadSignatureCrypto() throws AxisFault {
         Crypto crypto = null;
         if ((sigPropFile = (String) getOption(WSDoAllConstants.SIG_PROP_FILE))
-            == null) {
+                == null) {
             sigPropFile =
-                (String) msgContext.getProperty(WSDoAllConstants.SIG_PROP_FILE);
+                    (String) msgContext.getProperty(WSDoAllConstants.SIG_PROP_FILE);
         }
         if (sigPropFile != null) {
             if ((crypto = (Crypto) cryptos.get(sigPropFile)) == null) {
@@ -368,16 +362,16 @@ public class WSDoAllReceiver extends BasicHandler {
         }
         return crypto;
     }
-    
+
     /**
      * Hook to allow subclasses to load their Decryption Crypto however they see fit.
      */
     protected Crypto loadDecryptionCrypto() throws AxisFault {
         Crypto crypto = null;
         if ((decPropFile = (String) getOption(WSDoAllConstants.DEC_PROP_FILE))
-            == null) {
+                == null) {
             decPropFile =
-                (String) msgContext.getProperty(WSDoAllConstants.DEC_PROP_FILE);
+                    (String) msgContext.getProperty(WSDoAllConstants.DEC_PROP_FILE);
         }
         if (decPropFile != null) {
             if ((crypto = (Crypto) cryptos.get(decPropFile)) == null) {
@@ -389,7 +383,7 @@ public class WSDoAllReceiver extends BasicHandler {
         }
         return crypto;
     }
-    
+
     private void decodeSignatureParameter() throws AxisFault {
         sigCrypto = loadSignatureCrypto();
         /* There are currently no other signature parameters that need to be handled 
@@ -420,33 +414,29 @@ public class WSDoAllReceiver extends BasicHandler {
         String callback = null;
         CallbackHandler cbHandler = null;
         if ((callback = (String) getOption(WSDoAllConstants.PW_CALLBACK_CLASS))
-            == null) {
+                == null) {
             callback =
-                (String) msgContext.getProperty(
-                    WSDoAllConstants.PW_CALLBACK_CLASS);
+                    (String) msgContext.getProperty(WSDoAllConstants.PW_CALLBACK_CLASS);
         }
         if (callback != null) {
             Class cbClass = null;
             try {
                 cbClass = java.lang.Class.forName(callback);
             } catch (ClassNotFoundException e) {
-                throw new AxisFault(
-                    "WSDoAllReceiver: cannot load password callback class: "
+                throw new AxisFault("WSDoAllReceiver: cannot load password callback class: "
                         + callback,
-                    e);
+                        e);
             }
             try {
                 cbHandler = (CallbackHandler) cbClass.newInstance();
             } catch (java.lang.Exception e) {
-                throw new AxisFault(
-                    "WSDoAllReceiver: cannot create instance of password callback: "
+                throw new AxisFault("WSDoAllReceiver: cannot create instance of password callback: "
                         + callback,
-                    e);
+                        e);
             }
         } else {
             cbHandler =
-                (CallbackHandler) msgContext.getProperty(
-                    WSDoAllConstants.PW_CALLBACK_REF);
+                    (CallbackHandler) msgContext.getProperty(WSDoAllConstants.PW_CALLBACK_REF);
             if (cbHandler == null) {
                 throw new AxisFault("WSDoAllReceiver: no reference in callback property");
             }
@@ -461,11 +451,11 @@ public class WSDoAllReceiver extends BasicHandler {
      * Policy used in this implementation:
      * 1. Search the keystore for the transmitted certificate
      * 2. Search the keystore for a connection to the transmitted certificate
-     *    (that is, search for certificate(s) of the issuer of the transmitted certificate
+     * (that is, search for certificate(s) of the issuer of the transmitted certificate
      * 3. Verify the trust path for those certificates found because the search for the issuer might be fooled by a phony DN (String!)
-     * 
-     * @param cert       the certificate that should be validated against the keystore
-     * @return              true if the certificate is trusted, false if not (AxisFault is thrown for exceptions during CertPathValidation)
+     *
+     * @param cert the certificate that should be validated against the keystore
+     * @return true if the certificate is trusted, false if not (AxisFault is thrown for exceptions during CertPathValidation)
      * @throws AxisFault
      */
     private boolean verifyTrust(X509Certificate cert) throws AxisFault {
@@ -478,7 +468,7 @@ public class WSDoAllReceiver extends BasicHandler {
         String[] aliases = null;
         String alias = null;
         X509Certificate[] certs;
-    
+
         String subjectString = cert.getSubjectDN().getName();
         String issuerString = cert.getIssuerDN().getName();
         BigInteger issuerSerial = cert.getSerialNumber();
@@ -541,7 +531,7 @@ public class WSDoAllReceiver extends BasicHandler {
 
         // THIRD step
         // Check the certificate trust path for every alias of the issuer found in the keystore 
-        for (int i = 0; i < aliases.length; i++) { 
+        for (int i = 0; i < aliases.length; i++) {
             alias = aliases[i];
 
             if (doDebug) {
@@ -582,7 +572,7 @@ public class WSDoAllReceiver extends BasicHandler {
             x509certs[0] = cert;
             
             // ... and the other certificates
-            for (int j=0; j < certs.length; j++) {
+            for (int j = 0; j < certs.length; j++) {
                 cert = certs[i];
 
                 /* The following conversion into provider specific format seems not to be necessary
@@ -612,8 +602,8 @@ public class WSDoAllReceiver extends BasicHandler {
                 throw new AxisFault("WSDoAllReceiver: Certificate path verification failed for certificate with subject " + subjectString, ex);
             }
         }
-        
-        log.debug("WSDoAllReceiver: Certificate path could not be verified for certificate with subject " + subjectString);        
+
+        log.debug("WSDoAllReceiver: Certificate path could not be verified for certificate with subject " + subjectString);
         return false;
     }
 
@@ -622,12 +612,12 @@ public class WSDoAllReceiver extends BasicHandler {
      * Hook to allow subclasses to implement custom validation methods however they see fit.
      * <p/>
      * Policy used in this implementation:
-     * 1. The receiver can set its own time to live (besides from that set on sender side) 
+     * 1. The receiver can set its own time to live (besides from that set on sender side)
      * 2. If the message was created before (now-ttl) the message is rejected
-     * 
+     *
      * @param timestamp  the timestamp that is validated
      * @param timeToLive the limit on receiverside, the timestamp is validated against
-     * @return              true if the timestamp is before (now-timeToLive), false otherwise
+     * @return true if the timestamp is before (now-timeToLive), false otherwise
      * @throws AxisFault
      */
     protected boolean verifyTimestamp(Timestamp timestamp, int timeToLive) throws AxisFault {
@@ -636,12 +626,11 @@ public class WSDoAllReceiver extends BasicHandler {
         Calendar validCreation = Calendar.getInstance();
         long currentTime = validCreation.getTimeInMillis();
         currentTime -= timeToLive * 1000;
-        validCreation.setTimeInMillis(currentTime);        
+        validCreation.setTimeInMillis(currentTime);
 
         if (doDebug) {
             log.debug("Preparing to verify the timestamp");
-            SimpleDateFormat zulu = new SimpleDateFormat(
-                    "yyyy-MM-dd'T'HH:mm:ss'Z'");
+            SimpleDateFormat zulu = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
             zulu.setTimeZone(TimeZone.getTimeZone("GMT"));
             log.debug("Validation of Timestamp: Current time is "
                     + zulu.format(Calendar.getInstance().getTime()));
@@ -659,7 +648,7 @@ public class WSDoAllReceiver extends BasicHandler {
             }
             return false;
         }
-        
+
         log.debug("Validation of Timestamp: Everything is ok");
         return true;
     }

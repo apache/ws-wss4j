@@ -24,7 +24,7 @@ import java.util.ResourceBundle;
 /**
  * CredentialException.
  * <p/>
- * 
+ *
  * @author Davanum Srinivas (dims@yahoo.com).
  */
 public class CredentialException extends Exception {
@@ -47,10 +47,10 @@ public class CredentialException extends Exception {
     /**
      * Constructor.
      * <p/>
-     * 
-     * @param errorCode 
-     * @param msgId     
-     * @param root      
+     *
+     * @param errorCode
+     * @param msgId
+     * @param root
      */
     public CredentialException(int errorCode, String msgId, Throwable root) {
         this(errorCode, msgId, null, root);
@@ -59,10 +59,10 @@ public class CredentialException extends Exception {
     /**
      * Constructor.
      * <p/>
-     * 
-     * @param errorCode 
-     * @param msgId     
-     * @param args      
+     *
+     * @param errorCode
+     * @param msgId
+     * @param args
      */
     public CredentialException(int errorCode, String msgId, Object[] args) {
         this(errorCode, msgId, args, null);
@@ -71,11 +71,11 @@ public class CredentialException extends Exception {
     /**
      * Constructor.
      * <p/>
-     * 
-     * @param errorCode 
-     * @param msgId     
-     * @param args      
-     * @param root      
+     *
+     * @param errorCode
+     * @param msgId
+     * @param args
+     * @param root
      */
     public CredentialException(int errorCode, String msgId, Object[] args, Throwable root) {
         super(getMessage(msgId, args) + (root == null ? "[]" : " Inner Exception: [" + root.getMessage() + "]"));
@@ -86,7 +86,7 @@ public class CredentialException extends Exception {
     /**
      * get the error code.
      * <p/>
-     * 
+     *
      * @return error code of this exception See values above.
      */
     public int getErrorCode() {
@@ -96,9 +96,9 @@ public class CredentialException extends Exception {
     /**
      * get the actual message.
      * <p/>
-     * 
-     * @param msgId 
-     * @param args  
+     *
+     * @param msgId
+     * @param args
      * @return the message translated from the property (message) file.
      */
     private static String getMessage(String msgId, Object[] args) {

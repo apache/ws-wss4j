@@ -27,11 +27,11 @@ import javax.xml.namespace.QName;
  */
 public class SOAP11Constants implements SOAPConstants {
     private static QName headerQName = new QName(WSConstants.URI_SOAP11_ENV,
-                                                 WSConstants.ELEM_HEADER);
+            WSConstants.ELEM_HEADER);
     private static QName bodyQName = new QName(WSConstants.URI_SOAP11_ENV,
-                                               WSConstants.ELEM_BODY);
+            WSConstants.ELEM_BODY);
     private static QName roleQName = new QName(WSConstants.URI_SOAP11_ENV,
-                                                WSConstants.ATTR_ACTOR);
+            WSConstants.ATTR_ACTOR);
 
     public String getEnvelopeURI() {
         return WSConstants.URI_SOAP11_ENV;
@@ -58,6 +58,7 @@ public class SOAP11Constants implements SOAPConstants {
     public String getNextRoleURI() {
         return WSConstants.URI_SOAP11_NEXT_ACTOR;
     }
+
     /**
      * Obtain the Mustunderstand string
      */

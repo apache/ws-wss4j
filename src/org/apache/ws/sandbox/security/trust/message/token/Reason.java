@@ -15,7 +15,6 @@
  *
  */
 package org.apache.ws.security.trust.message.token;
-import javax.xml.namespace.QName;
 
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.trust.TrustConstants;
@@ -25,60 +24,69 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.Text;
+
+import javax.xml.namespace.QName;
+
 /**
  * @author Malinda Kaushalye
- * Reason token
+ *         Reason token
  * @see org.apache.ws.security.trust.message.token.Status
  */
 public class Reason {
-    public static final QName TOKEN = new QName(TrustConstants.WST_NS, TrustConstants.REASON_LN,TrustConstants.WST_PREFIX);
-    Element element=null;
+    public static final QName TOKEN = new QName(TrustConstants.WST_NS, TrustConstants.REASON_LN, TrustConstants.WST_PREFIX);
+    Element element = null;
+
     /**
      * Constructor for Reason
+     *
      * @param elem
      * @throws WSSecurityException
-     */    
-    public Reason(Element elem) throws WSSecurityException {    
+     */
+    public Reason(Element elem) throws WSSecurityException {
         this.element = elem;
-         QName el = new QName(this.element.getNamespaceURI(), this.element.getLocalName());
-         if (!el.equals(TOKEN)) {
-             throw new WSSecurityException(WSSecurityException.INVALID_SECURITY_TOKEN, "badTokenType", new Object[]{el});
-         } 
+        QName el = new QName(this.element.getNamespaceURI(), this.element.getLocalName());
+        if (!el.equals(TOKEN)) {
+            throw new WSSecurityException(WSSecurityException.INVALID_SECURITY_TOKEN, "badTokenType", new Object[]{el});
+        }
 
     }
+
     /**
      * Constructor for Reason
-     * 
+     *
      * @param doc
      */
     public Reason(Document doc) {
-        this.element = doc.createElementNS(TOKEN.getNamespaceURI(), TOKEN.getPrefix()+":"+TOKEN.getLocalPart());
+        this.element = doc.createElementNS(TOKEN.getNamespaceURI(), TOKEN.getPrefix() + ":" + TOKEN.getLocalPart());
         WSSecurityUtil.setNamespace(this.element, TrustConstants.WST_NS, TrustConstants.WST_PREFIX);
         this.element.appendChild(doc.createTextNode(""));
     }
+
     /**
      * Constructor for Reason
-     * 
+     *
      * @param doc
      * @param value
      */
-    public Reason(Document doc,String value) {
-        this.element = doc.createElementNS(TOKEN.getNamespaceURI(), TOKEN.getPrefix()+":"+TOKEN.getLocalPart());
+    public Reason(Document doc, String value) {
+        this.element = doc.createElementNS(TOKEN.getNamespaceURI(), TOKEN.getPrefix() + ":" + TOKEN.getLocalPart());
         WSSecurityUtil.setNamespace(this.element, TrustConstants.WST_NS, TrustConstants.WST_PREFIX);
         this.element.appendChild(doc.createTextNode(value));
     }
+
     /**
      * get the first Node of the element
+     *
      * @return
      */
     public Text getFirstNode() {
         Node node = this.element.getFirstChild();
         return ((node != null) && node instanceof Text) ? (Text) node : null;
     }
-    
 
     /**
      * getthe Reason element
+     *
      * @return
      */
     public Element getElement() {
@@ -87,36 +95,40 @@ public class Reason {
 
     /**
      * Set the reason element
+     *
      * @param element
      */
     public void setElement(Element element) {
         this.element = element;
     }
+
     /**
      * Set the reason value
-     * 
+     *
      * @param val
      */
-    public void setValue(String val){    
+    public void setValue(String val) {
         this.element.appendChild(element.getOwnerDocument().createTextNode(val));
     }
-    
+
     /**
      * to get the element as a String
      */
     public String toString() {
-      return DOM2Writer.nodeToString((Node)this.element);
+        return DOM2Writer.nodeToString((Node) this.element);
     }
+
     /**
      * get the value of the reason token
+     *
      * @return
      */
-    public String getValue(){
-        String val="";
-        if(this.element.getFirstChild().getNodeType()!=Node.TEXT_NODE){
+    public String getValue() {
+        String val = "";
+        if (this.element.getFirstChild().getNodeType() != Node.TEXT_NODE) {
             return null;
         }
-        val=this.element.getFirstChild().getNodeValue();        
-        return val;    
+        val = this.element.getFirstChild().getNodeValue();
+        return val;
     }
 }

@@ -16,8 +16,6 @@
  */
 package org.apache.ws.security.trust.message.token;
 
-import javax.xml.namespace.QName;
-
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.message.token.BinarySecurity;
@@ -29,57 +27,56 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import javax.xml.namespace.QName;
+
 /**
  * @author Malinda Kaushalye
- * 
- * Base token.
- * 
- *
+ *         <p/>
+ *         Base token.
  */
 public class BaseToken {
-    public static final QName TOKEN = new QName(TrustConstants.WST_NS,TrustConstants.BASE_LN,TrustConstants.WST_PREFIX);
+    public static final QName TOKEN = new QName(TrustConstants.WST_NS, TrustConstants.BASE_LN, TrustConstants.WST_PREFIX);
     Element element;
-    
 
     /**
      * Constructor for Base
+     *
      * @param elem
      * @throws WSSecurityException
      */
     public BaseToken(Element elem) throws WSSecurityException {
         this.element = elem;
         QName el =
-            new QName(
-                this.element.getNamespaceURI(),
-                this.element.getLocalName());
+                new QName(this.element.getNamespaceURI(),
+                        this.element.getLocalName());
         if (!el.equals(TOKEN)) {
-            
-            throw new WSSecurityException(
-                WSSecurityException.INVALID_SECURITY_TOKEN,
-                "badTokenType:base",
-                new Object[] { el });
+
+            throw new WSSecurityException(WSSecurityException.INVALID_SECURITY_TOKEN,
+                    "badTokenType:base",
+                    new Object[]{el});
         }
-        
+
     }
+
     /**
      * Constructor for Base
+     *
      * @param doc
      */
     public BaseToken(Document doc) {
         this.element =
-            doc.createElementNS(
+                doc.createElementNS(TOKEN.getNamespaceURI(),
+                        TOKEN.getPrefix() + ":" + TOKEN.getLocalPart());
+        WSSecurityUtil.setNamespace(this.element,
                 TOKEN.getNamespaceURI(),
-        TOKEN.getPrefix() + ":"+TOKEN.getLocalPart());
-        WSSecurityUtil.setNamespace(
-            this.element,
-            TOKEN.getNamespaceURI(),
-            TrustConstants.WST_PREFIX);
+                TrustConstants.WST_PREFIX);
         this.element.appendChild(doc.createTextNode(""));
     }
 
     /**
      * Return the binary security token of the base token if any
-     * @return 
+     *
+     * @return
      * @throws WSSecurityException
      */
     public BinarySecurity getBinarySecurityToken() throws WSSecurityException {
@@ -89,30 +86,30 @@ public class BaseToken {
         String firstChild = this.element.getFirstChild().getLocalName();
 
         if ("BinarySecurityToken" == firstChild) {
-            
+
             binarySecToken =
-                new BinarySecurity(WSSConfig.getDefaultWSConfig(),(Element) this.element.getFirstChild());
+                    new BinarySecurity(WSSConfig.getDefaultWSConfig(), (Element) this.element.getFirstChild());
             return binarySecToken;
         } else if ("SecurityTokenReference" == firstChild) {
-            
+
             SecurityTokenReference secTokRef =
-                new SecurityTokenReference(WSSConfig.getDefaultWSConfig(),
-                    (Element) this.element.getFirstChild());
+                    new SecurityTokenReference(WSSConfig.getDefaultWSConfig(),
+                            (Element) this.element.getFirstChild());
             binarySecToken =
-                new BinarySecurity(WSSConfig.getDefaultWSConfig(),
-                    secTokRef.getTokenElement(
-                        element.getOwnerDocument(),
-                        null));
+                    new BinarySecurity(WSSConfig.getDefaultWSConfig(),
+                            secTokRef.getTokenElement(element.getOwnerDocument(),
+                                    null));
             return binarySecToken;
         } else {
-            throw new WSSecurityException(
-                WSSecurityException.INVALID_SECURITY_TOKEN,
-                "badTokenType");
+            throw new WSSecurityException(WSSecurityException.INVALID_SECURITY_TOKEN,
+                    "badTokenType");
         }
 
     }
+
     /**
      * Currently support only direct reference
+     *
      * @param binarySecurity
      * @param asReference
      */
@@ -127,13 +124,13 @@ public class BaseToken {
 
     /**
      * get the first child element.
-     * 
+     *
      * @return the first <code>Element</code> child node
      */
     public Element getFirstElement() {
         for (Node currentChild = this.element.getFirstChild();
-            currentChild != null;
-            currentChild = currentChild.getNextSibling()) {
+             currentChild != null;
+             currentChild = currentChild.getNextSibling()) {
             if (currentChild instanceof Element) {
                 return (Element) currentChild;
             }
@@ -158,15 +155,19 @@ public class BaseToken {
     public String toString() {
         return DOM2Writer.nodeToString((Node) this.element);
     }
+
     /**
      * Other tokens can be added through this method
+     *
      * @param childToken
      */
     public void addToken(Element childToken) {
         this.element.appendChild(childToken);
     }
+
     /**
      * Tokens can be removed through this method
+     *
      * @param childToken
      */
     public void removeToken(Element childToken) {

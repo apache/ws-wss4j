@@ -16,25 +16,24 @@
  */
 package org.apache.ws.security.trust.request;
 
-import java.util.Hashtable;
-
 import org.apache.ws.security.trust.WSTrustException;
 import org.w3c.dom.Document;
 
+import java.util.Hashtable;
+
 /**
  * @author Malinda Kaushalye
- * Interface STRequester provide a way to build a request
- * on behalf of the client.
- * 
+ *         Interface STRequester provide a way to build a request
+ *         on behalf of the client.
  */
 public interface STRequester {
     /**
      * Modify request according to the given options
-     *  
-     * @param req full Envelop of the SOAP request as a Dom document
+     *
+     * @param req     full Envelop of the SOAP request as a Dom document
      * @param hashOps all the paramaeters in the .wsdd file as a hash map
      * @return modified request docment.
      * @throws WSTrustException
      */
-    public Document request(Document req,Hashtable hashOps) throws WSTrustException;
+    public Document request(Document req, Hashtable hashOps) throws WSTrustException;
 }

@@ -17,28 +17,28 @@
 
 package org.apache.ws.security.trust.verify;
 
-import java.util.Properties;
-
 import org.apache.ws.security.trust.WSTrustException;
 import org.w3c.dom.Document;
 
+import java.util.Properties;
+
 /**
  * @author Ruchith
- *
- * To change the template for this generated type comment go to
- * Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
+ *         <p/>
+ *         To change the template for this generated type comment go to
+ *         Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
  */
 public class ClaimVerifier implements STVerifier {
-    
+
     public ClaimVerifier(Properties prop) {
-        
+
     }
 
     /* (non-Javadoc)
      * @see org.apache.ws.security.trust.verify.STVerifier#verify(org.w3c.dom.Document)
      */
     public boolean verify(Document doc)
-        throws WSTrustException {
+            throws WSTrustException {
         // TODO Claims verification
         return true;
     }

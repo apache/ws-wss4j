@@ -23,8 +23,8 @@ public class ConversationException extends Exception {
 
     /**
      * Constructor ConversationException
-     * 
-     * @param message 
+     *
+     * @param message
      */
     public ConversationException(String message) {
         super(message);

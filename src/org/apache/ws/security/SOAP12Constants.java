@@ -27,15 +27,17 @@ import javax.xml.namespace.QName;
  */
 public class SOAP12Constants implements SOAPConstants {
     private static QName headerQName = new QName(WSConstants.URI_SOAP12_ENV,
-                                                 WSConstants.ELEM_HEADER);
+            WSConstants.ELEM_HEADER);
     private static QName bodyQName = new QName(WSConstants.URI_SOAP12_ENV,
-                                               WSConstants.ELEM_BODY);
+            WSConstants.ELEM_BODY);
     private static QName roleQName = new QName(WSConstants.URI_SOAP12_ENV,
-                                                WSConstants.ATTR_ROLE);
+            WSConstants.ATTR_ROLE);
     
     // Public constants for SOAP 1.2
     
-    /** MessageContext property name for webmethod */
+    /**
+     * MessageContext property name for webmethod
+     */
     public static final String PROP_WEBMETHOD = "soap12.webmethod";
 
     public String getEnvelopeURI() {
@@ -63,6 +65,7 @@ public class SOAP12Constants implements SOAPConstants {
     public String getNextRoleURI() {
         return WSConstants.URI_SOAP12_NEXT_ROLE;
     }
+
     /**
      * Obtain the Mustunderstand string
      */

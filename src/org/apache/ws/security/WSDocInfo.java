@@ -49,7 +49,6 @@ public class WSDocInfo {
 
     /**
      * Clears the info data except the hash code
-     * 
      */
     public void clear() {
         crypto = null;
@@ -59,9 +58,10 @@ public class WSDocInfo {
         }
         bst = null;
     }
+
     /**
      * Get a BinarySecurityToken for the given Id
-     * 
+     *
      * @param uri is the relative uri (starts with #) of the id
      * @return the BST element or null if nothing found
      */
@@ -83,7 +83,7 @@ public class WSDocInfo {
 
     /**
      * @return the signature crypto class used to process
-     *             the signature/verfiy 
+     *         the signature/verfiy
      */
     public Crypto getCrypto() {
         return crypto;
@@ -97,7 +97,7 @@ public class WSDocInfo {
     }
 
     /**
-     * @param elem    is the BinarySecurityToken to store
+     * @param elem is the BinarySecurityToken to store
      */
     public void setBst(Element elem) {
         if (bst == null) {
@@ -108,7 +108,7 @@ public class WSDocInfo {
 
     /**
      * @param crypto is the signature crypto class used to
-     *                 process signature/verify
+     *               process signature/verify
      */
     public void setCrypto(Crypto crypto) {
         this.crypto = crypto;
@@ -120,6 +120,7 @@ public class WSDocInfo {
     public Element getAssertion() {
         return assertion;
     }
+
     /**
      * @param assertion The assertion to set.
      */

@@ -16,11 +16,6 @@
  */
 package org.apache.ws.security.conversation.message.token;
 
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.cert.X509Certificate;
-
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.SOAPConstants;
@@ -29,7 +24,6 @@ import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
-import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.message.WSEncryptBody;
 import org.apache.ws.security.message.token.BinarySecurity;
 import org.apache.ws.security.message.token.Reference;
@@ -53,22 +47,23 @@ import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
 import javax.security.auth.callback.CallbackHandler;
-
 import javax.xml.namespace.QName;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.X509Certificate;
 
 /**
  * @author Dimuthu Leelarathne. (muthulee@yahoo.com)
  */
 public class RequestedProofToken {
     private static Log log =
-        LogFactory.getLog(RequestedProofToken.class.getName());
+            LogFactory.getLog(RequestedProofToken.class.getName());
 
     public static final QName TOKEN =
-        new QName(TrustConstants.WST_NS, "RequestedProofToken");
-     
-     private Element element;
+            new QName(TrustConstants.WST_NS, "RequestedProofToken");
+
+    private Element element;
     private byte[] sharedSecret = null;
 
     /**
@@ -79,10 +74,10 @@ public class RequestedProofToken {
      * @throws WSSecurityException
      */
     public RequestedProofToken(Document doc) throws WSSecurityException {
-        this.element = doc.createElementNS(TrustConstants.WST_NS,  TrustConstants.WST_PREFIX+":"+TOKEN.getLocalPart());
-            WSSecurityUtil.setNamespace(this.element, TOKEN.getNamespaceURI(), TrustConstants.WST_PREFIX);
-            this.element.appendChild(doc.createTextNode(""));
-            log.debug("RequestedProofToken : Document constructor, Element created.");
+        this.element = doc.createElementNS(TrustConstants.WST_NS, TrustConstants.WST_PREFIX + ":" + TOKEN.getLocalPart());
+        WSSecurityUtil.setNamespace(this.element, TOKEN.getNamespaceURI(), TrustConstants.WST_PREFIX);
+        this.element.appendChild(doc.createTextNode(""));
+        log.debug("RequestedProofToken : Document constructor, Element created.");
     }
 
     /**
@@ -93,14 +88,14 @@ public class RequestedProofToken {
      */
     public RequestedProofToken(Element elem) throws WSSecurityException {
         this.element = elem;
-                 QName el = new QName(this.element.getNamespaceURI(),
-                                      this.element.getLocalName());
-                 if (!el.equals(TOKEN)) {
-                   throw new WSSecurityException(WSSecurityException.INVALID_SECURITY_TOKEN,
-                                                 "badTokenType00", new Object[] {el});
-                 }
-          
-               log.debug("RequestedProofToken :: Element constructor, Element created.");  
+        QName el = new QName(this.element.getNamespaceURI(),
+                this.element.getLocalName());
+        if (!el.equals(TOKEN)) {
+            throw new WSSecurityException(WSSecurityException.INVALID_SECURITY_TOKEN,
+                    "badTokenType00", new Object[]{el});
+        }
+
+        log.debug("RequestedProofToken :: Element constructor, Element created.");
     }
 
     /**
@@ -111,19 +106,17 @@ public class RequestedProofToken {
      * @throws WSSecurityException
      */
     public void doDecryption(String callback, Crypto crypto)
-        throws WSSecurityException {
+            throws WSSecurityException {
         WSSecurityEngine secEngine = new WSSecurityEngine();
         CallbackHandler cbHandler;
 
         // Element
         NodeList ndList =
-            this.element.getElementsByTagNameNS(
-                "http://www.w3.org/2001/04/xmlenc#",
-                "EncryptedKey");
+                this.element.getElementsByTagNameNS("http://www.w3.org/2001/04/xmlenc#",
+                        "EncryptedKey");
         if (ndList.getLength() < 1) {
-            throw new WSSecurityException(
-                WSSecurityException.SECURITY_TOKEN_UNAVAILABLE,
-                "RequestedProofToken is empty");
+            throw new WSSecurityException(WSSecurityException.SECURITY_TOKEN_UNAVAILABLE,
+                    "RequestedProofToken is empty");
         }
 
         // CbHandler :: taken from WSSecurityEngine class
@@ -132,29 +125,26 @@ public class RequestedProofToken {
             try {
                 cbClass = java.lang.Class.forName(callback);
             } catch (ClassNotFoundException e) {
-                throw new WSSecurityException(
-                    WSSecurityException.FAILED_ENC_DEC,
-                    "RequestedProofToken: cannot load password callback class: "
+                throw new WSSecurityException(WSSecurityException.FAILED_ENC_DEC,
+                        "RequestedProofToken: cannot load password callback class: "
                         + callback);
             }
             try {
                 cbHandler = (CallbackHandler) cbClass.newInstance();
             } catch (java.lang.Exception e) {
-                throw new WSSecurityException(
-                    WSSecurityException.FAILED_ENC_DEC,
-                    "RequestedProofToken: cannot create instance of password callback: "
+                throw new WSSecurityException(WSSecurityException.FAILED_ENC_DEC,
+                        "RequestedProofToken: cannot create instance of password callback: "
                         + callback);
             }
-            secEngine.handleEncryptedKey(
-                (Element) ndList.item(0),
-                cbHandler,
-                crypto);
+            secEngine.handleEncryptedKey((Element) ndList.item(0),
+                    cbHandler,
+                    crypto);
 
             this.sharedSecret = secEngine.getDecryptedBytes();
-            log.debug(" RequestedProofToken, decryption ,Shared secret is :: "+ new String(this.sharedSecret));
+            log.debug(" RequestedProofToken, decryption ,Shared secret is :: " + new String(this.sharedSecret));
         } else {
-              log.debug("RequestedProofToken :: CallbackHandler is null");
-              throw new WSSecurityException(WSSecurityException.FAILURE,"CallbackHandler is null");
+            log.debug("RequestedProofToken :: CallbackHandler is null");
+            throw new WSSecurityException(WSSecurityException.FAILURE, "CallbackHandler is null");
         }
         log.debug("RequestedProofToken :: Encryption done");
     }
@@ -171,7 +161,7 @@ public class RequestedProofToken {
             wsEncrypt.setUserInfo(userInfo);
             wsEncrypt.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
             wsEncrypt.setParentNode(this.element);
-            if(this.sharedSecret!=null){
+            if (this.sharedSecret != null) {
                 //wsEncrypt.setSymmetricKey(WSSecurityUtil.prepareSecretKey(WSConstants.TRIPLE_DES, this.sharedSecret));//TODO
             }         
 //            wsEncrypt.setParentNode(
@@ -182,31 +172,33 @@ public class RequestedProofToken {
 //                    .item(0)));
             wsEncrypt.build(doc, crypto);
             this.sharedSecret = wsEncrypt.getSymmetricKey().getEncoded();
-            log.debug(" RequestedProofToken, encryption ,Shared secret is :: "+ new String(this.sharedSecret));   
+            log.debug(" RequestedProofToken, encryption ,Shared secret is :: " + new String(this.sharedSecret));
         } catch (WSSecurityException e) {
             e.printStackTrace();
         }
         log.debug("RequestedProofToken :: Decryption Done");
     }
 
-  
     public Element getElement() {
-         return element;
-     }
-     public void setElement(Element element) {
-         this.element = element;
-     }
+        return element;
+    }
 
-     public String toString() {
-       return DOM2Writer.nodeToString( (Node)this.element);
-     }
-     public void addToken(Element childToken){
-         this.element.appendChild(childToken);
-     }
-    
-     public void removeToken(Element childToken){
-         this.element.removeChild(childToken);
-     }
+    public void setElement(Element element) {
+        this.element = element;
+    }
+
+    public String toString() {
+        return DOM2Writer.nodeToString((Node) this.element);
+    }
+
+    public void addToken(Element childToken) {
+        this.element.appendChild(childToken);
+    }
+
+    public void removeToken(Element childToken) {
+        this.element.removeChild(childToken);
+    }
+
     /**
      * @return
      */
@@ -220,15 +212,15 @@ public class RequestedProofToken {
     public void setSharedSecret(byte[] bs) {
         sharedSecret = bs;
     }
-    
+
     public Document build(Document doc, Crypto crypto, String user, Element parentNode) throws WSSecurityException {
         boolean doDebug = log.isDebugEnabled();
         //TODO
-        int keyIdentifierType =WSConstants.ISSUER_SERIAL;
+        int keyIdentifierType = WSConstants.ISSUER_SERIAL;
         SecretKey symmetricKey = null;
-        String symEncAlgo= WSConstants.TRIPLE_DES;
-        String keyEncAlgo= WSConstants.KEYTRANSPORT_RSA15;
-        
+        String symEncAlgo = WSConstants.TRIPLE_DES;
+        String keyEncAlgo = WSConstants.KEYTRANSPORT_RSA15;
+
         if (doDebug) {
             log.debug("Beginning Encryption...");
         }
@@ -237,10 +229,9 @@ public class RequestedProofToken {
          * First step: set the encryption encoding namespace in the SOAP:Envelope
          */
         Element envelope = doc.getDocumentElement();
-        envelope.setAttributeNS(
-            WSConstants.XMLNS_NS,
-            "xmlns:" + WSConstants.ENC_PREFIX,
-            WSConstants.ENC_NS);
+        envelope.setAttributeNS(WSConstants.XMLNS_NS,
+                "xmlns:" + WSConstants.ENC_PREFIX,
+                WSConstants.ENC_NS);
 
         SOAPConstants soapConstants = WSSecurityUtil.getSOAPConstants(envelope);
 
@@ -248,7 +239,7 @@ public class RequestedProofToken {
          * Second step: generate a symmetric key (session key) for
          * this alogrithm, and set the cipher into encryption mode. 
          */
-        KeyGenerator keyGen=null;
+        KeyGenerator keyGen = null;
         try {
             keyGen = keyGen = KeyGenerator.getInstance("DESede");
         } catch (NoSuchAlgorithmException e2) {
@@ -260,8 +251,7 @@ public class RequestedProofToken {
         try {
             xmlCipher = XMLCipher.getInstance(symEncAlgo);
         } catch (XMLEncryptionException e3) {
-            throw new WSSecurityException(
-                WSSecurityException.UNSUPPORTED_ALGORITHM, null, null, e3);
+            throw new WSSecurityException(WSSecurityException.UNSUPPORTED_ALGORITHM, null, null, e3);
         }
 
 
@@ -274,86 +264,77 @@ public class RequestedProofToken {
         
         X509Certificate remoteCert = null;
         X509Certificate[] certs = crypto.getCertificates(user);
-            if (certs == null || certs.length <= 0) {
-                throw new WSSecurityException(
-                    WSSecurityException.FAILURE,
+        if (certs == null || certs.length <= 0) {
+            throw new WSSecurityException(WSSecurityException.FAILURE,
                     "invalidX509Data",
-                    new Object[] { "for Encryption" });
-            }
-            remoteCert = certs[0];
-        
+                    new Object[]{"for Encryption"});
+        }
+        remoteCert = certs[0];
+
         String certUri = "EncCertId-" + remoteCert.hashCode();
-        
+
         Cipher cipher = null;//TODO
         //Cipher cipher = WSSecurityUtil.getCiperInstance(keyEncAlgo);//TODO
         try {
             cipher.init(Cipher.ENCRYPT_MODE, remoteCert);
         } catch (InvalidKeyException e) {
-            throw new WSSecurityException(
-                WSSecurityException.FAILED_ENC_DEC, null, null, e);
+            throw new WSSecurityException(WSSecurityException.FAILED_ENC_DEC, null, null, e);
         }
         byte[] encKey = symmetricKey.getEncoded();
         if (doDebug) {
-            log.debug(
-                "cipher blksize: "
+            log.debug("cipher blksize: "
                     + cipher.getBlockSize()
                     + ", symm key length: "
                     + encKey.length);
         }
         if (cipher.getBlockSize() < encKey.length) {
-            throw new WSSecurityException(
-                WSSecurityException.FAILURE,
-                "unsupportedKeyTransp",
-                new Object[] { "public key algorithm too weak to encrypt symmetric key" });
+            throw new WSSecurityException(WSSecurityException.FAILURE,
+                    "unsupportedKeyTransp",
+                    new Object[]{"public key algorithm too weak to encrypt symmetric key"});
         }
         byte[] encryptedKey = null;
         try {
             encryptedKey = cipher.doFinal(encKey);
         } catch (IllegalStateException e1) {
-            throw new WSSecurityException(
-                WSSecurityException.FAILED_ENC_DEC, null, null, e1);
+            throw new WSSecurityException(WSSecurityException.FAILED_ENC_DEC, null, null, e1);
         } catch (IllegalBlockSizeException e1) {
-            throw new WSSecurityException(
-                WSSecurityException.FAILED_ENC_DEC, null, null, e1);
+            throw new WSSecurityException(WSSecurityException.FAILED_ENC_DEC, null, null, e1);
         } catch (BadPaddingException e1) {
-            throw new WSSecurityException(
-                WSSecurityException.FAILED_ENC_DEC, null, null, e1);
+            throw new WSSecurityException(WSSecurityException.FAILED_ENC_DEC, null, null, e1);
         }
         Text keyText =
-            WSSecurityUtil.createBase64EncodedTextNode(doc, encryptedKey);
-         
+                WSSecurityUtil.createBase64EncodedTextNode(doc, encryptedKey);
+
         Element xencEncryptedKey = WSEncryptBody.createEnrcyptedKey(doc, keyEncAlgo);
-        
-            WSSecurityUtil.prependChildElement(
-                        doc,
-                        parentNode,
-                        xencEncryptedKey,
-                        true);
-        
+
+        WSSecurityUtil.prependChildElement(doc,
+                parentNode,
+                xencEncryptedKey,
+                true);
+
         SecurityTokenReference secToken = null;//new SecurityTokenReference(doc); TODO
 
         switch (keyIdentifierType) {
-            case WSConstants.X509_KEY_IDENTIFIER :
+            case WSConstants.X509_KEY_IDENTIFIER:
                 secToken.setKeyIdentifier(remoteCert);
                 // build a key id class??
                 break;
 
-            case WSConstants.SKI_KEY_IDENTIFIER :
+            case WSConstants.SKI_KEY_IDENTIFIER:
                 secToken.setKeyIdentifierSKI(remoteCert, crypto);
                 break;
 
-            case WSConstants.ISSUER_SERIAL :
-                secToken.setX509IssuerSerial(
-                    new XMLX509IssuerSerial(doc, remoteCert));
+            case WSConstants.ISSUER_SERIAL:
+                secToken.setX509IssuerSerial(new XMLX509IssuerSerial(doc, remoteCert));
                 WSSecurityUtil.setNamespace(secToken.getElement(), WSConstants.WSSE_NS, WSConstants.WSSE_PREFIX);
                 break;
 
-            case WSConstants.BST_DIRECT_REFERENCE :
-                Reference ref = new Reference(WSSConfig.getDefaultWSConfig(),doc);
+            case WSConstants.BST_DIRECT_REFERENCE:
+                Reference ref = new Reference(WSSConfig.getDefaultWSConfig(), doc);
                 ref.setURI("#" + certUri);
                 secToken.setReference(ref);
                 BinarySecurity bstToken = null;
-                bstToken = new X509Security(WSSConfig.getDefaultWSConfig(),doc);
+                bstToken = new X509Security(WSSConfig.getDefaultWSConfig(), doc);
                 ((X509Security) bstToken).setX509Certificate(remoteCert);
                 bstToken.setID(certUri);
 //                WSSecurityUtil.prependChildElement(
@@ -364,9 +345,8 @@ public class RequestedProofToken {
                 break;
 
             default :
-                throw new WSSecurityException(
-                    WSSecurityException.FAILURE,
-                    "unsupportedKeyId");
+                throw new WSSecurityException(WSSecurityException.FAILURE,
+                        "unsupportedKeyId");
         }
         KeyInfo keyInfo = new KeyInfo(doc);
         keyInfo.addUnknownElement(secToken.getElement());
@@ -374,12 +354,9 @@ public class RequestedProofToken {
 
         Element xencCipherValue = WSEncryptBody.createCipherValue(doc, xencEncryptedKey);
         xencCipherValue.appendChild(keyText);
-    //    createDataRefList(doc, xencEncryptedKey, encDataRefs);
+        //    createDataRefList(doc, xencEncryptedKey, encDataRefs);
         log.debug("Encryption complete.");
         return doc;
     }
-
-
-    
 
 }

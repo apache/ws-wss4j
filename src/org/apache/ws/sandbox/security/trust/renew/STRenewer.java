@@ -20,10 +20,10 @@ import org.w3c.dom.Document;
 
 /**
  * @author Malinda Kaushalye
- *
- * To change the template for this generated type comment go to
- * Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
+ *         <p/>
+ *         To change the template for this generated type comment go to
+ *         Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
  */
 public interface STRenewer {
-    public Document renew(Document req,Document res)throws Exception;
+    public Document renew(Document req, Document res) throws Exception;
 }

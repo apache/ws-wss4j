@@ -19,24 +19,24 @@ package org.apache.ws.security.message;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.message.token.UsernameToken;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 /**
- * Builds a WS UsernameToken and inserts it into the SOAP Envelope. 
+ * Builds a WS UsernameToken and inserts it into the SOAP Envelope.
  * Refer to the WS specification, UsernameToken profile
- * 
+ *
  * @author Werner Dittmann (Werner.Dittmann@siemens.com).
  */
 
 public class WSSAddUsernameToken extends WSBaseMessage {
     private static Log log = LogFactory.getLog(WSSAddUsernameToken.class.getName());
     private String passwordType = WSConstants.PASSWORD_DIGEST;
-    
+
     private UsernameToken ut = null;
 
     /**
@@ -48,7 +48,7 @@ public class WSSAddUsernameToken extends WSBaseMessage {
     /**
      * Constructor.
      * <p/>
-     * 
+     *
      * @param actor the name of the actor of the <code>wsse:Security</code> header
      */
     public WSSAddUsernameToken(String actor) {
@@ -58,7 +58,7 @@ public class WSSAddUsernameToken extends WSBaseMessage {
     /**
      * Constructor.
      * <p/>
-     * 
+     *
      * @param actor The name of the actor of the <code>wsse:Security</code> header
      * @param mu    Set <code>mustUnderstand</code> to true or false
      */
@@ -69,22 +69,22 @@ public class WSSAddUsernameToken extends WSBaseMessage {
     /**
      * Constructor.
      * <p/>
-     * 
+     *
      * @param wssConfig Configuration options for processing and building the <code>wsse:Security</code> header
-     * @param actor The name of the actor of the <code>wsse:Security</code> header
-     * @param mu    Set <code>mustUnderstand</code> to true or false
+     * @param actor     The name of the actor of the <code>wsse:Security</code> header
+     * @param mu        Set <code>mustUnderstand</code> to true or false
      */
     public WSSAddUsernameToken(WSSConfig wssConfig, String actor, boolean mu) {
         super(wssConfig, actor, mu);
     }
 
     /**
-     * Defines how to construct the password element of the 
-     * <code>UsernameToken</code>. 
-     * 
-     * @param pwType     contains the password type. Only allowed values are 
-     *                     {@link WSConstants#PASSWORD_DIGEST} and 
-     *                     {@link WSConstants#PASSWORD_TEXT}.
+     * Defines how to construct the password element of the
+     * <code>UsernameToken</code>.
+     *
+     * @param pwType contains the password type. Only allowed values are
+     *               {@link WSConstants#PASSWORD_DIGEST} and
+     *               {@link WSConstants#PASSWORD_TEXT}.
      */
     public void setPasswordType(String pwType) {
         if (pwType == null) {
@@ -107,12 +107,13 @@ public class WSSAddUsernameToken extends WSBaseMessage {
     public void addCreated(Document doc) {
         ut.addCreated(doc);
     }
+
     /**
      * Adds a new <code>UsernameToken</code> to a soap envelope.
      * <p/>
      * A complete <code>UsernameToken</code> is constructed and added to
-     * the <code>wsse:Security</code> header. 
-     * 
+     * the <code>wsse:Security</code> header.
+     *
      * @param doc      The SOAP enevlope as W3C document
      * @param username The username to set in the UsernameToken
      * @param password The password of the user

@@ -15,10 +15,7 @@
  *
  */
 
-
-
 package org.apache.ws.security.conversation.message.token;
-
 
 /**
  * @author Dimuthu Leelarathne
@@ -27,65 +24,59 @@ package org.apache.ws.security.conversation.message.token;
 
 import org.apache.axis.components.logger.LogFactory;
 import org.apache.commons.logging.Log;
-import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSecurityException;
+import org.apache.ws.security.trust.TrustConstants;
 import org.apache.ws.security.util.DOM2Writer;
-import org.apache.ws.security.util.WSSecurityUtil;
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import javax.xml.namespace.QName;
-import javax.xml.soap.*;
-import org.apache.ws.security.trust.TrustConstants;
+import javax.xml.soap.Node;
 
 public class RequestSecurityToken {
 
     private static Log log =
-                LogFactory.getLog(RequestSecurityTokenResponse.class.getName());
+            LogFactory.getLog(RequestSecurityTokenResponse.class.getName());
 
-        private Element element = null;
-        
+    private Element element = null;
+
     public static final QName TOKEN =
-            new QName(
-                TrustConstants.WST_NS,
-                TrustConstants.REQUEST_SECURITY_TOKEN_LN,
-                TrustConstants.WST_PREFIX);
+            new QName(TrustConstants.WST_NS,
+                    TrustConstants.REQUEST_SECURITY_TOKEN_LN,
+                    TrustConstants.WST_PREFIX);
 
+    public RequestSecurityToken(Element elem) throws WSSecurityException {
+        //TODO :: Support only for SCT - for now
+        this.element = elem;
+        QName el =
+                new QName(this.element.getNamespaceURI(),
+                        this.element.getLocalName());
+        if (!el.equals(TOKEN)) {
+            throw new WSSecurityException(WSSecurityException.INVALID_SECURITY_TOKEN,
+                    "badTokenType00",
+                    new Object[]{el});
+        }
 
-  public RequestSecurityToken(Element elem) throws WSSecurityException{
-      //TODO :: Support only for SCT - for now
-    this.element = elem;
-    QName el =
-        new QName(
-            this.element.getNamespaceURI(),
-            this.element.getLocalName());
-    if (!el.equals(TOKEN)) {
-        throw new WSSecurityException(
-            WSSecurityException.INVALID_SECURITY_TOKEN,
-            "badTokenType00",
-            new Object[] { el });
     }
 
-  }
+    public Element getElement() {
+        return element;
+    }
 
+    public void setElement(Element element) {
+        this.element = element;
+    }
 
-  public Element getElement() {
-      return element;
-  }
-  public void setElement(Element element) {
-      this.element = element;
-  }
+    public String toString() {
+        return DOM2Writer.nodeToString((Node) this.element);
+    }
 
-  public String toString() {
-      return DOM2Writer.nodeToString((Node) this.element);
-  }
-  public void addToken(Element childToken) {
-      this.element.appendChild(childToken);
-  }
+    public void addToken(Element childToken) {
+        this.element.appendChild(childToken);
+    }
 
-  public void removeToken(Element childToken) {
-      this.element.removeChild(childToken);
-  }
+    public void removeToken(Element childToken) {
+        this.element.removeChild(childToken);
+    }
 //  
 //  //TODO @context - added by kau
 //   public void setContext(String context){
@@ -95,7 +86,5 @@ public class RequestSecurityToken {
 //   public String getContext(){
 //       return this.element.getAttribute("Context");
 //   }
-
-
 
 }

@@ -28,7 +28,7 @@ import java.util.Properties;
 /**
  * CryptoFactory.
  * <p/>
- * 
+ *
  * @author Davanum Srinivas (dims@yahoo.com).
  */
 public abstract class CryptoFactory {
@@ -47,7 +47,7 @@ public abstract class CryptoFactory {
      * <code>crypto.properties</code> is loaded with the
      * <code>Loader.getResource()</code> method.
      * <p/>
-     * 
+     *
      * @return The cyrpto implementation was defined
      */
     public static Crypto getInstance() {
@@ -61,7 +61,7 @@ public abstract class CryptoFactory {
      * implementation. The porperties can be <code>null</code>. It is depenend on the
      * Crypto implementation how the initialization is done in this case.
      * <p/>
-     * 
+     *
      * @param cryptoClassName This is the crypto implementation class. No default is
      *                        provided here.
      * @param properties      The Properties that are forwarded to the crypto implementaion.
@@ -83,7 +83,7 @@ public abstract class CryptoFactory {
      * handed over to the Crypto implementation. The specified file
      * is loaded with the <code>Loader.getResource()</code> method.
      * <p/>
-     * 
+     *
      * @param propFilename The name of the property file to load
      * @return The cyrpto implementation that was defined
      */
@@ -133,10 +133,10 @@ public abstract class CryptoFactory {
 
     /**
      * Gets the properties for crypto.
-     * The functions loads the property file via 
+     * The functions loads the property file via
      * {@link Loader.getResource(String)}, thus the property file
-     * should be accesible via the classpath 
-     * 
+     * should be accesible via the classpath
+     *
      * @param propFilename the properties file to load
      * @return a <code>Properties</code> object loaded from the filename
      */
@@ -147,8 +147,8 @@ public abstract class CryptoFactory {
             properties.load(url.openStream());
         } catch (Exception e) {
             log.debug("Cannot find crypto property file: " + propFilename);
-            throw new RuntimeException("CryptoFactory: Cannot load properties: "+
-                propFilename); 
+            throw new RuntimeException("CryptoFactory: Cannot load properties: " +
+                    propFilename);
         }
         return properties;
     }

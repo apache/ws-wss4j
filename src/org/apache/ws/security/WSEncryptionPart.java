@@ -21,7 +21,7 @@ package org.apache.ws.security;
  * @author Werner Dittmann (Werner.Dittmann@siemens.com)
  */
 public class WSEncryptionPart {
-    
+
     private String name;
     private String namespace;
     private String encModifier;
@@ -31,6 +31,7 @@ public class WSEncryptionPart {
         namespace = nmspace;
         encModifier = encMod;
     }
+
     /**
      * @return the local name of the element to encrypt.
      */

@@ -24,13 +24,14 @@ public class StringUtil {
      * An empty immutable <code>String</code> array.
      */
     public static final String[] EMPTY_STRING_ARRAY = new String[0];
-    
+
     /**
-     * Tests if this string starts with the specified prefix (Ignoring whitespaces) 
+     * Tests if this string starts with the specified prefix (Ignoring whitespaces)
+     *
      * @param prefix
      * @param string
      * @return boolean
-     */ 
+     */
     public static boolean startsWithIgnoreWhitespaces(String prefix, String string) {
         int index1 = 0;
         int index2 = 0;
@@ -54,7 +55,7 @@ public class StringUtil {
             index1++;
             index2++;
         }
-        if(index1 < length1 && index2 >= length2)
+        if (index1 < length1 && index2 >= length2)
             return false;
         return true;
     }
@@ -62,12 +63,12 @@ public class StringUtil {
     /**
      * <p>Splits the provided text into an array, separator specified.
      * This is an alternative to using StringTokenizer.</p>
-     *
+     * <p/>
      * <p>The separator is not included in the returned String array.
      * Adjacent separators are treated as one separator.</p>
-     *
+     * <p/>
      * <p>A <code>null</code> input String returns <code>null</code>.</p>
-     *
+     * <p/>
      * <pre>
      * StringUtils.split(null, *)         = null
      * StringUtils.split("", *)           = []
@@ -78,9 +79,9 @@ public class StringUtil {
      * StringUtils.split("a b c", ' ')    = ["a", "b", "c"]
      * </pre>
      *
-     * @param str  the String to parse, may be null
-     * @param separatorChar  the character used as the delimiter,
-     *  <code>null</code> splits on whitespace
+     * @param str           the String to parse, may be null
+     * @param separatorChar the character used as the delimiter,
+     *                      <code>null</code> splits on whitespace
      * @return an array of parsed Strings, <code>null</code> if null String input
      */
     public static String[] split(String str, char separatorChar) {

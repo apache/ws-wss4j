@@ -19,10 +19,10 @@ package org.apache.ws.security.message;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.SOAPConstants;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSEncryptionPart;
+import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.message.token.BinarySecurity;
@@ -71,13 +71,13 @@ public class WSEncryptBody extends WSBaseMessage {
     /**
      * Symmetric key used in the EncrytpedKey.
      */
-    protected SecretKey symmetricKey=null;
+    protected SecretKey symmetricKey = null;
 
     /**
      * Parent node to which the EncryptedKeyElement should be added.
      */
     protected Element parentNode = null;
-    
+
     /**
      * SecurityTokenReference to be inserted into EncryptedData/keyInfo element.
      */
@@ -94,7 +94,7 @@ public class WSEncryptBody extends WSBaseMessage {
      * <p/>
      *
      * @param actor The actor name of the <code>wsse:Security</code>
-     *                 header
+     *              header
      */
     public WSEncryptBody(String actor) {
         super(actor);
@@ -114,21 +114,21 @@ public class WSEncryptBody extends WSBaseMessage {
     /**
      * Constructor.
      * <p/>
-     * 
+     *
      * @param wssConfig Configuration options for processing and building the <code>wsse:Security</code> header
-     * @param actor The actor name of the <code>wsse:Security</code> header
-     * @param mu    Set <code>mustUnderstand</code> to true or false
+     * @param actor     The actor name of the <code>wsse:Security</code> header
+     * @param mu        Set <code>mustUnderstand</code> to true or false
      */
     public WSEncryptBody(WSSConfig wssConfig, String actor, boolean mu) {
         super(wssConfig, actor, mu);
     }
-    
+
     /**
      * Sets the key to use during embedded encryption.
      * <p/>
      *
      * @param key to use during encryption. The key must fit the
-     *               selected symmetrical encryption algorithm
+     *            selected symmetrical encryption algorithm
      */
     public void setKey(byte[] key) {
         this.embeddedKey = key;
@@ -147,6 +147,7 @@ public class WSEncryptBody extends WSBaseMessage {
     public void setKeyEnc(String keyEnc) {
         keyEncAlgo = keyEnc;
     }
+
     /**
      * Set the user name to get the encryption certificate. The public
      * key of this certificate is used, thus no password necessary.
@@ -161,6 +162,7 @@ public class WSEncryptBody extends WSBaseMessage {
 
     /**
      * Set the key name for EMBEDDED_KEYNAME
+     *
      * @param embeddedKeyName
      */
     public void setEmbeddedKeyName(String embeddedKeyName) {
@@ -178,6 +180,7 @@ public class WSEncryptBody extends WSBaseMessage {
     public void setUseThisCert(X509Certificate cert) {
         useThisCert = cert;
     }
+
     /**
      * Set the name of the symmetric encryption algorithm to use
      * <p/>
@@ -222,8 +225,8 @@ public class WSEncryptBody extends WSBaseMessage {
      * WSConstants which algorithms are supported.
      * <p/>
      *
-     * @return     the name of the currently selected symmetric encryption
-     *             algorithm
+     * @return the name of the currently selected symmetric encryption
+     *         algorithm
      * @see WSConstants#TRIPLE_DES
      * @see WSConstants#AES_128
      * @see WSConstants#AES_192
@@ -241,36 +244,36 @@ public class WSEncryptBody extends WSBaseMessage {
      * <ul>
      * <li>    First step: set the encoding namespace in the SOAP:Envelope </li>
      * <li>    Second step: generate a symmetric key (session key) for
-     *        the selected symmetric encryption alogrithm, and set the cipher
-     *        into encryption mode.
+     * the selected symmetric encryption alogrithm, and set the cipher
+     * into encryption mode.
      * </li>
      * <li> Third step: get the data to encrypt.
-     *        We always encrypt the complete first child element of
-     *        the SOAP Body element
+     * We always encrypt the complete first child element of
+     * the SOAP Body element
      * </li>
      * <li>    Forth step: encrypt data, and set neccessary attributes in
-     *         <code>xenc:EncryptedData</code>
-     *    </li>
+     * <code>xenc:EncryptedData</code>
+     * </li>
      * <li>    Fifth step: get the certificate that contains the public key for
-     *         the    public key algorithm that will encrypt the generated symmetric
-     *         (session) key. Up to now we support RSA 1-5 as public key
-     *          algorithm.
+     * the    public key algorithm that will encrypt the generated symmetric
+     * (session) key. Up to now we support RSA 1-5 as public key
+     * algorithm.
      * </li>
      * <li>    Sixth step: setup the <code>wsse:Security</code> header block </li>
      * </ul>
      *
-     * @param doc        the SOAP envelope as <code>Document</code> with
-     *                     plaintext Body
-     * @param crypto     an instance of the Crypto API to handle keystore and
-     *                     Certificates
-     * @return             the SOAP envelope with encrypted Body as <code>Document
-     *                     </code>
+     * @param doc    the SOAP envelope as <code>Document</code> with
+     *               plaintext Body
+     * @param crypto an instance of the Crypto API to handle keystore and
+     *               Certificates
+     * @return the SOAP envelope with encrypted Body as <code>Document
+     *         </code>
      * @throws Exception
      */
     public Document build(Document doc, Crypto crypto) throws WSSecurityException {
         doDebug = log.isDebugEnabled();
 
-        if (keyIdentifierType == WSConstants.EMBEDDED_KEYNAME||keyIdentifierType== WSConstants.EMBED_SECURITY_TOKEN_REF) {
+        if (keyIdentifierType == WSConstants.EMBEDDED_KEYNAME || keyIdentifierType == WSConstants.EMBED_SECURITY_TOKEN_REF) {
             return buildEmbedded(doc, crypto);
         }
 
@@ -286,10 +289,9 @@ public class WSEncryptBody extends WSBaseMessage {
          * First step: set the encryption encoding namespace in the SOAP:Envelope
          */
         Element envelope = doc.getDocumentElement();
-        envelope.setAttributeNS(
-            WSConstants.XMLNS_NS,
-            "xmlns:" + WSConstants.ENC_PREFIX,
-            WSConstants.ENC_NS);
+        envelope.setAttributeNS(WSConstants.XMLNS_NS,
+                "xmlns:" + WSConstants.ENC_PREFIX,
+                WSConstants.ENC_NS);
 
         SOAPConstants soapConstants = WSSecurityUtil.getSOAPConstants(envelope);
 
@@ -304,18 +306,16 @@ public class WSEncryptBody extends WSBaseMessage {
         try {
             xmlCipher = XMLCipher.getInstance(symEncAlgo);
         } catch (XMLEncryptionException e3) {
-            throw new WSSecurityException(
-                WSSecurityException.UNSUPPORTED_ALGORITHM, null, null, e3);
+            throw new WSSecurityException(WSSecurityException.UNSUPPORTED_ALGORITHM, null, null, e3);
         }
 
         // if no encryption parts set - use the default
         if (parts == null) {
             parts = new Vector();
             WSEncryptionPart encP =
-                new WSEncryptionPart(
-                    soapConstants.getBodyQName().getLocalPart(),
-                    soapConstants.getEnvelopeURI(),
-                    "Content");
+                    new WSEncryptionPart(soapConstants.getBodyQName().getLocalPart(),
+                            soapConstants.getEnvelopeURI(),
+                            "Content");
             parts.add(encP);
         }
 
@@ -330,15 +330,13 @@ public class WSEncryptBody extends WSBaseMessage {
              * Third step: get the data to encrypt.
              */
             Element body =
-                (Element) WSSecurityUtil.findElement(
-                    envelope,
-                    elemName,
-                    nmSpace);
+                    (Element) WSSecurityUtil.findElement(envelope,
+                            elemName,
+                            nmSpace);
             if (body == null) {
-                throw new WSSecurityException(
-                    WSSecurityException.FAILURE,
-                    "noEncElement",
-                    new Object[] { nmSpace, elemName });
+                throw new WSSecurityException(WSSecurityException.FAILURE,
+                        "noEncElement",
+                        new Object[]{nmSpace, elemName});
             }
 
             boolean content = modifier.equals("Content") ? true : false;
@@ -354,8 +352,7 @@ public class WSEncryptBody extends WSBaseMessage {
                 encData.setId(xencEncryptedDataId);
                 xmlCipher.doFinal(doc, body, content);
             } catch (Exception e2) {
-                throw new WSSecurityException(
-                    WSSecurityException.FAILED_ENC_DEC, null, null, e2);
+                throw new WSSecurityException(WSSecurityException.FAILED_ENC_DEC, null, null, e2);
             }
             if (tlog.isDebugEnabled()) {
                 t1 = System.currentTimeMillis();
@@ -380,10 +377,9 @@ public class WSEncryptBody extends WSBaseMessage {
         } else {
             X509Certificate[] certs = crypto.getCertificates(user);
             if (certs == null || certs.length <= 0) {
-                throw new WSSecurityException(
-                    WSSecurityException.FAILURE,
-                    "invalidX509Data",
-                    new Object[] { "for Encryption" });
+                throw new WSSecurityException(WSSecurityException.FAILURE,
+                        "invalidX509Data",
+                        new Object[]{"for Encryption"});
             }
             remoteCert = certs[0];
         }
@@ -395,38 +391,32 @@ public class WSEncryptBody extends WSBaseMessage {
         try {
             cipher.init(Cipher.ENCRYPT_MODE, remoteCert);
         } catch (InvalidKeyException e) {
-            throw new WSSecurityException(
-                WSSecurityException.FAILED_ENC_DEC, null, null, e);
+            throw new WSSecurityException(WSSecurityException.FAILED_ENC_DEC, null, null, e);
         }
         byte[] encKey = symmetricKey.getEncoded();
         if (doDebug) {
-            log.debug(
-                "cipher blksize: "
+            log.debug("cipher blksize: "
                     + cipher.getBlockSize()
                     + ", symm key length: "
                     + encKey.length);
         }
         if (cipher.getBlockSize() < encKey.length) {
-            throw new WSSecurityException(
-                WSSecurityException.FAILURE,
-                "unsupportedKeyTransp",
-                new Object[] { "public key algorithm too weak to encrypt symmetric key" });
+            throw new WSSecurityException(WSSecurityException.FAILURE,
+                    "unsupportedKeyTransp",
+                    new Object[]{"public key algorithm too weak to encrypt symmetric key"});
         }
         byte[] encryptedKey = null;
         try {
             encryptedKey = cipher.doFinal(encKey);
         } catch (IllegalStateException e1) {
-            throw new WSSecurityException(
-                WSSecurityException.FAILED_ENC_DEC, null, null, e1);
+            throw new WSSecurityException(WSSecurityException.FAILED_ENC_DEC, null, null, e1);
         } catch (IllegalBlockSizeException e1) {
-            throw new WSSecurityException(
-                WSSecurityException.FAILED_ENC_DEC, null, null, e1);
+            throw new WSSecurityException(WSSecurityException.FAILED_ENC_DEC, null, null, e1);
         } catch (BadPaddingException e1) {
-            throw new WSSecurityException(
-                WSSecurityException.FAILED_ENC_DEC, null, null, e1);
+            throw new WSSecurityException(WSSecurityException.FAILED_ENC_DEC, null, null, e1);
         }
         Text keyText =
-            WSSecurityUtil.createBase64EncodedTextNode(doc, encryptedKey);
+                WSSecurityUtil.createBase64EncodedTextNode(doc, encryptedKey);
 
         /*
          * Now we need to setup the wsse:Security header block
@@ -446,37 +436,34 @@ public class WSEncryptBody extends WSBaseMessage {
          */
         Element wsseSecurity = insertSecurityHeader(doc);
         Element xencEncryptedKey = createEnrcyptedKey(doc, keyEncAlgo);
-        if(parentNode==null){
-        WSSecurityUtil.prependChildElement(
-            doc,
-            wsseSecurity,
-            xencEncryptedKey,
-            true);
-        }else{
-            WSSecurityUtil.prependChildElement(
-                        doc,
-                        parentNode,
-                        xencEncryptedKey,
-                        true);
-        } 
+        if (parentNode == null) {
+            WSSecurityUtil.prependChildElement(doc,
+                    wsseSecurity,
+                    xencEncryptedKey,
+                    true);
+        } else {
+            WSSecurityUtil.prependChildElement(doc,
+                    parentNode,
+                    xencEncryptedKey,
+                    true);
+        }
         SecurityTokenReference secToken = new SecurityTokenReference(wssConfig, doc);
 
         switch (keyIdentifierType) {
-            case WSConstants.X509_KEY_IDENTIFIER :
+            case WSConstants.X509_KEY_IDENTIFIER:
                 secToken.setKeyIdentifier(remoteCert);
                 // build a key id class??
                 break;
 
-            case WSConstants.SKI_KEY_IDENTIFIER :
+            case WSConstants.SKI_KEY_IDENTIFIER:
                 secToken.setKeyIdentifierSKI(remoteCert, crypto);
                 break;
 
-            case WSConstants.ISSUER_SERIAL :
-                secToken.setX509IssuerSerial(
-                    new XMLX509IssuerSerial(doc, remoteCert));
+            case WSConstants.ISSUER_SERIAL:
+                secToken.setX509IssuerSerial(new XMLX509IssuerSerial(doc, remoteCert));
                 break;
 
-            case WSConstants.BST_DIRECT_REFERENCE :
+            case WSConstants.BST_DIRECT_REFERENCE:
                 Reference ref = new Reference(wssConfig, doc);
                 ref.setURI("#" + certUri);
                 secToken.setReference(ref);
@@ -484,17 +471,15 @@ public class WSEncryptBody extends WSBaseMessage {
                 bstToken = new X509Security(wssConfig, doc);
                 ((X509Security) bstToken).setX509Certificate(remoteCert);
                 bstToken.setID(certUri);
-                WSSecurityUtil.prependChildElement(
-                    doc,
-                    wsseSecurity,
-                    bstToken.getElement(),
-                    false);
+                WSSecurityUtil.prependChildElement(doc,
+                        wsseSecurity,
+                        bstToken.getElement(),
+                        false);
                 break;
 
             default :
-                throw new WSSecurityException(
-                    WSSecurityException.FAILURE,
-                    "unsupportedKeyId");
+                throw new WSSecurityException(WSSecurityException.FAILURE,
+                        "unsupportedKeyId");
         }
         KeyInfo keyInfo = new KeyInfo(doc);
         keyInfo.addUnknownElement(secToken.getElement());
@@ -506,8 +491,7 @@ public class WSEncryptBody extends WSBaseMessage {
         log.debug("Encryption complete.");
         if (tlog.isDebugEnabled()) {
             t3 = System.currentTimeMillis();
-            tlog.debug(
-                "EncryptBody: symm-enc= "
+            tlog.debug("EncryptBody: symm-enc= "
                     + (t1 - t0)
                     + ", cert= "
                     + (t2 - t1)
@@ -518,7 +502,7 @@ public class WSEncryptBody extends WSBaseMessage {
     }
 
     private Document buildEmbedded(Document doc, Crypto crypto)
-        throws WSSecurityException {
+            throws WSSecurityException {
         doDebug = log.isDebugEnabled();
 
         long t0 = 0, t1 = 0, t2 = 0, t3 = 0;
@@ -530,19 +514,17 @@ public class WSEncryptBody extends WSBaseMessage {
         }
 
         if (embeddedKey == null) {
-            throw new WSSecurityException(
-                WSSecurityException.FAILURE,
-                "noKeySupplied");
+            throw new WSSecurityException(WSSecurityException.FAILURE,
+                    "noKeySupplied");
         }
 
         /*
          * First step: set the encoding namespace in the SOAP:Envelope
          */
         Element envelope = doc.getDocumentElement();
-        envelope.setAttributeNS(
-            WSConstants.XMLNS_NS,
-            "xmlns:" + WSConstants.ENC_PREFIX,
-            WSConstants.ENC_NS);
+        envelope.setAttributeNS(WSConstants.XMLNS_NS,
+                "xmlns:" + WSConstants.ENC_PREFIX,
+                WSConstants.ENC_NS);
 
         SOAPConstants soapConstants = WSSecurityUtil.getSOAPConstants(envelope);
         /*
@@ -557,18 +539,16 @@ public class WSEncryptBody extends WSBaseMessage {
         try {
             xmlCipher = XMLCipher.getInstance(symEncAlgo);
         } catch (XMLEncryptionException e1) {
-            throw new WSSecurityException(
-                WSSecurityException.UNSUPPORTED_ALGORITHM, null, null, e1);
+            throw new WSSecurityException(WSSecurityException.UNSUPPORTED_ALGORITHM, null, null, e1);
         }
 
         // if no encryption parts set - use the default
         if (parts == null) {
             parts = new Vector();
             WSEncryptionPart encP =
-                new WSEncryptionPart(
-                    soapConstants.getBodyQName().getLocalPart(),
-                    soapConstants.getEnvelopeURI(),
-                    "Content");
+                    new WSEncryptionPart(soapConstants.getBodyQName().getLocalPart(),
+                            soapConstants.getEnvelopeURI(),
+                            "Content");
             parts.add(encP);
         }
 
@@ -585,37 +565,35 @@ public class WSEncryptBody extends WSBaseMessage {
              * Third step: get the data to encrypt.
              */
             Element body =
-                (Element) WSSecurityUtil.findElement(
-                    envelope,
-                    elemName,
-                    nmSpace);
+                    (Element) WSSecurityUtil.findElement(envelope,
+                            elemName,
+                            nmSpace);
             if (body == null) {
-                throw new WSSecurityException(
-                    WSSecurityException.FAILURE,
-                    "noEncElement",
-                    new Object[] { nmSpace, elemName });
+                throw new WSSecurityException(WSSecurityException.FAILURE,
+                        "noEncElement",
+                        new Object[]{nmSpace, elemName});
             }
 
             boolean content = modifier.equals("Content") ? true : false;
             String xencEncryptedDataId = "EncDataId-" + body.hashCode();
 
             KeyInfo keyInfo = null;
-            if(this.keyIdentifierType==WSConstants.EMBEDDED_KEYNAME){
+            if (this.keyIdentifierType == WSConstants.EMBEDDED_KEYNAME) {
                 keyInfo = new KeyInfo(doc);
-            keyInfo.addKeyName(embeddedKeyName == null ? user : embeddedKeyName);
-            }else if(this.keyIdentifierType==WSConstants.EMBED_SECURITY_TOKEN_REF){ 
+                keyInfo.addKeyName(embeddedKeyName == null ? user : embeddedKeyName);
+            } else if (this.keyIdentifierType == WSConstants.EMBED_SECURITY_TOKEN_REF) {
                 /* This means that we want to embed a <wsse:SecurityTokenReference> 
                  * into keyInfo element.
                  * If we need this functionality, this.secRef MUST be set before 
                  * calling the build(doc, crypto) method.
                  * So if secRef is null then throw an exception. 
                  */
-                 if(this.securityTokenReference==null){
-                    throw new WSSecurityException(WSSecurityException.SECURITY_TOKEN_UNAVAILABLE,"You must set keyInfo element, if the keyIdentifier ==EMBED_SECURITY_TOKEN_REF");
-                 }else{
+                if (this.securityTokenReference == null) {
+                    throw new WSSecurityException(WSSecurityException.SECURITY_TOKEN_UNAVAILABLE, "You must set keyInfo element, if the keyIdentifier ==EMBED_SECURITY_TOKEN_REF");
+                } else {
                     keyInfo = new KeyInfo(doc);
                     keyInfo.addUnknownElement(securityTokenReference.getElement());
-                 }
+                }
             }   
             /*
              * Forth step: encrypt data, and set neccessary attributes in
@@ -628,8 +606,7 @@ public class WSEncryptBody extends WSBaseMessage {
                 encData.setKeyInfo(keyInfo);
                 xmlCipher.doFinal(doc, body, content);
             } catch (Exception e) {
-                throw new WSSecurityException(
-                    WSSecurityException.FAILED_ENC_DEC, null, null, e);
+                throw new WSSecurityException(WSSecurityException.FAILED_ENC_DEC, null, null, e);
             }
             if (tlog.isDebugEnabled()) {
                 t1 = System.currentTimeMillis();
@@ -675,8 +652,7 @@ public class WSEncryptBody extends WSBaseMessage {
                 return null;
             }
         } catch (NoSuchAlgorithmException e) {
-            throw new WSSecurityException(
-                WSSecurityException.UNSUPPORTED_ALGORITHM, null, null, e);
+            throw new WSSecurityException(WSSecurityException.UNSUPPORTED_ALGORITHM, null, null, e);
         }
         return keyGen;
     }
@@ -684,62 +660,52 @@ public class WSEncryptBody extends WSBaseMessage {
     /**
      * Create DOM subtree for <code>xenc:EncryptedKey</code>
      *
-     * @param doc                  the SOAP enevelope parent document
-     * @param keyTransportAlgo    specifies which alogrithm to use to encrypt the
-     *                             symmetric key
-     * @return                     an <code>xenc:EncryptedKey</code> element
+     * @param doc              the SOAP enevelope parent document
+     * @param keyTransportAlgo specifies which alogrithm to use to encrypt the
+     *                         symmetric key
+     * @return an <code>xenc:EncryptedKey</code> element
      */
-    public static Element createEnrcyptedKey(
-        Document doc,
-        String keyTransportAlgo) {
+    public static Element createEnrcyptedKey(Document doc,
+                                             String keyTransportAlgo) {
         Element encryptedKey =
-            doc.createElementNS(
-                WSConstants.ENC_NS,
-                WSConstants.ENC_PREFIX + ":EncryptedKey");
+                doc.createElementNS(WSConstants.ENC_NS,
+                        WSConstants.ENC_PREFIX + ":EncryptedKey");
 
-        WSSecurityUtil.setNamespace(
-            encryptedKey,
-            WSConstants.ENC_NS,
-            WSConstants.ENC_PREFIX);
-        Element encryptionMethod =
-            doc.createElementNS(
+        WSSecurityUtil.setNamespace(encryptedKey,
                 WSConstants.ENC_NS,
-                WSConstants.ENC_PREFIX + ":EncryptionMethod");
+                WSConstants.ENC_PREFIX);
+        Element encryptionMethod =
+                doc.createElementNS(WSConstants.ENC_NS,
+                        WSConstants.ENC_PREFIX + ":EncryptionMethod");
         encryptionMethod.setAttributeNS(null, "Algorithm", keyTransportAlgo);
         WSSecurityUtil.appendChildElement(doc, encryptedKey, encryptionMethod);
         return encryptedKey;
     }
 
-    public static Element createCipherValue(
-        Document doc,
-        Element encryptedKey) {
+    public static Element createCipherValue(Document doc,
+                                            Element encryptedKey) {
         Element cipherData =
-            doc.createElementNS(
-                WSConstants.ENC_NS,
-                WSConstants.ENC_PREFIX + ":CipherData");
+                doc.createElementNS(WSConstants.ENC_NS,
+                        WSConstants.ENC_PREFIX + ":CipherData");
         Element cipherValue =
-            doc.createElementNS(
-                WSConstants.ENC_NS,
-                WSConstants.ENC_PREFIX + ":CipherValue");
+                doc.createElementNS(WSConstants.ENC_NS,
+                        WSConstants.ENC_PREFIX + ":CipherValue");
         cipherData.appendChild(cipherValue);
         WSSecurityUtil.appendChildElement(doc, encryptedKey, cipherData);
         return cipherValue;
     }
 
-    public static Element createDataRefList(
-        Document doc,
-        Element encryptedKey,
-        Vector encDataRefs) {
+    public static Element createDataRefList(Document doc,
+                                            Element encryptedKey,
+                                            Vector encDataRefs) {
         Element referenceList =
-            doc.createElementNS(
-                WSConstants.ENC_NS,
-                WSConstants.ENC_PREFIX + ":ReferenceList");
+                doc.createElementNS(WSConstants.ENC_NS,
+                        WSConstants.ENC_PREFIX + ":ReferenceList");
         for (int i = 0; i < encDataRefs.size(); i++) {
             String dataReferenceUri = (String) encDataRefs.get(i);
             Element dataReference =
-                doc.createElementNS(
-                    WSConstants.ENC_NS,
-                    WSConstants.ENC_PREFIX + ":DataReference");
+                    doc.createElementNS(WSConstants.ENC_NS,
+                            WSConstants.ENC_PREFIX + ":DataReference");
             dataReference.setAttributeNS(null, "URI", dataReferenceUri);
             referenceList.appendChild(dataReference);
         }
@@ -749,6 +715,7 @@ public class WSEncryptBody extends WSBaseMessage {
 
     /**
      * Sets the parent node of the EncryptedKeyElement
+     *
      * @param element
      */
     public void setParentNode(Element element) {

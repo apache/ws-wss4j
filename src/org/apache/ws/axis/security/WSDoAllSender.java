@@ -112,7 +112,6 @@ public class WSDoAllSender extends BasicHandler {
      * data fields. In particular remove old elements from the vectors. The
      * other fields are initialized implictly using the lookup of the WSDD
      * parameter (getOption()) and properties.
-     *  
      */
     private void initialize() {
         signatureParts.removeAllElements();
@@ -121,17 +120,15 @@ public class WSDoAllSender extends BasicHandler {
 
     /**
      * Axis calls invoke to handle a message. <p/>
-     * 
-     * @param mc
-     *            message context.
+     *
+     * @param mc message context.
      * @throws AxisFault
      */
     public void invoke(MessageContext mc) throws AxisFault {
 
         doDebug = log.isDebugEnabled();
         if (doDebug) {
-            log.debug(
-                "WSDoAllSender: enter invoke() with msg type: "
+            log.debug("WSDoAllSender: enter invoke() with msg type: "
                     + mc.getCurrentMessage().getMessageType());
         }
 
@@ -211,20 +208,19 @@ public class WSDoAllSender extends BasicHandler {
          */
         SOAPPart sPart = (org.apache.axis.SOAPPart) message.getSOAPPart();
         if ((doc =
-            (Document) msgContext.getProperty(WSDoAllConstants.SND_SECURITY))
-            == null) {
+                (Document) msgContext.getProperty(WSDoAllConstants.SND_SECURITY))
+                == null) {
             try {
                 doc =
-                    ((org.apache.axis.message.SOAPEnvelope) sPart
+                        ((org.apache.axis.message.SOAPEnvelope) sPart
                         .getEnvelope())
                         .getAsDocument();
             } catch (Exception e) {
-                throw new AxisFault(
-                    "WSDoAllSender: cannot get SOAP envlope from message" + e);
+                throw new AxisFault("WSDoAllSender: cannot get SOAP envlope from message" + e);
             }
         }
         soapConstants =
-            WSSecurityUtil.getSOAPConstants(doc.getDocumentElement());
+                WSSecurityUtil.getSOAPConstants(doc.getDocumentElement());
         /*
          * Here we have action, username, password, and actor, mustUnderstand.
          * Now get the action specific parameters.
@@ -269,31 +265,31 @@ public class WSDoAllSender extends BasicHandler {
 
             String password = null;
             switch (actionToDo) {
-                case WSConstants.UT :
+                case WSConstants.UT:
                     performUTAction(actionToDo, mu, doc);
                     break;
 
-                case WSConstants.ENCR :
+                case WSConstants.ENCR:
                     performENCRAction(mu, actionToDo, doc);
                     break;
 
-                case WSConstants.SIGN :
+                case WSConstants.SIGN:
                     performSIGNAction(actionToDo, mu, doc);
                     break;
 
-                case WSConstants.ST_SIGNED :
+                case WSConstants.ST_SIGNED:
                     performST_SIGNAction(actionToDo, mu, doc);
                     break;
 
-                case WSConstants.ST_UNSIGNED :
+                case WSConstants.ST_UNSIGNED:
                     performSTAction(actionToDo, mu, doc);
                     break;
 
-                case WSConstants.TS :
+                case WSConstants.TS:
                     performTSAction(actionToDo, mu, doc);
                     break;
 
-                case WSConstants.NO_SERIALIZE :
+                case WSConstants.NO_SERIALIZE:
                     noSerialization = true;
                     break;
             }
@@ -336,14 +332,13 @@ public class WSDoAllSender extends BasicHandler {
     }
 
     private void performSIGNAction(int actionToDo, boolean mu, Document doc)
-        throws AxisFault {
+            throws AxisFault {
         String password;
         password =
-            getPassword(
-                username,
-                actionToDo,
-                WSDoAllConstants.PW_CALLBACK_CLASS,
-                WSDoAllConstants.PW_CALLBACK_REF)
+                getPassword(username,
+                        actionToDo,
+                        WSDoAllConstants.PW_CALLBACK_CLASS,
+                        WSDoAllConstants.PW_CALLBACK_REF)
                 .getPassword();
 
         WSSignEnvelope wsSign = new WSSignEnvelope(actor, mu);
@@ -362,13 +357,12 @@ public class WSDoAllSender extends BasicHandler {
         try {
             wsSign.build(doc, sigCrypto);
         } catch (WSSecurityException e) {
-            throw new AxisFault(
-                "WSDoAllSender: Signature: error during message procesing" + e);
+            throw new AxisFault("WSDoAllSender: Signature: error during message procesing" + e);
         }
     }
 
     private void performENCRAction(boolean mu, int actionToDo, Document doc)
-        throws AxisFault {
+            throws AxisFault {
         WSEncryptBody wsEncrypt = new WSEncryptBody(actor, mu);
         if (encKeyId != 0) {
             wsEncrypt.setKeyIdentifierType(encKeyId);
@@ -376,19 +370,17 @@ public class WSDoAllSender extends BasicHandler {
         if (encKeyId == WSConstants.EMBEDDED_KEYNAME) {
             String encKeyName = null;
             if ((encKeyName =
-                (String) getOption(WSDoAllConstants.ENC_KEY_NAME))
-                == null) {
+                    (String) getOption(WSDoAllConstants.ENC_KEY_NAME))
+                    == null) {
                 encKeyName =
-                    (String) msgContext.getProperty(
-                        WSDoAllConstants.ENC_KEY_NAME);
+                        (String) msgContext.getProperty(WSDoAllConstants.ENC_KEY_NAME);
             }
             wsEncrypt.setEmbeddedKeyName(encKeyName);
             byte[] embeddedKey =
-                getPassword(
-                    encUser,
-                    actionToDo,
-                    WSDoAllConstants.ENC_CALLBACK_CLASS,
-                    WSDoAllConstants.ENC_CALLBACK_REF)
+                    getPassword(encUser,
+                            actionToDo,
+                            WSDoAllConstants.ENC_CALLBACK_CLASS,
+                            WSDoAllConstants.ENC_CALLBACK_REF)
                     .getKey();
             wsEncrypt.setKey(embeddedKey);
         }
@@ -406,21 +398,19 @@ public class WSDoAllSender extends BasicHandler {
         try {
             wsEncrypt.build(doc, encCrypto);
         } catch (WSSecurityException e) {
-            throw new AxisFault(
-                "WSDoAllSender: Encryption: error during message processing"
+            throw new AxisFault("WSDoAllSender: Encryption: error during message processing"
                     + e);
         }
     }
 
     private void performUTAction(int actionToDo, boolean mu, Document doc)
-        throws AxisFault {
+            throws AxisFault {
         String password;
         password =
-            getPassword(
-                username,
-                actionToDo,
-                WSDoAllConstants.PW_CALLBACK_CLASS,
-                WSDoAllConstants.PW_CALLBACK_REF)
+                getPassword(username,
+                        actionToDo,
+                        WSDoAllConstants.PW_CALLBACK_CLASS,
+                        WSDoAllConstants.PW_CALLBACK_REF)
                 .getPassword();
 
         WSSAddUsernameToken builder = new WSSAddUsernameToken(actor, mu);
@@ -442,16 +432,15 @@ public class WSDoAllSender extends BasicHandler {
     }
 
     private void performSTAction(int actionToDo, boolean mu, Document doc)
-        throws AxisFault {
+            throws AxisFault {
         WSSAddSAMLToken builder = new WSSAddSAMLToken(actor, mu);
 
         String samlPropFile = null;
         if ((samlPropFile =
-            (String) getOption(WSDoAllConstants.SAML_PROP_FILE))
-            == null) {
+                (String) getOption(WSDoAllConstants.SAML_PROP_FILE))
+                == null) {
             samlPropFile =
-                (String) msgContext.getProperty(
-                    WSDoAllConstants.SAML_PROP_FILE);
+                    (String) msgContext.getProperty(WSDoAllConstants.SAML_PROP_FILE);
         }
         SAMLIssuer saml = SAMLIssuerFactory.getInstance(samlPropFile);
         saml.setAxisMsg(msgContext);
@@ -464,14 +453,13 @@ public class WSDoAllSender extends BasicHandler {
     }
 
     private void performST_SIGNAction(int actionToDo, boolean mu, Document doc)
-        throws AxisFault {
+            throws AxisFault {
         String samlPropFile = null;
         if ((samlPropFile =
-            (String) getOption(WSDoAllConstants.SAML_PROP_FILE))
-            == null) {
+                (String) getOption(WSDoAllConstants.SAML_PROP_FILE))
+                == null) {
             samlPropFile =
-                (String) msgContext.getProperty(
-                    WSDoAllConstants.SAML_PROP_FILE);
+                    (String) msgContext.getProperty(WSDoAllConstants.SAML_PROP_FILE);
         }
         Crypto crypto = null;
         try {
@@ -499,14 +487,12 @@ public class WSDoAllSender extends BasicHandler {
             issuerKeyName = saml.getIssuerKeyName();
             issuerKeyPW = saml.getIssuerKeyPassword();
             issuerCrypto = saml.getIssuerCrypto();
-        }
-        else {            
+        } else {
             password =
-                getPassword(
-                    username,
-                    actionToDo,
-                    WSDoAllConstants.PW_CALLBACK_CLASS,
-                    WSDoAllConstants.PW_CALLBACK_REF)
+                    getPassword(username,
+                            actionToDo,
+                            WSDoAllConstants.PW_CALLBACK_CLASS,
+                            WSDoAllConstants.PW_CALLBACK_REF)
                     .getPassword();
             wsSign.setUserInfo(username, password);
         }
@@ -514,16 +500,14 @@ public class WSDoAllSender extends BasicHandler {
             wsSign.setKeyIdentifierType(sigKeyId);
         }
         try {
-            wsSign.build(
-                doc,
-                crypto,
-                assertion,
-                issuerCrypto,
-                issuerKeyName,
-                issuerKeyPW);
+            wsSign.build(doc,
+                    crypto,
+                    assertion,
+                    issuerCrypto,
+                    issuerKeyName,
+                    issuerKeyPW);
         } catch (WSSecurityException e) {
-            throw new AxisFault(
-                "WSDoAllSender: Signed SAML: error during message processing"
+            throw new AxisFault("WSDoAllSender: Signed SAML: error during message processing"
                     + e);
         }
     }
@@ -531,11 +515,10 @@ public class WSDoAllSender extends BasicHandler {
     private void performTSAction(int actionToDo, boolean mu, Document doc) throws AxisFault {
         String ttl = null;
         if ((ttl =
-            (String) getOption(WSDoAllConstants.TTL_TIMESTAMP))
-            == null) {
+                (String) getOption(WSDoAllConstants.TTL_TIMESTAMP))
+                == null) {
             ttl =
-                (String) msgContext.getProperty(
-                    WSDoAllConstants.TTL_TIMESTAMP);
+                    (String) msgContext.getProperty(WSDoAllConstants.TTL_TIMESTAMP);
         }
         int ttl_i = 0;
         if (ttl != null) {
@@ -546,10 +529,10 @@ public class WSDoAllSender extends BasicHandler {
             }
         }
         if (ttl_i <= 0) {
-            ttl_i = timeToLive;   
+            ttl_i = timeToLive;
         }
         WSAddTimestamp timeStampBuilder =
-            new WSAddTimestamp(actor, mu);
+                new WSAddTimestamp(actor, mu);
         // add the Timestamp to the SOAP Enevelope
         timeStampBuilder.build(doc, ttl_i);
     }
@@ -566,9 +549,9 @@ public class WSDoAllSender extends BasicHandler {
          */
         String sigPropFile = null;
         if ((sigPropFile = (String) getOption(WSDoAllConstants.SIG_PROP_FILE))
-            == null) {
+                == null) {
             sigPropFile =
-                (String) msgContext.getProperty(WSDoAllConstants.SIG_PROP_FILE);
+                    (String) msgContext.getProperty(WSDoAllConstants.SIG_PROP_FILE);
         }
         if (sigPropFile != null) {
             if ((crypto = (Crypto) cryptos.get(sigPropFile)) == null) {
@@ -593,9 +576,9 @@ public class WSDoAllSender extends BasicHandler {
          */
         String encPropFile = null;
         if ((encPropFile = (String) getOption(WSDoAllConstants.ENC_PROP_FILE))
-            == null) {
+                == null) {
             encPropFile =
-                (String) msgContext.getProperty(WSDoAllConstants.ENC_PROP_FILE);
+                    (String) msgContext.getProperty(WSDoAllConstants.ENC_PROP_FILE);
         }
         if (encPropFile != null) {
             if ((crypto = (Crypto) cryptos.get(encPropFile)) == null) {
@@ -610,22 +593,21 @@ public class WSDoAllSender extends BasicHandler {
 
     private void decodeUTParameter() throws AxisFault {
         if ((pwType = (String) getOption(WSDoAllConstants.PASSWORD_TYPE))
-            == null) {
+                == null) {
             pwType =
-                (String) msgContext.getProperty(WSDoAllConstants.PASSWORD_TYPE);
+                    (String) msgContext.getProperty(WSDoAllConstants.PASSWORD_TYPE);
         }
         if (pwType != null) {
             pwType =
-                pwType.equals(WSConstants.PW_TEXT)
+                    pwType.equals(WSConstants.PW_TEXT)
                     ? WSConstants.PASSWORD_TEXT
                     : WSConstants.PASSWORD_DIGEST;
         }
         String tmpS = null;
         if ((tmpS = (String) getOption(WSDoAllConstants.ADD_UT_ELEMENTS))
-            == null) {
+                == null) {
             tmpS =
-                (String) msgContext.getProperty(
-                    WSDoAllConstants.ADD_UT_ELEMENTS);
+                    (String) msgContext.getProperty(WSDoAllConstants.ADD_UT_ELEMENTS);
         }
         if (tmpS != null) {
             utElements = StringUtil.split(tmpS, ' ');
@@ -644,21 +626,20 @@ public class WSDoAllSender extends BasicHandler {
             }
             sigKeyId = I.intValue();
             if (!(sigKeyId == WSConstants.ISSUER_SERIAL
-                || sigKeyId == WSConstants.BST_DIRECT_REFERENCE
-                || sigKeyId == WSConstants.X509_KEY_IDENTIFIER
-                || sigKeyId == WSConstants.SKI_KEY_IDENTIFIER)) {
+                    || sigKeyId == WSConstants.BST_DIRECT_REFERENCE
+                    || sigKeyId == WSConstants.X509_KEY_IDENTIFIER
+                    || sigKeyId == WSConstants.SKI_KEY_IDENTIFIER)) {
                 throw new AxisFault("WSDoAllSender: Signature: illegal key identification");
             }
         }
         if ((sigAlgorithm = (String) getOption(WSDoAllConstants.SIG_ALGO))
-            == null) {
+                == null) {
             tmpS = (String) msgContext.getProperty(WSDoAllConstants.SIG_ALGO);
         }
         if ((tmpS = (String) getOption(WSDoAllConstants.SIGNATURE_PARTS))
-            == null) {
+                == null) {
             tmpS =
-                (String) msgContext.getProperty(
-                    WSDoAllConstants.SIGNATURE_PARTS);
+                    (String) msgContext.getProperty(WSDoAllConstants.SIGNATURE_PARTS);
         }
         if (tmpS != null) {
             splitEncParts(tmpS, signatureParts);
@@ -667,10 +648,9 @@ public class WSDoAllSender extends BasicHandler {
 
     private void decodeEncryptionParameter() throws AxisFault {
         if ((encUser = (String) getOption(WSDoAllConstants.ENCRYPTION_USER))
-            == null) {
+                == null) {
             encUser =
-                (String) msgContext.getProperty(
-                    WSDoAllConstants.ENCRYPTION_USER);
+                    (String) msgContext.getProperty(WSDoAllConstants.ENCRYPTION_USER);
         }
 
         if (encUser == null && (encUser = username) == null) {
@@ -698,30 +678,28 @@ public class WSDoAllSender extends BasicHandler {
             }
             encKeyId = I.intValue();
             if (!(encKeyId == WSConstants.ISSUER_SERIAL
-                || encKeyId == WSConstants.X509_KEY_IDENTIFIER
-                || encKeyId == WSConstants.SKI_KEY_IDENTIFIER
-                || encKeyId == WSConstants.BST_DIRECT_REFERENCE
-                || encKeyId == WSConstants.EMBEDDED_KEYNAME)) {
+                    || encKeyId == WSConstants.X509_KEY_IDENTIFIER
+                    || encKeyId == WSConstants.SKI_KEY_IDENTIFIER
+                    || encKeyId == WSConstants.BST_DIRECT_REFERENCE
+                    || encKeyId == WSConstants.EMBEDDED_KEYNAME)) {
                 throw new AxisFault("WSDoAllSender: Encryption: illegal key identification");
             }
         }
         if ((encSymmAlgo = (String) getOption(WSDoAllConstants.ENC_SYM_ALGO))
-            == null) {
+                == null) {
             encSymmAlgo =
-                (String) msgContext.getProperty(WSDoAllConstants.ENC_SYM_ALGO);
+                    (String) msgContext.getProperty(WSDoAllConstants.ENC_SYM_ALGO);
         }
         if ((encKeyTransport =
-            (String) getOption(WSDoAllConstants.ENC_KEY_TRANSPORT))
-            == null) {
+                (String) getOption(WSDoAllConstants.ENC_KEY_TRANSPORT))
+                == null) {
             encKeyTransport =
-                (String) msgContext.getProperty(
-                    WSDoAllConstants.ENC_KEY_TRANSPORT);
+                    (String) msgContext.getProperty(WSDoAllConstants.ENC_KEY_TRANSPORT);
         }
         if ((tmpS = (String) getOption(WSDoAllConstants.ENCRYPTION_PARTS))
-            == null) {
+                == null) {
             tmpS =
-                (String) msgContext.getProperty(
-                    WSDoAllConstants.ENCRYPTION_PARTS);
+                    (String) msgContext.getProperty(WSDoAllConstants.ENCRYPTION_PARTS);
         }
         if (tmpS != null) {
             splitEncParts(tmpS, encryptParts);
@@ -732,17 +710,16 @@ public class WSDoAllSender extends BasicHandler {
         boolean mu = true;
         String mustUnderstand = null;
         if ((mustUnderstand =
-            (String) getOption(WSDoAllConstants.MUST_UNDERSTAND))
-            == null) {
+                (String) getOption(WSDoAllConstants.MUST_UNDERSTAND))
+                == null) {
             mustUnderstand =
-                (String) msgContext.getProperty(
-                    WSDoAllConstants.MUST_UNDERSTAND);
+                    (String) msgContext.getProperty(WSDoAllConstants.MUST_UNDERSTAND);
         }
         if (mustUnderstand != null) {
             if (mustUnderstand.equals("0") || mustUnderstand.equals("false")) {
                 mu = false;
             } else if (
-                mustUnderstand.equals("1") || mustUnderstand.equals("true")) {
+                    mustUnderstand.equals("1") || mustUnderstand.equals("true")) {
                 mu = true;
             } else {
                 throw new AxisFault("WSDoAllSender: illegal mustUnderstand parameter");
@@ -752,16 +729,15 @@ public class WSDoAllSender extends BasicHandler {
     }
 
     /**
-     * Get a password to construct a UsernameToken or sign a message. 
+     * Get a password to construct a UsernameToken or sign a message.
      * <p/>
      * Try all possible sources to get a password.
      */
-    private WSPasswordCallback getPassword(
-        String username,
-        int doAction,
-        String clsProp,
-        String refProp)
-        throws AxisFault {
+    private WSPasswordCallback getPassword(String username,
+                                           int doAction,
+                                           String clsProp,
+                                           String refProp)
+            throws AxisFault {
         WSPasswordCallback pwCb = null;
         String password = null;
         String callback = null;
@@ -776,7 +752,7 @@ public class WSDoAllSender extends BasicHandler {
                 throw new AxisFault("WSDoAllSender: password callback class provided null or empty password");
             }
         } else if (
-            (cbHandler = (CallbackHandler) msgContext.getProperty(refProp))
+                (cbHandler = (CallbackHandler) msgContext.getProperty(refProp))
                 != null) {
             pwCb = performCallback(cbHandler, username, doAction);
             if ((pwCb.getPassword() == null) && (pwCb.getKey() == null)) {
@@ -792,57 +768,53 @@ public class WSDoAllSender extends BasicHandler {
         return pwCb;
     }
 
-    private WSPasswordCallback readPwViaCallbackClass(
-        String callback,
-        String username,
-        int doAction)
-        throws AxisFault {
+    private WSPasswordCallback readPwViaCallbackClass(String callback,
+                                                      String username,
+                                                      int doAction)
+            throws AxisFault {
 
         Class cbClass = null;
         CallbackHandler cbHandler = null;
         try {
             cbClass = java.lang.Class.forName(callback);
         } catch (ClassNotFoundException e) {
-            throw new AxisFault(
-                "WSDoAllSender: cannot load password callback class: "
+            throw new AxisFault("WSDoAllSender: cannot load password callback class: "
                     + callback,
-                e);
+                    e);
         }
         try {
             cbHandler = (CallbackHandler) cbClass.newInstance();
         } catch (java.lang.Exception e) {
-            throw new AxisFault(
-                "WSDoAllSender: cannot create instance of password callback: "
+            throw new AxisFault("WSDoAllSender: cannot create instance of password callback: "
                     + callback,
-                e);
+                    e);
         }
         return (performCallback(cbHandler, username, doAction));
     }
 
     /**
      * Perform a callback to get a password.
-     * 
+     * <p/>
      * The called back function gets an indication why to provide a password:
      * to produce a UsernameToken, Signature, or a password (key) for a given
      * name.
      */
-    private WSPasswordCallback performCallback(
-        CallbackHandler cbHandler,
-        String username,
-        int doAction)
-        throws AxisFault {
+    private WSPasswordCallback performCallback(CallbackHandler cbHandler,
+                                               String username,
+                                               int doAction)
+            throws AxisFault {
 
         WSPasswordCallback pwCb = null;
         int reason = 0;
 
         switch (doAction) {
-            case WSConstants.UT :
+            case WSConstants.UT:
                 reason = WSPasswordCallback.USERNAME_TOKEN;
                 break;
-            case WSConstants.SIGN :
+            case WSConstants.SIGN:
                 reason = WSPasswordCallback.SIGNATURE;
                 break;
-            case WSConstants.ENCR :
+            case WSConstants.ENCR:
                 reason = WSPasswordCallback.KEY_NAME;
                 break;
         }
@@ -861,7 +833,7 @@ public class WSDoAllSender extends BasicHandler {
     }
 
     private void splitEncParts(String tmpS, Vector encryptParts)
-        throws AxisFault {
+            throws AxisFault {
         WSEncryptionPart encPart = null;
         String[] rawParts = StringUtil.split(tmpS, ';');
 
@@ -873,10 +845,9 @@ public class WSDoAllSender extends BasicHandler {
                     log.debug("single partDef: '" + partDef[0] + "'");
                 }
                 encPart =
-                    new WSEncryptionPart(
-                        partDef[0].trim(),
-                        soapConstants.getEnvelopeURI(),
-                        "Content");
+                        new WSEncryptionPart(partDef[0].trim(),
+                                soapConstants.getEnvelopeURI(),
+                                "Content");
             } else if (partDef.length == 3) {
                 String mode = partDef[0].trim();
                 if (mode.length() <= 1) {
@@ -892,8 +863,7 @@ public class WSDoAllSender extends BasicHandler {
                 }
                 String element = partDef[2].trim();
                 if (doDebug) {
-                    log.debug(
-                        "partDefs: '"
+                    log.debug("partDefs: '"
                             + mode
                             + "' ,'"
                             + nmSpace
@@ -903,8 +873,7 @@ public class WSDoAllSender extends BasicHandler {
                 }
                 encPart = new WSEncryptionPart(element, nmSpace, mode);
             } else {
-                throw new AxisFault(
-                    "WSDoAllSender: wrong part definition: " + tmpS);
+                throw new AxisFault("WSDoAllSender: wrong part definition: " + tmpS);
             }
             encryptParts.add(encPart);
         }
@@ -916,8 +885,8 @@ public class WSDoAllSender extends BasicHandler {
         }
         Vector results = null;
         if ((results =
-            (Vector) msgContext.getProperty(WSDoAllConstants.RECV_RESULTS))
-            == null) {
+                (Vector) msgContext.getProperty(WSDoAllConstants.RECV_RESULTS))
+                == null) {
             return;
         }
         /*
@@ -926,7 +895,7 @@ public class WSDoAllSender extends BasicHandler {
          */
         for (int i = 0; i < results.size(); i++) {
             WSDoAllReceiverResult rResult =
-                (WSDoAllReceiverResult) results.get(i);
+                    (WSDoAllReceiverResult) results.get(i);
             String hActor = rResult.getActor();
             if (!WSSecurityUtil.isActorEqual(actor, hActor)) {
                 continue;
@@ -939,7 +908,7 @@ public class WSDoAllSender extends BasicHandler {
              */
             for (int j = 0; j < wsSecEngineResults.size(); j++) {
                 WSSecurityEngineResult wser =
-                    (WSSecurityEngineResult) wsSecEngineResults.get(j);
+                        (WSSecurityEngineResult) wsSecEngineResults.get(j);
                 if (wser.getAction() == WSConstants.SIGN) {
                     encCert = wser.getCertificate();
                     return;

@@ -30,55 +30,54 @@ import java.security.cert.X509Certificate;
 /**
  * Crypto.
  * <p/>
- * 
+ *
  * @author Davanum Srinivas (dims@yahoo.com).
  */
 public interface Crypto {
     /**
      * load a X509Certificate from the input stream.
      * <p/>
-     * 
+     *
      * @param in The <code>InputStream</code> array containg the X509 data
+     * @return An X509 certificate
      * @throws WSSecurityException
-     * @return    An X509 certificate
      */
     X509Certificate loadCertificate(InputStream in) throws WSSecurityException;
 
     /**
      * Construct an array of X509Certificate's from the byte array.
      * <p/>
-     * 
+     *
      * @param data    The <code>byte</code> array containg the X509 data
      * @param reverse If set the first certificate in input data will
      *                the last in the array
+     * @return An array of X509 certificates, ordered according to
+     *         the reverse flag
      * @throws WSSecurityException
-     * @return        An array of X509 certificates, ordered according to
-     * the reverse flag
      */
     X509Certificate[] getX509Certificates(byte[] data, boolean reverse) throws WSSecurityException;
 
     /**
      * get a byte array given an array of X509 certificates.
      * <p/>
-     * 
+     *
      * @param reverse If set the first certificate in the array data will
      *                the last in the byte array
      * @param certs   The certificates to convert
-
+     * @return The byte array for the certficates ordered according
+     *         to the reverse flag
      * @throws WSSecurityException
-     * @return        The byte array for the certficates ordered according
-     * to the reverse flag
      */
     byte[] getCertificateData(boolean reverse, X509Certificate[] certs) throws WSSecurityException;
 
     /**
      * Gets the private key identified by <code>alias</> and <code>password</code>.
      * <p/>
-     * 
+     *
      * @param alias    The alias (<code>KeyStore</code>) of the key owner
      * @param password The password needed to access the private key
-     * @throws Exception 
-     * @return        The private key
+     * @return The private key
+     * @throws Exception
      */
     public PrivateKey getPrivateKey(String alias, String password) throws Exception;
 
@@ -87,7 +86,7 @@ public interface Crypto {
      * reads a new certificate chain and overwrites a previously
      * stored certificate chain.
      * <p/>
-     * 
+     *
      * @param alias Lookup certificate chain for this alias
      * @return Array of X509 certificates for this alias name, or
      *         null if this alias does not exist in the keystore
@@ -97,7 +96,7 @@ public interface Crypto {
     /**
      * Return a X509 Certificate alias in the keystore according to a given Certificate
      * <p/>
-     * 
+     *
      * @param cert The certificate to lookup
      * @return alias name of the certificate that matches the given certificate
      *         or null if no such certificate was found.
@@ -118,13 +117,13 @@ public interface Crypto {
      * The search gets all alias names of the keystore and gets the certificate chain
      * for each alias. Then the Issuer fo each certificate of the chain
      * is compared with the parameters.
-     * 
-     * @param issuer       The issuer's name for the certificate
+     *
+     * @param issuer The issuer's name for the certificate
      * @return alias name of the certificate that matches the issuer name
      *         or null if no such certificate was found.
      */
     public String getAliasForX509Cert(String issuer) throws WSSecurityException;
-    
+
     /**
      * Search a X509 Certificate in the keystore according to a given serial number and
      * the issuer of a Certficate.
@@ -132,7 +131,7 @@ public interface Crypto {
      * The search gets all alias names of the keystore and gets the certificate chain
      * for each alias. Then the SerialNumber and Issuer fo each certificate of the chain
      * is compared with the parameters.
-     * 
+     *
      * @param issuer       The issuer's name for the certificate
      * @param serialNumber The serial number of the certificate from the named issuer
      * @return alias name of the certificate that matches serialNumber and issuer name
@@ -141,14 +140,14 @@ public interface Crypto {
     public String getAliasForX509Cert(String issuer, BigInteger serialNumber) throws WSSecurityException;
 
     /**
-     * Lookup a X509 Certificate in the keystore according to a given 
+     * Lookup a X509 Certificate in the keystore according to a given
      * SubjectKeyIdentifier.
      * <p/>
      * The search gets all alias names of the keystore and gets the certificate chain
-     * or certificate for each alias. Then the SKI for each user certificate 
+     * or certificate for each alias. Then the SKI for each user certificate
      * is compared with the SKI parameter.
-     * 
-     * @param skiBytes       The SKI info bytes
+     *
+     * @param skiBytes The SKI info bytes
      * @return alias name of the certificate that matches serialNumber and issuer name
      *         or null if no such certificate was found.
      */
@@ -160,19 +159,19 @@ public interface Crypto {
      * signature and encryption. This alias corresponds to the certificate that
      * should be used whenever KeyInfo is not poresent in a signed or
      * an encrypted message. May return null.
-     * 
+     *
      * @return alias name of the default X509 certificate.
      */
     public String getDefaultX509Alias();
-    
+
     /**
-     * Reads the SubjectKeyIdentifier information from the certificate. 
-     * <p/> 
-     * 
-     * @param cert       The certificate to read SKI
-     * @return              The byte array conating the binary SKI data
+     * Reads the SubjectKeyIdentifier information from the certificate.
+     * <p/>
+     *
+     * @param cert The certificate to read SKI
+     * @return The byte array conating the binary SKI data
      */
-    public byte[] getSKIBytesFromCert(X509Certificate cert)    throws WSSecurityException;
+    public byte[] getSKIBytesFromCert(X509Certificate cert) throws WSSecurityException;
 
     /**
      * Gets the Keystore that was loaded by the underlying implementation
@@ -192,9 +191,9 @@ public interface Crypto {
     /**
      * Uses the CertPath API to validate a given certificate chain
      * <p/>
-     * 
-     * @param certs      Certificate chain to validate
-     * @return           true if the certificate chain is valid, false otherwise
+     *
+     * @param certs Certificate chain to validate
+     * @return true if the certificate chain is valid, false otherwise
      * @throws WSSecurityException
      */
     public boolean validateCertPath(X509Certificate[] certs) throws WSSecurityException;
@@ -202,9 +201,9 @@ public interface Crypto {
     /**
      * Lookup X509 Certificates in the keystore according to a given DN of the subject of the certificate
      * <p/>
-     * 
-     * @param subjectDN  The DN of subject to look for in the keystore 
-     * @return              Vector with all alias of certificates with the same DN as given in the parameters
+     *
+     * @param subjectDN The DN of subject to look for in the keystore
+     * @return Vector with all alias of certificates with the same DN as given in the parameters
      * @throws WSSecurityException
      */
     public String[] getAliasesForDN(String subjectDN) throws WSSecurityException;

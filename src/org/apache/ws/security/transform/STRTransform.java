@@ -17,12 +17,12 @@
 
 package org.apache.ws.security.transform;
 
-import org.apache.ws.security.WSSConfig;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDocInfo;
 import org.apache.ws.security.WSDocInfoStore;
+import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.message.token.SecurityTokenReference;
 import org.apache.ws.security.message.token.X509Security;
 import org.apache.ws.security.util.WSSecurityUtil;
@@ -49,7 +49,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.security.cert.X509Certificate;
 
-
 /**
  * Class STRTransform
  *
@@ -58,33 +57,35 @@ import java.security.cert.X509Certificate;
  */
 public class STRTransform extends TransformSpi {
 
-    /** Field implementedTransformURI */
+    /**
+     * Field implementedTransformURI
+     */
     public static final String implementedTransformURI =
-        "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#STR-Transform";
-
+            "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#STR-Transform";
 
     private static Log log = LogFactory.getLog(STRTransform.class.getName());
     private static boolean doDebug = false;
-    
+
     private WSDocInfo wsDocInfo = null;
 
     public boolean wantsOctetStream() {
         return false;
     }
+
     public boolean wantsNodeSet() {
         return true;
     }
+
     public boolean returnsOctetStream() {
         return true;
     }
+
     public boolean returnsNodeSet() {
         return false;
     }
 
     /**
      * Method engineGetURI
-     *
-     *
      */
     protected String engineGetURI() {
         return STRTransform.implementedTransformURI;
@@ -94,12 +95,11 @@ public class STRTransform extends TransformSpi {
      * Method enginePerformTransform
      *
      * @param input
-     *
      * @throws CanonicalizationException
      * @throws InvalidCanonicalizerException
      */
     protected XMLSignatureInput enginePerformTransform(XMLSignatureInput input)
-        throws IOException, CanonicalizationException, InvalidCanonicalizerException {
+            throws IOException, CanonicalizationException, InvalidCanonicalizerException {
 
         doDebug = log.isDebugEnabled();
 
@@ -145,10 +145,8 @@ public class STRTransform extends TransformSpi {
             String canonAlgo = null;
             if (this._transformObject.length(WSConstants.WSSE_NS,
                     "TransformationParameters") == 1) {
-                Element tmpE = this._transformObject.getChildElementLocalName(
-                        0, WSConstants.WSSE_NS, "TransformationParameters");
-                Element canonElem = (Element) WSSecurityUtil.getDirectChild(
-                        tmpE, "CanonicalizationMethod", WSConstants.SIG_NS);
+                Element tmpE = this._transformObject.getChildElementLocalName(0, WSConstants.WSSE_NS, "TransformationParameters");
+                Element canonElem = (Element) WSSecurityUtil.getDirectChild(tmpE, "CanonicalizationMethod", WSConstants.SIG_NS);
                 canonAlgo = canonElem.getAttribute("Algorithm");
                 if (doDebug) {
                     log.debug("CanonAlgo: " + canonAlgo);
@@ -180,9 +178,8 @@ public class STRTransform extends TransformSpi {
              */
 
             NodeList nodeList =
-                doc.getElementsByTagNameNS(
-                    WSConstants.WSSE_NS,
-                    "SecurityTokenReference");
+                    doc.getElementsByTagNameNS(WSConstants.WSSE_NS,
+                            "SecurityTokenReference");
 
             Element str = null;
             Element tmpEl = (Element) nodeList.item(0);
@@ -259,7 +256,7 @@ public class STRTransform extends TransformSpi {
              * serialized XML.
              */
             StringBuffer bf = new StringBuffer(bos.toString());
-            String bf1 = bf.substring("<temp xmlns=\"urn:X\">".length(),bf.length()-"</temp>".length());
+            String bf1 = bf.substring("<temp xmlns=\"urn:X\">".length(), bf.length() - "</temp>".length());
 
             if (doDebug) {
                 log.debug("last result: ");
@@ -284,7 +281,7 @@ public class STRTransform extends TransformSpi {
     }
 
     private Element dereferenceSTR(Document doc, SecurityTokenReference secRef)
-        throws Exception {
+            throws Exception {
 
         /*
          * Third step: locate the security token referenced by the STR
@@ -304,7 +301,7 @@ public class STRTransform extends TransformSpi {
          * part that is signed/verified.
          * 
          */
-         Element tokElement = null;
+        Element tokElement = null;
         
         /*
          * First case: direct reference, according to chap 7.2 of OASIS
@@ -336,14 +333,13 @@ public class STRTransform extends TransformSpi {
             // x509token = secRef.getEmbeddedTokenFromIS(doc, wsDocInfo.getCrypto());
             if (x509token != null) {
                 cert = x509token.getX509Certificate(wsDocInfo.getCrypto());
-            }
-            else {
+            } else {
                 X509Certificate[] certs = secRef.getX509IssuerSerial(wsDocInfo.getCrypto());
                 if (certs == null || certs.length == 0 || certs[0] == null) {
                     throw new CanonicalizationException("empty");
                 }
                 cert = certs[0];
-            }    
+            }
             tokElement = createBST(doc, cert, secRef.getElement());
         }
         /*
@@ -363,8 +359,7 @@ public class STRTransform extends TransformSpi {
             // x509token = secRef.getEmbeddedTokenFromSKI(doc, wsDocInfo.getCrypto());
             if (x509token != null) {
                 cert = x509token.getX509Certificate(wsDocInfo.getCrypto());
-            }
-            else {
+            } else {
                 X509Certificate[] certs = secRef.getKeyIdentifier(wsDocInfo.getCrypto());
                 if (certs == null || certs.length == 0 || certs[0] == null) {
                     throw new CanonicalizationException("empty");
@@ -375,18 +370,16 @@ public class STRTransform extends TransformSpi {
         }
         return (Element) tokElement;
     }
-    
-    private Element createBST(
-        Document doc,
-        X509Certificate cert,
-        Element secRefE)
-        throws Exception {
+
+    private Element createBST(Document doc,
+                              X509Certificate cert,
+                              Element secRefE)
+            throws Exception {
         byte data[] = cert.getEncoded();
         String prefix = WSSecurityUtil.getPrefixNS(WSConstants.WSSE_NS, secRefE);
         Element elem =
-            doc.createElementNS(
-                WSConstants.WSSE_NS,
-                prefix + ":BinarySecurityToken");
+                doc.createElementNS(WSConstants.WSSE_NS,
+                        prefix + ":BinarySecurityToken");
         WSSecurityUtil.setNamespace(elem, WSConstants.WSSE_NS, prefix);
         elem.setAttributeNS(WSConstants.XMLNS_NS, "xmlns", "");
         elem.setAttributeNS(null, "ValueType", X509Security.getType(WSSConfig.getDefaultWSConfig()));

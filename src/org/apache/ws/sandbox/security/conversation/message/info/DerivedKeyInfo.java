@@ -1,13 +1,12 @@
 package org.apache.ws.security.conversation.message.info;
 
-import java.util.Hashtable;
-
-import org.apache.ws.security.message.token.SecurityTokenReference;
-import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.conversation.message.token.DerivedKeyToken;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.ws.security.WSSecurityException;
+import org.apache.ws.security.conversation.message.token.DerivedKeyToken;
+import org.apache.ws.security.message.token.SecurityTokenReference;
+
+import java.util.Hashtable;
 
 /**
  * @author Ruchith
@@ -15,80 +14,80 @@ import org.apache.commons.logging.LogFactory;
  */
 
 public class DerivedKeyInfo {
-    
-  private Log log = LogFactory.getLog(DerivedKeyInfo.class.getName());
 
-  private Hashtable properties;
-  private String id;
-  private String algorithm;
-  private int generation;
-  private int offset;
-  private long length;
-  private String label;
-  private String nonce;
-  private int usageCount;
-  private SecurityTokenReference secTokenRef;
-  private SecurityTokenReference secTokRef2DkToken;
+    private Log log = LogFactory.getLog(DerivedKeyInfo.class.getName());
 
-  public DerivedKeyInfo(DerivedKeyToken dkt) throws WSSecurityException {
-    this.properties = dkt.getProperties();
-    this.generation = dkt.getGeneration();
-    this.offset = dkt.getOffset();
-    this.length = dkt.getLength();
-    this.label = dkt.getLabel();
-    this.nonce = dkt.getNonce();
-    this.id = dkt.getID();
-    this.algorithm = dkt.getAlgorithm();
-    //I need this info in the KeyDerivator
-    //Please feel free to suggest a better method to get the reference info into the KeyDerivator
-    this.secTokenRef = dkt.getSecuityTokenReference();
-    log.debug("DerivedKeyInfo :created. dktId: " + this.id);
-  }
+    private Hashtable properties;
+    private String id;
+    private String algorithm;
+    private int generation;
+    private int offset;
+    private long length;
+    private String label;
+    private String nonce;
+    private int usageCount;
+    private SecurityTokenReference secTokenRef;
+    private SecurityTokenReference secTokRef2DkToken;
 
-  public int getGeneration() {
-    return generation;
-  }
+    public DerivedKeyInfo(DerivedKeyToken dkt) throws WSSecurityException {
+        this.properties = dkt.getProperties();
+        this.generation = dkt.getGeneration();
+        this.offset = dkt.getOffset();
+        this.length = dkt.getLength();
+        this.label = dkt.getLabel();
+        this.nonce = dkt.getNonce();
+        this.id = dkt.getID();
+        this.algorithm = dkt.getAlgorithm();
+        //I need this info in the KeyDerivator
+        //Please feel free to suggest a better method to get the reference info into the KeyDerivator
+        this.secTokenRef = dkt.getSecuityTokenReference();
+        log.debug("DerivedKeyInfo :created. dktId: " + this.id);
+    }
 
-  public String getLabel() {
-    return label;
-  }
+    public int getGeneration() {
+        return generation;
+    }
 
-  public long getLength() {
-    return length;
-  }
+    public String getLabel() {
+        return label;
+    }
 
-  public String getNonce() {
-    return nonce;
-  }
+    public long getLength() {
+        return length;
+    }
 
-  public int getOffset() {
-    return offset;
-  }
+    public String getNonce() {
+        return nonce;
+    }
 
-  public Hashtable getProperties() {
-    return properties;
-  }
+    public int getOffset() {
+        return offset;
+    }
 
-  public String getId() {
-    return this.id;
-  }
+    public Hashtable getProperties() {
+        return properties;
+    }
 
-  public SecurityTokenReference getSecurityTokenReference() {
-    return secTokenRef;
-  }
+    public String getId() {
+        return this.id;
+    }
 
-  public String getAlgorithm() {
-    return algorithm;
-  }
+    public SecurityTokenReference getSecurityTokenReference() {
+        return secTokenRef;
+    }
 
-  /**
-   * @param reference
-   */
-  public void setSecTokRef2DkToken(SecurityTokenReference reference) {
-      secTokRef2DkToken = reference;
-  }
+    public String getAlgorithm() {
+        return algorithm;
+    }
 
-  public SecurityTokenReference getSecTokRef2DkToken() {
-    return secTokRef2DkToken;
-  }
+    /**
+     * @param reference
+     */
+    public void setSecTokRef2DkToken(SecurityTokenReference reference) {
+        secTokRef2DkToken = reference;
+    }
+
+    public SecurityTokenReference getSecTokRef2DkToken() {
+        return secTokRef2DkToken;
+    }
 }

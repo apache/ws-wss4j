@@ -20,15 +20,15 @@ import org.w3c.dom.Document;
 
 /**
  * @author Malinda Kaushalye
- *
- * Builds the response message to validate the request
+ *         <p/>
+ *         Builds the response message to validate the request
  */
 public interface STValidator {
     /**
      * Status of the token as specified in the specification
      */
-    public static final String VALID= "http://schemas.xmlsoap.org/ws/2004/04/security/trust/status/valid";
-    public static final String INVALID= "http://schemas.xmlsoap.org/ws/2004/04/security/trust/status/invalid";
-    
-    public Document validate(Document req,Document res)throws Exception;
+    public static final String VALID = "http://schemas.xmlsoap.org/ws/2004/04/security/trust/status/valid";
+    public static final String INVALID = "http://schemas.xmlsoap.org/ws/2004/04/security/trust/status/invalid";
+
+    public Document validate(Document req, Document res) throws Exception;
 }

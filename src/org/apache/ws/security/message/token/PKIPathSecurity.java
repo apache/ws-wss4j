@@ -17,8 +17,8 @@
 
 package org.apache.ws.security.message.token;
 
-import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.w3c.dom.Document;
@@ -29,7 +29,7 @@ import java.security.cert.X509Certificate;
 /**
  * PKIPath Security Token.
  * <p/>
- * 
+ *
  * @author Davanum Srinivas (dims@yahoo.com).
  */
 public class PKIPathSecurity extends BinarySecurity {
@@ -38,8 +38,8 @@ public class PKIPathSecurity extends BinarySecurity {
     /**
      * Constructor.
      * <p/>
-     * 
-     * @throws WSSecurityException 
+     *
+     * @throws WSSecurityException
      */
     public PKIPathSecurity(WSSConfig wssConfig, Element elem) throws WSSecurityException {
         super(wssConfig, elem);
@@ -51,7 +51,6 @@ public class PKIPathSecurity extends BinarySecurity {
     /**
      * Constructor.
      * <p/>
-     * 
      */
     public PKIPathSecurity(WSSConfig wssConfig, Document doc) {
         super(wssConfig, doc);
@@ -61,11 +60,11 @@ public class PKIPathSecurity extends BinarySecurity {
     /**
      * get the X509Certificate array.
      * <p/>
-     * 
-     * @param reverse 
-     * @return 
-     * @throws GeneralSecurityException 
-     * @throws IOException              
+     *
+     * @param reverse
+     * @return
+     * @throws GeneralSecurityException
+     * @throws IOException
      */
     public X509Certificate[] getX509Certificates(boolean reverse, Crypto crypto) throws WSSecurityException {
         byte[] data = getToken();
@@ -80,22 +79,21 @@ public class PKIPathSecurity extends BinarySecurity {
     /**
      * set the X509Certificate array.
      * <p/>
-     * 
-     * @param certs   
-     * @param reverse 
-     * @throws CertificateEncodingException 
-     * @throws IOException                  
+     *
+     * @param certs
+     * @param reverse
+     * @throws CertificateEncodingException
+     * @throws IOException
      */
     public void setX509Certificates(X509Certificate[] certs, boolean reverse, Crypto crypto) throws WSSecurityException {
         if (certs == null) {
-            throw new WSSecurityException(
-                WSSecurityException.FAILURE,
-                "noCert");
+            throw new WSSecurityException(WSSecurityException.FAILURE,
+                    "noCert");
         }
         byte[] data = crypto.getCertificateData(reverse, certs);
         setToken(data);
     }
-    
+
     public static String getType(WSSConfig wssConfig) {
         return WSConstants.X509TOKEN_NS + "#" + X509PKI_PATH;
     }

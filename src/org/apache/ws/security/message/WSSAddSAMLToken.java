@@ -28,7 +28,7 @@ import org.w3c.dom.Element;
 /**
  * Builds a WS SAML Assertion and inserts it into the SOAP Envelope. Refer to
  * the WS specification, SAML Token profile
- * 
+ *
  * @author Davanum Srinivas (dims@yahoo.com).
  */
 public class WSSAddSAMLToken extends WSBaseMessage {
@@ -42,57 +42,49 @@ public class WSSAddSAMLToken extends WSBaseMessage {
     }
 
     /**
-     * Constructor. 
+     * Constructor.
      * <p/>
-     * 
-     * @param actor
-     *            the name of the actor of the <code>wsse:Security</code>
-     *            header
+     *
+     * @param actor the name of the actor of the <code>wsse:Security</code>
+     *              header
      */
     public WSSAddSAMLToken(String actor) {
         super(actor);
     }
 
     /**
-     * Constructor. 
+     * Constructor.
      * <p/>
-     * 
-     * @param actor
-     *            The name of the actor of the <code>wsse:Security</code>
-     *            header
-     * @param mu
-     *            Set <code>mustUnderstand</code> to true or false
+     *
+     * @param actor The name of the actor of the <code>wsse:Security</code>
+     *              header
+     * @param mu    Set <code>mustUnderstand</code> to true or false
      */
     public WSSAddSAMLToken(String actor, boolean mu) {
         super(actor, mu);
     }
 
     /**
-     * Constructor. 
+     * Constructor.
      * <p/>
-     * 
-     * @param wssConfig
-     *            Configuration options for processing and building the <code>wsse:Security</code> header
-     * @param actor
-     *            The name of the actor of the <code>wsse:Security</code>
-     *            header
-     * @param mu
-     *            Set <code>mustUnderstand</code> to true or false
+     *
+     * @param wssConfig Configuration options for processing and building the <code>wsse:Security</code> header
+     * @param actor     The name of the actor of the <code>wsse:Security</code>
+     *                  header
+     * @param mu        Set <code>mustUnderstand</code> to true or false
      */
     public WSSAddSAMLToken(WSSConfig wssConfig, String actor, boolean mu) {
         super(wssConfig, actor, mu);
     }
 
     /**
-     * Adds a new <code>SAMLAssertion</code> to a soap envelope. 
+     * Adds a new <code>SAMLAssertion</code> to a soap envelope.
      * <p/>
      * A complete <code>SAMLAssertion</code> is added to the
      * <code>wsse:Security</code> header.
-     * 
-     * @param doc
-     *            The SOAP enevlope as W3C document
-     * @param username
-     *            The username to set in the UsernameToken
+     *
+     * @param doc      The SOAP enevlope as W3C document
+     * @param username The username to set in the UsernameToken
      * @return Document with UsernameToken added
      */
     public Document build(Document doc, SAMLAssertion assertion) {
@@ -100,11 +92,10 @@ public class WSSAddSAMLToken extends WSBaseMessage {
         try {
             Element element = (Element) assertion.toDOM(doc);
             Element securityHeader = insertSecurityHeader(doc);
-            WSSecurityUtil.prependChildElement(
-                doc,
-                securityHeader,
-                element,
-                true);
+            WSSecurityUtil.prependChildElement(doc,
+                    securityHeader,
+                    element,
+                    true);
         } catch (SAMLException ex) {
             ex.printStackTrace();
             throw new RuntimeException(ex.toString());

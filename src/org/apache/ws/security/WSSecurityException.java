@@ -25,7 +25,7 @@ import java.util.ResourceBundle;
 /**
  * Exception class for WS-Security.
  * <p/>
- * 
+ *
  * @author Davanum Srinivas (dims@yahoo.com).
  */
 public class WSSecurityException extends RemoteException {
@@ -54,11 +54,11 @@ public class WSSecurityException extends RemoteException {
     /**
      * Constructor.
      * <p/>
-     * 
-     * @param errorCode 
-     * @param msgId     
-     * @param args      
-     * @param exception 
+     *
+     * @param errorCode
+     * @param msgId
+     * @param args
+     * @param exception
      */
     public WSSecurityException(int errorCode, String msgId, Object[] args, Throwable exception) {
         super(getMessage(errorCode, msgId, args), exception);
@@ -68,10 +68,10 @@ public class WSSecurityException extends RemoteException {
     /**
      * Constructor.
      * <p/>
-     * 
-     * @param errorCode 
-     * @param msgId     
-     * @param args      
+     *
+     * @param errorCode
+     * @param msgId
+     * @param args
      */
     public WSSecurityException(int errorCode, String msgId, Object[] args) {
         super(getMessage(errorCode, msgId, args));
@@ -81,9 +81,9 @@ public class WSSecurityException extends RemoteException {
     /**
      * Constructor.
      * <p/>
-     * 
-     * @param errorCode 
-     * @param msgId     
+     *
+     * @param errorCode
+     * @param msgId
      */
     public WSSecurityException(int errorCode, String msgId) {
         this(errorCode, msgId, null);
@@ -92,8 +92,8 @@ public class WSSecurityException extends RemoteException {
     /**
      * Constructor.
      * <p/>
-     * 
-     * @param errorCode 
+     *
+     * @param errorCode
      */
     public WSSecurityException(int errorCode) {
         this(errorCode, null, null);
@@ -102,7 +102,7 @@ public class WSSecurityException extends RemoteException {
     /**
      * Get the error code.
      * <p/>
-     * 
+     *
      * @return error code of this exception See values above.
      */
     public int getErrorCode() {
@@ -112,10 +112,10 @@ public class WSSecurityException extends RemoteException {
     /**
      * get the message from resource bundle.
      * <p/>
-     * 
-     * @param errorCode 
-     * @param msgId     
-     * @param args      
+     *
+     * @param errorCode
+     * @param msgId
+     * @param args
      * @return the message translated from the property (message) file.
      */
     private static String getMessage(int errorCode, String msgId, Object[] args) {

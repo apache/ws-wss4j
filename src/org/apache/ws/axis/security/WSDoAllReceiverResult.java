@@ -26,7 +26,6 @@ public class WSDoAllReceiverResult {
     private String actor;
     private Vector wsSecurityResults;
 
-
     WSDoAllReceiverResult(String actor, Vector wsResults) {
         this.actor = actor;
         this.wsSecurityResults = wsResults;

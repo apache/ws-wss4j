@@ -16,12 +16,6 @@
  */
 package org.apache.ws.security.conversation;
 
-import java.util.Vector;
-
-import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
-import javax.security.auth.callback.Callback;
-
 import org.apache.axis.components.logger.LogFactory;
 import org.apache.commons.logging.Log;
 import org.apache.ws.security.SOAPConstants;
@@ -49,25 +43,29 @@ import org.apache.xml.security.transforms.Transforms;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
+import javax.security.auth.callback.Callback;
+import java.util.Vector;
+
 /**
- * This class helps handlers to carry on conversation. 
- * 
+ * This class helps handlers to carry on conversation.
+ * <p/>
  * It performes functionalities
- *     1) Adding derived Keys
- *  2) Signing using derived keys
- *  3) Encrypting using derive keys
- * 
+ * 1) Adding derived Keys
+ * 2) Signing using derived keys
+ * 3) Encrypting using derive keys
+ * <p/>
  * Actually the class is the collection of methods that are useful
  * for carrying out conversation.
- * 
+ *
  * @author Dimuthu Leelarathne. (muthulee@yahoo.com)
  */
 public class ConversationManager {
 
     private static Log log =
-        LogFactory.getLog(ConversationManager.class.getName());
+            LogFactory.getLog(ConversationManager.class.getName());
 
-    
     private int generation = 0;
     protected String canonAlgo = Canonicalizer.ALGO_ID_C14N_EXCL_OMIT_COMMENTS;
 
@@ -82,11 +80,10 @@ public class ConversationManager {
      * @throws WSSecurityException
      * @throws ConversationException
      */
-    public DerivedKeyInfo addDerivedKeyToken(
-        Document doc,
-        String uuid,
-        DerivedKeyCallbackHandler dkcbHandler)
-        throws ConversationException {
+    public DerivedKeyInfo addDerivedKeyToken(Document doc,
+                                             String uuid,
+                                             DerivedKeyCallbackHandler dkcbHandler)
+            throws ConversationException {
         String genID = ConversationUtil.genericID();
         
         /*
@@ -94,16 +91,15 @@ public class ConversationManager {
          */
          
         // step 1 : Creating wsse:Reference
-        Reference ref = new Reference(WSSConfig.getDefaultWSConfig(),doc);
+        Reference ref = new Reference(WSSConfig.getDefaultWSConfig(), doc);
         ref.setURI("#" + genID);
         ref.setValueType("DerivedKeyToken");
-        SecurityTokenReference stRef = new SecurityTokenReference(WSSConfig.getDefaultWSConfig(),doc);
+        SecurityTokenReference stRef = new SecurityTokenReference(WSSConfig.getDefaultWSConfig(), doc);
         stRef.setReference(ref);
 
-        WSSecurityUtil.setNamespace(
-            stRef.getElement(),
-            WSConstants.WSSE_NS,
-            WSConstants.WSSE_PREFIX);
+        WSSecurityUtil.setNamespace(stRef.getElement(),
+                WSConstants.WSSE_NS,
+                WSConstants.WSSE_PREFIX);
 
         // step 2 :Create the DerriveToken
         DerivedKeyToken dtoken = new DerivedKeyToken(doc);
@@ -135,25 +131,24 @@ public class ConversationManager {
 
     }
 
-/**
- * Manages derived key encryption.
- * 
- * @param encUser
- * @param actor
- * @param mu
- * @param doc
- * @param secRef
- * @param dkcbHandler
- * @throws ConversationException
- */
-    public void performDK_ENCR(
-        String encUser,
-        String actor,
-        boolean mu,
-        Document doc,
-        SecurityTokenReference secRef,
-        DerivedKeyCallbackHandler dkcbHandler)
-        throws ConversationException {
+    /**
+     * Manages derived key encryption.
+     *
+     * @param encUser
+     * @param actor
+     * @param mu
+     * @param doc
+     * @param secRef
+     * @param dkcbHandler
+     * @throws ConversationException
+     */
+    public void performDK_ENCR(String encUser,
+                               String actor,
+                               boolean mu,
+                               Document doc,
+                               SecurityTokenReference secRef,
+                               DerivedKeyCallbackHandler dkcbHandler)
+            throws ConversationException {
         WSEncryptBody wsEncrypt = new WSEncryptBody(actor, mu);
 
         /*
@@ -176,7 +171,7 @@ public class ConversationManager {
          * step 2: Generating the key, and setting it in the the wsEncrypt
          */
         WSPasswordCallback pwCb =
-            new WSPasswordCallback(encUser, WSPasswordCallback.UNKNOWN);
+                new WSPasswordCallback(encUser, WSPasswordCallback.UNKNOWN);
         Callback[] callbacks = new Callback[1];
         callbacks[0] = (Callback) pwCb;
 
@@ -201,29 +196,28 @@ public class ConversationManager {
 
     }
 
-/**
- * Manages derived key signature.
- * 
- * @param doc
- * @param dkcbHandler
- * @param uuid
- * @param dkSigInfo
- * @throws ConversationException
- */
-    public void performDK_Sign(
-        Document doc,
-        DerivedKeyCallbackHandler dkcbHandler,
-        String uuid,
-        DerivedKeyInfo dkSigInfo)
-        throws ConversationException {
+    /**
+     * Manages derived key signature.
+     *
+     * @param doc
+     * @param dkcbHandler
+     * @param uuid
+     * @param dkSigInfo
+     * @throws ConversationException
+     */
+    public void performDK_Sign(Document doc,
+                               DerivedKeyCallbackHandler dkcbHandler,
+                               String uuid,
+                               DerivedKeyInfo dkSigInfo)
+            throws ConversationException {
         //            Signing....
         //        HMAC_SignVerify sign = new HMAC_SignVerify();
         String sigAlgo = XMLSignature.ALGO_ID_MAC_HMAC_SHA1;
 
         String sigUser =
-            ConversationUtil.generateIdentifier(uuid, dkSigInfo.getId());
+                ConversationUtil.generateIdentifier(uuid, dkSigInfo.getId());
         WSPasswordCallback pwCb =
-            new WSPasswordCallback(sigUser, WSPasswordCallback.UNKNOWN);
+                new WSPasswordCallback(sigUser, WSPasswordCallback.UNKNOWN);
         Callback[] callbacks = new Callback[1];
         callbacks[0] = (Callback) pwCb;
 
@@ -246,6 +240,7 @@ public class ConversationManager {
      * The method is coded such that it can be plugged into WSSignEnvelope.
      * Performs HMAC_SHA1 signature.
      * needed.
+     *
      * @param doc
      * @param ref
      * @param sk
@@ -254,7 +249,7 @@ public class ConversationManager {
      * @throws WSSecurityException
      */
     public Document build(Document doc, Reference ref, byte[] sk, Vector parts)
-        throws WSSecurityException {
+            throws WSSecurityException {
         boolean doDebug = log.isDebugEnabled();
 
         if (doDebug) {
@@ -262,17 +257,15 @@ public class ConversationManager {
         }
 
         if (ref == null) {
-            throw new WSSecurityException(
-                WSSecurityException.FAILURE,
-                "Invalid Data",
-                new Object[] { "For symmeric key signatures - Reference object must be provided" });
+            throw new WSSecurityException(WSSecurityException.FAILURE,
+                    "Invalid Data",
+                    new Object[]{"For symmeric key signatures - Reference object must be provided"});
         }
 
         if (sk == null) {
-            throw new WSSecurityException(
-                WSSecurityException.FAILURE,
-                "Invalid Data",
-                new Object[] { "For symmeric key signatures - Reference object must be provided" });
+            throw new WSSecurityException(WSSecurityException.FAILURE,
+                    "Invalid Data",
+                    new Object[]{"For symmeric key signatures - Reference object must be provided"});
         }
         String sigAlgo = XMLSignature.ALGO_ID_MAC_HMAC_SHA1;
 
@@ -288,35 +281,33 @@ public class ConversationManager {
         Element envelope = doc.getDocumentElement();
         SOAPConstants soapConstants = WSSecurityUtil.getSOAPConstants(envelope);
         Element securityHeader =
-            WSSecurityUtil.findWsseSecurityHeaderBlock(WSSConfig.getDefaultWSConfig(),
-                doc,
-                doc.getDocumentElement(),
-                true);
+                WSSecurityUtil.findWsseSecurityHeaderBlock(WSSConfig.getDefaultWSConfig(),
+                        doc,
+                        doc.getDocumentElement(),
+                        true);
 
         XMLSignature sig = null;
         try {
             sig = new XMLSignature(doc, null, sigAlgo, canonAlgo);
         } catch (XMLSecurityException e) {
-            throw new WSSecurityException(
-                WSSecurityException.FAILED_SIGNATURE,
-                "noXMLSig");
+            throw new WSSecurityException(WSSecurityException.FAILED_SIGNATURE,
+                    "noXMLSig");
         }
 
         KeyInfo info = sig.getKeyInfo();
         String keyInfoUri = "KeyId-" + info.hashCode();
         info.setId(keyInfoUri);
 
-        SecurityTokenReference secRef = new SecurityTokenReference(WSSConfig.getDefaultWSConfig(),doc);
+        SecurityTokenReference secRef = new SecurityTokenReference(WSSConfig.getDefaultWSConfig(), doc);
         String strUri = "STRId-" + secRef.hashCode();
         secRef.setID(strUri);
 
         if (parts == null) {
             parts = new Vector();
             WSEncryptionPart encP =
-                new WSEncryptionPart(
-                    soapConstants.getBodyQName().getLocalPart(),
-                    soapConstants.getEnvelopeURI(),
-                    "Content");
+                    new WSEncryptionPart(soapConstants.getBodyQName().getLocalPart(),
+                            soapConstants.getEnvelopeURI(),
+                            "Content");
             parts.add(encP);
         }
 
@@ -346,45 +337,38 @@ public class ConversationManager {
             try {
                 if (elemName.equals("Token")) {
                     transforms = new Transforms(doc);
-                    transforms.addTransform(
-                        Transforms.TRANSFORM_C14N_EXCL_OMIT_COMMENTS);
+                    transforms.addTransform(Transforms.TRANSFORM_C14N_EXCL_OMIT_COMMENTS);
                     sig.addDocument("#" + keyInfoUri, transforms);
                 } else if (elemName.equals("STRTransform")) { // STRTransform
                     Element ctx = createSTRParameter(doc);
                     transforms = new Transforms(doc);
-                    transforms.addTransform(
-                        STRTransform.implementedTransformURI,
-                        ctx);
+                    transforms.addTransform(STRTransform.implementedTransformURI,
+                            ctx);
                     sig.addDocument("#" + strUri, transforms);
                 } else {
                     Element body =
-                        (Element) WSSecurityUtil.findElement(
-                            envelope,
-                            elemName,
-                            nmSpace);
+                            (Element) WSSecurityUtil.findElement(envelope,
+                                    elemName,
+                                    nmSpace);
                     if (body == null) {
-                        throw new WSSecurityException(
-                            WSSecurityException.FAILURE,
-                            "noEncElement",
-                            new Object[] { nmSpace + ", " + elemName });
+                        throw new WSSecurityException(WSSecurityException.FAILURE,
+                                "noEncElement",
+                                new Object[]{nmSpace + ", " + elemName});
                     }
                     transforms = new Transforms(doc);
-                    transforms.addTransform(
-                        Transforms.TRANSFORM_C14N_EXCL_OMIT_COMMENTS);
+                    transforms.addTransform(Transforms.TRANSFORM_C14N_EXCL_OMIT_COMMENTS);
                     sig.addDocument("#" + setWsuId(body), transforms);
                 }
             } catch (TransformationException e1) {
-                throw new WSSecurityException(
-                    WSSecurityException.FAILED_SIGNATURE,
-                    "noXMLSig",
-                    null,
-                    e1);
+                throw new WSSecurityException(WSSecurityException.FAILED_SIGNATURE,
+                        "noXMLSig",
+                        null,
+                        e1);
             } catch (XMLSignatureException e1) {
-                throw new WSSecurityException(
-                    WSSecurityException.FAILED_SIGNATURE,
-                    "noXMLSig",
-                    null,
-                    e1);
+                throw new WSSecurityException(WSSecurityException.FAILED_SIGNATURE,
+                        "noXMLSig",
+                        null,
+                        e1);
             }
         }
 
@@ -395,11 +379,10 @@ public class ConversationManager {
          * -Append the signature element.
          * -Apped the KeyInfo element
          */
-        WSSecurityUtil.prependChildElement(
-            doc,
-            securityHeader,
-            sig.getElement(),
-            false);
+        WSSecurityUtil.prependChildElement(doc,
+                securityHeader,
+                sig.getElement(),
+                false);
 
         /*
          * Put the "Reference object" into secRef in KeyInfo
@@ -411,11 +394,10 @@ public class ConversationManager {
         try {
             sig.sign(sharedKey);
         } catch (XMLSignatureException e1) {
-            throw new WSSecurityException(
-                WSSecurityException.FAILED_SIGNATURE,
-                null,
-                null,
-                e1);
+            throw new WSSecurityException(WSSecurityException.FAILED_SIGNATURE,
+                    null,
+                    null,
+                    e1);
         }
 
         if (doDebug) {
@@ -430,29 +412,24 @@ public class ConversationManager {
      */
     private Element createSTRParameter(Document doc) {
         Element transformParam =
-            doc.createElementNS(
-                WSConstants.WSSE_NS,
-                WSConstants.WSSE_PREFIX + ":TransformationParameters");
+                doc.createElementNS(WSConstants.WSSE_NS,
+                        WSConstants.WSSE_PREFIX + ":TransformationParameters");
 
-        WSSecurityUtil.setNamespace(
-            transformParam,
-            WSConstants.WSSE_NS,
-            WSConstants.WSSE_PREFIX);
+        WSSecurityUtil.setNamespace(transformParam,
+                WSConstants.WSSE_NS,
+                WSConstants.WSSE_PREFIX);
 
         Element canonElem =
-            doc.createElementNS(
+                doc.createElementNS(WSConstants.SIG_NS,
+                        WSConstants.SIG_PREFIX + ":CanonicalizationMethod");
+
+        WSSecurityUtil.setNamespace(canonElem,
                 WSConstants.SIG_NS,
-                WSConstants.SIG_PREFIX + ":CanonicalizationMethod");
+                WSConstants.SIG_PREFIX);
 
-        WSSecurityUtil.setNamespace(
-            canonElem,
-            WSConstants.SIG_NS,
-            WSConstants.SIG_PREFIX);
-
-        canonElem.setAttributeNS(
-            null,
-            "Algorithm",
-            Canonicalizer.ALGO_ID_C14N_EXCL_OMIT_COMMENTS);
+        canonElem.setAttributeNS(null,
+                "Algorithm",
+                Canonicalizer.ALGO_ID_C14N_EXCL_OMIT_COMMENTS);
         transformParam.appendChild(canonElem);
         return transformParam;
     }
@@ -463,10 +440,9 @@ public class ConversationManager {
 
     protected String setWsuId(Element bodyElement) {
         String prefix =
-            WSSecurityUtil.setNamespace(
-                bodyElement,
-                WSConstants.WSU_NS,
-                WSConstants.WSU_PREFIX);
+                WSSecurityUtil.setNamespace(bodyElement,
+                        WSConstants.WSU_NS,
+                        WSConstants.WSU_PREFIX);
         String id = bodyElement.getAttributeNS(WSConstants.WSU_NS, "Id");
         if ((id == null) || (id.length() == 0)) {
             id = "id-" + Integer.toString(bodyElement.hashCode());

@@ -20,11 +20,11 @@ import org.w3c.dom.Document;
 
 /**
  * @author Malinda Kaushalye
- *
- * Builds the response message to issue a token.
- * any class that implements <code>STIssuer</code> would have the freedom to 
- * define its own way of issuing (i.e constructing the response) tokens
+ *         <p/>
+ *         Builds the response message to issue a token.
+ *         any class that implements <code>STIssuer</code> would have the freedom to
+ *         define its own way of issuing (i.e constructing the response) tokens
  */
 public interface STIssuer {
-    public Document issue(Document req,Document res)throws Exception;
+    public Document issue(Document req, Document res) throws Exception;
 }

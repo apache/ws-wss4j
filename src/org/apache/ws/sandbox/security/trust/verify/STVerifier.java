@@ -17,18 +17,18 @@
 
 package org.apache.ws.security.trust.verify;
 
+import org.apache.ws.security.trust.WSTrustException;
 import org.w3c.dom.Document;
-import org.apache.ws.security.trust.WSTrustException;;
-
 
 /**
  * @author Ruchith
- * This is the interface for three verifiers used by the Trust engine 
+ *         This is the interface for three verifiers used by the Trust engine
  */
 public interface STVerifier {
     /**
      * Verification for the Trust engine
-     * @param doc The request document
+     *
+     * @param doc  The request document
      * @param porp configuration information
      * @return Verified/NOT ?
      * @throws TrustException

@@ -28,13 +28,13 @@ import java.util.Properties;
 /**
  * CryptoFactory.
  * <p/>
- * 
+ *
  * @author Davanum Srinivas (dims@yahoo.com).
  */
 public abstract class SAMLIssuerFactory {
     private static Log log = LogFactory.getLog(SAMLIssuerFactory.class);
     private static final String defaultSAMLClassName =
-        "org.apache.ws.security.saml.WSSSAMLIssuerImpl";
+            "org.apache.ws.security.saml.WSSSAMLIssuerImpl";
 
     /**
      * getInstance
@@ -48,7 +48,7 @@ public abstract class SAMLIssuerFactory {
      * <code>saml.properties</code> is loaded with the
      * <code>Loader.getResource()</code> method.
      * <p/>
-     * 
+     *
      * @return The SAMLIssuer implementation was defined
      */
     public static SAMLIssuer getInstance() {
@@ -62,16 +62,15 @@ public abstract class SAMLIssuerFactory {
      * implementation. The porperties can be <code>null</code>. It is depenend on the
      * SAMLIssuer implementation how the initialization is done in this case.
      * <p/>
-     * 
+     *
      * @param samlClassName This is the SAMLIssuer implementation class. No default is
-     *                        provided here.
-     * @param properties      The Properties that are forwarded to the SAMLIssuer implementaion.
-     *                        These properties are dependend on the SAMLIssuer implementatin
+     *                      provided here.
+     * @param properties    The Properties that are forwarded to the SAMLIssuer implementaion.
+     *                      These properties are dependend on the SAMLIssuer implementatin
      * @return The SAMLIssuer implementation or null if no samlClassName was defined
      */
-    public static SAMLIssuer getInstance(
-        String samlClassName,
-        Properties properties) {
+    public static SAMLIssuer getInstance(String samlClassName,
+                                         Properties properties) {
         return loadClass(samlClassName, properties);
     }
 
@@ -86,7 +85,7 @@ public abstract class SAMLIssuerFactory {
      * handed over to the SAMLIssuer implementation. The specified file
      * is loaded with the <code>Loader.getResource()</code> method.
      * <p/>
-     * 
+     *
      * @param propFilename The name of the property file to load
      * @return The SAMLIssuer implementation that was defined
      */
@@ -97,16 +96,14 @@ public abstract class SAMLIssuerFactory {
         if ((samlClassName == null) || (samlClassName.length() == 0)) {
             properties = getProperties(propFilename);
             samlClassName =
-                properties.getProperty(
-                    "org.apache.ws.security.saml.issuerClass",
-                    defaultSAMLClassName);
+                    properties.getProperty("org.apache.ws.security.saml.issuerClass",
+                            defaultSAMLClassName);
         }
         return loadClass(samlClassName, properties);
     }
 
-    private static SAMLIssuer loadClass(
-        String samlClassName,
-        Properties properties) {
+    private static SAMLIssuer loadClass(String samlClassName,
+                                        Properties properties) {
         Class samlIssuerClass = null;
         SAMLIssuer samlIssuer = null;
         try {
@@ -117,10 +114,10 @@ public abstract class SAMLIssuerFactory {
         }
         log.info("Using Crypto Engine [" + samlClassName + "]");
         try {
-            Class[] classes = new Class[] { Properties.class };
+            Class[] classes = new Class[]{Properties.class};
             Constructor c = samlIssuerClass.getConstructor(classes);
             samlIssuer =
-                (SAMLIssuer) c.newInstance(new Object[] { properties });
+                    (SAMLIssuer) c.newInstance(new Object[]{properties});
             return samlIssuer;
         } catch (java.lang.Exception e) {
             e.printStackTrace();
@@ -133,17 +130,16 @@ public abstract class SAMLIssuerFactory {
         } catch (java.lang.Exception e) {
             e.printStackTrace();
             log.error(e);
-            throw new RuntimeException(
-                samlClassName + " cannot create instance");
+            throw new RuntimeException(samlClassName + " cannot create instance");
         }
     }
 
     /**
      * Gets the properties for SAML issuer.
-     * The functions loads the property file via 
+     * The functions loads the property file via
      * {@link Loader.getResource(String)}, thus the property file
-     * should be accesible via the classpath 
-     * 
+     * should be accesible via the classpath
+     *
      * @param propFilename the properties file to load
      * @return a <code>Properties</code> object loaded from the filename
      */
@@ -154,8 +150,7 @@ public abstract class SAMLIssuerFactory {
             properties.load(url.openStream());
         } catch (Exception e) {
             log.debug("Cannot find SAML property file: " + propFilename);
-            throw new RuntimeException(
-                "SAMLIssuerFactory: Cannot load properties: " + propFilename);
+            throw new RuntimeException("SAMLIssuerFactory: Cannot load properties: " + propFilename);
         }
         return properties;
     }

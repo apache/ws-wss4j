@@ -17,8 +17,8 @@
 
 package org.apache.ws.security.message.token;
 
-import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.util.DOM2Writer;
 import org.w3c.dom.Document;
@@ -30,7 +30,7 @@ import javax.xml.namespace.QName;
 /**
  * Reference.
  * <p/>
- * 
+ *
  * @author Davanum Srinivas (dims@yahoo.com).
  */
 public class Reference {
@@ -41,16 +41,15 @@ public class Reference {
     /**
      * Constructor.
      * <p/>
-     * 
+     *
      * @param wssConfig
-     * @param elem 
-     * @throws WSSecurityException 
+     * @param elem
+     * @throws WSSecurityException
      */
     public Reference(WSSConfig wssConfig, Element elem) throws WSSecurityException {
         if (elem == null) {
-            throw new WSSecurityException(
-                WSSecurityException.INVALID_SECURITY,
-                "noReference");
+            throw new WSSecurityException(WSSecurityException.INVALID_SECURITY,
+                    "noReference");
         }
         this.element = elem;
         this.wssConfig = wssConfig;
@@ -68,31 +67,30 @@ public class Reference {
         if (!nsOK || !element.getLocalName().equals(TOKEN_LNAME)) {
             QName el = new QName(this.element.getNamespaceURI(), this.element.getLocalName());
             QName token = new QName(wssConfig.getWsseNS(), TOKEN_LNAME);
-            throw new WSSecurityException(
-                    WSSecurityException.FAILURE,
+            throw new WSSecurityException(WSSecurityException.FAILURE,
                     "badElement",
-                    new Object[] { token, el });
+                    new Object[]{token, el});
         }
     }
 
     /**
      * Constructor.
      * <p/>
-     * 
+     *
      * @param wssConfig
-     * @param doc 
+     * @param doc
      */
     public Reference(WSSConfig wssConfig, Document doc) {
         this.wssConfig = wssConfig;
         this.element =
-            doc.createElementNS(wssConfig.getWsseNS(), "wsse:" + TOKEN_LNAME);
+                doc.createElementNS(wssConfig.getWsseNS(), "wsse:" + TOKEN_LNAME);
     }
 
     /**
      * get the dom element.
      * <p/>
-     * 
-     * @return 
+     *
+     * @return
      */
     public Element getElement() {
         return this.element;
@@ -101,8 +99,8 @@ public class Reference {
     /**
      * get the URI.
      * <p/>
-     * 
-     * @return 
+     *
+     * @return
      */
     public String getValueType() {
         return this.element.getAttribute("ValueType");
@@ -111,8 +109,8 @@ public class Reference {
     /**
      * get the URI.
      * <p/>
-     * 
-     * @return 
+     *
+     * @return
      */
     public String getURI() {
         return this.element.getAttribute("URI");
@@ -121,7 +119,7 @@ public class Reference {
     /**
      * set the Value type.
      * <p/>
-     * 
+     *
      * @param valueType
      */
     public void setValueType(String valueType) {
@@ -131,8 +129,8 @@ public class Reference {
     /**
      * set the URI.
      * <p/>
-     * 
-     * @param uri 
+     *
+     * @param uri
      */
     public void setURI(String uri) {
         this.element.setAttribute("URI", uri);
@@ -141,8 +139,8 @@ public class Reference {
     /**
      * return the string representation.
      * <p/>
-     * 
-     * @return 
+     *
+     * @return
      */
     public String toString() {
         return DOM2Writer.nodeToString((Node) this.element);

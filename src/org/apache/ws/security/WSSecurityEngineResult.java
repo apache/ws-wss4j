@@ -28,7 +28,7 @@ import java.util.Vector;
  * @author Werner Dittmann (Werner.Dittmann@siemens.com)
  */
 public class WSSecurityEngineResult {
-    
+
     private int action;
     private Principal principal;
     private X509Certificate cert;
@@ -50,9 +50,8 @@ public class WSSecurityEngineResult {
         signedElementQnames = elemQnames;
     }
 
-    WSSecurityEngineResult(
-        int act,
-        Timestamp tstamp) {
+    WSSecurityEngineResult(int act,
+                           Timestamp tstamp) {
         action = act;
         timestamp = tstamp;
     }
@@ -67,14 +66,15 @@ public class WSSecurityEngineResult {
 
     /**
      * @return the principals found if UsernameToken or Signature
-     * processing were done
+     *         processing were done
      */
     public Principal getPrincipal() {
         return principal;
     }
+
     /**
      * @return the Certificate found if Signature
-     * processing were done
+     *         processing were done
      */
     public X509Certificate getCertificate() {
         return cert;
@@ -92,7 +92,8 @@ public class WSSecurityEngineResult {
      */
     public Timestamp getTimestamp() {
         return timestamp;
-    }    
+    }
+
     /**
      * @return Returns the signedElementQnames.
      */

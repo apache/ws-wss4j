@@ -35,7 +35,7 @@ import java.security.Principal;
  * <p/>
  * Modeled according to the example provided by JAAS documentation
  * <p/>
- * 
+ *
  * @author Davanum Srinivas (dims@yahoo.com).
  * @author Werner Dittmann (Werner.Dittmann@siemens.com).
  * @see java.security.Principal
@@ -54,7 +54,7 @@ public class WSUsernameTokenPrincipal implements Principal, java.io.Serializable
     /**
      * Create a WSUsernameTokenPrincipal with a WSUsernameToken username.
      * <p/>
-     * 
+     *
      * @param name the WSUsernameToken username for this user.
      * @throws NullPointerException if the <code>name</code>
      *                              is <code>null</code>.
@@ -70,7 +70,7 @@ public class WSUsernameTokenPrincipal implements Principal, java.io.Serializable
      * Return the WSUsernameToken username for this <code>WSUsernameTokenPrincipal</code>.
      * <p/>
      * <p/>
-     * 
+     *
      * @return the WSUsernameToken username for this <code>WSUsernameTokenPrincipal</code>
      */
     public String getName() {
@@ -81,7 +81,7 @@ public class WSUsernameTokenPrincipal implements Principal, java.io.Serializable
      * Return the WSUsernameToken password type for this <code>WSUsernameTokenPrincipal</code>.
      * <p/>
      * <p/>
-     * 
+     *
      * @return true if the password type was <code>PassowrdDigest</code>
      */
     public boolean isPasswordDigest() {
@@ -92,8 +92,8 @@ public class WSUsernameTokenPrincipal implements Principal, java.io.Serializable
      * Set the WSUsernameToken nonce for this <code>WSUsernameTokenPrincipal</code>.
      * <p/>
      * <p/>
-     * 
-     * @param nonce 
+     *
+     * @param nonce
      */
     public void setNonce(String nonce) {
         this.nonce = nonce;
@@ -103,7 +103,7 @@ public class WSUsernameTokenPrincipal implements Principal, java.io.Serializable
      * Return the WSUsernameToken nonce for this <code>WSUsernameTokenPrincipal</code>.
      * <p/>
      * <p/>
-     * 
+     *
      * @return the WSUsernameToken nonce for this <code>WSUsernameTokenPrincipal</code>
      */
     public String getNonce() {
@@ -114,8 +114,8 @@ public class WSUsernameTokenPrincipal implements Principal, java.io.Serializable
      * Set the WSUsernameToken created time for this <code>WSUsernameTokenPrincipal</code>.
      * <p/>
      * <p/>
-     * 
-     * @param createdTime 
+     *
+     * @param createdTime
      */
     public void setCreatedTime(String createdTime) {
         this.createdTime = createdTime;
@@ -125,7 +125,7 @@ public class WSUsernameTokenPrincipal implements Principal, java.io.Serializable
      * Return the WSUsernameToken created time for this <code>WSUsernameTokenPrincipal</code>.
      * <p/>
      * <p/>
-     * 
+     *
      * @return the WSUsernameToken created time for this <code>WSUsernameTokenPrincipal</code>
      */
     public String getCreatedTime() {
@@ -136,7 +136,7 @@ public class WSUsernameTokenPrincipal implements Principal, java.io.Serializable
      * Return a string representation of this <code>WSUsernameTokenPrincipal</code>.
      * <p/>
      * <p/>
-     * 
+     *
      * @return a string representation of this <code>WSUsernameTokenPrincipal</code>.
      */
     public String toString() {
@@ -150,7 +150,7 @@ public class WSUsernameTokenPrincipal implements Principal, java.io.Serializable
      * have the same username.
      * <p/>
      * <p/>
-     * 
+     *
      * @param o Object to be compared for equality with this
      *          <code>WSUsernameTokenPrincipal</code>.
      * @return true if the specified Object is equal equal to this
@@ -173,7 +173,7 @@ public class WSUsernameTokenPrincipal implements Principal, java.io.Serializable
      * Return a hash code for this <code>WSUsernameTokenPrincipal</code>.
      * <p/>
      * <p/>
-     * 
+     *
      * @return a hash code for this <code>WSUsernameTokenPrincipal</code>.
      */
     public int hashCode() {

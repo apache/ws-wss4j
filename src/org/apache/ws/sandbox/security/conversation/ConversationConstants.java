@@ -25,7 +25,7 @@ public class ConversationConstants {
      * Field WSC_NS
      */
     public final static String WSC_NS =
-        "http://schemas.xmlsoap.org/ws/2004/04/sc";
+            "http://schemas.xmlsoap.org/ws/2004/04/sc";
 
     /**
      * Field WSC_PREFIX
@@ -36,7 +36,7 @@ public class ConversationConstants {
      * Field SECURITY_CONTEXT_TOKEN_LN
      */
     public static final String SECURITY_CONTEXT_TOKEN_LN =
-        "SecurityContextToken";
+            "SecurityContextToken";
 
     /**
      * Field IDENTIFIER_LN
@@ -57,7 +57,7 @@ public class ConversationConstants {
      * Field SECURITY_TOKEN_REFERENCE_LN
      */
     public static final String SECURITY_TOKEN_REFERENCE_LN =
-        "SecurityTokenReference";
+            "SecurityTokenReference";
 
     /**
      * Field DERIVED_KEY_TOKEN_LN

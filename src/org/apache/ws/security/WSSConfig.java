@@ -31,7 +31,8 @@ package org.apache.ws.security;
  * <b>WARNING: changing the default settings will break the compliance with the
  * latest specs.  Do this only if you know what you are doing.</b>
  * <p/>
- * @author Rami Jaamour (rjaamour@parasoft.com)  
+ *
+ * @author Rami Jaamour (rjaamour@parasoft.com)
  */
 public class WSSConfig {
     protected static WSSConfig defaultConfig = getNewInstance();
@@ -42,13 +43,13 @@ public class WSSConfig {
     protected boolean targetIdQualified = true;
     protected boolean processNonCompliantMessages = true;
     public static final int TIMESTAMP_IN_SECURITY_ELEMENT = 1;
-    public static final int TIMESTAMP_IN_HEADER_ELEMENT   = 2;
+    public static final int TIMESTAMP_IN_HEADER_ELEMENT = 2;
     protected int timestampLocation = TIMESTAMP_IN_SECURITY_ELEMENT;
-    
+
     protected WSSConfig() {
     }
+
     /**
-     * 
      * @return a new WSSConfig instance configured with the default values
      *         (values identical to {@link #getDefaultWSConfig getDefaultWSConfig()})
      */
@@ -56,21 +57,24 @@ public class WSSConfig {
         WSSConfig config = new WSSConfig();
         return config;
     }
+
     /**
-     *  returns a static WSConfig instance that is configured with the latest
-     *  OASIS WS-Seurity settings.
+     * returns a static WSConfig instance that is configured with the latest
+     * OASIS WS-Seurity settings.
      */
     public static WSSConfig getDefaultWSConfig() {
         return defaultConfig;
     }
+
     /**
-     *  default value is {@link WSConstants.WSSE_NS_OASIS_1_0}
-     *  <p/>
-     *  The WS-Security namespace
+     * default value is {@link WSConstants.WSSE_NS_OASIS_1_0}
+     * <p/>
+     * The WS-Security namespace
      */
     public String getWsseNS() {
         return wsse_ns;
     }
+
     /**
      * Valid values:
      * <ul>
@@ -83,14 +87,16 @@ public class WSSConfig {
     public void setWsseNS(String wsseNamespace) {
         wsse_ns = wsseNamespace;
     }
+
     /**
-     *  default value is {@link WSConstants.WSU_NS_OASIS_1_0}
-     *  <p/>
-     *  The WS-Security utility namespace
+     * default value is {@link WSConstants.WSU_NS_OASIS_1_0}
+     * <p/>
+     * The WS-Security utility namespace
      */
     public String getWsuNS() {
         return wsu_ns;
     }
+
     /**
      * Valid values:
      * <ul>
@@ -103,87 +109,97 @@ public class WSSConfig {
     public void setWsuNS(String wsuNamespace) {
         wsu_ns = wsuNamespace;
     }
+
     /**
-     *  default value is false.
-     *  <p/>
-     *  returns true if the BinarySecurityToken EncodingType and ValueType
+     * default value is false.
+     * <p/>
+     * returns true if the BinarySecurityToken EncodingType and ValueType
      * attributes should be namespace qualified.
      */
     public boolean isBSTAttributesQualified() {
         return qualifyBSTAttributes;
     }
+
     /**
-     *  specify if the BinarySecurityToken EncodingType and ValueType
-     *  attributes should be namespace qualified. The default value is false.
+     * specify if the BinarySecurityToken EncodingType and ValueType
+     * attributes should be namespace qualified. The default value is false.
      */
     public void setBSTAttributesQualified(boolean qualifyBSTAttributes) {
         this.qualifyBSTAttributes = qualifyBSTAttributes;
     }
+
     /**
-     *  default value is false.
-     *  <p/>
-     *  returns true if the BinarySecurityToken EncodingType and ValueType
-     *  attribute values should be prefixed with "wsse" or otherwise qualified
-     *  with the wsse namespace (false).
+     * default value is false.
+     * <p/>
+     * returns true if the BinarySecurityToken EncodingType and ValueType
+     * attribute values should be prefixed with "wsse" or otherwise qualified
+     * with the wsse namespace (false).
      */
     public boolean isBSTValuesPrefixed() {
         return prefixBSTValues;
     }
-    /** 
-     *  sets and option whether the BinarySecurityToken EncodingType and ValueType
-     *  attribute values should be prefixed with "wsse" or otherwise qualified
-     *  with the wsse namespace (false).
+
+    /**
+     * sets and option whether the BinarySecurityToken EncodingType and ValueType
+     * attribute values should be prefixed with "wsse" or otherwise qualified
+     * with the wsse namespace (false).
      */
     public void setBSTValuesPrefixed(boolean prefixBSTAttributeValues) {
         prefixBSTValues = prefixBSTAttributeValues;
     }
+
     /**
-     *  default value is true.
-     *  <p/>
-     *  returns true if the Id attribute placed in the signature target element is
-     *  qualified with the wsu namespace.
+     * default value is true.
+     * <p/>
+     * returns true if the Id attribute placed in the signature target element is
+     * qualified with the wsu namespace.
      */
     public boolean isTargetIdQualified() {
         return targetIdQualified;
     }
+
     /**
-     *  Sets an option whether the Id attribute placed in the signature target should be
-     *  qualified with the wsu namespace.
+     * Sets an option whether the Id attribute placed in the signature target should be
+     * qualified with the wsu namespace.
      */
     public void setTargetIdQualified(boolean qualifyTargetIdAttribute) {
         targetIdQualified = qualifyTargetIdAttribute;
     }
+
     /**
-     *  default value is TIMESTAMP_IN_SECURITY_ELEMENT (following OASIS 2003 and 2004 specs).
-     *  <p/>
-     *  returns TIMESTAMP_IN_SECURITY_ELEMENT if the wsu:Timestamp element is placed inside
-     *  the wsse:Secutriy element. TIMESTAMP_IN_HEADER_ELEMENT if it is placed under the Header directly, outside
-     *  the wsse:Secutriy element.
+     * default value is TIMESTAMP_IN_SECURITY_ELEMENT (following OASIS 2003 and 2004 specs).
+     * <p/>
+     * returns TIMESTAMP_IN_SECURITY_ELEMENT if the wsu:Timestamp element is placed inside
+     * the wsse:Secutriy element. TIMESTAMP_IN_HEADER_ELEMENT if it is placed under the Header directly, outside
+     * the wsse:Secutriy element.
      */
     public int getTimestampLocation() {
         return timestampLocation;
     }
+
     /**
-     *  Sets an option whether the Iwsu:Timestamp element is placed inside
-     *  the wsse:Secutriy element. set it to false foe placement in the Header,
-     *  outside the wsse:Secutriy element.
+     * Sets an option whether the Iwsu:Timestamp element is placed inside
+     * the wsse:Secutriy element. set it to false foe placement in the Header,
+     * outside the wsse:Secutriy element.
      */
     public void setTimestampLocation(int timestampElementLocation) {
         timestampLocation = timestampElementLocation;
     }
+
     /**
-     *  default value is true.
-     *  <p/>
-     *  returns true if WSS4J attempts to process non-compliant WS-Security
-     *  messages, such as WS-Security headers with older OASIS spec namespaces.  
+     * default value is true.
+     * <p/>
+     * returns true if WSS4J attempts to process non-compliant WS-Security
+     * messages, such as WS-Security headers with older OASIS spec namespaces.
      */
     public boolean getProcessNonCompliantMessages() {
         return processNonCompliantMessages;
     }
+
     /**
-     *  Sets an option whether WSS4J should attempt to process non-compliant
-     *  WS-Security messages, such as WS-Security headers with older OASIS spec
-     *  namespaces.
+     * Sets an option whether WSS4J should attempt to process non-compliant
+     * WS-Security messages, such as WS-Security headers with older OASIS spec
+     * namespaces.
      */
     public void setProcessNonCompliantMessages(boolean attemptProcess) {
         processNonCompliantMessages = attemptProcess;

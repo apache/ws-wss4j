@@ -30,10 +30,10 @@ public class DerivedKeyTokenAdder extends WSBaseMessage {
 
     /**
      * Method build
-     * 
-     * @param doc     
-     * @param dkToken 
-     * @return 
+     *
+     * @param doc
+     * @param dkToken
+     * @return
      */
     public Document build(Document doc,
                           DerivedKeyToken dkToken) {    // throws Exception {

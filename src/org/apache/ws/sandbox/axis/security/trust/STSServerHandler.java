@@ -16,54 +16,54 @@
  */
 package org.apache.ws.axis.security.trust;
 
-import java.io.ByteArrayOutputStream;
-
-import javax.xml.soap.SOAPHeader;
-
 import org.apache.axis.AxisFault;
 import org.apache.axis.Message;
 import org.apache.axis.MessageContext;
 import org.apache.axis.SOAPPart;
 import org.apache.axis.handlers.BasicHandler;
 import org.apache.axis.message.SOAPEnvelope;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.trust.STSManager;
 import org.apache.xml.security.utils.XMLUtils;
 import org.w3c.dom.Document;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import javax.xml.soap.SOAPHeader;
+import java.io.ByteArrayOutputStream;
+
 /**
  * @author Malinda Kaushalye
- * 
- * 
- * <code>STSServerHandler</code> is a handler which resides in the response path
- * of the Security Token Service end.
- * <code>STSServerHandler</code> currently performs following tasks
- *    <ul>
- *    <li>
- *            Get the request from the message context
- *    </li>
- *     <li>
- *            Create an <code>STSManager</code> and handover the task to be carried out.
- *    </li>
- *     <li>
- *            Get the resulted SOAP enevelop from <code>STSManager</code> 
- *    </li>
- *     <li>
- *            Set the current message of the message context 
- *    </li>
- *
- *    </ul>
- *
+ *         <p/>
+ *         <p/>
+ *         <code>STSServerHandler</code> is a handler which resides in the response path
+ *         of the Security Token Service end.
+ *         <code>STSServerHandler</code> currently performs following tasks
+ *         <ul>
+ *         <li>
+ *         Get the request from the message context
+ *         </li>
+ *         <li>
+ *         Create an <code>STSManager</code> and handover the task to be carried out.
+ *         </li>
+ *         <li>
+ *         Get the resulted SOAP enevelop from <code>STSManager</code>
+ *         </li>
+ *         <li>
+ *         Set the current message of the message context
+ *         </li>
+ *         <p/>
+ *         </ul>
  */
 public class STSServerHandler extends BasicHandler {
-    
+
     static Log log = LogFactory.getLog(STSServerHandler.class.getName());
+
     public STSServerHandler() {
-            
+
     }
+
     /**
-     *  Invoke method of handler
-     *   
+     * Invoke method of handler
      */
     public void invoke(MessageContext msgCntxt) throws AxisFault {
         log.debug("STSServerHandler: invoked");
@@ -71,13 +71,14 @@ public class STSServerHandler extends BasicHandler {
         if (msgCntxt.getPastPivot()) {
             doRequest(msgCntxt);
         } else {
-            
+
         }
-        
+
     }
+
     /**
      * Processing the outgoing msg
-     * 
+     *
      * @param msgCntxt
      * @throws AxisFault
      */
@@ -110,7 +111,7 @@ public class STSServerHandler extends BasicHandler {
             //creates an STSManager and handover server-config.wsdd parameters in a hash table
             log.debug("STSServerHandler: calling STSManager");
             STSManager stsMgr =
-                new STSManager(this.getOptions());
+                    new STSManager(this.getOptions());
             docRes = stsMgr.handleRequest(docReq, docRes);
             log.debug("STSServerHandler: STSManager has done the job");
             ByteArrayOutputStream os = new ByteArrayOutputStream();
@@ -119,17 +120,12 @@ public class STSServerHandler extends BasicHandler {
             sPartRes.setCurrentMessage(os.toByteArray(), SOAPPart.FORM_BYTES);            
             //set current message to the context
             msgCntxt.setCurrentMessage(sPartRes.getMessage());
-            
+
         } catch (Exception ex) {
-            throw new AxisFault(
-                "STSServerHandler-dorequest:Response failed due to a problem in issuence process",
-                ex);
-        }        
-        
+            throw new AxisFault("STSServerHandler-dorequest:Response failed due to a problem in issuence process",
+                    ex);
+        }
 
     }
-    
-        
-
 
 }

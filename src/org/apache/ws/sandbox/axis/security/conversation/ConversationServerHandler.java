@@ -24,8 +24,8 @@ import org.apache.axis.SOAPPart;
 import org.apache.axis.handlers.BasicHandler;
 import org.apache.ws.axis.security.WSDoAllConstants;
 import org.apache.ws.axis.security.WSDoAllSender;
-import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
@@ -34,10 +34,8 @@ import org.apache.ws.security.conversation.ConversationException;
 import org.apache.ws.security.conversation.ConversationManager;
 import org.apache.ws.security.conversation.ConversationUtil;
 import org.apache.ws.security.conversation.DerivedKeyCallbackHandler;
-import org.apache.ws.security.conversation.message.info.SecurityContextInfo;
 import org.apache.ws.security.conversation.message.token.DerivedKeyToken;
 import org.apache.ws.security.conversation.message.token.RequestSecurityTokenResponse;
-import org.apache.ws.security.conversation.message.token.RequestedProofToken;
 import org.apache.ws.security.conversation.message.token.SecurityContextToken;
 import org.apache.ws.security.message.token.Reference;
 import org.apache.ws.security.message.token.SecurityTokenReference;
@@ -56,21 +54,20 @@ import java.util.Iterator;
 
 /**
  * Serverside handler that implements WS-Secure Conversation for Axis.
- * 
- * @author Dimuthu
  *
- * Each application has a set of policies on how it should be accessed.
- * This handler facilitates one of the following two types of base tokens for a service 
- *     1) username token.
- *  2) X509 certificates.
+ * @author Dimuthu
+ *         <p/>
+ *         Each application has a set of policies on how it should be accessed.
+ *         This handler facilitates one of the following two types of base tokens for a service
+ *         1) username token.
+ *         2) X509 certificates.
  */
 public class ConversationServerHandler extends BasicHandler {
-    
+
     private static DerivedKeyCallbackHandler dkcbHandler;
-    
+
     /**
      * Contains the set of SecurityContextTokens of clients that access the service at this moment.
-     * 
      */
     public ConversationServerHandler() {
         System.out.println("ConversationServerHandler :: created");
@@ -86,13 +83,14 @@ public class ConversationServerHandler extends BasicHandler {
     }
 
     /**
-     * Method looks for a SCT in the SOAP envelope, 
+     * Method looks for a SCT in the SOAP envelope,
      * <li>        Case 1 :: if it is available then this is the first round.<\li>
      * <li>        Case 2 :: if it is not available check for derived keys<\li>
-     * 
-     * Case 1 :: Creating a new conversation session and add it to the <code>DerivedKeyCallBackHandler</code> 
-     * 
+     * <p/>
+     * Case 1 :: Creating a new conversation session and add it to the <code>DerivedKeyCallBackHandler</code>
+     * <p/>
      * Case 2 :: Then call a method <></code> derived key decryption.
+     *
      * @param msg
      * @throws AxisFault
      */
@@ -106,22 +104,20 @@ public class ConversationServerHandler extends BasicHandler {
             // Code to get the soap message as a Docuemnt
             SOAPPart sPart = (org.apache.axis.SOAPPart) message.getSOAPPart();
             doc =
-                ((org.apache.axis.message.SOAPEnvelope) sPart.getEnvelope())
+                    ((org.apache.axis.message.SOAPEnvelope) sPart.getEnvelope())
                     .getAsDocument();
 
             //Now search for a SCT in the Security header.        
             NodeList list =
-                doc.getElementsByTagNameNS(
-                    WSConstants.WSSE_NS,
-                    TrustConstants.SECURITY_CONTEXT_TOKEN_RESPONSE_LN);
+                    doc.getElementsByTagNameNS(WSConstants.WSSE_NS,
+                            TrustConstants.SECURITY_CONTEXT_TOKEN_RESPONSE_LN);
             int len = list.getLength();
             if (len == 0) { // No SCT is found
                 //    TODO:: Look for derived keys and do the decryption
                 try {
                     NodeList ndList =
-                        doc.getElementsByTagNameNS(
-                            WSConstants.WSSE_NS,
-                            "DerivedKeyToken");
+                            doc.getElementsByTagNameNS(WSConstants.WSSE_NS,
+                                    "DerivedKeyToken");
                     Element tmpE;
                     DerivedKeyToken tmpDKT;
                     String tmpID;
@@ -132,11 +128,10 @@ public class ConversationServerHandler extends BasicHandler {
                         //Add to the conv Session .... :-)                            
                     }
                     WSSecurityEngine secEng = new WSSecurityEngine();
-                    secEng.processSecurityHeader(
-                        doc,
-                        "",
-                        dkcbHandler,
-                        null);
+                    secEng.processSecurityHeader(doc,
+                            "",
+                            dkcbHandler,
+                            null);
 
                 } catch (WSSecurityException e1) {
                     e1.printStackTrace();
@@ -148,8 +143,7 @@ public class ConversationServerHandler extends BasicHandler {
                 Element elem = (Element) list.item(0);
                 stRes = new RequestSecurityTokenResponse(elem);
 
-                System.out.println(
-                    "SecurityTokenResponse Found :: " + stRes.toString());
+                System.out.println("SecurityTokenResponse Found :: " + stRes.toString());
 
                 // get securityContextToken, requestedProofToken
 //                SecurityContextToken SCT =
@@ -181,9 +175,8 @@ public class ConversationServerHandler extends BasicHandler {
             try {
                 sHeader = message.getSOAPEnvelope().getHeader();
             } catch (Exception ex) {
-                throw new AxisFault(
-                    "WSDoAllReceiver: cannot get SOAP header after security processing",
-                    ex);
+                throw new AxisFault("WSDoAllReceiver: cannot get SOAP header after security processing",
+                        ex);
             }
             String actor = null;
             Iterator headers = sHeader.examineHeaderElements(actor);
@@ -192,20 +185,19 @@ public class ConversationServerHandler extends BasicHandler {
             while (headers.hasNext()) {
                 SOAPHeaderElement hE = (SOAPHeaderElement) headers.next();
                 if (hE.getLocalName().equals(WSConstants.WSSE_LN)
-                    && hE.getNamespaceURI().equals(WSConstants.WSSE_NS)) {
+                        && hE.getNamespaceURI().equals(WSConstants.WSSE_NS)) {
                     headerElement = hE;
                     break;
                 }
             }
             (
-                (
+                    (
                     org
-                        .apache
-                        .axis
-                        .message
-                        .SOAPHeaderElement) headerElement)
-                        .setProcessed(
-                true);
+                    .apache
+                    .axis
+                    .message
+                    .SOAPHeaderElement) headerElement)
+                    .setProcessed(true);
         } catch (AxisFault e) {
             e.printStackTrace();
         } catch (WSSecurityException e) {
@@ -229,7 +221,7 @@ public class ConversationServerHandler extends BasicHandler {
         try {
 
             doc =
-                ((org.apache.axis.message.SOAPEnvelope) sPart.getEnvelope())
+                    ((org.apache.axis.message.SOAPEnvelope) sPart.getEnvelope())
                     .getAsDocument();
 
             //get the uuid
@@ -238,19 +230,17 @@ public class ConversationServerHandler extends BasicHandler {
             // Derrive the token 
             ConversationManager manager = new ConversationManager();
             String genID = ConversationUtil.genericID();
-           // manager.addDerivedKeyToken(doc, uuid, dkcbHandler, genID);
+            // manager.addDerivedKeyToken(doc, uuid, dkcbHandler, genID);
 
             //add the relavent SCT
             Element securityHeader =
-                WSSecurityUtil.findWsseSecurityHeaderBlock(
-                    WSSConfig.getDefaultWSConfig(),
-                    doc,
-                    doc.getDocumentElement(),
-                    false);
-            WSSecurityUtil.appendChildElement(
-                doc,
-                securityHeader,
-                (new SecurityContextToken(doc, uuid)).getElement());
+                    WSSecurityUtil.findWsseSecurityHeaderBlock(WSSConfig.getDefaultWSConfig(),
+                            doc,
+                            doc.getDocumentElement(),
+                            false);
+            WSSecurityUtil.appendChildElement(doc,
+                    securityHeader,
+                    (new SecurityContextToken(doc, uuid)).getElement());
 
             org.apache.xml.security.Init.init();
 
@@ -264,19 +254,17 @@ public class ConversationServerHandler extends BasicHandler {
             Reference ref = new Reference(WSSConfig.getDefaultWSConfig(), doc);
             ref.setURI("#" + genID);
             ref.setValueType("DerivedKeyToken");
-            SecurityTokenReference stRef = new SecurityTokenReference(WSSConfig.getDefaultWSConfig(),doc);
+            SecurityTokenReference stRef = new SecurityTokenReference(WSSConfig.getDefaultWSConfig(), doc);
             stRef.setReference(ref);
 
             //set mesage properties
-            msg.setProperty(
-                WSDoAllConstants.ENC_PROP_FILE,
-                "crypto.properties");
+            msg.setProperty(WSDoAllConstants.ENC_PROP_FILE,
+                    "crypto.properties");
             msg.setProperty(WSDoAllConstants.ENC_KEY_ID, "EmbeddedKeyName");
             msg.setProperty(WSDoAllConstants.ENC_KEY_NAME, stRef.toString());
             msg.setUsername(ConversationUtil.generateIdentifier(uuid, genID));
-            msg.setProperty(
-                WSDoAllConstants.ENC_CALLBACK_REF,
-                dkcbHandler);
+            msg.setProperty(WSDoAllConstants.ENC_CALLBACK_REF,
+                    dkcbHandler);
             msg.setProperty(WSDoAllConstants.ACTION, "Encrypt");
 
             WSDoAllSender wsd = new WSDoAllSender();

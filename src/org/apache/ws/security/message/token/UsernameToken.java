@@ -19,8 +19,8 @@ package org.apache.ws.security.message.token;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.util.DOM2Writer;
 import org.apache.ws.security.util.WSSecurityUtil;
@@ -43,7 +43,7 @@ import java.util.TimeZone;
 /**
  * UsernameToken according to WS Security specifications,
  * UsernameToken profile.
- * 
+ *
  * @author Davanum Srinivas (dims@yahoo.com)
  * @author Werner Dittmann (Werner.Dittmann@siemens.com)
  */
@@ -74,11 +74,11 @@ public class UsernameToken {
     /**
      * Constructs a <code>UsernameToken</code> object and parses the
      * <code>wsse:UsernameToken</code> element to initialize it.
-     * 
+     *
      * @param wssConfig Configuration options for processing and building the <code>wsse:Security</code> header
      * @param elem      the <code>wsse:UsernameToken</code> element that
      *                  contains the UsernameToken data
-     * @throws WSSecurityException 
+     * @throws WSSecurityException
      */
     public UsernameToken(WSSConfig wssConfig, Element elem) throws WSSecurityException {
         this.element = elem;
@@ -114,53 +114,53 @@ public class UsernameToken {
     }
 
     /**
-     * Constructs a <code>UsernameToken</code> object according 
+     * Constructs a <code>UsernameToken</code> object according
      * to the defined parameters.
      * <p/>
-     * This constructes set the password encoding to 
+     * This constructes set the password encoding to
      * {@link WSConstants#PASSWORD_DIGEST}
-     * 
+     *
      * @param wssConfig Configuration options for processing and building the <code>wsse:Security</code> header
-     * @param doc the SOAP envelope as <code>Document</code>
+     * @param doc       the SOAP envelope as <code>Document</code>
      */
     public UsernameToken(WSSConfig wssConfig, Document doc) {
         this(wssConfig, doc, WSConstants.PASSWORD_DIGEST);
     }
 
-     /**
-      * Constructs a <code>UsernameToken</code> object according 
-      * to the defined parameters.
-      * <p/>
-      * 
-      * @param wssConfig Configuration options for processing and building the <code>wsse:Security</code> header
-      * @param doc          the SOAP envelope as <code>Document</code>
-      * @param passwordType the required password encoding, either
-      *                         {@link WSConstants#PASSWORD_DIGEST} or
-      *                         {@link WSConstants#PASSWORD_TEXT}
-      */
-      public UsernameToken(WSSConfig wssConfig, Document doc, String passwordType) {
-         this.wssConfig = wssConfig;
-         this.element = doc.createElementNS(wssConfig.getWsseNS(), "wsse:" + WSConstants.USERNAME_TOKEN_LN);
-         WSSecurityUtil.setNamespace(this.element, wssConfig.getWsseNS(), WSConstants.WSSE_PREFIX);
-         
-         this.elementUsername = doc.createElementNS(wssConfig.getWsseNS(), "wsse:" + WSConstants.USERNAME_LN);
-         WSSecurityUtil.setNamespace(this.elementUsername, wssConfig.getWsseNS(), WSConstants.WSSE_PREFIX);
-         this.elementUsername.appendChild(doc.createTextNode(""));
-         element.appendChild(elementUsername);
-         
-         this.elementPassword = doc.createElementNS(wssConfig.getWsseNS(), "wsse:" + WSConstants.PASSWORD_LN);
-         WSSecurityUtil.setNamespace(this.elementPassword, wssConfig.getWsseNS(), WSConstants.WSSE_PREFIX);
-         this.elementPassword.appendChild(doc.createTextNode(""));
-         element.appendChild(elementPassword);
-         
-         if (passwordType.equals(WSConstants.PASSWORD_TEXT)) {
-             hashed = false;
-         } else {
-             hashed = true;
-                addNonce(doc);
+    /**
+     * Constructs a <code>UsernameToken</code> object according
+     * to the defined parameters.
+     * <p/>
+     *
+     * @param wssConfig    Configuration options for processing and building the <code>wsse:Security</code> header
+     * @param doc          the SOAP envelope as <code>Document</code>
+     * @param passwordType the required password encoding, either
+     *                     {@link WSConstants#PASSWORD_DIGEST} or
+     *                     {@link WSConstants#PASSWORD_TEXT}
+     */
+    public UsernameToken(WSSConfig wssConfig, Document doc, String passwordType) {
+        this.wssConfig = wssConfig;
+        this.element = doc.createElementNS(wssConfig.getWsseNS(), "wsse:" + WSConstants.USERNAME_TOKEN_LN);
+        WSSecurityUtil.setNamespace(this.element, wssConfig.getWsseNS(), WSConstants.WSSE_PREFIX);
+
+        this.elementUsername = doc.createElementNS(wssConfig.getWsseNS(), "wsse:" + WSConstants.USERNAME_LN);
+        WSSecurityUtil.setNamespace(this.elementUsername, wssConfig.getWsseNS(), WSConstants.WSSE_PREFIX);
+        this.elementUsername.appendChild(doc.createTextNode(""));
+        element.appendChild(elementUsername);
+
+        this.elementPassword = doc.createElementNS(wssConfig.getWsseNS(), "wsse:" + WSConstants.PASSWORD_LN);
+        WSSecurityUtil.setNamespace(this.elementPassword, wssConfig.getWsseNS(), WSConstants.WSSE_PREFIX);
+        this.elementPassword.appendChild(doc.createTextNode(""));
+        element.appendChild(elementPassword);
+
+        if (passwordType.equals(WSConstants.PASSWORD_TEXT)) {
+            hashed = false;
+        } else {
+            hashed = true;
+            addNonce(doc);
             addCreated(doc);
         }
-     }
+    }
 
     /**
      * Creates and adds a Nonce element to this UsernameToken
@@ -176,7 +176,7 @@ public class UsernameToken {
         this.elementNonce.appendChild(doc.createTextNode(Base64.encode(nonceValue)));
         element.appendChild(elementNonce);
     }
-    
+
     /**
      * Creates and adds a Created element to this UsernameToken
      */
@@ -192,10 +192,10 @@ public class UsernameToken {
         this.elementCreated.appendChild(doc.createTextNode(zulu.format(rightNow.getTime())));
         element.appendChild(elementCreated);
     }
-    
+
     /**
      * Get the user name.
-     * 
+     *
      * @return the data from the user name element.
      */
     public String getName() {
@@ -207,9 +207,9 @@ public class UsernameToken {
 
     /**
      * Set the user name.
-     * 
-     * @param name    sets a text node containing the use name into
-     *                 the user name element.
+     *
+     * @param name sets a text node containing the use name into
+     *             the user name element.
      */
     public void setName(String name) {
         Text node = getFirstNode(this.elementUsername);
@@ -218,7 +218,7 @@ public class UsernameToken {
 
     /**
      * Get the nonce.
-     * 
+     *
      * @return the data from the nonce element.
      */
     public String getNonce() {
@@ -231,9 +231,9 @@ public class UsernameToken {
     /**
      * Set the nonce.
      * <p/>
-     * 
+     *
      * @param nonce sets a text node containing the nonce data into
-     *                 the nonce element.
+     *              the nonce element.
      */
     public void setNonce(String nonce) {
         Text node = getFirstNode(this.elementNonce);
@@ -242,7 +242,7 @@ public class UsernameToken {
 
     /**
      * Get the created timestamp.
-     * 
+     *
      * @return the data from the created time element.
      */
     public String getCreated() {
@@ -254,9 +254,9 @@ public class UsernameToken {
 
     /**
      * Set the created timestamp.
-     * 
-     * @param created     sets a text node containing the created time data into
-     *                     the created time element.
+     *
+     * @param created sets a text node containing the created time data into
+     *                the created time element.
      */
     public void setCreated(String created) {
         Text node = getFirstNode(this.elementCreated);
@@ -267,7 +267,7 @@ public class UsernameToken {
      * Gets the password string.
      * This is the password as it is in the password element of a username,
      * token. Thus it can be either plain text or the password digest value.
-     * 
+     *
      * @return the password string or <code>null</code> if no such node exists.
      */
     public String getPassword() {
@@ -280,10 +280,10 @@ public class UsernameToken {
 
     /**
      * Get the hashed inidicator.
-     * If the indicator is <code>true> the password of the 
-     * <code>UsernameToken</code> was encoded using 
+     * If the indicator is <code>true> the password of the
+     * <code>UsernameToken</code> was encoded using
      * {@link WSConstants#PASSWORD_DIGEST}
-     * 
+     *
      * @return the hashed indicator.
      */
     public boolean isHashed() {
@@ -294,9 +294,9 @@ public class UsernameToken {
      * Sets the password string.
      * This function sets the password in the <code>UsernameToken</code>
      * either as plain text or encodes the password according to the
-     * WS Security specifications, UsernameToken profile, into a password 
+     * WS Security specifications, UsernameToken profile, into a password
      * digest.
-     *  
+     *
      * @param pwd the password to use
      */
     public void setPassword(String pwd) {
@@ -366,10 +366,10 @@ public class UsernameToken {
 
     /**
      * Returns the first text node of an element.
-     * 
+     *
      * @param e the element to get the node from
-     * @return    the first text node or <code>null</code> if node
-     *             is null or is not a text node
+     * @return the first text node or <code>null</code> if node
+     *         is null or is not a text node
      */
     private Text getFirstNode(Element e) {
         Node node = e.getFirstChild();
@@ -378,7 +378,7 @@ public class UsernameToken {
 
     /**
      * Returns the dom element of this <code>UsernameToken</code> object.
-     * 
+     *
      * @return the <code>wsse:UsernameToken</code> element
      */
     public Element getElement() {
@@ -387,7 +387,7 @@ public class UsernameToken {
 
     /**
      * Returns the string representation of the token.
-     * 
+     *
      * @return a XML string representation
      */
     public String toString() {
@@ -396,23 +396,23 @@ public class UsernameToken {
 
     /**
      * Gets the id.
-     * 
-     * @return     the value of the <code>wsu:Id</code> attribute of this
-     *             username token 
+     *
+     * @return the value of the <code>wsu:Id</code> attribute of this
+     *         username token
      */
     public String getID() {
         if (wssConfig.getProcessNonCompliantMessages()) {
-            return WSSecurityUtil.getAttributeValueWSU(element, "Id",  null);
+            return WSSecurityUtil.getAttributeValueWSU(element, "Id", null);
         } else {
-            return WSSecurityUtil.getAttributeValueWSU(element, "Id",  wssConfig.getWsuNS());
+            return WSSecurityUtil.getAttributeValueWSU(element, "Id", wssConfig.getWsuNS());
         }
     }
 
     /**
      * Set the id of this username token.
-     * 
-     * @param    id the value for the <code>wsu:Id</code> attribute of this
-     *             username token
+     *
+     * @param id the value for the <code>wsu:Id</code> attribute of this
+     *           username token
      */
     public void setID(String id) {
         String prefix = WSSecurityUtil.setNamespace(this.element, wssConfig.getWsuNS(), WSConstants.WSU_PREFIX);
@@ -423,9 +423,9 @@ public class UsernameToken {
      * Gets the secret key as per WS-Trust spec.
      * This function is not yet used because the WS Security specifications do not
      * require such trust keys.
-     * 
-     * @return    a secret key constructed from information conatined in
-     *             this username token
+     *
+     * @return a secret key constructed from information conatined in
+     *         this username token
      */
     public byte[] getSecretKey() {
         byte[] key = null;
@@ -463,13 +463,13 @@ public class UsernameToken {
     /**
      * P_hash defined in RFC for TLS.
      * <p/>
-     * 
-     * @param secret   
-     * @param seed     
-     * @param mac      
-     * @param required 
+     *
+     * @param secret
+     * @param seed
+     * @param mac
+     * @param required
      * @return a byte array that conatins a secrect key
-     * @throws Exception 
+     * @throws Exception
      */
     private static byte[] P_hash(byte[] secret, byte[] seed, Mac mac, int required) throws Exception {
         byte[] out = new byte[required];
@@ -509,10 +509,10 @@ public class UsernameToken {
     /**
      * helper method.
      * <p/>
-     * 
-     * @param a 
-     * @param b 
-     * @return 
+     *
+     * @param a
+     * @param b
+     * @return
      */
     private static int min(int a, int b) {
         return (a > b) ? b : a;

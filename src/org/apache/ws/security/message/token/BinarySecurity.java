@@ -17,8 +17,8 @@
 
 package org.apache.ws.security.message.token;
 
-import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.util.DOM2Writer;
 import org.apache.ws.security.util.WSSecurityUtil;
@@ -33,7 +33,7 @@ import javax.xml.namespace.QName;
 /**
  * Binary Security Token.
  * <p/>
- * 
+ *
  * @author Davanum Srinivas (dims@yahoo.com).
  */
 public class BinarySecurity {
@@ -41,13 +41,13 @@ public class BinarySecurity {
     private String base64Encoding;
     protected Element element = null;
     protected WSSConfig wssConfig = WSSConfig.getDefaultWSConfig();
-    
+
     /**
      * Constructor.
      * <p/>
-     * 
-     * @param elem 
-     * @throws WSSecurityException 
+     *
+     * @param elem
+     * @throws WSSecurityException
      */
     public BinarySecurity(WSSConfig wssConfig, Element elem) throws WSSecurityException {
         this.element = elem;
@@ -65,8 +65,8 @@ public class BinarySecurity {
             nsOK = true;
         }
         if (!nsOK ||
-            !(element.getLocalName().equals("BinarySecurityToken") ||
-              element.getLocalName().equals("KeyIdentifier"))) {
+                !(element.getLocalName().equals("BinarySecurityToken") ||
+                element.getLocalName().equals("KeyIdentifier"))) {
             QName el = new QName(this.element.getNamespaceURI(), this.element.getLocalName());
             throw new WSSecurityException(WSSecurityException.INVALID_SECURITY_TOKEN, "badTokenType", new Object[]{el});
         }
@@ -78,8 +78,8 @@ public class BinarySecurity {
     /**
      * Constructor.
      * <p/>
-     * 
-     * @param doc 
+     *
+     * @param doc
      */
     public BinarySecurity(WSSConfig wssConfig, Document doc) {
         this.wssConfig = wssConfig;
@@ -93,13 +93,13 @@ public class BinarySecurity {
     /**
      * get the value type.
      * <p/>
-     * 
-     * @return 
+     *
+     * @return
      */
     public String getValueType() {
         String valueType = this.element.getAttribute("ValueType");
         if (valueType.length() == 0 &&
-            (wssConfig.getProcessNonCompliantMessages() || wssConfig.isBSTAttributesQualified())) {
+                (wssConfig.getProcessNonCompliantMessages() || wssConfig.isBSTAttributesQualified())) {
             valueType = WSSecurityUtil.getAttributeValueWSSE(element, "ValueType", null);
         }
         return valueType;
@@ -108,8 +108,8 @@ public class BinarySecurity {
     /**
      * set the value type.
      * <p/>
-     * 
-     * @param type 
+     *
+     * @param type
      */
     protected void setValueType(String type) {
         if (wssConfig.isBSTAttributesQualified()) {
@@ -122,13 +122,13 @@ public class BinarySecurity {
     /**
      * get the encoding type.
      * <p/>
-     * 
-     * @return 
+     *
+     * @return
      */
     public String getEncodingType() {
         String encodingType = this.element.getAttribute("EncodingType");
         if (encodingType.length() == 0 &&
-            (wssConfig.getProcessNonCompliantMessages() || wssConfig.isBSTAttributesQualified())) {
+                (wssConfig.getProcessNonCompliantMessages() || wssConfig.isBSTAttributesQualified())) {
             encodingType = WSSecurityUtil.getAttributeValueWSSE(element, "EncodingType", null);
         }
         return encodingType;
@@ -137,8 +137,8 @@ public class BinarySecurity {
     /**
      * set the encoding type.
      * <p/>
-     * 
-     * @param encoding 
+     *
+     * @param encoding
      */
     protected void setEncodingType(String encoding) {
         if (wssConfig.isBSTAttributesQualified()) {
@@ -151,8 +151,8 @@ public class BinarySecurity {
     /**
      * get the byte array containing token information.
      * <p/>
-     * 
-     * @return 
+     *
+     * @return
      */
     public byte[] getToken() {
         Text node = getFirstNode();
@@ -169,8 +169,8 @@ public class BinarySecurity {
     /**
      * set the token information.
      * <p/>
-     * 
-     * @param data 
+     *
+     * @param data
      */
     protected void setToken(byte[] data) {
         if (data == null) {
@@ -183,8 +183,8 @@ public class BinarySecurity {
     /**
      * return the first text node.
      * <p/>
-     * 
-     * @return 
+     *
+     * @return
      */
     protected Text getFirstNode() {
         Node node = this.element.getFirstChild();
@@ -194,8 +194,8 @@ public class BinarySecurity {
     /**
      * return the dom element.
      * <p/>
-     * 
-     * @return 
+     *
+     * @return
      */
     public Element getElement() {
         return this.element;
@@ -204,8 +204,8 @@ public class BinarySecurity {
     /**
      * get the id.
      * <p/>
-     * 
-     * @return 
+     *
+     * @return
      */
     public String getID() {
         return this.element.getAttributeNS(wssConfig.getWsuNS(), "Id");
@@ -214,8 +214,8 @@ public class BinarySecurity {
     /**
      * set the id.
      * <p/>
-     * 
-     * @param id 
+     *
+     * @param id
      */
     public void setID(String id) {
         String prefix = WSSecurityUtil.setNamespace(this.element, wssConfig.getWsuNS(), WSConstants.WSU_PREFIX);
@@ -225,12 +225,13 @@ public class BinarySecurity {
     /**
      * return the string representation of the token.
      * <p/>
-     * 
-     * @return 
+     *
+     * @return
      */
     public String toString() {
         return DOM2Writer.nodeToString((Node) this.element);
     }
+
     public static String getBase64EncodingValue(WSSConfig wssConfig) {
         if (wssConfig.isBSTValuesPrefixed()) {
             return WSConstants.WSSE_PREFIX + ":" + BASE64_BINARY;
