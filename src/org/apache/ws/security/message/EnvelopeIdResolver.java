@@ -27,8 +27,7 @@ import org.apache.xml.security.utils.XMLUtils;
 import org.apache.xml.security.utils.resolver.ResourceResolverException;
 import org.apache.xml.security.utils.resolver.ResourceResolverSpi;
 import org.apache.xml.utils.URI;
-// import org.apache.xpath.CachedXPathAPI;
-import org.apache.xpath.XPathAPI;
+
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -96,7 +95,6 @@ public class EnvelopeIdResolver extends ResourceResolverSpi {
 
 		// Xalan fix for catching all namespaces
 		XMLUtils.circumventBug2650(doc);
-//		CachedXPathAPI cXPathAPI = new CachedXPathAPI();
 
 		/*
 		 * URI="#chapter1"
@@ -122,44 +120,18 @@ public class EnvelopeIdResolver extends ResourceResolverSpi {
 				BaseURI);
 		}
 		String cId = selectedElem.getAttributeNS(WSConstants.WSU_NS, "Id");
-//		if ((cId == null) || (cId.length() == 0)) {
-//			cId = selectedElem.getAttributeNS(WSConstants.SOAP_SEC_NS, "id");
-//		}
 		/*
 		 * If Body Id match fails, look for a generic Id (without a namespace)
 		 * that matches the URI. If that lookup fails, try to get a namespace
-		 * qualified Id that matches the URI. The lookup uses a wildcard
-		 * namespace. This lookup is not bound to s specific namespace prefix 
-		 * but accepts all prefixes.
-		 * 
-		 * Then loop over the result set and try to get the namespace
-		 * qualified Id (WSU_NS).
+		 * qualified Id that matches the URI.
 		 */
 		if (!id.equals(cId)) {
 			cId = null;
-			try {
-				if ((selectedElem =
-					(Element) XPathAPI.selectSingleNode(
-						doc,
-						"//*[@Id='" + id + "']"))
-					!= null) {
-					cId = selectedElem.getAttribute("Id");
-				}
-				else if ((selectedElem =
-						(Element) XPathAPI.selectSingleNode(
-							doc,
-							"//*[@wsu:Id='" + id + "']",
-							WSSecurityUtil.createNamespaceContext(doc)))
-						!= null) {
-					cId = selectedElem.getAttribute("Id");
-				}
-			}
-			catch (javax.xml.transform.TransformerException ex) {
-				throw new ResourceResolverException(
-					"generic.EmptyMessage",
-					ex,
-					uri,
-					BaseURI);
+						
+			if ((selectedElem = WSSecurityUtil.getElementByWsuId(doc, uriNodeValue)) != null) {
+				cId = selectedElem.getAttribute("Id");
+			} else if ((selectedElem = WSSecurityUtil.getElementByGenId(doc, uriNodeValue)) != null) {
+				cId = selectedElem.getAttribute("Id");
 			}
 			if (cId == null) {
 				throw new ResourceResolverException(

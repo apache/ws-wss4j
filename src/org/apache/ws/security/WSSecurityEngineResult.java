@@ -21,6 +21,8 @@ import org.opensaml.SAMLAssertion;
 import java.security.Principal;
 import java.security.cert.X509Certificate;
 
+import java.util.Vector;
+
 import org.apache.ws.security.message.token.Timestamp;
 
 /**
@@ -33,6 +35,7 @@ public class WSSecurityEngineResult {
 	private X509Certificate cert;
 	private SAMLAssertion assertion;
 	private Timestamp timestamp;
+	private Vector signedElementQnames;
 
     WSSecurityEngineResult(int act, SAMLAssertion ass) {
 		principal = null;
@@ -41,10 +44,11 @@ public class WSSecurityEngineResult {
 		assertion = ass;
 	}
 
-    WSSecurityEngineResult(Principal princ, int act, X509Certificate certificate) {
+    WSSecurityEngineResult(int act, Principal princ, X509Certificate certificate, Vector elemQnames) {
 		principal = princ;
 		action = act;
 		cert = certificate;
+		signedElementQnames = elemQnames;
 	}
 
 	WSSecurityEngineResult(
@@ -90,4 +94,10 @@ public class WSSecurityEngineResult {
 	public Timestamp getTimestamp() {
 		return timestamp;
 	}	
+	/**
+	 * @return Returns the signedElementQnames.
+	 */
+	public Vector getSignedElementQnames() {
+		return signedElementQnames;
+	}
 }

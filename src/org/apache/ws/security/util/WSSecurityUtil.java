@@ -221,6 +221,65 @@ public class WSSecurityUtil {
 		return null;
 	}
 
+	/**
+	 * Returns the first element that containes an Id with value
+	 * <code>uri</code> and <code>namespace</code>.
+	 * <p/>
+	 * This is a replacement for a XPath Id lookup with
+	 * the given namespace. It's somewhat faster than XPath, and we do
+	 * not deal with prefixes, just with the real namespace URI  
+	 * 
+	 * @param startNode		Where to start the search
+	 * @param uri			Value of the Id attribute
+	 * @param namespace		Namespace URI of the Id
+	 * @return				The found element or <code>null</code>
+	 */
+	public static Element findElementById(Node startNode, String value, String namespace) {
+
+		/*
+		 * Replace the formely recursive implementation with a depth-first-loop
+		 * lookup
+		 */
+		if (startNode == null) {
+			return null;
+		}
+		Node startParent = startNode.getParentNode();
+		Node processedNode = null;
+		
+		while (startNode != null) {
+			// start node processing at this point
+			if (startNode.getNodeType() == Node.ELEMENT_NODE) {
+				Element se = (Element) startNode;
+				if (se.hasAttributeNS(namespace, "Id") &&
+						value.equals(se.getAttributeNS(namespace, "Id"))) {
+					return se;
+				}
+			}
+
+			processedNode = startNode;
+			startNode = startNode.getFirstChild();
+			
+			// no child, this node is done.
+			if (startNode == null) {
+				// close node processing, get sibling
+				startNode = processedNode.getNextSibling();
+			}
+			// no more siblings, get parent, all children
+			// of parent are processed.
+			while (startNode == null) {
+				processedNode = processedNode.getParentNode();
+				if (processedNode == startParent) {
+					return null;
+				}
+				// close parent node processing (processed node now)
+				startNode = processedNode.getNextSibling();
+			}
+		}
+		return null;
+	}
+	
+	
+	
     /**
      * set the namespace if it is not set already.
      * <p/>
@@ -351,14 +410,7 @@ public class WSSecurityUtil {
             return null;
         }
         id = id.substring(1);
-        try {
-            Element nscontext = org.apache.xml.security.utils.XMLUtils.createDSctx(doc, "wsu", WSConstants.WSU_NS);
-			Element element = (Element) XPathAPI.selectSingleNode(doc, "//*[@wsu:Id='" + id + "']", nscontext);
-			return element;
-        } catch (TransformerException ex) {
-            log.error(ex);
-        }
-        return null;
+        	return WSSecurityUtil.findElementById(doc.getDocumentElement(), id, WSConstants.WSU_NS);
     }
 
 	/**
@@ -378,13 +430,7 @@ public class WSSecurityUtil {
 			return null;
 		}
 		id = id.substring(1);
-		try {
-			Element element = (Element) XPathAPI.selectSingleNode(doc, "//*[@Id='" + id + "']");
-			return element;
-		} catch (TransformerException ex) {
-			log.error(ex);
-		}
-		return null;
+        	return WSSecurityUtil.findElementById(doc.getDocumentElement(), id, null);
 	}
     /**
      * Create a BinarySecurityToken element
@@ -600,9 +646,7 @@ public class WSSecurityUtil {
     }
     	
     public static SOAPConstants getSOAPConstants(Element startElement) {
-        Document doc = startElement.getOwnerDocument();
-        String ns = doc.getDocumentElement().getNamespaceURI();
-    	if (WSConstants.URI_SOAP12_ENV.equals(ns)) {
+    	if (getPrefixNS(WSConstants.URI_SOAP12_ENV, startElement) != null) {
     		return new SOAP12Constants();
     	}
     	else {

@@ -38,6 +38,8 @@ import org.apache.xml.security.keys.KeyInfo;
 import org.apache.xml.security.keys.content.x509.XMLX509Certificate;
 import org.apache.xml.security.keys.content.X509Data;
 import org.apache.xml.security.signature.XMLSignature;
+import org.apache.xml.security.signature.SignedInfo;
+import org.apache.xml.security.signature.Reference;
 import org.apache.xml.security.signature.XMLSignatureException;
 import org.apache.xml.security.utils.Base64;
 
@@ -315,8 +317,9 @@ public class WSSecurityEngine {
 				}
 				WSDocInfoStore.store(wsDocInfo);
 				X509Certificate[] returnCert = new X509Certificate[1];
+				Vector returnQname[] = new Vector[1];
 				try {
-					lastPrincipalFound = verifyXMLSignature((Element) elem, sigCrypto, returnCert);
+					lastPrincipalFound = verifyXMLSignature((Element) elem, sigCrypto, returnCert, returnQname);
 				}
 				catch (WSSecurityException ex) {
 					throw ex;
@@ -324,12 +327,9 @@ public class WSSecurityEngine {
 				finally {
 					WSDocInfoStore.delete(wsDocInfo);        
 				}
-				returnResults.add(
-					0,
-					new WSSecurityEngineResult(
-						lastPrincipalFound,
-						WSConstants.SIGN,
-						returnCert[0]));
+				returnResults.add(0, new WSSecurityEngineResult(
+						WSConstants.SIGN, lastPrincipalFound, returnCert[0],
+						returnQname[0]));
             } else if (el.equals(ENCRYPTED_KEY)) {
             	if (doDebug) {
 					log.debug("Found encrypted key element");
@@ -343,9 +343,8 @@ public class WSSecurityEngine {
 												  "noCallback");
 				}
                 handleEncryptedKey((Element) elem, cb, decCrypto);
-				returnResults.add(
-					0,
-					new WSSecurityEngineResult(null, WSConstants.ENCR, null));
+				returnResults.add(0, new WSSecurityEngineResult(
+						WSConstants.ENCR, null, null, null));
             } else if (el.equals(REFERENCE_LIST)) {
             	if (doDebug) {
 					log.debug("Found reference list element");
@@ -355,9 +354,8 @@ public class WSSecurityEngine {
 												  "noCallback");
 				}
                 handleReferenceList((Element) elem, cb);
-				returnResults.add(
-					0,
-					new WSSecurityEngineResult(null, WSConstants.ENCR, null));
+				returnResults.add(0, new WSSecurityEngineResult(
+						WSConstants.ENCR, null, null, null));
            } else if (el.equals(USERNAME_TOKEN)) {
 				if (doDebug) {
 					log.debug("Found UsernameToken list element");
@@ -367,12 +365,8 @@ public class WSSecurityEngine {
 												  "noCallback");
 				}
                 lastPrincipalFound = handleUsernameToken((Element) elem, cb);
-				returnResults.add(
-					0,
-					new WSSecurityEngineResult(
-						lastPrincipalFound,
-						WSConstants.UT,
-						null));
+				returnResults.add(0, new WSSecurityEngineResult(WSConstants.UT,
+						lastPrincipalFound, null, null));
            } else if (el.equals(SAML_TOKEN)) {
                if (doDebug) {
                    log.debug("Found SAML Assertion element");
@@ -455,7 +449,8 @@ public class WSSecurityEngine {
 	protected Principal verifyXMLSignature(
 		Element elem,
 		Crypto crypto,
-		X509Certificate[] returnCert)
+		X509Certificate[] returnCert,
+		Vector[] returnQname)
 		throws WSSecurityException {
         if (doDebug) {
 			log.debug("Verify XML Signature");
@@ -469,17 +464,14 @@ public class WSSecurityEngine {
 		try {
 			sig = new XMLSignature(elem, null);
 		} catch (XMLSignatureException e2) {
-			throw new WSSecurityException(
-				WSSecurityException.FAILED_CHECK,
-				"noXMLSig");
+			throw new WSSecurityException(WSSecurityException.FAILED_CHECK,
+					"noXMLSig");
 		} catch (XMLSecurityException e2) {
-			throw new WSSecurityException(
-				WSSecurityException.FAILED_CHECK,
-				"noXMLSig");
+			throw new WSSecurityException(WSSecurityException.FAILED_CHECK,
+					"noXMLSig");
 		} catch (IOException e2) {
-			throw new WSSecurityException(
-				WSSecurityException.FAILED_CHECK,
-				"noXMLSig");
+			throw new WSSecurityException(WSSecurityException.FAILED_CHECK,
+					"noXMLSig");
 		}
 
 		sig.addResourceResolver(EnvelopeIdResolver.getInstance());
@@ -566,6 +558,35 @@ public class WSSecurityEngine {
 							+ ", verify= "
 							+ (t2 - t1));
 				}
+				/*
+				 * Now dig into the Signature element to get the elements that this
+				 * Signature covers. Build the QName of these Elements and return
+				 * them to caller 
+				 */
+				SignedInfo si = sig.getSignedInfo();
+				int numReferences = si.getLength();
+				Vector qvec = new Vector(numReferences);
+				for (int i = 0; i < numReferences; i++) {
+					Reference siRef;
+					try {
+						siRef = si.item(i);
+					} catch (XMLSecurityException e3) {
+						throw new WSSecurityException(WSSecurityException.FAILED_CHECK);
+						// TODO Auto-generated catch block
+						// e3.printStackTrace();
+					}
+					String uri = siRef.getURI();
+					Element se = WSSecurityUtil.getElementByWsuId(elem.getOwnerDocument(), uri);
+					if (se == null) {
+						se = WSSecurityUtil.getElementByGenId(elem.getOwnerDocument(), uri);						
+					}
+					if (se == null) {
+						throw new WSSecurityException(WSSecurityException.FAILED_CHECK);						
+					}
+					QName qn = new QName(se.getNamespaceURI(), se.getLocalName());
+					qvec.add(qn);
+				}
+				returnQname[0] = qvec;
 				returnCert[0] = certs[0];
 				return certs[0].getSubjectDN();
 			} else {
@@ -1107,8 +1128,6 @@ public class WSSecurityEngine {
             throw new WSSecurityException(
                 WSSecurityException.FAILED_ENC_DEC, null, null, e1);
 		}
-		// wsseSecurity.getParentNode().removeChild(wsseSecurity);  // don't do - this would remove wsse:Security
-
 	}
 
 	/**
