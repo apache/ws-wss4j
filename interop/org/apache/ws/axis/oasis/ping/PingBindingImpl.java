@@ -40,7 +40,7 @@ public class PingBindingImpl
             org.apache.ws.axis.oasis.ping.TicketType pingTicket, 
 		StringHolder text)
 		throws java.rmi.RemoteException {
-		text.value = "Echo " + text;
+		text.value = "Echo " + text.value;
 		MessageContext msgContext = MessageContext.getCurrentContext();
 		Message reqMsg = msgContext.getRequestMessage();
 

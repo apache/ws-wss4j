@@ -18,7 +18,20 @@
       <parameter name="wsdlServicePort" value="Ping1"/>
       <parameter name="className" value="org.apache.ws.axis.oasis.ping.PingBindingImpl"/>
       <parameter name="wsdlPortType" value="PingPort"/>
+      <operation name="ping" qname="operNS:Ping" xmlns:operNS="http://xmlsoap.org/Ping" >
+        <parameter qname="pns:ticket" xmlns:pns="http://xmlsoap.org/Ping" type="tns:ticketType" xmlns:tns="http://xmlsoap.org/Ping"/>
+        <parameter qname="pns:text" xmlns:pns="http://xmlsoap.org/Ping" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema" mode="INOUT"/>
+      </operation>
       <parameter name="allowedMethods" value="ping"/>
+
+      <typeMapping
+        xmlns:ns="http://xmlsoap.org/Ping"
+        qname="ns:ticketType"
+        type="java:org.apache.ws.axis.oasis.ping.TicketType"
+        serializer="org.apache.axis.encoding.ser.SimpleSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.SimpleDeserializerFactory"
+        encodingStyle=""
+      />
   <requestFlow>
    <handler type="java:org.apache.ws.axis.security.WSDoAllReceiver">
     <parameter name="passwordCallbackClass" value="org.apache.ws.axis.oasis.PWCallback1"/>
@@ -33,7 +46,20 @@
       <parameter name="wsdlServicePort" value="Ping2"/>
       <parameter name="className" value="org.apache.ws.axis.oasis.ping.PingBindingImpl"/>
       <parameter name="wsdlPortType" value="PingPort"/>
+      <operation name="ping" qname="operNS:Ping" xmlns:operNS="http://xmlsoap.org/Ping" >
+        <parameter qname="pns:ticket" xmlns:pns="http://xmlsoap.org/Ping" type="tns:ticketType" xmlns:tns="http://xmlsoap.org/Ping"/>
+        <parameter qname="pns:text" xmlns:pns="http://xmlsoap.org/Ping" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema" mode="INOUT"/>
+      </operation>
       <parameter name="allowedMethods" value="ping"/>
+
+      <typeMapping
+        xmlns:ns="http://xmlsoap.org/Ping"
+        qname="ns:ticketType"
+        type="java:org.apache.ws.axis.oasis.ping.TicketType"
+        serializer="org.apache.axis.encoding.ser.SimpleSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.SimpleDeserializerFactory"
+        encodingStyle=""
+      />
   <requestFlow>
    <handler type="java:org.apache.ws.axis.security.WSDoAllReceiver">
     <parameter name="passwordCallbackClass" value="org.apache.ws.axis.oasis.PWCallback1"/>
@@ -49,8 +75,20 @@
       <parameter name="wsdlServicePort" value="Ping3"/>
       <parameter name="className" value="org.apache.ws.axis.oasis.ping.PingBindingImpl"/>
       <parameter name="wsdlPortType" value="PingPort"/>
+      <operation name="ping" qname="operNS:Ping" xmlns:operNS="http://xmlsoap.org/Ping" >
+        <parameter qname="pns:ticket" xmlns:pns="http://xmlsoap.org/Ping" type="tns:ticketType" xmlns:tns="http://xmlsoap.org/Ping"/>
+        <parameter qname="pns:text" xmlns:pns="http://xmlsoap.org/Ping" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema" mode="INOUT"/>
+      </operation>
       <parameter name="allowedMethods" value="ping"/>
 
+      <typeMapping
+        xmlns:ns="http://xmlsoap.org/Ping"
+        qname="ns:ticketType"
+        type="java:org.apache.ws.axis.oasis.ping.TicketType"
+        serializer="org.apache.axis.encoding.ser.SimpleSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.SimpleDeserializerFactory"
+        encodingStyle=""
+      />
   <requestFlow>
    <handler type="java:org.apache.ws.axis.security.WSDoAllReceiver">
     <parameter name="passwordCallbackClass" value="org.apache.ws.axis.oasis.PWCallback1"/>
@@ -78,7 +116,20 @@
       <parameter name="wsdlServicePort" value="Ping4"/>
       <parameter name="className" value="org.apache.ws.axis.oasis.ping.PingBindingImpl"/>
       <parameter name="wsdlPortType" value="PingPort"/>
+      <operation name="ping" qname="operNS:Ping" xmlns:operNS="http://xmlsoap.org/Ping" >
+        <parameter qname="pns:ticket" xmlns:pns="http://xmlsoap.org/Ping" type="tns:ticketType" xmlns:tns="http://xmlsoap.org/Ping"/>
+        <parameter qname="pns:text" xmlns:pns="http://xmlsoap.org/Ping" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema" mode="INOUT"/>
+      </operation>
       <parameter name="allowedMethods" value="ping"/>
+
+      <typeMapping
+        xmlns:ns="http://xmlsoap.org/Ping"
+        qname="ns:ticketType"
+        type="java:org.apache.ws.axis.oasis.ping.TicketType"
+        serializer="org.apache.axis.encoding.ser.SimpleSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.SimpleDeserializerFactory"
+        encodingStyle=""
+      />
   <requestFlow>
    <handler type="java:org.apache.ws.axis.security.WSDoAllReceiver">
     <parameter name="passwordCallbackClass" value="org.apache.ws.axis.oasis.PWCallback1"/>
@@ -107,7 +158,20 @@
       <parameter name="wsdlServicePort" value="Ping5"/>
       <parameter name="className" value="org.apache.ws.axis.oasis.ping.PingBindingImpl"/>
       <parameter name="wsdlPortType" value="PingPort"/>
+      <operation name="ping" qname="operNS:Ping" xmlns:operNS="http://xmlsoap.org/Ping" >
+        <parameter qname="pns:ticket" xmlns:pns="http://xmlsoap.org/Ping" type="tns:ticketType" xmlns:tns="http://xmlsoap.org/Ping"/>
+        <parameter qname="pns:text" xmlns:pns="http://xmlsoap.org/Ping" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema" mode="INOUT"/>
+      </operation>
       <parameter name="allowedMethods" value="ping"/>
+
+      <typeMapping
+        xmlns:ns="http://xmlsoap.org/Ping"
+        qname="ns:ticketType"
+        type="java:org.apache.ws.axis.oasis.ping.TicketType"
+        serializer="org.apache.axis.encoding.ser.SimpleSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.SimpleDeserializerFactory"
+        encodingStyle=""
+      />
   <requestFlow>
    <handler type="java:org.apache.ws.axis.security.WSDoAllReceiver">
     <parameter name="passwordCallbackClass" value="org.apache.ws.axis.oasis.PWCallback"/>
@@ -123,7 +187,20 @@
       <parameter name="wsdlServicePort" value="Ping6"/>
       <parameter name="className" value="org.apache.ws.axis.oasis.ping.PingBindingImpl"/>
       <parameter name="wsdlPortType" value="PingPort"/>
+      <operation name="ping" qname="operNS:Ping" xmlns:operNS="http://xmlsoap.org/Ping" >
+        <parameter qname="pns:ticket" xmlns:pns="http://xmlsoap.org/Ping" type="tns:ticketType" xmlns:tns="http://xmlsoap.org/Ping"/>
+        <parameter qname="pns:text" xmlns:pns="http://xmlsoap.org/Ping" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema" mode="INOUT"/>
+      </operation>
       <parameter name="allowedMethods" value="ping"/>
+
+      <typeMapping
+        xmlns:ns="http://xmlsoap.org/Ping"
+        qname="ns:ticketType"
+        type="java:org.apache.ws.axis.oasis.ping.TicketType"
+        serializer="org.apache.axis.encoding.ser.SimpleSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.SimpleDeserializerFactory"
+        encodingStyle=""
+      />
   <requestFlow>
    <handler type="java:org.apache.ws.axis.security.WSDoAllReceiver">
     <parameter name="passwordCallbackClass" value="org.apache.ws.axis.oasis.PWCallback1"/>
@@ -151,7 +228,20 @@
       <parameter name="wsdlServicePort" value="Ping7"/>
       <parameter name="className" value="org.apache.ws.axis.oasis.ping.PingBindingImpl"/>
       <parameter name="wsdlPortType" value="PingPort"/>
+      <operation name="ping" qname="operNS:Ping" xmlns:operNS="http://xmlsoap.org/Ping" >
+        <parameter qname="pns:ticket" xmlns:pns="http://xmlsoap.org/Ping" type="tns:ticketType" xmlns:tns="http://xmlsoap.org/Ping"/>
+        <parameter qname="pns:text" xmlns:pns="http://xmlsoap.org/Ping" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema" mode="INOUT"/>
+      </operation>
       <parameter name="allowedMethods" value="ping"/>
+
+      <typeMapping
+        xmlns:ns="http://xmlsoap.org/Ping"
+        qname="ns:ticketType"
+        type="java:org.apache.ws.axis.oasis.ping.TicketType"
+        serializer="org.apache.axis.encoding.ser.SimpleSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.SimpleDeserializerFactory"
+        encodingStyle=""
+      />
   <requestFlow>
    <handler type="java:org.apache.ws.axis.security.WSDoAllReceiver">
     <parameter name="passwordCallbackClass" value="org.apache.ws.axis.oasis.PWCallback"/>
