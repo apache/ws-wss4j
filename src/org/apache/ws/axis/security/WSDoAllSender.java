@@ -497,6 +497,8 @@ public class WSDoAllSender extends BasicHandler {
 			encKeyId = I.intValue();
 			if (!(encKeyId == WSConstants.ISSUER_SERIAL
 				|| encKeyId == WSConstants.X509_KEY_IDENTIFIER
+                || encKeyId == WSConstants.SKI_KEY_IDENTIFIER
+                || encKeyId == WSConstants.SKI_KEY_IDENTIFIER_DIRECT
 				|| encKeyId == WSConstants.EMBEDDED_KEYNAME)) {
 				throw new AxisFault("WSDoAllSender: Encryption: illegal key identification");
 			}

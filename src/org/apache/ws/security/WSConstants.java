@@ -27,6 +27,7 @@ import org.apache.xml.security.utils.EncryptionConstants;
 public interface WSConstants {
     public static final String WSSE_NS = "http://www.docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd";
     public static final String USERNAMETOKEN_NS = "http://www.docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0";
+    public static final String X509TOKEN_NS = "http://www.docs.oasis-open.org/wss/2003/12/oasis-200401-wss-x509-token-profile-1.0";
     public static final String WSSE_PREFIX = "wsse";
     public static final String WSSE_LN = "Security";
     public static final String WSU_NS = "http://www.docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd";
@@ -284,3 +285,4 @@ public interface WSConstants {
 	public static final int SERIALIZE = 0x200;
     
 }
+

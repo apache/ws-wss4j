@@ -50,7 +50,7 @@ public class SecurityTokenReference {
 
 	public static final QName TOKEN =
 		new QName(WSConstants.WSSE_NS, "SecurityTokenReference");
-	public static final String SKI_URI = WSConstants.WSSE_NS + "#X509SubjectKeyIdentifier";
+	public static final String SKI_URI = WSConstants.X509TOKEN_NS + "#X509SubjectKeyIdentifier";
 	protected Element element = null;
 	private XMLX509IssuerSerial issuerSerial = null;
 	private byte[] skiBytes = null;
@@ -210,7 +210,7 @@ public class SecurityTokenReference {
 		Element keyId =
 			doc.createElementNS(WSConstants.WSSE_NS, "wsse:KeyIdentifier");
 		keyId.setAttributeNS(null, "ValueType", SKI_URI);
-		keyId.setAttributeNS(null, "EncodingType", BinarySecurity.BASE64_ENCODING);
+		//keyId.setAttributeNS(null, "EncodingType", BinarySecurity.BASE64_ENCODING);
 		keyId.appendChild(skiText);
 		Element elem = getFirstElement();
 		if (elem != null) {

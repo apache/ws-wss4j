@@ -31,6 +31,7 @@ import java.security.GeneralSecurityException;
 import java.security.Key;
 import java.security.KeyStore;
 import java.security.PrivateKey;
+import java.security.Security;
 import java.security.cert.CertPath;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
@@ -385,18 +386,28 @@ public class Merlin implements Crypto {
             throw new IllegalArgumentException("input stream cannot be null");
         }
         try {
-            keystore = KeyStore.getInstance
-                    (properties.getProperty("org.apache.ws.security.crypto.merlin.keystore.type",
-                            KeyStore.getDefaultType()));
+            String provider = properties.getProperty("org.apache.ws.security.crypto.merlin.keystore.provider");
+            if(provider == null || provider.length() == 0) {
+                keystore = KeyStore.getInstance
+                        (properties.getProperty("org.apache.ws.security.crypto.merlin.keystore.type",
+                                KeyStore.getDefaultType()));
+            } else {
+                keystore = KeyStore.getInstance
+                        (properties.getProperty("org.apache.ws.security.crypto.merlin.keystore.type",
+                                KeyStore.getDefaultType()),provider);
+            }
             String password = 
             	properties.getProperty("org.apache.ws.security.crypto.merlin.keystore.password",
                     				   "security");
-            keystore.load(input, password.toCharArray());
+            keystore.load(input, (password == null || password.length()==0) ? new char[0] : password.toCharArray());
         } catch (IOException e) {
+            e.printStackTrace();
             throw new CredentialException(3, "ioError00", e);
         } catch (GeneralSecurityException e) {
+            e.printStackTrace();
             throw new CredentialException(3, "secError00", e);
         } catch (Exception e) {
+            e.printStackTrace();
             throw new CredentialException(-1, "error00", e);
         }
     }
@@ -494,3 +505,4 @@ public class Merlin implements Crypto {
         return f.getAbsolutePath();
     }
 }
+

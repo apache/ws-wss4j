@@ -18,14 +18,14 @@
   <requestFlow>
    <handler type="java:org.apache.ws.axis.security.WSDoAllSender" >
     <parameter name="action" value="UsernameToken Encrypt"/>
-    <parameter name="user" value="werner"/>
+    <parameter name="user" value="Chris"/>
     <parameter name="passwordCallbackClass" 
       value="org.apache.ws.axis.oasis.PWCallback"/>
     <parameter name="passwordType" value="PasswordText" />
     <parameter name="addUTElements" value="Nonce Created" />
-    <parameter name="encryptionPropFile" value="crypto.properties" />
-    <parameter name="encryptionKeyIdentifier" value="X509KeyIdentifier" />
-    <parameter name="encryptionUser" value="16c73ab6-b892-458f-abf5-2f875f74882e" />
+    <parameter name="encryptionPropFile" value="wsstest2.properties" />
+    <parameter name="encryptionKeyIdentifier" value="SKIKeyIdentifier" />
+    <parameter name="encryptionUser" value="{4A309A0F-CCAB-4858-85CA-AFBA92B43B05}" />
     <parameter name="encryptionParts" 
       value="{Element}{http://www.docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd}UsernameToken" />  
    </handler>

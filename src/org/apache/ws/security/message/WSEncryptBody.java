@@ -385,6 +385,8 @@ public class WSEncryptBody extends WSBaseMessage {
 		if (keyIdentifierType == WSConstants.X509_KEY_IDENTIFIER) {
 			secToken.setKeyIdentifier(remoteCert); 
 			// build a key id class??
+        } else if (keyIdentifierType == WSConstants.SKI_KEY_IDENTIFIER) {
+            secToken.setKeyIdentifierSKI(remoteCert,crypto);
 		} else if (keyIdentifierType == WSConstants.ISSUER_SERIAL) {
 			secToken.setX509IssuerSerial(
 				new XMLX509IssuerSerial(doc, remoteCert));

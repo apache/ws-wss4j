@@ -78,7 +78,7 @@ public class CredentialException extends Exception {
      * @param root      
      */
     public CredentialException(int errorCode, String msgId, Object[] args, Throwable root) {
-        super(getMessage(msgId, args) + " Inner Exception: [" + root.getMessage() + "]");
+        super(getMessage(msgId, args) + (root == null ? "[]" : " Inner Exception: [" + root.getMessage() + "]"));
         this.errorCode = -1;
         this.errorCode = errorCode;
     }
@@ -109,3 +109,4 @@ public class CredentialException extends Exception {
         }
     }
 }
+

@@ -117,14 +117,16 @@ public abstract class CryptoFactory {
             crypto = (Crypto) c.newInstance(new Object[]{properties});
             return crypto;
         } catch (java.lang.Exception e) {
-            log.debug(cryptoClassName + " cannot create instance with properties constructor");
-            log.debug(e);
+            e.printStackTrace();
+            log.error(e);
         }
         try {
             // try to instantiate the Crypto subclass
             crypto = (Crypto) cryptogenClass.newInstance();
             return crypto;
         } catch (java.lang.Exception e) {
+            e.printStackTrace();
+            log.error(e);
             throw new RuntimeException(cryptoClassName + " cannot create instance");
         }
     }
@@ -151,3 +153,4 @@ public abstract class CryptoFactory {
         return properties;
     }
 }
+

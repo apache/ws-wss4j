@@ -39,7 +39,7 @@
    <handler type="java:org.apache.ws.axis.security.WSDoAllReceiver">
     <parameter name="passwordCallbackClass" value="org.apache.ws.axis.oasis.PWCallback"/>
     <parameter name="action" value="UsernameToken Encrypt"/>
-    <parameter name="decryptionPropFile" value="crypto.properties" />
+    <parameter name="decryptionPropFile" value="wsstest2.properties" />
    </handler>
   </requestFlow>
 

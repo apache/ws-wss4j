@@ -35,7 +35,7 @@ import java.security.cert.X509Certificate;
  * @author Davanum Srinivas (dims@yahoo.com).
  */
 public class X509Security extends BinarySecurity {
-    public static final String TYPE = WSConstants.WSSE_NS + "#X509v3";
+    public static final String TYPE = WSConstants.X509TOKEN_NS + "#X509v3";
 	
 	/*
 	 * Stores the associated X.509 Certificate. This saves numerous
