@@ -113,7 +113,7 @@ public class ConversationClientHandler extends BasicHandler {
                 //add DerivedKeyTokens
                 String genID = ConversationUtil.genericID();
                 ConversationManager conMan = new ConversationManager();
-                conMan.addDerivedKeyToken(doc, uuid, dkcbHandler, genID);
+              //  conMan.addDerivedKeyToken(doc, uuid, dkcbHandler, genID);
 
                 //add the SCT with just identifier 
                 Element securityHeader =
@@ -164,11 +164,11 @@ public class ConversationClientHandler extends BasicHandler {
                  * 1)Store the identifier in identifier
                  * 2)SCTInfo in dkcbHandler
                  */
-                uuid =
-                    stRes
-                        .getRequestedSecurityToken()
-                        .getSecurityContextToken()
-                        .getIdentifier();
+//                uuid =
+//                    stRes
+//                        .getRequestedSecurityToken()
+//                        .getSecurityContextToken()
+//                        .getIdentifier();
 
                 isTokenInMemory = true;
                 stRes.build(doc);
@@ -177,14 +177,14 @@ public class ConversationClientHandler extends BasicHandler {
                 RequestedProofToken reqProof = stRes.getRequestedProofToken();
                 //reqProof.doEncryptProof(doc);
 
-                SecurityContextInfo info =
-                    new SecurityContextInfo(
-                        stRes
-                            .getRequestedSecurityToken()
-                            .getSecurityContextToken(),
-                        reqProof,
-                        1);
-                dkcbHandler.addSecurtiyContext(uuid, info);
+//                SecurityContextInfo info =
+//                    new SecurityContextInfo(
+//                        stRes
+//                            .getRequestedSecurityToken()
+//                            .getSecurityContextToken(),
+//                        reqProof,
+//                        1);
+           //     dkcbHandler.addSecurtiyContext(uuid, info);
 
                 ByteArrayOutputStream os = new ByteArrayOutputStream();
                 XMLUtils.outputDOM(doc, os, true);

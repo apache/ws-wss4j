@@ -152,22 +152,22 @@ public class ConversationServerHandler extends BasicHandler {
                     "SecurityTokenResponse Found :: " + stRes.toString());
 
                 // get securityContextToken, requestedProofToken
-                SecurityContextToken SCT =
-                    stRes.getRequestedSecurityToken().getSecurityContextToken();
-                RequestedProofToken proofToken = stRes.getRequestedProfToken();
+//                SecurityContextToken SCT =
+//                    stRes.getRequestedSecurityToken().getSecurityContextToken();
+//                RequestedProofToken proofToken = stRes.getRequestedProfToken();
 
                 //TODO:: romove the hard coded decryption
-                proofToken.doDecryption(
-                    "org.apache.ws.axis.oasis.PWCallback",
-                    loadEncryptionCrypto());
+//                proofToken.doDecryption(
+//                    "org.apache.ws.axis.oasis.PWCallback",
+//                    loadEncryptionCrypto());
 
-                SecurityContextInfo scInfo =
-                    new SecurityContextInfo(SCT, proofToken, 1);
+//                SecurityContextInfo scInfo =
+//                    new SecurityContextInfo(SCT, proofToken, 1);
                 //scInfo.setSharedSecret(proofToken.getSharedSecret());
-                dkcbHandler.addSecurtiyContext("uuid:secureZone", scInfo);
-
-                //Set the stuff in msgContext.
-                msg.setProperty("WSSecureConversation.ID", SCT.getIdentifier());
+//                dkcbHandler.addSecurtiyContext("uuid:secureZone", scInfo);
+//
+//                //Set the stuff in msgContext.
+//                msg.setProperty("WSSecureConversation.ID", SCT.getIdentifier());
 
             }
             // Replace sPart with the new sPart.
@@ -238,7 +238,7 @@ public class ConversationServerHandler extends BasicHandler {
             // Derrive the token 
             ConversationManager manager = new ConversationManager();
             String genID = ConversationUtil.genericID();
-            manager.addDerivedKeyToken(doc, uuid, dkcbHandler, genID);
+           // manager.addDerivedKeyToken(doc, uuid, dkcbHandler, genID);
 
             //add the relavent SCT
             Element securityHeader =
