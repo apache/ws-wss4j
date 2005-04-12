@@ -32,7 +32,7 @@ import org.w3c.dom.Document;
  */
 public class SecurityTokenService {
 
-	private Hashtable options;
+	protected Hashtable options;
 	
 	public SecurityTokenService() {
 		this.loadProperties("STS.properties");
@@ -89,7 +89,7 @@ public class SecurityTokenService {
     	}
     }
 
-    private void loadProperties(String propFilename) {
+    protected void loadProperties(String propFilename) {
         Properties properties = new Properties();
         try {
             URL url = Loader.getResource(propFilename);

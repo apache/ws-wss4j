@@ -54,24 +54,24 @@ public class TrustConstants {
     public static final String SECURITY_CONTEXT_TOKEN_LN = "SecurityContextToken";
 
     // The request type is specified using following URIs as specified in the WS-Trust specification
-    public static final String ISSUE_SECURITY_TOKEN = "http://schemas.xmlsoap.org/ws/2004/04/security/trust/Issue";//RequestTypeEnum._value1.toString();//"http://schemas.xmlsoap.org/ws/2004/04/security/trust/Issue";
-    public static final String RENEW_SECURITY_TOKEN = "http://schemas.xmlsoap.org/ws/2004/04/security/trust/Renew";
-    public static final String VALIDATE_SECURITY_TOKEN = "http://schemas.xmlsoap.org/ws/2004/04/security/trust/Validate";
+    public static final String ISSUE_SECURITY_TOKEN = "http://schemas.xmlsoap.org/ws/2005/02/security/trust/Issue";//RequestTypeEnum._value1.toString();//"http://schemas.xmlsoap.org/ws/2005/02/security/trust/Issue";
+    public static final String RENEW_SECURITY_TOKEN = "http://schemas.xmlsoap.org/ws/2005/02/security/trust/Renew";
+    public static final String VALIDATE_SECURITY_TOKEN = "http://schemas.xmlsoap.org/ws/2005/02/security/trust/Validate";
 
-    public static final String ISSUE_SECURITY_TOKEN_RSTR = "http://schemas.xmlsoap.org/ws/2004/04/security/trust/RSTR/Issue";
-    public static final String RENEW_SECURITY_TOKEN_RSTR = "http://schemas.xmlsoap.org/ws/2004/04/security/trust/RSTR/Renew";
-    public static final String VALIDATE_SECURITY_TOKEN_RSTR = "http://schemas.xmlsoap.org/ws/2004/04/security/trust/RSTR/Validate";
+    public static final String ISSUE_SECURITY_TOKEN_RSTR = "http://schemas.xmlsoap.org/ws/2005/02/security/trust/RSTR/Issue";
+    public static final String RENEW_SECURITY_TOKEN_RSTR = "http://schemas.xmlsoap.org/ws/2005/02/security/trust/RSTR/Renew";
+    public static final String VALIDATE_SECURITY_TOKEN_RSTR = "http://schemas.xmlsoap.org/ws/2005/02/security/trust/RSTR/Validate";
 
-    public static final String ISSUE_SECURITY_TOKEN_RST = "http://schemas.xmlsoap.org/ws/2004/04/security/trust/RST/Issue";
-    public static final String RENEW_SECURITY_TOKEN_RST = "http://schemas.xmlsoap.org/ws/2004/04/security/trust/RST/Renew";
-    public static final String VALIDATE_SECURITY_TOKEN_RST = "http://schemas.xmlsoap.org/ws/2004/04/security/trust/RST/Validate";
+    public static final String ISSUE_SECURITY_TOKEN_RST = "http://schemas.xmlsoap.org/ws/2005/02/security/trust/RST/Issue";
+    public static final String RENEW_SECURITY_TOKEN_RST = "http://schemas.xmlsoap.org/ws/2005/02/security/trust/RST/Renew";
+    public static final String VALIDATE_SECURITY_TOKEN_RST = "http://schemas.xmlsoap.org/ws/2005/02/security/trust/RST/Validate";
   
   
-//  public static final URI ISSUE_SECURITY_TOKEN_URI = new URI("http://schemas.xmlsoap.org/ws/2004/04/security/trust/Issue");
-//  public static final URI RENEW_SECURITY_TOKEN_URI = new URI("http://schemas.xmlsoap.org/ws/2004/04/security/trust/Renew");
-//  public static final URI VALIDATE_SECURITY_TOKEN_URI = new URI("http://schemas.xmlsoap.org/ws/2004/04/security/trust/Validate"); 
-    public static final String WST_NS = "http://schemas.xmlsoap.org/ws/2004/04/trust";
-    public static final String WSP_NS = "http://schemas.xmlsoap.org/ws/2002/12/policy";
+//  public static final URI ISSUE_SECURITY_TOKEN_URI = new URI("http://schemas.xmlsoap.org/ws/2005/02/security/trust/Issue");
+//  public static final URI RENEW_SECURITY_TOKEN_URI = new URI("http://schemas.xmlsoap.org/ws/2005/02/security/trust/Renew");
+//  public static final URI VALIDATE_SECURITY_TOKEN_URI = new URI("http://schemas.xmlsoap.org/ws/2005/02/security/trust/Validate"); 
+    public static final String WST_NS = "http://schemas.xmlsoap.org/ws/2005/02/trust";
+    public static final String WSP_NS = "http://schemas.xmlsoap.org/ws/2004/09/policy";
 
     public static final String WST_PREFIX = "wst";
     public static final String WSP_PREFIX = "wsp";

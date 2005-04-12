@@ -105,7 +105,7 @@ public class UNT2SAMLIssuer implements STIssuer{
 			BinarySecret binSecretReq = new BinarySecret(elemBinSecret);
 			String nonceReq =  binSecretReq.getBinarySecretValue();
 			
-			//Responce entropy
+			//Response entropy
 			Entropy entropyRes = new Entropy(res);
 			BinarySecret binSecretRes = new BinarySecret(res);
 			String nonceRes = ConversationUtil.generateNonce(128);
@@ -120,7 +120,7 @@ public class UNT2SAMLIssuer implements STIssuer{
 			
 			
 			//Crete the response
-			RequestSecurityTokenResponse requestSecurityTokenResponse = new RequestSecurityTokenResponse(res);
+				RequestSecurityTokenResponse requestSecurityTokenResponse = new RequestSecurityTokenResponse(res);
 
 			RequestedSecurityToken requestedSecurityToken = new RequestedSecurityToken(res);
 			

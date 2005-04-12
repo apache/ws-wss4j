@@ -1,27 +1,26 @@
 /*
- * Copyright  2003-2004 The Apache Software Foundation.
- *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- *
- */
-
+* Copyright  2003-2004 The Apache Software Foundation.
+*
+*  Licensed under the Apache License, Version 2.0 (the "License");
+*  you may not use this file except in compliance with the License.
+*  You may obtain a copy of the License at
+*
+*      http://www.apache.org/licenses/LICENSE-2.0
+*
+*  Unless required by applicable law or agreed to in writing, software
+*  distributed under the License is distributed on an "AS IS" BASIS,
+*  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+*  See the License for the specific language governing permissions and
+*  limitations under the License.
+*
+*/
 package org.apache.ws.axis.security.conversation;
+
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Stack;
 import java.util.Vector;
 
 import javax.xml.namespace.QName;
@@ -36,12 +35,8 @@ import org.apache.axis.components.logger.LogFactory;
 import org.apache.axis.handlers.BasicHandler;
 import org.apache.axis.message.MessageElement;
 import org.apache.axis.message.SOAPHeaderElement;
-import org.apache.axis.types.URI;
-import org.apache.axis.types.URI.MalformedURIException;
 import org.apache.commons.logging.Log;
 import org.apache.ws.axis.security.trust.secconv.interop.InteropHandshaker;
-import org.apache.ws.axis.security.trust.secconv.interop.RST_Requester;
-
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngine;
@@ -53,7 +48,6 @@ import org.apache.ws.security.conversation.ConversationConstants;
 import org.apache.ws.security.conversation.ConversationEngine;
 import org.apache.ws.security.conversation.ConversationException;
 import org.apache.ws.security.conversation.ConversationManager;
-import org.apache.ws.security.conversation.ConversationSession;
 import org.apache.ws.security.conversation.ConversationUtil;
 import org.apache.ws.security.conversation.DerivedKeyCallbackHandler;
 import org.apache.ws.security.conversation.message.info.DerivedKeyInfo;
@@ -64,34 +58,24 @@ import org.apache.ws.security.conversation.message.token.RequestedSecurityToken;
 import org.apache.ws.security.conversation.message.token.SecurityContextToken;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.message.token.SecurityTokenReference;
-//import org.apache.ws.security.trust.TrustCommunicator;
-import org.apache.ws.security.transform.STRTransform;
-import org.apache.ws.security.trust.TrustConstants;
-import org.apache.ws.security.trust.message.token.TokenType;
 import org.apache.ws.security.util.StringUtil;
 import org.apache.ws.security.util.WSSecurityUtil;
-import org.apache.xml.security.transforms.Transform;
 import org.apache.xml.security.utils.XMLUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 /**
- *
- * This handler performs the client side actions, in order to execute WS-Secure
- * Conversation. It employs three major components;
- * <br /> 1) DerivedKeyCallbackHandler.java - Interfacing to the derived key generation component.
- * <br /> 2) ConversationEngine.java - Process and validate conversation elements.
- * <br /> 3) ConversationClient.java - Creates conversation elements.
- * 
- * @author Dimuthu Leelarathne. (muthulee@yahoo.com)
- * @author Kaushalye Kapruge.  (kaushalye@yahoo.com)
- *
+ * @author Ruchith Fernando
  */
+public class ClientSender extends BasicHandler {
+    /**
+     * Comment for <code>serialVersionUID</code>
+     */
+    private static final long serialVersionUID = 1L;
 
-public class ConversationClientHandler extends BasicHandler {
     private static Log log =
-        LogFactory.getLog(ConversationClientHandler.class.getName());
+        LogFactory.getLog(ClientSender.class.getName());
 
     private int keyLen = -1;
     private RequestSecurityTokenResponse stRes;
@@ -115,41 +99,22 @@ public class ConversationClientHandler extends BasicHandler {
     private static boolean isConfigured = false;
     private boolean readCrypto = false;
 
-	private String appliesTo = null;
-	
-	private boolean isSessionInfoConfigured = false;
-	/* 
-	 * TODO :: For now we are allowing only fixed sized derived keys
-	 */
-	private boolean usedFixedKeys = true;
-	 
+    private String appliesTo = null;
+    
+    private boolean isSessionInfoConfigured = false;
+    /* 
+     * TODO :: For now we are allowing only fixed sized derived keys
+     */
+    private boolean usedFixedKeys = true;
+     
     private HashMap configurator;
 
     int[] actionsInt;
-    static {
-        org.apache.xml.security.Init.init();
-        String Id = "BC";
-        if (java.security.Security.getProvider(Id) == null) {
-            log.debug("The provider " + Id
-                    + " had to be added to the java.security.Security");
-            java.security.Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
-        }
-        Transform.init();
-        try {
-            Transform.register(STRTransform.implementedTransformURI,
-                    "org.apache.ws.security.transform.STRTransform");
-        } catch (Exception ex) {
-        }
-    }
 
-    public ConversationClientHandler() throws AxisFault {
+    public ClientSender() throws AxisFault {
         log.debug("ConversationClientHandler :: created");
     }
     
-    public ConversationClientHandler(DerivedKeyCallbackHandler dk) throws AxisFault {
-		dkcbHandler = dk;
-		log.debug("ConversationClientHandler :: created");
-    }
 
     /**
      * Method inherited from the BasicHandler.
@@ -184,10 +149,10 @@ public class ConversationClientHandler extends BasicHandler {
      */
 
     private void doRequest(MessageContext msg) throws AxisFault {
-		if(!isSessionInfoConfigured){
-			initSessionInfo();
-			isSessionInfoConfigured = true;
-		}
+        if(!isSessionInfoConfigured){
+            initSessionInfo();
+            isSessionInfoConfigured = true;
+        }
         
         Message sm = msg.getCurrentMessage();
         //SOAPPart sPart = (org.apache.axis.SOAPPart) sm.getSOAPPart();
@@ -196,7 +161,7 @@ public class ConversationClientHandler extends BasicHandler {
         if (!handShakeDone) {
 
             decodeSCTEstabParameter();
-			this.loadCrypto();
+            this.loadCrypto();
            
             switch (this.sctEstablishment) {
 
@@ -212,8 +177,8 @@ public class ConversationClientHandler extends BasicHandler {
                     break;
                 
                 case ConversationConstants.INTEROP_SCENE1 :
-				    this.doHandlshake_Interop(sm);
-                	break;
+                    this.doHandlshake_Interop(sm);
+                    break;
                 
                 default :
                     throw new AxisFault("Unsupored STS establishment method.");
@@ -237,7 +202,7 @@ public class ConversationClientHandler extends BasicHandler {
 
             try {
 
-                //				add the relavent SCT
+                //              add the relavent SCT
                 Element securityHeader =
                     WSSecurityUtil.findWsseSecurityHeaderBlock(WSSConfig.getDefaultWSConfig(),
                         doc,
@@ -265,7 +230,7 @@ public class ConversationClientHandler extends BasicHandler {
                             stRef,
                             dkcbHandler, null,(String)this.configurator.get(ConvHandlerConstants.DK_ENC_ALGO));
                     } else if(actionsInt[i]==ConversationConstants.DK_SIGN){
-                    	//TODO:
+                        //TODO:
                         manager.performDK_Sign(doc, dkcbHandler, uuid, dkInfo, null);
                     }
                     
@@ -297,19 +262,17 @@ public class ConversationClientHandler extends BasicHandler {
     private void doResponse(MessageContext msgContext)
         throws AxisFault { //for incoming message
         Document doc = null;
-		if(!isSessionInfoConfigured){
-			initSessionInfo();
-			isSessionInfoConfigured = true;
-		}
+        if(!isSessionInfoConfigured){
+            initSessionInfo();
+            isSessionInfoConfigured = true;
+        }
         Message message = msgContext.getCurrentMessage();
         SOAPPart sPart = (org.apache.axis.SOAPPart) message.getSOAPPart();
-//        if (!this.readCrypto) {
-//            this.loadCrypto();
-//        }
+
         
         Object obj = null; 
         if((obj=msgContext.getProperty(ConvHandlerConstants.DK_CB_HANDLER))!=null){
-        	this.dkcbHandler = (DerivedKeyCallbackHandler)obj;
+            dkcbHandler = (DerivedKeyCallbackHandler)obj;
         } 
         try {
             doc =
@@ -325,79 +288,82 @@ public class ConversationClientHandler extends BasicHandler {
          *Add them to the convSession.
          */
 
-        log.debug("I am in ClientHandler Response");
+        log.debug("I am in ClientHndelr Response");
         
         
         try{
         ConversationEngine convEng = new ConversationEngine(this.configurator);
-		Vector results = convEng.processSecConvHeader(doc, "", dkcbHandler, (String)this.configurator.get(WSHandlerConstants.PW_CALLBACK_CLASS));
-				} catch (ConversationException e1) {
-					e1.printStackTrace();
-					throw new AxisFault("CovnersationServerHandler :: "+e1.getMessage());
-				}
-				
-				
+        Vector results = convEng.processSecConvHeader(doc, "", dkcbHandler, (String)this.configurator.get(WSHandlerConstants.PW_CALLBACK_CLASS));
+        
+        ConvEngineResult convResult  = null;
+
+                } catch (ConversationException e1) {
+                    e1.printStackTrace();
+                    throw new AxisFault("CovnersationServerHandler :: "+e1.getMessage());
+                }
+                
+                
 
 //stolen from WSDoallReciever
   ByteArrayOutputStream os = new ByteArrayOutputStream();
-		  XMLUtils.outputDOM(doc, os, true);
-		  sPart.setCurrentMessage(os.toByteArray(), SOAPPart.FORM_BYTES);
+          XMLUtils.outputDOM(doc, os, true);
+          sPart.setCurrentMessage(os.toByteArray(), SOAPPart.FORM_BYTES);
 
-		  ArrayList processedHeaders = new ArrayList();
-				  Iterator iterator = message.getSOAPEnvelope().getHeaders().iterator();
-				  while (iterator.hasNext()) {
-					  org.apache.axis.message.SOAPHeaderElement tempHeader = (org.apache.axis.message.SOAPHeaderElement) iterator.next();
-					  if (tempHeader.isProcessed()) {
-						  processedHeaders.add(tempHeader.getQName());
-					  }
-				  }        
+          ArrayList processedHeaders = new ArrayList();
+                  Iterator iterator = message.getSOAPEnvelope().getHeaders().iterator();
+                  while (iterator.hasNext()) {
+                      org.apache.axis.message.SOAPHeaderElement tempHeader = (org.apache.axis.message.SOAPHeaderElement) iterator.next();
+                      if (tempHeader.isProcessed()) {
+                          processedHeaders.add(tempHeader.getQName());
+                      }
+                  }        
   /*
-		   * set the original processed-header flags
-		   */
-		  iterator = processedHeaders.iterator();
-		  while (iterator.hasNext()) {
-			  QName qname = (QName) iterator.next();
-			  Enumeration enumHeaders = message.getSOAPEnvelope().getHeadersByName(qname.getNamespaceURI(), qname.getLocalPart());
-			  while(enumHeaders.hasMoreElements()) {
-				  org.apache.axis.message.SOAPHeaderElement tempHeader = (org.apache.axis.message.SOAPHeaderElement)enumHeaders.nextElement();
-				  tempHeader.setProcessed(true);
-			  }
-		  }	  
-		
-			/*
-				   * After setting the new current message, probably modified because
-				   * of decryption, we need to locate the security header. That is,
-				   * we force Axis (with getSOAPEnvelope()) to parse the string, build 
-				   * the new header. Then we examine, look up the security header 
-				   * and set the header as processed.
-				   * 
-				   * Please note: find all header elements that contain the same
-				   * actor that was given to processSecurityHeader(). Then
-				   * check if there is a security header with this actor.
-				   */
+           * set the original processed-header flags
+           */
+          iterator = processedHeaders.iterator();
+          while (iterator.hasNext()) {
+              QName qname = (QName) iterator.next();
+              Enumeration enumHeaders = message.getSOAPEnvelope().getHeadersByName(qname.getNamespaceURI(), qname.getLocalPart());
+              while(enumHeaders.hasMoreElements()) {
+                  org.apache.axis.message.SOAPHeaderElement tempHeader = (org.apache.axis.message.SOAPHeaderElement)enumHeaders.nextElement();
+                  tempHeader.setProcessed(true);
+              }
+          }   
+        
+            /*
+                   * After setting the new current message, probably modified because
+                   * of decryption, we need to locate the security header. That is,
+                   * we force Axis (with getSOAPEnvelope()) to parse the string, build 
+                   * the new header. Then we examine, look up the security header 
+                   * and set the header as processed.
+                   * 
+                   * Please note: find all header elements that contain the same
+                   * actor that was given to processSecurityHeader(). Then
+                   * check if there is a security header with this actor.
+                   */
 
-				  SOAPHeader sHeader = null;
-				  try {
-					  sHeader = message.getSOAPEnvelope().getHeader();
-				  } catch (Exception ex) {
-					  throw new AxisFault("WSDoAllReceiver: cannot get SOAP header after security processing", ex);
-				  }
+                  SOAPHeader sHeader = null;
+                  try {
+                      sHeader = message.getSOAPEnvelope().getHeader();
+                  } catch (Exception ex) {
+                      throw new AxisFault("WSDoAllReceiver: cannot get SOAP header after security processing", ex);
+                  }
 
-				  Iterator headers = sHeader.examineHeaderElements("");
+                  Iterator headers = sHeader.examineHeaderElements("");
 
-				  SOAPHeaderElement headerElement = null;
-				  while (headers.hasNext()) {
-					  SOAPHeaderElement hE = (SOAPHeaderElement) headers.next();
-					  if (hE.getLocalName().equals(WSConstants.WSSE_LN)
-							  && hE.getNamespaceURI().equals(WSConstants.WSSE_NS)) {
-						  headerElement = hE;
-						  break;
-					  }
-				  }
-				  ((org.apache.axis.message.SOAPHeaderElement) headerElement).setProcessed(true);
+                  SOAPHeaderElement headerElement = null;
+                  while (headers.hasNext()) {
+                      SOAPHeaderElement hE = (SOAPHeaderElement) headers.next();
+                      if (hE.getLocalName().equals(WSConstants.WSSE_LN)
+                              && hE.getNamespaceURI().equals(WSConstants.WSSE_NS)) {
+                          headerElement = hE;
+                          break;
+                      }
+                  }
+                  ((org.apache.axis.message.SOAPHeaderElement) headerElement).setProcessed(true);
 
-		
-		System.out.println("I am in ClientHndelr Response");
+        
+        System.out.println("I am in ClientHndelr Response");
           
         
     } //do response done
@@ -459,7 +425,7 @@ public class ConversationClientHandler extends BasicHandler {
              * 1) Key frequency.
              */
             if (usedFixedKeys == true) {
-				Long ln = new Long((String)Integer.toString(keyLen));
+                Long ln = new Long((String)Integer.toString(keyLen));
                 dkcbHandler.setDerivedKeyLength(uuid, ln.longValue() );
             }
             ByteArrayOutputStream os = new ByteArrayOutputStream();
@@ -500,29 +466,29 @@ public class ConversationClientHandler extends BasicHandler {
         Document doc = null;
         MessageElement[] meArrRes = null;
         String tmpStr = null;
-		String stsEndPoint, callbackHandler;
-		
-		
-		if ((tmpStr = (String) getOption(ConvHandlerConstants.STS_ADDRESS))
-			!= null) {
-				stsEndPoint =tmpStr;	    
-		}else{
-			throw new AxisFault("STS address is not set.");
-		}        
+        String stsEndPoint, callbackHandler;
+        
+        
+        if ((tmpStr = (String) getOption(ConvHandlerConstants.STS_ADDRESS))
+            != null) {
+                stsEndPoint =tmpStr;        
+        }else{
+            throw new AxisFault("STS address is not set.");
+        }        
         
         if ((tmpStr =(String) getOption(ConvHandlerConstants.APPLIES_TO_VAL))
-						!= null) {
-							log.debug("Applies to value is read ::" + tmpStr);
-				this.appliesTo = tmpStr;			
-			}
-		
-		if ((tmpStr = (String) getOption(ConvHandlerConstants.CONV_CALLBACK))
-					!= null) {
-						callbackHandler =tmpStr;	    
-		}else{
-					throw new AxisFault("PasswordCallbackHandler is not set.");
-		}
-			
+                        != null) {
+                            log.debug("Applies to value is read ::" + tmpStr);
+                this.appliesTo = tmpStr;            
+            }
+        
+        if ((tmpStr = (String) getOption(ConvHandlerConstants.CONV_CALLBACK))
+                    != null) {
+                        callbackHandler =tmpStr;        
+        }else{
+                    throw new AxisFault("PasswordCallbackHandler is not set.");
+        }
+            
 //        try {
 ////            TrustCommunicator tc =
 ////                new TrustCommunicator(stsEndPoint);
@@ -684,78 +650,78 @@ public class ConversationClientHandler extends BasicHandler {
 
 
     private void doHandlshake_Interop(Message sm) throws AxisFault{
-    	
-    	InteropHandshaker interop = new InteropHandshaker();
-		interop.handshake(getOptions()); 
-		//System.out.println("Ok back");
-		this.dkcbHandler = interop.getDkcb(); 
-		
-		this.uuid = interop.getUuid();
-		
+        
+        InteropHandshaker interop = new InteropHandshaker();
+        interop.handshake(getOptions());
+        //System.out.println("Ok back");
+        this.dkcbHandler = interop.getDkcb(); 
+       
+        this.uuid = interop.getUuid();
 
-		log.debug("Done handlshake .");
-		SOAPPart sPart = (org.apache.axis.SOAPPart) sm.getSOAPPart();
-		Document doc = null;
-		
-		try {
-			doc =
-				((org.apache.axis.message.SOAPEnvelope) sPart
-					.getEnvelope())
-					.getAsDocument();
-		} catch (Exception e) {
-			throw new AxisFault("CoversationClientHandler :: Cannot get the document");
-		}
 
-		try {
+        log.debug("Done handlshake .");
+        SOAPPart sPart = (org.apache.axis.SOAPPart) sm.getSOAPPart();
+        Document doc = null;
 
-			//				add the relavent SCT
-			Element securityHeader =
-				WSSecurityUtil.findWsseSecurityHeaderBlock(WSSConfig.getDefaultWSConfig(),
-					doc,
-					doc.getDocumentElement(),
-					true);
-			WSSecurityUtil.appendChildElement(
-				doc,
-				securityHeader,
-				(new SecurityContextToken(doc, uuid)).getElement());
-			ConversationManager manager = new ConversationManager();
-					
-			for (int i = 0; i < this.actionsInt.length; i++) {
-				// Derrive the token
-				System.out.println("UUID is "+this.uuid);
-				DerivedKeyInfo dkInfo =
-					manager.createDerivedKeyToken(doc, this.uuid, dkcbHandler,null,keyLen);
+        try {
+            doc =
+                ((org.apache.axis.message.SOAPEnvelope) sPart
+                    .getEnvelope())
+                    .getAsDocument();
+        } catch (Exception e) {
+            throw new AxisFault("CoversationClientHandler :: Cannot get the document");
+        }
 
-				String genID = dkInfo.getId();
-				SecurityTokenReference stRef =
-					dkInfo.getSecTokRef2DkToken();
-				if (actionsInt[i] == ConversationConstants.DK_ENCRYPT) {
-					manager.performDK_ENCR(
-						ConversationUtil.generateIdentifier(uuid, genID),
-						"",
-						true,
-						doc,
-						stRef,
-						dkcbHandler, null, (String)this.configurator.get(ConvHandlerConstants.DK_ENC_ALGO));
-				} else if(actionsInt[i]==ConversationConstants.DK_SIGN){
-					//TODO:
-					manager.performDK_Sign(doc, dkcbHandler, uuid, dkInfo, null);
-				}
+        try {
 
-				manager.addDkToken(doc,dkInfo);
-			}
-		} catch (ConversationException e1) {
-			e1.printStackTrace();
-			throw new AxisFault(
-				"ConversationClientHandler ::" + e1.getMessage());
-		}
+            //              add the relavent SCT
+            Element securityHeader =
+                WSSecurityUtil.findWsseSecurityHeaderBlock(WSSConfig.getDefaultWSConfig(),
+                    doc,
+                    doc.getDocumentElement(),
+                    true);
+            WSSecurityUtil.appendChildElement(
+                doc,
+                securityHeader,
+                (new SecurityContextToken(doc, uuid)).getElement());
+            ConversationManager manager = new ConversationManager();
 
-		//set it as current message
-		ByteArrayOutputStream os = new ByteArrayOutputStream();
-		XMLUtils.outputDOM(doc, os, true);
-		String osStr = os.toString();
-		sPart.setCurrentMessage(osStr, SOAPPart.FORM_STRING);
-		
+            for (int i = 0; i < this.actionsInt.length; i++) {
+                // Derrive the token
+                System.out.println("UUID is "+this.uuid);
+                DerivedKeyInfo dkInfo =
+                    manager.createDerivedKeyToken(doc, this.uuid, dkcbHandler,null,keyLen);
+
+                String genID = dkInfo.getId();
+                SecurityTokenReference stRef =
+                    dkInfo.getSecTokRef2DkToken();
+                if (actionsInt[i] == ConversationConstants.DK_ENCRYPT) {
+                    manager.performDK_ENCR(
+                        ConversationUtil.generateIdentifier(uuid, genID),
+                        "",
+                        true,
+                        doc,
+                        stRef,
+                        dkcbHandler, null, (String)this.configurator.get(ConvHandlerConstants.DK_ENC_ALGO));
+                } else if(actionsInt[i]==ConversationConstants.DK_SIGN){
+                    //TODO:
+                    manager.performDK_Sign(doc, dkcbHandler, uuid, dkInfo, null);
+                }
+
+                manager.addDkToken(doc,dkInfo);
+            }
+        } catch (ConversationException e1) {
+            e1.printStackTrace();
+            throw new AxisFault(
+                "ConversationClientHandler ::" + e1.getMessage());
+        }
+
+        //set it as current message
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        XMLUtils.outputDOM(doc, os, true);
+        String osStr = os.toString();
+        sPart.setCurrentMessage(osStr, SOAPPart.FORM_STRING);
+
     }
     /**
      * Reads configeration parameters from the wsdd file.
@@ -789,30 +755,30 @@ public class ConversationClientHandler extends BasicHandler {
                 }
             }
         }
-        
-		if ((tmpStr =
-						(String) getOption(ConvHandlerConstants.KEY_LEGNTH))
-						!= null) {
-						log.debug("Key Frequency is set ::" + tmpStr);
-					this.keyLen=Integer.parseInt(tmpStr);
-					this.configurator.put(ConvHandlerConstants.KEY_LEGNTH, new Long(tmpStr));
-				}
-		
-       
-		if ((tmpStr =
-					(String) getOption(WSHandlerConstants.PW_CALLBACK_CLASS))
-					!= null) {
-						this.configurator.put(WSHandlerConstants.PW_CALLBACK_CLASS, tmpStr);
-				}else{
-					//throw new AxisFault("Set the pass word call back class.....");
-				} 
+
+        if ((tmpStr =
+                        (String) getOption(ConvHandlerConstants.KEY_LEGNTH))
+                        != null) {
+                        log.debug("Key Frequency is set ::" + tmpStr);
+                    this.keyLen=Integer.parseInt(tmpStr);
+                    this.configurator.put(ConvHandlerConstants.KEY_LEGNTH, new Long(tmpStr));
+                }
+
+
+        if ((tmpStr =
+                    (String) getOption(WSHandlerConstants.PW_CALLBACK_CLASS))
+                    != null) {
+                        this.configurator.put(WSHandlerConstants.PW_CALLBACK_CLASS, tmpStr);
+                }else{
+                    //throw new AxisFault("Set the pass word call back class.....");
+                }
 
 
 
-		if((tmpStr =(String) getOption(ConvHandlerConstants.DK_ENC_ALGO))!= null) {
-						this.configurator.put(ConvHandlerConstants.DK_ENC_ALGO, tmpStr);
-				}
-		
+        if((tmpStr =(String) getOption(ConvHandlerConstants.DK_ENC_ALGO))!= null) {
+                        this.configurator.put(ConvHandlerConstants.DK_ENC_ALGO, tmpStr);
+                }
+
     }
 
     /**
@@ -833,19 +799,19 @@ public class ConversationClientHandler extends BasicHandler {
             this.sctEstablishment = i.intValue();
         }
     }
-    
-    private int decodeSTSRequesterTypeParamer () throws AxisFault{
-		String tmpStr =
-					(String) getOption(ConvHandlerConstants.STS_REQUSTOR_TYPE);
-		log.debug("ConversationClientHandler :: Decording STS requeter type parameter");
-		if (tmpStr.equals(null)) {
-			throw new AxisFault("STS requeter type not specified.");
-		} else {
-			Integer i =
-				(Integer) ConvHandlerConstants.requesterTypeMapper.get(
-					tmpStr);
-					return i.intValue();
-		}
+
+    private int decodeSTSRequesterTypeParamer() throws AxisFault{
+        String tmpStr =
+                    (String) getOption(ConvHandlerConstants.STS_REQUSTOR_TYPE);
+        log.debug("ConversationClientHandler :: Decording STS requeter type parameter");
+        if (tmpStr.equals(null)) {
+            throw new AxisFault("STS requeter type not specified.");
+        } else {
+            Integer i =
+                (Integer) ConvHandlerConstants.requesterTypeMapper.get(
+                    tmpStr);
+                    return i.intValue();
+        }
     }
 
     /**
@@ -869,9 +835,6 @@ public class ConversationClientHandler extends BasicHandler {
             throw new AxisFault("Error! No server server properties file in wsdd");
         }
         this.serverAlias = tmpStr;
-
-             
-                
 
     }
 

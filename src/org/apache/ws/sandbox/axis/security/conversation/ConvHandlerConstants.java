@@ -18,7 +18,11 @@
 package org.apache.ws.axis.security.conversation;
 
 
+import org.apache.axis.components.logger.LogFactory;
+import org.apache.commons.logging.Log;
 import org.apache.ws.security.conversation.ConversationConstants;
+import org.apache.ws.security.transform.STRTransform;
+import org.apache.xml.security.transforms.Transform;
 
 import java.util.Hashtable;
 import java.util.Map;
@@ -30,6 +34,9 @@ import java.util.Map;
  */
 public class ConvHandlerConstants {
 
+    private static Log log =
+        LogFactory.getLog(ConvHandlerConstants.class.getName());
+	
     public static final String SEVER_PROP_FILE = "serverPropFile";
     public static final String REQUESTOR_PROP_FILE = "requestorPropFile";
     public static final String STS_PROP_FILE = "trustServicePropFile";
@@ -65,6 +72,11 @@ public class ConvHandlerConstants {
     public static Map requesterTypeMapper = new Hashtable();
     //TODO::Remove the below line
 	public static final String CONV_CALLBACK = "pwcallback";
+    
+    public static final String SCT_ISSUE_ACTION = "http://schemas.xmlsoap.org/ws/2005/XX/security/trust/RST/SCT";
+    
+    
+    
 	
 	/**
 	 * Which algorithm to be used for encryption as in AES or DES and so on
@@ -103,7 +115,20 @@ public class ConvHandlerConstants {
 								new Integer(ConversationConstants.INTEROP_SCENE1));
 		
    
-    
+        org.apache.xml.security.Init.init();
+        String Id = "BC";
+        if (java.security.Security.getProvider(Id) == null) {
+            log.debug("The provider " + Id
+                    + " had to be added to the java.security.Security");
+            java.security.Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
+        }
+        Transform.init();
+        try {
+            Transform.register(STRTransform.implementedTransformURI,
+                    "org.apache.ws.security.transform.STRTransform");
+        } catch (Exception ex) {
+        	//TODO Log the exception
+        }
 		
     }
     

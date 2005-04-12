@@ -23,7 +23,8 @@ import org.w3c.dom.Node;
  */
 public class ComputedKey {
 	 
-	public static final String PSHA1 = "http://schemas.xmlsoap.org/ws/2004/04/security/trust/CK/PSHA1";
+	public static final String PSHA1 = "http://schemas.xmlsoap.org/ws/2005/02/security/trust/CK/PSHA1"; 
+
 	
 	 public static final QName TOKEN = new QName(TrustConstants.WST_NS, "ComputedKey");
     

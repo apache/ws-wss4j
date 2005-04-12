@@ -19,6 +19,13 @@ public class RequestSecurityTokenType  implements java.io.Serializable, org.apac
     public RequestSecurityTokenType() {
     }
 
+    public RequestSecurityTokenType(
+           org.apache.axis.message.MessageElement [] _any,
+           org.apache.axis.types.URI context) {
+           this._any = _any;
+           this.context = context;
+    }
+
 
     /**
      * Gets the _any value for this RequestSecurityTokenType.
@@ -111,7 +118,7 @@ public class RequestSecurityTokenType  implements java.io.Serializable, org.apac
         new org.apache.axis.description.TypeDesc(RequestSecurityTokenType.class, true);
 
     static {
-        typeDesc.setXmlType(new javax.xml.namespace.QName("http://schemas.xmlsoap.org/ws/2004/04/trust", "RequestSecurityTokenType"));
+        typeDesc.setXmlType(new javax.xml.namespace.QName("http://schemas.xmlsoap.org/ws/2005/02/trust", "RequestSecurityTokenType"));
         org.apache.axis.description.AttributeDesc attrField = new org.apache.axis.description.AttributeDesc();
         attrField.setFieldName("context");
         attrField.setXmlName(new javax.xml.namespace.QName("", "Context"));
