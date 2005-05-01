@@ -103,14 +103,13 @@ public class UsernameToken {
         if (elementUsername == null) {
             throw new WSSecurityException(WSSecurityException.INVALID_SECURITY_TOKEN, "badTokenType01", new Object[]{el});
         }
+        hashed = false;
         String type = elementPassword.getAttribute("Type");
-        if (type.equals(WSConstants.PASSWORD_DIGEST)) {
+        if (type != null && type.equals(WSConstants.PASSWORD_DIGEST)) {
             hashed = true;
             if (elementNonce == null || elementCreated == null) {
                 throw new WSSecurityException(WSSecurityException.INVALID_SECURITY_TOKEN, "badTokenType01", new Object[]{el});
             }
-        } else {
-            hashed = false;
         }
     }
 
@@ -154,9 +153,8 @@ public class UsernameToken {
         this.elementPassword.appendChild(doc.createTextNode(""));
         element.appendChild(elementPassword);
 
-        if (passwordType.equals(WSConstants.PASSWORD_TEXT)) {
-            hashed = false;
-        } else {
+        hashed = false;
+        if (passwordType != null && passwordType.equals(WSConstants.PASSWORD_DIGEST)) {
             hashed = true;
             addNonce(doc);
             addCreated(doc);
@@ -200,18 +198,16 @@ public class UsernameToken {
      * @return the data from the user name element.
      */
     public String getName() {
-        if (this.elementUsername != null) {
-            return getFirstNode(this.elementUsername).getData();
-        }
-        return null;
-    }
+		return nodeString (this.elementUsername);
+	}
 
     /**
-     * Set the user name.
-     *
-     * @param name sets a text node containing the use name into
-     *             the user name element.
-     */
+	 * Set the user name.
+	 * 
+	 * @param name
+	 *            sets a text node containing the use name into the user name
+	 *            element.
+	 */
     public void setName(String name) {
         Text node = getFirstNode(this.elementUsername);
         node.setData(name);
@@ -223,60 +219,28 @@ public class UsernameToken {
      * @return the data from the nonce element.
      */
     public String getNonce() {
-        if (this.elementNonce != null) {
-            return getFirstNode(this.elementNonce).getData();
-        }
-        return null;
-    }
+		return nodeString(this.elementNonce);
+	}
 
     /**
-     * Set the nonce.
-     * <p/>
-     *
-     * @param nonce sets a text node containing the nonce data into
-     *              the nonce element.
-     */
-    public void setNonce(String nonce) {
-        Text node = getFirstNode(this.elementNonce);
-        node.setData(nonce);
-    }
-
-    /**
-     * Get the created timestamp.
-     *
-     * @return the data from the created time element.
-     */
+	 * Get the created timestamp.
+	 * 
+	 * @return the data from the created time element.
+	 */
     public String getCreated() {
-        if (this.elementCreated != null) {
-            return getFirstNode(this.elementCreated).getData();
-        }
-        return null;
-    }
+		return nodeString(this.elementCreated);
+	}
 
     /**
-     * Set the created timestamp.
-     *
-     * @param created sets a text node containing the created time data into
-     *                the created time element.
-     */
-    public void setCreated(String created) {
-        Text node = getFirstNode(this.elementCreated);
-        node.setData(created);
-    }
-
-    /**
-     * Gets the password string.
-     * This is the password as it is in the password element of a username,
-     * token. Thus it can be either plain text or the password digest value.
-     *
-     * @return the password string or <code>null</code> if no such node exists.
-     */
+	 * Gets the password string. This is the password as it is in the password
+	 * element of a username, token. Thus it can be either plain text or the
+	 * password digest value.
+	 * 
+	 * @return the password string or <code>null</code> if no such node
+	 *         exists.
+	 */
     public String getPassword() {
-        Text node = getFirstNode(this.elementPassword);
-        if (node == null) {
-            return null;
-        }
-        return node.getData();
+    	return nodeString(this.elementPassword);
     }
 
     /**
@@ -376,6 +340,23 @@ public class UsernameToken {
         return ((node != null) && node instanceof Text) ? (Text) node : null;
     }
 
+    /**
+     * Returns the data of an elemen as String or null if either the
+     * the element does not contain a Text node or the node is empty.
+     * 
+     * @param e DOM element
+     * @return Element text node data as String
+     */
+    private String nodeString(Element e) {
+        if (e != null) {
+			Text node = getFirstNode(e);
+			if (node != null) {
+				return node.getData();
+			}
+		}
+		return null;
+    	
+    }
     /**
      * Returns the dom element of this <code>UsernameToken</code> object.
      *
