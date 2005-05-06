@@ -58,6 +58,7 @@ public class UsernameToken {
     protected Element elementPassword = null;
     protected Element elementNonce = null;
     protected Element elementCreated = null;
+    protected String passwordType = null;
     protected boolean hashed = true;
     private static SecureRandom random = null;
     protected WSSConfig wssConfig = WSSConfig.getDefaultWSConfig();
@@ -104,8 +105,8 @@ public class UsernameToken {
             throw new WSSecurityException(WSSecurityException.INVALID_SECURITY_TOKEN, "badTokenType01", new Object[]{el});
         }
         hashed = false;
-        String type = elementPassword.getAttribute("Type");
-        if (type != null && type.equals(WSConstants.PASSWORD_DIGEST)) {
+        passwordType = elementPassword.getAttribute("Type");
+        if (passwordType != null && passwordType.equals(WSConstants.PASSWORD_DIGEST)) {
             hashed = true;
             if (elementNonce == null || elementCreated == null) {
                 throw new WSSecurityException(WSSecurityException.INVALID_SECURITY_TOKEN, "badTokenType01", new Object[]{el});
@@ -138,7 +139,7 @@ public class UsernameToken {
      *                     {@link WSConstants#PASSWORD_DIGEST} or
      *                     {@link WSConstants#PASSWORD_TEXT}
      */
-    public UsernameToken(WSSConfig wssConfig, Document doc, String passwordType) {
+    public UsernameToken(WSSConfig wssConfig, Document doc, String pwType) {
         this.wssConfig = wssConfig;
         this.element = doc.createElementNS(wssConfig.getWsseNS(), "wsse:" + WSConstants.USERNAME_TOKEN_LN);
         WSSecurityUtil.setNamespace(this.element, wssConfig.getWsseNS(), WSConstants.WSSE_PREFIX);
@@ -154,6 +155,7 @@ public class UsernameToken {
         element.appendChild(elementPassword);
 
         hashed = false;
+        passwordType = pwType;
         if (passwordType != null && passwordType.equals(WSConstants.PASSWORD_DIGEST)) {
             hashed = true;
             addNonce(doc);
@@ -255,6 +257,12 @@ public class UsernameToken {
         return hashed;
     }
 
+	/**
+	 * @return Returns the passwordType.
+	 */
+	public String getPasswordType() {
+		return passwordType;
+	}
     /**
      * Sets the password string.
      * This function sets the password in the <code>UsernameToken</code>
