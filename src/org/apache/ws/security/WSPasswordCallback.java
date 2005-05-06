@@ -49,6 +49,12 @@ import javax.security.auth.callback.Callback;
  * decrypt parts of the SOAP request. Note, the key must match the
  * symmetric encryption/decryption algorithm specified (refer to
  * {@link org.apache.ws.security.handler.WSHandlerConstants# ENC_SYM_ALGO}).</li>
+ * * <li><code>USERNAME_TOKEN_UNKNOWN</code> - either an not specified 
+ * password type or a password type passwordText. In these both cases <b>only</b>
+ * the password variable is <b>set</>. The callback class now may check if
+ * the username and password match. If they don't match the callback class must
+ * throw an exception. The exception can be a UnsupportedCallbackException or
+ * an IOException.</li>
  * </ul>
  *
  * @author Werner Dittmann (Werner.Dittmann@siemens.com).
@@ -61,11 +67,13 @@ public class WSPasswordCallback implements Callback {
     public static final int USERNAME_TOKEN = 2;
     public static final int SIGNATURE = 3;
     public static final int KEY_NAME = 4;
+    public static final int USERNAME_TOKEN_UNKNOWN = 5;
 
     private String identifier;
     private String password;
     private byte[] key;
     private int usage;
+    private String passwordType;
 
     /**
      * Constructor.
@@ -74,10 +82,21 @@ public class WSPasswordCallback implements Callback {
      *           this identifier.
      */
     public WSPasswordCallback(String id, int usage) {
-        identifier = id;
-        this.usage = usage;
+    	this(id, null, null, usage);
     }
 
+    /**
+     * Constructor.
+     *
+     * @param id The application called back must supply the password for
+     *           this identifier.
+     */
+    public WSPasswordCallback(String id, String pw, String type, int usage) {
+        identifier = id;
+        password = pw;
+        passwordType = type;
+        this.usage = usage;
+    }
     /**
      * Get the identifier.
      * <p/>
@@ -137,5 +156,14 @@ public class WSPasswordCallback implements Callback {
     public int getUsage() {
         return usage;
     }
+	/**
+	 * The password type is only relevant for usage <code>USERNAME_TOKEN</code>
+	 * and <code>USERNAME_TOKEN_UNKNOWN</code>.
+	 * 
+	 * @return Returns the passwordType.
+	 */
+	public String getPasswordType() {
+		return passwordType;
+	}
 }
 

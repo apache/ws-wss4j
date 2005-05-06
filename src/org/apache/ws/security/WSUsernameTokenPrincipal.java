@@ -20,22 +20,23 @@ package org.apache.ws.security;
 import java.security.Principal;
 
 /**
+ * This class implements the <code>Principal</code> interface and
+ * represents a UsernameToken user. 
+ * <p/>In addition to the principal's name
+ * this principal object also conatins the nonce and created time of the
+ * UsernameToken (refer to the OASIS WS Security specification, UsernameToken
+ * profile). These values are set only if the password of UsernameToken was of
+ * type <code>PasswordDigest</code>.
+ * <p/>Furthermore the password type is
+ * provided to the application. The password type is the string of the type
+ * attribute of the password element inside the username token. Refer to the
+ * OASIS WSS specification for predefined password types. <p/>The
+ * <code>equals()</code> method use the prinicipal's name only and does not
+ * compare nonce or created time. 
+ * <p/>Modeled according to the example provided
+ * by JAAS documentation 
  * <p/>
- * This class implements the <code>Principal</code> interface
- * and represents a UsernameToken user.
- * <p/>
- * In addition to the principal's name this principal object
- * also conatins the nonce and created time of the UsernameToken
- * (refer to the OASIS WS Security specification, UsernameToken profile).
- * These values are set only if the password of UsernameToken was
- * of type <code>PasswordDigest</code>.
- * <p/>
- * The <code>equals()</code> method use the prinicipal's nameonly and
- * does not compare nonce or created time.
- * <p/>
- * Modeled according to the example provided by JAAS documentation
- * <p/>
- *
+ * 
  * @author Davanum Srinivas (dims@yahoo.com).
  * @author Werner Dittmann (Werner.Dittmann@siemens.com).
  * @see java.security.Principal
@@ -50,6 +51,7 @@ public class WSUsernameTokenPrincipal implements Principal, java.io.Serializable
     private String nonce = null;
     private String password = null;
     private String createdTime = null;
+    private String passwordType = null;
     private boolean digest = false;
 
     /**
@@ -136,7 +138,6 @@ public class WSUsernameTokenPrincipal implements Principal, java.io.Serializable
     /**
      * Set the WSUsernameToken created time for this <code>WSUsernameTokenPrincipal</code>.
      * <p/>
-     * <p/>
      *
      * @param createdTime
      */
@@ -146,7 +147,6 @@ public class WSUsernameTokenPrincipal implements Principal, java.io.Serializable
 
     /**
      * Return the WSUsernameToken created time for this <code>WSUsernameTokenPrincipal</code>.
-     * <p/>
      * <p/>
      *
      * @return the WSUsernameToken created time for this <code>WSUsernameTokenPrincipal</code>
@@ -158,7 +158,6 @@ public class WSUsernameTokenPrincipal implements Principal, java.io.Serializable
     /**
      * Return a string representation of this <code>WSUsernameTokenPrincipal</code>.
      * <p/>
-     * <p/>
      *
      * @return a string representation of this <code>WSUsernameTokenPrincipal</code>.
      */
@@ -166,6 +165,18 @@ public class WSUsernameTokenPrincipal implements Principal, java.io.Serializable
         return ("WSUsernameTokenPrincipal:  " + name);
     }
 
+	/**
+	 * @return Returns the passwordType.
+	 */
+	public String getPasswordType() {
+		return passwordType;
+	}
+	/**
+	 * @param passwordType The passwordType to set.
+	 */
+	public void setPasswordType(String passwordType) {
+		this.passwordType = passwordType;
+	}
     /**
      * Compares the specified Object with this <code>WSUsernameTokenPrincipal</code>
      * for equality.  Returns true if the given object is also a

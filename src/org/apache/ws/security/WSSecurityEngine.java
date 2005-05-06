@@ -645,8 +645,6 @@ public class WSSecurityEngine {
 			}
 		} catch (XMLSignatureException e1) {
 			throw new WSSecurityException(WSSecurityException.FAILED_CHECK);
-		} catch (XMLSecurityException e1) {
-			throw new WSSecurityException(WSSecurityException.FAILED_CHECK);
 		}
 	}
 
@@ -809,16 +807,40 @@ public class WSSecurityEngine {
         }
     }
 
+    /**
+     * Check the UsernameToken element. Depending on the password type 
+     * contained in the element the processing differs. If the password type
+     * is password digest (a hashed password) then process the password
+     * commpletely here. Use the callback class to get a stored password
+     * perform hash algorithm and compare the result with the transmitted 
+     * password.
+     * <p/>
+     * If the password is of type password text or any other yet unknown
+     * password type the delegate the password validation to the callback
+     * class. To do so the security engine hands over all necessary data to
+     * the callback class via the WSPasswordCallback object. To distinguish
+     * from digested usernam token the usage parameter of WSPasswordCallback
+     * is set to <code>USERNAME_TOKEN_UNKNOWN</code>
+     * 
+     * @param token the DOM element that contains the UsernameToken
+     * @param cb the refernce to the callback object
+     * @return WSUsernameTokenPrincipal that contain data that an application
+     * may use to further validate the password/user combination.
+     * @throws WSSecurityException
+     */
     public WSUsernameTokenPrincipal handleUsernameToken(Element token, CallbackHandler cb) throws WSSecurityException {
         UsernameToken ut = new UsernameToken(wssConfig, token);
         String user = ut.getName();
         String password = ut.getPassword();
         String nonce = ut.getNonce();
         String createdTime = ut.getCreated();
+        String pwType = ut.getPasswordType(); 
         if (doDebug) {
             log.debug("UsernameToken user " + user);
             log.debug("UsernameToken password " + password);
         }
+
+        Callback[] callbacks = new Callback[1];
         if (ut.isHashed()) {
             if (cb == null) {
                 throw new WSSecurityException(WSSecurityException.FAILURE,
@@ -826,7 +848,6 @@ public class WSSecurityEngine {
             }
 
             WSPasswordCallback pwCb = new WSPasswordCallback(user, WSPasswordCallback.USERNAME_TOKEN);
-            Callback[] callbacks = new Callback[1];
             callbacks[0] = pwCb;
             try {
                 cb.handle(callbacks);
@@ -854,11 +875,26 @@ public class WSSecurityEngine {
                 }
             }
         }
+        else if (cb != null) {
+			WSPasswordCallback pwCb = new WSPasswordCallback(user, password,
+					pwType, WSPasswordCallback.USERNAME_TOKEN_UNKNOWN);
+			callbacks[0] = pwCb;
+			try {
+				cb.handle(callbacks);
+			} catch (IOException e) {
+				throw new WSSecurityException(WSSecurityException.FAILURE,
+						"noPassword", new Object[] { user });
+			} catch (UnsupportedCallbackException e) {
+				throw new WSSecurityException(WSSecurityException.FAILURE,
+						"noPassword", new Object[] { user });
+			}
+       }
 
         WSUsernameTokenPrincipal principal = new WSUsernameTokenPrincipal(user, ut.isHashed());
         principal.setNonce(nonce);
         principal.setPassword(password);
         principal.setCreatedTime(createdTime);
+        principal.setPasswordType(pwType);
 
         return principal;
     }
