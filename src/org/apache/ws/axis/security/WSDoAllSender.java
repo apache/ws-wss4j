@@ -943,6 +943,9 @@ public class WSDoAllSender extends BasicHandler {
                     nmSpace = reqData.soapConstants.getEnvelopeURI();
                 } else {
                     nmSpace = nmSpace.substring(1);
+                    if (nmSpace.equals("Null")) {
+                    	nmSpace = null;
+                    }
                 }
                 String element = partDef[2].trim();
                 if (doDebug) {
