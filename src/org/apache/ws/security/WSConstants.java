@@ -135,6 +135,7 @@ public class WSConstants {
     public static final String ATTR_ACTOR = "actor";
     public static final String ATTR_ROLE = "role";
 
+    public static final String NULL_NS = "Null";
     /**
      * Sets the {@link org.apache.ws.security.message.WSSAddUsernameToken#build(Document, String, String) UserNameToken}
      * method to use a password digest to send the password information
