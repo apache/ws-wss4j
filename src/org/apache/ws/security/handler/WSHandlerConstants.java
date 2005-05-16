@@ -23,7 +23,11 @@ import java.util.Hashtable;
 import java.util.Map;
 
 /**
- * @author Werner Dittmann (Werner.Dittmann@siemens.com)
+ * This class defines the names, actions, and other string for the deployment
+ * data of the WSS handler. Both the Axis handler as well as the JAX-RPC handler
+ * use this class.
+ *  
+ * @author Werner Dittmann (werner@apache.org)
  */
 public class WSHandlerConstants {
 
@@ -98,6 +102,12 @@ public class WSHandlerConstants {
      */
     public static final String NO_SERIALIZATION = "NoSerialization";
 
+    /**
+     * Use this to use a specific signature mechanism for .Net.
+     * This signature mechanism uses data from the username token and
+     * a well defined constant string and constructs a signature
+     * key. 
+     */
     public static final String SIGN_WITH_UT_KEY = "UsernameTokenSignature";
     /**
      * This is an interal property name to support handler chaining.
@@ -202,6 +212,10 @@ public class WSHandlerConstants {
     /**
      * The Axis WSS4J handlers provide several ways to get the password required
      * to construct a username token or to sign a message.
+     * In addition the callback class may check if a username/password
+     * combination is valid. Refer to the documentation of 
+     * {@link org.apache.ws.security.WSPasswordCallback} for more information
+     * about this feature.
      * <ul>
      * <li> A class that implements a callback interface (see below). The
      * handler loads this class and calls the callback method. This
@@ -213,7 +227,7 @@ public class WSHandlerConstants {
      * <li> The application sets the password directly using the
      * <code>setPassword</code> function of the <code>Call</code>.
      * </ul>
-     * The callback class or callback object must implement specific password
+     * The callback class or callback object shall implement specific password
      * getter methods, for example reading a database or directory.
      * <p/>
      * The handler first checks if it can get a the password via a callback
@@ -295,8 +309,11 @@ public class WSHandlerConstants {
     public static final String ENCRYPTION_USER = "encryptionUser";
 
     /**
-     * This is a special user name. Specifying this name as {@link ENCRYPTION_USER}
+     * Specifying this name as {@link ENCRYPTION_USER}
      * triggers a special action to get the public key to use for encryption.
+     * The handler uses the public key of the sender's certificate. Using this
+     * way to define an encryption key simplifies certificate management to
+     * a large extend.
      */
     public static final String USE_REQ_SIG_CERT = "useReqSigCert";
 
@@ -493,6 +510,10 @@ public class WSHandlerConstants {
      * &lt;parameter name="signatureParts"
      *   value="{}{http://schemas.xmlsoap.org/soap/envelope/}Body; Token" />
      * </pre>
+     * To specify an element without a namespace use the string
+     * <code>Null</code> as the namespace name (this is a case sensitive
+     * string)
+     * <p/>
      * If there is no other element in the request with a local name of
      * <code>Body</code> then the SOAP namespace identifier can be empty
      * (<code>{}</code>).
@@ -598,8 +619,12 @@ public class WSHandlerConstants {
      * encryption mode for an <code>UserName</code> element in the SOAP
      * namespace.
      * <p/>
+     * To specify an element without a namespace use the string
+     * <code>Null</code> as the namespace name (this is a case sensitive
+     * string)
+     * <p/>
      * If no list is specified, the handler encrypts the SOAP Body in
-     * <code>Content</code> mode
+     * <code>Content</code> mode by default.
      */
     public static final String ENCRYPTION_PARTS = "encryptionParts";
 
