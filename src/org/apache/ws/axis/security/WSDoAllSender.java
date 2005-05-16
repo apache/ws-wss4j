@@ -60,7 +60,7 @@ import java.util.Hashtable;
 import java.util.Vector;
 
 /**
- * @author Werner Dittmann (Werner.Dittmann@siemens.com)
+ * @author Werner Dittmann (werner@apache.org)
  */
 public class WSDoAllSender extends BasicHandler {
 
@@ -943,7 +943,7 @@ public class WSDoAllSender extends BasicHandler {
                     nmSpace = reqData.soapConstants.getEnvelopeURI();
                 } else {
                     nmSpace = nmSpace.substring(1);
-                    if (nmSpace.equals("Null")) {
+                    if (nmSpace.equals(WSConstants.NULL_NS)) {
                     	nmSpace = null;
                     }
                 }
