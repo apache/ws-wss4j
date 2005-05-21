@@ -52,6 +52,7 @@ import org.w3c.dom.Document;
 
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
+import javax.xml.rpc.JAXRPCException;
 
 import java.io.ByteArrayOutputStream;
 import java.io.UnsupportedEncodingException;
@@ -519,15 +520,7 @@ public class WSDoAllSender extends BasicHandler {
     private void performSTAction(int actionToDo, boolean mu, Document doc, RequestData reqData)
             throws AxisFault {
         WSSAddSAMLToken builder = new WSSAddSAMLToken(reqData.actor, mu);
-
-        String samlPropFile = null;
-        if ((samlPropFile =
-                (String) getOption(WSHandlerConstants.SAML_PROP_FILE))
-                == null) {
-            samlPropFile =
-                    (String) reqData.msgContext.getProperty(WSHandlerConstants.SAML_PROP_FILE);
-        }
-        SAMLIssuer saml = SAMLIssuerFactory.getInstance(samlPropFile);
+        SAMLIssuer saml = loadSamlIssuer(reqData);
         saml.setUsername(reqData.username);
         SAMLAssertion assertion = saml.newAssertion();
 
@@ -537,19 +530,9 @@ public class WSDoAllSender extends BasicHandler {
 
     private void performST_SIGNAction(int actionToDo, boolean mu, Document doc, RequestData reqData)
             throws AxisFault {
-        String samlPropFile = null;
-        if ((samlPropFile =
-                (String) getOption(WSHandlerConstants.SAML_PROP_FILE))
-                == null) {
-            samlPropFile =
-                    (String) reqData.msgContext.getProperty(WSHandlerConstants.SAML_PROP_FILE);
-        }
         Crypto crypto = null;
-        try {
-            crypto = loadSignatureCrypto(reqData);
-        } catch (AxisFault ex) {
-        }
-        SAMLIssuer saml = SAMLIssuerFactory.getInstance(samlPropFile);
+        crypto = loadSignatureCrypto(reqData);
+        SAMLIssuer saml = loadSamlIssuer(reqData);
         saml.setUsername(reqData.username);
         saml.setUserCrypto(crypto);
         saml.setInstanceDoc(doc);
@@ -670,6 +653,18 @@ public class WSDoAllSender extends BasicHandler {
             throw new AxisFault("WSDoAllSender: Encryption: no crypto property file");
         }
         return crypto;
+    }
+
+    protected SAMLIssuer loadSamlIssuer(RequestData reqData) throws JAXRPCException{
+        String samlPropFile = null;
+        
+        if ((samlPropFile =
+            (String) getOption(WSHandlerConstants.SAML_PROP_FILE))
+            == null) {
+        samlPropFile =
+                (String) reqData.msgContext.getProperty(WSHandlerConstants.SAML_PROP_FILE);
+    }
+        return SAMLIssuerFactory.getInstance(samlPropFile);  
     }
 
     private void decodeUTParameter(RequestData reqData) throws AxisFault {
