@@ -18,7 +18,7 @@
 package org.apache.ws.axis.security;
 
 /**
- * @author Werner Dittmann (Werner.Dittmann@siemens.com)
+ * @author Werner Dittmann (werner@apache.org)
  *
  */
 

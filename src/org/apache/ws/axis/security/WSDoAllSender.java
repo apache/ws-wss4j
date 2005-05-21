@@ -52,7 +52,6 @@ import org.w3c.dom.Document;
 
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
-import javax.xml.rpc.JAXRPCException;
 
 import java.io.ByteArrayOutputStream;
 import java.io.UnsupportedEncodingException;
@@ -78,7 +77,7 @@ public class WSDoAllSender extends BasicHandler {
      * 
      * @author wdi
      */
-    private class RequestData {
+    protected class RequestData {
         MessageContext msgContext = null;
 
         boolean noSerialization = false;
@@ -174,7 +173,7 @@ public class WSDoAllSender extends BasicHandler {
 						.getProperty(WSHandlerConstants.ACTION);
 			}
 			if (action == null) {
-				throw new AxisFault("WSDoAllReceiver: No action defined");
+				throw new AxisFault("WSDoAllSender: No action defined");
 			}
 			int doAction = AxisUtil.decodeAction(action, actions);
 			if (doAction == WSConstants.NO_SECURITY) {
@@ -664,7 +663,7 @@ public class WSDoAllSender extends BasicHandler {
         return crypto;
     }
 
-    protected SAMLIssuer loadSamlIssuer(RequestData reqData) throws JAXRPCException{
+    protected SAMLIssuer loadSamlIssuer(RequestData reqData) {
         String samlPropFile = null;
         
         if ((samlPropFile =
