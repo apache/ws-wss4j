@@ -531,7 +531,16 @@ public class WSDoAllSender extends BasicHandler {
     private void performST_SIGNAction(int actionToDo, boolean mu, Document doc, RequestData reqData)
             throws AxisFault {
         Crypto crypto = null;
-        crypto = loadSignatureCrypto(reqData);
+        /*
+         * it is possible and legal that we do not have a signature
+         * crypto here - thus ignore the exception. This is usually
+         * the case for the SAML option "sender vouches". In this case
+         * no user crypto is required.
+         */
+        try {
+        	crypto = loadSignatureCrypto(reqData);
+        } catch (AxisFault ex) {}
+        
         SAMLIssuer saml = loadSamlIssuer(reqData);
         saml.setUsername(reqData.username);
         saml.setUserCrypto(crypto);
