@@ -39,6 +39,7 @@ import org.apache.ws.security.saml.SAMLIssuerFactory;
 import org.apache.ws.security.util.StringUtil;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.xml.security.signature.XMLSignature;
+import org.apache.xml.security.utils.XMLUtils;
 import org.opensaml.SAMLAssertion;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -369,7 +370,8 @@ public class WSS4JHandler implements Handler {
             msgContext.setProperty(WSHandlerConstants.SND_SECURITY, doc);
         } else {
             ByteArrayOutputStream os = new ByteArrayOutputStream();
-            documentToStream(doc, os);
+            // documentToStream(doc, os);
+			XMLUtils.outputDOM(doc, os, true);
 
             try {
                 sPart.setContent(new StreamSource(new ByteArrayInputStream(os.toByteArray())));
@@ -485,7 +487,8 @@ handle response
         */
 
         ByteArrayOutputStream os = new ByteArrayOutputStream();
-        documentToStream(doc, os);
+        // documentToStream(doc, os);
+		XMLUtils.outputDOM(doc, os, true);
         try {
             sPart.setContent(new StreamSource(new ByteArrayInputStream(os.toByteArray())));
         } catch (SOAPException se) {
@@ -967,7 +970,18 @@ handle response
         }
         return crypto;
     }
-
+    
+    protected SAMLIssuer loadSamlIssuer() throws JAXRPCException{
+        String samlPropFile = null;
+        if ((samlPropFile =
+                (String) handlerInfo.getHandlerConfig().get(WSHandlerConstants.SAML_PROP_FILE))
+                == null) {
+            samlPropFile =
+                    (String) msgContext.getProperty(WSHandlerConstants.SAML_PROP_FILE);
+        }
+        return SAMLIssuerFactory.getInstance(samlPropFile);  
+    }
+    
     private void decodeSignatureParameter() throws JAXRPCException {
         sigCrypto = loadSignatureCrypto();
         /* There are currently no other signature parameters that need to be handled
@@ -1131,15 +1145,7 @@ handle response
     private void performSTAction(boolean mu, Document doc)
             throws JAXRPCException {
         WSSAddSAMLToken builder = new WSSAddSAMLToken(actor, mu);
-
-        String samlPropFile = null;
-        if ((samlPropFile =
-                (String) handlerInfo.getHandlerConfig().get(WSHandlerConstants.SAML_PROP_FILE))
-                == null) {
-            samlPropFile =
-                    (String) msgContext.getProperty(WSHandlerConstants.SAML_PROP_FILE);
-        }
-        SAMLIssuer saml = SAMLIssuerFactory.getInstance(samlPropFile);
+        SAMLIssuer saml = loadSamlIssuer();
         saml.setUsername(username);
         SAMLAssertion assertion = saml.newAssertion();
 
@@ -1149,16 +1155,9 @@ handle response
 
     private void performST_SIGNAction(int actionToDo, boolean mu, Document doc)
             throws JAXRPCException {
-        String samlPropFile = null;
-        if ((samlPropFile =
-                (String) handlerInfo.getHandlerConfig().get(WSHandlerConstants.SAML_PROP_FILE))
-                == null) {
-            samlPropFile =
-                    (String) msgContext.getProperty(WSHandlerConstants.SAML_PROP_FILE);
-        }
         Crypto crypto = null;
         crypto = loadSignatureCrypto();
-        SAMLIssuer saml = SAMLIssuerFactory.getInstance(samlPropFile);
+        SAMLIssuer saml = loadSamlIssuer();
 
         saml.setUsername(username);
         saml.setUserCrypto(crypto);
