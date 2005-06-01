@@ -43,8 +43,6 @@ import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.conversation.message.info.DerivedKeyInfo;
 import org.apache.ws.security.conversation.message.info.SecurityContextInfo;
 import org.apache.ws.security.conversation.message.token.DerivedKeyToken;
-import org.apache.ws.security.conversation.message.token.RequestSecurityTokenResponse;
-import org.apache.ws.security.conversation.message.token.RequestedProofToken;
 import org.apache.ws.security.conversation.message.token.SecurityContextToken;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.message.EnvelopeIdResolver;
@@ -53,6 +51,8 @@ import org.apache.ws.security.message.token.SecurityTokenReference;
 import org.apache.ws.security.trust.TrustConstants;
 import org.apache.ws.security.trust.TrustEngine;
 import org.apache.ws.security.trust.WSTrustException;
+import org.apache.ws.security.trust.message.token.RequestSecurityTokenResponse;
+import org.apache.ws.security.trust.message.token.RequestedProofToken;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.xml.security.encryption.XMLCipher;
 import org.apache.xml.security.encryption.XMLEncryptionException;
@@ -565,7 +565,7 @@ public class ConversationEngine {
             //  System.out.println("ref.getURI()" + ref.getURI());
 
             //If the reference type is a derived key token
-            if (valueType.equals(ConversationConstants.VALUE_TYPE_DERIVED_KEY)) {
+            if (valueType.equals(ConversationConstants.TOKEN_TYPE_DERIVED_KEY_TOKEN)) {
             	//Get hold of the DerivedKeyToken 'Element'
                 Element ele =
                     WSSecurityUtil.getElementByWsuId(

@@ -16,43 +16,40 @@
  */
 package org.apache.ws.security.trust.message.token;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.TimeZone;
+
+import javax.xml.namespace.QName;
+
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.trust.TrustConstants;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import javax.xml.namespace.QName;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.TimeZone;
-
 /**
  * @author Malinda Kaushalye
+ * @author Ruchith Fernando
  *         Lifetime token
  */
 
-public class LifeTime {
+public class Lifetime extends AbstractToken {
 
-    public Element element;
     public Element created;
     public Element expires;
+
     public static final QName TOKEN = new QName(TrustConstants.WST_NS, TrustConstants.LIFE_TIME_LN, TrustConstants.WST_PREFIX);
-
-
-
-
-//new
     
     /**
-     * Constructor for LifeTime
+     * Constructor for Lifetime
      *
      * @param doc
      * @param created
      * @param expires
      */
-    public LifeTime(Document doc, String created, String expires) {
-        this.element = doc.createElementNS(TOKEN.getNamespaceURI(), "wst:" + TOKEN.getLocalPart());
+    public Lifetime(Document doc, String created, String expires) {
+    	super(doc);
         this.created = doc.createElementNS(TrustConstants.WST_NS, "wst:" + TrustConstants.CREATED_LN);
         this.expires = doc.createElementNS(TrustConstants.WST_NS, "wst:" + TrustConstants.EXPIRES_LN);
 
@@ -63,23 +60,14 @@ public class LifeTime {
     }
 
     /**
-     * Constructor for LifeTime
+     * Constructor for Lifetime
      * Check for created and epires elements
      *
      * @param elem
      * @throws WSSecurityException
      */
-    //new
-    public LifeTime(Element elem) throws WSSecurityException {
-        this.element = elem;
-        QName el =
-                new QName(this.element.getNamespaceURI(),
-                        this.element.getLocalName());
-        if (!el.equals(TOKEN)) {
-            throw new WSSecurityException(WSSecurityException.INVALID_SECURITY_TOKEN,
-                    "badTokenType00",
-                    new Object[]{el});
-        }
+    public Lifetime(Element elem) throws WSSecurityException {
+    	super(elem);
 
         this.created =
                 (Element) WSSecurityUtil.getDirectChild(elem,
@@ -93,24 +81,23 @@ public class LifeTime {
     }
 
     /**
-     * Constructor for LifeTime
+     * Constructor for Lifetime
      *
      * @param doc
      * @param duration in minutes
      */
     //new
 
-    public LifeTime(Document doc, int duration) {
-
+    public Lifetime(Document doc, int duration) {
+    	super(doc);
+    	
         SimpleDateFormat sdtf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
         sdtf.setTimeZone(TimeZone.getTimeZone("GMT"));
         Calendar rightNow = Calendar.getInstance();
         Calendar expires = Calendar.getInstance();
-        this.element = doc.createElementNS(TOKEN.getNamespaceURI(), "wst:" + TOKEN.getLocalPart());
-        WSSecurityUtil.setNamespace(this.element, TOKEN.getNamespaceURI(), TrustConstants.WST_PREFIX);
-        this.created = doc.createElementNS(TrustConstants.WST_NS, "wst:" + TrustConstants.CREATED_LN);
+        this.created = doc.createElementNS(TrustConstants.WST_NS, TrustConstants.WST_PREFIX + ":" + TrustConstants.CREATED_LN);
         WSSecurityUtil.setNamespace(this.created, TOKEN.getNamespaceURI(), TrustConstants.WST_PREFIX);
-        this.expires = doc.createElementNS(TrustConstants.WST_NS, "wst:" + TrustConstants.EXPIRES_LN);
+        this.expires = doc.createElementNS(TrustConstants.WST_NS, TrustConstants.WST_PREFIX + ":" + TrustConstants.EXPIRES_LN);
         WSSecurityUtil.setNamespace(this.expires, TOKEN.getNamespaceURI(), TrustConstants.WST_PREFIX);
         this.created.appendChild(doc.createTextNode(sdtf.format(rightNow.getTime())));
 
@@ -122,65 +109,12 @@ public class LifeTime {
         this.element.appendChild(this.expires);
 
     }
-    
-    /**
-     * 
-     * @param duration in minutes
-     */
-//    old
-//    public LifeTime(int duration) {
-//        this.ltt=new LifetimeType();
-//        SimpleDateFormat sdtf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-//        sdtf.setTimeZone(TimeZone.getTimeZone("GMT"));
-//        Calendar rightNow = Calendar.getInstance();
-//        Calendar expires= Calendar.getInstance();
-//        ltt.setCreated(new AttributedDateTime(sdtf.format(rightNow.getTime())));
-//        long exp=rightNow.getTimeInMillis()+duration*1000*60;
-//        expires.setTimeInMillis(exp);        
-//        ltt.setExpires(new AttributedDateTime(sdtf.format(expires.getTime())));        
-//    }
-////    old
-//    public String getCreated(){
-//        return this.ltt.getCreated().getValue();
-//    }
-////    old
-//    public String getExpires(){
-//        return this.ltt.getExpires().getValue();
-//    }
-//    
-////    old
-//    public void setCreated(String created){
-//        this.ltt.setCreated(new AttributedDateTime(created));
-//    }
-////    old
-//    public void setExpires(String expires){
-//        this.ltt.setExpires(new AttributedDateTime(expires));            
-//    }
-////    old
-//    public Element getLifeTimeElement(Document doc){
-//        Element elemLT = doc.createElementNS(LifetimeType.getTypeDesc().getXmlType().getNamespaceURI(),"wst:"+TrustConstants.LIFE_TIME_LN);
-//        Element elemCrt = doc.createElementNS(LifetimeType.getTypeDesc().getXmlType().getNamespaceURI(),"wst:"+TrustConstants.CREATED_LN);
-//        Element elemExp = doc.createElementNS(LifetimeType.getTypeDesc().getXmlType().getNamespaceURI(),"wst:"+TrustConstants.EXPIRES_LN);
-//        elemCrt.appendChild(doc.createTextNode(this.getCreated()));        
-//        elemExp.appendChild(doc.createTextNode(this.getExpires()));     
-//        elemLT.appendChild(elemCrt);
-//        elemLT.appendChild(elemExp);
-//        return elemLT;
-//    }
-
 
     /**
      * @return
      */
     public Element getCreated() {
         return created;
-    }
-
-    /**
-     * @return
-     */
-    public Element getElement() {
-        return element;
     }
 
     /**
@@ -197,12 +131,6 @@ public class LifeTime {
         created = element;
     }
 
-    /**
-     * @param element
-     */
-    public void setElement(Element element) {
-        this.element = element;
-    }
 
     /**
      * @param element
@@ -210,5 +138,12 @@ public class LifeTime {
     public void setExpires(Element element) {
         expires = element;
     }
-
+    
+	/**
+	 * Returns the QName of this type
+	 * @see org.apache.ws.security.trust.message.token.AbstractToken#getToken()
+	 */
+	protected QName getToken() {
+		return TOKEN;
+	}
 }

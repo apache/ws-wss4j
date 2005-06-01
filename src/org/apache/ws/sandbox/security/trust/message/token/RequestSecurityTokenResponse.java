@@ -15,14 +15,13 @@
  *
  */
 
-package org.apache.ws.security.conversation.message.token;
+package org.apache.ws.security.trust.message.token;
 
 import org.apache.axis.components.logger.LogFactory;
 import org.apache.commons.logging.Log;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.trust.TrustConstants;
-import org.apache.ws.security.trust.message.token.TokenType;
 import org.apache.ws.security.util.DOM2Writer;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.xml.security.utils.XMLUtils;
@@ -57,9 +56,7 @@ public class RequestSecurityTokenResponse {
      * @throws java.lang.Exception
      */
     public RequestSecurityTokenResponse(Document doc) throws Exception {
-        this.element =
-                doc.createElementNS(TOKEN.getNamespaceURI(),
-                        TOKEN.getPrefix() + ":" + TOKEN.getLocalPart());
+        this.element = doc.createElementNS(TOKEN.getNamespaceURI(), TOKEN.getPrefix() + ":" + TOKEN.getLocalPart());
         WSSecurityUtil.setNamespace(this.element,
                 TOKEN.getNamespaceURI(),
                 TrustConstants.WST_PREFIX);
@@ -154,7 +151,7 @@ public class RequestSecurityTokenResponse {
 //                    elem.getOwnerDocument(),
 //                    RequestedProofToken.TOKEN.getLocalPart(),
 //                    RequestedProofToken.TOKEN.getNamespaceURI()));
-        //this.lifeTime=(Element)WSSecurityUtil.findElement(elem.getOwnerDocument(),LifeTime.TOKEN.getLocalPart(),LifeTime.TOKEN.getNamespaceURI());
+        //this.lifeTime=(Element)WSSecurityUtil.findElement(elem.getOwnerDocument(),Lifetime.TOKEN.getLocalPart(),Lifetime.TOKEN.getNamespaceURI());
 
         //System.out.println("RequestSecurityTokenResponse created");
 
@@ -205,8 +202,7 @@ public class RequestSecurityTokenResponse {
     public void build(Document doc) {
         Element securityHeader = WSSecurityUtil.findWsseSecurityHeaderBlock(WSSConfig.getDefaultWSConfig(), doc, doc.getDocumentElement(), true);
         WSSecurityUtil.appendChildElement(doc, securityHeader, this.element);
-//              WSSecurityUtil.setNamespace(securityHeader, WSConstants.WSU_NS,
-        //                                          WSConstants.WSU_PREFIX);
+
         if (log.isInfoEnabled()) {
             ByteArrayOutputStream os = new ByteArrayOutputStream();
             XMLUtils.outputDOM(doc, os, true);

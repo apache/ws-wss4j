@@ -17,8 +17,6 @@
 package org.apache.ws.axis.security.trust.secconv.interop;
 
 import java.net.MalformedURLException;
-import java.net.URL;
-
 import java.util.Hashtable;
 
 import javax.xml.rpc.ServiceException;
@@ -29,22 +27,20 @@ import org.apache.axis.message.addressing.Action;
 import org.apache.axis.message.addressing.Address;
 import org.apache.axis.message.addressing.EndpointReference;
 import org.apache.axis.message.addressing.MessageID;
-import org.apache.axis.message.addressing.RelatesTo;
 import org.apache.axis.message.addressing.ReplyTo;
 import org.apache.axis.message.addressing.To;
 import org.apache.axis.message.addressing.uuid.AxisUUIdGenerator;
-import org.apache.axis.utils.XMLUtils;
+import org.apache.axis.types.URI;
 import org.apache.ws.addressing.uuid.UUIdGeneratorFactory;
 import org.apache.ws.axis.security.trust.STSAgent;
 import org.apache.ws.axis.security.trust.STSAgentAddressingConfiguration;
 import org.apache.ws.security.conversation.ConversationUtil;
-import org.apache.ws.security.conversation.message.token.RequestSecurityTokenResponse;
 import org.apache.ws.security.policy.message.token.AppliesTo;
-import org.apache.ws.security.trust.RSTR_Parser;
+import org.apache.ws.security.trust.RSTRParser;
 import org.apache.ws.security.trust.TrustConstants;
 import org.apache.ws.security.trust.message.token.BinarySecret;
 import org.apache.ws.security.trust.message.token.Entropy;
-import org.apache.axis.types.URI;
+import org.apache.ws.security.trust.message.token.RequestSecurityTokenResponse;
 import org.w3c.dom.Element;
 
 /**
@@ -62,7 +58,7 @@ public class UNT2SAMLRequester {
 
  */	
 	Element resp = null;
-	private RSTR_Parser parser= null;
+	private RSTRParser parser= null;
 	private String requestNonce = null;
 	
 	
@@ -139,7 +135,7 @@ public class UNT2SAMLRequester {
                
                this.requestNonce = ConversationUtil.generateNonce(128);
                BinarySecret binSec = new BinarySecret(sTSAgent.getDoc());
-               binSec.setTypeAttribute(BinarySecret.NONCE_VAL);
+               binSec.setTypeAttribute(TrustConstants.BINARY_SECRET_NONCE_VAL);
                binSec.setBinarySecretValue(requestNonce);
                
                Entropy entropy = new Entropy(sTSAgent.getDoc());               
@@ -154,7 +150,7 @@ public class UNT2SAMLRequester {
                
 //			Get the rstr  
 			   Element rstrEle = (Element)(resp.getElementsByTagNameNS(TrustConstants.WST_NS, TrustConstants.REQUEST_SECURITY_TOKEN_RESPONSE_LN)).item(0);
-			   parser = new RSTR_Parser();
+			   parser = new RSTRParser();
 			   parser.processRSTR(new RequestSecurityTokenResponse(rstrEle)); 
 			   
 	        
@@ -174,14 +170,14 @@ public class UNT2SAMLRequester {
 	/**
 	 * @return
 	 */
-	public RSTR_Parser getParser() {
+	public RSTRParser getParser() {
 		return parser;
 	}
 
 	/**
 	 * @param parser
 	 */
-	public void setParser(RSTR_Parser parser) {
+	public void setParser(RSTRParser parser) {
 		this.parser = parser;
 	}
 	

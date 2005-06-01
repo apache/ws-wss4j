@@ -14,7 +14,7 @@
  *  limitations under the License.
  *
  */
-package org.apache.ws.security.conversation.message.token;
+package org.apache.ws.security.trust.message.token;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -55,6 +55,7 @@ import java.security.cert.X509Certificate;
 
 /**
  * @author Dimuthu Leelarathne. (muthulee@yahoo.com)
+ * @author Ruchith Fernando
  */
 public class RequestedProofToken {
     private static Log log =

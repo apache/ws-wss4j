@@ -35,7 +35,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.axis.security.WSDoAllReceiver;
 import org.apache.ws.axis.security.WSDoAllSender;
-import org.apache.ws.security.conversation.message.token.RequestSecurityToken;
+import org.apache.ws.security.trust.message.token.RequestSecurityToken;
 import org.apache.ws.security.trust.message.token.RequestType;
 import org.apache.ws.security.trust.message.token.TokenType;
 import org.w3c.dom.Document;

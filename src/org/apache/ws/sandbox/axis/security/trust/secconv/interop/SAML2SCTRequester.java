@@ -25,19 +25,15 @@ import java.util.Vector;
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
-import javax.xml.rpc.ServiceException;
-import javax.xml.soap.SOAPHeader;
 import javax.xml.soap.SOAPHeaderElement;
 
 import org.apache.axis.AxisFault;
 import org.apache.axis.Message;
-import org.apache.axis.MessageContext;
 import org.apache.axis.SOAPPart;
 import org.apache.axis.client.Call;
 import org.apache.axis.client.Service;
 import org.apache.axis.encoding.Base64;
 import org.apache.axis.message.SOAPEnvelope;
-
 import org.apache.axis.message.addressing.Action;
 import org.apache.axis.message.addressing.Address;
 import org.apache.axis.message.addressing.Constants;
@@ -46,32 +42,21 @@ import org.apache.axis.message.addressing.MessageID;
 import org.apache.axis.message.addressing.ReplyTo;
 import org.apache.axis.message.addressing.To;
 import org.apache.axis.message.addressing.uuid.AxisUUIdGenerator;
-
-import org.apache.axis.soap.SOAPConstants;
 import org.apache.axis.types.URI;
 import org.apache.axis.types.URI.MalformedURIException;
-import org.apache.axis.utils.DOM2Writer;
-
 import org.apache.ws.addressing.uuid.UUIdGeneratorFactory;
-import org.apache.ws.axis.security.WSDoAllSender;
 import org.apache.ws.axis.security.conversation.ConvHandlerConstants;
 import org.apache.ws.axis.security.conversation.ConversationClientHandler;
-import org.apache.ws.axis.security.trust.STSAgent;
-import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSEncryptionPart;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.conversation.ConversationEngine;
 import org.apache.ws.security.conversation.ConversationException;
 import org.apache.ws.security.conversation.ConversationManager;
 import org.apache.ws.security.conversation.ConversationUtil;
 import org.apache.ws.security.conversation.DerivedKeyCallbackHandler;
 import org.apache.ws.security.conversation.message.info.DerivedKeyInfo;
-import org.apache.ws.security.conversation.message.token.RequestSecurityToken;
 import org.apache.ws.security.conversation.message.token.SecurityContextToken;
-import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.message.WSAddTimestamp;
-import org.apache.ws.security.message.WSBaseMessage;
 import org.apache.ws.security.message.WSSAddSAMLToken;
 import org.apache.ws.security.message.token.Reference;
 import org.apache.ws.security.message.token.SecurityTokenReference;
@@ -80,17 +65,14 @@ import org.apache.ws.security.trust.TrustConstants;
 import org.apache.ws.security.trust.WSTrustException;
 import org.apache.ws.security.trust.message.token.BinarySecret;
 import org.apache.ws.security.trust.message.token.Entropy;
+import org.apache.ws.security.trust.message.token.RequestSecurityToken;
 import org.apache.ws.security.trust.message.token.RequestType;
 import org.apache.ws.security.trust.message.token.TokenType;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.xml.security.utils.XMLUtils;
-
 import org.opensaml.SAMLAssertion;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-
-import sun.security.x509.KeyIdentifier;
 
 /**
  * @author Dimuthu Leelarathne. (muthulee@yahoo.com)
@@ -191,7 +173,7 @@ public class SAML2SCTRequester implements RST_Requester {
             SecretKey key = keyGen.generateKey();
 
             BinarySecret binSec = new BinarySecret(doc);
-            binSec.setTypeAttribute(BinarySecret.NONCE_VAL);
+            binSec.setTypeAttribute(TrustConstants.BINARY_SECRET_NONCE_VAL);
             binSec.setBinarySecretValue(Base64.encode(key.getEncoded()));
             // binSec.setBinarySecretValue(ConversationUtil.generateNonce(16));
             Entropy entropy = new Entropy(doc);

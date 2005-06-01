@@ -16,41 +16,25 @@
  */
 package org.apache.ws.axis.security.trust.secconv.interop;
 
-import java.io.ByteArrayOutputStream;
 import java.net.URL;
 import java.security.NoSuchAlgorithmException;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Properties;
 
-import javax.crypto.KeyGenerator;
-import javax.crypto.SecretKey;
-
 import org.apache.axis.utils.DOM2Writer;
-//import org.apache.axis.utils.XMLUtils;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.conversation.ConversationConstants;
-import org.apache.ws.security.conversation.ConversationUtil;
 import org.apache.ws.security.conversation.DerivedKeyCallbackHandler;
 import org.apache.ws.security.conversation.message.info.SecurityContextInfo;
-import org
-    .apache
-    .ws
-    .security
-    .conversation
-    .message
-    .token
-    .RequestSecurityTokenResponse;
-import org.apache.ws.security.conversation.message.token.RequestedSecurityToken;
 import org.apache.ws.security.conversation.message.token.SecurityContextToken;
-import org.apache.ws.security.trust.RSTR_Parser;
+import org.apache.ws.security.trust.RSTRParser;
 import org.apache.ws.security.trust.TrustConstants;
 import org.apache.ws.security.trust.WSTrustException;
+import org.apache.ws.security.trust.message.token.RequestSecurityTokenResponse;
+import org.apache.ws.security.trust.message.token.RequestedSecurityToken;
 import org.apache.ws.security.util.Loader;
 import org.apache.ws.security.util.WSSecurityUtil;
-import org.apache.xml.security.exceptions.Base64DecodingException;
-import org.apache.xml.security.utils.Base64;
-import org.apache.xml.security.utils.XMLUtils;
 import org.opensaml.SAMLAssertion;
 import org.opensaml.SAMLException;
 import org.w3c.dom.Document;
@@ -92,7 +76,7 @@ public class InteropHandshaker {
             initReq.setIpViaTCMPMon(ipViaTCMPMon);
             
             initReq.peformRST(opt);
-            RSTR_Parser parser = null; // initReq.getParser();
+            RSTRParser parser = null; // initReq.getParser();
 
             parser = initReq.getParser();
 
@@ -161,7 +145,7 @@ public class InteropHandshaker {
 
 		    //process the response.
             Document resSCTdoc = secondReq.getDocRes();
-            RSTR_Parser sec_Pars = new RSTR_Parser();
+            RSTRParser sec_Pars = new RSTRParser();
            
 //            ByteArrayOutputStream os = new ByteArrayOutputStream();
 //            XMLUtils.outputDOM(resSCTdoc, os, true);

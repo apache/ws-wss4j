@@ -1,42 +1,37 @@
+<!-- Use this file to deploy some handlers/chains and services      -->
+<!-- Two ways to do this:                                           -->
+<!--   java org.apache.axis.client.AdminClient deploy.wsdd          -->
+<!--      after the axis server is running                          -->
+<!-- or                                                             -->
+<!--   java org.apache.axis.utils.Admin client|server deploy.wsdd   -->
+<!--      from the same directory that the Axis engine runs         -->
+
 <deployment
     xmlns="http://xml.apache.org/axis/wsdd/"
     xmlns:java="http://xml.apache.org/axis/wsdd/providers/java">
 
- <service name="WSConvScenario1" provider="java:RPC" style="wrapped" use="literal">
-  <operation name="ping" qname="ns1:Ping" soapAction="" xmlns:ns1="http://xmlsoap.org/Ping">
-   <parameter qname="ns1:ticket" type="ns1:ticketType"/>
-   <parameter mode="inout" qname="ns1:text" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
-  </operation>
-  <requestFlow>
-   <handler type="java:org.apache.ws.axis.security.conversation.ConversationServerHandler">
-    <parameter name="keyFrequency" value="1"/>
-    <parameter name="sessionDuration" value="150000"/>
-    <parameter name="derivedKeyAction" value="Encrypt"/>
-    <parameter name="passwordCallbackClass" value="secconv.scenarios.ping.PWCallback"/>
-    <parameter name="generation" value="0"/>
-    <parameter name="keyLegnth" value="24"/>
-    <parameter name="useFixedKeyLegnth" value="true"/>
-    <parameter name="reapFrequency" value="1000"/>
-    <parameter name="decryptionPropFile" value="crypto.properties"/>
-   </handler>
-  </requestFlow>
-  <responseFlow>
-   <handler type="java:org.apache.ws.axis.security.conversation.ConversationServerHandler">
-    <parameter name="keyFrequency" value="1"/>
-    <parameter name="derivedKeyAction" value="Encrypt"/>
-    <parameter name="passwordCallbackClass" value="secconv.scenarios.ping.PWCallback"/>
-    <parameter name="dkEncryptionAlgorithm" value="http://www.w3.org/2001/04/xmlenc#tripledes-cbc" />
-    <parameter name="generation" value="0"/>
-    <parameter name="keyLegnth" value="24"/>
-    <parameter name="useFixedKeyLegnth" value="true"/>
-   </handler>
-  </responseFlow>
-  <parameter name="allowedMethods" value="ping"/>
-  <parameter name="wsdlPortType" value="PingPort"/>
-  <parameter name="className" value="secconv.scenarios.ping.impl.PingBindingImpl"/>
-  <parameter name="wsdlServicePort" value="WSConvScenario1"/>
-  <parameter name="wsdlTargetNamespace" value="http://xmlsoap.org/Ping"/>
-  <parameter name="wsdlServiceElement" value="PingService"/>
-  <typeMapping deserializer="org.apache.axis.encoding.ser.SimpleDeserializerFactory" encodingStyle="" qname="ns2:ticketType" serializer="org.apache.axis.encoding.ser.SimpleSerializerFactory" type="java:secconv.scenarios.ping.impl.TicketType" xmlns:ns2="http://xmlsoap.org/Ping"/>
- </service>
+  <!-- Services from PingService WSDL service -->
+
+  <service name="WSConvScenario1" provider="java:RPC" style="wrapped" use="literal">
+      <parameter name="wsdlTargetNamespace" value="http://xmlsoap.org/Ping"/>
+      <parameter name="wsdlServiceElement" value="PingService"/>
+      <parameter name="wsdlServicePort" value="WSConvScenario1"/>
+      <parameter name="className" value="secconv.scenarios.ping.impl.PingBindingImpl"/>
+      <parameter name="wsdlPortType" value="PingPort"/>
+      <parameter name="typeMappingVersion" value="1.2"/>
+      <operation name="ping" qname="operNS:Ping" xmlns:operNS="http://xmlsoap.org/Ping" soapAction="Ping" >
+        <parameter qname="pns:ticket" xmlns:pns="http://xmlsoap.org/Ping" type="tns:ticketType" xmlns:tns="http://xmlsoap.org/Ping"/>
+        <parameter qname="pns:text" xmlns:pns="http://xmlsoap.org/Ping" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema" mode="INOUT"/>
+      </operation>
+      <parameter name="allowedMethods" value="ping"/>
+
+      <typeMapping
+        xmlns:ns="http://xmlsoap.org/Ping"
+        qname="ns:ticketType"
+        type="java:secconv.scenarios.ping.impl.TicketType"
+        serializer="org.apache.axis.encoding.ser.SimpleSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.SimpleDeserializerFactory"
+        encodingStyle=""
+      />
+  </service>
 </deployment>

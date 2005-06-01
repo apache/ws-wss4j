@@ -17,35 +17,28 @@
 
 package org.apache.ws.security.trust.message.token;
 
+import javax.xml.namespace.QName;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSSConfig;
+import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.trust.TrustConstants;
 import org.apache.ws.security.trust.WSTrustException;
-import org.apache.ws.security.util.DOM2Writer;
-import org.apache.ws.security.util.WSSecurityUtil;
-import org.apache.xml.utils.QName;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 
 /**
  * 
  * @author Dimuthu Leelarathne. (muthulee@yahoo.com)
+ * @author Ruchith Fernando
  */
-public class Entropy {
-	private static Log log =
-			LogFactory.getLog(Entropy.class.getName());
+public class Entropy extends AbstractToken {
+	private static Log log = LogFactory.getLog(Entropy.class.getName());
 
-	public static final String ENTROPY = "Entropy";
-	public static final QName TOKEN = new QName(TrustConstants.WST_NS,ENTROPY);
-	public static final String BINARY_SECURITY = "BinarySecret";
+	public static final QName TOKEN = new QName(TrustConstants.WST_NS, TrustConstants.ENTROPY_LN, TrustConstants.WST_PREFIX);
+
+	private BinarySecret binarySecretElement = null;
 	
-	protected WSSConfig wssConfig = WSSConfig.getDefaultWSConfig();
-
-	protected Element element = null;
-   
 	/**
 	 * Constructor.
 	 * <p/>
@@ -54,101 +47,61 @@ public class Entropy {
 	 * @param elem
 	 * @throws WSSecurityException
 	 */
-	public Entropy(Element elem) throws WSTrustException {
-		
-				   this.element = elem;
-						   QName el = new QName(this.element.getNamespaceURI(),
-								   this.element.getLocalName());
-						   if (!el.equals(TOKEN)) {
-							   throw new WSTrustException();
-						   }
+	public Entropy(Element elem) throws WSSecurityException {
+		super(elem);
 	}
 
+
 	/**
-	 * Constructor.
-	 * <p/>
-	 *
-	 * @param wssConfig
+	 * Create a new <code>wst:Entropy</code> element
+	 * 
 	 * @param doc
 	 */
 	public Entropy(Document doc) {
-		this.element =
-				doc.createElementNS(TrustConstants.WST_NS,
-						TrustConstants.WST_PREFIX+":"+ENTROPY);
+		super(doc);
 	}
 
-	/*
-	 * Here the methods that handle the direct reference inside
-	 * a SecurityTokenReference
-	 */
 
 	/**
+	 * TODO: IMPORTANT : This method should be removed
 	 * set the BinarySecret.
 	 * <p/>
 	 *
 	 * @param secret
 	 */
 	public void setBinarySecret(BinarySecret secret) {
-			this.element.appendChild(secret.getElement());
+		this.binarySecretElement = secret;
 	}
 
+	/**
+	 * Sets the binary secret value
+	 * @param type The type uri of the binary secret as a <code>String</code>
+	 * @param secretValue The binary secret value as a <code>String</code>
+	 */
+	public void setBinarySecret(String type, String secretValue) {
+		if(this.binarySecretElement != null)
+			this.element.removeChild(this.binarySecretElement.getElement());
+		
+		this.binarySecretElement = new BinarySecret(this.element.getOwnerDocument());
+		this.binarySecretElement.setTypeAttribute(type);
+		this.binarySecretElement.setBinarySecretValue(secretValue);
+		this.element.appendChild(this.binarySecretElement.getElement());
+	}
+	
 	/**
 	 * 
 	 * @return
 	 * @throws WSTrustException
 	 */
 	public BinarySecret getBinarySecret() throws WSTrustException {
-		Element elem = getFirstElement();
-		return new BinarySecret(elem);
+		return this.binarySecretElement;
 	}
-	 
+	
 	/**
-	 * get the first child element.
-	 *
-	 * @return the first <code>Element</code> child node
+	 * Returns the QName of this type
+	 * @see org.apache.ws.security.trust.message.token.AbstractToken#getToken()
 	 */
-	public Element getFirstElement() {
-		for (Node currentChild = this.element.getFirstChild();
-			 currentChild != null;
-			 currentChild = currentChild.getNextSibling()) {
-			if (currentChild instanceof Element) {
-				return (Element) currentChild;
-			}
-		}
-		return null;
-	}
-
-	/**
-	 * get the dom element.
-	 * <p/>
-	 *
-	 * @return
-	 */
-	public Element getElement() {
-		return this.element;
-	}
-
-	/**
-	 * set the id.
-	 * <p/>
-	 *
-	 * @param id
-	 */
-	public void setID(String id) {
-		String prefix =
-				WSSecurityUtil.setNamespace(this.element,
-						wssConfig.getWsuNS(),
-						WSConstants.WSU_PREFIX);
-		this.element.setAttributeNS(wssConfig.getWsuNS(), prefix + ":Id", id);
-	}
-
-	/**
-	 * return the string representation.
-	 * <p/>
-	 *
-	 * @return
-	 */
-	public String toString() {
-		return DOM2Writer.nodeToString((Node) this.element);
+	protected QName getToken() {
+		return TOKEN;
 	}
 }

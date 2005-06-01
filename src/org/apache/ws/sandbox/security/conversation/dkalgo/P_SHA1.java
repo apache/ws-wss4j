@@ -15,7 +15,7 @@
  *
  */
 
-package org.apache.ws.security.conversation.dkAlgo;
+package org.apache.ws.security.conversation.dkalgo;
 
 /**
  *

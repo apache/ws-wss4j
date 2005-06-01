@@ -1,35 +1,39 @@
 /*
- * Created on Sep 4, 2004
+ * Copyright  2003-2004 The Apache Software Foundation.
  *
- * To change the template for this generated file go to
- * Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ *
  */
 package org.apache.ws.security.trust.message.token;
 
 
+import javax.xml.namespace.QName;
+
+import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.trust.TrustConstants;
-import org.apache.ws.security.trust.WSTrustException;
-import org.apache.ws.security.util.DOM2Writer;
-import org.apache.xml.utils.QName;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
+import org.w3c.dom.Text;
 
 /**
  * @author Dimuthu Leelarathne. (muthulee@yahoo.com)
- *
- * To change the template for this generated type comment go to
- * Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
+ * @author Ruchith Fernando
  */
-public class ComputedKey {
-	 
-	public static final String PSHA1 = "http://schemas.xmlsoap.org/ws/2005/02/security/trust/CK/PSHA1"; 
-
+public class ComputedKey extends AbstractToken {
 	
-	 public static final QName TOKEN = new QName(TrustConstants.WST_NS, "ComputedKey");
+	 public static final QName TOKEN = new QName(TrustConstants.WST_NS, TrustConstants.COMPUTED_KEY_LN, TrustConstants.WST_PREFIX);
     
-	 protected Element element = null;
-    
+	 private Text valueText = null;
 	 
 	 /**
 	  * Constructor.
@@ -38,27 +42,18 @@ public class ComputedKey {
 	  * @param wssConfig
 	  * @param elem
 	  */
-	 public ComputedKey(Element elem)
-		 throws WSTrustException {
-			this.element = elem;
-							QName el = new QName(this.element.getNamespaceURI(),
-									this.element.getLocalName());
-							if (!el.equals(TOKEN)) {
-								throw new WSTrustException();
-							}
-        
+	 public ComputedKey(Element elem) throws WSSecurityException {
+	 	super(elem);
 	 }
 
 	 /**
-	  * Constructor.
-	  * <p/>
-	  *
+	  * Constructor. <p/>
+	  * 
 	  * @param wssConfig
 	  * @param doc
 	  */
 	 public ComputedKey(Document doc) {
-		 this.element = doc.createElementNS(TrustConstants.WST_NS,
-		 "wst:ComputedKey");
+		 super(doc);
 	 }
 
 	 /**
@@ -67,45 +62,31 @@ public class ComputedKey {
 	  * @param val
 	  */
 	 public void setComputedKeyValue(String val) {
-		 this.element.appendChild(
-			 element.getOwnerDocument().createTextNode(val));
+	 	if(this.valueText != null)
+	 		this.element.removeChild(this.valueText);
+	 	
+	 	this.valueText = element.getOwnerDocument().createTextNode(val);
+		this.element.appendChild(this.valueText);
 	 }
 
 	 /**
-	 * return the value of the text node
-			*
-			* @return
-			*/
+	  * return the value of the text node
+	  *
+	  * @return
+	  */
 	 public String getComputedKeyValue() {
-		 String val = "";
-		 if (this.element.getFirstChild().getNodeType() != Node.TEXT_NODE) {
-			 return null;
-		 }
-		 val = this.element.getFirstChild().getNodeValue();
-		 return val;
+	 	if(this.valueText != null)
+	 		return this.valueText.getNodeValue();
+	 	else
+	 		return null;
 	 }
 
-	 /**
-		 * get the element
-		 *
-		 * @return
-		 */
-	 public Element getElement() {
-		 return this.element;
-	 }
-
-	 /**
-		 * set the element
-		 *
-		 * @param element
-		 */
-	 public void setElement(Element element) {
-		 this.element = element;
-	 }
-
-	 public String toString() {
-		 return DOM2Writer.nodeToString((Node) this.element);
-	 }
-	
+	/**
+	 * Returns the QName of this type
+	 * @see org.apache.ws.security.trust.message.token.AbstractToken#getToken()
+	 */
+	protected QName getToken() {
+		return TOKEN;
+	}
 
 }

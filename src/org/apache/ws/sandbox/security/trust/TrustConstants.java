@@ -18,6 +18,7 @@ package org.apache.ws.security.trust;
 
 /**
  * @author Malinda Kaushalye
+ * @author Ruchith Fernando
  * @version 1.0
  *          <p/>
  *          TrustConstants is the class where all the constants of the WS-Trust implementation are kept.
@@ -28,75 +29,105 @@ package org.apache.ws.security.trust;
 
 public class TrustConstants {
 
+    private static final String NS_YEAR_PREFIX = "http://schemas.xmlsoap.org/ws/2005/02/";
+    public static final String WST_NS = NS_YEAR_PREFIX + "trust";
+    public static final String WST_PREFIX = "wst";
+
+    //WS-Policy related constants
+    public static final String WSP_NS = "http://schemas.xmlsoap.org/ws/2004/09/policy";
+    public static final String WSP_PREFIX = "wsp";	
+    public static final String APPLIESTO_LN = "AppliesTo";
+    
+    //WS-Addressing related constants
+    public static final String WSA_NS = "http://schemas.xmlsoap.org/ws/2004/08/addressing";
+    public static final String WSA_PREFIX = "wsa";
+    public static final String ENDPOINT_REFERENCE_LN = "EndpointReference";
+    public static final String ADDRESS_LN = "Address";
+	
+    //Utility related constants
+    public static final String WSU_NS = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd";
+    public static final String WSU_PREFIX = "wsu";
+    public static final String CREATED_LN = "Created";
+    public static final String EXPIRES_LN = "Expires";
+    public static final String ID_ATTR = "Id";
+    
     //local names of the token used in WS-Trust
-    public static final String SECURITY_CONTEXT_TOKEN_RESPONSE_LN = "SecurityContextTokenResponse";
-    public static final String REQUEST_SECURITY_TOKEN_RESPONSE_LN = "RequestSecurityTokenResponse";//trust
     public static final String TOKEN_TYPE_LN = "TokenType";
     public static final String REQUEST_TYPE_LN = "RequestType";
     public static final String KEY_TYPE_LN = "KeyType";
     public static final String KEY_SIZE_LN = "KeySize";
-
     public static final String LIFE_TIME_LN = "Lifetime";
-    public static final String CREATED_LN = "Created";
-    public static final String EXPIRES_LN = "Expires";
     public static final String BASE_LN = "Base";
     public static final String STATUS_LN = "Status";
     public static final String CODE_LN = "Code";
     public static final String REASON_LN = "Reason";
     public static final String RENEWING_LN = "Renewing";
+    public static final String RENEW_TARGET_LN = "RenewTarget";
     public static final String ALLOWPOSTDATING_LN = "AllowPostdating";
-    public static final String APPLIESTO_LN = "AppliesTo";
     public static final String BINARY_SECRET_LN= "BinarySecret";
-
+    public static final String ENTROPY_LN= "Entropy";
+    public static final String CLAIMS_LN = "Claims";
+    public static final String COMPUTED_KEY_LN = "ComputedKey";
+    
     public static final String REQUEST_SECURITY_TOKEN_LN = "RequestSecurityToken";
+    public static final String REQUEST_SECURITY_TOKEN_RESPONSE_LN = "RequestSecurityTokenResponse";
     public static final String REQUESTED_SECURITY_TOKEN_LN = "RequestedSecurityToken";
     public static final String REQUESTED_PROOF_TOKEN_LN = "RequestedProofToken";
-    public static final String SECURITY_CONTEXT_TOKEN_LN = "SecurityContextToken";
 
+    //Attributes
+    public static final String BINARY_SECRET_TYPE_ATTR = "Type";
+    public static final String CLAIMS_DIALECT_ATTR = "Dialect";
+    public static final String RENEWING_ALLOW_ATTR = "Allow";
+    public static final String RENEWING_OK_ATTR = "OK";
+    
     // The request type is specified using following URIs as specified in the WS-Trust specification
-    public static final String ISSUE_SECURITY_TOKEN = "http://schemas.xmlsoap.org/ws/2005/02/security/trust/Issue";//RequestTypeEnum._value1.toString();//"http://schemas.xmlsoap.org/ws/2005/02/security/trust/Issue";
-    public static final String RENEW_SECURITY_TOKEN = "http://schemas.xmlsoap.org/ws/2005/02/security/trust/Renew";
-    public static final String VALIDATE_SECURITY_TOKEN = "http://schemas.xmlsoap.org/ws/2005/02/security/trust/Validate";
+    public static final String ISSUE_SECURITY_TOKEN = WST_NS + "/Issue";
+    public static final String RENEW_SECURITY_TOKEN = WST_NS + "/Renew";
+    public static final String VALIDATE_SECURITY_TOKEN = WST_NS + "/Validate";
+    public static final String CANCEL_SECURITY_TOKEN = WST_NS + "/Cancel";
 
-    public static final String ISSUE_SECURITY_TOKEN_RSTR = "http://schemas.xmlsoap.org/ws/2005/02/security/trust/RSTR/Issue";
-    public static final String RENEW_SECURITY_TOKEN_RSTR = "http://schemas.xmlsoap.org/ws/2005/02/security/trust/RSTR/Renew";
-    public static final String VALIDATE_SECURITY_TOKEN_RSTR = "http://schemas.xmlsoap.org/ws/2005/02/security/trust/RSTR/Validate";
+    //RSTRs
+    public static final String RSTR_PREFIX = WST_NS + "/RSTR";
+    public static final String ISSUE_SECURITY_TOKEN_RSTR = RSTR_PREFIX + "/Issue";
+    public static final String RENEW_SECURITY_TOKEN_RSTR = RSTR_PREFIX + "/Renew";
+    public static final String VALIDATE_SECURITY_TOKEN_RSTR = RSTR_PREFIX + "/Validate";
+    public static final String CANCEL_SECURITY_TOKEN_RSTR = RSTR_PREFIX + "/Cancel";
 
-    public static final String ISSUE_SECURITY_TOKEN_RST = "http://schemas.xmlsoap.org/ws/2005/02/security/trust/RST/Issue";
-    public static final String RENEW_SECURITY_TOKEN_RST = "http://schemas.xmlsoap.org/ws/2005/02/security/trust/RST/Renew";
-    public static final String VALIDATE_SECURITY_TOKEN_RST = "http://schemas.xmlsoap.org/ws/2005/02/security/trust/RST/Validate";
+    //RSTs
+    public static final String RST_PREFIX = WST_NS + "/RST";
+    public static final String ISSUE_SECURITY_TOKEN_RST = RST_PREFIX + "/Issue";
+    public static final String RENEW_SECURITY_TOKEN_RST = RST_PREFIX + "/Renew";
+    public static final String VALIDATE_SECURITY_TOKEN_RST = RST_PREFIX + "/Validate";
+    public static final String CANCEL_SECURITY_TOKEN_RST = RST_PREFIX + "/Cancel";
+    
+    //STATUS
+    public static final String STATUS_PREFIX = WST_NS + "/status";
+    public static final String STATUS_VALID = STATUS_PREFIX + "/valid";
+    public static final String STATUS_INVALID = STATUS_PREFIX + "/invalid";
+
+    //Token yypes
+    public static final String TOKEN_TYPE_RSTR_STATUS = RSTR_PREFIX + "/Status";
+    
+    //Binary secret types
+    public static final String BINARY_SECRET_ASYMMETRIC_KEY = WST_NS + "/AsymmetricKey";
+	public static final String BINARY_SECRET_SYMMETRIC_KEY = WST_NS + "/SymmetricKey";
+	public static final String BINARY_SECRET_NONCE_VAL= WST_NS + "/Nonce";
+    
+    //COmputedKey types
+    public static final String COMPUTED_KEY_PSHA1 = WST_NS + "/CK/PSHA1"; 
   
-  
-//  public static final URI ISSUE_SECURITY_TOKEN_URI = new URI("http://schemas.xmlsoap.org/ws/2005/02/security/trust/Issue");
-//  public static final URI RENEW_SECURITY_TOKEN_URI = new URI("http://schemas.xmlsoap.org/ws/2005/02/security/trust/Renew");
-//  public static final URI VALIDATE_SECURITY_TOKEN_URI = new URI("http://schemas.xmlsoap.org/ws/2005/02/security/trust/Validate"); 
-    public static final String WST_NS = "http://schemas.xmlsoap.org/ws/2005/02/trust";
-    public static final String WSP_NS = "http://schemas.xmlsoap.org/ws/2004/09/policy";
-
-    public static final String WST_PREFIX = "wst";
-    public static final String WSP_PREFIX = "wsp";
-
     //For STS there should be an issuer class specified in the STS.properties
     public static final String ISSUER_CLASS = "org.apache.ws.axis.security.trust.service.SecurityTokenService.issuerClass";
-    //    For STS there should be a renewer class specified in the STS.properties
+    //For STS there should be a renewer class specified in the STS.properties
     public static final String RENEWER_CLASS = "org.apache.ws.axis.security.trust.service.SecurityTokenService.renewerClass";
-    //    For STS there should be a validator class specified in the STS.properties
+    //For STS there should be a validator class specified in the STS.properties
     public static final String VALIDATOR_CLASS = "org.apache.ws.axis.security.trust.service.SecurityTokenService.validatorClass";
 
     //In the request, The token type can be specified in the client-config
     public static final String TOKEN_TYPE = "TokenType";
     //The request type , issue/renew or validate 
     public static final String REQUEST_TYPE = "RequestType";
-    
-//    ...commented.... no need of having these params.
-// architectural change in the STSClientHandler. Now we have more distributed requesters....
-//    //basedon params
-//    public static final String BASED_ON="BasedOn";
-//    //based on values
-//    public static final String BASED_ON_X509="X509Certificate";
-//    public static final String BASED_ON_USERNAME_TOKEN="UsernameToken";
-//    public static final String BASED_ON_SAML="SAML";
-    
+
     //for BASED_ON_X509
     public static final String BASE_CERT_FILE = "BaseCertFile";
     public static final String USER = "user";//alias of the certificate

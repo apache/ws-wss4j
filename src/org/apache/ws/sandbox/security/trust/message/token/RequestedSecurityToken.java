@@ -15,9 +15,12 @@
  *
  */
 
-package org.apache.ws.security.conversation.message.token;
+package org.apache.ws.security.trust.message.token;
+
+import javax.xml.namespace.QName;
 
 import org.apache.ws.security.WSSecurityException;
+import org.apache.ws.security.conversation.message.token.SecurityContextToken;
 import org.apache.ws.security.message.token.UsernameToken;
 import org.apache.ws.security.trust.TrustConstants;
 import org.apache.ws.security.util.DOM2Writer;
@@ -26,12 +29,11 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import javax.xml.namespace.QName;
-
 public class RequestedSecurityToken {
 
     // private SecurityContextToken securityContextToken;
-    private Element element = null;
+	private Element element = null;
+    
     public static final QName TOKEN =
             new QName(TrustConstants.WST_NS,
                     TrustConstants.REQUESTED_SECURITY_TOKEN_LN);

@@ -15,7 +15,7 @@
  *
  */
 
-package org.apache.ws.security.conversation.dkAlgo;
+package org.apache.ws.security.conversation.dkalgo;
 
 import org.apache.ws.security.conversation.ConversationException;
 

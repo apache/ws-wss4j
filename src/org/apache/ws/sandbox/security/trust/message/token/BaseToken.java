@@ -35,7 +35,8 @@ import javax.xml.namespace.QName;
  *         Base token.
  */
 public class BaseToken {
-    public static final QName TOKEN = new QName(TrustConstants.WST_NS, TrustConstants.BASE_LN, TrustConstants.WST_PREFIX);
+    
+	public static final QName TOKEN = new QName(TrustConstants.WST_NS, TrustConstants.BASE_LN, TrustConstants.WST_PREFIX);
     Element element;
 
     /**
@@ -46,8 +47,7 @@ public class BaseToken {
      */
     public BaseToken(Element elem) throws WSSecurityException {
         this.element = elem;
-        QName el =
-                new QName(this.element.getNamespaceURI(),
+        QName el = new QName(this.element.getNamespaceURI(),
                         this.element.getLocalName());
         if (!el.equals(TOKEN)) {
 

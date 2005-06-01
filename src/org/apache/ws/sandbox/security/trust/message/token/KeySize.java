@@ -16,45 +16,44 @@
 */
 package org.apache.ws.security.trust.message.token;
 
-import org.apache.ws.security.WSSConfig;
+import javax.xml.namespace.QName;
+
+import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.trust.TrustConstants;
 import org.apache.ws.security.trust.WSTrustException;
-import org.apache.xml.utils.QName;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
+import org.w3c.dom.Text;
 
 /**
  * @author Ruchith Fernando
  */
-public class KeySize {
+public class KeySize extends AbstractToken {
 
-    public static final String KEY_SIZE = "KeySize";
-    public static final QName TOKEN = new QName(TrustConstants.WST_NS,KEY_SIZE);
+    
+    public static final QName TOKEN = new QName(TrustConstants.WST_NS,TrustConstants.KEY_SIZE_LN,TrustConstants.WST_PREFIX);
 
-    protected WSSConfig wssConfig = WSSConfig.getDefaultWSConfig();
-
-    protected Element element = null;
+    private Text keySizeText = null;
 
 
-    public KeySize(Element elem) throws WSTrustException {
-           this.element = elem;
-           QName el = new QName(this.element.getNamespaceURI(),
-                   this.element.getLocalName());
-           if (!el.equals(TOKEN)) {
-               throw new WSTrustException("Elemtn is not a 'KeySize' element");
-           }
+    public KeySize(Element elem) throws WSSecurityException {
+    	super(elem);
     }
-
 
     public KeySize(Document doc) {
-        this.element =
-            doc.createElementNS(TrustConstants.WST_NS,
-                    TrustConstants.WST_PREFIX+":"+KEY_SIZE);
+        super(doc);
     }
 
+    /**
+     * Sets the key size value of the <code>wst:KeySize</code> element
+     * @param keySize
+     */
     public void setKeySize(int keySize) {
-        this.element.appendChild(this.element.getOwnerDocument().createTextNode(Integer.toString(keySize)));
+    	if(this.keySizeText != null)
+    		this.element.removeChild(this.keySizeText);
+    	
+    	this.keySizeText = this.element.getOwnerDocument().createTextNode(Integer.toString(keySize));
+        this.element.appendChild(this.keySizeText);
     }
 
     /**
@@ -62,31 +61,18 @@ public class KeySize {
      * @return Returns the key size if set otherwise returns -1
      * @throws WSTrustException
      */
-    public int getKeySize() throws WSTrustException {
-        Node node = this.element.getFirstChild();
-        if(node != null && node.getNodeType() == Node.TEXT_NODE) {
-            try {
-                return Integer.parseInt(node.getNodeValue());
-            } catch (NumberFormatException nfe) {
-                throw new WSTrustException("Invalid Key Size : " + nfe.getMessage());
-            }
-        } else {
-            return -1;
-        }
+    public int getKeySize() {
+        if(this.keySizeText != null)
+        	return Integer.parseInt(this.keySizeText.getNodeValue());
+        else
+        	return -1;
     }
 
-
-
-    /**
-     * @return Returns the element.
-     */
-    public Element getElement() {
-        return element;
-    }
-    /**
-     * @param element The element to set.
-     */
-    public void setElement(Element element) {
-        this.element = element;
-    }
+	/**
+	 * Returns the QName of this type
+	 * @see org.apache.ws.security.trust.message.token.AbstractToken#getToken()
+	 */
+	protected QName getToken() {
+		return TOKEN;
+	}
 }

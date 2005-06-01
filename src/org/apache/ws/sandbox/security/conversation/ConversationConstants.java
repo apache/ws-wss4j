@@ -21,16 +21,23 @@ package org.apache.ws.security.conversation;
  */
 public class ConversationConstants {
 
+	private static final String NS_YEAR_PREFIX = "http://schemas.xmlsoap.org/ws/2005/02/";
+	
     /**
-     * Field WSC_NS
+     * WS-Secure Conversation namespace
      */
-    public final static String WSC_NS =
-            "http://schemas.xmlsoap.org/ws/2004/04/sc";
+    public final static String WSC_NS = NS_YEAR_PREFIX + "sc";
     
+    /**
+     * TOken type of DerivedKeyToken
+     */
+    public final static String TOKEN_TYPE_DERIVED_KEY_TOKEN = WSC_NS + "/dk";
     
-    public final static String VALUE_TYPE_DERIVED_KEY = "http://schemas.xmlsoap.org/ws/2004/04/security/sc/dk";
+    /**
+     * Token type of SecurityContextToken
+     */
+    public static final String TOKEN_TYPE_SECURITY_CONTEXT_TOKEN = WSC_NS  + "/sct";
     
-
     /**
      * Field WSC_PREFIX
      */

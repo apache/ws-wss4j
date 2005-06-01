@@ -1,27 +1,18 @@
 package org.apache.ws.axis.security.trust.secconv.interop;
 
-import org.apache.axis.message.addressing.Address;
 import org.apache.axis.message.addressing.AttributedURI;
 import org.apache.axis.message.addressing.EndpointReference;
 import org.apache.axis.utils.DOM2Writer;
-
 import org.apache.ws.security.SOAPConstants;
-import org
-    .apache
-    .ws
-    .security
-    .conversation
-    .message
-    .token
-    .RequestSecurityTokenResponse;
-import org.apache.ws.security.conversation.message.token.RequestedProofToken;
-import org.apache.ws.security.conversation.message.token.RequestedSecurityToken;
 import org.apache.ws.security.conversation.message.token.SecurityContextToken;
 import org.apache.ws.security.policy.message.token.AppliesTo;
+import org.apache.ws.security.trust.TrustConstants;
 import org.apache.ws.security.trust.message.token.BinarySecret;
-import org.apache.ws.security.trust.message.token.LifeTime;
+import org.apache.ws.security.trust.message.token.Lifetime;
+import org.apache.ws.security.trust.message.token.RequestSecurityTokenResponse;
+import org.apache.ws.security.trust.message.token.RequestedProofToken;
+import org.apache.ws.security.trust.message.token.RequestedSecurityToken;
 import org.apache.ws.security.util.WSSecurityUtil;
-import org.apache.xml.security.utils.XMLUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -101,21 +92,21 @@ public class SAML2SCTIssuer {
 		appliesToRes.setAnyElement(eprNew.toDOM(res));
         
 		//	Create the Lifetime element for the response message
-		LifeTime lt = new LifeTime(res, 12 * 60);
+		Lifetime lt = new Lifetime(res, 12 * 60);
 
         
         //create Requested Security Token with a SCT
         RequestedSecurityToken reqtedSecTok = new RequestedSecurityToken(res);
         SecurityContextToken sct = new SecurityContextToken(res);
         this.uuidOfSCT = sct.getIdentifier();
-		LifeTime lt2 = new LifeTime(res, 12 * 60);
+		Lifetime lt2 = new Lifetime(res, 12 * 60);
         sct.setElement(lt2.getElement());
         reqtedSecTok.addToken(sct.getElement());
 
         //Requested Proof Token
         RequestedProofToken reqProofTok = new RequestedProofToken(res);
         BinarySecret binSecret = new BinarySecret(res);
-        binSecret.setTypeAttribute(BinarySecret.SYMMETRIC_KEY);
+        binSecret.setTypeAttribute(TrustConstants.BINARY_SECRET_SYMMETRIC_KEY);
         //TODO::
         binSecret.setBinarySecretValue("0987654321123456");
         this.sharedKey = "0987654321123456".getBytes();

@@ -17,33 +17,26 @@
 
 package org.apache.ws.security.trust.message.token;
 
+import javax.xml.namespace.QName;
+
+import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.trust.TrustConstants;
-import org.apache.ws.security.trust.WSTrustException;
-import org.apache.ws.security.util.DOM2Writer;
-import org.apache.xml.utils.QName;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
+import org.w3c.dom.Text;
 
 /**
  *
- * @author Dimuthu Leelarathne. muthulee@yahoo.com
+ * @author Dimuthu Leelarathne.(muthulee@yahoo.com)
+ * @author Ruchith Fernando
  */
-public class BinarySecret {
+public class BinarySecret extends AbstractToken {
 	
-    public static final QName TOKEN =new QName(TrustConstants.WST_NS,"BinarySecret");
+    public static final QName TOKEN = new QName(TrustConstants.WST_NS, TrustConstants.BINARY_SECRET_LN, TrustConstants.WST_PREFIX);
     
-    public static final String PRIVATE_KEY = "http://schemas.xmlsoap.org/ws/2004/04/security/trust/AsymmetricKey";
-	public static final String SYMMETRIC_KEY ="http://schemas.xmlsoap.org/ws/2004/04/security/trust/SymmetricKey";
-	public static final String NONCE_VAL="http://schemas.xmlsoap.org/ws/2004/04/security/trust/Nonce";
-	
-    protected Element element = null;
+    private Text secretText = null;
     
-    protected String typeAttr = null;
-    
-    
-//    protected WSSConfig wssConfig = WSSConfig.getDefaultWSConfig();
-
+    private String typeAttrValue = null;
     
     /**
      * Constructor.
@@ -52,15 +45,9 @@ public class BinarySecret {
      * @param wssConfig
      * @param elem
      */
-    public BinarySecret(Element elem)
-        throws WSTrustException {
-			this.element = elem;
-					QName el = new QName(this.element.getNamespaceURI(),
-							this.element.getLocalName());
-					if (!el.equals(TOKEN)) {
-						throw new WSTrustException();
-					}
-        } 
+    public BinarySecret(Element elem) throws WSSecurityException {
+    	super(elem);
+    } 
 					
 
     /**
@@ -71,14 +58,8 @@ public class BinarySecret {
      * @param doc
      */
     public BinarySecret(Document doc) {
-        this.element = doc.createElementNS(TrustConstants.WST_NS,
-		"wst:BinarySecret");
+    	super(doc);
     }
-
-    /*
-     * Here the methods that handle the direct reference inside
-     * a SecurityTokenReference
-     */
 
     /**
      * set the Type.
@@ -86,12 +67,19 @@ public class BinarySecret {
      * @param ref
      */
     public void setTypeAttribute(String type) {
-    	this.typeAttr=type;
-    	this.element.setAttribute("Type", typeAttr);
+    	if(this.typeAttrValue != null)
+    		this.element.removeAttribute(TrustConstants.BINARY_SECRET_TYPE_ATTR);
+    	
+    	this.typeAttrValue=type;
+    	this.element.setAttribute(TrustConstants.BINARY_SECRET_TYPE_ATTR, typeAttrValue);
     }
 
+    /**
+     * Returns the type attribute value
+     * @return
+     */
     public String getTypeAttribute() {
-    	return this.element.getAttribute("Type");
+    	return this.typeAttrValue;
     }
 
     /**
@@ -100,44 +88,30 @@ public class BinarySecret {
      * @param val
      */
     public void setBinarySecretValue(String val) {
-        this.element.appendChild(
-            element.getOwnerDocument().createTextNode(val));
+    	if(this.secretText != null)
+    		this.element.removeChild(this.secretText);
+    	
+    	this.secretText = element.getOwnerDocument().createTextNode(val);
+        this.element.appendChild(this.secretText);
     }
 
     /**
-    * return the value of the text node
-    	   *
-    	   * @return
-    	   */
+	 * return the value of the text node
+	 * 
+	 * @return
+	 */
     public String getBinarySecretValue() {
-        String val = "";
-        if (this.element.getFirstChild().getNodeType() != Node.TEXT_NODE) {
-            return null;
-        }
-        val = this.element.getFirstChild().getNodeValue();
-        return val;
+        if(this.secretText != null)
+        	return this.secretText.getNodeValue();
+        else
+        	return null;
     }
 
-    /**
-    	* get the element
-    	*
-    	* @return
-    	*/
-    public Element getElement() {
-        return this.element;
-    }
-
-    /**
-    	* set the element
-    	*
-    	* @param element
-    	*/
-    public void setElement(Element element) {
-        this.element = element;
-    }
-
-    public String toString() {
-        return DOM2Writer.nodeToString((Node) this.element);
-    }
-
+	/**
+	 * Returns the QName of this type
+	 * @see org.apache.ws.security.trust.message.token.AbstractToken#getToken()
+	 */
+	protected QName getToken() {
+		return TOKEN;
+	}
 }

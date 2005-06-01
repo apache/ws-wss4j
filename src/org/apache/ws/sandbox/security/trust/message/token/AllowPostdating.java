@@ -16,26 +16,23 @@
  */
 package org.apache.ws.security.trust.message.token;
 
-import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.trust.TrustConstants;
-import org.apache.ws.security.util.DOM2Writer;
-import org.apache.ws.security.util.WSSecurityUtil;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.Text;
-
 import javax.xml.namespace.QName;
 
+import org.apache.ws.security.WSSecurityException;
+import org.apache.ws.security.trust.TrustConstants;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
 /**
- * @author Malinda Kaushalye
- *         AllowPostdating element
- *         <p/>
- *         This element indicates that returned tokens should allow requests for postdated    tokens.
+ * @author Malinda Kaushalye 
+ * @author Ruchith Fernando
+ * 
+ * AllowPostdating element <p/>This element indicates
+ * that returned tokens should allow requests for postdated tokens.
  */
-public class AllowPostdating {
+public class AllowPostdating extends AbstractToken {
+	
     public static final QName TOKEN = new QName(TrustConstants.WST_NS, TrustConstants.ALLOWPOSTDATING_LN, TrustConstants.WST_PREFIX);
-    Element element = null;
 
     /**
      * Constructor for AllowPostdating
@@ -44,12 +41,7 @@ public class AllowPostdating {
      * @throws WSSecurityException
      */
     public AllowPostdating(Element elem) throws WSSecurityException {
-        this.element = elem;
-        QName el = new QName(this.element.getNamespaceURI(), this.element.getLocalName());
-        if (!el.equals(TOKEN)) {
-            throw new WSSecurityException(WSSecurityException.INVALID_SECURITY_TOKEN, "badTokenType", new Object[]{el});
-        }
-
+    	super(elem);
     }
 
     /**
@@ -58,45 +50,15 @@ public class AllowPostdating {
      * @param doc
      */
     public AllowPostdating(Document doc) {
-        this.element = doc.createElementNS(TOKEN.getNamespaceURI(), TOKEN.getPrefix() + ":" + TOKEN.getLocalPart());
-        WSSecurityUtil.setNamespace(this.element, TrustConstants.WST_NS, TrustConstants.WST_PREFIX);
-        this.element.appendChild(doc.createTextNode(""));
-
+        super(doc);
     }
 
-    /**
-     * get the first Node of the element
-     *
-     * @return
-     */
-    public Text getFirstNode() {
-        Node node = this.element.getFirstChild();
-        return ((node != null) && node instanceof Text) ? (Text) node : null;
-    }
-
-    /**
-     * getthe AllowPostdating element
-     *
-     * @return
-     */
-    public Element getElement() {
-        return element;
-    }
-
-    /**
-     * Set the AllowPostdating element
-     *
-     * @param element
-     */
-    public void setElement(Element element) {
-        this.element = element;
-    }
-
-    /**
-     * to get the element as a String
-     */
-    public String toString() {
-        return DOM2Writer.nodeToString((Node) this.element);
-    }
+	/**
+	 * Returns the QName of this type
+	 * @see org.apache.ws.security.trust.message.token.AbstractToken#getToken()
+	 */
+	protected QName getToken() {
+		return TOKEN;
+	}
 
 }

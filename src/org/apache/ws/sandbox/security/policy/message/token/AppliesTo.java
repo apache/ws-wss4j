@@ -1,86 +1,101 @@
 /*
- * Created on Jul 9, 2004
+ * Copyright  2003-2004 The Apache Software Foundation.
  *
- * To change the template for this generated file go to
- * Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ *
  */
+
 package org.apache.ws.security.policy.message.token;
 import javax.xml.namespace.QName;
 
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.trust.TrustConstants;
-import org.apache.ws.security.util.DOM2Writer;
-import org.apache.ws.security.util.WSSecurityUtil;
+import org.apache.ws.security.trust.message.token.AbstractToken;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 import org.w3c.dom.Text;
 /**
  * @author Malinda Kaushalye
- *
+ * @author Ruchith Fernando
  */
-public class AppliesTo {
+public class AppliesTo extends AbstractToken {
 	
-	public static final QName TOKEN = new QName(TrustConstants.WSP_NS, TrustConstants.APPLIESTO_LN,TrustConstants.WSP_PREFIX);
-	Element element=null;
+	public static final QName TOKEN = new QName(TrustConstants.WSP_NS, TrustConstants.APPLIESTO_LN, TrustConstants.WSP_PREFIX);
 
-/**
- * Constructor for AppliesTo
- * @param elem
- * @throws WSSecurityException
- */
+	/*
+	 * The WS-Addressing impl is bound to Axis, therefore the 
+	 * org.apache.axis.message.addressing.EndpointReference cannot be used here
+	 * since it will bring Axis specific stuff into the common core of wss4j 
+	 */
+	private Element endpointReferenceElement = null;
+	private Text addressValueText = null;
+
+	/**
+	 * Constructor for AppliesTo
+	 * @param elem
+	 * @throws WSSecurityException
+	 */
 	public AppliesTo(Element elem) throws WSSecurityException {	
-		this.element = elem;
-		 QName el = new QName(this.element.getNamespaceURI(), this.element.getLocalName());
-		 if (!el.equals(TOKEN)) {
-			 throw new WSSecurityException(WSSecurityException.INVALID_SECURITY_TOKEN, "badTokenType", new Object[]{el});
-		 }
-
+		super(elem);
 	}
+	
 	/**
 	 * Constructor for AppliesTo
 	 * @param doc
 	 */
 	public AppliesTo(Document doc) {
-		this.element = doc.createElementNS(TOKEN.getNamespaceURI(), TOKEN.getPrefix()+":"+TOKEN.getLocalPart());
-		WSSecurityUtil.setNamespace(this.element, TOKEN.getNamespaceURI(), TOKEN.getPrefix());
-		this.element.appendChild(doc.createTextNode(""));
+		super(doc);
 	}
-	public Text getFirstNode() {
-		Node node = this.element.getFirstChild();
-		return ((node != null) && node instanceof Text) ? (Text) node : null;
+
+	/**
+	 * Set the value of the <code>wsa:EndpointReference/wsa:Address</code>
+	 * @param eprValue
+	 */
+	public void setEndpointReference(String eprValue) {
+		if(this.endpointReferenceElement != null)  //If there's an existing element remove it and
+			this.element.removeChild(this.endpointReferenceElement);
+		
+		//Create a new element and add it
+		this.endpointReferenceElement = this.element.getOwnerDocument().createElementNS(TrustConstants.WSA_NS, TrustConstants.WSA_PREFIX + ":" + TrustConstants.ENDPOINT_REFERENCE_LN);
+		Element tempAddrElem = this.element.getOwnerDocument().createElementNS(TrustConstants.WSA_NS, TrustConstants.WSA_PREFIX + ":" + TrustConstants.ADDRESS_LN);
+		
+		this.addressValueText = this.element.getOwnerDocument().createTextNode(eprValue);
+		tempAddrElem.appendChild(addressValueText);
+		this.endpointReferenceElement.appendChild(tempAddrElem);
+		this.element.appendChild(endpointReferenceElement);
+		
 	}
 	
-	public String getValue(){
-		String val="";
-		if(this.element.getFirstChild().getNodeType()!=Node.TEXT_NODE){
-			return null;
-		}
-		val=this.element.getFirstChild().getNodeValue();		
-		return val;	
-	}
-	public void setValue(String val){	
-		this.element.appendChild(element.getOwnerDocument().createTextNode(val));
-	}
 	/**
+	 * Returns the value of the <code>wsa:EndpointReference/wsa:Address</code>
 	 * @return
 	 */
-	public Element getElement() {
-		return element;
-	}
-	
-	/**
-	 * @param element
-	 */
-	public void setElement(Element element) {
-		this.element = element;
-	}
-	
-	public String toString() {
-	  return DOM2Writer.nodeToString((Node)this.element);
+	public String getAppliesToAddressEpr() {
+		if(this.addressValueText != null)
+			return this.addressValueText.getNodeValue();
+		else 
+			return null;
 	}
 	
 	public void setAnyElement(Element elem) {
 		this.element.appendChild(elem);
+	}
+	
+	/**
+	 * Returns the QName of this type
+	 * @see org.apache.ws.security.trust.message.token.AbstractToken#getToken()
+	 */
+	protected QName getToken() {
+		return TOKEN;
 	}
 }

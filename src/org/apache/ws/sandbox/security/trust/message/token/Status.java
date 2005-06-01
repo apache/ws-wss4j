@@ -16,22 +16,24 @@
  */
 package org.apache.ws.security.trust.message.token;
 
+import javax.xml.namespace.QName;
+
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.trust.TrustConstants;
-import org.apache.ws.security.util.DOM2Writer;
-import org.apache.ws.security.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-
-import javax.xml.namespace.QName;
 
 /**
  * @author Malinda Kaushalye
+ * @author Ruchith Fernando
  */
-public class Status {
+public class Status extends AbstractToken {
+	
     public static final QName TOKEN = new QName(TrustConstants.WST_NS, TrustConstants.STATUS_LN, TrustConstants.WST_PREFIX);
-    Element element = null;
+    
+    private Code codeElement = null;
+    private Reason reasonElement = null;
+    
 
     /**
      * Constructor for Status
@@ -40,11 +42,7 @@ public class Status {
      * @throws WSSecurityException
      */
     public Status(Element elem) throws WSSecurityException {
-        this.element = elem;
-        QName el = new QName(this.element.getNamespaceURI(), this.element.getLocalName());
-        if (!el.equals(TOKEN)) {
-            throw new WSSecurityException(WSSecurityException.INVALID_SECURITY_TOKEN, "badTokenType", new Object[]{el});
-        }
+    	super(elem);
     }
 
     /**
@@ -53,9 +51,7 @@ public class Status {
      * @param doc
      */
     public Status(Document doc) {
-        this.element = doc.createElementNS(TOKEN.getNamespaceURI(), TOKEN.getPrefix() + ":" + TOKEN.getLocalPart());
-        WSSecurityUtil.setNamespace(this.element, TrustConstants.WST_NS, TrustConstants.WST_PREFIX);
-        this.element.appendChild(doc.createTextNode(""));
+        super(doc);
     }
 
     /**
@@ -63,9 +59,13 @@ public class Status {
      *
      * @param code
      */
-    public void setCode(Code code) {
+    public void setCode(String codeValue) {
+    	if(this.codeElement != null) //If there's a value already set, remove that element
+    		this.element.removeChild(this.codeElement.getElement());
 
-        this.element.appendChild(code.getElement());
+    	this.codeElement = new Code(this.element.getOwnerDocument());
+    	this.codeElement.setValue(codeValue);
+    	this.element.appendChild(this.codeElement.getElement());
     }
 
     /**
@@ -74,9 +74,11 @@ public class Status {
      * @return
      * @throws WSSecurityException
      */
-    public Code getCode() throws WSSecurityException {
-        Element elem = (Element) WSSecurityUtil.findElement(this.element, Code.TOKEN.getLocalPart(), Code.TOKEN.getNamespaceURI());
-        return new Code(elem);
+    public String getCode() {
+        if(this.codeElement != null)
+        	return this.codeElement.getValue();
+        else
+        	return null;
     }
 
     /**
@@ -84,8 +86,13 @@ public class Status {
      *
      * @param reason
      */
-    public void setReason(Reason reason) {
-        this.element.appendChild(reason.getElement());
+    public void setReason(String reason) {
+        if(this.reasonElement != null)
+        	this.element.removeChild(this.reasonElement.getElement());
+        
+        this.reasonElement = new Reason(this.element.getOwnerDocument());
+        this.reasonElement.setValue(reason);
+        this.element.appendChild(this.reasonElement.getElement());
     }
 
     /**
@@ -94,44 +101,18 @@ public class Status {
      * @return
      * @throws WSSecurityException
      */
-    public Reason getReason() throws WSSecurityException {
-        Element elem = (Element) WSSecurityUtil.findElement(this.element, Reason.TOKEN.getLocalPart(), Reason.TOKEN.getNamespaceURI());
-        return new Reason(elem);
+    public String getReason() {
+    	if(this.reasonElement != null)
+    		return this.reasonElement.getValue();
+    	else
+    		return null;
     }
 
-    /**
-     * @return first element of the status
-     */
-    public Element getFirstElement() {
-        for (Node currentChild = this.element.getFirstChild();
-             currentChild != null;
-             currentChild = currentChild.getNextSibling()) {
-            if (currentChild instanceof Element) {
-                return (Element) currentChild;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * @return status element
-     */
-    public Element getElement() {
-        return element;
-    }
-
-    /**
-     * @param element status element
-     */
-    public void setElement(Element element) {
-        this.element = element;
-    }
-
-    /**
-     * 
-     */
-    public String toString() {
-        return DOM2Writer.nodeToString((Node) this.element);
-    }
-
+	/**
+	 * Returns the QName of this type
+	 * @see org.apache.ws.security.trust.message.token.AbstractToken#getToken()
+	 */
+	protected QName getToken() {
+		return TOKEN;
+	}
 }

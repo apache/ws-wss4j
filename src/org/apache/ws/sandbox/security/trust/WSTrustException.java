@@ -26,10 +26,16 @@ import java.util.ResourceBundle;
  *         <p/>
  *         Exception class for WS-Trust implementation.
  */
-public class WSTrustException extends RemoteException {
-    public static final int PASSWORD_DOESNOT_MATCH = 0;
+public class WSTrustException extends RemoteException {	
+	
+	public static final String INVALID_REQUEST = "InvalidRequest";
+    
+    
     private static ResourceBundle resources;
 
+    private String faultCode;
+    private String faultString;
+    
     static {
         try {
             resources = ResourceBundle.getBundle("org.apache.ws.security.trust.errors");
@@ -38,45 +44,22 @@ public class WSTrustException extends RemoteException {
         }
     }
 
-    /**
-     * 
-     */
-    public WSTrustException() {
-        super();
-
+    public WSTrustException(String faultCode, String msgId, Object[] args, Throwable exception) {
+        super(getMessage(faultCode, null, null),exception);
+        this.faultCode = faultCode;
+        this.faultString = resources.getString(faultCode);
     }
 
-    /**
-     * @param s
-     */
-    public WSTrustException(String s) {
-        super(s);
-
+    public WSTrustException(String faultCode, String msgId, Object[] args) {
+        super(getMessage(faultCode, null, null));
+        this.faultCode = faultCode;
+        this.faultString = resources.getString(faultCode);
     }
 
-    /**
-     * @param s
-     * @param ex
-     */
-    public WSTrustException(String s, Throwable ex) {
-        super(s, ex);
-
-    }
-
-    /**
-     * Constructor
-     *
-     * @param errorCode
-     */
-    public WSTrustException(int errorCode) {
-        super(getMessage(errorCode, null, null));
-
-    }
-
-    private static String getMessage(int errorCode, String msgId, Object[] args) {
+    private static String getMessage(String faultCode, String msgId, Object[] args) {
         String msg = null;
         try {
-            msg = resources.getString(String.valueOf(errorCode));
+            msg = resources.getString(faultCode);
             if (msgId != null) {
                 return msg += (" (" + MessageFormat.format(resources.getString(msgId), args) + ")");
             }
@@ -86,4 +69,28 @@ public class WSTrustException extends RemoteException {
         return msg;
     }
 
+    public WSTrustException(String message) {
+    	super(message);    	
+    }
+    
+    public WSTrustException(String message, Throwable ex) {
+    	super(message,ex);    	
+    }
+    
+    
+    /**
+     * Return the fault code
+     * @return
+     */
+	public String getFaultCode() {
+		return TrustConstants.WST_PREFIX + faultCode;
+	}
+	
+	/**
+	 * Return the fault string
+	 * @return
+	 */
+	public String getFaultString() {
+		return faultString;
+	}
 }

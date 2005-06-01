@@ -42,11 +42,10 @@ public class RequestResolver {
     }
 
     public RequestInfo resolve() throws WSSecurityException {
+    	
         //get the request type and base
-        
         Element elemRequestType = (Element) WSSecurityUtil.findElement(doc, RequestType.TOKEN.getLocalPart(), RequestType.TOKEN.getNamespaceURI());
-        //Element elemBase=(Element)WSSecurityUtil.findElement(doc,BaseToken.TOKEN.getLocalPart(),BaseToken.TOKEN.getNamespaceURI());
-    
+
         //set request type    
         if (elemRequestType != null) {
             log.debug("Resolving request type");
@@ -55,15 +54,6 @@ public class RequestResolver {
             this.reqInfo.setRequestType(requestType.getValue());
             log.debug("Resolving request type complete");
         }
-        
-//        if(elemBase!=null){
-//            log.debug("Resolving base ");
-//            BaseToken baseToken=new BaseToken(elemBase);    
-//                //a more logic
-//            this.reqInfo.setBaseType(RequestInfo.X509);//hcoded
-//            log.debug("Resolving base complete");
-//            
-//        }    
         
         return this.reqInfo;
 

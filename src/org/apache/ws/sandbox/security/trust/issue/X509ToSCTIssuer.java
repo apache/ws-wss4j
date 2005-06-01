@@ -18,17 +18,17 @@ package org.apache.ws.security.trust.issue;
 
 import org.apache.ws.security.SOAPConstants;
 import org.apache.ws.security.components.crypto.Crypto;
-import org.apache.ws.security.conversation.message.token.RequestSecurityTokenResponse;
-import org.apache.ws.security.conversation.message.token.RequestedProofToken;
-import org.apache.ws.security.conversation.message.token.RequestedSecurityToken;
 import org.apache.ws.security.message.token.BinarySecurity;
 import org.apache.ws.security.message.token.X509Security;
 import org.apache.ws.security.trust.STSUtil;
 import org.apache.ws.security.trust.TrustConstants;
 import org.apache.ws.security.trust.WSTrustException;
 import org.apache.ws.security.trust.message.token.BaseToken;
-import org.apache.ws.security.trust.message.token.LifeTime;
+import org.apache.ws.security.trust.message.token.Lifetime;
+import org.apache.ws.security.trust.message.token.RequestSecurityTokenResponse;
 import org.apache.ws.security.trust.message.token.RequestType;
+import org.apache.ws.security.trust.message.token.RequestedProofToken;
+import org.apache.ws.security.trust.message.token.RequestedSecurityToken;
 import org.apache.ws.security.trust.message.token.TokenType;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.w3c.dom.Document;
@@ -88,7 +88,7 @@ public abstract class X509ToSCTIssuer implements STIssuer {
 		//It is RECOMMENDED that the issuer return this element with issued tokens so the 
 		//requestor knows the actual validity period without having to parse the
 		//returned token.
-		LifeTime lt=new LifeTime(res,this.getLifeTime());
+		Lifetime lt=new Lifetime(res,this.getLifeTime());
 		Element elemLifeTime = lt.getElement();
 
 		//append to req'ed token				

@@ -6,8 +6,6 @@
  */
 package org.apache.ws.axis.security.trust.secconv.interop;
 
-import java.io.ByteArrayOutputStream;
-
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
@@ -20,20 +18,20 @@ import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.conversation.ConversationUtil;
-import org.apache.ws.security.conversation.message.token.RequestSecurityTokenResponse;
-import org.apache.ws.security.conversation.message.token.RequestedProofToken;
-import org.apache.ws.security.conversation.message.token.RequestedSecurityToken;
 import org.apache.ws.security.message.token.UsernameToken;
 import org.apache.ws.security.policy.message.token.AppliesTo;
 import org.apache.ws.security.saml.SAMLIssuer;
 import org.apache.ws.security.saml.SAMLIssuerFactory;
+import org.apache.ws.security.trust.TrustConstants;
 import org.apache.ws.security.trust.issue.STIssuer;
 import org.apache.ws.security.trust.message.token.BinarySecret;
 import org.apache.ws.security.trust.message.token.ComputedKey;
 import org.apache.ws.security.trust.message.token.Entropy;
-import org.apache.ws.security.trust.message.token.LifeTime;
+import org.apache.ws.security.trust.message.token.Lifetime;
+import org.apache.ws.security.trust.message.token.RequestSecurityTokenResponse;
+import org.apache.ws.security.trust.message.token.RequestedProofToken;
+import org.apache.ws.security.trust.message.token.RequestedSecurityToken;
 import org.apache.ws.security.util.WSSecurityUtil;
-import org.apache.xml.security.utils.XMLUtils;
 import org.opensaml.SAMLAssertion;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -92,7 +90,7 @@ public class UNT2SAMLIssuer implements STIssuer{
 
 
 			//Create the Lifetime element for the response message
-			LifeTime lt = new LifeTime(res,12*60);
+			Lifetime lt = new Lifetime(res,12*60);
 			Element elemLifeTime = lt.getElement();
 
 			//Create the AppliesTo for the response message
@@ -115,7 +113,7 @@ public class UNT2SAMLIssuer implements STIssuer{
 			//Requested Proof Token
 			RequestedProofToken requestedProofTokenRes = new RequestedProofToken(res);
 			ComputedKey computedKeyRes = new ComputedKey(res);
-			computedKeyRes.setComputedKeyValue(ComputedKey.PSHA1);
+			computedKeyRes.setComputedKeyValue(TrustConstants.COMPUTED_KEY_PSHA1);
 			requestedProofTokenRes.addToken(computedKeyRes.getElement());
 			
 			

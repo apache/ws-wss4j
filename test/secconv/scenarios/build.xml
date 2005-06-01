@@ -48,8 +48,9 @@
 
     <target name="compile">
         <mkdir dir="${dir.work}"/>
+        <mkdir dir="${dir.classes}"/>
         <axis-wsdl2java
-            output="${dir.work}"
+            output="${dir.test}"
             serverSide="yes"
             testcase="no"
             verbose="no"

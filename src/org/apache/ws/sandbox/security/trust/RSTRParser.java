@@ -18,15 +18,14 @@
 package org.apache.ws.security.trust;
 
 import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.conversation.message.token.RequestSecurityTokenResponse;
-import org.apache.ws.security.conversation.message.token.RequestedProofToken;
-import org.apache.ws.security.conversation.message.token.RequestedSecurityToken;
 import org.apache.ws.security.policy.message.token.AppliesTo;
 import org.apache.ws.security.trust.message.token.BinarySecret;
 import org.apache.ws.security.trust.message.token.ComputedKey;
 import org.apache.ws.security.trust.message.token.Entropy;
+import org.apache.ws.security.trust.message.token.RequestSecurityTokenResponse;
+import org.apache.ws.security.trust.message.token.RequestedProofToken;
+import org.apache.ws.security.trust.message.token.RequestedSecurityToken;
 import org.apache.ws.security.trust2.Lifetime;
-import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.xml.utils.QName;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -39,7 +38,7 @@ import org.w3c.dom.NodeList;
  * requestor classes.
  * 
  */
-public class RSTR_Parser {
+public class RSTRParser {
 
     private Element element = null;
 	private AppliesTo appto = null;
@@ -125,7 +124,7 @@ public class RSTR_Parser {
                 if (val.getNodeType() == Node.TEXT_NODE) {
                     ckey.setComputedKeyValue(val.getNodeValue());
                 } else {
-                    throw new WSTrustException();
+                    throw new WSTrustException("Parser Exception");
                 }
             } else if (el.equals(BinarySecret.TOKEN)) {
 				this.binSecret = new BinarySecret(elem);
@@ -133,7 +132,7 @@ public class RSTR_Parser {
 				if (val.getNodeType() == Node.TEXT_NODE) {
 					binSecret.setBinarySecretValue(val.getNodeValue());
 				} else {
-				throw new WSTrustException();
+				throw new WSTrustException("Parser Exception");
 				}
                 
             }else{
@@ -166,7 +165,7 @@ public class RSTR_Parser {
                 if (val.getNodeType() == Node.TEXT_NODE) {
                     binSecret.setBinarySecretValue(val.getNodeValue());
                 } else {
-                    throw new WSTrustException();
+                    throw new WSTrustException("Parser Exception");
                 }
             } else {
                 //TODO :: Do something :-0

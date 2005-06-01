@@ -16,28 +16,28 @@
  */
 package org.apache.ws.security.trust.message.token;
 
+import javax.xml.namespace.QName;
+
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.trust.TrustConstants;
-import org.apache.ws.security.util.DOM2Writer;
-import org.apache.ws.security.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 import org.w3c.dom.Text;
-
-import javax.xml.namespace.QName;
 
 /**
  * @author Malinda Kaushalye
+ * @author Ruchith Fernando
  *         <p/>
  *         TokenType element
  */
-public class TokenType {
+public class TokenType extends AbstractToken {
+	
     public static final String UNT = "http://schemas.xmlsoap.org/ws/2004/04/security/sc/unt";
     public static final String SCT = "http://schemas.xmlsoap.org/ws/2004/04/security/sc/sct";
 
     public static final QName TOKEN = new QName(TrustConstants.WST_NS, TrustConstants.TOKEN_TYPE_LN, TrustConstants.WST_PREFIX);
-    Element element = null;
+    
+    private Text valueText = null;
 
     /**
      * Constructor for TokenType
@@ -46,11 +46,7 @@ public class TokenType {
      * @throws WSSecurityException
      */
     public TokenType(Element elem) throws WSSecurityException {
-        this.element = elem;
-        QName el = new QName(this.element.getNamespaceURI(), this.element.getLocalName());
-        if (!el.equals(TOKEN)) {
-            throw new WSSecurityException(WSSecurityException.INVALID_SECURITY_TOKEN, "badTokenType", new Object[]{el});
-        }
+    	super(elem);
     }
 
     /**
@@ -59,55 +55,39 @@ public class TokenType {
      * @param doc
      */
     public TokenType(Document doc) {
-        this.element = doc.createElementNS(TOKEN.getNamespaceURI(), TOKEN.getPrefix() + ":" + TOKEN.getLocalPart());
-        WSSecurityUtil.setNamespace(this.element, TrustConstants.WST_NS, TrustConstants.WST_PREFIX);
-        this.element.appendChild(doc.createTextNode(""));
+        super(doc);
     }
 
-    public Text getFirstNode() {
-        Node node = this.element.getFirstChild();
-        return ((node != null) && node instanceof Text) ? (Text) node : null;
+    /**
+     * Set the TokenType value
+     *
+     * @param val
+     */
+    public void setValue(String val) {
+        if(this.valueText != null)
+        	this.element.removeChild(this.valueText);
+        
+        this.valueText = element.getOwnerDocument().createTextNode(val);
+    	this.element.appendChild(this.valueText);
     }
-
+    
     /**
      * This will return the text node of the element
      *
      * @return
      */
     public String getValue() {
-        String val = "";
-        if (this.element.getFirstChild().getNodeType() != Node.TEXT_NODE) {
-            return null;
-        }
-        val = this.element.getFirstChild().getNodeValue();
-        return val;
+    	if(this.valueText != null)
+    		return this.valueText.getNodeValue();
+    	else
+    		return null;
     }
 
-    /**
-     * This will append the text node to the element
-     *
-     * @param val
-     */
-    public void setValue(String val) {
-        this.element.appendChild(element.getOwnerDocument().createTextNode(val));
-    }
-
-    /**
-     * @return
-     */
-    public Element getElement() {
-        return element;
-    }
-
-    /**
-     * @param element
-     */
-    public void setElement(Element element) {
-        this.element = element;
-    }
-
-    public String toString() {
-        return DOM2Writer.nodeToString((Node) this.element);
-    }
-
+	/**
+	 * Returns the QName of this type
+	 * @see org.apache.ws.security.trust.message.token.AbstractToken#getToken()
+	 */
+	protected QName getToken() {
+		return TOKEN;
+	}
 }

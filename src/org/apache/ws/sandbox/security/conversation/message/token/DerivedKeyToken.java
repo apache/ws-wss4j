@@ -23,7 +23,7 @@ import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.conversation.ConversationConstants;
 import org.apache.ws.security.conversation.ConversationException;
-import org.apache.ws.security.conversation.dkAlgo.DerivationAlgorithm;
+import org.apache.ws.security.conversation.dkalgo.DerivationAlgorithm;
 import org.apache.ws.security.message.token.SecurityTokenReference;
 import org.apache.ws.security.util.DOM2Writer;
 import org.apache.ws.security.util.WSSecurityUtil;

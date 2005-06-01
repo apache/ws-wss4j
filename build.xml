@@ -527,7 +527,7 @@ org.apache.ws.axis.security.util
                 <fileset dir="${build.classes}">
                     <include name="**/wssec/PackageTests.class"/>
                     <include name="**/components/PackageTests.class"/>
-                    <include name="**/secconv/components/PackageTests.class"/>  
+                    <!-- <include name="**/secconv/components/PackageTests.class"/>  -->
                 </fileset>
             </batchtest>
         </junit>
