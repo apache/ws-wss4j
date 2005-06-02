@@ -52,9 +52,11 @@ import org.apache.ws.security.conversation.DerivedKeyCallbackHandler;
 import org.apache.ws.security.conversation.message.info.SecurityContextInfo;
 import org.apache.ws.security.conversation.message.token.SecurityContextToken;
 import org.apache.ws.security.handler.WSHandlerConstants;
+import org.apache.ws.security.transform.STRTransform;
 import org.apache.ws.security.trust.message.token.RequestSecurityTokenResponse;
 import org.apache.ws.security.trust.message.token.RequestedProofToken;
 import org.apache.ws.security.util.WSSecurityUtil;
+import org.apache.xml.security.transforms.Transform;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -86,7 +88,19 @@ public class TestRSTR extends TestCase implements CallbackHandler{
 	Crypto crypto = CryptoFactory.getInstance();
 	
 	static{
-	org.apache.xml.security.Init.init();
+        org.apache.xml.security.Init.init();
+        String Id = "BC";
+        if (java.security.Security.getProvider(Id) == null) {
+            log.debug("The provider " + Id
+                    + " had to be added to the java.security.Security");
+            java.security.Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
+        }
+        Transform.init();
+        try {
+            Transform.register(STRTransform.implementedTransformURI,
+                    "org.apache.ws.security.transform.STRTransform");
+        } catch (Exception ex) {
+        }
 	}
 	//sharedSecret = "SriLankaSriLankaSriLanka".getBytes();
 

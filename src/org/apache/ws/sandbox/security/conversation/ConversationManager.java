@@ -93,7 +93,7 @@ public class ConversationManager {
         // step 1 : Creating wsse:Reference to DerivedKeyToken
         Reference ref = new Reference(WSSConfig.getDefaultWSConfig(), doc);
         ref.setURI("#" + genID);
-        ref.setValueType("http://schemas.xmlsoap.org/ws/2004/04/security/sc/dk");
+        ref.setValueType(ConversationConstants.TOKEN_TYPE_DERIVED_KEY_TOKEN);
         SecurityTokenReference stRef = new SecurityTokenReference(WSSConfig.getDefaultWSConfig(), doc);
         stRef.setReference(ref);
 
