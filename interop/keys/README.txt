@@ -7,19 +7,23 @@
   certificate.
 - Conversion tips are from http://mark.foster.cc/kb/openssl-keytool.html  
 
-java -classpath org.mortbay.jetty-5.1.4rc0.jar org.mortbay.util.PKCS12Import alice.pfx alice.jks
-java -classpath org.mortbay.jetty-5.1.4rc0.jar org.mortbay.util.PKCS12Import bob.pfx bob.jks
-java -classpath org.mortbay.jetty-5.1.4rc0.jar org.mortbay.util.PKCS12Import ca.pfx ca.jks
-java -classpath org.mortbay.jetty-5.1.4rc0.jar org.mortbay.util.PKCS12Import root.pfx root.jks
+set CLASSPATH=org.mortbay.jetty-5.1.4rc0.jar;
+
+java org.mortbay.util.PKCS12Import alice.pfx interop2.jks
+keytool -keyclone -keystore interop2.jks -alias 1 -dest alice
+keytool -delete -keystore interop2.jks -alias 1
+
+java org.mortbay.util.PKCS12Import bob.pfx interop2.jks
+keytool -keyclone -keystore interop2.jks -alias 1 -dest bob
+keytool -delete -keystore interop2.jks -alias 1
+
+java org.mortbay.util.PKCS12Import ca.pfx ca.jks
+java org.mortbay.util.PKCS12Import root.pfx root.jks
 
 keytool -export -alias 1 -keystore root.jks -file root.crt
-keytool -export -alias 1 -keystore bob.jks -file bob.crt
-keytool -export -alias 1 -keystore alice.jks -file alice.crt
 keytool -export -alias 1 -keystore ca.jks -file ca.crt
 
 keytool -import -keystore interop2.jks -import -trustcacerts -alias root -file root.crt
 keytool -import -keystore interop2.jks -import -trustcacerts -alias ca -file ca.crt
-keytool -import -keystore interop2.jks -import -trustcacerts -alias bob -file bob.crt
-keytool -import -keystore interop2.jks -import -trustcacerts -alias alice -file alice.crt
 
 keytool -list -v -keystore interop2.jks

@@ -129,14 +129,14 @@
    <handler type="java:org.apache.ws.axis.security.WSDoAllSender" >
     <parameter name="action" value="Signature Encrypt Timestamp"/>
     <!-- Use the Server's cert/key to sign the response -->
-    <parameter name="user" value="c82f74d031dabf9d7546f40ad07c32c0_1e149434-9d3a-4adc-9284-4cfdc595012f"/>
+    <parameter name="user" value="bob"/>
     <parameter name="passwordCallbackClass" 
       value="org.apache.ws.axis.oasis.PWCallback1"/>
     <parameter name="signatureKeyIdentifier" value="DirectReference" />
     <parameter name="signaturePropFile" value="wsstest.properties" />
     <parameter name="encryptionKeyIdentifier" value="SKIKeyIdentifier" />
     <!-- Use the Client's cert/key to encrypt the response -->
-    <parameter name="encryptionUser" value="1fb7623be7b2f4831ffc3f3741fa09dd_1e149434-9d3a-4adc-9284-4cfdc595012f" />
+    <parameter name="encryptionUser" value="alice" />
    </handler>
   </responseFlow>
   </service>
@@ -172,7 +172,7 @@
    <handler type="java:org.apache.ws.axis.security.WSDoAllSender" >
     <parameter name="action" value="Signature Encrypt Timestamp"/>
     <!-- Use the Server's cert/key to sign the response -->
-    <parameter name="user" value="c82f74d031dabf9d7546f40ad07c32c0_1e149434-9d3a-4adc-9284-4cfdc595012f"/>
+    <parameter name="user" value="bob"/>
     <parameter name="passwordCallbackClass" 
       value="org.apache.ws.axis.oasis.PWCallback1"/>
     <parameter name="signatureKeyIdentifier" value="SKIKeyIdentifier" />
@@ -245,14 +245,14 @@
    <handler type="java:org.apache.ws.axis.security.WSDoAllSender" >
     <parameter name="action" value="Encrypt Signature Timestamp"/>
     <!-- Use the Server's cert/key to sign the response -->
-    <parameter name="user" value="c82f74d031dabf9d7546f40ad07c32c0_1e149434-9d3a-4adc-9284-4cfdc595012f"/>
+    <parameter name="user" value="bob"/>
     <parameter name="passwordCallbackClass" 
       value="org.apache.ws.axis.oasis.PWCallback1"/>
     <parameter name="signatureKeyIdentifier" value="SKIKeyIdentifier" />
     <parameter name="signaturePropFile" value="wsstest.properties" />
     <parameter name="encryptionKeyIdentifier" value="DirectReference" />
     <!-- Use the Client's cert/key to encrypt the response -->
-    <parameter name="encryptionUser" value="1fb7623be7b2f4831ffc3f3741fa09dd_1e149434-9d3a-4adc-9284-4cfdc595012f" />
+    <parameter name="encryptionUser" value="alice" />
    </handler>
   </responseFlow>
   </service>
@@ -290,7 +290,7 @@
    <handler type="java:org.apache.ws.axis.security.WSDoAllSender" >
     <parameter name="action" value="Signature Encrypt Timestamp"/>
     <!-- Use the Server's cert/key to sign the response -->
-    <parameter name="user" value="c82f74d031dabf9d7546f40ad07c32c0_1e149434-9d3a-4adc-9284-4cfdc595012f"/>
+    <parameter name="user" value="bob"/>
     <parameter name="passwordCallbackClass" 
       value="org.apache.ws.axis.oasis.PWCallback1"/>
     <parameter name="signatureKeyIdentifier" value="SKIKeyIdentifier" />
@@ -298,7 +298,7 @@
     <parameter name="encryptionPropFile" value="wsstest.properties" />
     <parameter name="encryptionKeyIdentifier" value="DirectReference" />
     <!-- Use the Client's cert/key to encrypt the response -->    
-    <parameter name="encryptionUser" value="1fb7623be7b2f4831ffc3f3741fa09dd_1e149434-9d3a-4adc-9284-4cfdc595012f" />
+    <parameter name="encryptionUser" value="alice" />
    </handler>
   </responseFlow>
       

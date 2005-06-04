@@ -44,10 +44,10 @@ public class PWCallBackHandler implements CallbackHandler {
 					//for whatever username set the password as rabbit
 					if(pc.getIdentifer().equals("Alice")){						
 						pc.setPassword("ecilA");
-					} else if(pc.getIdentifer().equals("1fb7623be7b2f4831ffc3f3741fa09dd_1e149434-9d3a-4adc-9284-4cfdc595012f")) {
-						pc.setPassword("interop");
-					} else if(pc.getIdentifer().equals("c82f74d031dabf9d7546f40ad07c32c0_1e149434-9d3a-4adc-9284-4cfdc595012f")) {
-						pc.setPassword("interop");
+					} else if(pc.getIdentifer().equals("alice")) {
+						pc.setPassword("password");
+					} else if(pc.getIdentifer().equals("bob")) {
+						pc.setPassword("password");
 					}
 			     }
 			}

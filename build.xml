@@ -638,7 +638,7 @@ org.apache.ws.axis.security.util
     </copy>
     <copy todir="${build.webapp}/WEB-INF/classes/interop">
         <fileset dir="${dir.interop}">
-            <include name="**/interop.jks"/>
+            <include name="**/interop2.jks"/>
         </fileset>
     </copy>
 
