@@ -2,7 +2,7 @@
  * TicketType.java
  *
  * This file was auto-generated from WSDL
- * by the Apache Axis 1.2RC3 Feb 28, 2005 (10:15:14 EST) WSDL2Java emitter.
+ * by the Apache Axis 1.2 May 03, 2005 (02:20:24 EDT) WSDL2Java emitter.
  */
 
 package secconv.scenarios.ping.impl;
@@ -117,6 +117,7 @@ public class TicketType  implements java.io.Serializable, org.apache.axis.encodi
         elemField.setFieldName("_value");
         elemField.setXmlName(new javax.xml.namespace.QName("", "_value"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
+        elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);
     }
 

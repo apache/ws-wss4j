@@ -2,7 +2,7 @@
  * PingBindingStub.java
  *
  * This file was auto-generated from WSDL
- * by the Apache Axis 1.2RC3 Feb 28, 2005 (10:15:14 EST) WSDL2Java emitter.
+ * by the Apache Axis 1.2 May 03, 2005 (02:20:24 EDT) WSDL2Java emitter.
  */
 
 package secconv.scenarios.ping.impl;
@@ -22,10 +22,13 @@ public class PingBindingStub extends org.apache.axis.client.Stub implements secc
 
     private static void _initOperationDesc1(){
         org.apache.axis.description.OperationDesc oper;
+        org.apache.axis.description.ParameterDesc param;
         oper = new org.apache.axis.description.OperationDesc();
         oper.setName("Ping");
-        oper.addParameter(new javax.xml.namespace.QName("http://xmlsoap.org/Ping", "ticket"), new javax.xml.namespace.QName("http://xmlsoap.org/Ping", "ticketType"), secconv.scenarios.ping.impl.TicketType.class, org.apache.axis.description.ParameterDesc.IN, false, false);
-        oper.addParameter(new javax.xml.namespace.QName("http://xmlsoap.org/Ping", "text"), new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"), java.lang.String.class, org.apache.axis.description.ParameterDesc.INOUT, false, false);
+        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://xmlsoap.org/Ping", "ticket"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://xmlsoap.org/Ping", "ticketType"), secconv.scenarios.ping.impl.TicketType.class, false, false);
+        oper.addParameter(param);
+        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://xmlsoap.org/Ping", "text"), org.apache.axis.description.ParameterDesc.INOUT, new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"), java.lang.String.class, false, false);
+        oper.addParameter(param);
         oper.setReturnType(org.apache.axis.encoding.XMLType.AXIS_VOID);
         oper.setStyle(org.apache.axis.constants.Style.WRAPPED);
         oper.setUse(org.apache.axis.constants.Use.LITERAL);
@@ -51,6 +54,7 @@ public class PingBindingStub extends org.apache.axis.client.Stub implements secc
         ((org.apache.axis.client.Service)super.service).setTypeMappingVersion("1.2");
             java.lang.Class cls;
             javax.xml.namespace.QName qName;
+            javax.xml.namespace.QName qName2;
             java.lang.Class beansf = org.apache.axis.encoding.ser.BeanSerializerFactory.class;
             java.lang.Class beandf = org.apache.axis.encoding.ser.BeanDeserializerFactory.class;
             java.lang.Class enumsf = org.apache.axis.encoding.ser.EnumSerializerFactory.class;
@@ -72,8 +76,7 @@ public class PingBindingStub extends org.apache.axis.client.Stub implements secc
 
     protected org.apache.axis.client.Call createCall() throws java.rmi.RemoteException {
         try {
-            org.apache.axis.client.Call _call =
-                    (org.apache.axis.client.Call) super.service.createCall();
+            org.apache.axis.client.Call _call = super._createCall();
             if (super.maintainSessionSet) {
                 _call.setMaintainSession(super.maintainSession);
             }
