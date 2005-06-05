@@ -91,7 +91,7 @@ public class WSS4JHandler implements Handler {
     static Log log = LogFactory.getLog(WSS4JHandler.class.getName());
     static final WSSecurityEngine secEngine = new WSSecurityEngine();
 
-    private boolean doDebug = true;
+    private boolean doDebug = false;
     private static Hashtable cryptos = new Hashtable(5);
     private SOAPMessageContext msgContext = null;
 
@@ -160,6 +160,7 @@ public class WSS4JHandler implements Handler {
      * Switch for transfering control to doReceiver and doSender
      */
     public boolean processMessage(MessageContext mc, boolean messageType) {
+        doDebug = log.isDebugEnabled();
         String deployment = null;
         if ((deployment = (String) handlerInfo.getHandlerConfig().get(DEPLOYMENT)) == null) {
             deployment = (String) msgContext.getProperty(DEPLOYMENT);
@@ -253,7 +254,8 @@ public class WSS4JHandler implements Handler {
         */
         Document doc = null;
         SOAPMessage message = msgContext.getMessage();
-
+        Boolean propFormOptimization = (Boolean)msgContext.getProperty("axis.form.optimization");
+        log.debug("Form optimzation: " + propFormOptimization);
         /*
         * If the message context property conatins a document then this is a
         * chained handler.
@@ -267,6 +269,12 @@ public class WSS4JHandler implements Handler {
                 throw new JAXRPCException("WSS4JHandler: cannot get SOAP envlope from message" + e);
             }
         }
+        if (doDebug) {
+            log.debug("WSS4JHandler: orginal SOAP request: ");
+            log.debug(org.apache.axis.utils.XMLUtils
+                    .PrettyDocumentToString(doc));
+        }
+        
         soapConstants =
                 WSSecurityUtil.getSOAPConstants(doc.getDocumentElement());
         /*
@@ -372,12 +380,6 @@ public class WSS4JHandler implements Handler {
             ByteArrayOutputStream os = new ByteArrayOutputStream();
             // documentToStream(doc, os);
 			XMLUtils.outputDOM(doc, os, true);
-
-            try {
-                sPart.setContent(new StreamSource(new ByteArrayInputStream(os.toByteArray())));
-            } catch (SOAPException se) {
-                throw new JAXRPCException("Couldn't set content on SOAPPart" + se.getMessage());
-            }
             if (doDebug) {
                 String osStr = null;
                 try {
@@ -387,6 +389,12 @@ public class WSS4JHandler implements Handler {
                 }
                 log.debug("Send request:");
                 log.debug(osStr);
+            }
+
+            try {
+                sPart.setContent(new StreamSource(new ByteArrayInputStream(os.toByteArray())));
+            } catch (SOAPException se) {
+                throw new JAXRPCException("Couldn't set content on SOAPPart" + se.getMessage());
             }
             msgContext.setProperty(WSHandlerConstants.SND_SECURITY, null);
         }
