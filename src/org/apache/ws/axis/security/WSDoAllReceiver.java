@@ -41,6 +41,7 @@ import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.message.token.Timestamp;
 import org.apache.ws.security.util.WSSecurityUtil;
+import org.apache.ws.security.util.XmlSchemaDateFormat;
 import org.apache.xml.security.utils.XMLUtils;
 import org.w3c.dom.Document;
 
@@ -51,13 +52,12 @@ import javax.xml.soap.SOAPHeaderElement;
 import java.io.ByteArrayOutputStream;
 import java.math.BigInteger;
 import java.security.cert.X509Certificate;
-import java.text.SimpleDateFormat;
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Iterator;
-import java.util.TimeZone;
 import java.util.Vector;
 
 public class WSDoAllReceiver extends BasicHandler {
@@ -73,7 +73,7 @@ public class WSDoAllReceiver extends BasicHandler {
      *
      * @author wdi
      */
-    private class RequestData {
+    protected class RequestData {
         MessageContext msgContext = null;
 
         Crypto sigCrypto = null;
@@ -100,6 +100,8 @@ public class WSDoAllReceiver extends BasicHandler {
      * @throws AxisFault
      */
     public void invoke(MessageContext msgContext) throws AxisFault {
+        
+    	doDebug = log.isDebugEnabled();
 
         if (doDebug) {
             log.debug("WSDoAllReceiver: enter invoke() with msg type: "
@@ -670,8 +672,7 @@ public class WSDoAllReceiver extends BasicHandler {
 
         if (doDebug) {
             log.debug("Preparing to verify the timestamp");
-            SimpleDateFormat zulu = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-            zulu.setTimeZone(TimeZone.getTimeZone("GMT"));
+            DateFormat zulu = new XmlSchemaDateFormat();
             log.debug("Validation of Timestamp: Current time is "
                     + zulu.format(Calendar.getInstance().getTime()));
             log.debug("Validation of Timestamp: Valid creation is "
