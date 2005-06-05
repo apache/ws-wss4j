@@ -245,6 +245,7 @@ org.apache.ws.axis.security.util
         description="This target generates a first build directory and checks for some libraries">
         <tstamp/>
         <mkdir dir="${build.dir}"/>
+        <delete dir="${build.dir}/test-reports"/>
         <mkdir dir="${build.dir}/test-reports"/>
 
         <available property="junit.present" classname="junit.framework.TestCase">
@@ -281,7 +282,8 @@ org.apache.ws.axis.security.util
     <!-- #################################################################### -->
     <!-- #################################################################### -->
 
-    <target name="prepare-src" depends="prepare" description="This target copies the Java sources and brands the version information">
+    <target name="prepare-src" depends="prepare" 
+    	description="This target copies the Java sources and brands the version information">
         <!-- create directories -->
         <mkdir dir="${build.classes}"/>
     </target>
@@ -332,8 +334,6 @@ org.apache.ws.axis.security.util
         <javac srcdir="${dir.src}" destdir="${build.classes}" debug="on">
             <classpath refid="classpath.library"/>
             <exclude name="**/Merlin.java" unless="jdk14.present"/>
-            <!-- <exclude name="**/MerlinPFX.java" unless="jdk14.present"/> -->
-            <exclude name="**/BouncyCastle.java" unless="bc.present"/>
         </javac>
         <!-- Copy Property files -->
         <copy todir="${build.classes}">
@@ -390,9 +390,7 @@ org.apache.ws.axis.security.util
         </ant>
     </target>
 
-<!-- depends="compile, unitTests" -->
-    <target name="systemTests"
-                depends="compile, unitTests"
+    <target name="systemTests" depends="compile"
         if="junit.present"
         description="Runs all JUnit tests">
         <runaxisfunctionaltests
@@ -452,7 +450,7 @@ org.apache.ws.axis.security.util
             <classpath refid="classpath.library"/>
             <arg line="${deploy_xml_property}"/>
         </java>
-
+<!--
         <junit printsummary="yes"
             haltonfailure="yes"
             fork="yes"
@@ -471,14 +469,14 @@ org.apache.ws.axis.security.util
                 </fileset>
             </batchtest>
         </junit>
-
+-->
         <java classname="org.apache.axis.utils.Admin" fork="true">
             <classpath refid="classpath.library"/>
             <arg value="client"/>
             <arg file="${build.work}/org/apache/ws/axis/oasis/ping/undeploy.wsdd"/>
         </java>
         
-        <!--
+
         <junit printsummary="yes"
             haltonfailure="yes"
             fork="yes"
@@ -497,7 +495,7 @@ org.apache.ws.axis.security.util
                 </fileset>
             </batchtest>
         </junit>
-        -->
+
 
         <java classname="org.apache.axis.client.AdminClient" fork="yes">
             <classpath refid="classpath.library"/>
@@ -535,7 +533,7 @@ org.apache.ws.axis.security.util
 
     <!-- generate a report from all the tests. 
            requires Xalan or other XSLT engine in ant\lib-->
-    <target name="report" depends="prepare">
+    <target name="report" depends="init">
         <junitreport todir="${build.dir}/test-reports">
             <fileset dir="${build.dir}/test-reports">
                 <include name="TEST-*.xml"/>
@@ -555,18 +553,19 @@ org.apache.ws.axis.security.util
             />
     </target>
 
-    <target name="dist" depends="gump" description="Build zip file for distro">
-<!--     <target name="dist" depends="init" description="Build zip file for distro"> -->
+   <target name="bindist" depends="gump" description="Build zip file for distro">
+   		<delete dir="${dir.dist}"/>
         <mkdir dir="${dir.dist}"/>
         <jar jarfile="${dir.dist}/${jar.library}"
             basedir="${build.classes}"
             includes="**/apache/**/security/**"  />
-        <zip destfile="${dir.dist}/${product.shortname}-${product.version}.zip">
+        <zip destfile="${dir.dist}/${product.shortname}-bin-${product.version}.zip">
             <zipfileset prefix="wss4j" dir="."
-                includes="keys/**, interop/**, test/**, samples/**"/>
+                includes="keys/**, interop/**, interop2/**, test/**, samples/**,
+        				  LICENSE.txt, legal/**, webapps/**"/>
             <zipfileset prefix="wss4j/classes" dir="${build.classes}"
                 includes="interop/**, wssec/**, org/**/oasis/**, org/**/samples/**"/>
-            <zipfileset prefix="wss4j/api" dir="${build.javadoc}"/>
+            <zipfileset prefix="wss4j/doc/api" dir="${build.javadoc}"/>
             <zipfileset fullpath="wss4j/${jar.library}" dir="${dir.dist}" includes="${jar.library}"/>
         </zip>
 	  <delete file="${dir.dist}/${jar.library}" />
@@ -574,7 +573,7 @@ org.apache.ws.axis.security.util
 
     <target name="srcdist" depends="init" description="Build source zip file for distro">
         <mkdir dir="${dir.dist}"/>
-        <zip destfile="${dir.dist}/${product.shortname}-${product.version}-src.zip">
+        <zip destfile="${dir.dist}/${product.shortname}-src-${product.version}-src.zip">
             <zipfileset prefix="wss4j" dir="."
                 includes="src/** LICENSE.txt build.xml "/>
         </zip>
