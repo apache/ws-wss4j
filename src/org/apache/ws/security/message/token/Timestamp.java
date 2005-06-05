@@ -22,6 +22,7 @@ import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.util.DOM2Writer;
 import org.apache.ws.security.util.WSSecurityUtil;
+import org.apache.ws.security.util.XmlSchemaDateFormat;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -29,6 +30,7 @@ import org.w3c.dom.Text;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.text.DateFormat;
 import java.util.Calendar;
 import java.util.TimeZone;
 import java.util.Date;
@@ -84,9 +86,8 @@ public class Timestamp {
             }
         }
 
-        SimpleDateFormat zulu = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-        zulu.setTimeZone(TimeZone.getTimeZone("UTC"));
-
+        DateFormat zulu = new XmlSchemaDateFormat();;
+        
         try {
             created.setTime(zulu.parse(strCreated));
             expires.setTime(zulu.parse(strExpires));
@@ -118,8 +119,14 @@ public class Timestamp {
                 wssConfig.getWsuNS(),
                 WSConstants.WSU_PREFIX);
 
-        SimpleDateFormat zulu = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-        zulu.setTimeZone(TimeZone.getTimeZone("UTC"));
+        DateFormat zulu = null;
+        if (WSConstants.TIMESTAMP_WITH_MS) {
+        	zulu = new XmlSchemaDateFormat();
+        }
+        else {
+        	zulu = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+        	zulu.setTimeZone(TimeZone.getTimeZone("UTC"));
+        }
         Calendar rightNow = Calendar.getInstance();
 
         elementCreated =
@@ -168,7 +175,7 @@ public class Timestamp {
      * Get the time of creation.
      * <p/>
      *
-     * @return
+     * @return the "created" time
      */
     public Calendar getCreated() {
         return created;
@@ -178,7 +185,7 @@ public class Timestamp {
      * Get the time of expiration.
      * <p/>
      *
-     * @return
+     * @return the "expires" time
      */
     public Calendar getExpires() {
         return expires;

@@ -24,6 +24,7 @@ import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.util.DOM2Writer;
 import org.apache.ws.security.util.WSSecurityUtil;
+import org.apache.ws.security.util.XmlSchemaDateFormat;
 import org.apache.xml.security.utils.Base64;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -37,6 +38,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.text.SimpleDateFormat;
+import java.text.DateFormat;
 import java.util.Calendar;
 import java.util.TimeZone;
 
@@ -185,8 +187,14 @@ public class UsernameToken {
         if (elementCreated != null) {
             return;
         }
-        SimpleDateFormat zulu = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-        zulu.setTimeZone(TimeZone.getTimeZone("UTC"));
+        DateFormat zulu = null;
+        if (WSConstants.TIMESTAMP_WITH_MS) {
+        	zulu = new XmlSchemaDateFormat();
+        }
+        else {
+        	zulu = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+        	zulu.setTimeZone(TimeZone.getTimeZone("UTC"));
+        }
         Calendar rightNow = Calendar.getInstance();
         this.elementCreated = doc.createElementNS(wssConfig.getWsuNS(), "wsu:" + WSConstants.CREATED_LN);
         WSSecurityUtil.setNamespace(this.elementCreated, wssConfig.getWsuNS(), WSConstants.WSU_PREFIX);

@@ -51,7 +51,17 @@ public class WSConstants {
      * @param specs instructs WSS4J on which standard to follow
      */
     public static final int COMPLIANCE_MODE = OASIS_1_0;
+    /**
+     * Set the timestamp precision mode.
+     * If set to <code>true</code> then use timestamps with milliseconds,
+     * otherwise omit the millisconds. As per XML Date/Time specification
+     * the defualt is to include the milliseconds.
+     */
+    public static final boolean TIMESTAMP_WITH_MS = true;
 
+    /*
+     * All the various string and keywords required.
+     */
     public static final String WSSE_NS_OASIS_2002_07 = "http://schemas.xmlsoap.org/ws/2002/07/secext";
     public static final String WSSE_NS_OASIS_2002_12 = "http://schemas.xmlsoap.org/ws/2002/12/secext";
     public static final String WSSE_NS_OASIS_2003_06 = "http://schemas.xmlsoap.org/ws/2003/06/secext";
