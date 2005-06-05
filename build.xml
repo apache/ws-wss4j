@@ -49,7 +49,7 @@ Build Instructions:
         <property name='product.Version' value='${product.version.major}.${product.version.minor}.${product.version.level}'/>
         <property name='product.version' value='${product.version.major}.${product.version.minor}.${product.version.level}'/>
         <property name='product_version' value='${product.version.major}_${product.version.minor}_${product.version.level}'/>
-        <property name="year" value="2004"/>
+        <property name="year" value="2005"/>
         <property name="copyright" value="Copyright &#169; ${year} Apache WS-Security Project. All Rights Reserved."/>
 
         <!-- Give user a chance to override without editing this file
@@ -450,7 +450,7 @@ org.apache.ws.axis.security.util
             <classpath refid="classpath.library"/>
             <arg line="${deploy_xml_property}"/>
         </java>
-<!--
+
         <junit printsummary="yes"
             haltonfailure="yes"
             fork="yes"
@@ -469,14 +469,14 @@ org.apache.ws.axis.security.util
                 </fileset>
             </batchtest>
         </junit>
--->
+
         <java classname="org.apache.axis.utils.Admin" fork="true">
             <classpath refid="classpath.library"/>
             <arg value="client"/>
             <arg file="${build.work}/org/apache/ws/axis/oasis/ping/undeploy.wsdd"/>
         </java>
         
-
+<!--
         <junit printsummary="yes"
             haltonfailure="yes"
             fork="yes"
@@ -495,7 +495,7 @@ org.apache.ws.axis.security.util
                 </fileset>
             </batchtest>
         </junit>
-
+-->
 
         <java classname="org.apache.axis.client.AdminClient" fork="yes">
             <classpath refid="classpath.library"/>
