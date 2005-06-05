@@ -592,7 +592,6 @@ org.apache.ws.axis.security.util
             />
     </target>
 
-	<!-- This target is outdated
     <target name="changelog"
         depends="prepare"
         description="Generate the changelog for WSS4J project">
@@ -604,10 +603,9 @@ org.apache.ws.axis.security.util
             style="./tools/changelog.xsl">
             <param name="title" expression="WSS4J ChangeLog"/>
             <param name="module" expression="wss4j"/>
-            <param name="cvsweb" expression="http://cvs.sourceforge.net/viewcvs.py/wss4j/"/>
+            <param name="cvsweb" expression="http://cvs.apache.org/viewcvs/ws-fx/"/>
         </style>
     </target>
-    -->
 
   <!-- =================================================================== -->
   <!-- Creates a war file for interop testing                              -->
