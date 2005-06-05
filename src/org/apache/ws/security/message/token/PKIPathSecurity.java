@@ -67,7 +67,7 @@ public class PKIPathSecurity extends BinarySecurity {
      *
      * @param reverse
      * @param crypto
-     * @return
+     * @return array of certifcates 
      * @throws WSSecurityException
      */
     public X509Certificate[] getX509Certificates(boolean reverse, Crypto crypto)

@@ -493,10 +493,11 @@ public class WSSecurityUtil {
      * Search for an element given its wsu:id.
      * <p/>
      *
-     * @param wssConfig
-     * @param doc
-     * @param id
-     * @return
+     * @param wssConfig The WSS configuration data conating namesapce 
+     * 	definitions, etc.
+     * @param doc the DOM document (SOAP request) 
+     * @param id the Id of the element
+     * @return the found element or null if no element with the Id exists
      */
     public static Element getElementByWsuId(WSSConfig wssConfig, Document doc, String id) {
         if (id == null) {
@@ -523,9 +524,9 @@ public class WSSecurityUtil {
      * Search for an element given its generic id.
      * <p/>
      *
-     * @param doc
-     * @param id
-     * @return
+     * @param doc the DOM document (SOAP request) 
+     * @param id the Id of the element
+     * @return the found element or null if no element with the Id exists
      */
     public static Element getElementByGenId(Document doc, String id) {
         if (id == null) {
@@ -543,10 +544,11 @@ public class WSSecurityUtil {
      * Create a BinarySecurityToken element
      * <p/>
      *
-     * @param doc
-     * @param wsuIdVal
-     * @param wssConfig
-     * @return
+     * @param doc the DOM document (SOAP request) 
+     * @param wsuIdVal the value for the wsu:Id
+     * @param wssConfig The WSS configuration data conating namesapce 
+     * 	definitions, etc.
+     * @return then BST element (DOM element)
      */
     public static Element createBinarySecurityToken(Document doc,
                                                     String wsuIdVal,
@@ -566,9 +568,9 @@ public class WSSecurityUtil {
      * create a new element in the same namespace
      * <p/>
      *
-     * @param parent
-     * @param localName
-     * @return
+     * @param parent for the new element
+     * @param localName of the new element
+     * @return the new element
      */
     private static Element createElementInSameNamespace(Element parent,
                                                         String localName) {
@@ -585,10 +587,10 @@ public class WSSecurityUtil {
      * find a child element with given namespace and local name
      * <p/>
      *
-     * @param parent
-     * @param namespaceUri
-     * @param localName
-     * @return
+     * @param parent the node to start the search
+     * @param namespaceUri of the element
+     * @param localName of the eleme
+     * @return the found element or null if the element does not exist
      */
     private static Element findChildElement(Element parent,
                                             String namespaceUri,
@@ -612,10 +614,10 @@ public class WSSecurityUtil {
      * append a child element
      * <p/>
      *
-     * @param doc
-     * @param parent
-     * @param child
-     * @return
+     * @param doc the DOM document (SOAP request)
+     * @param parent element of this child element
+     * @param child the element to append
+     * @return the child element
      */
     public static Element appendChildElement(Document doc,
                                              Element parent,
@@ -630,11 +632,11 @@ public class WSSecurityUtil {
      * prepend a child element
      * <p/>
      *
-     * @param doc
-     * @param parent
-     * @param child
-     * @param addWhitespace
-     * @return
+     * @param doc the DOM document (SOAP request)
+     * @param parent element of this child element
+     * @param child the element to append
+     * @param addWhitespace if true prepend a newline before child
+     * @return the child element
      */
     public static Element prependChildElement(Document doc,
                                               Element parent,
@@ -657,10 +659,10 @@ public class WSSecurityUtil {
      * find the first ws-security header block
      * <p/>
      *
-     * @param doc
-     * @param envelope
-     * @param doCreate
-     * @return
+     * @param doc the DOM document (SOAP request)
+     * @param envelope the SOAP envelope
+     * @param doCreate if true create a new WSS header block if none exists
+     * @return the WSS header or null if none found and doCreate is false
      */
     public static Element findWsseSecurityHeaderBlock(WSSConfig wssConfig, Document doc, Element envelope, boolean doCreate) {
         return findWsseSecurityHeaderBlock(wssConfig, doc, envelope, null, doCreate);
@@ -670,11 +672,11 @@ public class WSSecurityUtil {
      * find a ws-security header block for a given actor
      * <p/>
      *
-     * @param doc
-     * @param envelope
-     * @param actor
-     * @param doCreate
-     * @return
+     * @param doc the DOM document (SOAP request)
+     * @param envelope the SOAP envelope
+     * @param actor the acttoer (role) name of the WSS header
+     * @param doCreate if true create a new WSS header block if none exists
+     * @return the WSS header or null if none found and doCreate is false
      */
     public static Element findWsseSecurityHeaderBlock(WSSConfig wssConfig,
                                                       Document doc,
@@ -705,9 +707,9 @@ public class WSSecurityUtil {
      * create a base64 test node
      * <p/>
      *
-     * @param doc
-     * @param data
-     * @return
+     * @param doc the DOM document (SOAP request)
+     * @param data to encode
+     * @return a Text node containing the base64 encoded data
      */
     public static Text createBase64EncodedTextNode(Document doc, byte data[]) {
         return doc.createTextNode(Base64.encode(data));
@@ -717,10 +719,10 @@ public class WSSecurityUtil {
      * use xpath to find a node
      * <p/>
      *
-     * @param contextNode
-     * @param xpath
-     * @param nsContext
-     * @return
+     * @param contextNode node to starte the select
+     * @param xpath the xpath expression
+     * @param nsContext the context element for xpath
+     * @return the select Node
      * @throws Exception
      */
     public static Node selectSingleNode(Node contextNode,
@@ -736,8 +738,8 @@ public class WSSecurityUtil {
     /**
      * Create a namespace context with namespaces of interest
      *
-     * @param doc
-     * @return
+     * @param doc the DOM document (SOAP request)
+     * @return a conext element usable for xpath requests
      */
     public static Element createNamespaceContext(WSSConfig wssConfig, Document doc) {
         SOAPConstants sc = getSOAPConstants(doc.getDocumentElement());
