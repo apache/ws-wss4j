@@ -29,6 +29,7 @@ import org.apache.ws.security.message.token.UsernameToken;
 import org.apache.ws.security.message.token.X509Security;
 import org.apache.ws.security.transform.STRTransform;
 import org.apache.ws.security.util.WSSecurityUtil;
+import org.apache.ws.security.util.XmlSchemaDateFormat;
 import org.apache.xml.security.encryption.XMLCipher;
 import org.apache.xml.security.encryption.XMLEncryptionException;
 import org.apache.xml.security.exceptions.Base64DecodingException;
@@ -69,10 +70,9 @@ import java.security.PrivateKey;
 import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
-import java.text.SimpleDateFormat;
+import java.text.DateFormat;
 import java.util.Calendar;
 import java.util.Iterator;
-import java.util.TimeZone;
 import java.util.Vector;
 
 /**
@@ -922,8 +922,7 @@ public class WSSecurityEngine {
         if (doDebug) {
             log.debug("Preparing to verify the timestamp");
 
-            SimpleDateFormat zulu = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-            zulu.setTimeZone(TimeZone.getTimeZone("GMT"));
+            DateFormat zulu = new XmlSchemaDateFormat();
 
             log.debug("Current time: " + zulu.format(Calendar.getInstance().getTime()));
             log.debug("Timestamp created: " + zulu.format(timestamp.getCreated().getTime()));
@@ -1200,7 +1199,7 @@ public class WSSecurityEngine {
         return;
     }
 
-    private void decryptDataRef(Document doc, String dataRefURI, byte[] decryptedBytes) throws WSSecurityException {
+    private void decryptDataRef(Document doc, String dataRefURI, byte[] decryptedData) throws WSSecurityException {
         if (doDebug) {
             log.debug("found data refernce: " + dataRefURI);
         }
@@ -1224,7 +1223,7 @@ public class WSSecurityEngine {
         String symEncAlgo = getEncAlgo(encBodyData);
 
         SecretKey symmetricKey = WSSecurityUtil.prepareSecretKey(
-            symEncAlgo, decryptedBytes);
+            symEncAlgo, decryptedData);
 
         // initialize Cipher ....
         XMLCipher xmlCipher = null;
@@ -1407,19 +1406,19 @@ public class WSSecurityEngine {
                     "noPassword",
                     new Object[]{keyName});
         }
-        byte[] decryptedBytes = pwCb.getKey();
-        if (decryptedBytes == null) {
+        byte[] decryptedData = pwCb.getKey();
+        if (decryptedData == null) {
             throw new WSSecurityException(WSSecurityException.FAILURE,
                     "noPassword",
                     new Object[]{keyName});
         }
-        return WSSecurityUtil.prepareSecretKey(algorithm, decryptedBytes);
+        return WSSecurityUtil.prepareSecretKey(algorithm, decryptedData);
     }
 
     /**
      * Method getDecodedBase64EncodedData
      * @param element
-     * @return
+     * @return a byte array containing the decoded data
      * @throws WSSecurityException
      */
     public static byte[] getDecodedBase64EncodedData(Element element) throws WSSecurityException {
@@ -1443,7 +1442,7 @@ public class WSSecurityEngine {
     }
 
     /**
-     * @return
+     * @return the strored decrypted bytes
      */
     public byte[] getDecryptedBytes() {
         return decryptedBytes;
