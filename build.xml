@@ -350,7 +350,31 @@ org.apache.ws.axis.security.util
 
         <javac srcdir="${dir.test}" destdir="${build.classes}" debug="on">
             <classpath refid="classpath.test"/>
-            <exclude name="**/secconv/*.java"/>
+            <exclude name="**/secconv/**/*.java"/>
+        </javac>
+
+        <mkdir dir="${build.work}"/>
+
+        <axis-wsdl2java
+            output="${build.work}"
+            serverSide="yes"
+            testcase="no"
+            verbose="no"
+            url="${dir.test}/secconv/scenarios/ping.wsdl">
+            <mapping
+                namespace="http://xmlsoap.org/Ping"
+                package="secconv.scenarios.ping.impl"/>
+        </axis-wsdl2java>
+
+        <copy todir="${build.work}/secconv/" overwrite="yes">
+          <fileset dir="${dir.test}/secconv/">
+            <include name="**/*.java"/>
+            <include name="**/*.wsdd"/>
+          </fileset>
+        </copy>
+
+        <javac srcdir="${build.work}" destdir="${build.classes}" debug="on">
+            <classpath refid="classpath.test"/>
         </javac>
 
         <!-- Copy Property files -->
@@ -379,11 +403,6 @@ org.apache.ws.axis.security.util
     <target name="compile.interops"
         depends="compile.library">
         <ant dir="${dir.interop}"
-            antfile="build.xml"
-            target="compile"
-            inheritAll="false">
-        </ant>
-        <ant dir="test/secconv/scenarios"
             antfile="build.xml"
             target="compile"
             inheritAll="false">
