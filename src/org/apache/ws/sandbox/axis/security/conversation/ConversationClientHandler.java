@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Stack;
 import java.util.Vector;
 
 import javax.xml.namespace.QName;
@@ -36,24 +35,17 @@ import org.apache.axis.components.logger.LogFactory;
 import org.apache.axis.handlers.BasicHandler;
 import org.apache.axis.message.MessageElement;
 import org.apache.axis.message.SOAPHeaderElement;
-import org.apache.axis.types.URI;
-import org.apache.axis.types.URI.MalformedURIException;
 import org.apache.commons.logging.Log;
-import org.apache.ws.axis.security.trust.secconv.interop.InteropHandshaker;
-import org.apache.ws.axis.security.trust.secconv.interop.RST_Requester;
-
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
-import org.apache.ws.security.conversation.ConvEngineResult;
 import org.apache.ws.security.conversation.ConversationConstants;
 import org.apache.ws.security.conversation.ConversationEngine;
 import org.apache.ws.security.conversation.ConversationException;
 import org.apache.ws.security.conversation.ConversationManager;
-import org.apache.ws.security.conversation.ConversationSession;
 import org.apache.ws.security.conversation.ConversationUtil;
 import org.apache.ws.security.conversation.DerivedKeyCallbackHandler;
 import org.apache.ws.security.conversation.message.info.DerivedKeyInfo;
@@ -61,13 +53,10 @@ import org.apache.ws.security.conversation.message.info.SecurityContextInfo;
 import org.apache.ws.security.conversation.message.token.SecurityContextToken;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.message.token.SecurityTokenReference;
-//import org.apache.ws.security.trust.TrustCommunicator;
 import org.apache.ws.security.transform.STRTransform;
-import org.apache.ws.security.trust.TrustConstants;
 import org.apache.ws.security.trust.message.token.RequestSecurityTokenResponse;
 import org.apache.ws.security.trust.message.token.RequestedProofToken;
 import org.apache.ws.security.trust.message.token.RequestedSecurityToken;
-import org.apache.ws.security.trust.message.token.TokenType;
 import org.apache.ws.security.util.StringUtil;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.xml.security.transforms.Transform;
@@ -211,9 +200,9 @@ public class ConversationClientHandler extends BasicHandler {
                 case ConversationConstants.STSREQUEST_TOKEN ://the scenario where STS signs the token.
                     break;
                 
-                case ConversationConstants.INTEROP_SCENE1 :
-				    this.doHandlshake_Interop(sm);
-                	break;
+//                case ConversationConstants.INTEROP_SCENE1 :
+//				    this.doHandlshake_Interop(sm);
+//                	break;
                 
                 default :
                     throw new AxisFault("Unsupored STS establishment method.");
@@ -683,80 +672,80 @@ public class ConversationClientHandler extends BasicHandler {
     } //end of doHandshake_STS_Generated
 
 
-    private void doHandlshake_Interop(Message sm) throws AxisFault{
-    	
-    	InteropHandshaker interop = new InteropHandshaker();
-		interop.handshake(getOptions()); 
-		//System.out.println("Ok back");
-		this.dkcbHandler = interop.getDkcb(); 
-		
-		this.uuid = interop.getUuid();
-		
-
-		log.debug("Done handlshake .");
-		SOAPPart sPart = (org.apache.axis.SOAPPart) sm.getSOAPPart();
-		Document doc = null;
-		
-		try {
-			doc =
-				((org.apache.axis.message.SOAPEnvelope) sPart
-					.getEnvelope())
-					.getAsDocument();
-		} catch (Exception e) {
-			throw new AxisFault("CoversationClientHandler :: Cannot get the document");
-		}
-
-		try {
-
-			//				add the relavent SCT
-			Element securityHeader =
-				WSSecurityUtil.findWsseSecurityHeaderBlock(WSSConfig.getDefaultWSConfig(),
-					doc,
-					doc.getDocumentElement(),
-					true);
-			WSSecurityUtil.appendChildElement(
-				doc,
-				securityHeader,
-				(new SecurityContextToken(doc, uuid)).getElement());
-			ConversationManager manager = new ConversationManager();
-					
-			for (int i = 0; i < this.actionsInt.length; i++) {
-				// Derrive the token
-				System.out.println("UUID is "+this.uuid);
-				DerivedKeyInfo dkInfo =
-					manager.createDerivedKeyToken(doc, this.uuid, dkcbHandler,null,keyLen);
-
-				String genID = dkInfo.getId();
-				SecurityTokenReference stRef =
-					dkInfo.getSecTokRef2DkToken();
-				if (actionsInt[i] == ConversationConstants.DK_ENCRYPT) {
-					manager.performDK_ENCR(
-						ConversationUtil.generateIdentifier(uuid, genID),
-						"",
-						true,
-						doc,
-						stRef,
-						dkcbHandler, null, (String)this.configurator.get(ConvHandlerConstants.DK_ENC_ALGO));
-				} else if(actionsInt[i]==ConversationConstants.DK_SIGN){
-					//TODO:
-					manager.performDK_Sign(doc, dkcbHandler, uuid, dkInfo, null);
-				}
-
-				manager.addDkToken(doc,dkInfo);
-			}
-		} catch (ConversationException e1) {
-			e1.printStackTrace();
-			throw new AxisFault(
-				"ConversationClientHandler ::" + e1.getMessage());
-		}
-
-		//set it as current message
-		ByteArrayOutputStream os = new ByteArrayOutputStream();
-		XMLUtils.outputDOM(doc, os, true);
-		String osStr = os.toString();
-		sPart.setCurrentMessage(osStr, SOAPPart.FORM_STRING);
-		
-    }
+//    private void doHandlshake_Interop(Message sm) throws AxisFault{
+//    	
+//    	InteropHandshaker interop = new InteropHandshaker();
+//		interop.handshake(getOptions()); 
+//		//System.out.println("Ok back");
+//		this.dkcbHandler = interop.getDkcb(); 
+//		
+//		this.uuid = interop.getUuid();
+//		
+//
+//		log.debug("Done handlshake .");
+//		SOAPPart sPart = (org.apache.axis.SOAPPart) sm.getSOAPPart();
+//		Document doc = null;
+//		
+//		try {
+//			doc =
+//				((org.apache.axis.message.SOAPEnvelope) sPart
+//					.getEnvelope())
+//					.getAsDocument();
+//		} catch (Exception e) {
+//			throw new AxisFault("CoversationClientHandler :: Cannot get the document");
+//		}
+//
+//		try {
+//
+//			//				add the relavent SCT
+//			Element securityHeader =
+//				WSSecurityUtil.findWsseSecurityHeaderBlock(WSSConfig.getDefaultWSConfig(),
+//					doc,
+//					doc.getDocumentElement(),
+//					true);
+//			WSSecurityUtil.appendChildElement(
+//				doc,
+//				securityHeader,
+//				(new SecurityContextToken(doc, uuid)).getElement());
+//			ConversationManager manager = new ConversationManager();
+//					
+//			for (int i = 0; i < this.actionsInt.length; i++) {
+//				// Derrive the token
+//				System.out.println("UUID is "+this.uuid);
+//				DerivedKeyInfo dkInfo =
+//					manager.createDerivedKeyToken(doc, this.uuid, dkcbHandler,null,keyLen);
+//
+//				String genID = dkInfo.getId();
+//				SecurityTokenReference stRef =
+//					dkInfo.getSecTokRef2DkToken();
+//				if (actionsInt[i] == ConversationConstants.DK_ENCRYPT) {
+//					manager.performDK_ENCR(
+//						ConversationUtil.generateIdentifier(uuid, genID),
+//						"",
+//						true,
+//						doc,
+//						stRef,
+//						dkcbHandler, null, (String)this.configurator.get(ConvHandlerConstants.DK_ENC_ALGO));
+//				} else if(actionsInt[i]==ConversationConstants.DK_SIGN){
+//					//TODO:
+//					manager.performDK_Sign(doc, dkcbHandler, uuid, dkInfo, null);
+//				}
+//
+//				manager.addDkToken(doc,dkInfo);
+//			}
+//		} catch (ConversationException e1) {
+//			e1.printStackTrace();
+//			throw new AxisFault(
+//				"ConversationClientHandler ::" + e1.getMessage());
+//		}
+//
+//		//set it as current message
+//		ByteArrayOutputStream os = new ByteArrayOutputStream();
+//		XMLUtils.outputDOM(doc, os, true);
+//		String osStr = os.toString();
+//		sPart.setCurrentMessage(osStr, SOAPPart.FORM_STRING);
+//		
+//    }
     /**
      * Reads configeration parameters from the wsdd file.
      * @throws AxisFault
