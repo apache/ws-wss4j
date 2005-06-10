@@ -35,8 +35,6 @@
         <property name="dir.work" value="${dir.wss4j}/target/work"/>
         <property name="server" value="org/apache/ws/axis/oasis/ping"/>
         <property name="client" value="org/apache/ws/axis/oasis"/>
-        <property name="server2" value="secconv/scenarios/ping/impl"/>
-        <property name="client2" value="secconv/scenarios/ping"/>
 
         <mkdir dir="${dir.work}"/>
 
@@ -50,21 +48,6 @@
                 namespace="http://xmlsoap.org/Ping"
                 package="org.apache.ws.axis.oasis.ping"/>
         </axis-wsdl2java>
-
-        <axis-wsdl2java
-            output="${dir.work}"
-            serverSide="yes"
-            testcase="no"
-            verbose="no"
-            url="${dir.interop2}/secconv/scenarios/ping.wsdl">
-            <mapping
-                namespace="http://xmlsoap.org/Ping"
-                package="secconv.scenarios.ping.impl"/>
-        </axis-wsdl2java>
-
-  	    <delete file="${dir.work}/${server2}/PingBindingImpl.java" />
-  	    <delete file="${dir.work}/${client2}/PWCallback.java" />
-  	    <delete file="${dir.work}/${client2}/WSConvScenario1.java" />
 
         <copy todir="target/classes" overwrite="yes">
           <fileset dir="${dir.interop}/${server}">
