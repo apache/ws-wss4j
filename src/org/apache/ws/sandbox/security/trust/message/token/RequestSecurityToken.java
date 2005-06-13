@@ -18,170 +18,185 @@
 package org.apache.ws.security.trust.message.token;
 
 import javax.xml.namespace.QName;
-import javax.xml.soap.Node;
 
-import org.apache.axis.components.logger.LogFactory;
-import org.apache.commons.logging.Log;
 import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.policy.message.token.AppliesTo;
 import org.apache.ws.security.trust.TrustConstants;
-import org.apache.ws.security.util.DOM2Writer;
-import org.apache.ws.security.util.WSSecurityUtil;
+import org.apache.ws.security.trust.WSTrustException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
-public class RequestSecurityToken {
-
+public abstract class RequestSecurityToken extends CompositeElement {
 	
+    protected TokenType tokenTypeElement;
+    protected RequestType requestTypeElement;
 	
-	private static Log log = LogFactory.getLog(RequestSecurityTokenResponse.class.getName());
-
-	private Element element = null;
-    
-    private TokenType tokenTypeElement = null;
-    private RequestType requestTypeElement = null;
-    private AppliesTo appliesToElement = null;
-    private Entropy entropyElement = null;
-    private KeySize keySizeElement = null;
-    private Lifetime lifetimeElement = null;
-		
 	public static final QName TOKEN = new QName(TrustConstants.WST_NS, TrustConstants.REQUEST_SECURITY_TOKEN_LN, TrustConstants.WST_PREFIX);
 
-	
-	public RequestSecurityToken(Document doc){
-		this.element = doc.createElementNS(TOKEN.getNamespaceURI(), TrustConstants.WST_PREFIX + ":" + TOKEN.getLocalPart());
+	/**
+	 * Creates a new <code>wst:RequestSecurityToken</code> with the 
+	 * given request type 
+	 * @param doc
+	 * @param requestType
+	 */
+	public RequestSecurityToken(Document doc, String requestType){
+		super(doc);
+		this.setRequestType(requestType);
 	}
 	
 	/**
-	 * @param elem
+	 * Instanciate a new <code>RequestSecurityToken</code> with a <code>wst:RequestSecurityToken</code> 
+	 * token's element 
+	 * @param elem 
 	 * @throws WSSecurityException
 	 */
-  public RequestSecurityToken(Element elem) throws WSSecurityException{
-	this.element = elem;
-	QName el =
-		new QName(
-			this.element.getNamespaceURI(),
-			this.element.getLocalName());
-	if (!el.equals(TOKEN)) {
-		throw new WSSecurityException(WSSecurityException.INVALID_SECURITY_TOKEN,
-			"badTokenType00",
-			new Object[] { el });
+	public RequestSecurityToken(Element elem) throws WSTrustException{
+	  	super(elem);
+	  	//TODO  Parse and populate the elements
+	  	
+	}  
+  
+	/**
+	 * Sets the <code>wst:TokenType</code> value of this <code>wst:RequestSecurityToken</code>
+	 * @param tokenType The <code>wst:TokenType</code> uri as a <code>String</code>
+	 */
+	public void setTokenType(String tokenType) {
+	  	if(this.tokenTypeElement == null) { 
+	  		this.tokenTypeElement = new TokenType(this.element.getOwnerDocument());
+	  		this.element.appendChild(this.tokenTypeElement.getElement());
+	  	}
+
+	  	this.tokenTypeElement.setValue(tokenType);
+	  	
 	}
 
-  }  
-  
-  /**
-   * Sets the <code>wst:TokenType</code> value of this <code>wst:RequestSecurityToken</code>
-   * @param tokenType The <code>wst:TokenType</code> uri as a <code>String</code>
-   */
-  public void setTokenType(String tokenType) {
-  	if(this.tokenTypeElement != null) //If there's an element already there remove it
-  		this.element.removeChild(this.tokenTypeElement.getElement());
+	/**
+	 * Returns the value of the TokenType element 
+	 * @return
+	 */
+	public String getTokenType() {
+		if(this.tokenTypeElement != null)
+			return this.tokenTypeElement.getValue();
+		else
+			return null;
+	}
 
-	this.tokenTypeElement = new TokenType(this.element.getOwnerDocument());
-	this.tokenTypeElement.setValue(tokenType);
-	this.addToken(this.tokenTypeElement.getElement()); 
-  	
-  }
   
-  /**
-   * Sets the <code>wst:RequestType</code> value of this <code>wst:RequestSecurityToken</code>
-   * @param requestType The <code>wst:RequestType</code> uri as a <code>String
-   */
-  public void setRequestType(String requestType) {
-  	if(this.requestTypeElement != null)
-  		this.element.removeChild(this.requestTypeElement.getElement());
+	/**
+	 * Sets the <code>wst:RequestType</code> value of this <code>wst:RequestSecurityToken</code>
+	 * @param requestType The <code>wst:RequestType</code> uri as a <code>String
+	 */
+	public void setRequestType(String requestType) {
+	  	if(this.requestTypeElement == null) {
+	  		this.requestTypeElement = new RequestType(this.element.getOwnerDocument());
+	  		this.element.appendChild(this.requestTypeElement.getElement());
+	  	}
 
-	this.requestTypeElement = new RequestType(this.element.getOwnerDocument());
-	this.requestTypeElement.setValue(requestType);
-	this.addToken(this.requestTypeElement.getElement());  	
-  	
-  }
+		this.requestTypeElement.setValue(requestType);
+
+	}
+
+	/**
+	 * Returns the value of the <code>RequestType</code> element
+	 * @return
+	 */
+	public String getRequesType() {
+	  	if(this.requestTypeElement != null)
+	  		return this.requestTypeElement.getValue();
+	  	else 
+	  		return null;
+	}
   
-  /**
-   * Sets the <code>wst:AppliesTo</code> value of the <code>wst:RequestSecurityToken</code>
-   * @param appliesTo The <code>wst:AppliesTo/wsa:EndpointReference<code> as a <code>String</code> 
-   */
-  public void setAppliesTo(String appliesTo) {
-  	if(this.appliesToElement != null)
-  		this.element.removeChild(this.appliesToElement.getElement());
-
-	this.appliesToElement = new AppliesTo(this.element.getOwnerDocument());
-  	this.appliesToElement.setEndpointReference(appliesTo);
-	this.addToken(this.appliesToElement.getElement());
-
-  }
+	public void setContextAttr(String contextAttrValue) {
+		this.element.setAttribute(TrustConstants.CONTEXT_ATTR, contextAttrValue);
+	}
   
-  /**
-   * Sets the <code>wst:Entropy/wst:BinarySecret</code> value and 
-   * <code>wst:Entropy/wst:BinarySecret@Type</code> of the 
-   * <code>wst:RequestSecurityToken</code>
-   * @param binarySecretType 
-   * @param entropyValue
-   */
-  public void setEntropy(String binarySecretType, String entropyValue) {
-  	if(this.entropyElement != null)
-  		this.element.removeChild(this.entropyElement.getElement());
-  	
-  	
-	this.entropyElement = new Entropy(this.element.getOwnerDocument());
-  	this.entropyElement.setBinarySecret(binarySecretType,entropyValue);
-	this.addToken(this.entropyElement.getElement());
 	
-  }
-  
-  /**
-   * Sets the binary secret of the Entropy element when the its of type <code>Nonce</code>
-   * @see BinarySecret#NONCE_VAL
-   * @param entropyValue The nonce value
-   */
-  public void setEntropyNonce(String nonceValue) {
-  	this.setEntropy(TrustConstants.BINARY_SECRET_NONCE_VAL,nonceValue);
-  }
-  
-  /**
-   * Adds a <code>wst:Lifetime</code> element with the given duration to the 
-   * <code>wst:RequestSecurityToken</code>
-   * @param duration
-   */
-  public void setLifetime(int duration) {
-  	if(this.lifetimeElement != null)
-  		this.element.removeChild(this.lifetimeElement.getElement());
-  	this.lifetimeElement = new Lifetime(this.element.getOwnerDocument(),duration);
-  }
-  
-  /**
-   * Sets the <code>wst:KeySize</code> value of the <code>wst:RequestSecurityToken</code>
-   * @param size
-   */
-  public void setKeySize(int size) {
-  	if(this.keySizeElement != null)
-  		this.element.removeChild(this.keySizeElement.getElement());
-  		
-	this.keySizeElement = new KeySize(this.element.getOwnerDocument());
-  	this.keySizeElement.setKeySize(size);
-	this.addToken(this.keySizeElement.getElement());
+	/**
+	 * This is provided as an extensibility mechanism to add any
+	 * child element to the <code>wst:RequestSecyrityToken</code> element
+	 * @param childToken
+	 */
+	public void addToken(Element childToken) {
+		this.element.appendChild(childToken);
+	}
+	
+	/**
+	 * This is provided as an extensibility mechnism to 
+	 * ass any attrbute to the <code>wst:RequestSecyrityToken</code> element
+	 * @param attribute
+	 * @param value
+	 */
+	public void addAttribute(String attribute, String value) {
+		this.element.setAttribute(attribute, value);
+	}
 
-  }
-  
-  
-  public Element getElement() {
-	  return element;
-  }
-  public void setElement(Element element) {
-	  this.element = element;
-  }
+	/**
+	 * This is provided to be used to extract custom elements from the 
+	 * <code>wst:RequestSecyrityToken</code>
+	 * @param namespace
+	 * @param tagName
+	 * @return
+	 */
+	public NodeList getTokensByTagNameNS(String namespace, String tagName) {
+		return this.element.getElementsByTagNameNS(namespace, tagName);
+	}
+	
+	/**
+	 * This is to be used to retrieve the value of the 
+	 * custom attrbutes added to the 
+	 * <code>wst:RequestSecyrityToken</code>
+	 * @param attribute
+	 * @return
+	 */
+	public String getAttributeValue(String attribute) {
+		return this.element.getAttribute(attribute);		
+	}
+	
+	/**
+	 * Returns the QName of this type
+	 * 
+	 * @see org.apache.ws.security.trust.message.token.AbstractToken#getToken()
+	 */
+	protected QName getToken() {
+		return TOKEN;
+	}
 
-  public String toString() {
-	  return DOM2Writer.nodeToString((Node) this.element);
-  }
-  public void addToken(Element childToken) {
-	  this.element.appendChild(childToken);
-  }
+	/**
+	 * Returns the root element of this token
+	 * TODO: This should be removed
+	 */
+	public Element getElement() {
+		return this.element;
+	}
 
-  public void removeToken(Element childToken) {
-	  this.element.removeChild(childToken);
-  }
-
-
+	/* (non-Javadoc)
+	 * @see org.apache.ws.security.trust.message.token.AbstractToken#deserializeElement(org.w3c.dom.Element)
+	 */
+	protected void deserializeChildElement(Element elem) throws WSTrustException {
+		QName el =  new QName(elem.getNamespaceURI(), elem.getLocalName());
+		
+		if(el.equals(RequestType.TOKEN)) {
+			this.requestTypeElement = new RequestType(elem);
+		} else if(el.equals(TokenType.TOKEN)) {
+			this.tokenTypeElement = new TokenType(elem);
+		} else {
+			this.handleSpecificChildren(elem);
+		}
+		
+	}
+	
+	/**
+	 * This is used to handle the specific child elements for the 
+	 * four types of requests
+	 * <ul>
+	 * <li>Issue</li> @see TrustConstants#ISSUE_SECURITY_TOKEN
+	 * <li>Renew</li> @see TrustConstants#RENEW_SECURITY_TOKEN
+	 * <li>Cancel</li> @see TrustConstants#CANCEL_SECURITY_TOKEN
+	 * <li>Validate</li> @see TrustConstants#VALIDATE_SECURITY_TOKEN
+	 * </ul>
+	 * @param elem
+	 * @throws WSTrustException
+	 */
+	protected abstract void handleSpecificChildren(Element elem) throws WSTrustException;
 }

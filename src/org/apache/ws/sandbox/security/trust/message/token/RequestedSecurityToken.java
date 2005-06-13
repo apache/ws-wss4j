@@ -32,7 +32,7 @@ import org.w3c.dom.Node;
 public class RequestedSecurityToken {
 
     // private SecurityContextToken securityContextToken;
-	private Element element = null;
+	private Element element;
     
     public static final QName TOKEN =
             new QName(TrustConstants.WST_NS,

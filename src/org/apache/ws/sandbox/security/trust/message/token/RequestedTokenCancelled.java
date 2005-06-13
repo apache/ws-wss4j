@@ -26,34 +26,27 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Text;
 
 /**
- * @author Malinda Kaushalye 
- * @author Ruchith Fernando
- * 
- * AllowPostdating element <p/>This element indicates
- * that returned tokens should allow requests for postdated tokens.
+ * @author Ruchith Fernando (ruchith.fernando@gmail.com)
  */
-public class AllowPostdating extends ValueElement {
+public class RequestedTokenCancelled extends AbstractToken {
+
 	
-    public static final QName TOKEN = new QName(TrustConstants.WST_NS, TrustConstants.ALLOWPOSTDATING_LN, TrustConstants.WST_PREFIX);
+	public static final QName TOKEN = new QName(TrustConstants.WST_NS, TrustConstants.REQUESTED_TOKEN_CANCELLED_LN, TrustConstants.WST_PREFIX);
+	
+	/**
+	 * @param doc
+	 */
+	public RequestedTokenCancelled(Document doc) {
+		super(doc);
+	}
 
-    /**
-     * Constructor for AllowPostdating
-     *
-     * @param elem
-     * @throws WSSecurityException
-     */
-    public AllowPostdating(Element elem) throws WSTrustException {
-    	super(elem);
-    }
-
-    /**
-     * Constructor for AllowPostdating
-     *
-     * @param doc
-     */
-    public AllowPostdating(Document doc) {
-        super(doc);
-    }
+	/**
+	 * @param elem
+	 * @throws WSSecurityException
+	 */
+	public RequestedTokenCancelled(Element elem) throws WSTrustException {
+		super(elem);
+	}
 
 	/**
 	 * Returns the QName of this type
@@ -64,11 +57,20 @@ public class AllowPostdating extends ValueElement {
 	}
 
 	/* (non-Javadoc)
+	 * @see org.apache.ws.security.trust.message.token.AbstractToken#deserializeElement(org.w3c.dom.Element)
+	 */
+	protected void deserializeChildElement(Element elem) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	/* (non-Javadoc)
 	 * @see org.apache.ws.security.trust.message.token.AbstractToken#deserializeElementText(org.w3c.dom.Text)
 	 */
-	protected void setElementTextValue(Text textNode) throws WSTrustException{
-		throw new WSTrustException(WSTrustException.INVALID_REQUEST,
-				"There cannot be a value in this element");
+	protected void setElementTextValue(Text textNode) {
+		// TODO Auto-generated method stub
+		
 	}
+
 
 }

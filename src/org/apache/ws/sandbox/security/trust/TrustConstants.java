@@ -63,6 +63,8 @@ public class TrustConstants {
     public static final String REASON_LN = "Reason";
     public static final String RENEWING_LN = "Renewing";
     public static final String RENEW_TARGET_LN = "RenewTarget";
+    public static final String CANCEL_TARGET_LN = "CancelTarget";
+    public static final String REQUESTED_TOKEN_CANCELLED_LN = "RequestedTokenCancelled";
     public static final String ALLOWPOSTDATING_LN = "AllowPostdating";
     public static final String BINARY_SECRET_LN= "BinarySecret";
     public static final String ENTROPY_LN= "Entropy";
@@ -75,6 +77,7 @@ public class TrustConstants {
     public static final String REQUESTED_PROOF_TOKEN_LN = "RequestedProofToken";
 
     //Attributes
+    public static final String CONTEXT_ATTR = "Context";
     public static final String BINARY_SECRET_TYPE_ATTR = "Type";
     public static final String CLAIMS_DIALECT_ATTR = "Dialect";
     public static final String RENEWING_ALLOW_ATTR = "Allow";

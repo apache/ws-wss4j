@@ -32,12 +32,12 @@ import org.w3c.dom.Element;
  * @author Dimuthu Leelarathne. (muthulee@yahoo.com)
  * @author Ruchith Fernando
  */
-public class Entropy extends AbstractToken {
+public class Entropy extends CompositeElement {
 	private static Log log = LogFactory.getLog(Entropy.class.getName());
 
 	public static final QName TOKEN = new QName(TrustConstants.WST_NS, TrustConstants.ENTROPY_LN, TrustConstants.WST_PREFIX);
 
-	private BinarySecret binarySecretElement = null;
+	private BinarySecret binarySecretElement;
 	
 	/**
 	 * Constructor.
@@ -47,7 +47,7 @@ public class Entropy extends AbstractToken {
 	 * @param elem
 	 * @throws WSSecurityException
 	 */
-	public Entropy(Element elem) throws WSSecurityException {
+	public Entropy(Element elem) throws WSTrustException {
 		super(elem);
 	}
 
@@ -79,13 +79,13 @@ public class Entropy extends AbstractToken {
 	 * @param secretValue The binary secret value as a <code>String</code>
 	 */
 	public void setBinarySecret(String type, String secretValue) {
-		if(this.binarySecretElement != null)
-			this.element.removeChild(this.binarySecretElement.getElement());
+		if(this.binarySecretElement == null) {
+			this.binarySecretElement = new BinarySecret(this.document);
+			this.addChild(this.binarySecretElement);
+		}
 		
-		this.binarySecretElement = new BinarySecret(this.element.getOwnerDocument());
 		this.binarySecretElement.setTypeAttribute(type);
-		this.binarySecretElement.setBinarySecretValue(secretValue);
-		this.element.appendChild(this.binarySecretElement.getElement());
+		this.binarySecretElement.setValue(secretValue);
 	}
 	
 	/**
@@ -104,4 +104,25 @@ public class Entropy extends AbstractToken {
 	protected QName getToken() {
 		return TOKEN;
 	}
+
+
+	/* (non-Javadoc)
+	 * @see org.apache.ws.security.trust.message.token.AbstractToken#deserializeElement(org.w3c.dom.Element)
+	 */
+	protected void deserializeChildElement(Element elem) throws WSTrustException {
+        QName el =  new QName(elem.getNamespaceURI(), elem.getLocalName());
+        
+        if(el.equals(BinarySecret.TOKEN)) {
+        	this.binarySecretElement = new BinarySecret(elem);
+        } else {
+        	throw new WSTrustException(WSTrustException.INVALID_REQUEST,
+        			WSTrustException.DESC_INCORRECT_CHILD_ELEM,
+					new Object[] {
+        			TOKEN.getPrefix(),TOKEN.getLocalPart(),
+					el.getNamespaceURI(),el.getLocalPart()});
+        }
+		
+	}
+
+
 }

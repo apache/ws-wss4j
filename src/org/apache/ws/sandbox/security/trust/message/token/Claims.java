@@ -18,52 +18,36 @@ package org.apache.ws.security.trust.message.token;
 
 import javax.xml.namespace.QName;
 
-import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.trust.TrustConstants;
+import org.apache.ws.security.trust.WSTrustException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Text;
+import org.w3c.dom.NodeList;
 
 /**
  * <code>wst:Claims</code> token
+ * Example token
+ * <pre>
+  <Claims>
+      <SubjectName MatchType="...">...</SubjectName>
+      <X509Extension OID="..." Critical="..." MatchType="...">
+        ...
+      </X509Extension>
+  </Claims>
+  </pre> 
  * @author Ruchith Fernando (ruchith.fernando@gmail.com)
  */
-public class Claims extends AbstractToken {
+public class Claims extends CompositeElement {
 	
 	public static final QName TOKEN = new QName(TrustConstants.WST_NS, TrustConstants.CLAIMS_LN, TrustConstants.WST_PREFIX);
 
-	private String dialectArrtValue = null;
-	private Text valueText = null;
-	
-	
+		
 	public Claims(Document doc) {
 		super(doc);
 	}
 	
-	public Claims(Element elem) throws WSSecurityException {
+	public Claims(Element elem) throws WSTrustException {
         super(elem);	
-	}
-	/**
-	 * Sets the value of this <code>wst:Claims</code> element
-	 * @param value
-	 */
-	public void setValue(String value) {
-		if(this.valueText != null)
-			this.element.removeChild(this.valueText);
-		
-		this.valueText = this.element.getOwnerDocument().createTextNode(value);
-		this.element.appendChild(this.valueText);
-	}
-	
-	/**
-	 * Returns the value of the <code>wst:Claims</code> element
-	 * @return
-	 */
-	public String getValue() {
-		if(this.valueText != null)
-			return this.valueText.getNodeValue();
-		else 
-			return null;
 	}
 	
 	/**
@@ -71,11 +55,12 @@ public class Claims extends AbstractToken {
 	 * @param value
 	 */
 	public void setDialectAttribute(String value) {
-		if(this.dialectArrtValue != null)
-			this.element.removeAttribute(TrustConstants.CLAIMS_DIALECT_ATTR);
-		
-		this.dialectArrtValue = value;
-		this.element.setAttribute(TrustConstants.CLAIMS_DIALECT_ATTR, this.dialectArrtValue);
+//		Will worry about null/removing attribute values later
+//		if(value == null) {
+//			if(this.element.getAttribute(TrustConstants.CLAIMS_DIALECT_ATTR) == null)
+//				this.element.removeAttribute(TrustConstants.CLAIMS_DIALECT_ATTR);
+//		}
+		this.element.setAttribute(TrustConstants.CLAIMS_DIALECT_ATTR, value);
 		
 	}
 	
@@ -84,7 +69,7 @@ public class Claims extends AbstractToken {
 	 * @return
 	 */
 	public String getDialectAttribute() {
-		return this.dialectArrtValue;
+		return this.element.getAttribute(TrustConstants.CLAIMS_DIALECT_ATTR);
 	}
 	
 	/**
@@ -94,4 +79,48 @@ public class Claims extends AbstractToken {
 	protected QName getToken() {
 		return TOKEN;
 	}
+
+	/* (non-Javadoc)
+	 * @see org.apache.ws.security.trust.message.token.AbstractToken#deserializeElement(org.w3c.dom.Element)
+	 */
+	protected void deserializeChildElement(Element elem) {
+		/*
+		 * We don't have to do anything since the elemets that
+		 * are given in here are custom elements and they can
+		 * be retrieved using getTokenByTagNameNS method
+		 */
+	}
+	
+	/**
+	 * This is provided as an extensibility mechanism to add any
+	 * child element to the <code>wst:Claims</code> element
+	 * @param childToken
+	 */
+	public void addToken(Element childToken) {
+		this.element.appendChild(childToken);
+	}
+	
+	/**
+	 * Adds a list of nodes as children of this 
+	 * <code>wst:Claims</code> element
+	 * @param claimsList A <code>NodeList</code> of the elements
+	 */
+	public void addClaims(NodeList claimsList) {
+		for (int i = 0; i < claimsList.getLength(); i++) {
+			this.element.appendChild(claimsList.item(i));
+		}
+	}
+	
+	
+	/**
+	 * This is provided to be used to extract custom elements from the 
+	 * <code>wst:Claims</code>
+	 * @param namespace
+	 * @param tagName
+	 * @return
+	 */
+	public NodeList getTokensByTagNameNS(String namespace, String tagName) {
+		return this.element.getElementsByTagNameNS(namespace, tagName);
+	}
+	
 }

@@ -17,37 +17,33 @@
 
 package org.apache.ws.security.trust.message.token;
 
+import java.io.ByteArrayOutputStream;
+
+import javax.xml.namespace.QName;
+
 import org.apache.axis.components.logger.LogFactory;
 import org.apache.commons.logging.Log;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.trust.TrustConstants;
-import org.apache.ws.security.util.DOM2Writer;
+import org.apache.ws.security.trust.WSTrustException;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.xml.security.utils.XMLUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
+import org.w3c.dom.Text;
 
-import javax.xml.namespace.QName;
-import java.io.ByteArrayOutputStream;
+public class RequestSecurityTokenResponse extends AbstractToken {
+	
+    private static Log log = LogFactory.getLog(RequestSecurityTokenResponse.class.getName());
 
-public class RequestSecurityTokenResponse {
-    private static Log log =
-            LogFactory.getLog(RequestSecurityTokenResponse.class.getName());
+    private RequestedSecurityToken requestedSecurityToken;
+    private RequestedProofToken requestedProofToken;
 
-    private Element element = null;
-    //for custom usage
-    //No getters and setters will be generated for these members
-    private RequestedSecurityToken requestedSecurityToken = null;
-    private RequestedProofToken requestedProofToken = null;
-    private Element tokenType = null;
-    private Element lifeTime = null;
+    private TokenType tokenTypeElement;
+    private Lifetime lifeTimeElement;
 
-    public static final QName TOKEN =
-            new QName(TrustConstants.WST_NS,
-                    TrustConstants.REQUEST_SECURITY_TOKEN_RESPONSE_LN,
-                    TrustConstants.WST_PREFIX);
+    public static final QName TOKEN = new QName(TrustConstants.WST_NS, TrustConstants.REQUEST_SECURITY_TOKEN_RESPONSE_LN, TrustConstants.WST_PREFIX);
     //
     /**
      * Constructor
@@ -56,12 +52,7 @@ public class RequestSecurityTokenResponse {
      * @throws java.lang.Exception
      */
     public RequestSecurityTokenResponse(Document doc) throws Exception {
-        this.element = doc.createElementNS(TOKEN.getNamespaceURI(), TOKEN.getPrefix() + ":" + TOKEN.getLocalPart());
-        WSSecurityUtil.setNamespace(this.element,
-                TOKEN.getNamespaceURI(),
-                TrustConstants.WST_PREFIX);
-        this.element.appendChild(doc.createTextNode(""));
-
+    	super(doc);
     }
 
     /**
@@ -86,20 +77,8 @@ public class RequestSecurityTokenResponse {
      * @param elem
      * @throws WSSecurityException
      */
-    public RequestSecurityTokenResponse(Element elem)
-            throws WSSecurityException {
-        this.element = elem;
-        QName el =
-                new QName(this.element.getNamespaceURI(),
-                        this.element.getLocalName());
-        if (!el.equals(TOKEN)) {
-            throw new WSSecurityException(WSSecurityException.INVALID_SECURITY_TOKEN,
-                    "badTokenType00",
-                    new Object[]{el});
-        }
-
-       
-
+    public RequestSecurityTokenResponse(Element elem) throws WSTrustException {
+    	super(elem);
     }
 
     /**
@@ -110,79 +89,21 @@ public class RequestSecurityTokenResponse {
      * @param setChildElement
      * @throws WSSecurityException
      */
-    public RequestSecurityTokenResponse(Element elem,
-                                        boolean parseChildElements)
-            throws WSSecurityException {
+    public RequestSecurityTokenResponse(Element elem, boolean parseChildElements) throws WSTrustException {
         this(elem);
         if (!parseChildElements) {
             return;
         }
-        Element elemTemp;
-
-        this.tokenType =
-                (Element) WSSecurityUtil.getDirectChild(elem.getOwnerDocument(),
-                        TokenType.TOKEN.getLocalPart(),
-                        TokenType.TOKEN.getNamespaceURI());
-
-        if ((elemTemp = (Element) WSSecurityUtil.getDirectChild(//elem.getOwnerDocument(),
-                elem,
-                RequestedSecurityToken.TOKEN.getLocalPart(),
-                RequestedSecurityToken.TOKEN.getNamespaceURI())) != null) {
-            this.requestedSecurityToken =
-                    new RequestedSecurityToken(elemTemp, true);
-        }
-//            this.requestedSecurityToken =
-//                new RequestedSecurityToken(
-//                    (Element) WSSecurityUtil.getDirectChild(
-//                        elem.getOwnerDocument(),
-//                        RequestedSecurityToken.TOKEN.getLocalPart(),
-//                        RequestedSecurityToken.TOKEN.getNamespaceURI()));
-
-        if ((elemTemp = (Element) WSSecurityUtil.getDirectChild(//elem.getOwnerDocument(),
-                elem,
-                RequestedProofToken.TOKEN.getLocalPart(),
-                RequestedProofToken.TOKEN.getNamespaceURI())) != null) {
-            this.requestedProofToken =
-                    new RequestedProofToken(elemTemp);
-        }
-//        this.requestedProofToken =
-//            new RequestedProofToken(
-//                (Element) WSSecurityUtil.getDirectChild(
-//                    elem.getOwnerDocument(),
-//                    RequestedProofToken.TOKEN.getLocalPart(),
-//                    RequestedProofToken.TOKEN.getNamespaceURI()));
-        //this.lifeTime=(Element)WSSecurityUtil.findElement(elem.getOwnerDocument(),Lifetime.TOKEN.getLocalPart(),Lifetime.TOKEN.getNamespaceURI());
-
-        //System.out.println("RequestSecurityTokenResponse created");
-
+        //TODO: This should be removed - parsing the child elements should eb teh default behaviour 
+        //which will be provided in the default element constructor
     }
 
-    public void setContext(String context) {
-        this.element.setAttribute("Context", context);
+    public void setContextAttr(String context) {
+        this.element.setAttribute(TrustConstants.CONTEXT_ATTR, context);
     }
 
-    public String getContext() {
-        return this.element.getAttribute("Context");
-    }
-
-    public Element getElement() {
-        return element;
-    }
-
-    public void setElement(Element element) {
-        this.element = element;
-    }
-
-    public String toString() {
-        return DOM2Writer.nodeToString((Node) this.element);
-    }
-
-    public void addToken(Element childToken) {
-        this.element.appendChild(childToken);
-    }
-
-    public void removeToken(Element childToken) {
-        this.element.removeChild(childToken);
+    public String getContextAttr() {
+        return this.element.getAttribute(TrustConstants.CONTEXT_ATTR);
     }
 
     /**
@@ -199,6 +120,10 @@ public class RequestSecurityTokenResponse {
         return requestedSecurityToken;
     }
 
+    /**
+     * TODO: Should be removed
+     * @param doc
+     */
     public void build(Document doc) {
         Element securityHeader = WSSecurityUtil.findWsseSecurityHeaderBlock(WSSConfig.getDefaultWSConfig(), doc, doc.getDocumentElement(), true);
         WSSecurityUtil.appendChildElement(doc, securityHeader, this.element);
@@ -209,5 +134,70 @@ public class RequestSecurityTokenResponse {
             String osStr = os.toString();
         }
     }
+    
+	
+	/**
+	 * This is provided as an extensibility mechanism to add any child element 
+	 * @param childToken
+	 */
+	public void addToken(Element childToken) {
+		this.element.appendChild(childToken);
+	}
+	
+	/**
+	 * This is provided as an extensibility mechnism to as any attrbute 
+	 * @param attribute
+	 * @param value
+	 */
+	public void addAttribute(String attribute, String value) {
+		this.element.setAttribute(attribute, value);
+	}
 
+	/**
+	 * This is provided to be used to extract custom elements
+	 * @param namespace
+	 * @param tagName
+	 * @return
+	 */
+	public Element getTokenByTagNameNS(String namespace, String tagName) {
+		return (Element)this.element.getElementsByTagNameNS(namespace, tagName);
+	}
+	
+	/**
+	 * This is to be used to retrieve the value of the 
+	 * custom attrbutes added
+	 * @param attribute
+	 * @return
+	 */
+	public String getAttributeValue(String attribute) {
+		return this.element.getAttribute(attribute);		
+	}
+    
+    
+	/**
+	 * Returns the QName of this type
+	 * 
+	 * @see org.apache.ws.security.trust.message.token.AbstractToken#getToken()
+	 */
+	protected QName getToken() {
+		return TOKEN;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.apache.ws.security.trust.message.token.AbstractToken#deserializeElement(org.w3c.dom.Element)
+	 */
+	protected void deserializeChildElement(Element elem) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	/* (non-Javadoc)
+	 * @see org.apache.ws.security.trust.message.token.AbstractToken#deserializeElementText(org.w3c.dom.Text)
+	 */
+	protected void setElementTextValue(Text textNode) {
+		// TODO Auto-generated method stub
+		
+	}
+
+    
 }

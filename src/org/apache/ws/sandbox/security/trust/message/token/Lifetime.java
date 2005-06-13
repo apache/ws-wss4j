@@ -24,7 +24,7 @@ import javax.xml.namespace.QName;
 
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.trust.TrustConstants;
-import org.apache.ws.security.util.WSSecurityUtil;
+import org.apache.ws.security.trust.WSTrustException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -34,10 +34,10 @@ import org.w3c.dom.Element;
  *         Lifetime token
  */
 
-public class Lifetime extends AbstractToken {
-
-    public Element created;
-    public Element expires;
+public class Lifetime extends CompositeElement {
+    
+    private Created createdElement;
+    private Expires expiresElement;
 
     public static final QName TOKEN = new QName(TrustConstants.WST_NS, TrustConstants.LIFE_TIME_LN, TrustConstants.WST_PREFIX);
     
@@ -50,13 +50,14 @@ public class Lifetime extends AbstractToken {
      */
     public Lifetime(Document doc, String created, String expires) {
     	super(doc);
-        this.created = doc.createElementNS(TrustConstants.WST_NS, "wst:" + TrustConstants.CREATED_LN);
-        this.expires = doc.createElementNS(TrustConstants.WST_NS, "wst:" + TrustConstants.EXPIRES_LN);
 
-        this.created.appendChild(doc.createTextNode(created));
-        this.expires.appendChild(doc.createTextNode(expires));
-        this.element.appendChild(this.created);
-        this.element.appendChild(this.expires);
+    	this.createdElement = new Created(doc);
+    	this.createdElement.setValue(created);
+    	this.addChild(createdElement);
+    	
+    	this.expiresElement = new Expires(doc);
+    	this.expiresElement.setValue(expires);
+    	this.addChild(this.expiresElement);
     }
 
     /**
@@ -66,18 +67,8 @@ public class Lifetime extends AbstractToken {
      * @param elem
      * @throws WSSecurityException
      */
-    public Lifetime(Element elem) throws WSSecurityException {
+    public Lifetime(Element elem) throws WSTrustException {
     	super(elem);
-
-        this.created =
-                (Element) WSSecurityUtil.getDirectChild(elem,
-                        TrustConstants.CREATED_LN,
-                        TrustConstants.WST_NS);
-        this.expires =
-                (Element) WSSecurityUtil.getDirectChild(elem,
-                        TrustConstants.EXPIRES_LN,
-                        TrustConstants.WST_NS);
-
     }
 
     /**
@@ -86,57 +77,74 @@ public class Lifetime extends AbstractToken {
      * @param doc
      * @param duration in minutes
      */
-    //new
-
     public Lifetime(Document doc, int duration) {
     	super(doc);
     	
         SimpleDateFormat sdtf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
         sdtf.setTimeZone(TimeZone.getTimeZone("GMT"));
+
         Calendar rightNow = Calendar.getInstance();
         Calendar expires = Calendar.getInstance();
-        this.created = doc.createElementNS(TrustConstants.WST_NS, TrustConstants.WST_PREFIX + ":" + TrustConstants.CREATED_LN);
-        WSSecurityUtil.setNamespace(this.created, TOKEN.getNamespaceURI(), TrustConstants.WST_PREFIX);
-        this.expires = doc.createElementNS(TrustConstants.WST_NS, TrustConstants.WST_PREFIX + ":" + TrustConstants.EXPIRES_LN);
-        WSSecurityUtil.setNamespace(this.expires, TOKEN.getNamespaceURI(), TrustConstants.WST_PREFIX);
-        this.created.appendChild(doc.createTextNode(sdtf.format(rightNow.getTime())));
-
+        
+        this.createdElement = new Created(doc);
+        this.createdElement.setValue(sdtf.format(rightNow.getTime()));
+        this.addChild(this.createdElement);
+        
+        this.expiresElement = new Expires(doc);
         long exp = rightNow.getTimeInMillis() + duration * 1000 * 60;
         expires.setTimeInMillis(exp);
-
-        this.expires.appendChild(doc.createTextNode(sdtf.format(expires.getTime())));
-        this.element.appendChild(this.created);
-        this.element.appendChild(this.expires);
-
+        this.expiresElement.setValue(sdtf.format(expires.getTime()));
+        this.addChild(this.expiresElement);
     }
-
+    
     /**
+     * Retuns the value of the <code>wsu:Created</code> child element 
      * @return
      */
-    public Element getCreated() {
-        return created;
+    public String getCreated() {
+    	if(this.createdElement != null)
+    		return this.createdElement.getValue();
+    	else
+    		return null;
     }
 
     /**
+     * Returns the value of the <code>wsu:Expires</code> element
      * @return
      */
-    public Element getExpires() {
-        return expires;
+    public String getExpires() {
+    	if(this.expiresElement!= null)
+    		return this.expiresElement.getValue();
+    	else
+    		return null;
     }
 
     /**
-     * @param element
+     * Sets the value of the <code>wsu:Created</code>element
+     * @param value
      */
-    public void setCreated(Element element) {
-        created = element;
+    public void setCreated(String value) {
+    	if(this.createdElement != null)
+    		this.createdElement.setValue(value);
+    	else { 
+    		this.createdElement = new Created(this.document);
+    		this.createdElement.setValue(value);
+    		this.addChild(this.createdElement);
+    	}
     }
 
-
     /**
-     * @param element
+     * Sets the value of the <code>wsu:Expires</code> element
+     * @param value
      */
-    public void setExpires(Element element) {
-        expires = element;
+    public void setExpires(String value) {
+    	if(this.expiresElement != null)
+    		this.expiresElement.setValue(value);
+    	else { 
+    		this.expiresElement = new Expires(this.document);
+    		this.expiresElement.setValue(value);
+    		this.addChild(this.expiresElement);
+    	}
     }
     
 	/**
@@ -146,4 +154,24 @@ public class Lifetime extends AbstractToken {
 	protected QName getToken() {
 		return TOKEN;
 	}
+
+	/* (non-Javadoc)
+	 * @see org.apache.ws.security.trust.message.token.AbstractToken#deserializeElement(org.w3c.dom.Element)
+	 */
+	protected void deserializeChildElement(Element elem) throws WSTrustException {
+		  QName el =  new QName(elem.getNamespaceURI(), elem.getLocalName());
+	        
+	        if(el.equals(Created.TOKEN)) {
+	        	this.createdElement = new Created(elem);
+	        } else if(el.equals(Expires.TOKEN)) {
+	        	this.expiresElement = new Expires(elem);
+	        } else {
+	        	throw new WSTrustException(WSTrustException.INVALID_REQUEST,
+	        			WSTrustException.DESC_INCORRECT_CHILD_ELEM,
+						new Object[] {
+	        			TOKEN.getPrefix(),TOKEN.getLocalPart(),
+						el.getNamespaceURI(),el.getLocalPart()});
+	        }
+	}
+
 }

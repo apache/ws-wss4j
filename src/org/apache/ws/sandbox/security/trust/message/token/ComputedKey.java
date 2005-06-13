@@ -19,8 +19,8 @@ package org.apache.ws.security.trust.message.token;
 
 import javax.xml.namespace.QName;
 
-import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.trust.TrustConstants;
+import org.apache.ws.security.trust.WSTrustException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Text;
@@ -33,7 +33,7 @@ public class ComputedKey extends AbstractToken {
 	
 	 public static final QName TOKEN = new QName(TrustConstants.WST_NS, TrustConstants.COMPUTED_KEY_LN, TrustConstants.WST_PREFIX);
     
-	 private Text valueText = null;
+	 private Text valueText;
 	 
 	 /**
 	  * Constructor.
@@ -42,7 +42,7 @@ public class ComputedKey extends AbstractToken {
 	  * @param wssConfig
 	  * @param elem
 	  */
-	 public ComputedKey(Element elem) throws WSSecurityException {
+	 public ComputedKey(Element elem) throws WSTrustException {
 	 	super(elem);
 	 }
 
@@ -87,6 +87,22 @@ public class ComputedKey extends AbstractToken {
 	 */
 	protected QName getToken() {
 		return TOKEN;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.apache.ws.security.trust.message.token.AbstractToken#deserializeElement(org.w3c.dom.Element)
+	 */
+	protected void deserializeChildElement(Element elem) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	/* (non-Javadoc)
+	 * @see org.apache.ws.security.trust.message.token.AbstractToken#deserializeElementText(org.w3c.dom.Text)
+	 */
+	protected void setElementTextValue(Text textNode) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

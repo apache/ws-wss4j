@@ -19,23 +19,26 @@ package org.apache.ws.security.trust.message.token;
 
 import javax.xml.namespace.QName;
 
+import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.message.token.SecurityTokenReference;
 import org.apache.ws.security.trust.TrustConstants;
+import org.apache.ws.security.trust.WSTrustException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 /**
  * @author Ruchith Fernando (ruchith.fernando@gmail.com)
  */
-public class RenewTarget extends AbstractToken {
+public class RenewTarget extends CompositeElement {
 	
     public static final QName TOKEN = new QName(TrustConstants.WST_NS, TrustConstants.RENEW_TARGET_LN, TrustConstants.WST_PREFIX);
 
-    private Element tokenToBeRenewed = null;
-    private SecurityTokenReference securityTokenReference = null;
+    private Element tokenToBeRenewed;
+    private SecurityTokenReference securityTokenReference;
     
-    public RenewTarget(Element elem) throws WSSecurityException {
+    public RenewTarget(Element elem) throws WSTrustException {
     	super(elem);
     }
     
@@ -56,9 +59,10 @@ public class RenewTarget extends AbstractToken {
 	 * @param securityTokenReference
 	 */
 	public void setSecurityTokenReference(SecurityTokenReference securityTokenReference) {
-		//If there's another token remove it
-		if(this.tokenToBeRenewed != null)
+		if(this.tokenToBeRenewed != null)//If there's another token remove it
 			this.element.removeChild(this.tokenToBeRenewed);
+		if(this.securityTokenReference != null)//IF there's sec tok ref remove it
+			this.element.removeChild(this.securityTokenReference.getElement());
 		this.securityTokenReference = securityTokenReference;
 		this.element.appendChild(this.securityTokenReference.getElement());
 	}
@@ -76,14 +80,14 @@ public class RenewTarget extends AbstractToken {
 	 * @param tokenToBeRenewed
 	 */
 	public void setTokenToBeRenewed(Element tokenToBeRenewed) {
-		//if there's wsse:SecurityTokenReference remove it
-		if(this.securityTokenReference != null)
+		if(this.securityTokenReference != null)//if there's wsse:SecurityTokenReference remove it
 			this.element.removeChild(this.securityTokenReference.getElement());
+		if(this.tokenToBeRenewed != null)//If there's some token remove it
+			this.element.removeChild(this.tokenToBeRenewed);
 		this.tokenToBeRenewed = tokenToBeRenewed;
 		this.element.appendChild(this.tokenToBeRenewed);
 	}
 	
-
 	/**
 	 * Returns the QName of this type
 	 * @see org.apache.ws.security.trust.message.token.AbstractToken#getToken()
@@ -91,4 +95,24 @@ public class RenewTarget extends AbstractToken {
 	protected QName getToken() {
 		return TOKEN;
 	}
+
+	/* (non-Javadoc)
+	 * @see org.apache.ws.security.trust.message.token.AbstractToken#deserializeElement(org.w3c.dom.Element)
+	 */
+	protected void deserializeChildElement(Element elem) throws WSTrustException {
+        QName el =  new QName(elem.getNamespaceURI(), elem.getLocalName());
+        
+        QName secTokRef = new QName(WSConstants.WSSE_NS, SecurityTokenReference.SECURITY_TOKEN_REFERENCE);
+
+        if(el.equals(secTokRef)) {
+        	try {
+        	this.securityTokenReference = new SecurityTokenReference(WSSConfig.getDefaultWSConfig(), elem);
+        	} catch (WSSecurityException ex) {
+        		throw new WSTrustException(WSTrustException.INVALID_REQUEST, ex.getMessage());
+        	}
+        } else {
+        	this.tokenToBeRenewed = elem;
+        }
+	}
+
 }

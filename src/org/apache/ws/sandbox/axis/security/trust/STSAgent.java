@@ -36,8 +36,6 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.ws.axis.security.WSDoAllReceiver;
 import org.apache.ws.axis.security.WSDoAllSender;
 import org.apache.ws.security.trust.message.token.RequestSecurityToken;
-import org.apache.ws.security.trust.message.token.RequestType;
-import org.apache.ws.security.trust.message.token.TokenType;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -117,7 +115,7 @@ public class STSAgent {
 		log.debug("Endpoint Address : "+url);
 		env = new SOAPEnvelope();
 		doc = env.getAsDocument();
-		reqSecTok=new RequestSecurityToken(doc);
+		//reqSecTok=new RequestSecurityToken(doc);
     }
     
 
@@ -135,24 +133,6 @@ public class STSAgent {
     	this(url,senderOptions,receiverOptions,null);
     }
     
-    /**
-     * Sets token type element
-     * @param value
-     */
-    public void setTokenTypeElement(String value){
-        TokenType tokenType=new TokenType(this.doc);
-        tokenType.setValue(value);
-        this.reqSecTok.addToken(tokenType.getElement());
-    }
-    /**
-     * Sets request type element
-     * @param value
-     */
-    public void setRequestTypeElement(String value){
-        RequestType requestType=new RequestType(this.doc);
-        requestType.setValue(value);
-        this.reqSecTok.addToken(requestType.getElement());
-    }
     /**
      * Use this method to add any element to the request
      * @param element

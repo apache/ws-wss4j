@@ -19,24 +19,19 @@ package org.apache.ws.security.trust.message.token;
 
 import javax.xml.namespace.QName;
 
-import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.trust.TrustConstants;
+import org.apache.ws.security.trust.WSTrustException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Text;
 
 /**
  *
  * @author Dimuthu Leelarathne.(muthulee@yahoo.com)
  * @author Ruchith Fernando
  */
-public class BinarySecret extends AbstractToken {
+public class BinarySecret extends ValueElement {
 	
     public static final QName TOKEN = new QName(TrustConstants.WST_NS, TrustConstants.BINARY_SECRET_LN, TrustConstants.WST_PREFIX);
-    
-    private Text secretText = null;
-    
-    private String typeAttrValue = null;
     
     /**
      * Constructor.
@@ -45,7 +40,7 @@ public class BinarySecret extends AbstractToken {
      * @param wssConfig
      * @param elem
      */
-    public BinarySecret(Element elem) throws WSSecurityException {
+    public BinarySecret(Element elem) throws WSTrustException {
     	super(elem);
     } 
 					
@@ -67,11 +62,7 @@ public class BinarySecret extends AbstractToken {
      * @param ref
      */
     public void setTypeAttribute(String type) {
-    	if(this.typeAttrValue != null)
-    		this.element.removeAttribute(TrustConstants.BINARY_SECRET_TYPE_ATTR);
-    	
-    	this.typeAttrValue=type;
-    	this.element.setAttribute(TrustConstants.BINARY_SECRET_TYPE_ATTR, typeAttrValue);
+    	this.element.setAttribute(TrustConstants.BINARY_SECRET_TYPE_ATTR, type);
     }
 
     /**
@@ -79,33 +70,27 @@ public class BinarySecret extends AbstractToken {
      * @return
      */
     public String getTypeAttribute() {
-    	return this.typeAttrValue;
+    	return this.element.getAttribute(TrustConstants.BINARY_SECRET_TYPE_ATTR);
     }
-
-    /**
-     * Sets the text node
-     *
-     * @param val
-     */
-    public void setBinarySecretValue(String val) {
-    	if(this.secretText != null)
-    		this.element.removeChild(this.secretText);
-    	
-    	this.secretText = element.getOwnerDocument().createTextNode(val);
-        this.element.appendChild(this.secretText);
-    }
-
-    /**
-	 * return the value of the text node
-	 * 
+    
+	/**
+	 * This is provided as an extensibility mechnism to as any attrbute 
+	 * @param attribute
+	 * @param value
+	 */
+	public void addAttribute(String attribute, String value) {
+		this.element.setAttribute(attribute, value);
+	}    
+    
+	/**
+	 * This is to be used to retrieve the value of the 
+	 * custom attrbutes added
+	 * @param attribute
 	 * @return
 	 */
-    public String getBinarySecretValue() {
-        if(this.secretText != null)
-        	return this.secretText.getNodeValue();
-        else
-        	return null;
-    }
+	public String getAttributeValue(String attribute) {
+		return this.element.getAttribute(attribute);		
+	}
 
 	/**
 	 * Returns the QName of this type

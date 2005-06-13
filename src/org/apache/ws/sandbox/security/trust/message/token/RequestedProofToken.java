@@ -65,7 +65,7 @@ public class RequestedProofToken {
             new QName(TrustConstants.WST_NS, "RequestedProofToken");
 
     private Element element;
-    private byte[] sharedSecret = null;
+    private byte[] sharedSecret;
 
     /**
      * Constructor.

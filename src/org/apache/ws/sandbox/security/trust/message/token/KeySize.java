@@ -18,25 +18,20 @@ package org.apache.ws.security.trust.message.token;
 
 import javax.xml.namespace.QName;
 
-import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.trust.TrustConstants;
 import org.apache.ws.security.trust.WSTrustException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Text;
 
 /**
  * @author Ruchith Fernando
  */
-public class KeySize extends AbstractToken {
+public class KeySize extends ValueElement {
 
     
     public static final QName TOKEN = new QName(TrustConstants.WST_NS,TrustConstants.KEY_SIZE_LN,TrustConstants.WST_PREFIX);
 
-    private Text keySizeText = null;
-
-
-    public KeySize(Element elem) throws WSSecurityException {
+    public KeySize(Element elem) throws WSTrustException {
     	super(elem);
     }
 
@@ -49,11 +44,8 @@ public class KeySize extends AbstractToken {
      * @param keySize
      */
     public void setKeySize(int keySize) {
-    	if(this.keySizeText != null)
-    		this.element.removeChild(this.keySizeText);
     	
-    	this.keySizeText = this.element.getOwnerDocument().createTextNode(Integer.toString(keySize));
-        this.element.appendChild(this.keySizeText);
+    	this.setValue(Integer.toString(keySize));
     }
 
     /**
@@ -62,8 +54,8 @@ public class KeySize extends AbstractToken {
      * @throws WSTrustException
      */
     public int getKeySize() {
-        if(this.keySizeText != null)
-        	return Integer.parseInt(this.keySizeText.getNodeValue());
+        if(this.getValue() != null)
+        	return Integer.parseInt(this.getValue());
         else
         	return -1;
     }

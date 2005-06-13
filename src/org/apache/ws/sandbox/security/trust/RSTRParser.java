@@ -32,6 +32,10 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
+ * This class' functionality will be included in the RequestSecurityTokenResponse class itself :-)
+ * When a  RequestSecurityTokenResponse instance is created with a corresponding 
+ * DOM Element it will parse that element and populate its properties
+ * 
  * @author Dimuthu Leelarathne. (muthulee@yahoo.com)
  * 
  * This parses the RequestSecurityTokenResponse. This will be extremely useful for 
@@ -66,39 +70,39 @@ public class RSTRParser {
 		
     public void processRSTR(RequestSecurityTokenResponse rstr)
         throws WSTrustException, WSSecurityException {
-        element = rstr.getElement();
-
-        NodeList list = element.getChildNodes();
-        int len = list.getLength();
-        Node nod;
-        Element elem;
-        for (int i = 0; i < len; i++) {
-            nod = list.item(i);
-            if (nod.getNodeType() != Node.ELEMENT_NODE)
-                continue;
-            elem = (Element) nod;
-
-            QName el = new QName(elem.getNamespaceURI(), elem.getLocalName());
-
-            if (el.equals(APPLIES_TO)) {
-                appto = new AppliesTo(elem);
-            } else if (el.equals(LIFE_TIME)) {
-                //TODO: Fix the problem
-                //lifeTime = new Lifetime(elem);
-            } else if (el.equals(REQUESTED_ST)) {
-                reqtedTok = new RequestedSecurityToken(elem);
-                System.out.println("Found reqtedToken....");
-            } else if (el.equals(PROOF_TOKEN)) {
-                proofTok = new RequestedProofToken(elem);
-                this.handleProofToken();
-            } else if (el.equals(ENTROPY)) {
-                entropy = new Entropy(elem);
-				handleEntropy();
-            } else {
-                //TODO :: Do something :-0
-            }
-
-        } //end of for loop
+//        element = rstr.getElement();
+//
+//        NodeList list = element.getChildNodes();
+//        int len = list.getLength();
+//        Node nod;
+//        Element elem;
+//        for (int i = 0; i < len; i++) {
+//            nod = list.item(i);
+//            if (nod.getNodeType() != Node.ELEMENT_NODE)
+//                continue;
+//            elem = (Element) nod;
+//
+//            QName el = new QName(elem.getNamespaceURI(), elem.getLocalName());
+//
+//            if (el.equals(APPLIES_TO)) {
+//                appto = new AppliesTo(elem);
+//            } else if (el.equals(LIFE_TIME)) {
+//                //TODO: Fix the problem
+//                //lifeTime = new Lifetime(elem);
+//            } else if (el.equals(REQUESTED_ST)) {
+//                reqtedTok = new RequestedSecurityToken(elem);
+//                System.out.println("Found reqtedToken....");
+//            } else if (el.equals(PROOF_TOKEN)) {
+//                proofTok = new RequestedProofToken(elem);
+//                this.handleProofToken();
+//            } else if (el.equals(ENTROPY)) {
+//                entropy = new Entropy(elem);
+//				handleEntropy();
+//            } else {
+//                //TODO :: Do something :-0
+//            }
+//
+//        } //end of for loop
     }
 
     private void handleProofToken()
@@ -130,7 +134,7 @@ public class RSTRParser {
 				this.binSecret = new BinarySecret(elem);
 				Node val = elem.getChildNodes().item(0);
 				if (val.getNodeType() == Node.TEXT_NODE) {
-					binSecret.setBinarySecretValue(val.getNodeValue());
+					binSecret.setValue(val.getNodeValue());
 				} else {
 				throw new WSTrustException("Parser Exception");
 				}
@@ -145,33 +149,33 @@ public class RSTRParser {
 
     private void handleEntropy() throws WSTrustException, WSSecurityException{
     	
-        NodeList list = this.entropy.getElement().getChildNodes();
-
-        int len = list.getLength();
-        Node nod;
-        Element elem;
-        for (int i = 0; i < len; i++) {
-            nod = list.item(i);
-            if (nod.getNodeType() != Node.ELEMENT_NODE)
-                continue;
-            elem = (Element) nod;
-
-            QName el = new QName(elem.getNamespaceURI(), elem.getLocalName());
-
-            if (el.equals(BinarySecret.TOKEN)) {
-                this.binSecret = new BinarySecret(elem);
-                entropy.setBinarySecret(binSecret);
-                Node val = elem.getChildNodes().item(0);
-                if (val.getNodeType() == Node.TEXT_NODE) {
-                    binSecret.setBinarySecretValue(val.getNodeValue());
-                } else {
-                    throw new WSTrustException("Parser Exception");
-                }
-            } else {
-                //TODO :: Do something :-0
-            }
-
-        } //for
+//        NodeList list = this.entropy.getElement().getChildNodes();
+//
+//        int len = list.getLength();
+//        Node nod;
+//        Element elem;
+//        for (int i = 0; i < len; i++) {
+//            nod = list.item(i);
+//            if (nod.getNodeType() != Node.ELEMENT_NODE)
+//                continue;
+//            elem = (Element) nod;
+//
+//            QName el = new QName(elem.getNamespaceURI(), elem.getLocalName());
+//
+//            if (el.equals(BinarySecret.TOKEN)) {
+//                this.binSecret = new BinarySecret(elem);
+//                entropy.setBinarySecret(binSecret);
+//                Node val = elem.getChildNodes().item(0);
+//                if (val.getNodeType() == Node.TEXT_NODE) {
+//                    binSecret.setBinarySecretValue(val.getNodeValue());
+//                } else {
+//                    throw new WSTrustException("Parser Exception");
+//                }
+//            } else {
+//                //TODO :: Do something :-0
+//            }
+//
+//        } //for
 
     } //handleEntropy
     

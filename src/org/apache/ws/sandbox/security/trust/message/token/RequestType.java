@@ -20,6 +20,7 @@ import javax.xml.namespace.QName;
 
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.trust.TrustConstants;
+import org.apache.ws.security.trust.WSTrustException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Text;
@@ -34,7 +35,7 @@ public class RequestType extends AbstractToken {
 	
     public static final QName TOKEN = new QName(TrustConstants.WST_NS, TrustConstants.REQUEST_TYPE_LN, TrustConstants.WST_PREFIX);
  
-    private Text valueText = null;
+    private Text valueText;
     
     /**
      * Constructor for RequestType
@@ -42,7 +43,7 @@ public class RequestType extends AbstractToken {
      * @param elem
      * @throws WSSecurityException
      */
-    public RequestType(Element elem) throws WSSecurityException {
+    public RequestType(Element elem) throws WSTrustException {
         super(elem);
     }
 
@@ -86,5 +87,21 @@ public class RequestType extends AbstractToken {
 	 */
 	protected QName getToken() {
 		return TOKEN;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.apache.ws.security.trust.message.token.AbstractToken#deserializeElement(org.w3c.dom.Element)
+	 */
+	protected void deserializeChildElement(Element elem) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	/* (non-Javadoc)
+	 * @see org.apache.ws.security.trust.message.token.AbstractToken#deserializeElementText(org.w3c.dom.Text)
+	 */
+	protected void setElementTextValue(Text textNode) {
+		// TODO Auto-generated method stub
+		
 	}
 }

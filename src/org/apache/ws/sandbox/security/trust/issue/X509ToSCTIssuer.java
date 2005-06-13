@@ -89,29 +89,29 @@ public abstract class X509ToSCTIssuer implements STIssuer {
 		//requestor knows the actual validity period without having to parse the
 		//returned token.
 		Lifetime lt=new Lifetime(res,this.getLifeTime());
-		Element elemLifeTime = lt.getElement();
-
-		//append to req'ed token				
-//		requestedSecurityToken.addToken(tokenTypeRes.getElement());
-//		requestedSecurityToken.addToken(requestTypeRes.getElement());
-		requestedSecurityToken.addToken(sct);
-		
-
-		RequestedProofToken requestedProofToken=new RequestedProofToken(res);
-		if(!this.alias.equals("")){
-			requestedProofToken.build(res, this.crypto, this.alias, requestedProofToken.getElement());
-		}		
-		
-	//	append to response
-		requestSecurityTokenResponse.addToken(tokenTypeRes.getElement());
-		requestSecurityTokenResponse.addToken(requestTypeRes.getElement());
-		requestSecurityTokenResponse.addToken(elemLifeTime);	
-			
-		requestSecurityTokenResponse.addToken(requestedSecurityToken.getElement());
-		requestSecurityTokenResponse.addToken(requestedProofToken.getElement());
-		requestSecurityTokenResponse.setContext(TrustConstants.ISSUE_SECURITY_TOKEN);
-		
-		
+//		Element elemLifeTime = lt.getElement();
+//
+//		//append to req'ed token				
+////		requestedSecurityToken.addToken(tokenTypeRes.getElement());
+////		requestedSecurityToken.addToken(requestTypeRes.getElement());
+//		requestedSecurityToken.addToken(sct);
+//		
+//
+//		RequestedProofToken requestedProofToken=new RequestedProofToken(res);
+//		if(!this.alias.equals("")){
+//			requestedProofToken.build(res, this.crypto, this.alias, requestedProofToken.getElement());
+//		}		
+//		
+//	//	append to response
+//		requestSecurityTokenResponse.addToken(tokenTypeRes.getElement());
+//		requestSecurityTokenResponse.addToken(requestTypeRes.getElement());
+//		requestSecurityTokenResponse.addToken(elemLifeTime);	
+//			
+//		requestSecurityTokenResponse.addToken(requestedSecurityToken.getElement());
+//		requestSecurityTokenResponse.addToken(requestedProofToken.getElement());
+//		requestSecurityTokenResponse.setContext(TrustConstants.ISSUE_SECURITY_TOKEN);
+//		
+//		
 		
 		//append to the body
 		Element elemEnv=res.getDocumentElement();
@@ -124,7 +124,7 @@ public abstract class X509ToSCTIssuer implements STIssuer {
 
 		//Option2:remove old and create new response element 
 		Element cld0=(Element)elemBody.removeChild((Element)elemBody.getFirstChild());
-		Element cld1=(Element)elemBody.appendChild(requestSecurityTokenResponse.getElement());
+		//Element cld1=(Element)elemBody.appendChild(requestSecurityTokenResponse.getElement());
 		
 		
 		return res;

@@ -49,9 +49,16 @@ public class RequestResolver {
         //set request type    
         if (elemRequestType != null) {
             log.debug("Resolving request type");
-            RequestType requestType = new RequestType(elemRequestType);
-            String temp = requestType.getValue();
-            this.reqInfo.setRequestType(requestType.getValue());
+            RequestType requestType;
+			try {
+				requestType = new RequestType(elemRequestType);
+				String temp = requestType.getValue();
+	            this.reqInfo.setRequestType(requestType.getValue());
+			} catch (WSTrustException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
             log.debug("Resolving request type complete");
         }
         
