@@ -63,6 +63,7 @@ import javax.xml.soap.SOAPPart;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
@@ -149,10 +150,14 @@ public class WSS4JHandler implements Handler {
     }
 
     public boolean handleRequest(MessageContext mc) {
+        mc.setProperty(org.apache.axis.SOAPPart.ALLOW_FORM_OPTIMIZATION,
+            Boolean.TRUE);
         return processMessage(mc, true);
     }
 
     public boolean handleResponse(MessageContext mc) {
+        mc.setProperty(org.apache.axis.SOAPPart.ALLOW_FORM_OPTIMIZATION,
+            Boolean.TRUE);
         return processMessage(mc, false);
     }
 
@@ -193,9 +198,11 @@ public class WSS4JHandler implements Handler {
         * Get the action first.
         */
         Vector actions = new Vector();
-        String action = null;
-        if ((action = (String) handlerInfo.getHandlerConfig().get(WSHandlerConstants.ACTION)) == null) {
-            action = (String) msgContext.getProperty(WSHandlerConstants.ACTION);
+        String action = (String) handlerInfo.getHandlerConfig().get(WSHandlerConstants.SEND + '.' + WSHandlerConstants.ACTION);
+        if (action == null) {
+            if ((action = (String) handlerInfo.getHandlerConfig().get(WSHandlerConstants.ACTION)) == null) {
+                action = (String) msgContext.getProperty(WSHandlerConstants.ACTION);
+            }
         }
         if (action == null) {
             throw new JAXRPCException("WSS4JHandler: No action defined");
@@ -411,9 +418,11 @@ handle response
         msgContext = (SOAPMessageContext) mc;
 
         Vector actions = new Vector();
-        String action = null;
-        if ((action = (String) handlerInfo.getHandlerConfig().get(WSHandlerConstants.ACTION)) == null) {
-            action = (String) msgContext.getProperty(WSHandlerConstants.ACTION);
+        String action = (String) handlerInfo.getHandlerConfig().get(WSHandlerConstants.RECEIVE + '.' + WSHandlerConstants.ACTION);
+        if (action == null) {
+            if ((action = (String) handlerInfo.getHandlerConfig().get(WSHandlerConstants.ACTION)) == null) {
+                action = (String) msgContext.getProperty(WSHandlerConstants.ACTION);
+            }
         }
         if (action == null) {
             throw new JAXRPCException("WSS4JHandler: No action defined");
@@ -1608,16 +1617,11 @@ handle response
 
         Document doc = null;
         try {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            message.writeTo(baos);
-            ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
-
+            Source content = message.getSOAPPart().getContent();
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             dbf.setNamespaceAware(true);
             DocumentBuilder builder = dbf.newDocumentBuilder();
-
-            doc = builder.parse(bais);
-
+            doc = builder.parse(org.apache.axis.utils.XMLUtils.sourceToInputSource(content));
         } catch (Exception ex) {
             throw new JAXRPCException("messageToDocument: cannot convert SOAPMessage into Document", ex);
         }
