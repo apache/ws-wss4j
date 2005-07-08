@@ -381,6 +381,49 @@ public Document build(Document doc, Crypto crypto)
                     transforms.addTransform(STRTransform.implementedTransformURI,
                             ctx);
                     sig.addDocument("#" + strUri, transforms);
+                } else if (elemName.equals("Assertion")) { // Assertion
+        		    // Make the AssertionID the wsu:Id and the signature reference the same 
+        		    SAMLAssertion assertion;
+        		    
+        		    Element assertionElement =
+                                    (Element) WSSecurityUtil.findElement(envelope,
+                                            elemName,
+                                            nmSpace);
+        		    
+        		    try {
+        			assertion = new SAMLAssertion(assertionElement);
+        		    }
+        		    catch (Exception e1) {
+        			log.error(e1);
+        			throw new WSSecurityException(WSSecurityException.FAILED_SIGNATURE,
+        						      "noXMLSig", null, e1);
+        		    }
+
+                           Element body =
+                                    (Element) WSSecurityUtil.findElement(envelope,
+                                            elemName,
+                                            nmSpace);
+                            if (body == null) {
+                                throw new WSSecurityException(WSSecurityException.FAILURE,
+                                        "noEncElement",
+                                        new Object[]{nmSpace + ", " + elemName});
+                            }
+                            transforms = new Transforms(doc);
+                            transforms.addTransform(
+                                    Transforms.TRANSFORM_C14N_EXCL_OMIT_COMMENTS);
+                            if (wssConfig.isWsiBSPCompliant()) {
+                                transforms.item(0).getElement().appendChild(
+                                        new InclusiveNamespaces(
+                                                doc, getInclusivePrefixes(body)).getElement());
+                            }
+        		    String prefix =
+                                WSSecurityUtil.setNamespace(body,
+        						    wssConfig.getWsuNS(),
+        						    WSConstants.WSU_PREFIX);
+        		    body.setAttributeNS(wssConfig.getWsuNS(), prefix + ":Id", assertion.getId());
+                            sig.addDocument("#" + assertion.getId(), transforms);
+
+
                 } else {
                     Element body =
                             (Element) WSSecurityUtil.findElement(envelope,

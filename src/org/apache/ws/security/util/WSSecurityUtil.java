@@ -72,6 +72,23 @@ public class WSSecurityUtil {
      * @param actor
      * @return the <code>wsse:Security</code> element or
      *         <code>null</code> if not such element found
+     *	@deprecated
+     *	@see	getSecurityHeader(
+        WSSConfig wssConfig, Document doc, String actor, SOAPConstants sc)
+     */
+    public static Element getSecurityHeader(
+       Document doc, String actor, SOAPConstants sc) {
+	return getSecurityHeader(WSSConfig.getDefaultWSConfig(), doc, actor, sc);
+    }
+
+    /**
+     * Returns the first WS-Security header element for a given actor.
+     * Only one WS-Security header is allowed for an actor.
+     *
+     * @param doc
+     * @param actor
+     * @return the <code>wsse:Security</code> element or
+     *         <code>null</code> if not such element found
      */
     public static Element getSecurityHeader(
         WSSConfig wssConfig, Document doc, String actor, SOAPConstants sc) {
@@ -498,8 +515,24 @@ public class WSSecurityUtil {
      * @param doc the DOM document (SOAP request) 
      * @param id the Id of the element
      * @return the found element or null if no element with the Id exists
+     * @deprecated
+     * @see getElementByWsuId(WSSConfig wssConfig, Document doc, String id)
+    */
+     public static Element getElementByWsuId(Document doc, String id) {
+	return getElementByWsuId(WSSConfig.getDefaultWSConfig(), doc, id);
+    }
+    /**
+     * Search for an element given its wsu:id.
+     * <p/>
+     *
+     * @param wssConfig The WSS configuration data conating namesapce 
+     * 	definitions, etc.
+     * @param doc the DOM document (SOAP request) 
+     * @param id the Id of the element
+     * @return the found element or null if no element with the Id exists
      */
     public static Element getElementByWsuId(WSSConfig wssConfig, Document doc, String id) {
+
         if (id == null) {
             return null;
         }
@@ -538,6 +571,26 @@ public class WSSecurityUtil {
         }
         id = id.substring(1);
         return WSSecurityUtil.findElementById(doc.getDocumentElement(), id, null);
+    }
+
+    /**
+     * Create a BinarySecurityToken element
+     * <p/>
+     *
+     * @param doc the DOM document (SOAP request) 
+     * @param wsuIdVal the value for the wsu:Id
+     * @param wssConfig The WSS configuration data conating namesapce 
+     * 	definitions, etc.
+     * @return then BST element (DOM element)
+     * @deprecated
+     * @see createBinarySecurityToken(Document doc,
+                                                    String wsuIdVal,
+                                                    WSSConfig wssConfig)
+     */
+    public static Element createBinarySecurityToken(Document doc,
+                                                    String wsuIdVal) {
+	return createBinarySecurityToken(doc, wsuIdVal, 
+					 WSSConfig.getDefaultWSConfig());
     }
 
     /**
@@ -663,11 +716,51 @@ public class WSSecurityUtil {
      * @param envelope the SOAP envelope
      * @param doCreate if true create a new WSS header block if none exists
      * @return the WSS header or null if none found and doCreate is false
+     * @deprecated
+     * @see	findWsseSecurityHeaderBlock(WSSConfig wssConfig, Document doc, Element envelope, boolean doCreate)
+     */
+    public static Element findWsseSecurityHeaderBlock(Document doc, Element envelope, boolean doCreate) {
+        return findWsseSecurityHeaderBlock(WSSConfig.getDefaultWSConfig(), doc, envelope, doCreate);
+    }
+
+    /**
+     * find the first ws-security header block
+     * <p/>
+     *
+     * @param doc the DOM document (SOAP request)
+     * @param envelope the SOAP envelope
+     * @param doCreate if true create a new WSS header block if none exists
+     * @return the WSS header or null if none found and doCreate is false
      */
     public static Element findWsseSecurityHeaderBlock(WSSConfig wssConfig, Document doc, Element envelope, boolean doCreate) {
         return findWsseSecurityHeaderBlock(wssConfig, doc, envelope, null, doCreate);
     }
 
+    /**
+     * find the first ws-security header block
+     * <p/>
+     *
+     * @param doc the DOM document (SOAP request)
+     * @param envelope the SOAP envelope
+     * @param doCreate if true create a new WSS header block if none exists
+     * @return the WSS header or null if none found and doCreate is false
+     * @deprecated
+     * @see findWsseSecurityHeaderBlock(WSSConfig wssConfig,
+                                                      Document doc,
+                                                      Element envelope,
+                                                      String actor,
+                                                      boolean doCreate)
+     */
+    public static Element findWsseSecurityHeaderBlock(Document doc,
+                                                      Element envelope,
+                                                      String actor,
+                                                      boolean doCreate) {
+	return findWsseSecurityHeaderBlock(WSSConfig.getDefaultWSConfig(),
+                                           doc,
+                                           envelope,
+                                           actor,
+					   doCreate);
+    }
     /**
      * find a ws-security header block for a given actor
      * <p/>
@@ -733,6 +826,18 @@ public class WSSecurityUtil {
         } catch (TransformerException e) {
             throw new Exception("Unable to resolve XPath");
         }
+    }
+
+    /**
+     * Create a namespace context with namespaces of interest
+     *
+     * @param doc the DOM document (SOAP request)
+     * @return a conext element usable for xpath requests
+     *	@deprecated
+     *	@see	createNamespaceContext(WSSConfig wssConfig, Document doc)
+     */
+    public static Element createNamespaceContext(Document doc) {
+	return createNamespaceContext(WSSConfig.getDefaultWSConfig(), doc);
     }
 
     /**
