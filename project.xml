@@ -39,7 +39,7 @@
 
   <!-- the project home page -->
   <url>http://ws.apache.org/ws-fx/wss4j/</url>
-  <issueTrackingUrl>http://nagoya.apache.org/bugzilla/</issueTrackingUrl>
+  <issueTrackingUrl>http://issues.apache.org/jira/browse/WSS</issueTrackingUrl>
   <siteAddress>ws.apache.org</siteAddress>
   <siteDirectory>/ws-fx/wss4j/</siteDirectory>
   <distributionDirectory>/www/ws.apache.org/builds/</distributionDirectory>
