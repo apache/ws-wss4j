@@ -1448,4 +1448,10 @@ public class WSSecurityEngine {
         return decryptedBytes;
     }
 
+    /**
+     * Should the timestamps have millisecond precision
+     */
+    public void setPrecisionInMilliSeconds(boolean precisionInMilliSeconds) {
+        wssConfig.setPrecisionInMilliSeconds(precisionInMilliSeconds);
+    }
 }

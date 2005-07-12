@@ -182,6 +182,8 @@ public class WSDoAllSender extends BasicHandler {
 
 			boolean mu = decodeMustUnderstand(reqData);
 
+            secEngine.setPrecisionInMilliSeconds(decodeTimestampPrecision(reqData));
+
 			if ((reqData.actor = (String) getOption(WSHandlerConstants.ACTOR)) == null) {
 				reqData.actor = (String) reqData.msgContext
 						.getProperty(WSHandlerConstants.ACTOR);
@@ -810,6 +812,28 @@ public class WSDoAllSender extends BasicHandler {
             }
         }
         return mu;
+    }
+
+    private boolean decodeTimestampPrecision(RequestData reqData) throws AxisFault {
+        boolean precisionInMilliSeconds = true;
+        String value = null;
+        if ((value =
+                (String) getOption(WSHandlerConstants.TIMESTAMP_PRECISION))
+                == null) {
+            value =
+                    (String) reqData.msgContext.getProperty(WSHandlerConstants.TIMESTAMP_PRECISION);
+        }
+        if (value != null) {
+            if (value.equals("0") || value.equals("false")) {
+                precisionInMilliSeconds = false;
+            } else if (
+                    value.equals("1") || value.equals("true")) {
+                precisionInMilliSeconds = true;
+            } else {
+                throw new AxisFault("WSDoAllSender: illegal precisionInMilliSeconds parameter");
+            }
+        }
+        return precisionInMilliSeconds;
     }
 
     /**

@@ -188,7 +188,7 @@ public class UsernameToken {
             return;
         }
         DateFormat zulu = null;
-        if (WSConstants.TIMESTAMP_WITH_MS) {
+        if (wssConfig.isPrecisionInMilliSeconds()) {
         	zulu = new XmlSchemaDateFormat();
         }
         else {

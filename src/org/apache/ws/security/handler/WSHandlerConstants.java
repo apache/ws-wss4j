@@ -1297,6 +1297,10 @@ public class WSHandlerConstants {
     public static final String TTL_TIMESTAMP = "timeToLive";
 
 
+    /**
+     * Should timestamps have precision in milliseconds
+     */
+    public static final String TIMESTAMP_PRECISION = "precisionInMilliseconds";
 
     /**
 

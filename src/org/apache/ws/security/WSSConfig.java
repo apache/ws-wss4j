@@ -47,6 +47,14 @@ public class WSSConfig {
     public static final int TIMESTAMP_IN_HEADER_ELEMENT = 2;
     protected int timestampLocation = TIMESTAMP_IN_SECURITY_ELEMENT;
 
+    /**
+     * Set the timestamp precision mode.
+     * If set to <code>true</code> then use timestamps with milliseconds,
+     * otherwise omit the millisconds. As per XML Date/Time specification
+     * the defualt is to include the milliseconds.
+     */
+    protected boolean precisionInMilliSeconds = true;
+
     protected WSSConfig() {
     }
 
@@ -223,5 +231,23 @@ public class WSSConfig {
      */
     public void setWsiBSPCompliant(boolean wsiBSPCompliant) {
         this.wsiBSPCompliant = wsiBSPCompliant;
+    }
+
+    /**
+     * Checks if we need to use milliseconds in timestamps
+     *
+     * @return
+     */
+    public boolean isPrecisionInMilliSeconds() {
+        return precisionInMilliSeconds;
+    }
+
+    /**
+     * Set the precision in milliseconds
+     *
+     * @param wsiBSPCompliant
+     */
+    public void setPrecisionInMilliSeconds(boolean precisionInMilliSeconds) {
+        this.precisionInMilliSeconds = precisionInMilliSeconds;
     }
 }
