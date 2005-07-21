@@ -126,6 +126,9 @@ public class WSS4JHandler implements Handler {
     static final String DEPLOYMENT = "deployment";
     static final String CLIENT_DEPLOYMENT = "client";
     static final String SERVER_DEPLOYMENT = "server";
+    static final String FLOW = "flow";
+    static final String REQUEST_ONLY = "request-only";
+    static final String RESPONSE_ONLY = "response-only";
 
     /**
      * Initializes the instance of the handler.
@@ -164,33 +167,48 @@ public class WSS4JHandler implements Handler {
     /**
      * Switch for transfering control to doReceiver and doSender
      */
-    public boolean processMessage(MessageContext mc, boolean messageType) {
+    public boolean processMessage(MessageContext mc, boolean isRequestMessage) {
         doDebug = log.isDebugEnabled();
+        msgContext = (SOAPMessageContext) mc;
         String deployment = null;
+        String handleFlow = null;
+        
         if ((deployment = (String) handlerInfo.getHandlerConfig().get(DEPLOYMENT)) == null) {
             deployment = (String) msgContext.getProperty(DEPLOYMENT);
         }
-
         if (deployment == null) {
             throw new JAXRPCException("WSS4JHandler.processMessage: No deployment defined");
+        }
+        if ((handleFlow = (String) handlerInfo.getHandlerConfig().get(FLOW)) == null) {
+            handleFlow = (String) msgContext.getProperty(FLOW);
+        }
+        if (handleFlow == null) {
+        	handleFlow = "";
         }
 
         // call doSender if we are -
         // (handling request and client-side deployment) or (handling response and server-side deployment).
         // call doReceiver if we are -
         // (handling request and server-side deployment) or (handling response and client-side deployment).
-        if (deployment.equals(CLIENT_DEPLOYMENT) ^ messageType) {
-            return doReceiver(mc);
+        
+        boolean needsHandling = ( isRequestMessage && !handleFlow.equals(RESPONSE_ONLY)) ||
+								(!isRequestMessage && !handleFlow.equals(REQUEST_ONLY));  
+        if (deployment.equals(CLIENT_DEPLOYMENT) ^ isRequestMessage) {
+        	if (needsHandling) { 
+            	return doReceiver(mc);
+        	}
         } else {
-            return doSender(mc);
+        	if (needsHandling) { 
+        		return doSender(mc);
+        	}
         }
+        return true;
     }
 
     /**
      * Handles incoming web service requests and outgoing responses
      */
     public boolean doSender(MessageContext mc) {
-        msgContext = (SOAPMessageContext) mc;
 
         initialize();
         noSerialization = false;
@@ -415,7 +433,6 @@ public class WSS4JHandler implements Handler {
 handle response
 */
     public boolean doReceiver(MessageContext mc) {
-        msgContext = (SOAPMessageContext) mc;
 
         Vector actions = new Vector();
         String action = (String) handlerInfo.getHandlerConfig().get(WSHandlerConstants.RECEIVE + '.' + WSHandlerConstants.ACTION);
