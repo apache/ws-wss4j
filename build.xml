@@ -45,7 +45,7 @@ Build Instructions:
 
         <property name='product.version.major' value='1'/>
         <property name='product.version.minor' value='0'/>
-        <property name='product.version.level' value='Beta'/>
+        <property name='product.version.level' value='0'/>
         <property name='product.Version' value='${product.version.major}.${product.version.minor}.${product.version.level}'/>
         <property name='product.version' value='${product.version.major}.${product.version.minor}.${product.version.level}'/>
         <property name='product_version' value='${product.version.major}_${product.version.minor}_${product.version.level}'/>
@@ -561,9 +561,9 @@ org.apache.ws.axis.security.util
         <zip destfile="${dir.dist}/${product.shortname}-bin-${product.version}.zip">
             <zipfileset prefix="wss4j" dir="."
                 includes="keys/**, interop/**, interop2/**, test/**, samples/**,
-        				  LICENSE.txt, legal/**, webapps/**"/>
+        				  LICENSE.txt, README.txt legal/**, webapps/**"/>
             <zipfileset prefix="wss4j/classes" dir="${build.classes}"
-                includes="interop/**, wssec/**, org/**/oasis/**, org/**/samples/**"/>
+                includes="*.properties, interop/**, wssec/**, org/**/oasis/**, org/**/samples/**"/>
             <zipfileset prefix="wss4j/doc/api" dir="${build.javadoc}"/>
             <zipfileset fullpath="wss4j/${jar.library}" dir="${dir.dist}" includes="${jar.library}"/>
         </zip>

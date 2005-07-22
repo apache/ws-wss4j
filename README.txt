@@ -15,13 +15,18 @@ WSS4J implements
 
  * OASIS Web Serives Security: SOAP Message Security 1.0 Standard 200401, 
    March 2004
- * Username Token profile V1.0
- * X.509 Token Profile V1.0
+    * Username Token profile V1.0
+    * X.509 Token Profile V1.0
+    
+The Web Services Security part of WSS4J is fairl well tested and many
+WebService projects use it already. Also interoperability with
+various other implementations is well tested.
 
 WSS4J can also be configured to emulate previous WSS spec implementations
 with older namespaces, such as WebSphere 5.1 and WebLogic 8.1 SP2.
 
-WS-Security Features
+
+* Web Services Security Features *
 
 WSS4J can generate and process the following SOAP Bindings:
 
@@ -44,14 +49,52 @@ of the WS sub-projects:
     http://wiki.apache.org/ws/FrontPage/WsFx
 
 
-TODO: describe parts Trust, Conversation
+The 'Trust' and 'Conversation' parts of WSS4J implements the WS-Trust 
+and WS-Secure Conversation specifications.
 
-Required software
+Status of these two parts right now:
+  * WS-Trust implementation is in the process of being re-done.
+  * WS-Secure Conversation impl will be re-worked burning the
+    WS-Addressing stuff into it once we have the components of WS-Trust
+    implementation ready.
+
+Introperability of these two parts:
+The SecurityTokenService successfully interoped with IBM's implementation
+last year (Token issuance only). But as of now we cannot confirm
+interoperability due to the changes.
+
+Therefore the 'Trust' and 'Conversation' parts of WSS4J are experimental.
+
+
+* Installation (binary distribution) *
+
+The WSS4J zip archive is the binary distribution and contains the wss4j
+jar file, some examples, test classes (incl. sources), the interop test
+classes (incl. sources and necessary certificate store), and the according
+client and server deployment and protery files.
+
+The WSS4J jar file contains all classes that implement the basic functions
+and the handlers. To install it make sure this jar file is in the classpath
+of your Axis client and/or Axis server. In addition you need to set up
+the property files that contain information about the certificate keystores
+you use. The property files and the keystore are accessed either as
+resources via classpath or, if that fails, as files using the relative path
+of the application
+
+Thus no specific installation is required. The wss4j.jar file could be 
+included into ear or war files of enterprise or web application servers.
+
+Please refer to the JAVADOC files of the distribution for further 
+information how to use WSS4J, the handlers, and how to setup the
+deployment files.
+
+
+* Required software *
 
 To work with WSS4J you need additional software. Most of
 the software is also needed by your SOAP base system, e.g.
-Apache Axis. To implement the Web Service Security (WSS) parts
-specific software is required such. See below.
+Apache Axis. To implement the Web Service Security (WSS) part
+specific software is required:
 
 addressing-1.0.jar
     This jar contains the implementation of WS-Adressing, required
