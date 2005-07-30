@@ -35,9 +35,12 @@ import java.security.InvalidAlgorithmParameterException;
 import java.security.Key;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
+import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.interfaces.RSAPublicKey;
 import java.security.cert.CertPath;
 import java.security.cert.CertPathValidator;
 import java.security.cert.CertPathValidatorException;
@@ -539,46 +542,72 @@ public class Merlin implements Crypto {
     /**
      * Reads the SubjectKeyIdentifier information from the certificate.
      * <p/>
+     * If the the certificate does not contain a SKI extension then
+     * try to compute the SKI according to RFC3280 using the
+     * SHA-1 hash value of the public key. The second method described
+     * in RFC3280 is not support. Also only RSA public keys are supported.
+     * If we cannot compute the SKI throw a WSSecurityException.
      *
      * @param cert The certificate to read SKI
      * @return The byte array conating the binary SKI data
      */
     public byte[] getSKIBytesFromCert(X509Certificate cert)
-            throws WSSecurityException {
-        /*
-         * Gets the DER-encoded OCTET string for the extension value (extnValue)
-         * identified by the passed-in oid String. The oid string is
-         * represented by a set of positive whole numbers separated by periods.
-         */
-        byte[] derEncodedValue = cert.getExtensionValue(SKI_OID);
+			throws WSSecurityException {
+		/*
+		 * Gets the DER-encoded OCTET string for the extension value (extnValue)
+		 * identified by the passed-in oid String. The oid string is represented
+		 * by a set of positive whole numbers separated by periods.
+		 */
+		byte[] derEncodedValue = cert.getExtensionValue(SKI_OID);
 
-        if (cert.getVersion() < 3) {
-            throw new WSSecurityException(1,
-                    "noSKIHandling",
-                    new Object[]{"Wrong certificate version (<3)"});
-        }
+		if (cert.getVersion() < 3) {
+			PublicKey key = cert.getPublicKey();
+			if (!(key instanceof RSAPublicKey)) {
+				throw new WSSecurityException(
+						1,
+						"noSKIHandling",
+						new Object[] { "Support for RSA key only" });
+			}
+			byte[] encoded = key.getEncoded();
+			// remove 22-byte algorithm ID and header
+			byte[] value = new byte[encoded.length - 22];
+			System.arraycopy(encoded, 22, value, 0, value.length);
+			MessageDigest sha;
+			try {
+				sha = MessageDigest.getInstance("SHA-1");
+			} catch (NoSuchAlgorithmException ex) {
+				throw new WSSecurityException(
+						1,
+						"noSKIHandling",
+						new Object[] { "Wrong certificate version (<3) and no SHA1 message digest availabe" });
+			}
+			sha.reset();
+			sha.update(value);
+			return sha.digest();
+		}
 
-        /**
-         * Strip away first four bytes from the DerValue (tag and length of
-         * ExtensionValue OCTET STRING and KeyIdentifier OCTET STRING)
-         */
-        byte abyte0[] = new byte[derEncodedValue.length - 4];
+		/**
+		 * Strip away first four bytes from the DerValue (tag and length of
+		 * ExtensionValue OCTET STRING and KeyIdentifier OCTET STRING)
+		 */
+		byte abyte0[] = new byte[derEncodedValue.length - 4];
 
-        System.arraycopy(derEncodedValue, 4, abyte0, 0, abyte0.length);
-        return abyte0;
-    }
+		System.arraycopy(derEncodedValue, 4, abyte0, 0, abyte0.length);
+		return abyte0;
+	}
 
     public KeyStore getKeyStore() {
         return this.keystore;
     }
 
     /**
-     * Uses the CertPath API to validate a given certificate chain
-     *
-     * @param certs Certificate chain to validate
-     * @return true if the certificate chain is valid, false otherwise
-     * @throws WSSecurityException
-     */
+	 * Uses the CertPath API to validate a given certificate chain
+	 * 
+	 * @param certs
+	 *            Certificate chain to validate
+	 * @return true if the certificate chain is valid, false otherwise
+	 * @throws WSSecurityException
+	 */
     public boolean validateCertPath(X509Certificate[] certs) throws WSSecurityException {
 
         try {
