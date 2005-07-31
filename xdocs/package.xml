@@ -22,7 +22,7 @@ for Java) to process the SOAP messages. WSS4J in turn uses the Apache XML Securi
 project to handle XML Security according to XML Signature and XML Encryption. 
 
 <ul>
-  <li><a href="http://ws.apache.org/ws-fx/wss4j/index.html">WSS4J</a></li>
+  <li><a href="http://ws.apache.org/wss4j/index.html">WSS4J</a></li>
   <li><a href="http://xml.apache.org/security/index.html">XML Security</a></li>
 </ul>
 
