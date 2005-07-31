@@ -600,8 +600,8 @@ org.apache.ws.axis.security.util
             out="${build.dir}/changelog.html"
             style="./tools/changelog.xsl">
             <param name="title" expression="WSS4J ChangeLog"/>
-            <param name="module" expression="wss4j"/>
-            <param name="cvsweb" expression="http://cvs.apache.org/viewcvs/ws-fx/"/>
+            <param name="module" expression="ws-wss4j"/>
+            <param name="cvsweb" expression="http://cvs.apache.org/viewcvs/"/>
         </style>
     </target>
 
