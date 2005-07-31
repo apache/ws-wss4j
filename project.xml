@@ -48,8 +48,8 @@
        the connection element has the form:
        scm:<system>:<system specific connection string> -->
   <repository>
-    <connection>scm:cvs:pserver:anoncvs@cvs.apache.org:/home/cvspublic:ws-fx/wss4j</connection>
-    <url>http://cvs.apache.org/viewcvs.cgi/ws-fx/wss4j/</url>
+    <connection>scm:cvs:pserver:anoncvs@cvs.apache.org:/home/cvspublic:ws-wss4j</connection>
+    <url>http://cvs.apache.org/viewcvs.cgi/ws-wss4j/</url>
   </repository>
 
   <!-- any mailing lists for the project -->
