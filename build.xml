@@ -572,9 +572,9 @@ org.apache.ws.axis.security.util
 
     <target name="srcdist" depends="init" description="Build source zip file for distro">
         <mkdir dir="${dir.dist}"/>
-        <zip destfile="${dir.dist}/${product.shortname}-src-${product.version}-src.zip">
+        <zip destfile="${dir.dist}/${product.shortname}-src-${product.version}.zip">
             <zipfileset prefix="wss4j" dir="."
-                includes="src/** LICENSE.txt build.xml "/>
+                includes="src/** LICENSE.txt README.txt legal/** build.xml "/>
         </zip>
     </target>
 
