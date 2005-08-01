@@ -42,7 +42,8 @@
   <issueTrackingUrl>http://issues.apache.org/jira/browse/WSS</issueTrackingUrl>
   <siteAddress>ws.apache.org</siteAddress>
   <siteDirectory>/wss4j/</siteDirectory>
-  <distributionDirectory>/www/ws.apache.org/builds/</distributionDirectory>
+  <distributionSite>www.apache.org</distributionSite>
+  <distributionDirectory>//dyn/closer.cgi/ws/wss4j/</distributionDirectory>
 
   <!-- the version control repository and http url for online access
        the connection element has the form:
