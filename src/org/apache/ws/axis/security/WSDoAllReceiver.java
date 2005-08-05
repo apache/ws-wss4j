@@ -265,7 +265,7 @@ public class WSDoAllReceiver extends BasicHandler {
 
             SOAPHeaderElement headerElement = null;
             while (headers.hasNext()) {
-                SOAPHeaderElement hE = (SOAPHeaderElement) headers.next();
+                org.apache.axis.message.SOAPHeaderElement hE = (org.apache.axis.message.SOAPHeaderElement) headers.next();
                 if (hE.getLocalName().equals(WSConstants.WSSE_LN)
                         && hE.getNamespaceURI().equals(WSConstants.WSSE_NS)) {
                     headerElement = hE;
