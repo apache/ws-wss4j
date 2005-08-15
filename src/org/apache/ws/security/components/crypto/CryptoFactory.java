@@ -33,7 +33,7 @@ import java.util.Properties;
  */
 public abstract class CryptoFactory {
     private static Log log = LogFactory.getLog(CryptoFactory.class);
-    private static final String defaultCryptoClassName = "org.apache.ws.security.components.crypto.BouncyCastle";
+    private static final String defaultCryptoClassName = "org.apache.ws.security.components.crypto.Merlin";
 
     /**
      * getInstance
