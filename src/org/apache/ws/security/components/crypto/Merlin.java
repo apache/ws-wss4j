@@ -560,7 +560,7 @@ public class Merlin implements Crypto {
 		 */
 		byte[] derEncodedValue = cert.getExtensionValue(SKI_OID);
 
-		if (cert.getVersion() < 3) {
+		 if (cert.getVersion() < 3 || derEncodedValue == null) {
 			PublicKey key = cert.getPublicKey();
 			if (!(key instanceof RSAPublicKey)) {
 				throw new WSSecurityException(
