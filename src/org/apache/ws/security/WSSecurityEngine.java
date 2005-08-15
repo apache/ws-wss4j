@@ -473,9 +473,6 @@ public class WSSecurityEngine {
         XMLSignature sig = null;
         try {
             sig = new XMLSignature(elem, null);
-        } catch (XMLSignatureException e2) {
-            throw new WSSecurityException(WSSecurityException.FAILED_CHECK,
-                    "noXMLSig");
         } catch (XMLSecurityException e2) {
             throw new WSSecurityException(WSSecurityException.FAILED_CHECK,
                     "noXMLSig");
