@@ -570,7 +570,15 @@ org.apache.ws.axis.security.util
 	  <delete file="${dir.dist}/${jar.library}" />
     </target>
 
-    <target name="srcdist" depends="init" description="Build source zip file for distro">
+    <target name="reqjardist" depends="init" description="Build zip for required jars">
+	     <mkdir dir="${dir.dist}"/>
+	     <zip destfile="${dir.dist}/${product.shortname}-otherjar-${product.version}.zip">
+	         <zipfileset prefix="wss4j" dir="."
+	             includes="lib/*.jar, endorsed/*.jar"/>
+	     </zip>
+	 </target>	
+	
+	<target name="srcdist" depends="init" description="Build source zip file for distro">
         <mkdir dir="${dir.dist}"/>
         <zip destfile="${dir.dist}/${product.shortname}-src-${product.version}.zip">
             <zipfileset prefix="wss4j" dir="."
