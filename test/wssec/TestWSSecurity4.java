@@ -135,7 +135,7 @@ public class TestWSSecurity4 extends TestCase {
 //         * as a document again for further processing.
 //         */
 //
-//        Message signedMsg = (Message) AxisUtil.toSOAPMessage(signedDoc);
+//        Message signedMsg = (Message) SOAPUtil.toSOAPMessage(signedDoc);
 //        XMLUtils.PrettyElementToWriter(signedMsg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
 //
 //        signedDoc = signedMsg.getSOAPEnvelope().getAsDocument();

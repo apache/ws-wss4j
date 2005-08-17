@@ -33,7 +33,6 @@ import org.apache.axis.configuration.NullProvider;
 import org.apache.axis.message.SOAPEnvelope;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.ws.axis.security.util.AxisUtil;
 import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.message.WSSAddSAMLToken;
@@ -157,7 +156,7 @@ public class TestWSSecurityST1 extends TestCase implements CallbackHandler {
          * as a document again for further processing.
          */
 
-        Message signedMsg = (Message) AxisUtil.toSOAPMessage(signedDoc);
+        Message signedMsg = (Message) SOAPUtil.toSOAPMessage(signedDoc);
         if (log.isDebugEnabled()) {
             log.debug("Unsigned SAML message (sender vouches):");
             XMLUtils.PrettyElementToWriter(signedMsg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
@@ -177,7 +176,7 @@ public class TestWSSecurityST1 extends TestCase implements CallbackHandler {
      */
     private void verify(Document doc) throws Exception {
         secEngine.processSecurityHeader(doc, null, this, null);
-        AxisUtil.updateSOAPMessage(doc, message);
+        SOAPUtil.updateSOAPMessage(doc, message);
         String decryptedString = message.getSOAPPartAsString();
         assertTrue(decryptedString.indexOf("LogTestService2") > 0 ? true : false);
     }

@@ -28,7 +28,6 @@ import org.apache.axis.message.SOAPEnvelope;
 import org.apache.axis.utils.XMLUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.ws.axis.security.util.AxisUtil;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
@@ -134,7 +133,7 @@ public class TestWSSecuritySOAP12 extends TestCase {
          * as a document again for further processing.
          */
 
-        Message signedMsg = (Message) AxisUtil.toSOAPMessage(signedDoc);
+        Message signedMsg = (Message) SOAPUtil.toSOAPMessage(signedDoc);
         if (log.isDebugEnabled()) {
             log.debug("Signed message SOAP 1.2:");
             XMLUtils.PrettyElementToWriter(signedMsg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));

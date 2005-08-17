@@ -27,7 +27,6 @@ import org.apache.axis.message.SOAPEnvelope;
 import org.apache.axis.utils.XMLUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.ws.axis.security.util.AxisUtil;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSConfig;
@@ -204,7 +203,7 @@ public class TestWSSecurity10 extends TestCase implements CallbackHandler {
          * as a document again for further processing.
          */
 
-        Message signedMsg = (Message) AxisUtil.toSOAPMessage(encDoc);
+        Message signedMsg = (Message) SOAPUtil.toSOAPMessage(encDoc);
 
         XMLUtils.PrettyElementToWriter(signedMsg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
         log.info("Encryption Done\n");

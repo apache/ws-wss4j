@@ -27,7 +27,6 @@ import org.apache.axis.configuration.NullProvider;
 import org.apache.axis.message.SOAPEnvelope;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.ws.axis.security.util.AxisUtil;
 import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.components.crypto.Crypto;
@@ -134,7 +133,7 @@ public class TestWSSecurity3 extends TestCase implements CallbackHandler {
          * as a document again for further processing.
          */
 
-        Message signedMsg = (Message) AxisUtil.toSOAPMessage(signedDoc);
+        Message signedMsg = (Message) SOAPUtil.toSOAPMessage(signedDoc);
         signedDoc = signedMsg.getSOAPEnvelope().getAsDocument();
         log.info("After Signing....");
         verify(signedDoc);

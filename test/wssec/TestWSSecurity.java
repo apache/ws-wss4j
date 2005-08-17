@@ -28,7 +28,6 @@ import org.apache.axis.configuration.NullProvider;
 import org.apache.axis.message.SOAPEnvelope;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.ws.axis.security.util.AxisUtil;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.components.crypto.Crypto;
@@ -137,7 +136,7 @@ public class TestWSSecurity extends TestCase {
          * as a document again for further processing.
          */
 
-        Message signedMsg = (Message) AxisUtil.toSOAPMessage(signedDoc);
+        Message signedMsg = (Message) SOAPUtil.toSOAPMessage(signedDoc);
         if (log.isDebugEnabled()) {
             log.debug("Signed message with IssuerSerial key identifier:");
             XMLUtils.PrettyElementToWriter(signedMsg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
@@ -167,7 +166,7 @@ public class TestWSSecurity extends TestCase {
 //        Document doc = unsignedEnvelope.getAsDocument();
 //        Document signedDoc = builder.build(doc, crypto);
 //
-//        Message signedMsg = (Message) AxisUtil.toSOAPMessage(signedDoc);
+//        Message signedMsg = (Message) SOAPUtil.toSOAPMessage(signedDoc);
 //        if (log.isDebugEnabled()) {
 //            log.debug("Signed message with IssuerSerialDirect key identifier:");
 //            XMLUtils.PrettyElementToWriter(signedMsg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));

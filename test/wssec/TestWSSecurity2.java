@@ -28,7 +28,6 @@ import org.apache.axis.configuration.NullProvider;
 import org.apache.axis.message.SOAPEnvelope;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.ws.axis.security.util.AxisUtil;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSecurityEngine;
@@ -151,7 +150,7 @@ public class TestWSSecurity2 extends TestCase implements CallbackHandler {
          * as a document again for further processing.
          */
 
-        Message encryptedMsg = (Message) AxisUtil.toSOAPMessage(encryptedDoc);
+        Message encryptedMsg = (Message) SOAPUtil.toSOAPMessage(encryptedDoc);
         if (log.isDebugEnabled()) {
             log.debug("Encrypted message, RSA-15 keytransport, 3DES:");
             XMLUtils.PrettyElementToWriter(encryptedMsg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
@@ -180,7 +179,7 @@ public class TestWSSecurity2 extends TestCase implements CallbackHandler {
         log.info("Before Encryption AES 128/RSA-15....");
         encryptedDoc = builder.build(doc, crypto);
         log.info("After Encryption AES 128/RSA-15....");
-        encryptedMsg = (Message) AxisUtil.toSOAPMessage(encryptedDoc);
+        encryptedMsg = (Message) SOAPUtil.toSOAPMessage(encryptedDoc);
         if (log.isDebugEnabled()) {
             log.debug("Encrypted message, RSA-15 keytransport, AES 128:");
             XMLUtils.PrettyElementToWriter(encryptedMsg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
@@ -211,7 +210,7 @@ public class TestWSSecurity2 extends TestCase implements CallbackHandler {
         Document encryptedDoc = builder.build(doc, crypto);
         log.info("After Encryption Triple DES/RSA-OAEP....");
 
-        Message encryptedMsg = (Message) AxisUtil.toSOAPMessage(encryptedDoc);
+        Message encryptedMsg = (Message) SOAPUtil.toSOAPMessage(encryptedDoc);
         if (log.isDebugEnabled()) {
             log.debug("Encrypted message, RSA-OAEP keytransport, 3DES:");
             XMLUtils.PrettyElementToWriter(encryptedMsg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
@@ -232,7 +231,7 @@ public class TestWSSecurity2 extends TestCase implements CallbackHandler {
      */
     private void verify(Document doc) throws Exception {
         secEngine.processSecurityHeader(doc, null, this, crypto);
-        AxisUtil.updateSOAPMessage(doc, message);
+        SOAPUtil.updateSOAPMessage(doc, message);
         String decryptedString = message.getSOAPPartAsString();
         assertTrue(decryptedString.indexOf("LogTestService2") > 0 ? true : false);
     }

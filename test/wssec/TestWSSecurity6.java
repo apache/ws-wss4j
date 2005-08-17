@@ -29,7 +29,6 @@ import org.apache.axis.message.SOAPEnvelope;
 import org.apache.axis.utils.XMLUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.ws.axis.security.util.AxisUtil;
 import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.components.crypto.Crypto;
@@ -148,7 +147,7 @@ public class TestWSSecurity6 extends TestCase implements CallbackHandler {
          * as a document again for further processing.
          */
 
-        Message encryptedMsg = (Message) AxisUtil.toSOAPMessage(encryptedSignedDoc);
+        Message encryptedMsg = (Message) SOAPUtil.toSOAPMessage(encryptedSignedDoc);
         String s = encryptedMsg.getSOAPPartAsString();
         ((SOAPPart)message.getSOAPPart()).setCurrentMessage(s, SOAPPart.FORM_STRING);
                 
@@ -166,7 +165,7 @@ public class TestWSSecurity6 extends TestCase implements CallbackHandler {
      */
     private void verify(Document doc) throws Exception {
         secEngine.processSecurityHeader(doc, null, this, crypto);
-        AxisUtil.updateSOAPMessage(doc, message);
+        SOAPUtil.updateSOAPMessage(doc, message);
         XMLUtils.PrettyElementToWriter(message.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
     }
 
