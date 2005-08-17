@@ -26,22 +26,19 @@ import org.apache.axis.AxisFault;
 import org.apache.axis.Message;
 import org.apache.axis.MessageContext;
 import org.apache.axis.SOAPPart;
-import org.apache.axis.handlers.BasicHandler;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.ws.axis.security.handler.WSDoAllHandler;
 import org.apache.ws.axis.security.util.AxisUtil;
 import org.apache.ws.security.SOAPConstants;
 import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.handler.WSHandlerResult;
+import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.handler.WSHandlerConstants;
-import org.apache.ws.security.components.crypto.Crypto;
-import org.apache.ws.security.components.crypto.CryptoFactory;
+import org.apache.ws.security.handler.WSHandlerResult;
 import org.apache.ws.security.message.token.Timestamp;
 import org.apache.ws.security.util.WSSecurityUtil;
-import org.apache.ws.security.util.XmlSchemaDateFormat;
 import org.apache.xml.security.utils.XMLUtils;
 import org.w3c.dom.Document;
 
@@ -50,57 +47,25 @@ import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPHeader;
 import javax.xml.soap.SOAPHeaderElement;
 import java.io.ByteArrayOutputStream;
-import java.math.BigInteger;
 import java.security.cert.X509Certificate;
-import java.text.DateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Enumeration;
-import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Vector;
 
-public class WSDoAllReceiver extends BasicHandler {
-    static Log log = LogFactory.getLog(WSDoAllReceiver.class.getName());
-    static final WSSecurityEngine secEngine = WSSecurityEngine.getInstance();
+public class WSDoAllReceiver extends WSDoAllHandler {
 
-    private boolean doDebug = false;
+    protected static Log log = LogFactory.getLog(WSDoAllReceiver.class.getName());
 
-    private static Hashtable cryptos = new Hashtable(5);
-
-    /**
-     * This nested private class hold per request data.
-     *
-     * @author wdi
-     */
-    protected class RequestData {
-        MessageContext msgContext = null;
-
-        Crypto sigCrypto = null;
-        String sigPropFile = null;
-
-        Crypto decCrypto = null;
-        String decPropFile = null;
-
-        int timeToLive = 300; 	// Timestamp: time in seconds between creation
-        // and expiery
-        void clear() {
-            decCrypto = null;
-            decPropFile = null;
-            msgContext = null;
-            sigCrypto = null;
-            sigPropFile = null;
-        }
-    }
     /**
      * Axis calls invoke to handle a message.
      * <p/>
      *
-     * @param mc message context.
+     * @param msgContext message context.
      * @throws AxisFault
      */
     public void invoke(MessageContext msgContext) throws AxisFault {
-        
+
     	doDebug = log.isDebugEnabled();
 
         if (doDebug) {
@@ -114,7 +79,7 @@ public class WSDoAllReceiver extends BasicHandler {
         * housekeeping.
         */
         try {
-            reqData.msgContext = msgContext;
+            reqData.setMsgContext(msgContext);
 
             Vector actions = new Vector();
             String action = null;
@@ -171,7 +136,7 @@ public class WSDoAllReceiver extends BasicHandler {
             */
 
             if ((doAction & WSConstants.SIGN) == WSConstants.SIGN) {
-                decodeSignatureParameter(reqData);
+                decodeSignatureParameter2(reqData);
             }
 
             if ((doAction & WSConstants.ENCR) == WSConstants.ENCR) {
@@ -181,7 +146,7 @@ public class WSDoAllReceiver extends BasicHandler {
             Vector wsResult = null;
             try {
                 wsResult = secEngine.processSecurityHeader(doc, actor,
-                        cbHandler, reqData.sigCrypto, reqData.decCrypto);
+                        cbHandler, reqData.getSigCrypto(), reqData.getDecCrypto());
             } catch (WSSecurityException ex) {
                 ex.printStackTrace();
                 throw new AxisFault(
@@ -234,7 +199,7 @@ public class WSDoAllReceiver extends BasicHandler {
                 Enumeration headersByName = sm.getSOAPEnvelope().getHeadersByName(
                         qname.getNamespaceURI(), qname.getLocalPart());
                 while (headersByName.hasMoreElements()) {
-                    org.apache.axis.message.SOAPHeaderElement tempHeader = 
+                    org.apache.axis.message.SOAPHeaderElement tempHeader =
                         (org.apache.axis.message.SOAPHeaderElement) headersByName.nextElement();
                     tempHeader.setProcessed(true);
                 }
@@ -328,14 +293,14 @@ public class WSDoAllReceiver extends BasicHandler {
                         try {
                             ttl_i = Integer.parseInt(ttl);
                         } catch (NumberFormatException e) {
-                            ttl_i = reqData.timeToLive;
+                            ttl_i = reqData.getTimeToLive();
                         }
                     }
                     if (ttl_i <= 0) {
-                        ttl_i = reqData.timeToLive;
+                        ttl_i = reqData.getTimeToLive();
                     }
 
-                    if (!verifyTimestamp(timestamp, reqData.timeToLive)) {
+                    if (!verifyTimestamp(timestamp, reqData.getTimeToLive())) {
                         throw new AxisFault(
                                 "WSDoAllReceiver: The timestamp could not be validated");
                     }
@@ -375,322 +340,11 @@ public class WSDoAllReceiver extends BasicHandler {
             if (doDebug) {
                 log.debug("WSDoAllReceiver: exit invoke()");
             }
+        } catch (WSSecurityException e) {
+            throw new AxisFault(e.getMessage(), e);
         } finally {
             reqData.clear();
             reqData = null;
         }
-
-    }
-
-    /**
-     * Hook to allow subclasses to load their Signature Crypto however they see
-     * fit.
-     */
-    protected Crypto loadSignatureCrypto(RequestData reqData) throws AxisFault {
-        Crypto crypto = null;
-        if ((reqData.sigPropFile = (String) getOption(WSHandlerConstants.SIG_PROP_FILE))
-                == null) {
-            reqData.sigPropFile =
-                    (String) reqData.msgContext.getProperty(WSHandlerConstants.SIG_PROP_FILE);
-        }
-        if (reqData.sigPropFile != null) {
-            if ((crypto = (Crypto) cryptos.get(reqData.sigPropFile)) == null) {
-                crypto = CryptoFactory.getInstance(reqData.sigPropFile);
-                cryptos.put(reqData.sigPropFile, crypto);
-            }
-        } else {
-            throw new AxisFault("WSDoAllReceiver: Signature: no crypto property file");
-        }
-        return crypto;
-    }
-
-    /**
-     * Hook to allow subclasses to load their Decryption Crypto however they see
-     * fit.
-     */
-    protected Crypto loadDecryptionCrypto(RequestData reqData) throws AxisFault {
-        Crypto crypto = null;
-        if ((reqData.decPropFile = (String) getOption(WSHandlerConstants.DEC_PROP_FILE))
-                == null) {
-            reqData.decPropFile =
-                    (String) reqData.msgContext.getProperty(WSHandlerConstants.DEC_PROP_FILE);
-        }
-        if (reqData.decPropFile != null) {
-            if ((crypto = (Crypto) cryptos.get(reqData.decPropFile)) == null) {
-                crypto = CryptoFactory.getInstance(reqData.decPropFile);
-                cryptos.put(reqData.decPropFile, crypto);
-            }
-        } else if ((crypto = reqData.sigCrypto) == null) {
-            throw new AxisFault("WSDoAllReceiver: Encryption: no crypto property file");
-        }
-        return crypto;
-    }
-
-    private void decodeSignatureParameter(RequestData reqData) throws AxisFault {
-        reqData.sigCrypto = loadSignatureCrypto(reqData);
-        /* There are currently no other signature parameters that need to be handled
-        * here, but we call the load crypto hook rather than just changing the visibility
-        * of this method to maintain parity with WSDoAllSender.
-        */
-    }
-
-    /*
-    * Set and check the decryption specific parameters, if necessary
-    * take over signatur crypto instance.
-    */
-
-    private void decodeDecryptionParameter(RequestData reqData) throws AxisFault {
-        reqData.decCrypto = loadDecryptionCrypto(reqData);
-        /* There are currently no other decryption parameters that need to be handled
-        * here, but we call the load crypto hook rather than just changing the visibility
-        * of this method to maintain parity with WSDoAllSender.
-        */
-    }
-
-    /**
-     * Get the password callback class and get an instance
-     * <p/>
-     */
-    private CallbackHandler getPasswordCB(RequestData reqData) throws AxisFault {
-
-        String callback = null;
-        CallbackHandler cbHandler = null;
-        if ((callback = (String) getOption(WSHandlerConstants.PW_CALLBACK_CLASS))
-                == null) {
-            callback =
-                    (String) reqData.msgContext.getProperty(WSHandlerConstants.PW_CALLBACK_CLASS);
-        }
-        if (callback != null) {
-            Class cbClass = null;
-            try {
-                cbClass = java.lang.Class.forName(callback);
-            } catch (ClassNotFoundException e) {
-                throw new AxisFault("WSDoAllReceiver: cannot load password callback class: "
-                        + callback,
-                        e);
-            }
-            try {
-                cbHandler = (CallbackHandler) cbClass.newInstance();
-            } catch (java.lang.Exception e) {
-                throw new AxisFault("WSDoAllReceiver: cannot create instance of password callback: "
-                        + callback,
-                        e);
-            }
-        } else {
-            cbHandler =
-                    (CallbackHandler) reqData.msgContext.getProperty(WSHandlerConstants.PW_CALLBACK_REF);
-            if (cbHandler == null) {
-                throw new AxisFault("WSDoAllReceiver: no reference in callback property");
-            }
-        }
-        return cbHandler;
-    }
-
-    /**
-     * Evaluate whether a given certificate should be trusted.
-     * Hook to allow subclasses to implement custom validation methods however they see fit.
-     * <p/>
-     * Policy used in this implementation:
-     * 1. Search the keystore for the transmitted certificate
-     * 2. Search the keystore for a connection to the transmitted certificate
-     * (that is, search for certificate(s) of the issuer of the transmitted certificate
-     * 3. Verify the trust path for those certificates found because the search for the issuer might be fooled by a phony DN (String!)
-     *
-     * @param cert the certificate that should be validated against the keystore
-     * @return true if the certificate is trusted, false if not (AxisFault is thrown for exceptions during CertPathValidation)
-     * @throws AxisFault
-     */
-    private boolean verifyTrust(X509Certificate cert, RequestData reqData) throws AxisFault {
-
-        // If no certificate was transmitted, do not trust the signature
-        if (cert == null) {
-            return false;
-        }
-
-        String[] aliases = null;
-        String alias = null;
-        X509Certificate[] certs;
-
-        String subjectString = cert.getSubjectDN().getName();
-        String issuerString = cert.getIssuerDN().getName();
-        BigInteger issuerSerial = cert.getSerialNumber();
-
-        if (doDebug) {
-            log.debug("WSDoAllReceiver: Transmitted certificate has subject " + subjectString);
-            log.debug("WSDoAllReceiver: Transmitted certificate has issuer " + issuerString + " (serial " + issuerSerial + ")");
-        }
-
-        // FIRST step
-        // Search the keystore for the transmitted certificate
-
-        // Search the keystore for the alias of the transmitted certificate
-        try {
-            alias = reqData.sigCrypto.getAliasForX509Cert(issuerString, issuerSerial);
-        } catch (WSSecurityException ex) {
-            throw new AxisFault("WSDoAllReceiver: Could not get alias for certificate with " + subjectString, ex);
-        }
-
-        if (alias != null) {
-            // Retrieve the certificate for the alias from the keystore
-            try {
-                certs = reqData.sigCrypto.getCertificates(alias);
-            } catch (WSSecurityException ex) {
-                throw new AxisFault("WSDoAllReceiver: Could not get certificates for alias " + alias, ex);
-            }
-
-            // If certificates have been found, the certificates must be compared
-            // to ensure againgst phony DNs (compare encoded form including signature)
-            if (certs != null && certs.length > 0 && cert.equals(certs[0])) {
-                if (doDebug) {
-                    log.debug("Direct trust for certificate with " + subjectString);
-                }
-                return true;
-            }
-        } else {
-            if (doDebug) {
-                log.debug("No alias found for subject from issuer with " + issuerString + " (serial " + issuerSerial + ")");
-            }
-        }
-
-        // SECOND step
-        // Search for the issuer of the transmitted certificate in the keystore
-
-        // Search the keystore for the alias of the transmitted certificates issuer
-        try {
-            aliases = reqData.sigCrypto.getAliasesForDN(issuerString);
-        } catch (WSSecurityException ex) {
-            throw new AxisFault("WSDoAllReceiver: Could not get alias for certificate with " + issuerString, ex);
-        }
-
-        // If the alias has not been found, the issuer is not in the keystore
-        // As a direct result, do not trust the transmitted certificate
-        if (aliases == null || aliases.length < 1) {
-            if (doDebug) {
-                log.debug("No aliases found in keystore for issuer " + issuerString + " of certificate for " + subjectString);
-            }
-            return false;
-        }
-
-        // THIRD step
-        // Check the certificate trust path for every alias of the issuer found in the keystore
-        for (int i = 0; i < aliases.length; i++) {
-            alias = aliases[i];
-
-            if (doDebug) {
-                log.debug("Preparing to validate certificate path with alias " + alias + " for issuer " + issuerString);
-            }
-
-            // Retrieve the certificate(s) for the alias from the keystore
-            try {
-                certs = reqData.sigCrypto.getCertificates(alias);
-            } catch (WSSecurityException ex) {
-                throw new AxisFault("WSDoAllReceiver: Could not get certificates for alias " + alias, ex);
-            }
-
-            // If no certificates have been found, there has to be an error:
-            // The keystore can find an alias but no certificate(s)
-            if (certs == null | certs.length < 1) {
-                throw new AxisFault("WSDoAllReceiver: Could not get certificates for alias " + alias);
-            }
-
-            // Form a certificate chain from the transmitted certificate
-            // and the certificate(s) of the issuer from the keystore
-
-            // First, create new array
-            X509Certificate[] x509certs = new X509Certificate[certs.length + 1];
-
-            /* The following conversion into provider specific format seems not to be necessary
-            // Create new certificate, possibly provider-specific
-            try {
-            cert = sigCrypto.loadCertificate(new ByteArrayInputStream(cert.getEncoded()));
-            } catch (CertificateEncodingException ex) {
-            throw new AxisFault("WSDoAllReceiver: Combination of subject and issuers certificates failed", ex);
-            } catch (WSSecurityException ex) {
-            throw new AxisFault("WSDoAllReceiver: Combination of subject and issuers certificates failed", ex);
-            }
-            */
-
-            // Then add the first certificate ...
-            x509certs[0] = cert;
-
-            // ... and the other certificates
-            for (int j = 0; j < certs.length; j++) {
-                cert = certs[i];
-
-                /* The following conversion into provider specific format seems not to be necessary
-                // Create new certificate, possibly provider-specific
-                try {
-                cert = sigCrypto.loadCertificate(new ByteArrayInputStream(cert.getEncoded()));
-                } catch (CertificateEncodingException ex) {
-                throw new AxisFault("WSDoAllReceiver: Combination of subject and issuers certificates failed", ex);
-                } catch (WSSecurityException ex) {
-                throw new AxisFault("WSDoAllReceiver: Combination of subject and issuers certificates failed", ex);
-                }
-                */
-
-                x509certs[certs.length + j] = cert;
-            }
-            certs = x509certs;
-
-            // Use the validation method from the crypto to check whether the subjects certificate was really signed by the issuer stated in the certificate
-            try {
-                if (reqData.sigCrypto.validateCertPath(certs)) {
-                    if (doDebug) {
-                        log.debug("WSDoAllReceiver: Certificate path has been verified for certificate with subject " + subjectString);
-                    }
-                    return true;
-                }
-            } catch (WSSecurityException ex) {
-                throw new AxisFault("WSDoAllReceiver: Certificate path verification failed for certificate with subject " + subjectString, ex);
-            }
-        }
-
-        log.debug("WSDoAllReceiver: Certificate path could not be verified for certificate with subject " + subjectString);
-        return false;
-    }
-
-    /**
-     * Evaluate whether a timestamp is considered valid on receiverside.
-     * Hook to allow subclasses to implement custom validation methods however they see fit.
-     * <p/>
-     * Policy used in this implementation:
-     * 1. The receiver can set its own time to live (besides from that set on sender side)
-     * 2. If the message was created before (now-ttl) the message is rejected
-     *
-     * @param timestamp  the timestamp that is validated
-     * @param timeToLive the limit on receiverside, the timestamp is validated against
-     * @return true if the timestamp is before (now-timeToLive), false otherwise
-     * @throws AxisFault
-     */
-    protected boolean verifyTimestamp(Timestamp timestamp, int timeToLive) throws AxisFault {
-
-        // Calculate the time that is allowed for the message to travel
-        Calendar validCreation = Calendar.getInstance();
-        long currentTime = validCreation.getTimeInMillis();
-        currentTime -= timeToLive * 1000;
-        validCreation.setTimeInMillis(currentTime);
-
-        if (doDebug) {
-            log.debug("Preparing to verify the timestamp");
-            DateFormat zulu = new XmlSchemaDateFormat();
-            log.debug("Validation of Timestamp: Current time is "
-                    + zulu.format(Calendar.getInstance().getTime()));
-            log.debug("Validation of Timestamp: Valid creation is "
-                    + zulu.format(validCreation.getTime()));
-            log.debug("Validation of Timestamp: Timestamp created is "
-                    + zulu.format(timestamp.getCreated().getTime()));
-        }
-        // Validate the time it took the message to travel
-        //        if (timestamp.getCreated().before(validCreation) ||
-        // !timestamp.getCreated().equals(validCreation)) {
-        if (!timestamp.getCreated().after(validCreation)) {
-            if (doDebug) {
-                log.debug("Validation of Timestamp: The message was created too long ago");
-            }
-            return false;
-        }
-
-        log.debug("Validation of Timestamp: Everything is ok");
-        return true;
     }
 }

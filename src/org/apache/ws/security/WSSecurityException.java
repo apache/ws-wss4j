@@ -100,6 +100,26 @@ public class WSSecurityException extends RemoteException {
     }
 
     /**
+     * Constructor.
+     * <p/>
+     *
+     * @param errorMessage
+     */
+    public WSSecurityException(String errorMessage) {
+        super(errorMessage);
+    }
+
+    /**
+     * Constructor.
+     * <p/>
+     *
+     * @param errorMessage
+     */
+    public WSSecurityException(String errorMessage, Throwable t) {
+        super(errorMessage, t);
+    }
+
+    /**
      * Get the error code.
      * <p/>
      *

@@ -87,7 +87,7 @@ import java.util.Vector;
  *
  * @author Venkat Reddy (vreddyp@gmail.com).
  */
-public class WSS4JHandler implements Handler {
+public class WSS4JHandler extends WSHandler implements Handler {
     private HandlerInfo handlerInfo;
     static Log log = LogFactory.getLog(WSS4JHandler.class.getName());
     static final WSSecurityEngine secEngine = new WSSecurityEngine();
@@ -147,11 +147,6 @@ public class WSS4JHandler implements Handler {
         return handlerInfo.getHeaders();
     }
 
-    private void initialize() {
-        signatureParts.removeAllElements();
-        encryptParts.removeAllElements();
-    }
-
     public boolean handleRequest(MessageContext mc) {
         mc.setProperty(org.apache.axis.SOAPPart.ALLOW_FORM_OPTIMIZATION,
             Boolean.TRUE);
@@ -168,6 +163,10 @@ public class WSS4JHandler implements Handler {
      * Switch for transfering control to doReceiver and doSender
      */
     public boolean processMessage(MessageContext mc, boolean isRequestMessage) {
+
+        RequestData reqData = new RequestData();
+        reqData.setMsgContext(mc);
+        
         doDebug = log.isDebugEnabled();
         msgContext = (SOAPMessageContext) mc;
         String deployment = null;
@@ -210,7 +209,8 @@ public class WSS4JHandler implements Handler {
      */
     public boolean doSender(MessageContext mc) {
 
-        initialize();
+        signatureParts.removeAllElements();
+        encryptParts.removeAllElements();
         noSerialization = false;
         /*
         * Get the action first.
@@ -1659,5 +1659,21 @@ handle response
         } catch (Exception ex) {
             throw new JAXRPCException("documentToStream : cannot convert document into stream", ex);
         }
+    }
+
+    public Object getOption(String key) {
+        return handlerInfo.getHandlerConfig().get(key);
+    }
+
+    public Object getProperty(Object msgContext, String key) {
+        return ((MessageContext)msgContext).getProperty(key);
+    }
+
+    public String getPassword(Object msgContext) {
+        return (String) ((MessageContext)msgContext).getProperty(Call.PASSWORD_PROPERTY);
+    }
+
+    public void setPassword(Object msgContext, String password) {
+        ((MessageContext)msgContext).setProperty(Call.PASSWORD_PROPERTY, password);
     }
 }
