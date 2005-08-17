@@ -27,11 +27,13 @@ import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
+import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.message.token.BinarySecurity;
 import org.apache.ws.security.message.token.X509Security;
 import org.apache.xml.security.algorithms.JCEMapper;
 import org.apache.xml.security.utils.Base64;
 import org.apache.xpath.XPathAPI;
+import org.apache.axis.AxisFault;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -926,5 +928,49 @@ public class WSSecurityUtil {
         }
 
         return wsResult;
+    }
+
+    static public int decodeAction(String action, Vector actions)
+            throws AxisFault {
+
+        int doAction = 0;
+
+        if (action == null) {
+            return doAction;
+        }
+        String single[] = StringUtil.split(action, ' ');
+        for (int i = 0; i < single.length; i++) {
+            if (single[i].equals(WSHandlerConstants.NO_SECURITY)) {
+                doAction = WSConstants.NO_SECURITY;
+                return doAction;
+            } else if (single[i].equals(WSHandlerConstants.USERNAME_TOKEN)) {
+                doAction |= WSConstants.UT;
+                actions.add(new Integer(WSConstants.UT));
+            } else if (single[i].equals(WSHandlerConstants.SIGNATURE)) {
+                doAction |= WSConstants.SIGN;
+                actions.add(new Integer(WSConstants.SIGN));
+            } else if (single[i].equals(WSHandlerConstants.ENCRYPT)) {
+                doAction |= WSConstants.ENCR;
+                actions.add(new Integer(WSConstants.ENCR));
+            } else if (single[i].equals(WSHandlerConstants.SAML_TOKEN_UNSIGNED)) {
+                doAction |= WSConstants.ST_UNSIGNED;
+                actions.add(new Integer(WSConstants.ST_UNSIGNED));
+            } else if (single[i].equals(WSHandlerConstants.SAML_TOKEN_SIGNED)) {
+                doAction |= WSConstants.ST_SIGNED;
+                actions.add(new Integer(WSConstants.ST_SIGNED));
+            } else if (single[i].equals(WSHandlerConstants.TIMESTAMP)) {
+                doAction |= WSConstants.TS;
+                actions.add(new Integer(WSConstants.TS));
+            } else if (single[i].equals(WSHandlerConstants.NO_SERIALIZATION)) {
+                doAction |= WSConstants.NO_SERIALIZE;
+                actions.add(new Integer(WSConstants.NO_SERIALIZE));
+            } else if (single[i].equals(WSHandlerConstants.SIGN_WITH_UT_KEY)) {
+                doAction |= WSConstants.UT_SIGN;
+                actions.add(new Integer(WSConstants.UT_SIGN));
+            } else {
+                throw new AxisFault("WSDoAllSender: Unknown action defined" + single[i]);
+            }
+        }
+        return doAction;
     }
 }

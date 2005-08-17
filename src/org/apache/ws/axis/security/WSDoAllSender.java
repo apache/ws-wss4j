@@ -24,7 +24,6 @@ import org.apache.axis.SOAPPart;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.axis.security.handler.WSDoAllHandler;
-import org.apache.ws.axis.security.util.AxisUtil;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.handler.RequestData;
@@ -78,7 +77,7 @@ public class WSDoAllSender extends WSDoAllHandler {
             if (action == null) {
                 throw new AxisFault("WSDoAllSender: No action defined");
             }
-            int doAction = AxisUtil.decodeAction(action, actions);
+            int doAction = WSSecurityUtil.decodeAction(action, actions);
             if (doAction == WSConstants.NO_SECURITY) {
                 return;
             }
