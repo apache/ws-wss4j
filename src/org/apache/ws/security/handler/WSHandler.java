@@ -699,32 +699,6 @@ public abstract class WSHandler {
         }
     }
 
-    /******************************************************** DIMS *******/
-
-
-    /**
-     * Hook to allow subclasses to load their Signature Crypto however they see
-     * fit.
-     */
-    protected Crypto loadSignatureCrypto2(RequestData reqData) throws WSSecurityException {
-        Crypto crypto = null;
-        String sigPropFile = null;
-        if ((sigPropFile = (String) getOption(WSHandlerConstants.SIG_PROP_FILE))
-                == null) {
-            sigPropFile =
-                    (String) getProperty(reqData.getMsgContext(), WSHandlerConstants.SIG_PROP_FILE);
-        }
-        if (sigPropFile != null) {
-            if ((crypto = (Crypto) cryptos.get(sigPropFile)) == null) {
-                crypto = CryptoFactory.getInstance(sigPropFile);
-                cryptos.put(sigPropFile, crypto);
-            }
-        } else {
-            throw new WSSecurityException("WSDoAllReceiver: Signature: no crypto property file");
-        }
-        return crypto;
-    }
-
     /**
      * Hook to allow subclasses to load their Decryption Crypto however they see
      * fit.
@@ -749,7 +723,7 @@ public abstract class WSHandler {
     }
 
     protected void decodeSignatureParameter2(RequestData reqData) throws WSSecurityException {
-        reqData.setSigCrypto(loadSignatureCrypto2(reqData));
+        reqData.setSigCrypto(loadSignatureCrypto(reqData));
         /* There are currently no other signature parameters that need to be handled
         * here, but we call the load crypto hook rather than just changing the visibility
         * of this method to maintain parity with WSDoAllSender.
@@ -917,39 +891,13 @@ public abstract class WSHandler {
 
             // Form a certificate chain from the transmitted certificate
             // and the certificate(s) of the issuer from the keystore
-
             // First, create new array
             X509Certificate[] x509certs = new X509Certificate[certs.length + 1];
-
-            /* The following conversion into provider specific format seems not to be necessary
-            // Create new certificate, possibly provider-specific
-            try {
-            cert = sigCrypto.loadCertificate(new ByteArrayInputStream(cert.getEncoded()));
-            } catch (CertificateEncodingException ex) {
-            throw new WSSecurityException("WSDoAllReceiver: Combination of subject and issuers certificates failed", ex);
-            } catch (WSSecurityException ex) {
-            throw new WSSecurityException("WSDoAllReceiver: Combination of subject and issuers certificates failed", ex);
-            }
-            */
-
             // Then add the first certificate ...
             x509certs[0] = cert;
-
             // ... and the other certificates
             for (int j = 0; j < certs.length; j++) {
                 cert = certs[i];
-
-                /* The following conversion into provider specific format seems not to be necessary
-                // Create new certificate, possibly provider-specific
-                try {
-                cert = sigCrypto.loadCertificate(new ByteArrayInputStream(cert.getEncoded()));
-                } catch (CertificateEncodingException ex) {
-                throw new WSSecurityException("WSDoAllReceiver: Combination of subject and issuers certificates failed", ex);
-                } catch (WSSecurityException ex) {
-                throw new WSSecurityException("WSDoAllReceiver: Combination of subject and issuers certificates failed", ex);
-                }
-                */
-
                 x509certs[certs.length + j] = cert;
             }
             certs = x509certs;
