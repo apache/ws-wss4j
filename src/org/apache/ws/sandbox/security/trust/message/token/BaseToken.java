@@ -14,13 +14,13 @@
  *  limitations under the License.
  *
  */
-package org.apache.ws.security.trust.message.token;
+package org.apache.ws.sandbox.security.trust.message.token;
 
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.message.token.BinarySecurity;
 import org.apache.ws.security.message.token.SecurityTokenReference;
-import org.apache.ws.security.trust.TrustConstants;
+import org.apache.ws.sandbox.security.trust.TrustConstants;
 import org.apache.ws.security.util.DOM2Writer;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.w3c.dom.Document;

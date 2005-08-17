@@ -15,7 +15,7 @@
 *
 */
 
-package org.apache.ws.axis.security.conversation;
+package org.apache.ws.sandbox.axis.security.conversation;
 
 import org.apache.axis.AxisFault;
 import org.apache.axis.Message;
@@ -28,9 +28,9 @@ import org.apache.ws.security.SOAPConstants;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSEncryptionPart;
 import org.apache.ws.security.WSSConfig;
-import org.apache.ws.security.conversation.*;
-import org.apache.ws.security.conversation.message.info.DerivedKeyInfo;
-import org.apache.ws.security.conversation.message.token.SecurityContextToken;
+import org.apache.ws.sandbox.security.conversation.*;
+import org.apache.ws.sandbox.security.conversation.message.info.DerivedKeyInfo;
+import org.apache.ws.sandbox.security.conversation.message.token.SecurityContextToken;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.message.token.Reference;
 import org.apache.ws.security.message.token.SecurityTokenReference;

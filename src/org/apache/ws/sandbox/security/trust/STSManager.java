@@ -14,15 +14,15 @@
  *  limitations under the License.
  *
  */
-package org.apache.ws.security.trust;
+package org.apache.ws.sandbox.security.trust;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.trust.issue.STIssuer;
-import org.apache.ws.security.trust.message.Info.RequestInfo;
-import org.apache.ws.security.trust.renew.STRenewer;
-import org.apache.ws.security.trust.validate.STValidator;
+import org.apache.ws.sandbox.security.trust.issue.STIssuer;
+import org.apache.ws.sandbox.security.trust.message.Info.RequestInfo;
+import org.apache.ws.sandbox.security.trust.renew.STRenewer;
+import org.apache.ws.sandbox.security.trust.validate.STValidator;
 import org.w3c.dom.Document;
 
 import java.util.Hashtable;

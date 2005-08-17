@@ -15,12 +15,12 @@
  *
  */
 
-package org.apache.ws.axis.security.conversation;
+package org.apache.ws.sandbox.axis.security.conversation;
 
 
 import org.apache.axis.components.logger.LogFactory;
 import org.apache.commons.logging.Log;
-import org.apache.ws.security.conversation.ConversationConstants;
+import org.apache.ws.sandbox.security.conversation.ConversationConstants;
 import org.apache.ws.security.transform.STRTransform;
 import org.apache.xml.security.transforms.Transform;
 

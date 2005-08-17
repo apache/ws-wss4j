@@ -15,7 +15,7 @@
  *
  */
 
-package org.apache.ws.security.conversation;
+package org.apache.ws.sandbox.security.conversation;
 
 /**
  * @author Ruchith Fernando
@@ -26,9 +26,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.conversation.message.info.DerivedKeyInfo;
-import org.apache.ws.security.conversation.message.info.SecurityContextInfo;
-import org.apache.ws.security.conversation.sessions.SessionMonitor;
+import org.apache.ws.sandbox.security.conversation.message.info.DerivedKeyInfo;
+import org.apache.ws.sandbox.security.conversation.message.info.SecurityContextInfo;
+import org.apache.ws.sandbox.security.conversation.sessions.SessionMonitor;
 
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;

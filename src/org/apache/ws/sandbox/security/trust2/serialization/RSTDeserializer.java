@@ -15,12 +15,12 @@
  *
  */
 
-package org.apache.ws.security.trust2.serialization;
+package org.apache.ws.sandbox.security.trust2.serialization;
 
 import org.apache.axis.encoding.DeserializationContext;
 import org.apache.axis.encoding.DeserializerImpl;
-import org.apache.ws.security.trust2.RequestSecurityToken;
-import org.apache.ws.security.trust2.TrustConstants;
+import org.apache.ws.sandbox.security.trust2.RequestSecurityToken;
+import org.apache.ws.sandbox.security.trust2.TrustConstants;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 

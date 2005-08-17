@@ -15,14 +15,14 @@
  *
  */
 
-package org.apache.ws.security.conversation;
+package org.apache.ws.sandbox.security.conversation;
 
 import org.apache.axis.encoding.Base64;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.conversation.message.token.DerivedKeyToken;
-import org.apache.ws.security.conversation.message.token.SecurityContextToken;
+import org.apache.ws.sandbox.security.conversation.message.token.DerivedKeyToken;
+import org.apache.ws.sandbox.security.conversation.message.token.SecurityContextToken;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;

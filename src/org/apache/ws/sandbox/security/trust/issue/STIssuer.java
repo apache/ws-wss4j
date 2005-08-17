@@ -14,7 +14,7 @@
  *  limitations under the License.
  *
  */
-package org.apache.ws.security.trust.issue;
+package org.apache.ws.sandbox.security.trust.issue;
 
 import org.w3c.dom.Document;
 

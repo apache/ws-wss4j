@@ -14,7 +14,7 @@
  *  limitations under the License.
  *
  */
-package org.apache.ws.security.trust.message.token;
+package org.apache.ws.sandbox.security.trust.message.token;
 
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;

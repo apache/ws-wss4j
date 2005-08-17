@@ -15,15 +15,15 @@
  *
  */
 
-package org.apache.ws.security.trust2.samples;
+package org.apache.ws.sandbox.security.trust2.samples;
 
-import org.apache.ws.security.trust2.Lifetime;
-import org.apache.ws.security.trust2.RequestSecurityToken;
-import org.apache.ws.security.trust2.RequestSecurityTokenResponse;
-import org.apache.ws.security.trust2.SecurityTokenOrReference;
-import org.apache.ws.security.trust2.TokenTypes;
-import org.apache.ws.security.trust2.TrustConstants;
-import org.apache.ws.security.trust2.exception.TrustException;
+import org.apache.ws.sandbox.security.trust2.Lifetime;
+import org.apache.ws.sandbox.security.trust2.RequestSecurityToken;
+import org.apache.ws.sandbox.security.trust2.RequestSecurityTokenResponse;
+import org.apache.ws.sandbox.security.trust2.SecurityTokenOrReference;
+import org.apache.ws.sandbox.security.trust2.TokenTypes;
+import org.apache.ws.sandbox.security.trust2.TrustConstants;
+import org.apache.ws.sandbox.security.trust2.exception.TrustException;
 import org.apache.axis.client.Call;
 import org.apache.axis.client.Service;
 import org.apache.axis.message.SOAPBodyElement;

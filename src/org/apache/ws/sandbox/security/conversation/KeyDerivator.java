@@ -15,19 +15,15 @@
  *
  */
 
-package org.apache.ws.security.conversation;
+package org.apache.ws.sandbox.security.conversation;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.conversation.dkalgo.AlgoFactory;
-import org.apache.ws.security.conversation.dkalgo.DerivationAlgorithm;
-import org.apache.ws.security.conversation.message.info.DerivedKeyInfo;
-import org.apache.ws.security.conversation.message.token.SecurityContextToken;
+import org.apache.ws.sandbox.security.conversation.dkalgo.AlgoFactory;
+import org.apache.ws.sandbox.security.conversation.dkalgo.DerivationAlgorithm;
+import org.apache.ws.sandbox.security.conversation.message.info.DerivedKeyInfo;
 import org.apache.ws.security.message.token.SecurityTokenReference;
-import org.apache.ws.security.util.WSSecurityUtil;
-import org.w3c.dom.Element;
 
 import java.util.Hashtable;
 

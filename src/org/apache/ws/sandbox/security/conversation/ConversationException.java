@@ -14,7 +14,7 @@
  *  limitations under the License.
  *
  */
-package org.apache.ws.security.conversation;
+package org.apache.ws.sandbox.security.conversation;
 
 /**
  * @todo Rewrite this to the way WSSecurityException work or some other proper way

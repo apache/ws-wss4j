@@ -14,7 +14,7 @@
  *  limitations under the License.
  *
  */
-package org.apache.ws.axis.security.trust;
+package org.apache.ws.sandbox.axis.security.trust;
 
 import org.apache.axis.AxisFault;
 import org.apache.axis.Message;
@@ -24,7 +24,7 @@ import org.apache.axis.handlers.BasicHandler;
 import org.apache.axis.message.SOAPEnvelope;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.ws.security.trust.STSManager;
+import org.apache.ws.sandbox.security.trust.STSManager;
 import org.apache.xml.security.utils.XMLUtils;
 import org.w3c.dom.Document;
 

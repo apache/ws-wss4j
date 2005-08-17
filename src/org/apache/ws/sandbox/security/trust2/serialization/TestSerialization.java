@@ -15,12 +15,12 @@
  *
  */
 
-package org.apache.ws.security.trust2.serialization;
+package org.apache.ws.sandbox.security.trust2.serialization;
 
-import org.apache.ws.security.trust2.RequestSecurityTokenResponse;
-import org.apache.ws.security.trust2.SecurityTokenOrReference;
-import org.apache.ws.security.trust2.TokenTypes;
-import org.apache.ws.security.trust2.TrustConstants;
+import org.apache.ws.sandbox.security.trust2.RequestSecurityTokenResponse;
+import org.apache.ws.sandbox.security.trust2.SecurityTokenOrReference;
+import org.apache.ws.sandbox.security.trust2.TokenTypes;
+import org.apache.ws.sandbox.security.trust2.TrustConstants;
 import org.apache.axis.Constants;
 import org.apache.axis.MessageContext;
 import org.apache.axis.encoding.DeserializationContext;

@@ -14,7 +14,7 @@
  *  limitations under the License.
  *
  */
-package org.apache.ws.security.trust2.exception;
+package org.apache.ws.sandbox.security.trust2.exception;
 
 /**
  * @author ddelvecc

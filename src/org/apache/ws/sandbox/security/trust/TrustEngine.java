@@ -15,11 +15,11 @@
  *
  */
 
-package org.apache.ws.security.trust;
+package org.apache.ws.sandbox.security.trust;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.ws.security.trust.verify.STVerifier;
+import org.apache.ws.sandbox.security.trust.verify.STVerifier;
 import org.apache.ws.security.util.Loader;
 import org.w3c.dom.Document;
 

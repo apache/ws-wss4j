@@ -16,11 +16,11 @@
  */
 
 
-package org.apache.ws.security.trust2;
+package org.apache.ws.sandbox.security.trust2;
 
-import org.apache.ws.security.trust2.exception.ElementParsingException;
-import org.apache.ws.security.trust2.exception.InvalidSecurityTokenReference;
-import org.apache.ws.security.trust2.exception.TrustException;
+import org.apache.ws.sandbox.security.trust2.exception.ElementParsingException;
+import org.apache.ws.sandbox.security.trust2.exception.InvalidSecurityTokenReference;
+import org.apache.ws.sandbox.security.trust2.exception.TrustException;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.message.token.BinarySecurity;

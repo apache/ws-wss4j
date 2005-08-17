@@ -14,7 +14,7 @@
  *  limitations under the License.
  *
  */
-package org.apache.ws.security.trust;
+package org.apache.ws.sandbox.security.trust;
 
 import java.net.URL;
 import java.util.Properties;
@@ -26,7 +26,7 @@ import org.apache.ws.security.message.token.BinarySecurity;
 import org.apache.ws.security.message.token.Reference;
 import org.apache.ws.security.message.token.SecurityTokenReference;
 import org.apache.ws.security.message.token.UsernameToken;
-import org.apache.ws.security.trust.message.token.BaseToken;
+import org.apache.ws.sandbox.security.trust.message.token.BaseToken;
 import org.apache.ws.security.util.Loader;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.w3c.dom.Document;

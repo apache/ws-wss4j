@@ -15,7 +15,7 @@
  *
  */
 
-package org.apache.ws.security.conversation;
+package org.apache.ws.sandbox.security.conversation;
 
 import java.util.HashMap;
 import java.util.Vector;
@@ -29,7 +29,7 @@ import javax.xml.namespace.QName;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.ws.axis.security.conversation.ConvHandlerConstants;
+import org.apache.ws.sandbox.axis.security.conversation.ConvHandlerConstants;
 import org.apache.ws.security.SOAPConstants;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDocInfo;
@@ -40,19 +40,19 @@ import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
-import org.apache.ws.security.conversation.message.info.DerivedKeyInfo;
-import org.apache.ws.security.conversation.message.info.SecurityContextInfo;
-import org.apache.ws.security.conversation.message.token.DerivedKeyToken;
-import org.apache.ws.security.conversation.message.token.SecurityContextToken;
+import org.apache.ws.sandbox.security.conversation.message.info.DerivedKeyInfo;
+import org.apache.ws.sandbox.security.conversation.message.info.SecurityContextInfo;
+import org.apache.ws.sandbox.security.conversation.message.token.DerivedKeyToken;
+import org.apache.ws.sandbox.security.conversation.message.token.SecurityContextToken;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.message.EnvelopeIdResolver;
 import org.apache.ws.security.message.token.Reference;
 import org.apache.ws.security.message.token.SecurityTokenReference;
-import org.apache.ws.security.trust.TrustConstants;
-import org.apache.ws.security.trust.TrustEngine;
-import org.apache.ws.security.trust.WSTrustException;
-import org.apache.ws.security.trust.message.token.RequestSecurityTokenResponse;
-import org.apache.ws.security.trust.message.token.RequestedProofToken;
+import org.apache.ws.sandbox.security.trust.TrustConstants;
+import org.apache.ws.sandbox.security.trust.TrustEngine;
+import org.apache.ws.sandbox.security.trust.WSTrustException;
+import org.apache.ws.sandbox.security.trust.message.token.RequestSecurityTokenResponse;
+import org.apache.ws.sandbox.security.trust.message.token.RequestedProofToken;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.xml.security.encryption.XMLCipher;
 import org.apache.xml.security.encryption.XMLEncryptionException;

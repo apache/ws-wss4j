@@ -15,7 +15,7 @@
  *
  */
 
-package org.apache.ws.security.trust.message.token;
+package org.apache.ws.sandbox.security.trust.message.token;
 
 import java.io.ByteArrayOutputStream;
 
@@ -25,8 +25,8 @@ import org.apache.axis.components.logger.LogFactory;
 import org.apache.commons.logging.Log;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.trust.TrustConstants;
-import org.apache.ws.security.trust.WSTrustException;
+import org.apache.ws.sandbox.security.trust.TrustConstants;
+import org.apache.ws.sandbox.security.trust.WSTrustException;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.xml.security.utils.XMLUtils;
 import org.w3c.dom.Document;
@@ -177,7 +177,7 @@ public class RequestSecurityTokenResponse extends AbstractToken {
 	/**
 	 * Returns the QName of this type
 	 * 
-	 * @see org.apache.ws.security.trust.message.token.AbstractToken#getToken()
+	 * @see org.apache.ws.sandbox.security.trust.message.token.AbstractToken#getToken()
 	 */
 	protected QName getToken() {
 		return TOKEN;

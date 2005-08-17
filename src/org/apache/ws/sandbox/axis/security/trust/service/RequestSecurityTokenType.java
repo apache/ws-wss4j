@@ -5,7 +5,7 @@
  * by the Apache Axis #axisVersion# #today# WSDL2Java emitter.
  */
 
-package org.apache.ws.axis.security.trust.service;
+package org.apache.ws.sandbox.axis.security.trust.service;
 
 
 /**

@@ -15,7 +15,7 @@
  *
  */
 
-package org.apache.ws.security.conversation.dkalgo;
+package org.apache.ws.sandbox.security.conversation.dkalgo;
 
 /**
  *
@@ -43,7 +43,7 @@ package org.apache.ws.security.conversation.dkalgo;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
-import org.apache.ws.security.conversation.ConversationException;
+import org.apache.ws.sandbox.security.conversation.ConversationException;
 
 public class P_SHA1
         implements DerivationAlgorithm {

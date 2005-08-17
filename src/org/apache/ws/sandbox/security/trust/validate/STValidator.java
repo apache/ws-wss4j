@@ -14,7 +14,7 @@
  *  limitations under the License.
  *
  */
-package org.apache.ws.security.trust.validate;
+package org.apache.ws.sandbox.security.trust.validate;
 
 import org.w3c.dom.Document;
 

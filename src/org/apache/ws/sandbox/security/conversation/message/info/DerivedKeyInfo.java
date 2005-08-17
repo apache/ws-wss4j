@@ -15,12 +15,12 @@
  *
  */
 
-package org.apache.ws.security.conversation.message.info;
+package org.apache.ws.sandbox.security.conversation.message.info;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.conversation.message.token.DerivedKeyToken;
+import org.apache.ws.sandbox.security.conversation.message.token.DerivedKeyToken;
 import org.apache.ws.security.message.token.SecurityTokenReference;
 
 import java.util.Hashtable;

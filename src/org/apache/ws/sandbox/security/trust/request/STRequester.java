@@ -14,9 +14,9 @@
  *  limitations under the License.
  *
  */
-package org.apache.ws.security.trust.request;
+package org.apache.ws.sandbox.security.trust.request;
 
-import org.apache.ws.security.trust.WSTrustException;
+import org.apache.ws.sandbox.security.trust.WSTrustException;
 import org.w3c.dom.Document;
 
 import java.util.Hashtable;

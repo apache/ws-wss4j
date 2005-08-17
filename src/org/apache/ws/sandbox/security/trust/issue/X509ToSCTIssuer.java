@@ -14,22 +14,20 @@
  *  limitations under the License.
  *
  */
-package org.apache.ws.security.trust.issue;
+package org.apache.ws.sandbox.security.trust.issue;
 
 import org.apache.ws.security.SOAPConstants;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.message.token.BinarySecurity;
 import org.apache.ws.security.message.token.X509Security;
-import org.apache.ws.security.trust.STSUtil;
-import org.apache.ws.security.trust.TrustConstants;
-import org.apache.ws.security.trust.WSTrustException;
-import org.apache.ws.security.trust.message.token.BaseToken;
-import org.apache.ws.security.trust.message.token.Lifetime;
-import org.apache.ws.security.trust.message.token.RequestSecurityTokenResponse;
-import org.apache.ws.security.trust.message.token.RequestType;
-import org.apache.ws.security.trust.message.token.RequestedProofToken;
-import org.apache.ws.security.trust.message.token.RequestedSecurityToken;
-import org.apache.ws.security.trust.message.token.TokenType;
+import org.apache.ws.sandbox.security.trust.STSUtil;
+import org.apache.ws.sandbox.security.trust.WSTrustException;
+import org.apache.ws.sandbox.security.trust.message.token.BaseToken;
+import org.apache.ws.sandbox.security.trust.message.token.Lifetime;
+import org.apache.ws.sandbox.security.trust.message.token.RequestSecurityTokenResponse;
+import org.apache.ws.sandbox.security.trust.message.token.RequestType;
+import org.apache.ws.sandbox.security.trust.message.token.RequestedSecurityToken;
+import org.apache.ws.sandbox.security.trust.message.token.TokenType;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -38,7 +36,7 @@ import org.w3c.dom.Element;
  *
  * Issue SCTs based on X509 certificates.
  * Developers have to override the method getSecuritContextToken()
- * @see org.apache.ws.security.trust.STIssuer#issue(org.w3c.dom.Document, org.w3c.dom.Document)
+ * @see org.apache.ws.sandbox.security.trust.STIssuer#issue(org.w3c.dom.Document, org.w3c.dom.Document)
  */
 public abstract class X509ToSCTIssuer implements STIssuer {
 	X509Security x509;

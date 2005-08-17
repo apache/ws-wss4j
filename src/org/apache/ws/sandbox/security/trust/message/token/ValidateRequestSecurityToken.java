@@ -14,13 +14,13 @@
  *  limitations under the License.
  *
  */
-package org.apache.ws.security.trust.message.token;
+package org.apache.ws.sandbox.security.trust.message.token;
 
 import javax.xml.namespace.QName;
 
 import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.trust.TrustConstants;
-import org.apache.ws.security.trust.WSTrustException;
+import org.apache.ws.sandbox.security.trust.TrustConstants;
+import org.apache.ws.sandbox.security.trust.WSTrustException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -33,7 +33,7 @@ import org.w3c.dom.Element;
  * child elements for this RST element, this can be used to extend the 
  * fuctionality 
  * 
- * @see org.apache.ws.security.trust.TrustConstants#RENEW_SECURITY_TOKEN
+ * @see org.apache.ws.sandbox.security.trust.TrustConstants#RENEW_SECURITY_TOKEN
  * @author Ruchith Fernando (ruchith.fernando@gmail.com)
  */
 public class ValidateRequestSecurityToken extends RequestSecurityToken {

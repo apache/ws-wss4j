@@ -15,7 +15,7 @@
  *
  */
 
-package org.apache.ws.axis.security.trust;
+package org.apache.ws.sandbox.axis.security.trust;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -35,8 +35,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.axis.security.WSDoAllReceiver;
 import org.apache.ws.axis.security.WSDoAllSender;
-import org.apache.ws.security.handler.WSHandler;
-import org.apache.ws.security.trust.message.token.RequestSecurityToken;
+import org.apache.ws.sandbox.security.trust.message.token.RequestSecurityToken;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 

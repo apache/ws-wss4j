@@ -15,7 +15,7 @@
  *
  */
 
-package org.apache.ws.security.conversation.sessions;
+package org.apache.ws.sandbox.security.conversation.sessions;
 
 /**
  * Monitor for the conversation sessions
@@ -25,8 +25,8 @@ package org.apache.ws.security.conversation.sessions;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.ws.security.conversation.ConversationException;
-import org.apache.ws.security.conversation.ConversationSession;
+import org.apache.ws.sandbox.security.conversation.ConversationException;
+import org.apache.ws.sandbox.security.conversation.ConversationSession;
 import org.apache.ws.security.util.Loader;
 
 import java.net.URL;

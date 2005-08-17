@@ -14,9 +14,9 @@
  *  limitations under the License.
  *
  */
-package org.apache.ws.security.trust.message.Info;
+package org.apache.ws.sandbox.security.trust.message.Info;
 
-import org.apache.ws.security.trust.TrustConstants;
+import org.apache.ws.sandbox.security.trust.TrustConstants;
 
 /**
  * @author Malinda Kaushalye

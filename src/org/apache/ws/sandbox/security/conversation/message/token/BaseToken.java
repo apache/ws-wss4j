@@ -15,7 +15,7 @@
  *
  */
 
-package org.apache.ws.security.conversation.message.token;
+package org.apache.ws.sandbox.security.conversation.message.token;
 
 /**
  * Class BaseToken

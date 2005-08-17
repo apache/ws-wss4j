@@ -15,7 +15,7 @@
  *
  */
 
-package org.apache.ws.security.trust2.serialization;
+package org.apache.ws.sandbox.security.trust2.serialization;
 
 import org.apache.axis.Constants;
 import org.apache.axis.encoding.DeserializerFactory;

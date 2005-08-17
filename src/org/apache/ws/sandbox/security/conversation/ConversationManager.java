@@ -14,7 +14,7 @@
  *  limitations under the License.
  *
  */
-package org.apache.ws.security.conversation;
+package org.apache.ws.sandbox.security.conversation;
 
 import org.apache.axis.components.logger.LogFactory;
 import org.apache.commons.logging.Log;
@@ -25,8 +25,8 @@ import org.apache.ws.security.WSEncryptionPart;
 import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.conversation.message.info.DerivedKeyInfo;
-import org.apache.ws.security.conversation.message.token.DerivedKeyToken;
+import org.apache.ws.sandbox.security.conversation.message.info.DerivedKeyInfo;
+import org.apache.ws.sandbox.security.conversation.message.token.DerivedKeyToken;
 import org.apache.ws.security.message.EnvelopeIdResolver;
 import org.apache.ws.security.message.WSEncryptBody;
 import org.apache.ws.security.message.token.Reference;

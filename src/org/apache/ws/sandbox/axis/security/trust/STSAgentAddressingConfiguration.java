@@ -15,7 +15,7 @@
  *
  */
 
-package org.apache.ws.axis.security.trust;
+package org.apache.ws.sandbox.axis.security.trust;
 
 
 import org.apache.axis.message.addressing.Action;

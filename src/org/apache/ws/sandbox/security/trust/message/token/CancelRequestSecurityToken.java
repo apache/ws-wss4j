@@ -14,14 +14,14 @@
  *  limitations under the License.
  *
  */
-package org.apache.ws.security.trust.message.token;
+package org.apache.ws.sandbox.security.trust.message.token;
 
 import javax.xml.namespace.QName;
 
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.message.token.SecurityTokenReference;
-import org.apache.ws.security.trust.TrustConstants;
-import org.apache.ws.security.trust.WSTrustException;
+import org.apache.ws.sandbox.security.trust.TrustConstants;
+import org.apache.ws.sandbox.security.trust.WSTrustException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -31,7 +31,7 @@ import org.w3c.dom.Element;
  * 
  * The additional child elements required for a cancel request is provided here
  * 
- * @see org.apache.ws.security.trust.TrustConstants#CANCEL_SECURITY_TOKEN
+ * @see org.apache.ws.sandbox.security.trust.TrustConstants#CANCEL_SECURITY_TOKEN
  * @author Ruchith Fernando (ruchith.fernando@gmail.com)
  */
 public class CancelRequestSecurityToken extends RequestSecurityToken {
@@ -88,7 +88,7 @@ public class CancelRequestSecurityToken extends RequestSecurityToken {
 
 	/**
 	 * Handle the serialization of child elements specific to this type
-	 * @see org.apache.ws.security.trust.message.token.RequestSecurityToken#handleSpecificChildren(org.w3c.dom.Element)
+	 * @see org.apache.ws.sandbox.security.trust.message.token.RequestSecurityToken#handleSpecificChildren(org.w3c.dom.Element)
 	 */
 	protected void handleSpecificChildren(Element elem) throws WSTrustException {
 		QName el =  new QName(elem.getNamespaceURI(), elem.getLocalName());

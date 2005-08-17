@@ -14,7 +14,7 @@
  *  limitations under the License.
  *
  */
-package org.apache.ws.security.trust;
+package org.apache.ws.sandbox.security.trust;
 
 import java.rmi.RemoteException;
 import java.text.MessageFormat;

@@ -15,7 +15,7 @@
  *
  */
 
-package org.apache.ws.axis.security.conversation;
+package org.apache.ws.sandbox.axis.security.conversation;
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -42,21 +42,21 @@ import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
-import org.apache.ws.security.conversation.ConversationConstants;
-import org.apache.ws.security.conversation.ConversationEngine;
-import org.apache.ws.security.conversation.ConversationException;
-import org.apache.ws.security.conversation.ConversationManager;
-import org.apache.ws.security.conversation.ConversationUtil;
-import org.apache.ws.security.conversation.DerivedKeyCallbackHandler;
-import org.apache.ws.security.conversation.message.info.DerivedKeyInfo;
-import org.apache.ws.security.conversation.message.info.SecurityContextInfo;
-import org.apache.ws.security.conversation.message.token.SecurityContextToken;
+import org.apache.ws.sandbox.security.conversation.ConversationConstants;
+import org.apache.ws.sandbox.security.conversation.ConversationEngine;
+import org.apache.ws.sandbox.security.conversation.ConversationException;
+import org.apache.ws.sandbox.security.conversation.ConversationManager;
+import org.apache.ws.sandbox.security.conversation.ConversationUtil;
+import org.apache.ws.sandbox.security.conversation.DerivedKeyCallbackHandler;
+import org.apache.ws.sandbox.security.conversation.message.info.DerivedKeyInfo;
+import org.apache.ws.sandbox.security.conversation.message.info.SecurityContextInfo;
+import org.apache.ws.sandbox.security.conversation.message.token.SecurityContextToken;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.message.token.SecurityTokenReference;
 import org.apache.ws.security.transform.STRTransform;
-import org.apache.ws.security.trust.message.token.RequestSecurityTokenResponse;
-import org.apache.ws.security.trust.message.token.RequestedProofToken;
-import org.apache.ws.security.trust.message.token.RequestedSecurityToken;
+import org.apache.ws.sandbox.security.trust.message.token.RequestSecurityTokenResponse;
+import org.apache.ws.sandbox.security.trust.message.token.RequestedProofToken;
+import org.apache.ws.sandbox.security.trust.message.token.RequestedSecurityToken;
 import org.apache.ws.security.util.StringUtil;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.xml.security.transforms.Transform;

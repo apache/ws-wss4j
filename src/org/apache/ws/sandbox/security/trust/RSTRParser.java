@@ -15,17 +15,17 @@
  *
  */
 
-package org.apache.ws.security.trust;
+package org.apache.ws.sandbox.security.trust;
 
 import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.policy.message.token.AppliesTo;
-import org.apache.ws.security.trust.message.token.BinarySecret;
-import org.apache.ws.security.trust.message.token.ComputedKey;
-import org.apache.ws.security.trust.message.token.Entropy;
-import org.apache.ws.security.trust.message.token.RequestSecurityTokenResponse;
-import org.apache.ws.security.trust.message.token.RequestedProofToken;
-import org.apache.ws.security.trust.message.token.RequestedSecurityToken;
-import org.apache.ws.security.trust2.Lifetime;
+import org.apache.ws.sandbox.security.policy.message.token.AppliesTo;
+import org.apache.ws.sandbox.security.trust.message.token.BinarySecret;
+import org.apache.ws.sandbox.security.trust.message.token.ComputedKey;
+import org.apache.ws.sandbox.security.trust.message.token.Entropy;
+import org.apache.ws.sandbox.security.trust.message.token.RequestSecurityTokenResponse;
+import org.apache.ws.sandbox.security.trust.message.token.RequestedProofToken;
+import org.apache.ws.sandbox.security.trust.message.token.RequestedSecurityToken;
+import org.apache.ws.sandbox.security.trust2.Lifetime;
 import org.apache.xml.utils.QName;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;

@@ -15,9 +15,9 @@
  *
  */
 
-package org.apache.ws.security.conversation;
+package org.apache.ws.sandbox.security.conversation;
 
-import org.apache.ws.security.conversation.message.token.DerivedKeyToken;
+import org.apache.ws.sandbox.security.conversation.message.token.DerivedKeyToken;
 import org.apache.ws.security.message.WSBaseMessage;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.w3c.dom.Document;

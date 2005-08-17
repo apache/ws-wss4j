@@ -14,16 +14,16 @@
  *  limitations under the License.
  *
  */
-package org.apache.ws.security.conversation.message.token;
+package org.apache.ws.sandbox.security.conversation.message.token;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.conversation.ConversationConstants;
-import org.apache.ws.security.conversation.ConversationException;
-import org.apache.ws.security.conversation.dkalgo.DerivationAlgorithm;
+import org.apache.ws.sandbox.security.conversation.ConversationConstants;
+import org.apache.ws.sandbox.security.conversation.ConversationException;
+import org.apache.ws.sandbox.security.conversation.dkalgo.DerivationAlgorithm;
 import org.apache.ws.security.message.token.SecurityTokenReference;
 import org.apache.ws.security.util.DOM2Writer;
 import org.apache.ws.security.util.WSSecurityUtil;

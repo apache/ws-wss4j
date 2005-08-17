@@ -4,7 +4,7 @@
  * TODO To change the template for this generated file go to
  * Window - Preferences - Java - Code Style - Code Templates
  */
-package org.apache.ws.axis.security.trust.service;
+package org.apache.ws.sandbox.axis.security.trust.service;
 
 import java.net.URL;
 import java.util.Enumeration;
@@ -19,7 +19,7 @@ import org.apache.axis.MessageContext;
 import org.apache.axis.SOAPPart;
 import org.apache.axis.message.SOAPEnvelope;
 import org.apache.axis.utils.ByteArrayOutputStream;
-import org.apache.ws.security.trust.STSManager;
+import org.apache.ws.sandbox.security.trust.STSManager;
 import org.apache.ws.security.util.Loader;
 import org.apache.xml.security.utils.XMLUtils;
 import org.w3c.dom.Document;
@@ -38,7 +38,7 @@ public class SecurityTokenService {
 		this.loadProperties("STS.properties");
 	}
 	
-	public void requestSecurityToken(org.apache.ws.axis.security.trust.service.RequestSecurityTokenType request) throws java.rmi.RemoteException{
+	public void requestSecurityToken(org.apache.ws.sandbox.axis.security.trust.service.RequestSecurityTokenType request) throws java.rmi.RemoteException{
     	try{
     		MessageContext msgCntxt = MessageContext.getCurrentContext();
 	    	msgCntxt.getRequestMessage();

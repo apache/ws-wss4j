@@ -15,9 +15,9 @@
  *
  */
 
-package org.apache.ws.security.conversation.dkalgo;
+package org.apache.ws.sandbox.security.conversation.dkalgo;
 
-import org.apache.ws.security.conversation.ConversationException;
+import org.apache.ws.sandbox.security.conversation.ConversationException;
 
 public interface DerivationAlgorithm {
 

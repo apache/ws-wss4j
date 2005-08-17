@@ -14,7 +14,7 @@
  *  limitations under the License.
  *
  */
-package org.apache.ws.security.trust.renew;
+package org.apache.ws.sandbox.security.trust.renew;
 
 import org.w3c.dom.Document;
 

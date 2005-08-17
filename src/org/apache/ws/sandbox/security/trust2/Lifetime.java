@@ -15,7 +15,7 @@
  *
  */
 
-package org.apache.ws.security.trust2;
+package org.apache.ws.sandbox.security.trust2;
 
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSecurityException;

@@ -14,14 +14,14 @@
  *  limitations under the License.
  *
  */
-package org.apache.ws.security.trust.message.token;
+package org.apache.ws.sandbox.security.trust.message.token;
 
 import javax.xml.namespace.QName;
 
 import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.policy.message.token.AppliesTo;
-import org.apache.ws.security.trust.TrustConstants;
-import org.apache.ws.security.trust.WSTrustException;
+import org.apache.ws.sandbox.security.policy.message.token.AppliesTo;
+import org.apache.ws.sandbox.security.trust.TrustConstants;
+import org.apache.ws.sandbox.security.trust.WSTrustException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -31,7 +31,7 @@ import org.w3c.dom.NodeList;
  * RST issuance binding
  * Some additional child elements are provided for the convenience of the 
  * developer to carry out an issue request
- * @see org.apache.ws.security.trust.TrustConstants#ISSUE_SECURITY_TOKEN
+ * @see org.apache.ws.sandbox.security.trust.TrustConstants#ISSUE_SECURITY_TOKEN
  * @author Ruchith Fernando (ruchith.fernando@gmail.com)
  */
 public class IssueRequestSecurityToken extends RequestSecurityToken {
@@ -236,7 +236,7 @@ public class IssueRequestSecurityToken extends RequestSecurityToken {
 	
 	/**
 	 * Handle the serialization of child elements specific to this type
-	 * @see org.apache.ws.security.trust.message.token.RequestSecurityToken#handleSpecificChildren(org.w3c.dom.Element)
+	 * @see org.apache.ws.sandbox.security.trust.message.token.RequestSecurityToken#handleSpecificChildren(org.w3c.dom.Element)
 	 */
 	protected void handleSpecificChildren(Element elem) throws WSTrustException {
 		QName el =  new QName(elem.getNamespaceURI(), elem.getLocalName());

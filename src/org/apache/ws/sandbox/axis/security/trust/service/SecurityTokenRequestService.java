@@ -5,7 +5,7 @@
  * by the Apache Axis #axisVersion# #today# WSDL2Java emitter.
  */
 
-package org.apache.ws.axis.security.trust.service;
+package org.apache.ws.sandbox.axis.security.trust.service;
 
 import java.io.FileInputStream;
 import java.io.InputStream;
@@ -15,7 +15,7 @@ import org.apache.axis.MessageContext;
 
 
 public class SecurityTokenRequestService {
-    public void requestSecurityToken(org.apache.ws.axis.security.trust.service.RequestSecurityTokenType request) throws java.rmi.RemoteException{
+    public void requestSecurityToken(org.apache.ws.sandbox.axis.security.trust.service.RequestSecurityTokenType request) throws java.rmi.RemoteException{
               MessageContext context = MessageContext.getCurrentContext();
               
 //              try {

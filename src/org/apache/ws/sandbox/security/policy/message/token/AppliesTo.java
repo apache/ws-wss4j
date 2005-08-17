@@ -15,13 +15,13 @@
  *
  */
 
-package org.apache.ws.security.policy.message.token;
+package org.apache.ws.sandbox.security.policy.message.token;
 import javax.xml.namespace.QName;
 
 import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.trust.TrustConstants;
-import org.apache.ws.security.trust.WSTrustException;
-import org.apache.ws.security.trust.message.token.AbstractToken;
+import org.apache.ws.sandbox.security.trust.TrustConstants;
+import org.apache.ws.sandbox.security.trust.WSTrustException;
+import org.apache.ws.sandbox.security.trust.message.token.AbstractToken;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -96,7 +96,7 @@ public class AppliesTo extends AbstractToken {
 	
 	/**
 	 * Returns the QName of this type
-	 * @see org.apache.ws.security.trust.message.token.AbstractToken#getToken()
+	 * @see org.apache.ws.sandbox.security.trust.message.token.AbstractToken#getToken()
 	 */
 	protected QName getToken() {
 		return TOKEN;
@@ -105,7 +105,7 @@ public class AppliesTo extends AbstractToken {
 	/**
 	 * Populates the attribute elements with given elements
 	 * This method will be called with the child elements of the <code>wsa:AppliesTo</code>
-	 * @see org.apache.ws.security.trust.message.token.AbstractToken#deserializeChildElement(org.w3c.dom.Element)
+	 * @see org.apache.ws.sandbox.security.trust.message.token.AbstractToken#deserializeChildElement(org.w3c.dom.Element)
 	 */
 	protected void deserializeChildElement(Element elem) throws WSTrustException {
 		if(elem.getNodeName().equals(TrustConstants.WSA_PREFIX + ":" + TrustConstants.ENDPOINT_REFERENCE_LN)) {
