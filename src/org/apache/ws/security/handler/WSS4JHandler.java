@@ -130,6 +130,8 @@ public class WSS4JHandler extends WSHandler implements Handler {
     static final String REQUEST_ONLY = "request-only";
     static final String RESPONSE_ONLY = "response-only";
 
+    public static final java.lang.String ALLOW_FORM_OPTIMIZATION = "axis.form.optimization";
+
     /**
      * Initializes the instance of the handler.
      */
@@ -148,13 +150,13 @@ public class WSS4JHandler extends WSHandler implements Handler {
     }
 
     public boolean handleRequest(MessageContext mc) {
-        mc.setProperty(org.apache.axis.SOAPPart.ALLOW_FORM_OPTIMIZATION,
+        mc.setProperty(ALLOW_FORM_OPTIMIZATION,
             Boolean.TRUE);
         return processMessage(mc, true);
     }
 
     public boolean handleResponse(MessageContext mc) {
-        mc.setProperty(org.apache.axis.SOAPPart.ALLOW_FORM_OPTIMIZATION,
+        mc.setProperty(ALLOW_FORM_OPTIMIZATION,
             Boolean.TRUE);
         return processMessage(mc, false);
     }
@@ -166,7 +168,7 @@ public class WSS4JHandler extends WSHandler implements Handler {
 
         RequestData reqData = new RequestData();
         reqData.setMsgContext(mc);
-        
+
         doDebug = log.isDebugEnabled();
         msgContext = (SOAPMessageContext) mc;
         String deployment = null;
@@ -296,8 +298,7 @@ public class WSS4JHandler extends WSHandler implements Handler {
         }
         if (doDebug) {
             log.debug("WSS4JHandler: orginal SOAP request: ");
-            log.debug(org.apache.axis.utils.XMLUtils
-                    .PrettyDocumentToString(doc));
+            log.debug(org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc));
         }
         
         soapConstants =
@@ -564,9 +565,7 @@ handle response
             }
         }
 
-/* JAXRPC conversion changes */
-/* commented axis specific code */
-//		((org.apache.axis.message.SOAPHeaderElement) headerElement).setProcessed(true);
+        /* JAXRPC conversion changes */
         headerElement.setMustUnderstand(false); // is this sufficient?
 
         /*
@@ -1638,7 +1637,7 @@ handle response
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             dbf.setNamespaceAware(true);
             DocumentBuilder builder = dbf.newDocumentBuilder();
-            doc = builder.parse(org.apache.axis.utils.XMLUtils.sourceToInputSource(content));
+            doc = builder.parse(org.apache.ws.security.util.XMLUtils.sourceToInputSource(content));
         } catch (Exception ex) {
             throw new JAXRPCException("messageToDocument: cannot convert SOAPMessage into Document", ex);
         }
