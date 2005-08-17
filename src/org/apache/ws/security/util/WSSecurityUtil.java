@@ -33,7 +33,6 @@ import org.apache.ws.security.message.token.X509Security;
 import org.apache.xml.security.algorithms.JCEMapper;
 import org.apache.xml.security.utils.Base64;
 import org.apache.xpath.XPathAPI;
-import org.apache.axis.AxisFault;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -931,7 +930,7 @@ public class WSSecurityUtil {
     }
 
     static public int decodeAction(String action, Vector actions)
-            throws AxisFault {
+            throws WSSecurityException {
 
         int doAction = 0;
 
@@ -968,7 +967,7 @@ public class WSSecurityUtil {
                 doAction |= WSConstants.UT_SIGN;
                 actions.add(new Integer(WSConstants.UT_SIGN));
             } else {
-                throw new AxisFault("WSDoAllSender: Unknown action defined" + single[i]);
+                throw new WSSecurityException("WSDoAllSender: Unknown action defined" + single[i]);
             }
         }
         return doAction;
