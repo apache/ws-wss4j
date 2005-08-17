@@ -85,7 +85,7 @@ public abstract class WSHandler {
         try {
             wsSign.build(doc, reqData.getSigCrypto());
         } catch (WSSecurityException e) {
-            throw new WSSecurityException("WSDoAllSender: Signature: error during message procesing" + e);
+            throw new WSSecurityException("WSHandler: Signature: error during message procesing" + e);
         }
     }
 
@@ -126,7 +126,7 @@ public abstract class WSHandler {
         try {
             wsEncrypt.build(doc, reqData.getEncCrypto());
         } catch (WSSecurityException e) {
-            throw new WSSecurityException("WSDoAllSender: Encryption: error during message processing"
+            throw new WSSecurityException("WSHandler: Encryption: error during message processing"
                     + e);
         }
     }
@@ -183,7 +183,7 @@ public abstract class WSHandler {
         try {
             sign.build(doc, null);
         } catch (WSSecurityException e) {
-            throw new WSSecurityException("WSDoAllSender: Error during Signatur with UsernameToken secret"
+            throw new WSSecurityException("WSHandler: Error during Signatur with UsernameToken secret"
                     + e);
         }
         builder.build(doc, null, null);
@@ -220,7 +220,7 @@ public abstract class WSHandler {
 
         SAMLAssertion assertion = saml.newAssertion();
         if (assertion == null) {
-            throw new WSSecurityException("WSDoAllSender: Signed SAML: no SAML token received");
+            throw new WSSecurityException("WSHandler: Signed SAML: no SAML token received");
         }
         String issuerKeyName = null;
         String issuerKeyPW = null;
@@ -252,7 +252,7 @@ public abstract class WSHandler {
                     issuerKeyName,
                     issuerKeyPW);
         } catch (WSSecurityException e) {
-            throw new WSSecurityException("WSDoAllSender: Signed SAML: error during message processing"
+            throw new WSSecurityException("WSHandler: Signed SAML: error during message processing"
                     + e);
         }
     }
@@ -304,7 +304,7 @@ public abstract class WSHandler {
                 cryptos.put(sigPropFile, crypto);
             }
         } else {
-            throw new WSSecurityException("WSDoAllSender: Signature: no crypto property file");
+            throw new WSSecurityException("WSHandler: Signature: no crypto property file");
         }
         return crypto;
     }
@@ -331,7 +331,7 @@ public abstract class WSHandler {
                 cryptos.put(encPropFile, crypto);
             }
         } else if ((crypto = reqData.getSigCrypto()) == null) {
-            throw new WSSecurityException("WSDoAllSender: Encryption: no crypto property file");
+            throw new WSSecurityException("WSHandler: Encryption: no crypto property file");
         }
         return crypto;
     }
@@ -377,14 +377,14 @@ public abstract class WSHandler {
         if (tmpS != null) {
             Integer I = (Integer) WSHandlerConstants.keyIdentifier.get(tmpS);
             if (I == null) {
-                throw new WSSecurityException("WSDoAllSender: Signature: unknown key identification");
+                throw new WSSecurityException("WSHandler: Signature: unknown key identification");
             }
             reqData.setSigKeyId(I.intValue());
             if (!(reqData.getSigKeyId() == WSConstants.ISSUER_SERIAL
                     || reqData.getSigKeyId() == WSConstants.BST_DIRECT_REFERENCE
                     || reqData.getSigKeyId() == WSConstants.X509_KEY_IDENTIFIER
                     || reqData.getSigKeyId() == WSConstants.SKI_KEY_IDENTIFIER)) {
-                throw new WSSecurityException("WSDoAllSender: Signature: illegal key identification");
+                throw new WSSecurityException("WSHandler: Signature: illegal key identification");
             }
         }
         reqData.setSigAlgorithm((String) getOption(WSHandlerConstants.SIG_ALGO));
@@ -410,7 +410,7 @@ public abstract class WSHandler {
             reqData.setEncUser(reqData.getUsername());
         }
         if (reqData.getEncUser() == null) {
-            throw new WSSecurityException("WSDoAllSender: Encryption: no username");
+            throw new WSSecurityException("WSHandler: Encryption: no username");
         }
         /*
         * String msgType = msgContext.getCurrentMessage().getMessageType(); if
@@ -430,7 +430,7 @@ public abstract class WSHandler {
         if (tmpS != null) {
             Integer I = (Integer) WSHandlerConstants.keyIdentifier.get(tmpS);
             if (I == null) {
-                throw new WSSecurityException("WSDoAllSender: Encryption: unknown key identification");
+                throw new WSSecurityException("WSHandler: Encryption: unknown key identification");
             }
             reqData.setEncKeyId(I.intValue());
             if (!(reqData.getEncKeyId() == WSConstants.ISSUER_SERIAL
@@ -438,7 +438,7 @@ public abstract class WSHandler {
                     || reqData.getEncKeyId() == WSConstants.SKI_KEY_IDENTIFIER
                     || reqData.getEncKeyId() == WSConstants.BST_DIRECT_REFERENCE
                     || reqData.getEncKeyId() == WSConstants.EMBEDDED_KEYNAME)) {
-                throw new WSSecurityException("WSDoAllSender: Encryption: illegal key identification");
+                throw new WSSecurityException("WSHandler: Encryption: illegal key identification");
             }
         }
 
@@ -477,7 +477,7 @@ public abstract class WSHandler {
                     mustUnderstand.equals("1") || mustUnderstand.equals("true")) {
                 mu = true;
             } else {
-                throw new WSSecurityException("WSDoAllSender: illegal mustUnderstand parameter");
+                throw new WSSecurityException("WSHandler: illegal mustUnderstand parameter");
             }
         }
         return mu;
@@ -499,7 +499,7 @@ public abstract class WSHandler {
                     value.equals("1") || value.equals("true")) {
                 precisionInMilliSeconds = true;
             } else {
-                throw new WSSecurityException("WSDoAllSender: illegal precisionInMilliSeconds parameter");
+                throw new WSSecurityException("WSHandler: illegal precisionInMilliSeconds parameter");
             }
         }
         return precisionInMilliSeconds;
@@ -527,17 +527,17 @@ public abstract class WSHandler {
         if (callback != null) { // we have a password callback class
             pwCb = readPwViaCallbackClass(callback, username, doAction);
             if ((pwCb.getPassword() == null) && (pwCb.getKey() == null)) {
-                throw new WSSecurityException("WSDoAllSender: password callback class provided null or empty password");
+                throw new WSSecurityException("WSHandler: password callback class provided null or empty password");
             }
         } else if (
                 (cbHandler = (CallbackHandler) getProperty(reqData.getMsgContext(), refProp))
                 != null) {
             pwCb = performCallback(cbHandler, username, doAction);
             if ((pwCb.getPassword() == null) && (pwCb.getKey() == null)) {
-                throw new WSSecurityException("WSDoAllSender: password callback provided null or empty password");
+                throw new WSSecurityException("WSHandler: password callback provided null or empty password");
             }
         } else if ((password = getPassword(reqData.getMsgContext())) == null) {
-            throw new WSSecurityException("WSDoAllSender: application provided null or empty password");
+            throw new WSSecurityException("WSHandler: application provided null or empty password");
         } else {
             setPassword(reqData.getMsgContext(), null);
             pwCb = new WSPasswordCallback("", WSPasswordCallback.UNKNOWN);
@@ -556,14 +556,14 @@ public abstract class WSHandler {
         try {
             cbClass = Class.forName(callback);
         } catch (ClassNotFoundException e) {
-            throw new WSSecurityException("WSDoAllSender: cannot load password callback class: "
+            throw new WSSecurityException("WSHandler: cannot load password callback class: "
                     + callback,
                     e);
         }
         try {
             cbHandler = (CallbackHandler) cbClass.newInstance();
         } catch (Exception e) {
-            throw new WSSecurityException("WSDoAllSender: cannot create instance of password callback: "
+            throw new WSSecurityException("WSHandler: cannot create instance of password callback: "
                     + callback,
                     e);
         }
@@ -606,7 +606,7 @@ public abstract class WSHandler {
         try {
             cbHandler.handle(callbacks);
         } catch (Exception e) {
-            throw new WSSecurityException("WSDoAllSender: password callback failed", e);
+            throw new WSSecurityException("WSHandler: password callback failed", e);
         }
         return pwCb;
     }
@@ -655,7 +655,7 @@ public abstract class WSHandler {
                 }
                 encPart = new WSEncryptionPart(element, nmSpace, mode);
             } else {
-                throw new WSSecurityException("WSDoAllSender: wrong part definition: " + tmpS);
+                throw new WSSecurityException("WSHandler: wrong part definition: " + tmpS);
             }
             parts.add(encPart);
         }
@@ -717,7 +717,7 @@ public abstract class WSHandler {
                 cryptos.put(decPropFile, crypto);
             }
         } else if ((crypto = reqData.getSigCrypto()) == null) {
-            throw new WSSecurityException("WSDoAllReceiver: Encryption: no crypto property file");
+            throw new WSSecurityException("WSHandler: Encryption: no crypto property file");
         }
         return crypto;
     }
@@ -761,14 +761,14 @@ public abstract class WSHandler {
             try {
                 cbClass = java.lang.Class.forName(callback);
             } catch (ClassNotFoundException e) {
-                throw new WSSecurityException("WSDoAllReceiver: cannot load password callback class: "
+                throw new WSSecurityException("WSHandler: cannot load password callback class: "
                         + callback,
                         e);
             }
             try {
                 cbHandler = (CallbackHandler) cbClass.newInstance();
             } catch (java.lang.Exception e) {
-                throw new WSSecurityException("WSDoAllReceiver: cannot create instance of password callback: "
+                throw new WSSecurityException("WSHandler: cannot create instance of password callback: "
                         + callback,
                         e);
             }
@@ -776,7 +776,7 @@ public abstract class WSHandler {
             cbHandler =
                     (CallbackHandler) getProperty(reqData.getMsgContext(), WSHandlerConstants.PW_CALLBACK_REF);
             if (cbHandler == null) {
-                throw new WSSecurityException("WSDoAllReceiver: no reference in callback property");
+                throw new WSSecurityException("WSHandler: no reference in callback property");
             }
         }
         return cbHandler;
@@ -812,8 +812,8 @@ public abstract class WSHandler {
         BigInteger issuerSerial = cert.getSerialNumber();
 
         if (doDebug) {
-            log.debug("WSDoAllReceiver: Transmitted certificate has subject " + subjectString);
-            log.debug("WSDoAllReceiver: Transmitted certificate has issuer " + issuerString + " (serial " + issuerSerial + ")");
+            log.debug("WSHandler: Transmitted certificate has subject " + subjectString);
+            log.debug("WSHandler: Transmitted certificate has issuer " + issuerString + " (serial " + issuerSerial + ")");
         }
 
         // FIRST step
@@ -823,7 +823,7 @@ public abstract class WSHandler {
         try {
             alias = reqData.getSigCrypto().getAliasForX509Cert(issuerString, issuerSerial);
         } catch (WSSecurityException ex) {
-            throw new WSSecurityException("WSDoAllReceiver: Could not get alias for certificate with " + subjectString, ex);
+            throw new WSSecurityException("WSHandler: Could not get alias for certificate with " + subjectString, ex);
         }
 
         if (alias != null) {
@@ -831,7 +831,7 @@ public abstract class WSHandler {
             try {
                 certs = reqData.getSigCrypto().getCertificates(alias);
             } catch (WSSecurityException ex) {
-                throw new WSSecurityException("WSDoAllReceiver: Could not get certificates for alias " + alias, ex);
+                throw new WSSecurityException("WSHandler: Could not get certificates for alias " + alias, ex);
             }
 
             // If certificates have been found, the certificates must be compared
@@ -855,7 +855,7 @@ public abstract class WSHandler {
         try {
             aliases = reqData.getSigCrypto().getAliasesForDN(issuerString);
         } catch (WSSecurityException ex) {
-            throw new WSSecurityException("WSDoAllReceiver: Could not get alias for certificate with " + issuerString, ex);
+            throw new WSSecurityException("WSHandler: Could not get alias for certificate with " + issuerString, ex);
         }
 
         // If the alias has not been found, the issuer is not in the keystore
@@ -880,13 +880,13 @@ public abstract class WSHandler {
             try {
                 certs = reqData.getSigCrypto().getCertificates(alias);
             } catch (WSSecurityException ex) {
-                throw new WSSecurityException("WSDoAllReceiver: Could not get certificates for alias " + alias, ex);
+                throw new WSSecurityException("WSHandler: Could not get certificates for alias " + alias, ex);
             }
 
             // If no certificates have been found, there has to be an error:
             // The keystore can find an alias but no certificate(s)
             if (certs == null | certs.length < 1) {
-                throw new WSSecurityException("WSDoAllReceiver: Could not get certificates for alias " + alias);
+                throw new WSSecurityException("WSHandler: Could not get certificates for alias " + alias);
             }
 
             // Form a certificate chain from the transmitted certificate
@@ -906,16 +906,16 @@ public abstract class WSHandler {
             try {
                 if (reqData.getSigCrypto().validateCertPath(certs)) {
                     if (doDebug) {
-                        log.debug("WSDoAllReceiver: Certificate path has been verified for certificate with subject " + subjectString);
+                        log.debug("WSHandler: Certificate path has been verified for certificate with subject " + subjectString);
                     }
                     return true;
                 }
             } catch (WSSecurityException ex) {
-                throw new WSSecurityException("WSDoAllReceiver: Certificate path verification failed for certificate with subject " + subjectString, ex);
+                throw new WSSecurityException("WSHandler: Certificate path verification failed for certificate with subject " + subjectString, ex);
             }
         }
 
-        log.debug("WSDoAllReceiver: Certificate path could not be verified for certificate with subject " + subjectString);
+        log.debug("WSHandler: Certificate path could not be verified for certificate with subject " + subjectString);
         return false;
     }
 
