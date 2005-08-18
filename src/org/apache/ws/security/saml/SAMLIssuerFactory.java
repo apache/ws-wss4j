@@ -109,7 +109,7 @@ public abstract class SAMLIssuerFactory {
         SAMLIssuer samlIssuer = null;
         try {
             // instruct the class loader to load the crypto implementation
-            samlIssuerClass = java.lang.Class.forName(samlClassName);
+            samlIssuerClass = Loader.loadClass(samlClassName);
         } catch (ClassNotFoundException e) {
             throw new RuntimeException(samlClassName + " Not Found");
         }

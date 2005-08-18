@@ -37,6 +37,7 @@ import org.apache.ws.security.saml.SAMLIssuerFactory;
 import org.apache.ws.security.util.StringUtil;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.ws.security.util.XmlSchemaDateFormat;
+import org.apache.ws.security.util.Loader;
 import org.apache.xml.security.signature.XMLSignature;
 import org.opensaml.SAMLAssertion;
 import org.w3c.dom.Document;
@@ -554,7 +555,7 @@ public abstract class WSHandler {
         Class cbClass = null;
         CallbackHandler cbHandler = null;
         try {
-            cbClass = Class.forName(callback);
+            cbClass = Loader.loadClass(callback);
         } catch (ClassNotFoundException e) {
             throw new WSSecurityException("WSHandler: cannot load password callback class: "
                     + callback,
@@ -759,7 +760,7 @@ public abstract class WSHandler {
         if (callback != null) {
             Class cbClass = null;
             try {
-                cbClass = java.lang.Class.forName(callback);
+                cbClass = Loader.loadClass(callback);
             } catch (ClassNotFoundException e) {
                 throw new WSSecurityException("WSHandler: cannot load password callback class: "
                         + callback,

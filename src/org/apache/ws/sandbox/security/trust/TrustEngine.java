@@ -181,7 +181,7 @@ public class TrustEngine {
         STVerifier verifier = null;
         Class verfierClass = null;
         try {
-            verfierClass = Class.forName(className);
+            verfierClass = Loader.loadClass(className);
             Class[] classes = new Class[]{Properties.class};
             Constructor c = verfierClass.getConstructor(classes);
             verifier = (STVerifier) c.newInstance(new Object[]{properties});

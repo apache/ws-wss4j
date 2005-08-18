@@ -19,6 +19,7 @@ package org.apache.ws.sandbox.security.trust;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSSecurityException;
+import org.apache.ws.security.util.Loader;
 import org.apache.ws.sandbox.security.trust.issue.STIssuer;
 import org.apache.ws.sandbox.security.trust.message.Info.RequestInfo;
 import org.apache.ws.sandbox.security.trust.renew.STRenewer;
@@ -110,7 +111,7 @@ public class STSManager {
             //Create the instance of the issue/renew/validate class  
             Class wClass = null;
             try {
-                wClass = java.lang.Class.forName(issuerClassName);
+                wClass = Loader.loadClass(issuerClassName);
             } catch (ClassNotFoundException e) {
                 throw new WSTrustException("STSManager: cannot load security token class: ",
                         e);
@@ -146,7 +147,7 @@ public class STSManager {
             //Create the instance of the issue/renew/validate class  
             Class wClass = null;
             try {
-                wClass = java.lang.Class.forName(renewerClassName);
+                wClass = Loader.loadClass(renewerClassName);
             } catch (ClassNotFoundException e) {
                 throw new WSTrustException("STSManager: cannot load security token class: ",
                         e);
@@ -180,7 +181,7 @@ public class STSManager {
             //Create the instance of the issue/renew/validate class  
             Class wClass = null;
             try {
-                wClass = java.lang.Class.forName(validatorClassName);
+                wClass = Loader.loadClass(validatorClassName);
             } catch (ClassNotFoundException e) {
                 throw new WSTrustException("STSManager: cannot load security token class: ",
                         e);

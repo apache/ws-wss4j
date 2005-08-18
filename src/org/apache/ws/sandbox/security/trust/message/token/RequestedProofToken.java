@@ -32,6 +32,7 @@ import org.apache.ws.security.message.token.X509Security;
 import org.apache.ws.sandbox.security.trust.TrustConstants;
 import org.apache.ws.security.util.DOM2Writer;
 import org.apache.ws.security.util.WSSecurityUtil;
+import org.apache.ws.security.util.Loader;
 import org.apache.xml.security.encryption.XMLCipher;
 import org.apache.xml.security.encryption.XMLEncryptionException;
 import org.apache.xml.security.keys.KeyInfo;
@@ -123,7 +124,7 @@ public class RequestedProofToken {
         if (callback != null) {
             Class cbClass = null;
             try {
-                cbClass = java.lang.Class.forName(callback);
+                cbClass = Loader.loadClass(callback);
             } catch (ClassNotFoundException e) {
                 throw new WSSecurityException(WSSecurityException.FAILED_ENC_DEC,
                         "RequestedProofToken: cannot load password callback class: "

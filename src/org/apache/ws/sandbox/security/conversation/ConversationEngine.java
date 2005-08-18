@@ -54,6 +54,7 @@ import org.apache.ws.sandbox.security.trust.WSTrustException;
 import org.apache.ws.sandbox.security.trust.message.token.RequestSecurityTokenResponse;
 import org.apache.ws.sandbox.security.trust.message.token.RequestedProofToken;
 import org.apache.ws.security.util.WSSecurityUtil;
+import org.apache.ws.security.util.Loader;
 import org.apache.xml.security.encryption.XMLCipher;
 import org.apache.xml.security.encryption.XMLEncryptionException;
 import org.apache.xml.security.exceptions.XMLSecurityException;
@@ -970,7 +971,7 @@ public class ConversationEngine {
 			if (cb != null) {
 				Class cbClass = null;
 					try {
-						cbClass = java.lang.Class.forName(cb);
+						cbClass = Loader.loadClass(cb);
 				         cbHandler = (CallbackHandler) cbClass.newInstance();
 
 					} catch (ClassNotFoundException e) {

@@ -106,7 +106,7 @@ public abstract class CryptoFactory {
         Crypto crypto = null;
         try {
             // instruct the class loader to load the crypto implementation
-            cryptogenClass = java.lang.Class.forName(cryptoClassName);
+            cryptogenClass = Loader.loadClass(cryptoClassName);
         } catch (ClassNotFoundException e) {
             throw new RuntimeException(cryptoClassName + " Not Found");
         }

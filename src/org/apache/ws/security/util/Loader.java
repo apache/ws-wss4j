@@ -100,12 +100,14 @@ public class Loader {
      */
     static public Class loadClass(String clazz) throws ClassNotFoundException {
         try {
-            return getTCL().loadClass(clazz);
+            Class c = getTCL().loadClass(clazz);
+            if (c != null)
+                return c;
         } catch (Throwable e) {
-            // we reached here because tcl was null or because of a
-            // security exception, or because clazz could not be loaded...
-            // In any case we now try one more time
-            return Class.forName(clazz);
         }
+        // we reached here because tcl was null or because of a
+        // security exception, or because clazz could not be loaded...
+        // In any case we now try one more time
+        return Class.forName(clazz);
     }
 }
