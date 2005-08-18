@@ -7,7 +7,7 @@
     <li>Username Token<br></br>
     </li>
   </ul>
-</ul></subsection></section><section name=""><subsection name="Introduction"><div style="margin-left: 40px;">WS4J can be used for securing web
+</ul></subsection></section><section name=""><subsection name="Introduction"><div style="margin-left: 40px;">WSS4J can be used for securing web
 services deployed in virtually any application server, but it includes
 special support for Axis. WSS4J ships with handlers that can be used in
 Axis-based web

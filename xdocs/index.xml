@@ -97,7 +97,6 @@ certificates and certificate paths.<br/>
                 </div>
                 <p style="margin-left: 40px;"/>
             </subsection>
-            <subsection name="WSS4J Use Cases"/>
             <subsection name="WSS4J API">
                 <p style="margin-left: 40px;">Please refer to the <a href="api.html">API
 Overview</a>
@@ -108,6 +107,11 @@ for details.<br/>
             <subsection name="WSS4J on Axis">
                 <p style="margin-left: 40px;">Please refer to the the <a href="axis.html">Axis
 Deployment Tutorial</a> for a short tutorial and <a href="package.html">Axis Deployment Examples</a> for more details.<br/>
+                </p>
+                <br/>
+            </subsection>
+            <subsection name="WSS4J Configuration">
+                <p style="margin-left: 40px;"><a href="cert.html">Difference between issuer-serial (WSS4J default) and direct-reference modes</a> 
                 </p>
                 <br/>
             </subsection>
