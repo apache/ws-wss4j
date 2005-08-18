@@ -129,20 +129,6 @@ public class WSSecurityEngine {
     protected static final QName SAML_TOKEN = new QName(WSConstants.SAML_NS, WSConstants.ASSERTION_LN);
 
     static {
-        org.apache.xml.security.Init.init();
-        String Id = "BC";
-        if (java.security.Security.getProvider(Id) == null) {
-            log.debug("The provider " + Id
-                    + " had to be added to the java.security.Security");
-            java.security.Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
-        }
-        Transform.init();
-        try {
-            Transform.register(STRTransform.implementedTransformURI,
-                    "org.apache.ws.security.transform.STRTransform");
-        } catch (Exception ex) {
-        }
-        ;
     }
 
     public WSSecurityEngine() {

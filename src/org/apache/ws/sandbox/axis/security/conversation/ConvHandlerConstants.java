@@ -113,24 +113,5 @@ public class ConvHandlerConstants {
 						new Integer(ConversationConstants.STSREQUEST_TOKEN));
 		sctEstablishmentMapper.put("InteropHandshake",
 								new Integer(ConversationConstants.INTEROP_SCENE1));
-		
-   
-        org.apache.xml.security.Init.init();
-        String Id = "BC";
-        if (java.security.Security.getProvider(Id) == null) {
-            log.debug("The provider " + Id
-                    + " had to be added to the java.security.Security");
-            java.security.Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
-        }
-        Transform.init();
-        try {
-            Transform.register(STRTransform.implementedTransformURI,
-                    "org.apache.ws.security.transform.STRTransform");
-        } catch (Exception ex) {
-        	//TODO Log the exception
-        }
-		
     }
-    
-
 }

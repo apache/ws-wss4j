@@ -85,23 +85,6 @@ public class ConversationServerHandler extends BasicHandler {
         log.debug("ConversationServerHandler :: created");
     }
 
-    static{
-        org.apache.xml.security.Init.init();
-        String Id = "BC";
-        if (java.security.Security.getProvider(Id) == null) {
-            log.debug("The provider " + Id
-                    + " had to be added to the java.security.Security");
-            java.security.Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
-        }
-        Transform.init();
-        try {
-            Transform.register(STRTransform.implementedTransformURI,
-                    "org.apache.ws.security.transform.STRTransform");
-        } catch (Exception ex) {
-        }
-
-    }
-
     /**
      * Method inherited from the BasicHandler.
      * If in the request flow calls the doRequestMetod()

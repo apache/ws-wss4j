@@ -17,6 +17,12 @@
 
 package org.apache.ws.security;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.ws.security.transform.STRTransform;
+import org.apache.ws.security.util.Loader;
+import org.apache.xml.security.transforms.Transform;
+
 /**
  * WSSConfig
  * <p/>
@@ -35,6 +41,7 @@ package org.apache.ws.security;
  * @author Rami Jaamour (rjaamour@parasoft.com)
  */
 public class WSSConfig {
+    private static Log log = LogFactory.getLog(WSSConfig.class.getName());
     protected static WSSConfig defaultConfig = getNewInstance();
     protected String wsse_ns = WSConstants.WSSE_NS_OASIS_1_0;
     protected String wsu_ns = WSConstants.WSU_NS_OASIS_1_0;
@@ -56,6 +63,23 @@ public class WSSConfig {
     protected boolean precisionInMilliSeconds = true;
 
     protected WSSConfig() {
+        org.apache.xml.security.Init.init();
+        try {
+            Class c = Loader.loadClass("org.bouncycastle.jce.provider.BouncyCastleProvider");
+            String Id = "BC";
+            if (java.security.Security.getProvider(Id) == null) {
+                log.debug("The provider " + Id
+                        + " had to be added to the java.security.Security");
+                java.security.Security.addProvider((java.security.Provider)c.newInstance());
+            }
+        } catch (Throwable t) {
+        }
+        Transform.init();
+        try {
+            Transform.register(STRTransform.implementedTransformURI,
+                    "org.apache.ws.security.transform.STRTransform");
+        } catch (Exception ex) {
+        }
     }
 
     /**

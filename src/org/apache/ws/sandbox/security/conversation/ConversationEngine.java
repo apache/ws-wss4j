@@ -80,16 +80,6 @@ public class ConversationEngine {
 
     private boolean doDebug = false;
 
-    static {
-        org.apache.xml.security.Init.init();
-        String Id = "BC";
-        if (java.security.Security.getProvider(Id) == null) {
-            log.debug("The provider " + Id
-                    + " had to be added to the java.security.Security");
-            java.security.Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
-        }
-    }
-    
     /**
      * <code>wsc:DerivedKeyToken</code> as defined in WS Secure Conversation specification.
      */
