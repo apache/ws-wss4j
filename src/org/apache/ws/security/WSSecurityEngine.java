@@ -791,11 +791,11 @@ public class WSSecurityEngine {
     }
 
     /**
-     * Check the UsernameToken element. Depending on the password type 
+     * Check the UsernameToken element. Depending on the password type
      * contained in the element the processing differs. If the password type
      * is password digest (a hashed password) then process the password
      * commpletely here. Use the callback class to get a stored password
-     * perform hash algorithm and compare the result with the transmitted 
+     * perform hash algorithm and compare the result with the transmitted
      * password.
      * <p/>
      * If the password is of type password text or any other yet unknown
@@ -804,7 +804,7 @@ public class WSSecurityEngine {
      * the callback class via the WSPasswordCallback object. To distinguish
      * from digested usernam token the usage parameter of WSPasswordCallback
      * is set to <code>USERNAME_TOKEN_UNKNOWN</code>
-     * 
+     *
      * @param token the DOM element that contains the UsernameToken
      * @param cb the refernce to the callback object
      * @return WSUsernameTokenPrincipal that contain data that an application
@@ -817,7 +817,7 @@ public class WSSecurityEngine {
         String password = ut.getPassword();
         String nonce = ut.getNonce();
         String createdTime = ut.getCreated();
-        String pwType = ut.getPasswordType(); 
+        String pwType = ut.getPasswordType();
         if (doDebug) {
             log.debug("UsernameToken user " + user);
             log.debug("UsernameToken password " + password);
@@ -1022,7 +1022,7 @@ public class WSSecurityEngine {
                 */
                 else if (secRef.containsKeyIdentifier()) {
                     X509Certificate[] certs = secRef.getKeyIdentifier(crypto);
-                    if (certs == null || certs.length != 1 || certs[0] == null) {
+                    if (certs == null || certs.length < 1 || certs[0] == null) {
                         throw new WSSecurityException(WSSecurityException.FAILURE,
                                 "invalidX509Data", new Object[]{"for decryption (KeyId)"});
                     }
