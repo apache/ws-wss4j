@@ -66,11 +66,11 @@ public class WSHandlerConstants {
 
     /**
 
-     * The action parameter in the WSDD configuration file. The
+     * The action parameter. The
 
-     * handler uses tha value of this parameter to determine how
+     * handlers use the value of this parameter to determine how
 
-     * to process the SOAP Envelope. For example:
+     * to process the SOAP Envelope. For example in a Axis WSDD file:
 
      * <pre>
 
@@ -84,7 +84,7 @@ public class WSHandlerConstants {
 
      * orders the handler to attach a <code>UsernameToken</code> to the SOAP
 
-     * enevelope. It is a blank speararted list of actions to perform.
+     * enevelope. It is a blank separated list of actions to perform.
 
      * <p/>
 
@@ -1288,7 +1288,7 @@ public class WSHandlerConstants {
 
      * If this parameter is not defined, contains a value less or equal
 
-     * zero, or an illegal format the Axis driver uses a default TTL of
+     * zero, or an illegal format the handlers use a default TTL of
 
      * 300 seconds (5 minutes).
 
