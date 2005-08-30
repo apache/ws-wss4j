@@ -60,6 +60,111 @@ public abstract class WSHandler {
     protected static boolean doDebug = true;
     protected static Hashtable cryptos = new Hashtable(5);
 
+    
+    /**
+     * Performs all defined security actions to set-up the SOAP request.
+     * 
+     * 
+     * @param doAction a set defining the actions to do 
+     * @param mu	if true set the musetUnderstand flag to true in the SOAP 
+     * 				request
+     * @param doc   the request as DOM document 
+     * @param reqData a data storage to pass values around bewteen methods
+     * @param actions a vector holding the actions to do in the order defined in
+     *                the deployment file or property
+     * @throws WSSecurityException
+     */
+    protected void doSenderAction(int doAction, boolean mu, Document doc,
+			RequestData reqData, Vector actions) throws WSSecurityException {
+
+		reqData.setSoapConstants(WSSecurityUtil.getSOAPConstants(doc
+				.getDocumentElement()));
+		/*
+		 * Here we have action, username, password, and actor, mustUnderstand.
+		 * Now get the action specific parameters.
+		 */
+		if ((doAction & WSConstants.UT) == WSConstants.UT) {
+			decodeUTParameter(reqData);
+		}
+		/*
+		 * Here we have action, username, password, and actor, mustUnderstand.
+		 * Now get the action specific parameters.
+		 */
+		if ((doAction & WSConstants.UT_SIGN) == WSConstants.UT_SIGN) {
+			decodeUTParameter(reqData);
+			decodeSignatureParameter(reqData);
+		}
+		/*
+		 * Get and check the Signature specific parameters first because they
+		 * may be used for encryption too.
+		 */
+		if ((doAction & WSConstants.SIGN) == WSConstants.SIGN) {
+			reqData.setSigCrypto(loadSignatureCrypto(reqData));
+			decodeSignatureParameter(reqData);
+		}
+		/*
+		 * If we need to handle signed SAML token then we need may of the
+		 * Signature parameters. The handle procedure loads the signature crypto
+		 * file on demand, thus don't do it here.
+		 */
+		if ((doAction & WSConstants.ST_SIGNED) == WSConstants.ST_SIGNED) {
+			decodeSignatureParameter(reqData);
+		}
+		/*
+		 * Set and check the encryption specific parameters, if necessary take
+		 * over signature parameters username and crypto instance.
+		 */
+		if ((doAction & WSConstants.ENCR) == WSConstants.ENCR) {
+			reqData.setEncCrypto(loadEncryptionCrypto(reqData));
+			decodeEncryptionParameter(reqData);
+		}
+		/*
+		 * Here we have all necessary information to perform the requested
+		 * action(s).
+		 */
+		for (int i = 0; i < actions.size(); i++) {
+
+			int actionToDo = ((Integer) actions.get(i)).intValue();
+			if (doDebug) {
+				log.debug("Performing Action: " + actionToDo);
+			}
+
+			switch (actionToDo) {
+			case WSConstants.UT:
+				performUTAction(actionToDo, mu, doc, reqData);
+				break;
+
+			case WSConstants.ENCR:
+				performENCRAction(actionToDo, mu, doc, reqData);
+				break;
+
+			case WSConstants.SIGN:
+				performSIGNAction(actionToDo, mu, doc, reqData);
+				break;
+
+			case WSConstants.ST_SIGNED:
+				performST_SIGNAction(actionToDo, mu, doc, reqData);
+				break;
+
+			case WSConstants.ST_UNSIGNED:
+				performSTAction(actionToDo, mu, doc, reqData);
+				break;
+
+			case WSConstants.TS:
+				performTSAction(actionToDo, mu, doc, reqData);
+				break;
+
+			case WSConstants.UT_SIGN:
+				performUT_SIGNAction(actionToDo, mu, doc, reqData);
+				break;
+
+			case WSConstants.NO_SERIALIZE:
+				reqData.setNoSerialization(true);
+				break;
+			}
+		}
+	}
+    
     protected void performSIGNAction(int actionToDo, boolean mu, Document doc, RequestData reqData)
             throws WSSecurityException {
         String password;
@@ -90,7 +195,7 @@ public abstract class WSHandler {
         }
     }
 
-    protected void performENCRAction(boolean mu, int actionToDo, Document doc, RequestData reqData)
+    protected void performENCRAction(int actionToDo, boolean mu, Document doc, RequestData reqData)
             throws WSSecurityException {
         WSEncryptBody wsEncrypt = new WSEncryptBody(reqData.getActor(), mu);
         if (reqData.getEncKeyId() != 0) {
