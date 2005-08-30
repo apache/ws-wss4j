@@ -80,7 +80,7 @@ import java.util.Vector;
  * <p/>
  *
  * @author Davanum Srinivas (dims@yahoo.com).
- * @author Werner Dittmann (Werner.Dittmann@siemens.com).
+ * @author Werner Dittmann (Werner.Dittmann@t-online.de).
  */
 public class WSSecurityEngine {
     private static final String VALUE_TYPE = "ValueType";

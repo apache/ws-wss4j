@@ -82,17 +82,6 @@ public class WSDoAllSender extends WSDoAllHandler {
                 return;
             }
 
-            boolean mu = decodeMustUnderstand(reqData);
-
-            secEngine.setPrecisionInMilliSeconds(decodeTimestampPrecision(reqData));
-
-            String actor = null;
-            if ((actor = (String) getOption(WSHandlerConstants.ACTOR)) == null) {
-                actor = (String)
-                        getProperty(reqData.getMsgContext(), WSHandlerConstants.ACTOR);
-            }
-            reqData.setActor(actor);
-
             /*
                 * For every action we need a username, so get this now. The
                 * username defined in the deployment descriptor takes precedence.
@@ -124,7 +113,7 @@ public class WSDoAllSender extends WSDoAllHandler {
             }
             if (doDebug) {
                 log.debug("Action: " + doAction);
-                log.debug("Actor: " + reqData.getActor() + ", mu: " + mu);
+                log.debug("Actor: " + reqData.getActor());
             }
             /*
                 * Now get the SOAP part from the request message and convert it
@@ -161,7 +150,7 @@ public class WSDoAllSender extends WSDoAllHandler {
                                     + e);
                 }
             }
-            doSenderAction(doAction, mu, doc, reqData, actions);
+            doSenderAction(doAction, doc, reqData, actions);
 
             /*
                 * If required convert the resulting document into a message first.

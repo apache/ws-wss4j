@@ -66,16 +66,25 @@ public abstract class WSHandler {
      * 
      * 
      * @param doAction a set defining the actions to do 
-     * @param mu	if true set the musetUnderstand flag to true in the SOAP 
-     * 				request
      * @param doc   the request as DOM document 
      * @param reqData a data storage to pass values around bewteen methods
      * @param actions a vector holding the actions to do in the order defined in
      *                the deployment file or property
      * @throws WSSecurityException
      */
-    protected void doSenderAction(int doAction, boolean mu, Document doc,
+    protected void doSenderAction(int doAction, Document doc,
 			RequestData reqData, Vector actions) throws WSSecurityException {
+
+        boolean mu = decodeMustUnderstand(reqData);
+        
+        secEngine.setPrecisionInMilliSeconds(decodeTimestampPrecision(reqData));
+
+        String actor = null;
+        if ((actor = (String) getOption(WSHandlerConstants.ACTOR)) == null) {
+            actor = (String)
+                    getProperty(reqData.getMsgContext(), WSHandlerConstants.ACTOR);
+        }
+        reqData.setActor(actor);
 
 		reqData.setSoapConstants(WSSecurityUtil.getSOAPConstants(doc
 				.getDocumentElement()));
@@ -364,28 +373,10 @@ public abstract class WSHandler {
     }
 
     protected void performTSAction(int actionToDo, boolean mu, Document doc, RequestData reqData) throws WSSecurityException {
-        String ttl = null;
-        if ((ttl =
-                (String) getOption(WSHandlerConstants.TTL_TIMESTAMP))
-                == null) {
-            ttl =
-                    (String) getProperty(reqData.getMsgContext(), WSHandlerConstants.TTL_TIMESTAMP);
-        }
-        int ttl_i = 0;
-        if (ttl != null) {
-            try {
-                ttl_i = Integer.parseInt(ttl);
-            } catch (NumberFormatException e) {
-                ttl_i = reqData.getTimeToLive();
-            }
-        }
-        if (ttl_i <= 0) {
-            ttl_i = reqData.getTimeToLive();
-        }
         WSAddTimestamp timeStampBuilder =
                 new WSAddTimestamp(reqData.getActor(), mu);
         // add the Timestamp to the SOAP Enevelope
-        timeStampBuilder.build(doc, ttl_i);
+        timeStampBuilder.build(doc, decodeTimeToLive(reqData));
     }
 
     /**
@@ -589,6 +580,28 @@ public abstract class WSHandler {
         return mu;
     }
 
+    protected int decodeTimeToLive(RequestData reqData) {
+        String ttl = null;
+        if ((ttl =
+                (String) getOption(WSHandlerConstants.TTL_TIMESTAMP))
+                == null) {
+            ttl =
+                    (String) getProperty(reqData.getMsgContext(), WSHandlerConstants.TTL_TIMESTAMP);
+        }
+        int ttl_i = 0;
+        if (ttl != null) {
+            try {
+                ttl_i = Integer.parseInt(ttl);
+            } catch (NumberFormatException e) {
+                ttl_i = reqData.getTimeToLive();
+            }
+        }
+        if (ttl_i <= 0) {
+            ttl_i = reqData.getTimeToLive();
+        }
+        return ttl_i;
+    }
+    
     protected boolean decodeTimestampPrecision(RequestData reqData) throws WSSecurityException {
         boolean precisionInMilliSeconds = true;
         String value = null;

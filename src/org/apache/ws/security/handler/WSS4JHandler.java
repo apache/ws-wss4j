@@ -21,7 +21,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.SOAPConstants;
 import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.message.token.Timestamp;
@@ -63,7 +62,7 @@ import java.util.Vector;
 public class WSS4JHandler extends WSHandler implements Handler {
     private HandlerInfo handlerInfo;
     static Log log = LogFactory.getLog(WSS4JHandler.class.getName());
-    static final WSSecurityEngine secEngine = new WSSecurityEngine();
+//    static final WSSecurityEngine secEngine = new WSSecurityEngine();
 
     private boolean doDebug = false;
 
@@ -191,15 +190,7 @@ public class WSS4JHandler extends WSHandler implements Handler {
         if (doAction == WSConstants.NO_SECURITY) {
             return true;
         }
-
-        boolean mu = decodeMustUnderstand(reqData);
-
-        String actor;
-        if ((actor = (String) getOption(WSHandlerConstants.ACTOR)) == null) {
-            actor = (String) mc.getProperty(WSHandlerConstants.ACTOR);
-        }
-        reqData.setActor(actor);
-
+        
         /*
         * For every action we need a username, so get this now. The username
         * defined in the deployment descriptor takes precedence.
@@ -226,7 +217,7 @@ public class WSS4JHandler extends WSHandler implements Handler {
         }
         if (doDebug) {
             log.debug("Action: " + doAction);
-            log.debug("Actor: " + reqData.getActor() + ", mu: " + mu);
+            log.debug("Actor: " + reqData.getActor());
         }
         /*
         * Now get the SOAP part from the request message and convert it into a
@@ -264,7 +255,7 @@ public class WSS4JHandler extends WSHandler implements Handler {
             log.debug("WSS4JHandler: orginal SOAP request: ");
             log.debug(org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc));
         }
-        doSenderAction(doAction, mu, doc, reqData, actions);
+        doSenderAction(doAction, doc, reqData, actions);
 
         /*
         * If required convert the resulting document into a message first. The
@@ -490,26 +481,7 @@ public class WSS4JHandler extends WSHandler implements Handler {
             Timestamp timestamp = actionResult.getTimestamp();
 
             if (timestamp != null) {
-                String ttl = null;
-                if ((ttl =
-                        (String) getOption(WSHandlerConstants.TTL_TIMESTAMP))
-                        == null) {
-                    ttl =
-                            (String) mc.getProperty(WSHandlerConstants.TTL_TIMESTAMP);
-                }
-                int ttl_i = 0;
-                if (ttl != null) {
-                    try {
-                        ttl_i = Integer.parseInt(ttl);
-                    } catch (NumberFormatException e) {
-                        ttl_i = reqData.getTimeToLive();
-                    }
-                }
-                if (ttl_i <= 0) {
-                    ttl_i = reqData.getTimeToLive();
-                }
-
-                if (!verifyTimestamp(timestamp, reqData.getTimeToLive())) {
+                if (!verifyTimestamp(timestamp, decodeTimeToLive(reqData))) {
                     throw new JAXRPCException("WSS4JHandler: The timestamp could not be validated");
                 }
             }

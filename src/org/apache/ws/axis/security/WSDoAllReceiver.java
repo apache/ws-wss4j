@@ -282,24 +282,7 @@ public class WSDoAllReceiver extends WSDoAllHandler {
                 Timestamp timestamp = actionResult.getTimestamp();
 
                 if (timestamp != null) {
-                    String ttl = null;
-                    if ((ttl = (String) getOption(WSHandlerConstants.TTL_TIMESTAMP)) == null) {
-                        ttl = (String) msgContext
-                                .getProperty(WSHandlerConstants.TTL_TIMESTAMP);
-                    }
-                    int ttl_i = 0;
-                    if (ttl != null) {
-                        try {
-                            ttl_i = Integer.parseInt(ttl);
-                        } catch (NumberFormatException e) {
-                            ttl_i = reqData.getTimeToLive();
-                        }
-                    }
-                    if (ttl_i <= 0) {
-                        ttl_i = reqData.getTimeToLive();
-                    }
-
-                    if (!verifyTimestamp(timestamp, reqData.getTimeToLive())) {
+                    if (!verifyTimestamp(timestamp, decodeTimeToLive(reqData))) {
                         throw new AxisFault(
                                 "WSDoAllReceiver: The timestamp could not be validated");
                     }
