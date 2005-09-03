@@ -134,10 +134,18 @@ public class WSDoAllSender extends WSDoAllHandler {
             Document doc = null;
             Message message = ((MessageContext)reqData.getMsgContext()).getCurrentMessage();
 
+            /**
+             * There is nothing to send...Usually happens when the provider needs to
+             * send a HTTP 202 message (with no content)
+             */
+            if(message == null){
+                return;
+            }
+
             /*
-                * If the message context property conatins a document then this is
-                * a chained handler.
-                */
+            * If the message context property conatins a document then this is
+            * a chained handler.
+            */
             SOAPPart sPart = (org.apache.axis.SOAPPart) message.getSOAPPart();
             if ((doc = (Document) ((MessageContext)reqData.getMsgContext())
                     .getProperty(WSHandlerConstants.SND_SECURITY)) == null) {

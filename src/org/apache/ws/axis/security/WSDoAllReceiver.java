@@ -95,6 +95,15 @@ public class WSDoAllReceiver extends WSDoAllHandler {
 
             Message sm = msgContext.getCurrentMessage();
             Document doc = null;
+
+            /**
+             * We did not receive anything...Usually happens when we get a
+             * HTTP 202 message (with no content)
+             */
+            if(sm == null){
+                return;
+            }
+
             try {
                 doc = sm.getSOAPEnvelope().getAsDocument();
                 if (doDebug) {
