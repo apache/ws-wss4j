@@ -1,15 +1,17 @@
-Here is the master link to all Apache Web Service projects:
+* What is WSS4J? *
 
+WSS4J is part of the Apache Web Services project. The link to all  Apache Web 
+Service projects:
 http://ws.apache.org/
 
-What is WSS4J?
+Apache WSS4J is an implementation of the OASIS Web Services Security specifications
+(WS-Security, WSS) from OASIS Web Services Security TC. WSS4J is primarily
+a Java library that can be used to sign, verify, encrypt, and decrypt SOAP Messages
+according to the WS-Security specifications. WSS4J uses Apache Axis and other Apache 
+XML-Security projects and is interoperable with other JAX-RPC based server/clients 
+and .Net WSE server/clients that follow the OASIS WSS specifications
 
-Apache WSS4J is an implementation of the OASIS Web Services Security 
-(WS-Security) from OASIS Web Services Security TC. WSS4J is a primarily
-a Java library that can be used to sign and verify SOAP Messages with 
-WS-Security information. WSS4J will use Apache Axis and Apache XML-Security
-projects and will be interoperable with JAX-RPC based server/clients 
-and .NET server/clients.
+* Supported WSS Specifications *
 
 WSS4J implements
 
@@ -18,12 +20,25 @@ WSS4J implements
     * Username Token profile V1.0
     * X.509 Token Profile V1.0
     
-The Web Services Security part of WSS4J is fairl well tested and many
+The Web Services Security part of WSS4J is fairly well tested and many
 WebService projects use it already. Also interoperability with
 various other implementations is well tested.
 
+* Support of older WSS specifications *
+
 WSS4J can also be configured to emulate previous WSS spec implementations
 with older namespaces, such as WebSphere 5.1 and WebLogic 8.1 SP2.
+The WSS4J release 1.1.0 is the last release that supports this old, draft
+WSS specifications. 
+
+The next WSS4J releases (>= 1.2.x)
+- support the OASIS V1.0 specs and the relevant namespaces only
+- support one versions of provisional (draft) namespaces for the upcoming version
+
+After the next version of the WSS specs is finished, we do one WSS4J release 
+with the provisional namespaces and another release (with a new release 
+number) with the then fixed namespace URIs. Doing so we could save a lot of
+coding while retaining some backward compatibility using the n-1 release.
 
 
 * Web Services Security Features *
@@ -40,8 +55,7 @@ WSS4J can generate and process the following SOAP Bindings:
 
 WSS4J supports X.509 binary certificates and certificate paths.
 
-The master link to WSS4J:
-http://ws.apache.org/wss4j/
+The master link to WSS4J: http://ws.apache.org/wss4j/
 
 There is also a Wiki concering Apache WS projects and WSS4J as one
 of the WS sub-projects:
@@ -63,7 +77,8 @@ The SecurityTokenService successfully interoped with IBM's implementation
 last year (Token issuance only). But as of now we cannot confirm
 interoperability due to the changes.
 
-Therefore the 'Trust' and 'Conversation' parts of WSS4J are experimental.
+Therefore the 'Trust' and 'Conversation' parts of WSS4J are experimental
+and are contained in the "sandbox" package.
 
 
 * Installation (binary distribution) *
@@ -75,11 +90,12 @@ client and server deployment and protery files.
 
 The WSS4J jar file contains all classes that implement the basic functions
 and the handlers. To install it make sure this jar file is in the classpath
-of your Axis client and/or Axis server. In addition you need to set up
-the property files that contain information about the certificate keystores
-you use. The property files and the keystore are accessed either as
-resources via classpath or, if that fails, as files using the relative path
-of the application
+of your Axis client and/or Axis server. 
+
+In addition you need to set up the property files that contain information
+about the certificate keystores you use. The property files and the keystore
+are accessed either as resources via classpath or, if that fails, as files
+using the relative path of the application
 
 Thus no specific installation is required. The wss4j.jar file could be 
 included into ear or war files of enterprise or web application servers.
@@ -91,10 +107,16 @@ deployment files.
 
 * Required software *
 
-To work with WSS4J you need additional software. Most of
-the software is also needed by your SOAP base system, e.g.
-Apache Axis. To implement the Web Service Security (WSS) part
-specific software is required:
+To work with WSS4J you need additional software. Most of the software is also
+needed by your SOAP base system, e.g. Apache Axis. 
+
+To simplify installation and operation of WSS4J an additional ZIP file 
+is provided that holds all other JARs that are required by WSS4J. Please 
+note that we probably not use the very latest versions of these JARs, but 
+we used them during the tests.
+
+To implement the Web Service Security (WSS) part specific software is 
+required:
 
 addressing-1.0.jar
     This jar contains the implementation of WS-Adressing, required
