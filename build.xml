@@ -44,7 +44,7 @@ Build Instructions:
         <property name='product.shortname' value='wss4j'/>
 
         <property name='product.version.major' value='1'/>
-        <property name='product.version.minor' value='0'/>
+        <property name='product.version.minor' value='1'/>
         <property name='product.version.level' value='0'/>
         <property name='product.Version' value='${product.version.major}.${product.version.minor}.${product.version.level}'/>
         <property name='product.version' value='${product.version.major}.${product.version.minor}.${product.version.level}'/>
@@ -570,9 +570,9 @@ org.apache.ws.axis.security.util
 	  <delete file="${dir.dist}/${jar.library}" />
     </target>
 
-    <target name="reqjardist" depends="init" description="Build zip for required jars">
+    <target name="otherdist" depends="init" description="Build zip for required jars">
 	     <mkdir dir="${dir.dist}"/>
-	     <zip destfile="${dir.dist}/${product.shortname}-otherjar-${product.version}.zip">
+	     <zip destfile="${dir.dist}/${product.shortname}-otherjars-${product.version}.zip">
 	         <zipfileset prefix="wss4j" dir="."
 	             includes="lib/*.jar, endorsed/*.jar"/>
 	     </zip>
