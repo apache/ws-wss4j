@@ -52,6 +52,8 @@ public class Timestamp {
 
     protected Calendar created;
     protected Calendar expires;
+    
+    protected WSSConfig wssConfig = WSSConfig.getDefaultWSConfig();
 
     /**
      * Constructs a <code>Timestamp</code> object and parses the
@@ -207,4 +209,27 @@ public class Timestamp {
     public Vector getCustomElements() {
         return this.customElements;
     }
+    
+    /**
+     * Set wsu:Id attribute of this timestamp
+     * @param id
+     */
+    public void setID(String id) {
+		String prefix = WSSecurityUtil.setNamespace(this.element, wssConfig
+				.getWsuNS(), WSConstants.WSU_PREFIX);
+		this.element.setAttributeNS(wssConfig.getWsuNS(), prefix + ":Id", id);
+    }
+    
+    /**
+     * Returns the value of the wsu:Id attribute
+     * @return
+     */
+    public String getID() {
+        if (wssConfig.getProcessNonCompliantMessages()) {
+            return WSSecurityUtil.getAttributeValueWSU(element, "Id", null);
+        } else {
+            return WSSecurityUtil.getAttributeValueWSU(element, "Id", wssConfig.getWsuNS());
+        }
+    }
+    
 }

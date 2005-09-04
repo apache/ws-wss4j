@@ -36,7 +36,7 @@ public class WSAddTimestamp extends WSBaseMessage {
     private static Log log = LogFactory.getLog(WSAddTimestamp.class.getName());
 
     private Timestamp ts = null;
-
+    private String id = null;
     /**
      * Constructor.
      */
@@ -97,8 +97,28 @@ public class WSAddTimestamp extends WSBaseMessage {
             target = (Element) securityHeader.getParentNode();
         }
         ts = new Timestamp(wssConfig, doc, ttl);
+        if(id != null) {
+        	ts.setID(id);
+        }
         WSSecurityUtil.prependChildElement(doc, target, ts.getElement(), true);
         return doc;
     }
 
+    /**
+     * Set the wsu:Id value of the Timestamp
+     * @param id
+     */
+    public void setId(String id) {
+        this.id = id;
+        if (ts != null)
+            ts.setID(id);
+    }
+    
+    /**
+     * Get the wsu:Id value of the Timestamp
+     * @return
+     */
+    public String getId() {
+        return id;
+    }
 }

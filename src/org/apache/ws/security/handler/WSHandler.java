@@ -258,6 +258,10 @@ public abstract class WSHandler {
 
         WSSAddUsernameToken builder = new WSSAddUsernameToken(reqData.getActor(), mu);
         builder.setPasswordType(reqData.getPwType());
+        
+        //Set the wsu:Id of the UNT
+        builder.setId("UsernameToken-" + System.currentTimeMillis());
+        
         // add the UsernameToken to the SOAP Enevelope
         builder.build(doc, reqData.getUsername(), password);
 
@@ -375,6 +379,9 @@ public abstract class WSHandler {
     protected void performTSAction(int actionToDo, boolean mu, Document doc, RequestData reqData) throws WSSecurityException {
         WSAddTimestamp timeStampBuilder =
                 new WSAddTimestamp(reqData.getActor(), mu);
+        
+        timeStampBuilder.setId("Timestamp-" + System.currentTimeMillis());
+        
         // add the Timestamp to the SOAP Enevelope
         timeStampBuilder.build(doc, decodeTimeToLive(reqData));
     }
