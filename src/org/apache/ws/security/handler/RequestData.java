@@ -1,6 +1,7 @@
 package org.apache.ws.security.handler;
 
 import org.apache.ws.security.SOAPConstants;
+import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.components.crypto.Crypto;
 
 import java.util.Vector;
@@ -9,7 +10,7 @@ import java.security.cert.X509Certificate;
 /**
  * This class holds per request data.
  *
- * @author wdi
+ * @author Werner Dittmann (Werner.Dittmann@t-online.de)
  */
 public class RequestData {
     private Object msgContext = null;
@@ -32,6 +33,8 @@ public class RequestData {
     private Vector encryptParts = new Vector();
     private X509Certificate encCert = null;
     private int timeToLive = 300; 	// Timestamp: time in seconds between creation and expiry
+    private WSSConfig wssConfig = null;
+    private Vector signatureValues = new Vector();
 
     public void clear() {
         soapConstants = null;
@@ -42,6 +45,9 @@ public class RequestData {
        	signatureParts = encryptParts = null;
        	encCert = null;
        	utElements = null;
+        wssConfig = null;
+        signatureValues.clear();
+        signatureValues = null;
     }
 
     public Object getMsgContext() {
@@ -136,9 +142,9 @@ public class RequestData {
         return signatureParts;
     }
 
-    public void setSignatureParts(Vector signatureParts) {
-        this.signatureParts = signatureParts;
-    }
+//    public void setSignatureParts(Vector signatureParts) {
+//        this.signatureParts = signatureParts;
+//    }
 
     public Crypto getEncCrypto() {
         return encCrypto;
@@ -184,9 +190,9 @@ public class RequestData {
         return encryptParts;
     }
 
-    public void setEncryptParts(Vector encryptParts) {
-        this.encryptParts = encryptParts;
-    }
+//    public void setEncryptParts(Vector encryptParts) {
+//        this.encryptParts = encryptParts;
+//    }
 
     public X509Certificate getEncCert() {
         return encCert;
@@ -203,4 +209,31 @@ public class RequestData {
     public void setTimeToLive(int timeToLive) {
         this.timeToLive = timeToLive;
     }
+
+    /**
+     * @return Returns the wssConfig.
+     */
+    public WSSConfig getWssConfig() {
+        return wssConfig;
+    }
+
+    /**
+     * @param wssConfig The wssConfig to set.
+     */
+    public void setWssConfig(WSSConfig wssConfig) {
+        this.wssConfig = wssConfig;
+    }
+    /**
+     * @return Returns the vector of stored signature values.
+     */
+    public Vector getSignatureValues() {
+        return signatureValues;
+    }
+
+//    /**
+//     * @param signatureValue The signature value to store.
+//     */
+//    public void addSignatureValue(byte[] signatureValue) {
+//        this.signatureValues.add(signatureValue);
+//    }    
 }

@@ -25,62 +25,39 @@ import org.apache.xml.security.utils.EncryptionConstants;
  * Constants in WS-Security spec.
  */
 public class WSConstants {
-    // the following compliance mode values must have increasing values as new
-    // modes are added; a later spec should have a value > value of an an earlier spec. 
-    public static final int OASIS_2002_07 = 1;
-    public static final int OASIS_2002_12 = 2;
-    public static final int OASIS_2003_06 = 3;
-    public static final int OASIS_1_0 = 4;
-
-    /**
-     * Set the specification compliance mode. This affects namespaces as well
-     * as how certain items are constructed in security headers.
-     * <p/>
-     * Currently this can only be set at compile time. The valid values are:
-     * <ul>
-     * <li> {@link #OASIS_2002_07} </li>
-     * <li> {@link #OASIS_2002_12} </li>
-     * <li> {@link #OASIS_2003_06} </li>
-     * <li> {@link #OASIS_1_0} OASIS WS-Security v1.0 as released on March 2004. This is the default and recommended setting</li>
-     * </ul>
-     * <p/>
-     * Using {@link #OASIS_2002} enhances chances of interoperability with other
-     * WSS implementations that do not fully adhere to the OASIS v1.0 March 2004
-     * specs yet.
-     *
-     * @param specs instructs WSS4J on which standard to follow
-     */
-    public static final int COMPLIANCE_MODE = OASIS_1_0;
-
     /*
      * All the various string and keywords required.
+     * 
+     * At first the WSS namespaces as per WSS specifications
      */
-    public static final String WSSE_NS_OASIS_2002_07 = "http://schemas.xmlsoap.org/ws/2002/07/secext";
-    public static final String WSSE_NS_OASIS_2002_12 = "http://schemas.xmlsoap.org/ws/2002/12/secext";
-    public static final String WSSE_NS_OASIS_2003_06 = "http://schemas.xmlsoap.org/ws/2003/06/secext";
-    public static final String WSSE_NS_OASIS_1_0 = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd";
-    public static String WSSE_NS = WSSE_NS_OASIS_1_0;
-    public static final String[] WSSE_NS_ARRAY =
-            new String[]{WSSE_NS_OASIS_1_0,
-                         WSSE_NS_OASIS_2003_06,
-                         WSSE_NS_OASIS_2002_12,
-                         WSSE_NS_OASIS_2002_07};
-    public static final String USERNAMETOKEN_NS = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0";
+    public static final String WSSE_NS = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd";
+    public static final String WSSE11_NS = "http://docs.oasis-open.org/wss/2005/xx/oasis-2005xx-wss-wssecurity-secext-1.1.xsd";
+    public static final String WSU_NS = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd";
+
+    /*
+     * The base UIRs for the various profiles.
+     * No new base URIs in WSS specification 1.1
+     */
     public static final String SOAPMESSAGE_NS = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0";
+    public static final String USERNAMETOKEN_NS = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0";
     public static final String X509TOKEN_NS = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0";
-    public static final String WSSE_PREFIX = "wsse";
+    
+    /*
+     * The Element name (local name) of the security header
+     */
     public static final String WSSE_LN = "Security";
-    public static final String WSU_NS_OASIS_2002_07 = "http://schemas.xmlsoap.org/ws/2002/07/utility";
-    public static final String WSU_NS_OASIS_2002_12 = "http://schemas.xmlsoap.org/ws/2002/12/utility";
-    public static final String WSU_NS_OASIS_2003_06 = "http://schemas.xmlsoap.org/ws/2003/06/utility";
-    public static final String WSU_NS_OASIS_1_0 = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd";
-    public static String WSU_NS = WSU_NS_OASIS_1_0;
-    public static final String[] WSU_NS_ARRAY =
-            new String[]{WSU_NS_OASIS_1_0,
-                         WSU_NS_OASIS_2003_06,
-                         WSU_NS_OASIS_2002_12,
-                         WSU_NS_OASIS_2002_07};
+
+    /*
+     * The namespace prefixes used. We uses the same prefix convention
+     * as shown in the specifications
+     */
+    public static final String WSSE_PREFIX = "wsse";
+    public static final String WSSE11_PREFIX = "wsse11";
     public static final String WSU_PREFIX = "wsu";
+    
+    /*
+     * Now the namespaces, local names, and prefixes of XML-SIG and XML-ENC
+     */
     public static final String SIG_NS = "http://www.w3.org/2000/09/xmldsig#";
     public static final String SIG_PREFIX = "ds";
     public static final String SIG_LN = "Signature";
@@ -88,9 +65,16 @@ public class WSConstants {
     public static final String ENC_PREFIX = "xenc";
     public static final String ENC_KEY_LN = "EncryptedKey";
     public static final String REF_LIST_LN = "ReferenceList";
-//    public static final String SOAP_SEC_NS = "http://schemas.xmlsoap.org/soap/security/2000-12";
+
+    /*
+     * The standard namesace definitions
+     */
     public static final String XMLNS_NS = "http://www.w3.org/2000/xmlns/";
     public static final String XML_NS = "http://www.w3.org/XML/1998/namespace";
+    
+    /*
+     * The local names and attribute names used by WSS
+     */
     public static final String USERNAME_TOKEN_LN = "UsernameToken";
     public static final String BINARY_TOKEN_LN = "BinarySecurityToken";
     public static final String TIMESTAMP_TOKEN_LN = "Timestamp";
@@ -101,6 +85,9 @@ public class WSConstants {
     public static final String CREATED_LN = "Created";
     public static final String EXPIRES_LN = "Expires";
 
+    /*
+     * The definitions for SAML
+     */
     public static final String SAML_NS = "urn:oasis:names:tc:SAML:1.0:assertion";
     public static final String SAMLP_NS = "urn:oasis:names:tc:SAML:1.0:protocol";
     public static final String ASSERTION_LN = "Assertion";
@@ -146,6 +133,9 @@ public class WSConstants {
      * This is a required method as defined by WS Specification, Username token profile.
      */
     public static final String PW_DIGEST = "PasswordDigest";
+    /*
+     * The password type URI used in the username token 
+     */
     public static final String PASSWORD_DIGEST = USERNAMETOKEN_NS + "#PasswordDigest";
 
     /**
@@ -155,7 +145,9 @@ public class WSConstants {
      * This is a required method as defined by WS Specification, Username token profile.
      */
     public static final String PW_TEXT = "PasswordText";
-
+    /*
+     * The password type URI used in the username token 
+     */
     public static final String PASSWORD_TEXT = USERNAMETOKEN_NS + "#PasswordText";
 
     /**
@@ -314,6 +306,10 @@ public class WSConstants {
      */
     public static final int UT_SIGNING = 7;
 
+    /*
+     * The following values are bits that can be combined to for a set.
+     * Be carefull when selecting new values.
+     */
     public static final int NO_SECURITY = 0;
     public static final int UT = 0x1; // perform UsernameToken
     public static final int SIGN = 0x2; // Perform Signature
@@ -339,35 +335,5 @@ public class WSConstants {
     public static final int WSE_DERIVED_KEY_LEN = 16;
     public static final String LABEL_FOR_DERIVED_KEY = "WS-Security";
     
-    static {
-        setComplianceMode();
-    }
-
-    /**
-     * init various constants to the chosen compliance mode
-     */
-    private static void setComplianceMode() {
-        switch (COMPLIANCE_MODE) {
-            case OASIS_1_0:
-                WSSE_NS = WSSE_NS_OASIS_1_0;
-                WSU_NS = WSU_NS_OASIS_1_0;
-                break;
-            case OASIS_2003_06:
-                WSSE_NS = WSSE_NS_OASIS_2003_06;
-                WSU_NS = WSU_NS_OASIS_2003_06;
-                break;
-            case OASIS_2002_12:
-                WSSE_NS = WSSE_NS_OASIS_2002_12;
-                WSU_NS = WSU_NS_OASIS_2002_12;
-                break;
-            case OASIS_2002_07:
-                WSSE_NS = WSSE_NS_OASIS_2002_07;
-                WSU_NS = WSU_NS_OASIS_2002_07;
-                break;
-            default:
-                WSSE_NS = WSSE_NS_OASIS_1_0;
-                WSU_NS = WSU_NS_OASIS_1_0;
-        }
-    }
 }
 

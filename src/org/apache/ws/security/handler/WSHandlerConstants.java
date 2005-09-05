@@ -1301,6 +1301,8 @@ public class WSHandlerConstants {
      * Should timestamps have precision in milliseconds
      */
     public static final String TIMESTAMP_PRECISION = "precisionInMilliseconds";
+    
+    public static final String SEND_SIGV = "_sendSignatureValues_";
 
     /**
 

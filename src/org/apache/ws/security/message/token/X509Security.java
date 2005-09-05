@@ -18,7 +18,6 @@
 package org.apache.ws.security.message.token;
 
 import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.w3c.dom.Document;
@@ -35,9 +34,7 @@ import java.security.cert.X509Certificate;
  * @author Davanum Srinivas (dims@yahoo.com).
  */
 public class X509Security extends BinarySecurity {
-    private String type;
-    public static final String X509_V3 = "X509v3";
-
+    private static final String type = WSConstants.X509TOKEN_NS + "#X509v3";
     /*
      * Stores the associated X.509 Certificate. This saves numerous
      * crypto loadCertificate operations
@@ -52,14 +49,9 @@ public class X509Security extends BinarySecurity {
      * @param elem      the element containing the X509 certificate data
      * @throws WSSecurityException
      */
-    public X509Security(WSSConfig wssConfig, Element elem) throws WSSecurityException {
-        super(wssConfig, elem);
-        if (wssConfig.isBSTValuesPrefixed()) {
-            type = WSConstants.WSSE_PREFIX + ":" + X509_V3;
-        } else {
-            type = WSConstants.X509TOKEN_NS + "#" + X509_V3;
-        }
-        if (!getValueType().endsWith(X509_V3)) {
+    public X509Security(Element elem) throws WSSecurityException {
+        super(elem);
+        if (!getValueType().equals(type)) {
             throw new WSSecurityException(WSSecurityException.INVALID_SECURITY_TOKEN, "invalidValueType", new Object[]{type, getValueType()});
         }
     }
@@ -69,13 +61,8 @@ public class X509Security extends BinarySecurity {
      *
      * @param doc
      */
-    public X509Security(WSSConfig wssConfig, Document doc) {
-        super(wssConfig, doc);
-        if (wssConfig.isBSTValuesPrefixed()) {
-            type = WSConstants.WSSE_PREFIX + ":" + X509_V3;
-        } else {
-            type = WSConstants.X509TOKEN_NS + "#" + X509_V3;
-        }
+    public X509Security(Document doc) {
+        super(doc);
         setValueType(type);
     }
 
@@ -126,11 +113,7 @@ public class X509Security extends BinarySecurity {
         }
     }
 
-    public static String getType(WSSConfig wssConfig) {
-        if (wssConfig.isBSTValuesPrefixed()) {
-            return WSConstants.WSSE_PREFIX + ":" + X509_V3;
-        } else {
-            return WSConstants.X509TOKEN_NS + "#" + X509_V3;
-        }
+    public static String getType() {
+        return type;
     }
 }

@@ -1,5 +1,5 @@
 /*
-* Copyright  2003-2004 The Apache Software Foundation.
+* Copyright  2003-2005 The Apache Software Foundation.
 *
 *  Licensed under the Apache License, Version 2.0 (the "License");
 *  you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ package org.apache.ws.security.handler;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSEncryptionPart;
 import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSecurityEngine;
@@ -53,14 +54,18 @@ import java.util.Vector;
 
 /**
  * Extracted from WSDoAllReceiver and WSDoAllSender
+ *
+ *
+ * @author Davanum Srinivas (dims@yahoo.com).
+ * @author Werner Dittmann (Werner.Dittmann@t-online.de).
  */
 public abstract class WSHandler {
     protected static Log log = LogFactory.getLog(WSHandler.class.getName());
     protected static final WSSecurityEngine secEngine = WSSecurityEngine.getInstance();
-    protected static boolean doDebug = true;
     protected static Hashtable cryptos = new Hashtable(5);
 
-    
+    private boolean doDebug = log.isDebugEnabled();
+
     /**
      * Performs all defined security actions to set-up the SOAP request.
      * 
@@ -73,11 +78,13 @@ public abstract class WSHandler {
      * @throws WSSecurityException
      */
     protected void doSenderAction(int doAction, Document doc,
-			RequestData reqData, Vector actions) throws WSSecurityException {
+			RequestData reqData, Vector actions, boolean isRequest) throws WSSecurityException {
 
         boolean mu = decodeMustUnderstand(reqData);
         
-        secEngine.setPrecisionInMilliSeconds(decodeTimestampPrecision(reqData));
+        WSSConfig wssConfig = WSSConfig.getNewInstance();
+        wssConfig.setPrecisionInMilliSeconds(decodeTimestampPrecision(reqData));
+        reqData.setWssConfig(wssConfig);
 
         String actor = null;
         if ((actor = (String) getOption(WSHandlerConstants.ACTOR)) == null) {
@@ -172,7 +179,55 @@ public abstract class WSHandler {
 				break;
 			}
 		}
+        if (wssConfig.isEnableSignatureConfirmation()) {
+            /*
+             * If this is a request then store all signature values. Add ours to
+             * already gathered values because of chained handlers, e.g. for
+             * other actors.
+             */
+            log.debug("Signature value handling, request is: " + isRequest);
+            if (isRequest) {
+                if (reqData.getSignatureValues().size() > 0) {
+                    Vector sigv = null;
+                    if ((sigv = (Vector) getProperty(reqData.getMsgContext(),
+                            WSHandlerConstants.SEND_SIGV)) == null) {
+                        sigv = new Vector();
+                        setProperty(reqData.getMsgContext(),
+                                WSHandlerConstants.SEND_SIGV, sigv);
+                    }
+                    sigv.add(reqData.getSignatureValues());
+                }
+            } else {
+                /*
+                 * If we are going to send a response generate the Signature
+                 * confirmation elements
+                 */
+                Vector results = null;
+                if ((results = (Vector) getProperty(reqData.getMsgContext(),
+                        WSHandlerConstants.RECV_RESULTS)) != null) {
+                    performSIGNConfirmation(mu, doc, reqData, results);
+                }
+            }
+        }
 	}
+    
+    protected void doReceiverAction(int doAction, RequestData reqData)
+            throws WSSecurityException {
+
+        WSSConfig wssConfig = WSSConfig.getNewInstance();
+        reqData.setWssConfig(wssConfig);
+
+        if ((doAction & WSConstants.SIGN) == WSConstants.SIGN) {
+            decodeSignatureParameter2(reqData);
+        }
+
+        if ((doAction & WSConstants.ENCR) == WSConstants.ENCR) {
+            decodeDecryptionParameter(reqData);
+        }
+        if ((doAction & WSConstants.NO_SERIALIZE) == WSConstants.NO_SERIALIZE) {
+            reqData.setNoSerialization(true);
+        }
+    }
     
     protected void performSIGNAction(int actionToDo, boolean mu, Document doc, RequestData reqData)
             throws WSSecurityException {
@@ -185,6 +240,8 @@ public abstract class WSHandler {
                 .getPassword();
 
         WSSignEnvelope wsSign = new WSSignEnvelope(reqData.getActor(), mu);
+        wsSign.setWsConfig(reqData.getWssConfig());
+        
         if (reqData.getSigKeyId() != 0) {
             wsSign.setKeyIdentifierType(reqData.getSigKeyId());
         }
@@ -199,6 +256,7 @@ public abstract class WSHandler {
 
         try {
             wsSign.build(doc, reqData.getSigCrypto());
+            reqData.getSignatureValues().add(wsSign.getSignatureValue());
         } catch (WSSecurityException e) {
             throw new WSSecurityException("WSHandler: Signature: error during message procesing" + e);
         }
@@ -207,6 +265,8 @@ public abstract class WSHandler {
     protected void performENCRAction(int actionToDo, boolean mu, Document doc, RequestData reqData)
             throws WSSecurityException {
         WSEncryptBody wsEncrypt = new WSEncryptBody(reqData.getActor(), mu);
+        wsEncrypt.setWsConfig(reqData.getWssConfig());
+        
         if (reqData.getEncKeyId() != 0) {
             wsEncrypt.setKeyIdentifierType(reqData.getEncKeyId());
         }
@@ -257,6 +317,7 @@ public abstract class WSHandler {
                 .getPassword();
 
         WSSAddUsernameToken builder = new WSSAddUsernameToken(reqData.getActor(), mu);
+        builder.setWsConfig(reqData.getWssConfig());
         builder.setPasswordType(reqData.getPwType());
         
         //Set the wsu:Id of the UNT
@@ -287,12 +348,16 @@ public abstract class WSHandler {
                 WSHandlerConstants.PW_CALLBACK_REF, reqData).getPassword();
 
         WSSAddUsernameToken builder = new WSSAddUsernameToken(reqData.getActor(), mu);
+        builder.setWsConfig(reqData.getWssConfig());
+
         builder.setPasswordType(WSConstants.PASSWORD_TEXT);
         builder.preSetUsernameToken(doc, reqData.getUsername(), password);
         builder.addCreated(doc);
         builder.addNonce(doc);
 
         WSSignEnvelope sign = new WSSignEnvelope(reqData.getActor(), mu);
+        sign.setWsConfig(reqData.getWssConfig());
+
         if (reqData.getSignatureParts().size() > 0) {
             sign.setParts(reqData.getSignatureParts());
         }
@@ -301,6 +366,7 @@ public abstract class WSHandler {
         sign.setSignatureAlgorithm(XMLSignature.ALGO_ID_MAC_HMAC_SHA1);
         try {
             sign.build(doc, null);
+            reqData.getSignatureValues().add(sign.getSignatureValue());
         } catch (WSSecurityException e) {
             throw new WSSecurityException("WSHandler: Error during Signatur with UsernameToken secret"
                     + e);
@@ -311,6 +377,8 @@ public abstract class WSHandler {
     protected void performSTAction(int actionToDo, boolean mu, Document doc, RequestData reqData)
             throws WSSecurityException {
         WSSAddSAMLToken builder = new WSSAddSAMLToken(reqData.getActor(), mu);
+        builder.setWsConfig(reqData.getWssConfig());
+
         SAMLIssuer saml = loadSamlIssuer(reqData);
         saml.setUsername(reqData.getUsername());
         SAMLAssertion assertion = saml.newAssertion();
@@ -346,6 +414,8 @@ public abstract class WSHandler {
         Crypto issuerCrypto = null;
 
         WSSignEnvelope wsSign = new WSSignEnvelope(reqData.getActor(), mu);
+        wsSign.setWsConfig(reqData.getWssConfig());
+
         String password = null;
         if (saml.isSenderVouches()) {
             issuerKeyName = saml.getIssuerKeyName();
@@ -370,6 +440,7 @@ public abstract class WSHandler {
                     issuerCrypto,
                     issuerKeyName,
                     issuerKeyPW);
+            reqData.getSignatureValues().add(wsSign.getSignatureValue());
         } catch (WSSecurityException e) {
             throw new WSSecurityException("WSHandler: Signed SAML: error during message processing"
                     + e);
@@ -379,6 +450,8 @@ public abstract class WSHandler {
     protected void performTSAction(int actionToDo, boolean mu, Document doc, RequestData reqData) throws WSSecurityException {
         WSAddTimestamp timeStampBuilder =
                 new WSAddTimestamp(reqData.getActor(), mu);
+        timeStampBuilder.setWsConfig(reqData.getWssConfig());
+
         
         timeStampBuilder.setId("Timestamp-" + System.currentTimeMillis());
         
@@ -386,6 +459,22 @@ public abstract class WSHandler {
         timeStampBuilder.build(doc, decodeTimeToLive(reqData));
     }
 
+    protected void performSIGNConfirmation(boolean mu, Document doc,
+            RequestData reqData, Vector results) {
+        if (doDebug) {
+            log.debug("Perform Signature confirmation");
+        }
+    }
+
+    protected boolean checkSignatureConfirmation(RequestData reqData, Vector wsResult) {
+        if (doDebug) {
+            log.debug("Check Signature confirmation");
+        }
+        if (!reqData.isNoSerialization()) {
+            log.debug("Check Signature confirmation - last handler");
+        }
+        return true;
+    }
     /**
      * Hook to allow subclasses to load their Signature Crypto however they see
      * fit.
@@ -1093,6 +1182,9 @@ public abstract class WSHandler {
     public abstract Object getOption(String key);
 
     public abstract Object getProperty(Object msgContext, String key);
+    
+    public abstract void setProperty(Object msgContext, String key, Object value);
+
 
     public abstract String getPassword(Object msgContext);
 

@@ -20,7 +20,6 @@ package org.apache.ws.security.message;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.message.token.UsernameToken;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.w3c.dom.Document;
@@ -68,18 +67,6 @@ public class WSSAddUsernameToken extends WSBaseMessage {
     }
 
     /**
-     * Constructor.
-     * <p/>
-     *
-     * @param wssConfig Configuration options for processing and building the <code>wsse:Security</code> header
-     * @param actor     The name of the actor of the <code>wsse:Security</code> header
-     * @param mu        Set <code>mustUnderstand</code> to true or false
-     */
-    public WSSAddUsernameToken(WSSConfig wssConfig, String actor, boolean mu) {
-        super(wssConfig, actor, mu);
-    }
-
-    /**
      * Defines how to construct the password element of the
      * <code>UsernameToken</code>.
      *
@@ -106,7 +93,7 @@ public class WSSAddUsernameToken extends WSBaseMessage {
      * Creates and adds a Created element to the UsernameToken
      */
     public void addCreated(Document doc) {
-        ut.addCreated(doc);
+        ut.addCreated(wssConfig.isPrecisionInMilliSeconds(), doc);
     }
 
     /**
@@ -131,7 +118,7 @@ public class WSSAddUsernameToken extends WSBaseMessage {
     }
 
     public Document preSetUsernameToken(Document doc, String username, String password) {
-        ut = new UsernameToken(wssConfig, doc, passwordType);
+        ut = new UsernameToken(wssConfig.isPrecisionInMilliSeconds(), doc, passwordType);
         ut.setName(username);
         ut.setPassword(password);
         return doc;

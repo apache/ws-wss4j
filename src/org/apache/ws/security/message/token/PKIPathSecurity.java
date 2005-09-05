@@ -18,7 +18,6 @@
 package org.apache.ws.security.message.token;
 
 import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.w3c.dom.Document;
@@ -33,7 +32,7 @@ import java.security.cert.X509Certificate;
  * @author Davanum Srinivas (dims@yahoo.com).
  */
 public class PKIPathSecurity extends BinarySecurity {
-    public static final String X509PKI_PATH = "X509PKIPathv1";
+    private static final String type = WSConstants.X509TOKEN_NS + "#X509PKIPathv1";
 
     /**
      * Constructor.
@@ -41,14 +40,14 @@ public class PKIPathSecurity extends BinarySecurity {
      *
      * @throws WSSecurityException
      */
-    public PKIPathSecurity(WSSConfig wssConfig, Element elem)
+    public PKIPathSecurity(Element elem)
         throws WSSecurityException {
-        super(wssConfig, elem);
-        if (!getValueType().equals(getType(wssConfig))) {
+        super(elem);
+        if (!getValueType().equals(getType())) {
             throw new WSSecurityException(
                 WSSecurityException.INVALID_SECURITY_TOKEN,
                 "invalidValueType",
-                new Object[]{getType(wssConfig), getValueType()});
+                new Object[]{type, getValueType()});
         }
     }
 
@@ -56,9 +55,9 @@ public class PKIPathSecurity extends BinarySecurity {
      * Constructor.
      * <p/>
      */
-    public PKIPathSecurity(WSSConfig wssConfig, Document doc) {
-        super(wssConfig, doc);
-        setValueType(getType(wssConfig));
+    public PKIPathSecurity(Document doc) {
+        super(doc);
+        setValueType(getType());
     }
 
     /**
@@ -102,7 +101,7 @@ public class PKIPathSecurity extends BinarySecurity {
         setToken(data);
     }
 
-    public static String getType(WSSConfig wssConfig) {
-        return WSConstants.X509TOKEN_NS + "#" + X509PKI_PATH;
+    public static String getType() {
+        return type;
     }
 }

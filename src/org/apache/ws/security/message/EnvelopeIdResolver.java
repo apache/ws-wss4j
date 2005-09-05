@@ -20,7 +20,7 @@ package org.apache.ws.security.message;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.SOAPConstants;
-import org.apache.ws.security.WSSConfig;
+import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.xml.security.signature.XMLSignatureInput;
 import org.apache.xml.security.utils.XMLUtils;
@@ -49,7 +49,6 @@ public class EnvelopeIdResolver extends ResourceResolverSpi {
     private static Log tlog = LogFactory.getLog("org.apache.ws.security.TIME");
 
     private static EnvelopeIdResolver resolver = null;
-    private WSSConfig wssConfig;
 
     private boolean doDebug = false;
 
@@ -59,17 +58,14 @@ public class EnvelopeIdResolver extends ResourceResolverSpi {
      *
      * @return
      */
-    public synchronized static ResourceResolverSpi getInstance(WSSConfig wssConfig) {
-        // instance comparison, should be same instance most of the time
-        // so no need for quals() here?
-        if (resolver == null || resolver.wssConfig != wssConfig) {
-            resolver = new EnvelopeIdResolver(wssConfig);
+    public synchronized static ResourceResolverSpi getInstance() {
+        if (resolver == null) {
+            resolver = new EnvelopeIdResolver();
         }
         return resolver;
     }
 
-    private EnvelopeIdResolver(WSSConfig wssConfig) {
-        this.wssConfig = wssConfig;
+    private EnvelopeIdResolver() {
     }
 
     /**
@@ -124,7 +120,7 @@ public class EnvelopeIdResolver extends ResourceResolverSpi {
                     uri,
                     BaseURI);
         }
-        String cId = selectedElem.getAttributeNS(wssConfig.getWsuNS(), "Id");
+        String cId = selectedElem.getAttributeNS(WSConstants.WSU_NS, "Id");
 
         /*
          * If Body Id match fails, look for a generic Id (without a namespace)
@@ -133,7 +129,7 @@ public class EnvelopeIdResolver extends ResourceResolverSpi {
          */
         if (!id.equals(cId)) {
             cId = null;
-            if ((selectedElem = WSSecurityUtil.getElementByWsuId(wssConfig, doc, uriNodeValue)) != null) {
+            if ((selectedElem = WSSecurityUtil.getElementByWsuId(doc, uriNodeValue)) != null) {
                 cId = selectedElem.getAttribute("Id");
             } else if ((selectedElem = WSSecurityUtil.getElementByGenId(doc, uriNodeValue)) != null) {
                 cId = selectedElem.getAttribute("Id");

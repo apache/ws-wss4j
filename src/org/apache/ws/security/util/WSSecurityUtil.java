@@ -24,7 +24,6 @@ import org.apache.ws.security.SOAP11Constants;
 import org.apache.ws.security.SOAP12Constants;
 import org.apache.ws.security.SOAPConstants;
 import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.handler.WSHandlerConstants;
@@ -65,22 +64,6 @@ public class WSSecurityUtil {
         doDebug = log.isDebugEnabled();
     }
 
-    /**
-     * Returns the first WS-Security header element for a given actor.
-     * Only one WS-Security header is allowed for an actor.
-     *
-     * @param doc
-     * @param actor
-     * @return the <code>wsse:Security</code> element or
-     *         <code>null</code> if not such element found
-     *	@deprecated
-     *	@see	getSecurityHeader(
-        WSSConfig wssConfig, Document doc, String actor, SOAPConstants sc)
-     */
-    public static Element getSecurityHeader(
-       Document doc, String actor, SOAPConstants sc) {
-	return getSecurityHeader(WSSConfig.getDefaultWSConfig(), doc, actor, sc);
-    }
 
     /**
      * Returns the first WS-Security header element for a given actor.
@@ -91,9 +74,7 @@ public class WSSecurityUtil {
      * @return the <code>wsse:Security</code> element or
      *         <code>null</code> if not such element found
      */
-    public static Element getSecurityHeader(
-        WSSConfig wssConfig, Document doc, String actor, SOAPConstants sc) {
-        // TODO skip non-element element, e.g. comments.
+    public static Element getSecurityHeader(Document doc, String actor, SOAPConstants sc) {
         Element soapHeaderElement =
             (Element) getDirectChild(doc.getFirstChild(),
                                      sc.getHeaderQName().getLocalPart(),
@@ -106,14 +87,7 @@ public class WSSecurityUtil {
         // get all wsse:Security nodes
         NodeList list = null;
         int len = 0;
-        if (wssConfig.getProcessNonCompliantMessages()) {
-            for (int i = 0; len == 0 && i < WSConstants.WSSE_NS_ARRAY.length; ++i) {
-                list = soapHeaderElement.getElementsByTagNameNS(WSConstants.WSSE_NS_ARRAY[i], WSConstants.WSSE_LN);
-                len = list.getLength();
-            }
-        } else {
-            list = soapHeaderElement.getElementsByTagNameNS(wssConfig.getWsseNS(), WSConstants.WSSE_LN);
-        }
+        list = soapHeaderElement.getElementsByTagNameNS(WSConstants.WSSE_NS, WSConstants.WSSE_LN);
         if (list == null) {
             return null;
         } else {
@@ -174,81 +148,6 @@ public class WSSecurityUtil {
             }
         }
         return null;
-    }
-
-    /**
-     * Gets a direct child with specified localname and one of the WSSE
-     * namespaces.
-     * <p/>
-     *
-     * @param fNode     the node where to start the search
-     * @param localName local name of the child to get
-     * @return the node or <code>null</code> if not such node found
-     */
-    public static Node getDirectChildWSSE(Node fNode, String localName) {
-        Node child = null;
-        for (int i = 0; child == null && i < WSConstants.WSSE_NS_ARRAY.length; ++i) {
-            child = getDirectChild(fNode, localName, WSConstants.WSSE_NS_ARRAY[i]);
-        }
-        return child;
-    }
-
-    /**
-     * Gets a direct child with specified localname and one of the WSU namespaces.
-     * <p/>
-     *
-     * @param fNode     the node where to start the search
-     * @param localName local name of the child to get
-     * @return the node or <code>null</code> if not such node found
-     */
-    public static Node getDirectChildWSU(Node fNode, String localName) {
-        Node child = null;
-        for (int i = 0; child == null && i < WSConstants.WSU_NS_ARRAY.length; ++i) {
-            child = getDirectChild(fNode, localName, WSConstants.WSU_NS_ARRAY[i]);
-        }
-        return child;
-    }
-
-    /**
-     * Gets the attribute value with specified localname and WSU namespace.
-     * <p/>
-     *
-     * @param element      the Element which contains the attribute
-     * @param attrName     local name of the attribute
-     * @param wsuNamespace the WSU namespace of the attribute to get.
-     *                     Pass null to try all WSU namespaces
-     */
-    public static String getAttributeValueWSU(Element element, String attrName, String wsuNamespace) {
-        if (wsuNamespace == null) {
-            String value = null;
-            for (int i = 0; (value == null || value.length() == 0) && i < WSConstants.WSU_NS_ARRAY.length; ++i) {
-                value = element.getAttributeNS(WSConstants.WSU_NS_ARRAY[i], attrName);
-            }
-            return value;
-        } else {
-            return element.getAttributeNS(wsuNamespace, attrName);
-        }
-    }
-
-    /**
-     * Gets the attribute value with specified localname and WSSE namespace.
-     * <p/>
-     *
-     * @param element       the Element which contains the attribute
-     * @param attrName      local name of the attribute
-     * @param wsseNamespace the WSSE namespace of the attribute to get.
-     *                      Pass null to try all WSSE namespaces
-     */
-    public static String getAttributeValueWSSE(Element element, String attrName, String wsseNamespace) {
-        if (wsseNamespace == null) {
-            String value = null;
-            for (int i = 0; (value == null || value.length() == 0) && i < WSConstants.WSSE_NS_ARRAY.length; ++i) {
-                value = element.getAttributeNS(WSConstants.WSSE_NS_ARRAY[i], attrName);
-            }
-            return value;
-        } else {
-            return element.getAttributeNS(wsseNamespace, attrName);
-        }
     }
 
     /**
@@ -507,22 +406,7 @@ public class WSSecurityUtil {
     }
     /* ** up to here */
 
-    /**
-     * Search for an element given its wsu:id.
-     * <p/>
-     *
-     * @param wssConfig The WSS configuration data conating namesapce 
-     * 	definitions, etc.
-     * @param doc the DOM document (SOAP request) 
-     * @param id the Id of the element
-     * @return the found element or null if no element with the Id exists
-     * @deprecated
-     * @see getElementByWsuId(WSSConfig wssConfig, Document doc, String id)
-    */
-     public static Element getElementByWsuId(Document doc, String id) {
-	return getElementByWsuId(WSSConfig.getDefaultWSConfig(), doc, id);
-    }
-    /**
+   /**
      * Search for an element given its wsu:id.
      * <p/>
      *
@@ -532,7 +416,7 @@ public class WSSecurityUtil {
      * @param id the Id of the element
      * @return the found element or null if no element with the Id exists
      */
-    public static Element getElementByWsuId(WSSConfig wssConfig, Document doc, String id) {
+    public static Element getElementByWsuId(Document doc, String id) {
 
         if (id == null) {
             return null;
@@ -542,16 +426,7 @@ public class WSSecurityUtil {
             return null;
         }
         id = id.substring(1);
-        if (wssConfig.getProcessNonCompliantMessages()) {
-            Element element = null;
-            for (int i = 0; element == null && i < WSConstants.WSU_NS_ARRAY.length; ++i) {
-                element = WSSecurityUtil.findElementById(doc.getDocumentElement(), id, WSConstants.WSU_NS_ARRAY[i]);
-            }
-            return element;
-        } else {
-            return WSSecurityUtil.findElementById(doc.getDocumentElement(), id, wssConfig.getWsuNS());
-        }
-
+        return WSSecurityUtil.findElementById(doc.getDocumentElement(), id, WSConstants.WSU_NS);
     }
 
     /**
@@ -583,38 +458,17 @@ public class WSSecurityUtil {
      * @param wssConfig The WSS configuration data conating namesapce 
      * 	definitions, etc.
      * @return then BST element (DOM element)
-     * @deprecated
-     * @see createBinarySecurityToken(Document doc,
-                                                    String wsuIdVal,
-                                                    WSSConfig wssConfig)
      */
     public static Element createBinarySecurityToken(Document doc,
                                                     String wsuIdVal) {
-	return createBinarySecurityToken(doc, wsuIdVal, 
-					 WSSConfig.getDefaultWSConfig());
-    }
-
-    /**
-     * Create a BinarySecurityToken element
-     * <p/>
-     *
-     * @param doc the DOM document (SOAP request) 
-     * @param wsuIdVal the value for the wsu:Id
-     * @param wssConfig The WSS configuration data conating namesapce 
-     * 	definitions, etc.
-     * @return then BST element (DOM element)
-     */
-    public static Element createBinarySecurityToken(Document doc,
-                                                    String wsuIdVal,
-                                                    WSSConfig wssConfig) {
-        Element retVal = doc.createElementNS(wssConfig.getWsseNS(),
+        Element retVal = doc.createElementNS(WSConstants.WSSE_NS,
                 "wsse:BinarySecurityToken");
         retVal.setAttributeNS(WSConstants.XMLNS_NS,
-                "xmlns:wsu", wssConfig.getWsuNS());
+                "xmlns:wsu", WSConstants.WSU_NS);
         retVal.setAttributeNS(WSConstants.WSU_NS, "wsu:Id", wsuIdVal);
-        retVal.setAttributeNS(null, "ValueType", X509Security.getType(wssConfig));
+        retVal.setAttributeNS(null, "ValueType", X509Security.getType());
         retVal.setAttributeNS(null, "EncodingType",
-                BinarySecurity.getBase64EncodingValue(wssConfig));
+                BinarySecurity.BASE64_ENCODING);
         return retVal;
     }
 
@@ -717,51 +571,11 @@ public class WSSecurityUtil {
      * @param envelope the SOAP envelope
      * @param doCreate if true create a new WSS header block if none exists
      * @return the WSS header or null if none found and doCreate is false
-     * @deprecated
-     * @see	findWsseSecurityHeaderBlock(WSSConfig wssConfig, Document doc, Element envelope, boolean doCreate)
      */
     public static Element findWsseSecurityHeaderBlock(Document doc, Element envelope, boolean doCreate) {
-        return findWsseSecurityHeaderBlock(WSSConfig.getDefaultWSConfig(), doc, envelope, doCreate);
+        return findWsseSecurityHeaderBlock(doc, envelope, null, doCreate);
     }
 
-    /**
-     * find the first ws-security header block
-     * <p/>
-     *
-     * @param doc the DOM document (SOAP request)
-     * @param envelope the SOAP envelope
-     * @param doCreate if true create a new WSS header block if none exists
-     * @return the WSS header or null if none found and doCreate is false
-     */
-    public static Element findWsseSecurityHeaderBlock(WSSConfig wssConfig, Document doc, Element envelope, boolean doCreate) {
-        return findWsseSecurityHeaderBlock(wssConfig, doc, envelope, null, doCreate);
-    }
-
-    /**
-     * find the first ws-security header block
-     * <p/>
-     *
-     * @param doc the DOM document (SOAP request)
-     * @param envelope the SOAP envelope
-     * @param doCreate if true create a new WSS header block if none exists
-     * @return the WSS header or null if none found and doCreate is false
-     * @deprecated
-     * @see findWsseSecurityHeaderBlock(WSSConfig wssConfig,
-                                                      Document doc,
-                                                      Element envelope,
-                                                      String actor,
-                                                      boolean doCreate)
-     */
-    public static Element findWsseSecurityHeaderBlock(Document doc,
-                                                      Element envelope,
-                                                      String actor,
-                                                      boolean doCreate) {
-	return findWsseSecurityHeaderBlock(WSSConfig.getDefaultWSConfig(),
-                                           doc,
-                                           envelope,
-                                           actor,
-					   doCreate);
-    }
     /**
      * find a ws-security header block for a given actor
      * <p/>
@@ -772,13 +586,12 @@ public class WSSecurityUtil {
      * @param doCreate if true create a new WSS header block if none exists
      * @return the WSS header or null if none found and doCreate is false
      */
-    public static Element findWsseSecurityHeaderBlock(WSSConfig wssConfig,
-                                                      Document doc,
+    public static Element findWsseSecurityHeaderBlock(Document doc,
                                                       Element envelope,
                                                       String actor,
                                                       boolean doCreate) {
         SOAPConstants sc = getSOAPConstants(envelope);
-        Element wsseSecurity = getSecurityHeader(wssConfig, doc, actor, sc);
+        Element wsseSecurity = getSecurityHeader(doc, actor, sc);
         if (wsseSecurity != null) {
             return wsseSecurity;
         }
@@ -790,8 +603,8 @@ public class WSSecurityUtil {
             }
         }
         if (doCreate) {
-            wsseSecurity = header.getOwnerDocument().createElementNS(wssConfig.getWsseNS(), "wsse:Security");
-            wsseSecurity.setAttributeNS(WSConstants.XMLNS_NS, "xmlns:wsse", wssConfig.getWsseNS());
+            wsseSecurity = header.getOwnerDocument().createElementNS(WSConstants.WSSE_NS, "wsse:Security");
+            wsseSecurity.setAttributeNS(WSConstants.XMLNS_NS, "xmlns:wsse", WSConstants.WSSE_NS);
             return prependChildElement(doc, header, wsseSecurity, true);
         }
         return null;
@@ -834,25 +647,13 @@ public class WSSecurityUtil {
      *
      * @param doc the DOM document (SOAP request)
      * @return a conext element usable for xpath requests
-     *	@deprecated
-     *	@see	createNamespaceContext(WSSConfig wssConfig, Document doc)
      */
     public static Element createNamespaceContext(Document doc) {
-	return createNamespaceContext(WSSConfig.getDefaultWSConfig(), doc);
-    }
-
-    /**
-     * Create a namespace context with namespaces of interest
-     *
-     * @param doc the DOM document (SOAP request)
-     * @return a conext element usable for xpath requests
-     */
-    public static Element createNamespaceContext(WSSConfig wssConfig, Document doc) {
         SOAPConstants sc = getSOAPConstants(doc.getDocumentElement());
         Element nsContext = doc.createElementNS(null, "namespaceContext");
         nsContext.setAttributeNS(WSConstants.XMLNS_NS, "xmlns:env", sc.getEnvelopeURI());
-        nsContext.setAttributeNS(WSConstants.XMLNS_NS, "xmlns:wsse", wssConfig.getWsseNS());
-        nsContext.setAttributeNS(WSConstants.XMLNS_NS, "xmlns:wsu", wssConfig.getWsuNS());
+        nsContext.setAttributeNS(WSConstants.XMLNS_NS, "xmlns:wsse", WSConstants.WSSE_NS);
+        nsContext.setAttributeNS(WSConstants.XMLNS_NS, "xmlns:wsu", WSConstants.WSU_NS);
         nsContext.setAttributeNS(WSConstants.XMLNS_NS, "xmlns:ds", WSConstants.SIG_NS);
         nsContext.setAttributeNS(WSConstants.XMLNS_NS, "xmlns:xenc", WSConstants.ENC_NS);
         return nsContext;

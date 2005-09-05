@@ -18,7 +18,6 @@ package org.apache.ws.security.message;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.opensaml.SAMLAssertion;
 import org.opensaml.SAMLException;
@@ -62,19 +61,6 @@ public class WSSAddSAMLToken extends WSBaseMessage {
      */
     public WSSAddSAMLToken(String actor, boolean mu) {
         super(actor, mu);
-    }
-
-    /**
-     * Constructor.
-     * <p/>
-     *
-     * @param wssConfig Configuration options for processing and building the <code>wsse:Security</code> header
-     * @param actor     The name of the actor of the <code>wsse:Security</code>
-     *                  header
-     * @param mu        Set <code>mustUnderstand</code> to true or false
-     */
-    public WSSAddSAMLToken(WSSConfig wssConfig, String actor, boolean mu) {
-        super(wssConfig, actor, mu);
     }
 
     /**

@@ -62,9 +62,8 @@ import java.util.Vector;
 public class WSS4JHandler extends WSHandler implements Handler {
     private HandlerInfo handlerInfo;
     static Log log = LogFactory.getLog(WSS4JHandler.class.getName());
-//    static final WSSecurityEngine secEngine = new WSSecurityEngine();
 
-    private boolean doDebug = false;
+    private boolean doDebug = log.isDebugEnabled();;
 
     static final String DEPLOYMENT = "deployment";
     static final String CLIENT_DEPLOYMENT = "client";
@@ -153,14 +152,19 @@ public class WSS4JHandler extends WSHandler implements Handler {
 
         boolean needsHandling = ( isRequestMessage && !handleFlow.equals(RESPONSE_ONLY)) ||
                                 (!isRequestMessage && !handleFlow.equals(REQUEST_ONLY));
-        if (deployment.equals(CLIENT_DEPLOYMENT) ^ isRequestMessage) {
-            if (needsHandling) {
-                return doReceiver(mc, reqData);
+        try {
+            if (deployment.equals(CLIENT_DEPLOYMENT) ^ isRequestMessage) {
+                if (needsHandling) {
+                    return doReceiver(mc, reqData, isRequestMessage);
+                }
+            } else {
+                if (needsHandling) {
+                    return doSender(mc, reqData, isRequestMessage);
+                }
             }
-        } else {
-            if (needsHandling) {
-                return doSender(mc, reqData);
-            }
+        } finally {
+            reqData.clear();
+            reqData = null;
         }
         return true;
     }
@@ -168,7 +172,7 @@ public class WSS4JHandler extends WSHandler implements Handler {
     /**
      * Handles incoming web service requests and outgoing responses
      */
-    public boolean doSender(MessageContext mc, RequestData reqData) throws WSSecurityException {
+    public boolean doSender(MessageContext mc, RequestData reqData, boolean isRequest) throws WSSecurityException {
 
         reqData.getSignatureParts().removeAllElements();
         reqData.getEncryptParts().removeAllElements();
@@ -255,8 +259,8 @@ public class WSS4JHandler extends WSHandler implements Handler {
             log.debug("WSS4JHandler: orginal SOAP request: ");
             log.debug(org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc));
         }
-        doSenderAction(doAction, doc, reqData, actions);
-
+        doSenderAction(doAction, doc, reqData, actions, isRequest);
+ 
         /*
         * If required convert the resulting document into a message first. The
         * outputDOM() method performs the necessary c14n call. After that we
@@ -307,7 +311,7 @@ public class WSS4JHandler extends WSHandler implements Handler {
      * @return
      * @throws WSSecurityException
      */
-    public boolean doReceiver(MessageContext mc, RequestData reqData) throws WSSecurityException {
+    public boolean doReceiver(MessageContext mc, RequestData reqData, boolean isRequest) throws WSSecurityException {
 
         Vector actions = new Vector();
         String action = (String) getOption(WSHandlerConstants.RECEIVE + '.' + WSHandlerConstants.ACTION);
@@ -359,14 +363,7 @@ public class WSS4JHandler extends WSHandler implements Handler {
         * Get and check the Signature specific parameters first because they
         * may be used for encryption too.
         */
-
-        if ((doAction & WSConstants.SIGN) == WSConstants.SIGN) {
-            decodeSignatureParameter2(reqData);
-        }
-
-        if ((doAction & WSConstants.ENCR) == WSConstants.ENCR) {
-            decodeDecryptionParameter(reqData);
-        }
+        doReceiverAction(doAction, reqData);
 
         Vector wsResult = null;
         try {
@@ -387,6 +384,9 @@ public class WSS4JHandler extends WSHandler implements Handler {
             } else {
                 throw new JAXRPCException("WSS4JHandler: Request does not contain required Security header");
             }
+        }
+        if (reqData.getWssConfig().isEnableSignatureConfirmation() && !isRequest) {
+            checkSignatureConfirmation(reqData, wsResult);
         }
 
         /*
@@ -545,6 +545,10 @@ public class WSS4JHandler extends WSHandler implements Handler {
 
     public Object getProperty(Object msgContext, String key) {
         return ((MessageContext)msgContext).getProperty(key);
+    }
+
+    public void setProperty(Object msgContext, String key, Object value) {
+        ((MessageContext)msgContext).setProperty(key, value);
     }
 
     public String getPassword(Object msgContext) {

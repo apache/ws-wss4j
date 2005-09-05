@@ -22,7 +22,6 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDocInfo;
 import org.apache.ws.security.WSDocInfoStore;
-import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.message.token.SecurityTokenReference;
 import org.apache.ws.security.message.token.X509Security;
 import org.apache.ws.security.util.WSSecurityUtil;
@@ -196,8 +195,7 @@ public class STRTransform extends TransformSpi {
             /*
              * Third and forth step are performed by derefenceSTR()
              */
-            SecurityTokenReference secRef = new SecurityTokenReference(
-                WSSConfig.getDefaultWSConfig(), tmpEl);
+            SecurityTokenReference secRef = new SecurityTokenReference(tmpEl);
 
             str = dereferenceSTR(thisDoc, secRef);
             /*
@@ -390,7 +388,7 @@ public class STRTransform extends TransformSpi {
                         prefix + ":BinarySecurityToken");
         WSSecurityUtil.setNamespace(elem, WSConstants.WSSE_NS, prefix);
         elem.setAttributeNS(WSConstants.XMLNS_NS, "xmlns", "");
-        elem.setAttributeNS(null, "ValueType", X509Security.getType(WSSConfig.getDefaultWSConfig()));
+        elem.setAttributeNS(null, "ValueType", X509Security.getType());
         Text certText = doc.createTextNode(Base64.encode(data, 0));  // no line wrap
         elem.appendChild(certText);
         return elem;

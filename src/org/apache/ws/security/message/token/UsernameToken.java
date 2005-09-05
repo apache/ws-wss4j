@@ -20,7 +20,6 @@ package org.apache.ws.security.message.token;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.util.DOM2Writer;
 import org.apache.ws.security.util.WSSecurityUtil;
@@ -52,7 +51,6 @@ import java.util.TimeZone;
 public class UsernameToken {
     private static Log log = LogFactory.getLog(UsernameToken.class.getName());
 
-    public QName token;
     public static final String PASSWORD_TYPE = "passwordType";
 
     protected Element element = null;
@@ -63,9 +61,8 @@ public class UsernameToken {
     protected String passwordType = null;
     protected boolean hashed = true;
     private static SecureRandom random = null;
-    protected WSSConfig wssConfig = WSSConfig.getDefaultWSConfig();
     
-    public static String TOKEN = "UsernameToken";
+    protected static final QName token = new QName(WSConstants.WSSE_NS, WSConstants.USERNAME_TOKEN_LN);
 
     static {
         try {
@@ -84,30 +81,23 @@ public class UsernameToken {
      *                  contains the UsernameToken data
      * @throws WSSecurityException
      */
-    public UsernameToken(WSSConfig wssConfig, Element elem) throws WSSecurityException {
+    public UsernameToken(Element elem) throws WSSecurityException {
         this.element = elem;
-        this.wssConfig = wssConfig;
-        token = new QName(wssConfig.getWsseNS(), TOKEN);
         QName el = new QName(this.element.getNamespaceURI(), this.element.getLocalName());
         if (!el.equals(token)) {
             throw new WSSecurityException(WSSecurityException.INVALID_SECURITY_TOKEN, "badTokenType00", new Object[]{el});
         }
-        if (wssConfig.getProcessNonCompliantMessages()) {
-            elementUsername = (Element) WSSecurityUtil.getDirectChildWSSE(element, "Username");
-            elementPassword = (Element) WSSecurityUtil.getDirectChildWSSE(element, "Password");
-            elementNonce = (Element) WSSecurityUtil.getDirectChildWSSE(element, "Nonce");
-            elementCreated = (Element) WSSecurityUtil.getDirectChildWSU(element, "Created");
-        } else {
-            elementUsername = (Element) WSSecurityUtil.getDirectChild(element, "Username", wssConfig.getWsseNS());
-            elementPassword = (Element) WSSecurityUtil.getDirectChild(element, "Password", wssConfig.getWsseNS());
-            elementNonce = (Element) WSSecurityUtil.getDirectChild(element, "Nonce", wssConfig.getWsseNS());
-            elementCreated = (Element) WSSecurityUtil.getDirectChild(element, "Created", wssConfig.getWsuNS());
-        }
+        elementUsername = (Element) WSSecurityUtil.getDirectChild(element, "Username", WSConstants.WSSE_NS);
+        elementPassword = (Element) WSSecurityUtil.getDirectChild(element, "Password", WSConstants.WSSE_NS);
+        elementNonce = (Element) WSSecurityUtil.getDirectChild(element, "Nonce", WSConstants.WSSE_NS);
+        elementCreated = (Element) WSSecurityUtil.getDirectChild(element, "Created", WSConstants.WSU_NS);
         if (elementUsername == null) {
             throw new WSSecurityException(WSSecurityException.INVALID_SECURITY_TOKEN, "badTokenType01", new Object[]{el});
         }
         hashed = false;
-        passwordType = elementPassword.getAttribute("Type");
+        if (elementPassword != null) {
+            passwordType = elementPassword.getAttribute("Type");
+        }
         if (passwordType != null && passwordType.equals(WSConstants.PASSWORD_DIGEST)) {
             hashed = true;
             if (elementNonce == null || elementCreated == null) {
@@ -126,8 +116,8 @@ public class UsernameToken {
      * @param wssConfig Configuration options for processing and building the <code>wsse:Security</code> header
      * @param doc       the SOAP envelope as <code>Document</code>
      */
-    public UsernameToken(WSSConfig wssConfig, Document doc) {
-        this(wssConfig, doc, WSConstants.PASSWORD_DIGEST);
+    public UsernameToken(boolean milliseconds, Document doc) {
+        this(milliseconds, doc, WSConstants.PASSWORD_DIGEST);
     }
 
     /**
@@ -141,18 +131,17 @@ public class UsernameToken {
      *                     {@link WSConstants#PASSWORD_DIGEST} or
      *                     {@link WSConstants#PASSWORD_TEXT}
      */
-    public UsernameToken(WSSConfig wssConfig, Document doc, String pwType) {
-        this.wssConfig = wssConfig;
-        this.element = doc.createElementNS(wssConfig.getWsseNS(), "wsse:" + WSConstants.USERNAME_TOKEN_LN);
-        WSSecurityUtil.setNamespace(this.element, wssConfig.getWsseNS(), WSConstants.WSSE_PREFIX);
+    public UsernameToken(boolean milliseconds, Document doc, String pwType) {
+        this.element = doc.createElementNS(WSConstants.WSSE_NS, "wsse:" + WSConstants.USERNAME_TOKEN_LN);
+        WSSecurityUtil.setNamespace(this.element, WSConstants.WSSE_NS, WSConstants.WSSE_PREFIX);
 
-        this.elementUsername = doc.createElementNS(wssConfig.getWsseNS(), "wsse:" + WSConstants.USERNAME_LN);
-        WSSecurityUtil.setNamespace(this.elementUsername, wssConfig.getWsseNS(), WSConstants.WSSE_PREFIX);
+        this.elementUsername = doc.createElementNS(WSConstants.WSSE_NS, "wsse:" + WSConstants.USERNAME_LN);
+        WSSecurityUtil.setNamespace(this.elementUsername, WSConstants.WSSE_NS, WSConstants.WSSE_PREFIX);
         this.elementUsername.appendChild(doc.createTextNode(""));
         element.appendChild(elementUsername);
 
-        this.elementPassword = doc.createElementNS(wssConfig.getWsseNS(), "wsse:" + WSConstants.PASSWORD_LN);
-        WSSecurityUtil.setNamespace(this.elementPassword, wssConfig.getWsseNS(), WSConstants.WSSE_PREFIX);
+        this.elementPassword = doc.createElementNS(WSConstants.WSSE_NS, "wsse:" + WSConstants.PASSWORD_LN);
+        WSSecurityUtil.setNamespace(this.elementPassword, WSConstants.WSSE_NS, WSConstants.WSSE_PREFIX);
         this.elementPassword.appendChild(doc.createTextNode(""));
         element.appendChild(elementPassword);
 
@@ -161,7 +150,7 @@ public class UsernameToken {
         if (passwordType != null && passwordType.equals(WSConstants.PASSWORD_DIGEST)) {
             hashed = true;
             addNonce(doc);
-            addCreated(doc);
+            addCreated(milliseconds, doc);
         }
     }
 
@@ -174,8 +163,8 @@ public class UsernameToken {
         }
         byte[] nonceValue = new byte[16];
         random.nextBytes(nonceValue);
-        this.elementNonce = doc.createElementNS(wssConfig.getWsseNS(), "wsse:" + WSConstants.NONCE_LN);
-        WSSecurityUtil.setNamespace(this.elementNonce, wssConfig.getWsseNS(), WSConstants.WSSE_PREFIX);
+        this.elementNonce = doc.createElementNS(WSConstants.WSSE_NS, "wsse:" + WSConstants.NONCE_LN);
+        WSSecurityUtil.setNamespace(this.elementNonce, WSConstants.WSSE_NS, WSConstants.WSSE_PREFIX);
         this.elementNonce.appendChild(doc.createTextNode(Base64.encode(nonceValue)));
         element.appendChild(elementNonce);
     }
@@ -183,12 +172,12 @@ public class UsernameToken {
     /**
      * Creates and adds a Created element to this UsernameToken
      */
-    public void addCreated(Document doc) {
+    public void addCreated(boolean milliseconds, Document doc) {
         if (elementCreated != null) {
             return;
         }
         DateFormat zulu = null;
-        if (wssConfig.isPrecisionInMilliSeconds()) {
+        if (milliseconds) {
         	zulu = new XmlSchemaDateFormat();
         }
         else {
@@ -196,8 +185,8 @@ public class UsernameToken {
         	zulu.setTimeZone(TimeZone.getTimeZone("UTC"));
         }
         Calendar rightNow = Calendar.getInstance();
-        this.elementCreated = doc.createElementNS(wssConfig.getWsuNS(), "wsu:" + WSConstants.CREATED_LN);
-        WSSecurityUtil.setNamespace(this.elementCreated, wssConfig.getWsuNS(), WSConstants.WSU_PREFIX);
+        this.elementCreated = doc.createElementNS(WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + WSConstants.CREATED_LN);
+        WSSecurityUtil.setNamespace(this.elementCreated, WSConstants.WSU_NS, WSConstants.WSU_PREFIX);
         this.elementCreated.appendChild(doc.createTextNode(zulu.format(rightNow.getTime())));
         element.appendChild(elementCreated);
     }
@@ -398,11 +387,7 @@ public class UsernameToken {
      *         username token
      */
     public String getID() {
-        if (wssConfig.getProcessNonCompliantMessages()) {
-            return WSSecurityUtil.getAttributeValueWSU(element, "Id", null);
-        } else {
-            return WSSecurityUtil.getAttributeValueWSU(element, "Id", wssConfig.getWsuNS());
-        }
+        return this.element.getAttributeNS(WSConstants.WSU_NS, "Id");
     }
 
     /**
@@ -412,9 +397,9 @@ public class UsernameToken {
      *           username token
      */
     public void setID(String id) {
-		String prefix = WSSecurityUtil.setNamespace(this.element, wssConfig
-				.getWsuNS(), WSConstants.WSU_PREFIX);
-		this.element.setAttributeNS(wssConfig.getWsuNS(), prefix + ":Id", id);
+        String prefix = WSSecurityUtil.setNamespace(this.element,
+                WSConstants.WSU_NS, WSConstants.WSU_PREFIX);
+        this.element.setAttributeNS(WSConstants.WSU_NS, prefix + ":Id", id);
     }
 
     /**

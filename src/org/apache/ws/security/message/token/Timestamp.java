@@ -18,7 +18,6 @@
 package org.apache.ws.security.message.token;
 
 import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.util.DOM2Writer;
 import org.apache.ws.security.util.WSSecurityUtil;
@@ -53,8 +52,6 @@ public class Timestamp {
     protected Calendar created;
     protected Calendar expires;
     
-    protected WSSConfig wssConfig = WSSConfig.getDefaultWSConfig();
-
     /**
      * Constructs a <code>Timestamp</code> object and parses the
      * <code>wsu:Timestamp</code> element to initialize it.
@@ -62,7 +59,7 @@ public class Timestamp {
      * @param elem the <code>wsu:Timestamp</code> element that
      *             contains the timestamp data
      */
-    public Timestamp(WSSConfig wssConfig, Element element) throws WSSecurityException {
+    public Timestamp(Element element) throws WSSecurityException {
 
         customElements = new Vector();
 
@@ -77,10 +74,10 @@ public class Timestamp {
              currentChild = currentChild.getNextSibling()) {
             if (currentChild instanceof Element) {
                 if (WSConstants.CREATED_LN.equals(currentChild.getLocalName()) &&
-                        wssConfig.getWsuNS().equals(currentChild.getNamespaceURI())) {
+                        WSConstants.WSU_NS.equals(currentChild.getNamespaceURI())) {
                     strCreated = ((Text) ((Element) currentChild).getFirstChild()).getData();
                 } else if (WSConstants.EXPIRES_LN.equals(currentChild.getLocalName()) &&
-                        wssConfig.getWsuNS().equals(currentChild.getNamespaceURI())) {
+                        WSConstants.WSU_NS.equals(currentChild.getNamespaceURI())) {
                     strExpires = ((Text) ((Element) currentChild).getFirstChild()).getData();
                 } else {
                     customElements.add((Element) currentChild);
@@ -108,21 +105,21 @@ public class Timestamp {
      * @param doc the SOAP envelope as <code>Document</code>
      * @param ttl the time to live (validity of the security semantics) in seconds
      */
-    public Timestamp(WSSConfig wssConfig, Document doc, int ttl) {
+    public Timestamp(boolean milliseconds, Document doc, int ttl) {
 
         customElements = new Vector();
 
         element =
-                doc.createElementNS(wssConfig.getWsuNS(),
+                doc.createElementNS(WSConstants.WSU_NS,
                         WSConstants.WSU_PREFIX
                 + ":"
                 + WSConstants.TIMESTAMP_TOKEN_LN);
         WSSecurityUtil.setNamespace(element,
-                wssConfig.getWsuNS(),
+                WSConstants.WSU_NS,
                 WSConstants.WSU_PREFIX);
 
         DateFormat zulu = null;
-        if (wssConfig.isPrecisionInMilliSeconds()) {
+        if (milliseconds) {
         	zulu = new XmlSchemaDateFormat();
         }
         else {
@@ -132,10 +129,10 @@ public class Timestamp {
         Calendar rightNow = Calendar.getInstance();
 
         elementCreated =
-                doc.createElementNS(wssConfig.getWsuNS(),
+                doc.createElementNS(WSConstants.WSU_NS,
                         WSConstants.WSU_PREFIX + ":" + WSConstants.CREATED_LN);
         WSSecurityUtil.setNamespace(elementCreated,
-                wssConfig.getWsuNS(),
+                WSConstants.WSU_NS,
                 WSConstants.WSU_PREFIX);
         elementCreated.appendChild(doc.createTextNode(zulu.format(rightNow.getTime())));
         element.appendChild(elementCreated);
@@ -145,10 +142,10 @@ public class Timestamp {
             rightNow.setTime(new Date(currentTime));
 
             elementExpires =
-                    doc.createElementNS(wssConfig.getWsuNS(),
+                    doc.createElementNS(WSConstants.WSU_NS,
                             WSConstants.WSU_PREFIX + ":" + WSConstants.EXPIRES_LN);
             WSSecurityUtil.setNamespace(elementExpires,
-                    wssConfig.getWsuNS(),
+                    WSConstants.WSU_NS,
                     WSConstants.WSU_PREFIX);
             elementExpires.appendChild(doc.createTextNode(zulu.format(rightNow.getTime())));
             element.appendChild(elementExpires);
@@ -215,9 +212,9 @@ public class Timestamp {
      * @param id
      */
     public void setID(String id) {
-		String prefix = WSSecurityUtil.setNamespace(this.element, wssConfig
-				.getWsuNS(), WSConstants.WSU_PREFIX);
-		this.element.setAttributeNS(wssConfig.getWsuNS(), prefix + ":Id", id);
+        String prefix = WSSecurityUtil.setNamespace(this.element,
+                WSConstants.WSU_NS, WSConstants.WSU_PREFIX);
+        this.element.setAttributeNS(WSConstants.WSU_NS, prefix + ":Id", id);
     }
     
     /**
@@ -225,11 +222,7 @@ public class Timestamp {
      * @return
      */
     public String getID() {
-        if (wssConfig.getProcessNonCompliantMessages()) {
-            return WSSecurityUtil.getAttributeValueWSU(element, "Id", null);
-        } else {
-            return WSSecurityUtil.getAttributeValueWSU(element, "Id", wssConfig.getWsuNS());
-        }
+        return this.element.getAttributeNS(WSConstants.WSU_NS, "Id");
     }
     
 }

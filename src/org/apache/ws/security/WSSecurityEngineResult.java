@@ -35,6 +35,7 @@ public class WSSecurityEngineResult {
     private SAMLAssertion assertion;
     private Timestamp timestamp;
     private Vector signedElementQnames;
+    private byte[] signatureValue = null;
 
     WSSecurityEngineResult(int act, SAMLAssertion ass) {
         principal = null;
@@ -43,11 +44,13 @@ public class WSSecurityEngineResult {
         assertion = ass;
     }
 
-    WSSecurityEngineResult(int act, Principal princ, X509Certificate certificate, Vector elemQnames) {
+    WSSecurityEngineResult(int act, Principal princ,
+            X509Certificate certificate, Vector elemQnames, byte[] sv) {
         principal = princ;
         action = act;
         cert = certificate;
         signedElementQnames = elemQnames;
+        signatureValue = sv;
     }
 
     WSSecurityEngineResult(int act,
@@ -100,4 +103,12 @@ public class WSSecurityEngineResult {
     public Vector getSignedElementQnames() {
         return signedElementQnames;
     }
+
+    /**
+     * @return Returns the signatureValue.
+     */
+    public byte[] getSignatureValue() {
+        return signatureValue;
+    }
+    
 }

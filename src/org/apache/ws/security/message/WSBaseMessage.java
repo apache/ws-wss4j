@@ -20,8 +20,8 @@ package org.apache.ws.security.message;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.SOAPConstants;
-import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSConfig;
+import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -33,7 +33,7 @@ import java.util.Vector;
  * It provides common functions and fields used by the specific message
  * classes such as sign, encrypt, and username token.
  *
- * @author Werner Dittmann (Werner.Dittmann@siemens.com)
+ * @author Werner Dittmann (Werner.Dittmann@t-online.de)
  */
 public class WSBaseMessage {
     private static Log log = LogFactory.getLog(WSBaseMessage.class.getName());
@@ -44,9 +44,11 @@ public class WSBaseMessage {
     protected int keyIdentifierType = WSConstants.ISSUER_SERIAL;
     protected Vector parts = null;
     protected int timeToLive = 300; // time between Created and Expires
+    
+    protected boolean doDebug = false;
+    
     protected WSSConfig wssConfig = WSSConfig.getDefaultWSConfig();
 
-    protected boolean doDebug = false;
 
     /**
      * Constructor.
@@ -72,19 +74,6 @@ public class WSBaseMessage {
      * @param mu    Set <code>mustUnderstand</code> to true or false
      */
     public WSBaseMessage(String actor, boolean mu) {
-        this(WSSConfig.getDefaultWSConfig(), actor, mu);
-    }
-
-    /**
-     * Constructor.
-     * <p/>
-     *
-     * @param wssConfig configuration options for processing and building security headers
-     * @param actor     The actor name of the <code>wsse:Security</code> header
-     * @param mu        Set <code>mustUnderstand</code> to true or false
-     */
-    public WSBaseMessage(WSSConfig wssConfig, String actor, boolean mu) {
-        this.wssConfig = wssConfig;
         setActor(actor);
         setMustUnderstand(mu);
     }
@@ -163,6 +152,13 @@ public class WSBaseMessage {
     }
 
     /**
+     * @param wsConfig The wsConfig to set.
+     */
+    public void setWsConfig(WSSConfig wsConfig) {
+        this.wssConfig = wsConfig;
+    }
+
+    /**
      * Looks up or adds a body id.
      * <p/>
      * First try to locate the <code>wsu:Id</code> in the SOAP body element.
@@ -190,30 +186,15 @@ public class WSBaseMessage {
 
     protected String setWsuId(Element bodyElement) {
         String id = null;
-        // try to get a differently qualified Id in case it was created with
-        // an older spec namespace
-        if (wssConfig.getProcessNonCompliantMessages()) {
-            id = WSSecurityUtil.getAttributeValueWSU(bodyElement, "Id", null);
-        }
-        if (wssConfig.getProcessNonCompliantMessages() ||
-                !wssConfig.isTargetIdQualified()) {
-            if ((id == null) || (id.length() == 0)) {
-                id = bodyElement.getAttribute("Id");
-            }
-        } else {
-            id = bodyElement.getAttributeNS(wssConfig.getWsuNS(), "Id");
-        }
+        id = bodyElement.getAttributeNS(WSConstants.WSU_NS, "Id");
+
         if ((id == null) || (id.length() == 0)) {
             id = "id-" + Integer.toString(bodyElement.hashCode());
-            if (wssConfig.isTargetIdQualified()) {
-                String prefix =
-                        WSSecurityUtil.setNamespace(bodyElement,
-                                wssConfig.getWsuNS(),
-                                WSConstants.WSU_PREFIX);
-                bodyElement.setAttributeNS(wssConfig.getWsuNS(), prefix + ":Id", id);
-            } else {
-                bodyElement.setAttributeNS(null, "Id", id);
-            }
+            String prefix =
+                WSSecurityUtil.setNamespace(bodyElement,
+                        WSConstants.WSU_NS,
+                        WSConstants.WSU_PREFIX);
+            bodyElement.setAttributeNS(WSConstants.WSU_NS, prefix + ":Id", id);
         }
         return id;
     }
@@ -248,11 +229,10 @@ public class WSBaseMessage {
                 WSSecurityUtil.getSOAPConstants(doc.getDocumentElement());
         // lookup a security header block that matches actor
         Element securityHeader =
-                WSSecurityUtil.getSecurityHeader(wssConfig, doc, actor, soapConstants);
+                WSSecurityUtil.getSecurityHeader(doc, actor, soapConstants);
         if (securityHeader == null) { // create if nothing found
             securityHeader =
-                    WSSecurityUtil.findWsseSecurityHeaderBlock(wssConfig,
-                            doc,
+                    WSSecurityUtil.findWsseSecurityHeaderBlock(doc,
                             doc.getDocumentElement(),
                             actor,
                             true);
