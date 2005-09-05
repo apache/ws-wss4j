@@ -176,6 +176,10 @@ public abstract class WSDoAllHandler extends WSHandler implements Handler {
     public Object getProperty(Object msgContext, String key) {
         return ((MessageContext)msgContext).getProperty(key);
     }
+    
+    public void setProperty(Object msgContext, String key, Object value) {
+        ((MessageContext)msgContext).setProperty(key, value);
+    }
 
     public String getPassword(Object msgContext) {
         return ((MessageContext)msgContext).getPassword();

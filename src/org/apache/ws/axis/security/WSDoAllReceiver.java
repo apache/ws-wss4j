@@ -1,5 +1,5 @@
 /*
-* Copyright  2003-2004 The Apache Software Foundation.
+* Copyright  2003-2005 The Apache Software Foundation.
 *
 *  Licensed under the Apache License, Version 2.0 (the "License");
 *  you may not use this file except in compliance with the License.
@@ -65,7 +65,7 @@ public class WSDoAllReceiver extends WSDoAllHandler {
      */
     public void invoke(MessageContext msgContext) throws AxisFault {
 
-    	doDebug = log.isDebugEnabled();
+    	boolean doDebug = log.isDebugEnabled();
 
         if (doDebug) {
             log.debug("WSDoAllReceiver: enter invoke() with msg type: "
@@ -142,14 +142,7 @@ public class WSDoAllReceiver extends WSDoAllHandler {
             * Get and check the Signature specific parameters first because
             * they may be used for encryption too.
             */
-
-            if ((doAction & WSConstants.SIGN) == WSConstants.SIGN) {
-                decodeSignatureParameter2(reqData);
-            }
-
-            if ((doAction & WSConstants.ENCR) == WSConstants.ENCR) {
-                decodeDecryptionParameter(reqData);
-            }
+            doReceiverAction(doAction, reqData);
 
             Vector wsResult = null;
             try {
@@ -169,6 +162,9 @@ public class WSDoAllReceiver extends WSDoAllHandler {
                 }
             }
 
+            if (reqData.getWssConfig().isEnableSignatureConfirmation() && msgContext.getPastPivot()) {
+                checkSignatureConfirmation(reqData, wsResult);
+            }
             /*
             * save the processed-header flags
             */
