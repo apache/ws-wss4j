@@ -41,7 +41,7 @@ import java.io.InputStream;
  * <p/>
  * 
  * @author Davanum Srinivas (dims@yahoo.com)
- * @author Werner Dittmann (Werner.Dittmann@siemens.com)
+ * @author Werner Dittmann (Werner.Dittmann@t-online.de)
  */
 public class TestWSSecurity4 extends TestCase {
     private static Log log = LogFactory.getLog(TestWSSecurity4.class);

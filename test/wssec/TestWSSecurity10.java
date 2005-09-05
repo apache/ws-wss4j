@@ -175,11 +175,11 @@ public class TestWSSecurity10 extends TestCase implements CallbackHandler {
         usrEle.setAttribute("Id", idValue);
 
         //Step 3 ::
-        Reference ref = new Reference(WSSConfig.getDefaultWSConfig(), doc);
+        Reference ref = new Reference(doc);
         ref.setURI("#" + idValue);
         ref.setValueType("UsernameToken");
         SecurityTokenReference secRef =
-            new SecurityTokenReference(WSSConfig.getDefaultWSConfig(), doc);
+            new SecurityTokenReference(doc);
         secRef.setReference(ref);
 
         // adding the namespace
