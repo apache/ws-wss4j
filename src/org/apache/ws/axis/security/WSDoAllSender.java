@@ -51,7 +51,7 @@ public class WSDoAllSender extends WSDoAllHandler {
     public void invoke(MessageContext mc) throws AxisFault {
 
         doDebug = log.isDebugEnabled();
-        if (doDebug) {
+        if (doDebug && mc.getCurrentMessage() != null && mc.getCurrentMessage().getMessageType() != null) {
             log.debug("WSDoAllSender: enter invoke() with msg type: "
                     + mc.getCurrentMessage().getMessageType());
         }
