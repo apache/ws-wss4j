@@ -331,9 +331,12 @@ public class WSSignEnvelope extends WSBaseMessage {
 
         for (int part = 0; part < parts.size(); part++) {
             WSEncryptionPart encPart = (WSEncryptionPart) parts.get(part);
+            
+            String idToSign = encPart.getId();
+            
             String elemName = encPart.getName();
             String nmSpace = encPart.getNamespace();
-
+ 
             /*
              * Set up the elements to sign. There are two resevered element
              * names: "Token" and "STRTransform" "Token": Setup the Signature to
@@ -344,7 +347,20 @@ public class WSSignEnvelope extends WSBaseMessage {
              *
              */
             try {
-                if (elemName.equals("Token")) {
+                if (idToSign != null) {
+                    Element toSignById = WSSecurityUtil.getElementByWsuId(doc, "#"+idToSign);
+                    transforms = new Transforms(doc);
+                    transforms
+                            .addTransform(Transforms.TRANSFORM_C14N_EXCL_OMIT_COMMENTS);
+                    if (wssConfig.isWsiBSPCompliant()) {
+                        transforms.item(0).getElement().appendChild(
+                                new InclusiveNamespaces(doc,
+                                        getInclusivePrefixes(toSignById))
+                                        .getElement());
+                    }
+                    sig.addDocument("#" + idToSign, transforms);
+                }
+                else if (elemName.equals("Token")) {
                     transforms = new Transforms(doc);
                     transforms
                             .addTransform(Transforms.TRANSFORM_C14N_EXCL_OMIT_COMMENTS);

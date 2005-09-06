@@ -25,13 +25,20 @@ public class WSEncryptionPart {
     private String name;
     private String namespace;
     private String encModifier;
+    private String id;
 
     public WSEncryptionPart(String nm, String nmspace, String encMod) {
         name = nm;
         namespace = nmspace;
         encModifier = encMod;
+        id = null;
     }
 
+    public WSEncryptionPart(String id) {
+        this.id = id;
+        name = namespace = encModifier = null;
+    }
+    
     /**
      * @return the local name of the element to encrypt.
      */
@@ -51,5 +58,12 @@ public class WSEncryptionPart {
      */
     public String getEncModifier() {
         return encModifier;
+    }
+
+    /**
+     * @return Returns the id.
+     */
+    public String getId() {
+        return id;
     }
 }
