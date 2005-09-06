@@ -63,6 +63,7 @@ import java.util.Arrays;
  * @author Werner Dittmann (Werner.Dittmann@t-online.de).
  */
 public abstract class WSHandler {
+    protected static String DONE = "done";
     protected static Log log = LogFactory.getLog(WSHandler.class.getName());
     protected static final WSSecurityEngine secEngine = WSSecurityEngine.getInstance();
     protected static Hashtable cryptos = new Hashtable(5);
@@ -141,7 +142,7 @@ public abstract class WSHandler {
         /*
          * If after all the parsing no Signature parts defined, set here a
          * default set. This is necessary because we add SignatureConfirmation
-         * and therefore the defaul (Body) must be set here. The default setting
+         * and therefore the default (Body) must be set here. The default setting
          * in WSSignEnvelope doesn't work because the vector is not empty anymore.
          */
         if (reqData.getSignatureParts().isEmpty()) {
@@ -152,18 +153,22 @@ public abstract class WSHandler {
         }
         /*
          * If SignatureConfirmation is enabled and this is a reqsponse then
-         * insert SignatureCOnfrmation elements, note their ids in the signature
+         * insert SignatureCOnfrmation elements, note their wsu:id in the signature
          * parts. They will be signed automatically during a (probably) defined
          * SIGN action.
          */
         if (wssConfig.isEnableSignatureConfirmation() && !isRequest) {
-            Vector results = null;
-            if ((results = (Vector) getProperty(reqData.getMsgContext(),
-                    WSHandlerConstants.RECV_RESULTS)) != null) {
-                performSIGNConfirmation(mu, doc, reqData, results);
+            String done;
+            if ((done = (String) getProperty(reqData.getMsgContext(),
+                    WSHandlerConstants.SIG_CONF_DONE)) == null
+                    || !DONE.equals(done)) {
+                Vector results = null;
+                if ((results = (Vector) getProperty(reqData.getMsgContext(),
+                        WSHandlerConstants.RECV_RESULTS)) != null) {
+                    performSIGNConfirmation(mu, doc, reqData, results);
+                }
             }
         }
-
         /*
          * Here we have all necessary information to perform the requested
          * action(s).
@@ -508,14 +513,14 @@ public abstract class WSHandler {
             log.debug("Perform Signature confirmation");
         }
         /*
-         * loop over all results gathered by all handlers in the chain. For
-         * each handler result get the various actions. After that loop we
-         * have all signature results in the signatureActions vector
+         * loop over all results gathered by all handlers in the chain. For each
+         * handler result get the various actions. After that loop we have all
+         * signature results in the signatureActions vector
          */
         Vector signatureActions = new Vector();
         for (int i = 0; i < results.size(); i++) {
             WSHandlerResult wshResult = (WSHandlerResult) results.get(i);
-            
+
             WSSecurityUtil.fetchAllActionResults(wshResult.getResults(),
                     WSConstants.SIGN, signatureActions);
             WSSecurityUtil.fetchAllActionResults(wshResult.getResults(),
@@ -525,30 +530,32 @@ public abstract class WSHandler {
         }
         Vector signatureParts = reqData.getSignatureParts();
         // prepare a SignatureConfirmation token
-        WSAddSignatureConfirmation wsc = new WSAddSignatureConfirmation(reqData.getActor(), mu);
+        WSAddSignatureConfirmation wsc = new WSAddSignatureConfirmation(reqData
+                .getActor(), mu);
         int idHash = wsc.hashCode();
         if (signatureActions.size() > 0) {
             if (doDebug) {
-                log.debug("Signature Confirmation: number of Signature results: " + signatureActions.size());
+                log
+                        .debug("Signature Confirmation: number of Signature results: "
+                                + signatureActions.size());
             }
             for (int i = 0; i < signatureActions.size(); i++) {
-                WSSecurityEngineResult wsr = (WSSecurityEngineResult)signatureActions.get(i);
+                WSSecurityEngineResult wsr = (WSSecurityEngineResult) signatureActions
+                        .get(i);
                 byte[] sigVal = wsr.getSignatureValue();
-                if (sigVal != null) {
-                    String id = "sigcon-" + (idHash + i);
-                    wsc.setId(id);
-                    wsc.build(doc, sigVal);
-                    signatureParts.add(new WSEncryptionPart(id));
-                }
-                wsr.setSignatureValue(null);
+                String id = "sigcon-" + (idHash + i);
+                wsc.setId(id);
+                wsc.build(doc, sigVal);
+                signatureParts.add(new WSEncryptionPart(id));
             }
-        }
-        else {
+        } else {
             String id = "sigcon-" + idHash;
             wsc.setId(id);
             wsc.build(doc, null);
             signatureParts.add(new WSEncryptionPart(id));
         }
+        setProperty(reqData.getMsgContext(), WSHandlerConstants.SIG_CONF_DONE,
+                DONE);
     }
 
     protected void checkSignatureConfirmation(RequestData reqData,
@@ -586,7 +593,6 @@ public abstract class WSHandler {
                 for (int ii = 0; ii < sigv.size(); ii++) {
                     byte[] storedValue = (byte[])sigv.get(i);
                     if (Arrays.equals(sigVal, storedValue)) {
-                        log.debug("Check Signature confirmation: match  ");
                         found = true;
                         sigv.remove(ii);
                         break;
