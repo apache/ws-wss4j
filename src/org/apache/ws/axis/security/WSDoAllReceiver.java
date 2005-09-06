@@ -297,20 +297,11 @@ public class WSDoAllReceiver extends WSDoAllHandler {
             /*
             * now check the security actions: do they match, in right order?
             */
-            int resultActions = wsResult.size();
-            int size = actions.size();
-            if (size != resultActions) {
+            if (!checkReceiverResults(wsResult, actions)) {
                 throw new AxisFault(
-                        "WSDoAllReceiver: security processing failed (actions number mismatch)");
+                    "WSDoAllReceiver: security processing failed (actions mismatch)");                
+                
             }
-            for (int i = 0; i < size; i++) {
-                if (((Integer) actions.get(i)).intValue() != ((WSSecurityEngineResult) wsResult
-                        .get(i)).getAction()) {
-                    throw new AxisFault(
-                            "WSDoAllReceiver: security processing failed (actions mismatch)");
-                }
-            }
-
             /*
             * All ok up to this point. Now construct and setup the security
             * result structure. The service may fetch this and check it.
