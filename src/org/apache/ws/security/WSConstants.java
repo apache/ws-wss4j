@@ -84,6 +84,7 @@ public class WSConstants {
     public static final String NONCE_LN = "Nonce";
     public static final String CREATED_LN = "Created";
     public static final String EXPIRES_LN = "Expires";
+    public static final String SIGNATURE_CONFIRMATION_LN = "SignatureConfirmation"; 
 
     /*
      * The definitions for SAML
@@ -325,6 +326,7 @@ public class WSConstants {
 
     public static final int TS = 0x20; // insert Timestamp
     public static final int UT_SIGN = 0x40; // perform sinagture with UT secrect key
+    public static final int SC = 0x80;      // this is a SignatureConfirmation
 
     public static final int NO_SERIALIZE = 0x100;
     public static final int SERIALIZE = 0x200;

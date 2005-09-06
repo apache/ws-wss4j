@@ -729,6 +729,31 @@ public class WSSecurityUtil {
 
         return wsResult;
     }
+    /**
+     * Fetch the result of a given action from a given result vector <p/>
+     * 
+     * @param wsResultVector
+     *            The result vector to fetch an action from
+     * @param action
+     *            The action to fetch
+     * @param results where to store the found results data for the action 
+     * @return The result fetched from the result vector, null if the result
+     *         could not be found
+     */
+    public static Vector fetchAllActionResults(Vector wsResultVector,
+            int action, Vector results) {
+
+        // Find the parts of the security result that matches the given action
+        for (int i = 0; i < wsResultVector.size(); i++) {
+            // Check the result of every action whether it matches the given
+            // action
+            if (((WSSecurityEngineResult) wsResultVector.get(i)).getAction() == action) {
+                results.add(wsResultVector.get(i));
+            }
+        }
+        return results;
+    }
+
 
     static public int decodeAction(String action, Vector actions)
             throws WSSecurityException {

@@ -18,6 +18,7 @@
 package org.apache.ws.security;
 
 import org.apache.ws.security.message.token.Timestamp;
+import org.apache.ws.security.message.token.SignatureConfirmation;
 import org.opensaml.SAMLAssertion;
 
 import java.security.Principal;
@@ -25,7 +26,7 @@ import java.security.cert.X509Certificate;
 import java.util.Vector;
 
 /**
- * @author Werner Dittmann (Werner.Dittmann@siemens.com)
+ * @author Werner Dittmann (Werner.Dittmann@t-online.de)
  */
 public class WSSecurityEngineResult {
 
@@ -36,6 +37,7 @@ public class WSSecurityEngineResult {
     private Timestamp timestamp;
     private Vector signedElementQnames;
     private byte[] signatureValue = null;
+    private SignatureConfirmation sigConf = null;
 
     WSSecurityEngineResult(int act, SAMLAssertion ass) {
         principal = null;
@@ -53,12 +55,15 @@ public class WSSecurityEngineResult {
         signatureValue = sv;
     }
 
-    WSSecurityEngineResult(int act,
-                           Timestamp tstamp) {
+    WSSecurityEngineResult(int act, Timestamp tstamp) {
         action = act;
         timestamp = tstamp;
     }
 
+    WSSecurityEngineResult(int act, SignatureConfirmation sc) {
+        action = act;
+        sigConf = sc;
+    }
     /**
      * @return the actions vector. These actions were performed by the the
      *         security engine.
@@ -109,6 +114,20 @@ public class WSSecurityEngineResult {
      */
     public byte[] getSignatureValue() {
         return signatureValue;
+    }
+
+    /**
+     * @return Returns the sigConf.
+     */
+    public SignatureConfirmation getSigConf() {
+        return sigConf;
+    }
+
+    /**
+     * @param signatureValue The signatureValue to set.
+     */
+    public void setSignatureValue(byte[] signatureValue) {
+        this.signatureValue = signatureValue;
     }
     
 }

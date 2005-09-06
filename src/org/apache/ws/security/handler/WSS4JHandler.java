@@ -490,16 +490,8 @@ public class WSS4JHandler extends WSHandler implements Handler {
         /*
         * now check the security actions: do they match, in right order?
         */
-        int resultActions = wsResult.size();
-        int size = actions.size();
-        if (size != resultActions) {
-            throw new JAXRPCException("WSS4JHandler: security processing failed (actions number mismatch)");
-        }
-        for (int i = 0; i < size; i++) {
-            if (((Integer) actions.get(i)).intValue()
-                    != ((WSSecurityEngineResult) wsResult.get(i)).getAction()) {
-                throw new JAXRPCException("WSS4JHandler: security processing failed (actions mismatch)");
-            }
+        if (!checkReceiverResults(wsResult, actions)) {
+            throw new JAXRPCException("WSS4JHandler: security processing failed (actions mismatch)");
         }
 
         /*

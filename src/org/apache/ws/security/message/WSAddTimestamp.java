@@ -1,5 +1,5 @@
 /*
- * Copyright  2003-2004 The Apache Software Foundation.
+ * Copyright  2003-2005 The Apache Software Foundation.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -25,9 +25,9 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 /**
- * Builds a WS Timestamp and inserts it into the SOAP Envelope.
- * Refer to the WS specification 1.0. chapter 10 / appendix A.2
- *
+ * Builds a WS Timestamp and inserts it into the SOAP Envelope. Refer to the WS
+ * specification 1.0. chapter 10 / appendix A.2
+ * 
  * @author Christof Soehngen (Christof.Soehngen@syracom.de).
  */
 
@@ -35,7 +35,9 @@ public class WSAddTimestamp extends WSBaseMessage {
     private static Log log = LogFactory.getLog(WSAddTimestamp.class.getName());
 
     private Timestamp ts = null;
+
     private String id = null;
+
     /**
      * Constructor.
      */
@@ -43,21 +45,24 @@ public class WSAddTimestamp extends WSBaseMessage {
     }
 
     /**
-     * Constructor.
-     * <p/>
-     *
-     * @param actor the name of the actor of the <code>wsse:Security</code> header
+     * Constructor. <p/>
+     * 
+     * @param actor
+     *            the name of the actor of the <code>wsse:Security</code>
+     *            header
      */
     public WSAddTimestamp(String actor) {
         super(actor);
     }
 
     /**
-     * Constructor.
-     * <p/>
-     *
-     * @param actor The name of the actor of the <code>wsse:Security</code> header
-     * @param mu    Set <code>mustUnderstand</code> to true or false
+     * Constructor. <p/>
+     * 
+     * @param actor
+     *            The name of the actor of the <code>wsse:Security</code>
+     *            header
+     * @param mu
+     *            Set <code>mustUnderstand</code> to true or false
      */
     public WSAddTimestamp(String actor, boolean mu) {
         super(actor, mu);
@@ -65,12 +70,17 @@ public class WSAddTimestamp extends WSBaseMessage {
 
     /**
      * Adds a new <code>Timestamp</code> to a soap envelope.
-     * <p/>
-     * A complete <code>Timestamp</code> is constructed and added to
-     * the <code>wsse:Security</code> header.
-     *
-     * @param doc The SOAP enevlope as W3C document
-     * @param ttl This is the time difference in seconds between the <code>Created</code> and the <code>Expires</code> in <code>Timestamp</code>, set to zero if <code>Expires</code> should not be added.
+     * 
+     * A complete <code>Timestamp</code> is constructed and added to the
+     * <code>wsse:Security</code> header.
+     * 
+     * @param doc
+     *            The SOAP enevlope as W3C document
+     * @param ttl
+     *            This is the time difference in seconds between the
+     *            <code>Created</code> and the <code>Expires</code> in
+     *            <code>Timestamp</code>, set to zero if <code>Expires</code>
+     *            should not be added.
      * @return Document with Timestamp added
      * @throws Exception
      */
@@ -78,15 +88,17 @@ public class WSAddTimestamp extends WSBaseMessage {
         log.debug("Begin add timestamp...");
         Element securityHeader = insertSecurityHeader(doc);
         ts = new Timestamp(wssConfig.isPrecisionInMilliSeconds(), doc, ttl);
-        if(id != null) {
-        	ts.setID(id);
+        if (id != null) {
+            ts.setID(id);
         }
-        WSSecurityUtil.prependChildElement(doc, securityHeader, ts.getElement(), true);
+        WSSecurityUtil.prependChildElement(doc, securityHeader,
+                ts.getElement(), true);
         return doc;
     }
 
     /**
      * Set the wsu:Id value of the Timestamp
+     * 
      * @param id
      */
     public void setId(String id) {
@@ -94,9 +106,10 @@ public class WSAddTimestamp extends WSBaseMessage {
         if (ts != null)
             ts.setID(id);
     }
-    
+
     /**
      * Get the wsu:Id value of the Timestamp
+     * 
      * @return
      */
     public String getId() {

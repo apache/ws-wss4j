@@ -61,6 +61,8 @@ public class Timestamp {
      */
     public Timestamp(Element element) throws WSSecurityException {
 
+        this.element = element;
+        
         customElements = new Vector();
 
         String strCreated = "";

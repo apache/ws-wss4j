@@ -28,6 +28,7 @@ import org.apache.ws.security.message.token.SecurityTokenReference;
 import org.apache.ws.security.message.token.Timestamp;
 import org.apache.ws.security.message.token.UsernameToken;
 import org.apache.ws.security.message.token.X509Security;
+import org.apache.ws.security.message.token.SignatureConfirmation;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.ws.security.util.XmlSchemaDateFormat;
 import org.apache.xml.security.encryption.XMLCipher;
@@ -108,6 +109,10 @@ public class WSSecurityEngine {
      * <code>wsu:Timestamp</code> as defined by OASIS WS Security specification,
      */
     protected static final QName timeStamp = new QName(WSConstants.WSU_NS, WSConstants.TIMESTAMP_TOKEN_LN);
+    /**
+     * <code>wsse11:signatureConfirmation</code> as defined by OASIS WS Security specification,
+     */
+   protected static final QName signatureConfirmation = new QName(WSConstants.WSSE11_NS, WSConstants.SIGNATURE_CONFIRMATION_LN);
     /**
      * <code>ds:Signature</code> as defined by XML Signature specification,
      * enhanced by WS Security specification
@@ -297,7 +302,7 @@ public class WSSecurityEngine {
                 WSDocInfoStore.store(wsDocInfo);
                 X509Certificate[] returnCert = new X509Certificate[1];
                 Vector returnQname[] = new Vector[1];
-                byte signatureValue[] = null;
+                byte[][] signatureValue = new byte[1][];
                 try {
 					lastPrincipalFound = verifyXMLSignature((Element) elem,
 							sigCrypto, returnCert, returnQname, signatureValue);
@@ -309,12 +314,12 @@ public class WSSecurityEngine {
                 if (lastPrincipalFound instanceof WSUsernameTokenPrincipal) {
 					returnResults.add(0, new WSSecurityEngineResult(
 							WSConstants.UT_SIGN, lastPrincipalFound, null,
-							returnQname[0], signatureValue));
+							returnQname[0], signatureValue[0]));
 
 				} else {
 					returnResults.add(0, new WSSecurityEngineResult(
 							WSConstants.SIGN, lastPrincipalFound,
-							returnCert[0], returnQname[0], signatureValue));
+							returnCert[0], returnQname[0], signatureValue[0]));
 				}
             } else if (el.equals(ENCRYPTED_KEY)) {
                 if (doDebug) {
@@ -367,6 +372,17 @@ public class WSSecurityEngine {
                 returnResults.add(0,
                         new WSSecurityEngineResult(WSConstants.TS,
                                 timestamp));
+            } else if (el.equals(signatureConfirmation)) {
+                if (doDebug) {
+                    log.debug("Found SignatureConfirmation list element");
+                }
+                /*
+                 * Decode SignatureConfirmation, just store in result
+                 */
+                SignatureConfirmation sigConf = new SignatureConfirmation(
+                        (Element) elem);
+                returnResults.add(0, new WSSecurityEngineResult(WSConstants.SC,
+                        sigConf));
             } else {
                 /*
                  * Add check for a BinarySecurityToken, add info to WSDocInfo. If BST is
@@ -429,7 +445,7 @@ public class WSSecurityEngine {
                                            Crypto crypto,
                                            X509Certificate[] returnCert,
                                            Vector[] returnQname,
-                                           byte[] signatureValue)
+                                           byte[][] signatureValue)
             throws WSSecurityException {
         if (doDebug) {
             log.debug("Verify XML Signature");
@@ -556,7 +572,7 @@ public class WSSecurityEngine {
 							+ ", prepare-cert= " + (t1 - t0) + ", verify= "
 							+ (t2 - t1));
 				}
-                signatureValue = sig.getSignatureValue();
+                signatureValue[0] = sig.getSignatureValue();
 				/*
 				 * Now dig into the Signature element to get the elements that
 				 * this Signature covers. Build the QName of these Elements and

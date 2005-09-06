@@ -125,7 +125,8 @@ public class SecurityTokenReference {
 
     /**
      * Gets the signing token element, which maybe a <code>BinarySecurityToken
-     * </code> or a SAML token        .
+     * </code> or a SAML token.
+     * 
      * The method gets the URI attribute of the {@link Reference} contained in
      * the {@link SecurityTokenReference} and tries to find the referenced
      * Element in the document.
