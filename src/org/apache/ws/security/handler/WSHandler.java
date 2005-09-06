@@ -16,7 +16,6 @@
 */
 package org.apache.ws.security.handler;
 
-import org.apache.axis.AxisFault;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
@@ -82,139 +81,154 @@ public abstract class WSHandler {
      * @throws WSSecurityException
      */
     protected void doSenderAction(int doAction, Document doc,
-			RequestData reqData, Vector actions, boolean isRequest) throws WSSecurityException {
+            RequestData reqData, Vector actions, boolean isRequest)
+            throws WSSecurityException {
 
         boolean mu = decodeMustUnderstand(reqData);
-        
+
         WSSConfig wssConfig = WSSConfig.getNewInstance();
         wssConfig.setPrecisionInMilliSeconds(decodeTimestampPrecision(reqData));
         reqData.setWssConfig(wssConfig);
 
         String actor = null;
         if ((actor = (String) getOption(WSHandlerConstants.ACTOR)) == null) {
-            actor = (String)
-                    getProperty(reqData.getMsgContext(), WSHandlerConstants.ACTOR);
+            actor = (String) getProperty(reqData.getMsgContext(),
+                    WSHandlerConstants.ACTOR);
         }
         reqData.setActor(actor);
 
-		reqData.setSoapConstants(WSSecurityUtil.getSOAPConstants(doc
-				.getDocumentElement()));
-		/*
-		 * Here we have action, username, password, and actor, mustUnderstand.
-		 * Now get the action specific parameters.
-		 */
-		if ((doAction & WSConstants.UT) == WSConstants.UT) {
-			decodeUTParameter(reqData);
-		}
-		/*
-		 * Here we have action, username, password, and actor, mustUnderstand.
-		 * Now get the action specific parameters.
-		 */
-		if ((doAction & WSConstants.UT_SIGN) == WSConstants.UT_SIGN) {
-			decodeUTParameter(reqData);
-			decodeSignatureParameter(reqData);
-		}
-		/*
-		 * Get and check the Signature specific parameters first because they
-		 * may be used for encryption too.
-		 */
-		if ((doAction & WSConstants.SIGN) == WSConstants.SIGN) {
-			reqData.setSigCrypto(loadSignatureCrypto(reqData));
-			decodeSignatureParameter(reqData);
-		}
-		/*
-		 * If we need to handle signed SAML token then we need may of the
-		 * Signature parameters. The handle procedure loads the signature crypto
-		 * file on demand, thus don't do it here.
-		 */
-		if ((doAction & WSConstants.ST_SIGNED) == WSConstants.ST_SIGNED) {
-			decodeSignatureParameter(reqData);
-		}
-		/*
-		 * Set and check the encryption specific parameters, if necessary take
-		 * over signature parameters username and crypto instance.
-		 */
-		if ((doAction & WSConstants.ENCR) == WSConstants.ENCR) {
-			reqData.setEncCrypto(loadEncryptionCrypto(reqData));
-			decodeEncryptionParameter(reqData);
-		}
-		/*
-		 * Here we have all necessary information to perform the requested
-		 * action(s).
-		 */
-		for (int i = 0; i < actions.size(); i++) {
-
-			int actionToDo = ((Integer) actions.get(i)).intValue();
-			if (doDebug) {
-				log.debug("Performing Action: " + actionToDo);
-			}
-
-			switch (actionToDo) {
-			case WSConstants.UT:
-				performUTAction(actionToDo, mu, doc, reqData);
-				break;
-
-			case WSConstants.ENCR:
-				performENCRAction(actionToDo, mu, doc, reqData);
-				break;
-
-			case WSConstants.SIGN:
-				performSIGNAction(actionToDo, mu, doc, reqData);
-				break;
-
-			case WSConstants.ST_SIGNED:
-				performST_SIGNAction(actionToDo, mu, doc, reqData);
-				break;
-
-			case WSConstants.ST_UNSIGNED:
-				performSTAction(actionToDo, mu, doc, reqData);
-				break;
-
-			case WSConstants.TS:
-				performTSAction(actionToDo, mu, doc, reqData);
-				break;
-
-			case WSConstants.UT_SIGN:
-				performUT_SIGNAction(actionToDo, mu, doc, reqData);
-				break;
-
-			case WSConstants.NO_SERIALIZE:
-				reqData.setNoSerialization(true);
-				break;
-			}
-		}
-        if (wssConfig.isEnableSignatureConfirmation()) {
-            /*
-             * If this is a request then store all signature values. Add ours to
-             * already gathered values because of chained handlers, e.g. for
-             * other actors.
-             */
-            log.debug("Signature value handling, request is: " + isRequest);
-            if (isRequest) {
-                if (reqData.getSignatureValues().size() > 0) {
-                    Vector sigv = null;
-                    if ((sigv = (Vector) getProperty(reqData.getMsgContext(),
-                            WSHandlerConstants.SEND_SIGV)) == null) {
-                        sigv = new Vector();
-                        setProperty(reqData.getMsgContext(),
-                                WSHandlerConstants.SEND_SIGV, sigv);
-                    }
-//                    sigv.add(reqData.getSignatureValues());
-                    sigv.addAll(reqData.getSignatureValues());
-                }
-            } else {
-                /*
-                 * If we are going to send a response generate the Signature
-                 * confirmation elements
-                 */
-                Vector results = null;
-                if ((results = (Vector) getProperty(reqData.getMsgContext(),
-                        WSHandlerConstants.RECV_RESULTS)) != null) {
-                    performSIGNConfirmation(mu, doc, reqData, results);
-                }
+        reqData.setSoapConstants(WSSecurityUtil.getSOAPConstants(doc
+                .getDocumentElement()));
+        /*
+         * Here we have action, username, password, and actor, mustUnderstand.
+         * Now get the action specific parameters.
+         */
+        if ((doAction & WSConstants.UT) == WSConstants.UT) {
+            decodeUTParameter(reqData);
+        }
+        /*
+         * Here we have action, username, password, and actor, mustUnderstand.
+         * Now get the action specific parameters.
+         */
+        if ((doAction & WSConstants.UT_SIGN) == WSConstants.UT_SIGN) {
+            decodeUTParameter(reqData);
+            decodeSignatureParameter(reqData);
+        }
+        /*
+         * Get and check the Signature specific parameters first because they
+         * may be used for encryption too.
+         */
+        if ((doAction & WSConstants.SIGN) == WSConstants.SIGN) {
+            reqData.setSigCrypto(loadSignatureCrypto(reqData));
+            decodeSignatureParameter(reqData);
+        }
+        /*
+         * If we need to handle signed SAML token then we need may of the
+         * Signature parameters. The handle procedure loads the signature crypto
+         * file on demand, thus don't do it here.
+         */
+        if ((doAction & WSConstants.ST_SIGNED) == WSConstants.ST_SIGNED) {
+            decodeSignatureParameter(reqData);
+        }
+        /*
+         * Set and check the encryption specific parameters, if necessary take
+         * over signature parameters username and crypto instance.
+         */
+        if ((doAction & WSConstants.ENCR) == WSConstants.ENCR) {
+            reqData.setEncCrypto(loadEncryptionCrypto(reqData));
+            decodeEncryptionParameter(reqData);
+        }
+        /*
+         * If after all the parsing no Signature parts defined, set here a
+         * default set. This is necessary because we add SignatureConfirmation
+         * and therefore the defaul (Body) must be set here. The default setting
+         * in WSSignEnvelope doesn't work because the vector is not empty anymore.
+         */
+        if (reqData.getSignatureParts().isEmpty()) {
+            WSEncryptionPart encP = new WSEncryptionPart(reqData.getSoapConstants()
+                    .getBodyQName().getLocalPart(), reqData.getSoapConstants()
+                    .getEnvelopeURI(), "Content");
+            reqData.getSignatureParts().add(encP);
+        }
+        /*
+         * If SignatureConfirmation is enabled and this is a reqsponse then
+         * insert SignatureCOnfrmation elements, note their ids in the signature
+         * parts. They will be signed automatically during a (probably) defined
+         * SIGN action.
+         */
+        if (wssConfig.isEnableSignatureConfirmation() && !isRequest) {
+            Vector results = null;
+            if ((results = (Vector) getProperty(reqData.getMsgContext(),
+                    WSHandlerConstants.RECV_RESULTS)) != null) {
+                performSIGNConfirmation(mu, doc, reqData, results);
             }
         }
-	}
+
+        /*
+         * Here we have all necessary information to perform the requested
+         * action(s).
+         */
+        for (int i = 0; i < actions.size(); i++) {
+
+            int actionToDo = ((Integer) actions.get(i)).intValue();
+            if (doDebug) {
+                log.debug("Performing Action: " + actionToDo);
+            }
+
+            switch (actionToDo) {
+            case WSConstants.UT:
+                performUTAction(actionToDo, mu, doc, reqData);
+                break;
+
+            case WSConstants.ENCR:
+                performENCRAction(actionToDo, mu, doc, reqData);
+                break;
+
+            case WSConstants.SIGN:
+                performSIGNAction(actionToDo, mu, doc, reqData);
+                break;
+
+            case WSConstants.ST_SIGNED:
+                performST_SIGNAction(actionToDo, mu, doc, reqData);
+                break;
+
+            case WSConstants.ST_UNSIGNED:
+                performSTAction(actionToDo, mu, doc, reqData);
+                break;
+
+            case WSConstants.TS:
+                performTSAction(actionToDo, mu, doc, reqData);
+                break;
+
+            case WSConstants.UT_SIGN:
+                performUT_SIGNAction(actionToDo, mu, doc, reqData);
+                break;
+
+            case WSConstants.NO_SERIALIZE:
+                reqData.setNoSerialization(true);
+                break;
+            }
+        }
+        /*
+         * If this is a request then store all signature values. Add ours to
+         * already gathered values because of chained handlers, e.g. for
+         * other actors.
+         */
+
+        if (wssConfig.isEnableSignatureConfirmation() && isRequest) {
+            if (reqData.getSignatureValues().size() > 0) {
+                Vector sigv = null;
+                if ((sigv = (Vector) getProperty(reqData.getMsgContext(),
+                        WSHandlerConstants.SEND_SIGV)) == null) {
+                    sigv = new Vector();
+                    setProperty(reqData.getMsgContext(),
+                            WSHandlerConstants.SEND_SIGV, sigv);
+                }
+                // sigv.add(reqData.getSignatureValues());
+                sigv.addAll(reqData.getSignatureValues());
+            }
+        }
+    }
     
     protected void doReceiverAction(int doAction, RequestData reqData)
             throws WSSecurityException {
@@ -509,7 +523,8 @@ public abstract class WSHandler {
             WSSecurityUtil.fetchAllActionResults(wshResult.getResults(),
                     WSConstants.UT_SIGN, signatureActions);
         }
-        // prepage a SignatureConfirmation token
+        Vector signatureParts = reqData.getSignatureParts();
+        // prepare a SignatureConfirmation token
         WSAddSignatureConfirmation wsc = new WSAddSignatureConfirmation(reqData.getActor(), mu);
         int idHash = wsc.hashCode();
         if (signatureActions.size() > 0) {
@@ -520,15 +535,19 @@ public abstract class WSHandler {
                 WSSecurityEngineResult wsr = (WSSecurityEngineResult)signatureActions.get(i);
                 byte[] sigVal = wsr.getSignatureValue();
                 if (sigVal != null) {
-                    wsc.setId("sigcon-" + (idHash + i));
+                    String id = "sigcon-" + (idHash + i);
+                    wsc.setId(id);
                     wsc.build(doc, sigVal);
+                    signatureParts.add(new WSEncryptionPart(id));
                 }
                 wsr.setSignatureValue(null);
             }
         }
         else {
-            wsc.setId("sigcon-" + idHash);
+            String id = "sigcon-" + idHash;
+            wsc.setId(id);
             wsc.build(doc, null);
+            signatureParts.add(new WSEncryptionPart(id));
         }
     }
 
