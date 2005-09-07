@@ -213,7 +213,7 @@ public class ConversationClientHandler extends BasicHandler {
 
                 //				add the relavent SCT
                 Element securityHeader =
-                    WSSecurityUtil.findWsseSecurityHeaderBlock(WSSConfig.getDefaultWSConfig(),
+                    WSSecurityUtil.findWsseSecurityHeaderBlock(
                         doc,
                         doc.getDocumentElement(),
                         true);
@@ -595,7 +595,7 @@ public class ConversationClientHandler extends BasicHandler {
                         this.serverAlias);
 
                     Element secHeader =
-                        WSSecurityUtil.findWsseSecurityHeaderBlock(WSSConfig.getDefaultWSConfig(),
+                        WSSecurityUtil.findWsseSecurityHeaderBlock(
                             doc,
                             doc.getDocumentElement(),
                             true);

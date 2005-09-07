@@ -342,7 +342,7 @@ public class ConversationServerHandler extends BasicHandler {
             if(session.isAddBase2Message()){
                 //add the relavent SCT
                 Element securityHeader =
-                        WSSecurityUtil.findWsseSecurityHeaderBlock(WSSConfig.getDefaultWSConfig(),
+                        WSSecurityUtil.findWsseSecurityHeaderBlock(
                                 doc,
                                 doc.getDocumentElement(),
                                 true);
@@ -361,8 +361,8 @@ public class ConversationServerHandler extends BasicHandler {
                 if(session.getRef2Base()==null){
                     //do nothing
                 }else{
-                    stRef2Base = new SecurityTokenReference(WSSConfig.getDefaultWSConfig(),doc);
-                    Reference ref = new Reference(WSSConfig.getDefaultWSConfig(),doc);
+                    stRef2Base = new SecurityTokenReference(doc);
+                    Reference ref = new Reference(doc);
                     Reference oldRef = session.getRef2Base();
 
                     ref.setURI(oldRef.getURI());
@@ -561,7 +561,4 @@ public class ConversationServerHandler extends BasicHandler {
             encryptParts.add(encPart);
         }
     }
-
-
-
 }
