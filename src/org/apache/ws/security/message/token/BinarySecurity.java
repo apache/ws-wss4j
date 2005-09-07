@@ -71,7 +71,8 @@ public class BinarySecurity {
             QName el = new QName(this.element.getNamespaceURI(), this.element.getLocalName());
             throw new WSSecurityException(WSSecurityException.INVALID_SECURITY_TOKEN, "badTokenType", new Object[]{el});
         }
-        if (!getEncodingType().endsWith(BASE64_BINARY)) {
+        String encoding = getEncodingType();
+        if (encoding.length() > 0 && !encoding.endsWith(BASE64_BINARY)) {
             throw new WSSecurityException(WSSecurityException.INVALID_SECURITY_TOKEN, "badEncoding", new Object[]{getEncodingType()});
         }
     }
