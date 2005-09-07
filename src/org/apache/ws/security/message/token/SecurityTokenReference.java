@@ -284,7 +284,7 @@ public class SecurityTokenReference {
                 certs[0] = cert;
                 return certs;
             }
-        } else if (value.equals(SKI_URI)) {
+        } else if (SKI_URI.equals(value)) {
             String alias = getX509SKIAlias(crypto);
             if (alias != null) {
                 return crypto.getCertificates(alias);

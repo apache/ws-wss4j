@@ -54,7 +54,8 @@ public class BinarySecurity {
         if (!el.equals(TOKEN) && !el.equals(TOKEN_KI)) {
             throw new WSSecurityException(WSSecurityException.INVALID_SECURITY_TOKEN, "badTokenType", new Object[]{el});
         }
-        if (!getEncodingType().equals(BASE64_ENCODING)) {
+        String encoding = getEncodingType();
+        if (encoding.length() > 0 && !encoding.equals(BASE64_ENCODING)) {
             throw new WSSecurityException(WSSecurityException.INVALID_SECURITY_TOKEN, "badEncoding", new Object[]{getEncodingType()});
         }
     }
