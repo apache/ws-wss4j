@@ -334,6 +334,7 @@ org.apache.ws.axis.security.util
         <javac srcdir="${dir.src}" destdir="${build.classes}" debug="on">
             <classpath refid="classpath.library"/>
             <exclude name="**/Merlin.java" unless="jdk14.present"/>
+        	<exclude name="**/sandbox/**/*.java" />
         </javac>
         <!-- Copy Property files -->
         <copy todir="${build.classes}">
@@ -476,8 +477,8 @@ org.apache.ws.axis.security.util
             <arg value="client"/>
             <arg file="${build.work}/org/apache/ws/axis/oasis/ping/undeploy.wsdd"/>
         </java>
-        
-        <junit printsummary="yes"
+
+	    <junit printsummary="yes"
             haltonfailure="yes"
             fork="yes"
             dir="${basedir}">
