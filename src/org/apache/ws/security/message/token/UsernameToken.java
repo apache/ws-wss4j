@@ -62,7 +62,7 @@ public class UsernameToken {
     protected boolean hashed = true;
     private static SecureRandom random = null;
     
-    protected static final QName token = new QName(WSConstants.WSSE_NS, WSConstants.USERNAME_TOKEN_LN);
+    public static final QName TOKEN = new QName(WSConstants.WSSE_NS, WSConstants.USERNAME_TOKEN_LN);
 
     static {
         try {
@@ -84,7 +84,7 @@ public class UsernameToken {
     public UsernameToken(Element elem) throws WSSecurityException {
         this.element = elem;
         QName el = new QName(this.element.getNamespaceURI(), this.element.getLocalName());
-        if (!el.equals(token)) {
+        if (!el.equals(TOKEN)) {
             throw new WSSecurityException(WSSecurityException.INVALID_SECURITY_TOKEN, "badTokenType00", new Object[]{el});
         }
         elementUsername = (Element) WSSecurityUtil.getDirectChild(element, "Username", WSConstants.WSSE_NS);

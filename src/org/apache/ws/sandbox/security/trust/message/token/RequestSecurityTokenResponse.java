@@ -125,7 +125,7 @@ public class RequestSecurityTokenResponse extends AbstractToken {
      * @param doc
      */
     public void build(Document doc) {
-        Element securityHeader = WSSecurityUtil.findWsseSecurityHeaderBlock(WSSConfig.getDefaultWSConfig(), doc, doc.getDocumentElement(), true);
+        Element securityHeader = WSSecurityUtil.findWsseSecurityHeaderBlock(doc, doc.getDocumentElement(), true);
         WSSecurityUtil.appendChildElement(doc, securityHeader, this.element);
 
         if (log.isInfoEnabled()) {

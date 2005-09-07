@@ -91,7 +91,7 @@ public class STSUtil {
 			//If the first child is a binary token
 					
 			if((elemBaseChild.getLocalName().equals("BinarySecurityToken"))   ){
-				binarySecurity=new BinarySecurity(WSSConfig.getDefaultWSConfig(),elemBaseChild);
+				binarySecurity=new BinarySecurity(elemBaseChild);
 				return binarySecurity;
 			}else if((elemBaseChild.getLocalName().equals(SecurityTokenReference.SECURITY_TOKEN_REFERENCE) )  ){
 				return null;
@@ -122,7 +122,7 @@ public class STSUtil {
 		 //If the first child is a UNT
 					
 		  if((elemBaseChild.getLocalName().equals("UsernameToken"))   ){
-			  unt=new UsernameToken(WSSConfig.getDefaultWSConfig(),elemBaseChild);
+			  unt=new UsernameToken(elemBaseChild);
 			  return unt;
 		  }else{
 			  return null;
@@ -148,7 +148,7 @@ public class STSUtil {
 			Reference ref=secTokRef.getReference();
 			String uri=ref.getURI();		
 			//System.out.println("uri"+uri);
-			Element elemFound=WSSecurityUtil.getElementByWsuId(WSSConfig.getDefaultWSConfig(),doc,uri);
+			Element elemFound=WSSecurityUtil.getElementByWsuId(doc,uri);
 			doc.replaceChild(secTokRef.getElement(),elemFound);			
 		}			
 			  	

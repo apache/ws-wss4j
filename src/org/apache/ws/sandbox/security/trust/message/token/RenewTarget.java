@@ -106,7 +106,7 @@ public class RenewTarget extends CompositeElement {
 
         if(el.equals(secTokRef)) {
         	try {
-        	this.securityTokenReference = new SecurityTokenReference(WSSConfig.getDefaultWSConfig(), elem);
+        	this.securityTokenReference = new SecurityTokenReference(elem);
         	} catch (WSSecurityException ex) {
         		throw new WSTrustException(WSTrustException.INVALID_REQUEST, ex.getMessage());
         	}

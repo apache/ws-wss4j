@@ -143,7 +143,7 @@ public class DerivedKeyToken {
     public SecurityTokenReference getSecuityTokenReference() throws
             WSSecurityException {
         if (this.elementSecurityTokenReference != null) {
-            return new SecurityTokenReference(WSSConfig.getDefaultWSConfig(), this.elementSecurityTokenReference);
+            return new SecurityTokenReference(this.elementSecurityTokenReference);
         }
         return null;
     }

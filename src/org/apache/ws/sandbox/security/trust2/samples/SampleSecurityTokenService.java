@@ -64,7 +64,7 @@ public class SampleSecurityTokenService {
                         X509Certificate cert = (X509Certificate) cf.generateCertificate(inputStream);
 						
                         // Add the cert to a <BinarySecurityToken> element
-                        X509Security binaryToken = new X509Security(WSSConfig.getDefaultWSConfig(),doc);
+                        X509Security binaryToken = new X509Security(doc);
                         binaryToken.setX509Certificate(cert);
 						
                         // Set the <BinarySecurityToken> as the <RequestedToken> in our response
@@ -75,7 +75,7 @@ public class SampleSecurityTokenService {
                 } else if (TokenTypes.USERNAME.equals(tokenRequest.getTokenType())) {
                     // Create an arbitrary, fixed UsernameToken to return if the client requests one
                     // A real security token service would do something more intelligent
-                    UsernameToken userToken = new UsernameToken(WSSConfig.getDefaultWSConfig(),doc);
+                    UsernameToken userToken = new UsernameToken(WSSConfig.getDefaultWSConfig().isPrecisionInMilliSeconds(),doc);
                     userToken.setName("bob");
                     userToken.setPassword("bobspass");
 					

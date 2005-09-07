@@ -444,7 +444,6 @@ public class ConversationEngine {
         Element encBodyData = null;
         if ((encBodyData =
             WSSecurityUtil.getElementByWsuId(
-                WSSConfig.getDefaultWSConfig(),
                 doc,
                 dataRefURI))
             == null) {
@@ -475,11 +474,10 @@ public class ConversationEngine {
             (Element) WSSecurityUtil.findElement(
                 (Node) encBodyData,
                 "SecurityTokenReference",
-                WSSConfig.getDefaultWSConfig().getWsseNS()))
+                WSConstants.WSSE_NS))
             != null) {
             SecurityTokenReference secRef =
                 new SecurityTokenReference(
-                    WSSConfig.getDefaultWSConfig(),
                     tmpE);
 
             try {
@@ -560,7 +558,6 @@ public class ConversationEngine {
             	//Get hold of the DerivedKeyToken 'Element'
                 Element ele =
                     WSSecurityUtil.getElementByWsuId(
-                        WSSConfig.getDefaultWSConfig(),
                         secRef2DkToken.getElement().getOwnerDocument(),
                         ref.getURI());
                 if (ele == null) {
@@ -699,7 +696,7 @@ public class ConversationEngine {
                                   */
 
         sig.addResourceResolver(
-            EnvelopeIdResolver.getInstance(WSSConfig.getDefaultWSConfig()));
+            EnvelopeIdResolver.getInstance());
         KeyInfo info = sig.getKeyInfo();
         if (info == null) {
             throw new WSSecurityException(
@@ -710,7 +707,7 @@ public class ConversationEngine {
             WSSecurityUtil.getDirectChild(
                 info.getElement(),
                 SecurityTokenReference.SECURITY_TOKEN_REFERENCE,
-                wssConfig.getWsseNS());
+                WSConstants.WSSE_NS);
         if (node == null) {
             throw new WSSecurityException(
                 WSSecurityException.INVALID_SECURITY,
@@ -718,7 +715,6 @@ public class ConversationEngine {
         }
         SecurityTokenReference secRef =
             new SecurityTokenReference(
-                WSSConfig.getDefaultWSConfig(),
                 (Element) node);
         Document docSig = sig.getDocument();
         int docHash = docSig.hashCode();
@@ -944,7 +940,7 @@ public class ConversationEngine {
             //get the security header block
             //get the saml assertion
 
-            Element ele=WSSecurityUtil.findWsseSecurityHeaderBlock(WSSConfig.getDefaultWSConfig(), doc, doc.getDocumentElement(), false);
+            Element ele=WSSecurityUtil.findWsseSecurityHeaderBlock(doc, doc.getDocumentElement(), false);
             Element samEle =(Element)WSSecurityUtil.getDirectChild(ele, "Assertion", "urn:oasis:names:tc:SAML:1.0:assertion" );
 //            SAMLAssertion assertion = new SAMLAssertion(samEle);
 //

@@ -19,6 +19,7 @@ package org.apache.ws.sandbox.security.trust2;
 
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.message.token.X509Security;
+import org.apache.ws.security.message.token.PKIPathSecurity;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -41,8 +42,8 @@ public abstract class TokenTypes {
     static {
         try {
             USERNAME = new URI(WSConstants.USERNAMETOKEN_NS + "#" + WSConstants.USERNAME_TOKEN_LN);
-            X509 = new URI(WSConstants.X509TOKEN_NS + "#" + X509Security.X509_V3);
-            X509PKIPATH = new URI(x509prefix + "#X509PKIPathv1");
+            X509 = new URI(X509Security.getType());
+            X509PKIPATH = new URI(PKIPathSecurity.getType());
             PKCS7 = new URI(x509prefix + "#PKCS7");
         } catch (URISyntaxException e) {
         }

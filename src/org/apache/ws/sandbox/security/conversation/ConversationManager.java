@@ -91,10 +91,10 @@ public class ConversationManager {
          */
          
         // step 1 : Creating wsse:Reference to DerivedKeyToken
-        Reference ref = new Reference(WSSConfig.getDefaultWSConfig(), doc);
+        Reference ref = new Reference(doc);
         ref.setURI("#" + genID);
         ref.setValueType(ConversationConstants.TOKEN_TYPE_DERIVED_KEY_TOKEN);
-        SecurityTokenReference stRef = new SecurityTokenReference(WSSConfig.getDefaultWSConfig(), doc);
+        SecurityTokenReference stRef = new SecurityTokenReference(doc);
         stRef.setReference(ref);
 
         WSSecurityUtil.setNamespace(stRef.getElement(),
@@ -298,8 +298,7 @@ public class ConversationManager {
         Element envelope = doc.getDocumentElement();
         SOAPConstants soapConstants = WSSecurityUtil.getSOAPConstants(envelope);
         Element securityHeader =
-                WSSecurityUtil.findWsseSecurityHeaderBlock(WSSConfig.getDefaultWSConfig(),
-                        doc,
+                WSSecurityUtil.findWsseSecurityHeaderBlock(doc,
                         doc.getDocumentElement(),
                         true);
 
@@ -315,7 +314,7 @@ public class ConversationManager {
         String keyInfoUri = "KeyId-" + info.hashCode();
         info.setId(keyInfoUri);
 
-        SecurityTokenReference secRef = new SecurityTokenReference(WSSConfig.getDefaultWSConfig(), doc);
+        SecurityTokenReference secRef = new SecurityTokenReference(doc);
         String strUri = "STRId-" + secRef.hashCode();
         secRef.setID(strUri);
 
@@ -389,7 +388,7 @@ public class ConversationManager {
             }
         }
 
-        sig.addResourceResolver(EnvelopeIdResolver.getInstance(WSSConfig.getDefaultWSConfig()));
+        sig.addResourceResolver(EnvelopeIdResolver.getInstance());
 
         /*
          * Prepending order

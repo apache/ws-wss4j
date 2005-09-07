@@ -46,7 +46,7 @@ public class Lifetime extends Timestamp {
      *
      */
     public Lifetime(WSSConfig wssConfig, Document doc, Element element) throws WSSecurityException {
-        super(wssConfig, element);
+        super(element);
         this.element = copyElement(doc, element);
     }
 
@@ -55,7 +55,7 @@ public class Lifetime extends Timestamp {
      * @param duration Indicates how many seconds in the future this Lifetime Expires
      */
     public Lifetime(WSSConfig wssConfig, Document doc, int duration) {
-        super(wssConfig, doc, duration);
+        super(wssConfig.isPrecisionInMilliSeconds(), doc, duration);
         element = changeElementName(element, TrustConstants.WST_NS, TrustConstants.WST_PREFIX + TrustConstants.LIFETIME);
     }
 
@@ -69,7 +69,7 @@ public class Lifetime extends Timestamp {
      * @param expires When this lifetime expires
      */
     public Lifetime(WSSConfig wssConfig, Document doc, Date created, Date expires) {
-        super(wssConfig, doc, 0);
+        super(wssConfig.isPrecisionInMilliSeconds(), doc, 0);
 
         element = doc.createElementNS(TrustConstants.WST_NS, TrustConstants.WST_PREFIX + TrustConstants.LIFETIME);
         WSSecurityUtil.setNamespace(element, WSConstants.WSU_NS, WSConstants.WSU_PREFIX);

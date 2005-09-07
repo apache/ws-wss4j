@@ -61,11 +61,11 @@ public class SecurityTokenOrReference {
         WSSConfig wssConfig = WSSConfig.getDefaultWSConfig();
         try {
             if (el.equals(SecurityTokenReference.SECURITY_TOKEN_REFERENCE))
-                this.reference = new SecurityTokenReference(wssConfig, element);
+                this.reference = new SecurityTokenReference(element);
             if (el.equals(UsernameToken.TOKEN))
-                this.usernameToken = new UsernameToken(wssConfig, element);
+                this.usernameToken = new UsernameToken(element);
             if (el.equals(BinarySecurity.TOKEN))
-                this.binarySecurityToken = new BinarySecurity(wssConfig, element);
+                this.binarySecurityToken = new BinarySecurity(element);
             doc = element.getOwnerDocument();
         } catch (WSSecurityException e) {
             throw new ElementParsingException("WSSecurityException while trying to create a SecurityTokenOrReference object from an XML Element: "
@@ -128,9 +128,9 @@ public class SecurityTokenOrReference {
                     try {
                         WSSConfig wssConfig = WSSConfig.getDefaultWSConfig();
                         if (el.equals(UsernameToken.TOKEN))
-                            return new UsernameToken(wssConfig, tokenElement);
+                            return new UsernameToken(tokenElement);
                         if (el.equals(BinarySecurity.TOKEN))
-                            return new BinarySecurity(wssConfig, tokenElement);
+                            return new BinarySecurity(tokenElement);
                     } catch (WSSecurityException e) {
                         throw new ElementParsingException("WSSecurityException while trying to create a SecurityToken object from a SecurityTokenReference: "
                                 + e.getMessage());

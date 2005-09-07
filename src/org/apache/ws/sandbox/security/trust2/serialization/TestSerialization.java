@@ -53,7 +53,7 @@ public class TestSerialization {
 
         Document doc = msg.getAsDocument();
 
-        UsernameToken userToken = new UsernameToken(WSSConfig.getDefaultWSConfig(),doc);
+        UsernameToken userToken = new UsernameToken(WSSConfig.getDefaultWSConfig().isPrecisionInMilliSeconds(),doc);
         userToken.setName("bob");
         userToken.setPassword("bobspass");
 

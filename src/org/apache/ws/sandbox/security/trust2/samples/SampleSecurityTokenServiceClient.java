@@ -68,17 +68,17 @@ public class SampleSecurityTokenServiceClient {
         tokenRequest.setTokenType(TokenTypes.X509);
 		
         // Construct a bunch of username tokens to be used as <Base> and <Supporting> elements
-        UsernameToken userToken = new UsernameToken(wssConfig, doc);
+        UsernameToken userToken = new UsernameToken(wssConfig.isPrecisionInMilliSeconds(), doc);
         userToken.setName("bob");
         userToken.setPassword("bobspass");
         tokenRequest.setBase(new SecurityTokenOrReference(userToken));
 
-        UsernameToken user2Token = new UsernameToken(wssConfig, doc);
+        UsernameToken user2Token = new UsernameToken(wssConfig.isPrecisionInMilliSeconds(), doc);
         user2Token.setName("joe");
         user2Token.setPassword("bobspass");
         tokenRequest.addSupporting(new SecurityTokenOrReference(user2Token));
 
-        UsernameToken user3Token = new UsernameToken(wssConfig, doc);
+        UsernameToken user3Token = new UsernameToken(wssConfig.isPrecisionInMilliSeconds(), doc);
         user3Token.setName("mike");
         user3Token.setPassword("bobspass");
         tokenRequest.addSupporting(new SecurityTokenOrReference(user3Token));

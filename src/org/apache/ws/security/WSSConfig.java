@@ -1,5 +1,5 @@
 /*
- * Copyright  2003-2004 The Apache Software Foundation.
+ * Copyright  2003-2005 The Apache Software Foundation.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -53,17 +53,21 @@ public class WSSConfig {
      */
     protected boolean precisionInMilliSeconds = true;
     
-    protected boolean enableSignatureConfirmation = false;
+    protected boolean enableSignatureConfirmation = true;
 
     protected WSSConfig() {
         org.apache.xml.security.Init.init();
         try {
-            Class c = Loader.loadClass("org.bouncycastle.jce.provider.BouncyCastleProvider");
+            Class c = Loader
+                    .loadClass("org.bouncycastle.jce.provider.BouncyCastleProvider");
             String Id = "BC";
             if (java.security.Security.getProvider(Id) == null) {
-                log.debug("The provider " + Id
-                        + " had to be added to the java.security.Security");
-                java.security.Security.addProvider((java.security.Provider)c.newInstance());
+                if (log.isDebugEnabled()) {
+                    log.debug("The provider " + Id
+                            + " had to be added to the java.security.Security");
+                }
+                java.security.Security.addProvider((java.security.Provider) c
+                        .newInstance());
             }
         } catch (Throwable t) {
         }

@@ -88,16 +88,14 @@ public class BaseToken {
         if ("BinarySecurityToken" == firstChild) {
 
             binarySecToken =
-                    new BinarySecurity(WSSConfig.getDefaultWSConfig(), (Element) this.element.getFirstChild());
+                    new BinarySecurity((Element) this.element.getFirstChild());
             return binarySecToken;
         } else if ("SecurityTokenReference" == firstChild) {
 
             SecurityTokenReference secTokRef =
-                    new SecurityTokenReference(WSSConfig.getDefaultWSConfig(),
-                            (Element) this.element.getFirstChild());
+                    new SecurityTokenReference((Element) this.element.getFirstChild());
             binarySecToken =
-                    new BinarySecurity(WSSConfig.getDefaultWSConfig(),
-                            secTokRef.getTokenElement(element.getOwnerDocument(),
+                    new BinarySecurity(secTokRef.getTokenElement(element.getOwnerDocument(),
                                     null));
             return binarySecToken;
         } else {
