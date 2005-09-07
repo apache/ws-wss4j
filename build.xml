@@ -531,7 +531,85 @@ org.apache.ws.axis.security.util
         </junit>
     </target>
 
-    <!-- generate a report from all the tests. 
+    <target name="tcpmon" depends="init" description="Start standalone tcp monitor application (provided by axis)">
+        <java dir="${basedir}" fork="yes" failOnError="true" className="org.apache.axis.utils.tcpmon">
+            <classpath refid="classpath.library" />
+             <arg value="9080" />
+             <arg value="localhost" />
+             <arg value="8080" />
+         </java>
+    </target>
+
+	<!--
+	This runs the selected scenario with SimpleAxisServer locally.
+	Before you start this target be sure you have started tcpmon too in a separate
+	"ant tcpmon" call.
+	To run different scenarios use: "ant -DNumber=x scenarioTest" to run scenario x
+	-->
+    <target name="scenarioTest" depends="compile"
+        if="junit.present"
+        description="Runs all JUnit tests">
+        <runaxisfunctionaltests
+            url="http://localhost:8088"
+            httpServerTarget="start-functional-test-http-server"
+            testTarget="scenario"
+            httpStopTarget="stop-functional-test-http-server"/>
+    </target>
+
+    <target name="scenario" if="junit.present">
+        <echo message="Running interop test scenario ${Number} on SimpleAxisServer"/>
+
+        <path id="deploy_xml_files">
+            <fileset dir="${build.work}">
+                <include name="**/deploy.wsdd"/>
+            </fileset>
+        </path>
+        <path id="undeploy_xml_files">
+            <fileset dir="${build.work}">
+                <include name="**/undeploy.wsdd"/>
+            </fileset>
+        </path>
+
+        <copy todir="${build.dir}/keys">
+            <fileset dir="${dir.keys}" includes="**"/>
+        </copy>
+        <copy todir="${build.dir}/interop">
+            <fileset dir="${dir.interop}" includes="*.jks"/>
+        </copy>
+        
+        <property name="deploy_xml_property" refid="deploy_xml_files"/>
+        <property name="undeploy_xml_property" refid="undeploy_xml_files"/>
+
+        <java classname="org.apache.axis.utils.Admin" fork="true">
+            <classpath refid="classpath.library"/>
+            <arg value="client"/>
+            <arg file="${build.work}/org/apache/ws/axis/oasis/Client_deploy.wsdd"/>
+        </java>
+        
+        <java classname="org.apache.axis.client.AdminClient" fork="yes">
+            <classpath refid="classpath.library"/>
+            <arg line="${deploy_xml_property}"/>
+        </java>
+
+        <java classname="interop.TestScenario${Number}" fork="yes" dir="${basedir}">
+            <jvmarg value="-Djava.endorsed.dirs=${basedir}/endorsed"/>
+            <classpath refid="classpath.library"/>
+        </java>
+
+    	<java classname="org.apache.axis.utils.Admin" fork="true">
+            <classpath refid="classpath.library"/>
+            <arg value="client"/>
+            <arg file="${build.work}/org/apache/ws/axis/oasis/ping/undeploy.wsdd"/>
+        </java>
+
+        <java classname="org.apache.axis.client.AdminClient" fork="yes">
+            <classpath refid="classpath.library"/>
+            <arg line="${undeploy_xml_property}"/>
+        </java>
+
+    </target>
+	
+	<!-- generate a report from all the tests. 
            requires Xalan or other XSLT engine in ant\lib-->
     <target name="report" depends="init">
         <junitreport todir="${build.dir}/test-reports">
