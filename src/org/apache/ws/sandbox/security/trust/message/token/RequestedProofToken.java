@@ -36,6 +36,7 @@ import org.apache.ws.security.util.Loader;
 import org.apache.xml.security.encryption.XMLCipher;
 import org.apache.xml.security.encryption.XMLEncryptionException;
 import org.apache.xml.security.keys.KeyInfo;
+import org.apache.xml.security.keys.content.X509Data;
 import org.apache.xml.security.keys.content.x509.XMLX509IssuerSerial;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -325,7 +326,10 @@ public class RequestedProofToken {
                 break;
 
             case WSConstants.ISSUER_SERIAL:
-                secToken.setX509IssuerSerial(new XMLX509IssuerSerial(doc, remoteCert));
+                XMLX509IssuerSerial data = new XMLX509IssuerSerial(doc, remoteCert);
+                X509Data x509Data = new X509Data(doc); 
+                x509Data.add(data);
+                secToken.setX509IssuerSerial(x509Data);
                 WSSecurityUtil.setNamespace(secToken.getElement(), WSConstants.WSSE_NS, WSConstants.WSSE_PREFIX);
                 break;
 

@@ -27,7 +27,9 @@ import org.apache.ws.security.util.DOM2Writer;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.keys.content.x509.XMLX509IssuerSerial;
+import org.apache.xml.security.keys.content.X509Data;
 import org.apache.xml.security.utils.Base64;
+import org.apache.xml.security.utils.Constants;
 import org.w3c.dom.*;
 
 import java.security.cert.CertificateEncodingException;
@@ -335,7 +337,7 @@ public class SecurityTokenReference {
      * @param ref the {@link XMLX509IssuerSerial} to put into this
      *            SecurityTokenReference
      */
-    public void setX509IssuerSerial(XMLX509IssuerSerial ref) {
+    public void setX509IssuerSerial(X509Data ref) {
         Element elem = getFirstElement();
         if (elem != null) {
             this.element.replaceChild(ref.getElement(), elem);
@@ -394,6 +396,9 @@ public class SecurityTokenReference {
             return null;
         }
         try {
+            if (Constants._TAG_X509DATA.equals(elem.getLocalName())) {
+                elem = (Element)WSSecurityUtil.findElement(elem, Constants._TAG_X509ISSUERSERIAL, Constants.SignatureSpecNS);
+            }
             issuerSerial = new XMLX509IssuerSerial(elem, "");
         } catch (XMLSecurityException e) {
             throw new WSSecurityException(WSSecurityException.SECURITY_TOKEN_UNAVAILABLE,
@@ -468,15 +473,33 @@ public class SecurityTokenReference {
     }
 
     /**
+     * Method containsX509Data
+     *
+     * @return true if the <code>SecurtityTokenReference</code> contains
+     *         a <code>ds:X509Data</code> element
+     */
+    public boolean containsX509Data() {
+        return this.lengthX509Data() > 0;
+    }
+    /**
      * Method lengthX509IssuerSerial.
      *
      * @return number of <code>ds:IssuerSerial</code> elements in
      *         the <code>SecurtityTokenReference</code>
      */
     public int lengthX509IssuerSerial() {
-        return this.length(WSConstants.SIG_NS, "X509IssuerSerial");
+        return this.length(WSConstants.SIG_NS, Constants._TAG_X509ISSUERSERIAL);
     }
 
+    /**
+     * Method lengthX509Data.
+     *
+     * @return number of <code>ds:IssuerSerial</code> elements in
+     *         the <code>SecurtityTokenReference</code>
+     */
+    public int lengthX509Data() {
+        return this.length(WSConstants.SIG_NS, Constants._TAG_X509DATA);
+    }
     /**
      * Method containsKeyIdentifier.
      *

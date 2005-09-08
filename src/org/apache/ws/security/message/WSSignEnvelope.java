@@ -39,6 +39,7 @@ import org.apache.xml.security.keys.KeyInfo;
 import org.apache.xml.security.keys.content.X509Data;
 import org.apache.xml.security.keys.content.x509.XMLX509Certificate;
 import org.apache.xml.security.keys.content.x509.XMLX509IssuerSerial;
+import org.apache.xml.security.keys.content.X509Data;
 import org.apache.xml.security.signature.XMLSignature;
 import org.apache.xml.security.signature.XMLSignatureException;
 import org.apache.xml.security.transforms.TransformationException;
@@ -492,7 +493,9 @@ public class WSSignEnvelope extends WSBaseMessage {
 
         case WSConstants.ISSUER_SERIAL:
             XMLX509IssuerSerial data = new XMLX509IssuerSerial(doc, certs[0]);
-            secRef.setX509IssuerSerial(data);
+            X509Data x509Data = new X509Data(doc); 
+            x509Data.add(data);
+            secRef.setX509IssuerSerial(x509Data);
             break;
 
         case WSConstants.X509_KEY_IDENTIFIER:

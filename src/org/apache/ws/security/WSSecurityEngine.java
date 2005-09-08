@@ -518,7 +518,7 @@ public class WSSecurityEngine {
 										.toString() });
 					}
 				}
-			} else if (secRef.containsX509IssuerSerial()) {
+			} else if (secRef.containsX509Data() || secRef.containsX509IssuerSerial()) {
 				certs = secRef.getX509IssuerSerial(crypto);
 			} else if (secRef.containsKeyIdentifier()) {
 				certs = secRef.getKeyIdentifier(crypto);
@@ -986,7 +986,7 @@ public class WSSecurityEngine {
                 * to issuer name and serial number.
                 * This method is recommended by OASIS WS-S specification, X509 profile
                 */
-                if (secRef.containsX509IssuerSerial()) {
+                if (secRef.containsX509Data() || secRef.containsX509IssuerSerial()) {
                     alias = secRef.getX509IssuerSerialAlias(crypto);
                     if (doDebug) {
                         log.debug("X509IssuerSerial alias: " + alias);

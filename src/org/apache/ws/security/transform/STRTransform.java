@@ -210,8 +210,7 @@ public class STRTransform extends TransformSpi {
             str = (Element) doc.importNode(str, true);
 
             Node parent = tmpEl.getParentNode(); // point to document node
-//            parent.replaceChild(str, tmpEl); // replace STR with new node
-//
+
 
             /*
              * Alert: Hacks ahead
@@ -229,10 +228,11 @@ public class STRTransform extends TransformSpi {
              * have to remove the fake element. See string buffer operation
              * below.
              */
+//          parent.replaceChild(str, tmpEl); // replace STR with new node
+
             Element tmpEl1 = doc.createElement("temp");
             tmpEl1.setAttributeNS(WSConstants.XMLNS_NS, "xmlns", "urn:X");
             parent.replaceChild(tmpEl1, tmpEl); // replace STR with new node
-
             tmpEl1.appendChild(str);
             // End of HACK 1
 
@@ -244,18 +244,18 @@ public class STRTransform extends TransformSpi {
             buf = canon.canonicalizeSubtree(doc, "#default");
 
             // If the problem with c14n method is solved then just do:
-
-            /* return new XMLSignatureInput(buf); */
-
-            /*
-             * HACK 2
-             */
             bos = new ByteArrayOutputStream(buf.length);
             bos.write(buf, 0, buf.length);
 
             if (doDebug) {
                 log.debug("after c14n: " + bos.toString());
             }
+
+//            return new XMLSignatureInput(buf);
+
+            /*
+             * HACK 2
+             */
 
             /*
              * Here we delete the previously inserted fake element from the
