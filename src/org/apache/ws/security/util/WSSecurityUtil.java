@@ -31,7 +31,6 @@ import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.message.token.BinarySecurity;
 import org.apache.ws.security.message.token.X509Security;
 import org.apache.xml.security.algorithms.JCEMapper;
-import org.apache.xml.security.utils.Base64;
 import org.apache.xpath.XPathAPI;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;

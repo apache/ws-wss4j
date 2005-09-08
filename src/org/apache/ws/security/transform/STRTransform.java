@@ -26,13 +26,13 @@ import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.message.token.SecurityTokenReference;
 import org.apache.ws.security.message.token.X509Security;
 import org.apache.ws.security.util.WSSecurityUtil;
+import org.apache.ws.security.util.Base64;
 import org.apache.xml.security.c14n.CanonicalizationException;
 import org.apache.xml.security.c14n.Canonicalizer;
 import org.apache.xml.security.c14n.InvalidCanonicalizerException;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.signature.XMLSignatureInput;
 import org.apache.xml.security.transforms.TransformSpi;
-import org.apache.xml.security.utils.Base64;
 import org.apache.xml.security.utils.XMLUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -391,7 +391,7 @@ public class STRTransform extends TransformSpi {
         WSSecurityUtil.setNamespace(elem, WSConstants.WSSE_NS, prefix);
         elem.setAttributeNS(WSConstants.XMLNS_NS, "xmlns", "");
         elem.setAttributeNS(null, "ValueType", X509Security.getType(WSSConfig.getDefaultWSConfig()));
-        Text certText = doc.createTextNode(Base64.encode(data, 0));  // no line wrap
+        Text certText = doc.createTextNode(Base64.encode(data));
         elem.appendChild(certText);
         return elem;
     }

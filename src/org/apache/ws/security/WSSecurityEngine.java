@@ -30,9 +30,9 @@ import org.apache.ws.security.message.token.X509Security;
 import org.apache.ws.security.transform.STRTransform;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.ws.security.util.XmlSchemaDateFormat;
+import org.apache.ws.security.util.Base64;
 import org.apache.xml.security.encryption.XMLCipher;
 import org.apache.xml.security.encryption.XMLEncryptionException;
-import org.apache.xml.security.exceptions.Base64DecodingException;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.keys.KeyInfo;
 import org.apache.xml.security.keys.content.X509Data;
@@ -42,7 +42,6 @@ import org.apache.xml.security.signature.SignedInfo;
 import org.apache.xml.security.signature.XMLSignature;
 import org.apache.xml.security.signature.XMLSignatureException;
 import org.apache.xml.security.transforms.Transform;
-import org.apache.xml.security.utils.Base64;
 import org.opensaml.SAMLAssertion;
 import org.opensaml.SAMLException;
 import org.opensaml.SAMLObject;
@@ -1414,14 +1413,7 @@ public class WSSecurityEngine {
                 sb.append(((Text) curr).getData());
         }
         String encodedData = sb.toString();
-        try {
-            return Base64.decode(encodedData);
-        } catch (Base64DecodingException e) {
-            throw new WSSecurityException(WSSecurityException.FAILURE,
-                    null,
-                    null,
-                    e);
-        }
+        return Base64.decode(encodedData);
     }
 
     /**
