@@ -31,8 +31,9 @@ import org.apache.xml.security.c14n.InvalidCanonicalizerException;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.signature.XMLSignatureInput;
 import org.apache.xml.security.transforms.TransformSpi;
-import org.apache.xml.security.utils.Base64;
+import org.apache.ws.security.util.Base64;
 import org.apache.xml.security.utils.XMLUtils;
+// import org.apache.xml.security.utils.Base64;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -328,7 +329,7 @@ public class STRTransform extends TransformSpi {
          * certificate, if that fails, lookup in keystore, wrap
          * in BST according to specification
          */
-        else if (secRef.containsX509IssuerSerial()) {
+        else if (secRef.containsX509Data() || secRef.containsX509IssuerSerial()) {
             if (doDebug) {
                 log.debug("STR: IssuerSerial");
             }
@@ -389,7 +390,7 @@ public class STRTransform extends TransformSpi {
         WSSecurityUtil.setNamespace(elem, WSConstants.WSSE_NS, prefix);
         elem.setAttributeNS(WSConstants.XMLNS_NS, "xmlns", "");
         elem.setAttributeNS(null, "ValueType", X509Security.getType());
-        Text certText = doc.createTextNode(Base64.encode(data, 0));  // no line wrap
+        Text certText = doc.createTextNode(Base64.encode(data));  // no line wrap
         elem.appendChild(certText);
         return elem;
     }
