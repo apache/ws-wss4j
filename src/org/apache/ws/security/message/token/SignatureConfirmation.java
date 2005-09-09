@@ -21,8 +21,7 @@ import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.util.DOM2Writer;
 import org.apache.ws.security.util.WSSecurityUtil;
-import org.apache.xml.security.exceptions.Base64DecodingException;
-import org.apache.xml.security.utils.Base64;
+import org.apache.ws.security.util.Base64;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -51,14 +50,7 @@ public class SignatureConfirmation {
         element = elem;
         String sv = element.getAttributeNS(null, VALUE);
         if (sv != null) {
-            try {
-                signatureValue = Base64.decode(sv);
-            } catch (Base64DecodingException e) {
-                throw new WSSecurityException(WSSecurityException.FAILURE,
-                        null,
-                        null,
-                        e);
-            }
+            signatureValue = Base64.decode(sv);
         }
     }
 
@@ -82,7 +74,7 @@ public class SignatureConfirmation {
                 WSConstants.WSSE11_NS,
                 WSConstants.WSSE11_PREFIX);
         if (signVal != null) {
-            String sv = Base64.encode(signVal,0);
+            String sv = Base64.encode(signVal);
             element.setAttribute(VALUE, sv);
         }
 

@@ -42,7 +42,7 @@ import org.apache.xml.security.signature.Reference;
 import org.apache.xml.security.signature.SignedInfo;
 import org.apache.xml.security.signature.XMLSignature;
 import org.apache.xml.security.signature.XMLSignatureException;
-import org.apache.xml.security.utils.Base64;
+import org.apache.ws.security.util.Base64;
 import org.opensaml.SAMLAssertion;
 import org.opensaml.SAMLException;
 import org.opensaml.SAMLObject;
@@ -1385,14 +1385,7 @@ public class WSSecurityEngine {
                 sb.append(((Text) curr).getData());
         }
         String encodedData = sb.toString();
-        try {
-            return Base64.decode(encodedData);
-        } catch (Base64DecodingException e) {
-            throw new WSSecurityException(WSSecurityException.FAILURE,
-                    null,
-                    null,
-                    e);
-        }
+        return Base64.decode(encodedData);
     }
 
     /**

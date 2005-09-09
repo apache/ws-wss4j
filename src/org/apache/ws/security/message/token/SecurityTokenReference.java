@@ -28,7 +28,7 @@ import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.keys.content.x509.XMLX509IssuerSerial;
 import org.apache.xml.security.keys.content.X509Data;
-import org.apache.xml.security.utils.Base64;
+import org.apache.ws.security.util.Base64;
 import org.apache.xml.security.utils.Constants;
 import org.w3c.dom.*;
 
@@ -320,7 +320,7 @@ public class SecurityTokenReference {
         if (node.getNodeType() == Node.TEXT_NODE) {
             try {
                 skiBytes = Base64.decode(((Text) node).getData());
-            } catch (Exception e) {
+            } catch (WSSecurityException e) {
                 return null;
             }
         }

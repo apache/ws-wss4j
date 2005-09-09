@@ -24,7 +24,7 @@ import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.util.DOM2Writer;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.ws.security.util.XmlSchemaDateFormat;
-import org.apache.xml.security.utils.Base64;
+import org.apache.ws.security.util.Base64;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
