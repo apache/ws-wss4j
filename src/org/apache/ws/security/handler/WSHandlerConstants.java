@@ -314,6 +314,7 @@ public class WSHandlerConstants {
     /**
      * Specifying this name as {@link ENCRYPTION_USER}
      * triggers a special action to get the public key to use for encryption.
+     * <p/>
      * The handler uses the public key of the sender's certificate. Using this
      * way to define an encryption key simplifies certificate management to
      * a large extend.
@@ -668,6 +669,8 @@ public class WSHandlerConstants {
      * </li>
      * <li><code>EmbeddedKeyName</code> for {@link WSConstants#EMBEDDED_KEYNAME}
      * </li>
+     * <li><code>Thumbprint</code> for {@link WSConstants#THUMBPRINT}
+     * </li>
      * </ul
      * See {@link #SIG_KEY_ID} {@link #ENC_KEY_ID}.
      */
@@ -684,6 +687,8 @@ public class WSHandlerConstants {
                 new Integer(WSConstants.SKI_KEY_IDENTIFIER));
         keyIdentifier.put("EmbeddedKeyName",
                 new Integer(WSConstants.EMBEDDED_KEYNAME));
+        keyIdentifier.put("Thumbprint",
+                new Integer(WSConstants.THUMBPRINT_IDENTIFIER));
     }
     /*
      * internally used property names to store values inside the message context

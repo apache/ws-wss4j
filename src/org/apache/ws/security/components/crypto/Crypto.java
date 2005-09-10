@@ -172,7 +172,23 @@ public interface Crypto {
      * @return The byte array conating the binary SKI data
      */
     public byte[] getSKIBytesFromCert(X509Certificate cert) throws WSSecurityException;
+ 
+    /**
+     * Lookup a X509 Certificate in the keystore according to a given
+     * Thumbprint.
+     * 
+     * The search gets all alias names of the keystore, then reads the certificate chain
+     * or certificate for each alias. Then the thumbprint for each user certificate
+     * is compared with the thumbprint parameter.
+     *
+     * @param thumb The SHA1 thumbprint info bytes
+     * @return alias name of the certificate that matches the thumbprint
+     *         or null if no such certificate was found.
+     * @throws WSSecurityException if problems during keystore handling or wrong certificate
+     */
 
+    public String getAliasForX509CertThumb(byte[] thumb) throws WSSecurityException;
+ 
     /**
      * Gets the Keystore that was loaded by the underlying implementation
      *

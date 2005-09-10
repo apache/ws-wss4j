@@ -393,6 +393,10 @@ public class WSEncryptBody extends WSBaseMessage {
             case WSConstants.SKI_KEY_IDENTIFIER:
                 secToken.setKeyIdentifierSKI(remoteCert, crypto);
                 break;
+                
+            case WSConstants.THUMBPRINT_IDENTIFIER:
+                secToken.setKeyIdentifierThumb(remoteCert);
+                break;
 
             case WSConstants.ISSUER_SERIAL:
                 XMLX509IssuerSerial data = new XMLX509IssuerSerial(doc, remoteCert);

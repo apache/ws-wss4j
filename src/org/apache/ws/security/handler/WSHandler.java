@@ -716,7 +716,8 @@ public abstract class WSHandler {
             if (!(reqData.getSigKeyId() == WSConstants.ISSUER_SERIAL
                     || reqData.getSigKeyId() == WSConstants.BST_DIRECT_REFERENCE
                     || reqData.getSigKeyId() == WSConstants.X509_KEY_IDENTIFIER
-                    || reqData.getSigKeyId() == WSConstants.SKI_KEY_IDENTIFIER)) {
+                    || reqData.getSigKeyId() == WSConstants.SKI_KEY_IDENTIFIER
+                    || reqData.getSigKeyId() == WSConstants.THUMBPRINT_IDENTIFIER)) {
                 throw new WSSecurityException("WSHandler: Signature: illegal key identification");
             }
         }
@@ -770,7 +771,8 @@ public abstract class WSHandler {
                     || reqData.getEncKeyId() == WSConstants.X509_KEY_IDENTIFIER
                     || reqData.getEncKeyId() == WSConstants.SKI_KEY_IDENTIFIER
                     || reqData.getEncKeyId() == WSConstants.BST_DIRECT_REFERENCE
-                    || reqData.getEncKeyId() == WSConstants.EMBEDDED_KEYNAME)) {
+                    || reqData.getEncKeyId() == WSConstants.EMBEDDED_KEYNAME
+                    || reqData.getSigKeyId() == WSConstants.THUMBPRINT_IDENTIFIER)) {
                 throw new WSSecurityException("WSHandler: Encryption: illegal key identification");
             }
         }

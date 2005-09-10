@@ -32,6 +32,8 @@ import org.apache.ws.security.util.Base64;
 import org.apache.xml.security.utils.Constants;
 import org.w3c.dom.*;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 
@@ -48,6 +50,8 @@ public class SecurityTokenReference {
     public static final String SECURITY_TOKEN_REFERENCE = "SecurityTokenReference";
     public static final String KEY_NAME = "KeyName";
     public static final String SKI_URI = WSConstants.X509TOKEN_NS + "#X509SubjectKeyIdentifier";
+    public static final String THUMB_URI = WSConstants.SOAPMESSAGE_NS11 + "#" + WSConstants.THUMBPRINT;
+    public static final String SAML_ID_URI = WSConstants.SAMLTOKEN_NS + "#" + WSConstants.SAML_ASSERTION_ID;
     protected Element element = null;
     private XMLX509IssuerSerial issuerSerial = null;
     private byte[] skiBytes = null;
@@ -231,15 +235,63 @@ public class SecurityTokenReference {
             throws WSSecurityException {
         Document doc = this.element.getOwnerDocument();
         byte data[] = crypto.getSKIBytesFromCert(cert);
-        org.w3c.dom.Text skiText = doc.createTextNode(Base64.encode(data));
-        Element keyId =
-                doc.createElementNS(WSConstants.WSSE_NS, "wsse:KeyIdentifier");
-            keyId.setAttributeNS(null, "ValueType", SKI_URI);
-            keyId.setAttributeNS(null,
-                    "EncodingType",
-                    BinarySecurity.BASE64_ENCODING);
+        
+        org.w3c.dom.Text text = doc.createTextNode(Base64.encode(data));
+        createKeyIdentifier(doc, SKI_URI, text);        
+    }
 
-        keyId.appendChild(skiText);
+    /**
+     * Sets the KeyIdentifer Element as a Thumbprint.
+     * 
+     * Takes a X509 certificate, computes its thumbprint using SHA-1, converts
+     * into base 64 and inserts it into a <code>wsse:KeyIdentifier</code>
+     * element, which is placed in the <code>wsse:SecurityTokenReference</code>
+     * element.
+     * 
+     * @param cert
+     *            is the X509 certficate to get the thumbprint
+     * @param crypto
+     *            is the Crypto implementation. Used to read SKI info bytes from
+     *            certificate
+     */
+    public void setKeyIdentifierThumb(X509Certificate cert)
+            throws WSSecurityException {
+        Document doc = this.element.getOwnerDocument();
+        MessageDigest sha = null;
+        try {
+            sha = MessageDigest.getInstance("SHA-1");
+        } catch (NoSuchAlgorithmException e1) {
+            throw new WSSecurityException(0, "noSHA1availabe");
+        }
+        sha.reset();
+        try {
+            sha.update(cert.getEncoded());
+        } catch (CertificateEncodingException e1) {
+            throw new WSSecurityException(
+                    WSSecurityException.SECURITY_TOKEN_UNAVAILABLE,
+                    "encodeError");
+        }
+        byte[] data = sha.digest();
+
+        org.w3c.dom.Text text = doc.createTextNode(Base64.encode(data));
+        createKeyIdentifier(doc, THUMB_URI, text);
+    }
+    
+	public void setSAMLKeyIdentifier(String keyIdVal)
+			throws WSSecurityException {
+		Document doc = this.element.getOwnerDocument();
+        createKeyIdentifier(doc, SAML_ID_URI, doc.createTextNode(keyIdVal));
+	}
+
+    private void createKeyIdentifier(Document doc, String uri, Node node) {
+        
+        Element keyId = doc.createElementNS(WSConstants.WSSE_NS,
+                "wsse:KeyIdentifier");
+        keyId.setAttributeNS(null, "ValueType", uri);
+        keyId.setAttributeNS(null, "EncodingType",
+                BinarySecurity.BASE64_ENCODING);
+
+        keyId.appendChild(node);
         Element elem = getFirstElement();
         if (elem != null) {
             this.element.replaceChild(keyId, elem);
@@ -247,29 +299,10 @@ public class SecurityTokenReference {
             this.element.appendChild(keyId);
         }
     }
-
-	public void setSAMLKeyIdentifier(String keyIdVal)
-			throws WSSecurityException {
-		Document doc = this.element.getOwnerDocument();
-		Element keyId =
-				doc.createElementNS(WSConstants.WSSE_NS, "wsse:KeyIdentifier");
-			keyId.setAttributeNS(WSConstants.WSSE_NS,
-					"ValueType",
-					"http://docs.oasis-open.org/wss/2004/XX/oasis-2004XX-wss-saml-token-profile-1.0#SAMLAssertionID");
-		keyId.appendChild(doc.createTextNode(keyIdVal));
-		Element elem = getFirstElement();
-		if (elem != null) {
-			this.element.replaceChild(keyId, elem);
-		} else {
-			this.element.appendChild(keyId);
-		}
-	}
-
     /**
      * Gets the KeyIdentifer.
      *
-     * @return the {@link BinarySecurity} containing the X509
-     *         certificate or zero if a unknown key identifier
+     * @return the the X509 certficate or zero if a unknown key identifier
      *         type was detected.
      */
     public X509Certificate[] getKeyIdentifier(Crypto crypto)
@@ -277,6 +310,7 @@ public class SecurityTokenReference {
         X509Security token = null;
         Element elem = getFirstElement();
         String value = elem.getAttribute("ValueType");
+        String alias = null;
 
         if (X509Security.getType().equals(value)) {
             token = new X509Security(elem);
@@ -287,10 +321,21 @@ public class SecurityTokenReference {
                 return certs;
             }
         } else if (SKI_URI.equals(value)) {
-            String alias = getX509SKIAlias(crypto);
-            if (alias != null) {
-                return crypto.getCertificates(alias);
+            alias = getX509SKIAlias(crypto);
+        }
+        else if  (THUMB_URI.equals(value)) {
+            Node node = getFirstElement().getFirstChild();
+            if (node == null) {
+                return null;
             }
+            if (node.getNodeType() == Node.TEXT_NODE) {
+                byte[] thumb = Base64.decode(((Text) node).getData());
+                alias = crypto.getAliasForX509CertThumb(thumb);
+            }
+                 
+        }
+        if (alias != null) {
+            return crypto.getCertificates(alias);
         }
         return null;
     }

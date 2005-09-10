@@ -519,6 +519,10 @@ public class WSSignEnvelope extends WSBaseMessage {
             secretKey = usernameToken.getSecretKey();
             break;
 
+        case WSConstants.THUMBPRINT_IDENTIFIER:
+            secRef.setKeyIdentifierThumb(certs[0]);
+            break;
+
         default:
             throw new WSSecurityException(WSSecurityException.FAILURE,
                     "unsupportedKeyId");

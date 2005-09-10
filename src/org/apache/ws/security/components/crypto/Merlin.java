@@ -24,6 +24,7 @@ import org.apache.commons.discovery.resource.DiscoverResources;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSSecurityException;
+import org.apache.ws.security.util.Base64;
 
 import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
@@ -55,6 +56,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 import java.util.Vector;
+import java.util.Arrays;
 
 /**
  * JDK1.4 based implementation of Crypto (uses keystore).
@@ -390,14 +392,7 @@ public class Merlin implements Crypto {
                 if (data.length != skiBytes.length) {
                     continue;
                 }
-                for (int ii = 0; ii < data.length; ii++) {
-                    if (data[ii] != skiBytes[ii]) {
-                        found = false;
-                        break;
-                    }
-                    found = true;
-                }
-                if (found) {
+                if (Arrays.equals(data, skiBytes)) {
                     return alias;
                 }
             }
@@ -487,6 +482,68 @@ public class Merlin implements Crypto {
             x509certs[i] = (X509Certificate) certs[i];
         }
         return x509certs;
+    }
+
+    /**
+     * Lookup a X509 Certificate in the keystore according to a given
+     * Thumbprint.
+     * 
+     * The search gets all alias names of the keystore, then reads the certificate chain
+     * or certificate for each alias. Then the thumbprint for each user certificate
+     * is compared with the thumbprint parameter.
+     *
+     * @param thumb The SHA1 thumbprint info bytes
+     * @return alias name of the certificate that matches the thumbprint
+     *         or null if no such certificate was found.
+     * @throws WSSecurityException if problems during keystore handling or wrong certificate
+     */
+
+    public String getAliasForX509CertThumb(byte[] thumb) throws WSSecurityException {
+        Certificate cert = null;
+        MessageDigest sha = null;
+
+        try {
+            sha = MessageDigest.getInstance("SHA-1");
+        } catch (NoSuchAlgorithmException e1) {
+            throw new WSSecurityException(
+                    0,
+                    "noSHA1availabe");
+        }
+        try {
+            for (Enumeration e = keystore.aliases(); e.hasMoreElements();) {
+                String alias = (String) e.nextElement();
+                Certificate[] certs = keystore.getCertificateChain(alias);
+                if (certs == null || certs.length == 0) {
+                    // no cert chain, so lets check if getCertificate gives us a  result.
+                    cert = keystore.getCertificate(alias);
+                    if (cert == null) {
+                        return null;
+                    }
+                } else {
+                    cert = certs[0];
+                }
+                if (!(cert instanceof X509Certificate)) {
+                    continue;
+                }
+                sha.reset();
+                try {
+                    sha.update(cert.getEncoded());
+                } catch (CertificateEncodingException e1) {
+                    throw new WSSecurityException(
+                            WSSecurityException.SECURITY_TOKEN_UNAVAILABLE,
+                            "encodeError");
+                }
+                byte[] data = sha.digest();
+
+                if (Arrays.equals(data, thumb)) {
+                    return alias;
+                }
+            }
+        } catch (KeyStoreException e) {
+            throw new WSSecurityException(WSSecurityException.FAILURE,
+                    "keystore");
+        }
+        return null;
     }
 
     /**

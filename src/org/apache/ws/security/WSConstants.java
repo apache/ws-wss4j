@@ -36,17 +36,27 @@ public class WSConstants {
 
     /*
      * The base UIRs for the various profiles.
-     * No new base URIs in WSS specification 1.1
      */
     public static final String SOAPMESSAGE_NS = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0";
-    public static final String USERNAMETOKEN_NS = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0";
+    public static final String SOAPMESSAGE_NS11 = "http://docs.oasis-open.org/wss/2004/xx/oasis-2004xx-wss-soap-message-security-1.0";
+    public static final String USERNAMETOKEN_NS = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.1";
     public static final String X509TOKEN_NS = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0";
-    
+    public static final String SAMLTOKEN_NS = "http://docs.oasis-open.org/wss/2004/XX/oasis-2004XX-wss-saml-token-profile-1.0";
     /*
      * The Element name (local name) of the security header
      */
     public static final String WSSE_LN = "Security";
 
+    /*
+     * The Thumbprint relative URI string (without #)
+     * Combine it with SOAPMESSAGE_NS11, #, to get the full URL
+     */
+    public static final String THUMBPRINT ="ThumbprintSHA1";
+    
+    /*
+     * The SAMLAssertionID relative URI string (without #)
+     */
+    public static final String SAML_ASSERTION_ID = "SAMLAssertionID";
     /*
      * The namespace prefixes used. We uses the same prefix convention
      * as shown in the specifications
@@ -306,6 +316,17 @@ public class WSConstants {
      * to WS-Trust specification.
      */
     public static final int UT_SIGNING = 7;
+    
+    /**
+     * <code>THUMPRINT_IDENTIFIER</code> is used to set the specific key identifier
+     * ThumbprintSHA1.
+     * 
+     * This identifier uses the SHA-1 digest of a security token to
+     * identify the security token. Please refer to chapter 7.2 of the OASIS WSS 1.1
+     * specification.
+     * 
+     */
+    public static final int THUMBPRINT_IDENTIFIER = 8;
 
     /*
      * The following values are bits that can be combined to for a set.
