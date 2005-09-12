@@ -110,7 +110,7 @@ public class WSAddTimestamp extends WSBaseMessage {
     /**
      * Get the wsu:Id value of the Timestamp
      * 
-     * @return
+     * @return TODO
      */
     public String getId() {
         return id;

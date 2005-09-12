@@ -80,7 +80,7 @@ public class Reference {
      * get the dom element.
      * <p/>
      * 
-     * @return 
+     * @return TODO
      */
     public Element getElement() {
         return this.element;
@@ -90,7 +90,7 @@ public class Reference {
      * get the URI.
      * <p/>
      * 
-     * @return 
+     * @return TODO
      */
     public String getValueType() {
         return this.element.getAttribute("ValueType");
@@ -100,7 +100,7 @@ public class Reference {
      * get the URI.
      * <p/>
      * 
-     * @return 
+     * @return TODO
      */
     public String getURI() {
         return this.element.getAttribute("URI");
@@ -130,7 +130,7 @@ public class Reference {
      * return the string representation.
      * <p/>
      * 
-     * @return 
+     * @return TODO
      */
     public String toString() {
         return DOM2Writer.nodeToString((Node) this.element);

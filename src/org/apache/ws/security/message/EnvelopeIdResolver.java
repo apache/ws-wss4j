@@ -56,7 +56,7 @@ public class EnvelopeIdResolver extends ResourceResolverSpi {
      * Singleton instance of the resolver.
      * <p/>
      *
-     * @return
+     * @return TODO
      */
     public synchronized static ResourceResolverSpi getInstance() {
         if (resolver == null) {
@@ -74,7 +74,7 @@ public class EnvelopeIdResolver extends ResourceResolverSpi {
      *
      * @param uri
      * @param BaseURI
-     * @return
+     * @return TODO
      * @throws ResourceResolverException
      */
     public XMLSignatureInput engineResolve(Attr uri, String BaseURI)
@@ -168,7 +168,7 @@ public class EnvelopeIdResolver extends ResourceResolverSpi {
      *
      * @param uri
      * @param BaseURI
-     * @return
+     * @return TODO
      */
     public boolean engineCanResolve(Attr uri, String BaseURI) {
         if (uri == null) {

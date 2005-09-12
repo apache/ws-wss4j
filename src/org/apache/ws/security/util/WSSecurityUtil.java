@@ -113,7 +113,7 @@ public class WSSecurityUtil {
      *
      * @param actor
      * @param hActor
-     * @return
+     * @return TODO
      */
     public static boolean isActorEqual(String actor, String hActor) {
         if ((((hActor == null) || (hActor.length() == 0))
@@ -295,7 +295,7 @@ public class WSSecurityUtil {
      * @param element
      * @param namespace
      * @param prefix
-     * @return
+     * @return TODO
      */
     public static String setNamespace(Element element,
                                       String namespace,
@@ -410,8 +410,6 @@ public class WSSecurityUtil {
      * Search for an element given its wsu:id.
      * <p/>
      *
-     * @param wssConfig The WSS configuration data conating namesapce 
-     * 	definitions, etc.
      * @param doc the DOM document (SOAP request) 
      * @param id the Id of the element
      * @return the found element or null if no element with the Id exists
@@ -455,8 +453,6 @@ public class WSSecurityUtil {
      *
      * @param doc the DOM document (SOAP request) 
      * @param wsuIdVal the value for the wsu:Id
-     * @param wssConfig The WSS configuration data conating namesapce 
-     * 	definitions, etc.
      * @return then BST element (DOM element)
      */
     public static Element createBinarySecurityToken(Document doc,

@@ -134,8 +134,8 @@ public class WSEncryptBody extends WSBaseMessage {
      * algorithm.
      *
      * @param keyEnc specifies the key encoding algorithm.
-     * @see WSConstants.KEYTRANSPORT_RSA15
-     * @see WSConstants.KEYTRANSPORT_RSAOEP
+     * @see WSConstants#KEYTRANSPORT_RSA15
+     * @see WSConstants#KEYTRANSPORT_RSAOEP
      */
     public void setKeyEnc(String keyEnc) {
         keyEncAlgo = keyEnc;
@@ -175,15 +175,15 @@ public class WSEncryptBody extends WSBaseMessage {
     }
 
     /**
-     * Set the name of the symmetric encryption algorithm to use
+     * Set the name of the symmetric encryption algorithm to use.
      * <p/>
-     * This encyrption alogrithm is used to encrypt
+     * This encryption alogrithm is used to encrypt
      * the data, i.e. the SOAP Body. If the algorithm
      * is not set then Triple DES is used. Refer to
      * WSConstants which algorithms are supported.
      * <p/>
      *
-     * @param algo Is the name of the encyrption algorithm
+     * @param algo Is the name of the encryption algorithm
      * @see WSConstants#TRIPLE_DES
      * @see WSConstants#AES_128
      * @see WSConstants#AES_192
@@ -195,7 +195,7 @@ public class WSEncryptBody extends WSBaseMessage {
 
     /**
      * Set the name of an optional canonicalization algorithm to use
-     * before encryption
+     * before encryption.
      * <p/>
      * This c14n alogrithm is used to serialize the data before
      * encryption, i.e. the SOAP Body. If the algorithm
@@ -211,9 +211,9 @@ public class WSEncryptBody extends WSBaseMessage {
     }
 
     /**
-     * Get the name of symmetric encryption algorithm to use
+     * Get the name of symmetric encryption algorithm to use.
      * <p/>
-     * The name of the encyrption alogrithm to encrypt
+     * The name of the encryption alogrithm to encrypt
      * the data, i.e. the SOAP Body. Refer to
      * WSConstants which algorithms are supported.
      * <p/>
@@ -688,7 +688,7 @@ public class WSEncryptBody extends WSBaseMessage {
     }
 
     /**
-     * @return
+     * @return TODO
      */
     public SecretKey getSymmetricKey() {
         return symmetricKey;
@@ -713,7 +713,7 @@ public class WSEncryptBody extends WSBaseMessage {
     }
 
     /**
-     * @return
+     * @return TODO
      */
     public SecurityTokenReference getSecurityTokenReference() {
         return securityTokenReference;

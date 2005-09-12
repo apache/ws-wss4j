@@ -104,7 +104,7 @@ public class WSBaseMessage {
      * Set which parts of the message to encrypt/sign.
      * <p/>
      *
-     * @param act The vector containing the WSEncryptionPart objects
+     * @param parts The vector containing the WSEncryptionPart objects
      */
     public void setParts(Vector parts) {
         this.parts = parts;

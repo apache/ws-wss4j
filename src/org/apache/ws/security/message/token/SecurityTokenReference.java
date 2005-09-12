@@ -62,8 +62,7 @@ public class SecurityTokenReference {
      * Constructor.
      * <p/>
      *
-     * @param wssConfig
-     * @param elem
+     * @param elem TODO
      * @throws WSSecurityException
      */
     public SecurityTokenReference(Element elem) throws WSSecurityException {
@@ -86,8 +85,7 @@ public class SecurityTokenReference {
      * Constructor.
      * <p/>
      *
-     * @param wssConfig
-     * @param doc
+     * @param doc TODO
      */
     public SecurityTokenReference(Document doc) {
         doDebug = log.isDebugEnabled();
@@ -250,9 +248,6 @@ public class SecurityTokenReference {
      * 
      * @param cert
      *            is the X509 certficate to get the thumbprint
-     * @param crypto
-     *            is the Crypto implementation. Used to read SKI info bytes from
-     *            certificate
      */
     public void setKeyIdentifierThumb(X509Certificate cert)
             throws WSSecurityException {
@@ -598,7 +593,7 @@ public class SecurityTokenReference {
      * get the dom element.
      * <p/>
      *
-     * @return
+     * @return TODO
      */
     public Element getElement() {
         return this.element;
@@ -622,7 +617,7 @@ public class SecurityTokenReference {
      * return the string representation.
      * <p/>
      *
-     * @return
+     * @return TODO
      */
     public String toString() {
         return DOM2Writer.nodeToString((Node) this.element);

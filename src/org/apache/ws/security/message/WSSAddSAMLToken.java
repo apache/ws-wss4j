@@ -70,7 +70,7 @@ public class WSSAddSAMLToken extends WSBaseMessage {
      * <code>wsse:Security</code> header.
      *
      * @param doc      The SOAP enevlope as W3C document
-     * @param username The username to set in the UsernameToken
+     * @param assertion TODO
      * @return Document with UsernameToken added
      */
     public Document build(Document doc, SAMLAssertion assertion) {

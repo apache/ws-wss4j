@@ -48,7 +48,7 @@ import javax.security.auth.callback.Callback;
  * associated with the identifier. WSS4J uses this key to encrypt or
  * decrypt parts of the SOAP request. Note, the key must match the
  * symmetric encryption/decryption algorithm specified (refer to
- * {@link org.apache.ws.security.handler.WSHandlerConstants# ENC_SYM_ALGO}).</li>
+ * {@link org.apache.ws.security.handler.WSHandlerConstants#ENC_SYM_ALGO}).</li>
  * * <li><code>USERNAME_TOKEN_UNKNOWN</code> - either an not specified 
  * password type or a password type passwordText. In these both cases <b>only</b>
  * the password variable is <b>set</>. The callback class now may check if

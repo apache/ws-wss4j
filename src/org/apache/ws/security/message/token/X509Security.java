@@ -45,7 +45,6 @@ public class X509Security extends BinarySecurity {
      * This constructor creates a new X509 certificate object and initializes
      * it from the data containe in the element.
      *
-     * @param wssConfig Configuration options for processing and building the <code>wsse:Security</code> header
      * @param elem      the element containing the X509 certificate data
      * @throws WSSecurityException
      */

@@ -76,7 +76,6 @@ public class UsernameToken {
      * Constructs a <code>UsernameToken</code> object and parses the
      * <code>wsse:UsernameToken</code> element to initialize it.
      *
-     * @param wssConfig Configuration options for processing and building the <code>wsse:Security</code> header
      * @param elem      the <code>wsse:UsernameToken</code> element that
      *                  contains the UsernameToken data
      * @throws WSSecurityException
@@ -113,7 +112,6 @@ public class UsernameToken {
      * This constructes set the password encoding to
      * {@link WSConstants#PASSWORD_DIGEST}
      *
-     * @param wssConfig Configuration options for processing and building the <code>wsse:Security</code> header
      * @param doc       the SOAP envelope as <code>Document</code>
      */
     public UsernameToken(boolean milliseconds, Document doc) {
@@ -125,9 +123,8 @@ public class UsernameToken {
      * to the defined parameters.
      * <p/>
      *
-     * @param wssConfig    Configuration options for processing and building the <code>wsse:Security</code> header
      * @param doc          the SOAP envelope as <code>Document</code>
-     * @param passwordType the required password encoding, either
+     * @param pwType the required password encoding, either
      *                     {@link WSConstants#PASSWORD_DIGEST} or
      *                     {@link WSConstants#PASSWORD_TEXT}
      */

@@ -56,7 +56,7 @@ public class Timestamp {
      * Constructs a <code>Timestamp</code> object and parses the
      * <code>wsu:Timestamp</code> element to initialize it.
      *
-     * @param elem the <code>wsu:Timestamp</code> element that
+     * @param element the <code>wsu:Timestamp</code> element that
      *             contains the timestamp data
      */
     public Timestamp(Element element) throws WSSecurityException {
@@ -221,7 +221,7 @@ public class Timestamp {
     
     /**
      * Returns the value of the wsu:Id attribute
-     * @return
+     * @return TODO
      */
     public String getID() {
         return this.element.getAttributeNS(WSConstants.WSU_NS, "Id");

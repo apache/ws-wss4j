@@ -584,9 +584,9 @@ The <code>WSDoAllReceiver</code> WSS4J handler takes this structure and
 checks if all required actions were performed. If this check fails, the
 WSS4J handler aborts the SOAP request and throws an Axis SOAP fault.
 Otherwise it creates its own data structure 
-{@link org.apache.ws.axis.security.WSDoAllReceiverResult}, copies the
+{@link org.apache.ws.security.handler.WSHandlerResult}, copies the
 security results in this structure, and adds the actor name of the
-security header. The it stores this new data structure in a vector and stores
+security header. Then it stores this new data structure in a vector and stores
 this vector in a specific 
 {@link org.apache.ws.security.handler.WSHandlerConstants#RECV_RESULTS property} 
 of the current message context. If WSS4J handlers are

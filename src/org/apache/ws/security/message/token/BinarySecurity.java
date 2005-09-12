@@ -77,7 +77,7 @@ public class BinarySecurity {
      * get the value type.
      * <p/>
      * 
-     * @return 
+     * @return TODO
      */
     public String getValueType() {
         return this.element.getAttribute("ValueType");
@@ -97,7 +97,7 @@ public class BinarySecurity {
      * get the encoding type.
      * <p/>
      * 
-     * @return 
+     * @return TODO
      */
     public String getEncodingType() {
         return this.element.getAttribute("EncodingType");
@@ -117,7 +117,7 @@ public class BinarySecurity {
      * get the byte array containing token information.
      * <p/>
      * 
-     * @return 
+     * @return TODO
      */
     public byte[] getToken() {
         Text node = getFirstNode();
@@ -149,7 +149,7 @@ public class BinarySecurity {
      * return the first text node.
      * <p/>
      * 
-     * @return 
+     * @return TODO
      */
     protected Text getFirstNode() {
         Node node = this.element.getFirstChild();
@@ -160,7 +160,7 @@ public class BinarySecurity {
      * return the dom element.
      * <p/>
      * 
-     * @return 
+     * @return TODO
      */
     public Element getElement() {
         return this.element;
@@ -170,7 +170,7 @@ public class BinarySecurity {
      * get the id.
      * <p/>
      * 
-     * @return 
+     * @return TODO
      */
     public String getID() {
         return this.element.getAttributeNS(WSConstants.WSU_NS, "Id");
@@ -191,7 +191,7 @@ public class BinarySecurity {
      * return the string representation of the token.
      * <p/>
      * 
-     * @return 
+     * @return TODO
      */
     public String toString() {
         return DOM2Writer.nodeToString((Node) this.element);

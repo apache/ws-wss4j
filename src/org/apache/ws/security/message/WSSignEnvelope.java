@@ -125,7 +125,7 @@ public class WSSignEnvelope extends WSBaseMessage {
     /**
      * Get the single cert flag.
      *
-     * @return
+     * @return TODO
      */
     public boolean isUseSingleCertificate() {
         return this.useSingleCert;
@@ -181,7 +181,7 @@ public class WSSignEnvelope extends WSBaseMessage {
      * If the canonicalization method was not set then Exclusive XML
      * Canonicalization is used by default.
      * 
-     * @return
+     * @return TODO
      */
     public String getSigCanonicalization() {
         return canonAlgo;

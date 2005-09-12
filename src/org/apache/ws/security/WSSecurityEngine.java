@@ -245,7 +245,9 @@ public class WSSecurityEngine {
      * <ul>
      * <li>{@link #SIGNATURE <code>ds:Signature</code>}</li>
      * <li>{@link #ENCRYPTED_KEY <code>xenc:EncryptedKey</code>}</li>
-     * <li>{@link #USERNAME_TOKEN <code>wsse:UsernameToken</code>}</li>
+     * <li>{@link #REFERENCE_LIST <code>xenc:ReferenceList</code>}</li>
+     * <li>{@link #usernameToken <code>wsse:UsernameToken</code>}</li>
+     * <li>{@link #timeStamp <code>wsu:Timestamp</code>}</li>
      * </ul>
      * <p/>
      *

@@ -99,7 +99,7 @@ public class WSSConfig {
     /**
      * Checks if we are in WS-I Basic Security Profile compliance mode
      *
-     * @return
+     * @return TODO
      */
     public boolean isWsiBSPCompliant() {
         return wsiBSPCompliant;
@@ -118,7 +118,7 @@ public class WSSConfig {
     /**
      * Checks if we need to use milliseconds in timestamps
      *
-     * @return
+     * @return TODO
      */
     public boolean isPrecisionInMilliSeconds() {
         return precisionInMilliSeconds;
@@ -127,7 +127,7 @@ public class WSSConfig {
     /**
      * Set the precision in milliseconds
      *
-     * @param wsiBSPCompliant
+     * @param precisionInMilliSeconds TODO
      */
     public void setPrecisionInMilliSeconds(boolean precisionInMilliSeconds) {
         this.precisionInMilliSeconds = precisionInMilliSeconds;

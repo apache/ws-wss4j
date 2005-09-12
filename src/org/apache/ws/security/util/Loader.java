@@ -48,7 +48,7 @@ public class Loader {
      * <p/>
      *
      * @param resource
-     * @return
+     * @return TODO
      */
     static public URL getResource(String resource) {
         ClassLoader classLoader = null;
@@ -95,7 +95,7 @@ public class Loader {
      * <p/>
      *
      * @param clazz
-     * @return
+     * @return TODO
      * @throws ClassNotFoundException
      */
     static public Class loadClass(String clazz) throws ClassNotFoundException {

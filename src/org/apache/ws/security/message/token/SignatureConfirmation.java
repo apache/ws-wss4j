@@ -60,8 +60,8 @@ public class SignatureConfirmation {
      * <p/>
      *
      * @param doc the SOAP envelope as <code>Document</code>
-     * @param the Signature value as byte[] of <code>null</code> if no value
-     *        available.
+     * @param signVal the Signature value as byte[] of <code>null</code> 
+     *   if no value available.
      */
     public SignatureConfirmation(Document doc, byte[] signVal) {
 
@@ -110,7 +110,7 @@ public class SignatureConfirmation {
     
     /**
      * Returns the value of the wsu:Id attribute
-     * @return
+     * @return TODO
      */
     public String getID() {
         return this.element.getAttributeNS(WSConstants.WSU_NS, "Id");
