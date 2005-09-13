@@ -95,6 +95,8 @@ public class WSConstants {
     public static final String CREATED_LN = "Created";
     public static final String EXPIRES_LN = "Expires";
     public static final String SIGNATURE_CONFIRMATION_LN = "SignatureConfirmation"; 
+    public static final String SALT_LN = "Salt";
+    public static final String ITERATION_LN = "Iteration";
 
     /*
      * The definitions for SAML

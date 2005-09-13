@@ -34,9 +34,10 @@ import javax.xml.namespace.QName;
  * <p/>
  * 
  * @author Davanum Srinivas (dims@yahoo.com).
+ * @author Werner Dittmann (Werner.Dittmann@t-onile.de).
  */
 public class BinarySecurity {
-    public static final QName TOKEN = new QName(WSConstants.WSSE_NS, "BinarySecurityToken");
+    public static final QName TOKEN_BST = new QName(WSConstants.WSSE_NS, "BinarySecurityToken");
     public static final QName TOKEN_KI = new QName(WSConstants.WSSE_NS, "KeyIdentifier");
     public static final String BASE64_ENCODING = WSConstants.SOAPMESSAGE_NS + "#Base64Binary";
     protected Element element = null;
@@ -50,19 +51,41 @@ public class BinarySecurity {
      */
     public BinarySecurity(Element elem) throws WSSecurityException {
         this.element = elem;
-        QName el = new QName(this.element.getNamespaceURI(), this.element.getLocalName());
-        if (!el.equals(TOKEN) && !el.equals(TOKEN_KI)) {
-            throw new WSSecurityException(WSSecurityException.INVALID_SECURITY_TOKEN, "badTokenType", new Object[]{el});
+        QName el = new QName(this.element.getNamespaceURI(), this.element
+                .getLocalName());
+        if (!el.equals(TOKEN_BST) && !el.equals(TOKEN_KI)) {
+            throw new WSSecurityException(
+                    WSSecurityException.INVALID_SECURITY_TOKEN, "badTokenType",
+                    new Object[] { el });
         }
         String encoding = getEncodingType();
-        if (encoding.length() > 0 && !encoding.equals(BASE64_ENCODING)) {
-            throw new WSSecurityException(WSSecurityException.INVALID_SECURITY_TOKEN, "badEncoding", new Object[]{getEncodingType()});
+        /*
+         * if the Element is a BinarySecurityToken then
+         *     encoding may be null -> default is Base64
+         *     if encoding is not null and not empty it must be Base64
+         * else
+         *     this is a keyidentifier element
+         *     must contain an encoding attribute which must be Base64
+         *     in this case
+         */
+        if (el.equals(TOKEN_BST)) {
+            if (encoding != null && encoding.length() > 0
+                    && !encoding.equals(BASE64_ENCODING)) {
+                throw new WSSecurityException(
+                        WSSecurityException.INVALID_SECURITY_TOKEN,
+                        "badEncoding", new Object[] { encoding });
+            }
+        } else if (el.equals(TOKEN_KI)) {
+            if (encoding == null || !encoding.equals(BASE64_ENCODING)) {
+                throw new WSSecurityException(
+                        WSSecurityException.INVALID_SECURITY_TOKEN,
+                        "badEncoding", new Object[] { encoding });
+            }
         }
     }
 
     /**
      * Constructor.
-     * <p/>
      * 
      * @param doc 
      */

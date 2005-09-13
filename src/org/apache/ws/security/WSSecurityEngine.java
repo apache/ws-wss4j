@@ -33,7 +33,6 @@ import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.ws.security.util.XmlSchemaDateFormat;
 import org.apache.xml.security.encryption.XMLCipher;
 import org.apache.xml.security.encryption.XMLEncryptionException;
-import org.apache.xml.security.exceptions.Base64DecodingException;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.keys.KeyInfo;
 import org.apache.xml.security.keys.content.X509Data;
@@ -63,8 +62,6 @@ import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.xml.namespace.QName;
 import java.io.IOException;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.security.Principal;
 import java.security.PrivateKey;
 import java.security.cert.CertificateExpiredException;
@@ -88,7 +85,6 @@ public class WSSecurityEngine {
     private static Log tlog =
             LogFactory.getLog("org.apache.ws.security.TIME");
 
-    private static final Class[] constructorType = {org.w3c.dom.Element.class};
     private static WSSecurityEngine engine = null;
     private static WSSConfig wssConfig = WSSConfig.getDefaultWSConfig();
     /**
@@ -500,7 +496,7 @@ public class WSSecurityEngine {
 				 */
 				QName el = new QName(token.getNamespaceURI(), token
 						.getLocalName());
-				if (token.getLocalName().equals(WSConstants.USERNAME_TOKEN_LN)) {
+				if (el.equals(usernameToken)) {
 			        ut = new UsernameToken(token);
 			        secretKey = ut.getSecretKey();
 				} else {
@@ -508,7 +504,7 @@ public class WSSecurityEngine {
 						throw new WSSecurityException(WSSecurityException.FAILURE,
 								"noSigCryptoFile");
 					}
-					if (token.getLocalName().equals(binaryToken.getLocalPart())) {
+					if (el.equals(binaryToken)) {
 						certs = getCertificatesTokenReference((Element) token,
 								crypto);
 					} else if (el.equals(SAML_TOKEN)) {
@@ -646,10 +642,8 @@ public class WSSecurityEngine {
             X509Certificate[] certs = new X509Certificate[1];
             certs[0] = cert;
             return certs;
-        } else {
-            throw new WSSecurityException(WSSecurityException.UNSUPPORTED_SECURITY_TOKEN,
-                    "unhandledToken", new Object[]{token.getClass().getName()});
         }
+        return null;
     }
 
     /**
@@ -742,38 +736,20 @@ public class WSSecurityEngine {
     private BinarySecurity createSecurityToken(Element element) throws WSSecurityException {
         BinarySecurity token = new BinarySecurity(element);
         String type = token.getValueType();
-        Class clazz = null;
-        if (type.equals(X509Security.getType())) {
-            clazz = X509Security.class;
-        } else if (type.equals(PKIPathSecurity.getType())) {
-            clazz = PKIPathSecurity.class;
+        X509Security x509 = null;
+        PKIPathSecurity pkiPath = null;
+        
+        if (X509Security.getType().equals(type)) {
+            x509 = new X509Security(element);
+            return (BinarySecurity)x509;
+        } else if (PKIPathSecurity.getType().equals(type)) {
+            pkiPath = new PKIPathSecurity(element);
+            return (BinarySecurity)pkiPath;
         }
-        if (clazz == null) {
-            throw new WSSecurityException(WSSecurityException.UNSUPPORTED_SECURITY_TOKEN,
-                    "unsupportedBinaryTokenType", new Object[]{type});
-        }
-        try {
-            Constructor constructor = clazz.getConstructor(constructorType);
-            if (constructor == null) {
-                throw new WSSecurityException(WSSecurityException.FAILURE,
-                        "invalidConstructor", new Object[]{clazz});
-            }
-            return (BinarySecurity) constructor.newInstance(new Object[]{element});
-        } catch (InvocationTargetException e) {
-            Throwable ee = e.getTargetException();
-            if (ee instanceof WSSecurityException) {
-                throw (WSSecurityException) ee;
-            } else {
-                throw new WSSecurityException(WSSecurityException.FAILURE, null, null, e);
-            }
-        } catch (NoSuchMethodException e) {
-            throw new WSSecurityException(WSSecurityException.FAILURE, null, null, e);
-        } catch (InstantiationException e) {
-            throw new WSSecurityException(WSSecurityException.FAILURE, null, null, e);
-        } catch (IllegalAccessException e) {
-            throw new WSSecurityException(WSSecurityException.FAILURE, null, null, e);
-        }
+        throw new WSSecurityException(WSSecurityException.UNSUPPORTED_SECURITY_TOKEN,
+                "unsupportedBinaryTokenType", new Object[]{type});
     }
+
 
     /**
      * Check the UsernameToken element. Depending on the password type
@@ -956,9 +932,7 @@ public class WSSecurityEngine {
             throw new WSSecurityException
                     (WSSecurityException.INVALID_SECURITY, "noCipher");
         }
-        // here get the reference to the private key / shared secret key.
-        // Shared secret key not yet supported
-        // see check above ... maybe later
+
         if (privateKey == null) {
             Element keyInfo = (Element) WSSecurityUtil.getDirectChild((Node) xencEncryptedKey,
                     "KeyInfo", WSConstants.SIG_NS);
@@ -998,7 +972,7 @@ public class WSSecurityEngine {
                 * If wsse:KeyIdentifier found, then the public key of the attached cert was used to
                 * encrypt the session (symmetric) key that encrypts the data. Extract the certificate
                 * using the BinarySecurity token (was enhanced to handle KeyIdentifier too).
-                * This method is _not_recommended by OASIS WS-S specification, X509 profile
+                * This method is _not_ recommended by OASIS WS-S specification, X509 profile
                 */
                 else if (secRef.containsKeyIdentifier()) {
                     X509Certificate[] certs = secRef.getKeyIdentifier(crypto);

@@ -206,18 +206,8 @@ public class SecurityTokenReference {
             throw new WSSecurityException(WSSecurityException.SECURITY_TOKEN_UNAVAILABLE,
                     "encodeError");
         }
-        Text certText = doc.createTextNode(Base64.encode(data));
-        Element keyId =
-                doc.createElementNS(WSConstants.WSSE_NS, "wsse:KeyIdentifier");
-        keyId.setAttributeNS(null, "ValueType", X509Security.getType());
-        keyId.setAttributeNS(null, "EncodingType", BinarySecurity.BASE64_ENCODING);
-        keyId.appendChild(certText);
-        Element elem = getFirstElement();
-        if (elem != null) {
-            this.element.replaceChild(keyId, elem);
-        } else {
-            this.element.appendChild(keyId);
-        }
+        Text text = doc.createTextNode(Base64.encode(data));
+        createKeyIdentifier(doc, X509Security.getType(), text);        
     }
 
     /**
@@ -317,8 +307,7 @@ public class SecurityTokenReference {
             }
         } else if (SKI_URI.equals(value)) {
             alias = getX509SKIAlias(crypto);
-        }
-        else if  (THUMB_URI.equals(value)) {
+        } else if (THUMB_URI.equals(value)) {
             Node node = getFirstElement().getFirstChild();
             if (node == null) {
                 return null;
@@ -327,7 +316,7 @@ public class SecurityTokenReference {
                 byte[] thumb = Base64.decode(((Text) node).getData());
                 alias = crypto.getAliasForX509CertThumb(thumb);
             }
-                 
+
         }
         if (alias != null) {
             return crypto.getCertificates(alias);
