@@ -19,29 +19,27 @@ package org.apache.ws.security.handler;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSEncryptionPart;
 import org.apache.ws.security.WSPasswordCallback;
+import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
+import org.apache.ws.security.action.EncryptionAction;
+import org.apache.ws.security.action.SAMLTokenSignedAction;
+import org.apache.ws.security.action.SAMLTokenUnsignedAction;
+import org.apache.ws.security.action.SignatureAction;
+import org.apache.ws.security.action.SignatureConfirmationAction;
+import org.apache.ws.security.action.TimestampAction;
+import org.apache.ws.security.action.UsernameTokenAction;
+import org.apache.ws.security.action.UsernameTokenSignedAction;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
-import org.apache.ws.security.message.WSAddTimestamp;
-import org.apache.ws.security.message.WSEncryptBody;
-import org.apache.ws.security.message.WSSAddSAMLToken;
-import org.apache.ws.security.message.WSSAddUsernameToken;
-import org.apache.ws.security.message.WSSignEnvelope;
-import org.apache.ws.security.message.WSAddSignatureConfirmation;
 import org.apache.ws.security.message.token.Timestamp;
-import org.apache.ws.security.saml.SAMLIssuer;
-import org.apache.ws.security.saml.SAMLIssuerFactory;
+import org.apache.ws.security.util.Loader;
 import org.apache.ws.security.util.StringUtil;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.ws.security.util.XmlSchemaDateFormat;
-import org.apache.ws.security.util.Loader;
-import org.apache.xml.security.signature.XMLSignature;
-import org.opensaml.SAMLAssertion;
 import org.w3c.dom.Document;
 
 import javax.security.auth.callback.Callback;
@@ -49,10 +47,10 @@ import javax.security.auth.callback.CallbackHandler;
 import java.math.BigInteger;
 import java.security.cert.X509Certificate;
 import java.text.DateFormat;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Hashtable;
 import java.util.Vector;
-import java.util.Arrays;
 
 
 /**
@@ -63,14 +61,14 @@ import java.util.Arrays;
  * @author Werner Dittmann (Werner.Dittmann@t-online.de).
  */
 public abstract class WSHandler {
-    protected static String DONE = "done";
+    public static String DONE = "done";
     protected static Log log = LogFactory.getLog(WSHandler.class.getName());
     protected static final WSSecurityEngine secEngine = WSSecurityEngine.getInstance();
     protected static Hashtable cryptos = new Hashtable(5);
 
     private boolean doDebug = log.isDebugEnabled();
 
-    /**
+    /**                                                             ut
      * Performs all defined security actions to set-up the SOAP request.
      * 
      * 
@@ -165,7 +163,7 @@ public abstract class WSHandler {
                 Vector results = null;
                 if ((results = (Vector) getProperty(reqData.getMsgContext(),
                         WSHandlerConstants.RECV_RESULTS)) != null) {
-                    performSIGNConfirmation(mu, doc, reqData, results);
+                    wssConfig.getAction(WSConstants.SC).execute(this, WSConstants.SC, mu, doc, reqData);
                 }
             }
         }
@@ -181,37 +179,18 @@ public abstract class WSHandler {
             }
 
             switch (actionToDo) {
-            case WSConstants.UT:
-                performUTAction(actionToDo, mu, doc, reqData);
-                break;
-
-            case WSConstants.ENCR:
-                performENCRAction(actionToDo, mu, doc, reqData);
-                break;
-
-            case WSConstants.SIGN:
-                performSIGNAction(actionToDo, mu, doc, reqData);
-                break;
-
-            case WSConstants.ST_SIGNED:
-                performST_SIGNAction(actionToDo, mu, doc, reqData);
-                break;
-
-            case WSConstants.ST_UNSIGNED:
-                performSTAction(actionToDo, mu, doc, reqData);
-                break;
-
-            case WSConstants.TS:
-                performTSAction(actionToDo, mu, doc, reqData);
-                break;
-
-            case WSConstants.UT_SIGN:
-                performUT_SIGNAction(actionToDo, mu, doc, reqData);
-                break;
-
-            case WSConstants.NO_SERIALIZE:
-                reqData.setNoSerialization(true);
-                break;
+                case WSConstants.UT:
+                case WSConstants.ENCR:
+                case WSConstants.SIGN:
+                case WSConstants.ST_SIGNED:
+                case WSConstants.ST_UNSIGNED:
+                case WSConstants.TS:
+                case WSConstants.UT_SIGN:
+                    wssConfig.getAction(actionToDo).execute(this, actionToDo, mu, doc, reqData);
+                    break;
+                case WSConstants.NO_SERIALIZE:
+                    reqData.setNoSerialization(true);
+                    break;
             }
         }
         /*
@@ -276,288 +255,6 @@ public abstract class WSHandler {
         return true;
     }
 
-    
-    protected void performSIGNAction(int actionToDo, boolean mu, Document doc, RequestData reqData)
-            throws WSSecurityException {
-        String password;
-        password =
-                getPassword(reqData.getUsername(),
-                        actionToDo,
-                        WSHandlerConstants.PW_CALLBACK_CLASS,
-                        WSHandlerConstants.PW_CALLBACK_REF, reqData)
-                .getPassword();
-
-        WSSignEnvelope wsSign = new WSSignEnvelope(reqData.getActor(), mu);
-        wsSign.setWsConfig(reqData.getWssConfig());
-        
-        if (reqData.getSigKeyId() != 0) {
-            wsSign.setKeyIdentifierType(reqData.getSigKeyId());
-        }
-        if (reqData.getSigAlgorithm() != null) {
-            wsSign.setSignatureAlgorithm(reqData.getSigAlgorithm());
-        }
-
-        wsSign.setUserInfo(reqData.getUsername(), password);
-        if (reqData.getSignatureParts().size() > 0) {
-            wsSign.setParts(reqData.getSignatureParts());
-        }
-
-        try {
-            wsSign.build(doc, reqData.getSigCrypto());
-            reqData.getSignatureValues().add(wsSign.getSignatureValue());
-        } catch (WSSecurityException e) {
-            throw new WSSecurityException("WSHandler: Signature: error during message procesing" + e);
-        }
-    }
-
-    protected void performENCRAction(int actionToDo, boolean mu, Document doc, RequestData reqData)
-            throws WSSecurityException {
-        WSEncryptBody wsEncrypt = new WSEncryptBody(reqData.getActor(), mu);
-        wsEncrypt.setWsConfig(reqData.getWssConfig());
-        
-        if (reqData.getEncKeyId() != 0) {
-            wsEncrypt.setKeyIdentifierType(reqData.getEncKeyId());
-        }
-        if (reqData.getEncKeyId() == WSConstants.EMBEDDED_KEYNAME) {
-            String encKeyName = null;
-            if ((encKeyName =
-                    (String) getOption(WSHandlerConstants.ENC_KEY_NAME))
-                    == null) {
-                encKeyName =
-                        (String) getProperty(reqData.getMsgContext(), WSHandlerConstants.ENC_KEY_NAME);
-            }
-            wsEncrypt.setEmbeddedKeyName(encKeyName);
-            byte[] embeddedKey =
-                    getPassword(reqData.getEncUser(),
-                            actionToDo,
-                            WSHandlerConstants.ENC_CALLBACK_CLASS,
-                            WSHandlerConstants.ENC_CALLBACK_REF, reqData)
-                    .getKey();
-            wsEncrypt.setKey(embeddedKey);
-        }
-        if (reqData.getEncSymmAlgo() != null) {
-            wsEncrypt.setSymmetricEncAlgorithm(reqData.getEncSymmAlgo());
-        }
-        if (reqData.getEncKeyTransport() != null) {
-            wsEncrypt.setKeyEnc(reqData.getEncKeyTransport());
-        }
-        wsEncrypt.setUserInfo(reqData.getEncUser());
-        wsEncrypt.setUseThisCert(reqData.getEncCert());
-        if (reqData.getEncryptParts().size() > 0) {
-            wsEncrypt.setParts(reqData.getEncryptParts());
-        }
-        try {
-            wsEncrypt.build(doc, reqData.getEncCrypto());
-        } catch (WSSecurityException e) {
-            throw new WSSecurityException("WSHandler: Encryption: error during message processing"
-                    + e);
-        }
-    }
-
-    protected void performUTAction(int actionToDo, boolean mu, Document doc, RequestData reqData)
-            throws WSSecurityException {
-        String password;
-        password =
-                getPassword(reqData.getUsername(),
-                        actionToDo,
-                        WSHandlerConstants.PW_CALLBACK_CLASS,
-                        WSHandlerConstants.PW_CALLBACK_REF, reqData)
-                .getPassword();
-
-        WSSAddUsernameToken builder = new WSSAddUsernameToken(reqData.getActor(), mu);
-        builder.setWsConfig(reqData.getWssConfig());
-        builder.setPasswordType(reqData.getPwType());
-        
-        //Set the wsu:Id of the UNT
-        builder.setId("UsernameToken-" + System.currentTimeMillis());
-        
-        // add the UsernameToken to the SOAP Enevelope
-        builder.build(doc, reqData.getUsername(), password);
-
-        if (reqData.getUtElements() != null && reqData.getUtElements().length > 0) {
-            for (int j = 0; j < reqData.getUtElements().length; j++) {
-                reqData.getUtElements()[j].trim();
-                if (reqData.getUtElements()[j].equals("Nonce")) {
-                    builder.addNonce(doc);
-                }
-                if (reqData.getUtElements()[j].equals("Created")) {
-                    builder.addCreated(doc);
-                }
-                reqData.getUtElements()[j] = null;
-            }
-        }
-    }
-
-    protected void performUT_SIGNAction(int actionToDo, boolean mu, Document doc, RequestData reqData)
-            throws WSSecurityException {
-        String password;
-        password = getPassword(reqData.getUsername(), actionToDo,
-                WSHandlerConstants.PW_CALLBACK_CLASS,
-                WSHandlerConstants.PW_CALLBACK_REF, reqData).getPassword();
-
-        WSSAddUsernameToken builder = new WSSAddUsernameToken(reqData.getActor(), mu);
-        builder.setWsConfig(reqData.getWssConfig());
-
-        builder.setPasswordType(WSConstants.PASSWORD_TEXT);
-        builder.preSetUsernameToken(doc, reqData.getUsername(), password);
-        builder.addCreated(doc);
-        builder.addNonce(doc);
-
-        WSSignEnvelope sign = new WSSignEnvelope(reqData.getActor(), mu);
-        sign.setWsConfig(reqData.getWssConfig());
-
-        if (reqData.getSignatureParts().size() > 0) {
-            sign.setParts(reqData.getSignatureParts());
-        }
-        sign.setUsernameToken(builder);
-        sign.setKeyIdentifierType(WSConstants.UT_SIGNING);
-        sign.setSignatureAlgorithm(XMLSignature.ALGO_ID_MAC_HMAC_SHA1);
-        try {
-            sign.build(doc, null);
-            reqData.getSignatureValues().add(sign.getSignatureValue());
-        } catch (WSSecurityException e) {
-            throw new WSSecurityException("WSHandler: Error during Signatur with UsernameToken secret"
-                    + e);
-        }
-        builder.build(doc, null, null);
-    }
-
-    protected void performSTAction(int actionToDo, boolean mu, Document doc, RequestData reqData)
-            throws WSSecurityException {
-        WSSAddSAMLToken builder = new WSSAddSAMLToken(reqData.getActor(), mu);
-        builder.setWsConfig(reqData.getWssConfig());
-
-        SAMLIssuer saml = loadSamlIssuer(reqData);
-        saml.setUsername(reqData.getUsername());
-        SAMLAssertion assertion = saml.newAssertion();
-
-        // add the SAMLAssertion Token to the SOAP Enevelope
-        builder.build(doc, assertion);
-    }
-
-    protected void performST_SIGNAction(int actionToDo, boolean mu, Document doc, RequestData reqData)
-            throws WSSecurityException {
-        Crypto crypto = null;
-        /*
-        * it is possible and legal that we do not have a signature
-        * crypto here - thus ignore the exception. This is usually
-        * the case for the SAML option "sender vouches". In this case
-        * no user crypto is required.
-        */
-        try {
-            crypto = loadSignatureCrypto(reqData);
-        } catch (WSSecurityException ex) {}
-
-        SAMLIssuer saml = loadSamlIssuer(reqData);
-        saml.setUsername(reqData.getUsername());
-        saml.setUserCrypto(crypto);
-        saml.setInstanceDoc(doc);
-
-        SAMLAssertion assertion = saml.newAssertion();
-        if (assertion == null) {
-            throw new WSSecurityException("WSHandler: Signed SAML: no SAML token received");
-        }
-        String issuerKeyName = null;
-        String issuerKeyPW = null;
-        Crypto issuerCrypto = null;
-
-        WSSignEnvelope wsSign = new WSSignEnvelope(reqData.getActor(), mu);
-        wsSign.setWsConfig(reqData.getWssConfig());
-
-        String password = null;
-        if (saml.isSenderVouches()) {
-            issuerKeyName = saml.getIssuerKeyName();
-            issuerKeyPW = saml.getIssuerKeyPassword();
-            issuerCrypto = saml.getIssuerCrypto();
-        } else {
-            password =
-                    getPassword(reqData.getUsername(),
-                            actionToDo,
-                            WSHandlerConstants.PW_CALLBACK_CLASS,
-                            WSHandlerConstants.PW_CALLBACK_REF, reqData)
-                    .getPassword();
-            wsSign.setUserInfo(reqData.getUsername(), password);
-        }
-        if (reqData.getSigKeyId() != 0) {
-            wsSign.setKeyIdentifierType(reqData.getSigKeyId());
-        }
-        try {
-            wsSign.build(doc,
-                    crypto,
-                    assertion,
-                    issuerCrypto,
-                    issuerKeyName,
-                    issuerKeyPW);
-            reqData.getSignatureValues().add(wsSign.getSignatureValue());
-        } catch (WSSecurityException e) {
-            throw new WSSecurityException("WSHandler: Signed SAML: error during message processing"
-                    + e);
-        }
-    }
-
-    protected void performTSAction(int actionToDo, boolean mu, Document doc, RequestData reqData) throws WSSecurityException {
-        WSAddTimestamp timeStampBuilder =
-                new WSAddTimestamp(reqData.getActor(), mu);
-        timeStampBuilder.setWsConfig(reqData.getWssConfig());
-
-        
-        timeStampBuilder.setId("Timestamp-" + System.currentTimeMillis());
-        
-        // add the Timestamp to the SOAP Enevelope
-        timeStampBuilder.build(doc, decodeTimeToLive(reqData));
-    }
-
-    protected void performSIGNConfirmation(boolean mu, Document doc,
-            RequestData reqData, Vector results) {
-        if (doDebug) {
-            log.debug("Perform Signature confirmation");
-        }
-        /*
-         * loop over all results gathered by all handlers in the chain. For each
-         * handler result get the various actions. After that loop we have all
-         * signature results in the signatureActions vector
-         */
-        Vector signatureActions = new Vector();
-        for (int i = 0; i < results.size(); i++) {
-            WSHandlerResult wshResult = (WSHandlerResult) results.get(i);
-
-            WSSecurityUtil.fetchAllActionResults(wshResult.getResults(),
-                    WSConstants.SIGN, signatureActions);
-            WSSecurityUtil.fetchAllActionResults(wshResult.getResults(),
-                    WSConstants.ST_SIGNED, signatureActions);
-            WSSecurityUtil.fetchAllActionResults(wshResult.getResults(),
-                    WSConstants.UT_SIGN, signatureActions);
-        }
-        Vector signatureParts = reqData.getSignatureParts();
-        // prepare a SignatureConfirmation token
-        WSAddSignatureConfirmation wsc = new WSAddSignatureConfirmation(reqData
-                .getActor(), mu);
-        int idHash = wsc.hashCode();
-        if (signatureActions.size() > 0) {
-            if (doDebug) {
-                log
-                        .debug("Signature Confirmation: number of Signature results: "
-                                + signatureActions.size());
-            }
-            for (int i = 0; i < signatureActions.size(); i++) {
-                WSSecurityEngineResult wsr = (WSSecurityEngineResult) signatureActions
-                        .get(i);
-                byte[] sigVal = wsr.getSignatureValue();
-                String id = "sigcon-" + (idHash + i);
-                wsc.setId(id);
-                wsc.build(doc, sigVal);
-                signatureParts.add(new WSEncryptionPart(id));
-            }
-        } else {
-            String id = "sigcon-" + idHash;
-            wsc.setId(id);
-            wsc.build(doc, null);
-            signatureParts.add(new WSEncryptionPart(id));
-        }
-        setProperty(reqData.getMsgContext(), WSHandlerConstants.SIG_CONF_DONE,
-                DONE);
-    }
-
     protected void checkSignatureConfirmation(RequestData reqData,
             Vector wsResult) throws WSSecurityException{
         if (doDebug) {
@@ -619,7 +316,7 @@ public abstract class WSHandler {
      * Hook to allow subclasses to load their Signature Crypto however they see
      * fit.
      */
-    protected Crypto loadSignatureCrypto(RequestData reqData) throws WSSecurityException {
+    public Crypto loadSignatureCrypto(RequestData reqData) throws WSSecurityException {
         Crypto crypto = null;
         /*
         * Get crypto property file for signature. If none specified throw
@@ -667,18 +364,6 @@ public abstract class WSHandler {
             throw new WSSecurityException("WSHandler: Encryption: no crypto property file");
         }
         return crypto;
-    }
-
-    protected SAMLIssuer loadSamlIssuer(RequestData reqData) {
-        String samlPropFile = null;
-
-        if ((samlPropFile =
-            (String) getOption(WSHandlerConstants.SAML_PROP_FILE))
-            == null) {
-        samlPropFile =
-                (String) getProperty(reqData.getMsgContext(), WSHandlerConstants.SAML_PROP_FILE);
-    }
-        return SAMLIssuerFactory.getInstance(samlPropFile);
     }
 
     protected void decodeUTParameter(RequestData reqData) throws WSSecurityException {
@@ -818,7 +503,7 @@ public abstract class WSHandler {
         return mu;
     }
 
-    protected int decodeTimeToLive(RequestData reqData) {
+    public int decodeTimeToLive(RequestData reqData) {
         String ttl = null;
         if ((ttl =
                 (String) getOption(WSHandlerConstants.TTL_TIMESTAMP))
@@ -867,7 +552,7 @@ public abstract class WSHandler {
      * <p/>
      * Try all possible sources to get a password.
      */
-    private WSPasswordCallback getPassword(String username,
+    public WSPasswordCallback getPassword(String username,
                                            int doAction,
                                            String clsProp,
                                            String refProp,

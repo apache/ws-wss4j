@@ -21,7 +21,11 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.transform.STRTransform;
 import org.apache.ws.security.util.Loader;
+import org.apache.ws.security.action.Action;
+import org.apache.ws.security.processor.Processor;
 import org.apache.xml.security.transforms.Transform;
+
+import javax.xml.namespace.QName;
 
 /**
  * WSSConfig
@@ -52,7 +56,7 @@ public class WSSConfig {
      * the default is to include the milliseconds.
      */
     protected boolean precisionInMilliSeconds = true;
-    
+
     protected boolean enableSignatureConfirmation = true;
 
     protected WSSConfig() {
@@ -145,5 +149,70 @@ public class WSSConfig {
      */
     public void setEnableSignatureConfirmation(boolean enableSignatureConfirmation) {
         this.enableSignatureConfirmation = enableSignatureConfirmation;
+    }
+
+    /**
+     * Lookup action
+     * @param action
+     * @return
+     * @throws WSSecurityException
+     */
+    public Action getAction(int action) throws WSSecurityException {
+        String name = null;
+        switch(action) {
+        case WSConstants.UT:
+            name = "org.apache.ws.security.action.UsernameTokenAction";
+            break;
+
+        case WSConstants.ENCR:
+            name = "org.apache.ws.security.action.EncryptionAction";
+            break;
+
+        case WSConstants.SIGN:
+            name = "org.apache.ws.security.action.SignatureAction";
+            break;
+
+        case WSConstants.ST_SIGNED:
+            name = "org.apache.ws.security.action.SAMLTokenSignedAction";
+            break;
+
+        case WSConstants.ST_UNSIGNED:
+            name = "org.apache.ws.security.action.SAMLTokenUnsignedAction";
+            break;
+
+        case WSConstants.TS:
+            name = "org.apache.ws.security.action.TimestampAction";
+            break;
+
+        case WSConstants.UT_SIGN:
+            name = "org.apache.ws.security.action.UsernameTokenSignedAction";
+            break;
+        case WSConstants.SC:
+            name = "org.apache.ws.security.action.SignatureConfirmationAction";
+            break;
+        }
+        if(name == null) {
+            throw new WSSecurityException(WSSecurityException.FAILURE, "unknownAction", new Object[]{new Integer(action)});
+        }
+        try {
+            return (Action)Loader.loadClass(name).newInstance();
+        } catch (Throwable t) {
+            throw new WSSecurityException(WSSecurityException.FAILURE, "unableToLoadClass", new Object[]{name});
+        }
+    }
+
+    public Processor getProcessor(QName el) throws WSSecurityException {
+        String name = null;
+        if(el.equals(WSSecurityEngine.SAML_TOKEN)){
+            name = "org.apache.ws.security.processor.SAMLTokenProcessor";
+        }
+        if(name != null){
+            try {
+                return (Processor)Loader.loadClass(name).newInstance();
+            } catch (Throwable t) {
+                throw new WSSecurityException(WSSecurityException.FAILURE, "unableToLoadClass", new Object[]{name});
+            }
+        }
+        return null;
     }
 }

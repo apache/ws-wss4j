@@ -19,34 +19,28 @@ package org.apache.ws.security;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.message.EnvelopeIdResolver;
 import org.apache.ws.security.message.token.BinarySecurity;
 import org.apache.ws.security.message.token.PKIPathSecurity;
 import org.apache.ws.security.message.token.SecurityTokenReference;
+import org.apache.ws.security.message.token.SignatureConfirmation;
 import org.apache.ws.security.message.token.Timestamp;
 import org.apache.ws.security.message.token.UsernameToken;
 import org.apache.ws.security.message.token.X509Security;
-import org.apache.ws.security.message.token.SignatureConfirmation;
+import org.apache.ws.security.processor.Processor;
+import org.apache.ws.security.saml.SAMLUtil;
+import org.apache.ws.security.util.Base64;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.ws.security.util.XmlSchemaDateFormat;
 import org.apache.xml.security.encryption.XMLCipher;
 import org.apache.xml.security.encryption.XMLEncryptionException;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.keys.KeyInfo;
-import org.apache.xml.security.keys.content.X509Data;
-import org.apache.xml.security.keys.content.x509.XMLX509Certificate;
 import org.apache.xml.security.signature.Reference;
 import org.apache.xml.security.signature.SignedInfo;
 import org.apache.xml.security.signature.XMLSignature;
 import org.apache.xml.security.signature.XMLSignatureException;
-import org.apache.ws.security.util.Base64;
-import org.opensaml.SAMLAssertion;
-import org.opensaml.SAMLException;
-import org.opensaml.SAMLObject;
-import org.opensaml.SAMLSubject;
-import org.opensaml.SAMLSubjectStatement;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -69,7 +63,6 @@ import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
 import java.text.DateFormat;
 import java.util.Calendar;
-import java.util.Iterator;
 import java.util.Vector;
 
 /**
@@ -350,14 +343,6 @@ public class WSSecurityEngine {
                 lastPrincipalFound = handleUsernameToken((Element) elem, cb);
                 returnResults.add(0, new WSSecurityEngineResult(WSConstants.UT,
                         lastPrincipalFound, null, null, null));
-            } else if (el.equals(SAML_TOKEN)) {
-                if (doDebug) {
-                    log.debug("Found SAML Assertion element");
-                }
-                SAMLAssertion assertion = handleSAMLToken((Element) elem);
-                wsDocInfo.setAssertion((Element) elem);
-                returnResults.add(0,
-                        new WSSecurityEngineResult(WSConstants.ST_UNSIGNED, assertion));
             } else if (el.equals(timeStamp)) {
                 if (doDebug) {
                     log.debug("Found Timestamp list element");
@@ -382,13 +367,18 @@ public class WSSecurityEngine {
                 returnResults.add(0, new WSSecurityEngineResult(WSConstants.SC,
                         sigConf));
             } else {
-                /*
-                 * Add check for a BinarySecurityToken, add info to WSDocInfo. If BST is
-                 * found before a Signature token this would speed up (at least a little
-                 * bit) the processing of STR Transform.
-                 */
-                if (doDebug) {
-                    log.debug("Unknown Element: " + elem.getLocalName() + " " + elem.getNamespaceURI());
+                Processor p = wssConfig.getProcessor(el);
+                if(p != null){
+                    p.handleToken((Element)elem, wsDocInfo, returnResults);
+                } else {
+                    /*
+                    * Add check for a BinarySecurityToken, add info to WSDocInfo. If BST is
+                    * found before a Signature token this would speed up (at least a little
+                    * bit) the processing of STR Transform.
+                    */
+                    if (doDebug) {
+                        log.debug("Unknown Element: " + elem.getLocalName() + " " + elem.getNamespaceURI());
+                    }
                 }
             }
         }
@@ -508,7 +498,7 @@ public class WSSecurityEngine {
 						certs = getCertificatesTokenReference((Element) token,
 								crypto);
 					} else if (el.equals(SAML_TOKEN)) {
-						certs = getCertificatesFromSAML((Element) token, crypto);
+						certs = SAMLUtil.getCertificatesFromSAML((Element) token);
 					} else {
 						throw new WSSecurityException(
 								WSSecurityException.INVALID_SECURITY,
@@ -647,83 +637,6 @@ public class WSSecurityEngine {
     }
 
     /**
-     * Extracts the certificate(s) from the SAML token reference.
-     * <p/>
-     *
-     * @param elem The element containing the SAML token.
-     * @return an array of X509 certificates
-     * @throws WSSecurityException
-     */
-    protected X509Certificate[] getCertificatesFromSAML(Element elem,
-                                                        Crypto crypto)
-            throws WSSecurityException {
-
-        /*
-         * Get some information about the SAML token content. This controls how
-         * to deal with the whole stuff. First get the Authentication statement
-         * (includes Subject), then get the _first_ confirmation method only.
-         */
-        SAMLAssertion assertion;
-        try {
-            assertion = new SAMLAssertion(elem);
-        } catch (SAMLException e) {
-            throw new WSSecurityException(WSSecurityException.FAILURE,
-                    "invalidSAMLToken", new Object[]{"for Signature (cannot parse)"});
-        }
-        SAMLSubjectStatement samlSubjS = null;
-        Iterator it = assertion.getStatements();
-        while (it.hasNext()) {
-            SAMLObject so = (SAMLObject) it.next();
-            if (so instanceof SAMLSubjectStatement) {
-                samlSubjS = (SAMLSubjectStatement) so;
-                break;
-            }
-        }
-        SAMLSubject samlSubj = null;
-        if (samlSubjS != null) {
-            samlSubj = samlSubjS.getSubject();
-        }
-        if (samlSubj == null) {
-            throw new WSSecurityException(WSSecurityException.FAILURE,
-                    "invalidSAMLToken", new Object[]{"for Signature (no Subject)"});
-        }
-
-//        String confirmMethod = null;
-//        it = samlSubj.getConfirmationMethods();
-//        if (it.hasNext()) {
-//            confirmMethod = (String) it.next();
-//        }
-//        boolean senderVouches = false;
-//        if (SAMLSubject.CONF_SENDER_VOUCHES.equals(confirmMethod)) {
-//            senderVouches = true;
-//        }
-        Element e = samlSubj.getKeyInfo();
-        X509Certificate[] certs = null;
-        try {
-            KeyInfo ki = new KeyInfo(e, null);
-
-            if (ki.containsX509Data()) {
-                X509Data data = ki.itemX509Data(0);
-                XMLX509Certificate certElem = null;
-                if (data != null && data.containsCertificate()) {
-                    certElem = data.itemCertificate(0);
-                }
-                if (certElem != null) {
-                    X509Certificate cert = certElem.getX509Certificate();
-                    certs = new X509Certificate[1];
-                    certs[0] = cert;
-                }
-            }
-            // TODO: get alias name for cert, check against username set by caller
-        } catch (XMLSecurityException e3) {
-            throw new WSSecurityException(WSSecurityException.FAILURE,
-                    "invalidSAMLsecurity",
-                    new Object[]{"cannot get certificate (key holder)"});
-        }
-        return certs;
-    }
-
-    /**
      * Checks the <code>element</code> and creates appropriate binary security object.
      *
      * @param element The XML element that contains either a <code>BinarySecurityToken
@@ -841,25 +754,6 @@ public class WSSecurityEngine {
         principal.setPasswordType(pwType);
 
         return principal;
-    }
-
-    public SAMLAssertion handleSAMLToken(Element token) throws WSSecurityException {
-        boolean result = false;
-        SAMLAssertion assertion = null;
-        try {
-            assertion = new SAMLAssertion(token);
-            result = true;
-            if (doDebug) {
-                log.debug("SAML Assertion issuer " + assertion.getIssuer());
-            }
-        } catch (SAMLException e) {
-            throw new WSSecurityException(WSSecurityException.FAILURE,
-                    "invalidSAMLsecurity", null, e);
-        }
-        if (!result) {
-            throw new WSSecurityException(WSSecurityException.FAILED_AUTHENTICATION);
-        }
-        return assertion;
     }
 
     public void handleTimestamp(Timestamp timestamp) throws WSSecurityException {

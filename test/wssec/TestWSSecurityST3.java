@@ -24,6 +24,7 @@ import junit.framework.TestSuite;
 import org.apache.ws.security.saml.SAMLIssuerFactory;
 import org.apache.ws.security.saml.SAMLIssuer;
 import org.apache.ws.security.saml.SAMLIssuerFactory;
+import org.apache.ws.security.saml.WSSignSAMLEnvelope;
 
 import org.apache.axis.Message;
 import org.apache.axis.MessageContext;
@@ -150,7 +151,7 @@ public class TestWSSecurityST3 extends TestCase implements CallbackHandler {
         saml.setUsername("16c73ab6-b892-458f-abf5-2f875f74882e");
         SAMLAssertion assertion = saml.newAssertion();
 
-        WSSignEnvelope wsSign = new WSSignEnvelope();
+        WSSignSAMLEnvelope wsSign = new WSSignSAMLEnvelope();
         wsSign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
         wsSign.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
 

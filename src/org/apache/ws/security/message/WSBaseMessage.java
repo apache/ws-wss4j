@@ -20,8 +20,9 @@ package org.apache.ws.security.message;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.SOAPConstants;
-import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.WSSConfig;
+import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -44,9 +45,9 @@ public class WSBaseMessage {
     protected int keyIdentifierType = WSConstants.ISSUER_SERIAL;
     protected Vector parts = null;
     protected int timeToLive = 300; // time between Created and Expires
-    
+
     protected boolean doDebug = false;
-    
+
     protected WSSConfig wssConfig = WSSConfig.getDefaultWSConfig();
 
 
@@ -256,5 +257,4 @@ public class WSBaseMessage {
         }
         return securityHeader;
     }
-
 }

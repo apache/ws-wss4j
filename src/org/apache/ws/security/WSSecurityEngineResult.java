@@ -17,8 +17,8 @@
 
 package org.apache.ws.security;
 
-import org.apache.ws.security.message.token.Timestamp;
 import org.apache.ws.security.message.token.SignatureConfirmation;
+import org.apache.ws.security.message.token.Timestamp;
 import org.opensaml.SAMLAssertion;
 
 import java.security.Principal;
@@ -39,14 +39,14 @@ public class WSSecurityEngineResult {
     private byte[] signatureValue = null;
     private SignatureConfirmation sigConf = null;
 
-    WSSecurityEngineResult(int act, SAMLAssertion ass) {
+    public WSSecurityEngineResult(int act, SAMLAssertion ass) {
         principal = null;
         cert = null;
         action = act;
         assertion = ass;
     }
 
-    WSSecurityEngineResult(int act, Principal princ,
+    public WSSecurityEngineResult(int act, Principal princ,
             X509Certificate certificate, Vector elemQnames, byte[] sv) {
         principal = princ;
         action = act;
@@ -55,12 +55,12 @@ public class WSSecurityEngineResult {
         signatureValue = sv;
     }
 
-    WSSecurityEngineResult(int act, Timestamp tstamp) {
+    public WSSecurityEngineResult(int act, Timestamp tstamp) {
         action = act;
         timestamp = tstamp;
     }
 
-    WSSecurityEngineResult(int act, SignatureConfirmation sc) {
+    public WSSecurityEngineResult(int act, SignatureConfirmation sc) {
         action = act;
         sigConf = sc;
     }

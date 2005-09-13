@@ -31,39 +31,31 @@ import org.apache.ws.security.message.token.PKIPathSecurity;
 import org.apache.ws.security.message.token.Reference;
 import org.apache.ws.security.message.token.SecurityTokenReference;
 import org.apache.ws.security.message.token.X509Security;
+import org.apache.ws.security.saml.SAMLUtil;
 import org.apache.ws.security.transform.STRTransform;
 import org.apache.ws.security.util.WSSecurityUtil;
+import org.apache.xml.security.algorithms.SignatureAlgorithm;
 import org.apache.xml.security.c14n.Canonicalizer;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.keys.KeyInfo;
 import org.apache.xml.security.keys.content.X509Data;
-import org.apache.xml.security.keys.content.x509.XMLX509Certificate;
 import org.apache.xml.security.keys.content.x509.XMLX509IssuerSerial;
-import org.apache.xml.security.keys.content.X509Data;
 import org.apache.xml.security.signature.XMLSignature;
 import org.apache.xml.security.signature.XMLSignatureException;
 import org.apache.xml.security.transforms.TransformationException;
 import org.apache.xml.security.transforms.Transforms;
 import org.apache.xml.security.transforms.params.InclusiveNamespaces;
-import org.apache.xml.security.utils.XMLUtils;
 import org.apache.xml.security.utils.Constants;
-import org.apache.xml.security.algorithms.SignatureAlgorithm;
-
-import org.opensaml.SAMLAssertion;
-import org.opensaml.SAMLException;
-import org.opensaml.SAMLObject;
-import org.opensaml.SAMLSubject;
-import org.opensaml.SAMLSubjectStatement;
+import org.apache.xml.security.utils.XMLUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
 
 import java.security.cert.X509Certificate;
-import java.util.Iterator;
-import java.util.Vector;
-import java.util.Set;
 import java.util.HashSet;
+import java.util.Set;
+import java.util.Vector;
 
 /**
  * Signs a SOAP envelope according to WS Specification, X509 profile, and adds
@@ -133,10 +125,10 @@ public class WSSignEnvelope extends WSBaseMessage {
 
     /**
      * Set the name of the signature encryption algorithm to use.
-     * 
+     *
      * If the algorithm is not set then Triple RSA is used. Refer to WSConstants
      * which algorithms are supported.
-     * 
+     *
      * @param algo
      *            Is the name of the signature algorithm
      * @see WSConstants#RSA
@@ -148,7 +140,7 @@ public class WSSignEnvelope extends WSBaseMessage {
 
     /**
      * Get the name of the signature algorithm that is being used.
-     * 
+     *
      * If the algorithm is not set then RSA is default.
      *
      * @return the identifier URI of the signature algorithm
@@ -159,11 +151,11 @@ public class WSSignEnvelope extends WSBaseMessage {
 
     /**
      * Set the canonicalization method to use.
-     * 
+     *
      * If the canonicalization method is not set then the recommended Exclusive
      * XML Canonicalization is used by default Refer to WSConstants which
      * algorithms are supported.
-     * 
+     *
      * @param algo
      *            Is the name of the signature algorithm
      * @see WSConstants#C14N_OMIT_COMMENTS
@@ -177,10 +169,10 @@ public class WSSignEnvelope extends WSBaseMessage {
 
     /**
      * Get the canonicalization method.
-     * 
+     *
      * If the canonicalization method was not set then Exclusive XML
      * Canonicalization is used by default.
-     * 
+     *
      * @return TODO
      */
     public String getSigCanonicalization() {
@@ -202,8 +194,8 @@ public class WSSignEnvelope extends WSBaseMessage {
     }
 
     /**
-     * Builds a signed soap envelope. 
-     * 
+     * Builds a signed soap envelope.
+     *
      * The method first gets an appropriate
      * security header. According to the defined parameters for certificate
      * handling the signature elements are constructed and inserted into the
@@ -332,12 +324,12 @@ public class WSSignEnvelope extends WSBaseMessage {
 
         for (int part = 0; part < parts.size(); part++) {
             WSEncryptionPart encPart = (WSEncryptionPart) parts.get(part);
-            
+
             String idToSign = encPart.getId();
-            
+
             String elemName = encPart.getName();
             String nmSpace = encPart.getNamespace();
- 
+
             /*
              * Set up the elements to sign. There are two resevered element
              * names: "Token" and "STRTransform" "Token": Setup the Signature to
@@ -394,20 +386,9 @@ public class WSSignEnvelope extends WSBaseMessage {
                             STRTransform.implementedTransformURI, ctx);
                     sig.addDocument("#" + strUri, transforms);
                 } else if (elemName.equals("Assertion")) { // Assertion
-                    // Make the AssertionID the wsu:Id and the signature reference the same 
-                    SAMLAssertion assertion;
 
-                    Element assertionElement = (Element) WSSecurityUtil
-                            .findElement(envelope, elemName, nmSpace);
-
-                    try {
-                        assertion = new SAMLAssertion(assertionElement);
-                    } catch (Exception e1) {
-                        log.error(e1);
-                        throw new WSSecurityException(
-                                WSSecurityException.FAILED_SIGNATURE,
-                                "noXMLSig", null, e1);
-                    }
+                    String id = null;
+                    id = SAMLUtil.getAssertionId(envelope, elemName, nmSpace);
 
                     Element body = (Element) WSSecurityUtil.findElement(
                             envelope, elemName, nmSpace);
@@ -428,8 +409,8 @@ public class WSSignEnvelope extends WSBaseMessage {
                     String prefix = WSSecurityUtil.setNamespace(body,
                             WSConstants.WSU_NS, WSConstants.WSU_PREFIX);
                     body.setAttributeNS(WSConstants.WSU_NS, prefix + ":Id",
-                            assertion.getId());
-                    sig.addDocument("#" + assertion.getId(), transforms);
+                            id);
+                    sig.addDocument("#" + id, transforms);
 
                 } else {
                     Element body = (Element) WSSecurityUtil.findElement(
@@ -493,7 +474,7 @@ public class WSSignEnvelope extends WSBaseMessage {
 
         case WSConstants.ISSUER_SERIAL:
             XMLX509IssuerSerial data = new XMLX509IssuerSerial(doc, certs[0]);
-            X509Data x509Data = new X509Data(doc); 
+            X509Data x509Data = new X509Data(doc);
             x509Data.add(data);
             secRef.setX509IssuerSerial(x509Data);
             break;
@@ -561,362 +542,7 @@ public class WSSignEnvelope extends WSBaseMessage {
         return (doc);
     }
 
-    /**
-     * Builds a signed soap envelope with SAML token. <p/>The method first
-     * gets an appropriate security header. According to the defined parameters
-     * for certificate handling the signature elements are constructed and
-     * inserted into the <code>wsse:Signature</code>
-     *
-     * @param doc           The unsigned SOAP envelope as <code>Document</code>
-     * @param assertion     the complete SAML assertion
-     * @param issuerCrypto  An instance of the Crypto API to handle keystore SAML token
-     *                      issuer and to generate certificates
-     * @param issuerKeyName Private key to use in case of "sender-Vouches"
-     * @param issuerKeyPW   Password for issuer private key
-     * @return A signed SOAP envelope as <code>Document</code>
-     * @throws WSSecurityException
-     */
-    public Document build(Document doc, Crypto userCrypto,
-            SAMLAssertion assertion, Crypto issuerCrypto, String issuerKeyName,
-            String issuerKeyPW) throws WSSecurityException {
-
-        doDebug = log.isDebugEnabled();
-
-        long t0 = 0, t1 = 0, t2 = 0, t3 = 0, t4 = 0;
-        if (tlog.isDebugEnabled()) {
-            t0 = System.currentTimeMillis();
-        }
-        if (doDebug) {
-            log.debug("Beginning ST signing...");
-        }
-        /*
-         * Get some information about the SAML token content. This controls how
-         * to deal with the whole stuff. First get the Authentication statement
-         * (includes Subject), then get the _first_ confirmation method only.
-         */
-        SAMLSubjectStatement samlSubjS = null;
-        Iterator it = assertion.getStatements();
-        while (it.hasNext()) {
-            SAMLObject so = (SAMLObject) it.next();
-            if (so instanceof SAMLSubjectStatement) {
-                samlSubjS = (SAMLSubjectStatement) so;
-                break;
-            }
-        }
-        SAMLSubject samlSubj = null;
-        if (samlSubjS != null) {
-            samlSubj = samlSubjS.getSubject();
-        }
-        if (samlSubj == null) {
-            throw new WSSecurityException(WSSecurityException.FAILURE,
-                    "invalidSAMLToken", new Object[] { "for Signature" });
-        }
-
-        String confirmMethod = null;
-        it = samlSubj.getConfirmationMethods();
-        if (it.hasNext()) {
-            confirmMethod = (String) it.next();
-        }
-        boolean senderVouches = false;
-        if (SAMLSubject.CONF_SENDER_VOUCHES.equals(confirmMethod)) {
-            senderVouches = true;
-        }
-        /*
-         * Gather some info about the document to process and store it for
-         * retrival
-         */
-        WSDocInfo wsDocInfo = new WSDocInfo(doc.hashCode());
-
-        Element envelope = doc.getDocumentElement();
-        SOAPConstants soapConstants = WSSecurityUtil.getSOAPConstants(envelope);
-
-        Element securityHeader = insertSecurityHeader(doc);
-        X509Certificate[] certs = null;
-
-        if (senderVouches) {
-            certs = issuerCrypto.getCertificates(issuerKeyName);
-            wsDocInfo.setCrypto(issuerCrypto);
-        }
-        /*
-         * in case of key holder:
-         * - get the user's certificate that _must_ be included in the SAML
-         * token. To ensure the cert integrity the SAML token must be signed
-         * (by the issuer). Just check if its signed, but
-         * don't verify this SAML token's signature here (maybe later).
-         */
-        else {
-            if (userCrypto == null || assertion.isSigned() == false) {
-                throw new WSSecurityException(WSSecurityException.FAILURE,
-                        "invalidSAMLsecurity",
-                        new Object[] { "for SAML Signature (Key Holder)" });
-            }
-            Element e = samlSubj.getKeyInfo();
-            try {
-                KeyInfo ki = new KeyInfo(e, null);
-
-                if (ki.containsX509Data()) {
-                    X509Data data = ki.itemX509Data(0);
-                    XMLX509Certificate certElem = null;
-                    if (data != null && data.containsCertificate()) {
-                        certElem = data.itemCertificate(0);
-                    }
-                    if (certElem != null) {
-                        X509Certificate cert = certElem.getX509Certificate();
-                        certs = new X509Certificate[1];
-                        certs[0] = cert;
-                    }
-                }
-                // TODO: get alias name for cert, check against username set by caller
-            } catch (XMLSecurityException e3) {
-                throw new WSSecurityException(WSSecurityException.FAILURE,
-                        "invalidSAMLsecurity",
-                        new Object[] { "cannot get certificate (key holder)" },
-                        e3);
-            }
-            wsDocInfo.setCrypto(userCrypto);
-        }
-        // Set the id of the elements to be used as digest source
-        // String id = setBodyID(doc);
-        if (certs == null || certs.length <= 0) {
-            throw new WSSecurityException(WSSecurityException.FAILURE,
-                    "invalidX509Data", new Object[] { "for Signature" });
-        }
-        if (sigAlgo == null) {
-            String pubKeyAlgo = certs[0].getPublicKey().getAlgorithm();
-            log.debug("automatic sig algo detection: " + pubKeyAlgo);
-            if (pubKeyAlgo.equalsIgnoreCase("DSA")) {
-                sigAlgo = XMLSignature.ALGO_ID_SIGNATURE_DSA;
-            } else if (pubKeyAlgo.equalsIgnoreCase("RSA")) {
-                sigAlgo = XMLSignature.ALGO_ID_SIGNATURE_RSA;
-            } else {
-                throw new WSSecurityException(
-                        WSSecurityException.FAILURE,
-                        "invalidX509Data",
-                        new Object[] { "for Signature - unkown public key Algo" });
-            }
-        }
-        XMLSignature sig = null;
-        try {
-            sig = new XMLSignature(doc, null, sigAlgo, canonAlgo);
-        } catch (XMLSecurityException e) {
-            throw new WSSecurityException(WSSecurityException.FAILED_SIGNATURE,
-                    "noXMLSig");
-        }
-
-        KeyInfo info = sig.getKeyInfo();
-        String keyInfoUri = "KeyId-" + info.hashCode();
-        info.setId(keyInfoUri);
-
-        SecurityTokenReference secRef = new SecurityTokenReference(doc);
-        String strUri = "STRId-" + secRef.hashCode();
-        secRef.setID(strUri);
-
-        String certUri = "CertId-" + certs[0].hashCode();
-
-        if (tlog.isDebugEnabled()) {
-            t1 = System.currentTimeMillis();
-        }
-
-        if (parts == null) {
-            parts = new Vector();
-            WSEncryptionPart encP = new WSEncryptionPart(soapConstants
-                    .getBodyQName().getLocalPart(), soapConstants
-                    .getEnvelopeURI(), "Content");
-            parts.add(encP);
-        }
-
-        /*
-         * If the sender vouches, then we must sign the SAML token _and_ at
-         * least one part of the message (usually the SOAP body). To do so we
-         * need to
-         * - put in a reference to the SAML token. Thus we create a STR
-         *   and insert it into the wsse:Security header
-         * - set a reference of the created STR to the signature and use STR
-         *   Transfrom during the signature
-         */
-        Transforms transforms = null;
-        SecurityTokenReference secRefSaml = null;
-
-        try {
-            if (senderVouches) {
-                secRefSaml = new SecurityTokenReference(doc);
-                String strSamlUri = "STRSAMLId-" + secRefSaml.hashCode();
-                secRefSaml.setID(strSamlUri);
-                // Decouple Refernce/KeyInfo setup - quick shot here
-                Reference ref = new Reference(doc);
-                ref.setURI("#" + assertion.getId());
-                ref.setValueType(WSConstants.WSS_SAML_NS
-                        + WSConstants.WSS_SAML_ASSERTION);
-                secRefSaml.setReference(ref);
-                // up to here
-                Element ctx = createSTRParameter(doc);
-                transforms = new Transforms(doc);
-                transforms.addTransform(STRTransform.implementedTransformURI,
-                        ctx);
-                sig.addDocument("#" + strSamlUri, transforms);
-            }
-            for (int part = 0; part < parts.size(); part++) {
-                WSEncryptionPart encPart = (WSEncryptionPart) parts.get(part);
-                String elemName = encPart.getName();
-                String nmSpace = encPart.getNamespace();
-
-                /*
-                 * Set up the elements to sign. There are two resevered element
-                 * names: "Token" and "STRTransform" "Token": Setup the
-                 * Signature to either sign the information that points to the
-                 * security token or the token itself. If its a direct
-                 * reference sign the token, otherwise sign the KeyInfo
-                 * Element. "STRTransform": Setup the ds:Reference to use STR
-                 * Transform
-                 *
-                 */
-                if (elemName.equals("Token")) {
-                    transforms = new Transforms(doc);
-                    transforms
-                            .addTransform(Transforms.TRANSFORM_C14N_EXCL_OMIT_COMMENTS);
-                    if (keyIdentifierType == WSConstants.BST_DIRECT_REFERENCE) {
-                        sig.addDocument("#" + certUri, transforms);
-                    } else {
-                        sig.addDocument("#" + keyInfoUri, transforms);
-                    }
-                } else if (elemName.equals("STRTransform")) { // STRTransform
-                    Element ctx = createSTRParameter(doc);
-                    transforms = new Transforms(doc);
-                    transforms.addTransform(
-                            STRTransform.implementedTransformURI, ctx);
-                    sig.addDocument("#" + strUri, transforms);
-                } else {
-                    Element body = (Element) WSSecurityUtil.findElement(
-                            envelope, elemName, nmSpace);
-                    if (body == null) {
-                        throw new WSSecurityException(
-                                WSSecurityException.FAILURE, "noEncElement",
-                                new Object[] { nmSpace + ", " + elemName });
-                    }
-                    transforms = new Transforms(doc);
-                    transforms
-                            .addTransform(Transforms.TRANSFORM_C14N_EXCL_OMIT_COMMENTS);
-                    sig.addDocument("#" + setWsuId(body), transforms);
-                }
-            }
-        } catch (TransformationException e1) {
-            throw new WSSecurityException(WSSecurityException.FAILED_SIGNATURE,
-                    "noXMLSig", null, e1);
-        } catch (XMLSignatureException e1) {
-            throw new WSSecurityException(WSSecurityException.FAILED_SIGNATURE,
-                    "noXMLSig", null, e1);
-        }
-
-        sig.addResourceResolver(EnvelopeIdResolver.getInstance());
-
-        /*
-         * The order to prepend is:
-         * - signature
-         * - BinarySecurityToken (depends on mode)
-         * - SecurityTokenRefrence (depends on mode)
-         * - SAML token
-         */
-
-        WSSecurityUtil.prependChildElement(doc, securityHeader, sig
-                .getElement(), false);
-
-        if (tlog.isDebugEnabled()) {
-            t2 = System.currentTimeMillis();
-        }
-        switch (keyIdentifierType) {
-        case WSConstants.BST_DIRECT_REFERENCE:
-            Reference ref = new Reference(doc);
-            if (senderVouches) {
-                ref.setURI("#" + certUri);
-                BinarySecurity bstToken = null;
-                bstToken = new X509Security(doc);
-                ((X509Security) bstToken).setX509Certificate(certs[0]);
-                bstToken.setID(certUri);
-                WSSecurityUtil.prependChildElement(doc, securityHeader,
-                        bstToken.getElement(), false);
-                wsDocInfo.setBst(bstToken.getElement());
-                ref.setValueType(bstToken.getValueType());
-            } else {
-                ref.setURI("#" + assertion.getId());
-                ref.setValueType(WSConstants.WSS_SAML_NS
-                        + WSConstants.WSS_SAML_ASSERTION);
-            }
-            secRef.setReference(ref);
-            break;
-        //
-        //            case WSConstants.ISSUER_SERIAL :
-        //                XMLX509IssuerSerial data =
-        //                    new XMLX509IssuerSerial(doc, certs[0]);
-        //                secRef.setX509IssuerSerial(data);
-        //                break;
-        //
-        //            case WSConstants.X509_KEY_IDENTIFIER :
-        //                secRef.setKeyIdentifier(certs[0]);
-        //                break;
-        //
-        //            case WSConstants.SKI_KEY_IDENTIFIER :
-        //                secRef.setKeyIdentifierSKI(certs[0], crypto);
-        //                break;
-        //
-        default:
-            throw new WSSecurityException(WSSecurityException.FAILURE,
-                    "unsupportedKeyId");
-        }
-
-        if (tlog.isDebugEnabled()) {
-            t3 = System.currentTimeMillis();
-        }
-        info.addUnknownElement(secRef.getElement());
-
-        Element samlToken = null;
-        try {
-            samlToken = (Element) assertion.toDOM(doc);
-        } catch (SAMLException e2) {
-            throw new WSSecurityException(WSSecurityException.FAILED_SIGNATURE,
-                    "noSAMLdoc", null, e2);
-        }
-        if (senderVouches) {
-            WSSecurityUtil.prependChildElement(doc, securityHeader, secRefSaml
-                    .getElement(), true);
-        }
-
-        wsDocInfo.setAssertion(samlToken);
-        WSSecurityUtil
-                .prependChildElement(doc, securityHeader, samlToken, true);
-
-        WSDocInfoStore.store(wsDocInfo);
-        try {
-            if (senderVouches) {
-                sig
-                        .sign(issuerCrypto.getPrivateKey(issuerKeyName,
-                                issuerKeyPW));
-            } else {
-                sig.sign(userCrypto.getPrivateKey(user, password));
-            }
-            signatureValue = sig.getSignatureValue();            
-        } catch (XMLSignatureException e1) {
-            throw new WSSecurityException(WSSecurityException.FAILED_SIGNATURE,
-                    null, null, e1);
-        } catch (Exception e1) {
-            throw new WSSecurityException(WSSecurityException.FAILED_SIGNATURE,
-                    null, null, e1);
-        } finally {
-            WSDocInfoStore.delete(wsDocInfo);
-        }
-        if (tlog.isDebugEnabled()) {
-            t4 = System.currentTimeMillis();
-            tlog.debug("SignEnvelope: cre-Sig= " + (t1 - t0)
-                    + " set transform= " + (t2 - t1) + " sec-ref= " + (t3 - t2)
-                    + " signature= " + (t4 - t3));
-        }
-        if (doDebug) {
-            log.debug("Signing complete.");
-        }
-        return (doc);
-
-    }
-
-    private Element createSTRParameter(Document doc) {
+    protected Element createSTRParameter(Document doc) {
         Element transformParam = doc.createElementNS(WSConstants.WSSE_NS,
                 WSConstants.WSSE_PREFIX + ":TransformationParameters");
 

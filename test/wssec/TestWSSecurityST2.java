@@ -36,6 +36,7 @@ import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.saml.SAMLIssuer;
+import org.apache.ws.security.saml.WSSignSAMLEnvelope;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.message.WSSignEnvelope;
@@ -145,7 +146,7 @@ public class TestWSSecurityST2 extends TestCase implements CallbackHandler {
         String issuerKeyName = saml.getIssuerKeyName();
         String issuerKeyPW = saml.getIssuerKeyPassword();
         Crypto issuerCrypto = saml.getIssuerCrypto();
-        WSSignEnvelope wsSign = new WSSignEnvelope();
+        WSSignSAMLEnvelope wsSign = new WSSignSAMLEnvelope();
         wsSign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
 
         log.info("Before SAMLSignedSenderVouches....");
@@ -179,7 +180,7 @@ public class TestWSSecurityST2 extends TestCase implements CallbackHandler {
      * Verifies the soap envelope
      * <p/>
      * 
-     * @param envelope 
+     * @param doc
      * @throws Exception Thrown when there is a problem in verification
      */
     private void verify(Document doc) throws Exception {
