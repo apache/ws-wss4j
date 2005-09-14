@@ -205,7 +205,20 @@ public class WSSConfig {
         String name = null;
         if(el.equals(WSSecurityEngine.SAML_TOKEN)){
             name = "org.apache.ws.security.processor.SAMLTokenProcessor";
+        } else if (el.equals(WSSecurityEngine.ENCRYPTED_KEY)) {
+            name = "org.apache.ws.security.processor.EncryptedKeyProcessor";
+        } else if (el.equals(WSSecurityEngine.SIGNATURE)){
+            name = "org.apache.ws.security.processor.SignatureProcessor";
+        } else if (el.equals(WSSecurityEngine.timeStamp)) {
+            name = "org.apache.ws.security.processor.TimestampProcessor";
+        } else if (el.equals(WSSecurityEngine.usernameToken)) {
+            name = "org.apache.ws.security.processor.UsernameTokenProcessor";
+        } else if (el.equals(WSSecurityEngine.REFERENCE_LIST)) {
+            name = "org.apache.ws.security.processor.ReferenceListProcessor";
+        } else if (el.equals(WSSecurityEngine.signatureConfirmation)) {
+            name = "org.apache.ws.security.processor.SignatureConfirmationProcessor";
         }
+
         if(name != null){
             try {
                 return (Processor)Loader.loadClass(name).newInstance();
