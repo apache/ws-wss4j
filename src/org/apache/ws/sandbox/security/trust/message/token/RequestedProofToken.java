@@ -23,6 +23,7 @@ import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSSecurityException;
+import org.apache.ws.security.processor.EncryptedKeyProcessor;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.message.WSEncryptBody;
 import org.apache.ws.security.message.token.BinarySecurity;
@@ -138,11 +139,12 @@ public class RequestedProofToken {
                         "RequestedProofToken: cannot create instance of password callback: "
                         + callback +":: ErrMsg "+e.getMessage());
             }
-            secEngine.handleEncryptedKey((Element) ndList.item(0),
+            EncryptedKeyProcessor processor = new EncryptedKeyProcessor();
+            processor.handleEncryptedKey((Element) ndList.item(0),
                     cbHandler,
                     crypto);
 
-            this.sharedSecret = secEngine.getDecryptedBytes();
+            this.sharedSecret = processor.getDecryptedBytes();
             log.debug(" RequestedProofToken, decryption ,Shared secret is :: " + new String(this.sharedSecret));
         } else {
             log.debug("RequestedProofToken :: CallbackHandler is null");

@@ -55,6 +55,8 @@ public class EncryptedKeyProcessor implements Processor {
     private static Log tlog =
             LogFactory.getLog("org.apache.ws.security.TIME");
 
+    byte[] decryptedBytes = null;
+
     public void handleToken(Element elem, Crypto crypto, Crypto decCrypto, CallbackHandler cb, WSDocInfo wsDocInfo, Vector returnResults) throws WSSecurityException {
         if (log.isDebugEnabled()) {
             log.debug("Found encrypted key element");
@@ -270,7 +272,7 @@ public class EncryptedKeyProcessor implements Processor {
         } catch (Exception e1) {
             throw new WSSecurityException(WSSecurityException.FAILED_ENC_DEC, null, null, e1);
         }
-        byte[] decryptedBytes = null;
+
         try {
             decryptedBytes =
                     cipher.doFinal(getDecodedBase64EncodedData(xencCipherValue));
@@ -384,4 +386,7 @@ public class EncryptedKeyProcessor implements Processor {
         }
     }
 
+    public byte[] getDecryptedBytes() {
+        return decryptedBytes;
+    }
 }

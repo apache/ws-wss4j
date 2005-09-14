@@ -38,6 +38,7 @@ import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSSecurityException;
+import org.apache.ws.security.processor.EncryptedKeyProcessor;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.sandbox.security.conversation.message.info.DerivedKeyInfo;
@@ -974,9 +975,9 @@ public class ConversationEngine {
 				throw new ConversationException("Cannot find passwordcallback");
 			}
 
-            WSSecurityEngine eng = new WSSecurityEngine();
-            eng.handleEncryptedKey(eleEnc, cbHandler, crypto);
-            byte[] key = eng.getDecryptedBytes();
+            EncryptedKeyProcessor processor = new EncryptedKeyProcessor();
+            processor.handleEncryptedKey(eleEnc, cbHandler, crypto);
+            byte[] key = processor.getDecryptedBytes();
 
             return key;
 

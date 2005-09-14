@@ -334,7 +334,7 @@ org.apache.ws.axis.security.util
         <javac srcdir="${dir.src}" destdir="${build.classes}" debug="on">
             <classpath refid="classpath.library"/>
             <exclude name="**/Merlin.java" unless="jdk14.present"/>
-            <exclude name="**/sandbox/**/*.java" />
+            <!-- <exclude name="**/sandbox/**/*.java" /> -->
         </javac>
         <!-- Copy Property files -->
         <copy todir="${build.classes}">
