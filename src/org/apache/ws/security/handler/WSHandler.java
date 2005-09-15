@@ -51,6 +51,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Hashtable;
 import java.util.Vector;
+import java.util.Date;
 
 
 /**
@@ -80,7 +81,7 @@ public abstract class WSHandler {
      * @throws WSSecurityException
      */
     protected void doSenderAction(int doAction, Document doc,
-            RequestData reqData, Vector actions, boolean isRequest)
+                                  RequestData reqData, Vector actions, boolean isRequest)
             throws WSSecurityException {
 
         boolean mu = decodeMustUnderstand(reqData);
@@ -213,7 +214,7 @@ public abstract class WSHandler {
             }
         }
     }
-    
+
     protected void doReceiverAction(int doAction, RequestData reqData)
             throws WSSecurityException {
 
@@ -231,17 +232,17 @@ public abstract class WSHandler {
             reqData.setNoSerialization(true);
         }
     }
-    
+
     protected boolean checkReceiverResults(Vector wsResult, Vector actions) {
         int resultActions = wsResult.size();
         int size = actions.size();
-        
+
         // if (size != resultActions) {
         // throw new AxisFault(
         // "WSDoAllReceiver: security processing failed (actions number
         // mismatch)");
         // }
-        
+
         int ai = 0;
         for (int i = 0; i < resultActions; i++) {
             int act = ((WSSecurityEngineResult) wsResult.get(i)).getAction();
@@ -256,14 +257,14 @@ public abstract class WSHandler {
     }
 
     protected void checkSignatureConfirmation(RequestData reqData,
-            Vector wsResult) throws WSSecurityException{
+                                              Vector wsResult) throws WSSecurityException{
         if (doDebug) {
             log.debug("Check Signature confirmation");
         }
-        
+
         /*
-         * First get all Signature value stored during sending the request
-         */
+        * First get all Signature value stored during sending the request
+        */
         Vector sigv = (Vector) getProperty(reqData.getMsgContext(),
                 WSHandlerConstants.SEND_SIGV);
         /*
@@ -300,11 +301,11 @@ public abstract class WSHandler {
                 }
             }
         }
-        
+
         /*
-         * This indicates this is the last handler: the vector holding the
-         * stored Signature values must be empty, otherwise we have an error
-         */
+        * This indicates this is the last handler: the vector holding the
+        * stored Signature values must be empty, otherwise we have an error
+        */
         if (!reqData.isNoSerialization()) {
             log.debug("Check Signature confirmation - last handler");
             if (sigv != null && !sigv.isEmpty()) {
@@ -524,7 +525,7 @@ public abstract class WSHandler {
         }
         return ttl_i;
     }
-    
+
     protected boolean decodeTimestampPrecision(RequestData reqData) throws WSSecurityException {
         boolean precisionInMilliSeconds = true;
         String value = null;
@@ -553,10 +554,10 @@ public abstract class WSHandler {
      * Try all possible sources to get a password.
      */
     public WSPasswordCallback getPassword(String username,
-                                           int doAction,
-                                           String clsProp,
-                                           String refProp,
-                                           RequestData reqData)
+                                          int doAction,
+                                          String clsProp,
+                                          String refProp,
+                                          RequestData reqData)
             throws WSSecurityException {
         WSPasswordCallback pwCb = null;
         String password = null;
@@ -978,9 +979,9 @@ public abstract class WSHandler {
 
         // Calculate the time that is allowed for the message to travel
         Calendar validCreation = Calendar.getInstance();
-        long currentTime = validCreation.getTimeInMillis();
+        long currentTime = validCreation.getTime().getTime();
         currentTime -= timeToLive * 1000;
-        validCreation.setTimeInMillis(currentTime);
+        validCreation.setTime(new Date(currentTime));
 
         if (doDebug) {
             log.debug("Preparing to verify the timestamp");
@@ -1009,7 +1010,7 @@ public abstract class WSHandler {
     public abstract Object getOption(String key);
 
     public abstract Object getProperty(Object msgContext, String key);
-    
+
     public abstract void setProperty(Object msgContext, String key, Object value);
 
 

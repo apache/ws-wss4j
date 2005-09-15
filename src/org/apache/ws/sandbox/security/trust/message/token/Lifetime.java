@@ -91,7 +91,7 @@ public class Lifetime extends CompositeElement {
         this.addChild(this.createdElement);
         
         this.expiresElement = new Expires(doc);
-        long exp = rightNow.getTimeInMillis() + duration * 1000 * 60;
+        long exp = rightNow.getTime().getTime() + duration * 1000 * 60;
         expires.setTimeInMillis(exp);
         this.expiresElement.setValue(sdtf.format(expires.getTime()));
         this.addChild(this.expiresElement);
