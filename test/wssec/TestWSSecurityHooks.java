@@ -17,16 +17,9 @@
 
 package wssec;
 
-import java.io.ByteArrayInputStream;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.security.KeyStore;
-
-import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.callback.UnsupportedCallbackException;
-
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
 import org.apache.axis.AxisFault;
 import org.apache.axis.Message;
 import org.apache.axis.MessageContext;
@@ -34,17 +27,21 @@ import org.apache.axis.client.AxisClient;
 import org.apache.axis.configuration.NullProvider;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.axis.security.WSDoAllReceiver;
 import org.apache.ws.axis.security.WSDoAllSender;
 import org.apache.ws.security.WSPasswordCallback;
-import org.apache.ws.security.handler.WSHandlerConstants;
+import org.apache.ws.security.components.crypto.BouncyCastle;
 import org.apache.ws.security.components.crypto.Crypto;
-import org.apache.ws.security.components.crypto.Merlin;
+import org.apache.ws.security.handler.WSHandlerConstants;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.CallbackHandler;
+import javax.security.auth.callback.UnsupportedCallbackException;
+import java.io.ByteArrayInputStream;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.security.KeyStore;
 
 /**
  * <dl>
@@ -179,7 +176,7 @@ public class TestWSSecurityHooks extends TestCase implements CallbackHandler
     * This is a subclass of Merlin that uses the setKeyStore() method rather than the 
     * load(is) method to set the private keystore field.
     */
-   public class TestCryptoImpl extends Merlin {
+   public class TestCryptoImpl extends BouncyCastle {
       TestCryptoImpl(KeyStore ks) throws Exception {
          super(null);
          assertNotNull(ks);
