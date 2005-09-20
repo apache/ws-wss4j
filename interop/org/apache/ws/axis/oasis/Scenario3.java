@@ -90,6 +90,7 @@ public class Scenario3 {
             long startTime = System.currentTimeMillis();
 
             for (int i = 0; i < 20; i++) {
+                System.out.println("\nLoop #" + i);
                 port.ping(new org.apache.ws.axis.oasis.ping.TicketType("WSS4J"), text);
             }
 
