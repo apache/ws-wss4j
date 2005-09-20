@@ -86,6 +86,6 @@ public class SignatureConfirmationAction implements Action {
             signatureParts.add(new WSEncryptionPart(id));
         }
         handler.setProperty(reqData.getMsgContext(), WSHandlerConstants.SIG_CONF_DONE,
-                handler.DONE);
+                WSHandler.DONE);
     }
 }

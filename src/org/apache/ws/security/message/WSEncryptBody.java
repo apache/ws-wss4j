@@ -435,11 +435,11 @@ public class WSEncryptBody extends WSBaseMessage {
         log.debug("Encryption complete.");
         if (tlog.isDebugEnabled()) {
             t3 = System.currentTimeMillis();
-            tlog.debug("EncryptBody: symm-enc= "
+            tlog.debug("EncryptBody: symm-enc "
                     + (t1 - t0)
-                    + ", cert= "
+                    + " cert "
                     + (t2 - t1)
-                    + ", key-encrypt= "
+                    + " key-encrypt "
                     + (t3 - t2));
         }
         return doc;
@@ -597,7 +597,7 @@ public class WSEncryptBody extends WSBaseMessage {
         WSSecurityUtil.prependChildElement(doc, wsseSecurity, refList, true);
 
         if (tlog.isDebugEnabled()) {
-            tlog.debug("EncryptBody embedded: symm-enc= " + (t1 - t0));
+            tlog.debug("EncryptBody embedded: symm-enc " + (t1 - t0));
         }
         return doc;
     }

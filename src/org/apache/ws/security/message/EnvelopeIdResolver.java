@@ -46,7 +46,6 @@ import java.util.Set;
 public class EnvelopeIdResolver extends ResourceResolverSpi {
     private static Log log =
             LogFactory.getLog(EnvelopeIdResolver.class.getName());
-    private static Log tlog = LogFactory.getLog("org.apache.ws.security.TIME");
 
     private static EnvelopeIdResolver resolver = null;
 
@@ -81,11 +80,6 @@ public class EnvelopeIdResolver extends ResourceResolverSpi {
             throws ResourceResolverException {
 
         doDebug = log.isDebugEnabled();
-
-        long t0 = 0, t1 = 0;
-        if (tlog.isDebugEnabled()) {
-            t0 = System.currentTimeMillis();
-        }
 
         String uriNodeValue = uri.getNodeValue();
 
@@ -150,10 +144,6 @@ public class EnvelopeIdResolver extends ResourceResolverSpi {
             result.setSourceURI(uriNew.toString());
         } catch (URI.MalformedURIException ex) {
             result.setSourceURI(BaseURI);
-        }
-        if (tlog.isDebugEnabled()) {
-            t1 = System.currentTimeMillis();
-            tlog.debug("engineResolve= " + (t1 - t0));
         }
         if (doDebug) {
             log.debug("exit engineResolve, result: " + result);

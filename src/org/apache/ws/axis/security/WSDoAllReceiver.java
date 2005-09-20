@@ -55,6 +55,8 @@ import java.util.Vector;
 public class WSDoAllReceiver extends WSDoAllHandler {
 
     protected static Log log = LogFactory.getLog(WSDoAllReceiver.class.getName());
+    private static Log tlog =
+        LogFactory.getLog("org.apache.ws.security.TIME");
 
     /**
      * Axis calls invoke to handle a message.
@@ -71,6 +73,10 @@ public class WSDoAllReceiver extends WSDoAllHandler {
             log.debug("WSDoAllReceiver: enter invoke() with msg type: "
                     + msgContext.getCurrentMessage().getMessageType());
         }
+        long t0 = 0, t1 = 0, t2 = 0, t3 = 0, t4 = 0;
+        if (tlog.isDebugEnabled()) {
+            t0 = System.currentTimeMillis();
+        }        
 
         RequestData reqData = new RequestData();
         /*
@@ -143,8 +149,12 @@ public class WSDoAllReceiver extends WSDoAllHandler {
             * they may be used for encryption too.
             */
             doReceiverAction(doAction, reqData);
-
+            
             Vector wsResult = null;
+            if (tlog.isDebugEnabled()) {
+                t1 = System.currentTimeMillis();
+            }        
+
             try {
                 wsResult = secEngine.processSecurityHeader(doc, actor,
                         cbHandler, reqData.getSigCrypto(), reqData.getDecCrypto());
@@ -153,6 +163,11 @@ public class WSDoAllReceiver extends WSDoAllHandler {
                 throw new AxisFault(
                         "WSDoAllReceiver: security processing failed", ex);
             }
+
+            if (tlog.isDebugEnabled()) {
+                t2 = System.currentTimeMillis();
+            }        
+
             if (wsResult == null) { // no security header found
                 if (doAction == WSConstants.NO_SECURITY) {
                     return;
@@ -193,6 +208,9 @@ public class WSDoAllReceiver extends WSDoAllHandler {
                 log.debug(org.apache.axis.utils.XMLUtils
                         .PrettyDocumentToString(doc));
             }
+            if (tlog.isDebugEnabled()) {
+                t3 = System.currentTimeMillis();
+            }        
 
             /*
             * set the original processed-header flags
@@ -315,6 +333,16 @@ public class WSDoAllReceiver extends WSDoAllHandler {
             }
             WSHandlerResult rResult = new WSHandlerResult(actor, wsResult);
             results.add(0, rResult);
+            if (tlog.isDebugEnabled()) {
+                t4 = System.currentTimeMillis();
+                tlog.debug("Receive request: total= " + (t4 - t0) +
+                        " request preparation= " + (t1 - t0) +
+                        " request processing= " + (t2 - t1) +
+                        " request to Axis= " + (t3 - t2) + 
+                        " header, cert verify, timestamp= " + (t4 - t3) +
+                        "\n");                                
+            }        
+
             if (doDebug) {
                 log.debug("WSDoAllReceiver: exit invoke()");
             }

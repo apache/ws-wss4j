@@ -42,6 +42,9 @@ import java.util.Vector;
 public class WSDoAllSender extends WSDoAllHandler {
 
     protected static Log log = LogFactory.getLog(WSDoAllSender.class.getName());
+    private static Log tlog =
+        LogFactory.getLog("org.apache.ws.security.TIME");
+    
     /**
      * Axis calls invoke to handle a message. <p/>
      *
@@ -51,6 +54,12 @@ public class WSDoAllSender extends WSDoAllHandler {
     public void invoke(MessageContext mc) throws AxisFault {
 
         boolean doDebug = log.isDebugEnabled();
+        
+        long t0 = 0, t1 = 0, t2 = 0, t3 = 0;
+        if (tlog.isDebugEnabled()) {
+            t0 = System.currentTimeMillis();
+        }
+
         if (doDebug && mc.getCurrentMessage() != null
                 && mc.getCurrentMessage().getMessageType() != null) {
             log.debug("WSDoAllSender: enter invoke() with msg type: "
@@ -158,7 +167,15 @@ public class WSDoAllSender extends WSDoAllHandler {
                                     + e);
                 }
             }
+            if (tlog.isDebugEnabled()) {
+                t1 = System.currentTimeMillis();
+            }
+
             doSenderAction(doAction, doc, reqData, actions, !mc.getPastPivot());
+            
+            if (tlog.isDebugEnabled()) {
+                t2 = System.currentTimeMillis();
+            }
 
             /*
                 * If required convert the resulting document into a message first.
@@ -194,6 +211,15 @@ public class WSDoAllSender extends WSDoAllHandler {
                 ((MessageContext)reqData.getMsgContext()).setProperty(WSHandlerConstants.SND_SECURITY,
                         null);
             }
+            if (tlog.isDebugEnabled()) {
+                t3 = System.currentTimeMillis();
+                tlog.debug("Send request: total= " + (t3 - t0) +
+                        " request preparation= " + (t1 - t0) +
+                        " request processing= " + (t2 - t1) +
+                        " request to Axis= " + (t3 - t2) +
+                        "\n");                
+            }
+
             if (doDebug) {
                 log.debug("WSDoAllSender: exit invoke()");
             }

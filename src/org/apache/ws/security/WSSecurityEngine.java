@@ -47,11 +47,6 @@ public class WSSecurityEngine {
 
     private static WSSecurityEngine engine = null;
     private static WSSConfig wssConfig = WSSConfig.getDefaultWSConfig();
-    /**
-     * The symmetric key.
-     */
-    private byte[] decryptedBytes = null;
-
     private boolean doDebug = false;
     /**
      * <code>wsse:BinarySecurityToken</code> as defined by WS Security specification
@@ -188,13 +183,17 @@ public class WSSecurityEngine {
 
     /**
      * Process the security header given the <code>wsse:Security</code> DOM
-     * Element. <p/>This function loops over all direct child elements of the
+     * Element. 
+     * 
+     * This function loops over all direct child elements of the
      * <code>wsse:Security</code> header. If it finds a knwon element, it
-     * transfers control to the appropriate handling function. The mehtod
+     * transfers control to the appropriate handling function. The method
      * processes the known child elements in the same order as they appear in
      * the <code>wsse:Security</code> element. This is in accordance to the WS
-     * Security specification. <p/>Currently the functions can handle the
-     * following child elements: here:
+     * Security specification. <p/>
+     * 
+     * Currently the functions can handle the following child elements:
+     * 
      * <ul>
      * <li>{@link #SIGNATURE <code>ds:Signature</code>}</li>
      * <li>{@link #ENCRYPTED_KEY <code>xenc:EncryptedKey</code>}</li>
@@ -202,7 +201,6 @@ public class WSSecurityEngine {
      * <li>{@link #usernameToken <code>wsse:UsernameToken</code>}</li>
      * <li>{@link #timeStamp <code>wsu:Timestamp</code>}</li>
      * </ul>
-     * <p/>
      *
      * @param securityHeader the <code>wsse:Security</code> header element
      * @param cb             a callback hander to the caller to resolve passwords during
@@ -265,9 +263,9 @@ public class WSSecurityEngine {
         }
         if (tlog.isDebugEnabled()) {
             t2 = System.currentTimeMillis();
-            tlog.debug("processHeader: total= " + (t2 - t0) +
-                    ", prepare= " + (t1 - t0) +
-                    ", handle= " + (t2 - t1));
+            tlog.debug("processHeader: total " + (t2 - t0) +
+                    ", prepare " + (t1 - t0) +
+                    ", handle " + (t2 - t1));
         }
         return returnResults;
     }
