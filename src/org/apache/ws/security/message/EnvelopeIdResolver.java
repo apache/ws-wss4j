@@ -138,6 +138,7 @@ public class EnvelopeIdResolver extends ResourceResolverSpi {
 
         Set resultSet = dereferenceSameDocumentURI(selectedElem);
         XMLSignatureInput result = new XMLSignatureInput(resultSet);
+//        XMLSignatureInput result = new XMLSignatureInput(selectedElem);
         result.setMIMEType("text/xml");
         try {
             URI uriNew = new URI(new URI(BaseURI), uri.getNodeValue());

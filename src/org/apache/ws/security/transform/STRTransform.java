@@ -160,7 +160,8 @@ public class STRTransform extends TransformSpi {
                 }
             }
             Canonicalizer canon = Canonicalizer.getInstance(canonAlgo);
-            byte buf[] = canon.canonicalizeXPathNodeSet(input.getNodeSet());
+//            byte buf[] = canon.canonicalizeXPathNodeSet(input.getNodeSet());
+            byte buf[] = input.getBytes();
 
             ByteArrayOutputStream bos = new ByteArrayOutputStream(buf.length);
             bos.write(buf, 0, buf.length);
