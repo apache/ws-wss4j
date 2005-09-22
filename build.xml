@@ -8,26 +8,8 @@
    This file is intended for ANT, a Java based build tool.
    ANT is available from http://jakarta.apache.org/ant/index.html
 
-   This build file is intended to build the wss4j package,
-   available from http://sf.net/projects/wss4j/
-
 Prerequisites:
-   J2SDK 1.4          from http://java.sun.com/
-   jakarta-ant        from http://jakarta.apache.org/ant/
-   commons-logging    from http://jakarta.apache.org/commons/logging.html
-   log4j              from http://jakarta.apache.org/log4j
-   xml-security       from http://xml.apache.org/security/
-                      ***** Attention: WSS4J uses a pre-release of xml-security
-		      that supports XML-Cipher. This jar file is contained
-		      in wss4j/lib.
-                      this requires also xalan from http://xml.apache.org/xalan
-		      and a JCE provider, e.g. from bouncycastle.org (recommended)
-   xml-api	      various Java XML-APIs (W3C DOM, javax.xml.soap).  To compile 
-		      WSS4J the API classes are sufficient, to run it an 
-		      implementation is necessary
-
-Optional components:
-   junit              from http://www.junit.org/
+	See the REAME file
 
 Build Instructions:
    To build, run
@@ -421,38 +403,14 @@ org.apache.ws.axis.security.util
     <target name="interopTests" depends="init">
         <echo message="Running system tests - BEGIN..."/>
 
-        <path id="deploy_xml_files">
-            <fileset dir="${build.work}">
-                <include name="**/deploy.wsdd"/>
-            </fileset>
-        </path>
         <path id="undeploy_xml_files">
             <fileset dir="${build.work}">
                 <include name="**/undeploy.wsdd"/>
             </fileset>
         </path>
-
-        <copy todir="${build.dir}/keys">
-            <fileset dir="${dir.keys}" includes="**"/>
-        </copy>
-        <copy todir="${build.dir}/interop">
-            <fileset dir="${dir.interop}" includes="*.jks"/>
-        </copy>
-        
-        <property name="deploy_xml_property" refid="deploy_xml_files"/>
         <property name="undeploy_xml_property" refid="undeploy_xml_files"/>
 
-        <java classname="org.apache.axis.utils.Admin" fork="true">
-            <classpath refid="classpath.library"/>
-            <arg value="client"/>
-            <arg file="${build.work}/org/apache/ws/axis/oasis/Client_deploy.wsdd"/>
-        </java>
-        
-        <java classname="org.apache.axis.client.AdminClient" fork="yes">
-            <classpath refid="classpath.library"/>
-            <arg line="${deploy_xml_property}"/>
-        </java>
-
+    	<antcall target="deployWSDD" />
         <junit printsummary="yes"
             haltonfailure="yes"
             fork="yes"
@@ -559,28 +517,64 @@ org.apache.ws.axis.security.util
     <target name="scenario" if="junit.present">
         <echo message="Running interop test scenario ${Number} on SimpleAxisServer"/>
 
+    	<antcall target="deployWSDD" />
+    	
+        <java classname="interop.TestScenario${Number}" fork="yes" dir="${basedir}">
+            <jvmarg value="-Djava.endorsed.dirs=${basedir}/endorsed"/>
+            <classpath refid="classpath.library"/>
+        </java>
+
+    	<antcall target="undeployWSDD" />
+
+    </target>
+	
+	<!--
+	This runs the selected scenario with SimpleAxisServer locally with perfomance
+	timing switched on.
+	You may also emable the **.TIME entry in log4j.properties to get the internal
+	timing.
+	To run different scenarios use: "ant -DNumber=x scenarioTest" to run scenario x
+	-->
+    <target name="performanceTest" depends="compile"
+        if="junit.present"
+        description="Runs all JUnit tests">
+        <runaxisfunctionaltests
+            url="http://localhost:8088"
+            httpServerTarget="start-functional-test-http-server"
+            testTarget="performance"
+            httpStopTarget="stop-functional-test-http-server"/>
+    </target>
+
+    <target name="performance" if="junit.present">
+        <echo message="Running performance test scenario ${Number} on SimpleAxisServer"/>
+
+    	<antcall target="deployWSDD" />
+        <java classname="interop.TestScenario${Number}" fork="yes" dir="${basedir}">
+            <jvmarg value="-Djava.endorsed.dirs=${basedir}/endorsed"/>
+        	<arg value="-lhttp://localhost:8080/axis/services/Ping${Number}" />
+        	<arg value="-t" />
+            <classpath refid="classpath.library"/>
+        </java>
+    	<antcall target="undeployWSDD" />
+    </target>
+	
+	<target name="deployWSDD">
         <path id="deploy_xml_files">
             <fileset dir="${build.work}">
                 <include name="**/deploy.wsdd"/>
             </fileset>
         </path>
-        <path id="undeploy_xml_files">
-            <fileset dir="${build.work}">
-                <include name="**/undeploy.wsdd"/>
-            </fileset>
-        </path>
 
-        <copy todir="${build.dir}/keys">
+    	<copy todir="${build.dir}/keys">
             <fileset dir="${dir.keys}" includes="**"/>
         </copy>
         <copy todir="${build.dir}/interop">
             <fileset dir="${dir.interop}" includes="*.jks"/>
         </copy>
-        
-        <property name="deploy_xml_property" refid="deploy_xml_files"/>
-        <property name="undeploy_xml_property" refid="undeploy_xml_files"/>
 
-        <java classname="org.apache.axis.utils.Admin" fork="true">
+		<property name="deploy_xml_property" refid="deploy_xml_files"/>
+ 
+		<java classname="org.apache.axis.utils.Admin" fork="true">
             <classpath refid="classpath.library"/>
             <arg value="client"/>
             <arg file="${build.work}/org/apache/ws/axis/oasis/Client_deploy.wsdd"/>
@@ -591,10 +585,16 @@ org.apache.ws.axis.security.util
             <arg line="${deploy_xml_property}"/>
         </java>
 
-        <java classname="interop.TestScenario${Number}" fork="yes" dir="${basedir}">
-            <jvmarg value="-Djava.endorsed.dirs=${basedir}/endorsed"/>
-            <classpath refid="classpath.library"/>
-        </java>
+	</target>
+	
+	<target name="undeployWSDD">
+        <path id="undeploy_xml_files">
+            <fileset dir="${build.work}">
+                <include name="**/undeploy.wsdd"/>
+            </fileset>
+        </path>
+
+        <property name="undeploy_xml_property" refid="undeploy_xml_files"/>
 
     	<java classname="org.apache.axis.utils.Admin" fork="true">
             <classpath refid="classpath.library"/>
@@ -607,8 +607,8 @@ org.apache.ws.axis.security.util
             <arg line="${undeploy_xml_property}"/>
         </java>
 
-    </target>
-	
+	</target>
+		
 	<!-- generate a report from all the tests. 
            requires Xalan or other XSLT engine in ant\lib-->
     <target name="report" depends="init">
