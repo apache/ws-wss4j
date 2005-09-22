@@ -110,7 +110,7 @@ public abstract class CryptoFactory {
         } catch (ClassNotFoundException e) {
             throw new RuntimeException(cryptoClassName + " Not Found");
         }
-        log.info("Using Crypto Engine [" + cryptoClassName + "]");
+        log.debug("Using Crypto Engine [" + cryptoClassName + "]");
         try {
             Class[] classes = new Class[]{Properties.class};
             Constructor c = cryptogenClass.getConstructor(classes);
