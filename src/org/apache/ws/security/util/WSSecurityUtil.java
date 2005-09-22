@@ -31,7 +31,6 @@ import org.apache.ws.security.message.token.BinarySecurity;
 import org.apache.ws.security.message.token.X509Security;
 import org.apache.xml.security.algorithms.JCEMapper;
 import org.apache.ws.security.util.Base64;
-import org.apache.xpath.XPathAPI;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -616,43 +615,6 @@ public class WSSecurityUtil {
      */
     public static Text createBase64EncodedTextNode(Document doc, byte data[]) {
         return doc.createTextNode(Base64.encode(data));
-    }
-
-    /**
-     * use xpath to find a node
-     * <p/>
-     *
-     * @param contextNode node to starte the select
-     * @param xpath the xpath expression
-     * @param nsContext the context element for xpath
-     * @return the select Node
-     * @throws Exception
-     */
-    public static Node selectSingleNode(Node contextNode,
-                                        String xpath,
-                                        Element nsContext) throws Exception {
-        try {
-            return XPathAPI.selectSingleNode(contextNode, xpath, nsContext);
-        } catch (TransformerException e) {
-            throw new Exception("Unable to resolve XPath");
-        }
-    }
-
-    /**
-     * Create a namespace context with namespaces of interest
-     *
-     * @param doc the DOM document (SOAP request)
-     * @return a conext element usable for xpath requests
-     */
-    public static Element createNamespaceContext(Document doc) {
-        SOAPConstants sc = getSOAPConstants(doc.getDocumentElement());
-        Element nsContext = doc.createElementNS(null, "namespaceContext");
-        nsContext.setAttributeNS(WSConstants.XMLNS_NS, "xmlns:env", sc.getEnvelopeURI());
-        nsContext.setAttributeNS(WSConstants.XMLNS_NS, "xmlns:wsse", WSConstants.WSSE_NS);
-        nsContext.setAttributeNS(WSConstants.XMLNS_NS, "xmlns:wsu", WSConstants.WSU_NS);
-        nsContext.setAttributeNS(WSConstants.XMLNS_NS, "xmlns:ds", WSConstants.SIG_NS);
-        nsContext.setAttributeNS(WSConstants.XMLNS_NS, "xmlns:xenc", WSConstants.ENC_NS);
-        return nsContext;
     }
 
     public static SecretKey prepareSecretKey(String symEncAlgo,
