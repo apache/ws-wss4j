@@ -56,7 +56,7 @@ public class Loader {
         try {
             // We could not find resource. Ler us now try with the
             // classloader that loaded this class.
-            classLoader = Loader.class.getClassLoader();
+            classLoader = getTCL();
             if (classLoader != null) {
                 log.debug("Trying to find [" + resource + "] using " + classLoader + " class loader.");
                 url = classLoader.getResource(resource);
@@ -100,7 +100,9 @@ public class Loader {
      */
     static public Class loadClass(String clazz) throws ClassNotFoundException {
         try {
-            Class c = getTCL().loadClass(clazz);
+            ClassLoader tcl = getTCL();	
+            
+			Class c = tcl.loadClass(clazz);
             if (c != null)
                 return c;
         } catch (Throwable e) {
