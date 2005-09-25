@@ -89,9 +89,6 @@ public class EnvelopeIdResolver extends ResourceResolverSpi {
 
         Document doc = uri.getOwnerDocument();
 
-        // Xalan fix for catching all namespaces
-        XMLUtils.circumventBug2650(doc);
-
         /*
          * URI="#chapter1"
          * Identifies a node-set containing the element with ID attribute
@@ -136,9 +133,7 @@ public class EnvelopeIdResolver extends ResourceResolverSpi {
             }
         }
 
-        Set resultSet = dereferenceSameDocumentURI(selectedElem);
-        XMLSignatureInput result = new XMLSignatureInput(resultSet);
-//        XMLSignatureInput result = new XMLSignatureInput(selectedElem);
+        XMLSignatureInput result = new XMLSignatureInput(selectedElem);
         result.setMIMEType("text/xml");
         try {
             URI uriNew = new URI(new URI(BaseURI), uri.getNodeValue());
