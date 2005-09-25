@@ -22,33 +22,25 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDocInfo;
 import org.apache.ws.security.WSDocInfoStore;
+import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.message.token.SecurityTokenReference;
 import org.apache.ws.security.message.token.X509Security;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.xml.security.c14n.CanonicalizationException;
 import org.apache.xml.security.c14n.Canonicalizer;
 import org.apache.xml.security.c14n.InvalidCanonicalizerException;
-import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.signature.XMLSignatureInput;
 import org.apache.xml.security.transforms.TransformSpi;
 import org.apache.ws.security.util.Base64;
 import org.apache.xml.security.utils.XMLUtils;
-// import org.apache.xml.security.utils.Base64;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
-import org.w3c.dom.DOMImplementation;
-import org.xml.sax.SAXException;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 
 /**
@@ -171,11 +163,10 @@ public class STRTransform extends TransformSpi {
             }
 
             /*
-             * Get the input (node) to transform. Currently we support only
-             * an Element as input format. If other formats are required
-             * we must get it as bytes and probably reparse it into a DOM
-             * tree (How to work with nodesets? how to select the right node
-             * from a nodeset?) 
+             * Get the input (node) to transform. Currently we support only an
+             * Element as input format. If other formats are required we must
+             * get it as bytes and probably reparse it into a DOM tree (How to
+             * work with nodesets? how to select the right node from a nodeset?)
              */
             Element str = null;
             if (input.isElement()) {
@@ -189,7 +180,8 @@ public class STRTransform extends TransformSpi {
                 log.debug("STR: " + str.toString());
             }
             /*
-             * The element to transform MUST be a SecurityTokenReference element.
+             * The element to transform MUST be a SecurityTokenReference
+             * element.
              */
             SecurityTokenReference secRef = new SecurityTokenReference(str);
             /*
@@ -206,20 +198,18 @@ public class STRTransform extends TransformSpi {
                 log.debug("after c14n: " + bos.toString());
             }
 
-
-             /*
-             * Alert: Hacks ahead
-             * According to WSS spec an Apex node must contain a default
-             * namespace. If none is availabe in the first node of the
-             * c14n output (this is the apex element) then we do some
-             * editing to insert an empty default namespace
+            /*
+             * Alert: Hacks ahead According to WSS spec an Apex node must
+             * contain a default namespace. If none is availabe in the first
+             * node of the c14n output (this is the apex element) then we do
+             * some editing to insert an empty default namespace
              * 
              * TODO: Rework theses hacks after c14n was updated and can be
              * instructed to insert empty default namespace if required
-             */            
+             */
             // If the problem with c14n method is solved then just do:
             // return new XMLSignatureInput(buf);
-
+            
             // start of HACK
             StringBuffer bf = new StringBuffer(new String(buf));
 
@@ -247,25 +237,16 @@ public class STRTransform extends TransformSpi {
                 log.debug(bf1);
             }
             return new XMLSignatureInput(bf1.getBytes());
-            // End of HACK
+        }
+        // End of HACK
+        catch (WSSecurityException ex) {
+            throw (new CanonicalizationException("WS Security Exception", ex));
 
-        } catch (IOException ex) {
-            throw new CanonicalizationException("empty", ex);
-        } catch (ParserConfigurationException ex) {
-            throw new CanonicalizationException("empty", ex);
-        } catch (XMLSecurityException ex) {
-            throw new CanonicalizationException("empty", ex);
-        } catch (SAXException ex) {
-            throw new CanonicalizationException("empty", ex);
-        } catch (TransformerException ex) {
-            throw new CanonicalizationException("empty", ex);
-        } catch (Exception ex) {
-            throw new CanonicalizationException("empty", ex);
         }
     }
 
     private Element dereferenceSTR(Document doc, SecurityTokenReference secRef)
-            throws Exception {
+            throws  WSSecurityException {
 
         /*
          * Third step: locate the security token referenced by the STR element.
@@ -291,9 +272,6 @@ public class STRTransform extends TransformSpi {
                 log.debug("STR: Reference");
             }
             tokElement = secRef.getTokenElement(doc, wsDocInfo);
-            if (tokElement == null) {
-                throw new CanonicalizationException("empty");
-            }
         }
         /*
          * second case: IssuerSerial, lookup in keystore, wrap in BST according
@@ -307,7 +285,7 @@ public class STRTransform extends TransformSpi {
             X509Certificate[] certs = secRef.getX509IssuerSerial(wsDocInfo
                     .getCrypto());
             if (certs == null || certs.length == 0 || certs[0] == null) {
-                throw new CanonicalizationException("empty");
+                throw new WSSecurityException(WSSecurityException.FAILED_CHECK);
             }
             cert = certs[0];
             tokElement = createBSTX509(doc, cert, secRef.getElement());
@@ -325,7 +303,7 @@ public class STRTransform extends TransformSpi {
             X509Certificate[] certs = secRef.getKeyIdentifier(wsDocInfo
                     .getCrypto());
             if (certs == null || certs.length == 0 || certs[0] == null) {
-                throw new CanonicalizationException("empty");
+                throw new WSSecurityException(WSSecurityException.FAILED_CHECK);
             }
             cert = certs[0];
             tokElement = createBSTX509(doc, cert, secRef.getElement());
@@ -334,9 +312,15 @@ public class STRTransform extends TransformSpi {
     }
 
     private Element createBSTX509(Document doc, X509Certificate cert,
-            Element secRefE) throws Exception {
+            Element secRefE) throws WSSecurityException {
 
-        byte data[] = cert.getEncoded();
+        byte data[];
+        try {
+            data = cert.getEncoded();
+        } catch (CertificateEncodingException e) {
+            throw new WSSecurityException(WSSecurityException.SECURITY_TOKEN_UNAVAILABLE,
+            "encodeError");
+        }
         String prefix = WSSecurityUtil
                 .getPrefixNS(WSConstants.WSSE_NS, secRefE);
         Element elem = doc.createElementNS(WSConstants.WSSE_NS, prefix
