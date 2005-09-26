@@ -312,7 +312,7 @@ org.apache.ws.axis.security.util
             description="Target for the gump run"/>
 
     <target name="compile" 
-            depends="compile.library, compile.samples, compile.tests, compile.interops"
+            depends="compile.library, compile.samples, compile.tests, compile.interops, fix.properties"
             description="compile everything"/>
 
     <target name="test"
@@ -320,6 +320,13 @@ org.apache.ws.axis.security.util
             description="tests everything"/>        
 
     <!-- #################################################################### -->
+
+    <target name="fix.properties" if="jdk13.present">
+        <replace dir="${build.dir}" value="org.apache.ws.security.components.crypto.BouncyCastle">
+            <include name="**/*.properties"/>
+            <replacetoken>org.apache.ws.security.components.crypto.Merlin</replacetoken>
+        </replace>
+    </target>
 
     <target name="compile.library" depends="prepare-src">
         <!-- Compile the java code from ${dir.src} into ${build.classes} -->
