@@ -212,26 +212,27 @@ public class STRTransform extends TransformSpi {
             
             // start of HACK
             StringBuffer bf = new StringBuffer(new String(buf));
+            String bf1 = bf.toString();
 
             /*
              * Find start and end of first element <....>, this is the Apex node
              */
-            int lt = bf.indexOf("<");
-            int gt = bf.indexOf(">");
+            int lt = bf1.indexOf("<");
+            int gt = bf1.indexOf(">");
             /*
              * Lookup the default namespace
              */
-            int idx = bf.indexOf(XMLNS);
+            int idx = bf1.indexOf(XMLNS);
             /*
              * If none found or if it is outside of this (Apex) element look for
              * first blank in, insert default namespace there (this is the
              * correct place according to c14n specification)
              */
             if (idx < 0 || idx > gt) {
-                idx = bf.indexOf(" ");
+                idx = bf1.indexOf(" ");
                 bf.insert(idx + 1, "xmlns=\"\" ");
+                bf1 = bf.toString();
             }
-            String bf1 = bf.toString();
             if (doDebug) {
                 log.debug("last result: ");
                 log.debug(bf1);

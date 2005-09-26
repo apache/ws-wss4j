@@ -235,15 +235,24 @@ org.apache.ws.axis.security.util
             <classpath refid="classpath.test"/>
         </available>
 
-        <available property="jdk14.present" classname="java.security.cert.CertPath">
-            <!-- check whether JDK14 is available -->
-            <classpath refid="classpath.test"/>
-        </available>
+        <condition property="jdk13.present">
+          <equals arg1="${ant.java.version}" arg2="1.3"/>
+        </condition>
 
-        <available property="jdk15.present" classname="java.lang.instrument.Instrumentation">
-            <!-- check whether JDK15 is available -->
-            <classpath refid="classpath.test"/>
-        </available>
+        <condition property="jdk14.present">
+          <equals arg1="${ant.java.version}" arg2="1.4"/>
+        </condition>
+
+        <condition property="jdk15.present">
+          <equals arg1="${ant.java.version}" arg2="1.5"/>
+        </condition>
+
+        <condition property="merlin.ok">
+            <or>
+                <equals arg1="${ant.java.version}" arg2="1.4"/>
+                <equals arg1="${ant.java.version}" arg2="1.5"/>
+            </or>
+        </condition>
 
         <available property="bc.present" classname="org.bouncycastle.jce.provider.BouncyCastleProvider">
             <!-- check whether BouncyCastle is available -->
@@ -252,6 +261,7 @@ org.apache.ws.axis.security.util
 
         <echo message="--- Flags (Note: If the {property name} is displayed, "/>
         <echo message="           then the component is not present)"/>
+        <echo message="jdk13.present=${jdk13.present}"/>
         <echo message="jdk14.present=${jdk14.present}"/>
         <echo message="jdk15.present=${jdk15.present}"/>
         <echo message="bc.present=${bc.present}"/>
@@ -315,8 +325,8 @@ org.apache.ws.axis.security.util
         <!-- Compile the java code from ${dir.src} into ${build.classes} -->
         <javac srcdir="${dir.src}" destdir="${build.classes}" debug="on">
             <classpath refid="classpath.library"/>
-            <exclude name="**/Merlin.java" unless="jdk14.present"/>
-            <!-- <exclude name="**/sandbox/**/*.java" /> -->
+            <exclude name="**/Merlin.java" unless="merlin.ok"/>
+            <exclude name="**/sandbox/**/*.java" if="jdk13.present" />
         </javac>
         <!-- Copy Property files -->
         <copy todir="${build.classes}">
