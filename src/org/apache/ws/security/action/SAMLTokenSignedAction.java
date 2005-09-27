@@ -97,15 +97,11 @@ public class SAMLTokenSignedAction implements Action {
         }
     }
 
-    protected SAMLIssuer loadSamlIssuer(WSHandler handler, RequestData reqData) {
-        String samlPropFile = null;
-
-        if ((samlPropFile =
-                (String) handler.getOption(WSHandlerConstants.SAML_PROP_FILE))
-                == null) {
-            samlPropFile =
-                    (String) handler.getProperty(reqData.getMsgContext(), WSHandlerConstants.SAML_PROP_FILE);
-        }
+    protected SAMLIssuer loadSamlIssuer(WSHandler handler, 
+					RequestData reqData) {
+        String samlPropFile 
+	    = handler.getString(WSHandlerConstants.SAML_PROP_FILE,
+				reqData.getMsgContext());
         return SAMLIssuerFactory.getInstance(samlPropFile);
     }
 

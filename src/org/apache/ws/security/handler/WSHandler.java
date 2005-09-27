@@ -33,6 +33,7 @@ import org.apache.ws.security.util.StringUtil;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.ws.security.util.XmlSchemaDateFormat;
 import org.w3c.dom.Document;
+//import org.apache.axis.MessageContext;
 
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
@@ -68,25 +69,24 @@ public abstract class WSHandler {
      * @param doAction a set defining the actions to do 
      * @param doc   the request as DOM document 
      * @param reqData a data storage to pass values around bewteen methods
-     * @param actions a vector holding the actions to do in the order defined in
-     *                the deployment file or property
+     * @param actions a vector holding the actions to do in the order defined
+     *                in the deployment file or property
      * @throws WSSecurityException
      */
     protected void doSenderAction(int doAction, Document doc,
-                                  RequestData reqData, Vector actions, boolean isRequest)
+                                  RequestData reqData, Vector actions, 
+				  boolean isRequest)
             throws WSSecurityException {
 
         boolean mu = decodeMustUnderstand(reqData);
 
         WSSConfig wssConfig = WSSConfig.getNewInstance();
-        wssConfig.setPrecisionInMilliSeconds(decodeTimestampPrecision(reqData));
+        wssConfig
+	    .setPrecisionInMilliSeconds(decodeTimestampPrecision(reqData));
         reqData.setWssConfig(wssConfig);
 
-        String actor = null;
-        if ((actor = (String) getOption(WSHandlerConstants.ACTOR)) == null) {
-            actor = (String) getProperty(reqData.getMsgContext(),
-                    WSHandlerConstants.ACTOR);
-        }
+	Object mc = reqData.getMsgContext();
+        String actor = getString(WSHandlerConstants.ACTOR, mc);
         reqData.setActor(actor);
 
         reqData.setSoapConstants(WSSecurityUtil.getSOAPConstants(doc
@@ -309,25 +309,23 @@ public abstract class WSHandler {
      * Hook to allow subclasses to load their Signature Crypto however they see
      * fit.
      */
-    public Crypto loadSignatureCrypto(RequestData reqData) throws WSSecurityException {
+    public Crypto loadSignatureCrypto(RequestData reqData) 
+	throws WSSecurityException {
         Crypto crypto = null;
         /*
         * Get crypto property file for signature. If none specified throw
         * fault, otherwise get a crypto instance.
         */
-        String sigPropFile = null;
-        if ((sigPropFile = (String) getOption(WSHandlerConstants.SIG_PROP_FILE))
-                == null) {
-            sigPropFile =
-                    (String) getProperty(reqData.getMsgContext(), WSHandlerConstants.SIG_PROP_FILE);
-        }
+        String sigPropFile = getString(WSHandlerConstants.SIG_PROP_FILE,
+				       reqData.getMsgContext());
         if (sigPropFile != null) {
             if ((crypto = (Crypto) cryptos.get(sigPropFile)) == null) {
                 crypto = CryptoFactory.getInstance(sigPropFile);
                 cryptos.put(sigPropFile, crypto);
             }
         } else {
-            throw new WSSecurityException("WSHandler: Signature: no crypto property file");
+            throw new WSSecurityException(
+                "WSHandler: Signature: no crypto property file");
         }
         return crypto;
     }
@@ -336,93 +334,87 @@ public abstract class WSHandler {
      * Hook to allow subclasses to load their Encryption Crypto however they
      * see fit.
      */
-    protected Crypto loadEncryptionCrypto(RequestData reqData) throws WSSecurityException {
+    protected Crypto loadEncryptionCrypto(RequestData reqData) 
+	throws WSSecurityException {
         Crypto crypto = null;
         /*
         * Get encryption crypto property file. If non specified take crypto
         * instance from signature, if that fails: throw fault
         */
-        String encPropFile = null;
-        if ((encPropFile = (String) getOption(WSHandlerConstants.ENC_PROP_FILE))
-                == null) {
-            encPropFile =
-                    (String) getProperty(reqData.getMsgContext(), WSHandlerConstants.ENC_PROP_FILE);
-        }
+        String encPropFile = getString(WSHandlerConstants.ENC_PROP_FILE,
+				       reqData.getMsgContext());
         if (encPropFile != null) {
             if ((crypto = (Crypto) cryptos.get(encPropFile)) == null) {
                 crypto = CryptoFactory.getInstance(encPropFile);
                 cryptos.put(encPropFile, crypto);
             }
         } else if ((crypto = reqData.getSigCrypto()) == null) {
-            throw new WSSecurityException("WSHandler: Encryption: no crypto property file");
+            throw new WSSecurityException(
+                "WSHandler: Encryption: no crypto property file");
         }
         return crypto;
     }
 
-    protected void decodeUTParameter(RequestData reqData) throws WSSecurityException {
-        reqData.setPwType((String) getOption(WSHandlerConstants.PASSWORD_TYPE));
-        if (reqData.getPwType() == null) {
-            reqData.setPwType((String) getProperty(reqData.getMsgContext(), WSHandlerConstants.PASSWORD_TYPE));
+    protected void decodeUTParameter(RequestData reqData) 
+	throws WSSecurityException {
+	Object mc = reqData.getMsgContext();
+
+        String type = getString(WSHandlerConstants.PASSWORD_TYPE, mc);
+	reqData.setPwType(type);
+        if (type != null) {
+            reqData.setPwType(type.equals(WSConstants.PW_TEXT)
+			      ? WSConstants.PASSWORD_TEXT
+			      : WSConstants.PASSWORD_DIGEST);
         }
-        if (reqData.getPwType() != null) {
-            reqData.setPwType(reqData.getPwType().equals(WSConstants.PW_TEXT)
-                ? WSConstants.PASSWORD_TEXT
-                : WSConstants.PASSWORD_DIGEST);
-        }
-        String tmpS = null;
-        if ((tmpS = (String) getOption(WSHandlerConstants.ADD_UT_ELEMENTS))
-                == null) {
-            tmpS =
-                    (String) getProperty(reqData.getMsgContext(), WSHandlerConstants.ADD_UT_ELEMENTS);
-        }
-        if (tmpS != null) {
-            reqData.setUtElements(StringUtil.split(tmpS, ' '));
+
+        String add = getString(WSHandlerConstants.ADD_UT_ELEMENTS, mc);
+        if (add != null) {
+            reqData.setUtElements(StringUtil.split(add, ' '));
         }
     }
 
-    protected void decodeSignatureParameter(RequestData reqData) throws WSSecurityException {
-        String tmpS = null;
-        if ((tmpS = (String) getOption(WSHandlerConstants.SIG_KEY_ID)) == null) {
-            tmpS = (String) getProperty(reqData.getMsgContext(), WSHandlerConstants.SIG_KEY_ID);
-        }
-        if (tmpS != null) {
-            Integer I = (Integer) WSHandlerConstants.keyIdentifier.get(tmpS);
-            if (I == null) {
-                throw new WSSecurityException("WSHandler: Signature: unknown key identification");
+    protected void decodeSignatureParameter(RequestData reqData) 
+	throws WSSecurityException {
+	Object mc = reqData.getMsgContext();
+        String keyId = getString(WSHandlerConstants.SIG_KEY_ID, mc);
+        if (keyId != null) {
+            Integer id = (Integer) WSHandlerConstants.keyIdentifier.get(keyId);
+            if (id == null) {
+                throw new WSSecurityException(
+                     "WSHandler: Signature: unknown key identification");
             }
-            reqData.setSigKeyId(I.intValue());
-            if (!(reqData.getSigKeyId() == WSConstants.ISSUER_SERIAL
-                    || reqData.getSigKeyId() == WSConstants.BST_DIRECT_REFERENCE
-                    || reqData.getSigKeyId() == WSConstants.X509_KEY_IDENTIFIER
-                    || reqData.getSigKeyId() == WSConstants.SKI_KEY_IDENTIFIER
-                    || reqData.getSigKeyId() == WSConstants.THUMBPRINT_IDENTIFIER)) {
-                throw new WSSecurityException("WSHandler: Signature: illegal key identification");
+            int tmp = id.intValue();
+            if (!(tmp == WSConstants.ISSUER_SERIAL
+		  || tmp == WSConstants.BST_DIRECT_REFERENCE
+		  || tmp == WSConstants.X509_KEY_IDENTIFIER
+		  || tmp == WSConstants.SKI_KEY_IDENTIFIER
+		  || tmp == WSConstants.THUMBPRINT_IDENTIFIER)) {
+                throw new WSSecurityException(
+                        "WSHandler: Signature: illegal key identification");
             }
+            reqData.setSigKeyId(tmp);
         }
-        reqData.setSigAlgorithm((String) getOption(WSHandlerConstants.SIG_ALGO));
-        if (reqData.getSigAlgorithm() == null) {
-            tmpS = (String) getProperty(reqData.getMsgContext(), WSHandlerConstants.SIG_ALGO);
-        }
-        if ((tmpS = (String) getOption(WSHandlerConstants.SIGNATURE_PARTS))
-                == null) {
-            tmpS =
-                    (String) getProperty(reqData.getMsgContext(), WSHandlerConstants.SIGNATURE_PARTS);
-        }
-        if (tmpS != null) {
-            splitEncParts(tmpS, reqData.getSignatureParts(), reqData);
+        String algo = getString(WSHandlerConstants.SIG_ALGO, mc);
+        reqData.setSigAlgorithm(algo);
+
+        String parts = getString(WSHandlerConstants.SIGNATURE_PARTS, mc);
+        if (parts != null) {
+            splitEncParts(parts, reqData.getSignatureParts(), reqData);
         }
     }
 
-    protected void decodeEncryptionParameter(RequestData reqData) throws WSSecurityException {
-        reqData.setEncUser((String) getOption(WSHandlerConstants.ENCRYPTION_USER));
-        if (reqData.getEncUser() == null) {
-            reqData.setEncUser((String) getProperty(reqData.getMsgContext(), WSHandlerConstants.ENCRYPTION_USER));
-        }
-        if (reqData.getEncUser() == null) {
+    protected void decodeEncryptionParameter(RequestData reqData) 
+	throws WSSecurityException {
+	Object mc = reqData.getMsgContext();
+        String encUser = getString(WSHandlerConstants.ENCRYPTION_USER, mc);
+	
+        if (encUser != null) {
+	    reqData.setEncUser(encUser);
+        } else {
             reqData.setEncUser(reqData.getUsername());
-        }
+	}
         if (reqData.getEncUser() == null) {
-            throw new WSSecurityException("WSHandler: Encryption: no username");
+	    throw new WSSecurityException("WSHandler: Encryption: no username");
         }
         /*
         * String msgType = msgContext.getCurrentMessage().getMessageType(); if
@@ -430,80 +422,61 @@ public abstract class WSHandler {
         * handleSpecialUser(encUser); }
         */
         handleSpecialUser(reqData);
-
+	
         /*
         * If the following parameters are no used (they return null) then the
         * default values of WSS4J are used.
         */
-        String tmpS = null;
-        if ((tmpS = (String) getOption(WSHandlerConstants.ENC_KEY_ID)) == null) {
-            tmpS = (String) getProperty(reqData.getMsgContext(), WSHandlerConstants.ENC_KEY_ID);
-        }
-        if (tmpS != null) {
-            Integer I = (Integer) WSHandlerConstants.keyIdentifier.get(tmpS);
-            if (I == null) {
-                throw new WSSecurityException("WSHandler: Encryption: unknown key identification");
+        String encKeyId = getString(WSHandlerConstants.ENC_KEY_ID, mc);
+        if (encKeyId != null) {
+            Integer id = (Integer) WSHandlerConstants
+		.keyIdentifier.get(encKeyId);
+            if (id == null) {
+                throw new WSSecurityException(
+		      "WSHandler: Encryption: unknown key identification");
             }
-            reqData.setEncKeyId(I.intValue());
-            if (!(reqData.getEncKeyId() == WSConstants.ISSUER_SERIAL
-                    || reqData.getEncKeyId() == WSConstants.X509_KEY_IDENTIFIER
-                    || reqData.getEncKeyId() == WSConstants.SKI_KEY_IDENTIFIER
-                    || reqData.getEncKeyId() == WSConstants.BST_DIRECT_REFERENCE
-                    || reqData.getEncKeyId() == WSConstants.EMBEDDED_KEYNAME
-                    || reqData.getSigKeyId() == WSConstants.THUMBPRINT_IDENTIFIER)) {
-                throw new WSSecurityException("WSHandler: Encryption: illegal key identification");
+            int tmp = id.intValue();
+	    reqData.setEncKeyId(tmp);
+	    if (!(tmp == WSConstants.ISSUER_SERIAL
+		  || tmp == WSConstants.X509_KEY_IDENTIFIER
+		  || tmp == WSConstants.SKI_KEY_IDENTIFIER
+		  || tmp == WSConstants.BST_DIRECT_REFERENCE
+		  || tmp == WSConstants.EMBEDDED_KEYNAME
+		  || tmp == WSConstants.THUMBPRINT_IDENTIFIER)) {
+                throw new WSSecurityException(
+                          "WSHandler: Encryption: illegal key identification");
             }
-        }
+	}
+        String encSymAlgo = getString(WSHandlerConstants.ENC_SYM_ALGO, mc);
+        reqData.setEncSymmAlgo(encSymAlgo);
 
-        reqData.setEncSymmAlgo((String) getOption(WSHandlerConstants.ENC_SYM_ALGO));
-        if (reqData.getEncSymmAlgo() == null) {
-            reqData.setEncSymmAlgo((String) getProperty(reqData.getMsgContext(), WSHandlerConstants.ENC_SYM_ALGO));
-        }
+        String encKeyTransport 
+	    = getString(WSHandlerConstants.ENC_KEY_TRANSPORT, mc);
+        reqData.setEncKeyTransport(encKeyTransport);
 
-        reqData.setEncKeyTransport((String) getOption(WSHandlerConstants.ENC_KEY_TRANSPORT));
-        if (reqData.getEncKeyTransport() == null) {
-            reqData.setEncKeyTransport((String) getProperty(reqData.getMsgContext(), WSHandlerConstants.ENC_KEY_TRANSPORT));
-        }
-        if ((tmpS = (String) getOption(WSHandlerConstants.ENCRYPTION_PARTS))
-                == null) {
-            tmpS =
-                    (String) getProperty(reqData.getMsgContext(), WSHandlerConstants.ENCRYPTION_PARTS);
-        }
-        if (tmpS != null) {
-            splitEncParts(tmpS, reqData.getEncryptParts(), reqData);
+        String encParts = getString(WSHandlerConstants.ENCRYPTION_PARTS, mc);
+        if (encParts != null) {
+            splitEncParts(encParts, reqData.getEncryptParts(), reqData);
         }
     }
 
-    protected boolean decodeMustUnderstand(RequestData reqData) throws WSSecurityException {
-        boolean mu = true;
-        String mustUnderstand = null;
-        if ((mustUnderstand =
-                (String) getOption(WSHandlerConstants.MUST_UNDERSTAND))
-                == null) {
-            mustUnderstand =
-                    (String) getProperty(reqData.getMsgContext(), WSHandlerConstants.MUST_UNDERSTAND);
-        }
-        if (mustUnderstand != null) {
-            if (mustUnderstand.equals("0") || mustUnderstand.equals("false")) {
-                mu = false;
-            } else if (
-                    mustUnderstand.equals("1") || mustUnderstand.equals("true")) {
-                mu = true;
-            } else {
-                throw new WSSecurityException("WSHandler: illegal mustUnderstand parameter");
-            }
-        }
-        return mu;
+    protected boolean decodeMustUnderstand(RequestData reqData) 
+	throws WSSecurityException {
+        String mu = getString(WSHandlerConstants.MUST_UNDERSTAND,
+			      reqData.getMsgContext());
+
+        if (mu == null) {return true;}
+
+	if ("0".equals(mu) || "false".equals(mu)) {return false;} 
+	if ("1".equals(mu) || "true".equals(mu)) {return true;}
+
+	throw new WSSecurityException(
+              "WSHandler: illegal mustUnderstand parameter");
     }
 
     public int decodeTimeToLive(RequestData reqData) {
-        String ttl = null;
-        if ((ttl =
-                (String) getOption(WSHandlerConstants.TTL_TIMESTAMP))
-                == null) {
-            ttl =
-                    (String) getProperty(reqData.getMsgContext(), WSHandlerConstants.TTL_TIMESTAMP);
-        }
+        String ttl = getString(WSHandlerConstants.TTL_TIMESTAMP,
+			       reqData.getMsgContext());
         int ttl_i = 0;
         if (ttl != null) {
             try {
@@ -518,26 +491,19 @@ public abstract class WSHandler {
         return ttl_i;
     }
 
-    protected boolean decodeTimestampPrecision(RequestData reqData) throws WSSecurityException {
+    protected boolean decodeTimestampPrecision(RequestData reqData) 
+	throws WSSecurityException {
         boolean precisionInMilliSeconds = true;
-        String value = null;
-        if ((value =
-                (String) getOption(WSHandlerConstants.TIMESTAMP_PRECISION))
-                == null) {
-            value =
-                    (String) getProperty(reqData.getMsgContext(), WSHandlerConstants.TIMESTAMP_PRECISION);
-        }
-        if (value != null) {
-            if (value.equals("0") || value.equals("false")) {
-                precisionInMilliSeconds = false;
-            } else if (
-                    value.equals("1") || value.equals("true")) {
-                precisionInMilliSeconds = true;
-            } else {
-                throw new WSSecurityException("WSHandler: illegal precisionInMilliSeconds parameter");
-            }
-        }
-        return precisionInMilliSeconds;
+        String value = getString(WSHandlerConstants.TIMESTAMP_PRECISION,
+				 reqData.getMsgContext());
+
+        if (value == null) {return true;}
+
+	if ("0".equals(value) || "false".equals(value)) {return false;} 
+	if ("1".equals(value) || "true".equals(value)) {return true;}
+
+	throw new WSSecurityException(
+		   "WSHandler: illegal precisionInMilliSeconds parameter");
     }
 
     /**
@@ -553,28 +519,27 @@ public abstract class WSHandler {
             throws WSSecurityException {
         WSPasswordCallback pwCb = null;
         String password = null;
-        String callback = null;
         CallbackHandler cbHandler = null;
-
-        if ((callback = (String) getOption(clsProp)) == null) {
-            callback = (String) getProperty(reqData.getMsgContext(), clsProp);
-        }
+	String err = "provided null or empty password";
+	Object mc = reqData.getMsgContext();
+        String callback = getString(clsProp, mc);
         if (callback != null) { // we have a password callback class
             pwCb = readPwViaCallbackClass(callback, username, doAction);
             if ((pwCb.getPassword() == null) && (pwCb.getKey() == null)) {
-                throw new WSSecurityException("WSHandler: password callback class provided null or empty password");
+            throw new WSSecurityException("WSHandler: password callback class "
+					  +err);
             }
-        } else if (
-                (cbHandler = (CallbackHandler) getProperty(reqData.getMsgContext(), refProp))
-                != null) {
+        } else if ((cbHandler = (CallbackHandler) getProperty(mc, refProp))
+		   != null) {
             pwCb = performCallback(cbHandler, username, doAction);
             if ((pwCb.getPassword() == null) && (pwCb.getKey() == null)) {
-                throw new WSSecurityException("WSHandler: password callback provided null or empty password");
+                throw new WSSecurityException("WSHandler: password callback " 
+					      +err);
             }
-        } else if ((password = getPassword(reqData.getMsgContext())) == null) {
-            throw new WSSecurityException("WSHandler: application provided null or empty password");
+        } else if ((password = getPassword(mc)) == null) {
+            throw new WSSecurityException("WSHandler: application "+err);
         } else {
-            setPassword(reqData.getMsgContext(), null);
+            setPassword(mc, null);
             pwCb = new WSPasswordCallback("", WSPasswordCallback.UNKNOWN);
             pwCb.setPassword(password);
         }
@@ -735,83 +700,84 @@ public abstract class WSHandler {
     }
 
     /**
-     * Hook to allow subclasses to load their Decryption Crypto however they see
-     * fit.
+     * Hook to allow subclasses to load their Decryption Crypto however they 
+     * see fit.
      */
-    protected Crypto loadDecryptionCrypto(RequestData reqData) throws WSSecurityException {
+    protected Crypto loadDecryptionCrypto(RequestData reqData) 
+	throws WSSecurityException {
+
         Crypto crypto = null;
-        String decPropFile = null;
-        if ((decPropFile = (String) getOption(WSHandlerConstants.DEC_PROP_FILE))
-                == null) {
-            decPropFile =
-                    (String) getProperty(reqData.getMsgContext(), WSHandlerConstants.DEC_PROP_FILE);
-        }
+        String decPropFile = getString(WSHandlerConstants.DEC_PROP_FILE,
+				     reqData.getMsgContext());
         if (decPropFile != null) {
             if ((crypto = (Crypto) cryptos.get(decPropFile)) == null) {
                 crypto = CryptoFactory.getInstance(decPropFile);
                 cryptos.put(decPropFile, crypto);
             }
         } else if ((crypto = reqData.getSigCrypto()) == null) {
-            throw new WSSecurityException("WSHandler: Encryption: no crypto property file");
+            throw new WSSecurityException(
+                            "WSHandler: Encryption: no crypto property file");
         }
         return crypto;
     }
 
-    protected void decodeSignatureParameter2(RequestData reqData) throws WSSecurityException {
+    protected void decodeSignatureParameter2(RequestData reqData) 
+	throws WSSecurityException {
         reqData.setSigCrypto(loadSignatureCrypto(reqData));
-        /* There are currently no other signature parameters that need to be handled
-        * here, but we call the load crypto hook rather than just changing the visibility
-        * of this method to maintain parity with WSDoAllSender.
-        */
+        /* There are currently no other signature parameters that need 
+	 * to be handled here, but we call the load crypto hook rather 
+	 * than just changing the visibility
+	 * of this method to maintain parity with WSDoAllSender.
+	 */
     }
 
     /*
-    * Set and check the decryption specific parameters, if necessary
-    * take over signatur crypto instance.
-    */
+     * Set and check the decryption specific parameters, if necessary
+     * take over signatur crypto instance.
+     */
 
-    protected void decodeDecryptionParameter(RequestData reqData) throws WSSecurityException {
+    protected void decodeDecryptionParameter(RequestData reqData) 
+	throws WSSecurityException {
         reqData.setDecCrypto(loadDecryptionCrypto(reqData));
-        /* There are currently no other decryption parameters that need to be handled
-        * here, but we call the load crypto hook rather than just changing the visibility
-        * of this method to maintain parity with WSDoAllSender.
-        */
+        /* There are currently no other decryption parameters that need 
+	 * to be handled here, but we call the load crypto hook rather 
+	 * than just changing the visibility
+	 * of this method to maintain parity with WSDoAllSender.
+	 */
     }
 
     /**
      * Get the password callback class and get an instance
      * <p/>
      */
-    protected CallbackHandler getPasswordCB(RequestData reqData) throws WSSecurityException {
+    protected CallbackHandler getPasswordCB(RequestData reqData) 
+	throws WSSecurityException {
 
-        String callback = null;
+	Object mc = reqData.getMsgContext();
         CallbackHandler cbHandler = null;
-        if ((callback = (String) getOption(WSHandlerConstants.PW_CALLBACK_CLASS))
-                == null) {
-            callback =
-                    (String) getProperty(reqData.getMsgContext(), WSHandlerConstants.PW_CALLBACK_CLASS);
-        }
+        String callback = getString(WSHandlerConstants.PW_CALLBACK_CLASS, mc);
         if (callback != null) {
             Class cbClass = null;
             try {
                 cbClass = Loader.loadClass(callback);
             } catch (ClassNotFoundException e) {
-                throw new WSSecurityException("WSHandler: cannot load password callback class: "
-                        + callback,
-                        e);
+                throw new WSSecurityException(
+                       "WSHandler: cannot load password callback class: "
+		       + callback, e);
             }
             try {
                 cbHandler = (CallbackHandler) cbClass.newInstance();
             } catch (java.lang.Exception e) {
-                throw new WSSecurityException("WSHandler: cannot create instance of password callback: "
-                        + callback,
-                        e);
+                throw new WSSecurityException(
+                     "WSHandler: cannot create instance of password callback: "
+		     + callback, e);
             }
         } else {
-            cbHandler =
-                    (CallbackHandler) getProperty(reqData.getMsgContext(), WSHandlerConstants.PW_CALLBACK_REF);
+            cbHandler = (CallbackHandler) getProperty(mc, 
+				           WSHandlerConstants.PW_CALLBACK_REF);
             if (cbHandler == null) {
-                throw new WSSecurityException("WSHandler: no reference in callback property");
+                throw new WSSecurityException(
+                           "WSHandler: no reference in callback property");
             }
         }
         return cbHandler;
@@ -998,12 +964,53 @@ public abstract class WSHandler {
         log.debug("Validation of Timestamp: Everything is ok");
         return true;
     }
+    
+    /**
+     * Looks up key first via {@link #getOption(String)} and if not found
+     * there, via {@link #getProperty(Object, String)}
+     *
+     * @param key the key to search for. May not be null.
+     * @param mc the message context to search. 
+     * @return the value found.
+     * @throws IllegalArgumentException if <code>key</code> is null.
+     */
+    public String getString(String key, Object mc) { 
+	if (key == null) {
+	    throw new IllegalArgumentException("Key cannot be null");
+	}
+        String s = getStringOption(key);
+	if (s != null) {
+	    return s;
+	}
+	if (mc == null) {
+	    throw new 
+		IllegalArgumentException("Message context cannot be null");
+	}
+	return (String) getProperty(mc, key);
+    }
+
+
+    /**
+     * Returns the option on <code>name</code>.
+     *
+     * @param key the non-null key of the option.
+     * @return the option on <code>key</code> if <code>key</code>
+     *  exists and is of type java.lang.String; otherwise null.
+     */
+    public String getStringOption(String key) {
+        Object o = getOption(key);
+	if (o instanceof String){
+	    return (String) o;
+	} else {
+	    return null;
+	}
+    }
 
     public abstract Object getOption(String key);
-
     public abstract Object getProperty(Object msgContext, String key);
 
-    public abstract void setProperty(Object msgContext, String key, Object value);
+    public abstract void setProperty(Object msgContext, String key, 
+				     Object value);
 
 
     public abstract String getPassword(Object msgContext);

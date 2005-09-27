@@ -70,19 +70,15 @@ public class WSDoAllSender extends WSDoAllHandler {
 
         reqData.setMsgContext(mc);
         /*
-           * The overall try, just to have a finally at the end to perform some
-           * housekeeping.
-           */
+	 * The overall try, just to have a finally at the end to perform some
+	 * housekeeping.
+	 */
         try {
             /*
-                * Get the action first.
-                */
+	     * Get the action first.
+	     */
             Vector actions = new Vector();
-            String action = null;
-            if ((action = (String) getOption(WSHandlerConstants.ACTION)) == null) {
-                action = (String) ((MessageContext)reqData.getMsgContext())
-                        .getProperty(WSHandlerConstants.ACTION);
-            }
+	    String action = getString(WSHandlerConstants.ACTION, mc);
             if (action == null) {
                 throw new AxisFault("WSDoAllSender: No action defined");
             }

@@ -107,11 +107,20 @@ public abstract class WSDoAllHandler extends WSHandler implements Handler {
     }
 
     /**
-     * Returns the option corresponding to the 'name' given
+     * Returns the option corresponding to <code>name</code>.
+     *
+     * @param name the non-null name of the option.
+     * @return the option on <code>name</code> if <code>name</code>
+     *  exists; otherwise null.
      */
     public Object getOption(String name) {
-        if (options == null) return (null);
-        return (options.get(name));
+	if (name == null) {
+	    throw new IllegalArgumentException("name cannot be null");
+	}
+        if (options == null) {
+	    return null;
+	}
+        return options.get(name);
     }
 
     /**

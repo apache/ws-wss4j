@@ -46,18 +46,30 @@
         </java>
     </target>
 
-    <target name="compile">
-        <mkdir dir="${dir.work}"/>
-        <axis-wsdl2java
-            output="${dir.work}"
-            serverSide="yes"
-            testcase="no"
-            verbose="no"
-            url="${dir.interop}/ping.wsdl">
-            <mapping
-                namespace="http://xmlsoap.org/Ping"
-                package="org.apache.ws.axis.oasis.ping"/>
-        </axis-wsdl2java>
+    <target name="chkWsdl">
+      <uptodate property="wsdl.notRequired" 
+        targetfile="${dir.work}/${server}/PingBindingImpl.java"
+        srcfile="${dir.interop}/ping.wsdl"/>
+    </target>
+
+    <target name="wsdl" depends="chkWsdl" unless="wsdl.notRequired">
+      <axis-wsdl2java
+          output="${dir.work}"
+          serverSide="yes"
+          testcase="no"
+          verbose="no"
+          url="${dir.interop}/ping.wsdl">
+          <mapping
+              namespace="http://xmlsoap.org/Ping"
+              package="org.apache.ws.axis.oasis.ping"/>
+      </axis-wsdl2java>
+    </target>
+
+    <target name="init">
+      <mkdir dir="${dir.work}"/>
+    </target>
+
+    <target name="compile" depends="init, wsdl">
         <copy todir="${dir.work}/${server}" overwrite="yes">
           <fileset dir="${dir.interop}/${server}">
             <include name="*.java"/>

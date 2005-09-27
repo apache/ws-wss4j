@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 
 <project name="Web Services Security (WSS4J)" default="usage" basedir=".">
-    <!-- =================================================================== -->
+    <!-- ================================================================== -->
     <description>
    Build file for WSS4J
 
@@ -9,7 +9,7 @@
    ANT is available from http://jakarta.apache.org/ant/index.html
 
 Prerequisites:
-	See the REAME file
+	See the README file
 
 Build Instructions:
    To build, run
@@ -28,9 +28,12 @@ Build Instructions:
         <property name='product.version.major' value='1'/>
         <property name='product.version.minor' value='1'/>
         <property name='product.version.level' value='0'/>
-        <property name='product.Version' value='${product.version.major}.${product.version.minor}.${product.version.level}'/>
-        <property name='product.version' value='${product.version.major}.${product.version.minor}.${product.version.level}'/>
-        <property name='product_version' value='${product.version.major}_${product.version.minor}_${product.version.level}'/>
+        <property name='product.Version' value='${product.version.major}
+             .${product.version.minor}.${product.version.level}'/>
+        <property name='product.version' value='${product.version.major}
+             .${product.version.minor}.${product.version.level}'/>
+        <property name='product_version' value='${product.version.major}
+             _${product.version.minor}_${product.version.level}'/>
         <property name="year" value="2005"/>
         <property name="copyright" value="Copyright &#169; ${year} Apache WS-Security Project. All Rights Reserved."/>
 
@@ -103,8 +106,10 @@ Build Instructions:
             <path refid="classpath.libraries"/>
         </path>
 
-        <taskdef resource="axis-tasks.properties" classpathref="classpath.library"/>
-        <taskdef name="runaxisfunctionaltests" classname="org.apache.axis.tools.ant.axis.RunAxisFunctionalTestsTask"
+        <taskdef resource="axis-tasks.properties" classpathref=
+              "classpath.library"/>
+        <taskdef name="runaxisfunctionaltests" classname=
+              "org.apache.axis.tools.ant.axis.RunAxisFunctionalTestsTask"
             loaderref="axis">
             <classpath refid="classpath.library"/>
         </taskdef>
@@ -132,7 +137,7 @@ Build Instructions:
         </patternset>
 
         <patternset id="srcFiles">
-            <!-- for some strange reasons, I can't use ${src} but must use src -->
+         <!-- for some strange reasons, I can't use ${src} but must use src -->
             <include name="src/**/*"/>
         </patternset>
 
@@ -161,54 +166,56 @@ org.apache.ws.axis.security,
 org.apache.ws.axis.security.util
 "/>
 
-        <echo message="-------------------------------------------------------------------"/>
-        <echo message="-------------- ${product.Name} v${product.Version} [${year}] ----------------"/>
-        <echo message="-------------------------------------------------------------------"/>
-        <echo message="Building with ${ant.version}"/>
-        <echo message="using build file ${ant.file}"/>
-        <echo message="Java ${java.version} located at ${java.home} "/>
-        <echo message="-------------------------------------------------------------------"/>
-        <echo message="--- Property values ---" />
-        <echo message="sun.boot.class.path=${sun.boot.class.path}"/>
-        <pathconvert targetos="windows" property="classpath.test.as.string" refid="classpath.test"/>
-        <echo message="classpath.test: ${classpath.test.as.string}"/>
-        <echo message="" />
-
+      <echo level="debug">
+        -------------------------------------------------------------------
+        ${product.Name} v${product.Version} [${year}] 
+        -------------------------------------------------------------------
+        Building with ${ant.version}
+        using build file ${ant.file}
+        Java ${java.version} located at ${java.home} 
+        -------------------------------------------------------------------
+        --- Property values ---
+        sun.boot.class.path=${sun.boot.class.path}
+      </echo>
+      <pathconvert targetos="windows" property="classpath.test.as.string" 
+          refid="classpath.test"/>
+      <echo level="debug">
+        classpath.test: ${classpath.test.as.string}
+      </echo>
     </target>
 
     <target name="usage" depends="init">
-        <echo message="                                                                   "/>
-        <echo message="                                                                   "/>
-        <echo message=" Build instructions                                                "/>
-        <echo message="-------------------------------------------------------------------"/>
-        <echo message="                                                                   "/>
-        <echo message=" available targets are:                                            "/>
-        <echo message="                                                                   "/>
-        <echo message="   compile         --> compiles everything                         "/>
-        <echo message="   compile.library --> compiles the source code                    "/>
-        <echo message="   compile.samples --> compiles the samples source code            "/>
-        <echo message="   compile.tests   --> compiles the tests source code              "/>
-        <echo message="   compile.interops--> compiles the interop source code            "/>
-        <echo message="                                                                   "/>
-        <echo message="   javadoc         --> generates the API documentation             "/>
-        <echo message="                       (needs Java > 1.2)                          "/>
-        <echo message="                                                                   "/>
-        <echo message="   test            --> runs the defined JUnit tests                "/>
-        <echo message="   report          --> generates html report of test results       "/>
-        <echo message="                                                                   "/>
-        <echo message="   clean           --> cleans up all generated files and           "/>
-        <echo message="                       directories                                 "/>
-        <echo message="   jar             --> creates the JAR file                        "/>
-        <echo message="   gump            --> includes javadoc, compile jar and test      "/>
-        <echo message="                                                                   "/>
-        <echo message="   usage           --> provides help on using the build tool       "/>
-        <echo message="                       (default)                                   "/>
-        <echo message="                                                                   "/>
-        <echo message="   changelog       --> generates changelog.html                    "/>
-        <echo message="                                                                   "/>
-        <echo message=" See comments inside the build.xml file for more details.          "/>
-        <echo message="-------------------------------------------------------------------"/>
-        <echo message="                                                                   "/>
+      <echo>
+         Build instructions                                                
+        -------------------------------------------------------------------
+                                                                           
+         available targets are:                                            
+                                                                           
+           compile         --> compiles everything                         
+           compile.library --> compiles the source code                    
+           compile.samples --> compiles the samples source code            
+           compile.tests   --> compiles the tests source code              
+           compile.interops--> compiles the interop source code            
+                                                                           
+           javadoc         --> generates the API documentation             
+                               (needs Java > 1.2)                          
+                                                                           
+           test            --> runs the defined JUnit tests                
+           report          --> generates html report of test results       
+                                                                           
+           clean           --> cleans up all generated files and           
+                               directories                                 
+           jar             --> creates the JAR file                        
+           gump            --> includes javadoc, compile jar and test      
+                                                                           
+           usage           --> provides help on using the build tool       
+                               (default)                                   
+                                                                           
+           changelog       --> generates changelog.html                    
+                                                                           
+         See comments inside the build.xml file for more details.          
+        -------------------------------------------------------------------
+      </echo>
     </target>
 
     <target name="clean" depends="init"
@@ -230,7 +237,8 @@ org.apache.ws.axis.security.util
         <delete dir="${build.dir}/test-reports"/>
         <mkdir dir="${build.dir}/test-reports"/>
 
-        <available property="junit.present" classname="junit.framework.TestCase">
+        <available property="junit.present" 
+                classname="junit.framework.TestCase">
             <!-- check whether JUnit is available -->
             <classpath refid="classpath.test"/>
         </available>
@@ -259,20 +267,22 @@ org.apache.ws.axis.security.util
             <classpath refid="classpath.test"/>
         </available>
 
-        <echo message="--- Flags (Note: If the {property name} is displayed, "/>
-        <echo message="           then the component is not present)"/>
-        <echo message="jdk13.present=${jdk13.present}"/>
-        <echo message="jdk14.present=${jdk14.present}"/>
-        <echo message="jdk15.present=${jdk15.present}"/>
-        <echo message="bc.present=${bc.present}"/>
+        <echo level="debug">
+        --- Flags (Note: If the {property name} is displayed,
+                   then the component is not present)
+        jdk13.present=${jdk13.present}
+        jdk14.present=${jdk14.present}
+        jdk15.present=${jdk15.present}
+        bc.present=${bc.present}
+        </echo>
 
     </target>
 
-    <!-- #################################################################### -->
-    <!-- #################################################################### -->
-    <!-- #################################################################### -->
-    <!-- #################################################################### -->
-    <!-- #################################################################### -->
+    <!-- ################################################################## -->
+    <!-- ################################################################## -->
+    <!-- ################################################################## -->
+    <!-- ################################################################## -->
+    <!-- ################################################################## -->
 
     <target name="prepare-src" depends="prepare" 
     	description="This target copies the Java sources and brands the version information">
@@ -300,7 +310,7 @@ org.apache.ws.axis.security.util
         </javadoc>
     </target>
 
-    <!-- #################################################################### -->
+    <!-- ################################################################## -->
 
     <!-- Aliases -->
     <target name="javadocs" depends="javadoc"/>
@@ -312,14 +322,15 @@ org.apache.ws.axis.security.util
             description="Target for the gump run"/>
 
     <target name="compile" 
-            depends="compile.library, compile.samples, compile.tests, compile.interops, fix.properties"
+       depends="compile.library,compile.samples, compile.tests, 
+                compile.interops, fix.properties"
             description="compile everything"/>
 
     <target name="test"
             depends="unitTests, systemTests"
             description="tests everything"/>        
 
-    <!-- #################################################################### -->
+    <!-- ################################################################## -->
 
     <target name="fix.properties" if="jdk13.present">
         <replace dir="${build.dir}" value="org.apache.ws.security.components.crypto.BouncyCastle">
@@ -403,7 +414,8 @@ org.apache.ws.axis.security.util
 
     <target name="start-functional-test-http-server" if="junit.present">
         <echo message="Starting http server."/>
-        <java classname="org.apache.axis.transport.http.SimpleAxisServer" fork="yes" dir="${build.dir}">
+        <java classname="org.apache.axis.transport.http.SimpleAxisServer" 
+          fork="yes" dir="${build.dir}">
             <jvmarg value="-Djava.endorsed.dirs=${basedir}/endorsed"/>
             <classpath refid="classpath.library"/>
         </java>
@@ -450,7 +462,8 @@ org.apache.ws.axis.security.util
         <java classname="org.apache.axis.utils.Admin" fork="true">
             <classpath refid="classpath.library"/>
             <arg value="client"/>
-            <arg file="${build.work}/org/apache/ws/axis/oasis/ping/undeploy.wsdd"/>
+            <arg file=
+               "${build.work}/org/apache/ws/axis/oasis/ping/undeploy.wsdd"/>
         </java>
 
 	    <junit printsummary="yes"
@@ -500,14 +513,16 @@ org.apache.ws.axis.security.util
                 <fileset dir="${build.classes}">
                     <include name="**/wssec/PackageTests.class"/>
                     <include name="**/components/PackageTests.class"/>
-                    <!--<include name="**/secconv/components/PackageTests.class"/> -->
+             <!--<include name="**/secconv/components/PackageTests.class"/> -->
                 </fileset>
             </batchtest>
         </junit>
     </target>
 
-    <target name="tcpmon" depends="init" description="Start standalone tcp monitor application (provided by axis)">
-        <java dir="${basedir}" fork="yes" failOnError="true" className="org.apache.axis.utils.tcpmon">
+    <target name="tcpmon" depends="init" description=
+                "Start standalone tcp monitor application (provided by axis)">
+        <java dir="${basedir}" fork="yes" failOnError="true" 
+                 className="org.apache.axis.utils.tcpmon">
             <classpath refid="classpath.library" />
              <arg value="9080" />
              <arg value="localhost" />
@@ -517,9 +532,11 @@ org.apache.ws.axis.security.util
 
 	<!--
 	This runs the selected scenario with SimpleAxisServer locally.
-	Before you start this target be sure you have started tcpmon too in a separate
+	Before you start this target be sure you have started tcpmon too 
+        in a separate
 	"ant tcpmon" call.
-	To run different scenarios use: "ant -DNumber=x scenarioTest" to run scenario x
+	To run different scenarios use: "ant -DNumber=x scenarioTest" 
+        to run scenario x
 	-->
     <target name="scenarioTest" depends="compile"
         if="junit.present"
@@ -532,11 +549,13 @@ org.apache.ws.axis.security.util
     </target>
 
     <target name="scenario" if="junit.present">
-        <echo message="Running interop test scenario ${Number} on SimpleAxisServer"/>
+        <echo message=
+          "Running interop test scenario ${Number} on SimpleAxisServer"/>
 
     	<antcall target="deployWSDD" />
     	
-        <java classname="interop.TestScenario${Number}" fork="yes" dir="${basedir}">
+        <java classname="interop.TestScenario${Number}" fork="yes" 
+                 dir="${basedir}">
             <jvmarg value="-Djava.endorsed.dirs=${basedir}/endorsed"/>
             <classpath refid="classpath.library"/>
         </java>
@@ -546,11 +565,14 @@ org.apache.ws.axis.security.util
     </target>
 	
 	<!--
-	This runs the selected scenario with SimpleAxisServer locally with perfomance
+	This runs the selected scenario with SimpleAxisServer locally 
+        with perfomance
 	timing switched on.
-	You may also emable the **.TIME entry in log4j.properties to get the internal
+	You may also emable the **.TIME entry in log4j.properties to get 
+        the internal
 	timing.
-	To run different scenarios use: "ant -DNumber=x scenarioTest" to run scenario x
+	To run different scenarios use: "ant -DNumber=x scenarioTest" 
+        to run scenario x
 	-->
     <target name="performanceTest" depends="compile"
         if="junit.present"
@@ -563,79 +585,82 @@ org.apache.ws.axis.security.util
     </target>
 
     <target name="performance" if="junit.present">
-        <echo message="Running performance test scenario ${Number} on SimpleAxisServer"/>
+        <echo message=
+           "Running performance test scenario ${Number} on SimpleAxisServer"/>
 
     	<antcall target="deployWSDD" />
-        <java classname="interop.TestScenario${Number}" fork="yes" dir="${basedir}">
+        <java classname="interop.TestScenario${Number}" fork="yes" 
+            dir="${basedir}">
             <jvmarg value="-Djava.endorsed.dirs=${basedir}/endorsed"/>
-        	<arg value="-lhttp://localhost:8080/axis/services/Ping${Number}" />
+       <arg value="-lhttp://localhost:8080/axis/services/Ping${Number}" />
         	<arg value="-t" />
             <classpath refid="classpath.library"/>
         </java>
     	<antcall target="undeployWSDD" />
     </target>
 	
-	<target name="deployWSDD">
-        <path id="deploy_xml_files">
-            <fileset dir="${build.work}">
-                <include name="**/deploy.wsdd"/>
-            </fileset>
-        </path>
+    <target name="deployWSDD">
+      <path id="deploy_xml_files">
+      <fileset dir="${build.work}">
+        <include name="**/deploy.wsdd"/>
+      </fileset>
+      </path>
 
-    	<copy todir="${build.dir}/keys">
-            <fileset dir="${dir.keys}" includes="**"/>
-        </copy>
-        <copy todir="${build.dir}/interop">
-            <fileset dir="${dir.interop}" includes="*.jks"/>
-        </copy>
+      <copy todir="${build.dir}/keys">
+        <fileset dir="${dir.keys}" includes="**"/>
+      </copy>
+      <copy todir="${build.dir}/interop">
+        <fileset dir="${dir.interop}" includes="*.jks"/>
+      </copy>
 
-		<property name="deploy_xml_property" refid="deploy_xml_files"/>
+      <property name="deploy_xml_property" refid="deploy_xml_files"/>
  
-		<java classname="org.apache.axis.utils.Admin" fork="true">
-            <classpath refid="classpath.library"/>
-            <arg value="client"/>
-            <arg file="${build.work}/org/apache/ws/axis/oasis/Client_deploy.wsdd"/>
-        </java>
+      <java classname="org.apache.axis.utils.Admin" fork="true">
+        <classpath refid="classpath.library"/>
+        <arg value="client"/>
+        <arg file="${build.work}/org/apache/ws/axis/oasis/Client_deploy.wsdd"/>
+      </java>
         
-        <java classname="org.apache.axis.client.AdminClient" fork="yes">
-            <classpath refid="classpath.library"/>
-            <arg line="${deploy_xml_property}"/>
-        </java>
-
-	</target>
+      <java classname="org.apache.axis.client.AdminClient" fork="yes">
+        <classpath refid="classpath.library"/>
+        <arg line="${deploy_xml_property}"/>
+      </java>
+    </target>
 	
-	<target name="undeployWSDD">
-        <path id="undeploy_xml_files">
-            <fileset dir="${build.work}">
-                <include name="**/undeploy.wsdd"/>
-            </fileset>
-        </path>
+    <target name="undeployWSDD">
+      <path id="undeploy_xml_files">
+        <fileset dir="${build.work}">
+          <include name="**/undeploy.wsdd"/>
+        </fileset>
+      </path>
 
-        <property name="undeploy_xml_property" refid="undeploy_xml_files"/>
+      <property name="undeploy_xml_property" refid="undeploy_xml_files"/>
 
-    	<java classname="org.apache.axis.utils.Admin" fork="true">
+      <java classname="org.apache.axis.utils.Admin" fork="true">
             <classpath refid="classpath.library"/>
             <arg value="client"/>
-            <arg file="${build.work}/org/apache/ws/axis/oasis/ping/undeploy.wsdd"/>
-        </java>
+            <arg file=
+                 "${build.work}/org/apache/ws/axis/oasis/ping/undeploy.wsdd"/>
+      </java>
 
-        <java classname="org.apache.axis.client.AdminClient" fork="yes">
-            <classpath refid="classpath.library"/>
-            <arg line="${undeploy_xml_property}"/>
-        </java>
-
-	</target>
+      <java classname="org.apache.axis.client.AdminClient" fork="yes">
+        <classpath refid="classpath.library"/>
+        <arg line="${undeploy_xml_property}"/>
+      </java>
+    </target>
 		
 	<!-- generate a report from all the tests. 
            requires Xalan or other XSLT engine in ant\lib-->
-    <target name="report" depends="init">
+
+   <target name="report" depends="init">
         <junitreport todir="${build.dir}/test-reports">
             <fileset dir="${build.dir}/test-reports">
                 <include name="TEST-*.xml"/>
             </fileset>
             <report format="frames" todir="${build.dir}/test-reports/html"/>
         </junitreport>
-        <echo message="point your browser to ${build.dir}/test-reports/html/index.html"/>
+        <echo message=
+            "point your browser to ${build.dir}/test-reports/html/index.html"/>
     </target>
 
     <target name="jar"
@@ -648,35 +673,43 @@ org.apache.ws.axis.security.util
             />
     </target>
 
-   <target name="bindist" depends="gump" description="Build zip file for distro">
-   		<delete dir="${dir.dist}"/>
-        <mkdir dir="${dir.dist}"/>
-        <jar jarfile="${dir.dist}/${jar.library}"
-            basedir="${build.classes}"
-            includes="**/apache/**/security/**"  />
-        <zip destfile="${dir.dist}/${product.shortname}-bin-${product.version}.zip">
-            <zipfileset prefix="wss4j" dir="."
-                includes="keys/**, interop/**, interop2/**, test/**, samples/**,
-        				  LICENSE.txt, README.txt legal/**, webapps/**"/>
-            <zipfileset prefix="wss4j/classes" dir="${build.classes}"
-                includes="*.properties, interop/**, wssec/**, org/**/oasis/**, org/**/samples/**"/>
-            <zipfileset prefix="wss4j/doc/api" dir="${build.javadoc}"/>
-            <zipfileset fullpath="wss4j/${jar.library}" dir="${dir.dist}" includes="${jar.library}"/>
-        </zip>
-	  <delete file="${dir.dist}/${jar.library}" />
+   <target name="bindist" depends="gump" 
+      description="Build zip file for distro">
+     <delete dir="${dir.dist}"/>
+     <mkdir dir="${dir.dist}"/>
+     <jar jarfile="${dir.dist}/${jar.library}"
+       basedir="${build.classes}"
+       includes="**/apache/**/security/**"  />
+     <zip destfile=
+        "${dir.dist}/${product.shortname}-bin-${product.version}.zip">
+        <zipfileset prefix="wss4j" dir="."
+          includes="keys/**, interop/**, interop2/**, test/**, samples/**,
+          LICENSE.txt, README.txt legal/**, webapps/**"/>
+        <zipfileset prefix="wss4j/classes" dir="${build.classes}"
+          includes=
+     "*.properties, interop/**, wssec/**, org/**/oasis/**, org/**/samples/**"/>
+        <zipfileset prefix="wss4j/doc/api" dir="${build.javadoc}"/>
+        <zipfileset fullpath="wss4j/${jar.library}" dir="${dir.dist}" 
+          includes="${jar.library}"/>
+      </zip>
+      <delete file="${dir.dist}/${jar.library}" />
     </target>
 
-    <target name="otherdist" depends="init" description="Build zip for required jars">
+    <target name="otherdist" depends="init" 
+             description="Build zip for required jars">
 	     <mkdir dir="${dir.dist}"/>
-	     <zip destfile="${dir.dist}/${product.shortname}-otherjars-${product.version}.zip">
+	     <zip destfile=
+           "${dir.dist}/${product.shortname}-otherjars-${product.version}.zip">
 	         <zipfileset prefix="wss4j" dir="."
 	             includes="lib/*.jar, endorsed/*.jar"/>
 	     </zip>
 	 </target>	
 	
-	<target name="srcdist" depends="init" description="Build source zip file for distro">
+	<target name="srcdist" depends="init" description=
+               "Build source zip file for distro">
         <mkdir dir="${dir.dist}"/>
-        <zip destfile="${dir.dist}/${product.shortname}-src-${product.version}.zip">
+        <zip destfile=
+                 "${dir.dist}/${product.shortname}-src-${product.version}.zip">
             <zipfileset prefix="wss4j" dir="."
                 includes="src/** LICENSE.txt README.txt legal/** build.xml "/>
         </zip>
@@ -751,7 +784,8 @@ org.apache.ws.axis.security.util
         </fileset>
     </path>
     <property name="deploy_xml_property" refid="deploy_xml_files"/>
-    <java classname="org.apache.axis.utils.Admin" fork="yes" dir="${build.webapp}/WEB-INF">
+    <java classname="org.apache.axis.utils.Admin" fork="yes" 
+        dir="${build.webapp}/WEB-INF">
         <classpath refid="classpath.library"/>
         <arg line="server"/>
         <arg line="${deploy_xml_property}"/>
