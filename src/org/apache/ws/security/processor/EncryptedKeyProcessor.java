@@ -20,6 +20,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDocInfo;
+import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSSecurityEngineResult;
@@ -56,11 +57,13 @@ public class EncryptedKeyProcessor implements Processor {
             LogFactory.getLog("org.apache.ws.security.TIME");
 
     byte[] decryptedBytes = null;
+    WSSConfig wssConfig = null;
 
-    public void handleToken(Element elem, Crypto crypto, Crypto decCrypto, CallbackHandler cb, WSDocInfo wsDocInfo, Vector returnResults) throws WSSecurityException {
+    public void handleToken(Element elem, Crypto crypto, Crypto decCrypto, CallbackHandler cb, WSDocInfo wsDocInfo, Vector returnResults, WSSConfig wsc) throws WSSecurityException {
         if (log.isDebugEnabled()) {
             log.debug("Found encrypted key element");
         }
+        wssConfig = wsc;
         if (decCrypto == null) {
             throw new WSSecurityException(WSSecurityException.FAILURE,
                     "noDecCryptoFile");
@@ -107,7 +110,7 @@ public class EncryptedKeyProcessor implements Processor {
             throw new WSSecurityException
                     (WSSecurityException.UNSUPPORTED_ALGORITHM, "noEncAlgo");
         }
-        Cipher cipher = WSSecurityUtil.getCipherInstance(keyEncAlgo);
+        Cipher cipher = WSSecurityUtil.getCipherInstance(keyEncAlgo, wssConfig.getJceProviderId());
         /*
          * Well, we can decrypt the session (symmetric) key. Now lookup CipherValue, this is the value of the
          * encrypted session key (session key usually is a symmetrical key that encrypts
@@ -261,6 +264,7 @@ public class EncryptedKeyProcessor implements Processor {
 
             try {
                 privateKey = crypto.getPrivateKey(alias, password);
+                System.out.println("Private Key class: " + privateKey.getClass().getName());
             } catch (Exception e) {
                 throw new WSSecurityException(WSSecurityException.FAILED_ENC_DEC, null, null, e);
             }

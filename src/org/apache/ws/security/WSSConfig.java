@@ -24,6 +24,9 @@ import org.apache.ws.security.util.Loader;
 import org.apache.ws.security.action.Action;
 import org.apache.ws.security.processor.Processor;
 import org.apache.xml.security.transforms.Transform;
+import org.apache.xml.security.algorithms.JCEMapper;
+
+import java.util.HashMap;
 
 import javax.xml.namespace.QName;
 
@@ -58,23 +61,17 @@ public class WSSConfig {
     protected boolean precisionInMilliSeconds = true;
 
     protected boolean enableSignatureConfirmation = true;
+    
+    protected HashMap jceProvider = new HashMap(10);
+    protected String jceProviderId = null;
+    
+    
+    
 
     protected WSSConfig() {
         org.apache.xml.security.Init.init();
-        try {
-            Class c = Loader
-                    .loadClass("org.bouncycastle.jce.provider.BouncyCastleProvider");
-            String Id = "BC";
-            if (java.security.Security.getProvider(Id) == null) {
-                if (log.isDebugEnabled()) {
-                    log.debug("The provider " + Id
-                            + " had to be added to the java.security.Security");
-                }
-                java.security.Security.addProvider((java.security.Provider) c
-                        .newInstance());
-            }
-        } catch (Throwable t) {
-        }
+        addJceProvider("BC", "org.bouncycastle.jce.provider.BouncyCastleProvider");
+        setJceProviderId("BC");
         Transform.init();
         try {
             Transform.register(STRTransform.implementedTransformURI,
@@ -227,5 +224,69 @@ public class WSSConfig {
             }
         }
         return null;
+    }
+    
+    private boolean loadProvider(String id, String className) {
+        try {
+            Class c = Loader
+                    .loadClass(className);
+            if (java.security.Security.getProvider(id) == null) {
+                if (log.isDebugEnabled()) {
+                    log.debug("The provider " + id
+                            + " had to be added to the java.security.Security");
+                }
+                java.security.Security.addProvider((java.security.Provider) c
+                        .newInstance());
+            }
+            return true;
+        } catch (Throwable t) {
+        	return false;
+        }
+    	
+    }
+    
+    public boolean addJceProvider(String id, String className) {
+    	/*
+    	 * Check if provider already exists, if not add it, otherwise
+    	 * not (don't allow overwrite to protect standard providers).
+    	 * 
+    	 * After adding to hashmap, load the class and register with
+    	 * standard security provider.
+    	 */
+    	if (jceProvider.get(id) == null) {
+    		jceProvider.put(id, className);
+    		return loadProvider(id, className);
+    	}
+    	return false;
+    }
+    
+    /**
+     * Sets the JCE provider to use in all following security operations.
+     * 
+     * The method checks if the provider is known. If yes it sets
+     * the provider id and returns true. Otherwise the provider id
+     * remains unchanged and the method returns false.
+     * 
+     * @param id is the JCE provider's id
+     * @return <code>true</code> if set, <code>false</code> otherwise
+     * @see addJceProvider
+     */
+    public boolean setJceProviderId(String id) {
+    	/*
+    	 * Check if provider exists, if yes just set id and
+    	 * return, otherwsie do nothing and return false
+    	 * (or shall we use exceptions here - which are more
+    	 * expensive).
+    	 */
+    	if (jceProvider.get(id) != null) {
+    		jceProviderId = id;
+    		JCEMapper.setProviderId(id);
+    		return true;
+    	}
+    	return false;
+    }
+    
+    public String getJceProviderId() {
+    	return jceProviderId;
     }
 }

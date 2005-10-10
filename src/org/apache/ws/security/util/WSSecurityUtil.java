@@ -634,15 +634,15 @@ public class WSSecurityUtil {
         }
     }
 
-    public static Cipher getCipherInstance(String cipherAlgo)
+    public static Cipher getCipherInstance(String cipherAlgo, String jceId)
             throws WSSecurityException {
         Cipher cipher = null;
         try {
             if (cipherAlgo.equalsIgnoreCase(WSConstants.KEYTRANSPORT_RSA15)) {
-                cipher = Cipher.getInstance("RSA/ECB/PKCS1PADDING", "BC");
+                cipher = Cipher.getInstance("RSA/ECB/PKCS1PADDING", jceId);
             } else if (
                     cipherAlgo.equalsIgnoreCase(WSConstants.KEYTRANSPORT_RSAOEP)) {
-                cipher = Cipher.getInstance("RSA/NONE/OAEPPADDING", "BC");
+                cipher = Cipher.getInstance("RSA/NONE/OAEPPADDING", jceId);
             } else {
                 throw new WSSecurityException(WSSecurityException.UNSUPPORTED_ALGORITHM,
                         "unsupportedKeyTransp",

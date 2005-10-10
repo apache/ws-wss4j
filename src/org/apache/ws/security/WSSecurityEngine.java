@@ -249,7 +249,7 @@ public class WSSecurityEngine {
             QName el = new QName(elem.getNamespaceURI(), elem.getLocalName());
             Processor p = wssConfig.getProcessor(el);
             if (p != null) {
-                p.handleToken((Element) elem, sigCrypto, decCrypto, cb, wsDocInfo, returnResults);
+                p.handleToken((Element) elem, sigCrypto, decCrypto, cb, wsDocInfo, returnResults, wssConfig);
             } else {
                 /*
                 * Add check for a BinarySecurityToken, add info to WSDocInfo. If BST is

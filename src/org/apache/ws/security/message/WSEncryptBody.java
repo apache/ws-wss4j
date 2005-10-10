@@ -322,7 +322,7 @@ public class WSEncryptBody extends WSBaseMessage {
         if (tlog.isDebugEnabled()) {
             t2 = System.currentTimeMillis();
         }
-        Cipher cipher = WSSecurityUtil.getCipherInstance(keyEncAlgo);
+        Cipher cipher = WSSecurityUtil.getCipherInstance(keyEncAlgo, wssConfig.getJceProviderId());
         try {
             cipher.init(Cipher.ENCRYPT_MODE, remoteCert);
         } catch (InvalidKeyException e) {
