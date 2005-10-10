@@ -921,18 +921,24 @@ public abstract class WSHandler {
     }
 
     /**
-     * Evaluate whether a timestamp is considered valid on receiverside.
-     * Hook to allow subclasses to implement custom validation methods however they see fit.
-     * <p/>
-     * Policy used in this implementation:
-     * 1. The receiver can set its own time to live (besides from that set on sender side)
-     * 2. If the message was created before (now-ttl) the message is rejected
-     *
-     * @param timestamp  the timestamp that is validated
-     * @param timeToLive the limit on receiverside, the timestamp is validated against
-     * @return true if the timestamp is before (now-timeToLive), false otherwise
-     * @throws WSSecurityException
-     */
+	 * Evaluate whether a timestamp is considered valid on receiverside. Hook to
+	 * allow subclasses to implement custom validation methods however they see
+	 * fit.
+	 * 
+	 * Policy used in this implementation:
+	 * 
+	 * 1. The receiver can set its own time to live (besides from that set on
+	 * sender side)
+	 * 
+	 * 2. If the message was created before (now-ttl) the message is rejected
+	 * 
+	 * @param timestamp
+	 *            the timestamp that is validated
+	 * @param timeToLive
+	 *            the limit on receiverside, the timestamp is validated against
+	 * @return true if the timestamp is before (now-timeToLive), false otherwise
+	 * @throws WSSecurityException
+	 */
     protected boolean verifyTimestamp(Timestamp timestamp, int timeToLive) throws WSSecurityException {
 
         // Calculate the time that is allowed for the message to travel
@@ -961,7 +967,9 @@ public abstract class WSHandler {
             return false;
         }
 
-        log.debug("Validation of Timestamp: Everything is ok");
+        if (doDebug) {
+        	log.debug("Validation of Timestamp: Everything is ok");
+        }
         return true;
     }
     
