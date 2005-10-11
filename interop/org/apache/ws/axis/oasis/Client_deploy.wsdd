@@ -41,6 +41,7 @@
     <parameter name="addUTElements" value="Nonce Created" />
     <parameter name="encryptionPropFile" value="wsstest.properties" />
     <parameter name="encryptionKeyIdentifier" value="SKIKeyIdentifier" />
+    <parameter name="encryptionSymAlgorithm" value="http://www.w3.org/2001/04/xmlenc#tripledes-cbc" />    
     <!-- Use the Server's cert/key to encrypt the request -->
     <parameter name="encryptionUser" value="bob" />
     <parameter name="encryptionParts" 
@@ -58,6 +59,7 @@
       value="org.apache.ws.axis.oasis.PWCallback1"/>
     <parameter name="encryptionPropFile" value="wsstest.properties" />
     <parameter name="encryptionKeyIdentifier" value="SKIKeyIdentifier" />
+    <parameter name="encryptionSymAlgorithm" value="http://www.w3.org/2001/04/xmlenc#tripledes-cbc" />    
     <!-- Use the Server's cert/key to encrypt the request -->
     <parameter name="encryptionUser" value="bob" />
     <parameter name="encryptionParts" 
@@ -77,6 +79,7 @@
     <parameter name="signatureKeyIdentifier" value="DirectReference" />
     <parameter name="signaturePropFile" value="wsstest.properties" />
     <parameter name="encryptionKeyIdentifier" value="SKIKeyIdentifier" />
+    <parameter name="encryptionSymAlgorithm" value="http://www.w3.org/2001/04/xmlenc#tripledes-cbc" />    
     <parameter name="encryptionUser" value="bob" />
    </handler>
   </requestFlow>
@@ -101,6 +104,7 @@
     <parameter name="signatureKeyIdentifier" value="DirectReference" />
     <parameter name="signaturePropFile" value="wsstest.properties" />
     <parameter name="encryptionKeyIdentifier" value="EmbeddedKeyName" />
+    <parameter name="encryptionSymAlgorithm" value="http://www.w3.org/2001/04/xmlenc#tripledes-cbc" />
     <parameter name="EmbeddedKeyCallbackClass" 
       value="org.apache.ws.axis.oasis.PWCallback1" />
     <parameter name="EmbeddedKeyName" value="SessionKey" />
@@ -152,6 +156,7 @@
     <parameter name="signatureKeyIdentifier" value="DirectReference" />
     <parameter name="signaturePropFile" value="wsstest.properties" />
     <parameter name="encryptionKeyIdentifier" value="SKIKeyIdentifier" />
+    <parameter name="encryptionSymAlgorithm" value="http://www.w3.org/2001/04/xmlenc#tripledes-cbc" />    
     <!-- Use the Server's cert/key to encrypt the request -->
     <parameter name="encryptionUser" value="bob" />
    </handler>
@@ -177,6 +182,7 @@
       value="{}{http://schemas.xmlsoap.org/soap/envelope/}Body;STRTransform" />
     <parameter name="signaturePropFile" value="wsstest.properties" />
     <parameter name="encryptionKeyIdentifier" value="SKIKeyIdentifier" />
+    <parameter name="encryptionSymAlgorithm" value="http://www.w3.org/2001/04/xmlenc#tripledes-cbc" />    
     <parameter name="encryptionUser" value="bob" />
     <parameter name="encryptionPropFile" value="wsstest.properties" />
    </handler>

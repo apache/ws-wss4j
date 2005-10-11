@@ -135,6 +135,7 @@
     <parameter name="signatureKeyIdentifier" value="DirectReference" />
     <parameter name="signaturePropFile" value="wsstest.properties" />
     <parameter name="encryptionKeyIdentifier" value="SKIKeyIdentifier" />
+    <parameter name="encryptionSymAlgorithm" value="http://www.w3.org/2001/04/xmlenc#tripledes-cbc" />    
     <!-- Use the Client's cert/key to encrypt the response -->
     <parameter name="encryptionUser" value="alice" />
    </handler>
@@ -178,6 +179,7 @@
     <parameter name="signatureKeyIdentifier" value="SKIKeyIdentifier" />
     <parameter name="signaturePropFile" value="wsstest.properties" />
     <parameter name="encryptionKeyIdentifier" value="EmbeddedKeyName" />
+    <parameter name="encryptionSymAlgorithm" value="http://www.w3.org/2001/04/xmlenc#tripledes-cbc" />    
     <parameter name="EmbeddedKeyCallbackClass" 
       value="org.apache.ws.axis.oasis.PWCallback1" />
     <parameter name="EmbeddedKeyName" value="SessionKey" />
@@ -251,6 +253,7 @@
     <parameter name="signatureKeyIdentifier" value="SKIKeyIdentifier" />
     <parameter name="signaturePropFile" value="wsstest.properties" />
     <parameter name="encryptionKeyIdentifier" value="DirectReference" />
+    <parameter name="encryptionSymAlgorithm" value="http://www.w3.org/2001/04/xmlenc#tripledes-cbc" />    
     <!-- Use the Client's cert/key to encrypt the response -->
     <parameter name="encryptionUser" value="alice" />
    </handler>
@@ -297,6 +300,7 @@
     <parameter name="signaturePropFile" value="wsstest.properties" />
     <parameter name="encryptionPropFile" value="wsstest.properties" />
     <parameter name="encryptionKeyIdentifier" value="DirectReference" />
+    <parameter name="encryptionSymAlgorithm" value="http://www.w3.org/2001/04/xmlenc#tripledes-cbc" />   
     <!-- Use the Client's cert/key to encrypt the response -->    
     <parameter name="encryptionUser" value="alice" />
    </handler>
