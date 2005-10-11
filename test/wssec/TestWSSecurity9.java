@@ -155,6 +155,7 @@ public class TestWSSecurity9 extends TestCase implements CallbackHandler {
         
         encrypt.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e");
         encrypt.setKeyIdentifierType(WSConstants.EMBEDDED_KEYNAME);
+        encrypt.setSymmetricEncAlgorithm(WSConstants.TRIPLE_DES);        
         encrypt.setKey(key);
 
         sign.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");

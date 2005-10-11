@@ -137,6 +137,7 @@ public class TestWSSecurity2 extends TestCase implements CallbackHandler {
         WSEncryptBody builder = new WSEncryptBody();
         builder.setUserInfo("wss4jcert");
         builder.setKeyIdentifierType(WSConstants.X509_KEY_IDENTIFIER);
+        builder.setSymmetricEncAlgorithm(WSConstants.TRIPLE_DES);
         Document doc = unsignedEnvelope.getAsDocument();
         log.info("Before Encryption Triple DES....");
         Document encryptedDoc = builder.build(doc, crypto);

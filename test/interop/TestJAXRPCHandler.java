@@ -78,6 +78,7 @@ public class TestJAXRPCHandler extends TestCase {
         config.put("signatureKeyIdentifier", "DirectReference");
         config.put("signaturePropFile", "wsstest.properties");
         config.put("encryptionKeyIdentifier", "EmbeddedKeyName");
+        config.put("encryptionSymAlgorithm", "http://www.w3.org/2001/04/xmlenc#tripledes-cbc");
         config.put("EmbeddedKeyCallbackClass", "org.apache.ws.axis.oasis.PWCallback1");
         config.put("EmbeddedKeyName", "SessionKey");
         invokeService (config, 4);
