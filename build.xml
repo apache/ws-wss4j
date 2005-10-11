@@ -121,7 +121,7 @@ Build Instructions:
         <path id="classpath.test">
             <!-- classpath for test is librarypath plus junit -->
             <path refid="classpath.library"/>
-            <pathelement path="${java.class.path}"/>
+<!--            <pathelement path="${java.class.path}"/> -->
         </path>
 
         <path id="classpath.test.jar">
