@@ -70,8 +70,9 @@ public class WSSConfig {
 
     protected WSSConfig() {
         org.apache.xml.security.Init.init();
-        addJceProvider("BC", "org.bouncycastle.jce.provider.BouncyCastleProvider");
-        setJceProviderId("BC");
+        if (addJceProvider("BC", "org.bouncycastle.jce.provider.BouncyCastleProvider")) {
+            setJceProviderId("BC");
+        }
         Transform.init();
         try {
             Transform.register(STRTransform.implementedTransformURI,
@@ -245,46 +246,51 @@ public class WSSConfig {
     	
     }
     
-    public boolean addJceProvider(String id, String className) {
-    	/*
-    	 * Check if provider already exists, if not add it, otherwise
-    	 * not (don't allow overwrite to protect standard providers).
-    	 * 
-    	 * After adding to hashmap, load the class and register with
-    	 * standard security provider.
-    	 */
-    	if (jceProvider.get(id) == null) {
-    		jceProvider.put(id, className);
-    		return loadProvider(id, className);
-    	}
-    	return false;
-    }
+    /**
+	 * Add a new JCE security provider to use for WSS4J.
+	 * 
+	 * If the provider is not already known the method loads a security provider
+	 * class and adds the provider to the java security service.
+	 * 
+	 * 
+	 * @param id
+	 *            The id string of the provider
+	 * @param className
+	 *            Name of the class the implements the provider. This class
+	 *            must be a subclass of <code>java.security.Provider</code>
+	 * 
+	 * @return Returns <code>true</code> if the provider was successfully
+	 *         added, <code>false</code> otherwise.
+	 */
+	public boolean addJceProvider(String id, String className) {
+		if (jceProvider.get(id) == null && loadProvider(id, className)) {
+			jceProvider.put(id, className);
+			return true;
+		}
+		return false;
+	}
     
     /**
-     * Sets the JCE provider to use in all following security operations.
-     * 
-     * The method checks if the provider is known. If yes it sets
-     * the provider id and returns true. Otherwise the provider id
-     * remains unchanged and the method returns false.
-     * 
-     * @param id is the JCE provider's id
-     * @return <code>true</code> if set, <code>false</code> otherwise
-     * @see addJceProvider
-     */
-    public boolean setJceProviderId(String id) {
-    	/*
-    	 * Check if provider exists, if yes just set id and
-    	 * return, otherwsie do nothing and return false
-    	 * (or shall we use exceptions here - which are more
-    	 * expensive).
-    	 */
-    	if (jceProvider.get(id) != null) {
-    		jceProviderId = id;
-    		JCEMapper.setProviderId(id);
-    		return true;
-    	}
-    	return false;
-    }
+	 * Sets the JCE provider to use in all following security operations.
+	 * 
+	 * The method checks if the provider is known. If yes it sets the provider
+	 * id and returns true. Otherwise the provider id remains unchanged and the
+	 * method returns false.
+	 * 
+	 * @param id
+	 *            is the JCE provider's id
+	 * @return Returns <code>true</code> if set, <code>false</code>
+	 *         otherwise
+	 * @see addJceProvider
+	 */
+	public boolean setJceProviderId(String id) {
+		if (jceProvider.get(id) != null) {
+			jceProviderId = id;
+			JCEMapper.setProviderId(id);
+			return true;
+		}
+		return false;
+	}
     
     public String getJceProviderId() {
     	return jceProviderId;

@@ -186,6 +186,9 @@ public class WSConstants {
      * method to use triple DES as the symmetric algorithm to encrypt data.
      * <p/>
      * This is a required method as defined by XML encryption.
+     * The String to use in WSDD file (in accordance to w3c specifications:
+     * <br/>
+     * http://www.w3.org/2001/04/xmlenc#tripledes-cbc
      */
     public static final String TRIPLE_DES = EncryptionConstants.ALGO_ID_BLOCKCIPHER_TRIPLEDES;
 
@@ -194,6 +197,9 @@ public class WSConstants {
      * method to use AES with 128 bit key as the symmetric algorithm to encrypt data.
      * <p/>
      * This is a required method as defined by XML encryption.
+     * The String to use in WSDD file (in accordance to w3c specifications:
+     * <br/>
+     * http://www.w3.org/2001/04/xmlenc#aes128-cbc
      */
     public static final String AES_128 = EncryptionConstants.ALGO_ID_BLOCKCIPHER_AES128;
 
@@ -202,6 +208,9 @@ public class WSConstants {
      * method to use AES with 256 bit key as the symmetric algorithm to encrypt data.
      * <p/>
      * This is a required method as defined by XML encryption.
+     * The String to use in WSDD file (in accordance to w3c specifications:
+     * <br/>
+     * http://www.w3.org/2001/04/xmlenc#aes256-cbc
      */
     public static final String AES_256 = EncryptionConstants.ALGO_ID_BLOCKCIPHER_AES256;
 
@@ -210,6 +219,9 @@ public class WSConstants {
      * method to use AES with 192 bit key as the symmetric algorithm to encrypt data.
      * <p/>
      * This is a optional method as defined by XML encryption.
+     * The String to use in WSDD file (in accordance to w3c specifications:
+     * <br/>
+     * http://www.w3.org/2001/04/xmlenc#aes192-cbc
      */
     public static final String AES_192 = EncryptionConstants.ALGO_ID_BLOCKCIPHER_AES192;
 

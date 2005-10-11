@@ -46,6 +46,7 @@ import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 import java.security.cert.X509Certificate;
 import java.util.Vector;
 
@@ -61,7 +62,7 @@ public class WSEncryptBody extends WSBaseMessage {
     private static Log log = LogFactory.getLog(WSEncryptBody.class.getName());
     private static Log tlog = LogFactory.getLog("org.apache.ws.security.TIME");
 
-    protected String symEncAlgo = WSConstants.TRIPLE_DES;
+    protected String symEncAlgo = WSConstants.AES_128;
     protected String keyEncAlgo = WSConstants.KEYTRANSPORT_RSA15;
     protected String encCanonAlgo = null;
     protected byte[] embeddedKey = null;
@@ -603,33 +604,51 @@ public class WSEncryptBody extends WSBaseMessage {
     }
 
     private KeyGenerator getKeyGenerator() throws WSSecurityException {
-        KeyGenerator keyGen = null;
-        try {
-            if (symEncAlgo.equalsIgnoreCase(WSConstants.TRIPLE_DES)) {
-                keyGen = KeyGenerator.getInstance("DESede");
-            } else if (symEncAlgo.equalsIgnoreCase(WSConstants.AES_128)) {
-                keyGen = KeyGenerator.getInstance("2.16.840.1.101.3.4.1.2");
-            } else if (symEncAlgo.equalsIgnoreCase(WSConstants.AES_192)) {
-                keyGen = KeyGenerator.getInstance("2.16.840.1.101.3.4.1.22");
-            } else if (symEncAlgo.equalsIgnoreCase(WSConstants.AES_256)) {
-                keyGen = KeyGenerator.getInstance("2.16.840.1.101.3.4.1.42");
-            } else {
-                return null;
-            }
-        } catch (NoSuchAlgorithmException e) {
-            throw new WSSecurityException(WSSecurityException.UNSUPPORTED_ALGORITHM, null, null, e);
-        }
-        return keyGen;
-    }
+		KeyGenerator keyGen = null;
+		String id = wssConfig.getJceProviderId();
+		try {
+			/*
+			 * Assume AES as default, so initialize it
+			 */
+			if (id == null) {
+				keyGen = KeyGenerator.getInstance("AES");
+			} else {
+				keyGen = KeyGenerator.getInstance("AES", id);
+			}
+			if (symEncAlgo.equalsIgnoreCase(WSConstants.TRIPLE_DES)) {
+				if (id == null) {
+					keyGen = KeyGenerator.getInstance("DESede");
+				} else {
+					keyGen = KeyGenerator.getInstance("DESede", id);
+				}
+			} else if (symEncAlgo.equalsIgnoreCase(WSConstants.AES_128)) {
+				keyGen.init(128);
+			} else if (symEncAlgo.equalsIgnoreCase(WSConstants.AES_192)) {
+				keyGen.init(192);
+			} else if (symEncAlgo.equalsIgnoreCase(WSConstants.AES_256)) {
+				keyGen.init(256);
+			} else {
+				return null;
+			}
+		} catch (NoSuchAlgorithmException e) {
+			throw new WSSecurityException(
+					WSSecurityException.UNSUPPORTED_ALGORITHM, null, null, e);
+		} catch (NoSuchProviderException e) {
+			throw new WSSecurityException(
+					WSSecurityException.UNSUPPORTED_ALGORITHM, null, null, e);
+		}
+		return keyGen;
+	}
 
     /**
-     * Create DOM subtree for <code>xenc:EncryptedKey</code>
-     *
-     * @param doc              the SOAP enevelope parent document
-     * @param keyTransportAlgo specifies which alogrithm to use to encrypt the
-     *                         symmetric key
-     * @return an <code>xenc:EncryptedKey</code> element
-     */
+	 * Create DOM subtree for <code>xenc:EncryptedKey</code>
+	 * 
+	 * @param doc
+	 *            the SOAP enevelope parent document
+	 * @param keyTransportAlgo
+	 *            specifies which alogrithm to use to encrypt the symmetric key
+	 * @return an <code>xenc:EncryptedKey</code> element
+	 */
     public static Element createEnrcyptedKey(Document doc,
                                              String keyTransportAlgo) {
         Element encryptedKey =

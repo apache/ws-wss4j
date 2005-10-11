@@ -568,7 +568,7 @@ public class WSHandlerConstants {
      * <p/>
      * The application may set this parameter using the following method:
      * <pre>
-     * call.setProperty(WSDoAllConstants.ENC_SYM_ALGO, "AES256");
+     * call.setProperty(WSDoAllConstants.ENC_SYM_ALGO, WSConstants.AES_256);
      * </pre>
      * However, the parameter in the WSDD deployment file overwrites the
      * property setting (deployment setting overwrites application setting).

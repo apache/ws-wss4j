@@ -264,7 +264,6 @@ public class EncryptedKeyProcessor implements Processor {
 
             try {
                 privateKey = crypto.getPrivateKey(alias, password);
-                System.out.println("Private Key class: " + privateKey.getClass().getName());
             } catch (Exception e) {
                 throw new WSSecurityException(WSSecurityException.FAILED_ENC_DEC, null, null, e);
             }

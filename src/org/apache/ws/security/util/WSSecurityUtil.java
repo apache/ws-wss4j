@@ -44,7 +44,6 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import javax.xml.namespace.QName;
-import javax.xml.transform.TransformerException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.util.Vector;
@@ -635,44 +634,56 @@ public class WSSecurityUtil {
     }
 
     public static Cipher getCipherInstance(String cipherAlgo, String jceId)
-            throws WSSecurityException {
-        Cipher cipher = null;
-        try {
-            if (cipherAlgo.equalsIgnoreCase(WSConstants.KEYTRANSPORT_RSA15)) {
-                cipher = Cipher.getInstance("RSA/ECB/PKCS1PADDING", jceId);
-            } else if (
-                    cipherAlgo.equalsIgnoreCase(WSConstants.KEYTRANSPORT_RSAOEP)) {
-                cipher = Cipher.getInstance("RSA/NONE/OAEPPADDING", jceId);
-            } else {
-                throw new WSSecurityException(WSSecurityException.UNSUPPORTED_ALGORITHM,
-                        "unsupportedKeyTransp",
-                        new Object[]{cipherAlgo});
-            }
-        } catch (NoSuchPaddingException ex) {
-            throw new WSSecurityException(WSSecurityException.UNSUPPORTED_ALGORITHM,
-                    "unsupportedKeyTransp",
-                    new Object[]{"No such padding: " + cipherAlgo});
-        } catch (NoSuchProviderException ex) {
-            throw new WSSecurityException(WSSecurityException.UNSUPPORTED_ALGORITHM,
-                    "unsupportedKeyTransp",
-                    new Object[]{"no provider: " + cipherAlgo});
-        } catch (NoSuchAlgorithmException ex) {
-            throw new WSSecurityException(WSSecurityException.UNSUPPORTED_ALGORITHM,
-                    "unsupportedKeyTransp",
-                    new Object[]{"No such algorithm: " + cipherAlgo});
-        }
-        return cipher;
-    }
+			throws WSSecurityException {
+		Cipher cipher = null;
+		try {
+			if (cipherAlgo.equalsIgnoreCase(WSConstants.KEYTRANSPORT_RSA15)) {
+				if (jceId == null) {
+					cipher = Cipher.getInstance("RSA/ECB/PKCS1PADDING");
+				} else {
+					cipher = Cipher.getInstance("RSA/ECB/PKCS1PADDING", jceId);
+				}
+			} else if (cipherAlgo
+					.equalsIgnoreCase(WSConstants.KEYTRANSPORT_RSAOEP)) {
+				if (jceId == null) {
+					cipher = Cipher.getInstance("RSA/NONE/OAEPPADDING");
+				} else {
+					cipher = Cipher.getInstance("RSA/NONE/OAEPPADDING", jceId);
+				}
+			} else {
+				throw new WSSecurityException(
+						WSSecurityException.UNSUPPORTED_ALGORITHM,
+						"unsupportedKeyTransp", new Object[] { cipherAlgo });
+			}
+		} catch (NoSuchPaddingException ex) {
+			throw new WSSecurityException(
+					WSSecurityException.UNSUPPORTED_ALGORITHM,
+					"unsupportedKeyTransp", new Object[] { "No such padding: "
+							+ cipherAlgo });
+		} catch (NoSuchProviderException ex) {
+			throw new WSSecurityException(
+					WSSecurityException.UNSUPPORTED_ALGORITHM,
+					"unsupportedKeyTransp", new Object[] { "no provider: "
+							+ cipherAlgo });
+		} catch (NoSuchAlgorithmException ex) {
+			throw new WSSecurityException(
+					WSSecurityException.UNSUPPORTED_ALGORITHM,
+					"unsupportedKeyTransp",
+					new Object[] { "No such algorithm: " + cipherAlgo });
+		}
+		return cipher;
+	}
 
     /**
-     * Fetch the result of a given action from a given result vector
-     * <p/>
-     *
-     * @param wsResultVector The result vector to fetch an action from
-     * @param action         The action to fetch
-     * @return The result fetched from the result vector, null if the result
-     *         could not be found
-     */
+	 * Fetch the result of a given action from a given result vector <p/>
+	 * 
+	 * @param wsResultVector
+	 *            The result vector to fetch an action from
+	 * @param action
+	 *            The action to fetch
+	 * @return The result fetched from the result vector, null if the result
+	 *         could not be found
+	 */
     public static WSSecurityEngineResult fetchActionResult(Vector wsResultVector, int action) {
         WSSecurityEngineResult wsResult = null;
 
