@@ -236,8 +236,8 @@ public class WSSConfig {
                     log.debug("The provider " + id
                             + " had to be added to the java.security.Security");
                 }
-                java.security.Security.addProvider((java.security.Provider) c
-                        .newInstance());
+                java.security.Security.insertProviderAt((java.security.Provider) c
+                        .newInstance(), 1);
             }
             return true;
         } catch (Throwable t) {
