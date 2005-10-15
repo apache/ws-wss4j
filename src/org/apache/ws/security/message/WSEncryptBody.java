@@ -467,7 +467,13 @@ public class WSEncryptBody extends WSBaseMessage {
 
         XMLCipher xmlCipher = null;
         try {
-            xmlCipher = XMLCipher.getInstance(symEncAlgo);
+            String provider = wssConfig.getJceProviderId();
+            if (provider == null) {
+                xmlCipher = XMLCipher.getInstance(symEncAlgo);
+            }
+            else {
+                xmlCipher = XMLCipher.getProviderInstance(symEncAlgo, provider);
+            }
         } catch (XMLEncryptionException e3) {
             throw new WSSecurityException(WSSecurityException.UNSUPPORTED_ALGORITHM, null, null, e3);
         }
