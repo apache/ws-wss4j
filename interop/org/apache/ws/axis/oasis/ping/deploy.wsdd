@@ -10,6 +10,11 @@
     xmlns="http://xml.apache.org/axis/wsdd/"
     xmlns:java="http://xml.apache.org/axis/wsdd/providers/java">
 
+ <globalConfiguration>
+   <parameter name="disablePrettyXML" value="true"/>
+   <parameter name="enableNamespacePrefixOptimization" value="true"/>
+ </globalConfiguration>
+
   <!-- Services from PingService WSDL service -->
 
   <service name="Ping1" provider="java:RPC" style="wrapped" use="literal">
