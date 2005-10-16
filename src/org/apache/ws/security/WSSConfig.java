@@ -236,8 +236,12 @@ public class WSSConfig {
                     log.debug("The provider " + id
                             + " had to be added to the java.security.Security");
                 }
+                int pos = 1;
+                if(id.equalsIgnoreCase("BC")) {
+                    pos = 2;
+                }
                 java.security.Security.insertProviderAt((java.security.Provider) c
-                        .newInstance(), 1);
+                        .newInstance(), pos);
             }
             return true;
         } catch (Throwable t) {
