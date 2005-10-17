@@ -755,6 +755,9 @@ org.apache.ws.axis.security.util
       <fileset dir="${dir.libs}">
         <include name="*.jar"/>
       </fileset>
+      <fileset dir="${basedir}/endorsed">
+        <include name="*.jar"/>
+      </fileset>
     </copy>
     <copy todir="${build.webapp}/WEB-INF">
       <fileset dir="${build.dir}">
@@ -784,6 +787,12 @@ org.apache.ws.axis.security.util
         </fileset>
     </path>
     <property name="deploy_xml_property" refid="deploy_xml_files"/>
+    <java classname="org.apache.axis.utils.Admin" fork="true"
+        dir="${build.webapp}/WEB-INF/classes">
+      <classpath refid="classpath.library"/>
+      <arg value="client"/>
+      <arg file="${build.work}/org/apache/ws/axis/oasis/Client_deploy.wsdd"/>
+    </java>
     <java classname="org.apache.axis.utils.Admin" fork="yes" 
         dir="${build.webapp}/WEB-INF">
         <classpath refid="classpath.library"/>
@@ -791,7 +800,7 @@ org.apache.ws.axis.security.util
         <arg line="${deploy_xml_property}"/>
     </java>
 
-    <jar jarfile="${build.dir}/axis.war" basedir="${build.webapp}"/>
+    <jar jarfile="${build.dir}/wss4j.war" basedir="${build.webapp}"/>
   </target>
 
 </project>
