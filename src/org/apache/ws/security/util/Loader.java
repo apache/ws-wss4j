@@ -102,9 +102,11 @@ public class Loader {
         try {
             ClassLoader tcl = getTCL();	
             
-			Class c = tcl.loadClass(clazz);
-            if (c != null)
-                return c;
+            if(tcl != null) {
+                Class c = tcl.loadClass(clazz);
+                if (c != null)
+                    return c;
+            }
         } catch (Throwable e) {
         }
         // we reached here because tcl was null or because of a
