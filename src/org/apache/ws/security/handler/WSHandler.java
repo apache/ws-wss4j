@@ -554,7 +554,7 @@ public abstract class WSHandler {
         Class cbClass = null;
         CallbackHandler cbHandler = null;
         try {
-            cbClass = Loader.loadClass(callback);
+            cbClass = Loader.loadClass(getClassLoader(), callback);
         } catch (ClassNotFoundException e) {
             throw new WSSecurityException("WSHandler: cannot load password callback class: "
                     + callback,
@@ -759,7 +759,7 @@ public abstract class WSHandler {
         if (callback != null) {
             Class cbClass = null;
             try {
-                cbClass = Loader.loadClass(callback);
+                cbClass = Loader.loadClass(getClassLoader(), callback);
             } catch (ClassNotFoundException e) {
                 throw new WSSecurityException(
                        "WSHandler: cannot load password callback class: "
@@ -1014,6 +1014,19 @@ public abstract class WSHandler {
 	}
     }
 
+	/**
+	 * Returns the classloader to be used for loading the callback class
+	 * 
+	 * @return class loader
+	 */
+	public ClassLoader getClassLoader() {
+		try {
+			return Loader.getTCL();
+		} catch (Throwable t) {
+			return null;
+		}
+	}
+	
     public abstract Object getOption(String key);
     public abstract Object getProperty(Object msgContext, String key);
 
