@@ -118,8 +118,7 @@ public class WSHandlerConstants {
      * hand over the SOAP partially processed envelope document to
      * the next WSS4J handler in the chain.
      */
-    public static final String SND_SECURITY = "SND_SECURTIY";
-    // public static final String RCV_SECURITY = "RCV_SECURTIY";
+    public static final String SND_SECURITY = "SND_SECURITY";
 
     /**
      * The actor name of the <code>wsse:Security</code> header.
