@@ -1,3 +1,19 @@
+/*
+ * Copyright  2003-2004 The Apache Software Foundation.
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ *
+ */
 package org.apache.ws.security.components.crypto;
 
 import org.apache.commons.discovery.Resource;
@@ -52,6 +68,17 @@ public abstract class AbstractCrypto implements Crypto {
      * @param properties
      */
     public AbstractCrypto(Properties properties) throws CredentialException, IOException {
+    	this(properties,AbstractCrypto.class.getClassLoader());
+    }
+
+    /**
+     * This allows providing a custom class loader to load the resources, etc
+     * @param properties
+     * @param loader
+     * @throws CredentialException
+     * @throws IOException
+     */
+    public AbstractCrypto(Properties properties, ClassLoader loader) throws CredentialException, IOException {
         /*
         * if no properties .. just return an instance, the rest will be
         * done later or this instance is just used to handle certificate
@@ -69,7 +96,7 @@ public abstract class AbstractCrypto implements Crypto {
          */
         DiscoverResources disc = new DiscoverResources();
         disc.addClassLoader(JDKHooks.getJDKHooks().getThreadContextClassLoader());
-        disc.addClassLoader(this.getClass().getClassLoader());
+        disc.addClassLoader(loader);
         ResourceIterator iterator = disc.findResources(location);
         if (iterator.hasNext()) {
             Resource resource = iterator.nextResource();
@@ -97,6 +124,7 @@ public abstract class AbstractCrypto implements Crypto {
         }
     }
 
+    
     /**
      * Singleton certificate factory for this Crypto instance.
      * <p/>

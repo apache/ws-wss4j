@@ -75,6 +75,32 @@ public class Loader {
         log.debug("Trying to find [" + resource + "] using ClassLoader.getSystemResource().");
         return ClassLoader.getSystemResource(resource);
     }
+    
+
+    /**
+     * Try to get the resource with the specified class loader
+     * <p/>
+     *
+     * @param cl
+     * @param clazz
+     * @return Class
+     * @throws ClassNotFoundException
+     */
+    static public URL getResource(ClassLoader loader, String resource) throws ClassNotFoundException {
+        URL url = null;
+        try {
+            if (loader != null) {
+                log.debug("Trying to find [" + resource + "] using " + loader + " class loader.");
+                url = loader.getResource(resource);
+                if (url != null) {
+                    return url;
+                }
+            }
+        } catch (Throwable t) {
+            log.warn("Caught Exception while in Loader.getResource. This may be innocuous.", t);
+        }
+        return getResource(resource);
+    }
 
     /**
      * Get the Thread context class loader.

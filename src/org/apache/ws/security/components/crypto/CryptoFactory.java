@@ -99,22 +99,47 @@ public abstract class CryptoFactory {
                     defaultCryptoClassName);
         }
         return loadClass(cryptoClassName, properties);
+    }    
+    
+    public static Crypto getInstance(String propFilename, ClassLoader customClassLoader) {
+        Properties properties = null;
+        String cryptoClassName = null;
+
+        // cryptoClassName = System.getProperty("org.apache.ws.security.crypto.provider");
+        if ((cryptoClassName == null) || (cryptoClassName.length() == 0)) {
+            properties = getProperties(propFilename,customClassLoader);
+            // use the default Crypto implementation
+            cryptoClassName = properties.getProperty("org.apache.ws.security.crypto.provider",
+                    defaultCryptoClassName);
+        }
+        return loadClass(cryptoClassName, properties,customClassLoader);
     }
 
     private static Crypto loadClass(String cryptoClassName, Properties properties) {
+    	return loadClass(cryptoClassName,properties,CryptoFactory.class.getClassLoader());
+    }
+
+    /**
+     * This allows loading the classes with a custom class loader  
+     * @param cryptoClassName
+     * @param properties
+     * @param loader
+     * @return
+     */
+    private static Crypto loadClass(String cryptoClassName, Properties properties, ClassLoader loader) {
         Class cryptogenClass = null;
         Crypto crypto = null;
         try {
             // instruct the class loader to load the crypto implementation
-            cryptogenClass = Loader.loadClass(cryptoClassName);
+            cryptogenClass = Loader.loadClass(loader, cryptoClassName);
         } catch (ClassNotFoundException e) {
             throw new RuntimeException(cryptoClassName + " Not Found");
         }
         log.debug("Using Crypto Engine [" + cryptoClassName + "]");
         try {
-            Class[] classes = new Class[]{Properties.class};
+            Class[] classes = new Class[]{Properties.class,ClassLoader.class};
             Constructor c = cryptogenClass.getConstructor(classes);
-            crypto = (Crypto) c.newInstance(new Object[]{properties});
+            crypto = (Crypto) c.newInstance(new Object[]{properties,loader});
             return crypto;
         } catch (java.lang.Exception e) {
             e.printStackTrace();
@@ -130,7 +155,6 @@ public abstract class CryptoFactory {
             throw new RuntimeException(cryptoClassName + " cannot create instance");
         }
     }
-
     /**
      * Gets the properties for crypto.
      * The functions loads the property file via
@@ -141,9 +165,20 @@ public abstract class CryptoFactory {
      * @return a <code>Properties</code> object loaded from the filename
      */
     private static Properties getProperties(String propFilename) {
+    	return getProperties(propFilename, CryptoFactory.class.getClassLoader());
+    }
+    
+    
+    /**
+     * This allows loading the resources with a custom class loader
+     * @param propFilename
+     * @param loader
+     * @return
+     */
+    private static Properties getProperties(String propFilename, ClassLoader loader) {
         Properties properties = new Properties();
         try {
-            URL url = Loader.getResource(propFilename);
+            URL url = Loader.getResource(loader, propFilename);
             properties.load(url.openStream());
         } catch (Exception e) {
             log.debug("Cannot find crypto property file: " + propFilename);
@@ -152,5 +187,6 @@ public abstract class CryptoFactory {
         }
         return properties;
     }
+
 }
 

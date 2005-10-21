@@ -33,18 +33,18 @@ import org.apache.ws.security.util.StringUtil;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.ws.security.util.XmlSchemaDateFormat;
 import org.w3c.dom.Document;
-//import org.apache.axis.MessageContext;
 
-import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.CallbackHandler;
 import java.math.BigInteger;
 import java.security.cert.X509Certificate;
 import java.text.DateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Hashtable;
 import java.util.Vector;
-import java.util.Date;
+
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.CallbackHandler;
 
 
 /**
@@ -320,7 +320,7 @@ public abstract class WSHandler {
 				       reqData.getMsgContext());
         if (sigPropFile != null) {
             if ((crypto = (Crypto) cryptos.get(sigPropFile)) == null) {
-                crypto = CryptoFactory.getInstance(sigPropFile);
+                crypto = CryptoFactory.getInstance(sigPropFile, this.getClassLoader());
                 cryptos.put(sigPropFile, crypto);
             }
         } else {
@@ -345,7 +345,7 @@ public abstract class WSHandler {
 				       reqData.getMsgContext());
         if (encPropFile != null) {
             if ((crypto = (Crypto) cryptos.get(encPropFile)) == null) {
-                crypto = CryptoFactory.getInstance(encPropFile);
+                crypto = CryptoFactory.getInstance(encPropFile, this.getClassLoader());
                 cryptos.put(encPropFile, crypto);
             }
         } else if ((crypto = reqData.getSigCrypto()) == null) {
@@ -711,7 +711,7 @@ public abstract class WSHandler {
 				     reqData.getMsgContext());
         if (decPropFile != null) {
             if ((crypto = (Crypto) cryptos.get(decPropFile)) == null) {
-                crypto = CryptoFactory.getInstance(decPropFile);
+                crypto = CryptoFactory.getInstance(decPropFile, this.getClassLoader());
                 cryptos.put(decPropFile, crypto);
             }
         } else if ((crypto = reqData.getSigCrypto()) == null) {

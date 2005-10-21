@@ -56,6 +56,10 @@ public class Merlin extends AbstractCrypto {
     public Merlin(Properties properties) throws CredentialException, IOException {
         super(properties);
     }
+    
+    public Merlin(Properties properties, ClassLoader loader) throws CredentialException, IOException {
+    	super(properties,loader);
+    }
 
     /**
      * Construct an array of X509Certificate's from the byte array.
