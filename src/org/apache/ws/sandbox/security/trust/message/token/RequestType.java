@@ -31,7 +31,7 @@ import org.w3c.dom.Text;
  *         <p/>
  *         RequestType token
  */
-public class RequestType extends AbstractToken {
+public class RequestType extends ValueElement {
 	
     public static final QName TOKEN = new QName(TrustConstants.WST_NS, TrustConstants.REQUEST_TYPE_LN, TrustConstants.WST_PREFIX);
  
@@ -56,31 +56,6 @@ public class RequestType extends AbstractToken {
         super(doc);
     }
 
-    /**
-     * Returns the value of the text node
-     *
-     * @return
-     */
-    public String getValue() {
-    	if(this.valueText != null)
-    		return this.valueText.getNodeValue();
-    	else
-    		return null;
-    }
-
-    /**
-     * Sets the text node
-     *
-     * @param val
-     */
-    public void setValue(String val) {
-    	if(this.valueText != null)
-    		this.element.removeChild(this.valueText);
-    	
-		this.valueText = element.getOwnerDocument().createTextNode(val);
-        this.element.appendChild(this.valueText);
-    }
-
 	/**
 	 * Returns the QName of this type
 	 * @see org.apache.ws.sandbox.security.trust.message.token.AbstractToken#getToken()
@@ -89,19 +64,4 @@ public class RequestType extends AbstractToken {
 		return TOKEN;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.apache.ws.security.trust.message.token.AbstractToken#deserializeElement(org.w3c.dom.Element)
-	 */
-	protected void deserializeChildElement(Element elem) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	/* (non-Javadoc)
-	 * @see org.apache.ws.security.trust.message.token.AbstractToken#deserializeElementText(org.w3c.dom.Text)
-	 */
-	protected void setElementTextValue(Text textNode) {
-		// TODO Auto-generated method stub
-		
-	}
 }
