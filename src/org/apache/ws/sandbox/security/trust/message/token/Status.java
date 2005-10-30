@@ -29,7 +29,7 @@ import org.w3c.dom.Text;
  * @author Malinda Kaushalye
  * @author Ruchith Fernando
  */
-public class Status extends AbstractToken {
+public class Status extends CompositeElement {
 	
     public static final QName TOKEN = new QName(TrustConstants.WST_NS, TrustConstants.STATUS_LN, TrustConstants.WST_PREFIX);
     
@@ -121,16 +121,19 @@ public class Status extends AbstractToken {
 	/* (non-Javadoc)
 	 * @see org.apache.ws.security.trust.message.token.AbstractToken#deserializeElement(org.w3c.dom.Element)
 	 */
-	protected void deserializeChildElement(Element elem) {
-		// TODO Auto-generated method stub
-		
+	protected void deserializeChildElement(Element elem) throws WSTrustException{
+		QName el =  new QName(elem.getNamespaceURI(), elem.getLocalName());
+		if(el.equals(Code.TOKEN)) {
+			this.codeElement = new Code(elem);
+		} else if(el.equals(Reason.TOKEN)) {
+			this.reasonElement = new Reason(elem);
+		} else {        	
+			throw new WSTrustException(WSTrustException.INVALID_REQUEST,
+    			WSTrustException.DESC_INCORRECT_CHILD_ELEM,
+				new Object[] {
+    			TOKEN.getPrefix(),TOKEN.getLocalPart(),
+				el.getNamespaceURI(),el.getLocalPart()});
+		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.apache.ws.security.trust.message.token.AbstractToken#deserializeElementText(org.w3c.dom.Text)
-	 */
-	protected void setElementTextValue(Text textNode) {
-		// TODO Auto-generated method stub
-		
-	}
 }

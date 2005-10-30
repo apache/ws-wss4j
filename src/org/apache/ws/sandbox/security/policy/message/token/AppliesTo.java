@@ -16,22 +16,22 @@
  */
 
 package org.apache.ws.sandbox.security.policy.message.token;
-import javax.xml.namespace.QName;
-
-import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.sandbox.security.trust.TrustConstants;
 import org.apache.ws.sandbox.security.trust.WSTrustException;
-import org.apache.ws.sandbox.security.trust.message.token.AbstractToken;
+import org.apache.ws.sandbox.security.trust.message.token.CompositeElement;
+import org.apache.ws.security.WSSecurityException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
+
+import javax.xml.namespace.QName;
 /**
  * @author Malinda Kaushalye
  * @author Ruchith Fernando
  */
-public class AppliesTo extends AbstractToken {
+public class AppliesTo extends CompositeElement {
 	
 	public static final QName TOKEN = new QName(TrustConstants.WSP_NS, TrustConstants.APPLIESTO_LN, TrustConstants.WSP_PREFIX);
 
@@ -143,11 +143,4 @@ public class AppliesTo extends AbstractToken {
 		
 	}
 
-	/* (non-Javadoc)
-	 * @see org.apache.ws.security.trust.message.token.AbstractToken#deserializeElementText(org.w3c.dom.Text)
-	 */
-	protected void setElementTextValue(Text textNode) {
-		// No processing required here xince everything is handled in the 
-		// deserializeChildElement	
-	}
 }

@@ -32,7 +32,7 @@ import org.w3c.dom.Text;
  * AllowPostdating element <p/>This element indicates
  * that returned tokens should allow requests for postdated tokens.
  */
-public class AllowPostdating extends ValueElement {
+public class AllowPostdating extends AbstractToken {
 	
     public static final QName TOKEN = new QName(TrustConstants.WST_NS, TrustConstants.ALLOWPOSTDATING_LN, TrustConstants.WST_PREFIX);
 
@@ -69,6 +69,11 @@ public class AllowPostdating extends ValueElement {
 	protected void setElementTextValue(Text textNode) throws WSTrustException{
 		throw new WSTrustException(WSTrustException.INVALID_REQUEST,
 				"There cannot be a value in this element");
+	}
+
+	protected void deserializeChildElement(Element elem) throws WSTrustException {
+		throw new WSTrustException(WSTrustException.INVALID_REQUEST,
+		"There cannot be a value in this element");
 	}
 
 }

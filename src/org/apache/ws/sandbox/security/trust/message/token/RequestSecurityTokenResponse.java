@@ -17,23 +17,21 @@
 
 package org.apache.ws.sandbox.security.trust.message.token;
 
-import java.io.ByteArrayOutputStream;
-
-import javax.xml.namespace.QName;
-
 import org.apache.axis.components.logger.LogFactory;
 import org.apache.commons.logging.Log;
-import org.apache.ws.security.WSSConfig;
-import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.sandbox.security.trust.TrustConstants;
 import org.apache.ws.sandbox.security.trust.WSTrustException;
+import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.xml.security.utils.XMLUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Text;
 
-public class RequestSecurityTokenResponse extends AbstractToken {
+import java.io.ByteArrayOutputStream;
+
+import javax.xml.namespace.QName;
+
+public class RequestSecurityTokenResponse extends CompositeElement {
 	
     private static Log log = LogFactory.getLog(RequestSecurityTokenResponse.class.getName());
 
@@ -187,14 +185,6 @@ public class RequestSecurityTokenResponse extends AbstractToken {
 	 * @see org.apache.ws.security.trust.message.token.AbstractToken#deserializeElement(org.w3c.dom.Element)
 	 */
 	protected void deserializeChildElement(Element elem) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	/* (non-Javadoc)
-	 * @see org.apache.ws.security.trust.message.token.AbstractToken#deserializeElementText(org.w3c.dom.Text)
-	 */
-	protected void setElementTextValue(Text textNode) {
 		// TODO Auto-generated method stub
 		
 	}

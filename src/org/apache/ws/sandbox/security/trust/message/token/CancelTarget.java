@@ -16,21 +16,21 @@
  */
 package org.apache.ws.sandbox.security.trust.message.token;
 
-import javax.xml.namespace.QName;
-
-import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.message.token.SecurityTokenReference;
 import org.apache.ws.sandbox.security.trust.TrustConstants;
 import org.apache.ws.sandbox.security.trust.WSTrustException;
+import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.WSSecurityException;
+import org.apache.ws.security.message.token.SecurityTokenReference;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Text;
+
+import javax.xml.namespace.QName;
 
 /**
  * The <code>wst:CancelTarget</code> element
  * @author Ruchith Fernando (ruchith.fernando@gmail.com)
  */
-public class CancelTarget extends AbstractToken {
+public class CancelTarget extends CompositeElement {
 
 	
     public static final QName TOKEN = new QName(TrustConstants.WST_NS, TrustConstants.CANCEL_TARGET_LN, TrustConstants.WST_PREFIX);
@@ -120,16 +120,18 @@ public class CancelTarget extends AbstractToken {
 	/* (non-Javadoc)
 	 * @see org.apache.ws.security.trust.message.token.AbstractToken#deserializeElement(org.w3c.dom.Element)
 	 */
-	protected void deserializeChildElement(Element elem) {
-		// TODO Auto-generated method stub
+	protected void deserializeChildElement(Element elem) throws WSTrustException {
+		QName el =  new QName(elem.getNamespaceURI(), elem.getLocalName());
 		
-	}
-
-	/* (non-Javadoc)
-	 * @see org.apache.ws.security.trust.message.token.AbstractToken#deserializeElementText(org.w3c.dom.Text)
-	 */
-	protected void setElementTextValue(Text textNode) {
-		// TODO Auto-generated method stub
+		if(el.equals(new QName(WSConstants.WSSE_NS,SecurityTokenReference.SECURITY_TOKEN_REFERENCE)) && this.targetToken == null) {
+			try {
+				this.securityTokenReference = new SecurityTokenReference(elem);
+			} catch (WSSecurityException wsse) {
+				throw new WSTrustException(wsse.getMessage(),wsse);
+			}
+		} else if(this.securityTokenReference == null) {
+			this.targetToken = elem;
+		}
 		
 	}
 

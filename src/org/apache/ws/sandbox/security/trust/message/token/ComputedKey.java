@@ -17,24 +17,21 @@
 package org.apache.ws.sandbox.security.trust.message.token;
 
 
-import javax.xml.namespace.QName;
-
 import org.apache.ws.sandbox.security.trust.TrustConstants;
 import org.apache.ws.sandbox.security.trust.WSTrustException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Text;
+
+import javax.xml.namespace.QName;
 
 /**
  * @author Dimuthu Leelarathne. (muthulee@yahoo.com)
  * @author Ruchith Fernando
  */
-public class ComputedKey extends AbstractToken {
+public class ComputedKey extends ValueElement {
 	
 	 public static final QName TOKEN = new QName(TrustConstants.WST_NS, TrustConstants.COMPUTED_KEY_LN, TrustConstants.WST_PREFIX);
-    
-	 private Text valueText;
-	 
+   	 
 	 /**
 	  * Constructor.
 	  * <p/>
@@ -56,31 +53,6 @@ public class ComputedKey extends AbstractToken {
 		 super(doc);
 	 }
 
-	 /**
-	  * Sets the text node
-	  *
-	  * @param val
-	  */
-	 public void setComputedKeyValue(String val) {
-	 	if(this.valueText != null)
-	 		this.element.removeChild(this.valueText);
-	 	
-	 	this.valueText = element.getOwnerDocument().createTextNode(val);
-		this.element.appendChild(this.valueText);
-	 }
-
-	 /**
-	  * return the value of the text node
-	  *
-	  * @return
-	  */
-	 public String getComputedKeyValue() {
-	 	if(this.valueText != null)
-	 		return this.valueText.getNodeValue();
-	 	else
-	 		return null;
-	 }
-
 	/**
 	 * Returns the QName of this type
 	 * @see org.apache.ws.sandbox.security.trust.message.token.AbstractToken#getToken()
@@ -89,20 +61,5 @@ public class ComputedKey extends AbstractToken {
 		return TOKEN;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.apache.ws.security.trust.message.token.AbstractToken#deserializeElement(org.w3c.dom.Element)
-	 */
-	protected void deserializeChildElement(Element elem) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	/* (non-Javadoc)
-	 * @see org.apache.ws.security.trust.message.token.AbstractToken#deserializeElementText(org.w3c.dom.Text)
-	 */
-	protected void setElementTextValue(Text textNode) {
-		// TODO Auto-generated method stub
-		
-	}
 
 }

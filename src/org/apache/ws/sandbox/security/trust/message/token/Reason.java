@@ -16,14 +16,13 @@
  */
 package org.apache.ws.sandbox.security.trust.message.token;
 
-import javax.xml.namespace.QName;
-
-import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.sandbox.security.trust.TrustConstants;
 import org.apache.ws.sandbox.security.trust.WSTrustException;
+import org.apache.ws.security.WSSecurityException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Text;
+
+import javax.xml.namespace.QName;
 
 /**
  * @author Malinda Kaushalye
@@ -31,11 +30,9 @@ import org.w3c.dom.Text;
  *         Reason token
  * @see org.apache.ws.sandbox.security.trust.message.token.Status
  */
-public class Reason extends AbstractToken {
+public class Reason extends ValueElement {
 	
     public static final QName TOKEN = new QName(TrustConstants.WST_NS, TrustConstants.REASON_LN, TrustConstants.WST_PREFIX);
-    
-    private Text valueText;
     
     /**
      * Constructor for Reason
@@ -68,31 +65,6 @@ public class Reason extends AbstractToken {
         this.element.appendChild(valueText);
     }
 
-    /**
-     * Set the reason value
-     *
-     * @param val
-     */
-    public void setValue(String val) {
-        if(this.valueText != null)
-        	this.element.removeChild(this.valueText);
-        
-        this.valueText = this.element.getOwnerDocument().createTextNode(val);
-        this.element.appendChild(valueText);
-    }
-
-    /**
-     * get the value of the reason token
-     *
-     * @return
-     */
-    public String getValue() {
-        if(this.valueText != null)
-        	return this.valueText.getNodeValue();
-        else
-        	return null;
-    }
-    
 	/**
 	 * Returns the QName of this type
 	 * @see org.apache.ws.sandbox.security.trust.message.token.AbstractToken#getToken()
@@ -101,19 +73,4 @@ public class Reason extends AbstractToken {
 		return TOKEN;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.apache.ws.security.trust.message.token.AbstractToken#deserializeElement(org.w3c.dom.Element)
-	 */
-	protected void deserializeChildElement(Element elem) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	/* (non-Javadoc)
-	 * @see org.apache.ws.security.trust.message.token.AbstractToken#deserializeElementText(org.w3c.dom.Text)
-	 */
-	protected void setElementTextValue(Text textNode) {
-		// TODO Auto-generated method stub
-		
-	}
 }

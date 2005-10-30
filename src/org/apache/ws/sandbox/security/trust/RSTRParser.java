@@ -17,7 +17,6 @@
 
 package org.apache.ws.sandbox.security.trust;
 
-import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.sandbox.security.policy.message.token.AppliesTo;
 import org.apache.ws.sandbox.security.trust.message.token.BinarySecret;
 import org.apache.ws.sandbox.security.trust.message.token.ComputedKey;
@@ -26,6 +25,7 @@ import org.apache.ws.sandbox.security.trust.message.token.RequestSecurityTokenRe
 import org.apache.ws.sandbox.security.trust.message.token.RequestedProofToken;
 import org.apache.ws.sandbox.security.trust.message.token.RequestedSecurityToken;
 import org.apache.ws.sandbox.security.trust2.Lifetime;
+import org.apache.ws.security.WSSecurityException;
 import org.apache.xml.utils.QName;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -126,7 +126,7 @@ public class RSTRParser {
                 //TODO: proofTok.s
                 Node val = elem.getChildNodes().item(0);
                 if (val.getNodeType() == Node.TEXT_NODE) {
-                    ckey.setComputedKeyValue(val.getNodeValue());
+                    ckey.setValue(val.getNodeValue());
                 } else {
                     throw new WSTrustException("Parser Exception");
                 }

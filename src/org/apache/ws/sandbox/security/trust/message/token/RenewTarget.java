@@ -17,16 +17,15 @@
 
 package org.apache.ws.sandbox.security.trust.message.token;
 
-import javax.xml.namespace.QName;
-
-import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSSConfig;
-import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.message.token.SecurityTokenReference;
 import org.apache.ws.sandbox.security.trust.TrustConstants;
 import org.apache.ws.sandbox.security.trust.WSTrustException;
+import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.WSSecurityException;
+import org.apache.ws.security.message.token.SecurityTokenReference;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
+import javax.xml.namespace.QName;
 
 /**
  * @author Ruchith Fernando (ruchith.fernando@gmail.com)
@@ -104,13 +103,13 @@ public class RenewTarget extends CompositeElement {
         
         QName secTokRef = new QName(WSConstants.WSSE_NS, SecurityTokenReference.SECURITY_TOKEN_REFERENCE);
 
-        if(el.equals(secTokRef)) {
+        if(el.equals(secTokRef) && this.tokenToBeRenewed == null) {
         	try {
         	this.securityTokenReference = new SecurityTokenReference(elem);
         	} catch (WSSecurityException ex) {
         		throw new WSTrustException(WSTrustException.INVALID_REQUEST, ex.getMessage());
         	}
-        } else {
+        } else if(this.securityTokenReference == null) {
         	this.tokenToBeRenewed = elem;
         }
 	}

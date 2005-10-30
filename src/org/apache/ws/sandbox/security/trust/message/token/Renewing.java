@@ -110,16 +110,16 @@ public class Renewing extends AbstractToken {
 	/* (non-Javadoc)
 	 * @see org.apache.ws.security.trust.message.token.AbstractToken#deserializeElement(org.w3c.dom.Element)
 	 */
-	protected void deserializeChildElement(Element elem) {
-		// TODO Auto-generated method stub
-		
+	protected void deserializeChildElement(Element elem) throws WSTrustException {
+		throw new WSTrustException(WSTrustException.INVALID_REQUEST,
+		"There cannot be a child element in this element");
 	}
 
 	/* (non-Javadoc)
 	 * @see org.apache.ws.security.trust.message.token.AbstractToken#deserializeElementText(org.w3c.dom.Text)
 	 */
-	protected void setElementTextValue(Text textNode) {
-		// TODO Auto-generated method stub
-		
+	protected void setElementTextValue(Text textNode) throws WSTrustException {
+		throw new WSTrustException(WSTrustException.INVALID_REQUEST,
+		"There cannot be a value in this element");
 	}
 }
