@@ -81,6 +81,10 @@ public abstract class WSHandler {
         boolean mu = decodeMustUnderstand(reqData);
 
         WSSConfig wssConfig = WSSConfig.getNewInstance();
+        
+        wssConfig
+	    .setEnableSignatureConfirmation(decodeEnableSignatureConfirmation(reqData));
+        
         wssConfig
 	    .setPrecisionInMilliSeconds(decodeTimestampPrecision(reqData));
         reqData.setWssConfig(wssConfig);
@@ -207,10 +211,14 @@ public abstract class WSHandler {
         }
     }
 
-    protected void doReceiverAction(int doAction, RequestData reqData)
+
+
+	protected void doReceiverAction(int doAction, RequestData reqData)
             throws WSSecurityException {
 
         WSSConfig wssConfig = WSSConfig.getNewInstance();
+        wssConfig
+	    .setEnableSignatureConfirmation(decodeEnableSignatureConfirmation(reqData));
         reqData.setWssConfig(wssConfig);
 
         if ((doAction & WSConstants.SIGN) == WSConstants.SIGN) {
@@ -490,6 +498,20 @@ public abstract class WSHandler {
         }
         return ttl_i;
     }
+    
+    protected boolean decodeEnableSignatureConfirmation(RequestData reqData) throws WSSecurityException {
+
+    	String value = getString(WSHandlerConstants.ENABLE_SIGNATURE_CONFIRMATION,
+				 reqData.getMsgContext());
+
+    	if (value == null) {return true;}
+
+       	if ("0".equals(value) || "false".equals(value)) {return false;} 
+       	if ("1".equals(value) || "true".equals(value)) {return true;}
+
+    	throw new WSSecurityException(
+    		   "WSHandler: illegal enableSignatureConfirmation parameter");
+	}
 
     protected boolean decodeTimestampPrecision(RequestData reqData) 
 	throws WSSecurityException {

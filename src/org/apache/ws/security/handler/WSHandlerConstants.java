@@ -651,6 +651,12 @@ public class WSHandlerConstants {
     public static final String TTL_TIMESTAMP = "timeToLive";
 
     /**
+     * Whether to enable signatureConfirmation or not
+     * By default signatureConfirmation is enabled
+     */
+    public static final String ENABLE_SIGNATURE_CONFIRMATION = "enableSignatureConfirmation";
+    
+    /**
      * Should timestamps have precision in milliseconds
      */
     public static final String TIMESTAMP_PRECISION = "precisionInMilliseconds";
