@@ -29,6 +29,7 @@ import org.apache.axis.client.Service;
 import org.apache.axis.message.SOAPBodyElement;
 import org.apache.axis.message.SOAPEnvelope;
 import org.apache.axis.utils.XMLUtils;
+import org.apache.axis.utils.Options;
 import org.apache.ws.security.message.token.UsernameToken;
 import org.apache.ws.security.WSSConfig;
 import org.w3c.dom.DOMException;
@@ -44,17 +45,20 @@ import java.util.Date;
  */
 public class SampleSecurityTokenServiceClient {
 
+    /** Field address */
+    private static final java.lang.String address =
+            "http://localhost:8080/axis/services/SampleSecurityTokenService";
+
+    
     // First arg passed should be the URL of the service. If none is specified, client tries localhost.
     public static void main(String[] args) throws DOMException, TrustException, Exception {
+
+        Options opts = new Options(args);
+        opts.setDefaultURL(address);
+
         Service service = new Service();
         Call call = (Call) service.createCall();
-		
-        // The default service location
-        String url = "http://localhost:8080/JavaTrust/services/SampleSecurityTokenService";
-        // Or the user-specified location
-        if (args.length > 0)
-            url = args[0];
-        call.setTargetEndpointAddress(new java.net.URL(url));
+        call.setTargetEndpointAddress(opts.getURL());
 
         SOAPEnvelope env = new SOAPEnvelope();
         Document doc = env.getAsDocument();

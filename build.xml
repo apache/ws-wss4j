@@ -408,7 +408,7 @@ org.apache.ws.axis.security.util
         <runaxisfunctionaltests
             url="http://localhost:8088"
             httpServerTarget="start-functional-test-http-server"
-            testTarget="interopTests"
+            testTarget="allTests"
             httpStopTarget="stop-functional-test-http-server"/>
     </target>
 
@@ -427,6 +427,9 @@ org.apache.ws.axis.security.util
             <classpath refid="classpath.library"/>
             <arg line="quit"/>
         </java>
+    </target>
+
+    <target name="allTests" depends="sandboxTests, interopTests">
     </target>
 
     <target name="interopTests" depends="init">
@@ -519,6 +522,40 @@ org.apache.ws.axis.security.util
         </junit>
     </target>
 
+    <target name="sandboxTests" depends="compile">
+        <java classname="org.apache.axis.client.AdminClient" fork="yes">
+            <classpath refid="classpath.library"/>
+            <arg line="${dir.samples}/org/apache/ws/sandbox/security/trust2/samples/deploy.wsdd"/>
+        </java>
+
+        <junit printsummary="yes"
+            haltonfailure="yes"
+            fork="yes"
+            dir="${basedir}">
+            <!-- See if this helps with Gump test failures -->
+            <sysproperty key="build.clonevm" value="true"/>
+
+            <jvmarg value="-Djava.endorsed.dirs=${basedir}/endorsed"/>
+            <jvmarg value="-Dhttp.proxyHost=${http.proxyHost}"/>
+            <jvmarg value="-Dhttp.proxyPort=${http.proxyPort}"/>
+            <jvmarg value="-Dhttp.nonProxyHosts=${http.nonProxyHosts}"/>
+            <jvmarg value="-Dhttp.proxyUser=${http.proxyUser}"/>
+            <jvmarg value="-Dhttp.proxyPassword=${http.proxyPassword}"/>
+            <classpath refid="classpath.test"/>
+            <formatter type="xml"/>
+            <batchtest todir="${build.dir}/test-reports">
+                <fileset dir="${build.classes}">
+                    <include name="**/sandbox/PackageTests.class"/>
+                </fileset>
+            </batchtest>
+        </junit>
+
+        <java classname="org.apache.axis.client.AdminClient" fork="yes">
+            <classpath refid="classpath.library"/>
+            <arg line="${dir.samples}/org/apache/ws/sandbox/security/trust2/samples/undeploy.wsdd"/>
+        </java>
+    </target>
+    
     <target name="tcpmon" depends="init" description=
                 "Start standalone tcp monitor application (provided by axis)">
         <java dir="${basedir}" fork="yes" failOnError="true" 
