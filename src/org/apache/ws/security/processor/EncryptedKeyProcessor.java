@@ -373,11 +373,17 @@ public class EncryptedKeyProcessor implements Processor {
         // initialize Cipher ....
         XMLCipher xmlCipher = null;
         try {
-            xmlCipher = XMLCipher.getInstance(symEncAlgo);
-            xmlCipher.init(XMLCipher.DECRYPT_MODE, symmetricKey);
-        } catch (XMLEncryptionException e) {
-            throw new WSSecurityException(WSSecurityException.UNSUPPORTED_ALGORITHM, null, null, e);
-        }
+			String provider = wssConfig.getJceProviderId();
+			if (provider == null) {
+				xmlCipher = XMLCipher.getInstance(symEncAlgo);
+			} else {
+				xmlCipher = XMLCipher.getProviderInstance(symEncAlgo, provider);
+			}
+			xmlCipher.init(XMLCipher.DECRYPT_MODE, symmetricKey);
+		} catch (XMLEncryptionException e) {
+			throw new WSSecurityException(
+					WSSecurityException.UNSUPPORTED_ALGORITHM, null, null, e);
+		}
 
         if (content) {
             encBodyData = (Element) encBodyData.getParentNode();
