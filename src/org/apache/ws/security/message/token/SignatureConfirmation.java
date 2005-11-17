@@ -99,7 +99,7 @@ public class SignatureConfirmation {
     }
     
     /**
-     * Set wsu:Id attribute of this timestamp
+     * Set wsu:Id attribute of this SignatureConfirmation element.
      * @param id
      */
     public void setID(String id) {
