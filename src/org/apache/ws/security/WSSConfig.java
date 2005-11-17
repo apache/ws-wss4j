@@ -62,6 +62,16 @@ public class WSSConfig {
 
     protected boolean enableSignatureConfirmation = true;
     
+    /**
+     * If set to true then the timestamp handling will throw an
+     * expcetion if the timestamp contains an expires element and
+     * the semantics are expired.
+     * 
+     * If set to false, not expetion will be thrown, even if the
+     * semantics are expired. 
+     */
+    protected boolean timeStampStrict = true;
+    
     protected HashMap jceProvider = new HashMap(10);
     protected String jceProviderId = null;
     
@@ -150,11 +160,28 @@ public class WSSConfig {
     }
 
     /**
-     * Lookup action
-     * @param action
-     * @return
-     * @throws WSSecurityException
-     */
+	 * @return Returns if we shall throw an exception on expired request
+	 *         semantic
+	 */
+	public boolean isTimeStampStrict() {
+		return timeStampStrict;
+	}
+
+	/**
+	 * @param timeStampStrict
+	 *            If true throw an exception on expired request semantic
+	 */
+	public void setTimeStampStrict(boolean timeStampStrict) {
+		this.timeStampStrict = timeStampStrict;
+	}
+
+	/**
+	 * Lookup action
+	 * 
+	 * @param action
+	 * @return
+	 * @throws WSSecurityException
+	 */
     public Action getAction(int action) throws WSSecurityException {
         String name = null;
         switch(action) {
