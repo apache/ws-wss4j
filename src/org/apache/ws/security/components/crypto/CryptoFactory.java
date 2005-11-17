@@ -152,7 +152,7 @@ public abstract class CryptoFactory {
         } catch (java.lang.Exception e) {
             e.printStackTrace();
             log.error("Unable to instantiate (2): " + cryptoClassName, e);
-            throw new RuntimeException(cryptoClassName + " cannot create instance", e);
+            throw new RuntimeException(cryptoClassName + " cannot create instance");
         }
     }
     /**
