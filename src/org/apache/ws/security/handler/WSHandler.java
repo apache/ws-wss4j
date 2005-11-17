@@ -219,6 +219,7 @@ public abstract class WSHandler {
         WSSConfig wssConfig = WSSConfig.getNewInstance();
         wssConfig
 	    .setEnableSignatureConfirmation(decodeEnableSignatureConfirmation(reqData));
+        wssConfig.setTimeStampStrict(decodeTimestampStrict(reqData));
         reqData.setWssConfig(wssConfig);
 
         if ((doAction & WSConstants.SIGN) == WSConstants.SIGN) {
@@ -527,6 +528,22 @@ public abstract class WSHandler {
 	throw new WSSecurityException(
 		   "WSHandler: illegal precisionInMilliSeconds parameter");
     }
+
+    protected boolean decodeTimestampStrict(RequestData reqData) 
+	throws WSSecurityException {
+        boolean precisionInMilliSeconds = true;
+        String value = getString(WSHandlerConstants.TIMESTAMP_STRICT,
+				 reqData.getMsgContext());
+
+        if (value == null) {return true;}
+
+	if ("0".equals(value) || "false".equals(value)) {return false;} 
+	if ("1".equals(value) || "true".equals(value)) {return true;}
+
+	throw new WSSecurityException(
+		   "WSHandler: illegal timestampStrict parameter");
+    }
+
 
     /**
      * Get a password to construct a UsernameToken or sign a message.

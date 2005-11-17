@@ -660,7 +660,17 @@ public class WSHandlerConstants {
      * Should timestamps have precision in milliseconds
      */
     public static final String TIMESTAMP_PRECISION = "precisionInMilliseconds";
-
+    
+    /**
+     * Set the value of this parameter to true to enable strict timestamp
+     * handling.
+     * 
+     * Strict Timestamp handling: throw an exception if a Timestamp contains
+     * an <code>Expires</code> element and the semantics of the request are
+     * expired, i.e. the current time at the receiver is past the expires time. 
+     */
+    public static final String TIMESTAMP_STRICT = "timestampStrict";
+    
     /**
      * Define the parameter values to set the key identifier types. These are:
      * <ul>

@@ -65,11 +65,8 @@ public class Timestamp {
         
         customElements = new Vector();
 
-        String strCreated = "";
-        String strExpires = "";
-
-        created = Calendar.getInstance();
-        expires = Calendar.getInstance();
+        String strCreated = null;
+        String strExpires = null;
 
         for (Node currentChild = element.getFirstChild();
              currentChild != null;
@@ -77,10 +74,22 @@ public class Timestamp {
             if (currentChild instanceof Element) {
                 if (WSConstants.CREATED_LN.equals(currentChild.getLocalName()) &&
                         WSConstants.WSU_NS.equals(currentChild.getNamespaceURI())) {
-                    strCreated = ((Text) ((Element) currentChild).getFirstChild()).getData();
+                	if (strCreated == null) {
+                		strCreated = ((Text) ((Element) currentChild).getFirstChild()).getData();
+                	}
+                	else {
+                        throw new WSSecurityException(WSSecurityException.INVALID_SECURITY,
+                                "invalidTimestamp");
+                	}
                 } else if (WSConstants.EXPIRES_LN.equals(currentChild.getLocalName()) &&
                         WSConstants.WSU_NS.equals(currentChild.getNamespaceURI())) {
-                    strExpires = ((Text) ((Element) currentChild).getFirstChild()).getData();
+                	if (strExpires == null) {
+                		strExpires = ((Text) ((Element) currentChild).getFirstChild()).getData();
+                	}
+                	else {
+                        throw new WSSecurityException(WSSecurityException.INVALID_SECURITY,
+                        "invalidTimestamp");                		
+                	}
                 } else {
                     customElements.add((Element) currentChild);
                 }
@@ -90,8 +99,14 @@ public class Timestamp {
         DateFormat zulu = new XmlSchemaDateFormat();;
         
         try {
-            created.setTime(zulu.parse(strCreated));
-            expires.setTime(zulu.parse(strExpires));
+        	if (strCreated != null) {
+                created = Calendar.getInstance();
+        		created.setTime(zulu.parse(strCreated));
+        	}
+        	if (strExpires != null) {
+                expires = Calendar.getInstance();
+        		expires.setTime(zulu.parse(strExpires));
+        	}
         } catch (ParseException e) {
             throw new WSSecurityException(WSSecurityException.INVALID_SECURITY,
                     "invalidTimestamp",
