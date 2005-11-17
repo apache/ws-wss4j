@@ -480,7 +480,7 @@ public class WSS4JHandler extends WSHandler implements Handler {
         if (actionResult != null) {
             Timestamp timestamp = actionResult.getTimestamp();
 
-            if (timestamp != null) {
+            if (timestamp != null && reqData.getWssConfig().isTimeStampStrict()) {
                 if (!verifyTimestamp(timestamp, decodeTimeToLive(reqData))) {
                     throw new JAXRPCException("WSS4JHandler: The timestamp could not be validated");
                 }

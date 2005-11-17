@@ -89,7 +89,7 @@ public abstract class WSHandler {
 	    .setPrecisionInMilliSeconds(decodeTimestampPrecision(reqData));
         reqData.setWssConfig(wssConfig);
 
-	Object mc = reqData.getMsgContext();
+        Object mc = reqData.getMsgContext();
         String actor = getString(WSHandlerConstants.ACTOR, mc);
         reqData.setActor(actor);
 
@@ -987,19 +987,22 @@ public abstract class WSHandler {
         validCreation.setTime(new Date(currentTime));
 
         if (doDebug) {
-            log.debug("Preparing to verify the timestamp");
-            DateFormat zulu = new XmlSchemaDateFormat();
-            log.debug("Validation of Timestamp: Current time is "
-                    + zulu.format(Calendar.getInstance().getTime()));
-            log.debug("Validation of Timestamp: Valid creation is "
-                    + zulu.format(validCreation.getTime()));
-            log.debug("Validation of Timestamp: Timestamp created is "
-                    + zulu.format(timestamp.getCreated().getTime()));
-        }
+			log.debug("Preparing to verify the timestamp");
+			DateFormat zulu = new XmlSchemaDateFormat();
+			log.debug("Validation of Timestamp: Current time is "
+					+ zulu.format(Calendar.getInstance().getTime()));
+			log.debug("Validation of Timestamp: Valid creation is "
+					+ zulu.format(validCreation.getTime()));
+			if (timestamp.getCreated() != null) {
+				log.debug("Validation of Timestamp: Timestamp created is "
+						+ zulu.format(timestamp.getCreated().getTime()));
+			}
+		}
         // Validate the time it took the message to travel
-        //        if (timestamp.getCreated().before(validCreation) ||
+        // if (timestamp.getCreated().before(validCreation) ||
         // !timestamp.getCreated().equals(validCreation)) {
-        if (!timestamp.getCreated().after(validCreation)) {
+        Calendar cre = timestamp.getCreated();
+        if (cre != null && !cre.after(validCreation)) {
             if (doDebug) {
                 log.debug("Validation of Timestamp: The message was created too long ago");
             }
