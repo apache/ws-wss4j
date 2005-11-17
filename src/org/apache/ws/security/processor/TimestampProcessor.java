@@ -37,10 +37,13 @@ import java.util.Vector;
 public class TimestampProcessor implements Processor {
     private static Log log = LogFactory.getLog(TimestampProcessor.class.getName());
 
+    private WSSConfig wssConfig = null;
+    
     public void handleToken(Element elem, Crypto crypto, Crypto decCrypto, CallbackHandler cb, WSDocInfo wsDocInfo, Vector returnResults, WSSConfig wsc) throws WSSecurityException {
         if (log.isDebugEnabled()) {
             log.debug("Found Timestamp list element");
         }
+        wssConfig = wsc;
         /*
          * Decode Timestamp, add the found time (created/expiry) to result
          */
@@ -72,13 +75,12 @@ public class TimestampProcessor implements Processor {
 		// Validate whether the security semantics have expired
 		Calendar rightNow = Calendar.getInstance();
 		Calendar exp = timestamp.getExpires();
-		if (exp != null && exp.before(rightNow)) {
+		if (exp != null && wssConfig.isTimeStampStrict() && exp.before(rightNow)) {
 			throw new WSSecurityException(
 					WSSecurityException.INVALID_SECURITY,
 					"invalidTimestamp",
 					new Object[] { "The security semantics of message have expired" });
 		}
-
 		return;
 	}
 }
