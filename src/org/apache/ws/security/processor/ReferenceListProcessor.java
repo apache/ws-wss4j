@@ -38,11 +38,14 @@ import java.util.Vector;
 
 public class ReferenceListProcessor implements Processor {
     private static Log log = LogFactory.getLog(ReferenceListProcessor.class.getName());
+    
+    WSSConfig wssConfig = null;    
 
     public void handleToken(Element elem, Crypto crypto, Crypto decCrypto, CallbackHandler cb, WSDocInfo wsDocInfo, Vector returnResults, WSSConfig wsc) throws WSSecurityException {
         if (log.isDebugEnabled()) {
             log.debug("Found reference list element");
         }
+        wssConfig = wsc;        
         if (cb == null) {
             throw new WSSecurityException(WSSecurityException.FAILURE,
                     "noCallback");
@@ -119,8 +122,13 @@ public class ReferenceListProcessor implements Processor {
         // initialize Cipher ....
         XMLCipher xmlCipher = null;
         try {
-            xmlCipher = XMLCipher.getInstance(symEncAlgo);
-            xmlCipher.init(XMLCipher.DECRYPT_MODE, symmetricKey);
+			String provider = wssConfig.getJceProviderId();
+			if (provider == null) {
+				xmlCipher = XMLCipher.getInstance(symEncAlgo);
+			} else {
+				xmlCipher = XMLCipher.getProviderInstance(symEncAlgo, provider);
+			}
+			xmlCipher.init(XMLCipher.DECRYPT_MODE, symmetricKey);
         } catch (XMLEncryptionException e1) {
             throw new WSSecurityException(WSSecurityException.UNSUPPORTED_ALGORITHM, null, null, e1);
         }
