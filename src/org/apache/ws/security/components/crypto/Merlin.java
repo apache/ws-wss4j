@@ -25,6 +25,7 @@ import java.io.InputStream;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 import java.security.cert.CertPath;
 import java.security.cert.CertPathValidator;
 import java.security.cert.CertPathValidatorException;
@@ -124,57 +125,68 @@ public class Merlin extends AbstractCrypto {
         }
     }
 
+
     /**
-     * Uses the CertPath API to validate a given certificate chain
+     * Overridden because there's a bug in the base class where they don't use
+     * the provider variant for the certificate validator.
      *
-     * @param certs Certificate chain to validate
+     * @param certs
+     *            Certificate chain to validate
      * @return true if the certificate chain is valid, false otherwise
      * @throws WSSecurityException
      */
-    public boolean validateCertPath(X509Certificate[] certs) throws WSSecurityException {
+    public boolean validateCertPath(X509Certificate[] certs)
+                    throws WSSecurityException {
+		try {
+			// Generate cert path
+			java.util.List certList = java.util.Arrays.asList(certs);
+			CertPath path = this.getCertificateFactory().generateCertPath(
+							certList);
 
-        try {
-            // Generate cert path
-            java.util.List certList = java.util.Arrays.asList(certs);
-            CertPath path = this.getCertificateFactory().generateCertPath(certList);
+			// Use the certificates in the keystore as TrustAnchors
+			PKIXParameters param = new PKIXParameters(this.keystore);
 
-            // Use the certificates in the keystore as TrustAnchors
-            PKIXParameters param = new PKIXParameters(this.keystore);
+			// Do not check a revocation list
+			param.setRevocationEnabled(false);
 
-            // Do not check a revocation list
-            param.setRevocationEnabled(false);
+			// Verify the trust path using the above settings
+			String provider = properties
+							.getProperty("org.apache.ws.security.crypto.merlin.cert.provider");
+			CertPathValidator certPathValidator;
+			if (provider == null || provider.length() == 0) {
+					certPathValidator = CertPathValidator.getInstance("PKIX");
+			} else {
+					certPathValidator = CertPathValidator.getInstance("PKIX",
+									provider);
+			}
+			certPathValidator.validate(path, param);
+		} catch (NoSuchProviderException ex) {
+				throw new WSSecurityException(WSSecurityException.FAILURE,
+								"certpath", new Object[] { ex.getMessage() },
+								(Throwable) ex);
+		} catch (NoSuchAlgorithmException ex) {
+				throw new WSSecurityException(WSSecurityException.FAILURE,
+								"certpath", new Object[] { ex.getMessage() },
+								(Throwable) ex);
+		} catch (CertificateException ex) {
+				throw new WSSecurityException(WSSecurityException.FAILURE,
+								"certpath", new Object[] { ex.getMessage() },
+								(Throwable) ex);
+		} catch (InvalidAlgorithmParameterException ex) {
+				throw new WSSecurityException(WSSecurityException.FAILURE,
+								"certpath", new Object[] { ex.getMessage() },
+								(Throwable) ex);
+		} catch (CertPathValidatorException ex) {
+				throw new WSSecurityException(WSSecurityException.FAILURE,
+								"certpath", new Object[] { ex.getMessage() },
+								(Throwable) ex);
+		} catch (KeyStoreException ex) {
+				throw new WSSecurityException(WSSecurityException.FAILURE,
+								"certpath", new Object[] { ex.getMessage() },
+								(Throwable) ex);
+		}
 
-            // Verify the trust path using the above settings            
-            CertPathValidator certPathValidator = CertPathValidator.getInstance("PKIX");
-            certPathValidator.validate(path, param);
-        } catch (NoSuchAlgorithmException ex) {
-            throw new WSSecurityException(WSSecurityException.FAILURE,
-                    "certpath",
-                    new Object[]{ex.getMessage()},
-                    (Throwable) ex);
-        } catch (CertificateException ex) {
-            throw new WSSecurityException(WSSecurityException.FAILURE,
-                    "certpath",
-                    new Object[]{ex.getMessage()},
-                    (Throwable) ex);
-        } catch (InvalidAlgorithmParameterException ex) {
-            throw new WSSecurityException(WSSecurityException.FAILURE,
-                    "certpath",
-                    new Object[]{ex.getMessage()},
-                    (Throwable) ex);
-        } catch (CertPathValidatorException ex) {
-            throw new WSSecurityException(WSSecurityException.FAILURE,
-                    "certpath",
-                    new Object[]{ex.getMessage()},
-                    (Throwable) ex);
-        } catch (KeyStoreException ex) {
-            throw new WSSecurityException(WSSecurityException.FAILURE,
-                    "certpath",
-                    new Object[]{ex.getMessage()},
-                    (Throwable) ex);
-        }
-
-        return true;
+		return true;
     }
 }
 
