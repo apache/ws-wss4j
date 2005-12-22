@@ -541,10 +541,6 @@ public class WSEncryptBody extends WSBaseMessage {
             log.debug("Beginning Encryption embedded...");
         }
 
-        if (embeddedKey == null) {
-            throw new WSSecurityException(WSSecurityException.FAILURE,
-                    "noKeySupplied");
-        }
 
         /*
          * Second step: generate a symmetric key from the specified
@@ -553,6 +549,10 @@ public class WSEncryptBody extends WSBaseMessage {
          */
         this.encryptionKey = this.symmetricKey;
         if (this.encryptionKey == null) {
+            if (embeddedKey == null) {
+                throw new WSSecurityException(WSSecurityException.FAILURE,
+                        "noKeySupplied");
+            }
             this.encryptionKey = WSSecurityUtil.prepareSecretKey(
                     symEncAlgo,
                     embeddedKey);

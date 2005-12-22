@@ -218,11 +218,19 @@ public class EncryptedKeyProcessor implements Processor {
                                 "unsupportedToken",
                                 null);
                     }
-                } else if (secRef.containsKeyName()) {
-                    alias = crypto.getAliasForX509Cert(secRef.getKeyNameValue());
-                    if (log.isDebugEnabled()) {
-                        log.debug("KeyName alias: " + alias);
-                    }
+        			/*
+        			 * The following code is somewhat strange: the called crypto method gets
+        			 * the keyname and searches for a certificate with an issuer's name that is
+        			 * equal to this keyname. No serialnumber is used - IMHO this does
+        			 * not identifies a certificate. In addition neither the WSS4J encryption
+        			 * nor signature methods use this way to identify a certificate. Because of that
+        			 * the next lines of code are disabled.  
+        			 */
+//                } else if (secRef.containsKeyName()) {
+//                    alias = crypto.getAliasForX509Cert(secRef.getKeyNameValue());
+//                    if (log.isDebugEnabled()) {
+//                        log.debug("KeyName alias: " + alias);
+//                    }
                 } else {
                     throw new WSSecurityException(WSSecurityException.FAILURE, "unsupportedKeyId");
                 }

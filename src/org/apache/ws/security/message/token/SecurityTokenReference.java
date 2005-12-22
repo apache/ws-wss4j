@@ -71,8 +71,8 @@ public class SecurityTokenReference {
         boolean goodElement = false;
         if (SECURITY_TOKEN_REFERENCE.equals(element.getLocalName())) {
             goodElement = WSConstants.WSSE_NS.equals(element.getNamespaceURI());
-        } else if (KEY_NAME.equals(element.getLocalName())) {
-            goodElement = WSConstants.SIG_NS.equals(element.getNamespaceURI());
+//        } else if (KEY_NAME.equals(element.getLocalName())) {
+//            goodElement = WSConstants.SIG_NS.equals(element.getNamespaceURI());
         }
         if (!goodElement) {
             throw new WSSecurityException(WSSecurityException.FAILURE,
@@ -463,13 +463,13 @@ public class SecurityTokenReference {
      * @return true if the <code>SecurtityTokenReference</code> contains
      *         a <code>wsse:KeyName</code> element
      */
-    public boolean containsKeyName() {
-        return element.getLocalName().equals(KEY_NAME);
-    }
-
-    public String getKeyNameValue() {
-        return element.getFirstChild().getNodeValue();
-    }
+//    public boolean containsKeyName() {
+//        return element.getLocalName().equals(KEY_NAME);
+//    }
+//
+//    public String getKeyNameValue() {
+//        return element.getFirstChild().getNodeValue();
+//    }
 
     /**
      * Method containsReference
