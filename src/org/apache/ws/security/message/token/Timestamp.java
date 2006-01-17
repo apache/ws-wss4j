@@ -45,8 +45,6 @@ import java.util.Vector;
 public class Timestamp {
 
     protected Element element = null;
-    protected Element elementCreated = null;
-    protected Element elementExpires = null;
     protected Vector customElements = null;
 
     protected Calendar created;
@@ -114,6 +112,7 @@ public class Timestamp {
         }
     }
 
+
     /**
      * Constructs a <code>Timestamp</code> object according
      * to the defined parameters.
@@ -143,32 +142,42 @@ public class Timestamp {
         	zulu = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
         	zulu.setTimeZone(TimeZone.getTimeZone("UTC"));
         }
-        Calendar rightNow = Calendar.getInstance();
+        created = getCurrentTime();
 
-        elementCreated =
+        Element elementCreated =
                 doc.createElementNS(WSConstants.WSU_NS,
                         WSConstants.WSU_PREFIX + ":" + WSConstants.CREATED_LN);
         WSSecurityUtil.setNamespace(elementCreated,
                 WSConstants.WSU_NS,
                 WSConstants.WSU_PREFIX);
-        elementCreated.appendChild(doc.createTextNode(zulu.format(rightNow.getTime())));
+        elementCreated.appendChild(doc.createTextNode(zulu.format(created.getTime())));
         element.appendChild(elementCreated);
         if (ttl != 0) {
-            long currentTime = rightNow.getTime().getTime();
+            long currentTime = created.getTimeInMillis();
             currentTime += ttl * 1000;
-            rightNow.setTime(new Date(currentTime));
+            expires = getCurrentTime();
+            expires.setTimeInMillis(currentTime);
 
-            elementExpires =
+            Element elementExpires =
                     doc.createElementNS(WSConstants.WSU_NS,
                             WSConstants.WSU_PREFIX + ":" + WSConstants.EXPIRES_LN);
             WSSecurityUtil.setNamespace(elementExpires,
                     WSConstants.WSU_NS,
                     WSConstants.WSU_PREFIX);
-            elementExpires.appendChild(doc.createTextNode(zulu.format(rightNow.getTime())));
+            elementExpires.appendChild(doc.createTextNode(zulu.format(expires.getTime())));
             element.appendChild(elementExpires);
         }
     }
 
+    /**
+     * Get the current time
+     * 
+     * @return calendar the current time
+     */
+    protected Calendar getCurrentTime() {
+    	return Calendar.getInstance();
+    }
+    
     /**
      * Returns the dom element of this <code>Timestamp</code> object.
      *
