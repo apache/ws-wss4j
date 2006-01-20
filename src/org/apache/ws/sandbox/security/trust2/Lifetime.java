@@ -80,7 +80,7 @@ public class Lifetime extends Timestamp {
         if (created == null)
             created = rightNow.getTime();
 
-        elementCreated = doc.createElementNS(WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + WSConstants.CREATED_LN);
+        Element elementCreated = doc.createElementNS(WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + WSConstants.CREATED_LN);
         WSSecurityUtil.setNamespace(elementCreated, WSConstants.WSU_NS, WSConstants.WSU_PREFIX);
         elementCreated.appendChild(doc.createTextNode(zulu.format(created)));
         element.appendChild(elementCreated);
@@ -88,7 +88,7 @@ public class Lifetime extends Timestamp {
         if (expires == null)
             expires = created;
 
-        elementExpires = doc.createElementNS(WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + WSConstants.EXPIRES_LN);
+        Element elementExpires = doc.createElementNS(WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + WSConstants.EXPIRES_LN);
         WSSecurityUtil.setNamespace(elementExpires, WSConstants.WSU_NS, WSConstants.WSU_PREFIX);
         elementExpires.appendChild(doc.createTextNode(zulu.format(expires)));
         element.appendChild(elementExpires);
