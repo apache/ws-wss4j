@@ -93,8 +93,6 @@ public class WSSecSignature extends WSBaseMessage {
 
     private Crypto crypto = null;
 
-    // private Element securityHeader = null;
-
     private WSDocInfo wsDocInfo = null;
 
     private String certUri = null;
@@ -181,7 +179,7 @@ public class WSSecSignature extends WSBaseMessage {
      * Call this method after <code>setupToken</code> to get the information
      * which signature algorithem was automaticall detected if no signature
      * algorithm was preset.
-     *  
+     * 
      * @return the identifier URI of the signature algorithm
      */
     public String getSignatureAlgorithm() {
@@ -550,7 +548,7 @@ public class WSSecSignature extends WSBaseMessage {
      * header.
      * 
      * The method can be called any time after <code>setupToken()</code>.
-     * This allows to insert the Signature element at any position in th
+     * This allows to insert the Signature element at any position in the
      * Security header.
      * 
      * @param securityHeader
@@ -566,7 +564,7 @@ public class WSSecSignature extends WSBaseMessage {
      * header.
      * 
      * The method can be called any time after <code>setupToken()</code>.
-     * This allows to insert the BST element at any position in th Security
+     * This allows to insert the BST element at any position in the Security
      * header.
      * 
      * @param securityHeader
@@ -584,7 +582,7 @@ public class WSSecSignature extends WSBaseMessage {
      * Compute the Signature over the references.
      * 
      * After references are set this method computes the Signature for them.
-     * This method cann be called anytime after the references are set using
+     * This method can be called anytime after the references are set using
      * <code>addReferencesToSign()</code>.
      * 
      * @throws WSSecurityException
@@ -613,8 +611,10 @@ public class WSSecSignature extends WSBaseMessage {
     /**
      * Builds a signed soap envelope.
      * 
-     * The method creates a Signature and puts it into the Security header. It
-     * does so by calling functions in order.
+     * This is a convenience method and for backward compatibility. The method
+     * creates a Signature and puts it into the Security header. It does so by
+     * calling functions in order. This build() method produces a Signature that
+     * is equivalent to the WSSignEnvelope.build().
      * 
      * @param doc
      *            The unsigned SOAP envelope as <code>Document</code>
