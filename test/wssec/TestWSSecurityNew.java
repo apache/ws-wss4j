@@ -33,6 +33,7 @@ import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.message.WSSecSignature;
+import org.apache.ws.security.message.WSSecHeader;
 import org.w3c.dom.Document;
 
 import java.io.ByteArrayInputStream;
@@ -121,14 +122,15 @@ public class TestWSSecurityNew extends TestCase {
      * @throws java.lang.Exception Thrown when there is any problem in signing or verification
      */
     public void testX509SignatureIS() throws Exception {
-        SOAPEnvelope envelope = null;
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         builder.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
         // builder.setUserInfo("john", "keypass");
         log.info("Before Signing IS....");
         Document doc = unsignedEnvelope.getAsDocument();
-        Document signedDoc = builder.build(doc, crypto);
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        Document signedDoc = builder.build(doc, crypto, secHeader);
 
         /*
          * convert the resulting document into a message first. The toSOAPMessage()
@@ -150,19 +152,19 @@ public class TestWSSecurityNew extends TestCase {
 
     /**
      * Test that signs (twice) and verifies a WS-Security envelope.
-     * The test uses the ThumbprintSHA1 key identifier type.
      * <p/>
      * 
      * @throws java.lang.Exception Thrown when there is any problem in signing or verification
      */
     public void testDoubleX509SignatureIS() throws Exception {
-        SOAPEnvelope envelope = null;
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         // builder.setUserInfo("john", "keypass");
         Document doc = unsignedEnvelope.getAsDocument();
-        Document signedDoc = builder.build(doc, crypto);
-        Document signedDoc1 = builder.build(signedDoc, crypto);
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        Document signedDoc = builder.build(doc, crypto, secHeader);
+        Document signedDoc1 = builder.build(signedDoc, crypto, secHeader);
         verify(signedDoc1);
     }
 

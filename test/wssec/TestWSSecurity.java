@@ -114,7 +114,7 @@ public class TestWSSecurity extends TestCase {
 
     /**
      * Test that signs and verifies a WS-Security envelope.
-     * The test uses the ThumbprintSHA1 key identifier type. 
+     * The test uses the IssuerSerial key identifier type. 
      * <p/>
      * 
      * @throws java.lang.Exception Thrown when there is any problem in signing or verification
