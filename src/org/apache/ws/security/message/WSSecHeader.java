@@ -30,11 +30,18 @@ import org.w3c.dom.Element;
 import java.util.Vector;
 
 /**
- * This is the base class for WS Security messages. It provides common functions
- * and fields used by the specific message classes such as sign, encrypt, and
- * username token.
+ * This class implements WS Security header.
  * 
- * @author Werner Dittmann (Werner.Dittmann@t-online.de)
+ * It provides to setup a Security header with a specified actor and
+ * mustunderstand flag.
+ * 
+ * <p/>
+ * 
+ * Use the to set or overwrite the default values for actor and mustunderstand.
+ * The defaults are: empty <code>actor</code> and <code>mustunderstand</code>
+ * is true.
+ * 
+ * @author Werner Dittmann (Werner.Dittmann@apache.org)
  */
 public class WSSecHeader {
 	private static Log log = LogFactory.getLog(WSSecHeader.class.getName());
