@@ -137,7 +137,7 @@ public class TestWSSecurityNew2 extends TestCase implements CallbackHandler {
         SOAPEnvelope envelope = null;
         WSSecEncrypt builder = new WSSecEncrypt();
         builder.setUserInfo("wss4jcert");
-        builder.setKeyIdentifierType(WSConstants.X509_KEY_IDENTIFIER);
+        builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
         builder.setSymmetricEncAlgorithm(WSConstants.TRIPLE_DES);
         Document doc = unsignedEnvelope.getAsDocument();
         WSSecHeader secHeader = new WSSecHeader();
