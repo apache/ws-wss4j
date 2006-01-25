@@ -72,7 +72,7 @@ import java.util.Vector;
  * @author Davanum Srinivas (dims@yahoo.com)
  * @author Werner Dittmann (werner@apache.org)
  */
-public class WSSecSignature extends WSBaseMessage {
+public class WSSecSignature extends WSSecBase {
 
     private static Log log = LogFactory.getLog(WSSecSignature.class.getName());
 
@@ -115,28 +115,6 @@ public class WSSecSignature extends WSBaseMessage {
      * Constructor.
      */
     public WSSecSignature() {
-    }
-
-    /**
-     * Constructor.
-     * 
-     * @param actor
-     *            The actor name of the <code>wsse:Security</code> header
-     */
-    public WSSecSignature(String actor) {
-        super(actor);
-    }
-
-    /**
-     * Constructor.
-     * 
-     * @param actor
-     *            The actor name of the <code>wsse:Security</code> header
-     * @param mu
-     *            Set <code>mustUnderstand</code> to true or false
-     */
-    public WSSecSignature(String actor, boolean mu) {
-        super(actor, mu);
     }
 
     /**
@@ -624,14 +602,14 @@ public class WSSecSignature extends WSBaseMessage {
      * @return A signed SOAP envelope as <code>Document</code>
      * @throws WSSecurityException
      */
-    public Document build(Document doc, Crypto cr) throws WSSecurityException {
+    public Document build(Document doc, Crypto cr, WSSecHeader secHeader) throws WSSecurityException {
         doDebug = log.isDebugEnabled();
 
         if (doDebug) {
             log.debug("Beginning signing...");
         }
 
-        Element securityHeader = insertSecurityHeader(doc);
+        Element securityHeader = secHeader.getSecurityHeader();
 
         setupToken(doc, cr, securityHeader);
 
