@@ -52,7 +52,7 @@ import java.util.Vector;
 
 /**
  * Encrypts a parts of a message according to WS Specification, X509 profile,
- * and adds the encryption data. <p/>
+ * and adds the encryption data.
  * 
  * @author Davanum Srinivas (dims@yahoo.com).
  * @author Werner Dittmann (Werner.Dittmann@apache.org).
@@ -125,8 +125,6 @@ public class WSSecEncrypt extends WSSecBase {
 
 	/**
 	 * Sets the algorithm to encode the symmetric key.
-	 * 
-	 * <p/>
 	 * 
 	 * Default is the <code>WSConstants.KEYTRANSPORT_RSA15</code> algorithm.
 	 * 
@@ -226,19 +224,23 @@ public class WSSecEncrypt extends WSSecBase {
 	/**
 	 * Initialize a WSSec Encrypt.
 	 * 
-	 * The method sets up and initializes a WSSec Encrypt structure after the
-	 * relevant token information was set. After setup of the token references
-	 * may be added. After all references are added they can be signed.
+	 * The method prepares and initializes a WSSec Encrypt structure after the
+	 * relevant information was set. After preparartion of the token references
+	 * can be added and encrypted.
 	 * 
+	 * </p>
+	 * 
+	 * This method does not add any element to the security header. This must
+	 * be done explicitly.
 	 * 
 	 * @param doc
 	 *            The unsigned SOAP envelope as <code>Document</code>
-	 * @param cr
+	 * @param crypto
 	 *            An instance of the Crypto API to handle keystore and
 	 *            certificates
 	 * @throws WSSecurityException
 	 */
-	public void setupToken(Document doc, Crypto crypto, Element securityHeader)
+	public void prepare(Document doc, Crypto crypto)
 			throws WSSecurityException {
 
 		document = doc;
@@ -312,9 +314,7 @@ public class WSSecEncrypt extends WSSecBase {
 		 * element, this wraps the wsse:SecurityTokenReference 3) Create and set
 		 * up the SecurityTokenReference according to the keyIdentifer parameter
 		 * 4) Create the CipherValue element structure and insert the encrypted
-		 * session key 5) The last step sets up the reference list that pints to
-		 * the encrypted data that was encrypted with this encrypted session key
-		 * :-)
+		 * session key
 		 */
 		xencEncryptedKey = createEnrcyptedKey(doc, keyEncAlgo);
 		encKeyId = "EncKeyId-" + xencEncryptedKey.hashCode();
@@ -330,7 +330,6 @@ public class WSSecEncrypt extends WSSecBase {
 		switch (keyIdentifierType) {
 		case WSConstants.X509_KEY_IDENTIFIER:
 			secToken.setKeyIdentifier(remoteCert);
-			// build a key id class??
 			break;
 
 		case WSConstants.SKI_KEY_IDENTIFIER:
@@ -376,36 +375,36 @@ public class WSSecEncrypt extends WSSecBase {
 	}
 
 	/**
-	 * Prepends the Encrypt element to the elements already in the Security
+	 * Prepend the EncryptedKey element to the elements already in the Security
 	 * header.
 	 * 
-	 * The method can be called any time after <code>setupToken()</code>.
-	 * This allows to insert the Signature element at any position in the
+	 * The method can be called any time after <code>prepare()</code>.
+	 * This allows to insert the EncryptedKey element at any position in the
 	 * Security header.
 	 * 
-	 * @param securityHeader
-	 *            The securityHeader that holds the Signature element.
+	 * @param secHeader
+	 *            The security header that holds the Signature element.
 	 */
-	public void prependEncryptElementToHeader(Element securityHeader) {
-		WSSecurityUtil.prependChildElement(document, securityHeader,
-				xencEncryptedKey, false);
+	public void prependToHeader(WSSecHeader secHeader) {
+		WSSecurityUtil.prependChildElement(document, secHeader
+				.getSecurityHeader(), xencEncryptedKey, false);
 	}
 
 	/**
 	 * Prepend the BinarySecurityToken to the elements already in the Security
 	 * header.
 	 * 
-	 * The method can be called any time after <code>setupToken()</code>.
+	 * The method can be called any time after <code>prepare()</code>.
 	 * This allows to insert the BST element at any position in the Security
 	 * header.
 	 * 
-	 * @param securityHeader
-	 *            The securityHeader that holds the BST element.
+	 * @param secHeader
+	 *            The security header that holds the BST element.
 	 */
-	public void prependBSTElementToHeader(Element securityHeader) {
+	public void prependBSTElementToHeader(WSSecHeader secHeader) {
 		if (bstToken != null) {
-			WSSecurityUtil.prependChildElement(document, securityHeader,
-					bstToken.getElement(), false);
+			WSSecurityUtil.prependChildElement(document, secHeader
+					.getSecurityHeader(), bstToken.getElement(), false);
 		}
 		bstToken = null;
 	}
@@ -443,9 +442,8 @@ public class WSSecEncrypt extends WSSecBase {
 		if (doDebug) {
 			log.debug("Beginning Encryption...");
 		}
-		Element securityHeader = secHeader.getSecurityHeader();
 
-		setupToken(doc, crypto, securityHeader);
+		prepare(doc, crypto);
 
 		SOAPConstants soapConstants = WSSecurityUtil.getSOAPConstants(envelope);
 		if (parts == null) {
@@ -457,18 +455,45 @@ public class WSSecEncrypt extends WSSecBase {
 		}
 
 		Element refs = encryptForInternalRef(null, parts);
-		addRefElement(refs);
+		addInternalRefElement(refs);
 
-		prependEncryptElementToHeader(securityHeader);
+		prependToHeader(secHeader);
 
 		if (bstToken != null) {
-			prependBSTElementToHeader(securityHeader);
+			prependBSTElementToHeader(secHeader);
 		}
 
 		log.debug("Encryption complete.");
 		return doc;
 	}
 
+	/**
+	 * Encrypt one or more parts or elements of the message (internal).
+	 * 
+	 * This method takes a vector of <code>WSEncryptionPart</code> object that
+	 * contain information about the elements to encrypt. The method call the
+	 * encryption method, takes the reference information generated during
+	 * encryption and add this to the <code>enc:Reference</code> element. This
+	 * method can be called after <code>prepare()</code> and can be
+	 * called multiple times to encrypt a number of parts or elements.
+	 * 
+	 * </p>
+	 * 
+	 * The method generates a <code>enc:Reference</code> element that <i>must</i>
+	 * be added to this token. See <code>addInternalRefElement()</code>.
+	 * 
+	 * </p>
+	 * 
+	 * If the <code>dataRef</code> parameter is <code>null</code> the method
+	 * creates and initializes a new Reference element.
+	 * 
+	 * @param dataRef
+	 *            A <code>enc:Reference</code> element or <code>null</code>
+	 * @param references
+	 *            A vector containing WSEncryptionPart objects
+	 * @return Returns the updated <code>enc:Reference</code> element
+	 * @throws WSSecurityException
+	 */
 	public Element encryptForInternalRef(Element dataRef, Vector references)
 			throws WSSecurityException {
 		Vector encDataRefs = doEncryption(document, this.encryptionKey, parts);
@@ -481,6 +506,33 @@ public class WSSecEncrypt extends WSSecBase {
 		return referenceList;
 	}
 
+	/**
+	 * Encrypt one or more parts or elements of the message (external).
+	 * 
+	 * This method takes a vector of <code>WSEncryptionPart</code> object that
+	 * contain information about the elements to encrypt. The method call the
+	 * encryption method, takes the reference information generated during
+	 * encryption and add this to the <code>enc:Reference</code> element. This
+	 * method can be called after <code>prepare()</code> and can be
+	 * called multiple times to encrypt a number of parts or elements.
+	 * 
+	 * </p>
+	 * 
+	 * The method generates a <code>enc:Reference</code> element that <i>must</i>
+	 * be added to the SecurityHeader. See <code>addExternalRefElement()</code>.
+	 * 
+	 * </p>
+	 * 
+	 * If the <code>dataRef</code> parameter is <code>null</code> the method
+	 * creates and initializes a new Reference element.
+	 * 
+	 * @param dataRef
+	 *            A <code>enc:Reference</code> element or <code>null</code>
+	 * @param references
+	 *            A vector containing WSEncryptionPart objects
+	 * @return Returns the updated <code>enc:Reference</code> element
+	 * @throws WSSecurityException
+	 */
 	public Element encryptForExternalRef(Element dataRef, Vector references)
 			throws WSSecurityException {
 
@@ -502,11 +554,39 @@ public class WSSecEncrypt extends WSSecBase {
 		return referenceList;
 	}
 
-	public void addRefElement(Element referenceList) {
+	/**
+	 * Adds the internal Reference element to this Encrypt data.
+	 * 
+	 * The refernce element <i>must</i> be created by the
+	 * <code>encryptForInternalRef()</code> method. The refernce element is
+	 * added to the <code>EncryptedKey</code> element of this encrypt block.
+	 * 
+	 * @param dataRef
+	 *            The internal <code>enc:Reference</code> element
+	 */
+	public void addInternalRefElement(Element dataRef) {
 		WSSecurityUtil.appendChildElement(document, xencEncryptedKey,
-				referenceList);
+				dataRef);
 	}
 
+	/**
+	 * Adds (prepends) the external Reference element to the Security header.
+	 * 
+	 * The refernce element <i>must</i> be created by the
+	 * <code>encryptForExternalRef() </code> method. The method prepends the
+	 * reference element in the SecurityHeader.
+	 * 
+	 * @param dataRef
+	 *            The external <code>enc:Reference</code> element
+	 * @param secHeader
+	 *            The security header.
+	 */
+	public void addExternalRefElement(Element dataRef, WSSecHeader secHeader) {
+		WSSecurityUtil.prependChildElement(document, secHeader
+				.getSecurityHeader(), dataRef, false);
+	}
+	
+	
 	private Vector doEncryption(Document doc, SecretKey secretKey,
 			Vector references) throws WSSecurityException {
 		return doEncryption(doc, secretKey, null, references);

@@ -155,8 +155,9 @@ public class WSSecBase {
 	}
 
 	/**
-	 * Set the user and password info. <p/> Both information is used to get the
-	 * user's private signing key.
+	 * Set the user and password info. 
+	 * 
+	 * Both information is used to get the user's private signing key.
 	 * 
 	 * @param user
 	 *            This is the user's alias name in the keystore that identifies

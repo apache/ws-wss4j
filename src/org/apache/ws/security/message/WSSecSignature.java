@@ -61,7 +61,7 @@ import java.util.Vector;
  * Creates a Signature according to WS Specification, X509 profile.
  * 
  * This class is a refactored implementation of the previous WSS4J class
- * <code>WSSigneEnvlope</code>. This new class allows the better control of
+ * <code>WSSignEnvlope</code>. This new class allows better control of
  * the process to create a Signature and to add it to the Security header.
  * 
  * <br/>
@@ -82,12 +82,12 @@ public class WSSecSignature extends WSSecBase {
 
 	protected String canonAlgo = Canonicalizer.ALGO_ID_C14N_EXCL_OMIT_COMMENTS;
 
-	protected WSSAddUsernameToken usernameToken = null;
+	protected WSSecUsernameToken usernameToken = null;
 
 	protected byte[] signatureValue = null;
 
 	/*
-	 * The following private variable are setup during setupToken().
+	 * The following private variable are setup during prepare().
 	 */
 	private Document document = null;
 
@@ -139,7 +139,7 @@ public class WSSecSignature extends WSSecBase {
 	 * Set the name of the signature encryption algorithm to use.
 	 * 
 	 * If the algorithm is not set then an automatic detection of the signature
-	 * algorithm to use is perfomed during the <code>setupToken()</code>
+	 * algorithm to use is perfomed during the <code>prepare()</code>
 	 * method. Refer to WSConstants which algorithms are supported.
 	 * 
 	 * @param algo
@@ -154,7 +154,7 @@ public class WSSecSignature extends WSSecBase {
 	/**
 	 * Get the name of the signature algorithm that is being used.
 	 * 
-	 * Call this method after <code>setupToken</code> to get the information
+	 * Call this method after <code>prepare</code> to get the information
 	 * which signature algorithem was automaticall detected if no signature
 	 * algorithm was preset.
 	 * 
@@ -198,11 +198,16 @@ public class WSSecSignature extends WSSecBase {
 	 * @param usernameToken
 	 *            The usernameToken to set.
 	 */
-	public void setUsernameToken(WSSAddUsernameToken usernameToken) {
+	public void setUsernameToken(WSSecUsernameToken usernameToken) {
 		this.usernameToken = usernameToken;
 	}
 
 	/**
+	 * Returns the computed Signature value.
+	 * 
+	 * Call this method after <code>computeSignature()</code> or <code>build()</code>
+	 * methods were called.
+	 * 
 	 * @return Returns the signatureValue.
 	 */
 	public byte[] getSignatureValue() {
@@ -213,18 +218,25 @@ public class WSSecSignature extends WSSecBase {
 	 * Initialize a WSSec Signature.
 	 * 
 	 * The method sets up and initializes a WSSec Signature structure after the
-	 * relevant token information was set. After setup of the token references
-	 * may be added. After all references are added they can be signed.
+	 * relevant information was set. After setup of the references to elements
+	 * to sign may be added. After all references are added they can be signed.
 	 * 
+	 * <p/>
+	 * 
+	 * This method does not add the Signature element to the security header.
+	 * See <code>prependSignatureElementToHeader()</code> method.
 	 * 
 	 * @param doc
-	 *            The unsigned SOAP envelope as <code>Document</code>
+	 *            The SOAP envelope as <code>Document</code>
 	 * @param cr
 	 *            An instance of the Crypto API to handle keystore and
 	 *            certificates
+	 * @param secHeader
+	 *            The security header that will hold the Signature. This ise use
+	 *            to construct namespace prefixes for Signature. This method
 	 * @throws WSSecurityException
 	 */
-	public void setupToken(Document doc, Crypto cr, Element securityHeader)
+	public void prepare(Document doc, Crypto cr, WSSecHeader secHeader)
 			throws WSSecurityException {
 		/*
 		 * Gather some info about the document to process and store it for
@@ -278,7 +290,7 @@ public class WSSecSignature extends WSSecBase {
 			canonElem.setAttributeNS(null, Constants._ATT_ALGORITHM, canonAlgo);
 
 			if (wssConfig.isWsiBSPCompliant()) {
-				Set prefixes = getInclusivePrefixes(securityHeader, false);
+				Set prefixes = getInclusivePrefixes(secHeader.getSecurityHeader(), false);
 
 				InclusiveNamespaces inclusiveNamespaces = new InclusiveNamespaces(
 						doc, prefixes);
@@ -357,10 +369,6 @@ public class WSSecSignature extends WSSecBase {
 			Reference refUt = new Reference(document);
 			refUt.setValueType(WSConstants.USERNAMETOKEN_NS + "#UsernameToken");
 			String utId = usernameToken.getId();
-			if (utId == null) {
-				utId = "usernameTokenId-" + usernameToken.hashCode();
-				usernameToken.setId(utId);
-			}
 			refUt.setURI("#" + utId);
 			secRef.setReference(refUt);
 			secretKey = usernameToken.getSecretKey();
@@ -384,17 +392,17 @@ public class WSSecSignature extends WSSecBase {
 	 * The added references are signed when calling
 	 * <code>computeSignature()</code>. This method can be called several
 	 * times to add references as required. <code>addReferencesToSign()</code>
-	 * can be called anytime after <code>setupToken</code>.
+	 * can be called anytime after <code>prepare</code>.
 	 * 
 	 * @param references
 	 *            A vector containing <code>WSEncryptionPart</code> objects
 	 *            that define the parts to sign.
-	 * @param securityHeader
+	 * @param secHeader
 	 *            Used to compute namespaces to be inserted by
 	 *            InclusiveNamespaces to be WSI compliant.
 	 * @throws WSSecurityException
 	 */
-	public void addReferencesToSign(Vector references, Element securityHeader)
+	public void addReferencesToSign(Vector references, WSSecHeader secHeader)
 			throws WSSecurityException {
 		Transforms transforms = null;
 
@@ -447,7 +455,7 @@ public class WSSecSignature extends WSSecBase {
 									.appendChild(
 											new InclusiveNamespaces(
 													document,
-													getInclusivePrefixes(securityHeader))
+													getInclusivePrefixes(secHeader.getSecurityHeader()))
 													.getElement());
 						}
 						sig.addDocument("#" + certUri, transforms);
@@ -525,15 +533,15 @@ public class WSSecSignature extends WSSecBase {
 	 * Prepends the Signature element to the elements already in the Security
 	 * header.
 	 * 
-	 * The method can be called any time after <code>setupToken()</code>.
+	 * The method can be called any time after <code>prepare()</code>.
 	 * This allows to insert the Signature element at any position in the
 	 * Security header.
 	 * 
 	 * @param securityHeader
-	 *            The securityHeader that holds the Signature element.
+	 *            The secHeader that holds the Signature element.
 	 */
-	public void prependSignatureElementToHeader(Element securityHeader) {
-		WSSecurityUtil.prependChildElement(document, securityHeader, sig
+	public void prependToHeader(WSSecHeader secHeader) {
+		WSSecurityUtil.prependChildElement(document, secHeader.getSecurityHeader(), sig
 				.getElement(), false);
 	}
 
@@ -541,16 +549,16 @@ public class WSSecSignature extends WSSecBase {
 	 * Prepend the BinarySecurityToken to the elements already in the Security
 	 * header.
 	 * 
-	 * The method can be called any time after <code>setupToken()</code>.
+	 * The method can be called any time after <code>prepare()</code>.
 	 * This allows to insert the BST element at any position in the Security
 	 * header.
 	 * 
-	 * @param securityHeader
-	 *            The securityHeader that holds the BST element.
+	 * @param secHeader
+	 *            The security header that holds the BST element.
 	 */
-	public void prependBSTElementToHeader(Element securityHeader) {
+	public void prependBSTElementToHeader(WSSecHeader secHeader) {
 		if (bstToken != null) {
-			WSSecurityUtil.prependChildElement(document, securityHeader,
+			WSSecurityUtil.prependChildElement(document, secHeader.getSecurityHeader(),
 					bstToken.getElement(), false);
 		}
 		bstToken = null;
@@ -560,7 +568,7 @@ public class WSSecSignature extends WSSecBase {
 	 * Compute the Signature over the references.
 	 * 
 	 * After references are set this method computes the Signature for them.
-	 * This method can be called anytime after the references are set using
+	 * This method can be called anytime after the references were set. See
 	 * <code>addReferencesToSign()</code>.
 	 * 
 	 * @throws WSSecurityException
@@ -591,13 +599,13 @@ public class WSSecSignature extends WSSecBase {
 	 * 
 	 * This is a convenience method and for backward compatibility. The method
 	 * creates a Signature and puts it into the Security header. It does so by
-	 * calling the sigle functions in order to perform a <i>one shot signature</i>.
+	 * calling the single functions in order to perform a <i>one shot signature</i>.
 	 * This method is compatible with the build method of the previous version
 	 * with the exception of the additional WSSecHeader parameter.
 	 * 
 	 * @param doc
 	 *            The unsigned SOAP envelope as <code>Document</code>
-	 * @param crypto
+	 * @param cr
 	 *            An instance of the Crypto API to handle keystore and
 	 *            certificates
 	 * @param secHeader
@@ -615,7 +623,7 @@ public class WSSecSignature extends WSSecBase {
 
 		Element securityHeader = secHeader.getSecurityHeader();
 
-		setupToken(doc, cr, securityHeader);
+		prepare(doc, cr, secHeader);
 
 		SOAPConstants soapConstants = WSSecurityUtil.getSOAPConstants(doc
 				.getDocumentElement());
@@ -628,16 +636,16 @@ public class WSSecSignature extends WSSecBase {
 			parts.add(encP);
 		}
 
-		addReferencesToSign(parts, securityHeader);
+		addReferencesToSign(parts, secHeader);
 
-		prependSignatureElementToHeader(securityHeader);
+		prependToHeader(secHeader);
 
 		/*
 		 * if we have a BST prepend it in front of the Signature according to
 		 * strict layout rules.
 		 */
 		if (bstToken != null) {
-			prependBSTElementToHeader(securityHeader);
+			prependBSTElementToHeader(secHeader);
 		}
 
 		computeSignature();
