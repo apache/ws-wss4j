@@ -129,6 +129,21 @@ Each new class also contains a <code>build()</code> method that is similar to th
 <code>build()</code> method in the old classes. Thus, if the flexibilty is not
 required you may use this method for convenience.
 
+<h3>Each top level security element has wsu:Id or plain Id attribute</h3>
+The <code>prepare()</code> method autmatically generates an Id string for each new
+element and sets the wsu:Id or plain Id attribute. Which type 
+of Id to use is determined by the security element. The <e>EncryptedKey</e> and <e>Signature</e> 
+elements have a plain Id according to the W3C specifications, elements defined by 
+the OASIS WS Security specifications contain a wsu:Id. 
+<p/>
+Each <code>WSSec*</code> class has a <code>getId()</code> that returns the id strig
+regardless if its qualified or not.
+<p/>
+The security processing uses these Id to identify each top level security element to
+provide additional further processing of an element, for example to encrypt a Signature or
+any other top level element. Also a Signature may include each top level element. Which
+parts of a message to sign and/or encrypt is controlled by the Security Policy
+
 @since WSS4J 2.0
 </body>
 </html>

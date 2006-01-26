@@ -215,6 +215,21 @@ public class WSSecSignature extends WSSecBase {
 	}
 
 	/**
+	 * Get the id generated during <code>prepare()</code>.
+	 * 
+	 * Returns the the value of wsu:Id attribute of the Signature element.
+	 * 
+	 * @return Return the wsu:Id of this token or null if <code>prepare()</code>
+	 *         was not called before.
+	 */
+	public String getId() {
+		if (sig == null) {
+			return null;
+		}
+		return sig.getId();
+	}
+
+	/**
 	 * Initialize a WSSec Signature.
 	 * 
 	 * The method sets up and initializes a WSSec Signature structure after the
@@ -319,6 +334,8 @@ public class WSSecSignature extends WSSecBase {
 		}
 
 		sig.addResourceResolver(EnvelopeIdResolver.getInstance());
+		String sigUri = "Signature-" + sig.hashCode();
+		sig.setId(sigUri);
 
 		keyInfo = sig.getKeyInfo();
 		keyInfoUri = "KeyId-" + keyInfo.hashCode();

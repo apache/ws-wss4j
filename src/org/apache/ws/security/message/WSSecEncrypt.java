@@ -222,6 +222,17 @@ public class WSSecEncrypt extends WSSecBase {
 	}
 
 	/**
+	 * Get the id generated during <code>prepare()</code>.
+	 * 
+	 * Returns the the value of wsu:Id attribute of the EncryptedKey element.
+	 * 
+	 * @return Return the wsu:Id of this token or null if <code>prepare()</code>
+	 *         was not called before.
+	 */
+	public String getId() {
+		return encKeyId;
+	}
+	/**
 	 * Initialize a WSSec Encrypt.
 	 * 
 	 * The method prepares and initializes a WSSec Encrypt structure after the
@@ -318,10 +329,7 @@ public class WSSecEncrypt extends WSSecBase {
 		 */
 		xencEncryptedKey = createEnrcyptedKey(doc, keyEncAlgo);
 		encKeyId = "EncKeyId-" + xencEncryptedKey.hashCode();
-		String prefix = WSSecurityUtil.setNamespace(xencEncryptedKey,
-				WSConstants.WSU_NS, WSConstants.WSU_PREFIX);
-		xencEncryptedKey.setAttributeNS(WSConstants.WSU_NS, prefix + ":Id",
-				encKeyId);
+		xencEncryptedKey.setAttributeNS(null, "Id",	encKeyId);
 
 		KeyInfo keyInfo = new KeyInfo(doc);
 
