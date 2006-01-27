@@ -60,10 +60,10 @@ public class WSSPolicyProcessor {
     SecurityPolicyToken topLevel = new SecurityPolicyToken("_TopLevel_",
             SecurityPolicyToken.COMPLEX_TOKEN, null);
 
-    SecurityProcessorContext secProcessorContext = null;
+    public SecurityProcessorContext secProcessorContext = null;
 
-    boolean setup() throws NoSuchMethodException {
-        prdr = PolicyFactory.getPolicyReader(PolicyFactory.OM_POLICY_READER);
+    public boolean setup() throws NoSuchMethodException {
+        prdr = PolicyFactory.getPolicyReader(PolicyFactory.DOM_POLICY_READER);
 
         /*
          * Initialize the top level security policy token.
@@ -123,7 +123,7 @@ public class WSSPolicyProcessor {
         return true;
     }
 
-    void go(String[] args) {
+    public void go(String[] args) {
 
         merged = null;
         for (int i = 0; i < args.length; i++) {
