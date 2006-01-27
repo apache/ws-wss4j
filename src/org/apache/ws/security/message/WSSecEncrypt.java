@@ -257,11 +257,11 @@ public class WSSecEncrypt extends WSSecBase {
 		document = doc;
 
 		/*
-		 * Generate a symmetric key (session key) for this Encrypt element. This
-		 * symmetric key will be encrypted using the public key of the receiver
+		 * If no external key (symmetricalKey) was set generate an encryption 
+		 * key (session key) for this Encrypt element. This
+		 * key will be encrypted using the public key of the receiver
 		 */
-		// This variable is made a classs attribute :: SecretKey symmetricKey =
-		// null;
+
 		this.encryptionKey = this.symmetricKey;
 		if (encryptionKey == null) {
 			KeyGenerator keyGen = getKeyGenerator();
@@ -481,13 +481,13 @@ public class WSSecEncrypt extends WSSecBase {
 	 * This method takes a vector of <code>WSEncryptionPart</code> object that
 	 * contain information about the elements to encrypt. The method call the
 	 * encryption method, takes the reference information generated during
-	 * encryption and add this to the <code>enc:Reference</code> element. This
+	 * encryption and add this to the <code>xenc:Reference</code> element. This
 	 * method can be called after <code>prepare()</code> and can be
 	 * called multiple times to encrypt a number of parts or elements.
 	 * 
 	 * </p>
 	 * 
-	 * The method generates a <code>enc:Reference</code> element that <i>must</i>
+	 * The method generates a <code>xenc:Reference</code> element that <i>must</i>
 	 * be added to this token. See <code>addInternalRefElement()</code>.
 	 * 
 	 * </p>
@@ -496,15 +496,15 @@ public class WSSecEncrypt extends WSSecBase {
 	 * creates and initializes a new Reference element.
 	 * 
 	 * @param dataRef
-	 *            A <code>enc:Reference</code> element or <code>null</code>
+	 *            A <code>xenc:Reference</code> element or <code>null</code>
 	 * @param references
 	 *            A vector containing WSEncryptionPart objects
-	 * @return Returns the updated <code>enc:Reference</code> element
+	 * @return Returns the updated <code>xenc:Reference</code> element
 	 * @throws WSSecurityException
 	 */
 	public Element encryptForInternalRef(Element dataRef, Vector references)
 			throws WSSecurityException {
-		Vector encDataRefs = doEncryption(document, this.encryptionKey, parts);
+		Vector encDataRefs = doEncryption(document, this.encryptionKey, references);
 		Element referenceList = dataRef;
 		if (referenceList == null) {
 			referenceList = document.createElementNS(WSConstants.ENC_NS,
@@ -520,13 +520,13 @@ public class WSSecEncrypt extends WSSecBase {
 	 * This method takes a vector of <code>WSEncryptionPart</code> object that
 	 * contain information about the elements to encrypt. The method call the
 	 * encryption method, takes the reference information generated during
-	 * encryption and add this to the <code>enc:Reference</code> element. This
+	 * encryption and add this to the <code>xenc:Reference</code> element. This
 	 * method can be called after <code>prepare()</code> and can be
 	 * called multiple times to encrypt a number of parts or elements.
 	 * 
 	 * </p>
 	 * 
-	 * The method generates a <code>enc:Reference</code> element that <i>must</i>
+	 * The method generates a <code>xenc:Reference</code> element that <i>must</i>
 	 * be added to the SecurityHeader. See <code>addExternalRefElement()</code>.
 	 * 
 	 * </p>
@@ -535,10 +535,10 @@ public class WSSecEncrypt extends WSSecBase {
 	 * creates and initializes a new Reference element.
 	 * 
 	 * @param dataRef
-	 *            A <code>enc:Reference</code> element or <code>null</code>
+	 *            A <code>xenc:Reference</code> element or <code>null</code>
 	 * @param references
 	 *            A vector containing WSEncryptionPart objects
-	 * @return Returns the updated <code>enc:Reference</code> element
+	 * @return Returns the updated <code>xenc:Reference</code> element
 	 * @throws WSSecurityException
 	 */
 	public Element encryptForExternalRef(Element dataRef, Vector references)
@@ -548,11 +548,12 @@ public class WSSecEncrypt extends WSSecBase {
 		SecurityTokenReference secToken = new SecurityTokenReference(document);
 		Reference ref = new Reference(document);
 		ref.setURI("#" + encKeyId);
+		secToken.setReference(ref);
 
 		keyInfo.addUnknownElement(secToken.getElement());
 
 		Vector encDataRefs = doEncryption(document, this.encryptionKey,
-				keyInfo, parts);
+				keyInfo, references);
 		Element referenceList = dataRef;
 		if (referenceList == null) {
 			referenceList = document.createElementNS(WSConstants.ENC_NS,
