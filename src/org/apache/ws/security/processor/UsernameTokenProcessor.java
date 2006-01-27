@@ -40,6 +40,8 @@ import java.util.Vector;
 public class UsernameTokenProcessor implements Processor {
     private static Log log = LogFactory.getLog(UsernameTokenProcessor.class.getName());
 
+    private String utId;
+    
     public void handleToken(Element elem, Crypto crypto, Crypto decCrypto, CallbackHandler cb, WSDocInfo wsDocInfo, Vector returnResults, WSSConfig wsc) throws WSSecurityException {
         if (log.isDebugEnabled()) {
             log.debug("Found UsernameToken list element");
@@ -47,6 +49,8 @@ public class UsernameTokenProcessor implements Processor {
         Principal lastPrincipalFound = handleUsernameToken((Element) elem, cb);
         returnResults.add(0, new WSSecurityEngineResult(WSConstants.UT,
                 lastPrincipalFound, null, null, null));
+        utId = elem.getAttributeNS(WSConstants.WSU_NS, "Id");
+
     }
 
     /**
@@ -140,4 +144,10 @@ public class UsernameTokenProcessor implements Processor {
         return principal;
     }
 
+    /* (non-Javadoc)
+     * @see org.apache.ws.security.processor.Processor#getId()
+     */
+    public String getId() {
+    	return utId;
+    }    
 }

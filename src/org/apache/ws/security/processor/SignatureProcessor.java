@@ -58,6 +58,8 @@ public class SignatureProcessor implements Processor {
     private static Log log = LogFactory.getLog(SignatureProcessor.class.getName());
     private static Log tlog =
             LogFactory.getLog("org.apache.ws.security.TIME");
+    
+    private String signatureId;
 
     public void handleToken(Element elem, Crypto crypto, Crypto decCrypto, CallbackHandler cb, WSDocInfo wsDocInfo, Vector returnResults, WSSConfig wsc) throws WSSecurityException {
         if (log.isDebugEnabled()) {
@@ -86,6 +88,7 @@ public class SignatureProcessor implements Processor {
                     WSConstants.SIGN, lastPrincipalFound,
                     returnCert[0], returnQname[0], signatureValue[0]));
         }
+        signatureId = elem.getAttributeNS(null, "Id");
     }
 
     /**
@@ -357,6 +360,13 @@ public class SignatureProcessor implements Processor {
         }
         throw new WSSecurityException(WSSecurityException.UNSUPPORTED_SECURITY_TOKEN,
                 "unsupportedBinaryTokenType", new Object[]{type});
+    }
+
+    /* (non-Javadoc)
+     * @see org.apache.ws.security.processor.Processor#getId()
+     */
+    public String getId() {
+    	return signatureId;
     }
 
 }

@@ -65,4 +65,12 @@ public class SAMLTokenProcessor implements Processor {
         return assertion;
     }
 
+    /* (non-Javadoc)
+     * @see org.apache.ws.security.processor.Processor#getId()
+     * TODO The Id of a SAML token?
+     */
+    public String getId() {
+    	return null;
+    }
+
 }

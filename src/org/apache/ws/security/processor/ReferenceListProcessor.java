@@ -25,6 +25,8 @@ import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
+import org.apache.ws.security.message.token.SecurityTokenReference;
+import org.apache.ws.security.message.token.Reference;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.xml.security.encryption.XMLCipher;
 import org.apache.xml.security.encryption.XMLEncryptionException;
@@ -37,91 +39,112 @@ import javax.security.auth.callback.CallbackHandler;
 import java.util.Vector;
 
 public class ReferenceListProcessor implements Processor {
-    private static Log log = LogFactory.getLog(ReferenceListProcessor.class.getName());
-    
-    WSSConfig wssConfig = null;    
+	private static Log log = LogFactory.getLog(ReferenceListProcessor.class
+			.getName());
 
-    public void handleToken(Element elem, Crypto crypto, Crypto decCrypto, CallbackHandler cb, WSDocInfo wsDocInfo, Vector returnResults, WSSConfig wsc) throws WSSecurityException {
-        if (log.isDebugEnabled()) {
-            log.debug("Found reference list element");
-        }
-        wssConfig = wsc;        
-        if (cb == null) {
-            throw new WSSecurityException(WSSecurityException.FAILURE,
-                    "noCallback");
-        }
-        handleReferenceList((Element) elem, cb);
-        returnResults.add(0, new WSSecurityEngineResult(WSConstants.ENCR, null, null, null, null));
-    }
+	private boolean debug = false;
 
-    /**
-     * Dereferences and decodes encrypted data elements.
-     *
-     * @param elem contains the <code>ReferenceList</code> to the
-     *             encrypted data elements
-     * @param cb   the callback handler to get the key for a key name
-     *             stored if <code>KeyInfo</code> inside the encrypted
-     *             data elements
-     */
-    private void handleReferenceList(Element elem, CallbackHandler cb)
-            throws WSSecurityException {
+	WSSConfig wssConfig = null;
 
-        Document doc = elem.getOwnerDocument();
+	WSDocInfo wsDocInfo = null;
 
-        Node tmpE = null;
-        for (tmpE = elem.getFirstChild();
-             tmpE != null;
-             tmpE = tmpE.getNextSibling()) {
-            if (tmpE.getNodeType() != Node.ELEMENT_NODE) {
-                continue;
-            }
-            if (!tmpE.getNamespaceURI().equals(WSConstants.ENC_NS)) {
-                continue;
-            }
-            if (tmpE.getLocalName().equals("DataReference")) {
-                String dataRefURI = ((Element) tmpE).getAttribute("URI");
-                decryptDataRefEmbedded(doc, dataRefURI, cb);
-            }
-        }
-    }
+	public void handleToken(Element elem, Crypto crypto, Crypto decCrypto,
+			CallbackHandler cb, WSDocInfo wdi, Vector returnResults,
+			WSSConfig wsc) throws WSSecurityException {
 
-    public void decryptDataRefEmbedded(Document doc,
-                                       String dataRefURI,
-                                       CallbackHandler cb)
-            throws WSSecurityException {
+		debug = log.isDebugEnabled();
+		if (debug) {
+			log.debug("Found reference list element");
+		}
+		if (cb == null) {
+			throw new WSSecurityException(WSSecurityException.FAILURE,
+					"noCallback");
+		}
+		wssConfig = wsc;
+		wsDocInfo = wdi;
+		handleReferenceList((Element) elem, cb);
+		returnResults.add(0, new WSSecurityEngineResult(WSConstants.ENCR, null,
+				null, null, null));
+	}
 
-        if (log.isDebugEnabled()) {
-            log.debug("Embedded found data refernce: " + dataRefURI);
-        }
-        /*
-         * Look up the encrypted data. First try wsu:Id="someURI". If no such Id then
-         * try the generic lookup to find Id="someURI"
-         */
-        Element encBodyData = null;
-        if ((encBodyData = WSSecurityUtil.getElementByWsuId(doc, dataRefURI)) == null) {
-            encBodyData = WSSecurityUtil.getElementByGenId(doc, dataRefURI);
-        }
-        if (encBodyData == null) {
-            throw new WSSecurityException
-                    (WSSecurityException.INVALID_SECURITY,
-                            "dataRef", new Object[]{dataRefURI});
-        }
+	/**
+	 * Dereferences and decodes encrypted data elements.
+	 * 
+	 * @param elem
+	 *            contains the <code>ReferenceList</code> to the encrypted
+	 *            data elements
+	 * @param cb
+	 *            the callback handler to get the key for a key name stored if
+	 *            <code>KeyInfo</code> inside the encrypted data elements
+	 */
+	private void handleReferenceList(Element elem, CallbackHandler cb)
+			throws WSSecurityException {
 
-        boolean content = X509Util.isContent(encBodyData);
+		Document doc = elem.getOwnerDocument();
 
-        // Now figure out the encryption algorithm
-        String symEncAlgo = X509Util.getEncAlgo(encBodyData);
+		Node tmpE = null;
+		for (tmpE = elem.getFirstChild(); tmpE != null; tmpE = tmpE
+				.getNextSibling()) {
+			if (tmpE.getNodeType() != Node.ELEMENT_NODE) {
+				continue;
+			}
+			if (!tmpE.getNamespaceURI().equals(WSConstants.ENC_NS)) {
+				continue;
+			}
+			if (tmpE.getLocalName().equals("DataReference")) {
+				String dataRefURI = ((Element) tmpE).getAttribute("URI");
+				decryptDataRefEmbedded(doc, dataRefURI, cb);
+			}
+		}
+	}
 
-        Element tmpE =
-                (Element) WSSecurityUtil.findElement((Node) encBodyData,
-                        "KeyInfo",
-                        WSConstants.SIG_NS);
+	public void decryptDataRefEmbedded(Document doc, String dataRefURI,
+			CallbackHandler cb) throws WSSecurityException {
 
-        SecretKey symmetricKey = X509Util.getSharedKey(tmpE, symEncAlgo, cb);
+		if (log.isDebugEnabled()) {
+			log.debug("Embedded found data refernce: " + dataRefURI);
+		}
+		/*
+		 * Look up the encrypted data. First try wsu:Id="someURI". If no such Id
+		 * then try the generic lookup to find Id="someURI"
+		 */
+		Element encBodyData = null;
+		if ((encBodyData = WSSecurityUtil.getElementByWsuId(doc, dataRefURI)) == null) {
+			encBodyData = WSSecurityUtil.getElementByGenId(doc, dataRefURI);
+		}
+		if (encBodyData == null) {
+			throw new WSSecurityException(WSSecurityException.INVALID_SECURITY,
+					"dataRef", new Object[] { dataRefURI });
+		}
 
-        // initialize Cipher ....
-        XMLCipher xmlCipher = null;
-        try {
+		boolean content = X509Util.isContent(encBodyData);
+
+		// Now figure out the encryption algorithm
+		String symEncAlgo = X509Util.getEncAlgo(encBodyData);
+
+		Element tmpE = (Element) WSSecurityUtil.findElement((Node) encBodyData,
+				"KeyInfo", WSConstants.SIG_NS);
+		if (tmpE == null) {
+			throw new WSSecurityException(WSSecurityException.INVALID_SECURITY,
+					"noKeyinfo");
+		}
+
+		/*
+		 * Try to get a security reference token, if none found try to get a
+		 * shared key using a KeyName.
+		 */
+		Element secRefToken = (Element) WSSecurityUtil.getDirectChild(tmpE,
+				"SecurityTokenReference", WSConstants.WSSE_NS);
+
+		SecretKey symmetricKey = null;
+		if (secRefToken == null) {
+			symmetricKey = X509Util.getSharedKey(tmpE, symEncAlgo, cb);
+		} else
+			symmetricKey = getKeyFromReference(secRefToken, symEncAlgo);
+
+		// initialize Cipher ....
+		XMLCipher xmlCipher = null;
+		try {
 			String provider = wssConfig.getJceProviderId();
 			if (provider == null) {
 				xmlCipher = XMLCipher.getInstance(symEncAlgo);
@@ -129,18 +152,77 @@ public class ReferenceListProcessor implements Processor {
 				xmlCipher = XMLCipher.getProviderInstance(symEncAlgo, provider);
 			}
 			xmlCipher.init(XMLCipher.DECRYPT_MODE, symmetricKey);
-        } catch (XMLEncryptionException e1) {
-            throw new WSSecurityException(WSSecurityException.UNSUPPORTED_ALGORITHM, null, null, e1);
-        }
+		} catch (XMLEncryptionException e1) {
+			throw new WSSecurityException(
+					WSSecurityException.UNSUPPORTED_ALGORITHM, null, null, e1);
+		}
 
-        if (content) {
-            encBodyData = (Element) encBodyData.getParentNode();
-        }
-        try {
-            xmlCipher.doFinal(doc, encBodyData, content);
-        } catch (Exception e) {
-            throw new WSSecurityException(WSSecurityException.FAILED_ENC_DEC, null, null, e);
-        }
-    }
+		if (content) {
+			encBodyData = (Element) encBodyData.getParentNode();
+		}
+		try {
+			xmlCipher.doFinal(doc, encBodyData, content);
+		} catch (Exception e) {
+			throw new WSSecurityException(WSSecurityException.FAILED_ENC_DEC,
+					null, null, e);
+		}
+	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.apache.ws.security.processor.Processor#getId()
+	 * 
+	 * A reference list does not have an id.
+	 */
+	public String getId() {
+		return null;
+	}
+
+	/**
+	 * Retrieves a secret key (session key) from a already parsed EncryptedKey
+	 * element
+	 * 
+	 * This method takes a security token reference (STR) element and checks if
+	 * it contains a Reference element. Then it gets the vale of the URI
+	 * attribute of the Reference and uses the retrieved value to lookup an
+	 * EncrypteKey element to get the decrypted session key bytes. Using the
+	 * algorithm parameter these bytes are converted into a secret key.
+	 * 
+	 * <p/>
+	 * 
+	 * This method requires that the EncyrptedKey element is already available,
+	 * thus requires a strict layout of the security header. This method
+	 * supports EncryptedKey elements within the same message.
+	 * 
+	 * @param secRefToken
+	 *            The element containg the STR
+	 * @param algorithm
+	 *            A string that identifies the symmetric decryption algorithm
+	 * @return The secret key for the specified algorithm
+	 * @throws WSSecurityException
+	 */
+	private SecretKey getKeyFromReference(Element secRefToken, String algorithm)
+			throws WSSecurityException {
+
+		SecurityTokenReference secRef = new SecurityTokenReference(secRefToken);
+		byte[] decryptedData = null;
+
+		if (secRef.containsReference()) {
+			Reference reference = secRef.getReference();
+			String uri = reference.getURI();
+			String id = uri.substring(1);
+			Processor p = wsDocInfo.getProcessor(id);
+			if (p == null || !(p instanceof EncryptedKeyProcessor)) {
+				throw new WSSecurityException(
+						WSSecurityException.FAILED_ENC_DEC, "unsupportedKeyId");
+			}
+			EncryptedKeyProcessor ekp = (EncryptedKeyProcessor) p;
+			decryptedData = ekp.getDecryptedBytes();
+		} else {
+			throw new WSSecurityException(WSSecurityException.FAILED_ENC_DEC,
+					"noReference");
+		}
+		return WSSecurityUtil.prepareSecretKey(algorithm, decryptedData);
+	}
 }

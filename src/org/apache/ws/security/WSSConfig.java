@@ -46,7 +46,7 @@ import javax.xml.namespace.QName;
  * <p/>
  *
  * @author Rami Jaamour (rjaamour@parasoft.com)
- * @author Werner Dittmann (Werner.Dittmann@t-online.de)
+ * @author Werner Dittmann (werner@apache.org)
  */
 public class WSSConfig {
     private static Log log = LogFactory.getLog(WSSConfig.class.getName());

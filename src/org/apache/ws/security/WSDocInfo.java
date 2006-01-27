@@ -32,6 +32,7 @@ package org.apache.ws.security;
  */
 
 import org.apache.ws.security.components.crypto.Crypto;
+import org.apache.ws.security.processor.Processor;
 import org.w3c.dom.Element;
 
 import java.util.Enumeration;
@@ -42,6 +43,7 @@ public class WSDocInfo {
     Crypto crypto = null;
     Vector bst = null;
     Element assertion = null;
+    Vector processors = null;
 
     public WSDocInfo(int hash) {
         this.hash = hash;
@@ -56,7 +58,12 @@ public class WSDocInfo {
         if (bst != null && bst.size() > 0) {
             bst.removeAllElements();
         }
+        if (processors != null && processors.size() > 0) {
+        	processors.removeAllElements();
+        }
+        
         bst = null;
+        processors = null;
     }
 
     /**
@@ -81,6 +88,43 @@ public class WSDocInfo {
         return elem;
     }
 
+    /**
+     * Get a Processor for the given Id
+     *
+     * @param id is the Id to look for
+     * @return the Security processor identified with this Id or null if nothing found
+     */
+    public Processor getProcessor(String id) {
+    	
+    	if (id == null) {
+    		return null;
+    	}
+
+    	Processor p = null;
+        if (processors != null) {
+            for (Enumeration e = processors.elements(); e.hasMoreElements();) {
+                p = (Processor) e.nextElement();
+                String cId = p.getId();
+                if (id.equals(cId)) {
+                    break;
+                }
+            }
+        }
+        return p;
+    }
+    
+    /**
+     * Store a Processor for later access.
+     * 
+     * @param p is the Processor to store
+     */
+    public void setProcessor(Processor p) {
+        if (processors == null) {
+        	processors = new Vector();
+        }
+        processors.add(p);
+    }
+    
     /**
      * @return the signature crypto class used to process
      *         the signature/verfiy

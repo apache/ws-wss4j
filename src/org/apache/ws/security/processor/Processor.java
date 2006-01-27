@@ -30,4 +30,11 @@ public interface Processor {
 	public void handleToken(Element elem, Crypto crypto, Crypto decCrypto,
 			CallbackHandler cb, WSDocInfo wsDocInfo, Vector returnResults,
 			WSSConfig config) throws WSSecurityException;
+	
+    /**
+     * Get the Id of the processoer.
+     * 
+     * @return The Id string
+     */
+	public String getId();
 }

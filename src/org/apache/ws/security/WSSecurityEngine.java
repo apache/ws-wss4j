@@ -248,8 +248,14 @@ public class WSSecurityEngine {
             }
             QName el = new QName(elem.getNamespaceURI(), elem.getLocalName());
             Processor p = wssConfig.getProcessor(el);
+            /*
+             * Call the processor for this token. After the processor returns, 
+             * store it for later retrival. The token processor may store some
+             * information about the processed token
+             */
             if (p != null) {
                 p.handleToken((Element) elem, sigCrypto, decCrypto, cb, wsDocInfo, returnResults, wssConfig);
+                wsDocInfo.setProcessor(p);
             } else {
                 /*
                 * Add check for a BinarySecurityToken, add info to WSDocInfo. If BST is

@@ -34,6 +34,8 @@ import java.util.Vector;
 public class SignatureConfirmationProcessor implements Processor {
     private static Log log = LogFactory.getLog(SignatureConfirmationProcessor.class.getName());
 
+    private String scId;
+    
     public void handleToken(Element elem, Crypto crypto, Crypto decCrypto, CallbackHandler cb, WSDocInfo wsDocInfo, Vector returnResults, WSSConfig wsc) throws WSSecurityException {
         if (log.isDebugEnabled()) {
             log.debug("Found SignatureConfirmation list element");
@@ -45,5 +47,14 @@ public class SignatureConfirmationProcessor implements Processor {
                 (Element) elem);
         returnResults.add(0, new WSSecurityEngineResult(WSConstants.SC,
                 sigConf));
+        
+        scId = elem.getAttributeNS(WSConstants.WSU_NS, "Id");
     }
+    
+    /* (non-Javadoc)
+     * @see org.apache.ws.security.processor.Processor#getId()
+     */
+    public String getId() {
+    	return scId;
+    }    
 }

@@ -56,8 +56,9 @@ public class EncryptedKeyProcessor implements Processor {
     private static Log tlog =
             LogFactory.getLog("org.apache.ws.security.TIME");
 
-    byte[] decryptedBytes = null;
-    WSSConfig wssConfig = null;
+    private byte[] decryptedBytes = null;
+    private WSSConfig wssConfig = null;
+    private String encryptedKeyId = null;
 
     public void handleToken(Element elem, Crypto crypto, Crypto decCrypto, CallbackHandler cb, WSDocInfo wsDocInfo, Vector returnResults, WSSConfig wsc) throws WSSecurityException {
         if (log.isDebugEnabled()) {
@@ -73,6 +74,8 @@ public class EncryptedKeyProcessor implements Processor {
                     "noCallback");
         }
         handleEncryptedKey((Element) elem, cb, decCrypto);
+        encryptedKeyId = elem.getAttributeNS(null, "Id");
+
         returnResults.add(0, new WSSecurityEngineResult(WSConstants.ENCR, null, null, null, null));
     }
 
@@ -135,10 +138,14 @@ public class EncryptedKeyProcessor implements Processor {
                 Element secRefToken;
                 secRefToken = (Element) WSSecurityUtil.getDirectChild(keyInfo,
                         "SecurityTokenReference", WSConstants.WSSE_NS);
-                if (secRefToken == null) {
-                    secRefToken = (Element) WSSecurityUtil.getDirectChild(keyInfo,
-                            "KeyName", WSConstants.SIG_NS);
-                }
+                /*
+                 * EncryptedKey must a a STR as child of KeyInfo, KeyName  
+                 * valid only for EncryptedData
+                 */
+//                if (secRefToken == null) {
+//                    secRefToken = (Element) WSSecurityUtil.getDirectChild(keyInfo,
+//                            "KeyName", WSConstants.SIG_NS);
+//                }
                 if (secRefToken == null) {
                     throw new WSSecurityException
                             (WSSecurityException.INVALID_SECURITY, "noSecTokRef");
@@ -403,6 +410,25 @@ public class EncryptedKeyProcessor implements Processor {
         }
     }
 
+    /**
+     * Get the Id of the encrypted key element.
+     * 
+     * @return The Id string
+     */
+    public String getId() {
+    	return encryptedKeyId;
+    }
+    
+    
+    /**
+     * Get the decrypted key.
+     * 
+     * The encrypted key element contains an encrypted session key. The
+     * security functions use the session key to encrypt contents of the message
+     * with symmetrical encryption methods.
+     *  
+     * @return The decrypted key.
+     */
     public byte[] getDecryptedBytes() {
         return decryptedBytes;
     }
