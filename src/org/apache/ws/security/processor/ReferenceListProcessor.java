@@ -102,7 +102,7 @@ public class ReferenceListProcessor implements Processor {
 			CallbackHandler cb) throws WSSecurityException {
 
 		if (log.isDebugEnabled()) {
-			log.debug("Embedded found data refernce: " + dataRefURI);
+			log.debug("Found data reference: " + dataRefURI);
 		}
 		/*
 		 * Look up the encrypted data. First try wsu:Id="someURI". If no such Id
