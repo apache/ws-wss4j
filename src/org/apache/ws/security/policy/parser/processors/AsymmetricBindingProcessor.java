@@ -17,6 +17,7 @@ package org.apache.ws.security.policy.parser.processors;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.ws.security.policy.model.Binding;
 import org.apache.ws.security.policy.parser.SecurityPolicy;
 import org.apache.ws.security.policy.parser.SecurityPolicyToken;
 import org.apache.ws.security.policy.parser.SecurityProcessorContext;
@@ -32,7 +33,7 @@ public class AsymmetricBindingProcessor {
     private boolean initializedAsymmetricBinding = false;
     
 	/**
-	 * Intialize the SymmetricBinding complex token.
+	 * Intialize the AsymmetricBinding complex token.
 	 * 
 	 * This method creates a copy of the SymmetricBinding token and sets the
 	 * handler object to the copy. Then it creates copies of the child tokens
@@ -135,6 +136,9 @@ public class AsymmetricBindingProcessor {
 		log.debug("Processing "
 				+ spc.readCurrentSecurityToken().getTokenName() + ": "
 				+ SecurityProcessorContext.ACTION_NAMES[spc.getAction()]);
+        if(spc.getAction() == SecurityProcessorContext.START) {
+            ((Binding)spc.readCurrentPolicyEngineData()).setIncludeTimestamp(true);
+        }
 		return new Boolean(true);
 	}
 
