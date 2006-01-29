@@ -45,7 +45,7 @@ public class WSHandlerConstants {
      * <p/>
      * The application may set this parameter using the following method:
      * <pre>
-     * call.setProperty(WSDoAllConstants.ACTION, WSDoAllConstants.USERNAME_TOKEN);
+     * call.setProperty(WSHandlerConstants.ACTION, WSHandlerConstants.USERNAME_TOKEN);
      * </pre>
      * However, the parameter in the WSDD deployment file overwrites the
      * property setting (deployment setting overwrites application setting)
@@ -133,7 +133,7 @@ public class WSHandlerConstants {
      * <p/>
      * The application may set this parameter using the following method:
      * <pre>
-     * call.setProperty(WSDoAllConstants.ACTOR, "ActorName");
+     * call.setProperty(WSHandlerConstants.ACTOR, "ActorName");
      * </pre>
      * However, the parameter in the WSDD deployment file overwrites the
      * property setting (deployment setting overwrites application setting).
@@ -159,7 +159,7 @@ public class WSHandlerConstants {
      * <p/>
      * The application may set this parameter using the following method:
      * <pre>
-     * call.setProperty(WSDoAllConstants.MUST_UNDERSTAND, "false");
+     * call.setProperty(WSHandlerConstants.MUST_UNDERSTAND, "false");
      * </pre>
      * However, the parameter in the WSDD deployment file overwrites the
      * property setting (deployment setting overwrites application setting).
@@ -252,7 +252,7 @@ public class WSHandlerConstants {
      * <p/>
      * The application may set this parameter using the following method:
      * <pre>
-     * call.setProperty(WSDoAllConstants.PW_CALLBACK_CLASS, "PWCallbackClass");
+     * call.setProperty(WSHandlerConstants.PW_CALLBACK_CLASS, "PWCallbackClass");
      * </pre>
      * However, the parameter in the WSDD deployment file overwrites the
      * property setting (deployment setting overwrites application setting).
@@ -267,7 +267,7 @@ public class WSHandlerConstants {
      * the {@link javax.security.auth.callback.CallbackHandler} interface.
      * Only the application can set this property using:
      * <pre>
-     * call.setProperty(WSDoAllConstants.PW_CALLBACK_REF, anPWCallbackObject);
+     * call.setProperty(WSHandlerConstants.PW_CALLBACK_REF, anPWCallbackObject);
      * </pre>
      * Refer to {@link #PW_CALLBACK_CLASS} for further information about
      * password callback handling and the priority of the different
@@ -303,7 +303,7 @@ public class WSHandlerConstants {
      * <p/>
      * The application may set this parameter using the following method:
      * <pre>
-     * call.setProperty(WSDoAllConstants.ENCYRPTION_USER, "encryptionuser");
+     * call.setProperty(WSHandlerConstants.ENCYRPTION_USER, "encryptionuser");
      * </pre>
      * However, the parameter in the WSDD deployment file overwrites the
      * property setting (deployment setting overwrites application setting).
@@ -391,7 +391,7 @@ public class WSHandlerConstants {
      * </ul>
      * The application may set this parameter using the following method:
      * <pre>
-     * call.setProperty(WSDoAllConstants.SIG_PROP_FILE, "myCrypto.properties");
+     * call.setProperty(WSHandlerConstants.SIG_PROP_FILE, "myCrypto.properties");
      * </pre>
      * However, the parameter in the WSDD deployment file overwrites the
      * property setting (deployment setting overwrites application setting).
@@ -420,7 +420,7 @@ public class WSHandlerConstants {
      * <p/>
      * The application may set this parameter using the following method:
      * <pre>
-     * call.setProperty(WSDoAllConstants.DEC_PROP_FILE, "myCrypto.properties");
+     * call.setProperty(WSHandlerConstants.DEC_PROP_FILE, "myCrypto.properties");
      * </pre>
      * However, the parameter in the WSDD deployment file overwrites the
      * property setting (deployment setting overwrites application setting).
@@ -441,7 +441,7 @@ public class WSHandlerConstants {
      * <p/>
      * The application may set this parameter using the following method:
      * <pre>
-     * call.setProperty(WSDoAllConstants.PASSWORD_TYPE, WSConstants.PW_DIGEST);
+     * call.setProperty(WSHandlerConstants.PASSWORD_TYPE, WSConstants.PW_DIGEST);
      * </pre>
      * However, the parameter in the WSDD deployment file overwrites the
      * property setting (deployment setting overwrites application setting).
@@ -472,7 +472,7 @@ public class WSHandlerConstants {
      * <p/>
      * The application may set this parameter using the following method:
      * <pre>
-     * call.setProperty(WSDoAllConstants.SIG_KEY_ID, "DirectReference");
+     * call.setProperty(WSHandlerConstants.SIG_KEY_ID, "DirectReference");
      * </pre>
      * However, the parameter in the WSDD deployment file overwrites the
      * property setting (deployment setting overwrites application setting).
@@ -486,7 +486,7 @@ public class WSHandlerConstants {
      * <p/>
      * The application may set this parameter using the following method:
      * <pre>
-     * call.setProperty(WSDoAllConstants.SIG_ALGO, "SHA1RSA");
+     * call.setProperty(WSHandlerConstants.SIG_ALGO, "SHA1RSA");
      * </pre>
      * However, the parameter in the WSDD deployment file overwrites the
      * property setting (deployment setting overwrites application setting).
@@ -530,7 +530,7 @@ public class WSHandlerConstants {
      * <p/>
      * The application may set this parameter using the following method:
      * <pre>
-     * call.setProperty(WSDoAllConstants.ENC_PROP_FILE, "myCrypto.properties");
+     * call.setProperty(WSHandlerConstants.ENC_PROP_FILE, "myCrypto.properties");
      * </pre>
      * However, the parameter in the WSDD deployment file overwrites the
      * property setting (deployment setting overwrites application setting).
@@ -551,7 +551,7 @@ public class WSHandlerConstants {
      * <p/>
      * The application may set this parameter using the following method:
      * <pre>
-     * call.setProperty(WSDoAllConstants.ENC_KEY_ID, "X509KeyIdentifier");
+     * call.setProperty(WSHandlerConstants.ENC_KEY_ID, "X509KeyIdentifier");
      * </pre>
      * However, the parameter in the WSDD deployment file overwrites the
      * property setting (deployment setting overwrites application setting).
@@ -567,7 +567,7 @@ public class WSHandlerConstants {
      * <p/>
      * The application may set this parameter using the following method:
      * <pre>
-     * call.setProperty(WSDoAllConstants.ENC_SYM_ALGO, WSConstants.AES_256);
+     * call.setProperty(WSHandlerConstants.ENC_SYM_ALGO, WSConstants.AES_256);
      * </pre>
      * However, the parameter in the WSDD deployment file overwrites the
      * property setting (deployment setting overwrites application setting).
@@ -580,7 +580,7 @@ public class WSHandlerConstants {
      * <p/>
      * The application may set this parameter using the following method:
      * <pre>
-     * call.setProperty(WSDoAllConstants.ENC_KEY_TRANSPORT, "RSA15");
+     * call.setProperty(WSHandlerConstants.ENC_KEY_TRANSPORT, "RSA15");
      * </pre>
      * However, the parameter in the WSDD deployment file overwrites the
      * property setting (deployment setting overwrites application setting).
