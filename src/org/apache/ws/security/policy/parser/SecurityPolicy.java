@@ -314,7 +314,10 @@ public class SecurityPolicy {
 	public static final SecurityPolicyToken encryptBeforeSigning = new SecurityPolicyToken(
 			"EncryptBeforeSigning", SecurityPolicyToken.SIMPLE_TOKEN, null);
 
-	public static final SecurityPolicyToken encryptSignature = new SecurityPolicyToken(
+    public static final SecurityPolicyToken signBeforeEncrypting = new SecurityPolicyToken(
+            "SignBeforeEncrypting", SecurityPolicyToken.SIMPLE_TOKEN, null);
+
+    public static final SecurityPolicyToken encryptSignature = new SecurityPolicyToken(
 			"EncryptSignature", SecurityPolicyToken.SIMPLE_TOKEN, null);
 
 	public static final SecurityPolicyToken protectTokens = new SecurityPolicyToken(

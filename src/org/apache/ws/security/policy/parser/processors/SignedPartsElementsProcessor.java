@@ -181,7 +181,7 @@ public class SignedPartsElementsProcessor {
 		log.debug("Processing "
 				+ spc.readCurrentSecurityToken().getTokenName() + ": "
 				+ SecurityProcessorContext.ACTION_NAMES[spc.getAction()]);
-            if(spc.getAction() == 2) {
+            if(spc.getAction() == SecurityProcessorContext.START) {
                 ((SignedEncryptedParts)spc.readCurrentPolicyEngineData()).setBody(true);
             }
 		return new Boolean(true);
@@ -191,7 +191,7 @@ public class SignedPartsElementsProcessor {
 		log.debug("Processing "
 				+ spc.readCurrentSecurityToken().getTokenName() + ": "
 				+ SecurityProcessorContext.ACTION_NAMES[spc.getAction()]);
-        if(spc.getAction() == 2) {
+        if(spc.getAction() == SecurityProcessorContext.START) {
             //Extract the sp:Header/@Name and sp:Header/@Namespace attrs
             //And create a Header
             Header header = new Header();
@@ -206,7 +206,7 @@ public class SignedPartsElementsProcessor {
 		log.debug("Processing "
 				+ spc.readCurrentSecurityToken().getTokenName() + ": "
 				+ SecurityProcessorContext.ACTION_NAMES[spc.getAction()]);
-        if(spc.getAction() == 2) {
+        if(spc.getAction() == SecurityProcessorContext.START) {
             ((SignedEncryptedElements) spc.readCurrentPolicyEngineData())
                     .addXPathExpression(spc.getAssertion().getStrValue());
         }

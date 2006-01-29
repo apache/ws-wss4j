@@ -112,14 +112,14 @@ public class LayoutProcessor {
 				+ spc.readCurrentSecurityToken().getTokenName() + ": "
 				+ SecurityProcessorContext.ACTION_NAMES[spc.getAction()]);
         try {
-            if(spc.getAction() == 2) {
+            if(spc.getAction() == SecurityProcessorContext.START) {
                 Layout layout = (Layout) spc.readCurrentPolicyEngineData();
                 layout.setValue(spc.getAssertion().getName().getLocalPart());
                 ((Binding)spc.readPreviousPolicyEngineData()).setLayout(layout);
             }
         } catch (WSSPolicyException e) {
-            // TODO Throw this exception out
-            e.printStackTrace();
+            log.error(e.getMessage(), e);
+            return new Boolean(false);                
         }
 		return new Boolean(true);
 	}
@@ -129,14 +129,14 @@ public class LayoutProcessor {
 				+ spc.readCurrentSecurityToken().getTokenName() + ": "
 				+ SecurityProcessorContext.ACTION_NAMES[spc.getAction()]);
         try {
-            if(spc.getAction() == 2) {
+            if(spc.getAction() == SecurityProcessorContext.START) {
                 Layout layout = (Layout) spc.readCurrentPolicyEngineData();
                 layout.setValue(spc.getAssertion().getName().getLocalPart());
                 ((Binding)spc.readPreviousPolicyEngineData()).setLayout(layout);
             }
         } catch (WSSPolicyException e) {
-            // TODO Throw this exception out
-            e.printStackTrace();
+            log.error(e.getMessage(), e);
+            return new Boolean(false);                
         }
 		return new Boolean(true);
 	}
@@ -146,14 +146,14 @@ public class LayoutProcessor {
 				+ spc.readCurrentSecurityToken().getTokenName() + ": "
 				+ SecurityProcessorContext.ACTION_NAMES[spc.getAction()]);
         try {
-            if(spc.getAction() == 2) {
+            if(spc.getAction() == SecurityProcessorContext.START) {
                 Layout layout = (Layout) spc.readCurrentPolicyEngineData();
                 layout.setValue(spc.getAssertion().getName().getLocalPart());
                 ((Binding)spc.readPreviousPolicyEngineData()).setLayout(layout);
             }
         } catch (WSSPolicyException e) {
-            // TODO Throw this exception out
-            e.printStackTrace();
+            log.error(e.getMessage(), e);
+            return new Boolean(false);                
         }
 		return new Boolean(true);
 	}
@@ -163,14 +163,14 @@ public class LayoutProcessor {
 				+ spc.readCurrentSecurityToken().getTokenName() + ": "
 				+ SecurityProcessorContext.ACTION_NAMES[spc.getAction()]);
         try {
-            if(spc.getAction() == 2) {
+            if(spc.getAction() == SecurityProcessorContext.START) {
                 Layout layout = (Layout) spc.readCurrentPolicyEngineData();
                 layout.setValue(spc.getAssertion().getName().getLocalPart());
                 ((Binding)spc.readPreviousPolicyEngineData()).setLayout(layout);
             }
         } catch (WSSPolicyException e) {
-            // TODO Throw this exception out
-            e.printStackTrace();
+            log.error(e.getMessage(), e);
+            return new Boolean(false);                
         }
 		return new Boolean(true);
 	}

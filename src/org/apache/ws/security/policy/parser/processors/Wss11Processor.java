@@ -121,7 +121,7 @@ public class Wss11Processor {
 		log.debug("Processing "
 				+ spc.readCurrentSecurityToken().getTokenName() + ": "
 				+ SecurityProcessorContext.ACTION_NAMES[spc.getAction()]);
-        if(spc.getAction() == SecurityProcessorContext.COMMIT) {
+        if(spc.getAction() == SecurityProcessorContext.START) {
             ((Wss11)spc.readCurrentPolicyEngineData()).setMustSupportRefKeyIdentifier(true);
         }
         return new Boolean(true);
@@ -131,7 +131,7 @@ public class Wss11Processor {
 		log.debug("Processing "
 				+ spc.readCurrentSecurityToken().getTokenName() + ": "
 				+ SecurityProcessorContext.ACTION_NAMES[spc.getAction()]);
-        if(spc.getAction() == SecurityProcessorContext.COMMIT) {
+        if(spc.getAction() == SecurityProcessorContext.START) {
             ((Wss11)spc.readCurrentPolicyEngineData()).setMustSupportRefIssuerSerial(true);
         }
         return new Boolean(true);
@@ -141,7 +141,7 @@ public class Wss11Processor {
 		log.debug("Processing "
 				+ spc.readCurrentSecurityToken().getTokenName() + ": "
 				+ SecurityProcessorContext.ACTION_NAMES[spc.getAction()]);
-        if(spc.getAction() == SecurityProcessorContext.COMMIT) {
+        if(spc.getAction() == SecurityProcessorContext.START) {
             ((Wss11)spc.readCurrentPolicyEngineData()).setMustSupportRefExternalURI(true);
         }
         return new Boolean(true);
@@ -151,7 +151,7 @@ public class Wss11Processor {
 		log.debug("Processing "
 				+ spc.readCurrentSecurityToken().getTokenName() + ": "
 				+ SecurityProcessorContext.ACTION_NAMES[spc.getAction()]);
-        if(spc.getAction() == SecurityProcessorContext.COMMIT) {
+        if(spc.getAction() == SecurityProcessorContext.START) {
             ((Wss11)spc.readCurrentPolicyEngineData()).setMustSupportRefEmbeddedToken(true);
         }
         return new Boolean(true);
@@ -161,7 +161,7 @@ public class Wss11Processor {
 		log.debug("Processing "
 				+ spc.readCurrentSecurityToken().getTokenName() + ": "
 				+ SecurityProcessorContext.ACTION_NAMES[spc.getAction()]);
-        if(spc.getAction() == SecurityProcessorContext.COMMIT) {
+        if(spc.getAction() == SecurityProcessorContext.START) {
             ((Wss11)spc.readCurrentPolicyEngineData()).setMustSupportRefThumbprint(true);
         }
         return new Boolean(true);
@@ -171,7 +171,7 @@ public class Wss11Processor {
 		log.debug("Processing "
 				+ spc.readCurrentSecurityToken().getTokenName() + ": "
 				+ SecurityProcessorContext.ACTION_NAMES[spc.getAction()]);
-        if(spc.getAction() == SecurityProcessorContext.COMMIT) {
+        if(spc.getAction() == SecurityProcessorContext.START) {
             ((Wss11)spc.readCurrentPolicyEngineData()).setMustSupportRefEncryptedKey(true);
         }
 		return new Boolean(true);
@@ -181,7 +181,7 @@ public class Wss11Processor {
 		log.debug("Processing "
 				+ spc.readCurrentSecurityToken().getTokenName() + ": "
 				+ SecurityProcessorContext.ACTION_NAMES[spc.getAction()]);
-        if(spc.getAction() == SecurityProcessorContext.COMMIT) {
+        if(spc.getAction() == SecurityProcessorContext.START) {
             ((Wss11)spc.readCurrentPolicyEngineData()).setRequireSignatureConfirmation(true);
         }
 		return new Boolean(true);

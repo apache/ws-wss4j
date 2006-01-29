@@ -98,6 +98,10 @@ public class SymmetricBindingProcessor {
 		tmpSpt.setProcessTokenMethod(this);
 		spt.setChildToken(tmpSpt);
 
+        tmpSpt = SecurityPolicy.signBeforeEncrypting.copy();
+        tmpSpt.setProcessTokenMethod(this);
+        spt.setChildToken(tmpSpt);
+
 		tmpSpt = SecurityPolicy.encryptSignature.copy();
 		tmpSpt.setProcessTokenMethod(this);
 		spt.setChildToken(tmpSpt);
@@ -164,6 +168,21 @@ public class SymmetricBindingProcessor {
         }
 		return new Boolean(true);
 	}
+
+    public Object doSignBeforeEncrypting(SecurityProcessorContext spc) {
+        log.debug("Processing "
+                + spc.readCurrentSecurityToken().getTokenName() + ": "
+                + SecurityProcessorContext.ACTION_NAMES[spc.getAction()]);
+        if(spc.getAction() == SecurityProcessorContext.START) {
+            try {
+                ((SymmetricBinding) spc.readCurrentPolicyEngineData()).setProtectionOrder(spc
+                        .getAssertion().getName().getLocalPart());
+            } catch (WSSPolicyException e) {
+                return new Boolean(false);
+            }
+        }
+        return new Boolean(true);
+    }
 
 	public Object doEncryptSignature(SecurityProcessorContext spc) {
 	    log.debug("Processing "

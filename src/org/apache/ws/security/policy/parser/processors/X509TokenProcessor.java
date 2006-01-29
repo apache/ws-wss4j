@@ -23,6 +23,7 @@ import org.apache.ws.policy.PrimitiveAssertion;
 import org.apache.ws.security.policy.Constants;
 import org.apache.ws.security.policy.WSSPolicyException;
 import org.apache.ws.security.policy.model.TokenWrapper;
+import org.apache.ws.security.policy.model.Wss11;
 import org.apache.ws.security.policy.model.X509Token;
 import org.apache.ws.security.policy.parser.SecurityPolicy;
 import org.apache.ws.security.policy.parser.SecurityPolicyToken;
@@ -160,6 +161,9 @@ public class X509TokenProcessor {
 		log.debug("Processing "
 				+ spc.readCurrentSecurityToken().getTokenName() + ": "
 				+ SecurityProcessorContext.ACTION_NAMES[spc.getAction()]);
+        if(spc.getAction() == SecurityProcessorContext.START) {
+            ((X509Token)spc.readCurrentPolicyEngineData()).setRequireKeyIdentifierReference(true);
+        }
 		return new Boolean(true);
 	}
 
@@ -167,6 +171,9 @@ public class X509TokenProcessor {
 		log.debug("Processing "
 				+ spc.readCurrentSecurityToken().getTokenName() + ": "
 				+ SecurityProcessorContext.ACTION_NAMES[spc.getAction()]);
+        if(spc.getAction() == SecurityProcessorContext.START) {
+            ((X509Token)spc.readCurrentPolicyEngineData()).setRequireIssuerSerialReference(true);
+        }
 		return new Boolean(true);
 	}
 
@@ -174,6 +181,9 @@ public class X509TokenProcessor {
 		log.debug("Processing "
 				+ spc.readCurrentSecurityToken().getTokenName() + ": "
 				+ SecurityProcessorContext.ACTION_NAMES[spc.getAction()]);
+        if(spc.getAction() == SecurityProcessorContext.START) {
+            ((X509Token)spc.readCurrentPolicyEngineData()).setRequireEmbeddedTokenReference(true);
+        }
 		return new Boolean(true);
 	}
 
@@ -181,6 +191,9 @@ public class X509TokenProcessor {
 		log.debug("Processing "
 				+ spc.readCurrentSecurityToken().getTokenName() + ": "
 				+ SecurityProcessorContext.ACTION_NAMES[spc.getAction()]);
+        if(spc.getAction() == SecurityProcessorContext.START) {
+            ((X509Token)spc.readCurrentPolicyEngineData()).setRequireThumbprintReference(true);
+        }        
 		return new Boolean(true);
 	}
 
@@ -188,13 +201,21 @@ public class X509TokenProcessor {
 		log.debug("Processing "
 				+ spc.readCurrentSecurityToken().getTokenName() + ": "
 				+ SecurityProcessorContext.ACTION_NAMES[spc.getAction()]);
-		return new Boolean(true);
+        if(spc.getAction() == SecurityProcessorContext.START) {
+            ((X509Token)spc.readCurrentPolicyEngineData()).setTokenVersionAndType(spc
+                    .getAssertion().getName().getLocalPart());
+        }
+        return new Boolean(true);
 	}
 
 	public Object doWssX509V3Token10(SecurityProcessorContext spc) {
 		log.debug("Processing "
 				+ spc.readCurrentSecurityToken().getTokenName() + ": "
 				+ SecurityProcessorContext.ACTION_NAMES[spc.getAction()]);
+        if(spc.getAction() == SecurityProcessorContext.START) {
+            ((X509Token)spc.readCurrentPolicyEngineData()).setTokenVersionAndType(spc
+                    .getAssertion().getName().getLocalPart());
+        }
 		return new Boolean(true);
 	}
 
@@ -202,6 +223,14 @@ public class X509TokenProcessor {
 		log.debug("Processing "
 				+ spc.readCurrentSecurityToken().getTokenName() + ": "
 				+ SecurityProcessorContext.ACTION_NAMES[spc.getAction()]);
+        if(spc.getAction() == SecurityProcessorContext.START) {
+            ((X509Token)spc.readCurrentPolicyEngineData()).setTokenVersionAndType(spc
+                    .getAssertion().getName().getLocalPart());
+        }
+        if(spc.getAction() == SecurityProcessorContext.START) {
+            ((X509Token)spc.readCurrentPolicyEngineData()).setTokenVersionAndType(spc
+                    .getAssertion().getName().getLocalPart());
+        }
 		return new Boolean(true);
 	}
 
@@ -209,6 +238,10 @@ public class X509TokenProcessor {
 		log.debug("Processing "
 				+ spc.readCurrentSecurityToken().getTokenName() + ": "
 				+ SecurityProcessorContext.ACTION_NAMES[spc.getAction()]);
+        if(spc.getAction() == SecurityProcessorContext.START) {
+            ((X509Token)spc.readCurrentPolicyEngineData()).setTokenVersionAndType(spc
+                    .getAssertion().getName().getLocalPart());
+        }
 		return new Boolean(true);
 	}
 
@@ -216,6 +249,10 @@ public class X509TokenProcessor {
 		log.debug("Processing "
 				+ spc.readCurrentSecurityToken().getTokenName() + ": "
 				+ SecurityProcessorContext.ACTION_NAMES[spc.getAction()]);
+        if(spc.getAction() == SecurityProcessorContext.START) {
+            ((X509Token)spc.readCurrentPolicyEngineData()).setTokenVersionAndType(spc
+                    .getAssertion().getName().getLocalPart());
+        }
 		return new Boolean(true);
 	}
 
@@ -223,6 +260,10 @@ public class X509TokenProcessor {
 		log.debug("Processing "
 				+ spc.readCurrentSecurityToken().getTokenName() + ": "
 				+ SecurityProcessorContext.ACTION_NAMES[spc.getAction()]);
+        if(spc.getAction() == SecurityProcessorContext.START) {
+            ((X509Token)spc.readCurrentPolicyEngineData()).setTokenVersionAndType(spc
+                    .getAssertion().getName().getLocalPart());
+        }
 		return new Boolean(true);
 	}
 
@@ -230,6 +271,10 @@ public class X509TokenProcessor {
 		log.debug("Processing "
 				+ spc.readCurrentSecurityToken().getTokenName() + ": "
 				+ SecurityProcessorContext.ACTION_NAMES[spc.getAction()]);
+        if(spc.getAction() == SecurityProcessorContext.START) {
+            ((X509Token)spc.readCurrentPolicyEngineData()).setTokenVersionAndType(spc
+                    .getAssertion().getName().getLocalPart());
+        }
 		return new Boolean(true);
 	}
 
@@ -237,6 +282,10 @@ public class X509TokenProcessor {
 		log.debug("Processing "
 				+ spc.readCurrentSecurityToken().getTokenName() + ": "
 				+ SecurityProcessorContext.ACTION_NAMES[spc.getAction()]);
+        if(spc.getAction() == SecurityProcessorContext.START) {
+            ((X509Token)spc.readCurrentPolicyEngineData()).setTokenVersionAndType(spc
+                    .getAssertion().getName().getLocalPart());
+        }
 		return new Boolean(true);
 	}
 

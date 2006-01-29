@@ -17,7 +17,11 @@ package org.apache.ws.security.policy.parser.processors;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.ws.security.policy.Constants;
+import org.apache.ws.security.policy.WSSPolicyException;
 import org.apache.ws.security.policy.model.Binding;
+import org.apache.ws.security.policy.model.AsymmetricBinding;
+import org.apache.ws.security.policy.model.SymmetricBinding;
 import org.apache.ws.security.policy.parser.SecurityPolicy;
 import org.apache.ws.security.policy.parser.SecurityPolicyToken;
 import org.apache.ws.security.policy.parser.SecurityProcessorContext;
@@ -35,12 +39,12 @@ public class AsymmetricBindingProcessor {
 	/**
 	 * Intialize the AsymmetricBinding complex token.
 	 * 
-	 * This method creates a copy of the SymmetricBinding token and sets the
+	 * This method creates a copy of the AsymmetricBinding token and sets the
 	 * handler object to the copy. Then it creates copies of the child tokens
-	 * that are allowed for SymmetricBinding. These tokens are:
+	 * that are allowed for AsymmetricBinding. These tokens are:
 	 * 
 	 * These copies are also initialized with the handler object and then set as
-	 * child tokens of SymmetricBinding.
+	 * child tokens of AsymmetricBinding.
 	 * 
 	 * @param spt
 	 *            The token that will hold the child tokens.
@@ -90,7 +94,11 @@ public class AsymmetricBindingProcessor {
 		tmpSpt.setProcessTokenMethod(this);
 		spt.setChildToken(tmpSpt);
 
-		tmpSpt = SecurityPolicy.encryptSignature.copy();
+        tmpSpt = SecurityPolicy.signBeforeEncrypting.copy();
+        tmpSpt.setProcessTokenMethod(this);
+        spt.setChildToken(tmpSpt);
+
+        tmpSpt = SecurityPolicy.encryptSignature.copy();
 		tmpSpt.setProcessTokenMethod(this);
 		spt.setChildToken(tmpSpt);
 
@@ -142,17 +150,43 @@ public class AsymmetricBindingProcessor {
 		return new Boolean(true);
 	}
 
-	public Object doEncryptBeforeSigning(SecurityProcessorContext spc) {
-		log.debug("Processing "
-				+ spc.readCurrentSecurityToken().getTokenName() + ": "
-				+ SecurityProcessorContext.ACTION_NAMES[spc.getAction()]);
-		return new Boolean(true);
-	}
+    public Object doEncryptBeforeSigning(SecurityProcessorContext spc) {
+        log.debug("Processing "
+                + spc.readCurrentSecurityToken().getTokenName() + ": "
+                + SecurityProcessorContext.ACTION_NAMES[spc.getAction()]);
+        if(spc.getAction() == SecurityProcessorContext.START) {
+            try {
+                ((AsymmetricBinding) spc.readCurrentPolicyEngineData()).setProtectionOrder(spc
+                        .getAssertion().getName().getLocalPart());
+            } catch (WSSPolicyException e) {
+                return new Boolean(false);
+            }
+        }
+        return new Boolean(true);
+    }
 
-	public Object doEncryptSignature(SecurityProcessorContext spc) {
+    public Object doSignBeforeEncrypting(SecurityProcessorContext spc) {
+        log.debug("Processing "
+                + spc.readCurrentSecurityToken().getTokenName() + ": "
+                + SecurityProcessorContext.ACTION_NAMES[spc.getAction()]);
+        if(spc.getAction() == SecurityProcessorContext.START) {
+            try {
+                ((AsymmetricBinding) spc.readCurrentPolicyEngineData()).setProtectionOrder(spc
+                        .getAssertion().getName().getLocalPart());
+            } catch (WSSPolicyException e) {
+                return new Boolean(false);
+            }
+        }
+        return new Boolean(true);
+    }
+    
+    public Object doEncryptSignature(SecurityProcessorContext spc) {
 		log.debug("Processing "
 				+ spc.readCurrentSecurityToken().getTokenName() + ": "
 				+ SecurityProcessorContext.ACTION_NAMES[spc.getAction()]);
+        if(spc.getAction() == SecurityProcessorContext.START) {
+            ((AsymmetricBinding)spc.readCurrentPolicyEngineData()).setSignatureProtection(true);
+        }
 		return new Boolean(true);
 	}
 
@@ -160,6 +194,9 @@ public class AsymmetricBindingProcessor {
 		log.debug("Processing "
 				+ spc.readCurrentSecurityToken().getTokenName() + ": "
 				+ SecurityProcessorContext.ACTION_NAMES[spc.getAction()]);
+        if(spc.getAction() == SecurityProcessorContext.START) {
+            ((AsymmetricBinding)spc.readCurrentPolicyEngineData()).setTokenProtection(true);
+        }
 		return new Boolean(true);
 	}
 
@@ -167,6 +204,9 @@ public class AsymmetricBindingProcessor {
 		log.debug("Processing "
 				+ spc.readCurrentSecurityToken().getTokenName() + ": "
 				+ SecurityProcessorContext.ACTION_NAMES[spc.getAction()]);
+        if(spc.getAction() == SecurityProcessorContext.START) {
+            ((AsymmetricBinding)spc.readCurrentPolicyEngineData()).setEntireHeaderAndBodySignatures(true);
+        }
 		return new Boolean(true);
 	}
 }

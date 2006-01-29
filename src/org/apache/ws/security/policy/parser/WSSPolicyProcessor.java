@@ -286,7 +286,6 @@ public class WSSPolicyProcessor {
             if(spt.getTokenType() == SecurityPolicyToken.COMPLEX_TOKEN && secProcessorContext.getAction() == SecurityProcessorContext.START) {
                 secProcessorContext.pushPolicyEngineData(PolicyEngineData.copy(pa.getName()));
             }
-            
             if (spt == null) {
                 log.debug("Security token: '" + tokenName
                                 + "' unknown in context of '"
@@ -341,7 +340,6 @@ public class WSSPolicyProcessor {
             if(currentToken.getTokenType() == SecurityPolicyToken.COMPLEX_TOKEN) {
             	secProcessorContext.popPolicyEngineData();
             }
-
         }
     }
 
