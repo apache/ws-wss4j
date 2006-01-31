@@ -20,27 +20,27 @@ import org.apache.ws.security.policy.WSSPolicyException;
 
 public class RecipientToken extends PolicyEngineData implements TokenWrapper {
     
-    private Token receipientToken;
+    private Token recipientToken;
 
     /**
      * @return Returns the receipientToken.
      */
-    public Token getReceipientToken() {
-        return receipientToken;
+    public Token getRecipientToken() {
+        return recipientToken;
     }
 
     /**
      * @param receipientToken The receipientToken to set.
      */
-    public void setReceipientToken(Token receipientToken) {
-        this.receipientToken = receipientToken;
+    public void setRecipientToken(Token receipientToken) {
+        this.recipientToken = receipientToken;
     }
 
     /* (non-Javadoc)
      * @see org.apache.ws.security.policy.TokenWrapper#setToken(org.apache.ws.security.policy.Token)
      */
     public void setToken(Token tok) throws WSSPolicyException {
-        this.setReceipientToken(tok);
+        this.setRecipientToken(tok);
     }
     
     

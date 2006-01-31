@@ -51,7 +51,6 @@ public class WSDocInfoStore {
         Integer intObj = new Integer(hash);
         WSDocInfo wsInfo = (WSDocInfo) storage.get(intObj);
         if (wsInfo != null) {
-            wsInfo.clear();
             storage.remove(intObj);
         }
     }

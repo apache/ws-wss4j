@@ -104,6 +104,8 @@ public class WSSecEncrypt extends WSSecBase {
 
 	private String encKeyId = null;
 
+	private Vector encDataRefs = null;
+
 	/**
 	 * Constructor.
 	 */
@@ -232,6 +234,29 @@ public class WSSecEncrypt extends WSSecBase {
 	public String getId() {
 		return encKeyId;
 	}
+
+	/**
+	 * Returns a Vector that contains the refernces to EncryptedData elements.
+	 * 
+	 * During encryption the encryption method generates one or more
+	 * EncryptedData elements. Each elements gets its unique id. The encryption
+	 * process stores these id in a vector that the caller may use to get the
+	 * generated unique ids.
+	 * 
+	 * <p/>
+	 * 
+	 * ATTENTION: Each call to <code>encryptForExternalRef</code> or
+	 * <code>encryptForInternalRef</code> overwrites the Vector that contains
+	 * the ids. Thus get the refernces immediatly after calling one of the named
+	 * methods.
+	 * 
+	 * 
+	 * @return Returns the encDataRefs.
+	 */
+	public Vector getEncDataRefs() {
+		return encDataRefs;
+	}
+
 	/**
 	 * Initialize a WSSec Encrypt.
 	 * 
@@ -241,8 +266,8 @@ public class WSSecEncrypt extends WSSecBase {
 	 * 
 	 * </p>
 	 * 
-	 * This method does not add any element to the security header. This must
-	 * be done explicitly.
+	 * This method does not add any element to the security header. This must be
+	 * done explicitly.
 	 * 
 	 * @param doc
 	 *            The unsigned SOAP envelope as <code>Document</code>
@@ -251,15 +276,14 @@ public class WSSecEncrypt extends WSSecBase {
 	 *            certificates
 	 * @throws WSSecurityException
 	 */
-	public void prepare(Document doc, Crypto crypto)
-			throws WSSecurityException {
+	public void prepare(Document doc, Crypto crypto) throws WSSecurityException {
 
 		document = doc;
 
 		/*
-		 * If no external key (symmetricalKey) was set generate an encryption 
-		 * key (session key) for this Encrypt element. This
-		 * key will be encrypted using the public key of the receiver
+		 * If no external key (symmetricalKey) was set generate an encryption
+		 * key (session key) for this Encrypt element. This key will be
+		 * encrypted using the public key of the receiver
 		 */
 
 		this.encryptionKey = this.symmetricKey;
@@ -329,7 +353,7 @@ public class WSSecEncrypt extends WSSecBase {
 		 */
 		xencEncryptedKey = createEnrcyptedKey(doc, keyEncAlgo);
 		encKeyId = "EncKeyId-" + xencEncryptedKey.hashCode();
-		xencEncryptedKey.setAttributeNS(null, "Id",	encKeyId);
+		xencEncryptedKey.setAttributeNS(null, "Id", encKeyId);
 
 		KeyInfo keyInfo = new KeyInfo(doc);
 
@@ -386,9 +410,9 @@ public class WSSecEncrypt extends WSSecBase {
 	 * Prepend the EncryptedKey element to the elements already in the Security
 	 * header.
 	 * 
-	 * The method can be called any time after <code>prepare()</code>.
-	 * This allows to insert the EncryptedKey element at any position in the
-	 * Security header.
+	 * The method can be called any time after <code>prepare()</code>. This
+	 * allows to insert the EncryptedKey element at any position in the Security
+	 * header.
 	 * 
 	 * @param secHeader
 	 *            The security header that holds the Signature element.
@@ -402,9 +426,8 @@ public class WSSecEncrypt extends WSSecBase {
 	 * Prepend the BinarySecurityToken to the elements already in the Security
 	 * header.
 	 * 
-	 * The method can be called any time after <code>prepare()</code>.
-	 * This allows to insert the BST element at any position in the Security
-	 * header.
+	 * The method can be called any time after <code>prepare()</code>. This
+	 * allows to insert the BST element at any position in the Security header.
 	 * 
 	 * @param secHeader
 	 *            The security header that holds the BST element.
@@ -481,8 +504,8 @@ public class WSSecEncrypt extends WSSecBase {
 	 * This method takes a vector of <code>WSEncryptionPart</code> object that
 	 * contain information about the elements to encrypt. The method call the
 	 * encryption method, takes the reference information generated during
-	 * encryption and add this to the <code>xenc:Reference</code> element. This
-	 * method can be called after <code>prepare()</code> and can be
+	 * encryption and add this to the <code>xenc:Reference</code> element.
+	 * This method can be called after <code>prepare()</code> and can be
 	 * called multiple times to encrypt a number of parts or elements.
 	 * 
 	 * </p>
@@ -504,7 +527,7 @@ public class WSSecEncrypt extends WSSecBase {
 	 */
 	public Element encryptForInternalRef(Element dataRef, Vector references)
 			throws WSSecurityException {
-		Vector encDataRefs = doEncryption(document, this.encryptionKey, references);
+		encDataRefs = doEncryption(document, this.encryptionKey, references);
 		Element referenceList = dataRef;
 		if (referenceList == null) {
 			referenceList = document.createElementNS(WSConstants.ENC_NS,
@@ -520,8 +543,8 @@ public class WSSecEncrypt extends WSSecBase {
 	 * This method takes a vector of <code>WSEncryptionPart</code> object that
 	 * contain information about the elements to encrypt. The method call the
 	 * encryption method, takes the reference information generated during
-	 * encryption and add this to the <code>xenc:Reference</code> element. This
-	 * method can be called after <code>prepare()</code> and can be
+	 * encryption and add this to the <code>xenc:Reference</code> element.
+	 * This method can be called after <code>prepare()</code> and can be
 	 * called multiple times to encrypt a number of parts or elements.
 	 * 
 	 * </p>
@@ -552,8 +575,8 @@ public class WSSecEncrypt extends WSSecBase {
 
 		keyInfo.addUnknownElement(secToken.getElement());
 
-		Vector encDataRefs = doEncryption(document, this.encryptionKey,
-				keyInfo, references);
+		encDataRefs = doEncryption(document, this.encryptionKey, keyInfo,
+				references);
 		Element referenceList = dataRef;
 		if (referenceList == null) {
 			referenceList = document.createElementNS(WSConstants.ENC_NS,
@@ -574,8 +597,7 @@ public class WSSecEncrypt extends WSSecBase {
 	 *            The internal <code>enc:Reference</code> element
 	 */
 	public void addInternalRefElement(Element dataRef) {
-		WSSecurityUtil.appendChildElement(document, xencEncryptedKey,
-				dataRef);
+		WSSecurityUtil.appendChildElement(document, xencEncryptedKey, dataRef);
 	}
 
 	/**
@@ -594,8 +616,7 @@ public class WSSecEncrypt extends WSSecBase {
 		WSSecurityUtil.prependChildElement(document, secHeader
 				.getSecurityHeader(), dataRef, false);
 	}
-	
-	
+
 	private Vector doEncryption(Document doc, SecretKey secretKey,
 			Vector references) throws WSSecurityException {
 		return doEncryption(doc, secretKey, null, references);
@@ -617,18 +638,34 @@ public class WSSecEncrypt extends WSSecBase {
 					WSSecurityException.UNSUPPORTED_ALGORITHM, null, null, e3);
 		}
 
-		Vector encDataRefs = new Vector();
+		Vector encDataRef = new Vector();
 
 		for (int part = 0; part < references.size(); part++) {
 			WSEncryptionPart encPart = (WSEncryptionPart) references.get(part);
+			
+			String idToEnc = encPart.getId();
+
 			String elemName = encPart.getName();
 			String nmSpace = encPart.getNamespace();
 			String modifier = encPart.getEncModifier();
 			/*
 			 * Third step: get the data to encrypt.
+			 * 
 			 */
-			Element body = (Element) WSSecurityUtil.findElement(envelope,
+			Element body = null;
+			if (idToEnc != null) {
+				body = WSSecurityUtil.findElementById(
+						document.getDocumentElement(), idToEnc,
+						WSConstants.WSU_NS);
+				if (body == null) {
+					body = WSSecurityUtil.findElementById(document
+							.getDocumentElement(), idToEnc, null);
+				}
+			}
+			else {
+				body = (Element) WSSecurityUtil.findElement(envelope,
 					elemName, nmSpace);
+			}
 			if (body == null) {
 				throw new WSSecurityException(WSSecurityException.FAILURE,
 						"noEncElement", new Object[] { "{" + nmSpace + "}"
@@ -652,9 +689,9 @@ public class WSSecEncrypt extends WSSecBase {
 				throw new WSSecurityException(
 						WSSecurityException.FAILED_ENC_DEC, null, null, e2);
 			}
-			encDataRefs.add(new String("#" + xencEncryptedDataId));
+			encDataRef.add(new String("#" + xencEncryptedDataId));
 		}
-		return encDataRefs;
+		return encDataRef;
 	}
 
 	private Document buildEmbedded(Document doc, Crypto crypto,

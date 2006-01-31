@@ -214,6 +214,7 @@ public class ReferenceListProcessor implements Processor {
 			String id = uri.substring(1);
 			Processor p = wsDocInfo.getProcessor(id);
 			if (p == null || !(p instanceof EncryptedKeyProcessor)) {
+				System.out.println("Cannot get id: " + id);
 				throw new WSSecurityException(
 						WSSecurityException.FAILED_ENC_DEC, "unsupportedKeyId");
 			}

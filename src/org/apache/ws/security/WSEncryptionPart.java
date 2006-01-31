@@ -27,6 +27,24 @@ public class WSEncryptionPart {
     private String encModifier;
     private String id;
 
+
+    /**
+     * Constructor to initialize part structure with element, namespace, and modifier.
+     * 
+     * This constructor initializes the parts structure to lookup for a
+     * fully qualified name of an element to encrypt or sign. The modifier
+     * controls how encryption encrypts the element, signature processing does
+     * not use the modifier information.
+     * 
+     * <p/>
+     * 
+     * Regarding the modifier ("Content" or "Element") refer to the W3C
+     * XML Encryption specification. 
+     * 
+     * @param nm Element's name
+     * @param nmspace Element's namespace
+     * @param encMod The encryption modifier
+     */
     public WSEncryptionPart(String nm, String nmspace, String encMod) {
         name = nm;
         namespace = nmspace;
@@ -34,11 +52,41 @@ public class WSEncryptionPart {
         id = null;
     }
 
+    /**
+     * Constructor to initialize part structure with element id.
+     * 
+     * This constructor initializes the parts structure to lookup for a
+     * an element with the given Id to encrypt or sign. 
+     * 
+     * @param id The Id to of the element to process
+     */
     public WSEncryptionPart(String id) {
         this.id = id;
         name = namespace = encModifier = null;
     }
     
+    /**
+     * Constructor to initialize part structure with element id and modifier.
+     * 
+     * This constructor initializes the parts structure to lookup for a
+     * an element with the given Id to encrypt or sign. The modifier
+     * controls how encryption encrypts the element, signature processing does
+     * not use the modifier information.
+     * 
+     * <p/>
+     * 
+     * Regarding the modifier ("Content" or "Element") refer to the W3C
+     * XML Encryption specification. 
+     * 
+     * @param id The Id to of the element to process
+     * @param encMod The encryption modifier
+     */
+    public WSEncryptionPart(String id, String encMod) {
+        this.id = id;
+        encModifier = encMod;
+        name = namespace = null;
+    }
+
     /**
      * @return the local name of the element to encrypt.
      */

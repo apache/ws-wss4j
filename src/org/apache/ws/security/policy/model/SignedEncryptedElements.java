@@ -27,10 +27,10 @@ public class SignedEncryptedElements extends PolicyEngineData {
      * Just a flag to identify whether this holds 
      * sign element info or encr elements info 
      */
-    private boolean signedElemets;
+    private boolean signedElements;
     
     public SignedEncryptedElements(boolean signedElements) {
-        this.signedElemets = signedElements;
+        this.signedElements = signedElements;
     }
     
     /**
@@ -61,8 +61,8 @@ public class SignedEncryptedElements extends PolicyEngineData {
     /**
      * @return Returns the signedElemets.
      */
-    public boolean isSignedElemets() {
-        return signedElemets;
+    public boolean isSignedElements() {
+        return signedElements;
     }
     
     
