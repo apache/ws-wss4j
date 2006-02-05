@@ -371,26 +371,6 @@ public class WSConstants {
      */
     public static final int WSE_DERIVED_KEY_LEN = 16;
     public static final String LABEL_FOR_DERIVED_KEY = "WS-Security";
-    
-//    public interface WSC {
-//        /*
-//         * WS-secureConversation namespace
-//         */
-//        public static final String WSC_NS = "http://schemas.xmlsoap.org/ws/2005/02/sc";
-//        
-//        /*
-//         * The local names and attribute names used by WSC
-//         */
-//        public final static String DERIVED_KEY_LN = "DerivedKeyToken";
-//        public final static String ALGORITHM_LN = "Algorithm";
-//        public final static String PROPERTIES_LN = "Properties";
-//        public final static String GENERATION_LN = "Generation";
-//        public final static String OFFSET_LN = "Offset";
-//        public final static String LENGTH_LN = "Length";
-//        public final static String LABEL_LN = "Label";
-//
-//        public final static String P_SHA_1 = "http://schemas.xmlsoap.org/ws/2005/02/sc/dk/p_sha1";
-//    }
 
 }
 
