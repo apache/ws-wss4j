@@ -17,6 +17,11 @@
 
 package org.apache.ws.security.processor;
 
+import java.util.Vector;
+
+import javax.crypto.SecretKey;
+import javax.security.auth.callback.CallbackHandler;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
@@ -25,18 +30,14 @@ import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
-import org.apache.ws.security.message.token.SecurityTokenReference;
 import org.apache.ws.security.message.token.Reference;
+import org.apache.ws.security.message.token.SecurityTokenReference;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.xml.security.encryption.XMLCipher;
 import org.apache.xml.security.encryption.XMLEncryptionException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-
-import javax.crypto.SecretKey;
-import javax.security.auth.callback.CallbackHandler;
-import java.util.Vector;
 
 public class ReferenceListProcessor implements Processor {
 	private static Log log = LogFactory.getLog(ReferenceListProcessor.class
@@ -213,12 +214,17 @@ public class ReferenceListProcessor implements Processor {
 			String uri = reference.getURI();
 			String id = uri.substring(1);
 			Processor p = wsDocInfo.getProcessor(id);
-			if (p == null || !(p instanceof EncryptedKeyProcessor)) {
+			if (p == null || (!(p instanceof EncryptedKeyProcessor) && !(p instanceof DerivedKeyTokenProcessor))) {
 				throw new WSSecurityException(
 						WSSecurityException.FAILED_ENC_DEC, "unsupportedKeyId");
 			}
-			EncryptedKeyProcessor ekp = (EncryptedKeyProcessor) p;
-			decryptedData = ekp.getDecryptedBytes();
+			if(p instanceof EncryptedKeyProcessor) {
+    			EncryptedKeyProcessor ekp = (EncryptedKeyProcessor) p;
+    			decryptedData = ekp.getDecryptedBytes();
+            } else if(p instanceof DerivedKeyTokenProcessor) {
+                DerivedKeyTokenProcessor dkp = (DerivedKeyTokenProcessor) p;
+                decryptedData = dkp.getKeyBytes(WSSecurityUtil.getKeyLength(algorithm));
+            }
 		} else {
 			throw new WSSecurityException(WSSecurityException.FAILED_ENC_DEC,
 					"noReference");

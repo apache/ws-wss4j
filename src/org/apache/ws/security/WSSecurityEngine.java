@@ -20,6 +20,7 @@ package org.apache.ws.security;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.components.crypto.Crypto;
+import org.apache.ws.security.conversation.ConversationConstants;
 import org.apache.ws.security.message.token.UsernameToken;
 import org.apache.ws.security.processor.Processor;
 import org.apache.ws.security.util.WSSecurityUtil;
@@ -30,6 +31,7 @@ import org.w3c.dom.NodeList;
 
 import javax.security.auth.callback.CallbackHandler;
 import javax.xml.namespace.QName;
+
 import java.util.Vector;
 
 /**
@@ -82,6 +84,11 @@ public class WSSecurityEngine {
      * <code>saml:Assertion</code> as defined by SAML specification
      */
     public static final QName SAML_TOKEN = new QName(WSConstants.SAML_NS, WSConstants.ASSERTION_LN);
+
+    /**
+     * <code>wsc:DerivedKeyToken</code> as defined by WS-SecureConversation specification
+     */
+    public static final QName DERIVED_KEY_TOKEN = new QName(ConversationConstants.WSC_NS, ConversationConstants.DERIVED_KEY_TOKEN_LN);
 
     public WSSecurityEngine() {
     }

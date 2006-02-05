@@ -767,4 +767,23 @@ public class WSSecurityUtil {
         }
         return doAction;
     }
+    
+    /**
+     * Returns the length of the key in # of bytes 
+     * @param algorithm
+     * @return
+     */
+    public static int getKeyLength(String algorithm) throws WSSecurityException {
+        if(algorithm.equals(WSConstants.TRIPLE_DES)) {
+            return 24;
+        } else if (algorithm.equals(WSConstants.AES_128)){
+            return 16;
+        } else if (algorithm.equals(WSConstants.AES_192)){
+            return 24;
+        } else if (algorithm.equals(WSConstants.AES_256)){
+            return 32;
+        } else {
+            throw new WSSecurityException(WSSecurityException.UNSUPPORTED_ALGORITHM);
+        }
+    }
 }

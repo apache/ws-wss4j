@@ -33,7 +33,7 @@ public class WSConstants {
     public static final String WSSE_NS = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd";
     public static final String WSSE11_NS = "http://docs.oasis-open.org/wss/2005/xx/oasis-2005xx-wss-wssecurity-secext-1.1.xsd";
     public static final String WSU_NS = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd";
-
+    
     /*
      * The base UIRs for the various profiles.
      */
@@ -97,7 +97,7 @@ public class WSConstants {
     public static final String SIGNATURE_CONFIRMATION_LN = "SignatureConfirmation"; 
     public static final String SALT_LN = "Salt";
     public static final String ITERATION_LN = "Iteration";
-
+    
     /*
      * The definitions for SAML
      */
@@ -372,5 +372,25 @@ public class WSConstants {
     public static final int WSE_DERIVED_KEY_LEN = 16;
     public static final String LABEL_FOR_DERIVED_KEY = "WS-Security";
     
+//    public interface WSC {
+//        /*
+//         * WS-secureConversation namespace
+//         */
+//        public static final String WSC_NS = "http://schemas.xmlsoap.org/ws/2005/02/sc";
+//        
+//        /*
+//         * The local names and attribute names used by WSC
+//         */
+//        public final static String DERIVED_KEY_LN = "DerivedKeyToken";
+//        public final static String ALGORITHM_LN = "Algorithm";
+//        public final static String PROPERTIES_LN = "Properties";
+//        public final static String GENERATION_LN = "Generation";
+//        public final static String OFFSET_LN = "Offset";
+//        public final static String LENGTH_LN = "Length";
+//        public final static String LABEL_LN = "Label";
+//
+//        public final static String P_SHA_1 = "http://schemas.xmlsoap.org/ws/2005/02/sc/dk/p_sha1";
+//    }
+
 }
 
