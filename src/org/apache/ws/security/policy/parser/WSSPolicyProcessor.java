@@ -32,12 +32,17 @@ import org.apache.ws.policy.PrimitiveAssertion;
 import org.apache.ws.policy.XorCompositeAssertion;
 import org.apache.ws.policy.util.PolicyFactory;
 import org.apache.ws.policy.util.PolicyReader;
+import org.apache.ws.security.policy.Constants;
 import org.apache.ws.security.policy.WSSPolicyException;
 import org.apache.ws.security.policy.model.PolicyEngineData;
 import org.apache.ws.security.policy.model.RootPolicyEngineData;
 import org.apache.ws.security.policy.parser.processors.AsymmetricBindingProcessor;
 import org.apache.ws.security.policy.parser.processors.EncryptedPartsElementsProcessor;
+import org.apache.ws.security.policy.parser.processors.EndorsingSupportingTokensProcessor;
+import org.apache.ws.security.policy.parser.processors.SignedEndorsingSupportingTokensProcessor;
 import org.apache.ws.security.policy.parser.processors.SignedPartsElementsProcessor;
+import org.apache.ws.security.policy.parser.processors.SignedSupportingTokensProcessor;
+import org.apache.ws.security.policy.parser.processors.SupportingTokensProcessor;
 import org.apache.ws.security.policy.parser.processors.SymmetricBindingProcessor;
 import org.apache.ws.security.policy.parser.processors.Wss10Processor;
 import org.apache.ws.security.policy.parser.processors.Wss11Processor;
@@ -104,6 +109,23 @@ public class WSSPolicyProcessor {
         spt.setProcessTokenMethod(new Wss11Processor());
         topLevel.setChildToken(spt);
         
+        spt = SecurityPolicy.supportingTokens.copy();
+        spt.setProcessTokenMethod(new SupportingTokensProcessor());
+        topLevel.setChildToken(spt);
+
+        spt = SecurityPolicy.signedSupportingTokens.copy();
+        spt.setProcessTokenMethod(new SignedSupportingTokensProcessor());
+        topLevel.setChildToken(spt);
+
+        spt = SecurityPolicy.endorsingSupportingTokens.copy();
+        spt.setProcessTokenMethod(new EndorsingSupportingTokensProcessor());
+        topLevel.setChildToken(spt);
+
+        spt = SecurityPolicy.signedEndorsingSupportingTokens.copy();
+        spt.setProcessTokenMethod(new SignedEndorsingSupportingTokensProcessor());
+        topLevel.setChildToken(spt);
+
+        
         /*
          * Now get the initial PolicyEngineData, initialize it and put it onto
          * the PED stack.
@@ -123,7 +145,7 @@ public class WSSPolicyProcessor {
         return true;
     }
 
-    public void go(String[] args) {
+    public boolean go(String[] args) {
 
         merged = null;
         for (int i = 0; i < args.length; i++) {
@@ -151,8 +173,10 @@ public class WSSPolicyProcessor {
         }
         if (processPolicy(merged)) {
             log.debug("Security Policy sucessfully parsed");
+            return true;
         } else {
             log.debug("Security Policy not sucessfully parsed");
+            return false;
         }
     }
 
@@ -216,7 +240,7 @@ public class WSSPolicyProcessor {
                  */
                 PrimitiveAssertion pa = (PrimitiveAssertion) assertion;
                 if (!(pa.getName().getNamespaceURI()
-                        .equals("http://schemas.xmlsoap.org/ws/2005/07/securitypolicy"))) {
+                        .equals(Constants.SP_NS))) {
                     log.debug("Got a unexpected assertion: "
                             + pa.getName().getLocalPart());
                     continue;
@@ -283,16 +307,15 @@ public class WSSPolicyProcessor {
         
         try {
 
-            if(spt.getTokenType() == SecurityPolicyToken.COMPLEX_TOKEN && secProcessorContext.getAction() == SecurityProcessorContext.START) {
-                secProcessorContext.pushPolicyEngineData(PolicyEngineData.copy(pa.getName()));
-            }
             if (spt == null) {
-                log.debug("Security token: '" + tokenName
+                log.error("Security token: '" + tokenName
                                 + "' unknown in context of '"
                                 + currentToken.getTokenName());
                 return false;
             }
-
+            if(spt.getTokenType() == SecurityPolicyToken.COMPLEX_TOKEN && secProcessorContext.getAction() == SecurityProcessorContext.START) {
+                secProcessorContext.pushPolicyEngineData(PolicyEngineData.copy(pa.getName()));
+            }
             ret = spt.invokeProcessTokenMethod(secProcessorContext);
             
         } catch (IllegalArgumentException e) {
@@ -317,7 +340,7 @@ public class WSSPolicyProcessor {
                 .readCurrentSecurityToken();
         if (currentToken == null) {
             secProcessorContext.popSecurityToken();
-            log.debug("Abort transaction because of unknown token: '"
+            log.error("Abort transaction because of unknown token: '"
                     + pa.getName().getLocalPart() + "'");
             return;
         }

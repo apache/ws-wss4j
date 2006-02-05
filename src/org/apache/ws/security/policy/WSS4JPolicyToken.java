@@ -37,11 +37,9 @@ public class WSS4JPolicyToken {
 	
 	int tokenType;
 	
-	int sigKeyIdentifier;
-
 	String sigAlgorithm;
 
-	int encKeyIdentifier;
+	int keyIdentifier;
 
 	String encAlgorithm;
 
@@ -79,8 +77,8 @@ public class WSS4JPolicyToken {
 	/**
 	 * @return Returns the encKeyIdentifier.
 	 */
-	public int getEncKeyIdentifier() {
-		return encKeyIdentifier;
+	public int getKeyIdentifier() {
+		return keyIdentifier;
 	}
 
 	/**
@@ -109,13 +107,6 @@ public class WSS4JPolicyToken {
 	 */
 	public ArrayList getSigElements() {
 		return sigElements;
-	}
-
-	/**
-	 * @return Returns the sigKeyIdentifier.
-	 */
-	public int getSigKeyIdentifier() {
-		return sigKeyIdentifier;
 	}
 
 	/**

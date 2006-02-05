@@ -70,21 +70,21 @@ public class AsymmetricBindingProcessor {
 		tmpSpt.setProcessTokenMethod(new LayoutProcessor());
 		spt.setChildToken(tmpSpt);
 
-		tmpSpt = SecurityPolicy.supportingTokens.copy();
-		tmpSpt.setProcessTokenMethod(new SupportingTokensProcessor());
-		spt.setChildToken(tmpSpt);
-
-		tmpSpt = SecurityPolicy.signedSupportingTokens.copy();
-		tmpSpt.setProcessTokenMethod(new SignedSupportingTokensProcessor());
-		spt.setChildToken(tmpSpt);
-
-		tmpSpt = SecurityPolicy.endorsingSupportingTokens.copy();
-		tmpSpt.setProcessTokenMethod(new EndorsingSupportingTokensProcessor());
-		spt.setChildToken(tmpSpt);
-
-		tmpSpt = SecurityPolicy.signedEndorsingSupportingTokens.copy();
-		tmpSpt.setProcessTokenMethod(new SignedEndorsingSupportingTokensProcessor());
-		spt.setChildToken(tmpSpt);
+//		tmpSpt = SecurityPolicy.supportingTokens.copy();
+//		tmpSpt.setProcessTokenMethod(new SupportingTokensProcessor());
+//		spt.setChildToken(tmpSpt);
+//
+//		tmpSpt = SecurityPolicy.signedSupportingTokens.copy();
+//		tmpSpt.setProcessTokenMethod(new SignedSupportingTokensProcessor());
+//		spt.setChildToken(tmpSpt);
+//
+//		tmpSpt = SecurityPolicy.endorsingSupportingTokens.copy();
+//		tmpSpt.setProcessTokenMethod(new EndorsingSupportingTokensProcessor());
+//		spt.setChildToken(tmpSpt);
+//
+//		tmpSpt = SecurityPolicy.signedEndorsingSupportingTokens.copy();
+//		tmpSpt.setProcessTokenMethod(new SignedEndorsingSupportingTokensProcessor());
+//		spt.setChildToken(tmpSpt);
 
 		tmpSpt = SecurityPolicy.includeTimestamp.copy();
 		tmpSpt.setProcessTokenMethod(this);

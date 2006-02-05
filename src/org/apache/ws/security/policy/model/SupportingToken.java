@@ -151,7 +151,4 @@ public class SupportingToken extends PolicyEngineData implements AlgorithmWrappe
     public void setToken(Token tok) throws WSSPolicyException {
         this.addToken(tok);
     }
-    
-    
-    
 }
