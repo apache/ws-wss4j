@@ -115,20 +115,4 @@ public class WSS4JPolicyToken {
 	public ArrayList getSigParts() {
 		return sigParts;
 	}
-
-    /**
-     * @return
-     */
-    public int getEncKeyIdentifier() {
-        // TODO TODO
-        throw new UnsupportedOperationException("TODO");
-    }
-
-    /**
-     * @return
-     */
-    public int getSigKeyIdentifier() {
-        // TODO TODO
-        throw new UnsupportedOperationException("TODO");
-    }
 }
