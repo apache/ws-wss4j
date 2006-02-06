@@ -69,11 +69,7 @@ public class WSSecDKSignEncrypt extends WSSecBase {
 
     private static Log tlog = LogFactory.getLog("org.apache.ws.security.TIME");
 
-    protected boolean doDebug = false;
-    
-    private Document doc;
-    
-    protected WSSConfig wssConfig = WSSConfig.getDefaultWSConfig();
+    private Document document;
     
     protected String symEncAlgo = WSConstants.AES_128;
 
@@ -83,7 +79,7 @@ public class WSSecDKSignEncrypt extends WSSecBase {
     
     private byte[] ephemeralKey;
     
-    private byte[] derivedsigKey;
+    private byte[] derivedSigKey;
     
     private byte[] derivedEncrKey;
 
@@ -91,79 +87,40 @@ public class WSSecDKSignEncrypt extends WSSecBase {
 
     private String encKeyId = null;
     
-    protected int keyIdentifierType = WSConstants.ISSUER_SERIAL;
-
     private BinarySecurity bstToken = null;
 
     private Element envelope;
+    
+    private DerivedKeyToken dkt = null;
+    
+    private String dkId = null;
 
     public Document build(Document doc, Crypto crypto, WSSecHeader secHeader) throws Exception  {
-        
-        this.prepare(doc, crypto);
         
         /*
          * Setup the encrypted key
          */
-        WSSecurityUtil.prependChildElement(this.doc, secHeader
-                .getSecurityHeader(), xencEncryptedKey, false);
-        if (bstToken != null) {
-            WSSecurityUtil.prependChildElement(this.doc, secHeader
-                    .getSecurityHeader(), bstToken.getElement(), false);
-        }
+        prepare(doc, crypto);
         
-        //Create the derived keys
-        //At this point figure out the key length accordng to teh symencAlgo
-        int offset = 0;
-        int length = WSSecurityUtil.getKeyLength(this.symEncAlgo);
-        byte[] label = ConversationConstants.DEFAULT_LABEL.getBytes("UTF-8");
-        byte[] nonce = generateNonce();
-        
-        byte[] seed = new byte[label.length + nonce.length];
-        System.arraycopy(label, 0, seed, 0, label.length);
-        System.arraycopy(nonce, 0, seed, label.length, nonce.length);
-        
-        DerivationAlgorithm algo = AlgoFactory.getInstance(ConversationConstants.DerivationAlgorithm.P_SHA_1);
-        
-        this.derivedEncrKey = algo.createKey(this.ephemeralKey, seed, offset, length);
-        
-        
-        //Add the DKTs
-        DerivedKeyToken dkt = new DerivedKeyToken(this.doc);
-        String dkId = "derivedKeyId-" + dkt.hashCode();
-        
-        dkt.setLength(length);
-        dkt.setNonce(Base64.encode(nonce));
-        dkt.setOffset(offset);
-        dkt.setID(dkId);
-        //Create the SecurityTokenRef to the Encrypted Key
-        SecurityTokenReference strEncKey = new SecurityTokenReference(this.doc);
-        Reference ref = new Reference(doc);
-        ref.setURI("#" + encKeyId);
-        strEncKey.setReference(ref);
-        dkt.setSecuityTokenReference(strEncKey);
-        WSSecurityUtil.appendChildElement(this.doc, secHeader
-                .getSecurityHeader(), dkt.getElement());
-        
-        
-        //Create the SecurityTokenRef to the DKT
-        SecurityTokenReference str = new SecurityTokenReference(this.doc);
-        Reference ref2 = new Reference(doc);
-        ref2.setURI("#" + dkId);
-        str.setReference(ref2);
-        KeyInfo keyInfo = new KeyInfo(doc);
-        keyInfo.addUnknownElement(str.getElement());
-        
-        Vector parts = new Vector();
+        /*
+         * prepend elements in the right order to the security header
+         */
+        prependDKElementToHeader(secHeader);
+        prependToHeader(secHeader);
+        prependBSTElementToHeader(secHeader);
+                
         SOAPConstants soapConstants = WSSecurityUtil.getSOAPConstants(envelope);
-        WSEncryptionPart encP = new WSEncryptionPart(soapConstants
-                .getBodyQName().getLocalPart(), soapConstants
-                .getEnvelopeURI(), "Content");
-        parts.add(encP);
-        Vector encDataRefs = doEncryption(this.doc, this.derivedEncrKey, keyInfo, parts);
-        
-        createDataRefList(doc, dkt.getElement(), encDataRefs, secHeader.getSecurityHeader());
-        
-        return this.doc;
+        if (parts == null) {
+            parts = new Vector();
+            WSEncryptionPart encP = new WSEncryptionPart(soapConstants
+                    .getBodyQName().getLocalPart(), soapConstants
+                    .getEnvelopeURI(), "Content");
+            parts.add(encP);
+        }
+        Element externRefList = encryptForExternalRef(null, parts);
+        addExternalRefElement(externRefList, secHeader);
+
+        return document;
     }
 
     private Vector doEncryption(Document doc, byte[] secretKey,
@@ -235,10 +192,31 @@ public class WSSecDKSignEncrypt extends WSSecBase {
         return temp;
     }
 
+    /**
+     * Initialize a WSSec Derived key.
+     * 
+     * The method prepares and initializes a WSSec dereived key structure after the
+     * relevant information was set. This method also creates and initializes the
+     * derived token using the ephemeral key. After preparation references
+     * can be added and encrypted.
+     * 
+     * </p>
+     * 
+     * This method does not add any element to the security header. This must be
+     * done explicitly.
+     * 
+     * @param doc
+     *            The unsigned SOAP envelope as <code>Document</code>
+     * @param crypto
+     *            An instance of the Crypto API to handle keystore and
+     *            certificates
+     * @throws WSSecurityException
+     */
+
     public void prepare(Document doc, Crypto crypto)
-        throws WSSecurityException, NoSuchAlgorithmException {
+        throws Exception {
         
-        this.doc = doc;
+        document = doc;
         
         /*
          * Set up the ephemeral key
@@ -355,8 +333,112 @@ public class WSSecDKSignEncrypt extends WSSecBase {
         envelope = doc.getDocumentElement();
         envelope.setAttributeNS(WSConstants.XMLNS_NS, "xmlns:"
                 + WSConstants.ENC_PREFIX, WSConstants.ENC_NS);
+        
+        //Create the derived keys
+        //At this point figure out the key length accordng to teh symencAlgo
+        int offset = 0;
+        int length = WSSecurityUtil.getKeyLength(this.symEncAlgo);
+        byte[] label = ConversationConstants.DEFAULT_LABEL.getBytes("UTF-8");
+        byte[] nonce = generateNonce();
+        
+        byte[] seed = new byte[label.length + nonce.length];
+        System.arraycopy(label, 0, seed, 0, label.length);
+        System.arraycopy(nonce, 0, seed, label.length, nonce.length);
+        
+        DerivationAlgorithm algo = AlgoFactory.getInstance(ConversationConstants.DerivationAlgorithm.P_SHA_1);
+        
+        this.derivedEncrKey = algo.createKey(this.ephemeralKey, seed, offset, length);
+        
+        
+        //Add the DKTs
+        dkt = new DerivedKeyToken(document);
+        dkId = "derivedKeyId-" + dkt.hashCode();
+        
+        dkt.setLength(length);
+        dkt.setNonce(Base64.encode(nonce));
+        dkt.setOffset(offset);
+        dkt.setID(dkId);
+        //Create the SecurityTokenRef to the Encrypted Key
+        SecurityTokenReference strEncKey = new SecurityTokenReference(document);
+        Reference ref = new Reference(document);
+        ref.setURI("#" + encKeyId);
+        strEncKey.setReference(ref);
+        dkt.setSecuityTokenReference(strEncKey);
     }
     
+    /**
+     * Encrypt one or more parts or elements of the message (external).
+     * 
+     * This method takes a vector of <code>WSEncryptionPart</code> object that
+     * contain information about the elements to encrypt. The method call the
+     * encryption method, takes the reference information generated during
+     * encryption and add this to the <code>xenc:Reference</code> element.
+     * This method can be called after <code>prepare()</code> and can be
+     * called multiple times to encrypt a number of parts or elements.
+     * 
+     * </p>
+     * 
+     * The method generates a <code>xenc:Reference</code> element that <i>must</i>
+     * be added to the SecurityHeader. See <code>addExternalRefElement()</code>.
+     * 
+     * </p>
+     * 
+     * If the <code>dataRef</code> parameter is <code>null</code> the method
+     * creates and initializes a new Reference element.
+     * 
+     * @param dataRef
+     *            A <code>xenc:Reference</code> element or <code>null</code>
+     * @param references
+     *            A vector containing WSEncryptionPart objects
+     * @return Returns the updated <code>xenc:Reference</code> element
+     * @throws WSSecurityException
+     */
+    public Element encryptForExternalRef(Element dataRef, Vector references)
+            throws Exception {
+
+        //Create the SecurityTokenRef to the DKT
+        KeyInfo keyInfo = new KeyInfo(document);
+        SecurityTokenReference secToken = new SecurityTokenReference(document);
+        Reference ref = new Reference(document);
+        ref.setURI("#" + dkId);
+        secToken.setReference(ref);
+
+        keyInfo.addUnknownElement(secToken.getElement());
+
+        Vector encDataRefs = doEncryption(document, derivedEncrKey, keyInfo,
+                references);
+        Element referenceList = dataRef;
+        if (referenceList == null) {
+            referenceList = document.createElementNS(WSConstants.ENC_NS,
+                    WSConstants.ENC_PREFIX + ":ReferenceList");
+        }
+        createDataRefList(document, referenceList, encDataRefs);
+        return referenceList;
+    }
+    
+    /**
+     * Adds (prepends) the external Reference element to the Security header.
+     * 
+     * The reference element <i>must</i> be created by the
+     * <code>encryptForExternalRef() </code> method. The method adds the
+     * reference element in the SecurityHeader.
+     * 
+     * @param dataRef
+     *            The external <code>enc:Reference</code> element
+     * @param secHeader
+     *            The security header.
+     */
+    public void addExternalRefElement(Element referenceList, WSSecHeader secHeader) {
+        Node node = dkt.getElement().getNextSibling();
+        if(node == null || (node != null && !(node instanceof Element))) {
+            //If (at this moment) DerivedKeyToken is the LAST element of 
+            //the security header 
+            secHeader.getSecurityHeader().appendChild(referenceList);
+        } else {
+            secHeader.getSecurityHeader().insertBefore(referenceList, node);
+        }
+        
+    }
 
     /**
      * @return
@@ -368,6 +450,56 @@ public class WSSecDKSignEncrypt extends WSSecBase {
         return temp;
     }
     
+    /**
+     * Prepend the DerivedKey element to the elements already in the Security
+     * header.
+     * 
+     * The method can be called any time after <code>prepare()</code>. This
+     * allows to insert the DereivedKey element at any position in the Security
+     * header.
+     * 
+     * @param secHeader
+     *            The security header that holds the Signature element.
+     */
+    public void prependDKElementToHeader(WSSecHeader secHeader) {
+        WSSecurityUtil.prependChildElement(document, secHeader
+            .getSecurityHeader(), dkt.getElement(), false);
+    }
+    
+    
+    /**
+     * Prepend the EncryptedKey element to the elements already in the Security
+     * header.
+     * 
+     * The method can be called any time after <code>prepare()</code>. This
+     * allows to insert the EncryptedKey element at any position in the Security
+     * header.
+     * 
+     * @param secHeader
+     *            The security header that holds the Signature element.
+     */
+    public void prependToHeader(WSSecHeader secHeader) {
+        WSSecurityUtil.prependChildElement(document, secHeader
+                .getSecurityHeader(), xencEncryptedKey, false);
+    }
+
+    /**
+     * Prepend the BinarySecurityToken to the elements already in the Security
+     * header.
+     * 
+     * The method can be called any time after <code>prepare()</code>. This
+     * allows to insert the BST element at any position in the Security header.
+     * 
+     * @param secHeader
+     *            The security header that holds the BST element.
+     */
+    public void prependBSTElementToHeader(WSSecHeader secHeader) {
+        if (bstToken != null) {
+            WSSecurityUtil.prependChildElement(document, secHeader
+                    .getSecurityHeader(), bstToken.getElement(), false);
+        }
+        bstToken = null;
+    }
     
     /**
      * Create DOM subtree for <code>xenc:EncryptedKey</code>
@@ -407,10 +539,8 @@ public class WSSecDKSignEncrypt extends WSSecBase {
         this.encrUser = user;
     }
     
-    public static Element createDataRefList(Document doc, Element dktElem,
-            Vector encDataRefs, Element secHeader) {
-        Element referenceList = doc.createElementNS(WSConstants.ENC_NS,
-                WSConstants.ENC_PREFIX + ":ReferenceList");
+    public static Element createDataRefList(Document doc,
+            Element referenceList, Vector encDataRefs) {
         for (int i = 0; i < encDataRefs.size(); i++) {
             String dataReferenceUri = (String) encDataRefs.get(i);
             Element dataReference = doc.createElementNS(WSConstants.ENC_NS,
@@ -418,19 +548,10 @@ public class WSSecDKSignEncrypt extends WSSecBase {
             dataReference.setAttributeNS(null, "URI", dataReferenceUri);
             referenceList.appendChild(dataReference);
         }
-        Node node = dktElem.getNextSibling();
-        if(node == null || (node != null && !(node instanceof Element))) {
-            //If (at this moment) DerivedKeyToken is the LAST element of 
-            //the security header 
-            secHeader.appendChild(referenceList);
-        } else {
-            secHeader.insertBefore(referenceList, node);
-        }
         return referenceList;
     }
 
     public void setSymmetricEncAlgorithm(String algo) {
         symEncAlgo = algo;
     }
-
 }
