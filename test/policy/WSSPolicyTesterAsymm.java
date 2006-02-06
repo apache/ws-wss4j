@@ -216,7 +216,7 @@ public class WSSPolicyTesterAsymm extends TestCase implements CallbackHandler {
 		if ((recToken = wpd.getRecipientToken()) != null) {
 			recEncrypt = new WSSecEncrypt();
 			recEncrypt.setUserInfo("wss4jcert");
-			recEncrypt.setKeyIdentifierType(recToken.getEncKeyIdentifier());
+			recEncrypt.setKeyIdentifierType(recToken.getKeyIdentifier());
 			recEncrypt.setSymmetricEncAlgorithm(recToken.getEncAlgorithm());
 			recEncrypt.setKeyEnc(recToken.getEncTransportAlgorithm());
 			recEncrypt.prepare(doc, cryptoSKI);
@@ -243,7 +243,7 @@ public class WSSPolicyTesterAsymm extends TestCase implements CallbackHandler {
 			iniSignature = new WSSecSignature();
 			iniSignature.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e",
 					"security");
-			iniSignature.setKeyIdentifierType(iniToken.getSigKeyIdentifier());
+			iniSignature.setKeyIdentifierType(iniToken.getKeyIdentifier());
 			iniSignature.setSignatureAlgorithm(iniToken.getSigAlgorithm());
 			iniSignature.prepare(doc, crypto, secHeader);
 			if (wpd.isSignatureProtection()) {
