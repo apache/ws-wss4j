@@ -43,11 +43,12 @@ import org.w3c.dom.Node;
  * 
  * @author Ruchith Fernando (ruchith.fernando@gmail.com)
  */
-public class WSSecDKSignEncrypt extends WSSecDerivedKeyBase {
+public class WSSecDKEncrypt extends WSSecDerivedKeyBase {
 
     protected String symEncAlgo = WSConstants.AES_128;
     
-    public Document build(Document doc, Crypto crypto, WSSecHeader secHeader) throws WSSecurityException  {
+    public Document build(Document doc, Crypto crypto, WSSecHeader secHeader)
+            throws WSSecurityException {
         
         /*
          * Setup the encrypted key

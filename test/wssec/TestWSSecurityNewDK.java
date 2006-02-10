@@ -44,8 +44,8 @@ import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
+import org.apache.ws.security.message.WSSecDKEncrypt;
 import org.apache.ws.security.message.WSSecDKSign;
-import org.apache.ws.security.message.WSSecDKSignEncrypt;
 import org.apache.ws.security.message.WSSecHeader;
 import org.apache.xml.security.signature.XMLSignature;
 import org.w3c.dom.Document;
@@ -126,7 +126,7 @@ public class TestWSSecurityNewDK extends TestCase implements CallbackHandler {
      */
     public void testEncryptionDecryptionTRIPLEDES() throws Exception {
         SOAPEnvelope unsignedEnvelope = message.getSOAPEnvelope();
-        WSSecDKSignEncrypt builder = new WSSecDKSignEncrypt();
+        WSSecDKEncrypt builder = new WSSecDKEncrypt();
         builder.setEncryptionUser("wss4jcert");
         builder.setKeyIdentifierType(WSConstants.THUMBPRINT_IDENTIFIER);
         builder.setSymmetricEncAlgorithm(WSConstants.TRIPLE_DES);
@@ -147,7 +147,7 @@ public class TestWSSecurityNewDK extends TestCase implements CallbackHandler {
      */
      public void testEncryptionDecryptionAES128() throws Exception {
         SOAPEnvelope unsignedEnvelope = message.getSOAPEnvelope();
-        WSSecDKSignEncrypt builder = new WSSecDKSignEncrypt();
+        WSSecDKEncrypt builder = new WSSecDKEncrypt();
         builder.setEncryptionUser("wss4jcert");
         builder.setKeyIdentifierType(WSConstants.THUMBPRINT_IDENTIFIER);
         builder.setSymmetricEncAlgorithm(WSConstants.AES_128);
