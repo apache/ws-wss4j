@@ -44,8 +44,10 @@ import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
+import org.apache.ws.security.message.WSSecDKSign;
 import org.apache.ws.security.message.WSSecDKSignEncrypt;
 import org.apache.ws.security.message.WSSecHeader;
+import org.apache.xml.security.signature.XMLSignature;
 import org.w3c.dom.Document;
 
 public class TestWSSecurityNewDK extends TestCase implements CallbackHandler {
@@ -134,8 +136,8 @@ public class TestWSSecurityNewDK extends TestCase implements CallbackHandler {
         log.info("Before Encryption Triple DES....");
         Document encryptedDoc = builder.build(doc, crypto, secHeader);
         log.info("After Encryption Triple DES....");
-        String out = org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(encryptedDoc);
-        System.out.println(out);
+//        String out = org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(encryptedDoc);
+//        System.out.println(out);
         verify(doc);
     }
 
@@ -160,10 +162,32 @@ public class TestWSSecurityNewDK extends TestCase implements CallbackHandler {
             log.debug("Encrypted message: 3DES  + DerivedKeys");
             XMLUtils.PrettyElementToWriter(encryptedMsg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
         }
-        String out = org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(encryptedDoc);
-        System.out.println(out);
+//        String out = org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(encryptedDoc);
+//        System.out.println(out);
         verify(doc);
-    }
+     }
+     
+     public void testSignature() throws Exception {
+         SOAPEnvelope unsignedEnvelope = message.getSOAPEnvelope();
+         WSSecDKSign builder = new WSSecDKSign();
+         builder.setEncryptionUser("wss4jcert");
+         builder.setKeyIdentifierType(WSConstants.THUMBPRINT_IDENTIFIER);
+         builder.setSignatureAlgorithm(XMLSignature.ALGO_ID_MAC_HMAC_SHA1);
+         Document doc = unsignedEnvelope.getAsDocument();
+         WSSecHeader secHeader = new WSSecHeader();
+         secHeader.insertSecurityHeader(doc);
+         log.info("Before HMAC-SHA1 signature");
+         Document signedDoc = builder.build(doc, crypto, secHeader);
+         Message signedMessage = (Message) SOAPUtil.toSOAPMessage(doc);
+         if (log.isDebugEnabled()) {
+             log.debug("Encrypted message: 3DES  + DerivedKeys");
+             XMLUtils.PrettyElementToWriter(signedMessage.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
+         }
+//         String out = org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+//         System.out.println(out);
+         
+     }
+     
     
     /**
      * Verifies the soap envelope

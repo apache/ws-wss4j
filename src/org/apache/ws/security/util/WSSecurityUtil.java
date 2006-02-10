@@ -46,6 +46,7 @@ import javax.crypto.spec.SecretKeySpec;
 import javax.xml.namespace.QName;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
+import java.security.SecureRandom;
 import java.util.Vector;
 
 /**
@@ -784,6 +785,23 @@ public class WSSecurityUtil {
             return 32;
         } else {
             throw new WSSecurityException(WSSecurityException.UNSUPPORTED_ALGORITHM);
+        }
+    }
+    
+    /**
+     * Generate a nonce of the given length
+     * @return
+     * @throws Exception
+     */
+    public static byte[] generateNonce(int length) throws WSSecurityException {
+        try {
+            SecureRandom random = SecureRandom.getInstance("SHA1PRNG");
+            byte[] temp = new byte[length];
+            random.nextBytes(temp);
+            return temp;
+        } catch (Exception e) {
+            throw new WSSecurityException(
+                    "Error in generating nonce of length " + length, e);
         }
     }
 }
