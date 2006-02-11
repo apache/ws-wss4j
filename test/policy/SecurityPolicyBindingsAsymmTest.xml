@@ -37,16 +37,6 @@
     <sp:EncryptBeforeSigning />
     <sp:EncryptSignature />
     <sp:ProtectTokens />
-    <sp:SignedSupportingTokens>
-      <wsp:Policy>
-        <sp:UsernameToken sp:IncludeToken="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy/IncludeToken/Once" />
-      </wsp:Policy>
-    </sp:SignedSupportingTokens>
-    <sp:SignedEndorsingSupportingTokens>
-      <wsp:Policy>
-        <sp:X509Token sp:IncludeToken="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy/IncludeToken/Once" />
-      </wsp:Policy>
-    </sp:SignedEndorsingSupportingTokens>
   </wsp:Policy> 
 </sp:AsymmetricBinding>
 <sp:Wss11> 
@@ -54,6 +44,30 @@
     <sp:RequireSignatureConfirmation />
   </wsp:Policy>
 </sp:Wss11>
+<sp:SignedSupportingTokens>
+  <wsp:Policy>
+    <sp:UsernameToken sp:IncludeToken="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy/IncludeToken/Once" />
+    <sp:AlgorithmSuite>
+      <wsp:Policy>
+        <sp:Basic256 />
+      </wsp:Policy>
+    </sp:AlgorithmSuite>
+  </wsp:Policy>
+</sp:SignedSupportingTokens>
+<sp:SignedEndorsingSupportingTokens>
+  <wsp:Policy>
+    <sp:X509Token sp:IncludeToken="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy/IncludeToken/Always" >
+      <wsp:Policy>
+        <sp:RequireIssuerSerialReference />
+      </wsp:Policy>
+    </sp:X509Token>
+    <sp:AlgorithmSuite>
+      <wsp:Policy>
+        <sp:Basic256 />
+      </wsp:Policy>
+    </sp:AlgorithmSuite>
+  </wsp:Policy>
+</sp:SignedEndorsingSupportingTokens>
 </wsp:Policy>
 
  

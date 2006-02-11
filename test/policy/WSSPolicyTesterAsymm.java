@@ -150,7 +150,10 @@ public class WSSPolicyTesterAsymm extends TestCase implements CallbackHandler {
 			String[] files = new String[2];
 			files[0] = "test/policy/SecurityPolicyBindingsAsymmTest.xml";
 			files[1] = "test/policy/SecurityPolicyMsgTest.xml";
-			processor.go(files);
+			if (!processor.go(files)) {
+			    System.out.println("Cannot parse the policy files.");
+                System.exit(1);
+            }
 
 			RootPolicyEngineData rootPolicyEngineData = (RootPolicyEngineData) processor.secProcessorContext
 					.popPolicyEngineData();
@@ -399,6 +402,7 @@ public class WSSPolicyTesterAsymm extends TestCase implements CallbackHandler {
 		secEngine.processSecurityHeader(doc, null, this, crypto, cryptoSKI);
 		SOAPUtil.updateSOAPMessage(doc, message);
 		String decryptedString = message.getSOAPPartAsString();
+        log.debug(decryptedString);
 		assertTrue(decryptedString.indexOf("LogTestService2") > 0 ? true
 				: false);
 	}
