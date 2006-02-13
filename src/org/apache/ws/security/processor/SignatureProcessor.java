@@ -20,6 +20,7 @@ package org.apache.ws.security.processor;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.WSDerivedKeyTokenPrincipal;
 import org.apache.ws.security.WSDocInfo;
 import org.apache.ws.security.WSDocInfoStore;
 import org.apache.ws.security.WSSConfig;
@@ -30,6 +31,7 @@ import org.apache.ws.security.WSUsernameTokenPrincipal;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.message.EnvelopeIdResolver;
 import org.apache.ws.security.message.token.BinarySecurity;
+import org.apache.ws.security.message.token.DerivedKeyToken;
 import org.apache.ws.security.message.token.PKIPathSecurity;
 import org.apache.ws.security.message.token.SecurityTokenReference;
 import org.apache.ws.security.message.token.UsernameToken;
@@ -157,6 +159,7 @@ public class SignatureProcessor implements Processor {
         KeyInfo info = sig.getKeyInfo();
         byte[] secretKey = null;
         UsernameToken ut = null;
+        DerivedKeyToken dkt = null;
 
         if (info != null) {
             Node node = WSSecurityUtil.getDirectChild(info.getElement(),
@@ -189,6 +192,14 @@ public class SignatureProcessor implements Processor {
                 if (el.equals(WSSecurityEngine.usernameToken)) {
                     ut = new UsernameToken(token);
                     secretKey = ut.getSecretKey();
+                } else if(el.equals(WSSecurityEngine.DERIVED_KEY_TOKEN)) {
+                    dkt = new DerivedKeyToken(token);
+                    String id = dkt.getID();
+                    DerivedKeyTokenProcessor dktProcessor = (DerivedKeyTokenProcessor) wsDocInfo
+                            .getProcessor(id);
+                    String signatureMethodURI = sig.getSignedInfo().getSignatureMethodURI();
+                    int keyLength = WSSecurityUtil.getKeyLength(signatureMethodURI);
+                    secretKey = dktProcessor.getKeyBytes(keyLength);
                 } else {
                     if (crypto == null) {
                         throw new WSSecurityException(WSSecurityException.FAILURE,
@@ -295,13 +306,22 @@ public class SignatureProcessor implements Processor {
                 if (certs != null) {
                     returnCert[0] = certs[0];
                     return certs[0].getSubjectDN();
-                } else {
+                } else if(ut != null){
                     WSUsernameTokenPrincipal principal = new WSUsernameTokenPrincipal(
                             ut.getName(), ut.isHashed());
                     principal.setNonce(ut.getNonce());
                     principal.setPassword(ut.getPassword());
                     principal.setCreatedTime(ut.getCreated());
                     return principal;
+                } else if (dkt != null) {
+                    WSDerivedKeyTokenPrincipal principal = new WSDerivedKeyTokenPrincipal(dkt.getID());
+                    principal.setNonce(dkt.getNonce());
+                    principal.setLabel(dkt.getLabel());
+                    principal.setLength(dkt.getLength());
+                    principal.setOffset(dkt.getOffset());
+                    return principal;
+                } else {
+                    throw new WSSecurityException("Cannot determine principal");
                 }
             } else {
                 throw new WSSecurityException(WSSecurityException.FAILED_CHECK);

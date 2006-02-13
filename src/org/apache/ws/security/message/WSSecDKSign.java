@@ -84,12 +84,7 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
         
         this.prepareSig(doc, crypto, secHeader);
         
-        /*
-         * prepend elements in the right order to the security header
-         */
-        prependDKElementToHeader(secHeader);
-        prependToHeader(secHeader);
-        prependBSTElementToHeader(secHeader);
+
         
         SOAPConstants soapConstants = WSSecurityUtil.getSOAPConstants(doc
                 .getDocumentElement());
@@ -104,10 +99,15 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
         
         addReferencesToSign(parts, secHeader);
         
-        prependToHeader(secHeader);
-        
         computeSignature();
         
+        this.prependSigToHeader(secHeader);
+        /*
+         * prepend elements in the right order to the security header
+         */
+        prependDKElementToHeader(secHeader);
+        prependToHeader(secHeader);
+        prependBSTElementToHeader(secHeader);
         return doc;
     }
     
@@ -391,7 +391,7 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
      * @param securityHeader
      *            The secHeader that holds the Signature element.
      */
-    public void prependToHeader(WSSecHeader secHeader) {
+    private void prependSigToHeader(WSSecHeader secHeader) {
         WSSecurityUtil.prependChildElement(document, secHeader.getSecurityHeader(), sig
                 .getElement(), false);
     }
@@ -427,19 +427,7 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
      * @see org.apache.ws.security.message.WSSecDerivedKeyBase#getDerivedKeyLength()
      */
     protected int getDerivedKeyLength() throws WSSecurityException {
-        if(XMLSignature.ALGO_ID_MAC_HMAC_SHA1.equals(sigAlgo)) {
-            return 20;
-        } else if(XMLSignature.ALGO_ID_MAC_HMAC_SHA256.equals(sigAlgo)) {
-            return 32;
-        } else if(XMLSignature.ALGO_ID_MAC_HMAC_SHA384.equals(sigAlgo)) {
-            return 48;
-        } else if(XMLSignature.ALGO_ID_MAC_HMAC_SHA512.equals(sigAlgo)) {
-            return 64;
-        } else if(XMLSignature.ALGO_ID_MAC_HMAC_NOT_RECOMMENDED_MD5.equals(sigAlgo)) {
-            return 16;
-        } else {
-            throw new WSSecurityException(WSSecurityException.UNSUPPORTED_ALGORITHM, null, null, null);
-        }
+        return WSSecurityUtil.getKeyLength(this.sigAlgo);
     }
     
     

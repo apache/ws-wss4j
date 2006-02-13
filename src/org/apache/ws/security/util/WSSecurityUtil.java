@@ -30,6 +30,7 @@ import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.message.token.BinarySecurity;
 import org.apache.ws.security.message.token.X509Security;
 import org.apache.xml.security.algorithms.JCEMapper;
+import org.apache.xml.security.signature.XMLSignature;
 import org.apache.ws.security.util.Base64;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
@@ -783,10 +784,22 @@ public class WSSecurityUtil {
             return 24;
         } else if (algorithm.equals(WSConstants.AES_256)){
             return 32;
+        } else if(XMLSignature.ALGO_ID_MAC_HMAC_SHA1.equals(algorithm)) {
+            return 20;
+        } else if(XMLSignature.ALGO_ID_MAC_HMAC_SHA256.equals(algorithm)) {
+            return 32;
+        } else if(XMLSignature.ALGO_ID_MAC_HMAC_SHA384.equals(algorithm)) {
+            return 48;
+        } else if(XMLSignature.ALGO_ID_MAC_HMAC_SHA512.equals(algorithm)) {
+            return 64;
+        } else if(XMLSignature.ALGO_ID_MAC_HMAC_NOT_RECOMMENDED_MD5.equals(algorithm)) {
+            return 16;
         } else {
-            throw new WSSecurityException(WSSecurityException.UNSUPPORTED_ALGORITHM);
+            throw new WSSecurityException(WSSecurityException.UNSUPPORTED_ALGORITHM, null, null, null);
         }
     }
+    
+    
     
     /**
      * Generate a nonce of the given length

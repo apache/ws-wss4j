@@ -185,7 +185,7 @@ public class TestWSSecurityNewDK extends TestCase implements CallbackHandler {
          }
 //         String out = org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
 //         System.out.println(out);
-         
+         verify(doc);
      }
      
     
