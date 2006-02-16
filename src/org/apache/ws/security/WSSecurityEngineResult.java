@@ -1,5 +1,6 @@
 /*
- * Copyright  2003-2004 The Apache Software Foundation.
+ * Copyright  2003-2006 The Apache Software Foundation, or their licensors, as
+ * appropriate.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -23,7 +24,7 @@ import org.opensaml.SAMLAssertion;
 
 import java.security.Principal;
 import java.security.cert.X509Certificate;
-import java.util.Vector;
+import java.util.Set;
 
 /**
  * @author Werner Dittmann (Werner.Dittmann@t-online.de)
@@ -35,7 +36,7 @@ public class WSSecurityEngineResult {
     private X509Certificate cert;
     private SAMLAssertion assertion;
     private Timestamp timestamp;
-    private Vector signedElementQnames;
+    private Set signedElements;
     private byte[] signatureValue = null;
     private SignatureConfirmation sigConf = null;
 
@@ -47,11 +48,11 @@ public class WSSecurityEngineResult {
     }
 
     public WSSecurityEngineResult(int act, Principal princ,
-            X509Certificate certificate, Vector elemQnames, byte[] sv) {
+            X509Certificate certificate, Set elements, byte[] sv) {
         principal = princ;
         action = act;
         cert = certificate;
-        signedElementQnames = elemQnames;
+        signedElements = elements;
         signatureValue = sv;
     }
 
@@ -103,10 +104,10 @@ public class WSSecurityEngineResult {
     }
 
     /**
-     * @return Returns the signedElementQnames.
+     * @return Returns the signedElements.
      */
-    public Vector getSignedElementQnames() {
-        return signedElementQnames;
+    public Set getSignedElements() {
+        return signedElements;
     }
 
     /**

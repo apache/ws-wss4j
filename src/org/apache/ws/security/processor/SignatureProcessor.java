@@ -1,5 +1,6 @@
 /*
- * Copyright  2003-2004 The Apache Software Foundation.
+ * Copyright  2003-2006 The Apache Software Foundation, or their licensors, as
+ * appropriate.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -55,6 +56,8 @@ import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
 import java.util.Vector;
+import java.util.HashSet;
+import java.util.Set;
 
 public class SignatureProcessor implements Processor {
     private static Log log = LogFactory.getLog(SignatureProcessor.class.getName());
@@ -69,12 +72,12 @@ public class SignatureProcessor implements Processor {
         }
         WSDocInfoStore.store(wsDocInfo);
         X509Certificate[] returnCert = new X509Certificate[1];
-        Vector returnQname[] = new Vector[1];
+        Set returnElements = new HashSet();
         byte[][] signatureValue = new byte[1][];
         Principal lastPrincipalFound = null;
         try {
             lastPrincipalFound = verifyXMLSignature((Element) elem,
-                    crypto, returnCert, returnQname, signatureValue);
+                    crypto, returnCert, returnElements, signatureValue);
         } catch (WSSecurityException ex) {
             throw ex;
         } finally {
@@ -83,12 +86,12 @@ public class SignatureProcessor implements Processor {
         if (lastPrincipalFound instanceof WSUsernameTokenPrincipal) {
             returnResults.add(0, new WSSecurityEngineResult(
                     WSConstants.UT_SIGN, lastPrincipalFound, null,
-                    returnQname[0], signatureValue[0]));
+                    returnElements, signatureValue[0]));
 
         } else {
             returnResults.add(0, new WSSecurityEngineResult(
                     WSConstants.SIGN, lastPrincipalFound,
-                    returnCert[0], returnQname[0], signatureValue[0]));
+                    returnCert[0], returnElements, signatureValue[0]));
         }
         signatureId = elem.getAttributeNS(null, "Id");
     }
@@ -123,9 +126,8 @@ public class SignatureProcessor implements Processor {
      * @param returnCert  verifyXMLSignature stores the certificate in the first
      *                    entry of this array. Ther caller may then further validate
      *                    the certificate
-     * @param returnQname verifyXMLSignature store the Qnames of all signed elements
-     *                    in this Vector ordered according the sequence in the Signature
-     *                    header.
+     * @param returnElements verifyXMLSignature adds the wsu:ID attribute values for
+     * 			     the signed elements to this Set
      * @return the subject principal of the validated X509 certificate (the
      *         authenticated subject). The calling function may use this
      *         principal for further authentication or authorization.
@@ -134,7 +136,7 @@ public class SignatureProcessor implements Processor {
     protected Principal verifyXMLSignature(Element elem,
                                            Crypto crypto,
                                            X509Certificate[] returnCert,
-                                           Vector[] returnQname,
+                                           Set returnElements,
                                            byte[][] signatureValue)
             throws WSSecurityException {
         if (log.isDebugEnabled()) {
@@ -298,11 +300,9 @@ public class SignatureProcessor implements Processor {
                         throw new WSSecurityException(
                                 WSSecurityException.FAILED_CHECK);
                     }
-                    QName qn = new QName(se.getNamespaceURI(), se
-                            .getLocalName());
-                    qvec.add(qn);
+                    returnElements.add(WSSecurityUtil.getIDfromReference(uri));                    
                 }
-                returnQname[0] = qvec;
+                
                 if (certs != null) {
                     returnCert[0] = certs[0];
                     return certs[0].getSubjectDN();
