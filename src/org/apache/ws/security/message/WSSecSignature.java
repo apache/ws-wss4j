@@ -89,27 +89,27 @@ public class WSSecSignature extends WSSecBase {
 	/*
 	 * The following private variable are setup during prepare().
 	 */
-	private Document document = null;
+	protected Document document = null;
 
 	private Crypto crypto = null;
 
-	private WSDocInfo wsDocInfo = null;
+	protected WSDocInfo wsDocInfo = null;
 
-	private String certUri = null;
+	protected String certUri = null;
 
-	private XMLSignature sig = null;
+	protected XMLSignature sig = null;
 
-	private KeyInfo keyInfo = null;
+	protected KeyInfo keyInfo = null;
 
-	private String keyInfoUri = null;
+	protected String keyInfoUri = null;
 
-	private SecurityTokenReference secRef = null;
+	protected SecurityTokenReference secRef = null;
 
-	private String strUri = null;
+	protected String strUri = null;
 
 	private byte[] secretKey = null;
 
-	private BinarySecurity bstToken = null;
+	protected BinarySecurity bstToken = null;
 
 	/**
 	 * Constructor.
@@ -296,7 +296,7 @@ public class WSSecSignature extends WSSecBase {
 		}
 
 		/*
-		 * Get an initialize a XMLSignature element.
+		 * Get an initialized XMLSignature element.
 		 */
 		if (canonAlgo.equals(WSConstants.C14N_EXCL_OMIT_COMMENTS)) {
 			Element canonElem = XMLUtils.createElementInSignatureSpace(doc,
