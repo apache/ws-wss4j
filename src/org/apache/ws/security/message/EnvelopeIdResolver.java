@@ -23,18 +23,12 @@ import org.apache.ws.security.SOAPConstants;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.xml.security.signature.XMLSignatureInput;
-import org.apache.xml.security.utils.XMLUtils;
 import org.apache.xml.security.utils.resolver.ResourceResolverException;
 import org.apache.xml.security.utils.resolver.ResourceResolverSpi;
 import org.apache.xml.utils.URI;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * XML-Security resolver that is used for resolving same-document URI like URI="#id".
