@@ -49,28 +49,25 @@ public class PackageTests extends TestCase {
 
     public static Test suite() {
         TestSuite suite = new TestSuite();
-        suite.addTestSuite(TestWSSecurity.class);
-        suite.addTestSuite(TestWSSecurity2.class);
-        suite.addTestSuite(TestWSSecurity3.class);
-//        suite.addTestSuite(TestWSSecurity4.class);
-        suite.addTestSuite(TestWSSecurity5.class);
-        suite.addTestSuite(TestWSSecurity6.class);
-        suite.addTestSuite(TestWSSecurity7.class);
-        suite.addTestSuite(TestWSSecurity8.class);
-        suite.addTestSuite(TestWSSecurity9.class);
-        suite.addTestSuite(TestWSSecurity11.class);
-        suite.addTestSuite(TestWSSecurity12.class);
-        suite.addTestSuite(TestWSSecurity13.class);
-        suite.addTestSuite(TestWSSecurity14.class);
-        suite.addTestSuite(TestWSSecuritySOAP12.class);
-        // suite.addTestSuite(TestWSSecurityHooks.class);
-        suite.addTestSuite(TestWSSecurityST1.class);
-        suite.addTestSuite(TestWSSecurityST2.class);
-        suite.addTestSuite(TestWSSecurityST3.class);
-        suite.addTestSuite(TestWSSecurityNew15.class);
+        suite.addTestSuite(TestWSSecurityNew.class);
         suite.addTestSuite(TestWSSecurityNew2.class);
+        suite.addTestSuite(TestWSSecurityNew3.class);
+//        suite.addTestSuite(TestWSSecurity4.class);
         suite.addTestSuite(TestWSSecurityNew5.class);
+        suite.addTestSuite(TestWSSecurityNew6.class);
+        suite.addTestSuite(TestWSSecurityNew7.class);
+        suite.addTestSuite(TestWSSecurityNew8.class);
         suite.addTestSuite(TestWSSecurityNew9.class);
+        suite.addTestSuite(TestWSSecurityNew10.class);
+        suite.addTestSuite(TestWSSecurityNew11.class);
+        suite.addTestSuite(TestWSSecurityNew12.class);
+        suite.addTestSuite(TestWSSecurityNew13.class);
+        suite.addTestSuite(TestWSSecurityNew14.class);
+        suite.addTestSuite(TestWSSecurityNewSOAP12.class);
+        // suite.addTestSuite(TestWSSecurityHooks.class);
+        suite.addTestSuite(TestWSSecurityNewST1.class);
+        suite.addTestSuite(TestWSSecurityNewST2.class);
+        suite.addTestSuite(TestWSSecurityNewST3.class);
         suite.addTestSuite(TestWSSecurityNewDK.class);
         return suite;
     }

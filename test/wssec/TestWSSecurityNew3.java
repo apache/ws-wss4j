@@ -23,22 +23,24 @@ import junit.framework.TestSuite;
 import org.apache.axis.Message;
 import org.apache.axis.MessageContext;
 import org.apache.axis.client.AxisClient;
-import org.apache.axis.utils.XMLUtils;
 import org.apache.axis.configuration.NullProvider;
 import org.apache.axis.message.SOAPEnvelope;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSecurityEngine;
-import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
-import org.apache.ws.security.message.WSSignEnvelope;
+import org.apache.ws.security.message.WSSecSignature;
+import org.apache.ws.security.message.WSSecHeader;
 import org.w3c.dom.Document;
 
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.CallbackHandler;
+import javax.security.auth.callback.UnsupportedCallbackException;
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
-import java.io.PrintWriter;
-
 
 /**
  * WS-Security Test Case
@@ -46,13 +48,12 @@ import java.io.PrintWriter;
  * 
  * @author Davanum Srinivas (dims@yahoo.com)
  */
-public class TestWSSecurity14 extends TestCase {
-    private static Log log = LogFactory.getLog(TestWSSecurity14.class);
+public class TestWSSecurityNew3 extends TestCase implements CallbackHandler {
+    private static Log log = LogFactory.getLog(TestWSSecurityNew3.class);
     static final String NS = "http://www.w3.org/2000/09/xmldsig#";
     static final String soapMsg = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + "<SOAP-ENV:Envelope xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" + "<SOAP-ENV:Body>" + "<add xmlns=\"http://ws.apache.org/counter/counter_port_type\">" + "<value xmlns=\"\">15</value>" + "</add>" + "</SOAP-ENV:Body>\r\n       \r\n" + "</SOAP-ENV:Envelope>";
     static final WSSecurityEngine secEngine = new WSSecurityEngine();
     static final Crypto crypto = CryptoFactory.getInstance();
-
     MessageContext msgContext;
     SOAPEnvelope unsignedEnvelope;
 
@@ -62,7 +63,7 @@ public class TestWSSecurity14 extends TestCase {
      * 
      * @param name name of the test
      */
-    public TestWSSecurity14(String name) {
+    public TestWSSecurityNew3(String name) {
         super(name);
     }
 
@@ -73,7 +74,7 @@ public class TestWSSecurity14 extends TestCase {
      * @return a junit test suite
      */
     public static Test suite() {
-        return new TestSuite(TestWSSecurity14.class);
+        return new TestSuite(TestWSSecurityNew3.class);
     }
 
     /**
@@ -113,23 +114,22 @@ public class TestWSSecurity14 extends TestCase {
     }
 
     /**
-     * Test that signs and verifies a WS-Security envelope.
-     * The test uses the ThumbprintSHA1 key identifier type. 
+     * Test that signs and verifies a WS-Security envelope
      * <p/>
      * 
      * @throws java.lang.Exception Thrown when there is any problem in signing or verification
      */
-    public void testX509SignatureThumb() throws Exception {
+    public void testX509Signature() throws Exception {
         SOAPEnvelope envelope = null;
-        WSSignEnvelope builder = new WSSignEnvelope();
+        WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
-        builder.setKeyIdentifierType(WSConstants.THUMBPRINT_IDENTIFIER);
-        // builder.setUserInfo("john", "keypass");
-        log.info("Before Signing ThumbprintSHA1....");
+        log.info("Before Signing....");
         Document doc = unsignedEnvelope.getAsDocument();
-        Document signedDoc = builder.build(doc, crypto);
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        Document signedDoc = builder.build(doc, CryptoFactory.getInstance(), secHeader);
 
-        /*
+         /*
          * convert the resulting document into a message first. The toSOAPMessage()
          * mehtod performs the necessary c14n call to properly set up the signed
          * document and convert it into a SOAP message. After that we extract it
@@ -137,42 +137,51 @@ public class TestWSSecurity14 extends TestCase {
          */
 
         Message signedMsg = (Message) SOAPUtil.toSOAPMessage(signedDoc);
-        if (log.isDebugEnabled()) {
-            log.debug("Signed message with ThumbprintSHA1 key identifier:");
-            XMLUtils.PrettyElementToWriter(signedMsg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
-        }
         signedDoc = signedMsg.getSOAPEnvelope().getAsDocument();
-        log.info("After Signing ThumbprintSHA1....");
+        log.info("After Signing....");
         verify(signedDoc);
     }
 
     /**
-     * Test that signs (twice) and verifies a WS-Security envelope.
-     * The test uses the ThumbprintSHA1 key identifier type.
-     * <p/>
-     * 
-     * @throws java.lang.Exception Thrown when there is any problem in signing or verification
+     * Test that signs (twice) and verifies a WS-Security envelope
+     * <p>
+     * @throws  java.lang.Exception  Thrown when there is any problem in signing or verification
+     public void testDoubleX509Signature() throws Exception {
+     SOAPEnvelope envelope = null;
+     WSSignEnvelope builder = new WSSignEnvelope();
+     Document doc = unsignedEnvelope.getAsDocument();
+     Document signedDoc = builder.build(doc);
+     signedDoc =  builder.build(signedDoc);
+     verify(signedDoc);
+     }
      */
-    public void testDoubleX509SignatureThumb() throws Exception {
-        SOAPEnvelope envelope = null;
-        WSSignEnvelope builder = new WSSignEnvelope();
-        builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
-        // builder.setUserInfo("john", "keypass");
-        builder.setKeyIdentifierType(WSConstants.THUMBPRINT_IDENTIFIER);        
-        Document doc = unsignedEnvelope.getAsDocument();
-        Document signedDoc = builder.build(doc, crypto);
-        Document signedDoc1 = builder.build(signedDoc, crypto);
-        verify(signedDoc1);
-    }
 
     /**
-     * Verifies the soap envelope.
-     * This method verfies all the signature generated. 
+     * Verifies the soap envelope
+     * <p/>
      * 
      * @param env soap envelope
      * @throws java.lang.Exception Thrown when there is a problem in verification
      */
     private void verify(Document doc) throws Exception {
-        secEngine.processSecurityHeader(doc, null, null, crypto);
+        secEngine.processSecurityHeader(doc, null, this, crypto);
+    }
+
+    public void handle(Callback[] callbacks)
+            throws IOException, UnsupportedCallbackException {
+        for (int i = 0; i < callbacks.length; i++) {
+            if (callbacks[i] instanceof WSPasswordCallback) {
+                WSPasswordCallback pc = (WSPasswordCallback) callbacks[i];
+                /*
+                 * here call a function/method to lookup the password for
+                 * the given identifier (e.g. a user name or keystore alias)
+                 * e.g.: pc.setPassword(passStore.getPassword(pc.getIdentfifier))
+                 * for Testing we supply a fixed name here.
+                 */
+                pc.setPassword("password");
+            } else {
+                throw new UnsupportedCallbackException(callbacks[i], "Unrecognized Callback");
+            }
+        }
     }
 }
