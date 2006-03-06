@@ -10,6 +10,7 @@ import org.apache.ws.security.WSEncryptionPart;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.message.EnvelopeIdResolver;
+import org.apache.ws.security.message.WSSecHeader;
 import org.apache.ws.security.message.WSSignEnvelope;
 import org.apache.ws.security.message.token.BinarySecurity;
 import org.apache.ws.security.message.token.Reference;
@@ -39,45 +40,60 @@ import java.util.Vector;
 
 public class WSSignSAMLEnvelope extends WSSignEnvelope {
 
-    private static Log log = LogFactory.getLog(WSSignSAMLEnvelope.class.getName());
+    private static Log log = LogFactory.getLog(WSSignSAMLEnvelope.class
+            .getName());
 
     private static Log tlog = LogFactory.getLog("org.apache.ws.security.TIME");
 
-
     /**
      * Constructor.
+     * 
+     * @deprecated replaced by {@link WSSecSignatureSAML#constructor()}
      */
     public WSSignSAMLEnvelope() {
     }
 
     /**
      * Constructor.
-     *
-     * @param actor The actor name of the <code>wsse:Security</code> header
-     * @param mu    Set <code>mustUnderstand</code> to true or false
+     * 
+     * @param actor
+     *            The actor name of the <code>wsse:Security</code> header
+     * @param mu
+     *            Set <code>mustUnderstand</code> to true or false
+     * 
+     * @deprecated replaced by {@link WSSecSignatureSAML#constructor()} and
+     *             {@link WSSecHeader} for actor and mustunderstand
+     *             specification.
      */
     public WSSignSAMLEnvelope(String actor, boolean mu) {
         super(actor, mu);
     }
 
     /**
-     * Builds a signed soap envelope with SAML token. <p/>The method first
-     * gets an appropriate security header. According to the defined parameters
-     * for certificate handling the signature elements are constructed and
-     * inserted into the <code>wsse:Signature</code>
-     *
-     * @param doc           The unsigned SOAP envelope as <code>Document</code>
-     * @param assertion     the complete SAML assertion
-     * @param issuerCrypto  An instance of the Crypto API to handle keystore SAML token
-     *                      issuer and to generate certificates
-     * @param issuerKeyName Private key to use in case of "sender-Vouches"
-     * @param issuerKeyPW   Password for issuer private key
+     * Builds a signed soap envelope with SAML token. <p/>The method first gets
+     * an appropriate security header. According to the defined parameters for
+     * certificate handling the signature elements are constructed and inserted
+     * into the <code>wsse:Signature</code>
+     * 
+     * @param doc
+     *            The unsigned SOAP envelope as <code>Document</code>
+     * @param assertion
+     *            the complete SAML assertion
+     * @param issuerCrypto
+     *            An instance of the Crypto API to handle keystore SAML token
+     *            issuer and to generate certificates
+     * @param issuerKeyName
+     *            Private key to use in case of "sender-Vouches"
+     * @param issuerKeyPW
+     *            Password for issuer private key
      * @return A signed SOAP envelope as <code>Document</code>
      * @throws org.apache.ws.security.WSSecurityException
+     * @deprecated replaced by
+     *             {@link WSSecSignatureSAML#build(Document, Crypto, SAMLAssertion, Crypto, String, String, WSSecHeader)}
      */
     public Document build(Document doc, Crypto userCrypto,
-                          SAMLAssertion assertion, Crypto issuerCrypto, String issuerKeyName,
-                          String issuerKeyPW) throws WSSecurityException {
+            SAMLAssertion assertion, Crypto issuerCrypto, String issuerKeyName,
+            String issuerKeyPW) throws WSSecurityException {
 
         doDebug = log.isDebugEnabled();
 
@@ -89,10 +105,10 @@ public class WSSignSAMLEnvelope extends WSSignEnvelope {
             log.debug("Beginning ST signing...");
         }
         /*
-        * Get some information about the SAML token content. This controls how
-        * to deal with the whole stuff. First get the Authentication statement
-        * (includes Subject), then get the _first_ confirmation method only.
-        */
+         * Get some information about the SAML token content. This controls how
+         * to deal with the whole stuff. First get the Authentication statement
+         * (includes Subject), then get the _first_ confirmation method only.
+         */
         SAMLSubjectStatement samlSubjS = null;
         Iterator it = assertion.getStatements();
         while (it.hasNext()) {
@@ -121,9 +137,9 @@ public class WSSignSAMLEnvelope extends WSSignEnvelope {
             senderVouches = true;
         }
         /*
-        * Gather some info about the document to process and store it for
-        * retrival
-        */
+         * Gather some info about the document to process and store it for
+         * retrival
+         */
         WSDocInfo wsDocInfo = new WSDocInfo(doc.hashCode());
 
         Element envelope = doc.getDocumentElement();
@@ -137,12 +153,11 @@ public class WSSignSAMLEnvelope extends WSSignEnvelope {
             wsDocInfo.setCrypto(issuerCrypto);
         }
         /*
-        * in case of key holder:
-        * - get the user's certificate that _must_ be included in the SAML
-        * token. To ensure the cert integrity the SAML token must be signed
-        * (by the issuer). Just check if its signed, but
-        * don't verify this SAML token's signature here (maybe later).
-        */
+         * in case of key holder: - get the user's certificate that _must_ be
+         * included in the SAML token. To ensure the cert integrity the SAML
+         * token must be signed (by the issuer). Just check if its signed, but
+         * don't verify this SAML token's signature here (maybe later).
+         */
         else {
             if (userCrypto == null || assertion.isSigned() == false) {
                 throw new WSSecurityException(WSSecurityException.FAILURE,
@@ -165,7 +180,8 @@ public class WSSignSAMLEnvelope extends WSSignEnvelope {
                         certs[0] = cert;
                     }
                 }
-                // TODO: get alias name for cert, check against username set by caller
+                // TODO: get alias name for cert, check against username set by
+                // caller
             } catch (XMLSecurityException e3) {
                 throw new WSSecurityException(WSSecurityException.FAILURE,
                         "invalidSAMLsecurity",
@@ -225,14 +241,13 @@ public class WSSignSAMLEnvelope extends WSSignEnvelope {
         }
 
         /*
-        * If the sender vouches, then we must sign the SAML token _and_ at
-        * least one part of the message (usually the SOAP body). To do so we
-        * need to
-        * - put in a reference to the SAML token. Thus we create a STR
-        *   and insert it into the wsse:Security header
-        * - set a reference of the created STR to the signature and use STR
-        *   Transfrom during the signature
-        */
+         * If the sender vouches, then we must sign the SAML token _and_ at
+         * least one part of the message (usually the SOAP body). To do so we
+         * need to - put in a reference to the SAML token. Thus we create a STR
+         * and insert it into the wsse:Security header - set a reference of the
+         * created STR to the signature and use STR Transfrom during the
+         * signature
+         */
         Transforms transforms = null;
         SecurityTokenReference secRefSaml = null;
 
@@ -260,15 +275,14 @@ public class WSSignSAMLEnvelope extends WSSignEnvelope {
                 String nmSpace = encPart.getNamespace();
 
                 /*
-                * Set up the elements to sign. There are two resevered element
-                * names: "Token" and "STRTransform" "Token": Setup the
-                * Signature to either sign the information that points to the
-                * security token or the token itself. If its a direct
-                * reference sign the token, otherwise sign the KeyInfo
-                * Element. "STRTransform": Setup the ds:Reference to use STR
-                * Transform
-                *
-                */
+                 * Set up the elements to sign. There are two resevered element
+                 * names: "Token" and "STRTransform" "Token": Setup the
+                 * Signature to either sign the information that points to the
+                 * security token or the token itself. If its a direct reference
+                 * sign the token, otherwise sign the KeyInfo Element.
+                 * "STRTransform": Setup the ds:Reference to use STR Transform
+                 * 
+                 */
                 if (elemName.equals("Token")) {
                     transforms = new Transforms(doc);
                     transforms
@@ -309,12 +323,9 @@ public class WSSignSAMLEnvelope extends WSSignEnvelope {
         sig.addResourceResolver(EnvelopeIdResolver.getInstance());
 
         /*
-        * The order to prepend is:
-        * - signature
-        * - BinarySecurityToken (depends on mode)
-        * - SecurityTokenRefrence (depends on mode)
-        * - SAML token
-        */
+         * The order to prepend is: - signature - BinarySecurityToken (depends
+         * on mode) - SecurityTokenRefrence (depends on mode) - SAML token
+         */
 
         WSSecurityUtil.prependChildElement(doc, securityHeader, sig
                 .getElement(), false);
@@ -343,19 +354,19 @@ public class WSSignSAMLEnvelope extends WSSignEnvelope {
             secRef.setReference(ref);
             break;
         //
-        //            case WSConstants.ISSUER_SERIAL :
-        //                XMLX509IssuerSerial data =
-        //                    new XMLX509IssuerSerial(doc, certs[0]);
-        //                secRef.setX509IssuerSerial(data);
-        //                break;
+        // case WSConstants.ISSUER_SERIAL :
+        // XMLX509IssuerSerial data =
+        // new XMLX509IssuerSerial(doc, certs[0]);
+        // secRef.setX509IssuerSerial(data);
+        // break;
         //
-        //            case WSConstants.X509_KEY_IDENTIFIER :
-        //                secRef.setKeyIdentifier(certs[0]);
-        //                break;
+        // case WSConstants.X509_KEY_IDENTIFIER :
+        // secRef.setKeyIdentifier(certs[0]);
+        // break;
         //
-        //            case WSConstants.SKI_KEY_IDENTIFIER :
-        //                secRef.setKeyIdentifierSKI(certs[0], crypto);
-        //                break;
+        // case WSConstants.SKI_KEY_IDENTIFIER :
+        // secRef.setKeyIdentifierSKI(certs[0], crypto);
+        // break;
         //
         default:
             throw new WSSecurityException(WSSecurityException.FAILURE,

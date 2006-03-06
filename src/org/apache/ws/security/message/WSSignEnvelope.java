@@ -82,6 +82,7 @@ public class WSSignEnvelope extends WSBaseMessage {
 
     /**
      * Constructor.
+     * @deprecated replaced by {@link WSSecSignature#constructor()}
      */
     public WSSignEnvelope() {
     }
@@ -90,6 +91,9 @@ public class WSSignEnvelope extends WSBaseMessage {
      * Constructor.
      *
      * @param actor The actor name of the <code>wsse:Security</code> header
+     * 
+     * @deprecated replaced by {@link WSSecSignature#constructor()}
+     *             and {@link WSSecHeader} for actor specification.
      */
     public WSSignEnvelope(String actor) {
         super(actor);
@@ -100,6 +104,10 @@ public class WSSignEnvelope extends WSBaseMessage {
      *
      * @param actor The actor name of the <code>wsse:Security</code> header
      * @param mu    Set <code>mustUnderstand</code> to true or false
+     * 
+     * @deprecated replaced by {@link WSSecSignature#constructor()}
+     *             and {@link WSSecHeader} for actor and mustunderstand
+     *             specification.
      */
     public WSSignEnvelope(String actor, boolean mu) {
         super(actor, mu);
@@ -109,6 +117,7 @@ public class WSSignEnvelope extends WSBaseMessage {
      * set the single cert flag.
      *
      * @param useSingleCert
+     * @deprecated replaced by {@link WSSecSignature#setUseSingleCertificate(boolean)}
      */
     public void setUseSingleCertificate(boolean useSingleCert) {
         this.useSingleCert = useSingleCert;
@@ -117,7 +126,8 @@ public class WSSignEnvelope extends WSBaseMessage {
     /**
      * Get the single cert flag.
      *
-     * @return TODO
+     * @return If to use a single cert
+     * @deprecated replaced by {@link WSSecSignature#isUseSingleCertificate()}
      */
     public boolean isUseSingleCertificate() {
         return this.useSingleCert;
@@ -133,6 +143,7 @@ public class WSSignEnvelope extends WSBaseMessage {
      *            Is the name of the signature algorithm
      * @see WSConstants#RSA
      * @see WSConstants#DSA
+     * @deprecated replaced by {@link WSSecSignature#setSignatureAlgorithm(String)}
      */
     public void setSignatureAlgorithm(String algo) {
         sigAlgo = algo;
@@ -144,6 +155,7 @@ public class WSSignEnvelope extends WSBaseMessage {
      * If the algorithm is not set then RSA is default.
      *
      * @return the identifier URI of the signature algorithm
+     * @deprecated replaced by {@link WSSecSignature#getSignatureAlgorithm()}
      */
     public String getSignatureAlgorithm() {
         return sigAlgo;
@@ -162,6 +174,7 @@ public class WSSignEnvelope extends WSBaseMessage {
      * @see WSConstants#C14N_WITH_COMMENTS
      * @see WSConstants#C14N_EXCL_OMIT_COMMENTS
      * @see WSConstants#C14N_EXCL_WITH_COMMENTS
+     * @deprecated replaced by {@link WSSecSignature#setSigCanonicalization(String)}
      */
     public void setSigCanonicalization(String algo) {
         canonAlgo = algo;
@@ -174,6 +187,7 @@ public class WSSignEnvelope extends WSBaseMessage {
      * Canonicalization is used by default.
      *
      * @return TODO
+     * @deprecated replaced by {@link WSSecSignature#getSigCanonicalization()}
      */
     public String getSigCanonicalization() {
         return canonAlgo;
@@ -181,6 +195,7 @@ public class WSSignEnvelope extends WSBaseMessage {
 
     /**
      * @param usernameToken The usernameToken to set.
+     * @deprecated replaced by {@link WSSecSignature#setUsernameToken(WSSecUsernameToken)}
      */
     public void setUsernameToken(WSSAddUsernameToken usernameToken) {
         this.usernameToken = usernameToken;
@@ -188,6 +203,7 @@ public class WSSignEnvelope extends WSBaseMessage {
 
     /**
      * @return Returns the signatureValue.
+     * @deprecated replaced by {@link WSSecSignature#getSignatureValue()}
      */
     public byte[] getSignatureValue() {
         return signatureValue;
@@ -206,6 +222,7 @@ public class WSSignEnvelope extends WSBaseMessage {
      *               certificates
      * @return A signed SOAP envelope as <code>Document</code>
      * @throws WSSecurityException
+     * @deprecated replaced by {@link WSSecSignature#build(Document, Crypto, WSSecHeader)}
      */
     public Document build(Document doc, Crypto crypto)
             throws WSSecurityException {

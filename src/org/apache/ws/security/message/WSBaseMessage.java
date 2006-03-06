@@ -30,49 +30,64 @@ import org.w3c.dom.Element;
 import java.util.Vector;
 
 /**
- * This is the base class for WS Security messages.
- * It provides common functions and fields used by the specific message
- * classes such as sign, encrypt, and username token.
- *
+ * This is the base class for WS Security messages. It provides common functions
+ * and fields used by the specific message classes such as sign, encrypt, and
+ * username token.
+ * 
  * @author Werner Dittmann (Werner.Dittmann@t-online.de)
  */
 public class WSBaseMessage {
     private static Log log = LogFactory.getLog(WSBaseMessage.class.getName());
+
     protected String actor = null;
+
     protected boolean mustunderstand = true;
+
     protected String user = null;
+
     protected String password = null;
+
     protected int keyIdentifierType = WSConstants.ISSUER_SERIAL;
+
     protected Vector parts = null;
+
     protected int timeToLive = 300; // time between Created and Expires
 
     protected boolean doDebug = false;
 
     protected WSSConfig wssConfig = WSSConfig.getDefaultWSConfig();
 
-
     /**
      * Constructor.
+     * 
+     * @deprecated replaced by {@link WSSecBase#constructor()}
      */
     public WSBaseMessage() {
     }
 
     /**
-     * Constructor.
-     * <p/>
-     *
-     * @param actor The actor name of the <code>wsse:Security</code> header
+     * Constructor. <p/>
+     * 
+     * @param actor
+     *            The actor name of the <code>wsse:Security</code> header
+     * @deprecated replaced by {@link WSSecBase#constructor()} and
+     *             {@link WSSecHeader} for actor specification.
      */
     public WSBaseMessage(String actor) {
         this(actor, true);
     }
 
     /**
-     * Constructor.
-     * <p/>
-     *
-     * @param actor The actor name of the <code>wsse:Security</code> header
-     * @param mu    Set <code>mustUnderstand</code> to true or false
+     * Constructor. <p/>
+     * 
+     * @param actor
+     *            The actor name of the <code>wsse:Security</code> header
+     * @param mu
+     *            Set <code>mustUnderstand</code> to true or false
+     * 
+     * @deprecated replaced by {@link WSSecBase#constructor()} and
+     *             {@link WSSecHeader} for actor and mustunderstand
+     *             specification.
      */
     public WSBaseMessage(String actor, boolean mu) {
         setActor(actor);
@@ -80,32 +95,35 @@ public class WSBaseMessage {
     }
 
     /**
-     * set actor name.
-     * <p/>
-     *
-     * @param act The actor name of the <code>wsse:Security</code> header
+     * set actor name. <p/>
+     * 
+     * @param act
+     *            The actor name of the <code>wsse:Security</code> header
+     * @deprecated replaced by {@link WSSecHeader#setActor(String)}
      */
     public void setActor(String act) {
         actor = act;
     }
 
     /**
-     * Set the time to live.
-     * This is the time difference in seconds between the <code>Created</code>
-     * and the <code>Expires</code> in <code>Timestamp</code>.
-     * <p/>
-     *
-     * @param ttl The time to live in second
+     * Set the time to live. This is the time difference in seconds between the
+     * <code>Created</code> and the <code>Expires</code> in
+     * <code>Timestamp</code>. <p/>
+     * 
+     * @param ttl
+     *            The time to live in second
+     * @deprecated replaced by {@link WSSecTimestamp#setTimeToLive(int)}
      */
     public void setTimeToLive(int ttl) {
         timeToLive = ttl;
     }
 
     /**
-     * Set which parts of the message to encrypt/sign.
-     * <p/>
-     *
-     * @param parts The vector containing the WSEncryptionPart objects
+     * Set which parts of the message to encrypt/sign. <p/>
+     * 
+     * @param parts
+     *            The vector containing the WSEncryptionPart objects
+     * @deprecated replaced by {@link WSSecBase#setParts(Vector)}
      */
     public void setParts(Vector parts) {
         this.parts = parts;
@@ -114,26 +132,27 @@ public class WSBaseMessage {
     /**
      * Set the <code>mustUnderstand</code> flag for the
      * <code>wsse:Security</code> header
-     *
-     * @param mu Set <code>mustUnderstand</code> to true or false
+     * 
+     * @param mu
+     *            Set <code>mustUnderstand</code> to true or false
+     * @deprecated replaced by {@link WSSecHeader#setMustUnderstand(boolean)}
      */
     public void setMustUnderstand(boolean mu) {
         mustunderstand = mu;
     }
 
     /**
-     * Sets which key identifier to use.
-     * <p/>
-     * Defines the key identifier type to use in the
-     * {@link WSSignEnvelope#build(Document, Crypto) signature} or the
-     * {@link WSEncryptBody#build(Document, Crypto) ecnryption}
-     * function to set up the key identification elements.
-     *
+     * Sets which key identifier to use. <p/> Defines the key identifier type to
+     * use in the {@link WSSignEnvelope#build(Document, Crypto) signature} or
+     * the {@link WSEncryptBody#build(Document, Crypto) ecnryption} function to
+     * set up the key identification elements.
+     * 
      * @param keyIdType
      * @see WSConstants#ISSUER_SERIAL
      * @see WSConstants#BST_DIRECT_REFERENCE
      * @see WSConstants#X509_KEY_IDENTIFIER
      * @see WSConstants#SKI_KEY_IDENTIFIER
+     * @deprecated replaced by {@link WSSecBase#setKeyIdentifierType(int)}
      */
     public void setKeyIdentifierType(int keyIdType) {
         keyIdentifierType = keyIdType;
@@ -141,44 +160,45 @@ public class WSBaseMessage {
 
     /**
      * Gets the value of the <code>keyIdentifyerType</code>.
-     *
+     * 
      * @return The <code>keyIdentifyerType</code>.
      * @see WSConstants#ISSUER_SERIAL
      * @see WSConstants#BST_DIRECT_REFERENCE
      * @see WSConstants#X509_KEY_IDENTIFIER
      * @see WSConstants#SKI_KEY_IDENTIFIER
+     * @deprecated replaced by {@link WSSecBase#getKeyIdentifierType()}
      */
     public int getKeyIdentifierType() {
         return keyIdentifierType;
     }
 
     /**
-     * @param wsConfig The wsConfig to set.
+     * @param wsConfig
+     *            The wsConfig to set.
+     * @deprecated replaced by {@link WSSecBase#setWsConfig(WSSConfig)}
      */
     public void setWsConfig(WSSConfig wsConfig) {
         this.wssConfig = wsConfig;
     }
 
     /**
-     * Looks up or adds a body id.
-     * <p/>
-     * First try to locate the <code>wsu:Id</code> in the SOAP body element.
-     * If one is found, the value of the <code>wsu:Id</code> attribute is returned.
-     * Otherwise the methode generates a new <code>wsu:Id</code> and an
-     * appropriate value.
-     *
-     * @param doc The SOAP envelope as <code>Document</code>
-     * @return The value of the <code>wsu:Id</code> attribute
-     *         of the SOAP body
+     * Looks up or adds a body id. <p/> First try to locate the
+     * <code>wsu:Id</code> in the SOAP body element. If one is found, the
+     * value of the <code>wsu:Id</code> attribute is returned. Otherwise the
+     * methode generates a new <code>wsu:Id</code> and an appropriate value.
+     * 
+     * @param doc
+     *            The SOAP envelope as <code>Document</code>
+     * @return The value of the <code>wsu:Id</code> attribute of the SOAP body
      * @throws Exception
+     * @deprecated replaced by {@link WSSecBase#setBodyID(Document)}
      */
     protected String setBodyID(Document doc) throws Exception {
-        SOAPConstants soapConstants =
-                WSSecurityUtil.getSOAPConstants(doc.getDocumentElement());
-        Element bodyElement =
-                (Element) WSSecurityUtil.getDirectChild(doc.getFirstChild(),
-                        soapConstants.getBodyQName().getLocalPart(),
-                        soapConstants.getEnvelopeURI());
+        SOAPConstants soapConstants = WSSecurityUtil.getSOAPConstants(doc
+                .getDocumentElement());
+        Element bodyElement = (Element) WSSecurityUtil.getDirectChild(doc
+                .getFirstChild(), soapConstants.getBodyQName().getLocalPart(),
+                soapConstants.getEnvelopeURI());
         if (bodyElement == null) {
             throw new Exception("SOAP Body Element node not found");
         }
@@ -191,24 +211,24 @@ public class WSBaseMessage {
 
         if ((id == null) || (id.length() == 0)) {
             id = "id-" + Integer.toString(bodyElement.hashCode());
-            String prefix =
-                WSSecurityUtil.setNamespace(bodyElement,
-                        WSConstants.WSU_NS,
-                        WSConstants.WSU_PREFIX);
+            String prefix = WSSecurityUtil.setNamespace(bodyElement,
+                    WSConstants.WSU_NS, WSConstants.WSU_PREFIX);
             bodyElement.setAttributeNS(WSConstants.WSU_NS, prefix + ":Id", id);
         }
         return id;
     }
 
     /**
-     * Set the user and password info.
-     * <p/>
-     * Both information is used to get the user's private signing key.
-     *
-     * @param user     This is the user's alias name in the keystore that
-     *                 identifies the private key to sign the document
-     * @param password The user's password to get the private signing key
-     *                 from the keystore
+     * Set the user and password info. <p/> Both information is used to get the
+     * user's private signing key.
+     * 
+     * @param user
+     *            This is the user's alias name in the keystore that identifies
+     *            the private key to sign the document
+     * @param password
+     *            The user's password to get the private signing key from the
+     *            keystore
+     * @deprecated replaced by {@link WSSecBase#setUserInfo(String, String)}
      */
     public void setUserInfo(String user, String password) {
         this.user = user;
@@ -217,37 +237,36 @@ public class WSBaseMessage {
 
     /**
      * Creates a security header and inserts it as child into the SOAP Envelope.
-     * <p/>
-     * Check if a WS Security header block for an actor is already available
-     * in the document. If a header block is found return it, otherwise a new
-     * wsse:Security header block is created and the attributes set
-     *
-     * @param doc A SOAP envelope as <code>Document</code>
+     * <p/> Check if a WS Security header block for an actor is already
+     * available in the document. If a header block is found return it,
+     * otherwise a new wsse:Security header block is created and the attributes
+     * set
+     * 
+     * @param doc
+     *            A SOAP envelope as <code>Document</code>
      * @return A <code>wsse:Security</code> element
+     * @deprecated replaced by
+     *             {@link WSSecHeader#insertSecurityHeader(Document)}
      */
     protected Element insertSecurityHeader(Document doc) {
-        SOAPConstants soapConstants =
-                WSSecurityUtil.getSOAPConstants(doc.getDocumentElement());
+        SOAPConstants soapConstants = WSSecurityUtil.getSOAPConstants(doc
+                .getDocumentElement());
         // lookup a security header block that matches actor
-        Element securityHeader =
-                WSSecurityUtil.getSecurityHeader(doc, actor, soapConstants);
+        Element securityHeader = WSSecurityUtil.getSecurityHeader(doc, actor,
+                soapConstants);
         if (securityHeader == null) { // create if nothing found
-            securityHeader =
-                    WSSecurityUtil.findWsseSecurityHeaderBlock(doc,
-                            doc.getDocumentElement(),
-                            actor,
-                            true);
+            securityHeader = WSSecurityUtil.findWsseSecurityHeaderBlock(doc,
+                    doc.getDocumentElement(), actor, true);
 
-            String soapPrefix =
-                    WSSecurityUtil.getPrefixNS(soapConstants.getEnvelopeURI(),
-                            securityHeader);
+            String soapPrefix = WSSecurityUtil.getPrefixNS(soapConstants
+                    .getEnvelopeURI(), securityHeader);
             if (actor != null && actor.length() > 0) {
                 // Check for SOAP 1.2 here and use "role" instead of "actor"
                 securityHeader.setAttributeNS(soapConstants.getEnvelopeURI(),
                         soapPrefix
-                        + ":"
-                        + soapConstants.getRoleAttributeQName().getLocalPart(),
-                        actor);
+                                + ":"
+                                + soapConstants.getRoleAttributeQName()
+                                        .getLocalPart(), actor);
             }
             if (mustunderstand) {
                 securityHeader.setAttributeNS(soapConstants.getEnvelopeURI(),

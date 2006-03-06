@@ -41,6 +41,8 @@ public class WSSAddUsernameToken extends WSBaseMessage {
     
     /**
      * Constructor.
+     * 
+     * @deprecated replaced by {@link WSSecUsernameToken#constructor()}
      */
     public WSSAddUsernameToken() {
     }
@@ -50,6 +52,8 @@ public class WSSAddUsernameToken extends WSBaseMessage {
      * <p/>
      *
      * @param actor the name of the actor of the <code>wsse:Security</code> header
+     * @deprecated replaced by {@link WSSecUsernameToken#constructor()}
+     *             and {@link WSSecHeader} for actor specification.
      */
     public WSSAddUsernameToken(String actor) {
         super(actor);
@@ -61,6 +65,9 @@ public class WSSAddUsernameToken extends WSBaseMessage {
      *
      * @param actor The name of the actor of the <code>wsse:Security</code> header
      * @param mu    Set <code>mustUnderstand</code> to true or false
+     * @deprecated replaced by {@link WSSecUsernameToken#constructor()}
+     *             and {@link WSSecHeader} for actor and mustunderstand
+     *             specification.
      */
     public WSSAddUsernameToken(String actor, boolean mu) {
         super(actor, mu);
@@ -73,6 +80,7 @@ public class WSSAddUsernameToken extends WSBaseMessage {
      * @param pwType contains the password type. Only allowed values are
      *               {@link WSConstants#PASSWORD_DIGEST} and
      *               {@link WSConstants#PASSWORD_TEXT}.
+     * @deprecated replaced by {@link WSSecUsernameToken#setPasswordType(String)}
      */
     public void setPasswordType(String pwType) {
         if (pwType == null) {
@@ -83,14 +91,16 @@ public class WSSAddUsernameToken extends WSBaseMessage {
     }
 
     /**
-     * Creates and adds a Nonce element to the UsernameToken
+     * Creates and adds a Nonce element to the UsernameToken.
+     * @deprecated replaced by {@link WSSecUsernameToken#addNonce()}
      */
     public void addNonce(Document doc) {
         ut.addNonce(doc);
     }
 
     /**
-     * Creates and adds a Created element to the UsernameToken
+     * Creates and adds a Created element to the UsernameToken.
+     * @deprecated replaced by {@link WSSecUsernameToken#addCreated()}
      */
     public void addCreated(Document doc) {
         ut.addCreated(wssConfig.isPrecisionInMilliSeconds(), doc);
@@ -99,6 +109,8 @@ public class WSSAddUsernameToken extends WSBaseMessage {
     /**
      * set the id
      * @param id
+     * @deprecated no replacement, id is created by default in
+     *             {@link WSSecUsernameToken}
      */ 
     public void setId(String id) {
         this.id = id;
@@ -106,12 +118,18 @@ public class WSSAddUsernameToken extends WSBaseMessage {
             ut.setID(id);
     }
 
+    /**
+     * Get a secret key derived from values in UsernameToken.
+     * @return
+     * @deprecated replaced by {@link WSSecUsernameToken#getSecretKey()}
+     */
     public byte[] getSecretKey() {
     	return ut.getSecretKey();
     }
     /**
      * get the id
-     * @return TODO
+     * @return The id
+     * @deprecated replaced by {@link WSSecUsernameToken#getId()}
      */ 
     public String getId() {
         return id;
@@ -133,6 +151,9 @@ public class WSSAddUsernameToken extends WSBaseMessage {
      * @param username The username to set in the UsernameToken
      * @param password The password of the user
      * @return Document with UsernameToken added
+     * @deprecated replaced by
+     *             {@link WSSecUsernameToken#build(Document, WSSecHeader)} and
+     *             {@link WSSecBase#setUserInfo(String, String)}
      */
     public Document build(Document doc, String username, String password) { // throws Exception {
         log.debug("Begin add username token...");

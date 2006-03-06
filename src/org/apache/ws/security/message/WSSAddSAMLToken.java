@@ -36,6 +36,8 @@ public class WSSAddSAMLToken extends WSBaseMessage {
 
     /**
      * Constructor.
+     * 
+     * @deprecated replaced by {@link WSSecSAMLToken#constructor()}
      */
     public WSSAddSAMLToken() {
     }
@@ -46,6 +48,8 @@ public class WSSAddSAMLToken extends WSBaseMessage {
      *
      * @param actor the name of the actor of the <code>wsse:Security</code>
      *              header
+     * @deprecated replaced by {@link WSSecSAMLToken#constructor()}
+     *             and {@link WSSecHeader} for actor specification.
      */
     public WSSAddSAMLToken(String actor) {
         super(actor);
@@ -58,6 +62,10 @@ public class WSSAddSAMLToken extends WSBaseMessage {
      * @param actor The name of the actor of the <code>wsse:Security</code>
      *              header
      * @param mu    Set <code>mustUnderstand</code> to true or false
+     * 
+     * @deprecated replaced by {@link WSSecSAMLToken#constructor()}
+     *             and {@link WSSecHeader} for actor and mustunderstand
+     *             specification.
      */
     public WSSAddSAMLToken(String actor, boolean mu) {
         super(actor, mu);
@@ -72,6 +80,7 @@ public class WSSAddSAMLToken extends WSBaseMessage {
      * @param doc      The SOAP enevlope as W3C document
      * @param assertion TODO
      * @return Document with UsernameToken added
+     * @deprecated replaced by {@link WSSecSAMLToken#build(Document, SAMLAssertion, WSSecHeader)}
      */
     public Document build(Document doc, SAMLAssertion assertion) {
         log.debug("Begin add SAMLAssertion token...");

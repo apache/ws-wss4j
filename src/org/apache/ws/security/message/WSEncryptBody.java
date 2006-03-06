@@ -91,7 +91,8 @@ public class WSEncryptBody extends WSBaseMessage {
 
     /**
      * Constructor.
-     */
+     * @deprecated replaced by {@link WSSecEncrypt#constructor()}
+    */
     public WSEncryptBody() {
     }
 
@@ -101,6 +102,9 @@ public class WSEncryptBody extends WSBaseMessage {
      *
      * @param actor The actor name of the <code>wsse:Security</code>
      *              header
+     * 
+     * @deprecated replaced by {@link WSSecEncrypt#constructor()}
+     *             and {@link WSSecHeader} for actor specification.
      */
     public WSEncryptBody(String actor) {
         super(actor);
@@ -112,6 +116,10 @@ public class WSEncryptBody extends WSBaseMessage {
      *
      * @param actor The actor name of the <code>wsse:Security</code> header
      * @param mu    Set <code>mustUnderstand</code> to true or false
+     * 
+     * @deprecated replaced by {@link WSSecEncrypt#constructor()}
+     *             and {@link WSSecHeader} for actor and mustunderstand
+     *             specification.
      */
     public WSEncryptBody(String actor, boolean mu) {
         super(actor, mu);
@@ -123,6 +131,8 @@ public class WSEncryptBody extends WSBaseMessage {
      *
      * @param key to use during encryption. The key must fit the
      *            selected symmetrical encryption algorithm
+     * @deprecated replaced by
+     *             {@link WSSecEncrypt#setKey(byte[])}
      */
     public void setKey(byte[] key) {
         this.embeddedKey = key;
@@ -137,6 +147,8 @@ public class WSEncryptBody extends WSBaseMessage {
      * @param keyEnc specifies the key encoding algorithm.
      * @see WSConstants#KEYTRANSPORT_RSA15
      * @see WSConstants#KEYTRANSPORT_RSAOEP
+     * @deprecated replaced by
+     *             {@link WSSecEncrypt#setKeyEnc(String)}
      */
     public void setKeyEnc(String keyEnc) {
         keyEncAlgo = keyEnc;
@@ -149,6 +161,8 @@ public class WSEncryptBody extends WSBaseMessage {
      * <p/>
      *
      * @param user
+     * @deprecated replaced by
+     *             {@link WSSecEncrypt#setUserInfo(String)}
      */
     public void setUserInfo(String user) {
         this.user = user;
@@ -158,6 +172,8 @@ public class WSEncryptBody extends WSBaseMessage {
      * Set the key name for EMBEDDED_KEYNAME
      *
      * @param embeddedKeyName
+     * @deprecated replaced by
+     *             {@link WSSecEncrypt#setEmbeddedKeyName(String)}
      */
     public void setEmbeddedKeyName(String embeddedKeyName) {
         this.embeddedKeyName = embeddedKeyName;
@@ -170,6 +186,8 @@ public class WSEncryptBody extends WSBaseMessage {
      * to get the public key for encryption.
      *
      * @param cert is the X509 certificate to use for encryption
+     * @deprecated replaced by
+     *             {@link WSSecEncrypt#setUseThisCert(X509Certificate)}
      */
     public void setUseThisCert(X509Certificate cert) {
         useThisCert = cert;
@@ -189,6 +207,8 @@ public class WSEncryptBody extends WSBaseMessage {
      * @see WSConstants#AES_128
      * @see WSConstants#AES_192
      * @see WSConstants#AES_256
+     * @deprecated replaced by
+     *             {@link WSSecEncrypt#setSymmetricEncAlgorithm(String)}
      */
     public void setSymmetricEncAlgorithm(String algo) {
         symEncAlgo = algo;
@@ -206,6 +226,8 @@ public class WSEncryptBody extends WSBaseMessage {
      * <p/>
      *
      * @param algo Is the name of the canonicalization algorithm
+     * @deprecated replaced by
+     *             {@link WSSecEncrypt#setEncCanonicalization(String)}
      */
     public void setEncCanonicalization(String algo) {
         encCanonAlgo = algo;
@@ -225,6 +247,8 @@ public class WSEncryptBody extends WSBaseMessage {
      * @see WSConstants#AES_128
      * @see WSConstants#AES_192
      * @see WSConstants#AES_256
+     * @deprecated replaced by
+     *             {@link WSSecEncrypt#getSymmetricEncAlgorithm()}
      */
     public String getSymmetricEncAlgorithm() {
         return symEncAlgo;
@@ -263,6 +287,8 @@ public class WSEncryptBody extends WSBaseMessage {
      * @return the SOAP envelope with encrypted Body as <code>Document
      *         </code>
      * @throws WSSecurityException
+     * @deprecated replaced by
+     *             {@link WSSecEncrypt#build(Document, Crypto, WSSecHeader)}
      */
     public Document build(Document doc, Crypto crypto) throws WSSecurityException {
         doDebug = log.isDebugEnabled();
@@ -446,13 +472,13 @@ public class WSEncryptBody extends WSBaseMessage {
         return doc;
     }
 
-    private Vector doEncryption(Document doc, SecretKey encryptionKey)
+    private Vector doEncryption(Document doc, SecretKey encryptKey)
         throws WSSecurityException {
-        return doEncryption(doc, encryptionKey, null);
+        return doEncryption(doc, encryptKey, null);
     }
 
     private Vector doEncryption(Document doc,
-                                SecretKey encryptionKey,
+                                SecretKey encryptKey,
                                 KeyInfo keyInfo)
             throws WSSecurityException {
         /*
@@ -516,7 +542,7 @@ public class WSEncryptBody extends WSBaseMessage {
              * xenc:EncryptedData
              */
             try {
-                xmlCipher.init(XMLCipher.ENCRYPT_MODE, encryptionKey);
+                xmlCipher.init(XMLCipher.ENCRYPT_MODE, encryptKey);
                 EncryptedData encData = xmlCipher.getEncryptedData();
                 encData.setId(xencEncryptedDataId);
                 encData.setKeyInfo(keyInfo);
@@ -707,6 +733,8 @@ public class WSEncryptBody extends WSBaseMessage {
      * Sets the parent node of the EncryptedKeyElement
      *
      * @param element
+     * @deprecated replaced by
+     *             {@link WSSecEncrypt#setParentNode(Element)}
      */
     public void setParentNode(Element element) {
         parentNode = element;
@@ -714,6 +742,8 @@ public class WSEncryptBody extends WSBaseMessage {
 
     /**
      * @return TODO
+     * @deprecated replaced by
+     *             {@link WSSecEncrypt#getSymmetricKey()}
      */
     public SecretKey getSymmetricKey() {
         return symmetricKey;
@@ -722,6 +752,8 @@ public class WSEncryptBody extends WSBaseMessage {
     /**
      * Set the symmetric key to be used for encryption
      * @param key
+     * @deprecated replaced by
+     *             {@link WSSecEncrypt#setSymmetricKey(SecretKey)}
      */
     public void setSymmetricKey(SecretKey key) {
         this.symmetricKey = key;
@@ -732,6 +764,8 @@ public class WSEncryptBody extends WSBaseMessage {
      * the symmetric key field.
      *
      * @return The symmetric key
+     * @deprecated replaced by
+     *             {@link WSSecEncrypt#getEncryptionKey()}
      */
     public SecretKey getEncryptionKey() {
         return this.encryptionKey;
@@ -739,6 +773,8 @@ public class WSEncryptBody extends WSBaseMessage {
 
     /**
      * @return TODO
+     * @deprecated replaced by
+     *             {@link WSSecEncrypt#getSecurityTokenReference()}
      */
     public SecurityTokenReference getSecurityTokenReference() {
         return securityTokenReference;
@@ -746,6 +782,8 @@ public class WSEncryptBody extends WSBaseMessage {
 
     /**
      * @param reference
+     * @deprecated replaced by
+     *             {@link WSSecEncrypt#setSecurityTokenReference(SecurityTokenReference)}
      */
     public void setSecurityTokenReference(SecurityTokenReference reference) {
         securityTokenReference = reference;

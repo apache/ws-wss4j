@@ -40,6 +40,8 @@ public class WSAddSignatureConfirmation extends WSBaseMessage {
 
     /**
      * Constructor.
+     * 
+     * @deprecated replaced by {@link WSSecSignatureConfirmation#constructor()}
      */
     public WSAddSignatureConfirmation() {
     }
@@ -50,6 +52,9 @@ public class WSAddSignatureConfirmation extends WSBaseMessage {
      * @param actor
      *            the name of the actor of the <code>wsse:Security</code>
      *            header
+     * 
+     * @deprecated replaced by {@link WSSecSignatureConfirmation#constructor()}
+     *             and {@link WSSecHeader} for actor specification.
      */
     public WSAddSignatureConfirmation(String actor) {
         super(actor);
@@ -63,6 +68,10 @@ public class WSAddSignatureConfirmation extends WSBaseMessage {
      *            header
      * @param mu
      *            Set <code>mustUnderstand</code> to true or false
+     * 
+     * @deprecated replaced by {@link WSSecSignatureConfirmation#constructor()}
+     *             and {@link WSSecHeader} for actor and mustunderstand
+     *             specification.
      */
     public WSAddSignatureConfirmation(String actor, boolean mu) {
         super(actor, mu);
@@ -80,6 +89,9 @@ public class WSAddSignatureConfirmation extends WSBaseMessage {
      *            the Signature value. This will be the content of the "Value"
      *            attribute.
      * @return Document with SignatureConfirmation added
+     * 
+     * @deprecated replaced by
+     *             {@link WSSecSignatureConfirmation#build(Document, byte[], WSSecHeader)}
      */
     public Document build(Document doc, byte[] sigVal) {
         log.debug("Begin add signature confirmation...");
@@ -98,6 +110,9 @@ public class WSAddSignatureConfirmation extends WSBaseMessage {
      * Set the wsu:Id value of the SignatureConfirmation
      * 
      * @param id
+     * 
+     * @deprecated no replacement, id is created by default in
+     *             {@link WSSecSignatureConfirmation}
      */
     public void setId(String id) {
         this.id = id;
@@ -107,6 +122,8 @@ public class WSAddSignatureConfirmation extends WSBaseMessage {
      * Get the wsu:Id value of the SignatureConfirmation
      * 
      * @return Returns the wsu:id value
+     * 
+     * @deprecated replaced by {@link WSSecSignatureConfirmation#getId()}
      */
     public String getId() {
         return id;

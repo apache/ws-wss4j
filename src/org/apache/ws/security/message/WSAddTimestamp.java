@@ -40,6 +40,8 @@ public class WSAddTimestamp extends WSBaseMessage {
 
     /**
      * Constructor.
+     * 
+     * @deprecated replaced by {@link WSSecTimestamp#constructor()}
      */
     public WSAddTimestamp() {
     }
@@ -50,6 +52,9 @@ public class WSAddTimestamp extends WSBaseMessage {
      * @param actor
      *            the name of the actor of the <code>wsse:Security</code>
      *            header
+     * 
+     * @deprecated replaced by {@link WSSecTimestamp#constructor()} and
+     *             {@link WSSecHeader} for actor specification.
      */
     public WSAddTimestamp(String actor) {
         super(actor);
@@ -63,6 +68,9 @@ public class WSAddTimestamp extends WSBaseMessage {
      *            header
      * @param mu
      *            Set <code>mustUnderstand</code> to true or false
+     * @deprecated replaced by {@link WSSecTimestamp#constructor()} and
+     *             {@link WSSecHeader} for actor and mustunderstand
+     *             specification.
      */
     public WSAddTimestamp(String actor, boolean mu) {
         super(actor, mu);
@@ -83,6 +91,9 @@ public class WSAddTimestamp extends WSBaseMessage {
      *            should not be added.
      * @return Document with Timestamp added
      * @throws Exception
+     * @deprecated replaced by
+     *             {@link WSSecTimestamp#build(Document, WSSecHeader)} and
+     *             {@link WSSecTimestamp#setTimeToLive()}
      */
     public Document build(Document doc, int ttl) {
         log.debug("Begin add timestamp...");
@@ -100,6 +111,8 @@ public class WSAddTimestamp extends WSBaseMessage {
      * Set the wsu:Id value of the Timestamp
      * 
      * @param id
+     * @deprecated no replacement, id is created by default in
+     *             {@link WSSecTimestamp}
      */
     public void setId(String id) {
         this.id = id;
@@ -111,6 +124,8 @@ public class WSAddTimestamp extends WSBaseMessage {
      * Get the wsu:Id value of the Timestamp
      * 
      * @return TODO
+     *
+     * @deprecated replaced by {@link WSSecTimestamp#getId()}
      */
     public String getId() {
         return id;
