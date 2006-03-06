@@ -31,7 +31,7 @@ import org.w3c.dom.Element;
  *
  * @author Davanum Srinivas (dims@yahoo.com).
  */
-public class WSSecSAMLToken extends WSBaseMessage {
+public class WSSecSAMLToken extends WSSecBase {
 
     private static Log log = LogFactory.getLog(WSSecSAMLToken.class.getName());
     
