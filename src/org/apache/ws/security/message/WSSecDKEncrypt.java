@@ -84,12 +84,7 @@ public class WSSecDKEncrypt extends WSSecDerivedKeyBase {
         
         XMLCipher xmlCipher = null;
         try {
-            String provider = wssConfig.getJceProviderId();
-            if (provider == null) {
-                xmlCipher = XMLCipher.getInstance(symEncAlgo);
-            } else {
-                xmlCipher = XMLCipher.getProviderInstance(symEncAlgo, provider);
-            }
+            xmlCipher = XMLCipher.getInstance(symEncAlgo);
         } catch (XMLEncryptionException e3) {
             throw new WSSecurityException(
                     WSSecurityException.UNSUPPORTED_ALGORITHM, null, null, e3);

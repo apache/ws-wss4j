@@ -31,57 +31,59 @@ import java.util.HashMap;
 import javax.xml.namespace.QName;
 
 /**
- * WSSConfig
- * <p/>
- * Carries configuration data so the WSS4J spec compliance can be modified in
- * runtime. Configure an instance of this object only if you need WSS4J to
- * emulate certain industry clients or previous OASIS specifications for
- * WS-Security interoperability testing purposes.
- * <p/>
- * The default settings follow the latest OASIS and changing anything might
- * violate the OASIS specs.
- * <p/>
- * <b>WARNING: changing the default settings will break the compliance with the
- * latest specs.  Do this only if you know what you are doing.</b>
- * <p/>
- *
+ * WSSConfig <p/> Carries configuration data so the WSS4J spec compliance can be
+ * modified in runtime. Configure an instance of this object only if you need
+ * WSS4J to emulate certain industry clients or previous OASIS specifications
+ * for WS-Security interoperability testing purposes. <p/> The default settings
+ * follow the latest OASIS and changing anything might violate the OASIS specs.
+ * <p/> <b>WARNING: changing the default settings will break the compliance with
+ * the latest specs. Do this only if you know what you are doing.</b> <p/>
+ * 
  * @author Rami Jaamour (rjaamour@parasoft.com)
  * @author Werner Dittmann (werner@apache.org)
  */
 public class WSSConfig {
     private static Log log = LogFactory.getLog(WSSConfig.class.getName());
+
     protected static WSSConfig defaultConfig = getNewInstance();
+
     protected boolean wsiBSPCompliant = false;
+
     /**
-     * Set the timestamp precision mode.
-     * If set to <code>true</code> then use timestamps with milliseconds,
-     * otherwise omit the millisconds. As per XML Date/Time specification
-     * the default is to include the milliseconds.
+     * Set the timestamp precision mode. If set to <code>true</code> then use
+     * timestamps with milliseconds, otherwise omit the millisconds. As per XML
+     * Date/Time specification the default is to include the milliseconds.
      */
     protected boolean precisionInMilliSeconds = true;
 
     protected boolean enableSignatureConfirmation = true;
-    
+
     /**
-     * If set to true then the timestamp handling will throw an
-     * expcetion if the timestamp contains an expires element and
-     * the semantics are expired.
+     * If set to true then the timestamp handling will throw an expcetion if the
+     * timestamp contains an expires element and the semantics are expired.
      * 
-     * If set to false, not expetion will be thrown, even if the
-     * semantics are expired. 
+     * If set to false, not expetion will be thrown, even if the semantics are
+     * expired.
      */
     protected boolean timeStampStrict = true;
-    
+
     protected HashMap jceProvider = new HashMap(10);
+
     protected String jceProviderId = null;
-    
-    
-    
 
     protected WSSConfig() {
         org.apache.xml.security.Init.init();
-        if (addJceProvider("BC", "org.bouncycastle.jce.provider.BouncyCastleProvider")) {
+        /*
+         * The last provider added has precedence, that is if JuiCE can be add
+         * then WSS4J uses this provider.
+         */
+        if (addJceProvider("BC",
+                "org.bouncycastle.jce.provider.BouncyCastleProvider")) {
             setJceProviderId("BC");
+        }
+        if (addJceProvider("JuiCE",
+                "org.apache.security.juice.provider.JuiCEProviderOpenSSL")) {
+            setJceProviderId("JuiCE");
         }
         Transform.init();
         try {
@@ -93,7 +95,8 @@ public class WSSConfig {
 
     /**
      * @return a new WSSConfig instance configured with the default values
-     *         (values identical to {@link #getDefaultWSConfig getDefaultWSConfig()})
+     *         (values identical to
+     *         {@link #getDefaultWSConfig getDefaultWSConfig()})
      */
     public static WSSConfig getNewInstance() {
         WSSConfig config = new WSSConfig();
@@ -110,7 +113,7 @@ public class WSSConfig {
 
     /**
      * Checks if we are in WS-I Basic Security Profile compliance mode
-     *
+     * 
      * @return TODO
      */
     public boolean isWsiBSPCompliant() {
@@ -118,9 +121,9 @@ public class WSSConfig {
     }
 
     /**
-     * Set the WS-I Basic Security Profile compliance mode. The default is
-     * false (dues to .Net interop problems).
-     *
+     * Set the WS-I Basic Security Profile compliance mode. The default is false
+     * (dues to .Net interop problems).
+     * 
      * @param wsiBSPCompliant
      */
     public void setWsiBSPCompliant(boolean wsiBSPCompliant) {
@@ -129,7 +132,7 @@ public class WSSConfig {
 
     /**
      * Checks if we need to use milliseconds in timestamps
-     *
+     * 
      * @return TODO
      */
     public boolean isPrecisionInMilliSeconds() {
@@ -138,8 +141,9 @@ public class WSSConfig {
 
     /**
      * Set the precision in milliseconds
-     *
-     * @param precisionInMilliSeconds TODO
+     * 
+     * @param precisionInMilliSeconds
+     *            TODO
      */
     public void setPrecisionInMilliSeconds(boolean precisionInMilliSeconds) {
         this.precisionInMilliSeconds = precisionInMilliSeconds;
@@ -153,38 +157,40 @@ public class WSSConfig {
     }
 
     /**
-     * @param enableSignatureConfirmation The enableSignatureConfirmation to set.
+     * @param enableSignatureConfirmation
+     *            The enableSignatureConfirmation to set.
      */
-    public void setEnableSignatureConfirmation(boolean enableSignatureConfirmation) {
+    public void setEnableSignatureConfirmation(
+            boolean enableSignatureConfirmation) {
         this.enableSignatureConfirmation = enableSignatureConfirmation;
     }
 
     /**
-	 * @return Returns if we shall throw an exception on expired request
-	 *         semantic
-	 */
-	public boolean isTimeStampStrict() {
-		return timeStampStrict;
-	}
+     * @return Returns if we shall throw an exception on expired request
+     *         semantic
+     */
+    public boolean isTimeStampStrict() {
+        return timeStampStrict;
+    }
 
-	/**
-	 * @param timeStampStrict
-	 *            If true throw an exception on expired request semantic
-	 */
-	public void setTimeStampStrict(boolean timeStampStrict) {
-		this.timeStampStrict = timeStampStrict;
-	}
+    /**
+     * @param timeStampStrict
+     *            If true throw an exception on expired request semantic
+     */
+    public void setTimeStampStrict(boolean timeStampStrict) {
+        this.timeStampStrict = timeStampStrict;
+    }
 
-	/**
-	 * Lookup action
-	 * 
-	 * @param action
-	 * @return
-	 * @throws WSSecurityException
-	 */
+    /**
+     * Lookup action
+     * 
+     * @param action
+     * @return An action class to create a security token
+     * @throws WSSecurityException
+     */
     public Action getAction(int action) throws WSSecurityException {
         String name = null;
-        switch(action) {
+        switch (action) {
         case WSConstants.UT:
             name = "org.apache.ws.security.action.UsernameTokenAction";
             break;
@@ -216,23 +222,25 @@ public class WSSConfig {
             name = "org.apache.ws.security.action.SignatureConfirmationAction";
             break;
         }
-        if(name == null) {
-            throw new WSSecurityException(WSSecurityException.FAILURE, "unknownAction", new Object[]{new Integer(action)});
+        if (name == null) {
+            throw new WSSecurityException(WSSecurityException.FAILURE,
+                    "unknownAction", new Object[] { new Integer(action) });
         }
         try {
-            return (Action)Loader.loadClass(name).newInstance();
+            return (Action) Loader.loadClass(name).newInstance();
         } catch (Throwable t) {
-            throw new WSSecurityException(WSSecurityException.FAILURE, "unableToLoadClass", new Object[]{name});
+            throw new WSSecurityException(WSSecurityException.FAILURE,
+                    "unableToLoadClass", new Object[] { name });
         }
     }
 
     public Processor getProcessor(QName el) throws WSSecurityException {
         String name = null;
-        if(el.equals(WSSecurityEngine.SAML_TOKEN)){
+        if (el.equals(WSSecurityEngine.SAML_TOKEN)) {
             name = "org.apache.ws.security.processor.SAMLTokenProcessor";
         } else if (el.equals(WSSecurityEngine.ENCRYPTED_KEY)) {
             name = "org.apache.ws.security.processor.EncryptedKeyProcessor";
-        } else if (el.equals(WSSecurityEngine.SIGNATURE)){
+        } else if (el.equals(WSSecurityEngine.SIGNATURE)) {
             name = "org.apache.ws.security.processor.SignatureProcessor";
         } else if (el.equals(WSSecurityEngine.timeStamp)) {
             name = "org.apache.ws.security.processor.TimestampProcessor";
@@ -246,86 +254,86 @@ public class WSSConfig {
             name = "org.apache.ws.security.processor.DerivedKeyTokenProcessor";
         }
 
-        if(name != null){
+        if (name != null) {
             try {
-                return (Processor)Loader.loadClass(name).newInstance();
+                return (Processor) Loader.loadClass(name).newInstance();
             } catch (Throwable t) {
-                throw new WSSecurityException(WSSecurityException.FAILURE, "unableToLoadClass", new Object[]{name});
+                throw new WSSecurityException(WSSecurityException.FAILURE,
+                        "unableToLoadClass", new Object[] { name });
             }
         }
         return null;
     }
-    
+
     private boolean loadProvider(String id, String className) {
         try {
-            Class c = Loader
-                    .loadClass(className);
+            Class c = Loader.loadClass(className);
             if (java.security.Security.getProvider(id) == null) {
                 if (log.isDebugEnabled()) {
                     log.debug("The provider " + id
                             + " had to be added to the java.security.Security");
                 }
-                int pos = 1;
-                if(id.equalsIgnoreCase("BC")) {
-                    pos = 2;
-                }
-                java.security.Security.insertProviderAt((java.security.Provider) c
-                        .newInstance(), pos);
+                java.security.Security.insertProviderAt(
+                        (java.security.Provider) c.newInstance(), 2);
             }
             return true;
         } catch (Throwable t) {
-        	return false;
+            if (log.isDebugEnabled()) {
+                log.debug("The provider " + id + " could not be added: "
+                        + t.getMessage());
+            }
+            return false;
         }
-    	
+
     }
-    
+
     /**
-	 * Add a new JCE security provider to use for WSS4J.
-	 * 
-	 * If the provider is not already known the method loads a security provider
-	 * class and adds the provider to the java security service.
-	 * 
-	 * 
-	 * @param id
-	 *            The id string of the provider
-	 * @param className
-	 *            Name of the class the implements the provider. This class
-	 *            must be a subclass of <code>java.security.Provider</code>
-	 * 
-	 * @return Returns <code>true</code> if the provider was successfully
-	 *         added, <code>false</code> otherwise.
-	 */
-	public boolean addJceProvider(String id, String className) {
-		if (jceProvider.get(id) == null && loadProvider(id, className)) {
-			jceProvider.put(id, className);
-			return true;
-		}
-		return false;
-	}
-    
+     * Add a new JCE security provider to use for WSS4J.
+     * 
+     * If the provider is not already known the method loads a security provider
+     * class and adds the provider to the java security service.
+     * 
+     * 
+     * @param id
+     *            The id string of the provider
+     * @param className
+     *            Name of the class the implements the provider. This class must
+     *            be a subclass of <code>java.security.Provider</code>
+     * 
+     * @return Returns <code>true</code> if the provider was successfully
+     *         added, <code>false</code> otherwise.
+     */
+    public boolean addJceProvider(String id, String className) {
+        if (jceProvider.get(id) == null && loadProvider(id, className)) {
+            jceProvider.put(id, className);
+            return true;
+        }
+        return false;
+    }
+
     /**
-	 * Sets the JCE provider to use in all following security operations.
-	 * 
-	 * The method checks if the provider is known. If yes it sets the provider
-	 * id and returns true. Otherwise the provider id remains unchanged and the
-	 * method returns false.
-	 * 
-	 * @param id
-	 *            is the JCE provider's id
-	 * @return Returns <code>true</code> if set, <code>false</code>
-	 *         otherwise
-	 * @see addJceProvider
-	 */
-	public boolean setJceProviderId(String id) {
-		if (jceProvider.get(id) != null) {
-			jceProviderId = id;
-			JCEMapper.setProviderId(id);
-			return true;
-		}
-		return false;
-	}
-    
+     * Sets the JCE provider to use in all following security operations.
+     * 
+     * The method checks if the provider is known. If yes it sets the provider
+     * id and returns true. Otherwise the provider id remains unchanged and the
+     * method returns false.
+     * 
+     * @param id
+     *            is the JCE provider's id
+     * @return Returns <code>true</code> if set, <code>false</code>
+     *         otherwise
+     * @see #addJceProvider
+     */
+    public boolean setJceProviderId(String id) {
+        if (jceProvider.get(id) != null) {
+            jceProviderId = id;
+//            JCEMapper.setProviderId(id);
+            return true;
+        }
+        return false;
+    }
+
     public String getJceProviderId() {
-    	return jceProviderId;
+        return jceProviderId;
     }
 }

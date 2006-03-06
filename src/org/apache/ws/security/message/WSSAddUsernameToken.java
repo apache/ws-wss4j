@@ -42,7 +42,7 @@ public class WSSAddUsernameToken extends WSBaseMessage {
     /**
      * Constructor.
      * 
-     * @deprecated replaced by {@link WSSecUsernameToken#constructor()}
+     * @deprecated replaced by {@link WSSecUsernameToken#WSSecUsernameToken()}
      */
     public WSSAddUsernameToken() {
     }
@@ -52,7 +52,7 @@ public class WSSAddUsernameToken extends WSBaseMessage {
      * <p/>
      *
      * @param actor the name of the actor of the <code>wsse:Security</code> header
-     * @deprecated replaced by {@link WSSecUsernameToken#constructor()}
+     * @deprecated replaced by {@link WSSecUsernameToken#WSSecUsernameToken()}
      *             and {@link WSSecHeader} for actor specification.
      */
     public WSSAddUsernameToken(String actor) {
@@ -65,7 +65,7 @@ public class WSSAddUsernameToken extends WSBaseMessage {
      *
      * @param actor The name of the actor of the <code>wsse:Security</code> header
      * @param mu    Set <code>mustUnderstand</code> to true or false
-     * @deprecated replaced by {@link WSSecUsernameToken#constructor()}
+     * @deprecated replaced by {@link WSSecUsernameToken#WSSecUsernameToken()}
      *             and {@link WSSecHeader} for actor and mustunderstand
      *             specification.
      */

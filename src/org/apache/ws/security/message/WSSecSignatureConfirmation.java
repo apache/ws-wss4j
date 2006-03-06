@@ -20,10 +20,8 @@ package org.apache.ws.security.message;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.message.token.SignatureConfirmation;
-import org.apache.ws.security.message.token.Timestamp;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
 /**
  * Builds a WS SignatureConfirmation and inserts it into the SOAP Envelope.

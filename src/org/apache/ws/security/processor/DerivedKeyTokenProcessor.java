@@ -135,8 +135,8 @@ public class DerivedKeyTokenProcessor implements Processor {
      * Get the derived key bytes for a given length
      * @return Returns the keyBytes.
      */
-    public byte[] getKeyBytes(int length) throws WSSecurityException {
-        this.length = length;
+    public byte[] getKeyBytes(int len) throws WSSecurityException {
+        this.length = len;
         this.deriveKey();
         return keyBytes;
     } 

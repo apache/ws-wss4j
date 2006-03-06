@@ -91,7 +91,7 @@ public class WSEncryptBody extends WSBaseMessage {
 
     /**
      * Constructor.
-     * @deprecated replaced by {@link WSSecEncrypt#constructor()}
+     * @deprecated replaced by {@link WSSecEncrypt#WSSecEncrypt()}
     */
     public WSEncryptBody() {
     }
@@ -103,7 +103,7 @@ public class WSEncryptBody extends WSBaseMessage {
      * @param actor The actor name of the <code>wsse:Security</code>
      *              header
      * 
-     * @deprecated replaced by {@link WSSecEncrypt#constructor()}
+     * @deprecated replaced by {@link WSSecEncrypt#WSSecEncrypt()}
      *             and {@link WSSecHeader} for actor specification.
      */
     public WSEncryptBody(String actor) {
@@ -117,7 +117,7 @@ public class WSEncryptBody extends WSBaseMessage {
      * @param actor The actor name of the <code>wsse:Security</code> header
      * @param mu    Set <code>mustUnderstand</code> to true or false
      * 
-     * @deprecated replaced by {@link WSSecEncrypt#constructor()}
+     * @deprecated replaced by {@link WSSecEncrypt#WSSecEncrypt()}
      *             and {@link WSSecHeader} for actor and mustunderstand
      *             specification.
      */
@@ -349,7 +349,7 @@ public class WSEncryptBody extends WSBaseMessage {
         if (tlog.isDebugEnabled()) {
             t2 = System.currentTimeMillis();
         }
-        Cipher cipher = WSSecurityUtil.getCipherInstance(keyEncAlgo, wssConfig.getJceProviderId());
+        Cipher cipher = WSSecurityUtil.getCipherInstance(keyEncAlgo);
         try {
             cipher.init(Cipher.ENCRYPT_MODE, remoteCert);
         } catch (InvalidKeyException e) {

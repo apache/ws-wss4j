@@ -678,23 +678,15 @@ public class WSSecurityUtil {
         }
     }
 
-    public static Cipher getCipherInstance(String cipherAlgo, String jceId)
+    public static Cipher getCipherInstance(String cipherAlgo)
             throws WSSecurityException {
         Cipher cipher = null;
         try {
             if (cipherAlgo.equalsIgnoreCase(WSConstants.KEYTRANSPORT_RSA15)) {
-                if (jceId == null) {
-                    cipher = Cipher.getInstance("RSA/ECB/PKCS1PADDING");
-                } else {
-                    cipher = Cipher.getInstance("RSA/ECB/PKCS1PADDING", jceId);
-                }
+                cipher = Cipher.getInstance("RSA/NONE/PKCS1PADDING");
             } else if (cipherAlgo
                     .equalsIgnoreCase(WSConstants.KEYTRANSPORT_RSAOEP)) {
-                if (jceId == null) {
-                    cipher = Cipher.getInstance("RSA/NONE/OAEPPADDING");
-                } else {
-                    cipher = Cipher.getInstance("RSA/NONE/OAEPPADDING", jceId);
-                }
+                cipher = Cipher.getInstance("RSA/NONE/OAEPPADDING");
             } else {
                 throw new WSSecurityException(
                         WSSecurityException.UNSUPPORTED_ALGORITHM,
@@ -704,11 +696,6 @@ public class WSSecurityUtil {
             throw new WSSecurityException(
                     WSSecurityException.UNSUPPORTED_ALGORITHM,
                     "unsupportedKeyTransp", new Object[] { "No such padding: "
-                            + cipherAlgo });
-        } catch (NoSuchProviderException ex) {
-            throw new WSSecurityException(
-                    WSSecurityException.UNSUPPORTED_ALGORITHM,
-                    "unsupportedKeyTransp", new Object[] { "no provider: "
                             + cipherAlgo });
         } catch (NoSuchAlgorithmException ex) {
             throw new WSSecurityException(

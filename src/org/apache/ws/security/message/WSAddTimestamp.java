@@ -41,7 +41,7 @@ public class WSAddTimestamp extends WSBaseMessage {
     /**
      * Constructor.
      * 
-     * @deprecated replaced by {@link WSSecTimestamp#constructor()}
+     * @deprecated replaced by {@link WSSecTimestamp#WSSecTimestamp()}
      */
     public WSAddTimestamp() {
     }
@@ -53,7 +53,7 @@ public class WSAddTimestamp extends WSBaseMessage {
      *            the name of the actor of the <code>wsse:Security</code>
      *            header
      * 
-     * @deprecated replaced by {@link WSSecTimestamp#constructor()} and
+     * @deprecated replaced by {@link WSSecTimestamp#WSSecTimestamp()} and
      *             {@link WSSecHeader} for actor specification.
      */
     public WSAddTimestamp(String actor) {
@@ -68,7 +68,7 @@ public class WSAddTimestamp extends WSBaseMessage {
      *            header
      * @param mu
      *            Set <code>mustUnderstand</code> to true or false
-     * @deprecated replaced by {@link WSSecTimestamp#constructor()} and
+     * @deprecated replaced by {@link WSSecTimestamp#WSSecTimestamp()} and
      *             {@link WSSecHeader} for actor and mustunderstand
      *             specification.
      */

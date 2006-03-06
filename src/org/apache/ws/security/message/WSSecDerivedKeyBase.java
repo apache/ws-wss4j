@@ -191,8 +191,7 @@ public abstract class WSSecDerivedKeyBase extends WSSecBase {
         remoteCert = certs[0];
         
         String certUri = "EncCertId-" + remoteCert.hashCode();
-        Cipher cipher = WSSecurityUtil.getCipherInstance(keyEncAlgo, wssConfig
-                .getJceProviderId());
+        Cipher cipher = WSSecurityUtil.getCipherInstance(keyEncAlgo);
         try {
             cipher.init(Cipher.ENCRYPT_MODE, remoteCert);
         } catch (InvalidKeyException e) {

@@ -41,7 +41,7 @@ public class WSAddSignatureConfirmation extends WSBaseMessage {
     /**
      * Constructor.
      * 
-     * @deprecated replaced by {@link WSSecSignatureConfirmation#constructor()}
+     * @deprecated replaced by {@link WSSecSignatureConfirmation#WSSecSignatureConfirmation()}
      */
     public WSAddSignatureConfirmation() {
     }
@@ -53,7 +53,7 @@ public class WSAddSignatureConfirmation extends WSBaseMessage {
      *            the name of the actor of the <code>wsse:Security</code>
      *            header
      * 
-     * @deprecated replaced by {@link WSSecSignatureConfirmation#constructor()}
+     * @deprecated replaced by {@link WSSecSignatureConfirmation#WSSecSignatureConfirmation()}
      *             and {@link WSSecHeader} for actor specification.
      */
     public WSAddSignatureConfirmation(String actor) {
@@ -69,7 +69,7 @@ public class WSAddSignatureConfirmation extends WSBaseMessage {
      * @param mu
      *            Set <code>mustUnderstand</code> to true or false
      * 
-     * @deprecated replaced by {@link WSSecSignatureConfirmation#constructor()}
+     * @deprecated replaced by {@link WSSecSignatureConfirmation#WSSecSignatureConfirmation()}
      *             and {@link WSSecHeader} for actor and mustunderstand
      *             specification.
      */

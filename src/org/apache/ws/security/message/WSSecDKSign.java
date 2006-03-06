@@ -251,7 +251,7 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
             throws WSSecurityException {
         Transforms transforms = null;
 
-        Element envelope = document.getDocumentElement();
+        Element envel = document.getDocumentElement();
 
         for (int part = 0; part < references.size(); part++) {
             WSEncryptionPart encPart = (WSEncryptionPart) references.get(part);
@@ -308,10 +308,10 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
                 } else if (elemName.equals("Assertion")) { // Assertion
 
                     String id = null;
-                    id = SAMLUtil.getAssertionId(envelope, elemName, nmSpace);
+                    id = SAMLUtil.getAssertionId(envel, elemName, nmSpace);
 
                     Element body = (Element) WSSecurityUtil.findElement(
-                            envelope, elemName, nmSpace);
+                            envel, elemName, nmSpace);
                     if (body == null) {
                         throw new WSSecurityException(
                                 WSSecurityException.FAILURE, "noEncElement",
@@ -332,7 +332,7 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
 
                 } else {
                     Element body = (Element) WSSecurityUtil.findElement(
-                            envelope, elemName, nmSpace);
+                            envel, elemName, nmSpace);
                     if (body == null) {
                         throw new WSSecurityException(
                                 WSSecurityException.FAILURE, "noEncElement",

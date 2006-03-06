@@ -57,7 +57,7 @@ import javax.security.auth.callback.CallbackHandler;
  */
 public abstract class WSHandler {
     public static String DONE = "done";
-    protected static Log log = LogFactory.getLog(WSHandler.class.getName());
+    private static Log log = LogFactory.getLog(WSHandler.class.getName());
     protected static final WSSecurityEngine secEngine = WSSecurityEngine.getInstance();
     protected static Hashtable cryptos = new Hashtable(5);
 

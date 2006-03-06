@@ -37,7 +37,7 @@ public class WSSAddSAMLToken extends WSBaseMessage {
     /**
      * Constructor.
      * 
-     * @deprecated replaced by {@link WSSecSAMLToken#constructor()}
+     * @deprecated replaced by {@link WSSecSAMLToken#WSSecSAMLToken()}
      */
     public WSSAddSAMLToken() {
     }
@@ -48,7 +48,7 @@ public class WSSAddSAMLToken extends WSBaseMessage {
      *
      * @param actor the name of the actor of the <code>wsse:Security</code>
      *              header
-     * @deprecated replaced by {@link WSSecSAMLToken#constructor()}
+     * @deprecated replaced by {@link WSSecSAMLToken#WSSecSAMLToken()}
      *             and {@link WSSecHeader} for actor specification.
      */
     public WSSAddSAMLToken(String actor) {
@@ -63,7 +63,7 @@ public class WSSAddSAMLToken extends WSBaseMessage {
      *              header
      * @param mu    Set <code>mustUnderstand</code> to true or false
      * 
-     * @deprecated replaced by {@link WSSecSAMLToken#constructor()}
+     * @deprecated replaced by {@link WSSecSAMLToken#WSSecSAMLToken()}
      *             and {@link WSSecHeader} for actor and mustunderstand
      *             specification.
      */

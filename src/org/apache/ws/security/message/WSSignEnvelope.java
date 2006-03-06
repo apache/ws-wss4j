@@ -82,7 +82,7 @@ public class WSSignEnvelope extends WSBaseMessage {
 
     /**
      * Constructor.
-     * @deprecated replaced by {@link WSSecSignature#constructor()}
+     * @deprecated replaced by {@link WSSecSignature#WSSecSignature()}
      */
     public WSSignEnvelope() {
     }
@@ -92,7 +92,7 @@ public class WSSignEnvelope extends WSBaseMessage {
      *
      * @param actor The actor name of the <code>wsse:Security</code> header
      * 
-     * @deprecated replaced by {@link WSSecSignature#constructor()}
+     * @deprecated replaced by {@link WSSecSignature#WSSecSignature()}
      *             and {@link WSSecHeader} for actor specification.
      */
     public WSSignEnvelope(String actor) {
@@ -105,7 +105,7 @@ public class WSSignEnvelope extends WSBaseMessage {
      * @param actor The actor name of the <code>wsse:Security</code> header
      * @param mu    Set <code>mustUnderstand</code> to true or false
      * 
-     * @deprecated replaced by {@link WSSecSignature#constructor()}
+     * @deprecated replaced by {@link WSSecSignature#WSSecSignature()}
      *             and {@link WSSecHeader} for actor and mustunderstand
      *             specification.
      */

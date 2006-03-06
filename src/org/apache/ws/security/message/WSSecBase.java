@@ -68,9 +68,13 @@ public class WSSecBase {
 	}
 
 	/**
-	 * Sets which key identifier to use. <p/> Defines the key identifier type to
-	 * use in the {@link WSSignEnvelope#build(Document, Crypto) signature} or
-	 * the {@link WSEncryptBody#build(Document, Crypto) ecnryption} function to
+	 * Sets which key identifier to use. 
+     * 
+     * <p/> 
+     * 
+     * Defines the key identifier type to
+	 * use in the {@link WSSecSignature#prepare(Document, Crypto, WSSecHeader) method} or
+	 * the {@link WSSecEncrypt#prepare(Document, Crypto) method} function to
 	 * set up the key identification elements.
 	 * 
 	 * @param keyIdType
