@@ -1,7 +1,6 @@
 package org.apache.ws.security.saml;
 
 import org.w3c.dom.Element;
-import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.xml.security.keys.KeyInfo;

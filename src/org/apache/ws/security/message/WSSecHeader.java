@@ -32,136 +32,126 @@ import java.util.Vector;
 /**
  * This class implements WS Security header.
  * 
- * It provides to setup a Security header with a specified actor and
- * mustunderstand flag.
+ * Setup a Security header with a specified actor and mustunderstand flag.
  * 
  * <p/>
  * 
- * Use the to set or overwrite the default values for actor and mustunderstand.
- * The defaults are: empty <code>actor</code> and <code>mustunderstand</code>
- * is true.
+ * The defaults for actor and mustunderstand are: empty <code>actor</code> and
+ * <code>mustunderstand</code> is true.
  * 
  * @author Werner Dittmann (Werner.Dittmann@apache.org)
  */
 public class WSSecHeader {
-	private static Log log = LogFactory.getLog(WSSecHeader.class.getName());
+    private static Log log = LogFactory.getLog(WSSecHeader.class.getName());
 
-	protected String actor = null;
+    protected String actor = null;
 
-	protected boolean mustunderstand = true;
+    protected boolean mustunderstand = true;
 
-	protected boolean doDebug = false;
+    protected boolean doDebug = false;
 
-	protected WSSConfig wssConfig = WSSConfig.getDefaultWSConfig();
+    private Element securityHeader = null;
 
-	private Element securityHeader = null;
+    /**
+     * Constructor.
+     */
+    public WSSecHeader() {
+    }
 
-	/**
-	 * Constructor.
-	 */
-	public WSSecHeader() {
-	}
+    /**
+     * Constructor.
+     * 
+     * @param actor
+     *            The actor name of the <code>wsse:Security</code> header
+     */
+    public WSSecHeader(String actor) {
+        this(actor, true);
+    }
 
-	/**
-	 * Constructor. <p/>
-	 * 
-	 * @param actor
-	 *            The actor name of the <code>wsse:Security</code> header
-	 */
-	public WSSecHeader(String actor) {
-		this(actor, true);
-	}
+    /**
+     * Constructor.
+     * 
+     * @param actor
+     *            The actor name of the <code>wsse:Security</code> header
+     * @param mu
+     *            Set <code>mustUnderstand</code> to true or false
+     */
+    public WSSecHeader(String act, boolean mu) {
+        actor = act;
+        mustunderstand = mu;
+    }
 
-	/**
-	 * Constructor. <p/>
-	 * 
-	 * @param actor
-	 *            The actor name of the <code>wsse:Security</code> header
-	 * @param mu
-	 *            Set <code>mustUnderstand</code> to true or false
-	 */
-	public WSSecHeader(String actor, boolean mu) {
-		setActor(actor);
-		setMustUnderstand(mu);
-	}
+    /**
+     * set actor name.
+     * 
+     * @param act
+     *            The actor name of the <code>wsse:Security</code> header
+     */
+    public void setActor(String act) {
+        actor = act;
+    }
 
-	/**
-	 * set actor name. <p/>
-	 * 
-	 * @param act
-	 *            The actor name of the <code>wsse:Security</code> header
-	 */
-	public void setActor(String act) {
-		actor = act;
-	}
+    /**
+     * Set the <code>mustUnderstand</code> flag for the
+     * <code>wsse:Security</code> header.
+     * 
+     * @param mu
+     *            Set <code>mustUnderstand</code> to true or false
+     */
+    public void setMustUnderstand(boolean mu) {
+        mustunderstand = mu;
+    }
 
-	/**
-	 * Set the <code>mustUnderstand</code> flag for the
-	 * <code>wsse:Security</code> header
-	 * 
-	 * @param mu
-	 *            Set <code>mustUnderstand</code> to true or false
-	 */
-	public void setMustUnderstand(boolean mu) {
-		mustunderstand = mu;
-	}
+    /**
+     * Get the security header element of this instance.
+     * 
+     * @return The security header element.
+     */
+    public Element getSecurityHeader() {
+        return securityHeader;
+    }
 
-	/**
-	 * Get the security header element of this instance.
-	 * 
-	 * @return The security header element.
-	 */
-	public Element getSecurityHeader() {
-		return securityHeader;
-	}
+    /**
+     * Creates a security header and inserts it as child into the SOAP Envelope.
+     * 
+     * <p/>
+     * 
+     * Check if a WS Security header block for an actor is already available in
+     * the document. If a header block is found return it, otherwise a new
+     * wsse:Security header block is created and the attributes set
+     * 
+     * @param doc
+     *            A SOAP envelope as <code>Document</code>
+     * @return A <code>wsse:Security</code> element
+     */
+    public Element insertSecurityHeader(Document doc) {
 
-	/**
-	 * @param wsConfig
-	 *            The wsConfig to set.
-	 */
-	public void setWsConfig(WSSConfig wsConfig) {
-		this.wssConfig = wsConfig;
-	}
+        /*
+         * If there is already a security header in this instance just return it
+         */
+        if (securityHeader != null) {
+            return securityHeader;
+        }
+        SOAPConstants soapConstants = WSSecurityUtil.getSOAPConstants(doc
+                .getDocumentElement());
 
-	/**
-	 * Creates a security header and inserts it as child into the SOAP Envelope.
-	 * <p/> Check if a WS Security header block for an actor is already
-	 * available in the document. If a header block is found return it,
-	 * otherwise a new wsse:Security header block is created and the attributes
-	 * set
-	 * 
-	 * @param doc
-	 *            A SOAP envelope as <code>Document</code>
-	 * @return A <code>wsse:Security</code> element
-	 */
-	public Element insertSecurityHeader(Document doc) {
+        securityHeader = WSSecurityUtil.findWsseSecurityHeaderBlock(doc, doc
+                .getDocumentElement(), actor, true);
 
-		/*
-		 * If there is already a security header in this instance just return it
-		 */
-		if (securityHeader != null) {
-			return securityHeader;
-		}
-		SOAPConstants soapConstants = WSSecurityUtil.getSOAPConstants(doc
-				.getDocumentElement());
-
-		securityHeader = WSSecurityUtil.findWsseSecurityHeaderBlock(doc, doc
-				.getDocumentElement(), actor, true);
-
-		String soapPrefix = WSSecurityUtil.getPrefixNS(soapConstants
-				.getEnvelopeURI(), securityHeader);
-		if (actor != null && actor.length() > 0) {
-			securityHeader.setAttributeNS(soapConstants.getEnvelopeURI(),
-					soapPrefix
-							+ ":"
-							+ soapConstants.getRoleAttributeQName()
-									.getLocalPart(), actor);
-		}
-		if (mustunderstand) {
-			securityHeader.setAttributeNS(soapConstants.getEnvelopeURI(),
-					soapPrefix + ":" + WSConstants.ATTR_MUST_UNDERSTAND,
-					soapConstants.getMustunderstand());
-		}
-		return securityHeader;
-	}
+        String soapPrefix = WSSecurityUtil.getPrefixNS(soapConstants
+                .getEnvelopeURI(), securityHeader);
+        if (actor != null && actor.length() > 0) {
+            securityHeader.setAttributeNS(soapConstants.getEnvelopeURI(),
+                    soapPrefix
+                            + ":"
+                            + soapConstants.getRoleAttributeQName()
+                                    .getLocalPart(), actor);
+        }
+        if (mustunderstand) {
+            securityHeader.setAttributeNS(soapConstants.getEnvelopeURI(),
+                    soapPrefix + ":" + WSConstants.ATTR_MUST_UNDERSTAND,
+                    soapConstants.getMustunderstand());
+        }
+        return securityHeader;
+    }
 }

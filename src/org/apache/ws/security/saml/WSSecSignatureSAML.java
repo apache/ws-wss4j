@@ -12,7 +12,6 @@ import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.message.EnvelopeIdResolver;
 import org.apache.ws.security.message.WSSecHeader;
 import org.apache.ws.security.message.WSSecSignature;
-import org.apache.ws.security.message.token.BinarySecurity;
 import org.apache.ws.security.message.token.Reference;
 import org.apache.ws.security.message.token.SecurityTokenReference;
 import org.apache.ws.security.message.token.X509Security;

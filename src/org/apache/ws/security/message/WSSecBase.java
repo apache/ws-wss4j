@@ -47,8 +47,6 @@ public class WSSecBase {
 
 	protected Vector parts = null;
 
-	protected int timeToLive = 300; // time between Created and Expires
-
 	protected boolean doDebug = false;
 
 	protected WSSConfig wssConfig = WSSConfig.getDefaultWSConfig();
@@ -57,18 +55,6 @@ public class WSSecBase {
 	 * Constructor.
 	 */
 	public WSSecBase() {
-	}
-
-	/**
-	 * Set the time to live. This is the time difference in seconds between the
-	 * <code>Created</code> and the <code>Expires</code> in
-	 * <code>Timestamp</code>. <p/>
-	 * 
-	 * @param ttl
-	 *            The time to live in second
-	 */
-	public void setTimeToLive(int ttl) {
-		timeToLive = ttl;
 	}
 
 	/**

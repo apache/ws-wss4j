@@ -38,45 +38,60 @@ public class WSSecTimestamp extends WSSecBase {
 
     private Document document = null;
 
+    private int timeToLive = 300; // time between Created and Expires
+
     /**
      * Constructor.
      */
     public WSSecTimestamp() {
     }
 
-	/**
-	 * Creates a Timestamp element.
-	 * 
-	 * The method prepares and initializes a WSSec Timestamp structure after the
-	 * relevant information was set. Before calling <code>prepare()</code> the
-	 * parameter such as <code>timeToLive</code> can be set if the deafult
-	 * value is not suitable.
-	 * 
-	 * @param doc
-	 *            The SOAP enevlope as W3C document
-	 */
-	public void prepare(Document doc) {
-		document = doc;
-        ts = new Timestamp(wssConfig.isPrecisionInMilliSeconds(), doc, timeToLive);
-		String tsId = "Timestamp-" + ts.hashCode();
-		ts.setID(tsId);
-	}
+    /**
+     * Set the time to live. This is the time difference in seconds between the
+     * <code>Created</code> and the <code>Expires</code> in
+     * <code>Timestamp</code>. <p/>
+     * 
+     * @param ttl
+     *            The time to live in second
+     */
+    public void setTimeToLive(int ttl) {
+        timeToLive = ttl;
+    }
 
-	/**
-	 * Prepends the Timestamp element to the elements already in the
-	 * Security header.
-	 * 
-	 * The method can be called any time after <code>prepare()</code>.
-	 * This allows to insert the Timestamp element at any position in the
-	 * Security header.
-	 * 
-	 * @param secHeader
-	 *            The security header that holds the Signature element.
-	 */
-	public void prependToHeader(WSSecHeader secHeader) {
-		WSSecurityUtil.prependChildElement(document, secHeader
-				.getSecurityHeader(), ts.getElement(), false);
-	}
+    /**
+     * Creates a Timestamp element.
+     * 
+     * The method prepares and initializes a WSSec Timestamp structure after the
+     * relevant information was set. Before calling <code>prepare()</code> the
+     * parameter such as <code>timeToLive</code> can be set if the deafult
+     * value is not suitable.
+     * 
+     * @param doc
+     *            The SOAP enevlope as W3C document
+     */
+    public void prepare(Document doc) {
+        document = doc;
+        ts = new Timestamp(wssConfig.isPrecisionInMilliSeconds(), doc,
+                timeToLive);
+        String tsId = "Timestamp-" + ts.hashCode();
+        ts.setID(tsId);
+    }
+
+    /**
+     * Prepends the Timestamp element to the elements already in the Security
+     * header.
+     * 
+     * The method can be called any time after <code>prepare()</code>. This
+     * allows to insert the Timestamp element at any position in the Security
+     * header.
+     * 
+     * @param secHeader
+     *            The security header that holds the Signature element.
+     */
+    public void prependToHeader(WSSecHeader secHeader) {
+        WSSecurityUtil.prependChildElement(document, secHeader
+                .getSecurityHeader(), ts.getElement(), false);
+    }
 
     /**
      * Adds a new <code>Timestamp</code> to a soap envelope.
@@ -94,24 +109,24 @@ public class WSSecTimestamp extends WSSecBase {
     public Document build(Document doc, WSSecHeader secHeader) {
         log.debug("Begin add timestamp...");
 
-		prepare(doc);
-		prependToHeader(secHeader);
+        prepare(doc);
+        prependToHeader(secHeader);
 
-		return doc;
+        return doc;
     }
 
-	/**
-	 * Get the id generated during <code>prepare()</code>.
-	 * 
-	 * Returns the the value of wsu:Id attribute of this Timestamp. 
-	 * 
-	 * @return Return the wsu:Id of this token or null if <code>prepareToken()</code>
-	 * was not called before.
-	 */
+    /**
+     * Get the id generated during <code>prepare()</code>.
+     * 
+     * Returns the the value of wsu:Id attribute of this Timestamp.
+     * 
+     * @return Return the wsu:Id of this token or null if
+     *         <code>prepareToken()</code> was not called before.
+     */
     public String getId() {
-    	if (ts == null) {
-    		return null;
-    	}
+        if (ts == null) {
+            return null;
+        }
         return ts.getID();
     }
 }
