@@ -21,11 +21,11 @@ import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.handler.WSHandler;
 import org.apache.ws.security.handler.WSHandlerConstants;
-import org.apache.ws.security.message.WSSAddUsernameToken;
+import org.apache.ws.security.message.WSSecUsernameToken;
 import org.w3c.dom.Document;
 
 public class UsernameTokenAction implements Action {
-    public void execute(WSHandler handler, int actionToDo, boolean mu, Document doc, RequestData reqData)
+    public void execute(WSHandler handler, int actionToDo, Document doc, RequestData reqData)
             throws WSSecurityException {
         String password;
         password =
@@ -35,27 +35,23 @@ public class UsernameTokenAction implements Action {
                         WSHandlerConstants.PW_CALLBACK_REF, reqData)
                         .getPassword();
 
-        WSSAddUsernameToken builder = new WSSAddUsernameToken(reqData.getActor(), mu);
+        WSSecUsernameToken builder = new WSSecUsernameToken();
         builder.setWsConfig(reqData.getWssConfig());
         builder.setPasswordType(reqData.getPwType());
-
-        //Set the wsu:Id of the UNT
-        builder.setId("UsernameToken-" + System.currentTimeMillis());
-
-        // add the UsernameToken to the SOAP Enevelope
-        builder.build(doc, reqData.getUsername(), password);
+        builder.setUserInfo(reqData.getUsername(), password);
 
         if (reqData.getUtElements() != null && reqData.getUtElements().length > 0) {
             for (int j = 0; j < reqData.getUtElements().length; j++) {
                 reqData.getUtElements()[j].trim();
                 if (reqData.getUtElements()[j].equals("Nonce")) {
-                    builder.addNonce(doc);
+                    builder.addNonce();
                 }
                 if (reqData.getUtElements()[j].equals("Created")) {
-                    builder.addCreated(doc);
+                    builder.addCreated();
                 }
                 reqData.getUtElements()[j] = null;
             }
         }
+        builder.build(doc, reqData.getSecHeader());        
     }
 }

@@ -26,16 +26,14 @@ import org.apache.ws.security.handler.WSHandler;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.saml.SAMLIssuer;
 import org.apache.ws.security.saml.SAMLIssuerFactory;
-import org.apache.ws.security.saml.WSSignSAMLEnvelope;
+import org.apache.ws.security.saml.WSSecSignatureSAML;
 import org.opensaml.SAMLAssertion;
 import org.w3c.dom.Document;
 
 public class SAMLTokenSignedAction implements Action {
     private static Log log = LogFactory.getLog(SAMLTokenSignedAction.class.getName());
-    private static Log tlog =
-            LogFactory.getLog("org.apache.ws.security.TIME");
 
-    public void execute(WSHandler handler, int actionToDo, boolean mu, Document doc, RequestData reqData)
+    public void execute(WSHandler handler, int actionToDo, Document doc, RequestData reqData)
             throws WSSecurityException {
         Crypto crypto = null;
         /*
@@ -62,7 +60,7 @@ public class SAMLTokenSignedAction implements Action {
         String issuerKeyPW = null;
         Crypto issuerCrypto = null;
 
-        WSSignSAMLEnvelope wsSign = new WSSignSAMLEnvelope(reqData.getActor(), mu);
+        WSSecSignatureSAML wsSign = new WSSecSignatureSAML();
         wsSign.setWsConfig(reqData.getWssConfig());
 
         String password = null;
@@ -89,7 +87,8 @@ public class SAMLTokenSignedAction implements Action {
                     assertion,
                     issuerCrypto,
                     issuerKeyName,
-                    issuerKeyPW);
+                    issuerKeyPW,
+                    reqData.getSecHeader());
             reqData.getSignatureValues().add(wsSign.getSignatureValue());
         } catch (WSSecurityException e) {
             throw new WSSecurityException("WSHandler: Signed SAML: error during message processing"

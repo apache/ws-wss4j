@@ -27,7 +27,7 @@ import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.handler.WSHandler;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.handler.WSHandlerResult;
-import org.apache.ws.security.message.WSAddSignatureConfirmation;
+import org.apache.ws.security.message.WSSecSignatureConfirmation;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 
@@ -36,7 +36,7 @@ import java.util.Vector;
 public class SignatureConfirmationAction implements Action {
     protected static Log log = LogFactory.getLog(WSHandler.class.getName());
 
-    public void execute(WSHandler handler, int actionToDo, boolean mu, Document doc, RequestData reqData)
+    public void execute(WSHandler handler, int actionToDo, Document doc, RequestData reqData)
             throws WSSecurityException {
         if (log.isDebugEnabled()) {
             log.debug("Perform Signature confirmation");
@@ -62,8 +62,7 @@ public class SignatureConfirmationAction implements Action {
         }
         Vector signatureParts = reqData.getSignatureParts();
         // prepare a SignatureConfirmation token
-        WSAddSignatureConfirmation wsc = new WSAddSignatureConfirmation(reqData
-                .getActor(), mu);
+        WSSecSignatureConfirmation wsc = new WSSecSignatureConfirmation();
         int idHash = wsc.hashCode();
         if (signatureActions.size() > 0) {
             if (log.isDebugEnabled()) {
@@ -74,16 +73,12 @@ public class SignatureConfirmationAction implements Action {
                 WSSecurityEngineResult wsr = (WSSecurityEngineResult) signatureActions
                         .get(i);
                 byte[] sigVal = wsr.getSignatureValue();
-                String id = "sigcon-" + (idHash + i);
-                wsc.setId(id);
-                wsc.build(doc, sigVal);
-                signatureParts.add(new WSEncryptionPart(id));
+                wsc.build(doc, sigVal, reqData.getSecHeader());
+                signatureParts.add(new WSEncryptionPart(wsc.getId()));
             }
         } else {
-            String id = "sigcon-" + idHash;
-            wsc.setId(id);
-            wsc.build(doc, null);
-            signatureParts.add(new WSEncryptionPart(id));
+            wsc.build(doc, null, reqData.getSecHeader());
+            signatureParts.add(new WSEncryptionPart(wsc.getId()));
         }
         handler.setProperty(reqData.getMsgContext(), WSHandlerConstants.SIG_CONF_DONE,
                 WSHandler.DONE);

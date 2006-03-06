@@ -26,5 +26,6 @@ import org.apache.ws.security.WSSecurityException;
  * Interface for all actions
  */
 public interface Action {
-    public void execute(WSHandler handler, int actionToDo, boolean mu, Document doc, RequestData reqData) throws WSSecurityException;
+    public void execute(WSHandler handler, int actionToDo, Document doc,
+            RequestData reqData) throws WSSecurityException;
 }

@@ -21,11 +21,11 @@ import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.handler.WSHandler;
 import org.apache.ws.security.handler.WSHandlerConstants;
-import org.apache.ws.security.message.WSSignEnvelope;
+import org.apache.ws.security.message.WSSecSignature;
 import org.w3c.dom.Document;
 
 public class SignatureAction implements Action {
-    public void execute(WSHandler handler, int actionToDo, boolean mu, Document doc, RequestData reqData)
+    public void execute(WSHandler handler, int actionToDo, Document doc, RequestData reqData)
             throws WSSecurityException {
         String password;
         password =
@@ -35,7 +35,7 @@ public class SignatureAction implements Action {
                         WSHandlerConstants.PW_CALLBACK_REF, reqData)
                         .getPassword();
 
-        WSSignEnvelope wsSign = new WSSignEnvelope(reqData.getActor(), mu);
+        WSSecSignature wsSign = new WSSecSignature();
         wsSign.setWsConfig(reqData.getWssConfig());
 
         if (reqData.getSigKeyId() != 0) {
@@ -51,7 +51,7 @@ public class SignatureAction implements Action {
         }
 
         try {
-            wsSign.build(doc, reqData.getSigCrypto());
+            wsSign.build(doc, reqData.getSigCrypto(), reqData.getSecHeader());
             reqData.getSignatureValues().add(wsSign.getSignatureValue());
         } catch (WSSecurityException e) {
             throw new WSSecurityException("WSHandler: Signature: error during message procesing" + e);

@@ -3,6 +3,7 @@ package org.apache.ws.security.handler;
 import org.apache.ws.security.SOAPConstants;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.components.crypto.Crypto;
+import org.apache.ws.security.message.WSSecHeader;
 
 import java.util.Vector;
 import java.security.cert.X509Certificate;
@@ -35,6 +36,7 @@ public class RequestData {
     private int timeToLive = 300; 	// Timestamp: time in seconds between creation and expiry
     private WSSConfig wssConfig = null;
     private Vector signatureValues = new Vector();
+    private WSSecHeader secHeader = null;
 
     public void clear() {
         soapConstants = null;
@@ -42,12 +44,10 @@ public class RequestData {
        	sigCrypto = decCrypto = encCrypto = null;
        	signatureParts.clear();
        	encryptParts.clear();
-       	signatureParts = encryptParts = null;
        	encCert = null;
        	utElements = null;
         wssConfig = null;
         signatureValues.clear();
-        signatureValues = null;
     }
 
     public Object getMsgContext() {
@@ -142,10 +142,6 @@ public class RequestData {
         return signatureParts;
     }
 
-//    public void setSignatureParts(Vector signatureParts) {
-//        this.signatureParts = signatureParts;
-//    }
-
     public Crypto getEncCrypto() {
         return encCrypto;
     }
@@ -190,10 +186,6 @@ public class RequestData {
         return encryptParts;
     }
 
-//    public void setEncryptParts(Vector encryptParts) {
-//        this.encryptParts = encryptParts;
-//    }
-
     public X509Certificate getEncCert() {
         return encCert;
     }
@@ -230,10 +222,17 @@ public class RequestData {
         return signatureValues;
     }
 
-//    /**
-//     * @param signatureValue The signature value to store.
-//     */
-//    public void addSignatureValue(byte[] signatureValue) {
-//        this.signatureValues.add(signatureValue);
-//    }    
+    /**
+     * @return Returns the secHeader.
+     */
+    public WSSecHeader getSecHeader() {
+        return secHeader;
+    }
+
+    /**
+     * @param secHeader The secHeader to set.
+     */
+    public void setSecHeader(WSSecHeader secHeader) {
+        this.secHeader = secHeader;
+    }
 }

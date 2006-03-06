@@ -22,13 +22,13 @@ import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.handler.WSHandler;
 import org.apache.ws.security.handler.WSHandlerConstants;
-import org.apache.ws.security.message.WSEncryptBody;
+import org.apache.ws.security.message.WSSecEncrypt;
 import org.w3c.dom.Document;
 
 public class EncryptionAction implements Action {
-    public void execute(WSHandler handler, int actionToDo, boolean mu, Document doc, RequestData reqData)
+    public void execute(WSHandler handler, int actionToDo, Document doc, RequestData reqData)
             throws WSSecurityException {
-        WSEncryptBody wsEncrypt = new WSEncryptBody(reqData.getActor(), mu);
+        WSSecEncrypt wsEncrypt = new WSSecEncrypt();
         wsEncrypt.setWsConfig(reqData.getWssConfig());
 
         if (reqData.getEncKeyId() != 0) {
@@ -59,7 +59,7 @@ public class EncryptionAction implements Action {
             wsEncrypt.setParts(reqData.getEncryptParts());
         }
         try {
-            wsEncrypt.build(doc, reqData.getEncCrypto());
+            wsEncrypt.build(doc, reqData.getEncCrypto(), reqData.getSecHeader());
         } catch (WSSecurityException e) {
             throw new WSSecurityException("WSHandler: Encryption: error during message processing"
                     + e);

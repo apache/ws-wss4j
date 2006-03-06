@@ -28,6 +28,7 @@ import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.message.token.Timestamp;
+import org.apache.ws.security.message.WSSecHeader;
 import org.apache.ws.security.util.Loader;
 import org.apache.ws.security.util.StringUtil;
 import org.apache.ws.security.util.WSSecurityUtil;
@@ -93,6 +94,10 @@ public abstract class WSHandler {
         String actor = getString(WSHandlerConstants.ACTOR, mc);
         reqData.setActor(actor);
 
+        WSSecHeader secHeader = new WSSecHeader(actor, mu);
+        secHeader.insertSecurityHeader(doc);
+        
+        reqData.setSecHeader(secHeader);
         reqData.setSoapConstants(WSSecurityUtil.getSOAPConstants(doc
                 .getDocumentElement()));
         /*
@@ -160,7 +165,7 @@ public abstract class WSHandler {
                 Vector results = null;
                 if ((results = (Vector) getProperty(reqData.getMsgContext(),
                         WSHandlerConstants.RECV_RESULTS)) != null) {
-                    wssConfig.getAction(WSConstants.SC).execute(this, WSConstants.SC, mu, doc, reqData);
+                    wssConfig.getAction(WSConstants.SC).execute(this, WSConstants.SC, doc, reqData);
                 }
             }
         }
@@ -183,7 +188,7 @@ public abstract class WSHandler {
                 case WSConstants.ST_UNSIGNED:
                 case WSConstants.TS:
                 case WSConstants.UT_SIGN:
-                    wssConfig.getAction(actionToDo).execute(this, actionToDo, mu, doc, reqData);
+                    wssConfig.getAction(actionToDo).execute(this, actionToDo, doc, reqData);
                     break;
                 case WSConstants.NO_SERIALIZE:
                     reqData.setNoSerialization(true);

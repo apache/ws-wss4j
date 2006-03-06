@@ -20,16 +20,16 @@ package org.apache.ws.security.action;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.handler.WSHandler;
-import org.apache.ws.security.message.WSSAddSAMLToken;
+import org.apache.ws.security.message.WSSecSAMLToken;
 import org.apache.ws.security.saml.SAMLIssuer;
 import org.opensaml.SAMLAssertion;
 import org.w3c.dom.Document;
 
-public class SAMLTokenUnsignedAction extends SAMLTokenSignedAction implements Action {
+public class SAMLTokenUnsignedAction extends SAMLTokenSignedAction {
 
-    public void execute(WSHandler handler, int actionToDo, boolean mu, Document doc, RequestData reqData)
+    public void execute(WSHandler handler, int actionToDo, Document doc, RequestData reqData)
             throws WSSecurityException {
-        WSSAddSAMLToken builder = new WSSAddSAMLToken(reqData.getActor(), mu);
+        WSSecSAMLToken builder = new WSSecSAMLToken();
         builder.setWsConfig(reqData.getWssConfig());
 
         SAMLIssuer saml = loadSamlIssuer(handler, reqData);
@@ -37,6 +37,6 @@ public class SAMLTokenUnsignedAction extends SAMLTokenSignedAction implements Ac
         SAMLAssertion assertion = saml.newAssertion();
 
         // add the SAMLAssertion Token to the SOAP Enevelope
-        builder.build(doc, assertion);
+        builder.build(doc, assertion, reqData.getSecHeader());
     }
 }
