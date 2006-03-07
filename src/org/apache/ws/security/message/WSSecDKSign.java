@@ -82,7 +82,7 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
 
     public Document build(Document doc, Crypto crypto, WSSecHeader secHeader) throws WSSecurityException  {
         
-        this.prepareSig(doc, crypto, secHeader);
+        this.prepare(doc, crypto, secHeader);
         
 
         
@@ -111,9 +111,9 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
         return doc;
     }
     
-    protected void prepareSig(Document doc, Crypto crypto, WSSecHeader secHeader)
+    protected void prepare(Document doc, Crypto crypto, WSSecHeader secHeader)
                             throws WSSecurityException {
-        this.prepare(doc, crypto);
+        super.prepare(doc, crypto);
         
         wsDocInfo = new WSDocInfo(doc.hashCode());
         wsDocInfo.setCrypto(crypto);
