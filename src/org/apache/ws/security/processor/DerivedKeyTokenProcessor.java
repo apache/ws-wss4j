@@ -109,7 +109,7 @@ public class DerivedKeyTokenProcessor implements Processor {
         if(str != null) {
             Reference ref = str.getReference();
             String uri = ref.getURI();
-            Processor processor = wsDocInfo.getProcessor(uri);
+            Processor processor = wsDocInfo.getProcessor(uri.substring(1));
             if(processor instanceof EncryptedKeyProcessor) {
                 this.secret = ((EncryptedKeyProcessor)processor).getDecryptedBytes();
             }

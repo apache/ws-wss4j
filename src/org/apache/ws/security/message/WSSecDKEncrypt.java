@@ -55,12 +55,11 @@ public class WSSecDKEncrypt extends WSSecDerivedKeyBase {
          */
         prepare(doc, crypto);
         
+        this.envelope =  doc.getDocumentElement();
         /*
          * prepend elements in the right order to the security header
          */
         prependDKElementToHeader(secHeader);
-        prependToHeader(secHeader);
-        prependBSTElementToHeader(secHeader);
                 
         SOAPConstants soapConstants = WSSecurityUtil.getSOAPConstants(envelope);
         if (parts == null) {

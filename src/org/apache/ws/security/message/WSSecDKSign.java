@@ -106,8 +106,7 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
          * prepend elements in the right order to the security header
          */
         prependDKElementToHeader(secHeader);
-        prependToHeader(secHeader);
-        prependBSTElementToHeader(secHeader);
+
         return doc;
     }
     
