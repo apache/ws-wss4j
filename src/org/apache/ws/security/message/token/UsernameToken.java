@@ -404,25 +404,7 @@ public class UsernameToken {
                 this.elementPassword.setAttribute("Type",
                         WSConstants.PASSWORD_TEXT);
             } else {
-                byte[] b1 = Base64.decode(getNonce());
-                byte[] b2 = getCreated().getBytes("UTF-8");
-                byte[] b3 = pwd.getBytes("UTF-8");
-                byte[] b4 = new byte[b1.length + b2.length + b3.length];
-                int i = 0;
-                int count = 0;
-                for (i = 0; i < b1.length; i++) {
-                    b4[count++] = b1[i];
-                }
-                for (i = 0; i < b2.length; i++) {
-                    b4[count++] = b2[i];
-                }
-                for (i = 0; i < b3.length; i++) {
-                    b4[count++] = b3[i];
-                }
-                MessageDigest sha = MessageDigest.getInstance("SHA-1");
-                sha.reset();
-                sha.update(b4);
-                node.setData(Base64.encode(sha.digest()));
+                node.setData(doPasswordDigest(getNonce(), getCreated(), pwd));
                 this.elementPassword.setAttribute("Type",
                         WSConstants.PASSWORD_DIGEST);
             }
@@ -440,16 +422,15 @@ public class UsernameToken {
             byte[] b3 = password.getBytes("UTF-8");
             byte[] b4 = new byte[b1.length + b2.length + b3.length];
             int i = 0;
-            int count = 0;
-            for (i = 0; i < b1.length; i++) {
-                b4[count++] = b1[i];
-            }
-            for (i = 0; i < b2.length; i++) {
-                b4[count++] = b2[i];
-            }
-            for (i = 0; i < b3.length; i++) {
-                b4[count++] = b3[i];
-            }
+            int offset = 0;
+            System.arraycopy(b1, 0, b4, offset, b1.length);
+            offset += b1.length;
+            
+            System.arraycopy(b2, 0, b4, offset, b2.length);
+            offset += b2.length;
+
+            System.arraycopy(b3, 0, b4, offset, b3.length);
+            
             MessageDigest sha = MessageDigest.getInstance("SHA-1");
             sha.reset();
             sha.update(b4);
@@ -534,7 +515,7 @@ public class UsernameToken {
     }
 
     /**
-     * Gets the secret key as per WS-Trust spec. This mthod uses default setting
+     * Gets the secret key as per WS-Trust spec. This method uses default setting
      * to generate the secret key. These default values are suitable for .NET
      * WSE.
      * 
@@ -565,17 +546,16 @@ public class UsernameToken {
             byte[] nonce = Base64.decode(getNonce());
             byte[] created = getCreated().getBytes("UTF-8");
             byte[] seed = new byte[label.length + nonce.length + created.length];
-            int i = 0;
-            int count = 0;
-            for (i = 0; i < label.length; i++) {
-                seed[count++] = label[i];
-            }
-            for (i = 0; i < nonce.length; i++) {
-                seed[count++] = nonce[i];
-            }
-            for (i = 0; i < created.length; i++) {
-                seed[count++] = created[i];
-            }
+
+            int offset = 0;
+            System.arraycopy(label, 0, seed, offset, label.length);
+            offset += label.length;
+            
+            System.arraycopy(nonce, 0, seed, offset, nonce.length);
+            offset += nonce.length;
+
+            System.arraycopy(created, 0, seed, offset, created.length);
+            
             key = P_hash(password, seed, mac, keylen);
 
             if (log.isDebugEnabled()) {
