@@ -134,18 +134,18 @@ public class TestWSSecurityNewDK extends TestCase implements CallbackHandler {
 
         //EncryptedKey
         WSSecEncryptedKey encrKeyBuilder = new WSSecEncryptedKey();
-        encrKeyBuilder.setEncryptionUser("wss4jcert");
+        encrKeyBuilder.setUserInfo("wss4jcert");
         encrKeyBuilder.setKeyIdentifierType(WSConstants.THUMBPRINT_IDENTIFIER);
         encrKeyBuilder.build(doc, crypto, secHeader);
 
         //Key information from the EncryptedKey
         byte[] ek = encrKeyBuilder.getEphemeralKey();
-        String tokneIdentifier = encrKeyBuilder.getTokneIdentifier();  
+        String tokenIdentifier = encrKeyBuilder.getId();  
         
         //Derived key encryption
         WSSecDKEncrypt encrBuilder = new WSSecDKEncrypt();
         encrBuilder.setSymmetricEncAlgorithm(WSConstants.AES_128);
-        encrBuilder.setExternalKey(ek, tokneIdentifier);
+        encrBuilder.setExternalKey(ek, tokenIdentifier);
         Document encryptedDoc = encrBuilder.build(doc, crypto, secHeader);
         
         encrKeyBuilder.commit(encryptedDoc, crypto, secHeader);
@@ -173,18 +173,18 @@ public class TestWSSecurityNewDK extends TestCase implements CallbackHandler {
 
          //EncryptedKey
          WSSecEncryptedKey encrKeyBuilder = new WSSecEncryptedKey();
-         encrKeyBuilder.setEncryptionUser("wss4jcert");
+         encrKeyBuilder.setUserInfo("wss4jcert");
          encrKeyBuilder.setKeyIdentifierType(WSConstants.THUMBPRINT_IDENTIFIER);
          encrKeyBuilder.build(doc, crypto, secHeader);
 
          //Key information from the EncryptedKey
          byte[] ek = encrKeyBuilder.getEphemeralKey();
-         String tokneIdentifier = encrKeyBuilder.getTokneIdentifier();  
+         String tokenIdentifier = encrKeyBuilder.getId();  
          
          //Derived key encryption
          WSSecDKEncrypt encrBuilder = new WSSecDKEncrypt();
          encrBuilder.setSymmetricEncAlgorithm(WSConstants.AES_128);
-         encrBuilder.setExternalKey(ek, tokneIdentifier);
+         encrBuilder.setExternalKey(ek, tokenIdentifier);
          Document encryptedDoc = encrBuilder.build(doc, crypto, secHeader);
          
          encrKeyBuilder.commit(encryptedDoc, crypto, secHeader);
@@ -208,17 +208,17 @@ public class TestWSSecurityNewDK extends TestCase implements CallbackHandler {
 
          //EncryptedKey
          WSSecEncryptedKey encrKeyBuilder = new WSSecEncryptedKey();
-         encrKeyBuilder.setEncryptionUser("wss4jcert");
+         encrKeyBuilder.setUserInfo("wss4jcert");
          encrKeyBuilder.setKeyIdentifierType(WSConstants.THUMBPRINT_IDENTIFIER);
          encrKeyBuilder.build(doc, crypto, secHeader);
 
          //Key information from the EncryptedKey
          byte[] ek = encrKeyBuilder.getEphemeralKey();
-         String tokneIdentifier = encrKeyBuilder.getTokneIdentifier();         
+         String tokenIdentifier = encrKeyBuilder.getId();         
          
          //Derived key encryption
          WSSecDKSign sigBuilder = new WSSecDKSign();
-         sigBuilder.setExternalKey(ek, tokneIdentifier);
+         sigBuilder.setExternalKey(ek, tokenIdentifier);
          sigBuilder.setSignatureAlgorithm(XMLSignature.ALGO_ID_MAC_HMAC_SHA1);
          Document signedDoc = sigBuilder.build(doc, crypto, secHeader);
          
@@ -244,17 +244,17 @@ public class TestWSSecurityNewDK extends TestCase implements CallbackHandler {
 
         //EncryptedKey
         WSSecEncryptedKey encrKeyBuilder = new WSSecEncryptedKey();
-        encrKeyBuilder.setEncryptionUser("wss4jcert");
+        encrKeyBuilder.setUserInfo("wss4jcert");
         encrKeyBuilder.setKeyIdentifierType(WSConstants.THUMBPRINT_IDENTIFIER);
         encrKeyBuilder.build(doc, crypto, secHeader);
 
         //Key information from the EncryptedKey
         byte[] ek = encrKeyBuilder.getEphemeralKey();
-        String tokneIdentifier = encrKeyBuilder.getTokneIdentifier();
+        String tokenIdentifier = encrKeyBuilder.getId();
 
         //Derived key encryption
         WSSecDKSign sigBuilder = new WSSecDKSign();
-        sigBuilder.setExternalKey(ek, tokneIdentifier);
+        sigBuilder.setExternalKey(ek, tokenIdentifier);
         sigBuilder.setSignatureAlgorithm(XMLSignature.ALGO_ID_MAC_HMAC_SHA1);
         log.info("Before HMAC-SHA1 signature");
         Document signedDoc = sigBuilder.build(doc, crypto, secHeader);
@@ -262,7 +262,7 @@ public class TestWSSecurityNewDK extends TestCase implements CallbackHandler {
         //Derived key signature
         WSSecDKEncrypt encrBuilder = new WSSecDKEncrypt();
         encrBuilder.setSymmetricEncAlgorithm(WSConstants.AES_128);
-        encrBuilder.setExternalKey(ek, tokneIdentifier);
+        encrBuilder.setExternalKey(ek, tokenIdentifier);
         Document signedEncryptedDoc = encrBuilder.build(signedDoc, crypto,
                 secHeader);
 
@@ -290,23 +290,23 @@ public class TestWSSecurityNewDK extends TestCase implements CallbackHandler {
 
          //EncryptedKey
          WSSecEncryptedKey encrKeyBuilder = new WSSecEncryptedKey();
-         encrKeyBuilder.setEncryptionUser("wss4jcert");
+         encrKeyBuilder.setUserInfo("wss4jcert");
          encrKeyBuilder.setKeyIdentifierType(WSConstants.THUMBPRINT_IDENTIFIER);
          encrKeyBuilder.build(doc, crypto, secHeader);
          
          //Key information from the EncryptedKey
          byte[] ek = encrKeyBuilder.getEphemeralKey();
-         String tokneIdentifier = encrKeyBuilder.getTokneIdentifier();
+         String tokenIdentifier = encrKeyBuilder.getId();
          
          //Derived key encryption
          WSSecDKEncrypt encrBuilder = new WSSecDKEncrypt();
          encrBuilder.setSymmetricEncAlgorithm(WSConstants.AES_128);
-         encrBuilder.setExternalKey(ek, tokneIdentifier);
+         encrBuilder.setExternalKey(ek, tokenIdentifier);
          Document encryptedDoc = encrBuilder.build(doc, crypto, secHeader);
          
          //Derived key signature
          WSSecDKSign sigBuilder = new WSSecDKSign();
-         sigBuilder.setExternalKey(ek, tokneIdentifier);
+         sigBuilder.setExternalKey(ek, tokenIdentifier);
          sigBuilder.setSignatureAlgorithm(XMLSignature.ALGO_ID_MAC_HMAC_SHA1);
          log.info("Before HMAC-SHA1 signature");
          Document encryptedSignedDoc = sigBuilder.build(encryptedDoc, crypto,
