@@ -93,14 +93,27 @@ public class WSSecDKEncrypt extends WSSecDerivedKeyBase {
 
         for (int part = 0; part < references.size(); part++) {
             WSEncryptionPart encPart = (WSEncryptionPart) references.get(part);
+
+            String idToEnc = encPart.getId();
+            
             String elemName = encPart.getName();
             String nmSpace = encPart.getNamespace();
             String modifier = encPart.getEncModifier();
             /*
              * Third step: get the data to encrypt.
              */
-            Element body = (Element) WSSecurityUtil.findElement(envelope,
-                    elemName, nmSpace);
+            Element body = null;
+            if (idToEnc != null) {
+                body = WSSecurityUtil.findElementById(document
+                        .getDocumentElement(), idToEnc, WSConstants.WSU_NS);
+                if (body == null) {
+                    body = WSSecurityUtil.findElementById(document
+                            .getDocumentElement(), idToEnc, null);
+                }
+            } else {
+                body = (Element) WSSecurityUtil.findElement(envelope, elemName,
+                        nmSpace);
+            }
             if (body == null) {
                 throw new WSSecurityException(WSSecurityException.FAILURE,
                         "noEncElement", new Object[] { "{" + nmSpace + "}"

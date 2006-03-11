@@ -74,7 +74,7 @@ public abstract class WSSecDerivedKeyBase extends WSSecBase {
      * The Token identifier of the token that the <code>DerivedKeyToken</code> 
      * is (or to be) derived from.
      */
-    protected String tokneIdentifier = null;
+    protected String tokenIdentifier = null;
     
     /**
      * The derived key will change depending on the sig/encr algorithm.
@@ -91,15 +91,27 @@ public abstract class WSSecDerivedKeyBase extends WSSecBase {
     public void setExternalKey(byte[] ephemeralKey, 
                                 String tokenIdentifier) {
         this.ephemeralKey = ephemeralKey;
-        this.tokneIdentifier = tokenIdentifier;
+        this.tokenIdentifier = tokenIdentifier;
     }
 
     
     /**
-     * @return Returns the tokneIdentifier.
+     * @return Returns the tokenIdentifier.
      */
-    public String getTokneIdentifier() {
-        return tokneIdentifier;
+    public String getTokenIdentifier() {
+        return tokenIdentifier;
+    }
+    
+    /**
+     * Get the id generated during <code>prepare()</code>.
+     * 
+     * Returns the the value of wsu:Id attribute of the DerivedKeyToken element.
+     * 
+     * @return Return the wsu:Id of this token or null if <code>prepare()</code>
+     *         was not called before.
+     */
+    public String getId() {
+        return dktId;
     }
     
     /**
@@ -159,7 +171,7 @@ public abstract class WSSecDerivedKeyBase extends WSSecBase {
         //Create the SecurityTokenRef to the Encrypted Key
         SecurityTokenReference strEncKey = new SecurityTokenReference(document);
         Reference ref = new Reference(document);
-        ref.setURI("#" + this.tokneIdentifier);
+        ref.setURI("#" + this.tokenIdentifier);
         strEncKey.setReference(ref);
         dkt.setSecuityTokenReference(strEncKey);
     }
