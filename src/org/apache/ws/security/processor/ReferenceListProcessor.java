@@ -146,12 +146,7 @@ public class ReferenceListProcessor implements Processor {
 		// initialize Cipher ....
 		XMLCipher xmlCipher = null;
 		try {
-			String provider = wssConfig.getJceProviderId();
-			if (provider == null) {
-				xmlCipher = XMLCipher.getInstance(symEncAlgo);
-			} else {
-				xmlCipher = XMLCipher.getProviderInstance(symEncAlgo, provider);
-			}
+		    xmlCipher = XMLCipher.getInstance(symEncAlgo);
 			xmlCipher.init(XMLCipher.DECRYPT_MODE, symmetricKey);
 		} catch (XMLEncryptionException e1) {
 			throw new WSSecurityException(

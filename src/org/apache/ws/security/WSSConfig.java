@@ -77,14 +77,10 @@ public class WSSConfig {
          * The last provider added has precedence, that is if JuiCE can be add
          * then WSS4J uses this provider.
          */
-        if (addJceProvider("BC",
-                "org.bouncycastle.jce.provider.BouncyCastleProvider")) {
-            setJceProviderId("BC");
-        }
-        if (addJceProvider("JuiCE",
-                "org.apache.security.juice.provider.JuiCEProviderOpenSSL")) {
-            setJceProviderId("JuiCE");
-        }
+        addJceProvider("BC",
+                "org.bouncycastle.jce.provider.BouncyCastleProvider");
+        addJceProvider("JuiCE",
+                "org.apache.security.juice.provider.JuiCEProviderOpenSSL");
         Transform.init();
         try {
             Transform.register(STRTransform.implementedTransformURI,
@@ -273,8 +269,12 @@ public class WSSConfig {
                     log.debug("The provider " + id
                             + " had to be added to the java.security.Security");
                 }
-                java.security.Security.insertProviderAt(
+                int ret =java.security.Security.insertProviderAt(
                         (java.security.Provider) c.newInstance(), 2);
+                if (log.isDebugEnabled()) {
+                    log.debug("The provider " + id + " was added at: "
+                            + ret);
+                }                
             }
             return true;
         } catch (Throwable t) {
@@ -311,29 +311,7 @@ public class WSSConfig {
         return false;
     }
 
-    /**
-     * Sets the JCE provider to use in all following security operations.
-     * 
-     * The method checks if the provider is known. If yes it sets the provider
-     * id and returns true. Otherwise the provider id remains unchanged and the
-     * method returns false.
-     * 
-     * @param id
-     *            is the JCE provider's id
-     * @return Returns <code>true</code> if set, <code>false</code>
-     *         otherwise
-     * @see #addJceProvider
-     */
-    public boolean setJceProviderId(String id) {
-        if (jceProvider.get(id) != null) {
-            jceProviderId = id;
-//            JCEMapper.setProviderId(id);
-            return true;
-        }
-        return false;
-    }
-
-    public String getJceProviderId() {
-        return jceProviderId;
-    }
+//    public String getJceProviderId() {
+//        return jceProviderId;
+//    }
 }

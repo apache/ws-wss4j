@@ -564,7 +564,6 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
 
     private KeyGenerator getKeyGenerator() throws WSSecurityException {
         KeyGenerator keyGen = null;
-        String id = wssConfig.getJceProviderId();
         try {
             /*
              * Assume AES as default, so initialize it

@@ -113,6 +113,14 @@ public class DerivedKeyTokenProcessor implements Processor {
             if(processor instanceof EncryptedKeyProcessor) {
                 this.secret = ((EncryptedKeyProcessor)processor).getDecryptedBytes();
             }
+            else  {
+                throw new WSSecurityException(
+                        WSSecurityException.FAILED_ENC_DEC, "unsupportedKeyId");
+            }
+        }
+        else {
+            throw new WSSecurityException(WSSecurityException.FAILED_ENC_DEC,
+            "noReference");
         }
     }
 

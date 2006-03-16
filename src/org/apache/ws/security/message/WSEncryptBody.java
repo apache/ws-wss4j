@@ -493,13 +493,7 @@ public class WSEncryptBody extends WSBaseMessage {
 
         XMLCipher xmlCipher = null;
         try {
-            String provider = wssConfig.getJceProviderId();
-            if (provider == null) {
-                xmlCipher = XMLCipher.getInstance(symEncAlgo);
-            }
-            else {
-                xmlCipher = XMLCipher.getProviderInstance(symEncAlgo, provider);
-            }
+            xmlCipher = XMLCipher.getInstance(symEncAlgo);
         } catch (XMLEncryptionException e3) {
             throw new WSSecurityException(WSSecurityException.UNSUPPORTED_ALGORITHM, null, null, e3);
         }
@@ -637,22 +631,13 @@ public class WSEncryptBody extends WSBaseMessage {
 
     private KeyGenerator getKeyGenerator() throws WSSecurityException {
 		KeyGenerator keyGen = null;
-		String id = wssConfig.getJceProviderId();
 		try {
 			/*
 			 * Assume AES as default, so initialize it
 			 */
-			if (id == null) {
-				keyGen = KeyGenerator.getInstance("AES");
-			} else {
-				keyGen = KeyGenerator.getInstance("AES", id);
-			}
+		    keyGen = KeyGenerator.getInstance("AES");
 			if (symEncAlgo.equalsIgnoreCase(WSConstants.TRIPLE_DES)) {
-				if (id == null) {
-					keyGen = KeyGenerator.getInstance("DESede");
-				} else {
-					keyGen = KeyGenerator.getInstance("DESede", id);
-				}
+			    keyGen = KeyGenerator.getInstance("DESede");
 			} else if (symEncAlgo.equalsIgnoreCase(WSConstants.AES_128)) {
 				keyGen.init(128);
 			} else if (symEncAlgo.equalsIgnoreCase(WSConstants.AES_192)) {
@@ -663,9 +648,6 @@ public class WSEncryptBody extends WSBaseMessage {
 				return null;
 			}
 		} catch (NoSuchAlgorithmException e) {
-			throw new WSSecurityException(
-					WSSecurityException.UNSUPPORTED_ALGORITHM, null, null, e);
-		} catch (NoSuchProviderException e) {
 			throw new WSSecurityException(
 					WSSecurityException.UNSUPPORTED_ALGORITHM, null, null, e);
 		}
