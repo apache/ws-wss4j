@@ -76,6 +76,25 @@ Build Instructions:
         <property name="build.junit.html" value="${build.doc.html}/junit"/>
 
 
+        <condition property="jdk13.present">
+          <equals arg1="${ant.java.version}" arg2="1.3"/>
+        </condition>
+
+        <condition property="jdk14.present">
+          <equals arg1="${ant.java.version}" arg2="1.4"/>
+        </condition>
+
+        <condition property="jdk15.present">
+          <equals arg1="${ant.java.version}" arg2="1.5"/>
+        </condition>
+
+        <condition property="merlin.ok">
+            <or>
+                <equals arg1="${ant.java.version}" arg2="1.4"/>
+                <equals arg1="${ant.java.version}" arg2="1.5"/>
+            </or>
+        </condition>
+
         <!-- 
 
          for the time being following path id uses the libs in the wss4j
@@ -85,9 +104,13 @@ Build Instructions:
          the CLASSPATH includes all required packages (see above
 
          -->
+    	
+    	
         <path id="classpath.libraries" description="3rd party libs">
             <fileset dir="${dir.libs}">
                 <include name="**/*.jar"/>
+                <exclude name="**/bcprov-jdk15-*.jar" unless="jdk15.present"/>
+                <exclude name="**/bcprov-jdk13-*.jar" if="jdk15.present" />
                 <!-- <pathelement path="${java.class.path}"/> -->
             </fileset>
             <fileset dir="${dir.endorsed.libs}">
@@ -242,25 +265,6 @@ org.apache.ws.axis.security.util
             <!-- check whether JUnit is available -->
             <classpath refid="classpath.test"/>
         </available>
-
-        <condition property="jdk13.present">
-          <equals arg1="${ant.java.version}" arg2="1.3"/>
-        </condition>
-
-        <condition property="jdk14.present">
-          <equals arg1="${ant.java.version}" arg2="1.4"/>
-        </condition>
-
-        <condition property="jdk15.present">
-          <equals arg1="${ant.java.version}" arg2="1.5"/>
-        </condition>
-
-        <condition property="merlin.ok">
-            <or>
-                <equals arg1="${ant.java.version}" arg2="1.4"/>
-                <equals arg1="${ant.java.version}" arg2="1.5"/>
-            </or>
-        </condition>
 
         <available property="bc.present" classname="org.bouncycastle.jce.provider.BouncyCastleProvider">
             <!-- check whether BouncyCastle is available -->
