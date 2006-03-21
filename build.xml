@@ -406,7 +406,7 @@ org.apache.ws.axis.security.util
         </ant>
     </target>
 
-    <target name="systemTests" depends="compile"
+    <target name="systemTests" unless="skip.tests" depends="compile"
         if="junit.present"
         description="Runs all JUnit tests">
         <runaxisfunctionaltests
@@ -500,7 +500,7 @@ org.apache.ws.axis.security.util
         <echo message="Running system tests - END..."/>
     </target>
 
-    <target name="unitTests" depends="compile">
+    <target name="unitTests" unless="skip.tests" depends="compile">
         <junit printsummary="yes"
             haltonfailure="yes"
             fork="yes"
