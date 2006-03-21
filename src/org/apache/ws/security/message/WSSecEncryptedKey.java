@@ -93,6 +93,8 @@ public class WSSecEncryptedKey extends WSSecBase {
      * is used to refer to the asymm encryption cert
      */
     protected BinarySecurity bstToken = null;
+    
+    protected X509Certificate useThisCert = null;
 
     /**
      * This will actually prepend the <code>EncryptedKey</code> to the
@@ -166,13 +168,17 @@ public class WSSecEncryptedKey extends WSSecBase {
          * algorithm that will encrypt the generated symmetric (session) key.
          */
         X509Certificate remoteCert = null;
-
-        X509Certificate[] certs = crypto.getCertificates(user);
-        if (certs == null || certs.length <= 0) {
-            throw new WSSecurityException(WSSecurityException.FAILURE,
-                    "invalidX509Data", new Object[] { "for Encryption" });
+        if (useThisCert != null) {
+            remoteCert = useThisCert;
+        } else {
+            X509Certificate[] certs = crypto.getCertificates(user);
+            if (certs == null || certs.length <= 0) {
+                throw new WSSecurityException(WSSecurityException.FAILURE,
+                        "invalidX509Data", new Object[] { "for Encryption" });
+            }
+            remoteCert = certs[0];
         }
-        remoteCert = certs[0];
+        
         prepareInternal(ephemeralKey, remoteCert, crypto);
     }
 
@@ -382,5 +388,19 @@ public class WSSecEncryptedKey extends WSSecBase {
      */
     public byte[] getEphemeralKey() {
         return ephemeralKey;
+    }
+    
+    /**
+     * Set the X509 Certificate to use for encryption.
+     * 
+     * If this is set <b>and</b> the key identifier is set to
+     * <code>DirectReference</code> then use this certificate to get the
+     * public key for encryption.
+     * 
+     * @param cert
+     *            is the X509 certificate to use for encryption
+     */
+    public void setUseThisCert(X509Certificate cert) {
+        useThisCert = cert;
     }
 }

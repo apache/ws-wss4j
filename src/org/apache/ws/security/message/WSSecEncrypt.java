@@ -60,8 +60,6 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
 
     protected String embeddedKeyName = null;
 
-    protected X509Certificate useThisCert = null;
-
     /**
      * Symmetric key used in the EncrytpedKey.
      */
@@ -112,20 +110,6 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
      */
     public void setEmbeddedKeyName(String embeddedKeyName) {
         this.embeddedKeyName = embeddedKeyName;
-    }
-
-    /**
-     * Set the X509 Certificate to use for encryption.
-     * 
-     * If this is set <b>and</b> the key identifier is set to
-     * <code>DirectReference</code> then use this certificate to get the
-     * public key for encryption.
-     * 
-     * @param cert
-     *            is the X509 certificate to use for encryption
-     */
-    public void setUseThisCert(X509Certificate cert) {
-        useThisCert = cert;
     }
 
     /**
