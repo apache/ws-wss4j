@@ -711,6 +711,7 @@ org.apache.ws.axis.security.util
         <jar jarfile="${build.dir}/${jar.library}"
             basedir="${build.classes}"
             includes="**/*, *.txt"
+            excludes="components/**, policy/**, *.properties, **/sandbox/**, wssec/**, **/interop/**, **/oasis/**, **/samples/**" 
             />
     </target>
 
