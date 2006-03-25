@@ -17,18 +17,17 @@
 
 package org.apache.ws.security;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.ws.security.transform.STRTransform;
-import org.apache.ws.security.util.Loader;
-import org.apache.ws.security.action.Action;
-import org.apache.ws.security.processor.Processor;
-import org.apache.xml.security.transforms.Transform;
-import org.apache.xml.security.algorithms.JCEMapper;
-
 import java.util.HashMap;
 
 import javax.xml.namespace.QName;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.ws.security.action.Action;
+import org.apache.ws.security.processor.Processor;
+import org.apache.ws.security.transform.STRTransform;
+import org.apache.ws.security.util.Loader;
+import org.apache.xml.security.transforms.Transform;
 
 /**
  * WSSConfig <p/> Carries configuration data so the WSS4J spec compliance can be
@@ -248,6 +247,8 @@ public class WSSConfig {
             name = "org.apache.ws.security.processor.SignatureConfirmationProcessor";
         } else if (el.equals(WSSecurityEngine.DERIVED_KEY_TOKEN)) {
             name = "org.apache.ws.security.processor.DerivedKeyTokenProcessor";
+        } else if(el.equals(WSSecurityEngine.SECURITY_CONTEXT_TOKEN)) {
+            name = "org.apache.ws.security.processor.SecurityContextTokenProcessor";
         }
 
         if (name != null) {

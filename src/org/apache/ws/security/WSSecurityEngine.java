@@ -90,6 +90,11 @@ public class WSSecurityEngine {
      */
     public static final QName DERIVED_KEY_TOKEN = new QName(ConversationConstants.WSC_NS, ConversationConstants.DERIVED_KEY_TOKEN_LN);
 
+    /**
+     * <code>wsc:SecurityContextToken</code> as defined by WS-SecureConversation specification
+     */
+    public static final QName SECURITY_CONTEXT_TOKEN = new QName(ConversationConstants.WSC_NS, ConversationConstants.SECURITY_CONTEXT_TOKEN_LN);
+    
     public WSSecurityEngine() {
     }
 

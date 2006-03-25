@@ -17,10 +17,6 @@
 
 package org.apache.ws.security.processor;
 
-import java.util.Vector;
-
-import javax.security.auth.callback.CallbackHandler;
-
 import org.apache.ws.security.WSDocInfo;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityException;
@@ -34,8 +30,13 @@ import org.apache.ws.security.message.token.SecurityTokenReference;
 import org.apache.ws.security.util.Base64;
 import org.w3c.dom.Element;
 
+import javax.security.auth.callback.CallbackHandler;
+
+import java.util.Vector;
+
 /**
- *
+ * The processor to process <code>wsc:DerivedKeyToken</code>.
+ * 
  * @author Ruchith Fernando (ruchith.fernando@gmail.com)
  */
 public class DerivedKeyTokenProcessor implements Processor {
@@ -104,23 +105,26 @@ public class DerivedKeyTokenProcessor implements Processor {
      * @param dkt
      * @throws WSSecurityException
      */
-    private void extractSecret(WSDocInfo wsDocInfo, DerivedKeyToken dkt) throws WSSecurityException {
+    private void extractSecret(WSDocInfo wsDocInfo, DerivedKeyToken dkt)
+            throws WSSecurityException {
         SecurityTokenReference str = dkt.getSecuityTokenReference();
-        if(str != null) {
+        if (str != null) {
             Reference ref = str.getReference();
             String uri = ref.getURI();
             Processor processor = wsDocInfo.getProcessor(uri.substring(1));
-            if(processor instanceof EncryptedKeyProcessor) {
-                this.secret = ((EncryptedKeyProcessor)processor).getDecryptedBytes();
-            }
-            else  {
+            if (processor instanceof EncryptedKeyProcessor) {
+                this.secret = ((EncryptedKeyProcessor) processor)
+                        .getDecryptedBytes();
+            } else if (processor instanceof SecurityContextTokenProcessor) {
+                this.secret = ((SecurityContextTokenProcessor) processor)
+                        .getSecret();
+            } else {
                 throw new WSSecurityException(
                         WSSecurityException.FAILED_ENC_DEC, "unsupportedKeyId");
             }
-        }
-        else {
+        } else {
             throw new WSSecurityException(WSSecurityException.FAILED_ENC_DEC,
-            "noReference");
+                    "noReference");
         }
     }
 
