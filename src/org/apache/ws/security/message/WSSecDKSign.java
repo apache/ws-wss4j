@@ -99,13 +99,13 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
         
         addReferencesToSign(parts, secHeader);
         
-        computeSignature();
+        this.computeSignature();
         
         this.prependSigToHeader(secHeader);
         /*
          * prepend elements in the right order to the security header
          */
-        prependDKElementToHeader(secHeader);
+        this.prependDKElementToHeader(secHeader);
 
         return doc;
     }
@@ -390,7 +390,7 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
      * @param securityHeader
      *            The secHeader that holds the Signature element.
      */
-    private void prependSigToHeader(WSSecHeader secHeader) {
+    public void prependSigToHeader(WSSecHeader secHeader) {
         WSSecurityUtil.prependChildElement(document, secHeader.getSecurityHeader(), sig
                 .getElement(), false);
     }

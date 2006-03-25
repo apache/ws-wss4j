@@ -134,7 +134,7 @@ public abstract class WSSecDerivedKeyBase extends WSSecBase {
      *            certificates
      * @throws WSSecurityException
      */
-    protected void prepare(Document doc, Crypto crypto)
+    public void prepare(Document doc, Crypto crypto)
         throws WSSecurityException {
         
         document = doc;
@@ -189,7 +189,7 @@ public abstract class WSSecDerivedKeyBase extends WSSecBase {
      * @param secHeader
      *            The security header that holds the Signature element.
      */
-    protected void prependDKElementToHeader(WSSecHeader secHeader) {
+    public void prependDKElementToHeader(WSSecHeader secHeader) {
         WSSecurityUtil.prependChildElement(document, secHeader
             .getSecurityHeader(), dkt.getElement(), false);
     }

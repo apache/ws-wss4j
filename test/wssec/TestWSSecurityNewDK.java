@@ -18,19 +18,6 @@
 package wssec;
 
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PrintWriter;
-
-import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.callback.UnsupportedCallbackException;
-
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-
 import org.apache.axis.Message;
 import org.apache.axis.MessageContext;
 import org.apache.axis.client.AxisClient;
@@ -50,6 +37,19 @@ import org.apache.ws.security.message.WSSecEncryptedKey;
 import org.apache.ws.security.message.WSSecHeader;
 import org.apache.xml.security.signature.XMLSignature;
 import org.w3c.dom.Document;
+
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.CallbackHandler;
+import javax.security.auth.callback.UnsupportedCallbackException;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintWriter;
+
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
 
 public class TestWSSecurityNewDK extends TestCase implements CallbackHandler {
     private static Log log = LogFactory.getLog(TestWSSecurityNewDK.class);
@@ -136,7 +136,7 @@ public class TestWSSecurityNewDK extends TestCase implements CallbackHandler {
         WSSecEncryptedKey encrKeyBuilder = new WSSecEncryptedKey();
         encrKeyBuilder.setUserInfo("wss4jcert");
         encrKeyBuilder.setKeyIdentifierType(WSConstants.THUMBPRINT_IDENTIFIER);
-        encrKeyBuilder.build(doc, crypto, secHeader);
+        encrKeyBuilder.prepare(doc, crypto);
 
         //Key information from the EncryptedKey
         byte[] ek = encrKeyBuilder.getEphemeralKey();
@@ -148,7 +148,9 @@ public class TestWSSecurityNewDK extends TestCase implements CallbackHandler {
         encrBuilder.setExternalKey(ek, tokenIdentifier);
         Document encryptedDoc = encrBuilder.build(doc, crypto, secHeader);
         
-        encrKeyBuilder.commit(encryptedDoc, crypto, secHeader);
+        encrKeyBuilder.prependToHeader(secHeader);
+        encrKeyBuilder.prependBSTElementToHeader(secHeader);
+
         
        Message encryptedMsg = (Message) SOAPUtil.toSOAPMessage(encryptedDoc);
        if (log.isDebugEnabled()) {
@@ -175,7 +177,7 @@ public class TestWSSecurityNewDK extends TestCase implements CallbackHandler {
          WSSecEncryptedKey encrKeyBuilder = new WSSecEncryptedKey();
          encrKeyBuilder.setUserInfo("wss4jcert");
          encrKeyBuilder.setKeyIdentifierType(WSConstants.THUMBPRINT_IDENTIFIER);
-         encrKeyBuilder.build(doc, crypto, secHeader);
+         encrKeyBuilder.prepare(doc, crypto);
 
          //Key information from the EncryptedKey
          byte[] ek = encrKeyBuilder.getEphemeralKey();
@@ -187,7 +189,8 @@ public class TestWSSecurityNewDK extends TestCase implements CallbackHandler {
          encrBuilder.setExternalKey(ek, tokenIdentifier);
          Document encryptedDoc = encrBuilder.build(doc, crypto, secHeader);
          
-         encrKeyBuilder.commit(encryptedDoc, crypto, secHeader);
+         encrKeyBuilder.prependToHeader(secHeader);
+         encrKeyBuilder.prependBSTElementToHeader(secHeader);
          
         Message encryptedMsg = (Message) SOAPUtil.toSOAPMessage(encryptedDoc);
         if (log.isDebugEnabled()) {
@@ -210,7 +213,7 @@ public class TestWSSecurityNewDK extends TestCase implements CallbackHandler {
          WSSecEncryptedKey encrKeyBuilder = new WSSecEncryptedKey();
          encrKeyBuilder.setUserInfo("wss4jcert");
          encrKeyBuilder.setKeyIdentifierType(WSConstants.THUMBPRINT_IDENTIFIER);
-         encrKeyBuilder.build(doc, crypto, secHeader);
+         encrKeyBuilder.prepare(doc, crypto);
 
          //Key information from the EncryptedKey
          byte[] ek = encrKeyBuilder.getEphemeralKey();
@@ -222,7 +225,8 @@ public class TestWSSecurityNewDK extends TestCase implements CallbackHandler {
          sigBuilder.setSignatureAlgorithm(XMLSignature.ALGO_ID_MAC_HMAC_SHA1);
          Document signedDoc = sigBuilder.build(doc, crypto, secHeader);
          
-         encrKeyBuilder.commit(signedDoc, crypto, secHeader);
+         encrKeyBuilder.prependToHeader(secHeader);
+         encrKeyBuilder.prependBSTElementToHeader(secHeader);
          
          Message signedMessage = (Message) SOAPUtil.toSOAPMessage(doc);
          if (log.isDebugEnabled()) {
@@ -246,7 +250,7 @@ public class TestWSSecurityNewDK extends TestCase implements CallbackHandler {
         WSSecEncryptedKey encrKeyBuilder = new WSSecEncryptedKey();
         encrKeyBuilder.setUserInfo("wss4jcert");
         encrKeyBuilder.setKeyIdentifierType(WSConstants.THUMBPRINT_IDENTIFIER);
-        encrKeyBuilder.build(doc, crypto, secHeader);
+        encrKeyBuilder.prepare(doc, crypto);
 
         //Key information from the EncryptedKey
         byte[] ek = encrKeyBuilder.getEphemeralKey();
@@ -266,7 +270,8 @@ public class TestWSSecurityNewDK extends TestCase implements CallbackHandler {
         Document signedEncryptedDoc = encrBuilder.build(signedDoc, crypto,
                 secHeader);
 
-        encrKeyBuilder.commit(signedEncryptedDoc, crypto, secHeader);
+        encrKeyBuilder.prependToHeader(secHeader);
+        encrKeyBuilder.prependBSTElementToHeader(secHeader);
 
         Message signedMessage = (Message) SOAPUtil
                 .toSOAPMessage(signedEncryptedDoc);
@@ -292,7 +297,7 @@ public class TestWSSecurityNewDK extends TestCase implements CallbackHandler {
          WSSecEncryptedKey encrKeyBuilder = new WSSecEncryptedKey();
          encrKeyBuilder.setUserInfo("wss4jcert");
          encrKeyBuilder.setKeyIdentifierType(WSConstants.THUMBPRINT_IDENTIFIER);
-         encrKeyBuilder.build(doc, crypto, secHeader);
+         encrKeyBuilder.prepare(doc, crypto);
          
          //Key information from the EncryptedKey
          byte[] ek = encrKeyBuilder.getEphemeralKey();
@@ -302,17 +307,18 @@ public class TestWSSecurityNewDK extends TestCase implements CallbackHandler {
          WSSecDKEncrypt encrBuilder = new WSSecDKEncrypt();
          encrBuilder.setSymmetricEncAlgorithm(WSConstants.AES_128);
          encrBuilder.setExternalKey(ek, tokenIdentifier);
-         Document encryptedDoc = encrBuilder.build(doc, crypto, secHeader);
+         encrBuilder.build(doc, crypto, secHeader);
          
          //Derived key signature
          WSSecDKSign sigBuilder = new WSSecDKSign();
          sigBuilder.setExternalKey(ek, tokenIdentifier);
          sigBuilder.setSignatureAlgorithm(XMLSignature.ALGO_ID_MAC_HMAC_SHA1);
          log.info("Before HMAC-SHA1 signature");
-         Document encryptedSignedDoc = sigBuilder.build(encryptedDoc, crypto,
+         Document encryptedSignedDoc = sigBuilder.build(doc, crypto,
                 secHeader);
          
-         encrKeyBuilder.commit(encryptedSignedDoc, crypto, secHeader);
+         encrKeyBuilder.prependToHeader(secHeader);
+         encrKeyBuilder.prependBSTElementToHeader(secHeader);
          
          Message signedMessage = (Message) SOAPUtil
                 .toSOAPMessage(encryptedSignedDoc);

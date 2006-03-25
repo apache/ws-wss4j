@@ -40,8 +40,10 @@ import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.conversation.ConversationConstants;
 import org.apache.ws.security.message.WSSecDKEncrypt;
+import org.apache.ws.security.message.WSSecDKSign;
 import org.apache.ws.security.message.WSSecHeader;
 import org.apache.ws.security.message.WSSecSecurityContextToken;
+import org.apache.xml.security.signature.XMLSignature;
 import org.w3c.dom.Document;
 
 /**
@@ -100,8 +102,9 @@ public class TestWSSecurityNewSCT extends TestCase implements CallbackHandler {
             secHeader.insertSecurityHeader(doc);
 
             WSSecSecurityContextToken sctBuilder = new WSSecSecurityContextToken();
-            sctBuilder.build(doc, crypto, secHeader);
-            sctBuilder.commit(doc, crypto, secHeader);
+            sctBuilder.prepare(doc, crypto);
+            
+            sctBuilder.prependSCTElementToHeader(doc, secHeader);
 
             String out = org.apache.ws.security.util.XMLUtils
                     .PrettyDocumentToString(doc);
@@ -125,7 +128,7 @@ public class TestWSSecurityNewSCT extends TestCase implements CallbackHandler {
      * Test encryption using a derived key which is based on a secret associated
      * with a security context token
      */
-    public void testSCTDKEncryptDecrypt() {
+    public void testSCTDKTEncrypt() {
         try {
             SOAPEnvelope unsignedEnvelope = message.getSOAPEnvelope();
             Document doc = unsignedEnvelope.getAsDocument();
@@ -133,7 +136,7 @@ public class TestWSSecurityNewSCT extends TestCase implements CallbackHandler {
             secHeader.insertSecurityHeader(doc);
 
             WSSecSecurityContextToken sctBuilder = new WSSecSecurityContextToken();
-            sctBuilder.build(doc, crypto, secHeader);
+            sctBuilder.prepare(doc, crypto);
 
             SecureRandom random = SecureRandom.getInstance("SHA1PRNG");
             byte[] tempSecret = new byte[16];
@@ -150,13 +153,138 @@ public class TestWSSecurityNewSCT extends TestCase implements CallbackHandler {
             encrBuilder.setExternalKey(tempSecret, tokenId);
             encrBuilder.build(doc, crypto, secHeader);
 
-            sctBuilder.commit(doc, crypto, secHeader);
+            sctBuilder.prependSCTElementToHeader(doc, secHeader);
+
+            // String out = org.apache.ws.security.util.XMLUtils
+            //          .PrettyDocumentToString(doc);
+            // System.out.println(out);
+
+            verify(doc);
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail(e.getMessage());
+        }
+    }
+
+    public void testSCTKDKTSign() {
+        try {
+            SOAPEnvelope unsignedEnvelope = message.getSOAPEnvelope();
+            Document doc = unsignedEnvelope.getAsDocument();
+            WSSecHeader secHeader = new WSSecHeader();
+            secHeader.insertSecurityHeader(doc);
+
+            WSSecSecurityContextToken sctBuilder = new WSSecSecurityContextToken();
+            sctBuilder.prepare(doc, crypto);
+
+            SecureRandom random = SecureRandom.getInstance("SHA1PRNG");
+            byte[] tempSecret = new byte[16];
+            random.nextBytes(tempSecret);
+
+            // Store the secret
+            this.secrets.put(sctBuilder.getIdentifier(), tempSecret);
+
+            String tokenId = sctBuilder.getSctId();
+
+            // Derived key signature
+            WSSecDKSign sigBuilder = new WSSecDKSign();
+            sigBuilder.setExternalKey(tempSecret, tokenId);
+            sigBuilder.setSignatureAlgorithm(XMLSignature.ALGO_ID_MAC_HMAC_SHA1);
+            sigBuilder.build(doc, crypto, secHeader);
+            
+            sctBuilder.prependSCTElementToHeader(doc, secHeader);
 
 //            String out = org.apache.ws.security.util.XMLUtils
-//                    .PrettyDocumentToString(doc);
-
+//                     .PrettyDocumentToString(doc);
 //            System.out.println(out);
-            
+
+            verify(doc);
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail(e.getMessage());
+        }
+    }
+    
+    public void testSCTKDKTSignEncrypt() {
+        try {
+            SOAPEnvelope unsignedEnvelope = message.getSOAPEnvelope();
+            Document doc = unsignedEnvelope.getAsDocument();
+            WSSecHeader secHeader = new WSSecHeader();
+            secHeader.insertSecurityHeader(doc);
+
+            WSSecSecurityContextToken sctBuilder = new WSSecSecurityContextToken();
+            sctBuilder.prepare(doc, crypto);
+
+            SecureRandom random = SecureRandom.getInstance("SHA1PRNG");
+            byte[] tempSecret = new byte[16];
+            random.nextBytes(tempSecret);
+
+            // Store the secret
+            this.secrets.put(sctBuilder.getIdentifier(), tempSecret);
+
+            String tokenId = sctBuilder.getSctId();
+
+            // Derived key signature
+            WSSecDKSign sigBuilder = new WSSecDKSign();
+            sigBuilder.setExternalKey(tempSecret, tokenId);
+            sigBuilder.setSignatureAlgorithm(XMLSignature.ALGO_ID_MAC_HMAC_SHA1);
+            sigBuilder.build(doc, crypto, secHeader);
+
+            // Derived key encryption
+            WSSecDKEncrypt encrBuilder = new WSSecDKEncrypt();
+            encrBuilder.setSymmetricEncAlgorithm(WSConstants.AES_128);
+            encrBuilder.setExternalKey(tempSecret, tokenId);
+            encrBuilder.build(doc, crypto, secHeader);
+
+            sctBuilder.prependSCTElementToHeader(doc, secHeader);
+
+            String out = org.apache.ws.security.util.XMLUtils
+                     .PrettyDocumentToString(doc);
+            System.out.println(out);
+
+            verify(doc);
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail(e.getMessage());
+        }
+    }
+
+    public void testSCTKDKTEncryptSign() {
+        try {
+            SOAPEnvelope unsignedEnvelope = message.getSOAPEnvelope();
+            Document doc = unsignedEnvelope.getAsDocument();
+            WSSecHeader secHeader = new WSSecHeader();
+            secHeader.insertSecurityHeader(doc);
+
+            WSSecSecurityContextToken sctBuilder = new WSSecSecurityContextToken();
+            sctBuilder.prepare(doc, crypto);
+
+            SecureRandom random = SecureRandom.getInstance("SHA1PRNG");
+            byte[] tempSecret = new byte[16];
+            random.nextBytes(tempSecret);
+
+            // Store the secret
+            this.secrets.put(sctBuilder.getIdentifier(), tempSecret);
+
+            String tokenId = sctBuilder.getSctId();
+
+            // Derived key encryption
+            WSSecDKEncrypt encrBuilder = new WSSecDKEncrypt();
+            encrBuilder.setSymmetricEncAlgorithm(WSConstants.AES_128);
+            encrBuilder.setExternalKey(tempSecret, tokenId);
+            encrBuilder.build(doc, crypto, secHeader);
+
+            // Derived key signature
+            WSSecDKSign sigBuilder = new WSSecDKSign();
+            sigBuilder.setExternalKey(tempSecret, tokenId);
+            sigBuilder.setSignatureAlgorithm(XMLSignature.ALGO_ID_MAC_HMAC_SHA1);
+            sigBuilder.build(doc, crypto, secHeader);
+
+            sctBuilder.prependSCTElementToHeader(doc, secHeader);
+
+//            String out = org.apache.ws.security.util.XMLUtils
+//                     .PrettyDocumentToString(doc);
+//            System.out.println(out);
+
             verify(doc);
         } catch (Exception e) {
             e.printStackTrace();
@@ -165,17 +293,18 @@ public class TestWSSecurityNewSCT extends TestCase implements CallbackHandler {
     }
     
     /**
-     * Verifies the soap envelope
-     * <p/>
+     * Verifies the soap envelope <p/>
      * 
-     * @param envelope 
-     * @throws Exception Thrown when there is a problem in verification
+     * @param envelope
+     * @throws Exception
+     *             Thrown when there is a problem in verification
      */
     private void verify(Document doc) throws Exception {
         secEngine.processSecurityHeader(doc, null, this, crypto);
         SOAPUtil.updateSOAPMessage(doc, message);
         String decryptedString = message.getSOAPPartAsString();
-        assertTrue(decryptedString.indexOf("LogTestService2") > 0 ? true : false);
+        assertTrue(decryptedString.indexOf("LogTestService2") > 0 ? true
+                : false);
     }
 
     /**

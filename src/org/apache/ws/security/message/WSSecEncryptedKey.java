@@ -97,27 +97,6 @@ public class WSSecEncryptedKey extends WSSecBase {
     protected X509Certificate useThisCert = null;
 
     /**
-     * This will actually prepend the <code>EncryptedKey</code> to the
-     * security header
-     * 
-     * @param doc
-     * @param crypto
-     * @param secHeader
-     * @throws WSSecurityException
-     */
-    public void commit(Document doc, Crypto crypto, WSSecHeader secHeader)
-            throws WSSecurityException {
-        prependToHeader(secHeader);
-        prependBSTElementToHeader(secHeader);
-    }
-
-    public Document build(Document doc, Crypto crypto, WSSecHeader secHeader)
-            throws WSSecurityException {
-        prepare(doc, crypto);
-        return doc;
-    }
-
-    /**
      * Set the user name to get the encryption certificate.
      * 
      * The public key of this certificate is used, thus no password necessary.

@@ -52,13 +52,7 @@ public class WSSecSecurityContextToken {
      */
     protected byte[] secret;
 
-    public Document build(Document doc, Crypto crypto, WSSecHeader secHeader)
-            throws WSSecurityException {
-        this.prepare(doc, crypto);
-        return doc;
-    }
-
-    protected void prepare(Document doc, Crypto crypto)
+    public void prepare(Document doc, Crypto crypto)
             throws WSSecurityException {
 
         if (sct == null) {
@@ -78,7 +72,7 @@ public class WSSecSecurityContextToken {
 
     }
 
-    public void commit(Document doc, Crypto crypto, WSSecHeader secHeader)
+    public void prependSCTElementToHeader(Document doc, WSSecHeader secHeader)
             throws WSSecurityException {
         WSSecurityUtil.prependChildElement(doc, secHeader.getSecurityHeader(),
                 sct.getElement(), false);
