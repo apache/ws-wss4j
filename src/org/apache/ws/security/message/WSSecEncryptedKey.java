@@ -382,4 +382,22 @@ public class WSSecEncryptedKey extends WSSecBase {
     public void setUseThisCert(X509Certificate cert) {
         useThisCert = cert;
     }
+
+    /**
+     * @return Returns the encryptedKeyElement.
+     */
+    public Element getEncryptedKeyElement() {
+        return encryptedKeyElement;
+    }
+    
+    /**
+     * @return Returns the BinarySecurityToken element.
+     */
+    public Element getBinarySecurityTokenElement() {
+        if(this.bstToken != null) {
+            return this.bstToken.getElement();
+        } else  {
+            return null;
+        }
+    }
 }
