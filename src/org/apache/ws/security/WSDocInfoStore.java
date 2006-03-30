@@ -25,7 +25,7 @@ package org.apache.ws.security;
  * The main usage for this is (are) the transformation functions that
  * are called during Signature/Verfication process. 
  * 
- * @author Werner Dittmann (Werner.Dittmann@siemens.com)
+ * @author Werner Dittmann (Werner.Dittmann@apache.org)
  */
 
 import java.util.Hashtable;
