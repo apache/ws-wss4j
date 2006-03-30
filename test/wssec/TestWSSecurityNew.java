@@ -125,7 +125,6 @@ public class TestWSSecurityNew extends TestCase {
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         builder.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
-        // builder.setUserInfo("john", "keypass");
         log.info("Before Signing IS....");
         Document doc = unsignedEnvelope.getAsDocument();
         WSSecHeader secHeader = new WSSecHeader();
@@ -139,9 +138,13 @@ public class TestWSSecurityNew extends TestCase {
          * as a document again for further processing.
          */
 
-        Message signedMsg = (Message) SOAPUtil.toSOAPMessage(signedDoc);
         if (log.isDebugEnabled()) {
             log.debug("Signed message with IssuerSerial key identifier:");
+            XMLUtils.PrettyElementToWriter(signedDoc.getDocumentElement(), new PrintWriter(System.out));
+        }
+        Message signedMsg = (Message) SOAPUtil.toSOAPMessage(signedDoc);
+        if (log.isDebugEnabled()) {
+            log.debug("Signed message with IssuerSerial key identifier(1):");
             XMLUtils.PrettyElementToWriter(signedMsg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
         }
         signedDoc = signedMsg.getSOAPEnvelope().getAsDocument();
@@ -159,7 +162,6 @@ public class TestWSSecurityNew extends TestCase {
     public void testDoubleX509SignatureIS() throws Exception {
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
-        // builder.setUserInfo("john", "keypass");
         Document doc = unsignedEnvelope.getAsDocument();
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
