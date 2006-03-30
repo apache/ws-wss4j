@@ -68,8 +68,6 @@ public class WSSConfig {
 
     protected HashMap jceProvider = new HashMap(10);
 
-    protected String jceProviderId = null;
-
     protected WSSConfig() {
         org.apache.xml.security.Init.init();
         /*
