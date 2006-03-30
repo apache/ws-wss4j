@@ -311,8 +311,4 @@ public class WSSConfig {
         }
         return false;
     }
-
-//    public String getJceProviderId() {
-//        return jceProviderId;
-//    }
 }
