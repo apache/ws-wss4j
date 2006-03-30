@@ -84,13 +84,13 @@ public class Scenario3 {
         StringHolder text =
                 new StringHolder("WSS4J - Scenario 3 text");
         port.ping(new org.apache.ws.axis.oasis.ping.TicketType("WSS4J"), text);
-        System.out.println(text.value);
+//        System.out.println(text.value);
 
         if (opts.isFlagSet('t') > 0) {
             long startTime = System.currentTimeMillis();
 
             for (int i = 0; i < 20; i++) {
-                System.out.println("\nLoop #" + i);
+//                System.out.println("\nLoop #" + i);
                 port.ping(new org.apache.ws.axis.oasis.ping.TicketType("WSS4J"), text);
             }
 
