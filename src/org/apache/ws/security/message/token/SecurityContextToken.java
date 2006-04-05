@@ -112,7 +112,6 @@ public class SecurityContextToken {
      */
     public String getIdentifier() {
         if (this.elementIdentifier != null) {
-            //System.out.println("In !=null "+ this.elementIdentifier.getFirstChild().toString());
             return getFirstNode(this.elementIdentifier).getData();
         }
         return null;
