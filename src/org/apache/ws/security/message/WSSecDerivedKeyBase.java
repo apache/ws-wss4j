@@ -84,6 +84,10 @@ public abstract class WSSecDerivedKeyBase extends WSSecBase {
      */
     protected abstract int getDerivedKeyLength() throws WSSecurityException;
    
+    /**
+     * The wsse:SecurityTokenReference element to be used
+     */
+    protected Element strElem;
     
     /**
      * @param ephemeralKey The ephemeralKey to set.
@@ -93,7 +97,15 @@ public abstract class WSSecDerivedKeyBase extends WSSecBase {
         this.ephemeralKey = ephemeralKey;
         this.tokenIdentifier = tokenIdentifier;
     }
-
+    
+    /**
+     * @param ephemeralKey The ephemeralKey to set.
+     */
+    public void setExternalKey(byte[] ephemeralKey, 
+                                Element strElem) {
+        this.ephemeralKey = ephemeralKey;
+        this.strElem = strElem;
+    }
     
     /**
      * @return Returns the tokenIdentifier.
@@ -168,12 +180,17 @@ public abstract class WSSecDerivedKeyBase extends WSSecBase {
         dkt.setNonce(Base64.encode(nonce));
         dkt.setOffset(offset);
         dkt.setID(dktId);
-        //Create the SecurityTokenRef to the Encrypted Key
-        SecurityTokenReference strEncKey = new SecurityTokenReference(document);
-        Reference ref = new Reference(document);
-        ref.setURI("#" + this.tokenIdentifier);
-        strEncKey.setReference(ref);
-        dkt.setSecuityTokenReference(strEncKey);
+        
+        if(this.strElem == null) {
+            //Create the SecurityTokenRef to the Encrypted Key
+            SecurityTokenReference strEncKey = new SecurityTokenReference(document);
+            Reference ref = new Reference(document);
+            ref.setURI("#" + this.tokenIdentifier);
+            strEncKey.setReference(ref);
+            dkt.setSecuityTokenReference(strEncKey); 
+        } else {
+            dkt.setSecuityTokenReference(this.strElem);
+        }
     }
 
 

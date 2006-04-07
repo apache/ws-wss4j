@@ -130,6 +130,11 @@ public class DerivedKeyToken {
         //WSSecurityUtil.appendChildElement(doc, this.element, ref.getElement());
         this.element.appendChild(ref.getElement());
     }
+    
+    public void setSecuityTokenReference(Element elem) {
+        this.elementSecurityTokenReference = elem;
+        this.element.appendChild(elem);
+    }
 
     /**
      * Returns the SecurityTokenReference of the derived key token
