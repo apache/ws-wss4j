@@ -52,8 +52,10 @@ public class SecurityContextToken {
         this.element.appendChild(this.elementIdentifier);
 
         String uuid = UUIDGenerator.getUUID();
-
+        
         this.elementIdentifier.appendChild(doc.createTextNode(uuid));
+        
+        this.setID("sctId-" + this.element.hashCode());
     }
 
     /**

@@ -237,9 +237,10 @@ public class TestWSSecurityNewSCT extends TestCase implements CallbackHandler {
 
             sctBuilder.prependSCTElementToHeader(doc, secHeader);
 
-            String out = org.apache.ws.security.util.XMLUtils
-                     .PrettyDocumentToString(doc);
-            System.out.println(out);
+//            String out = org.apache.ws.security.util.XMLUtils
+//                     .PrettyDocumentToString(doc);
+
+//            System.out.println(out);
 
             verify(doc);
         } catch (Exception e) {

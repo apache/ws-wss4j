@@ -65,11 +65,9 @@ public class WSSecSecurityContextToken {
         }
 
         // The wsu:Id of the wsc:SecurityContextToken
-        if (this.sctId == null) {
-            this.sctId = "sctid-" + this.sct.getElement().hashCode();
+        if (this.sctId != null) {
+            this.sct.setID(this.sctId);
         }
-        this.sct.setID(this.sctId);
-
     }
 
     public void prependSCTElementToHeader(Document doc, WSSecHeader secHeader)
@@ -126,7 +124,11 @@ public class WSSecSecurityContextToken {
      * @return Returns the sctId.
      */
     public String getSctId() {
-        return sctId;
+        if(this.sct != null) {
+            return this.sct.getID();
+        } else {
+            return this.sctId;
+        }
     }
 
     /**
