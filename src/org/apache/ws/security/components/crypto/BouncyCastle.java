@@ -18,11 +18,6 @@
 package org.apache.ws.security.components.crypto;
 
 import org.apache.ws.security.WSSecurityException;
-import org.bouncycastle.jce.cert.CertPath;
-import org.bouncycastle.jce.cert.CertificateFactory;
-import org.bouncycastle.jce.cert.PKIXParameters;
-import org.bouncycastle.jce.cert.CertPathValidator;
-import org.bouncycastle.jce.cert.CertPathValidatorException;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -30,9 +25,14 @@ import java.io.InputStream;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
-import java.security.cert.X509Certificate;
-import java.security.cert.CertificateException;
+import java.security.cert.CertPath;
+import java.security.cert.CertPathValidator;
+import java.security.cert.CertPathValidatorException;
 import java.security.cert.CertificateEncodingException;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
+import java.security.cert.PKIXParameters;
+import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
