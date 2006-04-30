@@ -13,7 +13,7 @@
   
   <!-- The version of the project under development, e.g.
        1.1, 1.2, 2.0-SNAPSHOT -->
-  <currentVersion>1.0</currentVersion>
+  <currentVersion>1.5</currentVersion>
   
   <!-- details about the organization that 'owns' the project -->
   <organization>
@@ -49,8 +49,9 @@
        the connection element has the form:
        scm:<system>:<system specific connection string> -->
   <repository>
-    <connection>scm:cvs:pserver:anoncvs@cvs.apache.org:/home/cvspublic:ws-wss4j</connection>
-    <url>http://cvs.apache.org/viewcvs.cgi/ws-wss4j/</url>
+  	<connection>scm:svn:http://svn.apache.org:repos/asf/webservices:wss4j/trunk</connection>
+	<developerConnection>scm:svn:http://svn.apache.org:repos/asf/webservices:wss4j/trunk</developerConnection>
+	<url>http://svn.apache.org/viewcvs.cgi/webservices/wss4j/trunk?root=Apache-SVN</url>
   </repository>
 
   <!-- any mailing lists for the project -->
@@ -81,6 +82,12 @@
             <name>Ias</name>
             <id>ias</id>
             <email>ias@apache.org</email>
+            <organization></organization>
+        </developer>
+        <developer>
+            <name>Ruchith Fernando</name>
+            <id>ruchithf</id>
+            <email>ruchithf@apache.org</email>
             <organization></organization>
         </developer>
   </developers>
@@ -188,10 +195,10 @@
         <report>maven-checkstyle-plugin</report>
         <report>maven-pmd-plugin</report>
         <report>maven-jdepend-plugin</report>
-        <report>maven-changelog-plugin</report>
+        <!--<report>maven-changelog-plugin</report> -->
         <!-- <report>maven-statcvs-plugin</report> -->
-        <report>maven-file-activity-plugin</report>
-        <report>maven-developer-activity-plugin</report>
+        <!-- <report>maven-file-activity-plugin</report> -->
+        <!-- <report>maven-developer-activity-plugin</report> -->
         <report>maven-jxr-plugin</report>
         <report>maven-javadoc-plugin</report>
         <!-- <report>maven-junit-report-plugin</report> -->
