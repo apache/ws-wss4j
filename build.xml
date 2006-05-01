@@ -26,7 +26,7 @@ Build Instructions:
         <property name='product.shortname' value='wss4j'/>
 
         <property name='product.version.major' value='1'/>
-        <property name='product.version.minor' value='1'/>
+        <property name='product.version.minor' value='5'/>
         <property name='product.version.level' value='0'/>
         <property name='product.Version' value='${product.version.major}
              .${product.version.minor}.${product.version.level}'/>
@@ -35,7 +35,7 @@ Build Instructions:
         <property name='product_version' value='${product.version.major}
              _${product.version.minor}_${product.version.level}'/>
         <property name="year" value="2005"/>
-        <property name="copyright" value="Copyright &#169; ${year} Apache WS-Security Project. All Rights Reserved."/>
+        <property name="copyright" value="Copyright &#169; ${year} Apache WSS4J Project. All Rights Reserved."/>
 
         <!-- Give user a chance to override without editing this file
              (and without typing -D each time it compiles it) -->
