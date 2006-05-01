@@ -22,8 +22,8 @@
                     </li>
                     <ul>
                         <li>WSS4J API</li>
-                        <li>WSS4J on Axis<br/>
-                        </li>
+                        <li>WSS4J on Axis</li>
+                        <li>Rampart: WS-Security Implementation module for Axis2</li>
                     </ul>
                 </ul>
                 <br/>
@@ -56,10 +56,6 @@ Token profile V1.0</a>
 Token Profile V1.0</a>
                     </li>
                 </ul>
-                <div style="margin-left: 40px;">WSS4J can also be configured to emulate
-previous WSS spec implementations with older namespaces, such as
-WebSphere 5.1 and WebLogic 8.1 SP2.<br/>
-                </div>
             </subsection>
             <subsection name="Where can I download WSS4J">
                 <p style="margin-left: 40px;">Latest version of WSS4J is 1.5.0:<br/>
@@ -107,6 +103,13 @@ for details.<br/>
             <subsection name="WSS4J on Axis">
                 <p style="margin-left: 40px;">Please refer to the the <a href="axis.html">Axis
 Deployment Tutorial</a> for a short tutorial and <a href="package.html">Axis Deployment Examples</a> for more details.<br/>
+                </p>
+                <br/>
+            </subsection>
+			<subsection name="Rampart: WS-Security Implementation module for Axis2">
+                <p style="margin-left: 40px;">Please refer to the the 
+				<a href="http://svn.apache.org/viewcvs.cgi/*checkout*/webservices/axis2/trunk/java/xdocs/latest/security-module.html">
+				Rampart configuration guide</a> for configuration information<br/>
                 </p>
                 <br/>
             </subsection>

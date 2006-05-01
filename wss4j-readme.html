@@ -46,7 +46,7 @@ previous WSS spec implementations with older namespaces, such as
 WebSphere 5.1 and WebLogic 8.1 SP2. The WSS4J release 1.1.0 is the
 last release that supports this old, draft WSS specifications. 
 </P>
-<P STYLE="margin-bottom: 0cm">The next WSS4J releases (&gt;= 1.2.x)</P>
+<P STYLE="margin-bottom: 0cm">The next WSS4J releases (&gt;= 1.5.x)</P>
 <UL>
 	<LI><P STYLE="margin-bottom: 0cm">support the OASIS V1.0 specs and
 	the relevant namespaces only</P>
@@ -79,25 +79,17 @@ to WSS4J. There is also a Wiki concering Apache WS projects and WSS4J
 as one of the WS sub-projects:</P>
 <P STYLE="margin-bottom: 0cm"><A HREF="http://wiki.apache.org/ws/">http://wiki.apache.org/ws/</A></P>
 <P STYLE="margin-bottom: 0cm"><A HREF="http://wiki.apache.org/ws/FrontPage/WsFx">http://wiki.apache.org/ws/FrontPage/WsFx</A></P>
-<H3>WS-Trust and WS-Secure specifications</H3>
-<P STYLE="margin-bottom: 0cm">The 'Trust' and 'Conversation' parts of
-WSS4J implements the WS-Trust and WS-Secure Conversation
-specifications. The status of these two parts right now:</P>
-<UL>
-	<LI><P STYLE="margin-bottom: 0cm">WS-Trust implementation is in the
-	process of being re-done.</P>
-	<LI><P STYLE="margin-bottom: 0cm">WS-Secure Conversation
-	implementation will be re-worked burning the WS-Addressing stuff
-	into it once we have the components of WS-Trust implementation
-	ready.</P>
-</UL>
-<P STYLE="margin-bottom: 0cm">Introperability of these two parts:</P>
-<P STYLE="margin-bottom: 0cm">The SecurityTokenService successfully
-interoped with IBM's implementation last year (Token issuance only).
-But as of now we cannot confirm interoperability due to the changes.</P>
-<P STYLE="margin-bottom: 0cm">Therefore the 'Trust' and
-'Conversation' parts of WSS4J are experimental and are contained in
-the &quot;sandbox&quot; package.</P>
+<H3>WS-Trust and WS-Secure Conversation specifications</H3>
+
+<p>WSS4J now comes with the support for derived key token signature and 
+encryption. This is used by the Axis2-"rahas" module to provide the 
+WS-Secure Conversation.</p>
+
+<p>WS-Trust support is also being developed within Axis2 based on WSS4J</p>
+
+<p><i>org.apache.ws.sandbox.</i> package contains experimental implementations of these 
+specifications.</p>
+
 <H2>Installation (binary distribution)</H2>
 <P STYLE="margin-bottom: 0cm">The WSS4J zip archive is the binary
 distribution and contains the wss4j jar file, some examples, test
@@ -142,7 +134,7 @@ fully supports namespaces. The Crimson parser included in the Sun JDK
 implementation of WS-Adressing, required by WSS4J Trust.</P>
 <P STYLE="margin-left: 2cm; margin-bottom: 0cm">See:
 <A HREF="http://ws.apache.org/addressing/">http://ws.apache.org/addressing/</A></P>
-<P STYLE="margin-bottom: 0cm"><FONT FACE="Courier New"><FONT SIZE=2>axis-1.2.1.jar<BR>axis-ant-1.2.1.jar<BR>axis-jaxrpc-1.2.1.jar<BR>axis-saaj-1.2.1.jar</FONT></FONT></P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Courier New"><FONT SIZE=2>axis-1.4.jar<BR>axis-ant-1.4.jar<BR>axis-jaxrpc-1.4.jar<BR>axis-saaj-1.4.jar</FONT></FONT></P>
 <P STYLE="margin-left: 2cm; margin-bottom: 0cm">These jars contain
 the Apache Axis base software. They implement the basic SOAP
 processing, deployment, WSDL to Java, Java to WSDL tools and a lot
@@ -151,7 +143,7 @@ should be familiar with Axis, its setup, and deployment methods
 before you start with any WSS4J functions.</P>
 <P STYLE="margin-left: 2cm; margin-bottom: 0cm">See:
 <A HREF="http://ws.apache.org/axis/">http://ws.apache.org/axis/</A></P>
-<P STYLE="margin-bottom: 0cm"><FONT FACE="Courier New"><FONT SIZE=2>bcprov-jdk13-128.jar</FONT></FONT></P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Courier New"><FONT SIZE=2>bcprov-jdk13-132.jar</FONT></FONT></P>
 <P STYLE="margin-left: 2cm; margin-bottom: 0cm">This is the
 BouncyCastle library that implements all necessary encryption,
 hashing, certifcate, and keystore functions. Without this fanatstic
@@ -187,20 +179,20 @@ functions, required by Axis tools to read and parse WSDL.</P>
 <P STYLE="margin-left: 2cm; margin-bottom: 0cm">See:
 <A HREF="http://ws.apache.org/axis/">http://ws.apache.org/axis/</A>
 under related projects</P>
-<P STYLE="margin-bottom: 0cm"><FONT FACE="Courier New"><FONT SIZE=2>xalan-2.6.0.jar</FONT></FONT></P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Courier New"><FONT SIZE=2>xalan-2.7.0.jar</FONT></FONT></P>
 <P STYLE="margin-left: 2cm; margin-bottom: 0cm">Library that
 implements XML Path Language (XPath) and XSLT. The XML Security
 implementation needs several functions of Xalan XPath.</P>
 <P STYLE="margin-left: 2cm; margin-bottom: 0cm">See:
 <A HREF="http://xml.apache.org/xalan-j/">http://xml.apache.org/xalan-j/</A></P>
-<P STYLE="margin-bottom: 0cm"><FONT FACE="Courier New"><FONT SIZE=2>xmlsec-1.2.1.jar</FONT></FONT></P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Courier New"><FONT SIZE=2>xmlsec-1.3.0.jar</FONT></FONT></P>
 <P STYLE="margin-left: 2cm; margin-bottom: 0cm">This library
 implements the XML-Signature Syntax and Processing and the XML
 Encryption Syntax and Processing specifications of the W3C. Thus they
 form one of the base foundations of WSS4J.</P>
 <P STYLE="margin-left: 2cm; margin-bottom: 0cm">See:
 <A HREF="http://xml.apache.org/security/">http://xml.apache.org/security/</A></P>
-<P STYLE="margin-bottom: 0cm"><FONT FACE="Courier New"><FONT SIZE=2>dom3-xercesImpl-2_6_2.jar<BR>dom3-xml-apis-2_6_2.jar</FONT></FONT></P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Courier New"><FONT SIZE=2>xercesImpl.jar<BR>xml-apis.jar</FONT></FONT></P>
 <P STYLE="margin-left: 2cm; margin-bottom: 0cm">The XML parser
 implementation. Required by anybody :-) .</P>
 <P STYLE="margin-left: 2cm; margin-bottom: 0cm">See:

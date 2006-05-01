@@ -31,7 +31,7 @@ with older namespaces, such as WebSphere 5.1 and WebLogic 8.1 SP2.
 The WSS4J release 1.1.0 is the last release that supports this old, draft
 WSS specifications. 
 
-The next WSS4J releases (>= 1.2.x)
+The next WSS4J releases (>= 1.5.x)
 - support the OASIS V1.0 specs and the relevant namespaces only
 - support one versions of provisional (draft) namespaces for the upcoming version
 
@@ -61,25 +61,17 @@ There is also a Wiki concering Apache WS projects and WSS4J as one
 of the WS sub-projects:
     http://wiki.apache.org/ws/
     http://wiki.apache.org/ws/FrontPage/WsFx
+	
 
+WS-Trust and WS-Secure Conversation specifications
 
-The 'Trust' and 'Conversation' parts of WSS4J implements the WS-Trust 
-and WS-Secure Conversation specifications.
+WSS4J now comes with the support for derived key token signature and encryption.
+This is used by the Axis2-"rahas" module to provide the WS-Secure Conversation.
 
-Status of these two parts right now:
-  * WS-Trust implementation is in the process of being re-done.
-  * WS-Secure Conversation impl will be re-worked burning the
-    WS-Addressing stuff into it once we have the components of WS-Trust
-    implementation ready.
+WS-Trust support is also being developed within Axis2 based on WSS4J
 
-Introperability of these two parts:
-The SecurityTokenService successfully interoped with IBM's implementation
-last year (Token issuance only). But as of now we cannot confirm
-interoperability due to the changes.
-
-Therefore the 'Trust' and 'Conversation' parts of WSS4J are experimental
-and are contained in the "sandbox" package.
-
+org.apache.ws.sandbox. package contains experimental implementations of these 
+specifications.
 
 * Installation (binary distribution) *
 
@@ -124,10 +116,10 @@ addressing-1.0.jar
 
     See: http://ws.apache.org/addressing/
 
-axis-1.2.1.jar
-axis-ant-1.2.1.jar
-axis-jaxrpc-1.2.1.jar
-axis-saaj-1.2.1.jar
+axis-1.4.jar
+axis-ant-1.4.jar
+axis-jaxrpc-1.4.jar
+axis-saaj-1.4.jar
     These jars contain the Apache Axis base software. They implement
     the basic SOAP processing, deployment, WSDL to Java, Java to WSDL
     tools and a lot more. Plase refer to a Axis documentation how to
@@ -136,7 +128,7 @@ axis-saaj-1.2.1.jar
     
     See: http://ws.apache.org/axis/
 
-bcprov-jdk13-128.jar
+bcprov-jdk13-132.jar
     This is the BouncyCastle library that implements all necessary
     encryption, hashing, certifcate, and keystore functions. Without
     this fanatstic library WSS4J wouldn't work at all.
@@ -178,7 +170,7 @@ wsdl4j-1.5.1.jar
     
     See: http://ws.apache.org/axis/  under related projects
     
-xalan-2.6.0.jar
+xalan-2.7.0.jar
     Library that implements XML Path Language (XPath) and XSLT. The XML 
     Security implementation needs several functions of Xalan XPath.
    
@@ -191,8 +183,8 @@ xmlsec-1.2.1.jar
     
     See: http://xml.apache.org/security/
     
-dom3-xercesImpl-2_6_2.jar
-dom3-xml-apis-2_6_2.jar
+xercesImpl.jar
+xml-apis.jar
     The XML parser implementation. Required by anybody :-) .
 
     See: http://xml.apache.org/xerces2-j/
