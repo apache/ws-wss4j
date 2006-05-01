@@ -62,7 +62,7 @@ WebSphere 5.1 and WebLogic 8.1 SP2.<br/>
                 </div>
             </subsection>
             <subsection name="Where can I download WSS4J">
-                <p style="margin-left: 40px;">Latest version of WSS4J is 1.0.0:<br/>
+                <p style="margin-left: 40px;">Latest version of WSS4J is 1.5.0:<br/>
                     <a href="http://www.apache.org/dyn/closer.cgi/ws/wss4j/">http://www.apache.org/dyn/closer.cgi/ws/wss4j/</a>
                 </p>
             </subsection>
