@@ -28,12 +28,8 @@ Build Instructions:
         <property name='product.version.major' value='1'/>
         <property name='product.version.minor' value='5'/>
         <property name='product.version.level' value='0'/>
-        <property name='product.Version' value='${product.version.major}
-             .${product.version.minor}.${product.version.level}'/>
-        <property name='product.version' value='${product.version.major}
-             .${product.version.minor}.${product.version.level}'/>
-        <property name='product_version' value='${product.version.major}
-             _${product.version.minor}_${product.version.level}'/>
+        <!--<property name='product.version' value='${product.version.major}.${product.version.minor}.${product.version.level}'/> -->
+    	<property name='product.version' value='SNAPSHOT'/>
         <property name="year" value="2005"/>
         <property name="copyright" value="Copyright &#169; ${year} Apache WSS4J Project. All Rights Reserved."/>
 
@@ -66,7 +62,7 @@ Build Instructions:
         <property name="build.work" value="${build.dir}/work"/>
         <property name="build.webapp" location="${build.dir}/webapps/axis"/>
 
-        <property name="jar.library" value="${product.shortname}.jar"/>
+        <property name="jar.library" value="${product.shortname}-${product.version}.jar"/>
 
         <property name="build.doc" value="${build.dir}/doc"/>
         <property name="build.doc.xml" value="${build.doc}/xml"/>
@@ -191,7 +187,7 @@ org.apache.ws.axis.security.util
 
       <echo level="debug">
         -------------------------------------------------------------------
-        ${product.Name} v${product.Version} [${year}] 
+        ${product.Name} v${product.version} [${year}] 
         -------------------------------------------------------------------
         Building with ${ant.version}
         using build file ${ant.file}
@@ -251,6 +247,7 @@ org.apache.ws.axis.security.util
             <fileset dir="." includes="server*.wsdd"/>
             <fileset dir="." includes="client*.wsdd"/>
         </delete>
+        <delete dir="${dir.dist}"/>
     </target>
 
     <target name="prepare" depends="init"
@@ -734,7 +731,6 @@ org.apache.ws.axis.security.util
         <zipfileset fullpath="wss4j/${jar.library}" dir="${dir.dist}" 
           includes="${jar.library}"/>
       </zip>
-      <delete file="${dir.dist}/${jar.library}" />
     </target>
 
     <target name="otherdist" depends="init" 
