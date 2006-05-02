@@ -1,0 +1,24 @@
+<deployment xmlns="http://xml.apache.org/axis/wsdd/" xmlns:java="http://xml.apache.org/axis/wsdd/providers/java">
+	<service name="SampleSecurityTokenService" style="document" use="literal">
+  		<parameter name="allowedMethods" value="*"/>
+  		<parameter name="className" value="org.apache.ws.sandbox.security.trust2.samples.SampleSecurityTokenService"/>
+		<typeMapping
+	        xmlns:ns="http://schemas.xmlsoap.org/ws/2004/04/trust"
+    	    qname="ns:RequestSecurityToken"
+        	type="java:org.apache.ws.sandbox.security.trust2.RequestSecurityToken"
+	        serializer="org.apache.ws.sandbox.security.trust2.serialization.RSTSerializerFactory"
+    	    deserializer="org.apache.ws.sandbox.security.trust2.serialization.RSTDeserializerFactory"
+	        encodingStyle=""/>
+		<typeMapping
+	        xmlns:ns="http://schemas.xmlsoap.org/ws/2004/04/trust"
+    	    qname="ns:RequestSecurityTokenResponse"
+        	type="java:org.apache.ws.sandbox.security.trust2.RequestSecurityTokenResponse"
+	        serializer="org.apache.ws.sandbox.security.trust2.serialization.RSTResponseSerializerFactory"
+    	    deserializer="org.apache.ws.sandbox.security.trust2.serialization.RSTResponseDeserializerFactory"
+	        encodingStyle=""/>	
+		<operation name="exchange" qname="ns1:RequestSecurityToken" xmlns:ns1="http://schemas.xmlsoap.org/ws/2004/04/trust"
+			returnQName="ns1:RequestSecurityTokenResponse" returnType="ns1:RequestSecurityTokenResponse">
+			<parameter qname="ns1:RequestSecurityToken" type="ns1:RequestSecurityToken" xmlns:ns1="http://schemas.xmlsoap.org/ws/2004/04/trust"/>
+		</operation>
+ 	</service>
+</deployment>
