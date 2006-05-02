@@ -19,17 +19,15 @@ WSS4J implements
    March 2004
     * Username Token profile V1.0
     * X.509 Token Profile V1.0
-    
+
 The Web Services Security part of WSS4J is fairly well tested and many
 WebService projects use it already. Also interoperability with
 various other implementations is well tested.
 
 * Support of older WSS specifications *
 
-WSS4J can also be configured to emulate previous WSS spec implementations
-with older namespaces, such as WebSphere 5.1 and WebLogic 8.1 SP2.
-The WSS4J release 1.1.0 is the last release that supports this old, draft
-WSS specifications. 
+The WSS4J release 1.1.0 is the last release that was able to emulate previous 
+WSS specs
 
 The next WSS4J releases (>= 1.5.x)
 - support the OASIS V1.0 specs and the relevant namespaces only
@@ -89,7 +87,7 @@ about the certificate keystores you use. The property files and the keystore
 are accessed either as resources via classpath or, if that fails, as files
 using the relative path of the application
 
-Thus no specific installation is required. The wss4j.jar file could be 
+Thus no specific installation is required. The wss4j-1.5.0.jar file could be 
 included into ear or war files of enterprise or web application servers.
 
 Please refer to the JAVADOC files of the distribution for further 
