@@ -291,19 +291,28 @@ public abstract class WSHandler {
             byte[] sigVal = ((WSSecurityEngineResult)sigConf.get(i)).getSigConf().getSignatureValue();
             if (sigVal != null) {
                 if (sigv == null || sigv.size() == 0) {
-                    throw new WSSecurityException("WSHandler: Check Signature confirmation: got a SC element, but no stored SV");
-                }
-                boolean found = false;
-                for (int ii = 0; ii < sigv.size(); ii++) {
-                    byte[] storedValue = (byte[])sigv.get(i);
-                    if (Arrays.equals(sigVal, storedValue)) {
-                        found = true;
-                        sigv.remove(ii);
-                        break;
+                    //If there are no store signature values
+                    if(sigVal.length != 0) {
+                        //If there's no value in the case where there are no
+                        //stored SV it is valid. Therefore if there IS a value 
+                        //in the sig confirmation element
+                        throw new WSSecurityException("WSHandler: Check Signature confirmation: got a SC element, but no stored SV");
                     }
-                }
-                if (!found) {
-                    throw new WSSecurityException("WSHandler: Check Signature confirmation: got SC element, but no matching SV");
+                } else {
+                    //If we have stored signature values
+                    boolean found = false;
+                    for (int ii = 0; ii < sigv.size(); ii++) {
+                        byte[] storedValue = (byte[]) sigv.get(i);
+                        if (Arrays.equals(sigVal, storedValue)) {
+                            found = true;
+                            sigv.remove(ii);
+                            break;
+                        }
+                    }
+                    if (!found) {
+                        throw new WSSecurityException(
+                                "WSHandler: Check Signature confirmation: got SC element, but no matching SV");
+                    } 
                 }
             }
         }
