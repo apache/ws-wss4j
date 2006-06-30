@@ -95,6 +95,12 @@ public class WSSecEncryptedKey extends WSSecBase {
     protected BinarySecurity bstToken = null;
     
     protected X509Certificate useThisCert = null;
+    
+    /**
+     * Key size in bits
+     * Defaults to 128
+     */
+    protected int keySize = 128;
 
     /**
      * Set the user name to get the encryption certificate.
@@ -286,7 +292,7 @@ public class WSSecEncryptedKey extends WSSecBase {
     protected byte[] generateEphemeralKey() throws WSSecurityException {
         try {
             SecureRandom random = SecureRandom.getInstance("SHA1PRNG");
-            byte[] temp = new byte[16];
+            byte[] temp = new byte[this.keySize / 8];
             random.nextBytes(temp);
             return temp;
         } catch (Exception e) {
@@ -399,5 +405,17 @@ public class WSSecEncryptedKey extends WSSecBase {
         } else  {
             return null;
         }
+    }
+
+    public void setKeySize(int keySize) throws WSSecurityException {
+        if(keySize < 64) {
+            //Minimum size has to be 64 bits - E.g. A DES key
+            throw new WSSecurityException("invalidKeySize");
+        }
+        this.keySize = keySize;
+    }
+
+    public void setKeyEncAlgo(String keyEncAlgo) {
+        this.keyEncAlgo = keyEncAlgo;
     }
 }
