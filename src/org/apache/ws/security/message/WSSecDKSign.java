@@ -80,11 +80,9 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
     
     private WSDocInfo wsDocInfo;
 
-    public Document build(Document doc, Crypto crypto, WSSecHeader secHeader) throws WSSecurityException  {
+    public Document build(Document doc, WSSecHeader secHeader) throws WSSecurityException  {
         
-        this.prepare(doc, crypto, secHeader);
-        
-
+        this.prepare(doc, secHeader);
         
         SOAPConstants soapConstants = WSSecurityUtil.getSOAPConstants(doc
                 .getDocumentElement());
@@ -110,12 +108,11 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
         return doc;
     }
     
-    protected void prepare(Document doc, Crypto crypto, WSSecHeader secHeader)
+    protected void prepare(Document doc, WSSecHeader secHeader)
                             throws WSSecurityException {
-        super.prepare(doc, crypto);
+        super.prepare(doc);
         
         wsDocInfo = new WSDocInfo(doc.hashCode());
-        wsDocInfo.setCrypto(crypto);
         
         /*
          * Get an initialize a XMLSignature element.

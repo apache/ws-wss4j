@@ -47,13 +47,13 @@ public class WSSecDKEncrypt extends WSSecDerivedKeyBase {
 
     protected String symEncAlgo = WSConstants.AES_128;
     
-    public Document build(Document doc, Crypto crypto, WSSecHeader secHeader)
+    public Document build(Document doc, WSSecHeader secHeader)
             throws WSSecurityException {
         
         /*
          * Setup the encrypted key
          */
-        prepare(doc, crypto);
+        prepare(doc);
         
         this.envelope =  doc.getDocumentElement();
         /*

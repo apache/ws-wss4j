@@ -151,7 +151,7 @@ public class TestWSSecurityNewSCT extends TestCase implements CallbackHandler {
             WSSecDKEncrypt encrBuilder = new WSSecDKEncrypt();
             encrBuilder.setSymmetricEncAlgorithm(WSConstants.AES_128);
             encrBuilder.setExternalKey(tempSecret, tokenId);
-            encrBuilder.build(doc, crypto, secHeader);
+            encrBuilder.build(doc, secHeader);
 
             sctBuilder.prependSCTElementToHeader(doc, secHeader);
 
@@ -189,7 +189,7 @@ public class TestWSSecurityNewSCT extends TestCase implements CallbackHandler {
             WSSecDKSign sigBuilder = new WSSecDKSign();
             sigBuilder.setExternalKey(tempSecret, tokenId);
             sigBuilder.setSignatureAlgorithm(XMLSignature.ALGO_ID_MAC_HMAC_SHA1);
-            sigBuilder.build(doc, crypto, secHeader);
+            sigBuilder.build(doc, secHeader);
             
             sctBuilder.prependSCTElementToHeader(doc, secHeader);
 
@@ -227,13 +227,13 @@ public class TestWSSecurityNewSCT extends TestCase implements CallbackHandler {
             WSSecDKSign sigBuilder = new WSSecDKSign();
             sigBuilder.setExternalKey(tempSecret, tokenId);
             sigBuilder.setSignatureAlgorithm(XMLSignature.ALGO_ID_MAC_HMAC_SHA1);
-            sigBuilder.build(doc, crypto, secHeader);
+            sigBuilder.build(doc, secHeader);
 
             // Derived key encryption
             WSSecDKEncrypt encrBuilder = new WSSecDKEncrypt();
             encrBuilder.setSymmetricEncAlgorithm(WSConstants.AES_128);
             encrBuilder.setExternalKey(tempSecret, tokenId);
-            encrBuilder.build(doc, crypto, secHeader);
+            encrBuilder.build(doc, secHeader);
 
             sctBuilder.prependSCTElementToHeader(doc, secHeader);
 
@@ -272,13 +272,13 @@ public class TestWSSecurityNewSCT extends TestCase implements CallbackHandler {
             WSSecDKEncrypt encrBuilder = new WSSecDKEncrypt();
             encrBuilder.setSymmetricEncAlgorithm(WSConstants.AES_128);
             encrBuilder.setExternalKey(tempSecret, tokenId);
-            encrBuilder.build(doc, crypto, secHeader);
+            encrBuilder.build(doc, secHeader);
 
             // Derived key signature
             WSSecDKSign sigBuilder = new WSSecDKSign();
             sigBuilder.setExternalKey(tempSecret, tokenId);
             sigBuilder.setSignatureAlgorithm(XMLSignature.ALGO_ID_MAC_HMAC_SHA1);
-            sigBuilder.build(doc, crypto, secHeader);
+            sigBuilder.build(doc, secHeader);
 
             sctBuilder.prependSCTElementToHeader(doc, secHeader);
 

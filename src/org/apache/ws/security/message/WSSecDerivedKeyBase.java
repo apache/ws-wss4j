@@ -141,12 +141,9 @@ public abstract class WSSecDerivedKeyBase extends WSSecBase {
      * 
      * @param doc
      *            The unsigned SOAP envelope as <code>Document</code>
-     * @param crypto
-     *            An instance of the Crypto API to handle keystore and
-     *            certificates
      * @throws WSSecurityException
      */
-    public void prepare(Document doc, Crypto crypto)
+    public void prepare(Document doc)
         throws WSSecurityException {
         
         document = doc;
