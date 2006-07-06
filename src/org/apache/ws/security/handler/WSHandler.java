@@ -343,7 +343,8 @@ public abstract class WSHandler {
 				       reqData.getMsgContext());
         if (sigPropFile != null) {
             if ((crypto = (Crypto) cryptos.get(sigPropFile)) == null) {
-                crypto = CryptoFactory.getInstance(sigPropFile, this.getClassLoader());
+                crypto = CryptoFactory.getInstance(sigPropFile, this
+                        .getClassLoader(reqData.getMsgContext()));
                 cryptos.put(sigPropFile, crypto);
             }
         } else {
@@ -368,7 +369,8 @@ public abstract class WSHandler {
 				       reqData.getMsgContext());
         if (encPropFile != null) {
             if ((crypto = (Crypto) cryptos.get(encPropFile)) == null) {
-                crypto = CryptoFactory.getInstance(encPropFile, this.getClassLoader());
+                crypto = CryptoFactory.getInstance(encPropFile, this
+                        .getClassLoader(reqData.getMsgContext()));
                 cryptos.put(encPropFile, crypto);
             }
         } else if ((crypto = reqData.getSigCrypto()) == null) {
@@ -577,7 +579,7 @@ public abstract class WSHandler {
 	Object mc = reqData.getMsgContext();
         String callback = getString(clsProp, mc);
         if (callback != null) { // we have a password callback class
-            pwCb = readPwViaCallbackClass(callback, username, doAction);
+            pwCb = readPwViaCallbackClass(callback, username, doAction, reqData);
             if ((pwCb.getPassword() == null) && (pwCb.getKey() == null)) {
             throw new WSSecurityException("WSHandler: password callback class "
 					  +err);
@@ -601,13 +603,15 @@ public abstract class WSHandler {
 
     private WSPasswordCallback readPwViaCallbackClass(String callback,
                                                       String username,
-                                                      int doAction)
+                                                      int doAction,
+                                                      RequestData requestData)
             throws WSSecurityException {
 
         Class cbClass = null;
         CallbackHandler cbHandler = null;
         try {
-            cbClass = Loader.loadClass(getClassLoader(), callback);
+            cbClass = Loader.loadClass(getClassLoader(requestData
+                    .getMsgContext()), callback);
         } catch (ClassNotFoundException e) {
             throw new WSSecurityException("WSHandler: cannot load password callback class: "
                     + callback,
@@ -764,7 +768,8 @@ public abstract class WSHandler {
 				     reqData.getMsgContext());
         if (decPropFile != null) {
             if ((crypto = (Crypto) cryptos.get(decPropFile)) == null) {
-                crypto = CryptoFactory.getInstance(decPropFile, this.getClassLoader());
+                crypto = CryptoFactory.getInstance(decPropFile, this
+                        .getClassLoader(reqData.getMsgContext()));
                 cryptos.put(decPropFile, crypto);
             }
         } else if ((crypto = reqData.getSigCrypto()) == null) {
@@ -812,7 +817,8 @@ public abstract class WSHandler {
         if (callback != null) {
             Class cbClass = null;
             try {
-                cbClass = Loader.loadClass(getClassLoader(), callback);
+                cbClass = Loader.loadClass(getClassLoader(reqData
+                        .getMsgContext()), callback);
             } catch (ClassNotFoundException e) {
                 throw new WSSecurityException(
                        "WSHandler: cannot load password callback class: "
@@ -1070,18 +1076,31 @@ public abstract class WSHandler {
 	}
     }
 
-	/**
-	 * Returns the classloader to be used for loading the callback class
-	 * 
-	 * @return class loader
-	 */
-	public ClassLoader getClassLoader() {
-		try {
-			return Loader.getTCL();
-		} catch (Throwable t) {
-			return null;
-		}
-	}
+//	/**
+//	 * Returns the classloader to be used for loading the callback class
+//	 * 
+//	 * @return class loader
+//	 */
+//	public ClassLoader getClassLoader() {
+//		try {
+//			return Loader.getTCL();
+//		} catch (Throwable t) {
+//			return null;
+//		}
+//	}
+    
+    /**
+     * Returns the classloader to be used for loading the callback class
+     * @param msgCtx The MessageContext 
+     * @return class loader
+     */
+    public ClassLoader getClassLoader(Object msgCtx) {
+        try {
+            return Loader.getTCL();
+        } catch (Throwable t) {
+            return null;
+        }
+    }
 	
     public abstract Object getOption(String key);
     public abstract Object getProperty(Object msgContext, String key);
