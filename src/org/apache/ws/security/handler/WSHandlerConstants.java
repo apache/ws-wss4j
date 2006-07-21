@@ -402,6 +402,16 @@ public class WSHandlerConstants {
     public static final String SIG_PROP_FILE = "signaturePropFile";
 
     /**
+     * The key that hold the refernce of the <code>java.util.Properties</code> 
+     * object holding complete info about signature Crypto implementation. 
+     * This should contain all information that would contain in an equivalent 
+     * .properties file which includes the Crypto implementation class name.
+     * 
+     * Refer to documentation of {@link #SIG_PROP_FILE}.
+     */
+    public final static String SIG_PROP_REF_ID = "SignaturePropRefId";
+    
+    /**
      * The WSDoAllReceiver handler stores a result <code>Vector</code>
      * in this property.
      * <p/>
@@ -431,6 +441,16 @@ public class WSHandlerConstants {
      * an <code>AxisFault</code>.
      */
     public static final String DEC_PROP_FILE = "decryptionPropFile";
+    
+    /**
+     * The key that hold the refernce of the <code>java.util.Properties</code> 
+     * object holding complete info about decryption Crypto implementation. This
+     * should contain all information that would contain in an equivalent 
+     * .properties file which includes the Crypto implementation class name.
+     * 
+     * Refer to documentation of {@link #DEC_PROP_FILE}.
+     */
+    public final static String DEC_PROP_REF_ID = "decryptionPropRefId";
 
     /**
      * Specific parameter for UsernameToken action to define the encoding
@@ -541,6 +561,18 @@ public class WSHandlerConstants {
      * handler throws an <code>AxisFault</code>.
      */
     public static final String ENC_PROP_FILE = "encryptionPropFile";
+    
+    /**
+     * The key that hold the refernce of the 
+     * <code>java.util.Properties</code> object holding complete info about 
+     * encryption Crypto implementation. This should contain all information 
+     * that would contain in an equivalent .properties file which includes the 
+     * Crypto implementation class name.
+     * 
+     * Refer to documentation of {@link #DEC_PROP_FILE}.
+     */
+    public final static String ENC_PROP_REF_ID = "encryptionPropRefId";
+
 
     /**
      * Defines which key identifier type to use. The WS-Security specifications
