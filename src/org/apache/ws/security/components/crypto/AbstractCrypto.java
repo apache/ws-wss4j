@@ -23,6 +23,7 @@ import org.apache.commons.discovery.resource.DiscoverResources;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSSecurityException;
+import org.apache.ws.security.util.Loader;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -91,16 +92,25 @@ public abstract class AbstractCrypto implements Crypto {
         String location = this.properties.getProperty("org.apache.ws.security.crypto.merlin.file");
         InputStream is = null;
 
-        /**
-         * Look for the keystore in classpaths
-         */
-        DiscoverResources disc = new DiscoverResources();
-        disc.addClassLoader(JDKHooks.getJDKHooks().getThreadContextClassLoader());
-        disc.addClassLoader(loader);
-        ResourceIterator iterator = disc.findResources(location);
-        if (iterator.hasNext()) {
-            Resource resource = iterator.nextResource();
-            is = resource.getResourceAsStream();
+        try {
+            /**
+             * Look for the keystore in classpaths using commons discovery
+             */
+            DiscoverResources disc = new DiscoverResources();
+            disc.addClassLoader(JDKHooks.getJDKHooks().getThreadContextClassLoader());
+            disc.addClassLoader(loader);
+            ResourceIterator iterator = disc.findResources(location);
+            if (iterator.hasNext()) {
+                Resource resource = iterator.nextResource();
+                is = resource.getResourceAsStream();
+            }
+        } catch (java.lang.NoClassDefFoundError ex) {
+            /**
+             * Look for the keystore in classpaths using TCCL
+             */
+            if (is == null) {
+                is = Loader.getResource(loader, location).openStream();
+            }
         }
 
         /**

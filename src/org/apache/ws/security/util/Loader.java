@@ -86,7 +86,7 @@ public class Loader {
      * @return Class
      * @throws ClassNotFoundException
      */
-    static public URL getResource(ClassLoader loader, String resource) throws ClassNotFoundException {
+    static public URL getResource(ClassLoader loader, String resource) {
         URL url = null;
         try {
             if (loader != null) {
