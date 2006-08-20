@@ -87,7 +87,13 @@ public abstract class AbstractCrypto implements Crypto {
         this.properties = properties;
         String location = this.properties.getProperty("org.apache.ws.security.crypto.merlin.file");
 
-        InputStream is = Loader.getResource(loader, location).openStream();
+		InputStream is = null;
+		java.net.URL url = Loader.getResource(loader, location);
+		if(url != null) {
+			is =  url.openStream();
+		} else {
+			is = new java.io.FileInputStream(location);
+		}
 
         /**
          * If we don't find it, then look on the file system.
