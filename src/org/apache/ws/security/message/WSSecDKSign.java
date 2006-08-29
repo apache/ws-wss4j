@@ -108,7 +108,7 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
         return doc;
     }
     
-    protected void prepare(Document doc, WSSecHeader secHeader)
+    public void prepare(Document doc, WSSecHeader secHeader)
                             throws WSSecurityException {
         super.prepare(doc);
         
@@ -392,6 +392,11 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
                 .getElement(), false);
     }
     
+    public void appendSigToHeader(WSSecHeader secHeader) {
+        WSSecurityUtil.appendChildElement(document, secHeader.getSecurityHeader(), sig
+                .getElement());
+    }
+    
     
     /**
      * Compute the Signature over the references.
@@ -418,6 +423,8 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
         }
 
     }
+    
+    
     
     /**
      * @see org.apache.ws.security.message.WSSecDerivedKeyBase#getDerivedKeyLength()

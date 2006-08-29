@@ -17,10 +17,7 @@
 
 package org.apache.ws.security.message;
 
-import java.io.UnsupportedEncodingException;
-
 import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.conversation.ConversationConstants;
 import org.apache.ws.security.conversation.dkalgo.AlgoFactory;
 import org.apache.ws.security.conversation.dkalgo.DerivationAlgorithm;
@@ -31,6 +28,8 @@ import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.xml.security.utils.Base64;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
+import java.io.UnsupportedEncodingException;
 
 /**
  * Base class for DerivedKey encryption and signature
@@ -64,6 +63,15 @@ public abstract class WSSecDerivedKeyBase extends WSSecBase {
     protected String dktId = null;
     
 
+    /**
+     * Client's label value
+     */
+    protected String clientLabel = ConversationConstants.DEFAULT_LABEL;
+    
+    /**
+     * Service's label value
+     */
+    protected String serviceLabel = ConversationConstants.DEFAULT_LABEL;
     
     /**
      * soap:Envelope element
@@ -127,6 +135,22 @@ public abstract class WSSecDerivedKeyBase extends WSSecBase {
     }
     
     /**
+     * Set the label value of the client.
+     * @param clientLabel
+     */    
+    public void setClientLabel(String clientLabel) {
+        this.clientLabel = clientLabel;
+    }
+
+    /**
+     * Set the label value of the service.
+     * @param serviceLabel
+     */
+    public void setServiceLabel(String serviceLabel) {
+        this.serviceLabel = serviceLabel;
+    }
+
+    /**
      * Initialize a WSSec Derived key.
      * 
      * The method prepares and initializes a WSSec dereived key structure after the
@@ -154,7 +178,7 @@ public abstract class WSSecDerivedKeyBase extends WSSecBase {
         int length = this.getDerivedKeyLength();
         byte[] label;
         try {
-            label = ConversationConstants.DEFAULT_LABEL.getBytes("UTF-8");
+            label = (clientLabel + serviceLabel).getBytes("UTF-8");
         } catch (UnsupportedEncodingException e) {
             throw new WSSecurityException("UTF-8 encoding is not supported", e);
         }
@@ -206,6 +230,11 @@ public abstract class WSSecDerivedKeyBase extends WSSecBase {
     public void prependDKElementToHeader(WSSecHeader secHeader) {
         WSSecurityUtil.prependChildElement(document, secHeader
             .getSecurityHeader(), dkt.getElement(), false);
+    }
+    
+    public void appendDKElementToHeader(WSSecHeader secHeader) {
+        WSSecurityUtil.appendChildElement(document, secHeader
+            .getSecurityHeader(), dkt.getElement());
     }
 
 }

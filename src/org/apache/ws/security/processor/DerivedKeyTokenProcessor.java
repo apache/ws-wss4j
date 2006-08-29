@@ -84,7 +84,8 @@ public class DerivedKeyTokenProcessor implements Processor {
             DerivationAlgorithm algo = AlgoFactory.getInstance(this.algorithm);
             byte[] labelBytes = null;
             if(label == null || (label != null && label.length() == 0)) {
-                labelBytes = ConversationConstants.DEFAULT_LABEL.getBytes("UTF-8");
+                labelBytes = (ConversationConstants.DEFAULT_LABEL + ConversationConstants.DEFAULT_LABEL)
+                        .getBytes("UTF-8");
             } else {
                 labelBytes = this.label.getBytes("UTF-8");
             }

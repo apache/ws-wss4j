@@ -21,12 +21,12 @@ package org.apache.ws.security.conversation;
  */
 public class ConversationConstants {
 
-	private static final String NS_YEAR_PREFIX = "http://schemas.xmlsoap.org/ws/2005/02/";
+	private static final String NS_YEAR_PREFIX = "http://docs.oasis-open.org/ws-sx/ws-secureconversation/200512";
 	
     /**
-     * WS-Secure Conversation namespace
+     * WS-Secure Conversation namespace 
      */
-    public final static String WSC_NS = NS_YEAR_PREFIX + "sc";
+    public final static String WSC_NS = NS_YEAR_PREFIX;
     
     /**
      * TOken type of DerivedKeyToken
