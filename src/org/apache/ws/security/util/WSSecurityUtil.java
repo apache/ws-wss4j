@@ -80,7 +80,7 @@ public class WSSecurityUtil {
     public static Element getSecurityHeader(Document doc, String actor,
             SOAPConstants sc) {
         Element soapHeaderElement = (Element) getDirectChild(doc
-                .getFirstChild(), sc.getHeaderQName().getLocalPart(), sc
+                .getDocumentElement(), sc.getHeaderQName().getLocalPart(), sc
                 .getEnvelopeURI());
 
         if (soapHeaderElement == null) { // no SOAP header at all
