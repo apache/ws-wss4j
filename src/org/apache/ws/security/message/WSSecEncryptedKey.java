@@ -418,4 +418,11 @@ public class WSSecEncryptedKey extends WSSecBase {
     public void setKeyEncAlgo(String keyEncAlgo) {
         this.keyEncAlgo = keyEncAlgo;
     }
+
+    /**
+     * @param ephemeralKey The ephemeralKey to set.
+     */
+    public void setEphemeralKey(byte[] ephemeralKey) {
+        this.ephemeralKey = ephemeralKey;
+    }
 }
