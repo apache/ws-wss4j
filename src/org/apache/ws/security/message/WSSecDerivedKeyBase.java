@@ -19,6 +19,7 @@ package org.apache.ws.security.message;
 
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.conversation.ConversationConstants;
+import org.apache.ws.security.conversation.ConversationException;
 import org.apache.ws.security.conversation.dkalgo.AlgoFactory;
 import org.apache.ws.security.conversation.dkalgo.DerivationAlgorithm;
 import org.apache.ws.security.message.token.DerivedKeyToken;
@@ -83,7 +84,7 @@ public abstract class WSSecDerivedKeyBase extends WSSecBase {
      * is (or to be) derived from.
      */
     protected String tokenIdentifier = null;
-    
+
     /**
      * The derived key will change depending on the sig/encr algorithm.
      * Therefore the child classes are expected to provide this value.
@@ -96,6 +97,8 @@ public abstract class WSSecDerivedKeyBase extends WSSecBase {
      * The wsse:SecurityTokenReference element to be used
      */
     protected Element strElem;
+    
+    private int wscVersion = ConversationConstants.DEFAULT_VERSION;
     
     /**
      * @param ephemeralKey The ephemeralKey to set.
@@ -168,7 +171,7 @@ public abstract class WSSecDerivedKeyBase extends WSSecBase {
      * @throws WSSecurityException
      */
     public void prepare(Document doc)
-        throws WSSecurityException {
+        throws WSSecurityException, ConversationException {
         
         document = doc;
 
@@ -194,7 +197,7 @@ public abstract class WSSecDerivedKeyBase extends WSSecBase {
         
         
         //Add the DKTs
-        dkt = new DerivedKeyToken(document);
+        dkt = new DerivedKeyToken(this.wscVersion, document);
         dktId = "derivedKeyId-" + dkt.hashCode();
         
         dkt.setLength(length);
@@ -235,6 +238,13 @@ public abstract class WSSecDerivedKeyBase extends WSSecBase {
     public void appendDKElementToHeader(WSSecHeader secHeader) {
         WSSecurityUtil.appendChildElement(document, secHeader
             .getSecurityHeader(), dkt.getElement());
+    }
+
+    /**
+     * @param wscVersion The wscVersion to set.
+     */
+    public void setWscVersion(int wscVersion) {
+        this.wscVersion = wscVersion;
     }
 
 }

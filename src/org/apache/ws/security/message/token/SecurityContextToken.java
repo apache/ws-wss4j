@@ -3,6 +3,7 @@ package org.apache.ws.security.message.token;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.conversation.ConversationConstants;
+import org.apache.ws.security.conversation.ConversationException;
 import org.apache.ws.security.util.DOM2Writer;
 import org.apache.ws.security.util.UUIDGenerator;
 import org.apache.ws.security.util.WSSecurityUtil;
@@ -19,10 +20,6 @@ import javax.xml.namespace.QName;
  */
 public class SecurityContextToken {
 
-    public static final QName TOKEN = new QName(ConversationConstants.WSC_NS,
-            ConversationConstants.
-            SECURITY_CONTEXT_TOKEN_LN);
-
     /**
      * Security context token element
      */
@@ -32,21 +29,41 @@ public class SecurityContextToken {
      * Identifier element
      */
     protected Element elementIdentifier = null;
+    
+    /**
+     * Constructor to create the SCT
+     *
+     * @param doc
+     */
+    public SecurityContextToken(Document doc) throws ConversationException {
+        this(ConversationConstants.DEFAULT_VERSION, doc);
+    }
+
+    /**
+     * Constructor to create the SCT with a given uuid
+     *
+     * @param doc
+     */
+    public SecurityContextToken(Document doc, String uuid) throws ConversationException {
+        this(ConversationConstants.DEFAULT_VERSION, doc, uuid);
+    }
 
     /**
      * Constructor to create the SCT
      *
      * @param doc
      */
-    public SecurityContextToken(Document doc) {
+    public SecurityContextToken(int version, Document doc) throws ConversationException {
 
-        this.element = doc.createElementNS(ConversationConstants.WSC_NS,
+        String ns = ConversationConstants.getWSCNs(version);
+        
+        this.element = doc.createElementNS(ns,
                 "wsc:" + ConversationConstants.SECURITY_CONTEXT_TOKEN_LN);
 
-        WSSecurityUtil.setNamespace(this.element, ConversationConstants.WSC_NS,
+        WSSecurityUtil.setNamespace(this.element,ns,
                 ConversationConstants.WSC_PREFIX);
 
-        this.elementIdentifier = doc.createElementNS(ConversationConstants.WSC_NS,
+        this.elementIdentifier = doc.createElementNS(ns,
                 "wsc:" + ConversationConstants.IDENTIFIER_LN);
 
         this.element.appendChild(this.elementIdentifier);
@@ -63,15 +80,17 @@ public class SecurityContextToken {
      *
      * @param doc
      */
-    public SecurityContextToken(Document doc, String uuid) {
+    public SecurityContextToken(int version, Document doc, String uuid) throws ConversationException {
 
-        this.element = doc.createElementNS(ConversationConstants.WSC_NS,
+        String ns = ConversationConstants.getWSCNs(version);
+        
+        this.element = doc.createElementNS(ns,
                 "wsc:" + ConversationConstants.SECURITY_CONTEXT_TOKEN_LN);
 
-        WSSecurityUtil.setNamespace(this.element, ConversationConstants.WSC_NS,
+        WSSecurityUtil.setNamespace(this.element, ns,
                 ConversationConstants.WSC_PREFIX);
 
-        this.elementIdentifier = doc.createElementNS(ConversationConstants.WSC_NS,
+        this.elementIdentifier = doc.createElementNS(ns,
                 "wsc:" + ConversationConstants.IDENTIFIER_LN);
 
         this.element.appendChild(this.elementIdentifier);
@@ -89,11 +108,16 @@ public class SecurityContextToken {
         this.element = elem;
         QName el = new QName(this.element.getNamespaceURI(),
                 this.element.getLocalName());
-        if (!el.equals(TOKEN)) {    // If the element is not a security context token
+
+        if (!el.equals(new QName(ConversationConstants.WSC_NS_05_02, ConversationConstants.SECURITY_CONTEXT_TOKEN_LN)) &&
+                !el.equals(new QName(ConversationConstants.WSC_NS_05_12, ConversationConstants.SECURITY_CONTEXT_TOKEN_LN))) {    // If the element is not a security context token
             throw new WSSecurityException(WSSecurityException.INVALID_SECURITY_TOKEN, "badTokenType00",
                     new Object[]{el});
         }
-        this.elementIdentifier = (Element) WSSecurityUtil.getDirectChild(element, ConversationConstants.IDENTIFIER_LN, ConversationConstants.WSC_NS);
+
+        this.elementIdentifier = (Element) WSSecurityUtil.getDirectChild(
+                element, ConversationConstants.IDENTIFIER_LN, el
+                        .getNamespaceURI());
     }
 
     /**

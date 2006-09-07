@@ -194,7 +194,8 @@ public class SignatureProcessor implements Processor {
                 if (el.equals(WSSecurityEngine.usernameToken)) {
                     ut = new UsernameToken(token);
                     secretKey = ut.getSecretKey();
-                } else if(el.equals(WSSecurityEngine.DERIVED_KEY_TOKEN)) {
+                } else if(el.equals(WSSecurityEngine.DERIVED_KEY_TOKEN_05_02) ||
+                        el.equals(WSSecurityEngine.DERIVED_KEY_TOKEN_05_12)) {
                     dkt = new DerivedKeyToken(token);
                     String id = dkt.getID();
                     DerivedKeyTokenProcessor dktProcessor = (DerivedKeyTokenProcessor) wsDocInfo

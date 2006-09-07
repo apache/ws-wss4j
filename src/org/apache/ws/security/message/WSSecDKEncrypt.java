@@ -17,15 +17,11 @@
 
 package org.apache.ws.security.message;
 
-import java.util.Vector;
-
-import javax.crypto.SecretKey;
-
 import org.apache.ws.security.SOAPConstants;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSEncryptionPart;
 import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.components.crypto.Crypto;
+import org.apache.ws.security.conversation.ConversationException;
 import org.apache.ws.security.message.token.Reference;
 import org.apache.ws.security.message.token.SecurityTokenReference;
 import org.apache.ws.security.util.WSSecurityUtil;
@@ -36,6 +32,10 @@ import org.apache.xml.security.keys.KeyInfo;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+
+import javax.crypto.SecretKey;
+
+import java.util.Vector;
 
 /**
  * Encrypts and signes parts of a message with derived keys derived from a
@@ -48,7 +48,7 @@ public class WSSecDKEncrypt extends WSSecDerivedKeyBase {
     protected String symEncAlgo = WSConstants.AES_128;
     
     public Document build(Document doc, WSSecHeader secHeader)
-            throws WSSecurityException {
+            throws WSSecurityException, ConversationException {
         
         /*
          * Setup the encrypted key

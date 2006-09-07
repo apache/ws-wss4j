@@ -55,9 +55,6 @@ public class DerivedKeyToken {
 
     private Log log = LogFactory.getLog(DerivedKeyToken.class.getName());
 
-    public static final QName TOKEN = new QName(ConversationConstants.WSC_NS,
-            ConversationConstants.
-            DERIVED_KEY_TOKEN_LN);
 
     //These are the elements that are used to create the SecurityContextToken
     protected Element element = null;
@@ -68,19 +65,34 @@ public class DerivedKeyToken {
     protected Element elementLength = null;
     protected Element elementLabel = null;
     protected Element elementNonce = null;
+    
+    private String ns;
+    
+    /**
+     * This will create an empty DerivedKeyToken
+     *
+     * @param doc THe DOM document
+     */
+    public DerivedKeyToken(Document doc) throws ConversationException {
+        this(ConversationConstants.DEFAULT_VERSION, doc);
+    }
 
     /**
      * This will create an empty DerivedKeyToken
      *
      * @param doc THe DOM document
      */
-    public DerivedKeyToken(Document doc) {
+    public DerivedKeyToken(int version, Document doc) throws ConversationException {
+        
         log.debug("DerivedKeyToken: created");
-        this.element = doc.createElementNS(ConversationConstants.WSC_NS,
+        
+        this.ns = ConversationConstants.getWSCNs(version);
+        
+        this.element = doc.createElementNS(ns,
                 "wsc:" +
                 ConversationConstants.
                 DERIVED_KEY_TOKEN_LN);
-        WSSecurityUtil.setNamespace(this.element, ConversationConstants.WSC_NS,
+        WSSecurityUtil.setNamespace(this.element, ns,
                 ConversationConstants.WSC_PREFIX);
     }
 
@@ -95,7 +107,8 @@ public class DerivedKeyToken {
         this.element = elem;
         QName el = new QName(this.element.getNamespaceURI(),
                 this.element.getLocalName());
-        if (!el.equals(TOKEN)) {
+        if (!el.equals(new QName(ConversationConstants.WSC_NS_05_02, ConversationConstants.DERIVED_KEY_TOKEN_LN)) &&
+                !el.equals(new QName(ConversationConstants.WSC_NS_05_12, ConversationConstants.DERIVED_KEY_TOKEN_LN))) {
             throw new WSSecurityException(WSSecurityException.INVALID_SECURITY_TOKEN,
                     "badTokenType00", new Object[]{el});
         }
@@ -103,20 +116,21 @@ public class DerivedKeyToken {
                 getDirectChild(this.element,
                         ConversationConstants.SECURITY_TOKEN_REFERENCE_LN,
                         WSConstants.WSSE_NS);
+        
+        this.ns = el.getNamespaceURI();
+        
         this.elementProperties = (Element) WSSecurityUtil.getDirectChild(this.
-                element, ConversationConstants.PROPERTIES_LN,
-                ConversationConstants.WSC_NS);
+                element, ConversationConstants.PROPERTIES_LN, this.ns);
         this.elementGeneration = (Element) WSSecurityUtil.getDirectChild(this.
-                element, ConversationConstants.GENERATION_LN,
-                ConversationConstants.WSC_NS);
+                element, ConversationConstants.GENERATION_LN, this.ns);
         this.elementOffset = (Element) WSSecurityUtil.getDirectChild(this.element,
-                ConversationConstants.OFFSET_LN, ConversationConstants.WSC_NS);
+                ConversationConstants.OFFSET_LN, this.ns);
         this.elementLength = (Element) WSSecurityUtil.getDirectChild(this.element,
-                ConversationConstants.LENGTH_LN, ConversationConstants.WSC_NS);
+                ConversationConstants.LENGTH_LN, this.ns);
         this.elementLabel = (Element) WSSecurityUtil.getDirectChild(this.element,
-                ConversationConstants.LABEL_LN, ConversationConstants.WSC_NS);
+                ConversationConstants.LABEL_LN, this.ns);
         this.elementNonce = (Element) WSSecurityUtil.getDirectChild(this.element,
-                ConversationConstants.NONCE_LN, ConversationConstants.WSC_NS);
+                ConversationConstants.NONCE_LN, this.ns);
     }
 
     /**
@@ -161,15 +175,15 @@ public class DerivedKeyToken {
      */
     private void addProperty(String propName, String propValue) {
         if (this.elementProperties == null) { //Create the properties element if it is not there
-            this.elementProperties = this.element.getOwnerDocument().createElementNS(ConversationConstants.WSC_NS,
+            this.elementProperties = this.element.getOwnerDocument().createElementNS(this.ns,
                     "wsc:" +
                     ConversationConstants.PROPERTIES_LN);
             WSSecurityUtil.setNamespace(this.elementProperties,
-                    ConversationConstants.WSC_NS,
+                    this.ns,
                     WSConstants.WSSE_PREFIX);
             this.element.appendChild(this.elementProperties);
         }
-        Element tempElement = this.element.getOwnerDocument().createElementNS(ConversationConstants.WSC_NS,
+        Element tempElement = this.element.getOwnerDocument().createElementNS(this.ns,
                 "wsc:" + propName);
         tempElement.appendChild(this.element.getOwnerDocument().createTextNode(propValue));
 
@@ -210,7 +224,7 @@ public class DerivedKeyToken {
             //If so change the value
             Node node = WSSecurityUtil.findElement(this.elementProperties,
                     propertyName,
-                    ConversationConstants.WSC_NS);
+                    this.ns);
             if (node != null && node instanceof Element) { //If the node is not null
                 Text node1 = getFirstNode((Element) node);
                 node1.setData((String) properties.get(propertyName));
@@ -243,11 +257,11 @@ public class DerivedKeyToken {
      * @param length The length of the derived key as a long
      */
     public void setLength(int length) {
-        this.elementLength = this.element.getOwnerDocument().createElementNS(ConversationConstants.WSC_NS,
+        this.elementLength = this.element.getOwnerDocument().createElementNS(this.ns,
                 "wsc:" +
                 ConversationConstants.LENGTH_LN);
         WSSecurityUtil.setNamespace(this.elementLength,
-                ConversationConstants.WSC_NS,
+                this.ns,
                 ConversationConstants.WSC_PREFIX);
         this.elementLength.appendChild(this.element.getOwnerDocument().createTextNode(Long.toString(length)));
         this.element.appendChild(this.elementLength);
@@ -268,11 +282,11 @@ public class DerivedKeyToken {
     public void setOffset( int offset) throws ConversationException {
         //This element MUST NOT be used if the <Generation> element is specified
         if (this.elementGeneration == null) {
-            this.elementOffset = this.element.getOwnerDocument().createElementNS(ConversationConstants.WSC_NS,
+            this.elementOffset = this.element.getOwnerDocument().createElementNS(this.ns,
                     "wsc:" +
                     ConversationConstants.OFFSET_LN);
             WSSecurityUtil.setNamespace(this.elementOffset,
-                    ConversationConstants.WSC_NS,
+                    this.ns,
                     ConversationConstants.WSC_PREFIX);
             this.elementOffset.appendChild(this.element.getOwnerDocument().createTextNode(Integer.toString(offset)));
             this.element.appendChild(this.elementOffset);
@@ -298,10 +312,10 @@ public class DerivedKeyToken {
             ConversationException {
         //This element MUST NOT be used if the <Offset> element is specified
         if (this.elementOffset == null) {
-            this.elementGeneration = this.element.getOwnerDocument().createElementNS(ConversationConstants.WSC_NS,
+            this.elementGeneration = this.element.getOwnerDocument().createElementNS(this.ns,
                     "wsc:" + ConversationConstants.GENERATION_LN);
             WSSecurityUtil.setNamespace(this.elementGeneration,
-                    ConversationConstants.WSC_NS,
+                    this.ns,
                     ConversationConstants.WSC_PREFIX);
             this.elementGeneration.appendChild(this.element.getOwnerDocument().createTextNode(Integer.toString(generation)));
             this.element.appendChild(this.elementGeneration);
@@ -323,10 +337,10 @@ public class DerivedKeyToken {
      * @param label Label value as a string
      */
     public void setLabel(String label) {
-        this.elementLabel = this.element.getOwnerDocument().createElementNS(ConversationConstants.WSC_NS,
+        this.elementLabel = this.element.getOwnerDocument().createElementNS(this.ns,
                 "wsc:" +
                 ConversationConstants.LABEL_LN);
-        WSSecurityUtil.setNamespace(this.elementLabel, ConversationConstants.WSC_NS,
+        WSSecurityUtil.setNamespace(this.elementLabel, this.ns,
                 ConversationConstants.WSC_PREFIX);
         this.elementLabel.appendChild(this.element.getOwnerDocument().createTextNode(label));
         this.element.appendChild(this.elementLabel);
@@ -338,10 +352,10 @@ public class DerivedKeyToken {
      * @param nonce Nonce value as a string
      */
     public void setNonce(String nonce) {
-        this.elementNonce = this.element.getOwnerDocument().createElementNS(ConversationConstants.WSC_NS,
+        this.elementNonce = this.element.getOwnerDocument().createElementNS(this.ns,
                 "wsc:" +
                 ConversationConstants.NONCE_LN);
-        WSSecurityUtil.setNamespace(this.elementNonce, ConversationConstants.WSC_NS,
+        WSSecurityUtil.setNamespace(this.elementNonce, this.ns,
                 ConversationConstants.WSC_PREFIX);
         this.elementNonce.appendChild(this.element.getOwnerDocument().createTextNode(nonce));
         this.element.appendChild(this.elementNonce);
@@ -432,7 +446,7 @@ public class DerivedKeyToken {
      *         DerivedKeyToken
      */
     public String getAlgorithm() {
-        String algo = this.element.getAttributeNS(ConversationConstants.WSC_NS,
+        String algo = this.element.getAttributeNS(this.ns,
                 "Algorithm");
         if (algo == null || algo.equals("")) {
             return ConversationConstants.DerivationAlgorithm.P_SHA_1;
@@ -449,10 +463,10 @@ public class DerivedKeyToken {
      */
     public void setAlgorithm(String algo) {
         String prefix = WSSecurityUtil.setNamespace(this.element,
-                ConversationConstants.WSC_NS,
+                this.ns,
                 ConversationConstants.
                 WSC_PREFIX);
-        this.element.setAttributeNS(ConversationConstants.WSC_NS,
+        this.element.setAttributeNS(this.ns,
                 prefix + ":Algorithm", algo);
     }
 

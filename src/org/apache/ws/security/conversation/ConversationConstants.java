@@ -21,22 +21,31 @@ package org.apache.ws.security.conversation;
  */
 public class ConversationConstants {
 
-	private static final String NS_YEAR_PREFIX = "http://docs.oasis-open.org/ws-sx/ws-secureconversation/200512";
-	
-    /**
-     * WS-Secure Conversation namespace 
-     */
-    public final static String WSC_NS = NS_YEAR_PREFIX;
+    public final static int VERSION_05_02 = 1;
+    
+    public final static int VERSION_05_12 = 2;
+    
+    public final static int DEFAULT_VERSION = VERSION_05_02; 
     
     /**
-     * TOken type of DerivedKeyToken
+     * WS-SecConv Feb 2005 version
      */
-    public final static String TOKEN_TYPE_DERIVED_KEY_TOKEN = WSC_NS + "/dk";
+    public final static String WSC_NS_05_02 = "http://schemas.xmlsoap.org/ws/2005/02/sc"; 
+    
+    /**
+     * WS-Sx version
+     */
+    public final static String WSC_NS_05_12 = "http://docs.oasis-open.org/ws-sx/ws-secureconversation/200512";
+    
+    /**
+     * Token type of DerivedKeyToken
+     */
+    public final static String TOKEN_TYPE_DERIVED_KEY_TOKEN =  "/dk";
     
     /**
      * Token type of SecurityContextToken
      */
-    public static final String TOKEN_TYPE_SECURITY_CONTEXT_TOKEN = WSC_NS  + "/sct";
+    public static final String TOKEN_TYPE_SECURITY_CONTEXT_TOKEN = "/sct";
     
     /**
      * Field WSC_PREFIX
@@ -119,5 +128,25 @@ public class ConversationConstants {
     
     public interface DerivationAlgorithm {
         public final static String P_SHA_1 = "http://schemas.xmlsoap.org/ws/2005/02/sc/dk/p_sha1";
+    }
+    
+    public static String getWSCNs(int version) throws ConversationException {
+        if(VERSION_05_02 == version) {
+            return WSC_NS_05_02;
+        } else if(VERSION_05_12 == version) {
+            return WSC_NS_05_12;
+        } else {
+            throw new ConversationException("unsupportedSecConvVersion");
+        }
+    }
+    
+    public static int getWSTVersion(String ns) throws ConversationException {
+        if(WSC_NS_05_02.equals(ns)) {
+            return VERSION_05_02;
+        } else if(WSC_NS_05_12.equals(ns)) {
+            return VERSION_05_12;
+        } else {
+            throw new ConversationException("unsupportedSecConvVersion");
+        }
     }
 }

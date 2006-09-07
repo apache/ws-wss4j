@@ -18,6 +18,8 @@ package org.apache.ws.security.message;
 
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
+import org.apache.ws.security.conversation.ConversationConstants;
+import org.apache.ws.security.conversation.ConversationException;
 import org.apache.ws.security.message.token.SecurityContextToken;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.w3c.dom.Document;
@@ -51,15 +53,17 @@ public class WSSecSecurityContextToken {
      * The symmetric secret associated with the SecurityContextToken
      */
     protected byte[] secret;
+    
+    private int wscVersion = ConversationConstants.DEFAULT_VERSION;
 
     public void prepare(Document doc, Crypto crypto)
-            throws WSSecurityException {
+            throws WSSecurityException, ConversationException  {
 
         if (sct == null) {
             if (this.identifier != null) {
-                this.sct = new SecurityContextToken(doc, this.identifier);
+                this.sct = new SecurityContextToken(this.wscVersion, doc, this.identifier);
             } else {
-                this.sct = new SecurityContextToken(doc);
+                this.sct = new SecurityContextToken(this.wscVersion, doc);
                 this.identifier = this.sct.getIdentifier();
             }
         }
@@ -136,6 +140,13 @@ public class WSSecSecurityContextToken {
      */
     public void setSctId(String sctId) {
         this.sctId = sctId;
+    }
+
+    /**
+     * @param wscVersion The wscVersion to set.
+     */
+    public void setWscVersion(int wscVersion) {
+        this.wscVersion = wscVersion;
     }
     
 }

@@ -17,10 +17,6 @@
 
 package org.apache.ws.security.message;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.Vector;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.SOAPConstants;
@@ -29,7 +25,7 @@ import org.apache.ws.security.WSDocInfo;
 import org.apache.ws.security.WSDocInfoStore;
 import org.apache.ws.security.WSEncryptionPart;
 import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.components.crypto.Crypto;
+import org.apache.ws.security.conversation.ConversationException;
 import org.apache.ws.security.message.token.Reference;
 import org.apache.ws.security.message.token.SecurityTokenReference;
 import org.apache.ws.security.saml.SAMLUtil;
@@ -50,6 +46,10 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
+
+import java.util.HashSet;
+import java.util.Set;
+import java.util.Vector;
 
 /**
  * Builder to sign with derived keys
@@ -80,7 +80,8 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
     
     private WSDocInfo wsDocInfo;
 
-    public Document build(Document doc, WSSecHeader secHeader) throws WSSecurityException  {
+    public Document build(Document doc, WSSecHeader secHeader)
+            throws WSSecurityException, ConversationException {
         
         this.prepare(doc, secHeader);
         
@@ -109,7 +110,7 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
     }
     
     public void prepare(Document doc, WSSecHeader secHeader)
-                            throws WSSecurityException {
+                            throws WSSecurityException, ConversationException {
         super.prepare(doc);
         
         wsDocInfo = new WSDocInfo(doc.hashCode());

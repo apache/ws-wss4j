@@ -243,9 +243,11 @@ public class WSSConfig {
             name = "org.apache.ws.security.processor.ReferenceListProcessor";
         } else if (el.equals(WSSecurityEngine.signatureConfirmation)) {
             name = "org.apache.ws.security.processor.SignatureConfirmationProcessor";
-        } else if (el.equals(WSSecurityEngine.DERIVED_KEY_TOKEN)) {
+        } else if (el.equals(WSSecurityEngine.DERIVED_KEY_TOKEN_05_02) ||
+                el.equals(WSSecurityEngine.DERIVED_KEY_TOKEN_05_12)) {
             name = "org.apache.ws.security.processor.DerivedKeyTokenProcessor";
-        } else if(el.equals(WSSecurityEngine.SECURITY_CONTEXT_TOKEN)) {
+        } else if(el.equals(WSSecurityEngine.SECURITY_CONTEXT_TOKEN_05_02) ||
+                el.equals(WSSecurityEngine.SECURITY_CONTEXT_TOKEN_05_12)) {
             name = "org.apache.ws.security.processor.SecurityContextTokenProcessor";
         }
 
