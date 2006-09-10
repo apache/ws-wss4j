@@ -163,6 +163,21 @@ public class WSSecUsernameToken extends WSSecBase {
 				.getSecurityHeader(), ut.getElement(), false);
 	}
 
+    /**
+     * Appends the UsernameToken element to the elements already in the
+     * Security header.
+     * 
+     * The method can be called any time after <code>prepare()</code>.
+     * This allows to insert the UsernameToken element at any position in the
+     * Security header.
+     * 
+     * @param secHeader
+     *            The security header that holds the Signature element.
+     */
+    public void appendToHeader(WSSecHeader secHeader) {
+        WSSecurityUtil.appendChildElement(document, secHeader
+                .getSecurityHeader(), ut.getElement());
+    }
 	/**
 	 * Adds a new <code>UsernameToken</code> to a soap envelope.
 	 * 
