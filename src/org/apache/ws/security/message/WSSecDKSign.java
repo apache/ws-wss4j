@@ -438,6 +438,42 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
     public void setSignatureAlgorithm(String algo) {
         this.sigAlgo = algo;
     }
+
+    /**
+     * @return Returns the signatureValue.
+     */
+    public byte[] getSignatureValue() {
+        return signatureValue;
+    }
     
+    /**
+     * Set the canonicalization method to use.
+     * 
+     * If the canonicalization method is not set then the recommended Exclusive
+     * XML Canonicalization is used by default Refer to WSConstants which
+     * algorithms are supported.
+     * 
+     * @param algo
+     *            Is the name of the signature algorithm
+     * @see WSConstants#C14N_OMIT_COMMENTS
+     * @see WSConstants#C14N_WITH_COMMENTS
+     * @see WSConstants#C14N_EXCL_OMIT_COMMENTS
+     * @see WSConstants#C14N_EXCL_WITH_COMMENTS
+     */
+    public void setSigCanonicalization(String algo) {
+        canonAlgo = algo;
+    }
+
+    /**
+     * Get the canonicalization method.
+     * 
+     * If the canonicalization method was not set then Exclusive XML
+     * Canonicalization is used by default.
+     * 
+     * @return The string describing the canonicalization algorithm.
+     */
+    public String getSigCanonicalization() {
+        return canonAlgo;
+    }
 
 }

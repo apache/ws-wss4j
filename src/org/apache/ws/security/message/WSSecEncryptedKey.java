@@ -351,6 +351,22 @@ public class WSSecEncryptedKey extends WSSecBase {
     }
 
     /**
+     * Append the EncryptedKey element to the elements already in the Security
+     * header.
+     * 
+     * The method can be called any time after <code>prepare()</code>. This
+     * allows to insert the EncryptedKey element at any position in the Security
+     * header.
+     * 
+     * @param secHeader
+     *            The security header that holds the Signature element.
+     */
+    public void appendToHeader(WSSecHeader secHeader) {
+        WSSecurityUtil.appendChildElement(document, secHeader
+                .getSecurityHeader(), encryptedKeyElement);
+    }
+    
+    /**
      * Prepend the BinarySecurityToken to the elements already in the Security
      * header.
      * 
@@ -368,6 +384,24 @@ public class WSSecEncryptedKey extends WSSecBase {
         bstToken = null;
     }
 
+    /**
+     * Append the BinarySecurityToken to the elements already in the Security
+     * header.
+     * 
+     * The method can be called any time after <code>prepare()</code>. This
+     * allows to insert the BST element at any position in the Security header.
+     * 
+     * @param secHeader
+     *            The security header that holds the BST element.
+     */
+    public void appendBSTElementToHeader(WSSecHeader secHeader) {
+        if (bstToken != null) {
+            WSSecurityUtil.appendChildElement(document, secHeader
+                    .getSecurityHeader(), bstToken.getElement());
+        }
+        bstToken = null;
+    }
+    
     /**
      * @return Returns the ephemeralKey.
      */
@@ -424,5 +458,19 @@ public class WSSecEncryptedKey extends WSSecBase {
      */
     public void setEphemeralKey(byte[] ephemeralKey) {
         this.ephemeralKey = ephemeralKey;
+    }
+    
+    /**
+     * Get the id of the BSt generated  during <code>prepare()</code>.
+     * 
+     * @return Returns the the value of wsu:Id attribute of the 
+     * BinaruSecurityToken element.
+     */
+    public String getBSTTokenId() {
+        if(this.bstToken == null) {
+            return null;
+        }
+        
+        return this.bstToken.getID();
     }
 }

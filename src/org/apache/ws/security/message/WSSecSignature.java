@@ -228,6 +228,20 @@ public class WSSecSignature extends WSSecBase {
 		}
 		return sig.getId();
 	}
+    
+    /**
+     * Get the id of the BSt generated  during <code>prepare()</code>.
+     * 
+     * @return Returns the the value of wsu:Id attribute of the 
+     * BinaruSecurityToken element.
+     */
+    public String getBSTTokenId() {
+        if(this.bstToken == null) {
+            return null;
+        }
+        
+        return this.bstToken.getID();
+    }
 
 	/**
 	 * Initialize a WSSec Signature.
@@ -561,7 +575,23 @@ public class WSSecSignature extends WSSecBase {
 		WSSecurityUtil.prependChildElement(document, secHeader.getSecurityHeader(), sig
 				.getElement(), false);
 	}
-
+    
+    /**
+     * Appends the Signature element to the elements already in the Security
+     * header.
+     * 
+     * The method can be called any time after <code>prepare()</code>.
+     * This allows to insert the Signature element at any position in the
+     * Security header.
+     * 
+     * @param securityHeader
+     *            The secHeader that holds the Signature element.
+     */
+    public void appendToHeader(WSSecHeader secHeader) {
+        WSSecurityUtil.appendChildElement(document, secHeader.getSecurityHeader(), sig
+                .getElement());
+    }
+    
 	/**
 	 * Prepend the BinarySecurityToken to the elements already in the Security
 	 * header.
@@ -581,6 +611,14 @@ public class WSSecSignature extends WSSecBase {
 		bstToken = null;
 	}
 
+    public void appendBSTElementToHeader(WSSecHeader secHeader) {
+        if (bstToken != null) {
+            WSSecurityUtil.appendChildElement(document, secHeader.getSecurityHeader(),
+                    bstToken.getElement());
+        }
+        bstToken = null;
+    }
+    
 	/**
 	 * Compute the Signature over the references.
 	 * 
