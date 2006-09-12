@@ -190,12 +190,14 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
          * encrypted using the public key of the receiver
          */
 
-        if (symmetricKey == null) {
-            KeyGenerator keyGen = getKeyGenerator();
-            this.symmetricKey = keyGen.generateKey();
+        
+        if(this.ephemeralKey == null) {
+            if (symmetricKey == null) {
+                KeyGenerator keyGen = getKeyGenerator();
+                this.symmetricKey = keyGen.generateKey();
+            } 
+            this.ephemeralKey = this.symmetricKey.getEncoded();
         }
-        byte[] encKey = this.symmetricKey.getEncoded();
-
         /*
          * Get the certificate that contains the public key for the public key
          * algorithm that will encrypt the generated symmetric (session) key.
@@ -211,7 +213,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
             }
             remoteCert = certs[0];
         }
-        prepareInternal(encKey, remoteCert, crypto);
+        prepareInternal(this.ephemeralKey, remoteCert, crypto);
     }
 
     /**
