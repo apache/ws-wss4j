@@ -510,11 +510,14 @@ public class WSSecurityUtil {
      */
     private static Element createElementInSameNamespace(Element parent,
             String localName) {
+        
+        String qName = localName;
+        
         String prefix = parent.getPrefix();
-        if (prefix == null) {
-            prefix = "";
+        if (prefix != null || prefix.length() > 0) {
+            qName = prefix + ":" + localName;
         }
-        String qName = prefix + ":" + localName;
+         
         String nsUri = parent.getNamespaceURI();
         return parent.getOwnerDocument().createElementNS(nsUri, qName);
     }
