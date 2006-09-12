@@ -228,7 +228,9 @@ public class WSSecEncryptedKey extends WSSecBase {
          * session key
          */
         encryptedKeyElement = createEnrcyptedKey(document, keyEncAlgo);
-        this.encKeyId = "EncKeyId-" + encryptedKeyElement.hashCode();
+        if(this.encKeyId == null || "".equals(this.encKeyId)) {
+            this.encKeyId = "EncKeyId-" + encryptedKeyElement.hashCode();
+        }
         encryptedKeyElement.setAttributeNS(null, "Id", this.encKeyId);
 
         KeyInfo keyInfo = new KeyInfo(document);
@@ -473,4 +475,20 @@ public class WSSecEncryptedKey extends WSSecBase {
         
         return this.bstToken.getID();
     }
+
+    /**
+     * @param document The document to set.
+     */
+    public void setDocument(Document document) {
+        this.document = document;
+    }
+
+    /**
+     * @param encKeyId The encKeyId to set.
+     */
+    public void setEncKeyId(String encKeyId) {
+        this.encKeyId = encKeyId;
+    }
+    
+    
 }
