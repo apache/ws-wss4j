@@ -23,6 +23,7 @@ import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.message.token.UsernameToken;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 /**
  * Builds a WS UsernameToken.
@@ -201,4 +202,16 @@ public class WSSecUsernameToken extends WSSecBase {
 		return doc;
 	}
 
+    /**
+     * Returns the <code>UsernameToken</code> element.
+     * 
+     * The method can be called any time after <code>prepare()</code>.
+     * This allows to insert the UsernameToken element at any position in the
+     * Security header.
+     * 
+     * @return
+     */
+    public Element getUsernameTokenElement() {
+       return this.ut.getElement(); 
+    }
 }

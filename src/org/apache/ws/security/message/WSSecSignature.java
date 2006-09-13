@@ -611,6 +611,28 @@ public class WSSecSignature extends WSSecBase {
 		bstToken = null;
 	}
 
+    /**
+     * Returns the SignatureElement.
+     * The method can be called any time after <code>prepare()</code>.
+     * @return The DOM Element of the signature.
+     */
+    public Element getSignatureElement() {
+        return this.sig.getElement();
+    }
+    
+    /**
+     * Returns the BST Token element.
+     * The method can be called any time after <code>prepare()</code>.
+     * @return
+     */
+    public Element getBinarySecurityTokenElement() {
+        if(this.bstToken != null) {
+            return this.bstToken.getElement();
+        } else  {
+            return null;
+        }
+    }
+    
     public void appendBSTElementToHeader(WSSecHeader secHeader) {
         if (bstToken != null) {
             WSSecurityUtil.appendChildElement(document, secHeader.getSecurityHeader(),

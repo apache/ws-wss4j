@@ -246,5 +246,9 @@ public abstract class WSSecDerivedKeyBase extends WSSecBase {
     public void setWscVersion(int wscVersion) {
         this.wscVersion = wscVersion;
     }
+    
+    public Element getdktElement() {
+        return this.dkt.getElement();
+    }
 
 }
