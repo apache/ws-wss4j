@@ -398,7 +398,14 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
                 .getElement());
     }
     
-    
+    /**
+     * Returns the signature Element.
+     * The method can be called any time after <code>prepare()</code>.
+     * @return
+     */
+    public Element getSignatureElement() {
+        return this.sig.getElement();
+    }
     /**
      * Compute the Signature over the references.
      * 
