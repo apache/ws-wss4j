@@ -22,6 +22,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.message.token.Timestamp;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 /**
  * Builds a WS Timestamp and inserts it into the SOAP Envelope. Refer to the WS
@@ -128,5 +129,15 @@ public class WSSecTimestamp extends WSSecBase {
             return null;
         }
         return ts.getID();
+    }
+    
+    /**
+     * Get the timestamp element generated during <code>prepare()</code>.
+     */
+    public Element getElement() {
+        if (ts == null) {
+            return null;
+        }
+        return ts.getElement();
     }
 }
