@@ -71,6 +71,26 @@ public abstract class CryptoFactory {
         String cryptoClassName = properties.getProperty("org.apache.ws.security.crypto.provider");
         return loadClass(cryptoClassName, properties);
     }
+
+    /**
+     * getInstance
+     * <p/>
+     * Returns an instance of Crypto loaded with the given classloader. 
+     * The properties are handed over the the crypto implementation. 
+     * The porperties must at least contain the Crypto implementation
+     * class name as the value of the property : org.apache.ws.security.crypto.provider
+     * <p/>
+     *
+     * @param properties      The Properties that are forwarded to the crypto implementaion 
+     *                        and the Crypto impl class name.
+     *                        These properties are dependend on the crypto implementatin
+     * @param classLoader   The class loader to use
+     * @return The cyrpto implementation or null if no cryptoClassName was defined
+     */
+    public static Crypto getInstance(Properties properties, ClassLoader classLoader) {
+        String cryptoClassName = properties.getProperty("org.apache.ws.security.crypto.provider");
+        return loadClass(cryptoClassName, properties, classLoader);
+    }
     
     /**
      * getInstance
