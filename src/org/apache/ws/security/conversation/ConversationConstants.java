@@ -126,6 +126,13 @@ public class ConversationConstants {
     
     public final static String DEFAULT_LABEL = "WS-SecureConversation";
     
+    /**
+     * Key to hod the map of security context identifiers against the 
+     * service epr addresses (service scope) or wsa:Action values (operation 
+     * scope).
+     */
+    public final static String KEY_CONTEXT_MAP = "contextMap";
+    
     public interface DerivationAlgorithm {
         public final static String P_SHA_1 = "http://schemas.xmlsoap.org/ws/2005/02/sc/dk/p_sha1";
     }

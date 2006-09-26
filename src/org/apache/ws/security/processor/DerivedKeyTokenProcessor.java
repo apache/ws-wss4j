@@ -120,8 +120,7 @@ public class DerivedKeyTokenProcessor implements Processor {
             if(processor == null) {
                 //Now use the callback and get it
                 this.secret = this.getSecret(cb, uri.substring(1));
-            }
-            if (processor instanceof EncryptedKeyProcessor) {
+            }else if (processor instanceof EncryptedKeyProcessor) {
                 this.secret = ((EncryptedKeyProcessor) processor)
                         .getDecryptedBytes();
             } else if (processor instanceof SecurityContextTokenProcessor) {

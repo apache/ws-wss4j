@@ -96,21 +96,21 @@ public class WSDocInfo {
      */
     public Processor getProcessor(String id) {
     	
-    	if (id == null) {
-    		return null;
-    	}
+        if (id == null) {
+    		    return null;
+    	    }
 
-    	Processor p = null;
+    	    Processor p = null;
         if (processors != null) {
             for (Enumeration e = processors.elements(); e.hasMoreElements();) {
                 p = (Processor) e.nextElement();
                 String cId = p.getId();
                 if (id.equals(cId)) {
-                    break;
+                    return p;
                 }
             }
         }
-        return p;
+        return null;
     }
     
     /**
