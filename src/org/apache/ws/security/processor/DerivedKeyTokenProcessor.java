@@ -18,6 +18,7 @@
 package org.apache.ws.security.processor;
 
 import org.apache.ws.security.WSDocInfo;
+import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
@@ -30,8 +31,11 @@ import org.apache.ws.security.message.token.SecurityTokenReference;
 import org.apache.ws.security.util.Base64;
 import org.w3c.dom.Element;
 
+import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
+import javax.security.auth.callback.UnsupportedCallbackException;
 
+import java.io.IOException;
 import java.util.Vector;
 
 /**
@@ -58,7 +62,7 @@ public class DerivedKeyTokenProcessor implements Processor {
         //Deserialize the DKT
         DerivedKeyToken dkt = new DerivedKeyToken(elem);
         
-        this.extractSecret(wsDocInfo, dkt);
+        this.extractSecret(wsDocInfo, dkt, cb);
         
         String tempNonce = dkt.getNonce();
         if(tempNonce == null) {
@@ -106,13 +110,17 @@ public class DerivedKeyTokenProcessor implements Processor {
      * @param dkt
      * @throws WSSecurityException
      */
-    private void extractSecret(WSDocInfo wsDocInfo, DerivedKeyToken dkt)
+    private void extractSecret(WSDocInfo wsDocInfo, DerivedKeyToken dkt, CallbackHandler cb)
             throws WSSecurityException {
         SecurityTokenReference str = dkt.getSecuityTokenReference();
         if (str != null) {
             Reference ref = str.getReference();
             String uri = ref.getURI();
             Processor processor = wsDocInfo.getProcessor(uri.substring(1));
+            if(processor == null) {
+                //Now use the callback and get it
+                this.secret = this.getSecret(cb, uri.substring(1));
+            }
             if (processor instanceof EncryptedKeyProcessor) {
                 this.secret = ((EncryptedKeyProcessor) processor)
                         .getDecryptedBytes();
@@ -129,6 +137,30 @@ public class DerivedKeyTokenProcessor implements Processor {
         }
     }
 
+    private byte[] getSecret(CallbackHandler cb, String id)
+            throws WSSecurityException {
+
+        if (cb == null) {
+            throw new WSSecurityException(WSSecurityException.FAILURE,
+                    "noCallback");
+        }
+
+        WSPasswordCallback callback = new WSPasswordCallback(id, WSPasswordCallback.SECURITY_CONTEXT_TOKEN);
+        Callback[] callbacks = new Callback[1];
+        callbacks[0] = callback;
+        try {
+            cb.handle(callbacks);
+        } catch (IOException e) {
+            throw new WSSecurityException(WSSecurityException.FAILURE, "noKey",
+                    new Object[] { id });
+        } catch (UnsupportedCallbackException e) {
+            throw new WSSecurityException(WSSecurityException.FAILURE, "noKey",
+                    new Object[] { id });
+        }
+
+        return callback.getKey();
+    }
+    
     /**
      * Returns the wsu:Id of the DerivedKeyToken
      * @see org.apache.ws.security.processor.Processor#getId()
