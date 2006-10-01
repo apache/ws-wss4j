@@ -320,6 +320,8 @@ public class SignatureProcessor implements Processor {
                     principal.setLabel(dkt.getLabel());
                     principal.setLength(dkt.getLength());
                     principal.setOffset(dkt.getOffset());
+                    String basetokenId = dkt.getSecuityTokenReference().getReference().getURI().substring(1);
+                    principal.setBasetokenId(basetokenId);
                     return principal;
                 } else {
                     throw new WSSecurityException("Cannot determine principal");

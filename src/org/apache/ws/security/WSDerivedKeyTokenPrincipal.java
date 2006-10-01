@@ -33,6 +33,7 @@ public class WSDerivedKeyTokenPrincipal implements Principal {
     private String label;
     private int length;
     private int offset;
+    private String basetokenId;
     
     public String getLabel() {
         return label;
@@ -72,6 +73,14 @@ public class WSDerivedKeyTokenPrincipal implements Principal {
     
     public void setNonce(String nonce) {
         this.nonce = nonce;
+    }
+
+    public String getBasetokenId() {
+        return basetokenId;
+    }
+
+    public void setBasetokenId(String basetokenId) {
+        this.basetokenId = basetokenId;
     }
 
 }
