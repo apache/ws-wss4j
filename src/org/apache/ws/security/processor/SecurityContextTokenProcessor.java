@@ -16,9 +16,11 @@
 
 package org.apache.ws.security.processor;
 
+import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDocInfo;
 import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSConfig;
+import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.message.token.SecurityContextToken;
@@ -63,6 +65,8 @@ public class SecurityContextTokenProcessor implements Processor {
         this.identifier = sct.getIdentifier();
         this.secret = this.getSecret(cb, sct);
         this.sctId = sct.getID();
+        
+        returnResults.add(0, new WSSecurityEngineResult(WSConstants.SCT, sct));
     }
 
     /**

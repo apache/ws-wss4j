@@ -18,6 +18,7 @@
 
 package org.apache.ws.security;
 
+import org.apache.ws.security.message.token.SecurityContextToken;
 import org.apache.ws.security.message.token.SignatureConfirmation;
 import org.apache.ws.security.message.token.Timestamp;
 import org.opensaml.SAMLAssertion;
@@ -36,6 +37,7 @@ public class WSSecurityEngineResult {
     private X509Certificate cert;
     private SAMLAssertion assertion;
     private Timestamp timestamp;
+    private SecurityContextToken securityContextToken;
     private Set signedElements;
     private byte[] signatureValue = null;
     private SignatureConfirmation sigConf = null;
@@ -60,7 +62,12 @@ public class WSSecurityEngineResult {
         action = act;
         timestamp = tstamp;
     }
-
+    
+    public WSSecurityEngineResult(int act, SecurityContextToken sct) {
+        action = act;
+        this.securityContextToken = sct;
+    }
+    
     public WSSecurityEngineResult(int act, SignatureConfirmation sc) {
         action = act;
         sigConf = sc;
@@ -129,6 +136,10 @@ public class WSSecurityEngineResult {
      */
     public void setSignatureValue(byte[] signatureValue) {
         this.signatureValue = signatureValue;
+    }
+
+    public SecurityContextToken getSecurityContextToken() {
+        return securityContextToken;
     }
     
 }
