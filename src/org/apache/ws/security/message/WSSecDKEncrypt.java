@@ -75,8 +75,7 @@ public class WSSecDKEncrypt extends WSSecDerivedKeyBase {
         return doc;
     }
 
-    private Vector doEncryption(Document doc, byte[] secretKey,
-            KeyInfo keyInfo, Vector references) throws WSSecurityException {
+    private Vector doEncryption(Document doc, byte[] secretKey, Vector references) throws WSSecurityException {
 
         SecretKey key = WSSecurityUtil.prepareSecretKey(this.symEncAlgo, secretKey);
         
@@ -128,6 +127,15 @@ public class WSSecDKEncrypt extends WSSecDerivedKeyBase {
              * xenc:EncryptedData
              */
             try {
+                //Create the SecurityTokenRef to the DKT
+                KeyInfo keyInfo = new KeyInfo(document);
+                SecurityTokenReference secToken = new SecurityTokenReference(document);
+                Reference ref = new Reference(document);
+                ref.setURI("#" + dktId);
+                secToken.setReference(ref);
+
+                keyInfo.addUnknownElement(secToken.getElement());
+
                 xmlCipher.init(XMLCipher.ENCRYPT_MODE, key);
                 EncryptedData encData = xmlCipher.getEncryptedData();
                 encData.setId(xencEncryptedDataId);
@@ -172,16 +180,8 @@ public class WSSecDKEncrypt extends WSSecDerivedKeyBase {
     public Element encryptForExternalRef(Element dataRef, Vector references)
             throws WSSecurityException {
 
-        //Create the SecurityTokenRef to the DKT
-        KeyInfo keyInfo = new KeyInfo(document);
-        SecurityTokenReference secToken = new SecurityTokenReference(document);
-        Reference ref = new Reference(document);
-        ref.setURI("#" + dktId);
-        secToken.setReference(ref);
 
-        keyInfo.addUnknownElement(secToken.getElement());
-
-        Vector encDataRefs = doEncryption(document, derivedKeyBytes, keyInfo,
+        Vector encDataRefs = doEncryption(document, derivedKeyBytes,
                 references);
         Element referenceList = dataRef;
         if (referenceList == null) {
