@@ -100,6 +100,8 @@ public abstract class WSSecDerivedKeyBase extends WSSecBase {
     
     private int wscVersion = ConversationConstants.DEFAULT_VERSION;
     
+    protected int derivedKeyLength = -1;
+    
     /**
      * @param ephemeralKey The ephemeralKey to set.
      */
@@ -251,4 +253,7 @@ public abstract class WSSecDerivedKeyBase extends WSSecBase {
         return this.dkt.getElement();
     }
 
+    public void setDerivedKeyLength(int keyLength) {
+        this.derivedKeyLength = keyLength;
+    }
 }

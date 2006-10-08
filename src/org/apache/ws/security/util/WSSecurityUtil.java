@@ -18,10 +18,6 @@
 
 package org.apache.ws.security.util;
 
-import java.util.Set;
-import org.apache.ws.security.handler.WSHandlerResult;
-import java.util.Iterator;
-import java.security.cert.X509Certificate;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.SOAP11Constants;
@@ -31,11 +27,11 @@ import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.handler.WSHandlerConstants;
+import org.apache.ws.security.handler.WSHandlerResult;
 import org.apache.ws.security.message.token.BinarySecurity;
 import org.apache.ws.security.message.token.X509Security;
 import org.apache.xml.security.algorithms.JCEMapper;
 import org.apache.xml.security.signature.XMLSignature;
-import org.apache.ws.security.util.Base64;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -49,9 +45,12 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import javax.xml.namespace.QName;
+
 import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
 import java.security.SecureRandom;
+import java.security.cert.X509Certificate;
+import java.util.Iterator;
+import java.util.Set;
 import java.util.Vector;
 
 /**

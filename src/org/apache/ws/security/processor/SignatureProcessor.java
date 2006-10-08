@@ -201,7 +201,9 @@ public class SignatureProcessor implements Processor {
                     DerivedKeyTokenProcessor dktProcessor = (DerivedKeyTokenProcessor) wsDocInfo
                             .getProcessor(id);
                     String signatureMethodURI = sig.getSignedInfo().getSignatureMethodURI();
-                    int keyLength = WSSecurityUtil.getKeyLength(signatureMethodURI);
+                    int keyLength = (dkt.getLength() > 0) ? dkt.getLength() : 
+                        WSSecurityUtil.getKeyLength(signatureMethodURI);
+                    
                     secretKey = dktProcessor.getKeyBytes(keyLength);
                 } else {
                     if (crypto == null) {

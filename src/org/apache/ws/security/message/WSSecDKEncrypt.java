@@ -237,7 +237,8 @@ public class WSSecDKEncrypt extends WSSecDerivedKeyBase {
      * @see org.apache.ws.security.message.WSSecDerivedKeyBase#getDerivedKeyLength()
      */
     protected int getDerivedKeyLength() throws WSSecurityException{
-        return WSSecurityUtil.getKeyLength(this.symEncAlgo);
+        return (this.derivedKeyLength > 0) ? this.derivedKeyLength : 
+            WSSecurityUtil.getKeyLength(this.symEncAlgo);
     }
     
 }

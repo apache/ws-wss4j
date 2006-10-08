@@ -22,6 +22,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.message.token.SignatureConfirmation;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 /**
  * Builds a WS SignatureConfirmation and inserts it into the SOAP Envelope.
@@ -128,5 +129,16 @@ public class WSSecSignatureConfirmation extends WSSecBase {
     		return null;
     	}
         return sc.getID();
+    }
+    
+    /**
+     * Get the SignatureConfirmation element generated during 
+     * <code>prepare()</code>.
+     * 
+     * @return Return the SignatureConfirmation element or null if <code>prepare()</code>
+     * was not called before.
+     */
+    public Element getSignatureConfirmationElement() {
+        return (this.sc != null) ? this.sc.getElement() : null;
     }
 }

@@ -80,6 +80,7 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
     
     private WSDocInfo wsDocInfo;
 
+
     public Document build(Document doc, WSSecHeader secHeader)
             throws WSSecurityException, ConversationException {
         
@@ -432,13 +433,12 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
 
     }
     
-    
-    
     /**
      * @see org.apache.ws.security.message.WSSecDerivedKeyBase#getDerivedKeyLength()
      */
     protected int getDerivedKeyLength() throws WSSecurityException {
-        return WSSecurityUtil.getKeyLength(this.sigAlgo);
+        return (this.derivedKeyLength > 0) ? this.derivedKeyLength : 
+            WSSecurityUtil.getKeyLength(this.sigAlgo);
     }
     
     
