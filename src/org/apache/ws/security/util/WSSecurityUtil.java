@@ -513,7 +513,7 @@ public class WSSecurityUtil {
         String qName = localName;
         
         String prefix = parent.getPrefix();
-        if (prefix != null || prefix.length() > 0) {
+        if (prefix != null && prefix.length() > 0) {
             qName = prefix + ":" + localName;
         }
          
