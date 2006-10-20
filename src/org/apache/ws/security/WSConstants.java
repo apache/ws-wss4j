@@ -275,7 +275,7 @@ public class WSConstants {
      * In contrast to {@link #BST_DIRECT_REFERENCE} only the issuer name
      * and the serial number of the signiung certificate are sent to the
      * receiver. This reduces the amount of data being sent. The ecnryption
-     * method uses the private key associated with this certificate to encrypt
+     * method uses the public key associated with this certificate to encrypt
      * the symmetric key used to encrypt data.
      * <p/>
      * Please refer to WS Security specification X509 profile, chapter 3.3.3
@@ -286,7 +286,7 @@ public class WSConstants {
      * Sets the {@link org.apache.ws.security.message.WSEncryptBody#build(Document, Crypto) encryption}
      * method to send the certificate used to encrypt the symmetric key.
      * <p/>
-     * The encryption method uses the private key associated with this certificate
+     * The encryption method uses the public key associated with this certificate
      * to encrypr the symmetric key used to encrypt data. The certificate is
      * converted into a <code>KeyIdentfier</code> token and sent to the receiver.
      * Thus the complete certificate data is transfered to receiver.
