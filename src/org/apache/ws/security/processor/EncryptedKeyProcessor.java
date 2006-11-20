@@ -76,7 +76,9 @@ public class EncryptedKeyProcessor implements Processor {
         handleEncryptedKey((Element) elem, cb, decCrypto);
         encryptedKeyId = elem.getAttributeNS(null, "Id");
 
-        returnResults.add(0, new WSSecurityEngineResult(WSConstants.ENCR, null, null, null, null));
+        returnResults.add(0, new WSSecurityEngineResult(WSConstants.ENCR, 
+                                                        this.decryptedBytes, 
+                                                        this.encryptedKeyId));
     }
 
     public void handleEncryptedKey(Element xencEncryptedKey,

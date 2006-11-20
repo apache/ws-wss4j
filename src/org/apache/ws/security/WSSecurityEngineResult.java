@@ -41,6 +41,8 @@ public class WSSecurityEngineResult {
     private Set signedElements;
     private byte[] signatureValue = null;
     private SignatureConfirmation sigConf = null;
+    private byte[] decryptedKey = null;
+    private String encryptedKeyId = null;
 
     public WSSecurityEngineResult(int act, SAMLAssertion ass) {
         principal = null;
@@ -58,6 +60,12 @@ public class WSSecurityEngineResult {
         signatureValue = sv;
     }
 
+    public WSSecurityEngineResult(int act, byte[] decryptedKey, 
+            String encyptedKeyId) {
+        action = act;
+        this.decryptedKey = decryptedKey;
+        this.encryptedKeyId = encyptedKeyId;
+    }
     public WSSecurityEngineResult(int act, Timestamp tstamp) {
         action = act;
         timestamp = tstamp;
@@ -140,6 +148,14 @@ public class WSSecurityEngineResult {
 
     public SecurityContextToken getSecurityContextToken() {
         return securityContextToken;
+    }
+
+    public byte[] getDecryptedKey() {
+        return decryptedKey;
+    }
+
+    public String getEncryptedKeyId() {
+        return encryptedKeyId;
     }
     
 }

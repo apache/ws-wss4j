@@ -65,7 +65,7 @@ public class ReferenceListProcessor implements Processor {
 		wsDocInfo = wdi;
 		handleReferenceList((Element) elem, cb);
 		returnResults.add(0, new WSSecurityEngineResult(WSConstants.ENCR, null,
-				null, null, null));
+				null));
 	}
 
 	/**

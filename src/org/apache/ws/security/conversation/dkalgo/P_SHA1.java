@@ -62,8 +62,7 @@ public class P_SHA1
 
             return key;
         } catch (Exception ex) {
-            throw new ConversationException("Key Derivation : P_SHA-1: "
-                    + ex.getMessage());
+            throw new ConversationException("errorInKeyDerivation", null, ex);
         }
     }
     
