@@ -49,6 +49,7 @@ import javax.xml.namespace.QName;
 import java.io.IOException;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.Vector;
 
 public class EncryptedKeyProcessor implements Processor {
@@ -73,25 +74,26 @@ public class EncryptedKeyProcessor implements Processor {
             throw new WSSecurityException(WSSecurityException.FAILURE,
                     "noCallback");
         }
-        handleEncryptedKey((Element) elem, cb, decCrypto);
+        ArrayList dataRefUris = handleEncryptedKey((Element) elem, cb, decCrypto);
         encryptedKeyId = elem.getAttributeNS(null, "Id");
 
         returnResults.add(0, new WSSecurityEngineResult(WSConstants.ENCR, 
                                                         this.decryptedBytes, 
-                                                        this.encryptedKeyId));
+                                                        this.encryptedKeyId, 
+                                                        dataRefUris));
     }
 
-    public void handleEncryptedKey(Element xencEncryptedKey,
+    public ArrayList handleEncryptedKey(Element xencEncryptedKey,
                                    CallbackHandler cb, Crypto crypto) throws WSSecurityException {
-        handleEncryptedKey(xencEncryptedKey, cb, crypto, null);
+        return handleEncryptedKey(xencEncryptedKey, cb, crypto, null);
     }
 
-    public void handleEncryptedKey(Element xencEncryptedKey,
+    public ArrayList handleEncryptedKey(Element xencEncryptedKey,
                                    PrivateKey privatekey) throws WSSecurityException {
-        handleEncryptedKey(xencEncryptedKey, null, null, privatekey);
+        return handleEncryptedKey(xencEncryptedKey, null, null, privatekey);
     }
 
-    public void handleEncryptedKey(Element xencEncryptedKey,
+    public ArrayList handleEncryptedKey(Element xencEncryptedKey,
                                    CallbackHandler cb, Crypto crypto, PrivateKey privateKey)
             throws WSSecurityException {
         long t0 = 0, t1 = 0, t2 = 0;
@@ -316,6 +318,7 @@ public class EncryptedKeyProcessor implements Processor {
         String dataRefURI = null;
         Element refList = (Element) WSSecurityUtil.getDirectChild((Node) xencEncryptedKey,
                 "ReferenceList", WSConstants.ENC_NS);
+        ArrayList dataRefUris = new ArrayList();
         if (refList != null) {
             for (tmpE = refList.getFirstChild();
                  tmpE != null; tmpE = tmpE.getNextSibling()) {
@@ -328,8 +331,10 @@ public class EncryptedKeyProcessor implements Processor {
                 if (tmpE.getLocalName().equals("DataReference")) {
                     dataRefURI = ((Element) tmpE).getAttribute("URI");
                     decryptDataRef(doc, dataRefURI, decryptedBytes);
+                    dataRefUris.add(dataRefURI.substring(1));
                 }
             }
+            return dataRefUris;
         }
 
         if (tlog.isDebugEnabled()) {
@@ -338,7 +343,8 @@ public class EncryptedKeyProcessor implements Processor {
                     ", get-sym-key= " + (t1 - t0) +
                     ", decrypt= " + (t2 - t1));
         }
-        return;
+        
+        return null;
     }
 
     /**

@@ -25,6 +25,7 @@ import org.opensaml.SAMLAssertion;
 
 import java.security.Principal;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.Set;
 
 /**
@@ -43,6 +44,7 @@ public class WSSecurityEngineResult {
     private SignatureConfirmation sigConf = null;
     private byte[] decryptedKey = null;
     private String encryptedKeyId = null;
+    private ArrayList dataRefUris = null;
 
     public WSSecurityEngineResult(int act, SAMLAssertion ass) {
         principal = null;
@@ -61,11 +63,18 @@ public class WSSecurityEngineResult {
     }
 
     public WSSecurityEngineResult(int act, byte[] decryptedKey, 
-            String encyptedKeyId) {
+            String encyptedKeyId, ArrayList dataRefUris) {
         action = act;
         this.decryptedKey = decryptedKey;
         this.encryptedKeyId = encyptedKeyId;
+        this.dataRefUris = dataRefUris;
     }
+    
+    public WSSecurityEngineResult(int act, ArrayList dataRefUris) {
+        action = act;
+        this.dataRefUris = dataRefUris;
+    }
+    
     public WSSecurityEngineResult(int act, Timestamp tstamp) {
         action = act;
         timestamp = tstamp;
@@ -156,6 +165,10 @@ public class WSSecurityEngineResult {
 
     public String getEncryptedKeyId() {
         return encryptedKeyId;
+    }
+
+    public ArrayList getDataRefUris() {
+        return dataRefUris;
     }
     
 }

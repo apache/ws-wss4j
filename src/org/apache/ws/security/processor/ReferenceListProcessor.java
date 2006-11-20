@@ -17,6 +17,7 @@
 
 package org.apache.ws.security.processor;
 
+import java.util.ArrayList;
 import java.util.Vector;
 
 import javax.crypto.SecretKey;
@@ -63,9 +64,8 @@ public class ReferenceListProcessor implements Processor {
 		}
 		wssConfig = wsc;
 		wsDocInfo = wdi;
-		handleReferenceList((Element) elem, cb);
-		returnResults.add(0, new WSSecurityEngineResult(WSConstants.ENCR, null,
-				null));
+		ArrayList uris = handleReferenceList((Element) elem, cb);
+		returnResults.add(0, new WSSecurityEngineResult(WSConstants.ENCR, uris));
 	}
 
 	/**
@@ -78,12 +78,13 @@ public class ReferenceListProcessor implements Processor {
 	 *            the callback handler to get the key for a key name stored if
 	 *            <code>KeyInfo</code> inside the encrypted data elements
 	 */
-	private void handleReferenceList(Element elem, CallbackHandler cb)
+	private ArrayList handleReferenceList(Element elem, CallbackHandler cb)
 			throws WSSecurityException {
 
 		Document doc = elem.getOwnerDocument();
 
 		Node tmpE = null;
+        ArrayList dataRefUris = new ArrayList();
 		for (tmpE = elem.getFirstChild(); tmpE != null; tmpE = tmpE
 				.getNextSibling()) {
 			if (tmpE.getNodeType() != Node.ELEMENT_NODE) {
@@ -95,8 +96,10 @@ public class ReferenceListProcessor implements Processor {
 			if (tmpE.getLocalName().equals("DataReference")) {
 				String dataRefURI = ((Element) tmpE).getAttribute("URI");
 				decryptDataRefEmbedded(doc, dataRefURI, cb);
+                dataRefUris.add(dataRefURI.substring(1));
 			}
 		}
+        return dataRefUris;
 	}
 
 	public void decryptDataRefEmbedded(Document doc, String dataRefURI,
