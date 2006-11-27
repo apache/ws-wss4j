@@ -30,22 +30,16 @@ import org.apache.xml.security.c14n.CanonicalizationException;
 import org.apache.xml.security.c14n.Canonicalizer;
 import org.apache.xml.security.c14n.InvalidCanonicalizerException;
 import org.apache.xml.security.signature.XMLSignatureInput;
-import org.apache.xml.security.transforms.Transform;
 import org.apache.xml.security.transforms.TransformSpi;
-import org.apache.xml.security.transforms.TransformationException;
 import org.apache.ws.security.util.Base64;
 import org.apache.xml.security.utils.XMLUtils;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Text;
-import org.xml.sax.SAXException;
-
-import javax.xml.parsers.ParserConfigurationException;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 
@@ -94,10 +88,17 @@ public class STRTransform extends TransformSpi {
     protected String engineGetURI() {
         return STRTransform.implementedTransformURI;
     }
-    
-    
 
-    protected XMLSignatureInput enginePerformTransform(XMLSignatureInput input, OutputStream os, Transform _transformObject) throws IOException, CanonicalizationException, InvalidCanonicalizerException, TransformationException, ParserConfigurationException, SAXException {
+    /**
+     * Method enginePerformTransform
+     * 
+     * @param input
+     * @throws CanonicalizationException
+     * @throws InvalidCanonicalizerException
+     */
+    protected XMLSignatureInput enginePerformTransform(XMLSignatureInput input)
+            throws IOException, CanonicalizationException,
+            InvalidCanonicalizerException {
 
         doDebug = log.isDebugEnabled();
 
@@ -110,7 +111,7 @@ public class STRTransform extends TransformSpi {
             /*
              * Get the main document, that is the complete SOAP request document
              */
-            Document thisDoc = _transformObject.getDocument();
+            Document thisDoc = this._transformObject.getDocument();
             int docHash = thisDoc.hashCode();
             if (doDebug) {
                 log.debug("doc: " + thisDoc.toString() + ", " + docHash);
@@ -138,9 +139,9 @@ public class STRTransform extends TransformSpi {
              */
 
             String canonAlgo = null;
-            if (_transformObject.length(WSConstants.WSSE_NS,
+            if (this._transformObject.length(WSConstants.WSSE_NS,
                     "TransformationParameters") == 1) {
-                Element tmpE = XMLUtils.selectNode(_transformObject
+                Element tmpE = XMLUtils.selectNode(this._transformObject
                         .getElement().getFirstChild(), WSConstants.WSSE_NS,
                         "TransformationParameters", 0);
                 Element canonElem = (Element) WSSecurityUtil.getDirectChild(
