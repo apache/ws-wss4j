@@ -59,6 +59,10 @@ public class BouncyCastle extends AbstractCrypto {
         super(properties);
     }
 
+    public BouncyCastle(Properties properties, ClassLoader loader) throws CredentialException, IOException {
+    	super(properties,loader);
+    }
+
     /**
      * Construct an array of X509Certificate's from the byte array.
      * <p/>
