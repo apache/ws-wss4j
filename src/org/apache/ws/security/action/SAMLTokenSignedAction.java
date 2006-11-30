@@ -80,6 +80,17 @@ public class SAMLTokenSignedAction implements Action {
         if (reqData.getSigKeyId() != 0) {
             wsSign.setKeyIdentifierType(reqData.getSigKeyId());
         }
+
+         /*
+         * required to add support for the 
+         * signatureParts parameter.
+         * If not set WSSecSignatureSAML
+         * defaults to only sign the body.
+         */
+        if (reqData.getSignatureParts().size() > 0) {
+            wsSign.setParts(reqData.getSignatureParts());
+        }
+
         try {
             wsSign.build(
                     doc,
