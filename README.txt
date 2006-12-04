@@ -87,7 +87,7 @@ about the certificate keystores you use. The property files and the keystore
 are accessed either as resources via classpath or, if that fails, as files
 using the relative path of the application
 
-Thus no specific installation is required. The wss4j-1.5.0.jar file could be 
+Thus no specific installation is required. The wss4j-1.5.1.jar file could be 
 included into ear or war files of enterprise or web application servers.
 
 Please refer to the JAVADOC files of the distribution for further 
