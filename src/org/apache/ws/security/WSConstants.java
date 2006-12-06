@@ -31,14 +31,14 @@ public class WSConstants {
      * At first the WSS namespaces as per WSS specifications
      */
     public static final String WSSE_NS = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd";
-    public static final String WSSE11_NS = "http://docs.oasis-open.org/wss/2005/xx/oasis-2005xx-wss-wssecurity-secext-1.1.xsd";
+    public static final String WSSE11_NS = "http://docs.oasis-open.org/wss/oasis-wss-wssecurity-secext-1.1.xsd";
     public static final String WSU_NS = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd";
     
     /*
      * The base UIRs for the various profiles.
      */
     public static final String SOAPMESSAGE_NS = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0";
-    public static final String SOAPMESSAGE_NS11 = "http://docs.oasis-open.org/wss/2004/xx/oasis-2004xx-wss-soap-message-security-1.0";
+    public static final String SOAPMESSAGE_NS11 = "http://docs.oasis-open.org/wss/oasis-wss-soap-message-security-1.1";
     public static final String USERNAMETOKEN_NS = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0";
     public static final String X509TOKEN_NS = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0";
     public static final String SAMLTOKEN_NS = "http://docs.oasis-open.org/wss/oasis-wss-saml-token-profile-1.0";
