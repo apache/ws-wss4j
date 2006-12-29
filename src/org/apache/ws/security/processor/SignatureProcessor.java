@@ -284,7 +284,6 @@ public class SignatureProcessor implements Processor {
                      */
                 SignedInfo si = sig.getSignedInfo();
                 int numReferences = si.getLength();
-                Vector qvec = new Vector(numReferences);
                 for (int i = 0; i < numReferences; i++) {
                     Reference siRef;
                     try {
@@ -294,16 +293,24 @@ public class SignatureProcessor implements Processor {
                                 WSSecurityException.FAILED_CHECK);
                     }
                     String uri = siRef.getURI();
-                    Element se = WSSecurityUtil.getElementByWsuId(elem.getOwnerDocument(), uri);
-                    if (se == null) {
-                        se = WSSecurityUtil.getElementByGenId(elem
-                                .getOwnerDocument(), uri);
+                    if(uri != null && !"".equals(uri)) {
+                        Element se = WSSecurityUtil.getElementByWsuId(elem.getOwnerDocument(), uri);
+                        if (se == null) {
+                            se = WSSecurityUtil.getElementByGenId(elem
+                                    .getOwnerDocument(), uri);
+                        }
+                        if (se == null) {
+                            throw new WSSecurityException(
+                                    WSSecurityException.FAILED_CHECK);
+                        }
+                        returnElements.add(WSSecurityUtil.getIDfromReference(uri));
+                    } else {
+                       //This is the case where the signed element is identified 
+                       //by a transform such as XPath filtering
+                       //We add the complete reference element to the return 
+                       //elements
+                       returnElements.add(siRef); 
                     }
-                    if (se == null) {
-                        throw new WSSecurityException(
-                                WSSecurityException.FAILED_CHECK);
-                    }
-                    returnElements.add(WSSecurityUtil.getIDfromReference(uri));                    
                 }
                 
                 if (certs != null) {

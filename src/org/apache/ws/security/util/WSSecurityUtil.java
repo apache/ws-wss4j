@@ -860,6 +860,11 @@ public class WSSecurityUtil {
      * Search through a WSS4J results vector for a single signature covering all
      * these elements.
      * 
+     * NOTE: it is important that the given elements are those that are 
+     * referenced using wsu:Id. When the signed element is referenced using a
+     * transformation such as XPath filtering the validation is carried out 
+     * in signature verification itself.
+     * 
      * @param results
      *            results (e.g., as stored as WSHandlerConstants.RECV_RESULTS on
      *            an Axis MessageContext)
@@ -948,20 +953,25 @@ public class WSSecurityUtil {
         if (resultItem.getAction() != WSConstants.SIGN)
             throw new IllegalArgumentException("Not a SIGN result");
 
-        Set signedIDs = resultItem.getSignedElements();
-        if (signedIDs == null)
+        Set sigElems = resultItem.getSignedElements();
+        if (sigElems == null)
             throw new RuntimeException(
                     "Missing signedElements set in WSSecurityEngineResult!");
 
         log.debug("Found SIGN result...");
-        for (Iterator i = signedIDs.iterator(); i.hasNext();) {
-            String e = (String) i.next();
-            log.debug("Signature includes element with ID " + e);
+        for (Iterator i = sigElems.iterator(); i.hasNext();) {
+            Object sigElement = i.next();
+            if(sigElement instanceof String) {
+                log.debug("Signature includes element with ID " + sigElement);
+            } else {
+                log.debug("Signature includes element with null uri " + 
+                        sigElement.toString());
+            }
         }
 
         log.debug("Checking required elements are in the signature...");
         for (int i = 0; i < requiredIDs.length; i++) {
-            if (!signedIDs.contains(requiredIDs[i])) {
+            if (!sigElems.contains(requiredIDs[i])) {
                 throw new WSSecurityException(WSSecurityException.FAILED_CHECK,
                         "requiredElementNotSigned",
                         new Object[] { requiredIDs[i] });
