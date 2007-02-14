@@ -217,7 +217,8 @@
         <bcprov.jdk15.version>132</bcprov.jdk15.version>
         <commons.logging.version>1.1</commons.logging.version>
         <xalan.version>2.7.0</xalan.version>
-        <xerces.version>2.8.1</xerces.version>        
+        <xerces.version>2.8.1</xerces.version>      
+        <axis.version>1.4</axis.version>
     </properties>
     <repositories>
 		<repository>
@@ -310,13 +311,9 @@
             <dependency>
                 <groupId>axis</groupId>
                 <artifactId>axis</artifactId>
-                <version>1.4</version>
+                <version>${axis.version}</version>
+                <scope>provided</scope>
             </dependency>
-        <dependency>
-            <groupId>org.apache.neethi</groupId>
-            <artifactId>neethi</artifactId>
-            <version>2.0</version>
-        </dependency>
         <dependency>
             <groupId>xalan</groupId>
             <artifactId>xalan</artifactId>
