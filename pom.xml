@@ -90,9 +90,7 @@
     </organization>
     <build>
         <sourceDirectory>src</sourceDirectory>
-        <!-- FIXME
-        <testSourceDirectory>test</testSourceDirectory>
-        -->
+        <!--<testSourceDirectory>test</testSourceDirectory> -->
         <plugins>
             <plugin>
                 <artifactId>maven-antrun-plugin</artifactId>
@@ -115,6 +113,43 @@
                             <goal>run</goal>
                         </goals>
                     </execution>
+<!--                    <execution>
+                        <id>settingUpInteropTests</id>
+                        <phase>generate-resources</phase>
+                        <configuration>
+                            <tasks>
+								
+							  <mkdir dir="target/work"/>
+							  <axis-wsdl2java
+								  output="target/work"
+								  serverSide="yes"
+								  testcase="no"
+								  verbose="no"
+								  url="interop/ping.wsdl">
+								  <mapping
+									  namespace="http://xmlsoap.org/Ping"
+									  package="org.apache.ws.axis.oasis.ping"/>
+							  </axis-wsdl2java>
+							  
+								<echo message="Starting http server."/>
+                            </tasks>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+					<execution>
+                        <id>stopServer</id>
+                        <phase>install</phase>
+                        <configuration>
+                            <tasks>
+								<echo message="Stopping http server."/>
+                            </tasks>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution> -->
                 </executions>
             </plugin>
             <plugin>
@@ -145,7 +180,8 @@
                     <target>1.3</target>
                 </configuration>
             </plugin>
-            <!-- FIXME: <plugin>
+
+			<!--<plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <includes>
@@ -155,7 +191,8 @@
                         <exclude>tests/w3c/SchemaTest.java</exclude>
                     </excludes>
                 </configuration>
-            </plugin>-->
+            </plugin> -->
+			
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <configuration>
@@ -208,6 +245,35 @@
                 </plugins>
             </build>
         </profile>
+        <profile>
+            <id>jdk14</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+                <jdk>1.4</jdk>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>bouncycastle</groupId>
+                    <artifactId>bcprov-jdk13</artifactId>
+                    <version>${bcprov.jdk13.version}</version>
+                </dependency>
+            </dependencies>
+        </profile>
+
+        <profile>
+            <id>jdk15</id>
+            <activation>
+                <jdk>1.5</jdk>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>bouncycastle</groupId>
+                    <artifactId>bcprov-jdk15</artifactId>
+                    <version>${bcprov.jdk15.version}</version>
+                </dependency>
+            </dependencies>
+        </profile>
+
     </profiles>
    <properties>
         <xmlsec.version>1.3.0</xmlsec.version>
@@ -219,6 +285,7 @@
         <xalan.version>2.7.0</xalan.version>
         <xerces.version>2.8.1</xerces.version>      
         <axis.version>1.4</axis.version>
+        <junit.version>3.8.1</junit.version>
     </properties>
     <repositories>
 		<repository>
@@ -308,12 +375,17 @@
             <artifactId>opensaml</artifactId>
             <version>${opensaml.version}</version>
         </dependency>
-            <dependency>
-                <groupId>axis</groupId>
-                <artifactId>axis</artifactId>
-                <version>${axis.version}</version>
-                <scope>provided</scope>
-            </dependency>
+		<dependency>
+			<groupId>axis</groupId>
+			<artifactId>axis</artifactId>
+			<version>${axis.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>axis</groupId>
+			<artifactId>axis-ant</artifactId>
+			<version>${axis.version}</version>
+		</dependency>
         <dependency>
             <groupId>xalan</groupId>
             <artifactId>xalan</artifactId>
@@ -329,7 +401,13 @@
 			<artifactId>xml-apis</artifactId>
 				<version>${xml.apis.version}</version>
 		</dependency>
+		<dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>${junit.version}</version>
+        </dependency>
     </dependencies>
+	
     <reporting>
         <plugins>
             <!--plugin>
