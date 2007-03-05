@@ -197,7 +197,8 @@ public class WSSecEncryptedKey extends WSSecBase {
             log.debug("cipher blksize: " + cipher.getBlockSize()
                     + ", symm key length: " + keyBytes.length);
         }
-        if (cipher.getBlockSize() < keyBytes.length) {
+        int blockSize = cipher.getBlockSize();
+        if (blockSize > 0 && blockSize < keyBytes.length) {
             throw new WSSecurityException(WSSecurityException.FAILURE,
                     "unsupportedKeyTransp",
                     new Object[] { "public key algorithm too weak to encrypt "
