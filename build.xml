@@ -342,7 +342,7 @@ org.apache.ws.axis.security.util
 
     <target name="compile.library" depends="prepare-src">
         <!-- Compile the java code from ${dir.src} into ${build.classes} -->
-        <javac srcdir="${dir.src}" destdir="${build.classes}" debug="on">
+        <javac srcdir="${dir.src}" destdir="${build.classes}" debug="on" source="1.3" target="1.3">
             <classpath refid="classpath.library"/>
             <exclude name="**/Merlin.java" unless="merlin.ok"/>
             <exclude name="**/sandbox/**/*.java" if="jdk13.present" />
@@ -360,14 +360,14 @@ org.apache.ws.axis.security.util
         depends="compile.interops"
         if="junit.present">
 
-        <javac srcdir="${dir.test}" destdir="${build.classes}" debug="on">
+        <javac srcdir="${dir.test}" destdir="${build.classes}" debug="on" source="1.3" target="1.3">
             <classpath refid="classpath.test"/>
 <!--            <exclude name="**/secconv/**/*.java"/> -->
         </javac>
 
         <mkdir dir="${build.work}"/>
 
-        <javac srcdir="${build.work}" destdir="${build.classes}" debug="on">
+        <javac srcdir="${build.work}" destdir="${build.classes}" debug="on" source="1.3" target="1.3">
             <classpath refid="classpath.test"/>
         </javac>
 
@@ -386,7 +386,7 @@ org.apache.ws.axis.security.util
         <javac srcdir="${dir.samples}"
             debug="on"
             source="1.4"
-            destdir="${build.classes}">
+            destdir="${build.classes}" target="1.4">
             <classpath refid="classpath.library"/>
         </javac>
         <copy todir="${build.classes}">
