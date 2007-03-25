@@ -100,11 +100,11 @@ public class UsernameTokenProcessor implements Processor {
             } catch (IOException e) {
                 throw new WSSecurityException(WSSecurityException.FAILURE,
                         "noPassword",
-                        new Object[]{user});
+                        new Object[]{user}, e);
             } catch (UnsupportedCallbackException e) {
                 throw new WSSecurityException(WSSecurityException.FAILURE,
                         "noPassword",
-                        new Object[]{user});
+                        new Object[]{user}, e);
             }
             String origPassword = pwCb.getPassword();
             if (log.isDebugEnabled()) {

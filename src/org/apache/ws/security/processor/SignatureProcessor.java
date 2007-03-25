@@ -73,11 +73,12 @@ public class SignatureProcessor implements Processor {
         WSDocInfoStore.store(wsDocInfo);
         X509Certificate[] returnCert = new X509Certificate[1];
         Set returnElements = new HashSet();
+        Set protectedElements = new java.util.TreeSet();
         byte[][] signatureValue = new byte[1][];
         Principal lastPrincipalFound = null;
         try {
             lastPrincipalFound = verifyXMLSignature((Element) elem,
-                    crypto, returnCert, returnElements, signatureValue);
+                    crypto, returnCert, returnElements, protectedElements, signatureValue);
         } catch (WSSecurityException ex) {
             throw ex;
         } finally {
@@ -86,12 +87,12 @@ public class SignatureProcessor implements Processor {
         if (lastPrincipalFound instanceof WSUsernameTokenPrincipal) {
             returnResults.add(0, new WSSecurityEngineResult(
                     WSConstants.UT_SIGN, lastPrincipalFound, null,
-                    returnElements, signatureValue[0]));
+                    returnElements, protectedElements, signatureValue[0]));
 
         } else {
             returnResults.add(0, new WSSecurityEngineResult(
                     WSConstants.SIGN, lastPrincipalFound,
-                    returnCert[0], returnElements, signatureValue[0]));
+                    returnCert[0], returnElements, protectedElements, signatureValue[0]));
         }
         signatureId = elem.getAttributeNS(null, "Id");
     }
@@ -137,6 +138,7 @@ public class SignatureProcessor implements Processor {
                                            Crypto crypto,
                                            X509Certificate[] returnCert,
                                            Set returnElements,
+                                           Set protectedElements,
                                            byte[][] signatureValue)
             throws WSSecurityException {
         if (log.isDebugEnabled()) {

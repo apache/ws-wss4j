@@ -26,149 +26,323 @@ import org.opensaml.SAMLAssertion;
 import java.security.Principal;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 /**
  * @author Werner Dittmann (Werner.Dittmann@t-online.de)
  */
-public class WSSecurityEngineResult {
+public class WSSecurityEngineResult extends java.util.HashMap {
 
-    private int action;
-    private Principal principal;
-    private X509Certificate cert;
-    private SAMLAssertion assertion;
-    private Timestamp timestamp;
-    private SecurityContextToken securityContextToken;
-    private Set signedElements;
-    private byte[] signatureValue = null;
-    private SignatureConfirmation sigConf = null;
-    private byte[] decryptedKey = null;
-    private String encryptedKeyId = null;
-    private ArrayList dataRefUris = null;
+    /**
+     * Tag denoting the cryptographic operation performed
+     *
+     * The value under this tag is of type java.lang.Integer
+     */
+    public static final java.lang.String TAG_ACTION =
+        "action";
 
-    public WSSecurityEngineResult(int act, SAMLAssertion ass) {
-        principal = null;
-        cert = null;
-        action = act;
-        assertion = ass;
+    /**
+     * Tag denoting the security principal found, if applicable.
+     *
+     * The value under this tag is of type java.security.Principal.
+     */
+    public static final java.lang.String TAG_PRINCIPAL =
+        "principal";
+
+    /**
+     * Tag denoting the X.509 certificate found, if applicable.
+     *
+     * The value under this tag is of type java.security.cert.X509Certificate.
+     */
+    public static final java.lang.String TAG_X509_CERTIFICATE =
+        "x509-certificate";
+
+    /**
+     * Tag denoting the SAML Assertion found, if applicable.
+     *
+     * The value under this tag is of type org.opensaml.SAMLAssertion.
+     */
+    public static final java.lang.String TAG_SAML_ASSERTION =
+        "saml-assertion";
+
+    /**
+     * Tag denoting the timestamp found, if applicable.
+     *
+     * The value under this tag is of type
+     * org.apache.ws.security.message.token.Timestamp.
+     */
+    public static final java.lang.String TAG_TIMESTAMP =
+        "timestamp";
+
+    /**
+     * Tag denoting the wsu:Ids of signed elements, if applicable.
+     *
+     * The value under this tag is of type java.util.Set, where
+     * each element of the set is of type java.lang.String.
+     */
+    public static final java.lang.String TAG_SIGNED_ELEMENT_IDS =
+        "signed-element-ids";
+
+    /**
+     * Tag denoting the signature value of a signed element, if applicable.
+     *
+     * The value under this tag is of type byte[].
+     */
+    public static final java.lang.String TAG_SIGNATURE_VALUE =
+        "signature-value";
+
+    /**
+     * Tag denoting the signature confirmation of a signed element,
+     * if applicable.
+     *
+     * The value under this tag is of type
+     * org.apache.ws.security.message.token.SignatureConfirmation.
+     */
+    public static final java.lang.String TAG_SIGNATURE_CONFIRMATION =
+        "signature-confirmation";
+
+    /**
+     * Tag denoting references to the DOM elements that have been
+     * cryptographically protected.
+     *
+     * The value under this tag is of type java.util.Set, where
+     * each element in the set is of type org.w3c.dom.Element.
+     */
+    public static final java.lang.String TAG_PROTECTED_ELEMENTS =
+        "protected-elements";
+
+    /**
+     * Tag denoting references to the DOM elements that have been
+     * cryptographically protected.
+     *
+     * The value under this tag is of type SecurityContextToken.
+     */
+    public static final java.lang.String TAG_SECURITY_CONTEXT_TOKEN =
+        "security-context-token";
+
+    /**
+     * Tag denoting a reference to the decrypted key
+     *
+     * The value under this tag is of type byte[].
+     */
+    public static final java.lang.String TAG_DECRYPTED_KEY =
+        "decrypted-key";
+
+    /**
+     * Tag denoting references to the encrypted key id.
+     *
+     * The value under this tag is of type String.
+     */
+    public static final java.lang.String TAG_ENCRYPTED_KEY_ID =
+        "encrypted-key-id";
+
+    /**
+     * Tag denoting references to a List of Data ref URIs.
+     *
+     * The value under this tag is of type List.
+     */
+    public static final java.lang.String TAG_DATA_REF_URIS =
+        "data-ref-uris";
+
+
+
+    public WSSecurityEngineResult(
+        int act, 
+        SAMLAssertion ass
+    ) {
+        put(TAG_ACTION, new Integer(act));
+        put(TAG_SAML_ASSERTION, ass);
     }
 
-    public WSSecurityEngineResult(int act, Principal princ,
-            X509Certificate certificate, Set elements, byte[] sv) {
-        principal = princ;
-        action = act;
-        cert = certificate;
-        signedElements = elements;
-        signatureValue = sv;
+    public WSSecurityEngineResult(
+        int act, 
+        Principal princ,
+        X509Certificate certificate, 
+        Set elements, 
+        byte[] sv
+    ) {
+        put(TAG_ACTION, new Integer(act));
+        put(TAG_PRINCIPAL, princ);
+        put(TAG_X509_CERTIFICATE, certificate);
+        put(TAG_SIGNED_ELEMENT_IDS, elements);
+        put(TAG_SIGNATURE_VALUE, sv);
     }
 
-    public WSSecurityEngineResult(int act, byte[] decryptedKey, 
-            String encyptedKeyId, ArrayList dataRefUris) {
-        action = act;
-        this.decryptedKey = decryptedKey;
-        this.encryptedKeyId = encyptedKeyId;
-        this.dataRefUris = dataRefUris;
+    public
+    WSSecurityEngineResult(
+        int act,
+        Principal princ,
+        X509Certificate certificate,
+        Set elements,
+        Set protectedElements,
+        byte[] sv
+    ) {
+        this(act, princ, certificate, elements, sv);
+        put(TAG_PROTECTED_ELEMENTS, protectedElements);
+    }
+
+    public WSSecurityEngineResult(
+        int act, 
+        byte[] decryptedKey, 
+        String encyptedKeyId, 
+        List dataRefUris
+    ) {
+        put(TAG_ACTION, new Integer(act));
+        put(TAG_DECRYPTED_KEY, decryptedKey);
+        put(TAG_ENCRYPTED_KEY_ID, encyptedKeyId);
+        put(TAG_DATA_REF_URIS, dataRefUris);
     }
     
     public WSSecurityEngineResult(int act, ArrayList dataRefUris) {
-        action = act;
-        this.dataRefUris = dataRefUris;
+        put(TAG_ACTION, new Integer(act));
+        put(TAG_DATA_REF_URIS, dataRefUris);
     }
     
     public WSSecurityEngineResult(int act, Timestamp tstamp) {
-        action = act;
-        timestamp = tstamp;
+        put(TAG_ACTION, new Integer(act));
+        put(TAG_TIMESTAMP, tstamp);
     }
     
     public WSSecurityEngineResult(int act, SecurityContextToken sct) {
-        action = act;
-        this.securityContextToken = sct;
+        put(TAG_ACTION, new Integer(act));
+        put(TAG_SECURITY_CONTEXT_TOKEN, sct);
     }
     
     public WSSecurityEngineResult(int act, SignatureConfirmation sc) {
-        action = act;
-        sigConf = sc;
+        put(TAG_ACTION, new Integer(act));
+        put(TAG_SIGNATURE_CONFIRMATION, sc);
     }
+
     /**
      * @return the actions vector. These actions were performed by the the
      *         security engine.
+     *
+     * @deprecated      use ((java.lang.Integer) #get(#TAG_ACTION)).intValue() 
+     *                  instead
      */
     public int getAction() {
-        return action;
+        return ((java.lang.Integer) get(TAG_ACTION)).intValue();
     }
 
     /**
      * @return the principals found if UsernameToken or Signature
      *         processing were done
+     *
+     * @deprecated      use (Principal) #get(#TAG_PRINCIPAL) instead
      */
     public Principal getPrincipal() {
-        return principal;
+        return (Principal) get(TAG_PRINCIPAL);
     }
 
     /**
      * @return the Certificate found if Signature
      *         processing were done
+     *
+     * @deprecated      use (X509Certificate)
+     *                  #get(#TAG_X509_CERTIFICATE) instead
      */
     public X509Certificate getCertificate() {
-        return cert;
+        return (X509Certificate) get(TAG_X509_CERTIFICATE);
     }
 
     /**
      * @return Returns the assertion.
+     *
+     * @deprecated      use (SAMLAssertion)
+     *                  #get(#TAG_SAML_ASSERTION) instead
      */
     public SAMLAssertion getAssertion() {
-        return assertion;
+        return (SAMLAssertion) get(TAG_SAML_ASSERTION);
     }
 
     /**
      * @return the timestamp found
+     *
+     * @deprecated      use (Timestamp)
+     *                  #get(#TAG_TIMESTAMP) instead
      */
     public Timestamp getTimestamp() {
-        return timestamp;
+        return (Timestamp) get(TAG_TIMESTAMP);
     }
 
     /**
      * @return Returns the signedElements.
+     *
+     * @deprecated      use (java.util.Set)
+     *                  #get(#TAG_SIGNED_ELEMENT_IDS) instead
      */
     public Set getSignedElements() {
-        return signedElements;
+        return (java.util.Set) get(TAG_SIGNED_ELEMENT_IDS);
     }
 
     /**
      * @return Returns the signatureValue.
+     *
+     * @deprecated      use (byte[])
+     *                  #get(#TAG_SIGNATURE_VALUE) instead
      */
     public byte[] getSignatureValue() {
-        return signatureValue;
+        return (byte[]) get(TAG_SIGNATURE_VALUE);
     }
 
     /**
      * @return Returns the sigConf.
+     *
+     * @deprecated      use (SignatureConfirmation)
+     *                  #get(#TAG_SIGNATURE_CONFIRMATION) instead
      */
     public SignatureConfirmation getSigConf() {
-        return sigConf;
+        return (SignatureConfirmation) get(TAG_SIGNATURE_CONFIRMATION);
     }
 
     /**
      * @param signatureValue The signatureValue to set.
+     *
+     * @deprecated      use put(#TAG_SIGNATURE_VALUE, signatureValue) instead
      */
     public void setSignatureValue(byte[] signatureValue) {
-        this.signatureValue = signatureValue;
+        put(TAG_SIGNATURE_VALUE, signatureValue);
     }
 
+    /**
+     * @return          the security context token acquired off the message
+     *
+     * @deprecated      use
+     *                  #get(#TAG_SECURITY_CONTEXT_TOKEN) instead
+     */
     public SecurityContextToken getSecurityContextToken() {
-        return securityContextToken;
+        return (SecurityContextToken) get(TAG_SECURITY_CONTEXT_TOKEN);
     }
 
+    /**
+     * @return          the decrypted key
+     *
+     * @deprecated      use
+     *                  #get(#TAG_DECRYPTED_KEY) instead
+     */
     public byte[] getDecryptedKey() {
-        return decryptedKey;
+        return (byte[]) get(TAG_DECRYPTED_KEY);
     }
 
+    /**
+     * @return          the encrypted key id
+     *
+     * @deprecated      use
+     *                  #get(#TAG_ENCRYPTED_KEY) instead
+     */
     public String getEncryptedKeyId() {
-        return encryptedKeyId;
+        return (String) get(TAG_ENCRYPTED_KEY_ID);
     }
 
+    /**
+     * @return          the list of data ref URIs
+     *
+     * @deprecated      use
+     *                  #get(#TAG_DATA_REF_URIS) instead
+     */
     public ArrayList getDataRefUris() {
-        return dataRefUris;
+        return (ArrayList) get(TAG_DATA_REF_URIS);
     }
     
 }
