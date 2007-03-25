@@ -274,7 +274,7 @@ public class WSConstants {
      * <p/>
      * In contrast to {@link #BST_DIRECT_REFERENCE} only the issuer name
      * and the serial number of the signiung certificate are sent to the
-     * receiver. This reduces the amount of data being sent. The ecnryption
+     * receiver. This reduces the amount of data being sent. The encryption
      * method uses the public key associated with this certificate to encrypt
      * the symmetric key used to encrypt data.
      * <p/>
