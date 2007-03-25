@@ -23,6 +23,7 @@ import org.apache.ws.security.util.Loader;
 
 import java.lang.reflect.Constructor;
 import java.net.URL;
+import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -105,9 +106,31 @@ public abstract class CryptoFactory {
      * @param properties      The Properties that are forwarded to the crypto implementaion.
      *                        These properties are dependend on the crypto implementatin
      * @return The cyrpto implementation or null if no cryptoClassName was defined
+     *
+     * @deprecated            use @link{#getInstance(java.lang.String, java.util.Map)} instead.
      */
     public static Crypto getInstance(String cryptoClassName, Properties properties) {
         return loadClass(cryptoClassName, properties);
+    }
+    
+    /**
+     * getInstance
+     * <p/>
+     * Returns an instance of Crypto. The supplied map is handed over the the crypto
+     * implementation. The map can be <code>null</code>. It is depenend on the
+     * Crypto implementation how the initialization is done in this case.
+     * <p/>
+     *
+     * @param cryptoClassName This is the crypto implementation class. No default is
+     *                        provided here.
+     * @param map             The Maps that is forwarded to the crypto implementaion.
+     *                        These contents of the map are dependent on the 
+     *                        underlying crypto implementation specified in the 
+     *                        cryptoClassName parameter.
+     * @return The cyrpto implementation or null if no cryptoClassName was defined
+     */
+    public static Crypto getInstance(String cryptoClassName, Map map) {
+        return loadClass(cryptoClassName, map);
     }
 
     /**
@@ -153,8 +176,8 @@ public abstract class CryptoFactory {
         return loadClass(cryptoClassName, properties,customClassLoader);
     }
 
-    private static Crypto loadClass(String cryptoClassName, Properties properties) {
-    	return loadClass(cryptoClassName,properties,CryptoFactory.class.getClassLoader());
+    private static Crypto loadClass(String cryptoClassName, Map map) {
+    	return loadClass(cryptoClassName,map,CryptoFactory.class.getClassLoader());
     }
 
     /**
@@ -164,7 +187,7 @@ public abstract class CryptoFactory {
      * @param loader
      * @return
      */
-    private static Crypto loadClass(String cryptoClassName, Properties properties, ClassLoader loader) {
+    private static Crypto loadClass(String cryptoClassName, Map map, ClassLoader loader) {
         Class cryptogenClass = null;
         Crypto crypto = null;
         try {
@@ -175,9 +198,17 @@ public abstract class CryptoFactory {
         }
         log.debug("Using Crypto Engine [" + cryptoClassName + "]");
         try {
-            Class[] classes = new Class[]{Properties.class,ClassLoader.class};
+            Class[] classes = null;
+            //
+            // for backwards compat
+            //
+            if (map instanceof Properties) {
+                classes = new Class[]{Properties.class,ClassLoader.class};
+            } else {
+                classes = new Class[]{Map.class,ClassLoader.class};
+            }
             Constructor c = cryptogenClass.getConstructor(classes);
-            crypto = (Crypto) c.newInstance(new Object[]{properties,loader});
+            crypto = (Crypto) c.newInstance(new Object[]{map,loader});
             return crypto;
         } catch (java.lang.Exception e) {
             e.printStackTrace();

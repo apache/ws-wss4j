@@ -31,6 +31,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.components.crypto.Crypto;
+import org.apache.ws.security.components.crypto.CryptoBase;
 import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.message.WSSecSignature;
 import org.apache.ws.security.message.WSSecHeader;
@@ -179,5 +180,20 @@ public class TestWSSecurityNew extends TestCase {
      */
     private void verify(Document doc) throws Exception {
         secEngine.processSecurityHeader(doc, null, null, crypto);
+    }
+    
+    /**
+     * Ensure that we can load a custom crypto implementation using a Map
+     */
+    public void testCustomCrypto() {
+        java.util.Map tmp = new java.util.TreeMap();
+        Crypto crypto = CryptoFactory.getInstance(
+            "wssec.CustomCrypto",
+            tmp
+        );
+        assertNotNull(crypto);
+        assertTrue(crypto instanceof CustomCrypto);
+        CustomCrypto custom = (CustomCrypto)crypto;
+        assertSame(tmp, custom.config);
     }
 }
