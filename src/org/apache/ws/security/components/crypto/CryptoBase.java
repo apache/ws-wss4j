@@ -20,8 +20,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSSecurityException;
 
-import java.io.InputStream;
 import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.math.BigInteger;
 import java.security.Key;
 import java.security.KeyStore;
@@ -31,11 +31,11 @@ import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.cert.CertPath;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
-import java.security.cert.CertPath;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.RSAPublicKey;
 import java.util.Arrays;
@@ -56,7 +56,8 @@ public abstract class CryptoBase implements Crypto {
     protected static CertificateFactory certFact;
     protected KeyStore keystore = null;
     static String SKI_OID = "2.5.29.14";
-
+    protected KeyStore cacerts = null;
+    
     /**
      * Constructor
      *
@@ -324,6 +325,7 @@ public abstract class CryptoBase implements Crypto {
         return null;
     }
 
+
     /**
      * Gets the list of certificates for a given alias.
      * <p/>
@@ -334,20 +336,37 @@ public abstract class CryptoBase implements Crypto {
      */
     public X509Certificate[] getCertificates(String alias) throws WSSecurityException {
         Certificate[] certs = null;
+        Certificate cert = null;
         try {
-            certs = keystore.getCertificateChain(alias);
-            if (certs == null || certs.length == 0) {
-                // no cert chain, so lets check if getCertificate gives us a  result.
-                Certificate cert = keystore.getCertificate(alias);
-                if (cert == null) {
-                    return null;
+            if (this.keystore != null) {
+                //There's a chance that there can only be a set of trust stores
+                certs = keystore.getCertificateChain(alias);
+                if (certs == null || certs.length == 0) {
+                    // no cert chain, so lets check if getCertificate gives us a
+                    // result.
+                    cert = keystore.getCertificate(alias);
                 }
+            }
+
+            if (certs == null && cert == null && cacerts != null) {
+                // Now look into the trust stores
+                certs = cacerts.getCertificateChain(alias);
+                if (certs == null) {
+                    cert = cacerts.getCertificate(alias);
+                }
+            }
+
+            if (cert != null) {
                 certs = new Certificate[]{cert};
+            } else if (certs == null) {
+                // At this pont we don't have certs or a cert
+                return null;
             }
         } catch (KeyStoreException e) {
             throw new WSSecurityException(WSSecurityException.FAILURE,
-                    "keystore");
+                                          "keystore");
         }
+
         X509Certificate[] x509certs = new X509Certificate[certs.length];
         for (int i = 0; i < certs.length; i++) {
             x509certs[i] = (X509Certificate) certs[i];
@@ -488,7 +507,6 @@ public abstract class CryptoBase implements Crypto {
     public KeyStore getKeyStore() {
         return this.keystore;
     }
-
     /**
      * Lookup X509 Certificates in the keystore according to a given DN of the subject of the certificate
      * <p/>
@@ -502,43 +520,16 @@ public abstract class CryptoBase implements Crypto {
      */
     public String[] getAliasesForDN(String subjectDN) throws WSSecurityException {
 
-        // Store the aliases found
-        Vector aliases = new Vector();
-
-        Certificate cert = null;
 
         // The DN to search the keystore for
         Vector subjectRDN = splitAndTrim(subjectDN);
-
-        // Look at every certificate in the keystore
-        try {
-            for (Enumeration e = keystore.aliases(); e.hasMoreElements();) {
-                String alias = (String) e.nextElement();
-
-                Certificate[] certs = keystore.getCertificateChain(alias);
-                if (certs == null || certs.length == 0) {
-                    // no cert chain, so lets check if getCertificate gives us a  result.
-                    cert = keystore.getCertificate(alias);
-                    if (cert == null) {
-                        return null;
-                    }
-                    certs = new Certificate[]{cert};
-                } else {
-                    cert = certs[0];
-                }
-                if (cert instanceof X509Certificate) {
-                    Vector foundRDN = splitAndTrim(((X509Certificate) cert).getSubjectDN().getName());
-
-                    if (subjectRDN.equals(foundRDN)) {
-                        aliases.add(alias);
-                    }
-                }
-            }
-        } catch (KeyStoreException e) {
-            throw new WSSecurityException(WSSecurityException.FAILURE,
-                    "keystore");
+        Vector aliases = getAlias(subjectRDN, keystore);
+        
+        //If we can't find the issuer in the keystore then look at cacerts
+        if(aliases.size() == 0) {
+            aliases = getAlias(subjectRDN, cacerts);
         }
-
+        
         // Convert the vector into an array
         String[] result = new String[aliases.size()];
         for (int i = 0; i < aliases.size(); i++)
@@ -546,7 +537,7 @@ public abstract class CryptoBase implements Crypto {
 
         return result;
     }
-
+    
     /**
      * get a byte array given an array of X509 certificates.
      * <p/>
@@ -695,5 +686,41 @@ public abstract class CryptoBase implements Crypto {
         }
 
         return true;
+    }
+    
+    private Vector getAlias(Vector subjectRDN, KeyStore store) throws WSSecurityException {
+        // Store the aliases found
+        Vector aliases = new Vector();
+
+        Certificate cert = null;
+        
+        try {
+            for (Enumeration e = store.aliases(); e.hasMoreElements();) {
+                String alias = (String) e.nextElement();
+
+                Certificate[] certs = store.getCertificateChain(alias);
+                if (certs == null || certs.length == 0) {
+                    // no cert chain, so lets check if getCertificate gives us a  result.
+                    cert = store.getCertificate(alias);
+                    if (cert == null) {
+                        return null;
+                    }
+                    certs = new Certificate[]{cert};
+                } else {
+                    cert = certs[0];
+                }
+                if (cert instanceof X509Certificate) {
+                    Vector foundRDN = splitAndTrim(((X509Certificate) cert).getSubjectDN().getName());
+
+                    if (subjectRDN.equals(foundRDN)) {
+                        aliases.add(alias);
+                    }
+                }
+            }
+        } catch (KeyStoreException e) {
+            throw new WSSecurityException(WSSecurityException.FAILURE,
+                    "keystore");
+        }
+        return aliases;
     }
 }

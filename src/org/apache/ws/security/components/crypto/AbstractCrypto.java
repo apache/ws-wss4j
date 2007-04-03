@@ -18,31 +18,15 @@ package org.apache.ws.security.components.crypto;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.util.Loader;
 
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.GeneralSecurityException;
-import java.security.Key;
 import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.security.cert.Certificate;
-import java.security.cert.CertificateEncodingException;
-import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
-import java.security.cert.X509Certificate;
-import java.security.interfaces.RSAPublicKey;
-import java.util.Arrays;
-import java.util.Enumeration;
 import java.util.Properties;
-import java.util.Vector;
 
 /**
  * Created by IntelliJ IDEA.
@@ -55,7 +39,6 @@ public abstract class AbstractCrypto extends CryptoBase {
     private static Log log = LogFactory.getLog(AbstractCrypto.class);
     protected static CertificateFactory certFact;
     protected Properties properties = null;
-    static String SKI_OID = "2.5.29.14";
     
     /**
      * Constructor
@@ -108,12 +91,65 @@ public abstract class AbstractCrypto extends CryptoBase {
          * Load the keystore
          */
         try {
-            load(is);
+            String provider = properties.getProperty("org.apache.ws.security.crypto.merlin.keystore.provider");
+            String passwd = properties.getProperty("org.apache.ws.security.crypto.merlin.keystore.password","security");
+            String type = properties.getProperty("org.apache.ws.security.crypto.merlin.keystore.type", KeyStore.getDefaultType());
+            this.keystore = load(is, passwd, provider, type);
         } finally {
             is.close();
         }
+
+        /**
+         * Load cacerts
+         */
+        String cacertsPath = System.getProperty("java.home") + "/lib/security/cacerts";
+        InputStream cacertsIs = new FileInputStream(cacertsPath);
+        try {
+            String cacertsPasswd = properties.getProperty("org.apache.ws.security.crypto.merlin.cacerts.password", "changeit");
+            this.cacerts = load(cacertsIs, cacertsPasswd, null, KeyStore.getDefaultType());
+        } finally {
+            cacertsIs.close();
+        }
     }
 
+
+    /**
+     * Loads the the keystore from an <code>InputStream </code>.
+     * <p/>
+     *
+     * @param input <code>InputStream</code> to read from
+     * @throws CredentialException
+     */
+    public KeyStore load(InputStream input, String storepass, String provider, String type) throws CredentialException {
+        if (input == null) {
+            throw new IllegalArgumentException("input stream cannot be null");
+        }
+        
+        KeyStore ks = null;
+        
+        try {
+            if (provider == null || provider.length() == 0) {
+                ks = KeyStore.getInstance(type);
+            } else {
+                ks = KeyStore.getInstance(type, provider);
+            }
+            
+                    
+            ks.load(input, (storepass == null || storepass.length() == 0) ? new char[0] : storepass.toCharArray());
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new CredentialException(3, "ioError00", e);
+        } catch (GeneralSecurityException e) {
+            e.printStackTrace();
+            throw new CredentialException(3, "secError00", e);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new CredentialException(-1, "error00", e);
+        }
+        return ks;
+    }
+
+    
     protected String
     getCryptoProvider() {
         return properties.getProperty("org.apache.ws.security.crypto.merlin.cert.provider");
@@ -133,44 +169,5 @@ public abstract class AbstractCrypto extends CryptoBase {
             return null;
         }
         return properties.getProperty("org.apache.ws.security.crypto.merlin.keystore.alias");
-    }
-
-
-    /**
-     * Loads the the keystore from an <code>InputStream </code>.
-     * <p/>
-     *
-     * @param input <code>InputStream</code> to read from
-     * @throws CredentialException
-     */
-    public void load(InputStream input) throws CredentialException {
-        if (input == null) {
-            throw new IllegalArgumentException("input stream cannot be null");
-        }
-        try {
-            String provider = properties.getProperty("org.apache.ws.security.crypto.merlin.keystore.provider");
-            if (provider == null || provider.length() == 0) {
-                keystore = KeyStore.getInstance
-                        (properties.getProperty("org.apache.ws.security.crypto.merlin.keystore.type",
-                                KeyStore.getDefaultType()));
-            } else {
-                keystore = KeyStore.getInstance
-                        (properties.getProperty("org.apache.ws.security.crypto.merlin.keystore.type",
-                                KeyStore.getDefaultType()), provider);
-            }
-            String password =
-                    properties.getProperty("org.apache.ws.security.crypto.merlin.keystore.password",
-                            "security");
-            keystore.load(input, (password == null || password.length() == 0) ? new char[0] : password.toCharArray());
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw new CredentialException(3, "ioError00", e);
-        } catch (GeneralSecurityException e) {
-            e.printStackTrace();
-            throw new CredentialException(3, "secError00", e);
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new CredentialException(-1, "error00", e);
-        }
     }
 }

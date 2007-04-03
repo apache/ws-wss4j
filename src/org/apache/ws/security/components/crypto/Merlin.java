@@ -32,45 +32,49 @@ import java.security.cert.CertPathValidatorException;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.PKIXParameters;
+import java.security.cert.TrustAnchor;
 import java.security.cert.X509Certificate;
+import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 import java.util.Vector;
 
 /**
- * JDK1.4 based implementation of Crypto (uses keystore).
- * <p/>
- *
+ * JDK1.4 based implementation of Crypto (uses keystore). <p/>
+ * 
  * @author Davanum Srinivas (dims@yahoo.com).
  */
 public class Merlin extends AbstractCrypto {
 
     /**
-     * Constructor.
-     * <p/>
-     *
+     * Constructor. <p/>
+     * 
      * @param properties
      * @throws CredentialException
      * @throws IOException
      */
-    public Merlin(Properties properties) throws CredentialException, IOException {
+    public Merlin(Properties properties) throws CredentialException,
+            IOException {
         super(properties);
     }
-    
-    public Merlin(Properties properties, ClassLoader loader) throws CredentialException, IOException {
-    	super(properties,loader);
+
+    public Merlin(Properties properties, ClassLoader loader)
+            throws CredentialException, IOException {
+        super(properties, loader);
     }
 
     /**
-     * Construct an array of X509Certificate's from the byte array.
-     * <p/>
-     *
-     * @param data    The <code>byte</code> array containg the X509 data
-     * @param reverse If set the first certificate in input data will
-     *                the last in the array
-     * @return An array of X509 certificates, ordered according to
-     *         the reverse flag
+     * Construct an array of X509Certificate's from the byte array. <p/>
+     * 
+     * @param data
+     *            The <code>byte</code> array containg the X509 data
+     * @param reverse
+     *            If set the first certificate in input data will the last in
+     *            the array
+     * @return An array of X509 certificates, ordered according to the reverse
+     *         flag
      * @throws WSSecurityException
      */
     public X509Certificate[] getX509Certificates(byte[] data, boolean reverse)
@@ -80,27 +84,30 @@ public class Merlin extends AbstractCrypto {
         try {
             path = getCertificateFactory().generateCertPath(in);
         } catch (CertificateException e) {
-            throw new WSSecurityException(WSSecurityException.SECURITY_TOKEN_UNAVAILABLE,
+            throw new WSSecurityException(
+                    WSSecurityException.SECURITY_TOKEN_UNAVAILABLE,
                     "parseError");
         }
         List l = path.getCertificates();
         X509Certificate[] certs = new X509Certificate[l.size()];
         Iterator iterator = l.iterator();
         for (int i = 0; i < l.size(); i++) {
-            certs[(reverse) ? (l.size() - 1 - i) : i] = (X509Certificate) iterator.next();
+            certs[(reverse) ? (l.size() - 1 - i) : i] = (X509Certificate) iterator
+                    .next();
         }
         return certs;
     }
 
     /**
-     * get a byte array given an array of X509 certificates.
-     * <p/>
-     *
-     * @param reverse If set the first certificate in the array data will
-     *                the last in the byte array
-     * @param certs   The certificates to convert
-     * @return The byte array for the certficates ordered according
-     *         to the reverse flag
+     * get a byte array given an array of X509 certificates. <p/>
+     * 
+     * @param reverse
+     *            If set the first certificate in the array data will the last
+     *            in the byte array
+     * @param certs
+     *            The certificates to convert
+     * @return The byte array for the certficates ordered according to the
+     *         reverse flag
      * @throws WSSecurityException
      */
     public byte[] getCertificateData(boolean reverse, X509Certificate[] certs)
@@ -117,77 +124,89 @@ public class Merlin extends AbstractCrypto {
             CertPath path = getCertificateFactory().generateCertPath(list);
             return path.getEncoded();
         } catch (CertificateEncodingException e) {
-            throw new WSSecurityException(WSSecurityException.SECURITY_TOKEN_UNAVAILABLE,
+            throw new WSSecurityException(
+                    WSSecurityException.SECURITY_TOKEN_UNAVAILABLE,
                     "encodeError");
         } catch (CertificateException e) {
-            throw new WSSecurityException(WSSecurityException.SECURITY_TOKEN_UNAVAILABLE,
+            throw new WSSecurityException(
+                    WSSecurityException.SECURITY_TOKEN_UNAVAILABLE,
                     "parseError");
         }
     }
 
-
-    /**
-     * Overridden because there's a bug in the base class where they don't use
-     * the provider variant for the certificate validator.
-     *
-     * @param certs
-     *            Certificate chain to validate
-     * @return true if the certificate chain is valid, false otherwise
-     * @throws WSSecurityException
-     */
     public boolean validateCertPath(X509Certificate[] certs)
-                    throws WSSecurityException {
-		try {
-			// Generate cert path
-			java.util.List certList = java.util.Arrays.asList(certs);
-			CertPath path = this.getCertificateFactory().generateCertPath(
-							certList);
+            throws WSSecurityException {
+        try {
+            // Generate cert path
+            java.util.List certList = java.util.Arrays.asList(certs);
+            CertPath path = this.getCertificateFactory().generateCertPath(
+                    certList);
 
-			// Use the certificates in the keystore as TrustAnchors
-			PKIXParameters param = new PKIXParameters(this.keystore);
+            HashSet set = new HashSet();
 
-			// Do not check a revocation list
-			param.setRevocationEnabled(false);
+            Enumeration cacertsAliases = this.cacerts.aliases();
+            while (cacertsAliases.hasMoreElements()) {
+                String alias = (String) cacertsAliases.nextElement();
+                X509Certificate cert = (X509Certificate) this.cacerts
+                        .getCertificate(alias);
+                TrustAnchor anchor = new TrustAnchor(cert, cert
+                        .getExtensionValue("NameConstraints"));
+                set.add(anchor);
+            }
 
-			// Verify the trust path using the above settings
-			String provider = properties
-							.getProperty("org.apache.ws.security.crypto.merlin.cert.provider");
-			CertPathValidator certPathValidator;
-			if (provider == null || provider.length() == 0) {
-					certPathValidator = CertPathValidator.getInstance("PKIX");
-			} else {
-					certPathValidator = CertPathValidator.getInstance("PKIX",
-									provider);
-			}
-			certPathValidator.validate(path, param);
-		} catch (NoSuchProviderException ex) {
-				throw new WSSecurityException(WSSecurityException.FAILURE,
-								"certpath", new Object[] { ex.getMessage() },
-								(Throwable) ex);
-		} catch (NoSuchAlgorithmException ex) {
-				throw new WSSecurityException(WSSecurityException.FAILURE,
-								"certpath", new Object[] { ex.getMessage() },
-								(Throwable) ex);
-		} catch (CertificateException ex) {
-				throw new WSSecurityException(WSSecurityException.FAILURE,
-								"certpath", new Object[] { ex.getMessage() },
-								(Throwable) ex);
-		} catch (InvalidAlgorithmParameterException ex) {
-				throw new WSSecurityException(WSSecurityException.FAILURE,
-								"certpath", new Object[] { ex.getMessage() },
-								(Throwable) ex);
-		} catch (CertPathValidatorException ex) {
-				throw new WSSecurityException(WSSecurityException.FAILURE,
-								"certpath", new Object[] { ex.getMessage() },
-								(Throwable) ex);
-		} catch (KeyStoreException ex) {
-				throw new WSSecurityException(WSSecurityException.FAILURE,
-								"certpath", new Object[] { ex.getMessage() },
-								(Throwable) ex);
-		}
+            // Add certificates from the keystore
+            Enumeration aliases = this.keystore.aliases();
+            while (aliases.hasMoreElements()) {
+                String alias = (String) aliases.nextElement();
+                X509Certificate cert = (X509Certificate) this.keystore
+                        .getCertificate(alias);
+                TrustAnchor anchor = new TrustAnchor(cert, cert
+                        .getExtensionValue("NameConstraints"));
+                set.add(anchor);
+            }
 
-		return true;
+            PKIXParameters param = new PKIXParameters(set);
+
+            // Do not check a revocation list
+            param.setRevocationEnabled(false);
+
+            // Verify the trust path using the above settings
+            String provider = properties
+                    .getProperty("org.apache.ws.security.crypto.merlin.cert.provider");
+            CertPathValidator certPathValidator;
+            if (provider == null || provider.length() == 0) {
+                certPathValidator = CertPathValidator.getInstance("PKIX");
+            } else {
+                certPathValidator = CertPathValidator.getInstance("PKIX",
+                        provider);
+            }
+            certPathValidator.validate(path, param);
+        } catch (NoSuchProviderException ex) {
+            throw new WSSecurityException(WSSecurityException.FAILURE,
+                    "certpath", new Object[] { ex.getMessage() },
+                    (Throwable) ex);
+        } catch (NoSuchAlgorithmException ex) {
+            throw new WSSecurityException(WSSecurityException.FAILURE,
+                    "certpath", new Object[] { ex.getMessage() },
+                    (Throwable) ex);
+        } catch (CertificateException ex) {
+            throw new WSSecurityException(WSSecurityException.FAILURE,
+                    "certpath", new Object[] { ex.getMessage() },
+                    (Throwable) ex);
+        } catch (InvalidAlgorithmParameterException ex) {
+            throw new WSSecurityException(WSSecurityException.FAILURE,
+                    "certpath", new Object[] { ex.getMessage() },
+                    (Throwable) ex);
+        } catch (CertPathValidatorException ex) {
+            throw new WSSecurityException(WSSecurityException.FAILURE,
+                    "certpath", new Object[] { ex.getMessage() },
+                    (Throwable) ex);
+        } catch (KeyStoreException ex) {
+            throw new WSSecurityException(WSSecurityException.FAILURE,
+                    "certpath", new Object[] { ex.getMessage() },
+                    (Throwable) ex);
+        }
+
+        return true;
     }
 }
-
-

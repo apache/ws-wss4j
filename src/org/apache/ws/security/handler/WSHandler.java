@@ -1013,19 +1013,6 @@ public abstract class WSHandler {
                 throw new WSSecurityException("WSHandler: Could not get certificates for alias " + alias);
             }
 
-            // Form a certificate chain from the transmitted certificate
-            // and the certificate(s) of the issuer from the keystore
-            // First, create new array
-            X509Certificate[] x509certs = new X509Certificate[certs.length + 1];
-            // Then add the first certificate ...
-            x509certs[0] = cert;
-            // ... and the other certificates
-            for (int j = 0; j < certs.length; j++) {
-                cert = certs[i];
-                x509certs[certs.length + j] = cert;
-            }
-            certs = x509certs;
-
             // Use the validation method from the crypto to check whether the subjects certificate was really signed by the issuer stated in the certificate
             try {
                 if (reqData.getSigCrypto().validateCertPath(certs)) {
