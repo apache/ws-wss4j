@@ -143,7 +143,7 @@ public class TestWSSecurityNew extends TestCase {
             log.debug("Signed message with IssuerSerial key identifier:");
             XMLUtils.PrettyElementToWriter(signedDoc.getDocumentElement(), new PrintWriter(System.out));
         }
-        Message signedMsg = (Message) SOAPUtil.toSOAPMessage(signedDoc);
+        Message signedMsg = SOAPUtil.toAxisMessage(signedDoc);
         if (log.isDebugEnabled()) {
             log.debug("Signed message with IssuerSerial key identifier(1):");
             XMLUtils.PrettyElementToWriter(signedMsg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
