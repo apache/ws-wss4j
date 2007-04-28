@@ -126,7 +126,6 @@ public class TestWSSecurityNew11 extends TestCase {
      * @throws java.lang.Exception Thrown when there is any problem in signing or verification
      */
     public void testX509SignatureDirectSTR() throws Exception {
-        SOAPEnvelope envelope = null;
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("wss4jcert", "security");
         // builder.setUserInfo("john", "keypass");
@@ -162,13 +161,13 @@ public class TestWSSecurityNew11 extends TestCase {
         Document signedDoc = builder.build(doc, crypto, secHeader);
 
         /*
-         * convert the resulting document into a message first. The toSOAPMessage()
+         * convert the resulting document into a message first. The toAxisMessage()
          * mehtod performs the necessary c14n call to properly set up the signed
          * document and convert it into a SOAP message. After that we extract it
          * as a document again for further processing.
          */
 
-        Message signedMsg = (Message) SOAPUtil.toSOAPMessage(signedDoc);
+        Message signedMsg = SOAPUtil.toAxisMessage(signedDoc);
         if (log.isDebugEnabled()) {
             log.debug("Signed message with STR DirectReference key identifier:");
             XMLUtils.PrettyElementToWriter(signedMsg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));

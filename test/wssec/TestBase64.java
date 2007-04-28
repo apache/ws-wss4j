@@ -109,7 +109,6 @@ public class TestBase64 extends TestCase {
 
     public void testDecode() {
         byte[] out = null;
-        byte[] outBinary = null;
         try {
             out = Base64.decode(thisIsATestEnc);
         } catch (WSSecurityException ex) {

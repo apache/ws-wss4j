@@ -126,7 +126,6 @@ public class TestWSSecurityNew13 extends TestCase implements CallbackHandler {
      * @throws java.lang.Exception Thrown when there is any problem in signing or verification
      */
     public void testUsernameTokenSigning() throws Exception {
-        SOAPEnvelope envelope = null;
         Document doc = unsignedEnvelope.getAsDocument();
 
         WSSecHeader secHeader = new WSSecHeader();
@@ -148,7 +147,7 @@ public class TestWSSecurityNew13 extends TestCase implements CallbackHandler {
         log.info("Before adding UsernameToken PW Text....");
         builder.prependToHeader(secHeader);
         Document signedDoc = doc;
-        Message signedMsg = (Message) SOAPUtil.toSOAPMessage(signedDoc);
+        Message signedMsg = SOAPUtil.toAxisMessage(signedDoc);
         if (log.isDebugEnabled()) {
             log.debug("Message with UserNameToken PW Text:");
             XMLUtils.PrettyElementToWriter(signedMsg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));

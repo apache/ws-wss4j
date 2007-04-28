@@ -134,7 +134,6 @@ public class TestWSSecurityNew8 extends TestCase implements CallbackHandler {
      */
     public void testSigningEncryptionIS3DES() throws Exception {
         SOAPEnvelope unsignedEnvelope = message.getSOAPEnvelope();
-        SOAPEnvelope envelope = null;
         
         WSSecEncrypt encrypt = new WSSecEncrypt();
         encrypt.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e");
@@ -154,13 +153,13 @@ public class TestWSSecurityNew8 extends TestCase implements CallbackHandler {
         Document signedDoc = sign.build(doc, crypto, secHeader);
         Document encryptedSignedDoc = encrypt.build(signedDoc, crypto, secHeader);
         /*
-         * convert the resulting document into a message first. The toSOAPMessage()
+         * convert the resulting document into a message first. The toAxisPMessage()
          * method performs the necessary c14n call to properly set up the signed
          * document and convert it into a SOAP message. After that we extract it
          * as a document again for further processing.
          */
 
-        Message encryptedMsg = (Message) SOAPUtil.toSOAPMessage(encryptedSignedDoc);
+        Message encryptedMsg = SOAPUtil.toAxisMessage(encryptedSignedDoc);
         if (log.isDebugEnabled()) {
             log.debug("Signed and encrypted message with IssuerSerial key identifier (both), 3DES:");
             XMLUtils.PrettyElementToWriter(encryptedMsg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));

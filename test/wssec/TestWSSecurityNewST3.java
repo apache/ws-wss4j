@@ -139,7 +139,6 @@ public class TestWSSecurityNewST3 extends TestCase implements CallbackHandler {
      */
     public void testSAMLSignedKeyHolder() throws Exception {
         SOAPEnvelope unsignedEnvelope = message.getSOAPEnvelope();
-        SOAPEnvelope envelope = null;
 
         Document doc = unsignedEnvelope.getAsDocument();
         
@@ -167,19 +166,19 @@ public class TestWSSecurityNewST3 extends TestCase implements CallbackHandler {
         log.info("After SAMLSignedKeyHolder....");
 
         /*
-         * convert the resulting document into a message first. The toSOAPMessage()
+         * convert the resulting document into a message first. The toAxisMessage()
          * method performs the necessary c14n call to properly set up the signed
          * document and convert it into a SOAP message. Check that the contents can't
           * be read (cheching if we can find a specific substring). After that we extract it
          * as a document again for further processing.
          */
 
-        Message signedMsg = (Message) SOAPUtil.toSOAPMessage(signedDoc);
+        Message signedMsg = SOAPUtil.toAxisMessage(signedDoc);
         if (log.isDebugEnabled()) {
             log.debug("Signed SAML message (key holder):");
             XMLUtils.PrettyElementToWriter(signedMsg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
         }
-        String encryptedString = signedMsg.getSOAPPartAsString();
+        // String encryptedString = signedMsg.getSOAPPartAsString();
         signedDoc = signedMsg.getSOAPEnvelope().getAsDocument();
         verify(signedDoc);
 

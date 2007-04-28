@@ -72,7 +72,7 @@ public class TestWSSecurityNew10 extends TestCase implements CallbackHandler {
 
     Message message;
 
-    private byte[] sharedSecret = "SriLankaSriLankaSriLanka".getBytes();
+    // private byte[] sharedSecret = "SriLankaSriLankaSriLanka".getBytes();
 
     /**
      * TestWSSecurity constructor <p/>
@@ -139,7 +139,6 @@ public class TestWSSecurityNew10 extends TestCase implements CallbackHandler {
     public void testEMBED_SECURITY_TOKEN_REF() throws Exception {
 
         SOAPEnvelope unsignedEnvelope = message.getSOAPEnvelope();
-        SOAPEnvelope envelope = null;
         WSSecEncrypt wsEncrypt = new WSSecEncrypt();
 
         // Get the message as document
@@ -188,12 +187,12 @@ public class TestWSSecurityNew10 extends TestCase implements CallbackHandler {
 
         /*
          * convert the resulting document into a message first. The
-         * toSOAPMessage() mehtod performs the necessary c14n call to properly
+         * toAxisMessage() mehtod performs the necessary c14n call to properly
          * set up the signed document and convert it into a SOAP message. After
          * that we extract it as a document again for further processing.
          */
 
-        Message signedMsg = (Message) SOAPUtil.toSOAPMessage(encDoc);
+        Message signedMsg = SOAPUtil.toAxisMessage(encDoc);
 
         if (log.isDebugEnabled()) {
             XMLUtils.PrettyElementToWriter(signedMsg.getSOAPEnvelope()
@@ -210,10 +209,10 @@ public class TestWSSecurityNew10 extends TestCase implements CallbackHandler {
      * @throws Exception
      *             Thrown when there is a problem in verification
      */
-    private void verifyEMBED_SECURITY_TOKEN_REF(Document doc) throws Exception {
-        secEngine.processSecurityHeader(doc, "", this, null);
-        log.info("Success ......");
-    }
+//    private void verifyEMBED_SECURITY_TOKEN_REF(Document doc) throws Exception {
+//        secEngine.processSecurityHeader(doc, "", this, null);
+//        log.info("Success ......");
+//    }
 
     /*
      * (non-Javadoc)

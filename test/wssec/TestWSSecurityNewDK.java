@@ -152,7 +152,7 @@ public class TestWSSecurityNewDK extends TestCase implements CallbackHandler {
         encrKeyBuilder.prependBSTElementToHeader(secHeader);
 
         
-       Message encryptedMsg = (Message) SOAPUtil.toSOAPMessage(encryptedDoc);
+       Message encryptedMsg = SOAPUtil.toAxisMessage(encryptedDoc);
        if (log.isDebugEnabled()) {
            log.debug("Encrypted message: 3DES  + DerivedKeys");
            XMLUtils.PrettyElementToWriter(encryptedMsg.getSOAPEnvelope()
@@ -192,7 +192,7 @@ public class TestWSSecurityNewDK extends TestCase implements CallbackHandler {
          encrKeyBuilder.prependToHeader(secHeader);
          encrKeyBuilder.prependBSTElementToHeader(secHeader);
          
-        Message encryptedMsg = (Message) SOAPUtil.toSOAPMessage(encryptedDoc);
+        Message encryptedMsg = SOAPUtil.toAxisMessage(encryptedDoc);
         if (log.isDebugEnabled()) {
             log.debug("Encrypted message: 3DES  + DerivedKeys");
             XMLUtils.PrettyElementToWriter(encryptedMsg.getSOAPEnvelope()
@@ -223,12 +223,12 @@ public class TestWSSecurityNewDK extends TestCase implements CallbackHandler {
          WSSecDKSign sigBuilder = new WSSecDKSign();
          sigBuilder.setExternalKey(ek, tokenIdentifier);
          sigBuilder.setSignatureAlgorithm(XMLSignature.ALGO_ID_MAC_HMAC_SHA1);
-         Document signedDoc = sigBuilder.build(doc, secHeader);
+         /* Document signedDoc = */ sigBuilder.build(doc, secHeader);
          
          encrKeyBuilder.prependToHeader(secHeader);
          encrKeyBuilder.prependBSTElementToHeader(secHeader);
          
-         Message signedMessage = (Message) SOAPUtil.toSOAPMessage(doc);
+         Message signedMessage = SOAPUtil.toAxisMessage(doc);
          if (log.isDebugEnabled()) {
              log.debug("Encrypted message: 3DES  + DerivedKeys");
              XMLUtils.PrettyElementToWriter(signedMessage.getSOAPEnvelope()
@@ -272,8 +272,7 @@ public class TestWSSecurityNewDK extends TestCase implements CallbackHandler {
         encrKeyBuilder.prependToHeader(secHeader);
         encrKeyBuilder.prependBSTElementToHeader(secHeader);
 
-        Message signedMessage = (Message) SOAPUtil
-                .toSOAPMessage(signedEncryptedDoc);
+        Message signedMessage = SOAPUtil.toAxisMessage(signedEncryptedDoc);
 
         if (log.isDebugEnabled()) {
             log.debug("Encrypted message: 3DES  + DerivedKeys");
@@ -318,8 +317,7 @@ public class TestWSSecurityNewDK extends TestCase implements CallbackHandler {
          encrKeyBuilder.prependToHeader(secHeader);
          encrKeyBuilder.prependBSTElementToHeader(secHeader);
          
-         Message signedMessage = (Message) SOAPUtil
-                .toSOAPMessage(encryptedSignedDoc);
+         Message signedMessage = SOAPUtil.toAxisMessage(encryptedSignedDoc);
          
          if (log.isDebugEnabled()) {
             log.debug("Encrypted message: 3DES  + DerivedKeys");

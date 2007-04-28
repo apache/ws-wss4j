@@ -31,7 +31,6 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.components.crypto.Crypto;
-import org.apache.ws.security.components.crypto.CryptoBase;
 import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.message.WSSecSignature;
 import org.apache.ws.security.message.WSSecHeader;
@@ -133,7 +132,7 @@ public class TestWSSecurityNew extends TestCase {
         Document signedDoc = builder.build(doc, crypto, secHeader);
 
         /*
-         * convert the resulting document into a message first. The toSOAPMessage()
+         * convert the resulting document into a message first. The toAxisMessage()
          * mehtod performs the necessary c14n call to properly set up the signed
          * document and convert it into a SOAP message. After that we extract it
          * as a document again for further processing.

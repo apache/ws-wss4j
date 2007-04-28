@@ -151,7 +151,6 @@ public class TestWSSecurityNew15 extends TestCase implements CallbackHandler {
 	 */
 	public void testEncryptionDecryptionRSA15() throws Exception {
 		SOAPEnvelope unsignedEnvelope = message.getSOAPEnvelope();
-		SOAPEnvelope envelope = null;
 		WSSecEncrypt builder = new WSSecEncrypt();
 		builder.setUserInfo("wss4jcert");
 		builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
@@ -199,14 +198,14 @@ public class TestWSSecurityNew15 extends TestCase implements CallbackHandler {
 
 		/*
 		 * convert the resulting document into a message first. The
-		 * toSOAPMessage() method performs the necessary c14n call to properly
+		 * toAxisMessage() method performs the necessary c14n call to properly
 		 * set up the signed document and convert it into a SOAP message. Check
 		 * that the contents can't be read (checking if we can find a specific
 		 * substring). After that we extract it as a document again for further
 		 * processing.
 		 */
 
-		Message encryptedMsg = (Message) SOAPUtil.toSOAPMessage(encryptedDoc);
+		Message encryptedMsg = SOAPUtil.toAxisMessage(encryptedDoc);
 		if (log.isDebugEnabled()) {
 			log.debug("Encrypted message, RSA-15 keytransport, 3DES:");
 			XMLUtils.PrettyElementToWriter(encryptedMsg.getSOAPEnvelope()

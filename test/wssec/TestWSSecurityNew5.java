@@ -121,7 +121,6 @@ public class TestWSSecurityNew5 extends TestCase implements CallbackHandler {
      * @throws java.lang.Exception Thrown when there is any problem in signing or verification
      */
     public void testUsernameTokenDigest() throws Exception {
-        SOAPEnvelope envelope = null;
         WSSecUsernameToken builder = new WSSecUsernameToken();
         builder.setUserInfo("wernerd", "verySecret");
         log.info("Before adding UsernameToken PW Digest....");
@@ -131,13 +130,13 @@ public class TestWSSecurityNew5 extends TestCase implements CallbackHandler {
         Document signedDoc = builder.build(doc, secHeader);
 
         /*
-         * convert the resulting document into a message first. The toSOAPMessage()
+         * convert the resulting document into a message first. The toAxisMessage()
          * method performs the necessary c14n call to properly set up the signed
          * document and convert it into a SOAP message. After that we extract it
          * as a document again for further processing.
          */
 
-        Message signedMsg = (Message) SOAPUtil.toSOAPMessage(signedDoc);
+        Message signedMsg = SOAPUtil.toAxisMessage(signedDoc);
         if (log.isDebugEnabled()) {
             log.debug("Message with UserNameToken PW Digest:");
             XMLUtils.PrettyElementToWriter(signedMsg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
@@ -154,7 +153,6 @@ public class TestWSSecurityNew5 extends TestCase implements CallbackHandler {
      * @throws java.lang.Exception Thrown when there is any problem in signing or verification
      */
     public void testUsernameTokenText() throws Exception {
-        SOAPEnvelope envelope = null;
         WSSecUsernameToken builder = new WSSecUsernameToken();
         builder.setPasswordType(WSConstants.PASSWORD_TEXT);
         builder.setUserInfo("wernerd", "verySecret");
@@ -163,7 +161,7 @@ public class TestWSSecurityNew5 extends TestCase implements CallbackHandler {
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         Document signedDoc = builder.build(doc, secHeader);
-        Message signedMsg = (Message) SOAPUtil.toSOAPMessage(signedDoc);
+        Message signedMsg = SOAPUtil.toAxisMessage(signedDoc);
         if (log.isDebugEnabled()) {
             log.debug("Message with UserNameToken PW Text:");
             XMLUtils.PrettyElementToWriter(signedMsg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));

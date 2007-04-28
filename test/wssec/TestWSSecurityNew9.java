@@ -150,7 +150,6 @@ public class TestWSSecurityNew9 extends TestCase implements CallbackHandler {
      */
     public void testSigningEncryptionEmbedded() throws Exception {
         SOAPEnvelope unsignedEnvelope = message.getSOAPEnvelope();
-        SOAPEnvelope envelope = null;
         WSSecEncrypt encrypt = new WSSecEncrypt();
         WSSecSignature sign = new WSSecSignature();
         
@@ -167,13 +166,13 @@ public class TestWSSecurityNew9 extends TestCase implements CallbackHandler {
         Document signedDoc = sign.build(doc, crypto, secHeader);
         Document encryptedSignedDoc = encrypt.build(signedDoc, crypto, secHeader);
         /*
-         * convert the resulting document into a message first. The toSOAPMessage()
+         * convert the resulting document into a message first. The toAxisMessage()
          * mehtod performs the necessary c14n call to properly set up the signed
          * document and convert it into a SOAP message. After that we extract it
          * as a document again for further processing.
          */
 
-        Message encryptedMsg = (Message) SOAPUtil.toSOAPMessage(encryptedSignedDoc);
+        Message encryptedMsg = SOAPUtil.toAxisMessage(encryptedSignedDoc);
         if (log.isDebugEnabled()) {
             log.debug("Encrypted message, RSA-OAEP keytransport, 3DES:");
             XMLUtils.PrettyElementToWriter(encryptedMsg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));

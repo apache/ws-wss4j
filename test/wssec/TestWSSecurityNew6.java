@@ -133,7 +133,6 @@ public class TestWSSecurityNew6 extends TestCase implements CallbackHandler {
      */
     public void testEncryptionSigning() throws Exception {
         SOAPEnvelope unsignedEnvelope = message.getSOAPEnvelope();
-        SOAPEnvelope envelope = null;
         WSSecEncrypt encrypt = new WSSecEncrypt();
         WSSecSignature sign = new WSSecSignature();
         encrypt.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e");
@@ -149,13 +148,12 @@ public class TestWSSecurityNew6 extends TestCase implements CallbackHandler {
                 secHeader);
         /*
          * convert the resulting document into a message first. The
-         * toSOAPMessage() mehtod performs the necessary c14n call to properly
+         * toAxisMessage() mehtod performs the necessary c14n call to properly
          * set up the signed document and convert it into a SOAP message. After
          * that we extract it as a document again for further processing.
          */
 
-        Message encryptedMsg = (Message) SOAPUtil
-                .toSOAPMessage(encryptedSignedDoc);
+        Message encryptedMsg = SOAPUtil.toAxisMessage(encryptedSignedDoc);
         String s = encryptedMsg.getSOAPPartAsString();
         ((SOAPPart) message.getSOAPPart()).setCurrentMessage(s,
                 SOAPPart.FORM_STRING);

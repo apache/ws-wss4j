@@ -119,7 +119,6 @@ public class TestWSSecurityNewSOAP12 extends TestCase {
      * @throws java.lang.Exception Thrown when there is any problem in signing or verification
      */
     public void testX509Signature() throws Exception {
-        SOAPEnvelope envelope = null;
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         // builder.setUserInfo("john", "keypass");
@@ -132,13 +131,13 @@ public class TestWSSecurityNewSOAP12 extends TestCase {
         Document signedDoc = builder.build(doc, crypto, secHeader);
 
         /*
-         * convert the resulting document into a message first. The toSOAPMessage()
+         * convert the resulting document into a message first. The toAxisMessage()
          * mehtod performs the necessary c14n call to properly set up the signed
          * document and convert it into a SOAP message. After that we extract it
          * as a document again for further processing.
          */
 
-        Message signedMsg = (Message) SOAPUtil.toSOAPMessage(signedDoc);
+        Message signedMsg = SOAPUtil.toAxisMessage(signedDoc);
         if (log.isDebugEnabled()) {
             log.debug("Signed message SOAP 1.2:");
             XMLUtils.PrettyElementToWriter(signedMsg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
@@ -155,7 +154,6 @@ public class TestWSSecurityNewSOAP12 extends TestCase {
      * @throws java.lang.Exception Thrown when there is any problem in signing or verification
      */
     public void testDoubleX509Signature() throws Exception {
-        SOAPEnvelope envelope = null;
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         // builder.setUserInfo("john", "keypass");
