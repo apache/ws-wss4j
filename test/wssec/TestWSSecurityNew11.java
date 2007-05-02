@@ -276,7 +276,7 @@ public class TestWSSecurityNew11 extends TestCase {
 
         Document signedDoc = builder.build(doc, crypto, secHeader);
 
-        Message signedMsg = (Message) SOAPUtil.toSOAPMessage(signedDoc);
+        Message signedMsg = (Message) SOAPUtil.toAxisMessage(signedDoc);
         if (log.isDebugEnabled()) {
             log.debug("Signed message with STR IssuerSerial key identifier:");
             XMLUtils.PrettyElementToWriter(signedMsg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
@@ -333,7 +333,7 @@ public class TestWSSecurityNew11 extends TestCase {
 
         Document signedDoc = builder.build(doc, crypto, secHeader);
 
-        Message signedMsg = (Message) SOAPUtil.toSOAPMessage(signedDoc);
+        Message signedMsg = (Message) SOAPUtil.toAxisMessage(signedDoc);
         if (log.isDebugEnabled()) {
             log.debug("Signed message with STR SKI key identifier:");
             XMLUtils.PrettyElementToWriter(signedMsg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));

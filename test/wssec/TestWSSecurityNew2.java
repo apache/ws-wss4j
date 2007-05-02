@@ -184,7 +184,7 @@ public class TestWSSecurityNew2 extends TestCase implements CallbackHandler {
         log.info("Before Encryption AES 128/RSA-15....");
         encryptedDoc = builder.build(doc, crypto, secHeader);
         log.info("After Encryption AES 128/RSA-15....");
-        encryptedMsg = (Message) SOAPUtil.toSOAPMessage(encryptedDoc);
+        encryptedMsg = (Message) SOAPUtil.toAxisMessage(encryptedDoc);
         if (log.isDebugEnabled()) {
             log.debug("Encrypted message, RSA-15 keytransport, AES 128:");
             XMLUtils.PrettyElementToWriter(encryptedMsg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
@@ -216,7 +216,7 @@ public class TestWSSecurityNew2 extends TestCase implements CallbackHandler {
         Document encryptedDoc = builder.build(doc, crypto, secHeader);
         log.info("After Encryption Triple DES/RSA-OAEP....");
 
-        Message encryptedMsg = (Message) SOAPUtil.toSOAPMessage(encryptedDoc);
+        Message encryptedMsg = (Message) SOAPUtil.toAxisMessage(encryptedDoc);
         if (log.isDebugEnabled()) {
             log.debug("Encrypted message, RSA-OAEP keytransport, 3DES:");
             XMLUtils.PrettyElementToWriter(encryptedMsg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
