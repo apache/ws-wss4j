@@ -58,14 +58,13 @@ public class EncryptedKeyProcessor implements Processor {
             LogFactory.getLog("org.apache.ws.security.TIME");
 
     private byte[] decryptedBytes = null;
-    private WSSConfig wssConfig = null;
+    
     private String encryptedKeyId = null;
 
     public void handleToken(Element elem, Crypto crypto, Crypto decCrypto, CallbackHandler cb, WSDocInfo wsDocInfo, Vector returnResults, WSSConfig wsc) throws WSSecurityException {
         if (log.isDebugEnabled()) {
             log.debug("Found encrypted key element");
         }
-        wssConfig = wsc;
         if (decCrypto == null) {
             throw new WSSecurityException(WSSecurityException.FAILURE,
                     "noDecCryptoFile");

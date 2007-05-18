@@ -46,7 +46,6 @@ public class ReferenceListProcessor implements Processor {
 
 	private boolean debug = false;
 
-	WSSConfig wssConfig = null;
 
 	WSDocInfo wsDocInfo = null;
 
@@ -62,7 +61,6 @@ public class ReferenceListProcessor implements Processor {
 			throw new WSSecurityException(WSSecurityException.FAILURE,
 					"noCallback");
 		}
-		wssConfig = wsc;
 		wsDocInfo = wdi;
 		ArrayList uris = handleReferenceList((Element) elem, cb);
 		returnResults.add(0, new WSSecurityEngineResult(WSConstants.ENCR, uris));
