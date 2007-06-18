@@ -578,8 +578,10 @@ public class WSHandlerConstants {
      * Defines which key identifier type to use. The WS-Security specifications
      * recommends to use the identifier type <code>IssuerSerial</code>. For
      * possible encryption key identifier types refer to
-     * {@link #keyIdentifier}. For encryption <code>IssuerSerial</code>
-     * and <code>X509KeyIdentifier</code> are valid only.
+     * {@link #keyIdentifier}. For encryption <code>IssuerSerial</code>,
+     * <code>X509KeyIdentifier</code>,  <code>DirectReference</code>, 
+     * <code>Thumbprint</code>, <code>SKIKeyIdentifier</code>, and
+     * <code>EmbeddedKeyName</code> are valid only.
      * <p/>
      * The application may set this parameter using the following method:
      * <pre>
