@@ -213,6 +213,7 @@ public class SignatureProcessor implements Processor {
                                 "noSigCryptoFile");
                     }
                     if (el.equals(WSSecurityEngine.binaryToken)) {
+                        //TODO: Use results from BinarySecurityTokenProcessor
                         certs = getCertificatesTokenReference((Element) token,
                                 crypto);
                     } else if (el.equals(WSSecurityEngine.SAML_TOKEN)) {

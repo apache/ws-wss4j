@@ -252,8 +252,10 @@ public abstract class WSHandler {
 
         int ai = 0;
         for (int i = 0; i < resultActions; i++) {
-            int act = ((WSSecurityEngineResult) wsResult.get(i)).getAction();
-            if (act == WSConstants.SC) {
+            final Integer actInt = (Integer) ((WSSecurityEngineResult) wsResult
+                    .get(i)).get(WSSecurityEngineResult.TAG_ACTION);
+            int act = actInt.intValue();
+            if (act == WSConstants.SC || act == WSConstants.BST) {
                 continue;
             }
             if (ai >= size || ((Integer) actions.get(ai++)).intValue() != act) {

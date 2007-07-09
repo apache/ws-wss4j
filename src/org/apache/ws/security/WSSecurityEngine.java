@@ -98,12 +98,12 @@ public class WSSecurityEngine {
     /**
      * <code>wsc:DerivedKeyToken</code> as defined by WS-SecureConversation specification in WS-SX
      */
-    public static final QName DERIVED_KEY_TOKEN_05_12 = new QName(ConversationConstants.WSC_NS_05_02, ConversationConstants.DERIVED_KEY_TOKEN_LN);
+    public static final QName DERIVED_KEY_TOKEN_05_12 = new QName(ConversationConstants.WSC_NS_05_12, ConversationConstants.DERIVED_KEY_TOKEN_LN);
 
     /**
      * <code>wsc:SecurityContextToken</code> as defined by WS-SecureConversation specification in WS-SX
      */
-    public static final QName SECURITY_CONTEXT_TOKEN_05_12 = new QName(ConversationConstants.WSC_NS_05_02, ConversationConstants.SECURITY_CONTEXT_TOKEN_LN);
+    public static final QName SECURITY_CONTEXT_TOKEN_05_12 = new QName(ConversationConstants.WSC_NS_05_12, ConversationConstants.SECURITY_CONTEXT_TOKEN_LN);
     
     public WSSecurityEngine() {
     }

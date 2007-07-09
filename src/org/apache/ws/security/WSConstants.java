@@ -365,7 +365,9 @@ public class WSConstants {
 
     public static final int NO_SERIALIZE = 0x100;
     public static final int SERIALIZE = 0x200;
-    public static final int SCT = 0x400;
+    public static final int SCT = 0x400; //SecurityContextToken
+    public static final int DKT = 0x800; //DerivedKeyToken
+    public static final int BST = 0x1000; //BinarySecurityToken
 
     /**
      * Length of UsernameToken derived key used by .NET WSE to sign a message.

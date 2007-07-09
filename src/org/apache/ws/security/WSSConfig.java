@@ -249,6 +249,8 @@ public class WSSConfig {
         } else if(el.equals(WSSecurityEngine.SECURITY_CONTEXT_TOKEN_05_02) ||
                 el.equals(WSSecurityEngine.SECURITY_CONTEXT_TOKEN_05_12)) {
             name = "org.apache.ws.security.processor.SecurityContextTokenProcessor";
+        } else if(el.equals(WSSecurityEngine.binaryToken)) {
+            name = "org.apache.ws.security.processor.BinarySecurityTokenProcessor";
         }
 
         if (name != null) {

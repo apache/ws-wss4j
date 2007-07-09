@@ -18,6 +18,7 @@
 
 package org.apache.ws.security;
 
+import org.apache.ws.security.message.token.BinarySecurity;
 import org.apache.ws.security.message.token.SecurityContextToken;
 import org.apache.ws.security.message.token.SignatureConfirmation;
 import org.apache.ws.security.message.token.Timestamp;
@@ -145,7 +146,21 @@ public class WSSecurityEngineResult extends java.util.HashMap {
     public static final java.lang.String TAG_DATA_REF_URIS =
         "data-ref-uris";
 
+    /**
+     * Tag denoting the X.509 certificate chain found, if applicable.
+     *
+     * The value under this tag is of type java.security.cert.X509Certificate[].
+     */
+    public static final java.lang.String TAG_X509_CERTIFICATES =
+        "x509-certificates";
 
+    /**
+     * Tag denoting the X.509 certificate found, if applicable.
+     *
+     * The value under this tag is of type java.security.cert.X509Certificate.
+     */
+    public static final java.lang.String TAG_BINARY_SECURITY_TOKEN =
+        "binary-security-token";
 
     public WSSecurityEngineResult(
         int act, 
@@ -212,6 +227,13 @@ public class WSSecurityEngineResult extends java.util.HashMap {
     public WSSecurityEngineResult(int act, SignatureConfirmation sc) {
         put(TAG_ACTION, new Integer(act));
         put(TAG_SIGNATURE_CONFIRMATION, sc);
+    }
+
+    public WSSecurityEngineResult(int act, BinarySecurity token,
+            X509Certificate[] certificates) {
+        put(TAG_ACTION, new Integer(act));
+        put(TAG_BINARY_SECURITY_TOKEN, token);
+        put(TAG_X509_CERTIFICATES, certificates);
     }
 
     /**
