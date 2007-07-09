@@ -90,6 +90,15 @@
     </organization>
     <build>
         <sourceDirectory>src</sourceDirectory>
+		<resources>
+			<resource>
+				<directory>src</directory>
+				<includes>
+					<include>org/**/errors.properties</include>
+				</includes>
+				<filtering>false</filtering>
+			</resource>
+		</resources>
         <!--<testSourceDirectory>test</testSourceDirectory> -->
         <plugins>
             <plugin>
