@@ -238,7 +238,7 @@ public class WSSignEnvelope extends WSBaseMessage {
 
         /*
          * Gather some info about the document to process and store it for
-         * retrival
+         * retrieval
          */
         WSDocInfo wsDocInfo = new WSDocInfo(doc.hashCode());
         wsDocInfo.setCrypto(crypto);
@@ -348,7 +348,7 @@ public class WSSignEnvelope extends WSBaseMessage {
             String nmSpace = encPart.getNamespace();
 
             /*
-             * Set up the elements to sign. There are two resevered element
+             * Set up the elements to sign. There are two reserved element
              * names: "Token" and "STRTransform" "Token": Setup the Signature to
              * either sign the information that points to the security token or
              * the token itself. If its a direct reference sign the token,

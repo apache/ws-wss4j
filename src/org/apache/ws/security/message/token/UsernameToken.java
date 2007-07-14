@@ -145,7 +145,7 @@ public class UsernameToken {
 
     /**
      * Constructs a <code>UsernameToken</code> object according to the defined
-     * parameters. <p/> This constructes set the password encoding to
+     * parameters. <p/> This constructs set the password encoding to
      * {@link WSConstants#PASSWORD_DIGEST}
      * 
      * @param doc
@@ -241,7 +241,7 @@ public class UsernameToken {
     }
 
     /**
-     * Adds and otionally creates a Salt element to this UsernameToken.
+     * Adds and optionally creates a Salt element to this UsernameToken.
      * 
      * If the <code>saltCalue</code> is <code>null</code> the the method
      * generates a new salt. Otherwise it uses the the given value.
@@ -366,7 +366,7 @@ public class UsernameToken {
     }
 
     /**
-     * Get the hashed inidicator. If the indicator is
+     * Get the hashed indicator. If the indicator is
      * <code>true> the password of the
      * <code>UsernameToken</code> was encoded using
      * {@link WSConstants#PASSWORD_DIGEST}
@@ -455,7 +455,7 @@ public class UsernameToken {
     }
 
     /**
-     * Returns the data of an elemen as String or null if either the the element
+     * Returns the data of an element as String or null if either the the element
      * does not contain a Text node or the node is empty.
      * 
      * @param e
@@ -519,7 +519,7 @@ public class UsernameToken {
      * to generate the secret key. These default values are suitable for .NET
      * WSE.
      * 
-     * @return a secret key constructed from information conatined in this
+     * @return a secret key constructed from information contained in this
      *         username token
      */
     public byte[] getSecretKey() {
@@ -534,7 +534,7 @@ public class UsernameToken {
      *            How many bytes to generate for the key
      * @param labelString
      *            the label used to generate the seed
-     * @return a secret key constructed from information conatined in this
+     * @return a secret key constructed from information contained in this
      *         username token
      */
     public byte[] getSecretKey(int keylen, String labelString) {
@@ -581,7 +581,7 @@ public class UsernameToken {
      * @param salt
      *            The Salt value
      * @param iteration
-     *            The Iteration value. If zero (0) is given the mehtod uses the
+     *            The Iteration value. If zero (0) is given the method uses the
      *            default value
      * @return Returns the derived key a byte array
      * @throws WSSecurityException
@@ -650,7 +650,7 @@ public class UsernameToken {
      *            the HMAC algorithm
      * @param required
      *            number of bytes to generate
-     * @return a byte array that conatins a secrect key
+     * @return a byte array that contains a secret key
      * @throws Exception
      */
     private static byte[] P_hash(byte[] secret, byte[] seed, Mac mac,

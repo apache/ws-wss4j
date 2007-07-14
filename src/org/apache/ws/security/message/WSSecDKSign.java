@@ -235,7 +235,7 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
      * The added references are signed when calling
      * <code>computeSignature()</code>. This method can be called several
      * times to add references as required. <code>addReferencesToSign()</code>
-     * can be called anytime after <code>prepare</code>.
+     * can be called any time after <code>prepare</code>.
      * 
      * @param references
      *            A vector containing <code>WSEncryptionPart</code> objects
@@ -260,7 +260,7 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
             String nmSpace = encPart.getNamespace();
 
             /*
-             * Set up the elements to sign. There are two resevered element
+             * Set up the elements to sign. There are two reserved element
              * names: "Token" and "STRTransform" "Token": Setup the Signature to
              * either sign the information that points to the security token or
              * the token itself. If its a direct reference sign the token,
@@ -411,7 +411,7 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
      * Compute the Signature over the references.
      * 
      * After references are set this method computes the Signature for them.
-     * This method can be called anytime after the references were set. See
+     * This method can be called any time after the references were set. See
      * <code>addReferencesToSign()</code>.
      * 
      * @throws WSSecurityException

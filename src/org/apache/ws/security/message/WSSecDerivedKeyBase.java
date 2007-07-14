@@ -158,7 +158,7 @@ public abstract class WSSecDerivedKeyBase extends WSSecBase {
     /**
      * Initialize a WSSec Derived key.
      * 
-     * The method prepares and initializes a WSSec dereived key structure after the
+     * The method prepares and initializes a WSSec derived key structure after the
      * relevant information was set. This method also creates and initializes the
      * derived token using the ephemeral key. After preparation references
      * can be added, encrypted and signed as required.

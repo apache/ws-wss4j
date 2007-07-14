@@ -54,7 +54,7 @@ public class WSSecSAMLToken extends WSSecBase {
      * constructed.
      * 
      * @param doc
-     *            The SOAP enevlope as W3C document
+     *            The SOAP envelope as W3C document
      */
     public void prepare(Document doc, SAMLAssertion assertion) {
         document = doc;
@@ -105,7 +105,7 @@ public class WSSecSAMLToken extends WSSecBase {
      * A complete <code>SAMLAssertion</code> is added to the
      * <code>wsse:Security</code> header.
      *
-     * @param doc      The SOAP enevlope as W3C document
+     * @param doc      The SOAP envelope as W3C document
      * @param assertion TODO
      * @return Document with UsernameToken added
      */

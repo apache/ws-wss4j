@@ -112,7 +112,7 @@ public class WSSecBase {
 	 * Looks up or adds a body id. <p/> First try to locate the
 	 * <code>wsu:Id</code> in the SOAP body element. If one is found, the
 	 * value of the <code>wsu:Id</code> attribute is returned. Otherwise the
-	 * methode generates a new <code>wsu:Id</code> and an appropriate value.
+	 * method generates a new <code>wsu:Id</code> and an appropriate value.
 	 * 
 	 * @param doc
 	 *            The SOAP envelope as <code>Document</code>

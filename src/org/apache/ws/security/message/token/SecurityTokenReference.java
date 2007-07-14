@@ -212,7 +212,7 @@ public class SecurityTokenReference {
     }
 
     /*
-     * Here the methods that handle the various key identifer types
+     * Here the methods that handle the various key identifier types
      * such as KeyIdentifier, SubjectKeyIdentifier (SKI)
      */
 
@@ -222,7 +222,7 @@ public class SecurityTokenReference {
      * it into a <code>wsse:KeyIdentifier</code> element, which is placed
      * in the <code>wsse:SecurityTokenReference</code> element.
      *
-     * @param cert is the X509 certficate to be inserted as key identifier
+     * @param cert is the X509 certificate to be inserted as key identifier
      */
     public void setKeyIdentifier(X509Certificate cert)
             throws WSSecurityException {
@@ -244,7 +244,7 @@ public class SecurityTokenReference {
      * inserts it into a <code>wsse:KeyIdentifier</code> element, which is placed
      * in the <code>wsse:SecurityTokenReference</code> element.
      *
-     * @param cert   is the X509 certficate to get the SKI
+     * @param cert   is the X509 certificate to get the SKI
      * @param crypto is the Crypto implementation. Used to read SKI info bytes from certificate
      */
     public void setKeyIdentifierSKI(X509Certificate cert, Crypto crypto)
@@ -265,7 +265,7 @@ public class SecurityTokenReference {
      * element.
      * 
      * @param cert
-     *            is the X509 certficate to get the thumbprint
+     *            is the X509 certificate to get the thumbprint
      */
     public void setKeyIdentifierThumb(X509Certificate cert)
             throws WSSecurityException {
@@ -315,7 +315,7 @@ public class SecurityTokenReference {
     /**
      * Gets the KeyIdentifer.
      *
-     * @return the the X509 certficate or zero if a unknown key identifier
+     * @return the the X509 certificate or zero if a unknown key identifier
      *         type was detected.
      */
     public X509Certificate[] getKeyIdentifier(Crypto crypto)
@@ -385,7 +385,7 @@ public class SecurityTokenReference {
     }
 
     /*
-     * Here the methods that handle the IssuerSerial key identifiaton
+     * Here the methods that handle the IssuerSerial key identification
      */
 
     /**
@@ -466,7 +466,7 @@ public class SecurityTokenReference {
     }
 
     /*
-     * Several helper and utility mehtods.
+     * Several helper and utility methods.
      */
 
     /**

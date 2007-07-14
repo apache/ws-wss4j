@@ -60,7 +60,7 @@ import java.util.Vector;
 /**
  * Creates a Signature according to WS Specification, X509 profile.
  * 
- * This class is a refactored implementation of the previous WSS4J class
+ * This class is a re-factored implementation of the previous WSS4J class
  * <code>WSSignEnvlope</code>. This new class allows better control of
  * the process to create a Signature and to add it to the Security header.
  * 
@@ -133,7 +133,7 @@ public class WSSecSignature extends WSSecBase {
 	/**
 	 * Get the single cert flag.
 	 * 
-	 * @return A blolean if single vertificate is set.
+	 * @return A boolean if single certificate is set.
 	 */
 	public boolean isUseSingleCertificate() {
 		return this.useSingleCert;
@@ -143,7 +143,7 @@ public class WSSecSignature extends WSSecBase {
 	 * Set the name of the signature encryption algorithm to use.
 	 * 
 	 * If the algorithm is not set then an automatic detection of the signature
-	 * algorithm to use is perfomed during the <code>prepare()</code>
+	 * algorithm to use is performed during the <code>prepare()</code>
 	 * method. Refer to WSConstants which algorithms are supported.
 	 * 
 	 * @param algo
@@ -159,7 +159,7 @@ public class WSSecSignature extends WSSecBase {
 	 * Get the name of the signature algorithm that is being used.
 	 * 
 	 * Call this method after <code>prepare</code> to get the information
-	 * which signature algorithem was automaticall detected if no signature
+	 * which signature algorithm was automatically detected if no signature
 	 * algorithm was preset.
 	 * 
 	 * @return the identifier URI of the signature algorithm
@@ -265,7 +265,7 @@ public class WSSecSignature extends WSSecBase {
 	 *            An instance of the Crypto API to handle keystore and
 	 *            certificates
 	 * @param secHeader
-	 *            The security header that will hold the Signature. This ise use
+	 *            The security header that will hold the Signature. This is used
 	 *            to construct namespace prefixes for Signature. This method
 	 * @throws WSSecurityException
 	 */
@@ -273,7 +273,7 @@ public class WSSecSignature extends WSSecBase {
 			throws WSSecurityException {
 		/*
 		 * Gather some info about the document to process and store it for
-		 * retrival
+		 * retrieval
 		 */
 		crypto = cr;
 		document = doc;
@@ -295,7 +295,7 @@ public class WSSecSignature extends WSSecBase {
 			}
 			certUri = "CertId-" + certs[0].hashCode();
 			/*
-			 * If no signature algo was set try to detect it accroding to the
+			 * If no signature algo was set try to detect it according to the
 			 * data stored in the certificate.
 			 */
 			if (sigAlgo == null) {
@@ -309,7 +309,7 @@ public class WSSecSignature extends WSSecBase {
 					throw new WSSecurityException(
 							WSSecurityException.FAILURE,
 							"invalidX509Data",
-							new Object[] { "for Signature - unkown public key Algo" });
+							new Object[] { "for Signature - unknown public key Algo" });
 				}
 			}
 		}
@@ -656,7 +656,7 @@ public class WSSecSignature extends WSSecBase {
 	 * Compute the Signature over the references.
 	 * 
 	 * After references are set this method computes the Signature for them.
-	 * This method can be called anytime after the references were set. See
+	 * This method can be called any time after the references were set. See
 	 * <code>addReferencesToSign()</code>.
 	 * 
 	 * @throws WSSecurityException

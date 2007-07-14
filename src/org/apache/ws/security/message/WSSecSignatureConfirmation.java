@@ -66,7 +66,7 @@ public class WSSecSignatureConfirmation extends WSSecBase {
 	 * filed <code>signatureValue</code> must be set
 	 * 
 	 * @param doc
-	 *            The SOAP enevlope as W3C document
+	 *            The SOAP envelope as W3C document
 	 */
 	public void prepare(Document doc) {
 		document = doc;

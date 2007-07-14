@@ -320,7 +320,7 @@ public class DerivedKeyToken {
             this.elementGeneration.appendChild(this.element.getOwnerDocument().createTextNode(Integer.toString(generation)));
             this.element.appendChild(this.elementGeneration);
         } else {
-            throw new ConversationException("Generatation cannot be set along with offset - Offset is already set");
+            throw new ConversationException("Generation cannot be set along with offset - Offset is already set");
         }
     }
 
@@ -440,7 +440,7 @@ public class DerivedKeyToken {
     }
 
     /**
-     * Gets the derivattion algorithm
+     * Gets the derivation algorithm
      *
      * @return the value of the <code>wsc:Algorithm</code> attribute of this
      *         DerivedKeyToken
@@ -456,7 +456,7 @@ public class DerivedKeyToken {
     }
 
     /**
-     * Set the derivattion algorithm of this derived key token.
+     * Set the derivation algorithm of this derived key token.
      *
      * @param derivattion algorithm the value for the <code>wsu:Algorithm</code> attribute of this
      *                    DerivgedKeyToken

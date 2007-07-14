@@ -130,7 +130,7 @@ public class WSSecUsernameToken extends WSSecBase {
 	 * constructed.
 	 * 
 	 * @param doc
-	 *            The SOAP enevlope as W3C document
+	 *            The SOAP envelope as W3C document
 	 */
 	public void prepare(Document doc) {
 		document = doc;
@@ -188,7 +188,7 @@ public class WSSecUsernameToken extends WSSecBase {
 	 * <code>wsse:Security</code> header.
 	 * 
 	 * @param doc
-	 *            The SOAP enevlope as W3C document
+	 *            The SOAP envelope as W3C document
 	 * @param secHeader
 	 *            The security header inside the SOAP envelope
 	 * @return Document with UsernameToken added

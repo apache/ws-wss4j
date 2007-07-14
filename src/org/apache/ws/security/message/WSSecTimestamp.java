@@ -101,7 +101,7 @@ public class WSSecTimestamp extends WSSecBase {
      * <code>wsse:Security</code> header.
      * 
      * @param doc
-     *            The SOAP enevlope as W3C document
+     *            The SOAP envelope as W3C document
      * @param secHeader
      *            The security header that hold this Timestamp
      * @return Document with Timestamp added

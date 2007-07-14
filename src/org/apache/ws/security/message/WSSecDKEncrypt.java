@@ -38,7 +38,7 @@ import javax.crypto.SecretKey;
 import java.util.Vector;
 
 /**
- * Encrypts and signes parts of a message with derived keys derived from a
+ * Encrypts and signs parts of a message with derived keys derived from a
  * symmetric key. This symmetric key will be included as an EncryptedKey
  * 
  * @author Ruchith Fernando (ruchith.fernando@gmail.com)
