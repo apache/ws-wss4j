@@ -121,7 +121,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
     /**
      * Set the name of the symmetric encryption algorithm to use.
      * 
-     * This encryption alogrithm is used to encrypt the data. If the algorithm
+     * This encryption algorithm is used to encrypt the data. If the algorithm
      * is not set then AES128 is used. Refer to WSConstants which algorithms are
      * supported.
      * 
@@ -140,7 +140,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
      * Set the name of an optional canonicalization algorithm to use before
      * encryption.
      * 
-     * This c14n alogrithm is used to serialize the data before encryption. If
+     * This c14n algorithm is used to serialize the data before encryption. If
      * the algorithm is not set then a standard serialization is used (provided
      * by XMLCipher, usually a XMLSerializer according to DOM 3 specification).
      * 
@@ -154,7 +154,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
     /**
      * Get the name of symmetric encryption algorithm to use.
      * 
-     * The name of the encryption alogrithm to encrypt the data, i.e. the SOAP
+     * The name of the encryption algorithm to encrypt the data, i.e. the SOAP
      * Body. Refer to WSConstants which algorithms are supported.
      * 
      * @return the name of the currently selected symmetric encryption algorithm
@@ -171,7 +171,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
      * Initialize a WSSec Encrypt.
      * 
      * The method prepares and initializes a WSSec Encrypt structure after the
-     * relevant information was set. After preparartion of the token references
+     * relevant information was set. After preparation of the token references
      * can be added and encrypted.
      * 
      * </p>
@@ -241,7 +241,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
      * parameter.
      * 
      * @param doc
-     *            the SOAP envelope as <code>Document</code> with plaintext
+     *            the SOAP envelope as <code>Document</code> with plain text
      *            Body
      * @param crypto
      *            an instance of the Crypto API to handle keystore and
@@ -373,8 +373,8 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
     /**
      * Adds the internal Reference element to this Encrypt data.
      * 
-     * The refernce element <i>must</i> be created by the
-     * <code>encryptForInternalRef()</code> method. The refernce element is
+     * The reference element <i>must</i> be created by the
+     * <code>encryptForInternalRef()</code> method. The reference element is
      * added to the <code>EncryptedKey</code> element of this encrypt block.
      * 
      * @param dataRef
@@ -387,7 +387,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
     /**
      * Adds (prepends) the external Reference element to the Security header.
      * 
-     * The refernce element <i>must</i> be created by the
+     * The reference element <i>must</i> be created by the
      * <code>encryptForExternalRef() </code> method. The method prepends the
      * reference element in the SecurityHeader.
      * 
@@ -464,7 +464,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
                 keyInfo.addUnknownElement(secToken.getElement());
             }
             /*
-             * Forth step: encrypt data, and set neccessary attributes in
+             * Forth step: encrypt data, and set necessary attributes in
              * xenc:EncryptedData
              */
             try {
@@ -498,7 +498,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
 
         /*
          * Second step: generate a symmetric key from the specified key
-         * (password) for this alogrithm, and set the cipher into encryption
+         * (password) for this algorithm, and set the cipher into encryption
          * mode.
          */
         if (this.symmetricKey == null) {
@@ -598,9 +598,9 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
      * Create DOM subtree for <code>xenc:EncryptedKey</code>
      * 
      * @param doc
-     *            the SOAP enevelope parent document
+     *            the SOAP envelope parent document
      * @param keyTransportAlgo
-     *            specifies which alogrithm to use to encrypt the symmetric key
+     *            specifies which algorithm to use to encrypt the symmetric key
      * @return an <code>xenc:EncryptedKey</code> element
      */
 
