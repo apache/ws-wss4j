@@ -17,6 +17,8 @@
 
 package org.apache.ws.security;
 
+import org.w3c.dom.Element;
+
 import javax.security.auth.callback.Callback;
 
 /**
@@ -70,14 +72,16 @@ public class WSPasswordCallback implements Callback {
     public static final int SIGNATURE = 3;
     public static final int KEY_NAME = 4;
     public static final int USERNAME_TOKEN_UNKNOWN = 5;
-    public final static int SECURITY_CONTEXT_TOKEN = 6; 
+    public final static int SECURITY_CONTEXT_TOKEN = 6;
+    public final static int CUSTOM_TOKEN = 7;
 
     private String identifier;
     private String password;
     private byte[] key;
     private int usage;
     private String passwordType;
-
+    private Element customToken;
+    
     /**
      * Constructor.
      *
@@ -168,5 +172,13 @@ public class WSPasswordCallback implements Callback {
 	public String getPasswordType() {
 		return passwordType;
 	}
+
+    public Element getCustomToken() {
+        return customToken;
+    }
+
+    public void setCustomToken(Element customToken) {
+        this.customToken = customToken;
+    }
 }
 

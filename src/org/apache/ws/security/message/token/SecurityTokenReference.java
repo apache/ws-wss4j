@@ -21,6 +21,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDocInfo;
+import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.util.DOM2Writer;
@@ -31,6 +32,9 @@ import org.apache.xml.security.keys.content.X509Data;
 import org.apache.ws.security.util.Base64;
 import org.apache.xml.security.utils.Constants;
 import org.w3c.dom.*;
+
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.CallbackHandler;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -143,7 +147,7 @@ public class SecurityTokenReference {
      * @throws WSSecurityException When either no <code>Reference</code> element, or the found
      *                   reference contains no URI, or the referenced signing not found.
      */
-    public Element getTokenElement(Document doc, WSDocInfo docInfo)
+    public Element getTokenElement(Document doc, WSDocInfo docInfo, CallbackHandler cb)
             throws WSSecurityException {
         Reference ref = getReference();
         String uri = ref.getURI();
@@ -156,7 +160,8 @@ public class SecurityTokenReference {
         }
         Element tokElement = null;
         String tmpS = WSConstants.WSS_SAML_NS + WSConstants.WSS_SAML_ASSERTION;
-        if (tmpS.equals(ref.getValueType())) {
+        String saml10 = WSConstants.WSS_SAML_NS + WSConstants.SAML_ASSERTION_ID;
+        if (tmpS.equals(ref.getValueType()) || saml10.equals(ref.getValueType())) {
             Element sa = docInfo.getAssertion();
             String saID = null;
             if (sa != null) {
@@ -167,9 +172,32 @@ public class SecurityTokenReference {
             }
             String id = uri.substring(1);
             if (saID == null || !saID.equals(id)) {
-                throw new WSSecurityException(WSSecurityException.INVALID_SECURITY,
-                        "badReferenceURI",
-                        new Object[]{"uri:" + uri + ", saID: " + saID});
+                
+                if(cb != null) {
+                    //try to find a custom token
+                    WSPasswordCallback pwcb = new WSPasswordCallback(id,
+                            WSPasswordCallback.CUSTOM_TOKEN);
+                    try {
+                        cb.handle(new Callback[]{pwcb});
+                    } catch (Exception e) {
+                        throw new WSSecurityException(WSSecurityException.FAILURE,
+                                "noPassword", new Object[] { id });
+                    }
+                    
+                    Element assertionElem = pwcb.getCustomToken();
+                    if(assertionElem != null) {
+                        sa = (Element)doc.importNode(assertionElem, true);
+                    }
+                    else {
+                        throw new WSSecurityException(WSSecurityException.INVALID_SECURITY,
+                            "badReferenceURI",
+                            new Object[]{"uri:" + uri + ", saID: " + saID});
+                    }
+                } else {
+                    throw new WSSecurityException(WSSecurityException.INVALID_SECURITY,
+                            "badReferenceURI",
+                            new Object[]{"uri:" + uri + ", saID: " + saID});
+                }
             }
             tokElement = sa;
         } else {

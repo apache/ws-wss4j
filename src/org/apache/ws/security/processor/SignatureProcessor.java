@@ -20,10 +20,12 @@ package org.apache.ws.security.processor;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.ws.security.CustomTokenPrincipal;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDerivedKeyTokenPrincipal;
 import org.apache.ws.security.WSDocInfo;
 import org.apache.ws.security.WSDocInfoStore;
+import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSSecurityEngineResult;
@@ -37,27 +39,30 @@ import org.apache.ws.security.message.token.PKIPathSecurity;
 import org.apache.ws.security.message.token.SecurityTokenReference;
 import org.apache.ws.security.message.token.UsernameToken;
 import org.apache.ws.security.message.token.X509Security;
+import org.apache.ws.security.saml.SAMLKeyInfo;
 import org.apache.ws.security.saml.SAMLUtil;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.xml.security.exceptions.XMLSecurityException;
-
 import org.apache.xml.security.keys.KeyInfo;
 import org.apache.xml.security.signature.Reference;
 import org.apache.xml.security.signature.SignedInfo;
 import org.apache.xml.security.signature.XMLSignature;
 import org.apache.xml.security.signature.XMLSignatureException;
+import org.opensaml.SAMLAssertion;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import javax.xml.namespace.QName;
+import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
+import javax.xml.namespace.QName;
+
 import java.security.Principal;
 import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
-import java.util.Vector;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.Vector;
 
 public class SignatureProcessor implements Processor {
     private static Log log = LogFactory.getLog(SignatureProcessor.class.getName());
@@ -78,7 +83,7 @@ public class SignatureProcessor implements Processor {
         Principal lastPrincipalFound = null;
         try {
             lastPrincipalFound = verifyXMLSignature((Element) elem,
-                    crypto, returnCert, returnElements, protectedElements, signatureValue);
+                    crypto, returnCert, returnElements, protectedElements, signatureValue, cb);
         } catch (WSSecurityException ex) {
             throw ex;
         } finally {
@@ -129,6 +134,7 @@ public class SignatureProcessor implements Processor {
      *                    the certificate
      * @param returnElements verifyXMLSignature adds the wsu:ID attribute values for
      * 			     the signed elements to this Set
+     * @param cb CallbackHandler instance to extract key passwords
      * @return the subject principal of the validated X509 certificate (the
      *         authenticated subject). The calling function may use this
      *         principal for further authentication or authorization.
@@ -139,7 +145,8 @@ public class SignatureProcessor implements Processor {
                                            X509Certificate[] returnCert,
                                            Set returnElements,
                                            Set protectedElements,
-                                           byte[][] signatureValue)
+                                           byte[][] signatureValue,
+                                           CallbackHandler cb)
             throws WSSecurityException {
         if (log.isDebugEnabled()) {
             log.debug("Verify XML Signature");
@@ -164,7 +171,9 @@ public class SignatureProcessor implements Processor {
         byte[] secretKey = null;
         UsernameToken ut = null;
         DerivedKeyToken dkt = null;
-
+        SAMLKeyInfo samlKi = null;
+        String customTokenId = null;
+        
         if (info != null) {
             Node node = WSSecurityUtil.getDirectChild(info.getElement(),
                     SecurityTokenReference.SECURITY_TOKEN_REFERENCE,
@@ -186,7 +195,7 @@ public class SignatureProcessor implements Processor {
 
             if (secRef.containsReference()) {
                 Element token = secRef.getTokenElement(elem.getOwnerDocument(),
-                        wsDocInfo);
+                        wsDocInfo, cb);
                 /*
                      * at this point check token type: UsernameToken, Binary, SAML
                      * Crypto required only for Binary and SAML
@@ -207,7 +216,8 @@ public class SignatureProcessor implements Processor {
                         WSSecurityUtil.getKeyLength(signatureMethodURI);
                     
                     secretKey = dktProcessor.getKeyBytes(keyLength);
-                } else {
+                } 
+                else {
                     if (crypto == null) {
                         throw new WSSecurityException(WSSecurityException.FAILURE,
                                 "noSigCryptoFile");
@@ -217,12 +227,35 @@ public class SignatureProcessor implements Processor {
                         certs = getCertificatesTokenReference((Element) token,
                                 crypto);
                     } else if (el.equals(WSSecurityEngine.SAML_TOKEN)) {
-                        certs = SAMLUtil.getCertificatesFromSAML((Element) token);
+                        samlKi = SAMLUtil.getSAMLKeyInfo(
+                                (Element) token, crypto, cb);
+                        
+                        certs = samlKi.getCerts();
+                        secretKey = samlKi.getSecret();
                     } else {
-                        throw new WSSecurityException(
-                                WSSecurityException.INVALID_SECURITY,
-                                "unsupportedKeyInfo", new Object[]{el
-                                .toString()});
+                        
+                        //Try custom token through callback handler
+                      //try to find a custom token
+                        String id = secRef
+                                .getReference().getURI().substring(1);
+                        WSPasswordCallback pwcb = new WSPasswordCallback(id,
+                                WSPasswordCallback.CUSTOM_TOKEN);
+                        try {
+                            cb.handle(new Callback[]{pwcb});
+                        } catch (Exception e) {
+                            throw new WSSecurityException(WSSecurityException.FAILURE,
+                                    "noPassword", new Object[] { id });
+                        }
+                        
+                        secretKey = pwcb.getKey();
+                        customTokenId = id;
+                        
+                        if(secretKey == null) {
+                            throw new WSSecurityException(
+                                    WSSecurityException.INVALID_SECURITY,
+                                    "unsupportedKeyInfo", new Object[]{el
+                                    .toString()});
+                        }
                     }
                 }
             } else if (secRef.containsX509Data() || secRef.containsX509IssuerSerial()) {
@@ -335,7 +368,16 @@ public class SignatureProcessor implements Processor {
                     String basetokenId = dkt.getSecuityTokenReference().getReference().getURI().substring(1);
                     principal.setBasetokenId(basetokenId);
                     return principal;
-                } else {
+                } else if(samlKi != null) {
+                    final SAMLAssertion assertion = samlKi.getAssertion();
+                    CustomTokenPrincipal principal = new CustomTokenPrincipal(assertion.getId());
+                    principal.setTokenObject(assertion);
+                    return principal;
+                } else if(secretKey != null) {
+                    //This is the custom key scenario
+                    CustomTokenPrincipal principal = new CustomTokenPrincipal(customTokenId);
+                    return principal;
+                }else {
                     throw new WSSecurityException("Cannot determine principal");
                 }
             } else {

@@ -194,7 +194,7 @@ public class EncryptedKeyProcessor implements Processor {
                         log.debug("KeyIdentifier Alias: " + alias);
                     }
                 } else if (secRef.containsReference()) {
-                    Element bstElement = secRef.getTokenElement(doc, null);
+                    Element bstElement = secRef.getTokenElement(doc, null, cb);
 
                     // at this point ... check token type: Binary
                     QName el =

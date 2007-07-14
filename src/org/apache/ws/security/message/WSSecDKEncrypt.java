@@ -123,7 +123,7 @@ public class WSSecDKEncrypt extends WSSecDerivedKeyBase {
             String xencEncryptedDataId = "EncDataId-" + body.hashCode();
 
             /*
-             * Forth step: encrypt data, and set neccessary attributes in
+             * Forth step: encrypt data, and set necessary attributes in
              * xenc:EncryptedData
              */
             try {

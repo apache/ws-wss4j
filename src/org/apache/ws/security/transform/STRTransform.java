@@ -272,7 +272,7 @@ public class STRTransform extends TransformSpi {
             if (doDebug) {
                 log.debug("STR: Reference");
             }
-            tokElement = secRef.getTokenElement(doc, wsDocInfo);
+            tokElement = secRef.getTokenElement(doc, wsDocInfo, null);
         }
         /*
          * second case: IssuerSerial, lookup in keystore, wrap in BST according

@@ -71,6 +71,12 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
     protected SecurityTokenReference securityTokenReference = null;
 
     /**
+     * Indicates whether to encrypt the symmetric key into an EncryptedKey 
+     * or not.
+     */
+    private boolean encryptSymmKey = true;
+
+    /**
      * Constructor.
      */
     public WSSecEncrypt() {
@@ -189,7 +195,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
          * key (session key) for this Encrypt element. This key will be
          * encrypted using the public key of the receiver
          */
-
+        
         
         if(this.ephemeralKey == null) {
             if (symmetricKey == null) {
@@ -198,22 +204,31 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
             } 
             this.ephemeralKey = this.symmetricKey.getEncoded();
         }
+        
+        if (this.symmetricKey == null) {
+
+            this.symmetricKey = WSSecurityUtil.prepareSecretKey(symEncAlgo,
+                    this.ephemeralKey);
+        }
+        
         /*
          * Get the certificate that contains the public key for the public key
          * algorithm that will encrypt the generated symmetric (session) key.
          */
-        X509Certificate remoteCert = null;
-        if (useThisCert != null) {
-            remoteCert = useThisCert;
-        } else {
-            X509Certificate[] certs = crypto.getCertificates(user);
-            if (certs == null || certs.length <= 0) {
-                throw new WSSecurityException(WSSecurityException.FAILURE,
-                        "invalidX509Data", new Object[] { "for Encryption" });
+        if(this.encryptSymmKey) {
+            X509Certificate remoteCert = null;
+            if (useThisCert != null) {
+                remoteCert = useThisCert;
+            } else {
+                X509Certificate[] certs = crypto.getCertificates(user);
+                if (certs == null || certs.length <= 0) {
+                    throw new WSSecurityException(WSSecurityException.FAILURE,
+                            "invalidX509Data", new Object[] { "for Encryption" });
+                }
+                remoteCert = certs[0];
             }
-            remoteCert = certs[0];
+            prepareInternal(this.ephemeralKey, remoteCert, crypto);
         }
-        prepareInternal(this.ephemeralKey, remoteCert, crypto);
     }
 
     /**
@@ -344,16 +359,8 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
     public Element encryptForExternalRef(Element dataRef, Vector references)
             throws WSSecurityException {
 
-        KeyInfo keyInfo = new KeyInfo(document);
-        SecurityTokenReference secToken = new SecurityTokenReference(document);
-        Reference ref = new Reference(document);
-        ref.setURI("#" + encKeyId);
-        secToken.setReference(ref);
-
-        keyInfo.addUnknownElement(secToken.getElement());
-
         Vector encDataRefs = doEncryption(document, this.symmetricKey,
-                keyInfo, references);
+                references);
         Element referenceList = dataRef;
         if (referenceList == null) {
             referenceList = document.createElementNS(WSConstants.ENC_NS,
@@ -412,6 +419,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
 
         Vector encDataRef = new Vector();
 
+        boolean cloneKeyInfo = false;
         for (int part = 0; part < references.size(); part++) {
             WSEncryptionPart encPart = (WSEncryptionPart) references.get(part);
 
@@ -445,6 +453,16 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
             boolean content = modifier.equals("Content") ? true : false;
             String xencEncryptedDataId = "EncDataId-" + body.hashCode();
 
+            if(keyInfo == null) {
+                cloneKeyInfo = true;
+                keyInfo = new KeyInfo(document);
+                SecurityTokenReference secToken = new SecurityTokenReference(document);
+                Reference ref = new Reference(document);
+                ref.setURI("#" + encKeyId);
+                secToken.setReference(ref);
+    
+                keyInfo.addUnknownElement(secToken.getElement());
+            }
             /*
              * Forth step: encrypt data, and set neccessary attributes in
              * xenc:EncryptedData
@@ -455,6 +473,9 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
                 encData.setId(xencEncryptedDataId);
                 encData.setKeyInfo(keyInfo);
                 xmlCipher.doFinal(doc, body, content);
+                if(cloneKeyInfo) {
+                    keyInfo = null;
+                }
             } catch (Exception e2) {
                 throw new WSSecurityException(
                         WSSecurityException.FAILED_ENC_DEC, null, null, e2);
@@ -623,6 +644,14 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
      */
     public void setSecurityTokenReference(SecurityTokenReference reference) {
         securityTokenReference = reference;
+    }
+
+    public boolean isEncryptSymmKey() {
+        return encryptSymmKey;
+    }
+
+    public void setEncryptSymmKey(boolean encryptSymmKey) {
+        this.encryptSymmKey = encryptSymmKey;
     }
 
 }

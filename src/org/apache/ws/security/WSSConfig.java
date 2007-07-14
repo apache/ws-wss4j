@@ -251,6 +251,8 @@ public class WSSConfig {
             name = "org.apache.ws.security.processor.SecurityContextTokenProcessor";
         } else if(el.equals(WSSecurityEngine.binaryToken)) {
             name = "org.apache.ws.security.processor.BinarySecurityTokenProcessor";
+        } else if(el.equals(WSSecurityEngine.ENCRYPTED_DATA)) {
+            name = "org.apache.ws.security.processor.EncryptedDataProcessor";
         }
 
         if (name != null) {

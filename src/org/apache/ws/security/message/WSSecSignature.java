@@ -111,6 +111,10 @@ public class WSSecSignature extends WSSecBase {
 
 	protected BinarySecurity bstToken = null;
 
+    private String customTokenValueType;
+
+    private String customTokenId;
+
 	/**
 	 * Constructor.
 	 */
@@ -282,7 +286,8 @@ public class WSSecSignature extends WSSecBase {
 		 * parameters.
 		 */
 		X509Certificate[] certs = null;
-		if (keyIdentifierType != WSConstants.UT_SIGNING) {
+		if (keyIdentifierType != WSConstants.UT_SIGNING
+                && keyIdentifierType != WSConstants.CUSTOM_SYMM_SIGNING) {
 			certs = crypto.getCertificates(user);
 			if (certs == null || certs.length <= 0) {
 				throw new WSSecurityException(WSSecurityException.FAILURE,
@@ -409,6 +414,12 @@ public class WSSecSignature extends WSSecBase {
 			secRef.setKeyIdentifierThumb(certs[0]);
 			break;
 
+		case WSConstants.CUSTOM_SYMM_SIGNING :
+            Reference refCust = new Reference(document);
+            refCust.setValueType(this.customTokenValueType);
+            refCust.setURI("#" + this.customTokenId);
+            secRef.setReference(refCust);
+		    break;
 		default:
 			throw new WSSecurityException(WSSecurityException.FAILURE,
 					"unsupportedKeyId");
@@ -423,7 +434,7 @@ public class WSSecSignature extends WSSecBase {
 	 * The added references are signed when calling
 	 * <code>computeSignature()</code>. This method can be called several
 	 * times to add references as required. <code>addReferencesToSign()</code>
-	 * can be called anytime after <code>prepare</code>.
+	 * can be called any time after <code>prepare</code>.
 	 * 
 	 * @param references
 	 *            A vector containing <code>WSEncryptionPart</code> objects
@@ -448,7 +459,7 @@ public class WSSecSignature extends WSSecBase {
 			String nmSpace = encPart.getNamespace();
 
 			/*
-			 * Set up the elements to sign. There are two resevered element
+			 * Set up the elements to sign. There are two reserved element
 			 * names: "Token" and "STRTransform" "Token": Setup the Signature to
 			 * either sign the information that points to the security token or
 			 * the token itself. If its a direct reference sign the token,
@@ -653,7 +664,8 @@ public class WSSecSignature extends WSSecBase {
 	public void computeSignature() throws WSSecurityException {
 		WSDocInfoStore.store(wsDocInfo);
 		try {
-			if (keyIdentifierType == WSConstants.UT_SIGNING) {
+			if (keyIdentifierType == WSConstants.UT_SIGNING ||
+			        keyIdentifierType == WSConstants.CUSTOM_SYMM_SIGNING) {
 				sig.sign(sig.createSecretKey(secretKey));
 			} else {
 				sig.sign(crypto.getPrivateKey(user, password));
@@ -802,4 +814,18 @@ public class WSSecSignature extends WSSecBase {
 
 		return result;
 	}
+
+    public void setSecretKey(byte[] secretKey) {
+        this.secretKey = secretKey;
+    }
+
+    public void setCustomTokenValueType(String customTokenValueType) {
+        this.customTokenValueType = customTokenValueType;
+    }
+
+    public void setCustomTokenId(String customTokenId) {
+        this.customTokenId = customTokenId;
+    }
+	
+	
 }

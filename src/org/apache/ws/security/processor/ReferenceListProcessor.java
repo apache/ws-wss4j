@@ -17,22 +17,28 @@
 
 package org.apache.ws.security.processor;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Vector;
 
 import javax.crypto.SecretKey;
+import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
+import javax.security.auth.callback.UnsupportedCallbackException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDocInfo;
+import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.message.token.Reference;
 import org.apache.ws.security.message.token.SecurityTokenReference;
+import org.apache.ws.security.saml.SAMLKeyInfo;
+import org.apache.ws.security.saml.SAMLUtil;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.xml.security.encryption.XMLCipher;
 import org.apache.xml.security.encryption.XMLEncryptionException;
@@ -62,7 +68,7 @@ public class ReferenceListProcessor implements Processor {
 					"noCallback");
 		}
 		wsDocInfo = wdi;
-		ArrayList uris = handleReferenceList((Element) elem, cb);
+		ArrayList uris = handleReferenceList((Element) elem, cb, crypto);
 		returnResults.add(0, new WSSecurityEngineResult(WSConstants.ENCR, uris));
 	}
 
@@ -76,8 +82,8 @@ public class ReferenceListProcessor implements Processor {
 	 *            the callback handler to get the key for a key name stored if
 	 *            <code>KeyInfo</code> inside the encrypted data elements
 	 */
-	private ArrayList handleReferenceList(Element elem, CallbackHandler cb)
-			throws WSSecurityException {
+	private ArrayList handleReferenceList(Element elem, CallbackHandler cb,
+	        Crypto crypto) throws WSSecurityException {
 
 		Document doc = elem.getOwnerDocument();
 
@@ -93,7 +99,7 @@ public class ReferenceListProcessor implements Processor {
 			}
 			if (tmpE.getLocalName().equals("DataReference")) {
 				String dataRefURI = ((Element) tmpE).getAttribute("URI");
-				decryptDataRefEmbedded(doc, dataRefURI, cb);
+				decryptDataRefEmbedded(doc, dataRefURI, cb, crypto);
                 dataRefUris.add(dataRefURI.substring(1));
 			}
 		}
@@ -101,7 +107,7 @@ public class ReferenceListProcessor implements Processor {
 	}
 
 	public void decryptDataRefEmbedded(Document doc, String dataRefURI,
-			CallbackHandler cb) throws WSSecurityException {
+			CallbackHandler cb, Crypto crypto) throws WSSecurityException {
 
 		if (log.isDebugEnabled()) {
 			log.debug("Found data reference: " + dataRefURI);
@@ -142,7 +148,7 @@ public class ReferenceListProcessor implements Processor {
 		if (secRefToken == null) {
 			symmetricKey = X509Util.getSharedKey(tmpE, symEncAlgo, cb);
 		} else
-			symmetricKey = getKeyFromReference(secRefToken, symEncAlgo);
+			symmetricKey = getKeyFromReference(secRefToken, symEncAlgo, crypto, cb);
 
 		// initialize Cipher ....
 		XMLCipher xmlCipher = null;
@@ -196,10 +202,13 @@ public class ReferenceListProcessor implements Processor {
 	 *            The element containg the STR
 	 * @param algorithm
 	 *            A string that identifies the symmetric decryption algorithm
+	 * @param crypto Crypto instance to obtain key
+	 * @param cb CAllback handler to obtain the key passwords
 	 * @return The secret key for the specified algorithm
 	 * @throws WSSecurityException
 	 */
-	private SecretKey getKeyFromReference(Element secRefToken, String algorithm)
+	private SecretKey getKeyFromReference(Element secRefToken, String algorithm,
+	        Crypto crypto, CallbackHandler cb)
 			throws WSSecurityException {
 
 		SecurityTokenReference secRef = new SecurityTokenReference(secRefToken);
@@ -210,9 +219,25 @@ public class ReferenceListProcessor implements Processor {
 			String uri = reference.getURI();
 			String id = uri.substring(1);
 			Processor p = wsDocInfo.getProcessor(id);
-			if (p == null || (!(p instanceof EncryptedKeyProcessor) && !(p instanceof DerivedKeyTokenProcessor))) {
-				throw new WSSecurityException(
+			if (p == null
+                    || (!(p instanceof EncryptedKeyProcessor)
+                            && !(p instanceof DerivedKeyTokenProcessor) 
+                            && !(p instanceof SAMLTokenProcessor))) {
+			    
+			    //Try custom token
+			    WSPasswordCallback pwcb = new WSPasswordCallback(id, WSPasswordCallback.CUSTOM_TOKEN);
+			    try {
+                    cb.handle(new Callback[]{pwcb});
+                } catch (Exception e) {
+                    throw new WSSecurityException(WSSecurityException.FAILURE,
+                            "noPassword", new Object[] { id });
+                }
+			    decryptedData = pwcb.getKey();
+			    
+			    if(decryptedData == null) {
+			        throw new WSSecurityException(
 						WSSecurityException.FAILED_ENC_DEC, "unsupportedKeyId");
+			    }
 			}
 			if(p instanceof EncryptedKeyProcessor) {
     			EncryptedKeyProcessor ekp = (EncryptedKeyProcessor) p;
@@ -220,6 +245,13 @@ public class ReferenceListProcessor implements Processor {
             } else if(p instanceof DerivedKeyTokenProcessor) {
                 DerivedKeyTokenProcessor dkp = (DerivedKeyTokenProcessor) p;
                 decryptedData = dkp.getKeyBytes(WSSecurityUtil.getKeyLength(algorithm));
+            } else if(p instanceof SAMLTokenProcessor) {
+                SAMLTokenProcessor samlp = (SAMLTokenProcessor) p;
+                SAMLKeyInfo keyInfo = SAMLUtil.getSAMLKeyInfo(samlp
+                        .getSamlTokenElement(), crypto, cb);
+                //TODO Handle malformed SAML tokens where they don't have the 
+                //secret in them
+                decryptedData = keyInfo.getSecret();
             }
 		} else {
 			throw new WSSecurityException(WSSecurityException.FAILED_ENC_DEC,

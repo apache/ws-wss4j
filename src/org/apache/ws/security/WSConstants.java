@@ -74,6 +74,7 @@ public class WSConstants {
     public static final String ENC_NS = "http://www.w3.org/2001/04/xmlenc#";
     public static final String ENC_PREFIX = "xenc";
     public static final String ENC_KEY_LN = "EncryptedKey";
+    public static final String ENC_DATA_LN = "EncryptedData";
     public static final String REF_LIST_LN = "ReferenceList";
 
     /*
@@ -323,8 +324,8 @@ public class WSConstants {
     public static final int EMBED_SECURITY_TOKEN_REF = 6;
     
     /**
-     * <code>UT_SIGNING</code> is used interally only to set a specific Signature
-     * behaviour.
+     * <code>UT_SIGNING</code> is used internally only to set a specific Signature
+     * behavior.
      * 
      * The signing token is constructed from values in the UsernameToken according
      * to WS-Trust specification.
@@ -341,10 +342,18 @@ public class WSConstants {
      * 
      */
     public static final int THUMBPRINT_IDENTIFIER = 8;
+    
+    /**
+     * <code>CUSTOM_SYMM_SIGNING</code> is used internally only to set a 
+     * specific Signature behavior.
+     * 
+     * The signing key, reference id and value type are set externally. 
+     */
+    public static final int CUSTOM_SYMM_SIGNING = 9;
 
     /*
      * The following values are bits that can be combined to for a set.
-     * Be carefull when selecting new values.
+     * Be careful when selecting new values.
      */
     public static final int NO_SECURITY = 0;
     public static final int UT = 0x1; // perform UsernameToken
@@ -374,6 +383,11 @@ public class WSConstants {
      */
     public static final int WSE_DERIVED_KEY_LEN = 16;
     public static final String LABEL_FOR_DERIVED_KEY = "WS-Security";
+    
+    /**
+     * WS-Trust namespace
+     */
+    public static final String WST_NS = "http://schemas.xmlsoap.org/ws/2005/02/trust";
 
 }
 

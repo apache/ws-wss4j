@@ -77,6 +77,11 @@ public class WSSecurityEngine {
      */
     public static final QName ENCRYPTED_KEY = new QName(WSConstants.ENC_NS, WSConstants.ENC_KEY_LN);
     /**
+     * <code>xenc:EncryptedData</code> as defined by XML Encryption specification,
+     * enhanced by WS Security specification
+     */
+    public static final QName ENCRYPTED_DATA = new QName(WSConstants.ENC_NS, WSConstants.ENC_DATA_LN);
+    /**
      * <code>xenc:ReferenceList</code> as defined by XML Encryption specification,
      */
     public static final QName REFERENCE_LIST = new QName(WSConstants.ENC_NS, WSConstants.REF_LIST_LN);

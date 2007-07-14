@@ -34,15 +34,20 @@ import java.util.Vector;
 
 public class SAMLTokenProcessor implements Processor {
     private static Log log = LogFactory.getLog(SAMLTokenProcessor.class.getName());
+    
+    private String id;
+    private Element samlTokenElement;
 
     public void handleToken(Element elem, Crypto crypto, Crypto decCrypto, CallbackHandler cb, WSDocInfo wsDocInfo, Vector returnResults, WSSConfig wsc) throws WSSecurityException {
         if (log.isDebugEnabled()) {
             log.debug("Found SAML Assertion element");
         }
         SAMLAssertion assertion = handleSAMLToken((Element) elem);
+        this.id = assertion.getId();
         wsDocInfo.setAssertion((Element) elem);
         returnResults.add(0,
                 new WSSecurityEngineResult(WSConstants.ST_UNSIGNED, assertion));
+        this.samlTokenElement = elem;
 
     }
 
@@ -65,12 +70,15 @@ public class SAMLTokenProcessor implements Processor {
         return assertion;
     }
 
-    /* (non-Javadoc)
-     * @see org.apache.ws.security.processor.Processor#getId()
-     * TODO The Id of a SAML token?
+    /**
+     * Return the id of the SAML token
      */
     public String getId() {
-    	return null;
+    	return this.id;
+    }
+
+    public Element getSamlTokenElement() {
+        return samlTokenElement;
     }
 
 }
