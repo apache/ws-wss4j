@@ -30,9 +30,9 @@ public class AlgoFactory {
      * This gives a DerivationAlgorithm instance from the default set of algorithms provided
      *
      * @param algorithm The algo identifier @see DeivationAlgorithm
-     * @return A derivatio algorithm
-     * @throws ConversationException If the specified algorithmis not available in
-     *                               default implementations
+     * @return A derivation algorithm
+     * @throws ConversationException If the specified algorithm is not available
+     *                               in default implementations
      */
     public static DerivationAlgorithm getInstance(String algorithm) throws
             ConversationException {

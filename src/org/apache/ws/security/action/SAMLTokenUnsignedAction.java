@@ -36,7 +36,7 @@ public class SAMLTokenUnsignedAction extends SAMLTokenSignedAction {
         saml.setUsername(reqData.getUsername());
         SAMLAssertion assertion = saml.newAssertion();
 
-        // add the SAMLAssertion Token to the SOAP Enevelope
+        // add the SAMLAssertion Token to the SOAP Envelope
         builder.build(doc, assertion, reqData.getSecHeader());
     }
 }

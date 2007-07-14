@@ -127,7 +127,7 @@ public class ConversationConstants {
     public final static String DEFAULT_LABEL = "WS-SecureConversation";
     
     /**
-     * Key to hod the map of security context identifiers against the 
+     * Key to hold the map of security context identifiers against the 
      * service epr addresses (service scope) or wsa:Action values (operation 
      * scope).
      */

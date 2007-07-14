@@ -67,7 +67,7 @@ public class BouncyCastle extends AbstractCrypto {
      * Construct an array of X509Certificate's from the byte array.
      * <p/>
      *
-     * @param data    The <code>byte</code> array containg the X509 data
+     * @param data    The <code>byte</code> array containing the X509 data
      * @param reverse If set the first certificate in input data will
      *                the last in the array
      * @return An array of X509 certificates, ordered according to
@@ -102,7 +102,7 @@ public class BouncyCastle extends AbstractCrypto {
      * @param reverse If set the first certificate in the array data will
      *                the last in the byte array
      * @param certs   The certificates to convert
-     * @return The byte array for the certficates ordered according
+     * @return The byte array for the certificates ordered according
      *         to the reverse flag
      * @throws org.apache.ws.security.WSSecurityException
      *

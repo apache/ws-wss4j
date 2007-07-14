@@ -38,7 +38,7 @@ public interface Crypto {
      * load a X509Certificate from the input stream.
      * <p/>
      *
-     * @param in The <code>InputStream</code> array containg the X509 data
+     * @param in The <code>InputStream</code> array containing the X509 data
      * @return An X509 certificate
      * @throws WSSecurityException
      */
@@ -48,7 +48,7 @@ public interface Crypto {
      * Construct an array of X509Certificate's from the byte array.
      * <p/>
      *
-     * @param data    The <code>byte</code> array containg the X509 data
+     * @param data    The <code>byte</code> array containing the X509 data
      * @param reverse If set the first certificate in input data will
      *                the last in the array
      * @return An array of X509 certificates, ordered according to
@@ -64,7 +64,7 @@ public interface Crypto {
      * @param reverse If set the first certificate in the array data will
      *                the last in the byte array
      * @param certs   The certificates to convert
-     * @return The byte array for the certficates ordered according
+     * @return The byte array for the certificates ordered according
      *         to the reverse flag
      * @throws WSSecurityException
      */
@@ -112,10 +112,10 @@ public interface Crypto {
 
     /**
      * Lookup a X509 Certificate in the keystore according to a given
-     * the issuer of a Certficate.
+     * the issuer of a Certificate.
      * <p/>
      * The search gets all alias names of the keystore and gets the certificate chain
-     * for each alias. Then the Issuer fo each certificate of the chain
+     * for each alias. Then the Issuer of each certificate of the chain
      * is compared with the parameters.
      *
      * @param issuer The issuer's name for the certificate
@@ -126,10 +126,10 @@ public interface Crypto {
 
     /**
      * Search a X509 Certificate in the keystore according to a given serial number and
-     * the issuer of a Certficate.
+     * the issuer of a Certificate.
      * <p/>
      * The search gets all alias names of the keystore and gets the certificate chain
-     * for each alias. Then the SerialNumber and Issuer fo each certificate of the chain
+     * for each alias. Then the SerialNumber and Issuer of each certificate of the chain
      * is compared with the parameters.
      *
      * @param issuer       The issuer's name for the certificate
@@ -157,7 +157,7 @@ public interface Crypto {
      * Retrieves the alias name of the default certificate which has been
      * specified as a property. This should be the certificate that is used for
      * signature and encryption. This alias corresponds to the certificate that
-     * should be used whenever KeyInfo is not poresent in a signed or
+     * should be used whenever KeyInfo is not present in a signed or
      * an encrypted message. May return null.
      *
      * @return alias name of the default X509 certificate.
@@ -169,7 +169,7 @@ public interface Crypto {
      * <p/>
      *
      * @param cert The certificate to read SKI
-     * @return The byte array conating the binary SKI data
+     * @return The byte array containing the binary SKI data
      */
     public byte[] getSKIBytesFromCert(X509Certificate cert) throws WSSecurityException;
  

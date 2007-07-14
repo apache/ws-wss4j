@@ -72,7 +72,8 @@ public class SignatureConfirmationAction implements Action {
             for (int i = 0; i < signatureActions.size(); i++) {
                 WSSecurityEngineResult wsr = (WSSecurityEngineResult) signatureActions
                         .get(i);
-                byte[] sigVal = wsr.getSignatureValue();
+                byte[] sigVal = (byte[]) wsr
+                        .get(WSSecurityEngineResult.TAG_SIGNATURE_VALUE);
                 wsc.build(doc, sigVal, reqData.getSecHeader());
                 signatureParts.add(new WSEncryptionPart(wsc.getId()));
             }

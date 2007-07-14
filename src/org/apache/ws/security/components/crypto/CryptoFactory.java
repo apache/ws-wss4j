@@ -59,7 +59,7 @@ public abstract class CryptoFactory {
      * getInstance
      * <p/>
      * Returns an instance of Crypto. The properties are handed over the the crypto
-     * implementation. The porperties must at least contain the Crypto implementation
+     * implementation. The properties must at least contain the Crypto implementation
      * class name as the value of the property : org.apache.ws.security.crypto.provider
      * <p/>
      *
@@ -78,13 +78,13 @@ public abstract class CryptoFactory {
      * <p/>
      * Returns an instance of Crypto loaded with the given classloader. 
      * The properties are handed over the the crypto implementation. 
-     * The porperties must at least contain the Crypto implementation
+     * The properties must at least contain the Crypto implementation
      * class name as the value of the property : org.apache.ws.security.crypto.provider
      * <p/>
      *
-     * @param properties      The Properties that are forwarded to the crypto implementaion 
+     * @param properties      The Properties that are forwarded to the crypto implementation 
      *                        and the Crypto impl class name.
-     *                        These properties are dependend on the crypto implementatin
+     *                        These properties are dependent on the crypto implementation
      * @param classLoader   The class loader to use
      * @return The cyrpto implementation or null if no cryptoClassName was defined
      */
@@ -97,7 +97,7 @@ public abstract class CryptoFactory {
      * getInstance
      * <p/>
      * Returns an instance of Crypto. The properties are handed over the the crypto
-     * implementation. The porperties can be <code>null</code>. It is depenend on the
+     * implementation. The properties can be <code>null</code>. It is dependent on the
      * Crypto implementation how the initialization is done in this case.
      * <p/>
      *
@@ -117,13 +117,13 @@ public abstract class CryptoFactory {
      * getInstance
      * <p/>
      * Returns an instance of Crypto. The supplied map is handed over the the crypto
-     * implementation. The map can be <code>null</code>. It is depenend on the
+     * implementation. The map can be <code>null</code>. It is dependent on the
      * Crypto implementation how the initialization is done in this case.
      * <p/>
      *
      * @param cryptoClassName This is the crypto implementation class. No default is
      *                        provided here.
-     * @param map             The Maps that is forwarded to the crypto implementaion.
+     * @param map             The Maps that is forwarded to the crypto implementation.
      *                        These contents of the map are dependent on the 
      *                        underlying crypto implementation specified in the 
      *                        cryptoClassName parameter.
@@ -136,7 +136,7 @@ public abstract class CryptoFactory {
     /**
      * getInstance
      * <p/>
-     * Returns an instance of Crypto. This method uses the specifed filename
+     * Returns an instance of Crypto. This method uses the specified filename
      * to load a property file. This file shall use the property
      * <code>org.apache.ws.security.crypto.provider</code>
      * to define the classname of the Crypto implementation. The file
@@ -228,7 +228,7 @@ public abstract class CryptoFactory {
      * Gets the properties for crypto.
      * The functions loads the property file via
      * {@link Loader.getResource(String)}, thus the property file
-     * should be accesible via the classpath
+     * should be accessible via the classpath
      *
      * @param propFilename the properties file to load
      * @return a <code>Properties</code> object loaded from the filename

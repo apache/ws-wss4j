@@ -106,7 +106,7 @@ public abstract class CryptoBase implements Crypto {
      * load a X509Certificate from the input stream.
      * <p/>
      *
-     * @param in The <code>InputStream</code> array containg the X509 data
+     * @param in The <code>InputStream</code> array containing the X509 data
      * @return Returns a X509 certificate
      * @throws org.apache.ws.security.WSSecurityException
      *
@@ -178,7 +178,7 @@ public abstract class CryptoBase implements Crypto {
 
     /**
      * Lookup a X509 Certificate in the keystore according to a given serial number and
-     * the issuer of a Certficate.
+     * the issuer of a Certificate.
      * <p/>
      * The search gets all alias names of the keystore and gets the certificate chain
      * for each alias. Then the SerialNumber and Issuer fo each certificate of the chain
@@ -457,7 +457,7 @@ public abstract class CryptoBase implements Crypto {
      * If we cannot compute the SKI throw a WSSecurityException.
      *
      * @param cert The certificate to read SKI
-     * @return The byte array conating the binary SKI data
+     * @return The byte array containing the binary SKI data
      */
     public byte[] getSKIBytesFromCert(X509Certificate cert)
             throws WSSecurityException {
@@ -545,7 +545,7 @@ public abstract class CryptoBase implements Crypto {
      * @param reverse If set the first certificate in the array data will
      *                the last in the byte array
      * @param certs   The certificates to convert
-     * @return The byte array for the certficates ordered according
+     * @return The byte array for the certificates ordered according
      *         to the reverse flag
      * @throws WSSecurityException
      */
@@ -575,7 +575,7 @@ public abstract class CryptoBase implements Crypto {
      * Construct an array of X509Certificate's from the byte array.
      * <p/>
      *
-     * @param data    The <code>byte</code> array containg the X509 data
+     * @param data    The <code>byte</code> array containing the X509 data
      * @param reverse If set the first certificate in input data will
      *                the last in the array
      * @return An array of X509 certificates, ordered according to

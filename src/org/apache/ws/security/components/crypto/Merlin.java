@@ -69,7 +69,7 @@ public class Merlin extends AbstractCrypto {
      * Construct an array of X509Certificate's from the byte array. <p/>
      * 
      * @param data
-     *            The <code>byte</code> array containg the X509 data
+     *            The <code>byte</code> array containing the X509 data
      * @param reverse
      *            If set the first certificate in input data will the last in
      *            the array
@@ -106,7 +106,7 @@ public class Merlin extends AbstractCrypto {
      *            in the byte array
      * @param certs
      *            The certificates to convert
-     * @return The byte array for the certficates ordered according to the
+     * @return The byte array for the certificates ordered according to the
      *         reverse flag
      * @throws WSSecurityException
      */

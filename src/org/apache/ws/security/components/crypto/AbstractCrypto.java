@@ -159,7 +159,7 @@ public abstract class AbstractCrypto extends CryptoBase {
      * Retrieves the alias name of the default certificate which has been
      * specified as a property. This should be the certificate that is used for
      * signature and encryption. This alias corresponds to the certificate that
-     * should be used whenever KeyInfo is not poresent in a signed or
+     * should be used whenever KeyInfo is not present in a signed or
      * an encrypted message. May return null.
      *
      * @return alias name of the default X509 certificate
