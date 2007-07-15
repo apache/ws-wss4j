@@ -3,6 +3,7 @@ package org.apache.ws.security.saml;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
@@ -26,9 +27,12 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
 
+import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
+import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.xml.namespace.QName;
 
+import java.io.IOException;
 import java.security.cert.X509Certificate;
 import java.util.Iterator;
 
@@ -61,79 +65,98 @@ public class SAMLUtil {
     
     public static SAMLKeyInfo getSAMLKeyInfo(SAMLAssertion assertion, Crypto crypto,
             CallbackHandler cb) throws WSSecurityException {
-        Iterator statements = assertion.getStatements();
-        while (statements.hasNext()) {
-            SAMLStatement stmt = (SAMLStatement) statements.next();
-            if (stmt instanceof SAMLAttributeStatement) {
-                SAMLAttributeStatement attrStmt = (SAMLAttributeStatement) stmt;
-                SAMLSubject samlSubject = attrStmt.getSubject();
-                Element kiElem = samlSubject.getKeyInfo();
-                
-                NodeList children = kiElem.getChildNodes();
-                int len = children.getLength();
-                
-                for(int i = 0; i < len; i++) {
-                    Node child = children.item(i);
-                    if (child.getNodeType() != Node.ELEMENT_NODE) {
-                        continue;
-                    }
-                    QName el = new QName(child.getNamespaceURI(), child.getLocalName());
-                    if(el.equals(WSSecurityEngine.ENCRYPTED_KEY)) {
-                        
-                        EncryptedKeyProcessor proc = new EncryptedKeyProcessor();
-                        proc.handleEncryptedKey((Element)child, cb, crypto, null);
-                        
-                        return new SAMLKeyInfo(assertion, proc.getDecryptedBytes());
-                    } else if(el.equals(new QName(WSConstants.WST_NS, "BinarySecret"))) {
-                        Text txt = (Text)child.getFirstChild();
-                        return new SAMLKeyInfo(assertion, Base64.decode(txt.getData()));
-                    }
-                }
-
-            } else if( stmt instanceof SAMLAuthenticationStatement) {
-                SAMLAuthenticationStatement authStmt = (SAMLAuthenticationStatement)stmt;
-                SAMLSubject samlSubj = authStmt.getSubject(); 
-                if (samlSubj == null) {
-                    throw new WSSecurityException(WSSecurityException.FAILURE,
-                            "invalidSAMLToken", new Object[]{"for Signature (no Subject)"});
-                }
-
-                Element e = samlSubj.getKeyInfo();
-                X509Certificate[] certs = null;
-                try {
-                    KeyInfo ki = new KeyInfo(e, null);
-
-                    if (ki.containsX509Data()) {
-                        X509Data data = ki.itemX509Data(0);
-                        XMLX509Certificate certElem = null;
-                        if (data != null && data.containsCertificate()) {
-                            certElem = data.itemCertificate(0);
-                        }
-                        if (certElem != null) {
-                            X509Certificate cert = certElem.getX509Certificate();
-                            certs = new X509Certificate[1];
-                            certs[0] = cert;
-                            return new SAMLKeyInfo(assertion, certs);
-                        }
-                    }
-
-                } catch (XMLSecurityException e3) {
-                    throw new WSSecurityException(WSSecurityException.FAILURE,
-                            "invalidSAMLsecurity",
-                            new Object[]{"cannot get certificate (key holder)"});
-                }
-                
-            } else {
-                throw new WSSecurityException(WSSecurityException.FAILURE,
-                        "invalidSAMLsecurity",
-                        new Object[]{"cannot get certificate or key "});
+        
+        //First ask the cb whether it can provide the secret
+        WSPasswordCallback pwcb = new WSPasswordCallback(assertion.getId(), WSPasswordCallback.CUSTOM_TOKEN);
+        if(cb != null) {
+            try {
+                cb.handle(new Callback[]{pwcb});
+            } catch (Exception e1) {
+                throw new WSSecurityException(WSSecurityException.FAILURE, "noKey",
+                        new Object[] { assertion.getId() });
             }
         }
         
-        throw new WSSecurityException(WSSecurityException.FAILURE,
-                "invalidSAMLsecurity",
-                new Object[]{"cannot get certificate or key "});
+        byte[] key = pwcb.getKey();
         
+        if(key != null) {
+            return new SAMLKeyInfo(assertion, key);
+        } else {
+            Iterator statements = assertion.getStatements();
+            while (statements.hasNext()) {
+                SAMLStatement stmt = (SAMLStatement) statements.next();
+                if (stmt instanceof SAMLAttributeStatement) {
+                    SAMLAttributeStatement attrStmt = (SAMLAttributeStatement) stmt;
+                    SAMLSubject samlSubject = attrStmt.getSubject();
+                    Element kiElem = samlSubject.getKeyInfo();
+                    
+                    NodeList children = kiElem.getChildNodes();
+                    int len = children.getLength();
+                    
+                    for(int i = 0; i < len; i++) {
+                        Node child = children.item(i);
+                        if (child.getNodeType() != Node.ELEMENT_NODE) {
+                            continue;
+                        }
+                        QName el = new QName(child.getNamespaceURI(), child.getLocalName());
+                        if(el.equals(WSSecurityEngine.ENCRYPTED_KEY)) {
+                            
+                            EncryptedKeyProcessor proc = new EncryptedKeyProcessor();
+                            proc.handleEncryptedKey((Element)child, cb, crypto, null);
+                            
+                            return new SAMLKeyInfo(assertion, proc.getDecryptedBytes());
+                        } else if(el.equals(new QName(WSConstants.WST_NS, "BinarySecret"))) {
+                            Text txt = (Text)child.getFirstChild();
+                            return new SAMLKeyInfo(assertion, Base64.decode(txt.getData()));
+                        }
+                    }
+
+                } else if( stmt instanceof SAMLAuthenticationStatement) {
+                    SAMLAuthenticationStatement authStmt = (SAMLAuthenticationStatement)stmt;
+                    SAMLSubject samlSubj = authStmt.getSubject(); 
+                    if (samlSubj == null) {
+                        throw new WSSecurityException(WSSecurityException.FAILURE,
+                                "invalidSAMLToken", new Object[]{"for Signature (no Subject)"});
+                    }
+
+                    Element e = samlSubj.getKeyInfo();
+                    X509Certificate[] certs = null;
+                    try {
+                        KeyInfo ki = new KeyInfo(e, null);
+
+                        if (ki.containsX509Data()) {
+                            X509Data data = ki.itemX509Data(0);
+                            XMLX509Certificate certElem = null;
+                            if (data != null && data.containsCertificate()) {
+                                certElem = data.itemCertificate(0);
+                            }
+                            if (certElem != null) {
+                                X509Certificate cert = certElem.getX509Certificate();
+                                certs = new X509Certificate[1];
+                                certs[0] = cert;
+                                return new SAMLKeyInfo(assertion, certs);
+                            }
+                        }
+
+                    } catch (XMLSecurityException e3) {
+                        throw new WSSecurityException(WSSecurityException.FAILURE,
+                                "invalidSAMLsecurity",
+                                new Object[]{"cannot get certificate (key holder)"});
+                    }
+                    
+                } else {
+                    throw new WSSecurityException(WSSecurityException.FAILURE,
+                            "invalidSAMLsecurity",
+                            new Object[]{"cannot get certificate or key "});
+                }
+            }
+            
+            throw new WSSecurityException(WSSecurityException.FAILURE,
+                    "invalidSAMLsecurity",
+                    new Object[]{"cannot get certificate or key "});
+                        
+        }
+
     }
     
     /**
