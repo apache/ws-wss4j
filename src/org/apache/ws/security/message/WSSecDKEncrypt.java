@@ -89,7 +89,11 @@ public class WSSecDKEncrypt extends WSSecDerivedKeyBase {
         }
 
         Vector encDataRefs = new Vector();
-
+        
+        if(envelope == null) {
+            envelope = doc.getDocumentElement();
+        }
+        
         for (int part = 0; part < references.size(); part++) {
             WSEncryptionPart encPart = (WSEncryptionPart) references.get(part);
 
