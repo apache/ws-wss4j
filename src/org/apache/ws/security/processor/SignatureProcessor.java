@@ -203,14 +203,17 @@ public class SignatureProcessor implements Processor {
                 QName el = new QName(token.getNamespaceURI(), token
                         .getLocalName());
                 if (el.equals(WSSecurityEngine.usernameToken)) {
-                    ut = new UsernameToken(token);
+                    String id = token.getAttributeNS(WSConstants.WSU_NS, "Id");
+                    UsernameTokenProcessor utProcessor = 
+                        (UsernameTokenProcessor) wsDocInfo.getProcessor(id);
+                    ut = utProcessor.getUt();
                     secretKey = ut.getSecretKey();
                 } else if(el.equals(WSSecurityEngine.DERIVED_KEY_TOKEN_05_02) ||
                         el.equals(WSSecurityEngine.DERIVED_KEY_TOKEN_05_12)) {
                     dkt = new DerivedKeyToken(token);
                     String id = dkt.getID();
-                    DerivedKeyTokenProcessor dktProcessor = (DerivedKeyTokenProcessor) wsDocInfo
-                            .getProcessor(id);
+                    DerivedKeyTokenProcessor dktProcessor = 
+                        (DerivedKeyTokenProcessor) wsDocInfo.getProcessor(id);
                     String signatureMethodURI = sig.getSignedInfo().getSignatureMethodURI();
                     int keyLength = (dkt.getLength() > 0) ? dkt.getLength() : 
                         WSSecurityUtil.getKeyLength(signatureMethodURI);

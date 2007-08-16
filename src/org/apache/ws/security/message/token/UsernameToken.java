@@ -329,7 +329,7 @@ public class UsernameToken {
 
     /**
      * Gets the password string. This is the password as it is in the password
-     * element of a username, token. Thus it can be either plain text or the
+     * element of a username token. Thus it can be either plain text or the
      * password digest value.
      * 
      * @return the password string or <code>null</code> if no such node
@@ -418,6 +418,15 @@ public class UsernameToken {
         }
     }
 
+    /**
+     * Set the raw (plain text) password used to compute secret key.
+     * 
+     * @param raw_password the raw_password to set
+     */
+    public void setRawPassword(String raw_password) {
+        this.raw_password = raw_password;
+    }
+    
     public static String doPasswordDigest(String nonce, String created,
             String password) {
         String passwdDigest = null;
