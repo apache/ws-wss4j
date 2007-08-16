@@ -1,5 +1,5 @@
 /*
- * Copyright  2003-2004 The Apache Software Foundation.
+ * Copyright  2003-2007 The Apache Software Foundation.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -44,13 +44,17 @@ import java.util.TimeZone;
 /**
  * UsernameToken according to WS Security specifications, UsernameToken profile.
  * 
+ * Enhanced to support digest password type for username token signature
+ * 
  * @author Davanum Srinivas (dims@yahoo.com)
- * @author Werner Dittmann (Werner.Dittmann@siemens.com)
+ * @author Werner Dittmann (Werner.Dittmann@t-online.de)
  */
 public class UsernameToken {
     private static Log log = LogFactory.getLog(UsernameToken.class.getName());
 
     public static final String PASSWORD_TYPE = "passwordType";
+    
+    private String raw_password;        // enhancment by Alberto Coletti
 
     protected Element element = null;
 
@@ -397,6 +401,7 @@ public class UsernameToken {
         if (pwd == null) {
             throw new IllegalArgumentException("pwd == null");
         }
+        raw_password = pwd;             // enhancement by Alberto coletti
         Text node = getFirstNode(this.elementPassword);
         try {
             if (!hashed) {
@@ -541,7 +546,7 @@ public class UsernameToken {
         byte[] key = null;
         try {
             Mac mac = Mac.getInstance("HMACSHA1");
-            byte[] password = getPassword().getBytes("UTF-8");
+            byte[] password = raw_password.getBytes("UTF-8"); // enhancement by Alberto Coletti
             byte[] label = labelString.getBytes("UTF-8");
             byte[] nonce = Base64.decode(getNonce());
             byte[] created = getCreated().getBytes("UTF-8");
@@ -571,6 +576,8 @@ public class UsernameToken {
         }
         return key;
     }
+    
+  
 
     /**
      * This static method generates a derived key as defined in WSS Username

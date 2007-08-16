@@ -1,5 +1,5 @@
 /*
- * Copyright  2003-2004 The Apache Software Foundation.
+ * Copyright  2003-2007 The Apache Software Foundation.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -27,6 +27,15 @@ import org.apache.ws.security.message.WSSecSignature;
 import org.apache.xml.security.signature.XMLSignature;
 import org.w3c.dom.Document;
 
+/**
+ * Sign a request using a secret key derived from UsernameToken data.
+ * 
+ * Enhanced by Alberto Coletti to support digest password type for 
+ * username token signature
+ * 
+ * @author Werner Dittmann (Werner.Dittmann@t-online.de)
+ */
+
 public class UsernameTokenSignedAction implements Action {
     public void execute(WSHandler handler, int actionToDo, Document doc, RequestData reqData)
             throws WSSecurityException {
@@ -37,7 +46,8 @@ public class UsernameTokenSignedAction implements Action {
 
         WSSecUsernameToken builder = new WSSecUsernameToken();
         builder.setWsConfig(reqData.getWssConfig());
-        builder.setPasswordType(WSConstants.PASSWORD_TEXT);
+        builder.setPasswordType(reqData.getPwType());  // enhancement by Alberto Coletti
+        
         builder.setUserInfo(reqData.getUsername(), password);
         builder.addCreated();
         builder.addNonce();
@@ -53,6 +63,7 @@ public class UsernameTokenSignedAction implements Action {
         sign.setKeyIdentifierType(WSConstants.UT_SIGNING);
         sign.setSignatureAlgorithm(XMLSignature.ALGO_ID_MAC_HMAC_SHA1);
         try {
+        	
             sign.build(doc, null, reqData.getSecHeader());
             reqData.getSignatureValues().add(sign.getSignatureValue());
         } catch (WSSecurityException e) {
