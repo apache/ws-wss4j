@@ -142,7 +142,7 @@ public class TestWSSecurityNew13 extends TestCase implements CallbackHandler {
         sign.setUsernameToken(builder);
         sign.setKeyIdentifierType(WSConstants.UT_SIGNING);
         sign.setSignatureAlgorithm(XMLSignature.ALGO_ID_MAC_HMAC_SHA1);
-        log.info("Before signing....");
+        log.info("Before signing with UT text....");
         sign.build(doc, null, secHeader);
         log.info("Before adding UsernameToken PW Text....");
         builder.prependToHeader(secHeader);
@@ -156,6 +156,45 @@ public class TestWSSecurityNew13 extends TestCase implements CallbackHandler {
         log.info("After adding UsernameToken PW Text....");
         verify(signedDoc);
     }
+    
+    /**
+     * Test the specific signing mehtod that use UsernameToken values
+     * <p/>
+     * 
+     * @throws java.lang.Exception Thrown when there is any problem in signing or verification
+     */
+    public void testUsernameTokenSigningDigest() throws Exception {
+        Document doc = unsignedEnvelope.getAsDocument();
+
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+
+        WSSecUsernameToken builder = new WSSecUsernameToken();
+        builder.setPasswordType(WSConstants.PASSWORD_DIGEST);
+        builder.setUserInfo("wernerd", "verySecret");
+        builder.addCreated();
+        builder.addNonce();
+        builder.prepare(doc);
+        
+        WSSecSignature sign = new WSSecSignature();
+        sign.setUsernameToken(builder);
+        sign.setKeyIdentifierType(WSConstants.UT_SIGNING);
+        sign.setSignatureAlgorithm(XMLSignature.ALGO_ID_MAC_HMAC_SHA1);
+        log.info("Before signing with UT digest....");
+        sign.build(doc, null, secHeader);
+        log.info("Before adding UsernameToken PW Digest....");
+        builder.prependToHeader(secHeader);
+        Document signedDoc = doc;
+        Message signedMsg = SOAPUtil.toAxisMessage(signedDoc);
+        if (log.isDebugEnabled()) {
+            log.debug("Message with UserNameToken PW Digest:");
+            XMLUtils.PrettyElementToWriter(signedMsg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
+        }
+        signedDoc = signedMsg.getSOAPEnvelope().getAsDocument();
+        log.info("After adding UsernameToken PW Digest....");
+        verify(signedDoc);
+    }
+
     /**
      * Verifies the soap envelope
      * <p/>
