@@ -68,6 +68,18 @@
   </requestFlow>
   </service>
 
+ <service name="Ping2b">
+  <requestFlow>
+   <handler type="java:org.apache.ws.axis.security.WSDoAllSender" >
+    <parameter name="action" value="UsernameTokenSignature Timestamp"/>
+    <parameter name="user" value="Chris"/>
+    <parameter name="passwordCallbackClass" 
+      value="org.apache.ws.axis.oasis.PWCallback1"/>
+    <parameter name="passwordType" value="PasswordDigest" />
+   </handler>
+  </requestFlow>
+  </service>
+
  <service name="Ping3">
   <requestFlow>
    <handler type="java:org.apache.ws.axis.security.WSDoAllSender" >
