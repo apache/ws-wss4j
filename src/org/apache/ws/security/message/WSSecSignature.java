@@ -710,8 +710,6 @@ public class WSSecSignature extends WSSecBase {
 			log.debug("Beginning signing...");
 		}
 
-		Element securityHeader = secHeader.getSecurityHeader();
-
 		prepare(doc, cr, secHeader);
 
 		SOAPConstants soapConstants = WSSecurityUtil.getSOAPConstants(doc
