@@ -28,6 +28,8 @@ import org.apache.ws.security.conversation.dkalgo.DerivationAlgorithm;
 import org.apache.ws.security.message.token.DerivedKeyToken;
 import org.apache.ws.security.message.token.Reference;
 import org.apache.ws.security.message.token.SecurityTokenReference;
+import org.apache.ws.security.saml.SAMLKeyInfo;
+import org.apache.ws.security.saml.SAMLUtil;
 import org.apache.ws.security.util.Base64;
 import org.w3c.dom.Element;
 
@@ -62,7 +64,7 @@ public class DerivedKeyTokenProcessor implements Processor {
         //Deserialize the DKT
         DerivedKeyToken dkt = new DerivedKeyToken(elem);
         
-        this.extractSecret(wsDocInfo, dkt, cb);
+        this.extractSecret(wsDocInfo, dkt, cb, crypto);
         
         String tempNonce = dkt.getNonce();
         if(tempNonce == null) {
@@ -110,22 +112,39 @@ public class DerivedKeyTokenProcessor implements Processor {
      * @param dkt
      * @throws WSSecurityException
      */
-    private void extractSecret(WSDocInfo wsDocInfo, DerivedKeyToken dkt, CallbackHandler cb)
+    private void extractSecret(WSDocInfo wsDocInfo, DerivedKeyToken dkt, CallbackHandler cb, Crypto crypto)
             throws WSSecurityException {
         SecurityTokenReference str = dkt.getSecuityTokenReference();
         if (str != null) {
-            Reference ref = str.getReference();
-            String uri = ref.getURI();
-            Processor processor = wsDocInfo.getProcessor(uri.substring(1));
-            if(processor == null) {
+            Processor processor;
+            String uri = null;
+            if(str.containsReference()) {
+                Reference ref = str.getReference();
+                
+                uri = ref.getURI();
+                processor = wsDocInfo.getProcessor(uri.substring(1));
+            } else {
+                //Contains key identifier
+                String keyIdentifier = str.getKeyIdentifierValue();
+                processor = wsDocInfo.getProcessor(keyIdentifier);
+            }
+            
+            if(processor == null && uri != null) {
                 //Now use the callback and get it
                 this.secret = this.getSecret(cb, uri.substring(1));
-            }else if (processor instanceof EncryptedKeyProcessor) {
+            } else if (processor instanceof EncryptedKeyProcessor) {
                 this.secret = ((EncryptedKeyProcessor) processor)
                         .getDecryptedBytes();
             } else if (processor instanceof SecurityContextTokenProcessor) {
                 this.secret = ((SecurityContextTokenProcessor) processor)
                         .getSecret();
+            } else if (processor instanceof SAMLTokenProcessor) {
+                SAMLTokenProcessor samlp = (SAMLTokenProcessor) processor;
+                SAMLKeyInfo keyInfo = SAMLUtil.getSAMLKeyInfo(samlp
+                        .getSamlTokenElement(), crypto, cb);
+                //TODO Handle malformed SAML tokens where they don't have the 
+                //secret in them
+                this.secret = keyInfo.getSecret();
             } else {
                 throw new WSSecurityException(
                         WSSecurityException.FAILED_ENC_DEC, "unsupportedKeyId");

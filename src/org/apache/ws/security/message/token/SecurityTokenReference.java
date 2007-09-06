@@ -344,13 +344,37 @@ public class SecurityTokenReference {
                 byte[] thumb = Base64.decode(((Text) node).getData());
                 alias = crypto.getAliasForX509CertThumb(thumb);
             }
-
         }
+        
         if (alias != null) {
             return crypto.getCertificates(alias);
         }
         return null;
     }
+    
+    public String getKeyIdentifierValue() {
+        if(containsKeyIdentifier()) {
+            Node node = getFirstElement().getFirstChild();
+            if (node == null) {
+                return null;
+            }
+            if (node.getNodeType() == Node.TEXT_NODE) {
+                return ((Text) node).getData();
+            }
+        } 
+        return null;
+    }
+    
+    public String getKeyIdentifierValueType() {
+        if(containsKeyIdentifier()) {
+            Element elem = getFirstElement();
+            return elem.getAttribute("ValueType");
+            
+        } 
+        return null;
+    }
+    
+        
 
     public String getX509SKIAlias(Crypto crypto) throws WSSecurityException {
         if (skiBytes == null) {

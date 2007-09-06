@@ -368,7 +368,17 @@ public class SignatureProcessor implements Processor {
                     principal.setLabel(dkt.getLabel());
                     principal.setLength(dkt.getLength());
                     principal.setOffset(dkt.getOffset());
-                    String basetokenId = dkt.getSecuityTokenReference().getReference().getURI().substring(1);
+                    String basetokenId = null;
+                    SecurityTokenReference secuityTokenReference = dkt
+                            .getSecuityTokenReference();
+                    if (secuityTokenReference.containsReference()) {
+                        basetokenId = secuityTokenReference.getReference()
+                                .getURI().substring(1);
+                    } else {
+                        // KeyIdentifier
+                        basetokenId = secuityTokenReference
+                                .getKeyIdentifierValue();
+                    }
                     principal.setBasetokenId(basetokenId);
                     return principal;
                 } else if(samlKi != null) {
