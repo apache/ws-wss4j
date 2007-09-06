@@ -41,6 +41,7 @@ public class UsernameTokenProcessor implements Processor {
     private static Log log = LogFactory.getLog(UsernameTokenProcessor.class.getName());
 
     private String utId;
+    private UsernameToken ut;
     
     public void handleToken(Element elem, Crypto crypto, Crypto decCrypto, CallbackHandler cb, WSDocInfo wsDocInfo, Vector returnResults, WSSConfig wsc) throws WSSecurityException {
         if (log.isDebugEnabled()) {
@@ -75,7 +76,7 @@ public class UsernameTokenProcessor implements Processor {
      * @throws WSSecurityException
      */
     public WSUsernameTokenPrincipal handleUsernameToken(Element token, CallbackHandler cb) throws WSSecurityException {
-        UsernameToken ut = new UsernameToken(token);
+        ut = new UsernameToken(token);
         String user = ut.getName();
         String password = ut.getPassword();
         String nonce = ut.getNonce();
@@ -87,6 +88,8 @@ public class UsernameTokenProcessor implements Processor {
         }
 
         Callback[] callbacks = new Callback[1];
+        String origPassword = null;
+        
         if (ut.isHashed()) {
             if (cb == null) {
                 throw new WSSecurityException(WSSecurityException.FAILURE,
@@ -106,7 +109,7 @@ public class UsernameTokenProcessor implements Processor {
                         "noPassword",
                         new Object[]{user}, e);
             }
-            String origPassword = pwCb.getPassword();
+            origPassword = pwCb.getPassword();
             if (log.isDebugEnabled()) {
                 log.debug("UsernameToken callback password " + origPassword);
             }
@@ -120,6 +123,7 @@ public class UsernameTokenProcessor implements Processor {
                     throw new WSSecurityException(WSSecurityException.FAILED_AUTHENTICATION);
                 }
             }
+            ut.setRawPassword(origPassword);
         } else if (cb != null) {
             WSPasswordCallback pwCb = new WSPasswordCallback(user, password,
                     pwType, WSPasswordCallback.USERNAME_TOKEN_UNKNOWN);
@@ -133,8 +137,8 @@ public class UsernameTokenProcessor implements Processor {
                 throw new WSSecurityException(WSSecurityException.FAILURE,
                         "noPassword", new Object[]{user});
             }
+            ut.setRawPassword(password);
         }
-
         WSUsernameTokenPrincipal principal = new WSUsernameTokenPrincipal(user, ut.isHashed());
         principal.setNonce(nonce);
         principal.setPassword(password);
@@ -149,5 +153,14 @@ public class UsernameTokenProcessor implements Processor {
      */
     public String getId() {
     	return utId;
+    }
+
+    /**
+     * Get the processed USernameToken.
+     * 
+     * @return the ut
+     */
+    public UsernameToken getUt() {
+        return ut;
     }    
 }
