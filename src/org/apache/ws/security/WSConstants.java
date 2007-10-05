@@ -57,6 +57,13 @@ public class WSConstants {
      * The SAMLAssertionID relative URI string (without #)
      */
     public static final String SAML_ASSERTION_ID = "SAMLAssertionID";
+    
+    /*
+     * The EncryptedKeyToken value type URI used in wsse:Reference 
+     */
+    public static final String ENC_KEY_VALUE_TYPE_NS = "http://docs.oasis-open.org/wss/2005/xx/oasis-2005xx-wss-soap-message-security-1.1#";
+    public static final String ENC_KEY_VALUE_TYPE = "EncryptedKey";
+    
     /*
      * The namespace prefixes used. We uses the same prefix convention
      * as shown in the specifications
@@ -390,4 +397,3 @@ public class WSConstants {
     public static final String WST_NS = "http://schemas.xmlsoap.org/ws/2005/02/trust";
 
 }
-

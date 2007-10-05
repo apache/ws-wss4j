@@ -235,7 +235,12 @@ public class SignatureProcessor implements Processor {
                         
                         certs = samlKi.getCerts();
                         secretKey = samlKi.getSecret();
-                    } else {
+                    } else if (el.equals(WSSecurityEngine.ENCRYPTED_KEY)){
+                        EncryptedKeyProcessor encryptKeyProcessor = new EncryptedKeyProcessor();
+                        encryptKeyProcessor.handleEncryptedKey((Element)token, cb, crypto);
+                        secretKey = encryptKeyProcessor.getDecryptedBytes();
+                     
+                    }else {
                         
                         //Try custom token through callback handler
                       //try to find a custom token

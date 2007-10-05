@@ -201,7 +201,13 @@ public class SecurityTokenReference {
             }
             tokElement = sa;
         } else {
+            
             tokElement = WSSecurityUtil.getElementByWsuId(doc, uri);
+            
+            // In some scenarios id is used rather than wsu:Id
+            if (tokElement == null) {
+                tokElement = WSSecurityUtil.getElementByGenId(doc, uri);
+            }
         }
         if (tokElement == null) {
             throw new WSSecurityException(WSSecurityException.SECURITY_TOKEN_UNAVAILABLE,
@@ -290,11 +296,11 @@ public class SecurityTokenReference {
         createKeyIdentifier(doc, THUMB_URI, text);
     }
     
-	public void setSAMLKeyIdentifier(String keyIdVal)
-			throws WSSecurityException {
-		Document doc = this.element.getOwnerDocument();
+    public void setSAMLKeyIdentifier(String keyIdVal)
+            throws WSSecurityException {
+        Document doc = this.element.getOwnerDocument();
         createKeyIdentifier(doc, SAML_ID_URI, doc.createTextNode(keyIdVal));
-	}
+    }
 
     private void createKeyIdentifier(Document doc, String uri, Node node) {
         
@@ -312,6 +318,26 @@ public class SecurityTokenReference {
             this.element.appendChild(keyId);
         }
     }
+    /*
+     * Several helper and utility methods.
+     */
+    
+    /**
+     * get the first child element.
+     *
+     * @return the first <code>Element</code> child node
+     */
+    public Element getFirstElement() {
+        for (Node currentChild = this.element.getFirstChild();
+             currentChild != null;
+             currentChild = currentChild.getNextSibling()) {
+            if (currentChild instanceof Element) {
+                return (Element) currentChild;
+            }
+        }
+        return null;
+    }
+
     /**
      * Gets the KeyIdentifer.
      *
@@ -492,36 +518,6 @@ public class SecurityTokenReference {
     /*
      * Several helper and utility methods.
      */
-
-    /**
-     * get the first child element.
-     *
-     * @return the first <code>Element</code> child node
-     */
-    public Element getFirstElement() {
-        for (Node currentChild = this.element.getFirstChild();
-             currentChild != null;
-             currentChild = currentChild.getNextSibling()) {
-            if (currentChild instanceof Element) {
-                return (Element) currentChild;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Method containsKeyName
-     *
-     * @return true if the <code>SecurtityTokenReference</code> contains
-     *         a <code>wsse:KeyName</code> element
-     */
-//    public boolean containsKeyName() {
-//        return element.getLocalName().equals(KEY_NAME);
-//    }
-//
-//    public String getKeyNameValue() {
-//        return element.getFirstChild().getNodeValue();
-//    }
 
     /**
      * Method containsReference
