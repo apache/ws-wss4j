@@ -188,7 +188,7 @@ public class WSSecEncryptedKey extends WSSecBase {
         String certUri = "EncCertId-" + remoteCert.hashCode();
         Cipher cipher = WSSecurityUtil.getCipherInstance(keyEncAlgo);
         try {
-            cipher.init(Cipher.ENCRYPT_MODE, remoteCert);
+            cipher.init(Cipher.ENCRYPT_MODE, remoteCert.getPublicKey());
         } catch (InvalidKeyException e) {
             throw new WSSecurityException(WSSecurityException.FAILED_ENC_DEC,
                     null, null, e);
