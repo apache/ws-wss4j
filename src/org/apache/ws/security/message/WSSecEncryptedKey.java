@@ -33,6 +33,7 @@ import org.apache.ws.security.message.token.BinarySecurity;
 import org.apache.ws.security.message.token.Reference;
 import org.apache.ws.security.message.token.SecurityTokenReference;
 import org.apache.ws.security.message.token.X509Security;
+import org.apache.ws.security.util.UUIDGenerator;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.xml.security.keys.KeyInfo;
 import org.apache.xml.security.keys.content.X509Data;
@@ -185,7 +186,7 @@ public class WSSecEncryptedKey extends WSSecBase {
      */
     protected void prepareInternal(byte[] keyBytes, X509Certificate remoteCert,
             Crypto crypto) throws WSSecurityException {
-        String certUri = "EncCertId-" + remoteCert.hashCode();
+        String certUri = UUIDGenerator.getUUID();
         Cipher cipher = WSSecurityUtil.getCipherInstance(keyEncAlgo);
         try {
             cipher.init(Cipher.ENCRYPT_MODE, remoteCert.getPublicKey());
@@ -230,7 +231,7 @@ public class WSSecEncryptedKey extends WSSecBase {
          */
         encryptedKeyElement = createEnrcyptedKey(document, keyEncAlgo);
         if(this.encKeyId == null || "".equals(this.encKeyId)) {
-            this.encKeyId = "EncKeyId-" + encryptedKeyElement.hashCode();
+            this.encKeyId = "EncKeyId-" + UUIDGenerator.getUUID();
         }
         encryptedKeyElement.setAttributeNS(null, "Id", this.encKeyId);
 
@@ -489,6 +490,10 @@ public class WSSecEncryptedKey extends WSSecBase {
      */
     public void setEncKeyId(String encKeyId) {
         this.encKeyId = encKeyId;
+    }
+    
+    public boolean isCertSet() {
+    	return (useThisCert == null ? true : false) ;
     }
     
     

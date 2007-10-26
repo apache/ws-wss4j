@@ -232,9 +232,9 @@ public class SignatureProcessor implements Processor {
                     } else if (el.equals(WSSecurityEngine.SAML_TOKEN)) {
                         samlKi = SAMLUtil.getSAMLKeyInfo(
                                 (Element) token, crypto, cb);
-                        
                         certs = samlKi.getCerts();
                         secretKey = samlKi.getSecret();
+
                     } else if (el.equals(WSSecurityEngine.ENCRYPTED_KEY)){
                         EncryptedKeyProcessor encryptKeyProcessor = new EncryptedKeyProcessor();
                         encryptKeyProcessor.handleEncryptedKey((Element)token, cb, crypto);
@@ -269,7 +269,24 @@ public class SignatureProcessor implements Processor {
             } else if (secRef.containsX509Data() || secRef.containsX509IssuerSerial()) {
                 certs = secRef.getX509IssuerSerial(crypto);
             } else if (secRef.containsKeyIdentifier()) {
-                certs = secRef.getKeyIdentifier(crypto);
+            	if (secRef.getKeyIdentifierValueType().equals
+            			(SecurityTokenReference.ENC_KEY_SHA1_URI)) {
+                    
+            		String id = secRef.getKeyIdentifierValue();
+                    WSPasswordCallback pwcb = new WSPasswordCallback(id,
+                                                       WSPasswordCallback.ENCRYPTED_KEY_TOKEN);
+                    try {
+                    	cb.handle(new Callback[]{pwcb});
+		            } catch (Exception e) {
+		                throw new WSSecurityException(WSSecurityException.FAILURE,
+		                        "noPassword", new Object[] { id });
+		            }
+            
+		            secretKey = pwcb.getKey();
+		            
+            	} else {
+            		certs = secRef.getKeyIdentifier(crypto);
+            	}
             } else {
                 throw new WSSecurityException(
                         WSSecurityException.INVALID_SECURITY,

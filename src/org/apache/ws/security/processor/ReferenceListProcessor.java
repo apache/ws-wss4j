@@ -103,6 +103,7 @@ public class ReferenceListProcessor implements Processor {
                 dataRefUris.add(dataRefURI.substring(1));
 			}
 		}
+		
         return dataRefUris;
 	}
 
@@ -148,7 +149,7 @@ public class ReferenceListProcessor implements Processor {
 		if (secRefToken == null) {
 			symmetricKey = X509Util.getSharedKey(tmpE, symEncAlgo, cb);
 		} else
-			symmetricKey = getKeyFromReference(secRefToken, symEncAlgo, crypto, cb);
+			symmetricKey = getKeyFromSecurityTokenReference(secRefToken, symEncAlgo, crypto, cb);
 
 		// initialize Cipher ....
 		XMLCipher xmlCipher = null;
@@ -163,8 +164,22 @@ public class ReferenceListProcessor implements Processor {
 		if (content) {
 			encBodyData = (Element) encBodyData.getParentNode();
 		}
+			
 		try {
+			Node parentEncBody =encBodyData.getParentNode();
+			
 			xmlCipher.doFinal(doc, encBodyData, content);
+			
+			if(parentEncBody.getLocalName().equals(WSConstants.ENCRYPTED_HEADER)
+					&& parentEncBody.getNamespaceURI().equals(WSConstants.WSSE11_NS)) {
+				Node decryptedHeader = parentEncBody.getFirstChild();
+				Node decryptedHeaderClone = decryptedHeader.cloneNode(true);
+				Node encryptedHeader = decryptedHeader.getParentNode();
+				parentEncBody.getParentNode().appendChild(decryptedHeaderClone);
+				parentEncBody.getParentNode().removeChild(parentEncBody);
+				
+			}
+			
 		} catch (Exception e) {
 			throw new WSSecurityException(WSSecurityException.FAILED_ENC_DEC,
 					null, null, e);
@@ -207,7 +222,7 @@ public class ReferenceListProcessor implements Processor {
 	 * @return The secret key for the specified algorithm
 	 * @throws WSSecurityException
 	 */
-	private SecretKey getKeyFromReference(Element secRefToken, String algorithm,
+	private SecretKey getKeyFromSecurityTokenReference(Element secRefToken, String algorithm,
 	        Crypto crypto, CallbackHandler cb)
 			throws WSSecurityException {
 
@@ -253,7 +268,24 @@ public class ReferenceListProcessor implements Processor {
                 //secret in them
                 decryptedData = keyInfo.getSecret();
             }
-		} else {
+		} else if (secRef.containsKeyIdentifier()){
+			
+			if ( secRef.getKeyIdentifierValueType().equals(SecurityTokenReference.ENC_KEY_SHA1_URI)) {
+			    
+				String sha = secRef.getKeyIdentifierValue();
+				
+				WSPasswordCallback pwcb = new WSPasswordCallback(sha, WSPasswordCallback.ENCRYPTED_KEY_TOKEN);
+			    
+				try {
+                    cb.handle(new Callback[]{pwcb});
+                } catch (Exception e) {
+                    throw new WSSecurityException(WSSecurityException.FAILURE,
+                            "noPassword", new Object[] { sha });
+                }
+			    decryptedData = pwcb.getKey();
+			}
+		
+	    }else {
 			throw new WSSecurityException(WSSecurityException.FAILED_ENC_DEC,
 					"noReference");
 		}

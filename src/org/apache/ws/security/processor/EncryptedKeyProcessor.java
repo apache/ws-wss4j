@@ -47,6 +47,8 @@ import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.xml.namespace.QName;
 import java.io.IOException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -319,6 +321,7 @@ public class EncryptedKeyProcessor implements Processor {
                 "ReferenceList", WSConstants.ENC_NS);
         ArrayList dataRefUris = new ArrayList();
         if (refList != null) {
+        	       	
             for (tmpE = refList.getFirstChild();
                  tmpE != null; tmpE = tmpE.getNextSibling()) {
                 if (tmpE.getNodeType() != Node.ELEMENT_NODE) {
@@ -519,4 +522,5 @@ public class EncryptedKeyProcessor implements Processor {
     public byte[] getDecryptedBytes() {
         return decryptedBytes;
     }
+  
 }

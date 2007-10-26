@@ -74,6 +74,7 @@ public class WSPasswordCallback implements Callback {
     public static final int USERNAME_TOKEN_UNKNOWN = 5;
     public final static int SECURITY_CONTEXT_TOKEN = 6;
     public final static int CUSTOM_TOKEN = 7;
+    public final static int ENCRYPTED_KEY_TOKEN = 8;
 
     private String identifier;
     private String password;
@@ -181,4 +182,5 @@ public class WSPasswordCallback implements Callback {
         this.customToken = customToken;
     }
 }
+
 

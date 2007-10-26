@@ -46,6 +46,7 @@ public class EncryptionAction implements Action {
                             WSHandlerConstants.ENC_CALLBACK_REF, reqData)
                             .getKey();
             wsEncrypt.setKey(embeddedKey);
+            wsEncrypt.setDocument(doc);
         }
         if (reqData.getEncSymmAlgo() != null) {
             wsEncrypt.setSymmetricEncAlgorithm(reqData.getEncSymmAlgo());

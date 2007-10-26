@@ -56,6 +56,7 @@ public class SecurityTokenReference {
     public static final String SKI_URI = WSConstants.X509TOKEN_NS + "#X509SubjectKeyIdentifier";
     public static final String THUMB_URI = WSConstants.SOAPMESSAGE_NS11 + "#" + WSConstants.THUMBPRINT;
     public static final String SAML_ID_URI = WSConstants.SAMLTOKEN_NS + "#" + WSConstants.SAML_ASSERTION_ID;
+    public static final String ENC_KEY_SHA1_URI = WSConstants.SOAPMESSAGE_NS11 + "#" + WSConstants.ENC_KEY_SHA1_URI;
     protected Element element = null;
     private XMLX509IssuerSerial issuerSerial = null;
     private byte[] skiBytes = null;
@@ -201,13 +202,14 @@ public class SecurityTokenReference {
             }
             tokElement = sa;
         } else {
-            
+
             tokElement = WSSecurityUtil.getElementByWsuId(doc, uri);
             
             // In some scenarios id is used rather than wsu:Id
             if (tokElement == null) {
-                tokElement = WSSecurityUtil.getElementByGenId(doc, uri);
+            	tokElement = WSSecurityUtil.getElementByGenId(doc, uri);
             }
+
         }
         if (tokElement == null) {
             throw new WSSecurityException(WSSecurityException.SECURITY_TOKEN_UNAVAILABLE,
@@ -296,6 +298,25 @@ public class SecurityTokenReference {
         createKeyIdentifier(doc, THUMB_URI, text);
     }
     
+
+    public void setKeyIdentifierEncKeySHA1(byte[] secret) 
+               throws WSSecurityException {
+        Document doc = this.element.getOwnerDocument();
+        MessageDigest sha = null;
+        try {
+            sha = MessageDigest.getInstance("SHA-1");
+        } catch (NoSuchAlgorithmException e1) {
+            throw new WSSecurityException(0, "noSHA1availabe");
+        }
+        sha.reset();
+        sha.update(secret);
+        byte[] data = sha.digest();
+        
+        org.w3c.dom.Text text = doc.createTextNode(Base64.encode(data));
+        createKeyIdentifier(doc, ENC_KEY_SHA1_URI, text);
+        
+    }
+    
     public void setSAMLKeyIdentifier(String keyIdVal)
             throws WSSecurityException {
         Document doc = this.element.getOwnerDocument();
@@ -318,6 +339,7 @@ public class SecurityTokenReference {
             this.element.appendChild(keyId);
         }
     }
+
     /*
      * Several helper and utility methods.
      */

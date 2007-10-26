@@ -19,6 +19,7 @@ package org.apache.ws.security.message;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.ws.security.SOAP11Constants;
 import org.apache.ws.security.SOAPConstants;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSEncryptionPart;
@@ -31,8 +32,11 @@ import org.apache.xml.security.encryption.EncryptedData;
 import org.apache.xml.security.encryption.XMLCipher;
 import org.apache.xml.security.encryption.XMLEncryptionException;
 import org.apache.xml.security.keys.KeyInfo;
+import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
@@ -59,6 +63,8 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
     protected byte[] embeddedKey = null;
 
     protected String embeddedKeyName = null;
+    
+    protected boolean useKeyIdentifier;
 
     /**
      * Symmetric key used in the EncrytpedKey.
@@ -117,6 +123,15 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
     public void setEmbeddedKeyName(String embeddedKeyName) {
         this.embeddedKeyName = embeddedKeyName;
     }
+    
+    /**
+     * Set this true if a key identifier must be used in the KeyInfo
+     * 
+     * @param useKeyIdentifier
+     */
+    public void setUseKeyIdentifier(boolean useKeyIdentifier) {
+        this.useKeyIdentifier = useKeyIdentifier;
+    }
 
     /**
      * Set the name of the symmetric encryption algorithm to use.
@@ -150,7 +165,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
     public void setEncCanonicalization(String algo) {
         encCanonAlgo = algo;
     }
-
+    
     /**
      * Get the name of symmetric encryption algorithm to use.
      * 
@@ -165,6 +180,14 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
      */
     public String getSymmetricEncAlgorithm() {
         return symEncAlgo;
+    }
+    
+    /**
+     * Returns if Key Identifiers should be used in KeyInfo
+     * @return
+     */
+    public boolean getUseKeyIdentifier() {
+        return useKeyIdentifier;
     }
 
     /**
@@ -403,7 +426,21 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
 
     private Vector doEncryption(Document doc, SecretKey secretKey,
             Vector references) throws WSSecurityException {
-        return doEncryption(doc, secretKey, null, references);
+    	
+    	KeyInfo keyInfo = null;
+    	
+    	// Prepare KeyInfo if useKeyIdentifier is set
+    	if ( useKeyIdentifier && 
+    			 keyIdentifierType == WSConstants.ENCRYPTED_KEY_SHA1_IDENTIFIER) {
+            
+    		keyInfo = new KeyInfo(document);
+            SecurityTokenReference secToken = new SecurityTokenReference(document);
+            secToken.setKeyIdentifierEncKeySHA1(secretKey.getEncoded());
+
+            keyInfo.addUnknownElement(secToken.getElement());
+    	} 
+    	
+        return doEncryption(doc, secretKey, keyInfo, references);
     }
 
     private Vector doEncryption(Document doc, SecretKey secretKey,
@@ -441,7 +478,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
                             .getDocumentElement(), idToEnc, null);
                 }
             } else {
-                body = (Element) WSSecurityUtil.findElement(envelope, elemName,
+                body = (Element) WSSecurityUtil.findElement(document, elemName,
                         nmSpace);
             }
             if (body == null) {
@@ -468,11 +505,40 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
              * xenc:EncryptedData
              */
             try {
-                xmlCipher.init(XMLCipher.ENCRYPT_MODE, secretKey);
-                EncryptedData encData = xmlCipher.getEncryptedData();
-                encData.setId(xencEncryptedDataId);
-                encData.setKeyInfo(keyInfo);
-                xmlCipher.doFinal(doc, body, content);
+            	
+            	if (modifier.equals("Header")) {
+            		
+                    Element elem = doc.createElementNS(WSConstants.WSSE11_NS,"wsse11:"+WSConstants.ENCRYPTED_HEADER);
+                    NamedNodeMap map = body.getAttributes();
+                    
+                    for (int i = 0 ; i < map.getLength() ; i++) {
+                    	Attr attr = (Attr)map.item(i);
+                    	if (attr.getNamespaceURI().equals(WSConstants.URI_SOAP11_ENV)
+                    			|| attr.getNamespaceURI().equals(WSConstants.URI_SOAP12_ENV)) {
+                    		elem.setAttributeNode(attr);
+                    	}
+                    }
+            		
+            	    xmlCipher.init(XMLCipher.ENCRYPT_MODE, secretKey);
+                    EncryptedData encData = xmlCipher.getEncryptedData();
+                    encData.setId(xencEncryptedDataId);
+                    encData.setKeyInfo(keyInfo);
+                    xmlCipher.doFinal(doc, body, content);
+                    
+                    Element encDataElem = WSSecurityUtil.findElementById(document
+                            .getDocumentElement(), xencEncryptedDataId, null);
+                    Node clone = encDataElem.cloneNode(true);
+                    elem.appendChild(clone);
+                    encDataElem.getParentNode().appendChild(elem);
+                    encDataElem.getParentNode().removeChild(encDataElem); 
+                    
+            	} else {
+            	    xmlCipher.init(XMLCipher.ENCRYPT_MODE, secretKey);
+                    EncryptedData encData = xmlCipher.getEncryptedData();
+                    encData.setId(xencEncryptedDataId);
+                    encData.setKeyInfo(keyInfo);
+                    xmlCipher.doFinal(doc, body, content);    		
+            	}
                 if(cloneKeyInfo) {
                     keyInfo = null;
                 }

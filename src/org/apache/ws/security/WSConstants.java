@@ -65,6 +65,12 @@ public class WSConstants {
     public static final String ENC_KEY_VALUE_TYPE = "EncryptedKey";
     
     /*
+     * The relative URI to be used for encrypted key SHA1 (Without #)
+     * Combine it with SOAPMESSAGE_NS11, #, to get the full URL
+     */
+    public static final String ENC_KEY_SHA1_URI = "EncryptedKeySHA1";
+    
+    /*
      * The namespace prefixes used. We uses the same prefix convention
      * as shown in the specifications
      */
@@ -357,6 +363,20 @@ public class WSConstants {
      * The signing key, reference id and value type are set externally. 
      */
     public static final int CUSTOM_SYMM_SIGNING = 9;
+    
+    /**
+     * <code>ENCRYPTED_KEY_SHA1_IDENTIFIER</code> is used to set the specific key identifier
+     * ThumbprintSHA1.
+     * 
+     * This identifier uses the SHA-1 digest of a security token to
+     * identify the security token. Please refer to chapter 7.3 of the OASIS WSS 1.1
+     * specification.
+     * 
+     */
+    public static final int ENCRYPTED_KEY_SHA1_IDENTIFIER = 10;
+    
+    
+    public static final String ENCRYPTED_HEADER = "EncryptedHeader";
 
     /*
      * The following values are bits that can be combined to for a set.

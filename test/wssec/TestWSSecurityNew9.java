@@ -161,6 +161,7 @@ public class TestWSSecurityNew9 extends TestCase implements CallbackHandler {
         sign.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         log.info("Before Encryption....");
         Document doc = unsignedEnvelope.getAsDocument();
+        encrypt.setDocument(doc);
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);                
         Document signedDoc = sign.build(doc, crypto, secHeader);

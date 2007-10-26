@@ -181,6 +181,7 @@ public class TestWSSecurityNew10 extends TestCase implements CallbackHandler {
         wsEncrypt.setSecurityTokenReference(secRef);
         wsEncrypt.setKey(key);
         wsEncrypt.setSymmetricEncAlgorithm(WSConstants.TRIPLE_DES);
+        wsEncrypt.setDocument(doc);
 
         // Step 4 :: Encrypting using the key.
         Document encDoc = wsEncrypt.build(doc, crypto, secHeader);
