@@ -299,20 +299,10 @@ public class SecurityTokenReference {
     }
     
 
-    public void setKeyIdentifierEncKeySHA1(byte[] secret) 
+    public void setKeyIdentifierEncKeySHA1(String value) 
                throws WSSecurityException {
         Document doc = this.element.getOwnerDocument();
-        MessageDigest sha = null;
-        try {
-            sha = MessageDigest.getInstance("SHA-1");
-        } catch (NoSuchAlgorithmException e1) {
-            throw new WSSecurityException(0, "noSHA1availabe");
-        }
-        sha.reset();
-        sha.update(secret);
-        byte[] data = sha.digest();
-        
-        org.w3c.dom.Text text = doc.createTextNode(Base64.encode(data));
+        org.w3c.dom.Text text = doc.createTextNode(value);
         createKeyIdentifier(doc, ENC_KEY_SHA1_URI, text);
         
     }

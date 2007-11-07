@@ -69,6 +69,11 @@ public class WSSecEncryptedKey extends WSSecBase {
     protected byte[] ephemeralKey;
 
     /**
+     * Encrypted bytes of the ephemeral key
+     */
+    protected byte[] encryptedEphemeralKey;
+    
+    /**
      * Remote user's alias to obtain the cert to encrypt the ephemeral key
      */
     protected String encrUser = null;
@@ -205,9 +210,9 @@ public class WSSecEncryptedKey extends WSSecBase {
                     new Object[] { "public key algorithm too weak to encrypt "
                             + "symmetric key" });
         }
-        byte[] encryptedKey = null;
+        
         try {
-            encryptedKey = cipher.doFinal(keyBytes);
+            this.encryptedEphemeralKey = cipher.doFinal(keyBytes);
         } catch (IllegalStateException e1) {
             throw new WSSecurityException(WSSecurityException.FAILED_ENC_DEC,
                     null, null, e1);
@@ -219,7 +224,7 @@ public class WSSecEncryptedKey extends WSSecBase {
                     null, null, e1);
         }
         Text keyText = WSSecurityUtil.createBase64EncodedTextNode(document,
-                encryptedKey);
+                this.encryptedEphemeralKey);
 
         /*
          * Now we need to setup the EncryptedKey header block 1) create a
@@ -494,6 +499,10 @@ public class WSSecEncryptedKey extends WSSecBase {
     
     public boolean isCertSet() {
     	return (useThisCert == null ? true : false) ;
+    }
+
+    public byte[] getEncryptedEphemeralKey() {
+        return encryptedEphemeralKey;
     }
     
     

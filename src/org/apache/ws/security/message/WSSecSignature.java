@@ -108,6 +108,8 @@ public class WSSecSignature extends WSSecBase {
 	protected String strUri = null;
 
 	private byte[] secretKey = null;
+	
+	private String encrKeySha1value = null;
 
 	protected BinarySecurity bstToken = null;
 
@@ -416,7 +418,7 @@ public class WSSecSignature extends WSSecBase {
 			break;
 			
 		case WSConstants.ENCRYPTED_KEY_SHA1_IDENTIFIER:
-			secRef.setKeyIdentifierEncKeySHA1(this.secretKey);
+			secRef.setKeyIdentifierEncKeySHA1(this.encrKeySha1value);
 			break;
 
 		case WSConstants.CUSTOM_SYMM_SIGNING :
@@ -829,6 +831,10 @@ public class WSSecSignature extends WSSecBase {
 
     public void setCustomTokenId(String customTokenId) {
         this.customTokenId = customTokenId;
+    }
+
+    public void setEncrKeySha1value(String encrKeySha1value) {
+        this.encrKeySha1value = encrKeySha1value;
     }
 	
 	

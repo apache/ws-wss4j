@@ -162,6 +162,13 @@ public class WSSecurityEngineResult extends java.util.HashMap {
     public static final java.lang.String TAG_BINARY_SECURITY_TOKEN =
         "binary-security-token";
 
+    /**
+     * Tag denoting the encrypted key bytes
+     *
+     * The value under this tag is a byte array 
+     */
+    public static final Object TAG_ENCRYPTED_EPHEMERAL_KEY = "encrypted-ephemeral-key-bytes";
+
     public WSSecurityEngineResult(
         int act, 
         SAMLAssertion ass
@@ -200,11 +207,13 @@ public class WSSecurityEngineResult extends java.util.HashMap {
     public WSSecurityEngineResult(
         int act, 
         byte[] decryptedKey, 
+        byte[] encryptedKeyBytes,
         String encyptedKeyId, 
         List dataRefUris
     ) {
         put(TAG_ACTION, new Integer(act));
         put(TAG_DECRYPTED_KEY, decryptedKey);
+        put(TAG_ENCRYPTED_EPHEMERAL_KEY, encryptedKeyBytes);
         put(TAG_ENCRYPTED_KEY_ID, encyptedKeyId);
         put(TAG_DATA_REF_URIS, dataRefUris);
     }

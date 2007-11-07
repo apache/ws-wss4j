@@ -19,7 +19,6 @@ package org.apache.ws.security.message;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.ws.security.SOAP11Constants;
 import org.apache.ws.security.SOAPConstants;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSEncryptionPart;
@@ -27,6 +26,7 @@ import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.message.token.Reference;
 import org.apache.ws.security.message.token.SecurityTokenReference;
+import org.apache.ws.security.util.Base64;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.xml.security.encryption.EncryptedData;
 import org.apache.xml.security.encryption.XMLCipher;
@@ -40,6 +40,8 @@ import org.w3c.dom.Node;
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
+
+import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
 import java.util.Vector;
@@ -435,7 +437,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
             
     		keyInfo = new KeyInfo(document);
             SecurityTokenReference secToken = new SecurityTokenReference(document);
-            secToken.setKeyIdentifierEncKeySHA1(secretKey.getEncoded());
+            secToken.setKeyIdentifierEncKeySHA1(getSHA1(encryptedEphemeralKey));
 
             keyInfo.addUnknownElement(secToken.getElement());
     	} 
@@ -720,4 +722,19 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
         this.encryptSymmKey = encryptSymmKey;
     }
 
+    private String getSHA1(byte[] input) throws WSSecurityException {
+        try {
+            MessageDigest sha = null;
+            sha = MessageDigest.getInstance("SHA-1");
+            sha.reset();
+            sha.update(input);
+            byte[] data = sha.digest();
+            
+            return Base64.encode(data);
+        } catch (NoSuchAlgorithmException e) {
+            throw new WSSecurityException(
+                    WSSecurityException.UNSUPPORTED_ALGORITHM, null, null, e);
+        }
+    }
+    
 }

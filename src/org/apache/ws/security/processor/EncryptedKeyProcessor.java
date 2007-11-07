@@ -20,8 +20,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDocInfo;
-import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSPasswordCallback;
+import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
@@ -46,9 +46,8 @@ import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.xml.namespace.QName;
+
 import java.io.IOException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -58,7 +57,8 @@ public class EncryptedKeyProcessor implements Processor {
     private static Log log = LogFactory.getLog(EncryptedKeyProcessor.class.getName());
     private static Log tlog =
             LogFactory.getLog("org.apache.ws.security.TIME");
-
+    private byte[] encryptedEphemeralKey;
+    
     private byte[] decryptedBytes = null;
     
     private String encryptedKeyId = null;
@@ -79,7 +79,8 @@ public class EncryptedKeyProcessor implements Processor {
         encryptedKeyId = elem.getAttributeNS(null, "Id");
 
         returnResults.add(0, new WSSecurityEngineResult(WSConstants.ENCR, 
-                                                        this.decryptedBytes, 
+                                                        this.decryptedBytes,
+                                                        this.encryptedEphemeralKey,
                                                         this.encryptedKeyId, 
                                                         dataRefUris));
     }
@@ -297,8 +298,9 @@ public class EncryptedKeyProcessor implements Processor {
         }
 
         try {
+            encryptedEphemeralKey = getDecodedBase64EncodedData(xencCipherValue);
             decryptedBytes =
-                    cipher.doFinal(getDecodedBase64EncodedData(xencCipherValue));
+                    cipher.doFinal(encryptedEphemeralKey);
         } catch (IllegalStateException e2) {
             throw new WSSecurityException(WSSecurityException.FAILED_ENC_DEC, null, null, e2);
         } catch (IllegalBlockSizeException e2) {
@@ -521,6 +523,10 @@ public class EncryptedKeyProcessor implements Processor {
      */
     public byte[] getDecryptedBytes() {
         return decryptedBytes;
+    }
+
+    public byte[] getEncryptedEphemeralKey() {
+        return encryptedEphemeralKey;
     }
   
 }
