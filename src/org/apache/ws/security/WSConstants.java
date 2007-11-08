@@ -61,7 +61,6 @@ public class WSConstants {
     /*
      * The EncryptedKeyToken value type URI used in wsse:Reference 
      */
-    public static final String ENC_KEY_VALUE_TYPE_NS = "http://docs.oasis-open.org/wss/2005/xx/oasis-2005xx-wss-soap-message-security-1.1#";
     public static final String ENC_KEY_VALUE_TYPE = "EncryptedKey";
     
     /*
