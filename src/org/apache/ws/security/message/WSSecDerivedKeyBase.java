@@ -102,6 +102,8 @@ public abstract class WSSecDerivedKeyBase extends WSSecBase {
     
     protected int derivedKeyLength = -1;
     
+    private String customValueType;
+    
     /**
      * @param ephemeralKey The ephemeralKey to set.
      */
@@ -202,9 +204,10 @@ public abstract class WSSecDerivedKeyBase extends WSSecBase {
         dkt = new DerivedKeyToken(this.wscVersion, document);
         dktId = "derivedKeyId-" + dkt.hashCode();
         
+        dkt.setOffset(offset);
         dkt.setLength(length);
         dkt.setNonce(Base64.encode(nonce));
-        dkt.setOffset(offset);
+        
         dkt.setID(dktId);
         
         if(this.strElem == null) {
@@ -212,6 +215,9 @@ public abstract class WSSecDerivedKeyBase extends WSSecBase {
             SecurityTokenReference strEncKey = new SecurityTokenReference(document);
             Reference ref = new Reference(document);
             ref.setURI("#" + this.tokenIdentifier);
+            if(this.customValueType != null && this.customValueType.trim().length() > 0) {
+                ref.setValueType(this.customValueType);
+            }
             strEncKey.setReference(ref);
             dkt.setSecuityTokenReference(strEncKey); 
         } else {
@@ -255,5 +261,9 @@ public abstract class WSSecDerivedKeyBase extends WSSecBase {
 
     public void setDerivedKeyLength(int keyLength) {
         this.derivedKeyLength = keyLength;
+    }
+
+    public void setCustomValueType(String customValueType) {
+        this.customValueType = customValueType;
     }
 }

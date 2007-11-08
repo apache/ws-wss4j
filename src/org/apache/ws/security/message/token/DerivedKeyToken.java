@@ -279,7 +279,7 @@ public class DerivedKeyToken {
      *
      * @param offset The offset value as an integer
      */
-    public void setOffset( int offset) throws ConversationException {
+    public void setOffset(int offset) throws ConversationException {
         //This element MUST NOT be used if the <Generation> element is specified
         if (this.elementGeneration == null) {
             this.elementOffset = this.element.getOwnerDocument().createElementNS(this.ns,
