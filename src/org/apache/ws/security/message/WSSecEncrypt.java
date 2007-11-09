@@ -83,6 +83,11 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
      * or not.
      */
     private boolean encryptSymmKey = true;
+    
+    /**
+     * Custom reference value
+     */
+    private String customReferenceValue;
 
     /**
      * Constructor.
@@ -434,10 +439,14 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
     	// Prepare KeyInfo if useKeyIdentifier is set
     	if ( useKeyIdentifier && 
     			 keyIdentifierType == WSConstants.ENCRYPTED_KEY_SHA1_IDENTIFIER) {
-            
     		keyInfo = new KeyInfo(document);
             SecurityTokenReference secToken = new SecurityTokenReference(document);
-            secToken.setKeyIdentifierEncKeySHA1(getSHA1(encryptedEphemeralKey));
+            if(this.customReferenceValue != null) {
+                secToken.setKeyIdentifierEncKeySHA1(this.customReferenceValue);
+            } else {
+                secToken.setKeyIdentifierEncKeySHA1(getSHA1(encryptedEphemeralKey));
+            }
+            
 
             keyInfo.addUnknownElement(secToken.getElement());
     	} 
@@ -492,14 +501,14 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
             boolean content = modifier.equals("Content") ? true : false;
             String xencEncryptedDataId = "EncDataId-" + body.hashCode();
 
+            cloneKeyInfo = true;
+            
             if(keyInfo == null) {
-                cloneKeyInfo = true;
                 keyInfo = new KeyInfo(document);
                 SecurityTokenReference secToken = new SecurityTokenReference(document);
                 Reference ref = new Reference(document);
                 ref.setURI("#" + encKeyId);
                 secToken.setReference(ref);
-    
                 keyInfo.addUnknownElement(secToken.getElement());
             }
             /*
@@ -542,7 +551,8 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
                     xmlCipher.doFinal(doc, body, content);    		
             	}
                 if(cloneKeyInfo) {
-                    keyInfo = null;
+                    keyInfo = new KeyInfo((Element) keyInfo.getElement()
+                            .cloneNode(true), null);
                 }
             } catch (Exception e2) {
                 throw new WSSecurityException(
@@ -735,6 +745,10 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
             throw new WSSecurityException(
                     WSSecurityException.UNSUPPORTED_ALGORITHM, null, null, e);
         }
+    }
+
+    public void setCustomReferenceValue(String customReferenceValue) {
+        this.customReferenceValue = customReferenceValue;
     }
     
 }

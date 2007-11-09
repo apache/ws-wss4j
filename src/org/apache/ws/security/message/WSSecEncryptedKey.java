@@ -505,5 +505,4 @@ public class WSSecEncryptedKey extends WSSecBase {
         return encryptedEphemeralKey;
     }
     
-    
 }

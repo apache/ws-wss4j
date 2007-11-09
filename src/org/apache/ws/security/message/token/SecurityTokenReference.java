@@ -162,7 +162,10 @@ public class SecurityTokenReference {
         Element tokElement = null;
         String tmpS = WSConstants.WSS_SAML_NS + WSConstants.WSS_SAML_ASSERTION;
         String saml10 = WSConstants.WSS_SAML_NS + WSConstants.SAML_ASSERTION_ID;
-        if (tmpS.equals(ref.getValueType()) || saml10.equals(ref.getValueType())) {
+        
+        if (tmpS.equals(ref.getValueType())
+                || saml10.equals(ref.getValueType())
+                || WSConstants.WSC_SCT.equals(ref.getValueType())) {
             Element sa = docInfo.getAssertion();
             String saID = null;
             if (sa != null) {

@@ -414,5 +414,7 @@ public class WSConstants {
      * WS-Trust namespace
      */
     public static final String WST_NS = "http://schemas.xmlsoap.org/ws/2005/02/trust";
-
+    
+    public final static String WSC_SCT = "http://schemas.xmlsoap.org/ws/2005/02/sc/sct";
+    
 }
