@@ -62,12 +62,6 @@ public class EncryptedKeyProcessor implements Processor {
     private byte[] decryptedBytes = null;
     
     private String encryptedKeyId = null;
-    
-    /**
-     * A flag to indicate this key was encrypted with an
-     * asymmetric key
-     */
-    private boolean asymmEncryption;
 
     public void handleToken(Element elem, Crypto crypto, Crypto decCrypto, CallbackHandler cb, WSDocInfo wsDocInfo, Vector returnResults, WSSConfig wsc) throws WSSecurityException {
         if (log.isDebugEnabled()) {
@@ -88,8 +82,7 @@ public class EncryptedKeyProcessor implements Processor {
                                                         this.decryptedBytes,
                                                         this.encryptedEphemeralKey,
                                                         this.encryptedKeyId, 
-                                                        dataRefUris, 
-                                                        this.asymmEncryption));
+                                                        dataRefUris));
     }
 
     public ArrayList handleEncryptedKey(Element xencEncryptedKey,
@@ -300,7 +293,6 @@ public class EncryptedKeyProcessor implements Processor {
         try {
             cipher.init(Cipher.DECRYPT_MODE,
                     privateKey);
-            this.asymmEncryption = true;
         } catch (Exception e1) {
             throw new WSSecurityException(WSSecurityException.FAILED_ENC_DEC, null, null, e1);
         }

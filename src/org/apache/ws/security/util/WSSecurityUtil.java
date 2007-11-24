@@ -162,7 +162,7 @@ public class WSSecurityUtil {
      */
     public static Element findBodyElement(Document doc, SOAPConstants sc) {
         Element soapBodyElement = (Element) WSSecurityUtil.getDirectChild(doc
-                .getDocumentElement(), sc.getBodyQName().getLocalPart(), sc
+                .getFirstChild(), sc.getBodyQName().getLocalPart(), sc
                 .getEnvelopeURI());
         return soapBodyElement;
     }
