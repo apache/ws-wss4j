@@ -147,6 +147,15 @@ public class WSSecurityEngineResult extends java.util.HashMap {
         "data-ref-uris";
 
     /**
+     * Tag denoting references the flag for asymmetric key encryption used in 
+     * encrypted key
+     *
+     * The value under this tag is of type Boolean
+     */
+    public static final java.lang.String TAG_ASYMM_KEY_ENCRYPTION =
+        "asymm-key-encr";
+    
+    /**
      * Tag denoting the X.509 certificate chain found, if applicable.
      *
      * The value under this tag is of type java.security.cert.X509Certificate[].
@@ -209,13 +218,15 @@ public class WSSecurityEngineResult extends java.util.HashMap {
         byte[] decryptedKey, 
         byte[] encryptedKeyBytes,
         String encyptedKeyId, 
-        List dataRefUris
+        List dataRefUris,
+        boolean asymmEncryption
     ) {
         put(TAG_ACTION, new Integer(act));
         put(TAG_DECRYPTED_KEY, decryptedKey);
         put(TAG_ENCRYPTED_EPHEMERAL_KEY, encryptedKeyBytes);
         put(TAG_ENCRYPTED_KEY_ID, encyptedKeyId);
         put(TAG_DATA_REF_URIS, dataRefUris);
+        put(TAG_ASYMM_KEY_ENCRYPTION, new Boolean(asymmEncryption));
     }
     
     public WSSecurityEngineResult(int act, ArrayList dataRefUris) {
