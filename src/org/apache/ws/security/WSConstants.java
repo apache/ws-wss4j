@@ -17,6 +17,8 @@
 
 package org.apache.ws.security;
 
+import javax.xml.namespace.QName;
+
 import org.apache.xml.security.c14n.Canonicalizer;
 import org.apache.xml.security.signature.XMLSignature;
 import org.apache.xml.security.utils.EncryptionConstants;
@@ -416,5 +418,42 @@ public class WSConstants {
     public static final String WST_NS = "http://schemas.xmlsoap.org/ws/2005/02/trust";
     
     public final static String WSC_SCT = "http://schemas.xmlsoap.org/ws/2005/02/sc/sct";
+    
+    // Fault codes defined in the WSS 1.0 spec under section 6, Error handling
+    
+    /**
+     * An unsupported token was provided
+     */
+    public static final QName UNSUPPORTED_SECURITY_TOKEN = new QName(WSSE_NS, "UnsupportedSecurityToken");
+    
+    /**
+     * An unsupported signature or encryption algorithm was used
+     */
+    public static final QName UNSUPPORTED_ALGORITHM  = new QName(WSSE_NS, "UnsupportedAlgorithm");
+    
+    /**
+     * An error was discovered processing the <Security> header
+     */
+    public static final QName INVALID_SECURITY = new QName (WSSE_NS, "InvalidSecurity");
+    
+    /**
+     * An invalid security token was provided
+     */
+    public static final QName INVALID_SECURITY_TOKEN = new QName (WSSE_NS, "InvalidSecurityToken");
+    
+    /**
+     * The security token could not be authenticated or authorized
+     */
+    public static final QName FAILED_AUTHENTICATION = new QName (WSSE_NS, "FailedAuthentication");
+    
+    /**
+     * The signature or decryption was invalid
+     */
+    public static final QName FAILED_CHECK = new QName (WSSE_NS, "FailedCheck");
+    
+    /** 
+     * Referenced security token could not be retrieved
+     */
+    public static final QName SECURITY_TOKEN_UNAVAILABLE = new QName (WSSE_NS, "SecurityTokenUnavailable");
     
 }
