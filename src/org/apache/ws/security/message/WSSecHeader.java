@@ -24,6 +24,7 @@ import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
 /**
  * This class implements WS Security header.
@@ -106,6 +107,31 @@ public class WSSecHeader {
     public Element getSecurityHeader() {
         return securityHeader;
     }
+    
+    /**
+     * Returns whether the security header is empty
+     * 
+     * @return true if empty or if there is no security header
+     *         false if non empty security header
+     */
+    public boolean isEmpty(Document doc) {
+        
+        if (securityHeader == null) {            
+            securityHeader = WSSecurityUtil.findWsseSecurityHeaderBlock(doc, doc
+                    .getDocumentElement(), actor, false);
+            if ( securityHeader == null ) {
+                return true;
+            }
+        }
+        
+        if ( securityHeader.getChildNodes().getLength() == 0 ) {
+            return true;
+        } else {
+            return false;
+        }
+
+        
+    }
 
     /**
      * Creates a security header and inserts it as child into the SOAP Envelope.
@@ -150,4 +176,19 @@ public class WSSecHeader {
         }
         return securityHeader;
     }
+    
+    public void removeSecurityHeader(Document doc) {
+        
+        if (securityHeader == null) {            
+            securityHeader = WSSecurityUtil.findWsseSecurityHeaderBlock(doc, doc
+                    .getDocumentElement(), actor, false);
+            if ( securityHeader == null ) {
+                return;
+            }
+        }
+        
+        Node parent = securityHeader.getParentNode();
+        parent.removeChild(securityHeader);
+    }
+    
 }

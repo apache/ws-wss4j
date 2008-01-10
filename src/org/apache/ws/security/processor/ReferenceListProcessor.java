@@ -173,7 +173,16 @@ public class ReferenceListProcessor implements Processor {
 			if(parentEncBody.getLocalName().equals(WSConstants.ENCRYPTED_HEADER)
 					&& parentEncBody.getNamespaceURI().equals(WSConstants.WSSE11_NS)) {
 				Node decryptedHeader = parentEncBody.getFirstChild();
-				Node decryptedHeaderClone = decryptedHeader.cloneNode(true);
+				Element decryptedHeaderClone = (Element)decryptedHeader.cloneNode(true);
+			        String sigId = decryptedHeaderClone.getAttributeNS(WSConstants.WSU_NS, "Id");
+				
+			        if ( sigId == null || sigId.equals("") ) {
+        			        String id = ((Element)parentEncBody).getAttributeNS(WSConstants.WSU_NS, "Id");       			            
+        			        String wsuPrefix = WSSecurityUtil.setNamespace(decryptedHeaderClone,
+        			                    WSConstants.WSU_NS, WSConstants.WSU_PREFIX);
+        			        decryptedHeaderClone.setAttributeNS(WSConstants.WSU_NS, wsuPrefix + ":Id", id);
+			        }
+			        
 				Node encryptedHeader = decryptedHeader.getParentNode();
 				parentEncBody.getParentNode().appendChild(decryptedHeaderClone);
 				parentEncBody.getParentNode().removeChild(parentEncBody);

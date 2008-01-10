@@ -500,6 +500,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
 
             boolean content = modifier.equals("Content") ? true : false;
             String xencEncryptedDataId = "EncDataId-" + body.hashCode();
+            encPart.setEncId(xencEncryptedDataId);
 
             cloneKeyInfo = true;
             
@@ -520,13 +521,20 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
             	if (modifier.equals("Header")) {
             		
                     Element elem = doc.createElementNS(WSConstants.WSSE11_NS,"wsse11:"+WSConstants.ENCRYPTED_HEADER);
+                    String wsuPrefix = WSSecurityUtil.setNamespace(elem,
+                            WSConstants.WSU_NS, WSConstants.WSU_PREFIX);
+                    elem.setAttributeNS(WSConstants.WSU_NS, wsuPrefix + ":Id", "EncHeader-" + body.hashCode());
+                    
+                    
                     NamedNodeMap map = body.getAttributes();
                     
                     for (int i = 0 ; i < map.getLength() ; i++) {
                     	Attr attr = (Attr)map.item(i);
                     	if (attr.getNamespaceURI().equals(WSConstants.URI_SOAP11_ENV)
-                    			|| attr.getNamespaceURI().equals(WSConstants.URI_SOAP12_ENV)) {
-                    		elem.setAttributeNode(attr);
+                    			|| attr.getNamespaceURI().equals(WSConstants.URI_SOAP12_ENV)) {                 	    
+                            String soapEnvPrefix = WSSecurityUtil.setNamespace(elem,
+                                    attr.getNamespaceURI(), "soapevn");
+                            elem.setAttributeNS(attr.getNamespaceURI(), soapEnvPrefix +":"+attr.getLocalName(), attr.getValue());
                     	}
                     }
             		

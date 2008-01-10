@@ -417,6 +417,29 @@ public class EncryptedKeyProcessor implements Processor {
         } catch (Exception e1) {
             throw new WSSecurityException(WSSecurityException.FAILED_ENC_DEC, null, null, e1);
         }
+        
+        if(parent.getLocalName().equals(WSConstants.ENCRYPTED_HEADER)
+                && parent.getNamespaceURI().equals(WSConstants.WSSE11_NS)) {
+            
+            Node decryptedHeader = parent.getFirstChild();
+            Element decryptedHeaderClone = (Element)decryptedHeader.cloneNode(true);            
+            String sigId = decryptedHeaderClone.getAttributeNS(WSConstants.WSU_NS, "Id");
+            
+            if ( sigId == null || sigId.equals("")) {
+                String id = ((Element)parent).getAttributeNS(WSConstants.WSU_NS, "Id");
+                
+                String wsuPrefix = WSSecurityUtil.setNamespace(decryptedHeaderClone,
+                        WSConstants.WSU_NS, WSConstants.WSU_PREFIX);
+                decryptedHeaderClone.setAttributeNS(WSConstants.WSU_NS, wsuPrefix + ":Id", id);
+            
+            }
+            
+            Node encryptedHeader = decryptedHeader.getParentNode();
+            parent.getParentNode().appendChild(decryptedHeaderClone);
+            parent.getParentNode().removeChild(parent);
+        
+        }
+             
         final java.util.List after_peers = listChildren(parent);
         final java.util.List new_nodes = newNodes(before_peers, after_peers);
         for (
