@@ -723,7 +723,7 @@ org.apache.ws.axis.security.util
         "${dir.dist}/${product.shortname}-bin-${product.version}.zip">
         <zipfileset prefix="wss4j" dir="."
           includes="keys/**, interop/**, interop2/**, test/**, samples/**,
-          LICENSE.txt, README.txt legal/**, webapps/**"/>
+          LICENSE.txt, README.txt, NOTICE, legal/**, webapps/**"/>
         <zipfileset prefix="wss4j/classes" dir="${build.classes}"
           includes=
      "*.properties, interop/**, wssec/**, org/**/oasis/**, org/**/samples/**"/>
@@ -749,7 +749,7 @@ org.apache.ws.axis.security.util
         <zip destfile=
                  "${dir.dist}/${product.shortname}-src-${product.version}.zip">
             <zipfileset prefix="wss4j" dir="."
-                includes="src/** LICENSE.txt README.txt legal/** build.xml "/>
+                includes="src/** LICENSE.txt README.txt NOTICE legal/** build.xml "/>
         </zip>
     </target>
 
