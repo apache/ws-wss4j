@@ -51,10 +51,11 @@ import java.util.Vector;
 
 /**
  * Extracted from WSDoAllReceiver and WSDoAllSender
- *
+ * Extended to all passwordless UsernameTokens and configurable identities.
  *
  * @author Davanum Srinivas (dims@yahoo.com).
  * @author Werner Dittmann (Werner.Dittmann@t-online.de).
+ * @author Marcel Ammerlaan (marcel.ammerlaan@gmail.com).
  */
 public abstract class WSHandler {
     public static String DONE = "done";
@@ -430,11 +431,17 @@ public abstract class WSHandler {
 	Object mc = reqData.getMsgContext();
 
         String type = getString(WSHandlerConstants.PASSWORD_TYPE, mc);
-	reqData.setPwType(type);
         if (type != null) {
-            reqData.setPwType(type.equals(WSConstants.PW_TEXT)
-			      ? WSConstants.PASSWORD_TEXT
-			      : WSConstants.PASSWORD_DIGEST);
+        	if(WSConstants.PW_TEXT.equals(type)) {
+        		reqData.setPwType(WSConstants.PASSWORD_TEXT);
+        	} else if(WSConstants.PW_DIGEST.equals(type)) {
+        		reqData.setPwType(WSConstants.PASSWORD_DIGEST);
+        	} else if(WSConstants.PW_NONE.equals(type)) {
+        		// No password requested.
+        		reqData.setPwType(null);
+        	} else {
+        		throw new WSSecurityException("Unknown password type encoding: " + type);
+        	}
         }
 
         String add = getString(WSHandlerConstants.ADD_UT_ELEMENTS, mc);
@@ -604,8 +611,7 @@ public abstract class WSHandler {
 	throw new WSSecurityException(
 		   "WSHandler: illegal timestampStrict parameter");
     }
-
-
+    
     /**
      * Get a password to construct a UsernameToken or sign a message.
      * <p/>
@@ -620,25 +626,19 @@ public abstract class WSHandler {
         WSPasswordCallback pwCb = null;
         String password = null;
         CallbackHandler cbHandler = null;
-	String err = "provided null or empty password";
-	Object mc = reqData.getMsgContext();
+        String err = "provided null or empty password";
+        Object mc = reqData.getMsgContext();
         String callback = getString(clsProp, mc);
         if (callback != null) { // we have a password callback class
             pwCb = readPwViaCallbackClass(callback, username, doAction, reqData);
-            if ((pwCb.getPassword() == null) && (pwCb.getKey() == null)) {
-            throw new WSSecurityException("WSHandler: password callback class "
-					  +err);
-            }
-        } else if ((cbHandler = (CallbackHandler) getProperty(mc, refProp))
-		   != null) {
+            // Null passwords are not always a problem: if the callback was called to provide a username instead.
+        } else if ((cbHandler = (CallbackHandler) getProperty(mc, refProp)) != null) {
             pwCb = performCallback(cbHandler, username, doAction);
-            if ((pwCb.getPassword() == null) && (pwCb.getKey() == null)) {
-                throw new WSSecurityException("WSHandler: password callback " 
-					      +err);
-            }
         } else if ((password = getPassword(mc)) == null) {
-            throw new WSSecurityException("WSHandler: application "+err);
+        	// TODO: hmm. does this also need changed for username processing?
+            throw new WSSecurityException("WSHandler: application " + err);
         } else {
+        	// TODO: hmm. does this also need changed for username processing?
             setPassword(mc, null);
             pwCb = new WSPasswordCallback("", WSPasswordCallback.UNKNOWN);
             pwCb.setPassword(password);

@@ -177,6 +177,15 @@ public class WSConstants {
      * The password type URI used in the username token 
      */
     public static final String PASSWORD_TEXT = USERNAMETOKEN_NS + "#PasswordText";
+    
+    /**
+     * Sets the {@link org.apache.ws.security.message.WSSAddUsernameToken#build(Document, String, String) UserNameToken}
+     * method to send _no_ password related information. 
+     * <p/>
+     * This is a required method as defined by WS Specification, Username token profile as passwords are optional.
+     * Also see the WS-I documentation for scenario's using this feature in a trust environment.
+     */ 
+    public static final String PW_NONE = "PasswordNone";
 
     /**
      * Sets the {@link org.apache.ws.security.message.WSEncryptBody#build(Document, Crypto) encryption}

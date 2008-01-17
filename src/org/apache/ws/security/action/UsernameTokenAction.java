@@ -17,6 +17,8 @@
 
 package org.apache.ws.security.action;
 
+import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.handler.WSHandler;
@@ -27,18 +29,20 @@ import org.w3c.dom.Document;
 public class UsernameTokenAction implements Action {
     public void execute(WSHandler handler, int actionToDo, Document doc, RequestData reqData)
             throws WSSecurityException {
-        String password;
-        password =
-                handler.getPassword(reqData.getUsername(),
+        
+        // Always call the callback for the username. We mis-use the configured password callback class and callback methods for this.
+        String providedUsername = reqData.getUsername();
+        WSPasswordCallback callbackData = handler.getPassword(reqData.getUsername(),
                         actionToDo,
                         WSHandlerConstants.PW_CALLBACK_CLASS,
-                        WSHandlerConstants.PW_CALLBACK_REF, reqData)
-                        .getPassword();
+                        WSHandlerConstants.PW_CALLBACK_REF, reqData);
+        providedUsername = callbackData.getIdentifer();
+        String password = callbackData.getPassword();
 
         WSSecUsernameToken builder = new WSSecUsernameToken();
         builder.setWsConfig(reqData.getWssConfig());
         builder.setPasswordType(reqData.getPwType());
-        builder.setUserInfo(reqData.getUsername(), password);
+        builder.setUserInfo(providedUsername, password);
 
         if (reqData.getUtElements() != null && reqData.getUtElements().length > 0) {
             for (int j = 0; j < reqData.getUtElements().length; j++) {

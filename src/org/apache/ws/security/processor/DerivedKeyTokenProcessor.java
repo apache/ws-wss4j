@@ -33,8 +33,6 @@ import org.apache.ws.security.saml.SAMLUtil;
 import org.apache.ws.security.util.Base64;
 import org.w3c.dom.Element;
 
-import sun.security.x509.KeyIdentifier;
-
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;

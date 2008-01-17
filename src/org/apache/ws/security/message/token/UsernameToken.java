@@ -45,6 +45,7 @@ import java.util.TimeZone;
  * UsernameToken according to WS Security specifications, UsernameToken profile.
  * 
  * Enhanced to support digest password type for username token signature
+ * Enhanced to support passwordless usernametokens as allowed by spec.
  * 
  * @author Davanum Srinivas (dims@yahoo.com)
  * @author Werner Dittmann (Werner.Dittmann@t-online.de)
@@ -168,7 +169,8 @@ public class UsernameToken {
      * @param pwType
      *            the required password encoding, either
      *            {@link WSConstants#PASSWORD_DIGEST} or
-     *            {@link WSConstants#PASSWORD_TEXT} or <code>null</code> if no
+     *            {@link WSConstants#PASSWORD_TEXT} or 
+     *            {@link WSConstants#PASSWORD_NONE} <code>null</code> if no
      *            password required
      */
     public UsernameToken(boolean milliseconds, Document doc, String pwType) {
@@ -399,8 +401,14 @@ public class UsernameToken {
      */
     public void setPassword(String pwd) {
         if (pwd == null) {
-            throw new IllegalArgumentException("pwd == null");
+        	if(this.passwordType != null) {
+        		throw new IllegalArgumentException("pwd == null but a password is needed");
+        	} else {
+        		// Ignore setting the password.
+        		return;
+        	}
         }
+        
         raw_password = pwd;             // enhancement by Alberto coletti
         Text node = getFirstNode(this.elementPassword);
         try {

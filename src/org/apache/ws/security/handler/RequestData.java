@@ -1,6 +1,7 @@
 package org.apache.ws.security.handler;
 
 import org.apache.ws.security.SOAPConstants;
+import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.message.WSSecHeader;
@@ -19,7 +20,7 @@ public class RequestData {
     private SOAPConstants soapConstants = null;
     private String actor = null;
     private String username = null;
-    private String pwType = null;
+    private String pwType = WSConstants.PASSWORD_DIGEST; // Make this the default when no password type is given.
     private String[] utElements = null;
     private Crypto sigCrypto = null;
     private Crypto decCrypto = null;

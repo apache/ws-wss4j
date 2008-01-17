@@ -75,7 +75,7 @@ public class WSPasswordCallback implements Callback {
     public final static int SECURITY_CONTEXT_TOKEN = 6;
     public final static int CUSTOM_TOKEN = 7;
     public final static int ENCRYPTED_KEY_TOKEN = 8;
-
+    
     private String identifier;
     private String password;
     private byte[] key;
@@ -113,6 +113,19 @@ public class WSPasswordCallback implements Callback {
      */
     public String getIdentifer() {
         return identifier;
+    }
+    
+    /**
+     * Extended callback interface allows for setting the username as well.
+     * Callback functions can change the identifier, this is intended in the usernametoken scenario
+     * where the usernametoken denotes the identity, but a fixed identity for signing is used
+     * The initial value is that from the configuration file. If this method is not called, the
+     * configured identity is used.
+     * 
+     * @param ident The identity.
+     */
+    public void setIdentifier(String ident) {
+    	this.identifier = ident;
     }
 
     /**

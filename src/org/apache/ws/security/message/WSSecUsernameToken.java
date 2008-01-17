@@ -63,14 +63,10 @@ public class WSSecUsernameToken extends WSSecBase {
 	 *            contains the password type. Only allowed values are
 	 *            {@link WSConstants#PASSWORD_DIGEST} and
 	 *            {@link WSConstants#PASSWORD_TEXT}.
+	 * 			  or null when no password is needed.
 	 */
 	public void setPasswordType(String pwType) {
-		if (pwType == null) {
-			passwordType = WSConstants.PASSWORD_DIGEST;
-		} else if (pwType.equals(WSConstants.PASSWORD_DIGEST)
-				|| pwType.equals(WSConstants.PASSWORD_TEXT)) {
-			passwordType = pwType;
-		}
+		this.passwordType = pwType;
 	}
 
 	/**
