@@ -12,7 +12,7 @@
                         <a href="#What_is_WSS4J">What is WSS4J?</a>
                     </li>
                     <li>
-                        <a href="#Where_can_I_download_WSS4J">Where can i download WSS4J?</a>
+                        <a href="#Where_can_I_download_WSS4J">Where can I download WSS4J?</a>
                     </li>
                     <li>
                         <a href="#WS-Security%20Features">WS-Security Features</a>
@@ -34,7 +34,7 @@
                 <p style="margin-left: 40px;"> 
 Apache WSS4J is an implementation of the
 OASIS Web Services Security (WS-Security) from <a href="http://www.oasis-open.org/committees/tc_home.php?wg_abbrev=wss">OASIS
-Web Services Security TC</a>. WSS4J is a primarily a Java library that can be used to sign and verify SOAP Messages 
+Web Services Security TC</a>. WSS4J is primarily a Java library that can be used to sign and verify SOAP Messages 
 with WS-Security information. WSS4J will use Apache Axis and Apache XML-Security projects and will be interoperable 
 with JAX-RPC based server/clients and .NET server/clients.
 <br/>
@@ -44,7 +44,7 @@ with JAX-RPC based server/clients and .NET server/clients.
                 <ul style="margin-left: 40px;">
                     <li>
                         <a href="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0.pdf">OASIS
-Web Serives Security: SOAP Message Security 1.0 Standard 200401, March
+Web Services Security: SOAP Message Security 1.0 Standard 200401, March
 2004</a>
                     </li>
                     <li>
@@ -101,15 +101,15 @@ for details.<br/>
                 </p>
             </subsection>
             <subsection name="WSS4J on Axis">
-                <p style="margin-left: 40px;">Please refer to the the <a href="axis.html">Axis
+                <p style="margin-left: 40px;">Please refer to the <a href="axis.html">Axis
 Deployment Tutorial</a> for a short tutorial and <a href="package.html">Axis Deployment Examples</a> for more details.<br/>
                 </p>
                 <br/>
             </subsection>
 			<subsection name="Rampart: WS-Security Implementation module for Axis2">
-                <p style="margin-left: 40px;">Please refer to the the 
-				<a href="http://svn.apache.org/viewcvs.cgi/*checkout*/webservices/axis2/trunk/java/xdocs/latest/security-module.html">
-				Rampart configuration guide</a> for configuration information<br/>
+                <p style="margin-left: 40px;">Please refer to the 
+				<a href="http://ws.apache.org/axis2/modules/rampart/1_2/security-module.html">
+				Rampart configuration guide</a> for configuration information.<br/>
                 </p>
                 <br/>
             </subsection>
