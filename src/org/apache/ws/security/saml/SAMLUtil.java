@@ -58,7 +58,7 @@ public class SAMLUtil {
             return getSAMLKeyInfo(assertion, crypto, cb);
         } catch (SAMLException e) {
             throw new WSSecurityException(WSSecurityException.FAILURE,
-                    "invalidSAMLToken", new Object[]{"for Signature (cannot parse)"});
+                    "invalidSAMLToken", new Object[]{"for Signature (cannot parse)"}, e);
         }
 
     }
