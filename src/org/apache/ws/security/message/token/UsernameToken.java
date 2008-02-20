@@ -267,7 +267,7 @@ public class UsernameToken {
             saltValue = generateSalt(mac);
         }
         this.elementSalt = doc.createElementNS(WSConstants.WSSE11_NS,
-                WSConstants.WSSE11_PREFIX + WSConstants.SALT_LN);
+                WSConstants.WSSE11_PREFIX + ":" + WSConstants.SALT_LN);
         WSSecurityUtil.setNamespace(this.elementSalt, WSConstants.WSSE11_NS,
                 WSConstants.WSSE11_PREFIX);
         this.elementSalt.appendChild(doc.createTextNode(Base64
@@ -282,7 +282,7 @@ public class UsernameToken {
     public void addIteration(Document doc, int iteration) {
         String text = "" + iteration;
         this.elementIteration = doc.createElementNS(WSConstants.WSSE11_NS,
-                WSConstants.WSSE11_PREFIX + WSConstants.ITERATION_LN);
+                WSConstants.WSSE11_PREFIX + ":" + WSConstants.ITERATION_LN);
         WSSecurityUtil.setNamespace(this.elementIteration,
                 WSConstants.WSSE11_NS, WSConstants.WSSE11_PREFIX);
         this.elementIteration.appendChild(doc.createTextNode(text));
