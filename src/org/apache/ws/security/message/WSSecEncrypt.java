@@ -521,6 +521,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
             	if (modifier.equals("Header")) {
             		
                     Element elem = doc.createElementNS(WSConstants.WSSE11_NS,"wsse11:"+WSConstants.ENCRYPTED_HEADER);
+                    WSSecurityUtil.setNamespace(elem, WSConstants.WSSE11_NS, WSConstants.WSSE11_PREFIX);
                     String wsuPrefix = WSSecurityUtil.setNamespace(elem,
                             WSConstants.WSU_NS, WSConstants.WSU_PREFIX);
                     elem.setAttributeNS(WSConstants.WSU_NS, wsuPrefix + ":Id", "EncHeader-" + body.hashCode());
