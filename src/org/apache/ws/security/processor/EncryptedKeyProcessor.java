@@ -32,6 +32,7 @@ import org.apache.ws.security.util.Base64;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.xml.security.encryption.XMLCipher;
 import org.apache.xml.security.encryption.XMLEncryptionException;
+import org.apache.xml.security.utils.Constants;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -411,6 +412,7 @@ public class EncryptedKeyProcessor implements Processor {
             encBodyData = (Element) encBodyData.getParentNode();
         }
         final Node parent = encBodyData.getParentNode();
+
         final java.util.List before_peers = listChildren(parent);
         try {
             xmlCipher.doFinal(doc, encBodyData, content);
@@ -448,6 +450,14 @@ public class EncryptedKeyProcessor implements Processor {
         ) {
             Node node = (Node) pos.next();
             if (node instanceof Element) {
+                if(!Constants.SignatureSpecNS.equals(node.getNamespaceURI()) &&
+                        node.getAttributes().getNamedItemNS(WSConstants.WSU_NS, "Id") == null) {
+                    String wsuPrefix = WSSecurityUtil.setNamespace((Element)node,
+                            WSConstants.WSU_NS, WSConstants.WSU_PREFIX);
+                    ((Element)node).setAttributeNS(WSConstants.WSU_NS, wsuPrefix + ":Id", dataRefURI);
+                    
+                }
+                
                 return (Element) node;
             }
         }

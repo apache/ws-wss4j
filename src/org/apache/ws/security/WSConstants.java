@@ -465,4 +465,19 @@ public class WSConstants {
      */
     public static final QName SECURITY_TOKEN_UNAVAILABLE = new QName (WSSE_NS, "SecurityTokenUnavailable");
     
+    /**
+     * Header type in <code>org.apache.ws.security.WSEncryptionPart</code>
+     */
+    public static final int PART_TYPE_HEADER = 1;
+    
+    /**
+     * Body type in <code>org.apache.ws.security.WSEncryptionPart</code>
+     */
+    public static final int PART_TYPE_BODY = 2;
+    
+    /**
+     * Element type in <code>org.apache.ws.security.WSEncryptionPart</code>
+     */
+    public static final int PART_TYPE_ELEMENT = 3;
+    
 }
