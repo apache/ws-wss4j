@@ -246,7 +246,12 @@ public class SecurityTokenReference {
                     "encodeError");
         }
         Text text = doc.createTextNode(Base64.encode(data));
-        createKeyIdentifier(doc, X509Security.getType(), text);        
+        
+        if (cert.getVersion() == 1) {
+            createKeyIdentifier(doc, X509Security.X509_V1_TYPE, text);
+        } else {
+            createKeyIdentifier(doc, X509Security.X509_V3_TYPE, text);
+        }
     }
 
     /**
@@ -260,6 +265,17 @@ public class SecurityTokenReference {
      */
     public void setKeyIdentifierSKI(X509Certificate cert, Crypto crypto)
             throws WSSecurityException {
+        //
+        // As per the 1.1 specification, SKI can only be used for a V3 certificate
+        //
+        if (cert.getVersion() != 3) {
+            throw new WSSecurityException(
+                WSSecurityException.UNSUPPORTED_SECURITY_TOKEN,
+                "invalidCertForSKI",
+                new Object[]{new Integer(cert.getVersion())}
+            );
+        }
+        
         Document doc = this.element.getOwnerDocument();
         byte data[] = crypto.getSKIBytesFromCert(cert);
         
@@ -366,7 +382,8 @@ public class SecurityTokenReference {
         String value = elem.getAttribute("ValueType");
         String alias = null;
 
-        if (X509Security.getType().equals(value)) {
+        if (X509Security.X509_V3_TYPE.equals(value) 
+                || X509Security.X509_V1_TYPE.equals(value)) {
             token = new X509Security(elem);
             if (token != null) {
                 X509Certificate cert = token.getX509Certificate(crypto);

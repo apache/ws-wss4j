@@ -477,28 +477,6 @@ public class WSSecurityUtil {
     }
 
     /**
-     * Create a BinarySecurityToken element <p/>
-     * 
-     * @param doc
-     *            the DOM document (SOAP request)
-     * @param wsuIdVal
-     *            the value for the wsu:Id
-     * @return then BST element (DOM element)
-     */
-    public static Element createBinarySecurityToken(Document doc,
-            String wsuIdVal) {
-        Element retVal = doc.createElementNS(WSConstants.WSSE_NS,
-                "wsse:BinarySecurityToken");
-        retVal.setAttributeNS(WSConstants.XMLNS_NS, "xmlns:wsu",
-                WSConstants.WSU_NS);
-        retVal.setAttributeNS(WSConstants.WSU_NS, "wsu:Id", wsuIdVal);
-        retVal.setAttributeNS(null, "ValueType", X509Security.getType());
-        retVal.setAttributeNS(null, "EncodingType",
-                BinarySecurity.BASE64_ENCODING);
-        return retVal;
-    }
-
-    /**
      * create a new element in the same namespace <p/>
      * 
      * @param parent

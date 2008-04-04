@@ -80,7 +80,8 @@ public class BinarySecurityTokenProcessor  implements Processor {
      * <p/>
      *
      * @param elem The element containing the binary security token. This is
-     *             either X509 certificate(s) or a PKIPath.
+     *             either X509 certificate(s) or a PKIPath. Any other token type
+     *             is ignored.
      * @throws WSSecurityException
      */
     private void getCertificatesTokenReference(Element elem, Crypto crypto)
@@ -99,22 +100,18 @@ public class BinarySecurityTokenProcessor  implements Processor {
      * Checks the <code>element</code> and creates appropriate binary security object.
      *
      * @param element The XML element that contains either a <code>BinarySecurityToken
-     *                </code> or a <code>PKIPath</code> element. Other element types a not
-     *                supported
+     *                </code> or a <code>PKIPath</code> element.
      * @throws WSSecurityException
      */
     private void createSecurityToken(Element element) throws WSSecurityException {
         this.token = new BinarySecurity(element);
         String type = token.getValueType();
 
-        if (X509Security.getType().equals(type)) {
+        if (X509Security.X509_V3_TYPE.equals(type) || X509Security.X509_V1_TYPE.equals(type)) {
             this.token = new X509Security(element);
         } else if (PKIPathSecurity.getType().equals(type)) {
             this.token = new PKIPathSecurity(element);
-        } else {
-            throw new WSSecurityException(WSSecurityException.UNSUPPORTED_SECURITY_TOKEN,
-                "unsupportedBinaryTokenType", new Object[]{type});
-        }
+        } 
     }
 
     public String getType() {

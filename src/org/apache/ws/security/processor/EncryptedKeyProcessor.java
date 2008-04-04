@@ -207,7 +207,8 @@ public class EncryptedKeyProcessor implements Processor {
                     if (el.equals(WSSecurityEngine.binaryToken)) {
                         X509Security token = null;
                         String value = bstElement.getAttribute(WSSecurityEngine.VALUE_TYPE);
-                        if (!X509Security.getType().equals(value)
+                        if (!(X509Security.X509_V3_TYPE.equals(value)
+                                || X509Security.X509_V1_TYPE.equals(value))
                                 || ((token = new X509Security(bstElement)) == null)) {
                             throw new WSSecurityException(WSSecurityException.UNSUPPORTED_SECURITY_TOKEN,
                                     "unsupportedBinaryTokenType",
