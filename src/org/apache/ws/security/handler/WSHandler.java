@@ -25,6 +25,7 @@ import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
+import org.apache.ws.security.action.Action;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.message.WSSecHeader;
@@ -83,7 +84,10 @@ public abstract class WSHandler {
 
         boolean mu = decodeMustUnderstand(reqData);
 
-        WSSConfig wssConfig = WSSConfig.getNewInstance();
+        WSSConfig wssConfig = reqData.getWssConfig();
+        if (wssConfig == null) {
+            wssConfig = WSSConfig.getNewInstance();
+        }
         
         wssConfig
 	    .setEnableSignatureConfirmation(decodeEnableSignatureConfirmation(reqData));
@@ -195,6 +199,24 @@ public abstract class WSHandler {
                 case WSConstants.NO_SERIALIZE:
                     reqData.setNoSerialization(true);
                     break;
+                //
+                // Handle any "custom" actions, similarly,
+                // but to preserve behavior from previous
+                // versions, consume (but log) action lookup failures.
+                //
+                default:
+                    Action doit = null;
+                    try {
+                        doit = wssConfig.getAction(actionToDo);
+                    } catch (final WSSecurityException e) {
+                        log.warn(
+                            "Error trying to locate a custom action (" + actionToDo + ")", 
+                            e
+                        );
+                    }
+                    if (doit != null) {
+                        doit.execute(this, actionToDo, doc, reqData);
+                    }
             }
         }
         /*
