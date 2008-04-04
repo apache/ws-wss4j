@@ -1,6 +1,8 @@
+#!/bin/sh
+
 #
 # Clean out the server and client keystores
-# rm wss4j.keystore
+rm wss4j.keystore
 
 # Generate the key that will be used for wss4j
 # (use security as the password)
