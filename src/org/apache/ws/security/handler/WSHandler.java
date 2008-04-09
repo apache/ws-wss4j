@@ -267,12 +267,6 @@ public abstract class WSHandler {
         int resultActions = wsResult.size();
         int size = actions.size();
 
-        // if (size != resultActions) {
-        // throw new AxisFault(
-        // "WSDoAllReceiver: security processing failed (actions number
-        // mismatch)");
-        // }
-
         int ai = 0;
         for (int i = 0; i < resultActions; i++) {
             final Integer actInt = (Integer) ((WSSecurityEngineResult) wsResult
@@ -285,6 +279,11 @@ public abstract class WSHandler {
                 return false;
             }
         }
+        
+        if (ai != size) {
+            return false;
+        }
+        
         return true;
     }
 
