@@ -93,7 +93,7 @@ public class Reference {
      * @return TODO
      */
     public String getValueType() {
-        return this.element.getAttribute("ValueType");
+        return this.element.getAttributeNS(null, "ValueType");
     }
 
     /**
@@ -103,7 +103,7 @@ public class Reference {
      * @return TODO
      */
     public String getURI() {
-        return this.element.getAttribute("URI");
+        return this.element.getAttributeNS(null, "URI");
     }
 
     /**
@@ -113,7 +113,7 @@ public class Reference {
      * @param valueType
      */
     public void setValueType(String valueType) {
-        this.element.setAttribute("ValueType", valueType);
+        this.element.setAttributeNS(null, "ValueType", valueType);
     }
 
     /**
@@ -123,7 +123,7 @@ public class Reference {
      * @param uri 
      */
     public void setURI(String uri) {
-        this.element.setAttribute("URI", uri);
+        this.element.setAttributeNS(null, "URI", uri);
     }
 
     /**
