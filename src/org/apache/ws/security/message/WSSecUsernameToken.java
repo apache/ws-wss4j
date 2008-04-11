@@ -41,8 +41,6 @@ public class WSSecUsernameToken extends WSSecBase {
 
 	private UsernameToken ut = null;
 
-	private String id = null;
-
 	private boolean nonce = false;
 
 	private boolean created = false;
@@ -134,14 +132,14 @@ public class WSSecUsernameToken extends WSSecBase {
 				passwordType);
 		ut.setName(user);
 		ut.setPassword(password);
-		String utId = "UsernameToken-" + ut.hashCode();
-		ut.setID(utId);
 		if (nonce) {
 			ut.addNonce(doc);
 		}
 		if (created) {
 			ut.addCreated(wssConfig.isPrecisionInMilliSeconds(), doc);
 		}
+		String utId = "UsernameToken-" + ut.hashCode();
+		ut.setID(utId);
 	}
 
 	/**

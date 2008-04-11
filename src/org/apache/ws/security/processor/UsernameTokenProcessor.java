@@ -117,11 +117,9 @@ public class UsernameTokenProcessor implements Processor {
                 throw new WSSecurityException(WSSecurityException.FAILURE,
                         "noPassword", new Object[]{user});
             }
-            if (nonce != null && createdTime != null) {
-                String passDigest = UsernameToken.doPasswordDigest(nonce, createdTime, origPassword);
-                if (!passDigest.equals(password)) {
-                    throw new WSSecurityException(WSSecurityException.FAILED_AUTHENTICATION);
-                }
+            String passDigest = UsernameToken.doPasswordDigest(nonce, createdTime, origPassword);
+            if (!passDigest.equals(password)) {
+                throw new WSSecurityException(WSSecurityException.FAILED_AUTHENTICATION);
             }
             ut.setRawPassword(origPassword);
         } else if (cb != null) {

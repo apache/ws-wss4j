@@ -439,11 +439,10 @@ public class UsernameToken {
             String password) {
         String passwdDigest = null;
         try {
-            byte[] b1 = Base64.decode(nonce);
-            byte[] b2 = created.getBytes("UTF-8");
+            byte[] b1 = nonce != null ? Base64.decode(nonce) : new byte[0];
+            byte[] b2 = created != null ? created.getBytes("UTF-8") : new byte[0];
             byte[] b3 = password.getBytes("UTF-8");
             byte[] b4 = new byte[b1.length + b2.length + b3.length];
-            int i = 0;
             int offset = 0;
             System.arraycopy(b1, 0, b4, offset, b1.length);
             offset += b1.length;
