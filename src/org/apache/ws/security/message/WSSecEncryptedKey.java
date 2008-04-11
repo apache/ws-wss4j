@@ -256,6 +256,14 @@ public class WSSecEncryptedKey extends WSSecBase {
         case WSConstants.THUMBPRINT_IDENTIFIER:
             secToken.setKeyIdentifierThumb(remoteCert);
             break;
+            
+        case WSConstants.ENCRYPTED_KEY_SHA1_IDENTIFIER:
+            //
+            // This identifier is not applicable for this case, so fall back to
+            // ThumbprintRSA.
+            //
+            secToken.setKeyIdentifierThumb(remoteCert);
+            break;
 
         case WSConstants.ISSUER_SERIAL:
             XMLX509IssuerSerial data = new XMLX509IssuerSerial(document,

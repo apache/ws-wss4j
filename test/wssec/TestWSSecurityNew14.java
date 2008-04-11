@@ -30,24 +30,32 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
+import org.apache.ws.security.message.WSSecEncrypt;
 import org.apache.ws.security.message.WSSecSignature;
 import org.apache.ws.security.message.WSSecHeader;
 import org.w3c.dom.Document;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.CallbackHandler;
+import javax.security.auth.callback.UnsupportedCallbackException;
+
 
 /**
- * WS-Security Test Case
+ * WS-Security Test Case for using the ThumbprintSHA1 key identifier for
+ * signature and encryption, and the EncryptedKeySHA1 key identifier for encryption.
  * <p/>
  * 
  * @author Davanum Srinivas (dims@yahoo.com)
  */
-public class TestWSSecurityNew14 extends TestCase {
+public class TestWSSecurityNew14 extends TestCase implements CallbackHandler {
     private static Log log = LogFactory.getLog(TestWSSecurityNew14.class);
     static final String NS = "http://www.w3.org/2000/09/xmldsig#";
     static final String soapMsg = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + "<SOAP-ENV:Envelope xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" + "<SOAP-ENV:Body>" + "<add xmlns=\"http://ws.apache.org/counter/counter_port_type\">" + "<value xmlns=\"\">15</value>" + "</add>" + "</SOAP-ENV:Body>\r\n       \r\n" + "</SOAP-ENV:Envelope>";
@@ -135,7 +143,7 @@ public class TestWSSecurityNew14 extends TestCase {
 
         /*
          * convert the resulting document into a message first. The toAxisMessage()
-         * mehtod performs the necessary c14n call to properly set up the signed
+         * method performs the necessary c14n call to properly set up the signed
          * document and convert it into a SOAP message. After that we extract it
          * as a document again for further processing.
          */
@@ -171,6 +179,66 @@ public class TestWSSecurityNew14 extends TestCase {
         Document signedDoc1 = builder.build(signedDoc, crypto, secHeader);
         verify(signedDoc1);
     }
+    
+    /**
+     * Test that encrypts and decrypts a WS-Security envelope.
+     * The test uses the ThumbprintSHA1 key identifier type. 
+     * <p/>
+     * 
+     * @throws java.lang.Exception Thrown when there is any problem in encryption or decryption
+     */
+    public void testX509EncryptionThumb() throws Exception {
+        WSSecEncrypt builder = new WSSecEncrypt();
+        builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+        builder.setKeyIdentifierType(WSConstants.THUMBPRINT_IDENTIFIER);
+        
+        log.info("Before Encrypting ThumbprintSHA1....");
+        Document doc = unsignedEnvelope.getAsDocument();
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);        
+        Document encryptedDoc = builder.build(doc, crypto, secHeader);
+        
+        if (log.isDebugEnabled()) {
+            log.debug("Encrypted message with THUMBPRINT_IDENTIFIER:");
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(encryptedDoc);
+            log.debug(outputString);
+            assertTrue(outputString.contains("#ThumbprintSHA1"));
+        }
+    
+        log.info("After Encrypting ThumbprintSHA1....");
+        verify(encryptedDoc);
+    }
+        
+    /**
+     * Test that encrypts and decrypts a WS-Security envelope.
+     * The test uses the EncryptedKeySHA1 key identifier type. 
+     * <p/>
+     * 
+     * @throws java.lang.Exception Thrown when there is any problem in encryption or decryption
+     */
+    public void testX509EncryptionSHA1() throws Exception {
+        WSSecEncrypt builder = new WSSecEncrypt();
+        builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+        builder.setKeyIdentifierType(WSConstants.ENCRYPTED_KEY_SHA1_IDENTIFIER);
+     
+        log.info("Before Encrypting EncryptedKeySHA1....");
+        Document doc = unsignedEnvelope.getAsDocument();
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);        
+        Document encryptedDoc = builder.build(doc, crypto, secHeader);
+     
+        if (log.isDebugEnabled()) {
+            log.debug("Encrypted message with ENCRYPTED_KEY_SHA1_IDENTIFIER:");
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(encryptedDoc);
+            log.debug(outputString);
+            assertTrue(outputString.contains("#EncryptedKeySHA1"));
+        }
+     
+        log.info("After Encrypting EncryptedKeySHA1....");
+        verify(encryptedDoc);
+    }
 
     /**
      * Verifies the soap envelope.
@@ -180,6 +248,24 @@ public class TestWSSecurityNew14 extends TestCase {
      * @throws java.lang.Exception Thrown when there is a problem in verification
      */
     private void verify(Document doc) throws Exception {
-        secEngine.processSecurityHeader(doc, null, null, crypto);
+        secEngine.processSecurityHeader(doc, null, this, crypto);
+    }
+    
+    public void handle(Callback[] callbacks)
+        throws IOException, UnsupportedCallbackException {
+        for (int i = 0; i < callbacks.length; i++) {
+            if (callbacks[i] instanceof WSPasswordCallback) {
+                WSPasswordCallback pc = (WSPasswordCallback) callbacks[i];
+                /*
+                 * here call a function/method to lookup the password for
+                 * the given identifier (e.g. a user name or keystore alias)
+                 * e.g.: pc.setPassword(passStore.getPassword(pc.getIdentfifier))
+                 * for Testing we supply a fixed name here.
+                 */
+                pc.setPassword("security");
+            } else {
+                throw new UnsupportedCallbackException(callbacks[i], "Unrecognized Callback");
+            }
+        }
     }
 }
