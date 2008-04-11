@@ -213,7 +213,7 @@ public class ReferenceListProcessor implements Processor {
 		            }
 			
 		} catch (Exception e) {
-			throw new WSSecurityException(WSSecurityException.FAILED_ENC_DEC,
+			throw new WSSecurityException(WSSecurityException.FAILED_CHECK,
 					null, null, e);
 		}
 	}
@@ -283,7 +283,7 @@ public class ReferenceListProcessor implements Processor {
 			    
 			    if(decryptedData == null) {
 			        throw new WSSecurityException(
-						WSSecurityException.FAILED_ENC_DEC, "unsupportedKeyId");
+						WSSecurityException.FAILED_CHECK, "unsupportedKeyId");
 			    }
 			}
 			if(p instanceof EncryptedKeyProcessor) {
@@ -318,7 +318,7 @@ public class ReferenceListProcessor implements Processor {
 			}
 		
 	    }else {
-			throw new WSSecurityException(WSSecurityException.FAILED_ENC_DEC,
+			throw new WSSecurityException(WSSecurityException.FAILED_CHECK,
 					"noReference");
 		}
 		return WSSecurityUtil.prepareSecretKey(algorithm, decryptedData);

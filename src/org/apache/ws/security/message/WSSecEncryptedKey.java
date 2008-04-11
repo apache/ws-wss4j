@@ -196,7 +196,7 @@ public class WSSecEncryptedKey extends WSSecBase {
         try {
             cipher.init(Cipher.ENCRYPT_MODE, remoteCert.getPublicKey());
         } catch (InvalidKeyException e) {
-            throw new WSSecurityException(WSSecurityException.FAILED_ENC_DEC,
+            throw new WSSecurityException(WSSecurityException.FAILED_ENCRYPTION,
                     null, null, e);
         }
         if (doDebug) {
@@ -214,13 +214,13 @@ public class WSSecEncryptedKey extends WSSecBase {
         try {
             this.encryptedEphemeralKey = cipher.doFinal(keyBytes);
         } catch (IllegalStateException e1) {
-            throw new WSSecurityException(WSSecurityException.FAILED_ENC_DEC,
+            throw new WSSecurityException(WSSecurityException.FAILED_ENCRYPTION,
                     null, null, e1);
         } catch (IllegalBlockSizeException e1) {
-            throw new WSSecurityException(WSSecurityException.FAILED_ENC_DEC,
+            throw new WSSecurityException(WSSecurityException.FAILED_ENCRYPTION,
                     null, null, e1);
         } catch (BadPaddingException e1) {
-            throw new WSSecurityException(WSSecurityException.FAILED_ENC_DEC,
+            throw new WSSecurityException(WSSecurityException.FAILED_ENCRYPTION,
                     null, null, e1);
         }
         Text keyText = WSSecurityUtil.createBase64EncodedTextNode(document,

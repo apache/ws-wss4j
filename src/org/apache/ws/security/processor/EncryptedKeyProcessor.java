@@ -229,8 +229,8 @@ public class EncryptedKeyProcessor implements Processor {
                             log.debug("BST Alias: " + alias);
                         }
                     } else {
-                        throw new WSSecurityException(WSSecurityException.INVALID_SECURITY,
-                                "unsupportedToken",
+                        throw new WSSecurityException(WSSecurityException.UNSUPPORTED_SECURITY_TOKEN,
+                                "unsupportedBinaryTokenType",
                                 null);
                     }
         			/*
@@ -247,7 +247,7 @@ public class EncryptedKeyProcessor implements Processor {
 //                        log.debug("KeyName alias: " + alias);
 //                    }
                 } else {
-                    throw new WSSecurityException(WSSecurityException.FAILURE, "unsupportedKeyId");
+                    throw new WSSecurityException(WSSecurityException.INVALID_SECURITY, "unsupportedKeyId");
                 }
             } else if (crypto.getDefaultX509Alias() != null) {
                 alias = crypto.getDefaultX509Alias();
@@ -288,7 +288,7 @@ public class EncryptedKeyProcessor implements Processor {
             try {
                 privateKey = crypto.getPrivateKey(alias, password);
             } catch (Exception e) {
-                throw new WSSecurityException(WSSecurityException.FAILED_ENC_DEC, null, null, e);
+                throw new WSSecurityException(WSSecurityException.FAILED_CHECK, null, null, e);
             }
         }
 
@@ -296,7 +296,7 @@ public class EncryptedKeyProcessor implements Processor {
             cipher.init(Cipher.DECRYPT_MODE,
                     privateKey);
         } catch (Exception e1) {
-            throw new WSSecurityException(WSSecurityException.FAILED_ENC_DEC, null, null, e1);
+            throw new WSSecurityException(WSSecurityException.FAILED_CHECK, null, null, e1);
         }
 
         try {
@@ -304,11 +304,11 @@ public class EncryptedKeyProcessor implements Processor {
             decryptedBytes =
                     cipher.doFinal(encryptedEphemeralKey);
         } catch (IllegalStateException e2) {
-            throw new WSSecurityException(WSSecurityException.FAILED_ENC_DEC, null, null, e2);
+            throw new WSSecurityException(WSSecurityException.FAILED_CHECK, null, null, e2);
         } catch (IllegalBlockSizeException e2) {
-            throw new WSSecurityException(WSSecurityException.FAILED_ENC_DEC, null, null, e2);
+            throw new WSSecurityException(WSSecurityException.FAILED_CHECK, null, null, e2);
         } catch (BadPaddingException e2) {
-            throw new WSSecurityException(WSSecurityException.FAILED_ENC_DEC, null, null, e2);
+            throw new WSSecurityException(WSSecurityException.FAILED_CHECK, null, null, e2);
         }
 
         if (tlog.isDebugEnabled()) {
@@ -418,7 +418,7 @@ public class EncryptedKeyProcessor implements Processor {
         try {
             xmlCipher.doFinal(doc, encBodyData, content);
         } catch (Exception e1) {
-            throw new WSSecurityException(WSSecurityException.FAILED_ENC_DEC, null, null, e1);
+            throw new WSSecurityException(WSSecurityException.FAILED_CHECK, null, null, e1);
         }
         
         if(parent.getLocalName().equals(WSConstants.ENCRYPTED_HEADER)

@@ -92,7 +92,7 @@ public class EncryptedDataProcessor implements Processor {
         try {
             xmlCipher.doFinal(elem.getOwnerDocument(), elem, false);
         } catch (Exception e) {
-            throw new WSSecurityException(WSSecurityException.FAILED_ENC_DEC,
+            throw new WSSecurityException(WSSecurityException.FAILED_CHECK,
                     null, null, e);
         }
         

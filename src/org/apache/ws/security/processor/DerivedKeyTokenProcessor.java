@@ -103,7 +103,7 @@ public class DerivedKeyTokenProcessor implements Processor {
             this.keyBytes = algo.createKey(this.secret, seed, offset, length);
             
         } catch (Exception e) {
-            throw new WSSecurityException(e.getMessage(), e);
+            throw new WSSecurityException(WSSecurityException.FAILURE, e.getMessage());
         }
     }
 
@@ -154,10 +154,10 @@ public class DerivedKeyTokenProcessor implements Processor {
                 this.secret = keyInfo.getSecret();
             } else {
                 throw new WSSecurityException(
-                        WSSecurityException.FAILED_ENC_DEC, "unsupportedKeyId");
+                        WSSecurityException.FAILED_CHECK, "unsupportedKeyId");
             }
         } else {
-            throw new WSSecurityException(WSSecurityException.FAILED_ENC_DEC,
+            throw new WSSecurityException(WSSecurityException.FAILED_CHECK,
                     "noReference");
         }
     }

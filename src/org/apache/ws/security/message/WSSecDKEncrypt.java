@@ -147,7 +147,7 @@ public class WSSecDKEncrypt extends WSSecDerivedKeyBase {
                 xmlCipher.doFinal(doc, body, content);
             } catch (Exception e2) {
                 throw new WSSecurityException(
-                        WSSecurityException.FAILED_ENC_DEC, null, null, e2);
+                        WSSecurityException.FAILED_ENCRYPTION, null, null, e2);
             }
             encDataRefs.add(new String("#" + xencEncryptedDataId));
         }
