@@ -66,7 +66,15 @@ public class WSSecurityUtil {
     static {
         doDebug = log.isDebugEnabled();
     }
-
+    
+    /**
+     * A cached pseuo-random number generator
+     * NB. On some JVMs, caching this random number
+     * generator is required to overcome punitive
+     * overhead.
+     */
+    private static SecureRandom random = null;
+    
     /**
      * Returns the first WS-Security header element for a given actor. Only one
      * WS-Security header is allowed for an actor.
@@ -823,10 +831,13 @@ public class WSSecurityUtil {
      * @throws Exception
      */
     public static byte[] generateNonce(int length) throws WSSecurityException {
-        try {
-            SecureRandom random = SecureRandom.getInstance("SHA1PRNG");
-            byte[] temp = new byte[length];
-            random.nextBytes(temp);
+        try {            
+            final SecureRandom r = resolveSecureRandom();
+            if (r == null) {
+                throw new WSSecurityException("Random generator is not initialzed.");
+            }
+            byte[] temp = new byte[length];            
+            r.nextBytes(temp);
             return temp;
         } catch (Exception e) {
             throw new WSSecurityException(
@@ -958,5 +969,32 @@ public class WSSecurityUtil {
                     + " was correctly signed");
         }
         log.debug("All required elements are signed");
+    }
+    
+    /**
+     * @return      a SecureRandom instance initialized with the "SHA1PRNG"
+     *              algorithm identifier
+     */
+    public static SecureRandom
+    resolveSecureRandom() throws NoSuchAlgorithmException {
+        return resolveSecureRandom("SHA1PRNG");
+    }
+    
+    /**
+     * @param       algorithm
+     *              
+     *
+     * @return      a SecureRandom instance initialize with the identifier
+     *              specified in algorithm
+     */
+    public synchronized static SecureRandom
+    resolveSecureRandom(
+        final String algorithm
+    ) throws NoSuchAlgorithmException {
+        if (random == null) {
+            random = SecureRandom.getInstance(algorithm);
+            random.setSeed(System.currentTimeMillis());
+        }
+        return random;
     }
 }

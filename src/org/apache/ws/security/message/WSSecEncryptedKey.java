@@ -307,10 +307,13 @@ public class WSSecEncryptedKey extends WSSecBase {
      * @throws WSSecurityException
      */
     protected byte[] generateEphemeralKey() throws WSSecurityException {
-        try {
-            SecureRandom random = SecureRandom.getInstance("SHA1PRNG");
+        try {     
+            final SecureRandom r = WSSecurityUtil.resolveSecureRandom();
+            if (r == null) {
+                throw new WSSecurityException("Random generator is not initialzed.");
+            }
             byte[] temp = new byte[this.keySize / 8];
-            random.nextBytes(temp);
+            r.nextBytes(temp);
             return temp;
         } catch (Exception e) {
             throw new WSSecurityException(
@@ -506,7 +509,7 @@ public class WSSecEncryptedKey extends WSSecBase {
     }
     
     public boolean isCertSet() {
-    	return (useThisCert == null ? true : false) ;
+        return (useThisCert == null ? true : false) ;
     }
 
     public byte[] getEncryptedEphemeralKey() {
