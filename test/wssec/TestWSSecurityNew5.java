@@ -189,6 +189,8 @@ public class TestWSSecurityNew5 extends TestCase implements CallbackHandler {
         org.w3c.dom.Element elem = builder.getUsernameTokenElement();
         org.w3c.dom.NodeList list = elem.getElementsByTagName("wsse:Nonce");
         org.w3c.dom.Node nonceNode = list.item(0);
+        org.w3c.dom.Node childNode = nonceNode.getFirstChild();
+        childNode.setNodeValue("");
         
         if (log.isDebugEnabled()) {
             String outputString = 
@@ -229,6 +231,8 @@ public class TestWSSecurityNew5 extends TestCase implements CallbackHandler {
         org.w3c.dom.Element elem = builder.getUsernameTokenElement();
         org.w3c.dom.NodeList list = elem.getElementsByTagName("wsu:Created");
         org.w3c.dom.Node nonceNode = list.item(0);
+        org.w3c.dom.Node childNode = nonceNode.getFirstChild();
+        childNode.setNodeValue("");
         
         if (log.isDebugEnabled()) {
             String outputString = 
