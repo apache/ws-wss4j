@@ -143,8 +143,8 @@ public class TestWSSecurityX509v1 extends TestCase implements CallbackHandler {
             String outputString = 
                 org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
             log.debug(outputString);
-            assertTrue(outputString.contains("#X509v1"));
-            assertTrue(!outputString.contains("#X509v3"));
+            assertTrue(outputString.indexOf("#X509v1") != -1);
+            assertTrue(outputString.indexOf("#X509v3") == -1);
         }
         
         verify(signedDoc);
@@ -167,8 +167,8 @@ public class TestWSSecurityX509v1 extends TestCase implements CallbackHandler {
             String outputString = 
                 org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(encryptedDoc);
             log.debug(outputString);
-            assertTrue(outputString.contains("#X509v1"));
-            assertTrue(!outputString.contains("#X509v3"));
+            assertTrue(outputString.indexOf("#X509v1") != -1);
+            assertTrue(outputString.indexOf("#X509v3") == -1);
         }
         
         verify(encryptedDoc);
@@ -192,8 +192,9 @@ public class TestWSSecurityX509v1 extends TestCase implements CallbackHandler {
             fail("Expected failure when using an X509#v1 certificate with SKI");
         } catch (WSSecurityException ex) {
             // expected
-            assertTrue(ex.getMessage().contains(
+            assertTrue(ex.getMessage().indexOf(
                 "An X509 certificate with version 3 must be used for SKI")
+                != -1
             );
         }
     }

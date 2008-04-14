@@ -46,8 +46,6 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import com.sun.org.apache.xerces.internal.dom.ParentNode;
-
 public class ReferenceListProcessor implements Processor {
 	private static Log log = LogFactory.getLog(ReferenceListProcessor.class
 			.getName());

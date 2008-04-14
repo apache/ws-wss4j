@@ -203,7 +203,7 @@ public class TestWSSecurityNew14 extends TestCase implements CallbackHandler {
             String outputString = 
                 org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(encryptedDoc);
             log.debug(outputString);
-            assertTrue(outputString.contains("#ThumbprintSHA1"));
+            assertTrue(outputString.indexOf("#ThumbprintSHA1") != -1);
         }
     
         log.info("After Encrypting ThumbprintSHA1....");
@@ -233,7 +233,7 @@ public class TestWSSecurityNew14 extends TestCase implements CallbackHandler {
             String outputString = 
                 org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(encryptedDoc);
             log.debug(outputString);
-            assertTrue(outputString.contains("#EncryptedKeySHA1"));
+            assertTrue(outputString.indexOf("#EncryptedKeySHA1") != -1);
         }
      
         log.info("After Encrypting EncryptedKeySHA1....");
