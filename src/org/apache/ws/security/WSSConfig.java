@@ -52,51 +52,35 @@ public class WSSConfig {
         try {
             tmp.put(
                 new Integer(WSConstants.UT),
-                (Action) Loader.loadClass(
-                    org.apache.ws.security.action.UsernameTokenAction.class.getName()
-                ).newInstance()
+                org.apache.ws.security.action.UsernameTokenAction.class.getName()
             );
             tmp.put(
                 new Integer(WSConstants.ENCR),
-                (Action) Loader.loadClass(
-                    org.apache.ws.security.action.EncryptionAction.class.getName()
-                ).newInstance()
+                org.apache.ws.security.action.EncryptionAction.class.getName()
             );
             tmp.put(
                 new Integer(WSConstants.SIGN),
-                (Action) Loader.loadClass(
-                    org.apache.ws.security.action.SignatureAction.class.getName()
-                ).newInstance()
+                org.apache.ws.security.action.SignatureAction.class.getName()
             );
             tmp.put(
                 new Integer(WSConstants.ST_SIGNED),
-                (Action) Loader.loadClass(
-                    org.apache.ws.security.action.SAMLTokenSignedAction.class.getName()
-                ).newInstance()
+                org.apache.ws.security.action.SAMLTokenSignedAction.class.getName()
             );
             tmp.put(
                 new Integer(WSConstants.ST_UNSIGNED),
-                (Action) Loader.loadClass(
-                    org.apache.ws.security.action.SAMLTokenUnsignedAction.class.getName()
-                ).newInstance()
+                org.apache.ws.security.action.SAMLTokenUnsignedAction.class.getName()
             );
             tmp.put(
                 new Integer(WSConstants.TS),
-                (Action) Loader.loadClass(
-                    org.apache.ws.security.action.TimestampAction.class.getName()
-                ).newInstance()
+                org.apache.ws.security.action.TimestampAction.class.getName()
             );
             tmp.put(
                 new Integer(WSConstants.UT_SIGN),
-                (Action) Loader.loadClass(
-                    org.apache.ws.security.action.UsernameTokenSignedAction.class.getName()
-                ).newInstance()
+                org.apache.ws.security.action.UsernameTokenSignedAction.class.getName()
             );
             tmp.put(
                 new Integer(WSConstants.SC),
-                (Action) Loader.loadClass(
-                    org.apache.ws.security.action.SignatureConfirmationAction.class.getName()
-                ).newInstance()
+                org.apache.ws.security.action.SignatureConfirmationAction.class.getName()
             );
         } catch (final Throwable t) {
             t.printStackTrace();
@@ -113,51 +97,35 @@ public class WSSConfig {
         try {
             tmp.put(
                 WSSecurityEngine.SAML_TOKEN,
-                (Processor) Loader.loadClass(
-                    org.apache.ws.security.processor.SAMLTokenProcessor.class.getName()
-                ).newInstance()
+                org.apache.ws.security.processor.SAMLTokenProcessor.class.getName()
             );
             tmp.put(
                 WSSecurityEngine.ENCRYPTED_KEY,
-                (Processor) Loader.loadClass(
-                    org.apache.ws.security.processor.EncryptedKeyProcessor.class.getName()
-                ).newInstance()
+                org.apache.ws.security.processor.EncryptedKeyProcessor.class.getName()
             );
             tmp.put(
                 WSSecurityEngine.SIGNATURE,
-                (Processor) Loader.loadClass(
-                    org.apache.ws.security.processor.SignatureProcessor.class.getName()
-                ).newInstance()
+                org.apache.ws.security.processor.SignatureProcessor.class.getName()
             );
             tmp.put(
                 WSSecurityEngine.timeStamp,
-                (Processor) Loader.loadClass(
-                    org.apache.ws.security.processor.TimestampProcessor.class.getName()
-                ).newInstance()
+                org.apache.ws.security.processor.TimestampProcessor.class.getName()
             );
             tmp.put(
                 WSSecurityEngine.usernameToken,
-                (Processor) Loader.loadClass(
-                    org.apache.ws.security.processor.UsernameTokenProcessor.class.getName()
-                ).newInstance()
+                org.apache.ws.security.processor.UsernameTokenProcessor.class.getName()
             );
             tmp.put(
                 WSSecurityEngine.REFERENCE_LIST,
-                (Processor) Loader.loadClass(
-                    org.apache.ws.security.processor.ReferenceListProcessor.class.getName()
-                ).newInstance()
+                org.apache.ws.security.processor.ReferenceListProcessor.class.getName()
             );
             tmp.put(
                 WSSecurityEngine.signatureConfirmation,
-                (Processor) Loader.loadClass(
-                    org.apache.ws.security.processor.SignatureConfirmationProcessor.class.getName()
-                ).newInstance()
+                org.apache.ws.security.processor.SignatureConfirmationProcessor.class.getName()
             );
             tmp.put(
                 WSSecurityEngine.DERIVED_KEY_TOKEN_05_02,
-                (Processor) Loader.loadClass(
-                    org.apache.ws.security.processor.DerivedKeyTokenProcessor.class.getName()
-                ).newInstance()
+                org.apache.ws.security.processor.DerivedKeyTokenProcessor.class.getName()
             );
             tmp.put(
                 WSSecurityEngine.DERIVED_KEY_TOKEN_05_12,
@@ -165,9 +133,7 @@ public class WSSConfig {
             );
             tmp.put(
                 WSSecurityEngine.SECURITY_CONTEXT_TOKEN_05_02,
-                (Processor) Loader.loadClass(
-                    org.apache.ws.security.processor.SecurityContextTokenProcessor.class.getName()
-                ).newInstance()
+                org.apache.ws.security.processor.SecurityContextTokenProcessor.class.getName()
             );
             tmp.put(
                 WSSecurityEngine.SECURITY_CONTEXT_TOKEN_05_12,
@@ -175,15 +141,11 @@ public class WSSConfig {
             );
             tmp.put(
                 WSSecurityEngine.binaryToken,
-                (Processor) Loader.loadClass(
-                    org.apache.ws.security.processor.BinarySecurityTokenProcessor.class.getName()
-                ).newInstance()
+                org.apache.ws.security.processor.BinarySecurityTokenProcessor.class.getName()
             );
             tmp.put(
                 WSSecurityEngine.ENCRYPTED_DATA,
-                (Processor) Loader.loadClass(
-                    org.apache.ws.security.processor.EncryptedDataProcessor.class.getName()
-                ).newInstance()
+                org.apache.ws.security.processor.EncryptedDataProcessor.class.getName()
             );
         } catch (final Throwable t) {
             t.printStackTrace();
@@ -382,8 +344,8 @@ public class WSSConfig {
      * This operation allows applications to supply their own
      * actions for well-known operations.
      */
-    public Action setAction(int code, Action action) {
-        return (Action) actionMap.put(new Integer(code), action);
+    public String setAction(int code, String action) {
+        return (String) actionMap.put(new Integer(code), action);
     }
 
     /**
@@ -395,31 +357,46 @@ public class WSSConfig {
      */
     public Action getAction(int action) throws WSSecurityException {
         Integer key = new Integer(action);
-        Action ret = (Action) actionMap.get(key);
-        if (ret == null) {
+        String name = (String) actionMap.get(key);
+        if (name == null) {
             throw new WSSecurityException(WSSecurityException.FAILURE,
                     "unknownAction", new Object[] { key });
         }
-        return ret;
+        try {
+            return (Action) Loader.loadClass(name).newInstance();
+        } catch (Throwable t) {
+            throw new WSSecurityException(WSSecurityException.FAILURE,
+                    "unableToLoadClass", new Object[] { name });
+        }
     }
     
     /**
-     * Associate a SOAP processor with a specified SOAP Security header
+     * Associate a SOAP processor name with a specified SOAP Security header
      * element QName.  Processors registered under this QName will be
      * called when processing header elements with the specified type.
      */
-    public Processor setProcessor(QName el, Processor p) {
-        return (Processor) processorMap.put(el, p);
+    public String setProcessor(QName el, String name) {
+        return (String) processorMap.put(el, name);
     }
 
     /**
      * @return      the SOAP processor associated with the specified
      *              QName.  The QName is intended to refer to an element
-     *              in a SOAP security header.
+     *              in a SOAP security header.  This operation returns
+     *              null if there is no processor associated with the 
+     *              specified QName.
      */
     public Processor getProcessor(QName el) throws WSSecurityException {
-        Processor p = (Processor) processorMap.get(el);
-        return p;
+        final String name = (String) processorMap.get(el);
+        if (name != null) {
+            try {
+                return (Processor) Loader.loadClass(name).newInstance();
+            } catch (Throwable t) {
+                throw new WSSecurityException(WSSecurityException.FAILURE,
+                        "unableToLoadClass", new Object[] { name });
+            }
+        }
+        return null;
     }
 
     private boolean loadProvider(String id, String className) {

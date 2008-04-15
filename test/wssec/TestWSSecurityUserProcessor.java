@@ -165,7 +165,7 @@ public class TestWSSecurityUserProcessor extends TestCase {
         // Check to make sure we can install/replace and use our own processor
         //
         WSSConfig cfg = WSSConfig.getNewInstance();
-        Processor p = new MyProcessor();
+        String p = "wssec.MyProcessor";
         cfg.setProcessor(
             WSSecurityEngine.SIGNATURE,
             p
@@ -179,7 +179,7 @@ public class TestWSSecurityUserProcessor extends TestCase {
             final java.util.Map result = (java.util.Map) pos.next();
             Object obj = result.get("foo");
             if (obj != null) {
-                if (obj == p) {
+                if (obj.getClass().getName().equals(p)) {
                     found = true;
                 }
             }
@@ -196,8 +196,7 @@ public class TestWSSecurityUserProcessor extends TestCase {
         
         final WSSConfig cfg = WSSConfig.getNewInstance();
         final int action = 0xDEADF000;
-        final MyAction myAction = new MyAction();
-        cfg.setAction(action, myAction);
+        cfg.setAction(action, "wssec.MyAction");
         final RequestData reqData = new RequestData();
         reqData.setWssConfig(cfg);
         reqData.setMsgContext(new java.util.TreeMap());
@@ -206,68 +205,21 @@ public class TestWSSecurityUserProcessor extends TestCase {
         actions.add(new Integer(action));
         final Document doc = unsignedEnvelope.getAsDocument();
         MyHandler handler = new MyHandler();
+        reqData.setMsgContext("bread");
+        assertEquals(reqData.getMsgContext(), "bread");
         handler.doit(
             action, 
             doc, 
             reqData, 
             actions
         );
-        assertTrue(myAction.getCalled() == 1);
-    }
-    
-    /**
-     * a custom processor that inserts itself into the results vector
-     */
-    private static class MyProcessor implements Processor {
-        
-        public final void 
-        handleToken(
-            org.w3c.dom.Element elem, 
-            org.apache.ws.security.components.crypto.Crypto crypto, 
-            org.apache.ws.security.components.crypto.Crypto decCrypto,
-            javax.security.auth.callback.CallbackHandler cb, 
-            org.apache.ws.security.WSDocInfo wsDocInfo, 
-            java.util.Vector returnResults,
-            org.apache.ws.security.WSSConfig config
-        ) throws org.apache.ws.security.WSSecurityException {
-            final java.util.Map result = 
-                new org.apache.ws.security.WSSecurityEngineResult(
-                    WSConstants.UT_SIGN, 
-                    (org.apache.ws.security.message.token.SecurityContextToken) null
-                );
-            result.put("foo", this);
-            returnResults.add(result);
-        }
-
-        public final String getId() {
-            return getClass().getName();
-        }
-    }
-    
-    /**
-     * a custom action that counts how many times it's been called
-     */
-    private static class MyAction implements Action {
-        
-        private int called = 0;
-        
-        public void 
-        execute(
-            WSHandler handler, 
-            int actionToDo, 
-            Document doc,
-            RequestData reqData
-        ) throws org.apache.ws.security.WSSecurityException {
-            ++called;
-        }
-        
-        int getCalled(){ return called; }
+        assertEquals(reqData.getMsgContext(), "crumb");
     }
     
     /**
      * a trivial extension of the WSHandler type
      */
-    private static class MyHandler extends WSHandler {
+    public static class MyHandler extends WSHandler {
         
         public Object 
         getOption(String key) {
