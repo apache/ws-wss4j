@@ -20,6 +20,7 @@ package org.apache.ws.security.message;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.message.token.UsernameToken;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.w3c.dom.Document;
@@ -44,6 +45,14 @@ public class WSSecUsernameToken extends WSSecBase {
 	private boolean nonce = false;
 
 	private boolean created = false;
+	
+	private boolean useDerivedKey = false;
+	
+	private boolean useMac = false;
+	
+	private byte[] saltValue;
+	
+	private int iteration = UsernameToken.DEFAULT_ITERATION;
 
 	private Document document = null;
 
@@ -80,6 +89,22 @@ public class WSSecUsernameToken extends WSSecBase {
 	public void addCreated() {
 		created = true;
 	}
+	
+    /**
+     * Add a derived key to the UsernameToken
+     * @param useMac whether the derived key is to be used for a MAC or not
+     * @param saltValue The saltvalue to use
+     * @param iteration The number of iterations to use in deriving a key
+     */
+    public void addDerivedKey(boolean useMac, byte[] saltValue, int iteration) {
+        passwordType = null;
+        useDerivedKey = true;
+        this.useMac = useMac;
+        this.saltValue = saltValue;
+        if (iteration > 0) {
+            this.iteration = iteration;
+        }
+    }
 
 	
 	/**
@@ -98,6 +123,23 @@ public class WSSecUsernameToken extends WSSecBase {
 		}
 		return ut.getSecretKey();
 	}
+	
+    /**
+     * Get the derived key.
+     * 
+     * After the <code>prepare()</code> method was called use this method
+     * to compute a derived key. The generation of this secret key is according
+     * to the UsernameTokenProfile 1.1 specification (section 4 - Key Derivation).
+     * 
+     * @return Return the derived key of this token or null if <code>prepare()</code>
+     * was not called before.
+     */
+    public byte[] getDerivedKey() throws WSSecurityException {
+        if (ut == null || !useDerivedKey) {
+            return null;
+        }
+        return UsernameToken.generateDerivedKey(password, saltValue, iteration);
+    }
 
 	/**
 	 * Get the id generated during <code>prepare()</code>.
@@ -131,7 +173,12 @@ public class WSSecUsernameToken extends WSSecBase {
 		ut = new UsernameToken(wssConfig.isPrecisionInMilliSeconds(), doc,
 				passwordType);
 		ut.setName(user);
-		ut.setPassword(password);
+		if (useDerivedKey) {
+		    saltValue = ut.addSalt(doc, saltValue, useMac);
+		    ut.addIteration(doc, iteration);
+		} else {
+		    ut.setPassword(password);
+		}
 		if (nonce) {
 			ut.addNonce(doc);
 		}
