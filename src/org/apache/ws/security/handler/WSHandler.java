@@ -662,7 +662,6 @@ public abstract class WSHandler {
                                           RequestData reqData)
             throws WSSecurityException {
         WSPasswordCallback pwCb = null;
-        String password = null;
         CallbackHandler cbHandler = null;
         String err = "provided null or empty password";
         Object mc = reqData.getMsgContext();
@@ -672,18 +671,21 @@ public abstract class WSHandler {
             // Null passwords are not always a problem: if the callback was called to provide a username instead.
         } else if ((cbHandler = (CallbackHandler) getProperty(mc, refProp)) != null) {
             pwCb = performCallback(cbHandler, username, doAction);
-        } else if ((password = getPassword(mc)) == null) {
-        	// TODO: hmm. does this also need changed for username processing?
-            throw new WSSecurityException("WSHandler: application " + err);
         } else {
-        	// TODO: hmm. does this also need changed for username processing?
-            setPassword(mc, null);
-            pwCb = new WSPasswordCallback("", WSPasswordCallback.UNKNOWN);
+            //
+            // If a callback isn't configured then try to get the password
+            // from the message context
+            //
+            String password = getPassword(mc);
+            if (password == null) {
+                throw new WSSecurityException("WSHandler: application " + err);
+            }
+            pwCb = constructPasswordCallback(username, doAction);
             pwCb.setPassword(password);
         }
         return pwCb;
     }
-
+    
     private WSPasswordCallback readPwViaCallbackClass(String callback,
                                                       String username,
                                                       int doAction,
@@ -722,22 +724,7 @@ public abstract class WSHandler {
                                                int doAction)
             throws WSSecurityException {
 
-        WSPasswordCallback pwCb = null;
-        int reason = 0;
-
-        switch (doAction) {
-        case WSConstants.UT:
-        case WSConstants.UT_SIGN:
-                reason = WSPasswordCallback.USERNAME_TOKEN;
-                break;
-            case WSConstants.SIGN:
-                reason = WSPasswordCallback.SIGNATURE;
-                break;
-            case WSConstants.ENCR:
-                reason = WSPasswordCallback.KEY_NAME;
-                break;
-        }
-        pwCb = new WSPasswordCallback(username, reason);
+        WSPasswordCallback pwCb = constructPasswordCallback(username, doAction);
         Callback[] callbacks = new Callback[1];
         callbacks[0] = pwCb;
         /*
@@ -749,6 +736,28 @@ public abstract class WSHandler {
             throw new WSSecurityException("WSHandler: password callback failed", e);
         }
         return pwCb;
+    }
+    
+    private WSPasswordCallback constructPasswordCallback(
+        String username,
+        int doAction
+    ) throws WSSecurityException {
+            
+        int reason = WSPasswordCallback.UNKNOWN;
+            
+        switch (doAction) {
+        case WSConstants.UT:
+        case WSConstants.UT_SIGN:
+            reason = WSPasswordCallback.USERNAME_TOKEN;
+            break;
+        case WSConstants.SIGN:
+            reason = WSPasswordCallback.SIGNATURE;
+            break;
+        case WSConstants.ENCR:
+            reason = WSPasswordCallback.KEY_NAME;
+            break;
+        }
+        return new WSPasswordCallback(username, reason);
     }
 
     private void splitEncParts(String tmpS, Vector parts, RequestData reqData)
