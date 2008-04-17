@@ -32,6 +32,7 @@ import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.message.WSSecUsernameToken;
 import org.apache.ws.security.message.WSSecHeader;
 import org.w3c.dom.Document;
@@ -144,6 +145,41 @@ public class TestWSSecurityNew5 extends TestCase implements CallbackHandler {
         log.info("After adding UsernameToken PW Digest....");
         verify(signedDoc);
     }
+    
+    /**
+     * Test that adds a UserNameToken with a bad password Digest to a WS-Security envelope
+     * <p/>
+     */
+    public void testUsernameTokenBadDigest() throws Exception {
+        WSSecUsernameToken builder = new WSSecUsernameToken();
+        builder.setUserInfo("wernerd", "verySecre");
+        log.info("Before adding UsernameToken PW Digest....");
+        Document doc = unsignedEnvelope.getAsDocument();
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        Document signedDoc = builder.build(doc, secHeader);
+
+        /*
+         * convert the resulting document into a message first. The toAxisMessage()
+         * method performs the necessary c14n call to properly set up the signed
+         * document and convert it into a SOAP message. After that we extract it
+         * as a document again for further processing.
+         */
+
+        Message signedMsg = SOAPUtil.toAxisMessage(signedDoc);
+        if (log.isDebugEnabled()) {
+            log.debug("Message with UserNameToken PW Digest:");
+            XMLUtils.PrettyElementToWriter(signedMsg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
+        }
+        signedDoc = signedMsg.getSOAPEnvelope().getAsDocument();
+        log.info("After adding UsernameToken PW Digest....");
+        try {
+            verify(signedDoc);
+        } catch (WSSecurityException ex) {
+            assertTrue(ex.getErrorCode() == WSSecurityException.FAILED_AUTHENTICATION);
+            // expected
+        }
+    }
 
     /**
      * Test that adds a UserNameToken with password text to a WS-Security envelope
@@ -167,6 +203,105 @@ public class TestWSSecurityNew5 extends TestCase implements CallbackHandler {
         log.info("After adding UsernameToken PW Text....");
         verify(signedDoc);
     }
+    
+    /**
+     * Test that adds a UserNameToken with (bad) password text to a WS-Security envelope
+     * <p/>
+     */
+    public void testUsernameTokenBadText() throws Exception {
+        WSSecUsernameToken builder = new WSSecUsernameToken();
+        builder.setPasswordType(WSConstants.PASSWORD_TEXT);
+        builder.setUserInfo("wernerd", "verySecre");
+        log.info("Before adding UsernameToken PW Text....");
+        Document doc = unsignedEnvelope.getAsDocument();
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        Document signedDoc = builder.build(doc, secHeader);
+        Message signedMsg = SOAPUtil.toAxisMessage(signedDoc);
+        if (log.isDebugEnabled()) {
+            log.debug("Message with UserNameToken PW Text:");
+            XMLUtils.PrettyElementToWriter(signedMsg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
+        }
+        signedDoc = signedMsg.getSOAPEnvelope().getAsDocument();
+        log.info("After adding UsernameToken PW Text....");
+        
+        try {
+            verify(signedDoc);
+        } catch (WSSecurityException ex) {
+            assertTrue(ex.getErrorCode() == WSSecurityException.FAILED_AUTHENTICATION);
+            // expected
+        }
+    }
+    
+    /**
+     * Test with a null token type. This will fail as the default is to reject custom
+     * token types.
+     * <p/>
+     */
+    public void testUsernameTokenCustomFail() throws Exception {
+        WSSecUsernameToken builder = new WSSecUsernameToken();
+        builder.setPasswordType(null);
+        builder.setUserInfo("wernerd", null);
+        
+        Document doc = unsignedEnvelope.getAsDocument();
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        Document signedDoc = builder.build(doc, secHeader);
+        Message signedMsg = SOAPUtil.toAxisMessage(signedDoc);
+        
+        if (log.isDebugEnabled()) {
+            log.debug("Message with UserNameToken PW Text:");
+            XMLUtils.PrettyElementToWriter(signedMsg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
+        }
+        
+        signedDoc = signedMsg.getSOAPEnvelope().getAsDocument();
+        try {
+            verify(signedDoc);
+            throw new Exception("Custom token types are not permitted");
+        } catch (WSSecurityException ex) {
+            assertTrue(ex.getErrorCode() == WSSecurityException.FAILED_AUTHENTICATION);
+            // expected
+        }
+    }
+    
+    /**
+     * Test with a null token type. This will pass as the WSSConfig is configured to 
+     * handle custom token types.
+     * <p/>
+     */
+    public void testUsernameTokenCustomPass() throws Exception {
+        WSSecUsernameToken builder = new WSSecUsernameToken();
+        builder.setPasswordType(null);
+        builder.setUserInfo("wernerd", null);
+        
+        Document doc = unsignedEnvelope.getAsDocument();
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        Document signedDoc = builder.build(doc, secHeader);
+        Message signedMsg = SOAPUtil.toAxisMessage(signedDoc);
+        
+        if (log.isDebugEnabled()) {
+            log.debug("Message with UserNameToken PW Text:");
+            XMLUtils.PrettyElementToWriter(signedMsg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
+        }
+        
+        signedDoc = signedMsg.getSOAPEnvelope().getAsDocument();
+        
+        //
+        // Configure so that custom token types are accepted
+        //
+        WSSConfig cfg = WSSConfig.getNewInstance();
+        cfg.setHandleCustomPasswordTypes(true);
+        secEngine.setWssConfig(cfg);
+        verify(signedDoc);
+        
+        //
+        // Go back to default for other tests
+        //
+        cfg.setHandleCustomPasswordTypes(false);
+        secEngine.setWssConfig(cfg);
+    }
+    
     
     /**
      * A test for WSS-66 - the nonce string is null
@@ -266,17 +401,19 @@ public class TestWSSecurityNew5 extends TestCase implements CallbackHandler {
     }
 
     public void handle(Callback[] callbacks)
-            throws IOException, UnsupportedCallbackException {
+        throws IOException, UnsupportedCallbackException {
         for (int i = 0; i < callbacks.length; i++) {
             if (callbacks[i] instanceof WSPasswordCallback) {
                 WSPasswordCallback pc = (WSPasswordCallback) callbacks[i];
-                /*
-                 * here call a function/method to lookup the password for
-                 * the given identifier (e.g. a user name or keystore alias)
-                 * e.g.: pc.setPassword(passStore.getPassword(pc.getIdentfifier))
-                 * for Testing we supply a fixed name here.
-                 */
-                pc.setPassword("verySecret");
+                if (pc.getUsage() == WSPasswordCallback.USERNAME_TOKEN
+                    && "wernerd".equals(pc.getIdentifer())) {
+                    pc.setPassword("verySecret");
+                } else if (
+                    pc.getUsage() == WSPasswordCallback.USERNAME_TOKEN_UNKNOWN
+                    && "wernerd".equals(pc.getIdentifer())
+                    && "verySecret".equals(pc.getPassword())) {
+                    return;
+                }
             } else {
                 throw new UnsupportedCallbackException(callbacks[i], "Unrecognized Callback");
             }

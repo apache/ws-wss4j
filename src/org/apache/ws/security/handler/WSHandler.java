@@ -249,6 +249,7 @@ public abstract class WSHandler {
         wssConfig
 	    .setEnableSignatureConfirmation(decodeEnableSignatureConfirmation(reqData));
         wssConfig.setTimeStampStrict(decodeTimestampStrict(reqData));
+        wssConfig.setHandleCustomPasswordTypes(decodeCustomPasswordTypes(reqData));
         reqData.setWssConfig(wssConfig);
 
         if ((doAction & WSConstants.SIGN) == WSConstants.SIGN) {
@@ -616,6 +617,22 @@ public abstract class WSHandler {
 
 	throw new WSSecurityException(
 		   "WSHandler: illegal precisionInMilliSeconds parameter");
+    }
+    
+    protected boolean decodeCustomPasswordTypes(RequestData reqData) 
+        throws WSSecurityException {
+        String value = getString(
+                WSHandlerConstants.HANDLE_CUSTOM_PASSWORD_TYPES,
+                reqData.getMsgContext()
+        );
+
+        if (value == null) {return false;}
+
+        if ("0".equals(value) || "false".equals(value)) {return false;} 
+        if ("1".equals(value) || "true".equals(value)) {return true;}
+    
+        throw new WSSecurityException(
+               "WSHandler: illegal handleCustomPasswordTypes parameter");
     }
 
     protected boolean decodeTimestampStrict(RequestData reqData) 

@@ -176,6 +176,15 @@ public class WSSConfig {
      * expired.
      */
     protected boolean timeStampStrict = true;
+    
+    /**
+     * This variable controls whether types other than PasswordDigest or PasswordText
+     * are allowed when processing UsernameTokens. 
+     * 
+     * By default this is set to false so that the user doesn't have to explicitly
+     * reject custom token types in the callback handler.
+     */
+    protected boolean handleCustomPasswordTypes = false;
 
     protected HashMap jceProvider = new HashMap(10);
 
@@ -320,6 +329,21 @@ public class WSSConfig {
     public void setEnableSignatureConfirmation(
             boolean enableSignatureConfirmation) {
         this.enableSignatureConfirmation = enableSignatureConfirmation;
+    }
+    
+    /**
+     * @param handleCustomTypes 
+     * whether to handle custom UsernameToken password types or not
+     */
+    public void setHandleCustomPasswordTypes(boolean handleCustomTypes) {
+        this.handleCustomPasswordTypes = handleCustomTypes;
+    }
+    
+    /**
+     * @return whether custom UsernameToken password types are allowed or not
+     */
+    public boolean getHandleCustomPasswordTypes() {
+        return handleCustomPasswordTypes;
     }
 
     /**
