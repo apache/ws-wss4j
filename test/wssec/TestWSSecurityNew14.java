@@ -198,13 +198,13 @@ public class TestWSSecurityNew14 extends TestCase implements CallbackHandler {
         secHeader.insertSecurityHeader(doc);        
         Document encryptedDoc = builder.build(doc, crypto, secHeader);
         
+        String outputString = 
+            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(encryptedDoc);
         if (log.isDebugEnabled()) {
             log.debug("Encrypted message with THUMBPRINT_IDENTIFIER:");
-            String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(encryptedDoc);
             log.debug(outputString);
-            assertTrue(outputString.indexOf("#ThumbprintSHA1") != -1);
         }
+        assertTrue(outputString.indexOf("#ThumbprintSHA1") != -1);
     
         log.info("After Encrypting ThumbprintSHA1....");
         verify(encryptedDoc);
@@ -221,6 +221,7 @@ public class TestWSSecurityNew14 extends TestCase implements CallbackHandler {
         WSSecEncrypt builder = new WSSecEncrypt();
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         builder.setKeyIdentifierType(WSConstants.ENCRYPTED_KEY_SHA1_IDENTIFIER);
+        builder.setUseKeyIdentifier(true);
      
         log.info("Before Encrypting EncryptedKeySHA1....");
         Document doc = unsignedEnvelope.getAsDocument();
@@ -228,13 +229,13 @@ public class TestWSSecurityNew14 extends TestCase implements CallbackHandler {
         secHeader.insertSecurityHeader(doc);        
         Document encryptedDoc = builder.build(doc, crypto, secHeader);
      
+        String outputString = 
+            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(encryptedDoc);
         if (log.isDebugEnabled()) {
             log.debug("Encrypted message with ENCRYPTED_KEY_SHA1_IDENTIFIER:");
-            String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(encryptedDoc);
             log.debug(outputString);
-            assertTrue(outputString.indexOf("#EncryptedKeySHA1") != -1);
         }
+        assertTrue(outputString.indexOf("#EncryptedKeySHA1") != -1);
      
         log.info("After Encrypting EncryptedKeySHA1....");
         verify(encryptedDoc);

@@ -66,6 +66,8 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
 
     protected String embeddedKeyName = null;
 
+    protected boolean useKeyIdentifier;
+
     /**
      * Symmetric key used in the EncrytpedKey.
      */
@@ -130,6 +132,15 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
     }
     
     /**
+     * Set this true if a key identifier must be used in the KeyInfo
+     * 
+     * @param useKeyIdentifier
+     */
+    public void setUseKeyIdentifier(boolean useKeyIdentifier) {
+        this.useKeyIdentifier = useKeyIdentifier;
+    }
+    
+    /**
      * Set the name of the symmetric encryption algorithm to use.
      * 
      * This encryption algorithm is used to encrypt the data. If the algorithm
@@ -176,6 +187,14 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
      */
     public String getSymmetricEncAlgorithm() {
         return symEncAlgo;
+    }
+    
+    /**
+     * Returns if Key Identifiers should be used in KeyInfo
+     * @return
+     */
+    public boolean getUseKeyIdentifier() {
+        return useKeyIdentifier;
     }
     
     /**
@@ -418,7 +437,8 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
         KeyInfo keyInfo = null;
         
         // Prepare KeyInfo if useKeyIdentifier is set
-        if (keyIdentifierType == WSConstants.ENCRYPTED_KEY_SHA1_IDENTIFIER) {
+        if (useKeyIdentifier &&
+            keyIdentifierType == WSConstants.ENCRYPTED_KEY_SHA1_IDENTIFIER) {
             keyInfo = new KeyInfo(document);
             SecurityTokenReference secToken = new SecurityTokenReference(document);
             if(this.customReferenceValue != null) {
