@@ -267,7 +267,7 @@ public class WSSConfig {
         }
         return defaultConfig;
     }
-
+    
     /**
      * Checks if we are in WS-I Basic Security Profile compliance mode
      * 

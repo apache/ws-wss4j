@@ -19,6 +19,7 @@ package org.apache.ws.security.processor;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.WSDataRef;
 import org.apache.ws.security.WSDocInfo;
 import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSConfig;
@@ -321,9 +322,10 @@ public class EncryptedKeyProcessor implements Processor {
          * Now lookup the references that are encrypted with this key
          */
         String dataRefURI = null;
+        WSDataRef dataRef = null;
         Element refList = (Element) WSSecurityUtil.getDirectChild((Node) xencEncryptedKey,
                 "ReferenceList", WSConstants.ENC_NS);
-        ArrayList dataRefUris = new ArrayList();
+        ArrayList dataRefs = new ArrayList();
         if (refList != null) {
         	       	
             for (tmpE = refList.getFirstChild();
@@ -334,13 +336,14 @@ public class EncryptedKeyProcessor implements Processor {
                 if (!tmpE.getNamespaceURI().equals(WSConstants.ENC_NS)) {
                     continue;
                 }
-                if (tmpE.getLocalName().equals("DataReference")) {
+                if (tmpE.getLocalName().equals("DataReference")) {                   
                     dataRefURI = ((Element) tmpE).getAttribute("URI");
-                    decryptDataRef(doc, dataRefURI, decryptedBytes);
-                    dataRefUris.add(dataRefURI.substring(1));
+                    dataRef = new WSDataRef(dataRefURI.substring(1));
+                    decryptDataRef(doc, dataRefURI,dataRef, decryptedBytes);
+                    dataRefs.add(dataRef);
                 }
             }
-            return dataRefUris;
+            return dataRefs;
         }
 
         if (tlog.isDebugEnabled()) {
@@ -373,7 +376,7 @@ public class EncryptedKeyProcessor implements Processor {
         return Base64.decode(encodedData);
     }
 
-    private Element decryptDataRef(Document doc, String dataRefURI, byte[] decryptedData) throws WSSecurityException {
+    private Element decryptDataRef(Document doc, String dataRefURI, WSDataRef wsDataRef, byte[] decryptedData) throws WSSecurityException {
         if (log.isDebugEnabled()) {
             log.debug("found data refernce: " + dataRefURI);
         }
@@ -434,7 +437,10 @@ public class EncryptedKeyProcessor implements Processor {
                 String wsuPrefix = WSSecurityUtil.setNamespace(decryptedHeaderClone,
                         WSConstants.WSU_NS, WSConstants.WSU_PREFIX);
                 decryptedHeaderClone.setAttributeNS(WSConstants.WSU_NS, wsuPrefix + ":Id", id);
+                wsDataRef.setWsuId(id.substring(1));
             
+            } else {
+                wsDataRef.setWsuId(sigId);
             }
             
             Node encryptedHeader = decryptedHeader.getParentNode();
@@ -456,8 +462,10 @@ public class EncryptedKeyProcessor implements Processor {
                     String wsuPrefix = WSSecurityUtil.setNamespace((Element)node,
                             WSConstants.WSU_NS, WSConstants.WSU_PREFIX);
                     ((Element)node).setAttributeNS(WSConstants.WSU_NS, wsuPrefix + ":Id", dataRefURI);
+                    wsDataRef.setWsuId(dataRefURI.substring(1));
                     
                 }
+                wsDataRef.setName(new QName(node.getNamespaceURI(),node.getLocalName()));
                 
                 return (Element) node;
             }

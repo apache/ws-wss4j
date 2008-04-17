@@ -23,10 +23,12 @@ import java.util.Vector;
 import javax.crypto.SecretKey;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
+import javax.xml.namespace.QName;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.WSDataRef;
 import org.apache.ws.security.WSDocInfo;
 import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSConfig;
@@ -99,15 +101,16 @@ public class ReferenceListProcessor implements Processor {
 			}
 			if (tmpE.getLocalName().equals("DataReference")) {
 				String dataRefURI = ((Element) tmpE).getAttribute("URI");
-				decryptDataRefEmbedded(doc, dataRefURI, cb, crypto);
-                dataRefUris.add(dataRefURI.substring(1));
+				WSDataRef dataRef = new WSDataRef(dataRefURI.substring(1));;
+				decryptDataRefEmbedded(doc, dataRefURI, dataRef,cb, crypto);
+                dataRefUris.add(dataRef);
 			}
 		}
 		
         return dataRefUris;
 	}
 
-	public void decryptDataRefEmbedded(Document doc, String dataRefURI,
+	public void decryptDataRefEmbedded(Document doc, String dataRefURI, WSDataRef dataRef,
 			CallbackHandler cb, Crypto crypto) throws WSSecurityException {
 
 		if (log.isDebugEnabled()) {
@@ -118,7 +121,7 @@ public class ReferenceListProcessor implements Processor {
 		 * then try the generic lookup to find Id="someURI"
 		 */
 		Element encBodyData = null;
-		if ((encBodyData = WSSecurityUtil.getElementByWsuId(doc, dataRefURI)) == null) {
+		if ((encBodyData = WSSecurityUtil.getElementByWsuId(doc, dataRefURI)) == null) {		    
 			encBodyData = WSSecurityUtil.getElementByGenId(doc, dataRefURI);
 		}
 		if (encBodyData == null) {
@@ -183,6 +186,9 @@ public class ReferenceListProcessor implements Processor {
         			        String wsuPrefix = WSSecurityUtil.setNamespace(decryptedHeaderClone,
         			                    WSConstants.WSU_NS, WSConstants.WSU_PREFIX);
         			        decryptedHeaderClone.setAttributeNS(WSConstants.WSU_NS, wsuPrefix + ":Id", id);
+        			        dataRef.setWsuId(id.substring(1));
+			        } else {
+			            dataRef.setWsuId(sigId);
 			        }
 			        
 				Node encryptedHeader = decryptedHeader.getParentNode();
@@ -205,8 +211,9 @@ public class ReferenceListProcessor implements Processor {
 		                        String wsuPrefix = WSSecurityUtil.setNamespace((Element)node,
 		                                WSConstants.WSU_NS, WSConstants.WSU_PREFIX);
 		                        ((Element)node).setAttributeNS(WSConstants.WSU_NS, wsuPrefix + ":Id", dataRefURI);
-		                        
-		                    }		                  
+		                        dataRef.setWsuId(dataRefURI.substring(1));		                        
+		                    }
+		                    dataRef.setName(new QName(node.getNamespaceURI(),node.getLocalName()));
 		                }
 		            }
 			
