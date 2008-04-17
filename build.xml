@@ -254,7 +254,7 @@ org.apache.ws.axis.security.util
         description="This target generates a first build directory and checks for some libraries">
         <tstamp/>
         <mkdir dir="${build.dir}"/>
-        <delete dir="${build.dir}/test-reports"/>
+        <!--<delete dir="${build.dir}/test-reports"/> -->
         <mkdir dir="${build.dir}/test-reports"/>
 
         <available property="junit.present" 
