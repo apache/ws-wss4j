@@ -454,7 +454,7 @@ public class WSHandlerConstants {
 
     /**
      * Specific parameter for UsernameToken action to define the encoding
-     * of the passowrd.
+     * of the password.
      * <p/>
      * The parameter can be set to either {@link WSConstants#PW_DIGEST}
      * or to {@link WSConstants#PW_TEXT}.
@@ -469,6 +469,15 @@ public class WSHandlerConstants {
      * The default setting is PW_DIGEST.
      */
     public static final String PASSWORD_TYPE = "passwordType";
+    
+    /**
+     * This variable controls whether types other than PasswordDigest or PasswordText
+     * are allowed when processing UsernameTokens. 
+     * 
+     * By default this is set to false so that the user doesn't have to explicitly
+     * reject custom token types in the callback handler.
+     */
+    public static final String HANDLE_CUSTOM_PASSWORD_TYPES = "handleCustomPasswordTypes";
 
     /**
      * Parameter to generate additional elements in <code>UsernameToken</code>.

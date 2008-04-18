@@ -48,7 +48,12 @@ public class WSSecurityEngine {
             LogFactory.getLog("org.apache.ws.security.TIME");
 
     private static WSSecurityEngine engine = null;
-    private static WSSConfig wssConfig = WSSConfig.getDefaultWSConfig();
+    
+    /**
+     * The WSSConfig instance used by this SecurityEngine to
+     * find Processors for processing security headers
+     */
+    private WSSConfig wssConfig = null;
     private boolean doDebug = false;
     /**
      * <code>wsse:BinarySecurityToken</code> as defined by WS Security specification
@@ -65,7 +70,7 @@ public class WSSecurityEngine {
     /**
      * <code>wsse11:signatureConfirmation</code> as defined by OASIS WS Security specification,
      */
-   public static final QName signatureConfirmation = new QName(WSConstants.WSSE11_NS, WSConstants.SIGNATURE_CONFIRMATION_LN);
+    public static final QName signatureConfirmation = new QName(WSConstants.WSSE11_NS, WSConstants.SIGNATURE_CONFIRMATION_LN);
     /**
      * <code>ds:Signature</code> as defined by XML Signature specification,
      * enhanced by WS Security specification
@@ -125,13 +130,30 @@ public class WSSecurityEngine {
         }
         return engine;
     }
-
+    
     /**
-     * @param wsc set the static WSSConfig to other than default
+     * @return      the WSSConfig object set on this instance, or
+     *              the statically defined one, if the instance-level
+     *              config object is null.
      */
-    public static void setWssConfig(WSSConfig wsc) {
-        wssConfig = wsc;
+    public final WSSConfig
+    getWssConfig() {
+        return (wssConfig == null) ? WSSConfig.getDefaultWSConfig() : wssConfig;
     }
+    
+    /**
+     * @param       the WSSConfig instance for this WSSecurityEngine to use
+     *
+     * @return      the WSSConfig instance previously set on this 
+     *              WSSecurityEngine instance
+     */
+    public final WSSConfig
+    setWssConfig(WSSConfig cfg) {
+        WSSConfig ret = wssConfig;
+        wssConfig = cfg;
+        return ret;
+    }
+    
     /**
      * Process the security header given the soap envelope as W3C document.
      * <p/>
@@ -229,6 +251,10 @@ public class WSSecurityEngine {
      * <li>{@link #timeStamp <code>wsu:Timestamp</code>}</li>
      * </ul>
      *
+     * Note that additional child elements can be processed if appropriate
+     * Processors have been registered with the WSSCondig instance set
+     * on this class.
+     *
      * @param securityHeader the <code>wsse:Security</code> header element
      * @param cb             a callback hander to the caller to resolve passwords during
      *                       encryption and {@link UsernameToken}handling
@@ -274,14 +300,15 @@ public class WSSecurityEngine {
                 continue;
             }
             QName el = new QName(elem.getNamespaceURI(), elem.getLocalName());
-            Processor p = wssConfig.getProcessor(el);
+            final WSSConfig cfg = getWssConfig();
+            Processor p = cfg.getProcessor(el);
             /*
              * Call the processor for this token. After the processor returns, 
              * store it for later retrival. The token processor may store some
              * information about the processed token
              */
             if (p != null) {
-                p.handleToken((Element) elem, sigCrypto, decCrypto, cb, wsDocInfo, returnResults, wssConfig);
+                p.handleToken((Element) elem, sigCrypto, decCrypto, cb, wsDocInfo, returnResults, cfg);
                 wsDocInfo.setProcessor(p);
             } else {
                 /*

@@ -37,6 +37,7 @@ import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.message.WSSecSignature;
 import org.apache.ws.security.message.WSSecHeader;
+import org.apache.ws.security.message.WSSecTimestamp;
 import org.w3c.dom.Document;
 
 import java.io.ByteArrayInputStream;
@@ -158,6 +159,66 @@ public class TestWSSecurityNew11 extends TestCase {
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
 
+        Document signedDoc = builder.build(doc, crypto, secHeader);
+
+        /*
+         * convert the resulting document into a message first. The toAxisMessage()
+         * mehtod performs the necessary c14n call to properly set up the signed
+         * document and convert it into a SOAP message. After that we extract it
+         * as a document again for further processing.
+         */
+
+        Message signedMsg = SOAPUtil.toAxisMessage(signedDoc);
+        if (log.isDebugEnabled()) {
+            log.debug("Signed message with STR DirectReference key identifier:");
+            XMLUtils.PrettyElementToWriter(signedMsg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
+        }
+        signedDoc = signedMsg.getSOAPEnvelope().getAsDocument();
+        log.info("After Signing STR DirectReference....");
+        verify(signedDoc);
+    }
+    
+    /**
+     * This is a test for WSS-96:
+     * "Error when making a signature when containing a WSSecTimestamp"
+     * A timestamp is added to the document and signed.
+     */
+    public void testWSS96() throws Exception {
+        WSSecSignature builder = new WSSecSignature();
+        builder.setUserInfo("wss4jcert", "security");
+        SOAPConstants soapConstants = WSSecurityUtil.getSOAPConstants(unsignedEnvelope.getAsDOM());
+        Vector parts = new Vector();
+        
+        Document doc = unsignedEnvelope.getAsDocument();
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        
+        /*
+         * Set up to sign body and use STRTransorm to sign
+         * the signature token (e.g. X.509 certificate)
+         */
+        WSEncryptionPart encP =
+            new WSEncryptionPart(
+                soapConstants.getBodyQName().getLocalPart(),
+                soapConstants.getEnvelopeURI(),
+                "Content");
+        parts.add(encP);
+        encP =
+            new WSEncryptionPart(
+                "STRTransform",
+                soapConstants.getEnvelopeURI(),
+                "Content");
+        parts.add(encP);
+        
+        WSSecTimestamp timestamp = new WSSecTimestamp();
+        timestamp.setTimeToLive(600);
+        timestamp.build(doc, secHeader);
+        parts.add(new WSEncryptionPart(timestamp.getId()));
+
+        builder.setParts(parts);
+        builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
+
+        log.info("Before Signing STR DirectReference....");
         Document signedDoc = builder.build(doc, crypto, secHeader);
 
         /*

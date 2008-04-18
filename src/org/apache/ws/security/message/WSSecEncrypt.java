@@ -65,7 +65,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
     protected byte[] embeddedKey = null;
 
     protected String embeddedKeyName = null;
-    
+
     protected boolean useKeyIdentifier;
 
     /**
@@ -139,7 +139,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
     public void setUseKeyIdentifier(boolean useKeyIdentifier) {
         this.useKeyIdentifier = useKeyIdentifier;
     }
-
+    
     /**
      * Set the name of the symmetric encryption algorithm to use.
      * 
@@ -196,7 +196,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
     public boolean getUseKeyIdentifier() {
         return useKeyIdentifier;
     }
-
+    
     /**
      * Initialize a WSSec Encrypt.
      * 
@@ -433,13 +433,13 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
 
     private Vector doEncryption(Document doc, SecretKey secretKey,
             Vector references) throws WSSecurityException {
-    	
-    	KeyInfo keyInfo = null;
-    	
-    	// Prepare KeyInfo if useKeyIdentifier is set
-    	if ( useKeyIdentifier && 
-    			 keyIdentifierType == WSConstants.ENCRYPTED_KEY_SHA1_IDENTIFIER) {
-    		keyInfo = new KeyInfo(document);
+        
+        KeyInfo keyInfo = null;
+        
+        // Prepare KeyInfo if useKeyIdentifier is set
+        if (useKeyIdentifier &&
+            keyIdentifierType == WSConstants.ENCRYPTED_KEY_SHA1_IDENTIFIER) {
+            keyInfo = new KeyInfo(document);
             SecurityTokenReference secToken = new SecurityTokenReference(document);
             if(this.customReferenceValue != null) {
                 secToken.setKeyIdentifierEncKeySHA1(this.customReferenceValue);
@@ -449,8 +449,8 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
             
 
             keyInfo.addUnknownElement(secToken.getElement());
-    	} 
-    	
+        } 
+        
         return doEncryption(doc, secretKey, keyInfo, references);
     }
 
@@ -517,9 +517,9 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
              * xenc:EncryptedData
              */
             try {
-            	
-            	if (modifier.equals("Header")) {
-            		
+                
+                if (modifier.equals("Header")) {
+                    
                     Element elem = doc.createElementNS(WSConstants.WSSE11_NS,"wsse11:"+WSConstants.ENCRYPTED_HEADER);
                     WSSecurityUtil.setNamespace(elem, WSConstants.WSSE11_NS, WSConstants.WSSE11_PREFIX);
                     String wsuPrefix = WSSecurityUtil.setNamespace(elem,
@@ -530,16 +530,16 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
                     NamedNodeMap map = body.getAttributes();
                     
                     for (int i = 0 ; i < map.getLength() ; i++) {
-                    	Attr attr = (Attr)map.item(i);
-                    	if (attr.getNamespaceURI().equals(WSConstants.URI_SOAP11_ENV)
-                    			|| attr.getNamespaceURI().equals(WSConstants.URI_SOAP12_ENV)) {                 	    
+                        Attr attr = (Attr)map.item(i);
+                        if (attr.getNamespaceURI().equals(WSConstants.URI_SOAP11_ENV)
+                                || attr.getNamespaceURI().equals(WSConstants.URI_SOAP12_ENV)) {                         
                             String soapEnvPrefix = WSSecurityUtil.setNamespace(elem,
                                     attr.getNamespaceURI(), "soapevn");
                             elem.setAttributeNS(attr.getNamespaceURI(), soapEnvPrefix +":"+attr.getLocalName(), attr.getValue());
-                    	}
+                        }
                     }
-            		
-            	    xmlCipher.init(XMLCipher.ENCRYPT_MODE, secretKey);
+                    
+                    xmlCipher.init(XMLCipher.ENCRYPT_MODE, secretKey);
                     EncryptedData encData = xmlCipher.getEncryptedData();
                     encData.setId(xencEncryptedDataId);
                     encData.setKeyInfo(keyInfo);
@@ -552,20 +552,20 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
                     encDataElem.getParentNode().appendChild(elem);
                     encDataElem.getParentNode().removeChild(encDataElem); 
                     
-            	} else {
-            	    xmlCipher.init(XMLCipher.ENCRYPT_MODE, secretKey);
+                } else {
+                    xmlCipher.init(XMLCipher.ENCRYPT_MODE, secretKey);
                     EncryptedData encData = xmlCipher.getEncryptedData();
                     encData.setId(xencEncryptedDataId);
                     encData.setKeyInfo(keyInfo);
-                    xmlCipher.doFinal(doc, body, content);    		
-            	}
+                    xmlCipher.doFinal(doc, body, content);          
+                }
                 if(cloneKeyInfo) {
                     keyInfo = new KeyInfo((Element) keyInfo.getElement()
                             .cloneNode(true), null);
                 }
             } catch (Exception e2) {
                 throw new WSSecurityException(
-                        WSSecurityException.FAILED_ENC_DEC, null, null, e2);
+                        WSSecurityException.FAILED_ENCRYPTION, null, null, e2);
             }
             encDataRef.add(new String("#" + xencEncryptedDataId));
         }

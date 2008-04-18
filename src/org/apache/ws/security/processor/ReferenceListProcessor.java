@@ -17,18 +17,18 @@
 
 package org.apache.ws.security.processor;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Vector;
 
 import javax.crypto.SecretKey;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.callback.UnsupportedCallbackException;
+import javax.xml.namespace.QName;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.WSDataRef;
 import org.apache.ws.security.WSDocInfo;
 import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSConfig;
@@ -42,9 +42,11 @@ import org.apache.ws.security.saml.SAMLUtil;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.xml.security.encryption.XMLCipher;
 import org.apache.xml.security.encryption.XMLEncryptionException;
+import org.apache.xml.security.utils.Constants;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 public class ReferenceListProcessor implements Processor {
 	private static Log log = LogFactory.getLog(ReferenceListProcessor.class
@@ -88,7 +90,7 @@ public class ReferenceListProcessor implements Processor {
 		Document doc = elem.getOwnerDocument();
 
 		Node tmpE = null;
-        ArrayList dataRefUris = new ArrayList();
+                ArrayList dataRefUris = new ArrayList();
 		for (tmpE = elem.getFirstChild(); tmpE != null; tmpE = tmpE
 				.getNextSibling()) {
 			if (tmpE.getNodeType() != Node.ELEMENT_NODE) {
@@ -99,15 +101,16 @@ public class ReferenceListProcessor implements Processor {
 			}
 			if (tmpE.getLocalName().equals("DataReference")) {
 				String dataRefURI = ((Element) tmpE).getAttribute("URI");
-				decryptDataRefEmbedded(doc, dataRefURI, cb, crypto);
-                dataRefUris.add(dataRefURI.substring(1));
+				WSDataRef dataRef = new WSDataRef(dataRefURI.substring(1));;
+				decryptDataRefEmbedded(doc, dataRefURI, dataRef,cb, crypto);
+                dataRefUris.add(dataRef);
 			}
 		}
 		
         return dataRefUris;
 	}
 
-	public void decryptDataRefEmbedded(Document doc, String dataRefURI,
+	public void decryptDataRefEmbedded(Document doc, String dataRefURI, WSDataRef dataRef,
 			CallbackHandler cb, Crypto crypto) throws WSSecurityException {
 
 		if (log.isDebugEnabled()) {
@@ -118,7 +121,7 @@ public class ReferenceListProcessor implements Processor {
 		 * then try the generic lookup to find Id="someURI"
 		 */
 		Element encBodyData = null;
-		if ((encBodyData = WSSecurityUtil.getElementByWsuId(doc, dataRefURI)) == null) {
+		if ((encBodyData = WSSecurityUtil.getElementByWsuId(doc, dataRefURI)) == null) {		    
 			encBodyData = WSSecurityUtil.getElementByGenId(doc, dataRefURI);
 		}
 		if (encBodyData == null) {
@@ -168,6 +171,8 @@ public class ReferenceListProcessor implements Processor {
 		try {
 			Node parentEncBody =encBodyData.getParentNode();
 			
+		        final java.util.List before_peers = listChildren(parentEncBody);
+			
 			xmlCipher.doFinal(doc, encBodyData, content);
 			
 			if(parentEncBody.getLocalName().equals(WSConstants.ENCRYPTED_HEADER)
@@ -181,16 +186,39 @@ public class ReferenceListProcessor implements Processor {
         			        String wsuPrefix = WSSecurityUtil.setNamespace(decryptedHeaderClone,
         			                    WSConstants.WSU_NS, WSConstants.WSU_PREFIX);
         			        decryptedHeaderClone.setAttributeNS(WSConstants.WSU_NS, wsuPrefix + ":Id", id);
+        			        dataRef.setWsuId(id.substring(1));
+			        } else {
+			            dataRef.setWsuId(sigId);
 			        }
 			        
 				Node encryptedHeader = decryptedHeader.getParentNode();
 				parentEncBody.getParentNode().appendChild(decryptedHeaderClone);
 				parentEncBody.getParentNode().removeChild(parentEncBody);
 				
-			}
+			} 
+			
+		        final java.util.List after_peers = listChildren(parentEncBody);
+		        final java.util.List new_nodes = newNodes(before_peers, after_peers);
+		        
+		        for (
+		                final java.util.Iterator pos = new_nodes.iterator();
+		                pos.hasNext();
+		            ) {
+		                Node node = (Node) pos.next();
+		                if (node instanceof Element) {
+		                    if(!Constants.SignatureSpecNS.equals(node.getNamespaceURI()) &&
+		                            node.getAttributes().getNamedItemNS(WSConstants.WSU_NS, "Id") == null) {
+		                        String wsuPrefix = WSSecurityUtil.setNamespace((Element)node,
+		                                WSConstants.WSU_NS, WSConstants.WSU_PREFIX);
+		                        ((Element)node).setAttributeNS(WSConstants.WSU_NS, wsuPrefix + ":Id", dataRefURI);
+		                        dataRef.setWsuId(dataRefURI.substring(1));		                        
+		                    }
+		                    dataRef.setName(new QName(node.getNamespaceURI(),node.getLocalName()));
+		                }
+		            }
 			
 		} catch (Exception e) {
-			throw new WSSecurityException(WSSecurityException.FAILED_ENC_DEC,
+			throw new WSSecurityException(WSSecurityException.FAILED_CHECK,
 					null, null, e);
 		}
 	}
@@ -260,7 +288,7 @@ public class ReferenceListProcessor implements Processor {
 			    
 			    if(decryptedData == null) {
 			        throw new WSSecurityException(
-						WSSecurityException.FAILED_ENC_DEC, "unsupportedKeyId");
+						WSSecurityException.FAILED_CHECK, "unsupportedKeyId");
 			    }
 			}
 			if(p instanceof EncryptedKeyProcessor) {
@@ -295,9 +323,80 @@ public class ReferenceListProcessor implements Processor {
 			}
 		
 	    }else {
-			throw new WSSecurityException(WSSecurityException.FAILED_ENC_DEC,
+			throw new WSSecurityException(WSSecurityException.FAILED_CHECK,
 					"noReference");
 		}
 		return WSSecurityUtil.prepareSecretKey(algorithm, decryptedData);
 	}
+	
+	    /**
+	     * @return      a list of Nodes, representing the 
+	     */
+	    private static java.util.List
+	    listChildren(
+	        final Node parent
+	    ) {
+	        if (parent == null) {
+	            return java.util.Collections.EMPTY_LIST;
+	        }
+	        final java.util.List ret = new java.util.ArrayList();
+	        if (parent.hasChildNodes()) {
+	            final NodeList children = parent.getChildNodes();
+	            if (children != null) {
+	                for (int i = 0, n = children.getLength();  i < n;  ++i) {
+	                    ret.add(children.item(i));
+	                }
+	            }
+	        }
+	        return ret;
+	    }
+	    
+	    /**
+	     * @return      a list of Nodes in b that are not in a 
+	     */
+	    private static java.util.List
+	    newNodes(
+	        final java.util.List a,
+	        final java.util.List b
+	    ) {
+	        if (a.size() == 0) {
+	            return b;
+	        }
+	        if (b.size() == 0) {
+	            return java.util.Collections.EMPTY_LIST;
+	        }
+	        final java.util.List ret = new java.util.ArrayList();
+	        for (
+	            final java.util.Iterator bpos = b.iterator();
+	            bpos.hasNext();
+	        ) {
+	            final Node bnode = (Node) bpos.next();
+	            final java.lang.String bns = bnode.getNamespaceURI();
+	            final java.lang.String bln = bnode.getLocalName();
+	            boolean found = false;
+	            for (
+	                final java.util.Iterator apos = a.iterator();
+	                apos.hasNext();
+	            ) {
+	                final Node anode = (Node) apos.next();
+	                final java.lang.String ans = anode.getNamespaceURI();
+	                final java.lang.String aln = anode.getLocalName();
+	                final boolean nsmatch =
+	                    ans == null
+	                    ? ((bns == null) ? true : false)
+	                    : ((bns == null) ? false : ans.equals(bns));
+	                final boolean lnmatch =
+	                    aln == null
+	                    ? ((bln == null) ? true : false)
+	                    : ((bln == null) ? false : aln.equals(bln));
+	                if (nsmatch && lnmatch) {
+	                    found = true;
+	                }
+	            }
+	            if (!found) {
+	                ret.add(bnode);
+	            }
+	        }
+	        return ret;
+	    }
 }

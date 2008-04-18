@@ -428,7 +428,9 @@ public class WSConstants {
     
     public final static String WSC_SCT = "http://schemas.xmlsoap.org/ws/2005/02/sc/sct";
     
-    // Fault codes defined in the WSS 1.0 spec under section 6, Error handling
+    //
+    // Fault codes defined in the WSS 1.1 spec under section 12, Error handling
+    //
     
     /**
      * An unsupported token was provided
@@ -464,5 +466,25 @@ public class WSConstants {
      * Referenced security token could not be retrieved
      */
     public static final QName SECURITY_TOKEN_UNAVAILABLE = new QName (WSSE_NS, "SecurityTokenUnavailable");
+    
+    /** 
+     * The message has expired
+     */
+    public static final QName MESSAGE_EXPIRED = new QName (WSSE_NS, "MessageExpired");
+    
+    /**
+     * Header type in <code>org.apache.ws.security.WSEncryptionPart</code>
+     */
+    public static final int PART_TYPE_HEADER = 1;
+    
+    /**
+     * Body type in <code>org.apache.ws.security.WSEncryptionPart</code>
+     */
+    public static final int PART_TYPE_BODY = 2;
+    
+    /**
+     * Element type in <code>org.apache.ws.security.WSEncryptionPart</code>
+     */
+    public static final int PART_TYPE_ELEMENT = 3;
     
 }

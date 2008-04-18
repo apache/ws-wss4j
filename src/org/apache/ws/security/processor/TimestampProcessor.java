@@ -80,7 +80,7 @@ public class TimestampProcessor implements Processor {
 		Calendar exp = timestamp.getExpires();
 		if (exp != null && wssConfig.isTimeStampStrict() && exp.before(rightNow)) {
 			throw new WSSecurityException(
-					WSSecurityException.INVALID_SECURITY,
+					WSSecurityException.MESSAGE_EXPIRED,
 					"invalidTimestamp",
 					new Object[] { "The security semantics of message have expired" });
 		}

@@ -19,6 +19,7 @@ package org.apache.ws.security.processor;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.WSDataRef;
 import org.apache.ws.security.WSDocInfo;
 import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSConfig;
@@ -32,6 +33,7 @@ import org.apache.ws.security.util.Base64;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.xml.security.encryption.XMLCipher;
 import org.apache.xml.security.encryption.XMLEncryptionException;
+import org.apache.xml.security.utils.Constants;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -206,7 +208,8 @@ public class EncryptedKeyProcessor implements Processor {
                     if (el.equals(WSSecurityEngine.binaryToken)) {
                         X509Security token = null;
                         String value = bstElement.getAttribute(WSSecurityEngine.VALUE_TYPE);
-                        if (!X509Security.getType().equals(value)
+                        if (!(X509Security.X509_V3_TYPE.equals(value)
+                                || X509Security.X509_V1_TYPE.equals(value))
                                 || ((token = new X509Security(bstElement)) == null)) {
                             throw new WSSecurityException(WSSecurityException.UNSUPPORTED_SECURITY_TOKEN,
                                     "unsupportedBinaryTokenType",
@@ -227,8 +230,8 @@ public class EncryptedKeyProcessor implements Processor {
                             log.debug("BST Alias: " + alias);
                         }
                     } else {
-                        throw new WSSecurityException(WSSecurityException.INVALID_SECURITY,
-                                "unsupportedToken",
+                        throw new WSSecurityException(WSSecurityException.UNSUPPORTED_SECURITY_TOKEN,
+                                "unsupportedBinaryTokenType",
                                 null);
                     }
         			/*
@@ -245,7 +248,7 @@ public class EncryptedKeyProcessor implements Processor {
 //                        log.debug("KeyName alias: " + alias);
 //                    }
                 } else {
-                    throw new WSSecurityException(WSSecurityException.FAILURE, "unsupportedKeyId");
+                    throw new WSSecurityException(WSSecurityException.INVALID_SECURITY, "unsupportedKeyId");
                 }
             } else if (crypto.getDefaultX509Alias() != null) {
                 alias = crypto.getDefaultX509Alias();
@@ -286,7 +289,7 @@ public class EncryptedKeyProcessor implements Processor {
             try {
                 privateKey = crypto.getPrivateKey(alias, password);
             } catch (Exception e) {
-                throw new WSSecurityException(WSSecurityException.FAILED_ENC_DEC, null, null, e);
+                throw new WSSecurityException(WSSecurityException.FAILED_CHECK, null, null, e);
             }
         }
 
@@ -294,7 +297,7 @@ public class EncryptedKeyProcessor implements Processor {
             cipher.init(Cipher.DECRYPT_MODE,
                     privateKey);
         } catch (Exception e1) {
-            throw new WSSecurityException(WSSecurityException.FAILED_ENC_DEC, null, null, e1);
+            throw new WSSecurityException(WSSecurityException.FAILED_CHECK, null, null, e1);
         }
 
         try {
@@ -302,11 +305,11 @@ public class EncryptedKeyProcessor implements Processor {
             decryptedBytes =
                     cipher.doFinal(encryptedEphemeralKey);
         } catch (IllegalStateException e2) {
-            throw new WSSecurityException(WSSecurityException.FAILED_ENC_DEC, null, null, e2);
+            throw new WSSecurityException(WSSecurityException.FAILED_CHECK, null, null, e2);
         } catch (IllegalBlockSizeException e2) {
-            throw new WSSecurityException(WSSecurityException.FAILED_ENC_DEC, null, null, e2);
+            throw new WSSecurityException(WSSecurityException.FAILED_CHECK, null, null, e2);
         } catch (BadPaddingException e2) {
-            throw new WSSecurityException(WSSecurityException.FAILED_ENC_DEC, null, null, e2);
+            throw new WSSecurityException(WSSecurityException.FAILED_CHECK, null, null, e2);
         }
 
         if (tlog.isDebugEnabled()) {
@@ -319,9 +322,10 @@ public class EncryptedKeyProcessor implements Processor {
          * Now lookup the references that are encrypted with this key
          */
         String dataRefURI = null;
+        WSDataRef dataRef = null;
         Element refList = (Element) WSSecurityUtil.getDirectChild((Node) xencEncryptedKey,
                 "ReferenceList", WSConstants.ENC_NS);
-        ArrayList dataRefUris = new ArrayList();
+        ArrayList dataRefs = new ArrayList();
         if (refList != null) {
         	       	
             for (tmpE = refList.getFirstChild();
@@ -332,13 +336,14 @@ public class EncryptedKeyProcessor implements Processor {
                 if (!tmpE.getNamespaceURI().equals(WSConstants.ENC_NS)) {
                     continue;
                 }
-                if (tmpE.getLocalName().equals("DataReference")) {
+                if (tmpE.getLocalName().equals("DataReference")) {                   
                     dataRefURI = ((Element) tmpE).getAttribute("URI");
-                    decryptDataRef(doc, dataRefURI, decryptedBytes);
-                    dataRefUris.add(dataRefURI.substring(1));
+                    dataRef = new WSDataRef(dataRefURI.substring(1));
+                    decryptDataRef(doc, dataRefURI,dataRef, decryptedBytes);
+                    dataRefs.add(dataRef);
                 }
             }
-            return dataRefUris;
+            return dataRefs;
         }
 
         if (tlog.isDebugEnabled()) {
@@ -371,7 +376,7 @@ public class EncryptedKeyProcessor implements Processor {
         return Base64.decode(encodedData);
     }
 
-    private Element decryptDataRef(Document doc, String dataRefURI, byte[] decryptedData) throws WSSecurityException {
+    private Element decryptDataRef(Document doc, String dataRefURI, WSDataRef wsDataRef, byte[] decryptedData) throws WSSecurityException {
         if (log.isDebugEnabled()) {
             log.debug("found data refernce: " + dataRefURI);
         }
@@ -411,11 +416,12 @@ public class EncryptedKeyProcessor implements Processor {
             encBodyData = (Element) encBodyData.getParentNode();
         }
         final Node parent = encBodyData.getParentNode();
+
         final java.util.List before_peers = listChildren(parent);
         try {
             xmlCipher.doFinal(doc, encBodyData, content);
         } catch (Exception e1) {
-            throw new WSSecurityException(WSSecurityException.FAILED_ENC_DEC, null, null, e1);
+            throw new WSSecurityException(WSSecurityException.FAILED_CHECK, null, null, e1);
         }
         
         if(parent.getLocalName().equals(WSConstants.ENCRYPTED_HEADER)
@@ -431,7 +437,10 @@ public class EncryptedKeyProcessor implements Processor {
                 String wsuPrefix = WSSecurityUtil.setNamespace(decryptedHeaderClone,
                         WSConstants.WSU_NS, WSConstants.WSU_PREFIX);
                 decryptedHeaderClone.setAttributeNS(WSConstants.WSU_NS, wsuPrefix + ":Id", id);
+                wsDataRef.setWsuId(id.substring(1));
             
+            } else {
+                wsDataRef.setWsuId(sigId);
             }
             
             Node encryptedHeader = decryptedHeader.getParentNode();
@@ -448,6 +457,16 @@ public class EncryptedKeyProcessor implements Processor {
         ) {
             Node node = (Node) pos.next();
             if (node instanceof Element) {
+                if(!Constants.SignatureSpecNS.equals(node.getNamespaceURI()) &&
+                        node.getAttributes().getNamedItemNS(WSConstants.WSU_NS, "Id") == null) {
+                    String wsuPrefix = WSSecurityUtil.setNamespace((Element)node,
+                            WSConstants.WSU_NS, WSConstants.WSU_PREFIX);
+                    ((Element)node).setAttributeNS(WSConstants.WSU_NS, wsuPrefix + ":Id", dataRefURI);
+                    wsDataRef.setWsuId(dataRefURI.substring(1));
+                    
+                }
+                wsDataRef.setName(new QName(node.getNamespaceURI(),node.getLocalName()));
+                
                 return (Element) node;
             }
         }

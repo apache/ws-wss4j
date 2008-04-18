@@ -353,7 +353,7 @@ public class WSEncryptBody extends WSBaseMessage {
         try {
             cipher.init(Cipher.ENCRYPT_MODE, remoteCert);
         } catch (InvalidKeyException e) {
-            throw new WSSecurityException(WSSecurityException.FAILED_ENC_DEC, null, null, e);
+            throw new WSSecurityException(WSSecurityException.FAILED_ENCRYPTION, null, null, e);
         }
         byte[] encKey = this.encryptionKey.getEncoded();
         if (doDebug) {
@@ -371,11 +371,11 @@ public class WSEncryptBody extends WSBaseMessage {
         try {
             encryptedKey = cipher.doFinal(encKey);
         } catch (IllegalStateException e1) {
-            throw new WSSecurityException(WSSecurityException.FAILED_ENC_DEC, null, null, e1);
+            throw new WSSecurityException(WSSecurityException.FAILED_ENCRYPTION, null, null, e1);
         } catch (IllegalBlockSizeException e1) {
-            throw new WSSecurityException(WSSecurityException.FAILED_ENC_DEC, null, null, e1);
+            throw new WSSecurityException(WSSecurityException.FAILED_ENCRYPTION, null, null, e1);
         } catch (BadPaddingException e1) {
-            throw new WSSecurityException(WSSecurityException.FAILED_ENC_DEC, null, null, e1);
+            throw new WSSecurityException(WSSecurityException.FAILED_ENCRYPTION, null, null, e1);
         }
         Text keyText =
                 WSSecurityUtil.createBase64EncodedTextNode(doc, encryptedKey);
@@ -542,7 +542,7 @@ public class WSEncryptBody extends WSBaseMessage {
                 encData.setKeyInfo(keyInfo);
                 xmlCipher.doFinal(doc, body, content);
             } catch (Exception e2) {
-                throw new WSSecurityException(WSSecurityException.FAILED_ENC_DEC, null, null, e2);
+                throw new WSSecurityException(WSSecurityException.FAILED_ENCRYPTION, null, null, e2);
             }
             encDataRefs.add(new String("#" + xencEncryptedDataId));
         }

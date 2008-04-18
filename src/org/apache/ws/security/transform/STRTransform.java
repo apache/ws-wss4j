@@ -328,7 +328,11 @@ public class STRTransform extends TransformSpi {
                 + ":BinarySecurityToken");
         WSSecurityUtil.setNamespace(elem, WSConstants.WSSE_NS, prefix);
         // elem.setAttributeNS(WSConstants.XMLNS_NS, "xmlns", "");
-        elem.setAttributeNS(null, "ValueType", X509Security.getType());
+        if (cert.getVersion() == 1) {
+            elem.setAttributeNS(null, "ValueType", X509Security.X509_V1_TYPE);
+        } else {
+            elem.setAttributeNS(null, "ValueType", X509Security.X509_V3_TYPE);
+        }
         Text certText = doc.createTextNode(Base64.encode(data)); // no lne
                                                                     // wrap
         elem.appendChild(certText);

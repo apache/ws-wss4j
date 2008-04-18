@@ -27,7 +27,14 @@ public class WSEncryptionPart {
     private String encModifier;
     private String encId;
     private String id;
-
+    
+    /**
+     * Types of WSEncryptionPart
+     * <code>org.apache.ws.security.WSConstants.PART_TYPE_HEADER</code>
+     * <code>org.apache.ws.security.WSConstants.PART_TYPE_BODY</code>
+     * <code>org.apache.ws.security.WSConstants.PART_TYPE_ELEMENT</code>
+     */
+    private int type = -1;
 
     /**
      * Constructor to initialize part structure with element, namespace, and modifier.
@@ -50,6 +57,32 @@ public class WSEncryptionPart {
         name = nm;
         namespace = nmspace;
         encModifier = encMod;
+        id = null;
+    }
+    
+    /**
+     * Constructor to initialize part structure with element, namespace, and modifier,type.
+     * 
+     * This constructor initializes the parts structure to lookup for a
+     * fully qualified name of an element to encrypt or sign. The modifier
+     * controls how encryption encrypts the element, signature processing does
+     * not use the modifier information.
+     * 
+     * <p/>
+     * 
+     * Regarding the modifier ("Content" or "Element") refer to the W3C
+     * XML Encryption specification. 
+     * 
+     * @param nm Element's name
+     * @param nmspace Element's namespace
+     * @param encMod The encryption modifier
+     * @param type Type of the WSEncryptionPart
+     */
+    public WSEncryptionPart(String nm, String nmspace, String encMod, int type) {
+        name = nm;
+        namespace = nmspace;
+        encModifier = encMod;
+        this.type = type;
         id = null;
     }
 
@@ -85,6 +118,30 @@ public class WSEncryptionPart {
     public WSEncryptionPart(String id, String encMod) {
         this.id = id;
         encModifier = encMod;
+        name = namespace = null;
+    }
+    
+    /**
+     * Constructor to initialize part structure with element id, modifier and type.
+     * 
+     * This constructor initializes the parts structure to lookup for a
+     * an element with the given Id to encrypt or sign. The modifier
+     * controls how encryption encrypts the element, signature processing does
+     * not use the modifier information. 
+     * 
+     * <p/>
+     * 
+     * Regarding the modifier ("Content" or "Element") refer to the W3C
+     * XML Encryption specification. 
+     * 
+     * @param id The Id to of the element to process
+     * @param encMod The encryption modifier
+     * @param type of the element
+     */
+    public WSEncryptionPart(String id, String encMod,int type) {
+        this.id = id;
+        encModifier = encMod;
+        this.type = type;
         name = namespace = null;
     }
 
@@ -123,4 +180,13 @@ public class WSEncryptionPart {
     public String getEncId() {
         return encId;
     }
+
+    public int getType() {
+        return type;
+    }
+
+    public void setType(int type) {
+        this.type = type;
+    }
+    
 }

@@ -28,9 +28,11 @@ import org.apache.axis.configuration.NullProvider;
 import org.apache.axis.message.SOAPEnvelope;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.message.WSSecUsernameToken;
 import org.apache.ws.security.message.WSSecHeader;
 import org.w3c.dom.Document;
@@ -45,7 +47,7 @@ import java.io.PrintWriter;
 
 
 /**
- * WS-Security Test Case
+ * WS-Security Test Case for UsernameTokens.
  * <p/>
  * 
  * @author Davanum Srinivas (dims@yahoo.com)
@@ -117,8 +119,6 @@ public class TestWSSecurityNew5 extends TestCase implements CallbackHandler {
     /**
      * Test that adds a UserNameToken with password Digest to a WS-Security envelope
      * <p/>
-     * 
-     * @throws java.lang.Exception Thrown when there is any problem in signing or verification
      */
     public void testUsernameTokenDigest() throws Exception {
         WSSecUsernameToken builder = new WSSecUsernameToken();
@@ -145,12 +145,45 @@ public class TestWSSecurityNew5 extends TestCase implements CallbackHandler {
         log.info("After adding UsernameToken PW Digest....");
         verify(signedDoc);
     }
+    
+    /**
+     * Test that adds a UserNameToken with a bad password Digest to a WS-Security envelope
+     * <p/>
+     */
+    public void testUsernameTokenBadDigest() throws Exception {
+        WSSecUsernameToken builder = new WSSecUsernameToken();
+        builder.setUserInfo("wernerd", "verySecre");
+        log.info("Before adding UsernameToken PW Digest....");
+        Document doc = unsignedEnvelope.getAsDocument();
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        Document signedDoc = builder.build(doc, secHeader);
+
+        /*
+         * convert the resulting document into a message first. The toAxisMessage()
+         * method performs the necessary c14n call to properly set up the signed
+         * document and convert it into a SOAP message. After that we extract it
+         * as a document again for further processing.
+         */
+
+        Message signedMsg = SOAPUtil.toAxisMessage(signedDoc);
+        if (log.isDebugEnabled()) {
+            log.debug("Message with UserNameToken PW Digest:");
+            XMLUtils.PrettyElementToWriter(signedMsg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
+        }
+        signedDoc = signedMsg.getSOAPEnvelope().getAsDocument();
+        log.info("After adding UsernameToken PW Digest....");
+        try {
+            verify(signedDoc);
+        } catch (WSSecurityException ex) {
+            assertTrue(ex.getErrorCode() == WSSecurityException.FAILED_AUTHENTICATION);
+            // expected
+        }
+    }
 
     /**
      * Test that adds a UserNameToken with password text to a WS-Security envelope
      * <p/>
-     * 
-     * @throws java.lang.Exception Thrown when there is any problem in signing or verification
      */
     public void testUsernameTokenText() throws Exception {
         WSSecUsernameToken builder = new WSSecUsernameToken();
@@ -170,6 +203,190 @@ public class TestWSSecurityNew5 extends TestCase implements CallbackHandler {
         log.info("After adding UsernameToken PW Text....");
         verify(signedDoc);
     }
+    
+    /**
+     * Test that adds a UserNameToken with (bad) password text to a WS-Security envelope
+     * <p/>
+     */
+    public void testUsernameTokenBadText() throws Exception {
+        WSSecUsernameToken builder = new WSSecUsernameToken();
+        builder.setPasswordType(WSConstants.PASSWORD_TEXT);
+        builder.setUserInfo("wernerd", "verySecre");
+        log.info("Before adding UsernameToken PW Text....");
+        Document doc = unsignedEnvelope.getAsDocument();
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        Document signedDoc = builder.build(doc, secHeader);
+        Message signedMsg = SOAPUtil.toAxisMessage(signedDoc);
+        if (log.isDebugEnabled()) {
+            log.debug("Message with UserNameToken PW Text:");
+            XMLUtils.PrettyElementToWriter(signedMsg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
+        }
+        signedDoc = signedMsg.getSOAPEnvelope().getAsDocument();
+        log.info("After adding UsernameToken PW Text....");
+        
+        try {
+            verify(signedDoc);
+        } catch (WSSecurityException ex) {
+            assertTrue(ex.getErrorCode() == WSSecurityException.FAILED_AUTHENTICATION);
+            // expected
+        }
+    }
+    
+    /**
+     * Test with a null token type. This will fail as the default is to reject custom
+     * token types.
+     * <p/>
+     */
+    public void testUsernameTokenCustomFail() throws Exception {
+        WSSecUsernameToken builder = new WSSecUsernameToken();
+        builder.setPasswordType(null);
+        builder.setUserInfo("wernerd", null);
+        
+        Document doc = unsignedEnvelope.getAsDocument();
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        Document signedDoc = builder.build(doc, secHeader);
+        Message signedMsg = SOAPUtil.toAxisMessage(signedDoc);
+        
+        if (log.isDebugEnabled()) {
+            log.debug("Message with UserNameToken PW Text:");
+            XMLUtils.PrettyElementToWriter(signedMsg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
+        }
+        
+        signedDoc = signedMsg.getSOAPEnvelope().getAsDocument();
+        try {
+            verify(signedDoc);
+            throw new Exception("Custom token types are not permitted");
+        } catch (WSSecurityException ex) {
+            assertTrue(ex.getErrorCode() == WSSecurityException.FAILED_AUTHENTICATION);
+            // expected
+        }
+    }
+    
+    /**
+     * Test with a null token type. This will pass as the WSSConfig is configured to 
+     * handle custom token types.
+     * <p/>
+     */
+    public void testUsernameTokenCustomPass() throws Exception {
+        WSSecUsernameToken builder = new WSSecUsernameToken();
+        builder.setPasswordType(null);
+        builder.setUserInfo("wernerd", null);
+        
+        Document doc = unsignedEnvelope.getAsDocument();
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        Document signedDoc = builder.build(doc, secHeader);
+        Message signedMsg = SOAPUtil.toAxisMessage(signedDoc);
+        
+        if (log.isDebugEnabled()) {
+            log.debug("Message with UserNameToken PW Text:");
+            XMLUtils.PrettyElementToWriter(signedMsg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
+        }
+        
+        signedDoc = signedMsg.getSOAPEnvelope().getAsDocument();
+        
+        //
+        // Configure so that custom token types are accepted
+        //
+        WSSConfig cfg = WSSConfig.getNewInstance();
+        cfg.setHandleCustomPasswordTypes(true);
+        secEngine.setWssConfig(cfg);
+        verify(signedDoc);
+        
+        //
+        // Go back to default for other tests
+        //
+        cfg.setHandleCustomPasswordTypes(false);
+        secEngine.setWssConfig(cfg);
+    }
+    
+    
+    /**
+     * A test for WSS-66 - the nonce string is null
+     * http://issues.apache.org/jira/browse/WSS-66
+     * "Possible security hole when PasswordDigest is used by client."
+     */
+    public void testNullNonce() throws Exception {
+        WSSecUsernameToken builder = new WSSecUsernameToken();
+        builder.setPasswordType(WSConstants.PASSWORD_DIGEST);
+        builder.setUserInfo("wernerd", "BAD_PASSWORD");
+        
+        Document doc = unsignedEnvelope.getAsDocument();
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        Document utDoc = builder.build(doc, secHeader);
+        
+        //
+        // Manually find the Nonce node and set the content to null
+        //
+        org.w3c.dom.Element elem = builder.getUsernameTokenElement();
+        org.w3c.dom.NodeList list = elem.getElementsByTagName("wsse:Nonce");
+        org.w3c.dom.Node nonceNode = list.item(0);
+        org.w3c.dom.Node childNode = nonceNode.getFirstChild();
+        childNode.setNodeValue("");
+        
+        if (log.isDebugEnabled()) {
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(utDoc);
+            log.debug(outputString);
+        }
+        
+        try {
+            //
+            // Verification should fail as the password is bad
+            //
+            verify(utDoc);
+            throw new Exception("Expected failure due to a bad password");
+        } catch (WSSecurityException ex) {
+            assertTrue(ex.getErrorCode() == WSSecurityException.FAILED_AUTHENTICATION);
+            // expected
+        }
+    }
+    
+    /**
+     * A test for WSS-66 - the created string is null
+     * http://issues.apache.org/jira/browse/WSS-66
+     * "Possible security hole when PasswordDigest is used by client."
+     */
+    public void testNullCreated() throws Exception {
+        WSSecUsernameToken builder = new WSSecUsernameToken();
+        builder.setPasswordType(WSConstants.PASSWORD_DIGEST);
+        builder.setUserInfo("wernerd", "BAD_PASSWORD");
+        
+        Document doc = unsignedEnvelope.getAsDocument();
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        Document utDoc = builder.build(doc, secHeader);
+        
+        //
+        // Manually find the Created node and set the content to null
+        //
+        org.w3c.dom.Element elem = builder.getUsernameTokenElement();
+        org.w3c.dom.NodeList list = elem.getElementsByTagName("wsu:Created");
+        org.w3c.dom.Node nonceNode = list.item(0);
+        org.w3c.dom.Node childNode = nonceNode.getFirstChild();
+        childNode.setNodeValue("");
+        
+        if (log.isDebugEnabled()) {
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(utDoc);
+            log.debug(outputString);
+        }
+        
+        try {
+            //
+            // Verification should fail as the password is bad
+            //
+            verify(utDoc);
+            throw new Exception("Expected failure due to a bad password");
+        } catch (WSSecurityException ex) {
+            assertTrue(ex.getErrorCode() == WSSecurityException.FAILED_AUTHENTICATION);
+            // expected
+        }
+    }
+    
     /**
      * Verifies the soap envelope
      * <p/>
@@ -184,17 +401,19 @@ public class TestWSSecurityNew5 extends TestCase implements CallbackHandler {
     }
 
     public void handle(Callback[] callbacks)
-            throws IOException, UnsupportedCallbackException {
+        throws IOException, UnsupportedCallbackException {
         for (int i = 0; i < callbacks.length; i++) {
             if (callbacks[i] instanceof WSPasswordCallback) {
                 WSPasswordCallback pc = (WSPasswordCallback) callbacks[i];
-                /*
-                 * here call a function/method to lookup the password for
-                 * the given identifier (e.g. a user name or keystore alias)
-                 * e.g.: pc.setPassword(passStore.getPassword(pc.getIdentfifier))
-                 * for Testing we supply a fixed name here.
-                 */
-                pc.setPassword("verySecret");
+                if (pc.getUsage() == WSPasswordCallback.USERNAME_TOKEN
+                    && "wernerd".equals(pc.getIdentifer())) {
+                    pc.setPassword("verySecret");
+                } else if (
+                    pc.getUsage() == WSPasswordCallback.USERNAME_TOKEN_UNKNOWN
+                    && "wernerd".equals(pc.getIdentifer())
+                    && "verySecret".equals(pc.getPassword())) {
+                    return;
+                }
             } else {
                 throw new UnsupportedCallbackException(callbacks[i], "Unrecognized Callback");
             }

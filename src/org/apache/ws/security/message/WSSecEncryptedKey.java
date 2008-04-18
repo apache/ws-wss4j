@@ -196,7 +196,7 @@ public class WSSecEncryptedKey extends WSSecBase {
         try {
             cipher.init(Cipher.ENCRYPT_MODE, remoteCert.getPublicKey());
         } catch (InvalidKeyException e) {
-            throw new WSSecurityException(WSSecurityException.FAILED_ENC_DEC,
+            throw new WSSecurityException(WSSecurityException.FAILED_ENCRYPTION,
                     null, null, e);
         }
         if (doDebug) {
@@ -214,13 +214,13 @@ public class WSSecEncryptedKey extends WSSecBase {
         try {
             this.encryptedEphemeralKey = cipher.doFinal(keyBytes);
         } catch (IllegalStateException e1) {
-            throw new WSSecurityException(WSSecurityException.FAILED_ENC_DEC,
+            throw new WSSecurityException(WSSecurityException.FAILED_ENCRYPTION,
                     null, null, e1);
         } catch (IllegalBlockSizeException e1) {
-            throw new WSSecurityException(WSSecurityException.FAILED_ENC_DEC,
+            throw new WSSecurityException(WSSecurityException.FAILED_ENCRYPTION,
                     null, null, e1);
         } catch (BadPaddingException e1) {
-            throw new WSSecurityException(WSSecurityException.FAILED_ENC_DEC,
+            throw new WSSecurityException(WSSecurityException.FAILED_ENCRYPTION,
                     null, null, e1);
         }
         Text keyText = WSSecurityUtil.createBase64EncodedTextNode(document,
@@ -254,6 +254,14 @@ public class WSSecEncryptedKey extends WSSecBase {
             break;
 
         case WSConstants.THUMBPRINT_IDENTIFIER:
+            secToken.setKeyIdentifierThumb(remoteCert);
+            break;
+            
+        case WSConstants.ENCRYPTED_KEY_SHA1_IDENTIFIER:
+            //
+            // This identifier is not applicable for this case, so fall back to
+            // ThumbprintRSA.
+            //
             secToken.setKeyIdentifierThumb(remoteCert);
             break;
 
@@ -299,10 +307,13 @@ public class WSSecEncryptedKey extends WSSecBase {
      * @throws WSSecurityException
      */
     protected byte[] generateEphemeralKey() throws WSSecurityException {
-        try {
-            SecureRandom random = SecureRandom.getInstance("SHA1PRNG");
+        try {     
+            final SecureRandom r = WSSecurityUtil.resolveSecureRandom();
+            if (r == null) {
+                throw new WSSecurityException("Random generator is not initialzed.");
+            }
             byte[] temp = new byte[this.keySize / 8];
-            random.nextBytes(temp);
+            r.nextBytes(temp);
             return temp;
         } catch (Exception e) {
             throw new WSSecurityException(
@@ -498,7 +509,7 @@ public class WSSecEncryptedKey extends WSSecBase {
     }
     
     public boolean isCertSet() {
-    	return (useThisCert == null ? true : false) ;
+        return (useThisCert == null ? true : false) ;
     }
 
     public byte[] getEncryptedEphemeralKey() {

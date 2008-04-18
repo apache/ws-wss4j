@@ -66,7 +66,15 @@ public class WSSecurityUtil {
     static {
         doDebug = log.isDebugEnabled();
     }
-
+    
+    /**
+     * A cached pseuo-random number generator
+     * NB. On some JVMs, caching this random number
+     * generator is required to overcome punitive
+     * overhead.
+     */
+    private static SecureRandom random = null;
+    
     /**
      * Returns the first WS-Security header element for a given actor. Only one
      * WS-Security header is allowed for an actor.
@@ -477,28 +485,6 @@ public class WSSecurityUtil {
     }
 
     /**
-     * Create a BinarySecurityToken element <p/>
-     * 
-     * @param doc
-     *            the DOM document (SOAP request)
-     * @param wsuIdVal
-     *            the value for the wsu:Id
-     * @return then BST element (DOM element)
-     */
-    public static Element createBinarySecurityToken(Document doc,
-            String wsuIdVal) {
-        Element retVal = doc.createElementNS(WSConstants.WSSE_NS,
-                "wsse:BinarySecurityToken");
-        retVal.setAttributeNS(WSConstants.XMLNS_NS, "xmlns:wsu",
-                WSConstants.WSU_NS);
-        retVal.setAttributeNS(WSConstants.WSU_NS, "wsu:Id", wsuIdVal);
-        retVal.setAttributeNS(null, "ValueType", X509Security.getType());
-        retVal.setAttributeNS(null, "EncodingType",
-                BinarySecurity.BASE64_ENCODING);
-        return retVal;
-    }
-
-    /**
      * create a new element in the same namespace <p/>
      * 
      * @param parent
@@ -845,10 +831,13 @@ public class WSSecurityUtil {
      * @throws Exception
      */
     public static byte[] generateNonce(int length) throws WSSecurityException {
-        try {
-            SecureRandom random = SecureRandom.getInstance("SHA1PRNG");
-            byte[] temp = new byte[length];
-            random.nextBytes(temp);
+        try {            
+            final SecureRandom r = resolveSecureRandom();
+            if (r == null) {
+                throw new WSSecurityException("Random generator is not initialzed.");
+            }
+            byte[] temp = new byte[length];            
+            r.nextBytes(temp);
             return temp;
         } catch (Exception e) {
             throw new WSSecurityException(
@@ -980,5 +969,32 @@ public class WSSecurityUtil {
                     + " was correctly signed");
         }
         log.debug("All required elements are signed");
+    }
+    
+    /**
+     * @return      a SecureRandom instance initialized with the "SHA1PRNG"
+     *              algorithm identifier
+     */
+    public static SecureRandom
+    resolveSecureRandom() throws NoSuchAlgorithmException {
+        return resolveSecureRandom("SHA1PRNG");
+    }
+    
+    /**
+     * @param       algorithm
+     *              
+     *
+     * @return      a SecureRandom instance initialize with the identifier
+     *              specified in algorithm
+     */
+    public synchronized static SecureRandom
+    resolveSecureRandom(
+        final String algorithm
+    ) throws NoSuchAlgorithmException {
+        if (random == null) {
+            random = SecureRandom.getInstance(algorithm);
+            random.setSeed(System.currentTimeMillis());
+        }
+        return random;
     }
 }

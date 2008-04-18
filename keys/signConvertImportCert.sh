@@ -1,3 +1,5 @@
+#!/bin/sh
+
 # Sign the server certificate request with the CA using the command 
 # (again, "security" is the PEM pass phrase):
 openssl ca -config ca.config -policy policy_anything -days 730 -out cert.pem -infiles cert.req

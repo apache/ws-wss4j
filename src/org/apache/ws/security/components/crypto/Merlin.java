@@ -47,6 +47,13 @@ import java.util.Vector;
  * @author Davanum Srinivas (dims@yahoo.com).
  */
 public class Merlin extends AbstractCrypto {
+   /**
+    * OID For the NameConstraints Extension to X.509
+    *
+    * http://java.sun.com/j2se/1.4.2/docs/api/
+    * http://www.ietf.org/rfc/rfc3280.txt (s. 4.2.1.11)
+    */
+    public static final String NAME_CONSTRAINTS_OID = "2.5.29.30";
 
     /**
      * Constructor. <p/>
@@ -150,7 +157,7 @@ public class Merlin extends AbstractCrypto {
                 X509Certificate cert = (X509Certificate) this.cacerts
                         .getCertificate(alias);
                 TrustAnchor anchor = new TrustAnchor(cert, cert
-                        .getExtensionValue("NameConstraints"));
+                        .getExtensionValue(NAME_CONSTRAINTS_OID));
                 set.add(anchor);
             }
 
@@ -161,7 +168,7 @@ public class Merlin extends AbstractCrypto {
                 X509Certificate cert = (X509Certificate) this.keystore
                         .getCertificate(alias);
                 TrustAnchor anchor = new TrustAnchor(cert, cert
-                        .getExtensionValue("NameConstraints"));
+                        .getExtensionValue(NAME_CONSTRAINTS_OID));
                 set.add(anchor);
             }
 

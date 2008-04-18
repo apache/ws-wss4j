@@ -463,7 +463,10 @@ public class SignatureProcessor implements Processor {
         X509Security x509 = null;
         PKIPathSecurity pkiPath = null;
 
-        if (X509Security.getType().equals(type)) {
+        if (X509Security.X509_V3_TYPE.equals(type)) {
+            x509 = new X509Security(element);
+            return (BinarySecurity) x509;
+        } else if (X509Security.X509_V1_TYPE.equals(type)) {
             x509 = new X509Security(element);
             return (BinarySecurity) x509;
         } else if (PKIPathSecurity.getType().equals(type)) {

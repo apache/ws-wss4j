@@ -77,7 +77,7 @@ public class UsernameToken {
 
     private static SecureRandom random = null;
 
-    private static int DEFAULT_ITERATION = 1000;
+    public static final int DEFAULT_ITERATION = 1000;
 
     public static final QName TOKEN = new QName(WSConstants.WSSE_NS,
             WSConstants.USERNAME_TOKEN_LN);
@@ -109,31 +109,36 @@ public class UsernameToken {
                     "badTokenType00", new Object[] { el });
         }
         elementUsername = (Element) WSSecurityUtil.getDirectChild(element,
-                "Username", WSConstants.WSSE_NS);
+                WSConstants.USERNAME_LN, WSConstants.WSSE_NS);
         elementPassword = (Element) WSSecurityUtil.getDirectChild(element,
-                "Password", WSConstants.WSSE_NS);
+                WSConstants.PASSWORD_LN, WSConstants.WSSE_NS);
         elementNonce = (Element) WSSecurityUtil.getDirectChild(element,
-                "Nonce", WSConstants.WSSE_NS);
+                WSConstants.NONCE_LN, WSConstants.WSSE_NS);
         elementCreated = (Element) WSSecurityUtil.getDirectChild(element,
-                "Created", WSConstants.WSU_NS);
-        elementSalt = (Element) WSSecurityUtil.getDirectChild(element, "Salt",
-                WSConstants.WSSE11_NS);
+                WSConstants.CREATED_LN, WSConstants.WSU_NS);
+        elementSalt = (Element) WSSecurityUtil.getDirectChild(element,
+                WSConstants.SALT_LN, WSConstants.WSSE11_NS);
         elementIteration = (Element) WSSecurityUtil.getDirectChild(element,
-                "Interation", WSConstants.WSSE11_NS);
+                WSConstants.ITERATION_LN, WSConstants.WSSE11_NS);
         if (elementUsername == null) {
             throw new WSSecurityException(
                     WSSecurityException.INVALID_SECURITY_TOKEN,
                     "badTokenType01", new Object[] { el });
         }
+        hashed = false;
         if (elementSalt != null) {
-            if (elementPassword != null) {
+            //
+            // If the UsernameToken is to be used for key derivation, the (1.1)
+            // spec says that it cannot contain a password, and it must contain
+            // an Iteration element
+            //
+            if (elementPassword != null || elementIteration == null) {
                 throw new WSSecurityException(
                         WSSecurityException.INVALID_SECURITY_TOKEN,
                         "badTokenType01", new Object[] { el });
             }
             return;
         }
-        hashed = false;
         if (elementPassword != null) {
             passwordType = elementPassword.getAttribute("Type");
         }
@@ -439,11 +444,10 @@ public class UsernameToken {
             String password) {
         String passwdDigest = null;
         try {
-            byte[] b1 = Base64.decode(nonce);
-            byte[] b2 = created.getBytes("UTF-8");
+            byte[] b1 = nonce != null ? Base64.decode(nonce) : new byte[0];
+            byte[] b2 = created != null ? created.getBytes("UTF-8") : new byte[0];
             byte[] b3 = password.getBytes("UTF-8");
             byte[] b4 = new byte[b1.length + b2.length + b3.length];
-            int i = 0;
             int offset = 0;
             System.arraycopy(b1, 0, b4, offset, b1.length);
             offset += b1.length;
@@ -616,7 +620,12 @@ public class UsernameToken {
         if (iteration == 0) {
             iteration = DEFAULT_ITERATION;
         }
-        byte[] pwBytes = password.getBytes();
+        byte[] pwBytes = null;
+        try {
+            pwBytes = password.getBytes("UTF-8");
+        } catch (final java.io.UnsupportedEncodingException e) {
+            throw new WSSecurityException("Unable to convert password to UTF-8", e);
+        }
 
         byte[] pwSalt = new byte[salt.length + pwBytes.length];
         System.arraycopy(pwBytes, 0, pwSalt, 0, pwBytes.length);
@@ -635,9 +644,9 @@ public class UsernameToken {
          */
         byte[] K = sha.digest(pwSalt);
         /*
-         * Perform the 2nd up to iteration hash rounds
+         * Perform the 1st up to iteration-1 hash rounds
          */
-        for (int i = 2; i <= iteration; i++) {
+        for (int i = 1; i < iteration; i++) {
             sha.reset();
             K = sha.digest(K);
         }

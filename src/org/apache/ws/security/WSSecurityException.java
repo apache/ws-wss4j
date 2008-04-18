@@ -37,9 +37,18 @@ public class WSSecurityException extends RemoteException {
     public static final int FAILED_AUTHENTICATION = 5;
     public static final int FAILED_CHECK = 6;
     public static final int SECURITY_TOKEN_UNAVAILABLE = 7;
-    public static final int FAILED_ENC_DEC = 8;
-    public static final int FAILED_SIGNATURE = 9;
+    public static final int MESSAGE_EXPIRED = 8;
+    public static final int FAILED_ENCRYPTION = 9;
+    public static final int FAILED_SIGNATURE = 10;
     private static ResourceBundle resources;
+    /*
+     * This is an Integer -> QName map. Its function is to map the integer error codes
+     * given above to the QName fault codes as defined in the SOAP Message Security 1.1
+     * specification. A client application can simply call getFaultCode rather than do
+     * any parsing of the error code. Note that there are no mappings for "FAILURE", 
+     * "FAILED_ENCRYPTION" and "FAILED_SIGNATURE" as these are not standard error messages.
+     */
+    private static final java.util.Map FAULT_CODE_MAP = new java.util.HashMap();
 
     static {
         try {
@@ -47,6 +56,39 @@ public class WSSecurityException extends RemoteException {
         } catch (MissingResourceException e) {
             throw new RuntimeException(e.getMessage());
         }
+        
+        FAULT_CODE_MAP.put(
+            new Integer(WSSecurityException.UNSUPPORTED_SECURITY_TOKEN), 
+            WSConstants.UNSUPPORTED_SECURITY_TOKEN
+        );
+        FAULT_CODE_MAP.put(
+            new Integer(UNSUPPORTED_ALGORITHM), 
+            WSConstants.UNSUPPORTED_ALGORITHM
+        );
+        FAULT_CODE_MAP.put(
+            new Integer(INVALID_SECURITY), 
+            WSConstants.INVALID_SECURITY
+        );
+        FAULT_CODE_MAP.put(
+            new Integer(INVALID_SECURITY_TOKEN), 
+            WSConstants.INVALID_SECURITY_TOKEN
+        );
+        FAULT_CODE_MAP.put(
+            new Integer(FAILED_AUTHENTICATION), 
+            WSConstants.FAILED_AUTHENTICATION
+         );
+        FAULT_CODE_MAP.put(
+            new Integer(FAILED_CHECK), 
+            WSConstants.FAILED_CHECK
+         );
+        FAULT_CODE_MAP.put(
+            new Integer(SECURITY_TOKEN_UNAVAILABLE),
+            WSConstants.SECURITY_TOKEN_UNAVAILABLE
+         );
+        FAULT_CODE_MAP.put(
+            new Integer(MESSAGE_EXPIRED), 
+            WSConstants.MESSAGE_EXPIRED
+        );
     }
 
     private int errorCode;
@@ -127,6 +169,20 @@ public class WSSecurityException extends RemoteException {
      */
     public int getErrorCode() {
         return this.errorCode;
+    }
+    
+    /**
+     * Get the fault code QName for this associated error code.
+     * <p/>
+     * 
+     * @return the fault code QName of this exception
+     */
+    public javax.xml.namespace.QName getFaultCode() {
+        Object ret = FAULT_CODE_MAP.get(new Integer(this.errorCode));
+        if (ret != null) {
+            return (javax.xml.namespace.QName)ret;
+        }
+        return null;
     }
 
     /**

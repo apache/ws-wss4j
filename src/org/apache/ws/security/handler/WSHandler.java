@@ -25,6 +25,7 @@ import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
+import org.apache.ws.security.action.Action;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.message.WSSecHeader;
@@ -83,7 +84,10 @@ public abstract class WSHandler {
 
         boolean mu = decodeMustUnderstand(reqData);
 
-        WSSConfig wssConfig = WSSConfig.getNewInstance();
+        WSSConfig wssConfig = reqData.getWssConfig();
+        if (wssConfig == null) {
+            wssConfig = WSSConfig.getNewInstance();
+        }
         
         wssConfig
 	    .setEnableSignatureConfirmation(decodeEnableSignatureConfirmation(reqData));
@@ -195,6 +199,24 @@ public abstract class WSHandler {
                 case WSConstants.NO_SERIALIZE:
                     reqData.setNoSerialization(true);
                     break;
+                //
+                // Handle any "custom" actions, similarly,
+                // but to preserve behavior from previous
+                // versions, consume (but log) action lookup failures.
+                //
+                default:
+                    Action doit = null;
+                    try {
+                        doit = wssConfig.getAction(actionToDo);
+                    } catch (final WSSecurityException e) {
+                        log.warn(
+                            "Error trying to locate a custom action (" + actionToDo + ")", 
+                            e
+                        );
+                    }
+                    if (doit != null) {
+                        doit.execute(this, actionToDo, doc, reqData);
+                    }
             }
         }
         /*
@@ -227,6 +249,7 @@ public abstract class WSHandler {
         wssConfig
 	    .setEnableSignatureConfirmation(decodeEnableSignatureConfirmation(reqData));
         wssConfig.setTimeStampStrict(decodeTimestampStrict(reqData));
+        wssConfig.setHandleCustomPasswordTypes(decodeCustomPasswordTypes(reqData));
         reqData.setWssConfig(wssConfig);
 
         if ((doAction & WSConstants.SIGN) == WSConstants.SIGN) {
@@ -245,12 +268,6 @@ public abstract class WSHandler {
         int resultActions = wsResult.size();
         int size = actions.size();
 
-        // if (size != resultActions) {
-        // throw new AxisFault(
-        // "WSDoAllReceiver: security processing failed (actions number
-        // mismatch)");
-        // }
-
         int ai = 0;
         for (int i = 0; i < resultActions; i++) {
             final Integer actInt = (Integer) ((WSSecurityEngineResult) wsResult
@@ -263,6 +280,11 @@ public abstract class WSHandler {
                 return false;
             }
         }
+        
+        if (ai != size) {
+            return false;
+        }
+        
         return true;
     }
 
@@ -596,6 +618,22 @@ public abstract class WSHandler {
 	throw new WSSecurityException(
 		   "WSHandler: illegal precisionInMilliSeconds parameter");
     }
+    
+    protected boolean decodeCustomPasswordTypes(RequestData reqData) 
+        throws WSSecurityException {
+        String value = getString(
+                WSHandlerConstants.HANDLE_CUSTOM_PASSWORD_TYPES,
+                reqData.getMsgContext()
+        );
+
+        if (value == null) {return false;}
+
+        if ("0".equals(value) || "false".equals(value)) {return false;} 
+        if ("1".equals(value) || "true".equals(value)) {return true;}
+    
+        throw new WSSecurityException(
+               "WSHandler: illegal handleCustomPasswordTypes parameter");
+    }
 
     protected boolean decodeTimestampStrict(RequestData reqData) 
 	throws WSSecurityException {
@@ -624,7 +662,6 @@ public abstract class WSHandler {
                                           RequestData reqData)
             throws WSSecurityException {
         WSPasswordCallback pwCb = null;
-        String password = null;
         CallbackHandler cbHandler = null;
         String err = "provided null or empty password";
         Object mc = reqData.getMsgContext();
@@ -634,18 +671,21 @@ public abstract class WSHandler {
             // Null passwords are not always a problem: if the callback was called to provide a username instead.
         } else if ((cbHandler = (CallbackHandler) getProperty(mc, refProp)) != null) {
             pwCb = performCallback(cbHandler, username, doAction);
-        } else if ((password = getPassword(mc)) == null) {
-        	// TODO: hmm. does this also need changed for username processing?
-            throw new WSSecurityException("WSHandler: application " + err);
         } else {
-        	// TODO: hmm. does this also need changed for username processing?
-            setPassword(mc, null);
-            pwCb = new WSPasswordCallback("", WSPasswordCallback.UNKNOWN);
+            //
+            // If a callback isn't configured then try to get the password
+            // from the message context
+            //
+            String password = getPassword(mc);
+            if (password == null) {
+                throw new WSSecurityException("WSHandler: application " + err);
+            }
+            pwCb = constructPasswordCallback(username, doAction);
             pwCb.setPassword(password);
         }
         return pwCb;
     }
-
+    
     private WSPasswordCallback readPwViaCallbackClass(String callback,
                                                       String username,
                                                       int doAction,
@@ -684,22 +724,7 @@ public abstract class WSHandler {
                                                int doAction)
             throws WSSecurityException {
 
-        WSPasswordCallback pwCb = null;
-        int reason = 0;
-
-        switch (doAction) {
-        case WSConstants.UT:
-        case WSConstants.UT_SIGN:
-                reason = WSPasswordCallback.USERNAME_TOKEN;
-                break;
-            case WSConstants.SIGN:
-                reason = WSPasswordCallback.SIGNATURE;
-                break;
-            case WSConstants.ENCR:
-                reason = WSPasswordCallback.KEY_NAME;
-                break;
-        }
-        pwCb = new WSPasswordCallback(username, reason);
+        WSPasswordCallback pwCb = constructPasswordCallback(username, doAction);
         Callback[] callbacks = new Callback[1];
         callbacks[0] = pwCb;
         /*
@@ -711,6 +736,28 @@ public abstract class WSHandler {
             throw new WSSecurityException("WSHandler: password callback failed", e);
         }
         return pwCb;
+    }
+    
+    private WSPasswordCallback constructPasswordCallback(
+        String username,
+        int doAction
+    ) throws WSSecurityException {
+            
+        int reason = WSPasswordCallback.UNKNOWN;
+            
+        switch (doAction) {
+        case WSConstants.UT:
+        case WSConstants.UT_SIGN:
+            reason = WSPasswordCallback.USERNAME_TOKEN;
+            break;
+        case WSConstants.SIGN:
+            reason = WSPasswordCallback.SIGNATURE;
+            break;
+        case WSConstants.ENCR:
+            reason = WSPasswordCallback.KEY_NAME;
+            break;
+        }
+        return new WSPasswordCallback(username, reason);
     }
 
     private void splitEncParts(String tmpS, Vector parts, RequestData reqData)
@@ -1014,6 +1061,19 @@ public abstract class WSHandler {
             if (certs == null || certs.length < 1) {
                 throw new WSSecurityException("WSHandler: Could not get certificates for alias " + alias);
             }
+
+            // Form a certificate chain from the transmitted certificate
+            // and the certificate(s) of the issuer from the keystore
+            // First, create new array
+            X509Certificate[] x509certs = new X509Certificate[certs.length + 1];
+            // Then add the first certificate ...
+            x509certs[0] = cert;
+            // ... and the other certificates
+            for (int j = 0; j < certs.length; j++) {
+                cert = certs[j];
+                x509certs[j + 1] = cert;
+            }
+            certs = x509certs;
 
             // Use the validation method from the crypto to check whether the subjects certificate was really signed by the issuer stated in the certificate
             try {

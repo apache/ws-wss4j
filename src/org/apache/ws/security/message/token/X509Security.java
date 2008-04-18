@@ -34,7 +34,10 @@ import java.security.cert.X509Certificate;
  * @author Davanum Srinivas (dims@yahoo.com).
  */
 public class X509Security extends BinarySecurity {
-    private static final String type = WSConstants.X509TOKEN_NS + "#X509v3";
+    
+    public static final String X509_V3_TYPE = WSConstants.X509TOKEN_NS + "#X509v3";
+    public static final String X509_V1_TYPE = WSConstants.X509TOKEN_NS + "#X509v1";
+    
     /*
      * Stores the associated X.509 Certificate. This saves numerous
      * crypto loadCertificate operations
@@ -50,8 +53,13 @@ public class X509Security extends BinarySecurity {
      */
     public X509Security(Element elem) throws WSSecurityException {
         super(elem);
-        if (!getValueType().equals(type)) {
-            throw new WSSecurityException(WSSecurityException.INVALID_SECURITY_TOKEN, "invalidValueType", new Object[]{type, getValueType()});
+        String valueType = getValueType();
+        if (!(valueType.equals(X509_V3_TYPE) || valueType.equals(X509_V1_TYPE))) {
+            throw new WSSecurityException(
+                WSSecurityException.INVALID_SECURITY_TOKEN, 
+                "invalidValueType", 
+                new Object[]{getValueType()}
+            );
         }
     }
 
@@ -62,7 +70,6 @@ public class X509Security extends BinarySecurity {
      */
     public X509Security(Document doc) {
         super(doc);
-        setValueType(type);
     }
 
     /**
@@ -100,8 +107,12 @@ public class X509Security extends BinarySecurity {
     public void setX509Certificate(X509Certificate cert)
             throws WSSecurityException {
         if (cert == null) {
-            throw new WSSecurityException(WSSecurityException.FAILURE,
-                    "noCert");
+            throw new WSSecurityException(WSSecurityException.FAILURE, "noCert");
+        }
+        if (cert.getVersion() == 1) {
+            setValueType(X509_V1_TYPE);
+        } else {
+            setValueType(X509_V3_TYPE);
         }
         cachedCert = cert;
         try {
@@ -110,9 +121,5 @@ public class X509Security extends BinarySecurity {
             throw new WSSecurityException(WSSecurityException.SECURITY_TOKEN_UNAVAILABLE,
                     "encodeError");
         }
-    }
-
-    public static String getType() {
-        return type;
     }
 }
