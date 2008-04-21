@@ -6,6 +6,7 @@
   <fileSets>
     <fileSet>
       <includes>
+        <include>NOTICE</include>
         <include>*.txt</include>
         <include>*.xml</include>
         <include>*.properties</include>
