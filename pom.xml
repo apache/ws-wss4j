@@ -7,7 +7,7 @@
     <groupId>org.apache.ws.security</groupId>
     <artifactId>wss4j</artifactId>
     <name>WSS4J</name>
-    <version>1.5.4-SNAPSHOT</version>
+    <version>1.5.4-RC2</version>
     <description>
     Apache WSS4J is an implementation of the Web Services Security (WS-Security) being developed at 
     OASIS Web Services Security TC. WSS4J is a primarily a Java library that can be used to sign and 
@@ -97,7 +97,7 @@
         <url>http://svn.apache.org/viewvc/webservices/wss4j/trunk</url>
     </scm>
     <organization>
-        <name>Apache Software Foundation</name>
+        <name>The Apache Software Foundation</name>
         <url>http://www.apache.org/</url>
     </organization>
     <build>

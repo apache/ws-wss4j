@@ -32,6 +32,8 @@ import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSEncryptionPart;
+import org.apache.ws.security.WSSecurityEngineResult;
+import org.apache.ws.security.WSDataRef;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.message.WSSecEncrypt;
@@ -236,10 +238,27 @@ public class TestWSSecurityNew2 extends TestCase implements CallbackHandler {
      * @throws Exception Thrown when there is a problem in verification
      */
     private void verify(Document doc) throws Exception {
-        secEngine.processSecurityHeader(doc, null, this, crypto);
+        final java.util.List results = secEngine.processSecurityHeader(doc, null, this, crypto);
         SOAPUtil.updateSOAPMessage(doc, message);
         String decryptedString = message.getSOAPPartAsString();
         assertTrue(decryptedString.indexOf("LogTestService2") > 0 ? true : false);
+        boolean encrypted = false;
+        for (java.util.Iterator ipos = results.iterator(); ipos.hasNext();) {
+            final java.util.Map result = (java.util.Map) ipos.next();
+            final Integer action = (Integer) result.get(WSSecurityEngineResult.TAG_ACTION);
+            assertNotNull(action);
+            if ((action.intValue() & WSConstants.ENCR) != 0) {
+                final java.util.List refs =
+                    (java.util.List) result.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
+                assertNotNull(refs);
+                encrypted = true;
+                for (java.util.Iterator jpos = refs.iterator(); jpos.hasNext();) {
+                    final WSDataRef ref = (WSDataRef) jpos.next();
+                    assertNotNull(ref);
+                }
+            }
+        }
+        assertTrue(encrypted);
     }
 
     public void handle(Callback[] callbacks)

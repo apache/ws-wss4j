@@ -131,9 +131,13 @@ To work with WSS4J you need additional software. Most of the software is also
 needed by your SOAP base system, e.g. Apache Axis. 
 
 To simplify installation and operation of WSS4J an additional ZIP file 
-is provided that holds all other JARs that are required by WSS4J. Please 
+is provided that holds releasable JARs that are required by WSS4J. Please 
 note that we probably not use the very latest versions of these JARs, but 
 we used them during the tests.
+
+Note also that some required software that cannot be shipped due to
+license restrictions must be downloaded separately and manually installed.
+See the end of this section for more details.
 
 To implement the Web Service Security (WSS) part specific software is 
 required:
@@ -155,13 +159,6 @@ axis-saaj-1.4.jar
     deployment methods before you start with any WSS4J functions.
     
     See: http://ws.apache.org/axis/
-
-bcprov-jdk13-132.jar
-    This is the BouncyCastle library that implements all necessary
-    encryption, hashing, certifcate, and keystore functions. Without
-    this fanatstic library WSS4J wouldn't work at all.
-    
-    See: http://www.bouncycastle.org/
     
 commons-codec-1.3.jar
 commons-discovery-0.2.jar
@@ -216,3 +213,15 @@ xml-apis.jar
     The XML parser implementation. Required by anybody :-) .
 
     See: http://xml.apache.org/xerces2-j/
+
+
+The following software is encumbered by U.S. patents, and therefore cannot
+be shipped with Apache software.  This software must be manually downloaded and
+installed separately.
+
+bcprov-jdk13-132.jar
+    This is the BouncyCastle library that implements all necessary
+    encryption, hashing, certifcate, and keystore functions. Without
+    this fanatstic library WSS4J wouldn't work at all.
+    
+    See: http://www.bouncycastle.org/

@@ -55,7 +55,7 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Vector;
 
-public class EncryptedKeyProcessor implements Processor {
+public class EncryptedKeyProcessor extends ProcessorBase {
     private static Log log = LogFactory.getLog(EncryptedKeyProcessor.class.getName());
     private static Log tlog =
             LogFactory.getLog("org.apache.ws.security.TIME");
@@ -471,77 +471,6 @@ public class EncryptedKeyProcessor implements Processor {
             }
         }
         return encBodyData;
-    }
-    
-    /**
-     * @return      a list of Nodes, representing the 
-     */
-    private static java.util.List
-    listChildren(
-        final Node parent
-    ) {
-        if (parent == null) {
-            return java.util.Collections.EMPTY_LIST;
-        }
-        final java.util.List ret = new java.util.ArrayList();
-        if (parent.hasChildNodes()) {
-            final NodeList children = parent.getChildNodes();
-            if (children != null) {
-                for (int i = 0, n = children.getLength();  i < n;  ++i) {
-                    ret.add(children.item(i));
-                }
-            }
-        }
-        return ret;
-    }
-    
-    /**
-     * @return      a list of Nodes in b that are not in a 
-     */
-    private static java.util.List
-    newNodes(
-        final java.util.List a,
-        final java.util.List b
-    ) {
-        if (a.size() == 0) {
-            return b;
-        }
-        if (b.size() == 0) {
-            return java.util.Collections.EMPTY_LIST;
-        }
-        final java.util.List ret = new java.util.ArrayList();
-        for (
-            final java.util.Iterator bpos = b.iterator();
-            bpos.hasNext();
-        ) {
-            final Node bnode = (Node) bpos.next();
-            final java.lang.String bns = bnode.getNamespaceURI();
-            final java.lang.String bln = bnode.getLocalName();
-            boolean found = false;
-            for (
-                final java.util.Iterator apos = a.iterator();
-                apos.hasNext();
-            ) {
-                final Node anode = (Node) apos.next();
-                final java.lang.String ans = anode.getNamespaceURI();
-                final java.lang.String aln = anode.getLocalName();
-                final boolean nsmatch =
-                    ans == null
-                    ? ((bns == null) ? true : false)
-                    : ((bns == null) ? false : ans.equals(bns));
-                final boolean lnmatch =
-                    aln == null
-                    ? ((bln == null) ? true : false)
-                    : ((bln == null) ? false : aln.equals(bln));
-                if (nsmatch && lnmatch) {
-                    found = true;
-                }
-            }
-            if (!found) {
-                ret.add(bnode);
-            }
-        }
-        return ret;
     }
 
     /**

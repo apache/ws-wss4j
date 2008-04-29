@@ -27,7 +27,7 @@ Build Instructions:
 
         <property name='product.version.major' value='1'/>
         <property name='product.version.minor' value='5'/>
-        <property name='product.version.level' value='4-SNAPSHOT'/>
+        <property name='product.version.level' value='4-RC2'/>
         <property name='product.version' value='${product.version.major}.${product.version.minor}.${product.version.level}'/>
         <property name="year" value="2008"/>
         <property name="copyright" value="Copyright &#169; ${year} Apache WSS4J Project. All Rights Reserved."/>
@@ -69,7 +69,9 @@ Build Instructions:
         <property name="build.javadoc" value="${build.doc.html}/api"/>
         <property name="build.junit.xml" value="${build.doc.xml}/junit"/>
         <property name="build.junit.html" value="${build.doc.html}/junit"/>
-
+        
+        <property name="bc.provider.version" value="132"/>
+        <property name="bc.provider.path" value="${dir.libs}"/>
 
         <condition property="jdk13.present">
           <equals arg1="${ant.java.version}" arg2="1.3"/>
@@ -104,12 +106,17 @@ Build Instructions:
         <path id="classpath.libraries" description="3rd party libs">
             <fileset dir="${dir.libs}">
                 <include name="**/*.jar"/>
-                <exclude name="**/bcprov-jdk15-*.jar" unless="jdk15.present"/>
-                <exclude name="**/bcprov-jdk13-*.jar" if="jdk15.present" />
-                <!-- <pathelement path="${java.class.path}"/> -->
+                 <exclude name="**/bcprov-jdk15-*.jar" unless="jdk15.present"/>
+                 <exclude name="**/bcprov-jdk13-*.jar" if="jdk15.present" />
+                 <!-- <pathelement path="${java.class.path}"/> -->
             </fileset>
             <fileset dir="${dir.endorsed.libs}">
                 <include name="**/*.jar"/>
+                <!-- <pathelement path="${java.class.path}"/> -->
+            </fileset>
+            <fileset dir="${bc.provider.path}">
+                <include name="bcprov-jdk15-${bc.provider.version}.jar" if="jdk15.present"/>
+                <include name="bcprov-jdk13-${bc.provider.version}.jar" unless="jdk15.present" />
                 <!-- <pathelement path="${java.class.path}"/> -->
             </fileset>
         </path>
