@@ -67,6 +67,11 @@ public class TestWSSecurityNew2 extends TestCase implements CallbackHandler {
 
     static final WSSecurityEngine secEngine = new WSSecurityEngine();
     static final Crypto crypto = CryptoFactory.getInstance("cryptoSKI.properties");
+    static final javax.xml.namespace.QName SOAP_BODY =
+        new javax.xml.namespace.QName(
+            WSConstants.URI_SOAP11_ENV,
+            "Body"
+        );
     MessageContext msgContext;
     Message message;
 
@@ -163,7 +168,7 @@ public class TestWSSecurityNew2 extends TestCase implements CallbackHandler {
         String encryptedString = encryptedMsg.getSOAPPartAsString();
         assertTrue(encryptedString.indexOf("LogTestService2") == -1 ? true : false);
         encryptedDoc = encryptedMsg.getSOAPEnvelope().getAsDocument();
-        verify(encryptedDoc);
+        verify(encryptedDoc, SOAP_BODY);
 
         /*
          * second run, same Junit set up, but change encryption method, 
@@ -194,7 +199,13 @@ public class TestWSSecurityNew2 extends TestCase implements CallbackHandler {
         encryptedString = encryptedMsg.getSOAPPartAsString();
         assertTrue(encryptedString.indexOf("LogTestService2") == -1 ? true : false);
         encryptedDoc = encryptedMsg.getSOAPEnvelope().getAsDocument();
-        verify(encryptedDoc);
+        verify(
+            encryptedDoc,
+            new javax.xml.namespace.QName(
+                "uri:LogTestService2",
+                "testMethod"
+            )
+        );
     }
 
     /**
@@ -226,7 +237,7 @@ public class TestWSSecurityNew2 extends TestCase implements CallbackHandler {
         String encryptedString = encryptedMsg.getSOAPPartAsString();
         assertTrue(encryptedString.indexOf("LogTestService2") == -1 ? true : false);
         encryptedDoc = encryptedMsg.getSOAPEnvelope().getAsDocument();
-        verify(encryptedDoc);
+        verify(encryptedDoc, SOAP_BODY);
 
     }
     
@@ -237,11 +248,19 @@ public class TestWSSecurityNew2 extends TestCase implements CallbackHandler {
      * @param envelope 
      * @throws Exception Thrown when there is a problem in verification
      */
-    private void verify(Document doc) throws Exception {
+    private void verify(
+        Document doc,
+        javax.xml.namespace.QName expectedEncryptedElement
+    ) throws Exception {
         final java.util.List results = secEngine.processSecurityHeader(doc, null, this, crypto);
         SOAPUtil.updateSOAPMessage(doc, message);
         String decryptedString = message.getSOAPPartAsString();
         assertTrue(decryptedString.indexOf("LogTestService2") > 0 ? true : false);
+        //
+        // walk through the results, and make sure there is an encrytion [sic] 
+        // action, together with a reference to the decrypted element 
+        // (as a QName)
+        //
         boolean encrypted = false;
         for (java.util.Iterator ipos = results.iterator(); ipos.hasNext();) {
             final java.util.Map result = (java.util.Map) ipos.next();
@@ -255,6 +274,11 @@ public class TestWSSecurityNew2 extends TestCase implements CallbackHandler {
                 for (java.util.Iterator jpos = refs.iterator(); jpos.hasNext();) {
                     final WSDataRef ref = (WSDataRef) jpos.next();
                     assertNotNull(ref);
+                    assertNotNull(ref.getName());
+                    assertEquals(
+                        expectedEncryptedElement,
+                        ref.getName()
+                    );
                 }
             }
         }
