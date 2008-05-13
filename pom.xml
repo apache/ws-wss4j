@@ -7,7 +7,7 @@
     <groupId>org.apache.ws.security</groupId>
     <artifactId>wss4j</artifactId>
     <name>WSS4J</name>
-    <version>1.5.4-RC3</version>
+    <version>1.5.4</version>
     <description>
     Apache WSS4J is an implementation of the Web Services Security (WS-Security) being developed at 
     OASIS Web Services Security TC. WSS4J is a primarily a Java library that can be used to sign and 
