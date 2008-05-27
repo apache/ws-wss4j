@@ -451,6 +451,14 @@ public class WSSecEncryptedKey extends WSSecBase {
     }
     
     /**
+     * Set the encrypted key element when a pre prepared encrypted key is used
+     * @param encryptedKeyElement EncryptedKey element of the encrypted key used
+     */
+    public void setEncryptedKeyElement(Element encryptedKeyElement) {
+        this.encryptedKeyElement = encryptedKeyElement;
+    }
+    
+    /**
      * @return Returns the BinarySecurityToken element.
      */
     public Element getBinarySecurityTokenElement() {

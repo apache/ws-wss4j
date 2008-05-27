@@ -17,7 +17,7 @@
     <url>http://ws.apache.org/wss4j/</url>
     <issueManagement>
         <system>JIRA</system>
-        <url>http://issues.apache.org/jira/browse/WSS4J</url>
+        <url>http://issues.apache.org/jira/browse/WSS</url>
     </issueManagement>
     <ciManagement>
         <system>Continuum</system>
@@ -83,6 +83,14 @@
             <organization></organization>
         </developer>
   </developers>
+    
+    <contributors>
+        <contributor>
+            <name>Colm O hEigeartaigh</name>
+        </contributor>
+        <!-- ask permission to list others -->
+    </contributors>
+  
     <licenses>
         <license>
             <name>The Apache Software License, Version 2.0</name>
@@ -436,6 +444,18 @@
             </plugin-->
             <plugin>
                 <artifactId>maven-project-info-reports-plugin</artifactId>
+                <reportSets>
+                    <reportSet>
+                        <reports>
+                            <report>dependencies</report>
+                            <report>project-team</report>
+                            <report>mailing-list</report>
+                            <report>issue-tracking</report>
+                            <report>license</report>
+                            <report>scm</report>
+                        </reports>
+                    </reportSet>
+                </reportSets>
             </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
@@ -447,6 +467,23 @@
               <artifactId>jxr-maven-plugin</artifactId>
               <version>2.0-beta-2-SNAPSHOT</version>
             </plugin-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-changes-plugin</artifactId>
+                <configuration>
+                    <onlyCurrentVersion>true</onlyCurrentVersion>
+                    <resolutionIds>Any</resolutionIds>
+                    <statusIds>Resolved, Closed</statusIds>
+                    <sortColumnNames>Key</sortColumnNames>
+                </configuration>
+                <reportSets>
+                    <reportSet>
+                        <reports>
+                            <report>jira-report</report>
+                        </reports>
+                    </reportSet>
+                </reportSets>
+            </plugin>
         </plugins>
     </reporting>
     <distributionManagement>
