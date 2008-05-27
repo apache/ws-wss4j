@@ -33,6 +33,7 @@ Release 1.5.4
     * [WSS-113] - Bug in WSHandler#getPassword
     * [WSS-114] - Some test reports are deleted by intermediate tasks in the ant build
     * [WSS-116] - EncryptedKeyProcessor fails to record QName of decrypted element
+    * [WSS-119] - Error in Singature Processor 
 
 ** Improvement
     * [WSS-37] - Make it easier to set key-stores programmatically
