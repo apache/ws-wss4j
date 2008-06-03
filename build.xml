@@ -27,10 +27,10 @@ Build Instructions:
 
         <property name='product.version.major' value='1'/>
         <property name='product.version.minor' value='5'/>
-        <property name='product.version.level' value='2'/>
-        <!--<property name='product.version' value='${product.version.major}.${product.version.minor}.${product.version.level}'/>-->
-    	<property name='product.version' value='SNAPSHOT'/>
-        <property name="year" value="2005"/>
+        <property name='product.version.level' value='4'/>
+        <property name='product.version' value='SNAPSHOT'/>
+        <!-- <property name='product.version' value='${product.version.major}.${product.version.minor}.${product.version.level}'/> -->
+        <property name="year" value="2008"/>
         <property name="copyright" value="Copyright &#169; ${year} Apache WSS4J Project. All Rights Reserved."/>
 
         <!-- Give user a chance to override without editing this file
@@ -711,6 +711,8 @@ org.apache.ws.axis.security.util
             excludes="components/**, *.properties, **/sandbox/**, wssec/**, **/interop/**, **/oasis/**, **/samples/**" 
             />
     </target>
+
+    <target name="dist" depends="bindist, otherdist, srcdist"/>
 
    <target name="bindist" depends="gump" 
       description="Build zip file for distro">

@@ -236,8 +236,18 @@ public class SignatureProcessor implements Processor {
                         secretKey = samlKi.getSecret();
 
                     } else if (el.equals(WSSecurityEngine.ENCRYPTED_KEY)){
-                        EncryptedKeyProcessor encryptKeyProcessor = new EncryptedKeyProcessor();
-                        encryptKeyProcessor.handleEncryptedKey((Element)token, cb, crypto);
+                        
+                        String encryptedKeyID = token.getAttributeNS(null,"Id");                   
+                        EncryptedKeyProcessor encryptKeyProcessor = (EncryptedKeyProcessor)
+                                wsDocInfo.getProcessor(encryptedKeyID);
+                        
+                        if (encryptKeyProcessor == null ) {
+                        
+                            encryptKeyProcessor = new EncryptedKeyProcessor();
+                            encryptKeyProcessor.handleEncryptedKey((Element)token, cb, crypto);
+                        
+                        } 
+                        
                         secretKey = encryptKeyProcessor.getDecryptedBytes();
                      
                     }else {

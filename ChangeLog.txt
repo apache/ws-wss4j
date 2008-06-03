@@ -1,0 +1,52 @@
+
+This file contains a listing of all Jira tickets that have been closed
+for a given release.  
+
+Portions of this report were generated using the ReleaseNotes facility
+in Jira.
+
+Release 1.5.4
+=============
+
+** Bug
+    * [WSS-51] - Incorrect test for null in WSHandler
+    * [WSS-52] - ArrayIndexOutOfBoundsException if certs.length > 1
+    * [WSS-54] - UsernameTokenProcessor not processing unhashed UsernameToken
+    * [WSS-56] - WSS4j statically inserts Bouncycastle and Juice in list of JCE providers
+    * [WSS-66] - Possible security hole when PasswordDigest is used by client.
+    * [WSS-68] - No way to create a UsernameToken with absent <Password> element
+    * [WSS-70] - WSHandler checkReceiverResults causes security problem
+    * [WSS-82] - Add the ability to use a custom-loaded JCE provider instance instead of using the system-provided one
+    * [WSS-89] - Error in verifying the signature with encrypted key
+    * [WSS-93] - xmlsec NPE on Reference URI and ValueType attributes
+    * [WSS-95] - Missing NOTICE file in WSS4J release
+    * [WSS-96] - Error when making a signature when containing a WSSecTimestamp
+    * [WSS-97] - Merlin passes invalid OID to getExtensionValue
+    * [WSS-100] - Bug in wsse11 element creation
+    * [WSS-101] - Bug in Encrypted SOAP Header creation
+    * [WSS-103] - BinarySecurityToken processor does not allow for custom token types
+    * [WSS-105] - Make WSS4J compliant with X.509 1.1 specification
+    * [WSS-106] - Certs are expired in wss4j.keystore
+    * [WSS-108] - Some work on KeyIdentifiers
+    * [WSS-109] - Review of error handling messages
+    * [WSS-112] - DerivedKeyProcessor is overwritten if more derivedkeys are present in a Soap Message.
+    * [WSS-113] - Bug in WSHandler#getPassword
+    * [WSS-114] - Some test reports are deleted by intermediate tasks in the ant build
+    * [WSS-116] - EncryptedKeyProcessor fails to record QName of decrypted element
+    * [WSS-119] - Error in Singature Processor 
+
+** Improvement
+    * [WSS-37] - Make it easier to set key-stores programmatically
+    * [WSS-38] - Make it easier to set key-stores programmatically
+    * [WSS-74] - Allow Actions and Processors to be customizable
+    * [WSS-80] - Doc fixes to main WSS4J page
+    * [WSS-88] - SecureRandom.getInstance("SHA1PRNG") is slow on IBM JDK 1.4.2 (And perhaps others)
+    * [WSS-92] - Support for Encrypted Header 
+    * [WSS-104] - Reference List processor should provide more information
+    * [WSS-107] - X509NameTokenizer.java contains Bouncy Castle JCE copyright code
+
+
+Version prior to 1.5.4
+======================
+
+no record

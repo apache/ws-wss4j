@@ -296,6 +296,10 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
         }
 
         prepare(doc, crypto);
+        
+        if (envelope == null) {
+            envelope = document.getDocumentElement();
+        }
 
         SOAPConstants soapConstants = WSSecurityUtil.getSOAPConstants(envelope);
         if (parts == null) {
