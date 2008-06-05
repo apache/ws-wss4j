@@ -219,17 +219,16 @@ public class SignatureProcessor implements Processor {
                         WSSecurityUtil.getKeyLength(signatureMethodURI);
                     
                     secretKey = dktProcessor.getKeyBytes(keyLength);
-                } 
-                else {
-                    if (crypto == null) {
-                        throw new WSSecurityException(WSSecurityException.FAILURE,
-                                "noSigCryptoFile");
-                    }
+                } else {
                     if (el.equals(WSSecurityEngine.binaryToken)) {
                         //TODO: Use results from BinarySecurityTokenProcessor
                         certs = getCertificatesTokenReference((Element) token,
                                 crypto);
                     } else if (el.equals(WSSecurityEngine.SAML_TOKEN)) {
+                        if (crypto == null) {
+                            throw new WSSecurityException(WSSecurityException.FAILURE,
+                                "noSigCryptoFile");
+                        }
                         samlKi = SAMLUtil.getSAMLKeyInfo(
                                 (Element) token, crypto, cb);
                         certs = samlKi.getCerts();
@@ -242,7 +241,10 @@ public class SignatureProcessor implements Processor {
                                 wsDocInfo.getProcessor(encryptedKeyID);
                         
                         if (encryptKeyProcessor == null ) {
-                        
+                            if (crypto == null) {
+                                throw new WSSecurityException(WSSecurityException.FAILURE,
+                                    "noSigCryptoFile");
+                            }
                             encryptKeyProcessor = new EncryptedKeyProcessor();
                             encryptKeyProcessor.handleEncryptedKey((Element)token, cb, crypto);
                         
@@ -445,6 +447,10 @@ public class SignatureProcessor implements Processor {
     public X509Certificate[] getCertificatesTokenReference(Element elem,
                                                            Crypto crypto)
             throws WSSecurityException {
+        if (crypto == null) {
+            throw new WSSecurityException(WSSecurityException.FAILURE,
+                    "noSigCryptoFile");
+        }
         BinarySecurity token = createSecurityToken(elem);
         if (token instanceof PKIPathSecurity) {
             return ((PKIPathSecurity) token).getX509Certificates(false, crypto);
