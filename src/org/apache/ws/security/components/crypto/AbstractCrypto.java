@@ -58,6 +58,9 @@ public abstract class AbstractCrypto extends CryptoBase {
      */
     public AbstractCrypto(Properties properties, ClassLoader loader) throws CredentialException, IOException {
         this.properties = properties;
+        if (this.properties == null) {
+            return;
+        }
         String location = this.properties.getProperty("org.apache.ws.security.crypto.merlin.file");
 
 
