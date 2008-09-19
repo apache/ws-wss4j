@@ -147,6 +147,44 @@ public class TestWSSecurityNew5 extends TestCase implements CallbackHandler {
     }
     
     /**
+     * Test that a bad username with password digest does not leak whether the username
+     * is valid or not - see WSS-141.
+     */
+    public void testUsernameTokenBadUsername() throws Exception {
+        WSSecUsernameToken builder = new WSSecUsernameToken();
+        builder.setUserInfo("badusername", "verySecret");
+        log.info("Before adding UsernameToken PW Digest....");
+        Document doc = unsignedEnvelope.getAsDocument();
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        Document signedDoc = builder.build(doc, secHeader);
+
+        /*
+         * convert the resulting document into a message first. The toAxisMessage()
+         * method performs the necessary c14n call to properly set up the signed
+         * document and convert it into a SOAP message. After that we extract it
+         * as a document again for further processing.
+         */
+
+        Message signedMsg = SOAPUtil.toAxisMessage(signedDoc);
+        if (log.isDebugEnabled()) {
+            log.debug("Message with UserNameToken PW Digest:");
+            XMLUtils.PrettyElementToWriter(signedMsg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
+        }
+        signedDoc = signedMsg.getSOAPEnvelope().getAsDocument();
+        log.info("After adding UsernameToken PW Digest....");
+        try {
+            verify(signedDoc);
+            throw new Exception("Failure expected on a bad username");
+        } catch (WSSecurityException ex) {
+            String message = ex.getMessage();
+            assertTrue(message.indexOf("badusername") == -1);
+            assertTrue(ex.getErrorCode() == WSSecurityException.FAILED_AUTHENTICATION);
+            // expected
+        }
+    }
+    
+    /**
      * Test that adds a UserNameToken with a bad password Digest to a WS-Security envelope
      * <p/>
      */
@@ -175,6 +213,7 @@ public class TestWSSecurityNew5 extends TestCase implements CallbackHandler {
         log.info("After adding UsernameToken PW Digest....");
         try {
             verify(signedDoc);
+            throw new Exception("Failure expected on a bad password digest");
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == WSSecurityException.FAILED_AUTHENTICATION);
             // expected
@@ -227,6 +266,7 @@ public class TestWSSecurityNew5 extends TestCase implements CallbackHandler {
         
         try {
             verify(signedDoc);
+            throw new Exception("Failure expected on a bad password text");
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == WSSecurityException.FAILED_AUTHENTICATION);
             // expected
@@ -265,14 +305,14 @@ public class TestWSSecurityNew5 extends TestCase implements CallbackHandler {
     }
     
     /**
-     * Test with a null token type. This will pass as the WSSConfig is configured to 
+     * Test with a null password type. This will pass as the WSSConfig is configured to 
      * handle custom token types.
      * <p/>
      */
     public void testUsernameTokenCustomPass() throws Exception {
         WSSecUsernameToken builder = new WSSecUsernameToken();
         builder.setPasswordType(null);
-        builder.setUserInfo("wernerd", null);
+        builder.setUserInfo("customUser", null);
         
         Document doc = unsignedEnvelope.getAsDocument();
         WSSecHeader secHeader = new WSSecHeader();
@@ -410,9 +450,15 @@ public class TestWSSecurityNew5 extends TestCase implements CallbackHandler {
                     pc.setPassword("verySecret");
                 } else if (
                     pc.getUsage() == WSPasswordCallback.USERNAME_TOKEN_UNKNOWN
-                    && "wernerd".equals(pc.getIdentifer())
-                    && "verySecret".equals(pc.getPassword())) {
-                    return;
+                ) {
+                    if ("wernerd".equals(pc.getIdentifer())
+                        && "verySecret".equals(pc.getPassword())) {
+                        return;
+                    } else if ("customUser".equals(pc.getIdentifer())) {
+                        return;
+                    } else {
+                        throw new IOException("Authentication failed");
+                    }
                 }
             } else {
                 throw new UnsupportedCallbackException(callbacks[i], "Unrecognized Callback");

@@ -121,8 +121,10 @@ public class UsernameTokenProcessor implements Processor {
                 log.debug("UsernameToken callback password " + origPassword);
             }
             if (origPassword == null) {
-                throw new WSSecurityException(WSSecurityException.FAILURE,
-                        "noPassword", new Object[]{user});
+                if (log.isDebugEnabled()) {
+                    log.debug("Callback supplied no password for: " + user);
+                }
+                throw new WSSecurityException(WSSecurityException.FAILED_AUTHENTICATION);
             }
             String passDigest = UsernameToken.doPasswordDigest(nonce, createdTime, origPassword);
             if (!passDigest.equals(password)) {
