@@ -116,6 +116,8 @@ public class WSSecSignature extends WSSecBase {
     private String customTokenValueType;
 
     private String customTokenId;
+    
+    private String digestAlgo = "http://www.w3.org/2000/09/xmldsig#sha1";
 
 	/**
 	 * Constructor.
@@ -200,6 +202,23 @@ public class WSSecSignature extends WSSecBase {
 		return canonAlgo;
 	}
 
+    /**
+     * @return the digestAlgo
+     */
+    public String getDigestAlgo() {
+        return digestAlgo;
+    }
+
+    /**
+     * Set the string that defines which digest algorithm to use
+     * 
+     * @param digestAlgo the digestAlgo to set
+     */
+    public void setDigestAlgo(String digestAlgo) {
+        this.digestAlgo = digestAlgo;
+    }
+    
+	
 	/**
 	 * @param usernameToken
 	 *            The usernameToken to set.
@@ -492,7 +511,7 @@ public class WSSecSignature extends WSSecBase {
 										getInclusivePrefixes(toSignById))
 										.getElement());
 					}
-					sig.addDocument("#" + idToSign, transforms);
+					sig.addDocument("#" + idToSign, transforms, digestAlgo);
 				} else if (elemName.equals("Token")) {
 					transforms
 							.addTransform(Transforms.TRANSFORM_C14N_EXCL_OMIT_COMMENTS);
@@ -507,7 +526,7 @@ public class WSSecSignature extends WSSecBase {
 													getInclusivePrefixes(secHeader.getSecurityHeader()))
 													.getElement());
 						}
-						sig.addDocument("#" + certUri, transforms);
+						sig.addDocument("#" + certUri, transforms, digestAlgo);
 					} else {
 						if (wssConfig.isWsiBSPCompliant()) {
 							transforms.item(0).getElement().appendChild(
@@ -516,13 +535,13 @@ public class WSSecSignature extends WSSecBase {
 													.getElement()))
 											.getElement());
 						}
-						sig.addDocument("#" + keyInfoUri, transforms);
+						sig.addDocument("#" + keyInfoUri, transforms, digestAlgo);
 					}
 				} else if (elemName.equals("STRTransform")) { // STRTransform
 					Element ctx = createSTRParameter(document);
 					transforms.addTransform(
 							STRTransform.implementedTransformURI, ctx);
-					sig.addDocument("#" + strUri, transforms);
+					sig.addDocument("#" + strUri, transforms, digestAlgo);
 				} else if (elemName.equals("Assertion")) { // Assertion
 
 					String id = null;
@@ -546,7 +565,7 @@ public class WSSecSignature extends WSSecBase {
 					String prefix = WSSecurityUtil.setNamespace(body,
 							WSConstants.WSU_NS, WSConstants.WSU_PREFIX);
 					body.setAttributeNS(WSConstants.WSU_NS, prefix + ":Id", id);
-					sig.addDocument("#" + id, transforms);
+					sig.addDocument("#" + id, transforms, digestAlgo);
 
 				} else {
 					Element body = (Element) WSSecurityUtil.findElement(
@@ -564,7 +583,7 @@ public class WSSecSignature extends WSSecBase {
 										getInclusivePrefixes(body))
 										.getElement());
 					}
-					sig.addDocument("#" + setWsuId(body), transforms);
+					sig.addDocument("#" + setWsuId(body), transforms, digestAlgo);
 				}
 			} catch (TransformationException e1) {
 				throw new WSSecurityException(
@@ -836,6 +855,5 @@ public class WSSecSignature extends WSSecBase {
     public void setEncrKeySha1value(String encrKeySha1value) {
         this.encrKeySha1value = encrKeySha1value;
     }
-	
 	
 }
