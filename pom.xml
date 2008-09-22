@@ -1,320 +1,331 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project
-        xmlns="http://maven.apache.org/POM/4.0.0"
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    <groupId>org.apache.ws.security</groupId>
-    <artifactId>wss4j</artifactId>
-    <name>WSS4J</name>
-    <!-- <version>1.5.4</version> -->
-    <version>SNAPSHOT</version>
-    <description>
-    Apache WSS4J is an implementation of the Web Services Security (WS-Security) being developed at 
-    OASIS Web Services Security TC. WSS4J is a primarily a Java library that can be used to sign and 
-    verify SOAP Messages with WS-Security information. WSS4J will use Apache Axis and Apache XML-Security 
-    projects and will be interoperable with JAX-RPC based server/clients and .NET server/clients. 
-    </description>
-    <url>http://ws.apache.org/wss4j/</url>
-    <issueManagement>
-        <system>JIRA</system>
-        <url>http://issues.apache.org/jira/browse/WSS</url>
-    </issueManagement>
-    <ciManagement>
-        <system>Continuum</system>
-        <url>unknown</url>
-        <notifiers>
-            <notifier>
-                <sendOnError>false</sendOnError>
-                <sendOnFailure>false</sendOnFailure>
-                <sendOnSuccess>false</sendOnSuccess>
-                <sendOnWarning>false</sendOnWarning>
-                <configuration>
-                    <address>wss4j-dev@ws.apache.org</address>
-                </configuration>
-            </notifier>
-        </notifiers>
-    </ciManagement>
-    <mailingLists>
-        <mailingList>
-            <name>WSS4J Developer List</name>
-            <subscribe>wss4j-dev-subscribe@ws.apache.org</subscribe>
-            <unsubscribe>wss4j-dev-unsubscribe@ws.apache.org</unsubscribe>
-            <post>wss4j-dev@ws.apache.org</post>
-            <archive>http://mail-archives.apache.org/mod_mbox/ws-wss4j-dev/</archive>
-        </mailingList>
-    </mailingLists>
-    <inceptionYear>2004</inceptionYear>
-  <!-- who the developers are for the project -->
-  <developers>
-        <developer>
-            <name>Davanum Srinivas</name>
-            <id>dims</id>
-            <email>dims@yahoo.com</email>
-            <organization></organization>
-        </developer>
-        <developer>
-            <name>Werner Dittmann</name>
-            <id>werner</id>
-            <email>werner@apache.org</email>
-            <organization></organization>
-        </developer>
-        <developer>
-            <name>Ias</name>
-            <id>ias</id>
-            <email>ias@apache.org</email>
-            <organization></organization>
-        </developer>
-        <developer>
-            <name>Ruchith Fernando</name>
-            <id>ruchithf</id>
-            <email>ruchithf@apache.org</email>
-            <organization></organization>
-        </developer>
-  </developers>
-    
-    <contributors>
-        <contributor>
-            <name>Colm O hEigeartaigh</name>
-        </contributor>
-        <!-- ask permission to list others -->
-    </contributors>
-  
-    <licenses>
-        <license>
-            <name>The Apache Software License, Version 2.0</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-            <distribution>repo</distribution>
-        </license>
-    </licenses>
-    <scm>
-        <connection>scm:svn:http://svn.apache.org/repos/asf/webservices/wss4j/trunk/</connection>
-        <developerConnection>
-            scm:svn:https://svn.apache.org/repos/asf/webservices/wss4j/trunk/</developerConnection>
-        <url>http://svn.apache.org/viewvc/webservices/wss4j/trunk</url>
-    </scm>
-    <organization>
-        <name>Apache Software Foundation</name>
-        <url>http://www.apache.org/</url>
-    </organization>
-    <build>
-        <sourceDirectory>src</sourceDirectory>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.apache.ws.security</groupId>
+	<artifactId>wss4j</artifactId>
+	<name>WSS4J</name>
+	<!-- <version>1.5.4</version> -->
+	<version>SNAPSHOT</version>
+	<description>
+		Apache WSS4J is an implementation of the Web Services Security
+		(WS-Security) being developed at OASIS Web Services Security TC.
+		WSS4J is a primarily a Java library that can be used to sign and
+		verify SOAP Messages with WS-Security information. WSS4J will
+		use Apache Axis and Apache XML-Security projects and will be
+		interoperable with JAX-RPC based server/clients and .NET
+		server/clients.
+	</description>
+	<url>http://ws.apache.org/wss4j/</url>
+	<issueManagement>
+		<system>JIRA</system>
+		<url>http://issues.apache.org/jira/browse/WSS</url>
+	</issueManagement>
+	<ciManagement>
+		<system>Continuum</system>
+		<url>unknown</url>
+		<notifiers>
+			<notifier>
+				<sendOnError>false</sendOnError>
+				<sendOnFailure>false</sendOnFailure>
+				<sendOnSuccess>false</sendOnSuccess>
+				<sendOnWarning>false</sendOnWarning>
+				<configuration>
+					<address>wss4j-dev@ws.apache.org</address>
+				</configuration>
+			</notifier>
+		</notifiers>
+	</ciManagement>
+	<mailingLists>
+		<mailingList>
+			<name>WSS4J Developer List</name>
+			<subscribe>wss4j-dev-subscribe@ws.apache.org</subscribe>
+			<unsubscribe>
+				wss4j-dev-unsubscribe@ws.apache.org
+			</unsubscribe>
+			<post>wss4j-dev@ws.apache.org</post>
+			<archive>
+				http://mail-archives.apache.org/mod_mbox/ws-wss4j-dev/
+			</archive>
+		</mailingList>
+	</mailingLists>
+	<inceptionYear>2004</inceptionYear>
+	<!-- who the developers are for the project -->
+	<developers>
+		<developer>
+			<name>Davanum Srinivas</name>
+			<id>dims</id>
+			<email>dims@yahoo.com</email>
+			<organization></organization>
+		</developer>
+		<developer>
+			<name>Werner Dittmann</name>
+			<id>werner</id>
+			<email>werner@apache.org</email>
+			<organization></organization>
+		</developer>
+		<developer>
+			<name>Ias</name>
+			<id>ias</id>
+			<email>ias@apache.org</email>
+			<organization></organization>
+		</developer>
+		<developer>
+			<name>Ruchith Fernando</name>
+			<id>ruchithf</id>
+			<email>ruchithf@apache.org</email>
+			<organization></organization>
+		</developer>
+		<developer>
+			<name>Fred Dushin</name>
+			<id>fadushin</id>
+			<email>fadushin@apache.org</email>
+			<organization></organization>
+		</developer>
+		<developer>
+			<name>Colm O hEigeartaigh</name>
+			<id>coheigea</id>
+			<email>coheigea@apache.org</email>
+			<organization></organization>
+		</developer>
+	</developers>
+
+	<licenses>
+		<license>
+			<name>The Apache Software License, Version 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+	<scm>
+		<connection>
+			scm:svn:http://svn.apache.org/repos/asf/webservices/wss4j/trunk/
+		</connection>
+		<developerConnection>
+			scm:svn:https://svn.apache.org/repos/asf/webservices/wss4j/trunk/
+		</developerConnection>
+		<url>http://svn.apache.org/viewvc/webservices/wss4j/trunk</url>
+	</scm>
+	<organization>
+		<name>Apache Software Foundation</name>
+		<url>http://www.apache.org/</url>
+	</organization>
+	<build>
+		<sourceDirectory>src</sourceDirectory>
 		<resources>
-
 			<resource>
-
 				<directory>src</directory>
-
 				<includes>
-
 					<include>org/**/errors.properties</include>
-
 				</includes>
-
 				<filtering>false</filtering>
-
 			</resource>
-
 		</resources>
 
-        <!--<testSourceDirectory>test</testSourceDirectory> -->
-        <plugins>
-            <plugin>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <version>1.1</version>
-                <executions>
-                    <execution>
-                        <id>prepareLicenseFiles</id>
-                        <phase>generate-resources</phase>
-                        <configuration>
-                            <tasks>
-                                <copy todir="${project.build.outputDirectory}/META-INF">
-                                    <fileset dir="${basedir}">
-                                        <include name="LICENSE.txt"/>
-                                        <include name="NOTICE.txt"/>
-                                    </fileset>
-                                </copy>
-                            </tasks>
-                        </configuration>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                    </execution>
-<!--                    <execution>
-                        <id>settingUpInteropTests</id>
-                        <phase>generate-resources</phase>
-                        <configuration>
-                            <tasks>
-								
-							  <mkdir dir="target/work"/>
-							  <axis-wsdl2java
-								  output="target/work"
-								  serverSide="yes"
-								  testcase="no"
-								  verbose="no"
-								  url="interop/ping.wsdl">
-								  <mapping
-									  namespace="http://xmlsoap.org/Ping"
-									  package="org.apache.ws.axis.oasis.ping"/>
-							  </axis-wsdl2java>
-							  
-								<echo message="Starting http server."/>
-                            </tasks>
-                        </configuration>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                    </execution>
+		<!--<testSourceDirectory>test</testSourceDirectory> -->
+		<plugins>
+			<plugin>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<version>1.1</version>
+				<executions>
 					<execution>
-                        <id>stopServer</id>
-                        <phase>install</phase>
-                        <configuration>
-                            <tasks>
-								<echo message="Stopping http server."/>
-                            </tasks>
-                        </configuration>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                    </execution> -->
-                </executions>
-            </plugin>
-            <plugin>
-                <artifactId>maven-one-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>install-maven-one-repository</goal>
-                            <goal>deploy-maven-one-repository</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <remoteRepositoryId>apache</remoteRepositoryId>
-                    <remoteRepositoryUrl>scpexe://people.apache.org/www/people.apache.org/repo/m1-snapshot-repository</remoteRepositoryUrl>
-                </configuration>
-            </plugin>
-            <plugin>
-                <artifactId>maven-release-plugin</artifactId>
-                <configuration>
-                    <tagBase>https://svn.apache.org/repos/asf/webservices/wss4j/tags/</tagBase>
-                </configuration>
-            </plugin>
-            <plugin>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>1.3</source>
-                    <target>1.3</target>
-                </configuration>
-            </plugin>
+						<id>prepareLicenseFiles</id>
+						<phase>generate-resources</phase>
+						<configuration>
+							<tasks>
+								<copy
+									todir="${project.build.outputDirectory}/META-INF">
+									<fileset dir="${basedir}">
+										<include name="LICENSE.txt" />
+										<include name="NOTICE.txt" />
+									</fileset>
+								</copy>
+							</tasks>
+						</configuration>
+						<goals>
+							<goal>run</goal>
+						</goals>
+					</execution>
+					<!--                    <execution>
+						<id>settingUpInteropTests</id>
+						<phase>generate-resources</phase>
+						<configuration>
+						<tasks>
+						
+						<mkdir dir="target/work"/>
+						<axis-wsdl2java
+						output="target/work"
+						serverSide="yes"
+						testcase="no"
+						verbose="no"
+						url="interop/ping.wsdl">
+						<mapping
+						namespace="http://xmlsoap.org/Ping"
+						package="org.apache.ws.axis.oasis.ping"/>
+						</axis-wsdl2java>
+						
+						<echo message="Starting http server."/>
+						</tasks>
+						</configuration>
+						<goals>
+						<goal>run</goal>
+						</goals>
+						</execution>
+						<execution>
+						<id>stopServer</id>
+						<phase>install</phase>
+						<configuration>
+						<tasks>
+						<echo message="Stopping http server."/>
+						</tasks>
+						</configuration>
+						<goals>
+						<goal>run</goal>
+						</goals>
+						</execution> -->
+				</executions>
+			</plugin>
+			<plugin>
+				<artifactId>maven-one-plugin</artifactId>
+				<executions>
+					<execution>
+						<goals>
+							<goal>install-maven-one-repository</goal>
+							<goal>deploy-maven-one-repository</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<remoteRepositoryId>apache</remoteRepositoryId>
+					<remoteRepositoryUrl>
+						scpexe://people.apache.org/www/people.apache.org/repo/m1-snapshot-repository
+					</remoteRepositoryUrl>
+				</configuration>
+			</plugin>
+			<plugin>
+				<artifactId>maven-release-plugin</artifactId>
+				<configuration>
+					<tagBase>
+						https://svn.apache.org/repos/asf/webservices/wss4j/tags/
+					</tagBase>
+				</configuration>
+			</plugin>
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>1.3</source>
+					<target>1.3</target>
+				</configuration>
+			</plugin>
 
 			<!--<plugin>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <includes>
-                        <include>**/*Test.java</include>
-                    </includes>
-                    <excludes>
-                        <exclude>tests/w3c/SchemaTest.java</exclude>
-                    </excludes>
-                </configuration>
-            </plugin> -->
-			
-            <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <configuration>
-                    <descriptors>
-                        <descriptor>assembly/bin.xml</descriptor>
-                        <descriptor>assembly/src.xml</descriptor>
-                    </descriptors>
-                    <tarLongFileMode>gnu</tarLongFileMode>
-                </configuration>
-            </plugin>
-            <plugin>
-                <artifactId>maven-source-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <attach>true</attach>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
-    <profiles>
-        <profile>
-            <id>release</id>
-            <activation>
-                <property>
-                    <name>release</name>
-                    <value></value>
-                </property>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <artifactId>maven-javadoc-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <goals>
-                                    <goal>jar</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                        <configuration>
-                            <attach>true</attach>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-        <profile>
-            <id>jdk14</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-                <jdk>1.4</jdk>
-            </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>bouncycastle</groupId>
-                    <artifactId>bcprov-jdk13</artifactId>
-                    <version>${bcprov.jdk13.version}</version>
-                </dependency>
-            </dependencies>
-        </profile>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+				<includes>
+				<include>**/*Test.java</include>
+				</includes>
+				<excludes>
+				<exclude>tests/w3c/SchemaTest.java</exclude>
+				</excludes>
+				</configuration>
+				</plugin> -->
 
-        <profile>
-            <id>jdk15</id>
-            <activation>
-                <jdk>1.5</jdk>
-            </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>bouncycastle</groupId>
-                    <artifactId>bcprov-jdk15</artifactId>
-                    <version>${bcprov.jdk15.version}</version>
-                </dependency>
-            </dependencies>
-        </profile>
+			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<configuration>
+					<descriptors>
+						<descriptor>assembly/bin.xml</descriptor>
+						<descriptor>assembly/src.xml</descriptor>
+					</descriptors>
+					<tarLongFileMode>gnu</tarLongFileMode>
+				</configuration>
+			</plugin>
+			<plugin>
+				<artifactId>maven-source-plugin</artifactId>
+				<executions>
+					<execution>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<attach>true</attach>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+	<profiles>
+		<profile>
+			<id>release</id>
+			<activation>
+				<property>
+					<name>release</name>
+					<value></value>
+				</property>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<artifactId>maven-javadoc-plugin</artifactId>
+						<executions>
+							<execution>
+								<goals>
+									<goal>jar</goal>
+								</goals>
+							</execution>
+						</executions>
+						<configuration>
+							<attach>true</attach>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		<profile>
+			<id>jdk14</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+				<jdk>1.4</jdk>
+			</activation>
+			<dependencies>
+				<dependency>
+					<groupId>bouncycastle</groupId>
+					<artifactId>bcprov-jdk13</artifactId>
+					<version>${bcprov.jdk13.version}</version>
+				</dependency>
+			</dependencies>
+		</profile>
 
-    </profiles>
-   <properties>
-        <xmlsec.version>1.4.0</xmlsec.version>
-	    <opensaml.version>1.1</opensaml.version>
-        <xml.apis.version>1.3.03</xml.apis.version>
-        <bcprov.jdk13.version>132</bcprov.jdk13.version>
-        <bcprov.jdk15.version>132</bcprov.jdk15.version>
-        <commons.logging.version>1.1</commons.logging.version>
-        <xalan.version>2.7.0</xalan.version>
-        <xerces.version>2.8.1</xerces.version>      
-        <axis.version>1.4</axis.version>
-        <junit.version>3.8.1</junit.version>
-    </properties>
-    <repositories>
+		<profile>
+			<id>jdk15</id>
+			<activation>
+				<jdk>1.5</jdk>
+			</activation>
+			<dependencies>
+				<dependency>
+					<groupId>bouncycastle</groupId>
+					<artifactId>bcprov-jdk15</artifactId>
+					<version>${bcprov.jdk15.version}</version>
+				</dependency>
+			</dependencies>
+		</profile>
+
+	</profiles>
+	<properties>
+		<xmlsec.version>1.4.1</xmlsec.version>
+		<opensaml.version>1.1</opensaml.version>
+		<xml.apis.version>1.3.03</xml.apis.version>
+		<bcprov.jdk13.version>132</bcprov.jdk13.version>
+		<bcprov.jdk15.version>132</bcprov.jdk15.version>
+		<commons.logging.version>1.1</commons.logging.version>
+		<xalan.version>2.7.0</xalan.version>
+		<xerces.version>2.8.1</xerces.version>
+		<axis.version>1.4</axis.version>
+		<junit.version>3.8.1</junit.version>
+	</properties>
+	<repositories>
 		<repository>
 			<releases>
 				<enabled>false</enabled>
@@ -328,23 +339,10 @@
 			</snapshots>
 			<id>apache-snapshots</id>
 			<name>Apache Maven2 SNAPSHOTS</name>
-			<url>http://people.apache.org/repo/m2-snapshot-repository/</url>
+			<url>
+				http://people.apache.org/repo/m2-snapshot-repository/
+			</url>
 			<layout>default</layout>
-		</repository>
-		<repository>
-			<releases>
-				<enabled>true</enabled>
-				<updatePolicy>always</updatePolicy>
-				<checksumPolicy>warn</checksumPolicy>
-			</releases>
-			<snapshots>
-				<enabled>true</enabled>
-				<updatePolicy>never</updatePolicy>
-				<checksumPolicy>warn</checksumPolicy>
-			</snapshots>
-			<id>apache-ws-snapshots2</id>
-			<name>Apache ws.zones - 2</name>
-			<url>http://ws.zones.apache.org/repository2/</url>
 		</repository>
 		<repository>
 			<releases>
@@ -361,47 +359,64 @@
 			<name>Maven2 repo</name>
 			<url>http://repo1.maven.org/maven2/</url>
 		</repository>
+		<repository>
+			<releases>
+				<enabled>true</enabled>
+				<updatePolicy>always</updatePolicy>
+				<checksumPolicy>warn</checksumPolicy>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+				<updatePolicy>never</updatePolicy>
+				<checksumPolicy>warn</checksumPolicy>
+			</snapshots>
+			<id>apache-ws-snapshots2</id>
+			<name>Apache ws.zones - 2</name>
+			<url>http://ws.zones.apache.org/repository2/</url>
+		</repository>
 	</repositories>
-    <pluginRepositories>
-        <pluginRepository>
-            <id>snapshot</id>
-            <name>Snapshot repository</name>
-            <url>http://snapshots.maven.codehaus.org/maven2/</url>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-        </pluginRepository>
-        <pluginRepository>
-            <id>snapshot-apache</id>
-            <name>Apache Snapshot repository</name>
-            <url>http://people.apache.org/repo/m2-snapshot-repository</url>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-        </pluginRepository>
-    </pluginRepositories>
-    <dependencies>
-        <dependency>
-            <groupId>commons-logging</groupId>
-            <artifactId>commons-logging</artifactId>
-            <version>${commons.logging.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.santuario</groupId>
-            <artifactId>xmlsec</artifactId>
-            <version>${xmlsec.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>opensaml</groupId>
-            <artifactId>opensaml</artifactId>
-            <version>${opensaml.version}</version>
-        </dependency>
+	<pluginRepositories>
+		<pluginRepository>
+			<id>snapshot</id>
+			<name>Snapshot repository</name>
+			<url>http://snapshots.maven.codehaus.org/maven2/</url>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+		</pluginRepository>
+		<pluginRepository>
+			<id>snapshot-apache</id>
+			<name>Apache Snapshot repository</name>
+			<url>
+				http://people.apache.org/repo/m2-snapshot-repository
+			</url>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+		</pluginRepository>
+	</pluginRepositories>
+	<dependencies>
+		<dependency>
+			<groupId>commons-logging</groupId>
+			<artifactId>commons-logging</artifactId>
+			<version>${commons.logging.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.santuario</groupId>
+			<artifactId>xmlsec</artifactId>
+			<version>${xmlsec.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>opensaml</groupId>
+			<artifactId>opensaml</artifactId>
+			<version>${opensaml.version}</version>
+		</dependency>
 		<dependency>
 			<groupId>axis</groupId>
 			<artifactId>axis</artifactId>
@@ -413,91 +428,99 @@
 			<artifactId>axis-ant</artifactId>
 			<version>${axis.version}</version>
 		</dependency>
-        <dependency>
-            <groupId>xalan</groupId>
-            <artifactId>xalan</artifactId>
-            <version>${xalan.version}</version>
-        </dependency>
 		<dependency>
-				<groupId>xerces</groupId>
-				<artifactId>xercesImpl</artifactId>
-				<version>${xerces.version}</version>
+			<groupId>xalan</groupId>
+			<artifactId>xalan</artifactId>
+			<version>${xalan.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>xerces</groupId>
+			<artifactId>xercesImpl</artifactId>
+			<version>${xerces.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>xml-apis</groupId>
 			<artifactId>xml-apis</artifactId>
-				<version>${xml.apis.version}</version>
+			<version>${xml.apis.version}</version>
 		</dependency>
 		<dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>${junit.version}</version>
-        </dependency>
-    </dependencies>
-	
-    <reporting>
-        <plugins>
-            <plugin>
-              <artifactId>maven-javadoc-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <artifactId>maven-project-info-reports-plugin</artifactId>
-                <reportSets>
-                    <reportSet>
-                        <reports>
-                            <report>dependencies</report>
-                            <report>project-team</report>
-                            <report>mailing-list</report>
-                            <report>issue-tracking</report>
-                            <report>license</report>
-                            <report>scm</report>
-                        </reports>
-                    </reportSet>
-                </reportSets>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>jdepend-maven-plugin</artifactId>
-                <version>2.0-beta-1-SNAPSHOT</version>
-            </plugin>
-            <plugin>
-              <groupId>org.codehaus.mojo</groupId>
-              <artifactId>jxr-maven-plugin</artifactId>
-              <version>2.0-beta-1</version>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-changes-plugin</artifactId>
-                <configuration>
-                    <onlyCurrentVersion>true</onlyCurrentVersion>
-                    <resolutionIds>Any</resolutionIds>
-                    <statusIds>Resolved, Closed</statusIds>
-                    <sortColumnNames>Key</sortColumnNames>
-                </configuration>
-                <reportSets>
-                    <reportSet>
-                        <reports>
-                            <report>jira-report</report>
-                        </reports>
-                    </reportSet>
-                </reportSets>
-            </plugin>
-        </plugins>
-    </reporting>
-    <distributionManagement>
-        <repository>
-            <id>apache-repo</id>
-            <name>Maven Central Repository</name>
-            <url>scpexe://people.apache.org/www/people.apache.org/repo/m2-ibiblio-rsync-repository</url>
-        </repository>
-        <snapshotRepository>
-            <id>apache-snapshots</id>
-            <name>Apache Development Repository</name>
-            <url>scpexe://people.apache.org/www/people.apache.org/repo/m2-snapshot-repository</url>
-        </snapshotRepository>
-        <site>
-            <id>website</id>
-            <url>scpexe://people.apache.org/www/ws.apache.org/wss4j/</url>
-        </site>
-    </distributionManagement>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>${junit.version}</version>
+		</dependency>
+	</dependencies>
+
+	<reporting>
+		<plugins>
+			<plugin>
+				<artifactId>maven-javadoc-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<artifactId>
+					maven-project-info-reports-plugin
+				</artifactId>
+				<reportSets>
+					<reportSet>
+						<reports>
+							<report>dependencies</report>
+							<report>project-team</report>
+							<report>mailing-list</report>
+							<report>issue-tracking</report>
+							<report>license</report>
+							<report>scm</report>
+						</reports>
+					</reportSet>
+				</reportSets>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>jdepend-maven-plugin</artifactId>
+				<version>2.0-beta-1-SNAPSHOT</version>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>jxr-maven-plugin</artifactId>
+				<version>2.0-beta-1</version>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-changes-plugin</artifactId>
+				<configuration>
+					<onlyCurrentVersion>true</onlyCurrentVersion>
+					<resolutionIds>Any</resolutionIds>
+					<statusIds>Resolved, Closed</statusIds>
+					<sortColumnNames>Key</sortColumnNames>
+				</configuration>
+				<reportSets>
+					<reportSet>
+						<reports>
+							<report>jira-report</report>
+						</reports>
+					</reportSet>
+				</reportSets>
+			</plugin>
+		</plugins>
+	</reporting>
+	<distributionManagement>
+		<repository>
+			<id>apache-repo</id>
+			<name>Maven Central Repository</name>
+			<url>
+				scpexe://people.apache.org/www/people.apache.org/repo/m2-ibiblio-rsync-repository
+			</url>
+		</repository>
+		<snapshotRepository>
+			<id>apache-snapshots</id>
+			<name>Apache Development Repository</name>
+			<url>
+				scpexe://people.apache.org/www/people.apache.org/repo/m2-snapshot-repository
+			</url>
+		</snapshotRepository>
+		<site>
+			<id>website</id>
+			<url>
+				scpexe://people.apache.org/www/ws.apache.org/wss4j/
+			</url>
+		</site>
+	</distributionManagement>
 </project>

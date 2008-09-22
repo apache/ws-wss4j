@@ -204,7 +204,7 @@ xalan-2.7.0.jar
    
     See: http://xml.apache.org/xalan-j/
    
-xmlsec-1.4.0.jar
+xmlsec-1.4.1.jar
     This library implements the XML-Signature Syntax and Processing and
     the XML Encryption Syntax and Processing specifications of the W3C. Thus
     they form one of the base foundations of WSS4J.  
