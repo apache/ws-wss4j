@@ -47,8 +47,6 @@ public class WSSecSignatureSAML extends WSSecSignature {
     private static Log log = LogFactory.getLog(WSSecSignatureSAML.class
             .getName());
 
-    private static Log tlog = LogFactory.getLog("org.apache.ws.security.TIME");
-
     private boolean senderVouches = false;
 
     private SecurityTokenReference secRefSaml = null;
@@ -99,8 +97,6 @@ public class WSSecSignatureSAML extends WSSecSignature {
     public Document build(Document doc, Crypto uCrypto,
             SAMLAssertion assertion, Crypto iCrypto, String iKeyName,
             String iKeyPW, WSSecHeader secHeader) throws WSSecurityException {
-
-        Element securityHeader = secHeader.getSecurityHeader();
 
         prepare(doc, uCrypto, assertion, iCrypto, iKeyName, iKeyPW, secHeader);
 

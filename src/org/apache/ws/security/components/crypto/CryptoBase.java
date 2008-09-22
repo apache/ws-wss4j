@@ -257,7 +257,6 @@ public abstract class CryptoBase implements Crypto {
 
     public String getAliasForX509Cert(byte[] skiBytes) throws WSSecurityException {
         Certificate cert = null;
-        boolean found = false;
 
         try {
             for (Enumeration e = keystore.aliases(); e.hasMoreElements();) {

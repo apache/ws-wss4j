@@ -50,7 +50,6 @@ import java.security.cert.X509Certificate;
 public class SecurityTokenReference {
     private static Log log =
             LogFactory.getLog(SecurityTokenReference.class.getName());
-    private static Log tlog = LogFactory.getLog("org.apache.ws.security.TIME");
     public static final String SECURITY_TOKEN_REFERENCE = "SecurityTokenReference";
     public static final String KEY_NAME = "KeyName";
     public static final String SKI_URI = WSConstants.X509TOKEN_NS + "#X509SubjectKeyIdentifier";

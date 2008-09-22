@@ -443,7 +443,6 @@ public class EncryptedKeyProcessor implements Processor {
                 wsDataRef.setWsuId(sigId);
             }
             
-            Node encryptedHeader = decryptedHeader.getParentNode();
             parent.getParentNode().appendChild(decryptedHeaderClone);
             parent.getParentNode().removeChild(parent);
         

@@ -28,8 +28,6 @@ import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.handler.WSHandlerResult;
-import org.apache.ws.security.message.token.BinarySecurity;
-import org.apache.ws.security.message.token.X509Security;
 import org.apache.xml.security.algorithms.JCEMapper;
 import org.apache.xml.security.signature.XMLSignature;
 import org.w3c.dom.Attr;
@@ -61,12 +59,6 @@ import java.util.Vector;
 public class WSSecurityUtil {
     private static Log log = LogFactory.getLog(WSSecurityUtil.class);
 
-    private static boolean doDebug = false;
-
-    static {
-        doDebug = log.isDebugEnabled();
-    }
-    
     /**
      * A cached pseuo-random number generator
      * NB. On some JVMs, caching this random number

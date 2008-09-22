@@ -191,7 +191,6 @@ public class ReferenceListProcessor implements Processor {
 			            dataRef.setWsuId(sigId);
 			        }
 			        
-				Node encryptedHeader = decryptedHeader.getParentNode();
 				parentEncBody.getParentNode().appendChild(decryptedHeaderClone);
 				parentEncBody.getParentNode().removeChild(parentEncBody);
 				

@@ -28,11 +28,9 @@ import org.apache.ws.security.handler.WSHandler;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.message.WSSecUsernameToken;
 import org.apache.ws.security.message.WSSecSignature;
-import org.apache.ws.security.message.WSSecHeader;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.xml.security.signature.XMLSignature;
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
 /**
  * Sign a request using a secret key derived from UsernameToken data.

@@ -37,8 +37,6 @@ import java.util.Vector;
  * @author Werner Dittmann (Werner.Dittmann@apache.org)
  */
 public class WSSecBase {
-	private static Log log = LogFactory.getLog(WSSecBase.class.getName());
-
 	protected String user = null;
 
 	protected String password = null;

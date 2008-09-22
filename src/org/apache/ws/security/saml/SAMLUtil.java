@@ -29,10 +29,8 @@ import org.w3c.dom.Text;
 
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.xml.namespace.QName;
 
-import java.io.IOException;
 import java.security.cert.X509Certificate;
 import java.util.Iterator;
 

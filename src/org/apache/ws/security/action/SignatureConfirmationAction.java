@@ -63,7 +63,6 @@ public class SignatureConfirmationAction implements Action {
         Vector signatureParts = reqData.getSignatureParts();
         // prepare a SignatureConfirmation token
         WSSecSignatureConfirmation wsc = new WSSecSignatureConfirmation();
-        int idHash = wsc.hashCode();
         if (signatureActions.size() > 0) {
             if (log.isDebugEnabled()) {
                 log.debug("Signature Confirmation: number of Signature results: "

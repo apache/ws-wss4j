@@ -39,8 +39,6 @@ import org.w3c.dom.Node;
  * @author Werner Dittmann (Werner.Dittmann@apache.org)
  */
 public class WSSecHeader {
-    private static Log log = LogFactory.getLog(WSSecHeader.class.getName());
-
     protected String actor = null;
 
     protected boolean mustunderstand = true;

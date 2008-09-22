@@ -16,8 +16,6 @@
  */
 package org.apache.ws.security.components.crypto;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.util.Loader;
 
 import java.io.FileInputStream;
@@ -36,7 +34,6 @@ import java.util.Properties;
  * To change this template use File | Settings | File Templates.
  */
 public abstract class AbstractCrypto extends CryptoBase {
-    private static Log log = LogFactory.getLog(AbstractCrypto.class);
     protected static CertificateFactory certFact;
     protected Properties properties = null;
     

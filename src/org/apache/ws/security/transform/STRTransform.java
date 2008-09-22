@@ -60,8 +60,6 @@ public class STRTransform extends TransformSpi {
 
     private static boolean doDebug = false;
 
-    private static String FAKE_NS = "urn:X";
-
     private static String XMLNS = "xmlns=";
 
     private WSDocInfo wsDocInfo = null;

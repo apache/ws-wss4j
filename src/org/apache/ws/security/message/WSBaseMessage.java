@@ -17,8 +17,6 @@
 
 package org.apache.ws.security.message;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.SOAPConstants;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSConfig;
@@ -37,8 +35,6 @@ import java.util.Vector;
  * @author Werner Dittmann (Werner.Dittmann@t-online.de)
  */
 public class WSBaseMessage {
-    private static Log log = LogFactory.getLog(WSBaseMessage.class.getName());
-
     protected String actor = null;
 
     protected boolean mustunderstand = true;

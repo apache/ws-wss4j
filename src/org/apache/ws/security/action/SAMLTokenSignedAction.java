@@ -17,8 +17,6 @@
 
 package org.apache.ws.security.action;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.handler.RequestData;
@@ -31,7 +29,6 @@ import org.opensaml.SAMLAssertion;
 import org.w3c.dom.Document;
 
 public class SAMLTokenSignedAction implements Action {
-    private static Log log = LogFactory.getLog(SAMLTokenSignedAction.class.getName());
 
     public void execute(WSHandler handler, int actionToDo, Document doc, RequestData reqData)
             throws WSSecurityException {

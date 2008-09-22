@@ -17,7 +17,6 @@
 
 package org.apache.ws.security.action;
 
-import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.handler.RequestData;

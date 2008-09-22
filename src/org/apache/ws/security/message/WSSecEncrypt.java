@@ -56,8 +56,6 @@ import java.util.Vector;
 public class WSSecEncrypt extends WSSecEncryptedKey {
     private static Log log = LogFactory.getLog(WSSecEncrypt.class.getName());
 
-    private static Log tlog = LogFactory.getLog("org.apache.ws.security.TIME");
-
     protected String symEncAlgo = WSConstants.AES_128;
 
     protected String encCanonAlgo = null;

@@ -42,12 +42,6 @@ public class XmlSchemaDateFormat extends DateFormat {
 	 */
 	private static Log log = LogFactory.getLog(XmlSchemaDateFormat.class);
 
-	private static boolean doDebug = false;
-
-	static {
-		doDebug = log.isDebugEnabled();
-	}
-
 	/**
 	 * Message retriever.
 	 */
