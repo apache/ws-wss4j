@@ -142,7 +142,7 @@ public class WSSecurityEngine {
     }
     
     /**
-     * @param       the WSSConfig instance for this WSSecurityEngine to use
+     * @param cfg   the WSSConfig instance for this WSSecurityEngine to use
      *
      * @return      the WSSConfig instance previously set on this 
      *              WSSecurityEngine instance

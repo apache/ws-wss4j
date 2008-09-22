@@ -796,7 +796,7 @@ public class WSSecurityUtil {
      * Returns the length of the key in # of bytes
      * 
      * @param algorithm
-     * @return
+     * @return the key length
      */
     public static int getKeyLength(String algorithm) throws WSSecurityException {
         if (algorithm.equals(WSConstants.TRIPLE_DES)) {
@@ -827,7 +827,7 @@ public class WSSecurityUtil {
     /**
      * Generate a nonce of the given length
      * 
-     * @return
+     * @return a nonce of the given length
      * @throws Exception
      */
     public static byte[] generateNonce(int length) throws WSSecurityException {

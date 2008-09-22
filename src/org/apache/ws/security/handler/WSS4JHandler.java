@@ -309,7 +309,7 @@ public class WSS4JHandler extends WSHandler implements Handler {
      *
      * @param mc
      * @param reqData
-     * @return
+     * @return true on successful processing
      * @throws WSSecurityException
      */
     public boolean doReceiver(MessageContext mc, RequestData reqData, boolean isRequest) throws WSSecurityException {

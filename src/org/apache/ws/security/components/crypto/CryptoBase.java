@@ -60,8 +60,6 @@ public abstract class CryptoBase implements Crypto {
     
     /**
      * Constructor
-     *
-     * @param properties
      */
     protected CryptoBase() {
     }

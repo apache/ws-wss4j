@@ -93,7 +93,7 @@ public class WSAddTimestamp extends WSBaseMessage {
      * @throws Exception
      * @deprecated replaced by
      *             {@link WSSecTimestamp#build(Document, WSSecHeader)} and
-     *             {@link WSSecTimestamp#setTimeToLive()}
+     *             {@link WSSecTimestamp#setTimeToLive(int)}
      */
     public Document build(Document doc, int ttl) {
         log.debug("Begin add timestamp...");

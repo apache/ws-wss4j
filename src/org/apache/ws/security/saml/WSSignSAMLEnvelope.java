@@ -48,7 +48,7 @@ public class WSSignSAMLEnvelope extends WSSignEnvelope {
     /**
      * Constructor.
      * 
-     * @deprecated replaced by {@link WSSecSignatureSAML#constructor()}
+     * @deprecated replaced by {@link WSSecSignatureSAML#WSSecSignatureSAML()}
      */
     public WSSignSAMLEnvelope() {
     }
@@ -61,7 +61,7 @@ public class WSSignSAMLEnvelope extends WSSignEnvelope {
      * @param mu
      *            Set <code>mustUnderstand</code> to true or false
      * 
-     * @deprecated replaced by {@link WSSecSignatureSAML#constructor()} and
+     * @deprecated replaced by {@link WSSecSignatureSAML#WSSecSignatureSAML()} and
      *             {@link WSSecHeader} for actor and mustunderstand
      *             specification.
      */

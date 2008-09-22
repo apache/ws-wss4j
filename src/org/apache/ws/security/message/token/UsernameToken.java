@@ -175,7 +175,7 @@ public class UsernameToken {
      *            the required password encoding, either
      *            {@link WSConstants#PASSWORD_DIGEST} or
      *            {@link WSConstants#PASSWORD_TEXT} or 
-     *            {@link WSConstants#PASSWORD_NONE} <code>null</code> if no
+     *            {@link WSConstants#PW_NONE} <code>null</code> if no
      *            password required
      */
     public UsernameToken(boolean milliseconds, Document doc, String pwType) {

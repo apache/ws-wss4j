@@ -122,9 +122,6 @@ public class SecurityContextToken {
 
     /**
      * Set the identifier.
-     *
-     * @param name sets a text node containing the identifier into
-     *             the identifier element.
      */
     public void setIdentifier(Document doc, String uuid) {
         Text node = getFirstNode(this.elementIdentifier);

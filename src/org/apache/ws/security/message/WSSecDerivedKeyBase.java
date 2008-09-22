@@ -88,7 +88,7 @@ public abstract class WSSecDerivedKeyBase extends WSSecBase {
     /**
      * The derived key will change depending on the sig/encr algorithm.
      * Therefore the child classes are expected to provide this value.
-     * @return
+     * @return the derived key length
      * @throws WSSecurityException
      */
     protected abstract int getDerivedKeyLength() throws WSSecurityException;

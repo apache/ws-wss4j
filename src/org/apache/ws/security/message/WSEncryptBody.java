@@ -715,8 +715,7 @@ public class WSEncryptBody extends WSBaseMessage {
      * Sets the parent node of the EncryptedKeyElement
      *
      * @param element
-     * @deprecated replaced by
-     *             {@link WSSecEncrypt#setParentNode(Element)}
+     * @deprecated
      */
     public void setParentNode(Element element) {
         parentNode = element;
@@ -747,7 +746,7 @@ public class WSEncryptBody extends WSBaseMessage {
      *
      * @return The symmetric key
      * @deprecated replaced by
-     *             {@link WSSecEncrypt#getEncryptionKey()}
+     *             {@link WSSecEncrypt#getEncryptedEphemeralKey()}
      */
     public SecretKey getEncryptionKey() {
         return this.encryptionKey;

@@ -15,15 +15,17 @@
                         <a href="#Where_can_I_download_WSS4J">Where can I download WSS4J?</a>
                     </li>
                     <li>
-                        <a href="#WS-Security%20Features">WS-Security Features</a>
+                        <a href="#WS-Security_Features">WS-Security Features</a>
                     </li>
                     <li>
-                        <a href="#WSS4J_Use_Cases">WSS4J Use Cases</a>
+                        WSS4J Use Cases
                     </li>
                     <ul>
-                        <li>WSS4J API</li>
-                        <li>WSS4J on Axis</li>
-                        <li>Rampart: WS-Security Implementation module for Axis2</li>
+                        <li><a href="#WSS4J_API">WSS4J API</a></li>
+                        <li><a href="#WSS4J_on_Axis">WSS4J on Axis</a></li>
+                        <li><a href="#Rampart:_WS-Security_Implementation_module_for_Axis2">
+                        Rampart: WS-Security Implementation module for Axis2</a></li>
+                        <li><a href="#WSS4J_Configuration">WSS4J Configuration</a></li>
                     </ul>
                 </ul>
                 <br/>
@@ -89,10 +91,10 @@ Tokens</li>
                         </ul>
                     </ul>
                 </ul>
-                <div style="margin-left: 40px;">WSS4J supports X.509 binary
+                <p style="margin-left: 40px;">WSS4J supports X.509 binary
 certificates and certificate paths.<br/>
                     <br/>
-                </div>
+                </p>
                 <p style="margin-left: 40px;"/>
             </subsection>
             <subsection name="WSS4J API">

@@ -191,7 +191,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
     
     /**
      * Returns if Key Identifiers should be used in KeyInfo
-     * @return
+     * @return if Key Identifiers should be used in KeyInfo
      */
     public boolean getUseKeyIdentifier() {
         return useKeyIdentifier;
@@ -690,8 +690,8 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
      * 
      * @param doc
      *            the SOAP envelope parent document
-     * @param keyTransportAlgo
-     *            specifies which algorithm to use to encrypt the symmetric key
+     * @param referenceList
+     * @param encDataRefs
      * @return an <code>xenc:EncryptedKey</code> element
      */
 

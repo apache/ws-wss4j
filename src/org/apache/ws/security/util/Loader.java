@@ -81,10 +81,9 @@ public class Loader {
      * Try to get the resource with the specified class loader
      * <p/>
      *
-     * @param cl
-     * @param clazz
-     * @return Class
-     * @throws ClassNotFoundException
+     * @param loader
+     * @param resource
+     * @return the resource url
      */
     static public URL getResource(ClassLoader loader, String resource) {
         URL url = null;
@@ -106,7 +105,7 @@ public class Loader {
      * Get the Thread context class loader.
      * <p/>
      *
-     * @return
+     * @return the Thread context class loader
      * @throws IllegalAccessException
      * @throws InvocationTargetException
      */
@@ -118,7 +117,7 @@ public class Loader {
      * Try the specified classloader and then fall back to the loadClass
      * <p/>
      *
-     * @param cl
+     * @param loader
      * @param clazz
      * @return Class
      * @throws ClassNotFoundException

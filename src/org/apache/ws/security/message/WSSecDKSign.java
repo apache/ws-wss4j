@@ -386,7 +386,7 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
      * This allows to insert the Signature element at any position in the
      * Security header.
      * 
-     * @param securityHeader
+     * @param secHeader
      *            The secHeader that holds the Signature element.
      */
     public void prependSigToHeader(WSSecHeader secHeader) {
@@ -402,7 +402,7 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
     /**
      * Returns the signature Element.
      * The method can be called any time after <code>prepare()</code>.
-     * @return
+     * @return the signature element
      */
     public Element getSignatureElement() {
         return this.sig.getElement();

@@ -153,7 +153,7 @@ public class DerivedKeyToken {
     /**
      * Returns the SecurityTokenReference of the derived key token
      *
-     * @return
+     * @return the Security Token Reference of the derived key token
      * @throws WSSecurityException
      */
     public SecurityTokenReference getSecuityTokenReference() throws
@@ -458,8 +458,8 @@ public class DerivedKeyToken {
     /**
      * Set the derivation algorithm of this derived key token.
      *
-     * @param derivattion algorithm the value for the <code>wsu:Algorithm</code> attribute of this
-     *                    DerivgedKeyToken
+     * @param algo the value for the <code>wsu:Algorithm</code> attribute of this
+     *                    DerivedKeyToken
      */
     public void setAlgorithm(String algo) {
         String prefix = WSSecurityUtil.setNamespace(this.element,

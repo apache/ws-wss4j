@@ -80,15 +80,19 @@ public class WSSecSignatureSAML extends WSSecSignature {
      * 
      * @param doc
      *            The unsigned SOAP envelope as <code>Document</code>
+     * @param uCrypto
+     *            The user's Crypto instance
      * @param assertion
      *            the complete SAML assertion
-     * @param issuerCrypto
+     * @param iCrypto
      *            An instance of the Crypto API to handle keystore SAML token
      *            issuer and to generate certificates
-     * @param issuerKeyName
+     * @param iKeyName
      *            Private key to use in case of "sender-Vouches"
-     * @param issuerKeyPW
+     * @param iKeyPW
      *            Password for issuer private key
+     * @param secHeader
+     *            The Security header
      * @return A signed SOAP envelope as <code>Document</code>
      * @throws org.apache.ws.security.WSSecurityException
      */
@@ -150,12 +154,19 @@ public class WSSecSignatureSAML extends WSSecSignature {
      * 
      * @param doc
      *            The SOAP envelope as <code>Document</code>
-     * @param cr
-     *            An instance of the Crypto API to handle keystore and
-     *            certificates
+     * @param uCrypto
+     *            The user's Crypto instance
+     * @param assertion
+     *            the complete SAML assertion
+     * @param iCrypto
+     *            An instance of the Crypto API to handle keystore SAML token
+     *            issuer and to generate certificates
+     * @param iKeyName
+     *            Private key to use in case of "sender-Vouches"
+     * @param iKeyPW
+     *            Password for issuer private key
      * @param secHeader
-     *            The security header that will hold the Signature. This ise use
-     *            to construct namespace prefixes for Signature. This method
+     *            The Security header
      * @throws WSSecurityException
      */
     public void prepare(Document doc, Crypto uCrypto, SAMLAssertion assertion,

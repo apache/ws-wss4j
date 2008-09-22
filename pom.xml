@@ -48,6 +48,9 @@
 			<archive>
 				http://mail-archives.apache.org/mod_mbox/ws-wss4j-dev/
 			</archive>
+			<otherArchives>
+			    <otherArchive>http://www.nabble.com/WSS4J-f2398.html</otherArchive>
+			</otherArchives>
 		</mailingList>
 	</mailingLists>
 	<inceptionYear>2004</inceptionYear>

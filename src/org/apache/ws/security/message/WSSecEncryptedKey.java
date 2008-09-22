@@ -303,7 +303,7 @@ public class WSSecEncryptedKey extends WSSecBase {
     /**
      * Create an ephemeral key
      * 
-     * @return
+     * @return an ephemeral key
      * @throws WSSecurityException
      */
     protected byte[] generateEphemeralKey() throws WSSecurityException {

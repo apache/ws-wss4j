@@ -120,7 +120,7 @@ public class WSSAddUsernameToken extends WSBaseMessage {
 
     /**
      * Get a secret key derived from values in UsernameToken.
-     * @return
+     * @return a secret key
      * @deprecated replaced by {@link WSSecUsernameToken#getSecretKey()}
      */
     public byte[] getSecretKey() {

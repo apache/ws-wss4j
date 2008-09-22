@@ -605,7 +605,7 @@ public class WSSecSignature extends WSSecBase {
 	 * This allows to insert the Signature element at any position in the
 	 * Security header.
 	 * 
-	 * @param securityHeader
+	 * @param secHeader
 	 *            The secHeader that holds the Signature element.
 	 */
 	public void prependToHeader(WSSecHeader secHeader) {
@@ -621,7 +621,7 @@ public class WSSecSignature extends WSSecBase {
      * This allows to insert the Signature element at any position in the
      * Security header.
      * 
-     * @param securityHeader
+     * @param secHeader
      *            The secHeader that holds the Signature element.
      */
     public void appendToHeader(WSSecHeader secHeader) {
@@ -660,7 +660,7 @@ public class WSSecSignature extends WSSecBase {
     /**
      * Returns the BST Token element.
      * The method can be called any time after <code>prepare()</code>.
-     * @return
+     * @return the BST Token element
      */
     public Element getBinarySecurityTokenElement() {
         if(this.bstToken != null) {

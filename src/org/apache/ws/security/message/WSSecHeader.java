@@ -68,7 +68,7 @@ public class WSSecHeader {
     /**
      * Constructor.
      * 
-     * @param actor
+     * @param act
      *            The actor name of the <code>wsse:Security</code> header
      * @param mu
      *            Set <code>mustUnderstand</code> to true or false

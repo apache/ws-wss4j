@@ -203,7 +203,7 @@ public class WSSecDKEncrypt extends WSSecDerivedKeyBase {
      * <code>encryptForExternalRef() </code> method. The method adds the
      * reference element in the SecurityHeader.
      * 
-     * @param dataRef
+     * @param referenceList
      *            The external <code>enc:Reference</code> element
      * @param secHeader
      *            The security header.

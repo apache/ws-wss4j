@@ -250,7 +250,7 @@ public class WSSecUsernameToken extends WSSecBase {
      * This allows to insert the UsernameToken element at any position in the
      * Security header.
      * 
-     * @return
+     * @return the Username Token element
      */
     public Element getUsernameTokenElement() {
        return this.ut.getElement(); 

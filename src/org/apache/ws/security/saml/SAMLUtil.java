@@ -47,7 +47,7 @@ public class SAMLUtil {
     /**
      * Extract certificates or the key available in the SAMLAssertion
      * @param elem
-     * @return
+     * @return the SAML Key Info
      * @throws WSSecurityException
      */
     public static SAMLKeyInfo getSAMLKeyInfo(Element elem, Crypto crypto,

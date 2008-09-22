@@ -311,7 +311,7 @@ public class WSHandlerConstants {
     public static final String ENCRYPTION_USER = "encryptionUser";
 
     /**
-     * Specifying this name as {@link ENCRYPTION_USER}
+     * Specifying this name as {@link #ENCRYPTION_USER}
      * triggers a special action to get the public key to use for encryption.
      * <p/>
      * The handler uses the public key of the sender's certificate. Using this
