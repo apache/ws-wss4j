@@ -138,6 +138,54 @@ public class TestWSSecurityNewST2 extends TestCase implements CallbackHandler {
      */
     public void testSAMLSignedSenderVouches() throws Exception {
         SOAPEnvelope unsignedEnvelope = message.getSOAPEnvelope();
+        SAMLIssuer saml = SAMLIssuerFactory.getInstance("saml.properties");
+
+        SAMLAssertion assertion = saml.newAssertion();
+
+        String issuerKeyName = saml.getIssuerKeyName();
+        String issuerKeyPW = saml.getIssuerKeyPassword();
+        Crypto issuerCrypto = saml.getIssuerCrypto();
+        WSSecSignatureSAML wsSign = new WSSecSignatureSAML();
+        wsSign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
+        
+        log.info("Before SAMLSignedSenderVouches....");
+        
+        Document doc = unsignedEnvelope.getAsDocument();
+
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        
+        Document signedDoc = wsSign.build(doc, null, assertion, issuerCrypto, issuerKeyName, issuerKeyPW, secHeader);
+        log.info("After SAMLSignedSenderVouches....");
+
+        /*
+         * convert the resulting document into a message first. The toAxisMessage()
+         * method performs the necessary c14n call to properly set up the signed
+         * document and convert it into a SOAP message. Check that the contents can't
+         * be read (checking if we can find a specific substring). After that we extract it
+         * as a document again for further processing.
+         */
+
+        Message signedMsg = SOAPUtil.toAxisMessage(signedDoc);
+        if (log.isDebugEnabled()) {
+            log.debug("Signed SAML message (sender vouches):");
+            XMLUtils.PrettyElementToWriter(signedMsg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
+        }
+        // String encryptedString = signedMsg.getSOAPPartAsString();
+        signedDoc = signedMsg.getSOAPEnvelope().getAsDocument();
+        verify(signedDoc);
+
+    }
+    
+    
+    /**
+     * Test the default issuer class as specified in SAMLIssuerFactory. The configuration
+     * file "saml3.properties" has no "org.apache.ws.security.saml.issuerClass" property,
+     * and so the default value is used (A bad value was previously used for the default
+     * value).
+     */
+    public void testDefaultIssuerClass() throws Exception {
+        SOAPEnvelope unsignedEnvelope = message.getSOAPEnvelope();
         SAMLIssuer saml = SAMLIssuerFactory.getInstance("saml3.properties");
 
         SAMLAssertion assertion = saml.newAssertion();
@@ -162,7 +210,7 @@ public class TestWSSecurityNewST2 extends TestCase implements CallbackHandler {
          * convert the resulting document into a message first. The toAxisMessage()
          * method performs the necessary c14n call to properly set up the signed
          * document and convert it into a SOAP message. Check that the contents can't
-          * be read (cheching if we can find a specific substring). After that we extract it
+         * be read (checking if we can find a specific substring). After that we extract it
          * as a document again for further processing.
          */
 
@@ -174,7 +222,6 @@ public class TestWSSecurityNewST2 extends TestCase implements CallbackHandler {
         // String encryptedString = signedMsg.getSOAPPartAsString();
         signedDoc = signedMsg.getSOAPEnvelope().getAsDocument();
         verify(signedDoc);
-
     }
 
     

@@ -35,7 +35,7 @@ import java.util.Properties;
 public abstract class SAMLIssuerFactory {
     private static Log log = LogFactory.getLog(SAMLIssuerFactory.class);
     private static final String defaultSAMLClassName =
-            "org.apache.ws.security.saml.WSSSAMLIssuerImpl";
+            "org.apache.ws.security.saml.SAMLIssuerImpl";
 
     /**
      * getInstance
