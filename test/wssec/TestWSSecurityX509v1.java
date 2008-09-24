@@ -177,7 +177,7 @@ public class TestWSSecurityX509v1 extends TestCase implements CallbackHandler {
     /**
      * Test for a X509 V1 certificate used for encryption/decryption.
      * This time a KeyIdentifier is used. This test should fail as the
-     * X.509 1.1 specification states that a KeyIdentifer should only
+     * X.509 1.1 specification states that a KeyIdentifier should only
      * reference a V3 certificate.
      */
     public void testX509v1KeyIdentifier() throws Exception {

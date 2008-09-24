@@ -430,7 +430,7 @@ org.apache.ws.axis.security.util
         </java>
     </target>
 
-    <target name="allTests" depends="sandboxTests, interopTests">
+    <target name="allTests" depends="interopTests">
     </target>
 
     <target name="interopTests" depends="init">

@@ -396,7 +396,7 @@ public class WSEncryptBody extends WSBaseMessage {
          *    data that was encrypted with this encrypted session key :-)
          */
         Element wsseSecurity = insertSecurityHeader(doc);
-        Element xencEncryptedKey = createEnrcyptedKey(doc, keyEncAlgo);
+        Element xencEncryptedKey = createEncryptedKey(doc, keyEncAlgo);
         if (parentNode == null) {
             WSSecurityUtil.prependChildElement(doc,
                     wsseSecurity,
@@ -563,7 +563,7 @@ public class WSEncryptBody extends WSBaseMessage {
 
         /*
          * Second step: generate a symmetric key from the specified
-         * key (password) for this alogrithm, and set the cipher into
+         * key (password) for this algorithm, and set the cipher into
          * encryption mode.
          */
         this.encryptionKey = this.symmetricKey;
@@ -657,13 +657,12 @@ public class WSEncryptBody extends WSBaseMessage {
 	 * Create DOM subtree for <code>xenc:EncryptedKey</code>
 	 * 
 	 * @param doc
-	 *            the SOAP enevelope parent document
+	 *            the SOAP envelope parent document
 	 * @param keyTransportAlgo
-	 *            specifies which alogrithm to use to encrypt the symmetric key
+	 *            specifies which algorithm to use to encrypt the symmetric key
 	 * @return an <code>xenc:EncryptedKey</code> element
 	 */
-    public static Element createEnrcyptedKey(Document doc,
-                                             String keyTransportAlgo) {
+    public static Element createEncryptedKey(Document doc, String keyTransportAlgo) {
         Element encryptedKey =
                 doc.createElementNS(WSConstants.ENC_NS,
                         WSConstants.ENC_PREFIX + ":EncryptedKey");
@@ -677,6 +676,20 @@ public class WSEncryptBody extends WSBaseMessage {
         encryptionMethod.setAttributeNS(null, "Algorithm", keyTransportAlgo);
         WSSecurityUtil.appendChildElement(doc, encryptedKey, encryptionMethod);
         return encryptedKey;
+    }
+    
+    /**
+     * Create DOM subtree for <code>xenc:EncryptedKey</code>
+     * 
+     * @param doc
+     *            the SOAP envelope parent document
+     * @param keyTransportAlgo
+     *            specifies which algorithm to use to encrypt the symmetric key
+     * @return an <code>xenc:EncryptedKey</code> element
+     * @deprecated use createEncryptedKey(Document doc, String keyTransportAlgo) instead
+     */
+    public static Element createEnrcyptedKey(Document doc, String keyTransportAlgo) {
+        return createEncryptedKey(doc, keyTransportAlgo);
     }
 
     public static Element createCipherValue(Document doc,

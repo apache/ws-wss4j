@@ -60,7 +60,7 @@ public class WSSecurityUtil {
     private static Log log = LogFactory.getLog(WSSecurityUtil.class);
 
     /**
-     * A cached pseuo-random number generator
+     * A cached pseudo-random number generator
      * NB. On some JVMs, caching this random number
      * generator is required to overcome punitive
      * overhead.
@@ -253,7 +253,7 @@ public class WSSecurityUtil {
         Element foundElement = null;
 
         /*
-         * Replace the formely recursive implementation with a depth-first-loop
+         * Replace the formerly recursive implementation with a depth-first-loop
          * lookup
          */
         if (startNode == null) {
@@ -434,7 +434,7 @@ public class WSSecurityUtil {
         if (id == null) {
             return null;
         }
-        id = getIDfromReference(id);
+        id = getIDFromReference(id);
         return WSSecurityUtil.findElementById(doc.getDocumentElement(), id,
                 WSConstants.WSU_NS);
     }
@@ -446,12 +446,24 @@ public class WSSecurityUtil {
      * @return ref trimmed and with the leading "#" removed, or null if not
      *         correctly formed
      */
-    public static String getIDfromReference(String ref) {
+    public static String getIDFromReference(String ref) {
         String id = ref.trim();
         if ((id.length() == 0) || (id.charAt(0) != '#')) {
             return null;
         }
         return id.substring(1);
+    }
+    
+    /**
+     * Turn a reference (eg "#5") into an ID (eg "5").
+     * 
+     * @param ref
+     * @return ref trimmed and with the leading "#" removed, or null if not
+     *         correctly formed
+     * @deprecated use getIDFromReference instead
+     */
+    public static String getIDfromReference(String ref) {
+        return getIDFromReference(ref);
     }
 
     /**
@@ -507,7 +519,7 @@ public class WSSecurityUtil {
      * @param namespaceUri
      *            of the element
      * @param localName
-     *            of the eleme
+     *            of the element
      * @return the found element or null if the element does not exist
      */
     private static Element findChildElement(Element parent,
@@ -598,7 +610,7 @@ public class WSSecurityUtil {
      * @param envelope
      *            the SOAP envelope
      * @param actor
-     *            the acttoer (role) name of the WSS header
+     *            the actor (role) name of the WSS header
      * @param doCreate
      *            if true create a new WSS header block if none exists
      * @return the WSS header or null if none found and doCreate is false
@@ -705,7 +717,11 @@ public class WSSecurityUtil {
         for (int i = 0; i < wsResultVector.size(); i++) {
             // Check the result of every action whether it matches the given
             // action
-            if (((WSSecurityEngineResult) wsResultVector.get(i)).getAction() == action) {
+            WSSecurityEngineResult result = 
+                (WSSecurityEngineResult) wsResultVector.get(i);
+            int resultAction = 
+                ((java.lang.Integer)result.get(WSSecurityEngineResult.TAG_ACTION)).intValue();
+            if (resultAction == action) {
                 wsResult = (WSSecurityEngineResult) wsResultVector.get(i);
             }
         }
@@ -732,7 +748,11 @@ public class WSSecurityUtil {
         for (int i = 0; i < wsResultVector.size(); i++) {
             // Check the result of every action whether it matches the given
             // action
-            if (((WSSecurityEngineResult) wsResultVector.get(i)).getAction() == action) {
+            WSSecurityEngineResult result = 
+                (WSSecurityEngineResult) wsResultVector.get(i);
+            int resultAction = 
+                ((java.lang.Integer)result.get(WSSecurityEngineResult.TAG_ACTION)).intValue();
+            if (resultAction == action) {
                 results.add(wsResultVector.get(i));
             }
         }
@@ -891,19 +911,22 @@ public class WSSecurityUtil {
             Iterator actions = result.getResults().iterator();
 
             while (actions.hasNext()) {
-                WSSecurityEngineResult resultItem = (WSSecurityEngineResult) actions
-                        .next();
-                if (resultItem.getAction() == WSConstants.SIGN) {
+                WSSecurityEngineResult resultItem = 
+                    (WSSecurityEngineResult) actions.next();
+                int resultAction = 
+                    ((java.lang.Integer)resultItem.get(WSSecurityEngineResult.TAG_ACTION)).intValue();
+                
+                if (resultAction == WSConstants.SIGN) {
                     try {
                         checkSignsAllElements(resultItem, requiredIDs);
-                        return resultItem.getCertificate();
+                        return 
+                            (X509Certificate)resultItem.get(
+                                WSSecurityEngineResult.TAG_X509_CERTIFICATE
+                            );
                     } catch (WSSecurityException ex) {
                         // Store the exception but keep going... there may be a
                         // better signature later
-                        log
-                                .debug(
-                                        "SIGN result does not sign all required elements",
-                                        ex);
+                        log.debug("SIGN result does not sign all required elements", ex);
                         fault = ex;
                     }
                 }
@@ -913,8 +936,7 @@ public class WSSecurityUtil {
         if (fault != null)
             throw fault;
 
-        throw new WSSecurityException(WSSecurityException.FAILED_CHECK,
-                "noSignResult");
+        throw new WSSecurityException(WSSecurityException.FAILED_CHECK, "noSignResult");
     }
 
     /**
@@ -931,13 +953,17 @@ public class WSSecurityUtil {
     private static void checkSignsAllElements(
             WSSecurityEngineResult resultItem, String[] requiredIDs)
             throws WSSecurityException {
-        if (resultItem.getAction() != WSConstants.SIGN)
+        int resultAction = 
+            ((java.lang.Integer)resultItem.get(WSSecurityEngineResult.TAG_ACTION)).intValue();
+        if (resultAction != WSConstants.SIGN) {
             throw new IllegalArgumentException("Not a SIGN result");
+        }
 
-        Set sigElems = resultItem.getSignedElements();
-        if (sigElems == null)
+        Set sigElems = (Set)resultItem.get(WSSecurityEngineResult.TAG_SIGNED_ELEMENT_IDS);
+        if (sigElems == null) {
             throw new RuntimeException(
                     "Missing signedElements set in WSSecurityEngineResult!");
+        }
 
         log.debug("Found SIGN result...");
         for (Iterator i = sigElems.iterator(); i.hasNext();) {

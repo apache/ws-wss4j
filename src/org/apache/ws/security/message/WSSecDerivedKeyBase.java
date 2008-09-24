@@ -219,9 +219,9 @@ public abstract class WSSecDerivedKeyBase extends WSSecBase {
                 ref.setValueType(this.customValueType);
             }
             strEncKey.setReference(ref);
-            dkt.setSecuityTokenReference(strEncKey); 
+            dkt.setSecurityTokenReference(strEncKey); 
         } else {
-            dkt.setSecuityTokenReference(this.strElem);
+            dkt.setSecurityTokenReference(this.strElem);
         }
     }
 

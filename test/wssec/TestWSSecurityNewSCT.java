@@ -327,7 +327,7 @@ public class TestWSSecurityNewSCT extends TestCase implements CallbackHandler {
         for (int i = 0; i < callbacks.length; i++) {
             if (callbacks[i] instanceof WSPasswordCallback) {
                 WSPasswordCallback pc = (WSPasswordCallback) callbacks[i];
-                byte[] secret = (byte[]) this.secrets.get(pc.getIdentifer());
+                byte[] secret = (byte[]) this.secrets.get(pc.getIdentifier());
                 pc.setKey(secret);
             } else {
                 throw new UnsupportedCallbackException(callbacks[i],

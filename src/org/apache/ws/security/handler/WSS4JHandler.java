@@ -122,7 +122,7 @@ public class WSS4JHandler extends WSHandler implements Handler {
     }
 
     /**
-     * Switch for transfering control to doReceiver and doSender
+     * Switch for transferring control to doReceiver and doSender
      */
     public boolean processMessage(MessageContext mc, boolean isRequestMessage) throws WSSecurityException {
 
@@ -209,7 +209,7 @@ public class WSS4JHandler extends WSHandler implements Handler {
         /*
         * Now we perform some set-up for UsernameToken and Signature
         * functions. No need to do it for encryption only. Check if username
-        * is available and then get a passowrd.
+        * is available and then get a password.
         */
         if ((doAction & (WSConstants.SIGN | WSConstants.UT | WSConstants.UT_SIGN)) != 0) {
             /*
@@ -233,7 +233,7 @@ public class WSS4JHandler extends WSHandler implements Handler {
         *
         * During the FORM_STRING serialization Axis performs multi-ref of
         * complex data types (if requested), generates and inserts references
-        * for attachements and so on. The resulting Document MUST be the
+        * for attachments and so on. The resulting Document MUST be the
         * complete and final SOAP request as Axis would send it over the wire.
         * Therefore this must shall be the last (or only) handler in a chain.
         *
@@ -457,7 +457,8 @@ public class WSS4JHandler extends WSHandler implements Handler {
         WSSecurityEngineResult actionResult = WSSecurityUtil.fetchActionResult(wsResult, WSConstants.SIGN);
 
         if (actionResult != null) {
-            X509Certificate returnCert = actionResult.getCertificate();
+            X509Certificate returnCert = 
+                (X509Certificate)actionResult.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE);
 
             if (returnCert != null) {
                 if (!verifyTrust(returnCert, reqData)) {
@@ -479,7 +480,8 @@ public class WSS4JHandler extends WSHandler implements Handler {
         actionResult = WSSecurityUtil.fetchActionResult(wsResult, WSConstants.TS);
 
         if (actionResult != null) {
-            Timestamp timestamp = actionResult.getTimestamp();
+            Timestamp timestamp = 
+                (Timestamp)actionResult.get(WSSecurityEngineResult.TAG_TIMESTAMP);
 
             if (timestamp != null && reqData.getWssConfig().isTimeStampStrict()) {
                 if (!verifyTimestamp(timestamp, decodeTimeToLive(reqData))) {

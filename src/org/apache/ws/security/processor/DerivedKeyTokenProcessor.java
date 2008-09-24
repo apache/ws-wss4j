@@ -114,7 +114,7 @@ public class DerivedKeyTokenProcessor implements Processor {
      */
     private void extractSecret(WSDocInfo wsDocInfo, DerivedKeyToken dkt, CallbackHandler cb, Crypto crypto)
             throws WSSecurityException {
-        SecurityTokenReference str = dkt.getSecuityTokenReference();
+        SecurityTokenReference str = dkt.getSecurityTokenReference();
         if (str != null) {
             Processor processor;
             String uri = null;

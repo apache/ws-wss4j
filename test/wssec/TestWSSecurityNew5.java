@@ -446,15 +446,15 @@ public class TestWSSecurityNew5 extends TestCase implements CallbackHandler {
             if (callbacks[i] instanceof WSPasswordCallback) {
                 WSPasswordCallback pc = (WSPasswordCallback) callbacks[i];
                 if (pc.getUsage() == WSPasswordCallback.USERNAME_TOKEN
-                    && "wernerd".equals(pc.getIdentifer())) {
+                    && "wernerd".equals(pc.getIdentifier())) {
                     pc.setPassword("verySecret");
                 } else if (
                     pc.getUsage() == WSPasswordCallback.USERNAME_TOKEN_UNKNOWN
                 ) {
-                    if ("wernerd".equals(pc.getIdentifer())
+                    if ("wernerd".equals(pc.getIdentifier())
                         && "verySecret".equals(pc.getPassword())) {
                         return;
-                    } else if ("customUser".equals(pc.getIdentifer())) {
+                    } else if ("customUser".equals(pc.getIdentifier())) {
                         return;
                     } else {
                         throw new IOException("Authentication failed");

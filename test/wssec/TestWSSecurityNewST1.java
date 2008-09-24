@@ -34,7 +34,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSecurityEngine;
-import org.apache.ws.security.message.WSSAddSAMLToken;
+import org.apache.ws.security.message.WSSecHeader;
+import org.apache.ws.security.message.WSSecSAMLToken;
 import org.w3c.dom.Document;
 
 import org.opensaml.SAMLAssertion;
@@ -138,12 +139,14 @@ public class TestWSSecurityNewST1 extends TestCase implements CallbackHandler {
 
         SAMLAssertion assertion = saml.newAssertion();
 
-        WSSAddSAMLToken wsSign = new WSSAddSAMLToken();
+        WSSecSAMLToken wsSign = new WSSecSAMLToken();
 
         Document doc = unsignedEnvelope.getAsDocument();
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
         log.info("Before SAMLUnsignedSenderVouches....");
         
-        Document signedDoc = wsSign.build(doc, assertion);
+        Document signedDoc = wsSign.build(doc, assertion, secHeader);
         log.info("After SAMLUnsignedSenderVouches....");
 
         /*

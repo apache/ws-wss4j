@@ -267,7 +267,7 @@ public class WSBaseMessage {
             if (mustunderstand) {
                 securityHeader.setAttributeNS(soapConstants.getEnvelopeURI(),
                         soapPrefix + ":" + WSConstants.ATTR_MUST_UNDERSTAND,
-                        soapConstants.getMustunderstand());
+                        soapConstants.getMustUnderstand());
             }
         }
         return securityHeader;

@@ -139,15 +139,33 @@ public class DerivedKeyToken {
      *
      * @param ref Security token reference
      */
-    public void setSecuityTokenReference(SecurityTokenReference ref) {
+    public void setSecurityTokenReference(SecurityTokenReference ref) {
         this.elementSecurityTokenReference = ref.getElement();
         //WSSecurityUtil.appendChildElement(doc, this.element, ref.getElement());
         WSSecurityUtil.prependChildElement(this.element.getOwnerDocument(), this.element, ref.getElement(), false);
     }
     
-    public void setSecuityTokenReference(Element elem) {
+    /**
+     * Sets the security token reference of the derived key token
+     * This is the reference to the shared secret used in the conversation/context
+     *
+     * @param ref Security token reference
+     * @deprecated use setSecurityTokenReference(SecurityTokenReference ref) instead
+     */
+    public void setSecuityTokenReference(SecurityTokenReference ref) {
+        setSecurityTokenReference(ref);
+    }
+    
+    public void setSecurityTokenReference(Element elem) {
         this.elementSecurityTokenReference = elem;
         WSSecurityUtil.prependChildElement(elem.getOwnerDocument(), this.element, elem, false);
+    }
+    
+    /**
+     * @deprecated use setSecurityTokenReference(Element elem) instead
+     */
+    public void setSecuityTokenReference(Element elem) {
+        setSecurityTokenReference(elem);
     }
 
     /**
@@ -156,12 +174,24 @@ public class DerivedKeyToken {
      * @return the Security Token Reference of the derived key token
      * @throws WSSecurityException
      */
-    public SecurityTokenReference getSecuityTokenReference() throws
+    public SecurityTokenReference getSecurityTokenReference() throws
             WSSecurityException {
         if (this.elementSecurityTokenReference != null) {
             return new SecurityTokenReference(this.elementSecurityTokenReference);
         }
         return null;
+    }
+    
+    /**
+     * Returns the SecurityTokenReference of the derived key token
+     *
+     * @return the Security Token Reference of the derived key token
+     * @throws WSSecurityException
+     * @deprecated use getSecurityTokenReference() instead
+     */
+    public SecurityTokenReference getSecuityTokenReference() throws
+            WSSecurityException {
+        return getSecurityTokenReference();
     }
 
     //Write the getter for security token reference

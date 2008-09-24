@@ -35,7 +35,7 @@ public class UsernameTokenAction implements Action {
                         actionToDo,
                         WSHandlerConstants.PW_CALLBACK_CLASS,
                         WSHandlerConstants.PW_CALLBACK_REF, reqData);
-        providedUsername = callbackData.getIdentifer();
+        providedUsername = callbackData.getIdentifier();
         String password = callbackData.getPassword();
 
         WSSecUsernameToken builder = new WSSecUsernameToken();

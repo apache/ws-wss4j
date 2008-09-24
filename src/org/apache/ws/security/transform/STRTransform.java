@@ -117,7 +117,7 @@ public class STRTransform extends TransformSpi {
 
             /*
              * Here we get some information about the document that is being
-             * processed, in partucular the crypto implementation, and already
+             * processed, in particular the crypto implementation, and already
              * detected BST that may be used later during dereferencing.
              */
             wsDocInfo = WSDocInfoStore.lookup(docHash);
@@ -128,7 +128,7 @@ public class STRTransform extends TransformSpi {
             /*
              * According to the OASIS WS Specification "Web Services Security:
              * SOAP Message Security 1.0" Monday, 19 January 2004, chapter 8.3
-             * describes that the input node set must be processed bythe c14n
+             * describes that the input node set must be processed by the c14n
              * that is specified in the argument element of the STRTransform
              * element.
              * 
@@ -331,7 +331,7 @@ public class STRTransform extends TransformSpi {
         } else {
             elem.setAttributeNS(null, "ValueType", X509Security.X509_V3_TYPE);
         }
-        Text certText = doc.createTextNode(Base64.encode(data)); // no lne
+        Text certText = doc.createTextNode(Base64.encode(data)); // no line
                                                                     // wrap
         elem.appendChild(certText);
         return elem;

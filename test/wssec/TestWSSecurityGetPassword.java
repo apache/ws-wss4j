@@ -159,7 +159,7 @@ public class TestWSSecurityGetPassword extends TestCase {
                 "SomeCallbackRef",
                 reqData
             );
-        assertTrue("bob".equals(callback.getIdentifer()));
+        assertTrue("bob".equals(callback.getIdentifier()));
         assertTrue("securityPassword".equals(callback.getPassword()));
         assertTrue(WSPasswordCallback.USERNAME_TOKEN == callback.getUsage());
     }
@@ -295,7 +295,7 @@ public class TestWSSecurityGetPassword extends TestCase {
             for (int i = 0; i < callbacks.length; i++) {
                 if (callbacks[i] instanceof WSPasswordCallback) {
                     WSPasswordCallback pc = (WSPasswordCallback) callbacks[i];
-                    if (pc.getIdentifer() == "bob") {
+                    if (pc.getIdentifier() == "bob") {
                         pc.setPassword("securityPassword");
                     }
                 } else {

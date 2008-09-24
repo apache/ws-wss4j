@@ -227,7 +227,7 @@ public class SecurityTokenReference {
      */
 
     /**
-     * Sets the KeyIdentifer Element as a X509 certificate.
+     * Sets the KeyIdentifier Element as a X509 certificate.
      * Takes a X509 certificate, converts its data into base 64 and inserts
      * it into a <code>wsse:KeyIdentifier</code> element, which is placed
      * in the <code>wsse:SecurityTokenReference</code> element.
@@ -254,7 +254,7 @@ public class SecurityTokenReference {
     }
 
     /**
-     * Sets the KeyIdentifer Element as a X509 Subject-Key-Identifier (SKI).
+     * Sets the KeyIdentifier Element as a X509 Subject-Key-Identifier (SKI).
      * Takes a X509 certificate, gets it SKI data, converts into base 64 and
      * inserts it into a <code>wsse:KeyIdentifier</code> element, which is placed
      * in the <code>wsse:SecurityTokenReference</code> element.
@@ -283,7 +283,7 @@ public class SecurityTokenReference {
     }
 
     /**
-     * Sets the KeyIdentifer Element as a Thumbprint.
+     * Sets the KeyIdentifier Element as a Thumbprint.
      * 
      * Takes a X509 certificate, computes its thumbprint using SHA-1, converts
      * into base 64 and inserts it into a <code>wsse:KeyIdentifier</code>
@@ -369,7 +369,7 @@ public class SecurityTokenReference {
     }
 
     /**
-     * Gets the KeyIdentifer.
+     * Gets the KeyIdentifier.
      *
      * @return the the X509 certificate or zero if a unknown key identifier
      *         type was detected.

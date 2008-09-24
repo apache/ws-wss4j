@@ -31,8 +31,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 /**
- * XML-Security resolver that is used for resolving same-document URI like URI="#id".
- * It is desgined to only work with SOAPEnvelopes.
+ * XML-Security resolver that is used for resolving same-document URIs like URI="#id".
+ * It is designed to work only with SOAPEnvelopes.
  * <p/>
  *
  * @author Davanum Srinivas (dims@yahoo.com).

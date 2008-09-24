@@ -175,7 +175,7 @@ public class UsernameTokenProcessor implements Processor {
     }
 
     /**
-     * Get the processed USernameToken.
+     * Get the processed UsernameToken.
      * 
      * @return the ut
      */

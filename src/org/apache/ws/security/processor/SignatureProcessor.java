@@ -376,7 +376,7 @@ public class SignatureProcessor implements Processor {
                             throw new WSSecurityException(
                                     WSSecurityException.FAILED_CHECK);
                         }
-                        returnElements.add(WSSecurityUtil.getIDfromReference(uri));
+                        returnElements.add(WSSecurityUtil.getIDFromReference(uri));
                     } else {
                        //This is the case where the signed element is identified 
                        //by a transform such as XPath filtering
@@ -403,14 +403,14 @@ public class SignatureProcessor implements Processor {
                     principal.setLength(dkt.getLength());
                     principal.setOffset(dkt.getOffset());
                     String basetokenId = null;
-                    SecurityTokenReference secuityTokenReference = dkt
-                            .getSecuityTokenReference();
-                    if (secuityTokenReference.containsReference()) {
-                        basetokenId = secuityTokenReference.getReference()
+                    SecurityTokenReference securityTokenReference = dkt
+                            .getSecurityTokenReference();
+                    if (securityTokenReference.containsReference()) {
+                        basetokenId = securityTokenReference.getReference()
                                 .getURI().substring(1);
                     } else {
                         // KeyIdentifier
-                        basetokenId = secuityTokenReference
+                        basetokenId = securityTokenReference
                                 .getKeyIdentifierValue();
                     }
                     principal.setBasetokenId(basetokenId);

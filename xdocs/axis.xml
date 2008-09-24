@@ -201,7 +201,7 @@ WSPasswordCallback pc = (WSPasswordCallback)callbacks[i];<br></br>
 // set the password given a username<br></br>
     </span>               
     <span style="color: rgb(0, 0, 153);">if
-("wss4j".equals(pc.getIdentifer())) {</span><br style="color: rgb(0, 0, 153);"></br>
+("wss4j".equals(pc.getIdentifier())) {</span><br style="color: rgb(0, 0, 153);"></br>
     <span style="color: rgb(0, 0, 153);">                   
 pc.setPassword("security");</span><br style="color: rgb(0, 0, 153);"></br>
     <span style="color: rgb(0, 0, 153);">               
@@ -310,7 +310,7 @@ WSPasswordCallback pc = (WSPasswordCallback)callbacks[i];</span><br style="color
     <span style="color: rgb(0, 0, 153);">               
 // set the password given a username</span><br style="color: rgb(0, 0, 153);"></br>
     <span style="color: rgb(0, 0, 153);">               
-if ("wss4j".equals(pc.getIdentifer())) {</span><br style="color: rgb(0, 0, 153);"></br>
+if ("wss4j".equals(pc.getIdentifier())) {</span><br style="color: rgb(0, 0, 153);"></br>
     <span style="color: rgb(0, 0, 153);">                   
 pc.setPassword("security");</span><br style="color: rgb(0, 0, 153);"></br>
     <span style="color: rgb(0, 0, 153);">               

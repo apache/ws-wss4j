@@ -67,10 +67,18 @@ public class SOAP12Constants implements SOAPConstants {
     }
 
     /**
-     * Obtain the Mustunderstand string
+     * Obtain the MustUnderstand string
+     */
+    public String getMustUnderstand() {
+        return "true";
+    }
+    
+    /**
+     * Obtain the MustUnderstand string
+     * @deprecated use getMustUnderstand() instead
      */
     public String getMustunderstand() {
-        return "true";
+        return getMustUnderstand();
     }
 
 }

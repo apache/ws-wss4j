@@ -111,8 +111,19 @@ public class WSPasswordCallback implements Callback {
      *
      * @return The identifier
      */
-    public String getIdentifer() {
+    public String getIdentifier() {
         return identifier;
+    }
+    
+    /**
+     * Get the identifier.
+     * <p/>
+     *
+     * @return The identifier
+     * @deprecated use getIdentifier() instead
+     */
+    public String getIdentifer() {
+        return getIdentifier();
     }
     
     /**

@@ -33,24 +33,25 @@ import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.handler.WSHandlerResult;
 
 import javax.xml.rpc.holders.StringHolder;
+import java.security.Principal;
 import java.util.Vector;
 
 public class PingBindingImpl
     implements org.apache.ws.axis.oasis.ping.PingPort {
+    
     public void ping(
-            org.apache.ws.axis.oasis.ping.TicketType pingTicket, 
-        StringHolder text)
-        throws java.rmi.RemoteException {
+        org.apache.ws.axis.oasis.ping.TicketType pingTicket, 
+        StringHolder text
+    ) throws java.rmi.RemoteException {
         MessageContext msgContext = MessageContext.getCurrentContext();
         Message reqMsg = msgContext.getRequestMessage();
 
-        Vector results = null;
-        if ((results =
-            (Vector) msgContext.getProperty(WSHandlerConstants.RECV_RESULTS))
-            == null) {
+        Vector results = 
+            (Vector) msgContext.getProperty(WSHandlerConstants.RECV_RESULTS);
+        if (results == null) {
             System.out.println("No security results!!");
         }
-        System.out.println("Number of results: " + results.size());
+        // System.out.println("Number of results: " + results.size());
         for (int i = 0; i < results.size(); i++) {
             WSHandlerResult rResult =
                 (WSHandlerResult) results.get(i);
@@ -59,8 +60,12 @@ public class PingBindingImpl
             for (int j = 0; j < wsSecEngineResults.size(); j++) {
                 WSSecurityEngineResult wser =
                     (WSSecurityEngineResult) wsSecEngineResults.get(j);
-                if (wser.getAction() != WSConstants.ENCR && wser.getPrincipal() != null) {
-                    System.out.println(wser.getPrincipal().getName());
+                int action = 
+                    ((java.lang.Integer)wser.get(WSSecurityEngineResult.TAG_ACTION)).intValue();
+                Principal principal = 
+                    (Principal)wser.get(WSSecurityEngineResult.TAG_PRINCIPAL);
+                if (action != WSConstants.ENCR && principal != null) {
+                    // System.out.println(principal.getName());
                 }
             }
         }
