@@ -1,7 +1,7 @@
 * What is WSS4J? *
 
-WSS4J is part of the Apache Web Services project. The link to all  Apache Web 
-Service projects:
+WSS4J is part of the Apache Web Services project:
+
 http://ws.apache.org/
 
 Apache WSS4J is an implementation of the OASIS Web Services Security specifications
@@ -17,8 +17,8 @@ WSS4J implements
 
  * OASIS Web Serives Security: SOAP Message Security 1.0 Standard 200401, 
    March 2004
-    * Username Token profile V1.0
-    * X.509 Token Profile V1.0
+ * Username Token profile V1.0
+ * X.509 Token Profile V1.0
 
 The Web Services Security part of WSS4J is fairly well tested and many
 WebService projects use it already. Also interoperability with
@@ -165,8 +165,7 @@ bcprov-jdk13-132.jar
     
 commons-codec-1.3.jar
 commons-discovery-0.2.jar
-commons-httpclient-3.0-rc2.jar
-commons-logging-1.0.4.jar
+commons-logging-1.1.jar
     These jars are from the Commons project and provide may useful 
     funtions, such as Base64 encoding/decoding, resource lookup,
     and much more. Please refer to the commons project to get more
@@ -187,7 +186,7 @@ log4j-1.2.9.jar
     
     See: http://logging.apache.org/
 
-opensaml-1.0.1.jar
+opensaml-1.1.jar
     The SAML implemetation used by WSS4J to implement the SAML profile.
     
     See: http://www.opensaml.org/
