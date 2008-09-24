@@ -339,7 +339,14 @@ public class EncryptedKeyProcessor implements Processor {
                 if (tmpE.getLocalName().equals("DataReference")) {                   
                     dataRefURI = ((Element) tmpE).getAttribute("URI");
                     dataRef = new WSDataRef(dataRefURI.substring(1));
-                    decryptDataRef(doc, dataRefURI,dataRef, decryptedBytes);
+                    Element elt = 
+                        decryptDataRef(doc, dataRefURI,dataRef, decryptedBytes);
+                    dataRef.setName(
+                        new javax.xml.namespace.QName(
+                            elt.getNamespaceURI(),
+                            elt.getLocalName()
+                        )
+                    );
                     dataRefs.add(dataRef);
                 }
             }

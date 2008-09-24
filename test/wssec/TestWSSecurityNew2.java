@@ -32,6 +32,8 @@ import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSEncryptionPart;
+import org.apache.ws.security.WSSecurityEngineResult;
+import org.apache.ws.security.WSDataRef;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.message.WSSecEncrypt;
@@ -65,6 +67,11 @@ public class TestWSSecurityNew2 extends TestCase implements CallbackHandler {
 
     static final WSSecurityEngine secEngine = new WSSecurityEngine();
     static final Crypto crypto = CryptoFactory.getInstance("cryptoSKI.properties");
+    static final javax.xml.namespace.QName SOAP_BODY =
+        new javax.xml.namespace.QName(
+            WSConstants.URI_SOAP11_ENV,
+            "Body"
+        );
     MessageContext msgContext;
     Message message;
 
@@ -161,7 +168,7 @@ public class TestWSSecurityNew2 extends TestCase implements CallbackHandler {
         String encryptedString = encryptedMsg.getSOAPPartAsString();
         assertTrue(encryptedString.indexOf("LogTestService2") == -1 ? true : false);
         encryptedDoc = encryptedMsg.getSOAPEnvelope().getAsDocument();
-        verify(encryptedDoc);
+        verify(encryptedDoc, SOAP_BODY);
 
         /*
          * second run, same Junit set up, but change encryption method, 
@@ -192,7 +199,13 @@ public class TestWSSecurityNew2 extends TestCase implements CallbackHandler {
         encryptedString = encryptedMsg.getSOAPPartAsString();
         assertTrue(encryptedString.indexOf("LogTestService2") == -1 ? true : false);
         encryptedDoc = encryptedMsg.getSOAPEnvelope().getAsDocument();
-        verify(encryptedDoc);
+        verify(
+            encryptedDoc,
+            new javax.xml.namespace.QName(
+                "uri:LogTestService2",
+                "testMethod"
+            )
+        );
     }
 
     /**
@@ -224,7 +237,7 @@ public class TestWSSecurityNew2 extends TestCase implements CallbackHandler {
         String encryptedString = encryptedMsg.getSOAPPartAsString();
         assertTrue(encryptedString.indexOf("LogTestService2") == -1 ? true : false);
         encryptedDoc = encryptedMsg.getSOAPEnvelope().getAsDocument();
-        verify(encryptedDoc);
+        verify(encryptedDoc, SOAP_BODY);
 
     }
     
@@ -235,11 +248,41 @@ public class TestWSSecurityNew2 extends TestCase implements CallbackHandler {
      * @param envelope 
      * @throws Exception Thrown when there is a problem in verification
      */
-    private void verify(Document doc) throws Exception {
-        secEngine.processSecurityHeader(doc, null, this, crypto);
+    private void verify(
+        Document doc,
+        javax.xml.namespace.QName expectedEncryptedElement
+    ) throws Exception {
+        final java.util.List results = secEngine.processSecurityHeader(doc, null, this, crypto);
         SOAPUtil.updateSOAPMessage(doc, message);
         String decryptedString = message.getSOAPPartAsString();
         assertTrue(decryptedString.indexOf("LogTestService2") > 0 ? true : false);
+        //
+        // walk through the results, and make sure there is an encrytion [sic] 
+        // action, together with a reference to the decrypted element 
+        // (as a QName)
+        //
+        boolean encrypted = false;
+        for (java.util.Iterator ipos = results.iterator(); ipos.hasNext();) {
+            final java.util.Map result = (java.util.Map) ipos.next();
+            final Integer action = (Integer) result.get(WSSecurityEngineResult.TAG_ACTION);
+            assertNotNull(action);
+            if ((action.intValue() & WSConstants.ENCR) != 0) {
+                final java.util.List refs =
+                    (java.util.List) result.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
+                assertNotNull(refs);
+                encrypted = true;
+                for (java.util.Iterator jpos = refs.iterator(); jpos.hasNext();) {
+                    final WSDataRef ref = (WSDataRef) jpos.next();
+                    assertNotNull(ref);
+                    assertNotNull(ref.getName());
+                    assertEquals(
+                        expectedEncryptedElement,
+                        ref.getName()
+                    );
+                }
+            }
+        }
+        assertTrue(encrypted);
     }
 
     public void handle(Callback[] callbacks)
