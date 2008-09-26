@@ -23,7 +23,7 @@ import java.security.Principal;
  * This class implements the <code>Principal</code> interface and
  * represents a UsernameToken user. 
  * <p/>In addition to the principal's name
- * this principal object also conatins the nonce and created time of the
+ * this principal object also contains the nonce and created time of the
  * UsernameToken (refer to the OASIS WS Security specification, UsernameToken
  * profile). These values are set only if the password of UsernameToken was of
  * type <code>PasswordDigest</code>.
@@ -33,7 +33,7 @@ import java.security.Principal;
  * OASIS WSS specification for predefined password types. <p/>The
  * <code>equals()</code> method use the prinicipal's name only and does not
  * compare nonce or created time. 
- * <p/>Modeled according to the example provided
+ * <p/>Modelled according to the example provided
  * by JAAS documentation 
  * <p/>
  * 

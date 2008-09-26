@@ -262,7 +262,7 @@ public class WSS4JHandler extends WSHandler implements Handler {
                 if (doDebug) {
                     log.debug(e.getMessage(), e);
                 }
-                throw new JAXRPCException("WSS4JHandler: cannot get SOAP envlope from message" + e);
+                throw new JAXRPCException("WSS4JHandler: cannot get SOAP envlope from message", e);
             }
         }
         if (doDebug) {
@@ -309,7 +309,7 @@ public class WSS4JHandler extends WSHandler implements Handler {
                 if (doDebug) {
                     log.debug(se.getMessage(), se);
                 }
-                throw new JAXRPCException("Couldn't set content on SOAPPart" + se.getMessage());
+                throw new JAXRPCException("Couldn't set content on SOAPPart" + se.getMessage(), se);
             }
             mc.setProperty(WSHandlerConstants.SND_SECURITY, null);
         }
@@ -424,7 +424,9 @@ public class WSS4JHandler extends WSHandler implements Handler {
             if (doDebug) {
                 log.debug(se.getMessage(), se);
             }
-            throw new JAXRPCException("Couldn't set content on SOAPPart" + se.getMessage());
+            throw new JAXRPCException(
+                "Couldn't set content on SOAPPart" + se.getMessage(), se
+            );
         }
 
         if (doDebug) {

@@ -45,7 +45,7 @@ import javax.security.auth.callback.Callback;
  * <li><code>SIGNATURE</code> - need the password to get the private key of
  * this identifier (username) from    the keystore. WSS4J uses this private
  * key to produce a signature. The signature verfication uses the public
- * key to verfiy the signature.</li>
+ * key to verify the signature.</li>
  * <li><code>KEY_NAME</code> - need the <i>key</i>, not the password,
  * associated with the identifier. WSS4J uses this key to encrypt or
  * decrypt parts of the SOAP request. Note, the key must match the

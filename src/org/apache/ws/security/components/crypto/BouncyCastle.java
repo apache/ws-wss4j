@@ -83,8 +83,9 @@ public class BouncyCastle extends AbstractCrypto {
             CertificateFactory factory = CertificateFactory.getInstance("X.509");
             path = factory.generateCertPath(in);
         } catch (CertificateException e) {
-            throw new WSSecurityException(WSSecurityException.SECURITY_TOKEN_UNAVAILABLE,
-                    "parseError");
+            throw new WSSecurityException(
+                WSSecurityException.SECURITY_TOKEN_UNAVAILABLE, "parseError", null, e
+            );
         }
         List l = path.getCertificates();
         X509Certificate[] certs = new X509Certificate[l.size()];
@@ -122,11 +123,13 @@ public class BouncyCastle extends AbstractCrypto {
             CertPath path = factory.generateCertPath(list);
             return path.getEncoded();
         } catch (CertificateEncodingException e) {
-            throw new WSSecurityException(WSSecurityException.SECURITY_TOKEN_UNAVAILABLE,
-                    "encodeError");
+            throw new WSSecurityException(
+                WSSecurityException.SECURITY_TOKEN_UNAVAILABLE, "encodeError", null, e
+            );
         } catch (CertificateException e) {
-            throw new WSSecurityException(WSSecurityException.SECURITY_TOKEN_UNAVAILABLE,
-                    "parseError");
+            throw new WSSecurityException(
+                WSSecurityException.SECURITY_TOKEN_UNAVAILABLE, "parseError", null, e
+            );
         }
     }
 

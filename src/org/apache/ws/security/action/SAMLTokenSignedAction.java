@@ -99,8 +99,7 @@ public class SAMLTokenSignedAction implements Action {
                     reqData.getSecHeader());
             reqData.getSignatureValues().add(wsSign.getSignatureValue());
         } catch (WSSecurityException e) {
-            throw new WSSecurityException("WSHandler: Signed SAML: error during message processing"
-                    + e);
+            throw new WSSecurityException("Error when signing the SAML token: ", e);
         }
     }
 

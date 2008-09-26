@@ -90,11 +90,15 @@ public abstract class CryptoBase implements Crypto {
                     certFact = CertificateFactory.getInstance("X.509", provider);
                 }
             } catch (CertificateException e) {
-                throw new WSSecurityException(WSSecurityException.SECURITY_TOKEN_UNAVAILABLE,
-                        "unsupportedCertType");
+                throw new WSSecurityException(
+                    WSSecurityException.SECURITY_TOKEN_UNAVAILABLE, "unsupportedCertType",
+                    null, e
+                );
             } catch (NoSuchProviderException e) {
-                throw new WSSecurityException(WSSecurityException.SECURITY_TOKEN_UNAVAILABLE,
-                        "noSecProvider");
+                throw new WSSecurityException(
+                    WSSecurityException.SECURITY_TOKEN_UNAVAILABLE, "noSecProvider",
+                    null, e
+                );
             }
         }
         return certFact;
@@ -112,11 +116,12 @@ public abstract class CryptoBase implements Crypto {
     public X509Certificate loadCertificate(InputStream in) throws WSSecurityException {
         X509Certificate cert = null;
         try {
-            cert =
-                    (X509Certificate) getCertificateFactory().generateCertificate(in);
+            cert = (X509Certificate) getCertificateFactory().generateCertificate(in);
         } catch (CertificateException e) {
-            throw new WSSecurityException(WSSecurityException.SECURITY_TOKEN_UNAVAILABLE,
-                    "parseError");
+            throw new WSSecurityException(
+                WSSecurityException.SECURITY_TOKEN_UNAVAILABLE, "parseError",
+                null, e
+            );
         }
         return cert;
     }
@@ -179,7 +184,7 @@ public abstract class CryptoBase implements Crypto {
      * the issuer of a Certificate.
      * <p/>
      * The search gets all alias names of the keystore and gets the certificate chain
-     * for each alias. Then the SerialNumber and Issuer fo each certificate of the chain
+     * for each alias. Then the SerialNumber and Issuer for each certificate of the chain
      * is compared with the parameters.
      *
      * @param issuer       The issuer's name for the certificate
@@ -234,8 +239,7 @@ public abstract class CryptoBase implements Crypto {
                 }
             }
         } catch (KeyStoreException e) {
-            throw new WSSecurityException(WSSecurityException.FAILURE,
-                    "keystore");
+            throw new WSSecurityException(WSSecurityException.FAILURE, "keystore", null, e);
         }
         return null;
     }
@@ -283,8 +287,7 @@ public abstract class CryptoBase implements Crypto {
                 }
             }
         } catch (KeyStoreException e) {
-            throw new WSSecurityException(WSSecurityException.FAILURE,
-                    "keystore");
+            throw new WSSecurityException(WSSecurityException.FAILURE, "keystore", null, e);
         }
         return null;
     }
@@ -316,8 +319,7 @@ public abstract class CryptoBase implements Crypto {
                 }
             }
         } catch (KeyStoreException e) {
-            throw new WSSecurityException(WSSecurityException.FAILURE,
-                    "keystore");
+            throw new WSSecurityException(WSSecurityException.FAILURE, "keystore", null, e);
         }
         return null;
     }
@@ -360,8 +362,7 @@ public abstract class CryptoBase implements Crypto {
                 return null;
             }
         } catch (KeyStoreException e) {
-            throw new WSSecurityException(WSSecurityException.FAILURE,
-                                          "keystore");
+            throw new WSSecurityException(WSSecurityException.FAILURE, "keystore", null, e);
         }
 
         X509Certificate[] x509certs = new X509Certificate[certs.length];
@@ -392,10 +393,10 @@ public abstract class CryptoBase implements Crypto {
 
         try {
             sha = MessageDigest.getInstance("SHA-1");
-        } catch (NoSuchAlgorithmException e1) {
+        } catch (NoSuchAlgorithmException e) {
             throw new WSSecurityException(
-                    0,
-                    "noSHA1availabe");
+                WSSecurityException.FAILURE, "noSHA1availabe", null, e
+            );
         }
         try {
             for (Enumeration e = keystore.aliases(); e.hasMoreElements();) {
@@ -416,10 +417,11 @@ public abstract class CryptoBase implements Crypto {
                 sha.reset();
                 try {
                     sha.update(cert.getEncoded());
-                } catch (CertificateEncodingException e1) {
+                } catch (CertificateEncodingException ex) {
                     throw new WSSecurityException(
-                            WSSecurityException.SECURITY_TOKEN_UNAVAILABLE,
-                            "encodeError");
+                        WSSecurityException.SECURITY_TOKEN_UNAVAILABLE, "encodeError",
+                        null, ex
+                    );
                 }
                 byte[] data = sha.digest();
 
@@ -428,8 +430,9 @@ public abstract class CryptoBase implements Crypto {
                 }
             }
         } catch (KeyStoreException e) {
-            throw new WSSecurityException(WSSecurityException.FAILURE,
-                    "keystore");
+            throw new WSSecurityException(
+                WSSecurityException.FAILURE, "keystore", null, e
+            );
         }
         return null;
     }
@@ -482,9 +485,10 @@ public abstract class CryptoBase implements Crypto {
                 sha = MessageDigest.getInstance("SHA-1");
             } catch (NoSuchAlgorithmException ex) {
                 throw new WSSecurityException(
-                        1,
-                        "noSKIHandling",
-                        new Object[]{"Wrong certificate version (<3) and no SHA1 message digest availabe"});
+                    WSSecurityException.UNSUPPORTED_SECURITY_TOKEN, "noSKIHandling",
+                    new Object[]{"Wrong certificate version (<3) and no SHA1 message digest availabe"},
+                    ex
+                );
             }
             sha.reset();
             sha.update(value);
@@ -560,11 +564,15 @@ public abstract class CryptoBase implements Crypto {
             CertPath path = getCertificateFactory().generateCertPath(list);
             return path.getEncoded();
         } catch (CertificateEncodingException e) {
-            throw new WSSecurityException(WSSecurityException.SECURITY_TOKEN_UNAVAILABLE,
-                    "encodeError");
+            throw new WSSecurityException(
+                WSSecurityException.SECURITY_TOKEN_UNAVAILABLE, "encodeError",
+                null, e
+            );
         } catch (CertificateException e) {
-            throw new WSSecurityException(WSSecurityException.SECURITY_TOKEN_UNAVAILABLE,
-                    "parseError");
+            throw new WSSecurityException(
+                WSSecurityException.SECURITY_TOKEN_UNAVAILABLE, "parseError",
+                null, e
+            );
         }
     }
 
@@ -586,8 +594,10 @@ public abstract class CryptoBase implements Crypto {
         try {
             path = getCertificateFactory().generateCertPath(in);
         } catch (CertificateException e) {
-            throw new WSSecurityException(WSSecurityException.SECURITY_TOKEN_UNAVAILABLE,
-                    "parseError");
+            throw new WSSecurityException(
+                WSSecurityException.SECURITY_TOKEN_UNAVAILABLE, "parseError",
+                null, e
+            );
         }
         List l = path.getCertificates();
         X509Certificate[] certs = new X509Certificate[l.size()];
@@ -715,8 +725,9 @@ public abstract class CryptoBase implements Crypto {
                 }
             }
         } catch (KeyStoreException e) {
-            throw new WSSecurityException(WSSecurityException.FAILURE,
-                    "keystore");
+            throw new WSSecurityException(
+                WSSecurityException.FAILURE, "keystore", null, e
+            );
         }
         return aliases;
     }

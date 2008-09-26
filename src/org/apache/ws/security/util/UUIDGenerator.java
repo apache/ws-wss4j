@@ -23,10 +23,15 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 import java.util.Random;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * UUID generator (taken from Axis2) 
  */
 public class UUIDGenerator {
+    
+    private static final Log log = LogFactory.getLog(UUIDGenerator.class);
 
     private static String baseUUID = null;
     private static long incrementingValue = 0;
@@ -69,8 +74,10 @@ public class UUIDGenerator {
         try {
             md5 = MessageDigest.getInstance("MD5");
         } catch (NoSuchAlgorithmException e) {
-            //System.out.println("Error: " + e);
-            //todo heve to be properly handle
+            if (log.isDebugEnabled()) {
+                log.debug(e.getMessage(), e);
+            }
+            //todo have to be properly handled
         }
         md5.update(sb.toString().getBytes());
         byte[] array = md5.digest();

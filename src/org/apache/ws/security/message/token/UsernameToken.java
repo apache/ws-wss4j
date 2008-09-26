@@ -652,7 +652,9 @@ public class UsernameToken {
             if (doDebug) {
                 log.debug(e.getMessage(), e);
             }
-            throw new WSSecurityException(0, "noSHA1availabe");
+            throw new WSSecurityException(
+                WSSecurityException.FAILURE, "noSHA1availabe", null, e
+            );
         }
         sha.reset();
 

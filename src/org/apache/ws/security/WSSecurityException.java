@@ -202,7 +202,7 @@ public class WSSecurityException extends RemoteException {
                 return msg += (" (" + MessageFormat.format(resources.getString(msgId), args) + ")");
             }
         } catch (MissingResourceException e) {
-            throw new RuntimeException("Undefined '" + msgId + "' resource property");
+            throw new RuntimeException("Undefined '" + msgId + "' resource property", e);
         }
         return msg;
     }

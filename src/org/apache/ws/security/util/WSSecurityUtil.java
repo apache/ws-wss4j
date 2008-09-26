@@ -686,14 +686,14 @@ public class WSSecurityUtil {
             }
         } catch (NoSuchPaddingException ex) {
             throw new WSSecurityException(
-                    WSSecurityException.UNSUPPORTED_ALGORITHM,
-                    "unsupportedKeyTransp", new Object[] { "No such padding: "
-                            + cipherAlgo });
+                WSSecurityException.UNSUPPORTED_ALGORITHM, "unsupportedKeyTransp", 
+                new Object[] { "No such padding: " + cipherAlgo }, ex
+            );
         } catch (NoSuchAlgorithmException ex) {
             throw new WSSecurityException(
-                    WSSecurityException.UNSUPPORTED_ALGORITHM,
-                    "unsupportedKeyTransp",
-                    new Object[] { "No such algorithm: " + cipherAlgo });
+                WSSecurityException.UNSUPPORTED_ALGORITHM, "unsupportedKeyTransp",
+                new Object[] { "No such algorithm: " + cipherAlgo }, ex
+            );
         }
         return cipher;
     }

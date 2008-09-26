@@ -281,7 +281,7 @@ public class ReferenceListProcessor implements Processor {
                     cb.handle(new Callback[]{pwcb});
                 } catch (Exception e) {
                     throw new WSSecurityException(WSSecurityException.FAILURE,
-                            "noPassword", new Object[] { id });
+                            "noPassword", new Object[] { id }, e);
                 }
 			    decryptedData = pwcb.getKey();
 			    
@@ -316,7 +316,7 @@ public class ReferenceListProcessor implements Processor {
                     cb.handle(new Callback[]{pwcb});
                 } catch (Exception e) {
                     throw new WSSecurityException(WSSecurityException.FAILURE,
-                            "noPassword", new Object[] { sha });
+                            "noPassword", new Object[] { sha }, e);
                 }
 			    decryptedData = pwcb.getKey();
 			}

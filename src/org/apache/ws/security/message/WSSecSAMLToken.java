@@ -77,7 +77,7 @@ public class WSSecSAMLToken extends WSSecBase {
         try {
             element = (Element) saml.toDOM(document);
         } catch (SAMLException ex) {
-            throw new RuntimeException(ex.toString());
+            throw new RuntimeException(ex.toString(), ex);
         }
         
         WSSecurityUtil.prependChildElement(document, secHeader

@@ -250,7 +250,9 @@ public class WSSConfig {
                 Transform.register(STRTransform.implementedTransformURI,
                         "org.apache.ws.security.transform.STRTransform");
             } catch (Exception ex) {
-                // TODO log error
+                if (log.isDebugEnabled()) {
+                    log.debug(ex.getMessage(), ex);
+                }
             }
             staticallyInitialized = true;
         }
@@ -397,7 +399,7 @@ public class WSSConfig {
                 log.debug(t.getMessage(), t);
             }
             throw new WSSecurityException(WSSecurityException.FAILURE,
-                    "unableToLoadClass", new Object[] { name });
+                    "unableToLoadClass", new Object[] { name }, t);
         }
     }
     
@@ -427,7 +429,7 @@ public class WSSConfig {
                     log.debug(t.getMessage(), t);
                 }
                 throw new WSSecurityException(WSSecurityException.FAILURE,
-                        "unableToLoadClass", new Object[] { name });
+                        "unableToLoadClass", new Object[] { name }, t);
             }
         }
         return null;

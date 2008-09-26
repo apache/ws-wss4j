@@ -103,7 +103,9 @@ public class DerivedKeyTokenProcessor implements Processor {
             this.keyBytes = algo.createKey(this.secret, seed, offset, length);
             
         } catch (Exception e) {
-            throw new WSSecurityException(WSSecurityException.FAILURE, e.getMessage());
+            throw new WSSecurityException(
+                WSSecurityException.FAILURE, null, null, e
+            );
         }
     }
 
@@ -177,10 +179,10 @@ public class DerivedKeyTokenProcessor implements Processor {
             cb.handle(callbacks);
         } catch (IOException e) {
             throw new WSSecurityException(WSSecurityException.FAILURE, "noKey",
-                    new Object[] { id });
+                    new Object[] { id }, e);
         } catch (UnsupportedCallbackException e) {
             throw new WSSecurityException(WSSecurityException.FAILURE, "noKey",
-                    new Object[] { id });
+                    new Object[] { id }, e);
         }
 
         return callback.getKey();
@@ -206,10 +208,10 @@ public class DerivedKeyTokenProcessor implements Processor {
             	cb.handle(new Callback[]{pwcb});
             } catch (IOException e) {
                 throw new WSSecurityException(WSSecurityException.FAILURE, "noKey",
-                        new Object[] { id });
+                        new Object[] { id }, e);
             } catch (UnsupportedCallbackException e) {
                 throw new WSSecurityException(WSSecurityException.FAILURE, "noKey",
-                        new Object[] { id });
+                        new Object[] { id }, e);
             }
             
         }

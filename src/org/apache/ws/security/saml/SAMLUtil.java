@@ -71,7 +71,7 @@ public class SAMLUtil {
                 cb.handle(new Callback[]{pwcb});
             } catch (Exception e1) {
                 throw new WSSecurityException(WSSecurityException.FAILURE, "noKey",
-                        new Object[] { assertion.getId() });
+                        new Object[] { assertion.getId() }, e1);
             }
         }
         
@@ -139,7 +139,7 @@ public class SAMLUtil {
                     } catch (XMLSecurityException e3) {
                         throw new WSSecurityException(WSSecurityException.FAILURE,
                                 "invalidSAMLsecurity",
-                                new Object[]{"cannot get certificate (key holder)"});
+                                new Object[]{"cannot get certificate (key holder)"}, e3);
                     }
                     
                 } else {
@@ -178,7 +178,7 @@ public class SAMLUtil {
             assertion = new SAMLAssertion(elem);
         } catch (SAMLException e) {
             throw new WSSecurityException(WSSecurityException.FAILURE,
-                    "invalidSAMLToken", new Object[]{"for Signature (cannot parse)"});
+                    "invalidSAMLToken", new Object[]{"for Signature (cannot parse)"}, e);
         }
         SAMLSubjectStatement samlSubjS = null;
         Iterator it = assertion.getStatements();
@@ -228,7 +228,7 @@ public class SAMLUtil {
         } catch (XMLSecurityException e3) {
             throw new WSSecurityException(WSSecurityException.FAILURE,
                     "invalidSAMLsecurity",
-                    new Object[]{"cannot get certificate (key holder)"});
+                    new Object[]{"cannot get certificate (key holder)"}, e3);
         }
         return certs;
     }

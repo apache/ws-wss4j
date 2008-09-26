@@ -109,12 +109,16 @@ public class UsernameTokenProcessor implements Processor {
                 if (log.isDebugEnabled()) {
                     log.debug(e);
                 }
-                throw new WSSecurityException(WSSecurityException.FAILED_AUTHENTICATION);
+                throw new WSSecurityException(
+                    WSSecurityException.FAILED_AUTHENTICATION, null, null, e
+                );
             } catch (UnsupportedCallbackException e) {
                 if (log.isDebugEnabled()) {
                     log.debug(e);
                 }
-                throw new WSSecurityException(WSSecurityException.FAILED_AUTHENTICATION);
+                throw new WSSecurityException(
+                    WSSecurityException.FAILED_AUTHENTICATION, null, null, e
+                );
             }
             origPassword = pwCb.getPassword();
             if (log.isDebugEnabled()) {
@@ -149,12 +153,16 @@ public class UsernameTokenProcessor implements Processor {
                 if (log.isDebugEnabled()) {
                     log.debug(e);
                 }
-                throw new WSSecurityException(WSSecurityException.FAILED_AUTHENTICATION);
+                throw new WSSecurityException(
+                    WSSecurityException.FAILED_AUTHENTICATION, null, null, e
+                );
             } catch (UnsupportedCallbackException e) {
                 if (log.isDebugEnabled()) {
                     log.debug(e);
                 }
-                throw new WSSecurityException(WSSecurityException.FAILED_AUTHENTICATION);
+                throw new WSSecurityException(
+                    WSSecurityException.FAILED_AUTHENTICATION, null, null, e
+                );
             }
             ut.setRawPassword(password);
         }

@@ -185,7 +185,7 @@ public class WSSecurityEngine {
      * Process the security header given the soap envelope as W3C document.
      * <p/>
      * This is the main entry point to verify or decrypt a SOAP enevelope.
-     * First check if a <code>wsse:Security</code> is availabe with the
+     * First check if a <code>wsse:Security</code> is available with the
      * defined actor.
      *
      * @param doc       the SOAP envelope as {@link Document}

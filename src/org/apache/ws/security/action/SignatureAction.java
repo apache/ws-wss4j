@@ -54,7 +54,7 @@ public class SignatureAction implements Action {
             wsSign.build(doc, reqData.getSigCrypto(), reqData.getSecHeader());
             reqData.getSignatureValues().add(wsSign.getSignatureValue());
         } catch (WSSecurityException e) {
-            throw new WSSecurityException("WSHandler: Signature: error during message processing" + e);
+            throw new WSSecurityException("Error during Signature: ", e);
         }
     }
 

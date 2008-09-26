@@ -274,11 +274,11 @@ public class EncryptedKeyProcessor implements Processor {
             } catch (IOException e) {
                 throw new WSSecurityException(WSSecurityException.FAILURE,
                         "noPassword",
-                        new Object[]{alias});
+                        new Object[]{alias}, e);
             } catch (UnsupportedCallbackException e) {
                 throw new WSSecurityException(WSSecurityException.FAILURE,
                         "noPassword",
-                        new Object[]{alias});
+                        new Object[]{alias}, e);
             }
             String password = pwCb.getPassword();
             if (password == null) {

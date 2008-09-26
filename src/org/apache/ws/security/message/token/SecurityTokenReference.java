@@ -184,7 +184,7 @@ public class SecurityTokenReference {
                         cb.handle(new Callback[]{pwcb});
                     } catch (Exception e) {
                         throw new WSSecurityException(WSSecurityException.FAILURE,
-                                "noPassword", new Object[] { id });
+                                "noPassword", new Object[] { id }, e);
                     }
                     
                     Element assertionElem = pwcb.getCustomToken();
@@ -241,8 +241,8 @@ public class SecurityTokenReference {
         try {
             data = cert.getEncoded();
         } catch (CertificateEncodingException e) {
-            throw new WSSecurityException(WSSecurityException.SECURITY_TOKEN_UNAVAILABLE,
-                    "encodeError");
+            throw new WSSecurityException(
+                WSSecurityException.SECURITY_TOKEN_UNAVAILABLE, "encodeError", null, e);
         }
         Text text = doc.createTextNode(Base64.encode(data));
         
@@ -300,15 +300,17 @@ public class SecurityTokenReference {
         try {
             sha = MessageDigest.getInstance("SHA-1");
         } catch (NoSuchAlgorithmException e1) {
-            throw new WSSecurityException(0, "noSHA1availabe");
+            throw new WSSecurityException(
+                WSSecurityException.FAILURE, "noSHA1availabe", null, e1
+            );
         }
         sha.reset();
         try {
             sha.update(cert.getEncoded());
         } catch (CertificateEncodingException e1) {
             throw new WSSecurityException(
-                    WSSecurityException.SECURITY_TOKEN_UNAVAILABLE,
-                    "encodeError");
+                WSSecurityException.SECURITY_TOKEN_UNAVAILABLE, "encodeError", null, e1
+            );
         }
         byte[] data = sha.digest();
 
@@ -541,7 +543,8 @@ public class SecurityTokenReference {
         } catch (XMLSecurityException e) {
             throw new WSSecurityException(WSSecurityException.SECURITY_TOKEN_UNAVAILABLE,
                     "noToken",
-                    new Object[]{"Issuer/Serial data element missing"});
+                    new Object[]{"Issuer/Serial data element missing"},
+                    e);
         }
         return issuerSerial;
     }

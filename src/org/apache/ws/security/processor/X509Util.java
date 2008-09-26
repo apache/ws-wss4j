@@ -41,7 +41,7 @@ public class X509Util {
          * holds the element whose contents where encrypted, e.g. soapenv:Body, or the
          * xenc:EncryptedData element (in case of Element encryption). In either case we need
          * to get the xenc:EncryptedData element. So get it. The findElement method returns
-         * immediatly if its already the correct element.
+         * immediately if its already the correct element.
          * Then we can get the Type attribute.
          */
 
@@ -107,11 +107,11 @@ public class X509Util {
         } catch (IOException e) {
             throw new WSSecurityException(WSSecurityException.FAILURE,
                     "noPassword",
-                    new Object[]{keyName});
+                    new Object[]{keyName}, e);
         } catch (UnsupportedCallbackException e) {
             throw new WSSecurityException(WSSecurityException.FAILURE,
                     "noPassword",
-                    new Object[]{keyName});
+                    new Object[]{keyName}, e);
         }
         byte[] decryptedData = pwCb.getKey();
         if (decryptedData == null) {

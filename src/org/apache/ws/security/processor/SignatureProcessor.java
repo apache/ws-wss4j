@@ -160,8 +160,9 @@ public class SignatureProcessor implements Processor {
         try {
             sig = new XMLSignature(elem, null);
         } catch (XMLSecurityException e2) {
-            throw new WSSecurityException(WSSecurityException.FAILED_CHECK,
-                    "noXMLSig");
+            throw new WSSecurityException(
+                WSSecurityException.FAILED_CHECK, "noXMLSig", null, e2
+            );
         }
 
         sig.addResourceResolver(EnvelopeIdResolver.getInstance());
@@ -264,7 +265,7 @@ public class SignatureProcessor implements Processor {
                             cb.handle(new Callback[]{pwcb});
                         } catch (Exception e) {
                             throw new WSSecurityException(WSSecurityException.FAILURE,
-                                    "noPassword", new Object[] { id });
+                                    "noPassword", new Object[] { id }, e);
                         }
                         
                         secretKey = pwcb.getKey();
@@ -291,7 +292,7 @@ public class SignatureProcessor implements Processor {
                     	cb.handle(new Callback[]{pwcb});
 		            } catch (Exception e) {
 		                throw new WSSecurityException(WSSecurityException.FAILURE,
-		                        "noPassword", new Object[] { id });
+		                        "noPassword", new Object[] { id }, e);
 		            }
             
 		            secretKey = pwcb.getKey();
@@ -327,11 +328,13 @@ public class SignatureProcessor implements Processor {
             try {
                 certs[0].checkValidity();
             } catch (CertificateExpiredException e) {
-                throw new WSSecurityException(WSSecurityException.FAILED_CHECK,
-                        "invalidCert");
+                throw new WSSecurityException(
+                    WSSecurityException.FAILED_CHECK, "invalidCert", null, e
+                );
             } catch (CertificateNotYetValidException e) {
-                throw new WSSecurityException(WSSecurityException.FAILED_CHECK,
-                        "invalidCert");
+                throw new WSSecurityException(
+                    WSSecurityException.FAILED_CHECK, "invalidCert", null, e
+                );
             }
         }
         try {
@@ -363,7 +366,8 @@ public class SignatureProcessor implements Processor {
                         siRef = si.item(i);
                     } catch (XMLSecurityException e3) {
                         throw new WSSecurityException(
-                                WSSecurityException.FAILED_CHECK);
+                            WSSecurityException.FAILED_CHECK, null, null, e3
+                        );
                     }
                     String uri = siRef.getURI();
                     if(uri != null && !"".equals(uri)) {
@@ -431,7 +435,9 @@ public class SignatureProcessor implements Processor {
                 throw new WSSecurityException(WSSecurityException.FAILED_CHECK);
             }
         } catch (XMLSignatureException e1) {
-            throw new WSSecurityException(WSSecurityException.FAILED_CHECK);
+            throw new WSSecurityException(
+                WSSecurityException.FAILED_CHECK, null, null, e1
+            );
         }
     }
 

@@ -35,8 +35,7 @@ public class EncryptionAction implements Action {
             wsEncrypt.setKeyIdentifierType(reqData.getEncKeyId());
         }
         if (reqData.getEncKeyId() == WSConstants.EMBEDDED_KEYNAME) {
-            String encKeyName 
-		= handler.getString(WSHandlerConstants.ENC_KEY_NAME,
+            String encKeyName = handler.getString(WSHandlerConstants.ENC_KEY_NAME,
 				    reqData.getMsgContext());
             wsEncrypt.setEmbeddedKeyName(encKeyName);
             byte[] embeddedKey =
@@ -62,8 +61,7 @@ public class EncryptionAction implements Action {
         try {
             wsEncrypt.build(doc, reqData.getEncCrypto(), reqData.getSecHeader());
         } catch (WSSecurityException e) {
-            throw new WSSecurityException("WSHandler: Encryption: error during message processing"
-                    + e);
+            throw new WSSecurityException("Error during encryption: ", e);
         }
     }
 }

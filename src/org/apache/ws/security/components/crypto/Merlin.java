@@ -92,8 +92,8 @@ public class Merlin extends AbstractCrypto {
             path = getCertificateFactory().generateCertPath(in);
         } catch (CertificateException e) {
             throw new WSSecurityException(
-                    WSSecurityException.SECURITY_TOKEN_UNAVAILABLE,
-                    "parseError");
+                WSSecurityException.SECURITY_TOKEN_UNAVAILABLE, "parseError", null, e
+            );
         }
         List l = path.getCertificates();
         X509Certificate[] certs = new X509Certificate[l.size()];
@@ -132,12 +132,12 @@ public class Merlin extends AbstractCrypto {
             return path.getEncoded();
         } catch (CertificateEncodingException e) {
             throw new WSSecurityException(
-                    WSSecurityException.SECURITY_TOKEN_UNAVAILABLE,
-                    "encodeError");
+                WSSecurityException.SECURITY_TOKEN_UNAVAILABLE, "encodeError", null, e
+            );
         } catch (CertificateException e) {
             throw new WSSecurityException(
-                    WSSecurityException.SECURITY_TOKEN_UNAVAILABLE,
-                    "parseError");
+                WSSecurityException.SECURITY_TOKEN_UNAVAILABLE, "parseError", null, e
+            );
         }
     }
 

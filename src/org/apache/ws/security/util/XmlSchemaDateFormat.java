@@ -161,7 +161,7 @@ public class XmlSchemaDateFormat extends DateFormat {
 				}
 			}
 		} catch (ParseException pe) {
-			log.error(pe.toString());
+			log.error(pe.toString(), pe);
 			index = 0; // IMPORTANT: this tells DateFormat.parse() to throw a ParseException
 			parse_pos.setErrorIndex(index);
 			date = null;

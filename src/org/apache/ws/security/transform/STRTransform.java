@@ -317,8 +317,9 @@ public class STRTransform extends TransformSpi {
         try {
             data = cert.getEncoded();
         } catch (CertificateEncodingException e) {
-            throw new WSSecurityException(WSSecurityException.SECURITY_TOKEN_UNAVAILABLE,
-            "encodeError");
+            throw new WSSecurityException(
+                WSSecurityException.SECURITY_TOKEN_UNAVAILABLE, "encodeError", null, e
+            );
         }
         String prefix = WSSecurityUtil
                 .getPrefixNS(WSConstants.WSSE_NS, secRefE);

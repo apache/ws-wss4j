@@ -39,7 +39,7 @@ public class ConversationException extends Exception {
         try {
             resources = ResourceBundle.getBundle("org.apache.ws.security.conversation.errors");
         } catch (MissingResourceException e) {
-            throw new RuntimeException(e.getMessage());
+            throw new RuntimeException(e.getMessage(), e);
         }
     }
     
@@ -91,7 +91,7 @@ public class ConversationException extends Exception {
         try {
             msg = MessageFormat.format(resources.getString(faultCode), args);
         } catch (MissingResourceException e) {
-            throw new RuntimeException("Undefined '" + faultCode + "' resource property");
+            throw new RuntimeException("Undefined '" + faultCode + "' resource property", e);
         }
         if(msg != null) {
             return msg;

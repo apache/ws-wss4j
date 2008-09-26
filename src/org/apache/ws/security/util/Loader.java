@@ -130,6 +130,7 @@ public class Loader {
                     return c;
             }
         } catch (Throwable e) {
+            log.warn(e.getMessage(), e);
         }
         return loadClass(clazz);
     }
@@ -154,6 +155,7 @@ public class Loader {
                     return c;
             }
         } catch (Throwable e) {
+            log.warn(e.getMessage(), e);
         }
         // we reached here because tcl was null or because of a
         // security exception, or because clazz could not be loaded...

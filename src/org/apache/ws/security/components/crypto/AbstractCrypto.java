@@ -83,7 +83,9 @@ public abstract class AbstractCrypto extends CryptoBase {
                 if (doDebug) {
                     log.debug(e.getMessage(), e);
                 }
-                throw new CredentialException(3, "proxyNotFound", new Object[]{location}, e);
+                throw new CredentialException(
+                    CredentialException.IO_ERROR, "proxyNotFound", new Object[]{location}, e
+                );
             }
         }
 

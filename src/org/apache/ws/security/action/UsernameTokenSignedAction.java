@@ -109,8 +109,9 @@ public class UsernameTokenSignedAction implements Action {
             sign.computeSignature();
             reqData.getSignatureValues().add(sign.getSignatureValue());
         } catch (WSSecurityException e) {
-            throw new WSSecurityException("WSHandler: Error during Signature with UsernameToken secret"
-                    + e);
+            throw new WSSecurityException(
+                "WSHandler: Error during UsernameTokenSignature", e
+            );
         }
     }
 }

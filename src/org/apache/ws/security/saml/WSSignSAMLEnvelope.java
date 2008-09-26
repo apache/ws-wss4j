@@ -214,8 +214,9 @@ public class WSSignSAMLEnvelope extends WSSignEnvelope {
         try {
             sig = new XMLSignature(doc, null, sigAlgo, canonAlgo);
         } catch (XMLSecurityException e) {
-            throw new WSSecurityException(WSSecurityException.FAILED_SIGNATURE,
-                    "noXMLSig");
+            throw new WSSecurityException(
+                WSSecurityException.FAILED_SIGNATURE, "noXMLSig", null, e
+            );
         }
 
         KeyInfo info = sig.getKeyInfo();

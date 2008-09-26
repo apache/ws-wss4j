@@ -45,7 +45,7 @@ import org.w3c.dom.Text;
 /**
  * Builder class to build an EncryptedKey.
  * 
- * This is expecially useful in the case where the same
+ * This is especially useful in the case where the same
  * <code>EncryptedKey</code> has to be used to sign and encrypt the message In
  * such a situation this builder will add the <code>EncryptedKey</code> to the
  * security header and we can use the information form the builder to provide to

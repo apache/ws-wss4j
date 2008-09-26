@@ -40,7 +40,7 @@ public class CredentialException extends Exception {
         try {
             resources = ResourceBundle.getBundle("org.apache.ws.security.components.crypto.errors");
         } catch (MissingResourceException e) {
-            throw new RuntimeException(e.getMessage());
+            throw new RuntimeException(e.getMessage(), e);
         }
     }
 
