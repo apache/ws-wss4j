@@ -156,7 +156,7 @@ axis-saaj-1.4.jar
     
     See: http://ws.apache.org/axis/
 
-bcprov-jdk13-132.jar
+bcprov-jdk14-136.jar
     This is the BouncyCastle library that implements all necessary
     encryption, hashing, certifcate, and keystore functions. Without
     this fanatstic library WSS4J wouldn't work at all.
