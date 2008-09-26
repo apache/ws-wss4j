@@ -16,6 +16,8 @@
  */
 package org.apache.ws.security.components.crypto;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.util.Loader;
 
 import java.io.FileInputStream;
@@ -34,6 +36,10 @@ import java.util.Properties;
  * To change this template use File | Settings | File Templates.
  */
 public abstract class AbstractCrypto extends CryptoBase {
+    
+    private static final Log log = LogFactory.getLog(AbstractCrypto.class.getName());
+    private static final boolean doDebug = log.isDebugEnabled();
+
     protected static CertificateFactory certFact;
     protected Properties properties = null;
     
@@ -59,22 +65,13 @@ public abstract class AbstractCrypto extends CryptoBase {
             return;
         }
         String location = this.properties.getProperty("org.apache.ws.security.crypto.merlin.file");
-
-
 		InputStream is = null;
-
 		java.net.URL url = Loader.getResource(loader, location);
-
 		if(url != null) {
-
 			is =  url.openStream();
-
 		} else {
-
 			is = new java.io.FileInputStream(location);
-
 		}
-
 
         /**
          * If we don't find it, then look on the file system.
@@ -83,7 +80,10 @@ public abstract class AbstractCrypto extends CryptoBase {
             try {
                 is = new FileInputStream(location);
             } catch (Exception e) {
-                throw new CredentialException(3, "proxyNotFound", new Object[]{location});
+                if (doDebug) {
+                    log.debug(e.getMessage(), e);
+                }
+                throw new CredentialException(3, "proxyNotFound", new Object[]{location}, e);
             }
         }
 
@@ -133,18 +133,23 @@ public abstract class AbstractCrypto extends CryptoBase {
             } else {
                 ks = KeyStore.getInstance(type, provider);
             }
-            
                     
             ks.load(input, (storepass == null || storepass.length() == 0) ? new char[0] : storepass.toCharArray());
         } catch (IOException e) {
-            e.printStackTrace();
-            throw new CredentialException(3, "ioError00", e);
+            if (doDebug) {
+                log.debug(e.getMessage(), e);
+            }
+            throw new CredentialException(CredentialException.IO_ERROR, "ioError00", e);
         } catch (GeneralSecurityException e) {
-            e.printStackTrace();
-            throw new CredentialException(3, "secError00", e);
+            if (doDebug) {
+                log.debug(e.getMessage(), e);
+            }
+            throw new CredentialException(CredentialException.SEC_ERROR, "secError00", e);
         } catch (Exception e) {
-            e.printStackTrace();
-            throw new CredentialException(-1, "error00", e);
+            if (doDebug) {
+                log.debug(e.getMessage(), e);
+            }
+            throw new CredentialException(CredentialException.FAILURE, "error00", e);
         }
         return ks;
     }

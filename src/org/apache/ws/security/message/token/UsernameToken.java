@@ -51,7 +51,9 @@ import java.util.TimeZone;
  * @author Werner Dittmann (Werner.Dittmann@t-online.de)
  */
 public class UsernameToken {
-    private static Log log = LogFactory.getLog(UsernameToken.class.getName());
+    private static final Log log = LogFactory.getLog(UsernameToken.class.getName());
+    
+    private static final boolean doDebug = log.isDebugEnabled();
 
     public static final String PASSWORD_TYPE = "passwordType";
     
@@ -85,8 +87,10 @@ public class UsernameToken {
     static {
         try {
             random = SecureRandom.getInstance("SHA1PRNG");
-        } catch (NoSuchAlgorithmException nsae) {
-            nsae.printStackTrace();
+        } catch (NoSuchAlgorithmException e) {
+            if (doDebug) {
+                log.debug(e.getMessage(), e);
+            }
         }
     }
 
@@ -254,7 +258,7 @@ public class UsernameToken {
     /**
      * Adds and optionally creates a Salt element to this UsernameToken.
      * 
-     * If the <code>saltCalue</code> is <code>null</code> the the method
+     * If the <code>saltValue</code> is <code>null</code> the the method
      * generates a new salt. Otherwise it uses the the given value.
      * 
      * @param doc
@@ -427,7 +431,9 @@ public class UsernameToken {
                         WSConstants.PASSWORD_DIGEST);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            if (doDebug) {
+                log.debug(e.getMessage(), e);
+            }
         }
     }
 
@@ -462,7 +468,9 @@ public class UsernameToken {
             sha.update(b4);
             passwdDigest = Base64.encode(sha.digest());
         } catch (Exception e) {
-            e.printStackTrace();
+            if (doDebug) {
+                log.debug(e.getMessage(), e);
+            }
         }
         return passwdDigest;
     }
@@ -593,6 +601,9 @@ public class UsernameToken {
                 log.debug("Key        :" + Base64.encode(key));
             }
         } catch (Exception e) {
+            if (doDebug) {
+                log.debug(e.getMessage(), e);
+            }
             return null;
         }
         return key;
@@ -624,6 +635,9 @@ public class UsernameToken {
         try {
             pwBytes = password.getBytes("UTF-8");
         } catch (final java.io.UnsupportedEncodingException e) {
+            if (doDebug) {
+                log.debug(e.getMessage(), e);
+            }
             throw new WSSecurityException("Unable to convert password to UTF-8", e);
         }
 
@@ -635,6 +649,9 @@ public class UsernameToken {
         try {
             sha = MessageDigest.getInstance("SHA-1");
         } catch (NoSuchAlgorithmException e) {
+            if (doDebug) {
+                log.debug(e.getMessage(), e);
+            }
             throw new WSSecurityException(0, "noSHA1availabe");
         }
         sha.reset();
@@ -710,16 +727,6 @@ public class UsernameToken {
         }
         return out;
     }
-
-    /*
-     * public static void main(String[] args) throws Exception { byte[] secret =
-     * Base64.decode("A4BKgeqUKi9VDwWyYPDrskwCwEQ5RIqH"); byte[] seed =
-     * Base64.decode("bWFzdGVyIHNlY3JldAAAAAAAAAAAAAAAAAAAAAAy+BE8DDEUf+XnAynZEVU0PUQR4QHesAbNCmt8/Ry6NqBELuBAiZV4Z0FuCT58Fi8=");
-     * int required = 48; Mac mac = Mac.getInstance("HMACSHA1"); byte[] out =
-     * UsernameToken.P_hash(secret, seed, mac, 48);
-     * System.out.println(Base64.encode(out));
-     * //UCbz0pT2DxRfx4IpY6iWRE0KCa4Fg9JKNRlrxE8AtjNjb1NEK17NI6XdrMRMOKM2 }
-     */
 
     /**
      * helper method.

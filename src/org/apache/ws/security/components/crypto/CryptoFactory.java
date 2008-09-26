@@ -33,7 +33,7 @@ import java.util.Properties;
  * @author Davanum Srinivas (dims@yahoo.com).
  */
 public abstract class CryptoFactory {
-    private static Log log = LogFactory.getLog(CryptoFactory.class);
+    private static final Log log = LogFactory.getLog(CryptoFactory.class);
     private static final String defaultCryptoClassName = "org.apache.ws.security.components.crypto.Merlin";
 
     /**
@@ -63,9 +63,9 @@ public abstract class CryptoFactory {
      * class name as the value of the property : org.apache.ws.security.crypto.provider
      * <p/>
      *
-     * @param properties      The Properties that are forwarded to the crypto implementaion 
+     * @param properties      The Properties that are forwarded to the crypto implementation 
      *                        and the Crypto impl class name.
-     *                        These properties are dependend on the crypto implementatin
+     *                        These properties are dependent on the crypto implementation
      * @return The cyrpto implementation or null if no cryptoClassName was defined
      */
     public static Crypto getInstance(Properties properties) {
@@ -104,7 +104,7 @@ public abstract class CryptoFactory {
      * @param cryptoClassName This is the crypto implementation class. No default is
      *                        provided here.
      * @param properties      The Properties that are forwarded to the crypto implementaion.
-     *                        These properties are dependend on the crypto implementatin
+     *                        These properties are dependent on the crypto implementation
      * @return The cyrpto implementation or null if no cryptoClassName was defined
      *
      * @deprecated            use @link{#getInstance(java.lang.String, java.util.Map)} instead.
@@ -127,7 +127,7 @@ public abstract class CryptoFactory {
      *                        These contents of the map are dependent on the 
      *                        underlying crypto implementation specified in the 
      *                        cryptoClassName parameter.
-     * @return The cyrpto implementation or null if no cryptoClassName was defined
+     * @return The crypto implementation or null if no cryptoClassName was defined
      */
     public static Crypto getInstance(String cryptoClassName, Map map) {
         return loadClass(cryptoClassName, map);
@@ -211,17 +211,19 @@ public abstract class CryptoFactory {
             crypto = (Crypto) c.newInstance(new Object[]{map,loader});
             return crypto;
         } catch (java.lang.Exception e) {
-            e.printStackTrace();
-            log.error("Unable to instantiate (1): " + cryptoClassName, e);
+            if (log.isDebugEnabled()) {
+                log.debug("Unable to instantiate (1): " + cryptoClassName, e);
+            }
         }
         try {
             // try to instantiate the Crypto subclass
             crypto = (Crypto) cryptogenClass.newInstance();
             return crypto;
         } catch (java.lang.Exception e) {
-            e.printStackTrace();
-            log.error("Unable to instantiate (2): " + cryptoClassName, e);
-            throw new RuntimeException(cryptoClassName + " cannot create instance");
+            if (log.isDebugEnabled()) {
+                log.debug("Unable to instantiate (2): " + cryptoClassName, e);
+            }
+            throw new RuntimeException(cryptoClassName + " cannot create instance", e);
         }
     }
     /**
@@ -250,9 +252,11 @@ public abstract class CryptoFactory {
             URL url = Loader.getResource(loader, propFilename);
             properties.load(url.openStream());
         } catch (Exception e) {
-            log.debug("Cannot find crypto property file: " + propFilename);
+            if (log.isDebugEnabled()) {
+                log.debug("Cannot find crypto property file: " + propFilename, e);
+            }
             throw new RuntimeException("CryptoFactory: Cannot load properties: " +
-                    propFilename);
+                    propFilename, e);
         }
         return properties;
     }

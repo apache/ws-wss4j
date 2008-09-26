@@ -64,7 +64,7 @@ public class Base64 {
 
     static private final char PAD = '=';
 
-    static private final boolean fDebug = false;
+    static private final boolean IS_DEBUG = log.isDebugEnabled();
 
     static final private byte[] base64Alphabet = new byte[BASELENGTH];
 
@@ -125,12 +125,6 @@ public class Base64 {
     }
 
     /**
-     * Encodes hex octects into Base64
-     *
-     * @param binaryData Array containing binaryData
-     * @return Encoded Base64 array
-     */
-    /**
      * Encode a byte array in Base64 format and return an optionally
      * wrapped line.
      *
@@ -167,8 +161,8 @@ public class Base64 {
         int encodedIndex = 0;
         int dataIndex = 0;
         int tripletsDone = 0;
-        if (fDebug) {
-            System.out.println("number of triplets = " + numberTriplets);
+        if (IS_DEBUG) {
+            log.debug("number of triplets = " + numberTriplets);
         }
 
         for (int line = 0; line < numberLines; line++) {
@@ -177,9 +171,8 @@ public class Base64 {
                 b2 = binaryData[dataIndex++];
                 b3 = binaryData[dataIndex++];
 
-                if (fDebug) {
-                    System.out.println("b1= " + b1 + ", b2= " + b2 + ", b3= "
-                            + b3);
+                if (IS_DEBUG) {
+                    log.debug("b1= " + b1 + ", b2= " + b2 + ", b3= " + b3);
                 }
 
                 l = (byte) (b2 & 0x0f);
@@ -193,10 +186,10 @@ public class Base64 {
                 byte val3 = ((b3 & SIGN) == 0) ? (byte) (b3 >> 6)
                         : (byte) ((b3) >> 6 ^ 0xfc);
 
-                if (fDebug) {
-                    System.out.println("val2 = " + val2);
-                    System.out.println("k4   = " + (k << 4));
-                    System.out.println("vak  = " + (val2 | (k << 4)));
+                if (IS_DEBUG) {
+                    log.debug("val2 = " + val2);
+                    log.debug("k4   = " + (k << 4));
+                    log.debug("vak  = " + (val2 | (k << 4)));
                 }
 
                 encodedData[encodedIndex++] = lookUpBase64Alphabet[val1];
@@ -218,8 +211,8 @@ public class Base64 {
             b2 = binaryData[dataIndex++];
             b3 = binaryData[dataIndex++];
 
-            if (fDebug) {
-                System.out.println("b1= " + b1 + ", b2= " + b2 + ", b3= " + b3);
+            if (IS_DEBUG) {
+                log.debug("b1= " + b1 + ", b2= " + b2 + ", b3= " + b3);
             }
 
             l = (byte) (b2 & 0x0f);
@@ -233,10 +226,10 @@ public class Base64 {
             byte val3 = ((b3 & SIGN) == 0) ? (byte) (b3 >> 6)
                     : (byte) ((b3) >> 6 ^ 0xfc);
 
-            if (fDebug) {
-                System.out.println("val2 = " + val2);
-                System.out.println("k4   = " + (k << 4));
-                System.out.println("vak  = " + (val2 | (k << 4)));
+            if (IS_DEBUG) {
+                log.debug("val2 = " + val2);
+                log.debug("k4   = " + (k << 4));
+                log.debug("vak  = " + (val2 | (k << 4)));
             }
 
             encodedData[encodedIndex++] = lookUpBase64Alphabet[val1];
@@ -249,9 +242,9 @@ public class Base64 {
         if (fewerThan24bits == EIGHTBIT) {
             b1 = binaryData[dataIndex];
             k = (byte) (b1 & 0x03);
-            if (fDebug) {
-                System.out.println("b1=" + b1);
-                System.out.println("b1<<2 = " + (b1 >> 2));
+            if (IS_DEBUG) {
+                log.debug("b1=" + b1);
+                log.debug("b1<<2 = " + (b1 >> 2));
             }
             byte val1 = ((b1 & SIGN) == 0) ? (byte) (b1 >> 2)
                     : (byte) ((b1) >> 2 ^ 0xc0);

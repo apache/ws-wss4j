@@ -64,7 +64,7 @@ public class WSS4JHandler extends WSHandler implements Handler {
     
     private static Log log = LogFactory.getLog(WSS4JHandler.class.getName());
 
-    private boolean doDebug = log.isDebugEnabled();;
+    private static boolean doDebug = log.isDebugEnabled();
 
     static final String DEPLOYMENT = "deployment";
     static final String CLIENT_DEPLOYMENT = "client";
@@ -97,6 +97,9 @@ public class WSS4JHandler extends WSHandler implements Handler {
         try {
             return processMessage(mc, true);
         } catch (WSSecurityException e) {
+            if (doDebug) {
+                log.debug(e.getMessage(), e);
+            }
             throw new JAXRPCException(e);
         }
     }
@@ -107,6 +110,9 @@ public class WSS4JHandler extends WSHandler implements Handler {
         try {
             return processMessage(mc, false);
         } catch (WSSecurityException e) {
+            if (doDebug) {
+                log.debug(e.getMessage(), e);
+            }
             throw new JAXRPCException(e);
         }
     }
@@ -242,9 +248,9 @@ public class WSS4JHandler extends WSHandler implements Handler {
         Document doc = null;
         SOAPMessage message = ((SOAPMessageContext)mc).getMessage();
         Boolean propFormOptimization = (Boolean)mc.getProperty("axis.form.optimization");
-        log.debug("Form optimzation: " + propFormOptimization);
+        log.debug("Form optimization: " + propFormOptimization);
         /*
-        * If the message context property conatins a document then this is a
+        * If the message context property contains a document then this is a
         * chained handler.
         */
         SOAPPart sPart = message.getSOAPPart();
@@ -253,6 +259,9 @@ public class WSS4JHandler extends WSHandler implements Handler {
             try {
                 doc = messageToDocument(message);
             } catch (Exception e) {
+                if (doDebug) {
+                    log.debug(e.getMessage(), e);
+                }
                 throw new JAXRPCException("WSS4JHandler: cannot get SOAP envlope from message" + e);
             }
         }
@@ -285,6 +294,9 @@ public class WSS4JHandler extends WSHandler implements Handler {
                 try {
                     osStr = os.toString("UTF-8");
                 } catch (UnsupportedEncodingException e) {
+                    if (doDebug) {
+                        log.debug(e.getMessage(), e);
+                    }
                     osStr = os.toString();
                 }
                 log.debug("Send request:");
@@ -294,6 +306,9 @@ public class WSS4JHandler extends WSHandler implements Handler {
             try {
                 sPart.setContent(new StreamSource(new ByteArrayInputStream(os.toByteArray())));
             } catch (SOAPException se) {
+                if (doDebug) {
+                    log.debug(se.getMessage(), se);
+                }
                 throw new JAXRPCException("Couldn't set content on SOAPPart" + se.getMessage());
             }
             mc.setProperty(WSHandlerConstants.SND_SECURITY, null);
@@ -334,6 +349,9 @@ public class WSS4JHandler extends WSHandler implements Handler {
         try {
             doc = messageToDocument(message);
         } catch (Exception ex) {
+            if (doDebug) {
+                log.debug(ex.getMessage(), ex);
+            }
             throw new JAXRPCException("WSS4JHandler: cannot convert into document",
                     ex);
         }
@@ -375,7 +393,9 @@ public class WSS4JHandler extends WSHandler implements Handler {
                             reqData.getSigCrypto(),
                             reqData.getDecCrypto());
         } catch (WSSecurityException ex) {
-            ex.printStackTrace();
+            if (doDebug) {
+                log.debug(ex.getMessage(), ex);
+            }
             throw new JAXRPCException("WSS4JHandler: security processing failed",
                     ex);
         }
@@ -401,6 +421,9 @@ public class WSS4JHandler extends WSHandler implements Handler {
         try {
             sPart.setContent(new StreamSource(new ByteArrayInputStream(os.toByteArray())));
         } catch (SOAPException se) {
+            if (doDebug) {
+                log.debug(se.getMessage(), se);
+            }
             throw new JAXRPCException("Couldn't set content on SOAPPart" + se.getMessage());
         }
 
@@ -424,6 +447,9 @@ public class WSS4JHandler extends WSHandler implements Handler {
         try {
             sHeader = message.getSOAPPart().getEnvelope().getHeader();
         } catch (Exception ex) {
+            if (doDebug) {
+                log.debug(ex.getMessage(), ex);
+            }
             throw new JAXRPCException("WSS4JHandler: cannot get SOAP header after security processing", ex);
         }
 
@@ -530,6 +556,9 @@ public class WSS4JHandler extends WSHandler implements Handler {
             DocumentBuilder builder = dbf.newDocumentBuilder();
             return builder.parse(org.apache.ws.security.util.XMLUtils.sourceToInputSource(content));
         } catch (Exception ex) {
+            if (doDebug) {
+                log.debug(ex.getMessage(), ex);
+            }
             throw new JAXRPCException("messageToDocument: cannot convert SOAPMessage into Document", ex);
         }
     }

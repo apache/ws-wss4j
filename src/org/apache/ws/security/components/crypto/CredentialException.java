@@ -32,7 +32,7 @@ public class CredentialException extends Exception {
     public static final int EXPIRED = 1;
     public static final int DEFECTIVE = 2;
     public static final int IO_ERROR = 3;
-    public static final int SEC_ERROR = 3;
+    public static final int SEC_ERROR = 4;
     private static ResourceBundle resources;
     private int errorCode;
 
@@ -78,8 +78,7 @@ public class CredentialException extends Exception {
      * @param root
      */
     public CredentialException(int errorCode, String msgId, Object[] args, Throwable root) {
-        super(getMessage(msgId, args) + (root == null ? "[]" : " Inner Exception: [" + root.getMessage() + "]"));
-        this.errorCode = -1;
+        super(getMessage(msgId, args), root);
         this.errorCode = errorCode;
     }
 
@@ -105,7 +104,7 @@ public class CredentialException extends Exception {
         try {
             return MessageFormat.format(resources.getString(msgId), args);
         } catch (MissingResourceException e) {
-            throw new RuntimeException("bad" + msgId);
+            throw new RuntimeException("bad" + msgId, e);
         }
     }
 }

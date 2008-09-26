@@ -48,7 +48,8 @@ import java.util.Properties;
  */
 public class SAMLIssuerImpl implements SAMLIssuer {
 
-    private static Log log = LogFactory.getLog(SAMLIssuerImpl.class.getName());
+    private static final Log log = LogFactory.getLog(SAMLIssuerImpl.class.getName());
+    private static final boolean doDebug = log.isDebugEnabled();
 
     private SAMLAssertion sa = null;
 
@@ -76,7 +77,7 @@ public class SAMLIssuerImpl implements SAMLIssuer {
         /*
          * if no properties .. just return an instance, the rest will be done
          * later or this instance is just used to handle certificate
-         * conversions in this implementatio
+         * conversions in this implementation
          */
         if (prop == null) {
             return;
@@ -120,7 +121,7 @@ public class SAMLIssuerImpl implements SAMLIssuer {
          * if (senderVouches == false && userCrypto == null) { throw
          * exception("need user crypto data to insert key") }
          */
-        // Issuer must enable crypto fubctions to get the issuer's certificate
+        // Issuer must enable crypto functions to get the issuer's certificate
         String issuer =
                 properties.getProperty("org.apache.ws.security.saml.issuer");
         String name =
@@ -169,9 +170,15 @@ public class SAMLIssuerImpl implements SAMLIssuer {
                     X509Data certElem = new X509Data(instanceDoc);
                     certElem.addCertificate(certs[0]);
                     ki.add(certElem);
-                } catch (WSSecurityException e) {
+                } catch (WSSecurityException ex) {
+                    if (log.isDebugEnabled()) {
+                        log.debug(ex.getMessage(), ex);
+                    }
                     return null;
-                } catch (XMLSecurityException e) {
+                } catch (XMLSecurityException ex) {
+                    if (log.isDebugEnabled()) {
+                        log.debug(ex.getMessage(), ex);
+                    }
                     return null;
                 }
                 subject.setKeyInfo(ki);
@@ -191,17 +198,23 @@ public class SAMLIssuerImpl implements SAMLIssuer {
                             issuerCrypto.getPrivateKey(issuerKeyName,
                                     issuerKeyPassword);
                     sa.sign(sigAlgo, issuerPK, Arrays.asList(issuerCerts));
-                } catch (WSSecurityException e1) {
-                    e1.printStackTrace();
+                } catch (WSSecurityException ex) {
+                    if (log.isDebugEnabled()) {
+                        log.debug(ex.getMessage(), ex);
+                    }
                     return null;
-                } catch (Exception e1) {
-                    e1.printStackTrace();
+                } catch (Exception ex) {
+                    if (log.isDebugEnabled()) {
+                        log.debug(ex.getMessage(), ex);
+                    }
                     return null;
                 }
             }
         } catch (SAMLException ex) {
-            ex.printStackTrace();
-            throw new RuntimeException(ex.toString());
+            if (log.isDebugEnabled()) {
+                log.debug(ex.getMessage(), ex);
+            }
+            throw new RuntimeException(ex.toString(), ex);
         }
         return sa;
     }

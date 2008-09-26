@@ -33,7 +33,8 @@ import java.util.Properties;
  * @author Davanum Srinivas (dims@yahoo.com).
  */
 public abstract class SAMLIssuerFactory {
-    private static Log log = LogFactory.getLog(SAMLIssuerFactory.class);
+    private static final Log log = LogFactory.getLog(SAMLIssuerFactory.class);
+    private static final boolean doDebug = log.isDebugEnabled();
     private static final String defaultSAMLClassName =
             "org.apache.ws.security.saml.SAMLIssuerImpl";
 
@@ -110,8 +111,11 @@ public abstract class SAMLIssuerFactory {
         try {
             // instruct the class loader to load the crypto implementation
             samlIssuerClass = Loader.loadClass(samlClassName);
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(samlClassName + " Not Found");
+        } catch (ClassNotFoundException ex) {
+            if (log.isDebugEnabled()) {
+                log.debug(ex.getMessage(), ex);
+            }
+            throw new RuntimeException(samlClassName + " Not Found", ex);
         }
         log.info("Using Crypto Engine [" + samlClassName + "]");
         try {
@@ -120,18 +124,20 @@ public abstract class SAMLIssuerFactory {
             samlIssuer =
                     (SAMLIssuer) c.newInstance(new Object[]{properties});
             return samlIssuer;
-        } catch (java.lang.Exception e) {
-            e.printStackTrace();
-            log.error(e);
+        } catch (java.lang.Exception ex) {
+            if (log.isDebugEnabled()) {
+                log.debug(ex.getMessage(), ex);
+            }
         }
         try {
             // try to instantiate the Crypto subclass
             samlIssuer = (SAMLIssuer) samlIssuerClass.newInstance();
             return samlIssuer;
-        } catch (java.lang.Exception e) {
-            e.printStackTrace();
-            log.error(e);
-            throw new RuntimeException(samlClassName + " cannot create instance");
+        } catch (java.lang.Exception ex) {
+            if (log.isDebugEnabled()) {
+                log.debug(ex.getMessage(), ex);
+            }
+            throw new RuntimeException(samlClassName + " cannot create instance", ex);
         }
     }
 
@@ -139,7 +145,7 @@ public abstract class SAMLIssuerFactory {
      * Gets the properties for SAML issuer.
      * The functions loads the property file via
      * {@link Loader.getResource(String)}, thus the property file
-     * should be accesible via the classpath
+     * should be accessible via the classpath
      *
      * @param propFilename the properties file to load
      * @return a <code>Properties</code> object loaded from the filename
@@ -150,8 +156,10 @@ public abstract class SAMLIssuerFactory {
             URL url = Loader.getResource(propFilename);
             properties.load(url.openStream());
         } catch (Exception e) {
-            log.debug("Cannot find SAML property file: " + propFilename);
-            throw new RuntimeException("SAMLIssuerFactory: Cannot load properties: " + propFilename);
+            if (doDebug) {
+                log.debug("Cannot find SAML property file: " + propFilename, e);
+            }
+            throw new RuntimeException("SAMLIssuerFactory: Cannot load properties: " + propFilename, e);
         }
         return properties;
     }

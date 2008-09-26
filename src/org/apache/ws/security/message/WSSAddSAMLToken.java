@@ -92,8 +92,10 @@ public class WSSAddSAMLToken extends WSBaseMessage {
                     element,
                     true);
         } catch (SAMLException ex) {
-            ex.printStackTrace();
-            throw new RuntimeException(ex.toString());
+            if (log.isDebugEnabled()) {
+                log.debug(ex.getMessage(), ex);
+            }
+            throw new RuntimeException(ex.toString(), ex);
         }
         return doc;
     }

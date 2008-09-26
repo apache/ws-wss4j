@@ -42,6 +42,8 @@ import org.apache.xml.security.transforms.Transform;
  * @author Werner Dittmann (werner@apache.org)
  */
 public class WSSConfig {
+    
+    private static final Log log = LogFactory.getLog(WSSConfig.class.getName());
 
     /**
      * The default collection of actions supported by the toolkit.
@@ -83,7 +85,9 @@ public class WSSConfig {
                 org.apache.ws.security.action.SignatureConfirmationAction.class.getName()
             );
         } catch (final Throwable t) {
-            t.printStackTrace();
+            if (log.isDebugEnabled()) {
+                log.debug(t.getMessage(), t);
+            }
         }
         DEFAULT_ACTIONS = java.util.Collections.unmodifiableMap(tmp);
     }
@@ -148,12 +152,12 @@ public class WSSConfig {
                 org.apache.ws.security.processor.EncryptedDataProcessor.class.getName()
             );
         } catch (final Throwable t) {
-            t.printStackTrace();
+            if (log.isDebugEnabled()) {
+                log.debug(t.getMessage(), t);
+            }
         }
         DEFAULT_PROCESSORS = java.util.Collections.unmodifiableMap(tmp);
     }
-
-    private static Log log = LogFactory.getLog(WSSConfig.class.getName());
 
     protected static WSSConfig defaultConfig = null;
 
@@ -169,10 +173,10 @@ public class WSSConfig {
     protected boolean enableSignatureConfirmation = true;
 
     /**
-     * If set to true then the timestamp handling will throw an expcetion if the
+     * If set to true then the timestamp handling will throw an exception if the
      * timestamp contains an expires element and the semantics are expired.
      * 
-     * If set to false, not expetion will be thrown, even if the semantics are
+     * If set to false, no exception will be thrown, even if the semantics are
      * expired.
      */
     protected boolean timeStampStrict = true;
@@ -232,14 +236,14 @@ public class WSSConfig {
         if (!staticallyInitialized) {
             org.apache.xml.security.Init.init();
             if (addJceProviders) {
-            /*
-             * The last provider added has precedence, that is if JuiCE can be add
-             * then WSS4J uses this provider.
-             */
-            addJceProvider("BC",
-                    "org.bouncycastle.jce.provider.BouncyCastleProvider");
-            addJceProvider("JuiCE",
-                    "org.apache.security.juice.provider.JuiCEProviderOpenSSL");
+                /*
+                 * The last provider added has precedence, that is if JuiCE can be add
+                 * then WSS4J uses this provider.
+                 */
+                addJceProvider("BC",
+                        "org.bouncycastle.jce.provider.BouncyCastleProvider");
+                addJceProvider("JuiCE",
+                        "org.apache.security.juice.provider.JuiCEProviderOpenSSL");
             }
             Transform.init();
             try {
@@ -268,7 +272,7 @@ public class WSSConfig {
 
     /**
      * returns a static WSConfig instance that is configured with the latest
-     * OASIS WS-Seurity settings.
+     * OASIS WS-Security settings.
      */
     public static WSSConfig getDefaultWSConfig() {
         if (defaultConfig == null) {
@@ -389,6 +393,9 @@ public class WSSConfig {
         try {
             return (Action) Loader.loadClass(name).newInstance();
         } catch (Throwable t) {
+            if (log.isDebugEnabled()) {
+                log.debug(t.getMessage(), t);
+            }
             throw new WSSecurityException(WSSecurityException.FAILURE,
                     "unableToLoadClass", new Object[] { name });
         }
@@ -416,6 +423,9 @@ public class WSSConfig {
             try {
                 return (Processor) Loader.loadClass(name).newInstance();
             } catch (Throwable t) {
+                if (log.isDebugEnabled()) {
+                    log.debug(t.getMessage(), t);
+                }
                 throw new WSSecurityException(WSSecurityException.FAILURE,
                         "unableToLoadClass", new Object[] { name });
             }
@@ -442,7 +452,7 @@ public class WSSConfig {
         } catch (Throwable t) {
             if (log.isDebugEnabled()) {
                 log.debug("The provider " + id + " could not be added: "
-                        + t.getMessage());
+                        + t.getMessage(), t);
             }
             return false;
         }

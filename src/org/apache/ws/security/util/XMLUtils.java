@@ -1,5 +1,7 @@
 package org.apache.ws.security.util;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -17,6 +19,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 
 public class XMLUtils {
+    
+    private static final Log log = LogFactory.getLog(XMLUtils.class.getName());
+    private static final boolean doDebug = log.isDebugEnabled();
+    
     public static String PrettyDocumentToString(Document doc) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         ElementToStream(doc.getDocumentElement(), baos);
@@ -30,8 +36,10 @@ public class XMLUtils {
             TransformerFactory transFactory = TransformerFactory.newInstance();
             Transformer transformer = transFactory.newTransformer();
             transformer.transform(source, result);
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception ex) {
+            if (doDebug) {
+                log.debug(ex.getMessage(), ex);
+            }
         }
     }
 

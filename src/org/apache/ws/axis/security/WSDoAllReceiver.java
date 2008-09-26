@@ -118,6 +118,9 @@ public class WSDoAllReceiver extends WSDoAllHandler {
                             .PrettyDocumentToString(doc));
                 }
             } catch (Exception ex) {
+                if (doDebug) {
+                    log.debug(ex.getMessage(), ex);
+                }
                 throw new AxisFault(
                         "WSDoAllReceiver: cannot convert into document", ex);
             }
@@ -159,7 +162,9 @@ public class WSDoAllReceiver extends WSDoAllHandler {
                 wsResult = secEngine.processSecurityHeader(doc, actor,
                         cbHandler, reqData.getSigCrypto(), reqData.getDecCrypto());
             } catch (WSSecurityException ex) {
-                ex.printStackTrace();
+                if (doDebug) {
+                    log.debug(ex.getMessage(), ex);
+                }
                 throw new AxisFault(
                         "WSDoAllReceiver: security processing failed", ex);
             }
@@ -243,6 +248,9 @@ public class WSDoAllReceiver extends WSDoAllHandler {
             try {
                 sHeader = sm.getSOAPEnvelope().getHeader();
             } catch (Exception ex) {
+                if (doDebug) {
+                    log.debug(ex.getMessage(), ex);
+                }
                 throw new AxisFault(
                         "WSDoAllReceiver: cannot get SOAP header after security processing",
                         ex);
@@ -347,6 +355,9 @@ public class WSDoAllReceiver extends WSDoAllHandler {
                 log.debug("WSDoAllReceiver: exit invoke()");
             }
         } catch (WSSecurityException e) {
+            if (doDebug) {
+                log.debug(e.getMessage(), e);
+            }
             throw new AxisFault(e.getMessage(), e);
         } finally {
             reqData.clear();
