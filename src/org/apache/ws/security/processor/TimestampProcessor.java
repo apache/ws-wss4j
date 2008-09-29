@@ -84,7 +84,6 @@ public class TimestampProcessor implements Processor {
 					"invalidTimestamp",
 					new Object[] { "The security semantics of message have expired" });
 		}
-		return;
 	}
     
     /* (non-Javadoc)

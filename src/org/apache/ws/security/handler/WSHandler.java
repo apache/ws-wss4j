@@ -162,20 +162,18 @@ public abstract class WSHandler {
             reqData.getSignatureParts().add(encP);
         }
         /*
-         * If SignatureConfirmation is enabled and this is a reqsponse then
+         * If SignatureConfirmation is enabled and this is a response then
          * insert SignatureConfrmation elements, note their wsu:id in the signature
          * parts. They will be signed automatically during a (probably) defined
          * SIGN action.
          */
         if (wssConfig.isEnableSignatureConfirmation() && !isRequest) {
-            String done;
-            if ((done = (String) getProperty(reqData.getMsgContext(),
-                    WSHandlerConstants.SIG_CONF_DONE)) == null
-                    || !DONE.equals(done)) {
-                if ((getProperty(reqData.getMsgContext(),
-                        WSHandlerConstants.RECV_RESULTS)) != null) {
-                    wssConfig.getAction(WSConstants.SC).execute(this, WSConstants.SC, doc, reqData);
-                }
+            String done = (String) 
+                getProperty(reqData.getMsgContext(), WSHandlerConstants.SIG_CONF_DONE);
+            if (!DONE.equals(done)
+                && (getProperty(reqData.getMsgContext(), WSHandlerConstants.RECV_RESULTS)) 
+                    != null) {
+                wssConfig.getAction(WSConstants.SC).execute(this, WSConstants.SC, doc, reqData);
             }
         }
         /*
@@ -228,25 +226,25 @@ public abstract class WSHandler {
          * other actors.
          */
 
-        if (wssConfig.isEnableSignatureConfirmation() && isRequest) {
-            if (reqData.getSignatureValues().size() > 0) {
-                Vector sigv = null;
-                if ((sigv = (Vector) getProperty(reqData.getMsgContext(),
-                        WSHandlerConstants.SEND_SIGV)) == null) {
-                    sigv = new Vector();
-                    setProperty(reqData.getMsgContext(),
-                            WSHandlerConstants.SEND_SIGV, sigv);
-                }
-                // sigv.add(reqData.getSignatureValues());
-                sigv.addAll(reqData.getSignatureValues());
+        if (wssConfig.isEnableSignatureConfirmation() 
+                && isRequest
+                && reqData.getSignatureValues().size() > 0) {
+            Vector sigv = (Vector) 
+            getProperty(reqData.getMsgContext(), WSHandlerConstants.SEND_SIGV);
+            if (sigv == null) {
+                sigv = new Vector();
+                setProperty(reqData.getMsgContext(),
+                        WSHandlerConstants.SEND_SIGV, sigv);
             }
+            // sigv.add(reqData.getSignatureValues());
+            sigv.addAll(reqData.getSignatureValues());
         }
     }
 
 
 
     protected void doReceiverAction(int doAction, RequestData reqData)
-    throws WSSecurityException {
+        throws WSSecurityException {
 
         WSSConfig wssConfig = WSSConfig.getNewInstance();
         wssConfig
@@ -367,7 +365,7 @@ public abstract class WSHandler {
      * fit.
      */
     public Crypto loadSignatureCrypto(RequestData reqData) 
-    throws WSSecurityException {
+        throws WSSecurityException {
         Crypto crypto = null;
         /*
          * Get crypto property file for signature. If none specified throw
@@ -376,7 +374,8 @@ public abstract class WSHandler {
         String sigPropFile = getString(WSHandlerConstants.SIG_PROP_FILE,
                 reqData.getMsgContext());
         if (sigPropFile != null) {
-            if ((crypto = (Crypto) cryptos.get(sigPropFile)) == null) {
+            crypto = (Crypto) cryptos.get(sigPropFile);
+            if (crypto == null) {
                 crypto = CryptoFactory.getInstance(sigPropFile, this
                         .getClassLoader(reqData.getMsgContext()));
                 cryptos.put(sigPropFile, crypto);
@@ -389,22 +388,25 @@ public abstract class WSHandler {
              */
             String refId = getString(WSHandlerConstants.SIG_PROP_REF_ID,
                     reqData.getMsgContext());
-            if(refId != null) {
+            if (refId != null) {
                 Object propObj = getProperty(reqData.getMsgContext(), refId);
                 if(propObj instanceof Properties) {
-                    if ((crypto = (Crypto) cryptos.get(refId)) == null) {
+                    crypto = (Crypto) cryptos.get(refId);
+                    if (crypto == null) {
                         crypto = CryptoFactory.getInstance((Properties)propObj);
                         cryptos.put(refId, crypto);
                     }
                 } else {
                     throw new WSSecurityException(
-                            "WSHandler: Signature: signaturePropRefId must hold a " +
-                    "java.util.Properties object");
+                        "WSHandler: Signature: signaturePropRefId must hold a " 
+                            + "java.util.Properties object"
+                    );
                 }
             }
         } else {
             throw new WSSecurityException(
-            "WSHandler: Signature: no crypto properties");
+                "WSHandler: Signature: no crypto properties"
+            );
         }
         return crypto;
     }
@@ -414,7 +416,7 @@ public abstract class WSHandler {
      * see fit.
      */
     protected Crypto loadEncryptionCrypto(RequestData reqData) 
-    throws WSSecurityException {
+        throws WSSecurityException {
         Crypto crypto = null;
         /*
          * Get encryption crypto property file. If non specified take crypto
@@ -423,7 +425,8 @@ public abstract class WSHandler {
         String encPropFile = getString(WSHandlerConstants.ENC_PROP_FILE,
                 reqData.getMsgContext());
         if (encPropFile != null) {
-            if ((crypto = (Crypto) cryptos.get(encPropFile)) == null) {
+            crypto = (Crypto) cryptos.get(encPropFile);
+            if (crypto == null) {
                 crypto = CryptoFactory.getInstance(encPropFile, this
                         .getClassLoader(reqData.getMsgContext()));
                 cryptos.put(encPropFile, crypto);
@@ -439,25 +442,28 @@ public abstract class WSHandler {
             if(refId != null) {
                 Object propObj = getProperty(reqData.getMsgContext(), refId);
                 if(propObj instanceof Properties) {
-                    if ((crypto = (Crypto) cryptos.get(refId)) == null) {
+                    crypto = (Crypto) cryptos.get(refId);
+                    if (crypto == null) {
                         crypto = CryptoFactory.getInstance((Properties)propObj);
                         cryptos.put(refId, crypto);
                     }
                 } else {
                     throw new WSSecurityException(
-                            "WSHandler: Encryption: encryptionPropRefId must hold a" +
-                    " java.util.Properties object");
+                        "WSHandler: Encryption: encryptionPropRefId must hold a" 
+                            + " java.util.Properties object"
+                    );
                 }
             }
         } else if ((crypto = reqData.getSigCrypto()) == null) {
             throw new WSSecurityException(
-            "WSHandler: Encryption: no crypto property file");
+                "WSHandler: Encryption: no crypto property file"
+            );
         }
         return crypto;
     }
 
     protected void decodeUTParameter(RequestData reqData) 
-    throws WSSecurityException {
+        throws WSSecurityException {
         Object mc = reqData.getMsgContext();
 
         String type = getString(WSHandlerConstants.PASSWORD_TYPE, mc);
@@ -481,14 +487,15 @@ public abstract class WSHandler {
     }
 
     protected void decodeSignatureParameter(RequestData reqData) 
-    throws WSSecurityException {
+        throws WSSecurityException {
         Object mc = reqData.getMsgContext();
         String keyId = getString(WSHandlerConstants.SIG_KEY_ID, mc);
         if (keyId != null) {
             Integer id = (Integer) WSHandlerConstants.keyIdentifier.get(keyId);
             if (id == null) {
                 throw new WSSecurityException(
-                "WSHandler: Signature: unknown key identification");
+                    "WSHandler: Signature: unknown key identification"
+                );
             }
             int tmp = id.intValue();
             if (!(tmp == WSConstants.ISSUER_SERIAL
@@ -497,7 +504,8 @@ public abstract class WSHandler {
                     || tmp == WSConstants.SKI_KEY_IDENTIFIER
                     || tmp == WSConstants.THUMBPRINT_IDENTIFIER)) {
                 throw new WSSecurityException(
-                "WSHandler: Signature: illegal key identification");
+                    "WSHandler: Signature: illegal key identification"
+                );
             }
             reqData.setSigKeyId(tmp);
         }
@@ -511,7 +519,7 @@ public abstract class WSHandler {
     }
 
     protected void decodeEncryptionParameter(RequestData reqData) 
-    throws WSSecurityException {
+        throws WSSecurityException {
         Object mc = reqData.getMsgContext();
         String encUser = getString(WSHandlerConstants.ENCRYPTION_USER, mc);
 
@@ -536,11 +544,11 @@ public abstract class WSHandler {
          */
         String encKeyId = getString(WSHandlerConstants.ENC_KEY_ID, mc);
         if (encKeyId != null) {
-            Integer id = (Integer) WSHandlerConstants
-            .keyIdentifier.get(encKeyId);
+            Integer id = (Integer) WSHandlerConstants.keyIdentifier.get(encKeyId);
             if (id == null) {
                 throw new WSSecurityException(
-                "WSHandler: Encryption: unknown key identification");
+                    "WSHandler: Encryption: unknown key identification"
+                );
             }
             int tmp = id.intValue();
             reqData.setEncKeyId(tmp);
@@ -551,14 +559,15 @@ public abstract class WSHandler {
                     || tmp == WSConstants.EMBEDDED_KEYNAME
                     || tmp == WSConstants.THUMBPRINT_IDENTIFIER)) {
                 throw new WSSecurityException(
-                "WSHandler: Encryption: illegal key identification");
+                    "WSHandler: Encryption: illegal key identification"
+                );
             }
         }
         String encSymAlgo = getString(WSHandlerConstants.ENC_SYM_ALGO, mc);
         reqData.setEncSymmAlgo(encSymAlgo);
 
-        String encKeyTransport 
-        = getString(WSHandlerConstants.ENC_KEY_TRANSPORT, mc);
+        String encKeyTransport = 
+            getString(WSHandlerConstants.ENC_KEY_TRANSPORT, mc);
         reqData.setEncKeyTransport(encKeyTransport);
 
         String encParts = getString(WSHandlerConstants.ENCRYPTION_PARTS, mc);
@@ -569,8 +578,8 @@ public abstract class WSHandler {
 
     protected boolean decodeMustUnderstand(RequestData reqData) 
         throws WSSecurityException {
-        String mu = getString(WSHandlerConstants.MUST_UNDERSTAND,
-                reqData.getMsgContext());
+        String mu = 
+            getString(WSHandlerConstants.MUST_UNDERSTAND, reqData.getMsgContext());
 
         if (mu == null) {return true;}
 
@@ -578,12 +587,13 @@ public abstract class WSHandler {
         if ("1".equals(mu) || "true".equals(mu)) {return true;}
 
         throw new WSSecurityException(
-        "WSHandler: illegal mustUnderstand parameter");
+            "WSHandler: illegal mustUnderstand parameter"
+        );
     }
 
     public int decodeTimeToLive(RequestData reqData) {
-        String ttl = getString(WSHandlerConstants.TTL_TIMESTAMP,
-                reqData.getMsgContext());
+        String ttl = 
+            getString(WSHandlerConstants.TTL_TIMESTAMP, reqData.getMsgContext());
         int ttl_i = 0;
         if (ttl != null) {
             try {
@@ -609,11 +619,12 @@ public abstract class WSHandler {
         if ("1".equals(value) || "true".equals(value)) {return true;}
 
         throw new WSSecurityException(
-        "WSHandler: illegal enableSignatureConfirmation parameter");
+            "WSHandler: illegal enableSignatureConfirmation parameter"
+        );
     }
 
     protected boolean decodeTimestampPrecision(RequestData reqData) 
-    throws WSSecurityException {
+        throws WSSecurityException {
         String value = getString(WSHandlerConstants.TIMESTAMP_PRECISION,
                 reqData.getMsgContext());
 
@@ -623,11 +634,12 @@ public abstract class WSHandler {
         if ("1".equals(value) || "true".equals(value)) {return true;}
 
         throw new WSSecurityException(
-        "WSHandler: illegal precisionInMilliSeconds parameter");
+            "WSHandler: illegal precisionInMilliSeconds parameter"
+        );
     }
 
     protected boolean decodeCustomPasswordTypes(RequestData reqData) 
-    throws WSSecurityException {
+        throws WSSecurityException {
         String value = getString(
                 WSHandlerConstants.HANDLE_CUSTOM_PASSWORD_TYPES,
                 reqData.getMsgContext()
@@ -639,11 +651,12 @@ public abstract class WSHandler {
         if ("1".equals(value) || "true".equals(value)) {return true;}
 
         throw new WSSecurityException(
-        "WSHandler: illegal handleCustomPasswordTypes parameter");
+            "WSHandler: illegal handleCustomPasswordTypes parameter"
+        );
     }
 
     protected boolean decodeTimestampStrict(RequestData reqData) 
-    throws WSSecurityException {
+        throws WSSecurityException {
         String value = getString(WSHandlerConstants.TIMESTAMP_STRICT,
                 reqData.getMsgContext());
 
@@ -653,7 +666,8 @@ public abstract class WSHandler {
         if ("1".equals(value) || "true".equals(value)) {return true;}
 
         throw new WSSecurityException(
-        "WSHandler: illegal timestampStrict parameter");
+            "WSHandler: illegal timestampStrict parameter"
+        );
     }
 
     /**
@@ -665,8 +679,8 @@ public abstract class WSHandler {
             int doAction,
             String clsProp,
             String refProp,
-            RequestData reqData)
-    throws WSSecurityException {
+            RequestData reqData
+    ) throws WSSecurityException {
         WSPasswordCallback pwCb = null;
         CallbackHandler cbHandler = null;
         String err = "provided null or empty password";
@@ -695,8 +709,8 @@ public abstract class WSHandler {
     private WSPasswordCallback readPwViaCallbackClass(String callback,
             String username,
             int doAction,
-            RequestData requestData)
-    throws WSSecurityException {
+            RequestData requestData
+    ) throws WSSecurityException {
 
         Class cbClass = null;
         CallbackHandler cbHandler = null;
@@ -727,8 +741,8 @@ public abstract class WSHandler {
      */
     private WSPasswordCallback performCallback(CallbackHandler cbHandler,
             String username,
-            int doAction)
-    throws WSSecurityException {
+            int doAction
+    ) throws WSSecurityException {
 
         WSPasswordCallback pwCb = constructPasswordCallback(username, doAction);
         Callback[] callbacks = new Callback[1];
@@ -767,7 +781,7 @@ public abstract class WSHandler {
     }
 
     private void splitEncParts(String tmpS, Vector parts, RequestData reqData)
-    throws WSSecurityException {
+        throws WSSecurityException {
         WSEncryptionPart encPart = null;
         String[] rawParts = StringUtil.split(tmpS, ';');
 
@@ -820,10 +834,9 @@ public abstract class WSHandler {
         if (!WSHandlerConstants.USE_REQ_SIG_CERT.equals(reqData.getEncUser())) {
             return;
         }
-        Vector results = null;
-        if ((results =
-            (Vector) getProperty(reqData.getMsgContext(), WSHandlerConstants.RECV_RESULTS))
-            == null) {
+        Vector results = 
+            (Vector) getProperty(reqData.getMsgContext(), WSHandlerConstants.RECV_RESULTS);
+        if (results == null) {
             return;
         }
         /*
@@ -846,8 +859,12 @@ public abstract class WSHandler {
             for (int j = 0; j < wsSecEngineResults.size(); j++) {
                 WSSecurityEngineResult wser =
                     (WSSecurityEngineResult) wsSecEngineResults.get(j);
-                if (wser.getAction() == WSConstants.SIGN) {
-                    reqData.setEncCert(wser.getCertificate());
+                int wserAction = 
+                    ((java.lang.Integer)wser.get(WSSecurityEngineResult.TAG_ACTION)).intValue();
+                if (wserAction == WSConstants.SIGN) {
+                    X509Certificate cert = 
+                        (X509Certificate)wser.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE);
+                    reqData.setEncCert(cert);
                     return;
                 }
             }
@@ -859,13 +876,14 @@ public abstract class WSHandler {
      * see fit.
      */
     protected Crypto loadDecryptionCrypto(RequestData reqData) 
-    throws WSSecurityException {
+        throws WSSecurityException {
 
         Crypto crypto = null;
         String decPropFile = getString(WSHandlerConstants.DEC_PROP_FILE,
                 reqData.getMsgContext());
         if (decPropFile != null) {
-            if ((crypto = (Crypto) cryptos.get(decPropFile)) == null) {
+            crypto = (Crypto) cryptos.get(decPropFile);
+            if (crypto == null) {
                 crypto = CryptoFactory.getInstance(decPropFile, this
                         .getClassLoader(reqData.getMsgContext()));
                 cryptos.put(decPropFile, crypto);
@@ -881,25 +899,28 @@ public abstract class WSHandler {
             if(refId != null) {
                 Object propObj = getProperty(reqData.getMsgContext(), refId);
                 if(propObj instanceof Properties) {
-                    if ((crypto = (Crypto) cryptos.get(refId)) == null) {
+                    crypto = (Crypto) cryptos.get(refId);
+                    if (crypto == null) {
                         crypto = CryptoFactory.getInstance((Properties)propObj);
                         cryptos.put(refId, crypto);
                     }
                 } else {
                     throw new WSSecurityException(
-                            "WSHandler: Decrytion: decryptionPropRefId must hold a" +
-                    " java.util.Properties object");
+                        "WSHandler: Decrytion: decryptionPropRefId must hold a" 
+                            + " java.util.Properties object"
+                    );
                 }
             }
         } else if ((crypto = reqData.getSigCrypto()) == null) {
             throw new WSSecurityException(
-            "WSHandler: Encryption: no crypto property file");
+                "WSHandler: Encryption: no crypto property file"
+            );
         }
         return crypto;
     }
 
     protected void decodeSignatureParameter2(RequestData reqData) 
-    throws WSSecurityException {
+        throws WSSecurityException {
         reqData.setSigCrypto(loadSignatureCrypto(reqData));
         /* There are currently no other signature parameters that need 
          * to be handled here, but we call the load crypto hook rather 
@@ -912,9 +933,8 @@ public abstract class WSHandler {
      * Set and check the decryption specific parameters, if necessary
      * take over signature crypto instance.
      */
-
     protected void decodeDecryptionParameter(RequestData reqData) 
-    throws WSSecurityException {
+        throws WSSecurityException {
         reqData.setDecCrypto(loadDecryptionCrypto(reqData));
         /* There are currently no other decryption parameters that need 
          * to be handled here, but we call the load crypto hook rather 
@@ -928,7 +948,7 @@ public abstract class WSHandler {
      * <p/>
      */
     protected CallbackHandler getPasswordCB(RequestData reqData) 
-    throws WSSecurityException {
+        throws WSSecurityException {
 
         Object mc = reqData.getMsgContext();
         CallbackHandler cbHandler = null;
@@ -975,7 +995,8 @@ public abstract class WSHandler {
      * @return true if the certificate is trusted, false if not (AxisFault is thrown for exceptions during CertPathValidation)
      * @throws WSSecurityException
      */
-    protected boolean verifyTrust(X509Certificate cert, RequestData reqData) throws WSSecurityException {
+    protected boolean verifyTrust(X509Certificate cert, RequestData reqData) 
+        throws WSSecurityException {
 
         // If no certificate was transmitted, do not trust the signature
         if (cert == null) {
@@ -1014,7 +1035,7 @@ public abstract class WSHandler {
             }
 
             // If certificates have been found, the certificates must be compared
-            // to ensure againgst phony DNs (compare encoded form including signature)
+            // to ensure against phony DNs (compare encoded form including signature)
             if (certs != null && certs.length > 0 && cert.equals(certs[0])) {
                 if (doDebug) {
                     log.debug("Direct trust for certificate with " + subjectString);
@@ -1172,8 +1193,7 @@ public abstract class WSHandler {
             return s;
         }
         if (mc == null) {
-            throw new 
-            IllegalArgumentException("Message context cannot be null");
+            throw new IllegalArgumentException("Message context cannot be null");
         }
         return (String) getProperty(mc, key);
     }

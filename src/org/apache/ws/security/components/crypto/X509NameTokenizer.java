@@ -89,11 +89,11 @@ public class X509NameTokenizer {
     private static String trim(String str) {
        String trimed = str.trim();
        int i = str.indexOf(trimed) + trimed.length();
-       if ((str.length() > i) && trimed.endsWith("\\")
-               &&!trimed.endsWith("\\\\")) {
-          if (str.charAt(i) == ' ') {
-             trimed = trimed + " ";
-          }
+       if ((str.length() > i) 
+           && trimed.endsWith("\\")
+           && !trimed.endsWith("\\\\")
+           && (str.charAt(i) == ' ')) {
+         trimed = trimed + " ";
        }
        return trimed;
     }

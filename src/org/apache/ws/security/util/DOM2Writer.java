@@ -124,6 +124,7 @@ public class DOM2Writer {
                                 prefixIsDeclared = true;
                             }
                         } catch (IllegalArgumentException e) {
+                            //
                         }
                         if (!prefixIsDeclared) {
                             printNamespaceDecl(node, namespaceStack, out);
@@ -146,6 +147,7 @@ public class DOM2Writer {
                                     prefixIsDeclared = true;
                                 }
                             } catch (IllegalArgumentException e) {
+                                //
                             }
                             if (!prefixIsDeclared) {
                                 printNamespaceDecl(attr, namespaceStack, out);

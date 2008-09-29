@@ -101,7 +101,7 @@ public class ReferenceListProcessor implements Processor {
 			}
 			if (tmpE.getLocalName().equals("DataReference")) {
 				String dataRefURI = ((Element) tmpE).getAttribute("URI");
-				WSDataRef dataRef = new WSDataRef(dataRefURI.substring(1));;
+				WSDataRef dataRef = new WSDataRef(dataRefURI.substring(1));
 				decryptDataRefEmbedded(doc, dataRefURI, dataRef,cb, crypto);
                 dataRefUris.add(dataRef);
 			}

@@ -93,7 +93,7 @@ public class Timestamp {
             }
         }
 
-        DateFormat zulu = new XmlSchemaDateFormat();;
+        DateFormat zulu = new XmlSchemaDateFormat();
         
         try {
         	if (strCreated != null) {

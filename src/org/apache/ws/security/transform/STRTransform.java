@@ -215,7 +215,6 @@ public class STRTransform extends TransformSpi {
             /*
              * Find start and end of first element <....>, this is the Apex node
              */
-            int lt = bf1.indexOf("<");
             int gt = bf1.indexOf(">");
             /*
              * Lookup the default namespace

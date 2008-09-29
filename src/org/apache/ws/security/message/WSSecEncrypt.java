@@ -289,7 +289,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
 
         if (keyIdentifierType == WSConstants.EMBEDDED_KEYNAME
                 || keyIdentifierType == WSConstants.EMBED_SECURITY_TOKEN_REF) {
-            return buildEmbedded(doc, crypto, secHeader);
+            return buildEmbedded(doc, secHeader);
         }
 
         if (doDebug) {
@@ -577,8 +577,8 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
         return encDataRef;
     }
 
-    private Document buildEmbedded(Document doc, Crypto crypto,
-            WSSecHeader secHeader) throws WSSecurityException {
+    private Document buildEmbedded(Document doc, WSSecHeader secHeader) 
+        throws WSSecurityException {
         doDebug = log.isDebugEnabled();
 
         if (doDebug) {

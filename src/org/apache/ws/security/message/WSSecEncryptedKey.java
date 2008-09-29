@@ -186,7 +186,7 @@ public class WSSecEncryptedKey extends WSSecBase {
      *            The bytes that represent the symmetric key
      * @param remoteCert
      *            The certificate that contains the public key to encrypt the
-     *            seymmetric key data
+     *            symmetric key data
      * @param crypto
      *            An instance of the Crypto API to handle keystore and
      *            certificates

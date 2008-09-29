@@ -296,7 +296,6 @@ public class UsernameToken {
                 WSConstants.WSSE11_NS, WSConstants.WSSE11_PREFIX);
         this.elementIteration.appendChild(doc.createTextNode(text));
         element.appendChild(elementIteration);
-        return;
     }
 
     /**

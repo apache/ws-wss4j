@@ -19,7 +19,6 @@ package org.apache.ws.security.saml;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.saml.SAMLIssuer;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.xml.security.exceptions.XMLSecurityException;
@@ -49,7 +48,6 @@ import java.util.Properties;
 public class SAMLIssuerImpl implements SAMLIssuer {
 
     private static final Log log = LogFactory.getLog(SAMLIssuerImpl.class.getName());
-    private static final boolean doDebug = log.isDebugEnabled();
 
     private SAMLAssertion sa = null;
 

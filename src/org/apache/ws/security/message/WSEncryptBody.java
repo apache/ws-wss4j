@@ -294,7 +294,7 @@ public class WSEncryptBody extends WSBaseMessage {
 
         if (keyIdentifierType == WSConstants.EMBEDDED_KEYNAME ||
             keyIdentifierType == WSConstants.EMBED_SECURITY_TOKEN_REF) {
-            return buildEmbedded(doc, crypto);
+            return buildEmbedded(doc);
         }
 
         long t0 = 0, t1 = 0, t2 = 0, t3 = 0;
@@ -550,7 +550,7 @@ public class WSEncryptBody extends WSBaseMessage {
         return encDataRefs;
     }
 
-    private Document buildEmbedded(Document doc, Crypto crypto)
+    private Document buildEmbedded(Document doc)
             throws WSSecurityException {
         doDebug = log.isDebugEnabled();
 

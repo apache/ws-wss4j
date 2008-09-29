@@ -624,12 +624,10 @@ public class WSSecurityUtil {
         }
         Element header = findChildElement(envelope, sc.getEnvelopeURI(), sc
                 .getHeaderQName().getLocalPart());
-        if (header == null) {
-            if (doCreate) {
-                header = createElementInSameNamespace(envelope, sc
-                        .getHeaderQName().getLocalPart());
-                header = prependChildElement(doc, envelope, header, true);
-            }
+        if (header == null && doCreate) {
+            header = createElementInSameNamespace(envelope, sc
+                    .getHeaderQName().getLocalPart());
+            header = prependChildElement(doc, envelope, header, true);
         }
         if (doCreate) {
             wsseSecurity = header.getOwnerDocument().createElementNS(

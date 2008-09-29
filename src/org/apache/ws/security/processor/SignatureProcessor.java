@@ -115,7 +115,7 @@ public class SignatureProcessor implements Processor {
      * here:
      * <ul>
      * <li> A URI reference to a binary security token contained in the <code>wsse:Security
-     * </code> header.  If the derefenced token is
+     * </code> header.  If the dereferenced token is
      * of the correct type the contained certificate is extracted.
      * </li>
      * <li> Issuer name an serial number of the certificate. In this case the method
@@ -188,19 +188,19 @@ public class SignatureProcessor implements Processor {
 
             int docHash = elem.getOwnerDocument().hashCode();
             /*
-                * Her we get some information about the document that is being
-                * processed, in particular the crypto implementation, and already
-                * detected BST that may be used later during dereferencing.
-                */
+             * Here we get some information about the document that is being
+             * processed, in particular the crypto implementation, and already
+             * detected BST that may be used later during dereferencing.
+             */
             WSDocInfo wsDocInfo = WSDocInfoStore.lookup(docHash);
 
             if (secRef.containsReference()) {
                 Element token = secRef.getTokenElement(elem.getOwnerDocument(),
                         wsDocInfo, cb);
                 /*
-                     * at this point check token type: UsernameToken, Binary, SAML
-                     * Crypto required only for Binary and SAML
-                     */
+                 * at this point check token type: UsernameToken, Binary, SAML
+                 * Crypto required only for Binary and SAML
+                 */
                 QName el = new QName(token.getNamespaceURI(), token
                         .getLocalName());
                 if (el.equals(WSSecurityEngine.usernameToken)) {
@@ -256,7 +256,7 @@ public class SignatureProcessor implements Processor {
                     }else {
                         
                         //Try custom token through callback handler
-                      //try to find a custom token
+                        //try to find a custom token
                         String id = secRef
                                 .getReference().getURI().substring(1);
                         WSPasswordCallback pwcb = new WSPasswordCallback(id,
@@ -354,10 +354,10 @@ public class SignatureProcessor implements Processor {
                 }
                 signatureValue[0] = sig.getSignatureValue();
                 /*
-                     * Now dig into the Signature element to get the elements that
-                     * this Signature covers. Build the QName of these Elements and
-                     * return them to caller
-                     */
+                 * Now dig into the Signature element to get the elements that
+                 * this Signature covers. Build the QName of these Elements and
+                 * return them to caller
+                 */
                 SignedInfo si = sig.getSignedInfo();
                 int numReferences = si.getLength();
                 for (int i = 0; i < numReferences; i++) {
