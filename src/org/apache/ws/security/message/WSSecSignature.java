@@ -312,8 +312,11 @@ public class WSSecSignature extends WSSecBase {
                   && keyIdentifierType != WSConstants.ENCRYPTED_KEY_SHA1_IDENTIFIER) {
 			certs = crypto.getCertificates(user);
 			if (certs == null || certs.length <= 0) {
-				throw new WSSecurityException(WSSecurityException.FAILURE,
-						"invalidX509Data", new Object[] { "for Signature" });
+				throw new WSSecurityException(
+				    WSSecurityException.FAILURE,
+				    "noUserCertsFound", 
+				    new Object[] { user, "signature" }
+				);
 			}
 			certUri = "CertId-" + certs[0].hashCode();
 			/*
@@ -329,9 +332,12 @@ public class WSSecSignature extends WSSecBase {
 					sigAlgo = XMLSignature.ALGO_ID_SIGNATURE_RSA;
 				} else {
 					throw new WSSecurityException(
-							WSSecurityException.FAILURE,
-							"invalidX509Data",
-							new Object[] { "for Signature - unknown public key Algo" });
+				        WSSecurityException.FAILURE,
+						"unknownSignatureAlgorithm",
+						new Object[] {
+				            pubKeyAlgo
+						}
+				    );
 				}
 			}
 		}

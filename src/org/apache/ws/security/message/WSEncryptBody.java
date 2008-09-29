@@ -338,9 +338,11 @@ public class WSEncryptBody extends WSBaseMessage {
         } else {
             X509Certificate[] certs = crypto.getCertificates(user);
             if (certs == null || certs.length <= 0) {
-                throw new WSSecurityException(WSSecurityException.FAILURE,
-                        "invalidX509Data",
-                        new Object[]{"for Encryption"});
+                throw new WSSecurityException(
+                    WSSecurityException.FAILURE,
+                    "noUserCertsFound", 
+                    new Object[] { user, "encryption" }
+                );
             }
             remoteCert = certs[0];
         }

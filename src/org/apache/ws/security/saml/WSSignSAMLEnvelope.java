@@ -138,7 +138,7 @@ public class WSSignSAMLEnvelope extends WSSignEnvelope {
         }
         /*
          * Gather some info about the document to process and store it for
-         * retrival
+         * retrieval
          */
         WSDocInfo wsDocInfo = new WSDocInfo(doc.hashCode());
 
@@ -193,8 +193,11 @@ public class WSSignSAMLEnvelope extends WSSignEnvelope {
         // Set the id of the elements to be used as digest source
         // String id = setBodyID(doc);
         if (certs == null || certs.length <= 0) {
-            throw new WSSecurityException(WSSecurityException.FAILURE,
-                    "invalidX509Data", new Object[] { "for Signature" });
+            throw new WSSecurityException(
+                WSSecurityException.FAILURE,
+                "noCertsFound",
+                new Object[] { "SAML signature" }
+            );
         }
         if (sigAlgo == null) {
             String pubKeyAlgo = certs[0].getPublicKey().getAlgorithm();
@@ -205,9 +208,12 @@ public class WSSignSAMLEnvelope extends WSSignEnvelope {
                 sigAlgo = XMLSignature.ALGO_ID_SIGNATURE_RSA;
             } else {
                 throw new WSSecurityException(
-                        WSSecurityException.FAILURE,
-                        "invalidX509Data",
-                        new Object[] { "for Signature - unkown public key Algo" });
+                    WSSecurityException.FAILURE,
+                    "unknownSignatureAlgorithm",
+                    new Object[] {
+                        pubKeyAlgo
+                    }
+                );
             }
         }
         XMLSignature sig = null;

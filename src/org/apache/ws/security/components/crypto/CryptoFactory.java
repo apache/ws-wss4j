@@ -49,7 +49,7 @@ public abstract class CryptoFactory {
      * <code>Loader.getResource()</code> method.
      * <p/>
      *
-     * @return The cyrpto implementation was defined
+     * @return The crypto implementation was defined
      */
     public static Crypto getInstance() {
         return getInstance("crypto.properties");
@@ -86,7 +86,7 @@ public abstract class CryptoFactory {
      *                        and the Crypto impl class name.
      *                        These properties are dependent on the crypto implementation
      * @param classLoader   The class loader to use
-     * @return The cyrpto implementation or null if no cryptoClassName was defined
+     * @return The crypto implementation or null if no cryptoClassName was defined
      */
     public static Crypto getInstance(Properties properties, ClassLoader classLoader) {
         String cryptoClassName = properties.getProperty("org.apache.ws.security.crypto.provider");
@@ -103,9 +103,9 @@ public abstract class CryptoFactory {
      *
      * @param cryptoClassName This is the crypto implementation class. No default is
      *                        provided here.
-     * @param properties      The Properties that are forwarded to the crypto implementaion.
+     * @param properties      The Properties that are forwarded to the crypto implementation.
      *                        These properties are dependent on the crypto implementation
-     * @return The cyrpto implementation or null if no cryptoClassName was defined
+     * @return The crypto implementation or null if no cryptoClassName was defined
      *
      * @deprecated            use @link{#getInstance(java.lang.String, java.util.Map)} instead.
      */
@@ -146,7 +146,7 @@ public abstract class CryptoFactory {
      * <p/>
      *
      * @param propFilename The name of the property file to load
-     * @return The cyrpto implementation that was defined
+     * @return The crypto implementation that was defined
      */
     public static Crypto getInstance(String propFilename) {
         Properties properties = null;

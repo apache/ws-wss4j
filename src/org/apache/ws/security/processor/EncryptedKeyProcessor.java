@@ -186,8 +186,11 @@ public class EncryptedKeyProcessor implements Processor {
                 else if (secRef.containsKeyIdentifier()) {
                     X509Certificate[] certs = secRef.getKeyIdentifier(crypto);
                     if (certs == null || certs.length < 1 || certs[0] == null) {
-                        throw new WSSecurityException(WSSecurityException.FAILURE,
-                                "invalidX509Data", new Object[]{"for decryption (KeyId)"});
+                        throw new WSSecurityException(
+                            WSSecurityException.FAILURE,
+                            "noCertsFound", 
+                            new Object[] { "decryption (KeyId)" }
+                        );
                     }
                     /*
                     * Here we have the certificate. Now find the alias for it. Needed to identify
@@ -217,9 +220,11 @@ public class EncryptedKeyProcessor implements Processor {
                         }
                         X509Certificate cert = token.getX509Certificate(crypto);
                         if (cert == null) {
-                            throw new WSSecurityException(WSSecurityException.FAILURE,
-                                    "invalidX509Data",
-                                    new Object[]{"for decryption"});
+                            throw new WSSecurityException(
+                                WSSecurityException.FAILURE,
+                                "noCertsFound", 
+                                new Object[] { "decryption" }
+                            );
                         }
                         /*
                         * Here we have the certificate. Now find the alias for it. Needed to identify

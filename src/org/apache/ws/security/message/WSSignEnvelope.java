@@ -255,8 +255,11 @@ public class WSSignEnvelope extends WSBaseMessage {
         if (keyIdentifierType != WSConstants.UT_SIGNING) {
             certs = crypto.getCertificates(user);
             if (certs == null || certs.length <= 0) {
-                throw new WSSecurityException(WSSecurityException.FAILURE,
-                        "invalidX509Data", new Object[] { "for Signature" });
+                throw new WSSecurityException(
+                    WSSecurityException.FAILURE,
+                    "noUserCertsFound", 
+                    new Object[] { user, "signature" }
+                );
             }
             certUri = "CertId-" + certs[0].hashCode();
             if (sigAlgo == null) {
@@ -268,9 +271,12 @@ public class WSSignEnvelope extends WSBaseMessage {
                     sigAlgo = XMLSignature.ALGO_ID_SIGNATURE_RSA;
                 } else {
                     throw new WSSecurityException(
-                            WSSecurityException.FAILURE,
-                            "invalidX509Data",
-                            new Object[] { "for Signature - unkown public key Algo" });
+                        WSSecurityException.FAILURE,
+                        "unknownSignatureAlgorithm",
+                        new Object[] {
+                            pubKeyAlgo
+                        }
+                    );
                 }
             }
         }

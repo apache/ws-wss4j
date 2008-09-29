@@ -78,6 +78,7 @@ public class PackageTests extends TestCase {
         suite.addTestSuite(TestWSSecurityUTDK.class);
         suite.addTestSuite(TestWSSecurityDataRef.class);
         suite.addTestSuite(TestWSSecurityDataRef1.class);
+        suite.addTestSuite(TestWSSecurityCertError.class);
         return suite;
     }
 
