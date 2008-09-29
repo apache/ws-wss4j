@@ -64,13 +64,18 @@ public class WSSConfig {
                 new Integer(WSConstants.SIGN),
                 org.apache.ws.security.action.SignatureAction.class.getName()
             );
+            //
+            // Note that all actions/processors with dependencies on opensaml are
+            // registered as Strings. This is so that applications that do not use
+            // saml do not have to have the opensaml jar available.
+            //
             tmp.put(
                 new Integer(WSConstants.ST_SIGNED),
-                org.apache.ws.security.action.SAMLTokenSignedAction.class.getName()
+                "org.apache.ws.security.action.SAMLTokenSignedAction"
             );
             tmp.put(
                 new Integer(WSConstants.ST_UNSIGNED),
-                org.apache.ws.security.action.SAMLTokenUnsignedAction.class.getName()
+                "org.apache.ws.security.action.SAMLTokenUnsignedAction"
             );
             tmp.put(
                 new Integer(WSConstants.TS),
@@ -101,7 +106,7 @@ public class WSSConfig {
         try {
             tmp.put(
                 WSSecurityEngine.SAML_TOKEN,
-                org.apache.ws.security.processor.SAMLTokenProcessor.class.getName()
+                "org.apache.ws.security.processor.SAMLTokenProcessor"
             );
             tmp.put(
                 WSSecurityEngine.ENCRYPTED_KEY,

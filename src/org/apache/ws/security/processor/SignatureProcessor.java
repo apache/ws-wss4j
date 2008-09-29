@@ -189,7 +189,7 @@ public class SignatureProcessor implements Processor {
             int docHash = elem.getOwnerDocument().hashCode();
             /*
                 * Her we get some information about the document that is being
-                * processed, in partucular the crypto implementation, and already
+                * processed, in particular the crypto implementation, and already
                 * detected BST that may be used later during dereferencing.
                 */
             WSDocInfo wsDocInfo = WSDocInfoStore.lookup(docHash);
@@ -428,7 +428,7 @@ public class SignatureProcessor implements Processor {
                     //This is the custom key scenario
                     CustomTokenPrincipal principal = new CustomTokenPrincipal(customTokenId);
                     return principal;
-                }else {
+                } else {
                     throw new WSSecurityException("Cannot determine principal");
                 }
             } else {

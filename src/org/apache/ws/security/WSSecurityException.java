@@ -54,7 +54,7 @@ public class WSSecurityException extends RemoteException {
         try {
             resources = ResourceBundle.getBundle("org.apache.ws.security.errors");
         } catch (MissingResourceException e) {
-            throw new RuntimeException(e.getMessage());
+            throw new RuntimeException(e.getMessage(), e);
         }
         
         FAULT_CODE_MAP.put(

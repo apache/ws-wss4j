@@ -76,7 +76,7 @@ specifications.
 The WSS4J zip archive is the binary distribution and contains the wss4j
 jar file, some examples, test classes (incl. sources), the interop test
 classes (incl. sources and necessary certificate store), and the according
-client and server deployment and protery files.
+client and server deployment and property files.
 
 The WSS4J jar file contains all classes that implement the basic functions
 and the handlers. To install it make sure this jar file is in the classpath
@@ -139,7 +139,7 @@ To implement the Web Service Security (WSS) part specific software is
 required:
 
 addressing-1.0.jar
-    This jar contains the implementation of WS-Adressing, required
+    This jar contains the implementation of WS-Addressing, required
     by WSS4J Trust.
 
     See: http://ws.apache.org/addressing/
@@ -150,7 +150,7 @@ axis-jaxrpc-1.4.jar
 axis-saaj-1.4.jar
     These jars contain the Apache Axis base software. They implement
     the basic SOAP processing, deployment, WSDL to Java, Java to WSDL
-    tools and a lot more. Plase refer to a Axis documentation how to
+    tools and a lot more. Please refer to a Axis documentation how to
     setup Axis. You should be familiar with Axis, its setup, and 
     deployment methods before you start with any WSS4J functions.
     
@@ -167,7 +167,7 @@ commons-codec-1.3.jar
 commons-discovery-0.2.jar
 commons-logging-1.1.jar
     These jars are from the Commons project and provide may useful 
-    funtions, such as Base64 encoding/decoding, resource lookup,
+    functions, such as Base64 encoding/decoding, resource lookup,
     and much more. Please refer to the commons project to get more
     information.
     
@@ -187,7 +187,7 @@ log4j-1.2.9.jar
     See: http://logging.apache.org/
 
 opensaml-1.1.jar
-    The SAML implemetation used by WSS4J to implement the SAML profile.
+    The SAML implementation used by WSS4J to implement the SAML profile.
     
     See: http://www.opensaml.org/
 
