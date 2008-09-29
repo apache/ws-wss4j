@@ -34,12 +34,10 @@ public class Loader {
 
     /**
      * This method will search for <code>resource</code> in different
-     * places. The rearch order is as follows:
+     * places. The search order is as follows:
      * <ol>
      * <p><li>Search for <code>resource</code> using the thread context
-     * class loader under Java2. If that fails, search for
-     * <code>resource</code> using the class loader that loaded this
-     * class (<code>Loader</code>).
+     * class loader under Java2.
      * <p><li>Try one last time with
      * <code>ClassLoader.getSystemResource(resource)</code>, that is is
      * using the system class loader in JDK 1.2 and virtual machine's
@@ -54,8 +52,6 @@ public class Loader {
         ClassLoader classLoader = null;
         URL url = null;
         try {
-            // We could not find resource. Ler us now try with the
-            // classloader that loaded this class.
             classLoader = getTCL();
             if (classLoader != null) {
                 log.debug("Trying to find [" + resource + "] using " + classLoader + " class loader.");
@@ -69,7 +65,7 @@ public class Loader {
         }
     
         // Last ditch attempt: get the resource from the class path. It
-        // may be the case that clazz was loaded by the Extentsion class
+        // may be the case that clazz was loaded by the Extension class
         // loader which the parent of the system class loader. Hence the
         // code below.
         log.debug("Trying to find [" + resource + "] using ClassLoader.getSystemResource().");
@@ -78,12 +74,21 @@ public class Loader {
     
 
     /**
-     * Try to get the resource with the specified class loader
+     * This method will search for <code>resource</code> in different
+     * places. The search order is as follows:
+     * <ol>
+     * <p><li>Search for <code>resource</code> using the supplied class loader. 
+     * If that fails, search for <code>resource</code> using the thread context
+     * class loader.
+     * <p><li>Try one last time with
+     * <code>ClassLoader.getSystemResource(resource)</code>, that is is
+     * using the system class loader in JDK 1.2 and virtual machine's
+     * built-in class loader in JDK 1.1.
+     * </ol>
      * <p/>
      *
-     * @param loader
      * @param resource
-     * @return the resource url
+     * @return TODO
      */
     static public URL getResource(ClassLoader loader, String resource) {
         URL url = null;
@@ -124,10 +129,11 @@ public class Loader {
      */
     static public Class loadClass(ClassLoader loader, String clazz) throws ClassNotFoundException {
         try {
-            if(loader != null) {
+            if (loader != null) {
                 Class c = loader.loadClass(clazz);
-                if (c != null)
+                if (c != null) {
                     return c;
+                }
             }
         } catch (Throwable e) {
             log.warn(e.getMessage(), e);
@@ -149,10 +155,11 @@ public class Loader {
         try {
             ClassLoader tcl = getTCL();	
             
-            if(tcl != null) {
+            if (tcl != null) {
                 Class c = tcl.loadClass(clazz);
-                if (c != null)
+                if (c != null) {
                     return c;
+                }
             }
         } catch (Throwable e) {
             log.warn(e.getMessage(), e);
