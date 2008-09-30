@@ -164,10 +164,10 @@ public abstract class CryptoBase implements Crypto {
 
     /**
      * Lookup a X509 Certificate in the keystore according to a given
-     * the issuer of a Certficate.
+     * the issuer of a Certificate.
      * <p/>
      * The search gets all alias names of the keystore and gets the certificate chain
-     * for each alias. Then the Issuer fo each certificate of the chain
+     * for each alias. Then the Issuer for each certificate of the chain
      * is compared with the parameters.
      *
      * @param issuer The issuer's name for the certificate
@@ -199,7 +199,7 @@ public abstract class CryptoBase implements Crypto {
 
     /*
     * need to check if "getCertificateChain" also finds certificates that are
-    * used for enryption only, i.e. they may not be signed by a CA
+    * used for encryption only, i.e. they may not be signed by a CA
     * Otherwise we must define a restriction how to use certificate:
     * each certificate must be signed by a CA or is a self signed Certificate
     * (this should work as well).
@@ -358,7 +358,7 @@ public abstract class CryptoBase implements Crypto {
             if (cert != null) {
                 certs = new Certificate[]{cert};
             } else if (certs == null) {
-                // At this pont we don't have certs or a cert
+                // At this point we don't have certs or a cert
                 return null;
             }
         } catch (KeyStoreException e) {
@@ -520,7 +520,6 @@ public abstract class CryptoBase implements Crypto {
      *
      */
     public String[] getAliasesForDN(String subjectDN) throws WSSecurityException {
-
 
         // The DN to search the keystore for
         Vector subjectRDN = splitAndTrim(subjectDN);

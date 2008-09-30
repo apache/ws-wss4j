@@ -1097,8 +1097,7 @@ public abstract class WSHandler {
             x509certs[0] = cert;
             // ... and the other certificates
             for (int j = 0; j < certs.length; j++) {
-                cert = certs[j];
-                x509certs[j + 1] = cert;
+                x509certs[j + 1] = certs[j];
             }
             certs = x509certs;
 
