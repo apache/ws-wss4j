@@ -52,7 +52,7 @@ public class UUIDGenerator {
         if(++incrementingValue >= Long.MAX_VALUE){
             incrementingValue = 0;
         }
-        return "urn:uuid:" + baseUUID + new Date().getTime() + incrementingValue;
+        return baseUUID + new Date().getTime() + incrementingValue;
     }
 
     protected static String getInitialUUID() {
