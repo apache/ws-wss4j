@@ -124,7 +124,8 @@ public class SignatureProcessor implements Processor {
      * </ul>
      * <p/>
      * The methods checks is the certificate is valid and calls the
-     * {@link org.apache.xml.security.signature.XMLSignature#checkSignatureValue(X509Certificate) verfication} function.
+     * {@link org.apache.xml.security.signature.XMLSignature#checkSignatureValue(X509Certificate) 
+     * verification} function.
      *
      * @param elem        the XMLSignature DOM Element.
      * @param crypto      the object that implements the access to the keystore and the

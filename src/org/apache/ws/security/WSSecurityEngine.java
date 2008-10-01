@@ -157,8 +157,8 @@ public class WSSecurityEngine {
     /**
      * Process the security header given the soap envelope as W3C document.
      * <p/>
-     * This is the main entry point to verify or decrypt a SOAP enevelope.
-     * First check if a <code>wsse:Security</code> is availabe with the
+     * This is the main entry point to verify or decrypt a SOAP envelope.
+     * First check if a <code>wsse:Security</code> is available with the
      * defined actor.
      *
      * @param doc    the SOAP envelope as {@link Document}
@@ -184,7 +184,7 @@ public class WSSecurityEngine {
     /**
      * Process the security header given the soap envelope as W3C document.
      * <p/>
-     * This is the main entry point to verify or decrypt a SOAP enevelope.
+     * This is the main entry point to verify or decrypt a SOAP envelope.
      * First check if a <code>wsse:Security</code> is available with the
      * defined actor.
      *
@@ -200,7 +200,8 @@ public class WSSecurityEngine {
      *                  handling of certificates for Decryption
      * @return a result vector
      * @throws WSSecurityException
-     * @see WSSecurityEngine#processSecurityHeader(Element securityHeader, CallbackHandler cb,Crypto sigCrypto, Crypto decCrypto)
+     * @see WSSecurityEngine#processSecurityHeader(
+     * Element securityHeader, CallbackHandler cb,Crypto sigCrypto, Crypto decCrypto)
      */
     public Vector processSecurityHeader(Document doc,
                                         String actor,
@@ -235,7 +236,7 @@ public class WSSecurityEngine {
      * Element. 
      * 
      * This function loops over all direct child elements of the
-     * <code>wsse:Security</code> header. If it finds a knwon element, it
+     * <code>wsse:Security</code> header. If it finds a known element, it
      * transfers control to the appropriate handling function. The method
      * processes the known child elements in the same order as they appear in
      * the <code>wsse:Security</code> element. This is in accordance to the WS
@@ -280,7 +281,7 @@ public class WSSecurityEngine {
         }
         /*
          * Gather some info about the document to process and store
-         * it for retrival. Store the implemenation of signature crypto
+         * it for retrieval. Store the implementation of signature crypto
          * (no need for encryption --- yet)
          */
         WSDocInfo wsDocInfo = new WSDocInfo(securityHeader.getOwnerDocument().hashCode());
@@ -304,7 +305,7 @@ public class WSSecurityEngine {
             Processor p = cfg.getProcessor(el);
             /*
              * Call the processor for this token. After the processor returns, 
-             * store it for later retrival. The token processor may store some
+             * store it for later retrieval. The token processor may store some
              * information about the processed token
              */
             if (p != null) {
