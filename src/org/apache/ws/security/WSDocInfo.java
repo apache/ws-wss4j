@@ -25,7 +25,7 @@ package org.apache.ws.security;
  * Using the Document's hash a caller can identify a document and get
  * the stored information that me be necessary to process the document.
  * The main usage for this is (are) the transformation functions that
- * are called during Signature/Verfication process. 
+ * are called during Signature/Verification process. 
  * 
  * @author Werner Dittmann (Werner.Dittmann@siemens.com)
  *
@@ -59,7 +59,7 @@ public class WSDocInfo {
             bst.removeAllElements();
         }
         if (processors != null && processors.size() > 0) {
-        	processors.removeAllElements();
+            processors.removeAllElements();
         }
         
         bst = null;
@@ -95,12 +95,12 @@ public class WSDocInfo {
      * @return the Security processor identified with this Id or null if nothing found
      */
     public Processor getProcessor(String id) {
-    	
+        
         if (id == null) {
-    		    return null;
-    	    }
+                return null;
+            }
 
-    	    Processor p = null;
+            Processor p = null;
         if (processors != null) {
             for (Enumeration e = processors.elements(); e.hasMoreElements();) {
                 p = (Processor) e.nextElement();
@@ -120,14 +120,14 @@ public class WSDocInfo {
      */
     public void setProcessor(Processor p) {
         if (processors == null) {
-        	processors = new Vector();
+            processors = new Vector();
         }
         processors.add(p);
     }
     
     /**
      * @return the signature crypto class used to process
-     *         the signature/verfiy
+     *         the signature/verify
      */
     public Crypto getCrypto() {
         return crypto;

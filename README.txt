@@ -59,7 +59,7 @@ There is also a Wiki concering Apache WS projects and WSS4J as one
 of the WS sub-projects:
     http://wiki.apache.org/ws/
     http://wiki.apache.org/ws/FrontPage/WsFx
-	
+    
 
 WS-Trust and WS-Secure Conversation specifications
 

@@ -74,7 +74,7 @@ public class SAMLTokenProcessor implements Processor {
      * Return the id of the SAML token
      */
     public String getId() {
-    	return this.id;
+        return this.id;
     }
 
     public Element getSamlTokenElement() {

@@ -124,7 +124,7 @@ public class WSSAddUsernameToken extends WSBaseMessage {
      * @deprecated replaced by {@link WSSecUsernameToken#getSecretKey()}
      */
     public byte[] getSecretKey() {
-    	return ut.getSecretKey();
+        return ut.getSecretKey();
     }
     /**
      * get the id
@@ -147,7 +147,7 @@ public class WSSAddUsernameToken extends WSBaseMessage {
      * A complete <code>UsernameToken</code> is constructed and added to
      * the <code>wsse:Security</code> header.
      *
-     * @param doc      The SOAP enevlope as W3C document
+     * @param doc      The SOAP envelope as W3C document
      * @param username The username to set in the UsernameToken
      * @param password The password of the user
      * @return Document with UsernameToken added
@@ -159,7 +159,7 @@ public class WSSAddUsernameToken extends WSBaseMessage {
         log.debug("Begin add username token...");
         Element securityHeader = insertSecurityHeader(doc);
         if (ut == null) {
-        	preSetUsernameToken(doc, username, password);
+            preSetUsernameToken(doc, username, password);
         }
         if (id != null)
             ut.setID(id);

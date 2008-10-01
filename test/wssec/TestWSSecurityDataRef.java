@@ -68,210 +68,210 @@ import org.w3c.dom.Element;
  * 
  */
 public class TestWSSecurityDataRef extends TestCase implements CallbackHandler {
-	private static Log log = LogFactory.getLog(TestWSSecurityDataRef.class);
+    private static Log log = LogFactory.getLog(TestWSSecurityDataRef.class);
 
-	static final String soapMsg = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
-			+ "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">"
-			+ "   <soapenv:Body>"
-			+ "      <ns1:testMethod xmlns:ns1=\"uri:LogTestService2\"></ns1:testMethod>"
-			+ "   </soapenv:Body>" + "</soapenv:Envelope>";
+    static final String soapMsg = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+            + "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">"
+            + "   <soapenv:Body>"
+            + "      <ns1:testMethod xmlns:ns1=\"uri:LogTestService2\"></ns1:testMethod>"
+            + "   </soapenv:Body>" + "</soapenv:Envelope>";
 
-	static final WSSecurityEngine secEngine = new WSSecurityEngine();
+    static final WSSecurityEngine secEngine = new WSSecurityEngine();
 
-	static final Crypto crypto = CryptoFactory
-			.getInstance("cryptoSKI.properties");
+    static final Crypto crypto = CryptoFactory
+            .getInstance("cryptoSKI.properties");
 
-	MessageContext msgContext;
+    MessageContext msgContext;
 
-	Message message;
+    Message message;
 
-	/**
-	 * TestWSSecurityDataRef constructor <p/>
-	 * 
-	 * @param name
-	 *            name of the test
-	 */
-	public TestWSSecurityDataRef(String name) {
-		super(name);
-	}
+    /**
+     * TestWSSecurityDataRef constructor <p/>
+     * 
+     * @param name
+     *            name of the test
+     */
+    public TestWSSecurityDataRef(String name) {
+        super(name);
+    }
 
-	/**
-	 * JUnit suite <p/>
-	 * 
-	 * @return a junit test suite
-	 */
-	public static Test suite() {
-		return new TestSuite( TestWSSecurityDataRef.class);
-	}
+    /**
+     * JUnit suite <p/>
+     * 
+     * @return a junit test suite
+     */
+    public static Test suite() {
+        return new TestSuite( TestWSSecurityDataRef.class);
+    }
 
-	/**
-	 * Main method <p/>
-	 * 
-	 * @param args
-	 *            command line args
-	 */
-	public static void main(String[] args) {
-		junit.textui.TestRunner.run(suite());
-	}
+    /**
+     * Main method <p/>
+     * 
+     * @param args
+     *            command line args
+     */
+    public static void main(String[] args) {
+        junit.textui.TestRunner.run(suite());
+    }
 
-	/**
-	 * Setup method <p/>
-	 * 
-	 * @throws Exception
-	 *             Thrown when there is a problem in setup
-	 */
-	protected void setUp() throws Exception {
-		AxisClient tmpEngine = new AxisClient(new NullProvider());
-		msgContext = new MessageContext(tmpEngine);
-		message = getSOAPMessage();
-	}
+    /**
+     * Setup method <p/>
+     * 
+     * @throws Exception
+     *             Thrown when there is a problem in setup
+     */
+    protected void setUp() throws Exception {
+        AxisClient tmpEngine = new AxisClient(new NullProvider());
+        msgContext = new MessageContext(tmpEngine);
+        message = getSOAPMessage();
+    }
 
-	/**
-	 * Constructs a soap envelope <p/>
-	 * 
-	 * @return soap envelope
-	 * @throws Exception
-	 *             if there is any problem constructing the soap envelope
-	 */
-	protected Message getSOAPMessage() throws Exception {
-		InputStream in = new ByteArrayInputStream(soapMsg.getBytes());
-		Message msg = new Message(in);
-		msg.setMessageContext(msgContext);
-		return msg;
-	}
+    /**
+     * Constructs a soap envelope <p/>
+     * 
+     * @return soap envelope
+     * @throws Exception
+     *             if there is any problem constructing the soap envelope
+     */
+    protected Message getSOAPMessage() throws Exception {
+        InputStream in = new ByteArrayInputStream(soapMsg.getBytes());
+        Message msg = new Message(in);
+        msg.setMessageContext(msgContext);
+        return msg;
+    }
 
-	/**
-	 * Test that check for correct WSDataRef object from ReferenceList Processor 
-	 * 
-	 * 
-	 * @throws Exception
-	 *             Thrown when there is an error in encryption or decryption
-	 */
-	public void testDataRefReferenceListProcessor() throws Exception {
-	  
-		SOAPEnvelope unsignedEnvelope = message.getSOAPEnvelope();
-		WSSecEncrypt builder = new WSSecEncrypt();
-		builder.setUserInfo("wss4jcert");
-		builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
-		builder.setSymmetricEncAlgorithm(WSConstants.TRIPLE_DES);
-		Document doc = unsignedEnvelope.getAsDocument();
-		WSSecHeader secHeader = new WSSecHeader();
-		secHeader.insertSecurityHeader(doc);
-		log.info("Before Encryption Triple DES....");
+    /**
+     * Test that check for correct WSDataRef object from ReferenceList Processor 
+     * 
+     * 
+     * @throws Exception
+     *             Thrown when there is an error in encryption or decryption
+     */
+    public void testDataRefReferenceListProcessor() throws Exception {
+      
+        SOAPEnvelope unsignedEnvelope = message.getSOAPEnvelope();
+        WSSecEncrypt builder = new WSSecEncrypt();
+        builder.setUserInfo("wss4jcert");
+        builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
+        builder.setSymmetricEncAlgorithm(WSConstants.TRIPLE_DES);
+        Document doc = unsignedEnvelope.getAsDocument();
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        log.info("Before Encryption Triple DES....");
 
-		/*
-		 * Prepare the Encrypt object with the token, setup data structure
-		 */
-		builder.prepare(doc, crypto);
+        /*
+         * Prepare the Encrypt object with the token, setup data structure
+         */
+        builder.prepare(doc, crypto);
 
-		/*
-		 * Set up the parts structure to encrypt the body
-		 */
-		SOAPConstants soapConstants = WSSecurityUtil.getSOAPConstants(doc
-				.getDocumentElement());
-		Vector parts = new Vector();
-		WSEncryptionPart encP = new WSEncryptionPart("testMethod", "uri:LogTestService2",
-				"Element");
-		parts.add(encP);
+        /*
+         * Set up the parts structure to encrypt the body
+         */
+        SOAPConstants soapConstants = WSSecurityUtil.getSOAPConstants(doc
+                .getDocumentElement());
+        Vector parts = new Vector();
+        WSEncryptionPart encP = new WSEncryptionPart("testMethod", "uri:LogTestService2",
+                "Element");
+        parts.add(encP);
 
-		/*
-		 * Encrypt the element (testMethod), create EncrypedData elements that reference
-		 * the EncryptedKey, and get a ReferenceList that can be put into the
-		 * Security header. Be sure that the ReferenceList is after the
-		 * EncryptedKey element in the Security header (strict layout)
-		 */
-		Element refs = builder.encryptForExternalRef(null, parts);
-		builder.addExternalRefElement(refs, secHeader);
+        /*
+         * Encrypt the element (testMethod), create EncrypedData elements that reference
+         * the EncryptedKey, and get a ReferenceList that can be put into the
+         * Security header. Be sure that the ReferenceList is after the
+         * EncryptedKey element in the Security header (strict layout)
+         */
+        Element refs = builder.encryptForExternalRef(null, parts);
+        builder.addExternalRefElement(refs, secHeader);
 
-		/*
-		 * now add (prepend) the EncryptedKey element, then a
-		 * BinarySecurityToken if one was setup during prepare
-		 */
-		builder.prependToHeader(secHeader);
+        /*
+         * now add (prepend) the EncryptedKey element, then a
+         * BinarySecurityToken if one was setup during prepare
+         */
+        builder.prependToHeader(secHeader);
 
-		builder.prependBSTElementToHeader(secHeader);
+        builder.prependBSTElementToHeader(secHeader);
 
-		Document encryptedDoc = doc;
-		log.info("After Encryption Triple DES....");
+        Document encryptedDoc = doc;
+        log.info("After Encryption Triple DES....");
 
-		checkDataRef(encryptedDoc);
-	}
+        checkDataRef(encryptedDoc);
+    }
 
-	/**
-	 * Verifies the soap envelope <p/>
-	 * 
-	 * @param envelope
-	 * @throws Exception
-	 *             Thrown when there is a problem in verification
-	 */
-	private void checkDataRef(Document doc) throws Exception {
-	    
-	        // Retrive the wsResults vector 
-		Vector wsResults = secEngine.processSecurityHeader(doc, null, this, crypto);
-		boolean found = false;
-				
-		for (int i = 0; i < wsResults.size(); i++) {
-		    
-		    WSSecurityEngineResult wsSecEngineResult = 
-		        (WSSecurityEngineResult)wsResults.get(i);		    
-		    int action = ((java.lang.Integer) 
-		        wsSecEngineResult.get(WSSecurityEngineResult.TAG_ACTION)).intValue();
-		    
-		    // We want to filter only encryption results
-		    if (action != WSConstants.ENCR) {
-		        continue;
-		    }
-		    ArrayList dataRefs = (ArrayList)wsSecEngineResult
-		        .get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
-		    
-		    //We want check only the DATA_REF_URIS 
-		    if (dataRefs != null && dataRefs.size() > 0) {
-		        for (int j = 0; j < dataRefs.size(); j++) {
-                            Object obj = dataRefs.get(i);                            
-                            
-                            // ReferenceList Processor must Return a WSDataRef objects
-                            assertTrue(obj instanceof WSDataRef);
-                            
-                            WSDataRef dataRef = (WSDataRef) obj;
-                            
-                            // Check whether dataRef URI is set
-                            assertNotNull(dataRef.getDataref());
-                            
-                            // Check whether QName is correctly set
-                            assertEquals("testMethod", dataRef.getName().getLocalPart());
-                            assertEquals("uri:LogTestService2", dataRef.getName().getNamespaceURI());
-                            
-                            // Check whether wsu:Id is set
-                            assertNotNull(dataRef.getWsuId());
-                            
-                            // flag to indicate the element was found in TAG_DATA_REF_URIS
-                            found = true;
-                                                      
-                        }
-		    }
+    /**
+     * Verifies the soap envelope <p/>
+     * 
+     * @param envelope
+     * @throws Exception
+     *             Thrown when there is a problem in verification
+     */
+    private void checkDataRef(Document doc) throws Exception {
+        
+        // Retrieve the wsResults vector 
+        Vector wsResults = secEngine.processSecurityHeader(doc, null, this, crypto);
+        boolean found = false;
+                
+        for (int i = 0; i < wsResults.size(); i++) {
+            
+            WSSecurityEngineResult wsSecEngineResult = 
+                (WSSecurityEngineResult)wsResults.get(i);           
+            int action = ((java.lang.Integer) 
+                wsSecEngineResult.get(WSSecurityEngineResult.TAG_ACTION)).intValue();
+            
+            // We want to filter only encryption results
+            if (action != WSConstants.ENCR) {
+                continue;
+            }
+            ArrayList dataRefs = (ArrayList)wsSecEngineResult
+                .get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
+            
+            //We want check only the DATA_REF_URIS 
+            if (dataRefs != null && dataRefs.size() > 0) {
+                for (int j = 0; j < dataRefs.size(); j++) {
+                    Object obj = dataRefs.get(i);                            
+
+                    // ReferenceList Processor must Return a WSDataRef objects
+                    assertTrue(obj instanceof WSDataRef);
+
+                    WSDataRef dataRef = (WSDataRef) obj;
+
+                    // Check whether dataRef URI is set
+                    assertNotNull(dataRef.getDataref());
+
+                    // Check whether QName is correctly set
+                    assertEquals("testMethod", dataRef.getName().getLocalPart());
+                    assertEquals("uri:LogTestService2", dataRef.getName().getNamespaceURI());
+
+                    // Check whether wsu:Id is set
+                    assertNotNull(dataRef.getWsuId());
+
+                    // flag to indicate the element was found in TAG_DATA_REF_URIS
+                    found = true;
+
                 }
-		
-		// Make sure the element is actually found in the decrypted elements
-		assertTrue(found);
-		
-	}
+            }
+        }
+        
+        // Make sure the element is actually found in the decrypted elements
+        assertTrue(found);
+        
+    }
 
-	public void handle(Callback[] callbacks) throws IOException,
-			UnsupportedCallbackException {
-		for (int i = 0; i < callbacks.length; i++) {
-			if (callbacks[i] instanceof WSPasswordCallback) {
-				WSPasswordCallback pc = (WSPasswordCallback) callbacks[i];
-				/*
-				 * here call a function/method to lookup the password for the
-				 * given identifier (e.g. a user name or keystore alias) e.g.:
-				 * pc.setPassword(passStore.getPassword(pc.getIdentfifier)) for
-				 * Testing we supply a fixed name here.
-				 */
-				pc.setPassword("security");
-			} else {
-				throw new UnsupportedCallbackException(callbacks[i],
-						"Unrecognized Callback");
-			}
-		}
-	}
+    public void handle(Callback[] callbacks) throws IOException,
+            UnsupportedCallbackException {
+        for (int i = 0; i < callbacks.length; i++) {
+            if (callbacks[i] instanceof WSPasswordCallback) {
+                WSPasswordCallback pc = (WSPasswordCallback) callbacks[i];
+                /*
+                 * here call a function/method to lookup the password for the
+                 * given identifier (e.g. a user name or keystore alias) e.g.:
+                 * pc.setPassword(passStore.getPassword(pc.getIdentfifier)) for
+                 * Testing we supply a fixed name here.
+                 */
+                pc.setPassword("security");
+            } else {
+                throw new UnsupportedCallbackException(callbacks[i],
+                        "Unrecognized Callback");
+            }
+        }
+    }
 }

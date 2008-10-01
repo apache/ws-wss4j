@@ -366,13 +366,13 @@ public class WSSignEnvelope extends WSBaseMessage {
              */
             try {
                 if (idToSign != null) {
-                	Element toSignById = WSSecurityUtil
-							.findElementById(doc.getDocumentElement(),
-									idToSign, WSConstants.WSU_NS);
-					if (toSignById == null) {
-						toSignById = WSSecurityUtil.findElementById(doc
-								.getDocumentElement(), idToSign, null);
-					}
+                    Element toSignById = WSSecurityUtil
+                            .findElementById(doc.getDocumentElement(),
+                                    idToSign, WSConstants.WSU_NS);
+                    if (toSignById == null) {
+                        toSignById = WSSecurityUtil.findElementById(doc
+                                .getDocumentElement(), idToSign, null);
+                    }
                     transforms = new Transforms(doc);
                     transforms
                             .addTransform(Transforms.TRANSFORM_C14N_EXCL_OMIT_COMMENTS);

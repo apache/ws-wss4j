@@ -153,7 +153,7 @@ public class Loader {
      */
     static public Class loadClass(String clazz) throws ClassNotFoundException {
         try {
-            ClassLoader tcl = getTCL();	
+            ClassLoader tcl = getTCL(); 
             
             if (tcl != null) {
                 Class c = tcl.loadClass(clazz);

@@ -114,12 +114,12 @@ public abstract class WSDoAllHandler extends WSHandler implements Handler {
      *  exists; otherwise null.
      */
     public Object getOption(String name) {
-	if (name == null) {
-	    throw new IllegalArgumentException("name cannot be null");
-	}
+        if (name == null) {
+            throw new IllegalArgumentException("name cannot be null");
+        }
         if (options == null) {
-	    return null;
-	}
+            return null;
+        }
         return options.get(name);
     }
 

@@ -34,125 +34,125 @@ import java.util.Vector;
  * @author Werner Dittmann (Werner.Dittmann@apache.org)
  */
 public class WSSecBase {
-	protected String user = null;
+    protected String user = null;
 
-	protected String password = null;
+    protected String password = null;
 
-	protected int keyIdentifierType = WSConstants.ISSUER_SERIAL;
+    protected int keyIdentifierType = WSConstants.ISSUER_SERIAL;
 
-	protected Vector parts = null;
+    protected Vector parts = null;
 
-	protected boolean doDebug = false;
+    protected boolean doDebug = false;
 
-	protected WSSConfig wssConfig = WSSConfig.getDefaultWSConfig();
+    protected WSSConfig wssConfig = WSSConfig.getDefaultWSConfig();
 
-	/**
-	 * Constructor.
-	 */
-	public WSSecBase() {
-	}
+    /**
+     * Constructor.
+     */
+    public WSSecBase() {
+    }
 
-	/**
-	 * Set which parts of the message to encrypt/sign. <p/>
-	 * 
-	 * @param parts
-	 *            The vector containing the WSEncryptionPart objects
-	 */
-	public void setParts(Vector parts) {
-		this.parts = parts;
-	}
+    /**
+     * Set which parts of the message to encrypt/sign. <p/>
+     * 
+     * @param parts
+     *            The vector containing the WSEncryptionPart objects
+     */
+    public void setParts(Vector parts) {
+        this.parts = parts;
+    }
 
-	/**
-	 * Sets which key identifier to use. 
+    /**
+     * Sets which key identifier to use. 
      * 
      * <p/> 
      * 
      * Defines the key identifier type to
-	 * use in the {@link WSSecSignature#prepare(Document, Crypto, WSSecHeader) method} or
-	 * the {@link WSSecEncrypt#prepare(Document, Crypto) method} function to
-	 * set up the key identification elements.
-	 * 
-	 * @param keyIdType
-	 * @see WSConstants#ISSUER_SERIAL
-	 * @see WSConstants#BST_DIRECT_REFERENCE
-	 * @see WSConstants#X509_KEY_IDENTIFIER
-	 * @see WSConstants#SKI_KEY_IDENTIFIER
-	 */
-	public void setKeyIdentifierType(int keyIdType) {
-		keyIdentifierType = keyIdType;
-	}
+     * use in the {@link WSSecSignature#prepare(Document, Crypto, WSSecHeader) method} or
+     * the {@link WSSecEncrypt#prepare(Document, Crypto) method} function to
+     * set up the key identification elements.
+     * 
+     * @param keyIdType
+     * @see WSConstants#ISSUER_SERIAL
+     * @see WSConstants#BST_DIRECT_REFERENCE
+     * @see WSConstants#X509_KEY_IDENTIFIER
+     * @see WSConstants#SKI_KEY_IDENTIFIER
+     */
+    public void setKeyIdentifierType(int keyIdType) {
+        keyIdentifierType = keyIdType;
+    }
 
-	/**
-	 * Gets the value of the <code>keyIdentifyerType</code>.
-	 * 
-	 * @return The <code>keyIdentifyerType</code>.
-	 * @see WSConstants#ISSUER_SERIAL
-	 * @see WSConstants#BST_DIRECT_REFERENCE
-	 * @see WSConstants#X509_KEY_IDENTIFIER
-	 * @see WSConstants#SKI_KEY_IDENTIFIER
-	 */
-	public int getKeyIdentifierType() {
-		return keyIdentifierType;
-	}
+    /**
+     * Gets the value of the <code>keyIdentifyerType</code>.
+     * 
+     * @return The <code>keyIdentifyerType</code>.
+     * @see WSConstants#ISSUER_SERIAL
+     * @see WSConstants#BST_DIRECT_REFERENCE
+     * @see WSConstants#X509_KEY_IDENTIFIER
+     * @see WSConstants#SKI_KEY_IDENTIFIER
+     */
+    public int getKeyIdentifierType() {
+        return keyIdentifierType;
+    }
 
-	/**
-	 * @param wsConfig
-	 *            The wsConfig to set.
-	 */
-	public void setWsConfig(WSSConfig wsConfig) {
-		this.wssConfig = wsConfig;
-	}
+    /**
+     * @param wsConfig
+     *            The wsConfig to set.
+     */
+    public void setWsConfig(WSSConfig wsConfig) {
+        this.wssConfig = wsConfig;
+    }
 
-	/**
-	 * Looks up or adds a body id. <p/> First try to locate the
-	 * <code>wsu:Id</code> in the SOAP body element. If one is found, the
-	 * value of the <code>wsu:Id</code> attribute is returned. Otherwise the
-	 * method generates a new <code>wsu:Id</code> and an appropriate value.
-	 * 
-	 * @param doc
-	 *            The SOAP envelope as <code>Document</code>
-	 * @return The value of the <code>wsu:Id</code> attribute of the SOAP body
-	 * @throws Exception
-	 */
-	protected String setBodyID(Document doc) throws Exception {
-		SOAPConstants soapConstants = WSSecurityUtil.getSOAPConstants(doc
-				.getDocumentElement());
-		Element bodyElement = (Element) WSSecurityUtil.getDirectChild(doc
-				.getFirstChild(), soapConstants.getBodyQName().getLocalPart(),
-				soapConstants.getEnvelopeURI());
-		if (bodyElement == null) {
-			throw new Exception("SOAP Body Element node not found");
-		}
-		return setWsuId(bodyElement);
-	}
+    /**
+     * Looks up or adds a body id. <p/> First try to locate the
+     * <code>wsu:Id</code> in the SOAP body element. If one is found, the
+     * value of the <code>wsu:Id</code> attribute is returned. Otherwise the
+     * method generates a new <code>wsu:Id</code> and an appropriate value.
+     * 
+     * @param doc
+     *            The SOAP envelope as <code>Document</code>
+     * @return The value of the <code>wsu:Id</code> attribute of the SOAP body
+     * @throws Exception
+     */
+    protected String setBodyID(Document doc) throws Exception {
+        SOAPConstants soapConstants = WSSecurityUtil.getSOAPConstants(doc
+                .getDocumentElement());
+        Element bodyElement = (Element) WSSecurityUtil.getDirectChild(doc
+                .getFirstChild(), soapConstants.getBodyQName().getLocalPart(),
+                soapConstants.getEnvelopeURI());
+        if (bodyElement == null) {
+            throw new Exception("SOAP Body Element node not found");
+        }
+        return setWsuId(bodyElement);
+    }
 
-	protected String setWsuId(Element bodyElement) {
-		String id = null;
-		id = bodyElement.getAttributeNS(WSConstants.WSU_NS, "Id");
+    protected String setWsuId(Element bodyElement) {
+        String id = null;
+        id = bodyElement.getAttributeNS(WSConstants.WSU_NS, "Id");
 
-		if ((id == null) || (id.length() == 0)) {
-			id = "id-" + Integer.toString(bodyElement.hashCode());
-			String prefix = WSSecurityUtil.setNamespace(bodyElement,
-					WSConstants.WSU_NS, WSConstants.WSU_PREFIX);
-			bodyElement.setAttributeNS(WSConstants.WSU_NS, prefix + ":Id", id);
-		}
-		return id;
-	}
+        if ((id == null) || (id.length() == 0)) {
+            id = "id-" + Integer.toString(bodyElement.hashCode());
+            String prefix = WSSecurityUtil.setNamespace(bodyElement,
+                    WSConstants.WSU_NS, WSConstants.WSU_PREFIX);
+            bodyElement.setAttributeNS(WSConstants.WSU_NS, prefix + ":Id", id);
+        }
+        return id;
+    }
 
-	/**
-	 * Set the user and password info. 
-	 * 
-	 * Both information is used to get the user's private signing key.
-	 * 
-	 * @param user
-	 *            This is the user's alias name in the keystore that identifies
-	 *            the private key to sign the document
-	 * @param password
-	 *            The user's password to get the private signing key from the
-	 *            keystore
-	 */
-	public void setUserInfo(String user, String password) {
-		this.user = user;
-		this.password = password;
-	}
+    /**
+     * Set the user and password info. 
+     * 
+     * Both information is used to get the user's private signing key.
+     * 
+     * @param user
+     *            This is the user's alias name in the keystore that identifies
+     *            the private key to sign the document
+     * @param password
+     *            The user's password to get the private signing key from the
+     *            keystore
+     */
+    public void setUserInfo(String user, String password) {
+        this.user = user;
+        this.password = password;
+    }
 }

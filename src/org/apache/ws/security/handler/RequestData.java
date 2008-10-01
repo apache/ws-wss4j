@@ -34,19 +34,19 @@ public class RequestData {
     private String encUser = null;
     private Vector encryptParts = new Vector();
     private X509Certificate encCert = null;
-    private int timeToLive = 300; 	// Timestamp: time in seconds between creation and expiry
+    private int timeToLive = 300;   // Timestamp: time in seconds between creation and expiry
     private WSSConfig wssConfig = null;
     private Vector signatureValues = new Vector();
     private WSSecHeader secHeader = null;
 
     public void clear() {
         soapConstants = null;
-       	actor = username = pwType = sigAlgorithm = encSymmAlgo = encKeyTransport = encUser = null;
-       	sigCrypto = decCrypto = encCrypto = null;
-       	signatureParts.clear();
-       	encryptParts.clear();
-       	encCert = null;
-       	utElements = null;
+        actor = username = pwType = sigAlgorithm = encSymmAlgo = encKeyTransport = encUser = null;
+        sigCrypto = decCrypto = encCrypto = null;
+        signatureParts.clear();
+        encryptParts.clear();
+        encCert = null;
+        utElements = null;
         wssConfig = null;
         signatureValues.clear();
     }

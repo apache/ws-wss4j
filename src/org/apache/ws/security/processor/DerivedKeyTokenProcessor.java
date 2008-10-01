@@ -139,8 +139,8 @@ public class DerivedKeyTokenProcessor implements Processor {
                 //Now use the callback and get it
                 this.secret = this.getSecret(cb, uri.substring(1));
             } else if (processor == null && keyIdentifierValue != null
-            		&& keyIdentifierValueType != null) {            	
-            	this.secret = this.getSecret(cb, keyIdentifierValue, keyIdentifierValueType); 
+                    && keyIdentifierValueType != null) {                
+                this.secret = this.getSecret(cb, keyIdentifierValue, keyIdentifierValueType); 
             } else if (processor instanceof EncryptedKeyProcessor) {
                 this.secret = ((EncryptedKeyProcessor) processor)
                         .getDecryptedBytes();
@@ -190,22 +190,22 @@ public class DerivedKeyTokenProcessor implements Processor {
     
     private byte[] getSecret(CallbackHandler cb, String keyIdentifierValue, String keyIdentifierType) 
                                                              throws WSSecurityException {
-    	
+        
         if (cb == null) {
             throw new WSSecurityException(WSSecurityException.FAILURE,
                     "noCallback");
         }
         
         WSPasswordCallback pwcb = null;
-    	
+        
         //Handle the EncryptedKeySHA1 type key references
-    	if (keyIdentifierType.equals
-    			(SecurityTokenReference.ENC_KEY_SHA1_URI)) {
+        if (keyIdentifierType.equals
+                (SecurityTokenReference.ENC_KEY_SHA1_URI)) {
 
             pwcb = new WSPasswordCallback(keyIdentifierValue,
                                                WSPasswordCallback.ENCRYPTED_KEY_TOKEN);
             try {
-            	cb.handle(new Callback[]{pwcb});
+                cb.handle(new Callback[]{pwcb});
             } catch (IOException e) {
                 throw new WSSecurityException(WSSecurityException.FAILURE, "noKey",
                         new Object[] { id }, e);
@@ -215,7 +215,7 @@ public class DerivedKeyTokenProcessor implements Processor {
             }
             
         }
-    	return pwcb.getKey();
+        return pwcb.getKey();
     }
     
     /**

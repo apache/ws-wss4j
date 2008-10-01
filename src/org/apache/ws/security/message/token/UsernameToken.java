@@ -409,12 +409,12 @@ public class UsernameToken {
      */
     public void setPassword(String pwd) {
         if (pwd == null) {
-        	if(this.passwordType != null) {
-        		throw new IllegalArgumentException("pwd == null but a password is needed");
-        	} else {
-        		// Ignore setting the password.
-        		return;
-        	}
+            if(this.passwordType != null) {
+                throw new IllegalArgumentException("pwd == null but a password is needed");
+            } else {
+                // Ignore setting the password.
+                return;
+            }
         }
         
         raw_password = pwd;             // enhancement by Alberto coletti

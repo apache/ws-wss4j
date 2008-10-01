@@ -71,22 +71,22 @@ public class Timestamp {
             if (currentChild instanceof Element) {
                 if (WSConstants.CREATED_LN.equals(currentChild.getLocalName()) &&
                         WSConstants.WSU_NS.equals(currentChild.getNamespaceURI())) {
-                	if (strCreated == null) {
-                		strCreated = ((Text) ((Element) currentChild).getFirstChild()).getData();
-                	}
-                	else {
+                    if (strCreated == null) {
+                        strCreated = ((Text) ((Element) currentChild).getFirstChild()).getData();
+                    }
+                    else {
                         throw new WSSecurityException(WSSecurityException.INVALID_SECURITY,
                                 "invalidTimestamp");
-                	}
+                    }
                 } else if (WSConstants.EXPIRES_LN.equals(currentChild.getLocalName()) &&
                         WSConstants.WSU_NS.equals(currentChild.getNamespaceURI())) {
-                	if (strExpires == null) {
-                		strExpires = ((Text) ((Element) currentChild).getFirstChild()).getData();
-                	}
-                	else {
+                    if (strExpires == null) {
+                        strExpires = ((Text) ((Element) currentChild).getFirstChild()).getData();
+                    }
+                    else {
                         throw new WSSecurityException(WSSecurityException.INVALID_SECURITY,
-                        "invalidTimestamp");                		
-                	}
+                        "invalidTimestamp");                        
+                    }
                 } else {
                     customElements.add((Element) currentChild);
                 }
@@ -96,14 +96,14 @@ public class Timestamp {
         DateFormat zulu = new XmlSchemaDateFormat();
         
         try {
-        	if (strCreated != null) {
+            if (strCreated != null) {
                 created = Calendar.getInstance();
-        		created.setTime(zulu.parse(strCreated));
-        	}
-        	if (strExpires != null) {
+                created.setTime(zulu.parse(strCreated));
+            }
+            if (strExpires != null) {
                 expires = Calendar.getInstance();
-        		expires.setTime(zulu.parse(strExpires));
-        	}
+                expires.setTime(zulu.parse(strExpires));
+            }
         } catch (ParseException e) {
             throw new WSSecurityException(WSSecurityException.INVALID_SECURITY,
                     "invalidTimestamp",
@@ -124,22 +124,19 @@ public class Timestamp {
 
         customElements = new Vector();
 
-        element =
-                doc.createElementNS(WSConstants.WSU_NS,
-                        WSConstants.WSU_PREFIX
-                + ":"
-                + WSConstants.TIMESTAMP_TOKEN_LN);
-        WSSecurityUtil.setNamespace(element,
-                WSConstants.WSU_NS,
-                WSConstants.WSU_PREFIX);
+        element = 
+            doc.createElementNS(
+                WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + WSConstants.TIMESTAMP_TOKEN_LN
+            );
+        WSSecurityUtil.setNamespace(element, WSConstants.WSU_NS, WSConstants.WSU_PREFIX);
 
         DateFormat zulu = null;
         if (milliseconds) {
-        	zulu = new XmlSchemaDateFormat();
+            zulu = new XmlSchemaDateFormat();
         }
         else {
-        	zulu = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-        	zulu.setTimeZone(TimeZone.getTimeZone("UTC"));
+            zulu = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+            zulu.setTimeZone(TimeZone.getTimeZone("UTC"));
         }
         created = getCurrentTime();
 
@@ -174,7 +171,7 @@ public class Timestamp {
      * @return calendar the current time
      */
     protected Calendar getCurrentTime() {
-    	return Calendar.getInstance();
+        return Calendar.getInstance();
     }
     
     /**

@@ -49,7 +49,7 @@ public abstract class AbstractCrypto extends CryptoBase {
      * @param properties
      */
     public AbstractCrypto(Properties properties) throws CredentialException, IOException {
-    	this(properties,AbstractCrypto.class.getClassLoader());
+        this(properties,AbstractCrypto.class.getClassLoader());
     }
 
     /**
@@ -65,13 +65,13 @@ public abstract class AbstractCrypto extends CryptoBase {
             return;
         }
         String location = this.properties.getProperty("org.apache.ws.security.crypto.merlin.file");
-		InputStream is = null;
-		java.net.URL url = Loader.getResource(loader, location);
-		if(url != null) {
-			is =  url.openStream();
-		} else {
-			is = new java.io.FileInputStream(location);
-		}
+        InputStream is = null;
+        java.net.URL url = Loader.getResource(loader, location);
+        if(url != null) {
+            is =  url.openStream();
+        } else {
+            is = new java.io.FileInputStream(location);
+        }
 
         /**
          * If we don't find it, then look on the file system.

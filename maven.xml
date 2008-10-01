@@ -137,9 +137,9 @@
     <postGoal name="jar">
         <ant:mkdir dir="${basedir}/target/lib"/>
     </postGoal>
-	<!--
+    <!--
     <preGoal name="xdoc:jelly-transform">
       <attainGoal name="html2xdoc"/>
     </preGoal>  
-	-->
+    -->
 </project>

@@ -261,7 +261,7 @@ public class WSEncryptBody extends WSBaseMessage {
      * <ul>
      * <li>    First step: set the encoding namespace in the SOAP:Envelope </li>
      * <li>    Second step: generate a symmetric key (session key) for
-     * the selected symmetric encryption alogrithm, and set the cipher
+     * the selected symmetric encryption algorithm, and set the cipher
      * into encryption mode.
      * </li>
      * <li> Third step: get the data to encrypt.
@@ -631,39 +631,39 @@ public class WSEncryptBody extends WSBaseMessage {
     }
 
     private KeyGenerator getKeyGenerator() throws WSSecurityException {
-		KeyGenerator keyGen = null;
-		try {
-			/*
-			 * Assume AES as default, so initialize it
-			 */
-		    keyGen = KeyGenerator.getInstance("AES");
-			if (symEncAlgo.equalsIgnoreCase(WSConstants.TRIPLE_DES)) {
-			    keyGen = KeyGenerator.getInstance("DESede");
-			} else if (symEncAlgo.equalsIgnoreCase(WSConstants.AES_128)) {
-				keyGen.init(128);
-			} else if (symEncAlgo.equalsIgnoreCase(WSConstants.AES_192)) {
-				keyGen.init(192);
-			} else if (symEncAlgo.equalsIgnoreCase(WSConstants.AES_256)) {
-				keyGen.init(256);
-			} else {
-				return null;
-			}
-		} catch (NoSuchAlgorithmException e) {
-			throw new WSSecurityException(
-					WSSecurityException.UNSUPPORTED_ALGORITHM, null, null, e);
-		}
-		return keyGen;
-	}
+        KeyGenerator keyGen = null;
+        try {
+            /*
+             * Assume AES as default, so initialize it
+             */
+            keyGen = KeyGenerator.getInstance("AES");
+            if (symEncAlgo.equalsIgnoreCase(WSConstants.TRIPLE_DES)) {
+                keyGen = KeyGenerator.getInstance("DESede");
+            } else if (symEncAlgo.equalsIgnoreCase(WSConstants.AES_128)) {
+                keyGen.init(128);
+            } else if (symEncAlgo.equalsIgnoreCase(WSConstants.AES_192)) {
+                keyGen.init(192);
+            } else if (symEncAlgo.equalsIgnoreCase(WSConstants.AES_256)) {
+                keyGen.init(256);
+            } else {
+                return null;
+            }
+        } catch (NoSuchAlgorithmException e) {
+            throw new WSSecurityException(
+                    WSSecurityException.UNSUPPORTED_ALGORITHM, null, null, e);
+        }
+        return keyGen;
+    }
 
     /**
-	 * Create DOM subtree for <code>xenc:EncryptedKey</code>
-	 * 
-	 * @param doc
-	 *            the SOAP envelope parent document
-	 * @param keyTransportAlgo
-	 *            specifies which algorithm to use to encrypt the symmetric key
-	 * @return an <code>xenc:EncryptedKey</code> element
-	 */
+     * Create DOM subtree for <code>xenc:EncryptedKey</code>
+     * 
+     * @param doc
+     *            the SOAP envelope parent document
+     * @param keyTransportAlgo
+     *            specifies which algorithm to use to encrypt the symmetric key
+     * @return an <code>xenc:EncryptedKey</code> element
+     */
     public static Element createEncryptedKey(Document doc, String keyTransportAlgo) {
         Element encryptedKey =
                 doc.createElementNS(WSConstants.ENC_NS,

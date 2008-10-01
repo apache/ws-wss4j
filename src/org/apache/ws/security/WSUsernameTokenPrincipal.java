@@ -165,18 +165,18 @@ public class WSUsernameTokenPrincipal implements Principal, java.io.Serializable
         return ("WSUsernameTokenPrincipal:  " + name);
     }
 
-	/**
-	 * @return Returns the passwordType.
-	 */
-	public String getPasswordType() {
-		return passwordType;
-	}
-	/**
-	 * @param passwordType The passwordType to set.
-	 */
-	public void setPasswordType(String passwordType) {
-		this.passwordType = passwordType;
-	}
+    /**
+     * @return Returns the passwordType.
+     */
+    public String getPasswordType() {
+        return passwordType;
+    }
+    /**
+     * @param passwordType The passwordType to set.
+     */
+    public void setPasswordType(String passwordType) {
+        this.passwordType = passwordType;
+    }
     /**
      * Compares the specified Object with this <code>WSUsernameTokenPrincipal</code>
      * for equality.  Returns true if the given object is also a
@@ -191,15 +191,19 @@ public class WSUsernameTokenPrincipal implements Principal, java.io.Serializable
      *         <code>WSUsernameTokenPrincipal</code>.
      */
     public boolean equals(Object o) {
-        if (o == null)
+        if (o == null) {
             return false;
-        if (this == o)
+        }
+        if (this == o) {
             return true;
-        if (!(o instanceof WSUsernameTokenPrincipal))
+        }
+        if (!(o instanceof WSUsernameTokenPrincipal)) {
             return false;
+        }
         WSUsernameTokenPrincipal that = (WSUsernameTokenPrincipal) o;
-        if (this.getName().equals(that.getName()))
+        if (this.getName().equals(that.getName())) {
             return true;
+        }
         return false;
     }
 

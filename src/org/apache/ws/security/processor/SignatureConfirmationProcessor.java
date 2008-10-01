@@ -55,6 +55,6 @@ public class SignatureConfirmationProcessor implements Processor {
      * @see org.apache.ws.security.processor.Processor#getId()
      */
     public String getId() {
-    	return scId;
+        return scId;
     }    
 }

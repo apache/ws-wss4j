@@ -27,14 +27,21 @@ import javax.security.auth.callback.CallbackHandler;
 import java.util.Vector;
 
 public interface Processor {
-	public void handleToken(Element elem, Crypto crypto, Crypto decCrypto,
-			CallbackHandler cb, WSDocInfo wsDocInfo, Vector returnResults,
-			WSSConfig config) throws WSSecurityException;
-	
+    
+    public void handleToken(
+        Element elem, 
+        Crypto crypto, 
+        Crypto decCrypto,
+        CallbackHandler cb, 
+        WSDocInfo wsDocInfo, 
+        Vector returnResults,
+        WSSConfig config
+    ) throws WSSecurityException;
+    
     /**
-     * Get the Id of the processoer.
+     * Get the Id of the processor.
      * 
      * @return The Id string
      */
-	public String getId();
+    public String getId();
 }

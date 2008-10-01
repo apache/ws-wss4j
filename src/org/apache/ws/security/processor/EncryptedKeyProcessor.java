@@ -104,7 +104,7 @@ public class EncryptedKeyProcessor implements Processor {
         if (tlog.isDebugEnabled()) {
             t0 = System.currentTimeMillis();
         }
-        // need to have it to find the encryped data elements in the envelope
+        // need to have it to find the encrypted data elements in the envelope
         Document doc = xencEncryptedKey.getOwnerDocument();
 
         // lookup xenc:EncryptionMethod, get the Algorithm attribute to determine
@@ -160,9 +160,9 @@ public class EncryptedKeyProcessor implements Processor {
                 }
                 SecurityTokenReference secRef = new SecurityTokenReference(secRefToken);
                 /*
-				 * Well, at this point there are several ways to get the key.
-				 * Try to handle all of them :-).
-				 */
+                 * Well, at this point there are several ways to get the key.
+                 * Try to handle all of them :-).
+                 */
                 alias = null;
                 /*
                 * handle X509IssuerSerial here. First check if all elements are available,
@@ -239,14 +239,14 @@ public class EncryptedKeyProcessor implements Processor {
                                 "unsupportedBinaryTokenType",
                                 null);
                     }
-        			/*
-        			 * The following code is somewhat strange: the called crypto method gets
-        			 * the keyname and searches for a certificate with an issuer's name that is
-        			 * equal to this keyname. No serialnumber is used - IMHO this does
-        			 * not identifies a certificate. In addition neither the WSS4J encryption
-        			 * nor signature methods use this way to identify a certificate. Because of that
-        			 * the next lines of code are disabled.  
-        			 */
+                    /*
+                     * The following code is somewhat strange: the called crypto method gets
+                     * the keyname and searches for a certificate with an issuer's name that is
+                     * equal to this keyname. No serialnumber is used - IMHO this does
+                     * not identifies a certificate. In addition neither the WSS4J encryption
+                     * nor signature methods use this way to identify a certificate. Because of that
+                     * the next lines of code are disabled.  
+                     */
 //                } else if (secRef.containsKeyName()) {
 //                    alias = crypto.getAliasForX509Cert(secRef.getKeyNameValue());
 //                    if (log.isDebugEnabled()) {
@@ -332,7 +332,7 @@ public class EncryptedKeyProcessor implements Processor {
                 "ReferenceList", WSConstants.ENC_NS);
         ArrayList dataRefs = new ArrayList();
         if (refList != null) {
-        	       	
+                    
             for (tmpE = refList.getFirstChild();
                  tmpE != null; tmpE = tmpE.getNextSibling()) {
                 if (tmpE.getNodeType() != Node.ELEMENT_NODE) {
@@ -408,7 +408,7 @@ public class EncryptedKeyProcessor implements Processor {
 
         boolean content = X509Util.isContent(encBodyData);
 
-        // get the encryprion method
+        // get the encryption method
         String symEncAlgo = X509Util.getEncAlgo(encBodyData);
 
         SecretKey symmetricKey = WSSecurityUtil.prepareSecretKey(
@@ -418,11 +418,11 @@ public class EncryptedKeyProcessor implements Processor {
         XMLCipher xmlCipher = null;
         try {
             xmlCipher = XMLCipher.getInstance(symEncAlgo);
-			xmlCipher.init(XMLCipher.DECRYPT_MODE, symmetricKey);
-		} catch (XMLEncryptionException e) {
-			throw new WSSecurityException(
-					WSSecurityException.UNSUPPORTED_ALGORITHM, null, null, e);
-		}
+            xmlCipher.init(XMLCipher.DECRYPT_MODE, symmetricKey);
+        } catch (XMLEncryptionException e) {
+            throw new WSSecurityException(
+                    WSSecurityException.UNSUPPORTED_ALGORITHM, null, null, e);
+        }
 
         if (content) {
             encBodyData = (Element) encBodyData.getParentNode();
@@ -561,7 +561,7 @@ public class EncryptedKeyProcessor implements Processor {
      * @return The Id string
      */
     public String getId() {
-    	return encryptedKeyId;
+        return encryptedKeyId;
     }
     
     

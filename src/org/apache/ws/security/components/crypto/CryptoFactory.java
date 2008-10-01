@@ -177,7 +177,7 @@ public abstract class CryptoFactory {
     }
 
     private static Crypto loadClass(String cryptoClassName, Map map) {
-    	return loadClass(cryptoClassName,map,CryptoFactory.class.getClassLoader());
+        return loadClass(cryptoClassName,map,CryptoFactory.class.getClassLoader());
     }
 
     /**
@@ -236,7 +236,7 @@ public abstract class CryptoFactory {
      * @return a <code>Properties</code> object loaded from the filename
      */
     private static Properties getProperties(String propFilename) {
-    	return getProperties(propFilename, CryptoFactory.class.getClassLoader());
+        return getProperties(propFilename, CryptoFactory.class.getClassLoader());
     }
     
     

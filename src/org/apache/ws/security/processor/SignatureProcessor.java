@@ -93,7 +93,6 @@ public class SignatureProcessor implements Processor {
             returnResults.add(0, new WSSecurityEngineResult(
                     WSConstants.UT_SIGN, lastPrincipalFound, null,
                     returnElements, protectedElements, signatureValue[0]));
-
         } else {
             returnResults.add(0, new WSSecurityEngineResult(
                     WSConstants.SIGN, lastPrincipalFound,
@@ -134,7 +133,7 @@ public class SignatureProcessor implements Processor {
      *                    entry of this array. Ther caller may then further validate
      *                    the certificate
      * @param returnElements verifyXMLSignature adds the wsu:ID attribute values for
-     * 			     the signed elements to this Set
+     *               the signed elements to this Set
      * @param cb CallbackHandler instance to extract key passwords
      * @return the subject principal of the validated X509 certificate (the
      *         authenticated subject). The calling function may use this
@@ -237,7 +236,6 @@ public class SignatureProcessor implements Processor {
                         secretKey = samlKi.getSecret();
 
                     } else if (el.equals(WSSecurityEngine.ENCRYPTED_KEY)){
-                        
                         String encryptedKeyID = token.getAttributeNS(null,"Id");                   
                         EncryptedKeyProcessor encryptKeyProcessor = (EncryptedKeyProcessor)
                                 wsDocInfo.getProcessor(encryptedKeyID);
@@ -251,10 +249,9 @@ public class SignatureProcessor implements Processor {
                             encryptKeyProcessor.handleEncryptedKey((Element)token, cb, crypto);
                         
                         } 
-                        
                         secretKey = encryptKeyProcessor.getDecryptedBytes();
                      
-                    }else {
+                    } else {
                         
                         //Try custom token through callback handler
                         //try to find a custom token
@@ -283,24 +280,23 @@ public class SignatureProcessor implements Processor {
             } else if (secRef.containsX509Data() || secRef.containsX509IssuerSerial()) {
                 certs = secRef.getX509IssuerSerial(crypto);
             } else if (secRef.containsKeyIdentifier()) {
-            	if (secRef.getKeyIdentifierValueType().equals
-            			(SecurityTokenReference.ENC_KEY_SHA1_URI)) {
+                if (secRef.getKeyIdentifierValueType().equals
+                        (SecurityTokenReference.ENC_KEY_SHA1_URI)) {
                     
-            		String id = secRef.getKeyIdentifierValue();
+                    String id = secRef.getKeyIdentifierValue();
                     WSPasswordCallback pwcb = new WSPasswordCallback(id,
                                                        WSPasswordCallback.ENCRYPTED_KEY_TOKEN);
                     try {
-                    	cb.handle(new Callback[]{pwcb});
-		            } catch (Exception e) {
-		                throw new WSSecurityException(WSSecurityException.FAILURE,
-		                        "noPassword", new Object[] { id }, e);
-		            }
-            
-		            secretKey = pwcb.getKey();
-		            
-            	} else {
-            		certs = secRef.getKeyIdentifier(crypto);
-            	}
+                        cb.handle(new Callback[]{pwcb});
+                    } catch (Exception e) {
+                        throw new WSSecurityException(WSSecurityException.FAILURE,
+                                "noPassword", new Object[] { id }, e);
+                    }
+                    secretKey = pwcb.getKey();
+                    
+                } else {
+                    certs = secRef.getKeyIdentifier(crypto);
+                }
             } else {
                 throw new WSSecurityException(
                         WSSecurityException.INVALID_SECURITY,
@@ -504,7 +500,7 @@ public class SignatureProcessor implements Processor {
      * @see org.apache.ws.security.processor.Processor#getId()
      */
     public String getId() {
-    	return signatureId;
+        return signatureId;
     }
 
 }

@@ -209,7 +209,7 @@ public class SecurityTokenReference {
             
             // In some scenarios id is used rather than wsu:Id
             if (tokElement == null) {
-            	tokElement = WSSecurityUtil.getElementByGenId(doc, uri);
+                tokElement = WSSecurityUtil.getElementByGenId(doc, uri);
             }
 
         }

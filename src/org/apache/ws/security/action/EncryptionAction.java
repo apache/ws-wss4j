@@ -36,7 +36,7 @@ public class EncryptionAction implements Action {
         }
         if (reqData.getEncKeyId() == WSConstants.EMBEDDED_KEYNAME) {
             String encKeyName = handler.getString(WSHandlerConstants.ENC_KEY_NAME,
-				    reqData.getMsgContext());
+                    reqData.getMsgContext());
             wsEncrypt.setEmbeddedKeyName(encKeyName);
             byte[] embeddedKey =
                     handler.getPassword(reqData.getEncUser(),

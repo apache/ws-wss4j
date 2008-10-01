@@ -9,7 +9,7 @@
    ANT is available from http://jakarta.apache.org/ant/index.html
 
 Prerequisites:
-	See the README file
+    See the README file
 
 Build Instructions:
    To build, run
@@ -100,8 +100,8 @@ Build Instructions:
          the CLASSPATH includes all required packages (see above
 
          -->
-    	
-    	
+        
+        
         <path id="classpath.libraries" description="3rd party libs">
             <fileset dir="${dir.libs}">
                 <include name="**/*.jar"/>
@@ -286,7 +286,7 @@ org.apache.ws.axis.security.util
     <!-- ################################################################## -->
 
     <target name="prepare-src" depends="prepare" 
-    	description="This target copies the Java sources and brands the version information">
+        description="This target copies the Java sources and brands the version information">
         <!-- create directories -->
         <mkdir dir="${build.classes}"/>
     </target>
@@ -443,7 +443,7 @@ org.apache.ws.axis.security.util
         </path>
         <property name="undeploy_xml_property" refid="undeploy_xml_files"/>
 
-    	<antcall target="deployWSDD" />
+        <antcall target="deployWSDD" />
         <junit printsummary="yes"
             haltonfailure="yes"
             fork="yes"
@@ -470,7 +470,7 @@ org.apache.ws.axis.security.util
                "${build.work}/org/apache/ws/axis/oasis/ping/undeploy.wsdd"/>
         </java>
 
-	    <junit printsummary="yes"
+        <junit printsummary="yes"
             haltonfailure="yes"
             fork="yes"
             dir="${basedir}">
@@ -568,14 +568,14 @@ org.apache.ws.axis.security.util
          </java>
     </target>
 
-	<!--
-	This runs the selected scenario with SimpleAxisServer locally.
-	Before you start this target be sure you have started tcpmon too 
+    <!--
+    This runs the selected scenario with SimpleAxisServer locally.
+    Before you start this target be sure you have started tcpmon too 
         in a separate
-	"ant tcpmon" call.
-	To run different scenarios use: "ant -DNumber=x scenarioTest" 
+    "ant tcpmon" call.
+    To run different scenarios use: "ant -DNumber=x scenarioTest" 
         to run scenario x
-	-->
+    -->
     <target name="scenarioTest" depends="compile"
         if="junit.present"
         description="Runs all JUnit tests">
@@ -590,28 +590,28 @@ org.apache.ws.axis.security.util
         <echo message=
           "Running interop test scenario ${Number} on SimpleAxisServer"/>
 
-    	<antcall target="deployWSDD" />
-    	
+        <antcall target="deployWSDD" />
+        
         <java classname="interop.TestScenario${Number}" fork="yes" 
                  dir="${basedir}">
             <jvmarg value="-Djava.endorsed.dirs=${basedir}/endorsed"/>
             <classpath refid="classpath.library"/>
         </java>
 
-    	<antcall target="undeployWSDD" />
+        <antcall target="undeployWSDD" />
 
     </target>
-	
-	<!--
-	This runs the selected scenario with SimpleAxisServer locally 
+    
+    <!--
+    This runs the selected scenario with SimpleAxisServer locally 
         with perfomance
-	timing switched on.
-	You may also emable the **.TIME entry in log4j.properties to get 
+    timing switched on.
+    You may also emable the **.TIME entry in log4j.properties to get 
         the internal
-	timing.
-	To run different scenarios use: "ant -DNumber=x scenarioTest" 
+    timing.
+    To run different scenarios use: "ant -DNumber=x scenarioTest" 
         to run scenario x
-	-->
+    -->
     <target name="performanceTest" depends="compile"
         if="junit.present"
         description="Runs all JUnit tests">
@@ -626,17 +626,17 @@ org.apache.ws.axis.security.util
         <echo message=
            "Running performance test scenario ${Number} on SimpleAxisServer"/>
 
-    	<antcall target="deployWSDD" />
+        <antcall target="deployWSDD" />
         <java classname="interop.TestScenario${Number}" fork="yes" 
             dir="${basedir}">
             <jvmarg value="-Djava.endorsed.dirs=${basedir}/endorsed"/>
        <arg value="-lhttp://localhost:8080/axis/services/Ping${Number}" />
-        	<arg value="-t" />
+            <arg value="-t" />
             <classpath refid="classpath.library"/>
         </java>
-    	<antcall target="undeployWSDD" />
+        <antcall target="undeployWSDD" />
     </target>
-	
+    
     <target name="deployWSDD">
       <path id="deploy_xml_files">
       <fileset dir="${build.work}">
@@ -664,7 +664,7 @@ org.apache.ws.axis.security.util
         <arg line="${deploy_xml_property}"/>
       </java>
     </target>
-	
+    
     <target name="undeployWSDD">
       <path id="undeploy_xml_files">
         <fileset dir="${build.work}">
@@ -686,8 +686,8 @@ org.apache.ws.axis.security.util
         <arg line="${undeploy_xml_property}"/>
       </java>
     </target>
-		
-	<!-- generate a report from all the tests. 
+        
+    <!-- generate a report from all the tests. 
            requires Xalan or other XSLT engine in ant\lib-->
 
    <target name="report" depends="init">
@@ -737,15 +737,15 @@ org.apache.ws.axis.security.util
 
     <target name="otherdist" depends="init" 
              description="Build zip for required jars">
-	     <mkdir dir="${dir.dist}"/>
-	     <zip destfile=
+         <mkdir dir="${dir.dist}"/>
+         <zip destfile=
            "${dir.dist}/${product.shortname}-otherjars-${product.version}.zip">
-	         <zipfileset prefix="wss4j" dir="."
-	             includes="lib/*.jar, endorsed/*.jar"/>
-	     </zip>
-	 </target>	
-	
-	<target name="srcdist" depends="init" description=
+             <zipfileset prefix="wss4j" dir="."
+                 includes="lib/*.jar, endorsed/*.jar"/>
+         </zip>
+     </target>  
+    
+    <target name="srcdist" depends="init" description=
                "Build source zip file for distro">
         <mkdir dir="${dir.dist}"/>
         <zip destfile=

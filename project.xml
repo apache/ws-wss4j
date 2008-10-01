@@ -49,9 +49,9 @@
        the connection element has the form:
        scm:<system>:<system specific connection string> -->
   <repository>
-  	<connection>scm:svn:http://svn.apache.org:repos/asf/webservices:wss4j/trunk</connection>
-	<developerConnection>scm:svn:http://svn.apache.org:repos/asf/webservices:wss4j/trunk</developerConnection>
-	<url>http://svn.apache.org/viewcvs.cgi/webservices/wss4j/trunk?root=Apache-SVN</url>
+    <connection>scm:svn:http://svn.apache.org:repos/asf/webservices:wss4j/trunk</connection>
+    <developerConnection>scm:svn:http://svn.apache.org:repos/asf/webservices:wss4j/trunk</developerConnection>
+    <url>http://svn.apache.org/viewcvs.cgi/webservices/wss4j/trunk?root=Apache-SVN</url>
   </repository>
 
   <!-- any mailing lists for the project -->

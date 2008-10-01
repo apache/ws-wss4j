@@ -70,15 +70,15 @@ public class WSDoAllSender extends WSDoAllHandler {
 
         reqData.setMsgContext(mc);
         /*
-	 * The overall try, just to have a finally at the end to perform some
-	 * housekeeping.
-	 */
+         * The overall try, just to have a finally at the end to perform some
+         * housekeeping.
+         */
         try {
             /*
-	     * Get the action first.
-	     */
+             * Get the action first.
+             */
             Vector actions = new Vector();
-	    String action = getString(WSHandlerConstants.ACTION, mc);
+            String action = getString(WSHandlerConstants.ACTION, mc);
             if (action == null) {
                 throw new AxisFault("WSDoAllSender: No action defined");
             }
@@ -88,9 +88,9 @@ public class WSDoAllSender extends WSDoAllHandler {
             }
 
             /*
-                * For every action we need a username, so get this now. The
-                * username defined in the deployment descriptor takes precedence.
-                */
+             * For every action we need a username, so get this now. The
+             * username defined in the deployment descriptor takes precedence.
+             */
             reqData.setUsername((String) getOption(WSHandlerConstants.USER));
             if (reqData.getUsername() == null || reqData.getUsername().equals("")) {
                 String username = (String) getProperty(reqData.getMsgContext(), WSHandlerConstants.USER);
@@ -102,18 +102,18 @@ public class WSDoAllSender extends WSDoAllHandler {
                 }
             }
             /*
-                * Now we perform some set-up for UsernameToken and Signature
-                * functions. No need to do it for encryption only. Check if
-                * username is available and then get a passowrd.
-                */
+             * Now we perform some set-up for UsernameToken and Signature
+             * functions. No need to do it for encryption only. Check if
+             * username is available and then get a passowrd.
+             */
             if ((doAction & (WSConstants.SIGN | WSConstants.UT | WSConstants.UT_SIGN)) != 0) {
                 /*
-                     * We need a username - if none throw an AxisFault. For
-                     * encryption there is a specific parameter to get a username.
-                     */
+                 * We need a username - if none throw an AxisFault. For
+                 * encryption there is a specific parameter to get a username.
+                 */
                 if (reqData.getUsername() == null || reqData.getUsername().equals("")) {
                     throw new AxisFault(
-                            "WSDoAllSender: Empty username for specified action");
+                    "WSDoAllSender: Empty username for specified action");
                 }
             }
             if (doDebug) {
@@ -121,21 +121,21 @@ public class WSDoAllSender extends WSDoAllHandler {
                 log.debug("Actor: " + reqData.getActor());
             }
             /*
-                * Now get the SOAP part from the request message and convert it
-                * into a Document.
-                *
-                * This forces Axis to serialize the SOAP request into FORM_STRING.
-                * This string is converted into a document.
-                *
-                * During the FORM_STRING serialization Axis performs multi-ref of
-                * complex data types (if requested), generates and inserts
-                * references for attachements and so on. The resulting Document
-                * MUST be the complete and final SOAP request as Axis would send it
-                * over the wire. Therefore this must shall be the last (or only)
-                * handler in a chain.
-                *
-                * Now we can perform our security operations on this request.
-                */
+             * Now get the SOAP part from the request message and convert it
+             * into a Document.
+             *
+             * This forces Axis to serialize the SOAP request into FORM_STRING.
+             * This string is converted into a document.
+             *
+             * During the FORM_STRING serialization Axis performs multi-ref of
+             * complex data types (if requested), generates and inserts
+             * references for attachements and so on. The resulting Document
+             * MUST be the complete and final SOAP request as Axis would send it
+             * over the wire. Therefore this must shall be the last (or only)
+             * handler in a chain.
+             *
+             * Now we can perform our security operations on this request.
+             */
             Document doc = null;
             Message message = mc.getCurrentMessage();
 
@@ -174,19 +174,19 @@ public class WSDoAllSender extends WSDoAllHandler {
             }
 
             /*
-                * If required convert the resulting document into a message first.
-                * The outputDOM() method performs the necessary c14n call. After
-                * that we extract it as a string for further processing.
-                *
-                * Set the resulting byte array as the new SOAP message.
-                *
-                * If noSerialization is false, this handler shall be the last (or
-                * only) one in a handler chain. If noSerialization is true, just
-                * set the processed Document in the transfer property. The next
-                * Axis WSS4J handler takes it and performs additional security
-                * processing steps.
-                *
-                */
+             * If required convert the resulting document into a message first.
+             * The outputDOM() method performs the necessary c14n call. After
+             * that we extract it as a string for further processing.
+             *
+             * Set the resulting byte array as the new SOAP message.
+             *
+             * If noSerialization is false, this handler shall be the last (or
+             * only) one in a handler chain. If noSerialization is true, just
+             * set the processed Document in the transfer property. The next
+             * Axis WSS4J handler takes it and performs additional security
+             * processing steps.
+             *
+             */
             if (reqData.isNoSerialization()) {
                 ((MessageContext)reqData.getMsgContext()).setProperty(WSHandlerConstants.SND_SECURITY,
                         doc);

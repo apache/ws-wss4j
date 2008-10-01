@@ -206,7 +206,7 @@ public class WSS4JHandler extends WSHandler implements Handler {
         * For every action we need a username, so get this now. The username
         * defined in the deployment descriptor takes precedence.
         */
-       reqData.setUsername((String) getOption(WSHandlerConstants.USER));
+        reqData.setUsername((String) getOption(WSHandlerConstants.USER));
         if (reqData.getUsername() == null || reqData.getUsername().equals("")) {
             reqData.setUsername((String) mc.getProperty(WSHandlerConstants.USER));
             mc.setProperty(WSHandlerConstants.USER, null);
@@ -399,7 +399,7 @@ public class WSS4JHandler extends WSHandler implements Handler {
             throw new JAXRPCException("WSS4JHandler: security processing failed",
                     ex);
         }
-        if (wsResult == null) {			// no security header found
+        if (wsResult == null) {         // no security header found
             if (doAction == WSConstants.NO_SECURITY) {
                 return true;
             } else {

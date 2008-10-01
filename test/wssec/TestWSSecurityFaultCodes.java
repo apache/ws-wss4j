@@ -166,7 +166,7 @@ public class TestWSSecurityFaultCodes extends TestCase implements CallbackHandle
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == 2);
             assertTrue(ex.getMessage().startsWith(
-            	"An unsupported signature or encryption algorithm was used"));
+                "An unsupported signature or encryption algorithm was used"));
             QName faultCode = new QName(WSConstants.WSSE_NS, "UnsupportedAlgorithm");
             assertTrue(ex.getFaultCode().equals(faultCode));
         }

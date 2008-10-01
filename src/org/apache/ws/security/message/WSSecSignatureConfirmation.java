@@ -46,50 +46,50 @@ public class WSSecSignatureConfirmation extends WSSecBase {
     public WSSecSignatureConfirmation() {
     }
 
-	/**
-	 * Set the Signature value to store in this SignatureConfirmation.
-	 * 
-	 * @param signatureValue
-	 *            The Signature value to store in the SignatureConfirmation
-	 *            element
-	 */
-	public void setSignatureValue(byte[] signatureValue) {
-		this.signatureValue = signatureValue;
-	}
+    /**
+     * Set the Signature value to store in this SignatureConfirmation.
+     * 
+     * @param signatureValue
+     *            The Signature value to store in the SignatureConfirmation
+     *            element
+     */
+    public void setSignatureValue(byte[] signatureValue) {
+        this.signatureValue = signatureValue;
+    }
 
 
-	/**
-	 * Creates a SignatureConfimation element.
-	 * 
-	 * The method prepares and initializes a WSSec SignatureConfirmation structure after
-	 * the relevant information was set. Before calling <code>prepare()</code> the
-	 * filed <code>signatureValue</code> must be set
-	 * 
-	 * @param doc
-	 *            The SOAP envelope as W3C document
-	 */
-	public void prepare(Document doc) {
-		document = doc;
+    /**
+     * Creates a SignatureConfimation element.
+     * 
+     * The method prepares and initializes a WSSec SignatureConfirmation structure after
+     * the relevant information was set. Before calling <code>prepare()</code> the
+     * filed <code>signatureValue</code> must be set
+     * 
+     * @param doc
+     *            The SOAP envelope as W3C document
+     */
+    public void prepare(Document doc) {
+        document = doc;
         sc = new SignatureConfirmation(doc, signatureValue);
-		String scId = "SigConf-" + sc.hashCode();
-		sc.setID(scId);
-	}
+        String scId = "SigConf-" + sc.hashCode();
+        sc.setID(scId);
+    }
     
-	/**
-	 * Prepends the SignatureConfirmation element to the elements already in the
-	 * Security header.
-	 * 
-	 * The method can be called any time after <code>prepare()</code>.
-	 * This allows to insert the SignatureConfirmation element at any position in the
-	 * Security header.
-	 * 
-	 * @param secHeader
-	 *            The security header that holds the Signature element.
-	 */
-	public void prependToHeader(WSSecHeader secHeader) {
-		WSSecurityUtil.prependChildElement(document, secHeader
-				.getSecurityHeader(), sc.getElement(), false);
-	}
+    /**
+     * Prepends the SignatureConfirmation element to the elements already in the
+     * Security header.
+     * 
+     * The method can be called any time after <code>prepare()</code>.
+     * This allows to insert the SignatureConfirmation element at any position in the
+     * Security header.
+     * 
+     * @param secHeader
+     *            The security header that holds the Signature element.
+     */
+    public void prependToHeader(WSSecHeader secHeader) {
+        WSSecurityUtil.prependChildElement(document, secHeader
+                .getSecurityHeader(), sc.getElement(), false);
+    }
     
     /**
      * Adds a new <code>SignatureConfirmation</code> to a soap envelope.
@@ -98,36 +98,36 @@ public class WSSecSignatureConfirmation extends WSSecBase {
      * to the <code>wsse:Security</code> header.
      * 
      * @param doc
-     *            The SOAP enevlope as W3C document
+     *            The SOAP envelope as W3C document
      * @param sigVal
      *            the Signature value. This will be the content of the "Value"
      *            attribute.
- 	 * @param secHeader
-	 *            The security header that holds the Signature element.
+     * @param secHeader
+     *            The security header that holds the Signature element.
     * @return Document with SignatureConfirmation added
      */
     public Document build(Document doc, byte[] sigVal, WSSecHeader secHeader) {
         log.debug("Begin add signature confirmation...");
         
         signatureValue = sigVal;
-		prepare(doc);
-		prependToHeader(secHeader);
+        prepare(doc);
+        prependToHeader(secHeader);
         
         return doc;
     }
 
-	/**
-	 * Get the id generated during <code>prepare()</code>.
-	 * 
-	 * Returns the the value of wsu:Id attribute of this SignatureConfirmation. 
-	 * 
-	 * @return Return the wsu:Id of this token or null if <code>prepareToken()</code>
-	 * was not called before.
-	 */
+    /**
+     * Get the id generated during <code>prepare()</code>.
+     * 
+     * Returns the the value of wsu:Id attribute of this SignatureConfirmation. 
+     * 
+     * @return Return the wsu:Id of this token or null if <code>prepareToken()</code>
+     * was not called before.
+     */
     public String getId() {
-    	if (sc == null) {
-    		return null;
-    	}
+        if (sc == null) {
+            return null;
+        }
         return sc.getID();
     }
     

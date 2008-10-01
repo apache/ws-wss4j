@@ -58,39 +58,39 @@ public class TimestampProcessor implements Processor {
     }
 
     public void handleTimestamp(Timestamp timestamp) throws WSSecurityException {
-		if (log.isDebugEnabled()) {
-			log.debug("Preparing to verify the timestamp");
+        if (log.isDebugEnabled()) {
+            log.debug("Preparing to verify the timestamp");
 
-			DateFormat zulu = new XmlSchemaDateFormat();
+            DateFormat zulu = new XmlSchemaDateFormat();
 
-			log.debug("Current time: "
-					+ zulu.format(Calendar.getInstance().getTime()));
-			if (timestamp.getCreated() != null) {
-				log.debug("Timestamp created: "
-						+ zulu.format(timestamp.getCreated().getTime()));
-			}
-			if (timestamp.getExpires() != null) {
-				log.debug("Timestamp expires: "
-						+ zulu.format(timestamp.getExpires().getTime()));
-			}
-		}
+            log.debug("Current time: "
+                    + zulu.format(Calendar.getInstance().getTime()));
+            if (timestamp.getCreated() != null) {
+                log.debug("Timestamp created: "
+                        + zulu.format(timestamp.getCreated().getTime()));
+            }
+            if (timestamp.getExpires() != null) {
+                log.debug("Timestamp expires: "
+                        + zulu.format(timestamp.getExpires().getTime()));
+            }
+        }
 
-		// Validate whether the security semantics have expired
-		Calendar rightNow = Calendar.getInstance();
-		Calendar exp = timestamp.getExpires();
-		if (exp != null && wssConfig.isTimeStampStrict() && exp.before(rightNow)) {
-			throw new WSSecurityException(
-					WSSecurityException.MESSAGE_EXPIRED,
-					"invalidTimestamp",
-					new Object[] { "The security semantics of message have expired" });
-		}
-	}
+        // Validate whether the security semantics have expired
+        Calendar rightNow = Calendar.getInstance();
+        Calendar exp = timestamp.getExpires();
+        if (exp != null && wssConfig.isTimeStampStrict() && exp.before(rightNow)) {
+            throw new WSSecurityException(
+                    WSSecurityException.MESSAGE_EXPIRED,
+                    "invalidTimestamp",
+                    new Object[] { "The security semantics of message have expired" });
+        }
+    }
     
     /* (non-Javadoc)
      * @see org.apache.ws.security.processor.Processor#getId()
      */
     public String getId() {
-    	return tsId;
+        return tsId;
     }    
     
 }
