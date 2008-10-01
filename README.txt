@@ -55,7 +55,7 @@ WSS4J supports X.509 binary certificates and certificate paths.
 
 The master link to WSS4J: http://ws.apache.org/wss4j/
 
-There is also a Wiki concering Apache WS projects and WSS4J as one
+There is also a Wiki concerning Apache WS projects and WSS4J as one
 of the WS sub-projects:
     http://wiki.apache.org/ws/
     http://wiki.apache.org/ws/FrontPage/WsFx
@@ -156,10 +156,10 @@ axis-saaj-1.4.jar
     
     See: http://ws.apache.org/axis/
 
-bcprov-jdk14-136.jar
+bcprov-jdk14-140.jar
     This is the BouncyCastle library that implements all necessary
-    encryption, hashing, certifcate, and keystore functions. Without
-    this fanatstic library WSS4J wouldn't work at all.
+    encryption, hashing, certificate, and keystore functions. Without
+    this fantastic library WSS4J wouldn't work at all.
     
     See: http://www.bouncycastle.org/
     
