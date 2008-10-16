@@ -197,7 +197,7 @@ wsdl4j-1.5.1.jar
     
     See: http://ws.apache.org/axis/  under related projects
     
-xalan-2.7.0.jar
+xalan-2.7.1.jar
     Library that implements XML Path Language (XPath) and XSLT. The XML 
     Security implementation needs several functions of Xalan XPath.
    

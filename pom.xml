@@ -269,7 +269,7 @@
         <bcprov.jdk14.version>140</bcprov.jdk14.version>
         <bcprov.jdk15.version>140</bcprov.jdk15.version>
         <commons.logging.version>1.1</commons.logging.version>
-        <xalan.version>2.7.0</xalan.version>
+        <xalan.version>2.7.1</xalan.version>
         <xerces.version>2.8.1</xerces.version>
         <axis.version>1.4</axis.version>
         <junit.version>3.8.1</junit.version>
@@ -310,14 +310,24 @@
             <version>${opensaml.version}</version>
         </dependency>
         <dependency>
-            <groupId>axis</groupId>
+            <groupId>org.apache.axis</groupId>
             <artifactId>axis</artifactId>
             <version>${axis.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>axis</groupId>
+            <groupId>org.apache.axis</groupId>
             <artifactId>axis-ant</artifactId>
+            <version>${axis.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.axis</groupId>
+            <artifactId>axis-jaxrpc</artifactId>
+            <version>${axis.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.axis</groupId>
+            <artifactId>axis-saaj</artifactId>
             <version>${axis.version}</version>
         </dependency>
         <dependency>
