@@ -193,4 +193,15 @@ public class TestWSSecurityNew extends TestCase {
         CustomCrypto custom = (CustomCrypto)crypto;
         assertSame(tmp, custom.config);
     }
+    
+    /**
+     * Test for WSS-149 - "AbstractCrypto requires org.apache.ws.security.crypto.merlin.file
+     * to be set and point to an existing file"
+     */
+    public void testNoKeyStoreFile() {
+        Crypto crypto = CryptoFactory.getInstance(
+            "nofile.properties"
+        );
+        assertNotNull(crypto);
+    }
 }

@@ -49,7 +49,7 @@ public abstract class AbstractCrypto extends CryptoBase {
      * @param properties
      */
     public AbstractCrypto(Properties properties) throws CredentialException, IOException {
-        this(properties,AbstractCrypto.class.getClassLoader());
+        this(properties, AbstractCrypto.class.getClassLoader());
     }
 
     /**
@@ -66,26 +66,28 @@ public abstract class AbstractCrypto extends CryptoBase {
         }
         String location = this.properties.getProperty("org.apache.ws.security.crypto.merlin.file");
         InputStream is = null;
-        java.net.URL url = Loader.getResource(loader, location);
-        if(url != null) {
-            is =  url.openStream();
-        } else {
-            is = new java.io.FileInputStream(location);
-        }
-
-        /**
-         * If we don't find it, then look on the file system.
-         */
-        if (is == null) {
-            try {
-                is = new FileInputStream(location);
-            } catch (Exception e) {
-                if (doDebug) {
-                    log.debug(e.getMessage(), e);
+        if (location != null) {
+            java.net.URL url = Loader.getResource(loader, location);
+            if(url != null) {
+                is =  url.openStream();
+            } else {
+                is = new java.io.FileInputStream(location);
+            }
+    
+            /**
+             * If we don't find it, then look on the file system.
+             */
+            if (is == null) {
+                try {
+                    is = new FileInputStream(location);
+                } catch (Exception e) {
+                    if (doDebug) {
+                        log.debug(e.getMessage(), e);
+                    }
+                    throw new CredentialException(
+                        CredentialException.IO_ERROR, "proxyNotFound", new Object[]{location}, e
+                    );
                 }
-                throw new CredentialException(
-                    CredentialException.IO_ERROR, "proxyNotFound", new Object[]{location}, e
-                );
             }
         }
 
@@ -94,11 +96,13 @@ public abstract class AbstractCrypto extends CryptoBase {
          */
         try {
             String provider = properties.getProperty("org.apache.ws.security.crypto.merlin.keystore.provider");
-            String passwd = properties.getProperty("org.apache.ws.security.crypto.merlin.keystore.password","security");
+            String passwd = properties.getProperty("org.apache.ws.security.crypto.merlin.keystore.password", "security");
             String type = properties.getProperty("org.apache.ws.security.crypto.merlin.keystore.type", KeyStore.getDefaultType());
             this.keystore = load(is, passwd, provider, type);
         } finally {
-            is.close();
+            if (is != null) {
+                is.close();
+            }
         }
 
         /**
@@ -116,17 +120,13 @@ public abstract class AbstractCrypto extends CryptoBase {
 
 
     /**
-     * Loads the the keystore from an <code>InputStream </code>.
+     * Loads the keystore from an <code>InputStream </code>.
      * <p/>
      *
      * @param input <code>InputStream</code> to read from
      * @throws CredentialException
      */
     public KeyStore load(InputStream input, String storepass, String provider, String type) throws CredentialException {
-        if (input == null) {
-            throw new IllegalArgumentException("input stream cannot be null");
-        }
-        
         KeyStore ks = null;
         
         try {
