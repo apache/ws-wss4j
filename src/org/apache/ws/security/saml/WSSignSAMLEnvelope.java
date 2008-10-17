@@ -384,6 +384,10 @@ public class WSSignSAMLEnvelope extends WSSignEnvelope {
             t3 = System.currentTimeMillis();
         }
         info.addUnknownElement(secRef.getElement());
+        
+        Element keyInfoElement = info.getElement();
+        keyInfoElement.setAttributeNS(WSConstants.XMLNS_NS, "xmlns:"
+                + WSConstants.SIG_PREFIX, WSConstants.SIG_NS);
 
         Element samlToken = null;
         try {

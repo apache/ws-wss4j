@@ -18,6 +18,7 @@ package org.apache.ws.security.saml;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
@@ -32,6 +33,7 @@ import org.opensaml.SAMLNameIdentifier;
 import org.opensaml.SAMLStatement;
 import org.opensaml.SAMLSubject;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
@@ -179,6 +181,10 @@ public class SAMLIssuerImpl implements SAMLIssuer {
                     }
                     return null;
                 }
+                Element keyInfoElement = ki.getElement();
+                keyInfoElement.setAttributeNS(WSConstants.XMLNS_NS, "xmlns:"
+                        + WSConstants.SIG_PREFIX, WSConstants.SIG_NS);
+
                 subject.setKeyInfo(ki);
                 // prepare to sign the SAML token
                 try {

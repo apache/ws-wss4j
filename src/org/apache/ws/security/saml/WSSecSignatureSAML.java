@@ -414,6 +414,10 @@ public class WSSecSignatureSAML extends WSSecSignature {
         }
 
         keyInfo.addUnknownElement(secRef.getElement());
+        
+        Element keyInfoElement = keyInfo.getElement();
+        keyInfoElement.setAttributeNS(WSConstants.XMLNS_NS, "xmlns:"
+                + WSConstants.SIG_PREFIX, WSConstants.SIG_NS);
 
         try {
             samlToken = (Element) assertion.toDOM(doc);

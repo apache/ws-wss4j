@@ -291,8 +291,11 @@ public class WSSecEncryptedKey extends WSSecBase {
                     "unsupportedKeyId");
         }
         keyInfo.addUnknownElement(secToken.getElement());
+        Element keyInfoElement = keyInfo.getElement();
+        keyInfoElement.setAttributeNS(WSConstants.XMLNS_NS, "xmlns:"
+                + WSConstants.SIG_PREFIX, WSConstants.SIG_NS);
         WSSecurityUtil.appendChildElement(document, encryptedKeyElement,
-                keyInfo.getElement());
+                keyInfoElement);
 
         Element xencCipherValue = createCipherValue(document,
                 encryptedKeyElement);

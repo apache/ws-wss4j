@@ -139,6 +139,9 @@ public class WSSecDKEncrypt extends WSSecDerivedKeyBase {
                 secToken.setReference(ref);
 
                 keyInfo.addUnknownElement(secToken.getElement());
+                Element keyInfoElement = keyInfo.getElement();
+                keyInfoElement.setAttributeNS(WSConstants.XMLNS_NS, "xmlns:"
+                        + WSConstants.SIG_PREFIX, WSConstants.SIG_NS);
 
                 xmlCipher.init(XMLCipher.ENCRYPT_MODE, key);
                 EncryptedData encData = xmlCipher.getEncryptedData();

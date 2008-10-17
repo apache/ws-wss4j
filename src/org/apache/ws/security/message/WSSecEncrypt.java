@@ -452,8 +452,10 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
                 secToken.setKeyIdentifierEncKeySHA1(getSHA1(encryptedEphemeralKey));
             }
             
-
             keyInfo.addUnknownElement(secToken.getElement());
+            Element keyInfoElement = keyInfo.getElement();
+            keyInfoElement.setAttributeNS(WSConstants.XMLNS_NS, "xmlns:"
+                    + WSConstants.SIG_PREFIX, WSConstants.SIG_NS);
         } 
         
         return doEncryption(doc, secretKey, keyInfo, references);
@@ -516,6 +518,9 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
                 ref.setURI("#" + encKeyId);
                 secToken.setReference(ref);
                 keyInfo.addUnknownElement(secToken.getElement());
+                Element keyInfoElement = keyInfo.getElement();
+                keyInfoElement.setAttributeNS(WSConstants.XMLNS_NS, "xmlns:"
+                        + WSConstants.SIG_PREFIX, WSConstants.SIG_NS);
             }
             /*
              * Forth step: encrypt data, and set necessary attributes in
@@ -628,6 +633,9 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
                 keyInfo.addUnknownElement(securityTokenReference.getElement());
             }
         }
+        Element keyInfoElement = keyInfo.getElement();
+        keyInfoElement.setAttributeNS(WSConstants.XMLNS_NS, "xmlns:"
+                + WSConstants.SIG_PREFIX, WSConstants.SIG_NS);
 
         SOAPConstants soapConstants = WSSecurityUtil.getSOAPConstants(envelope);
         if (parts == null) {

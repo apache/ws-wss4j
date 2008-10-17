@@ -263,7 +263,7 @@
     </profiles>
     
     <properties>
-        <xmlsec.version>1.4.0</xmlsec.version>
+        <xmlsec.version>1.4.2</xmlsec.version>
         <opensaml.version>1.1</opensaml.version>
         <xml.apis.version>1.3.03</xml.apis.version>
         <bcprov.jdk14.version>140</bcprov.jdk14.version>
@@ -319,16 +319,19 @@
             <groupId>org.apache.axis</groupId>
             <artifactId>axis-ant</artifactId>
             <version>${axis.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.axis</groupId>
             <artifactId>axis-jaxrpc</artifactId>
             <version>${axis.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.axis</groupId>
             <artifactId>axis-saaj</artifactId>
             <version>${axis.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>xalan</groupId>
