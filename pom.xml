@@ -6,8 +6,7 @@
     <groupId>org.apache.ws.security</groupId>
     <artifactId>wss4j</artifactId>
     <name>WSS4J</name>
-    <!-- <version>1.5.4</version> -->
-    <version>SNAPSHOT</version>
+    <version>1.5.5-RC1</version>
     <description>
         Apache WSS4J is an implementation of the Web Services Security
         (WS-Security) being developed at OASIS Web Services Security TC.
@@ -95,7 +94,7 @@
         <url>http://svn.apache.org/viewvc/webservices/wss4j/trunk</url>
     </scm>
     <organization>
-        <name>Apache Software Foundation</name>
+        <name>The Apache Software Foundation</name>
         <url>http://www.apache.org/</url>
     </organization>
     
@@ -244,6 +243,7 @@
                     <groupId>bouncycastle</groupId>
                     <artifactId>bcprov-jdk14</artifactId>
                     <version>${bcprov.jdk14.version}</version>
+                    <scope>runtime</scope>
                 </dependency>
             </dependencies>
         </profile>
@@ -257,6 +257,7 @@
                     <groupId>bouncycastle</groupId>
                     <artifactId>bcprov-jdk15</artifactId>
                     <version>${bcprov.jdk15.version}</version>
+                    <scope>runtime</scope>
                 </dependency>
             </dependencies>
         </profile>
@@ -298,16 +299,19 @@
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>
             <version>${commons.logging.version}</version>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.santuario</groupId>
             <artifactId>xmlsec</artifactId>
             <version>${xmlsec.version}</version>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>opensaml</groupId>
             <artifactId>opensaml</artifactId>
             <version>${opensaml.version}</version>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.axis</groupId>
@@ -337,21 +341,25 @@
             <groupId>xalan</groupId>
             <artifactId>xalan</artifactId>
             <version>${xalan.version}</version>
+            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>xerces</groupId>
             <artifactId>xercesImpl</artifactId>
             <version>${xerces.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>xml-apis</groupId>
             <artifactId>xml-apis</artifactId>
             <version>${xml.apis.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>${junit.version}</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
@@ -384,7 +392,10 @@
                 <artifactId>maven-changes-plugin</artifactId>
                 <version>2.0</version>
                 <configuration>
+                    <!--
                     <onlyCurrentVersion>true</onlyCurrentVersion>
+                    -->
+                    <fixVersionIds>12313215</fixVersionIds>
                     <resolutionIds>Any</resolutionIds>
                     <statusIds>Resolved, Closed</statusIds>
                     <sortColumnNames>Key</sortColumnNames>

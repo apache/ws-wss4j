@@ -27,8 +27,8 @@ Build Instructions:
 
         <property name='product.version.major' value='1'/>
         <property name='product.version.minor' value='5'/>
-        <property name='product.version.level' value='4'/>
-        <property name='product.version' value='SNAPSHOT'/>
+        <property name='product.version.level' value='5'/>
+        <property name='product.version' value='1.5.5-RC1'/>
         <!-- <property name='product.version' value='${product.version.major}.${product.version.minor}.${product.version.level}'/> -->
         <property name="year" value="2008"/>
         <property name="copyright" value="Copyright &#169; ${year} Apache WSS4J Project. All Rights Reserved."/>
@@ -289,6 +289,11 @@ org.apache.ws.axis.security.util
         description="This target copies the Java sources and brands the version information">
         <!-- create directories -->
         <mkdir dir="${build.classes}"/>
+        <copy todir="${build.classes}">
+            <fileset dir="${dir.src}">
+                <include name="META-INF/*"/>
+            </fileset>
+        </copy>
     </target>
 
     <target name="javadoc"
@@ -720,18 +725,18 @@ org.apache.ws.axis.security.util
      <mkdir dir="${dir.dist}"/>
      <jar jarfile="${dir.dist}/${jar.library}"
        basedir="${build.classes}"
-       includes="**/apache/**/security/**"  />
+       includes="**/apache/**/security/**, META-INF/**"  />
      <zip destfile=
         "${dir.dist}/${product.shortname}-bin-${product.version}.zip">
         <zipfileset prefix="wss4j" dir="."
-          includes="keys/**, interop/**, interop2/**, test/**, samples/**,
-          LICENSE.txt, README.txt, NOTICE, legal/**, webapps/**"/>
+            includes="keys/**, interop/**, interop2/**, test/**, samples/**,
+                ChangeLog.txt, LICENSE.txt, README.txt, NOTICE, legal/**, webapps/**"/>
         <zipfileset prefix="wss4j/classes" dir="${build.classes}"
-          includes=
-     "*.properties, interop/**, wssec/**, org/**/oasis/**, org/**/samples/**"/>
+            includes=
+                "*.properties, interop/**, wssec/**, org/**/oasis/**, org/**/samples/**"/>
         <zipfileset prefix="wss4j/doc/api" dir="${build.javadoc}"/>
         <zipfileset fullpath="wss4j/${jar.library}" dir="${dir.dist}" 
-          includes="${jar.library}"/>
+            includes="${jar.library}"/>
       </zip>
     </target>
 
@@ -751,7 +756,7 @@ org.apache.ws.axis.security.util
         <zip destfile=
                  "${dir.dist}/${product.shortname}-src-${product.version}.zip">
             <zipfileset prefix="wss4j" dir="."
-                includes="src/** LICENSE.txt README.txt NOTICE legal/** build.xml "/>
+                includes="src/** ChangeLog.txt LICENSE.txt README.txt NOTICE legal/** build.xml "/>
         </zip>
     </target>
 
