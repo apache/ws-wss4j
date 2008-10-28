@@ -6,7 +6,7 @@
     <groupId>org.apache.ws.security</groupId>
     <artifactId>wss4j</artifactId>
     <name>WSS4J</name>
-    <version>1.5.5-RC1</version>
+    <version>1.5.5</version>
     <description>
         Apache WSS4J is an implementation of the Web Services Security
         (WS-Security) being developed at OASIS Web Services Security TC.
@@ -392,12 +392,12 @@
                 <artifactId>maven-changes-plugin</artifactId>
                 <version>2.0</version>
                 <configuration>
-                    <!--
                     <onlyCurrentVersion>true</onlyCurrentVersion>
-                    -->
+                    <!--
                     <fixVersionIds>12313215</fixVersionIds>
+                    -->
                     <resolutionIds>Any</resolutionIds>
-                    <statusIds>Resolved, Closed</statusIds>
+                    <statusIds>Closed</statusIds>
                     <sortColumnNames>Key</sortColumnNames>
                 </configuration>
                 <reportSets>
