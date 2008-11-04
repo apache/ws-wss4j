@@ -276,24 +276,6 @@
         <junit.version>3.8.1</junit.version>
     </properties>
     
-    <repositories>
-        <repository>
-            <releases>
-                <enabled>true</enabled>
-                <updatePolicy>always</updatePolicy>
-                <checksumPolicy>warn</checksumPolicy>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-                <updatePolicy>never</updatePolicy>
-                <checksumPolicy>warn</checksumPolicy>
-            </snapshots>
-            <id>apache-ws-snapshots2</id>
-            <name>Apache ws.zones - 2</name>
-            <url>http://ws.zones.apache.org/repository2/</url>
-        </repository>
-    </repositories>
-
     <dependencies>
         <dependency>
             <groupId>commons-logging</groupId>
@@ -308,7 +290,7 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>opensaml</groupId>
+            <groupId>org.opensaml</groupId>
             <artifactId>opensaml</artifactId>
             <version>${opensaml.version}</version>
             <scope>compile</scope>

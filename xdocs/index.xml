@@ -25,6 +25,7 @@
                         <li><a href="#WSS4J_on_Axis">WSS4J on Axis</a></li>
                         <li><a href="#Rampart:_WS-Security_Implementation_module_for_Axis2">
                         Rampart: WS-Security Implementation module for Axis2</a></li>
+                        <li><a href="#WSS4J_on_CXF">WSS4J on CXF</a></li>
                         <li><a href="#WSS4J_Configuration">WSS4J Configuration</a></li>
                     </ul>
                 </ul>
@@ -114,6 +115,11 @@ Deployment Tutorial</a> for a short tutorial and <a href="package.html">Axis Dep
                 <p style="margin-left: 40px;">Please refer to the 
                 <a href="http://ws.apache.org/axis2/modules/rampart/1_2/security-module.html">
                 Rampart configuration guide</a> for configuration information.<br/>
+                </p>
+                <br/>
+            </subsection>
+            <subsection name="WSS4J on CXF">
+                <p style="margin-left: 40px;">Please refer to the <a href="http://cwiki.apache.org/CXF20DOC/ws-security.html">WS-Security section of the CXF wiki</a> for more details.<br/>
                 </p>
                 <br/>
             </subsection>
