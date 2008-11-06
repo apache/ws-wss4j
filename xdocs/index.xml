@@ -5,7 +5,6 @@
     </properties>
     <body>
         <section name="Apache WSS4J"/>
-        <section name="">
             <subsection name="Contents">
                 <ul>
                     <li>
@@ -30,8 +29,6 @@
                 </ul>
                 <br/>
             </subsection>
-        </section>
-        <section name="">
             <subsection name="What is WSS4J?">
                 <p style="margin-left: 40px;"> 
 Apache WSS4J is an implementation of the
@@ -99,8 +96,8 @@ certificates and certificate paths.<br/>
             </subsection>
             <subsection name="WSS4J API">
                 <p style="margin-left: 40px;">Please refer to the <a href="api.html">API
-Overview</a>
-for details.<br/>
+Overview</a> or <a href="apidocs/index.html"> online javadocs </a>
+for details. <br/>
                     <br/>
                 </p>
             </subsection>
@@ -122,6 +119,5 @@ Deployment Tutorial</a> for a short tutorial and <a href="package.html">Axis Dep
                 </p>
                 <br/>
             </subsection>
-        </section>
     </body>
 </document>
