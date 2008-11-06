@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<document><properties><title>Apache WSS4J API Overview</title></properties><body><section name="Apache WSS4J API Overview"></section><section name=""><subsection name="Contents"><ul>
+<document><properties><title>Apache WSS4J API Overview</title></properties><body><section name="Apache WSS4J API Overview"></section><subsection name="Contents"><ul>
   <li><a href="#API_Overview">API Overview</a><br></br>
   </li>
   <ul>
@@ -23,7 +23,7 @@
     <li>Process WSS Header and Check the Results<br></br>
     </li>
   </ul>
-</ul><br></br></subsection></section><section name=""><subsection name="API Overview"><p>WSS4J can be used as a library to provide an API for WS-Security
+</ul><br></br></subsection><subsection name="API Overview"><p>WSS4J can be used as a library to provide an API for WS-Security
 processing. In this case WSS4J does not need to be used with Axis, or
 even be a part of a deployed web application. The WSS4J API can be
 invoked directly to create WS-Security headers or process them given a
@@ -538,4 +538,4 @@ WSConstants.ENCR) {<br></br>
 System.out.println(eResult.getPrincipal().getName());<br></br>
         }<br></br>
     }<br></br>
-}</small><br></br></subsection></section></body></document>
+}</small><br></br></subsection></body></document>
