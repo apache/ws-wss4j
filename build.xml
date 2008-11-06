@@ -741,7 +741,7 @@ org.apache.ws.axis.security.util
          <zip destfile=
            "${dir.dist}/${product.shortname}-otherjars-${product.version}.zip">
              <zipfileset prefix="wss4j" dir="."
-                 includes="lib/*.jar, endorsed/*.jar"/>
+                 includes="lib/*.jar, endorsed/*.jar legal/**"/>
          </zip>
      </target>  
     
