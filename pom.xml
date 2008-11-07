@@ -5,6 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.apache.ws.security</groupId>
     <artifactId>wss4j</artifactId>
+    <packaging>bundle</packaging>
     <name>WSS4J</name>
     <!-- <version>1.5.4</version> -->
     <version>SNAPSHOT</version>
@@ -75,6 +76,12 @@
             <name>Colm O hEigeartaigh</name>
             <id>coheigea</id>
             <email>coheigea@apache.org</email>
+            <organization></organization>
+        </developer>
+        <developer>
+            <name>Nandana Mihindukulasooriya</name>
+            <id>nandana</id>
+            <email>nandana@apache.org</email>
             <organization></organization>
         </developer>
     </developers>
@@ -201,6 +208,35 @@
                     <attach>true</attach>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                  <artifactId>maven-bundle-plugin</artifactId>
+                  <version>1.4.0</version>
+                  <extensions>true</extensions>
+                  <configuration>
+                      <instructions>
+                          <Bundle-Version>1.0.0</Bundle-Version>
+                          <Bundle-Name>org.apache.ws.security</Bundle-Name>
+                          <Bundle-Vendor>Apache Software Foundation</Bundle-Vendor>
+                          <Bundle-Description>${pom.artifactId}</Bundle-Description>
+                          <Bundle-SymbolicName>org.apache.ws.security</Bundle-SymbolicName>
+                          <Export-Package>
+                              org.apache.ws.security.*; version=1.5.4,
+                              org.apache.ws.axis.security.*; version=1.5.4,                             
+                          </Export-Package>
+                          <Import-Package>
+                              !org.apache.ws.security.*,
+                              !org.apache.ws.axis.security.*,
+                              javax.xml.crypto.*,
+                              org.apache.xml.security.*,
+                              org.jcp.xml.dsig.internal.*,
+                              org.opensaml.*,
+                              *;resolution:=optional
+                          </Import-Package>
+                          <DynamicImport-Package>*</DynamicImport-Package>
+                      </instructions>
+                  </configuration>
+              </plugin>
         </plugins>
     </build>
     
