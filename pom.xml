@@ -346,7 +346,6 @@
             <groupId>org.opensaml</groupId>
             <artifactId>opensaml</artifactId>
             <version>${opensaml.version}</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.axis</groupId>
