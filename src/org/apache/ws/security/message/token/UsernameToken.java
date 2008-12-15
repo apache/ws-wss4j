@@ -143,8 +143,9 @@ public class UsernameToken {
             }
             return;
         }
-        if (elementPassword != null) {
-            passwordType = elementPassword.getAttribute("Type");
+        if (elementPassword != null 
+                && elementPassword.hasAttribute(WSConstants.PASSWORD_TYPE_ATTR)) {
+            passwordType = elementPassword.getAttribute(WSConstants.PASSWORD_TYPE_ATTR);
         }
         if (passwordType != null
                 && passwordType.equals(WSConstants.PASSWORD_DIGEST)) {
