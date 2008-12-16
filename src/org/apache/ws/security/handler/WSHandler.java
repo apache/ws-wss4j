@@ -334,7 +334,7 @@ public abstract class WSHandler {
                     //If we have stored signature values
                     boolean found = false;
                     for (int ii = 0; ii < sigv.size(); ii++) {
-                        byte[] storedValue = (byte[]) sigv.get(i);
+                        byte[] storedValue = (byte[]) sigv.get(ii);
                         if (Arrays.equals(sigVal, storedValue)) {
                             found = true;
                             sigv.remove(ii);
