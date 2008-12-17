@@ -141,6 +141,8 @@ public class DerivedKeyTokenProcessor implements Processor {
             } else if (processor == null && keyIdentifierValue != null
                     && keyIdentifierValueType != null) {                
                 this.secret = this.getSecret(cb, keyIdentifierValue, keyIdentifierValueType); 
+            } else if (processor instanceof UsernameTokenProcessor) {
+                this.secret = ((UsernameTokenProcessor) processor).getDerivedKey(cb);
             } else if (processor instanceof EncryptedKeyProcessor) {
                 this.secret = ((EncryptedKeyProcessor) processor)
                         .getDecryptedBytes();

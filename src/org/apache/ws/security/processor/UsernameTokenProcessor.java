@@ -169,7 +169,8 @@ public class UsernameTokenProcessor implements Processor {
                     WSSecurityException.FAILED_AUTHENTICATION, null, null, e
                 );
             }
-            ut.setRawPassword(password);
+            origPassword = pwCb.getPassword();
+            ut.setRawPassword(origPassword);
         }
         WSUsernameTokenPrincipal principal = new WSUsernameTokenPrincipal(user, ut.isHashed());
         principal.setNonce(nonce);
@@ -195,4 +196,14 @@ public class UsernameTokenProcessor implements Processor {
     public UsernameToken getUt() {
         return ut;
     }    
+    
+    public byte[] getDerivedKey(CallbackHandler cb) throws WSSecurityException {
+        String password = ut.getRawPassword();
+        if (password == null) {
+            password = "";
+        }
+        byte[] saltValue = ut.getSalt();
+        int iteration = ut.getIteration();
+        return UsernameToken.generateDerivedKey(password, saltValue, iteration);
+    }
 }

@@ -310,6 +310,32 @@ public class TestWSSecurityNew5 extends TestCase implements CallbackHandler {
     }
     
     /**
+     * Test that adds a UserNameToken with no password
+     */
+    public void testUsernameTokenNoPassword() throws Exception {
+        WSSecUsernameToken builder = new WSSecUsernameToken();
+        builder.setPasswordType(null);
+        builder.setUserInfo("wernerd", null);
+        log.info("Before adding UsernameToken with no password....");
+        Document doc = unsignedEnvelope.getAsDocument();
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        Document signedDoc = builder.build(doc, secHeader);
+        Message signedMsg = SOAPUtil.toAxisMessage(signedDoc);
+        if (log.isDebugEnabled()) {
+            XMLUtils.PrettyElementToWriter(signedMsg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
+        }
+        signedDoc = signedMsg.getSOAPEnvelope().getAsDocument();
+        try {
+            verify(signedDoc);
+            throw new Exception("Failure expected on no password");
+        } catch (WSSecurityException ex) {
+            assertTrue(ex.getErrorCode() == WSSecurityException.FAILED_AUTHENTICATION);
+            // expected
+        }
+    }
+    
+    /**
      * Test with a null token type. This will fail as the default is to reject custom
      * token types.
      * <p/>

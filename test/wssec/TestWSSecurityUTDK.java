@@ -28,6 +28,7 @@ import org.apache.axis.message.SOAPEnvelope;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSecurityEngine;
@@ -62,8 +63,8 @@ import java.util.Vector;
 
 /**
  * WS-Security Test Case for UsernameToken Key Derivation, as defined in the 
- * UsernameTokenProfile 1.1 specification. Note that the processing of UsernameTokens
- * with derived keys is not yet supported.
+ * UsernameTokenProfile 1.1 specification. The derived keys are used to encrypt
+ * and sign, as per wsc:DerivedKeyToken.
  */
 public class TestWSSecurityUTDK extends TestCase implements CallbackHandler {
     private static Log log = LogFactory.getLog(TestWSSecurityUTDK.class);
@@ -209,11 +210,111 @@ public class TestWSSecurityUTDK extends TestCase implements CallbackHandler {
         assertTrue(outputString.indexOf("wsse:Password") == -1);
         assertTrue(outputString.indexOf("wsse11:Salt") != -1);
         assertTrue(outputString.indexOf("wsse11:Iteration") != -1);
+        assertTrue(outputString.indexOf("testMethod") == -1);
         if (log.isDebugEnabled()) {
             log.debug(outputString);
         }
         
-        // verify(encryptedDoc);
+        verify(encryptedDoc);
+    }
+    
+    /**
+     * Test using a UsernameToken derived key for encrypting a SOAP body. In this test the
+     * derived key is modified before encryption, and so decryption should fail.
+     */
+    public void testDerivedKeyChangedEncryption() throws Exception {
+        Document doc = unsignedEnvelope.getAsDocument();
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        
+        WSSecUsernameToken builder = new WSSecUsernameToken();
+        builder.setUserInfo("bob", "security");
+        builder.addDerivedKey(false, null, 1000);
+        builder.prepare(doc);
+        
+        byte[] derivedKey = builder.getDerivedKey();
+        derivedKey[5] = 12;
+        assertTrue(derivedKey.length == 20);
+        
+        String tokenIdentifier = builder.getId();
+        
+        //
+        // Derived key encryption
+        //
+        WSSecDKEncrypt encrBuilder = new WSSecDKEncrypt();
+        encrBuilder.setSymmetricEncAlgorithm(WSConstants.AES_128);
+        encrBuilder.setExternalKey(derivedKey, tokenIdentifier);
+        Document encryptedDoc = encrBuilder.build(doc, secHeader);
+        
+        builder.prependToHeader(secHeader);
+        
+        String outputString = 
+            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(encryptedDoc);
+        assertTrue(outputString.indexOf("wsse:Username") != -1);
+        assertTrue(outputString.indexOf("wsse:Password") == -1);
+        assertTrue(outputString.indexOf("wsse11:Salt") != -1);
+        assertTrue(outputString.indexOf("wsse11:Iteration") != -1);
+        assertTrue(outputString.indexOf("testMethod") == -1);
+        if (log.isDebugEnabled()) {
+            log.debug(outputString);
+        }
+        
+        try {
+            verify(encryptedDoc);
+            throw new Exception("Failure expected on a bad derived encryption");
+        } catch (WSSecurityException ex) {
+            assertTrue(ex.getErrorCode() == WSSecurityException.FAILED_CHECK);
+            // expected
+        }
+    }
+    
+    /**
+     * Test using a UsernameToken derived key for encrypting a SOAP body. In this test the
+     * user is "alice" rather than "bob", and so decryption should fail.
+     */
+    public void testDerivedKeyBadUserEncryption() throws Exception {
+        Document doc = unsignedEnvelope.getAsDocument();
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        
+        WSSecUsernameToken builder = new WSSecUsernameToken();
+        builder.setUserInfo("alice", "security");
+        builder.addDerivedKey(false, null, 1000);
+        builder.prepare(doc);
+        
+        byte[] derivedKey = builder.getDerivedKey();
+        assertTrue(derivedKey.length == 20);
+        
+        String tokenIdentifier = builder.getId();
+        
+        //
+        // Derived key encryption
+        //
+        WSSecDKEncrypt encrBuilder = new WSSecDKEncrypt();
+        encrBuilder.setSymmetricEncAlgorithm(WSConstants.AES_128);
+        encrBuilder.setExternalKey(derivedKey, tokenIdentifier);
+        Document encryptedDoc = encrBuilder.build(doc, secHeader);
+        
+        builder.prependToHeader(secHeader);
+        
+        String outputString = 
+            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(encryptedDoc);
+        assertTrue(outputString.indexOf("wsse:Username") != -1);
+        assertTrue(outputString.indexOf("wsse:Password") == -1);
+        assertTrue(outputString.indexOf("wsse11:Salt") != -1);
+        assertTrue(outputString.indexOf("wsse11:Iteration") != -1);
+        assertTrue(outputString.indexOf("testMethod") == -1);
+        if (log.isDebugEnabled()) {
+            log.debug(outputString);
+        }
+        
+        try {
+            verify(encryptedDoc);
+            throw new Exception("Failure expected on a bad derived encryption");
+        } catch (WSSecurityException ex) {
+            assertTrue(ex.getErrorCode() == WSSecurityException.FAILED_AUTHENTICATION);
+            // expected
+        }
     }
     
     /**
@@ -254,7 +355,103 @@ public class TestWSSecurityUTDK extends TestCase implements CallbackHandler {
             log.debug(outputString);
         }
         
-        // verify(signedDoc);
+        Vector results = verify(signedDoc);
+        WSSecurityEngineResult actionResult =
+            WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
+        java.security.Principal principal = 
+            (java.security.Principal) actionResult.get(WSSecurityEngineResult.TAG_PRINCIPAL);
+        System.out.println(principal.getName());
+        assertTrue(principal.getName().indexOf("derivedKey") != -1);
+    }
+    
+    /**
+     * Test using a UsernameToken derived key for signing a SOAP body. In this test the
+     * derived key is modified before signature, and so signature verification should
+     * fail.
+     */
+    public void testDerivedKeyChangedSignature() throws Exception {
+        Document doc = unsignedEnvelope.getAsDocument();
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        
+        WSSecUsernameToken builder = new WSSecUsernameToken();
+        builder.setUserInfo("bob", "security");
+        builder.addDerivedKey(true, null, 1000);
+        builder.prepare(doc);
+        
+        byte[] derivedKey = builder.getDerivedKey();
+        derivedKey[5] = 12;
+        assertTrue(derivedKey.length == 20);
+        
+        String tokenIdentifier = builder.getId();
+        
+        //
+        // Derived key encryption
+        //
+        WSSecDKSign sigBuilder = new WSSecDKSign();
+        sigBuilder.setExternalKey(derivedKey, tokenIdentifier);
+        sigBuilder.setSignatureAlgorithm(XMLSignature.ALGO_ID_MAC_HMAC_SHA1);
+        Document signedDoc = sigBuilder.build(doc, secHeader);
+        
+        builder.prependToHeader(secHeader);
+        
+        String outputString = 
+            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+        if (log.isDebugEnabled()) {
+            log.debug(outputString);
+        }
+
+        try {
+            verify(signedDoc);
+            throw new Exception("Failure expected on a bad derived signature");
+        } catch (WSSecurityException ex) {
+            assertTrue(ex.getErrorCode() == WSSecurityException.FAILED_CHECK);
+            // expected
+        }
+    }
+    
+    /**
+     * Test using a UsernameToken derived key for signing a SOAP body. In this test the
+     * user is "alice" rather than "bob", and so signature verification should fail.
+     */
+    public void testDerivedKeyBadUserSignature() throws Exception {
+        Document doc = unsignedEnvelope.getAsDocument();
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        
+        WSSecUsernameToken builder = new WSSecUsernameToken();
+        builder.setUserInfo("alice", "security");
+        builder.addDerivedKey(true, null, 1000);
+        builder.prepare(doc);
+        
+        byte[] derivedKey = builder.getDerivedKey();
+        assertTrue(derivedKey.length == 20);
+        
+        String tokenIdentifier = builder.getId();
+        
+        //
+        // Derived key encryption
+        //
+        WSSecDKSign sigBuilder = new WSSecDKSign();
+        sigBuilder.setExternalKey(derivedKey, tokenIdentifier);
+        sigBuilder.setSignatureAlgorithm(XMLSignature.ALGO_ID_MAC_HMAC_SHA1);
+        Document signedDoc = sigBuilder.build(doc, secHeader);
+        
+        builder.prependToHeader(secHeader);
+        
+        String outputString = 
+            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+        if (log.isDebugEnabled()) {
+            log.debug(outputString);
+        }
+
+        try {
+            verify(signedDoc);
+            throw new Exception("Failure expected on a bad derived signature");
+        } catch (WSSecurityException ex) {
+            assertTrue(ex.getErrorCode() == WSSecurityException.FAILED_AUTHENTICATION);
+            // expected
+        }
     }
     
     /**
@@ -263,8 +460,8 @@ public class TestWSSecurityUTDK extends TestCase implements CallbackHandler {
      * @param env soap envelope
      * @throws java.lang.Exception Thrown when there is a problem in verification
      */
-    private void verify(Document doc) throws Exception {
-        secEngine.processSecurityHeader(doc, null, this, crypto);
+    private Vector verify(Document doc) throws Exception {
+        return secEngine.processSecurityHeader(doc, null, this, crypto);
     }
     
     
@@ -272,9 +469,13 @@ public class TestWSSecurityUTDK extends TestCase implements CallbackHandler {
         throws IOException, UnsupportedCallbackException {
         for (int i = 0; i < callbacks.length; i++) {
             if (callbacks[i] instanceof WSPasswordCallback) {
-                //
-                // Do nothing
-                //
+                WSPasswordCallback pc = (WSPasswordCallback) callbacks[i];
+                if (pc.getUsage() == WSPasswordCallback.USERNAME_TOKEN_UNKNOWN
+                    && "bob".equals(pc.getIdentifier())) {
+                    pc.setPassword("security");
+                } else {
+                    throw new IOException("Authentication failed");
+                }
             } else {
                 throw new UnsupportedCallbackException(callbacks[i], "Unrecognized Callback");
             }

@@ -446,6 +446,13 @@ public class UsernameToken {
         this.raw_password = raw_password;
     }
     
+    /**
+     * Get the raw (plain text) password used to compute secret key.
+     */
+    public String getRawPassword() {
+        return this.raw_password;
+    }
+    
     public static String doPasswordDigest(String nonce, String created,
             String password) {
         String passwdDigest = null;
