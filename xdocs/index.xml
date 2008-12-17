@@ -42,17 +42,16 @@ with JAX-RPC based server/clients and .NET server/clients.
                 </p>
                 <ul style="margin-left: 40px;">
                     <li>
-                        <a href="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0.pdf">OASIS
-Web Services Security: SOAP Message Security 1.0 Standard 200401, March
-2004</a>
+                        <a href="http://docs.oasis-open.org/wss/v1.1/wss-v1.1-spec-os-SOAPMessageSecurity.pdf">
+Web Services Security: SOAP Message Security 1.1</a>
                     </li>
                     <li>
-                        <a href="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0.pdf">Username
-Token profile V1.0</a>
+                        <a href="http://docs.oasis-open.org/wss/v1.1/wss-v1.1-spec-os-UsernameTokenProfile.pdf">Username
+Token Profile 1.1</a>
                     </li>
                     <li>
-                        <a href="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0.pdf">X.509
-Token Profile V1.0</a>
+                        <a href="http://docs.oasis-open.org/wss/v1.1/wss-v1.1-spec-os-x509TokenProfile.pdf">X.509
+Certificate Token Profile 1.1</a>
                     </li>
                 </ul>
             </subsection>

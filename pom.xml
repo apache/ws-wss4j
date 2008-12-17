@@ -8,7 +8,7 @@
     <packaging>bundle</packaging>
     <name>WSS4J</name>
     <!-- <version>1.5.4</version> -->
-    <version>SNAPSHOT</version>
+    <version>1.5.5-SNAPSHOT</version>
     <description>
         Apache WSS4J is an implementation of the Web Services Security
         (WS-Security) being developed at OASIS Web Services Security TC.
@@ -404,7 +404,7 @@
                 <configuration>
                     <onlyCurrentVersion>true</onlyCurrentVersion>
                     <resolutionIds>Any</resolutionIds>
-                    <statusIds>Resolved, Closed</statusIds>
+                    <statusIds>Closed</statusIds>
                     <sortColumnNames>Key</sortColumnNames>
                 </configuration>
                 <reportSets>
