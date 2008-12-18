@@ -167,8 +167,6 @@ public class TestWSSecurityDataRef extends TestCase implements CallbackHandler {
         /*
          * Set up the parts structure to encrypt the body
          */
-        SOAPConstants soapConstants = WSSecurityUtil.getSOAPConstants(doc
-                .getDocumentElement());
         Vector parts = new Vector();
         WSEncryptionPart encP = new WSEncryptionPart("testMethod", "uri:LogTestService2",
                 "Element");

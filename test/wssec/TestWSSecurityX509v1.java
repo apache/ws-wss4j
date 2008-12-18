@@ -188,7 +188,7 @@ public class TestWSSecurityX509v1 extends TestCase implements CallbackHandler {
             Document doc = unsignedEnvelope.getAsDocument();
             WSSecHeader secHeader = new WSSecHeader();
             secHeader.insertSecurityHeader(doc);        
-            Document encryptedDoc = builder.build(doc, v1Crypto, secHeader);
+            builder.build(doc, v1Crypto, secHeader);
             fail("Expected failure when using an X509#v1 certificate with SKI");
         } catch (WSSecurityException ex) {
             // expected

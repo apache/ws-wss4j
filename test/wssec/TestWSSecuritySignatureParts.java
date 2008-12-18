@@ -187,7 +187,7 @@ public class TestWSSecuritySignatureParts extends TestCase implements CallbackHa
         sign.setParts(parts);
         
         try {
-            Document signedDoc = sign.build(doc, crypto, secHeader);
+            sign.build(doc, crypto, secHeader);
             fail("Failure expected on a bad localname");
         } catch (WSSecurityException ex) {
             // expected
@@ -218,7 +218,7 @@ public class TestWSSecuritySignatureParts extends TestCase implements CallbackHa
         sign.setParts(parts);
         
         try {
-            Document signedDoc = sign.build(doc, crypto, secHeader);
+            sign.build(doc, crypto, secHeader);
             fail("Failure expected on a bad namespace");
         } catch (WSSecurityException ex) {
             // expected

@@ -63,7 +63,6 @@ import java.util.Vector;
  * standard fault codes and fault strings for error propagation.
  */
 public class TestWSSecurityFaultCodes extends TestCase implements CallbackHandler {
-    private static Log log = LogFactory.getLog(TestWSSecurityFaultCodes.class);
     static final String soapMsg = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
             "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" +
             "   <soapenv:Body>" +
@@ -229,7 +228,7 @@ public class TestWSSecurityFaultCodes extends TestCase implements CallbackHandle
         Document timestampedDoc = builder.build(doc, secHeader);
         
         try {
-            verify(doc);
+            verify(timestampedDoc);
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == 5);
             assertTrue(ex.getMessage().startsWith(
@@ -252,7 +251,7 @@ public class TestWSSecurityFaultCodes extends TestCase implements CallbackHandle
         Document doc = unsignedEnvelope.getAsDocument();
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);        
-        Document timestampedDoc = builder.build(doc, secHeader);
+        builder.build(doc, secHeader);
         
         try {
             new UsernameToken(doc.getDocumentElement());

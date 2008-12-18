@@ -62,7 +62,6 @@ import java.security.KeyStore;
  */
 public class TestWSSecurityHooks extends TestCase implements CallbackHandler
 {
-   private static Log log = LogFactory.getLog(TestWSSecurityHooks.class);
    private static final String soapMessage = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+
          "<soapenv:Envelope " +
                "xmlns:soapenv=\"http://www.w3.org/2003/05/soap-envelope\" " +
