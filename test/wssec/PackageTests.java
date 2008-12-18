@@ -80,6 +80,8 @@ public class PackageTests extends TestCase {
         suite.addTestSuite(TestWSSecurityDataRef1.class);
         suite.addTestSuite(TestWSSecurityCertError.class);
         suite.addTestSuite(TestWSSecuritySignatureParts.class);
+        suite.addTestSuite(TestWSSecurityUTSignature.class);
+        
         return suite;
     }
 

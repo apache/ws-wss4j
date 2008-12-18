@@ -111,17 +111,22 @@ public class WSSecUsernameToken extends WSSecBase {
      * Get the derived secret key.
      * 
      * After the <code>prepare()</code> method was called use this method
-     * to compute a derived secret key. The generation of this secret key is according
-     * to WS-Trust specification.
+     * to compute a derived secret key. If "useDerivedKey" is set, then the returned secret
+     * key is derived as per the UsernameToken 1.1 specification. Otherwise, the generation 
+     * of this secret key is according to the WS-Trust specifications.
      * 
      * @return Return the derived secret key of this token or null if <code>prepare()</code>
      * was not called before.
      */
-    public byte[] getSecretKey() {
+    public byte[] getSecretKey() throws WSSecurityException {
         if (ut == null) {
             return null;
         }
-        return ut.getSecretKey();
+        if (useDerivedKey) {
+            return UsernameToken.generateDerivedKey(password, saltValue, iteration);
+        } else {
+            return ut.getSecretKey();
+        }
     }
     
     /**

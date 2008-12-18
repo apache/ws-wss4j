@@ -336,7 +336,7 @@ public class TestWSSecurityUTDK extends TestCase implements CallbackHandler {
         String tokenIdentifier = builder.getId();
         
         //
-        // Derived key encryption
+        // Derived key signature
         //
         WSSecDKSign sigBuilder = new WSSecDKSign();
         sigBuilder.setExternalKey(derivedKey, tokenIdentifier);
@@ -386,7 +386,7 @@ public class TestWSSecurityUTDK extends TestCase implements CallbackHandler {
         String tokenIdentifier = builder.getId();
         
         //
-        // Derived key encryption
+        // Derived key signature
         //
         WSSecDKSign sigBuilder = new WSSecDKSign();
         sigBuilder.setExternalKey(derivedKey, tokenIdentifier);
@@ -430,7 +430,7 @@ public class TestWSSecurityUTDK extends TestCase implements CallbackHandler {
         String tokenIdentifier = builder.getId();
         
         //
-        // Derived key encryption
+        // Derived key signature
         //
         WSSecDKSign sigBuilder = new WSSecDKSign();
         sigBuilder.setExternalKey(derivedKey, tokenIdentifier);

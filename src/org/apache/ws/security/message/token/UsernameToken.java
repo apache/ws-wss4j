@@ -678,6 +678,35 @@ public class UsernameToken {
         }
         return K;
     }
+    
+    
+    /**
+     * This method gets a derived key as defined in WSS Username Token Profile.
+     * 
+     * @return Returns the derived key as a byte array
+     * @throws WSSecurityException
+     */
+    public byte[] getDerivedKey() throws WSSecurityException {
+        int iteration = getIteration();
+        byte[] salt = getSalt();
+        return generateDerivedKey(raw_password, salt, iteration);
+    }
+    
+    /**
+     * Return whether the UsernameToken represented by this class is to be used
+     * for key derivation as per the UsernameToken Profile 1.1. It does this by
+     * checking that the username token has salt and iteration values.
+     * 
+     * @throws WSSecurityException
+     */
+    public boolean isDerivedKey() throws WSSecurityException {
+        if (elementSalt != null && elementIteration != null) {
+            return true;
+        }
+        return false;
+    }
+
+    
 
     /**
      * This static method generates a 128 bit salt value as defined in WSS
