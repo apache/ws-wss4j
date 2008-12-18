@@ -289,7 +289,9 @@ public class SignatureProcessor implements Processor {
                     
                     String id = secRef.getKeyIdentifierValue();
                     WSPasswordCallback pwcb = new WSPasswordCallback(id,
-                                                       WSPasswordCallback.ENCRYPTED_KEY_TOKEN);
+                                                                     null,
+                                                                     SecurityTokenReference.ENC_KEY_SHA1_URI,
+                                                                     WSPasswordCallback.ENCRYPTED_KEY_TOKEN);
                     try {
                         cb.handle(new Callback[]{pwcb});
                     } catch (Exception e) {

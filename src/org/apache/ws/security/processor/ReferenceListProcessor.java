@@ -305,19 +305,19 @@ public class ReferenceListProcessor implements Processor {
                 decryptedData = keyInfo.getSecret();
             }
         } else if (secRef.containsKeyIdentifier()){
-            if (secRef.getKeyIdentifierValueType().equals(SecurityTokenReference.ENC_KEY_SHA1_URI)) {
-                String sha = secRef.getKeyIdentifierValue();
-                WSPasswordCallback pwcb = new WSPasswordCallback(sha, WSPasswordCallback.ENCRYPTED_KEY_TOKEN);
-                
-                try {
-                    cb.handle(new Callback[]{pwcb});
-                } catch (Exception e) {
-                    throw new WSSecurityException(WSSecurityException.FAILURE,
-                            "noPassword", new Object[] { sha }, e);
-                }
-                decryptedData = pwcb.getKey();
+            String sha = secRef.getKeyIdentifierValue();
+            WSPasswordCallback pwcb = new WSPasswordCallback(secRef.getKeyIdentifierValue(),
+                                                             null,
+                                                             secRef.getKeyIdentifierValueType(),
+                                                             WSPasswordCallback.ENCRYPTED_KEY_TOKEN);
+            
+            try {
+                cb.handle(new Callback[]{pwcb});
+            } catch (Exception e) {
+                throw new WSSecurityException(WSSecurityException.FAILURE,
+                        "noPassword", new Object[] { sha }, e);
             }
-        
+            decryptedData = pwcb.getKey();
         } else {
             throw new WSSecurityException(WSSecurityException.FAILED_CHECK,
                     "noReference");
