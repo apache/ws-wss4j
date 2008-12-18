@@ -66,6 +66,7 @@ public class WSSecurityUtil {
      * overhead.
      */
     private static SecureRandom random = null;
+    private static String randomAlgorithm = null;
     
     /**
      * Returns the first WS-Security header element for a given actor. Only one
@@ -1007,8 +1008,9 @@ public class WSSecurityUtil {
     resolveSecureRandom(
         final String algorithm
     ) throws NoSuchAlgorithmException {
-        if (random == null) {
+        if (random == null || !algorithm.equals(randomAlgorithm)) {
             random = SecureRandom.getInstance(algorithm);
+            randomAlgorithm = algorithm;
             random.setSeed(System.currentTimeMillis());
         }
         return random;
