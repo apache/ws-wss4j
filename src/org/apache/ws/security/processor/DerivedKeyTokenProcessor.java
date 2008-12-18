@@ -198,25 +198,20 @@ public class DerivedKeyTokenProcessor implements Processor {
                     "noCallback");
         }
         
-        WSPasswordCallback pwcb = null;
-        
-        //Handle the EncryptedKeySHA1 type key references
-        if (keyIdentifierType.equals
-                (SecurityTokenReference.ENC_KEY_SHA1_URI)) {
-
-            pwcb = new WSPasswordCallback(keyIdentifierValue,
+        WSPasswordCallback pwcb = new WSPasswordCallback(keyIdentifierValue,
+                                                         null,
+                                                         keyIdentifierType,
                                                WSPasswordCallback.ENCRYPTED_KEY_TOKEN);
-            try {
-                cb.handle(new Callback[]{pwcb});
-            } catch (IOException e) {
-                throw new WSSecurityException(WSSecurityException.FAILURE, "noKey",
-                        new Object[] { id }, e);
-            } catch (UnsupportedCallbackException e) {
-                throw new WSSecurityException(WSSecurityException.FAILURE, "noKey",
-                        new Object[] { id }, e);
-            }
-            
+        try {
+            cb.handle(new Callback[]{pwcb});
+        } catch (IOException e) {
+            throw new WSSecurityException(WSSecurityException.FAILURE, "noKey",
+                    new Object[] { id }, e);
+        } catch (UnsupportedCallbackException e) {
+            throw new WSSecurityException(WSSecurityException.FAILURE, "noKey",
+                    new Object[] { id }, e);
         }
+            
         return pwcb.getKey();
     }
     
