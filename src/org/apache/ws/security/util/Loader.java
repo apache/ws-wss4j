@@ -152,6 +152,9 @@ public class Loader {
      * @throws ClassNotFoundException
      */
     static public Class loadClass(String clazz) throws ClassNotFoundException {
+        return loadClass(clazz, true);
+    }
+    static public Class loadClass(String clazz, boolean warn) throws ClassNotFoundException {
         try {
             ClassLoader tcl = getTCL(); 
             
@@ -162,7 +165,11 @@ public class Loader {
                 }
             }
         } catch (Throwable e) {
-            log.warn(e.getMessage(), e);
+            if (warn) {
+                log.warn(e.getMessage(), e);
+            } else {
+                log.debug(e.getMessage(), e);
+            }
         }
         // we reached here because tcl was null or because of a
         // security exception, or because clazz could not be loaded...

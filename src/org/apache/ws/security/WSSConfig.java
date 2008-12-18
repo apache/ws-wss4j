@@ -442,7 +442,7 @@ public class WSSConfig {
 
     private boolean loadProvider(String id, String className) {
         try {
-            Class c = Loader.loadClass(className);
+            Class c = Loader.loadClass(className, false);
             if (java.security.Security.getProvider(id) == null) {
                 if (log.isDebugEnabled()) {
                     log.debug("The provider " + id
