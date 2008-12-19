@@ -32,19 +32,13 @@ import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSecurityEngine;
-import org.apache.ws.security.WSEncryptionPart;
-import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.message.WSSecDKEncrypt;
 import org.apache.ws.security.message.WSSecDKSign;
-import org.apache.ws.security.message.WSSecEncrypt;
 import org.apache.ws.security.message.WSSecHeader;
-import org.apache.ws.security.message.WSSecSignature;
 import org.apache.ws.security.message.WSSecUsernameToken;
 import org.apache.ws.security.message.token.UsernameToken;
-import org.apache.ws.security.processor.Processor;
-import org.apache.ws.security.processor.UsernameTokenProcessor;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.xml.security.signature.XMLSignature;
 import org.w3c.dom.Document;
@@ -54,10 +48,8 @@ import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PrintWriter;
 
 import java.util.Vector;
 
@@ -160,7 +152,7 @@ public class TestWSSecurityUTDK extends TestCase implements CallbackHandler {
         assertTrue(usernameToken.getIteration() == 500);
         
         WSSecurityUtil.prependChildElement(
-            doc, secHeader.getSecurityHeader(), usernameToken.getElement(), false
+            secHeader.getSecurityHeader(), usernameToken.getElement()
         );
         
         String outputString = 

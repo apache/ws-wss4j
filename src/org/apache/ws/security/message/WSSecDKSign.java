@@ -392,13 +392,12 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
      *            The secHeader that holds the Signature element.
      */
     public void prependSigToHeader(WSSecHeader secHeader) {
-        WSSecurityUtil.prependChildElement(document, secHeader.getSecurityHeader(), sig
-                .getElement(), false);
+        WSSecurityUtil.prependChildElement(secHeader.getSecurityHeader(), sig.getElement());
     }
     
     public void appendSigToHeader(WSSecHeader secHeader) {
-        WSSecurityUtil.appendChildElement(document, secHeader.getSecurityHeader(), sig
-                .getElement());
+        Element secHeaderElement = secHeader.getSecurityHeader();
+        secHeaderElement.appendChild(sig.getElement());
     }
     
     /**

@@ -163,7 +163,7 @@ public class WSSAddUsernameToken extends WSBaseMessage {
         }
         if (id != null)
             ut.setID(id);
-        WSSecurityUtil.prependChildElement(doc, securityHeader, ut.getElement(), true);
+        WSSecurityUtil.prependChildElement(securityHeader, ut.getElement());
         return doc;
     }
 

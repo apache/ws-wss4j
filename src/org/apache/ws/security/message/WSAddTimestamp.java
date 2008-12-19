@@ -83,7 +83,7 @@ public class WSAddTimestamp extends WSBaseMessage {
      * <code>wsse:Security</code> header.
      * 
      * @param doc
-     *            The SOAP enevlope as W3C document
+     *            The SOAP envelope as W3C document
      * @param ttl
      *            This is the time difference in seconds between the
      *            <code>Created</code> and the <code>Expires</code> in
@@ -102,8 +102,7 @@ public class WSAddTimestamp extends WSBaseMessage {
         if (id != null) {
             ts.setID(id);
         }
-        WSSecurityUtil.prependChildElement(doc, securityHeader,
-                ts.getElement(), true);
+        WSSecurityUtil.prependChildElement(securityHeader, ts.getElement());
         return doc;
     }
 

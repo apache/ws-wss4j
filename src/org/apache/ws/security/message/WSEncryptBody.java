@@ -400,15 +400,9 @@ public class WSEncryptBody extends WSBaseMessage {
         Element wsseSecurity = insertSecurityHeader(doc);
         Element xencEncryptedKey = createEncryptedKey(doc, keyEncAlgo);
         if (parentNode == null) {
-            WSSecurityUtil.prependChildElement(doc,
-                    wsseSecurity,
-                    xencEncryptedKey,
-                    true);
+            WSSecurityUtil.prependChildElement(wsseSecurity, xencEncryptedKey);
         } else {
-            WSSecurityUtil.prependChildElement(doc,
-                    parentNode,
-                    xencEncryptedKey,
-                    true);
+            WSSecurityUtil.prependChildElement(parentNode, xencEncryptedKey);
         }
         SecurityTokenReference secToken = new SecurityTokenReference(doc);
 
@@ -442,10 +436,7 @@ public class WSEncryptBody extends WSBaseMessage {
                 bstToken.setID(certUri);
                 ref.setValueType(bstToken.getValueType());
                 secToken.setReference(ref);
-                WSSecurityUtil.prependChildElement(doc,
-                        wsseSecurity,
-                        bstToken.getElement(),
-                        false);
+                WSSecurityUtil.prependChildElement(wsseSecurity, bstToken.getElement());
                 break;
 
             default :
@@ -454,8 +445,7 @@ public class WSEncryptBody extends WSBaseMessage {
         }
         KeyInfo keyInfo = new KeyInfo(doc);
         keyInfo.addUnknownElement(secToken.getElement());
-        WSSecurityUtil.appendChildElement(
-                doc, xencEncryptedKey, keyInfo.getElement());
+        xencEncryptedKey.appendChild(keyInfo.getElement());
 
         Element xencCipherValue = createCipherValue(doc, xencEncryptedKey);
         xencCipherValue.appendChild(keyText);
@@ -622,7 +612,7 @@ public class WSEncryptBody extends WSBaseMessage {
 
         Element tmpE = doc.createElement("temp");
         Element refList = createDataRefList(doc, tmpE, encDataRefs);
-        WSSecurityUtil.prependChildElement(doc, wsseSecurity, refList, true);
+        WSSecurityUtil.prependChildElement(wsseSecurity, refList);
 
         if (tlog.isDebugEnabled()) {
             tlog.debug("EncryptBody embedded: symm-enc " + (t1 - t0));
@@ -676,7 +666,7 @@ public class WSEncryptBody extends WSBaseMessage {
                 doc.createElementNS(WSConstants.ENC_NS,
                         WSConstants.ENC_PREFIX + ":EncryptionMethod");
         encryptionMethod.setAttributeNS(null, "Algorithm", keyTransportAlgo);
-        WSSecurityUtil.appendChildElement(doc, encryptedKey, encryptionMethod);
+        encryptedKey.appendChild(encryptionMethod);
         return encryptedKey;
     }
     
@@ -703,7 +693,7 @@ public class WSEncryptBody extends WSBaseMessage {
                 doc.createElementNS(WSConstants.ENC_NS,
                         WSConstants.ENC_PREFIX + ":CipherValue");
         cipherData.appendChild(cipherValue);
-        WSSecurityUtil.appendChildElement(doc, encryptedKey, cipherData);
+        encryptedKey.appendChild(cipherData);
         return cipherValue;
     }
 
@@ -721,7 +711,7 @@ public class WSEncryptBody extends WSBaseMessage {
             dataReference.setAttributeNS(null, "URI", dataReferenceUri);
             referenceList.appendChild(dataReference);
         }
-        WSSecurityUtil.appendChildElement(doc, encryptedKey, referenceList);
+        encryptedKey.appendChild(referenceList);
         return referenceList;
     }
 

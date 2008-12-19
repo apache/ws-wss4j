@@ -416,7 +416,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
      *            The internal <code>enc:Reference</code> element
      */
     public void addInternalRefElement(Element dataRef) {
-        WSSecurityUtil.appendChildElement(document, encryptedKeyElement, dataRef);
+        encryptedKeyElement.appendChild(dataRef);
     }
 
     /**
@@ -432,8 +432,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
      *            The security header.
      */
     public void addExternalRefElement(Element dataRef, WSSecHeader secHeader) {
-        WSSecurityUtil.prependChildElement(document, secHeader
-                .getSecurityHeader(), dataRef, false);
+        WSSecurityUtil.prependChildElement(secHeader.getSecurityHeader(), dataRef);
     }
 
     private Vector doEncryption(Document doc, SecretKey secretKey,
@@ -663,8 +662,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
         Element referenceList = doc.createElementNS(WSConstants.ENC_NS,
                 WSConstants.ENC_PREFIX + ":ReferenceList");
         referenceList = createDataRefList(doc, referenceList, encDataRefs);
-        WSSecurityUtil.prependChildElement(doc, wsseSecurity, referenceList,
-                true);
+        WSSecurityUtil.prependChildElement(wsseSecurity, referenceList);
 
         return doc;
     }

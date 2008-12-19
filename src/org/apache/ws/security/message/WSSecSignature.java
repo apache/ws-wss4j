@@ -617,8 +617,7 @@ public class WSSecSignature extends WSSecBase {
      *            The secHeader that holds the Signature element.
      */
     public void prependToHeader(WSSecHeader secHeader) {
-        WSSecurityUtil.prependChildElement(document, secHeader.getSecurityHeader(), sig
-                .getElement(), false);
+        WSSecurityUtil.prependChildElement(secHeader.getSecurityHeader(), sig.getElement());
     }
     
     /**
@@ -633,8 +632,8 @@ public class WSSecSignature extends WSSecBase {
      *            The secHeader that holds the Signature element.
      */
     public void appendToHeader(WSSecHeader secHeader) {
-        WSSecurityUtil.appendChildElement(document, secHeader.getSecurityHeader(), sig
-                .getElement());
+        Element secHeaderElement = secHeader.getSecurityHeader();
+        secHeaderElement.appendChild(sig.getElement());
     }
     
     /**
@@ -650,8 +649,7 @@ public class WSSecSignature extends WSSecBase {
      */
     public void prependBSTElementToHeader(WSSecHeader secHeader) {
         if (bstToken != null) {
-            WSSecurityUtil.prependChildElement(document, secHeader.getSecurityHeader(),
-                    bstToken.getElement(), false);
+            WSSecurityUtil.prependChildElement(secHeader.getSecurityHeader(), bstToken.getElement());
         }
         bstToken = null;
     }
@@ -680,8 +678,8 @@ public class WSSecSignature extends WSSecBase {
     
     public void appendBSTElementToHeader(WSSecHeader secHeader) {
         if (bstToken != null) {
-            WSSecurityUtil.appendChildElement(document, secHeader.getSecurityHeader(),
-                    bstToken.getElement());
+            Element secHeaderElement = secHeader.getSecurityHeader();
+            secHeaderElement.appendChild(bstToken.getElement());
         }
         bstToken = null;
     }

@@ -37,8 +37,6 @@ public class WSSecTimestamp extends WSSecBase {
 
     private Timestamp ts = null;
 
-    private Document document = null;
-
     private int timeToLive = 300; // time between Created and Expires
 
     /**
@@ -64,16 +62,14 @@ public class WSSecTimestamp extends WSSecBase {
      * 
      * The method prepares and initializes a WSSec Timestamp structure after the
      * relevant information was set. Before calling <code>prepare()</code> the
-     * parameter such as <code>timeToLive</code> can be set if the deafult
+     * parameter such as <code>timeToLive</code> can be set if the default
      * value is not suitable.
      * 
      * @param doc
      *            The SOAP enevlope as W3C document
      */
     public void prepare(Document doc) {
-        document = doc;
-        ts = new Timestamp(wssConfig.isPrecisionInMilliSeconds(), doc,
-                timeToLive);
+        ts = new Timestamp(wssConfig.isPrecisionInMilliSeconds(), doc, timeToLive);
         String tsId = "Timestamp-" + ts.hashCode();
         ts.setID(tsId);
     }
@@ -90,8 +86,7 @@ public class WSSecTimestamp extends WSSecBase {
      *            The security header that holds the Signature element.
      */
     public void prependToHeader(WSSecHeader secHeader) {
-        WSSecurityUtil.prependChildElement(document, secHeader
-                .getSecurityHeader(), ts.getElement(), false);
+        WSSecurityUtil.prependChildElement(secHeader.getSecurityHeader(), ts.getElement());
     }
 
     /**

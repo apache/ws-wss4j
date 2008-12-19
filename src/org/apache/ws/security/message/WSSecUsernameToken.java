@@ -54,8 +54,6 @@ public class WSSecUsernameToken extends WSSecBase {
     
     private int iteration = UsernameToken.DEFAULT_ITERATION;
 
-    private Document document = null;
-
     /**
      * Constructor.
      */
@@ -174,7 +172,6 @@ public class WSSecUsernameToken extends WSSecBase {
      *            The SOAP envelope as W3C document
      */
     public void prepare(Document doc) {
-        document = doc;
         ut = new UsernameToken(wssConfig.isPrecisionInMilliSeconds(), doc,
                 passwordType);
         ut.setName(user);
@@ -206,8 +203,7 @@ public class WSSecUsernameToken extends WSSecBase {
      *            The security header that holds the Signature element.
      */
     public void prependToHeader(WSSecHeader secHeader) {
-        WSSecurityUtil.prependChildElement(document, secHeader
-                .getSecurityHeader(), ut.getElement(), false);
+        WSSecurityUtil.prependChildElement(secHeader.getSecurityHeader(), ut.getElement());
     }
 
     /**
@@ -222,9 +218,10 @@ public class WSSecUsernameToken extends WSSecBase {
      *            The security header that holds the Signature element.
      */
     public void appendToHeader(WSSecHeader secHeader) {
-        WSSecurityUtil.appendChildElement(document, secHeader
-                .getSecurityHeader(), ut.getElement());
+        Element secHeaderElement = secHeader.getSecurityHeader();
+        secHeaderElement.appendChild(ut.getElement());
     }
+    
     /**
      * Adds a new <code>UsernameToken</code> to a soap envelope.
      * 

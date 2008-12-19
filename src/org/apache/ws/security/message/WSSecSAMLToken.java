@@ -80,8 +80,7 @@ public class WSSecSAMLToken extends WSSecBase {
             throw new RuntimeException(ex.toString(), ex);
         }
         
-        WSSecurityUtil.prependChildElement(document, secHeader
-                .getSecurityHeader(), element, false);
+        WSSecurityUtil.prependChildElement(secHeader.getSecurityHeader(), element);
     }
     
     /**
