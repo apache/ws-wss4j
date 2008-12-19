@@ -31,15 +31,12 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSConfig;
-import org.apache.ws.security.action.Action;
 import org.apache.ws.security.components.crypto.Crypto;
-import org.apache.ws.security.components.crypto.CryptoBase;
 import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.handler.WSHandler;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.message.WSSecSignature;
 import org.apache.ws.security.message.WSSecHeader;
-import org.apache.ws.security.processor.Processor;
 import org.w3c.dom.Document;
 
 import java.io.ByteArrayInputStream;
