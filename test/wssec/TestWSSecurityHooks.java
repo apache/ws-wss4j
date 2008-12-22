@@ -25,8 +25,6 @@ import org.apache.axis.Message;
 import org.apache.axis.MessageContext;
 import org.apache.axis.client.AxisClient;
 import org.apache.axis.configuration.NullProvider;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.ws.axis.security.WSDoAllReceiver;
 import org.apache.ws.axis.security.WSDoAllSender;
 import org.apache.ws.security.WSPasswordCallback;

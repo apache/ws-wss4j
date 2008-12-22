@@ -24,12 +24,9 @@ import org.apache.axis.MessageContext;
 import org.apache.axis.client.AxisClient;
 import org.apache.axis.configuration.NullProvider;
 import org.apache.axis.message.SOAPEnvelope;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
-import org.w3c.dom.Document;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
