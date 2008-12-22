@@ -177,7 +177,7 @@
                               javax.xml.crypto.*,
                               org.apache.xml.security.*,
                               org.jcp.xml.dsig.internal.*,
-                              org.opensaml.*,
+                              org.opensaml.*;resolution:=optional,
                               *;resolution:=optional
                         </Import-Package>
                         <DynamicImport-Package>*</DynamicImport-Package>
