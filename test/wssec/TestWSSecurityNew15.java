@@ -54,7 +54,7 @@ import java.util.Vector;
 /**
  * Test that encrypt and decrypt a WS-Security envelope.
  * 
- * This test uses the RSA_15 alogrithm to transport (wrap) the symmetric key.
+ * This test uses the RSA_15 algorithm to transport (wrap) the symmetric key.
  * The test case creates a ReferenceList element that references EncryptedData
  * elements. The ReferencesList element is put into the Security header, not
  * as child of the EncryptedKey. The EncryptedData elements contain a KeyInfo

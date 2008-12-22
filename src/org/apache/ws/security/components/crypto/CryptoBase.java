@@ -43,6 +43,7 @@ import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
+import javax.security.auth.x500.X500Principal;
 
 /**
  * Created by IntelliJ IDEA.
@@ -208,9 +209,9 @@ public abstract class CryptoBase implements Crypto {
     private String getAliasForX509Cert(String issuer, BigInteger serialNumber,
                                        boolean useSerialNumber)
             throws WSSecurityException {
-        Vector issuerRDN = splitAndTrim(issuer);
-        X509Certificate x509cert = null;
-        Vector certRDN = null;
+        X500Principal issuerRDN = new X500Principal(issuer);
+        X509Certificate x509cert;
+        X500Principal certRDN;
         Certificate cert = null;
 
         try {
@@ -232,7 +233,7 @@ public abstract class CryptoBase implements Crypto {
                 x509cert = (X509Certificate) cert;
                 if (!useSerialNumber ||
                         useSerialNumber && x509cert.getSerialNumber().compareTo(serialNumber) == 0) {
-                    certRDN = splitAndTrim(x509cert.getIssuerDN().getName());
+                    certRDN = new X500Principal(x509cert.getIssuerDN().getName());
                     if (certRDN.equals(issuerRDN)) {
                         return alias;
                     }
@@ -522,7 +523,7 @@ public abstract class CryptoBase implements Crypto {
     public String[] getAliasesForDN(String subjectDN) throws WSSecurityException {
 
         // The DN to search the keystore for
-        Vector subjectRDN = splitAndTrim(subjectDN);
+        X500Principal subjectRDN = new X500Principal(subjectDN);
         Vector aliases = getAlias(subjectRDN, keystore);
         
         //If we can't find the issuer in the keystore then look at cacerts
@@ -694,7 +695,7 @@ public abstract class CryptoBase implements Crypto {
         return true;
     }
     
-    private Vector getAlias(Vector subjectRDN, KeyStore store) throws WSSecurityException {
+    private Vector getAlias(X500Principal subjectRDN, KeyStore store) throws WSSecurityException {
         // Store the aliases found
         Vector aliases = new Vector();
 
@@ -716,7 +717,7 @@ public abstract class CryptoBase implements Crypto {
                     cert = certs[0];
                 }
                 if (cert instanceof X509Certificate) {
-                    Vector foundRDN = splitAndTrim(((X509Certificate) cert).getSubjectDN().getName());
+                    X500Principal foundRDN = ((X509Certificate) cert).getSubjectX500Principal();
 
                     if (subjectRDN.equals(foundRDN)) {
                         aliases.add(alias);
