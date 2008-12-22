@@ -60,7 +60,7 @@ import java.util.Vector;
  * non-standard implementation.
  */
 public class TestWSSecurityUTSignature extends TestCase implements CallbackHandler {
-    private static Log log = LogFactory.getLog(TestWSSecurityUTDK.class);
+    private static Log log = LogFactory.getLog(TestWSSecurityUTSignature.class);
     static final String soapMsg = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
             "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" +
             "   <soapenv:Body>" +

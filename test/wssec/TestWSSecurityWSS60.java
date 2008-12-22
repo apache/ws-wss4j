@@ -28,17 +28,13 @@ import org.apache.axis.message.SOAPEnvelope;
 import org.apache.axis.utils.XMLUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.ws.security.SOAPConstants;
-import org.apache.ws.security.WSEncryptionPart;
 import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.message.WSSecSignature;
 import org.apache.ws.security.message.WSSecHeader;
-import org.apache.ws.security.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 
 import javax.security.auth.callback.Callback;
@@ -48,23 +44,19 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
-import java.util.Vector;
 
 /**
- * This is some unit tests for signing using signature parts. Note that the "soapMsg" below
- * has a custom header added.
+ * This is a test for WSS-60 - "Problems when SOAP envelope namespace prefix is null"
+ * http://issues.apache.org/jira/browse/WSS-60
  */
-public class TestWSSecuritySignatureParts extends TestCase implements CallbackHandler {
-    private static Log log = LogFactory.getLog(TestWSSecuritySignatureParts.class);
+public class TestWSSecurityWSS60 extends TestCase implements CallbackHandler {
+    private static Log log = LogFactory.getLog(TestWSSecurityWSS60.class);
     static final String soapMsg = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
-            "<soapenv:Envelope xmlns:foo=\"urn:foo.bar\" xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" +
-            "   <soapenv:Header>" +
-            "       <foo:foobar>baz</foo:foobar>" + 
-            "   </soapenv:Header>" +
-            "   <soapenv:Body>" +
+            "<Envelope xmlns=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" +
+            "   <Body>" +
             "      <ns1:testMethod xmlns:ns1=\"http://axis/service/security/test6/LogTestService8\"></ns1:testMethod>" +
-            "   </soapenv:Body>" +
-            "</soapenv:Envelope>";
+            "   </Body>" +
+            "</Envelope>";
 
     static final WSSecurityEngine secEngine = new WSSecurityEngine();
     static final Crypto crypto = CryptoFactory.getInstance();
@@ -77,7 +69,7 @@ public class TestWSSecuritySignatureParts extends TestCase implements CallbackHa
      * 
      * @param name name of the test
      */
-    public TestWSSecuritySignatureParts(String name) {
+    public TestWSSecurityWSS60(String name) {
         super(name);
     }
 
@@ -88,7 +80,7 @@ public class TestWSSecuritySignatureParts extends TestCase implements CallbackHa
      * @return a junit test suite
      */
     public static Test suite() {
-        return new TestSuite(TestWSSecuritySignatureParts.class);
+        return new TestSuite(TestWSSecurityWSS60.class);
     }
 
     /**
@@ -128,144 +120,30 @@ public class TestWSSecuritySignatureParts extends TestCase implements CallbackHa
     }
 
     /**
-     * Test signing a custom SOAP header
+     * Test signing a SOAP message that has no SOAP namespace prefix
      */
-    public void testSOAPHeader() throws Exception {
+    public void testNoSOAPNamespacePrefix() throws Exception {
         SOAPEnvelope unsignedEnvelope = message.getSOAPEnvelope();
         WSSecSignature sign = new WSSecSignature();
         sign.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
-        sign.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
+        sign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
 
         Document doc = unsignedEnvelope.getAsDocument();
 
         WSSecHeader secHeader = new WSSecHeader();
+        secHeader.setActor("bob");
         secHeader.insertSecurityHeader(doc);
-        
-        Vector parts = new Vector();
-        WSEncryptionPart encP =
-            new WSEncryptionPart(
-                "foobar",
-                "urn:foo.bar",
-                "");
-        parts.add(encP);
-        sign.setParts(parts);
-        
         Document signedDoc = sign.build(doc, crypto, secHeader);
         
+        Message signedMsg = SOAPUtil.toAxisMessage(signedDoc);
         if (log.isDebugEnabled()) {
-            String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
-            log.debug(outputString);
+            XMLUtils.PrettyElementToWriter(signedMsg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
         }
+        signedDoc = signedMsg.getSOAPEnvelope().getAsDocument();
         
         verify(signedDoc);
     }
     
-    /**
-     * Test signing a custom SOAP header with a bad localname
-     */
-    public void testBadLocalname() throws Exception {
-        SOAPEnvelope unsignedEnvelope = message.getSOAPEnvelope();
-        WSSecSignature sign = new WSSecSignature();
-        sign.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
-        sign.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
-
-        Document doc = unsignedEnvelope.getAsDocument();
-
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
-        
-        Vector parts = new Vector();
-        WSEncryptionPart encP =
-            new WSEncryptionPart(
-                "foobar2",
-                "urn:foo.bar",
-                "");
-        parts.add(encP);
-        sign.setParts(parts);
-        
-        try {
-            sign.build(doc, crypto, secHeader);
-            fail("Failure expected on a bad localname");
-        } catch (WSSecurityException ex) {
-            // expected
-        }
-    }
-    
-    /**
-     * Test signing a custom SOAP header with a bad namespace
-     */
-    public void testBadNamespace() throws Exception {
-        SOAPEnvelope unsignedEnvelope = message.getSOAPEnvelope();
-        WSSecSignature sign = new WSSecSignature();
-        sign.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
-        sign.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
-
-        Document doc = unsignedEnvelope.getAsDocument();
-
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
-        
-        Vector parts = new Vector();
-        WSEncryptionPart encP =
-            new WSEncryptionPart(
-                "foobar",
-                "urn:foo.bar2",
-                "");
-        parts.add(encP);
-        sign.setParts(parts);
-        
-        try {
-            sign.build(doc, crypto, secHeader);
-            fail("Failure expected on a bad namespace");
-        } catch (WSSecurityException ex) {
-            // expected
-        }
-    }
-    
-    /**
-     * Test signing a custom SOAP header and the SOAP body
-     */
-    public void testSOAPHeaderAndBody() throws Exception {
-        SOAPEnvelope unsignedEnvelope = message.getSOAPEnvelope();
-        SOAPConstants soapConstants = 
-            WSSecurityUtil.getSOAPConstants(unsignedEnvelope.getAsDOM());
-        WSSecSignature sign = new WSSecSignature();
-        sign.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
-        sign.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
-
-        Document doc = unsignedEnvelope.getAsDocument();
-
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
-        
-        Vector parts = new Vector();
-        WSEncryptionPart encP =
-            new WSEncryptionPart(
-                soapConstants.getBodyQName().getLocalPart(),    // define the body
-                soapConstants.getEnvelopeURI(),
-                "");
-        parts.add(encP);
-        WSEncryptionPart encP2 =
-            new WSEncryptionPart(
-                "foobar",
-                "urn:foo.bar",
-                "");
-        parts.add(encP2);
-        sign.setParts(parts);
-        
-        Document signedDoc = sign.build(doc, crypto, secHeader);
-        
-        if (log.isDebugEnabled()) {
-            String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
-            log.debug(outputString);
-        }
-        
-        verify(signedDoc);
-    }
-    
-
     /**
      * Verifies the soap envelope
      * <p/>

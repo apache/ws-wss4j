@@ -78,6 +78,7 @@ public class WSConstants {
     public static final String WSSE_PREFIX = "wsse";
     public static final String WSSE11_PREFIX = "wsse11";
     public static final String WSU_PREFIX = "wsu";
+    public static final String DEFAULT_SOAP_PREFIX = "soapenv";
     
     /*
      * Now the namespaces, local names, and prefixes of XML-SIG and XML-ENC

@@ -302,12 +302,15 @@ public class WSSecurityUtil {
     }
 
     /**
-     * set the namespace if it is not set already. <p/>
+     * Set a namespace/prefix on an element if it is not set already. First off, it
+     * searches for the element for the prefix associated with the specified
+     * namespace. If the prefix isn't null, then this is returned. Otherwise, it
+     * creates a new attribute using the namespace/prefix passed as parameters.
      * 
      * @param element
      * @param namespace
      * @param prefix
-     * @return TODO
+     * @return the prefix associated with the set namespace
      */
     public static String setNamespace(Element element, String namespace,
             String prefix) {
@@ -315,8 +318,7 @@ public class WSSecurityUtil {
         if (pre != null) {
             return pre;
         }
-        element.setAttributeNS(WSConstants.XMLNS_NS, "xmlns:" + prefix,
-                namespace);
+        element.setAttributeNS(WSConstants.XMLNS_NS, "xmlns:" + prefix, namespace);
         return prefix;
     }
 
