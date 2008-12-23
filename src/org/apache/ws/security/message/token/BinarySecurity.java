@@ -112,7 +112,7 @@ public class BinarySecurity {
      * 
      * @param type 
      */
-    protected void setValueType(String type) {
+    public void setValueType(String type) {
         this.element.setAttributeNS(null, "ValueType", type);
     }
 
@@ -132,7 +132,7 @@ public class BinarySecurity {
      * 
      * @param encoding 
      */
-    protected void setEncodingType(String encoding) {
+    public void setEncodingType(String encoding) {
         this.element.setAttributeNS(null, "EncodingType", encoding);
     }
 
@@ -160,7 +160,7 @@ public class BinarySecurity {
      * 
      * @param data 
      */
-    protected void setToken(byte[] data) {
+    public void setToken(byte[] data) {
         if (data == null) {
             throw new IllegalArgumentException("data == null");
         }
