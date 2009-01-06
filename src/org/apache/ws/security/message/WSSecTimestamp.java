@@ -66,7 +66,7 @@ public class WSSecTimestamp extends WSSecBase {
      * value is not suitable.
      * 
      * @param doc
-     *            The SOAP enevlope as W3C document
+     *            The SOAP envelope as W3C document
      */
     public void prepare(Document doc) {
         ts = new Timestamp(wssConfig.isPrecisionInMilliSeconds(), doc, timeToLive);

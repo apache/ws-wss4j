@@ -59,7 +59,8 @@ public abstract class AbstractCrypto extends CryptoBase {
      * @throws CredentialException
      * @throws IOException
      */
-    public AbstractCrypto(Properties properties, ClassLoader loader) throws CredentialException, IOException {
+    public AbstractCrypto(Properties properties, ClassLoader loader) 
+        throws CredentialException, IOException {
         this.properties = properties;
         if (this.properties == null) {
             return;
@@ -68,8 +69,8 @@ public abstract class AbstractCrypto extends CryptoBase {
         InputStream is = null;
         if (location != null) {
             java.net.URL url = Loader.getResource(loader, location);
-            if(url != null) {
-                is =  url.openStream();
+            if (url != null) {
+                is = url.openStream();
             } else {
                 is = new java.io.FileInputStream(location);
             }

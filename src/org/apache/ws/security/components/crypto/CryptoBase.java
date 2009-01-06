@@ -77,7 +77,7 @@ public abstract class CryptoBase implements Crypto {
      * <p/>
      *
      * @return Returns a <code>CertificateFactory</code> to construct
-     *         X509 certficates
+     *         X509 certificates
      * @throws org.apache.ws.security.WSSecurityException
      *
      */
@@ -302,7 +302,7 @@ public abstract class CryptoBase implements Crypto {
      *         or null if no such certificate was found.
      */
 
-/*
+    /*
      * See comment above
      */
     public String getAliasForX509Cert(Certificate cert) throws WSSecurityException {
@@ -463,10 +463,10 @@ public abstract class CryptoBase implements Crypto {
     public byte[] getSKIBytesFromCert(X509Certificate cert)
             throws WSSecurityException {
         /*
-           * Gets the DER-encoded OCTET string for the extension value (extnValue)
-           * identified by the passed-in oid String. The oid string is represented
-           * by a set of positive whole numbers separated by periods.
-           */
+         * Gets the DER-encoded OCTET string for the extension value (extnValue)
+         * identified by the passed-in oid String. The oid string is represented
+         * by a set of positive whole numbers separated by periods.
+         */
         byte[] derEncodedValue = cert.getExtensionValue(SKI_OID);
 
         if (cert.getVersion() < 3 || derEncodedValue == null) {
@@ -496,7 +496,7 @@ public abstract class CryptoBase implements Crypto {
             return sha.digest();
         }
 
-        /**
+        /*
          * Strip away first four bytes from the DerValue (tag and length of
          * ExtensionValue OCTET STRING and KeyIdentifier OCTET STRING)
          */
@@ -509,6 +509,7 @@ public abstract class CryptoBase implements Crypto {
     public KeyStore getKeyStore() {
         return this.keystore;
     }
+    
     /**
      * Lookup X509 Certificates in the keystore according to a given DN of the subject of the certificate
      * <p/>
@@ -527,14 +528,15 @@ public abstract class CryptoBase implements Crypto {
         Vector aliases = getAlias(subjectRDN, keystore);
         
         //If we can't find the issuer in the keystore then look at cacerts
-        if(aliases.size() == 0) {
+        if (aliases.size() == 0) {
             aliases = getAlias(subjectRDN, cacerts);
         }
         
         // Convert the vector into an array
         String[] result = new String[aliases.size()];
-        for (int i = 0; i < aliases.size(); i++)
+        for (int i = 0; i < aliases.size(); i++) {
             result[i] = (String) aliases.elementAt(i);
+        }
 
         return result;
     }
@@ -620,8 +622,7 @@ public abstract class CryptoBase implements Crypto {
     public boolean
     validateCertPath(
         java.security.cert.X509Certificate[] certs
-    )
-        throws org.apache.ws.security.WSSecurityException {
+    ) throws org.apache.ws.security.WSSecurityException {
 
         try {
             // Generate cert path

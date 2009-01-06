@@ -44,7 +44,7 @@ public abstract class CryptoFactory {
      * use. Thus the property <code>org.apache.ws.security.crypto.provider</code>
      * must define the classname of the Crypto implementation. The file
      * may contain other property definitions as well. These properties are
-     * handed over to the  Crypto implementation. The file
+     * handed over to the Crypto implementation. The file
      * <code>crypto.properties</code> is loaded with the
      * <code>Loader.getResource()</code> method.
      * <p/>
