@@ -249,7 +249,10 @@ public abstract class WSHandler {
     protected void doReceiverAction(int doAction, RequestData reqData)
         throws WSSecurityException {
 
-        WSSConfig wssConfig = WSSConfig.getNewInstance();
+        WSSConfig wssConfig = reqData.getWssConfig();
+        if (wssConfig == null) {
+            wssConfig = WSSConfig.getNewInstance();
+        }
         wssConfig.setEnableSignatureConfirmation(
             decodeEnableSignatureConfirmation(reqData)
         );

@@ -126,7 +126,7 @@ public class TestWSSecurityUserProcessor extends TestCase {
     }
 
     /**
-     * Test to see that a custom processor configured through a
+     * Test to see that a custom processor configured through a 
      * WSSConfig instance is called
      */
     public void 
@@ -142,7 +142,7 @@ public class TestWSSecurityUserProcessor extends TestCase {
 
         /*
          * convert the resulting document into a message first. The toSOAPMessage()
-         * mehtod performs the necessary c14n call to properly set up the signed
+         * method performs the necessary c14n call to properly set up the signed
          * document and convert it into a SOAP message. After that we extract it
          * as a document again for further processing.
          */
@@ -185,6 +185,64 @@ public class TestWSSecurityUserProcessor extends TestCase {
     }
     
     /**
+     * Test to see that a custom processor (object) configured through a 
+     * WSSConfig instance is called
+     */
+    public void 
+    testCustomUserProcessorObject() throws Exception {
+        WSSecSignature builder = new WSSecSignature();
+        builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+        builder.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
+        log.info("Before Signing IS....");
+        Document doc = unsignedEnvelope.getAsDocument();
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        Document signedDoc = builder.build(doc, crypto, secHeader);
+
+        /*
+         * convert the resulting document into a message first. The toSOAPMessage()
+         * method performs the necessary c14n call to properly set up the signed
+         * document and convert it into a SOAP message. After that we extract it
+         * as a document again for further processing.
+         */
+
+        if (log.isDebugEnabled()) {
+            log.debug("Signed message with IssuerSerial key identifier:");
+            XMLUtils.PrettyElementToWriter(signedDoc.getDocumentElement(), new PrintWriter(System.out));
+        }
+        Message signedMsg = (Message) SOAPUtil.toSOAPMessage(signedDoc);
+        if (log.isDebugEnabled()) {
+            log.debug("Signed message with IssuerSerial key identifier(1):");
+            XMLUtils.PrettyElementToWriter(signedMsg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
+        }
+        signedDoc = signedMsg.getSOAPEnvelope().getAsDocument();
+        log.info("After Signing IS....");
+        //
+        // Check to make sure we can install/replace and use our own processor
+        //
+        WSSConfig cfg = WSSConfig.getNewInstance();
+        cfg.setProcessor(
+            WSSecurityEngine.SIGNATURE,
+            new wssec.MyProcessor()
+        );
+        final WSSecurityEngine engine = new WSSecurityEngine();
+        engine.setWssConfig(cfg);
+        final java.util.List results = 
+            engine.processSecurityHeader(doc, null, null, crypto);
+        boolean found = false;
+        for (final java.util.Iterator pos = results.iterator();  pos.hasNext(); ) {
+            final java.util.Map result = (java.util.Map) pos.next();
+            Object obj = result.get("foo");
+            if (obj != null) {
+                if (obj.getClass().getName().equals(wssec.MyProcessor.class.getName())) {
+                    found = true;
+                }
+            }
+        }
+        assertTrue("Unable to find result from MyProcessor", found);
+    }
+    
+    /**
      * Test to see that a custom action configured through a
      * WSSConfig instance is called
      */
@@ -194,6 +252,35 @@ public class TestWSSecurityUserProcessor extends TestCase {
         final WSSConfig cfg = WSSConfig.getNewInstance();
         final int action = 0xDEADF000;
         cfg.setAction(action, "wssec.MyAction");
+        final RequestData reqData = new RequestData();
+        reqData.setWssConfig(cfg);
+        reqData.setMsgContext(new java.util.TreeMap());
+        
+        final java.util.Vector actions = new java.util.Vector();
+        actions.add(new Integer(action));
+        final Document doc = unsignedEnvelope.getAsDocument();
+        MyHandler handler = new MyHandler();
+        reqData.setMsgContext("bread");
+        assertEquals(reqData.getMsgContext(), "bread");
+        handler.doit(
+            action, 
+            doc, 
+            reqData, 
+            actions
+        );
+        assertEquals(reqData.getMsgContext(), "crumb");
+    }
+    
+    /**
+     * Test to see that a custom action object configured through a
+     * WSSConfig instance is called
+     */
+    public void
+    testCustomActionObject() throws Exception {
+        
+        final WSSConfig cfg = WSSConfig.getNewInstance();
+        final int action = 0xDEADF000;
+        cfg.setAction(action, new wssec.MyAction());
         final RequestData reqData = new RequestData();
         reqData.setWssConfig(cfg);
         reqData.setMsgContext(new java.util.TreeMap());

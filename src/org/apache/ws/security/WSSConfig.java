@@ -170,7 +170,7 @@ public class WSSConfig {
 
     /**
      * Set the timestamp precision mode. If set to <code>true</code> then use
-     * timestamps with milliseconds, otherwise omit the millisconds. As per XML
+     * timestamps with milliseconds, otherwise omit the milliseconds. As per XML
      * Date/Time specification the default is to include the milliseconds.
      */
     protected boolean precisionInMilliSeconds = true;
@@ -198,14 +198,16 @@ public class WSSConfig {
     protected HashMap jceProvider = new HashMap(10);
 
     /**
-     * The known actions.  These are initialized from a set of defaults,
-     * but the list may be modified via the setAction operation.
+     * The known actions. This map is of the form <Integer, String> or <Integer, Action>. 
+     * The known actions are initialized from a set of defaults,
+     * but the list may be modified via the setAction operations.
      */
     private final java.util.Map actionMap = new java.util.HashMap(DEFAULT_ACTIONS);
 
     /**
-     * The known processors.  These are initialized from a set of defaults,
-     * but the list may be modified via the setProcessor operation.
+     * The known processors. This map is of the form <String, String> or <String,Processor>.
+     * The known processors are initialized from a set of defaults,
+     * but the list may be modified via the setProcessor operations.
      */
     private final java.util.Map processorMap = new java.util.HashMap(DEFAULT_PROCESSORS);
     
@@ -220,7 +222,7 @@ public class WSSConfig {
     
     /**
      * a boolean flag to record whether we have already been statically
-     * initialized.  This flag prevents repeated and unecessary calls
+     * initialized.  This flag prevents repeated and unnecessary calls
      * to static initialization code at construction time.
      */
     private static boolean staticallyInitialized = false;
@@ -273,8 +275,7 @@ public class WSSConfig {
      *         {@link #getDefaultWSConfig getDefaultWSConfig()})
      */
     public static WSSConfig getNewInstance() {
-        WSSConfig config = new WSSConfig();
-        return config;
+        return new WSSConfig();
     }
 
     /**
@@ -374,13 +375,35 @@ public class WSSConfig {
     }
     
     /**
-     * Associate an action with a specific action code.
+     * Associate an action name with a specific action code.
      *
      * This operation allows applications to supply their own
      * actions for well-known operations.
      */
     public String setAction(int code, String action) {
-        return (String) actionMap.put(new Integer(code), action);
+        Object previousAction = actionMap.put(new Integer(code), action);
+        if (previousAction instanceof String) {
+            return (String)previousAction;
+        } else if (previousAction instanceof Action){
+            return previousAction.getClass().getName();
+        }
+        return null;
+    }
+    
+    /**
+     * Associate an action instance with a specific action code.
+     *
+     * This operation allows applications to supply their own
+     * actions for well-known operations.
+     */
+    public String setAction(int code, Action action) {
+        Object previousAction = actionMap.put(new Integer(code), action);
+        if (previousAction instanceof String) {
+            return (String)previousAction;
+        } else if (previousAction instanceof Action){
+            return previousAction.getClass().getName();
+        }
+        return null;
     }
 
     /**
@@ -392,20 +415,23 @@ public class WSSConfig {
      */
     public Action getAction(int action) throws WSSecurityException {
         Integer key = new Integer(action);
-        String name = (String) actionMap.get(key);
-        if (name == null) {
-            throw new WSSecurityException(WSSecurityException.FAILURE,
-                    "unknownAction", new Object[] { key });
-        }
-        try {
-            return (Action) Loader.loadClass(name).newInstance();
-        } catch (Throwable t) {
-            if (log.isDebugEnabled()) {
-                log.debug(t.getMessage(), t);
+        final Object actionObject = actionMap.get(key);
+        
+        if (actionObject instanceof String) {
+            final String name = (String)actionObject;
+            try {
+                return (Action) Loader.loadClass(name).newInstance();
+            } catch (Throwable t) {
+                if (log.isDebugEnabled()) {
+                    log.debug(t.getMessage(), t);
+                }
+                throw new WSSecurityException(WSSecurityException.FAILURE,
+                        "unableToLoadClass", new Object[] { name }, t);
             }
-            throw new WSSecurityException(WSSecurityException.FAILURE,
-                    "unableToLoadClass", new Object[] { name }, t);
-        }
+        } else if (actionObject instanceof Action) {
+            return (Action)actionObject;
+        } 
+        return null;
     }
     
     /**
@@ -414,7 +440,28 @@ public class WSSConfig {
      * called when processing header elements with the specified type.
      */
     public String setProcessor(QName el, String name) {
-        return (String) processorMap.put(el, name);
+        Object previousProcessor = processorMap.put(el, name);
+        if (previousProcessor instanceof String) {
+            return (String)previousProcessor;
+        } else if (previousProcessor instanceof Processor){
+            return previousProcessor.getClass().getName();
+        }
+        return null;
+    }
+    
+    /**
+     * Associate a SOAP processor instance with a specified SOAP Security header
+     * element QName.  Processors registered under this QName will be
+     * called when processing header elements with the specified type.
+     */
+    public String setProcessor(QName el, Processor processor) {
+        Object previousProcessor = processorMap.put(el, processor);
+        if (previousProcessor instanceof String) {
+            return (String)previousProcessor;
+        } else if (previousProcessor instanceof Processor){
+            return previousProcessor.getClass().getName();
+        }
+        return null;
     }
 
     /**
@@ -425,8 +472,9 @@ public class WSSConfig {
      *              specified QName.
      */
     public Processor getProcessor(QName el) throws WSSecurityException {
-        final String name = (String) processorMap.get(el);
-        if (name != null) {
+        final Object processorObject = processorMap.get(el);
+        if (processorObject instanceof String) {
+            final String name = (String)processorObject;
             try {
                 return (Processor) Loader.loadClass(name).newInstance();
             } catch (Throwable t) {
@@ -436,7 +484,9 @@ public class WSSConfig {
                 throw new WSSecurityException(WSSecurityException.FAILURE,
                         "unableToLoadClass", new Object[] { name }, t);
             }
-        }
+        } else if (processorObject instanceof Processor) {
+            return (Processor)processorObject;
+        } 
         return null;
     }
 

@@ -58,62 +58,76 @@ public class WSSecurityEngine {
     /**
      * <code>wsse:BinarySecurityToken</code> as defined by WS Security specification
      */
-    public static final QName binaryToken = new QName(WSConstants.WSSE_NS, WSConstants.BINARY_TOKEN_LN);
+    public static final QName binaryToken = 
+        new QName(WSConstants.WSSE_NS, WSConstants.BINARY_TOKEN_LN);
     /**
      * <code>wsse:UsernameToken</code> as defined by WS Security specification
      */
-    public static final QName usernameToken = new QName(WSConstants.WSSE_NS, WSConstants.USERNAME_TOKEN_LN);
+    public static final QName usernameToken = 
+        new QName(WSConstants.WSSE_NS, WSConstants.USERNAME_TOKEN_LN);
     /**
      * <code>wsu:Timestamp</code> as defined by OASIS WS Security specification,
      */
-    public static final QName timeStamp = new QName(WSConstants.WSU_NS, WSConstants.TIMESTAMP_TOKEN_LN);
+    public static final QName timeStamp = 
+        new QName(WSConstants.WSU_NS, WSConstants.TIMESTAMP_TOKEN_LN);
     /**
      * <code>wsse11:signatureConfirmation</code> as defined by OASIS WS Security specification,
      */
-    public static final QName signatureConfirmation = new QName(WSConstants.WSSE11_NS, WSConstants.SIGNATURE_CONFIRMATION_LN);
+    public static final QName signatureConfirmation = 
+        new QName(WSConstants.WSSE11_NS, WSConstants.SIGNATURE_CONFIRMATION_LN);
     /**
      * <code>ds:Signature</code> as defined by XML Signature specification,
      * enhanced by WS Security specification
      */
-    public static final QName SIGNATURE = new QName(WSConstants.SIG_NS, WSConstants.SIG_LN);
+    public static final QName SIGNATURE = 
+        new QName(WSConstants.SIG_NS, WSConstants.SIG_LN);
     /**
      * <code>xenc:EncryptedKey</code> as defined by XML Encryption specification,
      * enhanced by WS Security specification
      */
-    public static final QName ENCRYPTED_KEY = new QName(WSConstants.ENC_NS, WSConstants.ENC_KEY_LN);
+    public static final QName ENCRYPTED_KEY = 
+        new QName(WSConstants.ENC_NS, WSConstants.ENC_KEY_LN);
     /**
      * <code>xenc:EncryptedData</code> as defined by XML Encryption specification,
      * enhanced by WS Security specification
      */
-    public static final QName ENCRYPTED_DATA = new QName(WSConstants.ENC_NS, WSConstants.ENC_DATA_LN);
+    public static final QName ENCRYPTED_DATA = 
+        new QName(WSConstants.ENC_NS, WSConstants.ENC_DATA_LN);
     /**
      * <code>xenc:ReferenceList</code> as defined by XML Encryption specification,
      */
-    public static final QName REFERENCE_LIST = new QName(WSConstants.ENC_NS, WSConstants.REF_LIST_LN);
+    public static final QName REFERENCE_LIST = 
+        new QName(WSConstants.ENC_NS, WSConstants.REF_LIST_LN);
     /**
      * <code>saml:Assertion</code> as defined by SAML specification
      */
-    public static final QName SAML_TOKEN = new QName(WSConstants.SAML_NS, WSConstants.ASSERTION_LN);
+    public static final QName SAML_TOKEN = 
+        new QName(WSConstants.SAML_NS, WSConstants.ASSERTION_LN);
 
     /**
      * <code>wsc:DerivedKeyToken</code> as defined by WS-SecureConversation specification
      */
-    public static final QName DERIVED_KEY_TOKEN_05_02 = new QName(ConversationConstants.WSC_NS_05_02, ConversationConstants.DERIVED_KEY_TOKEN_LN);
+    public static final QName DERIVED_KEY_TOKEN_05_02 = 
+        new QName(ConversationConstants.WSC_NS_05_02, ConversationConstants.DERIVED_KEY_TOKEN_LN);
 
     /**
      * <code>wsc:SecurityContextToken</code> as defined by WS-SecureConversation specification
      */
-    public static final QName SECURITY_CONTEXT_TOKEN_05_02 = new QName(ConversationConstants.WSC_NS_05_02, ConversationConstants.SECURITY_CONTEXT_TOKEN_LN);
+    public static final QName SECURITY_CONTEXT_TOKEN_05_02 = 
+        new QName(ConversationConstants.WSC_NS_05_02, ConversationConstants.SECURITY_CONTEXT_TOKEN_LN);
 
     /**
      * <code>wsc:DerivedKeyToken</code> as defined by WS-SecureConversation specification in WS-SX
      */
-    public static final QName DERIVED_KEY_TOKEN_05_12 = new QName(ConversationConstants.WSC_NS_05_12, ConversationConstants.DERIVED_KEY_TOKEN_LN);
+    public static final QName DERIVED_KEY_TOKEN_05_12 = 
+        new QName(ConversationConstants.WSC_NS_05_12, ConversationConstants.DERIVED_KEY_TOKEN_LN);
 
     /**
-     * <code>wsc:SecurityContextToken</code> as defined by WS-SecureConversation specification in WS-SX
+     * <code>wsc:SecurityContextToken</code> as defined by WS-SecureConversation specification in 
+     * WS-SX
      */
-    public static final QName SECURITY_CONTEXT_TOKEN_05_12 = new QName(ConversationConstants.WSC_NS_05_12, ConversationConstants.SECURITY_CONTEXT_TOKEN_LN);
+    public static final QName SECURITY_CONTEXT_TOKEN_05_12 = 
+        new QName(ConversationConstants.WSC_NS_05_12, ConversationConstants.SECURITY_CONTEXT_TOKEN_LN);
     
     public WSSecurityEngine() {
     }
@@ -171,7 +185,8 @@ public class WSSecurityEngine {
      *               handling of certificates.
      * @return a result vector
      * @throws WSSecurityException
-     * @see WSSecurityEngine#processSecurityHeader(Element securityHeader, CallbackHandler cb,Crypto sigCrypto, Crypto decCrypto)
+     * @see WSSecurityEngine#processSecurityHeader(Element securityHeader, CallbackHandler cb,
+     * Crypto sigCrypto, Crypto decCrypto)
      */
     public Vector processSecurityHeader(Document doc,
                                         String actor,
@@ -201,7 +216,7 @@ public class WSSecurityEngine {
      * @return a result vector
      * @throws WSSecurityException
      * @see WSSecurityEngine#processSecurityHeader(
-     * Element securityHeader, CallbackHandler cb,Crypto sigCrypto, Crypto decCrypto)
+     * Element securityHeader, CallbackHandler cb, Crypto sigCrypto, Crypto decCrypto)
      */
     public Vector processSecurityHeader(Document doc,
                                         String actor,
@@ -223,8 +238,7 @@ public class WSSecurityEngine {
         Element elem = WSSecurityUtil.getSecurityHeader(doc, actor, sc);
         if (elem != null) {
             if (doDebug) {
-                log.debug("Processing WS-Security header for '" + actor
-                        + "' actor.");
+                log.debug("Processing WS-Security header for '" + actor + "' actor.");
             }
             wsResult = processSecurityHeader(elem, cb, sigCrypto, decCrypto);
         }
@@ -313,20 +327,23 @@ public class WSSecurityEngine {
                 wsDocInfo.setProcessor(p);
             } else {
                 /*
-                * Add check for a BinarySecurityToken, add info to WSDocInfo. If BST is
-                * found before a Signature token this would speed up (at least a little
-                * bit) the processing of STR Transform.
-                */
+                 * Add check for a BinarySecurityToken, add info to WSDocInfo. If BST is
+                 * found before a Signature token this would speed up (at least a little
+                 * bit) the processing of STR Transform.
+                 */
                 if (doDebug) {
-                    log.debug("Unknown Element: " + elem.getLocalName() + " " + elem.getNamespaceURI());
+                    log.debug(
+                        "Unknown Element: " + elem.getLocalName() + " " + elem.getNamespaceURI()
+                    );
                 }
             }
         }
         if (tlog.isDebugEnabled()) {
             t2 = System.currentTimeMillis();
-            tlog.debug("processHeader: total " + (t2 - t0) +
-                    ", prepare " + (t1 - t0) +
-                    ", handle " + (t2 - t1));
+            tlog.debug(
+                "processHeader: total " + (t2 - t0) + ", prepare " + (t1 - t0) 
+                + ", handle " + (t2 - t1)
+            );
         }
         return returnResults;
     }
