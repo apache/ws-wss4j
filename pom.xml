@@ -168,8 +168,8 @@
                         <Bundle-Description>${pom.artifactId}</Bundle-Description>
                         <Bundle-SymbolicName>org.apache.ws.security</Bundle-SymbolicName>
                         <Export-Package>
-                              org.apache.ws.security.*; version=1.5.4,
-                              org.apache.ws.axis.security.*; version=1.5.4,
+                              org.apache.ws.security.*; version=1.5.5,
+                              org.apache.ws.axis.security.*; version=1.5.5,
                         </Export-Package>
                         <Import-Package>
                               !org.apache.ws.security.*,
