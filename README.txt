@@ -190,6 +190,11 @@ opensaml-1.1.jar
     
     See: http://www.opensaml.org/
 
+serializer-2.7.1.jar
+    The Apache Xalan XML serializer library.
+    
+    See: http://xml.apache.org/xalan-j/
+
 wsdl4j-1.5.1.jar
     The WSDL parsing functions, required by Axis tools to read and
     parse WSDL.

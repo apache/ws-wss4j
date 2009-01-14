@@ -5,6 +5,38 @@ for a given release.
 Portions of this report were generated using the ReleaseNotes facility
 in Jira.
 
+Release 1.5.5
+=============
+
+** Bug
+    * [WSS-42] - java.lang.NoClassDefFoundError: org/apache/xml/security/encryption/XMLEncryptionException
+    * [WSS-94] - Security Breach : The client certificate signature is not verified if the serial number is known in the keystore
+    * [WSS-121] - Bug in default value for SAML issuer class property
+    * [WSS-126] - SignatureProcessor:verifyXMLSignature method - Crypto object can have null values in the following scenario but it throws an Exception if the Crypto object is null
+    * [WSS-129] - Couple places where "cause" of WSSecurityException not set
+    * [WSS-133] - Method and variable misspellings fixed
+    * [WSS-140] - WSSecEncryptedKey produces EncryptedKey element with invalid Id attribute
+    * [WSS-141] - handleUsernameToken gives too much information. Can be used to deternine if a username exists or not
+    * [WSS-142] - We ship opensaml 1.0.1 even though we use opensaml 1.1 in maven
+    * [WSS-149] - AbstractCrypto requires org.apache.ws.security.crypto.merlin.file to be set and point to an existing file
+** Improvement
+    * [WSS-85] - Better exception handling in the crypto (e.g. no e.printStackTrace())
+    * [WSS-122] - Some fixes for the website
+    * [WSS-123] - 1.5.4 requires opensaml jar, older versions did not
+    * [WSS-125] - Upgrade BouncyCastle version
+    * [WSS-128] - Use xml-sec 1.4.1 version
+    * [WSS-135] - Fix for minor checkstyle issues
+    * [WSS-137] - "Unexpected number of X509Data: for Signature" error doesn't make sense.
+    * [WSS-138] - Add Nabble to site mailing list page
+    * [WSS-145] - Problem in upgrading to xml-sec 1.4.2
+    * [WSS-150] - Upgrade to XALAN 2.7.1
+* New Feature
+    * [WSS-23] - no way to programmatically set crypto.properties
+* Task
+    * [WSS-124] - Get maven dependencies pushed to central
+    * [WSS-132] - TestWSSecurityX509v1 failing
+    * [WSS-144] - Remove tab characters from WSS4J files
+
 Release 1.5.4
 =============
 
