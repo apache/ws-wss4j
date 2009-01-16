@@ -17,7 +17,7 @@
 if [ -z "${WSS4J_SRC_ROOT}" ]
 then
     echo "Assuming WSS4J source tree is the CWD..."
-    WSS4J_SRC_ROOT=.
+    WSS4J_SRC_ROOT=`pwd`
 fi
 if [ -z "${WSS4J_VERSION}" ]
 then
@@ -49,16 +49,12 @@ ant dist || exit 1
 cp -r dist/* ${WSS4J_STAGE_ROOT}/dist
 #
 # Build and stage through maven; copy the Jartifact built by Maven to the dist
-# Since we build and test with ant, we use the ant-built JAR as the version of
-# the artifact we'll use in maven.
-#
-# All this will get fixed when we move to maven throughout.
 #
 mvn clean || exit 1
 mvn -Prelease,jdk14 install || exit 1
 mkdir -p ${WSS4J_STAGE_ROOT}/maven/org/apache/ws/security/wss4j/
 cp -r ${M2_REPO}/org/apache/ws/security/wss4j/${WSS4J_VERSION} ${WSS4J_STAGE_ROOT}/maven/org/apache/ws/security/wss4j
-cp -f ${WSS4J_STAGE_ROOT}/build/wss4j-${WSS4J_VERSION}.jar ${M2_REPO}/org/apache/ws/security/wss4j/${WSS4J_VERSION}
+cp -f ${M2_REPO}/org/apache/ws/security/wss4j/${WSS4J_VERSION}/wss4j-${WSS4J_VERSION}.jar ${WSS4J_STAGE_ROOT}/dist
 #
 # Sign and hash the release bits
 #
@@ -76,7 +72,7 @@ do
 done
 for i in *.jar *.pom
 do
-    md5 -q $i > $i.md5
+    md5sum $i > $i.md5
 done
 #
 # Build the web site
