@@ -5,7 +5,6 @@
     </properties>
     <body>
         <section name="Apache WSS4J"/>
-        <section name="">
             <subsection name="Contents">
                 <ul>
                     <li>
@@ -25,14 +24,11 @@
                         <li><a href="#WSS4J_on_Axis">WSS4J on Axis</a></li>
                         <li><a href="#Rampart:_WS-Security_Implementation_module_for_Axis2">
                         Rampart: WS-Security Implementation module for Axis2</a></li>
-                        <li><a href="#WSS4J_on_CXF">WSS4J on CXF</a></li>
                         <li><a href="#WSS4J_Configuration">WSS4J Configuration</a></li>
                     </ul>
                 </ul>
                 <br/>
             </subsection>
-        </section>
-        <section name="">
             <subsection name="What is WSS4J?">
                 <p style="margin-left: 40px;"> 
 Apache WSS4J is an implementation of the
@@ -46,17 +42,16 @@ with JAX-RPC based server/clients and .NET server/clients.
                 </p>
                 <ul style="margin-left: 40px;">
                     <li>
-                        <a href="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0.pdf">OASIS
-Web Services Security: SOAP Message Security 1.0 Standard 200401, March
-2004</a>
+                        <a href="http://docs.oasis-open.org/wss/v1.1/wss-v1.1-spec-os-SOAPMessageSecurity.pdf">
+Web Services Security: SOAP Message Security 1.1</a>
                     </li>
                     <li>
-                        <a href="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0.pdf">Username
-Token profile V1.0</a>
+                        <a href="http://docs.oasis-open.org/wss/v1.1/wss-v1.1-spec-os-UsernameTokenProfile.pdf">Username
+Token Profile 1.1</a>
                     </li>
                     <li>
-                        <a href="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0.pdf">X.509
-Token Profile V1.0</a>
+                        <a href="http://docs.oasis-open.org/wss/v1.1/wss-v1.1-spec-os-x509TokenProfile.pdf">X.509
+Certificate Token Profile 1.1</a>
                     </li>
                 </ul>
             </subsection>
@@ -100,8 +95,8 @@ certificates and certificate paths.<br/>
             </subsection>
             <subsection name="WSS4J API">
                 <p style="margin-left: 40px;">Please refer to the <a href="api.html">API
-Overview</a>
-for details.<br/>
+Overview</a> or <a href="apidocs/index.html"> online javadocs </a>
+for details. <br/>
                     <br/>
                 </p>
             </subsection>
@@ -118,16 +113,10 @@ Deployment Tutorial</a> for a short tutorial and <a href="package.html">Axis Dep
                 </p>
                 <br/>
             </subsection>
-            <subsection name="WSS4J on CXF">
-                <p style="margin-left: 40px;">Please refer to the <a href="http://cwiki.apache.org/CXF20DOC/ws-security.html">WS-Security section of the CXF wiki</a> for more details.<br/>
-                </p>
-                <br/>
-            </subsection>
             <subsection name="WSS4J Configuration">
                 <p style="margin-left: 40px;"><a href="cert.html">Difference between issuer-serial (WSS4J default) and direct-reference modes</a> 
                 </p>
                 <br/>
             </subsection>
-        </section>
     </body>
 </document>

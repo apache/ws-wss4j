@@ -25,22 +25,17 @@ import org.apache.axis.MessageContext;
 import org.apache.axis.client.AxisClient;
 import org.apache.axis.configuration.NullProvider;
 import org.apache.axis.message.SOAPEnvelope;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSecurityEngine;
-import org.apache.ws.security.WSEncryptionPart;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.message.WSSecEncrypt;
 import org.apache.ws.security.message.WSSecHeader;
-import org.apache.ws.security.message.WSSecSignature;
 import org.apache.ws.security.message.WSSecTimestamp;
 import org.apache.ws.security.message.WSSecUsernameToken;
 import org.apache.ws.security.message.token.Reference;
-import org.apache.ws.security.message.token.SecurityTokenReference;
 import org.apache.ws.security.message.token.UsernameToken;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.w3c.dom.Document;
@@ -51,19 +46,14 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.xml.namespace.QName;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PrintWriter;
-
-import java.util.Vector;
 
 /**
  * WS-Security Test Case for fault codes. The SOAP Message Security specification 1.1 defines
  * standard fault codes and fault strings for error propagation.
  */
 public class TestWSSecurityFaultCodes extends TestCase implements CallbackHandler {
-    private static Log log = LogFactory.getLog(TestWSSecurityFaultCodes.class);
     static final String soapMsg = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
             "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" +
             "   <soapenv:Body>" +
@@ -229,7 +219,7 @@ public class TestWSSecurityFaultCodes extends TestCase implements CallbackHandle
         Document timestampedDoc = builder.build(doc, secHeader);
         
         try {
-            verify(doc);
+            verify(timestampedDoc);
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == 5);
             assertTrue(ex.getMessage().startsWith(
@@ -252,7 +242,7 @@ public class TestWSSecurityFaultCodes extends TestCase implements CallbackHandle
         Document doc = unsignedEnvelope.getAsDocument();
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);        
-        Document timestampedDoc = builder.build(doc, secHeader);
+        builder.build(doc, secHeader);
         
         try {
             new UsernameToken(doc.getDocumentElement());

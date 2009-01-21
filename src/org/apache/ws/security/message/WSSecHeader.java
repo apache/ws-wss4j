@@ -115,18 +115,16 @@ public class WSSecHeader {
         if (securityHeader == null) {            
             securityHeader = WSSecurityUtil.findWsseSecurityHeaderBlock(doc, doc
                     .getDocumentElement(), actor, false);
-            if ( securityHeader == null ) {
+            if (securityHeader == null) {
                 return true;
             }
         }
         
-        if ( securityHeader.getChildNodes().getLength() == 0 ) {
+        if (securityHeader.getChildNodes().getLength() == 0) {
             return true;
         } else {
             return false;
         }
-
-        
     }
 
     /**
@@ -156,8 +154,13 @@ public class WSSecHeader {
         securityHeader = WSSecurityUtil.findWsseSecurityHeaderBlock(doc, doc
                 .getDocumentElement(), actor, true);
 
-        String soapPrefix = WSSecurityUtil.getPrefixNS(soapConstants
-                .getEnvelopeURI(), securityHeader);
+        String soapPrefix = 
+            WSSecurityUtil.setNamespace(
+                securityHeader, 
+                soapConstants.getEnvelopeURI(),
+                WSConstants.DEFAULT_SOAP_PREFIX
+            );
+        
         if (actor != null && actor.length() > 0) {
             securityHeader.setAttributeNS(soapConstants.getEnvelopeURI(),
                     soapPrefix
@@ -178,7 +181,7 @@ public class WSSecHeader {
         if (securityHeader == null) {            
             securityHeader = WSSecurityUtil.findWsseSecurityHeaderBlock(doc, doc
                     .getDocumentElement(), actor, false);
-            if ( securityHeader == null ) {
+            if (securityHeader == null) {
                 return;
             }
         }

@@ -338,7 +338,7 @@ public class WSHandlerConstants {
     public static final String ENC_KEY_NAME = "EmbeddedKeyName";
 
     /**
-     * The name of the crypto propterty file to use for SOAP Signature.
+     * The name of the crypto property file to use for SOAP Signature.
      * <p/>
      * The classloader loads this file. Therefore it must be accessible
      * via the classpath.

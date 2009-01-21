@@ -48,7 +48,7 @@ public class TimestampProcessor implements Processor {
         /*
          * Decode Timestamp, add the found time (created/expiry) to result
          */
-        Timestamp timestamp = new Timestamp((Element) elem);
+        Timestamp timestamp = new Timestamp(elem);
         handleTimestamp(timestamp);
         returnResults.add(0,
                 new WSSecurityEngineResult(WSConstants.TS,
@@ -76,13 +76,16 @@ public class TimestampProcessor implements Processor {
         }
 
         // Validate whether the security semantics have expired
-        Calendar rightNow = Calendar.getInstance();
         Calendar exp = timestamp.getExpires();
-        if (exp != null && wssConfig.isTimeStampStrict() && exp.before(rightNow)) {
-            throw new WSSecurityException(
+        if (exp != null && wssConfig.isTimeStampStrict()) {
+            Calendar rightNow = Calendar.getInstance();
+            if (exp.before(rightNow)) {
+                throw new WSSecurityException(
                     WSSecurityException.MESSAGE_EXPIRED,
                     "invalidTimestamp",
-                    new Object[] { "The security semantics of message have expired" });
+                    new Object[] { "The security semantics of the message have expired" }
+                );
+            }
         }
     }
     

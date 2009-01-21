@@ -100,8 +100,7 @@ public class WSAddSignatureConfirmation extends WSBaseMessage {
         if (id != null) {
             sc.setID(id);
         }
-        WSSecurityUtil.prependChildElement(doc, securityHeader,
-                sc.getElement(), true);
+        WSSecurityUtil.prependChildElement(securityHeader, sc.getElement());
         sc = null;
         return doc;
     }

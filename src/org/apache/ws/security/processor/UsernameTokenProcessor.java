@@ -44,7 +44,8 @@ public class UsernameTokenProcessor implements Processor {
     private UsernameToken ut;
     private boolean handleCustomPasswordTypes;
     
-    public void handleToken(Element elem, Crypto crypto, Crypto decCrypto, CallbackHandler cb, WSDocInfo wsDocInfo, Vector returnResults, WSSConfig wsc) throws WSSecurityException {
+    public void handleToken(Element elem, Crypto crypto, Crypto decCrypto, CallbackHandler cb, 
+        WSDocInfo wsDocInfo, Vector returnResults, WSSConfig wsc) throws WSSecurityException {
         if (log.isDebugEnabled()) {
             log.debug("Found UsernameToken list element");
         }
@@ -53,7 +54,7 @@ public class UsernameTokenProcessor implements Processor {
         Principal lastPrincipalFound = handleUsernameToken((Element) elem, cb);
         returnResults.add(0, new WSSecurityEngineResult(WSConstants.UT,
                 lastPrincipalFound, null, null, null));
-        utId = elem.getAttributeNS(WSConstants.WSU_NS, "Id");
+        utId = ut.getID();
     }
 
     /**
@@ -77,6 +78,12 @@ public class UsernameTokenProcessor implements Processor {
      */
     public WSUsernameTokenPrincipal handleUsernameToken(Element token, CallbackHandler cb) 
         throws WSSecurityException {
+        if (cb == null) {
+            throw new WSSecurityException(WSSecurityException.FAILURE, "noCallback");
+        }
+        //
+        // Parse the UsernameToken element
+        //
         ut = new UsernameToken(token);
         String user = ut.getName();
         String password = ut.getPassword();
@@ -97,11 +104,8 @@ public class UsernameTokenProcessor implements Processor {
         // then delegate authentication to the callback handler
         //
         if (ut.isHashed()) {
-            if (cb == null) {
-                throw new WSSecurityException(WSSecurityException.FAILURE, "noCallback");
-            }
-
-            WSPasswordCallback pwCb = new WSPasswordCallback(user, WSPasswordCallback.USERNAME_TOKEN);
+            WSPasswordCallback pwCb = 
+                new WSPasswordCallback(user, WSPasswordCallback.USERNAME_TOKEN);
             callbacks[0] = pwCb;
             try {
                 cb.handle(callbacks);
@@ -136,9 +140,10 @@ public class UsernameTokenProcessor implements Processor {
             }
             ut.setRawPassword(origPassword);
         } else {
-            if (cb == null) {
-                throw new WSSecurityException(WSSecurityException.FAILURE, "noCallback");
-            } else if (!WSConstants.PASSWORD_TEXT.equals(pwType) && !handleCustomPasswordTypes) {
+            if (!WSConstants.PASSWORD_TEXT.equals(pwType) 
+                && pwType != null
+                && !handleCustomPasswordTypes
+            ) {
                 if (log.isDebugEnabled()) {
                     log.debug("Authentication failed as handleCustomUsernameTokenTypes is false");
                 }
@@ -164,7 +169,8 @@ public class UsernameTokenProcessor implements Processor {
                     WSSecurityException.FAILED_AUTHENTICATION, null, null, e
                 );
             }
-            ut.setRawPassword(password);
+            origPassword = pwCb.getPassword();
+            ut.setRawPassword(origPassword);
         }
         WSUsernameTokenPrincipal principal = new WSUsernameTokenPrincipal(user, ut.isHashed());
         principal.setNonce(nonce);
@@ -190,4 +196,14 @@ public class UsernameTokenProcessor implements Processor {
     public UsernameToken getUt() {
         return ut;
     }    
+    
+    public byte[] getDerivedKey(CallbackHandler cb) throws WSSecurityException {
+        String password = ut.getRawPassword();
+        if (password == null) {
+            password = "";
+        }
+        byte[] saltValue = ut.getSalt();
+        int iteration = ut.getIteration();
+        return UsernameToken.generateDerivedKey(password, saltValue, iteration);
+    }
 }

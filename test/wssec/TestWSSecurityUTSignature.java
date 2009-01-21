@@ -28,14 +28,17 @@ import org.apache.axis.message.SOAPEnvelope;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
-import org.apache.ws.security.message.WSSecEncrypt;
 import org.apache.ws.security.message.WSSecHeader;
 import org.apache.ws.security.message.WSSecSignature;
+import org.apache.ws.security.message.WSSecUsernameToken;
+import org.apache.ws.security.util.WSSecurityUtil;
+import org.apache.xml.security.signature.XMLSignature;
 import org.w3c.dom.Document;
 
 import javax.security.auth.callback.Callback;
@@ -46,13 +49,18 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import java.util.Vector;
+
 /**
- * WS-Security Test Case for X509v1 certificates. The WS-Security 1.1 X.509 specification adds 
- * support for X.509 V1 certificates. This test code verifies that the ValueType attribute gets 
- * set correctly in the BinarySecurityToken and Reference elements.
+ * WS-Security Test Case for UsernameToken Key Derivation, as defined in the 
+ * UsernameTokenProfile 1.1 specification. The derived keys are used for signature.
+ * Note that this functionality is different to the TestWSSecurityUTDK test case,
+ * which uses the derived key in conjunction with wsc:DerivedKeyToken. It's also
+ * different to TestWSSecurityNew13, which derives a key for signature using a 
+ * non-standard implementation.
  */
-public class TestWSSecurityX509v1 extends TestCase implements CallbackHandler {
-    private static Log log = LogFactory.getLog(TestWSSecurityX509v1.class);
+public class TestWSSecurityUTSignature extends TestCase implements CallbackHandler {
+    private static Log log = LogFactory.getLog(TestWSSecurityUTSignature.class);
     static final String soapMsg = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
             "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" +
             "   <soapenv:Body>" +
@@ -61,7 +69,7 @@ public class TestWSSecurityX509v1 extends TestCase implements CallbackHandler {
             "</soapenv:Envelope>";
 
     static final WSSecurityEngine secEngine = new WSSecurityEngine();
-    static final Crypto v1Crypto = CryptoFactory.getInstance("x509v1.properties");
+    static final Crypto crypto = CryptoFactory.getInstance();
     MessageContext msgContext;
     SOAPEnvelope unsignedEnvelope;
 
@@ -71,7 +79,7 @@ public class TestWSSecurityX509v1 extends TestCase implements CallbackHandler {
      * 
      * @param name name of the test
      */
-    public TestWSSecurityX509v1(String name) {
+    public TestWSSecurityUTSignature(String name) {
         super(name);
     }
 
@@ -82,7 +90,7 @@ public class TestWSSecurityX509v1 extends TestCase implements CallbackHandler {
      * @return a junit test suite
      */
     public static Test suite() {
-        return new TestSuite(TestWSSecurityX509v1.class);
+        return new TestSuite(TestWSSecurityUTDK.class);
     }
 
     /**
@@ -121,79 +129,81 @@ public class TestWSSecurityX509v1 extends TestCase implements CallbackHandler {
         return msg.getSOAPEnvelope();
     }
 
+
     /**
-     * Test for a X509 V1 certificate used for signature/verification.
+     * Test using a UsernameToken derived key for signing a SOAP body
      */
-    public void testX509v1Signature() throws Exception {
-        WSSecSignature builder = new WSSecSignature();
-        builder.setUserInfo("x509v1cert", "security");
-        builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
+    public void testSignature() throws Exception {
         Document doc = unsignedEnvelope.getAsDocument();
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
-        Document signedDoc = builder.build(doc, v1Crypto, secHeader);
         
+        WSSecUsernameToken builder = new WSSecUsernameToken();
+        builder.setUserInfo("bob", "security");
+        builder.addDerivedKey(true, null, 1000);
+        builder.prepare(doc);
+        
+        WSSecSignature sign = new WSSecSignature();
+        sign.setUsernameToken(builder);
+        sign.setKeyIdentifierType(WSConstants.UT_SIGNING);
+        sign.setSignatureAlgorithm(XMLSignature.ALGO_ID_MAC_HMAC_SHA1);
+        Document signedDoc = sign.build(doc, null, secHeader);
+        builder.prependToHeader(secHeader);
+        
+        String outputString = 
+            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+        assertTrue(outputString.indexOf("wsse:Username") != -1);
+        assertTrue(outputString.indexOf("wsse:Password") == -1);
+        assertTrue(outputString.indexOf("wsse11:Salt") != -1);
+        assertTrue(outputString.indexOf("wsse11:Iteration") != -1);
         if (log.isDebugEnabled()) {
-            log.debug("Signed message with BST_DIRECT_REFERENCE:");
-            String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
             log.debug(outputString);
-            assertTrue(outputString.indexOf("#X509v1") != -1);
-            assertTrue(outputString.indexOf("#X509v3") == -1);
         }
         
-        verify(signedDoc);
+        Vector results = verify(signedDoc);
+        WSSecurityEngineResult actionResult =
+            WSSecurityUtil.fetchActionResult(results, WSConstants.UT_SIGN);
+        java.security.Principal principal = 
+            (java.security.Principal) actionResult.get(WSSecurityEngineResult.TAG_PRINCIPAL);
+        assertTrue(principal.getName().indexOf("bob") != -1);
     }
     
+    
     /**
-     * Test for a X509 V1 certificate used for encryption/decryption
+     * Test using a UsernameToken derived key for signing a SOAP body. In this test the
+     * user is "alice" rather than "bob", and so signature verification should fail.
      */
-    public void testX509v1Encryption() throws Exception {
-        WSSecEncrypt builder = new WSSecEncrypt();
-        builder.setUserInfo("x509v1cert");
-        builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
+    public void testBadUserSignature() throws Exception {
         Document doc = unsignedEnvelope.getAsDocument();
         WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);        
-        Document encryptedDoc = builder.build(doc, v1Crypto, secHeader);
+        secHeader.insertSecurityHeader(doc);
         
+        WSSecUsernameToken builder = new WSSecUsernameToken();
+        builder.setUserInfo("alice", "security");
+        builder.addDerivedKey(true, null, 1000);
+        builder.prepare(doc);
+        
+        WSSecSignature sign = new WSSecSignature();
+        sign.setUsernameToken(builder);
+        sign.setKeyIdentifierType(WSConstants.UT_SIGNING);
+        sign.setSignatureAlgorithm(XMLSignature.ALGO_ID_MAC_HMAC_SHA1);
+        Document signedDoc = sign.build(doc, null, secHeader);
+        builder.prependToHeader(secHeader);
+        
+        String outputString = 
+            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
         if (log.isDebugEnabled()) {
-            log.debug("Encrypted message with BST_DIRECT_REFERENCE:");
-            String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(encryptedDoc);
             log.debug(outputString);
-            assertTrue(outputString.indexOf("#X509v1") != -1);
-            assertTrue(outputString.indexOf("#X509v3") == -1);
         }
-        
-        verify(encryptedDoc);
-    }
-    
-    /**
-     * Test for a X509 V1 certificate used for encryption/decryption.
-     * This time a KeyIdentifier is used. This test should fail as the
-     * X.509 1.1 specification states that a KeyIdentifier should only
-     * reference a V3 certificate.
-     */
-    public void testX509v1KeyIdentifier() throws Exception {
+
         try {
-            WSSecEncrypt builder = new WSSecEncrypt();
-            builder.setUserInfo("x509v1cert");
-            builder.setKeyIdentifierType(WSConstants.SKI_KEY_IDENTIFIER);
-            Document doc = unsignedEnvelope.getAsDocument();
-            WSSecHeader secHeader = new WSSecHeader();
-            secHeader.insertSecurityHeader(doc);        
-            builder.build(doc, v1Crypto, secHeader);
-            fail("Expected failure when using an X509#v1 certificate with SKI");
+            verify(signedDoc);
+            throw new Exception("Failure expected on a bad derived signature");
         } catch (WSSecurityException ex) {
+            assertTrue(ex.getErrorCode() == WSSecurityException.FAILED_AUTHENTICATION);
             // expected
-            assertTrue(ex.getMessage().indexOf(
-                "An X509 certificate with version 3 must be used for SKI")
-                != -1
-            );
         }
     }
-    
     
     /**
      * Verifies the soap envelope.
@@ -201,8 +211,8 @@ public class TestWSSecurityX509v1 extends TestCase implements CallbackHandler {
      * @param env soap envelope
      * @throws java.lang.Exception Thrown when there is a problem in verification
      */
-    private void verify(Document doc) throws Exception {
-        secEngine.processSecurityHeader(doc, null, this, v1Crypto);
+    private Vector verify(Document doc) throws Exception {
+        return secEngine.processSecurityHeader(doc, null, this, crypto);
     }
     
     
@@ -211,13 +221,12 @@ public class TestWSSecurityX509v1 extends TestCase implements CallbackHandler {
         for (int i = 0; i < callbacks.length; i++) {
             if (callbacks[i] instanceof WSPasswordCallback) {
                 WSPasswordCallback pc = (WSPasswordCallback) callbacks[i];
-                /*
-                 * here call a function/method to lookup the password for
-                 * the given identifier (e.g. a user name or keystore alias)
-                 * e.g.: pc.setPassword(passStore.getPassword(pc.getIdentfifier))
-                 * for Testing we supply a fixed name here.
-                 */
-                pc.setPassword("security");
+                if (pc.getUsage() == WSPasswordCallback.USERNAME_TOKEN_UNKNOWN
+                    && "bob".equals(pc.getIdentifier())) {
+                    pc.setPassword("security");
+                } else {
+                    throw new IOException("Authentication failed");
+                }
             } else {
                 throw new UnsupportedCallbackException(callbacks[i], "Unrecognized Callback");
             }

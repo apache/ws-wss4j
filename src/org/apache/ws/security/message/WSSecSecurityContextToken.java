@@ -76,8 +76,7 @@ public class WSSecSecurityContextToken {
 
     public void prependSCTElementToHeader(Document doc, WSSecHeader secHeader)
             throws WSSecurityException {
-        WSSecurityUtil.prependChildElement(doc, secHeader.getSecurityHeader(),
-                sct.getElement(), false);
+        WSSecurityUtil.prependChildElement(secHeader.getSecurityHeader(), sct.getElement());
     }
 
     /**

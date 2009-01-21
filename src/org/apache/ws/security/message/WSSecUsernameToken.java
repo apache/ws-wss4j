@@ -54,8 +54,6 @@ public class WSSecUsernameToken extends WSSecBase {
     
     private int iteration = UsernameToken.DEFAULT_ITERATION;
 
-    private Document document = null;
-
     /**
      * Constructor.
      */
@@ -111,17 +109,22 @@ public class WSSecUsernameToken extends WSSecBase {
      * Get the derived secret key.
      * 
      * After the <code>prepare()</code> method was called use this method
-     * to compute a derived secret key. The generation of this secret key is according
-     * to WS-Trust specification.
+     * to compute a derived secret key. If "useDerivedKey" is set, then the returned secret
+     * key is derived as per the UsernameToken 1.1 specification. Otherwise, the generation 
+     * of this secret key is according to the WS-Trust specifications.
      * 
      * @return Return the derived secret key of this token or null if <code>prepare()</code>
      * was not called before.
      */
-    public byte[] getSecretKey() {
+    public byte[] getSecretKey() throws WSSecurityException {
         if (ut == null) {
             return null;
         }
-        return ut.getSecretKey();
+        if (useDerivedKey) {
+            return UsernameToken.generateDerivedKey(password, saltValue, iteration);
+        } else {
+            return ut.getSecretKey();
+        }
     }
     
     /**
@@ -169,7 +172,6 @@ public class WSSecUsernameToken extends WSSecBase {
      *            The SOAP envelope as W3C document
      */
     public void prepare(Document doc) {
-        document = doc;
         ut = new UsernameToken(wssConfig.isPrecisionInMilliSeconds(), doc,
                 passwordType);
         ut.setName(user);
@@ -201,8 +203,7 @@ public class WSSecUsernameToken extends WSSecBase {
      *            The security header that holds the Signature element.
      */
     public void prependToHeader(WSSecHeader secHeader) {
-        WSSecurityUtil.prependChildElement(document, secHeader
-                .getSecurityHeader(), ut.getElement(), false);
+        WSSecurityUtil.prependChildElement(secHeader.getSecurityHeader(), ut.getElement());
     }
 
     /**
@@ -217,9 +218,10 @@ public class WSSecUsernameToken extends WSSecBase {
      *            The security header that holds the Signature element.
      */
     public void appendToHeader(WSSecHeader secHeader) {
-        WSSecurityUtil.appendChildElement(document, secHeader
-                .getSecurityHeader(), ut.getElement());
+        Element secHeaderElement = secHeader.getSecurityHeader();
+        secHeaderElement.appendChild(ut.getElement());
     }
+    
     /**
      * Adds a new <code>UsernameToken</code> to a soap envelope.
      * 

@@ -66,6 +66,7 @@ public class WSSecurityUtil {
      * overhead.
      */
     private static SecureRandom random = null;
+    private static String randomAlgorithm = null;
     
     /**
      * Returns the first WS-Security header element for a given actor. Only one
@@ -184,7 +185,7 @@ public class WSSecurityUtil {
     public static Node findElement(Node startNode, String name, String namespace) {
 
         /*
-         * Replace the formely recursive implementation with a depth-first-loop
+         * Replace the formerly recursive implementation with a depth-first-loop
          * lookup
          */
         if (startNode == null) {
@@ -230,7 +231,7 @@ public class WSSecurityUtil {
     }
 
     /**
-     * Returns the single element that containes an Id with value
+     * Returns the single element that contains an Id with value
      * <code>uri</code> and <code>namespace</code>. <p/> This is a
      * replacement for a XPath Id lookup with the given namespace. It's somewhat
      * faster than XPath, and we do not deal with prefixes, just with the real
@@ -272,8 +273,7 @@ public class WSSecurityUtil {
                         foundElement = se; // Continue searching to find
                         // duplicates
                     } else {
-                        log
-                                .warn("Multiple elements with the same 'Id' attribute value!");
+                        log.warn("Multiple elements with the same 'Id' attribute value!");
                         return null;
                     }
                 }
@@ -302,12 +302,15 @@ public class WSSecurityUtil {
     }
 
     /**
-     * set the namespace if it is not set already. <p/>
+     * Set a namespace/prefix on an element if it is not set already. First off, it
+     * searches for the element for the prefix associated with the specified
+     * namespace. If the prefix isn't null, then this is returned. Otherwise, it
+     * creates a new attribute using the namespace/prefix passed as parameters.
      * 
      * @param element
      * @param namespace
      * @param prefix
-     * @return TODO
+     * @return the prefix associated with the set namespace
      */
     public static String setNamespace(Element element, String namespace,
             String prefix) {
@@ -315,16 +318,14 @@ public class WSSecurityUtil {
         if (pre != null) {
             return pre;
         }
-        element.setAttributeNS(WSConstants.XMLNS_NS, "xmlns:" + prefix,
-                namespace);
+        element.setAttributeNS(WSConstants.XMLNS_NS, "xmlns:" + prefix, namespace);
         return prefix;
     }
 
     /*
-     * ** The following methods were copied over from aixs.utils.XMLUtils and
+     * The following methods were copied over from axis.utils.XMLUtils and
      * adapted
      */
-
     public static String getPrefixNS(String uri, Node e) {
         while (e != null && (e.getNodeType() == Element.ELEMENT_NODE)) {
             NamedNodeMap attrs = e.getAttributes();
@@ -548,13 +549,39 @@ public class WSSecurityUtil {
      *            element of this child element
      * @param child
      *            the element to append
+     * @deprecated use {@link Node#appendChild(Node)} instead
      * @return the child element
      */
-    public static Element appendChildElement(Document doc, Element parent,
-            Element child) {
+    public static Element appendChildElement(
+        Document doc, 
+        Element parent,
+        Element child
+    ) {
         Node whitespaceText = doc.createTextNode("\n");
         parent.appendChild(whitespaceText);
         parent.appendChild(child);
+        return child;
+    }
+    
+    /**
+     * prepend a child element <p/>
+     * 
+     * @param parent
+     *            element of this child element
+     * @param child
+     *            the element to append
+     * @return the child element
+     */
+    public static Element prependChildElement(
+        Element parent,
+        Element child
+    ) {
+        Node firstChild = parent.getFirstChild();
+        if (firstChild == null) {
+            parent.appendChild(child);
+        } else {
+            parent.insertBefore(child, firstChild);
+        }
         return child;
     }
 
@@ -569,6 +596,8 @@ public class WSSecurityUtil {
      *            the element to append
      * @param addWhitespace
      *            if true prepend a newline before child
+     * @deprecated use {@link WSSecurityUtil#prependChildElement(Element, Element)}
+     * instead
      * @return the child element
      */
     public static Element prependChildElement(Document doc, Element parent,
@@ -627,14 +656,14 @@ public class WSSecurityUtil {
         if (header == null && doCreate) {
             header = createElementInSameNamespace(envelope, sc
                     .getHeaderQName().getLocalPart());
-            header = prependChildElement(doc, envelope, header, true);
+            header = prependChildElement(envelope, header);
         }
         if (doCreate) {
             wsseSecurity = header.getOwnerDocument().createElementNS(
                     WSConstants.WSSE_NS, "wsse:Security");
             wsseSecurity.setAttributeNS(WSConstants.XMLNS_NS, "xmlns:wsse",
                     WSConstants.WSSE_NS);
-            return prependChildElement(doc, header, wsseSecurity, true);
+            return prependChildElement(header, wsseSecurity);
         }
         return null;
     }
@@ -844,7 +873,7 @@ public class WSSecurityUtil {
         try {            
             final SecureRandom r = resolveSecureRandom();
             if (r == null) {
-                throw new WSSecurityException("Random generator is not initialzed.");
+                throw new WSSecurityException("Random generator is not initialized.");
             }
             byte[] temp = new byte[length];            
             r.nextBytes(temp);
@@ -1007,8 +1036,9 @@ public class WSSecurityUtil {
     resolveSecureRandom(
         final String algorithm
     ) throws NoSuchAlgorithmException {
-        if (random == null) {
+        if (random == null || !algorithm.equals(randomAlgorithm)) {
             random = SecureRandom.getInstance(algorithm);
+            randomAlgorithm = algorithm;
             random.setSeed(System.currentTimeMillis());
         }
         return random;

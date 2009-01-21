@@ -239,13 +239,13 @@ public abstract class WSSecDerivedKeyBase extends WSSecBase {
      *            The security header that holds the Signature element.
      */
     public void prependDKElementToHeader(WSSecHeader secHeader) {
-        WSSecurityUtil.prependChildElement(document, secHeader
-            .getSecurityHeader(), dkt.getElement(), false);
+        WSSecurityUtil.prependChildElement(
+            secHeader.getSecurityHeader(), dkt.getElement());
     }
     
     public void appendDKElementToHeader(WSSecHeader secHeader) {
-        WSSecurityUtil.appendChildElement(document, secHeader
-            .getSecurityHeader(), dkt.getElement());
+        Element secHeaderElement = secHeader.getSecurityHeader();
+        secHeaderElement.appendChild(dkt.getElement());
     }
 
     /**

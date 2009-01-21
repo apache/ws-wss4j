@@ -462,12 +462,11 @@ public class WSSecSignatureSAML extends WSSecSignature {
      */
     public void prependSAMLElementsToHeader(WSSecHeader secHeader) {
         if (senderVouches) {
-            WSSecurityUtil.prependChildElement(document, secHeader
-                    .getSecurityHeader(), secRefSaml.getElement(), true);
+            WSSecurityUtil.prependChildElement(
+                secHeader.getSecurityHeader(), secRefSaml.getElement());
         }
 
-        WSSecurityUtil.prependChildElement(document, secHeader
-                .getSecurityHeader(), samlToken, true);
+        WSSecurityUtil.prependChildElement(secHeader.getSecurityHeader(), samlToken);
     }
 
     /**

@@ -43,6 +43,7 @@ import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
+import javax.security.auth.x500.X500Principal;
 
 /**
  * Created by IntelliJ IDEA.
@@ -76,7 +77,7 @@ public abstract class CryptoBase implements Crypto {
      * <p/>
      *
      * @return Returns a <code>CertificateFactory</code> to construct
-     *         X509 certficates
+     *         X509 certificates
      * @throws org.apache.ws.security.WSSecurityException
      *
      */
@@ -208,9 +209,9 @@ public abstract class CryptoBase implements Crypto {
     private String getAliasForX509Cert(String issuer, BigInteger serialNumber,
                                        boolean useSerialNumber)
             throws WSSecurityException {
-        Vector issuerRDN = splitAndTrim(issuer);
-        X509Certificate x509cert = null;
-        Vector certRDN = null;
+        X500Principal issuerRDN = new X500Principal(issuer);
+        X509Certificate x509cert;
+        X500Principal certRDN;
         Certificate cert = null;
 
         try {
@@ -232,7 +233,7 @@ public abstract class CryptoBase implements Crypto {
                 x509cert = (X509Certificate) cert;
                 if (!useSerialNumber ||
                         useSerialNumber && x509cert.getSerialNumber().compareTo(serialNumber) == 0) {
-                    certRDN = splitAndTrim(x509cert.getIssuerDN().getName());
+                    certRDN = new X500Principal(x509cert.getIssuerDN().getName());
                     if (certRDN.equals(issuerRDN)) {
                         return alias;
                     }
@@ -301,7 +302,7 @@ public abstract class CryptoBase implements Crypto {
      *         or null if no such certificate was found.
      */
 
-/*
+    /*
      * See comment above
      */
     public String getAliasForX509Cert(Certificate cert) throws WSSecurityException {
@@ -462,10 +463,10 @@ public abstract class CryptoBase implements Crypto {
     public byte[] getSKIBytesFromCert(X509Certificate cert)
             throws WSSecurityException {
         /*
-           * Gets the DER-encoded OCTET string for the extension value (extnValue)
-           * identified by the passed-in oid String. The oid string is represented
-           * by a set of positive whole numbers separated by periods.
-           */
+         * Gets the DER-encoded OCTET string for the extension value (extnValue)
+         * identified by the passed-in oid String. The oid string is represented
+         * by a set of positive whole numbers separated by periods.
+         */
         byte[] derEncodedValue = cert.getExtensionValue(SKI_OID);
 
         if (cert.getVersion() < 3 || derEncodedValue == null) {
@@ -495,7 +496,7 @@ public abstract class CryptoBase implements Crypto {
             return sha.digest();
         }
 
-        /**
+        /*
          * Strip away first four bytes from the DerValue (tag and length of
          * ExtensionValue OCTET STRING and KeyIdentifier OCTET STRING)
          */
@@ -508,6 +509,7 @@ public abstract class CryptoBase implements Crypto {
     public KeyStore getKeyStore() {
         return this.keystore;
     }
+    
     /**
      * Lookup X509 Certificates in the keystore according to a given DN of the subject of the certificate
      * <p/>
@@ -522,18 +524,19 @@ public abstract class CryptoBase implements Crypto {
     public String[] getAliasesForDN(String subjectDN) throws WSSecurityException {
 
         // The DN to search the keystore for
-        Vector subjectRDN = splitAndTrim(subjectDN);
+        X500Principal subjectRDN = new X500Principal(subjectDN);
         Vector aliases = getAlias(subjectRDN, keystore);
         
         //If we can't find the issuer in the keystore then look at cacerts
-        if(aliases.size() == 0) {
+        if (aliases.size() == 0) {
             aliases = getAlias(subjectRDN, cacerts);
         }
         
         // Convert the vector into an array
         String[] result = new String[aliases.size()];
-        for (int i = 0; i < aliases.size(); i++)
+        for (int i = 0; i < aliases.size(); i++) {
             result[i] = (String) aliases.elementAt(i);
+        }
 
         return result;
     }
@@ -619,8 +622,7 @@ public abstract class CryptoBase implements Crypto {
     public boolean
     validateCertPath(
         java.security.cert.X509Certificate[] certs
-    )
-        throws org.apache.ws.security.WSSecurityException {
+    ) throws org.apache.ws.security.WSSecurityException {
 
         try {
             // Generate cert path
@@ -694,7 +696,7 @@ public abstract class CryptoBase implements Crypto {
         return true;
     }
     
-    private Vector getAlias(Vector subjectRDN, KeyStore store) throws WSSecurityException {
+    private Vector getAlias(X500Principal subjectRDN, KeyStore store) throws WSSecurityException {
         // Store the aliases found
         Vector aliases = new Vector();
 
@@ -716,7 +718,7 @@ public abstract class CryptoBase implements Crypto {
                     cert = certs[0];
                 }
                 if (cert instanceof X509Certificate) {
-                    Vector foundRDN = splitAndTrim(((X509Certificate) cert).getSubjectDN().getName());
+                    X500Principal foundRDN = ((X509Certificate) cert).getSubjectX500Principal();
 
                     if (subjectRDN.equals(foundRDN)) {
                         aliases.add(alias);

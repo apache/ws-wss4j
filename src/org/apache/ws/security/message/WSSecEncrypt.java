@@ -225,7 +225,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
          */
         
         
-        if(this.ephemeralKey == null) {
+        if (this.ephemeralKey == null) {
             if (symmetricKey == null) {
                 KeyGenerator keyGen = getKeyGenerator();
                 this.symmetricKey = keyGen.generateKey();
@@ -234,7 +234,6 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
         }
         
         if (this.symmetricKey == null) {
-
             this.symmetricKey = WSSecurityUtil.prepareSecretKey(symEncAlgo,
                     this.ephemeralKey);
         }
@@ -243,7 +242,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
          * Get the certificate that contains the public key for the public key
          * algorithm that will encrypt the generated symmetric (session) key.
          */
-        if(this.encryptSymmKey) {
+        if (this.encryptSymmKey) {
             X509Certificate remoteCert = null;
             if (useThisCert != null) {
                 remoteCert = useThisCert;
@@ -416,7 +415,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
      *            The internal <code>enc:Reference</code> element
      */
     public void addInternalRefElement(Element dataRef) {
-        WSSecurityUtil.appendChildElement(document, encryptedKeyElement, dataRef);
+        encryptedKeyElement.appendChild(dataRef);
     }
 
     /**
@@ -432,8 +431,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
      *            The security header.
      */
     public void addExternalRefElement(Element dataRef, WSSecHeader secHeader) {
-        WSSecurityUtil.prependChildElement(document, secHeader
-                .getSecurityHeader(), dataRef, false);
+        WSSecurityUtil.prependChildElement(secHeader.getSecurityHeader(), dataRef);
     }
 
     private Vector doEncryption(Document doc, SecretKey secretKey,
@@ -446,7 +444,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
             keyIdentifierType == WSConstants.ENCRYPTED_KEY_SHA1_IDENTIFIER) {
             keyInfo = new KeyInfo(document);
             SecurityTokenReference secToken = new SecurityTokenReference(document);
-            if(this.customReferenceValue != null) {
+            if (this.customReferenceValue != null) {
                 secToken.setKeyIdentifierEncKeySHA1(this.customReferenceValue);
             } else {
                 secToken.setKeyIdentifierEncKeySHA1(getSHA1(encryptedEphemeralKey));
@@ -511,7 +509,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
 
             cloneKeyInfo = true;
             
-            if(keyInfo == null) {
+            if (keyInfo == null) {
                 keyInfo = new KeyInfo(document);
                 SecurityTokenReference secToken = new SecurityTokenReference(document);
                 Reference ref = new Reference(document);
@@ -523,7 +521,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
                         + WSConstants.SIG_PREFIX, WSConstants.SIG_NS);
             }
             /*
-             * Forth step: encrypt data, and set necessary attributes in
+             * Fourth step: encrypt data, and set necessary attributes in
              * xenc:EncryptedData
              */
             try {
@@ -544,7 +542,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
                         if (attr.getNamespaceURI().equals(WSConstants.URI_SOAP11_ENV)
                                 || attr.getNamespaceURI().equals(WSConstants.URI_SOAP12_ENV)) {                         
                             String soapEnvPrefix = WSSecurityUtil.setNamespace(elem,
-                                    attr.getNamespaceURI(), "soapevn");
+                                    attr.getNamespaceURI(), WSConstants.DEFAULT_SOAP_PREFIX);
                             elem.setAttributeNS(attr.getNamespaceURI(), soapEnvPrefix +":"+attr.getLocalName(), attr.getValue());
                         }
                     }
@@ -569,7 +567,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
                     encData.setKeyInfo(keyInfo);
                     xmlCipher.doFinal(doc, body, content);          
                 }
-                if(cloneKeyInfo) {
+                if (cloneKeyInfo) {
                     keyInfo = new KeyInfo((Element) keyInfo.getElement()
                             .cloneNode(true), null);
                 }
@@ -663,8 +661,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
         Element referenceList = doc.createElementNS(WSConstants.ENC_NS,
                 WSConstants.ENC_PREFIX + ":ReferenceList");
         referenceList = createDataRefList(doc, referenceList, encDataRefs);
-        WSSecurityUtil.prependChildElement(doc, wsseSecurity, referenceList,
-                true);
+        WSSecurityUtil.prependChildElement(wsseSecurity, referenceList);
 
         return doc;
     }

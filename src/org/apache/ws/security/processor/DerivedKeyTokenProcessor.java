@@ -141,6 +141,8 @@ public class DerivedKeyTokenProcessor implements Processor {
             } else if (processor == null && keyIdentifierValue != null
                     && keyIdentifierValueType != null) {                
                 this.secret = this.getSecret(cb, keyIdentifierValue, keyIdentifierValueType); 
+            } else if (processor instanceof UsernameTokenProcessor) {
+                this.secret = ((UsernameTokenProcessor) processor).getDerivedKey(cb);
             } else if (processor instanceof EncryptedKeyProcessor) {
                 this.secret = ((EncryptedKeyProcessor) processor)
                         .getDecryptedBytes();
@@ -196,25 +198,20 @@ public class DerivedKeyTokenProcessor implements Processor {
                     "noCallback");
         }
         
-        WSPasswordCallback pwcb = null;
-        
-        //Handle the EncryptedKeySHA1 type key references
-        if (keyIdentifierType.equals
-                (SecurityTokenReference.ENC_KEY_SHA1_URI)) {
-
-            pwcb = new WSPasswordCallback(keyIdentifierValue,
+        WSPasswordCallback pwcb = new WSPasswordCallback(keyIdentifierValue,
+                                                         null,
+                                                         keyIdentifierType,
                                                WSPasswordCallback.ENCRYPTED_KEY_TOKEN);
-            try {
-                cb.handle(new Callback[]{pwcb});
-            } catch (IOException e) {
-                throw new WSSecurityException(WSSecurityException.FAILURE, "noKey",
-                        new Object[] { id }, e);
-            } catch (UnsupportedCallbackException e) {
-                throw new WSSecurityException(WSSecurityException.FAILURE, "noKey",
-                        new Object[] { id }, e);
-            }
-            
+        try {
+            cb.handle(new Callback[]{pwcb});
+        } catch (IOException e) {
+            throw new WSSecurityException(WSSecurityException.FAILURE, "noKey",
+                    new Object[] { id }, e);
+        } catch (UnsupportedCallbackException e) {
+            throw new WSSecurityException(WSSecurityException.FAILURE, "noKey",
+                    new Object[] { id }, e);
         }
+            
         return pwcb.getKey();
     }
     

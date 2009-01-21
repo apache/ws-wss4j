@@ -36,8 +36,6 @@ public class WSSecSignatureConfirmation extends WSSecBase {
 
     private SignatureConfirmation sc = null;
 
-    private Document document = null;
-    
     byte[] signatureValue = null;
 
     /**
@@ -69,7 +67,6 @@ public class WSSecSignatureConfirmation extends WSSecBase {
      *            The SOAP envelope as W3C document
      */
     public void prepare(Document doc) {
-        document = doc;
         sc = new SignatureConfirmation(doc, signatureValue);
         String scId = "SigConf-" + sc.hashCode();
         sc.setID(scId);
@@ -87,8 +84,7 @@ public class WSSecSignatureConfirmation extends WSSecBase {
      *            The security header that holds the Signature element.
      */
     public void prependToHeader(WSSecHeader secHeader) {
-        WSSecurityUtil.prependChildElement(document, secHeader
-                .getSecurityHeader(), sc.getElement(), false);
+        WSSecurityUtil.prependChildElement(secHeader.getSecurityHeader(), sc.getElement());
     }
     
     /**

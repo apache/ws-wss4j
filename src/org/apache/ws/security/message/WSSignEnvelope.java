@@ -475,8 +475,7 @@ public class WSSignEnvelope extends WSBaseMessage {
 
         sig.addResourceResolver(EnvelopeIdResolver.getInstance());
 
-        WSSecurityUtil.prependChildElement(doc, securityHeader, sig
-                .getElement(), false);
+        WSSecurityUtil.prependChildElement(securityHeader, sig.getElement());
         if (tlog.isDebugEnabled()) {
             t2 = System.currentTimeMillis();
         }
@@ -498,8 +497,7 @@ public class WSSignEnvelope extends WSBaseMessage {
             ref.setValueType(bstToken.getValueType());
             secRef.setReference(ref);
             bstToken.setID(certUri);
-            WSSecurityUtil.prependChildElement(doc, securityHeader, bstToken
-                    .getElement(), false);
+            WSSecurityUtil.prependChildElement(securityHeader, bstToken.getElement());
             wsDocInfo.setBst(bstToken.getElement());
             break;
 

@@ -80,7 +80,7 @@ public class WSPasswordCallback implements Callback {
     private String password;
     private byte[] key;
     private int usage;
-    private String passwordType;
+    private String type;
     private Element customToken;
     
     /**
@@ -102,7 +102,7 @@ public class WSPasswordCallback implements Callback {
     public WSPasswordCallback(String id, String pw, String type, int usage) {
         identifier = id;
         password = pw;
-        passwordType = type;
+        this.type = type;
         this.usage = usage;
     }
     /**
@@ -195,9 +195,17 @@ public class WSPasswordCallback implements Callback {
      * @return Returns the passwordType.
      */
     public String getPasswordType() {
-        return passwordType;
+        return type;
     }
 
+    /**
+     * The key type is only relevant for usage <code>ENCRYPTED_KEY_TOKEN</code>
+     * 
+     * @return Returns the type.
+     */
+    public String getKeyType() {
+        return type;
+    }
     public Element getCustomToken() {
         return customToken;
     }

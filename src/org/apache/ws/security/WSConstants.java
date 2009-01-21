@@ -78,6 +78,7 @@ public class WSConstants {
     public static final String WSSE_PREFIX = "wsse";
     public static final String WSSE11_PREFIX = "wsse11";
     public static final String WSU_PREFIX = "wsu";
+    public static final String DEFAULT_SOAP_PREFIX = "soapenv";
     
     /*
      * Now the namespaces, local names, and prefixes of XML-SIG and XML-ENC
@@ -92,7 +93,7 @@ public class WSConstants {
     public static final String REF_LIST_LN = "ReferenceList";
 
     /*
-     * The standard namesace definitions
+     * The standard namespace definitions
      */
     public static final String XMLNS_NS = "http://www.w3.org/2000/xmlns/";
     public static final String XML_NS = "http://www.w3.org/XML/1998/namespace";
@@ -189,7 +190,7 @@ public class WSConstants {
 
     /**
      * Sets the {@link org.apache.ws.security.message.WSEncryptBody#build(Document, Crypto) encryption}
-     * method to encrypt the symmetric data encryption key with the RSA algoritm.
+     * method to encrypt the symmetric data encryption key with the RSA algorithm.
      * <p/>
      * This is a required method as defined by XML encryption.
      */
@@ -197,7 +198,7 @@ public class WSConstants {
 
     /**
      * Sets the {@link org.apache.ws.security.message.WSEncryptBody#build(Document, Crypto) encryption}
-     * method to encrypt the symmetric data encryption key with the RSA algoritm.
+     * method to encrypt the symmetric data encryption key with the RSA algorithm.
      * <p/>
      * This is a required method as defined by XML encryption.
      * <p/>
@@ -286,7 +287,7 @@ public class WSConstants {
      * Please refer to WS Security specification X509 profile, chapter 3.3.2
      * and to WS Security specification, chapter 7.2
      * <p/>
-     * Note: only local refernces to BinarySecurityToken are supported
+     * Note: only local references to BinarySecurityToken are supported
      */
     public static final int BST_DIRECT_REFERENCE = 1;
 
@@ -297,7 +298,7 @@ public class WSConstants {
      * certificate to the receiver.
      * <p/>
      * In contrast to {@link #BST_DIRECT_REFERENCE} only the issuer name
-     * and the serial number of the signiung certificate are sent to the
+     * and the serial number of the signing certificate are sent to the
      * receiver. This reduces the amount of data being sent. The encryption
      * method uses the public key associated with this certificate to encrypt
      * the symmetric key used to encrypt data.
@@ -406,7 +407,7 @@ public class WSConstants {
     public static final int ST_SIGNED = 0x10; // perform SAMLToken signed
 
     public static final int TS = 0x20; // insert Timestamp
-    public static final int UT_SIGN = 0x40; // perform sinagture with UT secrect key
+    public static final int UT_SIGN = 0x40; // perform signature with UT secret key
     public static final int SC = 0x80;      // this is a SignatureConfirmation
 
     public static final int NO_SERIALIZE = 0x100;

@@ -28,8 +28,8 @@ Build Instructions:
         <property name='product.version.major' value='1'/>
         <property name='product.version.minor' value='5'/>
         <property name='product.version.level' value='5'/>
-        <property name='product.version' value='1.5.5'/>
-        <!-- <property name='product.version' value='${product.version.major}.${product.version.minor}.${product.version.level}'/> -->
+        <property name='product.version.qualifier' value=''/>
+        <property name='product.version' value='${product.version.major}.${product.version.minor}.${product.version.level}${product.version.qualifier}'/>
         <property name="year" value="2008"/>
         <property name="copyright" value="Copyright &#169; ${year} Apache WSS4J Project. All Rights Reserved."/>
 
@@ -746,7 +746,7 @@ org.apache.ws.axis.security.util
          <zip destfile=
            "${dir.dist}/${product.shortname}-otherjars-${product.version}.zip">
              <zipfileset prefix="wss4j" dir="."
-                 includes="lib/*.jar, endorsed/*.jar"/>
+                 includes="lib/*.jar, endorsed/*.jar legal/**"/>
          </zip>
      </target>  
     

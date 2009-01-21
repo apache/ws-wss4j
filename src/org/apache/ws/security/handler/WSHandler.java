@@ -93,11 +93,13 @@ public abstract class WSHandler {
             wssConfig = WSSConfig.getNewInstance();
         }
 
-        wssConfig
-        .setEnableSignatureConfirmation(decodeEnableSignatureConfirmation(reqData));
+        wssConfig.setEnableSignatureConfirmation(
+            decodeEnableSignatureConfirmation(reqData)
+        );
 
-        wssConfig
-        .setPrecisionInMilliSeconds(decodeTimestampPrecision(reqData));
+        wssConfig.setPrecisionInMilliSeconds(
+            decodeTimestampPrecision(reqData)
+        );
         reqData.setWssConfig(wssConfig);
 
         Object mc = reqData.getMsgContext();
@@ -108,8 +110,9 @@ public abstract class WSHandler {
         secHeader.insertSecurityHeader(doc);
 
         reqData.setSecHeader(secHeader);
-        reqData.setSoapConstants(WSSecurityUtil.getSOAPConstants(doc
-                .getDocumentElement()));
+        reqData.setSoapConstants(
+            WSSecurityUtil.getSOAPConstants(doc.getDocumentElement())
+        );
         /*
          * Here we have action, username, password, and actor, mustUnderstand.
          * Now get the action specific parameters.
@@ -134,7 +137,7 @@ public abstract class WSHandler {
             decodeSignatureParameter(reqData);
         }
         /*
-         * If we need to handle signed SAML token then we need may of the
+         * If we need to handle signed SAML token then we may need the
          * Signature parameters. The handle procedure loads the signature crypto
          * file on demand, thus don't do it here.
          */
@@ -220,12 +223,12 @@ public abstract class WSHandler {
             }
             }
         }
+        
         /*
          * If this is a request then store all signature values. Add ours to
          * already gathered values because of chained handlers, e.g. for
          * other actors.
          */
-
         if (wssConfig.isEnableSignatureConfirmation() 
                 && isRequest
                 && reqData.getSignatureValues().size() > 0) {
@@ -246,9 +249,13 @@ public abstract class WSHandler {
     protected void doReceiverAction(int doAction, RequestData reqData)
         throws WSSecurityException {
 
-        WSSConfig wssConfig = WSSConfig.getNewInstance();
-        wssConfig
-        .setEnableSignatureConfirmation(decodeEnableSignatureConfirmation(reqData));
+        WSSConfig wssConfig = reqData.getWssConfig();
+        if (wssConfig == null) {
+            wssConfig = WSSConfig.getNewInstance();
+        }
+        wssConfig.setEnableSignatureConfirmation(
+            decodeEnableSignatureConfirmation(reqData)
+        );
         wssConfig.setTimeStampStrict(decodeTimestampStrict(reqData));
         wssConfig.setHandleCustomPasswordTypes(decodeCustomPasswordTypes(reqData));
         reqData.setWssConfig(wssConfig);
@@ -256,7 +263,11 @@ public abstract class WSHandler {
         if ((doAction & WSConstants.SIGN) == WSConstants.SIGN) {
             decodeSignatureParameter2(reqData);
         }
-
+        
+        if ((doAction & WSConstants.ST_SIGNED) == WSConstants.ST_SIGNED) {
+            decodeSignatureParameter2(reqData);
+        }
+        
         if ((doAction & WSConstants.ENCR) == WSConstants.ENCR) {
             decodeDecryptionParameter(reqData);
         }
@@ -296,7 +307,7 @@ public abstract class WSHandler {
         }
 
         /*
-         * First get all Signature value stored during sending the request
+         * First get all Signature values stored during sending the request
          */
         Vector sigv = (Vector) getProperty(reqData.getMsgContext(),
                 WSHandlerConstants.SEND_SIGV);
@@ -323,18 +334,21 @@ public abstract class WSHandler {
             byte[] sigVal = sc.getSignatureValue();
             if (sigVal != null) {
                 if (sigv == null || sigv.size() == 0) {
-                    //If there are no store signature values
-                    if(sigVal.length != 0) {
-                        //If there's no value in the case where there are no
-                        //stored SV it is valid. Therefore if there IS a value 
-                        //in the sig confirmation element
-                        throw new WSSecurityException("WSHandler: Check Signature confirmation: got a SC element, but no stored SV");
+                    // If there are no stored signature values
+                    if (sigVal.length != 0) {
+                        // If there's no value in the case where there are no
+                        // stored SV it is valid. Therefore if there IS a value 
+                        // in the sig confirmation element
+                        throw new WSSecurityException(
+                            "WSHandler: Check Signature confirmation: got a SC element, "
+                            + "but no stored SV"
+                        );
                     }
                 } else {
                     //If we have stored signature values
                     boolean found = false;
                     for (int ii = 0; ii < sigv.size(); ii++) {
-                        byte[] storedValue = (byte[]) sigv.get(i);
+                        byte[] storedValue = (byte[]) sigv.get(ii);
                         if (Arrays.equals(sigVal, storedValue)) {
                             found = true;
                             sigv.remove(ii);
@@ -343,7 +357,9 @@ public abstract class WSHandler {
                     }
                     if (!found) {
                         throw new WSSecurityException(
-                        "WSHandler: Check Signature confirmation: got SC element, but no matching SV");
+                            "WSHandler: Check Signature confirmation: got SC element, "
+                            + "but no matching SV"
+                        );
                     } 
                 }
             }
@@ -356,10 +372,13 @@ public abstract class WSHandler {
         if (!reqData.isNoSerialization()) {
             log.debug("Check Signature confirmation - last handler");
             if (sigv != null && !sigv.isEmpty()) {
-                throw new WSSecurityException("WSHandler: Check Signature confirmation: stored SV vector not empty");
+                throw new WSSecurityException(
+                    "WSHandler: Check Signature confirmation: stored SV vector not empty"
+                );
             }
         }
     }
+    
     /**
      * Hook to allow subclasses to load their Signature Crypto however they see
      * fit.
@@ -376,21 +395,19 @@ public abstract class WSHandler {
         if (sigPropFile != null) {
             crypto = (Crypto) cryptos.get(sigPropFile);
             if (crypto == null) {
-                crypto = CryptoFactory.getInstance(sigPropFile, this
-                        .getClassLoader(reqData.getMsgContext()));
+                crypto = CryptoFactory.getInstance(
+                    sigPropFile, this.getClassLoader(reqData.getMsgContext()));
                 cryptos.put(sigPropFile, crypto);
             }
-        } else if (getString(WSHandlerConstants.SIG_PROP_REF_ID, reqData
-                .getMsgContext()) != null) {
+        } else if (getString(WSHandlerConstants.SIG_PROP_REF_ID, reqData.getMsgContext()) != null) {
             /*
-             * If the property file is missing then 
-             * look for the Properties object 
+             * If the property file is missing then look for the Properties object 
              */
-            String refId = getString(WSHandlerConstants.SIG_PROP_REF_ID,
-                    reqData.getMsgContext());
+            String refId = 
+                getString(WSHandlerConstants.SIG_PROP_REF_ID, reqData.getMsgContext());
             if (refId != null) {
                 Object propObj = getProperty(reqData.getMsgContext(), refId);
-                if(propObj instanceof Properties) {
+                if (propObj instanceof Properties) {
                     crypto = (Crypto) cryptos.get(refId);
                     if (crypto == null) {
                         crypto = CryptoFactory.getInstance((Properties)propObj);
@@ -399,7 +416,7 @@ public abstract class WSHandler {
                 } else {
                     throw new WSSecurityException(
                         "WSHandler: Signature: signaturePropRefId must hold a " 
-                            + "java.util.Properties object"
+                        + "java.util.Properties object"
                     );
                 }
             }
@@ -422,26 +439,24 @@ public abstract class WSHandler {
          * Get encryption crypto property file. If non specified take crypto
          * instance from signature, if that fails: throw fault
          */
-        String encPropFile = getString(WSHandlerConstants.ENC_PROP_FILE,
-                reqData.getMsgContext());
+        String encPropFile = 
+            getString(WSHandlerConstants.ENC_PROP_FILE, reqData.getMsgContext());
         if (encPropFile != null) {
             crypto = (Crypto) cryptos.get(encPropFile);
             if (crypto == null) {
-                crypto = CryptoFactory.getInstance(encPropFile, this
-                        .getClassLoader(reqData.getMsgContext()));
+                crypto = 
+                    CryptoFactory.getInstance(encPropFile, this.getClassLoader(reqData.getMsgContext()));
                 cryptos.put(encPropFile, crypto);
             }
-        } else if (getString(WSHandlerConstants.ENC_PROP_REF_ID, reqData
-                .getMsgContext()) != null) {
+        } else if (getString(WSHandlerConstants.ENC_PROP_REF_ID, reqData.getMsgContext()) != null) {
             /*
-             * If the property file is missing then 
-             * look for the Properties object 
+             * If the property file is missing then look for the Properties object 
              */
-            String refId = getString(WSHandlerConstants.ENC_PROP_REF_ID,
-                    reqData.getMsgContext());
-            if(refId != null) {
+            String refId = 
+                getString(WSHandlerConstants.ENC_PROP_REF_ID, reqData.getMsgContext());
+            if (refId != null) {
                 Object propObj = getProperty(reqData.getMsgContext(), refId);
-                if(propObj instanceof Properties) {
+                if (propObj instanceof Properties) {
                     crypto = (Crypto) cryptos.get(refId);
                     if (crypto == null) {
                         crypto = CryptoFactory.getInstance((Properties)propObj);
@@ -450,7 +465,7 @@ public abstract class WSHandler {
                 } else {
                     throw new WSSecurityException(
                         "WSHandler: Encryption: encryptionPropRefId must hold a" 
-                            + " java.util.Properties object"
+                        + " java.util.Properties object"
                     );
                 }
             }
@@ -468,11 +483,11 @@ public abstract class WSHandler {
 
         String type = getString(WSHandlerConstants.PASSWORD_TYPE, mc);
         if (type != null) {
-            if(WSConstants.PW_TEXT.equals(type)) {
+            if (WSConstants.PW_TEXT.equals(type)) {
                 reqData.setPwType(WSConstants.PASSWORD_TEXT);
-            } else if(WSConstants.PW_DIGEST.equals(type)) {
+            } else if (WSConstants.PW_DIGEST.equals(type)) {
                 reqData.setPwType(WSConstants.PASSWORD_DIGEST);
-            } else if(WSConstants.PW_NONE.equals(type)) {
+            } else if (WSConstants.PW_NONE.equals(type)) {
                 // No password requested.
                 reqData.setPwType(null);
             } else {
@@ -581,10 +596,15 @@ public abstract class WSHandler {
         String mu = 
             getString(WSHandlerConstants.MUST_UNDERSTAND, reqData.getMsgContext());
 
-        if (mu == null) {return true;}
-
-        if ("0".equals(mu) || "false".equals(mu)) {return false;} 
-        if ("1".equals(mu) || "true".equals(mu)) {return true;}
+        if (mu == null) {
+            return true;
+        }
+        if ("0".equals(mu) || "false".equals(mu)) {
+            return false;
+        } 
+        if ("1".equals(mu) || "true".equals(mu)) {
+            return true;
+        }
 
         throw new WSSecurityException(
             "WSHandler: illegal mustUnderstand parameter"
@@ -613,10 +633,15 @@ public abstract class WSHandler {
         String value = getString(WSHandlerConstants.ENABLE_SIGNATURE_CONFIRMATION,
                 reqData.getMsgContext());
 
-        if (value == null) {return true;}
-
-        if ("0".equals(value) || "false".equals(value)) {return false;} 
-        if ("1".equals(value) || "true".equals(value)) {return true;}
+        if (value == null) {
+            return true;
+        }
+        if ("0".equals(value) || "false".equals(value)) {
+            return false;
+        } 
+        if ("1".equals(value) || "true".equals(value)) {
+            return true;
+        }
 
         throw new WSSecurityException(
             "WSHandler: illegal enableSignatureConfirmation parameter"
@@ -628,10 +653,15 @@ public abstract class WSHandler {
         String value = getString(WSHandlerConstants.TIMESTAMP_PRECISION,
                 reqData.getMsgContext());
 
-        if (value == null) {return true;}
-
-        if ("0".equals(value) || "false".equals(value)) {return false;} 
-        if ("1".equals(value) || "true".equals(value)) {return true;}
+        if (value == null) {
+            return true;
+        }
+        if ("0".equals(value) || "false".equals(value)) {
+            return false;
+        } 
+        if ("1".equals(value) || "true".equals(value)) {
+            return true;
+        }
 
         throw new WSSecurityException(
             "WSHandler: illegal precisionInMilliSeconds parameter"
@@ -645,10 +675,15 @@ public abstract class WSHandler {
                 reqData.getMsgContext()
         );
 
-        if (value == null) {return false;}
-
-        if ("0".equals(value) || "false".equals(value)) {return false;} 
-        if ("1".equals(value) || "true".equals(value)) {return true;}
+        if (value == null) {
+            return false;
+        }
+        if ("0".equals(value) || "false".equals(value)) {
+            return false;
+        } 
+        if ("1".equals(value) || "true".equals(value)) {
+            return true;
+        }
 
         throw new WSSecurityException(
             "WSHandler: illegal handleCustomPasswordTypes parameter"
@@ -660,10 +695,15 @@ public abstract class WSHandler {
         String value = getString(WSHandlerConstants.TIMESTAMP_STRICT,
                 reqData.getMsgContext());
 
-        if (value == null) {return true;}
-
-        if ("0".equals(value) || "false".equals(value)) {return false;} 
-        if ("1".equals(value) || "true".equals(value)) {return true;}
+        if (value == null) {
+            return true;
+        }
+        if ("0".equals(value) || "false".equals(value)) {
+            return false;
+        } 
+        if ("1".equals(value) || "true".equals(value)) {
+            return true;
+        }
 
         throw new WSSecurityException(
             "WSHandler: illegal timestampStrict parameter"
@@ -715,21 +755,21 @@ public abstract class WSHandler {
         Class cbClass = null;
         CallbackHandler cbHandler = null;
         try {
-            cbClass = Loader.loadClass(getClassLoader(requestData
-                    .getMsgContext()), callback);
+            cbClass = 
+                Loader.loadClass(getClassLoader(requestData.getMsgContext()), callback);
         } catch (ClassNotFoundException e) {
-            throw new WSSecurityException("WSHandler: cannot load password callback class: "
-                    + callback,
-                    e);
+            throw new WSSecurityException(
+                "WSHandler: cannot load password callback class: " + callback, e
+            );
         }
         try {
             cbHandler = (CallbackHandler) cbClass.newInstance();
         } catch (Exception e) {
-            throw new WSSecurityException("WSHandler: cannot create instance of password callback: "
-                    + callback,
-                    e);
+            throw new WSSecurityException(
+                "WSHandler: cannot create instance of password callback: " + callback, e
+            );
         }
-        return (performCallback(cbHandler, username, doAction));
+        return performCallback(cbHandler, username, doAction);
     }
 
     /**
@@ -814,13 +854,9 @@ public abstract class WSHandler {
                 }
                 String element = partDef[2].trim();
                 if (doDebug) {
-                    log.debug("partDefs: '"
-                            + mode
-                            + "' ,'"
-                            + nmSpace
-                            + "' ,'"
-                            + element
-                            + "'");
+                    log.debug(
+                        "partDefs: '" + mode + "' ,'" + nmSpace + "' ,'" + element + "'"
+                    );
                 }
                 encPart = new WSEncryptionPart(element, nmSpace, mode);
             } else {
@@ -879,26 +915,24 @@ public abstract class WSHandler {
         throws WSSecurityException {
 
         Crypto crypto = null;
-        String decPropFile = getString(WSHandlerConstants.DEC_PROP_FILE,
-                reqData.getMsgContext());
+        String decPropFile = 
+            getString(WSHandlerConstants.DEC_PROP_FILE, reqData.getMsgContext());
         if (decPropFile != null) {
             crypto = (Crypto) cryptos.get(decPropFile);
             if (crypto == null) {
-                crypto = CryptoFactory.getInstance(decPropFile, this
-                        .getClassLoader(reqData.getMsgContext()));
+                crypto = 
+                    CryptoFactory.getInstance(decPropFile, this.getClassLoader(reqData.getMsgContext()));
                 cryptos.put(decPropFile, crypto);
             }
-        } else if (getString(WSHandlerConstants.DEC_PROP_REF_ID, reqData
-                .getMsgContext()) != null) {
+        } else if (getString(WSHandlerConstants.DEC_PROP_REF_ID, reqData.getMsgContext()) != null) {
             /*
-             * If the property file is missing then 
-             * look for the Properties object 
+             * If the property file is missing then look for the Properties object 
              */
-            String refId = getString(WSHandlerConstants.DEC_PROP_REF_ID,
-                    reqData.getMsgContext());
-            if(refId != null) {
+            String refId = 
+                getString(WSHandlerConstants.DEC_PROP_REF_ID, reqData.getMsgContext());
+            if (refId != null) {
                 Object propObj = getProperty(reqData.getMsgContext(), refId);
-                if(propObj instanceof Properties) {
+                if (propObj instanceof Properties) {
                     crypto = (Crypto) cryptos.get(refId);
                     if (crypto == null) {
                         crypto = CryptoFactory.getInstance((Properties)propObj);
@@ -907,7 +941,7 @@ public abstract class WSHandler {
                 } else {
                     throw new WSSecurityException(
                         "WSHandler: Decrytion: decryptionPropRefId must hold a" 
-                            + " java.util.Properties object"
+                        + " java.util.Properties object"
                     );
                 }
             }
@@ -956,26 +990,27 @@ public abstract class WSHandler {
         if (callback != null) {
             Class cbClass = null;
             try {
-                cbClass = Loader.loadClass(getClassLoader(reqData
-                        .getMsgContext()), callback);
+                cbClass = 
+                    Loader.loadClass(getClassLoader(reqData.getMsgContext()), callback);
             } catch (ClassNotFoundException e) {
                 throw new WSSecurityException(
-                        "WSHandler: cannot load password callback class: "
-                        + callback, e);
+                    "WSHandler: cannot load password callback class: " + callback, e
+                );
             }
             try {
                 cbHandler = (CallbackHandler) cbClass.newInstance();
             } catch (java.lang.Exception e) {
                 throw new WSSecurityException(
-                        "WSHandler: cannot create instance of password callback: "
-                        + callback, e);
+                    "WSHandler: cannot create instance of password callback: " + callback, e
+                );
             }
         } else {
-            cbHandler = (CallbackHandler) getProperty(mc, 
-                    WSHandlerConstants.PW_CALLBACK_REF);
+            cbHandler = 
+                (CallbackHandler) getProperty(mc, WSHandlerConstants.PW_CALLBACK_REF);
             if (cbHandler == null) {
                 throw new WSSecurityException(
-                        "WSHandler: no reference in callback property");
+                    "WSHandler: no reference in callback property"
+                );
             }
         }
         return cbHandler;
@@ -989,10 +1024,12 @@ public abstract class WSHandler {
      * 1. Search the keystore for the transmitted certificate
      * 2. Search the keystore for a connection to the transmitted certificate
      * (that is, search for certificate(s) of the issuer of the transmitted certificate
-     * 3. Verify the trust path for those certificates found because the search for the issuer might be fooled by a phony DN (String!)
+     * 3. Verify the trust path for those certificates found because the search for the issuer 
+     * might be fooled by a phony DN (String!)
      *
      * @param cert the certificate that should be validated against the keystore
-     * @return true if the certificate is trusted, false if not (AxisFault is thrown for exceptions during CertPathValidation)
+     * @return true if the certificate is trusted, false if not (AxisFault is thrown for exceptions
+     * during CertPathValidation)
      * @throws WSSecurityException
      */
     protected boolean verifyTrust(X509Certificate cert, RequestData reqData) 
@@ -1013,7 +1050,10 @@ public abstract class WSHandler {
 
         if (doDebug) {
             log.debug("WSHandler: Transmitted certificate has subject " + subjectString);
-            log.debug("WSHandler: Transmitted certificate has issuer " + issuerString + " (serial " + issuerSerial + ")");
+            log.debug(
+                "WSHandler: Transmitted certificate has issuer " + issuerString 
+                + " (serial " + issuerSerial + ")"
+            );
         }
 
         // FIRST step
@@ -1023,7 +1063,9 @@ public abstract class WSHandler {
         try {
             alias = reqData.getSigCrypto().getAliasForX509Cert(issuerString, issuerSerial);
         } catch (WSSecurityException ex) {
-            throw new WSSecurityException("WSHandler: Could not get alias for certificate with " + subjectString, ex);
+            throw new WSSecurityException(
+                "WSHandler: Could not get alias for certificate with " + subjectString, ex
+            );
         }
 
         if (alias != null) {
@@ -1031,7 +1073,9 @@ public abstract class WSHandler {
             try {
                 certs = reqData.getSigCrypto().getCertificates(alias);
             } catch (WSSecurityException ex) {
-                throw new WSSecurityException("WSHandler: Could not get certificates for alias " + alias, ex);
+                throw new WSSecurityException(
+                    "WSHandler: Could not get certificates for alias " + alias, ex
+                );
             }
 
             // If certificates have been found, the certificates must be compared
@@ -1044,7 +1088,10 @@ public abstract class WSHandler {
             }
         } else {
             if (doDebug) {
-                log.debug("No alias found for subject from issuer with " + issuerString + " (serial " + issuerSerial + ")");
+                log.debug(
+                    "No alias found for subject from issuer with " + issuerString 
+                    + " (serial " + issuerSerial + ")"
+                );
             }
         }
 
@@ -1055,14 +1102,19 @@ public abstract class WSHandler {
         try {
             aliases = reqData.getSigCrypto().getAliasesForDN(issuerString);
         } catch (WSSecurityException ex) {
-            throw new WSSecurityException("WSHandler: Could not get alias for certificate with " + issuerString, ex);
+            throw new WSSecurityException(
+                "WSHandler: Could not get alias for certificate with " + issuerString, ex
+            );
         }
 
         // If the alias has not been found, the issuer is not in the keystore
         // As a direct result, do not trust the transmitted certificate
         if (aliases == null || aliases.length < 1) {
             if (doDebug) {
-                log.debug("No aliases found in keystore for issuer " + issuerString + " of certificate for " + subjectString);
+                log.debug(
+                    "No aliases found in keystore for issuer " + issuerString 
+                    + " of certificate for " + subjectString
+                );
             }
             return false;
         }
@@ -1073,20 +1125,27 @@ public abstract class WSHandler {
             alias = aliases[i];
 
             if (doDebug) {
-                log.debug("Preparing to validate certificate path with alias " + alias + " for issuer " + issuerString);
+                log.debug(
+                    "Preparing to validate certificate path with alias " + alias 
+                    + " for issuer " + issuerString
+                );
             }
 
             // Retrieve the certificate(s) for the alias from the keystore
             try {
                 certs = reqData.getSigCrypto().getCertificates(alias);
             } catch (WSSecurityException ex) {
-                throw new WSSecurityException("WSHandler: Could not get certificates for alias " + alias, ex);
+                throw new WSSecurityException(
+                    "WSHandler: Could not get certificates for alias " + alias, ex
+                );
             }
 
             // If no certificates have been found, there has to be an error:
             // The keystore can find an alias but no certificate(s)
             if (certs == null || certs.length < 1) {
-                throw new WSSecurityException("WSHandler: Could not get certificates for alias " + alias);
+                throw new WSSecurityException(
+                    "WSHandler: Could not get certificates for alias " + alias
+                );
             }
 
             // Form a certificate chain from the transmitted certificate
@@ -1101,27 +1160,38 @@ public abstract class WSHandler {
             }
             certs = x509certs;
 
-            // Use the validation method from the crypto to check whether the subjects certificate was really signed by the issuer stated in the certificate
+            // Use the validation method from the crypto to check whether the subjects' 
+            // certificate was really signed by the issuer stated in the certificate
             try {
                 if (reqData.getSigCrypto().validateCertPath(certs)) {
                     if (doDebug) {
-                        log.debug("WSHandler: Certificate path has been verified for certificate with subject " + subjectString);
+                        log.debug(
+                            "WSHandler: Certificate path has been verified for certificate "
+                            + "with subject " + subjectString
+                        );
                     }
                     return true;
                 }
             } catch (WSSecurityException ex) {
-                throw new WSSecurityException("WSHandler: Certificate path verification failed for certificate with subject " + subjectString, ex);
+                throw new WSSecurityException(
+                    "WSHandler: Certificate path verification failed for certificate "
+                    + "with subject " + subjectString, ex
+                );
             }
         }
 
-        log.debug("WSHandler: Certificate path could not be verified for certificate with subject " + subjectString);
+        if (doDebug) {
+            log.debug(
+                "WSHandler: Certificate path could not be verified for "
+                + "certificate with subject " + subjectString
+            );
+        }
         return false;
     }
 
     /**
-     * Evaluate whether a timestamp is considered valid on receiverside. Hook to
-     * allow subclasses to implement custom validation methods however they see
-     * fit.
+     * Evaluate whether a timestamp is considered valid on the receivers' side. Hook to
+     * allow subclasses to implement custom validation methods however they see fit.
      * 
      * Policy used in this implementation:
      * 
@@ -1133,7 +1203,7 @@ public abstract class WSHandler {
      * @param timestamp
      *            the timestamp that is validated
      * @param timeToLive
-     *            the limit on receiverside, the timestamp is validated against
+     *            the limit on the receivers' side, that the timestamp is validated against
      * @return true if the timestamp is before (now-timeToLive), false otherwise
      * @throws WSSecurityException
      */
@@ -1213,19 +1283,6 @@ public abstract class WSHandler {
             return null;
         }
     }
-
-//  /**
-//  * Returns the classloader to be used for loading the callback class
-//  * 
-//  * @return class loader
-//  */
-//  public ClassLoader getClassLoader() {
-//  try {
-//  return Loader.getTCL();
-//  } catch (Throwable t) {
-//  return null;
-//  }
-//  }
 
     /**
      * Returns the classloader to be used for loading the callback class

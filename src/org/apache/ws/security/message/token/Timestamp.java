@@ -73,19 +73,19 @@ public class Timestamp {
                         WSConstants.WSU_NS.equals(currentChild.getNamespaceURI())) {
                     if (strCreated == null) {
                         strCreated = ((Text) ((Element) currentChild).getFirstChild()).getData();
-                    }
-                    else {
-                        throw new WSSecurityException(WSSecurityException.INVALID_SECURITY,
-                                "invalidTimestamp");
+                    } else {
+                        throw new WSSecurityException(
+                            WSSecurityException.INVALID_SECURITY, "invalidTimestamp"
+                        );
                     }
                 } else if (WSConstants.EXPIRES_LN.equals(currentChild.getLocalName()) &&
                         WSConstants.WSU_NS.equals(currentChild.getNamespaceURI())) {
                     if (strExpires == null) {
                         strExpires = ((Text) ((Element) currentChild).getFirstChild()).getData();
-                    }
-                    else {
-                        throw new WSSecurityException(WSSecurityException.INVALID_SECURITY,
-                        "invalidTimestamp");                        
+                    } else {
+                        throw new WSSecurityException(
+                            WSSecurityException.INVALID_SECURITY, "invalidTimestamp"
+                        );                        
                     }
                 } else {
                     customElements.add((Element) currentChild);
@@ -105,9 +105,8 @@ public class Timestamp {
                 expires.setTime(zulu.parse(strExpires));
             }
         } catch (ParseException e) {
-            throw new WSSecurityException(WSSecurityException.INVALID_SECURITY,
-                    "invalidTimestamp",
-                    null, e);
+            throw new WSSecurityException(
+                WSSecurityException.INVALID_SECURITY, "invalidTimestamp", null, e);
         }
     }
 
@@ -133,8 +132,7 @@ public class Timestamp {
         DateFormat zulu = null;
         if (milliseconds) {
             zulu = new XmlSchemaDateFormat();
-        }
-        else {
+        } else {
             zulu = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
             zulu.setTimeZone(TimeZone.getTimeZone("UTC"));
         }
@@ -240,8 +238,7 @@ public class Timestamp {
     }
     
     /**
-     * Returns the value of the wsu:Id attribute
-     * @return TODO
+     * @return the value of the wsu:Id attribute
      */
     public String getID() {
         return this.element.getAttributeNS(WSConstants.WSU_NS, "Id");

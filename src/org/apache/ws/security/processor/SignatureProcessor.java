@@ -130,7 +130,7 @@ public class SignatureProcessor implements Processor {
      * @param crypto      the object that implements the access to the keystore and the
      *                    handling of certificates.
      * @param returnCert  verifyXMLSignature stores the certificate in the first
-     *                    entry of this array. Ther caller may then further validate
+     *                    entry of this array. The caller may then further validate
      *                    the certificate
      * @param returnElements verifyXMLSignature adds the wsu:ID attribute values for
      *               the signed elements to this Set
@@ -208,7 +208,11 @@ public class SignatureProcessor implements Processor {
                     UsernameTokenProcessor utProcessor = 
                         (UsernameTokenProcessor) wsDocInfo.getProcessor(id);
                     ut = utProcessor.getUt();
-                    secretKey = ut.getSecretKey();
+                    if (ut.isDerivedKey()) {
+                        secretKey = ut.getDerivedKey();
+                    } else {
+                        secretKey = ut.getSecretKey();
+                    }
                 } else if(el.equals(WSSecurityEngine.DERIVED_KEY_TOKEN_05_02) ||
                         el.equals(WSSecurityEngine.DERIVED_KEY_TOKEN_05_12)) {
                     dkt = new DerivedKeyToken(token);
@@ -285,7 +289,9 @@ public class SignatureProcessor implements Processor {
                     
                     String id = secRef.getKeyIdentifierValue();
                     WSPasswordCallback pwcb = new WSPasswordCallback(id,
-                                                       WSPasswordCallback.ENCRYPTED_KEY_TOKEN);
+                                                                     null,
+                                                                     SecurityTokenReference.ENC_KEY_SHA1_URI,
+                                                                     WSPasswordCallback.ENCRYPTED_KEY_TOKEN);
                     try {
                         cb.handle(new Callback[]{pwcb});
                     } catch (Exception e) {
@@ -390,7 +396,7 @@ public class SignatureProcessor implements Processor {
                 if (certs != null) {
                     returnCert[0] = certs[0];
                     return certs[0].getSubjectDN();
-                } else if(ut != null){
+                } else if (ut != null){
                     WSUsernameTokenPrincipal principal = new WSUsernameTokenPrincipal(
                             ut.getName(), ut.isHashed());
                     principal.setNonce(ut.getNonce());
@@ -416,12 +422,12 @@ public class SignatureProcessor implements Processor {
                     }
                     principal.setBasetokenId(basetokenId);
                     return principal;
-                } else if(samlKi != null) {
+                } else if (samlKi != null) {
                     final SAMLAssertion assertion = samlKi.getAssertion();
                     CustomTokenPrincipal principal = new CustomTokenPrincipal(assertion.getId());
                     principal.setTokenObject(assertion);
                     return principal;
-                } else if(secretKey != null) {
+                } else if (secretKey != null) {
                     //This is the custom key scenario
                     CustomTokenPrincipal principal = new CustomTokenPrincipal(customTokenId);
                     return principal;

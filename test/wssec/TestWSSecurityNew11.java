@@ -302,7 +302,6 @@ public class TestWSSecurityNew11 extends TestCase {
     
 
     public void testX509SignatureISSTR() throws Exception {
-        SOAPEnvelope envelope = null;
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("wss4jcert", "security");
         // builder.setUserInfo("john", "keypass");
@@ -359,7 +358,6 @@ public class TestWSSecurityNew11 extends TestCase {
     
 
     public void testX509SignatureSKISTR() throws Exception {
-        SOAPEnvelope envelope = null;
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("wss4jcert", "security");
         // builder.setUserInfo("john", "keypass");

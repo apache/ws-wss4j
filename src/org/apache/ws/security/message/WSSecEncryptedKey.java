@@ -294,8 +294,7 @@ public class WSSecEncryptedKey extends WSSecBase {
         Element keyInfoElement = keyInfo.getElement();
         keyInfoElement.setAttributeNS(WSConstants.XMLNS_NS, "xmlns:"
                 + WSConstants.SIG_PREFIX, WSConstants.SIG_NS);
-        WSSecurityUtil.appendChildElement(document, encryptedKeyElement,
-                keyInfoElement);
+        encryptedKeyElement.appendChild(keyInfoElement);
 
         Element xencCipherValue = createCipherValue(document,
                 encryptedKeyElement);
@@ -346,7 +345,7 @@ public class WSSecEncryptedKey extends WSSecBase {
         Element encryptionMethod = doc.createElementNS(WSConstants.ENC_NS,
                 WSConstants.ENC_PREFIX + ":EncryptionMethod");
         encryptionMethod.setAttributeNS(null, "Algorithm", keyTransportAlgo);
-        WSSecurityUtil.appendChildElement(doc, encryptedKey, encryptionMethod);
+        encryptedKey.appendChild(encryptionMethod);
         return encryptedKey;
     }
     
@@ -370,7 +369,7 @@ public class WSSecEncryptedKey extends WSSecBase {
         Element cipherValue = doc.createElementNS(WSConstants.ENC_NS,
                 WSConstants.ENC_PREFIX + ":CipherValue");
         cipherData.appendChild(cipherValue);
-        WSSecurityUtil.appendChildElement(doc, encryptedKey, cipherData);
+        encryptedKey.appendChild(cipherData);
         return cipherValue;
     }
 
@@ -386,8 +385,8 @@ public class WSSecEncryptedKey extends WSSecBase {
      *            The security header that holds the Signature element.
      */
     public void prependToHeader(WSSecHeader secHeader) {
-        WSSecurityUtil.prependChildElement(document, secHeader
-                .getSecurityHeader(), encryptedKeyElement, false);
+        WSSecurityUtil.prependChildElement(
+            secHeader.getSecurityHeader(), encryptedKeyElement);
     }
 
     /**
@@ -402,8 +401,8 @@ public class WSSecEncryptedKey extends WSSecBase {
      *            The security header that holds the Signature element.
      */
     public void appendToHeader(WSSecHeader secHeader) {
-        WSSecurityUtil.appendChildElement(document, secHeader
-                .getSecurityHeader(), encryptedKeyElement);
+        Element secHeaderElement = secHeader.getSecurityHeader();
+        secHeaderElement.appendChild(encryptedKeyElement);
     }
     
     /**
@@ -418,8 +417,8 @@ public class WSSecEncryptedKey extends WSSecBase {
      */
     public void prependBSTElementToHeader(WSSecHeader secHeader) {
         if (bstToken != null) {
-            WSSecurityUtil.prependChildElement(document, secHeader
-                    .getSecurityHeader(), bstToken.getElement(), false);
+            WSSecurityUtil.prependChildElement(
+                secHeader.getSecurityHeader(), bstToken.getElement());
         }
         bstToken = null;
     }
@@ -436,8 +435,8 @@ public class WSSecEncryptedKey extends WSSecBase {
      */
     public void appendBSTElementToHeader(WSSecHeader secHeader) {
         if (bstToken != null) {
-            WSSecurityUtil.appendChildElement(document, secHeader
-                    .getSecurityHeader(), bstToken.getElement());
+            Element secHeaderElement = secHeader.getSecurityHeader();
+            secHeaderElement.appendChild(bstToken.getElement());
         }
         bstToken = null;
     }

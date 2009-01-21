@@ -351,8 +351,7 @@ public class WSSignSAMLEnvelope extends WSSignEnvelope {
          * on mode) - SecurityTokenRefrence (depends on mode) - SAML token
          */
 
-        WSSecurityUtil.prependChildElement(doc, securityHeader, sig
-                .getElement(), false);
+        WSSecurityUtil.prependChildElement(securityHeader, sig.getElement());
 
         if (tlog.isDebugEnabled()) {
             t2 = System.currentTimeMillis();
@@ -366,8 +365,7 @@ public class WSSignSAMLEnvelope extends WSSignEnvelope {
                 bstToken = new X509Security(doc);
                 ((X509Security) bstToken).setX509Certificate(certs[0]);
                 bstToken.setID(certUri);
-                WSSecurityUtil.prependChildElement(doc, securityHeader,
-                        bstToken.getElement(), false);
+                WSSecurityUtil.prependChildElement(securityHeader, bstToken.getElement());
                 wsDocInfo.setBst(bstToken.getElement());
                 ref.setValueType(bstToken.getValueType());
             } else {
@@ -414,13 +412,11 @@ public class WSSignSAMLEnvelope extends WSSignEnvelope {
                     "noSAMLdoc", null, e2);
         }
         if (senderVouches) {
-            WSSecurityUtil.prependChildElement(doc, securityHeader, secRefSaml
-                    .getElement(), true);
+            WSSecurityUtil.prependChildElement(securityHeader, secRefSaml.getElement());
         }
 
         wsDocInfo.setAssertion(samlToken);
-        WSSecurityUtil
-                .prependChildElement(doc, securityHeader, samlToken, true);
+        WSSecurityUtil.prependChildElement(securityHeader, samlToken);
 
         WSDocInfoStore.store(wsDocInfo);
         try {

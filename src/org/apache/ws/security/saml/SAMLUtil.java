@@ -83,7 +83,7 @@ public class SAMLUtil {
         
         //First ask the cb whether it can provide the secret
         WSPasswordCallback pwcb = new WSPasswordCallback(assertion.getId(), WSPasswordCallback.CUSTOM_TOKEN);
-        if(cb != null) {
+        if (cb != null) {
             try {
                 cb.handle(new Callback[]{pwcb});
             } catch (Exception e1) {
@@ -94,7 +94,7 @@ public class SAMLUtil {
         
         byte[] key = pwcb.getKey();
         
-        if(key != null) {
+        if (key != null) {
             return new SAMLKeyInfo(assertion, key);
         } else {
             Iterator statements = assertion.getStatements();
@@ -108,25 +108,25 @@ public class SAMLUtil {
                     NodeList children = kiElem.getChildNodes();
                     int len = children.getLength();
                     
-                    for(int i = 0; i < len; i++) {
+                    for (int i = 0; i < len; i++) {
                         Node child = children.item(i);
                         if (child.getNodeType() != Node.ELEMENT_NODE) {
                             continue;
                         }
                         QName el = new QName(child.getNamespaceURI(), child.getLocalName());
-                        if(el.equals(WSSecurityEngine.ENCRYPTED_KEY)) {
+                        if (el.equals(WSSecurityEngine.ENCRYPTED_KEY)) {
                             
                             EncryptedKeyProcessor proc = new EncryptedKeyProcessor();
                             proc.handleEncryptedKey((Element)child, cb, crypto, null);
                             
                             return new SAMLKeyInfo(assertion, proc.getDecryptedBytes());
-                        } else if(el.equals(new QName(WSConstants.WST_NS, "BinarySecret"))) {
+                        } else if (el.equals(new QName(WSConstants.WST_NS, "BinarySecret"))) {
                             Text txt = (Text)child.getFirstChild();
                             return new SAMLKeyInfo(assertion, Base64.decode(txt.getData()));
                         }
                     }
 
-                } else if( stmt instanceof SAMLAuthenticationStatement) {
+                } else if (stmt instanceof SAMLAuthenticationStatement) {
                     SAMLAuthenticationStatement authStmt = (SAMLAuthenticationStatement)stmt;
                     SAMLSubject samlSubj = authStmt.getSubject(); 
                     if (samlSubj == null) {

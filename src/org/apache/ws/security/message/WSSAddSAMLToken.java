@@ -87,10 +87,7 @@ public class WSSAddSAMLToken extends WSBaseMessage {
         try {
             Element element = (Element) assertion.toDOM(doc);
             Element securityHeader = insertSecurityHeader(doc);
-            WSSecurityUtil.prependChildElement(doc,
-                    securityHeader,
-                    element,
-                    true);
+            WSSecurityUtil.prependChildElement(securityHeader, element);
         } catch (SAMLException ex) {
             if (log.isDebugEnabled()) {
                 log.debug(ex.getMessage(), ex);

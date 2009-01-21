@@ -34,10 +34,14 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSPasswordCallback;
+import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.saml.WSSecSignatureSAML;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
+import org.apache.ws.security.handler.RequestData;
+import org.apache.ws.security.handler.WSHandler;
+import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.message.WSSecHeader;
 import org.w3c.dom.Document;
 
@@ -223,6 +227,66 @@ public class TestWSSecurityNewST2 extends TestCase implements CallbackHandler {
         signedDoc = signedMsg.getSOAPEnvelope().getAsDocument();
         verify(signedDoc);
     }
+    
+    
+    /**
+     * A test for WSS-62: "the crypto file not being retrieved in the doReceiverAction
+     * method for the Saml Signed Token"
+     * 
+     * https://issues.apache.org/jira/browse/WSS-62
+     */
+    public void testWSS62() throws Exception {
+        SOAPEnvelope unsignedEnvelope = message.getSOAPEnvelope();
+        SAMLIssuer saml = SAMLIssuerFactory.getInstance("saml.properties");
+
+        SAMLAssertion assertion = saml.newAssertion();
+
+        String issuerKeyName = saml.getIssuerKeyName();
+        String issuerKeyPW = saml.getIssuerKeyPassword();
+        Crypto issuerCrypto = saml.getIssuerCrypto();
+        WSSecSignatureSAML wsSign = new WSSecSignatureSAML();
+        wsSign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
+        
+        Document doc = unsignedEnvelope.getAsDocument();
+
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        
+        Document signedDoc = 
+            wsSign.build(doc, null, assertion, issuerCrypto, issuerKeyName, issuerKeyPW, secHeader);
+        
+        //
+        // Now verify it but first call Handler#doReceiverAction
+        //
+        final WSSConfig cfg = WSSConfig.getNewInstance();
+        final RequestData reqData = new RequestData();
+        reqData.setWssConfig(cfg);
+        reqData.setMsgContext(new java.util.TreeMap());
+        java.util.Map msgContext = new java.util.HashMap();
+        msgContext.put(WSHandlerConstants.SIG_PROP_FILE, "crypto.properties");
+        reqData.setMsgContext(msgContext);
+        
+        MyHandler handler = new MyHandler();
+        handler.doit(WSConstants.ST_SIGNED, reqData);
+        
+        secEngine.processSecurityHeader(
+            signedDoc, null, this, reqData.getSigCrypto(), reqData.getDecCrypto()
+        );
+        
+        //
+        // Negative test
+        //
+        msgContext.put(WSHandlerConstants.SIG_PROP_FILE, "crypto.properties.na");
+        reqData.setMsgContext(msgContext);
+        
+        handler = new MyHandler();
+        try {
+            handler.doit(WSConstants.ST_SIGNED, reqData);
+            fail("Failure expected on a bad crypto properties file");
+        } catch (RuntimeException ex) {
+            // expected
+        }
+    }
 
     
     /**
@@ -254,6 +318,47 @@ public class TestWSSecurityNewST2 extends TestCase implements CallbackHandler {
             } else {
                 throw new UnsupportedCallbackException(callbacks[i], "Unrecognized Callback");
             }
+        }
+    }
+    
+    /**
+     * a trivial extension of the WSHandler type
+     */
+    public static class MyHandler extends WSHandler {
+        
+        public Object 
+        getOption(String key) {
+            return null;
+        }
+        
+        public void 
+        setProperty(
+            Object msgContext, 
+            String key, 
+            Object value
+        ) {
+        }
+
+        public Object 
+        getProperty(Object ctx, String key) {
+            java.util.Map ctxMap = (java.util.Map)ctx;
+            return ctxMap.get(key);
+        }
+    
+        public void 
+        setPassword(Object msgContext, String password) {
+        }
+        
+        public String 
+        getPassword(Object msgContext) {
+            return null;
+        }
+
+        void doit(
+            int action, 
+            RequestData reqData
+        ) throws org.apache.ws.security.WSSecurityException {
+            doReceiverAction(action, reqData);
         }
     }
 }

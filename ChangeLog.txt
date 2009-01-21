@@ -9,18 +9,33 @@ Release 1.5.5
 =============
 
 ** Bug
+
     * [WSS-42] - java.lang.NoClassDefFoundError: org/apache/xml/security/encryption/XMLEncryptionException
+    * [WSS-60] - Problems when SOAP envelope namespace prefix is null
+    * [WSS-62] - the crypto file not being retrieved in the doReceiverAction method for the Saml Signed Token
+    * [WSS-86] - CryptoBase.splitAndTrim does not take into account the format of a DN constructed by different providers
+    * [WSS-87] - CryptoBase.getAliasForX509Cert(String, BigInteger) fails when issuer string contains OIDs
     * [WSS-94] - Security Breach : The client certificate signature is not verified if the serial number is known in the keystore
+    * [WSS-111] - Some work on UsernameToken derived keys
     * [WSS-121] - Bug in default value for SAML issuer class property
     * [WSS-126] - SignatureProcessor:verifyXMLSignature method - Crypto object can have null values in the following scenario but it throws an Exception if the Crypto object is null
+    * [WSS-127] - No way of signing with UsernameToken without sending the password
     * [WSS-129] - Couple places where "cause" of WSSecurityException not set
     * [WSS-133] - Method and variable misspellings fixed
     * [WSS-140] - WSSecEncryptedKey produces EncryptedKey element with invalid Id attribute
     * [WSS-141] - handleUsernameToken gives too much information. Can be used to deternine if a username exists or not
     * [WSS-142] - We ship opensaml 1.0.1 even though we use opensaml 1.1 in maven
     * [WSS-149] - AbstractCrypto requires org.apache.ws.security.crypto.merlin.file to be set and point to an existing file
+    * [WSS-151] - Password type in UsernameToken not deserialized correctly
+    * [WSS-152] - Problem with processing Username Tokens with no password type
+    * [WSS-153] - Signature confirmation of multiple signatures doesn't work
+
 ** Improvement
+
+    * [WSS-79] - Compatibility issue with weblogic wsse
     * [WSS-85] - Better exception handling in the crypto (e.g. no e.printStackTrace())
+    * [WSS-110] - Add OSGi entries to jar manifest.
+    * [WSS-118] - Support for SAML 1.1 SecurityTokenReferences in /org/apache/ws/security/processor/DerivedKeyTokenProcessor
     * [WSS-122] - Some fixes for the website
     * [WSS-123] - 1.5.4 requires opensaml jar, older versions did not
     * [WSS-125] - Upgrade BouncyCastle version
@@ -30,12 +45,23 @@ Release 1.5.5
     * [WSS-138] - Add Nabble to site mailing list page
     * [WSS-145] - Problem in upgrading to xml-sec 1.4.2
     * [WSS-150] - Upgrade to XALAN 2.7.1
-* New Feature
+    * [WSS-154] - Allow WSSConfig injection in WSHandler and improve WSSConfig for injection of Processors instances
+
+** New Feature
+
     * [WSS-23] - no way to programmatically set crypto.properties
-* Task
+
+** Task
+
     * [WSS-124] - Get maven dependencies pushed to central
     * [WSS-132] - TestWSSecurityX509v1 failing
     * [WSS-144] - Remove tab characters from WSS4J files
+
+** Wish
+
+    * [WSS-75] - remove dependency on xalan because it gets in the way of trax resolution
+    * [WSS-91] - carriage return/line feed in the security header
+
 
 Release 1.5.4
 =============

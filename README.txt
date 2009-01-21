@@ -15,10 +15,9 @@ and .Net WSE server/clients that follow the OASIS WSS specifications
 
 WSS4J implements
 
- * OASIS Web Serives Security: SOAP Message Security 1.0 Standard 200401, 
-   March 2004
- * Username Token profile V1.0
- * X.509 Token Profile V1.0
+ * Web Services Security: SOAP Message Security 1.1 
+ * Username Token profile 1.1
+ * X.509 Certificate Token Profile 1.1
 
 The Web Services Security part of WSS4J is fairly well tested and many
 WebService projects use it already. Also interoperability with

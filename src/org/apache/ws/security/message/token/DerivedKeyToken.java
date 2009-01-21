@@ -141,8 +141,7 @@ public class DerivedKeyToken {
      */
     public void setSecurityTokenReference(SecurityTokenReference ref) {
         this.elementSecurityTokenReference = ref.getElement();
-        //WSSecurityUtil.appendChildElement(doc, this.element, ref.getElement());
-        WSSecurityUtil.prependChildElement(this.element.getOwnerDocument(), this.element, ref.getElement(), false);
+        WSSecurityUtil.prependChildElement(this.element, ref.getElement());
     }
     
     /**
@@ -158,7 +157,7 @@ public class DerivedKeyToken {
     
     public void setSecurityTokenReference(Element elem) {
         this.elementSecurityTokenReference = elem;
-        WSSecurityUtil.prependChildElement(elem.getOwnerDocument(), this.element, elem, false);
+        WSSecurityUtil.prependChildElement(this.element, elem);
     }
     
     /**
