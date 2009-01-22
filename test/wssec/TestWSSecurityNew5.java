@@ -35,6 +35,7 @@ import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.message.WSSecUsernameToken;
 import org.apache.ws.security.message.WSSecHeader;
+import org.apache.ws.security.util.Base64;
 import org.w3c.dom.Document;
 
 import javax.security.auth.callback.Callback;
@@ -44,6 +45,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
+import java.security.MessageDigest;
 
 
 /**
@@ -257,6 +259,33 @@ public class TestWSSecurityNew5 extends TestCase implements CallbackHandler {
         signedDoc = signedMsg.getSOAPEnvelope().getAsDocument();
         log.info("After adding UsernameToken PW Text....");
         verify(signedDoc);
+    }
+    
+    /**
+     * Test that adds a UserNameToken with a digested password but with type of
+     * password test.
+     * <p/>
+     */
+    public void testUsernameTokenDigestText() throws Exception {
+        WSSecUsernameToken builder = new WSSecUsernameToken();
+        builder.setPasswordType(WSConstants.PASSWORD_TEXT);
+        byte[] password = "verySecret".getBytes();
+        MessageDigest sha = MessageDigest.getInstance("MD5");
+        sha.reset();
+        sha.update(password);
+        String passwdDigest = Base64.encode(sha.digest());
+        
+        builder.setUserInfo("wernerd", passwdDigest);
+        log.info("Before adding UsernameToken PW Text....");
+        Document doc = unsignedEnvelope.getAsDocument();
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        Document signedDoc = builder.build(doc, secHeader);
+        Message signedMsg = SOAPUtil.toAxisMessage(signedDoc);
+        if (log.isDebugEnabled()) {
+            log.debug("Message with UserNameToken PW Text:");
+            XMLUtils.PrettyElementToWriter(signedMsg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
+        }
     }
     
     /**
