@@ -137,12 +137,6 @@ we used them during the tests.
 To implement the Web Service Security (WSS) part specific software is 
 required:
 
-addressing-1.0.jar
-    This jar contains the implementation of WS-Addressing, required
-    by WSS4J Trust.
-
-    See: http://ws.apache.org/addressing/
-
 axis-1.4.jar
 axis-ant-1.4.jar
 axis-jaxrpc-1.4.jar
