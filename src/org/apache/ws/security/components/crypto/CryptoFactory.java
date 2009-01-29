@@ -173,11 +173,11 @@ public abstract class CryptoFactory {
             cryptoClassName = properties.getProperty("org.apache.ws.security.crypto.provider",
                     defaultCryptoClassName);
         }
-        return loadClass(cryptoClassName, properties,customClassLoader);
+        return loadClass(cryptoClassName, properties, customClassLoader);
     }
 
     private static Crypto loadClass(String cryptoClassName, Map map) {
-        return loadClass(cryptoClassName,map,CryptoFactory.class.getClassLoader());
+        return loadClass(cryptoClassName, map, Loader.getClassLoader(CryptoFactory.class));
     }
 
     /**
@@ -236,7 +236,7 @@ public abstract class CryptoFactory {
      * @return a <code>Properties</code> object loaded from the filename
      */
     private static Properties getProperties(String propFilename) {
-        return getProperties(propFilename, CryptoFactory.class.getClassLoader());
+        return getProperties(propFilename, Loader.getClassLoader(CryptoFactory.class));
     }
     
     

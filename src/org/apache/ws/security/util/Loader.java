@@ -117,6 +117,16 @@ public class Loader {
     static public ClassLoader getTCL() throws IllegalAccessException, InvocationTargetException {
         return Thread.currentThread().getContextClassLoader();
     }
+    
+    /**
+     * Get the class loader of the class argument
+     * <p/>
+     *
+     * @return the class loader of the argument
+     */
+    static public ClassLoader getClassLoader(Class clazz) {
+        return clazz.getClassLoader();
+    }
 
     /**
      * Try the specified classloader and then fall back to the loadClass
@@ -138,7 +148,7 @@ public class Loader {
         } catch (Throwable e) {
             log.warn(e.getMessage(), e);
         }
-        return loadClass(clazz);
+        return loadClass(clazz, true);
     }
 
     /**
@@ -154,6 +164,7 @@ public class Loader {
     static public Class loadClass(String clazz) throws ClassNotFoundException {
         return loadClass(clazz, true);
     }
+    
     static public Class loadClass(String clazz, boolean warn) throws ClassNotFoundException {
         try {
             ClassLoader tcl = getTCL(); 

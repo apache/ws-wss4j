@@ -49,7 +49,7 @@ public abstract class AbstractCrypto extends CryptoBase {
      * @param properties
      */
     public AbstractCrypto(Properties properties) throws CredentialException, IOException {
-        this(properties, AbstractCrypto.class.getClassLoader());
+        this(properties, Loader.getClassLoader(AbstractCrypto.class));
     }
 
     /**
