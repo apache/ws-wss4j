@@ -191,16 +191,12 @@ public class UsernameToken {
 
         this.elementUsername = doc.createElementNS(WSConstants.WSSE_NS, "wsse:"
                 + WSConstants.USERNAME_LN);
-        WSSecurityUtil.setNamespace(this.elementUsername, WSConstants.WSSE_NS,
-                WSConstants.WSSE_PREFIX);
         this.elementUsername.appendChild(doc.createTextNode(""));
         element.appendChild(elementUsername);
 
         if (pwType != null) {
             this.elementPassword = doc.createElementNS(WSConstants.WSSE_NS,
                     "wsse:" + WSConstants.PASSWORD_LN);
-            WSSecurityUtil.setNamespace(this.elementPassword,
-                    WSConstants.WSSE_NS, WSConstants.WSSE_PREFIX);
             this.elementPassword.appendChild(doc.createTextNode(""));
             element.appendChild(elementPassword);
 
@@ -225,8 +221,6 @@ public class UsernameToken {
         random.nextBytes(nonceValue);
         this.elementNonce = doc.createElementNS(WSConstants.WSSE_NS, "wsse:"
                 + WSConstants.NONCE_LN);
-        WSSecurityUtil.setNamespace(this.elementNonce, WSConstants.WSSE_NS,
-                WSConstants.WSSE_PREFIX);
         this.elementNonce.appendChild(doc.createTextNode(Base64
                 .encode(nonceValue)));
         element.appendChild(elementNonce);
@@ -249,8 +243,7 @@ public class UsernameToken {
         Calendar rightNow = Calendar.getInstance();
         this.elementCreated = doc.createElementNS(WSConstants.WSU_NS,
                 WSConstants.WSU_PREFIX + ":" + WSConstants.CREATED_LN);
-        WSSecurityUtil.setNamespace(this.elementCreated, WSConstants.WSU_NS,
-                WSConstants.WSU_PREFIX);
+        WSSecurityUtil.setNamespace(this.element, WSConstants.WSU_NS, WSConstants.WSU_PREFIX);
         this.elementCreated.appendChild(doc.createTextNode(zulu.format(rightNow
                 .getTime())));
         element.appendChild(elementCreated);
@@ -278,7 +271,7 @@ public class UsernameToken {
         }
         this.elementSalt = doc.createElementNS(WSConstants.WSSE11_NS,
                 WSConstants.WSSE11_PREFIX + ":" + WSConstants.SALT_LN);
-        WSSecurityUtil.setNamespace(this.elementSalt, WSConstants.WSSE11_NS,
+        WSSecurityUtil.setNamespace(this.element, WSConstants.WSSE11_NS,
                 WSConstants.WSSE11_PREFIX);
         this.elementSalt.appendChild(doc.createTextNode(Base64
                 .encode(saltValue)));
@@ -293,7 +286,7 @@ public class UsernameToken {
         String text = "" + iteration;
         this.elementIteration = doc.createElementNS(WSConstants.WSSE11_NS,
                 WSConstants.WSSE11_PREFIX + ":" + WSConstants.ITERATION_LN);
-        WSSecurityUtil.setNamespace(this.elementIteration,
+        WSSecurityUtil.setNamespace(this.element,
                 WSConstants.WSSE11_NS, WSConstants.WSSE11_PREFIX);
         this.elementIteration.appendChild(doc.createTextNode(text));
         element.appendChild(elementIteration);

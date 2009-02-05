@@ -123,7 +123,7 @@ public class SecurityTokenReference {
      * Gets the Reference.
      *
      * @return the <code>Reference</code> element contained in this
-     *         SecurityTokeneReference
+     *         SecurityTokenReference
      * @throws WSSecurityException
      */
     public Reference getReference() throws WSSecurityException {

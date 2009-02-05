@@ -141,9 +141,6 @@ public class Timestamp {
         Element elementCreated =
                 doc.createElementNS(WSConstants.WSU_NS,
                         WSConstants.WSU_PREFIX + ":" + WSConstants.CREATED_LN);
-        WSSecurityUtil.setNamespace(elementCreated,
-                WSConstants.WSU_NS,
-                WSConstants.WSU_PREFIX);
         elementCreated.appendChild(doc.createTextNode(zulu.format(created.getTime())));
         element.appendChild(elementCreated);
         if (ttl != 0) {
@@ -155,9 +152,6 @@ public class Timestamp {
             Element elementExpires =
                     doc.createElementNS(WSConstants.WSU_NS,
                             WSConstants.WSU_PREFIX + ":" + WSConstants.EXPIRES_LN);
-            WSSecurityUtil.setNamespace(elementExpires,
-                    WSConstants.WSU_NS,
-                    WSConstants.WSU_PREFIX);
             elementExpires.appendChild(doc.createTextNode(zulu.format(expires.getTime())));
             element.appendChild(elementExpires);
         }

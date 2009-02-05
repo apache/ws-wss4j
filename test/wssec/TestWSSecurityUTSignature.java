@@ -90,7 +90,7 @@ public class TestWSSecurityUTSignature extends TestCase implements CallbackHandl
      * @return a junit test suite
      */
     public static Test suite() {
-        return new TestSuite(TestWSSecurityUTDK.class);
+        return new TestSuite(TestWSSecurityUTSignature.class);
     }
 
     /**

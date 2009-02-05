@@ -770,7 +770,7 @@ public class WSSecSignature extends WSSecBase {
 
         computeSignature();
 
-        return (doc);
+        return doc;
     }
 
     protected Element createSTRParameter(Document doc) {
