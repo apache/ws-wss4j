@@ -20,7 +20,6 @@ package wssec;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PrintWriter;
 
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
@@ -37,7 +36,6 @@ import org.apache.axis.SOAPPart;
 import org.apache.axis.client.AxisClient;
 import org.apache.axis.configuration.NullProvider;
 import org.apache.axis.message.SOAPEnvelope;
-import org.apache.axis.utils.XMLUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
@@ -175,7 +173,9 @@ public class TestWSSecurityNew16 extends TestCase implements CallbackHandler {
         Message encryptedMsg = SOAPUtil.toAxisMessage(encryptedSignedDoc);
         if (log.isDebugEnabled()) {
             log.debug("Signed and encrypted message with IssuerSerial key identifier (both), 3DES:");
-            XMLUtils.PrettyElementToWriter(encryptedMsg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(encryptedSignedDoc);
+            log.debug(outputString);
         }
         
         String s = encryptedMsg.getSOAPPartAsString();
@@ -195,15 +195,16 @@ public class TestWSSecurityNew16 extends TestCase implements CallbackHandler {
      */
     private void verify(Document doc) throws Exception {
         secEngine.processSecurityHeader(doc, null, this, crypto);
-        SOAPUtil.updateSOAPMessage(doc, message);
         if (log.isDebugEnabled()) {
             log.debug("Verfied and decrypted message:");
-            XMLUtils.PrettyElementToWriter(message.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+            log.debug(outputString);
         }
     }
 
     public void handle(Callback[] callbacks)
-            throws IOException, UnsupportedCallbackException {
+        throws IOException, UnsupportedCallbackException {
         for (int i = 0; i < callbacks.length; i++) {
             if (callbacks[i] instanceof WSPasswordCallback) {
                 WSPasswordCallback pc = (WSPasswordCallback) callbacks[i];

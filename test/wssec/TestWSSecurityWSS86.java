@@ -25,7 +25,6 @@ import org.apache.axis.MessageContext;
 import org.apache.axis.client.AxisClient;
 import org.apache.axis.configuration.NullProvider;
 import org.apache.axis.message.SOAPEnvelope;
-import org.apache.axis.utils.XMLUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSPasswordCallback;
@@ -43,7 +42,6 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PrintWriter;
 
 /**
  * This is a test for WSS-86 - "CryptoBase.splitAndTrim does not take into account the format of a 
@@ -166,7 +164,9 @@ public class TestWSSecurityWSS86 extends TestCase implements CallbackHandler {
         
         Message signedMsg = SOAPUtil.toAxisMessage(signedDoc);
         if (log.isDebugEnabled()) {
-            XMLUtils.PrettyElementToWriter(signedMsg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+            log.debug(outputString);
         }
         signedDoc = signedMsg.getSOAPEnvelope().getAsDocument();
         
@@ -182,10 +182,11 @@ public class TestWSSecurityWSS86 extends TestCase implements CallbackHandler {
      */
     private void verify(Document doc) throws Exception {
         secEngine.processSecurityHeader(doc, null, this, crypto);
-        SOAPUtil.updateSOAPMessage(doc, message);
         if (log.isDebugEnabled()) {
             log.debug("Verfied and decrypted message:");
-            XMLUtils.PrettyElementToWriter(message.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+            log.debug(outputString);
         }
     }
 

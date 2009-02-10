@@ -24,7 +24,6 @@ import org.apache.axis.MessageContext;
 import org.apache.axis.client.AxisClient;
 import org.apache.axis.configuration.NullProvider;
 import org.apache.axis.message.SOAPEnvelope;
-import org.apache.axis.utils.XMLUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
@@ -46,7 +45,6 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PrintWriter;
 
 /**
  * TestCase10 for testing HMAC_SHA1 in wss4j. Based on TestCase9.
@@ -72,8 +70,6 @@ public class TestWSSecurityNew10 extends TestCase implements CallbackHandler {
 
     Message message;
 
-    // private byte[] sharedSecret = "SriLankaSriLankaSriLanka".getBytes();
-
     /**
      * TestWSSecurity constructor <p/>
      * 
@@ -93,15 +89,6 @@ public class TestWSSecurityNew10 extends TestCase implements CallbackHandler {
         return new TestSuite(TestWSSecurityNew10.class);
     }
 
-    /**
-     * Main method <p/>
-     * 
-     * @param args
-     *            command line args
-     */
-    // public static void main(String[] args) {
-    // junit.textui.TestRunner.run(suite());
-    // }
     /**
      * Setup method <p/>
      * 
@@ -186,34 +173,14 @@ public class TestWSSecurityNew10 extends TestCase implements CallbackHandler {
         // Step 4 :: Encrypting using the key.
         Document encDoc = wsEncrypt.build(doc, crypto, secHeader);
 
-        /*
-         * convert the resulting document into a message first. The
-         * toAxisMessage() mehtod performs the necessary c14n call to properly
-         * set up the signed document and convert it into a SOAP message. After
-         * that we extract it as a document again for further processing.
-         */
-
-        Message signedMsg = SOAPUtil.toAxisMessage(encDoc);
-
         if (log.isDebugEnabled()) {
-            XMLUtils.PrettyElementToWriter(signedMsg.getSOAPEnvelope()
-                    .getAsDOM(), new PrintWriter(System.out));
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(encDoc);
+            log.debug(outputString);
         }
         log.info("Encryption Done\n");
-        // verifyEMBED_SECURITY_TOKEN_REF(signedMsg.getSOAPEnvelope().getAsDocument());
     }
 
-    /**
-     * Verifies the soap envelope <p/>
-     * 
-     * @param doc
-     * @throws Exception
-     *             Thrown when there is a problem in verification
-     */
-//    private void verifyEMBED_SECURITY_TOKEN_REF(Document doc) throws Exception {
-//        secEngine.processSecurityHeader(doc, "", this, null);
-//        log.info("Success ......");
-//    }
 
     /*
      * (non-Javadoc)
@@ -221,7 +188,7 @@ public class TestWSSecurityNew10 extends TestCase implements CallbackHandler {
      * @see javax.security.auth.callback.CallbackHandler#handle(javax.security.auth.callback.Callback[])
      */
     public void handle(Callback[] callbacks) throws IOException,
-            UnsupportedCallbackException {
+        UnsupportedCallbackException {
         for (int i = 0; i < callbacks.length; i++) {
             if (callbacks[i] instanceof WSPasswordCallback) {
                 WSPasswordCallback pc = (WSPasswordCallback) callbacks[i];

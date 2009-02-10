@@ -16,31 +16,34 @@
  */
 package org.apache.ws.security.conversation;
 
+import javax.xml.namespace.QName;
+
 /**
  * Class ConversationConstants
  */
 public class ConversationConstants {
 
-    public final static int VERSION_05_02 = 1;
+    public static final int VERSION_05_02 = 1;
     
-    public final static int VERSION_05_12 = 2;
+    public static final int VERSION_05_12 = 2;
     
-    public final static int DEFAULT_VERSION = VERSION_05_02; 
+    public static final int DEFAULT_VERSION = VERSION_05_02; 
     
     /**
      * WS-SecConv Feb 2005 version
      */
-    public final static String WSC_NS_05_02 = "http://schemas.xmlsoap.org/ws/2005/02/sc"; 
+    public static final String WSC_NS_05_02 = "http://schemas.xmlsoap.org/ws/2005/02/sc"; 
     
     /**
      * WS-Sx version
      */
-    public final static String WSC_NS_05_12 = "http://docs.oasis-open.org/ws-sx/ws-secureconversation/200512";
+    public static final String WSC_NS_05_12 = 
+        "http://docs.oasis-open.org/ws-sx/ws-secureconversation/200512";
     
     /**
      * Token type of DerivedKeyToken
      */
-    public final static String TOKEN_TYPE_DERIVED_KEY_TOKEN =  "/dk";
+    public static final String TOKEN_TYPE_DERIVED_KEY_TOKEN =  "/dk";
     
     /**
      * Token type of SecurityContextToken
@@ -50,7 +53,7 @@ public class ConversationConstants {
     /**
      * Field WSC_PREFIX
      */
-    public final static String WSC_PREFIX = "wsc";
+    public static final String WSC_PREFIX = "wsc";
 
     /**
      * Field SECURITY_CONTEXT_TOKEN_LN
@@ -124,23 +127,47 @@ public class ConversationConstants {
     public static final int DK_SIGN = 1;
     public static final int DK_ENCRYPT = 2;
     
-    public final static String DEFAULT_LABEL = "WS-SecureConversation";
+    public static final String DEFAULT_LABEL = "WS-SecureConversation";
+    
+    public static final QName SECURITY_CTX_TOKEN_QNAME_05_02 =
+        new QName(
+            ConversationConstants.WSC_NS_05_02, 
+            ConversationConstants.SECURITY_CONTEXT_TOKEN_LN
+        );
+    
+    public static final QName SECURITY_CTX_TOKEN_QNAME_05_12 =
+        new QName(
+            ConversationConstants.WSC_NS_05_12, 
+            ConversationConstants.SECURITY_CONTEXT_TOKEN_LN
+        );
+
+    public static final QName DERIVED_KEY_TOKEN_QNAME_05_02 =
+        new QName(
+            ConversationConstants.WSC_NS_05_02, 
+            ConversationConstants.DERIVED_KEY_TOKEN_LN
+        );
+    
+    public static final QName DERIVED_KEY_TOKEN_QNAME_05_12 =
+        new QName(
+            ConversationConstants.WSC_NS_05_12, 
+            ConversationConstants.DERIVED_KEY_TOKEN_LN
+        );
     
     /**
      * Key to hold the map of security context identifiers against the 
      * service epr addresses (service scope) or wsa:Action values (operation 
      * scope).
      */
-    public final static String KEY_CONTEXT_MAP = "contextMap";
+    public static final String KEY_CONTEXT_MAP = "contextMap";
     
     public interface DerivationAlgorithm {
-        public final static String P_SHA_1 = "http://schemas.xmlsoap.org/ws/2005/02/sc/dk/p_sha1";
+        public static final String P_SHA_1 = "http://schemas.xmlsoap.org/ws/2005/02/sc/dk/p_sha1";
     }
     
     public static String getWSCNs(int version) throws ConversationException {
-        if(VERSION_05_02 == version) {
+        if (VERSION_05_02 == version) {
             return WSC_NS_05_02;
-        } else if(VERSION_05_12 == version) {
+        } else if (VERSION_05_12 == version) {
             return WSC_NS_05_12;
         } else {
             throw new ConversationException("unsupportedSecConvVersion");
@@ -148,9 +175,9 @@ public class ConversationConstants {
     }
     
     public static int getWSTVersion(String ns) throws ConversationException {
-        if(WSC_NS_05_02.equals(ns)) {
+        if (WSC_NS_05_02.equals(ns)) {
             return VERSION_05_02;
-        } else if(WSC_NS_05_12.equals(ns)) {
+        } else if (WSC_NS_05_12.equals(ns)) {
             return VERSION_05_12;
         } else {
             throw new ConversationException("unsupportedSecConvVersion");

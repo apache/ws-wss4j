@@ -79,7 +79,6 @@ public class WSSecDKEncrypt extends WSSecDerivedKeyBase {
 
         SecretKey key = WSSecurityUtil.prepareSecretKey(this.symEncAlgo, secretKey);
         
-        
         XMLCipher xmlCipher = null;
         try {
             xmlCipher = XMLCipher.getInstance(symEncAlgo);
@@ -127,11 +126,11 @@ public class WSSecDKEncrypt extends WSSecDerivedKeyBase {
             String xencEncryptedDataId = "EncDataId-" + body.hashCode();
 
             /*
-             * Forth step: encrypt data, and set necessary attributes in
+             * Fourth step: encrypt data, and set necessary attributes in
              * xenc:EncryptedData
              */
             try {
-                //Create the SecurityTokenRef to the DKT
+                // Create the SecurityTokenRef to the DKT
                 KeyInfo keyInfo = new KeyInfo(document);
                 SecurityTokenReference secToken = new SecurityTokenReference(document);
                 Reference ref = new Reference(document);
@@ -187,9 +186,7 @@ public class WSSecDKEncrypt extends WSSecDerivedKeyBase {
     public Element encryptForExternalRef(Element dataRef, Vector references)
             throws WSSecurityException {
 
-
-        Vector encDataRefs = doEncryption(document, derivedKeyBytes,
-                references);
+        Vector encDataRefs = doEncryption(document, derivedKeyBytes, references);
         Element referenceList = dataRef;
         if (referenceList == null) {
             referenceList = document.createElementNS(WSConstants.ENC_NS,
@@ -213,14 +210,13 @@ public class WSSecDKEncrypt extends WSSecDerivedKeyBase {
      */
     public void addExternalRefElement(Element referenceList, WSSecHeader secHeader) {
         Node node = dkt.getElement().getNextSibling();
-        if(node == null || (node != null && !(node instanceof Element))) {
-            //If (at this moment) DerivedKeyToken is the LAST element of 
-            //the security header 
-            secHeader.getSecurityHeader().appendChild(referenceList);
-        } else {
+        if (node instanceof Element) {
             secHeader.getSecurityHeader().insertBefore(referenceList, node);
+        } else {
+            // If (at this moment) DerivedKeyToken is the LAST element of 
+            // the security header 
+            secHeader.getSecurityHeader().appendChild(referenceList);
         }
-        
     }
 
     public static Element createDataRefList(Document doc,

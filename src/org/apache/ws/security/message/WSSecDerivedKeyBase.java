@@ -62,7 +62,6 @@ public abstract class WSSecDerivedKeyBase extends WSSecBase {
      * wsu:Id of the wsc:DerivedKeyToken
      */
     protected String dktId = null;
-    
 
     /**
      * Client's label value
@@ -180,7 +179,7 @@ public abstract class WSSecDerivedKeyBase extends WSSecBase {
         document = doc;
 
         //Create the derived keys
-        //At this point figure out the key length accordng to teh symencAlgo
+        //At this point figure out the key length according to the symencAlgo
         int offset = 0;
         int length = this.getDerivedKeyLength();
         byte[] label;
@@ -195,10 +194,10 @@ public abstract class WSSecDerivedKeyBase extends WSSecBase {
         System.arraycopy(label, 0, seed, 0, label.length);
         System.arraycopy(nonce, 0, seed, label.length, nonce.length);
         
-        DerivationAlgorithm algo = AlgoFactory.getInstance(ConversationConstants.DerivationAlgorithm.P_SHA_1);
+        DerivationAlgorithm algo = 
+            AlgoFactory.getInstance(ConversationConstants.DerivationAlgorithm.P_SHA_1);
         
         this.derivedKeyBytes = algo.createKey(this.ephemeralKey, seed, offset, length);
-        
         
         //Add the DKTs
         dkt = new DerivedKeyToken(this.wscVersion, document);
@@ -210,12 +209,12 @@ public abstract class WSSecDerivedKeyBase extends WSSecBase {
         
         dkt.setID(dktId);
         
-        if(this.strElem == null) {
+        if (this.strElem == null) {
             //Create the SecurityTokenRef to the Encrypted Key
             SecurityTokenReference strEncKey = new SecurityTokenReference(document);
             Reference ref = new Reference(document);
             ref.setURI("#" + this.tokenIdentifier);
-            if(this.customValueType != null && this.customValueType.trim().length() > 0) {
+            if (this.customValueType != null && this.customValueType.trim().length() > 0) {
                 ref.setValueType(this.customValueType);
             }
             strEncKey.setReference(ref);
@@ -232,7 +231,7 @@ public abstract class WSSecDerivedKeyBase extends WSSecBase {
      * header.
      * 
      * The method can be called any time after <code>prepare()</code>. This
-     * allows to insert the DereivedKey element at any position in the Security
+     * allows to insert the DerivedKey element at any position in the Security
      * header.
      * 
      * @param secHeader

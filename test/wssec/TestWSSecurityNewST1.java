@@ -27,7 +27,6 @@ import org.apache.ws.security.saml.SAMLIssuer;
 import org.apache.axis.Message;
 import org.apache.axis.MessageContext;
 import org.apache.axis.client.AxisClient;
-import org.apache.axis.utils.XMLUtils;
 import org.apache.axis.configuration.NullProvider;
 import org.apache.axis.message.SOAPEnvelope;
 import org.apache.commons.logging.Log;
@@ -46,7 +45,6 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PrintWriter;
 
 /**
  * WS-Security Test Case
@@ -153,14 +151,16 @@ public class TestWSSecurityNewST1 extends TestCase implements CallbackHandler {
          * convert the resulting document into a message first. The toAxisMessage()
          * method performs the necessary c14n call to properly set up the signed
          * document and convert it into a SOAP message. Check that the contents can't
-          * be read (cheching if we can find a specific substring). After that we extract it
+          * be read (checking if we can find a specific substring). After that we extract it
          * as a document again for further processing.
          */
 
         Message signedMsg = SOAPUtil.toAxisMessage(signedDoc);
         if (log.isDebugEnabled()) {
             log.debug("Unsigned SAML message (sender vouches):");
-            XMLUtils.PrettyElementToWriter(signedMsg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+            log.debug(outputString);
         }
         // String encryptedString = signedMsg.getSOAPPartAsString();
         signedDoc = signedMsg.getSOAPEnvelope().getAsDocument();
@@ -177,13 +177,13 @@ public class TestWSSecurityNewST1 extends TestCase implements CallbackHandler {
      */
     private void verify(Document doc) throws Exception {
         secEngine.processSecurityHeader(doc, null, this, null);
-        SOAPUtil.updateSOAPMessage(doc, message);
-        String decryptedString = message.getSOAPPartAsString();
-        assertTrue(decryptedString.indexOf("LogTestService2") > 0 ? true : false);
+        String outputString = 
+            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+        assertTrue(outputString.indexOf("LogTestService2") > 0 ? true : false);
     }
 
     public void handle(Callback[] callbacks)
-            throws IOException, UnsupportedCallbackException {
+        throws IOException, UnsupportedCallbackException {
         for (int i = 0; i < callbacks.length; i++) {
             if (callbacks[i] instanceof WSPasswordCallback) {
                 WSPasswordCallback pc = (WSPasswordCallback) callbacks[i];

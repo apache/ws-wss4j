@@ -23,7 +23,6 @@ import junit.framework.TestSuite;
 import org.apache.axis.Message;
 import org.apache.axis.MessageContext;
 import org.apache.axis.client.AxisClient;
-import org.apache.axis.utils.XMLUtils;
 import org.apache.axis.configuration.NullProvider;
 import org.apache.axis.message.SOAPEnvelope;
 import org.apache.commons.logging.Log;
@@ -47,7 +46,6 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PrintWriter;
 
 import java.util.Vector;
 
@@ -208,8 +206,9 @@ public class TestWSSecurityNew15 extends TestCase implements CallbackHandler {
         Message encryptedMsg = SOAPUtil.toAxisMessage(encryptedDoc);
         if (log.isDebugEnabled()) {
             log.debug("Encrypted message, RSA-15 keytransport, 3DES:");
-            XMLUtils.PrettyElementToWriter(encryptedMsg.getSOAPEnvelope()
-                    .getAsDOM(), new PrintWriter(System.out));
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(encryptedDoc);
+            log.debug(outputString);
         }
         String encryptedString = encryptedMsg.getSOAPPartAsString();
         assertTrue(encryptedString.indexOf("LogTestService2") == -1 ? true
@@ -227,12 +226,12 @@ public class TestWSSecurityNew15 extends TestCase implements CallbackHandler {
      */
     private void verify(Document doc) throws Exception {
         secEngine.processSecurityHeader(doc, null, this, crypto);
-        SOAPUtil.updateSOAPMessage(doc, message);
-        String decryptedString = message.getSOAPPartAsString();
+        String outputString = 
+            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
         if (log.isDebugEnabled()) {
-            System.out.println("\n" + decryptedString + "\n");
+            System.out.println("\n" + outputString + "\n");
         }
-        assertTrue(decryptedString.indexOf("LogTestService2") > 0 ? true
+        assertTrue(outputString.indexOf("LogTestService2") > 0 ? true
                 : false);
     }
 

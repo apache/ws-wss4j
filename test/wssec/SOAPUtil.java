@@ -7,7 +7,6 @@ import org.apache.axis.Message;
 
 import javax.xml.soap.MessageFactory;
 import javax.xml.soap.SOAPMessage;
-import javax.xml.transform.dom.DOMSource;
 import java.io.ByteArrayInputStream;
 
 public class SOAPUtil {
@@ -45,20 +44,4 @@ public class SOAPUtil {
         return new Message(in);
     }
 
-    /**
-     * Update soap message.
-     * <p/>
-     *
-     * @param doc
-     * @param message
-     * @return
-     * @throws Exception
-     */
-    public static SOAPMessage updateSOAPMessage(Document doc,
-                                                SOAPMessage message)
-            throws Exception {
-        DOMSource domSource = new DOMSource(doc);
-        message.getSOAPPart().setContent(domSource);
-        return message;
-    }
 }

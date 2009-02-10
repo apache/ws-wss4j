@@ -22,7 +22,6 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 import org.apache.axis.Message;
 import org.apache.axis.MessageContext;
-import org.apache.axis.utils.XMLUtils;
 import org.apache.axis.client.AxisClient;
 import org.apache.axis.configuration.NullProvider;
 import org.apache.axis.message.SOAPEnvelope;
@@ -44,7 +43,6 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PrintWriter;
 import java.security.MessageDigest;
 
 
@@ -157,7 +155,9 @@ public class TestWSSecurityNew5 extends TestCase implements CallbackHandler {
         Message signedMsg = SOAPUtil.toAxisMessage(signedDoc);
         if (log.isDebugEnabled()) {
             log.debug("Message with UserNameToken PW Digest:");
-            XMLUtils.PrettyElementToWriter(signedMsg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+            log.debug(outputString);
         }
         signedDoc = signedMsg.getSOAPEnvelope().getAsDocument();
         log.info("After adding UsernameToken PW Digest....");
@@ -187,7 +187,9 @@ public class TestWSSecurityNew5 extends TestCase implements CallbackHandler {
         Message signedMsg = SOAPUtil.toAxisMessage(signedDoc);
         if (log.isDebugEnabled()) {
             log.debug("Message with UserNameToken PW Digest:");
-            XMLUtils.PrettyElementToWriter(signedMsg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+            log.debug(outputString);
         }
         signedDoc = signedMsg.getSOAPEnvelope().getAsDocument();
         log.info("After adding UsernameToken PW Digest....");
@@ -225,7 +227,9 @@ public class TestWSSecurityNew5 extends TestCase implements CallbackHandler {
         Message signedMsg = SOAPUtil.toAxisMessage(signedDoc);
         if (log.isDebugEnabled()) {
             log.debug("Message with UserNameToken PW Digest:");
-            XMLUtils.PrettyElementToWriter(signedMsg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+            log.debug(outputString);
         }
         signedDoc = signedMsg.getSOAPEnvelope().getAsDocument();
         log.info("After adding UsernameToken PW Digest....");
@@ -254,7 +258,9 @@ public class TestWSSecurityNew5 extends TestCase implements CallbackHandler {
         Message signedMsg = SOAPUtil.toAxisMessage(signedDoc);
         if (log.isDebugEnabled()) {
             log.debug("Message with UserNameToken PW Text:");
-            XMLUtils.PrettyElementToWriter(signedMsg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+            log.debug(outputString);
         }
         signedDoc = signedMsg.getSOAPEnvelope().getAsDocument();
         log.info("After adding UsernameToken PW Text....");
@@ -281,10 +287,11 @@ public class TestWSSecurityNew5 extends TestCase implements CallbackHandler {
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         Document signedDoc = builder.build(doc, secHeader);
-        Message signedMsg = SOAPUtil.toAxisMessage(signedDoc);
         if (log.isDebugEnabled()) {
             log.debug("Message with UserNameToken PW Text:");
-            XMLUtils.PrettyElementToWriter(signedMsg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+            log.debug(outputString);
         }
     }
     
@@ -304,7 +311,9 @@ public class TestWSSecurityNew5 extends TestCase implements CallbackHandler {
         Message signedMsg = SOAPUtil.toAxisMessage(signedDoc);
         if (log.isDebugEnabled()) {
             log.debug("Message with UserNameToken PW Text:");
-            XMLUtils.PrettyElementToWriter(signedMsg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+            log.debug(outputString);
         }
         signedDoc = signedMsg.getSOAPEnvelope().getAsDocument();
         log.info("After adding UsernameToken PW Text....");
@@ -332,8 +341,9 @@ public class TestWSSecurityNew5 extends TestCase implements CallbackHandler {
         SOAPEnvelope utEnvelope = msg.getSOAPEnvelope();
         Document doc = utEnvelope.getAsDocument();
         if (log.isDebugEnabled()) {
-            Message utMsg = SOAPUtil.toAxisMessage(doc);
-            XMLUtils.PrettyElementToWriter(utMsg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+            log.debug(outputString);
         }
         verify(doc);
     }
@@ -352,7 +362,9 @@ public class TestWSSecurityNew5 extends TestCase implements CallbackHandler {
         Document signedDoc = builder.build(doc, secHeader);
         Message signedMsg = SOAPUtil.toAxisMessage(signedDoc);
         if (log.isDebugEnabled()) {
-            XMLUtils.PrettyElementToWriter(signedMsg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+            log.debug(outputString);
         }
         signedDoc = signedMsg.getSOAPEnvelope().getAsDocument();
         try {
@@ -382,7 +394,9 @@ public class TestWSSecurityNew5 extends TestCase implements CallbackHandler {
         
         if (log.isDebugEnabled()) {
             log.debug("Message with UserNameToken PW Text:");
-            XMLUtils.PrettyElementToWriter(signedMsg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+            log.debug(outputString);
         }
         
         signedDoc = signedMsg.getSOAPEnvelope().getAsDocument();
@@ -413,7 +427,9 @@ public class TestWSSecurityNew5 extends TestCase implements CallbackHandler {
         
         if (log.isDebugEnabled()) {
             log.debug("Message with UserNameToken PW Text:");
-            XMLUtils.PrettyElementToWriter(signedMsg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+            log.debug(outputString);
         }
         
         signedDoc = signedMsg.getSOAPEnvelope().getAsDocument();

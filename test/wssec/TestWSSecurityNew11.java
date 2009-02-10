@@ -25,7 +25,6 @@ import org.apache.axis.MessageContext;
 import org.apache.axis.client.AxisClient;
 import org.apache.axis.configuration.NullProvider;
 import org.apache.axis.message.SOAPEnvelope;
-import org.apache.axis.utils.XMLUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.SOAPConstants;
@@ -42,7 +41,6 @@ import org.w3c.dom.Document;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.io.PrintWriter;
 import java.util.Vector;
 
 /**
@@ -171,7 +169,9 @@ public class TestWSSecurityNew11 extends TestCase {
         Message signedMsg = SOAPUtil.toAxisMessage(signedDoc);
         if (log.isDebugEnabled()) {
             log.debug("Signed message with STR DirectReference key identifier:");
-            XMLUtils.PrettyElementToWriter(signedMsg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+            log.debug(outputString);
         }
         signedDoc = signedMsg.getSOAPEnvelope().getAsDocument();
         log.info("After Signing STR DirectReference....");
@@ -231,64 +231,15 @@ public class TestWSSecurityNew11 extends TestCase {
         Message signedMsg = SOAPUtil.toAxisMessage(signedDoc);
         if (log.isDebugEnabled()) {
             log.debug("Signed message with STR DirectReference key identifier:");
-            XMLUtils.PrettyElementToWriter(signedMsg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+            log.debug(outputString);
         }
         signedDoc = signedMsg.getSOAPEnvelope().getAsDocument();
         log.info("After Signing STR DirectReference....");
         verify(signedDoc);
     }
 
-    /**
-     * Test that signs and verifies a WS-Security envelope.
-     * This test uses the IssuerSerialDirect reference key identifier (certificate included
-     * as a BinarySecurityToken (BST) in the message) but identified with IssuerSerialNumber
-     * and <b>not</b> with a Reference (relative URI). The test signs the message
-     * body (SOAP Body) and uses the STRTransform to sign the embedded certificate
-     * <p/>
-     * 
-     * @throws java.lang.Exception Thrown when there is any problem in signing or verification
-     */
-//    public void testX509SignatureISDirectSTR() throws Exception {
-//        SOAPEnvelope envelope = null;
-//        WSSignEnvelope builder = new WSSignEnvelope();
-//        builder.setUserInfo("wss4jcert", "security");
-//        // builder.setUserInfo("john", "keypass");
-//        SOAPConstants soapConstants = WSSecurityUtil.getSOAPConstants(unsignedEnvelope);
-//        Vector parts = new Vector();
-//        
-//        /*
-//         * Set up to sign body and use STRTransorm to sign
-//         * the signature token (e.g. X.509 certificate)
-//         */
-//        WSEncryptionPart encP =
-//            new WSEncryptionPart(
-//                soapConstants.getBodyQName().getLocalPart(),    // define the body
-//                soapConstants.getEnvelopeURI(),
-//                "Content");
-//        parts.add(encP);
-//        encP =
-//            new WSEncryptionPart(
-//                "STRTransform",                // reserved word to use STRTransform
-//                soapConstants.getEnvelopeURI(),
-//                "Content");
-//        parts.add(encP);
-//
-//        builder.setParts(parts);
-//        builder.setKeyIdentifierType(WSConstants.ISSUER_SERIAL_DIRECT);
-//
-//        log.info("Before Signing STR ISDirect....");
-//        Document doc = unsignedEnvelope.getAsDocument();
-//        Document signedDoc = builder.build(doc, crypto);
-//
-//        Message signedMsg = (Message) SOAPUtil.toSOAPMessage(signedDoc);
-//        if (log.isDebugEnabled()) {
-//            log.debug("Signed message with STR IssuerSerialDirect key identifier:");
-//            XMLUtils.PrettyElementToWriter(signedMsg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
-//        }
-//        signedDoc = signedMsg.getSOAPEnvelope().getAsDocument();
-//        log.info("After Signing STR ISDirect....");
-//        verify(signedDoc);
-//    }
 
     /**
      * Test that signs and verifies a WS-Security envelope.
@@ -299,8 +250,6 @@ public class TestWSSecurityNew11 extends TestCase {
      * 
      * @throws java.lang.Exception Thrown when there is any problem in signing or verification
      */
-    
-
     public void testX509SignatureISSTR() throws Exception {
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("wss4jcert", "security");
@@ -339,7 +288,9 @@ public class TestWSSecurityNew11 extends TestCase {
         Message signedMsg = (Message) SOAPUtil.toAxisMessage(signedDoc);
         if (log.isDebugEnabled()) {
             log.debug("Signed message with STR IssuerSerial key identifier:");
-            XMLUtils.PrettyElementToWriter(signedMsg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+            log.debug(outputString);
         }
         signedDoc = signedMsg.getSOAPEnvelope().getAsDocument();
         log.info("After Signing STR IS....");
@@ -355,8 +306,6 @@ public class TestWSSecurityNew11 extends TestCase {
      * 
      * @throws java.lang.Exception Thrown when there is any problem in signing or verification
      */
-    
-
     public void testX509SignatureSKISTR() throws Exception {
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("wss4jcert", "security");
@@ -395,64 +344,14 @@ public class TestWSSecurityNew11 extends TestCase {
         Message signedMsg = (Message) SOAPUtil.toAxisMessage(signedDoc);
         if (log.isDebugEnabled()) {
             log.debug("Signed message with STR SKI key identifier:");
-            XMLUtils.PrettyElementToWriter(signedMsg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+            log.debug(outputString);
         }
         signedDoc = signedMsg.getSOAPEnvelope().getAsDocument();
         log.info("After Signing STR SKI....");
         verify(signedDoc);
     }
-
-    /**
-     * Test that signs and verifies a WS-Security envelope.
-     * This test uses the SubjectKeyIdentifierDirect key identifier (certificate included
-     * in the message).
-     * <p/>
-     * 
-     * @throws java.lang.Exception Thrown when there is any problem in signing or verification
-     */
-    
-
-//    public void testX509SignatureSKIDirectSTR() throws Exception {
-//        SOAPEnvelope envelope = null;
-//        WSSignEnvelope builder = new WSSignEnvelope();
-//        builder.setUserInfo("wss4jcert", "security");
-//        // builder.setUserInfo("john", "keypass");
-//        SOAPConstants soapConstants = WSSecurityUtil.getSOAPConstants(unsignedEnvelope);
-//        Vector parts = new Vector();
-//        
-//        /*
-//         * Set up to sign body and use STRTransorm to sign
-//         * the signature token (e.g. X.509 certificate)
-//         */
-//        WSEncryptionPart encP =
-//            new WSEncryptionPart(
-//                soapConstants.getBodyQName().getLocalPart(),    // define the body
-//                soapConstants.getEnvelopeURI(),
-//                "Content");
-//        parts.add(encP);
-//        encP =
-//            new WSEncryptionPart(
-//                "STRTransform",                // reserved word to use STRTransform
-//                soapConstants.getEnvelopeURI(),
-//                "Content");
-//        parts.add(encP);
-//
-//        builder.setParts(parts);
-//        builder.setKeyIdentifierType(WSConstants.SKI_KEY_IDENTIFIER_DIRECT);
-//
-//        log.info("Before Signing STR SKIDirect....");
-//        Document doc = unsignedEnvelope.getAsDocument();
-//        Document signedDoc = builder.build(doc, crypto);
-//
-//        Message signedMsg = (Message) SOAPUtil.toSOAPMessage(signedDoc);
-//        if (log.isDebugEnabled()) {
-//            log.debug("Signed message with STR SKIDirect key identifier:");
-//            XMLUtils.PrettyElementToWriter(signedMsg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
-//        }
-//        signedDoc = signedMsg.getSOAPEnvelope().getAsDocument();
-//        log.info("After Signing STR SKIDirect....");
-//        verify(signedDoc);
-//    }
 
 
     /**

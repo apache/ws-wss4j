@@ -91,7 +91,7 @@ public class WSSecUsernameToken extends WSSecBase {
     /**
      * Add a derived key to the UsernameToken
      * @param useMac whether the derived key is to be used for a MAC or not
-     * @param saltValue The saltvalue to use
+     * @param saltValue The salt value to use
      * @param iteration The number of iterations to use in deriving a key
      */
     public void addDerivedKey(boolean useMac, byte[] saltValue, int iteration) {

@@ -87,8 +87,7 @@ public class WSSecSecurityContextToken {
     }
 
     /**
-     * @param sct
-     *            The sct to set.
+     * @param sct The sct to set.
      */
     public void setSct(SecurityContextToken sct) {
         this.sct = sct;
@@ -102,8 +101,7 @@ public class WSSecSecurityContextToken {
     }
 
     /**
-     * @param ephemeralKey
-     *            The ephemeralKey to set.
+     * @param ephemeralKey The ephemeralKey to set.
      */
     protected void setSecret(byte[] ephemeralKey) {
         this.secret = ephemeralKey;
@@ -127,7 +125,7 @@ public class WSSecSecurityContextToken {
      * @return Returns the sctId.
      */
     public String getSctId() {
-        if(this.sct != null) {
+        if (this.sct != null) {
             return this.sct.getID();
         } else {
             return this.sctId;

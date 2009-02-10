@@ -25,7 +25,6 @@ import org.apache.axis.MessageContext;
 import org.apache.axis.client.AxisClient;
 import org.apache.axis.configuration.NullProvider;
 import org.apache.axis.message.SOAPEnvelope;
-import org.apache.axis.utils.XMLUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSEncryptionPart;
@@ -48,7 +47,6 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PrintWriter;
 import java.util.Vector;
 
 /**
@@ -139,9 +137,10 @@ public class TestWSSecurityKerberosTokenProfile extends TestCase implements Call
         bst.setToken("12345678".getBytes());
         WSSecurityUtil.prependChildElement(secHeader.getSecurityHeader(), bst.getElement());
         
-        Message msg = SOAPUtil.toAxisMessage(doc);
         if (log.isDebugEnabled()) {
-            XMLUtils.PrettyElementToWriter(msg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+            log.debug(outputString);
         }
         
         assertTrue(AP_REQ.equals(bst.getValueType()));
@@ -180,9 +179,10 @@ public class TestWSSecurityKerberosTokenProfile extends TestCase implements Call
         
         Document signedDoc = sign.build(doc, crypto, secHeader);
         
-        Message msg = SOAPUtil.toAxisMessage(signedDoc);
         if (log.isDebugEnabled()) {
-            XMLUtils.PrettyElementToWriter(msg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+            log.debug(outputString);
         }
         
         verify(signedDoc);
@@ -221,9 +221,10 @@ public class TestWSSecurityKerberosTokenProfile extends TestCase implements Call
         
         Document signedDoc = sign.build(doc, crypto, secHeader);
         
-        Message msg = SOAPUtil.toAxisMessage(signedDoc);
         if (log.isDebugEnabled()) {
-            XMLUtils.PrettyElementToWriter(msg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+            log.debug(outputString);
         }
         
         verify(signedDoc);
@@ -238,15 +239,16 @@ public class TestWSSecurityKerberosTokenProfile extends TestCase implements Call
      */
     private void verify(Document doc) throws Exception {
         secEngine.processSecurityHeader(doc, null, this, crypto);
-        SOAPUtil.updateSOAPMessage(doc, message);
         if (log.isDebugEnabled()) {
             log.debug("Verfied and decrypted message:");
-            XMLUtils.PrettyElementToWriter(message.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+            log.debug(outputString);
         }
     }
 
     public void handle(Callback[] callbacks)
-            throws IOException, UnsupportedCallbackException {
+        throws IOException, UnsupportedCallbackException {
         for (int i = 0; i < callbacks.length; i++) {
             if (callbacks[i] instanceof WSPasswordCallback) {
                 WSPasswordCallback pc = (WSPasswordCallback) callbacks[i];

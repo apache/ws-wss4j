@@ -77,8 +77,7 @@ public class SecurityContextToken {
         this.element = doc.createElementNS(ns,
                 "wsc:" + ConversationConstants.SECURITY_CONTEXT_TOKEN_LN);
 
-        WSSecurityUtil.setNamespace(this.element,ns,
-                ConversationConstants.WSC_PREFIX);
+        WSSecurityUtil.setNamespace(this.element, ns, ConversationConstants.WSC_PREFIX);
 
         this.elementIdentifier = doc.createElementNS(ns,
                 "wsc:" + ConversationConstants.IDENTIFIER_LN);
@@ -116,7 +115,7 @@ public class SecurityContextToken {
     }
 
     /**
-     * This is used to create a SecurityContestToken using a DOM Element
+     * This is used to create a SecurityContextToken using a DOM Element
      *
      * @param elem The DOM element: The security context token
      * @throws WSSecurityException If the element passed in in not a security context token
@@ -126,21 +125,38 @@ public class SecurityContextToken {
         QName el = new QName(this.element.getNamespaceURI(),
                 this.element.getLocalName());
 
-        if (!el.equals(new QName(ConversationConstants.WSC_NS_05_02, ConversationConstants.SECURITY_CONTEXT_TOKEN_LN)) &&
-                !el.equals(new QName(ConversationConstants.WSC_NS_05_12, ConversationConstants.SECURITY_CONTEXT_TOKEN_LN))) {    // If the element is not a security context token
-            throw new WSSecurityException(WSSecurityException.INVALID_SECURITY_TOKEN, "badTokenType00",
-                    new Object[]{el});
+        // If the element is not a security context token, throw an exception
+        if (!(el.equals(ConversationConstants.SECURITY_CTX_TOKEN_QNAME_05_02) ||
+            el.equals(ConversationConstants.SECURITY_CTX_TOKEN_QNAME_05_12))
+        ) {
+            throw new WSSecurityException(
+                WSSecurityException.INVALID_SECURITY_TOKEN, 
+                "badTokenType00",
+                new Object[]{el}
+            );
         }
 
-        this.elementIdentifier = (Element) WSSecurityUtil.getDirectChild(
-                element, ConversationConstants.IDENTIFIER_LN, el
-                        .getNamespaceURI());
+        this.elementIdentifier = 
+            (Element) WSSecurityUtil.getDirectChild(
+                element, 
+                ConversationConstants.IDENTIFIER_LN,
+                el.getNamespaceURI()
+            );
     }
 
     /**
      * Set the identifier.
+     * @deprecated use {#link SecurityContextToken.setIdentifier(String)} instead
      */
     public void setIdentifier(Document doc, String uuid) {
+        Text node = getFirstNode(this.elementIdentifier);
+        node.setData(uuid);
+    }
+    
+    /**
+     * Set the identifier.
+     */
+    public void setIdentifier(String uuid) {
         Text node = getFirstNode(this.elementIdentifier);
         node.setData(uuid);
     }
@@ -170,7 +186,7 @@ public class SecurityContextToken {
      */
     private Text getFirstNode(Element e) {
         Node node = e.getFirstChild();
-        return ((node != null) && node instanceof Text) ? (Text) node : null;
+        return (node instanceof Text) ? (Text) node : null;
     }
 
     /**

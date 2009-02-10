@@ -57,7 +57,7 @@ public class UsernameToken {
 
     public static final String PASSWORD_TYPE = "passwordType";
     
-    private String raw_password;        // enhancment by Alberto Coletti
+    private String raw_password;        // enhancement by Alberto Coletti
 
     protected Element element = null;
 

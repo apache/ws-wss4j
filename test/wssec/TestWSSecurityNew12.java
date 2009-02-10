@@ -21,7 +21,6 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 import org.apache.axis.Message;
 import org.apache.axis.MessageContext;
-import org.apache.axis.utils.XMLUtils;
 import org.apache.axis.client.AxisClient;
 import org.apache.axis.configuration.NullProvider;
 import org.apache.axis.message.SOAPEnvelope;
@@ -39,7 +38,6 @@ import org.apache.xml.security.signature.XMLSignature;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.io.PrintWriter;
 
 
 /**
@@ -148,7 +146,9 @@ public class TestWSSecurityNew12 extends TestCase {
         Message signedMsg = SOAPUtil.toAxisMessage(signedDoc);
         if (log.isDebugEnabled()) {
             log.debug("Signed message with DSA_SKI key identifier:");
-            XMLUtils.PrettyElementToWriter(signedMsg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+            log.debug(outputString);
         }
 
         signedDoc = signedMsg.getSOAPEnvelope().getAsDocument();
@@ -189,7 +189,9 @@ public class TestWSSecurityNew12 extends TestCase {
         Message signedMsg = SOAPUtil.toAxisMessage(signedDoc);
         if (log.isDebugEnabled()) {
             log.debug("Signed message with DSA_Autodetect:");
-            XMLUtils.PrettyElementToWriter(signedMsg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+            log.debug(outputString);
         }
 
         signedDoc = signedMsg.getSOAPEnvelope().getAsDocument();
@@ -230,7 +232,9 @@ public class TestWSSecurityNew12 extends TestCase {
         Message signedMsg = SOAPUtil.toAxisMessage(signedDoc);
         if (log.isDebugEnabled()) {
             log.debug("Signed message with RSA Autodetect:");
-            XMLUtils.PrettyElementToWriter(signedMsg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+            log.debug(outputString);
         }
 
         signedDoc = signedMsg.getSOAPEnvelope().getAsDocument();

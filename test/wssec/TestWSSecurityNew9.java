@@ -26,7 +26,6 @@ import org.apache.axis.SOAPPart;
 import org.apache.axis.client.AxisClient;
 import org.apache.axis.configuration.NullProvider;
 import org.apache.axis.message.SOAPEnvelope;
-import org.apache.axis.utils.XMLUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSPasswordCallback;
@@ -46,7 +45,6 @@ import java.io.ByteArrayInputStream;
 // import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PrintWriter;
 
 /**
  * WS-Security Test Case
@@ -176,7 +174,9 @@ public class TestWSSecurityNew9 extends TestCase implements CallbackHandler {
         Message encryptedMsg = SOAPUtil.toAxisMessage(encryptedSignedDoc);
         if (log.isDebugEnabled()) {
             log.debug("Encrypted message, RSA-OAEP keytransport, 3DES:");
-            XMLUtils.PrettyElementToWriter(encryptedMsg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(encryptedSignedDoc);
+            log.debug(outputString);
         }
         String s = encryptedMsg.getSOAPPartAsString();
         ((SOAPPart)message.getSOAPPart()).setCurrentMessage(s, SOAPPart.FORM_STRING);
@@ -195,7 +195,6 @@ public class TestWSSecurityNew9 extends TestCase implements CallbackHandler {
      */
     private void verify(Document doc) throws Exception {
         secEngine.processSecurityHeader(doc, null, this, crypto);
-        SOAPUtil.updateSOAPMessage(doc, message);
     }
     
     /* (non-Javadoc)

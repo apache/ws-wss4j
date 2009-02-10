@@ -23,7 +23,6 @@ import org.apache.axis.MessageContext;
 import org.apache.axis.client.AxisClient;
 import org.apache.axis.configuration.NullProvider;
 import org.apache.axis.message.SOAPEnvelope;
-import org.apache.axis.utils.XMLUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
@@ -45,7 +44,6 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PrintWriter;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
@@ -151,16 +149,13 @@ public class TestWSSecurityNewDK extends TestCase implements CallbackHandler {
         encrKeyBuilder.prependToHeader(secHeader);
         encrKeyBuilder.prependBSTElementToHeader(secHeader);
 
-        
-       Message encryptedMsg = SOAPUtil.toAxisMessage(encryptedDoc);
-       if (log.isDebugEnabled()) {
-           log.debug("Encrypted message: 3DES  + DerivedKeys");
-           XMLUtils.PrettyElementToWriter(encryptedMsg.getSOAPEnvelope()
-                    .getAsDOM(), new PrintWriter(System.out));
-       }
-//       String out = org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(encryptedDoc);
-//       System.out.println(out);
-       verify(doc);
+        if (log.isDebugEnabled()) {
+            log.debug("Encrypted message: 3DES  + DerivedKeys");
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(encryptedDoc);
+            log.debug(outputString);
+        }
+        verify(doc);
     }
 
     /**
@@ -192,14 +187,12 @@ public class TestWSSecurityNewDK extends TestCase implements CallbackHandler {
          encrKeyBuilder.prependToHeader(secHeader);
          encrKeyBuilder.prependBSTElementToHeader(secHeader);
          
-        Message encryptedMsg = SOAPUtil.toAxisMessage(encryptedDoc);
-        if (log.isDebugEnabled()) {
-            log.debug("Encrypted message: 3DES  + DerivedKeys");
-            XMLUtils.PrettyElementToWriter(encryptedMsg.getSOAPEnvelope()
-                    .getAsDOM(), new PrintWriter(System.out));
-        }
-//        String out = org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(encryptedDoc);
-//        System.out.println(out);
+         if (log.isDebugEnabled()) {
+             log.debug("Encrypted message: 3DES  + DerivedKeys");
+             String outputString = 
+                 org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(encryptedDoc);
+             log.debug(outputString);
+         }
         verify(doc);
      }
      
@@ -228,15 +221,12 @@ public class TestWSSecurityNewDK extends TestCase implements CallbackHandler {
          encrKeyBuilder.prependToHeader(secHeader);
          encrKeyBuilder.prependBSTElementToHeader(secHeader);
          
-         Message signedMessage = SOAPUtil.toAxisMessage(doc);
          if (log.isDebugEnabled()) {
              log.debug("Encrypted message: 3DES  + DerivedKeys");
-             XMLUtils.PrettyElementToWriter(signedMessage.getSOAPEnvelope()
-                    .getAsDOM(), new PrintWriter(System.out));
+             String outputString = 
+                 org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+             log.debug(outputString);
          }
-//         String out = org.apache.ws.security.util.XMLUtils
-//                .PrettyDocumentToString(signedDoc);
-//        System.out.println(out);
          verify(doc);
      }
      
@@ -272,16 +262,12 @@ public class TestWSSecurityNewDK extends TestCase implements CallbackHandler {
         encrKeyBuilder.prependToHeader(secHeader);
         encrKeyBuilder.prependBSTElementToHeader(secHeader);
 
-        Message signedMessage = SOAPUtil.toAxisMessage(signedEncryptedDoc);
-
         if (log.isDebugEnabled()) {
             log.debug("Encrypted message: 3DES  + DerivedKeys");
-            XMLUtils.PrettyElementToWriter(signedMessage.getSOAPEnvelope()
-                    .getAsDOM(), new PrintWriter(System.out));
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedEncryptedDoc);
+            log.debug(outputString);
         }
-//        String out = org.apache.ws.security.util.XMLUtils
-//                .PrettyDocumentToString(signedEncryptedDoc);
-//        System.out.println(out);
         verify(signedEncryptedDoc);
     }
      
@@ -317,17 +303,13 @@ public class TestWSSecurityNewDK extends TestCase implements CallbackHandler {
          encrKeyBuilder.prependToHeader(secHeader);
          encrKeyBuilder.prependBSTElementToHeader(secHeader);
          
-         Message signedMessage = SOAPUtil.toAxisMessage(encryptedSignedDoc);
-         
          if (log.isDebugEnabled()) {
-            log.debug("Encrypted message: 3DES  + DerivedKeys");
-            XMLUtils.PrettyElementToWriter(signedMessage.getSOAPEnvelope()
-                    .getAsDOM(), new PrintWriter(System.out));
-        }
-        
-//         String out = org.apache.ws.security.util.XMLUtils
-//                .PrettyDocumentToString(encryptedSignedDoc);
-//         System.out.println(out);
+             log.debug("Encrypted message: 3DES  + DerivedKeys");
+             String outputString = 
+                 org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(encryptedSignedDoc);
+             log.debug(outputString);
+         }
+
          verify(encryptedSignedDoc);
      }
     
@@ -340,13 +322,13 @@ public class TestWSSecurityNewDK extends TestCase implements CallbackHandler {
      */
     private void verify(Document doc) throws Exception {
         secEngine.processSecurityHeader(doc, null, this, crypto);
-        SOAPUtil.updateSOAPMessage(doc, message);
-        String decryptedString = message.getSOAPPartAsString();
-        assertTrue(decryptedString.indexOf("LogTestService2") > 0 ? true : false);
+        String outputString = 
+            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+        assertTrue(outputString.indexOf("LogTestService2") > 0 ? true : false);
     }
 
     public void handle(Callback[] callbacks)
-            throws IOException, UnsupportedCallbackException {
+        throws IOException, UnsupportedCallbackException {
         for (int i = 0; i < callbacks.length; i++) {
             if (callbacks[i] instanceof WSPasswordCallback) {
                 WSPasswordCallback pc = (WSPasswordCallback) callbacks[i];

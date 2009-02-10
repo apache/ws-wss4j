@@ -280,8 +280,7 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
                         toSignById = WSSecurityUtil.findElementById(document
                                 .getDocumentElement(), idToSign, null);
                     }
-                    transforms
-                            .addTransform(Transforms.TRANSFORM_C14N_EXCL_OMIT_COMMENTS);
+                    transforms.addTransform(Transforms.TRANSFORM_C14N_EXCL_OMIT_COMMENTS);
                     if (wssConfig.isWsiBSPCompliant()) {
                         transforms.item(0).getElement().appendChild(
                                 new InclusiveNamespaces(document,
@@ -290,8 +289,7 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
                     }
                     sig.addDocument("#" + idToSign, transforms);
                 } else if (elemName.equals("Token")) {
-                    transforms
-                            .addTransform(Transforms.TRANSFORM_C14N_EXCL_OMIT_COMMENTS);
+                    transforms.addTransform(Transforms.TRANSFORM_C14N_EXCL_OMIT_COMMENTS);
                     if (wssConfig.isWsiBSPCompliant()) {
                         transforms.item(0).getElement().appendChild(
                                 new InclusiveNamespaces(document,
@@ -302,8 +300,7 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
                     sig.addDocument("#" + keyInfoUri, transforms);
                 } else if (elemName.equals("STRTransform")) { // STRTransform
                     Element ctx = createSTRParameter(document);
-                    transforms.addTransform(
-                            STRTransform.implementedTransformURI, ctx);
+                    transforms.addTransform(STRTransform.implementedTransformURI, ctx);
                     sig.addDocument("#" + strUri, transforms);
                 } else if (elemName.equals("Assertion")) { // Assertion
 
@@ -317,8 +314,7 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
                                 WSSecurityException.FAILURE, "noEncElement",
                                 new Object[] { nmSpace + ", " + elemName });
                     }
-                    transforms
-                            .addTransform(Transforms.TRANSFORM_C14N_EXCL_OMIT_COMMENTS);
+                    transforms.addTransform(Transforms.TRANSFORM_C14N_EXCL_OMIT_COMMENTS);
                     if (wssConfig.isWsiBSPCompliant()) {
                         transforms.item(0).getElement().appendChild(
                                 new InclusiveNamespaces(document,
@@ -338,8 +334,7 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
                                 WSSecurityException.FAILURE, "noEncElement",
                                 new Object[] { nmSpace + ", " + elemName });
                     }
-                    transforms
-                            .addTransform(Transforms.TRANSFORM_C14N_EXCL_OMIT_COMMENTS);
+                    transforms.addTransform(Transforms.TRANSFORM_C14N_EXCL_OMIT_COMMENTS);
                     if (wssConfig.isWsiBSPCompliant()) {
                         transforms.item(0).getElement().appendChild(
                                 new InclusiveNamespaces(document,
@@ -408,6 +403,7 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
     public Element getSignatureElement() {
         return this.sig.getElement();
     }
+    
     /**
      * Compute the Signature over the references.
      * 

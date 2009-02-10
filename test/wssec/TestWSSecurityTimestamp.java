@@ -25,7 +25,6 @@ import org.apache.axis.MessageContext;
 import org.apache.axis.client.AxisClient;
 import org.apache.axis.configuration.NullProvider;
 import org.apache.axis.message.SOAPEnvelope;
-import org.apache.axis.utils.XMLUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
@@ -41,7 +40,6 @@ import org.w3c.dom.Document;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.io.PrintWriter;
 import java.util.Vector;
 
 /**
@@ -128,7 +126,9 @@ public class TestWSSecurityTimestamp extends TestCase {
 
         Message msg = SOAPUtil.toAxisMessage(createdDoc);
         if (log.isDebugEnabled()) {
-            XMLUtils.PrettyElementToWriter(msg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(createdDoc);
+            log.debug(outputString);
         }
         
         createdDoc = msg.getSOAPEnvelope().getAsDocument();
@@ -166,7 +166,9 @@ public class TestWSSecurityTimestamp extends TestCase {
 
         Message msg = SOAPUtil.toAxisMessage(createdDoc);
         if (log.isDebugEnabled()) {
-            XMLUtils.PrettyElementToWriter(msg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(createdDoc);
+            log.debug(outputString);
         }
         
         createdDoc = msg.getSOAPEnvelope().getAsDocument();
@@ -204,7 +206,9 @@ public class TestWSSecurityTimestamp extends TestCase {
 
         Message msg = SOAPUtil.toAxisMessage(createdDoc);
         if (log.isDebugEnabled()) {
-            XMLUtils.PrettyElementToWriter(msg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(createdDoc);
+            log.debug(outputString);
         }
         
         createdDoc = msg.getSOAPEnvelope().getAsDocument();
@@ -236,7 +240,9 @@ public class TestWSSecurityTimestamp extends TestCase {
 
         Message msg = SOAPUtil.toAxisMessage(createdDoc);
         if (log.isDebugEnabled()) {
-            XMLUtils.PrettyElementToWriter(msg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(createdDoc);
+            log.debug(outputString);
         }
         
         createdDoc = msg.getSOAPEnvelope().getAsDocument();

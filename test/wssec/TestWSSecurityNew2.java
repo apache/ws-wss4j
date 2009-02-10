@@ -23,7 +23,6 @@ import junit.framework.TestSuite;
 import org.apache.axis.Message;
 import org.apache.axis.MessageContext;
 import org.apache.axis.client.AxisClient;
-import org.apache.axis.utils.XMLUtils;
 import org.apache.axis.configuration.NullProvider;
 import org.apache.axis.message.SOAPEnvelope;
 import org.apache.commons.logging.Log;
@@ -46,7 +45,6 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PrintWriter;
 
 import java.util.Vector;
 
@@ -133,7 +131,7 @@ public class TestWSSecurityNew2 extends TestCase implements CallbackHandler {
 
     /**
      * Test that encrypt and decrypt a WS-Security envelope.
-     * This test uses the RSA_15 alogrithm to transport (wrap) the symmetric
+     * This test uses the RSA_15 algorithm to transport (wrap) the symmetric
      * key.
      * <p/>
      * 
@@ -163,7 +161,9 @@ public class TestWSSecurityNew2 extends TestCase implements CallbackHandler {
         Message encryptedMsg = SOAPUtil.toAxisMessage(encryptedDoc);
         if (log.isDebugEnabled()) {
             log.debug("Encrypted message, RSA-15 keytransport, 3DES:");
-            XMLUtils.PrettyElementToWriter(encryptedMsg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(encryptedDoc);
+            log.debug(outputString);
         }
         String encryptedString = encryptedMsg.getSOAPPartAsString();
         assertTrue(encryptedString.indexOf("LogTestService2") == -1 ? true : false);
@@ -194,7 +194,9 @@ public class TestWSSecurityNew2 extends TestCase implements CallbackHandler {
         encryptedMsg = (Message) SOAPUtil.toAxisMessage(encryptedDoc);
         if (log.isDebugEnabled()) {
             log.debug("Encrypted message, RSA-15 keytransport, AES 128:");
-            XMLUtils.PrettyElementToWriter(encryptedMsg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(encryptedDoc);
+            log.debug(outputString);
         }
         encryptedString = encryptedMsg.getSOAPPartAsString();
         assertTrue(encryptedString.indexOf("LogTestService2") == -1 ? true : false);
@@ -232,7 +234,9 @@ public class TestWSSecurityNew2 extends TestCase implements CallbackHandler {
         Message encryptedMsg = (Message) SOAPUtil.toAxisMessage(encryptedDoc);
         if (log.isDebugEnabled()) {
             log.debug("Encrypted message, RSA-OAEP keytransport, 3DES:");
-            XMLUtils.PrettyElementToWriter(encryptedMsg.getSOAPEnvelope().getAsDOM(), new PrintWriter(System.out));
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(encryptedDoc);
+            log.debug(outputString);
         }
         String encryptedString = encryptedMsg.getSOAPPartAsString();
         assertTrue(encryptedString.indexOf("LogTestService2") == -1 ? true : false);
@@ -253,11 +257,11 @@ public class TestWSSecurityNew2 extends TestCase implements CallbackHandler {
         javax.xml.namespace.QName expectedEncryptedElement
     ) throws Exception {
         final java.util.List results = secEngine.processSecurityHeader(doc, null, this, crypto);
-        SOAPUtil.updateSOAPMessage(doc, message);
-        String decryptedString = message.getSOAPPartAsString();
-        assertTrue(decryptedString.indexOf("LogTestService2") > 0 ? true : false);
+        String outputString = 
+            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+        assertTrue(outputString.indexOf("LogTestService2") > 0 ? true : false);
         //
-        // walk through the results, and make sure there is an encrytion [sic] 
+        // walk through the results, and make sure there is an encryption
         // action, together with a reference to the decrypted element 
         // (as a QName)
         //

@@ -141,19 +141,6 @@ public class TestWSSecurityNew3 extends TestCase implements CallbackHandler {
         verify(signedDoc);
     }
 
-    /**
-     * Test that signs (twice) and verifies a WS-Security envelope
-     * <p>
-     * @throws  java.lang.Exception  Thrown when there is any problem in signing or verification
-     public void testDoubleX509Signature() throws Exception {
-     SOAPEnvelope envelope = null;
-     WSSignEnvelope builder = new WSSignEnvelope();
-     Document doc = unsignedEnvelope.getAsDocument();
-     Document signedDoc = builder.build(doc);
-     signedDoc =  builder.build(signedDoc);
-     verify(signedDoc);
-     }
-     */
 
     /**
      * Verifies the soap envelope

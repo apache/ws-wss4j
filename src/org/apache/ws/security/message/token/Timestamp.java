@@ -226,9 +226,7 @@ public class Timestamp {
      * @param id
      */
     public void setID(String id) {
-        String prefix = WSSecurityUtil.setNamespace(this.element,
-                WSConstants.WSU_NS, WSConstants.WSU_PREFIX);
-        this.element.setAttributeNS(WSConstants.WSU_NS, prefix + ":Id", id);
+        this.element.setAttributeNS(WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":Id", id);
     }
     
     /**

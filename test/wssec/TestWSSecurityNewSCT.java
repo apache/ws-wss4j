@@ -106,15 +106,17 @@ public class TestWSSecurityNewSCT extends TestCase implements CallbackHandler {
             
             sctBuilder.prependSCTElementToHeader(doc, secHeader);
 
-            String out = org.apache.ws.security.util.XMLUtils
-                    .PrettyDocumentToString(doc);
+            String out = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
 
             assertTrue(
-                    "SecurityContextToken missing",
-                    out
-                            .indexOf(ConversationConstants.SECURITY_CONTEXT_TOKEN_LN) > 0);
-            assertTrue("wsc:Identifier missing", out
-                    .indexOf(ConversationConstants.IDENTIFIER_LN) > 0);
+                "SecurityContextToken missing",
+                out.indexOf(ConversationConstants.SECURITY_CONTEXT_TOKEN_LN) > 0
+            );
+            assertTrue(
+                "wsc:Identifier missing", 
+                out.indexOf(ConversationConstants.IDENTIFIER_LN) > 0
+            );
 
             // System.out.println(out);
 
@@ -302,9 +304,9 @@ public class TestWSSecurityNewSCT extends TestCase implements CallbackHandler {
      */
     private void verify(Document doc) throws Exception {
         secEngine.processSecurityHeader(doc, null, this, crypto);
-        SOAPUtil.updateSOAPMessage(doc, message);
-        String decryptedString = message.getSOAPPartAsString();
-        assertTrue(decryptedString.indexOf("LogTestService2") > 0 ? true
+        String outputString = 
+            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+        assertTrue(outputString.indexOf("LogTestService2") > 0 ? true
                 : false);
     }
 
