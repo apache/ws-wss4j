@@ -86,6 +86,16 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
      * Custom reference value
      */
     private String customReferenceValue;
+    
+    /**
+     * ValueType for the encrypted key reference
+     */
+    private String encKeyValueType;
+    
+    /**
+     * True if the encKeyId is a direct reference to a key identifier instead of a URI to a key
+     */
+    private boolean encKeyIdDirectId;
 
     /**
      * Constructor.
@@ -513,7 +523,14 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
                 keyInfo = new KeyInfo(document);
                 SecurityTokenReference secToken = new SecurityTokenReference(document);
                 Reference ref = new Reference(document);
-                ref.setURI("#" + encKeyId);
+                if (encKeyIdDirectId) {
+                    ref.setURI(encKeyId);
+                } else {
+                    ref.setURI("#" + encKeyId);                    
+                }
+                if (encKeyValueType != null) {
+                    ref.setValueType(encKeyValueType);
+                }
                 secToken.setReference(ref);
                 keyInfo.addUnknownElement(secToken.getElement());
                 Element keyInfoElement = keyInfo.getElement();
@@ -770,4 +787,10 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
         this.customReferenceValue = customReferenceValue;
     }
     
+    public void setEncKeyValueType(String e) {
+        encKeyValueType = e;
+    }
+    public void setEncKeyIdDirectId(boolean b) {
+        encKeyIdDirectId = b;
+    }
 }

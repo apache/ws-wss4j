@@ -309,6 +309,7 @@ public class WSSecSignature extends WSSecBase {
         X509Certificate[] certs = null;
         if (keyIdentifierType != WSConstants.UT_SIGNING
                 && keyIdentifierType != WSConstants.CUSTOM_SYMM_SIGNING
+                && keyIdentifierType != WSConstants.CUSTOM_SYMM_SIGNING_DIRECT
                   && keyIdentifierType != WSConstants.ENCRYPTED_KEY_SHA1_IDENTIFIER) {
             certs = crypto.getCertificates(user);
             if (certs == null || certs.length <= 0) {
@@ -453,6 +454,12 @@ public class WSSecSignature extends WSSecBase {
             refCust.setValueType(this.customTokenValueType);
             refCust.setURI("#" + this.customTokenId);
             secRef.setReference(refCust);
+            break;
+        case WSConstants.CUSTOM_SYMM_SIGNING_DIRECT :
+            Reference refCustd = new Reference(document);
+            refCustd.setValueType(this.customTokenValueType);
+            refCustd.setURI(this.customTokenId);
+            secRef.setReference(refCustd);
             break;
         default:
             throw new WSSecurityException(WSSecurityException.FAILURE,
@@ -698,6 +705,7 @@ public class WSSecSignature extends WSSecBase {
         try {
             if (keyIdentifierType == WSConstants.UT_SIGNING ||
                     keyIdentifierType == WSConstants.CUSTOM_SYMM_SIGNING ||
+                    keyIdentifierType == WSConstants.CUSTOM_SYMM_SIGNING_DIRECT ||
                       keyIdentifierType == WSConstants.ENCRYPTED_KEY_SHA1_IDENTIFIER) {
                 sig.sign(sig.createSecretKey(secretKey));
             } else {

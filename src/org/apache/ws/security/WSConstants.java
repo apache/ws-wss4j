@@ -386,6 +386,14 @@ public class WSConstants {
      */
     public static final int ENCRYPTED_KEY_SHA1_IDENTIFIER = 10;
     
+    /**
+     * <code>CUSTOM_SYMM_SIGNING_DIRECT</code> is used internally only to set a 
+     * specific Signature behavior.
+     * 
+     * The signing key, reference id and value type are set externally. 
+     */
+    public static final int CUSTOM_SYMM_SIGNING_DIRECT = 11;
+    
     
     public static final String ENCRYPTED_HEADER = "EncryptedHeader";
 
