@@ -22,7 +22,6 @@ import org.apache.ws.security.message.token.BinarySecurity;
 import org.apache.ws.security.message.token.SecurityContextToken;
 import org.apache.ws.security.message.token.SignatureConfirmation;
 import org.apache.ws.security.message.token.Timestamp;
-import org.opensaml.SAMLAssertion;
 
 import java.security.Principal;
 import java.security.cert.X509Certificate;
@@ -171,7 +170,7 @@ public class WSSecurityEngineResult extends java.util.HashMap {
 
     public WSSecurityEngineResult(
         int act, 
-        SAMLAssertion ass
+        Object ass
     ) {
         put(TAG_ACTION, new Integer(act));
         put(TAG_SAML_ASSERTION, ass);
@@ -275,16 +274,6 @@ public class WSSecurityEngineResult extends java.util.HashMap {
      */
     public X509Certificate getCertificate() {
         return (X509Certificate) get(TAG_X509_CERTIFICATE);
-    }
-
-    /**
-     * @return Returns the assertion.
-     *
-     * @deprecated      use (SAMLAssertion)
-     *                  #get(#TAG_SAML_ASSERTION) instead
-     */
-    public SAMLAssertion getAssertion() {
-        return (SAMLAssertion) get(TAG_SAML_ASSERTION);
     }
 
     /**

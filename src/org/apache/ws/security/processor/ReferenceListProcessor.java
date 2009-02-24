@@ -268,7 +268,10 @@ public class ReferenceListProcessor implements Processor {
         if (secRef.containsReference()) {
             Reference reference = secRef.getReference();
             String uri = reference.getURI();
-            String id = uri.substring(1);
+            String id = uri;
+            if (id.charAt(0) == '#') {
+                id = id.substring(1);
+            }
             Processor p = wsDocInfo.getProcessor(id);
             if (p == null
                     || (!(p instanceof EncryptedKeyProcessor)

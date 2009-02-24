@@ -127,7 +127,10 @@ public class DerivedKeyTokenProcessor implements Processor {
                 Reference ref = str.getReference();
                 
                 uri = ref.getURI();
-                processor = wsDocInfo.getProcessor(uri.substring(1));
+                if (uri.charAt(0) == '#') {
+                    uri = uri.substring(1);
+                }
+                processor = wsDocInfo.getProcessor(uri);
             } else {
                 //Contains key identifier
                 keyIdentifierValue = str.getKeyIdentifierValue();
@@ -137,7 +140,7 @@ public class DerivedKeyTokenProcessor implements Processor {
             
             if(processor == null && uri != null) {
                 //Now use the callback and get it
-                this.secret = this.getSecret(cb, uri.substring(1));
+                this.secret = this.getSecret(cb, uri);
             } else if (processor == null && keyIdentifierValue != null
                     && keyIdentifierValueType != null) {                
                 this.secret = this.getSecret(cb, keyIdentifierValue, keyIdentifierValueType); 

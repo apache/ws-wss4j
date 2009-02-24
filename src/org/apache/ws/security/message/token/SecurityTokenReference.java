@@ -173,7 +173,10 @@ public class SecurityTokenReference {
             if (doDebug) {
                 log.debug("SAML token ID: " + saID);
             }
-            String id = uri.substring(1);
+            String id = uri;
+            if (id.charAt(0) == '#') {
+                id = id.substring(1);
+            }
             if (saID == null || !saID.equals(id)) {
                 
                 if(cb != null) {

@@ -260,7 +260,10 @@ public class SignatureProcessor implements Processor {
                         //Try custom token through callback handler
                         //try to find a custom token
                         String id = secRef
-                                .getReference().getURI().substring(1);
+                                .getReference().getURI();
+                        if (id.charAt(0) == '#') {
+                            id = id.substring(1);
+                        }
                         WSPasswordCallback pwcb = new WSPasswordCallback(id,
                                 WSPasswordCallback.CUSTOM_TOKEN);
                         try {
@@ -414,7 +417,10 @@ public class SignatureProcessor implements Processor {
                             .getSecurityTokenReference();
                     if (securityTokenReference.containsReference()) {
                         basetokenId = securityTokenReference.getReference()
-                                .getURI().substring(1);
+                                .getURI();
+                        if (basetokenId.charAt(0) == '#') {
+                            basetokenId = basetokenId.substring(1);
+                        }
                     } else {
                         // KeyIdentifier
                         basetokenId = securityTokenReference
