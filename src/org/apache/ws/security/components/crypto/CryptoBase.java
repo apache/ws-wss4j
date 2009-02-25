@@ -40,8 +40,10 @@ import java.security.cert.X509Certificate;
 import java.security.interfaces.RSAPublicKey;
 import java.util.Arrays;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Vector;
 import javax.security.auth.x500.X500Principal;
 
@@ -54,7 +56,7 @@ import javax.security.auth.x500.X500Principal;
  */
 public abstract class CryptoBase implements Crypto {
     private static Log log = LogFactory.getLog(CryptoBase.class);
-    protected static CertificateFactory certFact;
+    protected static Map certFactMap = new HashMap();
     protected KeyStore keystore = null;
     static String SKI_OID = "2.5.29.14";
     protected KeyStore cacerts = null;
@@ -72,6 +74,13 @@ public abstract class CryptoBase implements Crypto {
      */
     protected abstract String getCryptoProvider();
     
+    
+    private String mapKeystoreProviderToCertProvider(String s) {
+        if ("SunJSSE".equals(s)) {
+            return "SUN";
+        }
+        return s;
+    }
     /**
      * Singleton certificate factory for this Crypto instance.
      * <p/>
@@ -82,14 +91,45 @@ public abstract class CryptoBase implements Crypto {
      *
      */
     public synchronized CertificateFactory getCertificateFactory() throws WSSecurityException {
-        if (certFact == null) {
+        String provider = getCryptoProvider();
+        String keyStoreProvider = keystore == null ? null : keystore.getProvider().getName();
+
+        //Try to find a CertificateFactory that generates certs that are fully
+        //compatible with the certs in the KeyStore  (Sun -> Sun, BC -> BC, etc...)
+        CertificateFactory factory = null;
+        if (provider != null) {
+            factory = (CertificateFactory)certFactMap.get(provider);
+        } else if (keyStoreProvider != null) {
+            factory = (CertificateFactory)certFactMap.get(mapKeystoreProviderToCertProvider(keyStoreProvider));
+            if (factory == null) {
+                factory = (CertificateFactory)certFactMap.get(keyStoreProvider);                
+            }
+        } else {
+            factory = (CertificateFactory)certFactMap.get("DEFAULT");
+        }
+        if (factory == null) {
             try {
-                String provider = getCryptoProvider();
                 if (provider == null || provider.length() == 0) {
-                    certFact = CertificateFactory.getInstance("X.509");
+                    if (keyStoreProvider != null && keyStoreProvider.length() != 0) {
+                        try {
+                            factory = CertificateFactory.getInstance("X.509", 
+                                                                 mapKeystoreProviderToCertProvider(keyStoreProvider));
+                            certFactMap.put(keyStoreProvider, factory);
+                            certFactMap.put(mapKeystoreProviderToCertProvider(keyStoreProvider), factory);
+                        } catch (Exception ex) {
+                            //Ignore, we'll just use the default since they didn't specify one.
+                            //Hopefully that will work for them.
+                        }
+                    }
+                    if (factory == null) {
+                        factory = CertificateFactory.getInstance("X.509");
+                        certFactMap.put("DEFAULT", factory);
+                    }
                 } else {
-                    certFact = CertificateFactory.getInstance("X.509", provider);
+                    factory = CertificateFactory.getInstance("X.509", provider);
+                    certFactMap.put(provider, factory);
                 }
+                certFactMap.put(factory.getProvider().getName(), factory);
             } catch (CertificateException e) {
                 throw new WSSecurityException(
                     WSSecurityException.SECURITY_TOKEN_UNAVAILABLE, "unsupportedCertType",
@@ -102,7 +142,7 @@ public abstract class CryptoBase implements Crypto {
                 );
             }
         }
-        return certFact;
+        return factory;
     }
 
     /**
