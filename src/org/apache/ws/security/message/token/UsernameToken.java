@@ -666,7 +666,6 @@ public class UsernameToken {
          * Perform the 1st up to iteration-1 hash rounds
          */
         for (int i = 1; i < iteration; i++) {
-            sha.reset();
             K = sha.digest(K);
         }
         return K;

@@ -47,9 +47,7 @@ public class WSSecSignatureConfirmation extends WSSecBase {
     /**
      * Set the Signature value to store in this SignatureConfirmation.
      * 
-     * @param signatureValue
-     *            The Signature value to store in the SignatureConfirmation
-     *            element
+     * @param signatureValue The Signature value to store in the SignatureConfirmation element
      */
     public void setSignatureValue(byte[] signatureValue) {
         this.signatureValue = signatureValue;
@@ -63,8 +61,7 @@ public class WSSecSignatureConfirmation extends WSSecBase {
      * the relevant information was set. Before calling <code>prepare()</code> the
      * filed <code>signatureValue</code> must be set
      * 
-     * @param doc
-     *            The SOAP envelope as W3C document
+     * @param doc The SOAP envelope as W3C document
      */
     public void prepare(Document doc) {
         sc = new SignatureConfirmation(doc, signatureValue);
@@ -80,8 +77,7 @@ public class WSSecSignatureConfirmation extends WSSecBase {
      * This allows to insert the SignatureConfirmation element at any position in the
      * Security header.
      * 
-     * @param secHeader
-     *            The security header that holds the Signature element.
+     * @param secHeader The security header that holds the Signature element.
      */
     public void prependToHeader(WSSecHeader secHeader) {
         WSSecurityUtil.prependChildElement(secHeader.getSecurityHeader(), sc.getElement());
@@ -93,14 +89,10 @@ public class WSSecSignatureConfirmation extends WSSecBase {
      * A complete <code>SignatureConfirmation</code> is constructed and added
      * to the <code>wsse:Security</code> header.
      * 
-     * @param doc
-     *            The SOAP envelope as W3C document
-     * @param sigVal
-     *            the Signature value. This will be the content of the "Value"
-     *            attribute.
-     * @param secHeader
-     *            The security header that holds the Signature element.
-    * @return Document with SignatureConfirmation added
+     * @param doc The SOAP envelope as W3C document
+     * @param sigVal the Signature value. This will be the content of the "Value" attribute.
+     * @param secHeader The security header that holds the Signature element.
+     * @return Document with SignatureConfirmation added
      */
     public Document build(Document doc, byte[] sigVal, WSSecHeader secHeader) {
         log.debug("Begin add signature confirmation...");

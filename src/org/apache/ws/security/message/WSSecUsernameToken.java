@@ -122,9 +122,8 @@ public class WSSecUsernameToken extends WSSecBase {
         }
         if (useDerivedKey) {
             return UsernameToken.generateDerivedKey(password, saltValue, iteration);
-        } else {
-            return ut.getSecretKey();
         }
+        return ut.getSecretKey();
     }
     
     /**
@@ -168,12 +167,10 @@ public class WSSecUsernameToken extends WSSecBase {
      * passwordType etc. must be set. A complete <code>UsernameToken</code> is
      * constructed.
      * 
-     * @param doc
-     *            The SOAP envelope as W3C document
+     * @param doc The SOAP envelope as W3C document
      */
     public void prepare(Document doc) {
-        ut = new UsernameToken(wssConfig.isPrecisionInMilliSeconds(), doc,
-                passwordType);
+        ut = new UsernameToken(wssConfig.isPrecisionInMilliSeconds(), doc, passwordType);
         ut.setName(user);
         if (useDerivedKey) {
             saltValue = ut.addSalt(doc, saltValue, useMac);
@@ -199,8 +196,7 @@ public class WSSecUsernameToken extends WSSecBase {
      * This allows to insert the UsernameToken element at any position in the
      * Security header.
      * 
-     * @param secHeader
-     *            The security header that holds the Signature element.
+     * @param secHeader The security header that holds the Signature element.
      */
     public void prependToHeader(WSSecHeader secHeader) {
         WSSecurityUtil.prependChildElement(secHeader.getSecurityHeader(), ut.getElement());
@@ -214,8 +210,7 @@ public class WSSecUsernameToken extends WSSecBase {
      * This allows to insert the UsernameToken element at any position in the
      * Security header.
      * 
-     * @param secHeader
-     *            The security header that holds the Signature element.
+     * @param secHeader The security header that holds the Signature element.
      */
     public void appendToHeader(WSSecHeader secHeader) {
         Element secHeaderElement = secHeader.getSecurityHeader();
@@ -230,10 +225,8 @@ public class WSSecUsernameToken extends WSSecBase {
      * <code>UsernameToken</code> is constructed and added to the
      * <code>wsse:Security</code> header.
      * 
-     * @param doc
-     *            The SOAP envelope as W3C document
-     * @param secHeader
-     *            The security header inside the SOAP envelope
+     * @param doc The SOAP envelope as W3C document
+     * @param secHeader The security header inside the SOAP envelope
      * @return Document with UsernameToken added
      */
     public Document build(Document doc, WSSecHeader secHeader) {

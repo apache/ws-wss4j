@@ -55,8 +55,7 @@ public class WSSecBase {
     /**
      * Set which parts of the message to encrypt/sign. <p/>
      * 
-     * @param parts
-     *            The vector containing the WSEncryptionPart objects
+     * @param parts The vector containing the WSEncryptionPart objects
      */
     public void setParts(Vector parts) {
         this.parts = parts;
@@ -109,17 +108,19 @@ public class WSSecBase {
      * value of the <code>wsu:Id</code> attribute is returned. Otherwise the
      * method generates a new <code>wsu:Id</code> and an appropriate value.
      * 
-     * @param doc
-     *            The SOAP envelope as <code>Document</code>
+     * @param doc The SOAP envelope as <code>Document</code>
      * @return The value of the <code>wsu:Id</code> attribute of the SOAP body
      * @throws Exception
      */
     protected String setBodyID(Document doc) throws Exception {
-        SOAPConstants soapConstants = WSSecurityUtil.getSOAPConstants(doc
-                .getDocumentElement());
-        Element bodyElement = (Element) WSSecurityUtil.getDirectChild(doc
-                .getFirstChild(), soapConstants.getBodyQName().getLocalPart(),
-                soapConstants.getEnvelopeURI());
+        SOAPConstants soapConstants = 
+            WSSecurityUtil.getSOAPConstants(doc.getDocumentElement());
+        Element bodyElement = 
+            (Element) WSSecurityUtil.getDirectChild(
+                doc.getFirstChild(), 
+                soapConstants.getBodyQName().getLocalPart(),
+                soapConstants.getEnvelopeURI()
+            );
         if (bodyElement == null) {
             throw new Exception("SOAP Body Element node not found");
         }
@@ -127,13 +128,12 @@ public class WSSecBase {
     }
 
     protected String setWsuId(Element bodyElement) {
-        String id = null;
-        id = bodyElement.getAttributeNS(WSConstants.WSU_NS, "Id");
+        String id = bodyElement.getAttributeNS(WSConstants.WSU_NS, "Id");
 
         if ((id == null) || (id.length() == 0)) {
             id = "id-" + Integer.toString(bodyElement.hashCode());
-            String prefix = WSSecurityUtil.setNamespace(bodyElement,
-                    WSConstants.WSU_NS, WSConstants.WSU_PREFIX);
+            String prefix = 
+                WSSecurityUtil.setNamespace(bodyElement, WSConstants.WSU_NS, WSConstants.WSU_PREFIX);
             bodyElement.setAttributeNS(WSConstants.WSU_NS, prefix + ":Id", id);
         }
         return id;

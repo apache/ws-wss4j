@@ -29,8 +29,6 @@ import org.w3c.dom.Node;
  * 
  * Setup a Security header with a specified actor and mustunderstand flag.
  * 
- * <p/>
- * 
  * The defaults for actor and mustunderstand are: empty <code>actor</code> and
  * <code>mustunderstand</code> is true.
  * 
@@ -54,8 +52,7 @@ public class WSSecHeader {
     /**
      * Constructor.
      * 
-     * @param actor
-     *            The actor name of the <code>wsse:Security</code> header
+     * @param actor The actor name of the <code>wsse:Security</code> header
      */
     public WSSecHeader(String actor) {
         this(actor, true);
@@ -64,10 +61,8 @@ public class WSSecHeader {
     /**
      * Constructor.
      * 
-     * @param act
-     *            The actor name of the <code>wsse:Security</code> header
-     * @param mu
-     *            Set <code>mustUnderstand</code> to true or false
+     * @param act The actor name of the <code>wsse:Security</code> header
+     * @param mu Set <code>mustUnderstand</code> to true or false
      */
     public WSSecHeader(String act, boolean mu) {
         actor = act;
@@ -77,8 +72,7 @@ public class WSSecHeader {
     /**
      * set actor name.
      * 
-     * @param act
-     *            The actor name of the <code>wsse:Security</code> header
+     * @param act The actor name of the <code>wsse:Security</code> header
      */
     public void setActor(String act) {
         actor = act;
@@ -88,8 +82,7 @@ public class WSSecHeader {
      * Set the <code>mustUnderstand</code> flag for the
      * <code>wsse:Security</code> header.
      * 
-     * @param mu
-     *            Set <code>mustUnderstand</code> to true or false
+     * @param mu Set <code>mustUnderstand</code> to true or false
      */
     public void setMustUnderstand(boolean mu) {
         mustunderstand = mu;
@@ -111,10 +104,11 @@ public class WSSecHeader {
      *         false if non empty security header
      */
     public boolean isEmpty(Document doc) {
-        
         if (securityHeader == null) {            
-            securityHeader = WSSecurityUtil.findWsseSecurityHeaderBlock(doc, doc
-                    .getDocumentElement(), actor, false);
+            securityHeader = 
+                WSSecurityUtil.findWsseSecurityHeaderBlock(
+                    doc, doc.getDocumentElement(), actor, false
+                );
             if (securityHeader == null) {
                 return true;
             }
@@ -122,65 +116,63 @@ public class WSSecHeader {
         
         if (securityHeader.getChildNodes().getLength() == 0) {
             return true;
-        } else {
-            return false;
         }
+        return false;
     }
 
     /**
      * Creates a security header and inserts it as child into the SOAP Envelope.
      * 
-     * <p/>
-     * 
      * Check if a WS Security header block for an actor is already available in
      * the document. If a header block is found return it, otherwise a new
      * wsse:Security header block is created and the attributes set
      * 
-     * @param doc
-     *            A SOAP envelope as <code>Document</code>
+     * @param doc A SOAP envelope as <code>Document</code>
      * @return A <code>wsse:Security</code> element
      */
     public Element insertSecurityHeader(Document doc) {
-
-        /*
-         * If there is already a security header in this instance just return it
-         */
+        //
+        // If there is already a security header in this instance just return it
+        //
         if (securityHeader != null) {
             return securityHeader;
         }
-        SOAPConstants soapConstants = WSSecurityUtil.getSOAPConstants(doc
-                .getDocumentElement());
+        SOAPConstants soapConstants = 
+            WSSecurityUtil.getSOAPConstants(doc.getDocumentElement());
 
-        securityHeader = WSSecurityUtil.findWsseSecurityHeaderBlock(doc, doc
-                .getDocumentElement(), actor, true);
+        securityHeader = 
+            WSSecurityUtil.findWsseSecurityHeaderBlock(
+                doc, doc.getDocumentElement(), actor, true
+            );
 
         String soapPrefix = 
             WSSecurityUtil.setNamespace(
-                securityHeader, 
-                soapConstants.getEnvelopeURI(),
-                WSConstants.DEFAULT_SOAP_PREFIX
+                securityHeader, soapConstants.getEnvelopeURI(), WSConstants.DEFAULT_SOAP_PREFIX
             );
         
         if (actor != null && actor.length() > 0) {
-            securityHeader.setAttributeNS(soapConstants.getEnvelopeURI(),
-                    soapPrefix
-                            + ":"
-                            + soapConstants.getRoleAttributeQName()
-                                    .getLocalPart(), actor);
+            securityHeader.setAttributeNS(
+                soapConstants.getEnvelopeURI(),
+                soapPrefix + ":" + soapConstants.getRoleAttributeQName().getLocalPart(), 
+                actor
+            );
         }
         if (mustunderstand) {
-            securityHeader.setAttributeNS(soapConstants.getEnvelopeURI(),
-                    soapPrefix + ":" + WSConstants.ATTR_MUST_UNDERSTAND,
-                    soapConstants.getMustUnderstand());
+            securityHeader.setAttributeNS(
+                soapConstants.getEnvelopeURI(),
+                soapPrefix + ":" + WSConstants.ATTR_MUST_UNDERSTAND,
+                soapConstants.getMustUnderstand()
+            );
         }
         return securityHeader;
     }
     
     public void removeSecurityHeader(Document doc) {
-        
         if (securityHeader == null) {            
-            securityHeader = WSSecurityUtil.findWsseSecurityHeaderBlock(doc, doc
-                    .getDocumentElement(), actor, false);
+            securityHeader = 
+                WSSecurityUtil.findWsseSecurityHeaderBlock(
+                    doc, doc.getDocumentElement(), actor, false
+                );
             if (securityHeader == null) {
                 return;
             }

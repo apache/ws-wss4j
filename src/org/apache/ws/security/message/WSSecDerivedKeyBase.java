@@ -106,8 +106,7 @@ public abstract class WSSecDerivedKeyBase extends WSSecBase {
     /**
      * @param ephemeralKey The ephemeralKey to set.
      */
-    public void setExternalKey(byte[] ephemeralKey, 
-                                String tokenIdentifier) {
+    public void setExternalKey(byte[] ephemeralKey, String tokenIdentifier) {
         this.ephemeralKey = ephemeralKey;
         this.tokenIdentifier = tokenIdentifier;
     }
@@ -115,8 +114,7 @@ public abstract class WSSecDerivedKeyBase extends WSSecBase {
     /**
      * @param ephemeralKey The ephemeralKey to set.
      */
-    public void setExternalKey(byte[] ephemeralKey, 
-                                Element strElem) {
+    public void setExternalKey(byte[] ephemeralKey, Element strElem) {
         this.ephemeralKey = ephemeralKey;
         this.strElem = strElem;
     }
@@ -164,22 +162,18 @@ public abstract class WSSecDerivedKeyBase extends WSSecBase {
      * derived token using the ephemeral key. After preparation references
      * can be added, encrypted and signed as required.
      * 
-     * </p>
-     * 
      * This method does not add any element to the security header. This must be
      * done explicitly.
      * 
-     * @param doc
-     *            The unsigned SOAP envelope as <code>Document</code>
+     * @param doc The unsigned SOAP envelope as <code>Document</code>
      * @throws WSSecurityException
      */
-    public void prepare(Document doc)
-        throws WSSecurityException, ConversationException {
+    public void prepare(Document doc) throws WSSecurityException, ConversationException {
         
         document = doc;
 
-        //Create the derived keys
-        //At this point figure out the key length according to the symencAlgo
+        // Create the derived keys
+        // At this point figure out the key length according to the symencAlgo
         int offset = 0;
         int length = this.getDerivedKeyLength();
         byte[] label;
@@ -199,14 +193,13 @@ public abstract class WSSecDerivedKeyBase extends WSSecBase {
         
         this.derivedKeyBytes = algo.createKey(this.ephemeralKey, seed, offset, length);
         
-        //Add the DKTs
+        // Add the DKTs
         dkt = new DerivedKeyToken(this.wscVersion, document);
         dktId = "derivedKeyId-" + dkt.hashCode();
         
         dkt.setOffset(offset);
         dkt.setLength(length);
         dkt.setNonce(Base64.encode(nonce));
-        
         dkt.setID(dktId);
         
         if (this.strElem == null) {
@@ -225,7 +218,6 @@ public abstract class WSSecDerivedKeyBase extends WSSecBase {
     }
 
 
-
     /**
      * Prepend the DerivedKey element to the elements already in the Security
      * header.
@@ -234,12 +226,12 @@ public abstract class WSSecDerivedKeyBase extends WSSecBase {
      * allows to insert the DerivedKey element at any position in the Security
      * header.
      * 
-     * @param secHeader
-     *            The security header that holds the Signature element.
+     * @param secHeader The security header that holds the Signature element.
      */
     public void prependDKElementToHeader(WSSecHeader secHeader) {
         WSSecurityUtil.prependChildElement(
-            secHeader.getSecurityHeader(), dkt.getElement());
+            secHeader.getSecurityHeader(), dkt.getElement()
+        );
     }
     
     public void appendDKElementToHeader(WSSecHeader secHeader) {

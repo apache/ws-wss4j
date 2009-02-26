@@ -434,6 +434,7 @@ public abstract class CryptoBase implements Crypto {
 
         try {
             sha = MessageDigest.getInstance("SHA-1");
+            sha.reset();
         } catch (NoSuchAlgorithmException e) {
             throw new WSSecurityException(
                 WSSecurityException.FAILURE, "noSHA1availabe", null, e
@@ -455,7 +456,6 @@ public abstract class CryptoBase implements Crypto {
                 if (!(cert instanceof X509Certificate)) {
                     continue;
                 }
-                sha.reset();
                 try {
                     sha.update(cert.getEncoded());
                 } catch (CertificateEncodingException ex) {

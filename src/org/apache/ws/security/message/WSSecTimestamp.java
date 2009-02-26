@@ -50,8 +50,7 @@ public class WSSecTimestamp extends WSSecBase {
      * <code>Created</code> and the <code>Expires</code> in
      * <code>Timestamp</code>. <p/>
      * 
-     * @param ttl
-     *            The time to live in second
+     * @param ttl The time to live in second
      */
     public void setTimeToLive(int ttl) {
         timeToLive = ttl;
@@ -65,8 +64,7 @@ public class WSSecTimestamp extends WSSecBase {
      * parameter such as <code>timeToLive</code> can be set if the default
      * value is not suitable.
      * 
-     * @param doc
-     *            The SOAP envelope as W3C document
+     * @param doc The SOAP envelope as W3C document
      */
     public void prepare(Document doc) {
         ts = new Timestamp(wssConfig.isPrecisionInMilliSeconds(), doc, timeToLive);
@@ -82,8 +80,7 @@ public class WSSecTimestamp extends WSSecBase {
      * allows to insert the Timestamp element at any position in the Security
      * header.
      * 
-     * @param secHeader
-     *            The security header that holds the Signature element.
+     * @param secHeader The security header that holds the Signature element.
      */
     public void prependToHeader(WSSecHeader secHeader) {
         WSSecurityUtil.prependChildElement(secHeader.getSecurityHeader(), ts.getElement());
@@ -95,10 +92,8 @@ public class WSSecTimestamp extends WSSecBase {
      * A complete <code>Timestamp</code> is constructed and added to the
      * <code>wsse:Security</code> header.
      * 
-     * @param doc
-     *            The SOAP envelope as W3C document
-     * @param secHeader
-     *            The security header that hold this Timestamp
+     * @param doc The SOAP envelope as W3C document
+     * @param secHeader The security header that hold this Timestamp
      * @return Document with Timestamp added
      * @throws Exception
      */
