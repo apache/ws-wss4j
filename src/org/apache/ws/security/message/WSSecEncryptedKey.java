@@ -53,8 +53,7 @@ import org.w3c.dom.Text;
  */
 public class WSSecEncryptedKey extends WSSecBase {
 
-    private static Log log = LogFactory.getLog(WSSecEncryptedKey.class
-            .getName());
+    private static Log log = LogFactory.getLog(WSSecEncryptedKey.class.getName());
 
     protected Document document;
 

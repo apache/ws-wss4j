@@ -39,23 +39,25 @@ import java.util.Vector;
  * This will process incoming <code>xenc:EncryptedData</code> elements.
  * This processor will not be invoked for encrypted content referenced by a 
  * <code>xenc:ReferenceList</code>.
- *
  */
 public class EncryptedDataProcessor implements Processor {
-
     
     private byte[] symmKey;
-    
     
     public String getId() {
         return null;
     }
 
-    public void handleToken(Element elem, Crypto crypto, Crypto decCrypto,
-            CallbackHandler cb, WSDocInfo wsDocInfo, Vector returnResults,
-            WSSConfig config) throws WSSecurityException {
+    public void handleToken(
+        Element elem, 
+        Crypto crypto, 
+        Crypto decCrypto,
+        CallbackHandler cb, 
+        WSDocInfo wsDocInfo, 
+        Vector returnResults,
+        WSSConfig config
+    ) throws WSSecurityException {
         Element kiElem = (Element)WSSecurityUtil.findElement(elem, "KeyInfo", WSConstants.SIG_NS);
-        
         
         NodeList children = kiElem.getChildNodes();
         int len = children.getLength();
@@ -68,7 +70,9 @@ public class EncryptedDataProcessor implements Processor {
             QName el = new QName(child.getNamespaceURI(), child.getLocalName());
             if(el.equals(WSSecurityEngine.ENCRYPTED_KEY)) {
                 EncryptedKeyProcessor encrKeyProc = new EncryptedKeyProcessor();
-                encrKeyProc.handleToken((Element)child, crypto, decCrypto, cb, wsDocInfo, returnResults, config);
+                encrKeyProc.handleToken(
+                    (Element)child, crypto, decCrypto, cb, wsDocInfo, returnResults, config
+                );
                 this.symmKey = encrKeyProc.getDecryptedBytes();
                 break;
             }
@@ -84,25 +88,26 @@ public class EncryptedDataProcessor implements Processor {
             xmlCipher.init(XMLCipher.DECRYPT_MODE, key);
         } catch (XMLEncryptionException e1) {
             throw new WSSecurityException(
-                    WSSecurityException.UNSUPPORTED_ALGORITHM, null, null, e1);
+                WSSecurityException.UNSUPPORTED_ALGORITHM, null, null, e1
+            );
         }
         
         Node previousSibling = elem.getPreviousSibling();
-
         try {
             xmlCipher.doFinal(elem.getOwnerDocument(), elem, false);
         } catch (Exception e) {
-            throw new WSSecurityException(WSSecurityException.FAILED_CHECK,
-                    null, null, e);
+            throw new WSSecurityException(
+                WSSecurityException.FAILED_CHECK, null, null, e
+            );
         }
         
-        //GEt hold of the plain text element
+        // Get hold of the plain text element
         Element decryptedElem = (Element)previousSibling.getNextSibling();
-        QName el = new QName(decryptedElem.getNamespaceURI(), decryptedElem
-                .getLocalName());
+        QName el = new QName(decryptedElem.getNamespaceURI(), decryptedElem.getLocalName());
         Processor proc = config.getProcessor(el);
-        proc.handleToken((Element) decryptedElem, crypto, decCrypto, cb,
-                wsDocInfo, returnResults, config);
+        proc.handleToken(
+            decryptedElem, crypto, decCrypto, cb, wsDocInfo, returnResults, config
+        );
         wsDocInfo.setProcessor(proc);
     }
 

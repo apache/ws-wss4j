@@ -36,40 +36,40 @@ public class X509Util {
     private static Log log = LogFactory.getLog(X509Util.class.getName());
 
     public static boolean isContent(Node encBodyData) {
-        /*
-         * Depending on the encrypted data type (Content or Element) the encBodyData either
-         * holds the element whose contents where encrypted, e.g. soapenv:Body, or the
-         * xenc:EncryptedData element (in case of Element encryption). In either case we need
-         * to get the xenc:EncryptedData element. So get it. The findElement method returns
-         * immediately if its already the correct element.
-         * Then we can get the Type attribute.
-         */
-
-        Element tmpE = (Element) WSSecurityUtil.findElement(encBodyData,
-                "EncryptedData", WSConstants.ENC_NS);
-        String typeStr = null;
-        boolean content = true;
+        //
+        // Depending on the encrypted data type (Content or Element) the encBodyData either
+        // holds the element whose contents where encrypted, e.g. soapenv:Body, or the
+        // xenc:EncryptedData element (in case of Element encryption). In either case we need
+        // to get the xenc:EncryptedData element. So get it. The findElement method returns
+        // immediately if its already the correct element.
+        // Then we can get the Type attribute.
+        //
+        Element tmpE = 
+            (Element) WSSecurityUtil.findElement(
+                encBodyData, "EncryptedData", WSConstants.ENC_NS
+            );
         if (tmpE != null) {
-            typeStr = tmpE.getAttribute("Type");
+            String typeStr = tmpE.getAttribute("Type");
+            if (typeStr != null) {
+                 return typeStr.equals(WSConstants.ENC_NS + "Content");
+            }
         }
-        if (typeStr != null) {
-            content = typeStr.equals(WSConstants.ENC_NS + "Content") ? true : false;
-        }
-        return content;
+        return true;
     }
 
     public static String getEncAlgo(Node encBodyData) throws WSSecurityException {
-        Element tmpE = (Element) WSSecurityUtil.findElement(encBodyData,
-                "EncryptionMethod", WSConstants.ENC_NS);
-
+        Element tmpE = 
+            (Element) WSSecurityUtil.findElement(
+                encBodyData, "EncryptionMethod", WSConstants.ENC_NS
+            );
         String symEncAlgo = null;
         if (tmpE != null) {
             symEncAlgo = tmpE.getAttribute("Algorithm");
-        }
-        if (symEncAlgo == null) {
-            throw new WSSecurityException
-                    (WSSecurityException.UNSUPPORTED_ALGORITHM,
-                            "noEncAlgo");
+            if (symEncAlgo == null) {
+                throw new WSSecurityException(
+                    WSSecurityException.UNSUPPORTED_ALGORITHM, "noEncAlgo"
+                );
+            }
         }
         if (log.isDebugEnabled()) {
             log.debug("Sym Enc Algo: " + symEncAlgo);
@@ -77,47 +77,53 @@ public class X509Util {
         return symEncAlgo;
     }
 
-    protected static SecretKey getSharedKey(Element keyInfoElem,
-                                            String algorithm,
-                                            CallbackHandler cb)
-            throws WSSecurityException {
+    protected static SecretKey getSharedKey(
+        Element keyInfoElem,
+        String algorithm,
+        CallbackHandler cb
+    ) throws WSSecurityException {
         String keyName = null;
-        Element keyNmElem =
-                (Element) WSSecurityUtil.getDirectChild(keyInfoElem,
-                        "KeyName",
-                        WSConstants.SIG_NS);
+        Element keyNmElem = 
+            (Element) WSSecurityUtil.getDirectChild(
+                keyInfoElem, "KeyName", WSConstants.SIG_NS
+            );
         if (keyNmElem != null) {
             keyNmElem.normalize();
-            Node tmpN;
-            if ((tmpN = keyNmElem.getFirstChild()) != null
-                    && tmpN.getNodeType() == Node.TEXT_NODE) {
+            Node tmpN = keyNmElem.getFirstChild();
+            if (tmpN != null && tmpN.getNodeType() == Node.TEXT_NODE) {
                 keyName = tmpN.getNodeValue();
             }
         }
         if (keyName == null) {
-            throw new WSSecurityException(WSSecurityException.INVALID_SECURITY,
-                    "noKeyname");
+            throw new WSSecurityException(WSSecurityException.INVALID_SECURITY, "noKeyname");
         }
-        WSPasswordCallback pwCb = new WSPasswordCallback(
-                keyName, WSPasswordCallback.KEY_NAME);
+        WSPasswordCallback pwCb = new WSPasswordCallback(keyName, WSPasswordCallback.KEY_NAME);
         Callback[] callbacks = new Callback[1];
         callbacks[0] = pwCb;
         try {
             cb.handle(callbacks);
         } catch (IOException e) {
-            throw new WSSecurityException(WSSecurityException.FAILURE,
-                    "noPassword",
-                    new Object[]{keyName}, e);
+            throw new WSSecurityException(
+                WSSecurityException.FAILURE,
+                "noPassword",
+                new Object[]{keyName}, 
+                e
+            );
         } catch (UnsupportedCallbackException e) {
-            throw new WSSecurityException(WSSecurityException.FAILURE,
-                    "noPassword",
-                    new Object[]{keyName}, e);
+            throw new WSSecurityException(
+                WSSecurityException.FAILURE,
+                "noPassword",
+                new Object[]{keyName}, 
+                e
+            );
         }
         byte[] decryptedData = pwCb.getKey();
         if (decryptedData == null) {
-            throw new WSSecurityException(WSSecurityException.FAILURE,
-                    "noPassword",
-                    new Object[]{keyName});
+            throw new WSSecurityException(
+                WSSecurityException.FAILURE,
+                "noPassword",
+                new Object[]{keyName}
+            );
         }
         return WSSecurityUtil.prepareSecretKey(algorithm, decryptedData);
     }

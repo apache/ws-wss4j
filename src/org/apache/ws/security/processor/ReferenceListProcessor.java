@@ -53,46 +53,54 @@ public class ReferenceListProcessor implements Processor {
         LogFactory.getLog(ReferenceListProcessor.class.getName());
 
     private boolean debug = false;
-
-
     WSDocInfo wsDocInfo = null;
 
-    public void handleToken(Element elem, Crypto crypto, Crypto decCrypto,
-            CallbackHandler cb, WSDocInfo wdi, Vector returnResults,
-            WSSConfig wsc) throws WSSecurityException {
+    public void handleToken(
+        Element elem, 
+        Crypto crypto, 
+        Crypto decCrypto,
+        CallbackHandler cb, 
+        WSDocInfo wdi, 
+        Vector returnResults,
+        WSSConfig wsc
+    ) throws WSSecurityException {
 
         debug = log.isDebugEnabled();
         if (debug) {
             log.debug("Found reference list element");
         }
         if (cb == null) {
-            throw new WSSecurityException(WSSecurityException.FAILURE,
-                    "noCallback");
+            throw new WSSecurityException(WSSecurityException.FAILURE, "noCallback");
         }
         wsDocInfo = wdi;
-        ArrayList uris = handleReferenceList((Element) elem, cb, crypto);
-        returnResults.add(0, new WSSecurityEngineResult(WSConstants.ENCR, uris));
+        ArrayList uris = handleReferenceList(elem, cb, crypto);
+        returnResults.add(
+            0,
+            new WSSecurityEngineResult(WSConstants.ENCR, uris)
+        );
     }
 
     /**
      * Dereferences and decodes encrypted data elements.
      * 
-     * @param elem
-     *            contains the <code>ReferenceList</code> to the encrypted
-     *            data elements
-     * @param cb
-     *            the callback handler to get the key for a key name stored if
-     *            <code>KeyInfo</code> inside the encrypted data elements
+     * @param elem contains the <code>ReferenceList</code> to the encrypted
+     *             data elements
+     * @param cb the callback handler to get the key for a key name stored if
+     *           <code>KeyInfo</code> inside the encrypted data elements
      */
-    private ArrayList handleReferenceList(Element elem, CallbackHandler cb,
-            Crypto crypto) throws WSSecurityException {
-
+    private ArrayList handleReferenceList(
+        Element elem, 
+        CallbackHandler cb,
+        Crypto crypto
+    ) throws WSSecurityException {
         Document doc = elem.getOwnerDocument();
 
         Node tmpE = null;
         ArrayList dataRefUris = new ArrayList();
-        for (tmpE = elem.getFirstChild(); tmpE != null; tmpE = tmpE
-                .getNextSibling()) {
+        for (tmpE = elem.getFirstChild(); 
+            tmpE != null; 
+            tmpE = tmpE.getNextSibling()
+        ) {
             if (tmpE.getNodeType() != Node.ELEMENT_NODE) {
                 continue;
             }
@@ -110,23 +118,29 @@ public class ReferenceListProcessor implements Processor {
         return dataRefUris;
     }
 
-    public void decryptDataRefEmbedded(Document doc, String dataRefURI, WSDataRef dataRef,
-            CallbackHandler cb, Crypto crypto) throws WSSecurityException {
+    public void decryptDataRefEmbedded(
+        Document doc, 
+        String dataRefURI, 
+        WSDataRef dataRef,
+        CallbackHandler cb, 
+        Crypto crypto
+    ) throws WSSecurityException {
 
         if (log.isDebugEnabled()) {
             log.debug("Found data reference: " + dataRefURI);
         }
-        /*
-         * Look up the encrypted data. First try wsu:Id="someURI". If no such Id
-         * then try the generic lookup to find Id="someURI"
-         */
+        //
+        // Look up the encrypted data. First try wsu:Id="someURI". If no such Id
+        // then try the generic lookup to find Id="someURI"
+        //
         Element encBodyData = null;
         if ((encBodyData = WSSecurityUtil.getElementByWsuId(doc, dataRefURI)) == null) {            
             encBodyData = WSSecurityUtil.getElementByGenId(doc, dataRefURI);
         }
         if (encBodyData == null) {
-            throw new WSSecurityException(WSSecurityException.INVALID_SECURITY,
-                    "dataRef", new Object[] { dataRefURI });
+            throw new WSSecurityException(
+                WSSecurityException.INVALID_SECURITY, "dataRef", new Object[] {dataRefURI}
+            );
         }
 
         boolean content = X509Util.isContent(encBodyData);
@@ -134,25 +148,29 @@ public class ReferenceListProcessor implements Processor {
         // Now figure out the encryption algorithm
         String symEncAlgo = X509Util.getEncAlgo(encBodyData);
 
-        Element tmpE = (Element) WSSecurityUtil.findElement((Node) encBodyData,
-                "KeyInfo", WSConstants.SIG_NS);
+        Element tmpE = 
+            (Element)WSSecurityUtil.findElement(
+                (Node) encBodyData, "KeyInfo", WSConstants.SIG_NS
+            );
         if (tmpE == null) {
-            throw new WSSecurityException(WSSecurityException.INVALID_SECURITY,
-                    "noKeyinfo");
+            throw new WSSecurityException(WSSecurityException.INVALID_SECURITY, "noKeyinfo");
         }
 
-        /*
-         * Try to get a security reference token, if none found try to get a
-         * shared key using a KeyName.
-         */
-        Element secRefToken = (Element) WSSecurityUtil.getDirectChild(tmpE,
-                "SecurityTokenReference", WSConstants.WSSE_NS);
+        //
+        // Try to get a security reference token, if none found try to get a
+        // shared key using a KeyName.
+        //
+        Element secRefToken = 
+            (Element) WSSecurityUtil.getDirectChild(
+                tmpE, "SecurityTokenReference", WSConstants.WSSE_NS
+            );
 
         SecretKey symmetricKey = null;
         if (secRefToken == null) {
             symmetricKey = X509Util.getSharedKey(tmpE, symEncAlgo, cb);
-        } else
+        } else {
             symmetricKey = getKeyFromSecurityTokenReference(secRefToken, symEncAlgo, crypto, cb);
+        }
 
         // initialize Cipher ....
         XMLCipher xmlCipher = null;
@@ -161,7 +179,8 @@ public class ReferenceListProcessor implements Processor {
             xmlCipher.init(XMLCipher.DECRYPT_MODE, symmetricKey);
         } catch (XMLEncryptionException e1) {
             throw new WSSecurityException(
-                    WSSecurityException.UNSUPPORTED_ALGORITHM, null, null, e1);
+                WSSecurityException.UNSUPPORTED_ALGORITHM, null, null, e1
+            );
         }
 
         if (content) {
@@ -170,46 +189,49 @@ public class ReferenceListProcessor implements Processor {
             
         try {
             Node parentEncBody =encBodyData.getParentNode();
-            
-                final java.util.List before_peers = listChildren(parentEncBody);
+            final java.util.List before_peers = listChildren(parentEncBody);
             
             xmlCipher.doFinal(doc, encBodyData, content);
             
-            if(parentEncBody.getLocalName().equals(WSConstants.ENCRYPTED_HEADER)
-                    && parentEncBody.getNamespaceURI().equals(WSConstants.WSSE11_NS)) {
+            if (parentEncBody.getLocalName().equals(WSConstants.ENCRYPTED_HEADER)
+                && parentEncBody.getNamespaceURI().equals(WSConstants.WSSE11_NS)) {
                 Node decryptedHeader = parentEncBody.getFirstChild();
                 Element decryptedHeaderClone = (Element)decryptedHeader.cloneNode(true);
-                    String sigId = decryptedHeaderClone.getAttributeNS(WSConstants.WSU_NS, "Id");
+                String sigId = decryptedHeaderClone.getAttributeNS(WSConstants.WSU_NS, "Id");
                 
-                    if ( sigId == null || sigId.equals("") ) {
-                            String id = ((Element)parentEncBody).getAttributeNS(WSConstants.WSU_NS, "Id");                              
-                            String wsuPrefix = WSSecurityUtil.setNamespace(decryptedHeaderClone,
-                                        WSConstants.WSU_NS, WSConstants.WSU_PREFIX);
-                            decryptedHeaderClone.setAttributeNS(WSConstants.WSU_NS, wsuPrefix + ":Id", id);
-                            dataRef.setWsuId(id.substring(1));
-                    } else {
-                        dataRef.setWsuId(sigId);
-                    }
+                if (sigId == null || sigId.equals("")) {
+                    String id = ((Element)parentEncBody).getAttributeNS(WSConstants.WSU_NS, "Id");                              
+                    String wsuPrefix = 
+                        WSSecurityUtil.setNamespace(
+                            decryptedHeaderClone, WSConstants.WSU_NS, WSConstants.WSU_PREFIX
+                        );
+                    decryptedHeaderClone.setAttributeNS(WSConstants.WSU_NS, wsuPrefix + ":Id", id);
+                    dataRef.setWsuId(id.substring(1));
+                } else {
+                    dataRef.setWsuId(sigId);
+                }
                     
                 parentEncBody.getParentNode().appendChild(decryptedHeaderClone);
                 parentEncBody.getParentNode().removeChild(parentEncBody);
-                
             } 
             
             final java.util.List after_peers = listChildren(parentEncBody);
             final java.util.List new_nodes = newNodes(before_peers, after_peers);
-
             for (
                 final java.util.Iterator pos = new_nodes.iterator();
                 pos.hasNext();
             ) {
                 Node node = (Node) pos.next();
                 if (node instanceof Element) {
-                    if(!Constants.SignatureSpecNS.equals(node.getNamespaceURI()) &&
-                            node.getAttributes().getNamedItemNS(WSConstants.WSU_NS, "Id") == null) {
-                        String wsuPrefix = WSSecurityUtil.setNamespace((Element)node,
-                                WSConstants.WSU_NS, WSConstants.WSU_PREFIX);
-                        ((Element)node).setAttributeNS(WSConstants.WSU_NS, wsuPrefix + ":Id", dataRefURI);
+                    if(!Constants.SignatureSpecNS.equals(node.getNamespaceURI()) 
+                        && node.getAttributes().getNamedItemNS(WSConstants.WSU_NS, "Id") == null) {
+                        String wsuPrefix = 
+                            WSSecurityUtil.setNamespace(
+                                (Element)node, WSConstants.WSU_NS, WSConstants.WSU_PREFIX
+                            );
+                        ((Element)node).setAttributeNS(
+                            WSConstants.WSU_NS, wsuPrefix + ":Id", dataRefURI
+                        );
                         dataRef.setWsuId(dataRefURI.substring(1));                              
                     }
                     dataRef.setName(new QName(node.getNamespaceURI(),node.getLocalName()));
@@ -217,18 +239,12 @@ public class ReferenceListProcessor implements Processor {
             }
 
         } catch (Exception e) {
-            throw new WSSecurityException(WSSecurityException.FAILED_CHECK,
-                    null, null, e);
+            throw new WSSecurityException(
+                WSSecurityException.FAILED_CHECK, null, null, e
+            );
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.apache.ws.security.processor.Processor#getId()
-     * 
-     * A reference list does not have an id.
-     */
     public String getId() {
         return null;
     }
@@ -243,24 +259,23 @@ public class ReferenceListProcessor implements Processor {
      * EncrypteKey element to get the decrypted session key bytes. Using the
      * algorithm parameter these bytes are converted into a secret key.
      * 
-     * <p/>
-     * 
      * This method requires that the EncyrptedKey element is already available,
      * thus requires a strict layout of the security header. This method
      * supports EncryptedKey elements within the same message.
      * 
-     * @param secRefToken
-     *            The element containing the STR
-     * @param algorithm
-     *            A string that identifies the symmetric decryption algorithm
+     * @param secRefToken The element containing the STR
+     * @param algorithm A string that identifies the symmetric decryption algorithm
      * @param crypto Crypto instance to obtain key
      * @param cb CAllback handler to obtain the key passwords
      * @return The secret key for the specified algorithm
      * @throws WSSecurityException
      */
-    private SecretKey getKeyFromSecurityTokenReference(Element secRefToken, String algorithm,
-            Crypto crypto, CallbackHandler cb)
-            throws WSSecurityException {
+    private SecretKey getKeyFromSecurityTokenReference(
+        Element secRefToken, 
+        String algorithm,
+        Crypto crypto, 
+        CallbackHandler cb
+    ) throws WSSecurityException {
 
         SecurityTokenReference secRef = new SecurityTokenReference(secRefToken);
         byte[] decryptedData = null;
@@ -273,57 +288,69 @@ public class ReferenceListProcessor implements Processor {
                 id = id.substring(1);
             }
             Processor p = wsDocInfo.getProcessor(id);
-            if (p == null
-                    || (!(p instanceof EncryptedKeyProcessor)
-                            && !(p instanceof DerivedKeyTokenProcessor) 
-                            && !(p instanceof SAMLTokenProcessor))) {
-                
+            if (!(p instanceof EncryptedKeyProcessor
+                || p instanceof DerivedKeyTokenProcessor 
+                || p instanceof SAMLTokenProcessor)
+            ) {
                 // Try custom token
                 WSPasswordCallback pwcb = new WSPasswordCallback(id, WSPasswordCallback.CUSTOM_TOKEN);
                 try {
-                    cb.handle(new Callback[]{pwcb});
+                    Callback[] callbacks = new Callback[]{pwcb};
+                    cb.handle(callbacks);
                 } catch (Exception e) {
-                    throw new WSSecurityException(WSSecurityException.FAILURE,
-                            "noPassword", new Object[] { id }, e);
+                    throw new WSSecurityException(
+                        WSSecurityException.FAILURE,
+                        "noPassword", 
+                        new Object[] {id}, 
+                        e
+                    );
                 }
                 decryptedData = pwcb.getKey();
                 
-                if(decryptedData == null) {
+                if (decryptedData == null) {
                     throw new WSSecurityException(
-                        WSSecurityException.FAILED_CHECK, "unsupportedKeyId");
+                        WSSecurityException.FAILED_CHECK, "unsupportedKeyId"
+                    );
                 }
             }
-            if(p instanceof EncryptedKeyProcessor) {
+            if (p instanceof EncryptedKeyProcessor) {
                 EncryptedKeyProcessor ekp = (EncryptedKeyProcessor) p;
                 decryptedData = ekp.getDecryptedBytes();
-            } else if(p instanceof DerivedKeyTokenProcessor) {
+            } else if (p instanceof DerivedKeyTokenProcessor) {
                 DerivedKeyTokenProcessor dkp = (DerivedKeyTokenProcessor) p;
                 decryptedData = dkp.getKeyBytes(WSSecurityUtil.getKeyLength(algorithm));
-            } else if(p instanceof SAMLTokenProcessor) {
+            } else if (p instanceof SAMLTokenProcessor) {
                 SAMLTokenProcessor samlp = (SAMLTokenProcessor) p;
-                SAMLKeyInfo keyInfo = SAMLUtil.getSAMLKeyInfo(samlp
-                        .getSamlTokenElement(), crypto, cb);
-                //TODO Handle malformed SAML tokens where they don't have the 
-                //secret in them
+                SAMLKeyInfo keyInfo = 
+                    SAMLUtil.getSAMLKeyInfo(samlp.getSamlTokenElement(), crypto, cb);
+                // TODO Handle malformed SAML tokens where they don't have the 
+                // secret in them
                 decryptedData = keyInfo.getSecret();
             }
         } else if (secRef.containsKeyIdentifier()){
             String sha = secRef.getKeyIdentifierValue();
-            WSPasswordCallback pwcb = new WSPasswordCallback(secRef.getKeyIdentifierValue(),
-                                                             null,
-                                                             secRef.getKeyIdentifierValueType(),
-                                                             WSPasswordCallback.ENCRYPTED_KEY_TOKEN);
+            WSPasswordCallback pwcb = 
+                new WSPasswordCallback(
+                    secRef.getKeyIdentifierValue(),
+                    null,
+                    secRef.getKeyIdentifierValueType(),
+                    WSPasswordCallback.ENCRYPTED_KEY_TOKEN
+                );
             
             try {
-                cb.handle(new Callback[]{pwcb});
+                Callback[] callbacks = new Callback[]{pwcb};
+                cb.handle(callbacks);
             } catch (Exception e) {
-                throw new WSSecurityException(WSSecurityException.FAILURE,
-                        "noPassword", new Object[] { sha }, e);
+                throw new WSSecurityException(
+                    WSSecurityException.FAILURE,
+                    "noPassword", 
+                    new Object[] {sha}, 
+                    e
+                );
             }
             decryptedData = pwcb.getKey();
         } else {
-            throw new WSSecurityException(WSSecurityException.FAILED_CHECK,
-                    "noReference");
+            throw new WSSecurityException(WSSecurityException.FAILED_CHECK, "noReference");
         }
         return WSSecurityUtil.prepareSecretKey(algorithm, decryptedData);
     }

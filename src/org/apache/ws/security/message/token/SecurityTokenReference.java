@@ -43,7 +43,6 @@ import java.security.cert.X509Certificate;
 
 /**
  * Security Token Reference.
- * <p/>
  *
  * @author Davanum Srinivas (dims@yahoo.com).
  */
@@ -52,19 +51,21 @@ public class SecurityTokenReference {
             LogFactory.getLog(SecurityTokenReference.class.getName());
     public static final String SECURITY_TOKEN_REFERENCE = "SecurityTokenReference";
     public static final String KEY_NAME = "KeyName";
-    public static final String SKI_URI = WSConstants.X509TOKEN_NS + "#X509SubjectKeyIdentifier";
-    public static final String THUMB_URI = WSConstants.SOAPMESSAGE_NS11 + "#" + WSConstants.THUMBPRINT;
-    public static final String SAML_ID_URI = WSConstants.SAMLTOKEN_NS + "#" + WSConstants.SAML_ASSERTION_ID;
-    public static final String ENC_KEY_SHA1_URI = WSConstants.SOAPMESSAGE_NS11 + "#" + WSConstants.ENC_KEY_SHA1_URI;
+    public static final String SKI_URI = 
+        WSConstants.X509TOKEN_NS + "#X509SubjectKeyIdentifier";
+    public static final String THUMB_URI = 
+        WSConstants.SOAPMESSAGE_NS11 + "#" + WSConstants.THUMBPRINT;
+    public static final String SAML_ID_URI = 
+        WSConstants.SAMLTOKEN_NS + "#" + WSConstants.SAML_ASSERTION_ID;
+    public static final String ENC_KEY_SHA1_URI = 
+        WSConstants.SOAPMESSAGE_NS11 + "#" + WSConstants.ENC_KEY_SHA1_URI;
     protected Element element = null;
     private XMLX509IssuerSerial issuerSerial = null;
     private byte[] skiBytes = null;
-    
     private static boolean doDebug = false;
 
     /**
      * Constructor.
-     * <p/>
      *
      * @param elem TODO
      * @throws WSSecurityException
@@ -79,34 +80,24 @@ public class SecurityTokenReference {
 //            goodElement = WSConstants.SIG_NS.equals(element.getNamespaceURI());
         }
         if (!goodElement) {
-            throw new WSSecurityException(WSSecurityException.FAILURE,
-                    "badElement",
-                    null);
+            throw new WSSecurityException(WSSecurityException.FAILURE, "badElement", null);
         }
     }
 
     /**
      * Constructor.
-     * <p/>
      *
      * @param doc TODO
      */
     public SecurityTokenReference(Document doc) {
         doDebug = log.isDebugEnabled();
         this.element =
-                doc.createElementNS(WSConstants.WSSE_NS,
-                        "wsse:SecurityTokenReference");
+                doc.createElementNS(WSConstants.WSSE_NS, "wsse:SecurityTokenReference");
         WSSecurityUtil.setNamespace(this.element, WSConstants.WSSE_NS, WSConstants.WSSE_PREFIX);        
     }
 
-    /*
-     * Here the methods that handle the direct reference inside
-     * a SecurityTokenReference
-     */
-
     /**
      * set the reference.
-     * <p/>
      *
      * @param ref
      */
@@ -143,28 +134,29 @@ public class SecurityTokenReference {
      *            element. This could be different from the document
      *            that contains the SecurityTokenReference (STR). See
      *            STRTransform.derefenceBST() method
-     * @return Element     containing the signing token, must be a BinarySecurityToken
+     * @return Element containing the signing token, must be a BinarySecurityToken
      * @throws WSSecurityException When either no <code>Reference</code> element, or the found
      *                   reference contains no URI, or the referenced signing not found.
      */
     public Element getTokenElement(Document doc, WSDocInfo docInfo, CallbackHandler cb)
-            throws WSSecurityException {
+        throws WSSecurityException {
         Reference ref = getReference();
         String uri = ref.getURI();
         if (doDebug) {
             log.debug("Token reference uri: " + uri);
         }
         if (uri == null) {
-            throw new WSSecurityException(WSSecurityException.INVALID_SECURITY,
-                    "badReferenceURI");
+            throw new WSSecurityException(
+                WSSecurityException.INVALID_SECURITY, "badReferenceURI"
+            );
         }
         Element tokElement = null;
         String tmpS = WSConstants.WSS_SAML_NS + WSConstants.WSS_SAML_ASSERTION;
         String saml10 = WSConstants.WSS_SAML_NS + WSConstants.SAML_ASSERTION_ID;
         
         if (tmpS.equals(ref.getValueType())
-                || saml10.equals(ref.getValueType())
-                || WSConstants.WSC_SCT.equals(ref.getValueType())) {
+            || saml10.equals(ref.getValueType())
+            || WSConstants.WSC_SCT.equals(ref.getValueType())) {
             Element sa = docInfo.getAssertion();
             String saID = null;
             if (sa != null) {
@@ -178,36 +170,42 @@ public class SecurityTokenReference {
                 id = id.substring(1);
             }
             if (saID == null || !saID.equals(id)) {
-                
-                if(cb != null) {
+                if (cb != null) {
                     //try to find a custom token
-                    WSPasswordCallback pwcb = new WSPasswordCallback(id,
-                            WSPasswordCallback.CUSTOM_TOKEN);
+                    WSPasswordCallback pwcb = 
+                        new WSPasswordCallback(id, WSPasswordCallback.CUSTOM_TOKEN);
                     try {
                         cb.handle(new Callback[]{pwcb});
                     } catch (Exception e) {
-                        throw new WSSecurityException(WSSecurityException.FAILURE,
-                                "noPassword", new Object[] { id }, e);
+                        throw new WSSecurityException(
+                            WSSecurityException.FAILURE,
+                            "noPassword", 
+                            new Object[] {id}, 
+                            e
+                        );
                     }
                     
                     Element assertionElem = pwcb.getCustomToken();
-                    if(assertionElem != null) {
+                    if (assertionElem != null) {
                         sa = (Element)doc.importNode(assertionElem, true);
                     }
                     else {
-                        throw new WSSecurityException(WSSecurityException.INVALID_SECURITY,
+                        throw new WSSecurityException(
+                            WSSecurityException.INVALID_SECURITY,
                             "badReferenceURI",
-                            new Object[]{"uri:" + uri + ", saID: " + saID});
+                            new Object[]{"uri:" + uri + ", saID: " + saID}
+                        );
                     }
                 } else {
-                    throw new WSSecurityException(WSSecurityException.INVALID_SECURITY,
-                            "badReferenceURI",
-                            new Object[]{"uri:" + uri + ", saID: " + saID});
+                    throw new WSSecurityException(
+                        WSSecurityException.INVALID_SECURITY,
+                        "badReferenceURI",
+                        new Object[]{"uri:" + uri + ", saID: " + saID}
+                    );
                 }
             }
             tokElement = sa;
         } else {
-
             tokElement = WSSecurityUtil.getElementByWsuId(doc, uri);
             
             // In some scenarios id is used rather than wsu:Id
@@ -217,17 +215,15 @@ public class SecurityTokenReference {
 
         }
         if (tokElement == null) {
-            throw new WSSecurityException(WSSecurityException.SECURITY_TOKEN_UNAVAILABLE,
-                    "noToken",
-                    new Object[]{uri});
+            throw new WSSecurityException(
+                WSSecurityException.SECURITY_TOKEN_UNAVAILABLE,
+                "noToken",
+                new Object[]{uri}
+            );
         }
         return tokElement;
     }
 
-    /*
-     * Here the methods that handle the various key identifier types
-     * such as KeyIdentifier, SubjectKeyIdentifier (SKI)
-     */
 
     /**
      * Sets the KeyIdentifier Element as a X509 certificate.
@@ -238,22 +234,19 @@ public class SecurityTokenReference {
      * @param cert is the X509 certificate to be inserted as key identifier
      */
     public void setKeyIdentifier(X509Certificate cert)
-            throws WSSecurityException {
+        throws WSSecurityException {
         Document doc = this.element.getOwnerDocument();
         byte data[] = null;
         try {
             data = cert.getEncoded();
         } catch (CertificateEncodingException e) {
             throw new WSSecurityException(
-                WSSecurityException.SECURITY_TOKEN_UNAVAILABLE, "encodeError", null, e);
+                WSSecurityException.SECURITY_TOKEN_UNAVAILABLE, "encodeError", null, e
+            );
         }
         Text text = doc.createTextNode(Base64.encode(data));
         
-        if (cert.getVersion() == 1) {
-            createKeyIdentifier(doc, X509Security.X509_V1_TYPE, text);
-        } else {
-            createKeyIdentifier(doc, X509Security.X509_V3_TYPE, text);
-        }
+        createKeyIdentifier(doc, X509Security.X509_V3_TYPE, text);
     }
 
     /**
@@ -266,7 +259,7 @@ public class SecurityTokenReference {
      * @param crypto is the Crypto implementation. Used to read SKI info bytes from certificate
      */
     public void setKeyIdentifierSKI(X509Certificate cert, Crypto crypto)
-            throws WSSecurityException {
+        throws WSSecurityException {
         //
         // As per the 1.1 specification, SKI can only be used for a V3 certificate
         //
@@ -293,11 +286,9 @@ public class SecurityTokenReference {
      * element, which is placed in the <code>wsse:SecurityTokenReference</code>
      * element.
      * 
-     * @param cert
-     *            is the X509 certificate to get the thumbprint
+     * @param cert is the X509 certificate to get the thumbprint
      */
-    public void setKeyIdentifierThumb(X509Certificate cert)
-            throws WSSecurityException {
+    public void setKeyIdentifierThumb(X509Certificate cert) throws WSSecurityException {
         Document doc = this.element.getOwnerDocument();
         MessageDigest sha = null;
         try {
@@ -322,27 +313,21 @@ public class SecurityTokenReference {
     }
     
 
-    public void setKeyIdentifierEncKeySHA1(String value) 
-               throws WSSecurityException {
+    public void setKeyIdentifierEncKeySHA1(String value) throws WSSecurityException {
         Document doc = this.element.getOwnerDocument();
         org.w3c.dom.Text text = doc.createTextNode(value);
         createKeyIdentifier(doc, ENC_KEY_SHA1_URI, text);
-        
     }
     
-    public void setSAMLKeyIdentifier(String keyIdVal)
-            throws WSSecurityException {
+    public void setSAMLKeyIdentifier(String keyIdVal) throws WSSecurityException {
         Document doc = this.element.getOwnerDocument();
         createKeyIdentifier(doc, SAML_ID_URI, doc.createTextNode(keyIdVal));
     }
 
     private void createKeyIdentifier(Document doc, String uri, Node node) {
-        
-        Element keyId = doc.createElementNS(WSConstants.WSSE_NS,
-                "wsse:KeyIdentifier");
+        Element keyId = doc.createElementNS(WSConstants.WSSE_NS, "wsse:KeyIdentifier");
         keyId.setAttributeNS(null, "ValueType", uri);
-        keyId.setAttributeNS(null, "EncodingType",
-                BinarySecurity.BASE64_ENCODING);
+        keyId.setAttributeNS(null, "EncodingType", BinarySecurity.BASE64_ENCODING);
 
         keyId.appendChild(node);
         Element elem = getFirstElement();
@@ -353,9 +338,6 @@ public class SecurityTokenReference {
         }
     }
 
-    /*
-     * Several helper and utility methods.
-     */
     
     /**
      * get the first child element.
@@ -365,7 +347,8 @@ public class SecurityTokenReference {
     public Element getFirstElement() {
         for (Node currentChild = this.element.getFirstChild();
              currentChild != null;
-             currentChild = currentChild.getNextSibling()) {
+             currentChild = currentChild.getNextSibling()
+        ) {
             if (currentChild instanceof Element) {
                 return (Element) currentChild;
             }
@@ -379,16 +362,13 @@ public class SecurityTokenReference {
      * @return the the X509 certificate or zero if a unknown key identifier
      *         type was detected.
      */
-    public X509Certificate[] getKeyIdentifier(Crypto crypto)
-            throws WSSecurityException {
-        X509Security token = null;
+    public X509Certificate[] getKeyIdentifier(Crypto crypto) throws WSSecurityException {
         Element elem = getFirstElement();
         String value = elem.getAttribute("ValueType");
         String alias = null;
 
-        if (X509Security.X509_V3_TYPE.equals(value) 
-                || X509Security.X509_V1_TYPE.equals(value)) {
-            token = new X509Security(elem);
+        if (X509Security.X509_V3_TYPE.equals(value)) {
+            X509Security token = new X509Security(elem);
             if (token != null) {
                 X509Certificate cert = token.getX509Certificate(crypto);
                 X509Certificate[] certs = new X509Certificate[1];
@@ -415,7 +395,7 @@ public class SecurityTokenReference {
     }
     
     public String getKeyIdentifierValue() {
-        if(containsKeyIdentifier()) {
+        if (containsKeyIdentifier()) {
             Node node = getFirstElement().getFirstChild();
             if (node == null) {
                 return null;
@@ -428,15 +408,13 @@ public class SecurityTokenReference {
     }
     
     public String getKeyIdentifierValueType() {
-        if(containsKeyIdentifier()) {
+        if (containsKeyIdentifier()) {
             Element elem = getFirstElement();
             return elem.getAttribute("ValueType");
-            
         } 
         return null;
     }
     
-        
 
     public String getX509SKIAlias(Crypto crypto) throws WSSecurityException {
         if (skiBytes == null) {
@@ -470,9 +448,6 @@ public class SecurityTokenReference {
         return skiBytes;
     }
 
-    /*
-     * Here the methods that handle the IssuerSerial key identification
-     */
 
     /**
      * Sets the X509 IssuerSerial data.
@@ -497,8 +472,7 @@ public class SecurityTokenReference {
      *
      * @return a certificate array or null if nothing found
      */
-    public X509Certificate[] getX509IssuerSerial(Crypto crypto)
-            throws WSSecurityException {
+    public X509Certificate[] getX509IssuerSerial(Crypto crypto) throws WSSecurityException {
         String alias = getX509IssuerSerialAlias(crypto);
         if (alias != null) {
             return crypto.getCertificates(alias);
@@ -512,8 +486,7 @@ public class SecurityTokenReference {
      *
      * @return the alias name for the certificate or null if nothing found
      */
-    public String getX509IssuerSerialAlias(Crypto crypto)
-            throws WSSecurityException {
+    public String getX509IssuerSerialAlias(Crypto crypto) throws WSSecurityException {
         if (issuerSerial == null) {
             issuerSerial = getIssuerSerial();
             if (issuerSerial == null) {
@@ -521,9 +494,8 @@ public class SecurityTokenReference {
             }
         }
 
-        String alias = crypto.getAliasForX509Cert(issuerSerial.getIssuerName(),
-                issuerSerial.getSerialNumber());
-
+        String alias = 
+            crypto.getAliasForX509Cert(issuerSerial.getIssuerName(), issuerSerial.getSerialNumber());
         if (doDebug) {
             log.info("X509IssuerSerial alias: " + alias);
         }
@@ -540,21 +512,22 @@ public class SecurityTokenReference {
         }
         try {
             if (Constants._TAG_X509DATA.equals(elem.getLocalName())) {
-                elem = (Element)WSSecurityUtil.findElement(elem, Constants._TAG_X509ISSUERSERIAL, Constants.SignatureSpecNS);
+                elem = 
+                    (Element)WSSecurityUtil.findElement(
+                        elem, Constants._TAG_X509ISSUERSERIAL, Constants.SignatureSpecNS
+                    );
             }
             issuerSerial = new XMLX509IssuerSerial(elem, "");
         } catch (XMLSecurityException e) {
-            throw new WSSecurityException(WSSecurityException.SECURITY_TOKEN_UNAVAILABLE,
-                    "noToken",
-                    new Object[]{"Issuer/Serial data element missing"},
-                    e);
+            throw new WSSecurityException(
+                WSSecurityException.SECURITY_TOKEN_UNAVAILABLE,
+                "noToken",
+                new Object[]{"Issuer/Serial data element missing"},
+                e
+            );
         }
         return issuerSerial;
     }
-
-    /*
-     * Several helper and utility methods.
-     */
 
     /**
      * Method containsReference
@@ -595,6 +568,7 @@ public class SecurityTokenReference {
     public boolean containsX509Data() {
         return this.lengthX509Data() > 0;
     }
+    
     /**
      * Method lengthX509IssuerSerial.
      *
@@ -614,6 +588,7 @@ public class SecurityTokenReference {
     public int lengthX509Data() {
         return this.length(WSConstants.SIG_NS, Constants._TAG_X509DATA);
     }
+    
     /**
      * Method containsKeyIdentifier.
      *
@@ -643,17 +618,14 @@ public class SecurityTokenReference {
      */
     public int length(String namespace, String localname) {
         NodeList childNodes = this.element.getChildNodes();
-        int maxLength = childNodes.getLength();
         int result = 0;
-        for (int i = 0; i < maxLength; i++) {
+        for (int i = 0; i < childNodes.getLength(); i++) {
             Node n = childNodes.item(i);
             if (n.getNodeType() == Node.ELEMENT_NODE) {
                 String ns = n.getNamespaceURI();
                 String name = n.getLocalName();
-                if (((namespace != null)
-                        && (ns != null)
-                        && namespace.equals(ns))
-                        || ((namespace == null) && (ns == null))) {
+                if (((namespace != null) && (ns != null) && namespace.equals(ns))
+                    || ((namespace == null) && (ns == null))) {
                     if (localname.equals(name)) {
                         result++;
                     }
@@ -665,7 +637,6 @@ public class SecurityTokenReference {
 
     /**
      * get the dom element.
-     * <p/>
      *
      * @return TODO
      */
@@ -675,21 +646,19 @@ public class SecurityTokenReference {
 
     /**
      * set the id.
-     * <p/>
      *
      * @param id
      */
     public void setID(String id) {
         String prefix =
-                WSSecurityUtil.setNamespace(this.element,
-                        WSConstants.WSU_NS,
-                        WSConstants.WSU_PREFIX);
+                WSSecurityUtil.setNamespace(
+                    this.element, WSConstants.WSU_NS, WSConstants.WSU_PREFIX
+                );
         this.element.setAttributeNS(WSConstants.WSU_NS, prefix + ":Id", id);
     }
 
     /**
      * return the string representation.
-     * <p/>
      *
      * @return TODO
      */

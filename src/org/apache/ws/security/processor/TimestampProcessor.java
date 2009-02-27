@@ -40,21 +40,29 @@ public class TimestampProcessor implements Processor {
     private WSSConfig wssConfig = null;
     private String tsId;
     
-    public void handleToken(Element elem, Crypto crypto, Crypto decCrypto, CallbackHandler cb, WSDocInfo wsDocInfo, Vector returnResults, WSSConfig wsc) throws WSSecurityException {
+    public void handleToken(
+        Element elem, 
+        Crypto crypto, 
+        Crypto decCrypto, 
+        CallbackHandler cb, 
+        WSDocInfo wsDocInfo, 
+        Vector returnResults, 
+        WSSConfig wsc
+    ) throws WSSecurityException {
         if (log.isDebugEnabled()) {
             log.debug("Found Timestamp list element");
         }
         wssConfig = wsc;
-        /*
-         * Decode Timestamp, add the found time (created/expiry) to result
-         */
+        //
+        // Decode Timestamp, add the found time (created/expiry) to result
+        //
         Timestamp timestamp = new Timestamp(elem);
         handleTimestamp(timestamp);
-        returnResults.add(0,
-                new WSSecurityEngineResult(WSConstants.TS,
-                        timestamp));
+        returnResults.add(
+            0,
+            new WSSecurityEngineResult(WSConstants.TS, timestamp)
+        );
         tsId = elem.getAttributeNS(WSConstants.WSU_NS, "Id");
-
     }
 
     public void handleTimestamp(Timestamp timestamp) throws WSSecurityException {
@@ -63,15 +71,12 @@ public class TimestampProcessor implements Processor {
 
             DateFormat zulu = new XmlSchemaDateFormat();
 
-            log.debug("Current time: "
-                    + zulu.format(Calendar.getInstance().getTime()));
+            log.debug("Current time: " + zulu.format(Calendar.getInstance().getTime()));
             if (timestamp.getCreated() != null) {
-                log.debug("Timestamp created: "
-                        + zulu.format(timestamp.getCreated().getTime()));
+                log.debug("Timestamp created: " + zulu.format(timestamp.getCreated().getTime()));
             }
             if (timestamp.getExpires() != null) {
-                log.debug("Timestamp expires: "
-                        + zulu.format(timestamp.getExpires().getTime()));
+                log.debug("Timestamp expires: " + zulu.format(timestamp.getExpires().getTime()));
             }
         }
 
@@ -83,15 +88,12 @@ public class TimestampProcessor implements Processor {
                 throw new WSSecurityException(
                     WSSecurityException.MESSAGE_EXPIRED,
                     "invalidTimestamp",
-                    new Object[] { "The security semantics of the message have expired" }
+                    new Object[] {"The security semantics of the message have expired"}
                 );
             }
         }
     }
     
-    /* (non-Javadoc)
-     * @see org.apache.ws.security.processor.Processor#getId()
-     */
     public String getId() {
         return tsId;
     }    

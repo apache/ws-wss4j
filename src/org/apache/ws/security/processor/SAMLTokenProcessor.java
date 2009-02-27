@@ -38,15 +38,25 @@ public class SAMLTokenProcessor implements Processor {
     private String id;
     private Element samlTokenElement;
 
-    public void handleToken(Element elem, Crypto crypto, Crypto decCrypto, CallbackHandler cb, WSDocInfo wsDocInfo, Vector returnResults, WSSConfig wsc) throws WSSecurityException {
+    public void handleToken(
+        Element elem, 
+        Crypto crypto,
+        Crypto decCrypto, 
+        CallbackHandler cb, 
+        WSDocInfo wsDocInfo, 
+        Vector returnResults, 
+        WSSConfig wsc
+    ) throws WSSecurityException {
         if (log.isDebugEnabled()) {
             log.debug("Found SAML Assertion element");
         }
         SAMLAssertion assertion = handleSAMLToken((Element) elem);
         this.id = assertion.getId();
         wsDocInfo.setAssertion((Element) elem);
-        returnResults.add(0,
-                new WSSecurityEngineResult(WSConstants.ST_UNSIGNED, assertion));
+        returnResults.add(
+            0,
+            new WSSecurityEngineResult(WSConstants.ST_UNSIGNED, assertion)
+        );
         this.samlTokenElement = elem;
 
     }
@@ -61,8 +71,9 @@ public class SAMLTokenProcessor implements Processor {
                 log.debug("SAML Assertion issuer " + assertion.getIssuer());
             }
         } catch (SAMLException e) {
-            throw new WSSecurityException(WSSecurityException.FAILURE,
-                    "invalidSAMLsecurity", null, e);
+            throw new WSSecurityException(
+                WSSecurityException.FAILURE, "invalidSAMLsecurity", null, e
+            );
         }
         if (!result) {
             throw new WSSecurityException(WSSecurityException.FAILED_AUTHENTICATION);

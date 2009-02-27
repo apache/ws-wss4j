@@ -27,7 +27,6 @@ import java.security.cert.X509Certificate;
 
 /**
  * PKIPath Security Token.
- * <p/>
  *
  * @author Davanum Srinivas (dims@yahoo.com).
  */
@@ -36,7 +35,6 @@ public class PKIPathSecurity extends BinarySecurity {
 
     /**
      * Constructor.
-     * <p/>
      *
      * @throws WSSecurityException
      */
@@ -47,13 +45,13 @@ public class PKIPathSecurity extends BinarySecurity {
             throw new WSSecurityException(
                 WSSecurityException.INVALID_SECURITY_TOKEN,
                 "invalidValueType",
-                new Object[]{type, getValueType()});
+                new Object[]{type, getValueType()}
+            );
         }
     }
 
     /**
      * Constructor.
-     * <p/>
      */
     public PKIPathSecurity(Document doc) {
         super(doc);
@@ -62,7 +60,6 @@ public class PKIPathSecurity extends BinarySecurity {
 
     /**
      * get the X509Certificate array.
-     * <p/>
      *
      * @param reverse
      * @param crypto
@@ -75,27 +72,24 @@ public class PKIPathSecurity extends BinarySecurity {
         if (data == null) {
             return null;
         }
-        X509Certificate[] certs = null;
-        certs = crypto.getX509Certificates(data, reverse);
-        return certs;
+        return crypto.getX509Certificates(data, reverse);
     }
 
     /**
      * set the X509Certificate array.
-     * <p/>
      *
      * @param certs
      * @param reverse
      * @param crypto
      * @throws WSSecurityException
      */
-    public void setX509Certificates(X509Certificate[] certs,
-                                    boolean reverse,
-                                    Crypto crypto)
-        throws WSSecurityException {
+    public void setX509Certificates(
+        X509Certificate[] certs,
+        boolean reverse,
+        Crypto crypto
+    ) throws WSSecurityException {
         if (certs == null) {
-            throw new WSSecurityException(WSSecurityException.FAILURE,
-                    "noCert");
+            throw new WSSecurityException(WSSecurityException.FAILURE, "noCert");
         }
         byte[] data = crypto.getCertificateData(reverse, certs);
         setToken(data);

@@ -74,13 +74,13 @@ public class SecurityContextToken {
 
         String ns = ConversationConstants.getWSCNs(version);
         
-        this.element = doc.createElementNS(ns,
-                "wsc:" + ConversationConstants.SECURITY_CONTEXT_TOKEN_LN);
+        this.element = 
+            doc.createElementNS(ns, "wsc:" + ConversationConstants.SECURITY_CONTEXT_TOKEN_LN);
 
         WSSecurityUtil.setNamespace(this.element, ns, ConversationConstants.WSC_PREFIX);
 
-        this.elementIdentifier = doc.createElementNS(ns,
-                "wsc:" + ConversationConstants.IDENTIFIER_LN);
+        this.elementIdentifier = 
+            doc.createElementNS(ns, "wsc:" + ConversationConstants.IDENTIFIER_LN);
 
         this.element.appendChild(this.elementIdentifier);
 
@@ -100,14 +100,13 @@ public class SecurityContextToken {
 
         String ns = ConversationConstants.getWSCNs(version);
         
-        this.element = doc.createElementNS(ns,
-                "wsc:" + ConversationConstants.SECURITY_CONTEXT_TOKEN_LN);
+        this.element = 
+            doc.createElementNS(ns, "wsc:" + ConversationConstants.SECURITY_CONTEXT_TOKEN_LN);
 
-        WSSecurityUtil.setNamespace(this.element, ns,
-                ConversationConstants.WSC_PREFIX);
+        WSSecurityUtil.setNamespace(this.element, ns, ConversationConstants.WSC_PREFIX);
 
-        this.elementIdentifier = doc.createElementNS(ns,
-                "wsc:" + ConversationConstants.IDENTIFIER_LN);
+        this.elementIdentifier = 
+            doc.createElementNS(ns, "wsc:" + ConversationConstants.IDENTIFIER_LN);
 
         this.element.appendChild(this.elementIdentifier);
 
@@ -122,8 +121,7 @@ public class SecurityContextToken {
      */
     public SecurityContextToken(Element elem) throws WSSecurityException {
         this.element = elem;
-        QName el = new QName(this.element.getNamespaceURI(),
-                this.element.getLocalName());
+        QName el = new QName(this.element.getNamespaceURI(), this.element.getLocalName());
 
         // If the element is not a security context token, throw an exception
         if (!(el.equals(ConversationConstants.SECURITY_CTX_TOKEN_QNAME_05_02) ||
@@ -224,9 +222,8 @@ public class SecurityContextToken {
      *           SecurityContextToken
      */
     public void setID(String id) {
-        String prefix = WSSecurityUtil.setNamespace(this.element,
-                WSConstants.WSU_NS,
-                WSConstants.WSU_PREFIX);
+        String prefix = 
+            WSSecurityUtil.setNamespace(this.element, WSConstants.WSU_NS, WSConstants.WSU_PREFIX);
         this.element.setAttributeNS(WSConstants.WSU_NS, prefix + ":Id", id);
     }
 

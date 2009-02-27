@@ -23,20 +23,19 @@ import org.apache.ws.security.components.crypto.Crypto;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import java.io.InputStream;
 import java.io.ByteArrayInputStream;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 
 /**
  * X509 Security Token.
- * <p/>
  *
  * @author Davanum Srinivas (dims@yahoo.com).
  */
 public class X509Security extends BinarySecurity {
     
     public static final String X509_V3_TYPE = WSConstants.X509TOKEN_NS + "#X509v3";
-    public static final String X509_V1_TYPE = WSConstants.X509TOKEN_NS + "#X509v1";
     
     /*
      * Stores the associated X.509 Certificate. This saves numerous
@@ -48,17 +47,17 @@ public class X509Security extends BinarySecurity {
      * This constructor creates a new X509 certificate object and initializes
      * it from the data contained in the element.
      *
-     * @param elem      the element containing the X509 certificate data
+     * @param elem the element containing the X509 certificate data
      * @throws WSSecurityException
      */
     public X509Security(Element elem) throws WSSecurityException {
         super(elem);
         String valueType = getValueType();
-        if (!(valueType.equals(X509_V3_TYPE) || valueType.equals(X509_V1_TYPE))) {
+        if (!valueType.equals(X509_V3_TYPE)) {
             throw new WSSecurityException(
                 WSSecurityException.INVALID_SECURITY_TOKEN, 
                 "invalidValueType", 
-                new Object[]{getValueType()}
+                new Object[]{valueType}
             );
         }
     }
@@ -70,14 +69,13 @@ public class X509Security extends BinarySecurity {
      */
     public X509Security(Document doc) {
         super(doc);
+        setValueType(X509_V3_TYPE);
     }
 
     /**
      * Gets the X509Certificate certificate.
-     * <p/>
      *
-     * @return the X509 certificate converted from the base 64 encoded
-     *         element data
+     * @return the X509 certificate converted from the base 64 encoded element data
      * @throws WSSecurityException
      */
     public X509Certificate getX509Certificate(Crypto crypto) throws WSSecurityException {
@@ -86,11 +84,11 @@ public class X509Security extends BinarySecurity {
         }
         byte[] data = getToken();
         if (data == null) {
-            throw new WSSecurityException(WSSecurityException.FAILURE,
-                    "invalidCertData",
-                    new Object[]{new Integer(0)});
+            throw new WSSecurityException(
+                WSSecurityException.FAILURE, "invalidCertData", new Object[]{new Integer(0)}
+            );
         }
-        ByteArrayInputStream in = new ByteArrayInputStream(data);
+        InputStream in = new ByteArrayInputStream(data);
         cachedCert = crypto.loadCertificate(in);
         return cachedCert;
     }
@@ -104,15 +102,9 @@ public class X509Security extends BinarySecurity {
      * @param cert the X509 certificate to store in the element
      * @throws WSSecurityException
      */
-    public void setX509Certificate(X509Certificate cert)
-            throws WSSecurityException {
+    public void setX509Certificate(X509Certificate cert) throws WSSecurityException {
         if (cert == null) {
             throw new WSSecurityException(WSSecurityException.FAILURE, "noCert");
-        }
-        if (cert.getVersion() == 1) {
-            setValueType(X509_V1_TYPE);
-        } else {
-            setValueType(X509_V3_TYPE);
         }
         cachedCert = cert;
         try {

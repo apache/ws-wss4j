@@ -86,7 +86,7 @@ public class UsernameToken {
 
     static {
         try {
-            random = SecureRandom.getInstance("SHA1PRNG");
+            random = WSSecurityUtil.resolveSecureRandom();
         } catch (NoSuchAlgorithmException e) {
             if (doDebug) {
                 log.debug(e.getMessage(), e);
@@ -98,36 +98,50 @@ public class UsernameToken {
      * Constructs a <code>UsernameToken</code> object and parses the
      * <code>wsse:UsernameToken</code> element to initialize it.
      * 
-     * @param elem
-     *            the <code>wsse:UsernameToken</code> element that contains
-     *            the UsernameToken data
+     * @param elem the <code>wsse:UsernameToken</code> element that contains
+     *             the UsernameToken data
      * @throws WSSecurityException
      */
     public UsernameToken(Element elem) throws WSSecurityException {
         this.element = elem;
-        QName el = new QName(this.element.getNamespaceURI(), this.element
-                .getLocalName());
+        QName el = new QName(this.element.getNamespaceURI(), this.element.getLocalName());
         if (!el.equals(TOKEN)) {
             throw new WSSecurityException(
-                    WSSecurityException.INVALID_SECURITY_TOKEN,
-                    "badTokenType00", new Object[] { el });
+                WSSecurityException.INVALID_SECURITY_TOKEN,
+                "badTokenType00", 
+                new Object[] {el}
+            );
         }
-        elementUsername = (Element) WSSecurityUtil.getDirectChild(element,
-                WSConstants.USERNAME_LN, WSConstants.WSSE_NS);
-        elementPassword = (Element) WSSecurityUtil.getDirectChild(element,
-                WSConstants.PASSWORD_LN, WSConstants.WSSE_NS);
-        elementNonce = (Element) WSSecurityUtil.getDirectChild(element,
-                WSConstants.NONCE_LN, WSConstants.WSSE_NS);
-        elementCreated = (Element) WSSecurityUtil.getDirectChild(element,
-                WSConstants.CREATED_LN, WSConstants.WSU_NS);
-        elementSalt = (Element) WSSecurityUtil.getDirectChild(element,
-                WSConstants.SALT_LN, WSConstants.WSSE11_NS);
-        elementIteration = (Element) WSSecurityUtil.getDirectChild(element,
-                WSConstants.ITERATION_LN, WSConstants.WSSE11_NS);
+        elementUsername = 
+            (Element) WSSecurityUtil.getDirectChild(
+                element, WSConstants.USERNAME_LN, WSConstants.WSSE_NS
+            );
+        elementPassword = 
+            (Element) WSSecurityUtil.getDirectChild(
+                element, WSConstants.PASSWORD_LN, WSConstants.WSSE_NS
+            );
+        elementNonce = 
+            (Element) WSSecurityUtil.getDirectChild(
+                element, WSConstants.NONCE_LN, WSConstants.WSSE_NS
+            );
+        elementCreated = 
+            (Element) WSSecurityUtil.getDirectChild(
+                element, WSConstants.CREATED_LN, WSConstants.WSU_NS
+            );
+        elementSalt = 
+            (Element) WSSecurityUtil.getDirectChild(
+                element, WSConstants.SALT_LN, WSConstants.WSSE11_NS
+            );
+        elementIteration = 
+            (Element) WSSecurityUtil.getDirectChild(
+                element, WSConstants.ITERATION_LN, WSConstants.WSSE11_NS
+            );
         if (elementUsername == null) {
             throw new WSSecurityException(
-                    WSSecurityException.INVALID_SECURITY_TOKEN,
-                    "badTokenType01", new Object[] { el });
+                WSSecurityException.INVALID_SECURITY_TOKEN,
+                "badTokenType01", 
+                new Object[] {el}
+            );
         }
         hashed = false;
         if (elementSalt != null) {
@@ -138,22 +152,26 @@ public class UsernameToken {
             //
             if (elementPassword != null || elementIteration == null) {
                 throw new WSSecurityException(
-                        WSSecurityException.INVALID_SECURITY_TOKEN,
-                        "badTokenType01", new Object[] { el });
+                    WSSecurityException.INVALID_SECURITY_TOKEN,
+                    "badTokenType01", 
+                    new Object[] {el}
+                );
             }
             return;
         }
         if (elementPassword != null 
-                && elementPassword.hasAttribute(WSConstants.PASSWORD_TYPE_ATTR)) {
+            && elementPassword.hasAttribute(WSConstants.PASSWORD_TYPE_ATTR)) {
             passwordType = elementPassword.getAttribute(WSConstants.PASSWORD_TYPE_ATTR);
         }
         if (passwordType != null
-                && passwordType.equals(WSConstants.PASSWORD_DIGEST)) {
+            && passwordType.equals(WSConstants.PASSWORD_DIGEST)) {
             hashed = true;
             if (elementNonce == null || elementCreated == null) {
                 throw new WSSecurityException(
-                        WSSecurityException.INVALID_SECURITY_TOKEN,
-                        "badTokenType01", new Object[] { el });
+                    WSSecurityException.INVALID_SECURITY_TOKEN,
+                    "badTokenType01", 
+                    new Object[] {el}
+                );
             }
         }
     }
@@ -163,8 +181,7 @@ public class UsernameToken {
      * parameters. <p/> This constructs set the password encoding to
      * {@link WSConstants#PASSWORD_DIGEST}
      * 
-     * @param doc
-     *            the SOAP envelope as <code>Document</code>
+     * @param doc the SOAP envelope as <code>Document</code>
      */
     public UsernameToken(boolean milliseconds, Document doc) {
         this(milliseconds, doc, WSConstants.PASSWORD_DIGEST);
@@ -172,31 +189,28 @@ public class UsernameToken {
 
     /**
      * Constructs a <code>UsernameToken</code> object according to the defined
-     * parameters. <p/>
+     * parameters.
      * 
-     * @param doc
-     *            the SOAP envelope as <code>Document</code>
-     * @param pwType
-     *            the required password encoding, either
-     *            {@link WSConstants#PASSWORD_DIGEST} or
-     *            {@link WSConstants#PASSWORD_TEXT} or 
-     *            {@link WSConstants#PW_NONE} <code>null</code> if no
-     *            password required
+     * @param doc the SOAP envelope as <code>Document</code>
+     * @param pwType the required password encoding, either
+     *               {@link WSConstants#PASSWORD_DIGEST} or
+     *               {@link WSConstants#PASSWORD_TEXT} or 
+     *               {@link WSConstants#PW_NONE} <code>null</code> if no
+     *               password required
      */
     public UsernameToken(boolean milliseconds, Document doc, String pwType) {
-        this.element = doc.createElementNS(WSConstants.WSSE_NS, "wsse:"
-                + WSConstants.USERNAME_TOKEN_LN);
-        WSSecurityUtil.setNamespace(this.element, WSConstants.WSSE_NS,
-                WSConstants.WSSE_PREFIX);
+        this.element = 
+            doc.createElementNS(WSConstants.WSSE_NS, "wsse:" + WSConstants.USERNAME_TOKEN_LN);
+        WSSecurityUtil.setNamespace(this.element, WSConstants.WSSE_NS, WSConstants.WSSE_PREFIX);
 
-        this.elementUsername = doc.createElementNS(WSConstants.WSSE_NS, "wsse:"
-                + WSConstants.USERNAME_LN);
+        this.elementUsername = 
+            doc.createElementNS(WSConstants.WSSE_NS, "wsse:" + WSConstants.USERNAME_LN);
         this.elementUsername.appendChild(doc.createTextNode(""));
         element.appendChild(elementUsername);
 
         if (pwType != null) {
-            this.elementPassword = doc.createElementNS(WSConstants.WSSE_NS,
-                    "wsse:" + WSConstants.PASSWORD_LN);
+            this.elementPassword = 
+                doc.createElementNS(WSConstants.WSSE_NS, "wsse:" + WSConstants.PASSWORD_LN);
             this.elementPassword.appendChild(doc.createTextNode(""));
             element.appendChild(elementPassword);
 
@@ -219,10 +233,9 @@ public class UsernameToken {
         }
         byte[] nonceValue = new byte[16];
         random.nextBytes(nonceValue);
-        this.elementNonce = doc.createElementNS(WSConstants.WSSE_NS, "wsse:"
-                + WSConstants.NONCE_LN);
-        this.elementNonce.appendChild(doc.createTextNode(Base64
-                .encode(nonceValue)));
+        this.elementNonce = 
+            doc.createElementNS(WSConstants.WSSE_NS, "wsse:" + WSConstants.NONCE_LN);
+        this.elementNonce.appendChild(doc.createTextNode(Base64.encode(nonceValue)));
         element.appendChild(elementNonce);
     }
 
@@ -241,11 +254,12 @@ public class UsernameToken {
             zulu.setTimeZone(TimeZone.getTimeZone("UTC"));
         }
         Calendar rightNow = Calendar.getInstance();
-        this.elementCreated = doc.createElementNS(WSConstants.WSU_NS,
-                WSConstants.WSU_PREFIX + ":" + WSConstants.CREATED_LN);
+        this.elementCreated = 
+            doc.createElementNS(
+                WSConstants.WSU_NS,WSConstants.WSU_PREFIX + ":" + WSConstants.CREATED_LN
+            );
         WSSecurityUtil.setNamespace(this.element, WSConstants.WSU_NS, WSConstants.WSU_PREFIX);
-        this.elementCreated.appendChild(doc.createTextNode(zulu.format(rightNow
-                .getTime())));
+        this.elementCreated.appendChild(doc.createTextNode(zulu.format(rightNow.getTime())));
         element.appendChild(elementCreated);
     }
 
@@ -255,26 +269,22 @@ public class UsernameToken {
      * If the <code>saltValue</code> is <code>null</code> the the method
      * generates a new salt. Otherwise it uses the the given value.
      * 
-     * @param doc
-     *            The Document for the UsernameToken
-     * @param saltValue
-     *            The salt to add, if null generate a new salt value
-     * @param mac
-     *            If <code>true</code> then an optionally generated value is
+     * @param doc The Document for the UsernameToken
+     * @param saltValue The salt to add, if null generate a new salt value
+     * @param mac If <code>true</code> then an optionally generated value is
      *            usable for a MAC
      * @return Returns the added salt
      */
     public byte[] addSalt(Document doc, byte[] saltValue, boolean mac) {
-
         if (saltValue == null) {
             saltValue = generateSalt(mac);
         }
-        this.elementSalt = doc.createElementNS(WSConstants.WSSE11_NS,
-                WSConstants.WSSE11_PREFIX + ":" + WSConstants.SALT_LN);
-        WSSecurityUtil.setNamespace(this.element, WSConstants.WSSE11_NS,
-                WSConstants.WSSE11_PREFIX);
-        this.elementSalt.appendChild(doc.createTextNode(Base64
-                .encode(saltValue)));
+        this.elementSalt = 
+            doc.createElementNS(
+                WSConstants.WSSE11_NS, WSConstants.WSSE11_PREFIX + ":" + WSConstants.SALT_LN
+            );
+        WSSecurityUtil.setNamespace(this.element, WSConstants.WSSE11_NS, WSConstants.WSSE11_PREFIX);
+        this.elementSalt.appendChild(doc.createTextNode(Base64.encode(saltValue)));
         element.appendChild(elementSalt);
         return saltValue;
     }
@@ -284,10 +294,11 @@ public class UsernameToken {
      */
     public void addIteration(Document doc, int iteration) {
         String text = "" + iteration;
-        this.elementIteration = doc.createElementNS(WSConstants.WSSE11_NS,
-                WSConstants.WSSE11_PREFIX + ":" + WSConstants.ITERATION_LN);
-        WSSecurityUtil.setNamespace(this.element,
-                WSConstants.WSSE11_NS, WSConstants.WSSE11_PREFIX);
+        this.elementIteration = 
+            doc.createElementNS(
+                WSConstants.WSSE11_NS, WSConstants.WSSE11_PREFIX + ":" + WSConstants.ITERATION_LN
+            );
+        WSSecurityUtil.setNamespace(this.element, WSConstants.WSSE11_NS, WSConstants.WSSE11_PREFIX);
         this.elementIteration.appendChild(doc.createTextNode(text));
         element.appendChild(elementIteration);
     }
@@ -304,9 +315,8 @@ public class UsernameToken {
     /**
      * Set the user name.
      * 
-     * @param name
-     *            sets a text node containing the use name into the user name
-     *            element.
+     * @param name sets a text node containing the use name into the user name
+     *             element.
      */
     public void setName(String name) {
         Text node = getFirstNode(this.elementUsername);
@@ -336,8 +346,7 @@ public class UsernameToken {
      * element of a username token. Thus it can be either plain text or the
      * password digest value.
      * 
-     * @return the password string or <code>null</code> if no such node
-     *         exists.
+     * @return the password string or <code>null</code> if no such node exists.
      */
     public String getPassword() {
         return nodeString(this.elementPassword);
@@ -374,10 +383,8 @@ public class UsernameToken {
     }
 
     /**
-     * Get the hashed indicator. If the indicator is
-     * <code>true> the password of the
-     * <code>UsernameToken</code> was encoded using
-     * {@link WSConstants#PASSWORD_DIGEST}
+     * Get the hashed indicator. If the indicator is <code>true> the password of the
+     * <code>UsernameToken</code> was encoded using {@link WSConstants#PASSWORD_DIGEST}
      *
      * @return the hashed indicator.
      */
@@ -398,12 +405,11 @@ public class UsernameToken {
      * according to the WS Security specifications, UsernameToken profile, into
      * a password digest.
      * 
-     * @param pwd
-     *            the password to use
+     * @param pwd the password to use
      */
     public void setPassword(String pwd) {
         if (pwd == null) {
-            if(this.passwordType != null) {
+            if (this.passwordType != null) {
                 throw new IllegalArgumentException("pwd == null but a password is needed");
             } else {
                 // Ignore setting the password.
@@ -416,12 +422,10 @@ public class UsernameToken {
         try {
             if (!hashed) {
                 node.setData(pwd);
-                this.elementPassword.setAttribute("Type",
-                        WSConstants.PASSWORD_TEXT);
+                this.elementPassword.setAttribute("Type", WSConstants.PASSWORD_TEXT);
             } else {
                 node.setData(doPasswordDigest(getNonce(), getCreated(), pwd));
-                this.elementPassword.setAttribute("Type",
-                        WSConstants.PASSWORD_DIGEST);
+                this.elementPassword.setAttribute("Type", WSConstants.PASSWORD_DIGEST);
             }
         } catch (Exception e) {
             if (doDebug) {
@@ -446,8 +450,7 @@ public class UsernameToken {
         return this.raw_password;
     }
     
-    public static String doPasswordDigest(String nonce, String created,
-            String password) {
+    public static String doPasswordDigest(String nonce, String created, String password) {
         String passwdDigest = null;
         try {
             byte[] b1 = nonce != null ? Base64.decode(nonce) : new byte[0];
@@ -478,8 +481,7 @@ public class UsernameToken {
     /**
      * Returns the first text node of an element.
      * 
-     * @param e
-     *            the element to get the node from
+     * @param e the element to get the node from
      * @return the first text node or <code>null</code> if node is null or is
      *         not a text node
      */
@@ -492,8 +494,7 @@ public class UsernameToken {
      * Returns the data of an element as String or null if either the the element
      * does not contain a Text node or the node is empty.
      * 
-     * @param e
-     *            DOM element
+     * @param e DOM element
      * @return Element text node data as String
      */
     private String nodeString(Element e) {
@@ -543,8 +544,8 @@ public class UsernameToken {
      *            username token
      */
     public void setID(String id) {
-        String prefix = WSSecurityUtil.setNamespace(this.element,
-                WSConstants.WSU_NS, WSConstants.WSU_PREFIX);
+        String prefix = 
+            WSSecurityUtil.setNamespace(this.element, WSConstants.WSU_NS, WSConstants.WSU_PREFIX);
         this.element.setAttributeNS(WSConstants.WSU_NS, prefix + ":Id", id);
     }
 
@@ -557,17 +558,14 @@ public class UsernameToken {
      *         username token
      */
     public byte[] getSecretKey() {
-        return getSecretKey(WSConstants.WSE_DERIVED_KEY_LEN,
-                WSConstants.LABEL_FOR_DERIVED_KEY);
+        return getSecretKey(WSConstants.WSE_DERIVED_KEY_LEN, WSConstants.LABEL_FOR_DERIVED_KEY);
     }
 
     /**
      * Gets the secret key as per WS-Trust spec.
      * 
-     * @param keylen
-     *            How many bytes to generate for the key
-     * @param labelString
-     *            the label used to generate the seed
+     * @param keylen How many bytes to generate for the key
+     * @param labelString the label used to generate the seed
      * @return a secret key constructed from information contained in this
      *         username token
      */
@@ -615,19 +613,18 @@ public class UsernameToken {
      * This static method generates a derived key as defined in WSS Username
      * Token Profile.
      * 
-     * @param password
-     *            The password to include in the key generation
-     * @param salt
-     *            The Salt value
-     * @param iteration
-     *            The Iteration value. If zero (0) is given the method uses the
-     *            default value
+     * @param password The password to include in the key generation
+     * @param salt The Salt value
+     * @param iteration The Iteration value. If zero (0) is given the method uses the
+     *                  default value
      * @return Returns the derived key a byte array
      * @throws WSSecurityException
      */
-    public static byte[] generateDerivedKey(String password, byte[] salt,
-            int iteration) throws WSSecurityException {
-
+    public static byte[] generateDerivedKey(
+        String password, 
+        byte[] salt, 
+        int iteration
+    ) throws WSSecurityException {
         if (iteration == 0) {
             iteration = DEFAULT_ITERATION;
         }
@@ -658,13 +655,13 @@ public class UsernameToken {
         }
         sha.reset();
 
-        /*
-         * Make the first hash round with start value
-         */
+        //
+        // Make the first hash round with start value
+        //
         byte[] K = sha.digest(pwSalt);
-        /*
-         * Perform the 1st up to iteration-1 hash rounds
-         */
+        //
+        // Perform the 1st up to iteration-1 hash rounds
+        //
         for (int i = 1; i < iteration; i++) {
             K = sha.digest(K);
         }
@@ -704,8 +701,7 @@ public class UsernameToken {
      * This static method generates a 128 bit salt value as defined in WSS
      * Username Token Profile.
      * 
-     * @param useForMac
-     *            If <code>true</code> define the Salt for use in a MAC
+     * @param useForMac If <code>true</code> define the Salt for use in a MAC
      * @return Returns the 128 bit salt value as byte array
      */
     public static byte[] generateSalt(boolean useForMac) {
@@ -722,25 +718,25 @@ public class UsernameToken {
     /**
      * P_hash as defined in RFC 2246 for TLS.
      * 
-     * @param secret
-     *            is the key for the HMAC
-     * @param seed
-     *            the seed value to start the generation - A(0)
-     * @param mac
-     *            the HMAC algorithm
-     * @param required
-     *            number of bytes to generate
+     * @param secret is the key for the HMAC
+     * @param seed the seed value to start the generation - A(0)
+     * @param mac the HMAC algorithm
+     * @param required number of bytes to generate
      * @return a byte array that contains a secret key
      * @throws Exception
      */
-    private static byte[] P_hash(byte[] secret, byte[] seed, Mac mac,
-            int required) throws Exception {
+    private static byte[] P_hash(
+        byte[] secret, 
+        byte[] seed, 
+        Mac mac, 
+        int required
+    ) throws Exception {
         byte[] out = new byte[required];
         int offset = 0, tocpy;
         byte[] A, tmp;
-        /*
-         * A(0) is the seed
-         */
+        //
+        // A(0) is the seed
+        //
         A = seed;
         SecretKeySpec key = new SecretKeySpec(secret, "HMACSHA1");
         mac.init(key);
@@ -760,7 +756,6 @@ public class UsernameToken {
 
     /**
      * helper method.
-     * <p/>
      *
      * @param a
      * @param b

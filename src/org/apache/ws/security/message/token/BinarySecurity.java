@@ -31,7 +31,6 @@ import javax.xml.namespace.QName;
 
 /**
  * Binary Security Token.
- * <p/>
  * 
  * @author Davanum Srinivas (dims@yahoo.com).
  * @author Werner Dittmann (Werner.Dittmann@t-onile.de).
@@ -44,42 +43,45 @@ public class BinarySecurity {
 
     /**
      * Constructor.
-     * <p/>
      * 
      * @param elem 
      * @throws WSSecurityException 
      */
     public BinarySecurity(Element elem) throws WSSecurityException {
         this.element = elem;
-        QName el = new QName(this.element.getNamespaceURI(), this.element
-                .getLocalName());
+        QName el = new QName(this.element.getNamespaceURI(), this.element.getLocalName());
         if (!el.equals(TOKEN_BST) && !el.equals(TOKEN_KI)) {
             throw new WSSecurityException(
-                    WSSecurityException.INVALID_SECURITY_TOKEN, "badTokenType",
-                    new Object[] { el });
+                WSSecurityException.INVALID_SECURITY_TOKEN, 
+                "badTokenType",
+                new Object[] {el}
+            );
         }
         String encoding = getEncodingType();
-        /*
-         * if the Element is a BinarySecurityToken then
-         *     encoding may be null -> default is Base64
-         *     if encoding is not null and not empty it must be Base64
-         * else
-         *     this is a keyidentifier element
-         *     must contain an encoding attribute which must be Base64
-         *     in this case
-         */
+        //
+        // if the Element is a BinarySecurityToken then
+        //     encoding may be null -> default is Base64
+        //     if encoding is not null and not empty it must be Base64
+        // else
+        //     this is a keyidentifier element
+        //     must contain an encoding attribute which must be Base64
+        //     in this case
+        //
         if (el.equals(TOKEN_BST)) {
-            if (encoding != null && encoding.length() > 0
-                    && !encoding.equals(BASE64_ENCODING)) {
+            if (encoding != null && encoding.length() > 0 && !encoding.equals(BASE64_ENCODING)) {
                 throw new WSSecurityException(
-                        WSSecurityException.INVALID_SECURITY_TOKEN,
-                        "badEncoding", new Object[] { encoding });
+                    WSSecurityException.INVALID_SECURITY_TOKEN,
+                    "badEncoding", 
+                    new Object[] {encoding}
+                );
             }
         } else if (el.equals(TOKEN_KI)) {
             if (encoding == null || !encoding.equals(BASE64_ENCODING)) {
                 throw new WSSecurityException(
-                        WSSecurityException.INVALID_SECURITY_TOKEN,
-                        "badEncoding", new Object[] { encoding });
+                    WSSecurityException.INVALID_SECURITY_TOKEN,
+                    "badEncoding", 
+                    new Object[] {encoding}
+                );
             }
         }
     }
@@ -98,7 +100,6 @@ public class BinarySecurity {
 
     /**
      * get the value type.
-     * <p/>
      * 
      * @return TODO
      */
@@ -108,7 +109,6 @@ public class BinarySecurity {
 
     /**
      * set the value type.
-     * <p/>
      * 
      * @param type 
      */
@@ -118,7 +118,6 @@ public class BinarySecurity {
 
     /**
      * get the encoding type.
-     * <p/>
      * 
      * @return TODO
      */
@@ -128,7 +127,6 @@ public class BinarySecurity {
 
     /**
      * set the encoding type.
-     * <p/>
      * 
      * @param encoding 
      */
@@ -138,7 +136,6 @@ public class BinarySecurity {
 
     /**
      * get the byte array containing token information.
-     * <p/>
      * 
      * @return TODO
      */
@@ -156,7 +153,6 @@ public class BinarySecurity {
 
     /**
      * set the token information.
-     * <p/>
      * 
      * @param data 
      */
@@ -170,7 +166,6 @@ public class BinarySecurity {
 
     /**
      * return the first text node.
-     * <p/>
      * 
      * @return TODO
      */
@@ -181,7 +176,6 @@ public class BinarySecurity {
 
     /**
      * return the dom element.
-     * <p/>
      * 
      * @return TODO
      */
@@ -191,7 +185,6 @@ public class BinarySecurity {
 
     /**
      * get the id.
-     * <p/>
      * 
      * @return TODO
      */
@@ -201,18 +194,17 @@ public class BinarySecurity {
 
     /**
      * set the id.
-     * <p/>
      * 
      * @param id 
      */
     public void setID(String id) {
-        String prefix = WSSecurityUtil.setNamespace(this.element, WSConstants.WSU_NS, WSConstants.WSU_PREFIX);
+        String prefix = 
+            WSSecurityUtil.setNamespace(this.element, WSConstants.WSU_NS, WSConstants.WSU_PREFIX);
         this.element.setAttributeNS(WSConstants.WSU_NS, prefix + ":Id", id);
     }
 
     /**
      * return the string representation of the token.
-     * <p/>
      * 
      * @return TODO
      */

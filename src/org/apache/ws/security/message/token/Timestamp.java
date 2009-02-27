@@ -37,7 +37,6 @@ import java.util.Vector;
 /**
  * Timestamp according to SOAP Message Security 1.0,
  * chapter 10 / appendix A.2
- * <p/>
  *
  * @author Christof Soehngen (christof.soehngen@syracom.de)
  */
@@ -45,7 +44,6 @@ public class Timestamp {
 
     protected Element element = null;
     protected Vector customElements = null;
-
     protected Calendar created;
     protected Calendar expires;
     
@@ -54,12 +52,11 @@ public class Timestamp {
      * <code>wsu:Timestamp</code> element to initialize it.
      *
      * @param element the <code>wsu:Timestamp</code> element that
-     *             contains the timestamp data
+     *                contains the timestamp data
      */
     public Timestamp(Element element) throws WSSecurityException {
 
         this.element = element;
-        
         customElements = new Vector();
 
         String strCreated = null;
@@ -67,7 +64,8 @@ public class Timestamp {
 
         for (Node currentChild = element.getFirstChild();
              currentChild != null;
-             currentChild = currentChild.getNextSibling()) {
+             currentChild = currentChild.getNextSibling()
+         ) {
             if (currentChild instanceof Element) {
                 if (WSConstants.CREATED_LN.equals(currentChild.getLocalName()) &&
                         WSConstants.WSU_NS.equals(currentChild.getNamespaceURI())) {
@@ -94,7 +92,6 @@ public class Timestamp {
         }
 
         DateFormat zulu = new XmlSchemaDateFormat();
-        
         try {
             if (strCreated != null) {
                 created = Calendar.getInstance();
@@ -106,7 +103,8 @@ public class Timestamp {
             }
         } catch (ParseException e) {
             throw new WSSecurityException(
-                WSSecurityException.INVALID_SECURITY, "invalidTimestamp", null, e);
+                WSSecurityException.INVALID_SECURITY, "invalidTimestamp", null, e
+            );
         }
     }
 
@@ -114,7 +112,6 @@ public class Timestamp {
     /**
      * Constructs a <code>Timestamp</code> object according
      * to the defined parameters.
-     * <p/>
      *
      * @param doc the SOAP envelope as <code>Document</code>
      * @param ttl the time to live (validity of the security semantics) in seconds
@@ -122,7 +119,6 @@ public class Timestamp {
     public Timestamp(boolean milliseconds, Document doc, int ttl) {
 
         customElements = new Vector();
-
         element = 
             doc.createElementNS(
                 WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + WSConstants.TIMESTAMP_TOKEN_LN
@@ -139,8 +135,9 @@ public class Timestamp {
         created = getCurrentTime();
 
         Element elementCreated =
-                doc.createElementNS(WSConstants.WSU_NS,
-                        WSConstants.WSU_PREFIX + ":" + WSConstants.CREATED_LN);
+                doc.createElementNS(
+                    WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + WSConstants.CREATED_LN
+                );
         elementCreated.appendChild(doc.createTextNode(zulu.format(created.getTime())));
         element.appendChild(elementCreated);
         if (ttl != 0) {
@@ -150,8 +147,9 @@ public class Timestamp {
             expires.setTimeInMillis(currentTime);
 
             Element elementExpires =
-                    doc.createElementNS(WSConstants.WSU_NS,
-                            WSConstants.WSU_PREFIX + ":" + WSConstants.EXPIRES_LN);
+                    doc.createElementNS(
+                        WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + WSConstants.EXPIRES_LN
+                    );
             elementExpires.appendChild(doc.createTextNode(zulu.format(expires.getTime())));
             element.appendChild(elementExpires);
         }
@@ -186,7 +184,6 @@ public class Timestamp {
 
     /**
      * Get the time of creation.
-     * <p/>
      *
      * @return the "created" time
      */
@@ -196,7 +193,6 @@ public class Timestamp {
 
     /**
      * Get the time of expiration.
-     * <p/>
      *
      * @return the "expires" time
      */

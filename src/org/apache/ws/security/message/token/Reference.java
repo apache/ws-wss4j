@@ -29,7 +29,6 @@ import javax.xml.namespace.QName;
 
 /**
  * Reference.
- * <p/>
  * 
  * @author Davanum Srinivas (dims@yahoo.com).
  */
@@ -40,33 +39,26 @@ public class Reference {
 
     /**
      * Constructor.
-     * <p/>
      * 
      * @param elem 
      * @throws WSSecurityException 
      */
     public Reference(Element elem) throws WSSecurityException {
         if (elem == null) {
-            throw new WSSecurityException(
-                WSSecurityException.INVALID_SECURITY,
-                "noReference");
+            throw new WSSecurityException(WSSecurityException.INVALID_SECURITY, "noReference");
         }
         this.element = elem;
         QName el =
-            new QName(
-                this.element.getNamespaceURI(),
-                this.element.getLocalName());
+            new QName(this.element.getNamespaceURI(), this.element.getLocalName());
         if (!el.equals(TOKEN)) {
             throw new WSSecurityException(
-                WSSecurityException.FAILURE,
-                "badElement",
-                new Object[] { TOKEN, el });
+                WSSecurityException.FAILURE, "badElement", new Object[] {TOKEN, el}
+            );
         }
     }
 
     /**
      * Constructor.
-     * <p/>
      * 
      * @param doc 
      */
@@ -78,7 +70,6 @@ public class Reference {
 
     /**
      * get the dom element.
-     * <p/>
      * 
      * @return TODO
      */
@@ -88,7 +79,6 @@ public class Reference {
 
     /**
      * get the URI.
-     * <p/>
      * 
      * @return TODO
      */
@@ -98,7 +88,6 @@ public class Reference {
 
     /**
      * get the URI.
-     * <p/>
      * 
      * @return TODO
      */
@@ -108,7 +97,6 @@ public class Reference {
 
     /**
      * set the Value type.
-     * <p/>
      * 
      * @param valueType
      */
@@ -118,7 +106,6 @@ public class Reference {
 
     /**
      * set the URI.
-     * <p/>
      * 
      * @param uri 
      */
@@ -128,7 +115,6 @@ public class Reference {
 
     /**
      * return the string representation.
-     * <p/>
      * 
      * @return TODO
      */

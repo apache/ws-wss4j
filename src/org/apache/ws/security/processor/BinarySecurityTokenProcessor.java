@@ -68,16 +68,24 @@ public class BinarySecurityTokenProcessor  implements Processor {
     /**
      * {@inheritDoc}
      */
-    public void handleToken(Element elem, Crypto crypto, Crypto decCrypto,
-            CallbackHandler cb, WSDocInfo wsDocInfo, Vector returnResults,
-            WSSConfig config) throws WSSecurityException {
+    public void handleToken(
+        Element elem, 
+        Crypto crypto, 
+        Crypto decCrypto,
+        CallbackHandler cb, 
+        WSDocInfo wsDocInfo, 
+        Vector returnResults,
+        WSSConfig config
+    ) throws WSSecurityException {
         this.getCertificatesTokenReference(elem, crypto);
-        returnResults.add(0, new WSSecurityEngineResult(WSConstants.BST, this.token, this.certificates));
+        returnResults.add(
+            0, 
+            new WSSecurityEngineResult(WSConstants.BST, this.token, this.certificates)
+        );
     }
     
     /**
      * Extracts the certificate(s) from the Binary Security token reference.
-     * <p/>
      *
      * @param elem The element containing the binary security token. This is
      *             either X509 certificate(s) or a PKIPath. Any other token type
@@ -85,7 +93,7 @@ public class BinarySecurityTokenProcessor  implements Processor {
      * @throws WSSecurityException
      */
     private void getCertificatesTokenReference(Element elem, Crypto crypto)
-            throws WSSecurityException {
+        throws WSSecurityException {
         this.createSecurityToken(elem);
         if (token instanceof PKIPathSecurity) {
             this.certificates = ((PKIPathSecurity) token).getX509Certificates(false, crypto);
@@ -107,7 +115,7 @@ public class BinarySecurityTokenProcessor  implements Processor {
         this.token = new BinarySecurity(element);
         String type = token.getValueType();
 
-        if (X509Security.X509_V3_TYPE.equals(type) || X509Security.X509_V1_TYPE.equals(type)) {
+        if (X509Security.X509_V3_TYPE.equals(type)) {
             this.token = new X509Security(element);
         } else if (PKIPathSecurity.getType().equals(type)) {
             this.token = new PKIPathSecurity(element);

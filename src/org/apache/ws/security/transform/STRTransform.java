@@ -95,9 +95,7 @@ public class STRTransform extends TransformSpi {
      * @throws InvalidCanonicalizerException
      */
     protected XMLSignatureInput enginePerformTransform(XMLSignatureInput input)
-            throws IOException, CanonicalizationException,
-            InvalidCanonicalizerException {
-
+        throws IOException, CanonicalizationException, InvalidCanonicalizerException {
         doDebug = log.isDebugEnabled();
 
         if (doDebug) {
@@ -105,45 +103,47 @@ public class STRTransform extends TransformSpi {
         }
 
         try {
-
-            /*
-             * Get the main document, that is the complete SOAP request document
-             */
+            //
+            // Get the main document, that is the complete SOAP request document
+            //
             Document thisDoc = this._transformObject.getDocument();
             int docHash = thisDoc.hashCode();
             if (doDebug) {
                 log.debug("doc: " + thisDoc.toString() + ", " + docHash);
             }
-
-            /*
-             * Here we get some information about the document that is being
-             * processed, in particular the crypto implementation, and already
-             * detected BST that may be used later during dereferencing.
-             */
+            //
+            // Here we get some information about the document that is being
+            // processed, in particular the crypto implementation, and already
+            // detected BST that may be used later during dereferencing.
+            //
             wsDocInfo = WSDocInfoStore.lookup(docHash);
             if (wsDocInfo == null) {
                 throw (new CanonicalizationException("no WSDocInfo found"));
             }
-
-            /*
-             * According to the OASIS WS Specification "Web Services Security:
-             * SOAP Message Security 1.0" Monday, 19 January 2004, chapter 8.3
-             * describes that the input node set must be processed by the c14n
-             * that is specified in the argument element of the STRTransform
-             * element.
-             * 
-             * First step: Get the required c14n argument and get the specified
-             * Canonicalizer
-             */
-
+            //
+            // According to the OASIS WS Specification "Web Services Security:
+            // SOAP Message Security 1.0" Monday, 19 January 2004, chapter 8.3
+            // describes that the input node set must be processed by the c14n
+            // that is specified in the argument element of the STRTransform
+            // element.
+            // 
+            // First step: Get the required c14n argument and get the specified
+            // Canonicalizer
+            //
             String canonAlgo = null;
-            if (this._transformObject.length(WSConstants.WSSE_NS,
-                    "TransformationParameters") == 1) {
-                Element tmpE = XMLUtils.selectNode(this._transformObject
-                        .getElement().getFirstChild(), WSConstants.WSSE_NS,
-                        "TransformationParameters", 0);
-                Element canonElem = (Element) WSSecurityUtil.getDirectChild(
-                        tmpE, "CanonicalizationMethod", WSConstants.SIG_NS);
+            if (this._transformObject.length(
+                WSConstants.WSSE_NS, "TransformationParameters") == 1) {
+                Element tmpE = 
+                    XMLUtils.selectNode(
+                        this._transformObject.getElement().getFirstChild(), 
+                        WSConstants.WSSE_NS,
+                        "TransformationParameters", 
+                        0
+                    );
+                Element canonElem = 
+                    (Element) WSSecurityUtil.getDirectChild(
+                        tmpE, "CanonicalizationMethod", WSConstants.SIG_NS
+                    );
                 canonAlgo = canonElem.getAttribute("Algorithm");
                 if (doDebug) {
                     log.debug("CanonAlgo: " + canonAlgo);
@@ -160,35 +160,36 @@ public class STRTransform extends TransformSpi {
                 log.debug("canon bos: " + bos.toString());
             }
 
-            /*
-             * Get the input (node) to transform. Currently we support only an
-             * Element as input format. If other formats are required we must
-             * get it as bytes and probably reparse it into a DOM tree (How to
-             * work with nodesets? how to select the right node from a nodeset?)
-             */
+            //
+            // Get the input (node) to transform. Currently we support only an
+            // Element as input format. If other formats are required we must
+            // get it as bytes and probably reparse it into a DOM tree (How to
+            // work with nodesets? how to select the right node from a nodeset?)
+            //
             Element str = null;
             if (input.isElement()) {
                 str = (Element) input.getSubNode();
             } else {
-                throw (new CanonicalizationException(
-                        "Wrong input format - only element input supported"));
+                throw new CanonicalizationException(
+                    "Wrong input format - only element input supported"
+                );
             }
 
             if (doDebug) {
                 log.debug("STR: " + str.toString());
             }
-            /*
-             * The element to transform MUST be a SecurityTokenReference
-             * element.
-             */
+            //
+            // The element to transform MUST be a SecurityTokenReference
+            // element.
+            //
             SecurityTokenReference secRef = new SecurityTokenReference(str);
-            /*
-             * Third and forth step are performed by derefenceSTR()
-             */
+            //
+            // Third and forth step are performed by derefenceSTR()
+            //
             Element dereferencedToken = dereferenceSTR(thisDoc, secRef);
-            /*
-             * C14n with specified algorithm. According to WSS Specification.
-             */
+            //
+            // C14n with specified algorithm. According to WSS Specification.
+            //
             buf = canon.canonicalizeSubtree(dereferencedToken, "#default");
             if (doDebug) {
                 bos = new ByteArrayOutputStream(buf.length);
@@ -196,15 +197,15 @@ public class STRTransform extends TransformSpi {
                 log.debug("after c14n: " + bos.toString());
             }
 
-            /*
-             * Alert: Hacks ahead According to WSS spec an Apex node must
-             * contain a default namespace. If none is availabe in the first
-             * node of the c14n output (this is the apex element) then we do
-             * some editing to insert an empty default namespace
-             * 
-             * TODO: Rework theses hacks after c14n was updated and can be
-             * instructed to insert empty default namespace if required
-             */
+            //
+            // Alert: Hacks ahead According to WSS spec an Apex node must
+            // contain a default namespace. If none is availabe in the first
+            // node of the c14n output (this is the apex element) then we do
+            // some editing to insert an empty default namespace
+            // 
+            // TODO: Rework theses hacks after c14n was updated and can be
+            // instructed to insert empty default namespace if required
+            //
             // If the problem with c14n method is solved then just do:
             // return new XMLSignatureInput(buf);
             
@@ -212,19 +213,19 @@ public class STRTransform extends TransformSpi {
             StringBuffer bf = new StringBuffer(new String(buf));
             String bf1 = bf.toString();
 
-            /*
-             * Find start and end of first element <....>, this is the Apex node
-             */
+            //
+            // Find start and end of first element <....>, this is the Apex node
+            //
             int gt = bf1.indexOf(">");
-            /*
-             * Lookup the default namespace
-             */
+            //
+            // Lookup the default namespace
+            //
             int idx = bf1.indexOf(XMLNS);
-            /*
-             * If none found or if it is outside of this (Apex) element look for
-             * first blank in, insert default namespace there (this is the
-             * correct place according to c14n specification)
-             */
+            //
+            // If none found or if it is outside of this (Apex) element look for
+            // first blank in, insert default namespace there (this is the
+            // correct place according to c14n specification)
+            //
             if (idx < 0 || idx > gt) {
                 idx = bf1.indexOf(" ");
                 bf.insert(idx + 1, "xmlns=\"\" ");
@@ -239,67 +240,64 @@ public class STRTransform extends TransformSpi {
         // End of HACK
         catch (WSSecurityException ex) {
             throw (new CanonicalizationException("WS Security Exception", ex));
-
         }
     }
 
     private Element dereferenceSTR(Document doc, SecurityTokenReference secRef)
-            throws  WSSecurityException {
-
-        /*
-         * Third step: locate the security token referenced by the STR element.
-         * Either the Token is contained in the document as a
-         * BinarySecurityToken or stored in some key storage.
-         * 
-         * Forth step: after security token was located, prepare it. If its
-         * reference via a direct reference, i.e. a relative URI that references
-         * the BST directly in the message then just return that element.
-         * Otherwise wrap the located token in a newly created BST element as
-         * described in WSS Specification.
-         * 
-         */
+        throws  WSSecurityException {
+        //
+        // Third step: locate the security token referenced by the STR element.
+        // Either the Token is contained in the document as a
+        // BinarySecurityToken or stored in some key storage.
+        // 
+        // Fourth step: after security token was located, prepare it. If its
+        // reference via a direct reference, i.e. a relative URI that references
+        // the BST directly in the message then just return that element.
+        // Otherwise wrap the located token in a newly created BST element as
+        // described in WSS Specification.
+        // 
+        //
         Element tokElement = null;
 
-        /*
-         * First case: direct reference, according to chap 7.2 of OASIS WS
-         * specification (main document). Only in this case return a true
-         * reference to the BST. Copying is done by the caller.
-         */
+        //
+        // First case: direct reference, according to chap 7.2 of OASIS WS
+        // specification (main document). Only in this case return a true
+        // reference to the BST. Copying is done by the caller.
+        //
         if (secRef.containsReference()) {
             if (doDebug) {
                 log.debug("STR: Reference");
             }
             tokElement = secRef.getTokenElement(doc, wsDocInfo, null);
         }
-        /*
-         * second case: IssuerSerial, lookup in keystore, wrap in BST according
-         * to specification
-         */
+        //
+        // second case: IssuerSerial, lookup in keystore, wrap in BST according
+        // to specification
+        //
         else if (secRef.containsX509Data() || secRef.containsX509IssuerSerial()) {
             if (doDebug) {
                 log.debug("STR: IssuerSerial");
             }
             X509Certificate cert = null;
-            X509Certificate[] certs = secRef.getX509IssuerSerial(wsDocInfo
-                    .getCrypto());
+            X509Certificate[] certs = 
+                secRef.getX509IssuerSerial(wsDocInfo.getCrypto());
             if (certs == null || certs.length == 0 || certs[0] == null) {
                 throw new WSSecurityException(WSSecurityException.FAILED_CHECK);
             }
             cert = certs[0];
             tokElement = createBSTX509(doc, cert, secRef.getElement());
         }
-        /*
-         * third case: KeyIdentifier, must be SKI, lookup in keystore, wrap in
-         * BST according to specification. No other KeyIdentifier type handled
-         * here - just SKI
-         */
+        //
+        // third case: KeyIdentifier, must be SKI, lookup in keystore, wrap in
+        // BST according to specification. No other KeyIdentifier type handled
+        // here - just SKI
+        //
         else if (secRef.containsKeyIdentifier()) {
             if (doDebug) {
                 log.debug("STR: KeyIdentifier");
             }
             X509Certificate cert = null;
-            X509Certificate[] certs = secRef.getKeyIdentifier(wsDocInfo
-                    .getCrypto());
+            X509Certificate[] certs = secRef.getKeyIdentifier(wsDocInfo.getCrypto());
             if (certs == null || certs.length == 0 || certs[0] == null) {
                 throw new WSSecurityException(WSSecurityException.FAILED_CHECK);
             }
@@ -309,9 +307,8 @@ public class STRTransform extends TransformSpi {
         return (Element) tokElement;
     }
 
-    private Element createBSTX509(Document doc, X509Certificate cert,
-            Element secRefE) throws WSSecurityException {
-
+    private Element createBSTX509(Document doc, X509Certificate cert, Element secRefE) 
+        throws WSSecurityException {
         byte data[];
         try {
             data = cert.getEncoded();
@@ -320,20 +317,14 @@ public class STRTransform extends TransformSpi {
                 WSSecurityException.SECURITY_TOKEN_UNAVAILABLE, "encodeError", null, e
             );
         }
-        String prefix = WSSecurityUtil
-                .getPrefixNS(WSConstants.WSSE_NS, secRefE);
-        Element elem = doc.createElementNS(WSConstants.WSSE_NS, prefix
-                + ":BinarySecurityToken");
+        String prefix = WSSecurityUtil.getPrefixNS(WSConstants.WSSE_NS, secRefE);
+        Element elem = doc.createElementNS(WSConstants.WSSE_NS, prefix + ":BinarySecurityToken");
         WSSecurityUtil.setNamespace(elem, WSConstants.WSSE_NS, prefix);
         // elem.setAttributeNS(WSConstants.XMLNS_NS, "xmlns", "");
-        if (cert.getVersion() == 1) {
-            elem.setAttributeNS(null, "ValueType", X509Security.X509_V1_TYPE);
-        } else {
-            elem.setAttributeNS(null, "ValueType", X509Security.X509_V3_TYPE);
-        }
-        Text certText = doc.createTextNode(Base64.encode(data)); // no line
-                                                                    // wrap
+        elem.setAttributeNS(null, "ValueType", X509Security.X509_V3_TYPE);
+        Text certText = doc.createTextNode(Base64.encode(data)); // no line wrap
         elem.appendChild(certText);
         return elem;
     }
+    
 }

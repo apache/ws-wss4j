@@ -66,12 +66,19 @@ import java.util.Vector;
 
 public class SignatureProcessor implements Processor {
     private static Log log = LogFactory.getLog(SignatureProcessor.class.getName());
-    private static Log tlog =
-            LogFactory.getLog("org.apache.ws.security.TIME");
+    private static Log tlog = LogFactory.getLog("org.apache.ws.security.TIME");
     
     private String signatureId;
 
-    public void handleToken(Element elem, Crypto crypto, Crypto decCrypto, CallbackHandler cb, WSDocInfo wsDocInfo, Vector returnResults, WSSConfig wsc) throws WSSecurityException {
+    public void handleToken(
+        Element elem, 
+        Crypto crypto, 
+        Crypto decCrypto, 
+        CallbackHandler cb, 
+        WSDocInfo wsDocInfo, 
+        Vector returnResults, 
+        WSSConfig wsc
+    ) throws WSSecurityException {
         if (log.isDebugEnabled()) {
             log.debug("Found signature element");
         }
@@ -82,32 +89,50 @@ public class SignatureProcessor implements Processor {
         byte[][] signatureValue = new byte[1][];
         Principal lastPrincipalFound = null;
         try {
-            lastPrincipalFound = verifyXMLSignature((Element) elem,
-                    crypto, returnCert, returnElements, protectedElements, signatureValue, cb);
+            lastPrincipalFound = 
+                verifyXMLSignature(
+                    elem, crypto, returnCert, returnElements, protectedElements, signatureValue, cb
+                );
         } catch (WSSecurityException ex) {
             throw ex;
         } finally {
             WSDocInfoStore.delete(wsDocInfo);
         }
         if (lastPrincipalFound instanceof WSUsernameTokenPrincipal) {
-            returnResults.add(0, new WSSecurityEngineResult(
-                    WSConstants.UT_SIGN, lastPrincipalFound, null,
-                    returnElements, protectedElements, signatureValue[0]));
+            returnResults.add(
+                0, 
+                new WSSecurityEngineResult(
+                    WSConstants.UT_SIGN, 
+                    lastPrincipalFound, 
+                    null,
+                    returnElements, 
+                    protectedElements, 
+                    signatureValue[0]
+                )
+            );
         } else {
-            returnResults.add(0, new WSSecurityEngineResult(
-                    WSConstants.SIGN, lastPrincipalFound,
-                    returnCert[0], returnElements, protectedElements, signatureValue[0]));
+            returnResults.add(
+                0, 
+                new WSSecurityEngineResult(
+                    WSConstants.SIGN, 
+                    lastPrincipalFound,
+                    returnCert[0], 
+                    returnElements, 
+                    protectedElements, 
+                    signatureValue[0]
+                )
+            );
         }
         signatureId = elem.getAttributeNS(null, "Id");
     }
 
     /**
      * Verify the WS-Security signature.
-     * <p/>
+     * 
      * The functions at first checks if then <code>KeyInfo</code> that is
      * contained in the signature contains standard X509 data. If yes then
      * get the certificate data via the standard <code>KeyInfo</code> methods.
-     * <p/>
+     * 
      * Otherwise, if the <code>KeyInfo</code> info does not contain X509 data, check
      * if we can find a <code>wsse:SecurityTokenReference</code> element. If yes, the next
      * step is to check how to get the certificate. Two methods are currently supported
@@ -121,7 +146,7 @@ public class SignatureProcessor implements Processor {
      * looks up the certificate in the keystore via the <code>crypto</code> parameter.
      * </li>
      * </ul>
-     * <p/>
+     * 
      * The methods checks is the certificate is valid and calls the
      * {@link org.apache.xml.security.signature.XMLSignature#checkSignatureValue(X509Certificate) 
      * verification} function.
@@ -140,14 +165,15 @@ public class SignatureProcessor implements Processor {
      *         principal for further authentication or authorization.
      * @throws WSSecurityException
      */
-    protected Principal verifyXMLSignature(Element elem,
-                                           Crypto crypto,
-                                           X509Certificate[] returnCert,
-                                           Set returnElements,
-                                           Set protectedElements,
-                                           byte[][] signatureValue,
-                                           CallbackHandler cb)
-            throws WSSecurityException {
+    protected Principal verifyXMLSignature(
+        Element elem,
+        Crypto crypto,
+        X509Certificate[] returnCert,
+        Set returnElements,
+        Set protectedElements,
+        byte[][] signatureValue,
+        CallbackHandler cb
+    ) throws WSSecurityException {
         if (log.isDebugEnabled()) {
             log.debug("Verify XML Signature");
         }
@@ -176,33 +202,33 @@ public class SignatureProcessor implements Processor {
         String customTokenId = null;
         
         if (info != null) {
-            Node node = WSSecurityUtil.getDirectChild(info.getElement(),
+            Node node = 
+                WSSecurityUtil.getDirectChild(
+                    info.getElement(),
                     SecurityTokenReference.SECURITY_TOKEN_REFERENCE,
-                    WSConstants.WSSE_NS);
+                    WSConstants.WSSE_NS
+                );
             if (node == null) {
                 throw new WSSecurityException(
-                        WSSecurityException.INVALID_SECURITY,
-                        "unsupportedKeyInfo");
+                    WSSecurityException.INVALID_SECURITY, "unsupportedKeyInfo"
+                );
             }
             SecurityTokenReference secRef = new SecurityTokenReference((Element) node);
-
             int docHash = elem.getOwnerDocument().hashCode();
-            /*
-             * Here we get some information about the document that is being
-             * processed, in particular the crypto implementation, and already
-             * detected BST that may be used later during dereferencing.
-             */
+            //
+            // Here we get some information about the document that is being
+            // processed, in particular the crypto implementation, and already
+            // detected BST that may be used later during dereferencing.
+            //
             WSDocInfo wsDocInfo = WSDocInfoStore.lookup(docHash);
 
             if (secRef.containsReference()) {
-                Element token = secRef.getTokenElement(elem.getOwnerDocument(),
-                        wsDocInfo, cb);
-                /*
-                 * at this point check token type: UsernameToken, Binary, SAML
-                 * Crypto required only for Binary and SAML
-                 */
-                QName el = new QName(token.getNamespaceURI(), token
-                        .getLocalName());
+                Element token = secRef.getTokenElement(elem.getOwnerDocument(), wsDocInfo, cb);
+                //
+                // at this point check token type: UsernameToken, Binary, SAML
+                // Crypto required only for Binary and SAML
+                //
+                QName el = new QName(token.getNamespaceURI(), token.getLocalName());
                 if (el.equals(WSSecurityEngine.usernameToken)) {
                     String id = token.getAttributeNS(WSConstants.WSU_NS, "Id");
                     UsernameTokenProcessor utProcessor = 
@@ -213,8 +239,8 @@ public class SignatureProcessor implements Processor {
                     } else {
                         secretKey = ut.getSecretKey();
                     }
-                } else if(el.equals(WSSecurityEngine.DERIVED_KEY_TOKEN_05_02) ||
-                        el.equals(WSSecurityEngine.DERIVED_KEY_TOKEN_05_12)) {
+                } else if (el.equals(WSSecurityEngine.DERIVED_KEY_TOKEN_05_02) 
+                    || el.equals(WSSecurityEngine.DERIVED_KEY_TOKEN_05_12)) {
                     dkt = new DerivedKeyToken(token);
                     String id = dkt.getID();
                     DerivedKeyTokenProcessor dktProcessor = 
@@ -226,102 +252,110 @@ public class SignatureProcessor implements Processor {
                     secretKey = dktProcessor.getKeyBytes(keyLength);
                 } else {
                     if (el.equals(WSSecurityEngine.binaryToken)) {
-                        //TODO: Use results from BinarySecurityTokenProcessor
-                        certs = getCertificatesTokenReference((Element) token,
-                                crypto);
+                        // TODO: Use results from BinarySecurityTokenProcessor
+                        certs = getCertificatesTokenReference(token, crypto);
                     } else if (el.equals(WSSecurityEngine.SAML_TOKEN)) {
                         if (crypto == null) {
-                            throw new WSSecurityException(WSSecurityException.FAILURE,
-                                "noSigCryptoFile");
+                            throw new WSSecurityException(
+                                WSSecurityException.FAILURE, "noSigCryptoFile"
+                            );
                         }
-                        samlKi = SAMLUtil.getSAMLKeyInfo(
-                                (Element) token, crypto, cb);
+                        samlKi = SAMLUtil.getSAMLKeyInfo(token, crypto, cb);
                         certs = samlKi.getCerts();
                         secretKey = samlKi.getSecret();
 
                     } else if (el.equals(WSSecurityEngine.ENCRYPTED_KEY)){
                         String encryptedKeyID = token.getAttributeNS(null,"Id");                   
-                        EncryptedKeyProcessor encryptKeyProcessor = (EncryptedKeyProcessor)
-                                wsDocInfo.getProcessor(encryptedKeyID);
+                        EncryptedKeyProcessor encryptKeyProcessor = 
+                            (EncryptedKeyProcessor)wsDocInfo.getProcessor(encryptedKeyID);
                         
                         if (encryptKeyProcessor == null ) {
                             if (crypto == null) {
-                                throw new WSSecurityException(WSSecurityException.FAILURE,
-                                    "noSigCryptoFile");
+                                throw new WSSecurityException(
+                                    WSSecurityException.FAILURE, "noSigCryptoFile"
+                                );
                             }
                             encryptKeyProcessor = new EncryptedKeyProcessor();
                             encryptKeyProcessor.handleEncryptedKey((Element)token, cb, crypto);
-                        
                         } 
                         secretKey = encryptKeyProcessor.getDecryptedBytes();
-                     
                     } else {
-                        
-                        //Try custom token through callback handler
-                        //try to find a custom token
-                        String id = secRef
-                                .getReference().getURI();
+                        // Try custom token through callback handler
+                        // try to find a custom token
+                        String id = secRef.getReference().getURI();
                         if (id.charAt(0) == '#') {
                             id = id.substring(1);
                         }
-                        WSPasswordCallback pwcb = new WSPasswordCallback(id,
-                                WSPasswordCallback.CUSTOM_TOKEN);
+                        WSPasswordCallback pwcb = 
+                            new WSPasswordCallback(id, WSPasswordCallback.CUSTOM_TOKEN);
                         try {
-                            cb.handle(new Callback[]{pwcb});
+                            Callback[] callbacks = new Callback[]{pwcb};
+                            cb.handle(callbacks);
                         } catch (Exception e) {
-                            throw new WSSecurityException(WSSecurityException.FAILURE,
-                                    "noPassword", new Object[] { id }, e);
+                            throw new WSSecurityException(
+                                WSSecurityException.FAILURE,
+                                "noPassword", 
+                                new Object[] {id}, 
+                                e
+                            );
                         }
                         
                         secretKey = pwcb.getKey();
                         customTokenId = id;
-                        
-                        if(secretKey == null) {
+                        if (secretKey == null) {
                             throw new WSSecurityException(
-                                    WSSecurityException.INVALID_SECURITY,
-                                    "unsupportedKeyInfo", new Object[]{el
-                                    .toString()});
+                                WSSecurityException.INVALID_SECURITY,
+                                "unsupportedKeyInfo", 
+                                new Object[]{el.toString()}
+                            );
                         }
                     }
                 }
             } else if (secRef.containsX509Data() || secRef.containsX509IssuerSerial()) {
                 certs = secRef.getX509IssuerSerial(crypto);
             } else if (secRef.containsKeyIdentifier()) {
-                if (secRef.getKeyIdentifierValueType().equals
-                        (SecurityTokenReference.ENC_KEY_SHA1_URI)) {
+                if (secRef.getKeyIdentifierValueType().equals(SecurityTokenReference.ENC_KEY_SHA1_URI)) {
                     
                     String id = secRef.getKeyIdentifierValue();
-                    WSPasswordCallback pwcb = new WSPasswordCallback(id,
-                                                                     null,
-                                                                     SecurityTokenReference.ENC_KEY_SHA1_URI,
-                                                                     WSPasswordCallback.ENCRYPTED_KEY_TOKEN);
+                    WSPasswordCallback pwcb = 
+                        new WSPasswordCallback(
+                            id,
+                            null,
+                            SecurityTokenReference.ENC_KEY_SHA1_URI,
+                            WSPasswordCallback.ENCRYPTED_KEY_TOKEN
+                        );
                     try {
-                        cb.handle(new Callback[]{pwcb});
+                        Callback[] callbacks = new Callback[]{pwcb};
+                        cb.handle(callbacks);
                     } catch (Exception e) {
-                        throw new WSSecurityException(WSSecurityException.FAILURE,
-                                "noPassword", new Object[] { id }, e);
+                        throw new WSSecurityException(
+                            WSSecurityException.FAILURE,
+                            "noPassword", 
+                            new Object[] {id}, 
+                            e
+                        );
                     }
                     secretKey = pwcb.getKey();
-                    
                 } else {
                     certs = secRef.getKeyIdentifier(crypto);
                 }
             } else {
                 throw new WSSecurityException(
-                        WSSecurityException.INVALID_SECURITY,
-                        "unsupportedKeyInfo", new Object[]{node.toString()});
+                    WSSecurityException.INVALID_SECURITY,
+                    "unsupportedKeyInfo", 
+                    new Object[]{node.toString()}
+                );
             }
         } else {
             if (crypto == null) {
-                throw new WSSecurityException(WSSecurityException.FAILURE,
-                        "noSigCryptoFile");
+                throw new WSSecurityException(WSSecurityException.FAILURE, "noSigCryptoFile");
             }
             if (crypto.getDefaultX509Alias() != null) {
                 certs = crypto.getCertificates(crypto.getDefaultX509Alias());
             } else {
                 throw new WSSecurityException(
-                        WSSecurityException.INVALID_SECURITY,
-                        "unsupportedKeyInfo");
+                    WSSecurityException.INVALID_SECURITY, "unsupportedKeyInfo"
+                );
             }
         }
         if (tlog.isDebugEnabled()) {
@@ -348,22 +382,22 @@ public class SignatureProcessor implements Processor {
             if (certs != null) {
                 signatureOk = sig.checkSignatureValue(certs[0]);
             } else {
-                signatureOk = sig.checkSignatureValue(sig
-                        .createSecretKey(secretKey));
+                signatureOk = sig.checkSignatureValue(sig.createSecretKey(secretKey));
             }
             if (signatureOk) {
                 if (tlog.isDebugEnabled()) {
                     t2 = System.currentTimeMillis();
-                    tlog.debug("Verify: total= " + (t2 - t0)
-                            + ", prepare-cert= " + (t1 - t0) + ", verify= "
-                            + (t2 - t1));
+                    tlog.debug(
+                        "Verify: total= " + (t2 - t0) + ", prepare-cert= " + (t1 - t0) 
+                        + ", verify= " + (t2 - t1)
+                    );
                 }
                 signatureValue[0] = sig.getSignatureValue();
-                /*
-                 * Now dig into the Signature element to get the elements that
-                 * this Signature covers. Build the QName of these Elements and
-                 * return them to caller
-                 */
+                //
+                // Now dig into the Signature element to get the elements that
+                // this Signature covers. Build the QName of these Elements and
+                // return them to caller
+                //
                 SignedInfo si = sig.getSignedInfo();
                 int numReferences = si.getLength();
                 for (int i = 0; i < numReferences; i++) {
@@ -379,19 +413,17 @@ public class SignatureProcessor implements Processor {
                     if(uri != null && !"".equals(uri)) {
                         Element se = WSSecurityUtil.getElementByWsuId(elem.getOwnerDocument(), uri);
                         if (se == null) {
-                            se = WSSecurityUtil.getElementByGenId(elem
-                                    .getOwnerDocument(), uri);
+                            se = WSSecurityUtil.getElementByGenId(elem.getOwnerDocument(), uri);
                         }
                         if (se == null) {
-                            throw new WSSecurityException(
-                                    WSSecurityException.FAILED_CHECK);
+                            throw new WSSecurityException(WSSecurityException.FAILED_CHECK);
                         }
                         returnElements.add(WSSecurityUtil.getIDFromReference(uri));
                     } else {
-                       //This is the case where the signed element is identified 
-                       //by a transform such as XPath filtering
-                       //We add the complete reference element to the return 
-                       //elements
+                       // This is the case where the signed element is identified 
+                       // by a transform such as XPath filtering
+                       // We add the complete reference element to the return 
+                       // elements
                        returnElements.add(siRef); 
                     }
                 }
@@ -400,8 +432,8 @@ public class SignatureProcessor implements Processor {
                     returnCert[0] = certs[0];
                     return certs[0].getSubjectDN();
                 } else if (ut != null){
-                    WSUsernameTokenPrincipal principal = new WSUsernameTokenPrincipal(
-                            ut.getName(), ut.isHashed());
+                    WSUsernameTokenPrincipal principal = 
+                        new WSUsernameTokenPrincipal(ut.getName(), ut.isHashed());
                     principal.setNonce(ut.getNonce());
                     principal.setPassword(ut.getPassword());
                     principal.setCreatedTime(ut.getCreated());
@@ -413,18 +445,15 @@ public class SignatureProcessor implements Processor {
                     principal.setLength(dkt.getLength());
                     principal.setOffset(dkt.getOffset());
                     String basetokenId = null;
-                    SecurityTokenReference securityTokenReference = dkt
-                            .getSecurityTokenReference();
+                    SecurityTokenReference securityTokenReference = dkt.getSecurityTokenReference();
                     if (securityTokenReference.containsReference()) {
-                        basetokenId = securityTokenReference.getReference()
-                                .getURI();
+                        basetokenId = securityTokenReference.getReference().getURI();
                         if (basetokenId.charAt(0) == '#') {
                             basetokenId = basetokenId.substring(1);
                         }
                     } else {
                         // KeyIdentifier
-                        basetokenId = securityTokenReference
-                                .getKeyIdentifierValue();
+                        basetokenId = securityTokenReference.getKeyIdentifierValue();
                     }
                     principal.setBasetokenId(basetokenId);
                     return principal;
@@ -434,9 +463,8 @@ public class SignatureProcessor implements Processor {
                     principal.setTokenObject(assertion);
                     return principal;
                 } else if (secretKey != null) {
-                    //This is the custom key scenario
-                    CustomTokenPrincipal principal = new CustomTokenPrincipal(customTokenId);
-                    return principal;
+                    // This is the custom key scenario
+                    return new CustomTokenPrincipal(customTokenId);
                 } else {
                     throw new WSSecurityException("Cannot determine principal");
                 }
@@ -452,19 +480,16 @@ public class SignatureProcessor implements Processor {
 
     /**
      * Extracts the certificate(s) from the Binary Security token reference.
-     * <p/>
      *
      * @param elem The element containing the binary security token. This is
      *             either X509 certificate(s) or a PKIPath.
      * @return an array of X509 certificates
      * @throws WSSecurityException
      */
-    public X509Certificate[] getCertificatesTokenReference(Element elem,
-                                                           Crypto crypto)
-            throws WSSecurityException {
+    public X509Certificate[] getCertificatesTokenReference(Element elem, Crypto crypto)
+        throws WSSecurityException {
         if (crypto == null) {
-            throw new WSSecurityException(WSSecurityException.FAILURE,
-                    "noSigCryptoFile");
+            throw new WSSecurityException(WSSecurityException.FAILURE, "noSigCryptoFile");
         }
         BinarySecurity token = createSecurityToken(elem);
         if (token instanceof PKIPathSecurity) {
@@ -497,20 +522,17 @@ public class SignatureProcessor implements Processor {
         if (X509Security.X509_V3_TYPE.equals(type)) {
             x509 = new X509Security(element);
             return (BinarySecurity) x509;
-        } else if (X509Security.X509_V1_TYPE.equals(type)) {
-            x509 = new X509Security(element);
-            return (BinarySecurity) x509;
         } else if (PKIPathSecurity.getType().equals(type)) {
             pkiPath = new PKIPathSecurity(element);
             return (BinarySecurity) pkiPath;
         }
-        throw new WSSecurityException(WSSecurityException.UNSUPPORTED_SECURITY_TOKEN,
-                "unsupportedBinaryTokenType", new Object[]{type});
+        throw new WSSecurityException(
+            WSSecurityException.UNSUPPORTED_SECURITY_TOKEN,
+            "unsupportedBinaryTokenType", 
+            new Object[]{type}
+        );
     }
 
-    /* (non-Javadoc)
-     * @see org.apache.ws.security.processor.Processor#getId()
-     */
     public String getId() {
         return signatureId;
     }

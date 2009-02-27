@@ -38,6 +38,7 @@ public class SignatureConfirmation {
     private static final String VALUE = "Value"; 
     protected Element element = null;
     private byte[] signatureValue = null;
+    
     /**
      * Constructs a <code>SignatureConfirmation</code> object and parses the
      * <code>wsse11:SignatureCOnfirmation</code> element to initialize it.
@@ -46,7 +47,6 @@ public class SignatureConfirmation {
      *             contains the confirmation data
      */
     public SignatureConfirmation(Element elem) throws WSSecurityException {
-
         element = elem;
         String sv = element.getAttributeNS(null, VALUE);
         if (sv != null) {
@@ -57,22 +57,18 @@ public class SignatureConfirmation {
     /**
      * Constructs a <code>SignatureConfirmation</code> object according
      * to the defined parameters.
-     * <p/>
      *
      * @param doc the SOAP envelope as <code>Document</code>
      * @param signVal the Signature value as byte[] of <code>null</code> 
      *   if no value available.
      */
     public SignatureConfirmation(Document doc, byte[] signVal) {
-
-        element =
-                doc.createElementNS(WSConstants.WSSE11_NS,
-                        WSConstants.WSSE11_PREFIX
-                + ":"
-                + WSConstants.SIGNATURE_CONFIRMATION_LN);
-        WSSecurityUtil.setNamespace(element,
-                WSConstants.WSSE11_NS,
-                WSConstants.WSSE11_PREFIX);
+        element = 
+            doc.createElementNS(
+                WSConstants.WSSE11_NS, 
+                WSConstants.WSSE11_PREFIX + ":"  + WSConstants.SIGNATURE_CONFIRMATION_LN
+            );
+        WSSecurityUtil.setNamespace(element, WSConstants.WSSE11_NS, WSConstants.WSSE11_PREFIX);
         if (signVal != null) {
             String sv = Base64.encode(signVal);
             element.setAttribute(VALUE, sv);
@@ -103,8 +99,8 @@ public class SignatureConfirmation {
      * @param id
      */
     public void setID(String id) {
-        String prefix = WSSecurityUtil.setNamespace(this.element,
-                WSConstants.WSU_NS, WSConstants.WSU_PREFIX);
+        String prefix = 
+            WSSecurityUtil.setNamespace(this.element, WSConstants.WSU_NS, WSConstants.WSU_PREFIX);
         this.element.setAttributeNS(WSConstants.WSU_NS, prefix + ":Id", id);
     }
     
