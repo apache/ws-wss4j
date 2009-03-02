@@ -56,7 +56,18 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 public class TestWSSecurityNew14 extends TestCase implements CallbackHandler {
     private static Log log = LogFactory.getLog(TestWSSecurityNew14.class);
     static final String NS = "http://www.w3.org/2000/09/xmldsig#";
-    static final String soapMsg = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + "<SOAP-ENV:Envelope xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" + "<SOAP-ENV:Body>" + "<add xmlns=\"http://ws.apache.org/counter/counter_port_type\">" + "<value xmlns=\"\">15</value>" + "</add>" + "</SOAP-ENV:Body>\r\n       \r\n" + "</SOAP-ENV:Envelope>";
+    private final static String soapMsg = 
+        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" 
+        + "<SOAP-ENV:Envelope "
+        +   "xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" "
+        +   "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" "
+        +   "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" 
+        +   "<SOAP-ENV:Body>" 
+        +       "<add xmlns=\"http://ws.apache.org/counter/counter_port_type\">" 
+        +           "<value xmlns=\"\">15</value>" 
+        +       "</add>" 
+        +   "</SOAP-ENV:Body>" 
+        + "</SOAP-ENV:Envelope>";
     static final WSSecurityEngine secEngine = new WSSecurityEngine();
     static final Crypto crypto = CryptoFactory.getInstance();
 
@@ -139,21 +150,12 @@ public class TestWSSecurityNew14 extends TestCase implements CallbackHandler {
 
         Document signedDoc = builder.build(doc, crypto, secHeader);
 
-        /*
-         * convert the resulting document into a message first. The toAxisMessage()
-         * method performs the necessary c14n call to properly set up the signed
-         * document and convert it into a SOAP message. After that we extract it
-         * as a document again for further processing.
-         */
-
-        Message signedMsg = SOAPUtil.toAxisMessage(signedDoc);
         if (log.isDebugEnabled()) {
             log.debug("Signed message with ThumbprintSHA1 key identifier:");
             String outputString = 
                 org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
             log.debug(outputString);
         }
-        signedDoc = signedMsg.getSOAPEnvelope().getAsDocument();
         log.info("After Signing ThumbprintSHA1....");
         verify(signedDoc);
     }

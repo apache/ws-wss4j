@@ -55,7 +55,18 @@ import java.io.InputStream;
 public class TestWSSecurityNew13 extends TestCase implements CallbackHandler {
     private static Log log = LogFactory.getLog(TestWSSecurityNew13.class);
     static final String NS = "http://www.w3.org/2000/09/xmldsig#";
-    static final String soapMsg = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + "<SOAP-ENV:Envelope xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" + "<SOAP-ENV:Body>" + "<add xmlns=\"http://ws.apache.org/counter/counter_port_type\">" + "<value xmlns=\"\">15</value>" + "</add>" + "</SOAP-ENV:Body>\r\n       \r\n" + "</SOAP-ENV:Envelope>";
+    private final static String soapMsg = 
+        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" 
+        + "<SOAP-ENV:Envelope "
+        +   "xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" "
+        +   "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" "
+        +   "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" 
+        +   "<SOAP-ENV:Body>" 
+        +       "<add xmlns=\"http://ws.apache.org/counter/counter_port_type\">" 
+        +           "<value xmlns=\"\">15</value>" 
+        +       "</add>" 
+        +   "</SOAP-ENV:Body>" 
+        + "</SOAP-ENV:Envelope>";
     static final WSSecurityEngine secEngine = new WSSecurityEngine();
     MessageContext msgContext;
     SOAPEnvelope unsignedEnvelope;
@@ -145,14 +156,12 @@ public class TestWSSecurityNew13 extends TestCase implements CallbackHandler {
         log.info("Before adding UsernameToken PW Text....");
         builder.prependToHeader(secHeader);
         Document signedDoc = doc;
-        Message signedMsg = SOAPUtil.toAxisMessage(signedDoc);
         if (log.isDebugEnabled()) {
             log.debug("Message with UserNameToken PW Text:");
             String outputString = 
                 org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
             log.debug(outputString);
         }
-        signedDoc = signedMsg.getSOAPEnvelope().getAsDocument();
         log.info("After adding UsernameToken PW Text....");
         verify(signedDoc);
     }
@@ -185,14 +194,12 @@ public class TestWSSecurityNew13 extends TestCase implements CallbackHandler {
         log.info("Before adding UsernameToken PW Digest....");
         builder.prependToHeader(secHeader);
         Document signedDoc = doc;
-        Message signedMsg = SOAPUtil.toAxisMessage(signedDoc);
         if (log.isDebugEnabled()) {
             log.debug("Message with UserNameToken PW Digest:");
             String outputString = 
                 org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
             log.debug(outputString);
         }
-        signedDoc = signedMsg.getSOAPEnvelope().getAsDocument();
         log.info("After adding UsernameToken PW Digest....");
         verify(signedDoc);
     }

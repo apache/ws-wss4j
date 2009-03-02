@@ -30,8 +30,6 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSConfig;
-import org.apache.ws.security.components.crypto.Crypto;
-import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.handler.WSHandler;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.handler.WSHandlerConstants;
@@ -51,9 +49,8 @@ import javax.security.auth.callback.UnsupportedCallbackException;
  * <p/>
  */
 public class TestWSSecurityGetPassword extends TestCase {
-    private static Log log = LogFactory.getLog(TestWSSecurityGetPassword.class);
-    static final String NS = "http://www.w3.org/2000/09/xmldsig#";
-    static final String soapMsg = 
+    private static final Log LOG = LogFactory.getLog(TestWSSecurityGetPassword.class);
+    private static final String SOAPMSG = 
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" 
         + "<SOAP-ENV:Envelope "
         +   "xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" "
@@ -66,10 +63,8 @@ public class TestWSSecurityGetPassword extends TestCase {
         +   "</SOAP-ENV:Body>" 
         + "</SOAP-ENV:Envelope>";
 
-    static final Crypto crypto = CryptoFactory.getInstance();
-
-    MessageContext msgContext;
-    SOAPEnvelope unsignedEnvelope;
+    private MessageContext msgContext;
+    private SOAPEnvelope unsignedEnvelope;
 
     /**
      * TestWSSecurity constructor
@@ -121,7 +116,7 @@ public class TestWSSecurityGetPassword extends TestCase {
      * @throws java.lang.Exception if there is any problem constructing the soap envelope
      */
     protected SOAPEnvelope getSOAPEnvelope() throws Exception {
-        InputStream in = new ByteArrayInputStream(soapMsg.getBytes());
+        InputStream in = new ByteArrayInputStream(SOAPMSG.getBytes());
         Message msg = new Message(in);
         msg.setMessageContext(msgContext);
         return msg.getSOAPEnvelope();
@@ -184,8 +179,8 @@ public class TestWSSecurityGetPassword extends TestCase {
         
         String outputString = 
             org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
-        if (log.isDebugEnabled()) {
-            log.debug(outputString);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(outputString);
         }
         assertTrue(outputString.indexOf("bob") != -1);
         assertTrue(outputString.indexOf("securityPassword") != -1);
@@ -224,8 +219,8 @@ public class TestWSSecurityGetPassword extends TestCase {
         
         String outputString = 
             org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
-        if (log.isDebugEnabled()) {
-            log.debug(outputString);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(outputString);
         }
         assertTrue(outputString.indexOf("bob") != -1);
         assertTrue(outputString.indexOf("securityPassword") != -1);

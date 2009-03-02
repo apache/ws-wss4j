@@ -22,7 +22,6 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 import org.apache.axis.Message;
 import org.apache.axis.MessageContext;
-import org.apache.axis.SOAPPart;
 import org.apache.axis.client.AxisClient;
 import org.apache.axis.configuration.NullProvider;
 import org.apache.axis.message.SOAPEnvelope;
@@ -52,11 +51,18 @@ import java.io.InputStream;
 public class TestWSSecurityNew6 extends TestCase implements CallbackHandler {
     private static Log log = LogFactory.getLog(TestWSSecurityNew6.class);
 
-    static final String soapMsg = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
-            + "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">"
-            + "   <soapenv:Body>"
-            + "      <ns1:testMethod xmlns:ns1=\"http://axis/service/security/test6/LogTestService6\"></ns1:testMethod>"
-            + "   </soapenv:Body>" + "</soapenv:Envelope>";
+    private final static String soapMsg = 
+        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" 
+        + "<SOAP-ENV:Envelope "
+        +   "xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" "
+        +   "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" "
+        +   "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" 
+        +   "<SOAP-ENV:Body>" 
+        +       "<add xmlns=\"http://ws.apache.org/counter/counter_port_type\">" 
+        +           "<value xmlns=\"\">15</value>" 
+        +       "</add>" 
+        +   "</SOAP-ENV:Body>" 
+        + "</SOAP-ENV:Envelope>";
 
     static final WSSecurityEngine secEngine = new WSSecurityEngine();
 
@@ -144,22 +150,8 @@ public class TestWSSecurityNew6 extends TestCase implements CallbackHandler {
         Document encryptedDoc = encrypt.build(doc, crypto, secHeader);
         Document encryptedSignedDoc = sign.build(encryptedDoc, crypto,
                 secHeader);
-        /*
-         * convert the resulting document into a message first. The
-         * toAxisMessage() mehtod performs the necessary c14n call to properly
-         * set up the signed document and convert it into a SOAP message. After
-         * that we extract it as a document again for further processing.
-         */
-
-        Message encryptedMsg = SOAPUtil.toAxisMessage(encryptedSignedDoc);
-        String s = encryptedMsg.getSOAPPartAsString();
-        ((SOAPPart) message.getSOAPPart()).setCurrentMessage(s,
-                SOAPPart.FORM_STRING);
-
-        Document encryptedSignedDoc1 = message.getSOAPEnvelope()
-                .getAsDocument();
         log.info("After Encryption....");
-        verify(encryptedSignedDoc1);
+        verify(encryptedSignedDoc);
     }
 
     /**

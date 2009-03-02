@@ -48,7 +48,18 @@ import java.io.InputStream;
 public class TestWSSecurityNew extends TestCase {
     private static Log log = LogFactory.getLog(TestWSSecurityNew.class);
     static final String NS = "http://www.w3.org/2000/09/xmldsig#";
-    static final String soapMsg = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + "<SOAP-ENV:Envelope xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" + "<SOAP-ENV:Body>" + "<add xmlns=\"http://ws.apache.org/counter/counter_port_type\">" + "<value xmlns=\"\">15</value>" + "</add>" + "</SOAP-ENV:Body>\r\n       \r\n" + "</SOAP-ENV:Envelope>";
+    private final static String soapMsg = 
+        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" 
+        + "<SOAP-ENV:Envelope "
+        +   "xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" "
+        +   "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" "
+        +   "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" 
+        +   "<SOAP-ENV:Body>" 
+        +       "<add xmlns=\"http://ws.apache.org/counter/counter_port_type\">" 
+        +           "<value xmlns=\"\">15</value>" 
+        +       "</add>" 
+        +   "</SOAP-ENV:Body>" 
+        + "</SOAP-ENV:Envelope>";
     static final WSSecurityEngine secEngine = new WSSecurityEngine();
     static final Crypto crypto = CryptoFactory.getInstance();
 
@@ -127,21 +138,12 @@ public class TestWSSecurityNew extends TestCase {
         secHeader.insertSecurityHeader(doc);
         Document signedDoc = builder.build(doc, crypto, secHeader);
 
-        /*
-         * convert the resulting document into a message first. The toAxisMessage()
-         * mehtod performs the necessary c14n call to properly set up the signed
-         * document and convert it into a SOAP message. After that we extract it
-         * as a document again for further processing.
-         */
-
         if (log.isDebugEnabled()) {
             log.debug("Signed message with IssuerSerial key identifier:");
             String outputString = 
                 org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
             log.debug(outputString);
         }
-        Message signedMsg = SOAPUtil.toAxisMessage(signedDoc);
-        signedDoc = signedMsg.getSOAPEnvelope().getAsDocument();
         log.info("After Signing IS....");
         verify(signedDoc);
     }

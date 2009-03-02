@@ -46,7 +46,6 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PrintWriter;
 import java.util.Vector;
 
 /**
@@ -54,8 +53,8 @@ import java.util.Vector;
  * has a custom header added.
  */
 public class TestWSSecuritySignatureParts extends TestCase implements CallbackHandler {
-    private static Log log = LogFactory.getLog(TestWSSecuritySignatureParts.class);
-    static final String soapMsg = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+    private static final Log LOG = LogFactory.getLog(TestWSSecuritySignatureParts.class);
+    private static final String SOAPMSG = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
             "<soapenv:Envelope xmlns:foo=\"urn:foo.bar\" xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" +
             "   <soapenv:Header>" +
             "       <foo:foobar>baz</foo:foobar>" + 
@@ -65,10 +64,10 @@ public class TestWSSecuritySignatureParts extends TestCase implements CallbackHa
             "   </soapenv:Body>" +
             "</soapenv:Envelope>";
 
-    static final WSSecurityEngine secEngine = new WSSecurityEngine();
-    static final Crypto crypto = CryptoFactory.getInstance();
-    MessageContext msgContext;
-    Message message;
+    private WSSecurityEngine secEngine = new WSSecurityEngine();
+    private Crypto crypto = CryptoFactory.getInstance();
+    private MessageContext msgContext;
+    private Message message;
 
     /**
      * TestWSSecurity constructor
@@ -120,7 +119,7 @@ public class TestWSSecuritySignatureParts extends TestCase implements CallbackHa
      * @throws Exception if there is any problem constructing the soap envelope
      */
     protected Message getSOAPMessage() throws Exception {
-        InputStream in = new ByteArrayInputStream(soapMsg.getBytes());
+        InputStream in = new ByteArrayInputStream(SOAPMSG.getBytes());
         Message msg = new Message(in);
         msg.setMessageContext(msgContext);
         return msg;
@@ -151,10 +150,10 @@ public class TestWSSecuritySignatureParts extends TestCase implements CallbackHa
         
         Document signedDoc = sign.build(doc, crypto, secHeader);
         
-        if (log.isDebugEnabled()) {
+        if (LOG.isDebugEnabled()) {
             String outputString = 
                 org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
-            log.debug(outputString);
+            LOG.debug(outputString);
         }
         
         verify(signedDoc);
@@ -255,10 +254,10 @@ public class TestWSSecuritySignatureParts extends TestCase implements CallbackHa
         
         Document signedDoc = sign.build(doc, crypto, secHeader);
         
-        if (log.isDebugEnabled()) {
+        if (LOG.isDebugEnabled()) {
             String outputString = 
                 org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
-            log.debug(outputString);
+            LOG.debug(outputString);
         }
         
         verify(signedDoc);
@@ -274,11 +273,11 @@ public class TestWSSecuritySignatureParts extends TestCase implements CallbackHa
      */
     private void verify(Document doc) throws Exception {
         secEngine.processSecurityHeader(doc, null, this, crypto);
-        if (log.isDebugEnabled()) {
-            log.debug("Verfied and decrypted message:");
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Verfied and decrypted message:");
             String outputString = 
                 org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
-            log.debug(outputString);
+            LOG.debug(outputString);
         }
     }
 

@@ -50,12 +50,19 @@ import java.io.InputStream;
 public class TestWSSecurityNew7 extends TestCase implements CallbackHandler {
     private static Log log = LogFactory.getLog(TestWSSecurityNew7.class);
 
-    static final String soapMsg = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
-            + "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">"
-            + "   <soapenv:Body>"
-            + "      <ns1:testMethod xmlns:ns1=\"urn:LogTestService7\"></ns1:testMethod>"
-            + "   </soapenv:Body>" + "</soapenv:Envelope>";
-
+    private final static String soapMsg = 
+        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" 
+        + "<SOAP-ENV:Envelope "
+        +   "xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" "
+        +   "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" "
+        +   "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" 
+        +   "<SOAP-ENV:Body>" 
+        +       "<add xmlns=\"http://ws.apache.org/counter/counter_port_type\">" 
+        +           "<value xmlns=\"\">15</value>" 
+        +       "</add>" 
+        +   "</SOAP-ENV:Body>" 
+        + "</SOAP-ENV:Envelope>";
+    
     static final WSSecurityEngine secEngine = new WSSecurityEngine();
 
     static final Crypto crypto = CryptoFactory.getInstance();
@@ -140,15 +147,6 @@ public class TestWSSecurityNew7 extends TestCase implements CallbackHandler {
         Document encryptedEncryptedDoc = encrypt.build(encryptedDoc, crypto,
                 secHeader);
 
-        /*
-         * convert the resulting document into a message first. The
-         * toAxisMessage() mehtod performs the necessary c14n call to properly
-         * set up the signed document and convert it into a SOAP message. After
-         * that we extract it as a document again for further processing.
-         */
-
-        Message encryptedMsg = SOAPUtil.toAxisMessage(encryptedEncryptedDoc);
-        encryptedEncryptedDoc = encryptedMsg.getSOAPEnvelope().getAsDocument();
         log.info("After Encryption....");
         verify(encryptedEncryptedDoc);
     }

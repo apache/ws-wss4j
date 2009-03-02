@@ -45,14 +45,24 @@ import java.io.InputStream;
  * @author Davanum Srinivas (dims@yahoo.com)
  */
 public class TestWSSecurityNewSOAP12 extends TestCase {
-    private static Log log = LogFactory.getLog(TestWSSecurityNewSOAP12.class);
-    static final String NS = "http://www.w3.org/2000/09/xmldsig#";
-    static final String soapMsg = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + "<SOAP-ENV:Envelope xmlns:SOAP-ENV=\"http://www.w3.org/2003/05/soap-envelope\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" + "<SOAP-ENV:Body>" + "<add xmlns=\"http://ws.apache.org/counter/counter_port_type\">" + "<value xmlns=\"\">15</value>" + "</add>" + "</SOAP-ENV:Body>\r\n       \r\n" + "</SOAP-ENV:Envelope>";
-    static final WSSecurityEngine secEngine = new WSSecurityEngine();
-    static final Crypto crypto = CryptoFactory.getInstance();
-
-    MessageContext msgContext;
-    SOAPEnvelope unsignedEnvelope;
+    private static final Log LOG = LogFactory.getLog(TestWSSecurityNewSOAP12.class);
+    private static final String SOAPMSG = 
+        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" 
+        + "<SOAP-ENV:Envelope "
+        +   "xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" "
+        +   "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" "
+        +   "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" 
+        +   "<SOAP-ENV:Body>" 
+        +       "<add xmlns=\"http://ws.apache.org/counter/counter_port_type\">" 
+        +           "<value xmlns=\"\">15</value>" 
+        +       "</add>" 
+        +   "</SOAP-ENV:Body>" 
+        + "</SOAP-ENV:Envelope>";
+    
+    private WSSecurityEngine secEngine = new WSSecurityEngine();
+    private Crypto crypto = CryptoFactory.getInstance();
+    private MessageContext msgContext;
+    private SOAPEnvelope unsignedEnvelope;
 
     /**
      * TestWSSecurity constructor
@@ -104,7 +114,7 @@ public class TestWSSecurityNewSOAP12 extends TestCase {
      * @throws java.lang.Exception if there is any problem constructing the soap envelope
      */
     protected SOAPEnvelope getSOAPEnvelope() throws Exception {
-        InputStream in = new ByteArrayInputStream(soapMsg.getBytes());
+        InputStream in = new ByteArrayInputStream(SOAPMSG.getBytes());
         Message msg = new Message(in);
         msg.setMessageContext(msgContext);
         return msg.getSOAPEnvelope();
@@ -120,7 +130,7 @@ public class TestWSSecurityNewSOAP12 extends TestCase {
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         // builder.setUserInfo("john", "keypass");
-        log.info("Before Signing....");
+        LOG.info("Before Signing....");
         Document doc = unsignedEnvelope.getAsDocument();
         
         WSSecHeader secHeader = new WSSecHeader();
@@ -128,22 +138,13 @@ public class TestWSSecurityNewSOAP12 extends TestCase {
 
         Document signedDoc = builder.build(doc, crypto, secHeader);
 
-        /*
-         * convert the resulting document into a message first. The toAxisMessage()
-         * mehtod performs the necessary c14n call to properly set up the signed
-         * document and convert it into a SOAP message. After that we extract it
-         * as a document again for further processing.
-         */
-
-        Message signedMsg = SOAPUtil.toAxisMessage(signedDoc);
-        if (log.isDebugEnabled()) {
-            log.debug("Signed message SOAP 1.2:");
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Signed message SOAP 1.2:");
             String outputString = 
                 org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
-            log.debug(outputString);
+            LOG.debug(outputString);
         }
-        signedDoc = signedMsg.getSOAPEnvelope().getAsDocument();
-        log.info("After Signing....");
+        LOG.info("After Signing....");
         verify(signedDoc);
     }
 

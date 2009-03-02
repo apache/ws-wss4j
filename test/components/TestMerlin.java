@@ -51,7 +51,6 @@ public class TestMerlin extends TestCase {
      * can be instantiated
      */
     private static class NullPropertiesCrypto extends AbstractCrypto {
-    
         public NullPropertiesCrypto() 
             throws Exception {
             super((java.util.Properties) null);

@@ -57,19 +57,22 @@ import java.io.InputStream;
  * @author Davanum Srinivas (dims@yahoo.com)
  */
 public class TestWSSecurityNewST3 extends TestCase implements CallbackHandler {
-    private static Log log = LogFactory.getLog(TestWSSecurityNewST3.class);
-    static final String soapMsg = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
-            "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" +
-            "   <soapenv:Body>" +
-            "      <ns1:testMethod xmlns:ns1=\"uri:LogTestService2\"></ns1:testMethod>" +
-            "   </soapenv:Body>" +
-            "</soapenv:Envelope>";
+    private static final Log LOG = LogFactory.getLog(TestWSSecurityNewST3.class);
+    private static final String SOAPMSG = 
+        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" 
+        + "<SOAP-ENV:Envelope "
+        +   "xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" "
+        +   "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" "
+        +   "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" 
+        +   "<SOAP-ENV:Body>" 
+        +      "<ns1:testMethod xmlns:ns1=\"uri:LogTestService2\"></ns1:testMethod>" 
+        +   "</SOAP-ENV:Body>" 
+        + "</SOAP-ENV:Envelope>";
 
-    static final WSSecurityEngine secEngine = new WSSecurityEngine();
-
-    static final Crypto crypto = CryptoFactory.getInstance("crypto.properties");
-    MessageContext msgContext;
-    Message message;
+    private WSSecurityEngine secEngine = new WSSecurityEngine();
+    private Crypto crypto = CryptoFactory.getInstance("crypto.properties");
+    private MessageContext msgContext;
+    private Message message;
 
     /**
      * TestWSSecurity constructor
@@ -121,7 +124,7 @@ public class TestWSSecurityNewST3 extends TestCase implements CallbackHandler {
      * @throws Exception if there is any problem constructing the soap envelope
      */
     protected Message getSOAPMessage() throws Exception {
-        InputStream in = new ByteArrayInputStream(soapMsg.getBytes());
+        InputStream in = new ByteArrayInputStream(SOAPMSG.getBytes());
         Message msg = new Message(in);
         msg.setMessageContext(msgContext);
         return msg;
@@ -155,33 +158,21 @@ public class TestWSSecurityNewST3 extends TestCase implements CallbackHandler {
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
 
-        log.info("Before SAMLSignedKeyHolder....");
+        LOG.info("Before SAMLSignedKeyHolder....");
         
         /*
          * set up for keyHolder
          */
         Document signedDoc = wsSign.build(doc, crypto, assertion, null, null, null, secHeader);
-        log.info("After SAMLSignedKeyHolder....");
+        LOG.info("After SAMLSignedKeyHolder....");
 
-        /*
-         * convert the resulting document into a message first. The toAxisMessage()
-         * method performs the necessary c14n call to properly set up the signed
-         * document and convert it into a SOAP message. Check that the contents can't
-         * be read (checking if we can find a specific substring). After that we extract it
-         * as a document again for further processing.
-         */
-
-        Message signedMsg = SOAPUtil.toAxisMessage(signedDoc);
-        if (log.isDebugEnabled()) {
-            log.debug("Signed SAML message (key holder):");
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Signed SAML message (key holder):");
             String outputString = 
                 org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
-            log.debug(outputString);
+            LOG.debug(outputString);
         }
-        // String encryptedString = signedMsg.getSOAPPartAsString();
-        signedDoc = signedMsg.getSOAPEnvelope().getAsDocument();
         verify(signedDoc);
-
     }
 
     

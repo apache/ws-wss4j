@@ -56,12 +56,16 @@ import java.util.Vector;
  */
 public class TestWSSecurityNew2 extends TestCase implements CallbackHandler {
     private static Log log = LogFactory.getLog(TestWSSecurityNew2.class);
-    static final String soapMsg = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
-            "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" +
-            "   <soapenv:Body>" +
-            "      <ns1:testMethod xmlns:ns1=\"uri:LogTestService2\"></ns1:testMethod>" +
-            "   </soapenv:Body>" +
-            "</soapenv:Envelope>";
+    private final static String soapMsg = 
+        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" 
+        + "<SOAP-ENV:Envelope "
+        +   "xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" "
+        +   "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" "
+        +   "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" 
+        +   "<SOAP-ENV:Body>" 
+        +      "<ns1:testMethod xmlns:ns1=\"uri:LogTestService2\"></ns1:testMethod>" 
+        +   "</SOAP-ENV:Body>" 
+        + "</SOAP-ENV:Envelope>";
 
     static final WSSecurityEngine secEngine = new WSSecurityEngine();
     static final Crypto crypto = CryptoFactory.getInstance("cryptoSKI.properties");
@@ -150,24 +154,13 @@ public class TestWSSecurityNew2 extends TestCase implements CallbackHandler {
         Document encryptedDoc = builder.build(doc, crypto, secHeader);
         log.info("After Encryption Triple DES....");
 
-        /*
-         * convert the resulting document into a message first. The toAxisMessage()
-         * method performs the necessary c14n call to properly set up the signed
-         * document and convert it into a SOAP message. Check that the contents can't
-          * be read (cheching if we can find a specific substring). After that we extract it
-         * as a document again for further processing.
-         */
-
-        Message encryptedMsg = SOAPUtil.toAxisMessage(encryptedDoc);
+        String outputString = 
+            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(encryptedDoc);
         if (log.isDebugEnabled()) {
             log.debug("Encrypted message, RSA-15 keytransport, 3DES:");
-            String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(encryptedDoc);
             log.debug(outputString);
         }
-        String encryptedString = encryptedMsg.getSOAPPartAsString();
-        assertTrue(encryptedString.indexOf("LogTestService2") == -1 ? true : false);
-        encryptedDoc = encryptedMsg.getSOAPEnvelope().getAsDocument();
+        assertTrue(outputString.indexOf("LogTestService2") == -1 ? true : false);
         verify(encryptedDoc, SOAP_BODY);
 
         /*
@@ -191,16 +184,13 @@ public class TestWSSecurityNew2 extends TestCase implements CallbackHandler {
         log.info("Before Encryption AES 128/RSA-15....");
         encryptedDoc = builder.build(doc, crypto, secHeader);
         log.info("After Encryption AES 128/RSA-15....");
-        encryptedMsg = (Message) SOAPUtil.toAxisMessage(encryptedDoc);
+        outputString = 
+            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(encryptedDoc);
         if (log.isDebugEnabled()) {
             log.debug("Encrypted message, RSA-15 keytransport, AES 128:");
-            String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(encryptedDoc);
             log.debug(outputString);
         }
-        encryptedString = encryptedMsg.getSOAPPartAsString();
-        assertTrue(encryptedString.indexOf("LogTestService2") == -1 ? true : false);
-        encryptedDoc = encryptedMsg.getSOAPEnvelope().getAsDocument();
+        assertTrue(outputString.indexOf("LogTestService2") == -1 ? true : false);
         verify(
             encryptedDoc,
             new javax.xml.namespace.QName(
@@ -231,16 +221,13 @@ public class TestWSSecurityNew2 extends TestCase implements CallbackHandler {
         Document encryptedDoc = builder.build(doc, crypto, secHeader);
         log.info("After Encryption Triple DES/RSA-OAEP....");
 
-        Message encryptedMsg = (Message) SOAPUtil.toAxisMessage(encryptedDoc);
+        String outputString = 
+            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(encryptedDoc);
         if (log.isDebugEnabled()) {
             log.debug("Encrypted message, RSA-OAEP keytransport, 3DES:");
-            String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(encryptedDoc);
             log.debug(outputString);
         }
-        String encryptedString = encryptedMsg.getSOAPPartAsString();
-        assertTrue(encryptedString.indexOf("LogTestService2") == -1 ? true : false);
-        encryptedDoc = encryptedMsg.getSOAPEnvelope().getAsDocument();
+        assertTrue(outputString.indexOf("LogTestService2") == -1 ? true : false);
         verify(encryptedDoc, SOAP_BODY);
 
     }

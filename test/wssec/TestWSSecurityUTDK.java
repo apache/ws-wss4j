@@ -59,18 +59,24 @@ import java.util.Vector;
  * and sign, as per wsc:DerivedKeyToken.
  */
 public class TestWSSecurityUTDK extends TestCase implements CallbackHandler {
-    private static Log log = LogFactory.getLog(TestWSSecurityUTDK.class);
-    static final String soapMsg = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
-            "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" +
-            "   <soapenv:Body>" +
-            "      <ns1:testMethod xmlns:ns1=\"uri:LogTestService2\"></ns1:testMethod>" +
-            "   </soapenv:Body>" +
-            "</soapenv:Envelope>";
+    private static final Log LOG = LogFactory.getLog(TestWSSecurityUTDK.class);
+    private static final String SOAPMSG = 
+        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" 
+        + "<SOAP-ENV:Envelope "
+        +   "xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" "
+        +   "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" "
+        +   "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" 
+        +   "<SOAP-ENV:Body>" 
+        +       "<add xmlns=\"http://ws.apache.org/counter/counter_port_type\">" 
+        +           "<value xmlns=\"\">15</value>" 
+        +       "</add>" 
+        +   "</SOAP-ENV:Body>" 
+        + "</SOAP-ENV:Envelope>";
 
-    static final WSSecurityEngine secEngine = new WSSecurityEngine();
-    static final Crypto crypto = CryptoFactory.getInstance();
-    MessageContext msgContext;
-    SOAPEnvelope unsignedEnvelope;
+    private WSSecurityEngine secEngine = new WSSecurityEngine();
+    private Crypto crypto = CryptoFactory.getInstance();
+    private MessageContext msgContext;
+    private SOAPEnvelope unsignedEnvelope;
 
     /**
      * TestWSSecurity constructor
@@ -122,7 +128,7 @@ public class TestWSSecurityUTDK extends TestCase implements CallbackHandler {
      * @throws java.lang.Exception if there is any problem constructing the soap envelope
      */
     protected SOAPEnvelope getSOAPEnvelope() throws Exception {
-        InputStream in = new ByteArrayInputStream(soapMsg.getBytes());
+        InputStream in = new ByteArrayInputStream(SOAPMSG.getBytes());
         Message msg = new Message(in);
         msg.setMessageContext(msgContext);
         return msg.getSOAPEnvelope();
@@ -203,8 +209,8 @@ public class TestWSSecurityUTDK extends TestCase implements CallbackHandler {
         assertTrue(outputString.indexOf("wsse11:Salt") != -1);
         assertTrue(outputString.indexOf("wsse11:Iteration") != -1);
         assertTrue(outputString.indexOf("testMethod") == -1);
-        if (log.isDebugEnabled()) {
-            log.debug(outputString);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(outputString);
         }
         
         verify(encryptedDoc);
@@ -247,8 +253,8 @@ public class TestWSSecurityUTDK extends TestCase implements CallbackHandler {
         assertTrue(outputString.indexOf("wsse11:Salt") != -1);
         assertTrue(outputString.indexOf("wsse11:Iteration") != -1);
         assertTrue(outputString.indexOf("testMethod") == -1);
-        if (log.isDebugEnabled()) {
-            log.debug(outputString);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(outputString);
         }
         
         try {
@@ -296,8 +302,8 @@ public class TestWSSecurityUTDK extends TestCase implements CallbackHandler {
         assertTrue(outputString.indexOf("wsse11:Salt") != -1);
         assertTrue(outputString.indexOf("wsse11:Iteration") != -1);
         assertTrue(outputString.indexOf("testMethod") == -1);
-        if (log.isDebugEnabled()) {
-            log.debug(outputString);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(outputString);
         }
         
         try {
@@ -343,8 +349,8 @@ public class TestWSSecurityUTDK extends TestCase implements CallbackHandler {
         assertTrue(outputString.indexOf("wsse:Password") == -1);
         assertTrue(outputString.indexOf("wsse11:Salt") != -1);
         assertTrue(outputString.indexOf("wsse11:Iteration") != -1);
-        if (log.isDebugEnabled()) {
-            log.debug(outputString);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(outputString);
         }
         
         Vector results = verify(signedDoc);
@@ -389,8 +395,8 @@ public class TestWSSecurityUTDK extends TestCase implements CallbackHandler {
         
         String outputString = 
             org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
-        if (log.isDebugEnabled()) {
-            log.debug(outputString);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(outputString);
         }
 
         try {
@@ -433,8 +439,8 @@ public class TestWSSecurityUTDK extends TestCase implements CallbackHandler {
         
         String outputString = 
             org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
-        if (log.isDebugEnabled()) {
-            log.debug(outputString);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(outputString);
         }
 
         try {

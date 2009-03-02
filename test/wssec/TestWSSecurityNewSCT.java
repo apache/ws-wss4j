@@ -55,20 +55,21 @@ import org.w3c.dom.Document;
  */
 public class TestWSSecurityNewSCT extends TestCase implements CallbackHandler {
 
-    static final String soapMsg = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
-            + "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">"
-            + "   <soapenv:Body>"
-            + "      <ns1:testMethod xmlns:ns1=\"uri:LogTestService2\"></ns1:testMethod>"
-            + "   </soapenv:Body>" + "</soapenv:Envelope>";
+    private static final String SOAPMSG = 
+        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" 
+        + "<SOAP-ENV:Envelope "
+        +   "xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" "
+        +   "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" "
+        +   "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" 
+        +   "<SOAP-ENV:Body>" 
+        +      "<ns1:testMethod xmlns:ns1=\"uri:LogTestService2\"></ns1:testMethod>" 
+        +   "</SOAP-ENV:Body>" 
+        + "</SOAP-ENV:Envelope>";
 
-    static final WSSecurityEngine secEngine = new WSSecurityEngine();
-
-    static final Crypto crypto = CryptoFactory
-            .getInstance("cryptoSKI.properties");
-
-    MessageContext msgContext;
-
-    Message message;
+    private WSSecurityEngine secEngine = new WSSecurityEngine();
+    private Crypto crypto = CryptoFactory.getInstance("cryptoSKI.properties");
+    private MessageContext msgContext;
+    private Message message;
 
     /**
      * Table of secrets idexd by the sct identifiers
@@ -318,14 +319,14 @@ public class TestWSSecurityNewSCT extends TestCase implements CallbackHandler {
      *             if there is any problem constructing the soap envelope
      */
     protected Message getSOAPMessage() throws Exception {
-        InputStream in = new ByteArrayInputStream(soapMsg.getBytes());
+        InputStream in = new ByteArrayInputStream(SOAPMSG.getBytes());
         Message msg = new Message(in);
         msg.setMessageContext(msgContext);
         return msg;
     }
 
     public void handle(Callback[] callbacks) throws IOException,
-            UnsupportedCallbackException {
+        UnsupportedCallbackException {
         for (int i = 0; i < callbacks.length; i++) {
             if (callbacks[i] instanceof WSPasswordCallback) {
                 WSPasswordCallback pc = (WSPasswordCallback) callbacks[i];

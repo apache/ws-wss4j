@@ -50,18 +50,22 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 public class TestWSSecurityNewDK extends TestCase implements CallbackHandler {
-    private static Log log = LogFactory.getLog(TestWSSecurityNewDK.class);
-    static final String soapMsg = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
-            "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" +
-            "   <soapenv:Body>" +
-            "      <ns1:testMethod xmlns:ns1=\"uri:LogTestService2\"></ns1:testMethod>" +
-            "   </soapenv:Body>" +
-            "</soapenv:Envelope>";
+    private static final Log LOG = LogFactory.getLog(TestWSSecurityNewDK.class);
+    private static final String SOAPMSG = 
+        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" 
+        + "<SOAP-ENV:Envelope "
+        +   "xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" "
+        +   "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" "
+        +   "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" 
+        +   "<SOAP-ENV:Body>" 
+        +      "<ns1:testMethod xmlns:ns1=\"uri:LogTestService2\"></ns1:testMethod>" 
+        +   "</SOAP-ENV:Body>" 
+        + "</SOAP-ENV:Envelope>";
 
-    static final WSSecurityEngine secEngine = new WSSecurityEngine();
-    static final Crypto crypto = CryptoFactory.getInstance("cryptoSKI.properties");
-    MessageContext msgContext;
-    Message message;
+    private WSSecurityEngine secEngine = new WSSecurityEngine();
+    private Crypto crypto = CryptoFactory.getInstance("cryptoSKI.properties");
+    private MessageContext msgContext;
+    private Message message;
 
     /**
      * TestWSSecurity constructor
@@ -113,7 +117,7 @@ public class TestWSSecurityNewDK extends TestCase implements CallbackHandler {
      * @throws Exception if there is any problem constructing the soap envelope
      */
     protected Message getSOAPMessage() throws Exception {
-        InputStream in = new ByteArrayInputStream(soapMsg.getBytes());
+        InputStream in = new ByteArrayInputStream(SOAPMSG.getBytes());
         Message msg = new Message(in);
         msg.setMessageContext(msgContext);
         return msg;
@@ -149,11 +153,11 @@ public class TestWSSecurityNewDK extends TestCase implements CallbackHandler {
         encrKeyBuilder.prependToHeader(secHeader);
         encrKeyBuilder.prependBSTElementToHeader(secHeader);
 
-        if (log.isDebugEnabled()) {
-            log.debug("Encrypted message: 3DES  + DerivedKeys");
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Encrypted message: 3DES  + DerivedKeys");
             String outputString = 
                 org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(encryptedDoc);
-            log.debug(outputString);
+            LOG.debug(outputString);
         }
         verify(doc);
     }
@@ -187,11 +191,11 @@ public class TestWSSecurityNewDK extends TestCase implements CallbackHandler {
          encrKeyBuilder.prependToHeader(secHeader);
          encrKeyBuilder.prependBSTElementToHeader(secHeader);
          
-         if (log.isDebugEnabled()) {
-             log.debug("Encrypted message: 3DES  + DerivedKeys");
+         if (LOG.isDebugEnabled()) {
+             LOG.debug("Encrypted message: 3DES  + DerivedKeys");
              String outputString = 
                  org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(encryptedDoc);
-             log.debug(outputString);
+             LOG.debug(outputString);
          }
         verify(doc);
      }
@@ -221,11 +225,11 @@ public class TestWSSecurityNewDK extends TestCase implements CallbackHandler {
          encrKeyBuilder.prependToHeader(secHeader);
          encrKeyBuilder.prependBSTElementToHeader(secHeader);
          
-         if (log.isDebugEnabled()) {
-             log.debug("Encrypted message: 3DES  + DerivedKeys");
+         if (LOG.isDebugEnabled()) {
+             LOG.debug("Encrypted message: 3DES  + DerivedKeys");
              String outputString = 
                  org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
-             log.debug(outputString);
+             LOG.debug(outputString);
          }
          verify(doc);
      }
@@ -250,7 +254,7 @@ public class TestWSSecurityNewDK extends TestCase implements CallbackHandler {
         WSSecDKSign sigBuilder = new WSSecDKSign();
         sigBuilder.setExternalKey(ek, tokenIdentifier);
         sigBuilder.setSignatureAlgorithm(XMLSignature.ALGO_ID_MAC_HMAC_SHA1);
-        log.info("Before HMAC-SHA1 signature");
+        LOG.info("Before HMAC-SHA1 signature");
         Document signedDoc = sigBuilder.build(doc, secHeader);
 
         //Derived key signature
@@ -262,11 +266,11 @@ public class TestWSSecurityNewDK extends TestCase implements CallbackHandler {
         encrKeyBuilder.prependToHeader(secHeader);
         encrKeyBuilder.prependBSTElementToHeader(secHeader);
 
-        if (log.isDebugEnabled()) {
-            log.debug("Encrypted message: 3DES  + DerivedKeys");
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Encrypted message: 3DES  + DerivedKeys");
             String outputString = 
                 org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedEncryptedDoc);
-            log.debug(outputString);
+            LOG.debug(outputString);
         }
         verify(signedEncryptedDoc);
     }
@@ -297,17 +301,17 @@ public class TestWSSecurityNewDK extends TestCase implements CallbackHandler {
          WSSecDKSign sigBuilder = new WSSecDKSign();
          sigBuilder.setExternalKey(ek, tokenIdentifier);
          sigBuilder.setSignatureAlgorithm(XMLSignature.ALGO_ID_MAC_HMAC_SHA1);
-         log.info("Before HMAC-SHA1 signature");
+         LOG.info("Before HMAC-SHA1 signature");
          Document encryptedSignedDoc = sigBuilder.build(doc, secHeader);
          
          encrKeyBuilder.prependToHeader(secHeader);
          encrKeyBuilder.prependBSTElementToHeader(secHeader);
          
-         if (log.isDebugEnabled()) {
-             log.debug("Encrypted message: 3DES  + DerivedKeys");
+         if (LOG.isDebugEnabled()) {
+             LOG.debug("Encrypted message: 3DES  + DerivedKeys");
              String outputString = 
                  org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(encryptedSignedDoc);
-             log.debug(outputString);
+             LOG.debug(outputString);
          }
 
          verify(encryptedSignedDoc);

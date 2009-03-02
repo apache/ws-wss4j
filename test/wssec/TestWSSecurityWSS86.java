@@ -57,12 +57,23 @@ import java.io.InputStream;
  * OU=WSS4J,O=Apache,L=Munich,ST=Bayern,C=DE"
  */
 public class TestWSSecurityWSS86 extends TestCase implements CallbackHandler {
-    private static Log log = LogFactory.getLog(TestWSSecurityWSS86.class);
-    static final String soapMsg = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + "<SOAP-ENV:Envelope xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" + "<SOAP-ENV:Body>" + "<add xmlns=\"http://ws.apache.org/counter/counter_port_type\">" + "<value xmlns=\"\">15</value>" + "</add>" + "</SOAP-ENV:Body>\r\n       \r\n" + "</SOAP-ENV:Envelope>";
-    static final WSSecurityEngine secEngine = new WSSecurityEngine();
-    static final Crypto crypto = CryptoFactory.getInstance("wss86.properties");
-    MessageContext msgContext;
-    Message message;
+    private static final Log LOG = LogFactory.getLog(TestWSSecurityWSS86.class);
+    private static final String SOAPMSG = 
+        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" 
+        + "<SOAP-ENV:Envelope "
+        +   "xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" "
+        +   "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" "
+        +   "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" 
+        +   "<SOAP-ENV:Body>" 
+        +       "<add xmlns=\"http://ws.apache.org/counter/counter_port_type\">" 
+        +           "<value xmlns=\"\">15</value>" 
+        +       "</add>" 
+        +   "</SOAP-ENV:Body>" 
+        + "</SOAP-ENV:Envelope>";
+    private WSSecurityEngine secEngine = new WSSecurityEngine();
+    private Crypto crypto = CryptoFactory.getInstance("wss86.properties");
+    private MessageContext msgContext;
+    private Message message;
 
     /**
      * TestWSSecurity constructor
@@ -114,7 +125,7 @@ public class TestWSSecurityWSS86 extends TestCase implements CallbackHandler {
      * @throws Exception if there is any problem constructing the soap envelope
      */
     protected Message getSOAPMessage() throws Exception {
-        InputStream in = new ByteArrayInputStream(soapMsg.getBytes());
+        InputStream in = new ByteArrayInputStream(SOAPMSG.getBytes());
         Message msg = new Message(in);
         msg.setMessageContext(msgContext);
         return msg;
@@ -162,14 +173,11 @@ public class TestWSSecurityWSS86 extends TestCase implements CallbackHandler {
         secHeader.insertSecurityHeader(doc);
         Document signedDoc = sign.build(doc, crypto, secHeader);
         
-        Message signedMsg = SOAPUtil.toAxisMessage(signedDoc);
-        if (log.isDebugEnabled()) {
+        if (LOG.isDebugEnabled()) {
             String outputString = 
                 org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
-            log.debug(outputString);
+            LOG.debug(outputString);
         }
-        signedDoc = signedMsg.getSOAPEnvelope().getAsDocument();
-        
         verify(signedDoc);
     }
     
@@ -182,16 +190,16 @@ public class TestWSSecurityWSS86 extends TestCase implements CallbackHandler {
      */
     private void verify(Document doc) throws Exception {
         secEngine.processSecurityHeader(doc, null, this, crypto);
-        if (log.isDebugEnabled()) {
-            log.debug("Verfied and decrypted message:");
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Verfied and decrypted message:");
             String outputString = 
                 org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
-            log.debug(outputString);
+            LOG.debug(outputString);
         }
     }
 
     public void handle(Callback[] callbacks)
-            throws IOException, UnsupportedCallbackException {
+        throws IOException, UnsupportedCallbackException {
         for (int i = 0; i < callbacks.length; i++) {
             if (callbacks[i] instanceof WSPasswordCallback) {
                 WSPasswordCallback pc = (WSPasswordCallback) callbacks[i];

@@ -46,13 +46,23 @@ import java.util.Vector;
  * WS-Security Test Case for Timestamps.
  */
 public class TestWSSecurityTimestamp extends TestCase {
-    private static Log log = LogFactory.getLog(TestWSSecurityTimestamp.class);
-    static final String NS = "http://www.w3.org/2000/09/xmldsig#";
-    static final String soapMsg = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + "<SOAP-ENV:Envelope xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" + "<SOAP-ENV:Body>" + "<add xmlns=\"http://ws.apache.org/counter/counter_port_type\">" + "<value xmlns=\"\">15</value>" + "</add>" + "</SOAP-ENV:Body>\r\n       \r\n" + "</SOAP-ENV:Envelope>";
-    static final WSSecurityEngine secEngine = new WSSecurityEngine();
-
-    MessageContext msgContext;
-    SOAPEnvelope unsignedEnvelope;
+    private static final Log LOG = LogFactory.getLog(TestWSSecurityTimestamp.class);
+    private static final String soapMsg = 
+        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" 
+        + "<SOAP-ENV:Envelope "
+        +   "xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" "
+        +   "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" "
+        +   "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" 
+        +   "<SOAP-ENV:Body>" 
+        +       "<add xmlns=\"http://ws.apache.org/counter/counter_port_type\">" 
+        +           "<value xmlns=\"\">15</value>" 
+        +       "</add>" 
+        +   "</SOAP-ENV:Body>" 
+        + "</SOAP-ENV:Envelope>";
+    
+    private WSSecurityEngine secEngine = new WSSecurityEngine();
+    private MessageContext msgContext;
+    private SOAPEnvelope unsignedEnvelope;
 
     /**
      * TestWSSecurity constructor
@@ -124,14 +134,12 @@ public class TestWSSecurityTimestamp extends TestCase {
         timestamp.setTimeToLive(300);
         Document createdDoc = timestamp.build(doc, secHeader);
 
-        Message msg = SOAPUtil.toAxisMessage(createdDoc);
-        if (log.isDebugEnabled()) {
+        if (LOG.isDebugEnabled()) {
             String outputString = 
                 org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(createdDoc);
-            log.debug(outputString);
+            LOG.debug(outputString);
         }
         
-        createdDoc = msg.getSOAPEnvelope().getAsDocument();
         //
         // Do some processing
         //
@@ -164,14 +172,12 @@ public class TestWSSecurityTimestamp extends TestCase {
         timestamp.setTimeToLive(0);
         Document createdDoc = timestamp.build(doc, secHeader);
 
-        Message msg = SOAPUtil.toAxisMessage(createdDoc);
-        if (log.isDebugEnabled()) {
+        if (LOG.isDebugEnabled()) {
             String outputString = 
                 org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(createdDoc);
-            log.debug(outputString);
+            LOG.debug(outputString);
         }
         
-        createdDoc = msg.getSOAPEnvelope().getAsDocument();
         //
         // Do some processing
         //
@@ -204,14 +210,12 @@ public class TestWSSecurityTimestamp extends TestCase {
         timestamp.setTimeToLive(-1);
         Document createdDoc = timestamp.build(doc, secHeader);
 
-        Message msg = SOAPUtil.toAxisMessage(createdDoc);
-        if (log.isDebugEnabled()) {
+        if (LOG.isDebugEnabled()) {
             String outputString = 
                 org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(createdDoc);
-            log.debug(outputString);
+            LOG.debug(outputString);
         }
         
-        createdDoc = msg.getSOAPEnvelope().getAsDocument();
         try {
             //
             // Note that "expired" verification is done in the TimestampProcessor, whereas
@@ -238,14 +242,12 @@ public class TestWSSecurityTimestamp extends TestCase {
         WSSecTimestamp timestamp = new WSSecTimestamp();
         Document createdDoc = timestamp.build(doc, secHeader);
 
-        Message msg = SOAPUtil.toAxisMessage(createdDoc);
-        if (log.isDebugEnabled()) {
+        if (LOG.isDebugEnabled()) {
             String outputString = 
                 org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(createdDoc);
-            log.debug(outputString);
+            LOG.debug(outputString);
         }
         
-        createdDoc = msg.getSOAPEnvelope().getAsDocument();
         //
         // Do some processing
         //

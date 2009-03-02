@@ -68,11 +68,18 @@ import java.util.Vector;
 public class TestWSSecurityNew15 extends TestCase implements CallbackHandler {
     private static Log log = LogFactory.getLog(TestWSSecurityNew15.class);
 
-    static final String soapMsg = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
-            + "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">"
-            + "   <soapenv:Body>"
-            + "      <ns1:testMethod xmlns:ns1=\"uri:LogTestService2\"></ns1:testMethod>"
-            + "   </soapenv:Body>" + "</soapenv:Envelope>";
+    private final static String soapMsg = 
+        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" 
+        + "<SOAP-ENV:Envelope "
+        +   "xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" "
+        +   "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" "
+        +   "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" 
+        +   "<SOAP-ENV:Body>" 
+        +       "<add xmlns=\"http://ws.apache.org/counter/counter_port_type\">" 
+        +           "<value xmlns=\"\">15</value>" 
+        +       "</add>" 
+        +   "</SOAP-ENV:Body>" 
+        + "</SOAP-ENV:Envelope>";
 
     static final WSSecurityEngine secEngine = new WSSecurityEngine();
 
@@ -194,26 +201,14 @@ public class TestWSSecurityNew15 extends TestCase implements CallbackHandler {
         Document encryptedDoc = doc;
         log.info("After Encryption Triple DES....");
 
-        /*
-         * convert the resulting document into a message first. The
-         * toAxisMessage() method performs the necessary c14n call to properly
-         * set up the signed document and convert it into a SOAP message. Check
-         * that the contents can't be read (checking if we can find a specific
-         * substring). After that we extract it as a document again for further
-         * processing.
-         */
-
-        Message encryptedMsg = SOAPUtil.toAxisMessage(encryptedDoc);
+        String outputString = 
+            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(encryptedDoc);
         if (log.isDebugEnabled()) {
             log.debug("Encrypted message, RSA-15 keytransport, 3DES:");
-            String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(encryptedDoc);
             log.debug(outputString);
         }
-        String encryptedString = encryptedMsg.getSOAPPartAsString();
-        assertTrue(encryptedString.indexOf("LogTestService2") == -1 ? true
+        assertTrue(outputString.indexOf("LogTestService2") == -1 ? true
                 : false);
-        encryptedDoc = encryptedMsg.getSOAPEnvelope().getAsDocument();
         verify(encryptedDoc);
     }
 

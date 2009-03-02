@@ -48,18 +48,24 @@ import java.io.InputStream;
  * http://issues.apache.org/jira/browse/WSS-60
  */
 public class TestWSSecurityWSS60 extends TestCase implements CallbackHandler {
-    private static Log log = LogFactory.getLog(TestWSSecurityWSS60.class);
-    static final String soapMsg = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
-            "<Envelope xmlns=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" +
-            "   <Body>" +
-            "      <ns1:testMethod xmlns:ns1=\"http://axis/service/security/test6/LogTestService8\"></ns1:testMethod>" +
-            "   </Body>" +
-            "</Envelope>";
+    private static final Log LOG = LogFactory.getLog(TestWSSecurityWSS60.class);
+    private static final String SOAPMSG = 
+        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" 
+        + "<Envelope "
+        +   "xmlns=\"http://schemas.xmlsoap.org/soap/envelope/\" "
+        +   "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" "
+        +   "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" 
+        +   "<Body>" 
+        +       "<add xmlns=\"http://ws.apache.org/counter/counter_port_type\">" 
+        +           "<value xmlns=\"\">15</value>" 
+        +       "</add>" 
+        +   "</Body>" 
+        + "</Envelope>";
 
-    static final WSSecurityEngine secEngine = new WSSecurityEngine();
-    static final Crypto crypto = CryptoFactory.getInstance();
-    MessageContext msgContext;
-    Message message;
+    private WSSecurityEngine secEngine = new WSSecurityEngine();
+    private Crypto crypto = CryptoFactory.getInstance();
+    private MessageContext msgContext;
+    private Message message;
 
     /**
      * TestWSSecurity constructor
@@ -111,7 +117,7 @@ public class TestWSSecurityWSS60 extends TestCase implements CallbackHandler {
      * @throws Exception if there is any problem constructing the soap envelope
      */
     protected Message getSOAPMessage() throws Exception {
-        InputStream in = new ByteArrayInputStream(soapMsg.getBytes());
+        InputStream in = new ByteArrayInputStream(SOAPMSG.getBytes());
         Message msg = new Message(in);
         msg.setMessageContext(msgContext);
         return msg;
@@ -133,14 +139,11 @@ public class TestWSSecurityWSS60 extends TestCase implements CallbackHandler {
         secHeader.insertSecurityHeader(doc);
         Document signedDoc = sign.build(doc, crypto, secHeader);
         
-        Message signedMsg = SOAPUtil.toAxisMessage(signedDoc);
-        if (log.isDebugEnabled()) {
+        if (LOG.isDebugEnabled()) {
             String outputString = 
                 org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
-            log.debug(outputString);
+            LOG.debug(outputString);
         }
-        signedDoc = signedMsg.getSOAPEnvelope().getAsDocument();
-        
         verify(signedDoc);
     }
     
@@ -153,11 +156,11 @@ public class TestWSSecurityWSS60 extends TestCase implements CallbackHandler {
      */
     private void verify(Document doc) throws Exception {
         secEngine.processSecurityHeader(doc, null, this, crypto);
-        if (log.isDebugEnabled()) {
-            log.debug("Verfied and decrypted message:");
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Verfied and decrypted message:");
             String outputString = 
                 org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
-            log.debug(outputString);
+            LOG.debug(outputString);
         }
     }
 

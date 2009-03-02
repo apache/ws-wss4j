@@ -53,16 +53,28 @@ import java.util.Vector;
  * This is a test for the Kerberos Token Profile 1.1
  */
 public class TestWSSecurityKerberosTokenProfile extends TestCase implements CallbackHandler {
-    private static Log log = LogFactory.getLog(TestWSSecurityKerberosTokenProfile.class);
+    private static final Log LOG = LogFactory.getLog(TestWSSecurityKerberosTokenProfile.class);
     private static final String AP_REQ = 
         "http://docs.oasis-open.org/wss/oasiswss-kerberos-token-profile-1.1#Kerberosv5_AP_REQ";
     private static final String BASE64_NS = 
         WSConstants.SOAPMESSAGE_NS + "#Base64Binary";
-    static final String soapMsg = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + "<SOAP-ENV:Envelope xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" + "<SOAP-ENV:Body>" + "<add xmlns=\"http://ws.apache.org/counter/counter_port_type\">" + "<value xmlns=\"\">15</value>" + "</add>" + "</SOAP-ENV:Body>\r\n       \r\n" + "</SOAP-ENV:Envelope>";
-    static final WSSecurityEngine secEngine = new WSSecurityEngine();
-    static final Crypto crypto = CryptoFactory.getInstance();
-    MessageContext msgContext;
-    Message message;
+    private static final String SOAPMSG = 
+        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" 
+        + "<SOAP-ENV:Envelope "
+        +   "xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" "
+        +   "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" "
+        +   "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" 
+        +   "<SOAP-ENV:Body>" 
+        +       "<add xmlns=\"http://ws.apache.org/counter/counter_port_type\">" 
+        +           "<value xmlns=\"\">15</value>" 
+        +       "</add>" 
+        +   "</SOAP-ENV:Body>" 
+        + "</SOAP-ENV:Envelope>";
+    
+    private WSSecurityEngine secEngine = new WSSecurityEngine();
+    private Crypto crypto = CryptoFactory.getInstance();
+    private MessageContext msgContext;
+    private Message message;
 
     /**
      * TestWSSecurity constructor
@@ -114,7 +126,7 @@ public class TestWSSecurityKerberosTokenProfile extends TestCase implements Call
      * @throws Exception if there is any problem constructing the soap envelope
      */
     protected Message getSOAPMessage() throws Exception {
-        InputStream in = new ByteArrayInputStream(soapMsg.getBytes());
+        InputStream in = new ByteArrayInputStream(SOAPMSG.getBytes());
         Message msg = new Message(in);
         msg.setMessageContext(msgContext);
         return msg;
@@ -137,10 +149,10 @@ public class TestWSSecurityKerberosTokenProfile extends TestCase implements Call
         bst.setToken("12345678".getBytes());
         WSSecurityUtil.prependChildElement(secHeader.getSecurityHeader(), bst.getElement());
         
-        if (log.isDebugEnabled()) {
+        if (LOG.isDebugEnabled()) {
             String outputString = 
                 org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
-            log.debug(outputString);
+            LOG.debug(outputString);
         }
         
         assertTrue(AP_REQ.equals(bst.getValueType()));
@@ -179,10 +191,10 @@ public class TestWSSecurityKerberosTokenProfile extends TestCase implements Call
         
         Document signedDoc = sign.build(doc, crypto, secHeader);
         
-        if (log.isDebugEnabled()) {
+        if (LOG.isDebugEnabled()) {
             String outputString = 
                 org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
-            log.debug(outputString);
+            LOG.debug(outputString);
         }
         
         verify(signedDoc);
@@ -221,10 +233,10 @@ public class TestWSSecurityKerberosTokenProfile extends TestCase implements Call
         
         Document signedDoc = sign.build(doc, crypto, secHeader);
         
-        if (log.isDebugEnabled()) {
+        if (LOG.isDebugEnabled()) {
             String outputString = 
                 org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
-            log.debug(outputString);
+            LOG.debug(outputString);
         }
         
         verify(signedDoc);
@@ -239,11 +251,11 @@ public class TestWSSecurityKerberosTokenProfile extends TestCase implements Call
      */
     private void verify(Document doc) throws Exception {
         secEngine.processSecurityHeader(doc, null, this, crypto);
-        if (log.isDebugEnabled()) {
-            log.debug("Verfied and decrypted message:");
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Verfied and decrypted message:");
             String outputString = 
                 org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
-            log.debug(outputString);
+            LOG.debug(outputString);
         }
     }
 

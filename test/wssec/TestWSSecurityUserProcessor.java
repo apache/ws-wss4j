@@ -47,9 +47,8 @@ import java.io.InputStream;
  * <p/>
  */
 public class TestWSSecurityUserProcessor extends TestCase {
-    private static Log log = LogFactory.getLog(TestWSSecurityUserProcessor.class);
-    static final String NS = "http://www.w3.org/2000/09/xmldsig#";
-    static final String soapMsg = 
+    private static final Log LOG = LogFactory.getLog(TestWSSecurityUserProcessor.class);
+    private static final String SOAPMSG = 
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" 
         + "<SOAP-ENV:Envelope "
         +   "xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" "
@@ -62,10 +61,9 @@ public class TestWSSecurityUserProcessor extends TestCase {
         +   "</SOAP-ENV:Body>" 
         + "</SOAP-ENV:Envelope>";
 
-    static final Crypto crypto = CryptoFactory.getInstance();
-
-    MessageContext msgContext;
-    SOAPEnvelope unsignedEnvelope;
+    private Crypto crypto = CryptoFactory.getInstance();
+    private MessageContext msgContext;
+    private SOAPEnvelope unsignedEnvelope;
 
     /**
      * TestWSSecurity constructor
@@ -117,7 +115,7 @@ public class TestWSSecurityUserProcessor extends TestCase {
      * @throws java.lang.Exception if there is any problem constructing the soap envelope
      */
     protected SOAPEnvelope getSOAPEnvelope() throws Exception {
-        InputStream in = new ByteArrayInputStream(soapMsg.getBytes());
+        InputStream in = new ByteArrayInputStream(SOAPMSG.getBytes());
         Message msg = new Message(in);
         msg.setMessageContext(msgContext);
         return msg.getSOAPEnvelope();
@@ -132,28 +130,19 @@ public class TestWSSecurityUserProcessor extends TestCase {
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         builder.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
-        log.info("Before Signing IS....");
+        LOG.info("Before Signing IS....");
         Document doc = unsignedEnvelope.getAsDocument();
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         Document signedDoc = builder.build(doc, crypto, secHeader);
 
-        /*
-         * convert the resulting document into a message first. The toSOAPMessage()
-         * method performs the necessary c14n call to properly set up the signed
-         * document and convert it into a SOAP message. After that we extract it
-         * as a document again for further processing.
-         */
-
-        if (log.isDebugEnabled()) {
-            log.debug("Signed message with IssuerSerial key identifier:");
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Signed message with IssuerSerial key identifier:");
             String outputString = 
                 org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
-            log.debug(outputString);
+            LOG.debug(outputString);
         }
-        Message signedMsg = (Message) SOAPUtil.toSOAPMessage(signedDoc);
-        signedDoc = signedMsg.getSOAPEnvelope().getAsDocument();
-        log.info("After Signing IS....");
+        LOG.info("After Signing IS....");
         //
         // Check to make sure we can install/replace and use our own processor
         //
@@ -189,28 +178,19 @@ public class TestWSSecurityUserProcessor extends TestCase {
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         builder.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
-        log.info("Before Signing IS....");
+        LOG.info("Before Signing IS....");
         Document doc = unsignedEnvelope.getAsDocument();
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         Document signedDoc = builder.build(doc, crypto, secHeader);
 
-        /*
-         * convert the resulting document into a message first. The toSOAPMessage()
-         * method performs the necessary c14n call to properly set up the signed
-         * document and convert it into a SOAP message. After that we extract it
-         * as a document again for further processing.
-         */
-
-        if (log.isDebugEnabled()) {
-            log.debug("Signed message with IssuerSerial key identifier:");
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Signed message with IssuerSerial key identifier:");
             String outputString = 
                 org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
-            log.debug(outputString);
+            LOG.debug(outputString);
         }
-        Message signedMsg = (Message) SOAPUtil.toSOAPMessage(signedDoc);
-        signedDoc = signedMsg.getSOAPEnvelope().getAsDocument();
-        log.info("After Signing IS....");
+        LOG.info("After Signing IS....");
         //
         // Check to make sure we can install/replace and use our own processor
         //

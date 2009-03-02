@@ -55,7 +55,7 @@ import org.w3c.dom.Element;
  * Test that checks for correct WSDataRef which should be returned by 
  * <code>org.apache.ws.security.processor.ReferenceListProcessor</code> 
  * 
- * This test uses the RSA_15 alogrithm to transport (wrap) the symmetric key.
+ * This test uses the RSA_15 algorithm to transport (wrap) the symmetric key.
  * The test case creates a ReferenceList element that references EncryptedData
  * elements. The ReferencesList element is put into the Security header, not
  * as child of the EncryptedKey. The EncryptedData elements contain a KeyInfo
@@ -66,22 +66,22 @@ import org.w3c.dom.Element;
  * 
  */
 public class TestWSSecurityDataRef extends TestCase implements CallbackHandler {
-    private static Log log = LogFactory.getLog(TestWSSecurityDataRef.class);
-
-    static final String soapMsg = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
-            + "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">"
-            + "   <soapenv:Body>"
-            + "      <ns1:testMethod xmlns:ns1=\"uri:LogTestService2\"></ns1:testMethod>"
-            + "   </soapenv:Body>" + "</soapenv:Envelope>";
-
-    static final WSSecurityEngine secEngine = new WSSecurityEngine();
-
-    static final Crypto crypto = CryptoFactory
-            .getInstance("cryptoSKI.properties");
-
-    MessageContext msgContext;
-
-    Message message;
+    private static final Log LOG = LogFactory.getLog(TestWSSecurityDataRef.class);
+    private static final String SOAPMSG = 
+        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" 
+        + "<SOAP-ENV:Envelope "
+        +   "xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" "
+        +   "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" "
+        +   "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" 
+        +   "<SOAP-ENV:Body>" 
+        +      "<ns1:testMethod xmlns:ns1=\"uri:LogTestService2\"></ns1:testMethod>" 
+        +   "</SOAP-ENV:Body>" 
+        + "</SOAP-ENV:Envelope>";
+    
+    private WSSecurityEngine secEngine = new WSSecurityEngine();
+    private Crypto crypto = CryptoFactory.getInstance("cryptoSKI.properties");
+    private MessageContext msgContext;
+    private Message message;
 
     /**
      * TestWSSecurityDataRef constructor <p/>
@@ -132,7 +132,7 @@ public class TestWSSecurityDataRef extends TestCase implements CallbackHandler {
      *             if there is any problem constructing the soap envelope
      */
     protected Message getSOAPMessage() throws Exception {
-        InputStream in = new ByteArrayInputStream(soapMsg.getBytes());
+        InputStream in = new ByteArrayInputStream(SOAPMSG.getBytes());
         Message msg = new Message(in);
         msg.setMessageContext(msgContext);
         return msg;
@@ -155,7 +155,7 @@ public class TestWSSecurityDataRef extends TestCase implements CallbackHandler {
         Document doc = unsignedEnvelope.getAsDocument();
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
-        log.info("Before Encryption Triple DES....");
+        LOG.info("Before Encryption Triple DES....");
 
         /*
          * Prepare the Encrypt object with the token, setup data structure
@@ -188,7 +188,7 @@ public class TestWSSecurityDataRef extends TestCase implements CallbackHandler {
         builder.prependBSTElementToHeader(secHeader);
 
         Document encryptedDoc = doc;
-        log.info("After Encryption Triple DES....");
+        LOG.info("After Encryption Triple DES....");
 
         checkDataRef(encryptedDoc);
     }
