@@ -630,11 +630,11 @@ public class SecurityTokenReference {
             if (n.getNodeType() == Node.ELEMENT_NODE) {
                 String ns = n.getNamespaceURI();
                 String name = n.getLocalName();
-                if (((namespace != null) && (ns != null) && namespace.equals(ns))
-                    || ((namespace == null) && (ns == null))) {
-                    if (localname.equals(name)) {
-                        result++;
-                    }
+                if ((((namespace != null) && namespace.equals(ns))
+                    || ((namespace == null) && (ns == null)))
+                    && (localname.equals(name))
+                ) {
+                    result++;
                 }
             }
         }

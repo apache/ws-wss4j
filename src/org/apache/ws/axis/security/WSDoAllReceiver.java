@@ -287,11 +287,9 @@ public class WSDoAllReceiver extends WSDoAllHandler {
             if (actionResult != null) {
                 X509Certificate returnCert = actionResult.getCertificate();
 
-                if (returnCert != null) {
-                    if (!verifyTrust(returnCert, reqData)) {
-                        throw new AxisFault(
-                                "WSDoAllReceiver: The certificate used for the signature is not trusted");
-                    }
+                if (returnCert != null && !verifyTrust(returnCert, reqData)) {
+                    throw new AxisFault(
+                            "WSDoAllReceiver: The certificate used for the signature is not trusted");
                 }
             }
 
@@ -312,11 +310,9 @@ public class WSDoAllReceiver extends WSDoAllHandler {
             if (actionResult != null) {
                 Timestamp timestamp = actionResult.getTimestamp();
 
-                if (timestamp != null) {
-                    if (!verifyTimestamp(timestamp, decodeTimeToLive(reqData))) {
-                        throw new AxisFault(
-                                "WSDoAllReceiver: The timestamp could not be validated");
-                    }
+                if (timestamp != null 
+                    && !verifyTimestamp(timestamp, decodeTimeToLive(reqData))) {
+                    throw new AxisFault("WSDoAllReceiver: The timestamp could not be validated");
                 }
             }
 

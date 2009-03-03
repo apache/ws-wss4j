@@ -190,7 +190,8 @@ public class WSS4JHandler extends WSHandler implements Handler {
         Vector actions = new Vector();
         String action = (String) getOption(WSHandlerConstants.SEND + '.' + WSHandlerConstants.ACTION);
         if (action == null) {
-            if ((action = (String) getOption(WSHandlerConstants.ACTION)) == null) {
+            action = (String) getOption(WSHandlerConstants.ACTION);
+            if (action == null) {
                 action = (String) mc.getProperty(WSHandlerConstants.ACTION);
             }
         }
@@ -217,14 +218,13 @@ public class WSS4JHandler extends WSHandler implements Handler {
         * functions. No need to do it for encryption only. Check if username
         * is available and then get a password.
         */
-        if ((doAction & (WSConstants.SIGN | WSConstants.UT | WSConstants.UT_SIGN)) != 0) {
+        if (((doAction & (WSConstants.SIGN | WSConstants.UT | WSConstants.UT_SIGN)) != 0)
+            && (reqData.getUsername() == null || reqData.getUsername().equals(""))) {
             /*
             * We need a username - if none throw an JAXRPCException. For encryption
             * there is a specific parameter to get a username.
             */
-            if (reqData.getUsername() == null || reqData.getUsername().equals("")) {
-                throw new JAXRPCException("WSS4JHandler: Empty username for specified action");
-            }
+            throw new JAXRPCException("WSS4JHandler: Empty username for specified action");
         }
         if (doDebug) {
             log.debug("Action: " + doAction);
@@ -332,7 +332,8 @@ public class WSS4JHandler extends WSHandler implements Handler {
         Vector actions = new Vector();
         String action = (String) getOption(WSHandlerConstants.RECEIVE + '.' + WSHandlerConstants.ACTION);
         if (action == null) {
-            if ((action = (String) getOption(WSHandlerConstants.ACTION)) == null) {
+            action = (String) getOption(WSHandlerConstants.ACTION);
+            if (action == null) {
                 action = (String) mc.getProperty(WSHandlerConstants.ACTION);
             }
         }
@@ -488,10 +489,8 @@ public class WSS4JHandler extends WSHandler implements Handler {
             X509Certificate returnCert = 
                 (X509Certificate)actionResult.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE);
 
-            if (returnCert != null) {
-                if (!verifyTrust(returnCert, reqData)) {
-                    throw new JAXRPCException("WSS4JHandler: The certificate used for the signature is not trusted");
-                }
+            if (returnCert != null && !verifyTrust(returnCert, reqData)) {
+                throw new JAXRPCException("WSS4JHandler: The certificate used for the signature is not trusted");
             }
         }
 
@@ -511,10 +510,9 @@ public class WSS4JHandler extends WSHandler implements Handler {
             Timestamp timestamp = 
                 (Timestamp)actionResult.get(WSSecurityEngineResult.TAG_TIMESTAMP);
 
-            if (timestamp != null && reqData.getWssConfig().isTimeStampStrict()) {
-                if (!verifyTimestamp(timestamp, decodeTimeToLive(reqData))) {
-                    throw new JAXRPCException("WSS4JHandler: The timestamp could not be validated");
-                }
+            if (timestamp != null && reqData.getWssConfig().isTimeStampStrict()
+                && !verifyTimestamp(timestamp, decodeTimeToLive(reqData))) {
+                throw new JAXRPCException("WSS4JHandler: The timestamp could not be validated");
             }
         }
 

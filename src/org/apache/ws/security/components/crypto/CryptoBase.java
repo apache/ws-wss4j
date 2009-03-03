@@ -100,7 +100,10 @@ public abstract class CryptoBase implements Crypto {
         if (provider != null) {
             factory = (CertificateFactory)certFactMap.get(provider);
         } else if (keyStoreProvider != null) {
-            factory = (CertificateFactory)certFactMap.get(mapKeystoreProviderToCertProvider(keyStoreProvider));
+            factory = 
+                (CertificateFactory)certFactMap.get(
+                    mapKeystoreProviderToCertProvider(keyStoreProvider)
+                );
             if (factory == null) {
                 factory = (CertificateFactory)certFactMap.get(keyStoreProvider);                
             }
@@ -112,11 +115,17 @@ public abstract class CryptoBase implements Crypto {
                 if (provider == null || provider.length() == 0) {
                     if (keyStoreProvider != null && keyStoreProvider.length() != 0) {
                         try {
-                            factory = CertificateFactory.getInstance("X.509", 
-                                                                 mapKeystoreProviderToCertProvider(keyStoreProvider));
+                            factory = 
+                                CertificateFactory.getInstance(
+                                    "X.509", 
+                                    mapKeystoreProviderToCertProvider(keyStoreProvider)
+                                );
                             certFactMap.put(keyStoreProvider, factory);
-                            certFactMap.put(mapKeystoreProviderToCertProvider(keyStoreProvider), factory);
+                            certFactMap.put(
+                                mapKeystoreProviderToCertProvider(keyStoreProvider), factory
+                            );
                         } catch (Exception ex) {
+                            log.debug(ex);
                             //Ignore, we'll just use the default since they didn't specify one.
                             //Hopefully that will work for them.
                         }

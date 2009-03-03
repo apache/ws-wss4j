@@ -187,7 +187,7 @@ public class XmlSchemaDateFormat extends DateFormat {
 
         append_buf.append(str);
 
-        return (append_buf);
+        return append_buf;
     }
 
     private void validateChar(String str, ParsePosition parse_pos, int index,
@@ -206,7 +206,10 @@ public class XmlSchemaDateFormat extends DateFormat {
 
     private void handleParseError(ParsePosition parse_pos, String error_reason)
             throws ParseException {
-        throw new ParseException("INVALID_XSD_DATETIME", parse_pos.getErrorIndex());
+        throw new ParseException(
+            "INVALID_XSD_DATETIME: " + error_reason, 
+            parse_pos.getErrorIndex()
+        );
     }
 
 }

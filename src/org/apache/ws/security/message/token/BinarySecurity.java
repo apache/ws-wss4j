@@ -75,14 +75,12 @@ public class BinarySecurity {
                     new Object[] {encoding}
                 );
             }
-        } else if (el.equals(TOKEN_KI)) {
-            if (encoding == null || !encoding.equals(BASE64_ENCODING)) {
-                throw new WSSecurityException(
-                    WSSecurityException.INVALID_SECURITY_TOKEN,
-                    "badEncoding", 
-                    new Object[] {encoding}
-                );
-            }
+        } else if (el.equals(TOKEN_KI) && !BASE64_ENCODING.equals(encoding)) {
+            throw new WSSecurityException(
+                WSSecurityException.INVALID_SECURITY_TOKEN,
+                "badEncoding", 
+                new Object[] {encoding}
+            );
         }
     }
 

@@ -106,15 +106,13 @@ public class WSDoAllSender extends WSDoAllHandler {
              * functions. No need to do it for encryption only. Check if
              * username is available and then get a passowrd.
              */
-            if ((doAction & (WSConstants.SIGN | WSConstants.UT | WSConstants.UT_SIGN)) != 0) {
+            if (((doAction & (WSConstants.SIGN | WSConstants.UT | WSConstants.UT_SIGN)) != 0)
+                && (reqData.getUsername() == null || reqData.getUsername().equals(""))) {
                 /*
                  * We need a username - if none throw an AxisFault. For
                  * encryption there is a specific parameter to get a username.
                  */
-                if (reqData.getUsername() == null || reqData.getUsername().equals("")) {
-                    throw new AxisFault(
-                    "WSDoAllSender: Empty username for specified action");
-                }
+                 throw new AxisFault("WSDoAllSender: Empty username for specified action");
             }
             if (doDebug) {
                 log.debug("Action: " + doAction);
