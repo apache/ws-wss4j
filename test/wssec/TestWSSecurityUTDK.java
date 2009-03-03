@@ -99,16 +99,6 @@ public class TestWSSecurityUTDK extends TestCase implements CallbackHandler {
     }
 
     /**
-     * Main method
-     * <p/>
-     * 
-     * @param args command line args
-     */
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    /**
      * Setup method
      * <p/>
      * 

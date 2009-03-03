@@ -52,8 +52,8 @@ import java.io.InputStream;
  * @author Davanum Srinivas (dims@yahoo.com)
  */
 public class TestWSSecurityNew9 extends TestCase implements CallbackHandler {
-    private static Log log = LogFactory.getLog(TestWSSecurityNew9.class);
-    private final static String soapMsg = 
+    private static final Log LOG = LogFactory.getLog(TestWSSecurityNew9.class);
+    private static final String SOAPMSG = 
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" 
         + "<SOAP-ENV:Envelope "
         +   "xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" "
@@ -66,10 +66,10 @@ public class TestWSSecurityNew9 extends TestCase implements CallbackHandler {
         +   "</SOAP-ENV:Body>" 
         + "</SOAP-ENV:Envelope>";
 
-    static final WSSecurityEngine secEngine = new WSSecurityEngine();
-    static final Crypto crypto = CryptoFactory.getInstance();
-    MessageContext msgContext;
-    Message message;
+    private WSSecurityEngine secEngine = new WSSecurityEngine();
+    private Crypto crypto = CryptoFactory.getInstance();
+    private MessageContext msgContext;
+    private Message message;
 
     private static final byte[] key = {
         (byte)0x31, (byte)0xfd,
@@ -108,16 +108,6 @@ public class TestWSSecurityNew9 extends TestCase implements CallbackHandler {
     }
 
     /**
-     * Main method
-     * <p/>
-     * 
-     * @param args command line args
-     */
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    /**
      * Setup method
      * <p/>
      * 
@@ -137,7 +127,7 @@ public class TestWSSecurityNew9 extends TestCase implements CallbackHandler {
      * @throws Exception if there is any problem constructing the soap envelope
      */
     protected Message getSOAPMessage() throws Exception {
-        InputStream in = new ByteArrayInputStream(soapMsg.getBytes());
+        InputStream in = new ByteArrayInputStream(SOAPMSG.getBytes());
         Message msg = new Message(in);
         msg.setMessageContext(msgContext);
         return msg;
@@ -162,7 +152,7 @@ public class TestWSSecurityNew9 extends TestCase implements CallbackHandler {
         encrypt.setKey(key);
 
         sign.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
-        log.info("Before Encryption....");
+        LOG.info("Before Encryption....");
         Document doc = unsignedEnvelope.getAsDocument();
         encrypt.setDocument(doc);
         WSSecHeader secHeader = new WSSecHeader();
@@ -170,13 +160,13 @@ public class TestWSSecurityNew9 extends TestCase implements CallbackHandler {
         Document signedDoc = sign.build(doc, crypto, secHeader);
         Document encryptedSignedDoc = encrypt.build(signedDoc, crypto, secHeader);
 
-        if (log.isDebugEnabled()) {
-            log.debug("Encrypted message, RSA-OAEP keytransport, 3DES:");
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Encrypted message, RSA-OAEP keytransport, 3DES:");
             String outputString = 
                 org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(encryptedSignedDoc);
-            log.debug(outputString);
+            LOG.debug(outputString);
         }
-        log.info("After Encryption....");
+        LOG.info("After Encryption....");
         verify(encryptedSignedDoc);
     }
 

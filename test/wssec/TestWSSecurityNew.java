@@ -46,9 +46,8 @@ import java.io.InputStream;
  * @author Davanum Srinivas (dims@yahoo.com)
  */
 public class TestWSSecurityNew extends TestCase {
-    private static Log log = LogFactory.getLog(TestWSSecurityNew.class);
-    static final String NS = "http://www.w3.org/2000/09/xmldsig#";
-    private final static String soapMsg = 
+    private static final Log LOG = LogFactory.getLog(TestWSSecurityNew.class);
+    private static final String SOAPMSG = 
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" 
         + "<SOAP-ENV:Envelope "
         +   "xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" "
@@ -60,11 +59,11 @@ public class TestWSSecurityNew extends TestCase {
         +       "</add>" 
         +   "</SOAP-ENV:Body>" 
         + "</SOAP-ENV:Envelope>";
-    static final WSSecurityEngine secEngine = new WSSecurityEngine();
-    static final Crypto crypto = CryptoFactory.getInstance();
-
-    MessageContext msgContext;
-    SOAPEnvelope unsignedEnvelope;
+    
+    private WSSecurityEngine secEngine = new WSSecurityEngine();
+    private Crypto crypto = CryptoFactory.getInstance();
+    private MessageContext msgContext;
+    private SOAPEnvelope unsignedEnvelope;
 
     /**
      * TestWSSecurity constructor
@@ -87,16 +86,6 @@ public class TestWSSecurityNew extends TestCase {
     }
 
     /**
-     * Main method
-     * <p/>
-     * 
-     * @param args command line args
-     */
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    /**
      * Setup method
      * <p/>
      * 
@@ -116,7 +105,7 @@ public class TestWSSecurityNew extends TestCase {
      * @throws java.lang.Exception if there is any problem constructing the soap envelope
      */
     protected SOAPEnvelope getSOAPEnvelope() throws Exception {
-        InputStream in = new ByteArrayInputStream(soapMsg.getBytes());
+        InputStream in = new ByteArrayInputStream(SOAPMSG.getBytes());
         Message msg = new Message(in);
         msg.setMessageContext(msgContext);
         return msg.getSOAPEnvelope();
@@ -132,19 +121,19 @@ public class TestWSSecurityNew extends TestCase {
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         builder.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
-        log.info("Before Signing IS....");
+        LOG.info("Before Signing IS....");
         Document doc = unsignedEnvelope.getAsDocument();
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         Document signedDoc = builder.build(doc, crypto, secHeader);
 
-        if (log.isDebugEnabled()) {
-            log.debug("Signed message with IssuerSerial key identifier:");
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Signed message with IssuerSerial key identifier:");
             String outputString = 
                 org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
-            log.debug(outputString);
+            LOG.debug(outputString);
         }
-        log.info("After Signing IS....");
+        LOG.info("After Signing IS....");
         verify(signedDoc);
     }
 

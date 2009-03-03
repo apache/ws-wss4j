@@ -100,16 +100,6 @@ public class TestWSSecurityUTSignature extends TestCase implements CallbackHandl
     }
 
     /**
-     * Main method
-     * <p/>
-     * 
-     * @param args command line args
-     */
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    /**
      * Setup method
      * <p/>
      * 

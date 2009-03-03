@@ -49,9 +49,8 @@ import java.io.InputStream;
  * @author Davanum Srinivas (dims@yahoo.com)
  */
 public class TestWSSecurityNew6 extends TestCase implements CallbackHandler {
-    private static Log log = LogFactory.getLog(TestWSSecurityNew6.class);
-
-    private final static String soapMsg = 
+    private static final Log LOG = LogFactory.getLog(TestWSSecurityNew6.class);
+    private static final String soapMsg = 
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" 
         + "<SOAP-ENV:Envelope "
         +   "xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" "
@@ -64,13 +63,10 @@ public class TestWSSecurityNew6 extends TestCase implements CallbackHandler {
         +   "</SOAP-ENV:Body>" 
         + "</SOAP-ENV:Envelope>";
 
-    static final WSSecurityEngine secEngine = new WSSecurityEngine();
-
-    static final Crypto crypto = CryptoFactory.getInstance();
-
-    MessageContext msgContext;
-
-    Message message;
+    private WSSecurityEngine secEngine = new WSSecurityEngine();
+    private Crypto crypto = CryptoFactory.getInstance();
+    private MessageContext msgContext;
+    private Message message;
 
     /**
      * TestWSSecurity constructor <p/>
@@ -89,16 +85,6 @@ public class TestWSSecurityNew6 extends TestCase implements CallbackHandler {
      */
     public static Test suite() {
         return new TestSuite(TestWSSecurityNew6.class);
-    }
-
-    /**
-     * Main method <p/>
-     * 
-     * @param args
-     *            command line args
-     */
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
     }
 
     /**
@@ -141,7 +127,7 @@ public class TestWSSecurityNew6 extends TestCase implements CallbackHandler {
         WSSecSignature sign = new WSSecSignature();
         encrypt.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e");
         sign.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
-        log.info("Before Encryption....");
+        LOG.info("Before Encryption....");
         Document doc = unsignedEnvelope.getAsDocument();
 
         WSSecHeader secHeader = new WSSecHeader();
@@ -150,7 +136,7 @@ public class TestWSSecurityNew6 extends TestCase implements CallbackHandler {
         Document encryptedDoc = encrypt.build(doc, crypto, secHeader);
         Document encryptedSignedDoc = sign.build(encryptedDoc, crypto,
                 secHeader);
-        log.info("After Encryption....");
+        LOG.info("After Encryption....");
         verify(encryptedSignedDoc);
     }
 
@@ -163,10 +149,10 @@ public class TestWSSecurityNew6 extends TestCase implements CallbackHandler {
      */
     private void verify(Document doc) throws Exception {
         secEngine.processSecurityHeader(doc, null, this, crypto);
-        if (log.isDebugEnabled()) {
+        if (LOG.isDebugEnabled()) {
             String outputString = 
                 org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
-            log.debug(outputString);
+            LOG.debug(outputString);
         }
     }
 

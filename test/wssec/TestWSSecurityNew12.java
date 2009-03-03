@@ -48,9 +48,8 @@ import java.io.InputStream;
  * @author Werner Dittmann (Werner.Dittmann@siemens.com)
  */
 public class TestWSSecurityNew12 extends TestCase {
-    private static Log log = LogFactory.getLog(TestWSSecurityNew12.class);
-    static final String NS = "http://www.w3.org/2000/09/xmldsig#";
-    private final static String soapMsg = 
+    private static final Log LOG = LogFactory.getLog(TestWSSecurityNew12.class);
+    private static final String SOAPMSG = 
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" 
         + "<SOAP-ENV:Envelope "
         +   "xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" "
@@ -62,11 +61,11 @@ public class TestWSSecurityNew12 extends TestCase {
         +       "</add>" 
         +   "</SOAP-ENV:Body>" 
         + "</SOAP-ENV:Envelope>";
-    static final WSSecurityEngine secEngine = new WSSecurityEngine();
-    static final Crypto crypto = CryptoFactory.getInstance("cryptoSKI.properties");
-
-    MessageContext msgContext;
-    SOAPEnvelope unsignedEnvelope;
+    
+    private WSSecurityEngine secEngine = new WSSecurityEngine();
+    private Crypto crypto = CryptoFactory.getInstance("cryptoSKI.properties");
+    private MessageContext msgContext;
+    private SOAPEnvelope unsignedEnvelope;
 
     /**
      * TestWSSecurity constructor
@@ -89,16 +88,6 @@ public class TestWSSecurityNew12 extends TestCase {
     }
 
     /**
-     * Main method
-     * <p/>
-     * 
-     * @param args command line args
-     */
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    /**
      * Setup method
      * <p/>
      * 
@@ -118,7 +107,7 @@ public class TestWSSecurityNew12 extends TestCase {
      * @throws java.lang.Exception if there is any problem constructing the soap envelope
      */
     protected SOAPEnvelope getSOAPEnvelope() throws Exception {
-        InputStream in = new ByteArrayInputStream(soapMsg.getBytes());
+        InputStream in = new ByteArrayInputStream(SOAPMSG.getBytes());
         Message msg = new Message(in);
         msg.setMessageContext(msgContext);
         return msg.getSOAPEnvelope();
@@ -139,7 +128,7 @@ public class TestWSSecurityNew12 extends TestCase {
         builder.setSignatureAlgorithm(XMLSignature.ALGO_ID_SIGNATURE_DSA);
         
         // builder.setUserInfo("john", "keypass");
-        log.info("Before SigningDSA_SKIDirect....");
+        LOG.info("Before SigningDSA_SKIDirect....");
         Document doc = unsignedEnvelope.getAsDocument();
         
         WSSecHeader secHeader = new WSSecHeader();
@@ -147,14 +136,14 @@ public class TestWSSecurityNew12 extends TestCase {
 
         Document signedDoc = builder.build(doc, crypto, secHeader);
 
-        if (log.isDebugEnabled()) {
-            log.debug("Signed message with DSA_SKI key identifier:");
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Signed message with DSA_SKI key identifier:");
             String outputString = 
                 org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
-            log.debug(outputString);
+            LOG.debug(outputString);
         }
 
-        log.info("After SigningDSA_SKIDirect....");
+        LOG.info("After SigningDSA_SKIDirect....");
         verify(signedDoc);
     }
 
@@ -173,7 +162,7 @@ public class TestWSSecurityNew12 extends TestCase {
         builder.setKeyIdentifierType(WSConstants.SKI_KEY_IDENTIFIER);
         
         // builder.setUserInfo("john", "keypass");
-        log.info("Before SigningDSA_Autodetect....");
+        LOG.info("Before SigningDSA_Autodetect....");
         Document doc = unsignedEnvelope.getAsDocument();
         
         WSSecHeader secHeader = new WSSecHeader();
@@ -181,14 +170,14 @@ public class TestWSSecurityNew12 extends TestCase {
 
         Document signedDoc = builder.build(doc, crypto, secHeader);
 
-        if (log.isDebugEnabled()) {
-            log.debug("Signed message with DSA_Autodetect:");
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Signed message with DSA_Autodetect:");
             String outputString = 
                 org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
-            log.debug(outputString);
+            LOG.debug(outputString);
         }
 
-        log.info("After SigningDSA_Autodetect....");
+        LOG.info("After SigningDSA_Autodetect....");
         verify(signedDoc);
     }
 
@@ -207,7 +196,7 @@ public class TestWSSecurityNew12 extends TestCase {
         builder.setKeyIdentifierType(WSConstants.SKI_KEY_IDENTIFIER);
         
         // builder.setUserInfo("john", "keypass");
-        log.info("Before SigningRSA_Autodetect....");
+        LOG.info("Before SigningRSA_Autodetect....");
         Document doc = unsignedEnvelope.getAsDocument();
         
         WSSecHeader secHeader = new WSSecHeader();
@@ -215,14 +204,14 @@ public class TestWSSecurityNew12 extends TestCase {
 
         Document signedDoc = builder.build(doc, crypto, secHeader);
 
-        if (log.isDebugEnabled()) {
-            log.debug("Signed message with RSA Autodetect:");
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Signed message with RSA Autodetect:");
             String outputString = 
                 org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
-            log.debug(outputString);
+            LOG.debug(outputString);
         }
 
-        log.info("After SigningRSA_Autodetect....");
+        LOG.info("After SigningRSA_Autodetect....");
         verify(signedDoc);
     }
     

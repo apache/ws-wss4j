@@ -55,8 +55,8 @@ import org.w3c.dom.Document;
  * calling processSecurityHeader method of WSSecurityEngine.
  */
 public class TestWSSecurityNew17 extends TestCase implements CallbackHandler {
-    private static Log log = LogFactory.getLog(TestWSSecurityNew17.class);
-    private final static String soapMsg = 
+    private static final Log LOG = LogFactory.getLog(TestWSSecurityNew17.class);
+    private static final String SOAPMSG = 
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" 
         + "<SOAP-ENV:Envelope "
         +   "xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" "
@@ -69,10 +69,10 @@ public class TestWSSecurityNew17 extends TestCase implements CallbackHandler {
         +   "</SOAP-ENV:Body>" 
         + "</SOAP-ENV:Envelope>";
 
-    static final WSSecurityEngine secEngine = new WSSecurityEngine();
-    static final Crypto crypto = CryptoFactory.getInstance();
-    MessageContext msgContext;
-    Message message;
+    private WSSecurityEngine secEngine = new WSSecurityEngine();
+    private Crypto crypto = CryptoFactory.getInstance();
+    private MessageContext msgContext;
+    private Message message;
 
     /**
      * TestWSSecurity constructor
@@ -95,16 +95,6 @@ public class TestWSSecurityNew17 extends TestCase implements CallbackHandler {
     }
 
     /**
-     * Main method
-     * <p/>
-     * 
-     * @param args command line args
-     */
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    /**
      * Setup method
      * <p/>
      * 
@@ -124,7 +114,7 @@ public class TestWSSecurityNew17 extends TestCase implements CallbackHandler {
      * @throws Exception if there is any problem constructing the soap envelope
      */
     protected Message getSOAPMessage() throws Exception {
-        InputStream in = new ByteArrayInputStream(soapMsg.getBytes());
+        InputStream in = new ByteArrayInputStream(SOAPMSG.getBytes());
         Message msg = new Message(in);
         msg.setMessageContext(msgContext);
         return msg;
@@ -140,7 +130,7 @@ public class TestWSSecurityNew17 extends TestCase implements CallbackHandler {
     public void testEncryptedKeySignature() throws Exception {
         
         SOAPEnvelope unsignedEnvelope = message.getSOAPEnvelope();
-        log.info("Before Sign/Encryption....");
+        LOG.info("Before Sign/Encryption....");
         Document doc = unsignedEnvelope.getAsDocument();
         
         WSSecHeader secHeader = new WSSecHeader();
@@ -168,14 +158,14 @@ public class TestWSSecurityNew17 extends TestCase implements CallbackHandler {
         Document signedDoc = sign.build(doc, crypto, secHeader);
         Document encryptedSignedDoc = encrypt.build(signedDoc, crypto, secHeader);
 
-        if (log.isDebugEnabled()) {
-            log.debug("Signed and encrypted message with IssuerSerial key identifier (both), 3DES:");
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Signed and encrypted message with IssuerSerial key identifier (both), 3DES:");
             String outputString = 
                 org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(encryptedSignedDoc);
-            log.debug(outputString);
+            LOG.debug(outputString);
         }
         
-        log.info("After Sign/Encryption....");
+        LOG.info("After Sign/Encryption....");
         verify(encryptedSignedDoc);
     }
 
@@ -188,11 +178,11 @@ public class TestWSSecurityNew17 extends TestCase implements CallbackHandler {
      */
     private void verify(Document doc) throws Exception {
         secEngine.processSecurityHeader(doc, null, this, null, crypto);
-        if (log.isDebugEnabled()) {
-            log.debug("Verfied and decrypted message:");
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Verfied and decrypted message:");
             String outputString = 
                 org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
-            log.debug(outputString);
+            LOG.debug(outputString);
         }
     }
 

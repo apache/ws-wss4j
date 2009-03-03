@@ -66,9 +66,8 @@ import java.util.Vector;
  * @author Werner Dittmann (werner@apache.org)
  */
 public class TestWSSecurityNew15 extends TestCase implements CallbackHandler {
-    private static Log log = LogFactory.getLog(TestWSSecurityNew15.class);
-
-    private final static String soapMsg = 
+    private static final Log LOG = LogFactory.getLog(TestWSSecurityNew15.class);
+    private static final String SOAPMSG = 
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" 
         + "<SOAP-ENV:Envelope "
         +   "xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" "
@@ -81,14 +80,10 @@ public class TestWSSecurityNew15 extends TestCase implements CallbackHandler {
         +   "</SOAP-ENV:Body>" 
         + "</SOAP-ENV:Envelope>";
 
-    static final WSSecurityEngine secEngine = new WSSecurityEngine();
-
-    static final Crypto crypto = CryptoFactory
-            .getInstance("cryptoSKI.properties");
-
-    MessageContext msgContext;
-
-    Message message;
+    private WSSecurityEngine secEngine = new WSSecurityEngine();
+    private Crypto crypto = CryptoFactory.getInstance("cryptoSKI.properties");
+    private MessageContext msgContext;
+    private Message message;
 
     /**
      * TestWSSecurity constructor <p/>
@@ -107,16 +102,6 @@ public class TestWSSecurityNew15 extends TestCase implements CallbackHandler {
      */
     public static Test suite() {
         return new TestSuite(TestWSSecurityNew15.class);
-    }
-
-    /**
-     * Main method <p/>
-     * 
-     * @param args
-     *            command line args
-     */
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
     }
 
     /**
@@ -139,7 +124,7 @@ public class TestWSSecurityNew15 extends TestCase implements CallbackHandler {
      *             if there is any problem constructing the soap envelope
      */
     protected Message getSOAPMessage() throws Exception {
-        InputStream in = new ByteArrayInputStream(soapMsg.getBytes());
+        InputStream in = new ByteArrayInputStream(SOAPMSG.getBytes());
         Message msg = new Message(in);
         msg.setMessageContext(msgContext);
         return msg;
@@ -148,7 +133,7 @@ public class TestWSSecurityNew15 extends TestCase implements CallbackHandler {
     /**
      * Test that encrypt and decrypt a WS-Security envelope.
      * 
-     * This test uses the RSA_15 alogrithm to transport (wrap) the symmetric
+     * This test uses the RSA_15 algorithm to transport (wrap) the symmetric
      * key.
      * 
      * @throws Exception
@@ -163,7 +148,7 @@ public class TestWSSecurityNew15 extends TestCase implements CallbackHandler {
         Document doc = unsignedEnvelope.getAsDocument();
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
-        log.info("Before Encryption Triple DES....");
+        LOG.info("Before Encryption Triple DES....");
 
         /*
          * Prepare the Encrypt object with the token, setup data structure
@@ -199,13 +184,13 @@ public class TestWSSecurityNew15 extends TestCase implements CallbackHandler {
         builder.prependBSTElementToHeader(secHeader);
 
         Document encryptedDoc = doc;
-        log.info("After Encryption Triple DES....");
+        LOG.info("After Encryption Triple DES....");
 
         String outputString = 
             org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(encryptedDoc);
-        if (log.isDebugEnabled()) {
-            log.debug("Encrypted message, RSA-15 keytransport, 3DES:");
-            log.debug(outputString);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Encrypted message, RSA-15 keytransport, 3DES:");
+            LOG.debug(outputString);
         }
         assertTrue(outputString.indexOf("LogTestService2") == -1 ? true
                 : false);
@@ -223,7 +208,7 @@ public class TestWSSecurityNew15 extends TestCase implements CallbackHandler {
         secEngine.processSecurityHeader(doc, null, this, crypto);
         String outputString = 
             org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
-        if (log.isDebugEnabled()) {
+        if (LOG.isDebugEnabled()) {
             System.out.println("\n" + outputString + "\n");
         }
         assertTrue(outputString.indexOf("LogTestService2") > 0 ? true

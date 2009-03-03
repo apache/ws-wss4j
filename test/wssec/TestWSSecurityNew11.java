@@ -50,9 +50,8 @@ import java.util.Vector;
  * @author Davanum Srinivas (dims@yahoo.com)
  */
 public class TestWSSecurityNew11 extends TestCase {
-    private static Log log = LogFactory.getLog(TestWSSecurityNew11.class);
-    static final String NS = "http://www.w3.org/2000/09/xmldsig#";
-    private final static String soapMsg = 
+    private static final Log LOG = LogFactory.getLog(TestWSSecurityNew11.class);
+    private static final String SOAPMSG = 
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" 
         + "<SOAP-ENV:Envelope "
         +   "xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" "
@@ -64,11 +63,11 @@ public class TestWSSecurityNew11 extends TestCase {
         +       "</add>" 
         +   "</SOAP-ENV:Body>" 
         + "</SOAP-ENV:Envelope>";
-    static final WSSecurityEngine secEngine = new WSSecurityEngine();
-    static final Crypto crypto = CryptoFactory.getInstance("cryptoSKI.properties");
-
-    MessageContext msgContext;
-    SOAPEnvelope unsignedEnvelope;
+    
+    private WSSecurityEngine secEngine = new WSSecurityEngine();
+    private Crypto crypto = CryptoFactory.getInstance("cryptoSKI.properties");
+    private MessageContext msgContext;
+    private SOAPEnvelope unsignedEnvelope;
 
     /**
      * TestWSSecurity constructor
@@ -91,16 +90,6 @@ public class TestWSSecurityNew11 extends TestCase {
     }
 
     /**
-     * Main method
-     * <p/>
-     * 
-     * @param args command line args
-     */
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    /**
      * Setup method
      * <p/>
      * 
@@ -120,7 +109,7 @@ public class TestWSSecurityNew11 extends TestCase {
      * @throws java.lang.Exception if there is any problem constructing the soap envelope
      */
     protected SOAPEnvelope getSOAPEnvelope() throws Exception {
-        InputStream in = new ByteArrayInputStream(soapMsg.getBytes());
+        InputStream in = new ByteArrayInputStream(SOAPMSG.getBytes());
         Message msg = new Message(in);
         msg.setMessageContext(msgContext);
         return msg.getSOAPEnvelope();
@@ -162,7 +151,7 @@ public class TestWSSecurityNew11 extends TestCase {
         builder.setParts(parts);
         builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
 
-        log.info("Before Signing STR DirectReference....");
+        LOG.info("Before Signing STR DirectReference....");
         Document doc = unsignedEnvelope.getAsDocument();
 
         WSSecHeader secHeader = new WSSecHeader();
@@ -170,13 +159,13 @@ public class TestWSSecurityNew11 extends TestCase {
 
         Document signedDoc = builder.build(doc, crypto, secHeader);
 
-        if (log.isDebugEnabled()) {
-            log.debug("Signed message with STR DirectReference key identifier:");
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Signed message with STR DirectReference key identifier:");
             String outputString = 
                 org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
-            log.debug(outputString);
+            LOG.debug(outputString);
         }
-        log.info("After Signing STR DirectReference....");
+        LOG.info("After Signing STR DirectReference....");
         verify(signedDoc);
     }
     
@@ -220,16 +209,16 @@ public class TestWSSecurityNew11 extends TestCase {
         builder.setParts(parts);
         builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
 
-        log.info("Before Signing STR DirectReference....");
+        LOG.info("Before Signing STR DirectReference....");
         Document signedDoc = builder.build(doc, crypto, secHeader);
 
-        if (log.isDebugEnabled()) {
-            log.debug("Signed message with STR DirectReference key identifier:");
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Signed message with STR DirectReference key identifier:");
             String outputString = 
                 org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
-            log.debug(outputString);
+            LOG.debug(outputString);
         }
-        log.info("After Signing STR DirectReference....");
+        LOG.info("After Signing STR DirectReference....");
         verify(signedDoc);
     }
 
@@ -270,7 +259,7 @@ public class TestWSSecurityNew11 extends TestCase {
         builder.setParts(parts);
         builder.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
 
-        log.info("Before Signing STR IS....");
+        LOG.info("Before Signing STR IS....");
         Document doc = unsignedEnvelope.getAsDocument();
         
         WSSecHeader secHeader = new WSSecHeader();
@@ -278,13 +267,13 @@ public class TestWSSecurityNew11 extends TestCase {
 
         Document signedDoc = builder.build(doc, crypto, secHeader);
 
-        if (log.isDebugEnabled()) {
-            log.debug("Signed message with STR IssuerSerial key identifier:");
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Signed message with STR IssuerSerial key identifier:");
             String outputString = 
                 org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
-            log.debug(outputString);
+            LOG.debug(outputString);
         }
-        log.info("After Signing STR IS....");
+        LOG.info("After Signing STR IS....");
         verify(signedDoc);
     }
     
@@ -324,7 +313,7 @@ public class TestWSSecurityNew11 extends TestCase {
         builder.setParts(parts);
         builder.setKeyIdentifierType(WSConstants.SKI_KEY_IDENTIFIER);
 
-        log.info("Before Signing STR SKI....");
+        LOG.info("Before Signing STR SKI....");
         Document doc = unsignedEnvelope.getAsDocument();
         
         WSSecHeader secHeader = new WSSecHeader();
@@ -332,13 +321,13 @@ public class TestWSSecurityNew11 extends TestCase {
 
         Document signedDoc = builder.build(doc, crypto, secHeader);
 
-        if (log.isDebugEnabled()) {
-            log.debug("Signed message with STR SKI key identifier:");
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Signed message with STR SKI key identifier:");
             String outputString = 
                 org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
-            log.debug(outputString);
+            LOG.debug(outputString);
         }
-        log.info("After Signing STR SKI....");
+        LOG.info("After Signing STR SKI....");
         verify(signedDoc);
     }
 

@@ -54,9 +54,8 @@ import javax.security.auth.callback.UnsupportedCallbackException;
  * @author Davanum Srinivas (dims@yahoo.com)
  */
 public class TestWSSecurityNew14 extends TestCase implements CallbackHandler {
-    private static Log log = LogFactory.getLog(TestWSSecurityNew14.class);
-    static final String NS = "http://www.w3.org/2000/09/xmldsig#";
-    private final static String soapMsg = 
+    private static final Log LOG = LogFactory.getLog(TestWSSecurityNew14.class);
+    private static final String SOAPMSG = 
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" 
         + "<SOAP-ENV:Envelope "
         +   "xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" "
@@ -68,11 +67,11 @@ public class TestWSSecurityNew14 extends TestCase implements CallbackHandler {
         +       "</add>" 
         +   "</SOAP-ENV:Body>" 
         + "</SOAP-ENV:Envelope>";
-    static final WSSecurityEngine secEngine = new WSSecurityEngine();
-    static final Crypto crypto = CryptoFactory.getInstance();
-
-    MessageContext msgContext;
-    SOAPEnvelope unsignedEnvelope;
+    
+    private WSSecurityEngine secEngine = new WSSecurityEngine();
+    private Crypto crypto = CryptoFactory.getInstance();
+    private MessageContext msgContext;
+    private SOAPEnvelope unsignedEnvelope;
 
     /**
      * TestWSSecurity constructor
@@ -95,16 +94,6 @@ public class TestWSSecurityNew14 extends TestCase implements CallbackHandler {
     }
 
     /**
-     * Main method
-     * <p/>
-     * 
-     * @param args command line args
-     */
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    /**
      * Setup method
      * <p/>
      * 
@@ -124,7 +113,7 @@ public class TestWSSecurityNew14 extends TestCase implements CallbackHandler {
      * @throws java.lang.Exception if there is any problem constructing the soap envelope
      */
     protected SOAPEnvelope getSOAPEnvelope() throws Exception {
-        InputStream in = new ByteArrayInputStream(soapMsg.getBytes());
+        InputStream in = new ByteArrayInputStream(SOAPMSG.getBytes());
         Message msg = new Message(in);
         msg.setMessageContext(msgContext);
         return msg.getSOAPEnvelope();
@@ -142,7 +131,7 @@ public class TestWSSecurityNew14 extends TestCase implements CallbackHandler {
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         builder.setKeyIdentifierType(WSConstants.THUMBPRINT_IDENTIFIER);
         // builder.setUserInfo("john", "keypass");
-        log.info("Before Signing ThumbprintSHA1....");
+        LOG.info("Before Signing ThumbprintSHA1....");
         Document doc = unsignedEnvelope.getAsDocument();
         
         WSSecHeader secHeader = new WSSecHeader();
@@ -150,13 +139,13 @@ public class TestWSSecurityNew14 extends TestCase implements CallbackHandler {
 
         Document signedDoc = builder.build(doc, crypto, secHeader);
 
-        if (log.isDebugEnabled()) {
-            log.debug("Signed message with ThumbprintSHA1 key identifier:");
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Signed message with ThumbprintSHA1 key identifier:");
             String outputString = 
                 org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
-            log.debug(outputString);
+            LOG.debug(outputString);
         }
-        log.info("After Signing ThumbprintSHA1....");
+        LOG.info("After Signing ThumbprintSHA1....");
         verify(signedDoc);
     }
 
@@ -194,7 +183,7 @@ public class TestWSSecurityNew14 extends TestCase implements CallbackHandler {
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         builder.setKeyIdentifierType(WSConstants.THUMBPRINT_IDENTIFIER);
         
-        log.info("Before Encrypting ThumbprintSHA1....");
+        LOG.info("Before Encrypting ThumbprintSHA1....");
         Document doc = unsignedEnvelope.getAsDocument();
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);        
@@ -202,13 +191,13 @@ public class TestWSSecurityNew14 extends TestCase implements CallbackHandler {
         
         String outputString = 
             org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(encryptedDoc);
-        if (log.isDebugEnabled()) {
-            log.debug("Encrypted message with THUMBPRINT_IDENTIFIER:");
-            log.debug(outputString);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Encrypted message with THUMBPRINT_IDENTIFIER:");
+            LOG.debug(outputString);
         }
         assertTrue(outputString.indexOf("#ThumbprintSHA1") != -1);
     
-        log.info("After Encrypting ThumbprintSHA1....");
+        LOG.info("After Encrypting ThumbprintSHA1....");
         verify(encryptedDoc);
     }
         
@@ -225,7 +214,7 @@ public class TestWSSecurityNew14 extends TestCase implements CallbackHandler {
         builder.setKeyIdentifierType(WSConstants.ENCRYPTED_KEY_SHA1_IDENTIFIER);
         builder.setUseKeyIdentifier(true);
      
-        log.info("Before Encrypting EncryptedKeySHA1....");
+        LOG.info("Before Encrypting EncryptedKeySHA1....");
         Document doc = unsignedEnvelope.getAsDocument();
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);        
@@ -233,13 +222,13 @@ public class TestWSSecurityNew14 extends TestCase implements CallbackHandler {
      
         String outputString = 
             org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(encryptedDoc);
-        if (log.isDebugEnabled()) {
-            log.debug("Encrypted message with ENCRYPTED_KEY_SHA1_IDENTIFIER:");
-            log.debug(outputString);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Encrypted message with ENCRYPTED_KEY_SHA1_IDENTIFIER:");
+            LOG.debug(outputString);
         }
         assertTrue(outputString.indexOf("#EncryptedKeySHA1") != -1);
      
-        log.info("After Encrypting EncryptedKeySHA1....");
+        LOG.info("After Encrypting EncryptedKeySHA1....");
         verify(encryptedDoc);
     }
 

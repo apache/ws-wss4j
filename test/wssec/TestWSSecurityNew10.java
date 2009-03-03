@@ -28,7 +28,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSPasswordCallback;
-import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.message.WSSecEncrypt;
@@ -54,9 +53,8 @@ import java.io.InputStream;
  * @author Dimuthu Leelarathne. (muthulee@yahoo.com)
  */
 public class TestWSSecurityNew10 extends TestCase implements CallbackHandler {
-    private static Log log = LogFactory.getLog(TestWSSecurityNew10.class);
-
-    private final static String soapMsg = 
+    private static final Log LOG = LogFactory.getLog(TestWSSecurityNew10.class);
+    private static final String SOAPMSG = 
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" 
         + "<SOAP-ENV:Envelope "
         +   "xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" "
@@ -69,13 +67,9 @@ public class TestWSSecurityNew10 extends TestCase implements CallbackHandler {
         +   "</SOAP-ENV:Body>" 
         + "</SOAP-ENV:Envelope>";
 
-    static final WSSecurityEngine secEngine = new WSSecurityEngine();
-
-    static final Crypto crypto = CryptoFactory.getInstance();
-
-    MessageContext msgContext;
-
-    Message message;
+    private Crypto crypto = CryptoFactory.getInstance();
+    private MessageContext msgContext;
+    private Message message;
 
     /**
      * TestWSSecurity constructor <p/>
@@ -86,9 +80,10 @@ public class TestWSSecurityNew10 extends TestCase implements CallbackHandler {
     public TestWSSecurityNew10(String name) {
         super(name);
     }
-
+    
     /**
-     * JUnit suite <p/>
+     * JUnit suite
+     * <p/>
      * 
      * @return a junit test suite
      */
@@ -116,7 +111,7 @@ public class TestWSSecurityNew10 extends TestCase implements CallbackHandler {
      *             if there is any problem constructing the soap envelope
      */
     protected Message getSOAPMessage() throws Exception {
-        InputStream in = new ByteArrayInputStream(soapMsg.getBytes());
+        InputStream in = new ByteArrayInputStream(SOAPMSG.getBytes());
         Message msg = new Message(in);
         msg.setMessageContext(msgContext);
         return msg;
@@ -136,7 +131,7 @@ public class TestWSSecurityNew10 extends TestCase implements CallbackHandler {
         WSSecEncrypt wsEncrypt = new WSSecEncrypt();
 
         // Get the message as document
-        log.info("Before Encryption....");
+        LOG.info("Before Encryption....");
         Document doc = unsignedEnvelope.getAsDocument();
 
         WSSecHeader secHeader = new WSSecHeader();
@@ -180,12 +175,12 @@ public class TestWSSecurityNew10 extends TestCase implements CallbackHandler {
         // Step 4 :: Encrypting using the key.
         Document encDoc = wsEncrypt.build(doc, crypto, secHeader);
 
-        if (log.isDebugEnabled()) {
+        if (LOG.isDebugEnabled()) {
             String outputString = 
                 org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(encDoc);
-            log.debug(outputString);
+            LOG.debug(outputString);
         }
-        log.info("Encryption Done\n");
+        LOG.info("Encryption Done\n");
     }
 
 

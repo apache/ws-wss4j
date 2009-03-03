@@ -25,10 +25,6 @@ public class TestBase64 extends TestCase {
     
     private String encodedBinary;
     
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(TestBase64.class);
-    }
-
     public TestBase64(String arg0) {
         super(arg0);
     }

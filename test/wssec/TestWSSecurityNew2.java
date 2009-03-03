@@ -55,8 +55,8 @@ import java.util.Vector;
  * @author Davanum Srinivas (dims@yahoo.com)
  */
 public class TestWSSecurityNew2 extends TestCase implements CallbackHandler {
-    private static Log log = LogFactory.getLog(TestWSSecurityNew2.class);
-    private final static String soapMsg = 
+    private static final Log LOG = LogFactory.getLog(TestWSSecurityNew2.class);
+    private static final String SOAPMSG = 
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" 
         + "<SOAP-ENV:Envelope "
         +   "xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" "
@@ -66,16 +66,16 @@ public class TestWSSecurityNew2 extends TestCase implements CallbackHandler {
         +      "<ns1:testMethod xmlns:ns1=\"uri:LogTestService2\"></ns1:testMethod>" 
         +   "</SOAP-ENV:Body>" 
         + "</SOAP-ENV:Envelope>";
-
-    static final WSSecurityEngine secEngine = new WSSecurityEngine();
-    static final Crypto crypto = CryptoFactory.getInstance("cryptoSKI.properties");
-    static final javax.xml.namespace.QName SOAP_BODY =
+    private static final javax.xml.namespace.QName SOAP_BODY =
         new javax.xml.namespace.QName(
             WSConstants.URI_SOAP11_ENV,
             "Body"
         );
-    MessageContext msgContext;
-    Message message;
+
+    private WSSecurityEngine secEngine = new WSSecurityEngine();
+    private Crypto crypto = CryptoFactory.getInstance("cryptoSKI.properties");
+    private MessageContext msgContext;
+    private Message message;
 
     /**
      * TestWSSecurity constructor
@@ -98,16 +98,6 @@ public class TestWSSecurityNew2 extends TestCase implements CallbackHandler {
     }
 
     /**
-     * Main method
-     * <p/>
-     * 
-     * @param args command line args
-     */
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    /**
      * Setup method
      * <p/>
      * 
@@ -127,7 +117,7 @@ public class TestWSSecurityNew2 extends TestCase implements CallbackHandler {
      * @throws Exception if there is any problem constructing the soap envelope
      */
     protected Message getSOAPMessage() throws Exception {
-        InputStream in = new ByteArrayInputStream(soapMsg.getBytes());
+        InputStream in = new ByteArrayInputStream(SOAPMSG.getBytes());
         Message msg = new Message(in);
         msg.setMessageContext(msgContext);
         return msg;
@@ -150,15 +140,15 @@ public class TestWSSecurityNew2 extends TestCase implements CallbackHandler {
         Document doc = unsignedEnvelope.getAsDocument();
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
-        log.info("Before Encryption Triple DES....");
+        LOG.info("Before Encryption Triple DES....");
         Document encryptedDoc = builder.build(doc, crypto, secHeader);
-        log.info("After Encryption Triple DES....");
+        LOG.info("After Encryption Triple DES....");
 
         String outputString = 
             org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(encryptedDoc);
-        if (log.isDebugEnabled()) {
-            log.debug("Encrypted message, RSA-15 keytransport, 3DES:");
-            log.debug(outputString);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Encrypted message, RSA-15 keytransport, 3DES:");
+            LOG.debug(outputString);
         }
         assertTrue(outputString.indexOf("LogTestService2") == -1 ? true : false);
         verify(encryptedDoc, SOAP_BODY);
@@ -169,7 +159,7 @@ public class TestWSSecurityNew2 extends TestCase implements CallbackHandler {
          * This tests if several runs of different algorithms on same builder/cipher 
          * setup are ok.
          */
-        message = getSOAPMessage(); // create fresh message envrionment
+        message = getSOAPMessage(); // create fresh message environment
         builder.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
         builder.setSymmetricEncAlgorithm(WSConstants.AES_128);
         Vector parts = new Vector();
@@ -181,14 +171,14 @@ public class TestWSSecurityNew2 extends TestCase implements CallbackHandler {
         doc = unsignedEnvelope.getAsDocument();
         secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);        
-        log.info("Before Encryption AES 128/RSA-15....");
+        LOG.info("Before Encryption AES 128/RSA-15....");
         encryptedDoc = builder.build(doc, crypto, secHeader);
-        log.info("After Encryption AES 128/RSA-15....");
+        LOG.info("After Encryption AES 128/RSA-15....");
         outputString = 
             org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(encryptedDoc);
-        if (log.isDebugEnabled()) {
-            log.debug("Encrypted message, RSA-15 keytransport, AES 128:");
-            log.debug(outputString);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Encrypted message, RSA-15 keytransport, AES 128:");
+            LOG.debug(outputString);
         }
         assertTrue(outputString.indexOf("LogTestService2") == -1 ? true : false);
         verify(
@@ -202,7 +192,7 @@ public class TestWSSecurityNew2 extends TestCase implements CallbackHandler {
 
     /**
      * Test that encrypt and decrypt a WS-Security envelope.
-     * This test uses the RSA OAEP alogrithm to transport (wrap) the symmetric
+     * This test uses the RSA OAEP algorithm to transport (wrap) the symmetric
      * key.
      * <p/>
      * 
@@ -217,15 +207,15 @@ public class TestWSSecurityNew2 extends TestCase implements CallbackHandler {
         Document doc = unsignedEnvelope.getAsDocument();
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);        
-        log.info("Before Encryption Triple DES/RSA-OAEP....");
+        LOG.info("Before Encryption Triple DES/RSA-OAEP....");
         Document encryptedDoc = builder.build(doc, crypto, secHeader);
-        log.info("After Encryption Triple DES/RSA-OAEP....");
+        LOG.info("After Encryption Triple DES/RSA-OAEP....");
 
         String outputString = 
             org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(encryptedDoc);
-        if (log.isDebugEnabled()) {
-            log.debug("Encrypted message, RSA-OAEP keytransport, 3DES:");
-            log.debug(outputString);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Encrypted message, RSA-OAEP keytransport, 3DES:");
+            LOG.debug(outputString);
         }
         assertTrue(outputString.indexOf("LogTestService2") == -1 ? true : false);
         verify(encryptedDoc, SOAP_BODY);
@@ -277,7 +267,7 @@ public class TestWSSecurityNew2 extends TestCase implements CallbackHandler {
     }
 
     public void handle(Callback[] callbacks)
-            throws IOException, UnsupportedCallbackException {
+        throws IOException, UnsupportedCallbackException {
         for (int i = 0; i < callbacks.length; i++) {
             if (callbacks[i] instanceof WSPasswordCallback) {
                 WSPasswordCallback pc = (WSPasswordCallback) callbacks[i];
