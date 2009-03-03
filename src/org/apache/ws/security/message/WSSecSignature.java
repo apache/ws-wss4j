@@ -297,7 +297,8 @@ public class WSSecSignature extends WSSecBase {
         if (keyIdentifierType != WSConstants.UT_SIGNING
             && keyIdentifierType != WSConstants.CUSTOM_SYMM_SIGNING
             && keyIdentifierType != WSConstants.CUSTOM_SYMM_SIGNING_DIRECT
-            && keyIdentifierType != WSConstants.ENCRYPTED_KEY_SHA1_IDENTIFIER) {
+            && keyIdentifierType != WSConstants.ENCRYPTED_KEY_SHA1_IDENTIFIER
+            && keyIdentifierType != WSConstants.CUSTOM_KEY_IDENTIFIER) {
             certs = crypto.getCertificates(user);
             if (certs == null || certs.length <= 0) {
                 throw new WSSecurityException(
@@ -438,6 +439,10 @@ public class WSSecSignature extends WSSecBase {
             refCustd.setURI(this.customTokenId);
             secRef.setReference(refCustd);
             break;
+        case WSConstants.CUSTOM_KEY_IDENTIFIER:
+            secRef.setKeyIdentifier(customTokenValueType, customTokenId);
+            break;
+
         default:
             throw new WSSecurityException(WSSecurityException.FAILURE, "unsupportedKeyId");
         }
@@ -667,6 +672,7 @@ public class WSSecSignature extends WSSecBase {
             if (keyIdentifierType == WSConstants.UT_SIGNING ||
                     keyIdentifierType == WSConstants.CUSTOM_SYMM_SIGNING ||
                     keyIdentifierType == WSConstants.CUSTOM_SYMM_SIGNING_DIRECT ||
+                    keyIdentifierType == WSConstants.CUSTOM_KEY_IDENTIFIER || 
                     keyIdentifierType == WSConstants.ENCRYPTED_KEY_SHA1_IDENTIFIER) {
                 sig.sign(sig.createSecretKey(secretKey));
             } else {

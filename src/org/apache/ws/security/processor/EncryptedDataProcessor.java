@@ -93,6 +93,7 @@ public class EncryptedDataProcessor implements Processor {
         }
         
         Node previousSibling = elem.getPreviousSibling();
+        Node parent = elem.getParentNode();
         try {
             xmlCipher.doFinal(elem.getOwnerDocument(), elem, false);
         } catch (Exception e) {
@@ -102,13 +103,20 @@ public class EncryptedDataProcessor implements Processor {
         }
         
         // Get hold of the plain text element
-        Element decryptedElem = (Element)previousSibling.getNextSibling();
+        Element decryptedElem;
+        if (previousSibling == null) {
+            decryptedElem = (Element)parent.getFirstChild();
+        } else {
+            decryptedElem = (Element)previousSibling.getNextSibling();
+        }
         QName el = new QName(decryptedElem.getNamespaceURI(), decryptedElem.getLocalName());
-        Processor proc = config.getProcessor(el);
-        proc.handleToken(
-            decryptedElem, crypto, decCrypto, cb, wsDocInfo, returnResults, config
-        );
-        wsDocInfo.setProcessor(proc);
+        if (config != null) {
+            Processor proc = config.getProcessor(el);
+            proc.handleToken(
+                             decryptedElem, crypto, decCrypto, cb, wsDocInfo, returnResults, config
+            );
+            wsDocInfo.setProcessor(proc);
+        }
     }
 
 }

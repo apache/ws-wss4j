@@ -394,6 +394,7 @@ public class WSConstants {
      */
     public static final int CUSTOM_SYMM_SIGNING_DIRECT = 11;
     
+    public static final int CUSTOM_KEY_IDENTIFIER = 12;
     
     public static final String ENCRYPTED_HEADER = "EncryptedHeader";
 

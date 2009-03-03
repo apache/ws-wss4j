@@ -246,7 +246,7 @@ public class SecurityTokenReference {
         }
         Text text = doc.createTextNode(Base64.encode(data));
         
-        createKeyIdentifier(doc, X509Security.X509_V3_TYPE, text);
+        createKeyIdentifier(doc, X509Security.X509_V3_TYPE, text, true);
     }
 
     /**
@@ -275,7 +275,7 @@ public class SecurityTokenReference {
         byte data[] = crypto.getSKIBytesFromCert(cert);
         
         org.w3c.dom.Text text = doc.createTextNode(Base64.encode(data));
-        createKeyIdentifier(doc, SKI_URI, text);        
+        createKeyIdentifier(doc, SKI_URI, text, true);        
     }
 
     /**
@@ -309,25 +309,31 @@ public class SecurityTokenReference {
         byte[] data = sha.digest();
 
         org.w3c.dom.Text text = doc.createTextNode(Base64.encode(data));
-        createKeyIdentifier(doc, THUMB_URI, text);
+        createKeyIdentifier(doc, THUMB_URI, text, true);
     }
     
 
     public void setKeyIdentifierEncKeySHA1(String value) throws WSSecurityException {
         Document doc = this.element.getOwnerDocument();
         org.w3c.dom.Text text = doc.createTextNode(value);
-        createKeyIdentifier(doc, ENC_KEY_SHA1_URI, text);
+        createKeyIdentifier(doc, ENC_KEY_SHA1_URI, text, true);
     }
     
     public void setSAMLKeyIdentifier(String keyIdVal) throws WSSecurityException {
         Document doc = this.element.getOwnerDocument();
-        createKeyIdentifier(doc, SAML_ID_URI, doc.createTextNode(keyIdVal));
+        createKeyIdentifier(doc, SAML_ID_URI, doc.createTextNode(keyIdVal), false);
+    }
+    public void setKeyIdentifier(String valueType, String keyIdVal) throws WSSecurityException {
+        Document doc = this.element.getOwnerDocument();
+        createKeyIdentifier(doc, valueType, doc.createTextNode(keyIdVal), false);
     }
 
-    private void createKeyIdentifier(Document doc, String uri, Node node) {
+    private void createKeyIdentifier(Document doc, String uri, Node node, boolean base64) {
         Element keyId = doc.createElementNS(WSConstants.WSSE_NS, "wsse:KeyIdentifier");
         keyId.setAttributeNS(null, "ValueType", uri);
-        keyId.setAttributeNS(null, "EncodingType", BinarySecurity.BASE64_ENCODING);
+        if (base64) {
+            keyId.setAttributeNS(null, "EncodingType", BinarySecurity.BASE64_ENCODING);
+        }
 
         keyId.appendChild(node);
         Element elem = getFirstElement();
