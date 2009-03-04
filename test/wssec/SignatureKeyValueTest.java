@@ -27,12 +27,16 @@ import org.apache.axis.configuration.NullProvider;
 import org.apache.axis.message.SOAPEnvelope;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.ws.security.PublicKeyPrincipal;
+import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSecurityEngine;
+import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.message.WSSecSignature;
 import org.apache.ws.security.message.WSSecHeader;
+import org.apache.ws.security.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 
 import javax.security.auth.callback.Callback;
@@ -43,13 +47,12 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * WS-Security Test Case
- * <p/>
- * 
- * @author Davanum Srinivas (dims@yahoo.com)
+ * This class tests signing where the the public key is transmitted in the message via
+ * a ds:KeyInfo/ds:KeyValue element. Although this isn't strictly recommended for use in
+ * WS-Security, it's necessary to support it for WCF interop.
  */
-public class TestWSSecurityNew3 extends TestCase implements CallbackHandler {
-    private static final Log LOG = LogFactory.getLog(TestWSSecurityNew3.class);
+public class SignatureKeyValueTest extends TestCase implements CallbackHandler {
+    private static final Log LOG = LogFactory.getLog(SignatureKeyValueTest.class);
     private static final String SOAPMSG = 
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" 
         + "<SOAP-ENV:Envelope "
@@ -64,7 +67,7 @@ public class TestWSSecurityNew3 extends TestCase implements CallbackHandler {
         + "</SOAP-ENV:Envelope>";
     
     private WSSecurityEngine secEngine = new WSSecurityEngine();
-    private Crypto crypto = CryptoFactory.getInstance();
+    private Crypto crypto = CryptoFactory.getInstance("cryptoSKI.properties");
     private MessageContext msgContext;
     private SOAPEnvelope unsignedEnvelope;
 
@@ -74,7 +77,7 @@ public class TestWSSecurityNew3 extends TestCase implements CallbackHandler {
      * 
      * @param name name of the test
      */
-    public TestWSSecurityNew3(String name) {
+    public SignatureKeyValueTest(String name) {
         super(name);
     }
 
@@ -85,7 +88,7 @@ public class TestWSSecurityNew3 extends TestCase implements CallbackHandler {
      * @return a junit test suite
      */
     public static Test suite() {
-        return new TestSuite(TestWSSecurityNew3.class);
+        return new TestSuite(SignatureKeyValueTest.class);
     }
 
     /**
@@ -115,22 +118,67 @@ public class TestWSSecurityNew3 extends TestCase implements CallbackHandler {
     }
 
     /**
-     * Test that signs and verifies a WS-Security envelope
-     * <p/>
-     * 
-     * @throws java.lang.Exception Thrown when there is any problem in signing or verification
+     * Successful RSAKeyValue test.
      */
-    public void testX509Signature() throws Exception {
+    public void testRSAKeyValue() throws Exception {
         WSSecSignature builder = new WSSecSignature();
-        builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
-        LOG.info("Before Signing....");
+        builder.setUserInfo("wss4jcert", "security");
+        builder.setKeyIdentifierType(WSConstants.KEY_VALUE);
         Document doc = unsignedEnvelope.getAsDocument();
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         Document signedDoc = builder.build(doc, crypto, secHeader);
 
-        LOG.info("After Signing....");
-        verify(signedDoc);
+        String outputString = 
+            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(outputString);
+        }
+        assertTrue(outputString.indexOf("RSAKeyValue") != -1);
+        
+        final java.util.Vector results = verify(signedDoc);
+        WSSecurityEngineResult actionResult = 
+            WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
+        assertTrue(actionResult != null);
+        
+        java.security.Principal principal = 
+            (java.security.Principal)actionResult.get(WSSecurityEngineResult.TAG_PRINCIPAL);
+        assertTrue(principal instanceof PublicKeyPrincipal);
+        java.security.PublicKey publicKey = 
+            ((PublicKeyPrincipal)principal).getPublicKey();
+        assertTrue(publicKey instanceof java.security.interfaces.RSAPublicKey);
+    }
+    
+    /**
+     * Successful DSAKeyValue test.
+     */
+    public void testDSAKeyValue() throws Exception {
+        WSSecSignature builder = new WSSecSignature();
+        builder.setUserInfo("wss4jcertdsa", "security");
+        builder.setKeyIdentifierType(WSConstants.KEY_VALUE);
+        Document doc = unsignedEnvelope.getAsDocument();
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        Document signedDoc = builder.build(doc, crypto, secHeader);
+
+        String outputString = 
+            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(outputString);
+        }
+        assertTrue(outputString.indexOf("DSAKeyValue") != -1);
+        
+        final java.util.Vector results = verify(signedDoc);
+        WSSecurityEngineResult actionResult = 
+            WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
+        assertTrue(actionResult != null);
+        
+        java.security.Principal principal = 
+            (java.security.Principal)actionResult.get(WSSecurityEngineResult.TAG_PRINCIPAL);
+        assertTrue(principal instanceof PublicKeyPrincipal);
+        java.security.PublicKey publicKey = 
+            ((PublicKeyPrincipal)principal).getPublicKey();
+        assertTrue(publicKey instanceof java.security.interfaces.DSAPublicKey);
     }
 
 
@@ -141,8 +189,8 @@ public class TestWSSecurityNew3 extends TestCase implements CallbackHandler {
      * @param env soap envelope
      * @throws java.lang.Exception Thrown when there is a problem in verification
      */
-    private void verify(Document doc) throws Exception {
-        secEngine.processSecurityHeader(doc, null, this, crypto);
+    private java.util.Vector verify(Document doc) throws Exception {
+        return secEngine.processSecurityHeader(doc, null, this, null);
     }
 
     public void handle(Callback[] callbacks)

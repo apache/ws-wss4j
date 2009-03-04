@@ -396,6 +396,12 @@ public class WSConstants {
     
     public static final int CUSTOM_KEY_IDENTIFIER = 12;
     
+    /**
+     * <code>KEY_VALUE</code> is used to set a ds:KeyInfo/ds:KeyValue element to refer to
+     * either an RSA or DSA public key.
+     */
+    public static final int KEY_VALUE = 13;
+    
     public static final String ENCRYPTED_HEADER = "EncryptedHeader";
 
     /*

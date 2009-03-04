@@ -21,7 +21,7 @@ import java.security.Principal;
 /**
  * This class implements the <code>Principal</code> interface and
  * represents a <code>DerivedKeyToken</code>.
- * The principal's name will be the <code>wsu:Id</code> valud of the 
+ * The principal's name will be the <code>wsu:Id</code> value of the 
  * <code>DerivedKeyToken</code>
  * 
  * @author Ruchith Fernando (ruchith.fernando@gmail.com)

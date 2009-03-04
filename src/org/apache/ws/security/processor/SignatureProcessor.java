@@ -21,6 +21,7 @@ package org.apache.ws.security.processor;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.CustomTokenPrincipal;
+import org.apache.ws.security.PublicKeyPrincipal;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDerivedKeyTokenPrincipal;
 import org.apache.ws.security.WSDocInfo;
@@ -200,8 +201,15 @@ public class SignatureProcessor implements Processor {
         DerivedKeyToken dkt = null;
         SAMLKeyInfo samlKi = null;
         String customTokenId = null;
+        java.security.PublicKey publicKey = null;
         
-        if (info != null) {
+        if (info != null && info.containsKeyValue()) {
+            try {
+                publicKey = info.getPublicKey();
+            } catch (Exception ex) {
+                throw new WSSecurityException(ex.getMessage(), ex);
+            }
+        } else if (info != null) {
             Node node = 
                 WSSecurityUtil.getDirectChild(
                     info.getElement(),
@@ -361,7 +369,9 @@ public class SignatureProcessor implements Processor {
         if (tlog.isDebugEnabled()) {
             t1 = System.currentTimeMillis();
         }
-        if ((certs == null || certs.length == 0 || certs[0] == null) && secretKey == null) {
+        if ((certs == null || certs.length == 0 || certs[0] == null) 
+            && secretKey == null
+            && publicKey == null) {
             throw new WSSecurityException(WSSecurityException.FAILED_CHECK);
         }
         if (certs != null) {
@@ -381,6 +391,8 @@ public class SignatureProcessor implements Processor {
             boolean signatureOk = false;
             if (certs != null) {
                 signatureOk = sig.checkSignatureValue(certs[0]);
+            } else if (publicKey != null) {
+                signatureOk = sig.checkSignatureValue(publicKey);
             } else {
                 signatureOk = sig.checkSignatureValue(sig.createSecretKey(secretKey));
             }
@@ -431,7 +443,9 @@ public class SignatureProcessor implements Processor {
                 if (certs != null) {
                     returnCert[0] = certs[0];
                     return certs[0].getSubjectDN();
-                } else if (ut != null){
+                } else if (publicKey != null) {
+                    return new PublicKeyPrincipal(publicKey);
+                } else if (ut != null) {
                     WSUsernameTokenPrincipal principal = 
                         new WSUsernameTokenPrincipal(ut.getName(), ut.isHashed());
                     principal.setNonce(ut.getNonce());

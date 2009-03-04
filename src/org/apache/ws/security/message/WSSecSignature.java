@@ -40,6 +40,8 @@ import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.keys.KeyInfo;
 import org.apache.xml.security.keys.content.X509Data;
 import org.apache.xml.security.keys.content.x509.XMLX509IssuerSerial;
+import org.apache.xml.security.keys.content.keyvalues.DSAKeyValue;
+import org.apache.xml.security.keys.content.keyvalues.RSAKeyValue;
 import org.apache.xml.security.signature.XMLSignature;
 import org.apache.xml.security.signature.XMLSignatureException;
 import org.apache.xml.security.transforms.TransformationException;
@@ -116,7 +118,7 @@ public class WSSecSignature extends WSSecBase {
     private String customTokenId;
     
     private String digestAlgo = "http://www.w3.org/2000/09/xmldsig#sha1";
-
+    
     /**
      * Constructor.
      */
@@ -442,12 +444,29 @@ public class WSSecSignature extends WSSecBase {
         case WSConstants.CUSTOM_KEY_IDENTIFIER:
             secRef.setKeyIdentifier(customTokenValueType, customTokenId);
             break;
-
+        case WSConstants.KEY_VALUE:
+            java.security.PublicKey publicKey = certs[0].getPublicKey();
+            String pubKeyAlgo = publicKey.getAlgorithm();
+            if (pubKeyAlgo.equalsIgnoreCase("DSA")) {
+                DSAKeyValue dsaKeyValue = new DSAKeyValue(document, publicKey);
+                keyInfo.add(dsaKeyValue);
+            } else if (pubKeyAlgo.equalsIgnoreCase("RSA")) {
+                RSAKeyValue rsaKeyValue = new RSAKeyValue(document, publicKey);
+                keyInfo.add(rsaKeyValue);
+            } else {
+                throw new WSSecurityException(
+                    WSSecurityException.FAILURE,
+                    "unknownSignatureAlgorithm",
+                    new Object[] {pubKeyAlgo}
+                );
+            }
+            break;
         default:
             throw new WSSecurityException(WSSecurityException.FAILURE, "unsupportedKeyId");
         }
-        keyInfo.addUnknownElement(secRef.getElement());
-
+        if (keyIdentifierType != WSConstants.KEY_VALUE) {
+            keyInfo.addUnknownElement(secRef.getElement());
+        }
     }
 
     /**
