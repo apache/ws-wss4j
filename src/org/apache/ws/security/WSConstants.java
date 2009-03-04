@@ -394,6 +394,12 @@ public class WSConstants {
      */
     public static final int CUSTOM_SYMM_SIGNING_DIRECT = 11;
     
+    /**
+     * <code>CUSTOM_KEY_IDENTIFIER</code> is used to set a KeyIdentifier to
+     * a particular ID
+     * 
+     * The reference id and value type are set externally. 
+     */
     public static final int CUSTOM_KEY_IDENTIFIER = 12;
     
     /**

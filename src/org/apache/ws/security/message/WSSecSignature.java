@@ -119,6 +119,7 @@ public class WSSecSignature extends WSSecBase {
     
     private String digestAlgo = "http://www.w3.org/2000/09/xmldsig#sha1";
     
+    private X509Certificate useThisCert = null;
     /**
      * Constructor.
      */
@@ -301,7 +302,11 @@ public class WSSecSignature extends WSSecBase {
             && keyIdentifierType != WSConstants.CUSTOM_SYMM_SIGNING_DIRECT
             && keyIdentifierType != WSConstants.ENCRYPTED_KEY_SHA1_IDENTIFIER
             && keyIdentifierType != WSConstants.CUSTOM_KEY_IDENTIFIER) {
-            certs = crypto.getCertificates(user);
+            if (useThisCert == null) {
+                certs = crypto.getCertificates(user);
+            } else {
+                certs = new X509Certificate[] {useThisCert};
+            }
             if (certs == null || certs.length <= 0) {
                 throw new WSSecurityException(
                     WSSecurityException.FAILURE,
@@ -693,7 +698,11 @@ public class WSSecSignature extends WSSecBase {
                     keyIdentifierType == WSConstants.CUSTOM_SYMM_SIGNING_DIRECT ||
                     keyIdentifierType == WSConstants.CUSTOM_KEY_IDENTIFIER || 
                     keyIdentifierType == WSConstants.ENCRYPTED_KEY_SHA1_IDENTIFIER) {
-                sig.sign(sig.createSecretKey(secretKey));
+                if (secretKey == null) {
+                    sig.sign(crypto.getPrivateKey(user, password));
+                } else {
+                    sig.sign(sig.createSecretKey(secretKey));                    
+                }
             } else {
                 sig.sign(crypto.getPrivateKey(user, password));
             }
@@ -861,6 +870,9 @@ public class WSSecSignature extends WSSecBase {
 
     public void setEncrKeySha1value(String encrKeySha1value) {
         this.encrKeySha1value = encrKeySha1value;
+    }
+    public void setX509Certificate(X509Certificate cer) {
+        this.useThisCert = cer;
     }
     
 }
