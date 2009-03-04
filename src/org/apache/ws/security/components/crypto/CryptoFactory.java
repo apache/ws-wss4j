@@ -214,16 +214,16 @@ public abstract class CryptoFactory {
             if (log.isDebugEnabled()) {
                 log.debug("Unable to instantiate (1): " + cryptoClassName, e);
             }
-        }
-        try {
-            // try to instantiate the Crypto subclass
-            crypto = (Crypto) cryptogenClass.newInstance();
-            return crypto;
-        } catch (java.lang.Exception e) {
-            if (log.isDebugEnabled()) {
-                log.debug("Unable to instantiate (2): " + cryptoClassName, e);
+            try {
+                // try to instantiate the Crypto subclass
+                crypto = (Crypto) cryptogenClass.newInstance();
+                return crypto;
+            } catch (java.lang.Exception e2) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Unable to instantiate (2): " + cryptoClassName, e2);
+                }
+                throw new RuntimeException(cryptoClassName + " cannot create instance", e);
             }
-            throw new RuntimeException(cryptoClassName + " cannot create instance", e);
         }
     }
     /**
