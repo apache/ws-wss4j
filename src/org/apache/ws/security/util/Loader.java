@@ -22,6 +22,8 @@ import org.apache.commons.logging.LogFactory;
 
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 
 /**
  * Load resources (or images) from various sources.
@@ -48,7 +50,7 @@ public class Loader {
      * @param resource
      * @return TODO
      */
-    static public URL getResource(String resource) {
+    public static URL getResource(String resource) {
         ClassLoader classLoader = null;
         URL url = null;
         try {
@@ -90,7 +92,7 @@ public class Loader {
      * @param resource
      * @return TODO
      */
-    static public URL getResource(ClassLoader loader, String resource) {
+    public static URL getResource(ClassLoader loader, String resource) {
         URL url = null;
         try {
             if (loader != null) {
@@ -114,8 +116,12 @@ public class Loader {
      * @throws IllegalAccessException
      * @throws InvocationTargetException
      */
-    static public ClassLoader getTCL() throws IllegalAccessException, InvocationTargetException {
-        return Thread.currentThread().getContextClassLoader();
+    public static ClassLoader getTCL() throws IllegalAccessException, InvocationTargetException {
+         return (ClassLoader)AccessController.doPrivileged(new PrivilegedAction() {
+            public Object run() {
+                return Thread.currentThread().getContextClassLoader();
+            }
+         });
     }
     
     /**
@@ -124,8 +130,12 @@ public class Loader {
      *
      * @return the class loader of the argument
      */
-    static public ClassLoader getClassLoader(Class clazz) {
-        return clazz.getClassLoader();
+    public static ClassLoader getClassLoader(final Class clazz) {
+        return (ClassLoader)AccessController.doPrivileged(new PrivilegedAction() {
+            public Object run() {
+                return clazz.getClassLoader();
+            }
+         });
     }
 
     /**
@@ -137,7 +147,7 @@ public class Loader {
      * @return Class
      * @throws ClassNotFoundException
      */
-    static public Class loadClass(ClassLoader loader, String clazz) throws ClassNotFoundException {
+    public static Class loadClass(ClassLoader loader, String clazz) throws ClassNotFoundException {
         try {
             if (loader != null) {
                 Class c = loader.loadClass(clazz);
@@ -161,11 +171,11 @@ public class Loader {
      * @return TODO
      * @throws ClassNotFoundException
      */
-    static public Class loadClass(String clazz) throws ClassNotFoundException {
+    public static Class loadClass(String clazz) throws ClassNotFoundException {
         return loadClass(clazz, true);
     }
     
-    static public Class loadClass(String clazz, boolean warn) throws ClassNotFoundException {
+    public static Class loadClass(String clazz, boolean warn) throws ClassNotFoundException {
         try {
             ClassLoader tcl = getTCL(); 
             

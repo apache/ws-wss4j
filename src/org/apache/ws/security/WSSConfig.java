@@ -244,18 +244,18 @@ public class WSSConfig {
             org.apache.xml.security.Init.init();
             if (addJceProviders) {
                 /*
-                 * The last provider added has precedence, that is if JuiCE can be add
+                 * The last provider added has precedence, that is if JuiCE can be added
                  * then WSS4J uses this provider.
                  */
-                addJceProvider("BC",
-                        "org.bouncycastle.jce.provider.BouncyCastleProvider");
-                addJceProvider("JuiCE",
-                        "org.apache.security.juice.provider.JuiCEProviderOpenSSL");
+                addJceProvider("BC", "org.bouncycastle.jce.provider.BouncyCastleProvider");
+                addJceProvider("JuiCE", "org.apache.security.juice.provider.JuiCEProviderOpenSSL");
             }
             Transform.init();
             try {
-                Transform.register(STRTransform.implementedTransformURI,
-                        "org.apache.ws.security.transform.STRTransform");
+                Transform.register(
+                    STRTransform.implementedTransformURI,
+                    "org.apache.ws.security.transform.STRTransform"
+                );
             } catch (Exception ex) {
                 if (log.isDebugEnabled()) {
                     log.debug(ex.getMessage(), ex);
@@ -338,8 +338,7 @@ public class WSSConfig {
      * @param enableSignatureConfirmation
      *            The enableSignatureConfirmation to set.
      */
-    public void setEnableSignatureConfirmation(
-            boolean enableSignatureConfirmation) {
+    public void setEnableSignatureConfirmation(boolean enableSignatureConfirmation) {
         this.enableSignatureConfirmation = enableSignatureConfirmation;
     }
     
@@ -492,24 +491,20 @@ public class WSSConfig {
 
     private boolean loadProvider(String id, String className) {
         try {
-            Class c = Loader.loadClass(className, false);
             if (java.security.Security.getProvider(id) == null) {
+                Class c = Loader.loadClass(className, false);
+                int ret = 
+                    java.security.Security.insertProviderAt(
+                        (java.security.Provider) c.newInstance(), 2
+                    );
                 if (log.isDebugEnabled()) {
-                    log.debug("The provider " + id
-                            + " had to be added to the java.security.Security");
-                }
-                int ret =java.security.Security.insertProviderAt(
-                        (java.security.Provider) c.newInstance(), 2);
-                if (log.isDebugEnabled()) {
-                    log.debug("The provider " + id + " was added at: "
-                            + ret);
+                    log.debug("The provider " + id + " was added at: " + ret);
                 }                
             }
             return true;
         } catch (Throwable t) {
             if (log.isDebugEnabled()) {
-                log.debug("The provider " + id + " could not be added: "
-                        + t.getMessage(), t);
+                log.debug("The provider " + id + " could not be added: " + t.getMessage());
             }
             return false;
         }
