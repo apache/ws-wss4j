@@ -32,8 +32,10 @@ import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
+import org.apache.ws.security.message.WSSecEncrypt;
 import org.apache.ws.security.message.WSSecSignature;
 import org.apache.ws.security.message.WSSecHeader;
+import org.apache.xml.security.utils.RFC2253Parser;
 import org.w3c.dom.Document;
 
 import javax.security.auth.callback.Callback;
@@ -42,6 +44,8 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
 
 /**
  * This is a test for WSS-86 - "CryptoBase.splitAndTrim does not take into account the format of a 
@@ -169,6 +173,53 @@ public class TestWSSecurityWSS86 extends TestCase implements CallbackHandler {
             LOG.debug(outputString);
         }
         verify(signedDoc);
+    }
+    
+    /**
+     * Test loading a certificate using BouncyCastle, and using it to encrypt a message, but
+     * decrypt the message using the Java Keystore provider
+     */
+    public void testInterop() throws Exception {
+        // 
+        // This cert corresponds to the cert in wss86.keystore
+        //
+        byte[] certBytes = 
+            org.apache.ws.security.util.Base64.decode(
+                "MIICfDCCAeUCBElPtuwwDQYJKoZIhvcNAQEEBQAwgYQxCzAJBgNVBAYTAkRFMQ8wDQYDVQQIEwZC"
+                + "YXllcm4xDzANBgNVBAcTBk11bmljaDEPMA0GA1UEChMGQXBhY2hlMQ4wDAYDVQQLEwVXU1M0SjEP"
+                + "MA0GA1UEAxMGV2VybmVyMSEwHwYJKoZIhvcNAQkBFhJXZXJuZXJAZXhhbXBsZS5jb20wHhcNMDgx"
+                + "MjIyMTU0OTAwWhcNMDkwMzIyMTU0OTAwWjCBhDELMAkGA1UEBhMCREUxDzANBgNVBAgTBkJheWVy"
+                + "bjEPMA0GA1UEBxMGTXVuaWNoMQ8wDQYDVQQKEwZBcGFjaGUxDjAMBgNVBAsTBVdTUzRKMQ8wDQYD"
+                + "VQQDEwZXZXJuZXIxITAfBgkqhkiG9w0BCQEWEldlcm5lckBleGFtcGxlLmNvbTCBnzANBgkqhkiG"
+                + "9w0BAQEFAAOBjQAwgYkCgYEA0CudLx3cFcAVBZsk4PuMYD2w3fg0pAXP4J2GkWdIw/ydyfBaMcMy"
+                + "Q6LfIEWITj5IY9M7JSddj9Mil8po5ClvSKiu07pC7ePD7VbcXqA+D4CEjwkkkb3mBJ1ohUraCdI5"
+                + "/B2PsEY9QpAkoknMEKaKFn5JOE7BKfPG85rCCYC/B8cCAwEAATANBgkqhkiG9w0BAQQFAAOBgQBx"
+                + "4dlaLgJF74/mwhhWp49pxwk+MY/udrPw6GRiTdTFuAbkODuDL+zvssY6l6nZij2TL22ouTe4H/cf"
+                + "n/rjslklB73ZIcxgbfHar914UZd970AgbSt2NUGepybdr57zmKdi7wdLVojgdRQMHN6/NoUOicj3"
+                + "TRZG7slsfImuGsxMJw=="
+            );
+        CertificateFactory factory = 
+            CertificateFactory.getInstance("X.509", "BC");
+        X509Certificate cert = 
+            (X509Certificate)factory.generateCertificate(
+                new java.io.ByteArrayInputStream(certBytes)
+            );
+
+        SOAPEnvelope unsignedEnvelope = message.getSOAPEnvelope();
+        WSSecEncrypt encrypt = new WSSecEncrypt();
+        encrypt.setUseThisCert(cert);
+        Document doc = unsignedEnvelope.getAsDocument();
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        Document encryptedDoc = encrypt.build(doc, crypto, secHeader);
+        
+        if (LOG.isDebugEnabled()) {
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(encryptedDoc);
+            LOG.debug(outputString);
+        }
+        verify(encryptedDoc);
+        
     }
     
     /**

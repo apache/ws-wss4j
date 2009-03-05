@@ -255,8 +255,9 @@ public abstract class CryptoFactory {
             if (log.isDebugEnabled()) {
                 log.debug("Cannot find crypto property file: " + propFilename, e);
             }
-            throw new RuntimeException("CryptoFactory: Cannot load properties: " +
-                    propFilename, e);
+            throw new RuntimeException(
+                "CryptoFactory: Cannot load properties: " + propFilename, e
+            );
         }
         return properties;
     }

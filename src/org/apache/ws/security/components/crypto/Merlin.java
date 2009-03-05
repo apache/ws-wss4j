@@ -62,13 +62,12 @@ public class Merlin extends AbstractCrypto {
      * @throws CredentialException
      * @throws IOException
      */
-    public Merlin(Properties properties) throws CredentialException,
-            IOException {
+    public Merlin(Properties properties) throws CredentialException, IOException {
         super(properties);
     }
 
     public Merlin(Properties properties, ClassLoader loader)
-            throws CredentialException, IOException {
+        throws CredentialException, IOException {
         super(properties, loader);
     }
 
@@ -85,7 +84,7 @@ public class Merlin extends AbstractCrypto {
      * @throws WSSecurityException
      */
     public X509Certificate[] getX509Certificates(byte[] data, boolean reverse)
-            throws WSSecurityException {
+        throws WSSecurityException {
         InputStream in = new ByteArrayInputStream(data);
         CertPath path = null;
         try {
@@ -99,8 +98,7 @@ public class Merlin extends AbstractCrypto {
         X509Certificate[] certs = new X509Certificate[l.size()];
         Iterator iterator = l.iterator();
         for (int i = 0; i < l.size(); i++) {
-            certs[(reverse) ? (l.size() - 1 - i) : i] = (X509Certificate) iterator
-                    .next();
+            certs[(reverse) ? (l.size() - 1 - i) : i] = (X509Certificate) iterator.next();
         }
         return certs;
     }
@@ -118,11 +116,11 @@ public class Merlin extends AbstractCrypto {
      * @throws WSSecurityException
      */
     public byte[] getCertificateData(boolean reverse, X509Certificate[] certs)
-            throws WSSecurityException {
-        Vector list = new Vector();
+        throws WSSecurityException {
+        List list = new Vector();
         for (int i = 0; i < certs.length; i++) {
             if (reverse) {
-                list.insertElementAt(certs[i], 0);
+                list.add(0, certs[i]);
             } else {
                 list.add(certs[i]);
             }
@@ -141,23 +139,20 @@ public class Merlin extends AbstractCrypto {
         }
     }
 
-    public boolean validateCertPath(X509Certificate[] certs)
-            throws WSSecurityException {
+    public boolean validateCertPath(X509Certificate[] certs) throws WSSecurityException {
         try {
             // Generate cert path
             java.util.List certList = java.util.Arrays.asList(certs);
-            CertPath path = this.getCertificateFactory().generateCertPath(
-                    certList);
+            CertPath path = this.getCertificateFactory().generateCertPath(certList);
 
-            HashSet set = new HashSet();
-
+            java.util.Set set = new HashSet();
             Enumeration cacertsAliases = this.cacerts.aliases();
             while (cacertsAliases.hasMoreElements()) {
                 String alias = (String) cacertsAliases.nextElement();
-                X509Certificate cert = (X509Certificate) this.cacerts
-                        .getCertificate(alias);
-                TrustAnchor anchor = new TrustAnchor(cert, cert
-                        .getExtensionValue(NAME_CONSTRAINTS_OID));
+                X509Certificate cert = 
+                    (X509Certificate) this.cacerts.getCertificate(alias);
+                TrustAnchor anchor = 
+                    new TrustAnchor(cert, cert.getExtensionValue(NAME_CONSTRAINTS_OID));
                 set.add(anchor);
             }
 
@@ -165,10 +160,10 @@ public class Merlin extends AbstractCrypto {
             Enumeration aliases = this.keystore.aliases();
             while (aliases.hasMoreElements()) {
                 String alias = (String) aliases.nextElement();
-                X509Certificate cert = (X509Certificate) this.keystore
-                        .getCertificate(alias);
-                TrustAnchor anchor = new TrustAnchor(cert, cert
-                        .getExtensionValue(NAME_CONSTRAINTS_OID));
+                X509Certificate cert = 
+                    (X509Certificate) this.keystore.getCertificate(alias);
+                TrustAnchor anchor = 
+                    new TrustAnchor(cert, cert.getExtensionValue(NAME_CONSTRAINTS_OID));
                 set.add(anchor);
             }
 
@@ -178,14 +173,13 @@ public class Merlin extends AbstractCrypto {
             param.setRevocationEnabled(false);
 
             // Verify the trust path using the above settings
-            String provider = properties
-                    .getProperty("org.apache.ws.security.crypto.merlin.cert.provider");
+            String provider = 
+                properties.getProperty("org.apache.ws.security.crypto.merlin.cert.provider");
             CertPathValidator certPathValidator;
             if (provider == null || provider.length() == 0) {
                 certPathValidator = CertPathValidator.getInstance("PKIX");
             } else {
-                certPathValidator = CertPathValidator.getInstance("PKIX",
-                        provider);
+                certPathValidator = CertPathValidator.getInstance("PKIX", provider);
             }
             certPathValidator.validate(path, param);
         } catch (NoSuchProviderException ex) {

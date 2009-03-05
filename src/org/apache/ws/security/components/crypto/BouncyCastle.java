@@ -59,7 +59,8 @@ public class BouncyCastle extends AbstractCrypto {
         super(properties);
     }
 
-    public BouncyCastle(Properties properties, ClassLoader loader) throws CredentialException, IOException {
+    public BouncyCastle(Properties properties, ClassLoader loader) 
+        throws CredentialException, IOException {
         super(properties,loader);
     }
 
@@ -76,7 +77,7 @@ public class BouncyCastle extends AbstractCrypto {
      *
      */
     public X509Certificate[] getX509Certificates(byte[] data, boolean reverse)
-            throws WSSecurityException {
+        throws WSSecurityException {
         InputStream in = new ByteArrayInputStream(data);
         CertPath path = null;
         try {
@@ -109,11 +110,11 @@ public class BouncyCastle extends AbstractCrypto {
      *
      */
     public byte[] getCertificateData(boolean reverse, X509Certificate[] certs)
-            throws WSSecurityException {
-        Vector list = new Vector();
+        throws WSSecurityException {
+        List list = new Vector();
         for (int i = 0; i < certs.length; i++) {
             if (reverse) {
-                list.insertElementAt(certs[i], 0);
+                list.add(0, certs[i]);
             } else {
                 list.add(certs[i]);
             }

@@ -498,7 +498,7 @@ public class WSSConfig {
                         (java.security.Provider) c.newInstance(), 2
                     );
                 if (log.isDebugEnabled()) {
-                    log.debug("The provider " + id + " was added at: " + ret);
+                    log.debug("The provider " + id + " was added at position: " + ret);
                 }                
             }
             return true;

@@ -20,6 +20,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSSecurityException;
 
+import org.bouncycastle.asn1.x509.X509Name;
+
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.math.BigInteger;
@@ -81,6 +83,7 @@ public abstract class CryptoBase implements Crypto {
         }
         return s;
     }
+    
     /**
      * Singleton certificate factory for this Crypto instance.
      * <p/>
@@ -224,8 +227,7 @@ public abstract class CryptoBase implements Crypto {
      * @return alias name of the certificate that matches the issuer name
      *         or null if no such certificate was found.
      */
-    public String getAliasForX509Cert(String issuer)
-            throws WSSecurityException {
+    public String getAliasForX509Cert(String issuer) throws WSSecurityException {
         return getAliasForX509Cert(issuer, null, false);
     }
 
@@ -243,7 +245,7 @@ public abstract class CryptoBase implements Crypto {
      *         or null if no such certificate was found.
      */
     public String getAliasForX509Cert(String issuer, BigInteger serialNumber)
-            throws WSSecurityException {
+        throws WSSecurityException {
         return getAliasForX509Cert(issuer, serialNumber, true);
     }
 
@@ -255,20 +257,36 @@ public abstract class CryptoBase implements Crypto {
     * (this should work as well).
     * --- remains to be tested in several ways --
     */
-    private String getAliasForX509Cert(String issuer, BigInteger serialNumber,
-                                       boolean useSerialNumber)
-            throws WSSecurityException {
-        X500Principal issuerRDN = new X500Principal(issuer);
-        X509Certificate x509cert;
-        X500Principal certRDN;
+    private String getAliasForX509Cert(
+        String issuer, 
+        BigInteger serialNumber,
+        boolean useSerialNumber
+    ) throws WSSecurityException {
+        X500Principal issuerRDN = null;
+        X509Name issuerName = null;
         Certificate cert = null;
+        
+        //
+        // Convert the issuer DN to a java X500Principal object first. This is to ensure
+        // interop with a DN constructed from .NET, where e.g. it uses "S" instead of "ST".
+        // Then convert it to a BouncyCastle X509Name, which will order the attributes of
+        // the DN in a particular way (see WSS-168). If the conversion to an X500Principal
+        // object fails (e.g. if the DN contains "E" instead of "EMAILADDRESS"), then fall
+        // back on a direct conversion to a BC X509Name
+        //
+        try {
+            issuerRDN = new X500Principal(issuer);
+            issuerName =  new X509Name(issuerRDN.getName());
+        } catch (java.lang.IllegalArgumentException ex) {
+            issuerName = new X509Name(issuer);
+        }
 
         try {
             for (Enumeration e = keystore.aliases(); e.hasMoreElements();) {
                 String alias = (String) e.nextElement();
                 Certificate[] certs = keystore.getCertificateChain(alias);
                 if (certs == null || certs.length == 0) {
-                    // no cert chain, so lets check if getCertificate gives us a  result.
+                    // no cert chain, so lets check if getCertificate gives us a result.
                     cert = keystore.getCertificate(alias);
                     if (cert == null) {
                         return null;
@@ -279,11 +297,10 @@ public abstract class CryptoBase implements Crypto {
                 if (!(cert instanceof X509Certificate)) {
                     continue;
                 }
-                x509cert = (X509Certificate) cert;
-                if (!useSerialNumber ||
-                        useSerialNumber && x509cert.getSerialNumber().compareTo(serialNumber) == 0) {
-                    certRDN = new X500Principal(x509cert.getIssuerDN().getName());
-                    if (certRDN.equals(issuerRDN)) {
+                X509Certificate x509cert = (X509Certificate) cert;
+                if (!useSerialNumber || x509cert.getSerialNumber().compareTo(serialNumber) == 0) {
+                    X509Name certName = new X509Name(x509cert.getIssuerDN().getName());
+                    if (certName.equals(issuerName)) {
                         return alias;
                     }
                 }
@@ -308,7 +325,6 @@ public abstract class CryptoBase implements Crypto {
      * @throws org.apache.ws.security.WSSecurityException
      *          if problems during keystore handling or wrong certificate (no SKI data)
      */
-
     public String getAliasForX509Cert(byte[] skiBytes) throws WSSecurityException {
         Certificate cert = null;
 
@@ -350,15 +366,12 @@ public abstract class CryptoBase implements Crypto {
      * @return alias name of the certificate that matches the given certificate
      *         or null if no such certificate was found.
      */
-
-    /*
-     * See comment above
-     */
     public String getAliasForX509Cert(Certificate cert) throws WSSecurityException {
         try {
             String alias = keystore.getCertificateAlias(cert);
-            if (alias != null)
+            if (alias != null) {
                 return alias;
+            }
             // Use brute force search
             Enumeration e = keystore.aliases();
             while (e.hasMoreElements()) {
@@ -436,7 +449,6 @@ public abstract class CryptoBase implements Crypto {
      * @throws org.apache.ws.security.WSSecurityException
      *          if problems during keystore handling or wrong certificate
      */
-
     public String getAliasForX509CertThumb(byte[] thumb) throws WSSecurityException {
         Certificate cert = null;
         MessageDigest sha = null;
@@ -509,13 +521,12 @@ public abstract class CryptoBase implements Crypto {
      * @param cert The certificate to read SKI
      * @return The byte array containing the binary SKI data
      */
-    public byte[] getSKIBytesFromCert(X509Certificate cert)
-            throws WSSecurityException {
-        /*
-         * Gets the DER-encoded OCTET string for the extension value (extnValue)
-         * identified by the passed-in oid String. The oid string is represented
-         * by a set of positive whole numbers separated by periods.
-         */
+    public byte[] getSKIBytesFromCert(X509Certificate cert) throws WSSecurityException {
+        //
+        // Gets the DER-encoded OCTET string for the extension value (extnValue)
+        // identified by the passed-in oid String. The oid string is represented
+        // by a set of positive whole numbers separated by periods.
+        //
         byte[] derEncodedValue = cert.getExtensionValue(SKI_OID);
 
         if (cert.getVersion() < 3 || derEncodedValue == null) {
@@ -545,10 +556,10 @@ public abstract class CryptoBase implements Crypto {
             return sha.digest();
         }
 
-        /*
-         * Strip away first four bytes from the DerValue (tag and length of
-         * ExtensionValue OCTET STRING and KeyIdentifier OCTET STRING)
-         */
+        //
+        // Strip away first four bytes from the DerValue (tag and length of
+        // ExtensionValue OCTET STRING and KeyIdentifier OCTET STRING)
+        //
         byte abyte0[] = new byte[derEncodedValue.length - 4];
 
         System.arraycopy(derEncodedValue, 4, abyte0, 0, abyte0.length);
@@ -602,7 +613,7 @@ public abstract class CryptoBase implements Crypto {
      * @throws WSSecurityException
      */
     public byte[] getCertificateData(boolean reverse, X509Certificate[] certs)
-            throws WSSecurityException {
+        throws WSSecurityException {
         Vector list = new Vector();
         for (int i = 0; i < certs.length; i++) {
             if (reverse) {
@@ -639,7 +650,7 @@ public abstract class CryptoBase implements Crypto {
      * @throws WSSecurityException
      */
     public X509Certificate[] getX509Certificates(byte[] data, boolean reverse)
-            throws WSSecurityException {
+        throws WSSecurityException {
         InputStream in = new ByteArrayInputStream(data);
         CertPath path = null;
         try {
@@ -672,7 +683,6 @@ public abstract class CryptoBase implements Crypto {
     validateCertPath(
         java.security.cert.X509Certificate[] certs
     ) throws org.apache.ws.security.WSSecurityException {
-
         try {
             // Generate cert path
             java.util.List cert_list = java.util.Arrays.asList(certs);
@@ -748,7 +758,6 @@ public abstract class CryptoBase implements Crypto {
     private Vector getAlias(X500Principal subjectRDN, KeyStore store) throws WSSecurityException {
         // Store the aliases found
         Vector aliases = new Vector();
-
         Certificate cert = null;
         
         try {
