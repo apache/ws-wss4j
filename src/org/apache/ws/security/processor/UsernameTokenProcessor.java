@@ -52,8 +52,10 @@ public class UsernameTokenProcessor implements Processor {
         handleCustomPasswordTypes = wsc.getHandleCustomPasswordTypes();
         
         Principal lastPrincipalFound = handleUsernameToken((Element) elem, cb);
-        returnResults.add(0, new WSSecurityEngineResult(WSConstants.UT,
-                lastPrincipalFound, null, null, null));
+        returnResults.add(
+            0, 
+            new WSSecurityEngineResult(WSConstants.UT, lastPrincipalFound, null, null, null)
+        );
         utId = ut.getID();
     }
 

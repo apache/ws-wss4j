@@ -21,6 +21,7 @@ package org.apache.ws.security.processor;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.CustomTokenPrincipal;
+import org.apache.ws.security.PublicKeyCallback;
 import org.apache.ws.security.PublicKeyPrincipal;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDerivedKeyTokenPrincipal;
@@ -89,6 +90,7 @@ public class SignatureProcessor implements Processor {
         Set protectedElements = new java.util.TreeSet();
         byte[][] signatureValue = new byte[1][];
         Principal lastPrincipalFound = null;
+        
         try {
             lastPrincipalFound = 
                 verifyXMLSignature(
@@ -387,6 +389,21 @@ public class SignatureProcessor implements Processor {
                 );
             }
         }
+        //
+        // Delegate verification of a public key to a Callback Handler
+        //
+        if (publicKey != null) {
+            PublicKeyCallback pwcb = 
+                new PublicKeyCallback(publicKey);
+            try {
+                Callback[] callbacks = new Callback[]{pwcb};
+                cb.handle(callbacks);
+            } catch (Exception e) {
+                throw new WSSecurityException(
+                    WSSecurityException.FAILED_AUTHENTICATION, null, null, e
+                );
+            }
+        }
         try {
             boolean signatureOk = false;
             if (certs != null) {
@@ -422,7 +439,7 @@ public class SignatureProcessor implements Processor {
                         );
                     }
                     String uri = siRef.getURI();
-                    if(uri != null && !"".equals(uri)) {
+                    if (uri != null && !"".equals(uri)) {
                         Element se = WSSecurityUtil.getElementByWsuId(elem.getOwnerDocument(), uri);
                         if (se == null) {
                             se = WSSecurityUtil.getElementByGenId(elem.getOwnerDocument(), uri);
@@ -516,6 +533,7 @@ public class SignatureProcessor implements Processor {
         }
         return null;
     }
+
 
     /**
      * Checks the <code>element</code> and creates appropriate binary security object.

@@ -35,7 +35,6 @@ import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.message.WSSecEncrypt;
 import org.apache.ws.security.message.WSSecSignature;
 import org.apache.ws.security.message.WSSecHeader;
-import org.apache.xml.security.utils.RFC2253Parser;
 import org.w3c.dom.Document;
 
 import javax.security.auth.callback.Callback;

@@ -27,9 +27,9 @@ import org.apache.axis.configuration.NullProvider;
 import org.apache.axis.message.SOAPEnvelope;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.ws.security.PublicKeyCallback;
 import org.apache.ws.security.PublicKeyPrincipal;
 import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.components.crypto.Crypto;
@@ -39,12 +39,13 @@ import org.apache.ws.security.message.WSSecHeader;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 
-import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.callback.UnsupportedCallbackException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.CallbackHandler;
+import javax.security.auth.callback.UnsupportedCallbackException;
 
 /**
  * This class tests signing where the the public key is transmitted in the message via
@@ -68,6 +69,7 @@ public class SignatureKeyValueTest extends TestCase implements CallbackHandler {
     
     private WSSecurityEngine secEngine = new WSSecurityEngine();
     private Crypto crypto = CryptoFactory.getInstance("cryptoSKI.properties");
+    private java.security.KeyStore keyStore = null;
     private MessageContext msgContext;
     private SOAPEnvelope unsignedEnvelope;
 
@@ -79,6 +81,7 @@ public class SignatureKeyValueTest extends TestCase implements CallbackHandler {
      */
     public SignatureKeyValueTest(String name) {
         super(name);
+        keyStore = crypto.getKeyStore();
     }
 
     /**
@@ -147,7 +150,40 @@ public class SignatureKeyValueTest extends TestCase implements CallbackHandler {
         java.security.PublicKey publicKey = 
             ((PublicKeyPrincipal)principal).getPublicKey();
         assertTrue(publicKey instanceof java.security.interfaces.RSAPublicKey);
+        
     }
+    
+    
+    /**
+     * Failed RSAKeyValue test, where a message is signed using a key-pair which doesn't
+     * correspond to the public key in the "trust"-store.
+     */
+    public void testBadRSAKeyValue() throws Exception {
+        WSSecSignature builder = new WSSecSignature();
+        builder.setUserInfo("wss86", "security");
+        builder.setKeyIdentifierType(WSConstants.KEY_VALUE);
+        Document doc = unsignedEnvelope.getAsDocument();
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        Document signedDoc = 
+            builder.build(doc, CryptoFactory.getInstance("wss86.properties"), secHeader);
+
+        String outputString = 
+            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(outputString);
+        }
+        assertTrue(outputString.indexOf("RSAKeyValue") != -1);
+        
+        try {
+            verify(signedDoc);
+            fail("Failure expected on bad public key");
+        } catch (Exception ex) {
+            // expected
+        }
+        
+    }
+    
     
     /**
      * Successful DSAKeyValue test.
@@ -192,22 +228,20 @@ public class SignatureKeyValueTest extends TestCase implements CallbackHandler {
     private java.util.Vector verify(Document doc) throws Exception {
         return secEngine.processSecurityHeader(doc, null, this, null);
     }
-
-    public void handle(Callback[] callbacks)
+    
+    public void handle(Callback[] callbacks) 
         throws IOException, UnsupportedCallbackException {
         for (int i = 0; i < callbacks.length; i++) {
-            if (callbacks[i] instanceof WSPasswordCallback) {
-                WSPasswordCallback pc = (WSPasswordCallback) callbacks[i];
-                /*
-                 * here call a function/method to lookup the password for
-                 * the given identifier (e.g. a user name or keystore alias)
-                 * e.g.: pc.setPassword(passStore.getPassword(pc.getIdentfifier))
-                 * for Testing we supply a fixed name here.
-                 */
-                pc.setPassword("password");
+            if (callbacks[i] instanceof PublicKeyCallback) {
+                PublicKeyCallback pc = (PublicKeyCallback) callbacks[i];
+                java.security.PublicKey publicKey = pc.getPublicKey();
+                if (publicKey == null || !pc.verifyTrust(keyStore)) {
+                    throw new IOException("Authentication of public key failed");
+                }
             } else {
                 throw new UnsupportedCallbackException(callbacks[i], "Unrecognized Callback");
             }
         }
     }
+
 }
