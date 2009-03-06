@@ -110,7 +110,7 @@ public class ReferenceListProcessor implements Processor {
             if (tmpE.getLocalName().equals("DataReference")) {
                 String dataRefURI = ((Element) tmpE).getAttribute("URI");
                 WSDataRef dataRef = new WSDataRef(dataRefURI.substring(1));
-                decryptDataRefEmbedded(doc, dataRefURI, dataRef,cb, crypto);
+                decryptDataRefEmbedded(doc, dataRefURI, dataRef, cb, crypto);
                 dataRefUris.add(dataRef);
             }
         }
@@ -185,6 +185,7 @@ public class ReferenceListProcessor implements Processor {
 
         if (content) {
             encBodyData = (Element) encBodyData.getParentNode();
+            dataRef.setName(new QName(encBodyData.getNamespaceURI(), encBodyData.getLocalName()));
         }
             
         try {
@@ -378,12 +379,12 @@ public class ReferenceListProcessor implements Processor {
     }
 
     /**
-     * @return      a list of Nodes in b that are not in a 
+     * @return a list of Nodes in b that are not in a
      */
     private static java.util.List
     newNodes(
-        final java.util.List a,
-        final java.util.List b
+        java.util.List a,
+        java.util.List b
     ) {
         if (a.size() == 0) {
             return b;
@@ -391,6 +392,20 @@ public class ReferenceListProcessor implements Processor {
         if (b.size() == 0) {
             return java.util.Collections.EMPTY_LIST;
         }
+        
+        a = new ArrayList(a);
+        //try a fast node compare at same position first.....
+        for (int x = 0; x < b.size(); x++) {
+            final Node bnode = (Node)b.get(x);
+            final Node anode = (Node)a.get(x);
+            if (bnode == anode
+                || bnode.getLocalName().equals(anode.getLocalName())
+                && bnode.getNamespaceURI().equals(anode.getNamespaceURI())) {
+                b.remove(x);
+                a.remove(x);
+            }
+        }
+        //what's left is stuff that didn't exactly position match, do slower searches
         final java.util.List ret = new java.util.ArrayList();
         for (
             final java.util.Iterator bpos = b.iterator();
@@ -402,7 +417,7 @@ public class ReferenceListProcessor implements Processor {
             boolean found = false;
             for (
                 final java.util.Iterator apos = a.iterator();
-                apos.hasNext();
+                apos.hasNext() && !found;
             ) {
                 final Node anode = (Node) apos.next();
                 final java.lang.String ans = anode.getNamespaceURI();

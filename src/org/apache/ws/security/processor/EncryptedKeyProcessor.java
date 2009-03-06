@@ -64,6 +64,7 @@ public class EncryptedKeyProcessor implements Processor {
     private byte[] decryptedBytes = null;
     
     private String encryptedKeyId = null;
+    private X509Certificate cert = null;
 
     public void handleToken(
             Element elem, 
@@ -92,7 +93,8 @@ public class EncryptedKeyProcessor implements Processor {
                 this.decryptedBytes,
                 this.encryptedEphemeralKey,
                 this.encryptedKeyId, 
-                dataRefUris
+                dataRefUris,
+                cert
             )
         );
     }
@@ -222,6 +224,7 @@ public class EncryptedKeyProcessor implements Processor {
                     // the private key associated with this certificate
                     //
                     alias = crypto.getAliasForX509Cert(certs[0]);
+                    cert = certs[0];
                     if (log.isDebugEnabled()) {
                         log.debug("cert: " + certs[0]);
                         log.debug("KeyIdentifier Alias: " + alias);
@@ -242,7 +245,7 @@ public class EncryptedKeyProcessor implements Processor {
                                 new Object[] {"for decryption (BST)"}
                             );
                         }
-                        X509Certificate cert = token.getX509Certificate(crypto);
+                        cert = token.getX509Certificate(crypto);
                         if (cert == null) {
                             throw new WSSecurityException(
                                 WSSecurityException.FAILURE,

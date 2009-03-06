@@ -24,6 +24,7 @@ import org.apache.ws.security.CustomTokenPrincipal;
 import org.apache.ws.security.PublicKeyCallback;
 import org.apache.ws.security.PublicKeyPrincipal;
 import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.WSDataRef;
 import org.apache.ws.security.WSDerivedKeyTokenPrincipal;
 import org.apache.ws.security.WSDocInfo;
 import org.apache.ws.security.WSDocInfoStore;
@@ -63,6 +64,7 @@ import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.Vector;
 
@@ -87,14 +89,15 @@ public class SignatureProcessor implements Processor {
         WSDocInfoStore.store(wsDocInfo);
         X509Certificate[] returnCert = new X509Certificate[1];
         Set returnElements = new HashSet();
-        Set protectedElements = new java.util.TreeSet();
+        List protectedElements = new java.util.ArrayList();
         byte[][] signatureValue = new byte[1][];
         Principal lastPrincipalFound = null;
         
         try {
             lastPrincipalFound = 
                 verifyXMLSignature(
-                    elem, crypto, returnCert, returnElements, protectedElements, signatureValue, cb
+                    elem, crypto, returnCert, returnElements,
+                    protectedElements, signatureValue, cb
                 );
         } catch (WSSecurityException ex) {
             throw ex;
@@ -173,7 +176,7 @@ public class SignatureProcessor implements Processor {
         Crypto crypto,
         X509Certificate[] returnCert,
         Set returnElements,
-        Set protectedElements,
+        List protectedElements,
         byte[][] signatureValue,
         CallbackHandler cb
     ) throws WSSecurityException {
@@ -452,6 +455,10 @@ public class SignatureProcessor implements Processor {
                         if (se == null) {
                             throw new WSSecurityException(WSSecurityException.FAILED_CHECK);
                         }
+                        WSDataRef ref = new WSDataRef(uri);
+                        ref.setWsuId(uri);
+                        ref.setName(new QName(se.getNamespaceURI(), se.getLocalName()));
+                        protectedElements.add(ref);
                         returnElements.add(WSSecurityUtil.getIDFromReference(uri));
                     } else {
                        // This is the case where the signed element is identified 

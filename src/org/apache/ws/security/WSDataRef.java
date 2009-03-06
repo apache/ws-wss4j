@@ -18,7 +18,7 @@
 package org.apache.ws.security;
 
 /**
- * WSDataRef stores information about decrypted elements
+ * WSDataRef stores information about decrypted/signed elements
  * 
  * When a processor decrypts an elements it stores information 
  * about that element in a WSDataRef so these information can 

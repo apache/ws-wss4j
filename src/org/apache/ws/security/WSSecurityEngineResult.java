@@ -202,7 +202,18 @@ public class WSSecurityEngineResult extends java.util.HashMap {
         this(act, princ, certificate, elements, sv);
         put(TAG_PROTECTED_ELEMENTS, protectedElements);
     }
-
+    public
+    WSSecurityEngineResult(
+        int act,
+        Principal princ,
+        X509Certificate certificate,
+        Set elements,
+        List dataRefs,
+        byte[] sv
+    ) {
+        this(act, princ, certificate, elements, sv);
+        put(TAG_DATA_REF_URIS, dataRefs);
+    }
     public WSSecurityEngineResult(
         int act, 
         byte[] decryptedKey, 
@@ -215,6 +226,21 @@ public class WSSecurityEngineResult extends java.util.HashMap {
         put(TAG_ENCRYPTED_EPHEMERAL_KEY, encryptedKeyBytes);
         put(TAG_ENCRYPTED_KEY_ID, encyptedKeyId);
         put(TAG_DATA_REF_URIS, dataRefUris);
+    }
+    public WSSecurityEngineResult(
+                                  int act, 
+                                  byte[] decryptedKey, 
+                                  byte[] encryptedKeyBytes,
+                                  String encyptedKeyId, 
+                                  List dataRefUris,
+                                  X509Certificate cert
+    ) {
+        put(TAG_ACTION, new Integer(act));
+        put(TAG_DECRYPTED_KEY, decryptedKey);
+        put(TAG_ENCRYPTED_EPHEMERAL_KEY, encryptedKeyBytes);
+        put(TAG_ENCRYPTED_KEY_ID, encyptedKeyId);
+        put(TAG_DATA_REF_URIS, dataRefUris);
+        put(TAG_X509_CERTIFICATE, cert);
     }
     
     public WSSecurityEngineResult(int act, ArrayList dataRefUris) {
