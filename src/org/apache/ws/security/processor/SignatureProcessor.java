@@ -398,6 +398,11 @@ public class SignatureProcessor implements Processor {
             try {
                 Callback[] callbacks = new Callback[]{pwcb};
                 cb.handle(callbacks);
+                if (!pwcb.isVerified()) {
+                    throw new WSSecurityException(
+                        WSSecurityException.FAILED_AUTHENTICATION, null, null, null
+                    );
+                }
             } catch (Exception e) {
                 throw new WSSecurityException(
                     WSSecurityException.FAILED_AUTHENTICATION, null, null, e

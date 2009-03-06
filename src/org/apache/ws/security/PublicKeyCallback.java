@@ -30,6 +30,7 @@ import javax.security.auth.callback.Callback;
 public class PublicKeyCallback implements Callback {
 
     private java.security.PublicKey publicKey;
+    private boolean verified = false;
     
     public PublicKeyCallback(java.security.PublicKey publicKey) {
         this.publicKey = publicKey;
@@ -41,6 +42,14 @@ public class PublicKeyCallback implements Callback {
     
     public java.security.PublicKey getPublicKey() {
         return publicKey;
+    }
+    
+    public void setVerified(boolean b) {
+        verified = b;
+    }
+    
+    public boolean isVerified() {
+        return verified;
     }
     
     /**
@@ -80,6 +89,7 @@ public class PublicKeyCallback implements Callback {
                 }
                 X509Certificate x509cert = (X509Certificate) cert;
                 if (publicKey.equals(x509cert.getPublicKey())) {
+                    verified = true;
                     return true;
                 }
             }
