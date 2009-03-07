@@ -17,9 +17,11 @@
 
 package org.apache.ws.security.processor;
 
+import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDocInfo;
 import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSConfig;
+import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.conversation.ConversationConstants;
@@ -82,6 +84,15 @@ public class DerivedKeyTokenProcessor implements Processor {
         this.id = dkt.getID();
         if (length > 0) {
             this.deriveKey();
+            returnResults.add(
+                0, 
+                new WSSecurityEngineResult(WSConstants.DKT, 
+                                           secret,
+                                           keyBytes, 
+                                           id, 
+                                           null)
+            );
+
         }
     }
 
