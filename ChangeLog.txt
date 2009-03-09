@@ -5,6 +5,32 @@ for a given release.
 Portions of this report were generated using the ReleaseNotes facility
 in Jira.
 
+Release 1.5.6
+=============
+
+** Bug
+
+    * [WSS-105] - Make WSS4J compliant with X.509 1.1 specification
+    * [WSS-162] - With SecureConv tokens, URI reference processing can strip off first char of ID....
+    * [WSS-163] - No way to set SC ValueType attribute for references in WSSecEncrypt
+    * [WSS-164] - Related to WSS-162, there isn't anyway to create a direct Reference based on identifier
+    * [WSS-165] - Problems verifying trusted certs if provider not specified in properties
+    * [WSS-168] - Verification/Decryption failure with a DN String from a different provider
+
+** Improvement
+
+    * [WSS-143] - Better management of namespace declarations....
+    * [WSS-157] - Remove spurious calls to MessageDigest.reset()
+    * [WSS-160] - Add AccessController.doPrivileged blocks to the Loader
+    * [WSS-161] - Add JAX-WS handler support
+    * [WSS-166] - Refactor unit tests
+    * [WSS-167] - Apply PMD to source tree
+
+** New Feature
+
+    * [WSS-156] - Add support for RSAKeyValue tokens/signatures (needed for WS-SecurityPolicy KeyValueToken)
+
+
 Release 1.5.5
 =============
 
