@@ -139,8 +139,7 @@
                     <verbose>true</verbose>
                     <includeTests>false</includeTests>
                     <excludes>
-                        <exclude>**/Merlin.java, **/CryptoBase.java, **/SAMLIssuerImpl.java,
-                                 **/DOM2Writer.java
+                        <exclude>**/Merlin.java, **/CryptoBase.java, **/SAMLIssuerImpl.java, **/DOM2Writer.java
                         </exclude>
                     </excludes>
                 </configuration>
