@@ -26,8 +26,8 @@ Build Instructions:
         <property name='product.shortname' value='wss4j'/>
 
         <property name='product.version.major' value='1'/>
-        <property name='product.version.minor' value='5'/>
-        <property name='product.version.level' value='6'/>
+        <property name='product.version.minor' value='6'/>
+        <property name='product.version.level' value=''/>
         <property name='product.version.qualifier' value='-SNAPSHOT'/>
         <property name='product.version' value='${product.version.major}.${product.version.minor}.${product.version.level}${product.version.qualifier}'/>
         <property name="year" value="2008"/>
