@@ -74,7 +74,7 @@ public class TestWSSecurityNew15 extends TestCase implements CallbackHandler {
         +   "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" "
         +   "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" 
         +   "<SOAP-ENV:Body>" 
-        +       "<add xmlns=\"http://ws.apache.org/counter/counter_port_type\">" 
+        +       "<add xmlns=\"http://ws.apache.org/counter/counter_port_type/LogTestService2\">" 
         +           "<value xmlns=\"\">15</value>" 
         +       "</add>" 
         +   "</SOAP-ENV:Body>" 

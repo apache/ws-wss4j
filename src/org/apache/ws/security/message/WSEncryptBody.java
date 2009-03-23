@@ -346,7 +346,6 @@ public class WSEncryptBody extends WSBaseMessage {
             }
             remoteCert = certs[0];
         }
-        String certUri = "EncCertId-" + remoteCert.hashCode();
         if (tlog.isDebugEnabled()) {
             t2 = System.currentTimeMillis();
         }
@@ -429,6 +428,7 @@ public class WSEncryptBody extends WSBaseMessage {
 
             case WSConstants.BST_DIRECT_REFERENCE:
                 Reference ref = new Reference(doc);
+                String certUri = wssConfig.getIdAllocator().createId("EncCertId-", remoteCert);
                 ref.setURI("#" + certUri);
                 BinarySecurity bstToken = null;
                 bstToken = new X509Security(doc);
@@ -520,7 +520,7 @@ public class WSEncryptBody extends WSBaseMessage {
             }
 
             boolean content = modifier.equals("Content") ? true : false;
-            String xencEncryptedDataId = "EncDataId-" + body.hashCode();
+            String xencEncryptedDataId = wssConfig.getIdAllocator().createId("EncDataId-", body);
 
             /*
              * Forth step: encrypt data, and set neccessary attributes in

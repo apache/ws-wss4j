@@ -127,7 +127,7 @@ public class WSSecDKEncrypt extends WSSecDerivedKeyBase {
             }
 
             boolean content = modifier.equals("Content") ? true : false;
-            String xencEncryptedDataId = "EncDataId-" + body.hashCode();
+            String xencEncryptedDataId = wssConfig.getIdAllocator().createId("EncDataId-", body);
 
             //
             // Fourth step: encrypt data, and set necessary attributes in

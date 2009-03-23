@@ -68,7 +68,7 @@ public class WSSecTimestamp extends WSSecBase {
      */
     public void prepare(Document doc) {
         ts = new Timestamp(wssConfig.isPrecisionInMilliSeconds(), doc, timeToLive);
-        String tsId = "Timestamp-" + ts.hashCode();
+        String tsId = wssConfig.getIdAllocator().createId("Timestamp-", ts);
         ts.setID(tsId);
     }
 

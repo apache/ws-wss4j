@@ -65,8 +65,7 @@ public class WSSecSignatureConfirmation extends WSSecBase {
      */
     public void prepare(Document doc) {
         sc = new SignatureConfirmation(doc, signatureValue);
-        String scId = "SigConf-" + sc.hashCode();
-        sc.setID(scId);
+        sc.setID(wssConfig.getIdAllocator().createId("SigConf-", sc));
     }
     
     /**

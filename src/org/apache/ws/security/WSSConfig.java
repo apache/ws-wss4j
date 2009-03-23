@@ -27,6 +27,7 @@ import org.apache.ws.security.action.Action;
 import org.apache.ws.security.processor.Processor;
 import org.apache.ws.security.transform.STRTransform;
 import org.apache.ws.security.util.Loader;
+import org.apache.ws.security.util.UUIDGenerator;
 import org.apache.xml.security.transforms.Transform;
 
 /**
@@ -194,6 +195,26 @@ public class WSSConfig {
      * reject custom token types in the callback handler.
      */
     protected boolean handleCustomPasswordTypes = false;
+    
+    protected WsuIdAllocator idAllocator = new WsuIdAllocator() {
+        int i;
+        private synchronized String next() {
+            return Integer.toString(++i);
+        }
+        public String createId(String prefix, Object o) {
+            if (prefix == null) {
+                return next();
+            }
+            return prefix + next();
+        }
+
+        public String createSecureId(String prefix, Object o) {
+            if (prefix == null) {
+                return UUIDGenerator.getUUID();
+            }
+            return prefix + UUIDGenerator.getUUID();
+        }
+    };
 
     protected HashMap jceProvider = new HashMap(10);
 
@@ -373,6 +394,17 @@ public class WSSConfig {
         this.timeStampStrict = timeStampStrict;
     }
     
+    /**
+     * @return Returns the WsuIdAllocator used to generate wsu:Id attributes
+     */
+    public WsuIdAllocator getIdAllocator() {
+        return idAllocator;
+    }
+
+    public void setIdAllocator(WsuIdAllocator idAllocator) {
+        this.idAllocator = idAllocator;
+    }
+
     /**
      * Associate an action name with a specific action code.
      *

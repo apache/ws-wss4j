@@ -150,15 +150,15 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
         }
         
         sig.addResourceResolver(EnvelopeIdResolver.getInstance());
-        String sigUri = "Signature-" + sig.hashCode();
+        String sigUri = wssConfig.getIdAllocator().createId("Signature-", sig);
         sig.setId(sigUri);
         
         keyInfo = sig.getKeyInfo();
-        keyInfoUri = "KeyId-" + keyInfo.hashCode();
+        keyInfoUri = wssConfig.getIdAllocator().createSecureId("KeyId-", keyInfo);
         keyInfo.setId(keyInfoUri);
         
         secRef = new SecurityTokenReference(doc);
-        strUri = "STRId-" + secRef.hashCode();
+        strUri = wssConfig.getIdAllocator().createSecureId("STRId-", secRef);
         secRef.setID(strUri);
         
         Reference refUt = new Reference(document);

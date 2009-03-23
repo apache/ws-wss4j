@@ -195,7 +195,7 @@ public abstract class WSSecDerivedKeyBase extends WSSecBase {
         
         // Add the DKTs
         dkt = new DerivedKeyToken(this.wscVersion, document);
-        dktId = "derivedKeyId-" + dkt.hashCode();
+        dktId = wssConfig.getIdAllocator().createId("derivedKeyId-", dkt);
         
         dkt.setOffset(offset);
         dkt.setLength(length);

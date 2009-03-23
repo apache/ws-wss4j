@@ -314,7 +314,7 @@ public class WSSecSignature extends WSSecBase {
                     new Object[] { user, "signature" }
                 );
             }
-            certUri = "CertId-" + certs[0].hashCode();
+            certUri = wssConfig.getIdAllocator().createSecureId("CertId-", certs[0]);  
             //
             // If no signature algorithm was set try to detect it according to the
             // data stored in the certificate.
@@ -371,17 +371,16 @@ public class WSSecSignature extends WSSecBase {
         }
 
         sig.addResourceResolver(EnvelopeIdResolver.getInstance());
-        String sigUri = "Signature-" + sig.hashCode();
-        sig.setId(sigUri);
+        sig.setId(wssConfig.getIdAllocator().createId("Signature-", sig));
 
         keyInfo = sig.getKeyInfo();
-        keyInfoUri = "KeyId-" + keyInfo.hashCode();
+        keyInfoUri = wssConfig.getIdAllocator().createSecureId("KeyId-", keyInfo);
         keyInfo.setId(keyInfoUri);
 
         secRef = new SecurityTokenReference(doc);
-        strUri = "STRId-" + secRef.hashCode();
+        strUri = wssConfig.getIdAllocator().createSecureId("STRId-", secRef);
         secRef.setID(strUri);
-
+        
         //
         // Prepare and setup the token references for this Signature
         //

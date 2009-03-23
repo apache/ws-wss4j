@@ -261,7 +261,7 @@ public class WSSignEnvelope extends WSBaseMessage {
                     new Object[] { user, "signature" }
                 );
             }
-            certUri = "CertId-" + certs[0].hashCode();
+            certUri = wssConfig.getIdAllocator().createSecureId("CertId-", certs[0]);  
             if (sigAlgo == null) {
                 String pubKeyAlgo = certs[0].getPublicKey().getAlgorithm();
                 log.debug("automatic sig algo detection: " + pubKeyAlgo);
@@ -326,12 +326,12 @@ public class WSSignEnvelope extends WSBaseMessage {
          */
 
         KeyInfo info = sig.getKeyInfo();
-        String keyInfoUri = "KeyId-" + info.hashCode();
+        String keyInfoUri = wssConfig.getIdAllocator().createSecureId("KeyId-", info);
         info.setId(keyInfoUri);
 
         SecurityTokenReference secRef = new SecurityTokenReference(doc);
-        String strUri = "STRId-" + secRef.hashCode();
-        secRef.setID(strUri);
+        String secRefId = wssConfig.getIdAllocator().createSecureId("STRId-", info); 
+        secRef.setID(secRefId);
 
         if (tlog.isDebugEnabled()) {
             t1 = System.currentTimeMillis();
@@ -415,7 +415,7 @@ public class WSSignEnvelope extends WSBaseMessage {
                     transforms = new Transforms(doc);
                     transforms.addTransform(
                             STRTransform.implementedTransformURI, ctx);
-                    sig.addDocument("#" + strUri, transforms);
+                    sig.addDocument("#" + secRefId, transforms);
                 } else if (elemName.equals("Assertion")) { // Assertion
 
                     String id = null;
@@ -521,7 +521,7 @@ public class WSSignEnvelope extends WSBaseMessage {
             refUt.setValueType(WSConstants.USERNAMETOKEN_NS + "#UsernameToken");
             String utId = usernameToken.getId();
             if (utId == null) {
-                utId = "usernameTokenId-" + usernameToken.hashCode();
+                utId = wssConfig.getIdAllocator().createId("usernameTokenId-", usernameToken);
                 usernameToken.setId(utId);
             }
             refUt.setURI("#" + utId);
