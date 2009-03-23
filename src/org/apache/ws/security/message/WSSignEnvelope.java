@@ -240,7 +240,7 @@ public class WSSignEnvelope extends WSBaseMessage {
          * Gather some info about the document to process and store it for
          * retrieval
          */
-        WSDocInfo wsDocInfo = new WSDocInfo(doc.hashCode());
+        WSDocInfo wsDocInfo = new WSDocInfo(doc);
         wsDocInfo.setCrypto(crypto);
 
         Element envelope = doc.getDocumentElement();
@@ -542,7 +542,7 @@ public class WSSignEnvelope extends WSBaseMessage {
         }
         info.addUnknownElement(secRef.getElement());
 
-        WSDocInfoStore.store(wsDocInfo);
+        boolean remove = WSDocInfoStore.store(wsDocInfo);
         try {
             if (keyIdentifierType == WSConstants.UT_SIGNING) {
                 sig.sign(sig.createSecretKey(secretKey));
@@ -557,7 +557,9 @@ public class WSSignEnvelope extends WSBaseMessage {
             throw new WSSecurityException(WSSecurityException.FAILED_SIGNATURE,
                     null, null, e1);
         } finally {
-            WSDocInfoStore.delete(wsDocInfo);
+            if (remove) {
+                WSDocInfoStore.delete(wsDocInfo);
+            }
         }
         if (tlog.isDebugEnabled()) {
             t4 = System.currentTimeMillis();

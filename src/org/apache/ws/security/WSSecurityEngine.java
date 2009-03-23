@@ -298,7 +298,7 @@ public class WSSecurityEngine {
          * it for retrieval. Store the implementation of signature crypto
          * (no need for encryption --- yet)
          */
-        WSDocInfo wsDocInfo = new WSDocInfo(securityHeader.getOwnerDocument().hashCode());
+        WSDocInfo wsDocInfo = new WSDocInfo(securityHeader.getOwnerDocument());
         wsDocInfo.setCrypto(sigCrypto);
 
         NodeList list = securityHeader.getChildNodes();

@@ -289,7 +289,7 @@ public class WSSecSignature extends WSSecBase {
         //
         crypto = cr;
         document = doc;
-        wsDocInfo = new WSDocInfo(doc.hashCode());
+        wsDocInfo = new WSDocInfo(doc);
         wsDocInfo.setCrypto(cr);
 
         //
@@ -691,7 +691,7 @@ public class WSSecSignature extends WSSecBase {
      * @throws WSSecurityException
      */
     public void computeSignature() throws WSSecurityException {
-        WSDocInfoStore.store(wsDocInfo);
+        boolean remove = WSDocInfoStore.store(wsDocInfo);
         try {
             if (keyIdentifierType == WSConstants.UT_SIGNING ||
                     keyIdentifierType == WSConstants.CUSTOM_SYMM_SIGNING ||
@@ -716,7 +716,9 @@ public class WSSecSignature extends WSSecBase {
                 WSSecurityException.FAILED_SIGNATURE, null, null, e1
             );
         } finally {
-            WSDocInfoStore.delete(wsDocInfo);
+            if (remove) {
+                WSDocInfoStore.delete(wsDocInfo);
+            }
         }
 
     }

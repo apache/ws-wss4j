@@ -233,7 +233,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
          * Gather some info about the document to process and store it for
          * retrieval
          */
-        wsDocInfo = new WSDocInfo(doc.hashCode());
+        wsDocInfo = new WSDocInfo(doc);
 
         X509Certificate[] certs = null;
 
@@ -594,7 +594,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
      */
     public void computeSignature() throws WSSecurityException {
 
-        WSDocInfoStore.store(wsDocInfo);
+        boolean remove = WSDocInfoStore.store(wsDocInfo);
 
         try {
             if (senderVouches) {
@@ -612,7 +612,9 @@ public class WSSecSignatureSAML extends WSSecSignature {
             throw new WSSecurityException(WSSecurityException.FAILED_SIGNATURE,
                     null, null, e1);
         } finally {
-            WSDocInfoStore.delete(wsDocInfo);
+            if (remove) {
+                WSDocInfoStore.delete(wsDocInfo);
+            }
         }
     }
 }

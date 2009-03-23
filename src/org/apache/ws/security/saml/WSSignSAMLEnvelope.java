@@ -157,7 +157,7 @@ public class WSSignSAMLEnvelope extends WSSignEnvelope {
          * Gather some info about the document to process and store it for
          * retrieval
          */
-        WSDocInfo wsDocInfo = new WSDocInfo(doc.hashCode());
+        WSDocInfo wsDocInfo = new WSDocInfo(doc);
 
         Element envelope = doc.getDocumentElement();
         SOAPConstants soapConstants = WSSecurityUtil.getSOAPConstants(envelope);
@@ -418,7 +418,7 @@ public class WSSignSAMLEnvelope extends WSSignEnvelope {
         wsDocInfo.setAssertion(samlToken);
         WSSecurityUtil.prependChildElement(securityHeader, samlToken);
 
-        WSDocInfoStore.store(wsDocInfo);
+        boolean remove = WSDocInfoStore.store(wsDocInfo);
         try {
             if (senderVouches) {
                 sig
@@ -435,7 +435,9 @@ public class WSSignSAMLEnvelope extends WSSignEnvelope {
             throw new WSSecurityException(WSSecurityException.FAILED_SIGNATURE,
                     null, null, e1);
         } finally {
-            WSDocInfoStore.delete(wsDocInfo);
+            if (remove) {
+                WSDocInfoStore.delete(wsDocInfo);
+            }
         }
         if (tlog.isDebugEnabled()) {
             t4 = System.currentTimeMillis();

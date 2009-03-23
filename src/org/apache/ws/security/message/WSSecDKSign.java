@@ -112,7 +112,7 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
     public void prepare(Document doc, WSSecHeader secHeader)
         throws WSSecurityException, ConversationException {
         super.prepare(doc);
-        wsDocInfo = new WSDocInfo(doc.hashCode());
+        wsDocInfo = new WSDocInfo(doc);
         
         //
         // Get and initialize a XMLSignature element.
@@ -411,7 +411,7 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
      * @throws WSSecurityException
      */
     public void computeSignature() throws WSSecurityException {
-        WSDocInfoStore.store(wsDocInfo);
+        boolean remove = WSDocInfoStore.store(wsDocInfo);
         try {
             sig.sign(sig.createSecretKey(derivedKeyBytes));
             signatureValue = sig.getSignatureValue();
@@ -424,7 +424,9 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
                 WSSecurityException.FAILED_SIGNATURE, null, null, e1
             );
         } finally {
-            WSDocInfoStore.delete(wsDocInfo);
+            if (remove) {
+                WSDocInfoStore.delete(wsDocInfo);
+            }
         }
     }
     
