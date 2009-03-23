@@ -55,7 +55,7 @@ import java.util.Vector;
 public class TestWSSecurityKerberosTokenProfile extends TestCase implements CallbackHandler {
     private static final Log LOG = LogFactory.getLog(TestWSSecurityKerberosTokenProfile.class);
     private static final String AP_REQ = 
-        "http://docs.oasis-open.org/wss/oasiswss-kerberos-token-profile-1.1#Kerberosv5_AP_REQ";
+        "http://docs.oasis-open.org/wss/oasis-wss-kerberos-token-profile-1.1#Kerberosv5_AP_REQ";
     private static final String BASE64_NS = 
         WSConstants.SOAPMESSAGE_NS + "#Base64Binary";
     private static final String SOAPMSG = 
