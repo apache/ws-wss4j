@@ -209,7 +209,7 @@ public class TestWSSecurityNew15 extends TestCase implements CallbackHandler {
         String outputString = 
             org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
         if (LOG.isDebugEnabled()) {
-            System.out.println("\n" + outputString + "\n");
+            LOG.debug(outputString);
         }
         assertTrue(outputString.indexOf("LogTestService2") > 0 ? true
                 : false);
