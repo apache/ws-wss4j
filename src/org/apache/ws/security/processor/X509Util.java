@@ -36,20 +36,8 @@ public class X509Util {
     private static Log log = LogFactory.getLog(X509Util.class.getName());
 
     public static boolean isContent(Node encBodyData) {
-        //
-        // Depending on the encrypted data type (Content or Element) the encBodyData either
-        // holds the element whose contents where encrypted, e.g. soapenv:Body, or the
-        // xenc:EncryptedData element (in case of Element encryption). In either case we need
-        // to get the xenc:EncryptedData element. So get it. The findElement method returns
-        // immediately if its already the correct element.
-        // Then we can get the Type attribute.
-        //
-        Element tmpE = 
-            (Element) WSSecurityUtil.findElement(
-                encBodyData, "EncryptedData", WSConstants.ENC_NS
-            );
-        if (tmpE != null) {
-            String typeStr = tmpE.getAttribute("Type");
+        if (encBodyData != null) {
+            String typeStr = ((Element)encBodyData).getAttribute("Type");
             if (typeStr != null) {
                  return typeStr.equals(WSConstants.ENC_NS + "Content");
             }
@@ -59,7 +47,7 @@ public class X509Util {
 
     public static String getEncAlgo(Node encBodyData) throws WSSecurityException {
         Element tmpE = 
-            (Element) WSSecurityUtil.findElement(
+            WSSecurityUtil.getDirectChildElement(
                 encBodyData, "EncryptionMethod", WSConstants.ENC_NS
             );
         String symEncAlgo = null;
@@ -84,7 +72,7 @@ public class X509Util {
     ) throws WSSecurityException {
         String keyName = null;
         Element keyNmElem = 
-            (Element) WSSecurityUtil.getDirectChild(
+            WSSecurityUtil.getDirectChildElement(
                 keyInfoElem, "KeyName", WSConstants.SIG_NS
             );
         if (keyNmElem != null) {

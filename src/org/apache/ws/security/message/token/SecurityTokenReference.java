@@ -123,7 +123,7 @@ public class SecurityTokenReference {
     }
 
     /**
-     * Gets the signing token element, which maybe a <code>BinarySecurityToken
+     * Gets the signing token element, which may be a <code>BinarySecurityToken
      * </code> or a SAML token.
      * 
      * The method gets the URI attribute of the {@link Reference} contained in
@@ -503,7 +503,7 @@ public class SecurityTokenReference {
         String alias = 
             crypto.getAliasForX509Cert(issuerSerial.getIssuerName(), issuerSerial.getSerialNumber());
         if (doDebug) {
-            log.info("X509IssuerSerial alias: " + alias);
+            log.debug("X509IssuerSerial alias: " + alias);
         }
         return alias;
     }

@@ -17,7 +17,6 @@
 
 package org.apache.ws.security.message;
 
-import org.apache.ws.security.SOAPConstants;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.util.WSSecurityUtil;
@@ -113,14 +112,7 @@ public class WSSecBase {
      * @throws Exception
      */
     protected String setBodyID(Document doc) throws Exception {
-        SOAPConstants soapConstants = 
-            WSSecurityUtil.getSOAPConstants(doc.getDocumentElement());
-        Element bodyElement = 
-            (Element) WSSecurityUtil.getDirectChild(
-                doc.getFirstChild(), 
-                soapConstants.getBodyQName().getLocalPart(),
-                soapConstants.getEnvelopeURI()
-            );
+        Element bodyElement = WSSecurityUtil.findBodyElement(doc);
         if (bodyElement == null) {
             throw new Exception("SOAP Body Element node not found");
         }

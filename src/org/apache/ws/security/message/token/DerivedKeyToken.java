@@ -111,7 +111,7 @@ public class DerivedKeyToken {
             );
         }
         this.elementSecurityTokenReference = 
-            (Element) WSSecurityUtil.getDirectChild(
+            WSSecurityUtil.getDirectChildElement(
                 this.element,
                 ConversationConstants.SECURITY_TOKEN_REFERENCE_LN,
                 WSConstants.WSSE_NS
@@ -120,27 +120,27 @@ public class DerivedKeyToken {
         this.ns = el.getNamespaceURI();
         
         this.elementProperties = 
-            (Element) WSSecurityUtil.getDirectChild(
+            WSSecurityUtil.getDirectChildElement(
                 this.element, ConversationConstants.PROPERTIES_LN, this.ns
             );
         this.elementGeneration = 
-            (Element) WSSecurityUtil.getDirectChild(
+            WSSecurityUtil.getDirectChildElement(
                 this.element, ConversationConstants.GENERATION_LN, this.ns
             );
         this.elementOffset = 
-            (Element) WSSecurityUtil.getDirectChild(
+            WSSecurityUtil.getDirectChildElement(
                 this.element, ConversationConstants.OFFSET_LN, this.ns
             );
         this.elementLength = 
-            (Element) WSSecurityUtil.getDirectChild(
+            WSSecurityUtil.getDirectChildElement(
                 this.element, ConversationConstants.LENGTH_LN, this.ns
             );
         this.elementLabel = 
-            (Element) WSSecurityUtil.getDirectChild(
+            WSSecurityUtil.getDirectChildElement(
                 this.element, ConversationConstants.LABEL_LN, this.ns
             );
         this.elementNonce = 
-            (Element) WSSecurityUtil.getDirectChild(
+            WSSecurityUtil.getDirectChildElement(
                 this.element, ConversationConstants.NONCE_LN, this.ns
             );
     }

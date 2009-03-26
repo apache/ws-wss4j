@@ -19,7 +19,6 @@ package org.apache.ws.security.message;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.ws.security.SOAPConstants;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDocInfo;
 import org.apache.ws.security.WSDocInfoStore;
@@ -85,14 +84,13 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
         throws WSSecurityException, ConversationException {
         
         this.prepare(doc, secHeader);
-        SOAPConstants soapConstants = WSSecurityUtil.getSOAPConstants(doc.getDocumentElement());
-
+        String soapNamespace = WSSecurityUtil.getSOAPNamespace(doc.getDocumentElement());
         if (parts == null) {
             parts = new Vector();
             WSEncryptionPart encP = 
                 new WSEncryptionPart(
-                    soapConstants.getBodyQName().getLocalPart(), 
-                    soapConstants.getEnvelopeURI(), 
+                    WSConstants.ELEM_BODY,
+                    soapNamespace, 
                     "Content"
                 );
             parts.add(encP);

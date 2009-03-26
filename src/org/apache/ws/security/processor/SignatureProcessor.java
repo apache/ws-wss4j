@@ -53,7 +53,6 @@ import org.apache.xml.security.signature.XMLSignature;
 import org.apache.xml.security.signature.XMLSignatureException;
 import org.opensaml.SAMLAssertion;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
@@ -219,18 +218,18 @@ public class SignatureProcessor implements Processor {
                 throw new WSSecurityException(ex.getMessage(), ex);
             }
         } else if (info != null) {
-            Node node = 
-                WSSecurityUtil.getDirectChild(
+            Element strElement = 
+                WSSecurityUtil.getDirectChildElement(
                     info.getElement(),
                     SecurityTokenReference.SECURITY_TOKEN_REFERENCE,
                     WSConstants.WSSE_NS
                 );
-            if (node == null) {
+            if (strElement == null) {
                 throw new WSSecurityException(
                     WSSecurityException.INVALID_SECURITY, "unsupportedKeyInfo"
                 );
             }
-            SecurityTokenReference secRef = new SecurityTokenReference((Element) node);
+            SecurityTokenReference secRef = new SecurityTokenReference(strElement);
             // Here we get some information about the document that is being
             // processed, in particular the crypto implementation, and already
             // detected BST that may be used later during dereferencing.
@@ -357,7 +356,7 @@ public class SignatureProcessor implements Processor {
                 throw new WSSecurityException(
                     WSSecurityException.INVALID_SECURITY,
                     "unsupportedKeyInfo", 
-                    new Object[]{node.toString()}
+                    new Object[]{strElement.toString()}
                 );
             }
         } else {

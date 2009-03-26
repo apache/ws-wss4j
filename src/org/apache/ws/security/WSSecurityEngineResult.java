@@ -25,7 +25,6 @@ import org.apache.ws.security.message.token.Timestamp;
 
 import java.security.Principal;
 import java.security.cert.X509Certificate;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -214,6 +213,7 @@ public class WSSecurityEngineResult extends java.util.HashMap {
         this(act, princ, certificate, elements, sv);
         put(TAG_DATA_REF_URIS, dataRefs);
     }
+    
     public WSSecurityEngineResult(
         int act, 
         byte[] decryptedKey, 
@@ -228,12 +228,12 @@ public class WSSecurityEngineResult extends java.util.HashMap {
         put(TAG_DATA_REF_URIS, dataRefUris);
     }
     public WSSecurityEngineResult(
-                                  int act, 
-                                  byte[] decryptedKey, 
-                                  byte[] encryptedKeyBytes,
-                                  String encyptedKeyId, 
-                                  List dataRefUris,
-                                  X509Certificate cert
+        int act, 
+        byte[] decryptedKey, 
+        byte[] encryptedKeyBytes,
+        String encyptedKeyId, 
+        List dataRefUris,
+        X509Certificate cert
     ) {
         put(TAG_ACTION, new Integer(act));
         put(TAG_DECRYPTED_KEY, decryptedKey);
@@ -243,7 +243,7 @@ public class WSSecurityEngineResult extends java.util.HashMap {
         put(TAG_X509_CERTIFICATE, cert);
     }
     
-    public WSSecurityEngineResult(int act, ArrayList dataRefUris) {
+    public WSSecurityEngineResult(int act, List dataRefUris) {
         put(TAG_ACTION, new Integer(act));
         put(TAG_DATA_REF_URIS, dataRefUris);
     }
@@ -387,8 +387,8 @@ public class WSSecurityEngineResult extends java.util.HashMap {
      * @deprecated      use
      *                  #get(#TAG_DATA_REF_URIS) instead
      */
-    public ArrayList getDataRefUris() {
-        return (ArrayList) get(TAG_DATA_REF_URIS);
+    public List getDataRefUris() {
+        return (List) get(TAG_DATA_REF_URIS);
     }
     
 }

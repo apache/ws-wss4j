@@ -136,7 +136,7 @@ public class SecurityContextToken {
         }
 
         this.elementIdentifier = 
-            (Element) WSSecurityUtil.getDirectChild(
+            WSSecurityUtil.getDirectChildElement(
                 element, 
                 ConversationConstants.IDENTIFIER_LN,
                 el.getNamespaceURI()

@@ -140,7 +140,7 @@ public class STRTransform extends TransformSpi {
                         0
                     );
                 Element canonElem = 
-                    (Element) WSSecurityUtil.getDirectChild(
+                    WSSecurityUtil.getDirectChildElement(
                         tmpE, "CanonicalizationMethod", WSConstants.SIG_NS
                     );
                 canonAlgo = canonElem.getAttribute("Algorithm");

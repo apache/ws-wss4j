@@ -191,7 +191,7 @@ public class WSBaseMessage {
     protected String setBodyID(Document doc) throws Exception {
         SOAPConstants soapConstants = WSSecurityUtil.getSOAPConstants(doc
                 .getDocumentElement());
-        Element bodyElement = (Element) WSSecurityUtil.getDirectChild(doc
+        Element bodyElement = WSSecurityUtil.getDirectChildElement(doc
                 .getFirstChild(), soapConstants.getBodyQName().getLocalPart(),
                 soapConstants.getEnvelopeURI());
         if (bodyElement == null) {

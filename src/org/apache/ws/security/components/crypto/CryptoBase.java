@@ -189,11 +189,7 @@ public abstract class CryptoBase implements Crypto {
      * @throws Exception
      */
     public PrivateKey getPrivateKey(String alias, String password) throws Exception {
-        if (alias == null) {
-            throw new Exception("alias is null");
-        }
-        boolean b = keystore.isKeyEntry(alias);
-        if (!b) {
+        if (alias == null || !keystore.isKeyEntry(alias)) {
             log.error("Cannot find key for alias: " + alias);
             throw new Exception("Cannot find key for alias: " + alias);
         }

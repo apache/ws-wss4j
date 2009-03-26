@@ -17,7 +17,6 @@
 
 package org.apache.ws.security.message;
 
-import org.apache.ws.security.SOAPConstants;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSEncryptionPart;
 import org.apache.ws.security.WSSecurityException;
@@ -60,13 +59,13 @@ public class WSSecDKEncrypt extends WSSecDerivedKeyBase {
         //
         prependDKElementToHeader(secHeader);
                 
-        SOAPConstants soapConstants = WSSecurityUtil.getSOAPConstants(envelope);
+        String soapNamespace = WSSecurityUtil.getSOAPNamespace(envelope);
         if (parts == null) {
             parts = new Vector();
             WSEncryptionPart encP = 
                 new WSEncryptionPart(
-                    soapConstants.getBodyQName().getLocalPart(), 
-                    soapConstants.getEnvelopeURI(), 
+                    WSConstants.ELEM_BODY, 
+                    soapNamespace, 
                     "Content"
                 );
             parts.add(encP);

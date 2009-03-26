@@ -74,12 +74,13 @@ public class WSSecurityUtil {
      * 
      * @param doc
      * @param actor
+     * @deprecated use WSSecurityUtil.getSecurityHeader(Document, String) instead
      * @return the <code>wsse:Security</code> element or <code>null</code>
      *         if not such element found
      */
     public static Element getSecurityHeader(Document doc, String actor, SOAPConstants sc) {
         Element soapHeaderElement = 
-            (Element) getDirectChild(
+            getDirectChildElement(
                 doc.getDocumentElement(), 
                 sc.getHeaderQName().getLocalPart(), 
                 sc.getEnvelopeURI()
@@ -107,6 +108,50 @@ public class WSSecurityUtil {
         }
         return null;
     }
+    
+    /**
+     * Returns the first WS-Security header element for a given actor. Only one
+     * WS-Security header is allowed for an actor.
+     * 
+     * @param doc
+     * @param actor
+     * @return the <code>wsse:Security</code> element or <code>null</code>
+     *         if not such element found
+     */
+    public static Element getSecurityHeader(Document doc, String actor) {
+        String soapNamespace = WSSecurityUtil.getSOAPNamespace(doc.getDocumentElement());
+        Element soapHeaderElement = 
+            getDirectChildElement(
+                doc.getDocumentElement(), 
+                WSConstants.ELEM_HEADER, 
+                soapNamespace
+            );
+        if (soapHeaderElement == null) { // no SOAP header at all
+            return null;
+        }
+        
+        String actorLocal = WSConstants.ATTR_ACTOR;
+        if (WSConstants.URI_SOAP12_ENV.equals(soapNamespace)) {
+            actorLocal = WSConstants.ATTR_ROLE;
+        }
+
+        // get all wsse:Security nodes
+        NodeList list = 
+            soapHeaderElement.getElementsByTagNameNS(WSConstants.WSSE_NS, WSConstants.WSSE_LN);
+        if (list == null) {
+            return null;
+        }
+        for (int i = 0; i < list.getLength(); i++) {
+            Element elem = (Element) list.item(i);
+            Attr attr = elem.getAttributeNodeNS(soapNamespace, actorLocal);
+            String hActor = (attr != null) ? attr.getValue() : null;
+            if (WSSecurityUtil.isActorEqual(actor, hActor)) {
+                return elem;
+            }
+        }
+        return null;
+    }
+
 
     /**
      * Compares two actor strings and returns true if these are equal. Takes
@@ -117,7 +162,6 @@ public class WSSecurityUtil {
      * @return true is the actor arguments are equal
      */
     public static boolean isActorEqual(String actor, String hActor) {
-        
         if (((hActor == null) || (hActor.length() == 0)) 
             && ((actor == null) || (actor.length() == 0))) {
             return true;
@@ -136,6 +180,7 @@ public class WSSecurityUtil {
      * @param fNode the node where to start the search
      * @param localName local name of the child to get
      * @param namespace the namespace of the child to get
+     * @deprecated see WSSecurityUtil#getDirectChildElement instead
      * @return the node or <code>null</code> if not such node found
      */
     public static Node getDirectChild(
@@ -155,7 +200,54 @@ public class WSSecurityUtil {
         }
         return null;
     }
+    
+    /**
+     * Gets a direct child with specified localname and namespace. <p/>
+     * 
+     * @param fNode the node where to start the search
+     * @param localName local name of the child to get
+     * @param namespace the namespace of the child to get
+     * @return the node or <code>null</code> if not such node found
+     */
+    public static Element getDirectChildElement(
+        Node fNode, 
+        String localName,
+        String namespace
+    ) {
+        for (
+            Node currentChild = fNode.getFirstChild(); 
+            currentChild != null; 
+            currentChild = currentChild.getNextSibling()
+        ) {
+            if (Node.ELEMENT_NODE == currentChild.getNodeType()
+                && localName.equals(currentChild.getLocalName())
+                && namespace.equals(currentChild.getNamespaceURI())) {
+                return (Element)currentChild;
+            }
+        }
+        return null;
+    }
+    
 
+    /**
+     * return the first soap "Body" element. <p/>
+     * 
+     * @deprecated use findBodyElement(Document) instead
+     * @param doc
+     * @return the body element or <code>null</code> if document does not
+     *         contain a SOAP body
+     */
+    public static Element findBodyElement(Document doc, SOAPConstants sc) {
+        Element soapBodyElement = 
+            WSSecurityUtil.getDirectChildElement(
+                doc.getFirstChild(), 
+                sc.getBodyQName().getLocalPart(), 
+                sc.getEnvelopeURI()
+            );
+        return soapBodyElement;
+    }
+    
+    
     /**
      * return the first soap "Body" element. <p/>
      * 
@@ -163,14 +255,29 @@ public class WSSecurityUtil {
      * @return the body element or <code>null</code> if document does not
      *         contain a SOAP body
      */
-    public static Element findBodyElement(Document doc, SOAPConstants sc) {
-        Element soapBodyElement = 
-            (Element) WSSecurityUtil.getDirectChild(
-                doc.getFirstChild(), 
-                sc.getBodyQName().getLocalPart(), 
-                sc.getEnvelopeURI()
-            );
-        return soapBodyElement;
+    public static Element findBodyElement(Document doc) {
+        //
+        // Find the SOAP Envelope NS. Default to SOAP11 NS
+        //
+        Element docElement = doc.getDocumentElement();
+        String ns = docElement.getNamespaceURI();
+        String bodyNamespace = WSConstants.URI_SOAP11_ENV;
+        if (WSConstants.URI_SOAP12_ENV.equals(ns)) {
+            bodyNamespace = ns;
+        }
+        
+        for (
+            Node currentChild = docElement.getFirstChild(); 
+            currentChild != null; 
+            currentChild = currentChild.getNextSibling()
+        ) {
+            if (Node.ELEMENT_NODE == currentChild.getNodeType()
+                && WSConstants.ELEM_BODY.equals(currentChild.getLocalName())
+                && bodyNamespace.equals(currentChild.getNamespaceURI())) {
+                return (Element)currentChild;
+            }
+        }
+        return null;
     }
 
     /**
@@ -440,10 +547,13 @@ public class WSSecurityUtil {
      */
     public static String getIDFromReference(String ref) {
         String id = ref.trim();
-        if ((id.length() == 0) || (id.charAt(0) != '#')) {
+        if (id.length() == 0) {
             return null;
         }
-        return id.substring(1);
+        if (id.charAt(0) == '#') {
+            id = id.substring(1);
+        }
+        return id;
     }
     
     /**
@@ -470,10 +580,12 @@ public class WSSecurityUtil {
             return null;
         }
         id = id.trim();
-        if ((id.length() == 0) || (id.charAt(0) != '#')) {
+        if (id.length() == 0) {
             return null;
         }
-        id = id.substring(1);
+        if (id.charAt(0) == '#') {
+            id = id.substring(1);
+        }
         return WSSecurityUtil.findElementById(doc.getDocumentElement(), id, null);
     }
 
@@ -495,29 +607,6 @@ public class WSSecurityUtil {
         return parent.getOwnerDocument().createElementNS(nsUri, qName);
     }
 
-    /**
-     * find a child element with given namespace and local name <p/>
-     * 
-     * @param parent the node to start the search
-     * @param namespaceUri of the element
-     * @param localName of the element
-     * @return the found element or null if the element does not exist
-     */
-    private static Element findChildElement(Element parent, String namespaceUri, String localName) {
-        NodeList children = parent.getChildNodes();
-        int len = children.getLength();
-        for (int i = 0; i < len; i++) {
-            Node child = children.item(i);
-            if (child.getNodeType() == Node.ELEMENT_NODE) {
-                Element elementChild = (Element) child;
-                if (namespaceUri.equals(elementChild.getNamespaceURI())
-                    && localName.equals(elementChild.getLocalName())) {
-                    return elementChild;
-                }
-            }
-        }
-        return null;
-    }
 
     /**
      * append a child element <p/>
@@ -620,16 +709,15 @@ public class WSSecurityUtil {
         String actor, 
         boolean doCreate
     ) {
-        SOAPConstants sc = getSOAPConstants(envelope);
-        Element wsseSecurity = getSecurityHeader(doc, actor, sc);
+        Element wsseSecurity = getSecurityHeader(doc, actor);
         if (wsseSecurity != null) {
             return wsseSecurity;
         }
+        String soapNamespace = WSSecurityUtil.getSOAPNamespace(doc.getDocumentElement());
         Element header = 
-            findChildElement(envelope, sc.getEnvelopeURI(), sc.getHeaderQName().getLocalPart());
+            getDirectChildElement(envelope, WSConstants.ELEM_HEADER, soapNamespace);
         if (header == null && doCreate) {
-            header = 
-                createElementInSameNamespace(envelope, sc.getHeaderQName().getLocalPart());
+            header = createElementInSameNamespace(envelope, WSConstants.ELEM_HEADER);
             header = prependChildElement(envelope, header);
         }
         if (doCreate) {
@@ -666,14 +754,23 @@ public class WSSecurityUtil {
         }
         return new SOAP11Constants();
     }
+    
+    public static String getSOAPNamespace(Element startElement) {
+        Document doc = startElement.getOwnerDocument();
+        String ns = doc.getDocumentElement().getNamespaceURI();
+        if (WSConstants.URI_SOAP12_ENV.equals(ns)) {
+            return ns;
+        }
+        return WSConstants.URI_SOAP11_ENV;
+    }
 
     public static Cipher getCipherInstance(String cipherAlgo)
         throws WSSecurityException {
         Cipher cipher = null;
         try {
-            if (cipherAlgo.equalsIgnoreCase(WSConstants.KEYTRANSPORT_RSA15)) {
+            if (WSConstants.KEYTRANSPORT_RSA15.equalsIgnoreCase(cipherAlgo)) {
                 cipher = Cipher.getInstance("RSA/NONE/PKCS1PADDING");
-            } else if (cipherAlgo.equalsIgnoreCase(WSConstants.KEYTRANSPORT_RSAOEP)) {
+            } else if (WSConstants.KEYTRANSPORT_RSAOEP.equalsIgnoreCase(cipherAlgo)) {
                 cipher = Cipher.getInstance("RSA/NONE/OAEPPADDING");
             } else {
                 throw new WSSecurityException(
@@ -1005,4 +1102,76 @@ public class WSSecurityUtil {
         }
         return random;
     }
+    
+    /**
+     * @return  a list of child Nodes
+     */
+    public static java.util.List
+    listChildren(
+        final Node parent
+    ) {
+        if (parent == null) {
+            return java.util.Collections.EMPTY_LIST;
+        }
+        final java.util.List ret = new java.util.ArrayList();
+        if (parent.hasChildNodes()) {
+            final NodeList children = parent.getChildNodes();
+            if (children != null) {
+                for (int i = 0, n = children.getLength();  i < n;  ++i) {
+                    ret.add(children.item(i));
+                }
+            }
+        }
+        return ret;
+    }
+    
+    /**
+     * @return a list of Nodes in b that are not in a 
+     */
+    public static java.util.List
+    newNodes(
+        final java.util.List a,
+        final java.util.List b
+    ) {
+        if (a.size() == 0) {
+            return b;
+        }
+        if (b.size() == 0) {
+            return java.util.Collections.EMPTY_LIST;
+        }
+        final java.util.List ret = new java.util.ArrayList();
+        for (
+            final java.util.Iterator bpos = b.iterator();
+            bpos.hasNext();
+        ) {
+            final Node bnode = (Node) bpos.next();
+            final java.lang.String bns = bnode.getNamespaceURI();
+            final java.lang.String bln = bnode.getLocalName();
+            boolean found = false;
+            for (
+                final java.util.Iterator apos = a.iterator();
+                apos.hasNext() && !found;
+            ) {
+                final Node anode = (Node) apos.next();
+                final java.lang.String ans = anode.getNamespaceURI();
+                final java.lang.String aln = anode.getLocalName();
+                final boolean nsmatch =
+                    ans == null
+                    ? ((bns == null) ? true : false)
+                    : ((bns == null) ? false : ans.equals(bns));
+                final boolean lnmatch =
+                    aln == null
+                    ? ((bln == null) ? true : false)
+                    : ((bln == null) ? false : aln.equals(bln));
+                if (nsmatch && lnmatch) {
+                    found = true;
+                }
+            }
+            if (!found) {
+                ret.add(bnode);
+            }
+        }
+        return ret;
+    }
+    
 }

@@ -69,10 +69,8 @@ public class SignatureConfirmationAction implements Action {
                         + signatureActions.size());
             }
             for (int i = 0; i < signatureActions.size(); i++) {
-                WSSecurityEngineResult wsr = (WSSecurityEngineResult) signatureActions
-                        .get(i);
-                byte[] sigVal = (byte[]) wsr
-                        .get(WSSecurityEngineResult.TAG_SIGNATURE_VALUE);
+                WSSecurityEngineResult wsr = (WSSecurityEngineResult) signatureActions.get(i);
+                byte[] sigVal = (byte[]) wsr.get(WSSecurityEngineResult.TAG_SIGNATURE_VALUE);
                 wsc.build(doc, sigVal, reqData.getSecHeader());
                 signatureParts.add(new WSEncryptionPart(wsc.getId()));
             }
@@ -80,7 +78,8 @@ public class SignatureConfirmationAction implements Action {
             wsc.build(doc, null, reqData.getSecHeader());
             signatureParts.add(new WSEncryptionPart(wsc.getId()));
         }
-        handler.setProperty(reqData.getMsgContext(), WSHandlerConstants.SIG_CONF_DONE,
-                WSHandler.DONE);
+        handler.setProperty(
+            reqData.getMsgContext(), WSHandlerConstants.SIG_CONF_DONE, WSHandler.DONE
+        );
     }
 }

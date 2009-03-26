@@ -75,7 +75,10 @@ public class WSDocInfo {
      * @return the BST element or null if nothing found
      */
     public Element getBst(String uri) {
-        String id = uri.substring(1);
+        String id = uri;
+        if (id.charAt(0) == '#') {
+            id = id.substring(1);
+        }
         Element elem = null;
 
         if (bst != null) {
@@ -97,12 +100,11 @@ public class WSDocInfo {
      * @return the Security processor identified with this Id or null if nothing found
      */
     public Processor getProcessor(String id) {
-        
         if (id == null) {
-                return null;
-            }
+            return null;
+        }
 
-            Processor p = null;
+        Processor p = null;
         if (processors != null) {
             for (Enumeration e = processors.elements(); e.hasMoreElements();) {
                 p = (Processor) e.nextElement();

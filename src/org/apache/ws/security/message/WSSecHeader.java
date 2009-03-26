@@ -17,7 +17,6 @@
 
 package org.apache.ws.security.message;
 
-import org.apache.ws.security.SOAPConstants;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.w3c.dom.Document;
@@ -137,31 +136,37 @@ public class WSSecHeader {
         if (securityHeader != null) {
             return securityHeader;
         }
-        SOAPConstants soapConstants = 
-            WSSecurityUtil.getSOAPConstants(doc.getDocumentElement());
-
         securityHeader = 
             WSSecurityUtil.findWsseSecurityHeaderBlock(
                 doc, doc.getDocumentElement(), actor, true
             );
 
+        String soapNamespace = WSSecurityUtil.getSOAPNamespace(doc.getDocumentElement());
         String soapPrefix = 
             WSSecurityUtil.setNamespace(
-                securityHeader, soapConstants.getEnvelopeURI(), WSConstants.DEFAULT_SOAP_PREFIX
+                securityHeader, soapNamespace, WSConstants.DEFAULT_SOAP_PREFIX
             );
         
         if (actor != null && actor.length() > 0) {
+            String actorLocal = WSConstants.ATTR_ACTOR;
+            if (WSConstants.URI_SOAP12_ENV.equals(soapNamespace)) {
+                actorLocal = WSConstants.ATTR_ROLE;
+            }
             securityHeader.setAttributeNS(
-                soapConstants.getEnvelopeURI(),
-                soapPrefix + ":" + soapConstants.getRoleAttributeQName().getLocalPart(), 
+                soapNamespace,
+                soapPrefix + ":" + actorLocal, 
                 actor
             );
         }
         if (mustunderstand) {
+            String mustUnderstandLocal = "1";
+            if (WSConstants.URI_SOAP12_ENV.equals(soapNamespace)) {
+                mustUnderstandLocal = "true";
+            }
             securityHeader.setAttributeNS(
-                soapConstants.getEnvelopeURI(),
+                soapNamespace,
                 soapPrefix + ":" + WSConstants.ATTR_MUST_UNDERSTAND,
-                soapConstants.getMustUnderstand()
+                mustUnderstandLocal
             );
         }
         return securityHeader;

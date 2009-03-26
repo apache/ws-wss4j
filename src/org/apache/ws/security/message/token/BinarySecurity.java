@@ -50,7 +50,7 @@ public class BinarySecurity {
     public BinarySecurity(Element elem) throws WSSecurityException {
         this.element = elem;
         QName el = new QName(this.element.getNamespaceURI(), this.element.getLocalName());
-        if (!el.equals(TOKEN_BST) && !el.equals(TOKEN_KI)) {
+        if (!(el.equals(TOKEN_BST) || el.equals(TOKEN_KI))) {
             throw new WSSecurityException(
                 WSSecurityException.INVALID_SECURITY_TOKEN, 
                 "badTokenType",

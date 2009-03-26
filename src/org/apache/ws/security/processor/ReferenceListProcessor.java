@@ -18,6 +18,7 @@
 package org.apache.ws.security.processor;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
 
 import javax.crypto.SecretKey;
@@ -46,8 +47,6 @@ import org.apache.xml.security.utils.Constants;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 public class ReferenceListProcessor implements Processor {
     private static Log log = 
         LogFactory.getLog(ReferenceListProcessor.class.getName());
@@ -73,7 +72,7 @@ public class ReferenceListProcessor implements Processor {
             throw new WSSecurityException(WSSecurityException.FAILURE, "noCallback");
         }
         wsDocInfo = wdi;
-        ArrayList uris = handleReferenceList(elem, cb, crypto);
+        List uris = handleReferenceList(elem, cb, crypto);
         returnResults.add(
             0,
             new WSSecurityEngineResult(WSConstants.ENCR, uris)
@@ -88,29 +87,25 @@ public class ReferenceListProcessor implements Processor {
      * @param cb the callback handler to get the key for a key name stored if
      *           <code>KeyInfo</code> inside the encrypted data elements
      */
-    private ArrayList handleReferenceList(
+    private List handleReferenceList(
         Element elem, 
         CallbackHandler cb,
         Crypto crypto
     ) throws WSSecurityException {
-        Document doc = elem.getOwnerDocument();
-
-        Node tmpE = null;
-        ArrayList dataRefUris = new ArrayList();
-        for (tmpE = elem.getFirstChild(); 
+        List dataRefUris = new ArrayList();
+        for (Node tmpE = elem.getFirstChild(); 
             tmpE != null; 
             tmpE = tmpE.getNextSibling()
         ) {
-            if (tmpE.getNodeType() != Node.ELEMENT_NODE) {
-                continue;
-            }
-            if (!tmpE.getNamespaceURI().equals(WSConstants.ENC_NS)) {
-                continue;
-            }
-            if (tmpE.getLocalName().equals("DataReference")) {
+            if (Node.ELEMENT_NODE == tmpE.getNodeType()
+                && WSConstants.ENC_NS.equals(tmpE.getNamespaceURI())
+                && "DataReference".equals(tmpE.getLocalName())) {
                 String dataRefURI = ((Element) tmpE).getAttribute("URI");
-                WSDataRef dataRef = new WSDataRef(dataRefURI.substring(1));
-                decryptDataRefEmbedded(doc, dataRefURI, dataRef, cb, crypto);
+                if (dataRefURI.charAt(0) == '#') {
+                    dataRefURI = dataRefURI.substring(1);
+                }
+                WSDataRef dataRef = new WSDataRef(dataRefURI);
+                decryptDataRefEmbedded(elem.getOwnerDocument(), dataRefURI, dataRef, cb, crypto);
                 dataRefUris.add(dataRef);
             }
         }
@@ -133,8 +128,8 @@ public class ReferenceListProcessor implements Processor {
         // Look up the encrypted data. First try wsu:Id="someURI". If no such Id
         // then try the generic lookup to find Id="someURI"
         //
-        Element encBodyData = null;
-        if ((encBodyData = WSSecurityUtil.getElementByWsuId(doc, dataRefURI)) == null) {            
+        Element encBodyData = WSSecurityUtil.getElementByWsuId(doc, dataRefURI);
+        if (encBodyData == null) {            
             encBodyData = WSSecurityUtil.getElementByGenId(doc, dataRefURI);
         }
         if (encBodyData == null) {
@@ -142,7 +137,6 @@ public class ReferenceListProcessor implements Processor {
                 WSSecurityException.INVALID_SECURITY, "dataRef", new Object[] {dataRefURI}
             );
         }
-
         boolean content = X509Util.isContent(encBodyData);
 
         // Now figure out the encryption algorithm
@@ -150,7 +144,7 @@ public class ReferenceListProcessor implements Processor {
 
         Element tmpE = 
             (Element)WSSecurityUtil.findElement(
-                (Node) encBodyData, "KeyInfo", WSConstants.SIG_NS
+                encBodyData, "KeyInfo", WSConstants.SIG_NS
             );
         if (tmpE == null) {
             throw new WSSecurityException(WSSecurityException.INVALID_SECURITY, "noKeyinfo");
@@ -161,7 +155,7 @@ public class ReferenceListProcessor implements Processor {
         // shared key using a KeyName.
         //
         Element secRefToken = 
-            (Element) WSSecurityUtil.getDirectChild(
+            WSSecurityUtil.getDirectChildElement(
                 tmpE, "SecurityTokenReference", WSConstants.WSSE_NS
             );
 
@@ -189,8 +183,8 @@ public class ReferenceListProcessor implements Processor {
         }
             
         try {
-            Node parentEncBody =encBodyData.getParentNode();
-            final java.util.List before_peers = listChildren(parentEncBody);
+            Node parentEncBody = encBodyData.getParentNode();
+            final java.util.List before_peers = WSSecurityUtil.listChildren(parentEncBody);
             
             xmlCipher.doFinal(doc, encBodyData, content);
             
@@ -201,13 +195,16 @@ public class ReferenceListProcessor implements Processor {
                 String sigId = decryptedHeaderClone.getAttributeNS(WSConstants.WSU_NS, "Id");
                 
                 if (sigId == null || sigId.equals("")) {
-                    String id = ((Element)parentEncBody).getAttributeNS(WSConstants.WSU_NS, "Id");                              
+                    String id = ((Element)parentEncBody).getAttributeNS(WSConstants.WSU_NS, "Id");  
+                    if (id.charAt(0) == '#') {
+                        id = id.substring(1);
+                    }
                     String wsuPrefix = 
                         WSSecurityUtil.setNamespace(
                             decryptedHeaderClone, WSConstants.WSU_NS, WSConstants.WSU_PREFIX
                         );
                     decryptedHeaderClone.setAttributeNS(WSConstants.WSU_NS, wsuPrefix + ":Id", id);
-                    dataRef.setWsuId(id.substring(1));
+                    dataRef.setWsuId(id);
                 } else {
                     dataRef.setWsuId(sigId);
                 }
@@ -216,8 +213,8 @@ public class ReferenceListProcessor implements Processor {
                 parentEncBody.getParentNode().removeChild(parentEncBody);
             } 
             
-            final java.util.List after_peers = listChildren(parentEncBody);
-            final java.util.List new_nodes = newNodes(before_peers, after_peers);
+            final List after_peers = WSSecurityUtil.listChildren(parentEncBody);
+            final List new_nodes = WSSecurityUtil.newNodes(before_peers, after_peers);
             for (
                 final java.util.Iterator pos = new_nodes.iterator();
                 pos.hasNext();
@@ -233,7 +230,7 @@ public class ReferenceListProcessor implements Processor {
                         ((Element)node).setAttributeNS(
                             WSConstants.WSU_NS, wsuPrefix + ":Id", dataRefURI
                         );
-                        dataRef.setWsuId(dataRefURI.substring(1));                              
+                        dataRef.setWsuId(dataRefURI);                              
                     }
                     dataRef.setName(new QName(node.getNamespaceURI(),node.getLocalName()));
                 }
@@ -267,7 +264,7 @@ public class ReferenceListProcessor implements Processor {
      * @param secRefToken The element containing the STR
      * @param algorithm A string that identifies the symmetric decryption algorithm
      * @param crypto Crypto instance to obtain key
-     * @param cb CAllback handler to obtain the key passwords
+     * @param cb Callback handler to obtain the key passwords
      * @return The secret key for the specified algorithm
      * @throws WSSecurityException
      */
@@ -294,7 +291,8 @@ public class ReferenceListProcessor implements Processor {
                 || p instanceof SAMLTokenProcessor)
             ) {
                 // Try custom token
-                WSPasswordCallback pwcb = new WSPasswordCallback(id, WSPasswordCallback.CUSTOM_TOKEN);
+                WSPasswordCallback pwcb = 
+                    new WSPasswordCallback(id, WSPasswordCallback.CUSTOM_TOKEN);
                 try {
                     Callback[] callbacks = new Callback[]{pwcb};
                     cb.handle(callbacks);
@@ -356,88 +354,4 @@ public class ReferenceListProcessor implements Processor {
         return WSSecurityUtil.prepareSecretKey(algorithm, decryptedData);
     }
     
-    /**
-     * @return      a list of Nodes, representing the 
-     */
-    private static java.util.List
-    listChildren(
-        final Node parent
-    ) {
-        if (parent == null) {
-            return java.util.Collections.EMPTY_LIST;
-        }
-        final java.util.List ret = new java.util.ArrayList();
-        if (parent.hasChildNodes()) {
-            final NodeList children = parent.getChildNodes();
-            if (children != null) {
-                for (int i = 0, n = children.getLength();  i < n;  ++i) {
-                    ret.add(children.item(i));
-                }
-            }
-        }
-        return ret;
-    }
-
-    /**
-     * @return a list of Nodes in b that are not in a
-     */
-    private static java.util.List
-    newNodes(
-        java.util.List a,
-        java.util.List b
-    ) {
-        if (a.size() == 0) {
-            return b;
-        }
-        if (b.size() == 0) {
-            return java.util.Collections.EMPTY_LIST;
-        }
-        
-        a = new ArrayList(a);
-        //try a fast node compare at same position first.....
-        for (int x = 0; x < b.size(); x++) {
-            final Node bnode = (Node)b.get(x);
-            final Node anode = (Node)a.get(x);
-            if (bnode == anode
-                || bnode.getLocalName().equals(anode.getLocalName())
-                && bnode.getNamespaceURI().equals(anode.getNamespaceURI())) {
-                b.remove(x);
-                a.remove(x);
-            }
-        }
-        //what's left is stuff that didn't exactly position match, do slower searches
-        final java.util.List ret = new java.util.ArrayList();
-        for (
-            final java.util.Iterator bpos = b.iterator();
-            bpos.hasNext();
-        ) {
-            final Node bnode = (Node) bpos.next();
-            final java.lang.String bns = bnode.getNamespaceURI();
-            final java.lang.String bln = bnode.getLocalName();
-            boolean found = false;
-            for (
-                final java.util.Iterator apos = a.iterator();
-                apos.hasNext() && !found;
-            ) {
-                final Node anode = (Node) apos.next();
-                final java.lang.String ans = anode.getNamespaceURI();
-                final java.lang.String aln = anode.getLocalName();
-                final boolean nsmatch =
-                    ans == null
-                    ? ((bns == null) ? true : false)
-                            : ((bns == null) ? false : ans.equals(bns));
-                final boolean lnmatch =
-                    aln == null
-                    ? ((bln == null) ? true : false)
-                            : ((bln == null) ? false : aln.equals(bln));
-                if (nsmatch && lnmatch) {
-                    found = true;
-                }
-            }
-            if (!found) {
-                ret.add(bnode);
-            }
-        }
-        return ret;
-    }
 }

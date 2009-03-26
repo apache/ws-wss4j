@@ -19,7 +19,6 @@ package org.apache.ws.security.action;
 
 import java.util.Vector;
 
-import org.apache.ws.security.SOAPConstants;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSEncryptionPart;
 import org.apache.ws.security.WSSecurityException;
@@ -92,15 +91,11 @@ public class UsernameTokenSignedAction implements Action {
         Vector parts = null;
         if (reqData.getSignatureParts().size() > 0) {
             parts = reqData.getSignatureParts();
-        }
-        else {
-            SOAPConstants soapConstants = WSSecurityUtil.getSOAPConstants(doc
-                    .getDocumentElement());
-            
+        } else {
+            String soapNamespace = WSSecurityUtil.getSOAPNamespace(doc.getDocumentElement());
             parts = new Vector();
-            WSEncryptionPart encP = new WSEncryptionPart(soapConstants
-                    .getBodyQName().getLocalPart(), soapConstants
-                    .getEnvelopeURI(), "Content");
+            WSEncryptionPart encP = 
+                new WSEncryptionPart(WSConstants.ELEM_BODY, soapNamespace, "Content");
             parts.add(encP);
         }
         sign.addReferencesToSign(parts, reqData.getSecHeader());

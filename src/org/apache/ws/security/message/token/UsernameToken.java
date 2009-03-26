@@ -113,27 +113,27 @@ public class UsernameToken {
             );
         }
         elementUsername = 
-            (Element) WSSecurityUtil.getDirectChild(
+            WSSecurityUtil.getDirectChildElement(
                 element, WSConstants.USERNAME_LN, WSConstants.WSSE_NS
             );
         elementPassword = 
-            (Element) WSSecurityUtil.getDirectChild(
+            WSSecurityUtil.getDirectChildElement(
                 element, WSConstants.PASSWORD_LN, WSConstants.WSSE_NS
             );
         elementNonce = 
-            (Element) WSSecurityUtil.getDirectChild(
+            WSSecurityUtil.getDirectChildElement(
                 element, WSConstants.NONCE_LN, WSConstants.WSSE_NS
             );
         elementCreated = 
-            (Element) WSSecurityUtil.getDirectChild(
+            WSSecurityUtil.getDirectChildElement(
                 element, WSConstants.CREATED_LN, WSConstants.WSU_NS
             );
         elementSalt = 
-            (Element) WSSecurityUtil.getDirectChild(
+            WSSecurityUtil.getDirectChildElement(
                 element, WSConstants.SALT_LN, WSConstants.WSSE11_NS
             );
         elementIteration = 
-            (Element) WSSecurityUtil.getDirectChild(
+            WSSecurityUtil.getDirectChildElement(
                 element, WSConstants.ITERATION_LN, WSConstants.WSSE11_NS
             );
         if (elementUsername == null) {

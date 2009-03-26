@@ -86,13 +86,10 @@ public class DerivedKeyTokenProcessor implements Processor {
             this.deriveKey();
             returnResults.add(
                 0, 
-                new WSSecurityEngineResult(WSConstants.DKT, 
-                                           secret,
-                                           keyBytes, 
-                                           id, 
-                                           null)
+                new WSSecurityEngineResult(
+                    WSConstants.DKT, secret, keyBytes, id, null
+                )
             );
-
         }
     }
 
@@ -102,7 +99,8 @@ public class DerivedKeyTokenProcessor implements Processor {
             byte[] labelBytes = null;
             if (label == null || label.length() == 0) {
                 labelBytes = 
-                    (ConversationConstants.DEFAULT_LABEL + ConversationConstants.DEFAULT_LABEL).getBytes("UTF-8");
+                    (ConversationConstants.DEFAULT_LABEL 
+                        + ConversationConstants.DEFAULT_LABEL).getBytes("UTF-8");
             } else {
                 labelBytes = this.label.getBytes("UTF-8");
             }

@@ -223,6 +223,61 @@ public class TestWSSecurityWSS86 extends TestCase implements CallbackHandler {
         
     }
     
+    
+    /**
+     * Test loading a certificate using BouncyCastle, and using it to encrypt a message, but
+     * decrypt the message using the Java Keystore provider. In this case though the cert doesn't
+     * correspond with the cert in wss86.keystore.
+     */
+    public void testBadInterop() throws Exception {
+        byte[] certBytes = 
+            org.apache.ws.security.util.Base64.decode(
+                "MIIDNDCCAp2gAwIBAgIBEDANBgkqhkiG9w0BAQQFADBmMQswCQYDVQQGEwJERTEPMA0GA1UECBMG"
+                + "QmF5ZXJuMQ8wDQYDVQQHEwZNdW5pY2gxDTALBgNVBAoTBEhvbWUxFTATBgNVBAsTDEFwYWNoZSBX"
+                + "U1M0SjEPMA0GA1UEAxMGV2VybmVyMB4XDTA4MDQwNDE5MzIxOFoXDTEwMDQwNDE5MzIxOFowYTEL"
+                + "MAkGA1UEBhMCREUxDzANBgNVBAgTBkJheWVybjEPMA0GA1UEBxMGTXVuaWNoMQ8wDQYDVQQKEwZB"
+                + "cGFjaGUxDjAMBgNVBAsTBVdTUzRKMQ8wDQYDVQQDEwZXZXJuZXIwgZ8wDQYJKoZIhvcNAQEBBQAD"
+                + "gY0AMIGJAoGBAINlL3/k0H/zvknpBtLo8jzXwx/IJU/CGSv6MsqJZ2fyZ6kpLlXCuSBUZ/tfkdxp"
+                + "uzhYq/Sc7A8csIk9gDf9RUbrhK0qKw0VP6DoCIJjS5IeN+NeJkx8YjmzLPmZqLYbNPXr/hy8CRrR"
+                + "6CqLTTSkBwoEJ+cDkfZrdH2/bND0FEIZAgMBAAGjgfYwgfMwCQYDVR0TBAIwADAsBglghkgBhvhC"
+                + "AQ0EHxYdT3BlblNTTCBHZW5lcmF0ZWQgQ2VydGlmaWNhdGUwHQYDVR0OBBYEFFSZXv0I5bG7XPEw"
+                + "jylwG3lmZGdiMIGYBgNVHSMEgZAwgY2AFL/FsHHolGIMacU1TZW/88Bd2EL6oWqkaDBmMQswCQYD"
+                + "VQQGEwJERTEPMA0GA1UECBMGQmF5ZXJuMQ8wDQYDVQQHEwZNdW5pY2gxDTALBgNVBAoTBEhvbWUx"
+                + "FTATBgNVBAsTDEFwYWNoZSBXU1M0SjEPMA0GA1UEAxMGV2VybmVyggkAuBIOAWJ19mwwDQYJKoZI"
+                + "hvcNAQEEBQADgYEAUiUh/wORVcQYXxIh13h3w2Btg6Kj2g6V6YO0Utc/gEYWwT310C2OuroKAwwo"
+                + "HapMIIWiJRclIAiA8Hnb0Sv/puuHYD4G4NWFdiVjRord90eZJe40NMGruRmlqIRIGGKCv+wv3E6U"
+                + "x1cWW862f5H9Eyrcocke2P+3GNAGy83vghA="
+            );
+        CertificateFactory factory = 
+            CertificateFactory.getInstance("X.509", "BC");
+        X509Certificate cert = 
+            (X509Certificate)factory.generateCertificate(
+                new java.io.ByteArrayInputStream(certBytes)
+            );
+
+        SOAPEnvelope unsignedEnvelope = message.getSOAPEnvelope();
+        WSSecEncrypt encrypt = new WSSecEncrypt();
+        encrypt.setUseThisCert(cert);
+        Document doc = unsignedEnvelope.getAsDocument();
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        Document encryptedDoc = encrypt.build(doc, crypto, secHeader);
+        
+        if (LOG.isDebugEnabled()) {
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(encryptedDoc);
+            LOG.debug(outputString);
+        }
+        try {
+            verify(encryptedDoc);
+            fail("Failure expected on encryption with a key that does not exist in the keystore");
+        } catch (Exception ex) {
+            assertTrue(ex.getMessage().indexOf(
+                "The private key for the supplied alias does not exist in the keystore") != -1);
+        }
+        
+    }
+    
     /**
      * Verifies the soap envelope
      * <p/>

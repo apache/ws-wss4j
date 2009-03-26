@@ -50,9 +50,9 @@ public class SAMLTokenProcessor implements Processor {
         if (log.isDebugEnabled()) {
             log.debug("Found SAML Assertion element");
         }
-        SAMLAssertion assertion = handleSAMLToken((Element) elem);
+        SAMLAssertion assertion = handleSAMLToken(elem);
         this.id = assertion.getId();
-        wsDocInfo.setAssertion((Element) elem);
+        wsDocInfo.setAssertion(elem);
         returnResults.add(
             0,
             new WSSecurityEngineResult(WSConstants.ST_UNSIGNED, assertion)

@@ -19,7 +19,6 @@ package org.apache.ws.security.message;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.ws.security.SOAPConstants;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.xml.security.signature.XMLSignatureInput;
@@ -96,14 +95,14 @@ public class EnvelopeIdResolver extends ResourceResolverSpi {
          * First lookup the SOAP Body element (processed by default) and
          * check if it contains an Id and if it matches
          */
-        String id = uriNodeValue.substring(1);
-        SOAPConstants sc = WSSecurityUtil.getSOAPConstants(doc.getDocumentElement());
-        Element selectedElem = WSSecurityUtil.findBodyElement(doc, sc);
+        Element selectedElem = WSSecurityUtil.findBodyElement(doc);
         if (selectedElem == null) {
-            throw new ResourceResolverException("generic.EmptyMessage",
-                    new Object[]{"Body element not found"},
-                    uri,
-                    BaseURI);
+            throw new ResourceResolverException(
+                "generic.EmptyMessage",
+                new Object[]{"Body element not found"},
+                uri,
+                BaseURI
+            );
         }
         String cId = selectedElem.getAttributeNS(WSConstants.WSU_NS, "Id");
 
@@ -112,18 +111,25 @@ public class EnvelopeIdResolver extends ResourceResolverSpi {
          * that matches the URI. If that lookup fails, try to get a namespace
          * qualified Id that matches the URI.
          */
+        String id = uriNodeValue;
+        if (id.charAt(0) == '#') {
+            id = id.substring(1);
+        }
         if (!id.equals(cId)) {
             cId = null;
-            if ((selectedElem = WSSecurityUtil.getElementByWsuId(doc, uriNodeValue)) != null) {
-                cId = selectedElem.getAttributeNS(WSConstants.WSU_NS,"Id");
-            } else if ((selectedElem = WSSecurityUtil.getElementByGenId(doc, uriNodeValue)) != null) {
-                cId = selectedElem.getAttribute("Id");
+            selectedElem = WSSecurityUtil.getElementByWsuId(doc, uriNodeValue);
+            if (selectedElem == null) {
+                selectedElem = WSSecurityUtil.getElementByGenId(doc, uriNodeValue);
+                if (selectedElem != null) {
+                    cId = selectedElem.getAttribute("Id");
+                }
+            } else {
+                cId = selectedElem.getAttributeNS(WSConstants.WSU_NS, "Id");
             }
             if (cId == null) {
-                throw new ResourceResolverException("generic.EmptyMessage",
-                        new Object[]{"Id not found"},
-                        uri,
-                        BaseURI);
+                throw new ResourceResolverException(
+                    "generic.EmptyMessage", new Object[]{"Id not found"}, uri, BaseURI
+                );
             }
         }
 
@@ -155,6 +161,6 @@ public class EnvelopeIdResolver extends ResourceResolverSpi {
             return false;
         }
         String uriNodeValue = uri.getNodeValue();
-        return uriNodeValue.startsWith("#");
+        return (uriNodeValue != null) && (uriNodeValue.length() > 0);
     }
 }
