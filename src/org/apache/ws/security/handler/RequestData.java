@@ -43,6 +43,7 @@ public class RequestData {
     private Crypto decCrypto = null;
     private int sigKeyId = 0;
     private String sigAlgorithm = null;
+    private String signatureDigestAlgorithm = null;
     private Vector signatureParts = new Vector();
     private Crypto encCrypto = null;
     private int encKeyId = 0;
@@ -66,6 +67,7 @@ public class RequestData {
         utElements = null;
         wssConfig = null;
         signatureValues.clear();
+        signatureDigestAlgorithm = null;
     }
 
     public Object getMsgContext() {
@@ -154,6 +156,14 @@ public class RequestData {
 
     public void setSigAlgorithm(String sigAlgorithm) {
         this.sigAlgorithm = sigAlgorithm;
+    }
+    
+    public String getSigDigestAlgorithm() {
+        return signatureDigestAlgorithm;
+    }
+
+    public void setSigDigestAlgorithm(String sigDigestAlgorithm) {
+        this.signatureDigestAlgorithm = sigDigestAlgorithm;
     }
 
     public Vector getSignatureParts() {

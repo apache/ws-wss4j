@@ -27,10 +27,14 @@ import org.apache.axis.configuration.NullProvider;
 import org.apache.axis.message.SOAPEnvelope;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
+import org.apache.ws.security.handler.RequestData;
+import org.apache.ws.security.handler.WSHandler;
+import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.message.WSSecSignature;
 import org.apache.ws.security.message.WSSecHeader;
 import org.w3c.dom.Document;
@@ -188,5 +192,102 @@ public class TestWSSecurityNew18 extends TestCase {
         assertTrue(crypto instanceof CustomCrypto);
         CustomCrypto custom = (CustomCrypto)crypto;
         assertSame(tmp, custom.config);
+    }
+    
+    /**
+     * A test for "SignatureAction does not set DigestAlgorithm on WSSecSignature instance"
+     */
+    public void
+    testWSS170() throws Exception {
+        final WSSConfig cfg = WSSConfig.getNewInstance();
+        final int action = WSConstants.SIGN;
+        final RequestData reqData = new RequestData();
+        reqData.setWssConfig(cfg);
+        reqData.setUsername("16c73ab6-b892-458f-abf5-2f875f74882e");
+        java.util.Map config = new java.util.TreeMap();
+        config.put(WSHandlerConstants.SIG_PROP_FILE, "crypto.properties");
+        config.put("password", "security");
+        config.put(
+            WSHandlerConstants.SIG_ALGO, 
+            "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"
+        );
+        config.put(
+            WSHandlerConstants.SIG_DIGEST_ALGO, 
+            "http://www.w3.org/2001/04/xmlenc#sha256"
+        );
+        reqData.setMsgContext(config);
+        
+        final java.util.Vector actions = new java.util.Vector();
+        actions.add(new Integer(action));
+        final Document doc = unsignedEnvelope.getAsDocument();
+        MyHandler handler = new MyHandler();
+        handler.doit(
+            action, 
+            doc, 
+            reqData, 
+            actions
+        );
+        String outputString = 
+            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Signed message:");
+            LOG.debug(outputString);
+        }
+        assertTrue(
+            outputString.indexOf("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256") != -1
+        );
+        assertTrue(
+            outputString.indexOf("http://www.w3.org/2001/04/xmlenc#sha256") != -1
+        );
+        
+        verify(doc);
+    }
+    
+    /**
+     * a trivial extension of the WSHandler type
+     */
+    public static class MyHandler extends WSHandler {
+        
+        public Object 
+        getOption(String key) {
+            return null;
+        }
+        
+        public void 
+        setProperty(
+            Object msgContext, 
+            String key, 
+            Object value
+        ) {
+        }
+
+        public Object 
+        getProperty(Object ctx, String key) {
+            return ((java.util.Map)ctx).get(key);
+        }
+    
+        public void 
+        setPassword(Object msgContext, String password) {
+        }
+        
+        public String 
+        getPassword(Object msgContext) {
+            return (String)((java.util.Map)msgContext).get("password");
+        }
+
+        void doit(
+            int action, 
+            Document doc,
+            RequestData reqData, 
+            java.util.Vector actions
+        ) throws org.apache.ws.security.WSSecurityException {
+            doSenderAction(
+                action, 
+                doc, 
+                reqData, 
+                actions,
+                true
+            );
+        }
     }
 }
