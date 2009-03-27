@@ -27,13 +27,13 @@ import org.w3c.dom.Document;
 public class SignatureAction implements Action {
     public void execute(WSHandler handler, int actionToDo, Document doc, RequestData reqData)
             throws WSSecurityException {
-        String password;
-        password =
-                handler.getPassword(reqData.getUsername(),
-                        actionToDo,
-                        WSHandlerConstants.PW_CALLBACK_CLASS,
-                        WSHandlerConstants.PW_CALLBACK_REF, reqData)
-                        .getPassword();
+        String password =
+            handler.getPassword(
+                reqData.getUsername(),
+                actionToDo,
+                WSHandlerConstants.PW_CALLBACK_CLASS,
+                WSHandlerConstants.PW_CALLBACK_REF, reqData
+            ).getPassword();
 
         WSSecSignature wsSign = new WSSecSignature();
         wsSign.setWsConfig(reqData.getWssConfig());
@@ -43,6 +43,9 @@ public class SignatureAction implements Action {
         }
         if (reqData.getSigAlgorithm() != null) {
             wsSign.setSignatureAlgorithm(reqData.getSigAlgorithm());
+        }
+        if (reqData.getSigDigestAlgorithm() != null) {
+            wsSign.setDigestAlgo(reqData.getSigDigestAlgorithm());
         }
 
         wsSign.setUserInfo(reqData.getUsername(), password);

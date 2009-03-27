@@ -509,18 +509,33 @@ public class WSHandlerConstants {
     public static final String SIG_KEY_ID = "signatureKeyIdentifier";
 
     /**
-     * Defines which signature algorithm to use. Currently this
-     * parameter is ignored - SHA1RSA is the only supported algorithm,
-     * will be enhanced soon.
+     * Defines which signature algorithm to use.
      * <p/>
      * The application may set this parameter using the following method:
      * <pre>
-     * call.setProperty(WSHandlerConstants.SIG_ALGO, "SHA1RSA");
+     * call.setProperty(
+     *     WSHandlerConstants.SIG_ALGO, 
+     *     "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"
+     * );
      * </pre>
      * However, the parameter in the WSDD deployment file overwrites the
      * property setting (deployment setting overwrites application setting).
      */
     public static final String SIG_ALGO = "signatureAlgorithm";
+    
+    /**
+     * Defines which signature digest algorithm to use. 
+     * <p/>
+     * The application may set this parameter using the following method:
+     * <pre>
+     * call.setProperty(
+     *    WSHandlerConstants.SIG_DIGEST_ALGO, "http://www.w3.org/2001/04/xmlenc#sha256"
+     * );
+     * </pre>
+     * However, the parameter in the WSDD deployment file overwrites the
+     * property setting (deployment setting overwrites application setting).
+     */
+    public static final String SIG_DIGEST_ALGO = "signatureDigestAlgorithm";
 
     /**
      * Parameter to define which parts of the request shall be signed.
