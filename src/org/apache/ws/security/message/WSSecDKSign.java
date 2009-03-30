@@ -112,7 +112,7 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
     public void prepare(Document doc, WSSecHeader secHeader)
         throws WSSecurityException, ConversationException {
         super.prepare(doc);
-        wsDocInfo = new WSDocInfo(doc.hashCode());
+        wsDocInfo = new WSDocInfo(doc);
         
         //
         // Get and initialize a XMLSignature element.
@@ -150,15 +150,15 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
         }
         
         sig.addResourceResolver(EnvelopeIdResolver.getInstance());
-        String sigUri = "Signature-" + sig.hashCode();
+        String sigUri = wssConfig.getIdAllocator().createId("Signature-", sig);
         sig.setId(sigUri);
         
         keyInfo = sig.getKeyInfo();
-        keyInfoUri = "KeyId-" + keyInfo.hashCode();
+        keyInfoUri = wssConfig.getIdAllocator().createSecureId("KeyId-", keyInfo);
         keyInfo.setId(keyInfoUri);
         
         secRef = new SecurityTokenReference(doc);
-        strUri = "STRId-" + secRef.hashCode();
+        strUri = wssConfig.getIdAllocator().createSecureId("STRId-", secRef);
         secRef.setID(strUri);
         
         Reference refUt = new Reference(document);
@@ -411,7 +411,7 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
      * @throws WSSecurityException
      */
     public void computeSignature() throws WSSecurityException {
-        WSDocInfoStore.store(wsDocInfo);
+        boolean remove = WSDocInfoStore.store(wsDocInfo);
         try {
             sig.sign(sig.createSecretKey(derivedKeyBytes));
             signatureValue = sig.getSignatureValue();
@@ -424,7 +424,9 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
                 WSSecurityException.FAILED_SIGNATURE, null, null, e1
             );
         } finally {
-            WSDocInfoStore.delete(wsDocInfo);
+            if (remove) {
+                WSDocInfoStore.delete(wsDocInfo);
+            }
         }
     }
     

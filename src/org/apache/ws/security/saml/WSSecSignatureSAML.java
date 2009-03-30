@@ -233,7 +233,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
          * Gather some info about the document to process and store it for
          * retrieval
          */
-        wsDocInfo = new WSDocInfo(doc.hashCode());
+        wsDocInfo = new WSDocInfo(doc);
 
         X509Certificate[] certs = null;
 
@@ -342,18 +342,18 @@ public class WSSecSignatureSAML extends WSSecSignature {
         }
 
         sig.addResourceResolver(EnvelopeIdResolver.getInstance());
-        String sigUri = "Signature-" + sig.hashCode();
+        String sigUri = wssConfig.getIdAllocator().createId("Signature-", sig);
         sig.setId(sigUri);
 
         keyInfo = sig.getKeyInfo();
-        keyInfoUri = "KeyId-" + keyInfo.hashCode();
+        keyInfoUri = wssConfig.getIdAllocator().createSecureId("KeyId-", keyInfo);
         keyInfo.setId(keyInfoUri);
 
         secRef = new SecurityTokenReference(doc);
-        strUri = "STRId-" + secRef.hashCode();
+        strUri = wssConfig.getIdAllocator().createSecureId("STRId-", secRef);
         secRef.setID(strUri);
 
-        certUri = "CertId-" + certs[0].hashCode();
+        certUri = wssConfig.getIdAllocator().createSecureId("CertId-", certs[0]);  
 
         /*
          * If the sender vouches, then we must sign the SAML token _and_ at
@@ -368,7 +368,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
         try {
             if (senderVouches) {
                 secRefSaml = new SecurityTokenReference(doc);
-                String strSamlUri = "STRSAMLId-" + secRefSaml.hashCode();
+                String strSamlUri = wssConfig.getIdAllocator().createSecureId("STRSAMLId-", secRefSaml);
                 secRefSaml.setID(strSamlUri);
 
                 // Decouple Reference/KeyInfo setup - quick shot here
@@ -594,7 +594,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
      */
     public void computeSignature() throws WSSecurityException {
 
-        WSDocInfoStore.store(wsDocInfo);
+        boolean remove = WSDocInfoStore.store(wsDocInfo);
 
         try {
             if (senderVouches) {
@@ -612,7 +612,9 @@ public class WSSecSignatureSAML extends WSSecSignature {
             throw new WSSecurityException(WSSecurityException.FAILED_SIGNATURE,
                     null, null, e1);
         } finally {
-            WSDocInfoStore.delete(wsDocInfo);
+            if (remove) {
+                WSDocInfoStore.delete(wsDocInfo);
+            }
         }
     }
 }

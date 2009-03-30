@@ -205,7 +205,7 @@ public class WSBaseMessage {
         id = bodyElement.getAttributeNS(WSConstants.WSU_NS, "Id");
 
         if ((id == null) || (id.length() == 0)) {
-            id = "id-" + Integer.toString(bodyElement.hashCode());
+            id = wssConfig.getIdAllocator().createId("id-", bodyElement);
             String prefix = WSSecurityUtil.setNamespace(bodyElement,
                     WSConstants.WSU_NS, WSConstants.WSU_PREFIX);
             bodyElement.setAttributeNS(WSConstants.WSU_NS, prefix + ":Id", id);

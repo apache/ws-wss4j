@@ -86,7 +86,7 @@ public class SignatureProcessor implements Processor {
         if (log.isDebugEnabled()) {
             log.debug("Found signature element");
         }
-        WSDocInfoStore.store(wsDocInfo);
+        boolean remove = WSDocInfoStore.store(wsDocInfo);
         X509Certificate[] returnCert = new X509Certificate[1];
         Set returnElements = new HashSet();
         List protectedElements = new java.util.ArrayList();
@@ -97,12 +97,15 @@ public class SignatureProcessor implements Processor {
             lastPrincipalFound = 
                 verifyXMLSignature(
                     elem, crypto, returnCert, returnElements,
-                    protectedElements, signatureValue, cb
+                    protectedElements, signatureValue, cb,
+                    wsDocInfo
                 );
         } catch (WSSecurityException ex) {
             throw ex;
         } finally {
-            WSDocInfoStore.delete(wsDocInfo);
+            if (remove) {
+                WSDocInfoStore.delete(wsDocInfo);
+            }
         }
         if (lastPrincipalFound instanceof WSUsernameTokenPrincipal) {
             returnResults.add(
@@ -178,7 +181,8 @@ public class SignatureProcessor implements Processor {
         Set returnElements,
         List protectedElements,
         byte[][] signatureValue,
-        CallbackHandler cb
+        CallbackHandler cb,
+        WSDocInfo wsDocInfo
     ) throws WSSecurityException {
         if (log.isDebugEnabled()) {
             log.debug("Verify XML Signature");
@@ -227,13 +231,10 @@ public class SignatureProcessor implements Processor {
                 );
             }
             SecurityTokenReference secRef = new SecurityTokenReference((Element) node);
-            int docHash = elem.getOwnerDocument().hashCode();
-            //
             // Here we get some information about the document that is being
             // processed, in particular the crypto implementation, and already
             // detected BST that may be used later during dereferencing.
             //
-            WSDocInfo wsDocInfo = WSDocInfoStore.lookup(docHash);
 
             if (secRef.containsReference()) {
                 Element token = secRef.getTokenElement(elem.getOwnerDocument(), wsDocInfo, cb);

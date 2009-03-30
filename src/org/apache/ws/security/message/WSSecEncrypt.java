@@ -495,7 +495,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
             }
 
             boolean content = modifier.equals("Content") ? true : false;
-            String xencEncryptedDataId = "EncDataId-" + body.hashCode();
+            String xencEncryptedDataId = wssConfig.getIdAllocator().createId("EncDataId-", body);
             encPart.setEncId(xencEncryptedDataId);
 
             cloneKeyInfo = true;
@@ -534,7 +534,8 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
                     String wsuPrefix = 
                         WSSecurityUtil.setNamespace(elem, WSConstants.WSU_NS, WSConstants.WSU_PREFIX);
                     elem.setAttributeNS(
-                        WSConstants.WSU_NS, wsuPrefix + ":Id", "EncHeader-" + body.hashCode()
+                        WSConstants.WSU_NS, wsuPrefix + ":Id", 
+                        wssConfig.getIdAllocator().createId("EncHeader-", body)
                     );
                     
                     NamedNodeMap map = body.getAttributes();

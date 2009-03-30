@@ -33,20 +33,22 @@ package org.apache.ws.security;
 
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.processor.Processor;
+
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import java.util.Enumeration;
 import java.util.Vector;
 
 public class WSDocInfo {
-    int hash;
+    Document doc = null;
     Crypto crypto = null;
     Vector bst = null;
     Element assertion = null;
     Vector processors = null;
 
-    public WSDocInfo(int hash) {
-        this.hash = hash;
+    public WSDocInfo(Document doc) {
+        this.doc = doc;
     }
 
     /**
@@ -134,10 +136,10 @@ public class WSDocInfo {
     }
 
     /**
-     * @return the hash value of the document
+     * @return the document
      */
-    public int getHash() {
-        return hash;
+    public Document getDocument() {
+        return doc;
     }
 
     /**

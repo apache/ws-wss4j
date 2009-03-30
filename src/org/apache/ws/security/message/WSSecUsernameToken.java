@@ -184,8 +184,7 @@ public class WSSecUsernameToken extends WSSecBase {
         if (created) {
             ut.addCreated(wssConfig.isPrecisionInMilliSeconds(), doc);
         }
-        String utId = "UsernameToken-" + ut.hashCode();
-        ut.setID(utId);
+        ut.setID(wssConfig.getIdAllocator().createId("UsernameToken-", ut));
     }
 
     /**

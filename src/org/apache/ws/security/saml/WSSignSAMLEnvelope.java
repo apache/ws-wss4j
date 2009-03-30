@@ -157,7 +157,7 @@ public class WSSignSAMLEnvelope extends WSSignEnvelope {
          * Gather some info about the document to process and store it for
          * retrieval
          */
-        WSDocInfo wsDocInfo = new WSDocInfo(doc.hashCode());
+        WSDocInfo wsDocInfo = new WSDocInfo(doc);
 
         Element envelope = doc.getDocumentElement();
         SOAPConstants soapConstants = WSSecurityUtil.getSOAPConstants(envelope);
@@ -243,14 +243,14 @@ public class WSSignSAMLEnvelope extends WSSignEnvelope {
         }
 
         KeyInfo info = sig.getKeyInfo();
-        String keyInfoUri = "KeyId-" + info.hashCode();
+        String keyInfoUri = wssConfig.getIdAllocator().createSecureId("KeyId-", info);
         info.setId(keyInfoUri);
 
         SecurityTokenReference secRef = new SecurityTokenReference(doc);
-        String strUri = "STRId-" + secRef.hashCode();
+        String strUri = wssConfig.getIdAllocator().createSecureId("STRId-", secRef);
         secRef.setID(strUri);
 
-        String certUri = "CertId-" + certs[0].hashCode();
+        String certUri = wssConfig.getIdAllocator().createSecureId("CertId-", certs[0]);
 
         if (tlog.isDebugEnabled()) {
             t1 = System.currentTimeMillis();
@@ -278,7 +278,7 @@ public class WSSignSAMLEnvelope extends WSSignEnvelope {
         try {
             if (senderVouches) {
                 secRefSaml = new SecurityTokenReference(doc);
-                String strSamlUri = "STRSAMLId-" + secRefSaml.hashCode();
+                String strSamlUri = wssConfig.getIdAllocator().createSecureId("STRSAMLId-", secRefSaml);
                 secRefSaml.setID(strSamlUri);
                 // Decouple Refernce/KeyInfo setup - quick shot here
                 Reference ref = new Reference(doc);
@@ -418,7 +418,7 @@ public class WSSignSAMLEnvelope extends WSSignEnvelope {
         wsDocInfo.setAssertion(samlToken);
         WSSecurityUtil.prependChildElement(securityHeader, samlToken);
 
-        WSDocInfoStore.store(wsDocInfo);
+        boolean remove = WSDocInfoStore.store(wsDocInfo);
         try {
             if (senderVouches) {
                 sig
@@ -435,7 +435,9 @@ public class WSSignSAMLEnvelope extends WSSignEnvelope {
             throw new WSSecurityException(WSSecurityException.FAILED_SIGNATURE,
                     null, null, e1);
         } finally {
-            WSDocInfoStore.delete(wsDocInfo);
+            if (remove) {
+                WSDocInfoStore.delete(wsDocInfo);
+            }
         }
         if (tlog.isDebugEnabled()) {
             t4 = System.currentTimeMillis();

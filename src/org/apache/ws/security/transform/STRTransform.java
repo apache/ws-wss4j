@@ -30,6 +30,7 @@ import org.apache.xml.security.c14n.CanonicalizationException;
 import org.apache.xml.security.c14n.Canonicalizer;
 import org.apache.xml.security.c14n.InvalidCanonicalizerException;
 import org.apache.xml.security.signature.XMLSignatureInput;
+import org.apache.xml.security.transforms.Transform;
 import org.apache.xml.security.transforms.TransformSpi;
 import org.apache.ws.security.util.Base64;
 import org.apache.xml.security.utils.XMLUtils;
@@ -63,7 +64,7 @@ public class STRTransform extends TransformSpi {
     private static String XMLNS = "xmlns=";
 
     private WSDocInfo wsDocInfo = null;
-
+    
     public boolean wantsOctetStream() {
         return false;
     }
@@ -94,7 +95,8 @@ public class STRTransform extends TransformSpi {
      * @throws CanonicalizationException
      * @throws InvalidCanonicalizerException
      */
-    protected XMLSignatureInput enginePerformTransform(XMLSignatureInput input)
+    protected XMLSignatureInput enginePerformTransform(XMLSignatureInput input, 
+                                                       Transform transformObject)
         throws IOException, CanonicalizationException, InvalidCanonicalizerException {
         doDebug = log.isDebugEnabled();
 
@@ -106,17 +108,14 @@ public class STRTransform extends TransformSpi {
             //
             // Get the main document, that is the complete SOAP request document
             //
-            Document thisDoc = this._transformObject.getDocument();
-            int docHash = thisDoc.hashCode();
-            if (doDebug) {
-                log.debug("doc: " + thisDoc.toString() + ", " + docHash);
-            }
+            Document thisDoc = transformObject.getDocument();
+
             //
             // Here we get some information about the document that is being
             // processed, in particular the crypto implementation, and already
             // detected BST that may be used later during dereferencing.
             //
-            wsDocInfo = WSDocInfoStore.lookup(docHash);
+            wsDocInfo = WSDocInfoStore.lookup(thisDoc);
             if (wsDocInfo == null) {
                 throw (new CanonicalizationException("no WSDocInfo found"));
             }
@@ -131,11 +130,11 @@ public class STRTransform extends TransformSpi {
             // Canonicalizer
             //
             String canonAlgo = null;
-            if (this._transformObject.length(
+            if (transformObject.length(
                 WSConstants.WSSE_NS, "TransformationParameters") == 1) {
                 Element tmpE = 
                     XMLUtils.selectNode(
-                        this._transformObject.getElement().getFirstChild(), 
+                        transformObject.getElement().getFirstChild(), 
                         WSConstants.WSSE_NS,
                         "TransformationParameters", 
                         0

@@ -18,6 +18,7 @@
 package org.apache.ws.security.message.token;
 
 import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.conversation.ConversationConstants;
 import org.apache.ws.security.conversation.ConversationException;
@@ -88,7 +89,7 @@ public class SecurityContextToken {
         
         this.elementIdentifier.appendChild(doc.createTextNode(uuid));
         
-        this.setID("sctId-" + this.element.hashCode());
+        this.setID(WSSConfig.getDefaultWSConfig().getIdAllocator().createSecureId("sctId-", this.element));
     }
 
     /**

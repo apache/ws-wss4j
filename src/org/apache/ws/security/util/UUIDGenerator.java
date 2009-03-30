@@ -20,7 +20,6 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Date;
 import java.util.Random;
 
 import org.apache.commons.logging.Log;
@@ -49,10 +48,12 @@ public class UUIDGenerator {
         if (baseUUID == null) {
             baseUUID = getInitialUUID();
         }
-        if(++incrementingValue >= Long.MAX_VALUE){
+        long i = ++incrementingValue;
+        if(i >= Long.MAX_VALUE || i < 0){
             incrementingValue = 0;
+            i = 0;
         }
-        return baseUUID + new Date().getTime() + incrementingValue;
+        return baseUUID + System.currentTimeMillis() + i;
     }
 
     protected static String getInitialUUID() {
