@@ -96,9 +96,18 @@ public abstract class AbstractCrypto extends CryptoBase {
          * Load the keystore
          */
         try {
-            String provider = properties.getProperty("org.apache.ws.security.crypto.merlin.keystore.provider");
-            String passwd = properties.getProperty("org.apache.ws.security.crypto.merlin.keystore.password", "security");
-            String type = properties.getProperty("org.apache.ws.security.crypto.merlin.keystore.type", KeyStore.getDefaultType());
+            String provider = 
+                properties.getProperty("org.apache.ws.security.crypto.merlin.keystore.provider");
+            String passwd = 
+                properties.getProperty(
+                    "org.apache.ws.security.crypto.merlin.keystore.password", 
+                    "security"
+                );
+            String type = 
+                properties.getProperty(
+                    "org.apache.ws.security.crypto.merlin.keystore.type", 
+                    KeyStore.getDefaultType()
+                );
             this.keystore = load(is, passwd, provider, type);
         } finally {
             if (is != null) {
@@ -109,13 +118,31 @@ public abstract class AbstractCrypto extends CryptoBase {
         /**
          * Load cacerts
          */
-        String cacertsPath = System.getProperty("java.home") + "/lib/security/cacerts";
-        InputStream cacertsIs = new FileInputStream(cacertsPath);
-        try {
-            String cacertsPasswd = properties.getProperty("org.apache.ws.security.crypto.merlin.cacerts.password", "changeit");
-            this.cacerts = load(cacertsIs, cacertsPasswd, null, KeyStore.getDefaultType());
-        } finally {
-            cacertsIs.close();
+        String loadCacerts = 
+            properties.getProperty(
+                "org.apache.ws.security.crypto.merlin.load.cacerts",
+                "true"
+            );
+        if (Boolean.valueOf(loadCacerts).booleanValue()) {
+            String cacertsPath = System.getProperty("java.home") + "/lib/security/cacerts";
+            InputStream cacertsIs = new FileInputStream(cacertsPath);
+            try {
+                String cacertsPasswd = 
+                    properties.getProperty(
+                        "org.apache.ws.security.crypto.merlin.cacerts.password", 
+                        "changeit"
+                    );
+                this.cacerts = load(cacertsIs, cacertsPasswd, null, KeyStore.getDefaultType());
+                if (doDebug) {
+                    log.debug("CA certs have been loaded");
+                }
+            } finally {
+                cacertsIs.close();
+            }
+        } else {
+            if (doDebug) {
+                log.debug("CA certs have not been loaded");
+            }
         }
     }
 
@@ -127,7 +154,8 @@ public abstract class AbstractCrypto extends CryptoBase {
      * @param input <code>InputStream</code> to read from
      * @throws CredentialException
      */
-    public KeyStore load(InputStream input, String storepass, String provider, String type) throws CredentialException {
+    public KeyStore load(InputStream input, String storepass, String provider, String type) 
+        throws CredentialException {
         KeyStore ks = null;
         
         try {
@@ -137,7 +165,8 @@ public abstract class AbstractCrypto extends CryptoBase {
                 ks = KeyStore.getInstance(type, provider);
             }
                     
-            ks.load(input, (storepass == null || storepass.length() == 0) ? new char[0] : storepass.toCharArray());
+            ks.load(input, (storepass == null || storepass.length() == 0) 
+                ? new char[0] : storepass.toCharArray());
         } catch (IOException e) {
             if (doDebug) {
                 log.debug(e.getMessage(), e);

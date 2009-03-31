@@ -146,14 +146,16 @@ public class Merlin extends AbstractCrypto {
             CertPath path = this.getCertificateFactory().generateCertPath(certList);
 
             java.util.Set set = new HashSet();
-            Enumeration cacertsAliases = this.cacerts.aliases();
-            while (cacertsAliases.hasMoreElements()) {
-                String alias = (String) cacertsAliases.nextElement();
-                X509Certificate cert = 
-                    (X509Certificate) this.cacerts.getCertificate(alias);
-                TrustAnchor anchor = 
-                    new TrustAnchor(cert, cert.getExtensionValue(NAME_CONSTRAINTS_OID));
-                set.add(anchor);
+            if (this.cacerts != null) {
+                Enumeration cacertsAliases = this.cacerts.aliases();
+                while (cacertsAliases.hasMoreElements()) {
+                    String alias = (String) cacertsAliases.nextElement();
+                    X509Certificate cert = 
+                        (X509Certificate) this.cacerts.getCertificate(alias);
+                    TrustAnchor anchor = 
+                        new TrustAnchor(cert, cert.getExtensionValue(NAME_CONSTRAINTS_OID));
+                    set.add(anchor);
+                }
             }
 
             // Add certificates from the keystore

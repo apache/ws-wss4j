@@ -588,7 +588,7 @@ public abstract class CryptoBase implements Crypto {
         Vector aliases = getAlias(subjectRDN, keystore);
         
         //If we can't find the issuer in the keystore then look at cacerts
-        if (aliases.size() == 0) {
+        if (aliases.size() == 0 && cacerts != null) {
             aliases = getAlias(subjectRDN, cacerts);
         }
         
