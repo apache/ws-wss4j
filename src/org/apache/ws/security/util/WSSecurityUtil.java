@@ -884,7 +884,7 @@ public class WSSecurityUtil {
                 actions.add(new Integer(WSConstants.UT_SIGN));
             } else {
                 throw new WSSecurityException(
-                    "WSDoAllSender: Unknown action defined" + single[i]
+                    "Unknown action defined: " + single[i]
                 );
             }
         }
