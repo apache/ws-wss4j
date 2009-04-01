@@ -35,23 +35,15 @@ import org.w3c.dom.Element;
  */
 
 public class WSSecUsernameToken extends WSSecBase {
-    private static Log log = LogFactory.getLog(WSSecUsernameToken.class
-            .getName());
+    private static Log log = LogFactory.getLog(WSSecUsernameToken.class.getName());
 
     private String passwordType = WSConstants.PASSWORD_DIGEST;
-
     private UsernameToken ut = null;
-
     private boolean nonce = false;
-
     private boolean created = false;
-    
     private boolean useDerivedKey = false;
-    
     private boolean useMac = false;
-    
     private byte[] saltValue;
-    
     private int iteration = UsernameToken.DEFAULT_ITERATION;
 
     /**

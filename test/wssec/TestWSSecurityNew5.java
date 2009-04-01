@@ -48,7 +48,6 @@ import java.security.MessageDigest;
 
 /**
  * WS-Security Test Case for UsernameTokens.
- * <p/>
  * 
  * @author Davanum Srinivas (dims@yahoo.com)
  */
@@ -89,7 +88,6 @@ public class TestWSSecurityNew5 extends TestCase implements CallbackHandler {
 
     /**
      * TestWSSecurity constructor
-     * <p/>
      * 
      * @param name name of the test
      */
@@ -99,7 +97,6 @@ public class TestWSSecurityNew5 extends TestCase implements CallbackHandler {
 
     /**
      * JUnit suite
-     * <p/>
      * 
      * @return a junit test suite
      */
@@ -109,7 +106,6 @@ public class TestWSSecurityNew5 extends TestCase implements CallbackHandler {
 
     /**
      * Setup method
-     * <p/>
      * 
      * @throws java.lang.Exception Thrown when there is a problem in setup
      */
@@ -121,7 +117,6 @@ public class TestWSSecurityNew5 extends TestCase implements CallbackHandler {
 
     /**
      * Constructs a soap envelope
-     * <p/>
      * 
      * @return soap envelope
      * @throws java.lang.Exception if there is any problem constructing the soap envelope
@@ -135,14 +130,12 @@ public class TestWSSecurityNew5 extends TestCase implements CallbackHandler {
 
     /**
      * Test that adds a UserNameToken with password Digest to a WS-Security envelope
-     * <p/>
      */
     public void testUsernameTokenDigest() throws Exception {
         WSSecUsernameToken builder = new WSSecUsernameToken();
         builder.setUserInfo("wernerd", "verySecret");
         LOG.info("Before adding UsernameToken PW Digest....");
-        // Document doc = unsignedEnvelope.getAsDocument();
-        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
+        Document doc = unsignedEnvelope.getAsDocument();
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         Document signedDoc = builder.build(doc, secHeader);
@@ -190,7 +183,6 @@ public class TestWSSecurityNew5 extends TestCase implements CallbackHandler {
     
     /**
      * Test that adds a UserNameToken with a bad password Digest to a WS-Security envelope
-     * <p/>
      */
     public void testUsernameTokenBadDigest() throws Exception {
         WSSecUsernameToken builder = new WSSecUsernameToken();
@@ -219,7 +211,6 @@ public class TestWSSecurityNew5 extends TestCase implements CallbackHandler {
 
     /**
      * Test that adds a UserNameToken with password text to a WS-Security envelope
-     * <p/>
      */
     public void testUsernameTokenText() throws Exception {
         WSSecUsernameToken builder = new WSSecUsernameToken();
@@ -243,7 +234,6 @@ public class TestWSSecurityNew5 extends TestCase implements CallbackHandler {
     /**
      * Test that adds a UserNameToken with a digested password but with type of
      * password test.
-     * <p/>
      */
     public void testUsernameTokenDigestText() throws Exception {
         WSSecUsernameToken builder = new WSSecUsernameToken();
@@ -270,7 +260,6 @@ public class TestWSSecurityNew5 extends TestCase implements CallbackHandler {
     
     /**
      * Test that adds a UserNameToken with (bad) password text to a WS-Security envelope
-     * <p/>
      */
     public void testUsernameTokenBadText() throws Exception {
         WSSecUsernameToken builder = new WSSecUsernameToken();
@@ -348,7 +337,6 @@ public class TestWSSecurityNew5 extends TestCase implements CallbackHandler {
     /**
      * Test with a null token type. This will fail as the default is to reject custom
      * token types.
-     * <p/>
      */
     public void testUsernameTokenCustomFail() throws Exception {
         WSSecUsernameToken builder = new WSSecUsernameToken();
@@ -378,7 +366,6 @@ public class TestWSSecurityNew5 extends TestCase implements CallbackHandler {
     /**
      * Test with a null password type. This will pass as the WSSConfig is configured to 
      * handle custom token types.
-     * <p/>
      */
     public void testUsernameTokenCustomPass() throws Exception {
         WSSecUsernameToken builder = new WSSecUsernameToken();
@@ -498,8 +485,23 @@ public class TestWSSecurityNew5 extends TestCase implements CallbackHandler {
     }
     
     /**
+     * Test that verifies an EncodingType is set for the nonce. See WSS-169.
+     */
+    public void testUsernameTokenNonceEncodingType() throws Exception {
+        WSSecUsernameToken builder = new WSSecUsernameToken();
+        builder.setUserInfo("wernerd", "verySecret");
+        LOG.info("Before adding UsernameToken PW Digest....");
+        Document doc = unsignedEnvelope.getAsDocument();
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        Document signedDoc = builder.build(doc, secHeader);
+        String outputString = 
+            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+        assertTrue(outputString.indexOf("EncodingType") != -1);
+    }
+    
+    /**
      * Verifies the soap envelope
-     * <p/>
      * 
      * @param env soap envelope
      * @throws java.lang.Exception Thrown when there is a problem in verification
