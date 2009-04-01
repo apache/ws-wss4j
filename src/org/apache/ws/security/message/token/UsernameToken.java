@@ -51,45 +51,33 @@ import java.util.TimeZone;
  * @author Werner Dittmann (Werner.Dittmann@t-online.de)
  */
 public class UsernameToken {
-    private static final Log log = LogFactory.getLog(UsernameToken.class.getName());
-    
-    private static final boolean doDebug = log.isDebugEnabled();
-
+    public static final String BASE64_ENCODING = WSConstants.SOAPMESSAGE_NS + "#Base64Binary";
     public static final String PASSWORD_TYPE = "passwordType";
+    public static final int DEFAULT_ITERATION = 1000;
+    public static final QName TOKEN = 
+        new QName(WSConstants.WSSE_NS, WSConstants.USERNAME_TOKEN_LN);
     
-    private String raw_password;        // enhancement by Alberto Coletti
+    private static final Log LOG = LogFactory.getLog(UsernameToken.class.getName());
+    private static final boolean DO_DEBUG = LOG.isDebugEnabled();
+    private static SecureRandom random;
 
     protected Element element = null;
-
     protected Element elementUsername = null;
-
     protected Element elementPassword = null;
-
     protected Element elementNonce = null;
-
     protected Element elementCreated = null;
-
     protected Element elementSalt = null;
-
     protected Element elementIteration = null;
-
     protected String passwordType = null;
-
     protected boolean hashed = true;
-
-    private static SecureRandom random = null;
-
-    public static final int DEFAULT_ITERATION = 1000;
-
-    public static final QName TOKEN = new QName(WSConstants.WSSE_NS,
-            WSConstants.USERNAME_TOKEN_LN);
+    private String rawPassword;        // enhancement by Alberto Coletti
 
     static {
         try {
             random = WSSecurityUtil.resolveSecureRandom();
         } catch (NoSuchAlgorithmException e) {
-            if (doDebug) {
-                log.debug(e.getMessage(), e);
+            if (DO_DEBUG) {
+                LOG.debug(e.getMessage(), e);
             }
         }
     }
@@ -103,8 +91,8 @@ public class UsernameToken {
      * @throws WSSecurityException
      */
     public UsernameToken(Element elem) throws WSSecurityException {
-        this.element = elem;
-        QName el = new QName(this.element.getNamespaceURI(), this.element.getLocalName());
+        element = elem;
+        QName el = new QName(element.getNamespaceURI(), element.getLocalName());
         if (!el.equals(TOKEN)) {
             throw new WSSecurityException(
                 WSSecurityException.INVALID_SECURITY_TOKEN,
@@ -199,19 +187,19 @@ public class UsernameToken {
      *               password required
      */
     public UsernameToken(boolean milliseconds, Document doc, String pwType) {
-        this.element = 
+        element = 
             doc.createElementNS(WSConstants.WSSE_NS, "wsse:" + WSConstants.USERNAME_TOKEN_LN);
-        WSSecurityUtil.setNamespace(this.element, WSConstants.WSSE_NS, WSConstants.WSSE_PREFIX);
+        WSSecurityUtil.setNamespace(element, WSConstants.WSSE_NS, WSConstants.WSSE_PREFIX);
 
-        this.elementUsername = 
+        elementUsername = 
             doc.createElementNS(WSConstants.WSSE_NS, "wsse:" + WSConstants.USERNAME_LN);
-        this.elementUsername.appendChild(doc.createTextNode(""));
+        elementUsername.appendChild(doc.createTextNode(""));
         element.appendChild(elementUsername);
 
         if (pwType != null) {
-            this.elementPassword = 
+            elementPassword = 
                 doc.createElementNS(WSConstants.WSSE_NS, "wsse:" + WSConstants.PASSWORD_LN);
-            this.elementPassword.appendChild(doc.createTextNode(""));
+            elementPassword.appendChild(doc.createTextNode(""));
             element.appendChild(elementPassword);
 
             hashed = false;
@@ -233,9 +221,9 @@ public class UsernameToken {
         }
         byte[] nonceValue = new byte[16];
         random.nextBytes(nonceValue);
-        this.elementNonce = 
-            doc.createElementNS(WSConstants.WSSE_NS, "wsse:" + WSConstants.NONCE_LN);
-        this.elementNonce.appendChild(doc.createTextNode(Base64.encode(nonceValue)));
+        elementNonce = doc.createElementNS(WSConstants.WSSE_NS, "wsse:" + WSConstants.NONCE_LN);
+        elementNonce.appendChild(doc.createTextNode(Base64.encode(nonceValue)));
+        elementNonce.setAttributeNS(null, "EncodingType", BASE64_ENCODING);
         element.appendChild(elementNonce);
     }
 
@@ -254,12 +242,12 @@ public class UsernameToken {
             zulu.setTimeZone(TimeZone.getTimeZone("UTC"));
         }
         Calendar rightNow = Calendar.getInstance();
-        this.elementCreated = 
+        elementCreated = 
             doc.createElementNS(
                 WSConstants.WSU_NS,WSConstants.WSU_PREFIX + ":" + WSConstants.CREATED_LN
             );
-        WSSecurityUtil.setNamespace(this.element, WSConstants.WSU_NS, WSConstants.WSU_PREFIX);
-        this.elementCreated.appendChild(doc.createTextNode(zulu.format(rightNow.getTime())));
+        WSSecurityUtil.setNamespace(element, WSConstants.WSU_NS, WSConstants.WSU_PREFIX);
+        elementCreated.appendChild(doc.createTextNode(zulu.format(rightNow.getTime())));
         element.appendChild(elementCreated);
     }
 
@@ -279,12 +267,12 @@ public class UsernameToken {
         if (saltValue == null) {
             saltValue = generateSalt(mac);
         }
-        this.elementSalt = 
+        elementSalt = 
             doc.createElementNS(
                 WSConstants.WSSE11_NS, WSConstants.WSSE11_PREFIX + ":" + WSConstants.SALT_LN
             );
         WSSecurityUtil.setNamespace(this.element, WSConstants.WSSE11_NS, WSConstants.WSSE11_PREFIX);
-        this.elementSalt.appendChild(doc.createTextNode(Base64.encode(saltValue)));
+        elementSalt.appendChild(doc.createTextNode(Base64.encode(saltValue)));
         element.appendChild(elementSalt);
         return saltValue;
     }
@@ -294,11 +282,11 @@ public class UsernameToken {
      */
     public void addIteration(Document doc, int iteration) {
         String text = "" + iteration;
-        this.elementIteration = 
+        elementIteration = 
             doc.createElementNS(
                 WSConstants.WSSE11_NS, WSConstants.WSSE11_PREFIX + ":" + WSConstants.ITERATION_LN
             );
-        WSSecurityUtil.setNamespace(this.element, WSConstants.WSSE11_NS, WSConstants.WSSE11_PREFIX);
+        WSSecurityUtil.setNamespace(element, WSConstants.WSSE11_NS, WSConstants.WSSE11_PREFIX);
         this.elementIteration.appendChild(doc.createTextNode(text));
         element.appendChild(elementIteration);
     }
@@ -309,7 +297,7 @@ public class UsernameToken {
      * @return the data from the user name element.
      */
     public String getName() {
-        return nodeString(this.elementUsername);
+        return nodeString(elementUsername);
     }
 
     /**
@@ -319,7 +307,7 @@ public class UsernameToken {
      *             element.
      */
     public void setName(String name) {
-        Text node = getFirstNode(this.elementUsername);
+        Text node = getFirstNode(elementUsername);
         node.setData(name);
     }
 
@@ -329,7 +317,7 @@ public class UsernameToken {
      * @return the data from the nonce element.
      */
     public String getNonce() {
-        return nodeString(this.elementNonce);
+        return nodeString(elementNonce);
     }
 
     /**
@@ -338,7 +326,7 @@ public class UsernameToken {
      * @return the data from the created time element.
      */
     public String getCreated() {
-        return nodeString(this.elementCreated);
+        return nodeString(elementCreated);
     }
 
     /**
@@ -349,7 +337,7 @@ public class UsernameToken {
      * @return the password string or <code>null</code> if no such node exists.
      */
     public String getPassword() {
-        return nodeString(this.elementPassword);
+        return nodeString(elementPassword);
     }
 
     /**
@@ -360,9 +348,9 @@ public class UsernameToken {
      * @throws WSSecurityException
      */
     public byte[] getSalt() throws WSSecurityException {
-        String salt = nodeString(this.elementSalt);
+        String salt = nodeString(elementSalt);
         if (salt != null) {
-            return Base64.decode(nodeString(this.elementSalt));
+            return Base64.decode(nodeString(elementSalt));
         }
         return null;
     }
@@ -375,7 +363,7 @@ public class UsernameToken {
      *         is returned.
      */
     public int getIteration() {
-        String iter = nodeString(this.elementIteration);
+        String iter = nodeString(elementIteration);
         if (iter != null) {
             return Integer.parseInt(iter);
         }
@@ -409,7 +397,7 @@ public class UsernameToken {
      */
     public void setPassword(String pwd) {
         if (pwd == null) {
-            if (this.passwordType != null) {
+            if (passwordType != null) {
                 throw new IllegalArgumentException("pwd == null but a password is needed");
             } else {
                 // Ignore setting the password.
@@ -417,19 +405,19 @@ public class UsernameToken {
             }
         }
         
-        raw_password = pwd;             // enhancement by Alberto coletti
-        Text node = getFirstNode(this.elementPassword);
+        rawPassword = pwd;             // enhancement by Alberto coletti
+        Text node = getFirstNode(elementPassword);
         try {
             if (!hashed) {
                 node.setData(pwd);
-                this.elementPassword.setAttribute("Type", WSConstants.PASSWORD_TEXT);
+                elementPassword.setAttribute("Type", WSConstants.PASSWORD_TEXT);
             } else {
                 node.setData(doPasswordDigest(getNonce(), getCreated(), pwd));
-                this.elementPassword.setAttribute("Type", WSConstants.PASSWORD_DIGEST);
+                elementPassword.setAttribute("Type", WSConstants.PASSWORD_DIGEST);
             }
         } catch (Exception e) {
-            if (doDebug) {
-                log.debug(e.getMessage(), e);
+            if (DO_DEBUG) {
+                LOG.debug(e.getMessage(), e);
             }
         }
     }
@@ -439,15 +427,15 @@ public class UsernameToken {
      * 
      * @param raw_password the raw_password to set
      */
-    public void setRawPassword(String raw_password) {
-        this.raw_password = raw_password;
+    public void setRawPassword(String newRawPassword) {
+        rawPassword = newRawPassword;
     }
     
     /**
      * Get the raw (plain text) password used to compute secret key.
      */
     public String getRawPassword() {
-        return this.raw_password;
+        return rawPassword;
     }
     
     public static String doPasswordDigest(String nonce, String created, String password) {
@@ -471,8 +459,8 @@ public class UsernameToken {
             sha.update(b4);
             passwdDigest = Base64.encode(sha.digest());
         } catch (Exception e) {
-            if (doDebug) {
-                log.debug(e.getMessage(), e);
+            if (DO_DEBUG) {
+                LOG.debug(e.getMessage(), e);
             }
         }
         return passwdDigest;
@@ -514,7 +502,7 @@ public class UsernameToken {
      * @return the <code>wsse:UsernameToken</code> element
      */
     public Element getElement() {
-        return this.element;
+        return element;
     }
 
     /**
@@ -533,7 +521,7 @@ public class UsernameToken {
      *         token
      */
     public String getID() {
-        return this.element.getAttributeNS(WSConstants.WSU_NS, "Id");
+        return element.getAttributeNS(WSConstants.WSU_NS, "Id");
     }
 
     /**
@@ -545,8 +533,8 @@ public class UsernameToken {
      */
     public void setID(String id) {
         String prefix = 
-            WSSecurityUtil.setNamespace(this.element, WSConstants.WSU_NS, WSConstants.WSU_PREFIX);
-        this.element.setAttributeNS(WSConstants.WSU_NS, prefix + ":Id", id);
+            WSSecurityUtil.setNamespace(element, WSConstants.WSU_NS, WSConstants.WSU_PREFIX);
+        element.setAttributeNS(WSConstants.WSU_NS, prefix + ":Id", id);
     }
 
     /**
@@ -573,7 +561,7 @@ public class UsernameToken {
         byte[] key = null;
         try {
             Mac mac = Mac.getInstance("HMACSHA1");
-            byte[] password = raw_password.getBytes("UTF-8"); // enhancement by Alberto Coletti
+            byte[] password = rawPassword.getBytes("UTF-8"); // enhancement by Alberto Coletti
             byte[] label = labelString.getBytes("UTF-8");
             byte[] nonce = Base64.decode(getNonce());
             byte[] created = getCreated().getBytes("UTF-8");
@@ -590,17 +578,17 @@ public class UsernameToken {
             
             key = P_hash(password, seed, mac, keylen);
 
-            if (log.isDebugEnabled()) {
-                log.debug("password   :" + Base64.encode(password));
-                log.debug("label      :" + Base64.encode(label));
-                log.debug("nonce      :" + Base64.encode(nonce));
-                log.debug("created    :" + Base64.encode(created));
-                log.debug("seed       :" + Base64.encode(seed));
-                log.debug("Key        :" + Base64.encode(key));
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("password   :" + Base64.encode(password));
+                LOG.debug("label      :" + Base64.encode(label));
+                LOG.debug("nonce      :" + Base64.encode(nonce));
+                LOG.debug("created    :" + Base64.encode(created));
+                LOG.debug("seed       :" + Base64.encode(seed));
+                LOG.debug("Key        :" + Base64.encode(key));
             }
         } catch (Exception e) {
-            if (doDebug) {
-                log.debug(e.getMessage(), e);
+            if (DO_DEBUG) {
+                LOG.debug(e.getMessage(), e);
             }
             return null;
         }
@@ -608,7 +596,6 @@ public class UsernameToken {
     }
     
   
-
     /**
      * This static method generates a derived key as defined in WSS Username
      * Token Profile.
@@ -632,8 +619,8 @@ public class UsernameToken {
         try {
             pwBytes = password.getBytes("UTF-8");
         } catch (final java.io.UnsupportedEncodingException e) {
-            if (doDebug) {
-                log.debug(e.getMessage(), e);
+            if (DO_DEBUG) {
+                LOG.debug(e.getMessage(), e);
             }
             throw new WSSecurityException("Unable to convert password to UTF-8", e);
         }
@@ -646,8 +633,8 @@ public class UsernameToken {
         try {
             sha = MessageDigest.getInstance("SHA-1");
         } catch (NoSuchAlgorithmException e) {
-            if (doDebug) {
-                log.debug(e.getMessage(), e);
+            if (DO_DEBUG) {
+                LOG.debug(e.getMessage(), e);
             }
             throw new WSSecurityException(
                 WSSecurityException.FAILURE, "noSHA1availabe", null, e
@@ -678,7 +665,7 @@ public class UsernameToken {
     public byte[] getDerivedKey() throws WSSecurityException {
         int iteration = getIteration();
         byte[] salt = getSalt();
-        return generateDerivedKey(raw_password, salt, iteration);
+        return generateDerivedKey(rawPassword, salt, iteration);
     }
     
     /**
@@ -696,7 +683,6 @@ public class UsernameToken {
     }
 
     
-
     /**
      * This static method generates a 128 bit salt value as defined in WSS
      * Username Token Profile.
