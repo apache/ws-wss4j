@@ -329,7 +329,6 @@ public class SignatureProcessor implements Processor {
                 certs = secRef.getX509IssuerSerial(crypto);
             } else if (secRef.containsKeyIdentifier()) {
                 if (secRef.getKeyIdentifierValueType().equals(SecurityTokenReference.ENC_KEY_SHA1_URI)) {
-                    
                     String id = secRef.getKeyIdentifierValue();
                     WSPasswordCallback pwcb = 
                         new WSPasswordCallback(
@@ -350,6 +349,18 @@ public class SignatureProcessor implements Processor {
                         );
                     }
                     secretKey = pwcb.getKey();
+                } else if (WSConstants.WSS_SAML_KI_VALUE_TYPE.equals(secRef.getKeyIdentifierValueType())) { 
+                    Element token = 
+                        secRef.getKeyIdentifierTokenElement(elem.getOwnerDocument(), wsDocInfo, cb);
+                    
+                    if (crypto == null) {
+                        throw new WSSecurityException(
+                            WSSecurityException.FAILURE, "noSigCryptoFile"
+                        );
+                    }
+                    samlKi = SAMLUtil.getSAMLKeyInfo(token, crypto, cb);
+                    certs = samlKi.getCerts();
+                    secretKey = samlKi.getSecret();
                 } else {
                     certs = secRef.getKeyIdentifier(crypto);
                 }

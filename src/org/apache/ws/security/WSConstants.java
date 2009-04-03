@@ -122,6 +122,7 @@ public class WSConstants {
     public static final String ASSERTION_LN = "Assertion";
     public static final String WSS_SAML_NS = "http://docs.oasis-open.org/wss/oasis-wss-saml-token-profile-1.0#";
     public static final String WSS_SAML_ASSERTION = "SAMLAssertion-1.1";
+    public static final String WSS_SAML_KI_VALUE_TYPE = WSS_SAML_NS + SAML_ASSERTION_ID;
 
     //
     // SOAP-ENV Namespaces

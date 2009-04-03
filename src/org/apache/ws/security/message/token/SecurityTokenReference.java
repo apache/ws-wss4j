@@ -153,7 +153,6 @@ public class SecurityTokenReference {
         Element tokElement = null;
         String tmpS = WSConstants.WSS_SAML_NS + WSConstants.WSS_SAML_ASSERTION;
         String saml10 = WSConstants.WSS_SAML_NS + WSConstants.SAML_ASSERTION_ID;
-        
         if (tmpS.equals(ref.getValueType())
             || saml10.equals(ref.getValueType())
             || WSConstants.WSC_SCT.equals(ref.getValueType())) {
@@ -219,6 +218,104 @@ public class SecurityTokenReference {
                 WSSecurityException.SECURITY_TOKEN_UNAVAILABLE,
                 "noToken",
                 new Object[]{uri}
+            );
+        }
+        return tokElement;
+    }
+    
+    
+    /**
+     * Gets the signing token element, which may be a <code>BinarySecurityToken
+     * </code> or a SAML token.
+     * 
+     * The method gets the value of the KeyIdentifier contained in
+     * the {@link SecurityTokenReference} and tries to find the referenced
+     * Element in the document.
+     *
+     * @param doc the document that contains the binary security token
+     *            element. This could be different from the document
+     *            that contains the SecurityTokenReference (STR). See
+     *            STRTransform.derefenceBST() method
+     * @return Element containing the signing token
+     */
+    public Element getKeyIdentifierTokenElement(
+        Document doc, WSDocInfo docInfo, CallbackHandler cb
+    ) throws WSSecurityException {
+        String value = getKeyIdentifierValue();
+        String type = getKeyIdentifierValueType();
+        if (doDebug) {
+            log.debug("Token reference uri: " + value);
+        }
+        if (value == null) {
+            throw new WSSecurityException(
+                WSSecurityException.INVALID_SECURITY, "badReferenceURI"
+            );
+        }
+        Element tokElement = null;
+        String saml10 = WSConstants.WSS_SAML_NS + WSConstants.SAML_ASSERTION_ID;
+        if (saml10.equals(type)
+            || WSConstants.WSC_SCT.equals(type)) {
+            Element sa = docInfo.getAssertion();
+            String saID = null;
+            if (sa != null) {
+                saID = sa.getAttribute("AssertionID");
+            }
+            if (doDebug) {
+                log.debug("SAML token ID: " + saID);
+            }
+            String id = value;
+            if (id.charAt(0) == '#') {
+                id = id.substring(1);
+            }
+            if (saID == null || !saID.equals(id)) {
+                if (cb != null) {
+                    //try to find a custom token
+                    WSPasswordCallback pwcb = 
+                        new WSPasswordCallback(id, WSPasswordCallback.CUSTOM_TOKEN);
+                    try {
+                        cb.handle(new Callback[]{pwcb});
+                    } catch (Exception e) {
+                        throw new WSSecurityException(
+                            WSSecurityException.FAILURE,
+                            "noPassword", 
+                            new Object[] {id}, 
+                            e
+                        );
+                    }
+                    
+                    Element assertionElem = pwcb.getCustomToken();
+                    if (assertionElem != null) {
+                        sa = (Element)doc.importNode(assertionElem, true);
+                    }
+                    else {
+                        throw new WSSecurityException(
+                            WSSecurityException.INVALID_SECURITY,
+                            "badReferenceURI",
+                            new Object[]{"uri:" + value + ", saID: " + saID}
+                        );
+                    }
+                } else {
+                    throw new WSSecurityException(
+                        WSSecurityException.INVALID_SECURITY,
+                        "badReferenceURI",
+                        new Object[]{"uri:" + value + ", saID: " + saID}
+                    );
+                }
+            }
+            tokElement = sa;
+        } else {
+            tokElement = WSSecurityUtil.getElementByWsuId(doc, value);
+            
+            // In some scenarios id is used rather than wsu:Id
+            if (tokElement == null) {
+                tokElement = WSSecurityUtil.getElementByGenId(doc, value);
+            }
+        }
+        if (tokElement == null) {
+            throw new WSSecurityException(
+                WSSecurityException.SECURITY_TOKEN_UNAVAILABLE,
+                "noToken",
+                new Object[]{value}
             );
         }
         return tokElement;
