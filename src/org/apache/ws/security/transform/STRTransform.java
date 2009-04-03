@@ -243,7 +243,7 @@ public class STRTransform extends TransformSpi {
     }
 
     private Element dereferenceSTR(Document doc, SecurityTokenReference secRef)
-        throws  WSSecurityException {
+        throws WSSecurityException {
         //
         // Third step: locate the security token referenced by the STR element.
         // Either the Token is contained in the document as a
@@ -287,23 +287,27 @@ public class STRTransform extends TransformSpi {
             tokElement = createBSTX509(doc, cert, secRef.getElement());
         }
         //
-        // third case: KeyIdentifier, must be SKI, lookup in keystore, wrap in
-        // BST according to specification. No other KeyIdentifier type handled
-        // here - just SKI
+        // third case: KeyIdentifier. For SKI, lookup in keystore, wrap in
+        // BST according to specification. Otherwise if it's a wsse:KeyIdentifier it could
+        // be a SAML assertion, so try and find the referenced element.
         //
         else if (secRef.containsKeyIdentifier()) {
             if (doDebug) {
                 log.debug("STR: KeyIdentifier");
             }
-            X509Certificate cert = null;
-            X509Certificate[] certs = secRef.getKeyIdentifier(wsDocInfo.getCrypto());
-            if (certs == null || certs.length == 0 || certs[0] == null) {
-                throw new WSSecurityException(WSSecurityException.FAILED_CHECK);
+            if (WSConstants.WSS_SAML_KI_VALUE_TYPE.equals(secRef.getKeyIdentifierValueType())) {
+                tokElement = secRef.getKeyIdentifierTokenElement(doc, wsDocInfo, null);
+            } else {
+                X509Certificate cert = null;
+                X509Certificate[] certs = secRef.getKeyIdentifier(wsDocInfo.getCrypto());
+                if (certs == null || certs.length == 0 || certs[0] == null) {
+                    throw new WSSecurityException(WSSecurityException.FAILED_CHECK);
+                }
+                cert = certs[0];
+                tokElement = createBSTX509(doc, cert, secRef.getElement());
             }
-            cert = certs[0];
-            tokElement = createBSTX509(doc, cert, secRef.getElement());
         }
-        return (Element) tokElement;
+        return tokElement;
     }
 
     private Element createBSTX509(Document doc, X509Certificate cert, Element secRefE) 

@@ -24,6 +24,7 @@ import junit.framework.TestSuite;
 import org.apache.ws.security.saml.SAMLIssuerFactory;
 import org.apache.ws.security.saml.SAMLIssuer;
 import org.apache.ws.security.saml.WSSecSignatureSAML;
+import org.apache.ws.security.util.WSSecurityUtil;
 
 import org.apache.axis.Message;
 import org.apache.axis.MessageContext;
@@ -35,6 +36,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSecurityEngine;
+import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.message.WSSecHeader;
@@ -49,10 +51,10 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Vector;
 
 /**
- * WS-Security Test Case
- * <p/>
+ * Test-case for sending and processing a (signed) holder-of-key SAML Assertion.
  * 
  * @author Davanum Srinivas (dims@yahoo.com)
  */
@@ -76,7 +78,6 @@ public class TestWSSecurityNewST3 extends TestCase implements CallbackHandler {
 
     /**
      * TestWSSecurity constructor
-     * <p/>
      * 
      * @param name name of the test
      */
@@ -86,7 +87,6 @@ public class TestWSSecurityNewST3 extends TestCase implements CallbackHandler {
 
     /**
      * JUnit suite
-     * <p/>
      * 
      * @return a junit test suite
      */
@@ -96,7 +96,6 @@ public class TestWSSecurityNewST3 extends TestCase implements CallbackHandler {
 
     /**
      * Setup method
-     * <p/>
      * 
      * @throws Exception Thrown when there is a problem in setup
      */
@@ -108,7 +107,6 @@ public class TestWSSecurityNewST3 extends TestCase implements CallbackHandler {
 
     /**
      * Constructs a soap envelope
-     * <p/>
      * 
      * @return soap envelope
      * @throws Exception if there is any problem constructing the soap envelope
@@ -121,12 +119,7 @@ public class TestWSSecurityNewST3 extends TestCase implements CallbackHandler {
     }
 
     /**
-     * Test that encrypt and decrypt a WS-Security envelope.
-     * This test uses the RSA_15 algorithm to transport (wrap) the symmetric
-     * key.
-     * <p/>
-     * 
-     * @throws Exception Thrown when there is any problem in signing or verification
+     * * Test that creates, sends and processes an signed SAML assertion.
      */
     public void testSAMLSignedKeyHolder() throws Exception {
         SOAPEnvelope unsignedEnvelope = message.getSOAPEnvelope();
@@ -150,9 +143,9 @@ public class TestWSSecurityNewST3 extends TestCase implements CallbackHandler {
 
         LOG.info("Before SAMLSignedKeyHolder....");
         
-        /*
-         * set up for keyHolder
-         */
+        //
+        // set up for keyHolder
+        //
         Document signedDoc = wsSign.build(doc, crypto, assertion, null, null, null, secHeader);
         LOG.info("After SAMLSignedKeyHolder....");
 
@@ -162,26 +155,80 @@ public class TestWSSecurityNewST3 extends TestCase implements CallbackHandler {
                 org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
-        verify(signedDoc);
+        
+        Vector results = verify(signedDoc);
+        WSSecurityEngineResult actionResult =
+            WSSecurityUtil.fetchActionResult(results, WSConstants.ST_UNSIGNED);
+        SAMLAssertion receivedAssertion = 
+            (SAMLAssertion) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+        assertTrue(receivedAssertion != null);
+    }
+    
+    
+    /**
+     * Test that creates, sends and processes an signed SAML assertion using a KeyIdentifier
+     * instead of direct reference.
+     */
+    public void testSAMLSignedKeyHolderKeyIdentifier() throws Exception {
+        SOAPEnvelope unsignedEnvelope = message.getSOAPEnvelope();
+
+        Document doc = unsignedEnvelope.getAsDocument();
+        
+        SAMLIssuer saml = SAMLIssuerFactory.getInstance("saml4.properties");
+        // Provide info to SAML issuer that it can construct a Holder-of-key
+        // SAML token.
+        saml.setInstanceDoc(doc);
+        saml.setUserCrypto(crypto);
+        saml.setUsername("16c73ab6-b892-458f-abf5-2f875f74882e");
+        SAMLAssertion assertion = saml.newAssertion();
+
+        WSSecSignatureSAML wsSign = new WSSecSignatureSAML();
+        wsSign.setKeyIdentifierType(WSConstants.X509_KEY_IDENTIFIER);
+        wsSign.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+
+        LOG.info("Before SAMLSignedKeyHolder....");
+        
+        //
+        // set up for keyHolder
+        //
+        Document signedDoc = wsSign.build(doc, crypto, assertion, null, null, null, secHeader);
+        LOG.info("After SAMLSignedKeyHolder....");
+
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Signed SAML message (key holder):");
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+            LOG.debug(outputString);
+        }
+        
+        Vector results = verify(signedDoc);
+        WSSecurityEngineResult actionResult =
+            WSSecurityUtil.fetchActionResult(results, WSConstants.ST_UNSIGNED);
+        SAMLAssertion receivedAssertion = 
+            (SAMLAssertion) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+        assertTrue(receivedAssertion != null);
     }
 
     
     /**
      * Verifies the soap envelope
-     * <p/>
      * 
      * @param envelope 
      * @throws Exception Thrown when there is a problem in verification
      */
-    private void verify(Document doc) throws Exception {
-        secEngine.processSecurityHeader(doc, null, this, crypto);
+    private Vector verify(Document doc) throws Exception {
+        Vector results = secEngine.processSecurityHeader(doc, null, this, crypto);
         String outputString = 
             org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
         assertTrue(outputString.indexOf("LogTestService2") > 0 ? true : false);
+        return results;
     }
 
     public void handle(Callback[] callbacks)
-            throws IOException, UnsupportedCallbackException {
+        throws IOException, UnsupportedCallbackException {
         for (int i = 0; i < callbacks.length; i++) {
             if (callbacks[i] instanceof WSPasswordCallback) {
                 WSPasswordCallback pc = (WSPasswordCallback) callbacks[i];
