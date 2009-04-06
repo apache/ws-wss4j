@@ -264,12 +264,7 @@ public class WSSConfig {
         if (!staticallyInitialized) {
             org.apache.xml.security.Init.init();
             if (addJceProviders) {
-                /*
-                 * The last provider added has precedence, that is if JuiCE can be added
-                 * then WSS4J uses this provider.
-                 */
                 addJceProvider("BC", "org.bouncycastle.jce.provider.BouncyCastleProvider");
-                addJceProvider("JuiCE", "org.apache.security.juice.provider.JuiCEProviderOpenSSL");
             }
             Transform.init();
             try {
@@ -526,9 +521,9 @@ public class WSSConfig {
             if (java.security.Security.getProvider(id) == null) {
                 Class c = Loader.loadClass(className, false);
                 int ret = 
-                    java.security.Security.insertProviderAt(
-                        (java.security.Provider) c.newInstance(), 2
-                    );
+                        java.security.Security.addProvider(
+                            (java.security.Provider) c.newInstance()
+                        );
                 if (log.isDebugEnabled()) {
                     log.debug("The provider " + id + " was added at position: " + ret);
                 }                
