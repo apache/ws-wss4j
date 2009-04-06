@@ -145,15 +145,6 @@ public class SecurityContextToken {
 
     /**
      * Set the identifier.
-     * @deprecated use {#link SecurityContextToken.setIdentifier(String)} instead
-     */
-    public void setIdentifier(Document doc, String uuid) {
-        Text node = getFirstNode(this.elementIdentifier);
-        node.setData(uuid);
-    }
-    
-    /**
-     * Set the identifier.
      */
     public void setIdentifier(String uuid) {
         Text node = getFirstNode(this.elementIdentifier);

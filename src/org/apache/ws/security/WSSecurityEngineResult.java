@@ -201,6 +201,7 @@ public class WSSecurityEngineResult extends java.util.HashMap {
         this(act, princ, certificate, elements, sv);
         put(TAG_PROTECTED_ELEMENTS, protectedElements);
     }
+    
     public
     WSSecurityEngineResult(
         int act,
@@ -227,6 +228,7 @@ public class WSSecurityEngineResult extends java.util.HashMap {
         put(TAG_ENCRYPTED_KEY_ID, encyptedKeyId);
         put(TAG_DATA_REF_URIS, dataRefUris);
     }
+    
     public WSSecurityEngineResult(
         int act, 
         byte[] decryptedKey, 
@@ -270,125 +272,5 @@ public class WSSecurityEngineResult extends java.util.HashMap {
         put(TAG_X509_CERTIFICATES, certificates);
     }
 
-    /**
-     * @return the actions vector. These actions were performed by the the
-     *         security engine.
-     *
-     * @deprecated      use ((java.lang.Integer) #get(#TAG_ACTION)).intValue() 
-     *                  instead
-     */
-    public int getAction() {
-        return ((java.lang.Integer) get(TAG_ACTION)).intValue();
-    }
-
-    /**
-     * @return the principals found if UsernameToken or Signature
-     *         processing were done
-     *
-     * @deprecated      use (Principal) #get(#TAG_PRINCIPAL) instead
-     */
-    public Principal getPrincipal() {
-        return (Principal) get(TAG_PRINCIPAL);
-    }
-
-    /**
-     * @return the Certificate found if Signature
-     *         processing were done
-     *
-     * @deprecated      use (X509Certificate)
-     *                  #get(#TAG_X509_CERTIFICATE) instead
-     */
-    public X509Certificate getCertificate() {
-        return (X509Certificate) get(TAG_X509_CERTIFICATE);
-    }
-
-    /**
-     * @return the timestamp found
-     *
-     * @deprecated      use (Timestamp)
-     *                  #get(#TAG_TIMESTAMP) instead
-     */
-    public Timestamp getTimestamp() {
-        return (Timestamp) get(TAG_TIMESTAMP);
-    }
-
-    /**
-     * @return Returns the signedElements.
-     *
-     * @deprecated      use (java.util.Set)
-     *                  #get(#TAG_SIGNED_ELEMENT_IDS) instead
-     */
-    public Set getSignedElements() {
-        return (java.util.Set) get(TAG_SIGNED_ELEMENT_IDS);
-    }
-
-    /**
-     * @return Returns the signatureValue.
-     *
-     * @deprecated      use (byte[])
-     *                  #get(#TAG_SIGNATURE_VALUE) instead
-     */
-    public byte[] getSignatureValue() {
-        return (byte[]) get(TAG_SIGNATURE_VALUE);
-    }
-
-    /**
-     * @return Returns the sigConf.
-     *
-     * @deprecated      use (SignatureConfirmation)
-     *                  #get(#TAG_SIGNATURE_CONFIRMATION) instead
-     */
-    public SignatureConfirmation getSigConf() {
-        return (SignatureConfirmation) get(TAG_SIGNATURE_CONFIRMATION);
-    }
-
-    /**
-     * @param signatureValue The signatureValue to set.
-     *
-     * @deprecated      use put(#TAG_SIGNATURE_VALUE, signatureValue) instead
-     */
-    public void setSignatureValue(byte[] signatureValue) {
-        put(TAG_SIGNATURE_VALUE, signatureValue);
-    }
-
-    /**
-     * @return          the security context token acquired off the message
-     *
-     * @deprecated      use
-     *                  #get(#TAG_SECURITY_CONTEXT_TOKEN) instead
-     */
-    public SecurityContextToken getSecurityContextToken() {
-        return (SecurityContextToken) get(TAG_SECURITY_CONTEXT_TOKEN);
-    }
-
-    /**
-     * @return          the decrypted key
-     *
-     * @deprecated      use
-     *                  #get(#TAG_DECRYPTED_KEY) instead
-     */
-    public byte[] getDecryptedKey() {
-        return (byte[]) get(TAG_DECRYPTED_KEY);
-    }
-
-    /**
-     * @return          the encrypted key id
-     *
-     * @deprecated      use
-     *                  #get(#TAG_ENCRYPTED_KEY) instead
-     */
-    public String getEncryptedKeyId() {
-        return (String) get(TAG_ENCRYPTED_KEY_ID);
-    }
-
-    /**
-     * @return          the list of data ref URIs
-     *
-     * @deprecated      use
-     *                  #get(#TAG_DATA_REF_URIS) instead
-     */
-    public List getDataRefUris() {
-        return (List) get(TAG_DATA_REF_URIS);
-    }
     
 }

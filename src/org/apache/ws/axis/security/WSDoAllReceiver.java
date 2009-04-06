@@ -285,7 +285,8 @@ public class WSDoAllReceiver extends WSDoAllHandler {
                     .fetchActionResult(wsResult, WSConstants.SIGN);
 
             if (actionResult != null) {
-                X509Certificate returnCert = actionResult.getCertificate();
+                X509Certificate returnCert = 
+                    (X509Certificate)actionResult.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE); 
 
                 if (returnCert != null && !verifyTrust(returnCert, reqData)) {
                     throw new AxisFault(
@@ -308,7 +309,8 @@ public class WSDoAllReceiver extends WSDoAllHandler {
                     WSConstants.TS);
 
             if (actionResult != null) {
-                Timestamp timestamp = actionResult.getTimestamp();
+                Timestamp timestamp = 
+                    (Timestamp)actionResult.get(WSSecurityEngineResult.TAG_TIMESTAMP);
 
                 if (timestamp != null 
                     && !verifyTimestamp(timestamp, decodeTimeToLive(reqData))) {

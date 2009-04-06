@@ -74,47 +74,6 @@ public class WSSecurityUtil {
      * 
      * @param doc
      * @param actor
-     * @deprecated use WSSecurityUtil.getSecurityHeader(Document, String) instead
-     * @return the <code>wsse:Security</code> element or <code>null</code>
-     *         if not such element found
-     */
-    public static Element getSecurityHeader(Document doc, String actor, SOAPConstants sc) {
-        Element soapHeaderElement = 
-            getDirectChildElement(
-                doc.getDocumentElement(), 
-                sc.getHeaderQName().getLocalPart(), 
-                sc.getEnvelopeURI()
-            );
-        if (soapHeaderElement == null) { // no SOAP header at all
-            return null;
-        }
-
-        // get all wsse:Security nodes
-        NodeList list = 
-            soapHeaderElement.getElementsByTagNameNS(WSConstants.WSSE_NS, WSConstants.WSSE_LN);
-        if (list == null) {
-            return null;
-        }
-        for (int i = 0; i < list.getLength(); i++) {
-            Element elem = (Element) list.item(i);
-            Attr attr = 
-                elem.getAttributeNodeNS(
-                    sc.getEnvelopeURI(), sc.getRoleAttributeQName().getLocalPart()
-                );
-            String hActor = (attr != null) ? attr.getValue() : null;
-            if (WSSecurityUtil.isActorEqual(actor, hActor)) {
-                return elem;
-            }
-        }
-        return null;
-    }
-    
-    /**
-     * Returns the first WS-Security header element for a given actor. Only one
-     * WS-Security header is allowed for an actor.
-     * 
-     * @param doc
-     * @param actor
      * @return the <code>wsse:Security</code> element or <code>null</code>
      *         if not such element found
      */
@@ -174,32 +133,6 @@ public class WSSecurityUtil {
         return false;
     }
 
-    /**
-     * Gets a direct child with specified localname and namespace. <p/>
-     * 
-     * @param fNode the node where to start the search
-     * @param localName local name of the child to get
-     * @param namespace the namespace of the child to get
-     * @deprecated see WSSecurityUtil#getDirectChildElement instead
-     * @return the node or <code>null</code> if not such node found
-     */
-    public static Node getDirectChild(
-        Node fNode, 
-        String localName,
-        String namespace
-    ) {
-        for (
-            Node currentChild = fNode.getFirstChild(); 
-            currentChild != null; 
-            currentChild = currentChild.getNextSibling()
-        ) {
-            if (localName.equals(currentChild.getLocalName())
-                && namespace.equals(currentChild.getNamespaceURI())) {
-                return currentChild;
-            }
-        }
-        return null;
-    }
     
     /**
      * Gets a direct child with specified localname and namespace. <p/>
@@ -229,25 +162,6 @@ public class WSSecurityUtil {
     }
     
 
-    /**
-     * return the first soap "Body" element. <p/>
-     * 
-     * @deprecated use findBodyElement(Document) instead
-     * @param doc
-     * @return the body element or <code>null</code> if document does not
-     *         contain a SOAP body
-     */
-    public static Element findBodyElement(Document doc, SOAPConstants sc) {
-        Element soapBodyElement = 
-            WSSecurityUtil.getDirectChildElement(
-                doc.getFirstChild(), 
-                sc.getBodyQName().getLocalPart(), 
-                sc.getEnvelopeURI()
-            );
-        return soapBodyElement;
-    }
-    
-    
     /**
      * return the first soap "Body" element. <p/>
      * 
@@ -557,18 +471,6 @@ public class WSSecurityUtil {
     }
     
     /**
-     * Turn a reference (eg "#5") into an ID (eg "5").
-     * 
-     * @param ref
-     * @return ref trimmed and with the leading "#" removed, or null if not
-     *         correctly formed
-     * @deprecated use getIDFromReference instead
-     */
-    public static String getIDfromReference(String ref) {
-        return getIDFromReference(ref);
-    }
-
-    /**
      * Search for an element given its generic id. <p/>
      * 
      * @param doc the DOM document (SOAP request)
@@ -609,26 +511,6 @@ public class WSSecurityUtil {
 
 
     /**
-     * append a child element <p/>
-     * 
-     * @param doc the DOM document (SOAP request)
-     * @param parent element of this child element
-     * @param child the element to append
-     * @deprecated use {@link Node#appendChild(Node)} instead
-     * @return the child element
-     */
-    public static Element appendChildElement(
-        Document doc, 
-        Element parent,
-        Element child
-    ) {
-        Node whitespaceText = doc.createTextNode("\n");
-        parent.appendChild(whitespaceText);
-        parent.appendChild(child);
-        return child;
-    }
-    
-    /**
      * prepend a child element <p/>
      * 
      * @param parent element of this child element
@@ -648,35 +530,6 @@ public class WSSecurityUtil {
         return child;
     }
 
-    /**
-     * prepend a child element <p/>
-     * 
-     * @param doc the DOM document (SOAP request)
-     * @param parent element of this child element
-     * @param child the element to append
-     * @param addWhitespace if true prepend a newline before child
-     * @deprecated use {@link WSSecurityUtil#prependChildElement(Element, Element)}
-     * instead
-     * @return the child element
-     */
-    public static Element prependChildElement(
-        Document doc, 
-        Element parent,
-        Element child, 
-        boolean addWhitespace
-    ) {
-        Node firstChild = parent.getFirstChild();
-        if (firstChild == null) {
-            parent.appendChild(child);
-        } else {
-            parent.insertBefore(child, firstChild);
-        }
-        if (addWhitespace) {
-            Node whitespaceText = doc.createTextNode("\n");
-            parent.insertBefore(whitespaceText, child);
-        }
-        return child;
-    }
 
     /**
      * find the first ws-security header block <p/>

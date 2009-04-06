@@ -105,6 +105,7 @@ public class WSPasswordCallback implements Callback {
         this.type = type;
         this.usage = usage;
     }
+    
     /**
      * Get the identifier.
      * <p/>
@@ -113,17 +114,6 @@ public class WSPasswordCallback implements Callback {
      */
     public String getIdentifier() {
         return identifier;
-    }
-    
-    /**
-     * Get the identifier.
-     * <p/>
-     *
-     * @return The identifier
-     * @deprecated use getIdentifier() instead
-     */
-    public String getIdentifer() {
-        return getIdentifier();
     }
     
     /**

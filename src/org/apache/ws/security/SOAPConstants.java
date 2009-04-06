@@ -72,12 +72,5 @@ public interface SOAPConstants extends Serializable {
      */
     public String getMustUnderstand();
     
-    /**
-     * Obtain the "next" role/actor URI
-     * @deprecated use getMustUnderstand() instead
-     */
-    public String getMustunderstand();
-    
-    
 
 }

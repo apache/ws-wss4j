@@ -156,29 +156,11 @@ public class DerivedKeyToken {
         WSSecurityUtil.prependChildElement(this.element, ref.getElement());
     }
     
-    /**
-     * Sets the security token reference of the derived key token
-     * This is the reference to the shared secret used in the conversation/context
-     *
-     * @param ref Security token reference
-     * @deprecated use setSecurityTokenReference(SecurityTokenReference ref) instead
-     */
-    public void setSecuityTokenReference(SecurityTokenReference ref) {
-        setSecurityTokenReference(ref);
-    }
-    
     public void setSecurityTokenReference(Element elem) {
         this.elementSecurityTokenReference = elem;
         WSSecurityUtil.prependChildElement(this.element, elem);
     }
     
-    /**
-     * @deprecated use setSecurityTokenReference(Element elem) instead
-     */
-    public void setSecuityTokenReference(Element elem) {
-        setSecurityTokenReference(elem);
-    }
-
     /**
      * Returns the SecurityTokenReference of the derived key token
      *
@@ -192,19 +174,6 @@ public class DerivedKeyToken {
         return null;
     }
     
-    /**
-     * Returns the SecurityTokenReference of the derived key token
-     *
-     * @return the Security Token Reference of the derived key token
-     * @throws WSSecurityException
-     * @deprecated use getSecurityTokenReference() instead
-     */
-    public SecurityTokenReference getSecuityTokenReference() throws WSSecurityException {
-        return getSecurityTokenReference();
-    }
-
-    //Write the getter for security token reference
-
     /**
      * This adds a property into
      * /DerivedKeyToken/Properties

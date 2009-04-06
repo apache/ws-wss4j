@@ -96,26 +96,6 @@ public abstract class CryptoFactory {
     /**
      * getInstance
      * <p/>
-     * Returns an instance of Crypto. The properties are handed over the the crypto
-     * implementation. The properties can be <code>null</code>. It is dependent on the
-     * Crypto implementation how the initialization is done in this case.
-     * <p/>
-     *
-     * @param cryptoClassName This is the crypto implementation class. No default is
-     *                        provided here.
-     * @param properties      The Properties that are forwarded to the crypto implementation.
-     *                        These properties are dependent on the crypto implementation
-     * @return The crypto implementation or null if no cryptoClassName was defined
-     *
-     * @deprecated            use @link{#getInstance(java.lang.String, java.util.Map)} instead.
-     */
-    public static Crypto getInstance(String cryptoClassName, Properties properties) {
-        return loadClass(cryptoClassName, properties);
-    }
-    
-    /**
-     * getInstance
-     * <p/>
      * Returns an instance of Crypto. The supplied map is handed over the the crypto
      * implementation. The map can be <code>null</code>. It is dependent on the
      * Crypto implementation how the initialization is done in this case.

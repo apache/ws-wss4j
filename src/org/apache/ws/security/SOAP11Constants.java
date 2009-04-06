@@ -66,12 +66,4 @@ public class SOAP11Constants implements SOAPConstants {
         return "1";
     }
     
-    /**
-     * Obtain the MustUnderstand string
-     * @deprecated use getMustUnderstand() instead
-     */
-    public String getMustunderstand() {
-        return getMustUnderstand();
-    }
-
 }

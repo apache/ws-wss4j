@@ -345,18 +345,6 @@ public class WSSecEncryptedKey extends WSSecBase {
         return encryptedKey;
     }
     
-    /**
-     * Create DOM subtree for <code>xenc:EncryptedKey</code>
-     * 
-     * @param doc the SOAP envelope parent document
-     * @param keyTransportAlgo specifies which algorithm to use to encrypt the symmetric key
-     * @return an <code>xenc:EncryptedKey</code> element
-     * @deprecated use createEncryptedKey(Document doc, String keyTransportAlgo) instead
-     */
-    protected Element createEnrcyptedKey(Document doc, String keyTransportAlgo) {
-        return createEncryptedKey(doc, keyTransportAlgo);
-    }
-
     protected Element createCipherValue(Document doc, Element encryptedKey) {
         Element cipherData = 
             doc.createElementNS(WSConstants.ENC_NS, WSConstants.ENC_PREFIX + ":CipherData");
