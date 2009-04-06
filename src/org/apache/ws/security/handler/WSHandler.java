@@ -60,10 +60,10 @@ import java.util.Vector;
  * @author Marcel Ammerlaan (marcel.ammerlaan@gmail.com).
  */
 public abstract class WSHandler {
-    public static String DONE = "done";
+    public static final String DONE = "done";
     private static Log log = LogFactory.getLog(WSHandler.class.getName());
-    protected static final WSSecurityEngine secEngine = WSSecurityEngine.getInstance();
-    protected static Hashtable cryptos = new Hashtable(5);
+    protected WSSecurityEngine secEngine = WSSecurityEngine.getInstance();
+    protected Hashtable cryptos = new Hashtable(5);
 
     private boolean doDebug = log.isDebugEnabled();
 
@@ -386,23 +386,25 @@ public abstract class WSHandler {
     public Crypto loadSignatureCrypto(RequestData reqData) 
         throws WSSecurityException {
         Crypto crypto = null;
-        /*
-         * Get crypto property file for signature. If none specified throw
-         * fault, otherwise get a crypto instance.
-         */
-        String sigPropFile = getString(WSHandlerConstants.SIG_PROP_FILE,
-                reqData.getMsgContext());
+        //
+        // Get crypto property file for signature. If none specified throw
+        // fault, otherwise get a crypto instance.
+        //
+        String sigPropFile = 
+            getString(WSHandlerConstants.SIG_PROP_FILE, reqData.getMsgContext());
         if (sigPropFile != null) {
             crypto = (Crypto) cryptos.get(sigPropFile);
             if (crypto == null) {
-                crypto = CryptoFactory.getInstance(
-                    sigPropFile, this.getClassLoader(reqData.getMsgContext()));
+                crypto = 
+                    CryptoFactory.getInstance(
+                        sigPropFile, this.getClassLoader(reqData.getMsgContext())
+                    );
                 cryptos.put(sigPropFile, crypto);
             }
         } else if (getString(WSHandlerConstants.SIG_PROP_REF_ID, reqData.getMsgContext()) != null) {
-            /*
-             * If the property file is missing then look for the Properties object 
-             */
+            //
+            // If the property file is missing then look for the Properties object 
+            //
             String refId = 
                 getString(WSHandlerConstants.SIG_PROP_REF_ID, reqData.getMsgContext());
             if (refId != null) {
@@ -413,18 +415,10 @@ public abstract class WSHandler {
                         crypto = CryptoFactory.getInstance((Properties)propObj);
                         cryptos.put(refId, crypto);
                     }
-                } else {
-                    throw new WSSecurityException(
-                        "WSHandler: Signature: signaturePropRefId must hold a " 
-                        + "java.util.Properties object"
-                    );
                 }
             }
-        } else {
-            throw new WSSecurityException(
-                "WSHandler: Signature: no crypto properties"
-            );
         }
+        
         return crypto;
     }
 
@@ -435,23 +429,25 @@ public abstract class WSHandler {
     protected Crypto loadEncryptionCrypto(RequestData reqData) 
         throws WSSecurityException {
         Crypto crypto = null;
-        /*
-         * Get encryption crypto property file. If non specified take crypto
-         * instance from signature, if that fails: throw fault
-         */
+        //
+        // Get encryption crypto property file. If non specified take crypto
+        // instance from signature, if that fails: throw fault
+        //
         String encPropFile = 
             getString(WSHandlerConstants.ENC_PROP_FILE, reqData.getMsgContext());
         if (encPropFile != null) {
             crypto = (Crypto) cryptos.get(encPropFile);
             if (crypto == null) {
                 crypto = 
-                    CryptoFactory.getInstance(encPropFile, this.getClassLoader(reqData.getMsgContext()));
+                    CryptoFactory.getInstance(
+                        encPropFile, this.getClassLoader(reqData.getMsgContext())
+                    );
                 cryptos.put(encPropFile, crypto);
             }
         } else if (getString(WSHandlerConstants.ENC_PROP_REF_ID, reqData.getMsgContext()) != null) {
-            /*
-             * If the property file is missing then look for the Properties object 
-             */
+            //
+            // If the property file is missing then look for the Properties object 
+            //
             String refId = 
                 getString(WSHandlerConstants.ENC_PROP_REF_ID, reqData.getMsgContext());
             if (refId != null) {
@@ -462,18 +458,15 @@ public abstract class WSHandler {
                         crypto = CryptoFactory.getInstance((Properties)propObj);
                         cryptos.put(refId, crypto);
                     }
-                } else {
-                    throw new WSSecurityException(
-                        "WSHandler: Encryption: encryptionPropRefId must hold a" 
-                        + " java.util.Properties object"
-                    );
                 }
             }
-        } else if ((crypto = reqData.getSigCrypto()) == null) {
-            throw new WSSecurityException(
-                "WSHandler: Encryption: no crypto property file"
-            );
+        } else if (reqData.getSigCrypto() != null) {
+            //
+            // Default to the signature crypto
+            //
+            crypto = reqData.getSigCrypto();
         }
+        
         return crypto;
     }
 
@@ -924,13 +917,15 @@ public abstract class WSHandler {
             crypto = (Crypto) cryptos.get(decPropFile);
             if (crypto == null) {
                 crypto = 
-                    CryptoFactory.getInstance(decPropFile, this.getClassLoader(reqData.getMsgContext()));
+                    CryptoFactory.getInstance(
+                        decPropFile, this.getClassLoader(reqData.getMsgContext())
+                    );
                 cryptos.put(decPropFile, crypto);
             }
         } else if (getString(WSHandlerConstants.DEC_PROP_REF_ID, reqData.getMsgContext()) != null) {
-            /*
-             * If the property file is missing then look for the Properties object 
-             */
+            //
+            // If the property file is missing then look for the Properties object 
+            //
             String refId = 
                 getString(WSHandlerConstants.DEC_PROP_REF_ID, reqData.getMsgContext());
             if (refId != null) {
@@ -941,18 +936,15 @@ public abstract class WSHandler {
                         crypto = CryptoFactory.getInstance((Properties)propObj);
                         cryptos.put(refId, crypto);
                     }
-                } else {
-                    throw new WSSecurityException(
-                        "WSHandler: Decrytion: decryptionPropRefId must hold a" 
-                        + " java.util.Properties object"
-                    );
                 }
             }
-        } else if ((crypto = reqData.getSigCrypto()) == null) {
-            throw new WSSecurityException(
-                "WSHandler: Encryption: no crypto property file"
-            );
+        } else if (reqData.getSigCrypto() != null) {
+            //
+            // Default to the signature crypto
+            //
+            crypto = reqData.getSigCrypto();
         }
+        
         return crypto;
     }
 
