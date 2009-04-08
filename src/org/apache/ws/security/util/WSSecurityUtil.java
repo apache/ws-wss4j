@@ -157,6 +157,32 @@ public class WSSecurityUtil {
     }
 
     /**
+     * Gets a direct child with specified localname and namespace. <p/>
+     * 
+     * @param fNode the node where to start the search
+     * @param localName local name of the child to get
+     * @param namespace the namespace of the child to get
+     * @return the node or <code>null</code> if not such node found
+     */
+    public static Element getDirectChildElement(
+        Node fNode, 
+        String localName,
+        String namespace
+    ) {
+        for (
+            Node currentChild = fNode.getFirstChild(); 
+            currentChild != null; 
+            currentChild = currentChild.getNextSibling()
+        ) {
+            if (Node.ELEMENT_NODE == currentChild.getNodeType()
+                && localName.equals(currentChild.getLocalName())
+                && namespace.equals(currentChild.getNamespaceURI())) {
+                return (Element)currentChild;
+            }
+        }
+        return null;
+    }
+    /**
      * return the first soap "Body" element. <p/>
      * 
      * @param doc
