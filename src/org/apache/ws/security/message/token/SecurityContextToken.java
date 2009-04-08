@@ -114,6 +114,7 @@ public class SecurityContextToken {
         this.elementIdentifier.appendChild(doc.createTextNode(uuid));
     }
 
+    
     /**
      * This is used to create a SecurityContextToken using a DOM Element
      *
@@ -141,6 +142,14 @@ public class SecurityContextToken {
                 ConversationConstants.IDENTIFIER_LN,
                 el.getNamespaceURI()
             );
+    }
+    
+    /**
+     * Add the WSU Namespace to this SCT. The namespace is not added by default for
+     * efficiency purposes.
+     */
+    public void addWSUNamespace() {
+        WSSecurityUtil.setNamespace(element, WSConstants.WSU_NS, WSConstants.WSU_PREFIX);
     }
 
     /**
@@ -214,9 +223,7 @@ public class SecurityContextToken {
      *           SecurityContextToken
      */
     public void setID(String id) {
-        String prefix = 
-            WSSecurityUtil.setNamespace(this.element, WSConstants.WSU_NS, WSConstants.WSU_PREFIX);
-        this.element.setAttributeNS(WSConstants.WSU_NS, prefix + ":Id", id);
+        this.element.setAttributeNS(WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":Id", id);
     }
 
 }

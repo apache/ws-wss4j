@@ -31,8 +31,7 @@ import org.w3c.dom.Element;
  */
 
 public class WSSecSignatureConfirmation extends WSSecBase {
-    private static Log log = LogFactory.getLog(WSSecSignatureConfirmation.class
-            .getName());
+    private static Log log = LogFactory.getLog(WSSecSignatureConfirmation.class.getName());
 
     private SignatureConfirmation sc = null;
 

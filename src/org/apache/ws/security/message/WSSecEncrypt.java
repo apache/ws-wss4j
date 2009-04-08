@@ -426,6 +426,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
             keyIdentifierType == WSConstants.ENCRYPTED_KEY_SHA1_IDENTIFIER) {
             keyInfo = new KeyInfo(document);
             SecurityTokenReference secToken = new SecurityTokenReference(document);
+            secToken.addWSSENamespace();
             if (this.customReferenceValue != null) {
                 secToken.setKeyIdentifierEncKeySHA1(this.customReferenceValue);
             } else {
@@ -461,6 +462,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
         if (keyInfo == null) {
             keyInfo = new KeyInfo(document);
             SecurityTokenReference secToken = new SecurityTokenReference(document);
+            secToken.addWSSENamespace();
             Reference ref = new Reference(document);
             if (encKeyIdDirectId) {
                 ref.setURI(encKeyId);

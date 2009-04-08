@@ -136,6 +136,7 @@ public class WSSecDKEncrypt extends WSSecDerivedKeyBase {
                 // Create the SecurityTokenRef to the DKT
                 KeyInfo keyInfo = new KeyInfo(document);
                 SecurityTokenReference secToken = new SecurityTokenReference(document);
+                secToken.addWSSENamespace();
                 Reference ref = new Reference(document);
                 ref.setURI("#" + dktId);
                 secToken.setReference(ref);

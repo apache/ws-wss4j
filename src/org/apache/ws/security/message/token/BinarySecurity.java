@@ -91,9 +91,24 @@ public class BinarySecurity {
      */
     public BinarySecurity(Document doc) {
         this.element = doc.createElementNS(WSConstants.WSSE_NS, "wsse:BinarySecurityToken");
-        WSSecurityUtil.setNamespace(this.element, WSConstants.WSSE_NS, WSConstants.WSSE_PREFIX);
         setEncodingType(BASE64_ENCODING);
         this.element.appendChild(doc.createTextNode(""));
+    }
+    
+    /**
+     * Add the WSSE Namespace to this BST. The namespace is not added by default for
+     * efficiency purposes.
+     */
+    public void addWSSENamespace() {
+        WSSecurityUtil.setNamespace(this.element, WSConstants.WSSE_NS, WSConstants.WSSE_PREFIX);
+    }
+    
+    /**
+     * Add the WSU Namespace to this BST. The namespace is not added by default for
+     * efficiency purposes.
+     */
+    public void addWSUNamespace() {
+        WSSecurityUtil.setNamespace(element, WSConstants.WSU_NS, WSConstants.WSU_PREFIX);
     }
 
     /**
@@ -196,9 +211,7 @@ public class BinarySecurity {
      * @param id 
      */
     public void setID(String id) {
-        String prefix = 
-            WSSecurityUtil.setNamespace(this.element, WSConstants.WSU_NS, WSConstants.WSU_PREFIX);
-        this.element.setAttributeNS(WSConstants.WSU_NS, prefix + ":Id", id);
+        this.element.setAttributeNS(WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":Id", id);
     }
 
     /**

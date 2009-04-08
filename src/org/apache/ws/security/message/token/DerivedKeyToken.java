@@ -144,6 +144,14 @@ public class DerivedKeyToken {
                 this.element, ConversationConstants.NONCE_LN, this.ns
             );
     }
+    
+    /**
+     * Add the WSU Namespace to this DKT. The namespace is not added by default for
+     * efficiency purposes.
+     */
+    public void addWSUNamespace() {
+        WSSecurityUtil.setNamespace(element, WSConstants.WSU_NS, WSConstants.WSU_PREFIX);
+    }
 
     /**
      * Sets the security token reference of the derived key token
@@ -437,9 +445,7 @@ public class DerivedKeyToken {
      *           DerivedKeyToken
      */
     public void setID(String id) {
-        String prefix = 
-            WSSecurityUtil.setNamespace(this.element, WSConstants.WSU_NS, WSConstants.WSU_PREFIX);
-        this.element.setAttributeNS(WSConstants.WSU_NS, prefix + ":Id", id);
+        this.element.setAttributeNS(WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":Id", id);
     }
 
     /**

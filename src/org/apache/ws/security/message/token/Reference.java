@@ -63,8 +63,14 @@ public class Reference {
      * @param doc 
      */
     public Reference(Document doc) {
-        this.element =
-            doc.createElementNS(WSConstants.WSSE_NS, "wsse:Reference");
+        this.element = doc.createElementNS(WSConstants.WSSE_NS, "wsse:Reference");
+    }
+    
+    /**
+     * Add the WSSE Namespace to this reference. The namespace is not added by default for
+     * efficiency purposes, as the reference is embedded in a wsse:SecurityTokenReference.
+     */
+    public void addWSSENamespace() {
         WSSecurityUtil.setNamespace(this.element, WSConstants.WSSE_NS, WSConstants.WSSE_PREFIX);
     }
 

@@ -123,7 +123,6 @@ public class Timestamp {
             doc.createElementNS(
                 WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + WSConstants.TIMESTAMP_TOKEN_LN
             );
-        WSSecurityUtil.setNamespace(element, WSConstants.WSU_NS, WSConstants.WSU_PREFIX);
 
         DateFormat zulu = null;
         if (milliseconds) {
@@ -153,6 +152,14 @@ public class Timestamp {
             elementExpires.appendChild(doc.createTextNode(zulu.format(expires.getTime())));
             element.appendChild(elementExpires);
         }
+    }
+    
+    /**
+     * Add the WSU Namespace to this T. The namespace is not added by default for
+     * efficiency purposes.
+     */
+    public void addWSUNamespace() {
+        WSSecurityUtil.setNamespace(element, WSConstants.WSU_NS, WSConstants.WSU_PREFIX);
     }
 
     /**

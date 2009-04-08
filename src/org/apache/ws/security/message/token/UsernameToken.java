@@ -189,7 +189,6 @@ public class UsernameToken {
     public UsernameToken(boolean milliseconds, Document doc, String pwType) {
         element = 
             doc.createElementNS(WSConstants.WSSE_NS, "wsse:" + WSConstants.USERNAME_TOKEN_LN);
-        WSSecurityUtil.setNamespace(element, WSConstants.WSSE_NS, WSConstants.WSSE_PREFIX);
 
         elementUsername = 
             doc.createElementNS(WSConstants.WSSE_NS, "wsse:" + WSConstants.USERNAME_LN);
@@ -210,6 +209,22 @@ public class UsernameToken {
                 addCreated(milliseconds, doc);
             }
         }
+    }
+    
+    /**
+     * Add the WSSE Namespace to this UT. The namespace is not added by default for
+     * efficiency purposes.
+     */
+    public void addWSSENamespace() {
+        WSSecurityUtil.setNamespace(this.element, WSConstants.WSSE_NS, WSConstants.WSSE_PREFIX);
+    }
+    
+    /**
+     * Add the WSU Namespace to this UT. The namespace is not added by default for
+     * efficiency purposes.
+     */
+    public void addWSUNamespace() {
+        WSSecurityUtil.setNamespace(this.element, WSConstants.WSU_NS, WSConstants.WSU_PREFIX);
     }
 
     /**
@@ -244,9 +259,8 @@ public class UsernameToken {
         Calendar rightNow = Calendar.getInstance();
         elementCreated = 
             doc.createElementNS(
-                WSConstants.WSU_NS,WSConstants.WSU_PREFIX + ":" + WSConstants.CREATED_LN
+                WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + WSConstants.CREATED_LN
             );
-        WSSecurityUtil.setNamespace(element, WSConstants.WSU_NS, WSConstants.WSU_PREFIX);
         elementCreated.appendChild(doc.createTextNode(zulu.format(rightNow.getTime())));
         element.appendChild(elementCreated);
     }
@@ -532,9 +546,7 @@ public class UsernameToken {
      *            username token
      */
     public void setID(String id) {
-        String prefix = 
-            WSSecurityUtil.setNamespace(element, WSConstants.WSU_NS, WSConstants.WSU_PREFIX);
-        element.setAttributeNS(WSConstants.WSU_NS, prefix + ":Id", id);
+        element.setAttributeNS(WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":Id", id);
     }
 
     /**

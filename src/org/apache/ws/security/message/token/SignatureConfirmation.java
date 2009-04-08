@@ -73,7 +73,14 @@ public class SignatureConfirmation {
             String sv = Base64.encode(signVal);
             element.setAttribute(VALUE, sv);
         }
-
+    }
+    
+    /**
+     * Add the WSU Namespace to this SC. The namespace is not added by default for
+     * efficiency purposes.
+     */
+    public void addWSUNamespace() {
+        WSSecurityUtil.setNamespace(element, WSConstants.WSU_NS, WSConstants.WSU_PREFIX);
     }
 
     /**
@@ -99,9 +106,7 @@ public class SignatureConfirmation {
      * @param id
      */
     public void setID(String id) {
-        String prefix = 
-            WSSecurityUtil.setNamespace(this.element, WSConstants.WSU_NS, WSConstants.WSU_PREFIX);
-        this.element.setAttributeNS(WSConstants.WSU_NS, prefix + ":Id", id);
+        this.element.setAttributeNS(WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":Id", id);
     }
     
     /**

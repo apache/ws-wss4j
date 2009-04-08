@@ -91,9 +91,15 @@ public class SecurityTokenReference {
      */
     public SecurityTokenReference(Document doc) {
         doDebug = log.isDebugEnabled();
-        this.element =
-                doc.createElementNS(WSConstants.WSSE_NS, "wsse:SecurityTokenReference");
-        WSSecurityUtil.setNamespace(this.element, WSConstants.WSSE_NS, WSConstants.WSSE_PREFIX);        
+        this.element = doc.createElementNS(WSConstants.WSSE_NS, "wsse:SecurityTokenReference");
+    }
+    
+    /**
+     * Add the WSSE Namespace to this STR. The namespace is not added by default for
+     * efficiency purposes.
+     */
+    public void addWSSENamespace() {
+        WSSecurityUtil.setNamespace(this.element, WSConstants.WSSE_NS, WSConstants.WSSE_PREFIX);
     }
 
     /**
@@ -753,11 +759,8 @@ public class SecurityTokenReference {
      * @param id
      */
     public void setID(String id) {
-        String prefix =
-                WSSecurityUtil.setNamespace(
-                    this.element, WSConstants.WSU_NS, WSConstants.WSU_PREFIX
-                );
-        this.element.setAttributeNS(WSConstants.WSU_NS, prefix + ":Id", id);
+        WSSecurityUtil.setNamespace(element, WSConstants.WSU_NS, WSConstants.WSU_PREFIX);
+        this.element.setAttributeNS(WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":Id", id);
     }
 
     /**

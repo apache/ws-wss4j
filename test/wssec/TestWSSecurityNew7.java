@@ -114,7 +114,7 @@ public class TestWSSecurityNew7 extends TestCase implements CallbackHandler {
 
     /**
      * Test that encrypt and then again encrypts (Super encryption) WS-Security
-     * envelope and then verifies ist <p/>
+     * envelope and then verifies it <p/>
      * 
      * @throws Exception
      *             Thrown when there is any problem in encryption or
@@ -130,8 +130,22 @@ public class TestWSSecurityNew7 extends TestCase implements CallbackHandler {
         secHeader.insertSecurityHeader(doc);
 
         Document encryptedDoc = encrypt.build(doc, crypto, secHeader);
-        Document encryptedEncryptedDoc = encrypt.build(encryptedDoc, crypto,
-                secHeader);
+        
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("After the first encryption:");
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(encryptedDoc);
+            LOG.debug(outputString);
+        }
+        
+        Document encryptedEncryptedDoc = encrypt.build(encryptedDoc, crypto, secHeader);
+        
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("After the second encryption:");
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(encryptedEncryptedDoc);
+            LOG.debug(outputString);
+        }
 
         LOG.info("After Encryption....");
         verify(encryptedEncryptedDoc);

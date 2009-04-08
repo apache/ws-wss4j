@@ -169,6 +169,8 @@ public class WSSecHeader {
                 mustUnderstandLocal
             );
         }
+        WSSecurityUtil.setNamespace(securityHeader, WSConstants.WSU_NS, WSConstants.WSU_PREFIX);
+        
         return securityHeader;
     }
     

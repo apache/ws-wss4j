@@ -33,6 +33,8 @@ import org.apache.axis.MessageContext;
 import org.apache.axis.client.AxisClient;
 import org.apache.axis.configuration.NullProvider;
 import org.apache.axis.message.SOAPEnvelope;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSecurityEngine;
@@ -54,6 +56,7 @@ import org.w3c.dom.Document;
  * @author Ruchith Fernando (ruchith.fernando@gmail.com)
  */
 public class TestWSSecurityNewSCT extends TestCase implements CallbackHandler {
+    private static final Log LOG = LogFactory.getLog(TestWSSecurityNewSCT.class);
 
     private static final String SOAPMSG = 
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" 
@@ -109,6 +112,10 @@ public class TestWSSecurityNewSCT extends TestCase implements CallbackHandler {
 
             String out = 
                 org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+            
+            if (LOG.isDebugEnabled()) {
+                LOG.debug(out);
+            }
 
             assertTrue(
                 "SecurityContextToken missing",
@@ -118,8 +125,6 @@ public class TestWSSecurityNewSCT extends TestCase implements CallbackHandler {
                 "wsc:Identifier missing", 
                 out.indexOf(ConversationConstants.IDENTIFIER_LN) > 0
             );
-
-            // System.out.println(out);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -158,9 +163,10 @@ public class TestWSSecurityNewSCT extends TestCase implements CallbackHandler {
 
             sctBuilder.prependSCTElementToHeader(doc, secHeader);
 
-            // String out = org.apache.ws.security.util.XMLUtils
-            //          .PrettyDocumentToString(doc);
-            // System.out.println(out);
+            if (LOG.isDebugEnabled()) {
+                String out = org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+                LOG.debug(out);
+            }
 
             verify(doc);
         } catch (Exception e) {
@@ -196,9 +202,10 @@ public class TestWSSecurityNewSCT extends TestCase implements CallbackHandler {
             
             sctBuilder.prependSCTElementToHeader(doc, secHeader);
 
-//            String out = org.apache.ws.security.util.XMLUtils
-//                     .PrettyDocumentToString(doc);
-//            System.out.println(out);
+            if (LOG.isDebugEnabled()) {
+                String out = org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+                LOG.debug(out);
+            }
 
             verify(doc);
         } catch (Exception e) {
@@ -240,10 +247,10 @@ public class TestWSSecurityNewSCT extends TestCase implements CallbackHandler {
 
             sctBuilder.prependSCTElementToHeader(doc, secHeader);
 
-//            String out = org.apache.ws.security.util.XMLUtils
-//                     .PrettyDocumentToString(doc);
-
-//            System.out.println(out);
+            if (LOG.isDebugEnabled()) {
+                String out = org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+                LOG.debug(out);
+            }
 
             verify(doc);
         } catch (Exception e) {
@@ -285,9 +292,10 @@ public class TestWSSecurityNewSCT extends TestCase implements CallbackHandler {
 
             sctBuilder.prependSCTElementToHeader(doc, secHeader);
 
-//            String out = org.apache.ws.security.util.XMLUtils
-//                     .PrettyDocumentToString(doc);
-//            System.out.println(out);
+            if (LOG.isDebugEnabled()) {
+                String out = org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+                LOG.debug(out);
+            }
 
             verify(doc);
         } catch (Exception e) {
@@ -307,8 +315,7 @@ public class TestWSSecurityNewSCT extends TestCase implements CallbackHandler {
         secEngine.processSecurityHeader(doc, null, this, crypto);
         String outputString = 
             org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
-        assertTrue(outputString.indexOf("LogTestService2") > 0 ? true
-                : false);
+        assertTrue(outputString.indexOf("LogTestService2") > 0 ? true : false);
     }
 
     /**
