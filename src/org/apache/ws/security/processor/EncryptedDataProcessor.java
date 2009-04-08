@@ -54,11 +54,10 @@ public class EncryptedDataProcessor implements Processor {
         WSSConfig config
     ) throws WSSecurityException {
         Element kiElem = 
-            WSSecurityUtil.getDirectChildElement(elem, WSConstants.SIG_NS, "KeyInfo");
+            WSSecurityUtil.getDirectChildElement(elem, "KeyInfo", WSConstants.SIG_NS);
         if (kiElem == null) {
-            // TODO log and change alg
             throw new WSSecurityException(
-                WSSecurityException.UNSUPPORTED_ALGORITHM, "noEncAlgo"
+                WSSecurityException.UNSUPPORTED_ALGORITHM, "noKeyinfo"
             );
         }
         
@@ -67,9 +66,8 @@ public class EncryptedDataProcessor implements Processor {
                 kiElem, WSConstants.ENC_KEY_LN, WSConstants.ENC_NS
             );
         if (encryptedKeyElement == null) {
-            // TODO log and change alg
             throw new WSSecurityException(
-                WSSecurityException.UNSUPPORTED_ALGORITHM, "noEncAlgo"
+                WSSecurityException.UNSUPPORTED_ALGORITHM, "noEncKey"
             );
         }
         EncryptedKeyProcessor encrKeyProc = new EncryptedKeyProcessor();
