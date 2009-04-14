@@ -301,9 +301,6 @@ public class WSSecEncryptedKey extends WSSecBase {
         xencCipherValue.appendChild(keyText);
 
         envelope = document.getDocumentElement();
-        envelope.setAttributeNS(
-            WSConstants.XMLNS_NS, "xmlns:" + WSConstants.ENC_PREFIX, WSConstants.ENC_NS
-        );
     }
 
     /**

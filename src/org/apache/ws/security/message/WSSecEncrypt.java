@@ -565,6 +565,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
                 encData.setKeyInfo(keyInfo);
                 xmlCipher.doFinal(doc, body, content);
                 
+                keyInfo = new KeyInfo((Element) keyInfo.getElement().cloneNode(true), null);
             } catch (Exception e2) {
                 throw new WSSecurityException(
                     WSSecurityException.FAILED_ENCRYPTION, null, null, e2
