@@ -46,7 +46,7 @@ public class UUIDGenerator {
      */
     public static String getUUID() {
         if (baseUUID == null) {
-            baseUUID = getInitialUUID();
+            getInitialUUID();
         }
         long i = ++incrementingValue;
         if(i >= Long.MAX_VALUE || i < 0){
@@ -56,7 +56,10 @@ public class UUIDGenerator {
         return baseUUID + System.currentTimeMillis() + i;
     }
 
-    protected static String getInitialUUID() {
+    protected static synchronized void getInitialUUID() {
+        if (baseUUID != null) {
+            return;
+        }
         if (myRand == null) {
             myRand = new Random();
         }
@@ -90,7 +93,7 @@ public class UUIDGenerator {
         int begin = myRand.nextInt();
         if (begin < 0) begin = begin * -1;
         begin = begin % 8;
-        return sb2.toString().substring(begin, begin + 18).toUpperCase();
+        baseUUID = sb2.toString().substring(begin, begin + 18).toUpperCase();
     }
 
 }
