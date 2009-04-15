@@ -25,7 +25,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.axis.security.handler.WSDoAllHandler;
 import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.handler.WSHandlerConstants;
@@ -45,7 +44,6 @@ public class WSDoAllSender extends WSDoAllHandler {
     protected static Log log = LogFactory.getLog(WSDoAllSender.class.getName());
     private static Log tlog =
         LogFactory.getLog("org.apache.ws.security.TIME");
-    private static WSSConfig wssConfig = WSSConfig.getNewInstance();
     
     /**
      * Axis calls invoke to handle a message. <p/>
@@ -69,7 +67,6 @@ public class WSDoAllSender extends WSDoAllHandler {
         }
 
         RequestData reqData = new RequestData();
-        reqData.setWssConfig(wssConfig);
 
         reqData.setMsgContext(mc);
         /*

@@ -196,7 +196,12 @@ public class WSSConfig {
      */
     protected boolean handleCustomPasswordTypes = false;
     
-    protected WsuIdAllocator idAllocator = new WsuIdAllocator() {
+    
+    /**
+     * The default wsu:Id allocator is a simple "start at 1 and increment up"
+     * thing that is very fast.
+     */
+    public static WsuIdAllocator DEFAULT_ID_ALLOCATOR = new WsuIdAllocator() {
         int i;
         private synchronized String next() {
             return Integer.toString(++i);
@@ -215,7 +220,8 @@ public class WSSConfig {
             return prefix + UUIDGenerator.getUUID();
         }
     };
-
+    protected WsuIdAllocator idAllocator = DEFAULT_ID_ALLOCATOR;
+    
     protected HashMap jceProvider = new HashMap(10);
 
     /**
