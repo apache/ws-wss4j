@@ -59,7 +59,7 @@ Certificate Token Profile 1.1</a>
                 <p style="margin-left: 40px;">You can download the latest version of WSS4J at the following URL:<br/>
                     <a href="http://www.apache.org/dyn/closer.cgi/ws/wss4j/">http://www.apache.org/dyn/closer.cgi/ws/wss4j/</a>
                 </p>
-                <p style="margin-left: 40px;">The latest release of WSS4J is version 1.5.6.
+                <p style="margin-left: 40px;">The latest release of WSS4J is version 1.5.7.
                 </p>
             </subsection>
             <subsection name="WS-Security Features">
