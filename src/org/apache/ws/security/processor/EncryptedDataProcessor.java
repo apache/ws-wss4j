@@ -19,6 +19,7 @@ package org.apache.ws.security.processor;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDocInfo;
 import org.apache.ws.security.WSSConfig;
+import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.util.WSSecurityUtil;
@@ -26,6 +27,7 @@ import org.apache.xml.security.encryption.XMLCipher;
 import org.apache.xml.security.encryption.XMLEncryptionException;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import javax.crypto.SecretKey;
 import javax.security.auth.callback.CallbackHandler;
@@ -39,6 +41,8 @@ import java.util.Vector;
  * <code>xenc:ReferenceList</code>.
  */
 public class EncryptedDataProcessor implements Processor {
+
+    private byte[] symmKey;
     
     public String getId() {
         return null;
@@ -53,28 +57,26 @@ public class EncryptedDataProcessor implements Processor {
         Vector returnResults,
         WSSConfig config
     ) throws WSSecurityException {
-        Element kiElem = 
-            WSSecurityUtil.getDirectChildElement(elem, "KeyInfo", WSConstants.SIG_NS);
-        if (kiElem == null) {
-            throw new WSSecurityException(
-                WSSecurityException.UNSUPPORTED_ALGORITHM, "noKeyinfo"
-            );
-        }
+        Element kiElem = (Element)WSSecurityUtil.findElement(elem, "KeyInfo", WSConstants.SIG_NS);
         
-        Element encryptedKeyElement = 
-            WSSecurityUtil.getDirectChildElement(
-                kiElem, WSConstants.ENC_KEY_LN, WSConstants.ENC_NS
-            );
-        if (encryptedKeyElement == null) {
-            throw new WSSecurityException(
-                WSSecurityException.UNSUPPORTED_ALGORITHM, "noEncKey"
-            );
+        NodeList children = kiElem.getChildNodes();
+        int len = children.getLength();
+        
+        for (int i = 0; i < len; i++) {
+            Node child = children.item(i);
+            if (child.getNodeType() != Node.ELEMENT_NODE) {
+                continue;
+            }
+            QName el = new QName(child.getNamespaceURI(), child.getLocalName());
+            if (el.equals(WSSecurityEngine.ENCRYPTED_KEY)) {
+                EncryptedKeyProcessor encrKeyProc = new EncryptedKeyProcessor();
+                encrKeyProc.handleToken(
+                    (Element)child, crypto, decCrypto, cb, wsDocInfo, returnResults, config
+                );
+                symmKey = encrKeyProc.getDecryptedBytes();
+                break;
+            }
         }
-        EncryptedKeyProcessor encrKeyProc = new EncryptedKeyProcessor();
-        encrKeyProc.handleToken(
-            encryptedKeyElement, crypto, decCrypto, cb, wsDocInfo, returnResults, config
-        );
-        byte[] symmKey = encrKeyProc.getDecryptedBytes();
         String encAlgo = X509Util.getEncAlgo(elem);
         SecretKey key = WSSecurityUtil.prepareSecretKey(encAlgo, symmKey);
         
@@ -88,6 +90,7 @@ public class EncryptedDataProcessor implements Processor {
                 WSSecurityException.UNSUPPORTED_ALGORITHM, null, null, e1
             );
         }
+
         Node previousSibling = elem.getPreviousSibling();
         Node parent = elem.getParentNode();
         try {
