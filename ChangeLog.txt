@@ -5,6 +5,27 @@ for a given release.
 Portions of this report were generated using the ReleaseNotes facility
 in Jira.
 
+Release 1.5.7
+=============
+
+** Bug
+
+    * [WSS-90] - SamlUtil.java throws XMLSecurityException when SAML SubjectConfirmation element doesn't have KeyInfo child
+    * [WSS-99] - JCE provider ordering on solaris
+    * [WSS-117] - WSS4J does not supports KeyIdentifiers to reference SAML tokens but this is allowed by the WSS specification. Integration tesitng with owsm failed.
+    * [WSS-136] - POM files needed in Maven repository for OpenSAML, WSS4J, and XML Security
+
+** Improvement
+
+    * [WSS-84] - Make the use of the VM-wide keystore (lib/security/cacerts) optional
+    * [WSS-169] - Add an EncodingType attribute for a UsernameToken nonce
+    * [WSS-170] - SignatureAction does not set DigestAlgorithm on WSSecSignature instance
+
+** Test
+
+    * [WSS-172] - Test encrypted headers
+
+
 Release 1.5.6
 =============
 

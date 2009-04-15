@@ -7,7 +7,7 @@
     <artifactId>wss4j</artifactId>
     <packaging>bundle</packaging>
     <name>WSS4J</name>
-    <version>1.5.7-SNAPSHOT</version>
+    <version>1.5.7</version>
     <description>
         Apache WSS4J is an implementation of the Web Services Security
         (WS-Security) being developed at OASIS Web Services Security TC.
@@ -191,8 +191,8 @@
                         <Bundle-Description>${pom.artifactId}</Bundle-Description>
                         <Bundle-SymbolicName>org.apache.ws.security</Bundle-SymbolicName>
                         <Export-Package>
-                              org.apache.ws.security.*; version=1.5.5,
-                              org.apache.ws.axis.security.*; version=1.5.5,
+                              org.apache.ws.security.*; version=1.5.7,
+                              org.apache.ws.axis.security.*; version=1.5.7,
                         </Export-Package>
                         <Import-Package>
                               !org.apache.ws.security.*,
@@ -496,8 +496,8 @@
                 <artifactId>maven-changes-plugin</artifactId>
                 <version>2.1</version>
                 <configuration>
+                    <fixVersionIds>1.5.7</fixVersionIds>
                     <!-- <onlyCurrentVersion>true</onlyCurrentVersion> -->
-                    <fixVersionIds>12313215</fixVersionIds>
                     <resolutionIds>Any</resolutionIds>
                     <statusIds>Closed</statusIds>
                     <sortColumnNames>Key</sortColumnNames>
