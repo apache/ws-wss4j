@@ -154,31 +154,6 @@
                 </executions>
             </plugin>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <version>1.2</version>
-                <executions>
-                    <execution>
-                        <id>prepareLicenseFiles</id>
-                        <phase>generate-resources</phase>
-                        <configuration>
-                            <tasks>
-                                <copy
-                                    todir="${project.build.outputDirectory}/META-INF">
-                                    <fileset dir="${basedir}">
-                                        <include name="LICENSE.txt" />
-                                        <include name="NOTICE.txt" />
-                                    </fileset>
-                                </copy>
-                            </tasks>
-                        </configuration>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
                 <version>1.4.0</version>
@@ -191,8 +166,8 @@
                         <Bundle-Description>${pom.artifactId}</Bundle-Description>
                         <Bundle-SymbolicName>org.apache.ws.security</Bundle-SymbolicName>
                         <Export-Package>
-                              org.apache.ws.security.*; version=1.5.7,
-                              org.apache.ws.axis.security.*; version=1.5.7,
+                              org.apache.ws.security.*; version=1.5.5,
+                              org.apache.ws.axis.security.*; version=1.5.5,
                         </Export-Package>
                         <Import-Package>
                               !org.apache.ws.security.*,
@@ -207,6 +182,26 @@
                         <DynamicImport-Package>*</DynamicImport-Package>
                     </instructions>
                 </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-remote-resources-plugin</artifactId>
+                <version>1.0</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>process</goal>
+                        </goals>
+                        <configuration>
+                            <resourceBundles>
+                                <resourceBundle>org.apache:apache-jar-resource-bundle:1.4</resourceBundle>
+                            </resourceBundles>
+                            <properties>
+                                <projectName>Apache WebServices - WSS4J</projectName>
+                            </properties>
+                            <appendedResourcesDirectory> ${basedir}/appended-resources</appendedResourcesDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
 
