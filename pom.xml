@@ -154,31 +154,6 @@
                 </executions>
             </plugin>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <version>1.2</version>
-                <executions>
-                    <execution>
-                        <id>prepareLicenseFiles</id>
-                        <phase>generate-resources</phase>
-                        <configuration>
-                            <tasks>
-                                <copy
-                                    todir="${project.build.outputDirectory}/META-INF">
-                                    <fileset dir="${basedir}">
-                                        <include name="LICENSE.txt" />
-                                        <include name="NOTICE.txt" />
-                                    </fileset>
-                                </copy>
-                            </tasks>
-                        </configuration>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
                 <version>1.4.0</version>
