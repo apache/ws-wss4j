@@ -578,11 +578,10 @@ public class WSSecurityUtil {
     ) {
         Node firstChild = parent.getFirstChild();
         if (firstChild == null) {
-            parent.appendChild(child);
+            return (Element)parent.appendChild(child);
         } else {
-            parent.insertBefore(child, firstChild);
+            return (Element)parent.insertBefore(child, firstChild);
         }
-        return child;
     }
 
     /**
@@ -603,16 +602,17 @@ public class WSSecurityUtil {
         boolean addWhitespace
     ) {
         Node firstChild = parent.getFirstChild();
+        Node addedChild;
         if (firstChild == null) {
-            parent.appendChild(child);
+            addedChild = parent.appendChild(child);
         } else {
-            parent.insertBefore(child, firstChild);
+            addedChild = parent.insertBefore(child, firstChild);
         }
         if (addWhitespace) {
             Node whitespaceText = doc.createTextNode("\n");
-            parent.insertBefore(whitespaceText, child);
+            parent.insertBefore(whitespaceText, addedChild);
         }
-        return child;
+        return (Element)addedChild;
     }
 
     /**
