@@ -524,11 +524,10 @@ public class WSSecurityUtil {
     ) {
         Node firstChild = parent.getFirstChild();
         if (firstChild == null) {
-            parent.appendChild(child);
+            return (Element)parent.appendChild(child);
         } else {
-            parent.insertBefore(child, firstChild);
+            return (Element)parent.insertBefore(child, firstChild);
         }
-        return child;
     }
 
 
