@@ -173,10 +173,6 @@ public class Base64 {
                 b2 = binaryData[dataIndex++];
                 b3 = binaryData[dataIndex++];
 
-                if (IS_DEBUG) {
-                    log.debug("b1= " + b1 + ", b2= " + b2 + ", b3= " + b3);
-                }
-
                 l = (byte) (b2 & 0x0f);
                 k = (byte) (b1 & 0x03);
 
@@ -187,12 +183,6 @@ public class Base64 {
                         : (byte) ((b2) >> 4 ^ 0xf0);
                 byte val3 = ((b3 & SIGN) == 0) ? (byte) (b3 >> 6)
                         : (byte) ((b3) >> 6 ^ 0xfc);
-
-                if (IS_DEBUG) {
-                    log.debug("val2 = " + val2);
-                    log.debug("k4   = " + (k << 4));
-                    log.debug("vak  = " + (val2 | (k << 4)));
-                }
 
                 encodedData[encodedIndex++] = lookUpBase64Alphabet[val1];
                 encodedData[encodedIndex++] = lookUpBase64Alphabet[val2
@@ -213,10 +203,6 @@ public class Base64 {
             b2 = binaryData[dataIndex++];
             b3 = binaryData[dataIndex++];
 
-            if (IS_DEBUG) {
-                log.debug("b1= " + b1 + ", b2= " + b2 + ", b3= " + b3);
-            }
-
             l = (byte) (b2 & 0x0f);
             k = (byte) (b1 & 0x03);
 
@@ -228,12 +214,6 @@ public class Base64 {
             byte val3 = ((b3 & SIGN) == 0) ? (byte) (b3 >> 6)
                     : (byte) ((b3) >> 6 ^ 0xfc);
 
-            if (IS_DEBUG) {
-                log.debug("val2 = " + val2);
-                log.debug("k4   = " + (k << 4));
-                log.debug("vak  = " + (val2 | (k << 4)));
-            }
-
             encodedData[encodedIndex++] = lookUpBase64Alphabet[val1];
             encodedData[encodedIndex++] = lookUpBase64Alphabet[val2 | (k << 4)];
             encodedData[encodedIndex++] = lookUpBase64Alphabet[(l << 2) | val3];
@@ -244,10 +224,7 @@ public class Base64 {
         if (fewerThan24bits == EIGHTBIT) {
             b1 = binaryData[dataIndex];
             k = (byte) (b1 & 0x03);
-            if (IS_DEBUG) {
-                log.debug("b1=" + b1);
-                log.debug("b1<<2 = " + (b1 >> 2));
-            }
+
             byte val1 = ((b1 & SIGN) == 0) ? (byte) (b1 >> 2)
                     : (byte) ((b1) >> 2 ^ 0xc0);
             encodedData[encodedIndex++] = lookUpBase64Alphabet[val1];
