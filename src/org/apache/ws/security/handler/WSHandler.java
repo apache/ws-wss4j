@@ -299,6 +299,33 @@ public abstract class WSHandler {
 
         return true;
     }
+    
+    protected boolean checkReceiverResultsAnyOrder(Vector wsResult, Vector actions) {
+        int resultActions = wsResult.size();
+        Vector actionsClone = (Vector)actions.clone();
+        
+        for (int i = 0; i < resultActions; i++) {
+            final Integer actInt = (Integer) ((WSSecurityEngineResult) wsResult
+                    .get(i)).get(WSSecurityEngineResult.TAG_ACTION);
+            int act = actInt.intValue();
+            if (act == WSConstants.SC || act == WSConstants.BST) {
+                continue;
+            }
+            
+            int foundIndex = actionsClone.indexOf(actInt);
+            if (foundIndex == -1) {
+                return false;
+            } else {
+                actionsClone.remove(foundIndex);
+            }
+        }
+
+        if (!actionsClone.isEmpty()) {
+            return false;
+        }
+
+        return true;
+    }
 
     protected void checkSignatureConfirmation(RequestData reqData,
             Vector wsResult) throws WSSecurityException{

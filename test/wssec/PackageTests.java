@@ -85,6 +85,7 @@ public class PackageTests extends TestCase {
         suite.addTestSuite(TestWSSecurityKerberosTokenProfile.class);
         suite.addTestSuite(TestWSSecurityTimestamp.class);
         suite.addTestSuite(SignatureKeyValueTest.class);
+        suite.addTestSuite(TestWSSecurityResultsOrder.class);
         
         return suite;
     }
