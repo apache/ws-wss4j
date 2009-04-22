@@ -204,7 +204,7 @@ public class EncryptedKeyProcessor implements Processor {
                     if (dataRefURI.charAt(0) == '#') {
                         dataRefURI = dataRefURI.substring(1);
                     }
-                    WSDataRef dataRef = new WSDataRef(dataRefURI);
+                    WSDataRef dataRef = new WSDataRef();
                     Element elt = decryptDataRef(doc, dataRefURI, dataRef, decryptedBytes);
                     dataRef.setName(
                         new javax.xml.namespace.QName(

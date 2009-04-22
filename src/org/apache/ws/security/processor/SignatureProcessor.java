@@ -63,9 +63,7 @@ import java.security.Principal;
 import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.Vector;
 
 public class SignatureProcessor implements Processor {
@@ -88,16 +86,15 @@ public class SignatureProcessor implements Processor {
         }
         boolean remove = WSDocInfoStore.store(wsDocInfo);
         X509Certificate[] returnCert = new X509Certificate[1];
-        Set returnElements = new HashSet();
-        List protectedElements = new java.util.ArrayList();
+        List protectedRefs = new java.util.ArrayList();
         byte[][] signatureValue = new byte[1][];
         Principal lastPrincipalFound = null;
         
         try {
             lastPrincipalFound = 
                 verifyXMLSignature(
-                    elem, crypto, returnCert, returnElements,
-                    protectedElements, signatureValue, cb,
+                    elem, crypto, returnCert,
+                    protectedRefs, signatureValue, cb,
                     wsDocInfo
                 );
         } catch (WSSecurityException ex) {
@@ -114,8 +111,7 @@ public class SignatureProcessor implements Processor {
                     WSConstants.UT_SIGN, 
                     lastPrincipalFound, 
                     null,
-                    returnElements, 
-                    protectedElements, 
+                    protectedRefs, 
                     signatureValue[0]
                 )
             );
@@ -126,8 +122,7 @@ public class SignatureProcessor implements Processor {
                     WSConstants.SIGN, 
                     lastPrincipalFound,
                     returnCert[0], 
-                    returnElements, 
-                    protectedElements, 
+                    protectedRefs, 
                     signatureValue[0]
                 )
             );
@@ -166,8 +161,7 @@ public class SignatureProcessor implements Processor {
      * @param returnCert  verifyXMLSignature stores the certificate in the first
      *                    entry of this array. The caller may then further validate
      *                    the certificate
-     * @param returnElements verifyXMLSignature adds the wsu:ID attribute values for
-     *               the signed elements to this Set
+     * @param protectedRefs A list of (references) to the signed elements
      * @param cb CallbackHandler instance to extract key passwords
      * @return the subject principal of the validated X509 certificate (the
      *         authenticated subject). The calling function may use this
@@ -178,8 +172,7 @@ public class SignatureProcessor implements Processor {
         Element elem,
         Crypto crypto,
         X509Certificate[] returnCert,
-        Set returnElements,
-        List protectedElements,
+        List protectedRefs,
         byte[][] signatureValue,
         CallbackHandler cb,
         WSDocInfo wsDocInfo
@@ -290,7 +283,7 @@ public class SignatureProcessor implements Processor {
                                 );
                             }
                             encryptKeyProcessor = new EncryptedKeyProcessor();
-                            encryptKeyProcessor.handleEncryptedKey((Element)token, cb, crypto);
+                            encryptKeyProcessor.handleEncryptedKey(token, cb, crypto);
                         } 
                         secretKey = encryptKeyProcessor.getDecryptedBytes();
                     } else {
@@ -459,7 +452,7 @@ public class SignatureProcessor implements Processor {
                         );
                     }
                     String uri = siRef.getURI();
-                    if (uri != null && !"".equals(uri)) {
+                    if (!"".equals(uri)) {
                         Element se = WSSecurityUtil.getElementByWsuId(elem.getOwnerDocument(), uri);
                         if (se == null) {
                             se = WSSecurityUtil.getElementByGenId(elem.getOwnerDocument(), uri);
@@ -467,17 +460,10 @@ public class SignatureProcessor implements Processor {
                         if (se == null) {
                             throw new WSSecurityException(WSSecurityException.FAILED_CHECK);
                         }
-                        WSDataRef ref = new WSDataRef(uri);
+                        WSDataRef ref = new WSDataRef();
                         ref.setWsuId(uri);
                         ref.setName(new QName(se.getNamespaceURI(), se.getLocalName()));
-                        protectedElements.add(ref);
-                        returnElements.add(WSSecurityUtil.getIDFromReference(uri));
-                    } else {
-                       // This is the case where the signed element is identified 
-                       // by a transform such as XPath filtering
-                       // We add the complete reference element to the return 
-                       // elements
-                       returnElements.add(siRef); 
+                        protectedRefs.add(ref);
                     }
                 }
                 

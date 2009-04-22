@@ -22,96 +22,59 @@ package org.apache.ws.security;
 /**
  * WSDataRef stores information about decrypted/signed elements
  * 
- * When a processor decrypts an elements it stores information 
- * about that element in a WSDataRef so these information can 
- * be used for validation stages 
+ * When a processor decrypts/verifies an element it stores information 
+ * about that element in a WSDataRef so this information can 
+ * be used for validation 
  * 
  */
-
 import javax.xml.namespace.QName;
 
 public class WSDataRef {
     
     /**
-     * reference by which the Encrypted Data was referred 
-     */
-    private String dataref;
-    
-    /**
-     * wsu:Id of the decrypted element (if present)
+     * wsu:Id of the protected element
      */
     private String wsuId;
     
     /**
-     * QName of the decrypted element
+     * QName of the protected element
      */
     private QName name;
     
-    
     /**
-     * @param dataref reference by which the Encrypted Data was referred 
-     */
-    public WSDataRef(String dataref) {
-        this.dataref = dataref;
-    }
-    
-    /**
-     * @param dataref reference by which the Encrypted Data was referred 
-     * @param wsuId Id of the decrypted element (if present)
-     */
-    public WSDataRef(String dataref, String wsuId) {
-        this.dataref = dataref;
-        this.wsuId = wsuId;
-    }
-    
-    /**
-     * @param dataref reference by which the Encrypted Data was referred 
-     * @param wsuId Id of the decrypted element (if present)
-     * @param name QName of the decrypted element
-     */
-    public WSDataRef(String dataref, String wsuId, QName name) {
-        this.dataref = dataref;
-        this.wsuId = wsuId;
-        this.name = name;
-    }
-
-    /**
-     * @return the data reference 
+     * @deprecated 
+     * This method is left in the class for backwards compatibility.
+     * It returns the wsu:Id of the protected element, and not the data reference.
+     * This was never implemented properly in WSS4J code anyway 
+     * @return the wsu:Id
      */
     public String getDataref() {
-        return dataref;
+        return wsuId;
     }
 
     /**
-     * @param dataref reference by which the Encrypted Data was referred 
-     */
-    public void setDataref(String dataref) {
-        this.dataref = dataref;
-    }
-
-    /**
-     * @return Id of the decrypted element (if present)
+     * @return Id of the protected element
      */
     public String getWsuId() {
         return wsuId;
     }
 
     /**
-     * @param wsuId Id of the decrypted element (if present)
+     * @param wsuId Id of the protected element
      */
     public void setWsuId(String wsuId) {
         this.wsuId = wsuId;
     }
 
     /**
-     * @return QName of the decrypted element
+     * @return QName of the protected element
      */
     public QName getName() {
         return name;
     }
 
     /**
-     * @param name QName of the decrypted element
+     * @param name QName of the protected element
      */
     public void setName(QName name) {
         this.name = name;

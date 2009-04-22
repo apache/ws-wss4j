@@ -27,7 +27,6 @@ import org.apache.ws.security.message.token.Timestamp;
 import java.security.Principal;
 import java.security.cert.X509Certificate;
 import java.util.List;
-import java.util.Set;
 
 /**
  * @author Werner Dittmann (Werner.Dittmann@t-online.de)
@@ -76,15 +75,6 @@ public class WSSecurityEngineResult extends java.util.HashMap {
         "timestamp";
 
     /**
-     * Tag denoting the wsu:Ids of signed elements, if applicable.
-     *
-     * The value under this tag is of type java.util.Set, where
-     * each element of the set is of type java.lang.String.
-     */
-    public static final java.lang.String TAG_SIGNED_ELEMENT_IDS =
-        "signed-element-ids";
-
-    /**
      * Tag denoting the signature value of a signed element, if applicable.
      *
      * The value under this tag is of type byte[].
@@ -101,16 +91,6 @@ public class WSSecurityEngineResult extends java.util.HashMap {
      */
     public static final java.lang.String TAG_SIGNATURE_CONFIRMATION =
         "signature-confirmation";
-
-    /**
-     * Tag denoting references to the DOM elements that have been
-     * cryptographically protected.
-     *
-     * The value under this tag is of type java.util.Set, where
-     * each element in the set is of type org.w3c.dom.Element.
-     */
-    public static final java.lang.String TAG_PROTECTED_ELEMENTS =
-        "protected-elements";
 
     /**
      * Tag denoting references to the DOM elements that have been
@@ -180,13 +160,11 @@ public class WSSecurityEngineResult extends java.util.HashMap {
         int act, 
         Principal princ,
         X509Certificate certificate, 
-        Set elements, 
         byte[] sv
     ) {
         put(TAG_ACTION, new Integer(act));
         put(TAG_PRINCIPAL, princ);
         put(TAG_X509_CERTIFICATE, certificate);
-        put(TAG_SIGNED_ELEMENT_IDS, elements);
         put(TAG_SIGNATURE_VALUE, sv);
     }
 
@@ -195,24 +173,10 @@ public class WSSecurityEngineResult extends java.util.HashMap {
         int act,
         Principal princ,
         X509Certificate certificate,
-        Set elements,
-        Set protectedElements,
-        byte[] sv
-    ) {
-        this(act, princ, certificate, elements, sv);
-        put(TAG_PROTECTED_ELEMENTS, protectedElements);
-    }
-    
-    public
-    WSSecurityEngineResult(
-        int act,
-        Principal princ,
-        X509Certificate certificate,
-        Set elements,
         List dataRefs,
         byte[] sv
     ) {
-        this(act, princ, certificate, elements, sv);
+        this(act, princ, certificate, sv);
         put(TAG_DATA_REF_URIS, dataRefs);
     }
     

@@ -25,6 +25,7 @@ import org.apache.ws.security.SOAP11Constants;
 import org.apache.ws.security.SOAP12Constants;
 import org.apache.ws.security.SOAPConstants;
 import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.WSDataRef;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.handler.WSHandlerConstants;
@@ -49,7 +50,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
 import java.util.Iterator;
-import java.util.Set;
 import java.util.Vector;
 
 /**
@@ -881,7 +881,7 @@ public class WSSecurityUtil {
     }
 
     /**
-     * Ensure that this signature covers all required elements (identified by
+     * Ensure that this  covers all required elements (identified by
      * their wsu:Id attributes).
      * 
      * @param resultItem the signature to check
@@ -898,26 +898,24 @@ public class WSSecurityUtil {
             throw new IllegalArgumentException("Not a SIGN result");
         }
 
-        Set sigElems = (Set)resultItem.get(WSSecurityEngineResult.TAG_SIGNED_ELEMENT_IDS);
-        if (sigElems == null) {
-            throw new RuntimeException(
-                "Missing signedElements set in WSSecurityEngineResult!"
+        java.util.List signedElemsRefList = 
+            (java.util.List)resultItem.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
+        if (signedElemsRefList == null) {
+            throw new WSSecurityException(
+                "WSSecurityEngineResult does not contain any references to signed elements"
             );
-        }
-
-        log.debug("Found SIGN result...");
-        for (Iterator i = sigElems.iterator(); i.hasNext();) {
-            Object sigElement = i.next();
-            if(sigElement instanceof String) {
-                log.debug("Signature includes element with ID " + sigElement);
-            } else {
-                log.debug("Signature includes element with null uri " + sigElement.toString());
-            }
         }
 
         log.debug("Checking required elements are in the signature...");
         for (int i = 0; i < requiredIDs.length; i++) {
-            if (!sigElems.contains(requiredIDs[i])) {
+            boolean found = false;
+            for (int j = 0; j < signedElemsRefList.size(); j++) {
+                WSDataRef dataRef = (WSDataRef)signedElemsRefList.get(j);
+                if (dataRef.getWsuId().equals(requiredIDs[i])) {
+                    found = true;
+                }
+            }
+            if (!found) {
                 throw new WSSecurityException(
                     WSSecurityException.FAILED_CHECK,
                     "requiredElementNotSigned",

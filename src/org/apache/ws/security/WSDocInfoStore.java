@@ -25,7 +25,7 @@ package org.apache.ws.security;
  * Also the access methods are static. Thus it is possible to exchange
  * WSDocInfo between otherwise unrelated functions/methods.
  * The main usage for this is (are) the transformation functions that
- * are called during Signature/Verfication process. 
+ * are called during Signature/Verification process. 
  * 
  * @author Werner Dittmann (Werner.Dittmann@apache.org)
  */

@@ -222,9 +222,6 @@ public class TestWSSecurityDataRef extends TestCase implements CallbackHandler {
 
                     WSDataRef dataRef = (WSDataRef) obj;
 
-                    // Check whether dataRef URI is set
-                    assertNotNull(dataRef.getDataref());
-
                     // Check whether QName is correctly set
                     assertEquals("testMethod", dataRef.getName().getLocalPart());
                     assertEquals("uri:LogTestService2", dataRef.getName().getNamespaceURI());
