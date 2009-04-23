@@ -23,7 +23,7 @@ import javax.xml.namespace.QName;
 import java.io.Serializable;
 
 /**
- * An interface definining SOAP constants.  This allows various parts of the
+ * An interface defining SOAP constants.  This allows various parts of the
  * engine to avoid hardcoding dependence on a particular SOAP version and its
  * associated URIs, etc.
  * <p/>

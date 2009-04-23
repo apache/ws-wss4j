@@ -29,7 +29,6 @@ import org.apache.ws.security.WSDataRef;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.handler.WSHandlerConstants;
-import org.apache.ws.security.handler.WSHandlerResult;
 import org.apache.xml.security.algorithms.JCEMapper;
 import org.apache.xml.security.signature.XMLSignature;
 import org.w3c.dom.Attr;
@@ -48,7 +47,6 @@ import javax.xml.namespace.QName;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
-import java.security.cert.X509Certificate;
 import java.util.Iterator;
 import java.util.Vector;
 
@@ -797,87 +795,54 @@ public class WSSecurityUtil {
             );
         }
     }
-
+    
     /**
-     * Search through a WSS4J results vector for a single signature covering all
-     * these elements.
-     * 
-     * NOTE: it is important that the given elements are those that are 
-     * referenced using wsu:Id. When the signed element is referenced using a
-     * transformation such as XPath filtering the validation is carried out 
-     * in signature verification itself.
-     * 
-     * @param results results (e.g., as stored as WSHandlerConstants.RECV_RESULTS on
-     *                an Axis MessageContext)
-     * @param elements the elements to check
-     * @return the identity of the signer
-     * @throws WSSecurityException if no suitable signature could be found or if any element
-     *                             didn't have a wsu:Id attribute
+     * Check that all of the QName[] requiredParts are protected by a specified action in the
+     * results vector.
+     * @param results The Vector of WSSecurityEngineResults from processing
+     * @param action The action that is required (e.g. WSConstants.SIGN)
+     * @param requiredParts An array of QNames that correspond to the required elements
      */
-    public static X509Certificate ensureSignedTogether(Iterator results, Element[] elements) 
-        throws WSSecurityException {
-        log.debug("ensureSignedTogether()");
-
-        if (results == null) {
-            throw new IllegalArgumentException("No results vector");
-        }
-        if (elements == null || elements.length == 0) {
-            throw new IllegalArgumentException("No elements to check!");
-        }
-
-        // Turn the list of required elements into a list of required wsu:Id
-        // strings
-        String[] requiredIDs = new String[elements.length];
-        for (int i = 0; i < elements.length; i++) {
-            Element e = (Element) elements[i];
-            if (e == null) {
-                throw new IllegalArgumentException("elements[" + i + "] is null!");
-            }
-            requiredIDs[i] = e.getAttributeNS(WSConstants.WSU_NS, "Id");
-            if (requiredIDs[i] == null) {
-                throw new WSSecurityException(
-                    WSSecurityException.FAILED_CHECK,
-                    "requiredElementNoID", 
-                    new Object[] {e.getNodeName()}
-                );
-            }
-            log.debug("Required element " + e.getNodeName() + " has wsu:Id " + requiredIDs[i]);
-        }
-
-        WSSecurityException fault = null;
-
-        // Search through the results for a SIGN result
-        while (results.hasNext()) {
-            WSHandlerResult result = (WSHandlerResult) results.next();
-            Iterator actions = result.getResults().iterator();
-
-            while (actions.hasNext()) {
-                WSSecurityEngineResult resultItem = 
-                    (WSSecurityEngineResult) actions.next();
-                int resultAction = 
-                    ((java.lang.Integer)resultItem.get(WSSecurityEngineResult.TAG_ACTION)).intValue();
+    public static void checkAllElementsProtected(
+        Vector results,
+        int action,
+        QName[] requiredParts
+    ) throws WSSecurityException {
+        
+        if (requiredParts != null) {
+            for (int i = 0; i < requiredParts.length; i++) {
+                QName requiredPart = requiredParts[i];
                 
-                if (resultAction == WSConstants.SIGN) {
-                    try {
-                        checkSignsAllElements(resultItem, requiredIDs);
-                        return 
-                            (X509Certificate)resultItem.get(
-                                WSSecurityEngineResult.TAG_X509_CERTIFICATE
-                            );
-                    } catch (WSSecurityException ex) {
-                        // Store the exception but keep going... there may be a
-                        // better signature later
-                        log.debug("SIGN result does not sign all required elements", ex);
-                        fault = ex;
+                boolean found = false;
+                for (Iterator iter = results.iterator(); iter.hasNext() && !found;) {
+                    WSSecurityEngineResult result = (WSSecurityEngineResult)iter.next();
+                    int resultAction = 
+                        ((java.lang.Integer)result.get(WSSecurityEngineResult.TAG_ACTION)).intValue();
+                    if (resultAction != action) {
+                        continue;
+                    }
+                    java.util.List refList = 
+                        (java.util.List)result.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
+                    if (refList != null) {
+                        for (int k = 0; k < refList.size(); k++) {
+                            WSDataRef dataRef = (WSDataRef)refList.get(k);
+                            if (dataRef.getName().equals(requiredPart)) {
+                                found = true;
+                                break;
+                            }
+                        }
                     }
                 }
+                if (!found) {
+                    throw new WSSecurityException(
+                        WSSecurityException.FAILED_CHECK,
+                        "requiredElementNotProtected",
+                        new Object[] {requiredPart}
+                    );
+                }
             }
+            log.debug("All required elements are protected");
         }
-
-        if (fault != null)
-            throw fault;
-
-        throw new WSSecurityException(WSSecurityException.FAILED_CHECK, "noSignResult");
     }
 
     /**
@@ -888,7 +853,7 @@ public class WSSecurityUtil {
      * @param requiredIDs the list of wsu:Id values that must be covered
      * @throws WSSecurityException if any required element is not included
      */
-    private static void checkSignsAllElements(
+    public static void checkSignsAllElements(
         WSSecurityEngineResult resultItem, 
         String[] requiredIDs
     ) throws WSSecurityException {

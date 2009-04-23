@@ -49,6 +49,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Vector;
+import javax.xml.namespace.QName;
 
 /**
  * This is some unit tests for signing using signature parts. Note that the "soapMsg" below
@@ -148,7 +149,24 @@ public class TestWSSecuritySignatureParts extends TestCase implements CallbackHa
             LOG.debug(outputString);
         }
         
-        verify(signedDoc);
+        Vector results = verify(signedDoc);
+        
+        QName name = new QName("urn:foo.bar", "foobar");
+        WSSecurityUtil.checkAllElementsProtected(results, WSConstants.SIGN, new QName[]{name});
+        try {
+            name = new QName("urn:foo.bar", "foobar2");
+            WSSecurityUtil.checkAllElementsProtected(results, WSConstants.SIGN, new QName[]{name});
+            fail("Failure expected on a wrong protected part");
+        } catch (WSSecurityException ex) {
+            // expected
+        }
+        try {
+            name = new QName("urn:foo.bar", "foobar");
+            WSSecurityUtil.checkAllElementsProtected(results, WSConstants.ENCR, new QName[]{name});
+            fail("Failure expected on a wrong action");
+        } catch (WSSecurityException ex) {
+            // expected
+        }
     }
     
     /**
@@ -252,7 +270,43 @@ public class TestWSSecuritySignatureParts extends TestCase implements CallbackHa
             LOG.debug(outputString);
         }
         
-        verify(signedDoc);
+        Vector results = verify(signedDoc);
+        
+        QName fooName = new QName("urn:foo.bar", "foobar");
+        QName bodyName = new QName(soapConstants.getEnvelopeURI(), "Body");
+        WSSecurityUtil.checkAllElementsProtected(results, WSConstants.SIGN, new QName[]{fooName});
+        WSSecurityUtil.checkAllElementsProtected(results, WSConstants.SIGN, new QName[]{bodyName});
+        WSSecurityUtil.checkAllElementsProtected(
+            results, 
+            WSConstants.SIGN, 
+            new QName[]{bodyName, fooName}
+        );
+        WSSecurityUtil.checkAllElementsProtected(
+            results, 
+            WSConstants.SIGN, 
+            new QName[]{fooName, bodyName}
+        );
+        try {
+            WSSecurityUtil.checkAllElementsProtected(
+                results, 
+                WSConstants.ENCR, 
+                new QName[]{fooName, bodyName}
+            );
+            fail("Failure expected on a wrong action");
+        } catch (WSSecurityException ex) {
+            // expected
+        }
+        try {
+            QName headerName = new QName(soapConstants.getEnvelopeURI(), "Header");
+            WSSecurityUtil.checkAllElementsProtected(
+                results, 
+                WSConstants.SIGN, 
+                new QName[]{fooName, bodyName, headerName}
+            );
+            fail("Failure expected on an unsatisfied requirement");
+        } catch (WSSecurityException ex) {
+            // expected
+        }
     }
     
 
@@ -263,14 +317,15 @@ public class TestWSSecuritySignatureParts extends TestCase implements CallbackHa
      * @param doc 
      * @throws Exception Thrown when there is a problem in verification
      */
-    private void verify(Document doc) throws Exception {
-        secEngine.processSecurityHeader(doc, null, this, crypto);
+    private Vector verify(Document doc) throws Exception {
+        Vector results = secEngine.processSecurityHeader(doc, null, this, crypto);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Verfied and decrypted message:");
             String outputString = 
                 org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
             LOG.debug(outputString);
         }
+        return results;
     }
 
     public void handle(Callback[] callbacks)
