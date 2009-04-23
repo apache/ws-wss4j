@@ -259,8 +259,7 @@ public class SignatureProcessor implements Processor {
                     secretKey = dktProcessor.getKeyBytes(keyLength);
                 } else {
                     if (el.equals(WSSecurityEngine.binaryToken)) {
-                        // TODO: Use results from BinarySecurityTokenProcessor
-                        certs = getCertificatesTokenReference(token, crypto);
+                        certs = getCertificates(token, wsDocInfo, crypto);
                     } else if (el.equals(WSSecurityEngine.SAML_TOKEN)) {
                         if (crypto == null) {
                             throw new WSSecurityException(
@@ -518,6 +517,38 @@ public class SignatureProcessor implements Processor {
             );
         }
     }
+    
+    
+    /**
+     * Get the X509 Certificates from the BinarySecurityToken DOM element. It first tries to
+     * get the certificates from the BinarySecurityTokenProcessor, if the BST has been previously
+     * processed. If this fails, it gets the certificates directly from the token.
+     * @param The BinarySecurityToken element
+     * @wsDocInfo The WSDocInfo structure that contains information on previous processing
+     * @crypto The crypto instance that is needed to get the certificates from the BST
+     * @throws WSSecurityException
+     */
+    public X509Certificate[] getCertificates(Element elem, WSDocInfo wsDocInfo, Crypto crypto)
+        throws WSSecurityException {
+        
+        String id = elem.getAttributeNS(WSConstants.WSU_NS, "Id");
+        BinarySecurityTokenProcessor bstProcessor = 
+            (BinarySecurityTokenProcessor) wsDocInfo.getProcessor(id);
+        if (bstProcessor != null) {
+            String type = bstProcessor.getType();
+            if (!(X509Security.X509_V3_TYPE.equals(type) 
+                || PKIPathSecurity.getType().equals(type))) {
+                throw new WSSecurityException(
+                    WSSecurityException.UNSUPPORTED_SECURITY_TOKEN,
+                    "unsupportedBinaryTokenType", 
+                    new Object[]{type}
+                );
+            }
+            return bstProcessor.getCertificates();
+        } else {
+            return getCertificatesTokenReference(elem, crypto);
+        }
+    }
 
     /**
      * Extracts the certificate(s) from the Binary Security token reference.
@@ -535,13 +566,10 @@ public class SignatureProcessor implements Processor {
         BinarySecurity token = createSecurityToken(elem);
         if (token instanceof PKIPathSecurity) {
             return ((PKIPathSecurity) token).getX509Certificates(false, crypto);
-        } else if (token instanceof X509Security) {
+        } else {
             X509Certificate cert = ((X509Security) token).getX509Certificate(crypto);
-            X509Certificate[] certs = new X509Certificate[1];
-            certs[0] = cert;
-            return certs;
+            return new X509Certificate[]{cert};
         }
-        return null;
     }
 
 
@@ -556,16 +584,13 @@ public class SignatureProcessor implements Processor {
      * @throws WSSecurityException
      */
     private BinarySecurity createSecurityToken(Element element) throws WSSecurityException {
-        BinarySecurity token = new BinarySecurity(element);
-        String type = token.getValueType();
-        X509Security x509 = null;
-        PKIPathSecurity pkiPath = null;
 
+        String type = element.getAttribute("ValueType");
         if (X509Security.X509_V3_TYPE.equals(type)) {
-            x509 = new X509Security(element);
+            X509Security x509 = new X509Security(element);
             return (BinarySecurity) x509;
         } else if (PKIPathSecurity.getType().equals(type)) {
-            pkiPath = new PKIPathSecurity(element);
+            PKIPathSecurity pkiPath = new PKIPathSecurity(element);
             return (BinarySecurity) pkiPath;
         }
         throw new WSSecurityException(

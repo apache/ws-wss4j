@@ -39,7 +39,7 @@ import java.util.Vector;
 /**
  * Processor implementation to handle wsse:BinarySecurityToken elements
  */
-public class BinarySecurityTokenProcessor  implements Processor {
+public class BinarySecurityTokenProcessor implements Processor {
 
     /**
      * Token Id
@@ -65,7 +65,7 @@ public class BinarySecurityTokenProcessor  implements Processor {
      * {@inheritDoc}
      */
     public String getId() {
-        return this.id;
+        return id;
     }
     
     /**
@@ -80,11 +80,12 @@ public class BinarySecurityTokenProcessor  implements Processor {
         Vector returnResults,
         WSSConfig config
     ) throws WSSecurityException {
-        this.getCertificatesTokenReference(elem, crypto);
+        getCertificatesTokenReference(elem, crypto);
         returnResults.add(
             0, 
-            new WSSecurityEngineResult(WSConstants.BST, this.token, this.certificates)
+            new WSSecurityEngineResult(WSConstants.BST, token, certificates)
         );
+        id = elem.getAttributeNS(WSConstants.WSU_NS, "Id");
     }
     
     /**
@@ -97,13 +98,12 @@ public class BinarySecurityTokenProcessor  implements Processor {
      */
     private void getCertificatesTokenReference(Element elem, Crypto crypto)
         throws WSSecurityException {
-        this.createSecurityToken(elem);
+        createSecurityToken(elem);
         if (token instanceof PKIPathSecurity) {
-            this.certificates = ((PKIPathSecurity) token).getX509Certificates(false, crypto);
+            certificates = ((PKIPathSecurity) token).getX509Certificates(false, crypto);
         } else if (token instanceof X509Security) {
             X509Certificate cert = ((X509Security) token).getX509Certificate(crypto);
-            this.certificates = new X509Certificate[1];
-            this.certificates[0] = cert;
+            certificates = new X509Certificate[]{cert};
         }
     }
 
@@ -115,14 +115,15 @@ public class BinarySecurityTokenProcessor  implements Processor {
      * @throws WSSecurityException
      */
     private void createSecurityToken(Element element) throws WSSecurityException {
-        this.token = new BinarySecurity(element);
-        String type = token.getValueType();
-
+        
+        type = element.getAttribute("ValueType");
         if (X509Security.X509_V3_TYPE.equals(type)) {
-            this.token = new X509Security(element);
+            token = new X509Security(element);
         } else if (PKIPathSecurity.getType().equals(type)) {
-            this.token = new PKIPathSecurity(element);
-        } 
+            token = new PKIPathSecurity(element);
+        } else {
+            token = new BinarySecurity(element);
+        }
     }
 
     public String getType() {
