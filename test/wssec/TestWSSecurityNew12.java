@@ -66,7 +66,7 @@ public class TestWSSecurityNew12 extends TestCase {
         + "</SOAP-ENV:Envelope>";
     
     private WSSecurityEngine secEngine = new WSSecurityEngine();
-    private Crypto crypto = CryptoFactory.getInstance("cryptoSKI.properties");
+    private Crypto crypto = CryptoFactory.getInstance("wss40.properties");
     private MessageContext msgContext;
     private SOAPEnvelope unsignedEnvelope;
 
@@ -119,18 +119,17 @@ public class TestWSSecurityNew12 extends TestCase {
     /**
      * Test that signs and verifies a WS-Security envelope using SubjectKeyIdentifier.
      * This test uses the SubjectKeyIdentifier to identify the certificate. It
-     * uses the Direct version, that is it embedds the certificate in the message.
+     * uses the Direct version, that is it embeds the certificate in the message.
      * <p/>
      * 
      * @throws java.lang.Exception Thrown when there is any problem in signing or verification
      */
     public void testX509SignatureDSA_SKI() throws Exception {
         WSSecSignature builder = new WSSecSignature();
-        builder.setUserInfo("wss4jcertDSA", "security");
+        builder.setUserInfo("wss40DSA", "security");
         builder.setKeyIdentifierType(WSConstants.SKI_KEY_IDENTIFIER);
         builder.setSignatureAlgorithm(XMLSignature.ALGO_ID_SIGNATURE_DSA);
         
-        // builder.setUserInfo("john", "keypass");
         LOG.info("Before SigningDSA_SKIDirect....");
         Document doc = unsignedEnvelope.getAsDocument();
         
@@ -161,10 +160,9 @@ public class TestWSSecurityNew12 extends TestCase {
      */
     public void testX509SignatureDSA_Autodetect() throws Exception {
         WSSecSignature builder = new WSSecSignature();
-        builder.setUserInfo("wss4jcertDSA", "security");
+        builder.setUserInfo("wss40DSA", "security");
         builder.setKeyIdentifierType(WSConstants.SKI_KEY_IDENTIFIER);
         
-        // builder.setUserInfo("john", "keypass");
         LOG.info("Before SigningDSA_Autodetect....");
         Document doc = unsignedEnvelope.getAsDocument();
         
@@ -195,10 +193,9 @@ public class TestWSSecurityNew12 extends TestCase {
      */
     public void testX509SignatureRSA_Autodetect() throws Exception {
         WSSecSignature builder = new WSSecSignature();
-        builder.setUserInfo("wss4jcert", "security");
+        builder.setUserInfo("wss40", "security");
         builder.setKeyIdentifierType(WSConstants.SKI_KEY_IDENTIFIER);
         
-        // builder.setUserInfo("john", "keypass");
         LOG.info("Before SigningRSA_Autodetect....");
         Document doc = unsignedEnvelope.getAsDocument();
         

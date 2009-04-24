@@ -71,6 +71,10 @@ public class SignatureProcessor implements Processor {
     private static Log tlog = LogFactory.getLog("org.apache.ws.security.TIME");
     
     private String signatureId;
+    
+    private X509Certificate[] certs;
+    
+    private byte[] signatureValue;
 
     public void handleToken(
         Element elem, 
@@ -85,17 +89,15 @@ public class SignatureProcessor implements Processor {
             log.debug("Found signature element");
         }
         boolean remove = WSDocInfoStore.store(wsDocInfo);
-        X509Certificate[] returnCert = new X509Certificate[1];
         List protectedRefs = new java.util.ArrayList();
-        byte[][] signatureValue = new byte[1][];
         Principal lastPrincipalFound = null;
+        certs = null;
+        signatureValue = null;
         
         try {
             lastPrincipalFound = 
                 verifyXMLSignature(
-                    elem, crypto, returnCert,
-                    protectedRefs, signatureValue, cb,
-                    wsDocInfo
+                    elem, crypto, protectedRefs, cb, wsDocInfo
                 );
         } catch (WSSecurityException ex) {
             throw ex;
@@ -112,7 +114,7 @@ public class SignatureProcessor implements Processor {
                     lastPrincipalFound, 
                     null,
                     protectedRefs, 
-                    signatureValue[0]
+                    signatureValue
                 )
             );
         } else {
@@ -121,9 +123,9 @@ public class SignatureProcessor implements Processor {
                 new WSSecurityEngineResult(
                     WSConstants.SIGN, 
                     lastPrincipalFound,
-                    returnCert[0], 
+                    certs, 
                     protectedRefs, 
-                    signatureValue[0]
+                    signatureValue
                 )
             );
         }
@@ -158,9 +160,6 @@ public class SignatureProcessor implements Processor {
      * @param elem        the XMLSignature DOM Element.
      * @param crypto      the object that implements the access to the keystore and the
      *                    handling of certificates.
-     * @param returnCert  verifyXMLSignature stores the certificate in the first
-     *                    entry of this array. The caller may then further validate
-     *                    the certificate
      * @param protectedRefs A list of (references) to the signed elements
      * @param cb CallbackHandler instance to extract key passwords
      * @return the subject principal of the validated X509 certificate (the
@@ -171,9 +170,7 @@ public class SignatureProcessor implements Processor {
     protected Principal verifyXMLSignature(
         Element elem,
         Crypto crypto,
-        X509Certificate[] returnCert,
         List protectedRefs,
-        byte[][] signatureValue,
         CallbackHandler cb,
         WSDocInfo wsDocInfo
     ) throws WSSecurityException {
@@ -196,7 +193,6 @@ public class SignatureProcessor implements Processor {
 
         sig.addResourceResolver(EnvelopeIdResolver.getInstance());
 
-        X509Certificate[] certs = null;
         KeyInfo info = sig.getKeyInfo();
         byte[] secretKey = null;
         UsernameToken ut = null;
@@ -385,7 +381,9 @@ public class SignatureProcessor implements Processor {
         }
         if (certs != null) {
             try {
-                certs[0].checkValidity();
+                for (int i = 0; i < certs.length; i++) {
+                    certs[i].checkValidity();
+                }
             } catch (CertificateExpiredException e) {
                 throw new WSSecurityException(
                     WSSecurityException.FAILED_CHECK, "invalidCert", null, e
@@ -433,7 +431,7 @@ public class SignatureProcessor implements Processor {
                         + ", verify= " + (t2 - t1)
                     );
                 }
-                signatureValue[0] = sig.getSignatureValue();
+                signatureValue = sig.getSignatureValue();
                 //
                 // Now dig into the Signature element to get the elements that
                 // this Signature covers. Build the QName of these Elements and
@@ -467,7 +465,6 @@ public class SignatureProcessor implements Processor {
                 }
                 
                 if (certs != null) {
-                    returnCert[0] = certs[0];
                     return certs[0].getSubjectDN();
                 } else if (publicKey != null) {
                     return new PublicKeyPrincipal(publicKey);
@@ -528,8 +525,8 @@ public class SignatureProcessor implements Processor {
      * @crypto The crypto instance that is needed to get the certificates from the BST
      * @throws WSSecurityException
      */
-    public X509Certificate[] getCertificates(Element elem, WSDocInfo wsDocInfo, Crypto crypto)
-        throws WSSecurityException {
+    public static X509Certificate[] 
+    getCertificates(Element elem, WSDocInfo wsDocInfo, Crypto crypto) throws WSSecurityException {
         
         String id = elem.getAttributeNS(WSConstants.WSU_NS, "Id");
         BinarySecurityTokenProcessor bstProcessor = 
@@ -558,7 +555,7 @@ public class SignatureProcessor implements Processor {
      * @return an array of X509 certificates
      * @throws WSSecurityException
      */
-    public X509Certificate[] getCertificatesTokenReference(Element elem, Crypto crypto)
+    public static X509Certificate[] getCertificatesTokenReference(Element elem, Crypto crypto)
         throws WSSecurityException {
         if (crypto == null) {
             throw new WSSecurityException(WSSecurityException.FAILURE, "noSigCryptoFile");
@@ -583,7 +580,7 @@ public class SignatureProcessor implements Processor {
      *         <code>PKIPathSecurity</code> object.
      * @throws WSSecurityException
      */
-    private BinarySecurity createSecurityToken(Element element) throws WSSecurityException {
+    private static BinarySecurity createSecurityToken(Element element) throws WSSecurityException {
 
         String type = element.getAttribute("ValueType");
         if (X509Security.X509_V3_TYPE.equals(type)) {

@@ -68,7 +68,7 @@ public class EncryptedKeyProcessor implements Processor {
     private byte[] decryptedBytes = null;
     
     private String encryptedKeyId = null;
-    private X509Certificate cert = null;
+    private X509Certificate[] certs;
 
     public void handleToken(
         Element elem, 
@@ -82,6 +82,7 @@ public class EncryptedKeyProcessor implements Processor {
         if (log.isDebugEnabled()) {
             log.debug("Found encrypted key element");
         }
+        certs = null;
         if (decCrypto == null) {
             throw new WSSecurityException(WSSecurityException.FAILURE, "noDecCryptoFile");
         }
@@ -98,7 +99,7 @@ public class EncryptedKeyProcessor implements Processor {
                 this.encryptedEphemeralKey,
                 this.encryptedKeyId, 
                 dataRefUris,
-                cert
+                certs
             )
         );
     }
@@ -375,7 +376,7 @@ public class EncryptedKeyProcessor implements Processor {
         // This method is _not_ recommended by OASIS WS-S specification, X509 profile
         //
         else if (secRef.containsKeyIdentifier()) {
-            X509Certificate[] certs = secRef.getKeyIdentifier(crypto);
+            certs = secRef.getKeyIdentifier(crypto);
             if (certs == null || certs.length < 1 || certs[0] == null) {
                 throw new WSSecurityException(
                     WSSecurityException.FAILURE,
@@ -388,7 +389,6 @@ public class EncryptedKeyProcessor implements Processor {
             // the private key associated with this certificate
             //
             alias = crypto.getAliasForX509Cert(certs[0]);
-            cert = certs[0];
             if (log.isDebugEnabled()) {
                 log.debug("cert: " + certs[0]);
                 log.debug("KeyIdentifier Alias: " + alias);
@@ -409,8 +409,9 @@ public class EncryptedKeyProcessor implements Processor {
                         new Object[] {"for decryption (BST)"}
                     );
                 }
-                cert = token.getX509Certificate(crypto);
-                if (cert == null) {
+                certs = new X509Certificate[1];
+                certs[0] = token.getX509Certificate(crypto);
+                if (certs[0] == null) {
                     throw new WSSecurityException(
                         WSSecurityException.FAILURE,
                         "noCertsFound", 
@@ -421,7 +422,7 @@ public class EncryptedKeyProcessor implements Processor {
                 // Here we have the certificate. Now find the alias for it. Needed to identify
                 // the private key associated with this certificate
                 //
-                alias = crypto.getAliasForX509Cert(cert);
+                alias = crypto.getAliasForX509Cert(certs[0]);
                 if (log.isDebugEnabled()) {
                     log.debug("BST Alias: " + alias);
                 }

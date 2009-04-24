@@ -65,7 +65,7 @@ public class TestWSSecurityNewDK extends TestCase implements CallbackHandler {
         + "</SOAP-ENV:Envelope>";
 
     private WSSecurityEngine secEngine = new WSSecurityEngine();
-    private Crypto crypto = CryptoFactory.getInstance("cryptoSKI.properties");
+    private Crypto crypto = CryptoFactory.getInstance("wss40.properties");
     private MessageContext msgContext;
     private Message message;
 
@@ -128,7 +128,7 @@ public class TestWSSecurityNewDK extends TestCase implements CallbackHandler {
 
         //EncryptedKey
         WSSecEncryptedKey encrKeyBuilder = new WSSecEncryptedKey();
-        encrKeyBuilder.setUserInfo("wss4jcert");
+        encrKeyBuilder.setUserInfo("wss40");
         encrKeyBuilder.setKeyIdentifierType(WSConstants.THUMBPRINT_IDENTIFIER);
         encrKeyBuilder.prepare(doc, crypto);
 
@@ -166,7 +166,7 @@ public class TestWSSecurityNewDK extends TestCase implements CallbackHandler {
 
          //EncryptedKey
          WSSecEncryptedKey encrKeyBuilder = new WSSecEncryptedKey();
-         encrKeyBuilder.setUserInfo("wss4jcert");
+         encrKeyBuilder.setUserInfo("wss40");
          encrKeyBuilder.setKeyIdentifierType(WSConstants.THUMBPRINT_IDENTIFIER);
          encrKeyBuilder.prepare(doc, crypto);
 
@@ -200,7 +200,7 @@ public class TestWSSecurityNewDK extends TestCase implements CallbackHandler {
 
          //EncryptedKey
          WSSecEncryptedKey encrKeyBuilder = new WSSecEncryptedKey();
-         encrKeyBuilder.setUserInfo("wss4jcert");
+         encrKeyBuilder.setUserInfo("wss40");
          encrKeyBuilder.setKeyIdentifierType(WSConstants.THUMBPRINT_IDENTIFIER);
          encrKeyBuilder.prepare(doc, crypto);
 
@@ -234,7 +234,7 @@ public class TestWSSecurityNewDK extends TestCase implements CallbackHandler {
 
         //EncryptedKey
         WSSecEncryptedKey encrKeyBuilder = new WSSecEncryptedKey();
-        encrKeyBuilder.setUserInfo("wss4jcert");
+        encrKeyBuilder.setUserInfo("wss40");
         encrKeyBuilder.setKeyIdentifierType(WSConstants.THUMBPRINT_IDENTIFIER);
         encrKeyBuilder.prepare(doc, crypto);
 
@@ -275,7 +275,7 @@ public class TestWSSecurityNewDK extends TestCase implements CallbackHandler {
 
          //EncryptedKey
          WSSecEncryptedKey encrKeyBuilder = new WSSecEncryptedKey();
-         encrKeyBuilder.setUserInfo("wss4jcert");
+         encrKeyBuilder.setUserInfo("wss40");
          encrKeyBuilder.setKeyIdentifierType(WSConstants.THUMBPRINT_IDENTIFIER);
          encrKeyBuilder.prepare(doc, crypto);
          

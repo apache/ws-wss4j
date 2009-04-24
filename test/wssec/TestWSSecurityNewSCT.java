@@ -73,12 +73,12 @@ public class TestWSSecurityNewSCT extends TestCase implements CallbackHandler {
         + "</SOAP-ENV:Envelope>";
 
     private WSSecurityEngine secEngine = new WSSecurityEngine();
-    private Crypto crypto = CryptoFactory.getInstance("cryptoSKI.properties");
+    private Crypto crypto = CryptoFactory.getInstance("wss40.properties");
     private MessageContext msgContext;
     private Message message;
 
     /**
-     * Table of secrets idexd by the sct identifiers
+     * Table of secrets indexed by the sct identifiers
      */
     private Hashtable secrets = new Hashtable();
 

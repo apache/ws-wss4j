@@ -159,24 +159,27 @@ public class WSSecurityEngineResult extends java.util.HashMap {
     public WSSecurityEngineResult(
         int act, 
         Principal princ,
-        X509Certificate certificate, 
+        X509Certificate[] certs, 
         byte[] sv
     ) {
         put(TAG_ACTION, new Integer(act));
         put(TAG_PRINCIPAL, princ);
-        put(TAG_X509_CERTIFICATE, certificate);
+        put(TAG_X509_CERTIFICATES, certs);
         put(TAG_SIGNATURE_VALUE, sv);
+        if (certs != null) {
+            put(TAG_X509_CERTIFICATE, certs[0]);
+        }
     }
 
     public
     WSSecurityEngineResult(
         int act,
         Principal princ,
-        X509Certificate certificate,
+        X509Certificate[] certs,
         List dataRefs,
         byte[] sv
     ) {
-        this(act, princ, certificate, sv);
+        this(act, princ, certs, sv);
         put(TAG_DATA_REF_URIS, dataRefs);
     }
     
@@ -200,14 +203,17 @@ public class WSSecurityEngineResult extends java.util.HashMap {
         byte[] encryptedKeyBytes,
         String encyptedKeyId, 
         List dataRefUris,
-        X509Certificate cert
+        X509Certificate[] certs
     ) {
         put(TAG_ACTION, new Integer(act));
         put(TAG_DECRYPTED_KEY, decryptedKey);
         put(TAG_ENCRYPTED_EPHEMERAL_KEY, encryptedKeyBytes);
         put(TAG_ENCRYPTED_KEY_ID, encyptedKeyId);
         put(TAG_DATA_REF_URIS, dataRefUris);
-        put(TAG_X509_CERTIFICATE, cert);
+        put(TAG_X509_CERTIFICATES, certs);
+        if (certs != null) {
+            put(TAG_X509_CERTIFICATE, certs[0]);
+        }
     }
     
     public WSSecurityEngineResult(int act, List dataRefUris) {
@@ -230,11 +236,13 @@ public class WSSecurityEngineResult extends java.util.HashMap {
         put(TAG_SIGNATURE_CONFIRMATION, sc);
     }
 
-    public WSSecurityEngineResult(int act, BinarySecurity token,
-            X509Certificate[] certificates) {
+    public WSSecurityEngineResult(int act, BinarySecurity token, X509Certificate[] certs) {
         put(TAG_ACTION, new Integer(act));
         put(TAG_BINARY_SECURITY_TOKEN, token);
-        put(TAG_X509_CERTIFICATES, certificates);
+        put(TAG_X509_CERTIFICATES, certs);
+        if (certs != null) {
+            put(TAG_X509_CERTIFICATE, certs[0]);
+        }
     }
 
     

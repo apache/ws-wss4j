@@ -70,7 +70,7 @@ public class SignatureKeyValueTest extends TestCase implements CallbackHandler {
         + "</SOAP-ENV:Envelope>";
     
     private WSSecurityEngine secEngine = new WSSecurityEngine();
-    private Crypto crypto = CryptoFactory.getInstance("cryptoSKI.properties");
+    private Crypto crypto = CryptoFactory.getInstance("wss40.properties");
     private java.security.KeyStore keyStore = null;
     private MessageContext msgContext;
     private SOAPEnvelope unsignedEnvelope;
@@ -127,7 +127,7 @@ public class SignatureKeyValueTest extends TestCase implements CallbackHandler {
      */
     public void testRSAKeyValue() throws Exception {
         WSSecSignature builder = new WSSecSignature();
-        builder.setUserInfo("wss4jcert", "security");
+        builder.setUserInfo("wss40", "security");
         builder.setKeyIdentifierType(WSConstants.KEY_VALUE);
         Document doc = unsignedEnvelope.getAsDocument();
         WSSecHeader secHeader = new WSSecHeader();
@@ -192,7 +192,7 @@ public class SignatureKeyValueTest extends TestCase implements CallbackHandler {
      */
     public void testDSAKeyValue() throws Exception {
         WSSecSignature builder = new WSSecSignature();
-        builder.setUserInfo("wss4jcertdsa", "security");
+        builder.setUserInfo("wss40DSA", "security");
         builder.setKeyIdentifierType(WSConstants.KEY_VALUE);
         Document doc = unsignedEnvelope.getAsDocument();
         WSSecHeader secHeader = new WSSecHeader();
