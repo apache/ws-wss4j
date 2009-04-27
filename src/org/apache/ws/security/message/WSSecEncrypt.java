@@ -254,6 +254,8 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
                 remoteCert = certs[0];
             }
             prepareInternal(this.ephemeralKey, remoteCert, crypto);
+        } else {
+            encryptedEphemeralKey = ephemeralKey;
         }
     }
 
@@ -291,9 +293,9 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
             envelope = document.getDocumentElement();
         }
 
-        SOAPConstants soapConstants = WSSecurityUtil.getSOAPConstants(envelope);
         if (parts == null) {
             parts = new Vector();
+            SOAPConstants soapConstants = WSSecurityUtil.getSOAPConstants(envelope);
             WSEncryptionPart encP = 
                 new WSEncryptionPart(
                     soapConstants.getBodyQName().getLocalPart(), 
@@ -304,9 +306,12 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
         }
 
         Element refs = encryptForInternalRef(null, parts);
-        addInternalRefElement(refs);
-
-        prependToHeader(secHeader);
+        if (encryptedKeyElement != null) {
+            addInternalRefElement(refs);
+            prependToHeader(secHeader); 
+        } else {
+            WSSecurityUtil.prependChildElement(secHeader.getSecurityHeader(), refs);
+        }
 
         if (bstToken != null) {
             prependBSTElementToHeader(secHeader);

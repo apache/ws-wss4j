@@ -41,6 +41,8 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
@@ -72,6 +74,8 @@ public class TestWSSecurityNew14 extends TestCase implements CallbackHandler {
     private Crypto crypto = CryptoFactory.getInstance();
     private MessageContext msgContext;
     private SOAPEnvelope unsignedEnvelope;
+    private byte[] keyData;
+    private SecretKey key;
 
     /**
      * TestWSSecurity constructor
@@ -103,6 +107,11 @@ public class TestWSSecurityNew14 extends TestCase implements CallbackHandler {
         AxisClient tmpEngine = new AxisClient(new NullProvider());
         msgContext = new MessageContext(tmpEngine);
         unsignedEnvelope = getSOAPEnvelope();
+        
+        KeyGenerator keyGen = KeyGenerator.getInstance("AES");
+        keyGen.init(128);
+        key = keyGen.generateKey();
+        keyData = key.getEncoded();
     }
 
     /**
@@ -231,6 +240,69 @@ public class TestWSSecurityNew14 extends TestCase implements CallbackHandler {
         LOG.info("After Encrypting EncryptedKeySHA1....");
         verify(encryptedDoc);
     }
+    
+    /**
+     * Test that encrypts using EncryptedKeySHA1, where it uses a symmetric key, rather than a 
+     * generated session key which is then encrypted using a public key.
+     * 
+     * @throws java.lang.Exception Thrown when there is any problem in encryption or decryption
+     */
+    public void testEncryptionSHA1Symmetric() throws Exception {
+        WSSecEncrypt builder = new WSSecEncrypt();
+        builder.setKeyIdentifierType(WSConstants.ENCRYPTED_KEY_SHA1_IDENTIFIER);
+        builder.setSymmetricKey(key);
+        builder.setEncryptSymmKey(false);
+        builder.setUseKeyIdentifier(true);
+        
+        LOG.info("Before Encrypting EncryptedKeySHA1....");
+        Document doc = unsignedEnvelope.getAsDocument();
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);        
+        Document encryptedDoc = builder.build(doc, crypto, secHeader);
+     
+        String outputString = 
+            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(encryptedDoc);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Encrypted message with ENCRYPTED_KEY_SHA1_IDENTIFIER:");
+            LOG.debug(outputString);
+        }
+        assertTrue(outputString.indexOf("#EncryptedKeySHA1") != -1);
+     
+        LOG.info("After Encrypting EncryptedKeySHA1....");
+        verify(encryptedDoc);
+    }
+    
+    
+    /**
+     * Test that encrypts using EncryptedKeySHA1, where it uses a symmetric key (bytes), 
+     * rather than a generated session key which is then encrypted using a public key.
+     * 
+     * @throws java.lang.Exception Thrown when there is any problem in encryption or decryption
+     */
+    public void testEncryptionSHA1SymmetricBytes() throws Exception {
+        WSSecEncrypt builder = new WSSecEncrypt();
+        builder.setKeyIdentifierType(WSConstants.ENCRYPTED_KEY_SHA1_IDENTIFIER);
+        builder.setEphemeralKey(keyData);
+        builder.setEncryptSymmKey(false);
+        builder.setUseKeyIdentifier(true);
+        
+        LOG.info("Before Encrypting EncryptedKeySHA1....");
+        Document doc = unsignedEnvelope.getAsDocument();
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);        
+        Document encryptedDoc = builder.build(doc, crypto, secHeader);
+     
+        String outputString = 
+            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(encryptedDoc);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Encrypted message with ENCRYPTED_KEY_SHA1_IDENTIFIER:");
+            LOG.debug(outputString);
+        }
+        assertTrue(outputString.indexOf("#EncryptedKeySHA1") != -1);
+     
+        LOG.info("After Encrypting EncryptedKeySHA1....");
+        verify(encryptedDoc);
+    }
 
     /**
      * Verifies the soap envelope.
@@ -255,6 +327,7 @@ public class TestWSSecurityNew14 extends TestCase implements CallbackHandler {
                  * for Testing we supply a fixed name here.
                  */
                 pc.setPassword("security");
+                pc.setKey(keyData);
             } else {
                 throw new UnsupportedCallbackException(callbacks[i], "Unrecognized Callback");
             }
