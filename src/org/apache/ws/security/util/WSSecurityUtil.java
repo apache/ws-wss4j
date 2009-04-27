@@ -45,6 +45,7 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import javax.xml.namespace.QName;
 
+import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Iterator;
@@ -66,6 +67,12 @@ public class WSSecurityUtil {
      */
     private static SecureRandom random = null;
     private static String randomAlgorithm = null;
+    
+    /**
+     * A cached MessageDigest object
+     */
+    private static MessageDigest digest = null;
+    private static String digestAlgorithm = null;
     
     /**
      * Returns the first WS-Security header element for a given actor. Only one
@@ -917,6 +924,32 @@ public class WSSecurityUtil {
             random.setSeed(System.currentTimeMillis());
         }
         return random;
+    }
+    
+    /**
+     * @return      a MessageDigest instance initialized with the "SHA-1"
+     *              algorithm identifier
+     */
+    public static MessageDigest
+    resolveMessageDigest() throws NoSuchAlgorithmException {
+        return resolveMessageDigest("SHA-1");
+    }
+    
+    /**
+     * @param       algorithm
+     *              
+     * @return      a MessageDigest instance initialized with the identifier
+     *              specified in algorithm
+     */
+    public synchronized static MessageDigest
+    resolveMessageDigest(
+        final String algorithm
+    ) throws NoSuchAlgorithmException {
+        if (digest == null || !algorithm.equals(digestAlgorithm)) {
+            digest = MessageDigest.getInstance(algorithm);
+            digestAlgorithm = algorithm;
+        }
+        return digest;
     }
     
     /**

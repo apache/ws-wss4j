@@ -19,6 +19,7 @@
 
 package org.apache.ws.security.action;
 
+import java.util.List;
 import java.util.Vector;
 
 import org.apache.ws.security.WSConstants;
@@ -90,7 +91,7 @@ public class UsernameTokenSignedAction implements Action {
         sign.prependToHeader(reqData.getSecHeader());
         builder.prependToHeader(reqData.getSecHeader());
 
-        Vector parts = null;
+        List parts = null;
         if (reqData.getSignatureParts().size() > 0) {
             parts = reqData.getSignatureParts();
         } else {

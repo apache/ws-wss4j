@@ -22,6 +22,7 @@ package org.apache.ws.security.components.crypto;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSSecurityException;
+import org.apache.ws.security.util.WSSecurityUtil;
 
 import org.bouncycastle.asn1.x509.X509Name;
 
@@ -453,7 +454,7 @@ public abstract class CryptoBase implements Crypto {
         MessageDigest sha = null;
 
         try {
-            sha = MessageDigest.getInstance("SHA-1");
+            sha = WSSecurityUtil.resolveMessageDigest();
             sha.reset();
         } catch (NoSuchAlgorithmException e) {
             throw new WSSecurityException(
@@ -542,7 +543,7 @@ public abstract class CryptoBase implements Crypto {
             System.arraycopy(encoded, 22, value, 0, value.length);
             MessageDigest sha;
             try {
-                sha = MessageDigest.getInstance("SHA-1");
+                sha = WSSecurityUtil.resolveMessageDigest();
             } catch (NoSuchAlgorithmException ex) {
                 throw new WSSecurityException(
                     WSSecurityException.UNSUPPORTED_SECURITY_TOKEN, "noSKIHandling",

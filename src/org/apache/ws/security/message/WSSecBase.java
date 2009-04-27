@@ -25,7 +25,7 @@ import org.apache.ws.security.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import java.util.Vector;
+import java.util.List;
 
 /**
  * This is the base class for WS Security messages. It provides common functions
@@ -41,7 +41,7 @@ public class WSSecBase {
 
     protected int keyIdentifierType = WSConstants.ISSUER_SERIAL;
 
-    protected Vector parts = null;
+    protected List parts = null;
 
     protected boolean doDebug = false;
 
@@ -56,9 +56,9 @@ public class WSSecBase {
     /**
      * Set which parts of the message to encrypt/sign. <p/>
      * 
-     * @param parts The vector containing the WSEncryptionPart objects
+     * @param parts The list containing the WSEncryptionPart objects
      */
-    public void setParts(Vector parts) {
+    public void setParts(List parts) {
         this.parts = parts;
     }
 

@@ -36,6 +36,7 @@ import org.w3c.dom.Node;
 
 import javax.crypto.SecretKey;
 
+import java.util.List;
 import java.util.Vector;
 
 /**
@@ -78,7 +79,7 @@ public class WSSecDKEncrypt extends WSSecDerivedKeyBase {
         return doc;
     }
 
-    private Vector doEncryption(Document doc, byte[] secretKey, Vector references) 
+    private List doEncryption(Document doc, byte[] secretKey, List references) 
         throws WSSecurityException {
 
         SecretKey key = WSSecurityUtil.prepareSecretKey(this.symEncAlgo, secretKey);
@@ -91,7 +92,7 @@ public class WSSecDKEncrypt extends WSSecDerivedKeyBase {
             );
         }
 
-        Vector encDataRefs = new Vector();
+        List encDataRefs = new Vector();
         if (envelope == null) {
             envelope = doc.getDocumentElement();
         }
@@ -181,14 +182,14 @@ public class WSSecDKEncrypt extends WSSecDerivedKeyBase {
      * creates and initializes a new Reference element.
      * 
      * @param dataRef A <code>xenc:Reference</code> element or <code>null</code>
-     * @param references A vector containing WSEncryptionPart objects
+     * @param references A list containing WSEncryptionPart objects
      * @return Returns the updated <code>xenc:Reference</code> element
      * @throws WSSecurityException
      */
-    public Element encryptForExternalRef(Element dataRef, Vector references)
+    public Element encryptForExternalRef(Element dataRef, List references)
         throws WSSecurityException {
 
-        Vector encDataRefs = doEncryption(document, derivedKeyBytes, references);
+        List encDataRefs = doEncryption(document, derivedKeyBytes, references);
         Element referenceList = dataRef;
         if (referenceList == null) {
             referenceList = 
@@ -221,7 +222,7 @@ public class WSSecDKEncrypt extends WSSecDerivedKeyBase {
         }
     }
 
-    public static Element createDataRefList(Document doc, Element referenceList, Vector encDataRefs) {
+    public static Element createDataRefList(Document doc, Element referenceList, List encDataRefs) {
         for (int i = 0; i < encDataRefs.size(); i++) {
             String dataReferenceUri = (String) encDataRefs.get(i);
             Element dataReference = 

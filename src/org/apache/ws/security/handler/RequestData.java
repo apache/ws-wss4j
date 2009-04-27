@@ -25,6 +25,7 @@ import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.message.WSSecHeader;
 
+import java.util.List;
 import java.util.Vector;
 import java.security.cert.X509Certificate;
 
@@ -46,13 +47,13 @@ public class RequestData {
     private int sigKeyId = 0;
     private String sigAlgorithm = null;
     private String signatureDigestAlgorithm = null;
-    private Vector signatureParts = new Vector();
+    private List signatureParts = new Vector();
     private Crypto encCrypto = null;
     private int encKeyId = 0;
     private String encSymmAlgo = null;
     private String encKeyTransport = null;
     private String encUser = null;
-    private Vector encryptParts = new Vector();
+    private List encryptParts = new Vector();
     private X509Certificate encCert = null;
     private int timeToLive = 300;   // Timestamp: time in seconds between creation and expiry
     private WSSConfig wssConfig = null;
@@ -168,7 +169,7 @@ public class RequestData {
         this.signatureDigestAlgorithm = sigDigestAlgorithm;
     }
 
-    public Vector getSignatureParts() {
+    public List getSignatureParts() {
         return signatureParts;
     }
 
@@ -212,7 +213,7 @@ public class RequestData {
         this.encUser = encUser;
     }
 
-    public Vector getEncryptParts() {
+    public List getEncryptParts() {
         return encryptParts;
     }
 
@@ -245,6 +246,7 @@ public class RequestData {
     public void setWssConfig(WSSConfig wssConfig) {
         this.wssConfig = wssConfig;
     }
+    
     /**
      * @return Returns the vector of stored signature values.
      */

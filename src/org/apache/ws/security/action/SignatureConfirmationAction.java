@@ -33,6 +33,7 @@ import org.apache.ws.security.message.WSSecSignatureConfirmation;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 
+import java.util.List;
 import java.util.Vector;
 
 public class SignatureConfirmationAction implements Action {
@@ -62,7 +63,7 @@ public class SignatureConfirmationAction implements Action {
             WSSecurityUtil.fetchAllActionResults(wshResult.getResults(),
                     WSConstants.UT_SIGN, signatureActions);
         }
-        Vector signatureParts = reqData.getSignatureParts();
+        List signatureParts = reqData.getSignatureParts();
         // prepare a SignatureConfirmation token
         WSSecSignatureConfirmation wsc = new WSSecSignatureConfirmation();
         if (signatureActions.size() > 0) {

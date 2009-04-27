@@ -48,6 +48,7 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 import java.util.Vector;
 import javax.xml.namespace.QName;
 
@@ -132,7 +133,7 @@ public class TestWSSecuritySignatureParts extends TestCase implements CallbackHa
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
-        Vector parts = new Vector();
+        List parts = new Vector();
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "foobar",
@@ -183,7 +184,7 @@ public class TestWSSecuritySignatureParts extends TestCase implements CallbackHa
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
-        Vector parts = new Vector();
+        List parts = new Vector();
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "foobar2",
@@ -214,7 +215,7 @@ public class TestWSSecuritySignatureParts extends TestCase implements CallbackHa
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
-        Vector parts = new Vector();
+        List parts = new Vector();
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "foobar",
@@ -247,7 +248,7 @@ public class TestWSSecuritySignatureParts extends TestCase implements CallbackHa
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
-        Vector parts = new Vector();
+        List parts = new Vector();
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 soapConstants.getBodyQName().getLocalPart(),    // define the body

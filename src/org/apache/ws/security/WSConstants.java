@@ -380,7 +380,7 @@ public class WSConstants {
     
     /**
      * <code>ENCRYPTED_KEY_SHA1_IDENTIFIER</code> is used to set the specific key identifier
-     * ThumbprintSHA1.
+     * EncryptedKeySHA1.
      * 
      * This identifier uses the SHA-1 digest of a security token to
      * identify the security token. Please refer to chapter 7.3 of the OASIS WSS 1.1

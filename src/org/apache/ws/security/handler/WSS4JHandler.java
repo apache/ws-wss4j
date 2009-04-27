@@ -183,8 +183,8 @@ public class WSS4JHandler extends WSHandler implements Handler {
      */
     public boolean doSender(MessageContext mc, RequestData reqData, boolean isRequest) throws WSSecurityException {
 
-        reqData.getSignatureParts().removeAllElements();
-        reqData.getEncryptParts().removeAllElements();
+        reqData.getSignatureParts().clear();
+        reqData.getEncryptParts().clear();
         reqData.setNoSerialization(false);
         /*
         * Get the action first.

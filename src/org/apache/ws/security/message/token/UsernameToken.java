@@ -470,7 +470,7 @@ public class UsernameToken {
 
             System.arraycopy(b3, 0, b4, offset, b3.length);
             
-            MessageDigest sha = MessageDigest.getInstance("SHA-1");
+            MessageDigest sha = WSSecurityUtil.resolveMessageDigest();
             sha.reset();
             sha.update(b4);
             passwdDigest = Base64.encode(sha.digest());
@@ -645,7 +645,7 @@ public class UsernameToken {
 
         MessageDigest sha = null;
         try {
-            sha = MessageDigest.getInstance("SHA-1");
+            sha = WSSecurityUtil.resolveMessageDigest();
         } catch (NoSuchAlgorithmException e) {
             if (DO_DEBUG) {
                 LOG.debug(e.getMessage(), e);

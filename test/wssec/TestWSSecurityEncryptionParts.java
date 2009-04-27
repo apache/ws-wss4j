@@ -50,6 +50,7 @@ import javax.xml.namespace.QName;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 import java.util.Vector;
 
 /**
@@ -132,7 +133,7 @@ public class TestWSSecurityEncryptionParts extends TestCase implements CallbackH
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
-        Vector parts = new Vector();
+        List parts = new Vector();
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "foobar",
@@ -183,7 +184,7 @@ public class TestWSSecurityEncryptionParts extends TestCase implements CallbackH
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
-        Vector parts = new Vector();
+        List parts = new Vector();
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "foobar",
@@ -219,7 +220,7 @@ public class TestWSSecurityEncryptionParts extends TestCase implements CallbackH
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
-        Vector parts = new Vector();
+        List parts = new Vector();
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "foobar2",
@@ -251,7 +252,7 @@ public class TestWSSecurityEncryptionParts extends TestCase implements CallbackH
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
-        Vector parts = new Vector();
+        List parts = new Vector();
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "foobar",
@@ -285,7 +286,7 @@ public class TestWSSecurityEncryptionParts extends TestCase implements CallbackH
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
-        Vector parts = new Vector();
+        List parts = new Vector();
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 soapConstants.getBodyQName().getLocalPart(),    // define the body

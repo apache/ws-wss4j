@@ -243,10 +243,10 @@ public class WSSecEncryptedKey extends WSSecBase {
         // session key
         //
         encryptedKeyElement = createEncryptedKey(document, keyEncAlgo);
-        if(this.encKeyId == null || "".equals(this.encKeyId)) {
-            this.encKeyId = "EncKeyId-" + UUIDGenerator.getUUID();
+        if(encKeyId == null || "".equals(encKeyId)) {
+            encKeyId = "EncKeyId-" + UUIDGenerator.getUUID();
         }
-        encryptedKeyElement.setAttributeNS(null, "Id", this.encKeyId);
+        encryptedKeyElement.setAttributeNS(null, "Id", encKeyId);
 
         KeyInfo keyInfo = new KeyInfo(document);
 
@@ -315,9 +315,6 @@ public class WSSecEncryptedKey extends WSSecBase {
     protected byte[] generateEphemeralKey() throws WSSecurityException {
         try {     
             final SecureRandom r = WSSecurityUtil.resolveSecureRandom();
-            if (r == null) {
-                throw new WSSecurityException("Random generator is not initialzed.");
-            }
             byte[] temp = new byte[this.keySize / 8];
             r.nextBytes(temp);
             return temp;
@@ -458,8 +455,8 @@ public class WSSecEncryptedKey extends WSSecBase {
      * @return Returns the BinarySecurityToken element.
      */
     public Element getBinarySecurityTokenElement() {
-        if (this.bstToken != null) {
-            return this.bstToken.getElement();
+        if (bstToken != null) {
+            return bstToken.getElement();
         }
         return null;
     }
@@ -490,11 +487,11 @@ public class WSSecEncryptedKey extends WSSecBase {
      * BinaruSecurityToken element.
      */
     public String getBSTTokenId() {
-        if (this.bstToken == null) {
+        if (bstToken == null) {
             return null;
         }
         
-        return this.bstToken.getID();
+        return bstToken.getID();
     }
 
     /**

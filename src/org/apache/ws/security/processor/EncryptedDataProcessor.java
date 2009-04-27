@@ -111,10 +111,12 @@ public class EncryptedDataProcessor implements Processor {
             }
             QName el = new QName(decryptedElem.getNamespaceURI(), decryptedElem.getLocalName());
             Processor proc = config.getProcessor(el);
-            proc.handleToken(
-                decryptedElem, crypto, decCrypto, cb, wsDocInfo, returnResults, config
-            );
-            wsDocInfo.setProcessor(proc);
+            if (proc != null) {
+                proc.handleToken(
+                    decryptedElem, crypto, decCrypto, cb, wsDocInfo, returnResults, config
+                );
+                wsDocInfo.setProcessor(proc);
+            }
         }
     }
 

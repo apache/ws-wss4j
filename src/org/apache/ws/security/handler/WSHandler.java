@@ -50,6 +50,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Properties;
 import java.util.Vector;
 
@@ -846,7 +847,7 @@ public abstract class WSHandler {
         return new WSPasswordCallback(username, reason);
     }
 
-    private void splitEncParts(String tmpS, Vector parts, RequestData reqData)
+    private void splitEncParts(String tmpS, List parts, RequestData reqData)
         throws WSSecurityException {
         WSEncryptionPart encPart = null;
         String[] rawParts = StringUtil.split(tmpS, ';');

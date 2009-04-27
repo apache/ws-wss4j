@@ -397,7 +397,7 @@ public class SecurityTokenReference {
         Document doc = this.element.getOwnerDocument();
         MessageDigest sha = null;
         try {
-            sha = MessageDigest.getInstance("SHA-1");
+            sha = WSSecurityUtil.resolveMessageDigest();
         } catch (NoSuchAlgorithmException e1) {
             throw new WSSecurityException(
                 WSSecurityException.FAILURE, "noSHA1availabe", null, e1

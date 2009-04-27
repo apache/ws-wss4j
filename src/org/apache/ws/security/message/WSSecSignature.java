@@ -57,6 +57,7 @@ import org.w3c.dom.Node;
 
 import java.security.cert.X509Certificate;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.Vector;
 
@@ -482,13 +483,13 @@ public class WSSecSignature extends WSSecBase {
      * times to add references as required. <code>addReferencesToSign()</code>
      * can be called any time after <code>prepare</code>.
      * 
-     * @param references A vector containing <code>WSEncryptionPart</code> objects
+     * @param references A list containing <code>WSEncryptionPart</code> objects
      *                   that define the parts to sign.
      * @param secHeader Used to compute namespaces to be inserted by
      *                  InclusiveNamespaces to be WSI compliant.
      * @throws WSSecurityException
      */
-    public void addReferencesToSign(Vector references, WSSecHeader secHeader)
+    public void addReferencesToSign(List references, WSSecHeader secHeader)
         throws WSSecurityException {
         Element envelope = document.getDocumentElement();
 
