@@ -33,6 +33,7 @@ import org.apache.ws.security.message.token.SecurityTokenReference;
 import org.apache.ws.security.message.token.X509Security;
 import org.apache.ws.security.saml.SAMLUtil;
 import org.apache.ws.security.transform.STRTransform;
+import org.apache.ws.security.util.Base64;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.xml.security.algorithms.SignatureAlgorithm;
 import org.apache.xml.security.c14n.Canonicalizer;
@@ -54,6 +55,8 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
 import java.util.HashSet;
 import java.util.Set;
@@ -430,7 +433,11 @@ public class WSSecSignature extends WSSecBase {
             break;
             
         case WSConstants.ENCRYPTED_KEY_SHA1_IDENTIFIER:
-            secRef.setKeyIdentifierEncKeySHA1(this.encrKeySha1value);
+            if (encrKeySha1value != null) {
+                secRef.setKeyIdentifierEncKeySHA1(encrKeySha1value);
+            } else {
+                secRef.setKeyIdentifierEncKeySHA1(getSHA1(secretKey));
+            }
             break;
 
         case WSConstants.CUSTOM_SYMM_SIGNING :
@@ -874,6 +881,21 @@ public class WSSecSignature extends WSSecBase {
     }
     public void setX509Certificate(X509Certificate cer) {
         this.useThisCert = cer;
+    }
+    
+    private String getSHA1(byte[] input) throws WSSecurityException {
+        try {
+            MessageDigest sha = MessageDigest.getInstance("SHA-1");
+            sha.reset();
+            sha.update(input);
+            byte[] data = sha.digest();
+            
+            return Base64.encode(data);
+        } catch (NoSuchAlgorithmException e) {
+            throw new WSSecurityException(
+                WSSecurityException.UNSUPPORTED_ALGORITHM, null, null, e
+            );
+        }
     }
     
 }
