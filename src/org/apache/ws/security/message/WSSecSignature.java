@@ -34,6 +34,7 @@ import org.apache.ws.security.message.token.SecurityTokenReference;
 import org.apache.ws.security.message.token.X509Security;
 import org.apache.ws.security.saml.SAMLUtil;
 import org.apache.ws.security.transform.STRTransform;
+import org.apache.ws.security.util.Base64;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.xml.security.algorithms.SignatureAlgorithm;
 import org.apache.xml.security.c14n.Canonicalizer;
@@ -55,6 +56,8 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
 import java.util.HashSet;
 import java.util.List;
@@ -82,9 +85,7 @@ public class WSSecSignature extends WSSecBase {
 
     protected String sigAlgo = null;
 
-    protected String canonAlgo = Canonicalizer.ALGO_ID_C14N_EXCL_OMIT_COMMENTS;
-
-    protected WSSecUsernameToken usernameToken = null;
+    protected String canonAlgo = WSConstants.C14N_EXCL_OMIT_COMMENTS;
 
     protected byte[] signatureValue = null;
 
@@ -143,7 +144,7 @@ public class WSSecSignature extends WSSecBase {
      * @return A boolean if single certificate is set.
      */
     public boolean isUseSingleCertificate() {
-        return this.useSingleCert;
+        return useSingleCert;
     }
 
     /**
@@ -221,13 +222,6 @@ public class WSSecSignature extends WSSecBase {
     
     
     /**
-     * @param usernameToken The usernameToken to set.
-     */
-    public void setUsernameToken(WSSecUsernameToken usernameToken) {
-        this.usernameToken = usernameToken;
-    }
-
-    /**
      * Returns the computed Signature value.
      * 
      * Call this method after <code>computeSignature()</code> or <code>build()</code>
@@ -261,10 +255,10 @@ public class WSSecSignature extends WSSecBase {
      * BinaruSecurityToken element.
      */
     public String getBSTTokenId() {
-        if (this.bstToken == null) {
+        if (bstToken == null) {
             return null;
         }
-        return this.bstToken.getID();
+        return bstToken.getID();
     }
 
     /**
@@ -299,11 +293,10 @@ public class WSSecSignature extends WSSecBase {
         // parameters.
         //
         X509Certificate[] certs = null;
-        if (keyIdentifierType != WSConstants.UT_SIGNING
-            && keyIdentifierType != WSConstants.CUSTOM_SYMM_SIGNING
-            && keyIdentifierType != WSConstants.CUSTOM_SYMM_SIGNING_DIRECT
-            && keyIdentifierType != WSConstants.ENCRYPTED_KEY_SHA1_IDENTIFIER
-            && keyIdentifierType != WSConstants.CUSTOM_KEY_IDENTIFIER) {
+        if (!(keyIdentifierType == WSConstants.CUSTOM_SYMM_SIGNING
+            || keyIdentifierType == WSConstants.CUSTOM_SYMM_SIGNING_DIRECT
+            || keyIdentifierType == WSConstants.ENCRYPTED_KEY_SHA1_IDENTIFIER
+            || keyIdentifierType == WSConstants.CUSTOM_KEY_IDENTIFIER)) {
             if (useThisCert == null) {
                 certs = crypto.getCertificates(user);
             } else {
@@ -418,38 +411,36 @@ public class WSSecSignature extends WSSecBase {
             secRef.setKeyIdentifierSKI(certs[0], crypto);
             break;
 
-        case WSConstants.UT_SIGNING:
-            Reference refUt = new Reference(document);
-            refUt.setValueType(WSConstants.USERNAMETOKEN_NS + "#UsernameToken");
-            String utId = usernameToken.getId();
-            refUt.setURI("#" + utId);
-            secRef.setReference(refUt);
-            secretKey = usernameToken.getSecretKey();
-            break;
-
         case WSConstants.THUMBPRINT_IDENTIFIER:
             secRef.setKeyIdentifierThumb(certs[0]);
             break;
             
         case WSConstants.ENCRYPTED_KEY_SHA1_IDENTIFIER:
-            secRef.setKeyIdentifierEncKeySHA1(this.encrKeySha1value);
+            if (encrKeySha1value != null) {
+                secRef.setKeyIdentifierEncKeySHA1(encrKeySha1value);
+            } else {
+                secRef.setKeyIdentifierEncKeySHA1(getSHA1(secretKey));
+            }
             break;
 
         case WSConstants.CUSTOM_SYMM_SIGNING :
             Reference refCust = new Reference(document);
-            refCust.setValueType(this.customTokenValueType);
-            refCust.setURI("#" + this.customTokenId);
+            refCust.setValueType(customTokenValueType);
+            refCust.setURI("#" + customTokenId);
             secRef.setReference(refCust);
             break;
+
         case WSConstants.CUSTOM_SYMM_SIGNING_DIRECT :
             Reference refCustd = new Reference(document);
-            refCustd.setValueType(this.customTokenValueType);
-            refCustd.setURI(this.customTokenId);
+            refCustd.setValueType(customTokenValueType);
+            refCustd.setURI(customTokenId);
             secRef.setReference(refCustd);
             break;
+            
         case WSConstants.CUSTOM_KEY_IDENTIFIER:
             secRef.setKeyIdentifier(customTokenValueType, customTokenId);
             break;
+            
         case WSConstants.KEY_VALUE:
             java.security.PublicKey publicKey = certs[0].getPublicKey();
             String pubKeyAlgo = publicKey.getAlgorithm();
@@ -659,7 +650,7 @@ public class WSSecSignature extends WSSecBase {
      * @return The DOM Element of the signature.
      */
     public Element getSignatureElement() {
-        return this.sig.getElement();
+        return sig.getElement();
     }
     
     /**
@@ -668,8 +659,8 @@ public class WSSecSignature extends WSSecBase {
      * @return the BST Token element
      */
     public Element getBinarySecurityTokenElement() {
-        if (this.bstToken != null) {
-            return this.bstToken.getElement();
+        if (bstToken != null) {
+            return bstToken.getElement();
         }
         return null;
     }
@@ -694,11 +685,10 @@ public class WSSecSignature extends WSSecBase {
     public void computeSignature() throws WSSecurityException {
         boolean remove = WSDocInfoStore.store(wsDocInfo);
         try {
-            if (keyIdentifierType == WSConstants.UT_SIGNING ||
-                    keyIdentifierType == WSConstants.CUSTOM_SYMM_SIGNING ||
-                    keyIdentifierType == WSConstants.CUSTOM_SYMM_SIGNING_DIRECT ||
-                    keyIdentifierType == WSConstants.CUSTOM_KEY_IDENTIFIER || 
-                    keyIdentifierType == WSConstants.ENCRYPTED_KEY_SHA1_IDENTIFIER) {
+            if (keyIdentifierType == WSConstants.CUSTOM_SYMM_SIGNING
+                || keyIdentifierType == WSConstants.CUSTOM_SYMM_SIGNING_DIRECT
+                || keyIdentifierType == WSConstants.CUSTOM_KEY_IDENTIFIER
+                || keyIdentifierType == WSConstants.ENCRYPTED_KEY_SHA1_IDENTIFIER) {
                 if (secretKey == null) {
                     sig.sign(crypto.getPrivateKey(user, password));
                 } else {
@@ -748,9 +738,9 @@ public class WSSecSignature extends WSSecBase {
         }
 
         prepare(doc, cr, secHeader);
-        String soapNamespace = WSSecurityUtil.getSOAPNamespace(doc.getDocumentElement());
         if (parts == null) {
             parts = new Vector();
+            String soapNamespace = WSSecurityUtil.getSOAPNamespace(doc.getDocumentElement());
             WSEncryptionPart encP = 
                 new WSEncryptionPart(
                     WSConstants.ELEM_BODY, 
@@ -783,19 +773,11 @@ public class WSSecSignature extends WSSecBase {
                 WSConstants.WSSE_PREFIX + ":TransformationParameters"
             );
 
-        WSSecurityUtil.setNamespace(
-            transformParam, WSConstants.WSSE_NS, WSConstants.WSSE_PREFIX
-        );
-
         Element canonElem = 
             doc.createElementNS(
                 WSConstants.SIG_NS,
                 WSConstants.SIG_PREFIX + ":CanonicalizationMethod"
             );
-
-        WSSecurityUtil.setNamespace(
-            canonElem, WSConstants.SIG_NS, WSConstants.SIG_PREFIX
-        );
 
         canonElem.setAttributeNS(null, "Algorithm", Canonicalizer.ALGO_ID_C14N_EXCL_OMIT_COMMENTS);
         transformParam.appendChild(canonElem);
@@ -875,6 +857,21 @@ public class WSSecSignature extends WSSecBase {
     }
     public void setX509Certificate(X509Certificate cer) {
         this.useThisCert = cer;
+    }
+    
+    private String getSHA1(byte[] input) throws WSSecurityException {
+        try {
+            MessageDigest sha = WSSecurityUtil.resolveMessageDigest();
+            sha.reset();
+            sha.update(input);
+            byte[] data = sha.digest();
+            
+            return Base64.encode(data);
+        } catch (NoSuchAlgorithmException e) {
+            throw new WSSecurityException(
+                WSSecurityException.UNSUPPORTED_ALGORITHM, null, null, e
+            );
+        }
     }
     
 }

@@ -23,6 +23,8 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
@@ -75,6 +77,7 @@ public class TestWSSecurityNew17 extends TestCase implements CallbackHandler {
     private Crypto crypto = CryptoFactory.getInstance();
     private MessageContext msgContext;
     private Message message;
+    private byte[] keyData;
 
     /**
      * TestWSSecurity constructor
@@ -106,6 +109,11 @@ public class TestWSSecurityNew17 extends TestCase implements CallbackHandler {
         AxisClient tmpEngine = new AxisClient(new NullProvider());
         msgContext = new MessageContext(tmpEngine);
         message = getSOAPMessage();
+        
+        KeyGenerator keyGen = KeyGenerator.getInstance("AES");
+        keyGen.init(128);
+        SecretKey key = keyGen.generateKey();
+        keyData = key.getEncoded();
     }
 
     /**
@@ -120,6 +128,70 @@ public class TestWSSecurityNew17 extends TestCase implements CallbackHandler {
         Message msg = new Message(in);
         msg.setMessageContext(msgContext);
         return msg;
+    }
+    
+    /**
+     * Test signing a message body using a symmetric key with EncryptedKeySHA1
+     */
+    public void testSymmetricSignatureSHA1() throws Exception {
+        SOAPEnvelope unsignedEnvelope = message.getSOAPEnvelope();
+        Document doc = unsignedEnvelope.getAsDocument();
+        
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        
+        WSSecSignature sign = new WSSecSignature();
+        sign.setKeyIdentifierType(WSConstants.ENCRYPTED_KEY_SHA1_IDENTIFIER);
+        sign.setSecretKey(keyData);
+        sign.setSignatureAlgorithm(SignatureMethod.HMAC_SHA1);
+
+        Document signedDoc = sign.build(doc, crypto, secHeader);
+        
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Signed symmetric message SHA1:");
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+            LOG.debug(outputString);
+        }
+        
+        verify(signedDoc);
+    }
+    
+    
+    /**
+     * Test signing a message body using a symmetric key with Direct Reference to an
+     * EncryptedKey
+     */
+    public void testSymmetricSignatureDR() throws Exception {
+        SOAPEnvelope unsignedEnvelope = message.getSOAPEnvelope();
+        Document doc = unsignedEnvelope.getAsDocument();
+        
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        
+        WSSecEncryptedKey encrKey = new WSSecEncryptedKey();
+        encrKey.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
+        encrKey.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+        encrKey.setKeySize(192);
+        encrKey.prepare(doc, crypto);
+        
+        WSSecSignature sign = new WSSecSignature();
+        sign.setKeyIdentifierType(WSConstants.CUSTOM_SYMM_SIGNING);
+        sign.setCustomTokenId(encrKey.getId());
+        sign.setSecretKey(encrKey.getEphemeralKey());
+        sign.setSignatureAlgorithm(SignatureMethod.HMAC_SHA1);
+        sign.setCustomTokenValueType(
+            WSConstants.SOAPMESSAGE_NS11 + "#" + WSConstants.ENC_KEY_VALUE_TYPE
+        );
+
+        Document signedDoc = sign.build(doc, crypto, secHeader);
+        
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Signed symmetric message DR:");
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+            LOG.debug(outputString);
+        }
     }
 
     /**
@@ -200,6 +272,7 @@ public class TestWSSecurityNew17 extends TestCase implements CallbackHandler {
                  * for Testing we supply a fixed name here.
                  */
                 pc.setPassword("security");
+                pc.setKey(keyData);
             } else {
                 throw new UnsupportedCallbackException(callbacks[i], "Unrecognized Callback");
             }

@@ -121,7 +121,7 @@ public class TestWSSecurityNew13 extends TestCase implements CallbackHandler {
 
  
     /**
-     * Test the specific signing mehtod that use UsernameToken values
+     * Test the specific signing method that use UsernameToken values
      * <p/>
      * 
      * @throws java.lang.Exception Thrown when there is any problem in signing or verification
@@ -140,9 +140,12 @@ public class TestWSSecurityNew13 extends TestCase implements CallbackHandler {
         builder.prepare(doc);
         
         WSSecSignature sign = new WSSecSignature();
-        sign.setUsernameToken(builder);
-        sign.setKeyIdentifierType(WSConstants.UT_SIGNING);
+        sign.setCustomTokenValueType(WSConstants.USERNAMETOKEN_NS + "#UsernameToken");
+        sign.setCustomTokenId(builder.getId());
+        sign.setSecretKey(builder.getSecretKey());
+        sign.setKeyIdentifierType(WSConstants.CUSTOM_SYMM_SIGNING);
         sign.setSignatureAlgorithm(XMLSignature.ALGO_ID_MAC_HMAC_SHA1);
+        
         LOG.info("Before signing with UT text....");
         sign.build(doc, null, secHeader);
         LOG.info("Before adding UsernameToken PW Text....");
@@ -159,7 +162,7 @@ public class TestWSSecurityNew13 extends TestCase implements CallbackHandler {
     }
     
     /**
-     * Test the specific signing mehtod that use UsernameToken values
+     * Test the specific signing method that use UsernameToken values
      * <p/>
      * 
      * @throws java.lang.Exception Thrown when there is any problem in signing or verification
@@ -178,9 +181,12 @@ public class TestWSSecurityNew13 extends TestCase implements CallbackHandler {
         builder.prepare(doc);
         
         WSSecSignature sign = new WSSecSignature();
-        sign.setUsernameToken(builder);
-        sign.setKeyIdentifierType(WSConstants.UT_SIGNING);
+        sign.setCustomTokenValueType(WSConstants.USERNAMETOKEN_NS + "#UsernameToken");
+        sign.setCustomTokenId(builder.getId());
+        sign.setSecretKey(builder.getSecretKey());
+        sign.setKeyIdentifierType(WSConstants.CUSTOM_SYMM_SIGNING);
         sign.setSignatureAlgorithm(XMLSignature.ALGO_ID_MAC_HMAC_SHA1);
+        
         LOG.info("Before signing with UT digest....");
         sign.build(doc, null, secHeader);
         LOG.info("Before adding UsernameToken PW Digest....");

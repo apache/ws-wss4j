@@ -78,9 +78,10 @@ public class UsernameTokenSignedAction implements Action {
         
         WSSecSignature sign = new WSSecSignature();
         sign.setWsConfig(reqData.getWssConfig());
-
-        sign.setUsernameToken(builder);
-        sign.setKeyIdentifierType(WSConstants.UT_SIGNING);
+        sign.setCustomTokenValueType(WSConstants.USERNAMETOKEN_NS + "#UsernameToken");
+        sign.setCustomTokenId(builder.getId());
+        sign.setSecretKey(builder.getSecretKey());
+        sign.setKeyIdentifierType(WSConstants.CUSTOM_SYMM_SIGNING);
         sign.setSignatureAlgorithm(XMLSignature.ALGO_ID_MAC_HMAC_SHA1);
 
         sign.prepare(doc, null, reqData.getSecHeader());

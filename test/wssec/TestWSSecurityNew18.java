@@ -118,7 +118,7 @@ public class TestWSSecurityNew18 extends TestCase {
     }
 
     /**
-     * The test uses the ThumbprintSHA1 key identifier type.
+     * Sign using a different digest algorithm (SHA-256).
      * <p/>
      * 
      * @throws java.lang.Exception Thrown when there is any problem in signing or verification

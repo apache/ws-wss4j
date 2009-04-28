@@ -141,9 +141,12 @@ public class TestWSSecurityUTSignature extends TestCase implements CallbackHandl
         builder.prepare(doc);
         
         WSSecSignature sign = new WSSecSignature();
-        sign.setUsernameToken(builder);
-        sign.setKeyIdentifierType(WSConstants.UT_SIGNING);
+        sign.setCustomTokenValueType(WSConstants.USERNAMETOKEN_NS + "#UsernameToken");
+        sign.setCustomTokenId(builder.getId());
+        sign.setSecretKey(builder.getSecretKey());
+        sign.setKeyIdentifierType(WSConstants.CUSTOM_SYMM_SIGNING);
         sign.setSignatureAlgorithm(XMLSignature.ALGO_ID_MAC_HMAC_SHA1);
+        
         Document signedDoc = sign.build(doc, null, secHeader);
         builder.prependToHeader(secHeader);
         
@@ -181,9 +184,12 @@ public class TestWSSecurityUTSignature extends TestCase implements CallbackHandl
         builder.prepare(doc);
         
         WSSecSignature sign = new WSSecSignature();
-        sign.setUsernameToken(builder);
-        sign.setKeyIdentifierType(WSConstants.UT_SIGNING);
+        sign.setCustomTokenValueType(WSConstants.USERNAMETOKEN_NS + "#UsernameToken");
+        sign.setCustomTokenId(builder.getId());
+        sign.setSecretKey(builder.getSecretKey());
+        sign.setKeyIdentifierType(WSConstants.CUSTOM_SYMM_SIGNING);
         sign.setSignatureAlgorithm(XMLSignature.ALGO_ID_MAC_HMAC_SHA1);
+        
         Document signedDoc = sign.build(doc, null, secHeader);
         builder.prependToHeader(secHeader);
         
