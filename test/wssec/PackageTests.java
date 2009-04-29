@@ -72,6 +72,7 @@ public class PackageTests extends TestCase {
         suite.addTestSuite(TestWSSecurityTimestamp.class);
         suite.addTestSuite(SignatureKeyValueTest.class);
         suite.addTestSuite(TestWSSecurityResultsOrder.class);
+        suite.addTestSuite(TestWSSecurityWSS178.class);
         
         return suite;
     }
