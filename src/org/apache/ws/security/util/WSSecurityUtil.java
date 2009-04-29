@@ -256,6 +256,68 @@ public class WSSecurityUtil {
         }
         return null;
     }
+    
+    
+    /**
+     * Returns the single SAMLAssertion element that contains an AssertionID/ID that
+     * matches the supplied parameter.
+     * 
+     * @param startNode Where to start the search
+     * @param value Value of the AssertionID/ID attribute
+     * @return The found element if there was exactly one match, or
+     *         <code>null</code> otherwise
+     */
+    public static Element findSAMLAssertionElementById(Node startNode, String value) {
+        Element foundElement = null;
+
+        //
+        // Replace the formerly recursive implementation with a depth-first-loop
+        // lookup
+        //
+        if (startNode == null) {
+            return null;
+        }
+        Node startParent = startNode.getParentNode();
+        Node processedNode = null;
+
+        while (startNode != null) {
+            // start node processing at this point
+            if (startNode.getNodeType() == Node.ELEMENT_NODE) {
+                Element se = (Element) startNode;
+                if ((se.hasAttribute("ID") && value.equals(se.getAttribute("ID")))
+                    || (se.hasAttribute("AssertionID") 
+                        && value.equals(se.getAttribute("AssertionID")))) {
+                    if (foundElement == null) {
+                        foundElement = se; // Continue searching to find duplicates
+                    } else {
+                        log.warn("Multiple elements with the same 'ID' attribute value!");
+                        return null;
+                    }
+                }
+            }
+
+            processedNode = startNode;
+            startNode = startNode.getFirstChild();
+
+            // no child, this node is done.
+            if (startNode == null) {
+                // close node processing, get sibling
+                startNode = processedNode.getNextSibling();
+            }
+            // no more siblings, get parent, all children
+            // of parent are processed.
+            while (startNode == null) {
+                processedNode = processedNode.getParentNode();
+                if (processedNode == startParent) {
+                    return foundElement;
+                }
+                // close parent node processing (processed node now)
+                startNode = processedNode.getNextSibling();
+            }
+        }
+        return foundElement;
+    }
+    
 
     /**
      * Returns the single element that contains an Id with value

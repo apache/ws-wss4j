@@ -150,69 +150,9 @@ public class SecurityTokenReference {
                 WSSecurityException.INVALID_SECURITY, "badReferenceURI"
             );
         }
-        Element tokElement = null;
-        String tmpS = WSConstants.WSS_SAML_NS + WSConstants.WSS_SAML_ASSERTION;
-        String saml10 = WSConstants.WSS_SAML_NS + WSConstants.SAML_ASSERTION_ID;
-        if (tmpS.equals(ref.getValueType())
-            || saml10.equals(ref.getValueType())
-            || WSConstants.WSC_SCT.equals(ref.getValueType())) {
-            Element sa = docInfo.getAssertion();
-            String saID = null;
-            if (sa != null) {
-                saID = sa.getAttribute("AssertionID");
-            }
-            if (doDebug) {
-                log.debug("SAML token ID: " + saID);
-            }
-            String id = uri;
-            if (id.charAt(0) == '#') {
-                id = id.substring(1);
-            }
-            if (saID == null || !saID.equals(id)) {
-                if (cb != null) {
-                    //try to find a custom token
-                    WSPasswordCallback pwcb = 
-                        new WSPasswordCallback(id, WSPasswordCallback.CUSTOM_TOKEN);
-                    try {
-                        cb.handle(new Callback[]{pwcb});
-                    } catch (Exception e) {
-                        throw new WSSecurityException(
-                            WSSecurityException.FAILURE,
-                            "noPassword", 
-                            new Object[] {id}, 
-                            e
-                        );
-                    }
-                    
-                    Element assertionElem = pwcb.getCustomToken();
-                    if (assertionElem != null) {
-                        sa = (Element)doc.importNode(assertionElem, true);
-                    }
-                    else {
-                        throw new WSSecurityException(
-                            WSSecurityException.INVALID_SECURITY,
-                            "badReferenceURI",
-                            new Object[]{"uri:" + uri + ", saID: " + saID}
-                        );
-                    }
-                } else {
-                    throw new WSSecurityException(
-                        WSSecurityException.INVALID_SECURITY,
-                        "badReferenceURI",
-                        new Object[]{"uri:" + uri + ", saID: " + saID}
-                    );
-                }
-            }
-            tokElement = sa;
-        } else {
-            tokElement = WSSecurityUtil.getElementByWsuId(doc, uri);
-            
-            // In some scenarios id is used rather than wsu:Id
-            if (tokElement == null) {
-                tokElement = WSSecurityUtil.getElementByGenId(doc, uri);
-            }
-
-        }
+        
+        Element tokElement = findTokenElement(doc, docInfo, cb, uri, ref.getValueType());
+        
         if (tokElement == null) {
             throw new WSSecurityException(
                 WSSecurityException.SECURITY_TOKEN_UNAVAILABLE,
@@ -251,66 +191,9 @@ public class SecurityTokenReference {
                 WSSecurityException.INVALID_SECURITY, "badReferenceURI"
             );
         }
-        Element tokElement = null;
-        String saml10 = WSConstants.WSS_SAML_NS + WSConstants.SAML_ASSERTION_ID;
-        if (saml10.equals(type)
-            || WSConstants.WSC_SCT.equals(type)) {
-            Element sa = docInfo.getAssertion();
-            String saID = null;
-            if (sa != null) {
-                saID = sa.getAttribute("AssertionID");
-            }
-            if (doDebug) {
-                log.debug("SAML token ID: " + saID);
-            }
-            String id = value;
-            if (id.charAt(0) == '#') {
-                id = id.substring(1);
-            }
-            if (saID == null || !saID.equals(id)) {
-                if (cb != null) {
-                    //try to find a custom token
-                    WSPasswordCallback pwcb = 
-                        new WSPasswordCallback(id, WSPasswordCallback.CUSTOM_TOKEN);
-                    try {
-                        cb.handle(new Callback[]{pwcb});
-                    } catch (Exception e) {
-                        throw new WSSecurityException(
-                            WSSecurityException.FAILURE,
-                            "noPassword", 
-                            new Object[] {id}, 
-                            e
-                        );
-                    }
-                    
-                    Element assertionElem = pwcb.getCustomToken();
-                    if (assertionElem != null) {
-                        sa = (Element)doc.importNode(assertionElem, true);
-                    }
-                    else {
-                        throw new WSSecurityException(
-                            WSSecurityException.INVALID_SECURITY,
-                            "badReferenceURI",
-                            new Object[]{"uri:" + value + ", saID: " + saID}
-                        );
-                    }
-                } else {
-                    throw new WSSecurityException(
-                        WSSecurityException.INVALID_SECURITY,
-                        "badReferenceURI",
-                        new Object[]{"uri:" + value + ", saID: " + saID}
-                    );
-                }
-            }
-            tokElement = sa;
-        } else {
-            tokElement = WSSecurityUtil.getElementByWsuId(doc, value);
-            
-            // In some scenarios id is used rather than wsu:Id
-            if (tokElement == null) {
-                tokElement = WSSecurityUtil.getElementByGenId(doc, value);
-            }
-        }
+        
+        Element tokElement = findTokenElement(doc, docInfo, cb, value, type);
+        
         if (tokElement == null) {
             throw new WSSecurityException(
                 WSSecurityException.SECURITY_TOKEN_UNAVAILABLE,
@@ -318,6 +201,82 @@ public class SecurityTokenReference {
                 new Object[]{value}
             );
         }
+        return tokElement;
+    }
+    
+    
+    private Element findTokenElement(
+        Document doc,
+        WSDocInfo docInfo,
+        CallbackHandler cb,
+        String uri,
+        String type
+    ) {
+        Element tokElement = null;
+        String id = uri;
+        if (id.charAt(0) == '#') {
+            id = id.substring(1);
+        }
+        //
+        // If the type is a SAMLAssertionID then find the SAML assertion - first check
+        // if it has been previously processed, else search the header for it
+        //
+        String assertionStr = WSConstants.WSS_SAML_NS + WSConstants.ASSERTION_LN;
+        if (WSConstants.WSS_SAML_KI_VALUE_TYPE.equals(type)
+            || assertionStr.equals(type)) {
+            Element sa = docInfo.getAssertion();
+            if (sa != null) {
+                String saID = sa.getAttribute("AssertionID");
+                if (doDebug) {
+                    log.debug("SAML token ID: " + saID);
+                }
+                if (saID.equals(id)) {
+                    tokElement = sa;
+                }
+            }
+            if (tokElement == null) {
+                Node assertion = 
+                    WSSecurityUtil.findSAMLAssertionElementById(
+                        doc.getDocumentElement(),
+                        id
+                    );
+                if (assertion != null) {
+                    tokElement = (Element)assertion;
+                }
+            }
+        }
+        
+        // 
+        // Try to find a custom token
+        //
+        if (tokElement == null && WSConstants.WSC_SCT.equals(type) && cb != null) {
+            //try to find a custom token
+            WSPasswordCallback pwcb = 
+                new WSPasswordCallback(id, WSPasswordCallback.CUSTOM_TOKEN);
+            try {
+                cb.handle(new Callback[]{pwcb});
+                Element assertionElem = pwcb.getCustomToken();
+                if (assertionElem != null) {
+                    tokElement = (Element)doc.importNode(assertionElem, true);
+                }
+            } catch (Exception e) {
+                log.debug(e.getMessage(), e);
+                // Consume this failure
+            }
+        }
+        
+        //
+        // Finally try to find the element by its Id
+        //
+        if (tokElement == null) {
+            tokElement = WSSecurityUtil.getElementByWsuId(doc, uri);
+            
+            // In some scenarios id is used rather than wsu:Id
+            if (tokElement == null) {
+                tokElement = WSSecurityUtil.getElementByGenId(doc, uri);
+            }
+        }
+        
         return tokElement;
     }
 
