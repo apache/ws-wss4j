@@ -240,7 +240,8 @@ public class STRTransform extends TransformSpi {
         }
         // End of HACK
         catch (WSSecurityException ex) {
-            throw (new CanonicalizationException("WS Security Exception", ex));
+            log.debug(ex.getMessage(), ex);
+            throw (new CanonicalizationException("c14n.Canonicalizer.Exception", ex));
         }
     }
 
