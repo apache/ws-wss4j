@@ -91,11 +91,11 @@ public class WSHandlerConstants {
     public static final String TIMESTAMP = "Timestamp";
 
     /**
-     * Supress the serialization of the SOAP message.
+     * Suppress the serialization of the SOAP message.
      * <p/>
      * Usually the handler serializes the processed SOAP message into a string
      * and sets it into the Axis message context as new current message. To
-     * supress this action, define this action. In this case the handler
+     * suppress this action, define this action. In this case the handler
      * stores the processed SOAP message as <code>Document</code> in the
      * Axis message context with the property name <code>SND_SECURITY</code>.
      * <p/>
