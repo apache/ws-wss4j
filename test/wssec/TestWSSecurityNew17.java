@@ -253,7 +253,7 @@ public class TestWSSecurityNew17 extends TestCase implements CallbackHandler {
      */
     public void testSymmetricSignatureSHA1Handler() throws Exception {
         final WSSConfig cfg = WSSConfig.getNewInstance();
-        final RequestData reqData = new RequestData();
+        RequestData reqData = new RequestData();
         reqData.setWssConfig(cfg);
         java.util.Map messageContext = new java.util.TreeMap();
         messageContext.put(WSHandlerConstants.SIG_KEY_ID, "EncryptedKeySHA1");
@@ -267,7 +267,7 @@ public class TestWSSecurityNew17 extends TestCase implements CallbackHandler {
         SOAPEnvelope unsignedEnvelope = message.getSOAPEnvelope();
         final Document doc = unsignedEnvelope.getAsDocument();
         MyHandler handler = new MyHandler();
-        handler.doit(
+        handler.send(
             WSConstants.SIGN, 
             doc, 
             reqData, 
@@ -279,6 +279,15 @@ public class TestWSSecurityNew17 extends TestCase implements CallbackHandler {
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }
+        
+        reqData = new RequestData();
+        reqData.setWssConfig(WSSConfig.getNewInstance());
+        messageContext = new java.util.TreeMap();
+        messageContext.put(WSHandlerConstants.PW_CALLBACK_REF, this);
+        reqData.setMsgContext(messageContext);
+        reqData.setUsername("");
+        
+        handler.receive(WSConstants.SIGN, reqData);
         
         verify(doc);
     }
@@ -352,7 +361,7 @@ public class TestWSSecurityNew17 extends TestCase implements CallbackHandler {
             return null;
         }
 
-        void doit(
+        void send(
             int action, 
             Document doc,
             RequestData reqData, 
@@ -364,6 +373,16 @@ public class TestWSSecurityNew17 extends TestCase implements CallbackHandler {
                 reqData, 
                 actions,
                 true
+            );
+        }
+        
+        void receive(
+            int action, 
+            RequestData reqData
+        ) throws org.apache.ws.security.WSSecurityException {
+            doReceiverAction(
+                action, 
+                reqData
             );
         }
     }
