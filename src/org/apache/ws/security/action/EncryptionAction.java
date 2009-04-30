@@ -20,6 +20,7 @@
 package org.apache.ws.security.action;
 
 import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.handler.WSHandler;
@@ -59,6 +60,16 @@ public class EncryptionAction implements Action {
         wsEncrypt.setUseThisCert(reqData.getEncCert());
         if (reqData.getEncryptParts().size() > 0) {
             wsEncrypt.setParts(reqData.getEncryptParts());
+        }
+        if (!reqData.getEncryptSymmetricEncryptionKey()) {
+            WSPasswordCallback pwcb = 
+                handler.getPassword(reqData.getEncUser(),
+                    actionToDo,
+                    WSHandlerConstants.PW_CALLBACK_CLASS,
+                    WSHandlerConstants.PW_CALLBACK_REF, reqData
+                );
+            wsEncrypt.setEphemeralKey(pwcb.getKey());
+            wsEncrypt.setEncryptSymmKey(reqData.getEncryptSymmetricEncryptionKey());
         }
         try {
             wsEncrypt.build(doc, reqData.getEncCrypto(), reqData.getSecHeader());

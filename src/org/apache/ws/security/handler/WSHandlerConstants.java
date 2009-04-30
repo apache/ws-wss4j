@@ -646,6 +646,22 @@ public class WSHandlerConstants {
      */
     public static final String ENC_KEY_TRANSPORT =
             "encryptionKeyTransportAlgorithm";
+    
+    /**
+     * Defines whether to encrypt the symmetric encryption key or not. If true
+     * (the default), the symmetric key used for encryption is encrypted in turn,
+     * and inserted into the security header in an "EncryptedKey" structure. If
+     * set to false, no EncryptedKey structure is constructed.
+     * <p/>
+     * The application may set this parameter using the following method:
+     * <pre>
+     * call.setProperty(WSHandlerConstants.ENC_SYM_ENC_KEY, "false");
+     * </pre>
+     * However, the parameter in the WSDD deployment file overwrites the
+     * property setting (deployment setting overwrites application setting).
+     */
+    public static final String ENC_SYM_ENC_KEY = "encryptSymmetricEncryptionKey";
+    
 
     /**
      * Parameter to define which parts of the request shall be encrypted.
@@ -745,7 +761,9 @@ public class WSHandlerConstants {
      * </li>
      * <li><code>Thumbprint</code> for {@link WSConstants#THUMBPRINT}
      * </li>
-     * </ul
+     * <li><code>EncryptedKeySHA1</code> for {@link WSConstants#ENCRYPTED_KEY_SHA1_IDENTIFIER}
+     * </li>
+     * </ul>
      * See {@link #SIG_KEY_ID} {@link #ENC_KEY_ID}.
      */
     public static Map keyIdentifier = new Hashtable();
@@ -763,6 +781,8 @@ public class WSHandlerConstants {
                 new Integer(WSConstants.EMBEDDED_KEYNAME));
         keyIdentifier.put("Thumbprint",
                 new Integer(WSConstants.THUMBPRINT_IDENTIFIER));
+        keyIdentifier.put("EncryptedKeySHA1",
+                new Integer(WSConstants.ENCRYPTED_KEY_SHA1_IDENTIFIER));
     }
     /*
      * internally used property names to store values inside the message context

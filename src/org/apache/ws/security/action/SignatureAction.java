@@ -19,6 +19,7 @@
 
 package org.apache.ws.security.action;
 
+import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.handler.WSHandler;
@@ -29,14 +30,13 @@ import org.w3c.dom.Document;
 public class SignatureAction implements Action {
     public void execute(WSHandler handler, int actionToDo, Document doc, RequestData reqData)
             throws WSSecurityException {
-        String password =
+        WSPasswordCallback pwcb =
             handler.getPassword(
                 reqData.getUsername(),
                 actionToDo,
                 WSHandlerConstants.PW_CALLBACK_CLASS,
                 WSHandlerConstants.PW_CALLBACK_REF, reqData
-            ).getPassword();
-
+            );
         WSSecSignature wsSign = new WSSecSignature();
         wsSign.setWsConfig(reqData.getWssConfig());
 
@@ -50,9 +50,13 @@ public class SignatureAction implements Action {
             wsSign.setDigestAlgo(reqData.getSigDigestAlgorithm());
         }
 
-        wsSign.setUserInfo(reqData.getUsername(), password);
+        wsSign.setUserInfo(reqData.getUsername(), pwcb.getPassword());
         if (reqData.getSignatureParts().size() > 0) {
             wsSign.setParts(reqData.getSignatureParts());
+        }
+        
+        if (pwcb.getKey() != null) {
+            wsSign.setSecretKey(pwcb.getKey());
         }
 
         try {

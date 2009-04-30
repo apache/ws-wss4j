@@ -541,7 +541,8 @@ public abstract class WSHandler {
                     || tmp == WSConstants.BST_DIRECT_REFERENCE
                     || tmp == WSConstants.X509_KEY_IDENTIFIER
                     || tmp == WSConstants.SKI_KEY_IDENTIFIER
-                    || tmp == WSConstants.THUMBPRINT_IDENTIFIER)) {
+                    || tmp == WSConstants.THUMBPRINT_IDENTIFIER
+                    || tmp == WSConstants.ENCRYPTED_KEY_SHA1_IDENTIFIER)) {
                 throw new WSSecurityException(
                     "WSHandler: Signature: illegal key identification"
                 );
@@ -599,7 +600,8 @@ public abstract class WSHandler {
                     || tmp == WSConstants.SKI_KEY_IDENTIFIER
                     || tmp == WSConstants.BST_DIRECT_REFERENCE
                     || tmp == WSConstants.EMBEDDED_KEYNAME
-                    || tmp == WSConstants.THUMBPRINT_IDENTIFIER)) {
+                    || tmp == WSConstants.THUMBPRINT_IDENTIFIER
+                    || tmp == WSConstants.ENCRYPTED_KEY_SHA1_IDENTIFIER)) {
                 throw new WSSecurityException(
                     "WSHandler: Encryption: illegal key identification"
                 );
@@ -611,6 +613,12 @@ public abstract class WSHandler {
         String encKeyTransport = 
             getString(WSHandlerConstants.ENC_KEY_TRANSPORT, mc);
         reqData.setEncKeyTransport(encKeyTransport);
+        
+        String encSymEncKey = getString(WSHandlerConstants.ENC_SYM_ENC_KEY, mc);
+        if (encSymEncKey != null) {
+            boolean encSymEndKeyBoolean = Boolean.parseBoolean(encSymEncKey);
+            reqData.setEncryptSymmetricEncryptionKey(encSymEndKeyBoolean);
+        }
 
         String encParts = getString(WSHandlerConstants.ENCRYPTION_PARTS, mc);
         if (encParts != null) {
