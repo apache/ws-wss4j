@@ -391,6 +391,15 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
                     WSConstants.ENC_NS,
                     WSConstants.ENC_PREFIX + ":ReferenceList"
                 );
+            //
+            // If we're not placing the ReferenceList in an EncryptedKey structure,
+            // then add the ENC namespace
+            //
+            if (!encryptSymmKey) {
+                WSSecurityUtil.setNamespace(
+                    referenceList, WSConstants.ENC_NS, WSConstants.ENC_PREFIX
+                );
+            }
         }
         createDataRefList(document, referenceList, encDataRefs);
         return referenceList;
