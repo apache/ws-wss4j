@@ -26,13 +26,15 @@ import org.apache.ws.security.message.WSSecTimestamp;
 import org.w3c.dom.Document;
 
 public class TimestampAction implements Action {
+    
     public void execute(WSHandler handler, int actionToDo, Document doc, RequestData reqData)
-            throws WSSecurityException {
-        WSSecTimestamp timeStampBuilder =
-                new WSSecTimestamp();
+        throws WSSecurityException {
+        //
+        // add the Timestamp to the SOAP Envelope
+        //
+        WSSecTimestamp timeStampBuilder = new WSSecTimestamp();
         timeStampBuilder.setWsConfig(reqData.getWssConfig());
         timeStampBuilder.setTimeToLive(handler.decodeTimeToLive(reqData));
-        // add the Timestamp to the SOAP Envelope
         timeStampBuilder.build(doc, reqData.getSecHeader());
     }
 }

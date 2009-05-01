@@ -37,7 +37,6 @@ import org.apache.ws.security.message.token.Timestamp;
 import org.apache.ws.security.util.Loader;
 import org.apache.ws.security.util.StringUtil;
 import org.apache.ws.security.util.WSSecurityUtil;
-import org.apache.ws.security.util.XmlSchemaDateFormat;
 import org.w3c.dom.Document;
 
 import javax.security.auth.callback.Callback;
@@ -45,10 +44,7 @@ import javax.security.auth.callback.CallbackHandler;
 
 import java.math.BigInteger;
 import java.security.cert.X509Certificate;
-import java.text.DateFormat;
 import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Properties;
@@ -1242,40 +1238,7 @@ public abstract class WSHandler {
      * @throws WSSecurityException
      */
     protected boolean verifyTimestamp(Timestamp timestamp, int timeToLive) throws WSSecurityException {
-
-        // Calculate the time that is allowed for the message to travel
-        Calendar validCreation = Calendar.getInstance();
-        long currentTime = validCreation.getTime().getTime();
-        currentTime -= timeToLive * 1000;
-        validCreation.setTime(new Date(currentTime));
-
-        if (doDebug) {
-            log.debug("Preparing to verify the timestamp");
-            DateFormat zulu = new XmlSchemaDateFormat();
-            log.debug("Validation of Timestamp: Current time is "
-                    + zulu.format(Calendar.getInstance().getTime()));
-            log.debug("Validation of Timestamp: Valid creation is "
-                    + zulu.format(validCreation.getTime()));
-            if (timestamp.getCreated() != null) {
-                log.debug("Validation of Timestamp: Timestamp created is "
-                        + zulu.format(timestamp.getCreated().getTime()));
-            }
-        }
-        // Validate the time it took the message to travel
-        // if (timestamp.getCreated().before(validCreation) ||
-        // !timestamp.getCreated().equals(validCreation)) {
-        Calendar cre = timestamp.getCreated();
-        if (cre != null && !cre.after(validCreation)) {
-            if (doDebug) {
-                log.debug("Validation of Timestamp: The message was created too long ago");
-            }
-            return false;
-        }
-
-        if (doDebug) {
-            log.debug("Validation of Timestamp: Everything is ok");
-        }
-        return true;
+        return timestamp.verifyCreated(timeToLive);
     }
 
     /**

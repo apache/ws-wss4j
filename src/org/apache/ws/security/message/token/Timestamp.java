@@ -19,6 +19,8 @@
 
 package org.apache.ws.security.message.token;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.util.DOM2Writer;
@@ -33,6 +35,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.text.DateFormat;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
 import java.util.TimeZone;
 import java.util.Vector;
 
@@ -43,9 +47,11 @@ import java.util.Vector;
  * @author Christof Soehngen (christof.soehngen@syracom.de)
  */
 public class Timestamp {
+    
+    private final static Log LOG = LogFactory.getLog(Timestamp.class.getName());
 
     protected Element element = null;
-    protected Vector customElements = null;
+    protected List customElements = null;
     protected Calendar created;
     protected Calendar expires;
     
@@ -69,10 +75,11 @@ public class Timestamp {
              currentChild = currentChild.getNextSibling()
          ) {
             if (currentChild instanceof Element) {
+                Element currentChildElement = (Element) currentChild;
                 if (WSConstants.CREATED_LN.equals(currentChild.getLocalName()) &&
                         WSConstants.WSU_NS.equals(currentChild.getNamespaceURI())) {
                     if (strCreated == null) {
-                        strCreated = ((Text) ((Element) currentChild).getFirstChild()).getData();
+                        strCreated = ((Text)currentChildElement.getFirstChild()).getData();
                     } else {
                         throw new WSSecurityException(
                             WSSecurityException.INVALID_SECURITY, "invalidTimestamp"
@@ -81,27 +88,36 @@ public class Timestamp {
                 } else if (WSConstants.EXPIRES_LN.equals(currentChild.getLocalName()) &&
                         WSConstants.WSU_NS.equals(currentChild.getNamespaceURI())) {
                     if (strExpires == null) {
-                        strExpires = ((Text) ((Element) currentChild).getFirstChild()).getData();
+                        strExpires = ((Text)currentChildElement.getFirstChild()).getData();
                     } else {
                         throw new WSSecurityException(
                             WSSecurityException.INVALID_SECURITY, "invalidTimestamp"
                         );                        
                     }
                 } else {
-                    customElements.add((Element) currentChild);
+                    customElements.add(currentChildElement);
                 }
             }
         }
 
         DateFormat zulu = new XmlSchemaDateFormat();
         try {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Current time: " + zulu.format(Calendar.getInstance().getTime()));
+            }
             if (strCreated != null) {
                 created = Calendar.getInstance();
                 created.setTime(zulu.parse(strCreated));
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("Timestamp created: " + zulu.format(created.getTime()));
+                }
             }
             if (strExpires != null) {
                 expires = Calendar.getInstance();
                 expires.setTime(zulu.parse(strExpires));
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("Timestamp expires: " + zulu.format(expires.getTime()));
+                }
             }
         } catch (ParseException e) {
             throw new WSSecurityException(
@@ -179,7 +195,7 @@ public class Timestamp {
      * @return the <code>wsse:UsernameToken</code> element
      */
     public Element getElement() {
-        return this.element;
+        return element;
     }
 
     /**
@@ -188,7 +204,7 @@ public class Timestamp {
      * @return a XML string representation
      */
     public String toString() {
-        return DOM2Writer.nodeToString((Node) this.element);
+        return DOM2Writer.nodeToString((Node) element);
     }
 
     /**
@@ -220,10 +236,10 @@ public class Timestamp {
     /**
      * Get the the custom elements from this Timestamp
      *
-     * @return the vector containing the custom elements.
+     * @return the list containing the custom elements.
      */
-    public Vector getCustomElements() {
-        return this.customElements;
+    public List getCustomElements() {
+        return customElements;
     }
     
     /**
@@ -231,14 +247,59 @@ public class Timestamp {
      * @param id
      */
     public void setID(String id) {
-        this.element.setAttributeNS(WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":Id", id);
+        element.setAttributeNS(WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":Id", id);
     }
     
     /**
      * @return the value of the wsu:Id attribute
      */
     public String getID() {
-        return this.element.getAttributeNS(WSConstants.WSU_NS, "Id");
+        return element.getAttributeNS(WSConstants.WSU_NS, "Id");
     }
+    
+    /**
+     * Return true if the current Timestamp is expired, meaning if the "Expires" value
+     * is before the current time. It returns false if there is no Expires value.
+     */
+    public boolean isExpired() {
+        Calendar rightNow = Calendar.getInstance();
+        if (expires != null) {
+            return expires.before(rightNow);
+        }
+        return false;
+    }
+    
+    
+    /**
+     * Return true if the "Created" value is before the current time minus the timeToLive
+     * argument.
+     * 
+     * @param timeToLive
+     *            the limit on the receivers' side, that the timestamp is validated against
+     * @return true if the timestamp is before (now-timeToLive), false otherwise
+     */
+    public boolean verifyCreated(
+        int timeToLive
+    ) {
+        // Calculate the time that is allowed for the message to travel
+        Calendar validCreation = Calendar.getInstance();
+        long currentTime = validCreation.getTime().getTime();
+        currentTime -= timeToLive * 1000;
+        validCreation.setTime(new Date(currentTime));
+
+        // Validate the time it took the message to travel
+        if (created != null && created.before(validCreation)) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Validation of Timestamp: The message was created too long ago");
+            }
+            return false;
+        }
+
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Validation of Timestamp: Everything is ok");
+        }
+        return true;
+    }
+
     
 }

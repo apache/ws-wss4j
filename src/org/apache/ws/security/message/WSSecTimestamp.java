@@ -42,12 +42,6 @@ public class WSSecTimestamp extends WSSecBase {
     private int timeToLive = 300; // time between Created and Expires
 
     /**
-     * Constructor.
-     */
-    public WSSecTimestamp() {
-    }
-
-    /**
      * Set the time to live. This is the time difference in seconds between the
      * <code>Created</code> and the <code>Expires</code> in
      * <code>Timestamp</code>. <p/>
