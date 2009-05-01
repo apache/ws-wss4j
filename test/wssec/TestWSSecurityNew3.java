@@ -30,12 +30,14 @@ import org.apache.axis.message.SOAPEnvelope;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.WSEncryptionPart;
 import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.message.WSSecSignature;
 import org.apache.ws.security.message.WSSecHeader;
+import org.apache.ws.security.message.WSSecTimestamp;
 import org.w3c.dom.Document;
 
 import javax.security.auth.callback.Callback;
@@ -44,6 +46,8 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
+import java.util.Vector;
 
 /**
  * WS-Security Test Case
@@ -185,6 +189,53 @@ public class TestWSSecurityNew3 extends TestCase implements CallbackHandler {
         secHeader.insertSecurityHeader(doc);
         Document signedDoc = builder.build(doc, crypto, secHeader);
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("After Signing....");
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+            LOG.debug(outputString);
+        }
+        
+        verify(signedDoc);
+    }
+    
+    
+    /**
+     * Test that signs and verifies a Timestamp. The request is then modified so that the
+     * Timestamp has a default (WSU) namespace inserted. The signature validation should still
+     * pass due to c14n (see WSS-181).
+     * 
+     * @throws java.lang.Exception Thrown when there is any problem in signing or verification
+     */
+    public void testValidModifiedSignature() throws Exception {
+        WSSecSignature builder = new WSSecSignature();
+        builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+        LOG.info("Before Signing....");
+        Document doc = unsignedEnvelope.getAsDocument();
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        
+        WSSecTimestamp timestamp = new WSSecTimestamp();
+        timestamp.setTimeToLive(300);
+        Document createdDoc = timestamp.build(doc, secHeader);
+        
+        List parts = new Vector();
+        WSEncryptionPart encP =
+            new WSEncryptionPart(
+                "Timestamp",
+                WSConstants.WSU_NS,
+                "");
+        parts.add(encP);
+        builder.setParts(parts);
+        
+        Document signedDoc = builder.build(createdDoc, crypto, secHeader);
+        org.w3c.dom.Element secHeaderElement = secHeader.getSecurityHeader();
+        org.w3c.dom.Node timestampNode = 
+            secHeaderElement.getElementsByTagName("wsu:Timestamp").item(0);
+        ((org.w3c.dom.Element)timestampNode).setAttributeNS(
+            WSConstants.XMLNS_NS, "xmlns", WSConstants.WSU_NS
+        );
+        
         if (LOG.isDebugEnabled()) {
             LOG.debug("After Signing....");
             String outputString = 
