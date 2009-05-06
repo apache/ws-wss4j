@@ -35,7 +35,6 @@ import org.w3c.dom.Element;
  * 
  * @author Werner Dittmann (werner@apache.org).
  */
-
 public class WSSecUsernameToken extends WSSecBase {
     private static Log log = LogFactory.getLog(WSSecUsernameToken.class.getName());
 
@@ -48,11 +47,6 @@ public class WSSecUsernameToken extends WSSecBase {
     private byte[] saltValue;
     private int iteration = UsernameToken.DEFAULT_ITERATION;
 
-    /**
-     * Constructor.
-     */
-    public WSSecUsernameToken() {
-    }
 
     /**
      * Defines how to construct the password element of the
@@ -241,6 +235,6 @@ public class WSSecUsernameToken extends WSSecBase {
      * @return the Username Token element
      */
     public Element getUsernameTokenElement() {
-       return this.ut.getElement(); 
+       return ut.getElement(); 
     }
 }

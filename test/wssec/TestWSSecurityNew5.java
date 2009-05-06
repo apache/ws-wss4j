@@ -366,13 +366,13 @@ public class TestWSSecurityNew5 extends TestCase implements CallbackHandler {
     }
     
     /**
-     * Test with a null password type. This will pass as the WSSConfig is configured to 
-     * handle custom token types.
+     * Test with a non-standard token type. This will fail as the default is to reject custom
+     * token types.
      */
-    public void testUsernameTokenCustomPass() throws Exception {
+    public void testUsernameTokenCustomFail2() throws Exception {
         WSSecUsernameToken builder = new WSSecUsernameToken();
-        builder.setPasswordType(null);
-        builder.setUserInfo("customUser", null);
+        builder.setPasswordType("RandomType");
+        builder.setUserInfo("customUser", "randomPass");
         
         Document doc = unsignedEnvelope.getAsDocument();
         WSSecHeader secHeader = new WSSecHeader();
@@ -381,6 +381,35 @@ public class TestWSSecurityNew5 extends TestCase implements CallbackHandler {
         
         if (LOG.isDebugEnabled()) {
             LOG.debug("Message with UserNameToken PW Text:");
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+            LOG.debug(outputString);
+        }
+        try {
+            verify(signedDoc);
+            throw new Exception("Custom token types are not permitted");
+        } catch (WSSecurityException ex) {
+            assertTrue(ex.getErrorCode() == WSSecurityException.FAILED_AUTHENTICATION);
+            // expected
+        }
+    }
+    
+    /**
+     * Test with a non-standard password type. This will pass as the WSSConfig is configured to 
+     * handle custom token types.
+     */
+    public void testUsernameTokenCustomPass() throws Exception {
+        WSSecUsernameToken builder = new WSSecUsernameToken();
+        builder.setPasswordType("RandomType");
+        builder.setUserInfo("customUser", "randomPass");
+        
+        Document doc = unsignedEnvelope.getAsDocument();
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        Document signedDoc = builder.build(doc, secHeader);
+        
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Message with UserNameToken PW custom type:");
             String outputString = 
                 org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
@@ -525,10 +554,7 @@ public class TestWSSecurityNew5 extends TestCase implements CallbackHandler {
                 } else if (
                     pc.getUsage() == WSPasswordCallback.USERNAME_TOKEN_UNKNOWN
                 ) {
-                    if ("wernerd".equals(pc.getIdentifier())
-                        && "verySecret".equals(pc.getPassword())) {
-                        return;
-                    } else if ("customUser".equals(pc.getIdentifier())) {
+                    if ("customUser".equals(pc.getIdentifier())) {
                         return;
                     } else {
                         throw new IOException("Authentication failed");

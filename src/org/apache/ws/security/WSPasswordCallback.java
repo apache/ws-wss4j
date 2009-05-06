@@ -53,12 +53,11 @@ import javax.security.auth.callback.Callback;
  * decrypt parts of the SOAP request. Note, the key must match the
  * symmetric encryption/decryption algorithm specified (refer to
  * {@link org.apache.ws.security.handler.WSHandlerConstants#ENC_SYM_ALGO}).</li>
- * <li><code>USERNAME_TOKEN_UNKNOWN</code> - either an not specified 
- * password type or a password type passwordText. In these both cases <b>only</b>
- * the password variable is <b>set</b>. The callback class now may check if
- * the username and password match. If they don't match the callback class must
- * throw an exception. The exception can be a UnsupportedCallbackException or
- * an IOException.</li>
+ * <li><code>USERNAME_TOKEN_UNKNOWN</code> - A not specified password type. 
+ * In this case <b>only</b> the password variable is <b>set</b>. The callback
+ * class now may check if the username and password match. If they don't match
+ * the callback class must throw an exception. The exception can be a 
+ * UnsupportedCallbackException or an IOException.</li>
  * <li><code>SECURITY_CONTEXT_TOKEN</code> - need the key to to be associated 
  * with a <code>wsc:SecurityContextToken</code>.</li>
  * </ul>

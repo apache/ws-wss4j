@@ -28,16 +28,19 @@ import org.apache.ws.security.message.WSSecUsernameToken;
 import org.w3c.dom.Document;
 
 public class UsernameTokenAction implements Action {
+    
     public void execute(WSHandler handler, int actionToDo, Document doc, RequestData reqData)
-            throws WSSecurityException {
-        
-        // Always call the callback for the username. We mis-use the configured password callback class and callback methods for this.
-        String providedUsername = reqData.getUsername();
-        WSPasswordCallback callbackData = handler.getPassword(reqData.getUsername(),
-                        actionToDo,
-                        WSHandlerConstants.PW_CALLBACK_CLASS,
-                        WSHandlerConstants.PW_CALLBACK_REF, reqData);
-        providedUsername = callbackData.getIdentifier();
+        throws WSSecurityException {
+
+        WSPasswordCallback callbackData = 
+            handler.getPassword(
+                reqData.getUsername(),
+                actionToDo,
+                WSHandlerConstants.PW_CALLBACK_CLASS,
+                WSHandlerConstants.PW_CALLBACK_REF, 
+                reqData
+            );
+        String providedUsername = callbackData.getIdentifier();
         String password = callbackData.getPassword();
 
         WSSecUsernameToken builder = new WSSecUsernameToken();

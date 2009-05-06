@@ -203,12 +203,12 @@ public class UsernameToken {
             elementPassword.appendChild(doc.createTextNode(""));
             element.appendChild(elementPassword);
 
-            hashed = false;
             passwordType = pwType;
             if (passwordType.equals(WSConstants.PASSWORD_DIGEST)) {
-                hashed = true;
                 addNonce(doc);
                 addCreated(milliseconds, doc);
+            } else {
+                hashed = false;
             }
         }
     }
@@ -287,7 +287,7 @@ public class UsernameToken {
             doc.createElementNS(
                 WSConstants.WSSE11_NS, WSConstants.WSSE11_PREFIX + ":" + WSConstants.SALT_LN
             );
-        WSSecurityUtil.setNamespace(this.element, WSConstants.WSSE11_NS, WSConstants.WSSE11_PREFIX);
+        WSSecurityUtil.setNamespace(element, WSConstants.WSSE11_NS, WSConstants.WSSE11_PREFIX);
         elementSalt.appendChild(doc.createTextNode(Base64.encode(saltValue)));
         element.appendChild(elementSalt);
         return saltValue;
@@ -303,7 +303,7 @@ public class UsernameToken {
                 WSConstants.WSSE11_NS, WSConstants.WSSE11_PREFIX + ":" + WSConstants.ITERATION_LN
             );
         WSSecurityUtil.setNamespace(element, WSConstants.WSSE11_NS, WSConstants.WSSE11_PREFIX);
-        this.elementIteration.appendChild(doc.createTextNode(text));
+        elementIteration.appendChild(doc.createTextNode(text));
         element.appendChild(elementIteration);
     }
 
@@ -424,12 +424,13 @@ public class UsernameToken {
         rawPassword = pwd;             // enhancement by Alberto coletti
         Text node = getFirstNode(elementPassword);
         try {
-            if (!hashed) {
-                node.setData(pwd);
-                elementPassword.setAttribute("Type", WSConstants.PASSWORD_TEXT);
-            } else {
+            if (hashed) {
                 node.setData(doPasswordDigest(getNonce(), getCreated(), pwd));
-                elementPassword.setAttribute("Type", WSConstants.PASSWORD_DIGEST);
+            } else {
+                node.setData(pwd);
+            }
+            if (passwordType != null) {
+                elementPassword.setAttribute("Type", passwordType);
             }
         } catch (Exception e) {
             if (DO_DEBUG) {
@@ -491,7 +492,7 @@ public class UsernameToken {
      */
     private Text getFirstNode(Element e) {
         Node node = e.getFirstChild();
-        return ((node != null) && node instanceof Text) ? (Text) node : null;
+        return (node instanceof Text) ? (Text) node : null;
     }
 
     /**
@@ -527,7 +528,7 @@ public class UsernameToken {
      * @return a XML string representation
      */
     public String toString() {
-        return DOM2Writer.nodeToString((Node) this.element);
+        return DOM2Writer.nodeToString((Node)element);
     }
 
     /**
