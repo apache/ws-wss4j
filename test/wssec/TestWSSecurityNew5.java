@@ -83,6 +83,22 @@ public class TestWSSecurityNew5 extends TestCase implements CallbackHandler {
         + "<add xmlns=\"http://ws.apache.org/counter/counter_port_type\">" 
         + "<value xmlns=\"\">15</value>" + "</add>" 
         + "</SOAP-ENV:Body>\r\n       \r\n" + "</SOAP-ENV:Envelope>";
+    private static final String SOAPUTNOUSERMSG = 
+        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" 
+        + "<SOAP-ENV:Envelope xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" "
+        + "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" "
+        + "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">"
+        + "<SOAP-ENV:Header>"
+        + "<wsse:Security SOAP-ENV:mustUnderstand=\"1\" "
+        + "xmlns:wsse=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd\">"
+        + "<wsse:UsernameToken wsu:Id=\"UsernameToken-29477163\" xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">"
+        + "<wsse:Username></wsse:Username>"
+        + "<wsse:Password></wsse:Password>"
+        + "</wsse:UsernameToken></wsse:Security></SOAP-ENV:Header>"
+        + "<SOAP-ENV:Body>" 
+        + "<add xmlns=\"http://ws.apache.org/counter/counter_port_type\">" 
+        + "<value xmlns=\"\">15</value>" + "</add>" 
+        + "</SOAP-ENV:Body>\r\n       \r\n" + "</SOAP-ENV:Envelope>";
     
     private WSSecurityEngine secEngine = new WSSecurityEngine();
     private MessageContext msgContext;
@@ -298,6 +314,25 @@ public class TestWSSecurityNew5 extends TestCase implements CallbackHandler {
      */
     public void testUsernameTokenNoPasswordType() throws Exception {
         InputStream in = new ByteArrayInputStream(SOAPUTMSG.getBytes());
+        Message msg = new Message(in);
+        msg.setMessageContext(msgContext);
+        SOAPEnvelope utEnvelope = msg.getSOAPEnvelope();
+        Document doc = utEnvelope.getAsDocument();
+        if (LOG.isDebugEnabled()) {
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+            LOG.debug(outputString);
+        }
+        verify(doc);
+    }
+    
+    /**
+     * Test that adds a UserNameToken with no user (or password) to a WS-Security envelope
+     * See WSS-185 - https://issues.apache.org/jira/browse/WSS-185
+     * "NullPointerException on empty UsernameToken"
+     */
+    public void testUsernameTokenNoUser() throws Exception {
+        InputStream in = new ByteArrayInputStream(SOAPUTNOUSERMSG.getBytes());
         Message msg = new Message(in);
         msg.setMessageContext(msgContext);
         SOAPEnvelope utEnvelope = msg.getSOAPEnvelope();
@@ -555,6 +590,9 @@ public class TestWSSecurityNew5 extends TestCase implements CallbackHandler {
                     pc.getUsage() == WSPasswordCallback.USERNAME_TOKEN_UNKNOWN
                 ) {
                     if ("customUser".equals(pc.getIdentifier())) {
+                        return;
+                    } else if (null == pc.getIdentifier()) {
+                        // Note that this is not secure! Just doing this to test a NPE
                         return;
                     } else {
                         throw new IOException("Authentication failed");

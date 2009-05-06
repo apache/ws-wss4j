@@ -46,35 +46,25 @@ import java.security.Principal;
  */
 public class WSUsernameTokenPrincipal implements Principal, java.io.Serializable {
 
-    /**
-     * @serial
-     */
-    private String name = null;
-    private String nonce = null;
-    private String password = null;
-    private String createdTime = null;
-    private String passwordType = null;
+    private String name;
+    private String nonce;
+    private String password;
+    private String createdTime;
+    private String passwordType;
     private boolean digest = false;
 
     /**
      * Create a WSUsernameTokenPrincipal with a WSUsernameToken username.
-     * <p/>
      *
      * @param name the WSUsernameToken username for this user.
-     * @throws NullPointerException if the <code>name</code>
-     *                              is <code>null</code>.
      */
     public WSUsernameTokenPrincipal(String name, boolean digest) {
-        if (name == null)
-            throw new NullPointerException("illegal null input");
         this.name = name;
         this.digest = digest;
     }
 
     /**
      * Return the WSUsernameToken username for this <code>WSUsernameTokenPrincipal</code>.
-     * <p/>
-     * <p/>
      *
      * @return the WSUsernameToken username for this <code>WSUsernameTokenPrincipal</code>
      */
@@ -84,8 +74,6 @@ public class WSUsernameTokenPrincipal implements Principal, java.io.Serializable
 
     /**
      * Return the WSUsernameToken password type for this <code>WSUsernameTokenPrincipal</code>.
-     * <p/>
-     * <p/>
      *
      * @return true if the password type was <code>PassowrdDigest</code>
      */
@@ -95,8 +83,6 @@ public class WSUsernameTokenPrincipal implements Principal, java.io.Serializable
 
     /**
      * Set the WSUsernameToken password for this <code>WSUsernameTokenPrincipal</code>.
-     * <p/>
-     * <p/>
      *
      * @param password
      */
@@ -106,8 +92,6 @@ public class WSUsernameTokenPrincipal implements Principal, java.io.Serializable
 
     /**
      * Return the WSUsernameToken password for this <code>WSUsernameTokenPrincipal</code>.
-     * <p/>
-     * <p/>
      *
      * @return the WSUsernameToken password for this <code>WSUsernameTokenPrincipal</code>
      */
@@ -117,8 +101,6 @@ public class WSUsernameTokenPrincipal implements Principal, java.io.Serializable
 
     /**
      * Set the WSUsernameToken nonce for this <code>WSUsernameTokenPrincipal</code>.
-     * <p/>
-     * <p/>
      *
      * @param nonce
      */
@@ -128,8 +110,6 @@ public class WSUsernameTokenPrincipal implements Principal, java.io.Serializable
 
     /**
      * Return the WSUsernameToken nonce for this <code>WSUsernameTokenPrincipal</code>.
-     * <p/>
-     * <p/>
      *
      * @return the WSUsernameToken nonce for this <code>WSUsernameTokenPrincipal</code>
      */
@@ -139,7 +119,6 @@ public class WSUsernameTokenPrincipal implements Principal, java.io.Serializable
 
     /**
      * Set the WSUsernameToken created time for this <code>WSUsernameTokenPrincipal</code>.
-     * <p/>
      *
      * @param createdTime
      */
@@ -149,7 +128,6 @@ public class WSUsernameTokenPrincipal implements Principal, java.io.Serializable
 
     /**
      * Return the WSUsernameToken created time for this <code>WSUsernameTokenPrincipal</code>.
-     * <p/>
      *
      * @return the WSUsernameToken created time for this <code>WSUsernameTokenPrincipal</code>
      */
@@ -159,7 +137,6 @@ public class WSUsernameTokenPrincipal implements Principal, java.io.Serializable
 
     /**
      * Return a string representation of this <code>WSUsernameTokenPrincipal</code>.
-     * <p/>
      *
      * @return a string representation of this <code>WSUsernameTokenPrincipal</code>.
      */
@@ -173,19 +150,19 @@ public class WSUsernameTokenPrincipal implements Principal, java.io.Serializable
     public String getPasswordType() {
         return passwordType;
     }
+    
     /**
      * @param passwordType The passwordType to set.
      */
     public void setPasswordType(String passwordType) {
         this.passwordType = passwordType;
     }
+    
     /**
      * Compares the specified Object with this <code>WSUsernameTokenPrincipal</code>
      * for equality.  Returns true if the given object is also a
      * <code>WSUsernameTokenPrincipal</code> and the two WSUsernameTokenPrincipals
      * have the same username.
-     * <p/>
-     * <p/>
      *
      * @param o Object to be compared for equality with this
      *          <code>WSUsernameTokenPrincipal</code>.
@@ -211,12 +188,11 @@ public class WSUsernameTokenPrincipal implements Principal, java.io.Serializable
 
     /**
      * Return a hash code for this <code>WSUsernameTokenPrincipal</code>.
-     * <p/>
-     * <p/>
      *
      * @return a hash code for this <code>WSUsernameTokenPrincipal</code>.
      */
     public int hashCode() {
-        return name.hashCode();
+        return this.hashCode();
     }
+    
 }
