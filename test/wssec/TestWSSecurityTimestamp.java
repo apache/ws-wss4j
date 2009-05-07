@@ -30,11 +30,11 @@ import org.apache.axis.message.SOAPEnvelope;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.ws.security.WSSecurityEngine;
-import org.apache.ws.security.handler.WSHandler;
 import org.apache.ws.security.message.WSSecHeader;
 import org.apache.ws.security.message.WSSecTimestamp;
 import org.apache.ws.security.message.token.Timestamp;
@@ -135,7 +135,7 @@ public class TestWSSecurityTimestamp extends TestCase {
         //
         // Do some processing
         //
-        Vector wsResult = verify(createdDoc);
+        Vector wsResult = verify(createdDoc, WSSConfig.getNewInstance());
         WSSecurityEngineResult actionResult = 
             WSSecurityUtil.fetchActionResult(wsResult, WSConstants.TS);
         assertTrue(actionResult != null);
@@ -143,11 +143,6 @@ public class TestWSSecurityTimestamp extends TestCase {
         Timestamp receivedTimestamp = 
             (Timestamp)actionResult.get(WSSecurityEngineResult.TAG_TIMESTAMP);
         assertTrue(receivedTimestamp != null);
-
-        MyHandler myHandler = new MyHandler();
-        if (!myHandler.publicVerifyTimestamp(receivedTimestamp, 300)) {
-            fail("The timestamp could not be validated");
-        }
     }
     
     
@@ -173,7 +168,7 @@ public class TestWSSecurityTimestamp extends TestCase {
         //
         // Do some processing
         //
-        Vector wsResult = verify(createdDoc);
+        Vector wsResult = verify(createdDoc, WSSConfig.getNewInstance());
         WSSecurityEngineResult actionResult = 
             WSSecurityUtil.fetchActionResult(wsResult, WSConstants.TS);
         assertTrue(actionResult != null);
@@ -181,11 +176,6 @@ public class TestWSSecurityTimestamp extends TestCase {
         Timestamp receivedTimestamp = 
             (Timestamp)actionResult.get(WSSecurityEngineResult.TAG_TIMESTAMP);
         assertTrue(receivedTimestamp != null);
-
-        MyHandler myHandler = new MyHandler();
-        if (!myHandler.publicVerifyTimestamp(receivedTimestamp, 300)) {
-            fail("The timestamp could not be validated");
-        }
     }
     
     
@@ -209,11 +199,7 @@ public class TestWSSecurityTimestamp extends TestCase {
         }
         
         try {
-            //
-            // Note that "expired" verification is done in the TimestampProcessor, whereas
-            // "created" verification is done in the WSHandler
-            //
-            verify(createdDoc);
+            verify(createdDoc, WSSConfig.getNewInstance());
             fail("Expected failure on an expired timestamp");
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == WSSecurityException.MESSAGE_EXPIRED); 
@@ -243,19 +229,14 @@ public class TestWSSecurityTimestamp extends TestCase {
         //
         // Do some processing
         //
-        Vector wsResult = verify(createdDoc);
-        WSSecurityEngineResult actionResult = 
-            WSSecurityUtil.fetchActionResult(wsResult, WSConstants.TS);
-        assertTrue(actionResult != null);
-        
-        Timestamp receivedTimestamp = 
-            (Timestamp)actionResult.get(WSSecurityEngineResult.TAG_TIMESTAMP);
-        assertTrue(receivedTimestamp != null);
-
-        MyHandler myHandler = new MyHandler();
-        if (myHandler.publicVerifyTimestamp(receivedTimestamp, -1)) {
+        WSSConfig wssConfig = WSSConfig.getNewInstance();
+        wssConfig.setTimeStampTTL(-1);
+        try {
+            verify(createdDoc, wssConfig);
             fail("The timestamp validation should have failed");
-        }     
+        } catch (WSSecurityException ex) {
+            assertTrue(ex.getErrorCode() == WSSecurityException.MESSAGE_EXPIRED); 
+        }  
     }
     
 
@@ -263,50 +244,13 @@ public class TestWSSecurityTimestamp extends TestCase {
      * Verifies the soap envelope
      * 
      * @param env soap envelope
+     * @param wssConfig
      * @throws java.lang.Exception Thrown when there is a problem in verification
      */
-    private Vector verify(Document doc) throws Exception {
+    private Vector verify(Document doc, WSSConfig wssConfig) throws Exception {
+        secEngine.setWssConfig(wssConfig);
         return secEngine.processSecurityHeader(doc, null, null, null);
     }
     
-    /**
-     * a trivial extension of the WSHandler type
-     */
-    public static class MyHandler extends WSHandler {
-        
-        public Object 
-        getOption(String key) {
-            return null;
-        }
-        
-        public void 
-        setProperty(
-            Object msgContext, 
-            String key, 
-            Object value
-        ) {
-        }
-
-        public Object 
-        getProperty(Object ctx, String key) {
-            return null;
-        }
-    
-        public void 
-        setPassword(Object msgContext, String password) {
-        }
-        
-        public String 
-        getPassword(Object msgContext) {
-            return null;
-        }
-
-        boolean publicVerifyTimestamp(
-            Timestamp timestamp, 
-            int ttl
-        ) throws org.apache.ws.security.WSSecurityException {
-            return verifyTimestamp(timestamp, ttl);
-        }
-    }
     
 }

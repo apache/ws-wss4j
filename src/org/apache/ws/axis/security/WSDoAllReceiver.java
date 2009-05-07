@@ -38,7 +38,6 @@ import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.handler.WSHandlerResult;
-import org.apache.ws.security.message.token.Timestamp;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.xml.security.utils.XMLUtils;
 import org.w3c.dom.Document;
@@ -81,6 +80,7 @@ public class WSDoAllReceiver extends WSDoAllHandler {
         }        
 
         RequestData reqData = new RequestData();
+        reqData.setWssConfig(secEngine.getWssConfig());
         /*
         * The overall try, just to have a finally at the end to perform some
         * housekeeping.
@@ -154,7 +154,6 @@ public class WSDoAllReceiver extends WSDoAllHandler {
             * they may be used for encryption too.
             */
             doReceiverAction(doAction, reqData);
-            
             Vector wsResult = null;
             if (tlog.isDebugEnabled()) {
                 t1 = System.currentTimeMillis();
@@ -293,30 +292,6 @@ public class WSDoAllReceiver extends WSDoAllHandler {
                 if (returnCert != null && !verifyTrust(returnCert, reqData)) {
                     throw new AxisFault(
                             "WSDoAllReceiver: The certificate used for the signature is not trusted");
-                }
-            }
-
-            /*
-            * Perform further checks on the timestamp that was transmitted in
-            * the header. In the following implementation the timestamp is
-            * valid if it was created after (now-ttl), where ttl is set on
-            * server side, not by the client.
-            *
-            * Note: the method verifyTimestamp(Timestamp) allows custom
-            * implementations with other validation algorithms for subclasses.
-            */
-
-            // Extract the timestamp action result from the action vector
-            actionResult = WSSecurityUtil.fetchActionResult(wsResult,
-                    WSConstants.TS);
-
-            if (actionResult != null) {
-                Timestamp timestamp = 
-                    (Timestamp)actionResult.get(WSSecurityEngineResult.TAG_TIMESTAMP);
-
-                if (timestamp != null 
-                    && !verifyTimestamp(timestamp, decodeTimeToLive(reqData))) {
-                    throw new AxisFault("WSDoAllReceiver: The timestamp could not be validated");
                 }
             }
 

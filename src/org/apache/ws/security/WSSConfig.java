@@ -190,6 +190,12 @@ public class WSSConfig {
     protected boolean timeStampStrict = true;
     
     /**
+     * The time in seconds between creation and expiry for a Timestamp. The default
+     * is 300 seconds (5 minutes).
+     */
+    protected int timeStampTTL = 300;
+    
+    /**
      * This variable controls whether types other than PasswordDigest or PasswordText
      * are allowed when processing UsernameTokens. 
      * 
@@ -395,6 +401,21 @@ public class WSSConfig {
      */
     public void setTimeStampStrict(boolean timeStampStrict) {
         this.timeStampStrict = timeStampStrict;
+    }
+    
+    /**
+     * @return Returns the TTL of a Timestamp in seconds
+     */
+    public int getTimeStampTTL() {
+        return timeStampTTL;
+    }
+
+    /**
+     * @param timeStampTTL
+     *            The new value for timeStampTTL
+     */
+    public void setTimeStampTTL(int timeStampTTL) {
+        this.timeStampTTL = timeStampTTL;
     }
     
     /**

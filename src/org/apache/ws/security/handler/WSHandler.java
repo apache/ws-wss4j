@@ -257,6 +257,7 @@ public abstract class WSHandler {
             decodeEnableSignatureConfirmation(reqData)
         );
         wssConfig.setTimeStampStrict(decodeTimestampStrict(reqData));
+        wssConfig.setTimeStampTTL(decodeTimeToLive(reqData));
         wssConfig.setHandleCustomPasswordTypes(decodeCustomPasswordTypes(reqData));
         reqData.setWssConfig(wssConfig);
 
@@ -271,6 +272,7 @@ public abstract class WSHandler {
         if ((doAction & WSConstants.ENCR) == WSConstants.ENCR) {
             decodeDecryptionParameter(reqData);
         }
+        
         if ((doAction & WSConstants.NO_SERIALIZE) == WSConstants.NO_SERIALIZE) {
             reqData.setNoSerialization(true);
         }
@@ -1235,6 +1237,7 @@ public abstract class WSHandler {
      * @param timeToLive
      *            the limit on the receivers' side, that the timestamp is validated against
      * @return true if the timestamp is before (now-timeToLive), false otherwise
+     * @deprecated TTL validation is now done by default in the TimestampProcessor
      * @throws WSSecurityException
      */
     protected boolean verifyTimestamp(Timestamp timestamp, int timeToLive) throws WSSecurityException {

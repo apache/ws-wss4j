@@ -38,6 +38,7 @@ public class TimestampProcessor implements Processor {
 
     private WSSConfig wssConfig = null;
     private String tsId;
+    private int timeToLive = 300;
     
     public void handleToken(
         Element elem, 
@@ -52,6 +53,7 @@ public class TimestampProcessor implements Processor {
             log.debug("Found Timestamp list element");
         }
         wssConfig = wsc;
+        timeToLive = wssConfig.getTimeStampTTL();
         //
         // Decode Timestamp, add the found time (created/expiry) to result
         //
@@ -70,7 +72,8 @@ public class TimestampProcessor implements Processor {
         }
 
         // Validate whether the security semantics have expired
-        if (wssConfig.isTimeStampStrict() && timestamp.isExpired()) {
+        if ((wssConfig.isTimeStampStrict() && timestamp.isExpired()) 
+            || !timestamp.verifyCreated(timeToLive)) {
             throw new WSSecurityException(
                 WSSecurityException.MESSAGE_EXPIRED,
                 "invalidTimestamp",

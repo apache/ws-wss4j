@@ -25,7 +25,6 @@ import org.apache.ws.security.SOAPConstants;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.message.token.Timestamp;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.xml.security.utils.XMLUtils;
 import org.w3c.dom.Document;
@@ -135,6 +134,7 @@ public class WSS4JHandler extends WSHandler implements Handler {
     public boolean processMessage(MessageContext mc, boolean isRequestMessage) throws WSSecurityException {
 
         RequestData reqData = new RequestData();
+        reqData.setWssConfig(secEngine.getWssConfig());
         reqData.setMsgContext(mc);
 
         doDebug = log.isDebugEnabled();
@@ -386,7 +386,6 @@ public class WSS4JHandler extends WSHandler implements Handler {
         * may be used for encryption too.
         */
         doReceiverAction(doAction, reqData);
-
         Vector wsResult = null;
         try {
             wsResult =
@@ -493,28 +492,6 @@ public class WSS4JHandler extends WSHandler implements Handler {
 
             if (returnCert != null && !verifyTrust(returnCert, reqData)) {
                 throw new JAXRPCException("WSS4JHandler: The certificate used for the signature is not trusted");
-            }
-        }
-
-        /*
-        * Perform further checks on the timestamp that was transmitted in the header.
-        * In the following implementation the timestamp is valid if it was
-        * created after (now-ttl), where ttl is set on server side, not by the client.
-        *
-        * Note: the method verifyTimestamp(Timestamp) allows custom
-        * implementations with other validation algorithms for subclasses.
-        */
-
-        // Extract the timestamp action result from the action vector
-        actionResult = WSSecurityUtil.fetchActionResult(wsResult, WSConstants.TS);
-
-        if (actionResult != null) {
-            Timestamp timestamp = 
-                (Timestamp)actionResult.get(WSSecurityEngineResult.TAG_TIMESTAMP);
-
-            if (timestamp != null && reqData.getWssConfig().isTimeStampStrict()
-                && !verifyTimestamp(timestamp, decodeTimeToLive(reqData))) {
-                throw new JAXRPCException("WSS4JHandler: The timestamp could not be validated");
             }
         }
 
