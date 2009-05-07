@@ -791,7 +791,7 @@ public class WSSecSignature extends WSSecBase {
     protected Set getInclusivePrefixes(Element target, boolean excludeVisible) {
         Set result = new HashSet();
         Node parent = target;
-        while (!(parent.getParentNode() instanceof Document)) {
+        while (!(Node.DOCUMENT_NODE == parent.getParentNode().getNodeType())) {
             parent = parent.getParentNode();
             NamedNodeMap attributes = parent.getAttributes();
             for (int i = 0; i < attributes.getLength(); i++) {

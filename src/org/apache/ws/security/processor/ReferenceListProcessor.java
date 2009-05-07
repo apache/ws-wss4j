@@ -222,7 +222,7 @@ public class ReferenceListProcessor implements Processor {
                 pos.hasNext();
             ) {
                 Node node = (Node) pos.next();
-                if (node instanceof Element) {
+                if (node != null && Node.ELEMENT_NODE == node.getNodeType()) {
                     if(!Constants.SignatureSpecNS.equals(node.getNamespaceURI()) 
                         && node.getAttributes().getNamedItemNS(WSConstants.WSU_NS, "Id") == null) {
                         String wsuPrefix = 

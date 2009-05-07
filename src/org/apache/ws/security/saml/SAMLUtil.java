@@ -112,7 +112,7 @@ public class SAMLUtil {
                     
                     for (int i = 0; i < len; i++) {
                         Node child = children.item(i);
-                        if (child.getNodeType() != Node.ELEMENT_NODE) {
+                        if (child == null || child.getNodeType() != Node.ELEMENT_NODE) {
                             continue;
                         }
                         QName el = new QName(child.getNamespaceURI(), child.getLocalName());

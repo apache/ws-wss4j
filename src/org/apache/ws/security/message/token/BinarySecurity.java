@@ -50,8 +50,8 @@ public class BinarySecurity {
      * @throws WSSecurityException 
      */
     public BinarySecurity(Element elem) throws WSSecurityException {
-        this.element = elem;
-        QName el = new QName(this.element.getNamespaceURI(), this.element.getLocalName());
+        element = elem;
+        QName el = new QName(element.getNamespaceURI(), element.getLocalName());
         if (!(el.equals(TOKEN_BST) || el.equals(TOKEN_KI))) {
             throw new WSSecurityException(
                 WSSecurityException.INVALID_SECURITY_TOKEN, 
@@ -92,9 +92,9 @@ public class BinarySecurity {
      * @param doc 
      */
     public BinarySecurity(Document doc) {
-        this.element = doc.createElementNS(WSConstants.WSSE_NS, "wsse:BinarySecurityToken");
+        element = doc.createElementNS(WSConstants.WSSE_NS, "wsse:BinarySecurityToken");
         setEncodingType(BASE64_ENCODING);
-        this.element.appendChild(doc.createTextNode(""));
+        element.appendChild(doc.createTextNode(""));
     }
     
     /**
@@ -119,7 +119,7 @@ public class BinarySecurity {
      * @return TODO
      */
     public String getValueType() {
-        return this.element.getAttribute("ValueType");
+        return element.getAttribute("ValueType");
     }
 
     /**
@@ -128,7 +128,7 @@ public class BinarySecurity {
      * @param type 
      */
     public void setValueType(String type) {
-        this.element.setAttributeNS(null, "ValueType", type);
+        element.setAttributeNS(null, "ValueType", type);
     }
 
     /**
@@ -137,7 +137,7 @@ public class BinarySecurity {
      * @return TODO
      */
     public String getEncodingType() {
-        return this.element.getAttribute("EncodingType");
+        return element.getAttribute("EncodingType");
     }
 
     /**
@@ -146,7 +146,7 @@ public class BinarySecurity {
      * @param encoding 
      */
     public void setEncodingType(String encoding) {
-        this.element.setAttributeNS(null, "EncodingType", encoding);
+        element.setAttributeNS(null, "EncodingType", encoding);
     }
 
     /**
@@ -185,8 +185,8 @@ public class BinarySecurity {
      * @return TODO
      */
     protected Text getFirstNode() {
-        Node node = this.element.getFirstChild();
-        return ((node != null) && node instanceof Text) ? (Text) node : null;
+        Node node = element.getFirstChild();
+        return (node != null && Node.TEXT_NODE == node.getNodeType()) ? (Text) node : null;
     }
 
     /**
@@ -195,7 +195,7 @@ public class BinarySecurity {
      * @return TODO
      */
     public Element getElement() {
-        return this.element;
+        return element;
     }
 
     /**
@@ -204,7 +204,7 @@ public class BinarySecurity {
      * @return TODO
      */
     public String getID() {
-        return this.element.getAttributeNS(WSConstants.WSU_NS, "Id");
+        return element.getAttributeNS(WSConstants.WSU_NS, "Id");
     }
 
     /**
@@ -213,7 +213,7 @@ public class BinarySecurity {
      * @param id 
      */
     public void setID(String id) {
-        this.element.setAttributeNS(WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":Id", id);
+        element.setAttributeNS(WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":Id", id);
     }
 
     /**
@@ -222,6 +222,6 @@ public class BinarySecurity {
      * @return TODO
      */
     public String toString() {
-        return DOM2Writer.nodeToString((Node) this.element);
+        return DOM2Writer.nodeToString((Node)element);
     }
 }

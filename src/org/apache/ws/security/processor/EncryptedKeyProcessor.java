@@ -194,7 +194,7 @@ public class EncryptedKeyProcessor implements Processor {
                 node != null; 
                 node = node.getNextSibling()
             ) {
-                if (node.getNodeType() != Node.ELEMENT_NODE) {
+                if (Node.ELEMENT_NODE != node.getNodeType()) {
                     continue;
                 }
                 if (!node.getNamespaceURI().equals(WSConstants.ENC_NS)) {
@@ -242,7 +242,7 @@ public class EncryptedKeyProcessor implements Processor {
         int iMax = children.getLength();
         for (int i = 0; i < iMax; i++) {
             Node curr = children.item(i);
-            if (curr.getNodeType() == Node.TEXT_NODE) {
+            if (curr != null && Node.TEXT_NODE == curr.getNodeType()) {
                 sb.append(((Text) curr).getData());
             }
         }
@@ -541,7 +541,7 @@ public class EncryptedKeyProcessor implements Processor {
             pos.hasNext();
         ) {
             Node node = (Node) pos.next();
-            if (node instanceof Element) {
+            if (node != null && Node.ELEMENT_NODE == node.getNodeType()) {
                 if (!Constants.SignatureSpecNS.equals(node.getNamespaceURI()) &&
                         node.getAttributes().getNamedItemNS(WSConstants.WSU_NS, "Id") == null) {
                     String wsuPrefix = 

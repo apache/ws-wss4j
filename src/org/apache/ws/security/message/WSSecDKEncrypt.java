@@ -213,7 +213,7 @@ public class WSSecDKEncrypt extends WSSecDerivedKeyBase {
      */
     public void addExternalRefElement(Element referenceList, WSSecHeader secHeader) {
         Node node = dkt.getElement().getNextSibling();
-        if (node instanceof Element) {
+        if (node != null && Node.ELEMENT_NODE == node.getNodeType()) {
             secHeader.getSecurityHeader().insertBefore(referenceList, node);
         } else {
             // If (at this moment) DerivedKeyToken is the LAST element of 

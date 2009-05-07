@@ -312,7 +312,7 @@ public class WSSecurityEngine {
         final WSSConfig cfg = getWssConfig();
         for (int i = 0; i < len; i++) {
             elem = list.item(i);
-            if (elem.getNodeType() != Node.ELEMENT_NODE) {
+            if (elem == null || elem.getNodeType() != Node.ELEMENT_NODE) {
                 continue;
             }
             QName el = new QName(elem.getNamespaceURI(), elem.getLocalName());

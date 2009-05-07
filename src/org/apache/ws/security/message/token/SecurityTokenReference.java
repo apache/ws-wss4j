@@ -423,11 +423,11 @@ public class SecurityTokenReference {
      * @return the first <code>Element</code> child node
      */
     public Element getFirstElement() {
-        for (Node currentChild = this.element.getFirstChild();
+        for (Node currentChild = element.getFirstChild();
              currentChild != null;
              currentChild = currentChild.getNextSibling()
         ) {
-            if (currentChild instanceof Element) {
+            if (Node.ELEMENT_NODE == currentChild.getNodeType()) {
                 return (Element) currentChild;
             }
         }
@@ -460,7 +460,7 @@ public class SecurityTokenReference {
             if (node == null) {
                 return null;
             }
-            if (node.getNodeType() == Node.TEXT_NODE) {
+            if (Node.TEXT_NODE == node.getNodeType()) {
                 byte[] thumb = Base64.decode(((Text) node).getData());
                 alias = crypto.getAliasForX509CertThumb(thumb);
             }
@@ -699,7 +699,7 @@ public class SecurityTokenReference {
         int result = 0;
         for (int i = 0; i < childNodes.getLength(); i++) {
             Node n = childNodes.item(i);
-            if (n.getNodeType() == Node.ELEMENT_NODE) {
+            if (n != null && n.getNodeType() == Node.ELEMENT_NODE) {
                 String ns = n.getNamespaceURI();
                 String name = n.getLocalName();
                 if ((((namespace != null) && namespace.equals(ns))

@@ -74,7 +74,7 @@ public class Timestamp {
              currentChild != null;
              currentChild = currentChild.getNextSibling()
          ) {
-            if (currentChild instanceof Element) {
+            if (Node.ELEMENT_NODE == currentChild.getNodeType()) {
                 Element currentChildElement = (Element) currentChild;
                 if (WSConstants.CREATED_LN.equals(currentChild.getLocalName()) &&
                         WSConstants.WSU_NS.equals(currentChild.getNamespaceURI())) {

@@ -179,7 +179,7 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
         Node parent = target;
         NamedNodeMap attributes;
         Node attribute;
-        while (!(parent.getParentNode() instanceof Document)) {
+        while (!(Node.DOCUMENT_NODE == parent.getParentNode().getNodeType())) {
             parent = parent.getParentNode();
             attributes = parent.getAttributes();
             for (int i = 0; i < attributes.getLength(); i++) {

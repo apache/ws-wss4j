@@ -87,10 +87,10 @@ public class DerivedKeyToken {
     public DerivedKeyToken(int version, Document doc) throws ConversationException {
         log.debug("DerivedKeyToken: created");
         
-        this.ns = ConversationConstants.getWSCNs(version);
-        this.element = 
+        ns = ConversationConstants.getWSCNs(version);
+        element = 
             doc.createElementNS(ns, "wsc:" + ConversationConstants.DERIVED_KEY_TOKEN_LN);
-        WSSecurityUtil.setNamespace(this.element, ns, ConversationConstants.WSC_PREFIX);
+        WSSecurityUtil.setNamespace(element, ns, ConversationConstants.WSC_PREFIX);
     }
 
     /**
@@ -101,9 +101,9 @@ public class DerivedKeyToken {
      */
     public DerivedKeyToken(Element elem) throws WSSecurityException {
         log.debug("DerivedKeyToken: created : element constructor");
-        this.element = elem;
+        element = elem;
         QName el = 
-            new QName(this.element.getNamespaceURI(), this.element.getLocalName());
+            new QName(element.getNamespaceURI(), element.getLocalName());
         
         if (!(el.equals(ConversationConstants.DERIVED_KEY_TOKEN_QNAME_05_02) ||
             el.equals(ConversationConstants.DERIVED_KEY_TOKEN_QNAME_05_12))) {
@@ -113,38 +113,38 @@ public class DerivedKeyToken {
                 new Object[]{el}
             );
         }
-        this.elementSecurityTokenReference = 
+        elementSecurityTokenReference = 
             WSSecurityUtil.getDirectChildElement(
-                this.element,
+                element,
                 ConversationConstants.SECURITY_TOKEN_REFERENCE_LN,
                 WSConstants.WSSE_NS
             );
         
-        this.ns = el.getNamespaceURI();
+        ns = el.getNamespaceURI();
         
-        this.elementProperties = 
+        elementProperties = 
             WSSecurityUtil.getDirectChildElement(
-                this.element, ConversationConstants.PROPERTIES_LN, this.ns
+                element, ConversationConstants.PROPERTIES_LN, ns
             );
-        this.elementGeneration = 
+        elementGeneration = 
             WSSecurityUtil.getDirectChildElement(
-                this.element, ConversationConstants.GENERATION_LN, this.ns
+                element, ConversationConstants.GENERATION_LN, ns
             );
-        this.elementOffset = 
+        elementOffset = 
             WSSecurityUtil.getDirectChildElement(
-                this.element, ConversationConstants.OFFSET_LN, this.ns
+                element, ConversationConstants.OFFSET_LN, ns
             );
-        this.elementLength = 
+        elementLength = 
             WSSecurityUtil.getDirectChildElement(
-                this.element, ConversationConstants.LENGTH_LN, this.ns
+                element, ConversationConstants.LENGTH_LN, ns
             );
-        this.elementLabel = 
+        elementLabel = 
             WSSecurityUtil.getDirectChildElement(
-                this.element, ConversationConstants.LABEL_LN, this.ns
+                element, ConversationConstants.LABEL_LN, ns
             );
-        this.elementNonce = 
+        elementNonce = 
             WSSecurityUtil.getDirectChildElement(
-                this.element, ConversationConstants.NONCE_LN, this.ns
+                element, ConversationConstants.NONCE_LN, ns
             );
     }
     
@@ -163,13 +163,13 @@ public class DerivedKeyToken {
      * @param ref Security token reference
      */
     public void setSecurityTokenReference(SecurityTokenReference ref) {
-        this.elementSecurityTokenReference = ref.getElement();
-        WSSecurityUtil.prependChildElement(this.element, ref.getElement());
+        elementSecurityTokenReference = ref.getElement();
+        WSSecurityUtil.prependChildElement(element, ref.getElement());
     }
     
     public void setSecurityTokenReference(Element elem) {
-        this.elementSecurityTokenReference = elem;
-        WSSecurityUtil.prependChildElement(this.element, elem);
+        elementSecurityTokenReference = elem;
+        WSSecurityUtil.prependChildElement(element, elem);
     }
     
     /**
@@ -179,8 +179,8 @@ public class DerivedKeyToken {
      * @throws WSSecurityException
      */
     public SecurityTokenReference getSecurityTokenReference() throws WSSecurityException {
-        if (this.elementSecurityTokenReference != null) {
-            return new SecurityTokenReference(this.elementSecurityTokenReference);
+        if (elementSecurityTokenReference != null) {
+            return new SecurityTokenReference(elementSecurityTokenReference);
         }
         return null;
     }
@@ -193,18 +193,18 @@ public class DerivedKeyToken {
      * @param propValue Value of the property
      */
     private void addProperty(String propName, String propValue) {
-        if (this.elementProperties == null) { //Create the properties element if it is not there
-            this.elementProperties = 
-                this.element.getOwnerDocument().createElementNS(
-                    this.ns, "wsc:" + ConversationConstants.PROPERTIES_LN
+        if (elementProperties == null) { //Create the properties element if it is not there
+            elementProperties = 
+                element.getOwnerDocument().createElementNS(
+                    ns, "wsc:" + ConversationConstants.PROPERTIES_LN
                 );
-            this.element.appendChild(this.elementProperties);
+            element.appendChild(elementProperties);
         }
         Element tempElement = 
-            this.element.getOwnerDocument().createElementNS(this.ns, "wsc:" + propName);
-        tempElement.appendChild(this.element.getOwnerDocument().createTextNode(propValue));
+            element.getOwnerDocument().createElementNS(ns, "wsc:" + propName);
+        tempElement.appendChild(element.getOwnerDocument().createTextNode(propValue));
 
-        this.elementProperties.appendChild(tempElement);
+        elementProperties.appendChild(tempElement);
     }
 
     /**
@@ -223,7 +223,7 @@ public class DerivedKeyToken {
         table.put("Name", name);
         table.put("Label", label);
         table.put("Nonce", nonce);
-        this.setProperties(table);
+        setProperties(table);
     }
 
     /**
@@ -239,24 +239,24 @@ public class DerivedKeyToken {
             //Check whether this property is already there
             //If so change the value
             Node node = 
-                WSSecurityUtil.findElement(this.elementProperties, propertyName, this.ns);
-            if (node instanceof Element) { //If the node is not null
+                WSSecurityUtil.findElement(elementProperties, propertyName, ns);
+            if (node != null && Node.ELEMENT_NODE == node.getNodeType()) { //If the node is not null
                 Text node1 = getFirstNode((Element) node);
                 node1.setData((String) properties.get(propertyName));
             } else {
-                this.addProperty(propertyName, (String) properties.get(propertyName));
+                addProperty(propertyName, (String) properties.get(propertyName));
             }
         }
     }
 
     public Hashtable getProperties() {
-        if (this.elementProperties != null) {
+        if (elementProperties != null) {
             Hashtable table = new Hashtable();
-            NodeList nodes = this.elementProperties.getChildNodes();
+            NodeList nodes = elementProperties.getChildNodes();
             for (int i = 0; i < nodes.getLength(); i++) {
                 Node tempNode = nodes.item(i);
-                if (tempNode instanceof Element) {
-                    Text text = this.getFirstNode((Element) tempNode);
+                if (tempNode != null && Node.ELEMENT_NODE == tempNode.getNodeType()) {
+                    Text text = getFirstNode((Element) tempNode);
                     table.put(tempNode.getNodeName(), text.getData());
                 }
             }
@@ -270,19 +270,19 @@ public class DerivedKeyToken {
      * @param length The length of the derived key as a long
      */
     public void setLength(int length) {
-        this.elementLength = 
-            this.element.getOwnerDocument().createElementNS(
-                this.ns, "wsc:" + ConversationConstants.LENGTH_LN
+        elementLength = 
+            element.getOwnerDocument().createElementNS(
+                ns, "wsc:" + ConversationConstants.LENGTH_LN
             );
-        this.elementLength.appendChild(
-            this.element.getOwnerDocument().createTextNode(Long.toString(length))
+        elementLength.appendChild(
+            element.getOwnerDocument().createTextNode(Long.toString(length))
         );
-        this.element.appendChild(this.elementLength);
+        element.appendChild(elementLength);
     }
 
     public int getLength() {
-        if (this.elementLength != null) {
-            return Integer.parseInt(getFirstNode(this.elementLength).getData());
+        if (elementLength != null) {
+            return Integer.parseInt(getFirstNode(elementLength).getData());
         }
         return -1;
     }
@@ -294,15 +294,15 @@ public class DerivedKeyToken {
      */
     public void setOffset(int offset) throws ConversationException {
         //This element MUST NOT be used if the <Generation> element is specified
-        if (this.elementGeneration == null) {
-            this.elementOffset = 
-                this.element.getOwnerDocument().createElementNS(
-                    this.ns, "wsc:" + ConversationConstants.OFFSET_LN
+        if (elementGeneration == null) {
+            elementOffset = 
+                element.getOwnerDocument().createElementNS(
+                    ns, "wsc:" + ConversationConstants.OFFSET_LN
                 );
-            this.elementOffset.appendChild(
-                this.element.getOwnerDocument().createTextNode(Integer.toString(offset))
+            elementOffset.appendChild(
+                element.getOwnerDocument().createTextNode(Integer.toString(offset))
             );
-            this.element.appendChild(this.elementOffset);
+            element.appendChild(elementOffset);
         } else {
             throw new ConversationException(
                 "Offset cannot be set along with generation - generation is already set"
@@ -312,8 +312,8 @@ public class DerivedKeyToken {
     }
 
     public int getOffset() {
-        if (this.elementOffset != null) {
-            return Integer.parseInt(getFirstNode(this.elementOffset).getData());
+        if (elementOffset != null) {
+            return Integer.parseInt(getFirstNode(elementOffset).getData());
         }
         return -1;
     }
@@ -323,18 +323,17 @@ public class DerivedKeyToken {
      *
      * @param generation generation value as an integer
      */
-    public void setGeneration(int generation) throws
-            ConversationException {
+    public void setGeneration(int generation) throws ConversationException {
         //This element MUST NOT be used if the <Offset> element is specified
-        if (this.elementOffset == null) {
-            this.elementGeneration = 
-                this.element.getOwnerDocument().createElementNS(
-                    this.ns, "wsc:" + ConversationConstants.GENERATION_LN
+        if (elementOffset == null) {
+            elementGeneration = 
+                element.getOwnerDocument().createElementNS(
+                    ns, "wsc:" + ConversationConstants.GENERATION_LN
                 );
-            this.elementGeneration.appendChild(
-                this.element.getOwnerDocument().createTextNode(Integer.toString(generation))
+            elementGeneration.appendChild(
+                element.getOwnerDocument().createTextNode(Integer.toString(generation))
             );
-            this.element.appendChild(this.elementGeneration);
+            element.appendChild(elementGeneration);
         } else {
             throw new ConversationException(
                 "Generation cannot be set along with offset - Offset is already set"
@@ -343,8 +342,8 @@ public class DerivedKeyToken {
     }
 
     public int getGeneration() {
-        if (this.elementGeneration != null) {
-            return Integer.parseInt(getFirstNode(this.elementGeneration).getData());
+        if (elementGeneration != null) {
+            return Integer.parseInt(getFirstNode(elementGeneration).getData());
         }
         return -1;
     }
@@ -355,12 +354,12 @@ public class DerivedKeyToken {
      * @param label Label value as a string
      */
     public void setLabel(String label) {
-        this.elementLabel = 
-            this.element.getOwnerDocument().createElementNS(
-                this.ns, "wsc:" + ConversationConstants.LABEL_LN
+        elementLabel = 
+            element.getOwnerDocument().createElementNS(
+                ns, "wsc:" + ConversationConstants.LABEL_LN
             );
-        this.elementLabel.appendChild(this.element.getOwnerDocument().createTextNode(label));
-        this.element.appendChild(this.elementLabel);
+        elementLabel.appendChild(element.getOwnerDocument().createTextNode(label));
+        element.appendChild(elementLabel);
     }
 
     /**
@@ -369,12 +368,12 @@ public class DerivedKeyToken {
      * @param nonce Nonce value as a string
      */
     public void setNonce(String nonce) {
-        this.elementNonce = 
-            this.element.getOwnerDocument().createElementNS(
-                this.ns, "wsc:" + ConversationConstants.NONCE_LN
+        elementNonce = 
+            element.getOwnerDocument().createElementNS(
+                ns, "wsc:" + ConversationConstants.NONCE_LN
             );
-        this.elementNonce.appendChild(this.element.getOwnerDocument().createTextNode(nonce));
-        this.element.appendChild(this.elementNonce);
+        elementNonce.appendChild(element.getOwnerDocument().createTextNode(nonce));
+        element.appendChild(elementNonce);
     }
 
     /**
@@ -383,8 +382,8 @@ public class DerivedKeyToken {
      * @return Label of the derived key token
      */
     public String getLabel() {
-        if (this.elementLabel != null) {
-            return getFirstNode(this.elementLabel).getData();
+        if (elementLabel != null) {
+            return getFirstNode(elementLabel).getData();
         }
         return null;
     }
@@ -395,8 +394,8 @@ public class DerivedKeyToken {
      * @return Nonce of the derived key token
      */
     public String getNonce() {
-        if (this.elementNonce != null) {
-            return getFirstNode(this.elementNonce).getData();
+        if (elementNonce != null) {
+            return getFirstNode(elementNonce).getData();
         }
         return null;
     }
@@ -410,7 +409,7 @@ public class DerivedKeyToken {
      */
     private Text getFirstNode(Element e) {
         Node node = e.getFirstChild();
-        return (node instanceof Text) ? (Text) node : null;
+        return (node != null && Node.TEXT_NODE == node.getNodeType()) ? (Text) node : null;
     }
 
     /**
@@ -419,7 +418,7 @@ public class DerivedKeyToken {
      * @return the DerivedKeyToken element
      */
     public Element getElement() {
-        return this.element;
+        return element;
     }
 
     /**
@@ -428,7 +427,7 @@ public class DerivedKeyToken {
      * @return a XML string representation
      */
     public String toString() {
-        return DOM2Writer.nodeToString((Node) this.element);
+        return DOM2Writer.nodeToString((Node)element);
     }
 
     /**
@@ -438,7 +437,7 @@ public class DerivedKeyToken {
      *         DerivedKeyToken
      */
     public String getID() {
-        return this.element.getAttributeNS(WSConstants.WSU_NS, "Id");
+        return element.getAttributeNS(WSConstants.WSU_NS, "Id");
     }
 
     /**
@@ -448,7 +447,7 @@ public class DerivedKeyToken {
      *           DerivedKeyToken
      */
     public void setID(String id) {
-        this.element.setAttributeNS(WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":Id", id);
+        element.setAttributeNS(WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":Id", id);
     }
 
     /**
@@ -458,7 +457,7 @@ public class DerivedKeyToken {
      *         DerivedKeyToken
      */
     public String getAlgorithm() {
-        String algo = this.element.getAttributeNS(this.ns, "Algorithm");
+        String algo = element.getAttributeNS(ns, "Algorithm");
         if (algo == null || algo.equals("")) {
             return ConversationConstants.DerivationAlgorithm.P_SHA_1;
         } else {
@@ -473,8 +472,8 @@ public class DerivedKeyToken {
      *             DerivedKeyToken
      */
     public void setAlgorithm(String algo) {
-        this.element.setAttributeNS(
-            this.ns, ConversationConstants.WSC_PREFIX + ":Algorithm", algo
+        element.setAttributeNS(
+            ns, ConversationConstants.WSC_PREFIX + ":Algorithm", algo
         );
     }
 

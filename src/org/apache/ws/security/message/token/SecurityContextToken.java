@@ -77,21 +77,21 @@ public class SecurityContextToken {
 
         String ns = ConversationConstants.getWSCNs(version);
         
-        this.element = 
+        element = 
             doc.createElementNS(ns, "wsc:" + ConversationConstants.SECURITY_CONTEXT_TOKEN_LN);
 
-        WSSecurityUtil.setNamespace(this.element, ns, ConversationConstants.WSC_PREFIX);
+        WSSecurityUtil.setNamespace(element, ns, ConversationConstants.WSC_PREFIX);
 
-        this.elementIdentifier = 
+        elementIdentifier = 
             doc.createElementNS(ns, "wsc:" + ConversationConstants.IDENTIFIER_LN);
 
-        this.element.appendChild(this.elementIdentifier);
+        element.appendChild(elementIdentifier);
 
         String uuid = UUIDGenerator.getUUID();
         
-        this.elementIdentifier.appendChild(doc.createTextNode(uuid));
+        elementIdentifier.appendChild(doc.createTextNode(uuid));
         
-        this.setID(WSSConfig.getDefaultWSConfig().getIdAllocator().createSecureId("sctId-", this.element));
+        setID(WSSConfig.getDefaultWSConfig().getIdAllocator().createSecureId("sctId-", element));
     }
 
     /**
@@ -103,17 +103,17 @@ public class SecurityContextToken {
 
         String ns = ConversationConstants.getWSCNs(version);
         
-        this.element = 
+        element = 
             doc.createElementNS(ns, "wsc:" + ConversationConstants.SECURITY_CONTEXT_TOKEN_LN);
 
-        WSSecurityUtil.setNamespace(this.element, ns, ConversationConstants.WSC_PREFIX);
+        WSSecurityUtil.setNamespace(element, ns, ConversationConstants.WSC_PREFIX);
 
-        this.elementIdentifier = 
+        elementIdentifier = 
             doc.createElementNS(ns, "wsc:" + ConversationConstants.IDENTIFIER_LN);
 
-        this.element.appendChild(this.elementIdentifier);
+        element.appendChild(elementIdentifier);
 
-        this.elementIdentifier.appendChild(doc.createTextNode(uuid));
+        elementIdentifier.appendChild(doc.createTextNode(uuid));
     }
 
     
@@ -124,8 +124,8 @@ public class SecurityContextToken {
      * @throws WSSecurityException If the element passed in in not a security context token
      */
     public SecurityContextToken(Element elem) throws WSSecurityException {
-        this.element = elem;
-        QName el = new QName(this.element.getNamespaceURI(), this.element.getLocalName());
+        element = elem;
+        QName el = new QName(element.getNamespaceURI(), element.getLocalName());
 
         // If the element is not a security context token, throw an exception
         if (!(el.equals(ConversationConstants.SECURITY_CTX_TOKEN_QNAME_05_02) ||
@@ -138,7 +138,7 @@ public class SecurityContextToken {
             );
         }
 
-        this.elementIdentifier = 
+        elementIdentifier = 
             WSSecurityUtil.getDirectChildElement(
                 element, 
                 ConversationConstants.IDENTIFIER_LN,
@@ -168,14 +168,14 @@ public class SecurityContextToken {
      * @return the data from the identifier element.
      */
     public String getIdentifier() {
-        if (this.elementIdentifier != null) {
-            return getFirstNode(this.elementIdentifier).getData();
+        if (elementIdentifier != null) {
+            return getFirstNode(elementIdentifier).getData();
         }
         return null;
     }
 
     public void setElement(Element elem) {
-        this.element.appendChild(elem);
+        element.appendChild(elem);
     }
 
     /**
@@ -187,7 +187,7 @@ public class SecurityContextToken {
      */
     private Text getFirstNode(Element e) {
         Node node = e.getFirstChild();
-        return (node instanceof Text) ? (Text) node : null;
+        return (node != null && Node.TEXT_NODE == node.getNodeType()) ? (Text) node : null;
     }
 
     /**
@@ -196,7 +196,7 @@ public class SecurityContextToken {
      * @return the <code>wsse:UsernameToken</code> element
      */
     public Element getElement() {
-        return this.element;
+        return element;
     }
 
     /**
@@ -205,7 +205,7 @@ public class SecurityContextToken {
      * @return a XML string representation
      */
     public String toString() {
-        return DOM2Writer.nodeToString((Node) this.element);
+        return DOM2Writer.nodeToString((Node)element);
     }
 
     /**
@@ -215,7 +215,7 @@ public class SecurityContextToken {
      *         SecurityContextToken
      */
     public String getID() {
-        return this.element.getAttributeNS(WSConstants.WSU_NS, "Id");
+        return element.getAttributeNS(WSConstants.WSU_NS, "Id");
     }
 
     /**
@@ -225,7 +225,7 @@ public class SecurityContextToken {
      *           SecurityContextToken
      */
     public void setID(String id) {
-        this.element.setAttributeNS(WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":Id", id);
+        element.setAttributeNS(WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":Id", id);
     }
 
 }
