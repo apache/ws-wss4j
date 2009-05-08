@@ -177,7 +177,7 @@ public abstract class WSSecDerivedKeyBase extends WSSecBase {
         // Create the derived keys
         // At this point figure out the key length according to the symencAlgo
         int offset = 0;
-        int length = this.getDerivedKeyLength();
+        int length = getDerivedKeyLength();
         byte[] label;
         try {
             label = (clientLabel + serviceLabel).getBytes("UTF-8");
@@ -193,10 +193,10 @@ public abstract class WSSecDerivedKeyBase extends WSSecBase {
         DerivationAlgorithm algo = 
             AlgoFactory.getInstance(ConversationConstants.DerivationAlgorithm.P_SHA_1);
         
-        this.derivedKeyBytes = algo.createKey(this.ephemeralKey, seed, offset, length);
+        derivedKeyBytes = algo.createKey(ephemeralKey, seed, offset, length);
         
         // Add the DKTs
-        dkt = new DerivedKeyToken(this.wscVersion, document);
+        dkt = new DerivedKeyToken(wscVersion, document);
         dktId = wssConfig.getIdAllocator().createId("derivedKeyId-", dkt);
         
         dkt.setOffset(offset);
@@ -204,18 +204,18 @@ public abstract class WSSecDerivedKeyBase extends WSSecBase {
         dkt.setNonce(Base64.encode(nonce));
         dkt.setID(dktId);
         
-        if (this.strElem == null) {
+        if (strElem == null) {
             //Create the SecurityTokenRef to the Encrypted Key
             SecurityTokenReference strEncKey = new SecurityTokenReference(document);
             Reference ref = new Reference(document);
-            ref.setURI("#" + this.tokenIdentifier);
-            if (this.customValueType != null && this.customValueType.trim().length() > 0) {
-                ref.setValueType(this.customValueType);
+            ref.setURI("#" + tokenIdentifier);
+            if (customValueType != null && customValueType.trim().length() > 0) {
+                ref.setValueType(customValueType);
             }
             strEncKey.setReference(ref);
             dkt.setSecurityTokenReference(strEncKey); 
         } else {
-            dkt.setSecurityTokenReference(this.strElem);
+            dkt.setSecurityTokenReference(strElem);
         }
     }
 
@@ -249,7 +249,7 @@ public abstract class WSSecDerivedKeyBase extends WSSecBase {
     }
     
     public Element getdktElement() {
-        return this.dkt.getElement();
+        return dkt.getElement();
     }
 
     public void setDerivedKeyLength(int keyLength) {

@@ -63,17 +63,17 @@ public class WSSecSecurityContextToken {
         throws WSSecurityException, ConversationException  {
 
         if (sct == null) {
-            if (this.identifier != null) {
-                this.sct = new SecurityContextToken(this.wscVersion, doc, this.identifier);
+            if (identifier != null) {
+                sct = new SecurityContextToken(wscVersion, doc, identifier);
             } else {
-                this.sct = new SecurityContextToken(this.wscVersion, doc);
-                this.identifier = this.sct.getIdentifier();
+                sct = new SecurityContextToken(wscVersion, doc);
+                identifier = sct.getIdentifier();
             }
         }
 
         // The wsu:Id of the wsc:SecurityContextToken
-        if (this.sctId != null) {
-            this.sct.setID(this.sctId);
+        if (sctId != null) {
+            sct.setID(sctId);
         }
     }
 
@@ -107,7 +107,7 @@ public class WSSecSecurityContextToken {
      * @param ephemeralKey The ephemeralKey to set.
      */
     protected void setSecret(byte[] ephemeralKey) {
-        this.secret = ephemeralKey;
+        secret = ephemeralKey;
     }
 
     /**
@@ -128,10 +128,10 @@ public class WSSecSecurityContextToken {
      * @return Returns the sctId.
      */
     public String getSctId() {
-        if (this.sct != null) {
-            return this.sct.getID();
+        if (sct != null) {
+            return sct.getID();
         }
-        return this.sctId;
+        return sctId;
     }
 
     /**

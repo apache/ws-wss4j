@@ -184,7 +184,6 @@ public abstract class WSHandler {
          * action(s).
          */
         for (int i = 0; i < actions.size(); i++) {
-
             int actionToDo = ((Integer) actions.get(i)).intValue();
             if (doDebug) {
                 log.debug("Performing Action: " + actionToDo);

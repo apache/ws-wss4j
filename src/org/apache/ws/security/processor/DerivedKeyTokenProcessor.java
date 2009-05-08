@@ -73,19 +73,19 @@ public class DerivedKeyTokenProcessor implements Processor {
         
         // Deserialize the DKT
         DerivedKeyToken dkt = new DerivedKeyToken(elem);
-        this.extractSecret(wsDocInfo, dkt, cb, crypto);
+        extractSecret(wsDocInfo, dkt, cb, crypto);
         
         String tempNonce = dkt.getNonce();
         if (tempNonce == null) {
             throw new WSSecurityException("Missing wsc:Nonce value");
         }
-        this.nonce = Base64.decode(tempNonce);
-        this.length = dkt.getLength();
-        this.label = dkt.getLabel();
-        this.algorithm = dkt.getAlgorithm();
-        this.id = dkt.getID();
+        nonce = Base64.decode(tempNonce);
+        length = dkt.getLength();
+        label = dkt.getLabel();
+        algorithm = dkt.getAlgorithm();
+        id = dkt.getID();
         if (length > 0) {
-            this.deriveKey();
+            deriveKey();
             returnResults.add(
                 0, 
                 new WSSecurityEngineResult(
@@ -104,14 +104,14 @@ public class DerivedKeyTokenProcessor implements Processor {
                     (ConversationConstants.DEFAULT_LABEL 
                         + ConversationConstants.DEFAULT_LABEL).getBytes("UTF-8");
             } else {
-                labelBytes = this.label.getBytes("UTF-8");
+                labelBytes = label.getBytes("UTF-8");
             }
             
             byte[] seed = new byte[labelBytes.length + nonce.length];
             System.arraycopy(labelBytes, 0, seed, 0, labelBytes.length);
             System.arraycopy(nonce, 0, seed, labelBytes.length, nonce.length);
             
-            this.keyBytes = algo.createKey(this.secret, seed, offset, length);
+            keyBytes = algo.createKey(secret, seed, offset, length);
             
         } catch (Exception e) {
             throw new WSSecurityException(
@@ -155,23 +155,23 @@ public class DerivedKeyTokenProcessor implements Processor {
             
             if (processor == null && uri != null) {
                 // Now use the callback and get it
-                this.secret = this.getSecret(cb, uri);
+                secret = getSecret(cb, uri);
             } else if (processor == null && keyIdentifierValue != null
                 && keyIdentifierValueType != null) {                
-                this.secret = this.getSecret(cb, keyIdentifierValue, keyIdentifierValueType); 
+                secret = getSecret(cb, keyIdentifierValue, keyIdentifierValueType); 
             } else if (processor instanceof UsernameTokenProcessor) {
-                this.secret = ((UsernameTokenProcessor) processor).getDerivedKey(cb);
+                secret = ((UsernameTokenProcessor) processor).getDerivedKey(cb);
             } else if (processor instanceof EncryptedKeyProcessor) {
-                this.secret = ((EncryptedKeyProcessor) processor).getDecryptedBytes();
+                secret = ((EncryptedKeyProcessor) processor).getDecryptedBytes();
             } else if (processor instanceof SecurityContextTokenProcessor) {
-                this.secret = ((SecurityContextTokenProcessor) processor).getSecret();
+                secret = ((SecurityContextTokenProcessor) processor).getSecret();
             } else if (processor instanceof SAMLTokenProcessor) {
                 SAMLTokenProcessor samlp = (SAMLTokenProcessor) processor;
                 SAMLKeyInfo keyInfo = 
                     SAMLUtil.getSAMLKeyInfo(samlp.getSamlTokenElement(), crypto, cb);
                 // TODO Handle malformed SAML tokens where they don't have the 
                 // secret in them
-                this.secret = keyInfo.getSecret();
+                secret = keyInfo.getSecret();
             } else {
                 throw new WSSecurityException(
                     WSSecurityException.FAILED_CHECK, "unsupportedKeyId"
@@ -251,7 +251,7 @@ public class DerivedKeyTokenProcessor implements Processor {
      * @see org.apache.ws.security.processor.Processor#getId()
      */
     public String getId() {
-        return this.id;
+        return id;
     }
 
     /**
@@ -266,8 +266,8 @@ public class DerivedKeyTokenProcessor implements Processor {
      * @return Returns the keyBytes.
      */
     public byte[] getKeyBytes(int len) throws WSSecurityException {
-        this.length = len;
-        this.deriveKey();
+        length = len;
+        deriveKey();
         return keyBytes;
     } 
 

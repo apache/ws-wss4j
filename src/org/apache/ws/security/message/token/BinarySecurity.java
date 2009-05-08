@@ -102,7 +102,7 @@ public class BinarySecurity {
      * efficiency purposes.
      */
     public void addWSSENamespace() {
-        WSSecurityUtil.setNamespace(this.element, WSConstants.WSSE_NS, WSConstants.WSSE_PREFIX);
+        WSSecurityUtil.setNamespace(element, WSConstants.WSSE_NS, WSConstants.WSSE_PREFIX);
     }
     
     /**
@@ -116,7 +116,7 @@ public class BinarySecurity {
     /**
      * get the value type.
      * 
-     * @return TODO
+     * @return the value type
      */
     public String getValueType() {
         return element.getAttribute("ValueType");
@@ -128,7 +128,7 @@ public class BinarySecurity {
      * @param type 
      */
     public void setValueType(String type) {
-        element.setAttributeNS(null, "ValueType", type);
+        element.setAttribute("ValueType", type);
     }
 
     /**
@@ -146,7 +146,7 @@ public class BinarySecurity {
      * @param encoding 
      */
     public void setEncodingType(String encoding) {
-        element.setAttributeNS(null, "EncodingType", encoding);
+        element.setAttribute("EncodingType", encoding);
     }
 
     /**
@@ -201,7 +201,7 @@ public class BinarySecurity {
     /**
      * get the id.
      * 
-     * @return TODO
+     * @return the WSU ID of this element
      */
     public String getID() {
         return element.getAttributeNS(WSConstants.WSU_NS, "Id");
@@ -219,7 +219,7 @@ public class BinarySecurity {
     /**
      * return the string representation of the token.
      * 
-     * @return TODO
+     * @return the string representation of the token.
      */
     public String toString() {
         return DOM2Writer.nodeToString((Node)element);

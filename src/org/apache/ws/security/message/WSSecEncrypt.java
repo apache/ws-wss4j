@@ -97,19 +97,13 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
     private boolean encKeyIdDirectId;
 
     /**
-     * Constructor.
-     */
-    public WSSecEncrypt() {
-    }
-
-    /**
      * Sets the key to use during embedded encryption.
      * 
      * @param key to use during encryption. The key must fit the selected
      *            symmetrical encryption algorithm
      */
     public void setKey(byte[] key) {
-        this.embeddedKey = key;
+        embeddedKey = key;
     }
 
     /**
@@ -424,8 +418,8 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
             keyInfo = new KeyInfo(document);
             SecurityTokenReference secToken = new SecurityTokenReference(document);
             secToken.addWSSENamespace();
-            if (this.customReferenceValue != null) {
-                secToken.setKeyIdentifierEncKeySHA1(this.customReferenceValue);
+            if (customReferenceValue != null) {
+                secToken.setKeyIdentifierEncKeySHA1(customReferenceValue);
             } else {
                 secToken.setKeyIdentifierEncKeySHA1(getSHA1(encryptedEphemeralKey));
             }
@@ -563,9 +557,9 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
                 xmlCipher.doFinal(doc, body, content);
                 
                 keyInfo = new KeyInfo((Element) keyInfo.getElement().cloneNode(true), null);
-            } catch (Exception e2) {
+            } catch (Exception ex) {
                 throw new WSSecurityException(
-                    WSSecurityException.FAILED_ENCRYPTION, null, null, e2
+                    WSSecurityException.FAILED_ENCRYPTION, null, null, ex
                 );
             }
             encDataRef.add(new String("#" + xencEncryptedDataId));
@@ -705,7 +699,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
                 doc.createElementNS(
                     WSConstants.ENC_NS, WSConstants.ENC_PREFIX + ":DataReference"
                 );
-            dataReference.setAttributeNS(null, "URI", dataReferenceUri);
+            dataReference.setAttribute("URI", dataReferenceUri);
             referenceList.appendChild(dataReference);
         }
         return referenceList;

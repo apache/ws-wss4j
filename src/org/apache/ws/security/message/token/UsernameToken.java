@@ -153,8 +153,7 @@ public class UsernameToken {
             && elementPassword.hasAttribute(WSConstants.PASSWORD_TYPE_ATTR)) {
             passwordType = elementPassword.getAttribute(WSConstants.PASSWORD_TYPE_ATTR);
         }
-        if (passwordType != null
-            && passwordType.equals(WSConstants.PASSWORD_DIGEST)) {
+        if (WSConstants.PASSWORD_DIGEST.equals(passwordType)) {
             hashed = true;
             if (elementNonce == null || elementCreated == null) {
                 throw new WSSecurityException(
@@ -218,7 +217,7 @@ public class UsernameToken {
      * efficiency purposes.
      */
     public void addWSSENamespace() {
-        WSSecurityUtil.setNamespace(this.element, WSConstants.WSSE_NS, WSConstants.WSSE_PREFIX);
+        WSSecurityUtil.setNamespace(element, WSConstants.WSSE_NS, WSConstants.WSSE_PREFIX);
     }
     
     /**
@@ -226,7 +225,7 @@ public class UsernameToken {
      * efficiency purposes.
      */
     public void addWSUNamespace() {
-        WSSecurityUtil.setNamespace(this.element, WSConstants.WSU_NS, WSConstants.WSU_PREFIX);
+        WSSecurityUtil.setNamespace(element, WSConstants.WSU_NS, WSConstants.WSU_PREFIX);
     }
 
     /**
@@ -240,7 +239,7 @@ public class UsernameToken {
         random.nextBytes(nonceValue);
         elementNonce = doc.createElementNS(WSConstants.WSSE_NS, "wsse:" + WSConstants.NONCE_LN);
         elementNonce.appendChild(doc.createTextNode(Base64.encode(nonceValue)));
-        elementNonce.setAttributeNS(null, "EncodingType", BASE64_ENCODING);
+        elementNonce.setAttribute("EncodingType", BASE64_ENCODING);
         element.appendChild(elementNonce);
     }
 

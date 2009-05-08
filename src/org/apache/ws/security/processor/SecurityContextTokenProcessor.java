@@ -70,9 +70,9 @@ public class SecurityContextTokenProcessor implements Processor {
         WSSConfig config
     ) throws WSSecurityException {
         SecurityContextToken sct = new SecurityContextToken(elem);
-        this.identifier = sct.getIdentifier();
-        this.secret = this.getSecret(cb, sct);
-        this.sctId = sct.getID();
+        identifier = sct.getIdentifier();
+        secret = getSecret(cb, sct);
+        sctId = sct.getID();
         
         returnResults.add(
             0, 
@@ -124,7 +124,7 @@ public class SecurityContextTokenProcessor implements Processor {
      * Return the id of the 
      */
     public String getId() {
-        return this.sctId;
+        return sctId;
     }
 
     /**

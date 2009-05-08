@@ -40,12 +40,6 @@ public class WSSecSignatureConfirmation extends WSSecBase {
     byte[] signatureValue = null;
 
     /**
-     * Constructor.
-     */
-    public WSSecSignatureConfirmation() {
-    }
-
-    /**
      * Set the Signature value to store in this SignatureConfirmation.
      * 
      * @param signatureValue The Signature value to store in the SignatureConfirmation element
@@ -127,6 +121,7 @@ public class WSSecSignatureConfirmation extends WSSecBase {
      * was not called before.
      */
     public Element getSignatureConfirmationElement() {
-        return (this.sc != null) ? this.sc.getElement() : null;
+        return (sc != null) ? sc.getElement() : null;
     }
+    
 }

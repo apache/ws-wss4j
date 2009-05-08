@@ -22,6 +22,7 @@ package org.apache.ws.security.action;
 import java.util.List;
 import java.util.Vector;
 
+import org.apache.ws.security.SOAPConstants;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSEncryptionPart;
 import org.apache.ws.security.WSSecurityException;
@@ -46,8 +47,8 @@ import org.w3c.dom.Document;
 public class UsernameTokenSignedAction implements Action {
     public void execute(WSHandler handler, int actionToDo, Document doc, RequestData reqData)
             throws WSSecurityException {
-        String password;
-        password = handler.getPassword(reqData.getUsername(), actionToDo,
+        String password = 
+            handler.getPassword(reqData.getUsername(), actionToDo,
                 WSHandlerConstants.PW_CALLBACK_CLASS,
                 WSHandlerConstants.PW_CALLBACK_REF, reqData).getPassword();
 
@@ -96,10 +97,13 @@ public class UsernameTokenSignedAction implements Action {
         if (reqData.getSignatureParts().size() > 0) {
             parts = reqData.getSignatureParts();
         } else {
-            String soapNamespace = WSSecurityUtil.getSOAPNamespace(doc.getDocumentElement());
+            SOAPConstants soapConstants = reqData.getSoapConstants();
+            if (soapConstants == null) {
+                soapConstants = WSSecurityUtil.getSOAPConstants(doc.getDocumentElement());
+            }
             parts = new Vector();
             WSEncryptionPart encP = 
-                new WSEncryptionPart(WSConstants.ELEM_BODY, soapNamespace, "Content");
+                new WSEncryptionPart(WSConstants.ELEM_BODY, soapConstants.getEnvelopeURI(), "Content");
             parts.add(encP);
         }
         sign.addReferencesToSign(parts, reqData.getSecHeader());

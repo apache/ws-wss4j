@@ -35,8 +35,7 @@ import javax.xml.namespace.QName;
  * @author Davanum Srinivas (dims@yahoo.com).
  */
 public class Reference {
-    public static final QName TOKEN =
-        new QName(WSConstants.WSSE_NS, "Reference");
+    public static final QName TOKEN = new QName(WSConstants.WSSE_NS, "Reference");
     protected Element element = null;
 
     /**
@@ -49,9 +48,8 @@ public class Reference {
         if (elem == null) {
             throw new WSSecurityException(WSSecurityException.INVALID_SECURITY, "noReference");
         }
-        this.element = elem;
-        QName el =
-            new QName(this.element.getNamespaceURI(), this.element.getLocalName());
+        element = elem;
+        QName el = new QName(element.getNamespaceURI(), element.getLocalName());
         if (!el.equals(TOKEN)) {
             throw new WSSecurityException(
                 WSSecurityException.FAILURE, "badElement", new Object[] {TOKEN, el}
@@ -65,7 +63,7 @@ public class Reference {
      * @param doc 
      */
     public Reference(Document doc) {
-        this.element = doc.createElementNS(WSConstants.WSSE_NS, "wsse:Reference");
+        element = doc.createElementNS(WSConstants.WSSE_NS, "wsse:Reference");
     }
     
     /**
@@ -82,7 +80,7 @@ public class Reference {
      * @return TODO
      */
     public Element getElement() {
-        return this.element;
+        return element;
     }
 
     /**
@@ -91,7 +89,7 @@ public class Reference {
      * @return TODO
      */
     public String getValueType() {
-        return this.element.getAttributeNS(null, "ValueType");
+        return element.getAttribute("ValueType");
     }
 
     /**
@@ -100,7 +98,7 @@ public class Reference {
      * @return TODO
      */
     public String getURI() {
-        return this.element.getAttributeNS(null, "URI");
+        return element.getAttribute("URI");
     }
 
     /**
@@ -109,7 +107,7 @@ public class Reference {
      * @param valueType
      */
     public void setValueType(String valueType) {
-        this.element.setAttributeNS(null, "ValueType", valueType);
+        element.setAttribute("ValueType", valueType);
     }
 
     /**
@@ -118,7 +116,7 @@ public class Reference {
      * @param uri 
      */
     public void setURI(String uri) {
-        this.element.setAttributeNS(null, "URI", uri);
+        element.setAttribute("URI", uri);
     }
 
     /**
@@ -127,6 +125,6 @@ public class Reference {
      * @return TODO
      */
     public String toString() {
-        return DOM2Writer.nodeToString((Node) this.element);
+        return DOM2Writer.nodeToString((Node)element);
     }
 }

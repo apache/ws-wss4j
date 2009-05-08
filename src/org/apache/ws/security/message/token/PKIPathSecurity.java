@@ -40,10 +40,9 @@ public class PKIPathSecurity extends BinarySecurity {
      *
      * @throws WSSecurityException
      */
-    public PKIPathSecurity(Element elem)
-        throws WSSecurityException {
+    public PKIPathSecurity(Element elem) throws WSSecurityException {
         super(elem);
-        if (!getValueType().equals(getType())) {
+        if (!getValueType().equals(type)) {
             throw new WSSecurityException(
                 WSSecurityException.INVALID_SECURITY_TOKEN,
                 "invalidValueType",
@@ -57,7 +56,7 @@ public class PKIPathSecurity extends BinarySecurity {
      */
     public PKIPathSecurity(Document doc) {
         super(doc);
-        setValueType(getType());
+        setValueType(type);
     }
 
     /**

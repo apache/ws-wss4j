@@ -149,8 +149,8 @@ public class WSSecEncryptedKey extends WSSecBase {
         //
         // Set up the ephemeral key
         //
-        if (this.ephemeralKey == null) {
-            this.ephemeralKey = generateEphemeralKey();
+        if (ephemeralKey == null) {
+            ephemeralKey = generateEphemeralKey();
         }
 
         //
@@ -217,22 +217,22 @@ public class WSSecEncryptedKey extends WSSecBase {
         }
         
         try {
-            this.encryptedEphemeralKey = cipher.doFinal(keyBytes);
-        } catch (IllegalStateException e1) {
+            encryptedEphemeralKey = cipher.doFinal(keyBytes);
+        } catch (IllegalStateException ex) {
             throw new WSSecurityException(
-                WSSecurityException.FAILED_ENCRYPTION, null, null, e1
+                WSSecurityException.FAILED_ENCRYPTION, null, null, ex
             );
-        } catch (IllegalBlockSizeException e1) {
+        } catch (IllegalBlockSizeException ex) {
             throw new WSSecurityException(
-                WSSecurityException.FAILED_ENCRYPTION, null, null, e1
+                WSSecurityException.FAILED_ENCRYPTION, null, null, ex
             );
-        } catch (BadPaddingException e1) {
+        } catch (BadPaddingException ex) {
             throw new WSSecurityException(
-                WSSecurityException.FAILED_ENCRYPTION, null, null, e1
+                WSSecurityException.FAILED_ENCRYPTION, null, null, ex
             );
         }
         Text keyText = 
-            WSSecurityUtil.createBase64EncodedTextNode(document, this.encryptedEphemeralKey);
+            WSSecurityUtil.createBase64EncodedTextNode(document, encryptedEphemeralKey);
 
         //
         // Now we need to setup the EncryptedKey header block 1) create a
@@ -246,7 +246,7 @@ public class WSSecEncryptedKey extends WSSecBase {
         if(encKeyId == null || "".equals(encKeyId)) {
             encKeyId = "EncKeyId-" + UUIDGenerator.getUUID();
         }
-        encryptedKeyElement.setAttributeNS(null, "Id", encKeyId);
+        encryptedKeyElement.setAttribute("Id", encKeyId);
 
         KeyInfo keyInfo = new KeyInfo(document);
 
@@ -337,7 +337,7 @@ public class WSSecEncryptedKey extends WSSecBase {
         WSSecurityUtil.setNamespace(encryptedKey, WSConstants.ENC_NS, WSConstants.ENC_PREFIX);
         Element encryptionMethod = 
             doc.createElementNS(WSConstants.ENC_NS, WSConstants.ENC_PREFIX + ":EncryptionMethod");
-        encryptionMethod.setAttributeNS(null, "Algorithm", keyTransportAlgo);
+        encryptionMethod.setAttribute("Algorithm", keyTransportAlgo);
         encryptedKey.appendChild(encryptionMethod);
         return encryptedKey;
     }

@@ -158,7 +158,7 @@ public class SecurityContextToken {
      * Set the identifier.
      */
     public void setIdentifier(String uuid) {
-        Text node = getFirstNode(this.elementIdentifier);
+        Text node = getFirstNode(elementIdentifier);
         node.setData(uuid);
     }
 

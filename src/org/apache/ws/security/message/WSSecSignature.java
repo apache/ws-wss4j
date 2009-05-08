@@ -123,11 +123,6 @@ public class WSSecSignature extends WSSecBase {
     private String digestAlgo = "http://www.w3.org/2000/09/xmldsig#sha1";
     
     private X509Certificate useThisCert = null;
-    /**
-     * Constructor.
-     */
-    public WSSecSignature() {
-    }
 
     /**
      * set the single cert flag.
@@ -337,7 +332,7 @@ public class WSSecSignature extends WSSecBase {
         if (canonAlgo.equals(WSConstants.C14N_EXCL_OMIT_COMMENTS)) {
             Element canonElem = 
                 XMLUtils.createElementInSignatureSpace(doc, Constants._TAG_CANONICALIZATIONMETHOD);
-            canonElem.setAttributeNS(null, Constants._ATT_ALGORITHM, canonAlgo);
+            canonElem.setAttribute(Constants._ATT_ALGORITHM, canonAlgo);
 
             if (wssConfig.isWsiBSPCompliant()) {
                 Set prefixes = getInclusivePrefixes(secHeader.getSecurityHeader(), false);
@@ -698,13 +693,13 @@ public class WSSecSignature extends WSSecBase {
                 sig.sign(crypto.getPrivateKey(user, password));
             }
             signatureValue = sig.getSignatureValue();
-        } catch (XMLSignatureException e1) {
+        } catch (XMLSignatureException ex) {
             throw new WSSecurityException(
-                WSSecurityException.FAILED_SIGNATURE, null, null, e1
+                WSSecurityException.FAILED_SIGNATURE, null, null, ex
             );
-        } catch (Exception e1) {
+        } catch (Exception ex) {
             throw new WSSecurityException(
-                WSSecurityException.FAILED_SIGNATURE, null, null, e1
+                WSSecurityException.FAILED_SIGNATURE, null, null, ex
             );
         } finally {
             if (remove) {
@@ -779,7 +774,7 @@ public class WSSecSignature extends WSSecBase {
                 WSConstants.SIG_PREFIX + ":CanonicalizationMethod"
             );
 
-        canonElem.setAttributeNS(null, "Algorithm", Canonicalizer.ALGO_ID_C14N_EXCL_OMIT_COMMENTS);
+        canonElem.setAttribute("Algorithm", Canonicalizer.ALGO_ID_C14N_EXCL_OMIT_COMMENTS);
         transformParam.appendChild(canonElem);
         return transformParam;
     }

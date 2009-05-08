@@ -57,7 +57,8 @@ public class STRTransform extends TransformSpi {
     /**
      * Field implementedTransformURI
      */
-    public static final String implementedTransformURI = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#STR-Transform";
+    public static final String implementedTransformURI = 
+        "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#STR-Transform";
 
     private static Log log = LogFactory.getLog(STRTransform.class.getName());
 
@@ -119,7 +120,7 @@ public class STRTransform extends TransformSpi {
             //
             wsDocInfo = WSDocInfoStore.lookup(thisDoc);
             if (wsDocInfo == null) {
-                throw (new CanonicalizationException("no WSDocInfo found"));
+                throw new CanonicalizationException("no WSDocInfo found");
             }
             //
             // According to the OASIS WS Specification "Web Services Security:
@@ -185,7 +186,7 @@ public class STRTransform extends TransformSpi {
             //
             SecurityTokenReference secRef = new SecurityTokenReference(str);
             //
-            // Third and forth step are performed by derefenceSTR()
+            // Third and fourth step are performed by derefenceSTR()
             //
             Element dereferencedToken = dereferenceSTR(thisDoc, secRef);
             //
@@ -323,11 +324,10 @@ public class STRTransform extends TransformSpi {
                 WSSecurityException.SECURITY_TOKEN_UNAVAILABLE, "encodeError", null, e
             );
         }
-        String prefix = WSSecurityUtil.getPrefixNS(WSConstants.WSSE_NS, secRefE);
+        String prefix = 
+            WSSecurityUtil.setNamespace(secRefE, WSConstants.WSSE_NS, WSConstants.WSSE_PREFIX);
         Element elem = doc.createElementNS(WSConstants.WSSE_NS, prefix + ":BinarySecurityToken");
-        WSSecurityUtil.setNamespace(elem, WSConstants.WSSE_NS, prefix);
-        // elem.setAttributeNS(WSConstants.XMLNS_NS, "xmlns", "");
-        elem.setAttributeNS(null, "ValueType", X509Security.X509_V3_TYPE);
+        elem.setAttribute("ValueType", X509Security.X509_V3_TYPE);
         Text certText = doc.createTextNode(Base64.encode(data)); // no line wrap
         elem.appendChild(certText);
         return elem;

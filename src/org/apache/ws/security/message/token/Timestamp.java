@@ -59,12 +59,12 @@ public class Timestamp {
      * Constructs a <code>Timestamp</code> object and parses the
      * <code>wsu:Timestamp</code> element to initialize it.
      *
-     * @param element the <code>wsu:Timestamp</code> element that
-     *                contains the timestamp data
+     * @param timestampElement the <code>wsu:Timestamp</code> element that
+     *        contains the timestamp data
      */
-    public Timestamp(Element element) throws WSSecurityException {
+    public Timestamp(Element timestampElement) throws WSSecurityException {
 
-        this.element = element;
+        element = timestampElement;
         customElements = new Vector();
 
         String strCreated = null;

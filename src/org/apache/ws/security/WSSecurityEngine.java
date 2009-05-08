@@ -131,9 +131,6 @@ public class WSSecurityEngine {
     public static final QName SECURITY_CONTEXT_TOKEN_05_12 = 
         new QName(ConversationConstants.WSC_NS_05_12, ConversationConstants.SECURITY_CONTEXT_TOKEN_LN);
     
-    public WSSecurityEngine() {
-    }
-
     /**
      * Get a singleton instance of security engine.
      * <p/>
@@ -303,15 +300,13 @@ public class WSSecurityEngine {
         wsDocInfo.setCrypto(sigCrypto);
 
         NodeList list = securityHeader.getChildNodes();
-        int len = list.getLength();
-        Node elem;
         if (tlog.isDebugEnabled()) {
             t1 = System.currentTimeMillis();
         }
         Vector returnResults = new Vector();
         final WSSConfig cfg = getWssConfig();
-        for (int i = 0; i < len; i++) {
-            elem = list.item(i);
+        for (int i = 0; i < list.getLength(); i++) {
+            Node elem = list.item(i);
             if (elem == null || elem.getNodeType() != Node.ELEMENT_NODE) {
                 continue;
             }

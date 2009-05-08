@@ -42,12 +42,6 @@ public class WSSecSAMLToken extends WSSecBase {
     private SAMLAssertion saml = null;
 
     /**
-     * Constructor.
-     */
-    public WSSecSAMLToken() {
-    }
-
-    /**
      * Creates a SAML token.
      * 
      * The method prepares and initializes a WSSec UsernameToken structure after
@@ -76,14 +70,12 @@ public class WSSecSAMLToken extends WSSecBase {
      *            The security header that holds the Signature element.
      */
     public void prependToHeader(WSSecHeader secHeader) {
-        Element element = null;        
         try {
-            element = (Element) saml.toDOM(document);
+            Element element = (Element) saml.toDOM(document);
+            WSSecurityUtil.prependChildElement(secHeader.getSecurityHeader(), element);
         } catch (SAMLException ex) {
             throw new RuntimeException(ex.toString(), ex);
         }
-        
-        WSSecurityUtil.prependChildElement(secHeader.getSecurityHeader(), element);
     }
     
     /**

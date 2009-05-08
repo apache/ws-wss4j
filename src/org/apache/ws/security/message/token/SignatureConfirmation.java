@@ -50,7 +50,7 @@ public class SignatureConfirmation {
      */
     public SignatureConfirmation(Element elem) throws WSSecurityException {
         element = elem;
-        String sv = element.getAttributeNS(null, VALUE);
+        String sv = element.getAttribute(VALUE);
         if (sv != null) {
             signatureValue = Base64.decode(sv);
         }
@@ -91,7 +91,7 @@ public class SignatureConfirmation {
      * @return the <code>wsse:UsernameToken</code> element
      */
     public Element getElement() {
-        return this.element;
+        return element;
     }
 
     /**
@@ -100,7 +100,7 @@ public class SignatureConfirmation {
      * @return a XML string representation
      */
     public String toString() {
-        return DOM2Writer.nodeToString((Node) this.element);
+        return DOM2Writer.nodeToString((Node)element);
     }
     
     /**
@@ -108,15 +108,15 @@ public class SignatureConfirmation {
      * @param id
      */
     public void setID(String id) {
-        this.element.setAttributeNS(WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":Id", id);
+        element.setAttributeNS(WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":Id", id);
     }
     
     /**
      * Returns the value of the wsu:Id attribute
-     * @return TODO
+     * @return the WSU ID
      */
     public String getID() {
-        return this.element.getAttributeNS(WSConstants.WSU_NS, "Id");
+        return element.getAttributeNS(WSConstants.WSU_NS, "Id");
     }
 
     /**

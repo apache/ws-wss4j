@@ -48,12 +48,6 @@ public class WSSecBase {
     protected WSSConfig wssConfig = WSSConfig.getDefaultWSConfig();
 
     /**
-     * Constructor.
-     */
-    public WSSecBase() {
-    }
-
-    /**
      * Set which parts of the message to encrypt/sign. <p/>
      * 
      * @param parts The list containing the WSEncryptionPart objects

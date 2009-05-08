@@ -56,7 +56,7 @@ public class WSSecDKEncrypt extends WSSecDerivedKeyBase {
         // Setup the encrypted key
         //
         prepare(doc);
-        this.envelope =  doc.getDocumentElement();
+        envelope =  doc.getDocumentElement();
         //
         // prepend elements in the right order to the security header
         //
@@ -82,7 +82,7 @@ public class WSSecDKEncrypt extends WSSecDerivedKeyBase {
     private List doEncryption(Document doc, byte[] secretKey, List references) 
         throws WSSecurityException {
 
-        SecretKey key = WSSecurityUtil.prepareSecretKey(this.symEncAlgo, secretKey);
+        SecretKey key = WSSecurityUtil.prepareSecretKey(symEncAlgo, secretKey);
         XMLCipher xmlCipher = null;
         try {
             xmlCipher = XMLCipher.getInstance(symEncAlgo);
@@ -155,9 +155,9 @@ public class WSSecDKEncrypt extends WSSecDerivedKeyBase {
                 encData.setId(xencEncryptedDataId);
                 encData.setKeyInfo(keyInfo);
                 xmlCipher.doFinal(doc, body, content);
-            } catch (Exception e2) {
+            } catch (Exception ex) {
                 throw new WSSecurityException(
-                    WSSecurityException.FAILED_ENCRYPTION, null, null, e2
+                    WSSecurityException.FAILED_ENCRYPTION, null, null, ex
                 );
             }
             encDataRefs.add(new String("#" + xencEncryptedDataId));
@@ -229,7 +229,7 @@ public class WSSecDKEncrypt extends WSSecDerivedKeyBase {
                 doc.createElementNS(
                     WSConstants.ENC_NS, WSConstants.ENC_PREFIX + ":DataReference"
                 );
-            dataReference.setAttributeNS(null, "URI", dataReferenceUri);
+            dataReference.setAttribute("URI", dataReferenceUri);
             referenceList.appendChild(dataReference);
         }
         return referenceList;
@@ -244,8 +244,8 @@ public class WSSecDKEncrypt extends WSSecDerivedKeyBase {
      * @see org.apache.ws.security.message.WSSecDerivedKeyBase#getDerivedKeyLength()
      */
     protected int getDerivedKeyLength() throws WSSecurityException{
-        return (this.derivedKeyLength > 0) ? this.derivedKeyLength : 
-            WSSecurityUtil.getKeyLength(this.symEncAlgo);
+        return (derivedKeyLength > 0) ? derivedKeyLength : 
+            WSSecurityUtil.getKeyLength(symEncAlgo);
     }
     
 }

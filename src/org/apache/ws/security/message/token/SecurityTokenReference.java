@@ -33,8 +33,14 @@ import org.apache.xml.security.keys.content.x509.XMLX509IssuerSerial;
 import org.apache.xml.security.keys.content.X509Data;
 import org.apache.ws.security.util.Base64;
 import org.apache.xml.security.utils.Constants;
-import org.w3c.dom.*;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.w3c.dom.Text;
+
+import javax.xml.namespace.QName;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 
@@ -49,9 +55,9 @@ import java.security.cert.X509Certificate;
  * @author Davanum Srinivas (dims@yahoo.com).
  */
 public class SecurityTokenReference {
-    private static Log log =
-            LogFactory.getLog(SecurityTokenReference.class.getName());
     public static final String SECURITY_TOKEN_REFERENCE = "SecurityTokenReference";
+    public static final QName STR_QNAME = 
+        new QName(WSConstants.WSSE_NS, SECURITY_TOKEN_REFERENCE);
     public static final String KEY_NAME = "KeyName";
     public static final String SKI_URI = 
         WSConstants.X509TOKEN_NS + "#X509SubjectKeyIdentifier";
@@ -61,6 +67,8 @@ public class SecurityTokenReference {
         WSConstants.SAMLTOKEN_NS + "#" + WSConstants.SAML_ASSERTION_ID;
     public static final String ENC_KEY_SHA1_URI = 
         WSConstants.SOAPMESSAGE_NS11 + "#" + WSConstants.ENC_KEY_SHA1_URI;
+    private static Log log =
+        LogFactory.getLog(SecurityTokenReference.class.getName());
     protected Element element = null;
     private XMLX509IssuerSerial issuerSerial = null;
     private byte[] skiBytes = null;
@@ -74,14 +82,9 @@ public class SecurityTokenReference {
      */
     public SecurityTokenReference(Element elem) throws WSSecurityException {
         doDebug = log.isDebugEnabled();
-        this.element = elem;
-        boolean goodElement = false;
-        if (SECURITY_TOKEN_REFERENCE.equals(element.getLocalName())) {
-            goodElement = WSConstants.WSSE_NS.equals(element.getNamespaceURI());
-//        } else if (KEY_NAME.equals(element.getLocalName())) {
-//            goodElement = WSConstants.SIG_NS.equals(element.getNamespaceURI());
-        }
-        if (!goodElement) {
+        element = elem;
+        QName el = new QName(element.getNamespaceURI(), element.getLocalName());
+        if (!STR_QNAME.equals(el)) {
             throw new WSSecurityException(WSSecurityException.FAILURE, "badElement", null);
         }
     }
@@ -93,7 +96,7 @@ public class SecurityTokenReference {
      */
     public SecurityTokenReference(Document doc) {
         doDebug = log.isDebugEnabled();
-        this.element = doc.createElementNS(WSConstants.WSSE_NS, "wsse:SecurityTokenReference");
+        element = doc.createElementNS(WSConstants.WSSE_NS, "wsse:SecurityTokenReference");
     }
     
     /**
@@ -101,7 +104,7 @@ public class SecurityTokenReference {
      * efficiency purposes.
      */
     public void addWSSENamespace() {
-        WSSecurityUtil.setNamespace(this.element, WSConstants.WSSE_NS, WSConstants.WSSE_PREFIX);
+        WSSecurityUtil.setNamespace(element, WSConstants.WSSE_NS, WSConstants.WSSE_PREFIX);
     }
     
     /**
@@ -120,9 +123,9 @@ public class SecurityTokenReference {
     public void setReference(Reference ref) {
         Element elem = getFirstElement();
         if (elem != null) {
-            this.element.replaceChild(ref.getElement(), elem);
+            element.replaceChild(ref.getElement(), elem);
         } else {
-            this.element.appendChild(ref.getElement());
+            element.appendChild(ref.getElement());
         }
     }
 
@@ -251,13 +254,13 @@ public class SecurityTokenReference {
                 }
             }
             if (tokElement == null) {
-                Node assertion = 
+                Element assertion = 
                     WSSecurityUtil.findSAMLAssertionElementById(
                         doc.getDocumentElement(),
                         id
                     );
                 if (assertion != null) {
-                    tokElement = (Element)assertion;
+                    tokElement = assertion;
                 }
             }
         }
@@ -307,7 +310,7 @@ public class SecurityTokenReference {
      */
     public void setKeyIdentifier(X509Certificate cert)
         throws WSSecurityException {
-        Document doc = this.element.getOwnerDocument();
+        Document doc = element.getOwnerDocument();
         byte data[] = null;
         try {
             data = cert.getEncoded();
@@ -343,10 +346,10 @@ public class SecurityTokenReference {
             );
         }
         
-        Document doc = this.element.getOwnerDocument();
+        Document doc = element.getOwnerDocument();
         byte data[] = crypto.getSKIBytesFromCert(cert);
         
-        org.w3c.dom.Text text = doc.createTextNode(Base64.encode(data));
+        Text text = doc.createTextNode(Base64.encode(data));
         createKeyIdentifier(doc, SKI_URI, text, true);        
     }
 
@@ -361,7 +364,7 @@ public class SecurityTokenReference {
      * @param cert is the X509 certificate to get the thumbprint
      */
     public void setKeyIdentifierThumb(X509Certificate cert) throws WSSecurityException {
-        Document doc = this.element.getOwnerDocument();
+        Document doc = element.getOwnerDocument();
         MessageDigest sha = null;
         try {
             sha = WSSecurityUtil.resolveMessageDigest();
@@ -386,33 +389,33 @@ public class SecurityTokenReference {
     
 
     public void setKeyIdentifierEncKeySHA1(String value) throws WSSecurityException {
-        Document doc = this.element.getOwnerDocument();
+        Document doc = element.getOwnerDocument();
         org.w3c.dom.Text text = doc.createTextNode(value);
         createKeyIdentifier(doc, ENC_KEY_SHA1_URI, text, true);
     }
     
     public void setSAMLKeyIdentifier(String keyIdVal) throws WSSecurityException {
-        Document doc = this.element.getOwnerDocument();
+        Document doc = element.getOwnerDocument();
         createKeyIdentifier(doc, SAML_ID_URI, doc.createTextNode(keyIdVal), false);
     }
     public void setKeyIdentifier(String valueType, String keyIdVal) throws WSSecurityException {
-        Document doc = this.element.getOwnerDocument();
+        Document doc = element.getOwnerDocument();
         createKeyIdentifier(doc, valueType, doc.createTextNode(keyIdVal), false);
     }
 
     private void createKeyIdentifier(Document doc, String uri, Node node, boolean base64) {
         Element keyId = doc.createElementNS(WSConstants.WSSE_NS, "wsse:KeyIdentifier");
-        keyId.setAttributeNS(null, "ValueType", uri);
+        keyId.setAttribute("ValueType", uri);
         if (base64) {
-            keyId.setAttributeNS(null, "EncodingType", BinarySecurity.BASE64_ENCODING);
+            keyId.setAttribute("EncodingType", BinarySecurity.BASE64_ENCODING);
         }
 
         keyId.appendChild(node);
         Element elem = getFirstElement();
         if (elem != null) {
-            this.element.replaceChild(keyId, elem);
+            element.replaceChild(keyId, elem);
         } else {
-            this.element.appendChild(keyId);
+            element.appendChild(keyId);
         }
     }
 
@@ -449,9 +452,7 @@ public class SecurityTokenReference {
             X509Security token = new X509Security(elem);
             if (token != null) {
                 X509Certificate cert = token.getX509Certificate(crypto);
-                X509Certificate[] certs = new X509Certificate[1];
-                certs[0] = cert;
-                return certs;
+                return new X509Certificate[]{cert};
             }
         } else if (SKI_URI.equals(value)) {
             alias = getX509SKIAlias(crypto);
@@ -536,9 +537,9 @@ public class SecurityTokenReference {
     public void setX509IssuerSerial(X509Data ref) {
         Element elem = getFirstElement();
         if (elem != null) {
-            this.element.replaceChild(ref.getElement(), elem);
+            element.replaceChild(ref.getElement(), elem);
         } else {
-            this.element.appendChild(ref.getElement());
+            element.appendChild(ref.getElement());
         }
     }
 
@@ -614,7 +615,7 @@ public class SecurityTokenReference {
      *         a <code>wsse:Reference</code> element
      */
     public boolean containsReference() {
-        return this.lengthReference() > 0;
+        return lengthReference() > 0;
     }
 
     /**
@@ -624,7 +625,7 @@ public class SecurityTokenReference {
      *         the <code>SecurtityTokenReference</code>
      */
     public int lengthReference() {
-        return this.length(WSConstants.WSSE_NS, "Reference");
+        return length(WSConstants.WSSE_NS, "Reference");
     }
 
     /**
@@ -634,7 +635,7 @@ public class SecurityTokenReference {
      *         a <code>ds:IssuerSerial</code> element
      */
     public boolean containsX509IssuerSerial() {
-        return this.lengthX509IssuerSerial() > 0;
+        return lengthX509IssuerSerial() > 0;
     }
 
     /**
@@ -644,7 +645,7 @@ public class SecurityTokenReference {
      *         a <code>ds:X509Data</code> element
      */
     public boolean containsX509Data() {
-        return this.lengthX509Data() > 0;
+        return lengthX509Data() > 0;
     }
     
     /**
@@ -654,7 +655,7 @@ public class SecurityTokenReference {
      *         the <code>SecurtityTokenReference</code>
      */
     public int lengthX509IssuerSerial() {
-        return this.length(WSConstants.SIG_NS, Constants._TAG_X509ISSUERSERIAL);
+        return length(WSConstants.SIG_NS, Constants._TAG_X509ISSUERSERIAL);
     }
 
     /**
@@ -664,7 +665,7 @@ public class SecurityTokenReference {
      *         the <code>SecurtityTokenReference</code>
      */
     public int lengthX509Data() {
-        return this.length(WSConstants.SIG_NS, Constants._TAG_X509DATA);
+        return length(WSConstants.SIG_NS, Constants._TAG_X509DATA);
     }
     
     /**
@@ -674,7 +675,7 @@ public class SecurityTokenReference {
      *         a <code>wsse:KeyIdentifier</code> element
      */
     public boolean containsKeyIdentifier() {
-        return this.lengthKeyIdentifier() > 0;
+        return lengthKeyIdentifier() > 0;
     }
 
     /**
@@ -684,7 +685,7 @@ public class SecurityTokenReference {
      *         the <code>SecurtityTokenReference</code>
      */
     public int lengthKeyIdentifier() {
-        return this.length(WSConstants.WSSE_NS, "KeyIdentifier");
+        return length(WSConstants.WSSE_NS, "KeyIdentifier");
     }
 
     /**
@@ -695,7 +696,7 @@ public class SecurityTokenReference {
      * @return number of elements with matching localname and namespace
      */
     public int length(String namespace, String localname) {
-        NodeList childNodes = this.element.getChildNodes();
+        NodeList childNodes = element.getChildNodes();
         int result = 0;
         for (int i = 0; i < childNodes.getLength(); i++) {
             Node n = childNodes.item(i);
@@ -719,7 +720,7 @@ public class SecurityTokenReference {
      * @return TODO
      */
     public Element getElement() {
-        return this.element;
+        return element;
     }
 
     /**
@@ -728,7 +729,7 @@ public class SecurityTokenReference {
      * @param id
      */
     public void setID(String id) {
-        this.element.setAttributeNS(WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":Id", id);
+        element.setAttributeNS(WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":Id", id);
     }
 
     /**
@@ -737,6 +738,6 @@ public class SecurityTokenReference {
      * @return TODO
      */
     public String toString() {
-        return DOM2Writer.nodeToString((Node) this.element);
+        return DOM2Writer.nodeToString((Node) element);
     }
 }

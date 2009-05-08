@@ -90,14 +90,14 @@ public class EncryptedKeyProcessor implements Processor {
             throw new WSSecurityException(WSSecurityException.FAILURE, "noCallback");
         }
         List dataRefUris = handleEncryptedKey(elem, cb, decCrypto, null);
-        encryptedKeyId = elem.getAttributeNS(null, "Id");
+        encryptedKeyId = elem.getAttribute("Id");
         returnResults.add(
             0, 
             new WSSecurityEngineResult(
                 WSConstants.ENCR, 
-                this.decryptedBytes,
-                this.encryptedEphemeralKey,
-                this.encryptedKeyId, 
+                decryptedBytes,
+                encryptedEphemeralKey,
+                encryptedKeyId, 
                 dataRefUris,
                 certs
             )

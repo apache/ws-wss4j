@@ -300,7 +300,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
             Element canonElem = 
                 XMLUtils.createElementInSignatureSpace(doc, Constants._TAG_CANONICALIZATIONMETHOD);
 
-            canonElem.setAttributeNS(null, Constants._ATT_ALGORITHM, canonAlgo);
+            canonElem.setAttribute(Constants._ATT_ALGORITHM, canonAlgo);
 
             if (wssConfig.isWsiBSPCompliant()) {
                 Set prefixes = getInclusivePrefixes(secHeader.getSecurityHeader(), false);

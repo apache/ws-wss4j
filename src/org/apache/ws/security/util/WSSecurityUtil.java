@@ -549,13 +549,7 @@ public class WSSecurityUtil {
         if (id == null) {
             return null;
         }
-        id = id.trim();
-        if (id.length() == 0) {
-            return null;
-        }
-        if (id.charAt(0) == '#') {
-            id = id.substring(1);
-        }
+        id = getIDFromReference(id);
         return WSSecurityUtil.findElementById(doc.getDocumentElement(), id, null);
     }
 
@@ -615,32 +609,31 @@ public class WSSecurityUtil {
     }
 
     /**
-     * find a ws-security header block for a given actor <p/>
+     * find a WS-Security header block for a given actor <p/>
      * 
      * @param doc the DOM document (SOAP request)
      * @param envelope the SOAP envelope
-     * @param actot the actor (role) name of the WSS header
+     * @param actor the actor (role) name of the WSS header
      * @param doCreate if true create a new WSS header block if none exists
      * @return the WSS header or null if none found and doCreate is false
      */
     public static Element findWsseSecurityHeaderBlock(
         Document doc,
-        Element envelope, 
+        Element envelope,
         String actor, 
         boolean doCreate
     ) {
         Element wsseSecurity = getSecurityHeader(doc, actor);
         if (wsseSecurity != null) {
             return wsseSecurity;
-        }
-        String soapNamespace = WSSecurityUtil.getSOAPNamespace(doc.getDocumentElement());
-        Element header = 
-            getDirectChildElement(envelope, WSConstants.ELEM_HEADER, soapNamespace);
-        if (header == null && doCreate) {
-            header = createElementInSameNamespace(envelope, WSConstants.ELEM_HEADER);
-            header = prependChildElement(envelope, header);
-        }
-        if (doCreate) {
+        } else if (doCreate) {
+            String soapNamespace = WSSecurityUtil.getSOAPNamespace(doc.getDocumentElement());
+            Element header = 
+                getDirectChildElement(envelope, WSConstants.ELEM_HEADER, soapNamespace);
+            if (header == null) {
+                header = createElementInSameNamespace(envelope, WSConstants.ELEM_HEADER);
+                header = prependChildElement(envelope, header);
+            }
             wsseSecurity = 
                 header.getOwnerDocument().createElementNS(WSConstants.WSSE_NS, "wsse:Security");
             wsseSecurity.setAttributeNS(WSConstants.XMLNS_NS, "xmlns:wsse", WSConstants.WSSE_NS);
@@ -676,12 +669,7 @@ public class WSSecurityUtil {
     }
     
     public static String getSOAPNamespace(Element startElement) {
-        Document doc = startElement.getOwnerDocument();
-        String ns = doc.getDocumentElement().getNamespaceURI();
-        if (WSConstants.URI_SOAP12_ENV.equals(ns)) {
-            return ns;
-        }
-        return WSConstants.URI_SOAP11_ENV;
+        return getSOAPConstants(startElement).getEnvelopeURI();
     }
 
     public static Cipher getCipherInstance(String cipherAlgo)

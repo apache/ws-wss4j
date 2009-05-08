@@ -86,7 +86,7 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
     public Document build(Document doc, WSSecHeader secHeader)
         throws WSSecurityException, ConversationException {
         
-        this.prepare(doc, secHeader);
+        prepare(doc, secHeader);
         String soapNamespace = WSSecurityUtil.getSOAPNamespace(doc.getDocumentElement());
         if (parts == null) {
             parts = new Vector();
@@ -100,12 +100,12 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
         }
         
         addReferencesToSign(parts, secHeader);
-        this.computeSignature();
-        this.prependSigToHeader(secHeader);
+        computeSignature();
+        prependSigToHeader(secHeader);
         //
         // prepend elements in the right order to the security header
         //
-        this.prependDKElementToHeader(secHeader);
+        prependDKElementToHeader(secHeader);
 
         return doc;
     }
@@ -122,7 +122,7 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
             Element canonElem = 
                 XMLUtils.createElementInSignatureSpace(doc, Constants._TAG_CANONICALIZATIONMETHOD);
 
-            canonElem.setAttributeNS(null, Constants._ATT_ALGORITHM, canonAlgo);
+            canonElem.setAttribute(Constants._ATT_ALGORITHM, canonAlgo);
 
             if (wssConfig.isWsiBSPCompliant()) {
                 Set prefixes = getInclusivePrefixes(secHeader.getSecurityHeader(), false);
@@ -163,7 +163,7 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
         secRef.setID(strUri);
         
         Reference refUt = new Reference(document);
-        refUt.setURI("#" + this.dktId);
+        refUt.setURI("#" + dktId);
         secRef.setReference(refUt);
         
         keyInfo.addUnknownElement(secRef.getElement());
@@ -338,13 +338,13 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
                     }
                     sig.addDocument("#" + setWsuId(body), transforms);
                 }
-            } catch (TransformationException e1) {
+            } catch (TransformationException ex) {
                 throw new WSSecurityException(
-                    WSSecurityException.FAILED_SIGNATURE, "noXMLSig", null, e1
+                    WSSecurityException.FAILED_SIGNATURE, "noXMLSig", null, ex
                 );
-            } catch (XMLSignatureException e1) {
+            } catch (XMLSignatureException ex) {
                 throw new WSSecurityException(
-                    WSSecurityException.FAILED_SIGNATURE, "noXMLSig", null, e1
+                    WSSecurityException.FAILED_SIGNATURE, "noXMLSig", null, ex
                 );
             }
         }
@@ -357,18 +357,12 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
                 WSConstants.WSSE_PREFIX + ":TransformationParameters"
             );
 
-        WSSecurityUtil.setNamespace(
-            transformParam, WSConstants.WSSE_NS, WSConstants.WSSE_PREFIX
-        );
-
         Element canonElem = 
             doc.createElementNS(
                 WSConstants.SIG_NS, WSConstants.SIG_PREFIX + ":CanonicalizationMethod"
             );
 
-        WSSecurityUtil.setNamespace(canonElem, WSConstants.SIG_NS, WSConstants.SIG_PREFIX);
-
-        canonElem.setAttributeNS(null, "Algorithm", Canonicalizer.ALGO_ID_C14N_EXCL_OMIT_COMMENTS);
+        canonElem.setAttribute("Algorithm", Canonicalizer.ALGO_ID_C14N_EXCL_OMIT_COMMENTS);
         transformParam.appendChild(canonElem);
         return transformParam;
     }
@@ -399,7 +393,7 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
      * @return the signature element
      */
     public Element getSignatureElement() {
-        return this.sig.getElement();
+        return sig.getElement();
     }
     
     /**
@@ -416,13 +410,13 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
         try {
             sig.sign(sig.createSecretKey(derivedKeyBytes));
             signatureValue = sig.getSignatureValue();
-        } catch (XMLSignatureException e1) {
+        } catch (XMLSignatureException ex) {
             throw new WSSecurityException(
-                WSSecurityException.FAILED_SIGNATURE, null, null, e1
+                WSSecurityException.FAILED_SIGNATURE, null, null, ex
             );
-        } catch (Exception e1) {
+        } catch (Exception ex) {
             throw new WSSecurityException(
-                WSSecurityException.FAILED_SIGNATURE, null, null, e1
+                WSSecurityException.FAILED_SIGNATURE, null, null, ex
             );
         } finally {
             if (remove) {
@@ -435,13 +429,13 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
      * @see org.apache.ws.security.message.WSSecDerivedKeyBase#getDerivedKeyLength()
      */
     protected int getDerivedKeyLength() throws WSSecurityException {
-        return (this.derivedKeyLength > 0) ? this.derivedKeyLength : 
-            WSSecurityUtil.getKeyLength(this.sigAlgo);
+        return (derivedKeyLength > 0) ? derivedKeyLength : 
+            WSSecurityUtil.getKeyLength(sigAlgo);
     }
     
     
     public void setSignatureAlgorithm(String algo) {
-        this.sigAlgo = algo;
+        sigAlgo = algo;
     }
 
     /**

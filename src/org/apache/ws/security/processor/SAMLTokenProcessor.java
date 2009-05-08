@@ -53,13 +53,13 @@ public class SAMLTokenProcessor implements Processor {
             log.debug("Found SAML Assertion element");
         }
         SAMLAssertion assertion = handleSAMLToken(elem);
-        this.id = assertion.getId();
+        id = assertion.getId();
         wsDocInfo.setAssertion(elem);
         returnResults.add(
             0,
             new WSSecurityEngineResult(WSConstants.ST_UNSIGNED, assertion)
         );
-        this.samlTokenElement = elem;
+        samlTokenElement = elem;
 
     }
 
@@ -87,7 +87,7 @@ public class SAMLTokenProcessor implements Processor {
      * Return the id of the SAML token
      */
     public String getId() {
-        return this.id;
+        return id;
     }
 
     public Element getSamlTokenElement() {

@@ -109,12 +109,9 @@ public class WSSecHeader {
                 WSSecurityUtil.findWsseSecurityHeaderBlock(
                     doc, doc.getDocumentElement(), actor, false
                 );
-            if (securityHeader == null) {
-                return true;
-            }
         }
         
-        if (securityHeader.getChildNodes().getLength() == 0) {
+        if (securityHeader == null || securityHeader.getChildNodes().getLength() == 0) {
             return true;
         }
         return false;
@@ -181,13 +178,12 @@ public class WSSecHeader {
                 WSSecurityUtil.findWsseSecurityHeaderBlock(
                     doc, doc.getDocumentElement(), actor, false
                 );
-            if (securityHeader == null) {
-                return;
-            }
         }
         
-        Node parent = securityHeader.getParentNode();
-        parent.removeChild(securityHeader);
+        if (securityHeader != null) {
+            Node parent = securityHeader.getParentNode();
+            parent.removeChild(securityHeader);
+        }
     }
     
 }
