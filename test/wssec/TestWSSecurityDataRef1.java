@@ -163,11 +163,11 @@ public class TestWSSecurityDataRef1 extends TestCase implements CallbackHandler 
         parts.add(encP);
 
         /*
-         * Encrypt the element (testMethod), create EncrypedData elements that reference
+         * Encrypt the element (testMethod), create EncryptedData elements that reference
          * the EncryptedKey, and get a ReferenceList that can be put into the EncryptedKey
          * itself as a child.
          */
-        Element refs = builder.encryptForExternalRef(null, parts);
+        Element refs = builder.encryptForRef(null, parts);
         
         /*
          * We use this method because we want the reference list to be inside the 

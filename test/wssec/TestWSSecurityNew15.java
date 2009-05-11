@@ -169,12 +169,12 @@ public class TestWSSecurityNew15 extends TestCase implements CallbackHandler {
         parts.add(encP);
 
         /*
-         * Encrypt the parts (Body), create EncrypedData elements that reference
+         * Encrypt the parts (Body), create EncryptedData elements that reference
          * the EncryptedKey, and get a ReferenceList that can be put into the
          * Security header. Be sure that the ReferenceList is after the
          * EncryptedKey element in the Security header (strict layout)
          */
-        Element refs = builder.encryptForExternalRef(null, parts);
+        Element refs = builder.encryptForRef(null, parts);
         builder.addExternalRefElement(refs, secHeader);
 
         /*

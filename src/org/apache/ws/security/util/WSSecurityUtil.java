@@ -653,12 +653,6 @@ public class WSSecurityUtil {
         return doc.createTextNode(Base64.encode(data));
     }
 
-    public static SecretKey prepareSecretKey(String symEncAlgo, byte[] rawKey) {
-        SecretKeySpec keySpec = 
-            new SecretKeySpec(rawKey, JCEMapper.getJCEKeyAlgorithmFromURI(symEncAlgo));
-        return (SecretKey) keySpec;
-    }
-
     public static SOAPConstants getSOAPConstants(Element startElement) {
         Document doc = startElement.getOwnerDocument();
         String ns = doc.getDocumentElement().getNamespaceURI();
@@ -671,21 +665,26 @@ public class WSSecurityUtil {
     public static String getSOAPNamespace(Element startElement) {
         return getSOAPConstants(startElement).getEnvelopeURI();
     }
+    
+    
+    /**
+     * Convert the raw key bytes into a SecretKey object of type symEncAlgo.
+     */
+    public static SecretKey prepareSecretKey(String symEncAlgo, byte[] rawKey) {
+        SecretKeySpec keySpec = 
+            new SecretKeySpec(rawKey, JCEMapper.getJCEKeyAlgorithmFromURI(symEncAlgo));
+        return (SecretKey) keySpec;
+    }
 
+    /**
+     * Translate the "cipherAlgo" URI to a JCE ID, and return a javax.crypto.Cipher instance
+     * of this type. 
+     */
     public static Cipher getCipherInstance(String cipherAlgo)
         throws WSSecurityException {
-        Cipher cipher = null;
         try {
-            if (WSConstants.KEYTRANSPORT_RSA15.equalsIgnoreCase(cipherAlgo)) {
-                cipher = Cipher.getInstance("RSA/NONE/PKCS1PADDING");
-            } else if (WSConstants.KEYTRANSPORT_RSAOEP.equalsIgnoreCase(cipherAlgo)) {
-                cipher = Cipher.getInstance("RSA/NONE/OAEPPADDING");
-            } else {
-                throw new WSSecurityException(
-                    WSSecurityException.UNSUPPORTED_ALGORITHM,
-                    "unsupportedKeyTransp", new Object[] {cipherAlgo}
-                );
-            }
+            String keyAlgorithm = JCEMapper.translateURItoJCEID(cipherAlgo);
+            return Cipher.getInstance(keyAlgorithm);
         } catch (NoSuchPaddingException ex) {
             throw new WSSecurityException(
                 WSSecurityException.UNSUPPORTED_ALGORITHM, "unsupportedKeyTransp", 
@@ -697,7 +696,6 @@ public class WSSecurityUtil {
                 new Object[] { "No such algorithm: " + cipherAlgo }, ex
             );
         }
-        return cipher;
     }
 
     /**

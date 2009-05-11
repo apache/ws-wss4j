@@ -157,10 +157,8 @@ public class WSSecEncryptedKey extends WSSecBase {
         // Get the certificate that contains the public key for the public key
         // algorithm that will encrypt the generated symmetric (session) key.
         //
-        X509Certificate remoteCert = null;
-        if (useThisCert != null) {
-            remoteCert = useThisCert;
-        } else {
+        X509Certificate remoteCert = useThisCert;
+        if (remoteCert == null) {
             X509Certificate[] certs = crypto.getCertificates(user);
             if (certs == null || certs.length <= 0) {
                 throw new WSSecurityException(
@@ -192,22 +190,21 @@ public class WSSecEncryptedKey extends WSSecBase {
         X509Certificate remoteCert,
         Crypto crypto
     ) throws WSSecurityException {
-        String certUri = UUIDGenerator.getUUID();
         Cipher cipher = WSSecurityUtil.getCipherInstance(keyEncAlgo);
         try {
-            cipher.init(Cipher.ENCRYPT_MODE, remoteCert.getPublicKey());
+            cipher.init(Cipher.ENCRYPT_MODE, remoteCert);
         } catch (InvalidKeyException e) {
             throw new WSSecurityException(
                 WSSecurityException.FAILED_ENCRYPTION, null, null, e
             );
         }
+        int blockSize = cipher.getBlockSize();
         if (doDebug) {
             log.debug(
-                "cipher blksize: " + cipher.getBlockSize()
+                "cipher blksize: " + blockSize
                 + ", symm key length: " + keyBytes.length
             );
         }
-        int blockSize = cipher.getBlockSize();
         if (blockSize > 0 && blockSize < keyBytes.length) {
             throw new WSSecurityException(
                 WSSecurityException.FAILURE,
@@ -243,13 +240,12 @@ public class WSSecEncryptedKey extends WSSecBase {
         // session key
         //
         encryptedKeyElement = createEncryptedKey(document, keyEncAlgo);
-        if(encKeyId == null || "".equals(encKeyId)) {
+        if (encKeyId == null || "".equals(encKeyId)) {
             encKeyId = "EncKeyId-" + UUIDGenerator.getUUID();
         }
         encryptedKeyElement.setAttribute("Id", encKeyId);
 
         KeyInfo keyInfo = new KeyInfo(document);
-
         SecurityTokenReference secToken = new SecurityTokenReference(document);
 
         switch (keyIdentifierType) {
@@ -282,6 +278,7 @@ public class WSSecEncryptedKey extends WSSecBase {
 
         case WSConstants.BST_DIRECT_REFERENCE:
             Reference ref = new Reference(document);
+            String certUri = UUIDGenerator.getUUID();
             ref.setURI("#" + certUri);
             bstToken = new X509Security(document);
             ((X509Security) bstToken).setX509Certificate(remoteCert);
