@@ -37,7 +37,6 @@ import org.apache.xml.security.utils.Constants;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
 
 import javax.xml.namespace.QName;
@@ -696,13 +695,12 @@ public class SecurityTokenReference {
      * @return number of elements with matching localname and namespace
      */
     public int length(String namespace, String localname) {
-        NodeList childNodes = element.getChildNodes();
         int result = 0;
-        for (int i = 0; i < childNodes.getLength(); i++) {
-            Node n = childNodes.item(i);
-            if (n != null && n.getNodeType() == Node.ELEMENT_NODE) {
-                String ns = n.getNamespaceURI();
-                String name = n.getLocalName();
+        Node node = element.getFirstChild();
+        while (node != null) {
+            if (Node.ELEMENT_NODE == node.getNodeType()) {
+                String ns = node.getNamespaceURI();
+                String name = node.getLocalName();
                 if ((((namespace != null) && namespace.equals(ns))
                     || ((namespace == null) && (ns == null)))
                     && (localname.equals(name))
@@ -710,6 +708,7 @@ public class SecurityTokenReference {
                     result++;
                 }
             }
+            node = node.getNextSibling();
         }
         return result;
     }

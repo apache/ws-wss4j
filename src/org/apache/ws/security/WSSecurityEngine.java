@@ -29,7 +29,6 @@ import org.apache.ws.security.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import javax.security.auth.callback.CallbackHandler;
 import javax.xml.namespace.QName;
@@ -299,39 +298,38 @@ public class WSSecurityEngine {
         WSDocInfo wsDocInfo = new WSDocInfo(securityHeader.getOwnerDocument());
         wsDocInfo.setCrypto(sigCrypto);
 
-        NodeList list = securityHeader.getChildNodes();
         if (tlog.isDebugEnabled()) {
             t1 = System.currentTimeMillis();
         }
         Vector returnResults = new Vector();
         final WSSConfig cfg = getWssConfig();
-        for (int i = 0; i < list.getLength(); i++) {
-            Node elem = list.item(i);
-            if (elem == null || elem.getNodeType() != Node.ELEMENT_NODE) {
-                continue;
-            }
-            QName el = new QName(elem.getNamespaceURI(), elem.getLocalName());
-            Processor p = cfg.getProcessor(el);
-            /*
-             * Call the processor for this token. After the processor returns, 
-             * store it for later retrieval. The token processor may store some
-             * information about the processed token
-             */
-            if (p != null) {
-                p.handleToken((Element) elem, sigCrypto, decCrypto, cb, wsDocInfo, returnResults, cfg);
-                wsDocInfo.setProcessor(p);
-            } else {
-                /*
-                 * Add check for a BinarySecurityToken, add info to WSDocInfo. If BST is
-                 * found before a Signature token this would speed up (at least a little
-                 * bit) the processing of STR Transform.
-                 */
-                if (doDebug) {
-                    log.debug(
-                        "Unknown Element: " + elem.getLocalName() + " " + elem.getNamespaceURI()
-                    );
+        Node node = securityHeader.getFirstChild();
+        while (node != null) {
+            if (Node.ELEMENT_NODE == node.getNodeType()) {
+                QName el = new QName(node.getNamespaceURI(), node.getLocalName());
+                Processor p = cfg.getProcessor(el);
+                //
+                // Call the processor for this token. After the processor returns, 
+                // store it for later retrieval. The token processor may store some
+                // information about the processed token
+                //
+                if (p != null) {
+                    p.handleToken((Element) node, sigCrypto, decCrypto, cb, wsDocInfo, returnResults, cfg);
+                    wsDocInfo.setProcessor(p);
+                } else {
+                    //
+                    // Add check for a BinarySecurityToken, add info to WSDocInfo. If BST is
+                    // found before a Signature token this would speed up (at least a little
+                    // bit) the processing of STR Transform.
+                    //
+                    if (doDebug) {
+                        log.debug(
+                            "Unknown Element: " + node.getLocalName() + " " + node.getNamespaceURI()
+                        );
+                    }
                 }
             }
+            node = node.getNextSibling();
         }
         if (tlog.isDebugEnabled()) {
             t2 = System.currentTimeMillis();

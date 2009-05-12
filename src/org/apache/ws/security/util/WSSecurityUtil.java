@@ -36,7 +36,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
 
 import javax.crypto.Cipher;
@@ -49,6 +48,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Vector;
 
 /**
@@ -99,15 +99,20 @@ public class WSSecurityUtil {
         if (WSConstants.URI_SOAP12_ENV.equals(soapNamespace)) {
             actorLocal = WSConstants.ATTR_ROLE;
         }
-
+        //
         // get all wsse:Security nodes
-        NodeList list = 
-            soapHeaderElement.getElementsByTagNameNS(WSConstants.WSSE_NS, WSConstants.WSSE_LN);
-        if (list == null) {
+        //
+        List securityHeaderList = 
+            getDirectChildElements(
+                soapHeaderElement, 
+                WSConstants.WSSE_LN, 
+                WSConstants.WSSE_NS
+            );
+        if (securityHeaderList == null) {
             return null;
         }
-        for (int i = 0; i < list.getLength(); i++) {
-            Element elem = (Element) list.item(i);
+        for (int i = 0; i < securityHeaderList.size(); i++) {
+            Element elem = (Element) securityHeaderList.get(i);
             Attr attr = elem.getAttributeNodeNS(soapNamespace, actorLocal);
             String hActor = (attr != null) ? attr.getValue() : null;
             if (WSSecurityUtil.isActorEqual(actor, hActor)) {
@@ -167,6 +172,35 @@ public class WSSecurityUtil {
         return null;
     }
     
+    
+    /**
+     * Gets all direct children with specified localname and namespace. <p/>
+     * 
+     * @param fNode the node where to start the search
+     * @param localName local name of the children to get
+     * @param namespace the namespace of the children to get
+     * @return the list of nodes or <code>null</code> if not such nodes are found
+     */
+    public static List getDirectChildElements(
+        Node fNode, 
+        String localName,
+        String namespace
+    ) {
+        List children = new Vector();
+        for (
+            Node currentChild = fNode.getFirstChild(); 
+            currentChild != null; 
+            currentChild = currentChild.getNextSibling()
+        ) {
+            if (Node.ELEMENT_NODE == currentChild.getNodeType()
+                && localName.equals(currentChild.getLocalName())
+                && namespace.equals(currentChild.getNamespaceURI())) {
+                children.add(currentChild);
+            }
+        }
+        return children;
+    }
+    
 
     /**
      * return the first soap "Body" element. <p/>
@@ -186,19 +220,9 @@ public class WSSecurityUtil {
             bodyNamespace = ns;
         }
         
-        for (
-            Node currentChild = docElement.getFirstChild(); 
-            currentChild != null; 
-            currentChild = currentChild.getNextSibling()
-        ) {
-            if (Node.ELEMENT_NODE == currentChild.getNodeType()
-                && WSConstants.ELEM_BODY.equals(currentChild.getLocalName())
-                && bodyNamespace.equals(currentChild.getNamespaceURI())) {
-                return (Element)currentChild;
-            }
-        }
-        return null;
+        return getDirectChildElement(docElement, WSConstants.ELEM_BODY, bodyNamespace);
     }
+    
 
     /**
      * Returns the first element that matches <code>name</code> and
@@ -627,15 +651,14 @@ public class WSSecurityUtil {
         if (wsseSecurity != null) {
             return wsseSecurity;
         } else if (doCreate) {
-            String soapNamespace = WSSecurityUtil.getSOAPNamespace(doc.getDocumentElement());
+            String soapNamespace = WSSecurityUtil.getSOAPNamespace(envelope);
             Element header = 
                 getDirectChildElement(envelope, WSConstants.ELEM_HEADER, soapNamespace);
             if (header == null) {
                 header = createElementInSameNamespace(envelope, WSConstants.ELEM_HEADER);
                 header = prependChildElement(envelope, header);
             }
-            wsseSecurity = 
-                header.getOwnerDocument().createElementNS(WSConstants.WSSE_NS, "wsse:Security");
+            wsseSecurity = doc.createElementNS(WSConstants.WSSE_NS, "wsse:Security");
             wsseSecurity.setAttributeNS(WSConstants.XMLNS_NS, "xmlns:wsse", WSConstants.WSSE_NS);
             return prependChildElement(header, wsseSecurity);
         }
@@ -1011,13 +1034,10 @@ public class WSSecurityUtil {
             return java.util.Collections.EMPTY_LIST;
         }
         final java.util.List ret = new java.util.ArrayList();
-        if (parent.hasChildNodes()) {
-            final NodeList children = parent.getChildNodes();
-            if (children != null) {
-                for (int i = 0, n = children.getLength();  i < n;  ++i) {
-                    ret.add(children.item(i));
-                }
-            }
+        Node node = parent.getFirstChild();
+        while (node != null) {
+            ret.add(node);
+            node = node.getNextSibling();
         }
         return ret;
     }

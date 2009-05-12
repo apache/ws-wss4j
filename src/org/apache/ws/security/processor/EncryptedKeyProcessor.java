@@ -40,7 +40,6 @@ import org.apache.xml.security.utils.Constants;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
 
 import javax.crypto.BadPaddingException;
@@ -238,13 +237,12 @@ public class EncryptedKeyProcessor implements Processor {
      */
     public static byte[] getDecodedBase64EncodedData(Element element) throws WSSecurityException {
         StringBuffer sb = new StringBuffer();
-        NodeList children = element.getChildNodes();
-        int iMax = children.getLength();
-        for (int i = 0; i < iMax; i++) {
-            Node curr = children.item(i);
-            if (curr != null && Node.TEXT_NODE == curr.getNodeType()) {
-                sb.append(((Text) curr).getData());
+        Node node = element.getFirstChild();
+        while (node != null) {
+            if (Node.TEXT_NODE == node.getNodeType()) {
+                sb.append(((Text) node).getData());
             }
+            node = node.getNextSibling();
         }
         String encodedData = sb.toString();
         return Base64.decode(encodedData);

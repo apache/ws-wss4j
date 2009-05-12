@@ -23,6 +23,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSEncryptionPart;
+import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.message.token.Reference;
@@ -333,8 +334,10 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
      */
     public Element encryptForRef(Element dataRef, List references)
         throws WSSecurityException {
+
+        KeyInfo keyInfo = createKeyInfo();
         List encDataRefs = 
-            doEncryption(symmetricKey, references);
+            doEncryption(document, wssConfig, keyInfo, symmetricKey, symEncAlgo, references);
         if (dataRef == null) {
             dataRef = 
                 document.createElementNS(
@@ -398,23 +401,34 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
     }
 
 
-    private List doEncryption(
+    /**
+     * Perform encryption on the SOAP envelope.
+     * @param doc The document containing the SOAP envelope as document element
+     * @param config The WSSConfig from which to generate wsu:ID's
+     * @param keyInfo The KeyInfo object to set in EncryptedData
+     * @param secretKey The SecretKey object with which to encrypt data
+     * @param encryptionAlgorithm The encryption algorithm URI to use
+     * @param references The list of references to encrypt
+     * @return a List of references to EncryptedData elements
+     * @throws WSSecurityException
+     */
+    public static List doEncryption(
+        Document doc,
+        WSSConfig config,
+        KeyInfo keyInfo,
         SecretKey secretKey,
+        String encryptionAlgorithm,
         List references
     ) throws WSSecurityException {
 
         XMLCipher xmlCipher = null;
         try {
-            xmlCipher = XMLCipher.getInstance(symEncAlgo);
+            xmlCipher = XMLCipher.getInstance(encryptionAlgorithm);
         } catch (XMLEncryptionException ex) {
             throw new WSSecurityException(
                 WSSecurityException.UNSUPPORTED_ALGORITHM, null, null, ex
             );
         }
-        //
-        // Create the KeyInfo structure
-        //
-        KeyInfo keyInfo = createKeyInfo();
 
         List encDataRef = new Vector();
         for (int part = 0; part < references.size(); part++) {
@@ -431,15 +445,15 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
             if (idToEnc != null) {
                 elementToEncrypt = 
                     WSSecurityUtil.findElementById(
-                        document.getDocumentElement(), idToEnc, WSConstants.WSU_NS
+                            doc.getDocumentElement(), idToEnc, WSConstants.WSU_NS
                     );
                 if (elementToEncrypt == null) {
                     elementToEncrypt = 
-                        WSSecurityUtil.findElementById(document.getDocumentElement(), idToEnc, null);
+                        WSSecurityUtil.findElementById(doc.getDocumentElement(), idToEnc, null);
                 }
             } else {
                 elementToEncrypt = 
-                    (Element) WSSecurityUtil.findElement(document, elemName, nmSpace);
+                    (Element) WSSecurityUtil.findElement(doc, elemName, nmSpace);
             }
             if (elementToEncrypt == null) {
                 throw new WSSecurityException(
@@ -451,7 +465,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
 
             boolean content = modifier.equals("Content") ? true : false;
             String xencEncryptedDataId = 
-                wssConfig.getIdAllocator().createId("EncDataId-", elementToEncrypt);
+                config.getIdAllocator().createId("EncDataId-", elementToEncrypt);
             encPart.setEncId(xencEncryptedDataId);
             //
             // Encrypt data, and set necessary attributes in xenc:EncryptedData
@@ -459,7 +473,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
             try {
                 if (modifier.equals("Header")) {
                     Element elem = 
-                        document.createElementNS(
+                        doc.createElementNS(
                             WSConstants.WSSE11_NS, "wsse11:" + WSConstants.ENCRYPTED_HEADER
                         );
                     WSSecurityUtil.setNamespace(elem, WSConstants.WSSE11_NS, WSConstants.WSSE11_PREFIX);
@@ -467,7 +481,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
                         WSSecurityUtil.setNamespace(elem, WSConstants.WSU_NS, WSConstants.WSU_PREFIX);
                     elem.setAttributeNS(
                         WSConstants.WSU_NS, wsuPrefix + ":Id", 
-                        wssConfig.getIdAllocator().createId("EncHeader-", elementToEncrypt)
+                        config.getIdAllocator().createId("EncHeader-", elementToEncrypt)
                     );
                     //
                     // Add the EncryptedHeader node to the element to be encrypted's parent
@@ -499,7 +513,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
                 EncryptedData encData = xmlCipher.getEncryptedData();
                 encData.setId(xencEncryptedDataId);
                 encData.setKeyInfo(keyInfo);
-                xmlCipher.doFinal(document, elementToEncrypt, content);
+                xmlCipher.doFinal(doc, elementToEncrypt, content);
                 
                 if (part != (references.size() - 1)) {
                     keyInfo = new KeyInfo((Element) keyInfo.getElement().cloneNode(true), null);

@@ -43,7 +43,6 @@ import org.opensaml.SAMLSubject;
 import org.opensaml.SAMLSubjectStatement;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
 
 import javax.security.auth.callback.Callback;
@@ -107,25 +106,21 @@ public class SAMLUtil {
                     SAMLSubject samlSubject = attrStmt.getSubject();
                     Element kiElem = samlSubject.getKeyInfo();
                     
-                    NodeList children = kiElem.getChildNodes();
-                    int len = children.getLength();
-                    
-                    for (int i = 0; i < len; i++) {
-                        Node child = children.item(i);
-                        if (child == null || child.getNodeType() != Node.ELEMENT_NODE) {
-                            continue;
+                    Node node = kiElem.getFirstChild();
+                    while (node != null) {
+                        if (Node.ELEMENT_NODE == node.getNodeType()) {
+                            QName el = new QName(node.getNamespaceURI(), node.getLocalName());
+                            if (el.equals(WSSecurityEngine.ENCRYPTED_KEY)) {
+                                EncryptedKeyProcessor proc = new EncryptedKeyProcessor();
+                                proc.handleEncryptedKey((Element)node, cb, crypto, null);
+                                
+                                return new SAMLKeyInfo(assertion, proc.getDecryptedBytes());
+                            } else if (el.equals(new QName(WSConstants.WST_NS, "BinarySecret"))) {
+                                Text txt = (Text)node.getFirstChild();
+                                return new SAMLKeyInfo(assertion, Base64.decode(txt.getData()));
+                            }
                         }
-                        QName el = new QName(child.getNamespaceURI(), child.getLocalName());
-                        if (el.equals(WSSecurityEngine.ENCRYPTED_KEY)) {
-                            
-                            EncryptedKeyProcessor proc = new EncryptedKeyProcessor();
-                            proc.handleEncryptedKey((Element)child, cb, crypto, null);
-                            
-                            return new SAMLKeyInfo(assertion, proc.getDecryptedBytes());
-                        } else if (el.equals(new QName(WSConstants.WST_NS, "BinarySecret"))) {
-                            Text txt = (Text)child.getFirstChild();
-                            return new SAMLKeyInfo(assertion, Base64.decode(txt.getData()));
-                        }
+                        node = node.getNextSibling();
                     }
 
                 } else if (stmt instanceof SAMLAuthenticationStatement) {

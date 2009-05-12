@@ -35,7 +35,6 @@ import org.apache.ws.security.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
 
 /**
@@ -251,13 +250,13 @@ public class DerivedKeyToken {
     public Hashtable getProperties() {
         if (elementProperties != null) {
             Hashtable table = new Hashtable();
-            NodeList nodes = elementProperties.getChildNodes();
-            for (int i = 0; i < nodes.getLength(); i++) {
-                Node tempNode = nodes.item(i);
-                if (tempNode != null && Node.ELEMENT_NODE == tempNode.getNodeType()) {
-                    Text text = getFirstNode((Element) tempNode);
-                    table.put(tempNode.getNodeName(), text.getData());
+            Node node = elementProperties.getFirstChild();
+            while (node != null) {
+                if (Node.ELEMENT_NODE == node.getNodeType()) {
+                    Text text = getFirstNode((Element) node);
+                    table.put(node.getNodeName(), text.getData());
                 }
+                node = node.getNextSibling();
             }
         }
         return null;

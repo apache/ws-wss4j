@@ -24,7 +24,6 @@ import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -96,13 +95,10 @@ public class DOM2Writer {
         switch (type) {
             case Node.DOCUMENT_NODE:
                 {
-                    NodeList children = node.getChildNodes();
-                    if (children != null) {
-                        int numChildren = children.getLength();
-                        for (int i = 0; i < numChildren; i++) {
-                            print(children.item(i), namespaceStack, out,
-                                    pretty, indent);
-                        }
+                    Node child = node.getFirstChild();
+                    while (child != null) {
+                        print(child, namespaceStack, out, pretty, indent);
+                        child = child.getNextSibling();
                     }
                     break;
                 }
@@ -156,26 +152,23 @@ public class DOM2Writer {
                             }
                         }
                     }
-                    NodeList children = node.getChildNodes();
-                    if (children != null) {
-                        int numChildren = children.getLength();
-                        hasChildren = (numChildren > 0);
-                        if (hasChildren) {
-                            out.print('>');
-                            if (pretty)
-                                out.print(LS);
+                    Node child = node.getFirstChild();
+                    if (child != null) {
+                        hasChildren = true;
+                        out.print('>');
+                        if (pretty) {
+                            out.print(LS);
                         }
-                        for (int i = 0; i < numChildren; i++) {
-                            print(children.item(i), namespaceStack, out, pretty,
-                                    indent + 1);
+                        while (child != null) {
+                            print(child, namespaceStack, out, pretty, indent + 1);
+                            child = child.getNextSibling();
                         }
                     } else {
                         hasChildren = false;
-                    }
-                    if (!hasChildren) {
                         out.print("/>");
-                        if (pretty)
+                        if (pretty) {
                             out.print(LS);
+                        }
                     }
                     namespaceStack.pop();
                     break;

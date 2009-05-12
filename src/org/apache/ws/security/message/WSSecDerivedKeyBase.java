@@ -253,7 +253,7 @@ public abstract class WSSecDerivedKeyBase extends WSSecBase {
     }
 
     public void setDerivedKeyLength(int keyLength) {
-        this.derivedKeyLength = keyLength;
+        derivedKeyLength = keyLength;
     }
 
     public void setCustomValueType(String customValueType) {
