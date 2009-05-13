@@ -24,10 +24,11 @@ package org.apache.ws.security;
  * 
  * When a processor decrypts/verifies an element it stores information 
  * about that element in a WSDataRef so this information can 
- * be used for validation 
- * 
+ * be used for validation. 
  */
+
 import javax.xml.namespace.QName;
+import org.w3c.dom.Element;
 
 public class WSDataRef {
     
@@ -42,15 +43,9 @@ public class WSDataRef {
     private QName name;
     
     /**
-     * @deprecated 
-     * This method is left in the class for backwards compatibility.
-     * It returns the wsu:Id of the protected element, and not the data reference.
-     * This was never implemented properly in WSS4J code anyway 
-     * @return the wsu:Id
+     * The protected DOM element
      */
-    public String getDataref() {
-        return wsuId;
-    }
+    private Element protectedElement;
 
     /**
      * @return Id of the protected element
@@ -79,5 +74,32 @@ public class WSDataRef {
     public void setName(QName name) {
         this.name = name;
     }
+    
+    /**
+     * @param element The protected DOM element to set
+     */
+    public void setProtectedElement(Element element) {
+        protectedElement = element;
+        String prefix = element.getPrefix();
+        if (prefix == null) {
+            name = 
+                new QName(
+                    element.getNamespaceURI(), element.getLocalName()
+                );
+        } else {
+            name = 
+                new QName(
+                    element.getNamespaceURI(), element.getLocalName(), prefix
+                );
+        }
+    }
+    
+    /**
+     * @return the protected DOM element
+     */
+    public Element getProtectedElement() {
+        return protectedElement;
+    }
+
 
 }

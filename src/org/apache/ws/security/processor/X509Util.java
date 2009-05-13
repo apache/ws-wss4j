@@ -88,10 +88,8 @@ public class X509Util {
             throw new WSSecurityException(WSSecurityException.INVALID_SECURITY, "noKeyname");
         }
         WSPasswordCallback pwCb = new WSPasswordCallback(keyName, WSPasswordCallback.KEY_NAME);
-        Callback[] callbacks = new Callback[1];
-        callbacks[0] = pwCb;
         try {
-            cb.handle(callbacks);
+            cb.handle(new Callback[]{pwCb});
         } catch (IOException e) {
             throw new WSSecurityException(
                 WSSecurityException.FAILURE,

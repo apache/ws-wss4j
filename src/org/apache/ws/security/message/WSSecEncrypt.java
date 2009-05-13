@@ -61,8 +61,6 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
     
     protected String symEncAlgo = WSConstants.AES_128;
 
-    protected String encCanonAlgo = null;
-
     protected byte[] embeddedKey = null;
 
     protected String embeddedKeyName = null;
@@ -148,19 +146,6 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
         symEncAlgo = algo;
     }
 
-    /**
-     * Set the name of an optional canonicalization algorithm to use before
-     * encryption.
-     * 
-     * This c14n algorithm is used to serialize the data before encryption. If
-     * the algorithm is not set then a standard serialization is used (provided
-     * by XMLCipher, usually a XMLSerializer according to DOM 3 specification).
-     * 
-     * @param algo Is the name of the canonicalization algorithm
-     */
-    public void setEncCanonicalization(String algo) {
-        encCanonAlgo = algo;
-    }
     
     /**
      * Get the name of symmetric encryption algorithm to use.

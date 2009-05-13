@@ -1091,4 +1091,53 @@ public class WSSecurityUtil {
         return ret;
     }
     
+    
+    /**
+     * @return the first node in b that is not in a 
+     */
+    public static Node
+    newNode(
+        final java.util.List a,
+        final java.util.List b
+    ) {
+        if (a.size() == 0 && b.size() > 0) {
+            return (Node)b.get(0);
+        }
+        if (b.size() == 0) {
+            return null;
+        }
+        for (
+            final java.util.Iterator bpos = b.iterator();
+            bpos.hasNext();
+        ) {
+            final Node bnode = (Node) bpos.next();
+            final java.lang.String bns = bnode.getNamespaceURI();
+            final java.lang.String bln = bnode.getLocalName();
+            boolean found = false;
+            for (
+                final java.util.Iterator apos = a.iterator();
+                apos.hasNext() && !found;
+            ) {
+                final Node anode = (Node) apos.next();
+                final java.lang.String ans = anode.getNamespaceURI();
+                final java.lang.String aln = anode.getLocalName();
+                final boolean nsmatch =
+                    ans == null
+                    ? ((bns == null) ? true : false)
+                    : ((bns == null) ? false : ans.equals(bns));
+                final boolean lnmatch =
+                    aln == null
+                    ? ((bln == null) ? true : false)
+                    : ((bln == null) ? false : aln.equals(bln));
+                if (nsmatch && lnmatch) {
+                    found = true;
+                }
+            }
+            if (!found) {
+                return bnode;
+            }
+        }
+        return null;
+    }
+    
 }

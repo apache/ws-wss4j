@@ -238,6 +238,9 @@ public class TestWSSecurityNew2 extends TestCase implements CallbackHandler {
         final java.util.List results = secEngine.processSecurityHeader(doc, null, this, crypto);
         String outputString = 
             org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(outputString);
+        }
         assertTrue(outputString.indexOf("LogTestService2") > 0 ? true : false);
         //
         // walk through the results, and make sure there is an encryption
@@ -262,6 +265,15 @@ public class TestWSSecurityNew2 extends TestCase implements CallbackHandler {
                         expectedEncryptedElement,
                         ref.getName()
                     );
+                    assertNotNull(ref.getProtectedElement());
+                    if (LOG.isDebugEnabled()) {
+                        LOG.debug("WSDataRef element: ");
+                        LOG.debug(
+                            org.apache.ws.security.util.DOM2Writer.nodeToString(
+                                ref.getProtectedElement()
+                            )
+                        );
+                    }
                 }
             }
         }
