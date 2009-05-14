@@ -86,9 +86,9 @@ public class EncryptedDataProcessor implements Processor {
         try {
             xmlCipher = XMLCipher.getInstance(encAlgo);
             xmlCipher.init(XMLCipher.DECRYPT_MODE, key);
-        } catch (XMLEncryptionException e1) {
+        } catch (XMLEncryptionException ex) {
             throw new WSSecurityException(
-                WSSecurityException.UNSUPPORTED_ALGORITHM, null, null, e1
+                WSSecurityException.UNSUPPORTED_ALGORITHM, null, null, ex
             );
         }
         Node previousSibling = elem.getPreviousSibling();

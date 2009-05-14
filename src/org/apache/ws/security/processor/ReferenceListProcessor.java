@@ -222,13 +222,11 @@ public class ReferenceListProcessor implements Processor {
         WSDataRef dataRef = new WSDataRef();
         dataRef.setWsuId(dataRefURI);
         boolean content = X509Util.isContent(encData);
-        List beforePeers = null;
         Node parent = encData.getParentNode();
+        Node previousSibling = encData.getPreviousSibling();
         if (content) {
             encData = (Element) encData.getParentNode();
             parent = encData.getParentNode();
-        } else {
-            beforePeers = WSSecurityUtil.listChildren(parent);
         }
         
         try {
@@ -248,8 +246,12 @@ public class ReferenceListProcessor implements Processor {
         } else if (content) {
             dataRef.setProtectedElement(encData);
         } else {
-            final List afterPeers = WSSecurityUtil.listChildren(parent);
-            Node decryptedNode = WSSecurityUtil.newNode(beforePeers, afterPeers);
+            Node decryptedNode;
+            if (previousSibling == null) {
+                decryptedNode = parent.getFirstChild();
+            } else {
+                decryptedNode = previousSibling.getNextSibling();
+            }
             if (decryptedNode != null && Node.ELEMENT_NODE == decryptedNode.getNodeType()) {
                 dataRef.setProtectedElement((Element)decryptedNode);
             }

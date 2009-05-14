@@ -125,17 +125,15 @@ public class EncryptedKeyProcessor implements Processor {
         if (tlog.isDebugEnabled()) {
             t0 = System.currentTimeMillis();
         }
-        // need to have it to find the encrypted data elements in the envelope
         Document doc = xencEncryptedKey.getOwnerDocument();
-
+        //
         // lookup xenc:EncryptionMethod, get the Algorithm attribute to determine
         // how the key was encrypted. Then check if we support the algorithm
+        //
         String keyEncAlgo = X509Util.getEncAlgo(xencEncryptedKey);
         Cipher cipher = WSSecurityUtil.getCipherInstance(keyEncAlgo);
         //
-        // Well, we can decrypt the session (symmetric) key. Now lookup CipherValue, this is the 
-        // value of the encrypted session key (session key usually is a symmetrical key that encrypts
-        // the referenced content). This is a 2-step lookup
+        // Now lookup CipherValue.
         //
         Element tmpE = 
             WSSecurityUtil.getDirectChildElement(
@@ -264,7 +262,6 @@ public class EncryptedKeyProcessor implements Processor {
         if (alias == null) {
             throw new WSSecurityException(WSSecurityException.FAILED_CHECK, "noPrivateKey");
         }
-        
         //
         // At this point we have all information necessary to decrypt the session
         // key:
@@ -277,8 +274,7 @@ public class EncryptedKeyProcessor implements Processor {
         //
         WSPasswordCallback pwCb = new WSPasswordCallback(alias, WSPasswordCallback.DECRYPT);
         try {
-            Callback[] callbacks = new Callback[]{pwCb};
-            cb.handle(callbacks);
+            cb.handle(new Callback[]{pwCb});
         } catch (IOException e) {
             throw new WSSecurityException(
                 WSSecurityException.FAILURE,
@@ -394,8 +390,7 @@ public class EncryptedKeyProcessor implements Processor {
                         new Object[] {"for decryption (BST)"}
                     );
                 }
-                certs = new X509Certificate[1];
-                certs[0] = token.getX509Certificate(crypto);
+                certs = new X509Certificate[]{token.getX509Certificate(crypto)};
                 if (certs[0] == null) {
                     throw new WSSecurityException(
                         WSSecurityException.FAILURE,
@@ -476,7 +471,6 @@ public class EncryptedKeyProcessor implements Processor {
     public String getId() {
         return encryptedKeyId;
     }
-    
     
     /**
      * Get the decrypted key.

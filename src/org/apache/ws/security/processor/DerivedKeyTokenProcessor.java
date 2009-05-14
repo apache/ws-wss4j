@@ -97,7 +97,7 @@ public class DerivedKeyTokenProcessor implements Processor {
 
     private void deriveKey() throws WSSecurityException{
         try {
-            DerivationAlgorithm algo = AlgoFactory.getInstance(this.algorithm);
+            DerivationAlgorithm algo = AlgoFactory.getInstance(algorithm);
             byte[] labelBytes = null;
             if (label == null || label.length() == 0) {
                 labelBytes = 
