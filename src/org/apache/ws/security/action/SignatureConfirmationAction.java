@@ -45,27 +45,35 @@ public class SignatureConfirmationAction implements Action {
             log.debug("Perform Signature confirmation");
         }
 
-        Vector results = (Vector) handler.getProperty(reqData.getMsgContext(),
-                WSHandlerConstants.RECV_RESULTS);
-        /*
-         * loop over all results gathered by all handlers in the chain. For each
-         * handler result get the various actions. After that loop we have all
-         * signature results in the signatureActions vector
-         */
-        Vector signatureActions = new Vector();
+        List results = 
+            (List) handler.getProperty(reqData.getMsgContext(), WSHandlerConstants.RECV_RESULTS);
+        if (results == null) {
+            return;
+        }
+        //
+        // Loop over all the (signature) results gathered by all the processors, and store
+        // them in a list.
+        //
+        List signatureActions = new Vector();
         for (int i = 0; i < results.size(); i++) {
             WSHandlerResult wshResult = (WSHandlerResult) results.get(i);
+            List resultList = wshResult.getResults();
 
-            WSSecurityUtil.fetchAllActionResults(wshResult.getResults(),
-                    WSConstants.SIGN, signatureActions);
-            WSSecurityUtil.fetchAllActionResults(wshResult.getResults(),
-                    WSConstants.ST_SIGNED, signatureActions);
-            WSSecurityUtil.fetchAllActionResults(wshResult.getResults(),
-                    WSConstants.UT_SIGN, signatureActions);
+            WSSecurityUtil.fetchAllActionResults(
+                resultList, WSConstants.SIGN, signatureActions
+            );
+            WSSecurityUtil.fetchAllActionResults(
+                resultList, WSConstants.ST_SIGNED, signatureActions
+            );
+            WSSecurityUtil.fetchAllActionResults(
+                resultList, WSConstants.UT_SIGN, signatureActions
+            );
         }
-        List signatureParts = reqData.getSignatureParts();
+        //
         // prepare a SignatureConfirmation token
+        //
         WSSecSignatureConfirmation wsc = new WSSecSignatureConfirmation();
+        List signatureParts = reqData.getSignatureParts();
         if (signatureActions.size() > 0) {
             if (log.isDebugEnabled()) {
                 log.debug("Signature Confirmation: number of Signature results: "
@@ -82,7 +90,8 @@ public class SignatureConfirmationAction implements Action {
             signatureParts.add(new WSEncryptionPart(wsc.getId()));
         }
         handler.setProperty(
-            reqData.getMsgContext(), WSHandlerConstants.SIG_CONF_DONE, WSHandler.DONE
+            reqData.getMsgContext(), WSHandlerConstants.SIG_CONF_DONE, ""
         );
     }
+    
 }

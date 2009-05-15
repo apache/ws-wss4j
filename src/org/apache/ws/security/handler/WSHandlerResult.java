@@ -19,23 +19,23 @@
 
 package org.apache.ws.security.handler;
 
-import java.util.Vector;
+import java.util.List;
 
 /**
  * @author Werner Dittmann (Werner.Dittmann@Siemens.com)
  */
 public class WSHandlerResult {
     private String actor;
-    private Vector wsSecurityResults;
+    private List wsSecurityResults;
 
     /**
      * constructor
      * @param actor
      * @param wsResults
      */ 
-    public WSHandlerResult(String actor, Vector wsResults) {
+    public WSHandlerResult(String actor, List results) {
         this.actor = actor;
-        this.wsSecurityResults = wsResults;
+        this.wsSecurityResults = results;
     }
 
     /**
@@ -48,9 +48,9 @@ public class WSHandlerResult {
 
     /**
      * gets the the security results
-     * @return vector
+     * @return list
      */
-    public Vector getResults() {
+    public List getResults() {
         return wsSecurityResults;
     }
 }

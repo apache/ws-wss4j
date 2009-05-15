@@ -720,60 +720,62 @@ public class WSSecurityUtil {
             );
         }
     }
+    
 
     /**
-     * Fetch the result of a given action from a given result vector <p/>
+     * Fetch the result of a given action from a given result list
      * 
-     * @param wsResultVector The result vector to fetch an action from
+     * @param resultList The result list to fetch an action from
      * @param action The action to fetch
-     * @return The result fetched from the result vector, null if the result
+     * @return The first result fetched from the result list, null if the result
      *         could not be found
      */
-    public static WSSecurityEngineResult fetchActionResult(Vector wsResultVector, int action) {
-        WSSecurityEngineResult wsResult = null;
+    public static WSSecurityEngineResult fetchActionResult(List resultList, int action) {
 
-        // Find the part of the security result that matches the given action
-        for (int i = 0; i < wsResultVector.size(); i++) {
+        for (int i = 0; i < resultList.size(); i++) {
+            //
             // Check the result of every action whether it matches the given action
+            //
             WSSecurityEngineResult result = 
-                (WSSecurityEngineResult) wsResultVector.get(i);
+                (WSSecurityEngineResult) resultList.get(i);
             int resultAction = 
                 ((java.lang.Integer)result.get(WSSecurityEngineResult.TAG_ACTION)).intValue();
             if (resultAction == action) {
-                wsResult = (WSSecurityEngineResult) wsResultVector.get(i);
+                return result;
             }
         }
 
-        return wsResult;
+        return null;
     }
+    
 
     /**
-     * Fetch the result of a given action from a given result vector <p/>
+     * Fetch the result of a given action from a given result list.
      * 
-     * @param wsResultVector The result vector to fetch an action from
+     * @param resultList The result list to fetch an action from
      * @param action The action to fetch
-     * @param results where to store the found results data for the action
-     * @return The result fetched from the result vector, null if the result
+     * @param actionResultList where to store the found results data for the action
+     * @return The result fetched from the result list, null if the result
      *         could not be found
      */
-    public static Vector fetchAllActionResults(
-        Vector wsResultVector,
+    public static List fetchAllActionResults(
+        List resultList,
         int action, 
-        Vector results
+        List actionResultList
     ) {
-        // Find the parts of the security result that matches the given action
-        for (int i = 0; i < wsResultVector.size(); i++) {
-            // Check the result of every action whether it matches the given
-            // action
+        for (int i = 0; i < resultList.size(); i++) {
+            //
+            // Check the result of every action whether it matches the given action
+            //
             WSSecurityEngineResult result = 
-                (WSSecurityEngineResult) wsResultVector.get(i);
+                (WSSecurityEngineResult) resultList.get(i);
             int resultAction = 
                 ((java.lang.Integer)result.get(WSSecurityEngineResult.TAG_ACTION)).intValue();
             if (resultAction == action) {
-                results.add(wsResultVector.get(i));
+                actionResultList.add(result);
             }
         }
-        return results;
+        return actionResultList;
     }
 
     public static int decodeAction(String action, Vector actions) throws WSSecurityException {

@@ -60,7 +60,6 @@ import java.util.Vector;
  * @author Marcel Ammerlaan (marcel.ammerlaan@gmail.com).
  */
 public abstract class WSHandler {
-    public static final String DONE = "done";
     private static Log log = LogFactory.getLog(WSHandler.class.getName());
     protected WSSecurityEngine secEngine = WSSecurityEngine.getInstance();
     protected Hashtable cryptos = new Hashtable(5);
@@ -166,16 +165,14 @@ public abstract class WSHandler {
         }
         /*
          * If SignatureConfirmation is enabled and this is a response then
-         * insert SignatureConfrmation elements, note their wsu:id in the signature
+         * insert SignatureConfirmation elements, note their wsu:id in the signature
          * parts. They will be signed automatically during a (probably) defined
          * SIGN action.
          */
         if (wssConfig.isEnableSignatureConfirmation() && !isRequest) {
             String done = (String) 
                 getProperty(reqData.getMsgContext(), WSHandlerConstants.SIG_CONF_DONE);
-            if (!DONE.equals(done)
-                && (getProperty(reqData.getMsgContext(), WSHandlerConstants.RECV_RESULTS)) 
-                    != null) {
+            if (done == null) {
                 wssConfig.getAction(WSConstants.SC).execute(this, WSConstants.SC, doc, reqData);
             }
         }
@@ -229,17 +226,16 @@ public abstract class WSHandler {
          * other actors.
          */
         if (wssConfig.isEnableSignatureConfirmation() 
-                && isRequest
-                && reqData.getSignatureValues().size() > 0) {
-            Vector sigv = (Vector) 
-            getProperty(reqData.getMsgContext(), WSHandlerConstants.SEND_SIGV);
-            if (sigv == null) {
-                sigv = new Vector();
-                setProperty(reqData.getMsgContext(),
-                        WSHandlerConstants.SEND_SIGV, sigv);
+            && isRequest && reqData.getSignatureValues().size() > 0) {
+            List savedSignatures = 
+                (List)getProperty(reqData.getMsgContext(), WSHandlerConstants.SEND_SIGV);
+            if (savedSignatures == null) {
+                savedSignatures = new Vector();
+                setProperty(
+                    reqData.getMsgContext(), WSHandlerConstants.SEND_SIGV, savedSignatures
+                );
             }
-            // sigv.add(reqData.getSignatureValues());
-            sigv.addAll(reqData.getSignatureValues());
+            savedSignatures.addAll(reqData.getSignatureValues());
         }
     }
 
@@ -328,80 +324,84 @@ public abstract class WSHandler {
         return true;
     }
 
-    protected void checkSignatureConfirmation(RequestData reqData,
-            Vector wsResult) throws WSSecurityException{
+    protected void checkSignatureConfirmation(
+        RequestData reqData,
+        List resultList
+    ) throws WSSecurityException{
         if (doDebug) {
             log.debug("Check Signature confirmation");
         }
-
-        /*
-         * First get all Signature values stored during sending the request
-         */
-        Vector sigv = (Vector) getProperty(reqData.getMsgContext(),
-                WSHandlerConstants.SEND_SIGV);
-        /*
-         * Now get all results that hold a SignatureConfirmation element from
-         * the current run of receiver (we can have more than one run: if we
-         * have several security header blocks with different actors/roles)
-         */
-        Vector sigConf = new Vector();
-        WSSecurityUtil.fetchAllActionResults(wsResult, WSConstants.SC, sigConf);
-        /*
-         * now loop over all SignatureConfirmation results and check:
-         * - if there is a signature value and no Signature value generated in request: error
-         * - if there is a signature value and no matching Signature value found: error
-         * 
-         *  If a matching value found: remove from vector of stored signature values
-         */
+        //
+        // First get all Signature values stored during sending the request
+        //
+        List savedSignatures = 
+            (List) getProperty(reqData.getMsgContext(), WSHandlerConstants.SEND_SIGV);
+        //
+        // Now get all results that hold a SignatureConfirmation element from
+        // the current run of receiver (we can have more than one run: if we
+        // have several security header blocks with different actors/roles)
+        //
+        List sigConf = new Vector();
+        WSSecurityUtil.fetchAllActionResults(resultList, WSConstants.SC, sigConf);
+        //
+        // now loop over all SignatureConfirmation results and check:
+        // - if there is a signature value and no Signature value generated in request: error
+        // - if there is a signature value and no matching Signature value found: error
+        // 
+        //  If a matching value found: remove from vector of stored signature values
+        //
         for (int i = 0; i < sigConf.size(); i++) {
             WSSecurityEngineResult result = 
                 (WSSecurityEngineResult)sigConf.get(i);
             SignatureConfirmation sc = 
-                (SignatureConfirmation)result.get(WSSecurityEngineResult.TAG_SIGNATURE_CONFIRMATION);
+                (SignatureConfirmation)result.get(
+                    WSSecurityEngineResult.TAG_SIGNATURE_CONFIRMATION
+                );
 
             byte[] sigVal = sc.getSignatureValue();
             if (sigVal != null) {
-                if (sigv == null || sigv.size() == 0) {
-                    // If there are no stored signature values
+                if (savedSignatures == null || savedSignatures.size() == 0) {
+                    //
+                    // If there are no stored signature values, and we've received a 
+                    // SignatureConfirmation element then throw an Exception
+                    //
                     if (sigVal.length != 0) {
-                        // If there's no value in the case where there are no
-                        // stored SV it is valid. Therefore if there IS a value 
-                        // in the sig confirmation element
                         throw new WSSecurityException(
-                            "WSHandler: Check Signature confirmation: got a SC element, "
-                            + "but no stored SV"
+                            "Received a SignatureConfirmation element, but there are no stored"
+                             + "signature values"
                         );
                     }
                 } else {
-                    //If we have stored signature values
                     boolean found = false;
-                    for (int ii = 0; ii < sigv.size(); ii++) {
-                        byte[] storedValue = (byte[]) sigv.get(ii);
+                    for (int j = 0; j < savedSignatures.size(); j++) {
+                        byte[] storedValue = (byte[]) savedSignatures.get(j);
                         if (Arrays.equals(sigVal, storedValue)) {
                             found = true;
-                            sigv.remove(ii);
+                            savedSignatures.remove(j);
                             break;
                         }
                     }
                     if (!found) {
                         throw new WSSecurityException(
-                            "WSHandler: Check Signature confirmation: got SC element, "
-                            + "but no matching SV"
+                            "Received a SignatureConfirmation element, but there are no matching"
+                            + "stored signature values"
                         );
                     } 
                 }
             }
         }
 
-        /*
-         * This indicates this is the last handler: the vector holding the
-         * stored Signature values must be empty, otherwise we have an error
-         */
+        //
+        // This indicates this is the last handler: the list holding the
+        // stored Signature values must be empty, otherwise we have an error
+        //
         if (!reqData.isNoSerialization()) {
-            log.debug("Check Signature confirmation - last handler");
-            if (sigv != null && !sigv.isEmpty()) {
+            if (doDebug) {
+                log.debug("Check Signature confirmation - last handler");
+            }
+            if (savedSignatures != null && !savedSignatures.isEmpty()) {
                 throw new WSSecurityException(
-                    "WSHandler: Check Signature confirmation: stored SV vector not empty"
+                    "Check Signature confirmation: the stored signature values list is not empty"
                 );
             }
         }
@@ -918,7 +918,7 @@ public abstract class WSHandler {
             if (!WSSecurityUtil.isActorEqual(reqData.getActor(), hActor)) {
                 continue;
             }
-            Vector wsSecEngineResults = rResult.getResults();
+            List wsSecEngineResults = rResult.getResults();
             /*
              * Scan the results for the first Signature action. Use the
              * certificate of this Signature to set the certificate for the

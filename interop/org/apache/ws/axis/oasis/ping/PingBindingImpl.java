@@ -36,6 +36,7 @@ import org.apache.ws.security.handler.WSHandlerResult;
 
 import javax.xml.rpc.holders.StringHolder;
 import java.security.Principal;
+import java.util.List;
 import java.util.Vector;
 
 public class PingBindingImpl
@@ -57,7 +58,7 @@ public class PingBindingImpl
         for (int i = 0; i < results.size(); i++) {
             WSHandlerResult rResult =
                 (WSHandlerResult) results.get(i);
-            Vector wsSecEngineResults = rResult.getResults();
+            List wsSecEngineResults = rResult.getResults();
 
             for (int j = 0; j < wsSecEngineResults.size(); j++) {
                 WSSecurityEngineResult wser =

@@ -403,7 +403,7 @@ public class WSHandlerConstants {
     public static final String SIG_PROP_FILE = "signaturePropFile";
 
     /**
-     * The key that hold the refernce of the <code>java.util.Properties</code> 
+     * The key that holds the reference of the <code>java.util.Properties</code> 
      * object holding complete info about signature Crypto implementation. 
      * This should contain all information that would contain in an equivalent 
      * .properties file which includes the Crypto implementation class name.

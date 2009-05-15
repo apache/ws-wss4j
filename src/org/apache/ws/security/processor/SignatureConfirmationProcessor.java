@@ -58,7 +58,7 @@ public class SignatureConfirmationProcessor implements Processor {
             0, 
             new WSSecurityEngineResult(WSConstants.SC, sigConf)
         );
-        scId = elem.getAttributeNS(WSConstants.WSU_NS, "Id");
+        scId = sigConf.getID();
     }
     
     public String getId() {

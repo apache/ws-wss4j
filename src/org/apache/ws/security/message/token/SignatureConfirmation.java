@@ -37,20 +37,20 @@ import org.w3c.dom.Node;
  */
 public class SignatureConfirmation {
 
-    private static final String VALUE = "Value"; 
+    public static final String SC_VALUE_ATTR = "Value"; 
     protected Element element = null;
     private byte[] signatureValue = null;
     
     /**
      * Constructs a <code>SignatureConfirmation</code> object and parses the
-     * <code>wsse11:SignatureCOnfirmation</code> element to initialize it.
+     * <code>wsse11:SignatureConfirmation</code> element to initialize it.
      *
      * @param elem the <code>wsse11:SignatureCOnfirmation</code> element that
      *             contains the confirmation data
      */
     public SignatureConfirmation(Element elem) throws WSSecurityException {
         element = elem;
-        String sv = element.getAttribute(VALUE);
+        String sv = element.getAttribute(SC_VALUE_ATTR);
         if (sv != null) {
             signatureValue = Base64.decode(sv);
         }
@@ -62,7 +62,7 @@ public class SignatureConfirmation {
      *
      * @param doc the SOAP envelope as <code>Document</code>
      * @param signVal the Signature value as byte[] of <code>null</code> 
-     *   if no value available.
+     * if no value available.
      */
     public SignatureConfirmation(Document doc, byte[] signVal) {
         element = 
@@ -73,7 +73,7 @@ public class SignatureConfirmation {
         WSSecurityUtil.setNamespace(element, WSConstants.WSSE11_NS, WSConstants.WSSE11_PREFIX);
         if (signVal != null) {
             String sv = Base64.encode(signVal);
-            element.setAttribute(VALUE, sv);
+            element.setAttribute(SC_VALUE_ATTR, sv);
         }
     }
     
@@ -86,9 +86,9 @@ public class SignatureConfirmation {
     }
 
     /**
-     * Returns the dom element of this <code>Timestamp</code> object.
+     * Returns the dom element of this <code>SignatureConfirmation</code> object.
      *
-     * @return the <code>wsse:UsernameToken</code> element
+     * @return the <code>wsse11:SignatureConfirmation</code> element
      */
     public Element getElement() {
         return element;
