@@ -64,7 +64,6 @@ import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
 import java.util.List;
-import java.util.Vector;
 
 public class SignatureProcessor implements Processor {
     private static Log log = LogFactory.getLog(SignatureProcessor.class.getName());
@@ -82,14 +81,14 @@ public class SignatureProcessor implements Processor {
         Crypto decCrypto, 
         CallbackHandler cb, 
         WSDocInfo wsDocInfo, 
-        Vector returnResults, 
+        List returnResults, 
         WSSConfig wsc
     ) throws WSSecurityException {
         if (log.isDebugEnabled()) {
             log.debug("Found signature element");
         }
         boolean remove = WSDocInfoStore.store(wsDocInfo);
-        List protectedRefs = new java.util.ArrayList();
+        List protectedRefs = new java.util.Vector();
         Principal lastPrincipalFound = null;
         certs = null;
         signatureValue = null;
@@ -232,7 +231,7 @@ public class SignatureProcessor implements Processor {
                 // Crypto required only for Binary and SAML
                 //
                 QName el = new QName(token.getNamespaceURI(), token.getLocalName());
-                if (el.equals(WSSecurityEngine.usernameToken)) {
+                if (el.equals(WSSecurityEngine.USERNAME_TOKEN)) {
                     String id = token.getAttributeNS(WSConstants.WSU_NS, "Id");
                     UsernameTokenProcessor utProcessor = 
                         (UsernameTokenProcessor) wsDocInfo.getProcessor(id);
@@ -254,7 +253,7 @@ public class SignatureProcessor implements Processor {
                     
                     secretKey = dktProcessor.getKeyBytes(keyLength);
                 } else {
-                    if (el.equals(WSSecurityEngine.binaryToken)) {
+                    if (el.equals(WSSecurityEngine.BINARY_TOKEN)) {
                         certs = getCertificates(token, wsDocInfo, crypto);
                     } else if (el.equals(WSSecurityEngine.SAML_TOKEN)) {
                         if (crypto == null) {

@@ -19,7 +19,6 @@
 
 package org.apache.ws.security.processor;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 
@@ -60,7 +59,7 @@ public class ReferenceListProcessor implements Processor {
         Crypto decCrypto,
         CallbackHandler cb, 
         WSDocInfo wdi, 
-        Vector returnResults,
+        List returnResults,
         WSSConfig wsc
     ) throws WSSecurityException {
         debug = log.isDebugEnabled();
@@ -91,7 +90,7 @@ public class ReferenceListProcessor implements Processor {
         Crypto crypto,
         WSDocInfo wdi
     ) throws WSSecurityException {
-        List dataRefs = new ArrayList();
+        List dataRefs = new Vector();
         for (Node node = elem.getFirstChild(); 
             node != null; 
             node = node.getNextSibling()

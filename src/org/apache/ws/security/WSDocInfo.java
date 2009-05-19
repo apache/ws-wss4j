@@ -39,15 +39,16 @@ import org.apache.ws.security.processor.Processor;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import java.util.Enumeration;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Vector;
 
 public class WSDocInfo {
     Document doc = null;
     Crypto crypto = null;
-    Vector bst = null;
+    List bst = null;
     Element assertion = null;
-    Vector processors = null;
+    List processors = null;
 
     public WSDocInfo(Document doc) {
         this.doc = doc;
@@ -60,10 +61,10 @@ public class WSDocInfo {
         crypto = null;
         assertion = null;
         if (bst != null && bst.size() > 0) {
-            bst.removeAllElements();
+            bst.clear();
         }
         if (processors != null && processors.size() > 0) {
-            processors.removeAllElements();
+            processors.clear();
         }
         
         bst = null;
@@ -84,8 +85,8 @@ public class WSDocInfo {
         Element elem = null;
 
         if (bst != null) {
-            for (Enumeration e = bst.elements(); e.hasMoreElements();) {
-                elem = (Element) e.nextElement();
+            for (Iterator iter = bst.iterator(); iter.hasNext();) {
+                elem = (Element) iter.next();
                 String cId = elem.getAttribute("Id");
                 if (id.equals(cId)) {
                     break;
@@ -108,8 +109,8 @@ public class WSDocInfo {
 
         Processor p = null;
         if (processors != null) {
-            for (Enumeration e = processors.elements(); e.hasMoreElements();) {
-                p = (Processor) e.nextElement();
+            for (Iterator iter = processors.iterator(); iter.hasNext();) {
+                p = (Processor) iter.next();
                 String cId = p.getId();
                 if (id.equals(cId)) {
                     return p;

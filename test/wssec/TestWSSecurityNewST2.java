@@ -43,7 +43,6 @@ import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.handler.RequestData;
-import org.apache.ws.security.handler.WSHandler;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.message.WSSecHeader;
 import org.w3c.dom.Document;
@@ -56,7 +55,7 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Vector;
+import java.util.List;
 
 /**
  * Test-case for sending and processing an signed (sender vouches) SAML Assertion.
@@ -156,7 +155,7 @@ public class TestWSSecurityNewST2 extends TestCase implements CallbackHandler {
             LOG.debug(outputString);
         }
         
-        Vector results = verify(signedDoc);
+        List results = verify(signedDoc);
         WSSecurityEngineResult actionResult =
             WSSecurityUtil.fetchActionResult(results, WSConstants.ST_UNSIGNED);
         SAMLAssertion receivedAssertion = 
@@ -199,7 +198,7 @@ public class TestWSSecurityNewST2 extends TestCase implements CallbackHandler {
             LOG.debug(outputString);
         }
         
-        Vector results = verify(signedDoc);
+        List results = verify(signedDoc);
         WSSecurityEngineResult actionResult =
             WSSecurityUtil.fetchActionResult(results, WSConstants.ST_UNSIGNED);
         SAMLAssertion receivedAssertion = 
@@ -243,7 +242,7 @@ public class TestWSSecurityNewST2 extends TestCase implements CallbackHandler {
             LOG.debug(outputString);
         }
         
-        Vector results = verify(signedDoc);
+        List results = verify(signedDoc);
         WSSecurityEngineResult actionResult =
             WSSecurityUtil.fetchActionResult(results, WSConstants.ST_UNSIGNED);
         SAMLAssertion receivedAssertion = 
@@ -290,7 +289,7 @@ public class TestWSSecurityNewST2 extends TestCase implements CallbackHandler {
         reqData.setMsgContext(msgContext);
         
         MyHandler handler = new MyHandler();
-        handler.doit(WSConstants.ST_SIGNED, reqData);
+        handler.receive(WSConstants.ST_SIGNED, reqData);
         
         secEngine.processSecurityHeader(
             signedDoc, null, this, reqData.getSigCrypto(), reqData.getDecCrypto()
@@ -304,7 +303,7 @@ public class TestWSSecurityNewST2 extends TestCase implements CallbackHandler {
         
         handler = new MyHandler();
         try {
-            handler.doit(WSConstants.ST_SIGNED, reqData);
+            handler.receive(WSConstants.ST_SIGNED, reqData);
             fail("Failure expected on a bad crypto properties file");
         } catch (RuntimeException ex) {
             // expected
@@ -318,8 +317,8 @@ public class TestWSSecurityNewST2 extends TestCase implements CallbackHandler {
      * @param doc
      * @throws Exception Thrown when there is a problem in verification
      */
-    private Vector verify(Document doc) throws Exception {
-        Vector results = secEngine.processSecurityHeader(doc, null, this, crypto);
+    private List verify(Document doc) throws Exception {
+        List results = secEngine.processSecurityHeader(doc, null, this, crypto);
         String outputString = 
             org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
         assertTrue(outputString.indexOf("LogTestService2") > 0 ? true : false);
@@ -344,44 +343,4 @@ public class TestWSSecurityNewST2 extends TestCase implements CallbackHandler {
         }
     }
     
-    /**
-     * a trivial extension of the WSHandler type
-     */
-    public static class MyHandler extends WSHandler {
-        
-        public Object 
-        getOption(String key) {
-            return null;
-        }
-        
-        public void 
-        setProperty(
-            Object msgContext, 
-            String key, 
-            Object value
-        ) {
-        }
-
-        public Object 
-        getProperty(Object ctx, String key) {
-            java.util.Map ctxMap = (java.util.Map)ctx;
-            return ctxMap.get(key);
-        }
-    
-        public void 
-        setPassword(Object msgContext, String password) {
-        }
-        
-        public String 
-        getPassword(Object msgContext) {
-            return null;
-        }
-
-        void doit(
-            int action, 
-            RequestData reqData
-        ) throws org.apache.ws.security.WSSecurityException {
-            doReceiverAction(action, reqData);
-        }
-    }
 }

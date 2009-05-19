@@ -162,11 +162,12 @@ public class TestWSSecurityGetPassword extends TestCase {
         actions.add(new Integer(WSConstants.UT));
         Document doc = unsignedEnvelope.getAsDocument();
         MyHandler handler = new MyHandler();
-        handler.doit(
+        handler.send(
             WSConstants.UT, 
             doc, 
             reqData, 
-            actions
+            actions,
+            true
         );
         
         String outputString = 
@@ -202,11 +203,12 @@ public class TestWSSecurityGetPassword extends TestCase {
         actions.add(new Integer(WSConstants.UT));
         Document doc = unsignedEnvelope.getAsDocument();
         MyHandler handler = new MyHandler();
-        handler.doit(
+        handler.send(
             WSConstants.UT, 
             doc, 
             reqData, 
-            actions
+            actions,
+            true
         );
         
         String outputString = 
@@ -219,53 +221,6 @@ public class TestWSSecurityGetPassword extends TestCase {
     }
     
 
-    /**
-     * a trivial extension of the WSHandler type
-     */
-    public static class MyHandler extends WSHandler {
-        
-        public Object 
-        getOption(String key) {
-            return null;
-        }
-        
-        public void 
-        setProperty(
-            Object msgContext, 
-            String key, 
-            Object value
-        ) {
-        }
-
-        public Object 
-        getProperty(Object ctx, String key) {
-           return ((java.util.Map)ctx).get(key);
-        }
-    
-        public void 
-        setPassword(Object msgContext, String password) {
-        }
-        
-        public String 
-        getPassword(Object msgContext) {
-            return (String)((java.util.Map)msgContext).get("password");
-        }
-        
-        void doit(
-            int action, 
-            Document doc,
-            RequestData reqData, 
-            java.util.Vector actions
-        ) throws org.apache.ws.security.WSSecurityException {
-            doSenderAction(
-                action, 
-                doc, 
-                reqData, 
-                actions,
-                true
-            );
-        }
-    }
     
     public static class MyCallbackHandler implements CallbackHandler {
         public void handle(Callback[] callbacks)

@@ -33,7 +33,7 @@ import org.w3c.dom.Element;
 import javax.security.auth.callback.CallbackHandler;
 
 import java.security.cert.X509Certificate;
-import java.util.Vector;
+import java.util.List;
 
 
 /**
@@ -77,7 +77,7 @@ public class BinarySecurityTokenProcessor implements Processor {
         Crypto decCrypto,
         CallbackHandler cb, 
         WSDocInfo wsDocInfo, 
-        Vector returnResults,
+        List returnResults,
         WSSConfig config
     ) throws WSSecurityException {
         getCertificatesTokenReference(elem, crypto);

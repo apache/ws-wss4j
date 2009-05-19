@@ -34,7 +34,6 @@ import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
-import org.apache.ws.security.handler.WSHandler;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.message.WSSecSignature;
 import org.apache.ws.security.message.WSSecHeader;
@@ -228,11 +227,12 @@ public class TestWSSecurityUserProcessor extends TestCase {
         MyHandler handler = new MyHandler();
         reqData.setMsgContext("bread");
         assertEquals(reqData.getMsgContext(), "bread");
-        handler.doit(
+        handler.send(
             action, 
             doc, 
             reqData, 
-            actions
+            actions,
+            true
         );
         assertEquals(reqData.getMsgContext(), "crumb");
     }
@@ -257,60 +257,14 @@ public class TestWSSecurityUserProcessor extends TestCase {
         MyHandler handler = new MyHandler();
         reqData.setMsgContext("bread");
         assertEquals(reqData.getMsgContext(), "bread");
-        handler.doit(
+        handler.send(
             action, 
             doc, 
             reqData, 
-            actions
+            actions,
+            true
         );
         assertEquals(reqData.getMsgContext(), "crumb");
     }
-    
-    /**
-     * a trivial extension of the WSHandler type
-     */
-    public static class MyHandler extends WSHandler {
-        
-        public Object 
-        getOption(String key) {
-            return null;
-        }
-        
-        public void 
-        setProperty(
-            Object msgContext, 
-            String key, 
-            Object value
-        ) {
-        }
 
-        public Object 
-        getProperty(Object ctx, String key) {
-            return null;
-        }
-    
-        public void 
-        setPassword(Object msgContext, String password) {
-        }
-        
-        public String 
-        getPassword(Object msgContext) {
-            return null;
-        }
-
-        void doit(
-            int action, 
-            Document doc,
-            RequestData reqData, 
-            java.util.Vector actions
-        ) throws org.apache.ws.security.WSSecurityException {
-            doSenderAction(
-                action, 
-                doc, 
-                reqData, 
-                actions,
-                true
-            );
-        }
-    }
 }

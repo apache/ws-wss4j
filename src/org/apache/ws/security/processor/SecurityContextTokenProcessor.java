@@ -34,7 +34,7 @@ import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
 
 import java.io.IOException;
-import java.util.Vector;
+import java.util.List;
 
 /**
  * The processor to process <code>wsc:SecurityContextToken</code>.
@@ -66,7 +66,7 @@ public class SecurityContextTokenProcessor implements Processor {
         Crypto decCrypto,
         CallbackHandler cb, 
         WSDocInfo wsDocInfo, 
-        Vector returnResults,
+        List returnResults,
         WSSConfig config
     ) throws WSSecurityException {
         SecurityContextToken sct = new SecurityContextToken(elem);

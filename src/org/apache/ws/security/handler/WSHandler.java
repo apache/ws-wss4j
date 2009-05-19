@@ -73,7 +73,7 @@ public abstract class WSHandler {
      * @param doAction a set defining the actions to do 
      * @param doc   the request as DOM document 
      * @param reqData a data storage to pass values around between methods
-     * @param actions a vector holding the actions to do in the order defined
+     * @param actions a list holding the actions to do in the order defined
      *                in the deployment file or property
      * @throws WSSecurityException
      */
@@ -81,7 +81,7 @@ public abstract class WSHandler {
             int doAction, 
             Document doc,
             RequestData reqData, 
-            Vector actions, 
+            List actions, 
             boolean isRequest
     ) throws WSSecurityException {
 
@@ -273,12 +273,10 @@ public abstract class WSHandler {
         }
     }
 
-    protected boolean checkReceiverResults(Vector wsResult, Vector actions) {
-        int resultActions = wsResult.size();
+    protected boolean checkReceiverResults(List wsResult, List actions) {
         int size = actions.size();
-
         int ai = 0;
-        for (int i = 0; i < resultActions; i++) {
+        for (int i = 0; i < wsResult.size(); i++) {
             final Integer actInt = (Integer) ((WSSecurityEngineResult) wsResult
                     .get(i)).get(WSSecurityEngineResult.TAG_ACTION);
             int act = actInt.intValue();
@@ -297,11 +295,10 @@ public abstract class WSHandler {
         return true;
     }
     
-    protected boolean checkReceiverResultsAnyOrder(Vector wsResult, Vector actions) {
-        int resultActions = wsResult.size();
-        Vector actionsClone = (Vector)actions.clone();
+    protected boolean checkReceiverResultsAnyOrder(List wsResult, List actions) {
         
-        for (int i = 0; i < resultActions; i++) {
+        int ai = 0;
+        for (int i = 0; i < wsResult.size(); i++) {
             final Integer actInt = (Integer) ((WSSecurityEngineResult) wsResult
                     .get(i)).get(WSSecurityEngineResult.TAG_ACTION);
             int act = actInt.intValue();
@@ -309,15 +306,13 @@ public abstract class WSHandler {
                 continue;
             }
             
-            int foundIndex = actionsClone.indexOf(actInt);
-            if (foundIndex == -1) {
+            if (actions.indexOf(actInt) == -1) {
                 return false;
-            } else {
-                actionsClone.remove(foundIndex);
             }
+            ai++;
         }
 
-        if (!actionsClone.isEmpty()) {
+        if (ai != actions.size()) {
             return false;
         }
 
@@ -902,8 +897,8 @@ public abstract class WSHandler {
         if (!WSHandlerConstants.USE_REQ_SIG_CERT.equals(reqData.getEncUser())) {
             return;
         }
-        Vector results = 
-            (Vector) getProperty(reqData.getMsgContext(), WSHandlerConstants.RECV_RESULTS);
+        List results = 
+            (List) getProperty(reqData.getMsgContext(), WSHandlerConstants.RECV_RESULTS);
         if (results == null) {
             return;
         }
@@ -1128,7 +1123,6 @@ public abstract class WSHandler {
 
         // SECOND step
         // Search for the issuer of the transmitted certificate in the keystore
-
         // Search the keystore for the alias of the transmitted certificates issuer
         try {
             aliases = reqData.getSigCrypto().getAliasesForDN(issuerString);

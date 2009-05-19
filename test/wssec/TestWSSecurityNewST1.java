@@ -45,7 +45,7 @@ import org.opensaml.SAMLAssertion;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.util.Vector;
+import java.util.List;
 
 /**
  * Test-case for sending and processing an unsigned (sender vouches) SAML Assertion.
@@ -137,7 +137,7 @@ public class TestWSSecurityNewST1 extends TestCase {
             LOG.debug(outputString);
         }
         
-        Vector results = verify(unsignedDoc);
+        List results = verify(unsignedDoc);
         WSSecurityEngineResult actionResult =
             WSSecurityUtil.fetchActionResult(results, WSConstants.ST_UNSIGNED);
         SAMLAssertion receivedAssertion = 
@@ -152,8 +152,8 @@ public class TestWSSecurityNewST1 extends TestCase {
      * @param envelope 
      * @throws Exception Thrown when there is a problem in verification
      */
-    private Vector verify(Document doc) throws Exception {
-        Vector results = secEngine.processSecurityHeader(doc, null, null, null);
+    private List verify(Document doc) throws Exception {
+        List results = secEngine.processSecurityHeader(doc, null, null, null);
         String outputString = 
             org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
         assertTrue(outputString.indexOf("LogTestService2") > 0 ? true : false);

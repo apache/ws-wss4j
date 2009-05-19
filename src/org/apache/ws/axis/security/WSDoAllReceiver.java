@@ -51,6 +51,7 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Vector;
 
 public class WSDoAllReceiver extends WSDoAllHandler {
@@ -88,7 +89,7 @@ public class WSDoAllReceiver extends WSDoAllHandler {
         try {
             reqData.setMsgContext(msgContext);
 
-            Vector actions = new Vector();
+            List actions = new Vector();
             String action = null;
             if ((action = (String) getOption(WSHandlerConstants.ACTION)) == null) {
                 action = (String) msgContext
@@ -154,7 +155,7 @@ public class WSDoAllReceiver extends WSDoAllHandler {
             * they may be used for encryption too.
             */
             doReceiverAction(doAction, reqData);
-            Vector wsResult = null;
+            List wsResult = null;
             if (tlog.isDebugEnabled()) {
                 t1 = System.currentTimeMillis();
             }        
@@ -307,8 +308,8 @@ public class WSDoAllReceiver extends WSDoAllHandler {
             * All ok up to this point. Now construct and setup the security
             * result structure. The service may fetch this and check it.
             */
-            Vector results = null;
-            if ((results = (Vector) msgContext
+            List results = null;
+            if ((results = (List) msgContext
                     .getProperty(WSHandlerConstants.RECV_RESULTS)) == null) {
                 results = new Vector();
                 msgContext

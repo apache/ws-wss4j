@@ -36,6 +36,7 @@ import org.w3c.dom.Document;
 
 import java.io.ByteArrayOutputStream;
 import java.io.UnsupportedEncodingException;
+import java.util.List;
 import java.util.Vector;
 
 /**
@@ -79,7 +80,7 @@ public class WSDoAllSender extends WSDoAllHandler {
             /*
              * Get the action first.
              */
-            Vector actions = new Vector();
+            List actions = new Vector();
             String action = getString(WSHandlerConstants.ACTION, mc);
             if (action == null) {
                 throw new AxisFault("WSDoAllSender: No action defined");

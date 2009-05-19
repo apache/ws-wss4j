@@ -22,7 +22,7 @@ package wssec;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
 
 import javax.security.auth.callback.Callback;
@@ -157,7 +157,7 @@ public class TestWSSecurityDataRef extends TestCase implements CallbackHandler {
         /*
          * Set up the parts structure to encrypt the body
          */
-        Vector parts = new Vector();
+        List parts = new Vector();
         WSEncryptionPart encP = new WSEncryptionPart("testMethod", "uri:LogTestService2",
                 "Element");
         parts.add(encP);
@@ -194,8 +194,8 @@ public class TestWSSecurityDataRef extends TestCase implements CallbackHandler {
      */
     private void checkDataRef(Document doc) throws Exception {
         
-        // Retrieve the wsResults vector 
-        Vector wsResults = secEngine.processSecurityHeader(doc, null, this, crypto);
+        // Retrieve the wsResults List 
+        List wsResults = secEngine.processSecurityHeader(doc, null, this, crypto);
         boolean found = false;
                 
         for (int i = 0; i < wsResults.size(); i++) {
@@ -209,7 +209,7 @@ public class TestWSSecurityDataRef extends TestCase implements CallbackHandler {
             if (action != WSConstants.ENCR) {
                 continue;
             }
-            ArrayList dataRefs = (ArrayList)wsSecEngineResult
+            List dataRefs = (List)wsSecEngineResult
                 .get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
             
             //We want check only the DATA_REF_URIS 

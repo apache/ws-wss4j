@@ -26,7 +26,7 @@ import org.apache.ws.security.components.crypto.Crypto;
 import org.w3c.dom.Element;
 
 import javax.security.auth.callback.CallbackHandler;
-import java.util.Vector;
+import java.util.List;
 
 public interface Processor {
     
@@ -36,7 +36,7 @@ public interface Processor {
         Crypto decCrypto,
         CallbackHandler cb, 
         WSDocInfo wsDocInfo, 
-        Vector returnResults,
+        List returnResults,
         WSSConfig config
     ) throws WSSecurityException;
     

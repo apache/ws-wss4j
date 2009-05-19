@@ -52,7 +52,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import java.util.Vector;
+import java.util.List;
 
 /**
  * WS-Security Test Case for UsernameToken Key Derivation, as defined in the 
@@ -344,7 +344,7 @@ public class TestWSSecurityUTDK extends TestCase implements CallbackHandler {
             LOG.debug(outputString);
         }
         
-        Vector results = verify(signedDoc);
+        List results = verify(signedDoc);
         WSSecurityEngineResult actionResult =
             WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
         java.security.Principal principal = 
@@ -449,7 +449,7 @@ public class TestWSSecurityUTDK extends TestCase implements CallbackHandler {
      * @param env soap envelope
      * @throws java.lang.Exception Thrown when there is a problem in verification
      */
-    private Vector verify(Document doc) throws Exception {
+    private List verify(Document doc) throws Exception {
         return secEngine.processSecurityHeader(doc, null, this, crypto);
     }
     

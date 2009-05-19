@@ -120,11 +120,11 @@ public class WSSConfig {
                 org.apache.ws.security.processor.SignatureProcessor.class.getName()
             );
             tmp.put(
-                WSSecurityEngine.timeStamp,
+                WSSecurityEngine.TIMESTAMP,
                 org.apache.ws.security.processor.TimestampProcessor.class.getName()
             );
             tmp.put(
-                WSSecurityEngine.usernameToken,
+                WSSecurityEngine.USERNAME_TOKEN,
                 org.apache.ws.security.processor.UsernameTokenProcessor.class.getName()
             );
             tmp.put(
@@ -132,7 +132,7 @@ public class WSSConfig {
                 org.apache.ws.security.processor.ReferenceListProcessor.class.getName()
             );
             tmp.put(
-                WSSecurityEngine.signatureConfirmation,
+                WSSecurityEngine.SIGNATURE_CONFIRMATION,
                 org.apache.ws.security.processor.SignatureConfirmationProcessor.class.getName()
             );
             tmp.put(
@@ -152,7 +152,7 @@ public class WSSConfig {
                 tmp.get(WSSecurityEngine.SECURITY_CONTEXT_TOKEN_05_02)
             );
             tmp.put(
-                WSSecurityEngine.binaryToken,
+                WSSecurityEngine.BINARY_TOKEN,
                 org.apache.ws.security.processor.BinarySecurityTokenProcessor.class.getName()
             );
             tmp.put(

@@ -48,7 +48,6 @@ import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.handler.RequestData;
-import org.apache.ws.security.handler.WSHandler;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.message.WSSecEncrypt;
 import org.apache.ws.security.message.WSSecEncryptedKey;
@@ -271,7 +270,8 @@ public class TestWSSecurityNew17 extends TestCase implements CallbackHandler {
             WSConstants.SIGN, 
             doc, 
             reqData, 
-            actions
+            actions,
+            true
         );
         
         String outputString = 
@@ -329,61 +329,5 @@ public class TestWSSecurityNew17 extends TestCase implements CallbackHandler {
         }
     }
     
-    /**
-     * a trivial extension of the WSHandler type
-     */
-    private static class MyHandler extends WSHandler {
-        
-        public Object 
-        getOption(String key) {
-            return null;
-        }
-        
-        public void 
-        setProperty(
-            Object msgContext, 
-            String key, 
-            Object value
-        ) {
-        }
 
-        public Object 
-        getProperty(Object ctx, String key) {
-            return ((java.util.Map)ctx).get(key);
-        }
-    
-        public void 
-        setPassword(Object msgContext, String password) {
-        }
-        
-        public String 
-        getPassword(Object msgContext) {
-            return null;
-        }
-
-        void send(
-            int action, 
-            Document doc,
-            RequestData reqData, 
-            java.util.Vector actions
-        ) throws org.apache.ws.security.WSSecurityException {
-            doSenderAction(
-                action, 
-                doc, 
-                reqData, 
-                actions,
-                true
-            );
-        }
-        
-        void receive(
-            int action, 
-            RequestData reqData
-        ) throws org.apache.ws.security.WSSecurityException {
-            doReceiverAction(
-                action, 
-                reqData
-            );
-        }
-    }
 }

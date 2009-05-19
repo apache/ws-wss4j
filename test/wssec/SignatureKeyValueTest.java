@@ -44,6 +44,7 @@ import org.w3c.dom.Document;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
@@ -141,7 +142,7 @@ public class SignatureKeyValueTest extends TestCase implements CallbackHandler {
         }
         assertTrue(outputString.indexOf("RSAKeyValue") != -1);
         
-        final java.util.Vector results = verify(signedDoc);
+        final List results = verify(signedDoc);
         WSSecurityEngineResult actionResult = 
             WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
         assertTrue(actionResult != null);
@@ -206,7 +207,7 @@ public class SignatureKeyValueTest extends TestCase implements CallbackHandler {
         }
         assertTrue(outputString.indexOf("DSAKeyValue") != -1);
         
-        final java.util.Vector results = verify(signedDoc);
+        final List results = verify(signedDoc);
         WSSecurityEngineResult actionResult = 
             WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
         assertTrue(actionResult != null);
@@ -227,7 +228,7 @@ public class SignatureKeyValueTest extends TestCase implements CallbackHandler {
      * @param env soap envelope
      * @throws java.lang.Exception Thrown when there is a problem in verification
      */
-    private java.util.Vector verify(Document doc) throws Exception {
+    private List verify(Document doc) throws Exception {
         return secEngine.processSecurityHeader(doc, null, this, null);
     }
     

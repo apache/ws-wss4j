@@ -727,11 +727,13 @@ public class WSSecurityUtil {
      * 
      * @param resultList The result list to fetch an action from
      * @param action The action to fetch
-     * @return The first result fetched from the result list, null if the result
+     * @return The last result fetched from the result list, null if the result
      *         could not be found
      */
     public static WSSecurityEngineResult fetchActionResult(List resultList, int action) {
 
+        WSSecurityEngineResult returnResult = null;
+        
         for (int i = 0; i < resultList.size(); i++) {
             //
             // Check the result of every action whether it matches the given action
@@ -741,11 +743,11 @@ public class WSSecurityUtil {
             int resultAction = 
                 ((java.lang.Integer)result.get(WSSecurityEngineResult.TAG_ACTION)).intValue();
             if (resultAction == action) {
-                return result;
+                returnResult = result;
             }
         }
 
-        return null;
+        return returnResult;
     }
     
 
@@ -778,7 +780,7 @@ public class WSSecurityUtil {
         return actionResultList;
     }
 
-    public static int decodeAction(String action, Vector actions) throws WSSecurityException {
+    public static int decodeAction(String action, List actions) throws WSSecurityException {
 
         int doAction = 0;
         if (action == null) {
@@ -878,13 +880,13 @@ public class WSSecurityUtil {
     
     /**
      * Check that all of the QName[] requiredParts are protected by a specified action in the
-     * results vector.
-     * @param results The Vector of WSSecurityEngineResults from processing
+     * results list.
+     * @param results The List of WSSecurityEngineResults from processing
      * @param action The action that is required (e.g. WSConstants.SIGN)
      * @param requiredParts An array of QNames that correspond to the required elements
      */
     public static void checkAllElementsProtected(
-        Vector results,
+        List results,
         int action,
         QName[] requiredParts
     ) throws WSSecurityException {
@@ -1035,7 +1037,7 @@ public class WSSecurityUtil {
         if (parent == null) {
             return java.util.Collections.EMPTY_LIST;
         }
-        final java.util.List ret = new java.util.ArrayList();
+        final java.util.List ret = new java.util.Vector();
         Node node = parent.getFirstChild();
         while (node != null) {
             ret.add(node);
@@ -1058,7 +1060,7 @@ public class WSSecurityUtil {
         if (b.size() == 0) {
             return java.util.Collections.EMPTY_LIST;
         }
-        final java.util.List ret = new java.util.ArrayList();
+        final java.util.List ret = new java.util.Vector();
         for (
             final java.util.Iterator bpos = b.iterator();
             bpos.hasNext();

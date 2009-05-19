@@ -204,9 +204,9 @@ public abstract class CryptoBase implements Crypto {
         return (PrivateKey) keyTmp;
     }
 
-    protected Vector splitAndTrim(String inString) {
+    protected List splitAndTrim(String inString) {
         X509NameTokenizer nmTokens = new X509NameTokenizer(inString);
-        Vector vr = new Vector();
+        List vr = new Vector();
 
         while (nmTokens.hasMoreTokens()) {
             vr.add(nmTokens.nextToken());
@@ -577,7 +577,7 @@ public abstract class CryptoBase implements Crypto {
      * for each alias. Then the DN of the certificate is compared with the parameters.
      *
      * @param subjectDN The DN of subject to look for in the keystore
-     * @return Vector with all alias of certificates with the same DN as given in the parameters
+     * @return Array with all alias of certificates with the same DN as given in the parameters
      * @throws org.apache.ws.security.WSSecurityException
      *
      */
@@ -585,7 +585,7 @@ public abstract class CryptoBase implements Crypto {
 
         // The DN to search the keystore for
         X500Principal subjectRDN = new X500Principal(subjectDN);
-        Vector aliases = getAlias(subjectRDN, keystore);
+        List aliases = getAlias(subjectRDN, keystore);
         
         //If we can't find the issuer in the keystore then look at cacerts
         if (aliases.size() == 0 && cacerts != null) {
@@ -595,7 +595,7 @@ public abstract class CryptoBase implements Crypto {
         // Convert the vector into an array
         String[] result = new String[aliases.size()];
         for (int i = 0; i < aliases.size(); i++) {
-            result[i] = (String) aliases.elementAt(i);
+            result[i] = (String) aliases.get(i);
         }
 
         return result;
@@ -614,10 +614,10 @@ public abstract class CryptoBase implements Crypto {
      */
     public byte[] getCertificateData(boolean reverse, X509Certificate[] certs)
         throws WSSecurityException {
-        Vector list = new Vector();
+        List list = new Vector();
         for (int i = 0; i < certs.length; i++) {
             if (reverse) {
-                list.insertElementAt(certs[i], 0);
+                list.add(0, certs[i]);
             } else {
                 list.add(certs[i]);
             }
@@ -755,9 +755,9 @@ public abstract class CryptoBase implements Crypto {
         return true;
     }
     
-    private Vector getAlias(X500Principal subjectRDN, KeyStore store) throws WSSecurityException {
+    private List getAlias(X500Principal subjectRDN, KeyStore store) throws WSSecurityException {
         // Store the aliases found
-        Vector aliases = new Vector();
+        List aliases = new Vector();
         Certificate cert = null;
         
         try {

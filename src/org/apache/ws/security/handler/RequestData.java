@@ -57,7 +57,7 @@ public class RequestData {
     private X509Certificate encCert = null;
     private int timeToLive = 300;   // Timestamp: time in seconds between creation and expiry
     private WSSConfig wssConfig = null;
-    private Vector signatureValues = new Vector();
+    private List signatureValues = new Vector();
     private WSSecHeader secHeader = null;
     private boolean encSymmetricEncryptionKey = true;
 
@@ -258,9 +258,9 @@ public class RequestData {
     }
     
     /**
-     * @return Returns the vector of stored signature values.
+     * @return Returns the list of stored signature values.
      */
-    public Vector getSignatureValues() {
+    public List getSignatureValues() {
         return signatureValues;
     }
 

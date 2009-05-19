@@ -35,7 +35,6 @@ import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
-import org.apache.ws.security.handler.WSHandler;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.handler.WSHandlerResult;
@@ -129,6 +128,7 @@ public class SignatureConfirmationTest extends TestCase implements CallbackHandl
         java.util.Map msgContext = new java.util.TreeMap();
         msgContext.put(WSHandlerConstants.ENABLE_SIGNATURE_CONFIRMATION, "true");
         msgContext.put(WSHandlerConstants.SIG_PROP_FILE, "crypto.properties");
+        msgContext.put("password", "security");
         reqData.setMsgContext(msgContext);
         reqData.setUsername("16c73ab6-b892-458f-abf5-2f875f74882e");
         
@@ -136,7 +136,7 @@ public class SignatureConfirmationTest extends TestCase implements CallbackHandl
         actions.add(new Integer(WSConstants.SIGN));
         final Document doc = unsignedEnvelope.getAsDocument();
         MyHandler handler = new MyHandler();
-        handler.doit(
+        handler.send(
             WSConstants.SIGN, doc, reqData, actions, true
         );
         if (LOG.isDebugEnabled()) {
@@ -164,6 +164,7 @@ public class SignatureConfirmationTest extends TestCase implements CallbackHandl
         java.util.Map msgContext = new java.util.TreeMap();
         msgContext.put(WSHandlerConstants.ENABLE_SIGNATURE_CONFIRMATION, "false");
         msgContext.put(WSHandlerConstants.SIG_PROP_FILE, "crypto.properties");
+        msgContext.put("password", "security");
         reqData.setMsgContext(msgContext);
         reqData.setUsername("16c73ab6-b892-458f-abf5-2f875f74882e");
         
@@ -171,7 +172,7 @@ public class SignatureConfirmationTest extends TestCase implements CallbackHandl
         actions.add(new Integer(WSConstants.SIGN));
         final Document doc = unsignedEnvelope.getAsDocument();
         MyHandler handler = new MyHandler();
-        handler.doit(
+        handler.send(
             WSConstants.SIGN, doc, reqData, actions, true
         );
         if (LOG.isDebugEnabled()) {
@@ -197,6 +198,7 @@ public class SignatureConfirmationTest extends TestCase implements CallbackHandl
         java.util.Map msgContext = new java.util.TreeMap();
         msgContext.put(WSHandlerConstants.ENABLE_SIGNATURE_CONFIRMATION, "true");
         msgContext.put(WSHandlerConstants.SIG_PROP_FILE, "crypto.properties");
+        msgContext.put("password", "security");
         reqData.setMsgContext(msgContext);
         reqData.setUsername("16c73ab6-b892-458f-abf5-2f875f74882e");
         
@@ -204,7 +206,7 @@ public class SignatureConfirmationTest extends TestCase implements CallbackHandl
         actions.add(new Integer(WSConstants.SIGN));
         Document doc = unsignedEnvelope.getAsDocument();
         MyHandler handler = new MyHandler();
-        handler.doit(
+        handler.send(
             WSConstants.SIGN, doc, reqData, actions, true
         );
         if (LOG.isDebugEnabled()) {
@@ -231,7 +233,7 @@ public class SignatureConfirmationTest extends TestCase implements CallbackHandl
         List receivedResults = new Vector();
         receivedResults.add(handlerResult);
         msgContext.put(WSHandlerConstants.RECV_RESULTS, receivedResults);
-        handler.doit(
+        handler.send(
             WSConstants.NO_SECURITY, doc, reqData, actions, false
         );
         String outputString = 
@@ -254,6 +256,7 @@ public class SignatureConfirmationTest extends TestCase implements CallbackHandl
         java.util.Map msgContext = new java.util.TreeMap();
         msgContext.put(WSHandlerConstants.ENABLE_SIGNATURE_CONFIRMATION, "true");
         msgContext.put(WSHandlerConstants.SIG_PROP_FILE, "crypto.properties");
+        msgContext.put("password", "security");
         reqData.setMsgContext(msgContext);
         reqData.setUsername("16c73ab6-b892-458f-abf5-2f875f74882e");
         
@@ -261,7 +264,7 @@ public class SignatureConfirmationTest extends TestCase implements CallbackHandl
         actions.add(new Integer(WSConstants.SIGN));
         Document doc = unsignedEnvelope.getAsDocument();
         MyHandler handler = new MyHandler();
-        handler.doit(
+        handler.send(
             WSConstants.SIGN, doc, reqData, actions, true
         );
         if (LOG.isDebugEnabled()) {
@@ -282,7 +285,7 @@ public class SignatureConfirmationTest extends TestCase implements CallbackHandl
         List receivedResults = new Vector();
         receivedResults.add(handlerResult);
         msgContext.put(WSHandlerConstants.RECV_RESULTS, receivedResults);
-        handler.doit(
+        handler.send(
             WSConstants.NO_SECURITY, doc, reqData, actions, false
         );
         String outputString = 
@@ -311,8 +314,8 @@ public class SignatureConfirmationTest extends TestCase implements CallbackHandl
      * @param doc 
      * @throws Exception Thrown when there is a problem in verification
      */
-    private Vector verify(Document doc) throws Exception {
-        Vector results = secEngine.processSecurityHeader(doc, null, this, crypto);
+    private List verify(Document doc) throws Exception {
+        List results = secEngine.processSecurityHeader(doc, null, this, crypto);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Verfied and decrypted message:");
             String outputString = 
@@ -322,63 +325,6 @@ public class SignatureConfirmationTest extends TestCase implements CallbackHandl
         return results;
     }
     
-    
-    /**
-     * a trivial extension of the WSHandler type
-     */
-    private static class MyHandler extends WSHandler {
-        
-        public Object 
-        getOption(String key) {
-            return null;
-        }
-        
-        public void 
-        setProperty(
-            Object ctx, 
-            String key, 
-            Object value
-        ) {
-            ((java.util.Map)ctx).put(key, value);
-        }
-
-        public Object 
-        getProperty(Object ctx, String key) {
-            return ((java.util.Map)ctx).get(key);
-        }
-    
-        public void 
-        setPassword(Object msgContext, String password) {
-        }
-        
-        public String 
-        getPassword(Object msgContext) {
-            return "security";
-        }
-
-        void doit(
-            int action, 
-            Document doc,
-            RequestData reqData, 
-            java.util.Vector actions,
-            boolean request
-        ) throws org.apache.ws.security.WSSecurityException {
-            doSenderAction(
-                action, 
-                doc, 
-                reqData, 
-                actions,
-                request
-            );
-        }
-        
-        void signatureConfirmation(
-            RequestData requestData,
-            List results
-        ) throws org.apache.ws.security.WSSecurityException {
-            checkSignatureConfirmation(requestData, results);
-        }
-    }
     
     public void handle(Callback[] callbacks)
         throws IOException, UnsupportedCallbackException {

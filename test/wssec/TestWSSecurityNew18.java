@@ -35,7 +35,6 @@ import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.handler.RequestData;
-import org.apache.ws.security.handler.WSHandler;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.message.WSSecSignature;
 import org.apache.ws.security.message.WSSecHeader;
@@ -223,11 +222,12 @@ public class TestWSSecurityNew18 extends TestCase {
         actions.add(new Integer(action));
         final Document doc = unsignedEnvelope.getAsDocument();
         MyHandler handler = new MyHandler();
-        handler.doit(
+        handler.send(
             action, 
             doc, 
             reqData, 
-            actions
+            actions,
+            true
         );
         String outputString = 
             org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
@@ -245,51 +245,5 @@ public class TestWSSecurityNew18 extends TestCase {
         verify(doc);
     }
     
-    /**
-     * a trivial extension of the WSHandler type
-     */
-    public static class MyHandler extends WSHandler {
-        
-        public Object 
-        getOption(String key) {
-            return null;
-        }
-        
-        public void 
-        setProperty(
-            Object msgContext, 
-            String key, 
-            Object value
-        ) {
-        }
 
-        public Object 
-        getProperty(Object ctx, String key) {
-            return ((java.util.Map)ctx).get(key);
-        }
-    
-        public void 
-        setPassword(Object msgContext, String password) {
-        }
-        
-        public String 
-        getPassword(Object msgContext) {
-            return (String)((java.util.Map)msgContext).get("password");
-        }
-
-        void doit(
-            int action, 
-            Document doc,
-            RequestData reqData, 
-            java.util.Vector actions
-        ) throws org.apache.ws.security.WSSecurityException {
-            doSenderAction(
-                action, 
-                doc, 
-                reqData, 
-                actions,
-                true
-            );
-        }
-    }
 }

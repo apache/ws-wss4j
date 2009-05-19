@@ -33,6 +33,7 @@ import org.w3c.dom.Node;
 import javax.security.auth.callback.CallbackHandler;
 import javax.xml.namespace.QName;
 
+import java.util.List;
 import java.util.Vector;
 
 /**
@@ -59,22 +60,22 @@ public class WSSecurityEngine {
     /**
      * <code>wsse:BinarySecurityToken</code> as defined by WS Security specification
      */
-    public static final QName binaryToken = 
+    public static final QName BINARY_TOKEN = 
         new QName(WSConstants.WSSE_NS, WSConstants.BINARY_TOKEN_LN);
     /**
      * <code>wsse:UsernameToken</code> as defined by WS Security specification
      */
-    public static final QName usernameToken = 
+    public static final QName USERNAME_TOKEN = 
         new QName(WSConstants.WSSE_NS, WSConstants.USERNAME_TOKEN_LN);
     /**
      * <code>wsu:Timestamp</code> as defined by OASIS WS Security specification,
      */
-    public static final QName timeStamp = 
+    public static final QName TIMESTAMP = 
         new QName(WSConstants.WSU_NS, WSConstants.TIMESTAMP_TOKEN_LN);
     /**
      * <code>wsse11:signatureConfirmation</code> as defined by OASIS WS Security specification,
      */
-    public static final QName signatureConfirmation = 
+    public static final QName SIGNATURE_CONFIRMATION = 
         new QName(WSConstants.WSSE11_NS, WSConstants.SIGNATURE_CONFIRMATION_LN);
     /**
      * <code>ds:Signature</code> as defined by XML Signature specification,
@@ -181,16 +182,17 @@ public class WSSecurityEngine {
      *               encryption and {@link UsernameToken} handling
      * @param crypto the object that implements the access to the keystore and the
      *               handling of certificates.
-     * @return a result vector
+     * @return a result list
      * @throws WSSecurityException
      * @see WSSecurityEngine#processSecurityHeader(Element securityHeader, CallbackHandler cb,
      * Crypto sigCrypto, Crypto decCrypto)
      */
-    public Vector processSecurityHeader(Document doc,
-                                        String actor,
-                                        CallbackHandler cb,
-                                        Crypto crypto)
-            throws WSSecurityException {
+    public List processSecurityHeader(
+        Document doc,
+        String actor,
+        CallbackHandler cb,
+        Crypto crypto
+    ) throws WSSecurityException {
         return processSecurityHeader(doc, actor, cb, crypto, crypto);
     }
 
@@ -211,18 +213,18 @@ public class WSSecurityEngine {
      *                  handling of certificates for Signature
      * @param decCrypto the object that implements the access to the keystore and the
      *                  handling of certificates for Decryption
-     * @return a result vector
+     * @return a result list
      * @throws WSSecurityException
      * @see WSSecurityEngine#processSecurityHeader(
      * Element securityHeader, CallbackHandler cb, Crypto sigCrypto, Crypto decCrypto)
      */
-    public Vector processSecurityHeader(Document doc,
-                                        String actor,
-                                        CallbackHandler cb,
-                                        Crypto sigCrypto,
-                                        Crypto decCrypto)
-            throws WSSecurityException {
-
+    public List processSecurityHeader(
+        Document doc,
+        String actor,
+        CallbackHandler cb,
+        Crypto sigCrypto,
+        Crypto decCrypto
+    ) throws WSSecurityException {
         doDebug = log.isDebugEnabled();
         if (doDebug) {
             log.debug("enter processSecurityHeader()");
@@ -231,7 +233,7 @@ public class WSSecurityEngine {
         if (actor == null) {
             actor = "";
         }
-        Vector wsResult = null;
+        List wsResult = null;
         Element elem = WSSecurityUtil.getSecurityHeader(doc, actor);
         if (elem != null) {
             if (doDebug) {
@@ -274,34 +276,36 @@ public class WSSecurityEngine {
      *                       handling of certificates used for Signature
      * @param decCrypto      the object that implements the access to the keystore and the
      *                       handling of certificates used for Decryption
-     * @return a Vector of {@link WSSecurityEngineResult}. Each element in the
-     *         the Vector represents the result of a security action. The elements
+     * @return a List of {@link WSSecurityEngineResult}. Each element in the
+     *         the List represents the result of a security action. The elements
      *         are ordered according to the sequence of the security actions in the
-     *         wsse:Signature header. The Vector maybe empty if no security processing
+     *         wsse:Signature header. The List may be empty if no security processing
      *         was performed.
      * @throws WSSecurityException
      */
-    protected Vector processSecurityHeader(Element securityHeader,
-                                           CallbackHandler cb,
-                                           Crypto sigCrypto,
-                                           Crypto decCrypto) throws WSSecurityException {
+    protected List processSecurityHeader(
+        Element securityHeader,
+        CallbackHandler cb,
+        Crypto sigCrypto,
+        Crypto decCrypto
+    ) throws WSSecurityException {
 
         long t0 = 0, t1 = 0, t2 = 0;
         if (tlog.isDebugEnabled()) {
             t0 = System.currentTimeMillis();
         }
-        /*
-         * Gather some info about the document to process and store
-         * it for retrieval. Store the implementation of signature crypto
-         * (no need for encryption --- yet)
-         */
+        //
+        // Gather some info about the document to process and store
+        // it for retrieval. Store the implementation of signature crypto
+        // (no need for encryption --- yet)
+        //
         WSDocInfo wsDocInfo = new WSDocInfo(securityHeader.getOwnerDocument());
         wsDocInfo.setCrypto(sigCrypto);
 
         if (tlog.isDebugEnabled()) {
             t1 = System.currentTimeMillis();
         }
-        Vector returnResults = new Vector();
+        List returnResults = new Vector();
         final WSSConfig cfg = getWssConfig();
         Node node = securityHeader.getFirstChild();
         while (node != null) {

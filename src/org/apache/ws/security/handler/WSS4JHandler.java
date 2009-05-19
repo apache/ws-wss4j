@@ -52,6 +52,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.UnsupportedEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Vector;
 
 /**
@@ -189,7 +190,7 @@ public class WSS4JHandler extends WSHandler implements Handler {
         /*
         * Get the action first.
         */
-        Vector actions = new Vector();
+        List actions = new Vector();
         String action = (String) getOption(WSHandlerConstants.SEND + '.' + WSHandlerConstants.ACTION);
         if (action == null) {
             action = (String) getOption(WSHandlerConstants.ACTION);
@@ -331,7 +332,7 @@ public class WSS4JHandler extends WSHandler implements Handler {
      */
     public boolean doReceiver(MessageContext mc, RequestData reqData, boolean isRequest) throws WSSecurityException {
 
-        Vector actions = new Vector();
+        List actions = new Vector();
         String action = (String) getOption(WSHandlerConstants.RECEIVE + '.' + WSHandlerConstants.ACTION);
         if (action == null) {
             action = (String) getOption(WSHandlerConstants.ACTION);
@@ -386,7 +387,7 @@ public class WSS4JHandler extends WSHandler implements Handler {
         * may be used for encryption too.
         */
         doReceiverAction(doAction, reqData);
-        Vector wsResult = null;
+        List wsResult = null;
         try {
             wsResult =
                     secEngine.processSecurityHeader(doc,
@@ -507,8 +508,8 @@ public class WSS4JHandler extends WSHandler implements Handler {
         * security result structure. The service may fetch this
         * and check it.
         */
-        Vector results = null;
-        if ((results = (Vector) mc.getProperty(WSHandlerConstants.RECV_RESULTS))
+        List results = null;
+        if ((results = (List) mc.getProperty(WSHandlerConstants.RECV_RESULTS))
                 == null) {
             results = new Vector();
             mc.setProperty(WSHandlerConstants.RECV_RESULTS, results);

@@ -51,7 +51,6 @@ import javax.xml.namespace.QName;
 import java.io.IOException;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 
@@ -72,7 +71,7 @@ public class EncryptedKeyProcessor implements Processor {
         Crypto decCrypto, 
         CallbackHandler cb, 
         WSDocInfo wsDocInfo,
-        Vector returnResults, 
+        List returnResults, 
         WSSConfig wsc
     ) throws WSSecurityException {
         if (log.isDebugEnabled()) {
@@ -182,7 +181,7 @@ public class EncryptedKeyProcessor implements Processor {
             WSSecurityUtil.getDirectChildElement(
                 xencEncryptedKey, "ReferenceList", WSConstants.ENC_NS
             );
-        List dataRefs = new ArrayList();
+        List dataRefs = new Vector();
         if (refList != null) {
             for (Node node = refList.getFirstChild();
                 node != null; 
@@ -380,7 +379,7 @@ public class EncryptedKeyProcessor implements Processor {
             // at this point ... check token type: Binary
             QName el = 
                 new QName(bstElement.getNamespaceURI(), bstElement.getLocalName());
-            if (el.equals(WSSecurityEngine.binaryToken)) {
+            if (el.equals(WSSecurityEngine.BINARY_TOKEN)) {
                 X509Security token = new X509Security(bstElement);
                 String value = bstElement.getAttribute(WSSecurityEngine.VALUE_TYPE);
                 if (!X509Security.X509_V3_TYPE.equals(value) || (token == null)) {

@@ -34,7 +34,7 @@ import javax.crypto.SecretKey;
 import javax.security.auth.callback.CallbackHandler;
 import javax.xml.namespace.QName;
 
-import java.util.Vector;
+import java.util.List;
 
 /**
  * This will process incoming <code>xenc:EncryptedData</code> elements.
@@ -53,7 +53,7 @@ public class EncryptedDataProcessor implements Processor {
         Crypto decCrypto,
         CallbackHandler cb, 
         WSDocInfo wsDocInfo, 
-        Vector returnResults,
+        List returnResults,
         WSSConfig config
     ) throws WSSecurityException {
         Element kiElem = 

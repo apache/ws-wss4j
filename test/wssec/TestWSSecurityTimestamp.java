@@ -42,7 +42,7 @@ import org.w3c.dom.Document;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.util.Vector;
+import java.util.List;
 
 /**
  * WS-Security Test Case for Timestamps.
@@ -135,7 +135,7 @@ public class TestWSSecurityTimestamp extends TestCase {
         //
         // Do some processing
         //
-        Vector wsResult = verify(createdDoc, WSSConfig.getNewInstance());
+        List wsResult = verify(createdDoc, WSSConfig.getNewInstance());
         WSSecurityEngineResult actionResult = 
             WSSecurityUtil.fetchActionResult(wsResult, WSConstants.TS);
         assertTrue(actionResult != null);
@@ -168,7 +168,7 @@ public class TestWSSecurityTimestamp extends TestCase {
         //
         // Do some processing
         //
-        Vector wsResult = verify(createdDoc, WSSConfig.getNewInstance());
+        List wsResult = verify(createdDoc, WSSConfig.getNewInstance());
         WSSecurityEngineResult actionResult = 
             WSSecurityUtil.fetchActionResult(wsResult, WSConstants.TS);
         assertTrue(actionResult != null);
@@ -247,7 +247,7 @@ public class TestWSSecurityTimestamp extends TestCase {
      * @param wssConfig
      * @throws java.lang.Exception Thrown when there is a problem in verification
      */
-    private Vector verify(Document doc, WSSConfig wssConfig) throws Exception {
+    private List verify(Document doc, WSSConfig wssConfig) throws Exception {
         secEngine.setWssConfig(wssConfig);
         return secEngine.processSecurityHeader(doc, null, null, null);
     }

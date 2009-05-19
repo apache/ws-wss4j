@@ -53,7 +53,7 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Vector;
+import java.util.List;
 
 /**
  * Test-case for sending and processing a (signed) holder-of-key SAML Assertion.
@@ -158,7 +158,7 @@ public class TestWSSecurityNewST3 extends TestCase implements CallbackHandler {
             LOG.debug(outputString);
         }
         
-        Vector results = verify(signedDoc);
+        List results = verify(signedDoc);
         WSSecurityEngineResult actionResult =
             WSSecurityUtil.fetchActionResult(results, WSConstants.ST_UNSIGNED);
         SAMLAssertion receivedAssertion = 
@@ -206,7 +206,7 @@ public class TestWSSecurityNewST3 extends TestCase implements CallbackHandler {
             LOG.debug(outputString);
         }
         
-        Vector results = verify(signedDoc);
+        List results = verify(signedDoc);
         WSSecurityEngineResult actionResult =
             WSSecurityUtil.fetchActionResult(results, WSConstants.ST_UNSIGNED);
         SAMLAssertion receivedAssertion = 
@@ -221,8 +221,8 @@ public class TestWSSecurityNewST3 extends TestCase implements CallbackHandler {
      * @param envelope 
      * @throws Exception Thrown when there is a problem in verification
      */
-    private Vector verify(Document doc) throws Exception {
-        Vector results = secEngine.processSecurityHeader(doc, null, this, crypto);
+    private List verify(Document doc) throws Exception {
+        List results = secEngine.processSecurityHeader(doc, null, this, crypto);
         String outputString = 
             org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
         assertTrue(outputString.indexOf("LogTestService2") > 0 ? true : false);

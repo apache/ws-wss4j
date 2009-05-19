@@ -37,7 +37,7 @@ import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
 import java.io.IOException;
 import java.security.Principal;
-import java.util.Vector;
+import java.util.List;
 
 public class UsernameTokenProcessor implements Processor {
     private static Log log = LogFactory.getLog(UsernameTokenProcessor.class.getName());
@@ -47,7 +47,7 @@ public class UsernameTokenProcessor implements Processor {
     private boolean handleCustomPasswordTypes;
     
     public void handleToken(Element elem, Crypto crypto, Crypto decCrypto, CallbackHandler cb, 
-        WSDocInfo wsDocInfo, Vector returnResults, WSSConfig wsc) throws WSSecurityException {
+        WSDocInfo wsDocInfo, List returnResults, WSSConfig wsc) throws WSSecurityException {
         if (log.isDebugEnabled()) {
             log.debug("Found UsernameToken list element");
         }

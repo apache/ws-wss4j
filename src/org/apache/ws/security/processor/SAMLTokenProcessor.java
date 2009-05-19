@@ -32,7 +32,7 @@ import org.opensaml.SAMLException;
 import org.w3c.dom.Element;
 
 import javax.security.auth.callback.CallbackHandler;
-import java.util.Vector;
+import java.util.List;
 
 public class SAMLTokenProcessor implements Processor {
     private static Log log = LogFactory.getLog(SAMLTokenProcessor.class.getName());
@@ -46,7 +46,7 @@ public class SAMLTokenProcessor implements Processor {
         Crypto decCrypto, 
         CallbackHandler cb, 
         WSDocInfo wsDocInfo, 
-        Vector returnResults, 
+        List returnResults, 
         WSSConfig wsc
     ) throws WSSecurityException {
         if (log.isDebugEnabled()) {

@@ -37,7 +37,6 @@ import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.handler.RequestData;
-import org.apache.ws.security.handler.WSHandler;
 import org.apache.ws.security.message.WSSecSignature;
 import org.apache.ws.security.message.WSSecHeader;
 import org.apache.ws.security.util.WSSecurityUtil;
@@ -50,7 +49,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.cert.X509Certificate;
-import java.util.Vector;
+import java.util.List;
 
 /**
  * This is a test for WSS-40. Essentially it just tests that a message is signed using a
@@ -167,7 +166,7 @@ public class TestWSSecurityWSS40 extends TestCase implements CallbackHandler {
         //
         // Verify the signature
         //
-        Vector results = verify(signedDoc, cryptoCA);
+        List results = verify(signedDoc, cryptoCA);
         
         //
         // Verify trust on the X509Certificate
@@ -246,7 +245,7 @@ public class TestWSSecurityWSS40 extends TestCase implements CallbackHandler {
         //
         // Verify the signature
         //
-        Vector results = verify(signedDoc, CryptoFactory.getInstance("wss40badcatrust.properties"));
+        List results = verify(signedDoc, CryptoFactory.getInstance("wss40badcatrust.properties"));
         
         //
         // Verify trust on the X509Certificate
@@ -276,8 +275,8 @@ public class TestWSSecurityWSS40 extends TestCase implements CallbackHandler {
      * @param doc 
      * @throws Exception Thrown when there is a problem in verification
      */
-    private Vector verify(Document doc, Crypto crypto) throws WSSecurityException {
-        Vector results = secEngine.processSecurityHeader(
+    private List verify(Document doc, Crypto crypto) throws WSSecurityException {
+        List results = secEngine.processSecurityHeader(
             doc, null, this, crypto
         );
         if (LOG.isDebugEnabled()) {
@@ -307,46 +306,4 @@ public class TestWSSecurityWSS40 extends TestCase implements CallbackHandler {
         }
     }
     
-    /**
-     * a trivial extension of the WSHandler type
-     */
-    public static class MyHandler extends WSHandler {
-        
-        public Object 
-        getOption(String key) {
-            return null;
-        }
-        
-        public void 
-        setProperty(
-            Object msgContext, 
-            String key, 
-            Object value
-        ) {
-        }
-
-        public Object 
-        getProperty(Object ctx, String key) {
-            return null;
-        }
-    
-        public void 
-        setPassword(Object msgContext, String password) {
-        }
-        
-        public String 
-        getPassword(Object msgContext) {
-            return null;
-        }
-
-        boolean verifyCertificate(
-            X509Certificate cert,
-            RequestData reqData 
-        ) throws org.apache.ws.security.WSSecurityException {
-            return verifyTrust(
-                cert, 
-                reqData
-            );
-        }
-    }
 }

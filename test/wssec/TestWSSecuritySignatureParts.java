@@ -150,7 +150,7 @@ public class TestWSSecuritySignatureParts extends TestCase implements CallbackHa
             LOG.debug(outputString);
         }
         
-        Vector results = verify(signedDoc);
+        List results = verify(signedDoc);
         
         QName name = new QName("urn:foo.bar", "foobar");
         WSSecurityUtil.checkAllElementsProtected(results, WSConstants.SIGN, new QName[]{name});
@@ -271,7 +271,7 @@ public class TestWSSecuritySignatureParts extends TestCase implements CallbackHa
             LOG.debug(outputString);
         }
         
-        Vector results = verify(signedDoc);
+        List results = verify(signedDoc);
         
         QName fooName = new QName("urn:foo.bar", "foobar");
         QName bodyName = new QName(soapConstants.getEnvelopeURI(), "Body");
@@ -318,8 +318,8 @@ public class TestWSSecuritySignatureParts extends TestCase implements CallbackHa
      * @param doc 
      * @throws Exception Thrown when there is a problem in verification
      */
-    private Vector verify(Document doc) throws Exception {
-        Vector results = secEngine.processSecurityHeader(doc, null, this, crypto);
+    private List verify(Document doc) throws Exception {
+        List results = secEngine.processSecurityHeader(doc, null, this, crypto);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Verfied and decrypted message:");
             String outputString = 

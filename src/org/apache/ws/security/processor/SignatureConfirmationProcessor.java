@@ -31,7 +31,7 @@ import org.apache.ws.security.message.token.SignatureConfirmation;
 import org.w3c.dom.Element;
 
 import javax.security.auth.callback.CallbackHandler;
-import java.util.Vector;
+import java.util.List;
 
 public class SignatureConfirmationProcessor implements Processor {
     private static Log log = LogFactory.getLog(SignatureConfirmationProcessor.class.getName());
@@ -44,7 +44,7 @@ public class SignatureConfirmationProcessor implements Processor {
         Crypto decCrypto, 
         CallbackHandler cb, 
         WSDocInfo wsDocInfo, 
-        Vector returnResults, 
+        List returnResults, 
         WSSConfig wsc
     ) throws WSSecurityException {
         if (log.isDebugEnabled()) {

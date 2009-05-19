@@ -31,7 +31,7 @@ import org.apache.ws.security.message.token.Timestamp;
 import org.w3c.dom.Element;
 
 import javax.security.auth.callback.CallbackHandler;
-import java.util.Vector;
+import java.util.List;
 
 public class TimestampProcessor implements Processor {
     private static Log log = LogFactory.getLog(TimestampProcessor.class.getName());
@@ -46,7 +46,7 @@ public class TimestampProcessor implements Processor {
         Crypto decCrypto, 
         CallbackHandler cb, 
         WSDocInfo wsDocInfo, 
-        Vector returnResults, 
+        List returnResults, 
         WSSConfig wsc
     ) throws WSSecurityException {
         if (log.isDebugEnabled()) {
