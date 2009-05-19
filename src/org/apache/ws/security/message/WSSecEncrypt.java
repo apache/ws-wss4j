@@ -450,7 +450,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
 
             boolean content = modifier.equals("Content") ? true : false;
             String xencEncryptedDataId = 
-                config.getIdAllocator().createId("EncDataId-", elementToEncrypt);
+                config.getIdAllocator().createId("ED-", elementToEncrypt);
             encPart.setEncId(xencEncryptedDataId);
             //
             // Encrypt data, and set necessary attributes in xenc:EncryptedData
@@ -466,7 +466,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
                         WSSecurityUtil.setNamespace(elem, WSConstants.WSU_NS, WSConstants.WSU_PREFIX);
                     elem.setAttributeNS(
                         WSConstants.WSU_NS, wsuPrefix + ":Id", 
-                        config.getIdAllocator().createId("EncHeader-", elementToEncrypt)
+                        config.getIdAllocator().createId("EH-", elementToEncrypt)
                     );
                     //
                     // Add the EncryptedHeader node to the element to be encrypted's parent

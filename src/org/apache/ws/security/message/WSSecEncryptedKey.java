@@ -241,7 +241,7 @@ public class WSSecEncryptedKey extends WSSecBase {
         //
         encryptedKeyElement = createEncryptedKey(document, keyEncAlgo);
         if (encKeyId == null || "".equals(encKeyId)) {
-            encKeyId = "EncKeyId-" + UUIDGenerator.getUUID();
+            encKeyId = "EK-" + UUIDGenerator.getUUID();
         }
         encryptedKeyElement.setAttribute("Id", encKeyId);
 

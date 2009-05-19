@@ -283,7 +283,7 @@ public class WSSConfig {
             Transform.init();
             try {
                 Transform.register(
-                    STRTransform.implementedTransformURI,
+                    STRTransform.TRANSFORM_URI,
                     "org.apache.ws.security.transform.STRTransform"
                 );
             } catch (Exception ex) {

@@ -377,7 +377,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
 
                 Element ctx = createSTRParameter(doc);
                 transforms = new Transforms(doc);
-                transforms.addTransform(STRTransform.implementedTransformURI, ctx);
+                transforms.addTransform(STRTransform.TRANSFORM_URI, ctx);
                 sig.addDocument("#" + strSamlUri, transforms);
             }
         } catch (TransformationException e1) {
@@ -555,7 +555,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
                     }
                 } else if (elemName.equals("STRTransform")) { // STRTransform
                     Element ctx = createSTRParameter(document);
-                    transforms.addTransform(STRTransform.implementedTransformURI, ctx);
+                    transforms.addTransform(STRTransform.TRANSFORM_URI, ctx);
                     sig.addDocument("#" + strUri, transforms);
                 } else {
                     Element body = 

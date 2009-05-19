@@ -54,10 +54,7 @@ import java.security.cert.X509Certificate;
  */
 public class STRTransform extends TransformSpi {
 
-    /**
-     * Field implementedTransformURI
-     */
-    public static final String implementedTransformURI = 
+    public static final String TRANSFORM_URI = 
         "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#STR-Transform";
 
     private static Log log = LogFactory.getLog(STRTransform.class.getName());
@@ -88,7 +85,7 @@ public class STRTransform extends TransformSpi {
      * Method engineGetURI
      */
     protected String engineGetURI() {
-        return STRTransform.implementedTransformURI;
+        return STRTransform.TRANSFORM_URI;
     }
 
     /**

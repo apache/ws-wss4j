@@ -31,22 +31,23 @@ package org.apache.ws.security;
  */
 
 import java.util.Hashtable;
+import java.util.Map;
 
 import org.w3c.dom.Document;
 
 public class WSDocInfoStore {
 
-    static Hashtable storage = new Hashtable(10);
+    private static final Map STORAGE = new Hashtable(10);
 
     public static WSDocInfo lookup(Document doc) {
-        return (WSDocInfo) storage.get(doc);
+        return (WSDocInfo) STORAGE.get(doc);
     }
 
     public static boolean store(WSDocInfo info) {
-        return storage.put(info.getDocument(), info) == null;
+        return STORAGE.put(info.getDocument(), info) == null;
     }
 
     public static void delete(WSDocInfo info) {
-        storage.remove(info.getDocument());
+        STORAGE.remove(info.getDocument());
     }
 }

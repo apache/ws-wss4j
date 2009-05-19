@@ -46,7 +46,7 @@ import java.util.Vector;
 public class WSDocInfo {
     Document doc = null;
     Crypto crypto = null;
-    List bst = null;
+    List bstList = null;
     Element assertion = null;
     List processors = null;
 
@@ -60,14 +60,14 @@ public class WSDocInfo {
     public void clear() {
         crypto = null;
         assertion = null;
-        if (bst != null && bst.size() > 0) {
-            bst.clear();
+        if (bstList != null && bstList.size() > 0) {
+            bstList.clear();
         }
         if (processors != null && processors.size() > 0) {
             processors.clear();
         }
         
-        bst = null;
+        bstList = null;
         processors = null;
     }
 
@@ -84,8 +84,8 @@ public class WSDocInfo {
         }
         Element elem = null;
 
-        if (bst != null) {
-            for (Iterator iter = bst.iterator(); iter.hasNext();) {
+        if (bstList != null) {
+            for (Iterator iter = bstList.iterator(); iter.hasNext();) {
                 elem = (Element) iter.next();
                 String cId = elem.getAttribute("Id");
                 if (id.equals(cId)) {
@@ -151,10 +151,10 @@ public class WSDocInfo {
      * @param elem is the BinarySecurityToken to store
      */
     public void setBst(Element elem) {
-        if (bst == null) {
-            bst = new Vector();
+        if (bstList == null) {
+            bstList = new Vector();
         }
-        bst.add(elem);
+        bstList.add(elem);
     }
 
     /**

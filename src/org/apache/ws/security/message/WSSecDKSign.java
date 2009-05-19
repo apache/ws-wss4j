@@ -32,7 +32,6 @@ import org.apache.ws.security.message.token.SecurityTokenReference;
 import org.apache.ws.security.saml.SAMLUtil;
 import org.apache.ws.security.transform.STRTransform;
 import org.apache.ws.security.util.WSSecurityUtil;
-import org.apache.xml.security.algorithms.SignatureAlgorithm;
 import org.apache.xml.security.c14n.Canonicalizer;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.keys.KeyInfo;
@@ -41,16 +40,9 @@ import org.apache.xml.security.signature.XMLSignatureException;
 import org.apache.xml.security.transforms.TransformationException;
 import org.apache.xml.security.transforms.Transforms;
 import org.apache.xml.security.transforms.params.InclusiveNamespaces;
-import org.apache.xml.security.utils.Constants;
-import org.apache.xml.security.utils.XMLUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.Vector;
 
 /**
@@ -65,21 +57,14 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
     private static Log log = LogFactory.getLog(WSSecDKSign.class.getName());
 
     protected String sigAlgo = XMLSignature.ALGO_ID_MAC_HMAC_SHA1;
-
     protected String canonAlgo = Canonicalizer.ALGO_ID_C14N_EXCL_OMIT_COMMENTS;
-
     protected byte[] signatureValue = null;
     
     private XMLSignature sig = null;
-    
     private KeyInfo keyInfo = null;
-
     private String keyInfoUri = null;
-
     private SecurityTokenReference secRef = null;
-
     private String strUri = null;
-    
     private WSDocInfo wsDocInfo;
 
 
@@ -116,29 +101,13 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
         wsDocInfo = new WSDocInfo(doc);
         
         //
-        // Get and initialize a XMLSignature element.
+        // Get an initialized XMLSignature element.
         //
-        if (canonAlgo.equals(WSConstants.C14N_EXCL_OMIT_COMMENTS)) {
-            Element canonElem = 
-                XMLUtils.createElementInSignatureSpace(doc, Constants._TAG_CANONICALIZATIONMETHOD);
-
-            canonElem.setAttribute(Constants._ATT_ALGORITHM, canonAlgo);
-
-            if (wssConfig.isWsiBSPCompliant()) {
-                Set prefixes = getInclusivePrefixes(secHeader.getSecurityHeader(), false);
-                InclusiveNamespaces inclusiveNamespaces = new InclusiveNamespaces(doc, prefixes);
-                canonElem.appendChild(inclusiveNamespaces.getElement());
-            }
-
-            try {
-                SignatureAlgorithm signatureAlgorithm = new SignatureAlgorithm(doc, sigAlgo);
-                sig = new XMLSignature(doc, null, signatureAlgorithm.getElement(), canonElem);
-            } catch (XMLSecurityException e) {
-                log.error("", e);
-                throw new WSSecurityException(
-                    WSSecurityException.FAILED_SIGNATURE, "noXMLSig", null, e
+        if (wssConfig.isWsiBSPCompliant() && canonAlgo.equals(WSConstants.C14N_EXCL_OMIT_COMMENTS)) {
+            sig = 
+                WSSecSignature.createXMLSignatureInclusivePrefixes(
+                    doc, secHeader.getSecurityHeader(), canonAlgo, sigAlgo
                 );
-            }
         } else {
             try {
                 sig = new XMLSignature(doc, null, sigAlgo, canonAlgo);
@@ -151,15 +120,15 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
         }
         
         sig.addResourceResolver(EnvelopeIdResolver.getInstance());
-        String sigUri = wssConfig.getIdAllocator().createId("Signature-", sig);
+        String sigUri = wssConfig.getIdAllocator().createId("Sig-", sig);
         sig.setId(sigUri);
         
         keyInfo = sig.getKeyInfo();
-        keyInfoUri = wssConfig.getIdAllocator().createSecureId("KeyId-", keyInfo);
+        keyInfoUri = wssConfig.getIdAllocator().createSecureId("KI-", keyInfo);
         keyInfo.setId(keyInfoUri);
         
         secRef = new SecurityTokenReference(doc);
-        strUri = wssConfig.getIdAllocator().createSecureId("STRId-", secRef);
+        strUri = wssConfig.getIdAllocator().createSecureId("STR-", secRef);
         secRef.setID(strUri);
         
         Reference refUt = new Reference(document);
@@ -169,64 +138,6 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
         keyInfo.addUnknownElement(secRef.getElement());
     }
     
-    
-    protected Set getInclusivePrefixes(Element target) {
-        return getInclusivePrefixes(target, true);
-    }
-
-    protected Set getInclusivePrefixes(Element target, boolean excludeVisible) {
-        Set result = new HashSet();
-        Node parent = target;
-        NamedNodeMap attributes;
-        Node attribute;
-        while (!(Node.DOCUMENT_NODE == parent.getParentNode().getNodeType())) {
-            parent = parent.getParentNode();
-            attributes = parent.getAttributes();
-            for (int i = 0; i < attributes.getLength(); i++) {
-                attribute = attributes.item(i);
-                if (attribute.getNamespaceURI() != null
-                    && attribute.getNamespaceURI().equals(
-                        org.apache.ws.security.WSConstants.XMLNS_NS
-                    )
-                ) {
-                    if (attribute.getNodeName().equals("xmlns")) {
-                        result.add("#default");
-                    } else {
-                        result.add(attribute.getLocalName());
-                    }
-                }
-            }
-        }
-
-        if (excludeVisible == true) {
-            attributes = target.getAttributes();
-            for (int i = 0; i < attributes.getLength(); i++) {
-                attribute = attributes.item(i);
-                if (attribute.getNamespaceURI() != null
-                    && attribute.getNamespaceURI().equals(
-                        org.apache.ws.security.WSConstants.XMLNS_NS
-                    )
-                ) {
-                    if (attribute.getNodeName().equals("xmlns")) {
-                        result.remove("#default");
-                    } else {
-                        result.remove(attribute.getLocalName());
-                    }
-                }
-                if (attribute.getPrefix() != null) {
-                    result.remove(attribute.getPrefix());
-                }
-            }
-
-            if (target.getPrefix() == null) {
-                result.remove("#default");
-            } else {
-                result.remove(target.getPrefix());
-            }
-        }
-
-        return result;
-    }
     
     /**
      * This method adds references to the Signature.
@@ -279,7 +190,7 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
                     if (wssConfig.isWsiBSPCompliant()) {
                         transforms.item(0).getElement().appendChild(
                             new InclusiveNamespaces(
-                                document, getInclusivePrefixes(toSignById)).getElement()
+                                document, WSSecSignature.getInclusivePrefixes(toSignById)).getElement()
                             );
                     }
                     sig.addDocument("#" + idToSign, transforms);
@@ -288,13 +199,13 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
                     if (wssConfig.isWsiBSPCompliant()) {
                         transforms.item(0).getElement().appendChild(
                             new InclusiveNamespaces(document,
-                                getInclusivePrefixes(keyInfo.getElement())).getElement()
+                                WSSecSignature.getInclusivePrefixes(keyInfo.getElement())).getElement()
                             );
                     }
                     sig.addDocument("#" + keyInfoUri, transforms);
                 } else if (elemName.equals("STRTransform")) { // STRTransform
-                    Element ctx = createSTRParameter(document);
-                    transforms.addTransform(STRTransform.implementedTransformURI, ctx);
+                    Element ctx = WSSecSignature.createSTRParameter(document);
+                    transforms.addTransform(STRTransform.TRANSFORM_URI, ctx);
                     sig.addDocument("#" + strUri, transforms);
                 } else if (elemName.equals("Assertion")) { // Assertion
                     String id = SAMLUtil.getAssertionId(envel, elemName, nmSpace);
@@ -312,7 +223,7 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
                     if (wssConfig.isWsiBSPCompliant()) {
                         transforms.item(0).getElement().appendChild(
                             new InclusiveNamespaces(
-                                document, getInclusivePrefixes(body)).getElement()
+                                document, WSSecSignature.getInclusivePrefixes(body)).getElement()
                             );
                     }
                     String prefix = 
@@ -333,7 +244,7 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
                     if (wssConfig.isWsiBSPCompliant()) {
                         transforms.item(0).getElement().appendChild(
                             new InclusiveNamespaces(
-                                document, getInclusivePrefixes(body)).getElement()
+                                document, WSSecSignature.getInclusivePrefixes(body)).getElement()
                             );
                     }
                     sig.addDocument("#" + setWsuId(body), transforms);
@@ -348,23 +259,6 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
                 );
             }
         }
-    }
-    
-    protected Element createSTRParameter(Document doc) {
-        Element transformParam = 
-            doc.createElementNS(
-                WSConstants.WSSE_NS,
-                WSConstants.WSSE_PREFIX + ":TransformationParameters"
-            );
-
-        Element canonElem = 
-            doc.createElementNS(
-                WSConstants.SIG_NS, WSConstants.SIG_PREFIX + ":CanonicalizationMethod"
-            );
-
-        canonElem.setAttribute("Algorithm", Canonicalizer.ALGO_ID_C14N_EXCL_OMIT_COMMENTS);
-        transformParam.appendChild(canonElem);
-        return transformParam;
     }
     
     

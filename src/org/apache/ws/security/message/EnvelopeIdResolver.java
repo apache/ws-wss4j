@@ -26,7 +26,6 @@ import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.xml.security.signature.XMLSignatureInput;
 import org.apache.xml.security.utils.resolver.ResourceResolverException;
 import org.apache.xml.security.utils.resolver.ResourceResolverSpi;
-import org.apache.xml.utils.URI;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -34,7 +33,6 @@ import org.w3c.dom.Element;
 /**
  * XML-Security resolver that is used for resolving same-document URIs like URI="#id".
  * It is designed to work only with SOAPEnvelopes.
- * <p/>
  *
  * @author Davanum Srinivas (dims@yahoo.com).
  */
@@ -44,11 +42,8 @@ public class EnvelopeIdResolver extends ResourceResolverSpi {
 
     private static EnvelopeIdResolver resolver = null;
 
-    private boolean doDebug = false;
-
     /**
      * Singleton instance of the resolver.
-     * <p/>
      *
      * @return TODO
      */
@@ -64,95 +59,79 @@ public class EnvelopeIdResolver extends ResourceResolverSpi {
 
     /**
      * This is the workhorse method used to resolve resources.
-     * <p/>
      *
      * @param uri
      * @param BaseURI
      * @return TODO
      * @throws ResourceResolverException
      */
-    public XMLSignatureInput engineResolve(Attr uri, String BaseURI)
-            throws ResourceResolverException {
-
-        doDebug = log.isDebugEnabled();
+    public XMLSignatureInput engineResolve(Attr uri, String baseURI)
+        throws ResourceResolverException {
 
         String uriNodeValue = uri.getNodeValue();
-
-        if (doDebug) {
+        if (log.isDebugEnabled()) {
             log.debug("enter engineResolve, look for: " + uriNodeValue);
         }
-
-        Document doc = uri.getOwnerDocument();
-
-        /*
-         * URI="#chapter1"
-         * Identifies a node-set containing the element with ID attribute
-         * value 'chapter1' of the XML resource containing the signature.
-         * XML Signature (and its applications) modify this node-set to
-         * include the element plus all descendants including namespaces and
-         * attributes -- but not comments.
-         */
+        //
+        // URI="#chapter1"
+        // Identifies a node-set containing the element with ID attribute
+        // value 'chapter1' of the XML resource containing the signature.
+        // XML Signature (and its applications) modify this node-set to
+        // include the element plus all descendants including namespaces and
+        // attributes -- but not comments.
+        //
          
-        /*
-         * First lookup the SOAP Body element (processed by default) and
-         * check if it contains an Id and if it matches
-         */
+        //
+        // First lookup the SOAP Body element (processed by default) and
+        // check if it contains an Id and if it matches
+        //
+        Document doc = uri.getOwnerDocument();
         Element selectedElem = WSSecurityUtil.findBodyElement(doc);
         if (selectedElem == null) {
             throw new ResourceResolverException(
                 "generic.EmptyMessage",
                 new Object[]{"Body element not found"},
                 uri,
-                BaseURI
+                baseURI
             );
         }
-        String cId = selectedElem.getAttributeNS(WSConstants.WSU_NS, "Id");
-
-        /*
-         * If Body Id match fails, look for a generic Id (without a namespace)
-         * that matches the URI. If that lookup fails, try to get a namespace
-         * qualified Id that matches the URI.
-         */
+        //
+        // If Body Id match fails, look for a generic Id (without a namespace)
+        // that matches the URI. If that lookup fails, try to get a namespace
+        // qualified Id that matches the URI.
+        //
         String id = uriNodeValue;
         if (id.charAt(0) == '#') {
             id = id.substring(1);
         }
+        String cId = selectedElem.getAttributeNS(WSConstants.WSU_NS, "Id");
         if (!id.equals(cId)) {
-            cId = null;
             selectedElem = WSSecurityUtil.getElementByWsuId(doc, uriNodeValue);
             if (selectedElem == null) {
                 selectedElem = WSSecurityUtil.getElementByGenId(doc, uriNodeValue);
-                if (selectedElem != null) {
-                    cId = selectedElem.getAttribute("Id");
-                }
-            } else {
-                cId = selectedElem.getAttributeNS(WSConstants.WSU_NS, "Id");
             }
-            if (cId == null) {
+            if (selectedElem == null) {
                 throw new ResourceResolverException(
-                    "generic.EmptyMessage", new Object[]{"Id not found"}, uri, BaseURI
+                    "generic.EmptyMessage", new Object[]{"Id not found"}, uri, baseURI
                 );
             }
         }
 
         XMLSignatureInput result = new XMLSignatureInput(selectedElem);
         result.setMIMEType("text/xml");
-        try {
-            URI uriNew = new URI(new URI(BaseURI), uri.getNodeValue());
-            result.setSourceURI(uriNew.toString());
-        } catch (URI.MalformedURIException ex) {
-            result.setSourceURI(BaseURI);
-        }
-        if (doDebug) {
+        result.setExcludeComments(true);
+        result.setSourceURI(uri.getNodeValue());
+
+        if (log.isDebugEnabled()) {
             log.debug("exit engineResolve, result: " + result);
         }
         return result;
     }
+    
 
     /**
      * This method helps the ResourceResolver to decide whether a
      * ResourceResolverSpi is able to perform the requested action.
-     * <p/>
      *
      * @param uri
      * @param BaseURI

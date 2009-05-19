@@ -380,8 +380,6 @@
             </dependencies>
         </profile>
     </profiles>
-    
-
 
     <properties>
         <xmlsec.version>1.4.2</xmlsec.version>
@@ -396,13 +394,17 @@
         <junit.version>3.8.1</junit.version>
     </properties>
     
-
-
     <dependencies>
         <dependency>
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>
             <version>${commons.logging.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.santuario</groupId>
+            <artifactId>xmlsec</artifactId>
+            <version>${xmlsec.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
@@ -418,16 +420,16 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.apache.santuario</groupId>
-            <artifactId>xmlsec</artifactId>
-            <version>${xmlsec.version}</version>
-            <scope>compile</scope>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>xalan</groupId>
             <artifactId>xalan</artifactId>
             <version>${xalan.version}</version>
-            <scope>compile</scope>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>xerces</groupId>
@@ -440,12 +442,6 @@
             <artifactId>xml-apis</artifactId>
             <version>${xml.apis.version}</version>
             <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>${junit.version}</version>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.opensaml</groupId>

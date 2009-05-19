@@ -699,6 +699,7 @@ public class WSSecurityUtil {
         return (SecretKey) keySpec;
     }
 
+
     /**
      * Translate the "cipherAlgo" URI to a JCE ID, and return a javax.crypto.Cipher instance
      * of this type. 

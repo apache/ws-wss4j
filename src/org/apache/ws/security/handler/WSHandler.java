@@ -47,6 +47,7 @@ import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Vector;
 
@@ -62,7 +63,7 @@ import java.util.Vector;
 public abstract class WSHandler {
     private static Log log = LogFactory.getLog(WSHandler.class.getName());
     protected WSSecurityEngine secEngine = WSSecurityEngine.getInstance();
-    protected Hashtable cryptos = new Hashtable(5);
+    protected Map cryptos = new Hashtable(5);
 
     private boolean doDebug = log.isDebugEnabled();
 
