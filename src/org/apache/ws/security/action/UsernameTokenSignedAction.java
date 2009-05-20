@@ -84,6 +84,9 @@ public class UsernameTokenSignedAction implements Action {
         sign.setSecretKey(builder.getSecretKey());
         sign.setKeyIdentifierType(WSConstants.CUSTOM_SYMM_SIGNING);
         sign.setSignatureAlgorithm(XMLSignature.ALGO_ID_MAC_HMAC_SHA1);
+        if (reqData.getSigDigestAlgorithm() != null) {
+            sign.setDigestAlgo(reqData.getSigDigestAlgorithm());
+        }
 
         sign.prepare(doc, null, reqData.getSecHeader());
 

@@ -29,17 +29,12 @@ import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.conversation.ConversationException;
 import org.apache.ws.security.message.token.Reference;
 import org.apache.ws.security.message.token.SecurityTokenReference;
-import org.apache.ws.security.saml.SAMLUtil;
-import org.apache.ws.security.transform.STRTransform;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.xml.security.c14n.Canonicalizer;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.keys.KeyInfo;
 import org.apache.xml.security.signature.XMLSignature;
 import org.apache.xml.security.signature.XMLSignatureException;
-import org.apache.xml.security.transforms.TransformationException;
-import org.apache.xml.security.transforms.Transforms;
-import org.apache.xml.security.transforms.params.InclusiveNamespaces;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import java.util.List;
@@ -57,6 +52,7 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
     private static Log log = LogFactory.getLog(WSSecDKSign.class.getName());
 
     protected String sigAlgo = XMLSignature.ALGO_ID_MAC_HMAC_SHA1;
+    protected String digestAlgo = "http://www.w3.org/2000/09/xmldsig#sha1";
     protected String canonAlgo = Canonicalizer.ALGO_ID_C14N_EXCL_OMIT_COMMENTS;
     protected byte[] signatureValue = null;
     
@@ -141,126 +137,13 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
     
     /**
      * This method adds references to the Signature.
-     * 
-     * The added references are signed when calling
-     * <code>computeSignature()</code>. This method can be called several
-     * times to add references as required. <code>addReferencesToSign()</code>
-     * can be called any time after <code>prepare</code>.
-     * 
-     * @param references A list containing <code>WSEncryptionPart</code> objects
-     *                   that define the parts to sign.
-     * @param secHeader Used to compute namespaces to be inserted by
-     *                  InclusiveNamespaces to be WSI compliant.
-     * @throws WSSecurityException
      */
     public void addReferencesToSign(List references, WSSecHeader secHeader)
         throws WSSecurityException {
-        Transforms transforms = null;
-
-        Element envel = document.getDocumentElement();
-
-        for (int part = 0; part < references.size(); part++) {
-            WSEncryptionPart encPart = (WSEncryptionPart) references.get(part);
-
-            String idToSign = encPart.getId();
-            String elemName = encPart.getName();
-            String nmSpace = encPart.getNamespace();
-
-            //
-            // Set up the elements to sign. There are two reserved element
-            // names: "Token" and "STRTransform" "Token": Setup the Signature to
-            // either sign the information that points to the security token or
-            // the token itself. If its a direct reference sign the token,
-            // otherwise sign the KeyInfo Element. "STRTransform": Setup the
-            // ds:Reference to use STR Transform
-            // 
-            transforms = new Transforms(document);
-            try {
-                if (idToSign != null) {
-                    Element toSignById = 
-                        WSSecurityUtil.findElementById(
-                            document.getDocumentElement(), idToSign, WSConstants.WSU_NS);
-                    if (toSignById == null) {
-                        toSignById = 
-                            WSSecurityUtil.findElementById(
-                                document.getDocumentElement(), idToSign, null
-                            );
-                    }
-                    transforms.addTransform(Transforms.TRANSFORM_C14N_EXCL_OMIT_COMMENTS);
-                    if (wssConfig.isWsiBSPCompliant()) {
-                        transforms.item(0).getElement().appendChild(
-                            new InclusiveNamespaces(
-                                document, WSSecSignature.getInclusivePrefixes(toSignById)).getElement()
-                            );
-                    }
-                    sig.addDocument("#" + idToSign, transforms);
-                } else if (elemName.equals("Token")) {
-                    transforms.addTransform(Transforms.TRANSFORM_C14N_EXCL_OMIT_COMMENTS);
-                    if (wssConfig.isWsiBSPCompliant()) {
-                        transforms.item(0).getElement().appendChild(
-                            new InclusiveNamespaces(document,
-                                WSSecSignature.getInclusivePrefixes(keyInfo.getElement())).getElement()
-                            );
-                    }
-                    sig.addDocument("#" + keyInfoUri, transforms);
-                } else if (elemName.equals("STRTransform")) { // STRTransform
-                    Element ctx = WSSecSignature.createSTRParameter(document);
-                    transforms.addTransform(STRTransform.TRANSFORM_URI, ctx);
-                    sig.addDocument("#" + strUri, transforms);
-                } else if (elemName.equals("Assertion")) { // Assertion
-                    String id = SAMLUtil.getAssertionId(envel, elemName, nmSpace);
-
-                    Element body = 
-                        (Element) WSSecurityUtil.findElement(envel, elemName, nmSpace);
-                    if (body == null) {
-                        throw new WSSecurityException(
-                            WSSecurityException.FAILURE, 
-                            "noEncElement",
-                            new Object[] {nmSpace + ", " + elemName}
-                        );
-                    }
-                    transforms.addTransform(Transforms.TRANSFORM_C14N_EXCL_OMIT_COMMENTS);
-                    if (wssConfig.isWsiBSPCompliant()) {
-                        transforms.item(0).getElement().appendChild(
-                            new InclusiveNamespaces(
-                                document, WSSecSignature.getInclusivePrefixes(body)).getElement()
-                            );
-                    }
-                    String prefix = 
-                        WSSecurityUtil.setNamespace(body, WSConstants.WSU_NS, WSConstants.WSU_PREFIX);
-                    body.setAttributeNS(WSConstants.WSU_NS, prefix + ":Id", id);
-                    sig.addDocument("#" + id, transforms);
-
-                } else {
-                    Element body = (Element) WSSecurityUtil.findElement(envel, elemName, nmSpace);
-                    if (body == null) {
-                        throw new WSSecurityException(
-                            WSSecurityException.FAILURE, 
-                            "noEncElement",
-                            new Object[] {nmSpace + ", " + elemName}
-                        );
-                    }
-                    transforms.addTransform(Transforms.TRANSFORM_C14N_EXCL_OMIT_COMMENTS);
-                    if (wssConfig.isWsiBSPCompliant()) {
-                        transforms.item(0).getElement().appendChild(
-                            new InclusiveNamespaces(
-                                document, WSSecSignature.getInclusivePrefixes(body)).getElement()
-                            );
-                    }
-                    sig.addDocument("#" + setWsuId(body), transforms);
-                }
-            } catch (TransformationException ex) {
-                throw new WSSecurityException(
-                    WSSecurityException.FAILED_SIGNATURE, "noXMLSig", null, ex
-                );
-            } catch (XMLSignatureException ex) {
-                throw new WSSecurityException(
-                    WSSecurityException.FAILED_SIGNATURE, "noXMLSig", null, ex
-                );
-            }
-        }
+        WSSecSignature.addReferencesToSign(
+            document, parts, sig, secHeader, wssConfig, digestAlgo, strUri
+        );
     }
-    
     
     /**
      * Prepends the Signature element to the elements already in the Security
@@ -327,9 +210,34 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
             WSSecurityUtil.getKeyLength(sigAlgo);
     }
     
+    /**
+     * Set the signature algorithm to use. The default is XMLSignature.ALGO_ID_MAC_HMAC_SHA1
+     * @param algorithm the signature algorithm to use.
+     */
+    public void setSignatureAlgorithm(String algorithm) {
+        sigAlgo = algorithm;
+    }
     
-    public void setSignatureAlgorithm(String algo) {
-        sigAlgo = algo;
+    /**
+     * @return the signature algorithm to use
+     */
+    public String getSignatureAlgorithm() {
+        return sigAlgo;
+    }
+    
+    /**
+     * Set the digest algorithm to use. The default is SHA-1.
+     * @param algorithm the digest algorithm to use.
+     */
+    public void setDigestAlgorithm(String algorithm) {
+        digestAlgo = algorithm;
+    }
+    
+    /**
+     * @return the digest algorithm to use
+     */
+    public String getDigestAlgorithm() {
+        return digestAlgo;
     }
 
     /**

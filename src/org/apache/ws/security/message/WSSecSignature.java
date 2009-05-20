@@ -25,6 +25,7 @@ import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDocInfo;
 import org.apache.ws.security.WSDocInfoStore;
 import org.apache.ws.security.WSEncryptionPart;
+import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.message.token.BinarySecurity;
@@ -32,7 +33,6 @@ import org.apache.ws.security.message.token.PKIPathSecurity;
 import org.apache.ws.security.message.token.Reference;
 import org.apache.ws.security.message.token.SecurityTokenReference;
 import org.apache.ws.security.message.token.X509Security;
-import org.apache.ws.security.saml.SAMLUtil;
 import org.apache.ws.security.transform.STRTransform;
 import org.apache.ws.security.util.Base64;
 import org.apache.ws.security.util.WSSecurityUtil;
@@ -309,41 +309,53 @@ public class WSSecSignature extends WSSecBase {
         return doc;
     }
     
-
+    
     /**
      * This method adds references to the Signature.
      * 
-     * The added references are signed when calling
-     * <code>computeSignature()</code>. This method can be called several
-     * times to add references as required. <code>addReferencesToSign()</code>
-     * can be called any time after <code>prepare</code>.
-     * 
-     * @param references A list containing <code>WSEncryptionPart</code> objects
-     *                   that define the parts to sign.
-     * @param secHeader Used to compute namespaces to be inserted by
-     *                  InclusiveNamespaces to be WSI compliant.
+     * @param references The list of references to sign
+     * @param secHeader The Security Header
      * @throws WSSecurityException
      */
-    public void addReferencesToSign(List references, WSSecHeader secHeader)
-        throws WSSecurityException {
-        Element envelope = document.getDocumentElement();
+    public void addReferencesToSign(List references, WSSecHeader secHeader) throws WSSecurityException {
+        addReferencesToSign(document, references, sig, secHeader, wssConfig, digestAlgo, strUri);
+    }
+
+    
+    /**
+     * This method adds references to the Signature.
+     * 
+     * @param doc The parent document
+     * @param references The list of references to sign
+     * @param sig The XMLSignature object
+     * @param secHeader The Security Header
+     * @param wssConfig The WSSConfig
+     * @param digestAlgo The digest algorithm to use
+     * @param strUri The SecurityTokenReference uri to use for STRTransform
+     * @throws WSSecurityException
+     */
+    public static void addReferencesToSign(
+        Document doc,
+        List references,
+        XMLSignature sig,
+        WSSecHeader secHeader,
+        WSSConfig wssConfig,
+        String digestAlgo,
+        String strUri
+    ) throws WSSecurityException {
+        Element envelope = doc.getDocumentElement();
 
         for (int part = 0; part < references.size(); part++) {
             WSEncryptionPart encPart = (WSEncryptionPart) references.get(part);
 
             String idToSign = encPart.getId();
             String elemName = encPart.getName();
-            String nmSpace = encPart.getNamespace();
 
             //
-            // Set up the elements to sign. There are two reserved element
-            // names: "Token" and "STRTransform" "Token": Setup the Signature to
-            // either sign the information that points to the security token or
-            // the token itself. If it's a direct reference sign the token,
-            // otherwise sign the KeyInfo Element. "STRTransform": Setup the
-            // ds:Reference to use STR Transform
+            // Set up the elements to sign. There is one reserved element
+            // names: "STRTransform": Setup the ds:Reference to use STR Transform
             //
-            Transforms transforms = new Transforms(document);
+            Transforms transforms = new Transforms(doc);
             try {
                 if (idToSign != null) {
                     Element toSignById = 
@@ -360,61 +372,19 @@ public class WSSecSignature extends WSSecBase {
                     if (wssConfig.isWsiBSPCompliant()) {
                         transforms.item(0).getElement().appendChild(
                             new InclusiveNamespaces(
-                                document, getInclusivePrefixes(toSignById)).getElement()
+                                doc, getInclusivePrefixes(toSignById)).getElement()
                             );
                     }
                     sig.addDocument("#" + idToSign, transforms, digestAlgo);
-                } else if (elemName.equals("Token")) {
-                    transforms.addTransform(Transforms.TRANSFORM_C14N_EXCL_OMIT_COMMENTS);
-                    if (keyIdentifierType == WSConstants.BST_DIRECT_REFERENCE) {
-                        if (wssConfig.isWsiBSPCompliant()) {
-                            transforms.item(0).getElement().appendChild(
-                                new InclusiveNamespaces(
-                                    document,
-                                    getInclusivePrefixes(secHeader.getSecurityHeader())).getElement()
-                                );
-                        }
-                        sig.addDocument("#" + certUri, transforms, digestAlgo);
-                    } else {
-                        if (wssConfig.isWsiBSPCompliant()) {
-                            transforms.item(0).getElement().appendChild(
-                                new InclusiveNamespaces(
-                                    document, getInclusivePrefixes(keyInfo.getElement())).getElement()
-                                );
-                        }
-                        sig.addDocument("#" + keyInfoUri, transforms, digestAlgo);
-                    }
-                } else if (elemName.equals("STRTransform")) { // STRTransform
-                    Element ctx = createSTRParameter(document);
+                } else if (elemName.equals("STRTransform")) {
+                    Element ctx = createSTRParameter(doc);
                     transforms.addTransform(STRTransform.TRANSFORM_URI, ctx);
                     sig.addDocument("#" + strUri, transforms, digestAlgo);
-                } else if (elemName.equals("Assertion")) { // Assertion
-                    String id = null;
-                    id = SAMLUtil.getAssertionId(envelope, elemName, nmSpace);
-
-                    Element body = 
-                        (Element) WSSecurityUtil.findElement(envelope, elemName, nmSpace);
-                    if (body == null) {
-                        throw new WSSecurityException(
-                            WSSecurityException.FAILURE, "noEncElement",
-                            new Object[] {nmSpace + ", " + elemName}
-                        );
-                    }
-                    transforms.addTransform(Transforms.TRANSFORM_C14N_EXCL_OMIT_COMMENTS);
-                    if (wssConfig.isWsiBSPCompliant()) {
-                        transforms.item(0).getElement().appendChild(
-                            new InclusiveNamespaces(
-                                document, getInclusivePrefixes(body)).getElement()
-                            );
-                    }
-                    String prefix = 
-                        WSSecurityUtil.setNamespace(body, WSConstants.WSU_NS, WSConstants.WSU_PREFIX);
-                    body.setAttributeNS(WSConstants.WSU_NS, prefix + ":Id", id);
-                    sig.addDocument("#" + id, transforms, digestAlgo);
                 } else {
-                    Element body = 
+                    String nmSpace = encPart.getNamespace();
+                    Element elementToSign = 
                         (Element)WSSecurityUtil.findElement(envelope, elemName, nmSpace);
-                    if (body == null) {
+                    if (elementToSign == null) {
                         throw new WSSecurityException(
                             WSSecurityException.FAILURE, 
                             "noEncElement",
@@ -425,10 +395,10 @@ public class WSSecSignature extends WSSecBase {
                     if (wssConfig.isWsiBSPCompliant()) {
                         transforms.item(0).getElement().appendChild(
                             new InclusiveNamespaces(
-                                document, getInclusivePrefixes(body)).getElement()
+                                doc, getInclusivePrefixes(elementToSign)).getElement()
                             );
                     }
-                    sig.addDocument("#" + setWsuId(body), transforms, digestAlgo);
+                    sig.addDocument("#" + setWsuId(elementToSign, wssConfig), transforms, digestAlgo);
                 }
             } catch (TransformationException ex) {
                 throw new WSSecurityException(
@@ -530,6 +500,21 @@ public class WSSecSignature extends WSSecBase {
 
     }
 
+    
+    /**
+     * Set the wsu:Id on the element argument
+     */
+    public static String setWsuId(Element element, WSSConfig wssConfig) {
+        String id = element.getAttributeNS(WSConstants.WSU_NS, "Id");
+
+        if ((id == null) || (id.length() == 0)) {
+            id = wssConfig.getIdAllocator().createId("id-", element);
+            String prefix = 
+                WSSecurityUtil.setNamespace(element, WSConstants.WSU_NS, WSConstants.WSU_PREFIX);
+            element.setAttributeNS(WSConstants.WSU_NS, prefix + ":Id", id);
+        }
+        return id;
+    }
     
     /**
      * Create an STRTransformationParameters element
@@ -728,14 +713,14 @@ public class WSSecSignature extends WSSecBase {
     }
 
     /**
-     * @return the digestAlgo
+     * @return the digest algorithm to use
      */
     public String getDigestAlgo() {
         return digestAlgo;
     }
 
     /**
-     * Set the string that defines which digest algorithm to use
+     * Set the string that defines which digest algorithm to use. The default is SHA-1.
      * 
      * @param digestAlgo the digestAlgo to set
      */
@@ -882,7 +867,7 @@ public class WSSecSignature extends WSSecBase {
                         new Object[] { user, "signature" }
                 );
             }
-            certUri = wssConfig.getIdAllocator().createSecureId("CertId-", certs[0]);  
+            certUri = wssConfig.getIdAllocator().createSecureId("X509-", certs[0]);  
             //
             // If no signature algorithm was set try to detect it according to the
             // data stored in the certificate.

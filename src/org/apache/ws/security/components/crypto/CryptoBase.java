@@ -398,30 +398,31 @@ public abstract class CryptoBase implements Crypto {
      */
     public X509Certificate[] getCertificates(String alias) throws WSSecurityException {
         Certificate[] certs = null;
-        Certificate cert = null;
         try {
-            if (this.keystore != null) {
-                //There's a chance that there can only be a set of trust stores
+            if (keystore != null) {
+                // There's a chance that there can only be a set of trust stores
                 certs = keystore.getCertificateChain(alias);
                 if (certs == null || certs.length == 0) {
-                    // no cert chain, so lets check if getCertificate gives us a
-                    // result.
-                    cert = keystore.getCertificate(alias);
+                    // no cert chain, so lets check if getCertificate gives us a result.
+                    Certificate cert = keystore.getCertificate(alias);
+                    if (cert != null) {
+                        certs = new Certificate[]{cert};
+                    }
                 }
             }
 
-            if (certs == null && cert == null && cacerts != null) {
+            if (certs == null && cacerts != null) {
                 // Now look into the trust stores
                 certs = cacerts.getCertificateChain(alias);
                 if (certs == null) {
-                    cert = cacerts.getCertificate(alias);
+                    Certificate cert = cacerts.getCertificate(alias);
+                    if (cert != null) {
+                        certs = new Certificate[]{cert};
+                    }
                 }
             }
 
-            if (cert != null) {
-                certs = new Certificate[]{cert};
-            } else if (certs == null) {
-                // At this point we don't have certs or a cert
+            if (certs == null) {
                 return null;
             }
         } catch (KeyStoreException e) {
