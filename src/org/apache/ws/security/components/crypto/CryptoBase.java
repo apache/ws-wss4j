@@ -38,18 +38,23 @@ import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.cert.CertPath;
+import java.security.cert.CertPathValidator;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
+import java.security.cert.PKIXParameters;
 import java.security.cert.CertificateFactory;
+import java.security.cert.TrustAnchor;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.RSAPublicKey;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Vector;
 import javax.security.auth.x500.X500Principal;
 
@@ -61,10 +66,18 @@ import javax.security.auth.x500.X500Principal;
  * To change this template use File | Settings | File Templates.
  */
 public abstract class CryptoBase implements Crypto {
+    public static final String SKI_OID = "2.5.29.14";
+    /**
+     * OID For the NameConstraints Extension to X.509
+     *
+     * http://java.sun.com/j2se/1.4.2/docs/api/
+     * http://www.ietf.org/rfc/rfc3280.txt (s. 4.2.1.11)
+     */
+    public static final String NAME_CONSTRAINTS_OID = "2.5.29.30";
+    
     private static Log log = LogFactory.getLog(CryptoBase.class);
     protected static Map certFactMap = new HashMap();
     protected KeyStore keystore = null;
-    static String SKI_OID = "2.5.29.14";
     protected KeyStore cacerts = null;
     
     /**
@@ -99,7 +112,10 @@ public abstract class CryptoBase implements Crypto {
      */
     public synchronized CertificateFactory getCertificateFactory() throws WSSecurityException {
         String provider = getCryptoProvider();
-        String keyStoreProvider = keystore == null ? null : keystore.getProvider().getName();
+        String keyStoreProvider = null;
+        if (keystore != null) {
+            keyStoreProvider = keystore.getProvider().getName();
+        }
 
         //Try to find a CertificateFactory that generates certs that are fully
         //compatible with the certs in the KeyStore  (Sun -> Sun, BC -> BC, etc...)
@@ -162,25 +178,23 @@ public abstract class CryptoBase implements Crypto {
     }
 
     /**
-     * load a X509Certificate from the input stream.
-     * <p/>
+     * Load a X509Certificate from the input stream.
      *
-     * @param in The <code>InputStream</code> array containing the X509 data
-     * @return Returns a X509 certificate
+     * @param The <code>InputStream</code> containing the X509Certificate
+     * @return An X509 certificate
      * @throws org.apache.ws.security.WSSecurityException
      *
      */
     public X509Certificate loadCertificate(InputStream in) throws WSSecurityException {
-        X509Certificate cert = null;
         try {
-            cert = (X509Certificate) getCertificateFactory().generateCertificate(in);
+            CertificateFactory certFactory = getCertificateFactory();
+            return (X509Certificate) certFactory.generateCertificate(in);
         } catch (CertificateException e) {
             throw new WSSecurityException(
                 WSSecurityException.SECURITY_TOKEN_UNAVAILABLE, "parseError",
                 null, e
             );
         }
-        return cert;
     }
 
     /**
@@ -216,25 +230,9 @@ public abstract class CryptoBase implements Crypto {
     }
 
     /**
-     * Lookup a X509 Certificate in the keystore according to a given
+     * Lookup an X509 Certificate in the keystore according to a given serial number and
      * the issuer of a Certificate.
-     * <p/>
-     * The search gets all alias names of the keystore and gets the certificate chain
-     * for each alias. Then the Issuer for each certificate of the chain
-     * is compared with the parameters.
-     *
-     * @param issuer The issuer's name for the certificate
-     * @return alias name of the certificate that matches the issuer name
-     *         or null if no such certificate was found.
-     */
-    public String getAliasForX509Cert(String issuer) throws WSSecurityException {
-        return getAliasForX509Cert(issuer, null, false);
-    }
-
-    /**
-     * Lookup a X509 Certificate in the keystore according to a given serial number and
-     * the issuer of a Certificate.
-     * <p/>
+     * 
      * The search gets all alias names of the keystore and gets the certificate chain
      * for each alias. Then the SerialNumber and Issuer for each certificate of the chain
      * is compared with the parameters.
@@ -246,22 +244,6 @@ public abstract class CryptoBase implements Crypto {
      */
     public String getAliasForX509Cert(String issuer, BigInteger serialNumber)
         throws WSSecurityException {
-        return getAliasForX509Cert(issuer, serialNumber, true);
-    }
-
-    /*
-    * need to check if "getCertificateChain" also finds certificates that are
-    * used for encryption only, i.e. they may not be signed by a CA
-    * Otherwise we must define a restriction how to use certificate:
-    * each certificate must be signed by a CA or is a self signed Certificate
-    * (this should work as well).
-    * --- remains to be tested in several ways --
-    */
-    private String getAliasForX509Cert(
-        String issuer, 
-        BigInteger serialNumber,
-        boolean useSerialNumber
-    ) throws WSSecurityException {
         X500Principal issuerRDN = null;
         X509Name issuerName = null;
         Certificate cert = null;
@@ -289,7 +271,7 @@ public abstract class CryptoBase implements Crypto {
                     // no cert chain, so lets check if getCertificate gives us a result.
                     cert = keystore.getCertificate(alias);
                     if (cert == null) {
-                        return null;
+                        continue;
                     }
                 } else {
                     cert = certs[0];
@@ -298,7 +280,7 @@ public abstract class CryptoBase implements Crypto {
                     continue;
                 }
                 X509Certificate x509cert = (X509Certificate) cert;
-                if (!useSerialNumber || x509cert.getSerialNumber().compareTo(serialNumber) == 0) {
+                if (x509cert.getSerialNumber().compareTo(serialNumber) == 0) {
                     X509Name certName = new X509Name(x509cert.getIssuerDN().getName());
                     if (certName.equals(issuerName)) {
                         return alias;
@@ -310,6 +292,100 @@ public abstract class CryptoBase implements Crypto {
         }
         return null;
     }
+    
+    
+    /**
+     * Lookup an X509 Certificate in the keystore according to a given serial number and
+     * the issuer of a Certificate.
+     * 
+     * @param issuer       The issuer's name for the certificate
+     * @param serialNumber The serial number of the certificate from the named issuer
+     * @return the X509 certificate that matches the serialNumber and issuer name
+     *         or null if no such certificate was found.
+     */
+    public X509Certificate getX509Certificate(String issuer, BigInteger serialNumber)
+        throws WSSecurityException {
+        X500Principal issuerRDN = null;
+        X509Name issuerName = null;
+        Certificate cert = null;
+        
+        //
+        // Convert the issuer DN to a java X500Principal object first. This is to ensure
+        // interop with a DN constructed from .NET, where e.g. it uses "S" instead of "ST".
+        // Then convert it to a BouncyCastle X509Name, which will order the attributes of
+        // the DN in a particular way (see WSS-168). If the conversion to an X500Principal
+        // object fails (e.g. if the DN contains "E" instead of "EMAILADDRESS"), then fall
+        // back on a direct conversion to a BC X509Name
+        //
+        try {
+            issuerRDN = new X500Principal(issuer);
+            issuerName =  new X509Name(issuerRDN.getName());
+        } catch (java.lang.IllegalArgumentException ex) {
+            issuerName = new X509Name(issuer);
+        }
+
+        try {
+            for (Enumeration e = keystore.aliases(); e.hasMoreElements();) {
+                String alias = (String) e.nextElement();
+                Certificate[] certs = keystore.getCertificateChain(alias);
+                if (certs == null || certs.length == 0) {
+                    // no cert chain, so lets check if getCertificate gives us a result.
+                    cert = keystore.getCertificate(alias);
+                    if (cert == null) {
+                        continue;
+                    }
+                } else {
+                    cert = certs[0];
+                }
+                if (!(cert instanceof X509Certificate)) {
+                    continue;
+                }
+                X509Certificate x509cert = (X509Certificate) cert;
+                if (x509cert.getSerialNumber().compareTo(serialNumber) == 0) {
+                    X509Name certName = new X509Name(x509cert.getIssuerDN().getName());
+                    if (certName.equals(issuerName)) {
+                        return x509cert;
+                    }
+                }
+            }
+        } catch (KeyStoreException e) {
+            throw new WSSecurityException(WSSecurityException.FAILURE, "keystore", null, e);
+        }
+        return null;
+    }
+    
+    
+    /**
+     * Check to see if the certificate argument is in the keystore
+     * @param cert The certificate to check
+     * @return true if cert is in the keystore
+     * @throws WSSecurityException
+     */
+    public boolean isCertificateInKeyStore(X509Certificate cert) throws WSSecurityException {
+        String issuerString = cert.getIssuerDN().getName();
+        BigInteger issuerSerial = cert.getSerialNumber();
+        
+        X509Certificate foundCert = getX509Certificate(issuerString, issuerSerial);
+
+        //
+        // If a certificate has been found, the certificates must be compared
+        // to ensure against phony DNs (compare encoded form including signature)
+        //
+        if (foundCert != null && foundCert.equals(cert)) {
+            if (log.isDebugEnabled()) {
+                log.debug("Direct trust for certificate with " + cert.getSubjectDN().getName());
+            }
+            return true;
+        }
+        if (log.isDebugEnabled()) {
+            log.debug(
+                "No alias found for subject from issuer with " + issuerString 
+                + " (serial " + issuerSerial + ")"
+            );
+        }
+        return false;
+    }
+    
 
     /**
      * Lookup a X509 Certificate in the keystore according to a given
@@ -336,7 +412,7 @@ public abstract class CryptoBase implements Crypto {
                     // no cert chain, so lets check if getCertificate gives us a  result.
                     cert = keystore.getCertificate(alias);
                     if (cert == null) {
-                        return null;
+                        continue;
                     }
                 } else {
                     cert = certs[0];
@@ -345,10 +421,7 @@ public abstract class CryptoBase implements Crypto {
                     continue;
                 }
                 byte[] data = getSKIBytesFromCert((X509Certificate) cert);
-                if (data.length != skiBytes.length) {
-                    continue;
-                }
-                if (Arrays.equals(data, skiBytes)) {
+                if (data.length == skiBytes.length && Arrays.equals(data, skiBytes)) {
                     return alias;
                 }
             }
@@ -373,11 +446,10 @@ public abstract class CryptoBase implements Crypto {
                 return alias;
             }
             // Use brute force search
-            Enumeration e = keystore.aliases();
-            while (e.hasMoreElements()) {
+            for (Enumeration e = keystore.aliases(); e.hasMoreElements();) {
                 alias = (String) e.nextElement();
-                X509Certificate cert2 = (X509Certificate) keystore.getCertificate(alias);
-                if (cert2.equals(cert)) {
+                Certificate retrievedCert = keystore.getCertificate(alias);
+                if (retrievedCert.equals(cert)) {
                     return alias;
                 }
             }
@@ -435,7 +507,8 @@ public abstract class CryptoBase implements Crypto {
         }
         return x509certs;
     }
-
+    
+    
     /**
      * Lookup a X509 Certificate in the keystore according to a given
      * Thumbprint.
@@ -470,7 +543,7 @@ public abstract class CryptoBase implements Crypto {
                     // no cert chain, so lets check if getCertificate gives us a  result.
                     cert = keystore.getCertificate(alias);
                     if (cert == null) {
-                        return null;
+                        continue;
                     }
                 } else {
                     cert = certs[0];
@@ -568,11 +641,12 @@ public abstract class CryptoBase implements Crypto {
     }
 
     public KeyStore getKeyStore() {
-        return this.keystore;
+        return keystore;
     }
     
     /**
-     * Lookup X509 Certificates in the keystore according to a given DN of the subject of the certificate
+     * Lookup X509 Certificates in the keystore according to a given DN of the subject of the 
+     * certificate
      * <p/>
      * The search gets all alias names of the keystore and gets the certificate (chain)
      * for each alias. Then the DN of the certificate is compared with the parameters.
@@ -586,11 +660,11 @@ public abstract class CryptoBase implements Crypto {
 
         // The DN to search the keystore for
         X500Principal subjectRDN = new X500Principal(subjectDN);
-        List aliases = getAlias(subjectRDN, keystore);
+        List aliases = getAliases(subjectRDN, keystore);
         
         //If we can't find the issuer in the keystore then look at cacerts
         if (aliases.size() == 0 && cacerts != null) {
-            aliases = getAlias(subjectRDN, cacerts);
+            aliases = getAliases(subjectRDN, cacerts);
         }
         
         // Convert the vector into an array
@@ -603,28 +677,17 @@ public abstract class CryptoBase implements Crypto {
     }
     
     /**
-     * get a byte array given an array of X509 certificates.
+     * Get a byte array given an array of X509 certificates.
      * <p/>
      *
-     * @param reverse If set the first certificate in the array data will
-     *                the last in the byte array
-     * @param certs   The certificates to convert
-     * @return The byte array for the certificates ordered according
-     *         to the reverse flag
+     * @param certs The certificates to convert
+     * @return The byte array for the certificates
      * @throws WSSecurityException
      */
-    public byte[] getCertificateData(boolean reverse, X509Certificate[] certs)
+    public byte[] getCertificateData(X509Certificate[] certs)
         throws WSSecurityException {
-        List list = new Vector();
-        for (int i = 0; i < certs.length; i++) {
-            if (reverse) {
-                list.add(0, certs[i]);
-            } else {
-                list.add(certs[i]);
-            }
-        }
         try {
-            CertPath path = getCertificateFactory().generateCertPath(list);
+            CertPath path = getCertificateFactory().generateCertPath(Arrays.asList(certs));
             return path.getEncoded();
         } catch (CertificateEncodingException e) {
             throw new WSSecurityException(
@@ -644,13 +707,10 @@ public abstract class CryptoBase implements Crypto {
      * <p/>
      *
      * @param data    The <code>byte</code> array containing the X509 data
-     * @param reverse If set the first certificate in input data will
-     *                the last in the array
-     * @return An array of X509 certificates, ordered according to
-     *         the reverse flag
+     * @return An array of X509 certificates
      * @throws WSSecurityException
      */
-    public X509Certificate[] getX509Certificates(byte[] data, boolean reverse)
+    public X509Certificate[] getX509Certificates(byte[] data)
         throws WSSecurityException {
         InputStream in = new ByteArrayInputStream(data);
         CertPath path = null;
@@ -664,9 +724,9 @@ public abstract class CryptoBase implements Crypto {
         }
         List l = path.getCertificates();
         X509Certificate[] certs = new X509Certificate[l.size()];
-        Iterator iterator = l.iterator();
-        for (int i = 0; i < l.size(); i++) {
-            certs[(reverse) ? (l.size() - 1 - i) : i] = (X509Certificate) iterator.next();
+        int i = 0;
+        for (Iterator iterator = l.iterator(); iterator.hasNext(); ) {
+            certs[i++] = (X509Certificate) iterator.next();
         }
         return certs;
     }
@@ -675,40 +735,55 @@ public abstract class CryptoBase implements Crypto {
      * Overridden because there's a bug in the base class where they don't use
      * the provider variant for the certificate validator.
      *
-     * @param certs
-     *            Certificate chain to validate
+     * @param certs X509Certificate chain to validate
      * @return true if the certificate chain is valid, false otherwise
      * @throws WSSecurityException
      */
     public boolean
     validateCertPath(
-        java.security.cert.X509Certificate[] certs
+        X509Certificate[] certs
     ) throws org.apache.ws.security.WSSecurityException {
         try {
             // Generate cert path
-            java.util.List cert_list = java.util.Arrays.asList(certs);
-            java.security.cert.CertPath path =
-                getCertificateFactory().generateCertPath(cert_list);
+            List certList = Arrays.asList(certs);
+            CertPath path = getCertificateFactory().generateCertPath(certList);
 
-            // Use the certificates in the keystore as TrustAnchors
-            java.security.cert.PKIXParameters param =
-                new java.security.cert.PKIXParameters(this.keystore);
+            Set set = new HashSet();
+            if (cacerts != null) {
+                Enumeration cacertsAliases = cacerts.aliases();
+                while (cacertsAliases.hasMoreElements()) {
+                    String alias = (String) cacertsAliases.nextElement();
+                    X509Certificate cert = 
+                        (X509Certificate) cacerts.getCertificate(alias);
+                    TrustAnchor anchor = 
+                        new TrustAnchor(cert, cert.getExtensionValue(NAME_CONSTRAINTS_OID));
+                    set.add(anchor);
+                }
+            }
 
+            // Add certificates from the keystore
+            Enumeration aliases = keystore.aliases();
+            while (aliases.hasMoreElements()) {
+                String alias = (String) aliases.nextElement();
+                X509Certificate cert = 
+                    (X509Certificate) keystore.getCertificate(alias);
+                TrustAnchor anchor = 
+                    new TrustAnchor(cert, cert.getExtensionValue(NAME_CONSTRAINTS_OID));
+                set.add(anchor);
+            }
+
+            PKIXParameters param = new PKIXParameters(set);
+            
             // Do not check a revocation list
             param.setRevocationEnabled(false);
 
             // Verify the trust path using the above settings
             String provider = getCryptoProvider();
-            java.security.cert.CertPathValidator validator = null;
+            CertPathValidator validator = null;
             if (provider == null || provider.length() == 0) {
-                validator =
-                    java.security.cert.CertPathValidator.getInstance("PKIX");
+                validator = CertPathValidator.getInstance("PKIX");
             } else {
-                validator =
-                    java.security.cert.CertPathValidator.getInstance(
-                        "PKIX",
-                        provider
-                    );
+                validator = CertPathValidator.getInstance("PKIX", provider);
             }
             validator.validate(path, param);
         } catch (java.security.NoSuchProviderException e) {
@@ -756,7 +831,15 @@ public abstract class CryptoBase implements Crypto {
         return true;
     }
     
-    private List getAlias(X500Principal subjectRDN, KeyStore store) throws WSSecurityException {
+    /**
+     * Get all of the aliases of the X500Principal argument in the supplied KeyStore
+     * @param subjectRDN The X500Principal
+     * @param store The KeyStore
+     * @return A list of aliases
+     * @throws WSSecurityException
+     */
+    private static List getAliases(X500Principal subjectRDN, KeyStore store) 
+        throws WSSecurityException {
         // Store the aliases found
         List aliases = new Vector();
         Certificate cert = null;
@@ -770,7 +853,7 @@ public abstract class CryptoBase implements Crypto {
                     // no cert chain, so lets check if getCertificate gives us a  result.
                     cert = store.getCertificate(alias);
                     if (cert == null) {
-                        return null;
+                        continue;
                     }
                     certs = new Certificate[]{cert};
                 } else {

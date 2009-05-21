@@ -100,7 +100,7 @@ public class BinarySecurityTokenProcessor implements Processor {
         throws WSSecurityException {
         createSecurityToken(elem);
         if (token instanceof PKIPathSecurity) {
-            certificates = ((PKIPathSecurity) token).getX509Certificates(false, crypto);
+            certificates = ((PKIPathSecurity) token).getX509Certificates(crypto);
         } else if (token instanceof X509Security) {
             X509Certificate cert = ((X509Security) token).getX509Certificate(crypto);
             certificates = new X509Certificate[]{cert};

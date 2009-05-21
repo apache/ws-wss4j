@@ -1067,13 +1067,10 @@ public abstract class WSHandler {
             return false;
         }
 
-        String[] aliases = null;
-        String alias = null;
-        X509Certificate[] certs;
-
         String subjectString = cert.getSubjectDN().getName();
         String issuerString = cert.getIssuerDN().getName();
         BigInteger issuerSerial = cert.getSerialNumber();
+        Crypto crypto = reqData.getSigCrypto();
 
         if (doDebug) {
             log.debug("WSHandler: Transmitted certificate has subject " + subjectString);
@@ -1083,57 +1080,20 @@ public abstract class WSHandler {
             );
         }
 
-        // FIRST step
-        // Search the keystore for the transmitted certificate
-
-        // Search the keystore for the alias of the transmitted certificate
-        try {
-            alias = reqData.getSigCrypto().getAliasForX509Cert(issuerString, issuerSerial);
-        } catch (WSSecurityException ex) {
-            throw new WSSecurityException(
-                "WSHandler: Could not get alias for certificate with " + subjectString, ex
-            );
+        //
+        // FIRST step - Search the keystore for the transmitted certificate
+        //
+        if (crypto.isCertificateInKeyStore(cert)) {
+            return true;
         }
 
-        if (alias != null) {
-            // Retrieve the certificate for the alias from the keystore
-            try {
-                certs = reqData.getSigCrypto().getCertificates(alias);
-            } catch (WSSecurityException ex) {
-                throw new WSSecurityException(
-                    "WSHandler: Could not get certificates for alias " + alias, ex
-                );
-            }
+        //
+        // SECOND step - Search for the issuer of the transmitted certificate in the 
+        // keystore or the truststore
+        //
+        String[] aliases = crypto.getAliasesForDN(issuerString);
 
-            // If certificates have been found, the certificates must be compared
-            // to ensure against phony DNs (compare encoded form including signature)
-            if (certs != null && certs.length > 0 && cert.equals(certs[0])) {
-                if (doDebug) {
-                    log.debug("Direct trust for certificate with " + subjectString);
-                }
-                return true;
-            }
-        } else {
-            if (doDebug) {
-                log.debug(
-                    "No alias found for subject from issuer with " + issuerString 
-                    + " (serial " + issuerSerial + ")"
-                );
-            }
-        }
-
-        // SECOND step
-        // Search for the issuer of the transmitted certificate in the keystore
-        // Search the keystore for the alias of the transmitted certificates issuer
-        try {
-            aliases = reqData.getSigCrypto().getAliasesForDN(issuerString);
-        } catch (WSSecurityException ex) {
-            throw new WSSecurityException(
-                "WSHandler: Could not get alias for certificate with " + issuerString, ex
-            );
-        }
-
-        // If the alias has not been found, the issuer is not in the keystore
+        // If the alias has not been found, the issuer is not in the keystore/truststore
         // As a direct result, do not trust the transmitted certificate
         if (aliases == null || aliases.length < 1) {
             if (doDebug) {
@@ -1145,10 +1105,13 @@ public abstract class WSHandler {
             return false;
         }
 
+        //
         // THIRD step
-        // Check the certificate trust path for every alias of the issuer found in the keystore
+        // Check the certificate trust path for every alias of the issuer found in the 
+        // keystore/truststore
+        //
         for (int i = 0; i < aliases.length; i++) {
-            alias = aliases[i];
+            String alias = aliases[i];
 
             if (doDebug) {
                 log.debug(
@@ -1157,52 +1120,39 @@ public abstract class WSHandler {
                 );
             }
 
-            // Retrieve the certificate(s) for the alias from the keystore
-            try {
-                certs = reqData.getSigCrypto().getCertificates(alias);
-            } catch (WSSecurityException ex) {
-                throw new WSSecurityException(
-                    "WSHandler: Could not get certificates for alias " + alias, ex
-                );
-            }
+            // Retrieve the certificate(s) for the alias from the keystore/truststore
+            X509Certificate[] certs = crypto.getCertificates(alias);
 
             // If no certificates have been found, there has to be an error:
-            // The keystore can find an alias but no certificate(s)
+            // The keystore/truststore can find an alias but no certificate(s)
             if (certs == null || certs.length < 1) {
                 throw new WSSecurityException(
                     "WSHandler: Could not get certificates for alias " + alias
                 );
             }
 
+            //
             // Form a certificate chain from the transmitted certificate
-            // and the certificate(s) of the issuer from the keystore
-            // First, create new array
+            // and the certificate(s) of the issuer from the keystore/truststore
+            //
             X509Certificate[] x509certs = new X509Certificate[certs.length + 1];
-            // Then add the first certificate ...
             x509certs[0] = cert;
-            // ... and the other certificates
             for (int j = 0; j < certs.length; j++) {
                 x509certs[j + 1] = certs[j];
             }
-            certs = x509certs;
 
+            ///
             // Use the validation method from the crypto to check whether the subjects' 
             // certificate was really signed by the issuer stated in the certificate
-            try {
-                if (reqData.getSigCrypto().validateCertPath(certs)) {
-                    if (doDebug) {
-                        log.debug(
-                            "WSHandler: Certificate path has been verified for certificate "
-                            + "with subject " + subjectString
-                        );
-                    }
-                    return true;
+            //
+            if (crypto.validateCertPath(x509certs)) {
+                if (doDebug) {
+                    log.debug(
+                        "WSHandler: Certificate path has been verified for certificate "
+                        + "with subject " + subjectString
+                    );
                 }
-            } catch (WSSecurityException ex) {
-                throw new WSSecurityException(
-                    "WSHandler: Certificate path verification failed for certificate "
-                    + "with subject " + subjectString, ex
-                );
+                return true;
             }
         }
 
@@ -1214,7 +1164,8 @@ public abstract class WSHandler {
         }
         return false;
     }
-
+    
+    
     /**
      * Evaluate whether a timestamp is considered valid on the receivers' side. Hook to
      * allow subclasses to implement custom validation methods however they see fit.

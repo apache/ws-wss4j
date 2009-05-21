@@ -126,32 +126,6 @@ public class TestWSSecurityWSS86 extends TestCase implements CallbackHandler {
         return msg;
     }
 
-    /**
-     * A unit test...
-     */
-    public void testGetAliasWithPlainIssuer() throws Exception {
-        String issuer = "EMAILADDRESS=Werner@example.com,CN=Werner,OU=WSS4J,O=Apache,L=Munich,ST=Bayern,C=DE";
-        String alias = crypto.getAliasForX509Cert(issuer);
-        assertNotNull("Alias not found using plain issuer only", alias);
-    }
-
-    /**
-     * A unit test...
-     */
-    public void testGetAliasWithEncodedIssuer() throws Exception {
-        String issuer = "1.2.840.113549.1.9.1=#16125765726e6572406578616d706c652e636f6d,CN=Werner,OU=WSS4J,O=Apache,L=Munich,ST=Bayern,C=DE";
-        String alias = crypto.getAliasForX509Cert(issuer);
-        assertNotNull("Alias not found using encoded issuer only", alias);
-    }
-
-    /**
-     * A unit test...
-     */
-    public void testGetAliasWithMicrosoftState() throws Exception {
-        String issuer = "EMAILADDRESS=Werner@example.com,CN=Werner,OU=WSS4J,O=Apache,L=Munich,S=Bayern,C=DE";
-        String alias = crypto.getAliasForX509Cert(issuer);
-        assertNotNull("Alias not found using Microsoft style states (S= instead of ST=)", alias);
-    }
     
     /**
      * Test signing a SOAP message using a cert with an OID

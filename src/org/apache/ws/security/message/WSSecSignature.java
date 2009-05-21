@@ -175,7 +175,7 @@ public class WSSecSignature extends WSSecBase {
             ref.setURI("#" + certUri);
             if (!useSingleCert) {
                 bstToken = new PKIPathSecurity(document);
-                ((PKIPathSecurity) bstToken).setX509Certificates(certs, false, crypto);
+                ((PKIPathSecurity) bstToken).setX509Certificates(certs, crypto);
             } else {
                 bstToken = new X509Security(document);
                 ((X509Security) bstToken).setX509Certificate(certs[0]);

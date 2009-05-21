@@ -47,29 +47,34 @@ public interface Crypto {
 
     /**
      * Construct an array of X509Certificate's from the byte array.
-     * <p/>
      *
      * @param data    The <code>byte</code> array containing the X509 data
-     * @param reverse If set the first certificate in input data will
-     *                the last in the array
-     * @return An array of X509 certificates, ordered according to
-     *         the reverse flag
+     * @return An array of X509 certificates
      * @throws WSSecurityException
      */
-    X509Certificate[] getX509Certificates(byte[] data, boolean reverse) throws WSSecurityException;
+    X509Certificate[] getX509Certificates(byte[] data) throws WSSecurityException;
+    
+    /**
+     * Lookup an X509 Certificate in the keystore according to a given serial number and
+     * the issuer of a Certificate.
+     * 
+     * @param issuer       The issuer's name for the certificate
+     * @param serialNumber The serial number of the certificate from the named issuer
+     * @return the X509 certificate that matches the serialNumber and issuer name
+     *         or null if no such certificate was found.
+     */
+    public X509Certificate getX509Certificate(String issuer, BigInteger serialNumber)
+        throws WSSecurityException;
 
     /**
-     * get a byte array given an array of X509 certificates.
+     * Get a byte array given an array of X509 certificates.
      * <p/>
      *
-     * @param reverse If set the first certificate in the array data will
-     *                the last in the byte array
-     * @param certs   The certificates to convert
-     * @return The byte array for the certificates ordered according
-     *         to the reverse flag
+     * @param certs The certificates to convert
+     * @return The byte array for the certificates
      * @throws WSSecurityException
      */
-    byte[] getCertificateData(boolean reverse, X509Certificate[] certs) throws WSSecurityException;
+    byte[] getCertificateData(X509Certificate[] certs) throws WSSecurityException;
 
     /**
      * Gets the private key identified by <code>alias</> and <code>password</code>.
@@ -81,6 +86,14 @@ public interface Crypto {
      * @throws Exception
      */
     public PrivateKey getPrivateKey(String alias, String password) throws Exception;
+    
+    /**
+     * Check to see if the certificate argument is in the keystore
+     * @param cert The certificate to check
+     * @return true if cert is in the keystore
+     * @throws WSSecurityException
+     */
+    public boolean isCertificateInKeyStore(X509Certificate cert) throws WSSecurityException;
 
     /**
      * get the list of certificates for a given alias. This method
@@ -110,20 +123,6 @@ public interface Crypto {
      * See comment above
      */
     public String getAliasForX509Cert(Certificate cert) throws WSSecurityException;
-
-    /**
-     * Lookup a X509 Certificate in the keystore according to a given
-     * the issuer of a Certificate.
-     * <p/>
-     * The search gets all alias names of the keystore and gets the certificate chain
-     * for each alias. Then the Issuer of each certificate of the chain
-     * is compared with the parameters.
-     *
-     * @param issuer The issuer's name for the certificate
-     * @return alias name of the certificate that matches the issuer name
-     *         or null if no such certificate was found.
-     */
-    public String getAliasForX509Cert(String issuer) throws WSSecurityException;
 
     /**
      * Search a X509 Certificate in the keystore according to a given serial number and

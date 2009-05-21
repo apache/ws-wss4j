@@ -561,7 +561,7 @@ public class SignatureProcessor implements Processor {
         }
         BinarySecurity token = createSecurityToken(elem);
         if (token instanceof PKIPathSecurity) {
-            return ((PKIPathSecurity) token).getX509Certificates(false, crypto);
+            return ((PKIPathSecurity) token).getX509Certificates(crypto);
         } else {
             X509Certificate cert = ((X509Security) token).getX509Certificate(crypto);
             return new X509Certificate[]{cert};

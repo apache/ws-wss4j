@@ -67,13 +67,13 @@ public class PKIPathSecurity extends BinarySecurity {
      * @return array of certificates 
      * @throws WSSecurityException
      */
-    public X509Certificate[] getX509Certificates(boolean reverse, Crypto crypto)
+    public X509Certificate[] getX509Certificates(Crypto crypto)
         throws WSSecurityException {
         byte[] data = getToken();
         if (data == null) {
             return null;
         }
-        return crypto.getX509Certificates(data, reverse);
+        return crypto.getX509Certificates(data);
     }
 
     /**
@@ -86,13 +86,12 @@ public class PKIPathSecurity extends BinarySecurity {
      */
     public void setX509Certificates(
         X509Certificate[] certs,
-        boolean reverse,
         Crypto crypto
     ) throws WSSecurityException {
         if (certs == null) {
             throw new WSSecurityException(WSSecurityException.FAILURE, "noCert");
         }
-        byte[] data = crypto.getCertificateData(reverse, certs);
+        byte[] data = crypto.getCertificateData(certs);
         setToken(data);
     }
 
