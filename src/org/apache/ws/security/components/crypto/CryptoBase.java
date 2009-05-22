@@ -78,7 +78,7 @@ public abstract class CryptoBase implements Crypto {
     private static Log log = LogFactory.getLog(CryptoBase.class);
     protected static Map certFactMap = new HashMap();
     protected KeyStore keystore = null;
-    protected KeyStore cacerts = null;
+    protected KeyStore truststore = null;
     
     /**
      * Constructor
@@ -207,6 +207,9 @@ public abstract class CryptoBase implements Crypto {
      * @throws Exception
      */
     public PrivateKey getPrivateKey(String alias, String password) throws Exception {
+        if (keystore == null) {
+            throw new Exception("The keystore is null");
+        }
         if (alias == null || !keystore.isKeyEntry(alias)) {
             log.error("Cannot find key for alias: " + alias);
             throw new Exception("Cannot find key for alias: " + alias);
@@ -247,6 +250,10 @@ public abstract class CryptoBase implements Crypto {
         X500Principal issuerRDN = null;
         X509Name issuerName = null;
         Certificate cert = null;
+        
+        if (keystore == null) {
+            return null;
+        }
         
         //
         // Convert the issuer DN to a java X500Principal object first. This is to ensure
@@ -308,6 +315,10 @@ public abstract class CryptoBase implements Crypto {
         X500Principal issuerRDN = null;
         X509Name issuerName = null;
         Certificate cert = null;
+        
+        if (keystore == null) {
+            return null;
+        }
         
         //
         // Convert the issuer DN to a java X500Principal object first. This is to ensure
@@ -404,6 +415,9 @@ public abstract class CryptoBase implements Crypto {
     public String getAliasForX509Cert(byte[] skiBytes) throws WSSecurityException {
         Certificate cert = null;
 
+        if (keystore == null) {
+            return null;
+        }
         try {
             for (Enumeration e = keystore.aliases(); e.hasMoreElements();) {
                 String alias = (String) e.nextElement();
@@ -441,6 +455,9 @@ public abstract class CryptoBase implements Crypto {
      */
     public String getAliasForX509Cert(Certificate cert) throws WSSecurityException {
         try {
+            if (keystore == null) {
+                return null;
+            }
             String alias = keystore.getCertificateAlias(cert);
             if (alias != null) {
                 return alias;
@@ -483,11 +500,11 @@ public abstract class CryptoBase implements Crypto {
                 }
             }
 
-            if (certs == null && cacerts != null) {
+            if (certs == null && truststore != null) {
                 // Now look into the trust stores
-                certs = cacerts.getCertificateChain(alias);
+                certs = truststore.getCertificateChain(alias);
                 if (certs == null) {
-                    Certificate cert = cacerts.getCertificate(alias);
+                    Certificate cert = truststore.getCertificate(alias);
                     if (cert != null) {
                         certs = new Certificate[]{cert};
                     }
@@ -526,6 +543,10 @@ public abstract class CryptoBase implements Crypto {
     public String getAliasForX509CertThumb(byte[] thumb) throws WSSecurityException {
         Certificate cert = null;
         MessageDigest sha = null;
+        
+        if (keystore == null) {
+            return null;
+        }
 
         try {
             sha = WSSecurityUtil.resolveMessageDigest();
@@ -660,11 +681,14 @@ public abstract class CryptoBase implements Crypto {
 
         // The DN to search the keystore for
         X500Principal subjectRDN = new X500Principal(subjectDN);
-        List aliases = getAliases(subjectRDN, keystore);
+        List aliases = null;
+        if (keystore != null) {
+            aliases = getAliases(subjectRDN, keystore);
+        }
         
-        //If we can't find the issuer in the keystore then look at cacerts
-        if (aliases.size() == 0 && cacerts != null) {
-            aliases = getAliases(subjectRDN, cacerts);
+        //If we can't find the issuer in the keystore then look at the truststore
+        if ((aliases == null || aliases.size() == 0) && truststore != null) {
+            aliases = getAliases(subjectRDN, truststore);
         }
         
         // Convert the vector into an array
@@ -749,12 +773,12 @@ public abstract class CryptoBase implements Crypto {
             CertPath path = getCertificateFactory().generateCertPath(certList);
 
             Set set = new HashSet();
-            if (cacerts != null) {
-                Enumeration cacertsAliases = cacerts.aliases();
-                while (cacertsAliases.hasMoreElements()) {
-                    String alias = (String) cacertsAliases.nextElement();
+            if (truststore != null) {
+                Enumeration truststoreAliases = truststore.aliases();
+                while (truststoreAliases.hasMoreElements()) {
+                    String alias = (String) truststoreAliases.nextElement();
                     X509Certificate cert = 
-                        (X509Certificate) cacerts.getCertificate(alias);
+                        (X509Certificate) truststore.getCertificate(alias);
                     TrustAnchor anchor = 
                         new TrustAnchor(cert, cert.getExtensionValue(NAME_CONSTRAINTS_OID));
                     set.add(anchor);
@@ -762,14 +786,16 @@ public abstract class CryptoBase implements Crypto {
             }
 
             // Add certificates from the keystore
-            Enumeration aliases = keystore.aliases();
-            while (aliases.hasMoreElements()) {
-                String alias = (String) aliases.nextElement();
-                X509Certificate cert = 
-                    (X509Certificate) keystore.getCertificate(alias);
-                TrustAnchor anchor = 
-                    new TrustAnchor(cert, cert.getExtensionValue(NAME_CONSTRAINTS_OID));
-                set.add(anchor);
+            if (keystore != null) {
+                Enumeration aliases = keystore.aliases();
+                while (aliases.hasMoreElements()) {
+                    String alias = (String) aliases.nextElement();
+                    X509Certificate cert = 
+                        (X509Certificate) keystore.getCertificate(alias);
+                    TrustAnchor anchor = 
+                        new TrustAnchor(cert, cert.getExtensionValue(NAME_CONSTRAINTS_OID));
+                    set.add(anchor);
+                }
             }
 
             PKIXParameters param = new PKIXParameters(set);

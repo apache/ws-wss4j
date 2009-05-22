@@ -349,8 +349,8 @@ public class TestWSSecurityUTDK extends TestCase implements CallbackHandler {
             WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
         java.security.Principal principal = 
             (java.security.Principal) actionResult.get(WSSecurityEngineResult.TAG_PRINCIPAL);
-        //System.out.println(principal.getName());
-        assertTrue(principal.getName().indexOf("derivedKey") != -1);
+        // System.out.println(principal.getName());
+        assertTrue(principal.getName().indexOf("DK") != -1);
     }
     
     /**

@@ -40,6 +40,44 @@ import java.util.Properties;
  */
 public abstract class AbstractCrypto extends CryptoBase {
     
+    /*
+     * Deprecated types
+     */
+    public static final String OLD_KEYSTORE_FILE = 
+        "org.apache.ws.security.crypto.merlin.file";
+    public static final String OLD_CRYPTO_PROVIDER = 
+        "org.apache.ws.security.crypto.merlin.keystore.provider";
+    
+    /*
+     * Crypto provider
+     */
+    public static final String CRYPTO_PROVIDER = 
+        "org.apache.ws.security.crypto.merlin.crypto.provider";
+    
+    /*
+     * KeyStore configuration types
+     */
+    public static final String KEYSTORE_FILE = 
+        "org.apache.ws.security.crypto.merlin.keystore.file";
+    public static final String KEYSTORE_PASSWORD =
+        "org.apache.ws.security.crypto.merlin.keystore.password";
+    public static final String KEYSTORE_TYPE =
+        "org.apache.ws.security.crypto.merlin.keystore.type";
+    public static final String KEYSTORE_ALIAS =
+        "org.apache.ws.security.crypto.merlin.keystore.alias";
+    
+    /*
+     * TrustStore configuration types
+     */
+    public static final String LOAD_CA_CERTS =
+        "org.apache.ws.security.crypto.merlin.load.cacerts";
+    public static final String TRUSTSTORE_FILE =
+        "org.apache.ws.security.crypto.merlin.truststore.file";
+    public static final String TRUSTSTORE_PASSWORD =
+        "org.apache.ws.security.crypto.merlin.truststore.password";
+    public static final String TRUSTSTORE_TYPE =
+        "org.apache.ws.security.crypto.merlin.truststore.type";
+    
     private static final Log log = LogFactory.getLog(AbstractCrypto.class.getName());
     private static final boolean doDebug = log.isDebugEnabled();
 
@@ -64,11 +102,93 @@ public abstract class AbstractCrypto extends CryptoBase {
      */
     public AbstractCrypto(Properties properties, ClassLoader loader) 
         throws CredentialException, IOException {
-        this.properties = properties;
-        if (this.properties == null) {
+        if (properties == null) {
             return;
         }
-        String location = this.properties.getProperty("org.apache.ws.security.crypto.merlin.file");
+        this.properties = properties;
+        String provider = properties.getProperty(CRYPTO_PROVIDER);
+        if (provider == null) {
+            provider = properties.getProperty(OLD_CRYPTO_PROVIDER);
+        }
+        //
+        // Load the KeyStore
+        //
+        String keyStoreLocation = properties.getProperty(KEYSTORE_FILE);
+        if (keyStoreLocation == null) {
+            keyStoreLocation = properties.getProperty(OLD_KEYSTORE_FILE);
+        }
+        if (keyStoreLocation != null) {
+            InputStream is = loadInputStream(loader, keyStoreLocation);
+
+            try {
+                String passwd = properties.getProperty(KEYSTORE_PASSWORD, "security");
+                String type = properties.getProperty(KEYSTORE_TYPE, KeyStore.getDefaultType());
+                keystore = load(is, passwd, provider, type);
+                if (doDebug) {
+                    log.debug(
+                        "The KeyStore " + keyStoreLocation + " of type " + type 
+                        + " has been loaded"
+                    );
+                }
+            } finally {
+                if (is != null) {
+                    is.close();
+                }
+            }
+        } else {
+            if (doDebug) {
+                log.debug("The KeyStore is not loaded as KEYSTORE_FILE is null");
+            }
+        }
+        
+        //
+        // Load the TrustStore
+        //
+        String trustStoreLocation = properties.getProperty(TRUSTSTORE_FILE);
+        if (trustStoreLocation != null) {
+            InputStream is = loadInputStream(loader, trustStoreLocation);
+
+            try {
+                String passwd = properties.getProperty(TRUSTSTORE_PASSWORD, "changeit");
+                String type = properties.getProperty(TRUSTSTORE_TYPE, KeyStore.getDefaultType());
+                truststore = load(is, passwd, provider, type);
+                if (doDebug) {
+                    log.debug(
+                        "The TrustStore " + trustStoreLocation + " of type " + type 
+                        + " has been loaded"
+                    );
+                }
+            } finally {
+                if (is != null) {
+                    is.close();
+                }
+            }
+        } else {
+            String loadCacerts = properties.getProperty(LOAD_CA_CERTS, "false");
+            if (Boolean.valueOf(loadCacerts).booleanValue()) {
+                String cacertsPath = System.getProperty("java.home") + "/lib/security/cacerts";
+                InputStream is = new FileInputStream(cacertsPath);
+                try {
+                    String cacertsPasswd = properties.getProperty(TRUSTSTORE_PASSWORD, "changeit");
+                    truststore = load(is, cacertsPasswd, null, KeyStore.getDefaultType());
+                    if (doDebug) {
+                        log.debug("CA certs have been loaded");
+                    }
+                } finally {
+                    if (is != null) {
+                        is.close();
+                    }
+                }
+            }
+        }
+    }
+
+    
+    /**
+     * Load a KeyStore object as an InputStream, using the ClassLoader and location arguments
+     */
+    public static InputStream loadInputStream(ClassLoader loader, String location) 
+        throws CredentialException, IOException {
         InputStream is = null;
         if (location != null) {
             java.net.URL url = Loader.getResource(loader, location);
@@ -78,9 +198,9 @@ public abstract class AbstractCrypto extends CryptoBase {
                 is = new java.io.FileInputStream(location);
             }
     
-            /**
-             * If we don't find it, then look on the file system.
-             */
+            //
+            // If we don't find it, then look on the file system.
+            //
             if (is == null) {
                 try {
                     is = new FileInputStream(location);
@@ -94,61 +214,9 @@ public abstract class AbstractCrypto extends CryptoBase {
                 }
             }
         }
-
-        /**
-         * Load the keystore
-         */
-        try {
-            String provider = 
-                properties.getProperty("org.apache.ws.security.crypto.merlin.keystore.provider");
-            String passwd = 
-                properties.getProperty(
-                    "org.apache.ws.security.crypto.merlin.keystore.password", 
-                    "security"
-                );
-            String type = 
-                properties.getProperty(
-                    "org.apache.ws.security.crypto.merlin.keystore.type", 
-                    KeyStore.getDefaultType()
-                );
-            this.keystore = load(is, passwd, provider, type);
-        } finally {
-            if (is != null) {
-                is.close();
-            }
-        }
-
-        /**
-         * Load cacerts
-         */
-        String loadCacerts = 
-            properties.getProperty(
-                "org.apache.ws.security.crypto.merlin.load.cacerts",
-                "false"
-            );
-        if (Boolean.valueOf(loadCacerts).booleanValue()) {
-            String cacertsPath = System.getProperty("java.home") + "/lib/security/cacerts";
-            InputStream cacertsIs = new FileInputStream(cacertsPath);
-            try {
-                String cacertsPasswd = 
-                    properties.getProperty(
-                        "org.apache.ws.security.crypto.merlin.cacerts.password", 
-                        "changeit"
-                    );
-                this.cacerts = load(cacertsIs, cacertsPasswd, null, KeyStore.getDefaultType());
-                if (doDebug) {
-                    log.debug("CA certs have been loaded");
-                }
-            } finally {
-                cacertsIs.close();
-            }
-        } else {
-            if (doDebug) {
-                log.debug("CA certs have not been loaded");
-            }
-        }
+        return is;
     }
-
+    
 
     /**
      * Loads the keystore from an <code>InputStream </code>.
@@ -192,9 +260,9 @@ public abstract class AbstractCrypto extends CryptoBase {
     
     protected String
     getCryptoProvider() {
-        return properties.getProperty("org.apache.ws.security.crypto.merlin.cert.provider");
+        return properties.getProperty(CRYPTO_PROVIDER);
     }
-
+    
     /**
      * Retrieves the alias name of the default certificate which has been
      * specified as a property. This should be the certificate that is used for
@@ -208,6 +276,6 @@ public abstract class AbstractCrypto extends CryptoBase {
         if (properties == null) {
             return null;
         }
-        return properties.getProperty("org.apache.ws.security.crypto.merlin.keystore.alias");
+        return properties.getProperty(KEYSTORE_ALIAS);
     }
 }
