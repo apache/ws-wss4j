@@ -23,6 +23,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSecurityException;
+import org.apache.ws.security.WSUsernameTokenPrincipal;
 import org.apache.ws.security.util.DOM2Writer;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.ws.security.util.XmlSchemaDateFormat;
@@ -37,6 +38,7 @@ import javax.crypto.spec.SecretKeySpec;
 import javax.xml.namespace.QName;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.Principal;
 import java.security.SecureRandom;
 import java.text.SimpleDateFormat;
 import java.text.DateFormat;
@@ -695,7 +697,18 @@ public class UsernameToken {
         }
         return false;
     }
-
+    
+    /**
+     * Create a WSUsernameTokenPrincipal from this UsernameToken object
+     */
+    public Principal createPrincipal() {
+        WSUsernameTokenPrincipal principal = 
+            new WSUsernameTokenPrincipal(getName(), isHashed());
+        principal.setNonce(getNonce());
+        principal.setPassword(getPassword());
+        principal.setCreatedTime(getCreated());
+        return principal;
+    }
     
     /**
      * This static method generates a 128 bit salt value as defined in WSS

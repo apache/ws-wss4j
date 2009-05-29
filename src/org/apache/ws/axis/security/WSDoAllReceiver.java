@@ -33,7 +33,6 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.ws.axis.security.handler.WSDoAllHandler;
 import org.apache.ws.security.SOAPConstants;
 import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.handler.WSHandlerConstants;
@@ -47,7 +46,6 @@ import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPHeader;
 import javax.xml.soap.SOAPHeaderElement;
 import java.io.ByteArrayOutputStream;
-import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Iterator;
@@ -271,30 +269,6 @@ public class WSDoAllReceiver extends WSDoAllHandler {
             }
             ((org.apache.axis.message.SOAPHeaderElement) headerElement)
                     .setProcessed(true);
-
-            /*
-            * Now we can check the certificate used to sign the message. In the
-            * following implementation the certificate is only trusted if
-            * either it itself or the certificate of the issuer is installed in
-            * the keystore.
-            *
-            * Note: the method verifyTrust(X509Certificate) allows custom
-            * implementations with other validation algorithms for subclasses.
-            */
-
-            // Extract the signature action result from the action vector
-            WSSecurityEngineResult actionResult = WSSecurityUtil
-                    .fetchActionResult(wsResult, WSConstants.SIGN);
-
-            if (actionResult != null) {
-                X509Certificate returnCert = 
-                    (X509Certificate)actionResult.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE); 
-
-                if (returnCert != null && !verifyTrust(returnCert, reqData)) {
-                    throw new AxisFault(
-                            "WSDoAllReceiver: The certificate used for the signature is not trusted");
-                }
-            }
 
             /*
             * now check the security actions: do they match, in right order?

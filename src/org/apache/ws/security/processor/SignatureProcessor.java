@@ -26,7 +26,6 @@ import org.apache.ws.security.PublicKeyCallback;
 import org.apache.ws.security.PublicKeyPrincipal;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDataRef;
-import org.apache.ws.security.WSDerivedKeyTokenPrincipal;
 import org.apache.ws.security.WSDocInfo;
 import org.apache.ws.security.WSDocInfoStore;
 import org.apache.ws.security.WSPasswordCallback;
@@ -48,17 +47,21 @@ import org.apache.ws.security.saml.SAMLUtil;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.keys.KeyInfo;
+import org.apache.xml.security.keys.keyresolver.KeyResolverException;
 import org.apache.xml.security.signature.Reference;
 import org.apache.xml.security.signature.SignedInfo;
 import org.apache.xml.security.signature.XMLSignature;
 import org.apache.xml.security.signature.XMLSignatureException;
 import org.opensaml.SAMLAssertion;
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.xml.namespace.QName;
 
+import java.math.BigInteger;
+import java.security.PublicKey;
 import java.security.Principal;
 import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
@@ -67,7 +70,6 @@ import java.util.List;
 
 public class SignatureProcessor implements Processor {
     private static Log log = LogFactory.getLog(SignatureProcessor.class.getName());
-    private static Log tlog = LogFactory.getLog("org.apache.ws.security.TIME");
     
     private String signatureId;
     
@@ -105,30 +107,22 @@ public class SignatureProcessor implements Processor {
                 WSDocInfoStore.delete(wsDocInfo);
             }
         }
+        int actionPerformed = WSConstants.SIGN;
         if (lastPrincipalFound instanceof WSUsernameTokenPrincipal) {
-            returnResults.add(
-                0, 
-                new WSSecurityEngineResult(
-                    WSConstants.UT_SIGN, 
-                    lastPrincipalFound, 
-                    null,
-                    protectedRefs, 
-                    signatureValue
-                )
-            );
-        } else {
-            returnResults.add(
-                0, 
-                new WSSecurityEngineResult(
-                    WSConstants.SIGN, 
-                    lastPrincipalFound,
-                    certs, 
-                    protectedRefs, 
-                    signatureValue
-                )
-            );
+            actionPerformed = WSConstants.UT_SIGN;
         }
-        signatureId = elem.getAttributeNS(null, "Id");
+
+        returnResults.add(
+            0, 
+            new WSSecurityEngineResult(
+                actionPerformed, 
+                lastPrincipalFound,
+                certs, 
+                protectedRefs, 
+                signatureValue
+            )
+        );
+        signatureId = elem.getAttribute("Id");
     }
 
     /**
@@ -176,40 +170,33 @@ public class SignatureProcessor implements Processor {
         if (log.isDebugEnabled()) {
             log.debug("Verify XML Signature");
         }
-        long t0 = 0, t1 = 0, t2 = 0;
-        if (tlog.isDebugEnabled()) {
-            t0 = System.currentTimeMillis();
-        }
 
         XMLSignature sig = null;
         try {
             sig = new XMLSignature(elem, null);
-        } catch (XMLSecurityException e2) {
+        } catch (XMLSecurityException ex) {
             throw new WSSecurityException(
-                WSSecurityException.FAILED_CHECK, "noXMLSig", null, e2
+                WSSecurityException.FAILED_CHECK, "noXMLSig", null, ex
             );
         }
-
         sig.addResourceResolver(EnvelopeIdResolver.getInstance());
 
-        KeyInfo info = sig.getKeyInfo();
+        KeyInfo keyInfo = sig.getKeyInfo();
         byte[] secretKey = null;
-        UsernameToken ut = null;
-        DerivedKeyToken dkt = null;
-        SAMLKeyInfo samlKi = null;
-        String customTokenId = null;
-        java.security.PublicKey publicKey = null;
+        PublicKey publicKey = null;
+        Principal principal = null;
         
-        if (info != null && info.containsKeyValue()) {
+        if (keyInfo != null && keyInfo.containsKeyValue()) {
             try {
-                publicKey = info.getPublicKey();
-            } catch (Exception ex) {
-                throw new WSSecurityException(ex.getMessage(), ex);
+                publicKey = keyInfo.getPublicKey();
+                principal = validatePublicKey(cb, publicKey);
+            } catch (KeyResolverException ex) {
+                throw new WSSecurityException(WSSecurityException.FAILED_CHECK, null, null, ex);
             }
-        } else if (info != null) {
+        } else if (keyInfo != null) {
             Element strElement = 
                 WSSecurityUtil.getDirectChildElement(
-                    info.getElement(),
+                    keyInfo.getElement(),
                     SecurityTokenReference.SECURITY_TOKEN_REFERENCE,
                     WSConstants.WSSE_NS
                 );
@@ -219,123 +206,80 @@ public class SignatureProcessor implements Processor {
                 );
             }
             SecurityTokenReference secRef = new SecurityTokenReference(strElement);
+            //
             // Here we get some information about the document that is being
             // processed, in particular the crypto implementation, and already
             // detected BST that may be used later during dereferencing.
             //
-
             if (secRef.containsReference()) {
                 Element token = secRef.getTokenElement(elem.getOwnerDocument(), wsDocInfo, cb);
-                //
-                // at this point check token type: UsernameToken, Binary, SAML
-                // Crypto required only for Binary and SAML
-                //
+                String wsuId = token.getAttributeNS(WSConstants.WSU_NS, "Id");
                 QName el = new QName(token.getNamespaceURI(), token.getLocalName());
-                if (el.equals(WSSecurityEngine.USERNAME_TOKEN)) {
-                    String id = token.getAttributeNS(WSConstants.WSU_NS, "Id");
+                if (el.equals(WSSecurityEngine.BINARY_TOKEN)) {
+                    certs = getCertificates(token, wsDocInfo, crypto);
+                    principal = validateCertificates(certs, crypto);
+                } else if (el.equals(WSSecurityEngine.USERNAME_TOKEN)) {
                     UsernameTokenProcessor utProcessor = 
-                        (UsernameTokenProcessor) wsDocInfo.getProcessor(id);
-                    ut = utProcessor.getUt();
+                        (UsernameTokenProcessor) wsDocInfo.getProcessor(wsuId);
+                    
+                    UsernameToken ut = utProcessor.getUt();
                     if (ut.isDerivedKey()) {
                         secretKey = ut.getDerivedKey();
                     } else {
                         secretKey = ut.getSecretKey();
                     }
+                    principal = ut.createPrincipal();
                 } else if (el.equals(WSSecurityEngine.DERIVED_KEY_TOKEN_05_02) 
                     || el.equals(WSSecurityEngine.DERIVED_KEY_TOKEN_05_12)) {
-                    dkt = new DerivedKeyToken(token);
-                    String id = dkt.getID();
                     DerivedKeyTokenProcessor dktProcessor = 
-                        (DerivedKeyTokenProcessor) wsDocInfo.getProcessor(id);
+                        (DerivedKeyTokenProcessor) wsDocInfo.getProcessor(wsuId);
                     String signatureMethodURI = sig.getSignedInfo().getSignatureMethodURI();
+                    DerivedKeyToken dkt = dktProcessor.getDerivedKeyToken();
                     int keyLength = (dkt.getLength() > 0) ? dkt.getLength() : 
                         WSSecurityUtil.getKeyLength(signatureMethodURI);
                     
                     secretKey = dktProcessor.getKeyBytes(keyLength);
-                } else {
-                    if (el.equals(WSSecurityEngine.BINARY_TOKEN)) {
-                        certs = getCertificates(token, wsDocInfo, crypto);
-                    } else if (el.equals(WSSecurityEngine.SAML_TOKEN)) {
+                    principal = dkt.createPrincipal();
+                } else if (el.equals(WSSecurityEngine.SAML_TOKEN)) {
+                    if (crypto == null) {
+                        throw new WSSecurityException(
+                            WSSecurityException.FAILURE, "noSigCryptoFile"
+                        );
+                    }
+                    SAMLKeyInfo samlKi = SAMLUtil.getSAMLKeyInfo(token, crypto, cb);
+                    certs = samlKi.getCerts();
+                    validateCertificates(certs, crypto);
+                    secretKey = samlKi.getSecret();
+                    principal = createPrincipalFromSAMLKeyInfo(samlKi);
+                } else if (el.equals(WSSecurityEngine.ENCRYPTED_KEY)){
+                    String encryptedKeyID = token.getAttribute("Id");                   
+                    EncryptedKeyProcessor encryptKeyProcessor = 
+                        (EncryptedKeyProcessor)wsDocInfo.getProcessor(encryptedKeyID);
+
+                    if (encryptKeyProcessor == null) {
                         if (crypto == null) {
                             throw new WSSecurityException(
                                 WSSecurityException.FAILURE, "noSigCryptoFile"
                             );
                         }
-                        samlKi = SAMLUtil.getSAMLKeyInfo(token, crypto, cb);
-                        certs = samlKi.getCerts();
-                        secretKey = samlKi.getSecret();
-
-                    } else if (el.equals(WSSecurityEngine.ENCRYPTED_KEY)){
-                        String encryptedKeyID = token.getAttributeNS(null,"Id");                   
-                        EncryptedKeyProcessor encryptKeyProcessor = 
-                            (EncryptedKeyProcessor)wsDocInfo.getProcessor(encryptedKeyID);
-                        
-                        if (encryptKeyProcessor == null ) {
-                            if (crypto == null) {
-                                throw new WSSecurityException(
-                                    WSSecurityException.FAILURE, "noSigCryptoFile"
-                                );
-                            }
-                            encryptKeyProcessor = new EncryptedKeyProcessor();
-                            encryptKeyProcessor.handleEncryptedKey(token, cb, crypto);
-                        } 
-                        secretKey = encryptKeyProcessor.getDecryptedBytes();
-                    } else {
-                        // Try custom token through callback handler
-                        // try to find a custom token
-                        String id = secRef.getReference().getURI();
-                        if (id.charAt(0) == '#') {
-                            id = id.substring(1);
-                        }
-                        WSPasswordCallback pwcb = 
-                            new WSPasswordCallback(id, WSPasswordCallback.CUSTOM_TOKEN);
-                        try {
-                            Callback[] callbacks = new Callback[]{pwcb};
-                            cb.handle(callbacks);
-                        } catch (Exception e) {
-                            throw new WSSecurityException(
-                                WSSecurityException.FAILURE,
-                                "noPassword", 
-                                new Object[] {id}, 
-                                e
-                            );
-                        }
-                        
-                        secretKey = pwcb.getKey();
-                        customTokenId = id;
-                        if (secretKey == null) {
-                            throw new WSSecurityException(
-                                WSSecurityException.INVALID_SECURITY,
-                                "unsupportedKeyInfo", 
-                                new Object[]{el.toString()}
-                            );
-                        }
-                    }
+                        encryptKeyProcessor = new EncryptedKeyProcessor();
+                        encryptKeyProcessor.handleEncryptedKey(token, cb, crypto);
+                    } 
+                    secretKey = encryptKeyProcessor.getDecryptedBytes();
+                    principal = new CustomTokenPrincipal(encryptedKeyID);
+                } else {
+                    String id = secRef.getReference().getURI();
+                    secretKey = getSecretKeyFromCustomToken(id, cb);
+                    principal = new CustomTokenPrincipal(id);
                 }
             } else if (secRef.containsX509Data() || secRef.containsX509IssuerSerial()) {
                 certs = secRef.getX509IssuerSerial(crypto);
+                principal = validateCertificates(certs, crypto);
             } else if (secRef.containsKeyIdentifier()) {
                 if (secRef.getKeyIdentifierValueType().equals(SecurityTokenReference.ENC_KEY_SHA1_URI)) {
                     String id = secRef.getKeyIdentifierValue();
-                    WSPasswordCallback pwcb = 
-                        new WSPasswordCallback(
-                            id,
-                            null,
-                            SecurityTokenReference.ENC_KEY_SHA1_URI,
-                            WSPasswordCallback.ENCRYPTED_KEY_TOKEN
-                        );
-                    try {
-                        Callback[] callbacks = new Callback[]{pwcb};
-                        cb.handle(callbacks);
-                    } catch (Exception e) {
-                        throw new WSSecurityException(
-                            WSSecurityException.FAILURE,
-                            "noPassword", 
-                            new Object[] {id}, 
-                            e
-                        );
-                    }
-                    secretKey = pwcb.getKey();
+                    secretKey = getSecretKeyFromEncKeySHA1KI(id, cb);
+                    principal = new CustomTokenPrincipal(id);
                 } else if (WSConstants.WSS_SAML_KI_VALUE_TYPE.equals(secRef.getKeyIdentifierValueType())) { 
                     Element token = 
                         secRef.getKeyIdentifierTokenElement(elem.getOwnerDocument(), wsDocInfo, cb);
@@ -345,11 +289,14 @@ public class SignatureProcessor implements Processor {
                             WSSecurityException.FAILURE, "noSigCryptoFile"
                         );
                     }
-                    samlKi = SAMLUtil.getSAMLKeyInfo(token, crypto, cb);
+                    SAMLKeyInfo samlKi = SAMLUtil.getSAMLKeyInfo(token, crypto, cb);
                     certs = samlKi.getCerts();
+                    validateCertificates(certs, crypto);
                     secretKey = samlKi.getSecret();
+                    principal = createPrincipalFromSAMLKeyInfo(samlKi);
                 } else {
                     certs = secRef.getKeyIdentifier(crypto);
+                    principal = validateCertificates(certs, crypto);
                 }
             } else {
                 throw new WSSecurityException(
@@ -359,29 +306,64 @@ public class SignatureProcessor implements Processor {
                 );
             }
         } else {
-            if (crypto == null) {
-                throw new WSSecurityException(WSSecurityException.FAILURE, "noSigCryptoFile");
-            }
-            if (crypto.getDefaultX509Alias() != null) {
-                certs = crypto.getCertificates(crypto.getDefaultX509Alias());
-            } else {
-                throw new WSSecurityException(
-                    WSSecurityException.INVALID_SECURITY, "unsupportedKeyInfo"
-                );
-            }
+            principal = getDefaultPrincipal(crypto);
         }
-        if (tlog.isDebugEnabled()) {
-            t1 = System.currentTimeMillis();
-        }
+        //
+        // Check that we have a certificate, a public key or a secret key with which to
+        // perform signature verification
+        //
         if ((certs == null || certs.length == 0 || certs[0] == null) 
             && secretKey == null
             && publicKey == null) {
             throw new WSSecurityException(WSSecurityException.FAILED_CHECK);
         }
-        if (certs != null) {
+
+        //
+        // Perform the signature verification and build up a List of elements that the
+        // signature refers to
+        //
+        try {
+            boolean signatureOk = false;
+            if (certs != null && certs[0] != null) {
+                signatureOk = sig.checkSignatureValue(certs[0]);
+            } else if (publicKey != null) {
+                signatureOk = sig.checkSignatureValue(publicKey);
+            } else {
+                signatureOk = sig.checkSignatureValue(sig.createSecretKey(secretKey));
+            }
+            if (signatureOk) {
+                signatureValue = sig.getSignatureValue();
+                SignedInfo signedInfo = sig.getSignedInfo();
+                protectedRefs = 
+                    buildProtectedRefs(elem.getOwnerDocument(), signedInfo, protectedRefs);
+                
+                return principal;
+            } else {
+                throw new WSSecurityException(WSSecurityException.FAILED_CHECK);
+            }
+        } catch (XMLSignatureException ex) {
+            throw new WSSecurityException(
+                WSSecurityException.FAILED_CHECK, null, null, ex
+            );
+        }
+    }
+    
+    
+    /**
+     * Validate an array of certificates by checking the validity of each cert, and verifying trust
+     * @param certsToValidate The array of certificates to validate
+     * @param crypto The crypto object representing the keystore
+     * @return A principal representing the first element in the array (if it exists)
+     * @throws WSSecurityException
+     */
+    public static Principal validateCertificates(
+        X509Certificate[] certsToValidate,
+        Crypto crypto
+    ) throws WSSecurityException {
+        if (certsToValidate != null && certsToValidate.length > 0) {
             try {
-                for (int i = 0; i < certs.length; i++) {
-                    certs[i].checkValidity();
+                for (int i = 0; i < certsToValidate.length; i++) {
+                    certsToValidate[i].checkValidity();
                 }
             } catch (CertificateExpiredException e) {
                 throw new WSSecurityException(
@@ -392,126 +374,314 @@ public class SignatureProcessor implements Processor {
                     WSSecurityException.FAILED_CHECK, "invalidCert", null, e
                 );
             }
-        }
-        //
-        // Delegate verification of a public key to a Callback Handler
-        //
-        if (publicKey != null) {
-            PublicKeyCallback pwcb = 
-                new PublicKeyCallback(publicKey);
-            try {
-                Callback[] callbacks = new Callback[]{pwcb};
-                cb.handle(callbacks);
-                if (!pwcb.isVerified()) {
-                    throw new WSSecurityException(
-                        WSSecurityException.FAILED_AUTHENTICATION, null, null, null
-                    );
-                }
-            } catch (Exception e) {
-                throw new WSSecurityException(
-                    WSSecurityException.FAILED_AUTHENTICATION, null, null, e
-                );
-            }
-        }
-        try {
-            boolean signatureOk = false;
-            if (certs != null) {
-                signatureOk = sig.checkSignatureValue(certs[0]);
-            } else if (publicKey != null) {
-                signatureOk = sig.checkSignatureValue(publicKey);
-            } else {
-                signatureOk = sig.checkSignatureValue(sig.createSecretKey(secretKey));
-            }
-            if (signatureOk) {
-                if (tlog.isDebugEnabled()) {
-                    t2 = System.currentTimeMillis();
-                    tlog.debug(
-                        "Verify: total= " + (t2 - t0) + ", prepare-cert= " + (t1 - t0) 
-                        + ", verify= " + (t2 - t1)
-                    );
-                }
-                signatureValue = sig.getSignatureValue();
-                //
-                // Now dig into the Signature element to get the elements that
-                // this Signature covers. Build the QName of these Elements and
-                // return them to caller
-                //
-                SignedInfo si = sig.getSignedInfo();
-                int numReferences = si.getLength();
-                for (int i = 0; i < numReferences; i++) {
-                    Reference siRef;
-                    try {
-                        siRef = si.item(i);
-                    } catch (XMLSecurityException e3) {
-                        throw new WSSecurityException(
-                            WSSecurityException.FAILED_CHECK, null, null, e3
-                        );
-                    }
-                    String uri = siRef.getURI();
-                    if (!"".equals(uri)) {
-                        Element se = WSSecurityUtil.getElementByWsuId(elem.getOwnerDocument(), uri);
-                        if (se == null) {
-                            se = WSSecurityUtil.getElementByGenId(elem.getOwnerDocument(), uri);
-                        }
-                        if (se == null) {
-                            throw new WSSecurityException(WSSecurityException.FAILED_CHECK);
-                        }
-                        WSDataRef ref = new WSDataRef();
-                        ref.setWsuId(uri);
-                        ref.setName(new QName(se.getNamespaceURI(), se.getLocalName()));
-                        protectedRefs.add(ref);
-                    }
-                }
-                
-                if (certs != null) {
-                    return certs[0].getSubjectDN();
-                } else if (publicKey != null) {
-                    return new PublicKeyPrincipal(publicKey);
-                } else if (ut != null) {
-                    WSUsernameTokenPrincipal principal = 
-                        new WSUsernameTokenPrincipal(ut.getName(), ut.isHashed());
-                    principal.setNonce(ut.getNonce());
-                    principal.setPassword(ut.getPassword());
-                    principal.setCreatedTime(ut.getCreated());
-                    return principal;
-                } else if (dkt != null) {
-                    WSDerivedKeyTokenPrincipal principal = new WSDerivedKeyTokenPrincipal(dkt.getID());
-                    principal.setNonce(dkt.getNonce());
-                    principal.setLabel(dkt.getLabel());
-                    principal.setLength(dkt.getLength());
-                    principal.setOffset(dkt.getOffset());
-                    String basetokenId = null;
-                    SecurityTokenReference securityTokenReference = dkt.getSecurityTokenReference();
-                    if (securityTokenReference.containsReference()) {
-                        basetokenId = securityTokenReference.getReference().getURI();
-                        if (basetokenId.charAt(0) == '#') {
-                            basetokenId = basetokenId.substring(1);
-                        }
-                    } else {
-                        // KeyIdentifier
-                        basetokenId = securityTokenReference.getKeyIdentifierValue();
-                    }
-                    principal.setBasetokenId(basetokenId);
-                    return principal;
-                } else if (samlKi != null) {
-                    final SAMLAssertion assertion = samlKi.getAssertion();
-                    CustomTokenPrincipal principal = new CustomTokenPrincipal(assertion.getId());
-                    principal.setTokenObject(assertion);
-                    return principal;
-                } else if (secretKey != null) {
-                    // This is the custom key scenario
-                    return new CustomTokenPrincipal(customTokenId);
-                } else {
-                    throw new WSSecurityException("Cannot determine principal");
-                }
-            } else {
+            if (!verifyTrust(certsToValidate[0], crypto)) {
                 throw new WSSecurityException(WSSecurityException.FAILED_CHECK);
             }
-        } catch (XMLSignatureException e1) {
-            throw new WSSecurityException(
-                WSSecurityException.FAILED_CHECK, null, null, e1
+            return certsToValidate[0].getSubjectX500Principal();
+        }
+        return null;
+    }
+    
+    
+    /**
+     * Evaluate whether a given certificate should be trusted.
+     * 
+     * Policy used in this implementation:
+     * 1. Search the keystore for the transmitted certificate
+     * 2. Search the keystore for a connection to the transmitted certificate
+     * (that is, search for certificate(s) of the issuer of the transmitted certificate
+     * 3. Verify the trust path for those certificates found because the search for the issuer 
+     * might be fooled by a phony DN (String!)
+     *
+     * @param cert the certificate that should be validated against the keystore
+     * @return true if the certificate is trusted, false if not
+     * @throws WSSecurityException
+     */
+    public static boolean verifyTrust(X509Certificate cert, Crypto crypto) 
+        throws WSSecurityException {
+
+        // If no certificate was transmitted, do not trust the signature
+        if (cert == null) {
+            return false;
+        }
+
+        String subjectString = cert.getSubjectDN().getName();
+        String issuerString = cert.getIssuerDN().getName();
+        BigInteger issuerSerial = cert.getSerialNumber();
+
+        if (log.isDebugEnabled()) {
+            log.debug("Transmitted certificate has subject " + subjectString);
+            log.debug(
+                "Transmitted certificate has issuer " + issuerString + " (serial " 
+                + issuerSerial + ")"
             );
         }
+
+        //
+        // FIRST step - Search the keystore for the transmitted certificate
+        //
+        if (crypto.isCertificateInKeyStore(cert)) {
+            return true;
+        }
+
+        //
+        // SECOND step - Search for the issuer of the transmitted certificate in the 
+        // keystore or the truststore
+        //
+        String[] aliases = crypto.getAliasesForDN(issuerString);
+
+        // If the alias has not been found, the issuer is not in the keystore/truststore
+        // As a direct result, do not trust the transmitted certificate
+        if (aliases == null || aliases.length < 1) {
+            if (log.isDebugEnabled()) {
+                log.debug(
+                    "No aliases found in keystore for issuer " + issuerString 
+                    + " of certificate for " + subjectString
+                );
+            }
+            return false;
+        }
+
+        //
+        // THIRD step
+        // Check the certificate trust path for every alias of the issuer found in the 
+        // keystore/truststore
+        //
+        for (int i = 0; i < aliases.length; i++) {
+            String alias = aliases[i];
+
+            if (log.isDebugEnabled()) {
+                log.debug(
+                    "Preparing to validate certificate path with alias " + alias 
+                    + " for issuer " + issuerString
+                );
+            }
+
+            // Retrieve the certificate(s) for the alias from the keystore/truststore
+            X509Certificate[] certs = crypto.getCertificates(alias);
+
+            // If no certificates have been found, there has to be an error:
+            // The keystore/truststore can find an alias but no certificate(s)
+            if (certs == null || certs.length < 1) {
+                throw new WSSecurityException(
+                    "Could not get certificates for alias " + alias
+                );
+            }
+
+            //
+            // Form a certificate chain from the transmitted certificate
+            // and the certificate(s) of the issuer from the keystore/truststore
+            //
+            X509Certificate[] x509certs = new X509Certificate[certs.length + 1];
+            x509certs[0] = cert;
+            for (int j = 0; j < certs.length; j++) {
+                x509certs[j + 1] = certs[j];
+            }
+
+            ///
+            // Use the validation method from the crypto to check whether the subjects' 
+            // certificate was really signed by the issuer stated in the certificate
+            //
+            if (crypto.validateCertPath(x509certs)) {
+                if (log.isDebugEnabled()) {
+                    log.debug(
+                        "Certificate path has been verified for certificate with subject " 
+                        + subjectString
+                    );
+                }
+                return true;
+            }
+        }
+
+        if (log.isDebugEnabled()) {
+            log.debug(
+                "Certificate path could not be verified for certificate with subject " 
+                + subjectString
+            );
+        }
+        return false;
+    }
+    
+    
+    /**
+     * Get the default principal from the KeyStore
+     * @param crypto The Crypto object containing the default alias
+     * @return The default principal
+     * @throws WSSecurityException
+     */
+    private Principal getDefaultPrincipal(
+        Crypto crypto
+    ) throws WSSecurityException {
+        if (crypto == null) {
+            throw new WSSecurityException(WSSecurityException.FAILURE, "noSigCryptoFile");
+        }
+        if (crypto.getDefaultX509Alias() != null) {
+            certs = crypto.getCertificates(crypto.getDefaultX509Alias());
+            return certs[0].getSubjectX500Principal();
+        } else {
+            throw new WSSecurityException(
+                WSSecurityException.INVALID_SECURITY, "unsupportedKeyInfo"
+            );
+        }
+    }
+    
+    
+    /**
+     * Get the Secret Key from a CallbackHandler for a custom token
+     * @param id The id of the element
+     * @param cb The CallbackHandler object
+     * @return A Secret Key
+     * @throws WSSecurityException
+     */
+    private byte[] getSecretKeyFromCustomToken(
+        String id,
+        CallbackHandler cb
+    ) throws WSSecurityException {
+        if (id.charAt(0) == '#') {
+            id = id.substring(1);
+        }
+        WSPasswordCallback pwcb = 
+            new WSPasswordCallback(id, WSPasswordCallback.CUSTOM_TOKEN);
+        try {
+            Callback[] callbacks = new Callback[]{pwcb};
+            cb.handle(callbacks);
+        } catch (Exception e) {
+            throw new WSSecurityException(
+                WSSecurityException.FAILURE,
+                "noPassword", 
+                new Object[] {id}, 
+                e
+            );
+        }
+
+        return pwcb.getKey();
+    }
+    
+    
+    /**
+     * Get the Secret Key from a CallbackHandler for the Encrypted Key SHA1 case.
+     * @param id The id of the element
+     * @param cb The CallbackHandler object
+     * @return A Secret Key
+     * @throws WSSecurityException
+     */
+    private byte[] getSecretKeyFromEncKeySHA1KI(
+        String id,
+        CallbackHandler cb
+    ) throws WSSecurityException {
+        WSPasswordCallback pwcb = 
+            new WSPasswordCallback(
+                id,
+                null,
+                SecurityTokenReference.ENC_KEY_SHA1_URI,
+                WSPasswordCallback.ENCRYPTED_KEY_TOKEN
+            );
+        try {
+            Callback[] callbacks = new Callback[]{pwcb};
+            cb.handle(callbacks);
+        } catch (Exception e) {
+            throw new WSSecurityException(
+                WSSecurityException.FAILURE,
+                "noPassword", 
+                new Object[] {id}, 
+                e
+            );
+        }
+        return pwcb.getKey();
+    }
+    
+    
+    /**
+     * A method to create a Principal from a SAML KeyInfo
+     * @param samlKeyInfo The SAML KeyInfo object
+     * @return A principal
+     */
+    private static Principal createPrincipalFromSAMLKeyInfo(
+        SAMLKeyInfo samlKeyInfo
+    ) {
+        X509Certificate[] samlCerts = samlKeyInfo.getCerts();
+        Principal principal = null;
+        if (samlCerts != null && samlCerts.length > 0) {
+            principal = samlCerts[0].getSubjectX500Principal();
+        } else {
+            final SAMLAssertion assertion = samlKeyInfo.getAssertion();
+            principal = new CustomTokenPrincipal(assertion.getId());
+            ((CustomTokenPrincipal)principal).setTokenObject(assertion);
+        }
+        return principal;
+    }
+    
+    /**
+     * Validate a public key via a CallbackHandler
+     * @param cb The CallbackHandler object
+     * @param publicKey The PublicKey to validate
+     * @return A PublicKeyPrincipal object encapsulating the public key after successful 
+     *         validation
+     * @throws WSSecurityException
+     */
+    private static Principal validatePublicKey(
+        CallbackHandler cb,
+        PublicKey publicKey
+    ) throws WSSecurityException {
+        PublicKeyCallback pwcb = 
+            new PublicKeyCallback(publicKey);
+        try {
+            Callback[] callbacks = new Callback[]{pwcb};
+            cb.handle(callbacks);
+            if (!pwcb.isVerified()) {
+                throw new WSSecurityException(
+                    WSSecurityException.FAILED_AUTHENTICATION, null, null, null
+                );
+            }
+        } catch (Exception e) {
+            throw new WSSecurityException(
+                WSSecurityException.FAILED_AUTHENTICATION, null, null, e
+            );
+        }
+        return new PublicKeyPrincipal(publicKey);
+    }
+    
+    
+    /**
+     * This method digs into the Signature element to get the elements that
+     * this Signature covers. Build the QName of these Elements and return them
+     * to caller
+     * @param doc The owning document
+     * @param signedInfo The SignedInfo object
+     * @param protectedRefs A list of protected references
+     * @return A list of protected references
+     * @throws WSSecurityException
+     */
+    private static List buildProtectedRefs(
+        Document doc,
+        SignedInfo signedInfo, 
+        List protectedRefs
+    ) throws WSSecurityException {
+        for (int i = 0; i < signedInfo.getLength(); i++) {
+            Reference siRef;
+            try {
+                siRef = signedInfo.item(i);
+            } catch (XMLSecurityException ex) {
+                throw new WSSecurityException(
+                    WSSecurityException.FAILED_CHECK, null, null, ex
+                );
+            }
+            String uri = siRef.getURI();
+            if (!"".equals(uri)) {
+                Element se = WSSecurityUtil.getElementByWsuId(doc, uri);
+                if (se == null) {
+                    se = WSSecurityUtil.getElementByGenId(doc, uri);
+                }
+                if (se == null) {
+                    throw new WSSecurityException(WSSecurityException.FAILED_CHECK);
+                }
+                WSDataRef ref = new WSDataRef();
+                ref.setWsuId(uri);
+                ref.setProtectedElement(se);
+                protectedRefs.add(ref);
+            }
+        }
+        return protectedRefs;
     }
     
     

@@ -304,6 +304,8 @@
   
             </plugins>
         </pluginManagement>
+        
+        <defaultGoal>install</defaultGoal>
     </build>
     
 
@@ -378,6 +380,13 @@
                     <scope>compile</scope>
                 </dependency>
             </dependencies>
+        </profile>
+        <profile>
+            <id>fastinstall</id>
+            <properties>
+                <maven.test.skip>true</maven.test.skip>
+                <pmd.skip>true</pmd.skip>
+            </properties>
         </profile>
     </profiles>
 

@@ -19,6 +19,7 @@
 
 package org.apache.ws.security.message.token;
 
+import java.security.Principal;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
@@ -27,6 +28,7 @@ import javax.xml.namespace.QName;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.WSDerivedKeyTokenPrincipal;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.conversation.ConversationConstants;
 import org.apache.ws.security.conversation.ConversationException;
@@ -461,6 +463,32 @@ public class DerivedKeyToken {
         } else {
             return algo;
         }
+    }
+    
+    /**
+     * Create a WSDerivedKeyTokenPrincipal from this DerivedKeyToken object
+     */
+    public Principal createPrincipal() throws WSSecurityException {
+        WSDerivedKeyTokenPrincipal principal = new WSDerivedKeyTokenPrincipal(getID());
+        principal.setNonce(getNonce());
+        principal.setLabel(getLabel());
+        principal.setLength(getLength());
+        principal.setOffset(getOffset());
+        
+        String basetokenId = null;
+        SecurityTokenReference securityTokenReference = getSecurityTokenReference();
+        if (securityTokenReference.containsReference()) {
+            basetokenId = securityTokenReference.getReference().getURI();
+            if (basetokenId.charAt(0) == '#') {
+                basetokenId = basetokenId.substring(1);
+            }
+        } else {
+            // KeyIdentifier
+            basetokenId = securityTokenReference.getKeyIdentifierValue();
+        }
+        principal.setBasetokenId(basetokenId);
+        
+        return principal;
     }
 
     /**

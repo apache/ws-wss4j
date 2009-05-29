@@ -34,6 +34,7 @@ import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.message.WSSecHeader;
 import org.apache.ws.security.message.token.SignatureConfirmation;
 import org.apache.ws.security.message.token.Timestamp;
+import org.apache.ws.security.processor.SignatureProcessor;
 import org.apache.ws.security.util.Loader;
 import org.apache.ws.security.util.StringUtil;
 import org.apache.ws.security.util.WSSecurityUtil;
@@ -42,7 +43,6 @@ import org.w3c.dom.Document;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 
-import java.math.BigInteger;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.Hashtable;
@@ -1058,111 +1058,11 @@ public abstract class WSHandler {
      * @return true if the certificate is trusted, false if not (AxisFault is thrown for exceptions
      * during CertPathValidation)
      * @throws WSSecurityException
+     * @deprecated Trust is verified on signature certificates in the SignatureProcessor by default
      */
     protected boolean verifyTrust(X509Certificate cert, RequestData reqData) 
         throws WSSecurityException {
-
-        // If no certificate was transmitted, do not trust the signature
-        if (cert == null) {
-            return false;
-        }
-
-        String subjectString = cert.getSubjectDN().getName();
-        String issuerString = cert.getIssuerDN().getName();
-        BigInteger issuerSerial = cert.getSerialNumber();
-        Crypto crypto = reqData.getSigCrypto();
-
-        if (doDebug) {
-            log.debug("WSHandler: Transmitted certificate has subject " + subjectString);
-            log.debug(
-                "WSHandler: Transmitted certificate has issuer " + issuerString 
-                + " (serial " + issuerSerial + ")"
-            );
-        }
-
-        //
-        // FIRST step - Search the keystore for the transmitted certificate
-        //
-        if (crypto.isCertificateInKeyStore(cert)) {
-            return true;
-        }
-
-        //
-        // SECOND step - Search for the issuer of the transmitted certificate in the 
-        // keystore or the truststore
-        //
-        String[] aliases = crypto.getAliasesForDN(issuerString);
-
-        // If the alias has not been found, the issuer is not in the keystore/truststore
-        // As a direct result, do not trust the transmitted certificate
-        if (aliases == null || aliases.length < 1) {
-            if (doDebug) {
-                log.debug(
-                    "No aliases found in keystore for issuer " + issuerString 
-                    + " of certificate for " + subjectString
-                );
-            }
-            return false;
-        }
-
-        //
-        // THIRD step
-        // Check the certificate trust path for every alias of the issuer found in the 
-        // keystore/truststore
-        //
-        for (int i = 0; i < aliases.length; i++) {
-            String alias = aliases[i];
-
-            if (doDebug) {
-                log.debug(
-                    "Preparing to validate certificate path with alias " + alias 
-                    + " for issuer " + issuerString
-                );
-            }
-
-            // Retrieve the certificate(s) for the alias from the keystore/truststore
-            X509Certificate[] certs = crypto.getCertificates(alias);
-
-            // If no certificates have been found, there has to be an error:
-            // The keystore/truststore can find an alias but no certificate(s)
-            if (certs == null || certs.length < 1) {
-                throw new WSSecurityException(
-                    "WSHandler: Could not get certificates for alias " + alias
-                );
-            }
-
-            //
-            // Form a certificate chain from the transmitted certificate
-            // and the certificate(s) of the issuer from the keystore/truststore
-            //
-            X509Certificate[] x509certs = new X509Certificate[certs.length + 1];
-            x509certs[0] = cert;
-            for (int j = 0; j < certs.length; j++) {
-                x509certs[j + 1] = certs[j];
-            }
-
-            ///
-            // Use the validation method from the crypto to check whether the subjects' 
-            // certificate was really signed by the issuer stated in the certificate
-            //
-            if (crypto.validateCertPath(x509certs)) {
-                if (doDebug) {
-                    log.debug(
-                        "WSHandler: Certificate path has been verified for certificate "
-                        + "with subject " + subjectString
-                    );
-                }
-                return true;
-            }
-        }
-
-        if (doDebug) {
-            log.debug(
-                "WSHandler: Certificate path could not be verified for "
-                + "certificate with subject " + subjectString
-            );
-        }
-        return false;
+        return SignatureProcessor.verifyTrust(cert, reqData.getSigCrypto());
     }
     
     

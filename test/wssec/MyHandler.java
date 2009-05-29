@@ -19,8 +19,6 @@
 
 package wssec;
 
-import java.security.cert.X509Certificate;
-
 import org.apache.ws.security.handler.WSHandler;
 import org.apache.ws.security.handler.RequestData;
 import org.w3c.dom.Document;
@@ -112,14 +110,5 @@ public class MyHandler extends WSHandler {
         return checkReceiverResultsAnyOrder(results, actions);
     }
     
-    public boolean verifyCertificate(
-        X509Certificate cert,
-        RequestData reqData 
-    ) throws org.apache.ws.security.WSSecurityException {
-        return verifyTrust(
-            cert, 
-            reqData
-        );
-    }
     
 }

@@ -167,23 +167,11 @@ public class TestWSSecurityWSS40 extends TestCase implements CallbackHandler {
         // Verify the signature
         //
         List results = verify(signedDoc, cryptoCA);
-        
-        //
-        // Verify trust on the X509Certificate
-        //
-        MyHandler handler = new MyHandler();
-        final RequestData reqData = new RequestData();
-        reqData.setSigCrypto(cryptoCA);
         WSSecurityEngineResult result = 
             WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
-
         X509Certificate cert = 
             (X509Certificate)result.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE);
         assertTrue (cert != null);
-        boolean trusted = handler.verifyCertificate(cert, reqData);
-        if (!trusted) {
-            fail("The X509 Certificate is not trusted!");
-        }
     }
     
     
@@ -245,22 +233,8 @@ public class TestWSSecurityWSS40 extends TestCase implements CallbackHandler {
         //
         // Verify the signature
         //
-        List results = verify(signedDoc, CryptoFactory.getInstance("wss40badcatrust.properties"));
-        
-        //
-        // Verify trust on the X509Certificate
-        //
-        MyHandler handler = new MyHandler();
-        final RequestData reqData = new RequestData();
-        reqData.setSigCrypto(CryptoFactory.getInstance("wss40badcatrust.properties"));
-        WSSecurityEngineResult result = 
-            WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
-
-        X509Certificate cert = 
-            (X509Certificate)result.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE);
-        assertTrue (cert != null);
         try {
-            handler.verifyCertificate(cert, reqData);
+            verify(signedDoc, CryptoFactory.getInstance("wss40badcatrust.properties"));
             fail("Failure expected on bad CA cert!");
         } catch (WSSecurityException ex) {
             // expected
