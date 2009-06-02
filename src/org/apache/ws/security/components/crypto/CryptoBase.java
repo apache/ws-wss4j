@@ -194,14 +194,37 @@ public abstract class CryptoBase implements Crypto {
         }
         boolean b = keystore.isKeyEntry(alias);
         if (!b) {
-            log.error("Cannot find key for alias: " + alias);
-            throw new Exception("Cannot find key for alias: " + alias);
+            String msg = "Cannot find key for alias: [" + alias + "]";
+            String logMsg = createKeyStoreErrorMessage(keystore);
+            log.error(msg + logMsg);
+            throw new Exception(msg);
         }
         Key keyTmp = keystore.getKey(alias, password.toCharArray());
         if (!(keyTmp instanceof PrivateKey)) {
-            throw new Exception("Key is not a private key, alias: " + alias);
+            String msg = "Key is not a private key, alias: [" + alias + "]";
+            String logMsg = createKeyStoreErrorMessage(keystore);
+            log.error(msg + logMsg);
+            throw new Exception(msg);
         }
         return (PrivateKey) keyTmp;
+    }
+    
+    protected static String createKeyStoreErrorMessage(KeyStore keystore) throws KeyStoreException {
+        Enumeration aliases = keystore.aliases();
+        StringBuilder sb = new StringBuilder(keystore.size() * 7);
+        boolean firstAlias = true;
+        while (aliases.hasMoreElements()) {
+            if (!firstAlias) {
+                sb.append(", ");
+            }
+            sb.append(aliases.nextElement());
+            firstAlias = false;
+        }
+        String msg = " in keystore of type [" + keystore.getType()
+            + "] from provider [" + keystore.getProvider()
+            + "] with size [" + keystore.size() + "] and aliases: {"
+            + sb.toString() + "}";
+        return msg;
     }
 
     protected Vector splitAndTrim(String inString) {
