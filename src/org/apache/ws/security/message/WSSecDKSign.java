@@ -35,6 +35,7 @@ import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.keys.KeyInfo;
 import org.apache.xml.security.signature.XMLSignature;
 import org.apache.xml.security.signature.XMLSignatureException;
+import org.apache.xml.security.utils.Constants;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import java.util.List;
@@ -52,7 +53,7 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
     private static Log log = LogFactory.getLog(WSSecDKSign.class.getName());
 
     protected String sigAlgo = XMLSignature.ALGO_ID_MAC_HMAC_SHA1;
-    protected String digestAlgo = "http://www.w3.org/2000/09/xmldsig#sha1";
+    protected String digestAlgo = Constants.ALGO_ID_DIGEST_SHA1;
     protected String canonAlgo = Canonicalizer.ALGO_ID_C14N_EXCL_OMIT_COMMENTS;
     protected byte[] signatureValue = null;
     
@@ -116,7 +117,7 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
         }
         
         sig.addResourceResolver(EnvelopeIdResolver.getInstance());
-        String sigUri = wssConfig.getIdAllocator().createId("Sig-", sig);
+        String sigUri = wssConfig.getIdAllocator().createId("SIG-", sig);
         sig.setId(sigUri);
         
         keyInfo = sig.getKeyInfo();
@@ -226,7 +227,7 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
     }
     
     /**
-     * Set the digest algorithm to use. The default is SHA-1.
+     * Set the digest algorithm to use. The default is Constants.ALGO_ID_DIGEST_SHA1.
      * @param algorithm the digest algorithm to use.
      */
     public void setDigestAlgorithm(String algorithm) {

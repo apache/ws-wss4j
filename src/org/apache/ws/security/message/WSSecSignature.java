@@ -100,7 +100,7 @@ public class WSSecSignature extends WSSecBase {
     private Crypto crypto = null;
     private String customTokenValueType;
     private String customTokenId;
-    private String digestAlgo = "http://www.w3.org/2000/09/xmldsig#sha1";
+    private String digestAlgo = Constants.ALGO_ID_DIGEST_SHA1;
     private X509Certificate useThisCert = null;
 
    
@@ -156,7 +156,7 @@ public class WSSecSignature extends WSSecBase {
         }
 
         sig.addResourceResolver(EnvelopeIdResolver.getInstance());
-        sig.setId(wssConfig.getIdAllocator().createId("Sig-", sig));
+        sig.setId(wssConfig.getIdAllocator().createId("SIG-", sig));
 
         keyInfo = sig.getKeyInfo();
         keyInfoUri = wssConfig.getIdAllocator().createSecureId("KI-", keyInfo);
@@ -720,7 +720,8 @@ public class WSSecSignature extends WSSecBase {
     }
 
     /**
-     * Set the string that defines which digest algorithm to use. The default is SHA-1.
+     * Set the string that defines which digest algorithm to use. 
+     * The default is Constants.ALGO_ID_DIGEST_SHA1.
      * 
      * @param digestAlgo the digestAlgo to set
      */

@@ -23,6 +23,7 @@ import javax.xml.namespace.QName;
 
 import org.apache.xml.security.c14n.Canonicalizer;
 import org.apache.xml.security.signature.XMLSignature;
+import org.apache.xml.security.utils.Constants;
 import org.apache.xml.security.utils.EncryptionConstants;
 
 /**
@@ -39,7 +40,7 @@ public class WSConstants {
     public static final String WSU_NS = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd";
     
     /*
-     * The base UIRs for the various profiles.
+     * The base URIs for the various profiles.
      */
     public static final String SOAPMESSAGE_NS = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0";
     public static final String SOAPMESSAGE_NS11 = "http://docs.oasis-open.org/wss/oasis-wss-soap-message-security-1.1";
@@ -85,10 +86,10 @@ public class WSConstants {
     /*
      * Now the namespaces, local names, and prefixes of XML-SIG and XML-ENC
      */
-    public static final String SIG_NS = "http://www.w3.org/2000/09/xmldsig#";
+    public static final String SIG_NS = Constants.SignatureSpecNS;
     public static final String SIG_PREFIX = "ds";
     public static final String SIG_LN = "Signature";
-    public static final String ENC_NS = "http://www.w3.org/2001/04/xmlenc#";
+    public static final String ENC_NS = EncryptionConstants.EncryptionSpecNS;
     public static final String ENC_PREFIX = "xenc";
     public static final String ENC_KEY_LN = "EncryptedKey";
     public static final String ENC_DATA_LN = "EncryptedData";
@@ -97,8 +98,8 @@ public class WSConstants {
     /*
      * The standard namespace definitions
      */
-    public static final String XMLNS_NS = "http://www.w3.org/2000/xmlns/";
-    public static final String XML_NS = "http://www.w3.org/XML/1998/namespace";
+    public static final String XMLNS_NS = Constants.NamespaceSpecNS;
+    public static final String XML_NS = Constants.XML_LANG_SPACE_SpecNS;
     
     /*
      * The local names and attribute names used by WSS
