@@ -51,7 +51,15 @@ public class WSDocInfo {
     List processors = null;
 
     public WSDocInfo(Document doc) {
-        this.doc = doc;
+        //
+        // This is a bit of a hack. When the Document is a SAAJ SOAPPart instance, it may
+        // be that the "owner" document of any child elements is an internal Document, rather
+        // than the SOAPPart. This is the case for the SUN SAAJ implementation.
+        // This causes problems with STRTransform, as:
+        // WSDocInfoStore.lookup(transformObject.getDocument())
+        // will not work. 
+        //
+        this.doc = doc.getDocumentElement().getOwnerDocument();
     }
 
     /**
