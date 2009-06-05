@@ -474,7 +474,9 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
                     // Header node as well
                     //
                     elementToEncrypt.getParentNode().appendChild(elem);
-                    elem.appendChild(elementToEncrypt);
+                    elementToEncrypt = 
+                        (Element)elementToEncrypt.getParentNode().removeChild(elementToEncrypt);
+                    elementToEncrypt = (Element)elem.appendChild(elementToEncrypt);
                     
                     NamedNodeMap map = elementToEncrypt.getAttributes();
                     for (int i = 0 ; i < map.getLength() ; i++) {
