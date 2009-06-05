@@ -22,11 +22,6 @@ package wssec;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
-import org.apache.axis.Message;
-import org.apache.axis.MessageContext;
-import org.apache.axis.client.AxisClient;
-import org.apache.axis.configuration.NullProvider;
-import org.apache.axis.message.SOAPEnvelope;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.PublicKeyCallback;
@@ -41,9 +36,7 @@ import org.apache.ws.security.message.WSSecHeader;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
 
 import javax.security.auth.callback.Callback;
@@ -73,8 +66,6 @@ public class SignatureKeyValueTest extends TestCase implements CallbackHandler {
     private WSSecurityEngine secEngine = new WSSecurityEngine();
     private Crypto crypto = CryptoFactory.getInstance("wss40.properties");
     private java.security.KeyStore keyStore = null;
-    private MessageContext msgContext;
-    private SOAPEnvelope unsignedEnvelope;
 
     /**
      * TestWSSecurity constructor
@@ -98,39 +89,13 @@ public class SignatureKeyValueTest extends TestCase implements CallbackHandler {
     }
 
     /**
-     * Setup method
-     * <p/>
-     * 
-     * @throws java.lang.Exception Thrown when there is a problem in setup
-     */
-    protected void setUp() throws Exception {
-        AxisClient tmpEngine = new AxisClient(new NullProvider());
-        msgContext = new MessageContext(tmpEngine);
-        unsignedEnvelope = getSOAPEnvelope();
-    }
-
-    /**
-     * Constructs a soap envelope
-     * <p/>
-     * 
-     * @return soap envelope
-     * @throws java.lang.Exception if there is any problem constructing the soap envelope
-     */
-    protected SOAPEnvelope getSOAPEnvelope() throws Exception {
-        InputStream in = new ByteArrayInputStream(SOAPMSG.getBytes());
-        Message msg = new Message(in);
-        msg.setMessageContext(msgContext);
-        return msg.getSOAPEnvelope();
-    }
-
-    /**
      * Successful RSAKeyValue test.
      */
     public void testRSAKeyValue() throws Exception {
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("wss40", "security");
         builder.setKeyIdentifierType(WSConstants.KEY_VALUE);
-        Document doc = unsignedEnvelope.getAsDocument();
+        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         Document signedDoc = builder.build(doc, crypto, secHeader);
@@ -165,7 +130,7 @@ public class SignatureKeyValueTest extends TestCase implements CallbackHandler {
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("wss86", "security");
         builder.setKeyIdentifierType(WSConstants.KEY_VALUE);
-        Document doc = unsignedEnvelope.getAsDocument();
+        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         Document signedDoc = 
@@ -195,7 +160,7 @@ public class SignatureKeyValueTest extends TestCase implements CallbackHandler {
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("wss40DSA", "security");
         builder.setKeyIdentifierType(WSConstants.KEY_VALUE);
-        Document doc = unsignedEnvelope.getAsDocument();
+        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         Document signedDoc = builder.build(doc, crypto, secHeader);

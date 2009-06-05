@@ -19,9 +19,7 @@
 
 package wssec;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.security.SecureRandom;
 import java.util.Hashtable;
 
@@ -31,11 +29,6 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 
 import junit.framework.TestCase;
 
-import org.apache.axis.Message;
-import org.apache.axis.MessageContext;
-import org.apache.axis.client.AxisClient;
-import org.apache.axis.configuration.NullProvider;
-import org.apache.axis.message.SOAPEnvelope;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
@@ -74,8 +67,6 @@ public class TestWSSecurityNewSCT extends TestCase implements CallbackHandler {
 
     private WSSecurityEngine secEngine = new WSSecurityEngine();
     private Crypto crypto = CryptoFactory.getInstance("wss40.properties");
-    private MessageContext msgContext;
-    private Message message;
 
     /**
      * Table of secrets indexed by the sct identifiers
@@ -89,22 +80,10 @@ public class TestWSSecurityNewSCT extends TestCase implements CallbackHandler {
         super(arg0);
     }
 
-    /**
-     * Setup method <p/>
-     * 
-     * @throws Exception
-     *             Thrown when there is a problem in setup
-     */
-    protected void setUp() throws Exception {
-        AxisClient tmpEngine = new AxisClient(new NullProvider());
-        msgContext = new MessageContext(tmpEngine);
-        message = getSOAPMessage();
-    }
 
     public void testBuild() {
         try {
-            SOAPEnvelope unsignedEnvelope = message.getSOAPEnvelope();
-            Document doc = unsignedEnvelope.getAsDocument();
+            Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
             WSSecHeader secHeader = new WSSecHeader();
             secHeader.insertSecurityHeader(doc);
 
@@ -141,8 +120,7 @@ public class TestWSSecurityNewSCT extends TestCase implements CallbackHandler {
      */
     public void testSCTDKTEncrypt() {
         try {
-            SOAPEnvelope unsignedEnvelope = message.getSOAPEnvelope();
-            Document doc = unsignedEnvelope.getAsDocument();
+            Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
             WSSecHeader secHeader = new WSSecHeader();
             secHeader.insertSecurityHeader(doc);
 
@@ -180,8 +158,7 @@ public class TestWSSecurityNewSCT extends TestCase implements CallbackHandler {
 
     public void testSCTKDKTSign() {
         try {
-            SOAPEnvelope unsignedEnvelope = message.getSOAPEnvelope();
-            Document doc = unsignedEnvelope.getAsDocument();
+            Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
             WSSecHeader secHeader = new WSSecHeader();
             secHeader.insertSecurityHeader(doc);
 
@@ -219,8 +196,7 @@ public class TestWSSecurityNewSCT extends TestCase implements CallbackHandler {
     
     public void testSCTKDKTSignEncrypt() {
         try {
-            SOAPEnvelope unsignedEnvelope = message.getSOAPEnvelope();
-            Document doc = unsignedEnvelope.getAsDocument();
+            Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
             WSSecHeader secHeader = new WSSecHeader();
             secHeader.insertSecurityHeader(doc);
 
@@ -264,8 +240,7 @@ public class TestWSSecurityNewSCT extends TestCase implements CallbackHandler {
 
     public void testSCTKDKTEncryptSign() {
         try {
-            SOAPEnvelope unsignedEnvelope = message.getSOAPEnvelope();
-            Document doc = unsignedEnvelope.getAsDocument();
+            Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
             WSSecHeader secHeader = new WSSecHeader();
             secHeader.insertSecurityHeader(doc);
 
@@ -321,19 +296,6 @@ public class TestWSSecurityNewSCT extends TestCase implements CallbackHandler {
         assertTrue(outputString.indexOf("LogTestService2") > 0 ? true : false);
     }
 
-    /**
-     * Constructs a soap envelope <p/>
-     * 
-     * @return soap envelope
-     * @throws Exception
-     *             if there is any problem constructing the soap envelope
-     */
-    protected Message getSOAPMessage() throws Exception {
-        InputStream in = new ByteArrayInputStream(SOAPMSG.getBytes());
-        Message msg = new Message(in);
-        msg.setMessageContext(msgContext);
-        return msg;
-    }
 
     public void handle(Callback[] callbacks) throws IOException,
         UnsupportedCallbackException {

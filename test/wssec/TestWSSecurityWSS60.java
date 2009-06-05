@@ -22,11 +22,6 @@ package wssec;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
-import org.apache.axis.Message;
-import org.apache.axis.MessageContext;
-import org.apache.axis.client.AxisClient;
-import org.apache.axis.configuration.NullProvider;
-import org.apache.axis.message.SOAPEnvelope;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSPasswordCallback;
@@ -41,9 +36,7 @@ import org.w3c.dom.Document;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 
 /**
  * This is a test for WSS-60 - "Problems when SOAP envelope namespace prefix is null"
@@ -66,8 +59,6 @@ public class TestWSSecurityWSS60 extends TestCase implements CallbackHandler {
 
     private WSSecurityEngine secEngine = new WSSecurityEngine();
     private Crypto crypto = CryptoFactory.getInstance();
-    private MessageContext msgContext;
-    private Message message;
 
     /**
      * TestWSSecurity constructor
@@ -89,42 +80,16 @@ public class TestWSSecurityWSS60 extends TestCase implements CallbackHandler {
         return new TestSuite(TestWSSecurityWSS60.class);
     }
 
-    /**
-     * Setup method
-     * <p/>
-     * 
-     * @throws Exception Thrown when there is a problem in setup
-     */
-    protected void setUp() throws Exception {
-        AxisClient tmpEngine = new AxisClient(new NullProvider());
-        msgContext = new MessageContext(tmpEngine);
-        message = getSOAPMessage();
-    }
-
-    /**
-     * Constructs a soap envelope
-     * <p/>
-     * 
-     * @return soap envelope
-     * @throws Exception if there is any problem constructing the soap envelope
-     */
-    protected Message getSOAPMessage() throws Exception {
-        InputStream in = new ByteArrayInputStream(SOAPMSG.getBytes());
-        Message msg = new Message(in);
-        msg.setMessageContext(msgContext);
-        return msg;
-    }
 
     /**
      * Test signing a SOAP message that has no SOAP namespace prefix
      */
     public void testNoSOAPNamespacePrefix() throws Exception {
-        SOAPEnvelope unsignedEnvelope = message.getSOAPEnvelope();
         WSSecSignature sign = new WSSecSignature();
         sign.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         sign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
 
-        Document doc = unsignedEnvelope.getAsDocument();
+        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
 
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.setActor("bob");

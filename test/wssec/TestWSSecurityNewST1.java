@@ -27,11 +27,6 @@ import org.apache.ws.security.saml.SAMLIssuerFactory;
 import org.apache.ws.security.saml.SAMLIssuer;
 import org.apache.ws.security.util.WSSecurityUtil;
 
-import org.apache.axis.Message;
-import org.apache.axis.MessageContext;
-import org.apache.axis.client.AxisClient;
-import org.apache.axis.configuration.NullProvider;
-import org.apache.axis.message.SOAPEnvelope;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
@@ -43,8 +38,6 @@ import org.w3c.dom.Document;
 
 import org.opensaml.SAMLAssertion;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
 import java.util.List;
 
 /**
@@ -66,8 +59,6 @@ public class TestWSSecurityNewST1 extends TestCase {
         + "</SOAP-ENV:Envelope>";
 
     private WSSecurityEngine secEngine = new WSSecurityEngine();
-    private MessageContext msgContext;
-    private Message message;
 
     /**
      * TestWSSecurity constructor
@@ -88,41 +79,16 @@ public class TestWSSecurityNewST1 extends TestCase {
     }
 
     /**
-     * Setup method
-     * 
-     * @throws Exception Thrown when there is a problem in setup
-     */
-    protected void setUp() throws Exception {
-        AxisClient tmpEngine = new AxisClient(new NullProvider());
-        msgContext = new MessageContext(tmpEngine);
-        message = getSOAPMessage();
-    }
-
-    /**
-     * Constructs a soap envelope
-     * 
-     * @return soap envelope
-     * @throws Exception if there is any problem constructing the soap envelope
-     */
-    protected Message getSOAPMessage() throws Exception {
-        InputStream in = new ByteArrayInputStream(SOAPMSG.getBytes());
-        Message msg = new Message(in);
-        msg.setMessageContext(msgContext);
-        return msg;
-    }
-
-    /**
      * Test that creates, sends and processes an unsigned SAML assertion.
      */
     public void testSAMLUnsignedSenderVouches() throws Exception {
-        SOAPEnvelope unsignedEnvelope = message.getSOAPEnvelope();
         SAMLIssuer saml = SAMLIssuerFactory.getInstance("saml.properties");
 
         SAMLAssertion assertion = saml.newAssertion();
 
         WSSecSAMLToken wsSign = new WSSecSAMLToken();
 
-        Document doc = unsignedEnvelope.getAsDocument();
+        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         LOG.info("Before SAMLUnsignedSenderVouches....");

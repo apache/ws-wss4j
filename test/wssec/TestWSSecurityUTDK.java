@@ -21,11 +21,6 @@ package wssec;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
-import org.apache.axis.Message;
-import org.apache.axis.MessageContext;
-import org.apache.axis.client.AxisClient;
-import org.apache.axis.configuration.NullProvider;
-import org.apache.axis.message.SOAPEnvelope;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
@@ -48,9 +43,7 @@ import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 
 import java.util.List;
 
@@ -76,8 +69,6 @@ public class TestWSSecurityUTDK extends TestCase implements CallbackHandler {
 
     private WSSecurityEngine secEngine = new WSSecurityEngine();
     private Crypto crypto = CryptoFactory.getInstance();
-    private MessageContext msgContext;
-    private SOAPEnvelope unsignedEnvelope;
 
     /**
      * TestWSSecurity constructor
@@ -99,37 +90,12 @@ public class TestWSSecurityUTDK extends TestCase implements CallbackHandler {
         return new TestSuite(TestWSSecurityUTDK.class);
     }
 
-    /**
-     * Setup method
-     * <p/>
-     * 
-     * @throws Exception Thrown when there is a problem in setup
-     */
-    protected void setUp() throws Exception {
-        AxisClient tmpEngine = new AxisClient(new NullProvider());
-        msgContext = new MessageContext(tmpEngine);
-        unsignedEnvelope = getSOAPEnvelope();
-    }
-
-    /**
-     * Constructs a soap envelope
-     * <p/>
-     * 
-     * @return soap envelope
-     * @throws java.lang.Exception if there is any problem constructing the soap envelope
-     */
-    protected SOAPEnvelope getSOAPEnvelope() throws Exception {
-        InputStream in = new ByteArrayInputStream(SOAPMSG.getBytes());
-        Message msg = new Message(in);
-        msg.setMessageContext(msgContext);
-        return msg.getSOAPEnvelope();
-    }
 
     /**
      * Unit test for the UsernameToken derived key functionality 
      */
     public void testUsernameTokenUnit() throws Exception {
-        Document doc = unsignedEnvelope.getAsDocument();
+        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
@@ -169,7 +135,7 @@ public class TestWSSecurityUTDK extends TestCase implements CallbackHandler {
      * Test using a UsernameToken derived key for encrypting a SOAP body
      */
     public void testDerivedKeyEncryption() throws Exception {
-        Document doc = unsignedEnvelope.getAsDocument();
+        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
@@ -212,7 +178,7 @@ public class TestWSSecurityUTDK extends TestCase implements CallbackHandler {
      * derived key is modified before encryption, and so decryption should fail.
      */
     public void testDerivedKeyChangedEncryption() throws Exception {
-        Document doc = unsignedEnvelope.getAsDocument();
+        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
@@ -262,7 +228,7 @@ public class TestWSSecurityUTDK extends TestCase implements CallbackHandler {
      * user is "alice" rather than "bob", and so decryption should fail.
      */
     public void testDerivedKeyBadUserEncryption() throws Exception {
-        Document doc = unsignedEnvelope.getAsDocument();
+        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
@@ -310,7 +276,7 @@ public class TestWSSecurityUTDK extends TestCase implements CallbackHandler {
      * Test using a UsernameToken derived key for signing a SOAP body
      */
     public void testDerivedKeySignature() throws Exception {
-        Document doc = unsignedEnvelope.getAsDocument();
+        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
@@ -359,7 +325,7 @@ public class TestWSSecurityUTDK extends TestCase implements CallbackHandler {
      * fail.
      */
     public void testDerivedKeyChangedSignature() throws Exception {
-        Document doc = unsignedEnvelope.getAsDocument();
+        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
@@ -404,7 +370,7 @@ public class TestWSSecurityUTDK extends TestCase implements CallbackHandler {
      * user is "alice" rather than "bob", and so signature verification should fail.
      */
     public void testDerivedKeyBadUserSignature() throws Exception {
-        Document doc = unsignedEnvelope.getAsDocument();
+        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         

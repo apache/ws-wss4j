@@ -22,11 +22,6 @@ package wssec;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
-import org.apache.axis.Message;
-import org.apache.axis.MessageContext;
-import org.apache.axis.client.AxisClient;
-import org.apache.axis.configuration.NullProvider;
-import org.apache.axis.message.SOAPEnvelope;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
@@ -44,9 +39,7 @@ import org.w3c.dom.Document;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 
 import java.util.Vector;
 
@@ -76,8 +69,6 @@ public class TestWSSecurityNew2 extends TestCase implements CallbackHandler {
 
     private WSSecurityEngine secEngine = new WSSecurityEngine();
     private Crypto crypto = CryptoFactory.getInstance("wss40.properties");
-    private MessageContext msgContext;
-    private Message message;
 
     /**
      * TestWSSecurity constructor
@@ -100,32 +91,6 @@ public class TestWSSecurityNew2 extends TestCase implements CallbackHandler {
     }
 
     /**
-     * Setup method
-     * <p/>
-     * 
-     * @throws Exception Thrown when there is a problem in setup
-     */
-    protected void setUp() throws Exception {
-        AxisClient tmpEngine = new AxisClient(new NullProvider());
-        msgContext = new MessageContext(tmpEngine);
-        message = getSOAPMessage();
-    }
-
-    /**
-     * Constructs a soap envelope
-     * <p/>
-     * 
-     * @return soap envelope
-     * @throws Exception if there is any problem constructing the soap envelope
-     */
-    protected Message getSOAPMessage() throws Exception {
-        InputStream in = new ByteArrayInputStream(SOAPMSG.getBytes());
-        Message msg = new Message(in);
-        msg.setMessageContext(msgContext);
-        return msg;
-    }
-
-    /**
      * Test that encrypt and decrypt a WS-Security envelope.
      * This test uses the RSA_15 algorithm to transport (wrap) the symmetric
      * key.
@@ -134,12 +99,11 @@ public class TestWSSecurityNew2 extends TestCase implements CallbackHandler {
      * @throws Exception Thrown when there is any problem in signing or verification
      */
     public void testEncryptionDecryptionRSA15() throws Exception {
-        SOAPEnvelope unsignedEnvelope = message.getSOAPEnvelope();
         WSSecEncrypt builder = new WSSecEncrypt();
         builder.setUserInfo("wss40");
         builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
         builder.setSymmetricEncAlgorithm(WSConstants.TRIPLE_DES);
-        Document doc = unsignedEnvelope.getAsDocument();
+        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         LOG.info("Before Encryption Triple DES....");
@@ -161,7 +125,6 @@ public class TestWSSecurityNew2 extends TestCase implements CallbackHandler {
          * This tests if several runs of different algorithms on same builder/cipher 
          * setup are ok.
          */
-        message = getSOAPMessage(); // create fresh message environment
         builder.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
         builder.setSymmetricEncAlgorithm(WSConstants.AES_128);
         Vector parts = new Vector();
@@ -169,8 +132,7 @@ public class TestWSSecurityNew2 extends TestCase implements CallbackHandler {
             new WSEncryptionPart("testMethod", "uri:LogTestService2", "Element");
         parts.add(encP);
         builder.setParts(parts);
-        unsignedEnvelope = message.getSOAPEnvelope();
-        doc = unsignedEnvelope.getAsDocument();
+        doc = SOAPUtil.toSOAPPart(SOAPMSG);
         secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);        
         LOG.info("Before Encryption AES 128/RSA-15....");
@@ -201,12 +163,11 @@ public class TestWSSecurityNew2 extends TestCase implements CallbackHandler {
      * @throws Exception Thrown when there is any problem in signing or verification
      */
      public void testEncryptionDecryptionOAEP() throws Exception {
-        SOAPEnvelope unsignedEnvelope = message.getSOAPEnvelope();
         WSSecEncrypt builder = new WSSecEncrypt();
         builder.setUserInfo("wss40");
         builder.setKeyIdentifierType(WSConstants.X509_KEY_IDENTIFIER);
         builder.setKeyEnc(WSConstants.KEYTRANSPORT_RSAOEP);
-        Document doc = unsignedEnvelope.getAsDocument();
+        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);        
         LOG.info("Before Encryption Triple DES/RSA-OAEP....");

@@ -28,11 +28,6 @@ import org.apache.ws.security.saml.SAMLIssuer;
 import org.apache.ws.security.saml.WSSecSignatureSAML;
 import org.apache.ws.security.util.WSSecurityUtil;
 
-import org.apache.axis.Message;
-import org.apache.axis.MessageContext;
-import org.apache.axis.client.AxisClient;
-import org.apache.axis.configuration.NullProvider;
-import org.apache.axis.message.SOAPEnvelope;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
@@ -50,9 +45,7 @@ import org.opensaml.SAMLAssertion;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
 
 /**
@@ -75,8 +68,6 @@ public class TestWSSecurityNewST3 extends TestCase implements CallbackHandler {
 
     private WSSecurityEngine secEngine = new WSSecurityEngine();
     private Crypto crypto = CryptoFactory.getInstance("crypto.properties");
-    private MessageContext msgContext;
-    private Message message;
 
     /**
      * TestWSSecurity constructor
@@ -96,37 +87,12 @@ public class TestWSSecurityNewST3 extends TestCase implements CallbackHandler {
         return new TestSuite(TestWSSecurityNewST3.class);
     }
 
-    /**
-     * Setup method
-     * 
-     * @throws Exception Thrown when there is a problem in setup
-     */
-    protected void setUp() throws Exception {
-        AxisClient tmpEngine = new AxisClient(new NullProvider());
-        msgContext = new MessageContext(tmpEngine);
-        message = getSOAPMessage();
-    }
-
-    /**
-     * Constructs a soap envelope
-     * 
-     * @return soap envelope
-     * @throws Exception if there is any problem constructing the soap envelope
-     */
-    protected Message getSOAPMessage() throws Exception {
-        InputStream in = new ByteArrayInputStream(SOAPMSG.getBytes());
-        Message msg = new Message(in);
-        msg.setMessageContext(msgContext);
-        return msg;
-    }
 
     /**
      * * Test that creates, sends and processes an signed SAML assertion.
      */
     public void testSAMLSignedKeyHolder() throws Exception {
-        SOAPEnvelope unsignedEnvelope = message.getSOAPEnvelope();
-
-        Document doc = unsignedEnvelope.getAsDocument();
+        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         
         SAMLIssuer saml = SAMLIssuerFactory.getInstance("saml4.properties");
         // Provide info to SAML issuer that it can construct a Holder-of-key
@@ -172,9 +138,7 @@ public class TestWSSecurityNewST3 extends TestCase implements CallbackHandler {
      * instead of direct reference.
      */
     public void testSAMLSignedKeyHolderKeyIdentifier() throws Exception {
-        SOAPEnvelope unsignedEnvelope = message.getSOAPEnvelope();
-
-        Document doc = unsignedEnvelope.getAsDocument();
+        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         
         SAMLIssuer saml = SAMLIssuerFactory.getInstance("saml4.properties");
         // Provide info to SAML issuer that it can construct a Holder-of-key

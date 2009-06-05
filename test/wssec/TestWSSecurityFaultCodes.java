@@ -22,11 +22,6 @@ package wssec;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
-import org.apache.axis.Message;
-import org.apache.axis.MessageContext;
-import org.apache.axis.client.AxisClient;
-import org.apache.axis.configuration.NullProvider;
-import org.apache.axis.message.SOAPEnvelope;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.WSPasswordCallback;
@@ -47,9 +42,7 @@ import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.xml.namespace.QName;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 
 /**
  * WS-Security Test Case for fault codes. The SOAP Message Security specification 1.1 defines
@@ -71,8 +64,6 @@ public class TestWSSecurityFaultCodes extends TestCase implements CallbackHandle
 
     private WSSecurityEngine secEngine = new WSSecurityEngine();
     private Crypto crypto = CryptoFactory.getInstance();
-    private MessageContext msgContext;
-    private SOAPEnvelope unsignedEnvelope;
 
     /**
      * TestWSSecurity constructor
@@ -94,32 +85,6 @@ public class TestWSSecurityFaultCodes extends TestCase implements CallbackHandle
         return new TestSuite(TestWSSecurityFaultCodes.class);
     }
 
-    /**
-     * Setup method
-     * <p/>
-     * 
-     * @throws Exception Thrown when there is a problem in setup
-     */
-    protected void setUp() throws Exception {
-        AxisClient tmpEngine = new AxisClient(new NullProvider());
-        msgContext = new MessageContext(tmpEngine);
-        unsignedEnvelope = getSOAPEnvelope();
-    }
-
-    /**
-     * Constructs a soap envelope
-     * <p/>
-     * 
-     * @return soap envelope
-     * @throws java.lang.Exception if there is any problem constructing the soap envelope
-     */
-    protected SOAPEnvelope getSOAPEnvelope() throws Exception {
-        InputStream in = new ByteArrayInputStream(SOAPMSG.getBytes());
-        Message msg = new Message(in);
-        msg.setMessageContext(msgContext);
-        return msg.getSOAPEnvelope();
-    }
-
     
     /**
      * Test for the wsse:FailedCheck faultcode. This will fail due to a bad password in
@@ -129,7 +94,7 @@ public class TestWSSecurityFaultCodes extends TestCase implements CallbackHandle
         WSSecEncrypt builder = new WSSecEncrypt();
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
-        Document doc = unsignedEnvelope.getAsDocument();
+        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);        
         Document encryptedDoc = builder.build(doc, crypto, secHeader);
@@ -185,7 +150,7 @@ public class TestWSSecurityFaultCodes extends TestCase implements CallbackHandle
         WSSecTimestamp builder = new WSSecTimestamp();
         builder.setTimeToLive(-1);
         
-        Document doc = unsignedEnvelope.getAsDocument();
+        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);        
         Document timestampedDoc = builder.build(doc, secHeader);
@@ -211,7 +176,7 @@ public class TestWSSecurityFaultCodes extends TestCase implements CallbackHandle
         builder.addNonce();
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         
-        Document doc = unsignedEnvelope.getAsDocument();
+        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);        
         Document timestampedDoc = builder.build(doc, secHeader);
@@ -237,7 +202,7 @@ public class TestWSSecurityFaultCodes extends TestCase implements CallbackHandle
         builder.addNonce();
         builder.setUserInfo(null, "security");
         
-        Document doc = unsignedEnvelope.getAsDocument();
+        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);        
         builder.build(doc, secHeader);

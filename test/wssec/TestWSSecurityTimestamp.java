@@ -22,11 +22,6 @@ package wssec;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
-import org.apache.axis.Message;
-import org.apache.axis.MessageContext;
-import org.apache.axis.client.AxisClient;
-import org.apache.axis.configuration.NullProvider;
-import org.apache.axis.message.SOAPEnvelope;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
@@ -40,8 +35,6 @@ import org.apache.ws.security.message.WSSecTimestamp;
 import org.apache.ws.security.message.token.Timestamp;
 import org.w3c.dom.Document;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
 import java.util.List;
 
 /**
@@ -49,7 +42,7 @@ import java.util.List;
  */
 public class TestWSSecurityTimestamp extends TestCase {
     private static final Log LOG = LogFactory.getLog(TestWSSecurityTimestamp.class);
-    private static final String soapMsg = 
+    private static final String SOAPMSG = 
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" 
         + "<SOAP-ENV:Envelope "
         +   "xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" "
@@ -63,8 +56,6 @@ public class TestWSSecurityTimestamp extends TestCase {
         + "</SOAP-ENV:Envelope>";
     
     private WSSecurityEngine secEngine = new WSSecurityEngine();
-    private MessageContext msgContext;
-    private SOAPEnvelope unsignedEnvelope;
 
     /**
      * TestWSSecurity constructor
@@ -86,39 +77,13 @@ public class TestWSSecurityTimestamp extends TestCase {
         return new TestSuite(TestWSSecurityTimestamp.class);
     }
 
-    /**
-     * Setup method
-     * <p/>
-     * 
-     * @throws java.lang.Exception Thrown when there is a problem in setup
-     */
-    protected void setUp() throws Exception {
-        AxisClient tmpEngine = new AxisClient(new NullProvider());
-        msgContext = new MessageContext(tmpEngine);
-        unsignedEnvelope = getSOAPEnvelope();
-    }
-
-    /**
-     * Constructs a soap envelope
-     * <p/>
-     * 
-     * @return soap envelope
-     * @throws java.lang.Exception if there is any problem constructing the soap envelope
-     */
-    protected SOAPEnvelope getSOAPEnvelope() throws Exception {
-        InputStream in = new ByteArrayInputStream(soapMsg.getBytes());
-        Message msg = new Message(in);
-        msg.setMessageContext(msgContext);
-        return msg.getSOAPEnvelope();
-    }
-
     
     /**
      * This is a test for processing a valid Timestamp.
      */
     public void testValidTimestamp() throws Exception {
-        
-        Document doc = unsignedEnvelope.getAsDocument();
+
+        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
@@ -150,8 +115,8 @@ public class TestWSSecurityTimestamp extends TestCase {
      * This is a test for processing a valid Timestamp with no expires element
      */
     public void testValidTimestampNoExpires() throws Exception {
-        
-        Document doc = unsignedEnvelope.getAsDocument();
+
+        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
@@ -183,8 +148,8 @@ public class TestWSSecurityTimestamp extends TestCase {
      * This is a test for processing an expired Timestamp.
      */
     public void testExpiredTimestamp() throws Exception {
-        
-        Document doc = unsignedEnvelope.getAsDocument();
+
+        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
@@ -213,7 +178,7 @@ public class TestWSSecurityTimestamp extends TestCase {
      */
     public void testOldTimestamp() throws Exception {
         
-        Document doc = unsignedEnvelope.getAsDocument();
+        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         

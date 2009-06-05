@@ -22,11 +22,6 @@ package wssec;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
-import org.apache.axis.Message;
-import org.apache.axis.MessageContext;
-import org.apache.axis.client.AxisClient;
-import org.apache.axis.configuration.NullProvider;
-import org.apache.axis.message.SOAPEnvelope;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSPasswordCallback;
@@ -37,9 +32,7 @@ import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.w3c.dom.Document;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
@@ -65,9 +58,6 @@ public class TestWSSecurityGetPassword extends TestCase {
         +   "</SOAP-ENV:Body>" 
         + "</SOAP-ENV:Envelope>";
 
-    private MessageContext msgContext;
-    private SOAPEnvelope unsignedEnvelope;
-
     /**
      * TestWSSecurity constructor
      * <p/>
@@ -88,31 +78,6 @@ public class TestWSSecurityGetPassword extends TestCase {
         return new TestSuite(TestWSSecurityGetPassword.class);
     }
 
-    /**
-     * Setup method
-     * <p/>
-     * 
-     * @throws java.lang.Exception Thrown when there is a problem in setup
-     */
-    protected void setUp() throws Exception {
-        AxisClient tmpEngine = new AxisClient(new NullProvider());
-        msgContext = new MessageContext(tmpEngine);
-        unsignedEnvelope = getSOAPEnvelope();
-    }
-
-    /**
-     * Constructs a soap envelope
-     * <p/>
-     * 
-     * @return soap envelope
-     * @throws java.lang.Exception if there is any problem constructing the soap envelope
-     */
-    protected SOAPEnvelope getSOAPEnvelope() throws Exception {
-        InputStream in = new ByteArrayInputStream(SOAPMSG.getBytes());
-        Message msg = new Message(in);
-        msg.setMessageContext(msgContext);
-        return msg.getSOAPEnvelope();
-    }
 
     /**
      * A unit test for {@link WSHandler#getPassword(String, int, String, String, RequestData)},
@@ -160,7 +125,7 @@ public class TestWSSecurityGetPassword extends TestCase {
         
         final java.util.Vector actions = new java.util.Vector();
         actions.add(new Integer(WSConstants.UT));
-        Document doc = unsignedEnvelope.getAsDocument();
+        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         MyHandler handler = new MyHandler();
         handler.send(
             WSConstants.UT, 
@@ -201,7 +166,7 @@ public class TestWSSecurityGetPassword extends TestCase {
         
         final java.util.Vector actions = new java.util.Vector();
         actions.add(new Integer(WSConstants.UT));
-        Document doc = unsignedEnvelope.getAsDocument();
+        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         MyHandler handler = new MyHandler();
         handler.send(
             WSConstants.UT, 

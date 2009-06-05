@@ -22,11 +22,6 @@ package wssec;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
-import org.apache.axis.Message;
-import org.apache.axis.MessageContext;
-import org.apache.axis.client.AxisClient;
-import org.apache.axis.configuration.NullProvider;
-import org.apache.axis.message.SOAPEnvelope;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSSecurityException;
@@ -42,9 +37,7 @@ import org.w3c.dom.Document;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.security.MessageDigest;
 
 
@@ -101,8 +94,6 @@ public class TestWSSecurityNew5 extends TestCase implements CallbackHandler {
         + "</SOAP-ENV:Body>\r\n       \r\n" + "</SOAP-ENV:Envelope>";
     
     private WSSecurityEngine secEngine = new WSSecurityEngine();
-    private MessageContext msgContext;
-    private SOAPEnvelope unsignedEnvelope;
 
     /**
      * TestWSSecurity constructor
@@ -122,29 +113,6 @@ public class TestWSSecurityNew5 extends TestCase implements CallbackHandler {
         return new TestSuite(TestWSSecurityNew5.class);
     }
 
-    /**
-     * Setup method
-     * 
-     * @throws java.lang.Exception Thrown when there is a problem in setup
-     */
-    protected void setUp() throws Exception {
-        AxisClient tmpEngine = new AxisClient(new NullProvider());
-        msgContext = new MessageContext(tmpEngine);
-        unsignedEnvelope = getSOAPEnvelope();
-    }
-
-    /**
-     * Constructs a soap envelope
-     * 
-     * @return soap envelope
-     * @throws java.lang.Exception if there is any problem constructing the soap envelope
-     */
-    protected SOAPEnvelope getSOAPEnvelope() throws Exception {
-        InputStream in = new ByteArrayInputStream(SOAPMSG.getBytes());
-        Message msg = new Message(in);
-        msg.setMessageContext(msgContext);
-        return msg.getSOAPEnvelope();
-    }
 
     /**
      * Test that adds a UserNameToken with password Digest to a WS-Security envelope
@@ -153,7 +121,7 @@ public class TestWSSecurityNew5 extends TestCase implements CallbackHandler {
         WSSecUsernameToken builder = new WSSecUsernameToken();
         builder.setUserInfo("wernerd", "verySecret");
         LOG.info("Before adding UsernameToken PW Digest....");
-        Document doc = unsignedEnvelope.getAsDocument();
+        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         Document signedDoc = builder.build(doc, secHeader);
@@ -176,7 +144,7 @@ public class TestWSSecurityNew5 extends TestCase implements CallbackHandler {
         WSSecUsernameToken builder = new WSSecUsernameToken();
         builder.setUserInfo("badusername", "verySecret");
         LOG.info("Before adding UsernameToken PW Digest....");
-        Document doc = unsignedEnvelope.getAsDocument();
+        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         Document signedDoc = builder.build(doc, secHeader);
@@ -206,7 +174,7 @@ public class TestWSSecurityNew5 extends TestCase implements CallbackHandler {
         WSSecUsernameToken builder = new WSSecUsernameToken();
         builder.setUserInfo("wernerd", "verySecre");
         LOG.info("Before adding UsernameToken PW Digest....");
-        Document doc = unsignedEnvelope.getAsDocument();
+        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         Document signedDoc = builder.build(doc, secHeader);
@@ -235,7 +203,7 @@ public class TestWSSecurityNew5 extends TestCase implements CallbackHandler {
         builder.setPasswordType(WSConstants.PASSWORD_TEXT);
         builder.setUserInfo("wernerd", "verySecret");
         LOG.info("Before adding UsernameToken PW Text....");
-        Document doc = unsignedEnvelope.getAsDocument();
+        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         Document signedDoc = builder.build(doc, secHeader);
@@ -264,7 +232,7 @@ public class TestWSSecurityNew5 extends TestCase implements CallbackHandler {
         
         builder.setUserInfo("wernerd", passwdDigest);
         LOG.info("Before adding UsernameToken PW Text....");
-        Document doc = unsignedEnvelope.getAsDocument();
+        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         Document signedDoc = builder.build(doc, secHeader);
@@ -284,7 +252,7 @@ public class TestWSSecurityNew5 extends TestCase implements CallbackHandler {
         builder.setPasswordType(WSConstants.PASSWORD_TEXT);
         builder.setUserInfo("wernerd", "verySecre");
         LOG.info("Before adding UsernameToken PW Text....");
-        Document doc = unsignedEnvelope.getAsDocument();
+        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         Document signedDoc = builder.build(doc, secHeader);
@@ -313,11 +281,7 @@ public class TestWSSecurityNew5 extends TestCase implements CallbackHandler {
      * and so we should handle an incoming Username Token accordingly.
      */
     public void testUsernameTokenNoPasswordType() throws Exception {
-        InputStream in = new ByteArrayInputStream(SOAPUTMSG.getBytes());
-        Message msg = new Message(in);
-        msg.setMessageContext(msgContext);
-        SOAPEnvelope utEnvelope = msg.getSOAPEnvelope();
-        Document doc = utEnvelope.getAsDocument();
+        Document doc = SOAPUtil.toSOAPPart(SOAPUTMSG);
         if (LOG.isDebugEnabled()) {
             String outputString = 
                 org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
@@ -332,11 +296,7 @@ public class TestWSSecurityNew5 extends TestCase implements CallbackHandler {
      * "NullPointerException on empty UsernameToken"
      */
     public void testUsernameTokenNoUser() throws Exception {
-        InputStream in = new ByteArrayInputStream(SOAPUTNOUSERMSG.getBytes());
-        Message msg = new Message(in);
-        msg.setMessageContext(msgContext);
-        SOAPEnvelope utEnvelope = msg.getSOAPEnvelope();
-        Document doc = utEnvelope.getAsDocument();
+        Document doc = SOAPUtil.toSOAPPart(SOAPUTNOUSERMSG);
         if (LOG.isDebugEnabled()) {
             String outputString = 
                 org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
@@ -353,7 +313,7 @@ public class TestWSSecurityNew5 extends TestCase implements CallbackHandler {
         builder.setPasswordType(null);
         builder.setUserInfo("wernerd", null);
         LOG.info("Before adding UsernameToken with no password....");
-        Document doc = unsignedEnvelope.getAsDocument();
+        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         Document signedDoc = builder.build(doc, secHeader);
@@ -380,7 +340,7 @@ public class TestWSSecurityNew5 extends TestCase implements CallbackHandler {
         builder.setPasswordType(null);
         builder.setUserInfo("wernerd", null);
         
-        Document doc = unsignedEnvelope.getAsDocument();
+        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         Document signedDoc = builder.build(doc, secHeader);
@@ -409,7 +369,7 @@ public class TestWSSecurityNew5 extends TestCase implements CallbackHandler {
         builder.setPasswordType("RandomType");
         builder.setUserInfo("customUser", "randomPass");
         
-        Document doc = unsignedEnvelope.getAsDocument();
+        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         Document signedDoc = builder.build(doc, secHeader);
@@ -437,8 +397,8 @@ public class TestWSSecurityNew5 extends TestCase implements CallbackHandler {
         WSSecUsernameToken builder = new WSSecUsernameToken();
         builder.setPasswordType("RandomType");
         builder.setUserInfo("customUser", "randomPass");
-        
-        Document doc = unsignedEnvelope.getAsDocument();
+
+        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         Document signedDoc = builder.build(doc, secHeader);
@@ -475,8 +435,8 @@ public class TestWSSecurityNew5 extends TestCase implements CallbackHandler {
         WSSecUsernameToken builder = new WSSecUsernameToken();
         builder.setPasswordType(WSConstants.PASSWORD_DIGEST);
         builder.setUserInfo("wernerd", "BAD_PASSWORD");
-        
-        Document doc = unsignedEnvelope.getAsDocument();
+
+        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         Document utDoc = builder.build(doc, secHeader);
@@ -485,7 +445,7 @@ public class TestWSSecurityNew5 extends TestCase implements CallbackHandler {
         // Manually find the Nonce node and set the content to null
         //
         org.w3c.dom.Element elem = builder.getUsernameTokenElement();
-        org.w3c.dom.NodeList list = elem.getElementsByTagName("wsse:Nonce");
+        org.w3c.dom.NodeList list = elem.getElementsByTagNameNS(WSConstants.WSSE_NS, "Nonce");
         org.w3c.dom.Node nonceNode = list.item(0);
         org.w3c.dom.Node childNode = nonceNode.getFirstChild();
         childNode.setNodeValue("");
@@ -517,8 +477,8 @@ public class TestWSSecurityNew5 extends TestCase implements CallbackHandler {
         WSSecUsernameToken builder = new WSSecUsernameToken();
         builder.setPasswordType(WSConstants.PASSWORD_DIGEST);
         builder.setUserInfo("wernerd", "BAD_PASSWORD");
-        
-        Document doc = unsignedEnvelope.getAsDocument();
+
+        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         Document utDoc = builder.build(doc, secHeader);
@@ -527,7 +487,7 @@ public class TestWSSecurityNew5 extends TestCase implements CallbackHandler {
         // Manually find the Created node and set the content to null
         //
         org.w3c.dom.Element elem = builder.getUsernameTokenElement();
-        org.w3c.dom.NodeList list = elem.getElementsByTagName("wsu:Created");
+        org.w3c.dom.NodeList list = elem.getElementsByTagNameNS(WSConstants.WSU_NS, "Created");
         org.w3c.dom.Node nonceNode = list.item(0);
         org.w3c.dom.Node childNode = nonceNode.getFirstChild();
         childNode.setNodeValue("");
@@ -557,7 +517,7 @@ public class TestWSSecurityNew5 extends TestCase implements CallbackHandler {
         WSSecUsernameToken builder = new WSSecUsernameToken();
         builder.setUserInfo("wernerd", "verySecret");
         LOG.info("Before adding UsernameToken PW Digest....");
-        Document doc = unsignedEnvelope.getAsDocument();
+        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         Document signedDoc = builder.build(doc, secHeader);

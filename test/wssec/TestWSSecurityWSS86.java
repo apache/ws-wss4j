@@ -22,11 +22,6 @@ package wssec;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
-import org.apache.axis.Message;
-import org.apache.axis.MessageContext;
-import org.apache.axis.client.AxisClient;
-import org.apache.axis.configuration.NullProvider;
-import org.apache.axis.message.SOAPEnvelope;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSPasswordCallback;
@@ -42,9 +37,7 @@ import org.w3c.dom.Document;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 
@@ -77,8 +70,6 @@ public class TestWSSecurityWSS86 extends TestCase implements CallbackHandler {
         + "</SOAP-ENV:Envelope>";
     private WSSecurityEngine secEngine = new WSSecurityEngine();
     private Crypto crypto = CryptoFactory.getInstance("wss86.properties");
-    private MessageContext msgContext;
-    private Message message;
 
     /**
      * TestWSSecurity constructor
@@ -100,43 +91,15 @@ public class TestWSSecurityWSS86 extends TestCase implements CallbackHandler {
         return new TestSuite(TestWSSecurityWSS86.class);
     }
 
-    /**
-     * Setup method
-     * <p/>
-     * 
-     * @throws Exception Thrown when there is a problem in setup
-     */
-    protected void setUp() throws Exception {
-        AxisClient tmpEngine = new AxisClient(new NullProvider());
-        msgContext = new MessageContext(tmpEngine);
-        message = getSOAPMessage();
-    }
-
-    /**
-     * Constructs a soap envelope
-     * <p/>
-     * 
-     * @return soap envelope
-     * @throws Exception if there is any problem constructing the soap envelope
-     */
-    protected Message getSOAPMessage() throws Exception {
-        InputStream in = new ByteArrayInputStream(SOAPMSG.getBytes());
-        Message msg = new Message(in);
-        msg.setMessageContext(msgContext);
-        return msg;
-    }
-
     
     /**
      * Test signing a SOAP message using a cert with an OID
      */
     public void testSignatureOID() throws Exception {
-        SOAPEnvelope unsignedEnvelope = message.getSOAPEnvelope();
+        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         WSSecSignature sign = new WSSecSignature();
         sign.setUserInfo("wss86", "security");
         sign.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
-
-        Document doc = unsignedEnvelope.getAsDocument();
 
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
@@ -182,10 +145,9 @@ public class TestWSSecurityWSS86 extends TestCase implements CallbackHandler {
                 new java.io.ByteArrayInputStream(certBytes)
             );
 
-        SOAPEnvelope unsignedEnvelope = message.getSOAPEnvelope();
         WSSecEncrypt encrypt = new WSSecEncrypt();
         encrypt.setUseThisCert(cert);
-        Document doc = unsignedEnvelope.getAsDocument();
+        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         Document encryptedDoc = encrypt.build(doc, crypto, secHeader);
@@ -231,10 +193,9 @@ public class TestWSSecurityWSS86 extends TestCase implements CallbackHandler {
                 new java.io.ByteArrayInputStream(certBytes)
             );
 
-        SOAPEnvelope unsignedEnvelope = message.getSOAPEnvelope();
         WSSecEncrypt encrypt = new WSSecEncrypt();
         encrypt.setUseThisCert(cert);
-        Document doc = unsignedEnvelope.getAsDocument();
+        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         Document encryptedDoc = encrypt.build(doc, crypto, secHeader);

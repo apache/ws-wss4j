@@ -22,11 +22,6 @@ package wssec;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
-import org.apache.axis.Message;
-import org.apache.axis.MessageContext;
-import org.apache.axis.client.AxisClient;
-import org.apache.axis.configuration.NullProvider;
-import org.apache.axis.message.SOAPEnvelope;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSEncryptionPart;
@@ -46,9 +41,7 @@ import org.w3c.dom.Document;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Vector;
 
 /**
@@ -75,8 +68,6 @@ public class TestWSSecurityKerberosTokenProfile extends TestCase implements Call
     
     private WSSecurityEngine secEngine = new WSSecurityEngine();
     private Crypto crypto = CryptoFactory.getInstance();
-    private MessageContext msgContext;
-    private Message message;
 
     /**
      * TestWSSecurity constructor
@@ -98,38 +89,12 @@ public class TestWSSecurityKerberosTokenProfile extends TestCase implements Call
         return new TestSuite(TestWSSecurityKerberosTokenProfile.class);
     }
 
-    /**
-     * Setup method
-     * <p/>
-     * 
-     * @throws Exception Thrown when there is a problem in setup
-     */
-    protected void setUp() throws Exception {
-        AxisClient tmpEngine = new AxisClient(new NullProvider());
-        msgContext = new MessageContext(tmpEngine);
-        message = getSOAPMessage();
-    }
-
-    /**
-     * Constructs a soap envelope
-     * <p/>
-     * 
-     * @return soap envelope
-     * @throws Exception if there is any problem constructing the soap envelope
-     */
-    protected Message getSOAPMessage() throws Exception {
-        InputStream in = new ByteArrayInputStream(SOAPMSG.getBytes());
-        Message msg = new Message(in);
-        msg.setMessageContext(msgContext);
-        return msg;
-    }
 
     /**
      * A unit test for creating BinarySecurityTokens
      */
     public void testCreateBinarySecurityToken() throws Exception {
-        SOAPEnvelope unsignedEnvelope = message.getSOAPEnvelope();
-        Document doc = unsignedEnvelope.getAsDocument();
+        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         WSSConfig.getNewInstance();
 
         WSSecHeader secHeader = new WSSecHeader();
@@ -157,8 +122,7 @@ public class TestWSSecurityKerberosTokenProfile extends TestCase implements Call
      * A test for signing a Kerberos BST
      */
     public void testSignBST() throws Exception {
-        SOAPEnvelope unsignedEnvelope = message.getSOAPEnvelope();
-        Document doc = unsignedEnvelope.getAsDocument();
+        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         WSSConfig.getNewInstance();
 
         WSSecHeader secHeader = new WSSecHeader();
@@ -196,8 +160,7 @@ public class TestWSSecurityKerberosTokenProfile extends TestCase implements Call
      * A test for signing a Kerberos BST as well as a Timestamp
      */
     public void testSignBSTTimestamp() throws Exception {
-        SOAPEnvelope unsignedEnvelope = message.getSOAPEnvelope();
-        Document doc = unsignedEnvelope.getAsDocument();
+        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         WSSConfig.getNewInstance();
 
         WSSecHeader secHeader = new WSSecHeader();

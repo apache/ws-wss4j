@@ -21,18 +21,47 @@ package wssec;
 
 import javax.xml.soap.MessageFactory;
 import javax.xml.soap.SOAPMessage;
+
+import org.apache.axis.Message;
+import org.apache.axis.MessageContext;
+import org.apache.axis.client.AxisClient;
+import org.apache.axis.configuration.NullProvider;
+
 import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 
 public class SOAPUtil {
-
+    
     /**
-     * Convert an xml String to a Document
+     * Convert an SOAP Envelope as a String to a org.w3c.dom.Document. The way this
+     * is done is delegated to one of the other methods in this class.
      */
     public static org.w3c.dom.Document toSOAPPart(String xml) throws Exception {
+        // return toSOAPPartSAAJ(xml);
+        return toSOAPPartAxis(xml);
+    }
+
+    /**
+     * Convert an xml String to a Document using the SAAJ API
+     */
+    public static org.w3c.dom.Document toSOAPPartSAAJ(String xml) throws Exception {
         ByteArrayInputStream in = new ByteArrayInputStream(xml.getBytes());
         MessageFactory factory = MessageFactory.newInstance();
         SOAPMessage soapMessage = factory.createMessage(null, in);
         return soapMessage.getSOAPPart();
     }
-
+    
+    /**
+     * Convert an xml String to a Document using Axis
+     */
+    public static org.w3c.dom.Document toSOAPPartAxis(String xml) throws Exception {
+        AxisClient tmpEngine = new AxisClient(new NullProvider());
+        MessageContext msgContext = new MessageContext(tmpEngine);
+        InputStream in = new ByteArrayInputStream(xml.getBytes());
+        Message msg = new Message(in);
+        msg.setMessageContext(msgContext);
+        org.apache.axis.message.SOAPEnvelope soapEnvelope = msg.getSOAPEnvelope();
+        return soapEnvelope.getAsDocument();
+    }
+    
 }

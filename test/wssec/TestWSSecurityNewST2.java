@@ -26,11 +26,6 @@ import junit.framework.TestSuite;
 import org.apache.ws.security.saml.SAMLIssuerFactory;
 import org.apache.ws.security.saml.SAMLIssuer;
 
-import org.apache.axis.Message;
-import org.apache.axis.MessageContext;
-import org.apache.axis.client.AxisClient;
-import org.apache.axis.configuration.NullProvider;
-import org.apache.axis.message.SOAPEnvelope;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
@@ -52,9 +47,7 @@ import org.opensaml.SAMLAssertion;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
 
 /**
@@ -77,8 +70,6 @@ public class TestWSSecurityNewST2 extends TestCase implements CallbackHandler {
 
     private WSSecurityEngine secEngine = new WSSecurityEngine();
     private Crypto crypto = CryptoFactory.getInstance("crypto.properties");
-    private MessageContext msgContext;
-    private Message message;
 
     /**
      * TestWSSecurity constructor
@@ -99,34 +90,9 @@ public class TestWSSecurityNewST2 extends TestCase implements CallbackHandler {
     }
 
     /**
-     * Setup method
-     * 
-     * @throws Exception Thrown when there is a problem in setup
-     */
-    protected void setUp() throws Exception {
-        AxisClient tmpEngine = new AxisClient(new NullProvider());
-        msgContext = new MessageContext(tmpEngine);
-        message = getSOAPMessage();
-    }
-
-    /**
-     * Constructs a soap envelope
-     * 
-     * @return soap envelope
-     * @throws Exception if there is any problem constructing the soap envelope
-     */
-    protected Message getSOAPMessage() throws Exception {
-        InputStream in = new ByteArrayInputStream(SOAPMSG.getBytes());
-        Message msg = new Message(in);
-        msg.setMessageContext(msgContext);
-        return msg;
-    }
-
-    /**
      * Test that creates, sends and processes an signed SAML assertion.
      */
     public void testSAMLSignedSenderVouches() throws Exception {
-        SOAPEnvelope unsignedEnvelope = message.getSOAPEnvelope();
         SAMLIssuer saml = SAMLIssuerFactory.getInstance("saml.properties");
 
         SAMLAssertion assertion = saml.newAssertion();
@@ -139,7 +105,7 @@ public class TestWSSecurityNewST2 extends TestCase implements CallbackHandler {
         
         LOG.info("Before SAMLSignedSenderVouches....");
         
-        Document doc = unsignedEnvelope.getAsDocument();
+        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
 
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
@@ -169,7 +135,6 @@ public class TestWSSecurityNewST2 extends TestCase implements CallbackHandler {
      * instead of direct reference.
      */
     public void testSAMLSignedSenderVouchesKeyIdentifier() throws Exception {
-        SOAPEnvelope unsignedEnvelope = message.getSOAPEnvelope();
         SAMLIssuer saml = SAMLIssuerFactory.getInstance("saml.properties");
 
         SAMLAssertion assertion = saml.newAssertion();
@@ -182,7 +147,7 @@ public class TestWSSecurityNewST2 extends TestCase implements CallbackHandler {
         
         LOG.info("Before SAMLSignedSenderVouches....");
         
-        Document doc = unsignedEnvelope.getAsDocument();
+        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
 
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
@@ -214,7 +179,6 @@ public class TestWSSecurityNewST2 extends TestCase implements CallbackHandler {
      * value).
      */
     public void testDefaultIssuerClass() throws Exception {
-        SOAPEnvelope unsignedEnvelope = message.getSOAPEnvelope();
         SAMLIssuer saml = SAMLIssuerFactory.getInstance("saml3.properties");
 
         SAMLAssertion assertion = saml.newAssertion();
@@ -226,8 +190,8 @@ public class TestWSSecurityNewST2 extends TestCase implements CallbackHandler {
         wsSign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
         
         LOG.info("Before SAMLSignedSenderVouches....");
-        
-        Document doc = unsignedEnvelope.getAsDocument();
+
+        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
 
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
@@ -258,7 +222,6 @@ public class TestWSSecurityNewST2 extends TestCase implements CallbackHandler {
      * https://issues.apache.org/jira/browse/WSS-62
      */
     public void testWSS62() throws Exception {
-        SOAPEnvelope unsignedEnvelope = message.getSOAPEnvelope();
         SAMLIssuer saml = SAMLIssuerFactory.getInstance("saml.properties");
 
         SAMLAssertion assertion = saml.newAssertion();
@@ -268,8 +231,8 @@ public class TestWSSecurityNewST2 extends TestCase implements CallbackHandler {
         Crypto issuerCrypto = saml.getIssuerCrypto();
         WSSecSignatureSAML wsSign = new WSSecSignatureSAML();
         wsSign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
-        
-        Document doc = unsignedEnvelope.getAsDocument();
+
+        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
 
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);

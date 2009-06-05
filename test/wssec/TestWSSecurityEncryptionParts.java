@@ -22,11 +22,6 @@ package wssec;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
-import org.apache.axis.Message;
-import org.apache.axis.MessageContext;
-import org.apache.axis.client.AxisClient;
-import org.apache.axis.configuration.NullProvider;
-import org.apache.axis.message.SOAPEnvelope;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.SOAPConstants;
@@ -47,9 +42,7 @@ import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.xml.namespace.QName;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
 import java.util.Vector;
 
@@ -71,8 +64,6 @@ public class TestWSSecurityEncryptionParts extends TestCase implements CallbackH
 
     private WSSecurityEngine secEngine = new WSSecurityEngine();
     private Crypto crypto = CryptoFactory.getInstance();
-    private MessageContext msgContext;
-    private Message message;
 
     /**
      * TestWSSecurity constructor
@@ -94,42 +85,16 @@ public class TestWSSecurityEncryptionParts extends TestCase implements CallbackH
         return new TestSuite(TestWSSecurityEncryptionParts.class);
     }
 
-    /**
-     * Setup method
-     * <p/>
-     * 
-     * @throws Exception Thrown when there is a problem in setup
-     */
-    protected void setUp() throws Exception {
-        AxisClient tmpEngine = new AxisClient(new NullProvider());
-        msgContext = new MessageContext(tmpEngine);
-        message = getSOAPMessage();
-    }
-
-    /**
-     * Constructs a soap envelope
-     * <p/>
-     * 
-     * @return soap envelope
-     * @throws Exception if there is any problem constructing the soap envelope
-     */
-    protected Message getSOAPMessage() throws Exception {
-        InputStream in = new ByteArrayInputStream(SOAPMSG.getBytes());
-        Message msg = new Message(in);
-        msg.setMessageContext(msgContext);
-        return msg;
-    }
 
     /**
      * Test encrypting a custom SOAP header
      */
     public void testSOAPHeader() throws Exception {
-        SOAPEnvelope unencryptedEnvelope = message.getSOAPEnvelope();
         WSSecEncrypt encrypt = new WSSecEncrypt();
         encrypt.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         encrypt.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
 
-        Document doc = unencryptedEnvelope.getAsDocument();
+        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
@@ -175,12 +140,11 @@ public class TestWSSecurityEncryptionParts extends TestCase implements CallbackH
      * Test encrypting a custom SOAP header using wsse11:EncryptedHeader
      */
     public void testSOAPEncryptedHeader() throws Exception {
-        SOAPEnvelope unencryptedEnvelope = message.getSOAPEnvelope();
         WSSecEncrypt encrypt = new WSSecEncrypt();
         encrypt.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         encrypt.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
 
-        Document doc = unencryptedEnvelope.getAsDocument();
+        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
@@ -210,12 +174,11 @@ public class TestWSSecurityEncryptionParts extends TestCase implements CallbackH
      * Test encrypting a custom SOAP header with a bad localname
      */
     public void testBadLocalname() throws Exception {
-        SOAPEnvelope unencryptedEnvelope = message.getSOAPEnvelope();
         WSSecEncrypt encrypt = new WSSecEncrypt();
         encrypt.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         encrypt.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
 
-        Document doc = unencryptedEnvelope.getAsDocument();
+        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
 
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
@@ -242,12 +205,11 @@ public class TestWSSecurityEncryptionParts extends TestCase implements CallbackH
      * Test encrypting a custom SOAP header with a bad namespace
      */
     public void testBadNamespace() throws Exception {
-        SOAPEnvelope unencryptedEnvelope = message.getSOAPEnvelope();
         WSSecEncrypt encrypt = new WSSecEncrypt();
         encrypt.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         encrypt.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
 
-        Document doc = unencryptedEnvelope.getAsDocument();
+        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
 
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
@@ -274,14 +236,12 @@ public class TestWSSecurityEncryptionParts extends TestCase implements CallbackH
      * Test signing a custom SOAP header and the SOAP body
      */
     public void testSOAPHeaderAndBody() throws Exception {
-        SOAPEnvelope unencryptedEnvelope = message.getSOAPEnvelope();
+        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         SOAPConstants soapConstants = 
-            WSSecurityUtil.getSOAPConstants(unencryptedEnvelope.getAsDOM());
+            WSSecurityUtil.getSOAPConstants(doc.getDocumentElement());
         WSSecEncrypt encrypt = new WSSecEncrypt();
         encrypt.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         encrypt.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
-
-        Document doc = unencryptedEnvelope.getAsDocument();
 
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
@@ -347,7 +307,6 @@ public class TestWSSecurityEncryptionParts extends TestCase implements CallbackH
             // expected
         }
     }
-    
 
     /**
      * Verifies the soap envelope

@@ -19,9 +19,7 @@
 
 package wssec;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
@@ -34,11 +32,6 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import org.apache.axis.Message;
-import org.apache.axis.MessageContext;
-import org.apache.axis.client.AxisClient;
-import org.apache.axis.configuration.NullProvider;
-import org.apache.axis.message.SOAPEnvelope;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
@@ -78,8 +71,6 @@ public class TestWSSecurityNew17 extends TestCase implements CallbackHandler {
 
     private WSSecurityEngine secEngine = new WSSecurityEngine();
     private Crypto crypto = CryptoFactory.getInstance();
-    private MessageContext msgContext;
-    private Message message;
     private byte[] keyData;
 
     /**
@@ -109,10 +100,6 @@ public class TestWSSecurityNew17 extends TestCase implements CallbackHandler {
      * @throws Exception Thrown when there is a problem in setup
      */
     protected void setUp() throws Exception {
-        AxisClient tmpEngine = new AxisClient(new NullProvider());
-        msgContext = new MessageContext(tmpEngine);
-        message = getSOAPMessage();
-        
         KeyGenerator keyGen = KeyGenerator.getInstance("AES");
         keyGen.init(128);
         SecretKey key = keyGen.generateKey();
@@ -120,25 +107,10 @@ public class TestWSSecurityNew17 extends TestCase implements CallbackHandler {
     }
 
     /**
-     * Constructs a soap envelope
-     * <p/>
-     * 
-     * @return soap envelope
-     * @throws Exception if there is any problem constructing the soap envelope
-     */
-    protected Message getSOAPMessage() throws Exception {
-        InputStream in = new ByteArrayInputStream(SOAPMSG.getBytes());
-        Message msg = new Message(in);
-        msg.setMessageContext(msgContext);
-        return msg;
-    }
-    
-    /**
      * Test signing a message body using a symmetric key with EncryptedKeySHA1
      */
     public void testSymmetricSignatureSHA1() throws Exception {
-        SOAPEnvelope unsignedEnvelope = message.getSOAPEnvelope();
-        Document doc = unsignedEnvelope.getAsDocument();
+        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
@@ -166,8 +138,7 @@ public class TestWSSecurityNew17 extends TestCase implements CallbackHandler {
      * EncryptedKey
      */
     public void testSymmetricSignatureDR() throws Exception {
-        SOAPEnvelope unsignedEnvelope = message.getSOAPEnvelope();
-        Document doc = unsignedEnvelope.getAsDocument();
+        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
@@ -205,10 +176,8 @@ public class TestWSSecurityNew17 extends TestCase implements CallbackHandler {
      *                   decryption, or verification
      */
     public void testEncryptedKeySignature() throws Exception {
-        
-        SOAPEnvelope unsignedEnvelope = message.getSOAPEnvelope();
+        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         LOG.info("Before Sign/Encryption....");
-        Document doc = unsignedEnvelope.getAsDocument();
         
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
@@ -263,8 +232,7 @@ public class TestWSSecurityNew17 extends TestCase implements CallbackHandler {
         
         final java.util.Vector actions = new java.util.Vector();
         actions.add(new Integer(WSConstants.SIGN));
-        SOAPEnvelope unsignedEnvelope = message.getSOAPEnvelope();
-        final Document doc = unsignedEnvelope.getAsDocument();
+        final Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         MyHandler handler = new MyHandler();
         handler.send(
             WSConstants.SIGN, 

@@ -22,11 +22,6 @@ package wssec;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
-import org.apache.axis.Message;
-import org.apache.axis.MessageContext;
-import org.apache.axis.client.AxisClient;
-import org.apache.axis.configuration.NullProvider;
-import org.apache.axis.message.SOAPEnvelope;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
@@ -45,9 +40,7 @@ import org.w3c.dom.Document;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 
 
 /**
@@ -74,8 +67,6 @@ public class TestWSSecurityWSS178 extends TestCase implements CallbackHandler {
 
     private WSSecurityEngine secEngine = new WSSecurityEngine();
     private Crypto crypto = CryptoFactory.getInstance("crypto.properties");
-    private MessageContext msgContext;
-    private Message message;
 
     /**
      * TestWSSecurity constructor
@@ -96,36 +87,11 @@ public class TestWSSecurityWSS178 extends TestCase implements CallbackHandler {
     }
 
     /**
-     * Setup method
-     * 
-     * @throws Exception Thrown when there is a problem in setup
-     */
-    protected void setUp() throws Exception {
-        AxisClient tmpEngine = new AxisClient(new NullProvider());
-        msgContext = new MessageContext(tmpEngine);
-        message = getSOAPMessage();
-    }
-
-    /**
-     * Constructs a soap envelope
-     * 
-     * @return soap envelope
-     * @throws Exception if there is any problem constructing the soap envelope
-     */
-    protected Message getSOAPMessage() throws Exception {
-        InputStream in = new ByteArrayInputStream(SOAPMSG.getBytes());
-        Message msg = new Message(in);
-        msg.setMessageContext(msgContext);
-        return msg;
-    }
-
-    /**
      * Test where the Assertion is referenced using a Key Identifier 
      * (from the SecurityTokenReference).
      */
     public void testKeyIdentifier() throws Exception {
-        SOAPEnvelope unsignedEnvelope = message.getSOAPEnvelope();
-        Document doc = unsignedEnvelope.getAsDocument();
+        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
@@ -151,7 +117,7 @@ public class TestWSSecurityWSS178 extends TestCase implements CallbackHandler {
         //
         org.w3c.dom.Element secHeaderElement = secHeader.getSecurityHeader();
         org.w3c.dom.Node assertionNode = 
-            secHeaderElement.getElementsByTagName("Assertion").item(0);
+            secHeaderElement.getElementsByTagNameNS(WSConstants.SAML_NS, "Assertion").item(0);
         secHeaderElement.removeChild(assertionNode);
         secHeaderElement.appendChild(assertionNode);
 
@@ -171,8 +137,7 @@ public class TestWSSecurityWSS178 extends TestCase implements CallbackHandler {
      * (from the SecurityTokenReference).
      */
     public void testDirectReference() throws Exception {
-        SOAPEnvelope unsignedEnvelope = message.getSOAPEnvelope();
-        Document doc = unsignedEnvelope.getAsDocument();
+        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
@@ -198,7 +163,7 @@ public class TestWSSecurityWSS178 extends TestCase implements CallbackHandler {
         //
         org.w3c.dom.Element secHeaderElement = secHeader.getSecurityHeader();
         org.w3c.dom.Node assertionNode = 
-            secHeaderElement.getElementsByTagName("Assertion").item(0);
+            secHeaderElement.getElementsByTagNameNS(WSConstants.SAML_NS, "Assertion").item(0);
         secHeaderElement.removeChild(assertionNode);
         secHeaderElement.appendChild(assertionNode);
 

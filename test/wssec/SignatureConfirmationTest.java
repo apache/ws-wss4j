@@ -22,11 +22,6 @@ package wssec;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
-import org.apache.axis.Message;
-import org.apache.axis.MessageContext;
-import org.apache.axis.client.AxisClient;
-import org.apache.axis.configuration.NullProvider;
-import org.apache.axis.message.SOAPEnvelope;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
@@ -42,9 +37,7 @@ import org.apache.ws.security.util.Base64;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
 import java.util.Vector;
 
@@ -71,8 +64,6 @@ public class SignatureConfirmationTest extends TestCase implements CallbackHandl
         +   "</SOAP-ENV:Body>" 
         + "</SOAP-ENV:Envelope>";
 
-    private MessageContext msgContext;
-    private SOAPEnvelope unsignedEnvelope;
     private WSSecurityEngine secEngine = new WSSecurityEngine();
     private Crypto crypto = CryptoFactory.getInstance();
 
@@ -94,30 +85,6 @@ public class SignatureConfirmationTest extends TestCase implements CallbackHandl
         return new TestSuite(SignatureConfirmationTest.class);
     }
 
-    /**
-     * Setup method
-     * 
-     * @throws java.lang.Exception Thrown when there is a problem in setup
-     */
-    protected void setUp() throws Exception {
-        AxisClient tmpEngine = new AxisClient(new NullProvider());
-        msgContext = new MessageContext(tmpEngine);
-        unsignedEnvelope = getSOAPEnvelope();
-    }
-
-    /**
-     * Constructs a soap envelope
-     * 
-     * @return soap envelope
-     * @throws java.lang.Exception if there is any problem constructing the soap envelope
-     */
-    protected SOAPEnvelope getSOAPEnvelope() throws Exception {
-        InputStream in = new ByteArrayInputStream(SOAPMSG.getBytes());
-        Message msg = new Message(in);
-        msg.setMessageContext(msgContext);
-        return msg.getSOAPEnvelope();
-    }
-
     
     /**
      * Test to see that a signature is saved correctly on the outbound request.
@@ -134,7 +101,7 @@ public class SignatureConfirmationTest extends TestCase implements CallbackHandl
         
         final java.util.Vector actions = new java.util.Vector();
         actions.add(new Integer(WSConstants.SIGN));
-        final Document doc = unsignedEnvelope.getAsDocument();
+        final Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         MyHandler handler = new MyHandler();
         handler.send(
             WSConstants.SIGN, doc, reqData, actions, true
@@ -170,7 +137,7 @@ public class SignatureConfirmationTest extends TestCase implements CallbackHandl
         
         final java.util.Vector actions = new java.util.Vector();
         actions.add(new Integer(WSConstants.SIGN));
-        final Document doc = unsignedEnvelope.getAsDocument();
+        final Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         MyHandler handler = new MyHandler();
         handler.send(
             WSConstants.SIGN, doc, reqData, actions, true
@@ -204,7 +171,7 @@ public class SignatureConfirmationTest extends TestCase implements CallbackHandl
         
         final java.util.Vector actions = new java.util.Vector();
         actions.add(new Integer(WSConstants.SIGN));
-        Document doc = unsignedEnvelope.getAsDocument();
+        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         MyHandler handler = new MyHandler();
         handler.send(
             WSConstants.SIGN, doc, reqData, actions, true
@@ -227,7 +194,7 @@ public class SignatureConfirmationTest extends TestCase implements CallbackHandl
         //
         List results = verify(doc);
         actions.clear();
-        doc = unsignedEnvelope.getAsDocument();
+        doc = SOAPUtil.toSOAPPart(SOAPMSG);
         msgContext = (java.util.Map)reqData.getMsgContext();
         WSHandlerResult handlerResult = new WSHandlerResult(null, results);
         List receivedResults = new Vector();
@@ -262,7 +229,7 @@ public class SignatureConfirmationTest extends TestCase implements CallbackHandl
         
         final java.util.Vector actions = new java.util.Vector();
         actions.add(new Integer(WSConstants.SIGN));
-        Document doc = unsignedEnvelope.getAsDocument();
+        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         MyHandler handler = new MyHandler();
         handler.send(
             WSConstants.SIGN, doc, reqData, actions, true
@@ -279,7 +246,7 @@ public class SignatureConfirmationTest extends TestCase implements CallbackHandl
         //
         List results = verify(doc);
         actions.clear();
-        doc = unsignedEnvelope.getAsDocument();
+        doc = SOAPUtil.toSOAPPart(SOAPMSG);
         msgContext = (java.util.Map)reqData.getMsgContext();
         WSHandlerResult handlerResult = new WSHandlerResult(null, results);
         List receivedResults = new Vector();
