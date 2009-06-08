@@ -180,7 +180,7 @@ public class WSHandlerConstants {
      * </li>
      * <li>The <i>Signing</i> function uses this name as the alias name
      * in the keystore to get user's certificate and private key to
-     * perform signing.
+     * perform signing if {@link #SIGNATURE_USER} is not used.
      * </li>
      * <li>The <i>encryption</i>
      * functions uses this parameter as fallback if {@link #ENCRYPTION_USER}
@@ -298,18 +298,36 @@ public class WSHandlerConstants {
      * Encryption only does not authenticate a user / sender, therefore it
      * does not need a password.
      * <p/>
-     * Placing the username of the encryption certficate in the WSDD is not
+     * Placing the username of the encryption certificate in the WSDD is not
      * a security risk, because the public key of that certificate is used
      * only.
      * <p/>
      * The application may set this parameter using the following method:
      * <pre>
-     * call.setProperty(WSHandlerConstants.ENCYRPTION_USER, "encryptionuser");
+     * call.setProperty(WSHandlerConstants.ENCYRPTION_USER, "encryptionUser");
      * </pre>
      * However, the parameter in the WSDD deployment file overwrites the
      * property setting (deployment setting overwrites application setting).
      */
     public static final String ENCRYPTION_USER = "encryptionUser";
+    
+    /**
+     * The user's name for signature.
+     * <p/>
+     * This name is used as the alias name in the keystore to get user's
+     * certificate and private key to perform signing.
+     * <p/>
+     * If this parameter is not set, then the signature
+     * function falls back to the {@link #USER} parameter.
+     * <p/>
+     * The application may set this parameter using the following method:
+     * <pre>
+     * call.setProperty(WSHandlerConstants.SIGNATURE_USER, "signatureUser");
+     * </pre>
+     * However, the parameter in the WSDD deployment file overwrites the
+     * property setting (deployment setting overwrites application setting).
+     */
+    public static final String SIGNATURE_USER = "signatureUser";
 
     /**
      * Specifying this name as {@link #ENCRYPTION_USER}
