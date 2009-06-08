@@ -531,6 +531,14 @@ public abstract class WSHandler {
     protected void decodeSignatureParameter(RequestData reqData) 
         throws WSSecurityException {
         Object mc = reqData.getMsgContext();
+        String signatureUser = getString(WSHandlerConstants.SIGNATURE_USER, mc);
+
+        if (signatureUser != null) {
+            reqData.setSignatureUser(signatureUser);
+        } else {
+            reqData.setSignatureUser(reqData.getUsername());
+        }
+        
         String keyId = getString(WSHandlerConstants.SIG_KEY_ID, mc);
         if (keyId != null) {
             Integer id = (Integer) WSHandlerConstants.keyIdentifier.get(keyId);

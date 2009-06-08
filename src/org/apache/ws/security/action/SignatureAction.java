@@ -29,7 +29,7 @@ public class SignatureAction implements Action {
             throws WSSecurityException {
         String password =
             handler.getPassword(
-                reqData.getUsername(),
+                reqData.getSignatureUser(),
                 actionToDo,
                 WSHandlerConstants.PW_CALLBACK_CLASS,
                 WSHandlerConstants.PW_CALLBACK_REF, reqData
@@ -48,7 +48,7 @@ public class SignatureAction implements Action {
             wsSign.setDigestAlgo(reqData.getSigDigestAlgorithm());
         }
 
-        wsSign.setUserInfo(reqData.getUsername(), password);
+        wsSign.setUserInfo(reqData.getSignatureUser(), password);
         if (reqData.getSignatureParts().size() > 0) {
             wsSign.setParts(reqData.getSignatureParts());
         }

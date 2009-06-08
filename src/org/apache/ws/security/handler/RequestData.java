@@ -51,6 +51,7 @@ public class RequestData {
     private String encKeyTransport = null;
     private String encUser = null;
     private Vector encryptParts = new Vector();
+    private String signatureUser = null;
     private X509Certificate encCert = null;
     private int timeToLive = 300;   // Timestamp: time in seconds between creation and expiry
     private WSSConfig wssConfig = null;
@@ -68,6 +69,7 @@ public class RequestData {
         wssConfig = null;
         signatureValues.clear();
         signatureDigestAlgorithm = null;
+        signatureUser = null;
     }
 
     public Object getMsgContext() {
@@ -168,6 +170,14 @@ public class RequestData {
 
     public Vector getSignatureParts() {
         return signatureParts;
+    }
+    
+    public String getSignatureUser() {
+        return signatureUser;
+    }
+
+    public void setSignatureUser(String signatureUser) {
+        this.signatureUser = signatureUser;
     }
 
     public Crypto getEncCrypto() {
