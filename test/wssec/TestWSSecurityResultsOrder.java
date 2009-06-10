@@ -109,6 +109,7 @@ public class TestWSSecurityResultsOrder extends TestCase {
         
         assertFalse (handler.checkResults(results, actions));
         assertTrue (handler.checkResultsAnyOrder(results, actions));
+        assertTrue (results.size() == 4 && actions.size() == 3);
     }
     
     /**
@@ -251,6 +252,32 @@ public class TestWSSecurityResultsOrder extends TestCase {
         );
         
         java.util.Vector actions = new java.util.Vector();
+        
+        assertFalse (handler.checkResults(results, actions));
+        assertFalse (handler.checkResultsAnyOrder(results, actions));
+    }
+
+    /**
+     */
+    public void 
+    testMultipleIdenticalResults() throws Exception {
+        MyHandler handler = new MyHandler();
+        
+        java.util.Vector results = new java.util.Vector();
+        results.add(
+            new WSSecurityEngineResult(WSConstants.ENCR, (Object)null)
+        );
+        results.add(
+            new WSSecurityEngineResult(WSConstants.UT, (Object)null)
+        );
+        results.add(
+            new WSSecurityEngineResult(WSConstants.ENCR, (Object)null)
+        );
+        
+        java.util.Vector actions = new java.util.Vector();
+        actions.add(new Integer(WSConstants.ENCR));
+        actions.add(new Integer(WSConstants.UT));
+        actions.add(new Integer(WSConstants.UT));
         
         assertFalse (handler.checkResults(results, actions));
         assertFalse (handler.checkResultsAnyOrder(results, actions));
