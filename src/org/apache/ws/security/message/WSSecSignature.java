@@ -592,12 +592,8 @@ public class WSSecSignature extends WSSecBase {
             NamedNodeMap attributes = parent.getAttributes();
             for (int i = 0; i < attributes.getLength(); i++) {
                 Node attribute = attributes.item(i);
-                if (attribute.getNamespaceURI() != null
-                    && attribute.getNamespaceURI().equals(
-                        org.apache.ws.security.WSConstants.XMLNS_NS
-                    )
-                ) {
-                    if (attribute.getNodeName().equals("xmlns")) {
+                if (WSConstants.XMLNS_NS.equals(attribute.getNamespaceURI())) {
+                    if ("xmlns".equals(attribute.getNodeName())) {
                         result.add("#default");
                     } else {
                         result.add(attribute.getLocalName());
@@ -610,12 +606,8 @@ public class WSSecSignature extends WSSecBase {
             NamedNodeMap attributes = target.getAttributes();
             for (int i = 0; i < attributes.getLength(); i++) {
                 Node attribute = attributes.item(i);
-                if (attribute.getNamespaceURI() != null
-                    && attribute.getNamespaceURI().equals(
-                        org.apache.ws.security.WSConstants.XMLNS_NS
-                    )
-                ) {
-                    if (attribute.getNodeName().equals("xmlns")) {
+                if (WSConstants.XMLNS_NS.equals(attribute.getNamespaceURI())) {
+                    if ("xmlns".equals(attribute.getNodeName())) {
                         result.remove("#default");
                     } else {
                         result.remove(attribute.getLocalName());

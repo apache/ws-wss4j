@@ -28,6 +28,7 @@ import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSEncryptionPart;
 import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSecurityEngine;
+import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.message.WSSecSignature;
@@ -95,6 +96,60 @@ public class TestWSSecurityNew3 extends TestCase implements CallbackHandler {
      */
     public void testIssuerSerialSignature() throws Exception {
         WSSecSignature builder = new WSSecSignature();
+        builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+        LOG.info("Before Signing....");
+        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        Document signedDoc = builder.build(doc, crypto, secHeader);
+
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("After Signing....");
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+            LOG.debug(outputString);
+        }
+        
+        verify(signedDoc);
+    }
+    
+    /**
+     * Test that signs and verifies a WS-Security envelope
+     * <p/>
+     * 
+     * @throws java.lang.Exception Thrown when there is any problem in signing or verification
+     */
+    public void testSignatureInclusiveC14N() throws Exception {
+        WSSecSignature builder = new WSSecSignature();
+        builder.setSigCanonicalization(WSConstants.C14N_OMIT_COMMENTS);
+        builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+        LOG.info("Before Signing....");
+        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        Document signedDoc = builder.build(doc, crypto, secHeader);
+
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("After Signing....");
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+            LOG.debug(outputString);
+        }
+        
+        verify(signedDoc);
+    }
+    
+    /**
+     * Test that signs and verifies a WS-Security envelope
+     * <p/>
+     * 
+     * @throws java.lang.Exception Thrown when there is any problem in signing or verification
+     */
+    public void testSignatureInclusivePrefixes() throws Exception {
+        WSSConfig wssConfig = WSSConfig.getNewInstance();
+        wssConfig.setWsiBSPCompliant(true);
+        WSSecSignature builder = new WSSecSignature();
+        builder.setWsConfig(wssConfig);
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         LOG.info("Before Signing....");
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
