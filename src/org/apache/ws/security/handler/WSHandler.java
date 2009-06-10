@@ -298,7 +298,12 @@ public abstract class WSHandler {
     
     protected boolean checkReceiverResultsAnyOrder(List wsResult, List actions) {
         
-        int ai = 0;
+        List recordedActions = new Vector(actions.size());
+        for (int i = 0; i < actions.size(); i++) {
+            Integer action = (Integer)actions.get(i);
+            recordedActions.add(action);
+        }
+        
         for (int i = 0; i < wsResult.size(); i++) {
             final Integer actInt = (Integer) ((WSSecurityEngineResult) wsResult
                     .get(i)).get(WSSecurityEngineResult.TAG_ACTION);
@@ -307,13 +312,12 @@ public abstract class WSHandler {
                 continue;
             }
             
-            if (actions.indexOf(actInt) == -1) {
+            if (!recordedActions.remove(actInt)) {
                 return false;
             }
-            ai++;
         }
 
-        if (ai != actions.size()) {
+        if (!recordedActions.isEmpty()) {
             return false;
         }
 
