@@ -757,17 +757,23 @@ public class WSSecurityUtil {
 
     public static Cipher getCipherInstance(String cipherAlgo)
         throws WSSecurityException {
+        
+        String jceid = JCEMapper.translateURItoJCEID(cipherAlgo);
         Cipher cipher = null;
         try {
-            if (cipherAlgo.equalsIgnoreCase(WSConstants.KEYTRANSPORT_RSA15)) {
-                cipher = Cipher.getInstance("RSA/NONE/PKCS1PADDING");
-            } else if (cipherAlgo.equalsIgnoreCase(WSConstants.KEYTRANSPORT_RSAOEP)) {
-                cipher = Cipher.getInstance("RSA/NONE/OAEPPADDING");
+            if (jceid == null) {
+                if (cipherAlgo.equalsIgnoreCase(WSConstants.KEYTRANSPORT_RSA15)) {
+                    cipher = Cipher.getInstance("RSA/NONE/PKCS1PADDING");
+                } else if (cipherAlgo.equalsIgnoreCase(WSConstants.KEYTRANSPORT_RSAOEP)) {
+                    cipher = Cipher.getInstance("RSA/NONE/OAEPPADDING");
+                } else {
+                    throw new WSSecurityException(
+                        WSSecurityException.UNSUPPORTED_ALGORITHM,
+                        "unsupportedKeyTransp", new Object[] {cipherAlgo}
+                    );
+                }
             } else {
-                throw new WSSecurityException(
-                    WSSecurityException.UNSUPPORTED_ALGORITHM,
-                    "unsupportedKeyTransp", new Object[] {cipherAlgo}
-                );
+                cipher = Cipher.getInstance(jceid);
             }
         } catch (NoSuchPaddingException ex) {
             throw new WSSecurityException(
