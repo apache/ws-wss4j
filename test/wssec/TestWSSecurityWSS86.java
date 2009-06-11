@@ -108,6 +108,7 @@ public class TestWSSecurityWSS86 extends TestCase implements CallbackHandler {
         AxisClient tmpEngine = new AxisClient(new NullProvider());
         msgContext = new MessageContext(tmpEngine);
         message = getSOAPMessage();
+        secEngine.getWssConfig(); //make sure BC gets registered
     }
 
     /**
