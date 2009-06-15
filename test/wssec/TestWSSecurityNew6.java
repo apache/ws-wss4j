@@ -27,6 +27,7 @@ import org.apache.axis.configuration.NullProvider;
 import org.apache.axis.message.SOAPEnvelope;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.ws.security.WSEncryptionPart;
 import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.components.crypto.Crypto;
@@ -42,6 +43,7 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Vector;
 
 /**
  * WS-Security Test Case <p/>
@@ -58,7 +60,7 @@ public class TestWSSecurityNew6 extends TestCase implements CallbackHandler {
         +   "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" 
         +   "<SOAP-ENV:Body>" 
         +       "<add xmlns=\"http://ws.apache.org/counter/counter_port_type\">" 
-        +           "<value xmlns=\"\">15</value>" 
+        +           "<value xmlns=\"http://blah.com\">15</value>" 
         +       "</add>" 
         +   "</SOAP-ENV:Body>" 
         + "</SOAP-ENV:Envelope>";
@@ -137,6 +139,70 @@ public class TestWSSecurityNew6 extends TestCase implements CallbackHandler {
         Document encryptedSignedDoc = sign.build(encryptedDoc, crypto,
                 secHeader);
         LOG.info("After Encryption....");
+        verify(encryptedSignedDoc);
+    }
+    
+    /**
+     * Test that signs and then encrypts a WS-Security envelope, then performs
+     * decryption and verification <p/>
+     * 
+     * @throws Exception
+     *             Thrown when there is any problem in signing, encryption,
+     *             decryption, or verification
+     */
+    public void testSigningEncryption() throws Exception {
+        SOAPEnvelope unsignedEnvelope = message.getSOAPEnvelope();
+        WSSecEncrypt encrypt = new WSSecEncrypt();
+        WSSecSignature sign = new WSSecSignature();
+        encrypt.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e");
+        sign.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+        LOG.info("Before Encryption....");
+        Document doc = unsignedEnvelope.getAsDocument();
+
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+
+        Document signedDoc = sign.build(doc, crypto, secHeader);
+        Document encryptedSignedDoc = encrypt.build(signedDoc, crypto, secHeader);
+        LOG.info("After Encryption....");
+        verify(encryptedSignedDoc);
+    }
+    
+    
+    /**
+     * Test that signs a SOAP Body, and then encrypts some data inside the SOAP Body.
+     * As the encryption adds a wsu:Id to the encrypted element, this test checks that
+     * verification still works ok.
+     */
+    public void testWSS198() throws Exception {
+        SOAPEnvelope unsignedEnvelope = message.getSOAPEnvelope();
+        WSSecEncrypt encrypt = new WSSecEncrypt();
+        WSSecSignature sign = new WSSecSignature();
+        encrypt.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e");
+        sign.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+        LOG.info("Before Encryption....");
+        Document doc = unsignedEnvelope.getAsDocument();
+        
+        Vector parts = new Vector();
+        WSEncryptionPart encP =
+            new WSEncryptionPart(
+                "add",
+                "http://ws.apache.org/counter/counter_port_type",
+                "");
+        parts.add(encP);
+        encrypt.setParts(parts);
+
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+
+        Document signedDoc = sign.build(doc, crypto, secHeader);
+        Document encryptedSignedDoc = encrypt.build(signedDoc, crypto, secHeader);
+        LOG.info("WSS198");
+        if (LOG.isDebugEnabled()) {
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(encryptedSignedDoc);
+            LOG.debug(outputString);
+        }
         verify(encryptedSignedDoc);
     }
 

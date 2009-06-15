@@ -528,10 +528,13 @@ public class WSSecurityUtil {
      */
     public static String getIDFromReference(String ref) {
         String id = ref.trim();
-        if ((id.length() == 0) || (id.charAt(0) != '#')) {
+        if (id.length() == 0) {
             return null;
         }
-        return id.substring(1);
+        if (id.charAt(0) == '#') {
+            id = id.substring(1);
+        }
+        return id;
     }
     
     /**
@@ -557,11 +560,7 @@ public class WSSecurityUtil {
         if (id == null) {
             return null;
         }
-        id = id.trim();
-        if ((id.length() == 0) || (id.charAt(0) != '#')) {
-            return null;
-        }
-        id = id.substring(1);
+        id = getIDFromReference(id);
         return WSSecurityUtil.findElementById(doc.getDocumentElement(), id, null);
     }
 

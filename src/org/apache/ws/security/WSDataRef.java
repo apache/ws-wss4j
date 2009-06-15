@@ -27,8 +27,14 @@ package org.apache.ws.security;
  */
 
 import javax.xml.namespace.QName;
+import org.w3c.dom.Element;
 
 public class WSDataRef {
+    
+    /**
+     * The protected DOM element
+     */
+    private Element protectedElement;
     
     /**
      * reference by which the Encrypted Data was referred 
@@ -114,5 +120,32 @@ public class WSDataRef {
     public void setName(QName name) {
         this.name = name;
     }
+    
+    /**
+     * @param element The protected DOM element to set
+     */
+    public void setProtectedElement(Element element) {
+        protectedElement = element;
+        String prefix = element.getPrefix();
+        if (prefix == null) {
+            name = 
+                new QName(
+                    element.getNamespaceURI(), element.getLocalName()
+                );
+        } else {
+            name = 
+                new QName(
+                    element.getNamespaceURI(), element.getLocalName(), prefix
+                );
+        }
+    }
+     
+    /**
+     * @return the protected DOM element
+     */
+    public Element getProtectedElement() {
+        return protectedElement;
+    }
+
 
 }

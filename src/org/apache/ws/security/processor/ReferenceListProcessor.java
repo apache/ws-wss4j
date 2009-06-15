@@ -23,7 +23,6 @@ import java.util.Vector;
 import javax.crypto.SecretKey;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
-import javax.xml.namespace.QName;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -42,11 +41,9 @@ import org.apache.ws.security.saml.SAMLUtil;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.xml.security.encryption.XMLCipher;
 import org.apache.xml.security.encryption.XMLEncryptionException;
-import org.apache.xml.security.utils.Constants;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 public class ReferenceListProcessor implements Processor {
     private static Log log = 
@@ -93,8 +90,6 @@ public class ReferenceListProcessor implements Processor {
         CallbackHandler cb,
         Crypto crypto
     ) throws WSSecurityException {
-        Document doc = elem.getOwnerDocument();
-
         Node tmpE = null;
         ArrayList dataRefUris = new ArrayList();
         for (tmpE = elem.getFirstChild(); 
@@ -109,8 +104,11 @@ public class ReferenceListProcessor implements Processor {
             }
             if (tmpE.getLocalName().equals("DataReference")) {
                 String dataRefURI = ((Element) tmpE).getAttribute("URI");
-                WSDataRef dataRef = new WSDataRef(dataRefURI.substring(1));
-                decryptDataRefEmbedded(doc, dataRefURI, dataRef, cb, crypto);
+                if (dataRefURI.charAt(0) == '#') {
+                    dataRefURI = dataRefURI.substring(1);
+                }
+                WSDataRef dataRef = 
+                    decryptDataRefEmbedded(elem.getOwnerDocument(), dataRefURI, cb, crypto);
                 dataRefUris.add(dataRef);
             }
         }
@@ -118,137 +116,153 @@ public class ReferenceListProcessor implements Processor {
         return dataRefUris;
     }
 
-    public void decryptDataRefEmbedded(
+    
+    /**
+     * Decrypt an (embedded) EncryptedData element referenced by dataRefURI.
+     */
+    private WSDataRef decryptDataRefEmbedded(
         Document doc, 
         String dataRefURI, 
-        WSDataRef dataRef,
         CallbackHandler cb, 
         Crypto crypto
     ) throws WSSecurityException {
-
         if (log.isDebugEnabled()) {
             log.debug("Found data reference: " + dataRefURI);
         }
         //
-        // Look up the encrypted data. First try wsu:Id="someURI". If no such Id
-        // then try the generic lookup to find Id="someURI"
+        // Find the encrypted data element referenced by dataRefURI
         //
-        Element encBodyData = null;
-        if ((encBodyData = WSSecurityUtil.getElementByWsuId(doc, dataRefURI)) == null) {            
-            encBodyData = WSSecurityUtil.getElementByGenId(doc, dataRefURI);
-        }
-        if (encBodyData == null) {
-            throw new WSSecurityException(
-                WSSecurityException.INVALID_SECURITY, "dataRef", new Object[] {dataRefURI}
+        Element encryptedDataElement = findEncryptedDataElement(doc, dataRefURI);
+        //
+        // Prepare the SecretKey object to decrypt EncryptedData
+        //
+        String symEncAlgo = X509Util.getEncAlgo(encryptedDataElement);
+        Element keyInfoElement = 
+            (Element)WSSecurityUtil.getDirectChildElement(
+                encryptedDataElement, "KeyInfo", WSConstants.SIG_NS
             );
-        }
-
-        boolean content = X509Util.isContent(encBodyData);
-
-        // Now figure out the encryption algorithm
-        String symEncAlgo = X509Util.getEncAlgo(encBodyData);
-
-        Element tmpE = 
-            (Element)WSSecurityUtil.findElement(
-                (Node) encBodyData, "KeyInfo", WSConstants.SIG_NS
-            );
-        if (tmpE == null) {
+        if (keyInfoElement == null) {
             throw new WSSecurityException(WSSecurityException.INVALID_SECURITY, "noKeyinfo");
         }
-
         //
         // Try to get a security reference token, if none found try to get a
         // shared key using a KeyName.
         //
         Element secRefToken = 
-            (Element) WSSecurityUtil.getDirectChild(
-                tmpE, "SecurityTokenReference", WSConstants.WSSE_NS
+            WSSecurityUtil.getDirectChildElement(
+                keyInfoElement, "SecurityTokenReference", WSConstants.WSSE_NS
             );
-
         SecretKey symmetricKey = null;
         if (secRefToken == null) {
-            symmetricKey = X509Util.getSharedKey(tmpE, symEncAlgo, cb);
+            symmetricKey = X509Util.getSharedKey(keyInfoElement, symEncAlgo, cb);
         } else {
-            symmetricKey = getKeyFromSecurityTokenReference(secRefToken, symEncAlgo, crypto, cb);
+            symmetricKey = 
+                getKeyFromSecurityTokenReference(secRefToken, symEncAlgo, crypto, cb);
         }
 
-        // initialize Cipher ....
+        return 
+            decryptEncryptedData(
+                doc, dataRefURI, encryptedDataElement, symmetricKey, symEncAlgo
+            );
+    }
+
+    
+    /**
+     * Look up the encrypted data. First try wsu:Id="someURI". If no such Id then try the 
+     * generic lookup to find Id="someURI"
+     * 
+     * @param doc The document in which to find EncryptedData
+     * @param dataRefURI The URI of EncryptedData
+     * @return The EncryptedData element
+     * @throws WSSecurityException if the EncryptedData element referenced by dataRefURI is 
+     * not found
+     */
+    public static Element
+    findEncryptedDataElement(
+        Document doc,
+        String dataRefURI
+    ) throws WSSecurityException {
+        Element encryptedDataElement = WSSecurityUtil.getElementByWsuId(doc, dataRefURI);
+        if (encryptedDataElement == null) {   
+            encryptedDataElement = WSSecurityUtil.getElementByGenId(doc, dataRefURI);
+        }
+        if (encryptedDataElement == null) {
+            throw new WSSecurityException(
+                WSSecurityException.INVALID_SECURITY, "dataRef", new Object[] {dataRefURI}
+            );
+        }
+        return encryptedDataElement;
+    }
+
+    
+    /**
+     * Decrypt the EncryptedData argument using a SecretKey.
+     * @param doc The (document) owner of EncryptedData
+     * @param dataRefURI The URI of EncryptedData
+     * @param encData The EncryptedData element
+     * @param symmetricKey The SecretKey with which to decrypt EncryptedData
+     * @param symEncAlgo The symmetric encryption algorithm to use
+     * @throws WSSecurityException
+     */
+    public static WSDataRef
+    decryptEncryptedData(
+        Document doc,
+        String dataRefURI,
+        Element encData,
+        SecretKey symmetricKey,
+        String symEncAlgo
+    ) throws WSSecurityException {
         XMLCipher xmlCipher = null;
         try {
             xmlCipher = XMLCipher.getInstance(symEncAlgo);
             xmlCipher.init(XMLCipher.DECRYPT_MODE, symmetricKey);
-        } catch (XMLEncryptionException e1) {
+        } catch (XMLEncryptionException ex) {
             throw new WSSecurityException(
-                WSSecurityException.UNSUPPORTED_ALGORITHM, null, null, e1
+                WSSecurityException.UNSUPPORTED_ALGORITHM, null, null, ex
             );
         }
 
+        WSDataRef dataRef = new WSDataRef(dataRefURI);
+        dataRef.setWsuId(dataRefURI);
+        boolean content = X509Util.isContent(encData);
+        Node parent = encData.getParentNode();
+        Node previousSibling = encData.getPreviousSibling();
         if (content) {
-            encBodyData = (Element) encBodyData.getParentNode();
-            dataRef.setName(new QName(encBodyData.getNamespaceURI(), encBodyData.getLocalName()));
+            encData = (Element) encData.getParentNode();
+            parent = encData.getParentNode();
         }
-            
+        
         try {
-            Node parentEncBody =encBodyData.getParentNode();
-            final java.util.List before_peers = listChildren(parentEncBody);
-            
-            xmlCipher.doFinal(doc, encBodyData, content);
-            
-            if (parentEncBody.getLocalName().equals(WSConstants.ENCRYPTED_HEADER)
-                && parentEncBody.getNamespaceURI().equals(WSConstants.WSSE11_NS)) {
-                Node decryptedHeader = parentEncBody.getFirstChild();
-                Element decryptedHeaderClone = (Element)decryptedHeader.cloneNode(true);
-                String sigId = decryptedHeaderClone.getAttributeNS(WSConstants.WSU_NS, "Id");
-                
-                if (sigId == null || sigId.equals("")) {
-                    String id = ((Element)parentEncBody).getAttributeNS(WSConstants.WSU_NS, "Id");                              
-                    String wsuPrefix = 
-                        WSSecurityUtil.setNamespace(
-                            decryptedHeaderClone, WSConstants.WSU_NS, WSConstants.WSU_PREFIX
-                        );
-                    decryptedHeaderClone.setAttributeNS(WSConstants.WSU_NS, wsuPrefix + ":Id", id);
-                    dataRef.setWsuId(id.substring(1));
-                } else {
-                    dataRef.setWsuId(sigId);
-                }
-                    
-                parentEncBody.getParentNode().appendChild(decryptedHeaderClone);
-                parentEncBody.getParentNode().removeChild(parentEncBody);
-            } 
-            
-            final java.util.List after_peers = listChildren(parentEncBody);
-            final java.util.List new_nodes = newNodes(before_peers, after_peers);
-            for (
-                final java.util.Iterator pos = new_nodes.iterator();
-                pos.hasNext();
-            ) {
-                Node node = (Node) pos.next();
-                if (node instanceof Element) {
-                    if(!Constants.SignatureSpecNS.equals(node.getNamespaceURI()) 
-                        && node.getAttributes().getNamedItemNS(WSConstants.WSU_NS, "Id") == null) {
-                        String wsuPrefix = 
-                            WSSecurityUtil.setNamespace(
-                                (Element)node, WSConstants.WSU_NS, WSConstants.WSU_PREFIX
-                            );
-                        ((Element)node).setAttributeNS(
-                            WSConstants.WSU_NS, wsuPrefix + ":Id", dataRefURI
-                        );
-                        dataRef.setWsuId(dataRefURI.substring(1));                              
-                    }
-                    dataRef.setName(new QName(node.getNamespaceURI(),node.getLocalName()));
-                }
-            }
-
-        } catch (Exception e) {
-            throw new WSSecurityException(
-                WSSecurityException.FAILED_CHECK, null, null, e
-            );
+            xmlCipher.doFinal(doc, encData, content);
+        } catch (Exception ex) {
+            throw new WSSecurityException(WSSecurityException.FAILED_CHECK, null, null, ex);
         }
+        
+        if (parent.getLocalName().equals(WSConstants.ENCRYPTED_HEADER)
+            && parent.getNamespaceURI().equals(WSConstants.WSSE11_NS)) {
+                
+            Node decryptedHeader = parent.getFirstChild();
+            Element decryptedHeaderClone = (Element)decryptedHeader.cloneNode(true);            
+            parent.getParentNode().appendChild(decryptedHeaderClone);
+            parent.getParentNode().removeChild(parent);
+            dataRef.setProtectedElement(decryptedHeaderClone);
+        } else if (content) {
+            dataRef.setProtectedElement(encData);
+        } else {
+            Node decryptedNode;
+            if (previousSibling == null) {
+                decryptedNode = parent.getFirstChild();
+            } else {
+                decryptedNode = previousSibling.getNextSibling();
+            }
+            if (decryptedNode != null && Node.ELEMENT_NODE == decryptedNode.getNodeType()) {
+                dataRef.setProtectedElement((Element)decryptedNode);
+            }
+        }
+        
+        return dataRef;
     }
-
-    public String getId() {
-        return null;
-    }
+    
 
     /**
      * Retrieves a secret key (session key) from a already parsed EncryptedKey
@@ -356,88 +370,8 @@ public class ReferenceListProcessor implements Processor {
         return WSSecurityUtil.prepareSecretKey(algorithm, decryptedData);
     }
     
-    /**
-     * @return      a list of Nodes, representing the 
-     */
-    private static java.util.List
-    listChildren(
-        final Node parent
-    ) {
-        if (parent == null) {
-            return java.util.Collections.EMPTY_LIST;
-        }
-        final java.util.List ret = new java.util.ArrayList();
-        if (parent.hasChildNodes()) {
-            final NodeList children = parent.getChildNodes();
-            if (children != null) {
-                for (int i = 0, n = children.getLength();  i < n;  ++i) {
-                    ret.add(children.item(i));
-                }
-            }
-        }
-        return ret;
+    public String getId() {
+        return null;
     }
-
-    /**
-     * @return a list of Nodes in b that are not in a
-     */
-    private static java.util.List
-    newNodes(
-        java.util.List a,
-        java.util.List b
-    ) {
-        if (a.size() == 0) {
-            return b;
-        }
-        if (b.size() == 0) {
-            return java.util.Collections.EMPTY_LIST;
-        }
-        
-        a = new ArrayList(a);
-        //try a fast node compare at same position first.....
-        for (int x = 0; x < b.size(); x++) {
-            final Node bnode = (Node)b.get(x);
-            final Node anode = (Node)a.get(x);
-            if (bnode == anode
-                || bnode.getLocalName().equals(anode.getLocalName())
-                && bnode.getNamespaceURI().equals(anode.getNamespaceURI())) {
-                b.remove(x);
-                a.remove(x);
-            }
-        }
-        //what's left is stuff that didn't exactly position match, do slower searches
-        final java.util.List ret = new java.util.ArrayList();
-        for (
-            final java.util.Iterator bpos = b.iterator();
-            bpos.hasNext();
-        ) {
-            final Node bnode = (Node) bpos.next();
-            final java.lang.String bns = bnode.getNamespaceURI();
-            final java.lang.String bln = bnode.getLocalName();
-            boolean found = false;
-            for (
-                final java.util.Iterator apos = a.iterator();
-                apos.hasNext() && !found;
-            ) {
-                final Node anode = (Node) apos.next();
-                final java.lang.String ans = anode.getNamespaceURI();
-                final java.lang.String aln = anode.getLocalName();
-                final boolean nsmatch =
-                    ans == null
-                    ? ((bns == null) ? true : false)
-                            : ((bns == null) ? false : ans.equals(bns));
-                final boolean lnmatch =
-                    aln == null
-                    ? ((bln == null) ? true : false)
-                            : ((bln == null) ? false : aln.equals(bln));
-                if (nsmatch && lnmatch) {
-                    found = true;
-                }
-            }
-            if (!found) {
-                ret.add(bnode);
-            }
-        }
-        return ret;
-    }
+    
 }
