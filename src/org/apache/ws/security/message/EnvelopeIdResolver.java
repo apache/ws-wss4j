@@ -106,9 +106,9 @@ public class EnvelopeIdResolver extends ResourceResolverSpi {
         }
         String cId = selectedElem.getAttributeNS(WSConstants.WSU_NS, "Id");
         if (!id.equals(cId)) {
-            selectedElem = WSSecurityUtil.getElementByWsuId(doc, uriNodeValue);
+            selectedElem = WSSecurityUtil.getElementByWsuId(doc, uriNodeValue, false);
             if (selectedElem == null) {
-                selectedElem = WSSecurityUtil.getElementByGenId(doc, uriNodeValue);
+                selectedElem = WSSecurityUtil.getElementByGenId(doc, uriNodeValue, false);
             }
             if (selectedElem == null) {
                 throw new ResourceResolverException(

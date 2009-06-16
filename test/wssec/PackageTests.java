@@ -75,6 +75,7 @@ public class PackageTests extends TestCase {
         suite.addTestSuite(TestWSSecurityWSS178.class);
         suite.addTestSuite(SignatureConfirmationTest.class);
         suite.addTestSuite(TestWSSecurityWSS194.class);
+        suite.addTestSuite(TestModifiedRequest.class);
         
         return suite;
     }

@@ -360,12 +360,12 @@ public class WSSecSignature extends WSSecBase {
                 if (idToSign != null) {
                     Element toSignById = 
                         WSSecurityUtil.findElementById(
-                            envelope, idToSign, WSConstants.WSU_NS
+                            envelope, idToSign, WSConstants.WSU_NS, false
                         );
                     if (toSignById == null) {
                         toSignById = 
                             WSSecurityUtil.findElementById(
-                                envelope, idToSign, null
+                                envelope, idToSign, null, false
                             );
                     }
                     transforms.addTransform(Transforms.TRANSFORM_C14N_EXCL_OMIT_COMMENTS);

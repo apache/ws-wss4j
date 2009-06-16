@@ -430,11 +430,13 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
             if (idToEnc != null) {
                 elementToEncrypt = 
                     WSSecurityUtil.findElementById(
-                            doc.getDocumentElement(), idToEnc, WSConstants.WSU_NS
+                            doc.getDocumentElement(), idToEnc, WSConstants.WSU_NS, false
                     );
                 if (elementToEncrypt == null) {
                     elementToEncrypt = 
-                        WSSecurityUtil.findElementById(doc.getDocumentElement(), idToEnc, null);
+                        WSSecurityUtil.findElementById(
+                            doc.getDocumentElement(), idToEnc, null, false
+                        );
                 }
             } else {
                 elementToEncrypt = 

@@ -164,8 +164,8 @@ public class ReferenceListProcessor implements Processor {
 
     
     /**
-     * Look up the encrypted data. First try wsu:Id="someURI". If no such Id then try the 
-     * generic lookup to find Id="someURI"
+     * Look up the encrypted data. First try Id="someURI". If no such Id then try 
+     * wsu:Id="someURI".
      * 
      * @param doc The document in which to find EncryptedData
      * @param dataRefURI The URI of EncryptedData
@@ -178,9 +178,9 @@ public class ReferenceListProcessor implements Processor {
         Document doc,
         String dataRefURI
     ) throws WSSecurityException {
-        Element encryptedDataElement = WSSecurityUtil.getElementByWsuId(doc, dataRefURI);
+        Element encryptedDataElement = WSSecurityUtil.getElementByGenId(doc, dataRefURI);
         if (encryptedDataElement == null) {            
-            encryptedDataElement = WSSecurityUtil.getElementByGenId(doc, dataRefURI);
+            encryptedDataElement = WSSecurityUtil.getElementByWsuId(doc, dataRefURI);
         }
         if (encryptedDataElement == null) {
             throw new WSSecurityException(

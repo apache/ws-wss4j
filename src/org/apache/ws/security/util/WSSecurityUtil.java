@@ -351,35 +351,36 @@ public class WSSecurityUtil {
      * faster than XPath, and we do not deal with prefixes, just with the real
      * namespace URI
      * 
-     * If there are multiple elements, we log a warning and return null as this
-     * can be used to get around the signature checking.
+     * If checkMultipleElements is true and there are multiple elements, we log a 
+     * warning and return null as this can be used to get around the signature checking.
      * 
      * @param startNode Where to start the search
      * @param value Value of the Id attribute
      * @param namespace Namespace URI of the Id
+     * @param checkMultipleElements If true then go through the entire tree and return 
+     *        null if there are multiple elements with the same Id
      * @return The found element if there was exactly one match, or
      *         <code>null</code> otherwise
      */
-    public static Element findElementById(Node startNode, String value, String namespace) {
-        Element foundElement = null;
-
+    public static Element findElementById(
+        Node startNode, String value, String namespace, boolean checkMultipleElements
+    ) {
         //
-        // Replace the formerly recursive implementation with a depth-first-loop
-        // lookup
+        // Replace the formerly recursive implementation with a depth-first-loop lookup
         //
-        if (startNode == null) {
-            return null;
-        }
         Node startParent = startNode.getParentNode();
         Node processedNode = null;
+        Element foundElement = null;
 
         while (startNode != null) {
             // start node processing at this point
             if (startNode.getNodeType() == Node.ELEMENT_NODE) {
                 Element se = (Element) startNode;
-                if (se.hasAttributeNS(namespace, "Id")
-                    && value.equals(se.getAttributeNS(namespace, "Id"))) {
-                    if (foundElement == null) {
+                String attributeNS = se.getAttributeNS(namespace, "Id");
+                if (!"".equals(attributeNS) && value.equals(attributeNS)) {
+                    if (!checkMultipleElements) {
+                        return se;
+                    } else if (foundElement == null) {
                         foundElement = se; // Continue searching to find duplicates
                     } else {
                         log.warn("Multiple elements with the same 'Id' attribute value!");
@@ -537,13 +538,30 @@ public class WSSecurityUtil {
      * @return the found element or null if no element with the Id exists
      */
     public static Element getElementByWsuId(Document doc, String id) {
+        return getElementByWsuId(doc, id, true);
+    }
+
+    /**
+     * Search for an element given its wsu:id. <p/>
+     * 
+     * @param doc the DOM document (SOAP request)
+     * @param id the Id of the element
+     * @param checkMultipleElements If true then returns null if there are multiple
+     *        elements with the same id
+     * @return the found element or null if no element with the Id exists
+     */
+    public static Element getElementByWsuId(
+        Document doc, String id, boolean checkMultipleElements
+    ) {
         if (id == null) {
             return null;
         }
         id = getIDFromReference(id);
-        return WSSecurityUtil.findElementById(doc.getDocumentElement(), id, WSConstants.WSU_NS);
+        return WSSecurityUtil.findElementById(
+            doc.getDocumentElement(), id, WSConstants.WSU_NS, checkMultipleElements
+        );
     }
-
+    
     /**
      * Turn a reference (eg "#5") into an ID (eg "5").
      * 
@@ -570,11 +588,29 @@ public class WSSecurityUtil {
      * @return the found element or null if no element with the Id exists
      */
     public static Element getElementByGenId(Document doc, String id) {
+        return getElementByGenId(doc, id, true);
+    }
+    
+    /**
+     * Search for an element given its generic id. <p/>
+     * 
+     * @param doc the DOM document (SOAP request)
+     * @param id the Id of the element
+     * @param checkMultipleElements If true then returns null if there are multiple
+     *        elements with the same id
+     * 
+     * @return the found element or null if no element with the Id exists
+     */
+    public static Element getElementByGenId(
+        Document doc, String id, boolean checkMultipleElements
+    ) {
         if (id == null) {
             return null;
         }
         id = getIDFromReference(id);
-        return WSSecurityUtil.findElementById(doc.getDocumentElement(), id, null);
+        return WSSecurityUtil.findElementById(
+            doc.getDocumentElement(), id, null, checkMultipleElements
+        );
     }
 
     /**
@@ -929,7 +965,7 @@ public class WSSecurityUtil {
     }
 
     /**
-     * Ensure that this  covers all required elements (identified by
+     * Ensure that this covers all required elements (identified by
      * their wsu:Id attributes).
      * 
      * @param resultItem the signature to check
@@ -959,7 +995,11 @@ public class WSSecurityUtil {
             boolean found = false;
             for (int j = 0; j < signedElemsRefList.size(); j++) {
                 WSDataRef dataRef = (WSDataRef)signedElemsRefList.get(j);
-                if (dataRef.getWsuId().equals(requiredIDs[i])) {
+                String wsuId = dataRef.getWsuId();
+                if (wsuId.charAt(0) == '#') {
+                    wsuId = wsuId.substring(1);
+                }
+                if (wsuId.equals(requiredIDs[i])) {
                     found = true;
                 }
             }

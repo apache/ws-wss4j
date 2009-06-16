@@ -515,12 +515,12 @@ public class WSSecSignatureSAML extends WSSecSignature {
                 if (idToSign != null) {
                     Element toSignById = 
                         WSSecurityUtil.findElementById(
-                            document.getDocumentElement(), idToSign, WSConstants.WSU_NS
+                            document.getDocumentElement(), idToSign, WSConstants.WSU_NS, false
                         );
                     if (toSignById == null) {
                         toSignById = 
                             WSSecurityUtil.findElementById(
-                                document.getDocumentElement(), idToSign, null
+                                document.getDocumentElement(), idToSign, null, false
                             );
                     }
                     transforms.addTransform(Transforms.TRANSFORM_C14N_EXCL_OMIT_COMMENTS);
