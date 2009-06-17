@@ -415,14 +415,20 @@ public abstract class CryptoBase implements Crypto {
      */
     public String getAliasForX509Cert(Certificate cert) throws WSSecurityException {
         try {
-            String alias = keystore.getCertificateAlias(cert);
-            if (alias != null) {
-                return alias;
+            if (keystore == null) {
+                return null;
             }
-            // Use brute force search
+            //
+            // The following code produces the wrong alias in BouncyCastle and so
+            // we'll just use the brute-force search
+            //
+            // String alias = keystore.getCertificateAlias(cert);
+            // if (alias != null) {
+            //     return alias;
+            // }
             Enumeration e = keystore.aliases();
             while (e.hasMoreElements()) {
-                alias = (String) e.nextElement();
+                String alias = (String) e.nextElement();
                 X509Certificate cert2 = (X509Certificate) keystore.getCertificate(alias);
                 if (cert2.equals(cert)) {
                     return alias;

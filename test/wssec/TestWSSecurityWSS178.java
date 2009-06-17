@@ -73,7 +73,7 @@ public class TestWSSecurityWSS178 extends TestCase implements CallbackHandler {
         + "</SOAP-ENV:Envelope>";
 
     private WSSecurityEngine secEngine = new WSSecurityEngine();
-    private Crypto crypto = CryptoFactory.getInstance("crypto.properties");
+    private Crypto crypto;
     private MessageContext msgContext;
     private Message message;
 
@@ -84,6 +84,8 @@ public class TestWSSecurityWSS178 extends TestCase implements CallbackHandler {
      */
     public TestWSSecurityWSS178(String name) {
         super(name);
+        secEngine.getWssConfig(); //make sure BC gets registered
+        crypto = CryptoFactory.getInstance("crypto.properties");
     }
 
     /**
