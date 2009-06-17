@@ -66,7 +66,7 @@ public class TestWSSecurityWSS178 extends TestCase implements CallbackHandler {
         + "</SOAP-ENV:Envelope>";
 
     private WSSecurityEngine secEngine = new WSSecurityEngine();
-    private Crypto crypto = CryptoFactory.getInstance("crypto.properties");
+    private Crypto crypto;
 
     /**
      * TestWSSecurity constructor
@@ -75,6 +75,8 @@ public class TestWSSecurityWSS178 extends TestCase implements CallbackHandler {
      */
     public TestWSSecurityWSS178(String name) {
         super(name);
+        secEngine.getWssConfig(); //make sure BC gets registered
+        crypto = CryptoFactory.getInstance("crypto.properties");
     }
 
     /**
@@ -130,7 +132,6 @@ public class TestWSSecurityWSS178 extends TestCase implements CallbackHandler {
         
         verify(encryptedDoc);
     }
-    
     
     /**
      * Test where the Assertion is referenced using direct reference

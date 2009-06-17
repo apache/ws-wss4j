@@ -191,7 +191,7 @@
                               !org.apache.ws.axis.security.*,
                               javax.xml.crypto.*,
                               org.apache.xml.security.*,
-                              org.bouncycastle.*,
+                              org.bouncycastle.*;resolution:=optional,
                               org.jcp.xml.dsig.internal.*,
                               org.opensaml.*;resolution:=optional,
                               *;resolution:=optional
@@ -363,7 +363,7 @@
                     <groupId>bouncycastle</groupId>
                     <artifactId>bcprov-jdk14</artifactId>
                     <version>${bcprov.jdk14.version}</version>
-                    <scope>compile</scope>
+                    <scope>test</scope>
                 </dependency>
             </dependencies>
         </profile>
@@ -377,7 +377,7 @@
                     <groupId>bouncycastle</groupId>
                     <artifactId>bcprov-jdk15</artifactId>
                     <version>${bcprov.jdk15.version}</version>
-                    <scope>compile</scope>
+                    <scope>test</scope>
                 </dependency>
             </dependencies>
         </profile>

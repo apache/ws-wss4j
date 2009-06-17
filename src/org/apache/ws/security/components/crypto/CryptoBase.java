@@ -24,10 +24,9 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.util.WSSecurityUtil;
 
-import org.bouncycastle.asn1.x509.X509Name;
-
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.lang.reflect.Constructor;
 import java.math.BigInteger;
 import java.security.Key;
 import java.security.KeyStore;
@@ -76,9 +75,22 @@ public abstract class CryptoBase implements Crypto {
     public static final String NAME_CONSTRAINTS_OID = "2.5.29.30";
     
     private static Log log = LogFactory.getLog(CryptoBase.class);
+    private static final Constructor BC_509CLASS_CONS;
+
     protected static Map certFactMap = new HashMap();
     protected KeyStore keystore = null;
     protected KeyStore truststore = null;
+    
+    static {
+        Constructor cons = null;
+        try {
+            Class c = Class.forName("org.bouncycastle.asn1.x509.X509Name");
+            cons = c.getConstructor(new Class[] {String.class});
+        } catch (Exception e) {
+            //ignore
+        }
+        BC_509CLASS_CONS = cons;
+    }
     
     /**
      * Constructor
@@ -254,6 +266,17 @@ public abstract class CryptoBase implements Crypto {
         java.util.Collections.sort(vr);
         return vr;
     }
+    
+    private Object createBCX509Name(String s) {
+        if (BC_509CLASS_CONS != null) {
+             try {
+                 return BC_509CLASS_CONS.newInstance(new Object[] {s});
+             } catch (Exception e) {
+                 //ignore
+             }
+        }
+        return new X500Principal(s);
+    }
 
     /**
      * Lookup an X509 Certificate in the keystore according to a given serial number and
@@ -270,8 +293,7 @@ public abstract class CryptoBase implements Crypto {
      */
     public String getAliasForX509Cert(String issuer, BigInteger serialNumber)
         throws WSSecurityException {
-        X500Principal issuerRDN = null;
-        X509Name issuerName = null;
+        Object issuerName = null;
         Certificate cert = null;
         
         if (keystore == null) {
@@ -287,10 +309,10 @@ public abstract class CryptoBase implements Crypto {
         // back on a direct conversion to a BC X509Name
         //
         try {
-            issuerRDN = new X500Principal(issuer);
-            issuerName =  new X509Name(issuerRDN.getName());
+            X500Principal issuerRDN = new X500Principal(issuer);
+            issuerName =  createBCX509Name(issuerRDN.getName());
         } catch (java.lang.IllegalArgumentException ex) {
-            issuerName = new X509Name(issuer);
+            issuerName = createBCX509Name(issuer);
         }
 
         try {
@@ -311,7 +333,8 @@ public abstract class CryptoBase implements Crypto {
                 }
                 X509Certificate x509cert = (X509Certificate) cert;
                 if (x509cert.getSerialNumber().compareTo(serialNumber) == 0) {
-                    X509Name certName = new X509Name(x509cert.getIssuerDN().getName());
+                    Object certName = 
+                        createBCX509Name(x509cert.getIssuerDN().getName());
                     if (certName.equals(issuerName)) {
                         return alias;
                     }
@@ -335,8 +358,7 @@ public abstract class CryptoBase implements Crypto {
      */
     public X509Certificate getX509Certificate(String issuer, BigInteger serialNumber)
         throws WSSecurityException {
-        X500Principal issuerRDN = null;
-        X509Name issuerName = null;
+        Object issuerName = null;
         Certificate cert = null;
         
         if (keystore == null) {
@@ -352,10 +374,10 @@ public abstract class CryptoBase implements Crypto {
         // back on a direct conversion to a BC X509Name
         //
         try {
-            issuerRDN = new X500Principal(issuer);
-            issuerName =  new X509Name(issuerRDN.getName());
+            X500Principal issuerRDN = new X500Principal(issuer);
+            issuerName =  createBCX509Name(issuerRDN.getName());
         } catch (java.lang.IllegalArgumentException ex) {
-            issuerName = new X509Name(issuer);
+            issuerName = createBCX509Name(issuer);
         }
 
         try {
@@ -376,7 +398,8 @@ public abstract class CryptoBase implements Crypto {
                 }
                 X509Certificate x509cert = (X509Certificate) cert;
                 if (x509cert.getSerialNumber().compareTo(serialNumber) == 0) {
-                    X509Name certName = new X509Name(x509cert.getIssuerDN().getName());
+                    Object certName = 
+                        createBCX509Name(x509cert.getIssuerDN().getName());
                     if (certName.equals(issuerName)) {
                         return x509cert;
                     }
@@ -481,13 +504,16 @@ public abstract class CryptoBase implements Crypto {
             if (keystore == null) {
                 return null;
             }
-            String alias = keystore.getCertificateAlias(cert);
-            if (alias != null) {
-                return alias;
-            }
-            // Use brute force search
+            //
+            // The following code produces the wrong alias in BouncyCastle and so
+            // we'll just use the brute-force search
+            //
+            // String alias = keystore.getCertificateAlias(cert);
+            // if (alias != null) {
+            //     return alias;
+            // }
             for (Enumeration e = keystore.aliases(); e.hasMoreElements();) {
-                alias = (String) e.nextElement();
+                String alias = (String) e.nextElement();
                 Certificate retrievedCert = keystore.getCertificate(alias);
                 if (retrievedCert.equals(cert)) {
                     return alias;

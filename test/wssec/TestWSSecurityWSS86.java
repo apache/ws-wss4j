@@ -69,7 +69,7 @@ public class TestWSSecurityWSS86 extends TestCase implements CallbackHandler {
         +   "</SOAP-ENV:Body>" 
         + "</SOAP-ENV:Envelope>";
     private WSSecurityEngine secEngine = new WSSecurityEngine();
-    private Crypto crypto = CryptoFactory.getInstance("wss86.properties");
+    private Crypto crypto;
 
     /**
      * TestWSSecurity constructor
@@ -79,6 +79,8 @@ public class TestWSSecurityWSS86 extends TestCase implements CallbackHandler {
      */
     public TestWSSecurityWSS86(String name) {
         super(name);
+        secEngine.getWssConfig(); //make sure BC gets registered
+        crypto = CryptoFactory.getInstance("wss86.properties");
     }
 
     /**
