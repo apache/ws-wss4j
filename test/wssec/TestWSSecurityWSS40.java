@@ -139,6 +139,39 @@ public class TestWSSecurityWSS40 extends TestCase implements CallbackHandler {
         assertTrue (cert != null);
     }
     
+    /**
+     * Test signing a SOAP message using a BST, sending the CA cert as well in the
+     * message.
+     */
+    public void testSignatureDirectReferenceCACert() throws Exception {
+        WSSecSignature sign = new WSSecSignature();
+        sign.setUserInfo("wss40", "security");
+        sign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
+        sign.setUseSingleCertificate(false);
+
+        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
+
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        Document signedDoc = sign.build(doc, crypto, secHeader);
+        
+        if (LOG.isDebugEnabled()) {
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+            LOG.debug("BST CA Cert");
+            LOG.debug(outputString);
+        }
+        //
+        // Verify the signature
+        //
+        List results = verify(signedDoc, cryptoCA);
+        WSSecurityEngineResult result = 
+            WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
+        X509Certificate cert = 
+            (X509Certificate)result.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE);
+        assertTrue (cert != null);
+    }
+    
     
     /**
      * Test signing a SOAP message using Issuer Serial. Note that this should fail, as the

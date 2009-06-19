@@ -36,8 +36,7 @@ import org.apache.xml.security.signature.XMLSignature;
 
 
 /**
- * WS-Security Test Case
- * <p/>
+ * WS-Security Test Case for SubjectKeyIdentifier.
  * 
  * @author Davanum Srinivas (dims@yahoo.com)
  * @author Werner Dittmann (Werner.Dittmann@siemens.com)

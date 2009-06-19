@@ -325,7 +325,7 @@ public class SecurityTokenReference {
 
     /**
      * Sets the KeyIdentifier Element as a X509 Subject-Key-Identifier (SKI).
-     * Takes a X509 certificate, gets it SKI data, converts into base 64 and
+     * Takes a X509 certificate, gets the SKI data, converts it into base 64 and
      * inserts it into a <code>wsse:KeyIdentifier</code> element, which is placed
      * in the <code>wsse:SecurityTokenReference</code> element.
      *
