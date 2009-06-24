@@ -497,6 +497,15 @@ public class WSHandlerConstants {
      * reject custom token types in the callback handler.
      */
     public static final String HANDLE_CUSTOM_PASSWORD_TYPES = "handleCustomPasswordTypes";
+    
+    /**
+     * This variable controls whether (wsse) namespace qualified password types are
+     * accepted when processing UsernameTokens.
+     * 
+     * By default this is set to false.
+     */
+    public static final String ALLOW_NAMESPACE_QUALIFIED_PASSWORD_TYPES 
+        = "allowNamespaceQualifiedPasswordTypes";
 
     /**
      * Parameter to generate additional elements in <code>UsernameToken</code>.

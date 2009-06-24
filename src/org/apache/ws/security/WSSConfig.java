@@ -204,6 +204,14 @@ public class WSSConfig {
      */
     protected boolean handleCustomPasswordTypes = false;
     
+    /**
+     * This variable controls whether (wsse) namespace qualified password types are
+     * accepted when processing UsernameTokens.
+     * 
+     * By default this is set to false.
+     */
+    protected boolean allowNamespaceQualifiedPasswordTypes = false;
+    
     
     /**
      * The default wsu:Id allocator is a simple "start at 1 and increment up"
@@ -386,7 +394,22 @@ public class WSSConfig {
     public boolean getHandleCustomPasswordTypes() {
         return handleCustomPasswordTypes;
     }
-
+    
+    /**
+     * @param allowNamespaceQualifiedTypes
+     * whether (wsse) namespace qualified password types are accepted or not
+     */
+    public void setAllowNamespaceQualifiedPasswordTypes(boolean allowNamespaceQualifiedTypes) {
+        allowNamespaceQualifiedPasswordTypes = allowNamespaceQualifiedTypes;
+    }
+    
+    /**
+     * @return whether (wsse) namespace qualified password types are accepted or not
+     */
+    public boolean getAllowNamespaceQualifiedPasswordTypes() {
+        return allowNamespaceQualifiedPasswordTypes;
+    }
+    
     /**
      * @return Returns if we shall throw an exception on expired request
      *         semantic
