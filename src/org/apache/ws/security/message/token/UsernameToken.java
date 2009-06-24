@@ -71,7 +71,7 @@ public class UsernameToken {
     protected String passwordType = null;
     protected boolean hashed = true;
     private String rawPassword;        // enhancement by Alberto Coletti
-
+    
     static {
         try {
             random = WSSecurityUtil.resolveSecureRandom();
@@ -81,7 +81,7 @@ public class UsernameToken {
             }
         }
     }
-
+    
     /**
      * Constructs a <code>UsernameToken</code> object and parses the
      * <code>wsse:UsernameToken</code> element to initialize it.
@@ -91,6 +91,23 @@ public class UsernameToken {
      * @throws WSSecurityException
      */
     public UsernameToken(Element elem) throws WSSecurityException {
+        this (elem, false);
+    }
+
+    /**
+     * Constructs a <code>UsernameToken</code> object and parses the
+     * <code>wsse:UsernameToken</code> element to initialize it.
+     * 
+     * @param elem the <code>wsse:UsernameToken</code> element that contains
+     *             the UsernameToken data
+     * @param allowNamespaceQualifiedPasswordTypes whether to allow (wsse)
+     *        namespace qualified password types or not (for interop with WCF)
+     * @throws WSSecurityException
+     */
+    public UsernameToken(
+        Element elem, 
+        boolean allowNamespaceQualifiedPasswordTypes
+    ) throws WSSecurityException {
         element = elem;
         QName el = new QName(element.getNamespaceURI(), element.getLocalName());
         if (!el.equals(TOKEN)) {
@@ -147,9 +164,26 @@ public class UsernameToken {
             }
             return;
         }
-        if (elementPassword != null 
-            && elementPassword.hasAttribute(WSConstants.PASSWORD_TYPE_ATTR)) {
-            passwordType = elementPassword.getAttribute(WSConstants.PASSWORD_TYPE_ATTR);
+        if (elementPassword != null) {
+            if (elementPassword.hasAttribute(WSConstants.PASSWORD_TYPE_ATTR)) {
+                passwordType = elementPassword.getAttribute(WSConstants.PASSWORD_TYPE_ATTR);
+            } else if (elementPassword.hasAttributeNS(
+                WSConstants.WSSE_NS, WSConstants.PASSWORD_TYPE_ATTR)
+            ) {
+                if (allowNamespaceQualifiedPasswordTypes) {
+                    passwordType = 
+                        elementPassword.getAttributeNS(
+                            WSConstants.WSSE_NS, WSConstants.PASSWORD_TYPE_ATTR
+                        );
+                } else {
+                    throw new WSSecurityException(
+                        WSSecurityException.INVALID_SECURITY_TOKEN,
+                        "badTokenType01", 
+                        new Object[] {el}
+                    );
+                }
+            }
+            
         }
         if (passwordType != null
             && passwordType.equals(WSConstants.PASSWORD_DIGEST)) {

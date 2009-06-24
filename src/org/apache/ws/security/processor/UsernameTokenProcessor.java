@@ -43,6 +43,7 @@ public class UsernameTokenProcessor implements Processor {
     private String utId;
     private UsernameToken ut;
     private boolean handleCustomPasswordTypes;
+    private boolean allowNamespaceQualifiedPasswordTypes;
     
     public void handleToken(Element elem, Crypto crypto, Crypto decCrypto, CallbackHandler cb, 
         WSDocInfo wsDocInfo, Vector returnResults, WSSConfig wsc) throws WSSecurityException {
@@ -50,6 +51,7 @@ public class UsernameTokenProcessor implements Processor {
             log.debug("Found UsernameToken list element");
         }
         handleCustomPasswordTypes = wsc.getHandleCustomPasswordTypes();
+        allowNamespaceQualifiedPasswordTypes = wsc.getAllowNamespaceQualifiedPasswordTypes();
         
         Principal lastPrincipalFound = handleUsernameToken((Element) elem, cb);
         returnResults.add(
@@ -86,7 +88,7 @@ public class UsernameTokenProcessor implements Processor {
         //
         // Parse the UsernameToken element
         //
-        ut = new UsernameToken(token);
+        ut = new UsernameToken(token, allowNamespaceQualifiedPasswordTypes);
         String user = ut.getName();
         String password = ut.getPassword();
         String nonce = ut.getNonce();

@@ -258,6 +258,9 @@ public abstract class WSHandler {
         );
         wssConfig.setTimeStampStrict(decodeTimestampStrict(reqData));
         wssConfig.setHandleCustomPasswordTypes(decodeCustomPasswordTypes(reqData));
+        wssConfig.setAllowNamespaceQualifiedPasswordTypes(
+            decodeNamespaceQualifiedPasswordTypes(reqData)
+        );
         reqData.setWssConfig(wssConfig);
 
         if ((doAction & WSConstants.SIGN) == WSConstants.SIGN) {
@@ -726,6 +729,28 @@ public abstract class WSHandler {
 
         throw new WSSecurityException(
             "WSHandler: illegal handleCustomPasswordTypes parameter"
+        );
+    }
+    
+    protected boolean decodeNamespaceQualifiedPasswordTypes(RequestData reqData) 
+        throws WSSecurityException {
+        String value = getString(
+            WSHandlerConstants.ALLOW_NAMESPACE_QUALIFIED_PASSWORD_TYPES,
+            reqData.getMsgContext()
+        );
+    
+        if (value == null) {
+            return false;
+        }
+        if ("0".equals(value) || "false".equals(value)) {
+            return false;
+        } 
+        if ("1".equals(value) || "true".equals(value)) {
+            return true;
+        }
+    
+        throw new WSSecurityException(
+            "WSHandler: illegal allowNamespaceQualifiedPasswordTypes parameter"
         );
     }
 
