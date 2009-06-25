@@ -26,6 +26,7 @@ import org.apache.ws.security.SOAPConstants;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
+import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.handler.WSHandlerResult;
 import org.apache.xml.security.algorithms.JCEMapper;
@@ -882,6 +883,73 @@ public class WSSecurityUtil {
                 throw new WSSecurityException(
                     "Unknown action defined: " + single[i]
                 );
+            }
+        }
+        return doAction;
+    }
+    
+    
+    /**
+     * Decode an action String. This method should only be called on the outbound side.
+     * @param action The initial String of actions to perform
+     * @param actions The vector of created actions that will be performed
+     * @param wssConfig This object holds the list of custom actions to be performed.
+     * @return The or'd integer of all the actions (apart from the custom actions)
+     * @throws WSSecurityException
+     */
+    public static int decodeAction(
+        String action, 
+        Vector actions,
+        WSSConfig wssConfig
+    ) throws WSSecurityException {
+
+        int doAction = 0;
+        if (action == null) {
+            return doAction;
+        }
+        String single[] = StringUtil.split(action, ' ');
+        for (int i = 0; i < single.length; i++) {
+            if (single[i].equals(WSHandlerConstants.NO_SECURITY)) {
+                doAction = WSConstants.NO_SECURITY;
+                return doAction;
+            } else if (single[i].equals(WSHandlerConstants.USERNAME_TOKEN)) {
+                doAction |= WSConstants.UT;
+                actions.add(new Integer(WSConstants.UT));
+            } else if (single[i].equals(WSHandlerConstants.SIGNATURE)) {
+                doAction |= WSConstants.SIGN;
+                actions.add(new Integer(WSConstants.SIGN));
+            } else if (single[i].equals(WSHandlerConstants.ENCRYPT)) {
+                doAction |= WSConstants.ENCR;
+                actions.add(new Integer(WSConstants.ENCR));
+            } else if (single[i].equals(WSHandlerConstants.SAML_TOKEN_UNSIGNED)) {
+                doAction |= WSConstants.ST_UNSIGNED;
+                actions.add(new Integer(WSConstants.ST_UNSIGNED));
+            } else if (single[i].equals(WSHandlerConstants.SAML_TOKEN_SIGNED)) {
+                doAction |= WSConstants.ST_SIGNED;
+                actions.add(new Integer(WSConstants.ST_SIGNED));
+            } else if (single[i].equals(WSHandlerConstants.TIMESTAMP)) {
+                doAction |= WSConstants.TS;
+                actions.add(new Integer(WSConstants.TS));
+            } else if (single[i].equals(WSHandlerConstants.NO_SERIALIZATION)) {
+                doAction |= WSConstants.NO_SERIALIZE;
+                actions.add(new Integer(WSConstants.NO_SERIALIZE));
+            } else if (single[i].equals(WSHandlerConstants.SIGN_WITH_UT_KEY)) {
+                doAction |= WSConstants.UT_SIGN;
+                actions.add(new Integer(WSConstants.UT_SIGN));
+            } else {
+                try {
+                    int parsedAction = Integer.parseInt(single[i]);
+                    if (wssConfig.getAction(parsedAction) == null) {
+                        throw new WSSecurityException(
+                            "Unknown action defined: " + single[i]
+                        );
+                    }
+                    actions.add(new Integer(parsedAction));
+                } catch (NumberFormatException ex) {
+                    throw new WSSecurityException(
+                        "Unknown action defined: " + single[i]
+                    );
+                }
             }
         }
         return doAction;
