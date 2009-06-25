@@ -27,12 +27,18 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSConfig;
+import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.handler.RequestData;
+import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.message.WSSecSignature;
 import org.apache.ws.security.message.WSSecHeader;
+import org.apache.ws.security.util.WSSecurityUtil;
 import org.w3c.dom.Document;
+
+import java.util.List;
+import java.util.Vector;
 
 
 /**
@@ -110,7 +116,7 @@ public class TestWSSecurityUserProcessor extends TestCase {
         );
         final WSSecurityEngine engine = new WSSecurityEngine();
         engine.setWssConfig(cfg);
-        final java.util.List results = 
+        final List results = 
             engine.processSecurityHeader(doc, null, null, crypto);
         boolean found = false;
         for (final java.util.Iterator pos = results.iterator();  pos.hasNext(); ) {
@@ -157,7 +163,7 @@ public class TestWSSecurityUserProcessor extends TestCase {
         );
         final WSSecurityEngine engine = new WSSecurityEngine();
         engine.setWssConfig(cfg);
-        final java.util.List results = 
+        final List results = 
             engine.processSecurityHeader(doc, null, null, crypto);
         boolean found = false;
         for (final java.util.Iterator pos = results.iterator();  pos.hasNext(); ) {
@@ -184,9 +190,8 @@ public class TestWSSecurityUserProcessor extends TestCase {
         cfg.setAction(action, "wssec.MyAction");
         final RequestData reqData = new RequestData();
         reqData.setWssConfig(cfg);
-        reqData.setMsgContext(new java.util.TreeMap());
         
-        final java.util.Vector actions = new java.util.Vector();
+        final List actions = new Vector();
         actions.add(new Integer(action));
         final Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         MyHandler handler = new MyHandler();
@@ -214,9 +219,8 @@ public class TestWSSecurityUserProcessor extends TestCase {
         cfg.setAction(action, new wssec.MyAction());
         final RequestData reqData = new RequestData();
         reqData.setWssConfig(cfg);
-        reqData.setMsgContext(new java.util.TreeMap());
         
-        final java.util.Vector actions = new java.util.Vector();
+        final List actions = new Vector();
         actions.add(new Integer(action));
         final Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         MyHandler handler = new MyHandler();
@@ -230,6 +234,84 @@ public class TestWSSecurityUserProcessor extends TestCase {
             true
         );
         assertEquals(reqData.getMsgContext(), "crumb");
+    }
+    
+    /**
+     * Test to see that a custom action can be configured via WSSecurityUtil.decodeAction.
+     * A standard Timestamp action is also configured.
+     */
+    public void
+    testDecodeCustomAction() throws Exception {
+        
+        final WSSConfig cfg = WSSConfig.getNewInstance();
+        final int customAction = 0xDEADF000;
+        
+        String actionString = 
+            WSHandlerConstants.TIMESTAMP + " " + new Integer(customAction).toString();
+        List actionList = new Vector();
+        //
+        // This parsing will fail as it doesn't know what the custom action is
+        //
+        try {
+            WSSecurityUtil.decodeAction(actionString, actionList);
+            fail("Failure expected on unknown action");
+        } catch (WSSecurityException ex) {
+            // expected
+        }
+        actionList.clear();
+        
+        //
+        // This parsing will fail as WSSConfig doesn't know what the custom action is
+        //
+        try {
+            WSSecurityUtil.decodeAction(actionString, actionList, cfg);
+            fail("Failure expected on unknown action");
+        } catch (WSSecurityException ex) {
+            // expected
+        }
+        actionList.clear();
+        
+        //
+        // This parsing will fail as the action String is badly formed
+        //
+        try {
+            String badActionString = 
+                WSHandlerConstants.TIMESTAMP + " " + "NewCustomAction";
+            WSSecurityUtil.decodeAction(badActionString, actionList, cfg);
+            fail("Failure expected on unknown action");
+        } catch (WSSecurityException ex) {
+            // expected
+        }
+        actionList.clear();
+        
+        //
+        // This parsing should pass as WSSConfig has been configured with the custom action
+        //
+        cfg.setAction(customAction, "wssec.MyAction");
+        int actions = WSSecurityUtil.decodeAction(actionString, actionList, cfg);
+        
+        final RequestData reqData = new RequestData();
+        reqData.setWssConfig(cfg);
+        
+        final Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
+        MyHandler handler = new MyHandler();
+        reqData.setMsgContext("bread");
+        assertEquals(reqData.getMsgContext(), "bread");
+        handler.send(
+            actions, 
+            doc, 
+            reqData, 
+            actionList,
+            true
+        );
+        assertEquals(reqData.getMsgContext(), "crumb");
+        
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Message:");
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+            LOG.debug(outputString);
+        }
     }
 
 }
