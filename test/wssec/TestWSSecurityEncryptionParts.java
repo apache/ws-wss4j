@@ -25,15 +25,18 @@ import junit.framework.TestSuite;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.SOAPConstants;
+import org.apache.ws.security.WSDataRef;
 import org.apache.ws.security.WSEncryptionPart;
 import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.message.WSSecEncrypt;
 import org.apache.ws.security.message.WSSecHeader;
+import org.apache.ws.security.message.token.Timestamp;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 
@@ -133,6 +136,17 @@ public class TestWSSecurityEncryptionParts extends TestCase implements CallbackH
         } catch (WSSecurityException ex) {
             // expected
         }
+        
+        WSSecurityEngineResult actionResult = 
+            WSSecurityUtil.fetchActionResult(results, WSConstants.ENCR);
+        assertTrue(actionResult != null);
+        final java.util.List refs =
+            (java.util.List) actionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
+        assertTrue(actionResult != null && !actionResult.isEmpty());
+        WSDataRef wsDataRef = (WSDataRef)refs.get(0);
+        String xpath = wsDataRef.getXpath();
+        assertEquals("/soapenv:Envelope/soapenv:Header/foo:foobar", xpath);
+        
     }
     
     

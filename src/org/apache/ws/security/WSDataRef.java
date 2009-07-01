@@ -43,6 +43,13 @@ public class WSDataRef {
     private QName name;
     
     /**
+     * An xpath expression pointing to the data element
+     */
+    private String xpath;
+    
+    private boolean content;
+    
+    /**
      * The protected DOM element
      */
     private Element protectedElement;
@@ -101,5 +108,32 @@ public class WSDataRef {
         return protectedElement;
     }
 
+    /**
+     * @return the xpath
+     */
+    public String getXpath() {
+        return xpath;
+    }
+
+    /**
+     * @param xpath the xpath to set
+     */
+    public void setXpath(String xpath) {
+        this.xpath = xpath;
+    }
+
+    /**
+     * @return the content
+     */
+    public boolean isContent() {
+        return content;
+    }
+
+    /**
+     * @param content the content to set
+     */
+    public void setContent(boolean content) {
+        this.content = content;
+    }
 
 }

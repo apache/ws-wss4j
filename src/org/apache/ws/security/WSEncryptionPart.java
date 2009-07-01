@@ -31,6 +31,13 @@ public class WSEncryptionPart {
     private String id;
     
     /**
+     * An xpath expression pointing to the data element
+     * that may be specified in case the encryption part is of type
+     * <code>org.apache.ws.security.WSConstants.PART_TYPE_ELEMENT</code>
+     */
+    private String xpath;
+    
+    /**
      * Constructor to initialize part structure with element, namespace, and modifier.
      * 
      * This constructor initializes the parts structure to lookup for a
@@ -125,4 +132,18 @@ public class WSEncryptionPart {
         return encId;
     }
 
+    /**
+     * @return the xpath
+     */
+    public String getXpath() {
+        return xpath;
+    }
+
+    /**
+     * @param xpath the xpath to set
+     */
+    public void setXpath(String xpath) {
+        this.xpath = xpath;
+    }
+    
 }
