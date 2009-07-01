@@ -29,6 +29,13 @@ public class WSEncryptionPart {
     private String id;
     
     /**
+     * An xpath expression pointing to the data element
+     * that may be specified in case the encryption part is of type
+     * <code>org.apache.ws.security.WSConstants.PART_TYPE_ELEMENT</code>
+     */
+    private String xpath;
+    
+    /**
      * Types of WSEncryptionPart
      * <code>org.apache.ws.security.WSConstants.PART_TYPE_HEADER</code>
      * <code>org.apache.ws.security.WSConstants.PART_TYPE_BODY</code>
@@ -188,5 +195,18 @@ public class WSEncryptionPart {
     public void setType(int type) {
         this.type = type;
     }
-    
+
+    /**
+     * @return the xpath
+     */
+    public String getXpath() {
+        return xpath;
+    }
+
+    /**
+     * @param xpath the xpath to set
+     */
+    public void setXpath(String xpath) {
+        this.xpath = xpath;
+    }
 }

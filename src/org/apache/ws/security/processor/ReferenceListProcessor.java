@@ -41,6 +41,7 @@ import org.apache.ws.security.saml.SAMLUtil;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.xml.security.encryption.XMLCipher;
 import org.apache.xml.security.encryption.XMLEncryptionException;
+import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -225,6 +226,8 @@ public class ReferenceListProcessor implements Processor {
         WSDataRef dataRef = new WSDataRef(dataRefURI);
         dataRef.setWsuId(dataRefURI);
         boolean content = X509Util.isContent(encData);
+        dataRef.setContent(content);
+        
         Node parent = encData.getParentNode();
         Node previousSibling = encData.getPreviousSibling();
         if (content) {
@@ -246,8 +249,10 @@ public class ReferenceListProcessor implements Processor {
             parent.getParentNode().appendChild(decryptedHeaderClone);
             parent.getParentNode().removeChild(parent);
             dataRef.setProtectedElement(decryptedHeaderClone);
+            dataRef.setXpath(getXPath(decryptedHeader));
         } else if (content) {
             dataRef.setProtectedElement(encData);
+            dataRef.setXpath(getXPath(encData));
         } else {
             Node decryptedNode;
             if (previousSibling == null) {
@@ -258,6 +263,7 @@ public class ReferenceListProcessor implements Processor {
             if (decryptedNode != null && Node.ELEMENT_NODE == decryptedNode.getNodeType()) {
                 dataRef.setProtectedElement((Element)decryptedNode);
             }
+            dataRef.setXpath(getXPath(decryptedNode));
         }
         
         return dataRef;
@@ -374,4 +380,53 @@ public class ReferenceListProcessor implements Processor {
         return null;
     }
     
+    
+    /**
+     * @param decryptedNode the decrypted node
+     * @return a fully built xpath 
+     *        (eg. &quot;/soapenv:Envelope/soapenv:Body/ns:decryptedElement&quot;)
+     *        if the decryptedNode is an Element or an Attr node and is not detached
+     *        from the document. <code>null</code> otherwise
+	 */
+	private static String getXPath(Node decryptedNode) {
+	    if (decryptedNode == null) {
+	        return null;
+	    }
+	    
+	    String result = "";
+	    if (Node.ELEMENT_NODE == decryptedNode.getNodeType()) {
+	        result = decryptedNode.getNodeName();
+	        result = prependFullPath(result, decryptedNode.getParentNode());
+	    } else if (Node.ATTRIBUTE_NODE == decryptedNode.getNodeType()) {
+	        result = "@" + decryptedNode.getNodeName();
+            result = prependFullPath(result, ((Attr)decryptedNode).getOwnerElement());
+	    } else {
+	        return null;
+	    }
+	    
+	    return result;
+	}
+	
+	
+	/**
+	 * Recursively build an absolute xpath (starting with the root &quot;/&quot;)
+	 * 
+	 * @param xpath the xpath expression built so far
+	 * @param node the current node whose name is to be prepended
+	 * @return a fully built xpath
+	 */
+	private static String prependFullPath(String xpath, Node node) {
+	    if (node == null) {
+	        // probably a detached node... not really useful
+	        return null;
+	    } else if (Node.ELEMENT_NODE == node.getNodeType()) {
+	        xpath = node.getNodeName() + "/" + xpath;
+	        return prependFullPath(xpath, node.getParentNode());
+	    } else if (Node.DOCUMENT_NODE == node.getNodeType()) {
+	        return "/" + xpath;
+	    } else {
+	        return prependFullPath(xpath, node.getParentNode());
+	    }
+	}
+	
 }
