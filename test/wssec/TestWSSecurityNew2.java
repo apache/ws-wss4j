@@ -196,7 +196,8 @@ public class TestWSSecurityNew2 extends TestCase implements CallbackHandler {
         Document doc,
         javax.xml.namespace.QName expectedEncryptedElement
     ) throws Exception {
-        final java.util.List results = secEngine.processSecurityHeader(doc, null, this, crypto);
+        final java.util.List results = 
+            secEngine.processSecurityHeader(doc, null, this, null, crypto);
         String outputString = 
             org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
         if (LOG.isDebugEnabled()) {

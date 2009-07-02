@@ -70,7 +70,7 @@ public class ReferenceListProcessor implements Processor {
         if (cb == null) {
             throw new WSSecurityException(WSSecurityException.FAILURE, "noCallback");
         }
-        List dataRefs = handleReferenceList(elem, cb, crypto, wdi);
+        List dataRefs = handleReferenceList(elem, cb, decCrypto, wdi);
         returnResults.add(
             0,
             new WSSecurityEngineResult(WSConstants.ENCR, dataRefs)

@@ -80,7 +80,11 @@ public class BinarySecurityTokenProcessor implements Processor {
         List returnResults,
         WSSConfig config
     ) throws WSSecurityException {
-        getCertificatesTokenReference(elem, crypto);
+        if (crypto == null) {
+            getCertificatesTokenReference(elem, decCrypto);
+        } else {
+            getCertificatesTokenReference(elem, crypto);
+        }
         returnResults.add(
             0, 
             new WSSecurityEngineResult(WSConstants.BST, token, certificates)

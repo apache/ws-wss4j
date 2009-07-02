@@ -276,7 +276,7 @@ public class TestWSSecurityNew3 extends TestCase implements CallbackHandler {
      * @throws java.lang.Exception Thrown when there is a problem in verification
      */
     private void verify(Document doc) throws Exception {
-        secEngine.processSecurityHeader(doc, null, this, crypto);
+        secEngine.processSecurityHeader(doc, null, this, crypto, null);
     }
 
     public void handle(Callback[] callbacks)
