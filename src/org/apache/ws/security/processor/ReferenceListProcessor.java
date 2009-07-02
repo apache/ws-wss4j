@@ -71,7 +71,7 @@ public class ReferenceListProcessor implements Processor {
             throw new WSSecurityException(WSSecurityException.FAILURE, "noCallback");
         }
         wsDocInfo = wdi;
-        ArrayList uris = handleReferenceList(elem, cb, crypto);
+        ArrayList uris = handleReferenceList(elem, cb, decCrypto);
         returnResults.add(
             0,
             new WSSecurityEngineResult(WSConstants.ENCR, uris)

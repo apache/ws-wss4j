@@ -29,16 +29,12 @@ import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSConfig;
-import org.apache.ws.security.message.WSSecUsernameToken;
-import org.apache.ws.security.message.WSSecHeader;
-import org.apache.ws.security.util.Base64;
 import org.w3c.dom.Document;
 
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
 import java.io.IOException;
-import java.security.MessageDigest;
 
 
 /**

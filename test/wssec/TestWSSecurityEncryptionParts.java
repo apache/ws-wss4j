@@ -39,7 +39,6 @@ import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.message.WSSecEncrypt;
 import org.apache.ws.security.message.WSSecHeader;
-import org.apache.ws.security.message.token.Timestamp;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 
@@ -312,7 +311,7 @@ public class TestWSSecurityEncryptionParts extends TestCase implements CallbackH
      * @throws Exception Thrown when there is a problem in verification
      */
     private Vector verify(Document doc) throws Exception {
-        Vector results = secEngine.processSecurityHeader(doc, null, this, crypto);
+        Vector results = secEngine.processSecurityHeader(doc, null, this, null, crypto);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Verified and decrypted message:");
             String outputString = 
