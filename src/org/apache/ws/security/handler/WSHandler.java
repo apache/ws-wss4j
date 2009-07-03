@@ -93,8 +93,9 @@ public abstract class WSHandler {
             wssConfig = WSSConfig.getNewInstance();
         }
 
+        boolean enableSigConf = decodeEnableSignatureConfirmation(reqData);
         wssConfig.setEnableSignatureConfirmation(
-            decodeEnableSignatureConfirmation(reqData)
+            enableSigConf || ((doAction & WSConstants.SC) != 0)
         );
 
         wssConfig.setPrecisionInMilliSeconds(
@@ -249,8 +250,9 @@ public abstract class WSHandler {
         if (wssConfig == null) {
             wssConfig = WSSConfig.getNewInstance();
         }
+        boolean enableSigConf = decodeEnableSignatureConfirmation(reqData);
         wssConfig.setEnableSignatureConfirmation(
-            decodeEnableSignatureConfirmation(reqData)
+            enableSigConf || ((doAction & WSConstants.SC) != 0)
         );
         wssConfig.setTimeStampStrict(decodeTimestampStrict(reqData));
         wssConfig.setTimeStampTTL(decodeTimeToLive(reqData));

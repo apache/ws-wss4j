@@ -853,6 +853,9 @@ public class WSSecurityUtil {
             } else if (single[i].equals(WSHandlerConstants.SIGN_WITH_UT_KEY)) {
                 doAction |= WSConstants.UT_SIGN;
                 actions.add(new Integer(WSConstants.UT_SIGN));
+            } else if (single[i].equals(WSHandlerConstants.ENABLE_SIGNATURE_CONFIRMATION)) {
+                doAction |= WSConstants.SC;
+                actions.add(new Integer(WSConstants.SC));
             } else {
                 throw new WSSecurityException(
                     "Unknown action defined: " + single[i]
@@ -910,6 +913,9 @@ public class WSSecurityUtil {
             } else if (single[i].equals(WSHandlerConstants.SIGN_WITH_UT_KEY)) {
                 doAction |= WSConstants.UT_SIGN;
                 actions.add(new Integer(WSConstants.UT_SIGN));
+            } else if (single[i].equals(WSHandlerConstants.ENABLE_SIGNATURE_CONFIRMATION)) {
+                doAction |= WSConstants.SC;
+                actions.add(new Integer(WSConstants.SC));
             } else {
                 try {
                     int parsedAction = Integer.parseInt(single[i]);
