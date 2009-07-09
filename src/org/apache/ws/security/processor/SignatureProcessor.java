@@ -470,6 +470,8 @@ public class SignatureProcessor implements Processor {
                         WSDataRef ref = new WSDataRef(uri);
                         ref.setWsuId(uri);
                         ref.setName(new QName(se.getNamespaceURI(), se.getLocalName()));
+                        ref.setProtectedElement(se);
+                        ref.setXpath(ReferenceListProcessor.getXPath(se));
                         protectedElements.add(ref);
                         returnElements.add(WSSecurityUtil.getIDFromReference(uri));
                     } else {

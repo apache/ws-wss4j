@@ -28,10 +28,12 @@ import org.apache.axis.message.SOAPEnvelope;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.SOAPConstants;
+import org.apache.ws.security.WSDataRef;
 import org.apache.ws.security.WSEncryptionPart;
 import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
@@ -146,7 +148,17 @@ public class TestWSSecuritySignatureParts extends TestCase implements CallbackHa
             LOG.debug(outputString);
         }
         
-        verify(signedDoc);
+        Vector results = verify(signedDoc);
+        
+        WSSecurityEngineResult actionResult = 
+            WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
+        assertTrue(actionResult != null);
+        final java.util.List refs =
+            (java.util.List) actionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
+        assertTrue(actionResult != null && !actionResult.isEmpty());
+        WSDataRef wsDataRef = (WSDataRef)refs.get(0);
+        String xpath = wsDataRef.getXpath();
+        assertEquals("/soapenv:Envelope/soapenv:Header/foo:foobar", xpath);
     }
     
     /**
@@ -261,14 +273,15 @@ public class TestWSSecuritySignatureParts extends TestCase implements CallbackHa
      * @param doc 
      * @throws Exception Thrown when there is a problem in verification
      */
-    private void verify(Document doc) throws Exception {
-        secEngine.processSecurityHeader(doc, null, this, crypto);
+    private Vector verify(Document doc) throws Exception {
+        Vector results = secEngine.processSecurityHeader(doc, null, this, crypto);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Verfied and decrypted message:");
             String outputString = 
                 org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
             LOG.debug(outputString);
         }
+        return results;
     }
 
     public void handle(Callback[] callbacks)
