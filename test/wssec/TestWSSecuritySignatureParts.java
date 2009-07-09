@@ -25,10 +25,12 @@ import junit.framework.TestSuite;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.SOAPConstants;
+import org.apache.ws.security.WSDataRef;
 import org.apache.ws.security.WSEncryptionPart;
 import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
@@ -132,6 +134,16 @@ public class TestWSSecuritySignatureParts extends TestCase implements CallbackHa
         } catch (WSSecurityException ex) {
             // expected
         }
+        
+        WSSecurityEngineResult actionResult = 
+            WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
+        assertTrue(actionResult != null);
+        final java.util.List refs =
+            (java.util.List) actionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
+        assertTrue(actionResult != null && !actionResult.isEmpty());
+        WSDataRef wsDataRef = (WSDataRef)refs.get(0);
+        String xpath = wsDataRef.getXpath();
+        assertEquals("/soapenv:Envelope/soapenv:Header/foo:foobar", xpath);
     }
     
     /**

@@ -678,6 +678,7 @@ public class SignatureProcessor implements Processor {
                 WSDataRef ref = new WSDataRef();
                 ref.setWsuId(uri);
                 ref.setProtectedElement(se);
+                ref.setXpath(ReferenceListProcessor.getXPath(se));
                 protectedRefs.add(ref);
             }
         }

@@ -382,46 +382,46 @@ public class ReferenceListProcessor implements Processor {
      *        (eg. &quot;/soapenv:Envelope/soapenv:Body/ns:decryptedElement&quot;)
      *        if the decryptedNode is an Element or an Attr node and is not detached
      *        from the document. <code>null</code> otherwise
-	 */
-	private static String getXPath(Node decryptedNode) {
-	    if (decryptedNode == null) {
-	        return null;
-	    }
-	    
-	    String result = "";
-	    if (Node.ELEMENT_NODE == decryptedNode.getNodeType()) {
-	        result = decryptedNode.getNodeName();
-	        result = prependFullPath(result, decryptedNode.getParentNode());
-	    } else if (Node.ATTRIBUTE_NODE == decryptedNode.getNodeType()) {
-	        result = "@" + decryptedNode.getNodeName();
+     */
+    public static String getXPath(Node decryptedNode) {
+        if (decryptedNode == null) {
+            return null;
+        }
+        
+        String result = "";
+        if (Node.ELEMENT_NODE == decryptedNode.getNodeType()) {
+            result = decryptedNode.getNodeName();
+            result = prependFullPath(result, decryptedNode.getParentNode());
+        } else if (Node.ATTRIBUTE_NODE == decryptedNode.getNodeType()) {
+            result = "@" + decryptedNode.getNodeName();
             result = prependFullPath(result, ((Attr)decryptedNode).getOwnerElement());
-	    } else {
-	        return null;
-	    }
-	    
-	    return result;
-	}
-	
-	
-	/**
-	 * Recursively build an absolute xpath (starting with the root &quot;/&quot;)
-	 * 
-	 * @param xpath the xpath expression built so far
-	 * @param node the current node whose name is to be prepended
-	 * @return a fully built xpath
-	 */
-	private static String prependFullPath(String xpath, Node node) {
-	    if (node == null) {
-	        // probably a detached node... not really useful
-	        return null;
-	    } else if (Node.ELEMENT_NODE == node.getNodeType()) {
-	        xpath = node.getNodeName() + "/" + xpath;
-	        return prependFullPath(xpath, node.getParentNode());
-	    } else if (Node.DOCUMENT_NODE == node.getNodeType()) {
-	        return "/" + xpath;
-	    } else {
-	        return prependFullPath(xpath, node.getParentNode());
-	    }
-	}
-	
+        } else {
+            return null;
+        }
+        
+        return result;
+    }
+
+
+    /**
+     * Recursively build an absolute xpath (starting with the root &quot;/&quot;)
+     * 
+     * @param xpath the xpath expression built so far
+     * @param node the current node whose name is to be prepended
+     * @return a fully built xpath
+     */
+    private static String prependFullPath(String xpath, Node node) {
+        if (node == null) {
+            // probably a detached node... not really useful
+            return null;
+        } else if (Node.ELEMENT_NODE == node.getNodeType()) {
+            xpath = node.getNodeName() + "/" + xpath;
+            return prependFullPath(xpath, node.getParentNode());
+        } else if (Node.DOCUMENT_NODE == node.getNodeType()) {
+            return "/" + xpath;
+        } else {
+            return prependFullPath(xpath, node.getParentNode());
+        }
+    }
+
 }
