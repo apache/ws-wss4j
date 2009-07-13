@@ -109,7 +109,7 @@ public class UsernameTokenProcessor implements Processor {
         //
         if (ut.isHashed()) {
             WSPasswordCallback pwCb = 
-                new WSPasswordCallback(user, WSPasswordCallback.USERNAME_TOKEN);
+                new WSPasswordCallback(user, null, pwType, WSPasswordCallback.USERNAME_TOKEN);
             callbacks[0] = pwCb;
             try {
                 cb.handle(callbacks);
