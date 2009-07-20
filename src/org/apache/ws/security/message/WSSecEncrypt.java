@@ -28,6 +28,7 @@ import org.apache.ws.security.message.token.Reference;
 import org.apache.ws.security.message.token.SecurityTokenReference;
 import org.apache.ws.security.util.Base64;
 import org.apache.ws.security.util.WSSecurityUtil;
+import org.apache.xml.security.algorithms.JCEMapper;
 import org.apache.xml.security.encryption.EncryptedData;
 import org.apache.xml.security.encryption.XMLCipher;
 import org.apache.xml.security.encryption.XMLEncryptionException;
@@ -599,7 +600,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
                     WSSecurityException.FAILED_ENCRYPTION, null, null, e2
                 );
             }
-            encDataRef.add(new String("#" + xencEncryptedDataId));
+            encDataRef.add("#" + xencEncryptedDataId);
         }
         return encDataRef;
     }
@@ -692,29 +693,25 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
     }
 
     private KeyGenerator getKeyGenerator() throws WSSecurityException {
-        KeyGenerator keyGen = null;
         try {
             //
             // Assume AES as default, so initialize it
             //
-            keyGen = KeyGenerator.getInstance("AES");
-            if (symEncAlgo.equalsIgnoreCase(WSConstants.TRIPLE_DES)) {
-                keyGen = KeyGenerator.getInstance("DESede");
-            } else if (symEncAlgo.equalsIgnoreCase(WSConstants.AES_128)) {
+            String keyAlgorithm = JCEMapper.getJCEKeyAlgorithmFromURI(symEncAlgo);
+            KeyGenerator keyGen = KeyGenerator.getInstance(keyAlgorithm);
+            if (symEncAlgo.equalsIgnoreCase(WSConstants.AES_128)) {
                 keyGen.init(128);
             } else if (symEncAlgo.equalsIgnoreCase(WSConstants.AES_192)) {
                 keyGen.init(192);
             } else if (symEncAlgo.equalsIgnoreCase(WSConstants.AES_256)) {
                 keyGen.init(256);
-            } else {
-                return null;
             }
+            return keyGen;
         } catch (NoSuchAlgorithmException e) {
             throw new WSSecurityException(
                 WSSecurityException.UNSUPPORTED_ALGORITHM, null, null, e
             );
         }
-        return keyGen;
     }
 
     /**

@@ -27,6 +27,7 @@ import org.apache.axis.configuration.NullProvider;
 import org.apache.axis.message.SOAPEnvelope;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.components.crypto.Crypto;
@@ -120,7 +121,7 @@ public class TestWSSecurityNew3 extends TestCase implements CallbackHandler {
      * 
      * @throws java.lang.Exception Thrown when there is any problem in signing or verification
      */
-    public void testX509Signature() throws Exception {
+    public void testIssuerSerialSignature() throws Exception {
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         LOG.info("Before Signing....");
@@ -129,7 +130,39 @@ public class TestWSSecurityNew3 extends TestCase implements CallbackHandler {
         secHeader.insertSecurityHeader(doc);
         Document signedDoc = builder.build(doc, crypto, secHeader);
 
-        LOG.info("After Signing....");
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("After Signing....");
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+            LOG.debug(outputString);
+        }
+        
+        verify(signedDoc);
+    }
+    
+    /**
+     * Test that signs and verifies a WS-Security envelope
+     * <p/>
+     * 
+     * @throws java.lang.Exception Thrown when there is any problem in signing or verification
+     */
+    public void testBSTSignature() throws Exception {
+        WSSecSignature builder = new WSSecSignature();
+        builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+        builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
+        LOG.info("Before Signing....");
+        Document doc = unsignedEnvelope.getAsDocument();
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        Document signedDoc = builder.build(doc, crypto, secHeader);
+
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("After Signing....");
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+            LOG.debug(outputString);
+        }
+        
         verify(signedDoc);
     }
 

@@ -157,7 +157,7 @@ public class WSSecDKEncrypt extends WSSecDerivedKeyBase {
                     WSSecurityException.FAILED_ENCRYPTION, null, null, e2
                 );
             }
-            encDataRefs.add(new String("#" + xencEncryptedDataId));
+            encDataRefs.add("#" + xencEncryptedDataId);
         }
         return encDataRefs;
     }
