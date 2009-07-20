@@ -52,8 +52,8 @@ public class Timestamp {
 
     protected Element element = null;
     protected List customElements = null;
-    protected Calendar created;
-    protected Calendar expires;
+    protected Date createdDate;
+    protected Date expiresDate;
     
     /**
      * Constructs a <code>Timestamp</code> object and parses the
@@ -106,17 +106,15 @@ public class Timestamp {
                 LOG.debug("Current time: " + zulu.format(Calendar.getInstance().getTime()));
             }
             if (strCreated != null) {
-                created = Calendar.getInstance();
-                created.setTime(zulu.parse(strCreated));
+                createdDate = zulu.parse(strCreated);
                 if (LOG.isDebugEnabled()) {
-                    LOG.debug("Timestamp created: " + zulu.format(created.getTime()));
+                    LOG.debug("Timestamp created: " + zulu.format(createdDate));
                 }
             }
             if (strExpires != null) {
-                expires = Calendar.getInstance();
-                expires.setTime(zulu.parse(strExpires));
+                expiresDate = zulu.parse(strExpires);
                 if (LOG.isDebugEnabled()) {
-                    LOG.debug("Timestamp expires: " + zulu.format(expires.getTime()));
+                    LOG.debug("Timestamp expires: " + zulu.format(expiresDate));
                 }
             }
         } catch (ParseException e) {
@@ -149,25 +147,26 @@ public class Timestamp {
             zulu = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
             zulu.setTimeZone(TimeZone.getTimeZone("UTC"));
         }
-        created = getCurrentTime();
+        Calendar calendar = getCurrentTime();
 
         Element elementCreated =
-                doc.createElementNS(
-                    WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + WSConstants.CREATED_LN
-                );
-        elementCreated.appendChild(doc.createTextNode(zulu.format(created.getTime())));
+            doc.createElementNS(
+                WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + WSConstants.CREATED_LN
+            );
+        createdDate = calendar.getTime();
+        elementCreated.appendChild(doc.createTextNode(zulu.format(createdDate)));
         element.appendChild(elementCreated);
         if (ttl != 0) {
-            long currentTime = created.getTimeInMillis();
+            long currentTime = calendar.getTimeInMillis();
             currentTime += ttl * 1000;
-            expires = getCurrentTime();
-            expires.setTimeInMillis(currentTime);
+            calendar.setTimeInMillis(currentTime);
+            expiresDate = calendar.getTime();
 
             Element elementExpires =
-                    doc.createElementNS(
-                        WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + WSConstants.EXPIRES_LN
-                    );
-            elementExpires.appendChild(doc.createTextNode(zulu.format(expires.getTime())));
+                doc.createElementNS(
+                    WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + WSConstants.EXPIRES_LN
+                );
+            elementExpires.appendChild(doc.createTextNode(zulu.format(expiresDate)));
             element.appendChild(elementExpires);
         }
     }
@@ -212,8 +211,8 @@ public class Timestamp {
      *
      * @return the "created" time
      */
-    public Calendar getCreated() {
-        return created;
+    public Date getCreated() {
+        return createdDate;
     }
 
     /**
@@ -221,8 +220,8 @@ public class Timestamp {
      *
      * @return the "expires" time
      */
-    public Calendar getExpires() {
-        return expires;
+    public Date getExpires() {
+        return expiresDate;
     }
 
     /**
@@ -262,9 +261,9 @@ public class Timestamp {
      * is before the current time. It returns false if there is no Expires value.
      */
     public boolean isExpired() {
-        Calendar rightNow = Calendar.getInstance();
-        if (expires != null) {
-            return expires.before(rightNow);
+        if (expiresDate != null) {
+            Calendar rightNow = Calendar.getInstance();
+            return expiresDate.before(rightNow.getTime());
         }
         return false;
     }
@@ -288,7 +287,7 @@ public class Timestamp {
         validCreation.setTime(new Date(currentTime));
 
         // Validate the time it took the message to travel
-        if (created != null && created.before(validCreation)) {
+        if (createdDate != null && createdDate.before(validCreation.getTime())) {
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Validation of Timestamp: The message was created too long ago");
             }

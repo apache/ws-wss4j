@@ -512,7 +512,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
                     WSSecurityException.FAILED_ENCRYPTION, null, null, ex
                 );
             }
-            encDataRef.add(new String("#" + xencEncryptedDataId));
+            encDataRef.add("#" + xencEncryptedDataId);
         }
         return encDataRef;
     }
