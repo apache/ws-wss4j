@@ -444,10 +444,10 @@ public class UsernameToken {
         try {
             if (!hashed) {
                 node.setData(pwd);
-                elementPassword.setAttribute("Type", WSConstants.PASSWORD_TEXT);
+                elementPassword.setAttributeNS(null, "Type", WSConstants.PASSWORD_TEXT);
             } else {
                 node.setData(doPasswordDigest(getNonce(), getCreated(), pwd));
-                elementPassword.setAttribute("Type", WSConstants.PASSWORD_DIGEST);
+                elementPassword.setAttributeNS(null, "Type", WSConstants.PASSWORD_DIGEST);
             }
         } catch (Exception e) {
             if (DO_DEBUG) {
