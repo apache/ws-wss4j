@@ -49,7 +49,7 @@ public class WSSecurityEngine {
     private static Log tlog =
             LogFactory.getLog("org.apache.ws.security.TIME");
 
-    private static WSSecurityEngine engine = null;
+    private static WSSecurityEngine engine = new WSSecurityEngine();
     
     /**
      * The WSSConfig instance used by this SecurityEngine to
@@ -137,10 +137,7 @@ public class WSSecurityEngine {
      *
      * @return ws-security engine.
      */
-    public synchronized static WSSecurityEngine getInstance() {
-        if (engine == null) {
-            engine = new WSSecurityEngine();
-        }
+    public static WSSecurityEngine getInstance() {
         return engine;
     }
     

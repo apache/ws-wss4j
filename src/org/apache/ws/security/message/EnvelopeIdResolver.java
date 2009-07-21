@@ -40,17 +40,14 @@ public class EnvelopeIdResolver extends ResourceResolverSpi {
     private static Log log =
             LogFactory.getLog(EnvelopeIdResolver.class.getName());
 
-    private static EnvelopeIdResolver resolver = null;
+    private static EnvelopeIdResolver resolver = new EnvelopeIdResolver();
 
     /**
      * Singleton instance of the resolver.
      *
      * @return TODO
      */
-    public synchronized static ResourceResolverSpi getInstance() {
-        if (resolver == null) {
-            resolver = new EnvelopeIdResolver();
-        }
+    public static ResourceResolverSpi getInstance() {
         return resolver;
     }
 
