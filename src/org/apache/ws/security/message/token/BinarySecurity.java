@@ -17,6 +17,8 @@
 
 package org.apache.ws.security.message.token;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.util.DOM2Writer;
@@ -39,6 +41,7 @@ public class BinarySecurity {
     public static final QName TOKEN_BST = new QName(WSConstants.WSSE_NS, "BinarySecurityToken");
     public static final QName TOKEN_KI = new QName(WSConstants.WSSE_NS, "KeyIdentifier");
     public static final String BASE64_ENCODING = WSConstants.SOAPMESSAGE_NS + "#Base64Binary";
+    private static final Log LOG = LogFactory.getLog(BinarySecurity.class.getName());
     protected Element element = null;
 
     /**
@@ -135,16 +138,24 @@ public class BinarySecurity {
     /**
      * get the byte array containing token information.
      * 
-     * @return TODO
+     * @return the byte array containing token information
      */
     public byte[] getToken() {
-        Text node = getFirstNode();
-        if (node == null) {
-            return null;
+        Node node = element.getFirstChild();
+        StringBuffer buffer = new StringBuffer();
+        while (node != null) {
+            if (Node.TEXT_NODE == node.getNodeType()) {
+                buffer.append(((Text)node).getData());
+            }
+            node = node.getNextSibling();
         }
+                
         try {
-            return Base64.decode(node.getData());
-        } catch (Exception e) {
+            return Base64.decode(buffer.toString());
+        } catch (Exception ex) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug(ex.getMessage(), ex);
+            }
             return null;
         }
     }
