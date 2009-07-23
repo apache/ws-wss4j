@@ -404,9 +404,9 @@ public class SecurityTokenReference {
 
     private void createKeyIdentifier(Document doc, String uri, Node node, boolean base64) {
         Element keyId = doc.createElementNS(WSConstants.WSSE_NS, "wsse:KeyIdentifier");
-        keyId.setAttribute("ValueType", uri);
+        keyId.setAttributeNS(null, "ValueType", uri);
         if (base64) {
-            keyId.setAttribute("EncodingType", BinarySecurity.BASE64_ENCODING);
+            keyId.setAttributeNS(null, "EncodingType", BinarySecurity.BASE64_ENCODING);
         }
 
         keyId.appendChild(node);
@@ -539,6 +539,22 @@ public class SecurityTokenReference {
             element.replaceChild(ref.getElement(), elem);
         } else {
             element.appendChild(ref.getElement());
+        }
+    }
+    
+    
+    /**
+     * Set an unknown element.
+     *
+     * @param unknownElement the org.w3c.dom.Element to put into this
+     *        SecurityTokenReference
+     */
+    public void setUnknownElement(Element unknownElement) {
+        Element elem = getFirstElement();
+        if (elem != null) {
+            element.replaceChild(unknownElement, elem);
+        } else {
+            element.appendChild(unknownElement);
         }
     }
 

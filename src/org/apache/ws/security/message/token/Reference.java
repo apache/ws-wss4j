@@ -107,7 +107,7 @@ public class Reference {
      * @param valueType
      */
     public void setValueType(String valueType) {
-        element.setAttribute("ValueType", valueType);
+        element.setAttributeNS(null, "ValueType", valueType);
     }
 
     /**
@@ -116,7 +116,7 @@ public class Reference {
      * @param uri 
      */
     public void setURI(String uri) {
-        element.setAttribute("URI", uri);
+        element.setAttributeNS(null, "URI", uri);
     }
 
     /**

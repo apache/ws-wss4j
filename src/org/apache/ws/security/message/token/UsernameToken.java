@@ -275,7 +275,7 @@ public class UsernameToken {
         random.nextBytes(nonceValue);
         elementNonce = doc.createElementNS(WSConstants.WSSE_NS, "wsse:" + WSConstants.NONCE_LN);
         elementNonce.appendChild(doc.createTextNode(Base64.encode(nonceValue)));
-        elementNonce.setAttribute("EncodingType", BASE64_ENCODING);
+        elementNonce.setAttributeNS(null, "EncodingType", BASE64_ENCODING);
         element.appendChild(elementNonce);
     }
 
@@ -465,7 +465,7 @@ public class UsernameToken {
                 node.setData(pwd);
             }
             if (passwordType != null) {
-                elementPassword.setAttribute("Type", passwordType);
+                elementPassword.setAttributeNS(null, "Type", passwordType);
             }
         } catch (Exception e) {
             if (DO_DEBUG) {

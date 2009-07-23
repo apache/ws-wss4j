@@ -73,7 +73,7 @@ public class SignatureConfirmation {
         WSSecurityUtil.setNamespace(element, WSConstants.WSSE11_NS, WSConstants.WSSE11_PREFIX);
         if (signVal != null) {
             String sv = Base64.encode(signVal);
-            element.setAttribute(SC_VALUE_ATTR, sv);
+            element.setAttributeNS(null, SC_VALUE_ATTR, sv);
         }
     }
     
