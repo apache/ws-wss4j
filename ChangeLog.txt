@@ -5,6 +5,55 @@ for a given release.
 Portions of this report were generated using the ReleaseNotes facility
 in Jira.
 
+Release 1.5.8
+=============
+
+** Bug
+
+    * [WSS-147] - WCF interop issue: Security header ordering constraint
+    * [WSS-176] - Problem with WSSecurityUtil.prependChildElement and JBossWS
+    * [WSS-178] - signature verification failure of signed saml token due to The Reference for URI (bst-saml-uri) has no XMLSignatureInput
+    * [WSS-182] - Encryption with symmetric key with encryptSymmKey set to false generates invalid xml without xenc defined
+    * [WSS-196] - STRTransform not compatible with Sun's SAAJ implementation
+    * [WSS-198] - Problem when body is signed and then an XPath is encrypted
+    * [WSS-201] - Some of the processors use the wrong Crypto implementation
+
+** Improvement
+
+    * [WSS-131] - no support for extension of SecurityHeader
+    * [WSS-158] - Upgrade to BouncyCastle 1.43
+    * [WSS-177] - Allow encryption using a symmetric key and EncryptedKeySHA1
+    * [WSS-179] - Allow signature using a symmetric key and EncryptedKeySHA1
+    * [WSS-195] - More detailed exception thrown from CryptoBase.getPrivateKey()
+    * [WSS-199] - Add support for WCF non-standard Username Tokens
+    * [WSS-202] - Upgrade to XML Security 1.4.3.
+
+** New Feature
+
+    * [WSS-194] - Support overriding KeyStore alias for signature so that it can be different than user name used for UsernameToken
+
+
+Release 1.5.7
+=============
+
+** Bug
+
+    * [WSS-90] - SamlUtil.java throws XMLSecurityException when SAML SubjectConfirmation element doesn't have KeyInfo child
+    * [WSS-99] - JCE provider ordering on solaris
+    * [WSS-117] - WSS4J does not supports KeyIdentifiers to reference SAML tokens but this is allowed by the WSS specification. Integration tesitng with owsm failed.
+    * [WSS-136] - POM files needed in Maven repository for OpenSAML, WSS4J, and XML Security
+
+** Improvement
+
+    * [WSS-84] - Make the use of the VM-wide keystore (lib/security/cacerts) optional
+    * [WSS-169] - Add an EncodingType attribute for a UsernameToken nonce
+    * [WSS-170] - SignatureAction does not set DigestAlgorithm on WSSecSignature instance
+
+** Test
+
+    * [WSS-172] - Test encrypted headers
+
+
 Release 1.5.6
 =============
 
