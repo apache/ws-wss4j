@@ -231,7 +231,7 @@ public class WSSecurityUtil {
      * <code>//name</code> with the given namespace. It's somewhat faster than
      * XPath, and we do not deal with prefixes, just with the real namespace URI
      * 
-     * @param start Node Where to start the search
+     * @param startNode Where to start the search
      * @param name Local name of the element
      * @param namespace Namespace URI of the element
      * @return The found element or <code>null</code>

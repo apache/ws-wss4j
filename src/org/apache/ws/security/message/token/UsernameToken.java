@@ -477,7 +477,7 @@ public class UsernameToken {
     /**
      * Set the raw (plain text) password used to compute secret key.
      * 
-     * @param raw_password the raw_password to set
+     * @param newRawPassword the raw password to set
      */
     public void setRawPassword(String newRawPassword) {
         rawPassword = newRawPassword;
