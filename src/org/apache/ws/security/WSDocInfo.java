@@ -107,10 +107,10 @@ public class WSDocInfo {
     public Processor getProcessor(String id) {
         
         if (id == null) {
-                return null;
-            }
+            return null;
+        }
 
-            Processor p = null;
+        Processor p = null;
         if (processors != null) {
             for (Enumeration e = processors.elements(); e.hasMoreElements();) {
                 p = (Processor) e.nextElement();
