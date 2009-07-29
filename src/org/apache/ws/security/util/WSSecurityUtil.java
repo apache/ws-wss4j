@@ -206,7 +206,7 @@ public class WSSecurityUtil {
      * <code>//name</code> with the given namespace. It's somewhat faster than
      * XPath, and we do not deal with prefixes, just with the real namespace URI
      * 
-     * @param start Node Where to start the search
+     * @param startNode Where to start the search
      * @param name Local name of the element
      * @param namespace Namespace URI of the element
      * @return The found element or <code>null</code>
@@ -698,7 +698,7 @@ public class WSSecurityUtil {
      * 
      * @param doc the DOM document (SOAP request)
      * @param envelope the SOAP envelope
-     * @param actot the actor (role) name of the WSS header
+     * @param actor the actor (role) name of the WSS header
      * @param doCreate if true create a new WSS header block if none exists
      * @return the WSS header or null if none found and doCreate is false
      */
