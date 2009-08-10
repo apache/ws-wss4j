@@ -210,7 +210,7 @@ public class WSS4JHandler extends WSHandler implements Handler {
         reqData.setUsername((String) getOption(WSHandlerConstants.USER));
         if (reqData.getUsername() == null || reqData.getUsername().equals("")) {
             reqData.setUsername((String) mc.getProperty(WSHandlerConstants.USER));
-            mc.setProperty(WSHandlerConstants.USER, null);
+            mc.removeProperty(WSHandlerConstants.USER);
         }
 
         /*
@@ -311,7 +311,7 @@ public class WSS4JHandler extends WSHandler implements Handler {
                 }
                 throw new JAXRPCException("Couldn't set content on SOAPPart" + se.getMessage(), se);
             }
-            mc.setProperty(WSHandlerConstants.SND_SECURITY, null);
+            mc.removeProperty(WSHandlerConstants.SND_SECURITY);
         }
         if (doDebug) {
             log.debug("WSS4JHandler: exit invoke()");
