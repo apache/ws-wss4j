@@ -451,12 +451,11 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
             }
 
             boolean content = modifier.equals("Content") ? true : false;
-            String xencEncryptedDataId = 
-                config.getIdAllocator().createId("ED-", elementToEncrypt);
-            encPart.setEncId(xencEncryptedDataId);
             //
             // Encrypt data, and set necessary attributes in xenc:EncryptedData
             //
+            String xencEncryptedDataId = 
+                config.getIdAllocator().createId("ED-", elementToEncrypt);
             try {
                 if (modifier.equals("Header")) {
                     Element elem = 
@@ -607,7 +606,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
                 doc.createElementNS(
                     WSConstants.ENC_NS, WSConstants.ENC_PREFIX + ":DataReference"
                 );
-            dataReference.setAttribute("URI", dataReferenceUri);
+            dataReference.setAttributeNS(null, "URI", dataReferenceUri);
             referenceList.appendChild(dataReference);
         }
         return referenceList;

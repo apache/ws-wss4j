@@ -95,7 +95,14 @@ public class WSConstants {
     public static final String AES_256 = EncryptionConstants.ALGO_ID_BLOCKCIPHER_AES256;
     public static final String AES_192 = EncryptionConstants.ALGO_ID_BLOCKCIPHER_AES192;
     public static final String DSA = XMLSignature.ALGO_ID_SIGNATURE_DSA;
-    public static final String RSA = XMLSignature.ALGO_ID_SIGNATURE_RSA_SHA1;
+    public static final String RSA = XMLSignature.ALGO_ID_SIGNATURE_RSA;
+    public static final String RSA_SHA1 = XMLSignature.ALGO_ID_SIGNATURE_RSA_SHA1;
+    public static final String SHA1 = Constants.ALGO_ID_DIGEST_SHA1;
+    public static final String HMAC_SHA1 = XMLSignature.ALGO_ID_MAC_HMAC_SHA1;
+    public static final String HMAC_SHA256 = XMLSignature.ALGO_ID_MAC_HMAC_SHA256;
+    public static final String HMAC_SHA384 = XMLSignature.ALGO_ID_MAC_HMAC_SHA384;
+    public static final String HMAC_SHA512 = XMLSignature.ALGO_ID_MAC_HMAC_SHA512;
+    public static final String HMAC_MD5 = XMLSignature.ALGO_ID_MAC_HMAC_NOT_RECOMMENDED_MD5;
     
     public static final String WST_NS = "http://schemas.xmlsoap.org/ws/2005/02/trust";
     public final static String WSC_SCT = "http://schemas.xmlsoap.org/ws/2005/02/sc/sct";
@@ -130,6 +137,11 @@ public class WSConstants {
     public static final String PW_TEXT = "PasswordText";
     public static final String PW_NONE = "PasswordNone";
     public static final String ENCRYPTED_HEADER = "EncryptedHeader";
+    public static final String X509_ISSUER_SERIAL_LN = "X509IssuerSerial";
+    public static final String X509_ISSUER_NAME_LN = "X509IssuerName";
+    public static final String X509_SERIAL_NUMBER_LN = "X509SerialNumber";
+    public static final String X509_DATA_LN = "X509Data";
+    public static final String X509_CERT_LN = "X509Certificate";
     
     public static final String ELEM_ENVELOPE = "Envelope";
     public static final String ELEM_HEADER = "Header";
@@ -148,6 +160,7 @@ public class WSConstants {
     public static final String DEFAULT_SOAP_PREFIX = "soapenv";
     public static final String SIG_PREFIX = "ds";
     public static final String ENC_PREFIX = "xenc";
+    public static final String C14N_EXCL_OMIT_COMMENTS_PREFIX = "ec";
     
     
     //

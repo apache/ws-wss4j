@@ -32,7 +32,6 @@ import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.message.WSSecUsernameToken;
 import org.apache.ws.security.message.WSSecSignature;
 import org.apache.ws.security.util.WSSecurityUtil;
-import org.apache.xml.security.signature.XMLSignature;
 import org.w3c.dom.Document;
 
 /**
@@ -83,7 +82,7 @@ public class UsernameTokenSignedAction implements Action {
         sign.setCustomTokenId(builder.getId());
         sign.setSecretKey(builder.getSecretKey());
         sign.setKeyIdentifierType(WSConstants.CUSTOM_SYMM_SIGNING);
-        sign.setSignatureAlgorithm(XMLSignature.ALGO_ID_MAC_HMAC_SHA1);
+        sign.setSignatureAlgorithm(WSConstants.HMAC_SHA1);
         if (reqData.getSigDigestAlgorithm() != null) {
             sign.setDigestAlgo(reqData.getSigDigestAlgorithm());
         }
@@ -93,8 +92,8 @@ public class UsernameTokenSignedAction implements Action {
         // prepend in this order: first the Signature Element and then the
         // UsernameToken Element. This way the server gets the UsernameToken
         // first, can check it and are prepared to compute the Signature key.  
-        sign.prependToHeader(reqData.getSecHeader());
-        builder.prependToHeader(reqData.getSecHeader());
+        // sign.prependToHeader(reqData.getSecHeader());
+        // builder.prependToHeader(reqData.getSecHeader());
 
         List parts = null;
         if (reqData.getSignatureParts().size() > 0) {
@@ -109,15 +108,16 @@ public class UsernameTokenSignedAction implements Action {
                 new WSEncryptionPart(WSConstants.ELEM_BODY, soapConstants.getEnvelopeURI(), "Content");
             parts.add(encP);
         }
-        sign.addReferencesToSign(parts, reqData.getSecHeader());
+        List referenceList = sign.addReferencesToSign(parts, reqData.getSecHeader());
 
         try {
-            sign.computeSignature();
+            sign.computeSignature(referenceList, reqData.getSecHeader());
             reqData.getSignatureValues().add(sign.getSignatureValue());
         } catch (WSSecurityException e) {
             throw new WSSecurityException(
                 "WSHandler: Error during UsernameTokenSignature", e
             );
         }
+        builder.prependToHeader(reqData.getSecHeader());
     }
 }

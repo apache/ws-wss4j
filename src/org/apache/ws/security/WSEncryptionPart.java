@@ -27,7 +27,6 @@ public class WSEncryptionPart {
     private String name;
     private String namespace;
     private String encModifier;
-    private String encId;
     private String id;
     
     /**
@@ -124,12 +123,12 @@ public class WSEncryptionPart {
         return id;
     }
     
-    public void setEncId(String id) {
-        encId = id;
-    }
-    
-    public String getEncId() {
-        return encId;
+    /**
+     * Set the id
+     * @param id
+     */
+    public void setId(String id) {
+        this.id = id;
     }
 
     /**

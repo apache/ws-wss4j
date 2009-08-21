@@ -104,8 +104,22 @@ public class TestWSSecurityNew6 extends TestCase implements CallbackHandler {
         secHeader.insertSecurityHeader(doc);
 
         Document encryptedDoc = encrypt.build(doc, crypto, secHeader);
+        
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("After Encryption....");
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(encryptedDoc);
+            LOG.debug(outputString);
+        }
+        
         Document encryptedSignedDoc = sign.build(encryptedDoc, crypto, secHeader);
-        LOG.info("After Encryption....");
+        
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("After Signing....");
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(encryptedSignedDoc);
+            LOG.debug(outputString);
+        }
         verify(encryptedSignedDoc);
     }
     

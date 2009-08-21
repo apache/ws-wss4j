@@ -28,11 +28,7 @@ import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.util.DOM2Writer;
 import org.apache.ws.security.util.WSSecurityUtil;
-import org.apache.xml.security.exceptions.XMLSecurityException;
-import org.apache.xml.security.keys.content.x509.XMLX509IssuerSerial;
-import org.apache.xml.security.keys.content.X509Data;
 import org.apache.ws.security.util.Base64;
-import org.apache.xml.security.utils.Constants;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -69,7 +65,7 @@ public class SecurityTokenReference {
     private static Log log =
         LogFactory.getLog(SecurityTokenReference.class.getName());
     protected Element element = null;
-    private XMLX509IssuerSerial issuerSerial = null;
+    private DOMX509IssuerSerial issuerSerial = null;
     private byte[] skiBytes = null;
     private static boolean doDebug = false;
 
@@ -261,6 +257,23 @@ public class SecurityTokenReference {
                 if (assertion != null) {
                     tokElement = assertion;
                 }
+            }
+        }
+        
+        //
+        // If the type is a BinarySecurityToken then check to see if it's available in
+        // the WSDocInfo
+        //
+        if (docInfo != null && 
+            (X509Security.X509_V3_TYPE.equals(type) || PKIPathSecurity.getType().equals(type))) {
+            Element bst = docInfo.getBst(uri);
+            if (bst != null) {
+                //
+                // Add the WSSE/WSU namespaces to the element for C14n
+                //
+                WSSecurityUtil.setNamespace(bst, WSConstants.WSSE_NS, WSConstants.WSSE_PREFIX);
+                WSSecurityUtil.setNamespace(bst, WSConstants.WSU_NS, WSConstants.WSU_PREFIX);
+                return bst;
             }
         }
         
@@ -528,17 +541,17 @@ public class SecurityTokenReference {
 
 
     /**
-     * Sets the X509 IssuerSerial data.
+     * Sets the X509Data.
      *
-     * @param ref the {@link XMLX509IssuerSerial} to put into this
+     * @param ref the {@link DOMX509Data} to put into this
      *            SecurityTokenReference
      */
-    public void setX509IssuerSerial(X509Data ref) {
+    public void setX509Data(DOMX509Data domX509Data) {
         Element elem = getFirstElement();
         if (elem != null) {
-            element.replaceChild(ref.getElement(), elem);
+            element.replaceChild(domX509Data.getElement(), elem);
         } else {
-            element.appendChild(ref.getElement());
+            element.appendChild(domX509Data.getElement());
         }
     }
     
@@ -589,14 +602,14 @@ public class SecurityTokenReference {
         }
 
         String alias = 
-            crypto.getAliasForX509Cert(issuerSerial.getIssuerName(), issuerSerial.getSerialNumber());
+            crypto.getAliasForX509Cert(issuerSerial.getIssuer(), issuerSerial.getSerialNumber());
         if (doDebug) {
             log.debug("X509IssuerSerial alias: " + alias);
         }
         return alias;
     }
 
-    private XMLX509IssuerSerial getIssuerSerial() throws WSSecurityException {
+    private DOMX509IssuerSerial getIssuerSerial() throws WSSecurityException {
         if (issuerSerial != null) {
             return issuerSerial;
         }
@@ -604,22 +617,14 @@ public class SecurityTokenReference {
         if (elem == null) {
             return null;
         }
-        try {
-            if (Constants._TAG_X509DATA.equals(elem.getLocalName())) {
-                elem = 
-                    (Element)WSSecurityUtil.findElement(
-                        elem, Constants._TAG_X509ISSUERSERIAL, Constants.SignatureSpecNS
-                    );
-            }
-            issuerSerial = new XMLX509IssuerSerial(elem, "");
-        } catch (XMLSecurityException e) {
-            throw new WSSecurityException(
-                WSSecurityException.SECURITY_TOKEN_UNAVAILABLE,
-                "noToken",
-                new Object[]{"Issuer/Serial data element missing"},
-                e
-            );
+        if (WSConstants.X509_DATA_LN.equals(elem.getLocalName())) {
+            elem = 
+                (Element)WSSecurityUtil.findElement(
+                    elem, WSConstants.X509_ISSUER_SERIAL_LN, WSConstants.SIG_NS
+                );
         }
+        issuerSerial = new DOMX509IssuerSerial(elem);
+
         return issuerSerial;
     }
 
@@ -670,7 +675,7 @@ public class SecurityTokenReference {
      *         the <code>SecurtityTokenReference</code>
      */
     public int lengthX509IssuerSerial() {
-        return length(WSConstants.SIG_NS, Constants._TAG_X509ISSUERSERIAL);
+        return length(WSConstants.SIG_NS, WSConstants.X509_ISSUER_SERIAL_LN);
     }
 
     /**
@@ -680,7 +685,7 @@ public class SecurityTokenReference {
      *         the <code>SecurtityTokenReference</code>
      */
     public int lengthX509Data() {
-        return length(WSConstants.SIG_NS, Constants._TAG_X509DATA);
+        return length(WSConstants.SIG_NS, WSConstants.X509_DATA_LN);
     }
     
     /**

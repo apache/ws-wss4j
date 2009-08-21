@@ -238,7 +238,7 @@ public class WSSConfig {
     };
     protected WsuIdAllocator idAllocator = DEFAULT_ID_ALLOCATOR;
     
-    protected HashMap jceProvider = new HashMap(10);
+    protected java.util.Map jceProvider = new HashMap(10);
 
     /**
      * The known actions. This map is of the form <Integer, String> or <Integer, Action>. 
@@ -287,7 +287,18 @@ public class WSSConfig {
             org.apache.xml.security.Init.init();
             if (addJceProviders) {
                 addJceProvider("BC", "org.bouncycastle.jce.provider.BouncyCastleProvider");
+                String xmlDSigName = 
+                    addJceProvider("XMLDSig", "org.jcp.xml.dsig.internal.dom.XMLDSigRI");
+                if (xmlDSigName != null) {
+                    java.security.Provider provider =
+                        java.security.Security.getProvider(xmlDSigName);
+                    provider.put(
+                        "TransformService." + STRTransform.TRANSFORM_URI,
+                        "org.apache.ws.security.transform.STRApacheTransform"
+                    );
+                }
             }
+            
             Transform.init();
             try {
                 Transform.register(
@@ -299,6 +310,7 @@ public class WSSConfig {
                     log.debug(ex.getMessage(), ex);
                 }
             }
+            
             staticallyInitialized = true;
         }
     }
@@ -568,12 +580,19 @@ public class WSSConfig {
         return null;
     }
 
-    private boolean loadProvider(String id, String className) {
+    
+    /**
+     * Load the provider of the specified name, and of the specified class. Return either the
+     * name of the previously loaded provider, the name of the new loaded provider, or null if
+     * there's an exception in loading the provider.
+     */
+    private String loadProvider(String name, String className) {
         try {
-            if (java.security.Security.getProvider(id) == null) {
+            if (java.security.Security.getProvider(name) == null) {
                 Class c = Loader.loadClass(className, false);
                 java.security.Provider[] provs = 
                     java.security.Security.getProviders();
+                java.security.Provider newProvider = (java.security.Provider)c.newInstance();
                 //
                 // Install the provider after the SUN provider (see WSS-99)
                 // Otherwise fall back to the old behaviour of inserting
@@ -586,27 +605,28 @@ public class WSSConfig {
                         || "IBMJCE".equals(provs[i].getName())) {
                         ret =
                             java.security.Security.insertProviderAt(
-                                (java.security.Provider) c.newInstance(), i + 2
+                                newProvider, i + 2
                             );
                         break;
                     }
                 }
                 if (ret == 0) {
-                    ret =
-                        java.security.Security.insertProviderAt(
-                            (java.security.Provider) c.newInstance(), 2
-                        );
+                    ret = java.security.Security.insertProviderAt(newProvider, 2);
                 }
                 if (log.isDebugEnabled()) {
-                    log.debug("The provider " + id + " was added at position: " + ret);
-                }                
+                    log.debug(
+                        "The provider " + newProvider.getName() + " was added at position: " + ret
+                    );
+                }
+                return newProvider.getName();
+            } else {
+                return name;
             }
-            return true;
         } catch (Throwable t) {
             if (log.isDebugEnabled()) {
-                log.debug("The provider " + id + " could not be added: " + t.getMessage());
+                log.debug("The provider " + name + " could not be added: " + t.getMessage(), t);
             }
-            return false;
+            return null;
         }
 
     }
@@ -617,21 +637,22 @@ public class WSSConfig {
      * If the provider is not already known the method loads a security provider
      * class and adds the provider to the java security service.
      * 
-     * 
-     * @param id
-     *            The id string of the provider
+     * @param name
+     *            The name string of the provider (this may not be the real name of the provider)
      * @param className
      *            Name of the class the implements the provider. This class must
      *            be a subclass of <code>java.security.Provider</code>
      * 
-     * @return Returns <code>true</code> if the provider was successfully
-     *         added, <code>false</code> otherwise.
+     * @return Returns the actual name of the provider that was loaded
      */
-    public boolean addJceProvider(String id, String className) {
-        if (jceProvider.get(id) == null && loadProvider(id, className)) {
-            jceProvider.put(id, className);
-            return true;
+    public String addJceProvider(String name, String className) {
+        if (jceProvider.get(name) == null) {
+            String newName = loadProvider(name, className);
+            if (newName != null) {
+                jceProvider.put(newName, className);
+            }
+            return newName;
         }
-        return false;
+        return name;
     }
 }

@@ -31,7 +31,6 @@ import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.xml.security.algorithms.JCEMapper;
-import org.apache.xml.security.signature.XMLSignature;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -149,18 +148,18 @@ public class WSSecurityUtil {
     /**
      * Gets a direct child with specified localname and namespace. <p/>
      * 
-     * @param fNode the node where to start the search
+     * @param parentNode the node where to start the search
      * @param localName local name of the child to get
      * @param namespace the namespace of the child to get
      * @return the node or <code>null</code> if not such node found
      */
     public static Element getDirectChildElement(
-        Node fNode, 
+        Node parentNode, 
         String localName,
         String namespace
     ) {
         for (
-            Node currentChild = fNode.getFirstChild(); 
+            Node currentChild = parentNode.getFirstChild(); 
             currentChild != null; 
             currentChild = currentChild.getNextSibling()
         ) {
@@ -950,15 +949,15 @@ public class WSSecurityUtil {
             return 24;
         } else if (algorithm.equals(WSConstants.AES_256)) {
             return 32;
-        } else if (XMLSignature.ALGO_ID_MAC_HMAC_SHA1.equals(algorithm)) {
+        } else if (WSConstants.HMAC_SHA1.equals(algorithm)) {
             return 20;
-        } else if (XMLSignature.ALGO_ID_MAC_HMAC_SHA256.equals(algorithm)) {
+        } else if (WSConstants.HMAC_SHA256.equals(algorithm)) {
             return 32;
-        } else if (XMLSignature.ALGO_ID_MAC_HMAC_SHA384.equals(algorithm)) {
+        } else if (WSConstants.HMAC_SHA384.equals(algorithm)) {
             return 48;
-        } else if (XMLSignature.ALGO_ID_MAC_HMAC_SHA512.equals(algorithm)) {
+        } else if (WSConstants.HMAC_SHA512.equals(algorithm)) {
             return 64;
-        } else if (XMLSignature.ALGO_ID_MAC_HMAC_NOT_RECOMMENDED_MD5.equals(algorithm)) {
+        } else if (WSConstants.HMAC_MD5.equals(algorithm)) {
             return 16;
         } else {
             throw new WSSecurityException(

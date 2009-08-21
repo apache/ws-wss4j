@@ -289,6 +289,7 @@ public abstract class WSHandler {
             if (act == WSConstants.SC || act == WSConstants.BST) {
                 continue;
             }
+            
             if (ai >= size || ((Integer) actions.get(ai++)).intValue() != act) {
                 return false;
             }

@@ -29,28 +29,16 @@ import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.message.token.BinarySecurity;
+import org.apache.ws.security.message.token.DOMX509Data;
+import org.apache.ws.security.message.token.DOMX509IssuerSerial;
 import org.apache.ws.security.message.token.PKIPathSecurity;
 import org.apache.ws.security.message.token.Reference;
 import org.apache.ws.security.message.token.SecurityTokenReference;
 import org.apache.ws.security.message.token.X509Security;
-import org.apache.ws.security.transform.STRTransform;
+import org.apache.ws.security.transform.STRApacheTransform;
 import org.apache.ws.security.util.Base64;
 import org.apache.ws.security.util.WSSecurityUtil;
-import org.apache.xml.security.algorithms.SignatureAlgorithm;
-import org.apache.xml.security.c14n.Canonicalizer;
-import org.apache.xml.security.exceptions.XMLSecurityException;
-import org.apache.xml.security.keys.KeyInfo;
-import org.apache.xml.security.keys.content.X509Data;
-import org.apache.xml.security.keys.content.x509.XMLX509IssuerSerial;
-import org.apache.xml.security.keys.content.keyvalues.DSAKeyValue;
-import org.apache.xml.security.keys.content.keyvalues.RSAKeyValue;
-import org.apache.xml.security.signature.XMLSignature;
-import org.apache.xml.security.signature.XMLSignatureException;
-import org.apache.xml.security.transforms.TransformationException;
-import org.apache.xml.security.transforms.Transforms;
-import org.apache.xml.security.transforms.params.InclusiveNamespaces;
-import org.apache.xml.security.utils.Constants;
-import org.apache.xml.security.utils.XMLUtils;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
@@ -59,10 +47,28 @@ import org.w3c.dom.Node;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
-import java.util.HashSet;
+import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 import java.util.Vector;
+
+import javax.xml.crypto.XMLStructure;
+import javax.xml.crypto.dom.DOMStructure;
+import javax.xml.crypto.dsig.CanonicalizationMethod;
+import javax.xml.crypto.dsig.DigestMethod;
+import javax.xml.crypto.dsig.SignatureMethod;
+import javax.xml.crypto.dsig.SignedInfo;
+import javax.xml.crypto.dsig.Transform;
+import javax.xml.crypto.dsig.XMLSignature;
+import javax.xml.crypto.dsig.XMLSignatureFactory;
+import javax.xml.crypto.dsig.XMLSignContext;
+import javax.xml.crypto.dsig.dom.DOMSignContext;
+import javax.xml.crypto.dsig.keyinfo.KeyInfo;
+import javax.xml.crypto.dsig.keyinfo.KeyInfoFactory;
+import javax.xml.crypto.dsig.keyinfo.KeyValue;
+import javax.xml.crypto.dsig.spec.C14NMethodParameterSpec;
+import javax.xml.crypto.dsig.spec.ExcC14NParameterSpec;
+import javax.xml.crypto.dsig.spec.TransformParameterSpec;
+
 
 /**
  * Creates a Signature according to WS Specification, X509 profile.
@@ -88,19 +94,23 @@ public class WSSecSignature extends WSSecBase {
     protected Document document = null;
     protected WSDocInfo wsDocInfo = null;
     protected String certUri = null;
-    protected XMLSignature sig = null;
-    protected KeyInfo keyInfo = null;
     protected String keyInfoUri = null;
     protected SecurityTokenReference secRef = null;
     protected String strUri = null;
     protected BinarySecurity bstToken = null;
+    
+    protected KeyInfoFactory keyInfoFactory = KeyInfoFactory.getInstance("DOM");
+    protected XMLSignatureFactory signatureFactory = XMLSignatureFactory.getInstance("DOM");
+    protected KeyInfo keyInfo;
+    protected CanonicalizationMethod c14nMethod;
+    protected XMLSignature sig;
 
     private byte[] secretKey = null;
     private String encrKeySha1value = null;
     private Crypto crypto = null;
     private String customTokenValueType;
     private String customTokenId;
-    private String digestAlgo = Constants.ALGO_ID_DIGEST_SHA1;
+    private String digestAlgo = WSConstants.SHA1;
     private X509Certificate useThisCert = null;
 
    
@@ -130,38 +140,28 @@ public class WSSecSignature extends WSSecBase {
         document = doc;
         wsDocInfo = new WSDocInfo(doc);
         wsDocInfo.setCrypto(cr);
-
+        
         //
         // At first get the security token (certificate) according to the parameters.
         //
         X509Certificate[] certs = getSigningCerts();
 
-        //
-        // Get an initialized XMLSignature element.
-        //
-        if (wssConfig.isWsiBSPCompliant() && canonAlgo.equals(WSConstants.C14N_EXCL_OMIT_COMMENTS)) {
-            sig = 
-                createXMLSignatureInclusivePrefixes(
-                    doc, secHeader.getSecurityHeader(), canonAlgo, sigAlgo
-                );
-        } else {
-            try {
-                sig = new XMLSignature(doc, null, sigAlgo, canonAlgo);
-            } catch (XMLSecurityException e) {
-                log.error("", e);
-                throw new WSSecurityException(
-                    WSSecurityException.FAILED_SIGNATURE, "noXMLSig", null, e
-                );
+        try {
+            C14NMethodParameterSpec c14nSpec = null;
+            if (wssConfig.isWsiBSPCompliant() && canonAlgo.equals(WSConstants.C14N_EXCL_OMIT_COMMENTS)) {
+                List prefixes = getInclusivePrefixes(secHeader.getSecurityHeader(), false);
+                c14nSpec = new ExcC14NParameterSpec(prefixes);
             }
+            
+           c14nMethod = signatureFactory.newCanonicalizationMethod(canonAlgo, c14nSpec);
+        } catch (Exception ex) {
+            log.error("", ex);
+            throw new WSSecurityException(
+                WSSecurityException.FAILED_SIGNATURE, "noXMLSig", null, ex
+            );
         }
 
-        sig.addResourceResolver(EnvelopeIdResolver.getInstance());
-        sig.setId(wssConfig.getIdAllocator().createId("SIG-", sig));
-
-        keyInfo = sig.getKeyInfo();
         keyInfoUri = wssConfig.getIdAllocator().createSecureId("KI-", keyInfo);
-        keyInfo.setId(keyInfoUri);
-
         secRef = new SecurityTokenReference(doc);
         strUri = wssConfig.getIdAllocator().createSecureId("STR-", secRef);
         secRef.setID(strUri);
@@ -187,10 +187,12 @@ public class WSSecSignature extends WSSecBase {
             break;
 
         case WSConstants.ISSUER_SERIAL:
-            XMLX509IssuerSerial data = new XMLX509IssuerSerial(document, certs[0]);
-            X509Data x509Data = new X509Data(document);
-            x509Data.add(data);
-            secRef.setX509IssuerSerial(x509Data);
+            String issuer = certs[0].getIssuerX500Principal().getName();
+            java.math.BigInteger serialNumber = certs[0].getSerialNumber();
+            DOMX509IssuerSerial domIssuerSerial = 
+                new DOMX509IssuerSerial(doc, issuer, serialNumber);
+            DOMX509Data domX509Data = new DOMX509Data(doc, domIssuerSerial);
+            secRef.setX509Data(domX509Data);
             break;
 
         case WSConstants.X509_KEY_IDENTIFIER:
@@ -233,26 +235,29 @@ public class WSSecSignature extends WSSecBase {
             
         case WSConstants.KEY_VALUE:
             java.security.PublicKey publicKey = certs[0].getPublicKey();
-            String pubKeyAlgo = publicKey.getAlgorithm();
-            if (pubKeyAlgo.equalsIgnoreCase("DSA")) {
-                DSAKeyValue dsaKeyValue = new DSAKeyValue(document, publicKey);
-                keyInfo.add(dsaKeyValue);
-            } else if (pubKeyAlgo.equalsIgnoreCase("RSA")) {
-                RSAKeyValue rsaKeyValue = new RSAKeyValue(document, publicKey);
-                keyInfo.add(rsaKeyValue);
-            } else {
-                throw new WSSecurityException(
-                    WSSecurityException.FAILURE,
-                    "unknownSignatureAlgorithm",
-                    new Object[] {pubKeyAlgo}
-                );
-            }
+            
+            try {
+                KeyValue keyValue = keyInfoFactory.newKeyValue(publicKey);
+                keyInfo = 
+                    keyInfoFactory.newKeyInfo(
+                        java.util.Collections.singletonList(keyValue), keyInfoUri
+                    );
+            } catch (java.security.KeyException ex) {
+                    log.error("", ex);
+                    throw new WSSecurityException(
+                        WSSecurityException.FAILED_SIGNATURE, "noXMLSig", null, ex
+                    );
+                }
             break;
         default:
             throw new WSSecurityException(WSSecurityException.FAILURE, "unsupportedKeyId");
         }
         if (keyIdentifierType != WSConstants.KEY_VALUE) {
-            keyInfo.addUnknownElement(secRef.getElement());
+            XMLStructure structure = new DOMStructure(secRef.getElement());
+            keyInfo = 
+                keyInfoFactory.newKeyInfo(
+                    java.util.Collections.singletonList(structure), keyInfoUri
+                );
         }
     }
     
@@ -291,11 +296,19 @@ public class WSSecSignature extends WSSecBase {
                     "Content"
                 );
             parts.add(encP);
+        } else {
+            for (int i = 0; i < parts.size(); i++) {
+                WSEncryptionPart part = (WSEncryptionPart)parts.get(i);
+                if ("STRTransform".equals(part.getName()) && part.getId() == null) {
+                    part.setId(strUri);
+                }
+            }
         }
 
-        addReferencesToSign(parts, secHeader);
-        prependToHeader(secHeader);
+        List referenceList = addReferencesToSign(parts, secHeader);
 
+        computeSignature(referenceList, secHeader);
+        
         //
         // if we have a BST prepend it in front of the Signature according to
         // strict layout rules.
@@ -303,8 +316,6 @@ public class WSSecSignature extends WSSecBase {
         if (bstToken != null) {
             prependBSTElementToHeader(secHeader);
         }
-
-        computeSignature();
 
         return doc;
     }
@@ -317,8 +328,16 @@ public class WSSecSignature extends WSSecBase {
      * @param secHeader The Security Header
      * @throws WSSecurityException
      */
-    public void addReferencesToSign(List references, WSSecHeader secHeader) throws WSSecurityException {
-        addReferencesToSign(document, references, sig, secHeader, wssConfig, digestAlgo, strUri);
+    public List addReferencesToSign(List references, WSSecHeader secHeader) throws WSSecurityException {
+        return 
+            addReferencesToSign(
+                document, 
+                references, 
+                signatureFactory, 
+                secHeader, 
+                wssConfig, 
+                digestAlgo
+            );
     }
 
     
@@ -331,19 +350,29 @@ public class WSSecSignature extends WSSecBase {
      * @param secHeader The Security Header
      * @param wssConfig The WSSConfig
      * @param digestAlgo The digest algorithm to use
-     * @param strUri The SecurityTokenReference uri to use for STRTransform
      * @throws WSSecurityException
      */
-    public static void addReferencesToSign(
+    public static List addReferencesToSign(
         Document doc,
         List references,
-        XMLSignature sig,
+        XMLSignatureFactory signatureFactory,
         WSSecHeader secHeader,
         WSSConfig wssConfig,
-        String digestAlgo,
-        String strUri
+        String digestAlgo
     ) throws WSSecurityException {
         Element envelope = doc.getDocumentElement();
+        
+        DigestMethod digestMethod;
+        try {
+            digestMethod = signatureFactory.newDigestMethod(digestAlgo, null);
+        } catch (Exception ex) {
+            log.error("", ex);
+            throw new WSSecurityException(
+                WSSecurityException.FAILED_SIGNATURE, "noXMLSig", null, ex
+            );
+        }
+        
+        List referenceList = new Vector();
 
         for (int part = 0; part < references.size(); part++) {
             WSEncryptionPart encPart = (WSEncryptionPart) references.get(part);
@@ -355,9 +384,8 @@ public class WSSecSignature extends WSSecBase {
             // Set up the elements to sign. There is one reserved element
             // names: "STRTransform": Setup the ds:Reference to use STR Transform
             //
-            Transforms transforms = new Transforms(doc);
             try {
-                if (idToSign != null) {
+                if (idToSign != null && !"STRTransform".equals(elemName)) {
                     Element toSignById = 
                         WSSecurityUtil.findElementById(
                             envelope, idToSign, WSConstants.WSU_NS, false
@@ -368,18 +396,44 @@ public class WSSecSignature extends WSSecBase {
                                 envelope, idToSign, null, false
                             );
                     }
-                    transforms.addTransform(Transforms.TRANSFORM_C14N_EXCL_OMIT_COMMENTS);
+                    TransformParameterSpec transformSpec = null;
                     if (wssConfig.isWsiBSPCompliant()) {
-                        transforms.item(0).getElement().appendChild(
-                            new InclusiveNamespaces(
-                                doc, getInclusivePrefixes(toSignById)).getElement()
-                            );
+                        List prefixes = getInclusivePrefixes(toSignById);
+                        transformSpec = new ExcC14NParameterSpec(prefixes);
                     }
-                    sig.addDocument("#" + idToSign, transforms, digestAlgo);
-                } else if (elemName.equals("STRTransform")) {
+                    Transform transform =
+                        signatureFactory.newTransform(
+                            WSConstants.C14N_EXCL_OMIT_COMMENTS,
+                            transformSpec
+                        );
+                    javax.xml.crypto.dsig.Reference reference = 
+                        signatureFactory.newReference(
+                            "#" + idToSign, 
+                            digestMethod,
+                            Collections.singletonList(transform),
+                            null,
+                            null
+                        );
+                    referenceList.add(reference);
+                } else if (idToSign != null && elemName.equals("STRTransform")) {
                     Element ctx = createSTRParameter(doc);
-                    transforms.addTransform(STRTransform.TRANSFORM_URI, ctx);
-                    sig.addDocument("#" + strUri, transforms, digestAlgo);
+                    
+                    XMLStructure structure = new DOMStructure(ctx);
+                    Transform transform =
+                        signatureFactory.newTransform(
+                            STRApacheTransform.TRANSFORM_URI,
+                            structure
+                        );
+                    
+                    javax.xml.crypto.dsig.Reference reference = 
+                        signatureFactory.newReference(
+                            "#" + idToSign, 
+                            digestMethod,
+                            Collections.singletonList(transform),
+                            null,
+                            null
+                        );
+                    referenceList.add(reference);
                 } else {
                     String nmSpace = encPart.getNamespace();
                     Element elementToSign = 
@@ -391,55 +445,37 @@ public class WSSecSignature extends WSSecBase {
                             new Object[] {nmSpace + ", " + elemName}
                         );
                     }
-                    transforms.addTransform(Transforms.TRANSFORM_C14N_EXCL_OMIT_COMMENTS);
+                    TransformParameterSpec transformSpec = null;
                     if (wssConfig.isWsiBSPCompliant()) {
-                        transforms.item(0).getElement().appendChild(
-                            new InclusiveNamespaces(
-                                doc, getInclusivePrefixes(elementToSign)).getElement()
-                            );
+                        List prefixes = getInclusivePrefixes(elementToSign);
+                        transformSpec = new ExcC14NParameterSpec(prefixes);
                     }
-                    sig.addDocument("#" + setWsuId(elementToSign, wssConfig), transforms, digestAlgo);
+                    Transform transform =
+                        signatureFactory.newTransform(
+                            WSConstants.C14N_EXCL_OMIT_COMMENTS,
+                            transformSpec
+                        );
+                    javax.xml.crypto.dsig.Reference reference = 
+                        signatureFactory.newReference(
+                            "#" + setWsuId(elementToSign, wssConfig), 
+                            digestMethod,
+                            Collections.singletonList(transform),
+                            null,
+                            null
+                        );
+                    referenceList.add(reference);
                 }
-            } catch (TransformationException ex) {
-                throw new WSSecurityException(
-                    WSSecurityException.FAILED_SIGNATURE, "noXMLSig", null, ex
-                );
-            } catch (XMLSignatureException ex) {
+            } catch (Exception ex) {
+                log.error("", ex);
                 throw new WSSecurityException(
                     WSSecurityException.FAILED_SIGNATURE, "noXMLSig", null, ex
                 );
             }
         }
-    }
-
-    /**
-     * Prepends the Signature element to the elements already in the Security
-     * header.
-     * 
-     * The method can be called any time after <code>prepare()</code>.
-     * This allows to insert the Signature element at any position in the
-     * Security header.
-     * 
-     * @param secHeader The secHeader that holds the Signature element.
-     */
-    public void prependToHeader(WSSecHeader secHeader) {
-        WSSecurityUtil.prependChildElement(secHeader.getSecurityHeader(), sig.getElement());
+        
+        return referenceList;
     }
     
-    /**
-     * Appends the Signature element to the elements already in the Security
-     * header.
-     * 
-     * The method can be called any time after <code>prepare()</code>.
-     * This allows to insert the Signature element at any position in the
-     * Security header.
-     * 
-     * @param secHeader The secHeader that holds the Signature element.
-     */
-    public void appendToHeader(WSSecHeader secHeader) {
-        Element secHeaderElement = secHeader.getSecurityHeader();
-        secHeaderElement.appendChild(sig.getElement());
-    }
     
     /**
      * Prepend the BinarySecurityToken to the elements already in the Security
@@ -470,6 +506,7 @@ public class WSSecSignature extends WSSecBase {
         bstToken = null;
     }
     
+    
     /**
      * Compute the Signature over the references.
      * 
@@ -479,16 +516,51 @@ public class WSSecSignature extends WSSecBase {
      * 
      * @throws WSSecurityException
      */
-    public void computeSignature() throws WSSecurityException {
+    public void computeSignature(List referenceList, WSSecHeader secHeader) 
+        throws WSSecurityException {
         boolean remove = WSDocInfoStore.store(wsDocInfo);
         try {
+            java.security.Key key;
             if (secretKey == null) {
-                sig.sign(crypto.getPrivateKey(user, password));
+                key = crypto.getPrivateKey(user, password);
             } else {
-                sig.sign(sig.createSecretKey(secretKey));                    
+                key = WSSecurityUtil.prepareSecretKey(sigAlgo, secretKey);
             }
-            signatureValue = sig.getSignatureValue();
+            SignatureMethod signatureMethod = 
+                signatureFactory.newSignatureMethod(sigAlgo, null);
+            SignedInfo signedInfo = 
+                signatureFactory.newSignedInfo(c14nMethod, signatureMethod, referenceList);
+            
+            sig = signatureFactory.newXMLSignature(
+                    signedInfo, 
+                    keyInfo,
+                    null,
+                    wssConfig.getIdAllocator().createId("SIG-", null),
+                    null);
+            
+            org.w3c.dom.Element securityHeaderElement = secHeader.getSecurityHeader();
+            //
+            // Prepend the signature element to the security header
+            //
+            XMLSignContext signContext = null;
+            if (securityHeaderElement.hasChildNodes()) {
+                org.w3c.dom.Node firstChild = securityHeaderElement.getFirstChild();
+                signContext = new DOMSignContext(key, securityHeaderElement, firstChild);
+            } else {
+                signContext = new DOMSignContext(key, securityHeaderElement);
+            }
+            signContext.putNamespacePrefix(WSConstants.SIG_NS, WSConstants.SIG_PREFIX);
+            if (WSConstants.C14N_EXCL_OMIT_COMMENTS.equals(canonAlgo)) {
+                signContext.putNamespacePrefix(
+                    WSConstants.C14N_EXCL_OMIT_COMMENTS, 
+                    WSConstants.C14N_EXCL_OMIT_COMMENTS_PREFIX
+                );
+            }
+            sig.sign(signContext);
+            
+            signatureValue = sig.getSignatureValue().getValue();
         } catch (Exception ex) {
+            log.error(ex);
             throw new WSSecurityException(
                 WSSecurityException.FAILED_SIGNATURE, null, null, ex
             );
@@ -532,60 +604,25 @@ public class WSSecSignature extends WSSecBase {
                 WSConstants.SIG_PREFIX + ":CanonicalizationMethod"
             );
 
-        canonElem.setAttribute("Algorithm", Canonicalizer.ALGO_ID_C14N_EXCL_OMIT_COMMENTS);
+        canonElem.setAttributeNS(null, "Algorithm", WSConstants.C14N_EXCL_OMIT_COMMENTS);
         transformParam.appendChild(canonElem);
         return transformParam;
     }
 
     
     /**
-     * Create a new XMLSignature object with inclusive prefixes
-     * @param doc The document that will own the signature
-     * @param securityHeader The security header in which to insert the signature
-     * @param c14nAlgorithm The canonicalization algorithm to use in SignedInfo
-     * @param signatureAlg The signature algorithm to use in SignedInfo
-     * @return A new XMLSignature object with inclusive prefixes
-     * @throws WSSecurityException
+     * Get the List of inclusive prefixes from the DOM Element argument 
      */
-    public static XMLSignature createXMLSignatureInclusivePrefixes(
-        Document doc,
-        Element securityHeader,
-        String c14nAlgorithm,
-        String signatureAlg
-    ) throws WSSecurityException {
-        Element canonElem = 
-            XMLUtils.createElementInSignatureSpace(doc, Constants._TAG_CANONICALIZATIONMETHOD);
-        canonElem.setAttribute(Constants._ATT_ALGORITHM, c14nAlgorithm);
-
-        Set prefixes = getInclusivePrefixes(securityHeader, false);
-        InclusiveNamespaces inclusiveNamespaces = new InclusiveNamespaces(doc, prefixes);
-        canonElem.appendChild(inclusiveNamespaces.getElement());
-
-        try {
-            SignatureAlgorithm signatureAlgorithm = new SignatureAlgorithm(doc, signatureAlg);
-            return new XMLSignature(doc, null, signatureAlgorithm.getElement(), canonElem);
-        } catch (XMLSecurityException e) {
-            log.error("", e);
-            throw new WSSecurityException(
-                WSSecurityException.FAILED_SIGNATURE, "noXMLSig", null, e
-            );
-        }
-    }
-    
-    
-    /**
-     * Get the set of inclusive prefixes from the DOM Element argument 
-     */
-    public static Set getInclusivePrefixes(Element target) {
+    public static List getInclusivePrefixes(Element target) {
         return getInclusivePrefixes(target, true);
     }
     
     
     /**
-     * Get the set of inclusive prefixes from the DOM Element argument 
+     * Get the List of inclusive prefixes from the DOM Element argument 
      */
-    public static Set getInclusivePrefixes(Element target, boolean excludeVisible) {
-        Set result = new HashSet();
+    public static List getInclusivePrefixes(Element target, boolean excludeVisible) {
+        List result = new Vector();
         Node parent = target;
         while (!(Node.DOCUMENT_NODE == parent.getParentNode().getNodeType())) {
             parent = parent.getParentNode();
@@ -803,15 +840,6 @@ public class WSSecSignature extends WSSecBase {
     }
     
     /**
-     * Returns the SignatureElement.
-     * The method can be called any time after <code>prepare()</code>.
-     * @return The DOM Element of the signature.
-     */
-    public Element getSignatureElement() {
-        return sig.getElement();
-    }
-    
-    /**
      * Returns the BST Token element.
      * The method can be called any time after <code>prepare()</code>.
      * @return the BST Token element
@@ -869,9 +897,9 @@ public class WSSecSignature extends WSSecBase {
                 String pubKeyAlgo = certs[0].getPublicKey().getAlgorithm();
                 log.debug("Automatic signature algorithm detection: " + pubKeyAlgo);
                 if (pubKeyAlgo.equalsIgnoreCase("DSA")) {
-                    sigAlgo = XMLSignature.ALGO_ID_SIGNATURE_DSA;
+                    sigAlgo = WSConstants.DSA;
                 } else if (pubKeyAlgo.equalsIgnoreCase("RSA")) {
-                    sigAlgo = XMLSignature.ALGO_ID_SIGNATURE_RSA;
+                    sigAlgo = WSConstants.RSA;
                 } else {
                     throw new WSSecurityException(
                         WSSecurityException.FAILURE,

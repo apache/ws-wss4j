@@ -47,6 +47,8 @@ public abstract class AbstractCrypto extends CryptoBase {
         "org.apache.ws.security.crypto.merlin.file";
     public static final String OLD_CRYPTO_PROVIDER = 
         "org.apache.ws.security.crypto.merlin.keystore.provider";
+    public static final String OLD_CRYPTO_CERT_PROVIDER =
+        "org.apache.ws.security.crypto.merlin.cert.provider";
     
     /*
      * Crypto provider
@@ -260,7 +262,11 @@ public abstract class AbstractCrypto extends CryptoBase {
     
     protected String
     getCryptoProvider() {
-        return properties.getProperty(CRYPTO_PROVIDER);
+        String provider = properties.getProperty(CRYPTO_PROVIDER);
+        if (provider == null) {
+            provider = properties.getProperty(OLD_CRYPTO_CERT_PROVIDER);
+        }
+        return provider;
     }
     
     /**

@@ -33,14 +33,16 @@ import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.message.token.BinarySecurity;
+import org.apache.ws.security.message.token.DOMX509Data;
+import org.apache.ws.security.message.token.DOMX509IssuerSerial;
 import org.apache.ws.security.message.token.Reference;
 import org.apache.ws.security.message.token.SecurityTokenReference;
 import org.apache.ws.security.message.token.X509Security;
 import org.apache.ws.security.util.UUIDGenerator;
 import org.apache.ws.security.util.WSSecurityUtil;
+
 import org.apache.xml.security.keys.KeyInfo;
-import org.apache.xml.security.keys.content.X509Data;
-import org.apache.xml.security.keys.content.x509.XMLX509IssuerSerial;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Text;
@@ -243,7 +245,7 @@ public class WSSecEncryptedKey extends WSSecBase {
         if (encKeyId == null || "".equals(encKeyId)) {
             encKeyId = "EK-" + UUIDGenerator.getUUID();
         }
-        encryptedKeyElement.setAttribute("Id", encKeyId);
+        encryptedKeyElement.setAttributeNS(null, "Id", encKeyId);
 
         KeyInfo keyInfo = new KeyInfo(document);
         SecurityTokenReference secToken = new SecurityTokenReference(document);
@@ -270,10 +272,14 @@ public class WSSecEncryptedKey extends WSSecBase {
             break;
 
         case WSConstants.ISSUER_SERIAL:
-            XMLX509IssuerSerial data = new XMLX509IssuerSerial(document, remoteCert);
-            X509Data x509Data = new X509Data(document);
-            x509Data.add(data);
-            secToken.setX509IssuerSerial(x509Data);
+            String issuer = remoteCert.getIssuerX500Principal().getName();
+            java.math.BigInteger serialNumber = remoteCert.getSerialNumber();
+            DOMX509IssuerSerial domIssuerSerial = 
+                new DOMX509IssuerSerial(
+                    document, issuer, serialNumber
+                );
+            DOMX509Data domX509Data = new DOMX509Data(document, domIssuerSerial);
+            secToken.setX509Data(domX509Data);
             break;
 
         case WSConstants.BST_DIRECT_REFERENCE:
@@ -334,7 +340,7 @@ public class WSSecEncryptedKey extends WSSecBase {
         WSSecurityUtil.setNamespace(encryptedKey, WSConstants.ENC_NS, WSConstants.ENC_PREFIX);
         Element encryptionMethod = 
             doc.createElementNS(WSConstants.ENC_NS, WSConstants.ENC_PREFIX + ":EncryptionMethod");
-        encryptionMethod.setAttribute("Algorithm", keyTransportAlgo);
+        encryptionMethod.setAttributeNS(null, "Algorithm", keyTransportAlgo);
         encryptedKey.appendChild(encryptionMethod);
         return encryptedKey;
     }

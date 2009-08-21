@@ -46,6 +46,7 @@ import java.io.IOException;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 
+
 /**
  * Class STRTransform
  * 
@@ -87,6 +88,7 @@ public class STRTransform extends TransformSpi {
     protected String engineGetURI() {
         return STRTransform.TRANSFORM_URI;
     }
+    
 
     /**
      * Method enginePerformTransform
@@ -198,7 +200,7 @@ public class STRTransform extends TransformSpi {
 
             //
             // Alert: Hacks ahead According to WSS spec an Apex node must
-            // contain a default namespace. If none is availabe in the first
+            // contain a default namespace. If none is available in the first
             // node of the c14n output (this is the apex element) then we do
             // some editing to insert an empty default namespace
             // 
@@ -234,7 +236,13 @@ public class STRTransform extends TransformSpi {
                 log.debug("last result: ");
                 log.debug(bf1);
             }
-            return new XMLSignatureInput(bf1.getBytes());
+            XMLSignatureInput output = new XMLSignatureInput(bf1.getBytes());
+            //
+            // HACK-2 - Need to fool the ApacheTransform class that this XMLSignatureInput
+            // returns a node-set
+            //
+            output.setNodeSet(true);
+            return output;
         }
         // End of HACK
         catch (WSSecurityException ex) {
@@ -324,7 +332,7 @@ public class STRTransform extends TransformSpi {
         String prefix = 
             WSSecurityUtil.setNamespace(secRefE, WSConstants.WSSE_NS, WSConstants.WSSE_PREFIX);
         Element elem = doc.createElementNS(WSConstants.WSSE_NS, prefix + ":BinarySecurityToken");
-        elem.setAttribute("ValueType", X509Security.X509_V3_TYPE);
+        elem.setAttributeNS(null, "ValueType", X509Security.X509_V3_TYPE);
         Text certText = doc.createTextNode(Base64.encode(data)); // no line wrap
         elem.appendChild(certText);
         return elem;
