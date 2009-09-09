@@ -243,11 +243,11 @@ public class WSSecSignature extends WSSecBase {
                         java.util.Collections.singletonList(keyValue), keyInfoUri
                     );
             } catch (java.security.KeyException ex) {
-                    log.error("", ex);
-                    throw new WSSecurityException(
-                        WSSecurityException.FAILED_SIGNATURE, "noXMLSig", null, ex
-                    );
-                }
+                log.error("", ex);
+                throw new WSSecurityException(
+                    WSSecurityException.FAILED_SIGNATURE, "noXMLSig", null, ex
+                );
+            }
             break;
         default:
             throw new WSSecurityException(WSSecurityException.FAILURE, "unsupportedKeyId");
