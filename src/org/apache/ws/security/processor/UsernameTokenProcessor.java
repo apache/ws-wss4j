@@ -105,7 +105,7 @@ public class UsernameTokenProcessor implements Processor {
         // then delegate authentication to the callback handler
         //
         if (ut.isHashed() || WSConstants.PASSWORD_TEXT.equals(pwType) 
-            || (password != null && pwType == null)) {
+            || (password != null && (pwType == null || "".equals(pwType.trim())))) {
             WSPasswordCallback pwCb = 
                 new WSPasswordCallback(user, null, pwType, WSPasswordCallback.USERNAME_TOKEN);
             try {
