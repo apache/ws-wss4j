@@ -189,6 +189,9 @@ public abstract class AbstractCrypto extends CryptoBase {
     
     protected String
     getCryptoProvider() {
+        if (properties == null) {
+            return null;
+        }
         return properties.getProperty("org.apache.ws.security.crypto.merlin.cert.provider");
     }
 
