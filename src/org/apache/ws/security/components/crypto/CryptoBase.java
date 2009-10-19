@@ -313,6 +313,10 @@ public abstract class CryptoBase implements Crypto {
         Object issuerName = null;
         Certificate cert = null;
         
+        if (keystore == null) {
+            return null;
+        }
+        
         //
         // Convert the issuer DN to a java X500Principal object first. This is to ensure
         // interop with a DN constructed from .NET, where e.g. it uses "S" instead of "ST".
@@ -323,7 +327,7 @@ public abstract class CryptoBase implements Crypto {
         //
         try {
             X500Principal issuerRDN = new X500Principal(issuer);
-            issuerName =  createBCX509Name(issuerRDN.getName());
+            issuerName = createBCX509Name(issuerRDN.getName());
         } catch (java.lang.IllegalArgumentException ex) {
             issuerName = createBCX509Name(issuer);
         }
@@ -336,7 +340,7 @@ public abstract class CryptoBase implements Crypto {
                     // no cert chain, so lets check if getCertificate gives us a result.
                     cert = keystore.getCertificate(alias);
                     if (cert == null) {
-                        return null;
+                        continue;
                     }
                 } else {
                     cert = certs[0];
@@ -375,6 +379,9 @@ public abstract class CryptoBase implements Crypto {
     public String getAliasForX509Cert(byte[] skiBytes) throws WSSecurityException {
         Certificate cert = null;
 
+        if (keystore == null) {
+            return null;
+        }
         try {
             for (Enumeration e = keystore.aliases(); e.hasMoreElements();) {
                 String alias = (String) e.nextElement();
@@ -383,7 +390,7 @@ public abstract class CryptoBase implements Crypto {
                     // no cert chain, so lets check if getCertificate gives us a  result.
                     cert = keystore.getCertificate(alias);
                     if (cert == null) {
-                        return null;
+                        continue;
                     }
                 } else {
                     cert = certs[0];
@@ -429,8 +436,8 @@ public abstract class CryptoBase implements Crypto {
             Enumeration e = keystore.aliases();
             while (e.hasMoreElements()) {
                 String alias = (String) e.nextElement();
-                X509Certificate cert2 = (X509Certificate) keystore.getCertificate(alias);
-                if (cert2.equals(cert)) {
+                Certificate retrievedCert = keystore.getCertificate(alias);
+                if (retrievedCert != null && retrievedCert.equals(cert)) {
                     return alias;
                 }
             }
@@ -505,6 +512,10 @@ public abstract class CryptoBase implements Crypto {
     public String getAliasForX509CertThumb(byte[] thumb) throws WSSecurityException {
         Certificate cert = null;
         MessageDigest sha = null;
+        
+        if (keystore == null) {
+            return null;
+        }
 
         try {
             sha = MessageDigest.getInstance("SHA-1");
@@ -522,7 +533,7 @@ public abstract class CryptoBase implements Crypto {
                     // no cert chain, so lets check if getCertificate gives us a  result.
                     cert = keystore.getCertificate(alias);
                     if (cert == null) {
-                        return null;
+                        continue;
                     }
                 } else {
                     cert = certs[0];
@@ -745,7 +756,7 @@ public abstract class CryptoBase implements Crypto {
             // Use the certificates in the keystore as TrustAnchors
             java.security.cert.PKIXParameters param =
                 new java.security.cert.PKIXParameters(this.keystore);
-
+            
             // Do not check a revocation list
             param.setRevocationEnabled(false);
 
@@ -822,7 +833,7 @@ public abstract class CryptoBase implements Crypto {
                     // no cert chain, so lets check if getCertificate gives us a  result.
                     cert = store.getCertificate(alias);
                     if (cert == null) {
-                        return null;
+                        continue;
                     }
                     certs = new Certificate[]{cert};
                 } else {
