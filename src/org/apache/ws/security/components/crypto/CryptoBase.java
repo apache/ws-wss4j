@@ -310,7 +310,7 @@ public abstract class CryptoBase implements Crypto {
         //
         try {
             X500Principal issuerRDN = new X500Principal(issuer);
-            issuerName =  createBCX509Name(issuerRDN.getName());
+            issuerName = createBCX509Name(issuerRDN.getName());
         } catch (java.lang.IllegalArgumentException ex) {
             issuerName = createBCX509Name(issuer);
         }
@@ -515,7 +515,7 @@ public abstract class CryptoBase implements Crypto {
             for (Enumeration e = keystore.aliases(); e.hasMoreElements();) {
                 String alias = (String) e.nextElement();
                 Certificate retrievedCert = keystore.getCertificate(alias);
-                if (retrievedCert.equals(cert)) {
+                if (retrievedCert != null && retrievedCert.equals(cert)) {
                     return alias;
                 }
             }
@@ -828,9 +828,11 @@ public abstract class CryptoBase implements Crypto {
                     String alias = (String) truststoreAliases.nextElement();
                     X509Certificate cert = 
                         (X509Certificate) truststore.getCertificate(alias);
-                    TrustAnchor anchor = 
-                        new TrustAnchor(cert, cert.getExtensionValue(NAME_CONSTRAINTS_OID));
-                    set.add(anchor);
+                    if (cert != null) {
+                        TrustAnchor anchor = 
+                            new TrustAnchor(cert, cert.getExtensionValue(NAME_CONSTRAINTS_OID));
+                        set.add(anchor);
+                    }
                 }
             }
 
@@ -841,9 +843,11 @@ public abstract class CryptoBase implements Crypto {
                     String alias = (String) aliases.nextElement();
                     X509Certificate cert = 
                         (X509Certificate) keystore.getCertificate(alias);
-                    TrustAnchor anchor = 
-                        new TrustAnchor(cert, cert.getExtensionValue(NAME_CONSTRAINTS_OID));
-                    set.add(anchor);
+                    if (cert != null) {
+                        TrustAnchor anchor = 
+                            new TrustAnchor(cert, cert.getExtensionValue(NAME_CONSTRAINTS_OID));
+                        set.add(anchor);
+                    }
                 }
             }
 
