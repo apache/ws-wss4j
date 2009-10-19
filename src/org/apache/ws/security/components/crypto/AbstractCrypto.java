@@ -262,6 +262,9 @@ public abstract class AbstractCrypto extends CryptoBase {
     
     protected String
     getCryptoProvider() {
+        if (properties == null) {
+            return null;
+        }
         String provider = properties.getProperty(CRYPTO_PROVIDER);
         if (provider == null) {
             provider = properties.getProperty(OLD_CRYPTO_CERT_PROVIDER);
