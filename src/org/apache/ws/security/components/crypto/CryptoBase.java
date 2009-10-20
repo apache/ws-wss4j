@@ -334,7 +334,7 @@ public abstract class CryptoBase implements Crypto {
                 X509Certificate x509cert = (X509Certificate) cert;
                 if (x509cert.getSerialNumber().compareTo(serialNumber) == 0) {
                     Object certName = 
-                        createBCX509Name(x509cert.getIssuerDN().getName());
+                        createBCX509Name(x509cert.getIssuerX500Principal().getName());
                     if (certName.equals(issuerName)) {
                         return alias;
                     }
@@ -399,7 +399,7 @@ public abstract class CryptoBase implements Crypto {
                 X509Certificate x509cert = (X509Certificate) cert;
                 if (x509cert.getSerialNumber().compareTo(serialNumber) == 0) {
                     Object certName = 
-                        createBCX509Name(x509cert.getIssuerDN().getName());
+                        createBCX509Name(x509cert.getIssuerX500Principal().getName());
                     if (certName.equals(issuerName)) {
                         return x509cert;
                     }
@@ -419,7 +419,7 @@ public abstract class CryptoBase implements Crypto {
      * @throws WSSecurityException
      */
     public boolean isCertificateInKeyStore(X509Certificate cert) throws WSSecurityException {
-        String issuerString = cert.getIssuerDN().getName();
+        String issuerString = cert.getIssuerX500Principal().getName();
         BigInteger issuerSerial = cert.getSerialNumber();
         
         X509Certificate foundCert = getX509Certificate(issuerString, issuerSerial);
@@ -430,7 +430,9 @@ public abstract class CryptoBase implements Crypto {
         //
         if (foundCert != null && foundCert.equals(cert)) {
             if (log.isDebugEnabled()) {
-                log.debug("Direct trust for certificate with " + cert.getSubjectDN().getName());
+                log.debug(
+                    "Direct trust for certificate with " + cert.getSubjectX500Principal().getName()
+                );
             }
             return true;
         }

@@ -453,8 +453,8 @@ public class SignatureProcessor implements Processor {
             return false;
         }
 
-        String subjectString = cert.getSubjectDN().getName();
-        String issuerString = cert.getIssuerDN().getName();
+        String subjectString = cert.getSubjectX500Principal().getName();
+        String issuerString = cert.getIssuerX500Principal().getName();
         BigInteger issuerSerial = cert.getSerialNumber();
 
         if (log.isDebugEnabled()) {
