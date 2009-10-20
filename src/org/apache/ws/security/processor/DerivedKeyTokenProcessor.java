@@ -42,6 +42,7 @@ import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
 
 import java.io.IOException;
+import java.security.cert.X509Certificate;
 import java.util.List;
 
 /**
@@ -158,8 +159,13 @@ public class DerivedKeyTokenProcessor implements Processor {
                 // Now use the callback and get it
                 secret = getSecret(cb, uri);
             } else if (processor == null && keyIdentifierValue != null
-                && keyIdentifierValueType != null) {                
-                secret = getSecret(cb, keyIdentifierValue, keyIdentifierValueType); 
+                && keyIdentifierValueType != null) {
+                X509Certificate[] certs = str.getKeyIdentifier(crypto);
+                if (certs == null || certs.length < 1 || certs[0] == null) {
+                    this.secret = this.getSecret(cb, keyIdentifierValue, keyIdentifierValueType); 
+                } else {
+                    this.secret = this.getSecret(cb, crypto, certs);
+                }
             } else if (processor instanceof UsernameTokenProcessor) {
                 secret = ((UsernameTokenProcessor) processor).getDerivedKey(cb);
             } else if (processor instanceof EncryptedKeyProcessor) {
@@ -246,6 +252,55 @@ public class DerivedKeyTokenProcessor implements Processor {
             
         return pwcb.getKey();
     }
+    
+    private byte[] getSecret(
+        CallbackHandler cb,
+        Crypto crypto,
+        X509Certificate certs[]
+    ) throws WSSecurityException {
+        if (cb == null) {
+            throw new WSSecurityException(WSSecurityException.FAILURE, "noCallback");
+        }
+
+        String alias = crypto.getAliasForX509Cert(certs[0]);
+
+        WSPasswordCallback pwCb = 
+            new WSPasswordCallback(alias, WSPasswordCallback.DECRYPT);
+        try {
+            Callback[] callbacks = new Callback[]{pwCb};
+            cb.handle(callbacks);
+        } catch (IOException e) {
+            throw new WSSecurityException(
+                WSSecurityException.FAILURE,
+                "noPassword",
+                new Object[]{alias}, 
+                e
+            );
+        } catch (UnsupportedCallbackException e) {
+            throw new WSSecurityException(
+                WSSecurityException.FAILURE,
+                "noPassword",
+                new Object[]{alias}, 
+                e
+            );
+        }
+
+        String password = pwCb.getPassword();
+        if (password == null) {
+            throw new WSSecurityException(
+                WSSecurityException.FAILURE, "noPassword", new Object[]{alias}
+            );
+        }
+
+        java.security.Key privateKey;
+        try {
+            privateKey = crypto.getPrivateKey(alias, password);
+            return privateKey.getEncoded();
+        } catch (Exception e) {
+            throw new WSSecurityException(WSSecurityException.FAILED_CHECK, null, null, e);
+        }
+    }
+    
     
     /**
      * Returns the wsu:Id of the DerivedKeyToken
