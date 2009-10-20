@@ -485,7 +485,7 @@ public class SignatureProcessor implements Processor {
                 
                 if (certs != null) {
                     returnCert[0] = certs[0];
-                    return certs[0].getSubjectDN();
+                    return certs[0].getSubjectX500Principal();
                 } else if (publicKey != null) {
                     return new PublicKeyPrincipal(publicKey);
                 } else if (ut != null) {

@@ -350,7 +350,7 @@ public abstract class CryptoBase implements Crypto {
                 }
                 X509Certificate x509cert = (X509Certificate) cert;
                 if (!useSerialNumber || x509cert.getSerialNumber().compareTo(serialNumber) == 0) {
-                    Object certName = createBCX509Name(x509cert.getIssuerDN().getName());
+                    Object certName = createBCX509Name(x509cert.getIssuerX500Principal().getName());
                     if (certName.equals(issuerName)) {
                         return alias;
                     }
