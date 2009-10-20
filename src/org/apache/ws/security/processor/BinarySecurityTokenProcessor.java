@@ -86,6 +86,7 @@ public class BinarySecurityTokenProcessor  implements Processor {
             0, 
             new WSSecurityEngineResult(WSConstants.BST, this.token, this.certificates)
         );
+        id = elem.getAttributeNS(WSConstants.WSU_NS, "Id");
     }
     
     /**

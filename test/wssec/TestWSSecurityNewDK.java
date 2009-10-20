@@ -34,6 +34,7 @@ import org.apache.ws.security.message.WSSecDKEncrypt;
 import org.apache.ws.security.message.WSSecDKSign;
 import org.apache.ws.security.message.WSSecEncryptedKey;
 import org.apache.ws.security.message.WSSecHeader;
+import org.apache.ws.security.message.token.SecurityTokenReference;
 import org.apache.xml.security.signature.XMLSignature;
 import org.w3c.dom.Document;
 
@@ -44,6 +45,7 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.security.cert.X509Certificate;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
@@ -224,6 +226,76 @@ public class TestWSSecurityNewDK extends TestCase implements CallbackHandler {
          verify(doc);
      }
      
+     
+     /**
+      * A test for WSS-211 - "WSS4J does not support ThumbprintSHA1 in DerivedKeyTokens".
+      * Here we're signing the SOAP body, where the signature refers to a DerivedKeyToken
+      * which uses a Thumbprint-SHA1 reference to the encoded certificate (which is in the
+      * keystore)
+      */
+     public void testSignatureThumbprintSHA1() throws Exception {
+         SOAPEnvelope unsignedEnvelope = message.getSOAPEnvelope();
+         Document doc = unsignedEnvelope.getAsDocument();
+         WSSecHeader secHeader = new WSSecHeader();
+         secHeader.insertSecurityHeader(doc);
+
+         SecurityTokenReference secToken = new SecurityTokenReference(doc);
+         X509Certificate[] certs = crypto.getCertificates("wss4jcert");
+         secToken.setKeyIdentifierThumb(certs[0]);
+         secToken.getElement();
+         
+         WSSecDKSign sigBuilder = new WSSecDKSign();
+         java.security.Key key = crypto.getPrivateKey("wss4jcert", "security");
+         sigBuilder.setExternalKey(key.getEncoded(), secToken.getElement());
+         sigBuilder.setSignatureAlgorithm(XMLSignature.ALGO_ID_MAC_HMAC_SHA1);
+         sigBuilder.build(doc, secHeader);
+         
+         sigBuilder.appendSigToHeader(secHeader);
+         
+         if (LOG.isDebugEnabled()) {
+             LOG.debug("Encrypted message: ThumbprintSHA1 + DerivedKeys");
+             String outputString = 
+                 org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+             LOG.debug(outputString);
+         }
+         verify(doc);
+     }
+     
+     
+     /**
+      * Here we're signing the SOAP body, where the signature refers to a DerivedKeyToken
+      * which uses an SKI reference to the encoded certificate (which is in the
+      * keystore)
+      */
+     public void testSignatureSKI() throws Exception {
+         SOAPEnvelope unsignedEnvelope = message.getSOAPEnvelope();
+         Document doc = unsignedEnvelope.getAsDocument();
+         WSSecHeader secHeader = new WSSecHeader();
+         secHeader.insertSecurityHeader(doc);
+
+         SecurityTokenReference secToken = new SecurityTokenReference(doc);
+         X509Certificate[] certs = crypto.getCertificates("wss4jcert");
+         secToken.setKeyIdentifierSKI(certs[0], crypto);
+         secToken.getElement();
+         
+         WSSecDKSign sigBuilder = new WSSecDKSign();
+         java.security.Key key = crypto.getPrivateKey("wss4jcert", "security");
+         sigBuilder.setExternalKey(key.getEncoded(), secToken.getElement());
+         sigBuilder.setSignatureAlgorithm(XMLSignature.ALGO_ID_MAC_HMAC_SHA1);
+         sigBuilder.build(doc, secHeader);
+         
+         sigBuilder.appendSigToHeader(secHeader);
+         
+         if (LOG.isDebugEnabled()) {
+             LOG.debug("Encrypted message: SKI + DerivedKeys");
+             String outputString = 
+                 org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+             LOG.debug(outputString);
+         }
+         verify(doc);
+     }
+     
+     
      public void testSignatureEncrypt() throws Exception {
         SOAPEnvelope unsignedEnvelope = message.getSOAPEnvelope();
         Document doc = unsignedEnvelope.getAsDocument();
@@ -320,7 +392,7 @@ public class TestWSSecurityNewDK extends TestCase implements CallbackHandler {
             org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
         assertTrue(outputString.indexOf("LogTestService2") > 0 ? true : false);
     }
-
+    
     public void handle(Callback[] callbacks)
         throws IOException, UnsupportedCallbackException {
         for (int i = 0; i < callbacks.length; i++) {
