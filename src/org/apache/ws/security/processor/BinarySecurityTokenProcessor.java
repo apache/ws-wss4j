@@ -118,7 +118,7 @@ public class BinarySecurityTokenProcessor  implements Processor {
      */
     private void createSecurityToken(Element element) throws WSSecurityException {
         this.token = new BinarySecurity(element);
-        String type = token.getValueType();
+        type = token.getValueType();
 
         if (X509Security.X509_V3_TYPE.equals(type)) {
             this.token = new X509Security(element);

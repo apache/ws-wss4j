@@ -52,6 +52,7 @@ public class DerivedKeyTokenProcessor implements Processor {
 
     private String id;
     private byte[] keyBytes;
+    private DerivedKeyToken dkt;
     
     private byte[] secret;
     private int length;
@@ -71,7 +72,7 @@ public class DerivedKeyTokenProcessor implements Processor {
     ) throws WSSecurityException {
         
         // Deserialize the DKT
-        DerivedKeyToken dkt = new DerivedKeyToken(elem);
+        dkt = new DerivedKeyToken(elem);
         this.extractSecret(wsDocInfo, dkt, cb, crypto);
         
         String tempNonce = dkt.getNonce();
@@ -325,6 +326,13 @@ public class DerivedKeyTokenProcessor implements Processor {
         this.length = len;
         this.deriveKey();
         return keyBytes;
+    }
+    
+    /**
+     * Return the DerivedKeyToken object
+     */
+    public DerivedKeyToken getDerivedKeyToken() {
+        return dkt;
     }
     
 }
