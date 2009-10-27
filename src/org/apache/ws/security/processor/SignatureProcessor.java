@@ -312,10 +312,15 @@ public class SignatureProcessor implements Processor {
                 } else if (processor instanceof BinarySecurityTokenProcessor) {
                     certs = ((BinarySecurityTokenProcessor)processor).getCertificates();
                 } else if (processor instanceof EncryptedKeyProcessor) {
-                    secretKey = ((EncryptedKeyProcessor) processor).getDecryptedBytes();
-                // } else if (processor instanceof SecurityContextTokenProcessor) {
-                //    this.secret = ((SecurityContextTokenProcessor) processor).getSecret();
-                }  else if (processor instanceof DerivedKeyTokenProcessor) {
+                    EncryptedKeyProcessor ekProcessor = (EncryptedKeyProcessor)processor;
+                    secretKey = ekProcessor.getDecryptedBytes();
+                    customTokenId = ekProcessor.getId();
+                } else if (processor instanceof SecurityContextTokenProcessor) {
+                    SecurityContextTokenProcessor sctProcessor = 
+                        (SecurityContextTokenProcessor)processor;
+                    secretKey = sctProcessor.getSecret();
+                    customTokenId = sctProcessor.getIdentifier();
+                } else if (processor instanceof DerivedKeyTokenProcessor) {
                     DerivedKeyTokenProcessor dktProcessor = 
                         (DerivedKeyTokenProcessor) processor;
                     String signatureMethodURI = sig.getSignedInfo().getSignatureMethodURI();
@@ -324,7 +329,7 @@ public class SignatureProcessor implements Processor {
                         WSSecurityUtil.getKeyLength(signatureMethodURI);
                     
                     secretKey = dktProcessor.getKeyBytes(keyLength);
-                }  else if (processor instanceof SAMLTokenProcessor) {
+                } else if (processor instanceof SAMLTokenProcessor) {
                     if (crypto == null) {
                         throw new WSSecurityException(
                             WSSecurityException.FAILURE, "noSigCryptoFile"
