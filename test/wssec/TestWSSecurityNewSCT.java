@@ -26,6 +26,7 @@ import java.util.Hashtable;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
+import javax.xml.crypto.dsig.SignatureMethod;
 
 import junit.framework.TestCase;
 
@@ -41,6 +42,7 @@ import org.apache.ws.security.message.WSSecDKEncrypt;
 import org.apache.ws.security.message.WSSecDKSign;
 import org.apache.ws.security.message.WSSecHeader;
 import org.apache.ws.security.message.WSSecSecurityContextToken;
+import org.apache.ws.security.message.WSSecSignature;
 import org.apache.xml.security.signature.XMLSignature;
 import org.w3c.dom.Document;
 
@@ -281,6 +283,53 @@ public class TestWSSecurityNewSCT extends TestCase implements CallbackHandler {
             fail(e.getMessage());
         }
     }
+    
+    /**
+     * Test signature and verification using a SecurityContextToken directly,
+     * rather than using a DerivedKeyToken to point to a SecurityContextToken.
+     * See WSS-216 - https://issues.apache.org/jira/browse/WSS-216
+     */
+    public void testSCTSign() {
+        try {
+            Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
+            WSSecHeader secHeader = new WSSecHeader();
+            secHeader.insertSecurityHeader(doc);
+
+            WSSecSecurityContextToken sctBuilder = new WSSecSecurityContextToken();
+            sctBuilder.prepare(doc, crypto);
+
+            SecureRandom random = SecureRandom.getInstance("SHA1PRNG");
+            byte[] tempSecret = new byte[16];
+            random.nextBytes(tempSecret);
+
+            // Store the secret
+            this.secrets.put(sctBuilder.getIdentifier(), tempSecret);
+
+            String tokenId = sctBuilder.getSctId();
+
+            WSSecSignature builder = new WSSecSignature();
+            builder.setSecretKey(tempSecret);
+            builder.setKeyIdentifierType(WSConstants.CUSTOM_SYMM_SIGNING_DIRECT);
+            builder.setCustomTokenId(tokenId);
+            builder.setSignatureAlgorithm(SignatureMethod.HMAC_SHA1);
+            builder.build(doc, crypto, secHeader);
+            
+            sctBuilder.prependSCTElementToHeader(doc, secHeader);
+            
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("SCT sign");
+                String outputString = 
+                    org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+                LOG.debug(outputString);
+            }
+
+            verify(doc);
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail(e.getMessage());
+        }
+    }
+    
     
     /**
      * Verifies the soap envelope <p/>

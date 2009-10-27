@@ -290,8 +290,11 @@ public class SignatureProcessor implements Processor {
                             (EncryptedKeyProcessor)processor;
                         secretKey = encryptedKeyProcessor.getDecryptedBytes();
                         principal = new CustomTokenPrincipal(encryptedKeyProcessor.getId());
-                    // } else if (processor instanceof SecurityContextTokenProcessor) {
-                    //    this.secret = ((SecurityContextTokenProcessor) processor).getSecret();
+                    } else if (processor instanceof SecurityContextTokenProcessor) {
+                        SecurityContextTokenProcessor sctProcessor = 
+                            (SecurityContextTokenProcessor)processor;
+                        secretKey = sctProcessor.getSecret();
+                        principal = new CustomTokenPrincipal(sctProcessor.getIdentifier());
                     }  else if (processor instanceof DerivedKeyTokenProcessor) {
                         DerivedKeyTokenProcessor dktProcessor = 
                             (DerivedKeyTokenProcessor) processor;
