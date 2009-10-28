@@ -57,6 +57,7 @@ public class RequestData {
     private WSSConfig wssConfig = null;
     private Vector signatureValues = new Vector();
     private WSSecHeader secHeader = null;
+    private boolean encSymmetricEncryptionKey = true;
 
     public void clear() {
         soapConstants = null;
@@ -69,6 +70,7 @@ public class RequestData {
         wssConfig = null;
         signatureValues.clear();
         signatureDigestAlgorithm = null;
+        encSymmetricEncryptionKey = true;
         signatureUser = null;
     }
 
@@ -110,6 +112,14 @@ public class RequestData {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+    
+    public void setEncryptSymmetricEncryptionKey(boolean encrypt) {
+        encSymmetricEncryptionKey = encrypt;
+    }
+    
+    public boolean getEncryptSymmetricEncryptionKey() {
+        return encSymmetricEncryptionKey;
     }
 
     public String getPwType() {

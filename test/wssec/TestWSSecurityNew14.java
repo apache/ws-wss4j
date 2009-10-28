@@ -27,11 +27,14 @@ import org.apache.axis.configuration.NullProvider;
 import org.apache.axis.message.SOAPEnvelope;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
+import org.apache.ws.security.handler.RequestData;
+import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.message.WSSecEncrypt;
 import org.apache.ws.security.message.WSSecSignature;
 import org.apache.ws.security.message.WSSecHeader;
@@ -303,6 +306,49 @@ public class TestWSSecurityNew14 extends TestCase implements CallbackHandler {
         LOG.info("After Encrypting EncryptedKeySHA1....");
         verify(encryptedDoc);
     }
+    
+    
+    /**
+     * Test that encrypts using EncryptedKeySHA1, where it uses a symmetric key, rather than a 
+     * generated session key which is then encrypted using a public key. The request is generated
+     * using WSHandler, instead of coding it.
+     * 
+     * @throws java.lang.Exception Thrown when there is any problem in encryption or decryption
+     * 
+     */
+    public void testEncryptionSHA1SymmetricBytesHandler() throws Exception {
+        final WSSConfig cfg = WSSConfig.getNewInstance();
+        final RequestData reqData = new RequestData();
+        reqData.setWssConfig(cfg);
+        java.util.Map messageContext = new java.util.TreeMap();
+        messageContext.put(WSHandlerConstants.ENC_SYM_ENC_KEY, "false");
+        messageContext.put(WSHandlerConstants.ENC_KEY_ID, "EncryptedKeySHA1");
+        messageContext.put(WSHandlerConstants.PW_CALLBACK_REF, this);
+        reqData.setMsgContext(messageContext);
+        reqData.setUsername("");
+        
+        final java.util.Vector actions = new java.util.Vector();
+        actions.add(new Integer(WSConstants.ENCR));
+        
+        Document doc = unsignedEnvelope.getAsDocument();
+        MyHandler handler = new MyHandler();
+        handler.send(
+            WSConstants.ENCR, 
+            doc, 
+            reqData, 
+            actions,
+            true
+        );
+        
+        String outputString = 
+            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(outputString);
+        }
+        
+        verify(doc);
+    }
+    
 
     /**
      * Verifies the soap envelope.

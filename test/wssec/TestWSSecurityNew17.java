@@ -41,9 +41,12 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSPasswordCallback;
+import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
+import org.apache.ws.security.handler.RequestData;
+import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.message.WSSecEncrypt;
 import org.apache.ws.security.message.WSSecEncryptedKey;
 import org.apache.ws.security.message.WSSecHeader;
@@ -240,6 +243,55 @@ public class TestWSSecurityNew17 extends TestCase implements CallbackHandler {
         LOG.info("After Sign/Encryption....");
         verify(encryptedSignedDoc);
     }
+    
+    
+    /**
+     * Test signing a message body using a symmetric key with EncryptedKeySHA1. 
+     * The request is generated using WSHandler, instead of coding it.
+     */
+    public void testSymmetricSignatureSHA1Handler() throws Exception {
+        final WSSConfig cfg = WSSConfig.getNewInstance();
+        RequestData reqData = new RequestData();
+        reqData.setWssConfig(cfg);
+        java.util.Map messageContext = new java.util.TreeMap();
+        messageContext.put(WSHandlerConstants.SIG_KEY_ID, "EncryptedKeySHA1");
+        messageContext.put(WSHandlerConstants.SIG_ALGO, SignatureMethod.HMAC_SHA1);
+        messageContext.put(WSHandlerConstants.PW_CALLBACK_REF, this);
+        reqData.setMsgContext(messageContext);
+        reqData.setUsername("");
+        
+        final java.util.Vector actions = new java.util.Vector();
+        actions.add(new Integer(WSConstants.SIGN));
+        
+        SOAPEnvelope unsignedEnvelope = message.getSOAPEnvelope();
+        Document doc = unsignedEnvelope.getAsDocument();
+        MyHandler handler = new MyHandler();
+        handler.send(
+            WSConstants.SIGN, 
+            doc, 
+            reqData, 
+            actions,
+            true
+        );
+        
+        String outputString = 
+            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(outputString);
+        }
+        
+        reqData = new RequestData();
+        reqData.setWssConfig(WSSConfig.getNewInstance());
+        messageContext = new java.util.TreeMap();
+        messageContext.put(WSHandlerConstants.PW_CALLBACK_REF, this);
+        reqData.setMsgContext(messageContext);
+        reqData.setUsername("");
+        
+        handler.receive(WSConstants.SIGN, reqData);
+        
+        verify(doc);
+    }
+    
 
     /**
      * Verifies the soap envelope
