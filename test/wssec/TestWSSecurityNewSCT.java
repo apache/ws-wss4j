@@ -215,6 +215,51 @@ public class TestWSSecurityNewSCT extends TestCase implements CallbackHandler {
         }
     }
     
+    /**
+     * Test for WSS-217:
+     * "Add ability to specify a reference to an absolute URI in the derived key functionality".
+     */
+    public void testSCTKDKTSignAbsolute() {
+        try {
+            SOAPEnvelope unsignedEnvelope = message.getSOAPEnvelope();
+            Document doc = unsignedEnvelope.getAsDocument();
+            WSSecHeader secHeader = new WSSecHeader();
+            secHeader.insertSecurityHeader(doc);
+
+            WSSecSecurityContextToken sctBuilder = new WSSecSecurityContextToken();
+            sctBuilder.prepare(doc, crypto);
+
+            SecureRandom random = SecureRandom.getInstance("SHA1PRNG");
+            byte[] tempSecret = new byte[16];
+            random.nextBytes(tempSecret);
+
+            // Store the secret
+            this.secrets.put(sctBuilder.getIdentifier(), tempSecret);
+
+            // Derived key signature
+            WSSecDKSign sigBuilder = new WSSecDKSign();
+            sigBuilder.setExternalKey(tempSecret, sctBuilder.getIdentifier());
+            sigBuilder.setTokenIdDirectId(true);
+            sigBuilder.setSignatureAlgorithm(XMLSignature.ALGO_ID_MAC_HMAC_SHA1);
+            sigBuilder.build(doc, secHeader);
+            
+            sctBuilder.prependSCTElementToHeader(doc, secHeader);
+
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("DKT Absolute");
+                String outputString = 
+                    org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+                LOG.debug(outputString);
+            }
+
+            verify(doc);
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail(e.getMessage());
+        }
+    }
+
+    
     public void testSCTKDKTSignEncrypt() {
         try {
             SOAPEnvelope unsignedEnvelope = message.getSOAPEnvelope();
@@ -334,7 +379,8 @@ public class TestWSSecurityNewSCT extends TestCase implements CallbackHandler {
 
             WSSecSignature builder = new WSSecSignature();
             builder.setSecretKey(tempSecret);
-            builder.setKeyIdentifierType(WSConstants.CUSTOM_SYMM_SIGNING_DIRECT);
+            builder.setKeyIdentifierType(WSConstants.CUSTOM_SYMM_SIGNING);
+            builder.setCustomTokenValueType(WSConstants.WSC_SCT);
             builder.setCustomTokenId(tokenId);
             builder.setSignatureAlgorithm(SignatureMethod.HMAC_SHA1);
             builder.build(doc, crypto, secHeader);
@@ -354,7 +400,6 @@ public class TestWSSecurityNewSCT extends TestCase implements CallbackHandler {
             fail(e.getMessage());
         }
     }
-    
     
     /**
      * Verifies the soap envelope <p/>
