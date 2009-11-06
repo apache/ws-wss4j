@@ -64,7 +64,7 @@ public abstract class WSSecDerivedKeyBase extends WSSecBase {
      * wsu:Id of the wsc:DerivedKeyToken
      */
     protected String dktId = null;
-
+    
     /**
      * Client's label value
      */
@@ -85,6 +85,12 @@ public abstract class WSSecDerivedKeyBase extends WSSecBase {
      * is (or to be) derived from.
      */
     protected String tokenIdentifier = null;
+    
+    /**
+     * True if the tokenIdentifier is a direct reference to a key identifier
+     * instead of a URI to a key
+     */
+    protected boolean tokenIdDirectId;
 
     /**
      * The derived key will change depending on the sig/encr algorithm.
@@ -208,7 +214,12 @@ public abstract class WSSecDerivedKeyBase extends WSSecBase {
             //Create the SecurityTokenRef to the Encrypted Key
             SecurityTokenReference strEncKey = new SecurityTokenReference(document);
             Reference ref = new Reference(document);
-            ref.setURI("#" + tokenIdentifier);
+            
+            if (tokenIdDirectId) {
+                ref.setURI(tokenIdentifier);
+            } else {
+                ref.setURI("#" + tokenIdentifier);
+            }
             if (customValueType != null && customValueType.trim().length() > 0) {
                 ref.setValueType(customValueType);
             }
@@ -258,5 +269,9 @@ public abstract class WSSecDerivedKeyBase extends WSSecBase {
 
     public void setCustomValueType(String customValueType) {
         this.customValueType = customValueType;
+    }
+    
+    public void setTokenIdDirectId(boolean b) {
+        tokenIdDirectId = b;
     }
 }
