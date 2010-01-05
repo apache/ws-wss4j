@@ -90,7 +90,7 @@ public abstract class WSHandler {
 
         WSSConfig wssConfig = reqData.getWssConfig();
         if (wssConfig == null) {
-            wssConfig = WSSConfig.getNewInstance();
+            wssConfig = secEngine.getWssConfig();
         }
 
         boolean enableSigConf = decodeEnableSignatureConfirmation(reqData);
@@ -252,7 +252,7 @@ public abstract class WSHandler {
 
         WSSConfig wssConfig = reqData.getWssConfig();
         if (wssConfig == null) {
-            wssConfig = WSSConfig.getNewInstance();
+            wssConfig = secEngine.getWssConfig();
         }
         boolean enableSigConf = decodeEnableSignatureConfirmation(reqData);
         wssConfig.setEnableSignatureConfirmation(
