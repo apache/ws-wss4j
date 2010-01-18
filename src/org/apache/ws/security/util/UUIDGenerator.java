@@ -26,10 +26,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * UUID generator (taken from Axis2) 
+ * UUID generator (taken from Axis2)
  */
 public class UUIDGenerator {
-    
+
     private static final Log log = LogFactory.getLog(UUIDGenerator.class);
 
     private static String baseUUID = null;
@@ -44,7 +44,7 @@ public class UUIDGenerator {
      *
      * @return string
      */
-    public static String getUUID() {
+    public static synchronized String getUUID() {
         if (baseUUID == null) {
             getInitialUUID();
         }
