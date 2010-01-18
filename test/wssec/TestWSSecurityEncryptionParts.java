@@ -180,7 +180,17 @@ public class TestWSSecurityEncryptionParts extends TestCase implements CallbackH
         assertTrue(outputString.indexOf("wsse11:EncryptedHeader") != -1);
         assertTrue(outputString.indexOf("foo:foobar") == -1);
         
-        verify(encryptedDoc);
+        List results = verify(encryptedDoc);
+        
+        WSSecurityEngineResult actionResult =
+                WSSecurityUtil.fetchActionResult(results, WSConstants.ENCR);
+        assertTrue(actionResult != null);
+        final java.util.List refs =
+            (java.util.List) actionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
+        assertTrue(actionResult != null && !actionResult.isEmpty());
+        WSDataRef wsDataRef = (WSDataRef)refs.get(0);
+        String xpath = wsDataRef.getXpath();
+        assertEquals("/soapenv:Envelope/soapenv:Header/foo:foobar", xpath);
     }
     
     /**
