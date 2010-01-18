@@ -249,7 +249,7 @@ public class ReferenceListProcessor implements Processor {
             parent.getParentNode().appendChild(decryptedHeaderClone);
             parent.getParentNode().removeChild(parent);
             dataRef.setProtectedElement(decryptedHeaderClone);
-            dataRef.setXpath(getXPath(decryptedHeader));
+            dataRef.setXpath(getXPath(decryptedHeaderClone));
         } else if (content) {
             dataRef.setProtectedElement(encData);
             dataRef.setXpath(getXPath(encData));
