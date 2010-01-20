@@ -135,6 +135,8 @@ public class TestWSSecurityNewST3 extends TestCase implements CallbackHandler {
         SAMLAssertion assertion = saml.newAssertion();
 
         WSSecSignatureSAML wsSign = new WSSecSignatureSAML();
+        wsSign.setDigestAlgo("http://www.w3.org/2001/04/xmlenc#sha256");
+        wsSign.setSignatureAlgorithm("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256");
         wsSign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
         wsSign.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
 
@@ -149,12 +151,14 @@ public class TestWSSecurityNewST3 extends TestCase implements CallbackHandler {
         Document signedDoc = wsSign.build(doc, crypto, assertion, null, null, null, secHeader);
         LOG.info("After SAMLSignedKeyHolder....");
 
+        String outputString = 
+            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed SAML message (key holder):");
-            String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
+        assertTrue(outputString.indexOf("http://www.w3.org/2001/04/xmlenc#sha256") != -1);
+        assertTrue(outputString.indexOf("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256") != -1);
         
         Vector results = verify(signedDoc);
         WSSecurityEngineResult actionResult =

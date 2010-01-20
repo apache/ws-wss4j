@@ -532,7 +532,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
                                 getInclusivePrefixes(toSignById)
                             ).getElement());
                     }
-                    sig.addDocument("#" + idToSign, transforms);
+                    sig.addDocument("#" + idToSign, transforms, this.getDigestAlgo());
                 } else if (elemName.equals("Token")) {
                     transforms.addTransform(Transforms.TRANSFORM_C14N_EXCL_OMIT_COMMENTS);
                     if (keyIdentifierType == WSConstants.BST_DIRECT_REFERENCE) {
@@ -543,7 +543,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
                                     getInclusivePrefixes(secHeader.getSecurityHeader())
                                 ).getElement());
                         }
-                        sig.addDocument("#" + certUri, transforms);
+                        sig.addDocument("#" + certUri, transforms, this.getDigestAlgo());
                     } else {
                         if (wssConfig.isWsiBSPCompliant()) {
                             transforms.item(0).getElement().appendChild(
@@ -552,12 +552,12 @@ public class WSSecSignatureSAML extends WSSecSignature {
                                     getInclusivePrefixes(keyInfo.getElement())
                                 ).getElement());
                         }
-                        sig.addDocument("#" + keyInfoUri, transforms);
+                        sig.addDocument("#" + keyInfoUri, transforms, this.getDigestAlgo());
                     }
                 } else if (elemName.equals("STRTransform")) { // STRTransform
                     Element ctx = createSTRParameter(document);
                     transforms.addTransform(STRTransform.implementedTransformURI, ctx);
-                    sig.addDocument("#" + strUri, transforms);
+                    sig.addDocument("#" + strUri, transforms, this.getDigestAlgo());
                 } else {
                     Element body = 
                         (Element) WSSecurityUtil.findElement(envelope, elemName, nmSpace);
@@ -575,7 +575,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
                                 getInclusivePrefixes(body)
                             ).getElement());
                     }
-                    sig.addDocument("#" + setWsuId(body), transforms);
+                    sig.addDocument("#" + setWsuId(body), transforms, this.getDigestAlgo());
                 }
             } catch (TransformationException e1) {
                 throw new WSSecurityException(

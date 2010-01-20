@@ -84,6 +84,12 @@ public class SAMLTokenSignedAction implements Action {
         if (reqData.getSigKeyId() != 0) {
             wsSign.setKeyIdentifierType(reqData.getSigKeyId());
         }
+        if (reqData.getSigAlgorithm() != null) {
+            wsSign.setSignatureAlgorithm(reqData.getSigAlgorithm());
+        }
+        if (reqData.getSigDigestAlgorithm() != null) {
+            wsSign.setDigestAlgo(reqData.getSigDigestAlgorithm());
+        }
 
          /*
          * required to add support for the 
