@@ -65,7 +65,7 @@ public class TestWSSecurityNew11 extends TestCase {
         + "</SOAP-ENV:Envelope>";
     
     private WSSecurityEngine secEngine = new WSSecurityEngine();
-    private Crypto crypto = CryptoFactory.getInstance("cryptoSKI.properties");
+    private Crypto crypto = CryptoFactory.getInstance("wss40.properties");
     private MessageContext msgContext;
     private SOAPEnvelope unsignedEnvelope;
 
@@ -126,7 +126,7 @@ public class TestWSSecurityNew11 extends TestCase {
      */
     public void testX509SignatureDirectSTR() throws Exception {
         WSSecSignature builder = new WSSecSignature();
-        builder.setUserInfo("wss4jcert", "security");
+        builder.setUserInfo("wss40", "security");
         // builder.setUserInfo("john", "keypass");
         SOAPConstants soapConstants = WSSecurityUtil.getSOAPConstants(unsignedEnvelope.getAsDOM());
         Vector parts = new Vector();
@@ -176,7 +176,7 @@ public class TestWSSecurityNew11 extends TestCase {
      */
     public void testWSS96() throws Exception {
         WSSecSignature builder = new WSSecSignature();
-        builder.setUserInfo("wss4jcert", "security");
+        builder.setUserInfo("wss40", "security");
         SOAPConstants soapConstants = WSSecurityUtil.getSOAPConstants(unsignedEnvelope.getAsDOM());
         Vector parts = new Vector();
         
@@ -234,7 +234,7 @@ public class TestWSSecurityNew11 extends TestCase {
      */
     public void testX509SignatureISSTR() throws Exception {
         WSSecSignature builder = new WSSecSignature();
-        builder.setUserInfo("wss4jcert", "security");
+        builder.setUserInfo("wss40", "security");
         // builder.setUserInfo("john", "keypass");
         SOAPConstants soapConstants = WSSecurityUtil.getSOAPConstants(unsignedEnvelope.getAsDOM());
         Vector parts = new Vector();
@@ -288,7 +288,7 @@ public class TestWSSecurityNew11 extends TestCase {
      */
     public void testX509SignatureSKISTR() throws Exception {
         WSSecSignature builder = new WSSecSignature();
-        builder.setUserInfo("wss4jcert", "security");
+        builder.setUserInfo("wss40", "security");
         // builder.setUserInfo("john", "keypass");
         SOAPConstants soapConstants = WSSecurityUtil.getSOAPConstants(unsignedEnvelope.getAsDOM());
         Vector parts = new Vector();

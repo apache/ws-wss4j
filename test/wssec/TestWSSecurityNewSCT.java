@@ -71,7 +71,7 @@ public class TestWSSecurityNewSCT extends TestCase implements CallbackHandler {
         + "</SOAP-ENV:Envelope>";
 
     private WSSecurityEngine secEngine = new WSSecurityEngine();
-    private Crypto crypto = CryptoFactory.getInstance("cryptoSKI.properties");
+    private Crypto crypto = CryptoFactory.getInstance("wss40.properties");
     private MessageContext msgContext;
     private Message message;
 

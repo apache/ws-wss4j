@@ -79,7 +79,7 @@ public class TestWSSecurityDataRef extends TestCase implements CallbackHandler {
         + "</SOAP-ENV:Envelope>";
     
     private WSSecurityEngine secEngine = new WSSecurityEngine();
-    private Crypto crypto = CryptoFactory.getInstance("cryptoSKI.properties");
+    private Crypto crypto = CryptoFactory.getInstance("wss40.properties");
     private MessageContext msgContext;
     private Message message;
 
@@ -139,7 +139,7 @@ public class TestWSSecurityDataRef extends TestCase implements CallbackHandler {
       
         SOAPEnvelope unsignedEnvelope = message.getSOAPEnvelope();
         WSSecEncrypt builder = new WSSecEncrypt();
-        builder.setUserInfo("wss4jcert");
+        builder.setUserInfo("wss40");
         builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
         builder.setSymmetricEncAlgorithm(WSConstants.TRIPLE_DES);
         Document doc = unsignedEnvelope.getAsDocument();
