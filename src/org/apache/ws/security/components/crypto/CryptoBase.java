@@ -213,7 +213,8 @@ public abstract class CryptoBase implements Crypto {
             log.error(msg + logMsg);
             throw new Exception(msg);
         }
-        Key keyTmp = keystore.getKey(alias, password.toCharArray());
+        
+        Key keyTmp = keystore.getKey(alias, password == null ? new char[]{} : password.toCharArray());
         if (!(keyTmp instanceof PrivateKey)) {
             String msg = "Key is not a private key, alias: [" + alias + "]";
             String logMsg = createKeyStoreErrorMessage(keystore);
