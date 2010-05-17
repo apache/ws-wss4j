@@ -1,19 +1,20 @@
-/*
- * Copyright  2003-2006 The Apache Software Foundation, or their licensors, as
- * appropriate.
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
  *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 
 package org.apache.ws.security.processor;
@@ -44,6 +45,8 @@ import org.apache.ws.security.message.token.UsernameToken;
 import org.apache.ws.security.message.token.X509Security;
 import org.apache.ws.security.saml.SAMLKeyInfo;
 import org.apache.ws.security.saml.SAMLUtil;
+import org.apache.ws.security.transform.STRTransform;
+import org.apache.ws.security.transform.STRTransformUtil;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.keys.KeyInfo;
@@ -51,6 +54,9 @@ import org.apache.xml.security.signature.Reference;
 import org.apache.xml.security.signature.SignedInfo;
 import org.apache.xml.security.signature.XMLSignature;
 import org.apache.xml.security.signature.XMLSignatureException;
+import org.apache.xml.security.signature.XMLSignatureInput;
+import org.apache.xml.security.transforms.Transform;
+import org.apache.xml.security.transforms.Transforms;
 import org.opensaml.SAMLAssertion;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -475,7 +481,53 @@ public class SignatureProcessor implements Processor {
                     }
                     String uri = siRef.getURI();
                     if (uri != null && !"".equals(uri)) {
-                        Element se = WSSecurityUtil.getElementByWsuId(elem.getOwnerDocument(), uri);
+                        
+                        Element se = null;
+                        try {
+                            Transforms transforms = siRef.getTransforms();
+                            for (int j = 0; j < transforms.getLength(); j++) {
+                                Transform transform = transforms.item(j);
+                                // We have some transforming to do before we can 
+                                // determine the protected element.
+                                if (STRTransform.implementedTransformURI
+                                        .equals(transform.getURI())) {
+                                    
+                                    XMLSignatureInput signatureInput = 
+                                        siRef.getContentsBeforeTransformation();
+                                    
+                                    if (signatureInput.isElement()) {
+                                        // The signature was already validated,
+                                        // meaning that this element was already
+                                        // parsed.  We can therefore be pretty
+                                        // confident that this constructor will work.
+                                        SecurityTokenReference secTokenRef = 
+                                            new SecurityTokenReference(
+                                                    (Element) signatureInput.getSubNode());
+                                        
+                                        // Use the utility to extract the element (or
+                                        // generate a new one in some cases) from the
+                                        // message.
+                                        se = STRTransformUtil.dereferenceSTR(
+                                                transform.getDocument(),
+                                                secTokenRef, wsDocInfo);
+                                    } else {
+                                        // The internal impl of Reference changed.
+                                        // We expect it to return the signature input
+                                        // based on a node/element.
+                                        throw new WSSecurityException(
+                                                WSSecurityException.FAILURE);
+                                    }
+                                }
+                            }
+                        }
+                        catch (XMLSecurityException e) {
+                            log.warn("Error processing signature coverage elements.", e);
+                            throw new WSSecurityException(WSSecurityException.FAILURE);
+                        }
+                        
+                        if (se == null) {
+                            se = WSSecurityUtil.getElementByWsuId(elem.getOwnerDocument(), uri);
+                        }
                         if (se == null) {
                             se = WSSecurityUtil.getElementByGenId(elem.getOwnerDocument(), uri);
                         }
