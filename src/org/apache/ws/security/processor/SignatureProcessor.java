@@ -43,20 +43,25 @@ import org.apache.ws.security.message.token.UsernameToken;
 import org.apache.ws.security.message.token.X509Security;
 import org.apache.ws.security.saml.SAMLKeyInfo;
 import org.apache.ws.security.saml.SAMLUtil;
+import org.apache.ws.security.transform.STRApacheTransform;
+import org.apache.ws.security.transform.STRTransformUtil;
 import org.apache.ws.security.util.WSSecurityUtil;
 
 import org.opensaml.SAMLAssertion;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 
 import javax.xml.crypto.MarshalException;
+import javax.xml.crypto.NodeSetData;
 import javax.xml.crypto.XMLStructure;
 import javax.xml.crypto.dom.DOMStructure;
 import javax.xml.crypto.dsig.Reference;
 import javax.xml.crypto.dsig.SignedInfo;
+import javax.xml.crypto.dsig.Transform;
 import javax.xml.crypto.dsig.XMLSignature;
 import javax.xml.crypto.dsig.XMLSignatureFactory;
 import javax.xml.crypto.dsig.XMLValidateContext;
@@ -381,6 +386,7 @@ public class SignatureProcessor implements Processor {
             key = WSSecurityUtil.prepareSecretKey(signatureMethod, secretKey);
         }
         XMLValidateContext context = new DOMValidateContext(key, elem);
+        context.setProperty("javax.xml.crypto.dsig.cacheReference", Boolean.TRUE);
         try {
             XMLSignature xmlSignature = signatureFactory.unmarshalXMLSignature(context);
             boolean signatureOk = xmlSignature.validate(context);
@@ -388,7 +394,7 @@ public class SignatureProcessor implements Processor {
                 signatureValue = xmlSignature.getSignatureValue().getValue();
                 protectedRefs = 
                     buildProtectedRefs(
-                        elem.getOwnerDocument(), xmlSignature.getSignedInfo(), protectedRefs
+                        elem.getOwnerDocument(), xmlSignature.getSignedInfo(), wsDocInfo, protectedRefs
                     );
                 
                 return principal;
@@ -778,15 +784,50 @@ public class SignatureProcessor implements Processor {
      */
     private static List buildProtectedRefs(
         Document doc,
-        SignedInfo signedInfo, 
+        SignedInfo signedInfo,
+        WSDocInfo wsDocInfo,
         List protectedRefs
     ) throws WSSecurityException {
         List referencesList = signedInfo.getReferences();
         for (int i = 0; i < referencesList.size(); i++) {
             Reference siRef = (Reference)referencesList.get(i);
             String uri = siRef.getURI();
+            
             if (!"".equals(uri)) {
-                Element se = WSSecurityUtil.getElementByWsuId(doc, uri);
+                Element se = null;
+                
+                List transformsList = siRef.getTransforms();
+                
+                for (int j = 0; j < transformsList.size(); j++) {
+                    
+                    Transform transform = (Transform)transformsList.get(j);
+                    
+                    if (STRApacheTransform.TRANSFORM_URI.equals(transform.getAlgorithm())) {
+                        NodeSetData data = (NodeSetData)siRef.getDereferencedData();
+                        if (data != null) {
+                            java.util.Iterator iter = data.iterator();
+                            
+                            Node securityTokenReference = null;
+                            while (iter.hasNext()) {
+                                Node node = (Node)iter.next();
+                                if ("SecurityTokenReference".equals(node.getLocalName())) {
+                                    securityTokenReference = node;
+                                    break;
+                                }
+                            }
+                            
+                            if (securityTokenReference != null) {
+                                SecurityTokenReference secTokenRef = 
+                                    new SecurityTokenReference((Element)securityTokenReference);
+                                se = STRTransformUtil.dereferenceSTR(doc, secTokenRef, wsDocInfo);
+                            }
+                        }
+                    }
+                }
+                
+                if (se == null) {
+                    se = WSSecurityUtil.getElementByWsuId(doc, uri);
+                }
                 if (se == null) {
                     se = WSSecurityUtil.getElementByGenId(doc, uri);
                 }

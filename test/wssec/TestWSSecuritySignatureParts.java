@@ -36,7 +36,11 @@ import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.message.WSSecSignature;
 import org.apache.ws.security.message.WSSecHeader;
+import org.apache.ws.security.saml.SAMLIssuer;
+import org.apache.ws.security.saml.SAMLIssuerFactory;
+import org.apache.ws.security.saml.WSSecSignatureSAML;
 import org.apache.ws.security.util.WSSecurityUtil;
+import org.opensaml.SAMLAssertion;
 import org.w3c.dom.Document;
 
 import javax.security.auth.callback.Callback;
@@ -144,6 +148,66 @@ public class TestWSSecuritySignatureParts extends TestCase implements CallbackHa
         WSDataRef wsDataRef = (WSDataRef)refs.get(0);
         String xpath = wsDataRef.getXpath();
         assertEquals("/soapenv:Envelope/soapenv:Header/foo:foobar", xpath);
+    }
+    
+    /**
+     * Test signing of a header through a STR Dereference Transform
+     */
+    public void testSOAPHeaderSTRTransform() throws Exception {
+        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
+        
+        SAMLIssuer saml = SAMLIssuerFactory.getInstance("saml4.properties");
+        // Provide info to SAML issuer that it can construct a Holder-of-key
+        // SAML token.
+        saml.setInstanceDoc(doc);
+        saml.setUserCrypto(crypto);
+        saml.setUsername("16c73ab6-b892-458f-abf5-2f875f74882e");
+        SAMLAssertion assertion = saml.newAssertion();
+
+        WSSecSignatureSAML wsSign = new WSSecSignatureSAML();
+        wsSign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
+        wsSign.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+        
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        
+        List parts = new Vector();
+        WSEncryptionPart encP =
+            new WSEncryptionPart("STRTransform", "", "Element");
+        parts.add(encP);
+        wsSign.setParts(parts);
+
+        LOG.info("Before SAMLSignedKeyHolder....");
+        
+        //
+        // set up for keyHolder
+        //
+        Document signedDoc = wsSign.build(doc, crypto, assertion, null, null, null, secHeader);
+        LOG.info("After SAMLSignedKeyHolder....");
+
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Signed SAML message (key holder):");
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+            LOG.debug(outputString);
+        }
+        
+        List results = verify(signedDoc);
+        WSSecurityEngineResult stUnsignedActionResult =
+            WSSecurityUtil.fetchActionResult(results, WSConstants.ST_UNSIGNED);
+        SAMLAssertion receivedAssertion = 
+            (SAMLAssertion) stUnsignedActionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+        assertTrue(receivedAssertion != null);
+        
+        WSSecurityEngineResult signActionResult = 
+            WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
+        assertTrue(signActionResult != null);
+        final java.util.List refs =
+            (java.util.List) signActionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
+        assertTrue(signActionResult != null && !signActionResult.isEmpty());
+        WSDataRef wsDataRef = (WSDataRef)refs.get(0);
+        String xpath = wsDataRef.getXpath();
+        assertEquals("/soapenv:Envelope/soapenv:Header/wsse:Security/Assertion", xpath);
     }
     
     /**
