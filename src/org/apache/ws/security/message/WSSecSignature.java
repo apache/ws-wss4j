@@ -1,18 +1,20 @@
-/*
- * Copyright  2003-2004 The Apache Software Foundation.
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
  *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 
 package org.apache.ws.security.message;
@@ -373,7 +375,9 @@ public class WSSecSignature extends WSSecBase {
             }
         }
 
-        sig.addResourceResolver(EnvelopeIdResolver.getInstance());
+        EnvelopeIdResolver resolver = (EnvelopeIdResolver)EnvelopeIdResolver.getInstance();
+        resolver.setWsDocInfo(wsDocInfo);
+        sig.addResourceResolver(resolver);
         sig.setId(wssConfig.getIdAllocator().createId("Signature-", sig));
 
         keyInfo = sig.getKeyInfo();
@@ -477,6 +481,7 @@ public class WSSecSignature extends WSSecBase {
         }
         if (keyIdentifierType != WSConstants.KEY_VALUE) {
             keyInfo.addUnknownElement(secRef.getElement());
+            wsDocInfo.setSecurityTokenReference(secRef.getElement());
         }
     }
 
@@ -768,7 +773,7 @@ public class WSSecSignature extends WSSecBase {
 
         addReferencesToSign(parts, secHeader);
         prependToHeader(secHeader);
-
+        
         //
         // if we have a BST prepend it in front of the Signature according to
         // strict layout rules.
@@ -778,7 +783,7 @@ public class WSSecSignature extends WSSecBase {
         }
 
         computeSignature();
-
+        
         return doc;
     }
 

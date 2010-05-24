@@ -1,18 +1,20 @@
-/*
- * Copyright  2003-2004 The Apache Software Foundation.
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
  *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 
 package org.apache.ws.security.message;
@@ -21,6 +23,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.SOAPConstants;
 import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.WSDocInfo;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.xml.security.signature.XMLSignatureInput;
 import org.apache.xml.security.utils.resolver.ResourceResolverException;
@@ -44,6 +47,8 @@ public class EnvelopeIdResolver extends ResourceResolverSpi {
     private static EnvelopeIdResolver resolver = null;
 
     private boolean doDebug = false;
+    
+    private WSDocInfo wsDocInfo;
 
     /**
      * Singleton instance of the resolver.
@@ -59,6 +64,13 @@ public class EnvelopeIdResolver extends ResourceResolverSpi {
     }
 
     private EnvelopeIdResolver() {
+    }
+    
+    /**
+     * @param docInfo The WSDocInfo object to be used for resolving elements
+     */
+    public void setWsDocInfo(WSDocInfo docInfo) {
+        wsDocInfo = docInfo;
     }
 
     /**
@@ -93,37 +105,49 @@ public class EnvelopeIdResolver extends ResourceResolverSpi {
          */
          
         /*
-         * First lookup the SOAP Body element (processed by default) and
-         * check if it contains an Id and if it matches
+         * First check to see if the element that we require is a SecurityTokenReference
+         * that is stored in WSDocInfo.
          */
         String id = uriNodeValue.substring(1);
-        SOAPConstants sc = WSSecurityUtil.getSOAPConstants(doc.getDocumentElement());
-        Element selectedElem = WSSecurityUtil.findBodyElement(doc, sc);
-        if (selectedElem == null) {
-            throw new ResourceResolverException("generic.EmptyMessage",
-                    new Object[]{"Body element not found"},
-                    uri,
-                    BaseURI);
+        Element selectedElem = null;
+        if (wsDocInfo != null) {
+            selectedElem = wsDocInfo.getSecurityTokenReference(id);
         }
-        String cId = selectedElem.getAttributeNS(WSConstants.WSU_NS, "Id");
-
+        
         /*
-         * If Body Id match fails, look for a generic Id (without a namespace)
-         * that matches the URI. If that lookup fails, try to get a namespace
-         * qualified Id that matches the URI.
+         * Then lookup the SOAP Body element (processed by default) and
+         * check if it contains a matching Id
          */
-        if (!id.equals(cId)) {
-            cId = null;
-            if ((selectedElem = WSSecurityUtil.getElementByWsuId(doc, uriNodeValue)) != null) {
-                cId = selectedElem.getAttributeNS(WSConstants.WSU_NS,"Id");
-            } else if ((selectedElem = WSSecurityUtil.getElementByGenId(doc, uriNodeValue)) != null) {
-                cId = selectedElem.getAttribute("Id");
-            }
-            if (cId == null) {
+        if (selectedElem == null) {
+            SOAPConstants sc = WSSecurityUtil.getSOAPConstants(doc.getDocumentElement());
+            selectedElem = WSSecurityUtil.findBodyElement(doc, sc);
+            if (selectedElem == null) {
                 throw new ResourceResolverException("generic.EmptyMessage",
-                        new Object[]{"Id not found"},
+                        new Object[]{"Body element not found"},
                         uri,
                         BaseURI);
+            }
+            String cId = selectedElem.getAttributeNS(WSConstants.WSU_NS, "Id");
+
+            /*
+             * If Body Id match fails, look for a generic Id (without a namespace)
+             * that matches the URI. If that lookup fails, try to get a namespace
+             * qualified Id that matches the URI.
+             */
+            if (!id.equals(cId)) {
+                cId = null;
+                
+                if ((selectedElem = WSSecurityUtil.getElementByWsuId(doc, uriNodeValue)) != null) {
+                    cId = selectedElem.getAttributeNS(WSConstants.WSU_NS, "Id");
+                } else if ((selectedElem = WSSecurityUtil.getElementByGenId(doc, uriNodeValue)) != null) {
+                    cId = selectedElem.getAttribute("Id");
+                }
+                if (cId == null) {
+                    throw new ResourceResolverException("generic.EmptyMessage",
+                            new Object[]{"Id not found"},
+                            uri,
+                            BaseURI);
+                }
             }
         }
 
