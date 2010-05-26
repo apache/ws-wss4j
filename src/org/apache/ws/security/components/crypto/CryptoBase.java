@@ -1,18 +1,20 @@
-/*
- * Copyright  2003-2004 The Apache Software Foundation.
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
  *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 package org.apache.ws.security.components.crypto;
 
@@ -648,13 +650,26 @@ public abstract class CryptoBase implements Crypto {
      */
     public String[] getAliasesForDN(String subjectDN) throws WSSecurityException {
 
-        // The DN to search the keystore for
-        X500Principal subjectRDN = new X500Principal(subjectDN);
-        Vector aliases = getAlias(subjectRDN, keystore);
+        //
+        // Convert the subject DN to a java X500Principal object first. This is to ensure
+        // interop with a DN constructed from .NET, where e.g. it uses "S" instead of "ST".
+        // Then convert it to a BouncyCastle X509Name, which will order the attributes of
+        // the DN in a particular way (see WSS-168). If the conversion to an X500Principal
+        // object fails (e.g. if the DN contains "E" instead of "EMAILADDRESS"), then fall
+        // back on a direct conversion to a BC X509Name
+        //
+        Object subject;
+        try {
+            X500Principal subjectRDN = new X500Principal(subjectDN);
+            subject = createBCX509Name(subjectRDN.getName());
+        } catch (java.lang.IllegalArgumentException ex) {
+            subject = createBCX509Name(subjectDN);
+        }
+        Vector aliases = getAlias(subject, keystore);
         
         //If we can't find the issuer in the keystore then look at cacerts
         if (aliases.size() == 0 && cacerts != null) {
-            aliases = getAlias(subjectRDN, cacerts);
+            aliases = getAlias(subject, cacerts);
         }
         
         // Convert the vector into an array
@@ -820,7 +835,10 @@ public abstract class CryptoBase implements Crypto {
         return true;
     }
     
-    private Vector getAlias(X500Principal subjectRDN, KeyStore store) throws WSSecurityException {
+    /**
+     * The subjectRDN argument is either an X500Principal or a BouncyCastle X509Name instance.
+     */
+    private Vector getAlias(Object subjectRDN, KeyStore store) throws WSSecurityException {
         // Store the aliases found
         Vector aliases = new Vector();
         Certificate cert = null;
@@ -842,8 +860,9 @@ public abstract class CryptoBase implements Crypto {
                 }
                 if (cert instanceof X509Certificate) {
                     X500Principal foundRDN = ((X509Certificate) cert).getSubjectX500Principal();
+                    Object certName = createBCX509Name(foundRDN.getName());
 
-                    if (subjectRDN.equals(foundRDN)) {
+                    if (subjectRDN.equals(certName)) {
                         aliases.add(alias);
                     }
                 }
