@@ -155,6 +155,7 @@ public class TestWSSecurityNew3 extends TestCase implements CallbackHandler {
         Document doc = unsignedEnvelope.getAsDocument();
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
+        
         Document signedDoc = builder.build(doc, crypto, secHeader);
 
         if (LOG.isDebugEnabled()) {
@@ -165,6 +166,35 @@ public class TestWSSecurityNew3 extends TestCase implements CallbackHandler {
         }
         
         verify(signedDoc);
+    }
+    
+    /**
+     * Test that signs and verifies a WS-Security envelope
+     * <p/>
+     * 
+     * @throws java.lang.Exception Thrown when there is any problem in signing or verification
+     */
+    public void testBSTPKIPathSignature() throws Exception {
+        WSSecSignature builder = new WSSecSignature();
+        builder.setUserInfo("wss40", "security");
+        builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
+        builder.setUseSingleCertificate(false);
+        LOG.info("Before Signing....");
+        Document doc = unsignedEnvelope.getAsDocument();
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        
+        Crypto pkiCrypto = CryptoFactory.getInstance("wss40.properties");
+        Document signedDoc = builder.build(doc, pkiCrypto, secHeader);
+
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("After PKI Signing....");
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+            LOG.debug(outputString);
+        }
+        
+        secEngine.processSecurityHeader(doc, null, this, pkiCrypto, null);
     }
     
     /**
