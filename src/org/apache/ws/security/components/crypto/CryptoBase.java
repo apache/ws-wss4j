@@ -731,16 +731,29 @@ public abstract class CryptoBase implements Crypto {
      */
     public String[] getAliasesForDN(String subjectDN) throws WSSecurityException {
 
-        // The DN to search the keystore for
-        X500Principal subjectRDN = new X500Principal(subjectDN);
+        //
+        // Convert the subject DN to a java X500Principal object first. This is to ensure
+        // interop with a DN constructed from .NET, where e.g. it uses "S" instead of "ST".
+        // Then convert it to a BouncyCastle X509Name, which will order the attributes of
+        // the DN in a particular way (see WSS-168). If the conversion to an X500Principal
+        // object fails (e.g. if the DN contains "E" instead of "EMAILADDRESS"), then fall
+        // back on a direct conversion to a BC X509Name
+        //
+        Object subject;
+        try {
+            X500Principal subjectRDN = new X500Principal(subjectDN);
+            subject = createBCX509Name(subjectRDN.getName());
+        } catch (java.lang.IllegalArgumentException ex) {
+            subject = createBCX509Name(subjectDN);
+        }
         List aliases = null;
         if (keystore != null) {
-            aliases = getAliases(subjectRDN, keystore);
+            aliases = getAliases(subject, keystore);
         }
-        
+
         //If we can't find the issuer in the keystore then look at the truststore
         if ((aliases == null || aliases.size() == 0) && truststore != null) {
-            aliases = getAliases(subjectRDN, truststore);
+            aliases = getAliases(subject, truststore);
         }
         
         // Convert the vector into an array
@@ -915,12 +928,12 @@ public abstract class CryptoBase implements Crypto {
     
     /**
      * Get all of the aliases of the X500Principal argument in the supplied KeyStore
-     * @param subjectRDN The X500Principal
+     * @param subjectRDN either an X500Principal or a BouncyCastle X509Name instance.
      * @param store The KeyStore
      * @return A list of aliases
      * @throws WSSecurityException
      */
-    private static List getAliases(X500Principal subjectRDN, KeyStore store) 
+    private List getAliases(Object subjectRDN, KeyStore store) 
         throws WSSecurityException {
         // Store the aliases found
         List aliases = new Vector();
@@ -943,8 +956,9 @@ public abstract class CryptoBase implements Crypto {
                 }
                 if (cert instanceof X509Certificate) {
                     X500Principal foundRDN = ((X509Certificate) cert).getSubjectX500Principal();
+                    Object certName = createBCX509Name(foundRDN.getName());
 
-                    if (subjectRDN.equals(foundRDN)) {
+                    if (subjectRDN.equals(certName)) {
                         aliases.add(alias);
                     }
                 }
