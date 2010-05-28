@@ -1,18 +1,20 @@
-/*
- * Copyright  2003-2004 The Apache Software Foundation.
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
  *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 
 package wssec;
@@ -32,6 +34,8 @@ import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSConfig;
+import org.apache.ws.security.handler.RequestData;
+import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.message.WSSecUsernameToken;
 import org.apache.ws.security.message.WSSecHeader;
 import org.apache.ws.security.util.Base64;
@@ -335,6 +339,32 @@ public class TestWSSecurityNew5 extends TestCase implements CallbackHandler {
     }
     
     /**
+     * Test that adds a UserNameToken with an empty password
+     */
+    public void testUsernameTokenEmptyPassword() throws Exception {
+        WSSecUsernameToken builder = new WSSecUsernameToken();
+        builder.setPasswordType(WSConstants.PASSWORD_TEXT);
+        builder.setUserInfo("wernerd", "");
+        LOG.info("Before adding UsernameToken with an empty password....");
+        Document doc = unsignedEnvelope.getAsDocument();
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        Document signedDoc = builder.build(doc, secHeader);
+        if (LOG.isDebugEnabled()) {
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+            LOG.debug(outputString);
+        }
+        try {
+            verify(signedDoc);
+            throw new Exception("Failure expected on an password");
+        } catch (WSSecurityException ex) {
+            assertTrue(ex.getErrorCode() == WSSecurityException.FAILED_AUTHENTICATION);
+            // expected
+        }
+    }
+    
+    /**
      * Test with a null token type. This will fail as the default is to reject custom
      * token types.
      */
@@ -501,6 +531,60 @@ public class TestWSSecurityNew5 extends TestCase implements CallbackHandler {
     }
     
     /**
+     * Test that adds a UserNameToken via WSHandler
+     */
+    public void testUsernameTokenWSHandler() throws Exception {
+        MyHandler handler = new MyHandler();
+        Document doc = unsignedEnvelope.getAsDocument();
+        
+        RequestData reqData = new RequestData();
+        java.util.Map config = new java.util.TreeMap();
+        config.put("password", "verySecret");
+        config.put(WSHandlerConstants.PASSWORD_TYPE, WSConstants.PW_TEXT);
+        reqData.setUsername("wernerd");
+        reqData.setMsgContext(config);
+        
+        java.util.Vector actions = new java.util.Vector();
+        actions.add(new Integer(WSConstants.UT));
+        
+        handler.send(WSConstants.UT, doc, reqData, actions, true);
+        
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Username Token via WSHandler");
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+            LOG.debug(outputString);
+        }
+    }
+    
+    /**
+     * Test that adds a UserNameToken with an empty password via WSHandler
+     */
+    public void testUsernameTokenWSHandlerEmptyPassword() throws Exception {
+        MyHandler handler = new MyHandler();
+        Document doc = unsignedEnvelope.getAsDocument();
+        
+        RequestData reqData = new RequestData();
+        java.util.Map config = new java.util.TreeMap();
+        config.put(WSHandlerConstants.PASSWORD_TYPE, WSConstants.PW_TEXT);
+        config.put(WSHandlerConstants.PW_CALLBACK_REF, this);
+        reqData.setUsername("emptyuser");
+        reqData.setMsgContext(config);
+        
+        java.util.Vector actions = new java.util.Vector();
+        actions.add(new Integer(WSConstants.UT));
+        
+        handler.send(WSConstants.UT, doc, reqData, actions, true);
+        
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Username Token with an empty password via WSHandler");
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+            LOG.debug(outputString);
+        }
+    }
+    
+    /**
      * Verifies the soap envelope
      * 
      * @param env soap envelope
@@ -520,7 +604,11 @@ public class TestWSSecurityNew5 extends TestCase implements CallbackHandler {
                 if (pc.getUsage() == WSPasswordCallback.USERNAME_TOKEN
                     && "wernerd".equals(pc.getIdentifier())) {
                     pc.setPassword("verySecret");
-                } else if (
+                } else if (pc.getUsage() == WSPasswordCallback.USERNAME_TOKEN
+                    && "emptyuser".equals(pc.getIdentifier())) {
+                    pc.setPassword("");
+                }  
+                else if (
                     pc.getUsage() == WSPasswordCallback.USERNAME_TOKEN_UNKNOWN
                 ) {
                     if ("wernerd".equals(pc.getIdentifier())
