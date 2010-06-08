@@ -17,6 +17,7 @@
  * under the License.
  */
 
+
 package org.apache.ws.security;
 
 import java.util.HashMap;
@@ -212,6 +213,10 @@ public class WSSConfig {
      */
     protected boolean allowNamespaceQualifiedPasswordTypes = false;
     
+    /**
+     * The secret key length to be used for UT_SIGN.
+     */
+    protected int secretKeyLength = WSConstants.WSE_DERIVED_KEY_LEN;
     
     /**
      * The default wsu:Id allocator is a simple "start at 1 and increment up"
@@ -451,6 +456,20 @@ public class WSSConfig {
      */
     public void setTimeStampTTL(int timeStampTTL) {
         this.timeStampTTL = timeStampTTL;
+    }
+    
+    /**
+     * Set the secret key length to be used for UT_SIGN.
+     */
+    public void setSecretKeyLength(int length) {
+        secretKeyLength = length;
+    }
+    
+    /**
+     * Get the secret key length to be used for UT_SIGN.
+     */
+    public int getSecretKeyLength() {
+        return secretKeyLength;
     }
     
     /**

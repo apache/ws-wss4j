@@ -260,6 +260,7 @@ public abstract class WSHandler {
         wssConfig.setAllowNamespaceQualifiedPasswordTypes(
             decodeNamespaceQualifiedPasswordTypes(reqData)
         );
+        wssConfig.setSecretKeyLength(reqData.getSecretKeyLength());
         reqData.setWssConfig(wssConfig);
 
         if ((doAction & WSConstants.SIGN) == WSConstants.SIGN) {
@@ -569,6 +570,12 @@ public abstract class WSHandler {
         String parts = getString(WSHandlerConstants.SIGNATURE_PARTS, mc);
         if (parts != null) {
             splitEncParts(parts, reqData.getSignatureParts(), reqData);
+        }
+        
+        String secretKeyLength = getString(WSHandlerConstants.WSE_SECRET_KEY_LENGTH, mc);
+        if (secretKeyLength != null) {
+            int iSecretKeyLength = Integer.parseInt(secretKeyLength);
+            reqData.setSecretKeyLength(iSecretKeyLength);
         }
     }
 

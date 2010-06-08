@@ -54,6 +54,7 @@ public class UsernameTokenSignedAction implements Action {
         WSSecUsernameToken builder = new WSSecUsernameToken();
         builder.setWsConfig(reqData.getWssConfig());
         builder.setPasswordType(reqData.getPwType());  // enhancement by Alberto Coletti
+        builder.setSecretKeyLength(reqData.getSecretKeyLength());
         
         builder.setUserInfo(reqData.getUsername(), password);
         builder.addCreated();

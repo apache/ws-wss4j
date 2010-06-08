@@ -594,9 +594,17 @@ public class WSHandlerConstants {
      * (<code>{}</code>).
      */
     public static final String SIGNATURE_PARTS = "signatureParts";
+    
+    /**
+     * This parameter sets the length of the secret (derived) key to use for the
+     * WSE UT_SIGN functionality.
+     * 
+     * The default value is 16 bytes.
+     */
+    public static final String WSE_SECRET_KEY_LENGTH = "wseSecretKeyLength";
 
     /**
-     * The name of the crypto propterty file to use for SOAP Encryption.
+     * The name of the crypto property file to use for SOAP Encryption.
      * <p/>
      * Refer to documentation of {@link #SIG_PROP_FILE}.
      * <p/>

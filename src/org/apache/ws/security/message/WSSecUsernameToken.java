@@ -46,6 +46,7 @@ public class WSSecUsernameToken extends WSSecBase {
     private boolean useMac = false;
     private byte[] saltValue;
     private int iteration = UsernameToken.DEFAULT_ITERATION;
+    private int secretKeyLength = WSConstants.WSE_DERIVED_KEY_LEN;
 
 
     /**
@@ -74,6 +75,20 @@ public class WSSecUsernameToken extends WSSecBase {
      */
     public void addCreated() {
         created = true;
+    }
+    
+    /**
+     * Set the secret key length
+     */
+    public void setSecretKeyLength(int length) {
+        secretKeyLength = length;
+    }
+    
+    /**
+     * Get the secret key length
+     */
+    public int getSecretKeyLength() {
+        return secretKeyLength;
     }
     
     /**
@@ -111,7 +126,7 @@ public class WSSecUsernameToken extends WSSecBase {
         if (useDerivedKey) {
             return UsernameToken.generateDerivedKey(password, saltValue, iteration);
         }
-        return ut.getSecretKey();
+        return ut.getSecretKey(secretKeyLength);
     }
     
     /**

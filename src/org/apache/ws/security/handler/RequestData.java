@@ -61,6 +61,7 @@ public class RequestData {
     private List signatureValues = new Vector();
     private WSSecHeader secHeader = null;
     private boolean encSymmetricEncryptionKey = true;
+    private int secretKeyLength = WSConstants.WSE_DERIVED_KEY_LEN;
 
     public void clear() {
         soapConstants = null;
@@ -74,6 +75,7 @@ public class RequestData {
         signatureValues.clear();
         signatureDigestAlgorithm = null;
         encSymmetricEncryptionKey = true;
+        secretKeyLength = WSConstants.WSE_DERIVED_KEY_LEN;
         signatureUser = null;
     }
 
@@ -107,6 +109,14 @@ public class RequestData {
 
     public void setActor(String actor) {
         this.actor = actor;
+    }
+    
+    public void setSecretKeyLength(int length) {
+        secretKeyLength = length;
+    }
+    
+    public int getSecretKeyLength() {
+        return secretKeyLength;
     }
 
     public String getUsername() {

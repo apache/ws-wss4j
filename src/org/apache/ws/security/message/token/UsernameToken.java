@@ -598,6 +598,18 @@ public class UsernameToken {
     public byte[] getSecretKey() {
         return getSecretKey(WSConstants.WSE_DERIVED_KEY_LEN, WSConstants.LABEL_FOR_DERIVED_KEY);
     }
+    
+    /**
+     * Gets the secret key as per WS-Trust spec. This method uses default setting
+     * to generate the secret key. These default values are suitable for .NET
+     * WSE.
+     * 
+     * @return a secret key constructed from information contained in this
+     *         username token
+     */
+    public byte[] getSecretKey(int keylen) {
+        return getSecretKey(keylen, WSConstants.LABEL_FOR_DERIVED_KEY);
+    }
 
     /**
      * Gets the secret key as per WS-Trust spec.

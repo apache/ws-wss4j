@@ -90,6 +90,8 @@ public class SignatureProcessor implements Processor {
     
     private byte[] signatureValue;
     
+    private int secretKeyLength = WSConstants.WSE_DERIVED_KEY_LEN;
+    
     private KeyInfoFactory keyInfoFactory = KeyInfoFactory.getInstance("DOM");
     private XMLSignatureFactory signatureFactory = XMLSignatureFactory.getInstance("DOM");
 
@@ -110,6 +112,7 @@ public class SignatureProcessor implements Processor {
         Principal lastPrincipalFound = null;
         certs = null;
         signatureValue = null;
+        secretKeyLength = wsc.getSecretKeyLength();
         
         try {
             lastPrincipalFound = 
@@ -284,7 +287,7 @@ public class SignatureProcessor implements Processor {
                         if (ut.isDerivedKey()) {
                             secretKey = ut.getDerivedKey();
                         } else {
-                            secretKey = ut.getSecretKey();
+                            secretKey = ut.getSecretKey(secretKeyLength);
                         }
                         principal = ut.createPrincipal();
                     } else if (processor instanceof BinarySecurityTokenProcessor) {
