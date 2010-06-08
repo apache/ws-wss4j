@@ -1,19 +1,20 @@
-/*
-
- * Copyright  2003-2005 The Apache Software Foundation.
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
  *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 
 package org.apache.ws.security.handler;
@@ -593,9 +594,17 @@ public class WSHandlerConstants {
      * (<code>{}</code>).
      */
     public static final String SIGNATURE_PARTS = "signatureParts";
+    
+    /**
+     * This parameter sets the length of the secret (derived) key to use for the
+     * WSE UT_SIGN functionality.
+     * 
+     * The default value is 16 bytes.
+     */
+    public static final String WSE_SECRET_KEY_LENGTH = "wseSecretKeyLength";
 
     /**
-     * The name of the crypto propterty file to use for SOAP Encryption.
+     * The name of the crypto property file to use for SOAP Encryption.
      * <p/>
      * Refer to documentation of {@link #SIG_PROP_FILE}.
      * <p/>

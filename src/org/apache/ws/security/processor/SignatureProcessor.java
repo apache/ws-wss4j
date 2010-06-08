@@ -79,6 +79,9 @@ public class SignatureProcessor implements Processor {
     private static Log tlog = LogFactory.getLog("org.apache.ws.security.TIME");
     
     private String signatureId;
+    
+    private int secretKeyLength = WSConstants.WSE_DERIVED_KEY_LEN;
+    
 
     public void handleToken(
         Element elem, 
@@ -98,6 +101,7 @@ public class SignatureProcessor implements Processor {
         List protectedElements = new java.util.ArrayList();
         byte[][] signatureValue = new byte[1][];
         Principal lastPrincipalFound = null;
+        secretKeyLength = wsc.getSecretKeyLength();
         
         try {
             lastPrincipalFound = 
@@ -313,7 +317,7 @@ public class SignatureProcessor implements Processor {
                     if (ut.isDerivedKey()) {
                         secretKey = ut.getDerivedKey();
                     } else {
-                        secretKey = ut.getSecretKey();
+                        secretKey = ut.getSecretKey(secretKeyLength);
                     }
                 } else if (processor instanceof BinarySecurityTokenProcessor) {
                     certs = ((BinarySecurityTokenProcessor)processor).getCertificates();
