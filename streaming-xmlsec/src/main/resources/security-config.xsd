@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="http://www.xmlsecurity.org/NS/configuration" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="Configuration" type="con:ConfigurationType" xmlns:con="http://www.xmlsecurity.org/NS/configuration">
+    <xs:annotation>
+      <xs:documentation>This configuration file is used for configuration of the org.apache.xml.security package</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:complexType name="JCEAlgorithmMappingsType">
+    <xs:sequence>
+      <xs:element type="con:AlgorithmsType" name="Algorithms" xmlns:con="http://www.xmlsecurity.org/NS/configuration"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="KeyResolverType">
+    <xs:sequence>
+      <xs:element type="con:ResolverType" name="Resolver" maxOccurs="unbounded" minOccurs="0" xmlns:con="http://www.xmlsecurity.org/NS/configuration">
+        <xs:annotation>
+          <xs:documentation>This section contains a list of KeyResolvers that are available in
+           every KeyInfo object</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="CanonicalizationMethodsType">
+    <xs:sequence>
+      <xs:element type="con:CanonicalizationMethodType" name="CanonicalizationMethod" maxOccurs="unbounded" minOccurs="0" xmlns:con="http://www.xmlsecurity.org/NS/configuration"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="PrefixMappingsType">
+    <xs:sequence>
+      <xs:element type="con:PrefixMappingType" name="PrefixMapping" maxOccurs="unbounded" minOccurs="0" xmlns:con="http://www.xmlsecurity.org/NS/configuration">
+        <xs:annotation>
+          <xs:documentation>Many classes create Elements which are in a specific namespace;
+           here, the prefixes for these namespaces are defined. But this
+           can also be overwritten using the ElementProxy#setDefaultPrefix()
+           method. You can even set all prefixes to "" so that the corresponding
+           elements are created using the default namespace</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="CanonicalizationMethodType">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute type="xs:string" name="URI" use="required"/>
+        <xs:attribute type="xs:string" name="JAVACLASS" use="required"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="TransformAlgorithmType">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute type="xs:string" name="URI" use="required"/>
+        <xs:attribute type="xs:string" name="JAVACLASS" use="required"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="SignatureAlgorithmsType">
+    <xs:sequence>
+      <xs:element type="con:SignatureAlgorithmType" name="SignatureAlgorithm" maxOccurs="unbounded" minOccurs="0" xmlns:con="http://www.xmlsecurity.org/NS/configuration"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="AlgorithmType">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute type="xs:anyURI" name="URI" use="required"/>
+        <xs:attribute type="xs:string" name="Description" use="required"/>
+        <xs:attribute type="xs:string" name="AlgorithmClass" use="required"/>
+        <xs:attribute type="xs:string" name="RequirementLevel" use="required"/>
+        <xs:attribute type="xs:string" name="SpecificationURL" use="optional"/>
+        <xs:attribute type="xs:string" name="JCEName" use="optional"/>
+        <xs:attribute type="xs:int" name="KeyLength" use="optional"/>
+        <xs:attribute type="xs:string" name="RequiredKey" use="optional"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="ResolverType">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute type="xs:string" name="JAVACLASS" use="required"/>
+        <xs:attribute type="xs:string" name="DESCRIPTION" use="required"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="SignatureAlgorithmType">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute type="xs:string" name="URI" use="required"/>
+        <xs:attribute type="xs:string" name="JAVACLASS" use="required"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="TransformAlgorithmsType">
+    <xs:sequence>
+      <xs:element type="con:TransformAlgorithmType" name="TransformAlgorithm" maxOccurs="unbounded" minOccurs="0" xmlns:con="http://www.xmlsecurity.org/NS/configuration">
+        <xs:annotation>
+          <xs:documentation>Base64  c14n omitting comments  c14n with comments  c14n 1.1 omitting comments  c14n 1.1 with comments  exclusive c14n omitting comments  exclusive c14n with comments  XPath transform  enveloped signature  XSLT  XPath version 2  XPath version 2b</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="KeyInfoType">
+    <xs:sequence>
+      <xs:element type="con:ContentHandlerType" name="ContentHandler" maxOccurs="unbounded" minOccurs="0" xmlns:con="http://www.xmlsecurity.org/NS/configuration"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="ResourceBundleType">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute type="xs:string" name="LanguageCode" use="required"/>
+        <xs:attribute type="xs:string" name="CountryCode" use="required"/>
+        <xs:attribute type="xs:string" name="LOCATION" use="required"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="ContentHandlerType">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute type="xs:string" name="LOCALNAME" use="required"/>
+        <xs:attribute type="xs:string" name="NAMESPACE" use="required"/>
+        <xs:attribute type="xs:string" name="JAVACLASS" use="required"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="ResourceBundlesType">
+    <xs:sequence>
+      <xs:element type="con:ResourceBundleType" name="ResourceBundle" maxOccurs="unbounded" minOccurs="0" xmlns:con="http://www.xmlsecurity.org/NS/configuration"/>
+    </xs:sequence>
+    <xs:attribute type="xs:string" name="defaultLanguageCode"/>
+    <xs:attribute type="xs:string" name="defaultCountryCode"/>
+  </xs:complexType>
+  <xs:complexType name="ConfigurationType">
+    <xs:sequence>
+      <xs:element type="con:CanonicalizationMethodsType" name="CanonicalizationMethods" xmlns:con="http://www.xmlsecurity.org/NS/configuration"/>
+      <xs:element type="con:TransformAlgorithmsType" name="TransformAlgorithms" xmlns:con="http://www.xmlsecurity.org/NS/configuration"/>
+      <xs:element type="con:SignatureAlgorithmsType" name="SignatureAlgorithms" xmlns:con="http://www.xmlsecurity.org/NS/configuration"/>
+      <xs:element type="con:JCEAlgorithmMappingsType" name="JCEAlgorithmMappings" xmlns:con="http://www.xmlsecurity.org/NS/configuration"/>
+      <xs:element type="con:ResourceBundlesType" name="ResourceBundles" xmlns:con="http://www.xmlsecurity.org/NS/configuration"/>
+      <xs:element type="con:ResourceResolversType" name="ResourceResolvers" xmlns:con="http://www.xmlsecurity.org/NS/configuration"/>
+      <xs:element type="con:KeyInfoType" name="KeyInfo" xmlns:con="http://www.xmlsecurity.org/NS/configuration">
+        <xs:annotation>
+          <xs:documentation>&lt;defaultLocale languageCode="en" countryCode="US" /></xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element type="con:KeyResolverType" name="KeyResolver" xmlns:con="http://www.xmlsecurity.org/NS/configuration"/>
+      <xs:element type="con:PrefixMappingsType" name="PrefixMappings" xmlns:con="http://www.xmlsecurity.org/NS/configuration"/>
+    </xs:sequence>
+    <xs:attribute type="xs:string" name="target"/>
+  </xs:complexType>
+  <xs:complexType name="PrefixMappingType">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute type="xs:string" name="namespace" use="required"/>
+        <xs:attribute type="xs:string" name="prefix" use="required"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="AlgorithmsType">
+    <xs:sequence>
+      <xs:element type="con:AlgorithmType" name="Algorithm" maxOccurs="unbounded" minOccurs="0" xmlns:con="http://www.xmlsecurity.org/NS/configuration">
+        <xs:annotation>
+          <xs:documentation>MessageDigest Algorithms  Signature Algorithms  MAC Algorithms  Block encryption Algorithms</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="ResourceResolversType">
+    <xs:sequence>
+      <xs:element type="con:ResolverType" name="Resolver" maxOccurs="unbounded" minOccurs="0" xmlns:con="http://www.xmlsecurity.org/NS/configuration"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>
