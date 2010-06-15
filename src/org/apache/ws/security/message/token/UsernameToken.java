@@ -373,7 +373,12 @@ public class UsernameToken {
      * @return the password string or <code>null</code> if no such node exists.
      */
     public String getPassword() {
-        return nodeString(elementPassword);
+        String password = nodeString(elementPassword);
+        // See WSS-219
+        if (password == null && elementPassword != null) {
+            return "";
+        }
+        return password;
     }
 
     /**
@@ -529,7 +534,6 @@ public class UsernameToken {
             }
         }
         return null;
-
     }
 
     /**
