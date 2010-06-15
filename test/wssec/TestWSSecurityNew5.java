@@ -62,6 +62,7 @@ public class TestWSSecurityNew5 extends TestCase implements CallbackHandler {
         +       "</add>" 
         +   "</SOAP-ENV:Body>" 
         + "</SOAP-ENV:Envelope>";
+
     private static final String SOAPUTMSG = 
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" 
         + "<SOAP-ENV:Envelope xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" "
@@ -89,6 +90,24 @@ public class TestWSSecurityNew5 extends TestCase implements CallbackHandler {
         + "<wsse:UsernameToken wsu:Id=\"UsernameToken-29477163\" xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">"
         + "<wsse:Username></wsse:Username>"
         + "<wsse:Password></wsse:Password>"
+        + "</wsse:UsernameToken></wsse:Security></SOAP-ENV:Header>"
+        + "<SOAP-ENV:Body>" 
+        + "<add xmlns=\"http://ws.apache.org/counter/counter_port_type\">" 
+        + "<value xmlns=\"\">15</value>" + "</add>" 
+        + "</SOAP-ENV:Body>\r\n       \r\n" + "</SOAP-ENV:Envelope>";
+    private static final String EMPTY_PASSWORD_MSG =
+        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" 
+        + "<SOAP-ENV:Envelope xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" "
+        + "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" "
+        + "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">"
+        + "<SOAP-ENV:Header>"
+        + "<wsse:Security SOAP-ENV:mustUnderstand=\"1\" "
+        + "xmlns:wsse=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd\">"
+        + "<wsse:UsernameToken wsu:Id=\"UsernameToken-1\" "
+        + "xmlns:wsse=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd\" "
+        + "xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">"
+        + "<wsse:Username>emptyuser</wsse:Username>"
+        + "<wsse:Password Type=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText\"/>"
         + "</wsse:UsernameToken></wsse:Security></SOAP-ENV:Header>"
         + "<SOAP-ENV:Body>" 
         + "<add xmlns=\"http://ws.apache.org/counter/counter_port_type\">" 
@@ -304,7 +323,13 @@ public class TestWSSecurityNew5 extends TestCase implements CallbackHandler {
                 org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
             LOG.debug(outputString);
         }
-        verify(doc);
+        try {
+            verify(doc);
+            throw new Exception("Failure expected on no password");
+        } catch (WSSecurityException ex) {
+            assertTrue(ex.getErrorCode() == WSSecurityException.FAILED_AUTHENTICATION);
+            // expected
+        }
     }
     
     /**
@@ -339,7 +364,7 @@ public class TestWSSecurityNew5 extends TestCase implements CallbackHandler {
     public void testUsernameTokenEmptyPassword() throws Exception {
         WSSecUsernameToken builder = new WSSecUsernameToken();
         builder.setPasswordType(WSConstants.PASSWORD_TEXT);
-        builder.setUserInfo("wernerd", "");
+        builder.setUserInfo("emptyuser", "");
         LOG.info("Before adding UsernameToken with an empty password....");
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         WSSecHeader secHeader = new WSSecHeader();
@@ -350,13 +375,22 @@ public class TestWSSecurityNew5 extends TestCase implements CallbackHandler {
                 org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
-        try {
-            verify(signedDoc);
-            throw new Exception("Failure expected on an password");
-        } catch (WSSecurityException ex) {
-            assertTrue(ex.getErrorCode() == WSSecurityException.FAILED_AUTHENTICATION);
-            // expected
+        verify(signedDoc);
+    }
+    
+    /**
+     * Test that processes a UserNameToken with an empty password
+     */
+    public void testEmptyPasswordProcessing() throws Exception {
+        Document doc = SOAPUtil.toSOAPPart(EMPTY_PASSWORD_MSG);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Empty password message: ");
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+            LOG.debug(outputString);
         }
+        
+        verify(doc);
     }
     
     /**
@@ -631,8 +665,7 @@ public class TestWSSecurityNew5 extends TestCase implements CallbackHandler {
                 } else if (pc.getUsage() == WSPasswordCallback.USERNAME_TOKEN
                     && "emptyuser".equals(pc.getIdentifier())) {
                     pc.setPassword("");
-                }  
-                else if (
+                } else if (
                     pc.getUsage() == WSPasswordCallback.USERNAME_TOKEN_UNKNOWN
                 ) {
                     if ("customUser".equals(pc.getIdentifier())) {
