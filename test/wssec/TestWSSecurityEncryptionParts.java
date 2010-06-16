@@ -145,7 +145,7 @@ public class TestWSSecurityEncryptionParts extends TestCase implements CallbackH
         WSDataRef wsDataRef = (WSDataRef)refs.get(0);
         String xpath = wsDataRef.getXpath();
         assertEquals("/soapenv:Envelope/soapenv:Header/foo:foobar", xpath);
-        
+        assertEquals(WSConstants.AES_128, wsDataRef.getAlgorithm());
     }
     
     

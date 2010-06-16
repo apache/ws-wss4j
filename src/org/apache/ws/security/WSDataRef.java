@@ -47,6 +47,11 @@ public class WSDataRef {
      */
     private String xpath;
     
+    /**
+     * Algorithm used to encrypt/sign the element
+     */
+    private String algorithm;
+    
     private boolean content;
     
     /**
@@ -134,6 +139,20 @@ public class WSDataRef {
      */
     public void setContent(boolean content) {
         this.content = content;
+    }
+    
+    /**
+     * @return the algorithm used for encryption/signature
+     */
+    public String getAlgorithm() {
+        return algorithm;
+    }
+
+    /**
+     * @param algo algorithm used for encryption
+     */
+    public void setAlgorithm(String algo) {
+        algorithm = algo;
     }
 
 }

@@ -95,6 +95,10 @@ public class SignatureProcessor implements Processor {
     private KeyInfoFactory keyInfoFactory = KeyInfoFactory.getInstance("DOM");
     private XMLSignatureFactory signatureFactory = XMLSignatureFactory.getInstance("DOM");
 
+    private String signatureMethod;
+    
+    private String c14nMethod;
+
     public void handleToken(
         Element elem, 
         Crypto crypto, 
@@ -113,6 +117,7 @@ public class SignatureProcessor implements Processor {
         certs = null;
         signatureValue = null;
         secretKeyLength = wsc.getSecretKeyLength();
+        signatureMethod = c14nMethod = null;
         
         try {
             lastPrincipalFound = 
@@ -131,16 +136,13 @@ public class SignatureProcessor implements Processor {
             actionPerformed = WSConstants.UT_SIGN;
         }
 
-        returnResults.add(
-            0, 
-            new WSSecurityEngineResult(
-                actionPerformed, 
-                lastPrincipalFound,
-                certs, 
-                protectedRefs, 
-                signatureValue
-            )
-        );
+        WSSecurityEngineResult result = new WSSecurityEngineResult(
+                actionPerformed, lastPrincipalFound,
+                certs, protectedRefs, signatureValue);
+        result.put(WSSecurityEngineResult.TAG_SIGNATURE_METHOD, signatureMethod);
+        result.put(WSSecurityEngineResult.TAG_CANONICALIZATION_METHOD, c14nMethod);
+        returnResults.add(0, result);
+        
         signatureId = elem.getAttribute("Id");
     }
 
@@ -785,7 +787,7 @@ public class SignatureProcessor implements Processor {
      * @return A list of protected references
      * @throws WSSecurityException
      */
-    private static List buildProtectedRefs(
+    private List buildProtectedRefs(
         Document doc,
         SignedInfo signedInfo,
         WSDocInfo wsDocInfo,
@@ -837,9 +839,14 @@ public class SignatureProcessor implements Processor {
                 if (se == null) {
                     throw new WSSecurityException(WSSecurityException.FAILED_CHECK);
                 }
+                
+                signatureMethod = signedInfo.getSignatureMethod().getAlgorithm();
+                c14nMethod = signedInfo.getCanonicalizationMethod().getAlgorithm();
+                
                 WSDataRef ref = new WSDataRef();
                 ref.setWsuId(uri);
                 ref.setProtectedElement(se);
+                ref.setAlgorithm(signatureMethod);
                 ref.setXpath(ReferenceListProcessor.getXPath(se));
                 protectedRefs.add(ref);
             }

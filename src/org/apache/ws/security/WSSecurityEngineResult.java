@@ -147,6 +147,20 @@ public class WSSecurityEngineResult extends java.util.HashMap {
      * The value under this tag is a byte array 
      */
     public static final Object TAG_ENCRYPTED_EPHEMERAL_KEY = "encrypted-ephemeral-key-bytes";
+    
+    /**
+     * Tag denoting the algorithm that was used to sign the message
+     *
+     * The value under this tag is of type String.
+     */
+    public static final Object TAG_SIGNATURE_METHOD = "signature-method";
+
+    /**
+     * Tag denoting the algorithm that was used to do canonicalization
+     *
+     * The value under this tag is of type String.
+     */
+    public static final Object TAG_CANONICALIZATION_METHOD = "canonicalization-method";
 
     public WSSecurityEngineResult(
         int act, 

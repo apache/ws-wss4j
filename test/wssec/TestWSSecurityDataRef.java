@@ -191,6 +191,9 @@ public class TestWSSecurityDataRef extends TestCase implements CallbackHandler {
 
                     // Check whether wsu:Id is set
                     assertNotNull(dataRef.getWsuId());
+                    
+                    // Check the encryption algorithm was set
+                    assertEquals(WSConstants.TRIPLE_DES, dataRef.getAlgorithm());
 
                     // flag to indicate the element was found in TAG_DATA_REF_URIS
                     found = true;

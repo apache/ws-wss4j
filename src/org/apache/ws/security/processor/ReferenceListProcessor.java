@@ -156,7 +156,7 @@ public class ReferenceListProcessor implements Processor {
             symmetricKey = 
                 getKeyFromSecurityTokenReference(secRefToken, symEncAlgo, crypto, cb, wdi);
         }
-
+        
         return 
             decryptEncryptedData(
                 doc, dataRefURI, encryptedDataElement, symmetricKey, symEncAlgo
@@ -221,6 +221,7 @@ public class ReferenceListProcessor implements Processor {
 
         WSDataRef dataRef = new WSDataRef();
         dataRef.setWsuId(dataRefURI);
+        dataRef.setAlgorithm(symEncAlgo);
         boolean content = X509Util.isContent(encData);
         dataRef.setContent(content);
         
