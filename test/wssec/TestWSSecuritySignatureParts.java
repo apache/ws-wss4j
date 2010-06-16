@@ -45,6 +45,8 @@ import org.apache.ws.security.saml.SAMLIssuer;
 import org.apache.ws.security.saml.SAMLIssuerFactory;
 import org.apache.ws.security.saml.WSSecSignatureSAML;
 import org.apache.ws.security.util.WSSecurityUtil;
+import org.apache.xml.security.c14n.Canonicalizer;
+import org.apache.xml.security.signature.XMLSignature;
 import org.opensaml.SAMLAssertion;
 import org.w3c.dom.Document;
 
@@ -165,6 +167,13 @@ public class TestWSSecuritySignatureParts extends TestCase implements CallbackHa
         WSDataRef wsDataRef = (WSDataRef)refs.get(0);
         String xpath = wsDataRef.getXpath();
         assertEquals("/soapenv:Envelope/soapenv:Header/foo:foobar", xpath);
+        assertEquals(XMLSignature.ALGO_ID_SIGNATURE_RSA, wsDataRef.getAlgorithm());
+        
+        String sigMethod = (String)actionResult.get(WSSecurityEngineResult.TAG_SIGNATURE_METHOD);
+        assertEquals(XMLSignature.ALGO_ID_SIGNATURE_RSA, sigMethod);
+        String c14nMethod = 
+            (String)actionResult.get(WSSecurityEngineResult.TAG_CANONICALIZATION_METHOD);
+        assertEquals(WSConstants.C14N_EXCL_OMIT_COMMENTS, c14nMethod);
     }
     
     /**

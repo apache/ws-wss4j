@@ -82,6 +82,9 @@ public class SignatureProcessor implements Processor {
     
     private int secretKeyLength = WSConstants.WSE_DERIVED_KEY_LEN;
     
+    private String signatureMethod;
+    
+    private String c14nMethod;
 
     public void handleToken(
         Element elem, 
@@ -102,6 +105,7 @@ public class SignatureProcessor implements Processor {
         byte[][] signatureValue = new byte[1][];
         Principal lastPrincipalFound = null;
         secretKeyLength = wsc.getSecretKeyLength();
+        signatureMethod = c14nMethod = null;
         
         try {
             lastPrincipalFound = 
@@ -118,28 +122,24 @@ public class SignatureProcessor implements Processor {
             }
         }
         if (lastPrincipalFound instanceof WSUsernameTokenPrincipal) {
+            WSSecurityEngineResult result = new WSSecurityEngineResult(
+                    WSConstants.UT_SIGN, lastPrincipalFound, null,
+                    returnElements, protectedElements, signatureValue[0]);
+            result.put(WSSecurityEngineResult.TAG_SIGNATURE_METHOD, signatureMethod);
+            result.put(WSSecurityEngineResult.TAG_CANONICALIZATION_METHOD, c14nMethod);
             returnResults.add(
                 0, 
-                new WSSecurityEngineResult(
-                    WSConstants.UT_SIGN, 
-                    lastPrincipalFound, 
-                    null,
-                    returnElements, 
-                    protectedElements, 
-                    signatureValue[0]
-                )
+                result
             );
         } else {
+            WSSecurityEngineResult result = new WSSecurityEngineResult(
+                    WSConstants.SIGN, lastPrincipalFound, returnCert[0], 
+                    returnElements, protectedElements, signatureValue[0]);
+            result.put(WSSecurityEngineResult.TAG_SIGNATURE_METHOD, signatureMethod);
+            result.put(WSSecurityEngineResult.TAG_CANONICALIZATION_METHOD, c14nMethod);
             returnResults.add(
                 0, 
-                new WSSecurityEngineResult(
-                    WSConstants.SIGN, 
-                    lastPrincipalFound,
-                    returnCert[0], 
-                    returnElements, 
-                    protectedElements, 
-                    signatureValue[0]
-                )
+                result
             );
         }
         signatureId = elem.getAttributeNS(null, "Id");
@@ -543,6 +543,7 @@ public class SignatureProcessor implements Processor {
                         ref.setName(new QName(se.getNamespaceURI(), se.getLocalName()));
                         ref.setProtectedElement(se);
                         ref.setXpath(ReferenceListProcessor.getXPath(se));
+                        ref.setAlgorithm(si.getSignatureMethodURI());
                         protectedElements.add(ref);
                         returnElements.add(WSSecurityUtil.getIDFromReference(uri));
                     } else {
@@ -553,6 +554,10 @@ public class SignatureProcessor implements Processor {
                        returnElements.add(siRef); 
                     }
                 }
+                
+                // Algorithms used for signature and c14n
+                signatureMethod = si.getSignatureMethodURI();
+                c14nMethod = si.getCanonicalizationMethodURI();
                 
                 if (certs != null) {
                     returnCert[0] = certs[0];
