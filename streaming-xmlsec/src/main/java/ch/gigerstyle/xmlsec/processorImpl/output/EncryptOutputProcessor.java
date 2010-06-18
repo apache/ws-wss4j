@@ -67,7 +67,7 @@ public class EncryptOutputProcessor extends AbstractOutputProcessor {
         if (xmlEvent.isStartElement()) {
             StartElement startElement = xmlEvent.asStartElement();
 
-            //prohibit double encryption when child elements matches too
+            //avoid double encryption when child elements matches too
             if (activeInternalEncryptionOutputProcessor == null) {
                 for (int i = 0; i < secureParts.size(); i++) {
                     SecurePart securePart = secureParts.get(i);

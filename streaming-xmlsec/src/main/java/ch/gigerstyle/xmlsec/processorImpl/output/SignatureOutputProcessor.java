@@ -39,6 +39,7 @@ public class SignatureOutputProcessor extends AbstractOutputProcessor {
     private List<SignaturePartDef> signaturePartDefList = new ArrayList<SignaturePartDef>();
 
     private boolean bstProcessorAdded = false;
+    private InternalSignatureOutputProcessor activeInternalSignatureOutputProcessor = null;
 
     public SignatureOutputProcessor(SecurityProperties securityProperties) throws XMLSecurityException {
         super(securityProperties);
@@ -50,54 +51,58 @@ public class SignatureOutputProcessor extends AbstractOutputProcessor {
         if (xmlEvent.isStartElement()) {
             StartElement startElement = xmlEvent.asStartElement();
 
-            for (int i = 0; i < secureParts.size(); i++) {
-                SecurePart securePart = secureParts.get(i);
-                if (securePart.getId() == null) {
-                    if (startElement.getName().getLocalPart().equals(securePart.getName())
-                            && startElement.getName().getNamespaceURI().equals(securePart.getNamespace())) {
+            //avoid double signature when child elements matches too
+            if (activeInternalSignatureOutputProcessor == null) {
+                for (int i = 0; i < secureParts.size(); i++) {
+                    SecurePart securePart = secureParts.get(i);
+                    if (securePart.getId() == null) {
+                        if (startElement.getName().getLocalPart().equals(securePart.getName())
+                                && startElement.getName().getNamespaceURI().equals(securePart.getNamespace())) {
 
-                        if (!bstProcessorAdded) {
-                            outputProcessorChain.addProcessor(new BinarySecurityTokenOutputProcessor(getSecurityProperties()));
-                            bstProcessorAdded = true;
-                        }
-
-                        System.out.println("matched securePart for signature");
-                        InternalSignatureOutputProcessor internalSignatureOutputProcessor = null;
-                        try {
-                            SignaturePartDef signaturePartDef = new SignaturePartDef();
-                            signaturePartDef.setModifier(SignaturePartDef.Modifier.valueOf(securePart.getModifier()));
-                            signaturePartDef.setSigRefId("id-" + UUID.randomUUID().toString());//"EncDataId-1612925417"
-                            //signaturePartDef.setKeyId("#" + symmetricKeyId);//#EncKeyId-1483925398
-                            //signaturePartDef.setSymmetricKey(symmetricKey);
-                            signaturePartDefList.add(signaturePartDef);
-                            internalSignatureOutputProcessor = new InternalSignatureOutputProcessor(getSecurityProperties(), signaturePartDef, startElement.getName());
-
-
-                            List<Namespace> namespaceList = new ArrayList<Namespace>();
-                            Iterator<Namespace> namespaceIterator = startElement.getNamespaces();
-                            while (namespaceIterator.hasNext()) {
-                                Namespace namespace = namespaceIterator.next();
-                                namespaceList.add(namespace);
+                            if (!bstProcessorAdded) {
+                                outputProcessorChain.addProcessor(new BinarySecurityTokenOutputProcessor(getSecurityProperties()));
+                                bstProcessorAdded = true;
                             }
-                            namespaceList.add(securityContext.<XMLEventNSAllocator>get("XMLEventNSAllocator").createNamespace(Constants.ATT_wsu_Id.getPrefix(), Constants.ATT_wsu_Id.getNamespaceURI()));
 
-                            List<Attribute> attributeList = new ArrayList<Attribute>();
-                            Iterator<Attribute> attributeIterator = startElement.getAttributes();
-                            while (attributeIterator.hasNext()) {
-                                Attribute attribute = attributeIterator.next();
-                                attributeList.add(attribute);
+                            System.out.println("matched securePart for signature");
+                            InternalSignatureOutputProcessor internalSignatureOutputProcessor = null;
+                            try {
+                                SignaturePartDef signaturePartDef = new SignaturePartDef();
+                                signaturePartDef.setModifier(SignaturePartDef.Modifier.valueOf(securePart.getModifier()));
+                                signaturePartDef.setSigRefId("id-" + UUID.randomUUID().toString());//"EncDataId-1612925417"
+                                //signaturePartDef.setKeyId("#" + symmetricKeyId);//#EncKeyId-1483925398
+                                //signaturePartDef.setSymmetricKey(symmetricKey);
+                                signaturePartDefList.add(signaturePartDef);
+                                internalSignatureOutputProcessor = new InternalSignatureOutputProcessor(getSecurityProperties(), signaturePartDef, startElement.getName());
+
+
+                                List<Namespace> namespaceList = new ArrayList<Namespace>();
+                                Iterator<Namespace> namespaceIterator = startElement.getNamespaces();
+                                while (namespaceIterator.hasNext()) {
+                                    Namespace namespace = namespaceIterator.next();
+                                    namespaceList.add(namespace);
+                                }
+                                namespaceList.add(securityContext.<XMLEventNSAllocator>get("XMLEventNSAllocator").createNamespace(Constants.ATT_wsu_Id.getPrefix(), Constants.ATT_wsu_Id.getNamespaceURI()));
+
+                                List<Attribute> attributeList = new ArrayList<Attribute>();
+                                Iterator<Attribute> attributeIterator = startElement.getAttributes();
+                                while (attributeIterator.hasNext()) {
+                                    Attribute attribute = attributeIterator.next();
+                                    attributeList.add(attribute);
+                                }
+                                attributeList.add(securityContext.<XMLEventNSAllocator>get("XMLEventNSAllocator").createAttribute(Constants.ATT_wsu_Id, signaturePartDef.getSigRefId()));
+                                xmlEvent = securityContext.<XMLEventNSAllocator>get("XMLEventNSAllocator").createStartElement(startElement.getName(), namespaceList, attributeList);
+
+                            } catch (NoSuchAlgorithmException e) {
+                                throw new XMLSecurityException(e.getMessage(), e);
+                            } catch (NoSuchProviderException e) {
+                                throw new XMLSecurityException(e.getMessage(), e);
                             }
-                            attributeList.add(securityContext.<XMLEventNSAllocator>get("XMLEventNSAllocator").createAttribute(Constants.ATT_wsu_Id, signaturePartDef.getSigRefId()));
-                            xmlEvent = securityContext.<XMLEventNSAllocator>get("XMLEventNSAllocator").createStartElement(startElement.getName(), namespaceList, attributeList);
 
-                        } catch (NoSuchAlgorithmException e) {
-                            throw new XMLSecurityException(e.getMessage(), e);
-                        } catch (NoSuchProviderException e) {
-                            throw new XMLSecurityException(e.getMessage(), e);
+                            activeInternalSignatureOutputProcessor = internalSignatureOutputProcessor;
+                            outputProcessorChain.addProcessor(internalSignatureOutputProcessor);
+                            break;
                         }
-
-                        outputProcessorChain.addProcessor(internalSignatureOutputProcessor);
-                        break;
                     }
                 }
             }
@@ -303,6 +308,8 @@ public class SignatureOutputProcessor extends AbstractOutputProcessor {
                     signaturePartDef.setDigestValue(calculatedDigest);
 
                     outputProcessorChain.removeProcessor(this);
+                    //from now on signature is possible again
+                    activeInternalSignatureOutputProcessor = null;
                 } else {
                     for (int i = 0; i < transformers.size(); i++) {
                         Transformer transformer = transformers.get(i);

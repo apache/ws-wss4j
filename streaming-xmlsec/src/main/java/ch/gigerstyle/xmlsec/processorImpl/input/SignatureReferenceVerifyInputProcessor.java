@@ -1,6 +1,7 @@
 package ch.gigerstyle.xmlsec.processorImpl.input;
 
 import ch.gigerstyle.xmlsec.*;
+import ch.gigerstyle.xmlsec.config.JCEAlgorithmMapper;
 import org.w3._2000._09.xmldsig_.ReferenceType;
 import org.w3._2000._09.xmldsig_.SignatureType;
 
@@ -10,6 +11,9 @@ import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 import java.util.*;
 
 /**
@@ -36,8 +40,6 @@ public class SignatureReferenceVerifyInputProcessor extends AbstractInputProcess
 
     private SignatureType signatureType;
 
-    private Map<QName, SignatureReferenceVerifier> signatureReferenceVerifiers = new HashMap<QName, SignatureReferenceVerifier>();
-
     public SignatureReferenceVerifyInputProcessor(SignatureType signatureType, SecurityProperties securityProperties) {
         super(securityProperties);
         this.signatureType = signatureType;
@@ -51,30 +53,80 @@ public class SignatureReferenceVerifyInputProcessor extends AbstractInputProcess
             if (refId != null) {
                 List<ReferenceType> references = signatureType.getSignedInfo().getReference();
                 for (int i = 0; i < references.size(); i++) {
-                    ReferenceType referenceType =  references.get(i);
+                    ReferenceType referenceType = references.get(i);
                     if (refId.getValue().equals(referenceType.getURI())) {
                         System.out.println("found " + refId.getValue());
                         //todo exception when reference is not found
-                        signatureReferenceVerifiers.put(getLastStartElementName(), new SignatureReferenceVerifier(referenceType));
+                        inputProcessorChain.addProcessor(new InternalSignatureReferenceVerifier(getSecurityProperties(), referenceType, startElement.getName()));
                     }
                 }
-            }            
-        }
-
-        Set<Map.Entry<QName, SignatureReferenceVerifier>> entrySet = signatureReferenceVerifiers.entrySet();
-        for (Iterator<Map.Entry<QName, SignatureReferenceVerifier>> entryIterator = entrySet.iterator(); entryIterator.hasNext();) {
-            Map.Entry<QName, SignatureReferenceVerifier> qNameSignatureReferenceVerifierEntry = entryIterator.next();
-            qNameSignatureReferenceVerifierEntry.getValue().processEvent(xmlEvent);
+            }
         }
 
         if (xmlEvent.isEndElement()) {
             EndElement endElement = xmlEvent.asEndElement();
-            if (signatureReferenceVerifiers.containsKey(endElement.getName())) {
-                SignatureReferenceVerifier signatureReferenceVerifier = signatureReferenceVerifiers.remove(endElement.getName());
-                signatureReferenceVerifier.doFinal();
+        }
+        inputProcessorChain.processEvent(xmlEvent);
+    }
+
+    class InternalSignatureReferenceVerifier extends AbstractInputProcessor {
+        private ReferenceType referenceType;
+
+        private List<Transformer> transformers = new ArrayList<Transformer>();
+        private DigestOutputStream digestOutputStream;
+        //todo: startElement still needed?? Is elementCounter not enough? Test overall code
+        private QName startElement;
+        private int elementCounter = 0;
+
+        public InternalSignatureReferenceVerifier(SecurityProperties securityProperties, ReferenceType referenceType, QName startElement) throws XMLSecurityException {
+            super(securityProperties);
+
+            this.startElement = startElement;
+            this.referenceType = referenceType;
+            try {
+                createMessageDigest();
+                buildTransformerChain();
+            } catch (Exception e) {
+                throw new XMLSecurityException(e.getMessage(), e);
             }
         }
 
-        inputProcessorChain.processEvent(xmlEvent);
+        private void createMessageDigest() throws NoSuchAlgorithmException, NoSuchProviderException {
+            String digestAlgorithm = JCEAlgorithmMapper.translateURItoJCEID(referenceType.getDigestMethod().getAlgorithm());
+            MessageDigest messageDigest = MessageDigest.getInstance(digestAlgorithm, "BC");
+            this.digestOutputStream = new DigestOutputStream(messageDigest);
+        }
+
+        private void buildTransformerChain() {
+            transformers.add(new Canonicalizer20010315ExclOmitCommentsTransformer(null));
+        }
+
+        public void processEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException {
+
+            for (int i = 0; i < transformers.size(); i++) {
+                Transformer transformer = transformers.get(i);
+                transformer.transform(xmlEvent, this.digestOutputStream);
+            }
+
+            if (xmlEvent.isStartElement()) {
+                elementCounter++;
+            } else if (xmlEvent.isEndElement()) {
+                EndElement endElement = xmlEvent.asEndElement();
+                elementCounter--;
+
+                if (endElement.getName().equals(startElement) && elementCounter == 0) {
+                    inputProcessorChain.removeProcessor(this);
+
+                    byte[] calculatedDigest = this.digestOutputStream.getDigestValue();
+                    System.out.println("Calculated Digest: " + new String(org.bouncycastle.util.encoders.Base64.encode(calculatedDigest)));
+                    byte[] storedDigest = org.bouncycastle.util.encoders.Base64.decode(referenceType.getDigestValue());
+                    System.out.println("Stored Digest: " + new String(org.bouncycastle.util.encoders.Base64.encode(storedDigest)));
+
+                    if (!MessageDigest.isEqual(storedDigest, calculatedDigest)) {
+                        throw new XMLSecurityException("Digest verification failed");
+                    }
+                }
+            }
+        }
     }
 }

@@ -37,17 +37,18 @@ public class DigestOutputStream extends OutputStream {
 
     public void write(int arg0) {
         messageDigest.update((byte) arg0);
-
+        /*
         System.out.print(new String(new byte[]{(byte)arg0}));
         System.out.flush();
+        */
     }
 
     public void write(byte[] arg0, int arg1, int arg2) {
         messageDigest.update(arg0, arg1, arg2);
-
+        /*
         System.out.print(new String(arg0, arg1, arg2));
         System.out.flush();
-        
+          */
     }
 
     public byte[] getDigestValue() {

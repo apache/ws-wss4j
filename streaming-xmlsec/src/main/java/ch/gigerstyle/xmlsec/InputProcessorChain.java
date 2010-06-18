@@ -26,5 +26,9 @@ public interface InputProcessorChain extends ProcessorChain {
 
     public void addProcessor(InputProcessor inputProcessor);
 
+    public void removeProcessor(InputProcessor inputProcessor);
+
+    public SecurityContext getSecurityContext();
+
     public InputProcessorChain createSubChain(InputProcessor inputProcessor) throws XMLStreamException, XMLSecurityException;
 }

@@ -50,7 +50,7 @@ public class BinarySecurityTokenOutputProcessor extends AbstractOutputProcessor 
             if (startElement.getName().equals(Constants.TAG_wsse_Security)) {
 
                 OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
-
+                //todo from config:
                 Map<QName, String> attributes = new HashMap<QName, String>();
                 attributes.put(Constants.ATT_NULL_EncodingType, "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#Base64Binary");
                 attributes.put(Constants.ATT_NULL_ValueType, "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0#X509v3");

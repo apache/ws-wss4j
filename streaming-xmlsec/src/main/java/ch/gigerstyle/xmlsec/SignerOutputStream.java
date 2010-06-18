@@ -34,9 +34,9 @@ public class SignerOutputStream extends OutputStream {
     public void write(int arg0) {
         try {
             signature.update((byte) arg0);
-            /*System.out.print(new String(new byte[]{(byte)arg0}));
+            System.out.print(new String(new byte[]{(byte)arg0}));
             System.out.flush();
-            */
+
         } catch (SignatureException e) {
             throw new RuntimeException(e);
         }
@@ -45,9 +45,9 @@ public class SignerOutputStream extends OutputStream {
     public void write(byte[] arg0, int arg1, int arg2) {
         try {
             signature.update(arg0, arg1, arg2);
-            /*System.out.print(new String(arg0, arg1, arg2));
+            System.out.print(new String(arg0, arg1, arg2));
             System.out.flush();
-            */
+            
         } catch (SignatureException e) {
             throw new RuntimeException(e);
         }

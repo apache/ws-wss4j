@@ -55,13 +55,26 @@ public class InputProcessorChainImpl implements InputProcessorChain {
         setPos(0);
     }
 
+    public SecurityContext getSecurityContext() {
+        return this.xmlSecurityContext;
+    }
+
     public void addProcessor(InputProcessor inputProcessor) {
         if (inputProcessor.getClass().getName().equals(DecryptInputProcessor.class.getName())
-                || inputProcessor.getClass().getName().equals(SignatureReferenceVerifyInputProcessor.class.getName())) {
+                || inputProcessor.getClass().getName().equals(SignatureReferenceVerifyInputProcessor.class.getName())
+                || inputProcessor.getClass().getName().equals("ch.gigerstyle.xmlsec.processorImpl.input.SignatureReferenceVerifyInputProcessor$InternalSignatureReferenceVerifier")) {
             this.inputProcessors.add(this.inputProcessors.size() -2, inputProcessor);
         } else {
             this.inputProcessors.add(inputProcessor);
         }
+    }
+
+    public void removeProcessor(InputProcessor inputProcessor) {
+        if (this.inputProcessors.indexOf(inputProcessor) <= getPos()) {
+            this.pos--;
+        }
+        //System.out.println("Removing proc " + outputProcessor.getClass().getName() + " from pos " + outputProcessors.indexOf(outputProcessor));
+        this.inputProcessors.remove(inputProcessor);
     }
 
     public void processEvent(XMLEvent xmlEvent) throws XMLStreamException, XMLSecurityException {

@@ -86,7 +86,7 @@ public class XMLSec {
                         throw new SecurityConfigurationException("NoSignatureUser");
                     }
                     if (securityProperties.getSignatureSecureParts().isEmpty()) {
-                        securityProperties.addSignaturePart(new SecurePart("Body", "http://schemas.xmlsoap.org/soap/envelope/", "Content"));
+                        securityProperties.addSignaturePart(new SecurePart("Body", "http://schemas.xmlsoap.org/soap/envelope/", "Element"));
                     }
                     if (securityProperties.getSignatureAlgorithm() == null) {
                         securityProperties.setSignatureAlgorithm("http://www.w3.org/2000/09/xmldsig#rsa-sha1");
