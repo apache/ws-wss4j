@@ -1,4 +1,4 @@
-package ch.gigerstyle.xmlsec.processorImpl;
+package ch.gigerstyle.xmlsec.processorImpl.input;
 
 import ch.gigerstyle.xmlsec.*;
 import org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_secext_1_0.BinarySecurityTokenType;

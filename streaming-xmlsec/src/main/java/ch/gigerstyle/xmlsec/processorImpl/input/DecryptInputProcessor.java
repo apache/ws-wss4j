@@ -1,4 +1,4 @@
-package ch.gigerstyle.xmlsec.processorImpl;
+package ch.gigerstyle.xmlsec.processorImpl.input;
 
 import ch.gigerstyle.xmlsec.*;
 import ch.gigerstyle.xmlsec.config.JCEAlgorithmMapper;

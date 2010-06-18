@@ -1,11 +1,7 @@
 package ch.gigerstyle.xmlsec;
 
 import ch.gigerstyle.xmlsec.config.Init;
-import ch.gigerstyle.xmlsec.processorImpl.*;
-import ch.gigerstyle.xmlsec.processorImpl.FinalOutputProcessor;
 
-import javax.xml.stream.*;
-import java.io.OutputStream;
 import java.security.Provider;
 import java.security.Security;
 
@@ -43,80 +39,89 @@ public class XMLSec {
                 int i = Security.addProvider((Provider) c.newInstance());
             }
         } catch (Throwable e) {
+            //todo: exception is not allowed here...
             throw new RuntimeException("Adding BouncyCastle provider failed", e);
         }
     }
 
-    private SecurityProperties securityProperties;
-
-    public XMLSec(SecurityProperties securityProperties) throws XMLSecurityException {
-        Init.init(null);
-
+    public static OutboundXMLSec getOutboundXMLSec(SecurityProperties securityProperties) throws XMLSecurityException, SecurityConfigurationException {
         if (securityProperties == null) {
             throw new XMLSecurityException("SecurityProperties must not be null!");
         }
 
-        this.securityProperties = securityProperties;
+        Init.init(null);
+
+        securityProperties = validateAndApplyDefaultsToOutboundSecurityProperties(securityProperties);
+        return new OutboundXMLSec(securityProperties);
     }
 
-    public XMLStreamReader processInMessage(XMLStreamReader xmlStreamReader) throws XMLStreamException, XMLSecurityException {
-        return processInMessage(Constants.xmlInputFactory.createXMLEventReader(xmlStreamReader));
+    public static InboundXMLSec getInboundXMLSec(SecurityProperties securityProperties) throws XMLSecurityException, SecurityConfigurationException {
+        if (securityProperties == null) {
+            throw new XMLSecurityException("SecurityProperties must not be null!");
+        }
+
+        Init.init(null);
+
+        securityProperties = validateAndApplyDefaultsToInboundSecurityProperties(securityProperties);
+        return new InboundXMLSec(securityProperties);
     }
 
-    public XMLStreamReader processInMessage(final XMLEventReader xmlEventReader) throws XMLStreamException, XMLSecurityException {
-
-        final PipedXMLStreamReader pipedXMLStreamReader = new PipedXMLStreamReader(10);
-        final PipedOutputInputProcessor pipedOutputProcessor = new PipedOutputInputProcessor(pipedXMLStreamReader, securityProperties);
-
-        Runnable runnable = new Runnable() {
-
-            public void run() {
-
-                try {
-
-                    long start = System.currentTimeMillis();
-
-                    InputProcessorChainImpl processorChain = new InputProcessorChainImpl();
-
-                    //todo dynamic add procs
-                    processorChain.addProcessor(new EncryptedKeyInputProcessor(securityProperties));
-                    processorChain.addProcessor(new BinarySecurityTokenInputProcessor(securityProperties));
-                    processorChain.addProcessor(new SignatureInputProcessor(securityProperties));
-                    processorChain.addProcessor(new TimestampInputProcessor(securityProperties));
-                    processorChain.addProcessor(new LogInputProcessor(securityProperties));
-                    processorChain.addProcessor(pipedOutputProcessor);
-
-                    while (xmlEventReader.hasNext()) {
-                        processorChain.processEvent(xmlEventReader.nextEvent());
-                        processorChain.reset();
+    public static SecurityProperties validateAndApplyDefaultsToOutboundSecurityProperties(SecurityProperties securityProperties) throws SecurityConfigurationException {
+        if (securityProperties.getOutAction() == null) {
+            throw new SecurityConfigurationException("NoOutputAction");
+        }
+        for (int i = 0; i < securityProperties.getOutAction().length; i++) {
+            Constants.Action action = securityProperties.getOutAction()[i];
+            switch (action) {
+                case TIMESTAMP:
+                    if (securityProperties.getTimestampTTL() == null) {
+                        securityProperties.setTimestampTTL(300);
                     }
-                    processorChain.reset();
-                    processorChain.doFinal();
+                    break;
+                case SIGNATURE:
+                    if (securityProperties.getSignatureKeyStore() == null) {
+                        throw new SecurityConfigurationException("NoSignatureKeyStore");
+                    }
+                    if (securityProperties.getSignatureUser() == null) {
+                        throw new SecurityConfigurationException("NoSignatureUser");
+                    }
+                    if (securityProperties.getSignatureSecureParts().isEmpty()) {
+                        securityProperties.addSignaturePart(new SecurePart("Body", "http://schemas.xmlsoap.org/soap/envelope/", "Content"));
+                    }
+                    if (securityProperties.getSignatureAlgorithm() == null) {
+                        securityProperties.setSignatureAlgorithm("http://www.w3.org/2000/09/xmldsig#rsa-sha1");
+                    }
+                    if (securityProperties.getSignatureDigestAlgorithm() == null) {
+                        securityProperties.setSignatureDigestAlgorithm("http://www.w3.org/2000/09/xmldsig#sha1");
+                    }
+                    break;
 
-                    System.out.println("Chain processing time: " + (System.currentTimeMillis() - start));
-
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
+                case ENCRYPT:
+                    if (securityProperties.getEncryptionUseThisCertificate() == null
+                            && securityProperties.getEncryptionKeyStore() == null) {
+                        throw new SecurityConfigurationException("NoEncryptionKeyStoreNorEncryptionUseThisCertificate");
+                    }
+                    if (securityProperties.getEncryptionUser() == null) {
+                        throw new SecurityConfigurationException("NoEncryptionUser");
+                    }
+                    if (securityProperties.getEncryptionSecureParts().isEmpty()) {
+                        securityProperties.addEncryptionSecurePart(new SecurePart("Body", "http://schemas.xmlsoap.org/soap/envelope/", "Content"));
+                    }
+                    if (securityProperties.getEncryptionSymAlgorithm() == null) {
+                        securityProperties.setEncryptionSymAlgorithm("http://www.w3.org/2001/04/xmlenc#aes256-cbc");
+                    }
+                    if (securityProperties.getEncryptionKeyTransportAlgorithm() == null) {
+                        securityProperties.setEncryptionKeyTransportAlgorithm("http://www.w3.org/2001/04/xmlenc#rsa-1_5");
+                    }
+                    break;
             }
-        };
-
-        new Thread(runnable).start();
-
-        return pipedXMLStreamReader;
+        }
+        //todo clone securityProperties
+        return securityProperties;
     }
 
-    public XMLStreamWriter processOutMessage(OutputStream outputStream) throws XMLSecurityException {
-
-        OutputProcessorChainImpl processorChain = new OutputProcessorChainImpl();
-        //StartSecurityOutputProcessor startSecurityOutputProcessor = new StartSecurityOutputProcessor(securityProperties, finalOutputProcessor);
-        //processorChain.addProcessor(startSecurityOutputProcessor);
-        processorChain.addProcessor(new SecurityHeaderOutputProcessor(securityProperties));
-        processorChain.addProcessor(new TimestampOutputProcessor(securityProperties));
-        processorChain.addProcessor(new SignatureOutputProcessor(securityProperties));
-        processorChain.addProcessor(new EncryptOutputProcessor(securityProperties));
-        processorChain.addProcessor(new FinalOutputProcessor(outputStream, securityProperties));
-
-        return new XMLSecurityStreamWriter(processorChain);
+    public static SecurityProperties validateAndApplyDefaultsToInboundSecurityProperties(SecurityProperties securityProperties) throws SecurityConfigurationException {
+        //todo clone securityProperties
+        return securityProperties;
     }
 }

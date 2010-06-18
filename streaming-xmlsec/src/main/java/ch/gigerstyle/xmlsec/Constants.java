@@ -47,7 +47,9 @@ public class Constants {
     public static final String NS_WSU = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd";
     public static final String NS_SOAP11 = "http://schemas.xmlsoap.org/soap/envelope/";
 
+    public static final QName TAG_soap11_Envelope = new QName(NS_SOAP11, "Envelope", "env");
     public static final QName TAG_soap11_Header = new QName(NS_SOAP11, "Header", "env");
+    public static final QName TAG_soap11_Body = new QName(NS_SOAP11, "Body", "env");
 
     public static final QName TAG_wsse_Security = new QName(NS_WSSE, "Security", "wsse");
 
@@ -116,4 +118,10 @@ public class Constants {
     public static final String THUMB_URI = SOAPMESSAGE_NS11 + "#" + "ThumbprintSHA1";
 
     public static final String CACHED_EVENTS = "CACHED_EVENTS";
+
+    public enum Action {
+        TIMESTAMP,
+        SIGNATURE,
+        ENCRYPT,
+    }
 }

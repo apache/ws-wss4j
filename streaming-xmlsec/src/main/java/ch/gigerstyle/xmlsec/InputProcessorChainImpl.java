@@ -1,7 +1,7 @@
 package ch.gigerstyle.xmlsec;
 
-import ch.gigerstyle.xmlsec.processorImpl.DecryptInputProcessor;
-import ch.gigerstyle.xmlsec.processorImpl.SignatureReferenceVerifyInputProcessor;
+import ch.gigerstyle.xmlsec.processorImpl.input.DecryptInputProcessor;
+import ch.gigerstyle.xmlsec.processorImpl.input.SignatureReferenceVerifyInputProcessor;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.XMLEvent;

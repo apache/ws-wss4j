@@ -1,9 +1,5 @@
 package ch.gigerstyle.xmlsec;
 
-import ch.gigerstyle.xmlsec.processorImpl.DecryptInputProcessor;
-import ch.gigerstyle.xmlsec.processorImpl.EncryptOutputProcessor;
-import ch.gigerstyle.xmlsec.processorImpl.SignatureReferenceVerifyInputProcessor;
-
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.XMLEvent;
 import java.util.ArrayList;
@@ -67,11 +63,11 @@ public class OutputProcessorChainImpl implements OutputProcessorChain {
     }
 
     public void addProcessor(OutputProcessor outputProcessor) {
-        if (outputProcessor.getClass().getName().equals("ch.gigerstyle.xmlsec.processorImpl.EncryptOutputProcessor$InternalEncryptionOutputProcessor")) {
+        if (outputProcessor.getClass().getName().equals("ch.gigerstyle.xmlsec.processorImpl.output.EncryptOutputProcessor$InternalEncryptionOutputProcessor")) {
             int pos = this.outputProcessors.size() - 1;
             for (int i = 0; i < outputProcessors.size(); i++) {
                 OutputProcessor processor = outputProcessors.get(i);
-                if (processor.getClass().getName().equals("ch.gigerstyle.xmlsec.processorImpl.EncryptOutputProcessor$InternalEncryptionOutputProcessor")) {
+                if (processor.getClass().getName().equals("ch.gigerstyle.xmlsec.processorImpl.output.EncryptOutputProcessor$InternalEncryptionOutputProcessor")) {
                     //add encrypption processor before other encryption processors...
                     pos = i;
                     break;
@@ -80,11 +76,11 @@ public class OutputProcessorChainImpl implements OutputProcessorChain {
             System.out.println("Adding internal enc proc at pos " + pos);
             this.outputProcessors.add(pos, outputProcessor);
         }
-        else if (outputProcessor.getClass().getName().equals("ch.gigerstyle.xmlsec.processorImpl.SignatureOutputProcessor$InternalSignatureOutputProcessor")) {
+        else if (outputProcessor.getClass().getName().equals("ch.gigerstyle.xmlsec.processorImpl.output.SignatureOutputProcessor$InternalSignatureOutputProcessor")) {
             int pos = this.outputProcessors.size() - 1;
             for (int i = 0; i < outputProcessors.size(); i++) {
                 OutputProcessor processor = outputProcessors.get(i);
-                if (processor.getClass().getName().equals("ch.gigerstyle.xmlsec.processorImpl.SignatureOutputProcessor")) {
+                if (processor.getClass().getName().equals("ch.gigerstyle.xmlsec.processorImpl.output.SignatureOutputProcessor")) {
                     //add encrypption processor before other encryption processors...
                     pos = i + 1;
                     break;
@@ -93,15 +89,15 @@ public class OutputProcessorChainImpl implements OutputProcessorChain {
             this.outputProcessors.add(pos, outputProcessor);
             System.out.println("Adding internal sig proc at pos " + pos);
         }
-        else if (outputProcessor.getClass().getName().equals("ch.gigerstyle.xmlsec.processorImpl.BinarySecurityTokenOutputProcessor")) {
+        else if (outputProcessor.getClass().getName().equals("ch.gigerstyle.xmlsec.processorImpl.output.BinarySecurityTokenOutputProcessor")) {
             this.outputProcessors.add(this.outputProcessors.size() - 1, outputProcessor);
             System.out.println("Adding internal bst proc at pos " + (this.outputProcessors.size() - 1));
         }
-        else if (outputProcessor.getClass().getName().equals("ch.gigerstyle.xmlsec.processorImpl.SignatureOutputProcessor$SignedInfoProcessor")) {
+        else if (outputProcessor.getClass().getName().equals("ch.gigerstyle.xmlsec.processorImpl.output.SignatureOutputProcessor$SignedInfoProcessor")) {
             int pos = this.outputProcessors.size() - 1;
             for (int i = 0; i < outputProcessors.size(); i++) {
                 OutputProcessor processor = outputProcessors.get(i);
-                if (processor.getClass().getName().equals("ch.gigerstyle.xmlsec.processorImpl.SignatureOutputProcessor")) {
+                if (processor.getClass().getName().equals("ch.gigerstyle.xmlsec.processorImpl.output.SignatureOutputProcessor")) {
                     //add encrypption processor before other encryption processors...
                     pos = i + 1;
                     break;

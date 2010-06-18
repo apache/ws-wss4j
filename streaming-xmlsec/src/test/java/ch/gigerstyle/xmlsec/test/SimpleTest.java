@@ -1,16 +1,11 @@
 package ch.gigerstyle.xmlsec.test;
 
 import ch.gigerstyle.xmlsec.*;
-import ch.gigerstyle.xmlsec.test.utils.XMLStreamHelper;
+import ch.gigerstyle.xmlsec.test.utils.StAX2DOM;
 import ch.gigerstyle.xmlsec.test.utils.XmlReaderToWriter;
-import org.codehaus.stax2.XMLInputFactory2;
-import org.codehaus.stax2.XMLStreamReader2;
-import org.codehaus.stax2.ri.Stax2WriterAdapter;
 import org.testng.annotations.Test;
 import org.w3c.dom.*;
 
-import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.stream.*;
@@ -43,21 +38,9 @@ import java.io.OutputStream;
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
-public class SimpleTest {
+public class SimpleTest extends AbstractTestBase {
 
-    private static final XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
 
-    class Callback implements CallbackHandler {
-        public void handle(javax.security.auth.callback.Callback[] callbacks) throws IOException, UnsupportedCallbackException {
-            WSPasswordCallback pc = (WSPasswordCallback) callbacks[0];
-
-            if (pc.getUsage() == WSPasswordCallback.DECRYPT || pc.getUsage() == WSPasswordCallback.SIGNATURE) {
-                pc.setPassword("refApp9876");
-            } else {
-                throw new UnsupportedCallbackException(pc, "Unrecognized Callback");
-            }
-        }
-    }
 
     @Test
     public void testInputChain() throws Exception {
@@ -70,8 +53,8 @@ public class SimpleTest {
             SecurityProperties securityProperties = new SecurityProperties();
             securityProperties.setDecryptionAliasPassword("refApp9876".toCharArray());
             securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "1234567890".toCharArray());
-            securityProperties.setCallbackHandler(new Callback());
-            XMLSec xmlSec = new XMLSec(securityProperties);
+            securityProperties.setCallbackHandler(new CallbackHandlerImpl());
+            InboundXMLSec xmlSec = XMLSec.getInboundXMLSec(securityProperties);
             XMLStreamReader outXmlStreamReader = xmlSec.processInMessage(xmlStreamReader);
             System.out.println("Time: " + (System.currentTimeMillis() - start));
             System.out.println("");
@@ -82,7 +65,7 @@ public class SimpleTest {
             DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
             Document document = documentBuilder.newDocument();
             outXmlStreamReader.next();
-            readDocElements(document, document, outXmlStreamReader, false, false);
+            StAX2DOM.readDocElements(document, document, outXmlStreamReader, false, false);
 
             Transformer transformer = TransformerFactory.newInstance().newTransformer();
             //transformer.transform(new DOMSource(document), new StreamResult(System.out));
@@ -105,13 +88,13 @@ public class SimpleTest {
         XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml"));
 
         SecurityProperties securityProperties = new SecurityProperties();
+        securityProperties.setOutAction(new Constants.Action[]{Constants.Action.TIMESTAMP, Constants.Action.SIGNATURE, Constants.Action.ENCRYPT});
         //securityProperties.setDecryptionAliasPassword("refApp9876".toCharArray());
         //securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "1234567890".toCharArray());
-        //securityProperties.setCallbackHandler(new Callback());
+        //securityProperties.setCallbackHandler(new CallbackHandlerImpl());
         securityProperties.addEncryptionSecurePart(new SecurePart("complexType", "http://www.w3.org/1999/XMLSchema", "Content"));
         securityProperties.setEncryptionSymAlgorithm("http://www.w3.org/2001/04/xmlenc#aes256-cbc");
-        XMLSec xmlSec = new XMLSec(securityProperties);
-
+        OutboundXMLSec xmlSec = XMLSec.getOutboundXMLSec(securityProperties);
         XMLStreamWriter xmlStreamWriter = xmlSec.processOutMessage(baos);
 
 /*        TransformerFactory transformerFactory = TransformerFactory.newInstance();
@@ -135,9 +118,11 @@ public class SimpleTest {
         XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml"));
 
         SecurityProperties securityProperties = new SecurityProperties();
+
+        securityProperties.setOutAction(new Constants.Action[]{Constants.Action.TIMESTAMP, Constants.Action.SIGNATURE, Constants.Action.ENCRYPT});
         //securityProperties.setDecryptionAliasPassword("refApp9876".toCharArray());
         //securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "1234567890".toCharArray());
-        //securityProperties.setCallbackHandler(new Callback());
+        //securityProperties.setCallbackHandler(new CallbackHandlerImpl());
         securityProperties.addEncryptionSecurePart(new SecurePart("complexType", "http://www.w3.org/1999/XMLSchema", "Content"));
         securityProperties.setEncryptionSymAlgorithm("http://www.w3.org/2001/04/xmlenc#aes256-cbc");
         securityProperties.setEncryptionKeyTransportAlgorithm("http://www.w3.org/2001/04/xmlenc#rsa-1_5");
@@ -150,11 +135,11 @@ public class SimpleTest {
         securityProperties.setSignatureAlgorithm("http://www.w3.org/2000/09/xmldsig#rsa-sha1");
         securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "1234567890".toCharArray());
         securityProperties.setSignatureUser("transmitter");
-        securityProperties.setCallbackHandler(new Callback());
+        securityProperties.setCallbackHandler(new CallbackHandlerImpl());
 
         securityProperties.setTimestampTTL(300);
 
-        XMLSec xmlSecOut = new XMLSec(securityProperties);
+        OutboundXMLSec xmlSecOut = XMLSec.getOutboundXMLSec(securityProperties);
 
         XMLStreamWriter xmlStreamWriter = xmlSecOut.processOutMessage(baos);
 
@@ -186,8 +171,8 @@ public class SimpleTest {
 
         securityProperties.setDecryptionAliasPassword("refApp9876".toCharArray());
         securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "1234567890".toCharArray());
-        securityProperties.setCallbackHandler(new Callback());
-        XMLSec xmlSecIn = new XMLSec(securityProperties);
+        securityProperties.setCallbackHandler(new CallbackHandlerImpl());
+        InboundXMLSec xmlSecIn = XMLSec.getInboundXMLSec(securityProperties);
         XMLStreamReader outXmlStreamReader = xmlSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
         System.out.println("Time: " + (System.currentTimeMillis() - start));
         System.out.println("");
@@ -198,7 +183,7 @@ public class SimpleTest {
         DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
         Document document = documentBuilder.newDocument();
         while (outXmlStreamReader.hasNext() && outXmlStreamReader.next() != XMLStreamConstants.START_ELEMENT){}
-        readDocElements(document, document, outXmlStreamReader, false, false);
+        StAX2DOM.readDocElements(document, document, outXmlStreamReader, false, false);
 
         Transformer transformer = TransformerFactory.newInstance().newTransformer();
         transformer.transform(new DOMSource(document), new StreamResult(System.out));
@@ -212,188 +197,4 @@ public class SimpleTest {
         */
     }
 
-    public static void readDocElements(Document doc, Node parent,
-                                       XMLStreamReader reader, boolean repairing, boolean recordLoc)
-            throws XMLStreamException {
-
-        int event = reader.getEventType();
-        while (reader.hasNext()) {
-            switch (event) {
-                case XMLStreamConstants.START_ELEMENT:
-                    startElement(doc, parent, reader, repairing, recordLoc);
-
-                    if (parent instanceof Document) {
-                        return;
-                    }
-                    break;
-                case XMLStreamConstants.END_ELEMENT:
-                    return;
-                case XMLStreamConstants.NAMESPACE:
-                    break;
-                case XMLStreamConstants.ATTRIBUTE:
-                    break;
-                case XMLStreamConstants.CHARACTERS:
-                    if (parent != null) {
-                        recordLoc = addLocation(doc,
-                                parent.appendChild(doc.createTextNode(reader.getText())),
-                                reader, recordLoc);
-                    }
-                    break;
-                case XMLStreamConstants.COMMENT:
-                    if (parent != null) {
-                        parent.appendChild(doc.createComment(reader.getText()));
-                    }
-                    break;
-                case XMLStreamConstants.CDATA:
-                    recordLoc = addLocation(doc,
-                            parent.appendChild(doc.createCDATASection(reader.getText())),
-                            reader, recordLoc);
-                    break;
-                case XMLStreamConstants.PROCESSING_INSTRUCTION:
-                    parent.appendChild(doc.createProcessingInstruction(reader.getPITarget(), reader.getPIData()));
-                    break;
-                case XMLStreamConstants.ENTITY_REFERENCE:
-                    parent.appendChild(doc.createProcessingInstruction(reader.getPITarget(), reader.getPIData()));
-                    break;
-                default:
-                    break;
-            }
-
-            if (reader.hasNext()) {
-                event = reader.next();
-            }
-        }
-    }
-
-    private static boolean addLocation(Document doc, Node node,
-                                       XMLStreamReader reader,
-                                       boolean recordLoc) {
-        if (recordLoc) {
-            Location loc = reader.getLocation();
-            if (loc != null && (loc.getColumnNumber() != 0 || loc.getLineNumber() != 0)) {
-                try {
-                    final int charOffset = loc.getCharacterOffset();
-                    final int colNum = loc.getColumnNumber();
-                    final int linNum = loc.getLineNumber();
-                    final String pubId = loc.getPublicId() == null ? doc.getDocumentURI() : loc.getPublicId();
-                    final String sysId = loc.getSystemId() == null ? doc.getDocumentURI() : loc.getSystemId();
-                    Location loc2 = new Location() {
-                        public int getCharacterOffset() {
-                            return charOffset;
-                        }
-
-                        public int getColumnNumber() {
-                            return colNum;
-                        }
-
-                        public int getLineNumber() {
-                            return linNum;
-                        }
-
-                        public String getPublicId() {
-                            return pubId;
-                        }
-
-                        public String getSystemId() {
-                            return sysId;
-                        }
-                    };
-                    node.setUserData("location", loc2, new UserDataHandler() {
-                        public void handle(short operation, String key, Object data, Node src, Node dst) {
-                            if (operation == NODE_CLONED) {
-                                dst.setUserData(key, data, this);
-                            }
-                        }
-                    });
-                } catch (Exception ex) {
-                    //possibly not DOM level 3, won't be able to record this then
-                    return false;
-                }
-            }
-        }
-        return recordLoc;
-    }
-
-    /**
-     * @param parent
-     * @param reader
-     * @return
-     * @throws XMLStreamException
-     */
-    private static Element startElement(Document doc,
-                                        Node parent,
-                                        XMLStreamReader reader,
-                                        boolean repairing,
-                                        boolean recordLocation)
-            throws XMLStreamException {
-
-        Element e = doc.createElementNS(reader.getNamespaceURI(), reader.getLocalName());
-        if (reader.getPrefix() != null) {
-            e.setPrefix(reader.getPrefix());
-        }
-        e = (Element) parent.appendChild(e);
-        recordLocation = addLocation(doc, e, reader, recordLocation);
-
-        for (int ns = 0; ns < reader.getNamespaceCount(); ns++) {
-            String uri = reader.getNamespaceURI(ns);
-            String prefix = reader.getNamespacePrefix(ns);
-
-            declare(e, uri, prefix);
-        }
-
-        for (int att = 0; att < reader.getAttributeCount(); att++) {
-            String name = reader.getAttributeLocalName(att);
-            String prefix = reader.getAttributePrefix(att);
-            if (prefix != null && prefix.length() > 0) {
-                name = prefix + ":" + name;
-            }
-
-            Attr attr = doc.createAttributeNS(reader.getAttributeNamespace(att), name);
-            attr.setValue(reader.getAttributeValue(att));
-            e.setAttributeNode(attr);
-        }
-
-        if (repairing && !isDeclared(e, reader.getNamespaceURI(), reader.getPrefix())) {
-            declare(e, reader.getNamespaceURI(), reader.getPrefix());
-        }
-
-        reader.next();
-
-        readDocElements(doc, e, reader, repairing, recordLocation);
-
-        return e;
-    }
-
-    private static final String XML_NS = "http://www.w3.org/2000/xmlns/";
-
-    private static void declare(Element node, String uri, String prefix) {
-        String qualname;
-        if (prefix != null && prefix.length() > 0) {
-            qualname = "xmlns:" + prefix;
-        } else {
-            qualname = "xmlns";
-        }
-        Attr attr = node.getOwnerDocument().createAttributeNS(XML_NS, qualname);
-        attr.setValue(uri);
-        node.setAttributeNodeNS(attr);
-    }
-
-    private static boolean isDeclared(Element e, String namespaceURI, String prefix) {
-        Attr att;
-        if (prefix != null && prefix.length() > 0) {
-            att = e.getAttributeNodeNS(XML_NS, prefix);
-        } else {
-            att = e.getAttributeNode("xmlns");
-        }
-
-        if (att != null && att.getNodeValue().equals(namespaceURI)) {
-            return true;
-        }
-
-        if (e.getParentNode() instanceof Element) {
-            return isDeclared((Element) e.getParentNode(), namespaceURI, prefix);
-        }
-
-        return false;
-    }
 }

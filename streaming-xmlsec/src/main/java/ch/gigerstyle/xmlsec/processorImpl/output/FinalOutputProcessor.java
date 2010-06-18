@@ -1,14 +1,19 @@
-package ch.gigerstyle.xmlsec.processorImpl;
+package ch.gigerstyle.xmlsec.processorImpl.output;
 
 import ch.gigerstyle.xmlsec.*;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.XMLEvent;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * User: giger
- * Date: May 31, 2010
- * Time: 6:17:55 PM
+ * Date: May 29, 2010
+ * Time: 4:25:26 PM
  * Copyright 2010 Marc Giger gigerstyle@gmx.ch
  * <p/>
  * This program is free software; you can redistribute it and/or modify it
@@ -25,27 +30,35 @@ import javax.xml.stream.events.XMLEvent;
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
-public class StartSecurityOutputProcessor extends AbstractOutputProcessor {
+public class FinalOutputProcessor extends AbstractOutputProcessor {
 
-    FinalOutputProcessor finalOutputProcessor;
+    private OutputStreamWriter outputStreamWriter;
 
-    public StartSecurityOutputProcessor(SecurityProperties securityProperties, FinalOutputProcessor finalOutputProcessor) throws XMLSecurityException {
+    private List<XMLEvent> xmlEventList = new ArrayList<XMLEvent>();
+
+    public FinalOutputProcessor(OutputStream outputStream, SecurityProperties securityProperties) throws XMLSecurityException {
         super(securityProperties);
-        this.finalOutputProcessor = finalOutputProcessor;
+        outputStreamWriter = new OutputStreamWriter(outputStream);
     }
 
-    @Override
     public void processEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException {
-        outputProcessorChain.processEvent(xmlEvent);
+        //cache events
+        xmlEventList.add(xmlEvent);
+        if (securityContext.get(Constants.CACHED_EVENTS) == null) {
+            securityContext.put(Constants.CACHED_EVENTS, xmlEventList);
+        }
     }
 
     @Override
     public void processHeaderEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException {
-        outputProcessorChain.processEvent(xmlEvent);
+        xmlEvent.writeAsEncodedUnicode(outputStreamWriter);
     }
 
-    @Override
-    public void doFinal(OutputProcessorChain outputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException {
-        super.doFinal(outputProcessorChain, securityContext);
+    public void doFinal(OutputProcessorChain outputProcessorChain, SecurityContext securityContext) throws XMLSecurityException {
+        try {
+            outputStreamWriter.flush();
+        } catch (IOException e) {
+            throw new XMLSecurityException(e.getMessage(), e);
+        }
     }
 }

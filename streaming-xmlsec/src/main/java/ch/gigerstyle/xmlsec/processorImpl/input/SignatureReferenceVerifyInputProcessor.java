@@ -1,4 +1,4 @@
-package ch.gigerstyle.xmlsec.processorImpl;
+package ch.gigerstyle.xmlsec.processorImpl.input;
 
 import ch.gigerstyle.xmlsec.*;
 import org.w3._2000._09.xmldsig_.ReferenceType;

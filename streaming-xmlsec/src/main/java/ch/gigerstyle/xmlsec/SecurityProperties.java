@@ -99,7 +99,8 @@ public class SecurityProperties {
         this.callbackHandler = callbackHandler;
     }
 
-    private boolean doEncrypt = false;
+    private Constants.Action[] outAction;
+
     private Class encryptionCryptoClass;
     private KeyStore encryptionKeyStore;
     private String encryptionUser;
@@ -147,7 +148,7 @@ public class SecurityProperties {
         encryptionParts.add(securePart);
     }
 
-    public List<SecurePart> getEncryptionParts() {
+    public List<SecurePart> getEncryptionSecureParts() {
         return encryptionParts;
     }
 
@@ -173,14 +174,6 @@ public class SecurityProperties {
 
     public void setEncryptionUseThisCertificate(X509Certificate encryptionUseThisCertificate) {
         this.encryptionUseThisCertificate = encryptionUseThisCertificate;
-    }
-
-    public boolean isDoEncrypt() {
-        return doEncrypt;
-    }
-
-    public void setDoEncrypt(boolean doEncrypt) {
-        this.doEncrypt = doEncrypt;
     }
 
     public String getEncryptionUser() {
@@ -210,7 +203,7 @@ public class SecurityProperties {
         signatureParts.add(securePart);
     }
 
-    public List<SecurePart> getSignatureParts() {
+    public List<SecurePart> getSignatureSecureParts() {
         return signatureParts;
     }
 
@@ -272,13 +265,21 @@ public class SecurityProperties {
         }
     }
 
-    private int timestampTTL;
+    private Integer timestampTTL;
 
-    public int getTimestampTTL() {
+    public Integer getTimestampTTL() {
         return timestampTTL;
     }
 
-    public void setTimestampTTL(int timestampTTL) {
+    public void setTimestampTTL(Integer timestampTTL) {
         this.timestampTTL = timestampTTL;
+    }
+
+    public Constants.Action[] getOutAction() {
+        return outAction;
+    }
+
+    public void setOutAction(Constants.Action[] outAction) {
+        this.outAction = outAction;
     }
 }

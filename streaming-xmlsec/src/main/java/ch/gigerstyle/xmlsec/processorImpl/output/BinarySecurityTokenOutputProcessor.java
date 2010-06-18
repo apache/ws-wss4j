@@ -1,4 +1,4 @@
-package ch.gigerstyle.xmlsec.processorImpl;
+package ch.gigerstyle.xmlsec.processorImpl.output;
 
 import ch.gigerstyle.xmlsec.*;
 

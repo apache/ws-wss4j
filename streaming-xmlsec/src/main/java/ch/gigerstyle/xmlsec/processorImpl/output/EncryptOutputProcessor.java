@@ -1,4 +1,4 @@
-package ch.gigerstyle.xmlsec.processorImpl;
+package ch.gigerstyle.xmlsec.processorImpl.output;
 
 import ch.gigerstyle.xmlsec.*;
 import ch.gigerstyle.xmlsec.config.JCEAlgorithmMapper;
@@ -43,9 +43,11 @@ public class EncryptOutputProcessor extends AbstractOutputProcessor {
     private String symmetricKeyId = UUID.randomUUID().toString();
     private List<EncryptionPartDef> encryptionPartDefList = new ArrayList<EncryptionPartDef>();
 
+    private InternalEncryptionOutputProcessor activeInternalEncryptionOutputProcessor = null;
+
     public EncryptOutputProcessor(SecurityProperties securityProperties) throws XMLSecurityException {
         super(securityProperties);
-        secureParts = securityProperties.getEncryptionParts();
+        secureParts = securityProperties.getEncryptionSecureParts();
 
         String keyAlgorithm = JCEAlgorithmMapper.getJCEKeyAlgorithmFromURI(securityProperties.getEncryptionSymAlgorithm());
         int keyLength = JCEAlgorithmMapper.getKeyLengthFromURI(securityProperties.getEncryptionSymAlgorithm());
@@ -65,34 +67,38 @@ public class EncryptOutputProcessor extends AbstractOutputProcessor {
         if (xmlEvent.isStartElement()) {
             StartElement startElement = xmlEvent.asStartElement();
 
-            for (int i = 0; i < secureParts.size(); i++) {
-                SecurePart securePart = secureParts.get(i);
-                if (securePart.getId() == null) {
-                    if (startElement.getName().getLocalPart().equals(securePart.getName())
-                            && startElement.getName().getNamespaceURI().equals(securePart.getNamespace())) {
+            //prohibit double encryption when child elements matches too
+            if (activeInternalEncryptionOutputProcessor == null) {
+                for (int i = 0; i < secureParts.size(); i++) {
+                    SecurePart securePart = secureParts.get(i);
+                    if (securePart.getId() == null) {
+                        if (startElement.getName().getLocalPart().equals(securePart.getName())
+                                && startElement.getName().getNamespaceURI().equals(securePart.getNamespace())) {
 
-                        System.out.println("matched securePart for encryption");
-                        InternalEncryptionOutputProcessor internalEncryptionOutputProcessor = null;
-                        try {
-                            EncryptionPartDef encryptionPartDef = new EncryptionPartDef();
-                            encryptionPartDef.setModifier(EncryptionPartDef.Modifier.valueOf(securePart.getModifier()));
-                            encryptionPartDef.setEncRefId("EncDataId-" + UUID.randomUUID().toString());//"EncDataId-1612925417"
-                            encryptionPartDef.setKeyId("#EncKeyId-" + symmetricKeyId);//#EncKeyId-1483925398
-                            encryptionPartDef.setSymmetricKey(symmetricKey);
-                            encryptionPartDefList.add(encryptionPartDef);
-                            internalEncryptionOutputProcessor = new InternalEncryptionOutputProcessor(getSecurityProperties(), encryptionPartDef, startElement.getName(), securityContext.<XMLEventNSAllocator>get("XMLEventNSAllocator"));
-                        } catch (NoSuchAlgorithmException e) {
-                            throw new XMLSecurityException(e.getMessage(), e);
-                        } catch (NoSuchPaddingException e) {
-                            throw new XMLSecurityException(e.getMessage(), e);
-                        } catch (InvalidKeyException e) {
-                            throw new XMLSecurityException(e.getMessage(), e);
-                        } catch (IOException e) {
-                            throw new XMLSecurityException(e.getMessage(), e);
+                            System.out.println("matched securePart for encryption");
+                            InternalEncryptionOutputProcessor internalEncryptionOutputProcessor = null;
+                            try {
+                                EncryptionPartDef encryptionPartDef = new EncryptionPartDef();
+                                encryptionPartDef.setModifier(EncryptionPartDef.Modifier.valueOf(securePart.getModifier()));
+                                encryptionPartDef.setEncRefId("EncDataId-" + UUID.randomUUID().toString());//"EncDataId-1612925417"
+                                encryptionPartDef.setKeyId("#EncKeyId-" + symmetricKeyId);//#EncKeyId-1483925398
+                                encryptionPartDef.setSymmetricKey(symmetricKey);
+                                encryptionPartDefList.add(encryptionPartDef);
+                                internalEncryptionOutputProcessor = new InternalEncryptionOutputProcessor(getSecurityProperties(), encryptionPartDef, startElement.getName(), securityContext.<XMLEventNSAllocator>get("XMLEventNSAllocator"));
+                            } catch (NoSuchAlgorithmException e) {
+                                throw new XMLSecurityException(e.getMessage(), e);
+                            } catch (NoSuchPaddingException e) {
+                                throw new XMLSecurityException(e.getMessage(), e);
+                            } catch (InvalidKeyException e) {
+                                throw new XMLSecurityException(e.getMessage(), e);
+                            } catch (IOException e) {
+                                throw new XMLSecurityException(e.getMessage(), e);
+                            }
+
+                            activeInternalEncryptionOutputProcessor = internalEncryptionOutputProcessor;
+                            outputProcessorChain.addProcessor(internalEncryptionOutputProcessor);
+                            break;
                         }
-
-                        outputProcessorChain.addProcessor(internalEncryptionOutputProcessor);
-                        break;
                     }
                 }
             }
@@ -121,7 +127,7 @@ public class EncryptOutputProcessor extends AbstractOutputProcessor {
                 createStartElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_xmlenc_EncryptedKey, attributes);
 
                 attributes = new HashMap<QName, String>();
-                attributes.put(Constants.ATT_NULL_Algorithm, "http://www.w3.org/2001/04/xmlenc#rsa-1_5");
+                attributes.put(Constants.ATT_NULL_Algorithm, getSecurityProperties().getEncryptionKeyTransportAlgorithm());
                 createStartElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_xenc_EncryptionMethod, attributes);
                 createEndElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_xenc_EncryptionMethod);
                 createStartElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_dsig_KeyInfo, null);
@@ -285,29 +291,29 @@ public class EncryptOutputProcessor extends AbstractOutputProcessor {
                 EndElement endElement = xmlEvent.asEndElement();
 
                 if (endElement.getName().equals(this.startElement) && elementCounter == 0) {
-
+                    OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
                     if (encryptionPartDef.getModifier() == EncryptionPartDef.Modifier.Element) {
-                        OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
                         encryptEvent(xmlEvent);
                         doFinalInternal(subOutputProcessorChain);
-                        subOutputProcessorChain.removeProcessor(this);
                     } else {
-                        OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
                         doFinalInternal(subOutputProcessorChain);
                         outputAsEvent(subOutputProcessorChain, xmlEvent);
-                        subOutputProcessorChain.removeProcessor(this);
                     }
+                    subOutputProcessorChain.removeProcessor(this);
+                    //from now on encryption is possible again
+                    activeInternalEncryptionOutputProcessor = null;
 
                 } else {
                     encryptEvent(xmlEvent);
                 }
             } else {
 
-                List<Characters> charactersList =  characterEventGeneratorOutputStream.getCharactersBuffer();
                 OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
-                for (int i = 0; i < charactersList.size(); i++) {
-                    Characters characters = charactersList.get(i);
+                Iterator<Characters> charactersIterator =  characterEventGeneratorOutputStream.getCharactersBuffer().iterator();
+                while (charactersIterator.hasNext()) {
+                    Characters characters = charactersIterator.next();
                     outputAsEvent(subOutputProcessorChain, characters);
+                    charactersIterator.remove();
                 }
             }
         }
@@ -384,10 +390,11 @@ public class EncryptOutputProcessor extends AbstractOutputProcessor {
             } catch (IllegalBlockSizeException e) {
                 throw new XMLSecurityException(e.getMessage(), e);
             }
-            List<Characters> charactersList =  characterEventGeneratorOutputStream.getCharactersBuffer();
-            for (int i = 0; i < charactersList.size(); i++) {
-                Characters characters = charactersList.get(i);
+            Iterator<Characters> charactersIterator =  characterEventGeneratorOutputStream.getCharactersBuffer().iterator();
+            while (charactersIterator.hasNext()) {
+                Characters characters = charactersIterator.next();
                 outputAsEvent(outputProcessorChain, characters);
+                charactersIterator.remove();
             }
 
             createEndElementAndOutputAsEvent(outputProcessorChain, Constants.TAG_xenc_CipherValue);

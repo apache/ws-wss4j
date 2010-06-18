@@ -1,4 +1,4 @@
-package ch.gigerstyle.xmlsec.processorImpl;
+package ch.gigerstyle.xmlsec.processorImpl.output;
 
 import ch.gigerstyle.xmlsec.*;
 import ch.gigerstyle.xmlsec.DigestOutputStream;
@@ -42,7 +42,7 @@ public class SignatureOutputProcessor extends AbstractOutputProcessor {
 
     public SignatureOutputProcessor(SecurityProperties securityProperties) throws XMLSecurityException {
         super(securityProperties);
-        secureParts = securityProperties.getSignatureParts();
+        secureParts = securityProperties.getSignatureSecureParts();
     }
 
     @Override

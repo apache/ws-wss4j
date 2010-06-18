@@ -19,6 +19,7 @@ package ch.gigerstyle.xmlsec.test;
 import ch.gigerstyle.xmlsec.Canonicalizer20010315ExclWithCommentsTransformer;
 import ch.gigerstyle.xmlsec.Canonicalizer20010315WithCommentsTransformer;
 import ch.gigerstyle.xmlsec.XMLEventNSAllocator;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import javax.xml.namespace.QName;
@@ -39,7 +40,8 @@ public class Canonicalizer20010315ExclusiveTest {
 
     private XMLInputFactory xmlInputFactory;
 
-    public Canonicalizer20010315ExclusiveTest() {
+    @BeforeMethod
+    public void setUp() {
         this.xmlInputFactory = XMLInputFactory.newFactory();
         this.xmlInputFactory.setEventAllocator(new XMLEventNSAllocator());
     }
