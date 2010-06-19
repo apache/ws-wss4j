@@ -195,6 +195,7 @@ public class SecurityProperties {
     private List<SecurePart> signatureParts = new ArrayList<SecurePart>();
     private String signatureAlgorithm;
     private String signatureDigestAlgorithm;
+    private String signatureCanonicalizationAlgorithm;
     private Class signatureCryptoClass;
     private KeyStore signatureKeyStore;
     private String signatureUser;
@@ -281,5 +282,13 @@ public class SecurityProperties {
 
     public void setOutAction(Constants.Action[] outAction) {
         this.outAction = outAction;
+    }
+
+    public String getSignatureCanonicalizationAlgorithm() {
+        return signatureCanonicalizationAlgorithm;
+    }
+
+    public void setSignatureCanonicalizationAlgorithm(String signatureCanonicalizationAlgorithm) {
+        this.signatureCanonicalizationAlgorithm = signatureCanonicalizationAlgorithm;
     }
 }

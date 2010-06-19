@@ -164,12 +164,12 @@ public class SignatureOutputProcessor extends AbstractOutputProcessor {
                 createStartElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_dsig_SignedInfo, null);
 
                 attributes = new HashMap<QName, String>();
-                attributes.put(Constants.ATT_NULL_Algorithm, "http://www.w3.org/2001/10/xml-exc-c14n#");
+                attributes.put(Constants.ATT_NULL_Algorithm, getSecurityProperties().getSignatureCanonicalizationAlgorithm());
                 createStartElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_dsig_CanonicalizationMethod, attributes);
                 createEndElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_dsig_CanonicalizationMethod);
 
                 attributes = new HashMap<QName, String>();
-                attributes.put(Constants.ATT_NULL_Algorithm, "http://www.w3.org/2000/09/xmldsig#rsa-sha1");
+                attributes.put(Constants.ATT_NULL_Algorithm, getSecurityProperties().getSignatureAlgorithm());
                 createStartElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_dsig_SignatureMethod, attributes);
                 createEndElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_dsig_SignatureMethod);
 
@@ -181,14 +181,14 @@ public class SignatureOutputProcessor extends AbstractOutputProcessor {
                     createStartElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_dsig_Transforms, null);
 
                     attributes = new HashMap<QName, String>();
-                    attributes.put(Constants.ATT_NULL_Algorithm, "http://www.w3.org/2001/10/xml-exc-c14n#");
+                    attributes.put(Constants.ATT_NULL_Algorithm, getSecurityProperties().getSignatureCanonicalizationAlgorithm());
                     createStartElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_dsig_Transform, attributes);
                     createEndElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_dsig_Transform);
 
                     createEndElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_dsig_Transforms);
 
                     attributes = new HashMap<QName, String>();
-                    attributes.put(Constants.ATT_NULL_Algorithm, "http://www.w3.org/2000/09/xmldsig#sha1");
+                    attributes.put(Constants.ATT_NULL_Algorithm, getSecurityProperties().getSignatureDigestAlgorithm());
                     createStartElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_dsig_DigestMethod, attributes);
                     createEndElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_dsig_DigestMethod);
                     createStartElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_dsig_DigestValue, null);
@@ -203,6 +203,7 @@ public class SignatureOutputProcessor extends AbstractOutputProcessor {
                 createCharactersAndOutputAsHeaderEvent(subOutputProcessorChain, Base64.encode(signedInfoProcessor.getSignatureValue()));
                 createEndElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_dsig_SignatureValue);
 
+                //todo dynamic attr values:
                 attributes = new HashMap<QName, String>();
                 attributes.put(Constants.ATT_NULL_Id, "KeyId-1043455692");
                 createStartElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_dsig_KeyInfo, attributes);
@@ -290,10 +291,8 @@ public class SignatureOutputProcessor extends AbstractOutputProcessor {
                 }
 
                 elementCounter++;
-                //System.out.println("Instance: " + this.hashCode() + " Incr " + elementCounter);
             } else if (xmlEvent.isEndElement()) {
                 elementCounter--;
-                //System.out.println("Instance: " + this.hashCode() + " Decr " + elementCounter);
 
                 EndElement endElement = xmlEvent.asEndElement();
 

@@ -85,6 +85,9 @@ public class XMLSec {
                     if (securityProperties.getSignatureUser() == null) {
                         throw new SecurityConfigurationException("NoSignatureUser");
                     }
+                    if (securityProperties.getCallbackHandler() == null) {
+                        throw new SecurityConfigurationException("NoCallbackHandler");
+                    }
                     if (securityProperties.getSignatureSecureParts().isEmpty()) {
                         securityProperties.addSignaturePart(new SecurePart("Body", "http://schemas.xmlsoap.org/soap/envelope/", "Element"));
                     }
@@ -94,6 +97,9 @@ public class XMLSec {
                     if (securityProperties.getSignatureDigestAlgorithm() == null) {
                         securityProperties.setSignatureDigestAlgorithm("http://www.w3.org/2000/09/xmldsig#sha1");
                     }
+                    if (securityProperties.getSignatureCanonicalizationAlgorithm() == null) {
+                        securityProperties.setSignatureCanonicalizationAlgorithm("http://www.w3.org/2001/10/xml-exc-c14n#");
+                    }
                     break;
 
                 case ENCRYPT:
@@ -101,7 +107,7 @@ public class XMLSec {
                             && securityProperties.getEncryptionKeyStore() == null) {
                         throw new SecurityConfigurationException("NoEncryptionKeyStoreNorEncryptionUseThisCertificate");
                     }
-                    if (securityProperties.getEncryptionUser() == null) {
+                    if (securityProperties.getEncryptionUser() == null && securityProperties.getEncryptionUseThisCertificate() == null) {
                         throw new SecurityConfigurationException("NoEncryptionUser");
                     }
                     if (securityProperties.getEncryptionSecureParts().isEmpty()) {

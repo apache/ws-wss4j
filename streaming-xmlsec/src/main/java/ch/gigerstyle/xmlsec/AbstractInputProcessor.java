@@ -1,5 +1,8 @@
 package ch.gigerstyle.xmlsec;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.XMLEvent;
@@ -25,6 +28,9 @@ import javax.xml.stream.events.XMLEvent;
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 public abstract class AbstractInputProcessor implements InputProcessor {
+
+    protected final transient Log logger = LogFactory.getLog(this.getClass());
+
     protected SecurityProperties securityProperties;
     private QName lastStartElementName = new QName("", "");
 
