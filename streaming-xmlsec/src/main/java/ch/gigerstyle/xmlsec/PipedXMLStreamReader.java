@@ -77,7 +77,7 @@ public class PipedXMLStreamReader implements XMLStreamReader {
 
     /**
      * Creates a <code>PipedInputStream</code> so
-     * that it is not yet PipedOutputInputProcessor
+     * that it is not yet PipedInputProcessor
      * connected}.
      * It must be {@linkplain java.io.PipedOutputStream#connect(
      *java.io.PipedInputStream) connected} to a
@@ -89,7 +89,7 @@ public class PipedXMLStreamReader implements XMLStreamReader {
 
     /**
      * Creates a <code>PipedInputStream</code> so that it is not yet
-     * PipedOutputInputProcessor connected and
+     * PipedInputProcessor connected and
      * uses the specified pipe size for the pipe's buffer.
      * It must be {@linkplain java.io.PipedOutputStream#connect(
      *java.io.PipedInputStream)
@@ -115,7 +115,7 @@ public class PipedXMLStreamReader implements XMLStreamReader {
      * available.
      *
      * @throws java.io.IOException If the pipe is <a href=#BROKEN> <code>broken</code></a>,
-     *                             PipedOutputInputProcessor unconnected,
+     *                             PipedInputProcessor unconnected,
      *                             closed, or if an I/O error occurs.
      */
     protected synchronized void receive(XMLEvent xmlEvent) throws IOException {

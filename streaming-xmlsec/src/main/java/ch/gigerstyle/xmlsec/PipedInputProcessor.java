@@ -24,11 +24,11 @@ import java.io.IOException;
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
-public class PipedOutputInputProcessor extends AbstractInputProcessor {
+public class PipedInputProcessor extends AbstractInputProcessor {
 
     private PipedXMLStreamReader sink;
 
-    public PipedOutputInputProcessor(PipedXMLStreamReader pipedXMLStreamReader, SecurityProperties securityProperties) throws XMLStreamException {
+    public PipedInputProcessor(PipedXMLStreamReader pipedXMLStreamReader, SecurityProperties securityProperties) throws XMLStreamException {
         super(securityProperties);
         connect(pipedXMLStreamReader);
     }

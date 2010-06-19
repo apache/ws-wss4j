@@ -42,7 +42,7 @@ public class InboundXMLSec {
     public XMLStreamReader processInMessage(final XMLEventReader xmlEventReader) throws XMLStreamException, XMLSecurityException {
 
         final PipedXMLStreamReader pipedXMLStreamReader = new PipedXMLStreamReader(10);
-        final PipedOutputInputProcessor pipedOutputProcessor = new PipedOutputInputProcessor(pipedXMLStreamReader, securityProperties);
+        final PipedInputProcessor pipedInputProcessor = new PipedInputProcessor(pipedXMLStreamReader, securityProperties);
 
         Runnable runnable = new Runnable() {
 
@@ -60,7 +60,7 @@ public class InboundXMLSec {
                     processorChain.addProcessor(new SignatureInputProcessor(securityProperties));
                     processorChain.addProcessor(new TimestampInputProcessor(securityProperties));
                     processorChain.addProcessor(new LogInputProcessor(securityProperties));
-                    processorChain.addProcessor(pipedOutputProcessor);
+                    processorChain.addProcessor(pipedInputProcessor);
 
                     while (xmlEventReader.hasNext()) {
                         processorChain.processEvent(xmlEventReader.nextEvent());
