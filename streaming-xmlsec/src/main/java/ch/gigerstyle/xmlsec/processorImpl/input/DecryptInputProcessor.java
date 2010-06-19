@@ -53,10 +53,12 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
 
     private EncryptedKeyType encryptedKeyType;
     private EncryptedDataType currentEncryptedDataType;
+    private byte[] keyBytes;
 
-    public DecryptInputProcessor(EncryptedKeyType encryptedKeyType, SecurityProperties securityProperties) {
+    public DecryptInputProcessor(EncryptedKeyType encryptedKeyType, byte[] keyBytes, SecurityProperties securityProperties) {
         super(securityProperties);
         this.encryptedKeyType = encryptedKeyType;
+        this.keyBytes = keyBytes;
     }
 
     /*
@@ -69,6 +71,7 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
         </ds:KeyInfo>
         <xenc:CipherData xmlns:xenc="http://www.w3.org/2001/04/xmlenc#">
             <xenc:CipherValue xmlns:xenc="http://www.w3.org/2001/04/xmlenc#">
+            ...
             </xenc:CipherValue>
         </xenc:CipherData>
     </xenc:EncryptedData>
@@ -159,85 +162,9 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
             //todo this should go to EncryptedKeyInputProcessor...
             if (getLastStartElementName().equals(Constants.TAG_xenc_CipherValue)) {
                 try {
-                    String asyncEncAlgo = JCEAlgorithmMapper.translateURItoJCEID(encryptedKeyType.getEncryptionMethod().getAlgorithm());
-                    Cipher cipher = Cipher.getInstance(asyncEncAlgo, "BC");
-
-                    String alias = null;
-
-                    KeyInfoType keyInfoType = encryptedKeyType.getKeyInfo();
-                    if (keyInfoType != null) {
-
-                        //todo better access and null checks
-                        SecurityTokenReferenceType securityTokenReferenceType = (SecurityTokenReferenceType)keyInfoType.getContent().get(0);
-                        if (securityTokenReferenceType == null) {
-                            throw new XMLSecurityException("No SecurityTokenReference found");
-                        }
-
-                        Object securityToken = securityTokenReferenceType.getAny().get(0);
-                        if (securityToken == null) {
-                            throw new XMLSecurityException("No securityToken found");
-                        }
-                        else if (securityToken instanceof X509DataType) {
-                            X509DataType x509DataType = (X509DataType)securityToken;
-                            //todo
-                        } else if (securityToken instanceof X509IssuerSerialType) {
-                            X509IssuerSerialType x509IssuerSerialType = (X509IssuerSerialType)securityToken;
-                            //todo
-                        }
-                        else if (securityToken instanceof KeyIdentifierType) {
-                            KeyIdentifierType keyIdentifierType = (KeyIdentifierType)securityToken;
-
-                            String valueType = keyIdentifierType.getValueType();
-                            byte[] binaryContent = Base64.decode(keyIdentifierType.getValue());
-
-                            if (Constants.X509_V3_TYPE.equals(valueType)) {
-                                X509Certificate[] x509Certificate = getSecurityProperties().getDecryptionCrypto().getX509Certificates(binaryContent, false);
-                                if (x509Certificate == null || x509Certificate.length < 1 || x509Certificate[0] == null) {
-                                    throw new XMLSecurityException("noCertsFound" + "decryption (KeyId)");
-                                }
-                                alias = getSecurityProperties().getDecryptionCrypto().getAliasForX509Cert(x509Certificate[0]);
-                            }
-                            else if (Constants.SKI_URI.equals(valueType)) {
-                                alias = getSecurityProperties().getDecryptionCrypto().getAliasForX509Cert(binaryContent);
-                            }
-                            else if (Constants.THUMB_URI.equals(valueType)) {
-                                alias = getSecurityProperties().getDecryptionCrypto().getAliasForX509CertThumb(binaryContent);
-                            }                            
-                        }
-                        else if (securityToken instanceof org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_secext_1_0.ReferenceType) {
-                            org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_secext_1_0.ReferenceType referenceType
-                                    = (org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_secext_1_0.ReferenceType)securityToken;
-                            //todo
-                        }
-                    }
-                    else if (getSecurityProperties().getDecryptionDefaultAlias() != null) {
-                        //todo
-                    } else {
-                        throw new XMLSecurityException("No KeyInfo in request and no defaultAlias specified");
-                    }
-
-                    WSPasswordCallback pwCb = new WSPasswordCallback(alias, WSPasswordCallback.DECRYPT);
-                    try {
-                        Callback[] callbacks = new Callback[]{pwCb};
-                        getSecurityProperties().getCallbackHandler().handle(callbacks);
-                    } catch (IOException e) {
-                        throw new XMLSecurityException("noPassword " + alias, e);
-                    } catch (UnsupportedCallbackException e) {
-                        throw new XMLSecurityException("noPassword " + alias, e);
-                    }
-                    String password = pwCb.getPassword();
-                    if (password == null) {
-                        throw new XMLSecurityException("noPassword " + alias);
-                    }
-
-                    PrivateKey privateKey = getSecurityProperties().getDecryptionCrypto().getPrivateKey(alias, password);
-                    cipher.init(Cipher.DECRYPT_MODE, privateKey);
-
-                    byte[] encryptedEphemeralKey = Base64.decode(encryptedKeyType.getCipherData().getCipherValue());
-                    byte[] decryptedKey = cipher.doFinal(encryptedEphemeralKey);
                     String syncEncAlgo = JCEAlgorithmMapper.translateURItoJCEID(currentEncryptedDataType.getEncryptionMethod().getAlgorithm());
                     String algoFamily = JCEAlgorithmMapper.getJCEKeyAlgorithmFromURI(currentEncryptedDataType.getEncryptionMethod().getAlgorithm());
-                    SecretKey symmetricKey = new SecretKeySpec(decryptedKey, algoFamily);
+                    SecretKey symmetricKey = new SecretKeySpec(keyBytes, algoFamily);
                     Cipher symmetricCipher = Cipher.getInstance(syncEncAlgo, "BC");
 
                     int ivLen = symmetricCipher.getBlockSize();
@@ -302,10 +229,6 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
                     outputStreamWriter.flush();
                     plainBytes = null; //let gc do its job
 
-                    //XMLInputFactory xmlInputFactory = XMLInputFactory.newFactory();
-                    //xmlInputFactory.setEventAllocator(Constants.xmlEventAllocator);
-                    //xmlInputFactory.setProperty(XMLInputFactory.IS_NAMESPACE_AWARE, false);
-                    //XMLEventReader xmlEventReader = xmlInputFactory.createXMLEventReader(new ByteArrayInputStream(plainBytes));
                     //todo set encoding?:
                     XMLEventReader xmlEventReader = Constants.xmlInputFactory.createXMLEventReader(new ByteArrayInputStream(baos.toByteArray()));
 
@@ -313,7 +236,6 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
 
                     while (xmlEventReader.hasNext()) {
                         XMLEvent decXmlEvent = xmlEventReader.nextEvent();
-                        //todo something more clever than parsing string
                         if (decXmlEvent.getEventType() == XMLStreamConstants.START_DOCUMENT
                                 || decXmlEvent.getEventType() == XMLStreamConstants.END_DOCUMENT) {
                             while (xmlEventReader.hasNext()) {
@@ -350,39 +272,4 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
             inputProcessorChain.processEvent(xmlEvent);
         }
     }
-
-    /*
-    class NamespaceFixReader extends Reader {
-
-        private NamespaceContext namespaceContext;
-        private Reader parentReader;
-
-        private char[] buffer;
-
-        NamespaceFixReader(Reader reader, NamespaceContext namespaceContext) {
-            this.namespaceContext = namespaceContext;
-            this.parentReader = reader;
-        }
-
-        @Override
-        public int read(char[] cbuf, int off, int len) throws IOException {
-
-            CharBuffer charBuffer = CharBuffer.allocate(len);
-            charBuffer.
-            int read = parentReader.read(cbuf, off, len);
-
-            for (int i = 0; i < cbuf.length; i++) {
-                char c = cbuf[i];
-                if (c == '<')
-            }
-
-            return 0;  //To change body of implemented methods use File | Settings | File Templates.
-        }
-
-        @Override
-        public void close() throws IOException {
-            parentReader.close();
-        }
-    }
-    */
 }

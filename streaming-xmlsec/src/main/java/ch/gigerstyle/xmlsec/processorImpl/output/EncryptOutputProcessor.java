@@ -75,6 +75,8 @@ public class EncryptOutputProcessor extends AbstractOutputProcessor {
                         if (startElement.getName().getLocalPart().equals(securePart.getName())
                                 && startElement.getName().getNamespaceURI().equals(securePart.getNamespace())) {
 
+                            //todo buildEmbedded @see WSSecEncrypt 284
+
                             System.out.println("matched securePart for encryption");
                             InternalEncryptionOutputProcessor internalEncryptionOutputProcessor = null;
                             try {
@@ -159,8 +161,8 @@ public class EncryptOutputProcessor extends AbstractOutputProcessor {
                     }
                 }
 
-                String jceid = JCEAlgorithmMapper.translateURItoJCEID(getSecurityProperties().getEncryptionKeyTransportAlgorithm());
                 try {
+                    String jceid = JCEAlgorithmMapper.translateURItoJCEID(getSecurityProperties().getEncryptionKeyTransportAlgorithm());
                     Cipher cipher = Cipher.getInstance(jceid);
                     cipher.init(Cipher.ENCRYPT_MODE, x509Certificate);
 
