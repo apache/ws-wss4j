@@ -1,5 +1,7 @@
 package ch.gigerstyle.xmlsec;
 
+import javax.xml.stream.events.XMLEvent;
+
 /**
  * User: giger
  * Date: May 13, 2010
@@ -30,5 +32,34 @@ public class Utils {
             return reference.substring(1);
         }
         return reference;
+    }
+
+    public static String getXMLEventAsString(XMLEvent xmlEvent) {
+        int eventType = xmlEvent.getEventType();
+
+        switch (eventType) {
+            case XMLEvent.START_ELEMENT:
+                return "START_ELEMENT";
+            case XMLEvent.END_ELEMENT:
+                return "END_ELEMENT";
+            case XMLEvent.PROCESSING_INSTRUCTION:
+                return "PROCESSING_INSTRUCTION";
+            case XMLEvent.CHARACTERS:
+                return "CHARACTERS";
+            case XMLEvent.COMMENT:
+                return "COMMENT";
+            case XMLEvent.START_DOCUMENT:
+                return "START_DOCUMENT";
+            case XMLEvent.END_DOCUMENT:
+                return "END_DOCUMENT";
+            case XMLEvent.ATTRIBUTE:
+                return "ATTRIBUTE";
+            case XMLEvent.DTD:
+                return "DTD";
+            case XMLEvent.NAMESPACE:
+                return "NAMESPACE";
+            default:
+                throw new IllegalArgumentException("Illegal XMLEvent received: " + eventType);
+        }
     }
 }

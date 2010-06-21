@@ -18,7 +18,20 @@ import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.events.Attribute;
+import javax.xml.stream.events.EndElement;
+import javax.xml.stream.events.StartElement;
+import javax.xml.stream.events.XMLEvent;
+
+import ch.gigerstyle.xmlsec.Constants;
+import ch.gigerstyle.xmlsec.ParseException;
+import ch.gigerstyle.xmlsec.Parseable;
+import ch.gigerstyle.xmlsec.Utils;
 import org.w3._2000._09.xmldsig_.KeyInfoType;
+
+import java.util.Iterator;
 
 
 /**
@@ -58,7 +71,9 @@ import org.w3._2000._09.xmldsig_.KeyInfoType;
     EncryptedKeyType.class,
     EncryptedDataType.class
 })
-public abstract class EncryptedType {
+public abstract class EncryptedType implements Parseable {
+
+    private Parseable currentParseable;
 
     @XmlElement(name = "EncryptionMethod")
     protected EncryptionMethodType encryptionMethod;
@@ -81,6 +96,90 @@ public abstract class EncryptedType {
     @XmlAttribute(name = "Encoding")
     @XmlSchemaType(name = "anyURI")
     protected String encoding;
+
+    private QName startElementName;
+
+    protected EncryptedType(StartElement startElement) {
+        this.startElementName = startElement.getName();
+
+        Iterator<Attribute> attributeIterator = startElement.getAttributes();
+        while (attributeIterator.hasNext()) {
+            Attribute attribute = attributeIterator.next();
+            if (attribute.getName().equals(Constants.ATT_NULL_Id)) {
+                CollapsedStringAdapter collapsedStringAdapter = new CollapsedStringAdapter();
+                this.id = collapsedStringAdapter.unmarshal(attribute.getValue());
+            } else if (attribute.getName().equals(Constants.ATT_NULL_Type)) {
+                this.type = attribute.getValue();
+            } else if (attribute.getName().equals(Constants.ATT_NULL_MimeType)) {
+                this.mimeType = attribute.getValue();
+            } else if (attribute.getName().equals(Constants.ATT_NULL_Encoding)) {
+                this.encoding = attribute.getValue();
+            }
+        }
+    }
+
+    public boolean parseXMLEvent(XMLEvent xmlEvent) throws ParseException {
+        if (currentParseable != null) {
+            boolean finished = currentParseable.parseXMLEvent(xmlEvent);
+            if (finished) {
+                currentParseable.validate();
+                currentParseable = null;
+            }
+            return false;
+        }
+
+        switch (xmlEvent.getEventType()) {
+             case XMLStreamConstants.START_ELEMENT:
+                 StartElement startElement = xmlEvent.asStartElement();
+
+                 if (startElement.getName().equals(Constants.TAG_xenc_EncryptionMethod)) {
+                     currentParseable = this.encryptionMethod = new EncryptionMethodType(startElement);
+                 }
+                 else if (startElement.getName().equals(Constants.TAG_dsig_KeyInfo)) {
+                     currentParseable = this.keyInfo = new KeyInfoType(startElement);
+                 }
+                 else if (startElement.getName().equals(Constants.TAG_xenc_CipherData)) {
+                     currentParseable = this.cipherData = new CipherDataType(startElement);
+                 }
+                 else if (startElement.getName().equals(Constants.TAG_xenc_EncryptionProperties)) {
+                     //currentParseable = this.encryptionProperties = new EncryptionPropertiesType();
+                     currentParseable = new Parseable() {
+                         public boolean parseXMLEvent(XMLEvent xmlEvent) throws ParseException {
+                             switch (xmlEvent.getEventType()) {
+                                 case XMLStreamConstants.END_ELEMENT:
+                                     EndElement endElement = xmlEvent.asEndElement();
+                                     if (endElement.getName().equals(Constants.TAG_xenc_EncryptionProperties)) {
+                                         return true;
+                                     }
+                                     break;
+                             }
+                             return false;
+                         }
+                         public void validate() throws ParseException {
+                         }
+                     };
+                 }                 
+                 break;
+             case XMLStreamConstants.END_ELEMENT:
+
+                 currentParseable = null;
+                 EndElement endElement = xmlEvent.asEndElement();
+                 
+                 if (endElement.getName().equals(startElementName)) {
+                     return true;
+                 }
+                 break;
+             default:
+                 throw new ParseException("Unexpected event received " + Utils.getXMLEventAsString(xmlEvent));
+        }
+        return false;
+    }
+
+    public void validate() throws ParseException {
+        if (cipherData == null) {
+            throw new ParseException("Element \"CipherData\" is missing");
+        }
+    }
 
     /**
      * Gets the value of the encryptionMethod property.
@@ -273,5 +372,4 @@ public abstract class EncryptedType {
     public void setEncoding(String value) {
         this.encoding = value;
     }
-
 }

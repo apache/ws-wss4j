@@ -8,21 +8,26 @@
 
 package org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_secext_1_0;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAnyAttribute;
-import javax.xml.bind.annotation.XmlAnyElement;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlID;
-import javax.xml.bind.annotation.XmlSchemaType;
-import javax.xml.bind.annotation.XmlType;
+import java.util.*;
+import javax.xml.bind.annotation.*;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.events.Attribute;
+import javax.xml.stream.events.EndElement;
+import javax.xml.stream.events.StartElement;
+import javax.xml.stream.events.XMLEvent;
+
+import ch.gigerstyle.xmlsec.Constants;
+import ch.gigerstyle.xmlsec.ParseException;
+import ch.gigerstyle.xmlsec.Parseable;
+import ch.gigerstyle.xmlsec.Utils;
+import org.w3._2000._09.xmldsig_.KeyInfoType;
+import org.w3._2000._09.xmldsig_.X509DataType;
+import org.w3._2001._04.xmlenc_.CipherDataType;
+import org.w3._2001._04.xmlenc_.EncryptionMethodType;
+import org.w3._2001._04.xmlenc_.EncryptionPropertiesType;
 import org.w3c.dom.Element;
 
 
@@ -54,10 +59,18 @@ import org.w3c.dom.Element;
 @XmlType(name = "SecurityTokenReferenceType", propOrder = {
     "any"
 })
-public class SecurityTokenReferenceType {
+public class SecurityTokenReferenceType implements Parseable {
+
+     private Parseable currentParseable;
 
     @XmlAnyElement(lax = true)
     protected List<Object> any;
+    @XmlElement(name = "Reference")
+    protected ReferenceType referenceType;
+    @XmlElement(name = "KeyIdentifier")
+    protected KeyIdentifierType keyIdentifierType;
+    @XmlElement(name = "X509Data", namespace = "http://www.w3.org/2000/09/xmldsig#")
+    protected X509DataType x509DataType;
     @XmlAttribute(name = "Id", namespace = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd")
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
     @XmlID
@@ -67,6 +80,66 @@ public class SecurityTokenReferenceType {
     protected List<String> usage;
     @XmlAnyAttribute
     private Map<QName, String> otherAttributes = new HashMap<QName, String>();
+
+    public SecurityTokenReferenceType(StartElement startElement) {
+        Iterator<Attribute> attributeIterator = startElement.getAttributes();
+        while (attributeIterator.hasNext()) {
+            Attribute attribute = attributeIterator.next();
+            if (attribute.getName().equals(Constants.ATT_wsu_Id)) {
+                CollapsedStringAdapter collapsedStringAdapter = new CollapsedStringAdapter();
+                this.id = collapsedStringAdapter.unmarshal(attribute.getValue());
+            } else if (attribute.getName().equals(Constants.ATT_wsse_Usage)) {
+                this.getUsage().add(attribute.getValue());
+            }
+        }
+    }
+
+    public boolean parseXMLEvent(XMLEvent xmlEvent) throws ParseException {
+        if (currentParseable != null) {
+            boolean finished = currentParseable.parseXMLEvent(xmlEvent);
+            if (finished) {
+                currentParseable.validate();
+                currentParseable = null;
+            }
+            return false;
+        }
+
+        switch (xmlEvent.getEventType()) {
+             case XMLStreamConstants.START_ELEMENT:
+                 StartElement startElement = xmlEvent.asStartElement();
+
+                 if (startElement.getName().equals(Constants.TAG_wsse_Reference)) {
+                     currentParseable = this.referenceType = new ReferenceType(startElement);
+                 }
+                 else if (startElement.getName().equals(Constants.TAG_wsse_KeyIdentifier)) {
+                     currentParseable = this.keyIdentifierType = new KeyIdentifierType(startElement);
+                 }
+                 else if (startElement.getName().equals(Constants.TAG_dsig_X509Data)) {
+                     currentParseable = this.x509DataType = new X509DataType(startElement);
+                 }
+                 else {
+                     throw new ParseException("Unexpected Element: " + startElement.getName());
+                 }
+
+                 break;
+             case XMLStreamConstants.END_ELEMENT:
+                currentParseable = null;
+                 EndElement endElement = xmlEvent.asEndElement();
+                 if (endElement.getName().equals(Constants.TAG_wsse_SecurityTokenReference)) {
+                     return true;
+                 }
+                 break;
+             default:
+                 throw new ParseException("Unexpected event received " + Utils.getXMLEventAsString(xmlEvent));
+        }
+        return false;
+    }
+
+    public void validate() throws ParseException {
+        if (referenceType == null && keyIdentifierType == null && x509DataType == null) {
+            throw new ParseException("Element \"Reference\"|\"KeyIdentifier\"|\"x509DataType\" is missing");
+        }
+    }
 
     /**
      * Gets the value of the any property.
@@ -169,4 +242,27 @@ public class SecurityTokenReferenceType {
         return otherAttributes;
     }
 
+    public ReferenceType getReferenceType() {
+        return referenceType;
+    }
+
+    public void setReferenceType(ReferenceType referenceType) {
+        this.referenceType = referenceType;
+    }
+
+    public KeyIdentifierType getKeyIdentifierType() {
+        return keyIdentifierType;
+    }
+
+    public void setKeyIdentifierType(KeyIdentifierType keyIdentifierType) {
+        this.keyIdentifierType = keyIdentifierType;
+    }
+
+    public X509DataType getX509DataType() {
+        return x509DataType;
+    }
+
+    public void setX509DataType(X509DataType x509DataType) {
+        this.x509DataType = x509DataType;
+    }
 }

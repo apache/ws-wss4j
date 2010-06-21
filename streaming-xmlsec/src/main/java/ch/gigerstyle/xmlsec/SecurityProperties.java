@@ -105,7 +105,7 @@ public class SecurityProperties {
     private KeyStore encryptionKeyStore;
     private String encryptionUser;
     private X509Certificate encryptionUseThisCertificate;
-    private String encryptionKeyId;
+    private Constants.KeyIdentifierType encryptionKeyIdentifierType;
     private String encryptionSymAlgorithm;
     private String encryptionKeyTransportAlgorithm;
     private List<SecurePart> encryptionParts = new ArrayList<SecurePart>();
@@ -184,12 +184,12 @@ public class SecurityProperties {
         this.encryptionUser = encryptionUser;
     }
 
-    public String getEncryptionKeyId() {
-        return encryptionKeyId;
+    public Constants.KeyIdentifierType getEncryptionKeyIdentifierType() {
+        return encryptionKeyIdentifierType;
     }
 
-    public void setEncryptionKeyId(String encryptionKeyId) {
-        this.encryptionKeyId = encryptionKeyId;
+    public void setEncryptionKeyIdentifierType(Constants.KeyIdentifierType encryptionKeyIdentifierType) {
+        this.encryptionKeyIdentifierType = encryptionKeyIdentifierType;
     }
 
     private List<SecurePart> signatureParts = new ArrayList<SecurePart>();

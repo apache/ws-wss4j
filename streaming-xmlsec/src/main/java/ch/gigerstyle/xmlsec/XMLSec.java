@@ -119,6 +119,9 @@ public class XMLSec {
                     if (securityProperties.getEncryptionKeyTransportAlgorithm() == null) {
                         securityProperties.setEncryptionKeyTransportAlgorithm("http://www.w3.org/2001/04/xmlenc#rsa-1_5");
                     }
+                    if (securityProperties.getEncryptionKeyIdentifierType() == null) {
+                        securityProperties.setEncryptionKeyIdentifierType(Constants.KeyIdentifierType.ISSUER_SERIAL);
+                    }
                     break;
             }
         }

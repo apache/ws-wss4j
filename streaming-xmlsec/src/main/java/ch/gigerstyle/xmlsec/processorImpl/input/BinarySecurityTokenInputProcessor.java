@@ -43,7 +43,7 @@ public class BinarySecurityTokenInputProcessor extends AbstractInputProcessor {
             StartElement startElement = xmlEvent.asStartElement();
 
             if (startElement.getName().equals(Constants.TAG_wsse_BinarySecurityToken)) {
-                currentBinarySecurityTokenType = new BinarySecurityTokenType();
+                currentBinarySecurityTokenType = new BinarySecurityTokenType(startElement);
 
                 Attribute encodingType = startElement.getAttributeByName(Constants.ATT_NULL_EncodingType);
                 if (encodingType != null) {

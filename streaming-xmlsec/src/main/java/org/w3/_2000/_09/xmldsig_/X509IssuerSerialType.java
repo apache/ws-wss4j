@@ -8,11 +8,20 @@
 
 package org.w3._2000._09.xmldsig_;
 
+import ch.gigerstyle.xmlsec.Constants;
+import ch.gigerstyle.xmlsec.ParseException;
+import ch.gigerstyle.xmlsec.Parseable;
+import ch.gigerstyle.xmlsec.Utils;
+
 import java.math.BigInteger;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.events.EndElement;
+import javax.xml.stream.events.StartElement;
+import javax.xml.stream.events.XMLEvent;
 
 
 /**
@@ -40,12 +49,95 @@ import javax.xml.bind.annotation.XmlType;
     "x509IssuerName",
     "x509SerialNumber"
 })
-public class X509IssuerSerialType {
+public class X509IssuerSerialType implements Parseable {
+
+    private Parseable currentParseable;
 
     @XmlElement(name = "X509IssuerName", required = true)
     protected String x509IssuerName;
     @XmlElement(name = "X509SerialNumber", required = true)
     protected BigInteger x509SerialNumber;
+
+    public X509IssuerSerialType(StartElement startElement) {
+    }
+
+    public boolean parseXMLEvent(XMLEvent xmlEvent) throws ParseException {
+
+        if (currentParseable != null) {
+            boolean finished = currentParseable.parseXMLEvent(xmlEvent);
+            if (finished) {
+                currentParseable.validate();
+                currentParseable = null;
+            }
+            return false;
+        }
+
+        switch (xmlEvent.getEventType()) {
+             case XMLStreamConstants.START_ELEMENT:
+                 StartElement startElement = xmlEvent.asStartElement();
+
+                 if (startElement.getName().equals(Constants.TAG_dsig_X509IssuerName)) {
+                     currentParseable = new Parseable() {
+                         public boolean parseXMLEvent(XMLEvent xmlEvent) throws ParseException {
+                             switch (xmlEvent.getEventType()) {
+                                 case XMLStreamConstants.START_ELEMENT:
+                                     StartElement startElement = xmlEvent.asStartElement();
+                                     throw new ParseException("Unsupported Element: " + startElement.getName());
+                                 case XMLStreamConstants.END_ELEMENT:
+                                     return true;
+                                 case XMLStreamConstants.CHARACTERS:
+                                     x509IssuerName = xmlEvent.asCharacters().getData();
+                                     break;
+                             }
+                             return false;
+                         }
+
+                         public void validate() throws ParseException {
+                         }
+                     };
+                 }
+                 else if (startElement.getName().equals(Constants.TAG_dsig_X509SerialNumber)) {
+                     currentParseable = new Parseable() {
+                         public boolean parseXMLEvent(XMLEvent xmlEvent) throws ParseException {
+                             switch (xmlEvent.getEventType()) {
+                                 case XMLStreamConstants.START_ELEMENT:
+                                     StartElement startElement = xmlEvent.asStartElement();
+                                     throw new ParseException("Unsupported Element: " + startElement.getName());
+                                 case XMLStreamConstants.END_ELEMENT:
+                                     return true;
+                                 case XMLStreamConstants.CHARACTERS:
+                                     x509SerialNumber = new BigInteger(xmlEvent.asCharacters().getData());
+                                     break;
+                             }
+                             return false;
+                         }
+
+                         public void validate() throws ParseException {
+                         }
+                     };
+                 }
+                 else {
+                     throw new ParseException("Unsupported Element: " + startElement.getName());
+                 }
+                 break;
+             case XMLStreamConstants.END_ELEMENT:
+                 currentParseable = null;
+                 EndElement endElement = xmlEvent.asEndElement();
+                 if (endElement.getName().equals(Constants.TAG_dsig_X509IssuerSerial)) {
+                     return true;
+                 }
+                 break;
+             default:
+                 throw new ParseException("Unexpected event received " + Utils.getXMLEventAsString(xmlEvent));
+        }
+        return false;
+    }
+
+    public void validate() throws ParseException {
+        if (x509IssuerName == null || x509SerialNumber == null) {
+            throw new ParseException("Element \"X509IssuerName\"| \"X509SerialNumber\" is missing");
+        }
+    }
 
     /**
      * Gets the value of the x509IssuerName property.

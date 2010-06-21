@@ -172,7 +172,7 @@ public class SignatureInputProcessor extends AbstractInputProcessor {
                 }
                 currentSignatureType.setSignatureValue(signatureValueType);
             } else if (startElement.getName().equals(Constants.TAG_dsig_KeyInfo)) {
-                KeyInfoType keyInfoType = new KeyInfoType();
+                KeyInfoType keyInfoType = new KeyInfoType(startElement);
 
                 Attribute id = startElement.getAttributeByName(Constants.ATT_NULL_Id);
                 if (id != null) {
@@ -180,7 +180,7 @@ public class SignatureInputProcessor extends AbstractInputProcessor {
                 }
                 currentSignatureType.setKeyInfo(keyInfoType);
             } else if (startElement.getName().equals(Constants.TAG_wsse_SecurityTokenReference)) {
-                SecurityTokenReferenceType securityTokenReferenceType = new SecurityTokenReferenceType();
+                SecurityTokenReferenceType securityTokenReferenceType = new SecurityTokenReferenceType(startElement);
                 //optional:
                 Attribute idAttribute = startElement.getAttributeByName(Constants.ATT_wsu_Id);
                 if (idAttribute != null) {
@@ -189,7 +189,7 @@ public class SignatureInputProcessor extends AbstractInputProcessor {
                 currentSignatureType.getKeyInfo().getContent().add(securityTokenReferenceType);
             } else if (startElement.getName().equals(Constants.TAG_wsse_Reference)) {
                 org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_secext_1_0.ReferenceType referenceType
-                        = new org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_secext_1_0.ReferenceType();
+                        = new org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_secext_1_0.ReferenceType(startElement);
 
                 Attribute uri = startElement.getAttributeByName(Constants.ATT_NULL_URI);
                 if (uri != null) {

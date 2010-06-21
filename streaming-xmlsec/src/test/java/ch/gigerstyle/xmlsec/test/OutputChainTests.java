@@ -55,7 +55,7 @@ public class OutputChainTests extends AbstractTestBase {
         xmlStreamWriter.close();
 
         Document document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
-        NodeList nodeList = document.getElementsByTagNameNS(Constants.TAG_xmlenc_EncryptedKey.getNamespaceURI(), Constants.TAG_xmlenc_EncryptedKey.getLocalPart());
+        NodeList nodeList = document.getElementsByTagNameNS(Constants.TAG_xenc_EncryptedKey.getNamespaceURI(), Constants.TAG_xenc_EncryptedKey.getLocalPart());
         Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), Constants.TAG_wsse_Security.getLocalPart());
 
         nodeList = document.getElementsByTagNameNS(Constants.TAG_xenc_EncryptedData.getNamespaceURI(), Constants.TAG_xenc_EncryptedData.getLocalPart());

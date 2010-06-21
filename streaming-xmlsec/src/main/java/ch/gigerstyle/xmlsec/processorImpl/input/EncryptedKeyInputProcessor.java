@@ -1,16 +1,14 @@
 package ch.gigerstyle.xmlsec.processorImpl.input;
 
 import ch.gigerstyle.xmlsec.*;
-import ch.gigerstyle.xmlsec.Base64;
 import ch.gigerstyle.xmlsec.config.JCEAlgorithmMapper;
 import ch.gigerstyle.xmlsec.crypto.WSSecurityException;
-import org.bouncycastle.util.encoders.*;
+import org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_secext_1_0.BinarySecurityTokenType;
 import org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_secext_1_0.KeyIdentifierType;
 import org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_secext_1_0.SecurityTokenReferenceType;
 import org.w3._2000._09.xmldsig_.KeyInfoType;
 import org.w3._2000._09.xmldsig_.X509DataType;
-import org.w3._2000._09.xmldsig_.X509IssuerSerialType;
-import org.w3._2001._04.xmlenc_.*;
+import org.w3._2001._04.xmlenc_.EncryptedKeyType;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -19,15 +17,15 @@ import javax.crypto.NoSuchPaddingException;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.events.*;
+import javax.xml.stream.events.StartElement;
+import javax.xml.stream.events.XMLEvent;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * User: giger
@@ -51,9 +49,8 @@ import java.util.Map;
  */
 public class EncryptedKeyInputProcessor extends AbstractInputProcessor {
 
-    private Map<String, EncryptedKeyType> encryptedKeys = new HashMap<String, EncryptedKeyType>();
     private EncryptedKeyType currentEncryptedKeyType;
-    private KeyIdentifierType currentKeyIdentifierType;
+    private boolean isFinishedcurrentEncryptedKey;
 
     public EncryptedKeyInputProcessor(SecurityProperties securityProperties) {
         super(securityProperties);
@@ -79,209 +76,156 @@ public class EncryptedKeyInputProcessor extends AbstractInputProcessor {
 
     public void processEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException {
 
+        if (currentEncryptedKeyType != null) {
+            try {
+                isFinishedcurrentEncryptedKey = currentEncryptedKeyType.parseXMLEvent(xmlEvent);
+            } catch (ParseException e) {
+                throw new XMLSecurityException(e);
+            }
+        }
+
         if (xmlEvent.isStartElement()) {
             StartElement startElement = xmlEvent.asStartElement();
 
-            if (startElement.getName().equals(Constants.TAG_xmlenc_EncryptedKey)) {
-                currentEncryptedKeyType = new EncryptedKeyType();
-
-                Attribute attribute = startElement.getAttributeByName(Constants.ATT_NULL_Id);
-                if (attribute != null) {
-                    currentEncryptedKeyType.setId(attribute.getValue());
-                    encryptedKeys.put(attribute.getValue(), currentEncryptedKeyType);
-                } else {
-                    encryptedKeys.put(null, currentEncryptedKeyType);
-                }
-            }
-            else if (currentEncryptedKeyType == null) {
-                //do nothing...fall out
-            }
-            else if (startElement.getName().equals(Constants.TAG_xmlenc_EncryptionMethod)) {
-
-                //required:
-                Attribute attribute = startElement.getAttributeByName(Constants.ATT_NULL_Algorithm);
-                if (attribute == null) {
-                    throw new XMLSecurityException("Missing Attribute " + Constants.ATT_NULL_Algorithm);
-                }
-
-                EncryptionMethodType encryptionMethodType = new EncryptionMethodType();
-                encryptionMethodType.setAlgorithm(attribute.getValue());
-                currentEncryptedKeyType.setEncryptionMethod(encryptionMethodType);
-            }
-            else if (startElement.getName().equals(Constants.TAG_dsig_KeyInfo)) {
-                KeyInfoType keyInfoType = new KeyInfoType();
-                //optional:
-                Attribute idAttribute = startElement.getAttributeByName(Constants.ATT_NULL_Id);
-                if (idAttribute != null) {
-                    keyInfoType.setId(idAttribute.getValue());
-                }
-                currentEncryptedKeyType.setKeyInfo(keyInfoType);
-            }
-            else if (startElement.getName().equals(Constants.TAG_wsse_SecurityTokenReference)) {
-                SecurityTokenReferenceType securityTokenReferenceType = new SecurityTokenReferenceType();
-                //optional:
-                Attribute idAttribute = startElement.getAttributeByName(Constants.ATT_wsu_Id);
-                if (idAttribute != null) {
-                    securityTokenReferenceType.setId(idAttribute.getValue());
-                }
-                currentEncryptedKeyType.getKeyInfo().getContent().add(securityTokenReferenceType);
-            }
-            else if (startElement.getName().equals(Constants.TAG_wsse_KeyIdentifier)) {
-                KeyIdentifierType keyIdentifierType = new KeyIdentifierType();
-
-                Attribute encodingType = startElement.getAttributeByName(Constants.ATT_NULL_EncodingType);
-                if (encodingType != null) {
-                    keyIdentifierType.setEncodingType(encodingType.getValue());
-                }
-
-                Attribute valueType = startElement.getAttributeByName(Constants.ATT_NULL_ValueType);
-                if (valueType != null) {
-                    keyIdentifierType.setValueType(valueType.getValue());
-                }
-                //todo easier api for lists with unknown types @see cxf
-                ((SecurityTokenReferenceType)currentEncryptedKeyType.getKeyInfo().getContent().get(0)).getAny().add(keyIdentifierType);
-                currentKeyIdentifierType = keyIdentifierType;
-            }
-            else if (startElement.getName().equals(Constants.TAG_xenc_CipherData)) {
-                CipherDataType cipherDataType = new CipherDataType();
-                currentEncryptedKeyType.setCipherData(cipherDataType);
-            }
-            else if (startElement.getName().equals(Constants.TAG_xenc_CipherValue)) {
-                //nothing todo
-            }
-            else if (startElement.getName().equals(Constants.TAG_xenc_ReferenceList)) {
-                ReferenceList referenceList = new ReferenceList();
-                currentEncryptedKeyType.setReferenceList(referenceList);
-            }
-            else if (startElement.getName().equals(Constants.TAG_xenc_DataReference)) {
-
-                Attribute uriAttribute = startElement.getAttributeByName(Constants.ATT_NULL_URI);
-                if (uriAttribute == null) {
-                    throw new XMLSecurityException("Missing Attribute " + Constants.ATT_NULL_URI);
-                }
-                ReferenceType referenceType = new ReferenceType();
-                referenceType.setURI(Utils.dropReferenceMarker(uriAttribute.getValue()));
-                currentEncryptedKeyType.getReferenceList().getDataReferenceOrKeyReference().add(referenceType);
+            if (startElement.getName().equals(Constants.TAG_xenc_EncryptedKey)) {
+                currentEncryptedKeyType = new EncryptedKeyType(startElement);
             }
         }
-        else if (currentEncryptedKeyType != null && xmlEvent.isCharacters()) {
-            //todo handle multiple character events for same text-node
-            Characters characters = xmlEvent.asCharacters();
-            if (!characters.isWhiteSpace() &&getLastStartElementName().equals(Constants.TAG_xenc_CipherValue)) {
-                currentEncryptedKeyType.getCipherData().setCipherValue(characters.getData().getBytes());
-            }
-            else if (!characters.isWhiteSpace() &&getLastStartElementName().equals(Constants.TAG_wsse_KeyIdentifier)) {
-                currentKeyIdentifierType.setValue(characters.getData());
-            }
-        }
-        else if (currentEncryptedKeyType != null && xmlEvent.isEndElement()) {
-            EndElement endElement = xmlEvent.asEndElement();
-            
-            if (endElement.getName().equals(Constants.TAG_xmlenc_EncryptedKey)) {
 
-                try {
+        if (currentEncryptedKeyType != null && isFinishedcurrentEncryptedKey) {
+
+            try {
                 String asyncEncAlgo = JCEAlgorithmMapper.translateURItoJCEID(currentEncryptedKeyType.getEncryptionMethod().getAlgorithm());
-                    Cipher cipher = Cipher.getInstance(asyncEncAlgo, "BC");
+                Cipher cipher = Cipher.getInstance(asyncEncAlgo, "BC");
 
-                    String alias = null;
+                String alias = null;
 
-                    KeyInfoType keyInfoType = currentEncryptedKeyType.getKeyInfo();
-                    if (keyInfoType != null) {
+                KeyInfoType keyInfoType = currentEncryptedKeyType.getKeyInfo();
+                if (keyInfoType != null) {
 
-                        //todo better access and null checks
-                        SecurityTokenReferenceType securityTokenReferenceType = (SecurityTokenReferenceType)keyInfoType.getContent().get(0);
-                        if (securityTokenReferenceType == null) {
-                            throw new XMLSecurityException("No SecurityTokenReference found");
-                        }
-
-                        Object securityToken = securityTokenReferenceType.getAny().get(0);
-                        if (securityToken == null) {
-                            throw new XMLSecurityException("No securityToken found");
-                        }
-                        else if (securityToken instanceof X509DataType) {
-                            X509DataType x509DataType = (X509DataType)securityToken;
-                            //todo
-                        } else if (securityToken instanceof X509IssuerSerialType) {
-                            X509IssuerSerialType x509IssuerSerialType = (X509IssuerSerialType)securityToken;
-                            //todo
-                        }
-                        else if (securityToken instanceof KeyIdentifierType) {
-                            KeyIdentifierType keyIdentifierType = (KeyIdentifierType)securityToken;
-
-                            String valueType = keyIdentifierType.getValueType();
-                            byte[] binaryContent = org.bouncycastle.util.encoders.Base64.decode(keyIdentifierType.getValue());
-
-                            if (Constants.X509_V3_TYPE.equals(valueType)) {
-                                X509Certificate[] x509Certificate = getSecurityProperties().getDecryptionCrypto().getX509Certificates(binaryContent, false);
-                                if (x509Certificate == null || x509Certificate.length < 1 || x509Certificate[0] == null) {
-                                    throw new XMLSecurityException("noCertsFound" + "decryption (KeyId)");
-                                }
-                                alias = getSecurityProperties().getDecryptionCrypto().getAliasForX509Cert(x509Certificate[0]);
-                            }
-                            else if (Constants.SKI_URI.equals(valueType)) {
-                                alias = getSecurityProperties().getDecryptionCrypto().getAliasForX509Cert(binaryContent);
-                            }
-                            else if (Constants.THUMB_URI.equals(valueType)) {
-                                alias = getSecurityProperties().getDecryptionCrypto().getAliasForX509CertThumb(binaryContent);
-                            }
-                        }
-                        else if (securityToken instanceof org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_secext_1_0.ReferenceType) {
-                            org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_secext_1_0.ReferenceType referenceType
-                                    = (org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_secext_1_0.ReferenceType)securityToken;
-                            //todo
-                        }
+                    SecurityTokenReferenceType securityTokenReferenceType = keyInfoType.getSecurityTokenReferenceType();
+                    if (securityTokenReferenceType == null) {
+                        throw new XMLSecurityException("No SecurityTokenReference found");
                     }
-                    else if (getSecurityProperties().getDecryptionDefaultAlias() != null) {
-                        //todo
+
+                    if (securityTokenReferenceType.getX509DataType() != null) {
+                        X509DataType x509DataType = securityTokenReferenceType.getX509DataType();
+                        alias = getSecurityProperties().getDecryptionCrypto().getAliasForX509Cert(x509DataType.getX509IssuerSerialType().getX509IssuerName(), x509DataType.getX509IssuerSerialType().getX509SerialNumber());
+                    } /*else if (securityToken instanceof X509IssuerSerialType) {
+                        X509IssuerSerialType x509IssuerSerialType = (X509IssuerSerialType) securityToken;
+                        //todo this is not supported by outputProcessor but can be implemented. We'll have a look at the spec if this is allowed
+                    }*/
+                    else if (securityTokenReferenceType.getKeyIdentifierType() != null) {
+                        KeyIdentifierType keyIdentifierType = securityTokenReferenceType.getKeyIdentifierType();
+
+                        String valueType = keyIdentifierType.getValueType();
+                        String encodingType = keyIdentifierType.getEncodingType();
+
+                        byte[] binaryContent;
+                        if (Constants.SOAPMESSAGE_NS10_BASE64_ENCODING.equals(encodingType)) {
+                            binaryContent = org.bouncycastle.util.encoders.Base64.decode(keyIdentifierType.getValue());
+                        } else {
+                            binaryContent = keyIdentifierType.getValue().getBytes();
+                        }
+
+                        if (Constants.NS_X509_V3_TYPE.equals(valueType)) {
+                            X509Certificate x509Certificate = getSecurityProperties().getDecryptionCrypto().loadCertificate(new ByteArrayInputStream(binaryContent));
+                            if (x509Certificate == null) {
+                                throw new XMLSecurityException("noCertsFound" + "decryption (KeyId)");
+                            }
+                            alias = getSecurityProperties().getDecryptionCrypto().getAliasForX509Cert(x509Certificate);
+                        } else if (Constants.NS_X509SubjectKeyIdentifier.equals(valueType)) {
+                            alias = getSecurityProperties().getDecryptionCrypto().getAliasForX509Cert(binaryContent);
+                        } else if (Constants.NS_THUMBPRINT.equals(valueType)) {
+                            alias = getSecurityProperties().getDecryptionCrypto().getAliasForX509CertThumb(binaryContent);
+                        }
+                    }//todo BST can be SAML Token, Custom-Token etc... 
+                    else if (securityTokenReferenceType.getReferenceType() != null) {
+
+                        String uri = securityTokenReferenceType.getReferenceType().getURI();
+                        if (uri == null) {
+                            throw new XMLSecurityException("badReferenceURI");
+                        }
+                        uri = Utils.dropReferenceMarker(uri);
+                        if (securityTokenReferenceType.getReferenceType().getBinarySecurityTokenType() != null
+                                && uri.equals(securityTokenReferenceType.getReferenceType().getBinarySecurityTokenType().getId())) {
+
+                            BinarySecurityTokenType binarySecurityTokenType = securityTokenReferenceType.getReferenceType().getBinarySecurityTokenType();
+                            if (!Constants.NS_X509_V3_TYPE.equals(binarySecurityTokenType.getValueType())) {
+                                throw new XMLSecurityException("unsupportedBinaryTokenType");
+                            }
+                            byte[] binaryContent;
+                            if (Constants.SOAPMESSAGE_NS10_BASE64_ENCODING.equals(binarySecurityTokenType.getEncodingType())) {
+                                binaryContent = org.bouncycastle.util.encoders.Base64.decode(binarySecurityTokenType.getValue());
+                            } else {
+                                binaryContent = binarySecurityTokenType.getValue().getBytes();
+                            }
+                            X509Certificate x509Certificate = getSecurityProperties().getDecryptionCrypto().loadCertificate(new ByteArrayInputStream(binaryContent));
+                            if (x509Certificate == null) {
+                                throw new XMLSecurityException("noCertsFound" + "decryption (KeyId)");
+                            }
+                            alias = getSecurityProperties().getDecryptionCrypto().getAliasForX509Cert(x509Certificate);
+
+                        } else {
+                            //todo
+                            //we have to search BST somewhere in the doc. First we will check for a BST already processed and
+                            //stored in the context. Otherwise we will abort now.
+                            throw new XMLSecurityException("No SecurityToken found");
+                        }
                     } else {
-                        throw new XMLSecurityException("No KeyInfo in request and no defaultAlias specified");
+                        throw new XMLSecurityException("No SecurityToken found");
                     }
+                } else if (getSecurityProperties().getDecryptionDefaultAlias() != null) {
+                    //todo
+                } else {
+                    throw new XMLSecurityException("No KeyInfo in request and no defaultAlias specified");
+                }
 
-                    WSPasswordCallback pwCb = new WSPasswordCallback(alias, WSPasswordCallback.DECRYPT);
-                    try {
-                        Callback[] callbacks = new Callback[]{pwCb};
-                        getSecurityProperties().getCallbackHandler().handle(callbacks);
-                    } catch (IOException e) {
-                        throw new XMLSecurityException("noPassword " + alias, e);
-                    } catch (UnsupportedCallbackException e) {
-                        throw new XMLSecurityException("noPassword " + alias, e);
-                    }
-                    String password = pwCb.getPassword();
-                    if (password == null) {
-                        throw new XMLSecurityException("noPassword " + alias);
-                    }
+                WSPasswordCallback pwCb = new WSPasswordCallback(alias, WSPasswordCallback.DECRYPT);
+                try {
+                    Callback[] callbacks = new Callback[]{pwCb};
+                    getSecurityProperties().getCallbackHandler().handle(callbacks);
+                } catch (IOException e) {
+                    throw new XMLSecurityException("noPassword " + alias, e);
+                } catch (UnsupportedCallbackException e) {
+                    throw new XMLSecurityException("noPassword " + alias, e);
+                }
+                String password = pwCb.getPassword();
+                if (password == null) {
+                    throw new XMLSecurityException("noPassword " + alias);
+                }
 
-                    PrivateKey privateKey = getSecurityProperties().getDecryptionCrypto().getPrivateKey(alias, password);
-                    cipher.init(Cipher.DECRYPT_MODE, privateKey);
+                PrivateKey privateKey = getSecurityProperties().getDecryptionCrypto().getPrivateKey(alias, password);
+                cipher.init(Cipher.DECRYPT_MODE, privateKey);
 
-                    byte[] encryptedEphemeralKey = org.bouncycastle.util.encoders.Base64.decode(currentEncryptedKeyType.getCipherData().getCipherValue());
-                    byte[] decryptedKey = cipher.doFinal(encryptedEphemeralKey);
+                byte[] encryptedEphemeralKey = org.bouncycastle.util.encoders.Base64.decode(currentEncryptedKeyType.getCipherData().getCipherValue());
+                byte[] decryptedKey = cipher.doFinal(encryptedEphemeralKey);
 
                 inputProcessorChain.addProcessor(new DecryptInputProcessor(currentEncryptedKeyType, decryptedKey, getSecurityProperties()));
             } catch (NoSuchPaddingException e) {
-                    throw new XMLSecurityException(e);
-                } catch (WSSecurityException e) {
-                    throw new XMLSecurityException(e);
-                } catch (NoSuchAlgorithmException e) {
-                    throw new XMLSecurityException(e);
-                } catch (BadPaddingException e) {
-                    throw new XMLSecurityException(e);
-                } catch (IllegalBlockSizeException e) {
-                    throw new XMLSecurityException(e);
-                } catch (NoSuchProviderException e) {
-                    throw new XMLSecurityException(e);
-                } catch (InvalidKeyException e) {
-                    throw new XMLSecurityException(e);
-                } catch (Exception e) {
-                    throw new XMLSecurityException(e);
-                }
-                finally {
-                    //probably we can remove this processor from the chain now?
-                    currentEncryptedKeyType = null;
-                }
+                throw new XMLSecurityException(e);
+            } catch (WSSecurityException e) {
+                throw new XMLSecurityException(e);
+            } catch (NoSuchAlgorithmException e) {
+                throw new XMLSecurityException(e);
+            } catch (BadPaddingException e) {
+                throw new XMLSecurityException(e);
+            } catch (IllegalBlockSizeException e) {
+                throw new XMLSecurityException(e);
+            } catch (NoSuchProviderException e) {
+                throw new XMLSecurityException(e);
+            } catch (InvalidKeyException e) {
+                throw new XMLSecurityException(e);
+            } catch (Exception e) {
+                throw new XMLSecurityException(e);
             }
-        }
+            finally {
+                //probably we can remove this processor from the chain now?
+                currentEncryptedKeyType = null;
+            }
 
+            isFinishedcurrentEncryptedKey = false;
+        }
         inputProcessorChain.processEvent(xmlEvent);
     }
 }

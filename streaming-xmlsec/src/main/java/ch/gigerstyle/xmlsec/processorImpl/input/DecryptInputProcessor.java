@@ -91,7 +91,7 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
                         if (refId.getValue().equals(referenceType.getURI())) {
                             System.out.println("found " + refId.getValue());
                             //todo exception when reference is not found
-                            currentEncryptedDataType = new EncryptedDataType();
+                            currentEncryptedDataType = new EncryptedDataType(startElement);
                             currentEncryptedDataType.setId(refId.getValue());
 
                             Attribute type = startElement.getAttributeByName(Constants.ATT_NULL_Type);
@@ -110,12 +110,12 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
                 if (algorithm == null) {
                     throw new XMLSecurityException("Missing Attribute " + Constants.ATT_NULL_Algorithm);
                 }
-                EncryptionMethodType encryptionMethodType = new EncryptionMethodType();
+                EncryptionMethodType encryptionMethodType = new EncryptionMethodType(startElement);
                 encryptionMethodType.setAlgorithm(algorithm.getValue());
                 currentEncryptedDataType.setEncryptionMethod(encryptionMethodType);
             }
             else if (startElement.getName().equals(Constants.TAG_dsig_KeyInfo)) {
-                KeyInfoType keyInfoType = new KeyInfoType();
+                KeyInfoType keyInfoType = new KeyInfoType(startElement);
 
                 Attribute id = startElement.getAttributeByName(Constants.ATT_NULL_Id);
                 if (id != null) {
@@ -124,7 +124,7 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
                 currentEncryptedDataType.setKeyInfo(keyInfoType);
             }
             else if (startElement.getName().equals(Constants.TAG_wsse_SecurityTokenReference)) {
-                SecurityTokenReferenceType securityTokenReferenceType = new SecurityTokenReferenceType();
+                SecurityTokenReferenceType securityTokenReferenceType = new SecurityTokenReferenceType(startElement);
 
                 Attribute id = startElement.getAttributeByName(Constants.ATT_wsu_Id);
                 if (id != null) {
@@ -134,7 +134,7 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
             }
             else if (startElement.getName().equals(Constants.TAG_wsse_Reference)) {
                org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_secext_1_0.ReferenceType referenceType
-                       = new org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_secext_1_0.ReferenceType();
+                       = new org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_secext_1_0.ReferenceType(startElement);
 
                 Attribute uri = startElement.getAttributeByName(Constants.ATT_NULL_URI);
                 if (uri != null) {
@@ -148,7 +148,7 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
                 ((SecurityTokenReferenceType)currentEncryptedDataType.getKeyInfo().getContent().get(0)).getAny().add(referenceType);
             }
             else if (startElement.getName().equals(Constants.TAG_xenc_CipherData)) {
-                CipherDataType cipherDataType = new CipherDataType();
+                CipherDataType cipherDataType = new CipherDataType(startElement);
                 currentEncryptedDataType.setCipherData(cipherDataType);
             }
             else if (startElement.getName().equals(Constants.TAG_xenc_CipherValue)) {
@@ -159,7 +159,6 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
             //todo handle multiple character events for same text-node
             Characters characters = xmlEvent.asCharacters();
 
-            //todo this should go to EncryptedKeyInputProcessor...
             if (getLastStartElementName().equals(Constants.TAG_xenc_CipherValue)) {
                 try {
                     String syncEncAlgo = JCEAlgorithmMapper.translateURItoJCEID(currentEncryptedDataType.getEncryptionMethod().getAlgorithm());

@@ -8,12 +8,25 @@
 
 package org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_secext_1_0;
 
+import ch.gigerstyle.xmlsec.Constants;
+import ch.gigerstyle.xmlsec.ParseException;
+import ch.gigerstyle.xmlsec.Parseable;
+import ch.gigerstyle.xmlsec.Utils;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
+import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.events.Attribute;
+import javax.xml.stream.events.EndElement;
+import javax.xml.stream.events.StartElement;
+import javax.xml.stream.events.XMLEvent;
+import java.util.Iterator;
 
 
 /**
@@ -43,12 +56,51 @@ import javax.xml.bind.annotation.XmlType;
     KeyIdentifierType.class
 })
 public class EncodedString
-    extends AttributedString
+    extends AttributedString implements Parseable
 {
 
     @XmlAttribute(name = "EncodingType")
     @XmlSchemaType(name = "anyURI")
     protected String encodingType;
+
+    private QName startElementName;
+
+    public EncodedString(StartElement startElement) {
+        super(startElement);
+        this.startElementName = startElement.getName();
+        Iterator<Attribute> attributeIterator = startElement.getAttributes();
+        while (attributeIterator.hasNext()) {
+            Attribute attribute = attributeIterator.next();
+            if (attribute.getName().equals(Constants.ATT_NULL_EncodingType)) {
+                this.encodingType = attribute.getValue();
+            }
+        }
+    }
+
+    public boolean parseXMLEvent(XMLEvent xmlEvent) throws ParseException {
+
+        super.parseXMLEvent(xmlEvent);
+
+        switch (xmlEvent.getEventType()) {
+             case XMLStreamConstants.START_ELEMENT:
+                 break;
+             case XMLStreamConstants.END_ELEMENT:
+                 EndElement endElement = xmlEvent.asEndElement();
+                 if (endElement.getName().equals(startElementName)) {
+                     return true;
+                 }
+                 break;
+             case XMLStreamConstants.CHARACTERS:
+                 break;
+             default:
+                 throw new ParseException("Unexpected event received " + Utils.getXMLEventAsString(xmlEvent));
+        }
+        return false;
+    }
+
+    public void validate() throws ParseException {
+        super.validate();
+    }
 
     /**
      * Gets the value of the encodingType property.

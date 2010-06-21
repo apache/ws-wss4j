@@ -13,6 +13,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
+import javax.xml.stream.events.StartElement;
 
 
 /**
@@ -44,6 +45,11 @@ public class PasswordString
     @XmlAttribute(name = "Type")
     @XmlSchemaType(name = "anyURI")
     protected String type;
+
+
+    public PasswordString(StartElement startElement) {
+        super(startElement);
+    }
 
     /**
      * Gets the value of the type property.

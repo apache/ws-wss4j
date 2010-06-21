@@ -8,10 +8,24 @@
 
 package org.w3._2001._04.xmlenc_;
 
+import ch.gigerstyle.xmlsec.Constants;
+import ch.gigerstyle.xmlsec.ParseException;
+import ch.gigerstyle.xmlsec.Parseable;
+import ch.gigerstyle.xmlsec.Utils;
+import com.sun.org.apache.xml.internal.security.encryption.CipherValue;
+import org.w3._2000._09.xmldsig_.KeyInfoType;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.events.Attribute;
+import javax.xml.stream.events.EndElement;
+import javax.xml.stream.events.StartElement;
+import javax.xml.stream.events.XMLEvent;
+import java.util.Iterator;
 
 
 /**
@@ -39,12 +53,89 @@ import javax.xml.bind.annotation.XmlType;
     "cipherValue",
     "cipherReference"
 })
-public class CipherDataType {
+public class CipherDataType implements Parseable {
+
+    private Parseable currentParseable;
 
     @XmlElement(name = "CipherValue")
     protected byte[] cipherValue;
     @XmlElement(name = "CipherReference")
     protected CipherReferenceType cipherReference;
+
+    public CipherDataType(StartElement startElement) {
+    }
+
+
+    public boolean parseXMLEvent(XMLEvent xmlEvent) throws ParseException {
+        if (currentParseable != null) {
+            boolean finished = currentParseable.parseXMLEvent(xmlEvent);
+            if (finished) {
+                currentParseable.validate();
+                currentParseable = null;
+            }
+            return false;
+        }
+
+        switch (xmlEvent.getEventType()) {
+             case XMLStreamConstants.START_ELEMENT:
+                 StartElement startElement = xmlEvent.asStartElement();
+
+                 if (startElement.getName().equals(Constants.TAG_xenc_CipherValue)) {
+                     currentParseable = new Parseable() {
+                         public boolean parseXMLEvent(XMLEvent xmlEvent) throws ParseException {
+                             switch (xmlEvent.getEventType()) {
+                                case XMLStreamConstants.START_ELEMENT:
+                                    StartElement startElement = xmlEvent.asStartElement();
+                                    if (!startElement.getName().equals(Constants.TAG_xenc_CipherValue)) {
+                                        throw new ParseException("Unsupported Element " + startElement.getName());
+                                    }
+                                    break;
+                                case XMLStreamConstants.END_ELEMENT:
+                                    EndElement endElement = xmlEvent.asEndElement();
+                                     if (endElement.getName().equals(Constants.TAG_xenc_CipherValue)) {
+                                         return true;
+                                     }
+                                    break;
+                                case XMLStreamConstants.CHARACTERS:
+                                    //todo handle mutliple character events:
+                                    cipherValue = xmlEvent.asCharacters().getData().getBytes();
+                                    break;
+                                default:
+                                    throw new ParseException("Unexpected event received " + Utils.getXMLEventAsString(xmlEvent));
+                             }
+                             return false;
+                         }
+
+                         public void validate() throws ParseException {
+                             if (cipherValue == null) {
+                                 throw new ParseException("CipherValue is missing");
+                             }
+                         }
+                     };
+                 }
+                 else {
+                     throw new ParseException("Unsupported Element: " + startElement.getName());
+                 }
+
+                 break;
+             case XMLStreamConstants.END_ELEMENT:
+                 currentParseable = null;
+                 EndElement endElement = xmlEvent.asEndElement();
+                 if (endElement.getName().equals(Constants.TAG_xenc_CipherData)) {
+                     return true;
+                 }
+                 break;             
+             default:
+                 throw new ParseException("Unexpected event received " + Utils.getXMLEventAsString(xmlEvent));
+        }
+        return false;
+    }
+
+    public void validate() throws ParseException {
+        if (cipherValue == null) {
+            throw new ParseException("CipherValue is missing");
+        }
+    }
 
     /**
      * Gets the value of the cipherValue property.

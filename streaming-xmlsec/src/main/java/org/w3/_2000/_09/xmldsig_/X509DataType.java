@@ -9,14 +9,21 @@
 package org.w3._2000._09.xmldsig_;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import javax.xml.bind.JAXBElement;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAnyElement;
-import javax.xml.bind.annotation.XmlElementRef;
-import javax.xml.bind.annotation.XmlElementRefs;
-import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.*;
+import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.events.Attribute;
+import javax.xml.stream.events.EndElement;
+import javax.xml.stream.events.StartElement;
+import javax.xml.stream.events.XMLEvent;
+
+import ch.gigerstyle.xmlsec.Constants;
+import ch.gigerstyle.xmlsec.ParseException;
+import ch.gigerstyle.xmlsec.Parseable;
+import ch.gigerstyle.xmlsec.Utils;
 import org.w3c.dom.Element;
 
 
@@ -50,7 +57,9 @@ import org.w3c.dom.Element;
 @XmlType(name = "X509DataType", propOrder = {
     "x509IssuerSerialOrX509SKIOrX509SubjectName"
 })
-public class X509DataType {
+public class X509DataType implements Parseable {
+
+    private Parseable currentParseable;
 
     @XmlElementRefs({
         @XmlElementRef(name = "X509Certificate", namespace = "http://www.w3.org/2000/09/xmldsig#", type = JAXBElement.class),
@@ -61,6 +70,52 @@ public class X509DataType {
     })
     @XmlAnyElement(lax = true)
     protected List<Object> x509IssuerSerialOrX509SKIOrX509SubjectName;
+    @XmlElement(name = "X509IssuerSerial")
+    protected X509IssuerSerialType x509IssuerSerialType;
+
+    public X509DataType(StartElement startElement) {
+    }
+
+    public boolean parseXMLEvent(XMLEvent xmlEvent) throws ParseException {
+
+        if (currentParseable != null) {
+            boolean finished = currentParseable.parseXMLEvent(xmlEvent);
+            if (finished) {
+                currentParseable.validate();
+                currentParseable = null;
+            }
+            return false;
+        }
+
+        switch (xmlEvent.getEventType()) {
+             case XMLStreamConstants.START_ELEMENT:
+                 StartElement startElement = xmlEvent.asStartElement();
+
+                 if (startElement.getName().equals(Constants.TAG_dsig_X509IssuerSerial)) {
+                     currentParseable = this.x509IssuerSerialType = new X509IssuerSerialType(startElement);
+                 }
+                 else {
+                     throw new ParseException("Unsupported Element: " + startElement.getName());
+                 }
+                 break;
+             case XMLStreamConstants.END_ELEMENT:
+                 currentParseable = null;
+                 EndElement endElement = xmlEvent.asEndElement();
+                 if (endElement.getName().equals(Constants.TAG_dsig_X509Data)) {
+                     return true;
+                 }
+                 break;
+             default:
+                 throw new ParseException("Unexpected event received " + Utils.getXMLEventAsString(xmlEvent));
+        }
+        return false;
+    }
+
+    public void validate() throws ParseException {
+        if (x509IssuerSerialType == null) {
+            throw new ParseException("Element \"X509IssuerSerialType\" is missing");
+        }
+    }
 
     /**
      * Gets the value of the x509IssuerSerialOrX509SKIOrX509SubjectName property.
@@ -97,4 +152,11 @@ public class X509DataType {
         return this.x509IssuerSerialOrX509SKIOrX509SubjectName;
     }
 
+    public X509IssuerSerialType getX509IssuerSerialType() {
+        return x509IssuerSerialType;
+    }
+
+    public void setX509IssuerSerialType(X509IssuerSerialType x509IssuerSerialType) {
+        this.x509IssuerSerialType = x509IssuerSerialType;
+    }
 }

@@ -8,7 +8,13 @@
 
 package org.w3._2001._04.xmlenc_;
 
+import ch.gigerstyle.xmlsec.Constants;
+import ch.gigerstyle.xmlsec.ParseException;
+import ch.gigerstyle.xmlsec.Parseable;
+import ch.gigerstyle.xmlsec.Utils;
+
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -16,6 +22,13 @@ import javax.xml.bind.annotation.XmlAnyElement;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
+import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.events.Attribute;
+import javax.xml.stream.events.EndElement;
+import javax.xml.stream.events.StartElement;
+import javax.xml.stream.events.XMLEvent;
 
 
 /**
@@ -42,13 +55,45 @@ import javax.xml.bind.annotation.XmlType;
 @XmlType(name = "ReferenceType", propOrder = {
     "any"
 })
-public class ReferenceType {
+public class ReferenceType implements Parseable {
 
     @XmlAnyElement(lax = true)
     protected List<Object> any;
     @XmlAttribute(name = "URI", required = true)
     @XmlSchemaType(name = "anyURI")
     protected String uri;
+
+    private QName startElementName;
+
+    public ReferenceType(StartElement startElement) {
+        this.startElementName = startElement.getName();
+        Iterator<Attribute> attributeIterator = startElement.getAttributes();
+        while (attributeIterator.hasNext()) {
+            Attribute attribute = attributeIterator.next();
+            if (attribute.getName().equals(Constants.ATT_NULL_URI)) {
+                this.uri = Utils.dropReferenceMarker(attribute.getValue());
+            }
+        }
+    }
+
+    public boolean parseXMLEvent(XMLEvent xmlEvent) throws ParseException {
+
+        switch (xmlEvent.getEventType()) {
+             case XMLStreamConstants.END_ELEMENT:
+                 EndElement endElement = xmlEvent.asEndElement();
+                 if (endElement.getName().equals(startElementName)) {
+                     return true;
+                 }
+             default:
+                 throw new ParseException("Unexpected event received " + Utils.getXMLEventAsString(xmlEvent));
+        }
+    }
+
+    public void validate() throws ParseException {
+        if (uri == null) {
+            throw new ParseException("Attribute \"URI\" is missing");
+        }
+    }
 
     /**
      * Gets the value of the any property.
