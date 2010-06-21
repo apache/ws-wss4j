@@ -79,6 +79,9 @@ public class EncryptedKeyInputProcessor extends AbstractInputProcessor {
         if (currentEncryptedKeyType != null) {
             try {
                 isFinishedcurrentEncryptedKey = currentEncryptedKeyType.parseXMLEvent(xmlEvent);
+                if (isFinishedcurrentEncryptedKey) {
+                    currentEncryptedKeyType.validate();
+                }
             } catch (ParseException e) {
                 throw new XMLSecurityException(e);
             }
@@ -90,8 +93,7 @@ public class EncryptedKeyInputProcessor extends AbstractInputProcessor {
                 currentEncryptedKeyType = new EncryptedKeyType(startElement);
             }
         }
-
-        if (currentEncryptedKeyType != null && isFinishedcurrentEncryptedKey) {
+        else if (currentEncryptedKeyType != null && isFinishedcurrentEncryptedKey) {
 
             try {
                 String asyncEncAlgo = JCEAlgorithmMapper.translateURItoJCEID(currentEncryptedKeyType.getEncryptionMethod().getAlgorithm());

@@ -52,8 +52,10 @@ import java.util.UUID;
 public class DecryptInputProcessor extends AbstractInputProcessor {
 
     private EncryptedKeyType encryptedKeyType;
-    private EncryptedDataType currentEncryptedDataType;
     private byte[] keyBytes;
+
+    private EncryptedDataType currentEncryptedDataType;
+    private boolean isFinishedcurrentEncryptedDataType = false;
 
     public DecryptInputProcessor(EncryptedKeyType encryptedKeyType, byte[] keyBytes, SecurityProperties securityProperties) {
         super(securityProperties);
@@ -79,7 +81,23 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
 
     public void processEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException {
 
-        if (xmlEvent.isStartElement()) {
+        //todo overall null checks
+
+        if (currentEncryptedDataType != null
+                && !(xmlEvent.isEndElement()
+                && getLastStartElementName().equals(Constants.TAG_xenc_CipherValue))) {
+            try {
+                isFinishedcurrentEncryptedDataType = currentEncryptedDataType.parseXMLEvent(xmlEvent);
+                //todo validation will never be called because we abort early (see above if condition)
+                if (isFinishedcurrentEncryptedDataType) {
+                    currentEncryptedDataType.validate();
+                }
+            } catch (ParseException e) {
+                throw new XMLSecurityException(e);
+            }
+        }
+
+        else if (xmlEvent.isStartElement()) {
             StartElement startElement = xmlEvent.asStartElement();
 
             if (startElement.getName().equals(Constants.TAG_xenc_EncryptedData)) {
@@ -89,70 +107,19 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
                     for (int i = 0; i < references.size(); i++) {
                         ReferenceType referenceType =  references.get(i);
                         if (refId.getValue().equals(referenceType.getURI())) {
-                            System.out.println("found " + refId.getValue());
+                            logger.debug("Found reference " + refId.getValue());
                             //todo exception when reference is not found
                             currentEncryptedDataType = new EncryptedDataType(startElement);
-                            currentEncryptedDataType.setId(refId.getValue());
-
-                            Attribute type = startElement.getAttributeByName(Constants.ATT_NULL_Type);
-                            if (type != null) {
-                                currentEncryptedDataType.setType(type.getValue());
+                            //currentEncryptedDataType.setId(refId.getValue());
+/*                            try {
+                                currentEncryptedDataType.validate();
+                            } catch (ParseException e) {
+                                throw new XMLSecurityException(e);
                             }
+*/                            
                         }
                     }
                 }
-            }
-            else if (currentEncryptedDataType == null) {
-                //do nothing...fall out
-            }
-            else if (startElement.getName().equals(Constants.TAG_xenc_EncryptionMethod)) {
-                Attribute algorithm = startElement.getAttributeByName(Constants.ATT_NULL_Algorithm);
-                if (algorithm == null) {
-                    throw new XMLSecurityException("Missing Attribute " + Constants.ATT_NULL_Algorithm);
-                }
-                EncryptionMethodType encryptionMethodType = new EncryptionMethodType(startElement);
-                encryptionMethodType.setAlgorithm(algorithm.getValue());
-                currentEncryptedDataType.setEncryptionMethod(encryptionMethodType);
-            }
-            else if (startElement.getName().equals(Constants.TAG_dsig_KeyInfo)) {
-                KeyInfoType keyInfoType = new KeyInfoType(startElement);
-
-                Attribute id = startElement.getAttributeByName(Constants.ATT_NULL_Id);
-                if (id != null) {
-                    keyInfoType.setId(id.getValue());
-                }
-                currentEncryptedDataType.setKeyInfo(keyInfoType);
-            }
-            else if (startElement.getName().equals(Constants.TAG_wsse_SecurityTokenReference)) {
-                SecurityTokenReferenceType securityTokenReferenceType = new SecurityTokenReferenceType(startElement);
-
-                Attribute id = startElement.getAttributeByName(Constants.ATT_wsu_Id);
-                if (id != null) {
-                    securityTokenReferenceType.setId(id.getValue());
-                }
-                currentEncryptedDataType.getKeyInfo().getContent().add(securityTokenReferenceType);
-            }
-            else if (startElement.getName().equals(Constants.TAG_wsse_Reference)) {
-               org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_secext_1_0.ReferenceType referenceType
-                       = new org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_secext_1_0.ReferenceType(startElement);
-
-                Attribute uri = startElement.getAttributeByName(Constants.ATT_NULL_URI);
-                if (uri != null) {
-                    referenceType.setURI(uri.getValue());
-                }
-                Attribute valueType = startElement.getAttributeByName(Constants.ATT_NULL_ValueType);
-                if (valueType != null) {
-                    referenceType.setValueType(valueType.getValue());
-                }
-                //todo easier api for lists with unknown types @see cxf
-                ((SecurityTokenReferenceType)currentEncryptedDataType.getKeyInfo().getContent().get(0)).getAny().add(referenceType);
-            }
-            else if (startElement.getName().equals(Constants.TAG_xenc_CipherData)) {
-                CipherDataType cipherDataType = new CipherDataType(startElement);
-                currentEncryptedDataType.setCipherData(cipherDataType);
-            }
-            else if (startElement.getName().equals(Constants.TAG_xenc_CipherValue)) {
-                //nothing to-do
             }
         }
         else if (currentEncryptedDataType != null && xmlEvent.isCharacters()) {
@@ -263,6 +230,7 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
             if (endElement.getName().equals(Constants.TAG_xenc_EncryptedData)) {
                 //todo remove this processor when finished processing all references
                 currentEncryptedDataType = null;
+                isFinishedcurrentEncryptedDataType = false;
                 return;
             }
         }
