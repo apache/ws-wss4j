@@ -50,7 +50,7 @@ import java.security.cert.X509Certificate;
 public class EncryptedKeyInputProcessor extends AbstractInputProcessor {
 
     private EncryptedKeyType currentEncryptedKeyType;
-    private boolean isFinishedcurrentEncryptedKey;
+    private boolean isFinishedcurrentEncryptedKey = false;
 
     public EncryptedKeyInputProcessor(SecurityProperties securityProperties) {
         super(securityProperties);
@@ -86,7 +86,6 @@ public class EncryptedKeyInputProcessor extends AbstractInputProcessor {
 
         if (xmlEvent.isStartElement()) {
             StartElement startElement = xmlEvent.asStartElement();
-
             if (startElement.getName().equals(Constants.TAG_xenc_EncryptedKey)) {
                 currentEncryptedKeyType = new EncryptedKeyType(startElement);
             }
@@ -222,9 +221,8 @@ public class EncryptedKeyInputProcessor extends AbstractInputProcessor {
             finally {
                 //probably we can remove this processor from the chain now?
                 currentEncryptedKeyType = null;
+                isFinishedcurrentEncryptedKey = false;
             }
-
-            isFinishedcurrentEncryptedKey = false;
         }
         inputProcessorChain.processEvent(xmlEvent);
     }

@@ -62,6 +62,7 @@ public class SignatureVerifier {
         String signatureAlgorithm = JCEAlgorithmMapper.translateURItoJCEID(signatureType.getSignedInfo().getSignatureMethod().getAlgorithm());
         Signature signature = Signature.getInstance(signatureAlgorithm, "BC");
 
+        //todo loop over bst for matching id
         String pubCert = bst.get(0).getValue();
         Certificate certificate = CertificateFactory.getInstance("X.509", "BC").generateCertificate(new ByteArrayInputStream(Base64.decode(pubCert.getBytes())));
         signature.initVerify(certificate.getPublicKey());

@@ -4,7 +4,8 @@ import ch.gigerstyle.xmlsec.*;
 import org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_secext_1_0.BinarySecurityTokenType;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.events.*;
+import javax.xml.stream.events.StartElement;
+import javax.xml.stream.events.XMLEvent;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -32,54 +33,36 @@ public class BinarySecurityTokenInputProcessor extends AbstractInputProcessor {
 
     private Map<String, BinarySecurityTokenType> binarySecurityTokens = new HashMap<String, BinarySecurityTokenType>();
     private BinarySecurityTokenType currentBinarySecurityTokenType;
+    private boolean isFinishedcurrentBinarySecurityToken = false;
 
     public BinarySecurityTokenInputProcessor(SecurityProperties securityProperties) {
         super(securityProperties);
     }
 
     public void processEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException {
-        
+
+        if (currentBinarySecurityTokenType != null) {
+            try {
+                isFinishedcurrentBinarySecurityToken = currentBinarySecurityTokenType.parseXMLEvent(xmlEvent);
+            } catch (ParseException e) {
+                throw new XMLSecurityException(e);
+            }
+        }
+
         if (xmlEvent.isStartElement()) {
             StartElement startElement = xmlEvent.asStartElement();
-
             if (startElement.getName().equals(Constants.TAG_wsse_BinarySecurityToken)) {
                 currentBinarySecurityTokenType = new BinarySecurityTokenType(startElement);
-
-                Attribute encodingType = startElement.getAttributeByName(Constants.ATT_NULL_EncodingType);
-                if (encodingType != null) {
-                    currentBinarySecurityTokenType.setEncodingType(encodingType.getValue());
-                }
-
-                Attribute valueType = startElement.getAttributeByName(Constants.ATT_NULL_ValueType);
-                if (valueType != null) {
-                    currentBinarySecurityTokenType.setValueType(valueType.getValue());
-                }
-
-                Attribute id = startElement.getAttributeByName(Constants.ATT_wsu_Id);
-                if (id != null) {
-                    currentBinarySecurityTokenType.setId(id.getValue());
-                    binarySecurityTokens.put(id.getValue(), currentBinarySecurityTokenType);
-                } else {
-                    binarySecurityTokens.put(null, currentBinarySecurityTokenType);
-                }
-            }
-            else if (currentBinarySecurityTokenType == null) {
-                //do nothing...fall out
             }
         }
-        else if (currentBinarySecurityTokenType != null && xmlEvent.isCharacters()) {
-            //todo handle multiple character events for same text-node
-            Characters characters = xmlEvent.asCharacters();
-            if (getLastStartElementName().equals(Constants.TAG_wsse_BinarySecurityToken)) {
-                currentBinarySecurityTokenType.setValue(characters.getData());
-            }
-        }
-        else if (currentBinarySecurityTokenType != null && xmlEvent.isEndElement()) {
-            EndElement endElement = xmlEvent.asEndElement();
 
-            if (endElement.getName().equals(Constants.TAG_wsse_BinarySecurityToken)) {
+        if (currentBinarySecurityTokenType != null && isFinishedcurrentBinarySecurityToken) {
+            try {
                 securityContext.putAsList(BinarySecurityTokenType.class, currentBinarySecurityTokenType);
+            } finally {
+                //probably we can remove this processor from the chain now?
                 currentBinarySecurityTokenType = null;
+                isFinishedcurrentBinarySecurityToken = false;
             }
         }
 

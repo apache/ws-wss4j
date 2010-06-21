@@ -12,11 +12,6 @@ import org.w3c.dom.NodeList;
 
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
-import javax.xml.transform.*;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import java.io.ByteArrayInputStream;
@@ -67,11 +62,8 @@ public class EncDecryptionTests extends AbstractTestBase {
             NodeList nodeList = document.getElementsByTagNameNS(Constants.TAG_xenc_EncryptedKey.getNamespaceURI(), Constants.TAG_xenc_EncryptedKey.getLocalPart());
             Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), Constants.TAG_wsse_Security.getLocalPart());
 
-            Transformer transformer = TransformerFactory.newInstance().newTransformer();
-            transformer.transform(new DOMSource(document), new StreamResult(System.out));
-
             XPathExpression xPathExpression = getXPath("/env:Envelope/env:Header/wsse:Security/xenc:EncryptedKey/xenc:EncryptionMethod[@Algorithm='http://www.w3.org/2001/04/xmlenc#rsa-1_5']");
-            Node node = (Node)xPathExpression.evaluate(document, XPathConstants.NODE);
+            Node node = (Node) xPathExpression.evaluate(document, XPathConstants.NODE);
             Assert.assertNotNull(node);
 
             nodeList = document.getElementsByTagNameNS(Constants.TAG_xenc_DataReference.getNamespaceURI(), Constants.TAG_xenc_DataReference.getLocalPart());
@@ -81,7 +73,7 @@ public class EncDecryptionTests extends AbstractTestBase {
             Assert.assertEquals(nodeList.getLength(), 1);
 
             xPathExpression = getXPath("/env:Envelope/env:Body/xenc:EncryptedData/xenc:EncryptionMethod[@Algorithm='http://www.w3.org/2001/04/xmlenc#aes256-cbc']");
-            node = (Node)xPathExpression.evaluate(document, XPathConstants.NODE);
+            node = (Node) xPathExpression.evaluate(document, XPathConstants.NODE);
             Assert.assertNotNull(node);
 
             Assert.assertEquals(node.getParentNode().getParentNode().getLocalName(), "Body");
@@ -116,14 +108,6 @@ public class EncDecryptionTests extends AbstractTestBase {
             //no encrypted content
             nodeList = document.getElementsByTagNameNS(Constants.TAG_xenc_EncryptedData.getNamespaceURI(), Constants.TAG_xenc_EncryptedData.getLocalPart());
             Assert.assertEquals(nodeList.getLength(), 0);
-            /*
-            DetailedDiff detailedDiff = new DetailedDiff(
-                    new Diff(
-                            new InputStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml")),
-                            new InputStreamReader(new ByteArrayInputStream(baos.toByteArray()))));
-            List allDifferences = detailedDiff.getAllDifferences();
-            Assert.assertEquals(allDifferences.size(), 2, detailedDiff.toString());
-            */
         }
     }
 
@@ -257,7 +241,7 @@ public class EncDecryptionTests extends AbstractTestBase {
 
             KeyStore keyStore = KeyStore.getInstance("jks");
             keyStore.load(this.getClass().getClassLoader().getResourceAsStream("receiver.jks"), "1234567890".toCharArray());
-            securityProperties.setEncryptionUseThisCertificate((X509Certificate)keyStore.getCertificate("receiver"));
+            securityProperties.setEncryptionUseThisCertificate((X509Certificate) keyStore.getCertificate("receiver"));
 
             OutboundXMLSec xmlSecOut = XMLSec.getOutboundXMLSec(securityProperties);
             XMLStreamWriter xmlStreamWriter = xmlSecOut.processOutMessage(baos);
@@ -333,7 +317,7 @@ public class EncDecryptionTests extends AbstractTestBase {
             Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), Constants.TAG_wsse_Security.getLocalPart());
 
             XPathExpression xPathExpression = getXPath("/env:Envelope/env:Header/wsse:Security/xenc:EncryptedKey/dsig:KeyInfo/wsse:SecurityTokenReference/dsig:X509Data/dsig:X509IssuerSerial/dsig:X509SerialNumber");
-            Node node = (Node)xPathExpression.evaluate(document, XPathConstants.NODE);
+            Node node = (Node) xPathExpression.evaluate(document, XPathConstants.NODE);
             Assert.assertNotNull(node);
 
             nodeList = document.getElementsByTagNameNS(Constants.TAG_xenc_DataReference.getNamespaceURI(), Constants.TAG_xenc_DataReference.getLocalPart());
@@ -387,7 +371,7 @@ public class EncDecryptionTests extends AbstractTestBase {
             Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), Constants.TAG_wsse_Security.getLocalPart());
 
             XPathExpression xPathExpression = getXPath("/env:Envelope/env:Header/wsse:Security/xenc:EncryptedKey/dsig:KeyInfo/wsse:SecurityTokenReference/wsse:Reference/wsse:BinarySecurityToken");
-            Node node = (Node)xPathExpression.evaluate(document, XPathConstants.NODE);
+            Node node = (Node) xPathExpression.evaluate(document, XPathConstants.NODE);
             Assert.assertNotNull(node);
 
             nodeList = document.getElementsByTagNameNS(Constants.TAG_xenc_DataReference.getNamespaceURI(), Constants.TAG_xenc_DataReference.getLocalPart());
@@ -441,7 +425,7 @@ public class EncDecryptionTests extends AbstractTestBase {
             Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), Constants.TAG_wsse_Security.getLocalPart());
 
             XPathExpression xPathExpression = getXPath("/env:Envelope/env:Header/wsse:Security/xenc:EncryptedKey/dsig:KeyInfo/wsse:SecurityTokenReference/wsse:KeyIdentifier[@ValueType='http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0#X509v3']");
-            Node node = (Node)xPathExpression.evaluate(document, XPathConstants.NODE);
+            Node node = (Node) xPathExpression.evaluate(document, XPathConstants.NODE);
             Assert.assertNotNull(node);
 
             nodeList = document.getElementsByTagNameNS(Constants.TAG_xenc_DataReference.getNamespaceURI(), Constants.TAG_xenc_DataReference.getLocalPart());
@@ -495,7 +479,7 @@ public class EncDecryptionTests extends AbstractTestBase {
             Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), Constants.TAG_wsse_Security.getLocalPart());
 
             XPathExpression xPathExpression = getXPath("/env:Envelope/env:Header/wsse:Security/xenc:EncryptedKey/dsig:KeyInfo/wsse:SecurityTokenReference/wsse:KeyIdentifier[@ValueType='http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0#X509SubjectKeyIdentifier']");
-            Node node = (Node)xPathExpression.evaluate(document, XPathConstants.NODE);
+            Node node = (Node) xPathExpression.evaluate(document, XPathConstants.NODE);
             Assert.assertNotNull(node);
 
             nodeList = document.getElementsByTagNameNS(Constants.TAG_xenc_DataReference.getNamespaceURI(), Constants.TAG_xenc_DataReference.getLocalPart());
@@ -549,7 +533,7 @@ public class EncDecryptionTests extends AbstractTestBase {
             Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), Constants.TAG_wsse_Security.getLocalPart());
 
             XPathExpression xPathExpression = getXPath("/env:Envelope/env:Header/wsse:Security/xenc:EncryptedKey/dsig:KeyInfo/wsse:SecurityTokenReference/wsse:KeyIdentifier[@ValueType='http://docs.oasis-open.org/wss/oasis-wss-soap-message-security-1.1#ThumbprintSHA1']");
-            Node node = (Node)xPathExpression.evaluate(document, XPathConstants.NODE);
+            Node node = (Node) xPathExpression.evaluate(document, XPathConstants.NODE);
             Assert.assertNotNull(node);
 
             nodeList = document.getElementsByTagNameNS(Constants.TAG_xenc_DataReference.getNamespaceURI(), Constants.TAG_xenc_DataReference.getLocalPart());
@@ -603,7 +587,7 @@ public class EncDecryptionTests extends AbstractTestBase {
             Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), Constants.TAG_wsse_Security.getLocalPart());
 
             XPathExpression xPathExpression = getXPath("/env:Envelope/env:Header/wsse:Security/xenc:EncryptedKey/dsig:KeyInfo/wsse:SecurityTokenReference/wsse:KeyIdentifier[@ValueType='http://docs.oasis-open.org/wss/oasis-wss-soap-message-security-1.1#ThumbprintSHA1']");
-            Node node = (Node)xPathExpression.evaluate(document, XPathConstants.NODE);
+            Node node = (Node) xPathExpression.evaluate(document, XPathConstants.NODE);
             Assert.assertNotNull(node);
 
             nodeList = document.getElementsByTagNameNS(Constants.TAG_xenc_DataReference.getNamespaceURI(), Constants.TAG_xenc_DataReference.getLocalPart());
