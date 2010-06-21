@@ -86,14 +86,14 @@ public class EncryptedKeyInputProcessor extends AbstractInputProcessor {
                 throw new XMLSecurityException(e);
             }
         }
-
-        if (xmlEvent.isStartElement()) {
+        else if (xmlEvent.isStartElement()) {
             StartElement startElement = xmlEvent.asStartElement();
             if (startElement.getName().equals(Constants.TAG_xenc_EncryptedKey)) {
                 currentEncryptedKeyType = new EncryptedKeyType(startElement);
             }
         }
-        else if (currentEncryptedKeyType != null && isFinishedcurrentEncryptedKey) {
+
+        if (currentEncryptedKeyType != null && isFinishedcurrentEncryptedKey) {
 
             try {
                 String asyncEncAlgo = JCEAlgorithmMapper.translateURItoJCEID(currentEncryptedKeyType.getEncryptionMethod().getAlgorithm());

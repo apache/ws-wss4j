@@ -8,10 +8,7 @@
 
 package org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_utility_1_0;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAnyAttribute;
@@ -24,6 +21,17 @@ import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.events.Attribute;
+import javax.xml.stream.events.EndElement;
+import javax.xml.stream.events.StartElement;
+import javax.xml.stream.events.XMLEvent;
+
+import ch.gigerstyle.xmlsec.Constants;
+import ch.gigerstyle.xmlsec.ParseException;
+import ch.gigerstyle.xmlsec.Parseable;
+import ch.gigerstyle.xmlsec.Utils;
+import org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_secext_1_0.SecurityTokenReferenceType;
 import org.w3c.dom.Element;
 
 
@@ -62,7 +70,9 @@ import org.w3c.dom.Element;
     "expires",
     "any"
 })
-public class TimestampType {
+public class TimestampType implements Parseable {
+
+    private Parseable currentParseable;
 
     @XmlElement(name = "Created")
     protected AttributedDateTime created;
@@ -77,6 +87,61 @@ public class TimestampType {
     protected String id;
     @XmlAnyAttribute
     private Map<QName, String> otherAttributes = new HashMap<QName, String>();
+
+    public TimestampType(StartElement startElement) {
+        Iterator<Attribute> attributeIterator = startElement.getAttributes();
+        while (attributeIterator.hasNext()) {
+            Attribute attribute = attributeIterator.next();
+            if (attribute.getName().equals(Constants.ATT_wsu_Id)) {
+                CollapsedStringAdapter collapsedStringAdapter = new CollapsedStringAdapter();
+                this.id = collapsedStringAdapter.unmarshal(attribute.getValue());
+            }
+        }
+    }
+
+    public boolean parseXMLEvent(XMLEvent xmlEvent) throws ParseException {
+        if (currentParseable != null) {
+            boolean finished = currentParseable.parseXMLEvent(xmlEvent);
+            if (finished) {
+                currentParseable.validate();
+                currentParseable = null;
+            }
+            return false;
+        }
+
+        switch (xmlEvent.getEventType()) {
+             case XMLStreamConstants.START_ELEMENT:
+                 StartElement startElement = xmlEvent.asStartElement();
+
+                 if (startElement.getName().equals(Constants.TAG_wsu_Created)) {
+                     currentParseable = this.created = new AttributedDateTime(startElement);
+                 }
+                 else if (startElement.getName().equals(Constants.TAG_wsu_Expires)) {
+                     currentParseable = this.expires = new AttributedDateTime(startElement);
+                 }
+                 else {
+                     throw new ParseException("Unsupported Element: " + startElement.getName());
+                 }
+
+                 break;
+             case XMLStreamConstants.END_ELEMENT:
+                 currentParseable = null;
+                 EndElement endElement = xmlEvent.asEndElement();
+                 if (endElement.getName().equals(Constants.TAG_wsu_Timestamp)) {
+                     return true;
+                 }
+                 break;
+             default:
+                 throw new ParseException("Unexpected event received " + Utils.getXMLEventAsString(xmlEvent));
+        }
+        return false;
+    }
+
+    public void validate() throws ParseException {
+        if (created == null || expires == null) {
+            throw new ParseException("Element \"Created\"|\"Expires\" is missing");
+        }
+    }
 
     /**
      * Gets the value of the created property.
