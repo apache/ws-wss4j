@@ -8,7 +8,13 @@
 
 package org.w3._2000._09.xmldsig_;
 
+import ch.gigerstyle.xmlsec.Constants;
+import ch.gigerstyle.xmlsec.ParseException;
+import ch.gigerstyle.xmlsec.Parseable;
+import ch.gigerstyle.xmlsec.Utils;
+
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -19,6 +25,11 @@ import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.events.Attribute;
+import javax.xml.stream.events.EndElement;
+import javax.xml.stream.events.StartElement;
+import javax.xml.stream.events.XMLEvent;
 
 
 /**
@@ -49,7 +60,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
     "signatureMethod",
     "reference"
 })
-public class SignedInfoType {
+public class SignedInfoType implements Parseable {
 
     @XmlElement(name = "CanonicalizationMethod", required = true)
     protected CanonicalizationMethodType canonicalizationMethod;
@@ -62,6 +73,68 @@ public class SignedInfoType {
     @XmlID
     @XmlSchemaType(name = "ID")
     protected String id;
+
+    private Parseable currentParseable;
+
+    public SignedInfoType(StartElement startElement) {
+        Iterator<Attribute> attributeIterator = startElement.getAttributes();
+        while (attributeIterator.hasNext()) {
+            Attribute attribute = attributeIterator.next();
+            if (attribute.getName().equals(Constants.ATT_NULL_Id)) {
+                CollapsedStringAdapter collapsedStringAdapter = new CollapsedStringAdapter();
+                this.id = collapsedStringAdapter.unmarshal(attribute.getValue());
+            }
+        }
+    }
+
+    public boolean parseXMLEvent(XMLEvent xmlEvent) throws ParseException {
+        if (currentParseable != null) {
+            boolean finished = currentParseable.parseXMLEvent(xmlEvent);
+            if (finished) {
+                currentParseable.validate();
+                currentParseable = null;
+            }
+            return false;
+        }
+
+        switch (xmlEvent.getEventType()) {
+             case XMLStreamConstants.START_ELEMENT:
+                 StartElement startElement = xmlEvent.asStartElement();
+
+                 if (startElement.getName().equals(Constants.TAG_dsig_CanonicalizationMethod)) {
+                     currentParseable = this.canonicalizationMethod = new CanonicalizationMethodType(startElement);
+                 }
+                 else if (startElement.getName().equals(Constants.TAG_dsig_SignatureMethod)) {
+                     currentParseable = this.signatureMethod = new SignatureMethodType(startElement);
+                 }
+                 else if (startElement.getName().equals(Constants.TAG_dsig_Reference)) {
+                     ReferenceType referenceType = new ReferenceType(startElement);
+                     currentParseable = referenceType;
+                     getReference().add(referenceType);
+                 }
+                 else {
+                     throw new ParseException("Unsupported Element: " + startElement.getName());
+                 }
+
+                 break;
+             case XMLStreamConstants.END_ELEMENT:
+                 currentParseable = null;
+                 EndElement endElement = xmlEvent.asEndElement();
+                 if (endElement.getName().equals(Constants.TAG_dsig_SignedInfo)) {
+                     return true;
+                 }
+                 break;
+             default:
+                 throw new ParseException("Unexpected event received " + Utils.getXMLEventAsString(xmlEvent));
+        }
+        return false;
+    }
+
+    public void validate() throws ParseException {
+        if (canonicalizationMethod == null || signatureMethod == null || reference.size() == 0) {
+            throw new ParseException("Element \"CanonicalizationMethod\"|\"SignatureMethod\"|\"Reference\" is missing");
+        }
+    }
 
     /**
      * Gets the value of the canonicalizationMethod property.

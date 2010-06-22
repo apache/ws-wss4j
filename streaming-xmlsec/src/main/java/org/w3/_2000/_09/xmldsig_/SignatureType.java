@@ -8,7 +8,14 @@
 
 package org.w3._2000._09.xmldsig_;
 
+import ch.gigerstyle.xmlsec.Constants;
+import ch.gigerstyle.xmlsec.ParseException;
+import ch.gigerstyle.xmlsec.Parseable;
+import ch.gigerstyle.xmlsec.Utils;
+import org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_utility_1_0.AttributedDateTime;
+
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -19,6 +26,11 @@ import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.events.Attribute;
+import javax.xml.stream.events.EndElement;
+import javax.xml.stream.events.StartElement;
+import javax.xml.stream.events.XMLEvent;
 
 
 /**
@@ -51,7 +63,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
     "keyInfo",
     "object"
 })
-public class SignatureType {
+public class SignatureType implements Parseable {
 
     @XmlElement(name = "SignedInfo", required = true)
     protected SignedInfoType signedInfo;
@@ -66,6 +78,66 @@ public class SignatureType {
     @XmlID
     @XmlSchemaType(name = "ID")
     protected String id;
+
+    private Parseable currentParseable;
+
+    public SignatureType(StartElement startElement) {
+        Iterator<Attribute> attributeIterator = startElement.getAttributes();
+        while (attributeIterator.hasNext()) {
+            Attribute attribute = attributeIterator.next();
+            if (attribute.getName().equals(Constants.ATT_NULL_Id)) {
+                CollapsedStringAdapter collapsedStringAdapter = new CollapsedStringAdapter();
+                this.id = collapsedStringAdapter.unmarshal(attribute.getValue());
+            }
+        }
+    }
+
+    public boolean parseXMLEvent(XMLEvent xmlEvent) throws ParseException {
+        if (currentParseable != null) {
+            boolean finished = currentParseable.parseXMLEvent(xmlEvent);
+            if (finished) {
+                currentParseable.validate();
+                currentParseable = null;
+            }
+            return false;
+        }
+
+        switch (xmlEvent.getEventType()) {
+             case XMLStreamConstants.START_ELEMENT:
+                 StartElement startElement = xmlEvent.asStartElement();
+
+                 if (startElement.getName().equals(Constants.TAG_dsig_SignedInfo)) {
+                     currentParseable = this.signedInfo = new SignedInfoType(startElement);
+                 }
+                 else if (startElement.getName().equals(Constants.TAG_dsig_SignatureValue)) {
+                     currentParseable = this.signatureValue = new SignatureValueType(startElement);
+                 }
+                 else if (startElement.getName().equals(Constants.TAG_dsig_KeyInfo)) {
+                     currentParseable = this.keyInfo = new KeyInfoType(startElement);
+                 }
+                 else {
+                     throw new ParseException("Unsupported Element: " + startElement.getName());
+                 }
+
+                 break;
+             case XMLStreamConstants.END_ELEMENT:
+                 currentParseable = null;
+                 EndElement endElement = xmlEvent.asEndElement();
+                 if (endElement.getName().equals(Constants.TAG_dsig_Signature)) {
+                     return true;
+                 }
+                 break;
+             default:
+                 throw new ParseException("Unexpected event received " + Utils.getXMLEventAsString(xmlEvent));
+        }
+        return false;
+    }
+
+    public void validate() throws ParseException {
+        if (signedInfo == null || signatureValue == null) {
+            throw new ParseException("Element \"SignedInfo\"|\"SignatureValue\" is missing");
+        }
+    }
 
     /**
      * Gets the value of the signedInfo property.

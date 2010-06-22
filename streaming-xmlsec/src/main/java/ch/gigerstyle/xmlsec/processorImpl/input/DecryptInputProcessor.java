@@ -96,7 +96,6 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
                 throw new XMLSecurityException(e);
             }
         }
-
         else if (xmlEvent.isStartElement()) {
             StartElement startElement = xmlEvent.asStartElement();
 

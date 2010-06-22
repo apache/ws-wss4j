@@ -1,15 +1,14 @@
 package ch.gigerstyle.xmlsec.processorImpl.input;
 
 import ch.gigerstyle.xmlsec.*;
-import org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_secext_1_0.SecurityTokenReferenceType;
-import org.w3._2000._09.xmldsig_.*;
+import org.w3._2000._09.xmldsig_.SignatureType;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.events.*;
+import javax.xml.stream.events.EndElement;
+import javax.xml.stream.events.StartElement;
+import javax.xml.stream.events.XMLEvent;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * User: giger
@@ -33,10 +32,8 @@ import java.util.Map;
  */
 public class SignatureInputProcessor extends AbstractInputProcessor {
 
-    private Map<String, SignatureType> signatureTypes = new HashMap<String, SignatureType>();
     private SignatureType currentSignatureType;
-    private ReferenceType currentReferenceType;
-    private TransformType currentTransformType;
+    private boolean isFinishedcurrentSignatureType;
 
     private boolean recordSignedInfo = false;
     private List<XMLEvent> signedInfoXMLEvents = new ArrayList<XMLEvent>();
@@ -80,145 +77,41 @@ public class SignatureInputProcessor extends AbstractInputProcessor {
 
     public void processEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException {
 
+        if (currentSignatureType != null) {
+            try {
+                isFinishedcurrentSignatureType = currentSignatureType.parseXMLEvent(xmlEvent);
+                if (isFinishedcurrentSignatureType) {
+                    currentSignatureType.validate();
+                }
+            } catch (ParseException e) {
+                throw new XMLSecurityException(e);
+            }
+        }
+
         if (xmlEvent.isStartElement()) {
             StartElement startElement = xmlEvent.asStartElement();
 
             if (startElement.getName().equals(Constants.TAG_dsig_Signature)) {
-                currentSignatureType = new SignatureType();
-
-                Attribute attribute = startElement.getAttributeByName(Constants.ATT_NULL_Id);
-                if (attribute != null) {
-                    currentSignatureType.setId(attribute.getValue());
-                    signatureTypes.put(attribute.getValue(), currentSignatureType);
-                } else {
-                    signatureTypes.put(null, currentSignatureType);
-                }
-            } else if (currentSignatureType == null) {
-                //do nothing...fall out
-            } else if (startElement.getName().equals(Constants.TAG_dsig_SignedInfo)) {
+                currentSignatureType = new SignatureType(startElement);
+            } else if (currentSignatureType != null && startElement.getName().equals(Constants.TAG_dsig_SignedInfo)) {
                 recordSignedInfo = true;
-                SignedInfoType signedInfoType = new SignedInfoType();
-
-                Attribute id = startElement.getAttributeByName(Constants.ATT_NULL_Id);
-                if (id != null) {
-                    signedInfoType.setId(id.getValue());
-                }
-                currentSignatureType.setSignedInfo(signedInfoType);
-            } else if (startElement.getName().equals(Constants.TAG_dsig_CanonicalizationMethod)) {
-                CanonicalizationMethodType canonicalizationMethodType = new CanonicalizationMethodType();
-                //optional:
-                Attribute algorithm = startElement.getAttributeByName(Constants.ATT_NULL_Algorithm);
-                if (algorithm != null) {
-                    canonicalizationMethodType.setAlgorithm(algorithm.getValue());
-                }
-                currentSignatureType.getSignedInfo().setCanonicalizationMethod(canonicalizationMethodType);
-            } else if (startElement.getName().equals(Constants.TAG_dsig_SignatureMethod)) {
-                SignatureMethodType signatureMethodType = new SignatureMethodType();
-                //optional:
-                Attribute algorithm = startElement.getAttributeByName(Constants.ATT_NULL_Algorithm);
-                if (algorithm != null) {
-                    signatureMethodType.setAlgorithm(algorithm.getValue());
-                }
-                currentSignatureType.getSignedInfo().setSignatureMethod(signatureMethodType);
-            } else if (startElement.getName().equals(Constants.TAG_dsig_Reference)) {
-                ReferenceType referenceType = new ReferenceType();
-
-                Attribute id = startElement.getAttributeByName(Constants.ATT_NULL_Id);
-                if (id != null) {
-                    referenceType.setId(id.getValue());
-                }
-
-                Attribute uri = startElement.getAttributeByName(Constants.ATT_NULL_URI);
-                if (uri != null) {
-                    referenceType.setURI(Utils.dropReferenceMarker(uri.getValue()));
-                }
-
-                Attribute type = startElement.getAttributeByName(Constants.ATT_NULL_Type);
-                if (type != null) {
-                    referenceType.setType(type.getValue());
-                }
-                //todo easier api for lists with unknown types @see cxf
-                currentSignatureType.getSignedInfo().getReference().add(referenceType);
-                currentReferenceType = referenceType;
-            } else if (startElement.getName().equals(Constants.TAG_dsig_Transforms)) {
-                TransformsType transformsType = new TransformsType();
-                currentReferenceType.setTransforms(transformsType);
-            } else if (startElement.getName().equals(Constants.TAG_dsig_Transform)) {
-                Attribute algorithm = startElement.getAttributeByName(Constants.ATT_NULL_Algorithm);
-                if (algorithm == null) {
-                    throw new XMLSecurityException("Missing Attribute " + Constants.ATT_NULL_Algorithm);
-                }
-
-                TransformType transformType = new TransformType();
-                transformType.setAlgorithm(algorithm.getValue());
-                currentReferenceType.getTransforms().getTransform().add(transformType);
-                currentTransformType = transformType;
-            } else if (startElement.getName().equals(Constants.TAG_dsig_DigestMethod)) {
-                Attribute algorithm = startElement.getAttributeByName(Constants.ATT_NULL_Algorithm);
-                if (algorithm == null) {
-                    throw new XMLSecurityException("Missing Attribute " + Constants.ATT_NULL_Algorithm);
-                }
-                DigestMethodType digestMethodType = new DigestMethodType();
-                digestMethodType.setAlgorithm(algorithm.getValue());
-                currentReferenceType.setDigestMethod(digestMethodType);
-            } else if (startElement.getName().equals(Constants.TAG_dsig_DigestValue)) {
-                //nothing todo
-            } else if (startElement.getName().equals(Constants.TAG_dsig_SignatureValue)) {
-                SignatureValueType signatureValueType = new SignatureValueType();
-
-                Attribute id = startElement.getAttributeByName(Constants.ATT_NULL_Id);
-                if (id != null) {
-                    signatureValueType.setId(id.getValue());
-                }
-                currentSignatureType.setSignatureValue(signatureValueType);
-            } else if (startElement.getName().equals(Constants.TAG_dsig_KeyInfo)) {
-                KeyInfoType keyInfoType = new KeyInfoType(startElement);
-
-                Attribute id = startElement.getAttributeByName(Constants.ATT_NULL_Id);
-                if (id != null) {
-                    keyInfoType.setId(id.getValue());
-                }
-                currentSignatureType.setKeyInfo(keyInfoType);
-            } else if (startElement.getName().equals(Constants.TAG_wsse_SecurityTokenReference)) {
-                SecurityTokenReferenceType securityTokenReferenceType = new SecurityTokenReferenceType(startElement);
-                //optional:
-                Attribute idAttribute = startElement.getAttributeByName(Constants.ATT_wsu_Id);
-                if (idAttribute != null) {
-                    securityTokenReferenceType.setId(idAttribute.getValue());
-                }
-                currentSignatureType.getKeyInfo().getContent().add(securityTokenReferenceType);
-            } else if (startElement.getName().equals(Constants.TAG_wsse_Reference)) {
-                org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_secext_1_0.ReferenceType referenceType
-                        = new org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_secext_1_0.ReferenceType(startElement);
-
-                Attribute uri = startElement.getAttributeByName(Constants.ATT_NULL_URI);
-                if (uri != null) {
-                    referenceType.setURI(uri.getValue());
-                }
-                Attribute valueType = startElement.getAttributeByName(Constants.ATT_NULL_ValueType);
-                if (valueType != null) {
-                    referenceType.setValueType(valueType.getValue());
-                }
-                //todo easier api for lists with unknown types @see cxf
-                ((SecurityTokenReferenceType) currentSignatureType.getKeyInfo().getContent().get(0)).getAny().add(referenceType);
             }
-        } else if (currentSignatureType != null && xmlEvent.isCharacters()) {
-            //todo handle multiple character events for same text-node
-            Characters characters = xmlEvent.asCharacters();
-            if (!characters.isWhiteSpace() && getLastStartElementName().equals(Constants.TAG_dsig_DigestValue)) {
-                currentReferenceType.setDigestValue(characters.getData().getBytes());
-            } else if (!characters.isWhiteSpace() && getLastStartElementName().equals(Constants.TAG_dsig_SignatureValue)) {
-                currentSignatureType.getSignatureValue().setValue(characters.getData().getBytes());
-            }
-        } else if (currentSignatureType != null && xmlEvent.isEndElement()) {
+        }
+        else if (currentSignatureType != null && xmlEvent.isEndElement()) {
             EndElement endElement = xmlEvent.asEndElement();
 
             if (endElement.getName().equals(Constants.TAG_dsig_SignedInfo)) {
                 signedInfoXMLEvents.add(xmlEvent);
                 recordSignedInfo = false;
-                currentReferenceType = null;
-                currentTransformType = null;
-            } else if (endElement.getName().equals(Constants.TAG_dsig_Signature)) {
+            }
+        }
+
+        if (recordSignedInfo) {
+            signedInfoXMLEvents.add(xmlEvent);
+        }
+
+        if (currentSignatureType != null && isFinishedcurrentSignatureType) {
+            try {
                 //todo reparse SignedInfo when custom canonicalization method is used
                 //verify SignedInfo
                 SignatureVerifier signatureVerifier = new SignatureVerifier(currentSignatureType, securityContext);
@@ -231,12 +124,11 @@ public class SignatureInputProcessor extends AbstractInputProcessor {
                 //add processors to verify references
                 inputProcessorChain.addProcessor(new SignatureReferenceVerifyInputProcessor(currentSignatureType, getSecurityProperties()));
                 currentSignatureType = null;
+            } finally {
+                //probably we can remove this processor from the chain now?
+                currentSignatureType = null;
+                isFinishedcurrentSignatureType = false;
             }
-            //probably we can remove this processor from the chain now?
-        }
-
-        if (recordSignedInfo) {
-            signedInfoXMLEvents.add(xmlEvent);
         }
 
         inputProcessorChain.processEvent(xmlEvent);
