@@ -91,7 +91,7 @@ public class ReferenceType implements Parseable {
                 this.id = collapsedStringAdapter.unmarshal(attribute.getValue());
             }
             else if (attribute.getName().equals(Constants.ATT_NULL_URI)) {
-                this.uri = attribute.getValue();
+                this.uri = Utils.dropReferenceMarker(attribute.getValue());
             }
             else if (attribute.getName().equals(Constants.ATT_NULL_Type)) {
                 this.type = attribute.getValue();
@@ -158,8 +158,8 @@ public class ReferenceType implements Parseable {
     }
 
     public void validate() throws ParseException {
-        if (digestMethod == null || digestValue == null) {
-            throw new ParseException("Element \"DigestMethod\"|\"DigestValue\" is missing");
+        if (digestMethod == null || digestValue == null || uri == null) {
+            throw new ParseException("Element \"DigestMethod\"|\"DigestValue\" or Attribute \"uri\" is missing");
         }
     }
 
