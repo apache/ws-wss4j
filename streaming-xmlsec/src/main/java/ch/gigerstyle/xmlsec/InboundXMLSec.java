@@ -54,12 +54,14 @@ public class InboundXMLSec {
 
                     InputProcessorChainImpl processorChain = new InputProcessorChainImpl();
 
+                    processorChain.addProcessor(new SecurityHeaderInputProcessor(securityProperties));
                     //todo dynamic add procs
-                    processorChain.addProcessor(new EncryptedKeyInputProcessor(securityProperties));
+                    /*processorChain.addProcessor(new EncryptedKeyInputProcessor(securityProperties));
                     processorChain.addProcessor(new ReferenceListInputProcessor(securityProperties));
                     processorChain.addProcessor(new BinarySecurityTokenInputProcessor(securityProperties));
                     processorChain.addProcessor(new SignatureInputProcessor(securityProperties));
                     processorChain.addProcessor(new TimestampInputProcessor(securityProperties));
+                    */
                     processorChain.addProcessor(new LogInputProcessor(securityProperties));
                     processorChain.addProcessor(pipedInputProcessor);
 

@@ -1,6 +1,8 @@
 package ch.gigerstyle.xmlsec;
 
 import ch.gigerstyle.xmlsec.processorImpl.input.DecryptInputProcessor;
+import ch.gigerstyle.xmlsec.processorImpl.input.LogInputProcessor;
+import ch.gigerstyle.xmlsec.processorImpl.input.SecurityHeaderInputProcessor;
 import ch.gigerstyle.xmlsec.processorImpl.input.SignatureReferenceVerifyInputProcessor;
 
 import javax.xml.stream.XMLStreamException;
@@ -60,9 +62,9 @@ public class InputProcessorChainImpl implements InputProcessorChain {
     }
 
     public void addProcessor(InputProcessor inputProcessor) {
-        if (inputProcessor.getClass().getName().equals(DecryptInputProcessor.class.getName())
-                || inputProcessor.getClass().getName().equals(SignatureReferenceVerifyInputProcessor.class.getName())
-                || inputProcessor.getClass().getName().equals("ch.gigerstyle.xmlsec.processorImpl.input.SignatureReferenceVerifyInputProcessor$InternalSignatureReferenceVerifier")) {
+        if (!inputProcessor.getClass().getName().equals(LogInputProcessor.class.getName())
+            && !inputProcessor.getClass().getName().equals(PipedInputProcessor.class.getName())
+            && !inputProcessor.getClass().getName().equals(SecurityHeaderInputProcessor.class.getName())) {
             this.inputProcessors.add(this.inputProcessors.size() -2, inputProcessor);
         } else {
             this.inputProcessors.add(inputProcessor);
