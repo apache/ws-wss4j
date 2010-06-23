@@ -3,7 +3,7 @@ package ch.gigerstyle.xmlsec.processorImpl.output;
 import ch.gigerstyle.xmlsec.*;
 import ch.gigerstyle.xmlsec.config.JCEAlgorithmMapper;
 import ch.gigerstyle.xmlsec.crypto.WSSecurityException;
-import com.sun.xml.internal.messaging.saaj.packaging.mime.util.BASE64EncoderStream;
+import com.sun.mail.util.BASE64EncoderStream;
 
 import javax.crypto.*;
 import javax.xml.namespace.QName;
@@ -82,8 +82,6 @@ public class EncryptOutputProcessor extends AbstractOutputProcessor {
                     if (securePart.getId() == null) {
                         if (startElement.getName().getLocalPart().equals(securePart.getName())
                                 && startElement.getName().getNamespaceURI().equals(securePart.getNamespace())) {
-
-                            //todo buildEmbedded @see WSSecEncrypt 284
 
                             System.out.println("matched securePart for encryption");
                             InternalEncryptionOutputProcessor internalEncryptionOutputProcessor = null;
@@ -281,6 +279,7 @@ public class EncryptOutputProcessor extends AbstractOutputProcessor {
 
                 createEndElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_xenc_CipherValue);
                 createEndElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_xenc_CipherData);
+                
                 createStartElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_xenc_ReferenceList, null);
 
                 for (int i = 0; i < encryptionPartDefList.size(); i++) {

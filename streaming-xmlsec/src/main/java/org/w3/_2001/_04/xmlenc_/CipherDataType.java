@@ -12,20 +12,15 @@ import ch.gigerstyle.xmlsec.Constants;
 import ch.gigerstyle.xmlsec.ParseException;
 import ch.gigerstyle.xmlsec.Parseable;
 import ch.gigerstyle.xmlsec.Utils;
-import com.sun.org.apache.xml.internal.security.encryption.CipherValue;
-import org.w3._2000._09.xmldsig_.KeyInfoType;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
-import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.stream.XMLStreamConstants;
-import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
-import java.util.Iterator;
 
 
 /**

@@ -56,6 +56,7 @@ public class InboundXMLSec {
 
                     //todo dynamic add procs
                     processorChain.addProcessor(new EncryptedKeyInputProcessor(securityProperties));
+                    processorChain.addProcessor(new ReferenceListInputProcessor(securityProperties));
                     processorChain.addProcessor(new BinarySecurityTokenInputProcessor(securityProperties));
                     processorChain.addProcessor(new SignatureInputProcessor(securityProperties));
                     processorChain.addProcessor(new TimestampInputProcessor(securityProperties));

@@ -1,11 +1,9 @@
 package ch.gigerstyle.xmlsec;
 
-import java.util.List;
-
 /**
  * User: giger
- * Date: May 15, 2010
- * Time: 11:54:26 AM
+ * Date: Jun 23, 2010
+ * Time: 8:19:09 PM
  * Copyright 2010 Marc Giger gigerstyle@gmx.ch
  * <p/>
  * This program is free software; you can redistribute it and/or modify it
@@ -22,17 +20,7 @@ import java.util.List;
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
-public interface SecurityContext {
+public interface SecurityTokenProvider {
 
-    public <T> void put(String key, T value);
-
-    public <T> T get(String key);
-
-    public <T> void putAsList(Class key, T value);
-
-    public <T> List<T> getAsList(Class key);
-
-    public void registerSecurityTokenProvider(String id, SecurityTokenProvider securityTokenProvider);
-
-    public SecurityTokenProvider getSecurityTokenProvider(String id);
+    public byte[] getSecurityToken();
 }

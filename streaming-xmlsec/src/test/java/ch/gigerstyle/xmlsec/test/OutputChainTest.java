@@ -37,7 +37,7 @@ import java.io.ByteArrayOutputStream;
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
-public class OutputChainTests extends AbstractTestBase {
+public class OutputChainTest extends AbstractTestBase {
 
     @Test
     public void testEncryptionAction() throws Exception {

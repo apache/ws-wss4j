@@ -23,6 +23,8 @@ import java.util.*;
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 public class XMLSecurityContext implements SecurityContext {
+
+    private Map<String, SecurityTokenProvider> secretTokenProviders = new HashMap<String, SecurityTokenProvider>();
     
     @SuppressWarnings("unchecked")
     private Map content = Collections.synchronizedMap(new HashMap());
@@ -50,5 +52,16 @@ public class XMLSecurityContext implements SecurityContext {
     @SuppressWarnings("unchecked")
     public <T> List<T> getAsList(Class key) {
         return (List<T>)content.get(key);
+    }
+
+    public void registerSecurityTokenProvider(String id, SecurityTokenProvider securityTokenProvider) {
+        if (id == null) {
+            throw new IllegalArgumentException("Id must not be null");
+        }
+        secretTokenProviders.put(id, securityTokenProvider);
+    }
+
+    public SecurityTokenProvider getSecurityTokenProvider(String id) {
+        return secretTokenProviders.get(id);
     }
 }

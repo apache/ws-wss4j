@@ -6,8 +6,6 @@ import org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_secext_1_0.
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * User: giger
@@ -29,11 +27,12 @@ import java.util.Map;
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
-public class BinarySecurityTokenInputProcessor extends AbstractInputProcessor {
+public class BinarySecurityTokenInputProcessor extends AbstractInputProcessor implements SecurityTokenProvider {
 
-    private Map<String, BinarySecurityTokenType> binarySecurityTokens = new HashMap<String, BinarySecurityTokenType>();
     private BinarySecurityTokenType currentBinarySecurityTokenType;
     private boolean isFinishedcurrentBinarySecurityToken = false;
+
+    private byte[] securityToken;
 
     public BinarySecurityTokenInputProcessor(SecurityProperties securityProperties) {
         super(securityProperties);
@@ -60,7 +59,20 @@ public class BinarySecurityTokenInputProcessor extends AbstractInputProcessor {
 
         if (currentBinarySecurityTokenType != null && isFinishedcurrentBinarySecurityToken) {
             try {
-                securityContext.putAsList(BinarySecurityTokenType.class, currentBinarySecurityTokenType);
+                if (currentBinarySecurityTokenType.getId() != null) {
+                    securityContext.registerSecurityTokenProvider(currentBinarySecurityTokenType.getId(), this);
+                    if (currentBinarySecurityTokenType.getEncodingType() != null) {
+                        if (Constants.SOAPMESSAGE_NS10_BASE64_ENCODING.equals(currentBinarySecurityTokenType.getEncodingType())) {
+                            securityToken = Base64.decode(currentBinarySecurityTokenType.getValue());
+                        }
+                        else {
+                            throw new XMLSecurityException("Unsupported BST Encoding: " + currentBinarySecurityTokenType.getEncodingType());
+                        }
+                    }
+                    else {
+                        securityToken = currentBinarySecurityTokenType.getValue().getBytes();
+                    }
+                }
             } finally {
                 //probably we can remove this processor from the chain now?
                 currentBinarySecurityTokenType = null;
@@ -69,5 +81,9 @@ public class BinarySecurityTokenInputProcessor extends AbstractInputProcessor {
         }
 
         inputProcessorChain.processEvent(xmlEvent);
+    }
+
+    public byte[] getSecurityToken() {
+        return securityToken;
     }
 }

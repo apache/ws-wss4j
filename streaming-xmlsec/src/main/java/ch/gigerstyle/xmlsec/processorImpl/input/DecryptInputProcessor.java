@@ -3,11 +3,7 @@ package ch.gigerstyle.xmlsec.processorImpl.input;
 import ch.gigerstyle.xmlsec.*;
 import ch.gigerstyle.xmlsec.config.JCEAlgorithmMapper;
 import org.bouncycastle.util.encoders.Base64;
-import org.codehaus.stax2.XMLInputFactory2;
-import org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_secext_1_0.*;
-import org.w3._2000._09.xmldsig_.KeyInfoType;
-import org.w3._2000._09.xmldsig_.X509DataType;
-import org.w3._2000._09.xmldsig_.X509IssuerSerialType;
+import org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_secext_1_0.SecurityTokenReferenceType;
 import org.w3._2001._04.xmlenc_.*;
 import org.w3._2001._04.xmlenc_.ReferenceType;
 
@@ -15,16 +11,10 @@ import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
-import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.UnsupportedCallbackException;
-import javax.xml.namespace.NamespaceContext;
 import javax.xml.namespace.QName;
 import javax.xml.stream.*;
 import javax.xml.stream.events.*;
 import java.io.*;
-import java.nio.CharBuffer;
-import java.security.PrivateKey;
-import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -51,16 +41,14 @@ import java.util.UUID;
  */
 public class DecryptInputProcessor extends AbstractInputProcessor {
 
-    private EncryptedKeyType encryptedKeyType;
-    private byte[] keyBytes;
+    private ReferenceList referenceList;
 
     private EncryptedDataType currentEncryptedDataType;
     private boolean isFinishedcurrentEncryptedDataType = false;
 
-    public DecryptInputProcessor(EncryptedKeyType encryptedKeyType, byte[] keyBytes, SecurityProperties securityProperties) {
+    public DecryptInputProcessor(ReferenceList referenceList, SecurityProperties securityProperties) {
         super(securityProperties);
-        this.encryptedKeyType = encryptedKeyType;
-        this.keyBytes = keyBytes;
+        this.referenceList = referenceList;
     }
 
     /*
@@ -102,7 +90,7 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
             if (startElement.getName().equals(Constants.TAG_xenc_EncryptedData)) {
                 Attribute refId = startElement.getAttributeByName(Constants.ATT_NULL_Id);
                 if (refId != null) {
-                    List<ReferenceType> references = encryptedKeyType.getReferenceList().getDataReferenceOrKeyReference();
+                    List<ReferenceType> references = referenceList.getDataReferenceOrKeyReference();
                     for (int i = 0; i < references.size(); i++) {
                         ReferenceType referenceType =  references.get(i);
                         if (refId.getValue().equals(referenceType.getURI())) {
@@ -129,7 +117,17 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
                 try {
                     String syncEncAlgo = JCEAlgorithmMapper.translateURItoJCEID(currentEncryptedDataType.getEncryptionMethod().getAlgorithm());
                     String algoFamily = JCEAlgorithmMapper.getJCEKeyAlgorithmFromURI(currentEncryptedDataType.getEncryptionMethod().getAlgorithm());
-                    SecretKey symmetricKey = new SecretKeySpec(keyBytes, algoFamily);
+
+                    SecurityTokenReferenceType securityTokenReferenceType = currentEncryptedDataType.getKeyInfo().getSecurityTokenReferenceType();
+                    if (securityTokenReferenceType == null
+                            || securityTokenReferenceType.getReferenceType() == null) {
+                        throw new XMLSecurityException("SecurityToken not found");
+                    }
+                    SecurityTokenProvider securityTokenProvider = securityContext.getSecurityTokenProvider(Utils.dropReferenceMarker(securityTokenReferenceType.getReferenceType().getURI()));
+                    if (securityTokenProvider == null || securityTokenProvider.getSecurityToken() == null) {
+                        throw new XMLSecurityException("SecurityToken not found");
+                    }
+                    SecretKey symmetricKey = new SecretKeySpec(securityTokenProvider.getSecurityToken(), algoFamily);
                     Cipher symmetricCipher = Cipher.getInstance(syncEncAlgo, "BC");
 
                     int ivLen = symmetricCipher.getBlockSize();

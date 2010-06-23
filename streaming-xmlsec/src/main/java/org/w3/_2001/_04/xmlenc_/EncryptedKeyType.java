@@ -112,9 +112,7 @@ public class EncryptedKeyType
     }
 
     public void validate() throws ParseException {
-        if (referenceList == null) {
-            throw new ParseException("Element \"ReferenceList\" is missing");
-        }
+        //ReferenceList is optional (can be outside of EncryptedKey -> child element of wsse:Security
     }
 
     /**

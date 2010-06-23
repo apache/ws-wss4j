@@ -47,10 +47,12 @@ import java.security.cert.X509Certificate;
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
-public class EncryptedKeyInputProcessor extends AbstractInputProcessor {
+public class EncryptedKeyInputProcessor extends AbstractInputProcessor implements SecurityTokenProvider {
 
     private EncryptedKeyType currentEncryptedKeyType;
     private boolean isFinishedcurrentEncryptedKey = false;
+
+    private byte[] secretToken;
 
     public EncryptedKeyInputProcessor(SecurityProperties securityProperties) {
         super(securityProperties);
@@ -200,9 +202,13 @@ public class EncryptedKeyInputProcessor extends AbstractInputProcessor {
                 cipher.init(Cipher.DECRYPT_MODE, privateKey);
 
                 byte[] encryptedEphemeralKey = org.bouncycastle.util.encoders.Base64.decode(currentEncryptedKeyType.getCipherData().getCipherValue());
-                byte[] decryptedKey = cipher.doFinal(encryptedEphemeralKey);
+                secretToken = cipher.doFinal(encryptedEphemeralKey);
 
-                inputProcessorChain.addProcessor(new DecryptInputProcessor(currentEncryptedKeyType, decryptedKey, getSecurityProperties()));
+                if (currentEncryptedKeyType.getReferenceList() != null) {
+                    inputProcessorChain.addProcessor(new DecryptInputProcessor(currentEncryptedKeyType.getReferenceList(), getSecurityProperties()));
+                } else if (currentEncryptedKeyType.getId() != null) {
+                    securityContext.registerSecurityTokenProvider(currentEncryptedKeyType.getId(), this);
+                }
             } catch (NoSuchPaddingException e) {
                 throw new XMLSecurityException(e);
             } catch (WSSecurityException e) {
@@ -227,5 +233,9 @@ public class EncryptedKeyInputProcessor extends AbstractInputProcessor {
             }
         }
         inputProcessorChain.processEvent(xmlEvent);
+    }
+
+    public byte[] getSecurityToken() {
+        return secretToken; 
     }
 }

@@ -12,6 +12,11 @@ import org.w3c.dom.NodeList;
 
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
+import javax.xml.transform.*;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import java.io.ByteArrayInputStream;
@@ -39,7 +44,7 @@ import java.security.cert.X509Certificate;
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
-public class EncDecryptionTests extends AbstractTestBase {
+public class EncDecryptionTest extends AbstractTestBase {
 
     @Test
     public void testEncDecryptionDefaultConfiguration() throws Exception {
@@ -595,6 +600,67 @@ public class EncDecryptionTests extends AbstractTestBase {
 
             nodeList = document.getElementsByTagNameNS(Constants.TAG_xenc_EncryptedData.getNamespaceURI(), Constants.TAG_xenc_EncryptedData.getLocalPart());
             Assert.assertEquals(nodeList.getLength(), 1);
+        }
+
+        //done encryption; now test decryption:
+        {
+            SecurityProperties securityProperties = new SecurityProperties();
+            securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "1234567890".toCharArray());
+            securityProperties.setCallbackHandler(new CallbackHandlerImpl());
+            InboundXMLSec xmlSec = XMLSec.getInboundXMLSec(securityProperties);
+            XMLStreamReader xmlStreamReader = xmlSec.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
+
+            Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
+
+            //header element must still be there
+            NodeList nodeList = document.getElementsByTagNameNS(Constants.TAG_xenc_EncryptedKey.getNamespaceURI(), Constants.TAG_xenc_EncryptedKey.getLocalPart());
+            Assert.assertEquals(nodeList.getLength(), 1);
+            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), Constants.TAG_wsse_Security.getLocalPart());
+
+            //no encrypted content
+            nodeList = document.getElementsByTagNameNS(Constants.TAG_xenc_EncryptedData.getNamespaceURI(), Constants.TAG_xenc_EncryptedData.getLocalPart());
+            Assert.assertEquals(nodeList.getLength(), 0);
+        }
+    }
+
+    @Test
+    public void testDecryptionReferenceListOutsideEncryptedKey() throws Exception {
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        {
+            SecurityProperties securityProperties = new SecurityProperties();
+            Constants.Action[] actions = new Constants.Action[]{Constants.Action.ENCRYPT};
+            securityProperties.setOutAction(actions);
+            securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "1234567890".toCharArray());
+            securityProperties.setEncryptionUser("receiver");
+            securityProperties.setEncryptionKeyIdentifierType(Constants.KeyIdentifierType.ISSUER_SERIAL);
+
+            OutboundXMLSec xmlSecOut = XMLSec.getOutboundXMLSec(securityProperties);
+            XMLStreamWriter xmlStreamWriter = xmlSecOut.processOutMessage(baos);
+            XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml"));
+            XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
+            xmlStreamWriter.close();
+
+            Document document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
+            NodeList nodeList = document.getElementsByTagNameNS(Constants.TAG_xenc_EncryptedKey.getNamespaceURI(), Constants.TAG_xenc_EncryptedKey.getLocalPart());
+            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), Constants.TAG_wsse_Security.getLocalPart());
+
+            XPathExpression xPathExpression = getXPath("/env:Envelope/env:Header/wsse:Security/xenc:EncryptedKey/dsig:KeyInfo/wsse:SecurityTokenReference/dsig:X509Data/dsig:X509IssuerSerial/dsig:X509SerialNumber");
+            Node node = (Node) xPathExpression.evaluate(document, XPathConstants.NODE);
+            Assert.assertNotNull(node);
+
+            nodeList = document.getElementsByTagNameNS(Constants.TAG_xenc_DataReference.getNamespaceURI(), Constants.TAG_xenc_DataReference.getLocalPart());
+            Assert.assertEquals(nodeList.getLength(), 1);
+
+            nodeList = document.getElementsByTagNameNS(Constants.TAG_xenc_EncryptedData.getNamespaceURI(), Constants.TAG_xenc_EncryptedData.getLocalPart());
+            Assert.assertEquals(nodeList.getLength(), 1);
+
+            //move ReferenceList...
+            TransformerFactory transFact = TransformerFactory.newInstance();
+            Transformer trans = transFact.newTransformer(new StreamSource(this.getClass().getClassLoader().getResourceAsStream("xsl/testDecryptionReferenceListOutsideEncryptedKey.xsl")));
+            baos.reset();
+            trans.transform(new DOMSource(document), new StreamResult(baos));
+
         }
 
         //done encryption; now test decryption:

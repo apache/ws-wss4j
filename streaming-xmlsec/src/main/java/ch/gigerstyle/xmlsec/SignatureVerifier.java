@@ -2,7 +2,6 @@ package ch.gigerstyle.xmlsec;
 
 import ch.gigerstyle.xmlsec.config.JCEAlgorithmMapper;
 import org.bouncycastle.util.encoders.Base64;
-import org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_secext_1_0.BinarySecurityTokenType;
 import org.w3._2000._09.xmldsig_.SignatureType;
 
 import javax.xml.stream.XMLStreamException;
@@ -12,7 +11,6 @@ import java.security.*;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
-import java.util.List;
 
 /**
  * User: giger
@@ -34,6 +32,7 @@ import java.util.List;
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
+//todo inner class?
 public class SignatureVerifier {
 
     private SignatureType signatureType;
@@ -54,17 +53,13 @@ public class SignatureVerifier {
     }
 
     private void createSignatureAlgorithm() throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, CertificateException {
-        //todo read values from xml
-        /*((org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_secext_1_0.ReferenceType)
-        ((SecurityTokenReferenceType)currentSignatureType.getKeyInfo().getContent().get(0)).getAny().get(0)).getURI()*/
-        List<BinarySecurityTokenType> bst = ((XMLSecurityContext)securityContext).getAsList(BinarySecurityTokenType.class);
-
         String signatureAlgorithm = JCEAlgorithmMapper.translateURItoJCEID(signatureType.getSignedInfo().getSignatureMethod().getAlgorithm());
         Signature signature = Signature.getInstance(signatureAlgorithm, "BC");
 
-        //todo loop over bst for matching id
-        String pubCert = bst.get(0).getValue();
-        Certificate certificate = CertificateFactory.getInstance("X.509", "BC").generateCertificate(new ByteArrayInputStream(Base64.decode(pubCert.getBytes())));
+        //todo handle the all the possible key types
+        String keyId = signatureType.getKeyInfo().getSecurityTokenReferenceType().getReferenceType().getURI();
+        SecurityTokenProvider securityTokenProvider = securityContext.getSecurityTokenProvider(Utils.dropReferenceMarker(keyId));
+        Certificate certificate = CertificateFactory.getInstance("X.509", "BC").generateCertificate(new ByteArrayInputStream(securityTokenProvider.getSecurityToken()));
         signature.initVerify(certificate.getPublicKey());
         signerOutputStream = new SignerOutputStream(signature);
     }
