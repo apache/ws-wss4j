@@ -222,9 +222,9 @@ public class EncryptOutputProcessor extends AbstractOutputProcessor {
                     createEndElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_wsse_KeyIdentifier);
                 }
                 else if (getSecurityProperties().getEncryptionKeyIdentifierType() == Constants.KeyIdentifierType.BST_DIRECT_REFERENCE) {
-                    String certUri = UUID.randomUUID().toString();
+                    String certUri = "CertId-" + UUID.randomUUID().toString();
                     attributes = new HashMap<QName, String>();
-                    attributes.put(Constants.ATT_NULL_URI, "#CertId-" + certUri);
+                    attributes.put(Constants.ATT_NULL_URI, "#" + certUri);
                     attributes.put(Constants.ATT_NULL_ValueType, Constants.NS_X509_V3_TYPE);
                     createStartElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_wsse_Reference, attributes);
 
@@ -232,7 +232,7 @@ public class EncryptOutputProcessor extends AbstractOutputProcessor {
                     attributes = new HashMap<QName, String>();
                     attributes.put(Constants.ATT_NULL_EncodingType, Constants.SOAPMESSAGE_NS10_BASE64_ENCODING);
                     attributes.put(Constants.ATT_NULL_ValueType, Constants.NS_X509_V3_TYPE);
-                    attributes.put(Constants.ATT_wsu_Id, "CertId-" + certUri);
+                    attributes.put(Constants.ATT_wsu_Id, certUri);
                     createStartElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_wsse_BinarySecurityToken, attributes);
                     try {
                         createCharactersAndOutputAsHeaderEvent(subOutputProcessorChain, Base64.encode(x509Certificate.getEncoded()));

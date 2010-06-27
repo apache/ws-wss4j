@@ -100,6 +100,9 @@ public class XMLSec {
                     if (securityProperties.getSignatureCanonicalizationAlgorithm() == null) {
                         securityProperties.setSignatureCanonicalizationAlgorithm("http://www.w3.org/2001/10/xml-exc-c14n#");
                     }
+                    if (securityProperties.getSignatureKeyIdentifierType() == null) {
+                        securityProperties.setSignatureKeyIdentifierType(Constants.KeyIdentifierType.ISSUER_SERIAL);
+                    }
                     break;
 
                 case ENCRYPT:

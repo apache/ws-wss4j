@@ -204,6 +204,7 @@ public class SecurityProperties {
     private Class signatureCryptoClass;
     private KeyStore signatureKeyStore;
     private String signatureUser;
+    private Constants.KeyIdentifierType signatureKeyIdentifierType;
 
     public void addSignaturePart(SecurePart securePart){
         signatureParts.add(securePart);
@@ -270,6 +271,15 @@ public class SecurityProperties {
             throw new XMLSecurityException("signatureCrypto instanciation failed", e);
         }
     }
+
+    public Constants.KeyIdentifierType getSignatureKeyIdentifierType() {
+        return signatureKeyIdentifierType;
+    }
+
+    public void setSignatureKeyIdentifierType(Constants.KeyIdentifierType signatureKeyIdentifierType) {
+        this.signatureKeyIdentifierType = signatureKeyIdentifierType;
+    }
+
 
     private Integer timestampTTL;
 

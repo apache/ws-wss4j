@@ -171,6 +171,7 @@ public class SimpleTest extends AbstractTestBase {
 
         securityProperties.setDecryptionAliasPassword("refApp9876".toCharArray());
         securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "1234567890".toCharArray());
+        securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "1234567890".toCharArray());
         securityProperties.setCallbackHandler(new CallbackHandlerImpl());
         InboundXMLSec xmlSecIn = XMLSec.getInboundXMLSec(securityProperties);
         XMLStreamReader outXmlStreamReader = xmlSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));

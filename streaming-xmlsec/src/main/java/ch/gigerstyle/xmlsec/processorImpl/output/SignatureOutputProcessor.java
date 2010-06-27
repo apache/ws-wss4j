@@ -3,6 +3,7 @@ package ch.gigerstyle.xmlsec.processorImpl.output;
 import ch.gigerstyle.xmlsec.*;
 import ch.gigerstyle.xmlsec.DigestOutputStream;
 import ch.gigerstyle.xmlsec.config.JCEAlgorithmMapper;
+import ch.gigerstyle.xmlsec.crypto.WSSecurityException;
 
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.UnsupportedCallbackException;
@@ -11,6 +12,8 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.*;
 import java.io.IOException;
 import java.security.*;
+import java.security.cert.CertificateEncodingException;
+import java.security.cert.X509Certificate;
 import java.util.*;
 
 /**
@@ -40,6 +43,8 @@ public class SignatureOutputProcessor extends AbstractOutputProcessor {
 
     private boolean bstProcessorAdded = false;
     private InternalSignatureOutputProcessor activeInternalSignatureOutputProcessor = null;
+
+    private boolean useSingleCert = true;
 
     public SignatureOutputProcessor(SecurityProperties securityProperties) throws XMLSecurityException {
         super(securityProperties);
@@ -149,6 +154,7 @@ public class SignatureOutputProcessor extends AbstractOutputProcessor {
                 } catch (NoSuchProviderException e) {
                     throw new XMLSecurityException(e);
                 }
+
                 try {
                     signature.initSign(
                             getSecurityProperties().getSignatureCrypto().getPrivateKey(
@@ -156,6 +162,16 @@ public class SignatureOutputProcessor extends AbstractOutputProcessor {
                                     password));
                 } catch (Exception e) {
                     throw new XMLSecurityException(e);
+                }
+
+                X509Certificate[] x509Certificates;
+                try {
+                    x509Certificates = getSecurityProperties().getSignatureCrypto().getCertificates(alias);
+                } catch (WSSecurityException e) {
+                    throw new XMLSecurityException(e);
+                }
+                if (x509Certificates == null || x509Certificates.length == 0) {
+                    throw new XMLSecurityException("noUserCertsFound");
                 }
 
                 SignedInfoProcessor signedInfoProcessor = new SignedInfoProcessor(getSecurityProperties(), signature);
@@ -212,11 +228,105 @@ public class SignatureOutputProcessor extends AbstractOutputProcessor {
                 attributes.put(Constants.ATT_wsu_Id, "STRId-1008354042");
                 createStartElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_wsse_SecurityTokenReference, attributes);
 
-                attributes = new HashMap<QName, String>();
-                attributes.put(Constants.ATT_NULL_URI, "#CertId-3458500");
-                attributes.put(Constants.ATT_NULL_ValueType, "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0#X509v3");
-                createStartElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_wsse_Reference, attributes);
-                createEndElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_wsse_Reference);
+                if (getSecurityProperties().getSignatureKeyIdentifierType() == Constants.KeyIdentifierType.ISSUER_SERIAL) {
+
+                    createStartElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_dsig_X509Data, null);
+                    createStartElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_dsig_X509IssuerSerial, null);
+                    createStartElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_dsig_X509IssuerName, null);
+                    createCharactersAndOutputAsHeaderEvent(subOutputProcessorChain, RFC2253Parser.normalize(x509Certificates[0].getIssuerDN().getName()));
+                    createEndElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_dsig_X509IssuerName);
+                    createStartElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_dsig_X509SerialNumber, null);
+                    createCharactersAndOutputAsHeaderEvent(subOutputProcessorChain, x509Certificates[0].getSerialNumber().toString());
+                    createEndElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_dsig_X509SerialNumber);
+                    createEndElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_dsig_X509IssuerSerial);
+                    createEndElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_dsig_X509Data);
+                }
+                else if (getSecurityProperties().getSignatureKeyIdentifierType() == Constants.KeyIdentifierType.SKI_KEY_IDENTIFIER) {
+                    // As per the 1.1 specification, SKI can only be used for a V3 certificate
+                    if (x509Certificates[0].getVersion() != 3) {
+                        throw new XMLSecurityException("invalidCertForSKI");
+                    }
+
+                    attributes = new HashMap<QName, String>();
+                    attributes.put(Constants.ATT_NULL_EncodingType, Constants.SOAPMESSAGE_NS10_BASE64_ENCODING);
+                    attributes.put(Constants.ATT_NULL_ValueType, Constants.NS_X509SubjectKeyIdentifier);
+                    createStartElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_wsse_KeyIdentifier, attributes);
+                    try {
+                        byte data[] = getSecurityProperties().getSignatureCrypto().getSKIBytesFromCert(x509Certificates[0]);
+                        createCharactersAndOutputAsHeaderEvent(subOutputProcessorChain, Base64.encode(data));
+                    } catch (WSSecurityException e) {
+                        throw new XMLSecurityException(e);
+                    }
+                    createEndElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_wsse_KeyIdentifier);
+                }
+                else if (getSecurityProperties().getSignatureKeyIdentifierType() == Constants.KeyIdentifierType.X509_KEY_IDENTIFIER) {
+
+                    attributes = new HashMap<QName, String>();
+                    attributes.put(Constants.ATT_NULL_EncodingType, Constants.SOAPMESSAGE_NS10_BASE64_ENCODING);
+                    attributes.put(Constants.ATT_NULL_ValueType, Constants.NS_X509_V3_TYPE);
+                    createStartElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_wsse_KeyIdentifier, attributes);
+                    try {
+                        createCharactersAndOutputAsHeaderEvent(subOutputProcessorChain, Base64.encode(x509Certificates[0].getEncoded()));
+                    } catch (CertificateEncodingException e) {
+                        throw new XMLSecurityException(e);
+                    }
+                    createEndElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_wsse_KeyIdentifier);
+                }
+                else if (getSecurityProperties().getSignatureKeyIdentifierType() == Constants.KeyIdentifierType.THUMBPRINT_IDENTIFIER) {
+
+                    attributes = new HashMap<QName, String>();
+                    attributes.put(Constants.ATT_NULL_EncodingType, Constants.SOAPMESSAGE_NS10_BASE64_ENCODING);
+                    attributes.put(Constants.ATT_NULL_ValueType, Constants.NS_THUMBPRINT);
+                    createStartElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_wsse_KeyIdentifier, attributes);
+                    try {
+                        MessageDigest sha = null;
+                        sha = MessageDigest.getInstance("SHA-1");
+                        sha.reset();
+                        sha.update(x509Certificates[0].getEncoded());
+                        byte[] data = sha.digest();
+
+                        createCharactersAndOutputAsHeaderEvent(subOutputProcessorChain, Base64.encode(data));
+                    } catch (CertificateEncodingException e) {
+                        throw new XMLSecurityException(e);
+                    } catch (NoSuchAlgorithmException e) {
+                        throw new XMLSecurityException(e);
+                    }
+                    createEndElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_wsse_KeyIdentifier);
+                }
+                else if (getSecurityProperties().getSignatureKeyIdentifierType() == Constants.KeyIdentifierType.BST_DIRECT_REFERENCE) {
+                    String certUri = "CertId-" + UUID.randomUUID().toString();
+                    attributes = new HashMap<QName, String>();
+                    attributes.put(Constants.ATT_NULL_URI, "#" + certUri);
+                    attributes.put(Constants.ATT_NULL_ValueType, Constants.NS_X509_V3_TYPE);
+                    createStartElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_wsse_Reference, attributes);
+
+                    //todo probably we can reuse BinarySecurityTokenOutputProcessor??
+                    attributes = new HashMap<QName, String>();
+                    attributes.put(Constants.ATT_NULL_EncodingType, Constants.SOAPMESSAGE_NS10_BASE64_ENCODING);
+                    if (useSingleCert) {
+                        attributes.put(Constants.ATT_NULL_ValueType, Constants.NS_X509_V3_TYPE);
+                    } else {
+                        attributes.put(Constants.ATT_NULL_ValueType, Constants.NS_X509PKIPathv1);
+                    }
+                    attributes.put(Constants.ATT_wsu_Id, certUri);
+                    createStartElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_wsse_BinarySecurityToken, attributes);
+                    try {
+                        if (useSingleCert) {
+                            createCharactersAndOutputAsHeaderEvent(subOutputProcessorChain, Base64.encode(x509Certificates[0].getEncoded()));
+                        } else {
+                            createCharactersAndOutputAsHeaderEvent(subOutputProcessorChain, Base64.encode(getSecurityProperties().getSignatureCrypto().getCertificateData(false, x509Certificates)));
+                        }
+                    } catch (CertificateEncodingException e) {
+                        throw new XMLSecurityException(e);
+                    } catch (WSSecurityException e) {
+                        throw new XMLSecurityException(e);
+                    }
+                    createEndElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_wsse_BinarySecurityToken);
+
+                    createEndElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_wsse_Reference);
+                }
+
+
                 createEndElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_wsse_SecurityTokenReference);
                 createEndElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_dsig_KeyInfo);
                 createEndElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_dsig_Signature);

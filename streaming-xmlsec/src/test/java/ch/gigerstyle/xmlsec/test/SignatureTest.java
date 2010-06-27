@@ -12,6 +12,8 @@ import org.w3c.dom.NodeList;
 
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpression;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 
@@ -73,6 +75,7 @@ public class SignatureTest extends AbstractTestBase {
         //done signature; now test sig-verification:
         {
             SecurityProperties securityProperties = new SecurityProperties();
+            securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "1234567890".toCharArray());
             InboundXMLSec xmlSec = XMLSec.getInboundXMLSec(securityProperties);
             XMLStreamReader xmlStreamReader = xmlSec.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
@@ -127,6 +130,7 @@ public class SignatureTest extends AbstractTestBase {
         //done signature; now test sig-verification:
         {
             SecurityProperties securityProperties = new SecurityProperties();
+            securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "1234567890".toCharArray());
             InboundXMLSec xmlSec = XMLSec.getInboundXMLSec(securityProperties);
             XMLStreamReader xmlStreamReader = xmlSec.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
@@ -138,4 +142,84 @@ public class SignatureTest extends AbstractTestBase {
             Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), Constants.TAG_wsse_Security.getLocalPart());
         }
     }
+
+    @Test
+    public void testSignatureKeyIdentifierIssuerSerial() throws Exception {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+        {
+            SecurityProperties securityProperties = new SecurityProperties();
+            Constants.Action[] actions = new Constants.Action[]{Constants.Action.SIGNATURE};
+            securityProperties.setOutAction(actions);
+            securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "1234567890".toCharArray());
+            securityProperties.setSignatureUser("transmitter");
+            securityProperties.setSignatureKeyIdentifierType(Constants.KeyIdentifierType.ISSUER_SERIAL);
+            securityProperties.setCallbackHandler(new CallbackHandlerImpl());
+
+            OutboundXMLSec xmlSecOut = XMLSec.getOutboundXMLSec(securityProperties);
+            XMLStreamWriter xmlStreamWriter = xmlSecOut.processOutMessage(baos);
+            XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml"));
+            XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
+            xmlStreamWriter.close();
+
+            Document document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
+            NodeList nodeList = document.getElementsByTagNameNS(Constants.TAG_dsig_Signature.getNamespaceURI(), Constants.TAG_dsig_Signature.getLocalPart());
+            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), Constants.TAG_wsse_Security.getLocalPart());
+
+            XPathExpression xPathExpression = getXPath("/env:Envelope/env:Header/wsse:Security/dsig:Signature/dsig:KeyInfo/wsse:SecurityTokenReference/dsig:X509Data/dsig:X509IssuerSerial/dsig:X509SerialNumber");
+            Node node = (Node) xPathExpression.evaluate(document, XPathConstants.NODE);
+            Assert.assertNotNull(node);
+
+            nodeList = document.getElementsByTagNameNS(Constants.TAG_dsig_Reference.getNamespaceURI(), Constants.TAG_dsig_Reference.getLocalPart());
+            Assert.assertEquals(nodeList.getLength(), 1);
+
+            nodeList = document.getElementsByTagNameNS(Constants.TAG_soap11_Body.getNamespaceURI(), Constants.TAG_soap11_Body.getLocalPart());
+            Assert.assertEquals(nodeList.getLength(), 1);
+            String idAttrValue = ((Element)nodeList.item(0)).getAttributeNS(Constants.ATT_wsu_Id.getNamespaceURI(), Constants.ATT_wsu_Id.getLocalPart());
+            Assert.assertNotNull(idAttrValue);
+            Assert.assertTrue(idAttrValue.startsWith("id-"), "wsu:id Attribute doesn't start with id");
+        }
+
+        //done signature; now test sig-verification:
+        {
+            SecurityProperties securityProperties = new SecurityProperties();
+            securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "1234567890".toCharArray());
+            InboundXMLSec xmlSec = XMLSec.getInboundXMLSec(securityProperties);
+            XMLStreamReader xmlStreamReader = xmlSec.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
+
+            Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
+
+            //header element must still be there
+            NodeList nodeList = document.getElementsByTagNameNS(Constants.TAG_dsig_Signature.getNamespaceURI(), Constants.TAG_dsig_Signature.getLocalPart());
+            Assert.assertEquals(nodeList.getLength(), 1);
+            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), Constants.TAG_wsse_Security.getLocalPart());
+        }
+    }
+
+    @Test
+    public void testSignatureKeyIdentifierBinarySecurityTokenDirectReference() throws Exception {
+
+    }
+
+    @Test
+    public void testSignatureKeyIdentifierX509Key() throws Exception {
+
+    }
+
+    @Test
+    public void testSignatureKeyIdentifierSubjectKey() throws Exception {
+
+    }
+
+    @Test
+    public void testSignatureKeyIdentifierThumbprint() throws Exception {
+
+    }
+
+    @Test
+    public void testSignatureKeyIdentifierEmbeddedKeyName() throws Exception {
+
+    }
+
+
 }
