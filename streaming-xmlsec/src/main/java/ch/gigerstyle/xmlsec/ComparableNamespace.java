@@ -56,11 +56,18 @@ public class ComparableNamespace implements Comparable<ComparableNamespace> {
         if (comparableNamespace.getPrefix().length() == 0 && this.getPrefix().length() == 0) {
             return comparableNamespace.getNamespaceURI().equals(this.getNamespaceURI());
         }
-        else */if (comparableNamespace.getPrefix().equals(this.getPrefix())) {
+        else */
+        if (comparableNamespace.getPrefix().equals(this.getPrefix())) {
                 //&& comparableNamespace.getNamespaceURI().equals(this.getNamespaceURI())) {
             //just test for prefix to get the last prefix definition on the stack and let overwrite it 
             return true;
         }
+        /*
+        else if (("".equals(comparableNamespace.getPrefix()) && comparableNamespace.getNamespaceURI().equals(this.getNamespaceURI()))
+                || ("".equals(this.getPrefix()) && comparableNamespace.getNamespaceURI().equals(this.getNamespaceURI()))) {
+            return true;
+        }
+        */
         return false;
     }
 

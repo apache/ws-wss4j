@@ -222,7 +222,9 @@ public class Canonicalizer20010315Transformer implements Transformer {
                                         break;
                                     }
                                 }
-                                if (!nsUsedByAttr && !comparableNamespace.getNamespaceURI().equals(startElement.getName().getNamespaceURI())) {
+                                if (!nsUsedByAttr
+                                        //&& !comparableNamespace.getNamespaceURI().equals(startElement.getName().getNamespaceURI())
+                                        && !comparableNamespace.getPrefix().equals(startElement.getName().getPrefix())) {
                                     continue;
                                 }
                             }

@@ -56,21 +56,25 @@ public class XMLEventNSAllocator implements XMLEventAllocator {
                     }
                     namespaceList.add(new ComparableNamespace(namespace));
                 }
-                //add current ns also to the list
-                Namespace namespace = Constants.xmlEventFactory.createNamespace(reader.getName().getPrefix(), reader.getName().getNamespaceURI());
-                namespaceList.add(new ComparableNamespace(namespace));
-                nsStack.push(namespaceList);
 
                 List<ComparableAttribute> attributeList = new ArrayList<ComparableAttribute>();
                 for (int i = 0; i < reader.getAttributeCount(); i++) {
                     QName attrName = reader.getAttributeName(i);
                     if (!"xml".equals(attrName.getPrefix())) {
+                        if (!"".equals(attrName.getPrefix())) {
+                            namespaceList.add(new ComparableNamespace(Constants.xmlEventFactory.createNamespace(attrName.getPrefix(), attrName.getNamespaceURI())));
+                        }
                         continue;
                     }
                     Attribute attribute = Constants.xmlEventFactory.createAttribute(attrName, reader.getAttributeValue(i));
                     attributeList.add(new ComparableAttribute(attribute));
                 }
                 attrStack.push(attributeList);
+
+                //add current ns also to the list
+                Namespace namespace = Constants.xmlEventFactory.createNamespace(reader.getName().getPrefix(), reader.getName().getNamespaceURI());
+                namespaceList.add(new ComparableNamespace(namespace));
+                nsStack.push(namespaceList);
             }
             else if (reader.getEventType() == XMLStreamConstants.END_ELEMENT) {
                 nsStack.pop();
