@@ -114,7 +114,7 @@ public class SignatureInputProcessor extends AbstractInputProcessor {
             try {
                 //todo reparse SignedInfo when custom canonicalization method is used
                 //verify SignedInfo
-                SignatureVerifier signatureVerifier = new SignatureVerifier(currentSignatureType, securityContext);
+                SignatureVerifier signatureVerifier = new SignatureVerifier(currentSignatureType, securityContext, getSecurityProperties());
                 for (int i = 0; i < signedInfoXMLEvents.size(); i++) {
                     XMLEvent signedInfoEvent = signedInfoXMLEvents.get(i);
                     signatureVerifier.processEvent(signedInfoEvent);
@@ -125,7 +125,7 @@ public class SignatureInputProcessor extends AbstractInputProcessor {
                 inputProcessorChain.addProcessor(new SignatureReferenceVerifyInputProcessor(currentSignatureType, getSecurityProperties()));
                 currentSignatureType = null;
             } finally {
-                //probably we can remove this processor from the chain now?
+                inputProcessorChain.removeProcessor(this);
                 currentSignatureType = null;
                 isFinishedcurrentSignatureType = false;
             }

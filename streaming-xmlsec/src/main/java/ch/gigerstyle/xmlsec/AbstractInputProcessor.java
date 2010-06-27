@@ -31,7 +31,7 @@ public abstract class AbstractInputProcessor implements InputProcessor {
 
     protected final transient Log logger = LogFactory.getLog(this.getClass());
 
-    protected SecurityProperties securityProperties;
+    private SecurityProperties securityProperties;
     private QName lastStartElementName = new QName("", "");
 
     public AbstractInputProcessor(SecurityProperties securityProperties) {

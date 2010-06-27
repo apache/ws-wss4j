@@ -2,15 +2,13 @@ package ch.gigerstyle.xmlsec;
 
 import ch.gigerstyle.xmlsec.config.JCEAlgorithmMapper;
 import org.bouncycastle.util.encoders.Base64;
+import org.w3._2000._09.xmldsig_.KeyInfoType;
 import org.w3._2000._09.xmldsig_.SignatureType;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.XMLEvent;
-import java.io.ByteArrayInputStream;
 import java.security.*;
-import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
-import java.security.cert.CertificateFactory;
 
 /**
  * User: giger
@@ -37,13 +35,15 @@ public class SignatureVerifier {
 
     private SignatureType signatureType;
     private SecurityContext securityContext;
+    private SecurityProperties securityProperties;
 
     private SignerOutputStream signerOutputStream;
     private Canonicalizer20010315Transformer canonicalizer20010315Transformer = new Canonicalizer20010315ExclOmitCommentsTransformer(null);
 
-    public SignatureVerifier(SignatureType signatureType, SecurityContext securityContext) throws XMLSecurityException {
+    public SignatureVerifier(SignatureType signatureType, SecurityContext securityContext, SecurityProperties securityProperties) throws XMLSecurityException {
         this.signatureType = signatureType;
         this.securityContext = securityContext;
+        this.securityProperties = securityProperties;
 
         try {
             createSignatureAlgorithm();
@@ -52,15 +52,13 @@ public class SignatureVerifier {
         }
     }
 
-    private void createSignatureAlgorithm() throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, CertificateException {
+    private void createSignatureAlgorithm() throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, CertificateException, XMLSecurityException {
         String signatureAlgorithm = JCEAlgorithmMapper.translateURItoJCEID(signatureType.getSignedInfo().getSignatureMethod().getAlgorithm());
         Signature signature = Signature.getInstance(signatureAlgorithm, "BC");
 
-        //todo handle the all the possible key types
-        String keyId = signatureType.getKeyInfo().getSecurityTokenReferenceType().getReferenceType().getURI();
-        SecurityTokenProvider securityTokenProvider = securityContext.getSecurityTokenProvider(Utils.dropReferenceMarker(keyId));
-        Certificate certificate = CertificateFactory.getInstance("X.509", "BC").generateCertificate(new ByteArrayInputStream(securityTokenProvider.getSecurityToken()));
-        signature.initVerify(certificate.getPublicKey());
+        KeyInfoType keyInfoType = signatureType.getKeyInfo();
+        SecurityToken securityToken = SecurityTokenFactory.newInstance().getSecurityToken(keyInfoType, securityProperties.getSignatureVerificationCrypto(), securityProperties.getCallbackHandler(), securityContext);
+        signature.initVerify(securityToken.getPublicKey());
         signerOutputStream = new SignerOutputStream(signature);
     }
 

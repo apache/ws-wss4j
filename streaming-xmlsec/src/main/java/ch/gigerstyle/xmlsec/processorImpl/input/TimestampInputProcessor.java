@@ -93,6 +93,7 @@ public class TimestampInputProcessor extends AbstractInputProcessor {
                 throw new XMLSecurityException(e.getMessage(), e);
             }
             finally {
+                inputProcessorChain.removeProcessor(this);
                 currentTimestampType = null;
                 isFinishedcurrentTimestamp = false;
             }

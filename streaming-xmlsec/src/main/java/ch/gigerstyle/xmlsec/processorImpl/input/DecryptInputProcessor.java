@@ -71,9 +71,8 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
 
         //todo overall null checks
 
-        if (currentEncryptedDataType != null
-                && !(xmlEvent.isEndElement()
-                && getLastStartElementName().equals(Constants.TAG_xenc_CipherValue))) {
+        //lastStartElement is also set for characterEvents so we dont handle the whole CipherValue subtree here
+        if (currentEncryptedDataType != null && !(getLastStartElementName().equals(Constants.TAG_xenc_CipherValue))) {
             try {
                 isFinishedcurrentEncryptedDataType = currentEncryptedDataType.parseXMLEvent(xmlEvent);
                 //todo validation will never be called because we abort early (see above if condition)
@@ -117,17 +116,20 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
                 try {
                     String syncEncAlgo = JCEAlgorithmMapper.translateURItoJCEID(currentEncryptedDataType.getEncryptionMethod().getAlgorithm());
                     String algoFamily = JCEAlgorithmMapper.getJCEKeyAlgorithmFromURI(currentEncryptedDataType.getEncryptionMethod().getAlgorithm());
-
+                    //todo use SecurityTokenFactory??
+                    /*
                     SecurityTokenReferenceType securityTokenReferenceType = currentEncryptedDataType.getKeyInfo().getSecurityTokenReferenceType();
                     if (securityTokenReferenceType == null
                             || securityTokenReferenceType.getReferenceType() == null) {
                         throw new XMLSecurityException("SecurityToken not found");
                     }
                     SecurityTokenProvider securityTokenProvider = securityContext.getSecurityTokenProvider(Utils.dropReferenceMarker(securityTokenReferenceType.getReferenceType().getURI()));
-                    if (securityTokenProvider == null || securityTokenProvider.getSecurityToken() == null) {
+                    if (securityTokenProvider == null || securityTokenProvider.getSecurityToken(getSecurityProperties().getDecryptionCrypto()) == null) {
                         throw new XMLSecurityException("SecurityToken not found");
                     }
-                    SecretKey symmetricKey = new SecretKeySpec(securityTokenProvider.getSecurityToken(), algoFamily);
+                    */
+                    SecurityToken securityToken = SecurityTokenFactory.newInstance().getSecurityToken(currentEncryptedDataType.getKeyInfo(), getSecurityProperties().getDecryptionCrypto(), getSecurityProperties().getCallbackHandler(), securityContext);
+                    SecretKey symmetricKey = new SecretKeySpec(securityToken.getSymmetricKey(), algoFamily);
                     Cipher symmetricCipher = Cipher.getInstance(syncEncAlgo, "BC");
 
                     int ivLen = symmetricCipher.getBlockSize();
@@ -222,7 +224,8 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
                 }
             }
         }
-        else if (xmlEvent.isEndElement()) {
+
+        if (xmlEvent.isEndElement()) {
             EndElement endElement = xmlEvent.asEndElement();
             if (endElement.getName().equals(Constants.TAG_xenc_EncryptedData)) {
                 //todo remove this processor when finished processing all references

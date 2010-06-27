@@ -1,11 +1,12 @@
 package ch.gigerstyle.xmlsec;
 
-import ch.gigerstyle.xmlsec.crypto.Crypto;
+import java.security.Key;
+import java.security.PublicKey;
 
 /**
  * User: giger
- * Date: Jun 23, 2010
- * Time: 8:19:09 PM
+ * Date: Jun 25, 2010
+ * Time: 9:11:57 PM
  * Copyright 2010 Marc Giger gigerstyle@gmx.ch
  * <p/>
  * This program is free software; you can redistribute it and/or modify it
@@ -22,7 +23,13 @@ import ch.gigerstyle.xmlsec.crypto.Crypto;
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
-public interface SecurityTokenProvider {
+public interface SecurityToken {
 
-    public SecurityToken getSecurityToken(Crypto crypto) throws XMLSecurityException;
+    public byte[] getSymmetricKey() throws XMLSecurityException;
+
+    public Key getSecretKey() throws XMLSecurityException;
+
+    public PublicKey getPublicKey() throws XMLSecurityException;
+
+    public void verify() throws XMLSecurityException;
 }

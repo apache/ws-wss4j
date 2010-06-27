@@ -64,7 +64,7 @@ public class ReferenceListInputProcessor extends AbstractInputProcessor {
                 //todo probably directly after the EncryptedKeyInputProcessor and after other DecryptInputProcessor!  
                 inputProcessorChain.addProcessor(new DecryptInputProcessor(currentReferenceList, getSecurityProperties()));
             } finally {
-                //probably we can remove this processor from the chain now?
+                inputProcessorChain.removeProcessor(this);
                 currentReferenceList = null;
                 isFinishedcurrentReferenceList = false;
             }

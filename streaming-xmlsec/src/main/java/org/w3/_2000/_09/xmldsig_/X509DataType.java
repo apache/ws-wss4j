@@ -105,6 +105,10 @@ public class X509DataType implements Parseable {
                      return true;
                  }
                  break;
+             //possible ignorable withespace and comments
+             case XMLStreamConstants.CHARACTERS:
+             case XMLStreamConstants.COMMENT:
+                 break;
              default:
                  throw new ParseException("Unexpected event received " + Utils.getXMLEventAsString(xmlEvent));
         }

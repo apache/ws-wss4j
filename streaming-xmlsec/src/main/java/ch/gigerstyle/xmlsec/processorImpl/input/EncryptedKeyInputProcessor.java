@@ -2,6 +2,7 @@ package ch.gigerstyle.xmlsec.processorImpl.input;
 
 import ch.gigerstyle.xmlsec.*;
 import ch.gigerstyle.xmlsec.config.JCEAlgorithmMapper;
+import ch.gigerstyle.xmlsec.crypto.Crypto;
 import ch.gigerstyle.xmlsec.crypto.WSSecurityException;
 import org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_secext_1_0.BinarySecurityTokenType;
 import org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_secext_1_0.KeyIdentifierType;
@@ -21,10 +22,7 @@ import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.PrivateKey;
+import java.security.*;
 import java.security.cert.X509Certificate;
 
 /**
@@ -104,7 +102,7 @@ public class EncryptedKeyInputProcessor extends AbstractInputProcessor implement
                 String alias = null;
 
                 KeyInfoType keyInfoType = currentEncryptedKeyType.getKeyInfo();
-                if (keyInfoType != null) {
+  /*              if (keyInfoType != null) {
 
                     SecurityTokenReferenceType securityTokenReferenceType = keyInfoType.getSecurityTokenReferenceType();
                     if (securityTokenReferenceType == null) {
@@ -114,10 +112,10 @@ public class EncryptedKeyInputProcessor extends AbstractInputProcessor implement
                     if (securityTokenReferenceType.getX509DataType() != null) {
                         X509DataType x509DataType = securityTokenReferenceType.getX509DataType();
                         alias = getSecurityProperties().getDecryptionCrypto().getAliasForX509Cert(x509DataType.getX509IssuerSerialType().getX509IssuerName(), x509DataType.getX509IssuerSerialType().getX509SerialNumber());
-                    } /*else if (securityToken instanceof X509IssuerSerialType) {
+                    } *//*else if (securityToken instanceof X509IssuerSerialType) {
                         X509IssuerSerialType x509IssuerSerialType = (X509IssuerSerialType) securityToken;
                         //todo this is not supported by outputProcessor but can be implemented. We'll have a look at the spec if this is allowed
-                    }*/
+                    }*/ /*
                     else if (securityTokenReferenceType.getKeyIdentifierType() != null) {
                         KeyIdentifierType keyIdentifierType = securityTokenReferenceType.getKeyIdentifierType();
 
@@ -199,19 +197,22 @@ public class EncryptedKeyInputProcessor extends AbstractInputProcessor implement
                 }
 
                 PrivateKey privateKey = getSecurityProperties().getDecryptionCrypto().getPrivateKey(alias, password);
-                cipher.init(Cipher.DECRYPT_MODE, privateKey);
+*/
+                SecurityToken securityToken = SecurityTokenFactory.newInstance().getSecurityToken(keyInfoType, getSecurityProperties().getDecryptionCrypto(), getSecurityProperties().getCallbackHandler(), securityContext);
+                cipher.init(Cipher.DECRYPT_MODE, securityToken.getSecretKey());
 
                 byte[] encryptedEphemeralKey = org.bouncycastle.util.encoders.Base64.decode(currentEncryptedKeyType.getCipherData().getCipherValue());
                 secretToken = cipher.doFinal(encryptedEphemeralKey);
 
-                if (currentEncryptedKeyType.getReferenceList() != null) {
-                    inputProcessorChain.addProcessor(new DecryptInputProcessor(currentEncryptedKeyType.getReferenceList(), getSecurityProperties()));
-                } else if (currentEncryptedKeyType.getId() != null) {
+                if (currentEncryptedKeyType.getId() != null) {
                     securityContext.registerSecurityTokenProvider(currentEncryptedKeyType.getId(), this);
                 }
+
+                if (currentEncryptedKeyType.getReferenceList() != null) {
+                    inputProcessorChain.addProcessor(new DecryptInputProcessor(currentEncryptedKeyType.getReferenceList(), getSecurityProperties()));
+                }
+
             } catch (NoSuchPaddingException e) {
-                throw new XMLSecurityException(e);
-            } catch (WSSecurityException e) {
                 throw new XMLSecurityException(e);
             } catch (NoSuchAlgorithmException e) {
                 throw new XMLSecurityException(e);
@@ -227,7 +228,7 @@ public class EncryptedKeyInputProcessor extends AbstractInputProcessor implement
                 throw new XMLSecurityException(e);
             }
             finally {
-                //probably we can remove this processor from the chain now?
+                inputProcessorChain.removeProcessor(this);
                 currentEncryptedKeyType = null;
                 isFinishedcurrentEncryptedKey = false;
             }
@@ -235,7 +236,23 @@ public class EncryptedKeyInputProcessor extends AbstractInputProcessor implement
         inputProcessorChain.processEvent(xmlEvent);
     }
 
-    public byte[] getSecurityToken() {
-        return secretToken; 
+    public SecurityToken getSecurityToken(Crypto crypto) throws XMLSecurityException {
+        return new SecurityToken() {
+
+            public byte[] getSymmetricKey() throws XMLSecurityException {
+                return secretToken;
+            }
+
+            public Key getSecretKey() throws XMLSecurityException {
+                return null;
+            }
+
+            public PublicKey getPublicKey() throws XMLSecurityException {
+                return null;
+            }
+
+            public void verify() throws XMLSecurityException {
+            }
+        };
     }
 }

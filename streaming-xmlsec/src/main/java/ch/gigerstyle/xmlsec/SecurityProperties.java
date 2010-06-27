@@ -77,6 +77,11 @@ public class SecurityProperties {
 
     //todo caching?
     public Crypto getDecryptionCrypto() throws XMLSecurityException {
+
+        if (this.getDecryptionKeyStore() == null) {
+            throw new XMLSecurityException(new SecurityConfigurationException("Decryption KeyStore is not set"));
+        }
+
         Class decryptionCryptoClass = ch.gigerstyle.xmlsec.crypto.Merlin.class;
         if (this.getDecryptionCryptoClass() != null) {
             decryptionCryptoClass = this.getDecryptionCryptoClass();
@@ -291,4 +296,41 @@ public class SecurityProperties {
     public void setSignatureCanonicalizationAlgorithm(String signatureCanonicalizationAlgorithm) {
         this.signatureCanonicalizationAlgorithm = signatureCanonicalizationAlgorithm;
     }
+
+    private Class signatureVerificationCryptoClass;
+    private KeyStore signatureVerificationKeyStore;
+
+    public KeyStore getSignatureVerificationKeyStore() {
+        return signatureVerificationKeyStore;
+    }
+
+    public void loadSignatureVerificationKeystore(URL url, char[] keyStorePassword) throws Exception {
+        KeyStore keyStore = KeyStore.getInstance("jks");
+        keyStore.load(url.openStream(), keyStorePassword);
+        this.signatureVerificationKeyStore = keyStore;
+    }
+
+    public Class getSignatureVerificationCryptoClass() {
+        return signatureVerificationCryptoClass;
+    }
+
+    public void setSignatureVerificationCryptoClass(Class signatureVerificationCryptoClass) {
+        this.signatureVerificationCryptoClass = signatureVerificationCryptoClass;
+    }
+
+    //todo caching?
+    public Crypto getSignatureVerificationCrypto() throws XMLSecurityException {
+        Class signatureVerificationCryptoClass = ch.gigerstyle.xmlsec.crypto.Merlin.class;
+        if (this.getSignatureVerificationCryptoClass() != null) {
+            signatureVerificationCryptoClass = this.getSignatureVerificationCryptoClass();
+        }
+        //todo test instance for CryptoBase class
+        try {
+            CryptoBase signatureVerificationCrypto = (CryptoBase)signatureVerificationCryptoClass.newInstance();
+            signatureVerificationCrypto.setKeyStore(this.getSignatureVerificationKeyStore());
+            return signatureVerificationCrypto;
+        } catch (Exception e) {
+            throw new XMLSecurityException("decryptionCrypto instanciation failed", e);
+        }
+    }    
 }

@@ -119,7 +119,11 @@ public class CipherDataType implements Parseable {
                  if (endElement.getName().equals(Constants.TAG_xenc_CipherData)) {
                      return true;
                  }
-                 break;             
+                 break;
+             //possible ignorable withespace and comments
+             case XMLStreamConstants.CHARACTERS:
+             case XMLStreamConstants.COMMENT:
+                 break;
              default:
                  throw new ParseException("Unexpected event received " + Utils.getXMLEventAsString(xmlEvent));
         }
@@ -127,9 +131,12 @@ public class CipherDataType implements Parseable {
     }
 
     public void validate() throws ParseException {
+        //cipherValue can/must be null for decryptionProcessor
+        /*
         if (cipherValue == null) {
             throw new ParseException("CipherValue is missing");
         }
+        */
     }
 
     /**

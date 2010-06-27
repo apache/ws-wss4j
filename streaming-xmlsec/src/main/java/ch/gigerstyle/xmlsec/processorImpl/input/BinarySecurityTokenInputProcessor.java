@@ -1,11 +1,14 @@
 package ch.gigerstyle.xmlsec.processorImpl.input;
 
 import ch.gigerstyle.xmlsec.*;
+import ch.gigerstyle.xmlsec.crypto.Crypto;
 import org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_secext_1_0.BinarySecurityTokenType;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
+import java.security.Key;
+import java.security.PublicKey;
 
 /**
  * User: giger
@@ -29,10 +32,11 @@ import javax.xml.stream.events.XMLEvent;
  */
 public class BinarySecurityTokenInputProcessor extends AbstractInputProcessor implements SecurityTokenProvider {
 
+    //todo this processor is not usable multiple times! Enforce one time usage! Other processors have the same "problem"
     private BinarySecurityTokenType currentBinarySecurityTokenType;
     private boolean isFinishedcurrentBinarySecurityToken = false;
 
-    private byte[] securityToken;
+    private SecurityToken securityToken;
 
     public BinarySecurityTokenInputProcessor(SecurityProperties securityProperties) {
         super(securityProperties);
@@ -61,21 +65,9 @@ public class BinarySecurityTokenInputProcessor extends AbstractInputProcessor im
             try {
                 if (currentBinarySecurityTokenType.getId() != null) {
                     securityContext.registerSecurityTokenProvider(currentBinarySecurityTokenType.getId(), this);
-                    if (currentBinarySecurityTokenType.getEncodingType() != null) {
-                        if (Constants.SOAPMESSAGE_NS10_BASE64_ENCODING.equals(currentBinarySecurityTokenType.getEncodingType())) {
-                            securityToken = Base64.decode(currentBinarySecurityTokenType.getValue());
-                        }
-                        else {
-                            throw new XMLSecurityException("Unsupported BST Encoding: " + currentBinarySecurityTokenType.getEncodingType());
-                        }
-                    }
-                    else {
-                        securityToken = currentBinarySecurityTokenType.getValue().getBytes();
-                    }
                 }
             } finally {
-                //probably we can remove this processor from the chain now?
-                currentBinarySecurityTokenType = null;
+                inputProcessorChain.removeProcessor(this);
                 isFinishedcurrentBinarySecurityToken = false;
             }
         }
@@ -83,7 +75,7 @@ public class BinarySecurityTokenInputProcessor extends AbstractInputProcessor im
         inputProcessorChain.processEvent(xmlEvent);
     }
 
-    public byte[] getSecurityToken() {
-        return securityToken;
+    public SecurityToken getSecurityToken(Crypto crypto) throws XMLSecurityException {
+        return SecurityTokenFactory.newInstance().getSecurityToken(currentBinarySecurityTokenType, crypto, getSecurityProperties().getCallbackHandler());
     }
 }

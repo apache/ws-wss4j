@@ -69,7 +69,7 @@ public class ReferenceType implements Parseable {
         while (attributeIterator.hasNext()) {
             Attribute attribute = attributeIterator.next();
             if (attribute.getName().equals(Constants.ATT_NULL_URI)) {
-                this.uri = attribute.getValue();
+                this.uri = Utils.dropReferenceMarker(attribute.getValue());
             } else if (attribute.getName().equals(Constants.ATT_NULL_ValueType)) {
                 this.valueType = attribute.getValue();
             }

@@ -1,6 +1,24 @@
 package ch.gigerstyle.xmlsec;
 
+import ch.gigerstyle.xmlsec.crypto.Crypto;
+import ch.gigerstyle.xmlsec.crypto.WSSecurityException;
+import org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_secext_1_0.BinarySecurityTokenType;
+import org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_secext_1_0.KeyIdentifierType;
+import org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_secext_1_0.SecurityTokenReferenceType;
+import org.w3._2000._09.xmldsig_.KeyInfoType;
+import org.w3._2000._09.xmldsig_.X509DataType;
+
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.CallbackHandler;
+import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.xml.stream.events.XMLEvent;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.security.Key;
+import java.security.PrivateKey;
+import java.security.cert.CertificateExpiredException;
+import java.security.cert.CertificateNotYetValidException;
+import java.security.cert.X509Certificate;
 
 /**
  * User: giger
@@ -60,6 +78,17 @@ public class Utils {
                 return "NAMESPACE";
             default:
                 throw new IllegalArgumentException("Illegal XMLEvent received: " + eventType);
+        }
+    }
+
+    public static void doCallback(CallbackHandler callbackHandler, Callback callback) throws XMLSecurityException {
+        try {
+            Callback[] callbacks = new Callback[]{callback};
+            callbackHandler.handle(callbacks);
+        } catch (IOException e) {
+            throw new XMLSecurityException(e);
+        } catch (UnsupportedCallbackException e) {
+            throw new XMLSecurityException(e);
         }
     }
 }

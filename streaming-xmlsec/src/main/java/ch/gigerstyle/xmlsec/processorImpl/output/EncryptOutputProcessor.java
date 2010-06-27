@@ -48,7 +48,7 @@ public class EncryptOutputProcessor extends AbstractOutputProcessor {
 
     private List<SecurePart> secureParts;
     private Key symmetricKey;
-    private String symmetricKeyId = UUID.randomUUID().toString();
+    private String symmetricKeyId = "EncKeyId-" + UUID.randomUUID().toString();
     private List<EncryptionPartDef> encryptionPartDefList = new ArrayList<EncryptionPartDef>();
 
     private InternalEncryptionOutputProcessor activeInternalEncryptionOutputProcessor = null;
@@ -89,7 +89,7 @@ public class EncryptOutputProcessor extends AbstractOutputProcessor {
                                 EncryptionPartDef encryptionPartDef = new EncryptionPartDef();
                                 encryptionPartDef.setModifier(EncryptionPartDef.Modifier.valueOf(securePart.getModifier()));
                                 encryptionPartDef.setEncRefId("EncDataId-" + UUID.randomUUID().toString());//"EncDataId-1612925417"
-                                encryptionPartDef.setKeyId("#EncKeyId-" + symmetricKeyId);//#EncKeyId-1483925398
+                                encryptionPartDef.setKeyId(symmetricKeyId);//EncKeyId-1483925398
                                 encryptionPartDef.setSymmetricKey(symmetricKey);
                                 encryptionPartDefList.add(encryptionPartDef);
                                 internalEncryptionOutputProcessor = new InternalEncryptionOutputProcessor(getSecurityProperties(), encryptionPartDef, startElement.getName(), securityContext.<XMLEventNSAllocator>get("XMLEventNSAllocator"));
@@ -131,7 +131,7 @@ public class EncryptOutputProcessor extends AbstractOutputProcessor {
                 OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
 
                 Map<QName, String> attributes = new HashMap<QName, String>();
-                attributes.put(Constants.ATT_NULL_Id, "#EncKeyId-" + symmetricKeyId);
+                attributes.put(Constants.ATT_NULL_Id, symmetricKeyId);
                 createStartElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_xenc_EncryptedKey, attributes);
 
                 attributes = new HashMap<QName, String>();
@@ -439,7 +439,7 @@ public class EncryptOutputProcessor extends AbstractOutputProcessor {
             createStartElementAndOutputAsEvent(outputProcessorChain, Constants.TAG_wsse_SecurityTokenReference, null);
 
             attributes = new HashMap<QName, String>();
-            attributes.put(Constants.ATT_NULL_URI, encryptionPartDef.getKeyId());
+            attributes.put(Constants.ATT_NULL_URI, "#" + encryptionPartDef.getKeyId());
             createStartElementAndOutputAsEvent(outputProcessorChain, Constants.TAG_wsse_Reference, attributes);
             createEndElementAndOutputAsEvent(outputProcessorChain, Constants.TAG_wsse_Reference);
             createEndElementAndOutputAsEvent(outputProcessorChain, Constants.TAG_wsse_SecurityTokenReference);
