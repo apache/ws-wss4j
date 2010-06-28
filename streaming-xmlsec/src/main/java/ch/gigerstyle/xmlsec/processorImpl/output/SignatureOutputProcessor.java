@@ -353,6 +353,8 @@ public class SignatureOutputProcessor extends AbstractOutputProcessor {
                 createEndElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_wsse_SecurityTokenReference);
                 createEndElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_dsig_KeyInfo);
                 createEndElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_dsig_Signature);
+                
+                outputProcessorChain.removeProcessor(this);
 
                 /*
                     <ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#" Id="Signature-1022834285">

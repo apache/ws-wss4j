@@ -55,9 +55,12 @@ public class SignatureReferenceVerifyInputProcessor extends AbstractInputProcess
                 for (int i = 0; i < references.size(); i++) {
                     ReferenceType referenceType = references.get(i);
                     if (refId.getValue().equals(referenceType.getURI())) {
-                        System.out.println("found " + refId.getValue());
-                        //todo exception when reference is not found
+                        logger.debug("Found signature reference: " + refId.getValue() + "on element" + startElement.getName());
+                        if (referenceType.isProcessed()) {
+                            throw new XMLSecurityException("duplicate id encountered!");
+                        }
                         inputProcessorChain.addProcessor(new InternalSignatureReferenceVerifier(getSecurityProperties(), referenceType, startElement.getName()));
+                        referenceType.setProcessed(true);
                     }
                 }
             }
@@ -67,6 +70,17 @@ public class SignatureReferenceVerifyInputProcessor extends AbstractInputProcess
             EndElement endElement = xmlEvent.asEndElement();
         }
         inputProcessorChain.processEvent(xmlEvent);
+    }
+
+    @Override
+    public void doFinal(InputProcessorChain inputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException {
+        List<ReferenceType> references = signatureType.getSignedInfo().getReference();
+        for (int i = 0; i < references.size(); i++) {
+            ReferenceType referenceType = references.get(i);
+            if (!referenceType.isProcessed()) {
+                throw new XMLSecurityException("Some signature references where not processed... Probably security header ordering problem?");
+            }
+        }
     }
 
     class InternalSignatureReferenceVerifier extends AbstractInputProcessor {
@@ -124,7 +138,7 @@ public class SignatureReferenceVerifyInputProcessor extends AbstractInputProcess
 
                     if (!MessageDigest.isEqual(storedDigest, calculatedDigest)) {
                         throw new XMLSecurityException("Digest verification failed");
-                    }
+                    }                    
                 }
             }
         }

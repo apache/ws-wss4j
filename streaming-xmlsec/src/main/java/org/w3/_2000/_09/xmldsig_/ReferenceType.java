@@ -80,6 +80,8 @@ public class ReferenceType implements Parseable {
     @XmlSchemaType(name = "anyURI")
     protected String type;
 
+    private boolean processed  = false;
+
     private Parseable currentParseable;
 
     public ReferenceType(StartElement startElement) {
@@ -309,4 +311,11 @@ public class ReferenceType implements Parseable {
         this.type = value;
     }
 
+    public boolean isProcessed() {
+        return processed;
+    }
+
+    public void setProcessed(boolean processed) {
+        this.processed = processed;
+    }
 }

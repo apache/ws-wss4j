@@ -3,8 +3,8 @@ package ch.gigerstyle.xmlsec.processorImpl.input;
 import ch.gigerstyle.xmlsec.*;
 import ch.gigerstyle.xmlsec.config.JCEAlgorithmMapper;
 import org.bouncycastle.util.encoders.Base64;
-import org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_secext_1_0.SecurityTokenReferenceType;
-import org.w3._2001._04.xmlenc_.*;
+import org.w3._2001._04.xmlenc_.EncryptedDataType;
+import org.w3._2001._04.xmlenc_.ReferenceList;
 import org.w3._2001._04.xmlenc_.ReferenceType;
 
 import javax.crypto.Cipher;
@@ -12,9 +12,13 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import javax.xml.namespace.QName;
-import javax.xml.stream.*;
+import javax.xml.stream.XMLEventReader;
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.*;
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -82,8 +86,7 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
             } catch (ParseException e) {
                 throw new XMLSecurityException(e);
             }
-        }
-        else if (xmlEvent.isStartElement()) {
+        } else if (xmlEvent.isStartElement()) {
             StartElement startElement = xmlEvent.asStartElement();
 
             if (startElement.getName().equals(Constants.TAG_xenc_EncryptedData)) {
@@ -91,10 +94,12 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
                 if (refId != null) {
                     List<ReferenceType> references = referenceList.getDataReferenceOrKeyReference();
                     for (int i = 0; i < references.size(); i++) {
-                        ReferenceType referenceType =  references.get(i);
+                        ReferenceType referenceType = references.get(i);
                         if (refId.getValue().equals(referenceType.getURI())) {
-                            logger.debug("Found reference " + refId.getValue());
-                            //todo exception when reference is not found
+                            logger.debug("Found encryption reference: " + refId.getValue() + "on element" + startElement.getName());
+                            if (referenceType.isProcessed()) {
+                                throw new XMLSecurityException("duplicate id encountered!");
+                            }
                             currentEncryptedDataType = new EncryptedDataType(startElement);
                             //currentEncryptedDataType.setId(refId.getValue());
 /*                            try {
@@ -102,13 +107,14 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
                             } catch (ParseException e) {
                                 throw new XMLSecurityException(e);
                             }
-*/                            
+*/
+
+                            referenceType.setProcessed(true);
                         }
                     }
                 }
             }
-        }
-        else if (currentEncryptedDataType != null && xmlEvent.isCharacters()) {
+        } else if (currentEncryptedDataType != null && xmlEvent.isCharacters()) {
             //todo handle multiple character events for same text-node
             Characters characters = xmlEvent.asCharacters();
 
@@ -165,7 +171,7 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
                     //apply all namespaces from current scope to get a valid documentfragment:
                     List<ComparableNamespace> comparableNamespacesToApply = new ArrayList<ComparableNamespace>();
                     //test first before casting...should be done in XMLSec...
-                    XMLEventNS xmlEventNs = (XMLEventNS)xmlEvent;
+                    XMLEventNS xmlEventNs = (XMLEventNS) xmlEvent;
                     List<ComparableNamespace>[] comparableNamespaceList = xmlEventNs.getNamespaceList();
                     for (int i = 0; i < comparableNamespaceList.length; i++) {
                         List<ComparableNamespace> comparableNamespaces = comparableNamespaceList[i];
@@ -210,8 +216,7 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
                                 }
                             }
                             continue;
-                        }
-                        else if (decXmlEvent.isEndElement() && decXmlEvent.asEndElement().getName().equals(startElementName)) {
+                        } else if (decXmlEvent.isEndElement() && decXmlEvent.asEndElement().getName().equals(startElementName)) {
                             xmlEventReader.close();
                             break;
                         }
@@ -234,9 +239,20 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
                 return;
             }
         }
-        
+
         if (currentEncryptedDataType == null) {
             inputProcessorChain.processEvent(xmlEvent);
+        }
+    }
+
+    @Override
+    public void doFinal(InputProcessorChain inputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException {
+        List<ReferenceType> references = referenceList.getDataReferenceOrKeyReference();
+        for (int i = 0; i < references.size(); i++) {
+            ReferenceType referenceType = references.get(i);
+            if (!referenceType.isProcessed()) {
+                throw new XMLSecurityException("Some encryption references where not processed... Probably security header ordering problem?");
+            }
         }
     }
 }

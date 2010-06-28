@@ -46,6 +46,7 @@ public class SecurityHeaderOutputProcessor extends AbstractOutputProcessor {
 
             if (startElement.getName().equals(Constants.TAG_soap11_Header)) {
                 //todo replace all Constants.xmlEventFactory.create** with XMLEventAllocator.create*** @see signatureOutputProcessor
+                //todo use AbstractOutputProcessor to generate Events
                 //or better with create methods in abstractOuptutProcessor
                 Namespace namespace = Constants.xmlEventFactory.createNamespace(Constants.TAG_wsse_Security.getPrefix(), Constants.TAG_wsse_Security.getNamespaceURI());
                 List<Namespace> namespaceList = new ArrayList<Namespace>();
@@ -59,6 +60,8 @@ public class SecurityHeaderOutputProcessor extends AbstractOutputProcessor {
                 newXMLEvent = Constants.xmlEventFactory.createEndElement(Constants.TAG_wsse_Security, namespaceIterator);
                 subOutputProcessorChain.processEvent(newXMLEvent);
                 subOutputProcessorChain.reset();
+                
+                outputProcessorChain.removeProcessor(this);
             }
         }
         else if (xmlEvent.isEndElement()) {

@@ -345,6 +345,8 @@ public class EncryptOutputProcessor extends AbstractOutputProcessor {
                 </xenc:EncryptedKey>
                  */
 
+                outputProcessorChain.removeProcessor(this);
+
                 return;
             }
         }
