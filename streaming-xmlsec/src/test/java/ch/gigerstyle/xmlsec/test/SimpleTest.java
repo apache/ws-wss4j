@@ -4,19 +4,20 @@ import ch.gigerstyle.xmlsec.*;
 import ch.gigerstyle.xmlsec.test.utils.StAX2DOM;
 import ch.gigerstyle.xmlsec.test.utils.XmlReaderToWriter;
 import org.testng.annotations.Test;
-import org.w3c.dom.*;
+import org.w3c.dom.Document;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.stream.*;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
 
 /**
  * User: giger
@@ -114,7 +115,8 @@ public class SimpleTest extends AbstractTestBase {
         documentBuilderFactory.setNamespaceAware(true);
         DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
         Document document = documentBuilder.newDocument();
-        while (outXmlStreamReader.hasNext() && outXmlStreamReader.next() != XMLStreamConstants.START_ELEMENT){}
+        while (outXmlStreamReader.hasNext() && outXmlStreamReader.next() != XMLStreamConstants.START_ELEMENT) {
+        }
         StAX2DOM.readDocElements(document, document, outXmlStreamReader, false, false);
 
         Transformer transformer = TransformerFactory.newInstance().newTransformer();

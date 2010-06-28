@@ -104,7 +104,7 @@ public class OutputProcessorChainImpl implements OutputProcessorChain {
                 }
             }
             this.outputProcessors.add(pos, outputProcessor);
-            System.out.println("Adding internal bst proc at pos " + (this.outputProcessors.size() - 1));
+            System.out.println("Adding internal sig proc at pos " + (this.outputProcessors.size() - 1));
         }
         else {
             this.outputProcessors.add(outputProcessor);

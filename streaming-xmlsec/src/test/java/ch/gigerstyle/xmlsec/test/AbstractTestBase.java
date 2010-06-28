@@ -68,20 +68,15 @@ public abstract class AbstractTestBase {
                     public String getNamespaceURI(String prefix) {
                         if (Constants.PREFIX_DSIG.equals(prefix)) {
                             return Constants.NS_DSIG;
-                        }
-                        else if (Constants.PREFIX_SOAPENV.equals(prefix)) {
+                        } else if (Constants.PREFIX_SOAPENV.equals(prefix)) {
                             return Constants.NS_SOAP11;
-                        }
-                        else if (Constants.PREFIX_WSSE.equals(prefix)) {
+                        } else if (Constants.PREFIX_WSSE.equals(prefix)) {
                             return Constants.NS_WSSE;
-                        }
-                        else if (Constants.PREFIX_WSU.equals(prefix)) {
+                        } else if (Constants.PREFIX_WSU.equals(prefix)) {
                             return Constants.NS_WSU;
-                        }
-                        else if (Constants.PREFIX_XENC.equals(prefix)) {
+                        } else if (Constants.PREFIX_XENC.equals(prefix)) {
                             return Constants.NS_XMLENC;
-                        }
-                        else {
+                        } else {
                             return null;
                         }
                     }
@@ -89,26 +84,21 @@ public abstract class AbstractTestBase {
                     public String getPrefix(String namespaceURI) {
                         if (Constants.NS_DSIG.equals(namespaceURI)) {
                             return Constants.PREFIX_DSIG;
-                        }
-                        else if (Constants.NS_SOAP11.equals(namespaceURI)) {
+                        } else if (Constants.NS_SOAP11.equals(namespaceURI)) {
                             return Constants.PREFIX_SOAPENV;
-                        }
-                        else if (Constants.NS_WSSE.equals(namespaceURI)) {
+                        } else if (Constants.NS_WSSE.equals(namespaceURI)) {
                             return Constants.PREFIX_WSSE;
-                        }
-                        else if (Constants.NS_WSU.equals(namespaceURI)) {
+                        } else if (Constants.NS_WSU.equals(namespaceURI)) {
                             return Constants.PREFIX_WSU;
-                        }
-                        else if (Constants.NS_XMLENC.equals(namespaceURI)) {
+                        } else if (Constants.NS_XMLENC.equals(namespaceURI)) {
                             return Constants.PREFIX_XENC;
-                        }
-                        else {
+                        } else {
                             return null;
                         }
                     }
 
-                    public Iterator getPrefixes(String namespaceURI) {                        
-                            return null;
+                    public Iterator getPrefixes(String namespaceURI) {
+                        return null;
                     }
                 }
         );

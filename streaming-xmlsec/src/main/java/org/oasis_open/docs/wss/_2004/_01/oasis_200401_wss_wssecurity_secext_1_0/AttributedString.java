@@ -77,6 +77,10 @@ public class AttributedString implements Parseable {
 
     private QName startElementName;
 
+    public AttributedString() {
+        super();
+    }
+
     public AttributedString(StartElement startElement) {
         this.startElementName = startElement.getName();
         Iterator<Attribute> attributeIterator = startElement.getAttributes();

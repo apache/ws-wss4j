@@ -4,6 +4,7 @@ import ch.gigerstyle.xmlsec.*;
 import ch.gigerstyle.xmlsec.config.JCEAlgorithmMapper;
 import ch.gigerstyle.xmlsec.crypto.WSSecurityException;
 import com.sun.mail.util.BASE64EncoderStream;
+import org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_secext_1_0.BinarySecurityTokenType;
 
 import javax.crypto.*;
 import javax.xml.namespace.QName;
@@ -130,17 +131,6 @@ public class EncryptOutputProcessor extends AbstractOutputProcessor {
 
                 OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
 
-                Map<QName, String> attributes = new HashMap<QName, String>();
-                attributes.put(Constants.ATT_NULL_Id, symmetricKeyId);
-                createStartElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_xenc_EncryptedKey, attributes);
-
-                attributes = new HashMap<QName, String>();
-                attributes.put(Constants.ATT_NULL_Algorithm, getSecurityProperties().getEncryptionKeyTransportAlgorithm());
-                createStartElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_xenc_EncryptionMethod, attributes);
-                createEndElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_xenc_EncryptionMethod);
-                createStartElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_dsig_KeyInfo, null);
-                createStartElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_wsse_SecurityTokenReference, null);
-
                 X509Certificate x509Certificate;
                 if (getSecurityProperties().getEncryptionUseThisCertificate() != null) {
                     x509Certificate = getSecurityProperties().getEncryptionUseThisCertificate();
@@ -155,6 +145,38 @@ public class EncryptOutputProcessor extends AbstractOutputProcessor {
                         throw new XMLSecurityException(e);
                     }
                 }
+
+                String certUri = "CertId-" + UUID.randomUUID().toString();
+                BinarySecurityTokenType referencedBinarySecurityTokenType = null;
+                if (getSecurityProperties().getEncryptionKeyIdentifierType() == Constants.KeyIdentifierType.BST_DIRECT_REFERENCE) {
+                    referencedBinarySecurityTokenType = new BinarySecurityTokenType();
+                    referencedBinarySecurityTokenType.setEncodingType(Constants.SOAPMESSAGE_NS10_BASE64_ENCODING);
+                    referencedBinarySecurityTokenType.setValueType(Constants.NS_X509_V3_TYPE);
+                    referencedBinarySecurityTokenType.setId(certUri);
+
+                    Map<QName, String> attributes = new HashMap<QName, String>();
+                    attributes.put(Constants.ATT_NULL_EncodingType, referencedBinarySecurityTokenType.getEncodingType());
+                    attributes.put(Constants.ATT_NULL_ValueType, referencedBinarySecurityTokenType.getValueType());
+                    attributes.put(Constants.ATT_wsu_Id, referencedBinarySecurityTokenType.getId());
+                    createStartElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_wsse_BinarySecurityToken, attributes);
+                    try {
+                        createCharactersAndOutputAsHeaderEvent(subOutputProcessorChain, Base64.encode(x509Certificate.getEncoded()));
+                    } catch (CertificateEncodingException e) {
+                        throw new XMLSecurityException(e);
+                    }
+                    createEndElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_wsse_BinarySecurityToken);
+                }
+
+                Map<QName, String> attributes = new HashMap<QName, String>();
+                attributes.put(Constants.ATT_NULL_Id, symmetricKeyId);
+                createStartElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_xenc_EncryptedKey, attributes);
+
+                attributes = new HashMap<QName, String>();
+                attributes.put(Constants.ATT_NULL_Algorithm, getSecurityProperties().getEncryptionKeyTransportAlgorithm());
+                createStartElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_xenc_EncryptionMethod, attributes);
+                createEndElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_xenc_EncryptionMethod);
+                createStartElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_dsig_KeyInfo, null);
+                createStartElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_wsse_SecurityTokenReference, null);
 
                 if (getSecurityProperties().getEncryptionKeyIdentifierType() == Constants.KeyIdentifierType.ISSUER_SERIAL) {
 
@@ -221,8 +243,7 @@ public class EncryptOutputProcessor extends AbstractOutputProcessor {
                     }
                     createEndElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_wsse_KeyIdentifier);
                 }
-                else if (getSecurityProperties().getEncryptionKeyIdentifierType() == Constants.KeyIdentifierType.BST_DIRECT_REFERENCE) {
-                    String certUri = "CertId-" + UUID.randomUUID().toString();
+                else if (getSecurityProperties().getEncryptionKeyIdentifierType() == Constants.KeyIdentifierType.BST_EMBEDDED) {
                     attributes = new HashMap<QName, String>();
                     attributes.put(Constants.ATT_NULL_URI, "#" + certUri);
                     attributes.put(Constants.ATT_NULL_ValueType, Constants.NS_X509_V3_TYPE);
@@ -242,6 +263,15 @@ public class EncryptOutputProcessor extends AbstractOutputProcessor {
                     createEndElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_wsse_BinarySecurityToken);
                     
                     createEndElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_wsse_Reference);
+                } else if (getSecurityProperties().getEncryptionKeyIdentifierType() == Constants.KeyIdentifierType.BST_DIRECT_REFERENCE) {
+
+                    attributes = new HashMap<QName, String>();
+                    attributes.put(Constants.ATT_NULL_URI, "#" + certUri);
+                    attributes.put(Constants.ATT_NULL_ValueType, referencedBinarySecurityTokenType.getValueType());
+                    createStartElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_wsse_Reference, attributes);
+                    createEndElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_wsse_Reference);
+                } else {
+                    throw new XMLSecurityException("Unsupported SecurityToken: " + getSecurityProperties().getEncryptionKeyIdentifierType().name());
                 }
 
                 createEndElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_wsse_SecurityTokenReference);

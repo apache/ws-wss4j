@@ -65,6 +65,10 @@ public class EncodedString
 
     private QName startElementName;
 
+    public EncodedString() {
+        super();
+    }
+
     public EncodedString(StartElement startElement) {
         super(startElement);
         this.startElementName = startElement.getName();

@@ -32,9 +32,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
-import static org.testng.Assert.fail;
+import static org.testng.Assert.*;
 
 public class Canonicalizer20010315Test {
 
@@ -51,155 +49,157 @@ public class Canonicalizer20010315Test {
         this.xmlInputFactory.setXMLResolver(xmlResolver);
     }
 
-   /**
-    * 3.1 PIs, Comments, and Outside of Document Element
-    */
-   @Test
-   public void test31withCommentsSubtree() throws Exception {
+    /**
+     * 3.1 PIs, Comments, and Outside of Document Element
+     */
+    @Test
+    public void test31withCommentsSubtree() throws Exception {
 
-      String descri =
-         "3.1: PIs, Comments, and Outside of Document Element. (commented)";
+        String descri =
+                "3.1: PIs, Comments, and Outside of Document Element. (commented)";
 
-      URL fileIn = this.getClass().getClassLoader().getResource("testdata/c14n/in/31_input.xml");
-      URL fileRef = this.getClass().getClassLoader().getResource("testdata/c14n/in/31_c14n-comments.xml");
+        URL fileIn = this.getClass().getClassLoader().getResource("testdata/c14n/in/31_input.xml");
+        URL fileRef = this.getClass().getClassLoader().getResource("testdata/c14n/in/31_c14n-comments.xml");
 
-      Canonicalizer20010315Transformer canonicalizer20010315Transformer = new Canonicalizer20010315WithCommentsTransformer(null);
+        Canonicalizer20010315Transformer canonicalizer20010315Transformer = new Canonicalizer20010315WithCommentsTransformer(null);
 
-     c14nAndCompare(fileIn, fileRef, canonicalizer20010315Transformer);
-   }
+        c14nAndCompare(fileIn, fileRef, canonicalizer20010315Transformer);
+    }
 
-   /**
-    * 3.1 PIs, Comments, and Outside of Document Element
-    *
-    * @see <A HREF="http://www.w3.org/TR/2001/PR-xml-c14n-20010119#Example-OutsideDoc">the example from the spec</A>
-    */
-   @Test
-   public void test31subtree() throws Exception {
+    /**
+     * 3.1 PIs, Comments, and Outside of Document Element
+     *
+     * @see <A HREF="http://www.w3.org/TR/2001/PR-xml-c14n-20010119#Example-OutsideDoc">the example from the spec</A>
+     */
+    @Test
+    public void test31subtree() throws Exception {
 
-      String descri =
-         "3.1: PIs, Comments, and Outside of Document Element. (uncommented)";
-      URL fileIn = this.getClass().getClassLoader().getResource("testdata/c14n/in/31_input.xml");
-      URL fileRef = this.getClass().getClassLoader().getResource("testdata/c14n/in/31_c14n.xml");
+        String descri =
+                "3.1: PIs, Comments, and Outside of Document Element. (uncommented)";
+        URL fileIn = this.getClass().getClassLoader().getResource("testdata/c14n/in/31_input.xml");
+        URL fileRef = this.getClass().getClassLoader().getResource("testdata/c14n/in/31_c14n.xml");
 
-       Canonicalizer20010315OmitCommentsTransformer canonicalizer20010315Transformer = new Canonicalizer20010315OmitCommentsTransformer(null);
+        Canonicalizer20010315OmitCommentsTransformer canonicalizer20010315Transformer = new Canonicalizer20010315OmitCommentsTransformer(null);
 
-       c14nAndCompare(fileIn, fileRef, canonicalizer20010315Transformer);
-   }
+        c14nAndCompare(fileIn, fileRef, canonicalizer20010315Transformer);
+    }
 
-   /**
-    * 3.2 Whitespace in Document Content
-    *
-    * @see <A HREF="http://www.w3.org/TR/2001/PR-xml-c14n-20010119#Example-WhitespaceInContent">the example from the spec</A>
-    */
-   @Test
-   public void test32subtree() throws Exception {
+    /**
+     * 3.2 Whitespace in Document Content
+     *
+     * @see <A HREF="http://www.w3.org/TR/2001/PR-xml-c14n-20010119#Example-WhitespaceInContent">the example from the spec</A>
+     */
+    @Test
+    public void test32subtree() throws Exception {
 
-      String descri = "3.2 Whitespace in Document Content. (uncommented)";
-       URL fileIn = this.getClass().getClassLoader().getResource("testdata/c14n/in/32_input.xml");
-      URL fileRef = this.getClass().getClassLoader().getResource("testdata/c14n/in/32_c14n.xml");
+        String descri = "3.2 Whitespace in Document Content. (uncommented)";
+        URL fileIn = this.getClass().getClassLoader().getResource("testdata/c14n/in/32_input.xml");
+        URL fileRef = this.getClass().getClassLoader().getResource("testdata/c14n/in/32_c14n.xml");
 
-       Canonicalizer20010315OmitCommentsTransformer canonicalizer20010315Transformer = new Canonicalizer20010315OmitCommentsTransformer(null);
+        Canonicalizer20010315OmitCommentsTransformer canonicalizer20010315Transformer = new Canonicalizer20010315OmitCommentsTransformer(null);
 
-       c14nAndCompare(fileIn, fileRef, canonicalizer20010315Transformer);
-   }
+        c14nAndCompare(fileIn, fileRef, canonicalizer20010315Transformer);
+    }
 
-   /**
-    * 3.3 Start and End Tags
-    *
-    * @see <A HREF="http://www.w3.org/TR/2001/PR-xml-c14n-20010119#Example-SETags">the example from the spec</A>
-    */
-   @Test
-   public void test33subtree() throws Exception {
+    /**
+     * 3.3 Start and End Tags
+     *
+     * @see <A HREF="http://www.w3.org/TR/2001/PR-xml-c14n-20010119#Example-SETags">the example from the spec</A>
+     */
+    @Test
+    public void test33subtree() throws Exception {
 
-      String descri = "3.3 Start and End Tags. (uncommented)";
+        String descri = "3.3 Start and End Tags. (uncommented)";
 
-       URL fileIn = this.getClass().getClassLoader().getResource("testdata/c14n/in/33_input.xml");
-      URL fileRef = this.getClass().getClassLoader().getResource("testdata/c14n/in/33_c14n.xml");
+        URL fileIn = this.getClass().getClassLoader().getResource("testdata/c14n/in/33_input.xml");
+        URL fileRef = this.getClass().getClassLoader().getResource("testdata/c14n/in/33_c14n.xml");
 
-       Canonicalizer20010315OmitCommentsTransformer canonicalizer20010315Transformer = new Canonicalizer20010315OmitCommentsTransformer(null);
+        Canonicalizer20010315OmitCommentsTransformer canonicalizer20010315Transformer = new Canonicalizer20010315OmitCommentsTransformer(null);
 
-       c14nAndCompare(fileIn, fileRef, canonicalizer20010315Transformer);
-   }
+        c14nAndCompare(fileIn, fileRef, canonicalizer20010315Transformer);
+    }
 
-   /**
-    * 3.4 Character Modifications and Character References
-    * @see <A HREF="http://www.w3.org/TR/2001/PR-xml-c14n-20010119#Example-Chars">the example from the spec</A>
-    */
-   @Test
-   public void test34() throws Exception {
+    /**
+     * 3.4 Character Modifications and Character References
+     *
+     * @see <A HREF="http://www.w3.org/TR/2001/PR-xml-c14n-20010119#Example-Chars">the example from the spec</A>
+     */
+    @Test
+    public void test34() throws Exception {
 
-      String descri =
-         "3.4 Character Modifications and Character References. (uncommented)";
+        String descri =
+                "3.4 Character Modifications and Character References. (uncommented)";
 
-       URL fileIn = this.getClass().getClassLoader().getResource("testdata/c14n/in/34_input.xml");
-      URL fileRef = this.getClass().getClassLoader().getResource("testdata/c14n/in/34_c14n.xml");
+        URL fileIn = this.getClass().getClassLoader().getResource("testdata/c14n/in/34_input.xml");
+        URL fileRef = this.getClass().getClassLoader().getResource("testdata/c14n/in/34_c14n.xml");
 
-       Canonicalizer20010315OmitCommentsTransformer canonicalizer20010315Transformer = new Canonicalizer20010315OmitCommentsTransformer(null);
+        Canonicalizer20010315OmitCommentsTransformer canonicalizer20010315Transformer = new Canonicalizer20010315OmitCommentsTransformer(null);
 
-       c14nAndCompare(fileIn, fileRef, canonicalizer20010315Transformer);
-   }
+        c14nAndCompare(fileIn, fileRef, canonicalizer20010315Transformer);
+    }
 
-   /**
-    * 3.4 Character Modifications and Character References (patched to run on validating Parsers)
-    * <P>
-    * <A HREF="http://www.w3.org/TR/2001/PR-xml-c14n-20010119"> The spec</A> states that:
-    * <P>
-    * Note: The last element, normId, is well-formed but violates a validity
-    * constraint for attributes of type ID. For testing canonical XML
-    * implementations based on validating processors, remove the line
-    * containing this element from the input and canonical form. In general,
-    * XML consumers should be discouraged from using this feature of XML.
-    *
-    * @see <A HREF="http://www.w3.org/TR/2001/PR-xml-c14n-20010119#Example-Chars">the example from the spec</A>
-    */
-   @Test
-   public void test34subtree() throws Exception {
-       //todo enable validation
-      String descri =
-         "3.4 Character Modifications and Character References. (uncommented, patched to run on validating Parsers)";
+    /**
+     * 3.4 Character Modifications and Character References (patched to run on validating Parsers)
+     * <p/>
+     * <A HREF="http://www.w3.org/TR/2001/PR-xml-c14n-20010119"> The spec</A> states that:
+     * <p/>
+     * Note: The last element, normId, is well-formed but violates a validity
+     * constraint for attributes of type ID. For testing canonical XML
+     * implementations based on validating processors, remove the line
+     * containing this element from the input and canonical form. In general,
+     * XML consumers should be discouraged from using this feature of XML.
+     *
+     * @see <A HREF="http://www.w3.org/TR/2001/PR-xml-c14n-20010119#Example-Chars">the example from the spec</A>
+     */
+    @Test
+    public void test34subtree() throws Exception {
+        //todo enable validation
+        String descri =
+                "3.4 Character Modifications and Character References. (uncommented, patched to run on validating Parsers)";
 
-       URL fileIn = this.getClass().getClassLoader().getResource("testdata/c14n/in/34_input_validatingParser.xml");
-      URL fileRef = this.getClass().getClassLoader().getResource("testdata/c14n/in/34_c14n_validatingParser.xml");
+        URL fileIn = this.getClass().getClassLoader().getResource("testdata/c14n/in/34_input_validatingParser.xml");
+        URL fileRef = this.getClass().getClassLoader().getResource("testdata/c14n/in/34_c14n_validatingParser.xml");
 
-       Canonicalizer20010315OmitCommentsTransformer canonicalizer20010315Transformer = new Canonicalizer20010315OmitCommentsTransformer(null);
+        Canonicalizer20010315OmitCommentsTransformer canonicalizer20010315Transformer = new Canonicalizer20010315OmitCommentsTransformer(null);
 
-       c14nAndCompare(fileIn, fileRef, canonicalizer20010315Transformer);
-   }
+        c14nAndCompare(fileIn, fileRef, canonicalizer20010315Transformer);
+    }
 
-   /**
-    * 3.5 Entity References
-    * @see <A HREF="http://www.w3.org/TR/2001/PR-xml-c14n-20010119#Example-Entities">the example from the spec</A>
-    */
-   @Test
-   public void test35subtree() throws Exception {
-       //todo enable validation
-      String descri = "3.5 Entity References. (uncommented)";
+    /**
+     * 3.5 Entity References
+     *
+     * @see <A HREF="http://www.w3.org/TR/2001/PR-xml-c14n-20010119#Example-Entities">the example from the spec</A>
+     */
+    @Test
+    public void test35subtree() throws Exception {
+        //todo enable validation
+        String descri = "3.5 Entity References. (uncommented)";
 
-       URL fileIn = this.getClass().getClassLoader().getResource("testdata/c14n/in/35_input.xml");
-      URL fileRef = this.getClass().getClassLoader().getResource("testdata/c14n/in/35_c14n.xml");
+        URL fileIn = this.getClass().getClassLoader().getResource("testdata/c14n/in/35_input.xml");
+        URL fileRef = this.getClass().getClassLoader().getResource("testdata/c14n/in/35_c14n.xml");
 
-       Canonicalizer20010315OmitCommentsTransformer canonicalizer20010315Transformer = new Canonicalizer20010315OmitCommentsTransformer(null);
+        Canonicalizer20010315OmitCommentsTransformer canonicalizer20010315Transformer = new Canonicalizer20010315OmitCommentsTransformer(null);
 
-       c14nAndCompare(fileIn, fileRef, canonicalizer20010315Transformer);
-   }
+        c14nAndCompare(fileIn, fileRef, canonicalizer20010315Transformer);
+    }
 
-   /**
-    * 3.6 UTF-8 Encoding
-    *
-    * @see <A HREF="http://www.w3.org/TR/2001/PR-xml-c14n-20010119#Example-UTF8">the example from the spec</A>
-    */
-   @Test
-   public void test36subtree() throws Exception {
+    /**
+     * 3.6 UTF-8 Encoding
+     *
+     * @see <A HREF="http://www.w3.org/TR/2001/PR-xml-c14n-20010119#Example-UTF8">the example from the spec</A>
+     */
+    @Test
+    public void test36subtree() throws Exception {
 
-      String descri = "3.6 UTF-8 Encoding. (uncommented)";
+        String descri = "3.6 UTF-8 Encoding. (uncommented)";
 
-       URL fileIn = this.getClass().getClassLoader().getResource("testdata/c14n/in/36_input.xml");
-      URL fileRef = this.getClass().getClassLoader().getResource("testdata/c14n/in/36_c14n.xml");
+        URL fileIn = this.getClass().getClassLoader().getResource("testdata/c14n/in/36_input.xml");
+        URL fileRef = this.getClass().getClassLoader().getResource("testdata/c14n/in/36_c14n.xml");
 
-       Canonicalizer20010315OmitCommentsTransformer canonicalizer20010315Transformer = new Canonicalizer20010315OmitCommentsTransformer(null);
+        Canonicalizer20010315OmitCommentsTransformer canonicalizer20010315Transformer = new Canonicalizer20010315OmitCommentsTransformer(null);
 
-       c14nAndCompare(fileIn, fileRef, canonicalizer20010315Transformer);
-   }
+        c14nAndCompare(fileIn, fileRef, canonicalizer20010315Transformer);
+    }
 
 //   /**
 //    * 3.7 Document Subsets
@@ -249,30 +249,31 @@ public class Canonicalizer20010315Test {
 //                                xpath));
 //   }
 //
-   /**
-    * Note: This specification supports the recent XML plenary decision to
-    * deprecate relative namespace URIs as follows: implementations of XML
-    * canonicalization MUST report an operation failure on documents containing
-    * relative namespace URIs. XML canonicalization MUST NOT be implemented
-    * with an XML parser that converts relative URIs to absolute URIs.
-    *
-    * Implementations MUST report an operation failure on documents containing
-    * relative namespace URIs.
-    */
-   @Test
-   public void testRelativeNSbehaviour() throws Exception {
 
-      URL fileIn = this.getClass().getClassLoader().getResource("testdata/c14n/in/relative-ns-behaviour.xml");
+    /**
+     * Note: This specification supports the recent XML plenary decision to
+     * deprecate relative namespace URIs as follows: implementations of XML
+     * canonicalization MUST report an operation failure on documents containing
+     * relative namespace URIs. XML canonicalization MUST NOT be implemented
+     * with an XML parser that converts relative URIs to absolute URIs.
+     * <p/>
+     * Implementations MUST report an operation failure on documents containing
+     * relative namespace URIs.
+     */
+    @Test
+    public void testRelativeNSbehaviour() throws Exception {
 
-       Canonicalizer20010315OmitCommentsTransformer canonicalizer20010315Transformer = new Canonicalizer20010315OmitCommentsTransformer(null);
+        URL fileIn = this.getClass().getClassLoader().getResource("testdata/c14n/in/relative-ns-behaviour.xml");
 
-       try {
-        c14nAndCompare(fileIn, fileIn, canonicalizer20010315Transformer);
-           fail();
-      } catch (XMLStreamException cex) {
-         assertTrue(cex != null);
-      }
-   }
+        Canonicalizer20010315OmitCommentsTransformer canonicalizer20010315Transformer = new Canonicalizer20010315OmitCommentsTransformer(null);
+
+        try {
+            c14nAndCompare(fileIn, fileIn, canonicalizer20010315Transformer);
+            fail();
+        } catch (XMLStreamException cex) {
+            assertTrue(cex != null);
+        }
+    }
 
 //   /**
 //    * The XPath data model represents data using UCS characters.
@@ -553,31 +554,31 @@ public class Canonicalizer20010315Test {
 //      return java.security.MessageDigest.isEqual(defined, result);
 //   }
 
-   /**
-    * Method c14nAndCompare
-    */
-   private void c14nAndCompare(
-           URL fileIn, URL fileRef, Canonicalizer20010315Transformer canonicalizer20010315Transformer) throws Exception {
+    /**
+     * Method c14nAndCompare
+     */
+    private void c14nAndCompare(
+            URL fileIn, URL fileRef, Canonicalizer20010315Transformer canonicalizer20010315Transformer) throws Exception {
 
-       ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
-       XMLEventReader xmlEventReader = xmlInputFactory.createXMLEventReader(fileIn.openStream());
-       while (xmlEventReader.hasNext()) {
-           XMLEvent xmlEvent = xmlEventReader.nextEvent();
+        XMLEventReader xmlEventReader = xmlInputFactory.createXMLEventReader(fileIn.openStream());
+        while (xmlEventReader.hasNext()) {
+            XMLEvent xmlEvent = xmlEventReader.nextEvent();
             canonicalizer20010315Transformer.transform(xmlEvent, baos);
-       }
+        }
 
-      // org.xml.sax.InputSource refIs = resolver.resolveEntity(null, fileRef);
-      // byte refBytes[] = JavaUtils.getBytesFromStream(refIs.getByteStream());
-      byte refBytes[] = getBytesFromResource(fileRef);
+        // org.xml.sax.InputSource refIs = resolver.resolveEntity(null, fileRef);
+        // byte refBytes[] = JavaUtils.getBytesFromStream(refIs.getByteStream());
+        byte refBytes[] = getBytesFromResource(fileRef);
 
-      // if everything is OK, result is true; we do a binary compare, byte by byte
-      boolean result = java.security.MessageDigest.isEqual(refBytes, baos.toByteArray());
-       if (!result) {
-         assertEquals(new String(baos.toByteArray()), new String(refBytes));
-       }
-       assertTrue(result);
-   }
+        // if everything is OK, result is true; we do a binary compare, byte by byte
+        boolean result = java.security.MessageDigest.isEqual(refBytes, baos.toByteArray());
+        if (!result) {
+            assertEquals(new String(baos.toByteArray()), new String(refBytes));
+        }
+        assertTrue(result);
+    }
 
 
     public static byte[] getBytesFromResource(URL resource) throws IOException {

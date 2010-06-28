@@ -33,7 +33,8 @@ public class StAX2DOM {
 
     public static Document readDoc(DocumentBuilder documentBuilder, XMLStreamReader xmlStreamReader) throws XMLStreamException {
         //skip possible text at the beginning of a document and go directly to the root tag
-        while (xmlStreamReader.hasNext() && xmlStreamReader.next() != XMLStreamConstants.START_ELEMENT) {}
+        while (xmlStreamReader.hasNext() && xmlStreamReader.next() != XMLStreamConstants.START_ELEMENT) {
+        }
         Document document = documentBuilder.newDocument();
         StAX2DOM.readDocElements(document, document, xmlStreamReader, false, false);
         xmlStreamReader.close();
@@ -94,8 +95,8 @@ public class StAX2DOM {
     }
 
     static boolean addLocation(Document doc, Node node,
-                                       XMLStreamReader reader,
-                                       boolean recordLoc) {
+                               XMLStreamReader reader,
+                               boolean recordLoc) {
         if (recordLoc) {
             Location loc = reader.getLocation();
             if (loc != null && (loc.getColumnNumber() != 0 || loc.getLineNumber() != 0)) {
@@ -147,12 +148,13 @@ public class StAX2DOM {
      * @param reader
      * @return
      * @throws javax.xml.stream.XMLStreamException
+     *
      */
     static Element startElement(Document doc,
-                                        Node parent,
-                                        XMLStreamReader reader,
-                                        boolean repairing,
-                                        boolean recordLocation)
+                                Node parent,
+                                XMLStreamReader reader,
+                                boolean repairing,
+                                boolean recordLocation)
             throws XMLStreamException {
 
         Element e = doc.createElementNS(reader.getNamespaceURI(), reader.getLocalName());

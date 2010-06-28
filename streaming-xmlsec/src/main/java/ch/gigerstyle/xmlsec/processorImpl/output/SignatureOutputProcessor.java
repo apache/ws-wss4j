@@ -4,6 +4,7 @@ import ch.gigerstyle.xmlsec.*;
 import ch.gigerstyle.xmlsec.DigestOutputStream;
 import ch.gigerstyle.xmlsec.config.JCEAlgorithmMapper;
 import ch.gigerstyle.xmlsec.crypto.WSSecurityException;
+import org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_secext_1_0.BinarySecurityTokenType;
 
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.UnsupportedCallbackException;
@@ -64,11 +65,6 @@ public class SignatureOutputProcessor extends AbstractOutputProcessor {
                         if (startElement.getName().getLocalPart().equals(securePart.getName())
                                 && startElement.getName().getNamespaceURI().equals(securePart.getNamespace())) {
 
-                            if (!bstProcessorAdded) {
-                                outputProcessorChain.addProcessor(new BinarySecurityTokenOutputProcessor(getSecurityProperties()));
-                                bstProcessorAdded = true;
-                            }
-
                             System.out.println("matched securePart for signature");
                             InternalSignatureOutputProcessor internalSignatureOutputProcessor = null;
                             try {
@@ -79,7 +75,6 @@ public class SignatureOutputProcessor extends AbstractOutputProcessor {
                                 //signaturePartDef.setSymmetricKey(symmetricKey);
                                 signaturePartDefList.add(signaturePartDef);
                                 internalSignatureOutputProcessor = new InternalSignatureOutputProcessor(getSecurityProperties(), signaturePartDef, startElement.getName());
-
 
                                 List<Namespace> namespaceList = new ArrayList<Namespace>();
                                 Iterator<Namespace> namespaceIterator = startElement.getNamespaces();
@@ -126,11 +121,43 @@ public class SignatureOutputProcessor extends AbstractOutputProcessor {
 
                 OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
 
+                String alias = getSecurityProperties().getSignatureUser();
+
+                X509Certificate[] x509Certificates;
+                try {
+                    x509Certificates = getSecurityProperties().getSignatureCrypto().getCertificates(alias);
+                } catch (WSSecurityException e) {
+                    throw new XMLSecurityException(e);
+                }
+                if (x509Certificates == null || x509Certificates.length == 0) {
+                    throw new XMLSecurityException("noUserCertsFound");
+                }
+
+                String certUri = "CertId-" + UUID.randomUUID().toString();
+                BinarySecurityTokenType referencedBinarySecurityTokenType = null;
+                if (getSecurityProperties().getSignatureKeyIdentifierType() == Constants.KeyIdentifierType.BST_DIRECT_REFERENCE) {
+                    referencedBinarySecurityTokenType = new BinarySecurityTokenType();
+                    referencedBinarySecurityTokenType.setEncodingType(Constants.SOAPMESSAGE_NS10_BASE64_ENCODING);
+                    referencedBinarySecurityTokenType.setValueType(Constants.NS_X509_V3_TYPE);
+                    referencedBinarySecurityTokenType.setId(certUri);
+
+                    Map<QName, String> attributes = new HashMap<QName, String>();
+                    attributes.put(Constants.ATT_NULL_EncodingType, referencedBinarySecurityTokenType.getEncodingType());
+                    attributes.put(Constants.ATT_NULL_ValueType, referencedBinarySecurityTokenType.getValueType());
+                    attributes.put(Constants.ATT_wsu_Id, referencedBinarySecurityTokenType.getId());
+                    createStartElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_wsse_BinarySecurityToken, attributes);
+                    try {
+                        createCharactersAndOutputAsHeaderEvent(subOutputProcessorChain, Base64.encode(x509Certificates[0].getEncoded()));
+                    } catch (CertificateEncodingException e) {
+                        throw new XMLSecurityException(e);
+                    }
+                    createEndElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_wsse_BinarySecurityToken);
+                }
+
                 Map<QName, String> attributes = new HashMap<QName, String>();
                 attributes.put(Constants.ATT_NULL_Id, "Signature-" + UUID.randomUUID().toString());
                 createStartElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_dsig_Signature, attributes);
 
-                String alias = getSecurityProperties().getSignatureUser();
                 WSPasswordCallback pwCb = new WSPasswordCallback(alias, WSPasswordCallback.SIGNATURE);
                 try {
                     Callback[] callbacks = new Callback[]{pwCb};
@@ -162,16 +189,6 @@ public class SignatureOutputProcessor extends AbstractOutputProcessor {
                                     password));
                 } catch (Exception e) {
                     throw new XMLSecurityException(e);
-                }
-
-                X509Certificate[] x509Certificates;
-                try {
-                    x509Certificates = getSecurityProperties().getSignatureCrypto().getCertificates(alias);
-                } catch (WSSecurityException e) {
-                    throw new XMLSecurityException(e);
-                }
-                if (x509Certificates == null || x509Certificates.length == 0) {
-                    throw new XMLSecurityException("noUserCertsFound");
                 }
 
                 SignedInfoProcessor signedInfoProcessor = new SignedInfoProcessor(getSecurityProperties(), signature);
@@ -219,13 +236,12 @@ public class SignatureOutputProcessor extends AbstractOutputProcessor {
                 createCharactersAndOutputAsHeaderEvent(subOutputProcessorChain, Base64.encode(signedInfoProcessor.getSignatureValue()));
                 createEndElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_dsig_SignatureValue);
 
-                //todo dynamic attr values:
                 attributes = new HashMap<QName, String>();
-                attributes.put(Constants.ATT_NULL_Id, "KeyId-1043455692");
+                attributes.put(Constants.ATT_NULL_Id, "KeyId-" + UUID.randomUUID().toString());
                 createStartElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_dsig_KeyInfo, attributes);
 
                 attributes = new HashMap<QName, String>();
-                attributes.put(Constants.ATT_wsu_Id, "STRId-1008354042");
+                attributes.put(Constants.ATT_wsu_Id, "STRId-" + UUID.randomUUID().toString());
                 createStartElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_wsse_SecurityTokenReference, attributes);
 
                 if (getSecurityProperties().getSignatureKeyIdentifierType() == Constants.KeyIdentifierType.ISSUER_SERIAL) {
@@ -240,8 +256,7 @@ public class SignatureOutputProcessor extends AbstractOutputProcessor {
                     createEndElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_dsig_X509SerialNumber);
                     createEndElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_dsig_X509IssuerSerial);
                     createEndElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_dsig_X509Data);
-                }
-                else if (getSecurityProperties().getSignatureKeyIdentifierType() == Constants.KeyIdentifierType.SKI_KEY_IDENTIFIER) {
+                } else if (getSecurityProperties().getSignatureKeyIdentifierType() == Constants.KeyIdentifierType.SKI_KEY_IDENTIFIER) {
                     // As per the 1.1 specification, SKI can only be used for a V3 certificate
                     if (x509Certificates[0].getVersion() != 3) {
                         throw new XMLSecurityException("invalidCertForSKI");
@@ -258,8 +273,7 @@ public class SignatureOutputProcessor extends AbstractOutputProcessor {
                         throw new XMLSecurityException(e);
                     }
                     createEndElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_wsse_KeyIdentifier);
-                }
-                else if (getSecurityProperties().getSignatureKeyIdentifierType() == Constants.KeyIdentifierType.X509_KEY_IDENTIFIER) {
+                } else if (getSecurityProperties().getSignatureKeyIdentifierType() == Constants.KeyIdentifierType.X509_KEY_IDENTIFIER) {
 
                     attributes = new HashMap<QName, String>();
                     attributes.put(Constants.ATT_NULL_EncodingType, Constants.SOAPMESSAGE_NS10_BASE64_ENCODING);
@@ -271,8 +285,7 @@ public class SignatureOutputProcessor extends AbstractOutputProcessor {
                         throw new XMLSecurityException(e);
                     }
                     createEndElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_wsse_KeyIdentifier);
-                }
-                else if (getSecurityProperties().getSignatureKeyIdentifierType() == Constants.KeyIdentifierType.THUMBPRINT_IDENTIFIER) {
+                } else if (getSecurityProperties().getSignatureKeyIdentifierType() == Constants.KeyIdentifierType.THUMBPRINT_IDENTIFIER) {
 
                     attributes = new HashMap<QName, String>();
                     attributes.put(Constants.ATT_NULL_EncodingType, Constants.SOAPMESSAGE_NS10_BASE64_ENCODING);
@@ -292,12 +305,15 @@ public class SignatureOutputProcessor extends AbstractOutputProcessor {
                         throw new XMLSecurityException(e);
                     }
                     createEndElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_wsse_KeyIdentifier);
-                }
-                else if (getSecurityProperties().getSignatureKeyIdentifierType() == Constants.KeyIdentifierType.BST_DIRECT_REFERENCE) {
-                    String certUri = "CertId-" + UUID.randomUUID().toString();
+                } else if (getSecurityProperties().getSignatureKeyIdentifierType() == Constants.KeyIdentifierType.BST_EMBEDDED) {
+
                     attributes = new HashMap<QName, String>();
                     attributes.put(Constants.ATT_NULL_URI, "#" + certUri);
-                    attributes.put(Constants.ATT_NULL_ValueType, Constants.NS_X509_V3_TYPE);
+                    if (useSingleCert) {
+                        attributes.put(Constants.ATT_NULL_ValueType, Constants.NS_X509_V3_TYPE);
+                    } else {
+                        attributes.put(Constants.ATT_NULL_ValueType, Constants.NS_X509PKIPathv1);
+                    }
                     createStartElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_wsse_Reference, attributes);
 
                     //todo probably we can reuse BinarySecurityTokenOutputProcessor??
@@ -322,10 +338,17 @@ public class SignatureOutputProcessor extends AbstractOutputProcessor {
                         throw new XMLSecurityException(e);
                     }
                     createEndElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_wsse_BinarySecurityToken);
-
                     createEndElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_wsse_Reference);
-                }
+                } else if (getSecurityProperties().getSignatureKeyIdentifierType() == Constants.KeyIdentifierType.BST_DIRECT_REFERENCE) {
 
+                    attributes = new HashMap<QName, String>();
+                    attributes.put(Constants.ATT_NULL_URI, "#" + certUri);
+                    attributes.put(Constants.ATT_NULL_ValueType, referencedBinarySecurityTokenType.getValueType());
+                    createStartElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_wsse_Reference, attributes);
+                    createEndElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_wsse_Reference);
+                } else {
+                    throw new XMLSecurityException("Unsupported SecurityToken: " + getSecurityProperties().getSignatureKeyIdentifierType().name());
+                }
 
                 createEndElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_wsse_SecurityTokenReference);
                 createEndElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_dsig_KeyInfo);
@@ -365,7 +388,6 @@ public class SignatureOutputProcessor extends AbstractOutputProcessor {
                 */
             }
         }
-        //outputProcessorChain.processHeaderEvent(xmlEvent);
     }
 
     class InternalSignatureOutputProcessor extends AbstractOutputProcessor {

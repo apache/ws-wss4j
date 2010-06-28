@@ -57,6 +57,10 @@ public class BinarySecurityTokenType
 
     private boolean isChildFinished = false;
 
+    public BinarySecurityTokenType() {
+        super();
+    }
+
     public BinarySecurityTokenType(StartElement startElement) {
         super(startElement);
         Iterator<Attribute> attributeIterator = startElement.getAttributes();

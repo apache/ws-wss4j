@@ -15,18 +15,17 @@
  */
 package ch.gigerstyle.xmlsec.test.utils;
 
+import org.xml.sax.Attributes;
+import org.xml.sax.ContentHandler;
+import org.xml.sax.SAXException;
+import org.xml.sax.helpers.AttributesImpl;
+
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
-import javax.xml.stream.events.XMLEvent;
-
-import org.xml.sax.Attributes;
-import org.xml.sax.ContentHandler;
-import org.xml.sax.SAXException;
-import org.xml.sax.helpers.AttributesImpl;
 
 /**
  * Utility methods for working with an XMLStreamWriter. Maybe push this back into
@@ -67,7 +66,7 @@ public class XMLStreamHelper implements XMLStreamConstants {
     public static void copy(XMLStreamReader in, XMLStreamWriter out, boolean repairing) throws XMLStreamException {
         int elementCount = 0;
         for (int code = in.getEventType(); in.hasNext(); code = in.next()) {
-          elementCount = copyOne(in, out, repairing, code, elementCount);
+            elementCount = copyOne(in, out, repairing, code, elementCount);
         }
         while (elementCount-- > 0) {
             out.writeEndElement();
@@ -78,28 +77,28 @@ public class XMLStreamHelper implements XMLStreamConstants {
      *
      */
     public static int copyOne(XMLStreamReader in, XMLStreamWriter out, boolean repairing, int code, int elementCount) throws XMLStreamException {
-      switch (code) {
-        case START_ELEMENT:
-            elementCount++;
-            writeStartElementAndAttributes(out, in, repairing);
-            break;
+        switch (code) {
+            case START_ELEMENT:
+                elementCount++;
+                writeStartElementAndAttributes(out, in, repairing);
+                break;
 
-        case END_ELEMENT:
-            if (--elementCount < 0) {
-                return elementCount;
-            }
-            out.writeEndElement();
-            break;
+            case END_ELEMENT:
+                if (--elementCount < 0) {
+                    return elementCount;
+                }
+                out.writeEndElement();
+                break;
 
-        case CDATA:
-            out.writeCData(in.getText());
-            break;
+            case CDATA:
+                out.writeCData(in.getText());
+                break;
 
-        case CHARACTERS:
-            out.writeCharacters(in.getText());
-            break;
-      }
-      return elementCount;
+            case CHARACTERS:
+                out.writeCharacters(in.getText());
+                break;
+        }
+        return elementCount;
     }
 
     public static void writeStartElement(XMLStreamWriter out, String prefix, String uri, String localName, boolean repairing) throws XMLStreamException {
@@ -112,8 +111,7 @@ public class XMLStreamHelper implements XMLStreamConstants {
             if (map && !repairing) {
                 out.writeNamespace(prefix, uri);
             }
-        }
-        else {
+        } else {
             boolean hasURI = uri != null && uri.length() > 0;
             if (map && hasURI) {
                 out.setDefaultNamespace(uri);
@@ -143,8 +141,7 @@ public class XMLStreamHelper implements XMLStreamConstants {
             if (isPrefixNotMappedToUri(out, aPrefix, uri)) {
                 if (aPrefix != null && aPrefix.length() > 0) {
                     out.setPrefix(aPrefix, uri);
-                }
-                else {
+                } else {
                     out.setDefaultNamespace(uri);
                 }
             }
@@ -228,31 +225,30 @@ public class XMLStreamHelper implements XMLStreamConstants {
         return map;
     }
 
-static class QNameHelper {
-    public static String getQualifiedName(QName qname) {
-        String prefix = qname.getPrefix();
-        String localPart = qname.getLocalPart();
-        if (prefix != null && prefix.length() > 0) {
-            return prefix + ":" + localPart;
+    static class QNameHelper {
+        public static String getQualifiedName(QName qname) {
+            String prefix = qname.getPrefix();
+            String localPart = qname.getLocalPart();
+            if (prefix != null && prefix.length() > 0) {
+                return prefix + ":" + localPart;
+            }
+            return localPart;
         }
-        return localPart;
-    }
 
-    /**
-     * Turns the given String into a QName using the current namespace context
-     */
-    public static QName asQName(NamespaceContext context, String text) {
-        int idx = text.indexOf(':');
-        if (idx >= 0) {
-            String prefix = text.substring(0, idx);
-            String localPart = text.substring(idx + 1);
-            String uri = context.getNamespaceURI(prefix);
-            return new QName(uri, localPart, prefix);
-        }
-        else {
-            return new QName(text);
+        /**
+         * Turns the given String into a QName using the current namespace context
+         */
+        public static QName asQName(NamespaceContext context, String text) {
+            int idx = text.indexOf(':');
+            if (idx >= 0) {
+                String prefix = text.substring(0, idx);
+                String localPart = text.substring(idx + 1);
+                String uri = context.getNamespaceURI(prefix);
+                return new QName(uri, localPart, prefix);
+            } else {
+                return new QName(text);
+            }
         }
     }
-}
 
 }

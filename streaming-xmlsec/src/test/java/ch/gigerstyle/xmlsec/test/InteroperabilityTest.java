@@ -4,7 +4,7 @@ import ch.gigerstyle.xmlsec.InboundXMLSec;
 import ch.gigerstyle.xmlsec.SecurityProperties;
 import ch.gigerstyle.xmlsec.XMLSec;
 import ch.gigerstyle.xmlsec.test.utils.StAX2DOM;
-import com.sun.xml.internal.ws.streaming.DOMStreamReader;
+import com.sun.xml.ws.streaming.DOMStreamReader;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.handler.WSS4JHandler;

@@ -145,6 +145,7 @@ public class Constants {
     public enum KeyIdentifierType {
         ISSUER_SERIAL,
         BST_DIRECT_REFERENCE,
+        BST_EMBEDDED,
         X509_KEY_IDENTIFIER,
         SKI_KEY_IDENTIFIER,
         THUMBPRINT_IDENTIFIER,
