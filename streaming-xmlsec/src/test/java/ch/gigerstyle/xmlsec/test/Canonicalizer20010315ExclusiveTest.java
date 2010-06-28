@@ -18,6 +18,7 @@ package ch.gigerstyle.xmlsec.test;
 
 import ch.gigerstyle.xmlsec.Canonicalizer20010315ExclWithCommentsTransformer;
 import ch.gigerstyle.xmlsec.Canonicalizer20010315WithCommentsTransformer;
+import ch.gigerstyle.xmlsec.Constants;
 import ch.gigerstyle.xmlsec.XMLEventNSAllocator;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -195,6 +196,52 @@ public class Canonicalizer20010315ExclusiveTest {
             System.out.println("Got:\n" + new String(baos.toByteArray(), "UTF-8"));
         }
 
+        assertTrue(equals);
+    }
+
+    @Test
+    public void testComplexDocexcl() throws Exception {
+
+        Canonicalizer20010315ExclWithCommentsTransformer c = new Canonicalizer20010315ExclWithCommentsTransformer(null);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        XMLEventReader xmlEventReader = xmlInputFactory.createXMLEventReader(
+                this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml")
+        );
+
+        XMLEvent xmlEvent = null;
+        while (xmlEventReader.hasNext()) {
+            xmlEvent = xmlEventReader.nextEvent();
+            if (xmlEvent.isStartElement() && xmlEvent.asStartElement().getName().equals(Constants.TAG_soap11_Body)) {
+                break;
+            }
+        }
+        while (xmlEventReader.hasNext()) {
+
+            c.transform(xmlEvent, baos);
+
+            if (xmlEvent.isEndElement() && xmlEvent.asEndElement().getName().equals(Constants.TAG_soap11_Body)) {
+                break;
+            }
+            xmlEvent = xmlEventReader.nextEvent();
+        }
+
+        byte[] reference = getBytesFromResource(this.getClass().getClassLoader().getResource("testdata/c14n/inExcl/plain-soap-c14nized.xml"));
+        boolean equals = java.security.MessageDigest.isEqual(reference, baos.toByteArray());
+
+        if (equals == false) {
+            System.out.println("Expected:\n" + new String(reference, "UTF-8"));
+            System.out.println("");
+            System.out.println("Got:\n" + new String(baos.toByteArray(), "UTF-8"));
+        }
+/*
+        for (int i = 0; i < reference.length; i++) {
+            if (reference[i] != baos.toByteArray()[i]) {
+                System.out.println("Expected diff: " + new String(reference, i - 10, 20));
+                System.out.println("Got diff: " + new String(baos.toByteArray(), i - 10, 20));
+                return;
+            }
+        }
+*/
         assertTrue(equals);
     }
 
