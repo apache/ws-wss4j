@@ -84,7 +84,7 @@ public class EncryptOutputProcessor extends AbstractOutputProcessor {
                         if (startElement.getName().getLocalPart().equals(securePart.getName())
                                 && startElement.getName().getNamespaceURI().equals(securePart.getNamespace())) {
 
-                            System.out.println("matched securePart for encryption");
+                            logger.debug("Matched securePart for encryption");
                             InternalEncryptionOutputProcessor internalEncryptionOutputProcessor = null;
                             try {
                                 EncryptionPartDef encryptionPartDef = new EncryptionPartDef();
@@ -429,7 +429,8 @@ public class EncryptOutputProcessor extends AbstractOutputProcessor {
                     encryptEvent(xmlEvent);
                 }
             } else {
-
+                encryptEvent(xmlEvent);
+                
                 OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
                 Iterator<Characters> charactersIterator = characterEventGeneratorOutputStream.getCharactersBuffer().iterator();
                 while (charactersIterator.hasNext()) {
