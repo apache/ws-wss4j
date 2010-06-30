@@ -62,9 +62,8 @@ public class InteroperabilityTest extends AbstractTestBase {
 
         InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml");
 
-        String action = WSHandlerConstants.NO_SERIALIZATION + " " + WSHandlerConstants.TIMESTAMP + " " + WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.ENCRYPT;
-
-        Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action);
+        String action = WSHandlerConstants.TIMESTAMP + " " + WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.ENCRYPT;
+        Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, new Properties());
 
         SecurityProperties securityProperties = new SecurityProperties();
         securityProperties.setCallbackHandler(new CallbackHandlerImpl());
@@ -99,6 +98,7 @@ public class InteroperabilityTest extends AbstractTestBase {
 
         InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml");
         ByteArrayOutputStream baos = doOutboundSecurity(securityProperties, sourceDocument);
+
         String action = WSHandlerConstants.TIMESTAMP + " " + WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.ENCRYPT;
         Document document = doInboundSecurityWithWSS4J(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action);
     }

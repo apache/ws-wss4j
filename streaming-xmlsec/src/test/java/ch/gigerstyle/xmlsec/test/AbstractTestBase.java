@@ -98,12 +98,12 @@ public abstract class AbstractTestBase {
         return baos;
     }
 
-    protected Document doOutboundSecurityWithWSS4J(InputStream sourceDocument, String action) throws WSSecurityException {
+    protected Document doOutboundSecurityWithWSS4J(InputStream sourceDocument, String action, Properties properties) throws WSSecurityException {
         WSS4JHandler wss4JHandler = new WSS4JHandler();
         HandlerInfo handlerInfo = new HandlerInfo();
         wss4JHandler.init(handlerInfo);
         MessageContext messageContext = getMessageContext(sourceDocument);
-        handlerInfo.getHandlerConfig().put(WSHandlerConstants.ACTION, action);
+        handlerInfo.getHandlerConfig().put(WSHandlerConstants.ACTION, WSHandlerConstants.NO_SERIALIZATION + " " + action);
         handlerInfo.getHandlerConfig().put(WSHandlerConstants.USER, "transmitter");
         Properties sigProperties = new Properties();
         sigProperties.setProperty("org.apache.ws.security.crypto.provider", "org.apache.ws.security.components.crypto.Merlin");
@@ -114,6 +114,23 @@ public abstract class AbstractTestBase {
         wss4JHandler.setPassword(messageContext, "refApp9876");
         messageContext.setProperty(WSHandlerConstants.SIG_PROP_REF_ID, "" + sigProperties.hashCode());
         messageContext.setProperty("" + sigProperties.hashCode(), sigProperties);
+
+        Properties encProperties = new Properties();
+        encProperties.setProperty("org.apache.ws.security.crypto.provider", "org.apache.ws.security.components.crypto.Merlin");
+        encProperties.setProperty("org.apache.ws.security.crypto.merlin.file", "transmitter.jks");
+        //sigProperties.setProperty("org.apache.ws.security.crypto.merlin.alias.password", "refApp9876");
+        encProperties.setProperty("org.apache.ws.security.crypto.merlin.keystore.password", "1234567890");
+        //sigProperties.setProperty("org.apache.ws.security.crypto.merlin.keystore.alias", "transmitter");
+        wss4JHandler.setPassword(messageContext, "refApp9876");
+        messageContext.setProperty(WSHandlerConstants.ENCRYPTION_USER, "receiver");
+        messageContext.setProperty(WSHandlerConstants.ENC_PROP_REF_ID, "" + encProperties.hashCode());
+        messageContext.setProperty("" + encProperties.hashCode(), encProperties);
+
+        Enumeration enumeration = properties.propertyNames();
+        while (enumeration.hasMoreElements()) {
+            String s = (String) enumeration.nextElement();
+            messageContext.setProperty(s, properties.getProperty(s));
+        }
 
         RequestData requestData = new RequestData();
         requestData.setMsgContext(messageContext);
@@ -140,6 +157,16 @@ public abstract class AbstractTestBase {
         messageContext.setProperty(WSHandlerConstants.SIG_PROP_REF_ID, "" + sigProperties.hashCode());
         messageContext.setProperty("" + sigProperties.hashCode(), sigProperties);
         messageContext.setProperty(WSHandlerConstants.PW_CALLBACK_REF, new WSS4JCallbackHandlerImpl());
+
+        Properties decProperties = new Properties();
+        decProperties.setProperty("org.apache.ws.security.crypto.provider", "org.apache.ws.security.components.crypto.Merlin");
+        decProperties.setProperty("org.apache.ws.security.crypto.merlin.file", "receiver.jks");
+        //sigProperties.setProperty("org.apache.ws.security.crypto.merlin.alias.password", "refApp9876");
+        decProperties.setProperty("org.apache.ws.security.crypto.merlin.keystore.password", "1234567890");
+        //sigProperties.setProperty("org.apache.ws.security.crypto.merlin.keystore.alias", "transmitter");
+        wss4JHandler.setPassword(messageContext, "refApp9876");
+        messageContext.setProperty(WSHandlerConstants.DEC_PROP_REF_ID, "" + decProperties.hashCode());
+        messageContext.setProperty("" + decProperties.hashCode(), decProperties);
 
         RequestData requestData = new RequestData();
         requestData.setMsgContext(messageContext);
