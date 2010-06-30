@@ -1,5 +1,8 @@
 package ch.gigerstyle.xmlsec;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import java.io.OutputStream;
 import java.security.MessageDigest;
 
@@ -25,10 +28,17 @@ import java.security.MessageDigest;
  */
 public class DigestOutputStream extends OutputStream {
 
+    protected static final transient Log log = LogFactory.getLog(DigestOutputStream.class);
+
     private MessageDigest messageDigest;
+
+    private StringBuffer stringBuffer;
 
     public DigestOutputStream(MessageDigest messageDigest) {
         this.messageDigest = messageDigest;
+        if (log.isDebugEnabled()) {
+            stringBuffer = new StringBuffer();
+        }
     }
 
     public void write(byte[] arg0) {
@@ -37,21 +47,25 @@ public class DigestOutputStream extends OutputStream {
 
     public void write(int arg0) {
         messageDigest.update((byte) arg0);
-        /*
-        System.out.print(new String(new byte[]{(byte)arg0}));
-        System.out.flush();
-        */
+        if (log.isDebugEnabled()) {
+            stringBuffer.append(new String(new byte[]{(byte)arg0}));
+        }
     }
 
     public void write(byte[] arg0, int arg1, int arg2) {
         messageDigest.update(arg0, arg1, arg2);
-        /*
-        System.out.print(new String(arg0, arg1, arg2));
-        System.out.flush();
-          */
+        if (log.isDebugEnabled()) {
+            stringBuffer.append(new String(arg0, arg1, arg2));
+        }
     }
 
     public byte[] getDigestValue() {
+        if (log.isDebugEnabled()) {
+            log.debug("Pre Digest: ");
+            log.debug(stringBuffer.toString());
+            log.debug("End pre Digest ");
+            stringBuffer = new StringBuffer();
+        }
         return messageDigest.digest();
     }
 }

@@ -19,6 +19,9 @@
 		        <appender-ref ref="STDOUT"/>
         </root>
         <logger name="ch.gigerstyle.xmlsec">
-                <level value="DEBUG"/>
+                <level value="INFO"/>
         </logger>
+    <logger name="org.apache.xml">
+        <level value="INFO"/>
+    </logger>
 </log4j:configuration>

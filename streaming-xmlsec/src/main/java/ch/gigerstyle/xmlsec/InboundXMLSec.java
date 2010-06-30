@@ -1,6 +1,8 @@
 package ch.gigerstyle.xmlsec;
 
 import ch.gigerstyle.xmlsec.processorImpl.input.*;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamException;
@@ -27,6 +29,8 @@ import javax.xml.stream.XMLStreamReader;
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 public class InboundXMLSec {
+
+    protected static final transient Log log = LogFactory.getLog(InboundXMLSec.class);
 
     private SecurityProperties securityProperties;
 
@@ -72,7 +76,7 @@ public class InboundXMLSec {
                     processorChain.reset();
                     processorChain.doFinal();
 
-                    System.out.println("Chain processing time: " + (System.currentTimeMillis() - start));
+                    log.debug("Chain processing time: " + (System.currentTimeMillis() - start));
 
                 } catch (Exception e) {
                     throw new RuntimeException(e);

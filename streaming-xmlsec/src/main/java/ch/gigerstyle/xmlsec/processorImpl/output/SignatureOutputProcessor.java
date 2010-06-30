@@ -65,7 +65,7 @@ public class SignatureOutputProcessor extends AbstractOutputProcessor {
                         if (startElement.getName().getLocalPart().equals(securePart.getName())
                                 && startElement.getName().getNamespaceURI().equals(securePart.getNamespace())) {
 
-                            System.out.println("matched securePart for signature");
+                            logger.debug("Matched securePart for signature");
                             InternalSignatureOutputProcessor internalSignatureOutputProcessor = null;
                             try {
                                 SignaturePartDef signaturePartDef = new SignaturePartDef();
@@ -437,7 +437,7 @@ public class SignatureOutputProcessor extends AbstractOutputProcessor {
                     }
 
                     String calculatedDigest = new String(org.bouncycastle.util.encoders.Base64.encode(this.digestOutputStream.getDigestValue()));
-                    System.out.println("Calculated Digest: " + calculatedDigest);
+                    logger.debug("Calculated Digest: " + calculatedDigest);
                     signaturePartDef.setDigestValue(calculatedDigest);
 
                     outputProcessorChain.removeProcessor(this);

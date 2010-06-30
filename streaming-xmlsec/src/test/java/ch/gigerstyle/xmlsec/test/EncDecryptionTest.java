@@ -10,6 +10,8 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.Transformer;
@@ -21,6 +23,7 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.security.KeyStore;
 import java.security.cert.X509Certificate;
 
@@ -49,7 +52,7 @@ public class EncDecryptionTest extends AbstractTestBase {
     @Test
     public void testEncDecryptionDefaultConfiguration() throws Exception {
 
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ByteArrayOutputStream baos;
         {
             SecurityProperties securityProperties = new SecurityProperties();
             Constants.Action[] actions = new Constants.Action[]{Constants.Action.ENCRYPT};
@@ -57,12 +60,9 @@ public class EncDecryptionTest extends AbstractTestBase {
             securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "1234567890".toCharArray());
             securityProperties.setEncryptionUser("receiver");
 
-            OutboundXMLSec xmlSecOut = XMLSec.getOutboundXMLSec(securityProperties);
-            XMLStreamWriter xmlStreamWriter = xmlSecOut.processOutMessage(baos);
-            XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml"));
-            XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
-            xmlStreamWriter.close();
-
+            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml");
+            baos = doOutboundSecurity(securityProperties, sourceDocument);
+            
             Document document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
             NodeList nodeList = document.getElementsByTagNameNS(Constants.TAG_xenc_EncryptedKey.getNamespaceURI(), Constants.TAG_xenc_EncryptedKey.getLocalPart());
             Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), Constants.TAG_wsse_Security.getLocalPart());
@@ -100,10 +100,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             SecurityProperties securityProperties = new SecurityProperties();
             securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "1234567890".toCharArray());
             securityProperties.setCallbackHandler(new CallbackHandlerImpl());
-            InboundXMLSec xmlSec = XMLSec.getInboundXMLSec(securityProperties);
-            XMLStreamReader xmlStreamReader = xmlSec.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
-
-            Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
+            Document document = doInboundSecurity(securityProperties, new ByteArrayInputStream(baos.toByteArray()));
 
             //header element must still be there
             NodeList nodeList = document.getElementsByTagNameNS(Constants.TAG_xenc_EncryptedKey.getNamespaceURI(), Constants.TAG_xenc_EncryptedKey.getLocalPart());
@@ -119,7 +116,7 @@ public class EncDecryptionTest extends AbstractTestBase {
     @Test
     public void testEncDecryptionPartsContent() throws Exception {
 
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ByteArrayOutputStream baos;
         {
             SecurityProperties securityProperties = new SecurityProperties();
             Constants.Action[] actions = new Constants.Action[]{Constants.Action.ENCRYPT};
@@ -128,11 +125,8 @@ public class EncDecryptionTest extends AbstractTestBase {
             securityProperties.setEncryptionUser("receiver");
             securityProperties.addEncryptionSecurePart(new SecurePart("complexType", "http://www.w3.org/1999/XMLSchema", "Content"));
 
-            OutboundXMLSec xmlSecOut = XMLSec.getOutboundXMLSec(securityProperties);
-            XMLStreamWriter xmlStreamWriter = xmlSecOut.processOutMessage(baos);
-            XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml"));
-            XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
-            xmlStreamWriter.close();
+            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml");
+            baos = doOutboundSecurity(securityProperties, sourceDocument);
 
             Document document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
             NodeList nodeList = document.getElementsByTagNameNS(Constants.TAG_xenc_EncryptedKey.getNamespaceURI(), Constants.TAG_xenc_EncryptedKey.getLocalPart());
@@ -166,10 +160,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             SecurityProperties securityProperties = new SecurityProperties();
             securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "1234567890".toCharArray());
             securityProperties.setCallbackHandler(new CallbackHandlerImpl());
-            InboundXMLSec xmlSec = XMLSec.getInboundXMLSec(securityProperties);
-            XMLStreamReader xmlStreamReader = xmlSec.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
-
-            Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
+            Document document = doInboundSecurity(securityProperties, new ByteArrayInputStream(baos.toByteArray()));
 
             //header element must still be there
             NodeList nodeList = document.getElementsByTagNameNS(Constants.TAG_xenc_EncryptedKey.getNamespaceURI(), Constants.TAG_xenc_EncryptedKey.getLocalPart());
@@ -185,7 +176,7 @@ public class EncDecryptionTest extends AbstractTestBase {
     @Test
     public void testEncDecryptionPartsElement() throws Exception {
 
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ByteArrayOutputStream baos;
         {
             SecurityProperties securityProperties = new SecurityProperties();
             Constants.Action[] actions = new Constants.Action[]{Constants.Action.ENCRYPT};
@@ -194,11 +185,9 @@ public class EncDecryptionTest extends AbstractTestBase {
             securityProperties.setEncryptionUser("receiver");
             securityProperties.addEncryptionSecurePart(new SecurePart("complexType", "http://www.w3.org/1999/XMLSchema", "Element"));
 
-            OutboundXMLSec xmlSecOut = XMLSec.getOutboundXMLSec(securityProperties);
-            XMLStreamWriter xmlStreamWriter = xmlSecOut.processOutMessage(baos);
-            XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml"));
-            XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
-            xmlStreamWriter.close();
+            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml");
+
+            baos = doOutboundSecurity(securityProperties, sourceDocument);
 
             Document document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
             NodeList nodeList = document.getElementsByTagNameNS(Constants.TAG_xenc_EncryptedKey.getNamespaceURI(), Constants.TAG_xenc_EncryptedKey.getLocalPart());
@@ -219,10 +208,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             SecurityProperties securityProperties = new SecurityProperties();
             securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "1234567890".toCharArray());
             securityProperties.setCallbackHandler(new CallbackHandlerImpl());
-            InboundXMLSec xmlSec = XMLSec.getInboundXMLSec(securityProperties);
-            XMLStreamReader xmlStreamReader = xmlSec.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
-
-            Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
+            Document document = doInboundSecurity(securityProperties, new ByteArrayInputStream(baos.toByteArray()));
 
             //header element must still be there
             NodeList nodeList = document.getElementsByTagNameNS(Constants.TAG_xenc_EncryptedKey.getNamespaceURI(), Constants.TAG_xenc_EncryptedKey.getLocalPart());
@@ -238,7 +224,7 @@ public class EncDecryptionTest extends AbstractTestBase {
     @Test
     public void testEncDecryptionUseThisCert() throws Exception {
 
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ByteArrayOutputStream baos;
         {
             SecurityProperties securityProperties = new SecurityProperties();
             Constants.Action[] actions = new Constants.Action[]{Constants.Action.ENCRYPT};
@@ -248,11 +234,9 @@ public class EncDecryptionTest extends AbstractTestBase {
             keyStore.load(this.getClass().getClassLoader().getResourceAsStream("receiver.jks"), "1234567890".toCharArray());
             securityProperties.setEncryptionUseThisCertificate((X509Certificate) keyStore.getCertificate("receiver"));
 
-            OutboundXMLSec xmlSecOut = XMLSec.getOutboundXMLSec(securityProperties);
-            XMLStreamWriter xmlStreamWriter = xmlSecOut.processOutMessage(baos);
-            XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml"));
-            XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
-            xmlStreamWriter.close();
+            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml");
+
+            baos = doOutboundSecurity(securityProperties, sourceDocument);
 
             Document document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
             NodeList nodeList = document.getElementsByTagNameNS(Constants.TAG_xenc_EncryptedKey.getNamespaceURI(), Constants.TAG_xenc_EncryptedKey.getLocalPart());
@@ -283,10 +267,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             SecurityProperties securityProperties = new SecurityProperties();
             securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "1234567890".toCharArray());
             securityProperties.setCallbackHandler(new CallbackHandlerImpl());
-            InboundXMLSec xmlSec = XMLSec.getInboundXMLSec(securityProperties);
-            XMLStreamReader xmlStreamReader = xmlSec.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
-
-            Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
+            Document document = doInboundSecurity(securityProperties, new ByteArrayInputStream(baos.toByteArray()));
 
             //header element must still be there
             NodeList nodeList = document.getElementsByTagNameNS(Constants.TAG_xenc_EncryptedKey.getNamespaceURI(), Constants.TAG_xenc_EncryptedKey.getLocalPart());
@@ -302,7 +283,7 @@ public class EncDecryptionTest extends AbstractTestBase {
     @Test
     public void testEncDecryptionKeyIdentifierIssuerSerial() throws Exception {
 
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ByteArrayOutputStream baos;
         {
             SecurityProperties securityProperties = new SecurityProperties();
             Constants.Action[] actions = new Constants.Action[]{Constants.Action.ENCRYPT};
@@ -311,11 +292,9 @@ public class EncDecryptionTest extends AbstractTestBase {
             securityProperties.setEncryptionUser("receiver");
             securityProperties.setEncryptionKeyIdentifierType(Constants.KeyIdentifierType.ISSUER_SERIAL);
 
-            OutboundXMLSec xmlSecOut = XMLSec.getOutboundXMLSec(securityProperties);
-            XMLStreamWriter xmlStreamWriter = xmlSecOut.processOutMessage(baos);
-            XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml"));
-            XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
-            xmlStreamWriter.close();
+            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml");
+
+            baos = doOutboundSecurity(securityProperties, sourceDocument);
 
             Document document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
             NodeList nodeList = document.getElementsByTagNameNS(Constants.TAG_xenc_EncryptedKey.getNamespaceURI(), Constants.TAG_xenc_EncryptedKey.getLocalPart());
@@ -337,10 +316,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             SecurityProperties securityProperties = new SecurityProperties();
             securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "1234567890".toCharArray());
             securityProperties.setCallbackHandler(new CallbackHandlerImpl());
-            InboundXMLSec xmlSec = XMLSec.getInboundXMLSec(securityProperties);
-            XMLStreamReader xmlStreamReader = xmlSec.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
-
-            Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
+            Document document = doInboundSecurity(securityProperties, new ByteArrayInputStream(baos.toByteArray()));
 
             //header element must still be there
             NodeList nodeList = document.getElementsByTagNameNS(Constants.TAG_xenc_EncryptedKey.getNamespaceURI(), Constants.TAG_xenc_EncryptedKey.getLocalPart());
@@ -356,7 +332,7 @@ public class EncDecryptionTest extends AbstractTestBase {
     @Test
     public void testEncDecryptionKeyIdentifierBinarySecurityTokenDirectReference() throws Exception {
 
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ByteArrayOutputStream baos;
         {
             SecurityProperties securityProperties = new SecurityProperties();
             Constants.Action[] actions = new Constants.Action[]{Constants.Action.ENCRYPT};
@@ -365,11 +341,9 @@ public class EncDecryptionTest extends AbstractTestBase {
             securityProperties.setEncryptionUser("receiver");
             securityProperties.setEncryptionKeyIdentifierType(Constants.KeyIdentifierType.BST_DIRECT_REFERENCE);
 
-            OutboundXMLSec xmlSecOut = XMLSec.getOutboundXMLSec(securityProperties);
-            XMLStreamWriter xmlStreamWriter = xmlSecOut.processOutMessage(baos);
-            XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml"));
-            XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
-            xmlStreamWriter.close();
+            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml");
+
+            baos = doOutboundSecurity(securityProperties, sourceDocument);
 
             Document document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
             NodeList nodeList = document.getElementsByTagNameNS(Constants.TAG_xenc_EncryptedKey.getNamespaceURI(), Constants.TAG_xenc_EncryptedKey.getLocalPart());
@@ -391,10 +365,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             SecurityProperties securityProperties = new SecurityProperties();
             securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "1234567890".toCharArray());
             securityProperties.setCallbackHandler(new CallbackHandlerImpl());
-            InboundXMLSec xmlSec = XMLSec.getInboundXMLSec(securityProperties);
-            XMLStreamReader xmlStreamReader = xmlSec.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
-
-            Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
+            Document document = doInboundSecurity(securityProperties, new ByteArrayInputStream(baos.toByteArray()));
 
             //header element must still be there
             NodeList nodeList = document.getElementsByTagNameNS(Constants.TAG_xenc_EncryptedKey.getNamespaceURI(), Constants.TAG_xenc_EncryptedKey.getLocalPart());
@@ -410,7 +381,7 @@ public class EncDecryptionTest extends AbstractTestBase {
     @Test
     public void testEncDecryptionKeyIdentifierBinarySecurityTokenEmbedded() throws Exception {
 
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ByteArrayOutputStream baos;
         {
             SecurityProperties securityProperties = new SecurityProperties();
             Constants.Action[] actions = new Constants.Action[]{Constants.Action.ENCRYPT};
@@ -419,11 +390,9 @@ public class EncDecryptionTest extends AbstractTestBase {
             securityProperties.setEncryptionUser("receiver");
             securityProperties.setEncryptionKeyIdentifierType(Constants.KeyIdentifierType.BST_EMBEDDED);
 
-            OutboundXMLSec xmlSecOut = XMLSec.getOutboundXMLSec(securityProperties);
-            XMLStreamWriter xmlStreamWriter = xmlSecOut.processOutMessage(baos);
-            XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml"));
-            XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
-            xmlStreamWriter.close();
+            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml");
+
+            baos = doOutboundSecurity(securityProperties, sourceDocument);
 
             Document document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
             NodeList nodeList = document.getElementsByTagNameNS(Constants.TAG_xenc_EncryptedKey.getNamespaceURI(), Constants.TAG_xenc_EncryptedKey.getLocalPart());
@@ -445,10 +414,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             SecurityProperties securityProperties = new SecurityProperties();
             securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "1234567890".toCharArray());
             securityProperties.setCallbackHandler(new CallbackHandlerImpl());
-            InboundXMLSec xmlSec = XMLSec.getInboundXMLSec(securityProperties);
-            XMLStreamReader xmlStreamReader = xmlSec.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
-
-            Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
+            Document document = doInboundSecurity(securityProperties, new ByteArrayInputStream(baos.toByteArray()));
 
             //header element must still be there
             NodeList nodeList = document.getElementsByTagNameNS(Constants.TAG_xenc_EncryptedKey.getNamespaceURI(), Constants.TAG_xenc_EncryptedKey.getLocalPart());
@@ -464,7 +430,7 @@ public class EncDecryptionTest extends AbstractTestBase {
     @Test
     public void testEncDecryptionKeyIdentifierX509Key() throws Exception {
 
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ByteArrayOutputStream baos;
         {
             SecurityProperties securityProperties = new SecurityProperties();
             Constants.Action[] actions = new Constants.Action[]{Constants.Action.ENCRYPT};
@@ -472,12 +438,9 @@ public class EncDecryptionTest extends AbstractTestBase {
             securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "1234567890".toCharArray());
             securityProperties.setEncryptionUser("receiver");
             securityProperties.setEncryptionKeyIdentifierType(Constants.KeyIdentifierType.X509_KEY_IDENTIFIER);
+            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml");
 
-            OutboundXMLSec xmlSecOut = XMLSec.getOutboundXMLSec(securityProperties);
-            XMLStreamWriter xmlStreamWriter = xmlSecOut.processOutMessage(baos);
-            XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml"));
-            XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
-            xmlStreamWriter.close();
+            baos = doOutboundSecurity(securityProperties, sourceDocument);
 
             Document document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
             NodeList nodeList = document.getElementsByTagNameNS(Constants.TAG_xenc_EncryptedKey.getNamespaceURI(), Constants.TAG_xenc_EncryptedKey.getLocalPart());
@@ -499,10 +462,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             SecurityProperties securityProperties = new SecurityProperties();
             securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "1234567890".toCharArray());
             securityProperties.setCallbackHandler(new CallbackHandlerImpl());
-            InboundXMLSec xmlSec = XMLSec.getInboundXMLSec(securityProperties);
-            XMLStreamReader xmlStreamReader = xmlSec.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
-
-            Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
+            Document document = doInboundSecurity(securityProperties, new ByteArrayInputStream(baos.toByteArray()));
 
             //header element must still be there
             NodeList nodeList = document.getElementsByTagNameNS(Constants.TAG_xenc_EncryptedKey.getNamespaceURI(), Constants.TAG_xenc_EncryptedKey.getLocalPart());
@@ -518,7 +478,7 @@ public class EncDecryptionTest extends AbstractTestBase {
     @Test
     public void testEncDecryptionKeyIdentifierSubjectKey() throws Exception {
 
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ByteArrayOutputStream baos;
         {
             SecurityProperties securityProperties = new SecurityProperties();
             Constants.Action[] actions = new Constants.Action[]{Constants.Action.ENCRYPT};
@@ -527,11 +487,9 @@ public class EncDecryptionTest extends AbstractTestBase {
             securityProperties.setEncryptionUser("receiver");
             securityProperties.setEncryptionKeyIdentifierType(Constants.KeyIdentifierType.SKI_KEY_IDENTIFIER);
 
-            OutboundXMLSec xmlSecOut = XMLSec.getOutboundXMLSec(securityProperties);
-            XMLStreamWriter xmlStreamWriter = xmlSecOut.processOutMessage(baos);
-            XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml"));
-            XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
-            xmlStreamWriter.close();
+            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml");
+
+            baos = doOutboundSecurity(securityProperties, sourceDocument);
 
             Document document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
             NodeList nodeList = document.getElementsByTagNameNS(Constants.TAG_xenc_EncryptedKey.getNamespaceURI(), Constants.TAG_xenc_EncryptedKey.getLocalPart());
@@ -553,10 +511,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             SecurityProperties securityProperties = new SecurityProperties();
             securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "1234567890".toCharArray());
             securityProperties.setCallbackHandler(new CallbackHandlerImpl());
-            InboundXMLSec xmlSec = XMLSec.getInboundXMLSec(securityProperties);
-            XMLStreamReader xmlStreamReader = xmlSec.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
-
-            Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
+            Document document = doInboundSecurity(securityProperties, new ByteArrayInputStream(baos.toByteArray()));
 
             //header element must still be there
             NodeList nodeList = document.getElementsByTagNameNS(Constants.TAG_xenc_EncryptedKey.getNamespaceURI(), Constants.TAG_xenc_EncryptedKey.getLocalPart());
@@ -572,7 +527,7 @@ public class EncDecryptionTest extends AbstractTestBase {
     @Test
     public void testEncDecryptionKeyIdentifierThumbprint() throws Exception {
 
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ByteArrayOutputStream baos;
         {
             SecurityProperties securityProperties = new SecurityProperties();
             Constants.Action[] actions = new Constants.Action[]{Constants.Action.ENCRYPT};
@@ -581,11 +536,9 @@ public class EncDecryptionTest extends AbstractTestBase {
             securityProperties.setEncryptionUser("receiver");
             securityProperties.setEncryptionKeyIdentifierType(Constants.KeyIdentifierType.THUMBPRINT_IDENTIFIER);
 
-            OutboundXMLSec xmlSecOut = XMLSec.getOutboundXMLSec(securityProperties);
-            XMLStreamWriter xmlStreamWriter = xmlSecOut.processOutMessage(baos);
-            XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml"));
-            XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
-            xmlStreamWriter.close();
+            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml");
+
+            baos = doOutboundSecurity(securityProperties, sourceDocument);
 
             Document document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
             NodeList nodeList = document.getElementsByTagNameNS(Constants.TAG_xenc_EncryptedKey.getNamespaceURI(), Constants.TAG_xenc_EncryptedKey.getLocalPart());
@@ -607,10 +560,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             SecurityProperties securityProperties = new SecurityProperties();
             securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "1234567890".toCharArray());
             securityProperties.setCallbackHandler(new CallbackHandlerImpl());
-            InboundXMLSec xmlSec = XMLSec.getInboundXMLSec(securityProperties);
-            XMLStreamReader xmlStreamReader = xmlSec.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
-
-            Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
+            Document document = doInboundSecurity(securityProperties, new ByteArrayInputStream(baos.toByteArray()));
 
             //header element must still be there
             NodeList nodeList = document.getElementsByTagNameNS(Constants.TAG_xenc_EncryptedKey.getNamespaceURI(), Constants.TAG_xenc_EncryptedKey.getLocalPart());
@@ -626,7 +576,7 @@ public class EncDecryptionTest extends AbstractTestBase {
     @Test
     public void testDecryptionReferenceListOutsideEncryptedKey() throws Exception {
 
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ByteArrayOutputStream baos;
         {
             SecurityProperties securityProperties = new SecurityProperties();
             Constants.Action[] actions = new Constants.Action[]{Constants.Action.ENCRYPT};
@@ -635,11 +585,9 @@ public class EncDecryptionTest extends AbstractTestBase {
             securityProperties.setEncryptionUser("receiver");
             securityProperties.setEncryptionKeyIdentifierType(Constants.KeyIdentifierType.ISSUER_SERIAL);
 
-            OutboundXMLSec xmlSecOut = XMLSec.getOutboundXMLSec(securityProperties);
-            XMLStreamWriter xmlStreamWriter = xmlSecOut.processOutMessage(baos);
-            XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml"));
-            XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
-            xmlStreamWriter.close();
+            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml");
+
+            baos = doOutboundSecurity(securityProperties, sourceDocument);
 
             Document document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
             NodeList nodeList = document.getElementsByTagNameNS(Constants.TAG_xenc_EncryptedKey.getNamespaceURI(), Constants.TAG_xenc_EncryptedKey.getLocalPart());
@@ -668,10 +616,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             SecurityProperties securityProperties = new SecurityProperties();
             securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "1234567890".toCharArray());
             securityProperties.setCallbackHandler(new CallbackHandlerImpl());
-            InboundXMLSec xmlSec = XMLSec.getInboundXMLSec(securityProperties);
-            XMLStreamReader xmlStreamReader = xmlSec.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
-
-            Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
+            Document document = doInboundSecurity(securityProperties, new ByteArrayInputStream(baos.toByteArray()));
 
             //header element must still be there
             NodeList nodeList = document.getElementsByTagNameNS(Constants.TAG_xenc_EncryptedKey.getNamespaceURI(), Constants.TAG_xenc_EncryptedKey.getLocalPart());

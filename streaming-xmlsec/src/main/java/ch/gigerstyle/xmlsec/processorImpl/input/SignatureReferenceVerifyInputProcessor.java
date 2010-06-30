@@ -132,9 +132,9 @@ public class SignatureReferenceVerifyInputProcessor extends AbstractInputProcess
                     inputProcessorChain.removeProcessor(this);
 
                     byte[] calculatedDigest = this.digestOutputStream.getDigestValue();
-                    System.out.println("Calculated Digest: " + new String(org.bouncycastle.util.encoders.Base64.encode(calculatedDigest)));
                     byte[] storedDigest = org.bouncycastle.util.encoders.Base64.decode(referenceType.getDigestValue());
-                    System.out.println("Stored Digest: " + new String(org.bouncycastle.util.encoders.Base64.encode(storedDigest)));
+                    logger.debug("Calculated Digest: " + new String(org.bouncycastle.util.encoders.Base64.encode(calculatedDigest)));
+                    logger.debug("Stored Digest: " + new String(org.bouncycastle.util.encoders.Base64.encode(storedDigest)));
 
                     if (!MessageDigest.isEqual(storedDigest, calculatedDigest)) {
                         throw new XMLSecurityException("Digest verification failed");
