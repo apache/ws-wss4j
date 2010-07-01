@@ -338,8 +338,8 @@ public class Canonicalizer20010315Transformer implements Transformer {
 
                     //hashMapStack.pop();
                     outputStack.pop();
-
-                    if (endElement.getName().equals(rootElement)) {
+                    //todo the size() test is probably enough 
+                    if (outputStack.size() == 0 && endElement.getName().equals(rootElement)) {
                         documentLevel=NODE_AFTER_DOCUMENT_ELEMENT;
                     }
 
