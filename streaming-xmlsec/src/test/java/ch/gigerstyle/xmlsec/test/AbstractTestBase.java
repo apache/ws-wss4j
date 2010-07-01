@@ -66,6 +66,9 @@ import java.util.*;
  */
 public abstract class AbstractTestBase {
 
+    //javax.xml.transform.Transformer transformer = TransformerFactory.newInstance().newTransformer();
+    //transformer.transform(new StreamSource(new ByteArrayInputStream(baos.toByteArray())), new StreamResult(System.out));
+
     protected static final XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
     protected DocumentBuilderFactory documentBuilderFactory;
 

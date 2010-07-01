@@ -3,6 +3,8 @@ package ch.gigerstyle.xmlsec.test;
 import ch.gigerstyle.xmlsec.*;
 import ch.gigerstyle.xmlsec.test.utils.StAX2DOM;
 import ch.gigerstyle.xmlsec.test.utils.XmlReaderToWriter;
+import com.sun.xml.ws.streaming.DOMStreamReader;
+import org.apache.ws.security.handler.WSHandlerConstants;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.w3c.dom.Document;
@@ -12,10 +14,15 @@ import org.w3c.dom.NodeList;
 
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.util.Properties;
 
 /**
  * User: giger
@@ -40,7 +47,7 @@ import java.io.ByteArrayOutputStream;
 public class SignatureTest extends AbstractTestBase {
 
     @Test
-    public void testSignatureDefaultConfiguration() throws Exception {
+    public void testSignatureDefaultConfigurationOutbound() throws Exception {
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
@@ -74,10 +81,31 @@ public class SignatureTest extends AbstractTestBase {
 
         //done signature; now test sig-verification:
         {
+            String action = WSHandlerConstants.SIGNATURE;
+            doInboundSecurityWithWSS4J(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action);
+        }
+    }
+
+    @Test
+    public void testSignatureDefaultConfigurationInbound() throws Exception {
+
+        Document securedDocument;
+        {
+            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml");
+            String action = WSHandlerConstants.SIGNATURE;
+            securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, new Properties());
+
+            //some test that we can really sure we get what we want from WSS4J
+            NodeList nodeList = securedDocument.getElementsByTagNameNS(Constants.TAG_dsig_Signature.getNamespaceURI(), Constants.TAG_dsig_Signature.getLocalPart());
+            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), Constants.TAG_wsse_Security.getLocalPart());
+        }
+
+        //done signature; now test sig-verification:
+        {
             SecurityProperties securityProperties = new SecurityProperties();
             securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "1234567890".toCharArray());
             InboundXMLSec xmlSec = XMLSec.getInboundXMLSec(securityProperties);
-            XMLStreamReader xmlStreamReader = xmlSec.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
+            XMLStreamReader xmlStreamReader = xmlSec.processInMessage(new DOMStreamReader(securedDocument));
 
             Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
 
@@ -89,7 +117,7 @@ public class SignatureTest extends AbstractTestBase {
     }
 
     @Test
-    public void testSignatureParts() throws Exception {
+    public void testSignaturePartsOutbound() throws Exception {
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
@@ -129,10 +157,33 @@ public class SignatureTest extends AbstractTestBase {
 
         //done signature; now test sig-verification:
         {
+            String action = WSHandlerConstants.SIGNATURE;
+            doInboundSecurityWithWSS4J(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action);
+        }
+    }
+
+    @Test
+    public void testSignaturePartsInbound() throws Exception {
+
+        Document securedDocument;
+        {
+            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml");
+            String action = WSHandlerConstants.SIGNATURE;
+            Properties properties = new Properties();
+            properties.setProperty(WSHandlerConstants.SIGNATURE_PARTS, "{Element}{http://www.w3.org/1999/XMLSchema}complexType;");
+            securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
+
+            //some test that we can really sure we get what we want from WSS4J
+            NodeList nodeList = securedDocument.getElementsByTagNameNS(Constants.TAG_dsig_Signature.getNamespaceURI(), Constants.TAG_dsig_Signature.getLocalPart());
+            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), Constants.TAG_wsse_Security.getLocalPart());
+        }
+
+        //done signature; now test sig-verification:
+        {
             SecurityProperties securityProperties = new SecurityProperties();
             securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "1234567890".toCharArray());
             InboundXMLSec xmlSec = XMLSec.getInboundXMLSec(securityProperties);
-            XMLStreamReader xmlStreamReader = xmlSec.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
+            XMLStreamReader xmlStreamReader = xmlSec.processInMessage(new DOMStreamReader(securedDocument));
 
             Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
 
@@ -144,7 +195,7 @@ public class SignatureTest extends AbstractTestBase {
     }
 
     @Test
-    public void testSignatureKeyIdentifierIssuerSerial() throws Exception {
+    public void testSignatureKeyIdentifierIssuerSerialOutbound() throws Exception {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
         {
@@ -182,10 +233,34 @@ public class SignatureTest extends AbstractTestBase {
 
         //done signature; now test sig-verification:
         {
+            String action = WSHandlerConstants.SIGNATURE;
+            doInboundSecurityWithWSS4J(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action);
+        }
+    }
+
+    @Test
+    public void testSignatureKeyIdentifierIssuerSerialInbound() throws Exception {
+
+        Document securedDocument;
+        {
+            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml");
+            String action = WSHandlerConstants.SIGNATURE;
+            Properties properties = new Properties();
+            properties.setProperty(WSHandlerConstants.SIG_KEY_ID, "IssuerSerial");
+            securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
+
+            //some test that we can really sure we get what we want from WSS4J
+            XPathExpression xPathExpression = getXPath("/env:Envelope/env:Header/wsse:Security/dsig:Signature/dsig:KeyInfo/wsse:SecurityTokenReference/dsig:X509Data/dsig:X509IssuerSerial/dsig:X509SerialNumber");
+            Node node = (Node) xPathExpression.evaluate(securedDocument, XPathConstants.NODE);
+            Assert.assertNotNull(node);
+        }
+
+        //done signature; now test sig-verification:
+        {
             SecurityProperties securityProperties = new SecurityProperties();
             securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "1234567890".toCharArray());
             InboundXMLSec xmlSec = XMLSec.getInboundXMLSec(securityProperties);
-            XMLStreamReader xmlStreamReader = xmlSec.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
+            XMLStreamReader xmlStreamReader = xmlSec.processInMessage(new DOMStreamReader(securedDocument));
 
             Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
 
@@ -197,7 +272,7 @@ public class SignatureTest extends AbstractTestBase {
     }
 
     @Test
-    public void testSignatureKeyIdentifierBinarySecurityTokenDirectReference() throws Exception {
+    public void testSignatureKeyIdentifierBinarySecurityTokenDirectReferenceOutbound() throws Exception {
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
@@ -236,10 +311,34 @@ public class SignatureTest extends AbstractTestBase {
 
         //done signature; now test sig-verification:
         {
+            String action = WSHandlerConstants.SIGNATURE;
+            doInboundSecurityWithWSS4J(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action);
+        }
+    }
+
+    @Test
+    public void testSignatureKeyIdentifierBinarySecurityTokenDirectReferenceInbound() throws Exception {
+
+        Document securedDocument;
+        {
+            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml");
+            String action = WSHandlerConstants.SIGNATURE;
+            Properties properties = new Properties();
+            properties.setProperty(WSHandlerConstants.SIG_KEY_ID, "DirectReference");
+            securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
+
+            //some test that we can really sure we get what we want from WSS4J
+            XPathExpression xPathExpression = getXPath("/env:Envelope/env:Header/wsse:Security/wsse:BinarySecurityToken");
+            Node node = (Node) xPathExpression.evaluate(securedDocument, XPathConstants.NODE);
+            Assert.assertNotNull(node);
+        }
+
+        //done signature; now test sig-verification:
+        {
             SecurityProperties securityProperties = new SecurityProperties();
             securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "1234567890".toCharArray());
             InboundXMLSec xmlSec = XMLSec.getInboundXMLSec(securityProperties);
-            XMLStreamReader xmlStreamReader = xmlSec.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
+            XMLStreamReader xmlStreamReader = xmlSec.processInMessage(new DOMStreamReader(securedDocument));
 
             Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
 
@@ -305,7 +404,7 @@ public class SignatureTest extends AbstractTestBase {
     }
 
     @Test
-    public void testSignatureKeyIdentifierX509Key() throws Exception {
+    public void testSignatureKeyIdentifierX509KeyOutbound() throws Exception {
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
@@ -344,10 +443,34 @@ public class SignatureTest extends AbstractTestBase {
 
         //done signature; now test sig-verification:
         {
+            String action = WSHandlerConstants.SIGNATURE;
+            doInboundSecurityWithWSS4J(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action);
+        }
+    }
+
+    @Test
+    public void testSignatureKeyIdentifierX509KeyInbound() throws Exception {
+
+        Document securedDocument;
+        {
+            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml");
+            String action = WSHandlerConstants.SIGNATURE;
+            Properties properties = new Properties();
+            properties.setProperty(WSHandlerConstants.SIG_KEY_ID, "X509KeyIdentifier");
+            securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
+
+            //some test that we can really sure we get what we want from WSS4J
+            XPathExpression xPathExpression = getXPath("/env:Envelope/env:Header/wsse:Security/dsig:Signature/dsig:KeyInfo/wsse:SecurityTokenReference/wsse:KeyIdentifier[@ValueType='http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0#X509v3']");
+            Node node = (Node) xPathExpression.evaluate(securedDocument, XPathConstants.NODE);
+            Assert.assertNotNull(node);
+        }
+
+        //done signature; now test sig-verification:
+        {
             SecurityProperties securityProperties = new SecurityProperties();
             securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "1234567890".toCharArray());
             InboundXMLSec xmlSec = XMLSec.getInboundXMLSec(securityProperties);
-            XMLStreamReader xmlStreamReader = xmlSec.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
+            XMLStreamReader xmlStreamReader = xmlSec.processInMessage(new DOMStreamReader(securedDocument));
 
             Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
 
@@ -359,7 +482,7 @@ public class SignatureTest extends AbstractTestBase {
     }
 
     @Test
-    public void testSignatureKeyIdentifierSubjectKey() throws Exception {
+    public void testSignatureKeyIdentifierSubjectKeyOutbound() throws Exception {
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
@@ -398,10 +521,34 @@ public class SignatureTest extends AbstractTestBase {
 
         //done signature; now test sig-verification:
         {
+            String action = WSHandlerConstants.SIGNATURE;
+            doInboundSecurityWithWSS4J(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action);
+        }
+    }
+
+    @Test
+    public void testSignatureKeyIdentifierSubjectKeyInbound() throws Exception {
+
+        Document securedDocument;
+        {
+            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml");
+            String action = WSHandlerConstants.SIGNATURE;
+            Properties properties = new Properties();
+            properties.setProperty(WSHandlerConstants.SIG_KEY_ID, "SKIKeyIdentifier");
+            securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
+
+            //some test that we can really sure we get what we want from WSS4J
+            XPathExpression xPathExpression = getXPath("/env:Envelope/env:Header/wsse:Security/dsig:Signature/dsig:KeyInfo/wsse:SecurityTokenReference/wsse:KeyIdentifier[@ValueType='http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0#X509SubjectKeyIdentifier']");
+            Node node = (Node) xPathExpression.evaluate(securedDocument, XPathConstants.NODE);
+            Assert.assertNotNull(node);
+        }
+
+        //done signature; now test sig-verification:
+        {
             SecurityProperties securityProperties = new SecurityProperties();
             securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "1234567890".toCharArray());
             InboundXMLSec xmlSec = XMLSec.getInboundXMLSec(securityProperties);
-            XMLStreamReader xmlStreamReader = xmlSec.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
+            XMLStreamReader xmlStreamReader = xmlSec.processInMessage(new DOMStreamReader(securedDocument));
 
             Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
 
@@ -413,10 +560,9 @@ public class SignatureTest extends AbstractTestBase {
     }
 
     @Test
-    public void testSignatureKeyIdentifierThumbprint() throws Exception {
+    public void testSignatureKeyIdentifierThumbprintOutbound() throws Exception {
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-
         {
             SecurityProperties securityProperties = new SecurityProperties();
             Constants.Action[] actions = new Constants.Action[]{Constants.Action.SIGNATURE};
@@ -452,10 +598,34 @@ public class SignatureTest extends AbstractTestBase {
 
         //done signature; now test sig-verification:
         {
+            String action = WSHandlerConstants.SIGNATURE;
+            doInboundSecurityWithWSS4J(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action);
+        }
+    }
+
+    @Test
+    public void testSignatureKeyIdentifierThumbprintInbound() throws Exception {
+
+        Document securedDocument;
+        {
+            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml");
+            String action = WSHandlerConstants.SIGNATURE;
+            Properties properties = new Properties();
+            properties.setProperty(WSHandlerConstants.SIG_KEY_ID, "Thumbprint");
+            securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
+
+            //some test that we can really sure we get what we want from WSS4J
+            XPathExpression xPathExpression = getXPath("/env:Envelope/env:Header/wsse:Security/dsig:Signature/dsig:KeyInfo/wsse:SecurityTokenReference/wsse:KeyIdentifier[@ValueType='http://docs.oasis-open.org/wss/oasis-wss-soap-message-security-1.1#ThumbprintSHA1']");
+            Node node = (Node) xPathExpression.evaluate(securedDocument, XPathConstants.NODE);
+            Assert.assertNotNull(node);
+        }
+
+        //done signature; now test sig-verification:
+        {
             SecurityProperties securityProperties = new SecurityProperties();
             securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "1234567890".toCharArray());
             InboundXMLSec xmlSec = XMLSec.getInboundXMLSec(securityProperties);
-            XMLStreamReader xmlStreamReader = xmlSec.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
+            XMLStreamReader xmlStreamReader = xmlSec.processInMessage(new DOMStreamReader(securedDocument));
 
             Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
 

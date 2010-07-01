@@ -353,7 +353,7 @@ public class SignatureOutputProcessor extends AbstractOutputProcessor {
                 createEndElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_wsse_SecurityTokenReference);
                 createEndElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_dsig_KeyInfo);
                 createEndElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_dsig_Signature);
-                
+
                 outputProcessorChain.removeProcessor(this);
 
                 /*
@@ -415,15 +415,13 @@ public class SignatureOutputProcessor extends AbstractOutputProcessor {
 
         @Override
         public void processEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException {
+
+            for (int i = 0; i < transformers.size(); i++) {
+                Transformer transformer = transformers.get(i);
+                transformer.transform(xmlEvent, this.digestOutputStream);
+            }
+
             if (xmlEvent.isStartElement()) {
-
-                StartElement startElement = xmlEvent.asStartElement();
-
-                for (int i = 0; i < transformers.size(); i++) {
-                    Transformer transformer = transformers.get(i);
-                    transformer.transform(xmlEvent, this.digestOutputStream);
-                }
-
                 elementCounter++;
             } else if (xmlEvent.isEndElement()) {
                 elementCounter--;
@@ -431,11 +429,6 @@ public class SignatureOutputProcessor extends AbstractOutputProcessor {
                 EndElement endElement = xmlEvent.asEndElement();
 
                 if (endElement.getName().equals(this.startElement) && elementCounter == 0) {
-                    for (int i = 0; i < transformers.size(); i++) {
-                        Transformer transformer = transformers.get(i);
-                        transformer.transform(xmlEvent, this.digestOutputStream);
-                    }
-
                     String calculatedDigest = new String(org.bouncycastle.util.encoders.Base64.encode(this.digestOutputStream.getDigestValue()));
                     logger.debug("Calculated Digest: " + calculatedDigest);
                     signaturePartDef.setDigestValue(calculatedDigest);
@@ -443,16 +436,6 @@ public class SignatureOutputProcessor extends AbstractOutputProcessor {
                     outputProcessorChain.removeProcessor(this);
                     //from now on signature is possible again
                     activeInternalSignatureOutputProcessor = null;
-                } else {
-                    for (int i = 0; i < transformers.size(); i++) {
-                        Transformer transformer = transformers.get(i);
-                        transformer.transform(xmlEvent, this.digestOutputStream);
-                    }
-                }
-            } else {
-                for (int i = 0; i < transformers.size(); i++) {
-                    Transformer transformer = transformers.get(i);
-                    transformer.transform(xmlEvent, this.digestOutputStream);
                 }
             }
             outputProcessorChain.processEvent(xmlEvent);
