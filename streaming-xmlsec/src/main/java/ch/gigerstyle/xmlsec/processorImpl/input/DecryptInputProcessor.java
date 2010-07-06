@@ -254,5 +254,6 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
                 throw new XMLSecurityException("Some encryption references where not processed... Probably security header ordering problem?");
             }
         }
+        inputProcessorChain.doFinal();
     }
 }

@@ -81,6 +81,7 @@ public class SignatureReferenceVerifyInputProcessor extends AbstractInputProcess
                 throw new XMLSecurityException("Some signature references where not processed... Probably security header ordering problem?");
             }
         }
+        inputProcessorChain.doFinal();
     }
 
     class InternalSignatureReferenceVerifier extends AbstractInputProcessor {
