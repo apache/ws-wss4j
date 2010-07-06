@@ -29,10 +29,10 @@ public final class XmlReaderToWriter {
     public static void writeAll(XMLStreamReader xmlr, XMLStreamWriter writer)
             throws XMLStreamException {
         while (xmlr.hasNext()) {
-            write(xmlr, writer);
             xmlr.next();
+            write(xmlr, writer);
         }
-        write(xmlr, writer); // write the last element
+        //write(xmlr, writer); // write the last element
         writer.flush();
     }
 

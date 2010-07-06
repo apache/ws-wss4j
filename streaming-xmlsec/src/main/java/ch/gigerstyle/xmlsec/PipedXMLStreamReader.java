@@ -315,7 +315,7 @@ public class PipedXMLStreamReader implements XMLStreamReader {
         } else if (closedByReader) {
             throw new XMLStreamException("Pipe closed");
         } else if (writeSide != null && !writeSide.isAlive()
-                && !closedByWriter && (in < 0)) {
+                && !closedByWriter) {
             throw new XMLStreamException("Write end dead");
         }
 

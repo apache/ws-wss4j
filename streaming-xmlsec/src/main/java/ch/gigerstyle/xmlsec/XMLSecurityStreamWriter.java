@@ -108,7 +108,7 @@ public class XMLSecurityStreamWriter implements XMLStreamWriter {
     }
 
     public void writeEmptyElement(String namespaceURI, String localName) throws XMLStreamException {
-        outputOpenStartElement();
+        outputOpenStartElement();        
         chainProcessEvent(xmlEventFactory.createStartElement(null, namespaceURI, localName));
         chainProcessEvent(xmlEventFactory.createEndElement(null, namespaceURI, localName));
     }
@@ -127,15 +127,15 @@ public class XMLSecurityStreamWriter implements XMLStreamWriter {
 
     public void writeEndElement() throws XMLStreamException {
         outputOpenStartElement();
-        chainProcessEvent(xmlEventFactory.createEndElement(startElementStack.pop(), null));
+        //chainProcessEvent(xmlEventFactory.createEndElement(startElementStack.pop(), null));
+        chainProcessEvent(xmlEventNSAllocator.createEndElement(startElementStack.pop()));
     }
 
     public void writeEndDocument() throws XMLStreamException {
         outputOpenStartElement();
         Iterator<QName> startElements = startElementStack.iterator();
         while (startElements.hasNext()) {
-            QName qName = startElements.next();
-            chainProcessEvent(xmlEventFactory.createEndElement(startElementStack.pop(), null));
+            chainProcessEvent(xmlEventNSAllocator.createEndElement(startElementStack.pop()));
         }
     }
 

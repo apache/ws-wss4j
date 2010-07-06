@@ -221,8 +221,12 @@ public class XMLEventNSAllocator implements XMLEventAllocator {
                 comparableAttributeList.add(new ComparableAttribute(attribute));
                 String prefix = qNameStringEntry.getKey().getPrefix();
                 if (!prefixList.contains(prefix)) {
-
+                    /*
                     if (prefix != null && "".equals(prefix) && "".equals(attribute.getName().getNamespaceURI())) {
+                        continue;
+                    }
+                    */
+                    if (prefix != null && prefix.length() == 0 && attribute.getName().getNamespaceURI().length() == 0) {
                         continue;
                     }
 
@@ -257,7 +261,12 @@ public class XMLEventNSAllocator implements XMLEventAllocator {
             Namespace namespace = namespaces.get(i);
             String prefix = namespace.getPrefix();
 
+            /*
             if (prefix != null && "".equals(prefix) && "".equals(namespace.getNamespaceURI())) {
+                continue;
+            }
+            */
+            if (prefix != null && prefix.length() == 0 && namespace.getNamespaceURI().length() == 0) {
                 continue;
             }
 
@@ -277,7 +286,12 @@ public class XMLEventNSAllocator implements XMLEventAllocator {
             comparableAttributeList.add(new ComparableAttribute(attribute));
             String prefix = attribute.getName().getPrefix();
 
+            /*
             if (prefix != null && "".equals(prefix) && "".equals(attribute.getName().getNamespaceURI())) {
+                continue;
+            }             
+            */
+            if (prefix != null && prefix.length() == 0 && attribute.getName().getNamespaceURI().length() == 0) {
                 continue;
             }
 
@@ -291,7 +305,11 @@ public class XMLEventNSAllocator implements XMLEventAllocator {
 
         nsStack.push(comparableNamespaceList);
         attrStack.push(comparableAttributeList);
-
+        //todo we have a little problem;-) every call to createStartElement methods must have an equivalent call to createEndElement to hold the stack small and correct!!   
+        /*
+        System.out.println("NS Size: " + nsStack.size());
+        System.out.println("Attr Size: " + attrStack.size());
+        */
         return new XMLEventNS(Constants.xmlEventFactory.createStartElement(element, attributeList.iterator(), namespaceList.iterator()), nsStack.toArray(new List[nsStack.size()]), attrStack.toArray(new List[attrStack.size()]));
     }
 
@@ -299,10 +317,12 @@ public class XMLEventNSAllocator implements XMLEventAllocator {
         List<Namespace> namespaceList = new ArrayList<Namespace>();
         namespaceList.add(Constants.xmlEventFactory.createNamespace(element.getPrefix(), element.getNamespaceURI()));
 
+        XMLEventNS xmlEventNS = new XMLEventNS(Constants.xmlEventFactory.createEndElement(element, namespaceList.iterator()), nsStack.toArray(new List[nsStack.size()]), attrStack.toArray(new List[attrStack.size()]));
+
         nsStack.pop();
         attrStack.pop();
 
-        return new XMLEventNS(Constants.xmlEventFactory.createEndElement(element, namespaceList.iterator()), nsStack.toArray(new List[nsStack.size()]), attrStack.toArray(new List[attrStack.size()]));
+        return xmlEventNS; 
     }
 
     public Characters createCharacters(String characters) {

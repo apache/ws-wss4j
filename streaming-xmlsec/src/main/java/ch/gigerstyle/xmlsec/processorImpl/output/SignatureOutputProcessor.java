@@ -91,6 +91,8 @@ public class SignatureOutputProcessor extends AbstractOutputProcessor {
                                     attributeList.add(attribute);
                                 }
                                 attributeList.add(securityContext.<XMLEventNSAllocator>get("XMLEventNSAllocator").createAttribute(Constants.ATT_wsu_Id, signaturePartDef.getSigRefId()));
+                                //todo this event should probably be allocated directly and not with our allocator to hold the stack consistent
+                                //or also generate the matching endElement...
                                 xmlEvent = securityContext.<XMLEventNSAllocator>get("XMLEventNSAllocator").createStartElement(startElement.getName(), namespaceList, attributeList);
 
                             } catch (NoSuchAlgorithmException e) {
