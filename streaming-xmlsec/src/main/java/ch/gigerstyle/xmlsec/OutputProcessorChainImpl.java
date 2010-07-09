@@ -36,6 +36,10 @@ public class OutputProcessorChainImpl implements OutputProcessorChain {
         xmlSecurityContext = new XMLSecurityContext();
     }
 
+    public OutputProcessorChainImpl(XMLSecurityContext xmlSecurityContext) {
+        this.xmlSecurityContext = xmlSecurityContext;
+    }
+
     public int getPos() {
         return pos;
     }
@@ -45,12 +49,6 @@ public class OutputProcessorChainImpl implements OutputProcessorChain {
     }
 
     public int getPosAndIncrement() {
-        /*
-        if (this.pos >= outputProcessors.size()) {
-            this.pos = 0;
-        }
-        System.out.println("Main chain increment" + this.pos);
-        */
         return this.pos++;
     }
 
@@ -75,8 +73,7 @@ public class OutputProcessorChainImpl implements OutputProcessorChain {
             }
             System.out.println("Adding internal enc proc at pos " + pos);
             this.outputProcessors.add(pos, outputProcessor);
-        }
-        else if (outputProcessor.getClass().getName().equals("ch.gigerstyle.xmlsec.processorImpl.output.SignatureOutputProcessor$InternalSignatureOutputProcessor")) {
+        } else if (outputProcessor.getClass().getName().equals("ch.gigerstyle.xmlsec.processorImpl.output.SignatureOutputProcessor$InternalSignatureOutputProcessor")) {
             int pos = this.outputProcessors.size() - 1;
             for (int i = 0; i < outputProcessors.size(); i++) {
                 OutputProcessor processor = outputProcessors.get(i);
@@ -88,12 +85,10 @@ public class OutputProcessorChainImpl implements OutputProcessorChain {
             }
             this.outputProcessors.add(pos, outputProcessor);
             System.out.println("Adding internal sig proc at pos " + pos);
-        }
-        else if (outputProcessor.getClass().getName().equals("ch.gigerstyle.xmlsec.processorImpl.output.BinarySecurityTokenOutputProcessor")) {
+        } else if (outputProcessor.getClass().getName().equals("ch.gigerstyle.xmlsec.processorImpl.output.BinarySecurityTokenOutputProcessor")) {
             this.outputProcessors.add(this.outputProcessors.size() - 1, outputProcessor);
             System.out.println("Adding internal bst proc at pos " + (this.outputProcessors.size() - 1));
-        }
-        else if (outputProcessor.getClass().getName().equals("ch.gigerstyle.xmlsec.processorImpl.output.SignatureOutputProcessor$SignedInfoProcessor")) {
+        } else if (outputProcessor.getClass().getName().equals("ch.gigerstyle.xmlsec.processorImpl.output.SignatureOutputProcessor$SignedInfoProcessor")) {
             int pos = this.outputProcessors.size() - 1;
             for (int i = 0; i < outputProcessors.size(); i++) {
                 OutputProcessor processor = outputProcessors.get(i);
@@ -105,22 +100,16 @@ public class OutputProcessorChainImpl implements OutputProcessorChain {
             }
             this.outputProcessors.add(pos, outputProcessor);
             System.out.println("Adding internal sig-info proc at pos " + (this.outputProcessors.size() - 1));
-        }
-        else {
+        } else {
             this.outputProcessors.add(outputProcessor);
         }
-        /*
-        for (int i = 0; i < outputProcessors.size(); i++) {
-            System.out.println("New Processor Chain: pos: " + i + " name: " + outputProcessors.get(i).getClass().getName());
-        }
-        */
     }
 
     public void removeProcessor(OutputProcessor outputProcessor) {
         if (this.outputProcessors.indexOf(outputProcessor) <= getPos()) {
             this.pos--;
         }
-        
+
         //System.out.println("Removing proc " + outputProcessor.getClass().getName() + " from pos " + outputProcessors.indexOf(outputProcessor));
         this.outputProcessors.remove(outputProcessor);
     }
@@ -146,11 +135,11 @@ public class OutputProcessorChainImpl implements OutputProcessorChain {
         private int startPos;
 
         OutputProcessorSubChainImpl(XMLSecurityContext securityContext, int pos, List<OutputProcessor> outputProcessors) {
-            this.xmlSecurityContext = securityContext;
+            super(securityContext);
             this.startPos = this.pos = pos;
             //we don't clone the list to get updates in the sublist too!
             this.outputProcessors = outputProcessors;
-        }        
+        }
 
         public void reset() {
             this.pos = startPos;

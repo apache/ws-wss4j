@@ -7,16 +7,14 @@ import com.sun.mail.util.BASE64EncoderStream;
 import org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_secext_1_0.BinarySecurityTokenType;
 
 import javax.crypto.*;
+import javax.crypto.CipherOutputStream;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.Characters;
 import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
-import java.io.BufferedOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.StringWriter;
+import java.io.*;
 import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.MessageDigest;
@@ -190,8 +188,7 @@ public class EncryptOutputProcessor extends AbstractOutputProcessor {
                     createEndElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_dsig_X509SerialNumber);
                     createEndElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_dsig_X509IssuerSerial);
                     createEndElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_dsig_X509Data);
-                }
-                else if (getSecurityProperties().getEncryptionKeyIdentifierType() == Constants.KeyIdentifierType.SKI_KEY_IDENTIFIER) {
+                } else if (getSecurityProperties().getEncryptionKeyIdentifierType() == Constants.KeyIdentifierType.SKI_KEY_IDENTIFIER) {
                     // As per the 1.1 specification, SKI can only be used for a V3 certificate
                     if (x509Certificate.getVersion() != 3) {
                         throw new XMLSecurityException("invalidCertForSKI");
@@ -208,8 +205,7 @@ public class EncryptOutputProcessor extends AbstractOutputProcessor {
                         throw new XMLSecurityException(e);
                     }
                     createEndElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_wsse_KeyIdentifier);
-                }
-                else if (getSecurityProperties().getEncryptionKeyIdentifierType() == Constants.KeyIdentifierType.X509_KEY_IDENTIFIER) {
+                } else if (getSecurityProperties().getEncryptionKeyIdentifierType() == Constants.KeyIdentifierType.X509_KEY_IDENTIFIER) {
 
                     attributes = new HashMap<QName, String>();
                     attributes.put(Constants.ATT_NULL_EncodingType, Constants.SOAPMESSAGE_NS10_BASE64_ENCODING);
@@ -221,8 +217,7 @@ public class EncryptOutputProcessor extends AbstractOutputProcessor {
                         throw new XMLSecurityException(e);
                     }
                     createEndElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_wsse_KeyIdentifier);
-                }
-                else if (getSecurityProperties().getEncryptionKeyIdentifierType() == Constants.KeyIdentifierType.THUMBPRINT_IDENTIFIER) {
+                } else if (getSecurityProperties().getEncryptionKeyIdentifierType() == Constants.KeyIdentifierType.THUMBPRINT_IDENTIFIER) {
 
                     attributes = new HashMap<QName, String>();
                     attributes.put(Constants.ATT_NULL_EncodingType, Constants.SOAPMESSAGE_NS10_BASE64_ENCODING);
@@ -242,8 +237,7 @@ public class EncryptOutputProcessor extends AbstractOutputProcessor {
                         throw new XMLSecurityException(e);
                     }
                     createEndElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_wsse_KeyIdentifier);
-                }
-                else if (getSecurityProperties().getEncryptionKeyIdentifierType() == Constants.KeyIdentifierType.BST_EMBEDDED) {
+                } else if (getSecurityProperties().getEncryptionKeyIdentifierType() == Constants.KeyIdentifierType.BST_EMBEDDED) {
                     attributes = new HashMap<QName, String>();
                     attributes.put(Constants.ATT_NULL_URI, "#" + certUri);
                     attributes.put(Constants.ATT_NULL_ValueType, Constants.NS_X509_V3_TYPE);
@@ -261,7 +255,7 @@ public class EncryptOutputProcessor extends AbstractOutputProcessor {
                         throw new XMLSecurityException(e);
                     }
                     createEndElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_wsse_BinarySecurityToken);
-                    
+
                     createEndElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_wsse_Reference);
                 } else if (getSecurityProperties().getEncryptionKeyIdentifierType() == Constants.KeyIdentifierType.BST_DIRECT_REFERENCE) {
 
@@ -309,7 +303,7 @@ public class EncryptOutputProcessor extends AbstractOutputProcessor {
 
                 createEndElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_xenc_CipherValue);
                 createEndElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_xenc_CipherData);
-                
+
                 createStartElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_xenc_ReferenceList, null);
 
                 for (int i = 0; i < encryptionPartDefList.size(); i++) {
@@ -357,9 +351,8 @@ public class EncryptOutputProcessor extends AbstractOutputProcessor {
 
         XMLEventNSAllocator xmlEventNSAllocator;
         private EncryptionPartDef encryptionPartDef;
-        private Cipher symmetricCipher;
         private CharacterEventGeneratorOutputStream characterEventGeneratorOutputStream;
-        private BufferedOutputStream base64EncoderStream;
+        private Writer streamWriter;
 
         private QName startElement;
         private int elementCounter = 0;
@@ -370,18 +363,22 @@ public class EncryptOutputProcessor extends AbstractOutputProcessor {
             this.encryptionPartDef = encryptionPartDef;
             this.startElement = startElement;
 
-            characterEventGeneratorOutputStream = new CharacterEventGeneratorOutputStream(xmlEventNSAllocator);
-            base64EncoderStream = new BufferedOutputStream(new BASE64EncoderStream(characterEventGeneratorOutputStream));
-
             String jceAlgorithm = JCEAlgorithmMapper.translateURItoJCEID(securityProperties.getEncryptionSymAlgorithm());
-            symmetricCipher = Cipher.getInstance(jceAlgorithm);
+            Cipher symmetricCipher = Cipher.getInstance(jceAlgorithm);
 
             // Should internally generate an IV
             // todo - allow user to set an IV
             symmetricCipher.init(Cipher.ENCRYPT_MODE, encryptionPartDef.getSymmetricKey());
             byte[] iv = symmetricCipher.getIV();
 
+            characterEventGeneratorOutputStream = new CharacterEventGeneratorOutputStream(xmlEventNSAllocator);
+            //Base64EncoderStream calls write every 78byte (line breaks). So we have to buffer again to get optimal performance
+            //todo play around to find optimal size
+            BASE64EncoderStream base64EncoderStream = new BASE64EncoderStream(new BufferedOutputStream(characterEventGeneratorOutputStream));
             base64EncoderStream.write(iv);
+
+            CipherOutputStream cipherOutputStream = new CipherOutputStream(base64EncoderStream, symmetricCipher);
+            streamWriter = new BufferedWriter(new OutputStreamWriter(cipherOutputStream), symmetricCipher.getBlockSize() * 2); //todo encoding?
         }
 
         public void processEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException {
@@ -405,10 +402,9 @@ public class EncryptOutputProcessor extends AbstractOutputProcessor {
                 }
 
                 elementCounter++;
-                //System.out.println("Instance: " + this.hashCode() + " Incr " + elementCounter);
+
             } else if (xmlEvent.isEndElement()) {
                 elementCounter--;
-                //System.out.println("Instance: " + this.hashCode() + " Decr " + elementCounter);
 
                 EndElement endElement = xmlEvent.asEndElement();
 
@@ -430,7 +426,7 @@ public class EncryptOutputProcessor extends AbstractOutputProcessor {
                 }
             } else {
                 encryptEvent(xmlEvent);
-                
+
                 OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
                 Iterator<Characters> charactersIterator = characterEventGeneratorOutputStream.getCharactersBuffer().iterator();
                 while (charactersIterator.hasNext()) {
@@ -447,14 +443,7 @@ public class EncryptOutputProcessor extends AbstractOutputProcessor {
         }
 
         private void encryptEvent(XMLEvent xmlEvent) throws XMLStreamException {
-            StringWriter stringWriter = new StringWriter();
-            xmlEvent.writeAsEncodedUnicode(stringWriter);
-
-            try {
-                base64EncoderStream.write(symmetricCipher.update(stringWriter.toString().getBytes()));
-            } catch (IOException e) {
-                throw new XMLStreamException(e);
-            }
+            xmlEvent.writeAsEncodedUnicode(streamWriter);
         }
 
         public void processHeaderEventInternal(OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException {
@@ -504,14 +493,9 @@ public class EncryptOutputProcessor extends AbstractOutputProcessor {
         public void doFinalInternal(OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException {
 
             try {
-                base64EncoderStream.write(symmetricCipher.doFinal());
-                base64EncoderStream.close();
+                streamWriter.close();
             } catch (IOException e) {
                 throw new XMLStreamException(e);
-            } catch (BadPaddingException e) {
-                throw new XMLSecurityException(e.getMessage(), e);
-            } catch (IllegalBlockSizeException e) {
-                throw new XMLSecurityException(e.getMessage(), e);
             }
             Iterator<Characters> charactersIterator = characterEventGeneratorOutputStream.getCharactersBuffer().iterator();
             while (charactersIterator.hasNext()) {

@@ -11,7 +11,9 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.*;
+import java.io.BufferedOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.security.*;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
@@ -400,6 +402,7 @@ public class SignatureOutputProcessor extends AbstractOutputProcessor {
         private QName startElement;
         private int elementCounter = 0;
 
+        private OutputStream bufferedDigestOutputStream;
         private DigestOutputStream digestOutputStream;
         private List<Transformer> transformers = new ArrayList<Transformer>();
 
@@ -410,7 +413,8 @@ public class SignatureOutputProcessor extends AbstractOutputProcessor {
 
             String algorithmID = JCEAlgorithmMapper.translateURItoJCEID(getSecurityProperties().getSignatureDigestAlgorithm());
             MessageDigest messageDigest = MessageDigest.getInstance(algorithmID, "BC");
-            digestOutputStream = new DigestOutputStream(messageDigest);
+            this.digestOutputStream = new DigestOutputStream(messageDigest);
+            this.bufferedDigestOutputStream = new BufferedOutputStream(digestOutputStream);
 
             transformers.add(new Canonicalizer20010315ExclOmitCommentsTransformer(null));
         }
@@ -420,7 +424,7 @@ public class SignatureOutputProcessor extends AbstractOutputProcessor {
 
             for (int i = 0; i < transformers.size(); i++) {
                 Transformer transformer = transformers.get(i);
-                transformer.transform(xmlEvent, this.digestOutputStream);
+                transformer.transform(xmlEvent, this.bufferedDigestOutputStream);
             }
 
             if (xmlEvent.isStartElement()) {
@@ -431,6 +435,11 @@ public class SignatureOutputProcessor extends AbstractOutputProcessor {
                 EndElement endElement = xmlEvent.asEndElement();
 
                 if (endElement.getName().equals(this.startElement) && elementCounter == 0) {
+                    try {
+                        bufferedDigestOutputStream.close();
+                    } catch (IOException e) {
+                        throw new XMLSecurityException(e);
+                    }
                     String calculatedDigest = new String(org.bouncycastle.util.encoders.Base64.encode(this.digestOutputStream.getDigestValue()));
                     logger.debug("Calculated Digest: " + calculatedDigest);
                     signaturePartDef.setDigestValue(calculatedDigest);
@@ -452,20 +461,24 @@ public class SignatureOutputProcessor extends AbstractOutputProcessor {
     class SignedInfoProcessor extends AbstractOutputProcessor {
 
         private SignerOutputStream signerOutputStream;
+        private OutputStream bufferedSignerOutputStream;
         private Canonicalizer20010315Transformer canonicalizer20010315Transformer;
-        private byte[] signatureValue;
 
         SignedInfoProcessor(SecurityProperties securityProperties, Signature signature) throws XMLSecurityException {
             super(securityProperties);
 
             signerOutputStream = new SignerOutputStream(signature);
+            bufferedSignerOutputStream = new BufferedOutputStream(signerOutputStream);
             canonicalizer20010315Transformer = new Canonicalizer20010315ExclOmitCommentsTransformer(null);
         }
 
         public byte[] getSignatureValue() throws XMLSecurityException {
             try {
+                bufferedSignerOutputStream.close();
                 return signerOutputStream.sign();
             } catch (SignatureException e) {
+                throw new XMLSecurityException(e);
+            } catch (IOException e) {
                 throw new XMLSecurityException(e);
             }
         }
@@ -477,7 +490,7 @@ public class SignatureOutputProcessor extends AbstractOutputProcessor {
 
         @Override
         public void processHeaderEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException {
-            canonicalizer20010315Transformer.transform(xmlEvent, signerOutputStream);
+            canonicalizer20010315Transformer.transform(xmlEvent, bufferedSignerOutputStream);
             outputProcessorChain.processHeaderEvent(xmlEvent);
         }
     }
