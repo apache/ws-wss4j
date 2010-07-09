@@ -2,6 +2,9 @@ package ch.gigerstyle.xmlsec.processorImpl.input;
 
 import ch.gigerstyle.xmlsec.*;
 import ch.gigerstyle.xmlsec.config.JCEAlgorithmMapper;
+import java.io.BufferedOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import org.w3._2000._09.xmldsig_.ReferenceType;
 import org.w3._2000._09.xmldsig_.SignatureType;
 
@@ -66,9 +69,6 @@ public class SignatureReferenceVerifyInputProcessor extends AbstractInputProcess
             }
         }
 
-        if (xmlEvent.isEndElement()) {
-            EndElement endElement = xmlEvent.asEndElement();
-        }
         inputProcessorChain.processEvent(xmlEvent);
     }
 
@@ -89,6 +89,7 @@ public class SignatureReferenceVerifyInputProcessor extends AbstractInputProcess
 
         private List<Transformer> transformers = new ArrayList<Transformer>();
         private DigestOutputStream digestOutputStream;
+        private OutputStream bufferedDigestOutputStream;
         //todo: startElement still needed?? Is elementCounter not enough? Test overall code
         private QName startElement;
         private int elementCounter = 0;
@@ -110,6 +111,7 @@ public class SignatureReferenceVerifyInputProcessor extends AbstractInputProcess
             String digestAlgorithm = JCEAlgorithmMapper.translateURItoJCEID(referenceType.getDigestMethod().getAlgorithm());
             MessageDigest messageDigest = MessageDigest.getInstance(digestAlgorithm, "BC");
             this.digestOutputStream = new DigestOutputStream(messageDigest);
+            this.bufferedDigestOutputStream = new BufferedOutputStream(this.digestOutputStream);
         }
 
         private void buildTransformerChain() {
@@ -120,7 +122,7 @@ public class SignatureReferenceVerifyInputProcessor extends AbstractInputProcess
 
             for (int i = 0; i < transformers.size(); i++) {
                 Transformer transformer = transformers.get(i);
-                transformer.transform(xmlEvent, this.digestOutputStream);
+                transformer.transform(xmlEvent, this.bufferedDigestOutputStream);
             }
 
             if (xmlEvent.isStartElement()) {
@@ -129,17 +131,25 @@ public class SignatureReferenceVerifyInputProcessor extends AbstractInputProcess
                 EndElement endElement = xmlEvent.asEndElement();
                 elementCounter--;
 
-                if (endElement.getName().equals(startElement) && elementCounter == 0) {
-                    inputProcessorChain.removeProcessor(this);
+                if (endElement.getName().equals(startElement) && elementCounter == 0) {                    
+                    try {
+                        bufferedDigestOutputStream.close();
+                    } catch (IOException e) {
+                        throw new XMLSecurityException(e);
+                    }
 
                     byte[] calculatedDigest = this.digestOutputStream.getDigestValue();
                     byte[] storedDigest = org.bouncycastle.util.encoders.Base64.decode(referenceType.getDigestValue());
-                    logger.debug("Calculated Digest: " + new String(org.bouncycastle.util.encoders.Base64.encode(calculatedDigest)));
-                    logger.debug("Stored Digest: " + new String(org.bouncycastle.util.encoders.Base64.encode(storedDigest)));
+                    
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("Calculated Digest: " + new String(org.bouncycastle.util.encoders.Base64.encode(calculatedDigest)));
+                        logger.debug("Stored Digest: " + new String(org.bouncycastle.util.encoders.Base64.encode(storedDigest)));
+                    }
 
                     if (!MessageDigest.isEqual(storedDigest, calculatedDigest)) {
                         throw new XMLSecurityException("Digest verification failed");
-                    }                    
+                    }
+                    inputProcessorChain.removeProcessor(this);
                 }
             }
         }

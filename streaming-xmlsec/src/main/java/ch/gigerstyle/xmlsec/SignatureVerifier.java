@@ -1,6 +1,9 @@
 package ch.gigerstyle.xmlsec;
 
 import ch.gigerstyle.xmlsec.config.JCEAlgorithmMapper;
+import java.io.BufferedOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import org.bouncycastle.util.encoders.Base64;
 import org.w3._2000._09.xmldsig_.KeyInfoType;
 import org.w3._2000._09.xmldsig_.SignatureType;
@@ -38,6 +41,7 @@ public class SignatureVerifier {
     private SecurityProperties securityProperties;
 
     private SignerOutputStream signerOutputStream;
+    private OutputStream bufferedSignerOutputStream;
     private Canonicalizer20010315Transformer canonicalizer20010315Transformer = new Canonicalizer20010315ExclOmitCommentsTransformer(null);
 
     public SignatureVerifier(SignatureType signatureType, SecurityContext securityContext, SecurityProperties securityProperties) throws XMLSecurityException {
@@ -62,19 +66,23 @@ public class SignatureVerifier {
         securityToken.verify();
         signature.initVerify(securityToken.getPublicKey());
         signerOutputStream = new SignerOutputStream(signature);
+        bufferedSignerOutputStream = new BufferedOutputStream(signerOutputStream);
     }
 
     public void processEvent(XMLEvent xmlEvent) throws XMLStreamException {
-        canonicalizer20010315Transformer.transform(xmlEvent, signerOutputStream);
+        canonicalizer20010315Transformer.transform(xmlEvent, bufferedSignerOutputStream);
     }
 
     public void doFinal() throws XMLSecurityException {
         try {
+            bufferedSignerOutputStream.close();
             if (!signerOutputStream.verify(Base64.decode(signatureType.getSignatureValue().getValue()))) {
                 throw new XMLSecurityException("Signature verification failed");
             }
         } catch (SignatureException e) {
-            throw new XMLSecurityException(e.getMessage(), e);
+            throw new XMLSecurityException(e);
+        } catch (IOException e) {
+            throw new XMLSecurityException(e);
         }
     }
 }

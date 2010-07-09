@@ -3,8 +3,13 @@ package ch.gigerstyle.xmlsec;
 import com.ctc.wstx.evt.DefaultEventAllocator;
 
 import javax.xml.namespace.QName;
-import javax.xml.stream.*;
-import javax.xml.stream.events.*;
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.events.Attribute;
+import javax.xml.stream.events.Characters;
+import javax.xml.stream.events.Namespace;
+import javax.xml.stream.events.XMLEvent;
 import javax.xml.stream.util.XMLEventAllocator;
 import javax.xml.stream.util.XMLEventConsumer;
 import java.util.*;
@@ -42,150 +47,53 @@ public class XMLEventNSAllocator implements XMLEventAllocator {
     }
 
     public XMLEvent allocate(XMLStreamReader reader) throws XMLStreamException {
-        Boolean isNamespaceAware = (Boolean)reader.getProperty(XMLInputFactory.IS_NAMESPACE_AWARE);
-        if (isNamespaceAware == null || isNamespaceAware.equals(Boolean.TRUE)) {
-            if (reader.getEventType() == XMLStreamConstants.START_ELEMENT) {
+        if (reader.getEventType() == XMLStreamConstants.START_ELEMENT) {
 
-                List<ComparableNamespace> namespaceList = new ArrayList<ComparableNamespace>();
-                for (int i = 0; i < reader.getNamespaceCount(); i++) {
-                    Namespace namespace;
-                    if (reader.getNamespacePrefix(i) == null) {
-                        namespace = Constants.xmlEventFactory.createNamespace(reader.getNamespaceURI(i));
-                    } else {
-                        namespace = Constants.xmlEventFactory.createNamespace(reader.getNamespacePrefix(i), reader.getNamespaceURI(i));
-                    }
-                    namespaceList.add(new ComparableNamespace(namespace));
+            List<ComparableNamespace> namespaceList = new ArrayList<ComparableNamespace>();
+            for (int i = 0; i < reader.getNamespaceCount(); i++) {
+                Namespace namespace;
+                if (reader.getNamespacePrefix(i) == null) {
+                    namespace = Constants.xmlEventFactory.createNamespace(reader.getNamespaceURI(i));
+                } else {
+                    namespace = Constants.xmlEventFactory.createNamespace(reader.getNamespacePrefix(i), reader.getNamespaceURI(i));
                 }
-
-                List<ComparableAttribute> attributeList = new ArrayList<ComparableAttribute>();
-                for (int i = 0; i < reader.getAttributeCount(); i++) {
-                    QName attrName = reader.getAttributeName(i);
-                    if (!"xml".equals(attrName.getPrefix())) {
-                        if (!"".equals(attrName.getPrefix())) {
-                            namespaceList.add(new ComparableNamespace(Constants.xmlEventFactory.createNamespace(attrName.getPrefix(), attrName.getNamespaceURI())));
-                        }
-                        continue;
-                    }
-                    Attribute attribute = Constants.xmlEventFactory.createAttribute(attrName, reader.getAttributeValue(i));
-                    attributeList.add(new ComparableAttribute(attribute));
-                }
-                attrStack.push(attributeList);
-
-                //add current ns also to the list
-                Namespace namespace = Constants.xmlEventFactory.createNamespace(reader.getName().getPrefix(), reader.getName().getNamespaceURI());
-                namespaceList.add(new ComparableNamespace(namespace));
-                nsStack.push(namespaceList);
+                ComparableNamespace comparableNamespace = new ComparableNamespace(namespace);
+                namespaceList.add(comparableNamespace);
             }
-            else if (reader.getEventType() == XMLStreamConstants.END_ELEMENT) {
-                nsStack.pop();
-                attrStack.pop();
-            }//todo unneeded array allocation for eg characters, attributes etc...
+
+            List<ComparableAttribute> attributeList = new ArrayList<ComparableAttribute>();
+            for (int i = 0; i < reader.getAttributeCount(); i++) {
+                QName attrName = reader.getAttributeName(i);
+                if (!"xml".equals(attrName.getPrefix())) {
+                    if (!"".equals(attrName.getPrefix())) {
+                        ComparableNamespace comparableNamespace = new ComparableNamespace(Constants.xmlEventFactory.createNamespace(attrName.getPrefix(), attrName.getNamespaceURI()));
+                        namespaceList.add(comparableNamespace);
+                    }
+                    continue;
+                }
+                //add all attrs with xml - prefix (eg. xml:lang to attr list;
+                Attribute attribute = Constants.xmlEventFactory.createAttribute(attrName, reader.getAttributeValue(i));
+                attributeList.add(new ComparableAttribute(attribute));
+            }
+            attrStack.push(attributeList);
+
+            //add current ns also to the list if not already there
+            Namespace namespace = Constants.xmlEventFactory.createNamespace(reader.getName().getPrefix(), reader.getName().getNamespaceURI());
+            ComparableNamespace comparableNamespace = new ComparableNamespace(namespace);
+            if (!namespaceList.contains(comparableNamespace)) {
+                namespaceList.add(comparableNamespace);
+            }
+            nsStack.push(namespaceList);
+
             return new XMLEventNS(xmlEventAllocator.allocate(reader), nsStack.toArray(new List[nsStack.size()]), attrStack.toArray(new List[attrStack.size()]));
+
+        } else if (reader.getEventType() == XMLStreamConstants.END_ELEMENT) {
+            XMLEventNS xmlEventNS = new XMLEventNS(xmlEventAllocator.allocate(reader), nsStack.toArray(new List[nsStack.size()]), attrStack.toArray(new List[attrStack.size()]));
+            nsStack.pop();
+            attrStack.pop();
+            return xmlEventNS;
         }
-        else { //todo: no longer needed!
-
-            XMLEvent xmlEvent;
-            //decryption handling
-            if (reader.getEventType() == XMLStreamConstants.START_ELEMENT) {
-
-                //todo namespace are now attributes when parsing ns_less??
-                List<ComparableAttribute> attributeList = new ArrayList<ComparableAttribute>();
-                List<ComparableNamespace> namespaceList = new ArrayList<ComparableNamespace>();
-                List<Attribute> attributes = new ArrayList<Attribute>();
-                List<Namespace> namespaces = new ArrayList<Namespace>();
-                for (int i = 0; i < reader.getAttributeCount(); i++) {
-                    QName attrName = reader.getAttributeName(i);
-                    if ("xml".equals(attrName.getPrefix())) {
-                        continue;
-                    }
-                    Attribute attribute = Constants.xmlEventFactory.createAttribute(attrName, reader.getAttributeValue(i));
-                    attributes.add(attribute);
-                    attributeList.add(new ComparableAttribute(attribute));
-                }
-                attrStack.push(attributeList);
-                nsStack.push(namespaceList);
-
-                QName name = reader.getName();
-                String prefix;
-                String localName;
-                int idx = name.getLocalPart().indexOf(':');
-                if (idx >= 0) {
-                    prefix = name.getLocalPart().substring(0, idx);
-                    localName = name.getLocalPart().substring(idx + 1);
-                    //xmlEvent = xmlEventFactory.createStartElement(prefix, localName, attributes.iterator(), namespaces.iterator());
-                } else {
-                    prefix = "";
-                    localName = name.getLocalPart();
-                }
-
-                String ns = null;
-                boolean found = false;
-                Iterator<List<ComparableNamespace>> nsStackIterator = nsStack.iterator();
-                while (nsStackIterator.hasNext()) {
-                    List<ComparableNamespace> comparableNamespaceList = nsStackIterator.next();
-                    for (int i = 0; i < comparableNamespaceList.size(); i++) {
-                        ComparableNamespace comparableNamespace = comparableNamespaceList.get(i);
-                        if (comparableNamespace.getPrefix().equals(prefix)) {
-                            ns = comparableNamespace.getNamespaceURI();
-                            found = true;
-                            break;
-                        }
-                    }
-                    if (found) {
-                        break;
-                    }
-                }
-               /*
-                if (ns == null) {
-                    if (Constants.NS_DSIG.eqprefix
-                }
-                 */
-                xmlEvent = Constants.xmlEventFactory.createStartElement(prefix, ns, localName, attributes.iterator(), namespaces.iterator());
-            }
-            else if (reader.getEventType() == XMLStreamConstants.END_ELEMENT) {
-
-                //todo namespace are now attributes when parsing ns_less??
-                List<Namespace> namespaces = new ArrayList<Namespace>();
-
-                QName name = reader.getName();
-                String prefix;
-                String localName;
-                int idx = name.getLocalPart().indexOf(':');
-                if (idx >= 0) {
-                    prefix = name.getLocalPart().substring(0, idx);
-                    localName = name.getLocalPart().substring(idx + 1);
-                    //xmlEvent = xmlEventFactory.createStartElement(prefix, localName, attributes.iterator(), namespaces.iterator());
-                } else {
-                    prefix = "";
-                    localName = name.getLocalPart();
-                }
-
-                String ns = "";
-                boolean found = false;
-                Iterator<List<ComparableNamespace>> nsStackIterator = nsStack.iterator();
-                while (nsStackIterator.hasNext()) {
-                    List<ComparableNamespace> comparableNamespaceList = nsStackIterator.next();
-                    for (int i = 0; i < comparableNamespaceList.size(); i++) {
-                        ComparableNamespace comparableNamespace = comparableNamespaceList.get(i);
-                        if (comparableNamespace.getPrefix().equals(prefix)) {
-                            ns = comparableNamespace.getNamespaceURI();
-                            found = true;
-                            break;
-                        }
-                    }
-                    if (found) {
-                        break;
-                    }
-                }
-
-                xmlEvent = Constants.xmlEventFactory.createEndElement(prefix, ns, localName, namespaces.iterator());
-                nsStack.pop();
-                attrStack.pop();
-            } else {
-                xmlEvent = new XMLEventNS(xmlEventAllocator.allocate(reader), nsStack.toArray(new List[nsStack.size()]), attrStack.toArray(new List[attrStack.size()]));
-            }
-            return new XMLEventNS(xmlEvent, nsStack.toArray(new List[nsStack.size()]), attrStack.toArray(new List[attrStack.size()]));
-        }
+        return new XMLEventNS(xmlEventAllocator.allocate(reader), new List[0], new List[0]);
     }
 
     public void allocate(XMLStreamReader reader, XMLEventConsumer consumer) throws XMLStreamException {
@@ -322,7 +230,7 @@ public class XMLEventNSAllocator implements XMLEventAllocator {
         nsStack.pop();
         attrStack.pop();
 
-        return xmlEventNS; 
+        return xmlEventNS;
     }
 
     public Characters createCharacters(String characters) {

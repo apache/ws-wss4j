@@ -41,6 +41,10 @@ public class InputProcessorChainImpl implements InputProcessorChain {
         xmlSecurityContext = new XMLSecurityContext();
     }
 
+    public InputProcessorChainImpl(XMLSecurityContext xmlSecurityContext) {
+        this.xmlSecurityContext = xmlSecurityContext;
+    }
+
     public int getPos() {
         return pos;
     }
@@ -88,13 +92,14 @@ public class InputProcessorChainImpl implements InputProcessorChain {
     }
 
     public InputProcessorChain createSubChain(InputProcessor inputProcessor) throws XMLStreamException, XMLSecurityException {
-        return new InputProcessorSubChainImpl(inputProcessors.indexOf(inputProcessor) + 1, this.inputProcessors);
+        return new InputProcessorSubChainImpl(xmlSecurityContext, inputProcessors.indexOf(inputProcessor) + 1, this.inputProcessors);
     }
 
     class InputProcessorSubChainImpl extends InputProcessorChainImpl {
         private int startPos;
 
-        InputProcessorSubChainImpl(int pos, List<InputProcessor> inputProcessors) {
+        InputProcessorSubChainImpl(XMLSecurityContext securityContext, int pos, List<InputProcessor> inputProcessors) {
+            super(securityContext);
             this.startPos = this.pos = pos;
             //we don't clone the list to get updates in the sublist too!
             this.inputProcessors = inputProcessors;
