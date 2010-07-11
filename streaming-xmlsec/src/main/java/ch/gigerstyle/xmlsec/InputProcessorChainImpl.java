@@ -66,7 +66,30 @@ public class InputProcessorChainImpl implements InputProcessorChain {
     }
 
     public void addProcessor(InputProcessor inputProcessor) {
-        if (!inputProcessor.getClass().getName().equals(LogInputProcessor.class.getName())
+        if (inputProcessor.getClass().getName().equals("ch.gigerstyle.xmlsec.processorImpl.input.DecryptInputProcessor$InternalDecryptProcessor")) {
+            int pos = this.inputProcessors.size() - 2;
+            boolean found = false;
+            for (int i = 0; i < inputProcessors.size(); i++) {
+                InputProcessor processor = inputProcessors.get(i);
+                if (processor.getClass().getName().equals("ch.gigerstyle.xmlsec.processorImpl.input.DecryptInputProcessor$InternalDecryptProcessor")) {
+                    //add decryption after other decryption processors...
+                    pos = i + 1;
+                }
+            }
+            if (!found) {
+                //search for main decryption processor
+                for (int i = 0; i < inputProcessors.size(); i++) {
+                    InputProcessor processor = inputProcessors.get(i);
+                    if (processor.getClass().getName().equals("ch.gigerstyle.xmlsec.processorImpl.input.DecryptInputProcessor")) {
+                        //add decryption after other decryption processors...
+                        pos = i + 1;
+                    }
+                }
+            }
+            System.out.println("Adding internal enc proc at pos " + pos);
+            this.inputProcessors.add(pos, inputProcessor);
+        }
+        else if (!inputProcessor.getClass().getName().equals(LogInputProcessor.class.getName())
             && !inputProcessor.getClass().getName().equals(PipedInputProcessor.class.getName())
             && !inputProcessor.getClass().getName().equals(SecurityHeaderInputProcessor.class.getName())) {
             this.inputProcessors.add(this.inputProcessors.size() -2, inputProcessor);

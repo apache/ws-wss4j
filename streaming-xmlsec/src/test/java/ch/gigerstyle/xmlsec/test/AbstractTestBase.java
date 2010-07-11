@@ -4,6 +4,7 @@ import ch.gigerstyle.xmlsec.*;
 import ch.gigerstyle.xmlsec.Constants;
 import ch.gigerstyle.xmlsec.test.utils.StAX2DOM;
 import ch.gigerstyle.xmlsec.test.utils.XmlReaderToWriter;
+import com.ctc.wstx.api.WstxInputProperties;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.log4j.spi.LoggerFactory;
@@ -78,6 +79,9 @@ public abstract class AbstractTestBase {
         documentBuilderFactory.setIgnoringComments(false);
         documentBuilderFactory.setCoalescing(false);
         documentBuilderFactory.setIgnoringElementContentWhitespace(false);
+        xmlInputFactory.setProperty(XMLInputFactory.IS_COALESCING, false);
+        xmlInputFactory.setProperty(XMLInputFactory.SUPPORT_DTD, false);
+        xmlInputFactory.setProperty(WstxInputProperties.P_MIN_TEXT_SEGMENT, new Integer(8192));
     }
 
     public Document doInboundSecurity(SecurityProperties securityProperties, InputStream inputStream) throws XMLSecurityException, SecurityConfigurationException, XMLStreamException, ParserConfigurationException {
