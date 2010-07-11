@@ -211,7 +211,6 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
                     public void run() {
 
                         try {
-                            //todo _output_ processor seems to output namespaces on every element, try to prevent this 
                             //todo set encoding?:
                             XMLEventReader xmlEventReader = Constants.xmlInputFactory.createXMLEventReader(pipedInputStream);
 

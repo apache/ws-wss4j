@@ -51,6 +51,7 @@ public class FinalOutputProcessor extends AbstractOutputProcessor {
 
     @Override
     public void processHeaderEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException {
+        //todo write optimized xml...every element has its ns declaration... 
         xmlEvent.writeAsEncodedUnicode(outputStreamWriter);
     }
 
