@@ -73,7 +73,6 @@ public class InboundXMLSec {
                         processorChain.processEvent(xmlEventReader.nextEvent());
                         processorChain.reset();
                     }
-                    processorChain.reset();
                     processorChain.doFinal();
 
                     log.debug("Chain processing time: " + (System.currentTimeMillis() - start));

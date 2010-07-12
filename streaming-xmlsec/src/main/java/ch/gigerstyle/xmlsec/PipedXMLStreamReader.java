@@ -33,7 +33,7 @@ import java.util.Iterator;
  */
 public class PipedXMLStreamReader implements XMLStreamReader {
 
-    boolean closedByWriter = false;
+    volatile boolean closedByWriter = false;
     volatile boolean closedByReader = false;
     boolean connected = false;
 
@@ -44,7 +44,7 @@ public class PipedXMLStreamReader implements XMLStreamReader {
     Thread readSide;
     Thread writeSide;
 
-    private static final int DEFAULT_PIPE_SIZE = 1024;
+    private static final int DEFAULT_PIPE_SIZE = 100;
 
     /**
      * The default size of the pipe's circular input buffer.
@@ -120,7 +120,11 @@ public class PipedXMLStreamReader implements XMLStreamReader {
      */
     protected synchronized void receive(XMLEvent xmlEvent) throws IOException {
         checkStateForReceive();
-        writeSide = Thread.currentThread();
+        //the first calling thread is the thread which must also call receivedLast()
+        //this is the contract of this class!
+        if (writeSide == null) {
+            writeSide = Thread.currentThread();
+        }
         if (in == out)
             awaitSpace();
         if (in < 0) {
@@ -315,12 +319,12 @@ public class PipedXMLStreamReader implements XMLStreamReader {
         } else if (closedByReader) {
             throw new XMLStreamException("Pipe closed");
         } else if (writeSide != null && !writeSide.isAlive()
-                && !closedByWriter) {
+                && !closedByWriter && (in < 0)) {
             throw new XMLStreamException("Write end dead");
         }
 
-        if (closedByWriter) {
-            return false;
+        if (closedByWriter && in < 0) {
+            return false;            
         }
         return true;
     }
