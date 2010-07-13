@@ -1,38 +1,17 @@
 package ch.gigerstyle.xmlsec.test;
 
-import ch.gigerstyle.xmlsec.Constants;
-import ch.gigerstyle.xmlsec.InboundXMLSec;
-import ch.gigerstyle.xmlsec.SecurityProperties;
-import ch.gigerstyle.xmlsec.XMLSec;
-import ch.gigerstyle.xmlsec.test.utils.StAX2DOM;
+import ch.gigerstyle.xmlsec.ext.Constants;
+import ch.gigerstyle.xmlsec.ext.SecurityProperties;
 import com.sun.xml.ws.streaming.DOMStreamReader;
-import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.handler.WSHandlerConstants;
-import org.apache.ws.security.handler.WSS4JHandler;
 import org.testng.annotations.Test;
 import org.w3c.dom.Document;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.rpc.handler.HandlerInfo;
-import javax.xml.rpc.handler.MessageContext;
-import javax.xml.rpc.handler.soap.SOAPMessageContext;
-import javax.xml.soap.MessageFactory;
-import javax.xml.soap.SOAPConstants;
-import javax.xml.soap.SOAPMessage;
-import javax.xml.stream.XMLStreamConstants;
-import javax.xml.stream.XMLStreamReader;
-import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.stream.StreamSource;
 import java.io.*;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
 import java.util.Properties;
 
 /**

@@ -1,6 +1,7 @@
 package ch.gigerstyle.xmlsec.test;
 
 import ch.gigerstyle.xmlsec.*;
+import ch.gigerstyle.xmlsec.ext.*;
 import ch.gigerstyle.xmlsec.test.utils.StAX2DOM;
 import ch.gigerstyle.xmlsec.test.utils.XmlReaderToWriter;
 import com.sun.xml.ws.streaming.DOMStreamReader;
@@ -14,9 +15,6 @@ import org.w3c.dom.NodeList;
 
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.stream.StreamSource;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import java.io.ByteArrayInputStream;

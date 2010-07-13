@@ -9,21 +9,18 @@
 package org.w3._2000._09.xmldsig_;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.*;
-import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.stream.XMLStreamConstants;
-import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 
-import ch.gigerstyle.xmlsec.Constants;
-import ch.gigerstyle.xmlsec.ParseException;
-import ch.gigerstyle.xmlsec.Parseable;
-import ch.gigerstyle.xmlsec.Utils;
+import ch.gigerstyle.xmlsec.ext.Constants;
+import ch.gigerstyle.xmlsec.ext.Parseable;
+import ch.gigerstyle.xmlsec.ext.ParseException;
+import ch.gigerstyle.xmlsec.ext.Utils;
 import org.w3c.dom.Element;
 
 

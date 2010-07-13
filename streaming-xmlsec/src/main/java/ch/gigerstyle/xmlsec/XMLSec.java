@@ -1,6 +1,7 @@
 package ch.gigerstyle.xmlsec;
 
 import ch.gigerstyle.xmlsec.config.Init;
+import ch.gigerstyle.xmlsec.ext.*;
 
 import java.security.Provider;
 import java.security.Security;

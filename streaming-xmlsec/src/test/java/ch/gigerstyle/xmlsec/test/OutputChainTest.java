@@ -1,8 +1,8 @@
 package ch.gigerstyle.xmlsec.test;
 
-import ch.gigerstyle.xmlsec.Constants;
-import ch.gigerstyle.xmlsec.OutboundXMLSec;
-import ch.gigerstyle.xmlsec.SecurityProperties;
+import ch.gigerstyle.xmlsec.ext.Constants;
+import ch.gigerstyle.xmlsec.ext.OutboundXMLSec;
+import ch.gigerstyle.xmlsec.ext.SecurityProperties;
 import ch.gigerstyle.xmlsec.XMLSec;
 import ch.gigerstyle.xmlsec.test.utils.XmlReaderToWriter;
 import org.testng.Assert;

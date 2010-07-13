@@ -16,10 +16,10 @@
  */
 package ch.gigerstyle.xmlsec.test;
 
-import ch.gigerstyle.xmlsec.Canonicalizer20010315ExclWithCommentsTransformer;
-import ch.gigerstyle.xmlsec.Canonicalizer20010315WithCommentsTransformer;
-import ch.gigerstyle.xmlsec.Constants;
-import ch.gigerstyle.xmlsec.XMLEventNSAllocator;
+import ch.gigerstyle.xmlsec.ext.Constants;
+import ch.gigerstyle.xmlsec.impl.transformer.canonicalizer.Canonicalizer20010315ExclWithCommentsTransformer;
+import ch.gigerstyle.xmlsec.impl.transformer.canonicalizer.Canonicalizer20010315WithCommentsTransformer;
+import ch.gigerstyle.xmlsec.impl.XMLEventNSAllocator;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 

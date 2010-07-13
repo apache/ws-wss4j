@@ -1,13 +1,12 @@
 package ch.gigerstyle.xmlsec.test;
 
 import ch.gigerstyle.xmlsec.*;
-import ch.gigerstyle.xmlsec.Constants;
+import ch.gigerstyle.xmlsec.ext.*;
 import ch.gigerstyle.xmlsec.test.utils.StAX2DOM;
 import ch.gigerstyle.xmlsec.test.utils.XmlReaderToWriter;
 import com.ctc.wstx.api.WstxInputProperties;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.log4j.spi.LoggerFactory;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
@@ -17,7 +16,6 @@ import org.apache.ws.security.handler.WSHandlerResult;
 import org.apache.ws.security.handler.WSS4JHandler;
 import org.apache.ws.security.message.token.Timestamp;
 import org.apache.ws.security.util.WSSecurityUtil;
-import org.apache.xml.security.utils.*;
 import org.w3c.dom.*;
 
 import javax.security.auth.callback.CallbackHandler;
@@ -38,7 +36,6 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -267,32 +264,32 @@ public abstract class AbstractTestBase {
         xPath.setNamespaceContext(
                 new NamespaceContext() {
                     public String getNamespaceURI(String prefix) {
-                        if (Constants.PREFIX_DSIG.equals(prefix)) {
-                            return Constants.NS_DSIG;
-                        } else if (Constants.PREFIX_SOAPENV.equals(prefix)) {
-                            return Constants.NS_SOAP11;
-                        } else if (Constants.PREFIX_WSSE.equals(prefix)) {
-                            return Constants.NS_WSSE;
-                        } else if (Constants.PREFIX_WSU.equals(prefix)) {
-                            return Constants.NS_WSU;
-                        } else if (Constants.PREFIX_XENC.equals(prefix)) {
-                            return Constants.NS_XMLENC;
+                        if (ch.gigerstyle.xmlsec.ext.Constants.PREFIX_DSIG.equals(prefix)) {
+                            return ch.gigerstyle.xmlsec.ext.Constants.NS_DSIG;
+                        } else if (ch.gigerstyle.xmlsec.ext.Constants.PREFIX_SOAPENV.equals(prefix)) {
+                            return ch.gigerstyle.xmlsec.ext.Constants.NS_SOAP11;
+                        } else if (ch.gigerstyle.xmlsec.ext.Constants.PREFIX_WSSE.equals(prefix)) {
+                            return ch.gigerstyle.xmlsec.ext.Constants.NS_WSSE;
+                        } else if (ch.gigerstyle.xmlsec.ext.Constants.PREFIX_WSU.equals(prefix)) {
+                            return ch.gigerstyle.xmlsec.ext.Constants.NS_WSU;
+                        } else if (ch.gigerstyle.xmlsec.ext.Constants.PREFIX_XENC.equals(prefix)) {
+                            return ch.gigerstyle.xmlsec.ext.Constants.NS_XMLENC;
                         } else {
                             return null;
                         }
                     }
 
                     public String getPrefix(String namespaceURI) {
-                        if (Constants.NS_DSIG.equals(namespaceURI)) {
-                            return Constants.PREFIX_DSIG;
-                        } else if (Constants.NS_SOAP11.equals(namespaceURI)) {
-                            return Constants.PREFIX_SOAPENV;
-                        } else if (Constants.NS_WSSE.equals(namespaceURI)) {
-                            return Constants.PREFIX_WSSE;
-                        } else if (Constants.NS_WSU.equals(namespaceURI)) {
-                            return Constants.PREFIX_WSU;
-                        } else if (Constants.NS_XMLENC.equals(namespaceURI)) {
-                            return Constants.PREFIX_XENC;
+                        if (ch.gigerstyle.xmlsec.ext.Constants.NS_DSIG.equals(namespaceURI)) {
+                            return ch.gigerstyle.xmlsec.ext.Constants.PREFIX_DSIG;
+                        } else if (ch.gigerstyle.xmlsec.ext.Constants.NS_SOAP11.equals(namespaceURI)) {
+                            return ch.gigerstyle.xmlsec.ext.Constants.PREFIX_SOAPENV;
+                        } else if (ch.gigerstyle.xmlsec.ext.Constants.NS_WSSE.equals(namespaceURI)) {
+                            return ch.gigerstyle.xmlsec.ext.Constants.PREFIX_WSSE;
+                        } else if (ch.gigerstyle.xmlsec.ext.Constants.NS_WSU.equals(namespaceURI)) {
+                            return ch.gigerstyle.xmlsec.ext.Constants.PREFIX_WSU;
+                        } else if (ch.gigerstyle.xmlsec.ext.Constants.NS_XMLENC.equals(namespaceURI)) {
+                            return ch.gigerstyle.xmlsec.ext.Constants.PREFIX_XENC;
                         } else {
                             return null;
                         }

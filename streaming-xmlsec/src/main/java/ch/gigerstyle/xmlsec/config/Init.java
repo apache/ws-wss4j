@@ -1,6 +1,6 @@
 package ch.gigerstyle.xmlsec.config;
 
-import ch.gigerstyle.xmlsec.XMLSecurityException;
+import ch.gigerstyle.xmlsec.ext.XMLSecurityException;
 import org.xmlsecurity.ns.configuration.ConfigurationType;
 
 import javax.xml.XMLConstants;

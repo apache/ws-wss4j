@@ -8,16 +8,15 @@
 
 package org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_secext_1_0;
 
-import ch.gigerstyle.xmlsec.Constants;
-import ch.gigerstyle.xmlsec.ParseException;
-import ch.gigerstyle.xmlsec.Parseable;
-import ch.gigerstyle.xmlsec.Utils;
+import ch.gigerstyle.xmlsec.ext.*;
+import ch.gigerstyle.xmlsec.ext.ParseException;
+import ch.gigerstyle.xmlsec.ext.Utils;
+import ch.gigerstyle.xmlsec.ext.Parseable;
 
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import javax.xml.bind.annotation.*;
-import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.events.Attribute;

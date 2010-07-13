@@ -1,8 +1,8 @@
 package ch.gigerstyle.xmlsec.test;
 
-import ch.gigerstyle.xmlsec.Constants;
-import ch.gigerstyle.xmlsec.SecurePart;
-import ch.gigerstyle.xmlsec.SecurityProperties;
+import ch.gigerstyle.xmlsec.ext.Constants;
+import ch.gigerstyle.xmlsec.ext.SecurePart;
+import ch.gigerstyle.xmlsec.ext.SecurityProperties;
 import com.sun.xml.ws.streaming.DOMStreamReader;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.testng.Assert;

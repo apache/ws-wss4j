@@ -1,11 +1,5 @@
 package ch.gigerstyle.xmlsec.test;
 
-import ch.gigerstyle.xmlsec.IVSplittingOutputStream;
-import org.testng.Assert;
-import org.testng.annotations.Test;
-
-import java.io.ByteArrayOutputStream;
-
 /**
  * User: giger
  * Date: Jul 11, 2010

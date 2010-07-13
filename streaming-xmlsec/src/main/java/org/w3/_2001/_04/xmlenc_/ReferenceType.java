@@ -8,10 +8,10 @@
 
 package org.w3._2001._04.xmlenc_;
 
-import ch.gigerstyle.xmlsec.Constants;
-import ch.gigerstyle.xmlsec.ParseException;
-import ch.gigerstyle.xmlsec.Parseable;
-import ch.gigerstyle.xmlsec.Utils;
+import ch.gigerstyle.xmlsec.ext.Constants;
+import ch.gigerstyle.xmlsec.ext.ParseException;
+import ch.gigerstyle.xmlsec.ext.Parseable;
+import ch.gigerstyle.xmlsec.ext.Utils;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -22,7 +22,6 @@ import javax.xml.bind.annotation.XmlAnyElement;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
-import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.events.Attribute;

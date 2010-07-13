@@ -8,10 +8,10 @@
 
 package org.w3._2000._09.xmldsig_;
 
-import ch.gigerstyle.xmlsec.Constants;
-import ch.gigerstyle.xmlsec.ParseException;
-import ch.gigerstyle.xmlsec.Parseable;
-import ch.gigerstyle.xmlsec.Utils;
+import ch.gigerstyle.xmlsec.ext.ParseException;
+import ch.gigerstyle.xmlsec.ext.Utils;
+import ch.gigerstyle.xmlsec.ext.Constants;
+import ch.gigerstyle.xmlsec.ext.Parseable;
 
 import java.util.ArrayList;
 import java.util.Iterator;

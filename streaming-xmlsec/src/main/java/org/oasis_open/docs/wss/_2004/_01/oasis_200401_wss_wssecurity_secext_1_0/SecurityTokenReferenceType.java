@@ -19,15 +19,11 @@ import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 
-import ch.gigerstyle.xmlsec.Constants;
-import ch.gigerstyle.xmlsec.ParseException;
-import ch.gigerstyle.xmlsec.Parseable;
-import ch.gigerstyle.xmlsec.Utils;
-import org.w3._2000._09.xmldsig_.KeyInfoType;
+import ch.gigerstyle.xmlsec.ext.Constants;
+import ch.gigerstyle.xmlsec.ext.ParseException;
+import ch.gigerstyle.xmlsec.ext.Parseable;
+import ch.gigerstyle.xmlsec.ext.Utils;
 import org.w3._2000._09.xmldsig_.X509DataType;
-import org.w3._2001._04.xmlenc_.CipherDataType;
-import org.w3._2001._04.xmlenc_.EncryptionMethodType;
-import org.w3._2001._04.xmlenc_.EncryptionPropertiesType;
 import org.w3c.dom.Element;
 
 
