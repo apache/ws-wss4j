@@ -13,12 +13,7 @@ import ch.gigerstyle.xmlsec.ext.ParseException;
 import ch.gigerstyle.xmlsec.ext.Parseable;
 import ch.gigerstyle.xmlsec.ext.Utils;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlSchemaType;
-import javax.xml.bind.annotation.XmlSeeAlso;
-import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.*;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.events.Attribute;
@@ -30,11 +25,11 @@ import java.util.Iterator;
 
 /**
  * This type is used for elements containing stringified binary data.
- * 
+ * <p/>
  * <p>Java class for EncodedString complex type.
- * 
+ * <p/>
  * <p>The following schema fragment specifies the expected content contained within this class.
- * 
+ * <p/>
  * <pre>
  * &lt;complexType name="EncodedString">
  *   &lt;simpleContent>
@@ -45,18 +40,15 @@ import java.util.Iterator;
  *   &lt;/simpleContent>
  * &lt;/complexType>
  * </pre>
- * 
- * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "EncodedString")
 @XmlSeeAlso({
-    BinarySecurityTokenType.class,
-    KeyIdentifierType.class
+        BinarySecurityTokenType.class,
+        KeyIdentifierType.class
 })
 public class EncodedString
-    extends AttributedString implements Parseable
-{
+        extends AttributedString implements Parseable {
 
     @XmlAttribute(name = "EncodingType")
     @XmlSchemaType(name = "anyURI")
@@ -85,18 +77,18 @@ public class EncodedString
         super.parseXMLEvent(xmlEvent);
 
         switch (xmlEvent.getEventType()) {
-             case XMLStreamConstants.START_ELEMENT:
-                 break;
-             case XMLStreamConstants.END_ELEMENT:
-                 EndElement endElement = xmlEvent.asEndElement();
-                 if (endElement.getName().equals(startElementName)) {
-                     return true;
-                 }
-                 break;
-             case XMLStreamConstants.CHARACTERS:
-                 break;
-             default:
-                 throw new ParseException("Unexpected event received " + Utils.getXMLEventAsString(xmlEvent));
+            case XMLStreamConstants.START_ELEMENT:
+                break;
+            case XMLStreamConstants.END_ELEMENT:
+                EndElement endElement = xmlEvent.asEndElement();
+                if (endElement.getName().equals(startElementName)) {
+                    return true;
+                }
+                break;
+            case XMLStreamConstants.CHARACTERS:
+                break;
+            default:
+                throw new ParseException("Unexpected event received " + Utils.getXMLEventAsString(xmlEvent));
         }
         return false;
     }
@@ -107,11 +99,9 @@ public class EncodedString
 
     /**
      * Gets the value of the encodingType property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     *         {@link String }
      */
     public String getEncodingType() {
         return encodingType;
@@ -119,11 +109,9 @@ public class EncodedString
 
     /**
      * Sets the value of the encodingType property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setEncodingType(String value) {
         this.encodingType = value;

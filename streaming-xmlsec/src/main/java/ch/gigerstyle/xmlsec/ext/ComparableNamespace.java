@@ -39,7 +39,7 @@ public class ComparableNamespace implements Comparable<ComparableNamespace> {
         //(the default namespace node, if one exists, has no local name and is therefore lexicographically least).
         int prefixCompare = this.getPrefix().compareTo(o.getPrefix());
 //        if (prefixCompare != 0) {
-            return prefixCompare;
+        return prefixCompare;
 /*        } else {
             return this.getNamespaceURI().compareTo(o.getNamespaceURI());
         }
@@ -51,14 +51,14 @@ public class ComparableNamespace implements Comparable<ComparableNamespace> {
         if (!(obj instanceof ComparableNamespace)) {
             return false;
         }
-        ComparableNamespace comparableNamespace = (ComparableNamespace)obj;
+        ComparableNamespace comparableNamespace = (ComparableNamespace) obj;
         /*
         if (comparableNamespace.getPrefix().length() == 0 && this.getPrefix().length() == 0) {
             return comparableNamespace.getNamespaceURI().equals(this.getNamespaceURI());
         }
         else */
         if (comparableNamespace.getPrefix().equals(this.getPrefix())) {
-                //&& comparableNamespace.getNamespaceURI().equals(this.getNamespaceURI())) {
+            //&& comparableNamespace.getNamespaceURI().equals(this.getNamespaceURI())) {
             //just test for prefix to get the last prefix definition on the stack and let overwrite it 
             return true;
         }
@@ -88,6 +88,6 @@ public class ComparableNamespace implements Comparable<ComparableNamespace> {
         if (namespace.getPrefix() == null || namespace.getPrefix().length() == 0) {
             return "xmlns=\"" + namespace.getNamespaceURI() + "\"";
         }
-        return "xmlns:" + namespace.getPrefix() + "=\"" + namespace.getNamespaceURI() + "\""; 
+        return "xmlns:" + namespace.getPrefix() + "=\"" + namespace.getNamespaceURI() + "\"";
     }
 }

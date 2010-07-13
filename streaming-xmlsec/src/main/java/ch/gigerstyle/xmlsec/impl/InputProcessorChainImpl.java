@@ -88,11 +88,10 @@ public class InputProcessorChainImpl implements InputProcessorChain {
             }
             System.out.println("Adding internal enc proc at pos " + pos);
             this.inputProcessors.add(pos, inputProcessor);
-        }
-        else if (!inputProcessor.getClass().getName().equals(LogInputProcessor.class.getName())
-            && !inputProcessor.getClass().getName().equals(PipedInputProcessor.class.getName())
-            && !inputProcessor.getClass().getName().equals(SecurityHeaderInputProcessor.class.getName())) {
-            this.inputProcessors.add(this.inputProcessors.size() -2, inputProcessor);
+        } else if (!inputProcessor.getClass().getName().equals(LogInputProcessor.class.getName())
+                && !inputProcessor.getClass().getName().equals(PipedInputProcessor.class.getName())
+                && !inputProcessor.getClass().getName().equals(SecurityHeaderInputProcessor.class.getName())) {
+            this.inputProcessors.add(this.inputProcessors.size() - 2, inputProcessor);
         } else {
             this.inputProcessors.add(inputProcessor);
         }

@@ -1,7 +1,7 @@
 package ch.gigerstyle.xmlsec.impl;
 
-import ch.gigerstyle.xmlsec.ext.OutputProcessorChain;
 import ch.gigerstyle.xmlsec.ext.Constants;
+import ch.gigerstyle.xmlsec.ext.OutputProcessorChain;
 import ch.gigerstyle.xmlsec.ext.XMLSecurityException;
 
 import javax.xml.namespace.NamespaceContext;
@@ -79,8 +79,7 @@ public class XMLSecurityStreamWriter implements XMLStreamWriter {
         if (localName.contains(":")) {
             String[] splittedName = localName.split(":");
             qName = new QName(null, splittedName[1], splittedName[0]);
-        }
-        else {
+        } else {
             //todo: Writes a start tag to the output. All writeStartElement methods open a new scope in the internal namespace context. Writing the corresponding EndElement causes the scope to be closed.
             qName = new QName(localName);
         }
@@ -94,8 +93,7 @@ public class XMLSecurityStreamWriter implements XMLStreamWriter {
         if (localName.contains(":")) {
             String[] splittedName = localName.split(":");
             qName = new QName(null, splittedName[1], splittedName[0]);
-        }
-        else {
+        } else {
             //todo: Writes a start tag to the output. All writeStartElement methods open a new scope in the internal namespace context. Writing the corresponding EndElement causes the scope to be closed.
             qName = new QName(namespaceURI, localName);
         }
@@ -112,7 +110,7 @@ public class XMLSecurityStreamWriter implements XMLStreamWriter {
     }
 
     public void writeEmptyElement(String namespaceURI, String localName) throws XMLStreamException {
-        outputOpenStartElement();        
+        outputOpenStartElement();
         chainProcessEvent(xmlEventFactory.createStartElement(null, namespaceURI, localName));
         chainProcessEvent(xmlEventFactory.createEndElement(null, namespaceURI, localName));
     }
@@ -244,7 +242,7 @@ public class XMLSecurityStreamWriter implements XMLStreamWriter {
 
     public String getPrefix(String uri) throws XMLStreamException {
         //todo
-        return null;  
+        return null;
     }
 
     public void setPrefix(String prefix, String uri) throws XMLStreamException {
@@ -260,10 +258,10 @@ public class XMLSecurityStreamWriter implements XMLStreamWriter {
     }
 
     public NamespaceContext getNamespaceContext() {
-        return null;  
+        return null;
     }
 
     public Object getProperty(String name) throws IllegalArgumentException {
-        return null;  
+        return null;
     }
 }

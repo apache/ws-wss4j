@@ -8,7 +8,13 @@
 
 package org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_secext_1_0;
 
-import java.util.*;
+import ch.gigerstyle.xmlsec.ext.Constants;
+import ch.gigerstyle.xmlsec.ext.ParseException;
+import ch.gigerstyle.xmlsec.ext.Parseable;
+import ch.gigerstyle.xmlsec.ext.Utils;
+import org.w3._2000._09.xmldsig_.X509DataType;
+import org.w3c.dom.Element;
+
 import javax.xml.bind.annotation.*;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
@@ -18,22 +24,16 @@ import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
-
-import ch.gigerstyle.xmlsec.ext.Constants;
-import ch.gigerstyle.xmlsec.ext.ParseException;
-import ch.gigerstyle.xmlsec.ext.Parseable;
-import ch.gigerstyle.xmlsec.ext.Utils;
-import org.w3._2000._09.xmldsig_.X509DataType;
-import org.w3c.dom.Element;
+import java.util.*;
 
 
 /**
  * This type is used reference a security token.
- * 
+ * <p/>
  * <p>Java class for SecurityTokenReferenceType complex type.
- * 
+ * <p/>
  * <p>The following schema fragment specifies the expected content contained within this class.
- * 
+ * <p/>
  * <pre>
  * &lt;complexType name="SecurityTokenReferenceType">
  *   &lt;complexContent>
@@ -48,16 +48,14 @@ import org.w3c.dom.Element;
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
- * 
- * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "SecurityTokenReferenceType", propOrder = {
-    "any"
+        "any"
 })
 public class SecurityTokenReferenceType implements Parseable {
 
-     private Parseable currentParseable;
+    private Parseable currentParseable;
 
     @XmlAnyElement(lax = true)
     protected List<Object> any;
@@ -101,36 +99,33 @@ public class SecurityTokenReferenceType implements Parseable {
         }
 
         switch (xmlEvent.getEventType()) {
-             case XMLStreamConstants.START_ELEMENT:
-                 StartElement startElement = xmlEvent.asStartElement();
+            case XMLStreamConstants.START_ELEMENT:
+                StartElement startElement = xmlEvent.asStartElement();
 
-                 if (startElement.getName().equals(Constants.TAG_wsse_Reference)) {
-                     currentParseable = this.referenceType = new ReferenceType(startElement);
-                 }
-                 else if (startElement.getName().equals(Constants.TAG_wsse_KeyIdentifier)) {
-                     currentParseable = this.keyIdentifierType = new KeyIdentifierType(startElement);
-                 }
-                 else if (startElement.getName().equals(Constants.TAG_dsig_X509Data)) {
-                     currentParseable = this.x509DataType = new X509DataType(startElement);
-                 }
-                 else {
-                     throw new ParseException("Unexpected Element: " + startElement.getName());
-                 }
+                if (startElement.getName().equals(Constants.TAG_wsse_Reference)) {
+                    currentParseable = this.referenceType = new ReferenceType(startElement);
+                } else if (startElement.getName().equals(Constants.TAG_wsse_KeyIdentifier)) {
+                    currentParseable = this.keyIdentifierType = new KeyIdentifierType(startElement);
+                } else if (startElement.getName().equals(Constants.TAG_dsig_X509Data)) {
+                    currentParseable = this.x509DataType = new X509DataType(startElement);
+                } else {
+                    throw new ParseException("Unexpected Element: " + startElement.getName());
+                }
 
-                 break;
-             case XMLStreamConstants.END_ELEMENT:
+                break;
+            case XMLStreamConstants.END_ELEMENT:
                 currentParseable = null;
-                 EndElement endElement = xmlEvent.asEndElement();
-                 if (endElement.getName().equals(Constants.TAG_wsse_SecurityTokenReference)) {
-                     return true;
-                 }
-                 break;
-             //possible ignorable withespace and comments
-             case XMLStreamConstants.CHARACTERS:
-             case XMLStreamConstants.COMMENT:
-                 break;
-             default:
-                 throw new ParseException("Unexpected event received " + Utils.getXMLEventAsString(xmlEvent));
+                EndElement endElement = xmlEvent.asEndElement();
+                if (endElement.getName().equals(Constants.TAG_wsse_SecurityTokenReference)) {
+                    return true;
+                }
+                break;
+            //possible ignorable withespace and comments
+            case XMLStreamConstants.CHARACTERS:
+            case XMLStreamConstants.COMMENT:
+                break;
+            default:
+                throw new ParseException("Unexpected event received " + Utils.getXMLEventAsString(xmlEvent));
         }
         return false;
     }
@@ -143,26 +138,24 @@ public class SecurityTokenReferenceType implements Parseable {
 
     /**
      * Gets the value of the any property.
-     * 
-     * <p>
+     * <p/>
+     * <p/>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
      * This is why there is not a <CODE>set</CODE> method for the any property.
-     * 
-     * <p>
+     * <p/>
+     * <p/>
      * For example, to add a new item, do as follows:
      * <pre>
      *    getAny().add(newItem);
      * </pre>
-     * 
-     * 
-     * <p>
+     * <p/>
+     * <p/>
+     * <p/>
      * Objects of the following type(s) are allowed in the list
      * {@link Element }
      * {@link Object }
-     * 
-     * 
      */
     public List<Object> getAny() {
         if (any == null) {
@@ -173,11 +166,9 @@ public class SecurityTokenReferenceType implements Parseable {
 
     /**
      * Gets the value of the id property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     *         {@link String }
      */
     public String getId() {
         return id;
@@ -185,11 +176,9 @@ public class SecurityTokenReferenceType implements Parseable {
 
     /**
      * Sets the value of the id property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setId(String value) {
         this.id = value;
@@ -197,25 +186,23 @@ public class SecurityTokenReferenceType implements Parseable {
 
     /**
      * Gets the value of the usage property.
-     * 
-     * <p>
+     * <p/>
+     * <p/>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
      * This is why there is not a <CODE>set</CODE> method for the usage property.
-     * 
-     * <p>
+     * <p/>
+     * <p/>
      * For example, to add a new item, do as follows:
      * <pre>
      *    getUsage().add(newItem);
      * </pre>
-     * 
-     * 
-     * <p>
+     * <p/>
+     * <p/>
+     * <p/>
      * Objects of the following type(s) are allowed in the list
      * {@link String }
-     * 
-     * 
      */
     public List<String> getUsage() {
         if (usage == null) {
@@ -226,17 +213,15 @@ public class SecurityTokenReferenceType implements Parseable {
 
     /**
      * Gets a map that contains attributes that aren't bound to any typed property on this class.
-     * 
-     * <p>
-     * the map is keyed by the name of the attribute and 
+     * <p/>
+     * <p/>
+     * the map is keyed by the name of the attribute and
      * the value is the string value of the attribute.
-     * 
+     * <p/>
      * the map returned by this method is live, and you can add new attribute
      * by updating the map directly. Because of this design, there's no setter.
-     * 
-     * 
-     * @return
-     *     always non-null
+     *
+     * @return always non-null
      */
     public Map<QName, String> getOtherAttributes() {
         return otherAttributes;

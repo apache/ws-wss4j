@@ -13,11 +13,7 @@ import ch.gigerstyle.xmlsec.ext.ParseException;
 import ch.gigerstyle.xmlsec.ext.Parseable;
 import ch.gigerstyle.xmlsec.ext.Utils;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.*;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
@@ -26,9 +22,9 @@ import javax.xml.stream.events.XMLEvent;
 
 /**
  * <p>Java class for EncryptedKeyType complex type.
- * 
+ * <p/>
  * <p>The following schema fragment specifies the expected content contained within this class.
- * 
+ * <p/>
  * <pre>
  * &lt;complexType name="EncryptedKeyType">
  *   &lt;complexContent>
@@ -42,17 +38,14 @@ import javax.xml.stream.events.XMLEvent;
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
- * 
- * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "EncryptedKeyType", propOrder = {
-    "referenceList",
-    "carriedKeyName"
+        "referenceList",
+        "carriedKeyName"
 })
 public class EncryptedKeyType
-    extends EncryptedType implements Parseable
-{
+        extends EncryptedType implements Parseable {
 
     private Parseable currentParseable;
 
@@ -85,26 +78,26 @@ public class EncryptedKeyType
         }
 
         switch (xmlEvent.getEventType()) {
-             case XMLStreamConstants.START_ELEMENT:
-                 StartElement startElement = xmlEvent.asStartElement();
+            case XMLStreamConstants.START_ELEMENT:
+                StartElement startElement = xmlEvent.asStartElement();
 
-                 if (startElement.getName().equals(Constants.TAG_xenc_ReferenceList)) {
-                     currentParseable = this.referenceList = new ReferenceList(startElement);
-                 }
-                 break;
-             case XMLStreamConstants.END_ELEMENT:
-                 currentParseable = null;
-                 EndElement endElement = xmlEvent.asEndElement();
-                 if (endElement.getName().equals(Constants.TAG_xenc_EncryptedKey)) {
-                     return true;
-                 }
-                 break;
-             //possible ignorable withespace and comments
-             case XMLStreamConstants.CHARACTERS:
-             case XMLStreamConstants.COMMENT:
-                 break;
-             default:
-                 throw new ParseException("Unexpected event received " + Utils.getXMLEventAsString(xmlEvent));
+                if (startElement.getName().equals(Constants.TAG_xenc_ReferenceList)) {
+                    currentParseable = this.referenceList = new ReferenceList(startElement);
+                }
+                break;
+            case XMLStreamConstants.END_ELEMENT:
+                currentParseable = null;
+                EndElement endElement = xmlEvent.asEndElement();
+                if (endElement.getName().equals(Constants.TAG_xenc_EncryptedKey)) {
+                    return true;
+                }
+                break;
+            //possible ignorable withespace and comments
+            case XMLStreamConstants.CHARACTERS:
+            case XMLStreamConstants.COMMENT:
+                break;
+            default:
+                throw new ParseException("Unexpected event received " + Utils.getXMLEventAsString(xmlEvent));
         }
         return false;
     }
@@ -115,11 +108,9 @@ public class EncryptedKeyType
 
     /**
      * Gets the value of the referenceList property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link ReferenceList }
-     *     
+     *
+     * @return possible object is
+     *         {@link ReferenceList }
      */
     public ReferenceList getReferenceList() {
         return referenceList;
@@ -127,11 +118,9 @@ public class EncryptedKeyType
 
     /**
      * Sets the value of the referenceList property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link ReferenceList }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link ReferenceList }
      */
     public void setReferenceList(ReferenceList value) {
         this.referenceList = value;
@@ -139,11 +128,9 @@ public class EncryptedKeyType
 
     /**
      * Gets the value of the carriedKeyName property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     *         {@link String }
      */
     public String getCarriedKeyName() {
         return carriedKeyName;
@@ -151,11 +138,9 @@ public class EncryptedKeyType
 
     /**
      * Sets the value of the carriedKeyName property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setCarriedKeyName(String value) {
         this.carriedKeyName = value;
@@ -163,11 +148,9 @@ public class EncryptedKeyType
 
     /**
      * Gets the value of the recipient property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     *         {@link String }
      */
     public String getRecipient() {
         return recipient;
@@ -175,11 +158,9 @@ public class EncryptedKeyType
 
     /**
      * Sets the value of the recipient property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setRecipient(String value) {
         this.recipient = value;

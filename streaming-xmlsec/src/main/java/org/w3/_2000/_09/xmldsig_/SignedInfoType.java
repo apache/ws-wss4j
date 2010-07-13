@@ -8,21 +8,12 @@
 
 package org.w3._2000._09.xmldsig_;
 
-import ch.gigerstyle.xmlsec.ext.ParseException;
-import ch.gigerstyle.xmlsec.ext.Utils;
 import ch.gigerstyle.xmlsec.ext.Constants;
+import ch.gigerstyle.xmlsec.ext.ParseException;
 import ch.gigerstyle.xmlsec.ext.Parseable;
+import ch.gigerstyle.xmlsec.ext.Utils;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlID;
-import javax.xml.bind.annotation.XmlSchemaType;
-import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.*;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import javax.xml.stream.XMLStreamConstants;
@@ -30,13 +21,16 @@ import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 
 /**
  * <p>Java class for SignedInfoType complex type.
- * 
+ * <p/>
  * <p>The following schema fragment specifies the expected content contained within this class.
- * 
+ * <p/>
  * <pre>
  * &lt;complexType name="SignedInfoType">
  *   &lt;complexContent>
@@ -51,14 +45,12 @@ import javax.xml.stream.events.XMLEvent;
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
- * 
- * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "SignedInfoType", propOrder = {
-    "canonicalizationMethod",
-    "signatureMethod",
-    "reference"
+        "canonicalizationMethod",
+        "signatureMethod",
+        "reference"
 })
 public class SignedInfoType implements Parseable {
 
@@ -98,38 +90,35 @@ public class SignedInfoType implements Parseable {
         }
 
         switch (xmlEvent.getEventType()) {
-             case XMLStreamConstants.START_ELEMENT:
-                 StartElement startElement = xmlEvent.asStartElement();
+            case XMLStreamConstants.START_ELEMENT:
+                StartElement startElement = xmlEvent.asStartElement();
 
-                 if (startElement.getName().equals(Constants.TAG_dsig_CanonicalizationMethod)) {
-                     currentParseable = this.canonicalizationMethod = new CanonicalizationMethodType(startElement);
-                 }
-                 else if (startElement.getName().equals(Constants.TAG_dsig_SignatureMethod)) {
-                     currentParseable = this.signatureMethod = new SignatureMethodType(startElement);
-                 }
-                 else if (startElement.getName().equals(Constants.TAG_dsig_Reference)) {
-                     ReferenceType referenceType = new ReferenceType(startElement);
-                     currentParseable = referenceType;
-                     getReference().add(referenceType);
-                 }
-                 else {
-                     throw new ParseException("Unsupported Element: " + startElement.getName());
-                 }
+                if (startElement.getName().equals(Constants.TAG_dsig_CanonicalizationMethod)) {
+                    currentParseable = this.canonicalizationMethod = new CanonicalizationMethodType(startElement);
+                } else if (startElement.getName().equals(Constants.TAG_dsig_SignatureMethod)) {
+                    currentParseable = this.signatureMethod = new SignatureMethodType(startElement);
+                } else if (startElement.getName().equals(Constants.TAG_dsig_Reference)) {
+                    ReferenceType referenceType = new ReferenceType(startElement);
+                    currentParseable = referenceType;
+                    getReference().add(referenceType);
+                } else {
+                    throw new ParseException("Unsupported Element: " + startElement.getName());
+                }
 
-                 break;
-             case XMLStreamConstants.END_ELEMENT:
-                 currentParseable = null;
-                 EndElement endElement = xmlEvent.asEndElement();
-                 if (endElement.getName().equals(Constants.TAG_dsig_SignedInfo)) {
-                     return true;
-                 }
-                 break;
-             //possible ignorable withespace and comments
-             case XMLStreamConstants.CHARACTERS:
-             case XMLStreamConstants.COMMENT:
-                 break;
-             default:
-                 throw new ParseException("Unexpected event received " + Utils.getXMLEventAsString(xmlEvent));
+                break;
+            case XMLStreamConstants.END_ELEMENT:
+                currentParseable = null;
+                EndElement endElement = xmlEvent.asEndElement();
+                if (endElement.getName().equals(Constants.TAG_dsig_SignedInfo)) {
+                    return true;
+                }
+                break;
+            //possible ignorable withespace and comments
+            case XMLStreamConstants.CHARACTERS:
+            case XMLStreamConstants.COMMENT:
+                break;
+            default:
+                throw new ParseException("Unexpected event received " + Utils.getXMLEventAsString(xmlEvent));
         }
         return false;
     }
@@ -142,11 +131,9 @@ public class SignedInfoType implements Parseable {
 
     /**
      * Gets the value of the canonicalizationMethod property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link CanonicalizationMethodType }
-     *     
+     *
+     * @return possible object is
+     *         {@link CanonicalizationMethodType }
      */
     public CanonicalizationMethodType getCanonicalizationMethod() {
         return canonicalizationMethod;
@@ -154,11 +141,9 @@ public class SignedInfoType implements Parseable {
 
     /**
      * Sets the value of the canonicalizationMethod property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link CanonicalizationMethodType }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link CanonicalizationMethodType }
      */
     public void setCanonicalizationMethod(CanonicalizationMethodType value) {
         this.canonicalizationMethod = value;
@@ -166,11 +151,9 @@ public class SignedInfoType implements Parseable {
 
     /**
      * Gets the value of the signatureMethod property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link SignatureMethodType }
-     *     
+     *
+     * @return possible object is
+     *         {@link SignatureMethodType }
      */
     public SignatureMethodType getSignatureMethod() {
         return signatureMethod;
@@ -178,11 +161,9 @@ public class SignedInfoType implements Parseable {
 
     /**
      * Sets the value of the signatureMethod property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link SignatureMethodType }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link SignatureMethodType }
      */
     public void setSignatureMethod(SignatureMethodType value) {
         this.signatureMethod = value;
@@ -190,25 +171,23 @@ public class SignedInfoType implements Parseable {
 
     /**
      * Gets the value of the reference property.
-     * 
-     * <p>
+     * <p/>
+     * <p/>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
      * This is why there is not a <CODE>set</CODE> method for the reference property.
-     * 
-     * <p>
+     * <p/>
+     * <p/>
      * For example, to add a new item, do as follows:
      * <pre>
      *    getReference().add(newItem);
      * </pre>
-     * 
-     * 
-     * <p>
+     * <p/>
+     * <p/>
+     * <p/>
      * Objects of the following type(s) are allowed in the list
      * {@link ReferenceType }
-     * 
-     * 
      */
     public List<ReferenceType> getReference() {
         if (reference == null) {
@@ -219,11 +198,9 @@ public class SignedInfoType implements Parseable {
 
     /**
      * Gets the value of the id property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     *         {@link String }
      */
     public String getId() {
         return id;
@@ -231,11 +208,9 @@ public class SignedInfoType implements Parseable {
 
     /**
      * Sets the value of the id property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setId(String value) {
         this.id = value;

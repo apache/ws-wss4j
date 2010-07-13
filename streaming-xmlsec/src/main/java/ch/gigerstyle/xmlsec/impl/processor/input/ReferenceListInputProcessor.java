@@ -47,8 +47,7 @@ public class ReferenceListInputProcessor extends AbstractInputProcessor {
             } catch (ParseException e) {
                 throw new XMLSecurityException(e);
             }
-        }
-        else if (xmlEvent.isStartElement()) {
+        } else if (xmlEvent.isStartElement()) {
             StartElement startElement = xmlEvent.asStartElement();
             if (startElement.getName().equals(Constants.TAG_xenc_ReferenceList)) {
                 currentReferenceList = new ReferenceList(startElement);

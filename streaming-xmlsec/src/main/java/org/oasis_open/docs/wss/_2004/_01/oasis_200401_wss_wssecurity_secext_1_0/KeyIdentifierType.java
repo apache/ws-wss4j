@@ -13,11 +13,7 @@ import ch.gigerstyle.xmlsec.ext.ParseException;
 import ch.gigerstyle.xmlsec.ext.Parseable;
 import ch.gigerstyle.xmlsec.ext.Utils;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlSchemaType;
-import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.*;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.EndElement;
@@ -28,11 +24,11 @@ import java.util.Iterator;
 
 /**
  * A security token key identifier
- * 
+ * <p/>
  * <p>Java class for KeyIdentifierType complex type.
- * 
+ * <p/>
  * <p>The following schema fragment specifies the expected content contained within this class.
- * 
+ * <p/>
  * <pre>
  * &lt;complexType name="KeyIdentifierType">
  *   &lt;simpleContent>
@@ -43,14 +39,11 @@ import java.util.Iterator;
  *   &lt;/simpleContent>
  * &lt;/complexType>
  * </pre>
- * 
- * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "KeyIdentifierType")
 public class KeyIdentifierType
-    extends EncodedString implements Parseable
-{
+        extends EncodedString implements Parseable {
 
     @XmlAttribute(name = "ValueType")
     @XmlSchemaType(name = "anyURI")
@@ -62,8 +55,8 @@ public class KeyIdentifierType
         while (attributeIterator.hasNext()) {
             Attribute attribute = attributeIterator.next();
             if (attribute.getName().equals(Constants.ATT_NULL_ValueType)) {
-                 this.valueType = attribute.getValue();
-             }
+                this.valueType = attribute.getValue();
+            }
         }
     }
 
@@ -72,18 +65,18 @@ public class KeyIdentifierType
         super.parseXMLEvent(xmlEvent);
 
         switch (xmlEvent.getEventType()) {
-             case XMLStreamConstants.START_ELEMENT:
-                 break;
-             case XMLStreamConstants.END_ELEMENT:
-                 EndElement endElement = xmlEvent.asEndElement();
-                 if (endElement.getName().equals(Constants.TAG_wsse_KeyIdentifier)) {
-                     return true;
-                 }
-                 break;
-             case XMLStreamConstants.CHARACTERS:
-                 break;
-             default:
-                 throw new ParseException("Unexpected event received " + Utils.getXMLEventAsString(xmlEvent));
+            case XMLStreamConstants.START_ELEMENT:
+                break;
+            case XMLStreamConstants.END_ELEMENT:
+                EndElement endElement = xmlEvent.asEndElement();
+                if (endElement.getName().equals(Constants.TAG_wsse_KeyIdentifier)) {
+                    return true;
+                }
+                break;
+            case XMLStreamConstants.CHARACTERS:
+                break;
+            default:
+                throw new ParseException("Unexpected event received " + Utils.getXMLEventAsString(xmlEvent));
         }
         return false;
     }
@@ -94,11 +87,9 @@ public class KeyIdentifierType
 
     /**
      * Gets the value of the valueType property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     *         {@link String }
      */
     public String getValueType() {
         return valueType;
@@ -106,11 +97,9 @@ public class KeyIdentifierType
 
     /**
      * Sets the value of the valueType property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setValueType(String value) {
         this.valueType = value;

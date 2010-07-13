@@ -8,27 +8,27 @@
 
 package org.w3._2000._09.xmldsig_;
 
-import java.util.ArrayList;
-import java.util.List;
+import ch.gigerstyle.xmlsec.ext.Constants;
+import ch.gigerstyle.xmlsec.ext.ParseException;
+import ch.gigerstyle.xmlsec.ext.Parseable;
+import ch.gigerstyle.xmlsec.ext.Utils;
+import org.w3c.dom.Element;
+
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.*;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
-
-import ch.gigerstyle.xmlsec.ext.Constants;
-import ch.gigerstyle.xmlsec.ext.Parseable;
-import ch.gigerstyle.xmlsec.ext.ParseException;
-import ch.gigerstyle.xmlsec.ext.Utils;
-import org.w3c.dom.Element;
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
  * <p>Java class for X509DataType complex type.
- * 
+ * <p/>
  * <p>The following schema fragment specifies the expected content contained within this class.
- * 
+ * <p/>
  * <pre>
  * &lt;complexType name="X509DataType">
  *   &lt;complexContent>
@@ -47,23 +47,21 @@ import org.w3c.dom.Element;
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
- * 
- * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "X509DataType", propOrder = {
-    "x509IssuerSerialOrX509SKIOrX509SubjectName"
+        "x509IssuerSerialOrX509SKIOrX509SubjectName"
 })
 public class X509DataType implements Parseable {
 
     private Parseable currentParseable;
 
     @XmlElementRefs({
-        @XmlElementRef(name = "X509Certificate", namespace = "http://www.w3.org/2000/09/xmldsig#", type = JAXBElement.class),
-        @XmlElementRef(name = "X509IssuerSerial", namespace = "http://www.w3.org/2000/09/xmldsig#", type = JAXBElement.class),
-        @XmlElementRef(name = "X509SubjectName", namespace = "http://www.w3.org/2000/09/xmldsig#", type = JAXBElement.class),
-        @XmlElementRef(name = "X509SKI", namespace = "http://www.w3.org/2000/09/xmldsig#", type = JAXBElement.class),
-        @XmlElementRef(name = "X509CRL", namespace = "http://www.w3.org/2000/09/xmldsig#", type = JAXBElement.class)
+            @XmlElementRef(name = "X509Certificate", namespace = "http://www.w3.org/2000/09/xmldsig#", type = JAXBElement.class),
+            @XmlElementRef(name = "X509IssuerSerial", namespace = "http://www.w3.org/2000/09/xmldsig#", type = JAXBElement.class),
+            @XmlElementRef(name = "X509SubjectName", namespace = "http://www.w3.org/2000/09/xmldsig#", type = JAXBElement.class),
+            @XmlElementRef(name = "X509SKI", namespace = "http://www.w3.org/2000/09/xmldsig#", type = JAXBElement.class),
+            @XmlElementRef(name = "X509CRL", namespace = "http://www.w3.org/2000/09/xmldsig#", type = JAXBElement.class)
     })
     @XmlAnyElement(lax = true)
     protected List<Object> x509IssuerSerialOrX509SKIOrX509SubjectName;
@@ -85,29 +83,28 @@ public class X509DataType implements Parseable {
         }
 
         switch (xmlEvent.getEventType()) {
-             case XMLStreamConstants.START_ELEMENT:
-                 StartElement startElement = xmlEvent.asStartElement();
+            case XMLStreamConstants.START_ELEMENT:
+                StartElement startElement = xmlEvent.asStartElement();
 
-                 if (startElement.getName().equals(Constants.TAG_dsig_X509IssuerSerial)) {
-                     currentParseable = this.x509IssuerSerialType = new X509IssuerSerialType(startElement);
-                 }
-                 else {
-                     throw new ParseException("Unsupported Element: " + startElement.getName());
-                 }
-                 break;
-             case XMLStreamConstants.END_ELEMENT:
-                 currentParseable = null;
-                 EndElement endElement = xmlEvent.asEndElement();
-                 if (endElement.getName().equals(Constants.TAG_dsig_X509Data)) {
-                     return true;
-                 }
-                 break;
-             //possible ignorable withespace and comments
-             case XMLStreamConstants.CHARACTERS:
-             case XMLStreamConstants.COMMENT:
-                 break;
-             default:
-                 throw new ParseException("Unexpected event received " + Utils.getXMLEventAsString(xmlEvent));
+                if (startElement.getName().equals(Constants.TAG_dsig_X509IssuerSerial)) {
+                    currentParseable = this.x509IssuerSerialType = new X509IssuerSerialType(startElement);
+                } else {
+                    throw new ParseException("Unsupported Element: " + startElement.getName());
+                }
+                break;
+            case XMLStreamConstants.END_ELEMENT:
+                currentParseable = null;
+                EndElement endElement = xmlEvent.asEndElement();
+                if (endElement.getName().equals(Constants.TAG_dsig_X509Data)) {
+                    return true;
+                }
+                break;
+            //possible ignorable withespace and comments
+            case XMLStreamConstants.CHARACTERS:
+            case XMLStreamConstants.COMMENT:
+                break;
+            default:
+                throw new ParseException("Unexpected event received " + Utils.getXMLEventAsString(xmlEvent));
         }
         return false;
     }
@@ -120,21 +117,21 @@ public class X509DataType implements Parseable {
 
     /**
      * Gets the value of the x509IssuerSerialOrX509SKIOrX509SubjectName property.
-     * 
-     * <p>
+     * <p/>
+     * <p/>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
      * This is why there is not a <CODE>set</CODE> method for the x509IssuerSerialOrX509SKIOrX509SubjectName property.
-     * 
-     * <p>
+     * <p/>
+     * <p/>
      * For example, to add a new item, do as follows:
      * <pre>
      *    getX509IssuerSerialOrX509SKIOrX509SubjectName().add(newItem);
      * </pre>
-     * 
-     * 
-     * <p>
+     * <p/>
+     * <p/>
+     * <p/>
      * Objects of the following type(s) are allowed in the list
      * {@link Element }
      * {@link Object }
@@ -143,8 +140,6 @@ public class X509DataType implements Parseable {
      * {@link JAXBElement }{@code <}{@link String }{@code >}
      * {@link JAXBElement }{@code <}{@link byte[]}{@code >}
      * {@link JAXBElement }{@code <}{@link byte[]}{@code >}
-     * 
-     * 
      */
     public List<Object> getX509IssuerSerialOrX509SKIOrX509SubjectName() {
         if (x509IssuerSerialOrX509SKIOrX509SubjectName == null) {

@@ -1,8 +1,10 @@
 package ch.gigerstyle.xmlsec.ext;
 
 import ch.gigerstyle.xmlsec.impl.InputProcessorChainImpl;
+import ch.gigerstyle.xmlsec.impl.processor.input.LogInputProcessor;
+import ch.gigerstyle.xmlsec.impl.processor.input.PipedInputProcessor;
 import ch.gigerstyle.xmlsec.impl.processor.input.PipedXMLStreamReader;
-import ch.gigerstyle.xmlsec.impl.processor.input.*;
+import ch.gigerstyle.xmlsec.impl.processor.input.SecurityHeaderInputProcessor;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -45,6 +47,7 @@ public class InboundXMLSec {
     }
 
     //todo this method should not be public we need our own xmlEventReader and not a foreign one... (XMLEventNS)
+
     public XMLStreamReader processInMessage(final XMLEventReader xmlEventReader) throws XMLStreamException, XMLSecurityException {
 
         final PipedXMLStreamReader pipedXMLStreamReader = new PipedXMLStreamReader(10);

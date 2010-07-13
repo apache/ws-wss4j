@@ -231,36 +231,36 @@ public class PipedXMLStreamReader implements XMLStreamReader {
 
         if (localName != null) {
             if (xmlEvent.getEventType() != START_ELEMENT && xmlEvent.getEventType() != END_ELEMENT
-                && xmlEvent.getEventType() != ENTITY_REFERENCE) {
-                throw new XMLStreamException("Expected non-null local name, but current token not a START_ELEMENT, END_ELEMENT or ENTITY_REFERENCE (was "+ xmlEvent.getEventType() +")");
+                    && xmlEvent.getEventType() != ENTITY_REFERENCE) {
+                throw new XMLStreamException("Expected non-null local name, but current token not a START_ELEMENT, END_ELEMENT or ENTITY_REFERENCE (was " + xmlEvent.getEventType() + ")");
             }
             String n = getLocalName();
             if (!n.equals(localName)) {
-                throw new XMLStreamException("Expected local name '"+localName+"'; current local name '"+n+"'.");
+                throw new XMLStreamException("Expected local name '" + localName + "'; current local name '" + n + "'.");
             }
         }
         if (namespaceURI != null) {
             if (xmlEvent.getEventType() != START_ELEMENT && xmlEvent.getEventType() != END_ELEMENT) {
-                throw new XMLStreamException("Expected non-null NS URI, but current token not a START_ELEMENT or END_ELEMENT (was "+ xmlEvent.getEventType() +")");
+                throw new XMLStreamException("Expected non-null NS URI, but current token not a START_ELEMENT or END_ELEMENT (was " + xmlEvent.getEventType() + ")");
             }
             String uri = getNamespaceURI();
             // No namespace?
             if (namespaceURI.length() == 0) {
                 if (uri != null && uri.length() > 0) {
-                    throw new XMLStreamException("Expected empty namespace, instead have '"+uri+"'.");
+                    throw new XMLStreamException("Expected empty namespace, instead have '" + uri + "'.");
                 }
             } else {
                 if (!namespaceURI.equals(uri)) {
-                    throw new XMLStreamException("Expected namespace '"+namespaceURI+"'; have '"
-                                    +uri+"'.");
+                    throw new XMLStreamException("Expected namespace '" + namespaceURI + "'; have '"
+                            + uri + "'.");
                 }
             }
         }
     }
 
     final private static int MASK_GET_ELEMENT_TEXT =
-        (1 << CHARACTERS) | (1 << CDATA) | (1 << SPACE)
-        | (1 << ENTITY_REFERENCE);
+            (1 << CHARACTERS) | (1 << CDATA) | (1 << SPACE)
+                    | (1 << ENTITY_REFERENCE);
 
     public String getElementText() throws XMLStreamException {
         XMLEvent xmlEvent = getCurrentEvent();
@@ -281,7 +281,7 @@ public class PipedXMLStreamReader implements XMLStreamReader {
                 continue;
             }
             if (((1 << type) & MASK_GET_ELEMENT_TEXT) == 0) {
-                throw new XMLStreamException("Expected a text token, got "+xmlEvent.getEventType()+".");
+                throw new XMLStreamException("Expected a text token, got " + xmlEvent.getEventType() + ".");
             }
             stringBuffer.append(getText());
         }
@@ -324,7 +324,7 @@ public class PipedXMLStreamReader implements XMLStreamReader {
         }
 
         if (closedByWriter && in < 0) {
-            return false;            
+            return false;
         }
         return true;
     }
@@ -574,12 +574,12 @@ public class PipedXMLStreamReader implements XMLStreamReader {
 
     public int getEventType() {
         XMLEvent xmlEvent = getCurrentEvent();
-        return xmlEvent.getEventType(); 
+        return xmlEvent.getEventType();
     }
 
     final private static int MASK_GET_TEXT =
-        (1 << CHARACTERS) | (1 << CDATA) | (1 << SPACE)
-        | (1 << COMMENT) | (1 << DTD) | (1 << ENTITY_REFERENCE);
+            (1 << CHARACTERS) | (1 << CDATA) | (1 << SPACE)
+                    | (1 << COMMENT) | (1 << DTD) | (1 << ENTITY_REFERENCE);
 
     public String getText() {
         XMLEvent xmlEvent = getCurrentEvent();
@@ -588,19 +588,19 @@ public class PipedXMLStreamReader implements XMLStreamReader {
             throw new IllegalStateException("Current state not TEXT");
         }
         if (xmlEvent.getEventType() == ENTITY_REFERENCE) {
-            return ((EntityReference)xmlEvent).getDeclaration().getReplacementText();
+            return ((EntityReference) xmlEvent).getDeclaration().getReplacementText();
         }
         if (xmlEvent.getEventType() == DTD) {
-            return ((javax.xml.stream.events.DTD)xmlEvent).getDocumentTypeDeclaration();
+            return ((javax.xml.stream.events.DTD) xmlEvent).getDocumentTypeDeclaration();
         }
         if (xmlEvent.getEventType() == COMMENT) {
-            return ((Comment)xmlEvent).getText();
+            return ((Comment) xmlEvent).getText();
         }
         return xmlEvent.asCharacters().getData();
     }
 
-     final private static int MASK_GET_TEXT_XXX =
-        (1 << CHARACTERS) | (1 << CDATA) | (1 << SPACE) | (1 << COMMENT);
+    final private static int MASK_GET_TEXT_XXX =
+            (1 << CHARACTERS) | (1 << CDATA) | (1 << SPACE) | (1 << COMMENT);
 
     public char[] getTextCharacters() {
         XMLEvent xmlEvent = getCurrentEvent();
@@ -609,13 +609,13 @@ public class PipedXMLStreamReader implements XMLStreamReader {
             throw new IllegalStateException("Current state not TEXT");
         }
         if (xmlEvent.getEventType() == ENTITY_REFERENCE) {
-            return ((EntityReference)xmlEvent).getDeclaration().getReplacementText().toCharArray();
+            return ((EntityReference) xmlEvent).getDeclaration().getReplacementText().toCharArray();
         }
         if (xmlEvent.getEventType() == DTD) {
-            return ((javax.xml.stream.events.DTD)xmlEvent).getDocumentTypeDeclaration().toCharArray();
+            return ((javax.xml.stream.events.DTD) xmlEvent).getDocumentTypeDeclaration().toCharArray();
         }
         if (xmlEvent.getEventType() == COMMENT) {
-            return ((Comment)xmlEvent).getText().toCharArray();
+            return ((Comment) xmlEvent).getText().toCharArray();
         }
         return xmlEvent.asCharacters().getData().toCharArray();
     }
@@ -627,15 +627,15 @@ public class PipedXMLStreamReader implements XMLStreamReader {
             throw new IllegalStateException("Current state not TEXT");
         }
         if (xmlEvent.getEventType() == ENTITY_REFERENCE) {
-            ((EntityReference)xmlEvent).getDeclaration().getReplacementText().getChars(sourceStart, sourceStart + length, target, targetStart);
+            ((EntityReference) xmlEvent).getDeclaration().getReplacementText().getChars(sourceStart, sourceStart + length, target, targetStart);
             return sourceStart + length;
         }
         if (xmlEvent.getEventType() == DTD) {
-            ((javax.xml.stream.events.DTD)xmlEvent).getDocumentTypeDeclaration().getChars(sourceStart, sourceStart + length, target, targetStart);
-            return sourceStart + length; 
+            ((javax.xml.stream.events.DTD) xmlEvent).getDocumentTypeDeclaration().getChars(sourceStart, sourceStart + length, target, targetStart);
+            return sourceStart + length;
         }
         if (xmlEvent.getEventType() == COMMENT) {
-            ((Comment)xmlEvent).getText().getChars(sourceStart, sourceStart + length, target, targetStart);
+            ((Comment) xmlEvent).getText().getChars(sourceStart, sourceStart + length, target, targetStart);
             return sourceStart + length;
         }
         xmlEvent.asCharacters().getData().getChars(sourceStart, sourceStart + length, target, targetStart);
@@ -653,13 +653,13 @@ public class PipedXMLStreamReader implements XMLStreamReader {
             throw new IllegalStateException("Current state not TEXT");
         }
         if (xmlEvent.getEventType() == ENTITY_REFERENCE) {
-            return ((EntityReference)xmlEvent).getDeclaration().getReplacementText().length();
+            return ((EntityReference) xmlEvent).getDeclaration().getReplacementText().length();
         }
         if (xmlEvent.getEventType() == DTD) {
-            return ((javax.xml.stream.events.DTD)xmlEvent).getDocumentTypeDeclaration().length();
+            return ((javax.xml.stream.events.DTD) xmlEvent).getDocumentTypeDeclaration().length();
         }
         if (xmlEvent.getEventType() == COMMENT) {
-            return ((Comment)xmlEvent).getText().length();
+            return ((Comment) xmlEvent).getText().length();
         }
         return xmlEvent.asCharacters().getData().length();
     }
@@ -704,8 +704,7 @@ public class PipedXMLStreamReader implements XMLStreamReader {
         }
         if (xmlEvent.isStartElement()) {
             return xmlEvent.asStartElement().getName();
-        }
-        else {
+        } else {
             return xmlEvent.asEndElement().getName();
         }
     }
@@ -717,8 +716,7 @@ public class PipedXMLStreamReader implements XMLStreamReader {
         }
         if (xmlEvent.isStartElement()) {
             return xmlEvent.asStartElement().getName().getLocalPart();
-        }
-        else {
+        } else {
             return xmlEvent.asEndElement().getName().getLocalPart();
         }
     }
@@ -738,8 +736,7 @@ public class PipedXMLStreamReader implements XMLStreamReader {
         }
         if (xmlEvent.isStartElement()) {
             return xmlEvent.asStartElement().getName().getNamespaceURI();
-        }
-        else {
+        } else {
             return xmlEvent.asEndElement().getName().getNamespaceURI();
         }
     }
@@ -751,8 +748,7 @@ public class PipedXMLStreamReader implements XMLStreamReader {
         }
         if (xmlEvent.isStartElement()) {
             return xmlEvent.asStartElement().getName().getPrefix();
-        }
-        else {
+        } else {
             return xmlEvent.asEndElement().getName().getPrefix();
         }
     }
@@ -778,7 +774,7 @@ public class PipedXMLStreamReader implements XMLStreamReader {
         if (xmlEvent.getEventType() != PROCESSING_INSTRUCTION) {
             throw new IllegalStateException(ErrorConsts.ERR_STATE_NOT_PI);
         }
-        return ((ProcessingInstruction)xmlEvent).getTarget();
+        return ((ProcessingInstruction) xmlEvent).getTarget();
     }
 
     public String getPIData() {
@@ -786,6 +782,6 @@ public class PipedXMLStreamReader implements XMLStreamReader {
         if (xmlEvent.getEventType() != PROCESSING_INSTRUCTION) {
             throw new IllegalStateException(ErrorConsts.ERR_STATE_NOT_PI);
         }
-        return ((ProcessingInstruction)xmlEvent).getData();
+        return ((ProcessingInstruction) xmlEvent).getData();
     }
 }

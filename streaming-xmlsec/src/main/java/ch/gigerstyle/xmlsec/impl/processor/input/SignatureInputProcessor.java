@@ -108,8 +108,7 @@ public class SignatureInputProcessor extends AbstractInputProcessor {
             } else if (currentSignatureType != null && startElement.getName().equals(Constants.TAG_dsig_SignedInfo)) {
                 recordSignedInfo = true;
             }
-        }
-        else if (currentSignatureType != null && xmlEvent.isEndElement()) {
+        } else if (currentSignatureType != null && xmlEvent.isEndElement()) {
             EndElement endElement = xmlEvent.asEndElement();
 
             if (endElement.getName().equals(Constants.TAG_dsig_SignedInfo)) {

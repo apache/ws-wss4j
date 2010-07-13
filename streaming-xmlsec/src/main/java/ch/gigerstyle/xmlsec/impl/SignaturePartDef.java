@@ -26,7 +26,7 @@ public class SignaturePartDef {
 
     public enum Modifier {
         Element("http://www.w3.org/2001/04/xmlenc#Element");
-        
+
         private String modifier;
 
         Modifier(String modifier) {

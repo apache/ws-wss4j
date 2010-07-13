@@ -31,7 +31,7 @@ public class SecurityHeaderInputProcessor extends AbstractInputProcessor {
 
     private int level = 0;
     private boolean isInSecurityHeader = false;
-    
+
     public SecurityHeaderInputProcessor(SecurityProperties securityProperties) {
         super(securityProperties);
     }
@@ -63,8 +63,7 @@ public class SecurityHeaderInputProcessor extends AbstractInputProcessor {
             if (isInSecurityHeader) {
                 level++;
             }
-        }
-        else if (xmlEvent.isEndElement()) {
+        } else if (xmlEvent.isEndElement()) {
             if (isInSecurityHeader) {
                 level--;
             }

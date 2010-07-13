@@ -25,7 +25,6 @@ import javax.xml.stream.events.XMLEvent;
 public interface Parseable {
 
     /**
-     *
      * @param xmlEvent
      * @return true when current Element is finished
      * @throws ParseException

@@ -106,6 +106,7 @@ public class WSPasswordCallback implements Callback {
         this.type = type;
         this.usage = usage;
     }
+
     /**
      * Get the identifier.
      * <p/>
@@ -189,6 +190,7 @@ public class WSPasswordCallback implements Callback {
     public int getUsage() {
         return usage;
     }
+
     /**
      * The password type is only relevant for usage <code>USERNAME_TOKEN</code>
      * and <code>USERNAME_TOKEN_UNKNOWN</code>.
@@ -207,6 +209,7 @@ public class WSPasswordCallback implements Callback {
     public String getKeyType() {
         return type;
     }
+
     public Element getCustomToken() {
         return customToken;
     }

@@ -51,9 +51,9 @@ public class ComparableAttribute implements Comparable<ComparableAttribute> {
         if (!(obj instanceof ComparableAttribute)) {
             return false;
         }
-        ComparableAttribute comparableAttribute = (ComparableAttribute)obj;
+        ComparableAttribute comparableAttribute = (ComparableAttribute) obj;
         if (comparableAttribute.getName().getLocalPart().equals(this.getName().getLocalPart())) {
-                //&& comparableNamespace.getNamespace().getNamespaceURI().equals(this.attribute.getNamespaceURI())) {
+            //&& comparableNamespace.getNamespace().getNamespaceURI().equals(this.attribute.getNamespaceURI())) {
             return true;
         }
         return false;

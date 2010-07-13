@@ -70,7 +70,7 @@ public class PipedInputProcessor extends AbstractInputProcessor {
             throw new XMLStreamException("Pipe not connected");
         }
         try {
-            sink.receive(((XMLEventNS)xmlEvent).getCurrentEvent());
+            sink.receive(((XMLEventNS) xmlEvent).getCurrentEvent());
         } catch (IOException e) {
             throw new XMLStreamException(e);
         }

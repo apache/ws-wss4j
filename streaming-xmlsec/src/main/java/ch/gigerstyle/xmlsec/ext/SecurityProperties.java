@@ -49,6 +49,7 @@ public class SecurityProperties {
     }
 
     //used as fallback...
+
     public String getDecryptionDefaultAlias() {
         return decryptionDefaultAlias;
     }
@@ -76,6 +77,7 @@ public class SecurityProperties {
     }
 
     //todo caching?
+
     public Crypto getDecryptionCrypto() throws XMLSecurityException {
 
         if (this.getDecryptionKeyStore() == null) {
@@ -88,7 +90,7 @@ public class SecurityProperties {
         }
         //todo test instance for CryptoBase class
         try {
-            CryptoBase decryptionCrypto = (CryptoBase)decryptionCryptoClass.newInstance();
+            CryptoBase decryptionCrypto = (CryptoBase) decryptionCryptoClass.newInstance();
             decryptionCrypto.setKeyStore(this.getDecryptionKeyStore());
             return decryptionCrypto;
         } catch (Exception e) {
@@ -134,6 +136,7 @@ public class SecurityProperties {
     }
 
     //todo caching?
+
     public Crypto getEncryptionCrypto() throws XMLSecurityException {
         Class encryptionCryptoClass = ch.gigerstyle.xmlsec.crypto.Merlin.class;
         if (this.getEncryptionCryptoClass() != null) {
@@ -141,7 +144,7 @@ public class SecurityProperties {
         }
         //todo test instance for CryptoBase class
         try {
-            CryptoBase encryptionCrypto = (CryptoBase)encryptionCryptoClass.newInstance();
+            CryptoBase encryptionCrypto = (CryptoBase) encryptionCryptoClass.newInstance();
             encryptionCrypto.setKeyStore(this.getEncryptionKeyStore());
             return encryptionCrypto;
         } catch (Exception e) {
@@ -149,7 +152,7 @@ public class SecurityProperties {
         }
     }
 
-    public void addEncryptionSecurePart(SecurePart securePart){
+    public void addEncryptionSecurePart(SecurePart securePart) {
         encryptionParts.add(securePart);
     }
 
@@ -206,7 +209,7 @@ public class SecurityProperties {
     private String signatureUser;
     private Constants.KeyIdentifierType signatureKeyIdentifierType;
 
-    public void addSignaturePart(SecurePart securePart){
+    public void addSignaturePart(SecurePart securePart) {
         signatureParts.add(securePart);
     }
 
@@ -257,6 +260,7 @@ public class SecurityProperties {
     }
 
     //todo caching?
+
     public Crypto getSignatureCrypto() throws XMLSecurityException {
         Class signatureCryptoClass = ch.gigerstyle.xmlsec.crypto.Merlin.class;
         if (this.getDecryptionCryptoClass() != null) {
@@ -264,7 +268,7 @@ public class SecurityProperties {
         }
         //todo test instance for CryptoBase class
         try {
-            CryptoBase signatureCrypto = (CryptoBase)signatureCryptoClass.newInstance();
+            CryptoBase signatureCrypto = (CryptoBase) signatureCryptoClass.newInstance();
             signatureCrypto.setKeyStore(this.getSignatureKeyStore());
             return signatureCrypto;
         } catch (Exception e) {
@@ -329,6 +333,7 @@ public class SecurityProperties {
     }
 
     //todo caching?
+
     public Crypto getSignatureVerificationCrypto() throws XMLSecurityException {
         Class signatureVerificationCryptoClass = ch.gigerstyle.xmlsec.crypto.Merlin.class;
         if (this.getSignatureVerificationCryptoClass() != null) {
@@ -336,11 +341,11 @@ public class SecurityProperties {
         }
         //todo test instance for CryptoBase class
         try {
-            CryptoBase signatureVerificationCrypto = (CryptoBase)signatureVerificationCryptoClass.newInstance();
+            CryptoBase signatureVerificationCrypto = (CryptoBase) signatureVerificationCryptoClass.newInstance();
             signatureVerificationCrypto.setKeyStore(this.getSignatureVerificationKeyStore());
             return signatureVerificationCrypto;
         } catch (Exception e) {
             throw new XMLSecurityException("decryptionCrypto instanciation failed", e);
         }
-    }    
+    }
 }

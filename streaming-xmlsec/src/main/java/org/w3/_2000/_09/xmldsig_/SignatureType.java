@@ -13,16 +13,7 @@ import ch.gigerstyle.xmlsec.ext.ParseException;
 import ch.gigerstyle.xmlsec.ext.Parseable;
 import ch.gigerstyle.xmlsec.ext.Utils;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlID;
-import javax.xml.bind.annotation.XmlSchemaType;
-import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.*;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import javax.xml.stream.XMLStreamConstants;
@@ -30,13 +21,16 @@ import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 
 /**
  * <p>Java class for SignatureType complex type.
- * 
+ * <p/>
  * <p>The following schema fragment specifies the expected content contained within this class.
- * 
+ * <p/>
  * <pre>
  * &lt;complexType name="SignatureType">
  *   &lt;complexContent>
@@ -52,15 +46,13 @@ import javax.xml.stream.events.XMLEvent;
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
- * 
- * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "SignatureType", propOrder = {
-    "signedInfo",
-    "signatureValue",
-    "keyInfo",
-    "object"
+        "signedInfo",
+        "signatureValue",
+        "keyInfo",
+        "object"
 })
 public class SignatureType implements Parseable {
 
@@ -102,36 +94,33 @@ public class SignatureType implements Parseable {
         }
 
         switch (xmlEvent.getEventType()) {
-             case XMLStreamConstants.START_ELEMENT:
-                 StartElement startElement = xmlEvent.asStartElement();
+            case XMLStreamConstants.START_ELEMENT:
+                StartElement startElement = xmlEvent.asStartElement();
 
-                 if (startElement.getName().equals(Constants.TAG_dsig_SignedInfo)) {
-                     currentParseable = this.signedInfo = new SignedInfoType(startElement);
-                 }
-                 else if (startElement.getName().equals(Constants.TAG_dsig_SignatureValue)) {
-                     currentParseable = this.signatureValue = new SignatureValueType(startElement);
-                 }
-                 else if (startElement.getName().equals(Constants.TAG_dsig_KeyInfo)) {
-                     currentParseable = this.keyInfo = new KeyInfoType(startElement);
-                 }
-                 else {
-                     throw new ParseException("Unsupported Element: " + startElement.getName());
-                 }
+                if (startElement.getName().equals(Constants.TAG_dsig_SignedInfo)) {
+                    currentParseable = this.signedInfo = new SignedInfoType(startElement);
+                } else if (startElement.getName().equals(Constants.TAG_dsig_SignatureValue)) {
+                    currentParseable = this.signatureValue = new SignatureValueType(startElement);
+                } else if (startElement.getName().equals(Constants.TAG_dsig_KeyInfo)) {
+                    currentParseable = this.keyInfo = new KeyInfoType(startElement);
+                } else {
+                    throw new ParseException("Unsupported Element: " + startElement.getName());
+                }
 
-                 break;
-             case XMLStreamConstants.END_ELEMENT:
-                 currentParseable = null;
-                 EndElement endElement = xmlEvent.asEndElement();
-                 if (endElement.getName().equals(Constants.TAG_dsig_Signature)) {
-                     return true;
-                 }
-                 break;
-             //possible ignorable withespace and comments
-             case XMLStreamConstants.CHARACTERS:
-             case XMLStreamConstants.COMMENT:
-                 break;
-             default:
-                 throw new ParseException("Unexpected event received " + Utils.getXMLEventAsString(xmlEvent));
+                break;
+            case XMLStreamConstants.END_ELEMENT:
+                currentParseable = null;
+                EndElement endElement = xmlEvent.asEndElement();
+                if (endElement.getName().equals(Constants.TAG_dsig_Signature)) {
+                    return true;
+                }
+                break;
+            //possible ignorable withespace and comments
+            case XMLStreamConstants.CHARACTERS:
+            case XMLStreamConstants.COMMENT:
+                break;
+            default:
+                throw new ParseException("Unexpected event received " + Utils.getXMLEventAsString(xmlEvent));
         }
         return false;
     }
@@ -144,11 +133,9 @@ public class SignatureType implements Parseable {
 
     /**
      * Gets the value of the signedInfo property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link SignedInfoType }
-     *     
+     *
+     * @return possible object is
+     *         {@link SignedInfoType }
      */
     public SignedInfoType getSignedInfo() {
         return signedInfo;
@@ -156,11 +143,9 @@ public class SignatureType implements Parseable {
 
     /**
      * Sets the value of the signedInfo property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link SignedInfoType }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link SignedInfoType }
      */
     public void setSignedInfo(SignedInfoType value) {
         this.signedInfo = value;
@@ -168,11 +153,9 @@ public class SignatureType implements Parseable {
 
     /**
      * Gets the value of the signatureValue property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link SignatureValueType }
-     *     
+     *
+     * @return possible object is
+     *         {@link SignatureValueType }
      */
     public SignatureValueType getSignatureValue() {
         return signatureValue;
@@ -180,11 +163,9 @@ public class SignatureType implements Parseable {
 
     /**
      * Sets the value of the signatureValue property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link SignatureValueType }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link SignatureValueType }
      */
     public void setSignatureValue(SignatureValueType value) {
         this.signatureValue = value;
@@ -192,11 +173,9 @@ public class SignatureType implements Parseable {
 
     /**
      * Gets the value of the keyInfo property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link KeyInfoType }
-     *     
+     *
+     * @return possible object is
+     *         {@link KeyInfoType }
      */
     public KeyInfoType getKeyInfo() {
         return keyInfo;
@@ -204,11 +183,9 @@ public class SignatureType implements Parseable {
 
     /**
      * Sets the value of the keyInfo property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link KeyInfoType }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link KeyInfoType }
      */
     public void setKeyInfo(KeyInfoType value) {
         this.keyInfo = value;
@@ -216,25 +193,23 @@ public class SignatureType implements Parseable {
 
     /**
      * Gets the value of the object property.
-     * 
-     * <p>
+     * <p/>
+     * <p/>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
      * This is why there is not a <CODE>set</CODE> method for the object property.
-     * 
-     * <p>
+     * <p/>
+     * <p/>
      * For example, to add a new item, do as follows:
      * <pre>
      *    getObject().add(newItem);
      * </pre>
-     * 
-     * 
-     * <p>
+     * <p/>
+     * <p/>
+     * <p/>
      * Objects of the following type(s) are allowed in the list
      * {@link ObjectType }
-     * 
-     * 
      */
     public List<ObjectType> getObject() {
         if (object == null) {
@@ -245,11 +220,9 @@ public class SignatureType implements Parseable {
 
     /**
      * Gets the value of the id property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     *         {@link String }
      */
     public String getId() {
         return id;
@@ -257,11 +230,9 @@ public class SignatureType implements Parseable {
 
     /**
      * Sets the value of the id property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setId(String value) {
         this.id = value;

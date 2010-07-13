@@ -25,7 +25,7 @@ import java.util.*;
 public class XMLSecurityContext implements SecurityContext {
 
     private Map<String, SecurityTokenProvider> secretTokenProviders = new HashMap<String, SecurityTokenProvider>();
-    
+
     @SuppressWarnings("unchecked")
     private Map content = Collections.synchronizedMap(new HashMap());
 
@@ -36,22 +36,22 @@ public class XMLSecurityContext implements SecurityContext {
 
     @SuppressWarnings("unchecked")
     public <T> T get(String key) {
-        return (T)content.get(key);
+        return (T) content.get(key);
     }
 
     @SuppressWarnings("unchecked")
     public <T> void putAsList(Class key, T value) {
-        List<T> entry = (List<T>)content.get(key);
+        List<T> entry = (List<T>) content.get(key);
         if (entry == null) {
             entry = new ArrayList();
             content.put(key, entry);
         }
-        entry.add(value);        
+        entry.add(value);
     }
 
     @SuppressWarnings("unchecked")
     public <T> List<T> getAsList(Class key) {
-        return (List<T>)content.get(key);
+        return (List<T>) content.get(key);
     }
 
     public void registerSecurityTokenProvider(String id, SecurityTokenProvider securityTokenProvider) {

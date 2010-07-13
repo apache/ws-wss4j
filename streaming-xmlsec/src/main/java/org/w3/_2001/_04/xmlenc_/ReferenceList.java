@@ -8,31 +8,26 @@
 
 package org.w3._2001._04.xmlenc_;
 
+import ch.gigerstyle.xmlsec.ext.Constants;
 import ch.gigerstyle.xmlsec.ext.ParseException;
 import ch.gigerstyle.xmlsec.ext.Parseable;
 import ch.gigerstyle.xmlsec.ext.Utils;
-import ch.gigerstyle.xmlsec.ext.Constants;
 
-import java.util.ArrayList;
-import java.util.List;
 import javax.xml.bind.JAXBElement;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElementRef;
-import javax.xml.bind.annotation.XmlElementRefs;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.*;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
  * <p>Java class for anonymous complex type.
- * 
+ * <p/>
  * <p>The following schema fragment specifies the expected content contained within this class.
- * 
+ * <p/>
  * <pre>
  * &lt;complexType>
  *   &lt;complexContent>
@@ -45,12 +40,10 @@ import javax.xml.stream.events.XMLEvent;
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
- * 
- * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
-    "dataReferenceOrKeyReference"
+        "dataReferenceOrKeyReference"
 })
 @XmlRootElement(name = "ReferenceList")
 public class ReferenceList implements Parseable {
@@ -58,8 +51,8 @@ public class ReferenceList implements Parseable {
     private Parseable currentParseable;
 
     @XmlElementRefs({
-        @XmlElementRef(name = "DataReference", namespace = "http://www.w3.org/2001/04/xmlenc#", type = ReferenceType.class),
-        @XmlElementRef(name = "KeyReference", namespace = "http://www.w3.org/2001/04/xmlenc#", type = ReferenceType.class)
+            @XmlElementRef(name = "DataReference", namespace = "http://www.w3.org/2001/04/xmlenc#", type = ReferenceType.class),
+            @XmlElementRef(name = "KeyReference", namespace = "http://www.w3.org/2001/04/xmlenc#", type = ReferenceType.class)
     })
     protected List<ReferenceType> dataReferenceOrKeyReference;
 
@@ -78,28 +71,27 @@ public class ReferenceList implements Parseable {
         }
 
         switch (xmlEvent.getEventType()) {
-             case XMLStreamConstants.START_ELEMENT:
-                 StartElement startElement = xmlEvent.asStartElement();
+            case XMLStreamConstants.START_ELEMENT:
+                StartElement startElement = xmlEvent.asStartElement();
 
-                 if (startElement.getName().equals(Constants.TAG_xenc_DataReference)) {
-                     ReferenceType referenceType = new ReferenceType(startElement);
-                     currentParseable = referenceType;
-                     getDataReferenceOrKeyReference().add(referenceType);
-                 }
-                 else {
-                     throw new ParseException("Unsupported Element: " + startElement.getName());
-                 }
+                if (startElement.getName().equals(Constants.TAG_xenc_DataReference)) {
+                    ReferenceType referenceType = new ReferenceType(startElement);
+                    currentParseable = referenceType;
+                    getDataReferenceOrKeyReference().add(referenceType);
+                } else {
+                    throw new ParseException("Unsupported Element: " + startElement.getName());
+                }
 
-                 break;
-             case XMLStreamConstants.END_ELEMENT:
-                 currentParseable = null;
-                 EndElement endElement = xmlEvent.asEndElement();
-                 if (endElement.getName().equals(Constants.TAG_xenc_ReferenceList)) {
-                     return true;
-                 }
-                 break;             
-             default:
-                 throw new ParseException("Unexpected event received " + Utils.getXMLEventAsString(xmlEvent));
+                break;
+            case XMLStreamConstants.END_ELEMENT:
+                currentParseable = null;
+                EndElement endElement = xmlEvent.asEndElement();
+                if (endElement.getName().equals(Constants.TAG_xenc_ReferenceList)) {
+                    return true;
+                }
+                break;
+            default:
+                throw new ParseException("Unexpected event received " + Utils.getXMLEventAsString(xmlEvent));
         }
         return false;
     }
@@ -112,26 +104,24 @@ public class ReferenceList implements Parseable {
 
     /**
      * Gets the value of the dataReferenceOrKeyReference property.
-     * 
-     * <p>
+     * <p/>
+     * <p/>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
      * This is why there is not a <CODE>set</CODE> method for the dataReferenceOrKeyReference property.
-     * 
-     * <p>
+     * <p/>
+     * <p/>
      * For example, to add a new item, do as follows:
      * <pre>
      *    getDataReferenceOrKeyReference().add(newItem);
      * </pre>
-     * 
-     * 
-     * <p>
+     * <p/>
+     * <p/>
+     * <p/>
      * Objects of the following type(s) are allowed in the list
      * {@link JAXBElement }{@code <}{@link ReferenceType }{@code >}
      * {@link JAXBElement }{@code <}{@link ReferenceType }{@code >}
-     * 
-     * 
      */
     public List<ReferenceType> getDataReferenceOrKeyReference() {
         if (dataReferenceOrKeyReference == null) {

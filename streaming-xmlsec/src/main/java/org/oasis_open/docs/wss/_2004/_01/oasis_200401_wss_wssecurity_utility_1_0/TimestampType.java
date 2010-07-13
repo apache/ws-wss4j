@@ -8,16 +8,13 @@
 
 package org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_utility_1_0;
 
-import java.util.*;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAnyAttribute;
-import javax.xml.bind.annotation.XmlAnyElement;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlID;
-import javax.xml.bind.annotation.XmlSchemaType;
-import javax.xml.bind.annotation.XmlType;
+import ch.gigerstyle.xmlsec.ext.Constants;
+import ch.gigerstyle.xmlsec.ext.ParseException;
+import ch.gigerstyle.xmlsec.ext.Parseable;
+import ch.gigerstyle.xmlsec.ext.Utils;
+import org.w3c.dom.Element;
+
+import javax.xml.bind.annotation.*;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import javax.xml.namespace.QName;
@@ -26,23 +23,17 @@ import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
-
-import ch.gigerstyle.xmlsec.ext.*;
-import ch.gigerstyle.xmlsec.ext.ParseException;
-import ch.gigerstyle.xmlsec.ext.Parseable;
-import ch.gigerstyle.xmlsec.ext.Constants;
-import org.w3c.dom.Element;
+import java.util.*;
 
 
 /**
- * 
  * This complex type ties together the timestamp related elements into a composite type.
- *             
- * 
+ * <p/>
+ * <p/>
  * <p>Java class for TimestampType complex type.
- * 
+ * <p/>
  * <p>The following schema fragment specifies the expected content contained within this class.
- * 
+ * <p/>
  * <pre>
  * &lt;complexType name="TimestampType">
  *   &lt;complexContent>
@@ -60,14 +51,12 @@ import org.w3c.dom.Element;
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
- * 
- * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "TimestampType", propOrder = {
-    "created",
-    "expires",
-    "any"
+        "created",
+        "expires",
+        "any"
 })
 public class TimestampType implements Parseable {
 
@@ -109,29 +98,27 @@ public class TimestampType implements Parseable {
         }
 
         switch (xmlEvent.getEventType()) {
-             case XMLStreamConstants.START_ELEMENT:
-                 StartElement startElement = xmlEvent.asStartElement();
+            case XMLStreamConstants.START_ELEMENT:
+                StartElement startElement = xmlEvent.asStartElement();
 
-                 if (startElement.getName().equals(Constants.TAG_wsu_Created)) {
-                     currentParseable = this.created = new AttributedDateTime(startElement);
-                 }
-                 else if (startElement.getName().equals(Constants.TAG_wsu_Expires)) {
-                     currentParseable = this.expires = new AttributedDateTime(startElement);
-                 }
-                 else {
-                     throw new ParseException("Unsupported Element: " + startElement.getName());
-                 }
+                if (startElement.getName().equals(Constants.TAG_wsu_Created)) {
+                    currentParseable = this.created = new AttributedDateTime(startElement);
+                } else if (startElement.getName().equals(Constants.TAG_wsu_Expires)) {
+                    currentParseable = this.expires = new AttributedDateTime(startElement);
+                } else {
+                    throw new ParseException("Unsupported Element: " + startElement.getName());
+                }
 
-                 break;
-             case XMLStreamConstants.END_ELEMENT:
-                 currentParseable = null;
-                 EndElement endElement = xmlEvent.asEndElement();
-                 if (endElement.getName().equals(Constants.TAG_wsu_Timestamp)) {
-                     return true;
-                 }
-                 break;
-             default:
-                 throw new ParseException("Unexpected event received " + Utils.getXMLEventAsString(xmlEvent));
+                break;
+            case XMLStreamConstants.END_ELEMENT:
+                currentParseable = null;
+                EndElement endElement = xmlEvent.asEndElement();
+                if (endElement.getName().equals(Constants.TAG_wsu_Timestamp)) {
+                    return true;
+                }
+                break;
+            default:
+                throw new ParseException("Unexpected event received " + Utils.getXMLEventAsString(xmlEvent));
         }
         return false;
     }
@@ -144,11 +131,9 @@ public class TimestampType implements Parseable {
 
     /**
      * Gets the value of the created property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link AttributedDateTime }
-     *     
+     *
+     * @return possible object is
+     *         {@link AttributedDateTime }
      */
     public AttributedDateTime getCreated() {
         return created;
@@ -156,11 +141,9 @@ public class TimestampType implements Parseable {
 
     /**
      * Sets the value of the created property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link AttributedDateTime }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link AttributedDateTime }
      */
     public void setCreated(AttributedDateTime value) {
         this.created = value;
@@ -168,11 +151,9 @@ public class TimestampType implements Parseable {
 
     /**
      * Gets the value of the expires property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link AttributedDateTime }
-     *     
+     *
+     * @return possible object is
+     *         {@link AttributedDateTime }
      */
     public AttributedDateTime getExpires() {
         return expires;
@@ -180,11 +161,9 @@ public class TimestampType implements Parseable {
 
     /**
      * Sets the value of the expires property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link AttributedDateTime }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link AttributedDateTime }
      */
     public void setExpires(AttributedDateTime value) {
         this.expires = value;
@@ -192,26 +171,24 @@ public class TimestampType implements Parseable {
 
     /**
      * Gets the value of the any property.
-     * 
-     * <p>
+     * <p/>
+     * <p/>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
      * This is why there is not a <CODE>set</CODE> method for the any property.
-     * 
-     * <p>
+     * <p/>
+     * <p/>
      * For example, to add a new item, do as follows:
      * <pre>
      *    getAny().add(newItem);
      * </pre>
-     * 
-     * 
-     * <p>
+     * <p/>
+     * <p/>
+     * <p/>
      * Objects of the following type(s) are allowed in the list
      * {@link Element }
      * {@link Object }
-     * 
-     * 
      */
     public List<Object> getAny() {
         if (any == null) {
@@ -222,11 +199,9 @@ public class TimestampType implements Parseable {
 
     /**
      * Gets the value of the id property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     *         {@link String }
      */
     public String getId() {
         return id;
@@ -234,11 +209,9 @@ public class TimestampType implements Parseable {
 
     /**
      * Sets the value of the id property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setId(String value) {
         this.id = value;
@@ -246,17 +219,15 @@ public class TimestampType implements Parseable {
 
     /**
      * Gets a map that contains attributes that aren't bound to any typed property on this class.
-     * 
-     * <p>
-     * the map is keyed by the name of the attribute and 
+     * <p/>
+     * <p/>
+     * the map is keyed by the name of the attribute and
      * the value is the string value of the attribute.
-     * 
+     * <p/>
      * the map returned by this method is live, and you can add new attribute
      * by updating the map directly. Because of this design, there's no setter.
-     * 
-     * 
-     * @return
-     *     always non-null
+     *
+     * @return always non-null
      */
     public Map<QName, String> getOtherAttributes() {
         return otherAttributes;

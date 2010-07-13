@@ -34,7 +34,7 @@ public class SignerOutputStream extends OutputStream {
     }
 
     public void write(byte[] arg0) {
-        write(arg0, 0, arg0.length);        
+        write(arg0, 0, arg0.length);
     }
 
     public void write(int arg0) {

@@ -13,18 +13,7 @@ import ch.gigerstyle.xmlsec.ext.ParseException;
 import ch.gigerstyle.xmlsec.ext.Parseable;
 import ch.gigerstyle.xmlsec.ext.Utils;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAnyAttribute;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlID;
-import javax.xml.bind.annotation.XmlSchemaType;
-import javax.xml.bind.annotation.XmlSeeAlso;
-import javax.xml.bind.annotation.XmlType;
-import javax.xml.bind.annotation.XmlValue;
+import javax.xml.bind.annotation.*;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import javax.xml.namespace.QName;
@@ -33,15 +22,18 @@ import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 
 /**
  * This type represents an element with arbitrary attributes.
- * 
+ * <p/>
  * <p>Java class for AttributedString complex type.
- * 
+ * <p/>
  * <p>The following schema fragment specifies the expected content contained within this class.
- * 
+ * <p/>
  * <pre>
  * &lt;complexType name="AttributedString">
  *   &lt;simpleContent>
@@ -52,16 +44,14 @@ import javax.xml.stream.events.XMLEvent;
  *   &lt;/simpleContent>
  * &lt;/complexType>
  * </pre>
- * 
- * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "AttributedString", propOrder = {
-    "value"
+        "value"
 })
 @XmlSeeAlso({
-    PasswordString.class,
-    EncodedString.class
+        PasswordString.class,
+        EncodedString.class
 })
 public class AttributedString implements Parseable {
 
@@ -93,22 +83,22 @@ public class AttributedString implements Parseable {
         }
     }
 
-     public boolean parseXMLEvent(XMLEvent xmlEvent) throws ParseException {
+    public boolean parseXMLEvent(XMLEvent xmlEvent) throws ParseException {
 
         switch (xmlEvent.getEventType()) {
-             case XMLStreamConstants.START_ELEMENT:
-                 break;
-             case XMLStreamConstants.END_ELEMENT:
-                 EndElement endElement = xmlEvent.asEndElement();
-                 if (endElement.getName().equals(startElementName)) {
-                     return true;
-                 }
-                 break;
-             case XMLStreamConstants.CHARACTERS:
-                 this.value = xmlEvent.asCharacters().getData();
-                 break;
-             default:
-                 throw new ParseException("Unexpected event received " + Utils.getXMLEventAsString(xmlEvent));
+            case XMLStreamConstants.START_ELEMENT:
+                break;
+            case XMLStreamConstants.END_ELEMENT:
+                EndElement endElement = xmlEvent.asEndElement();
+                if (endElement.getName().equals(startElementName)) {
+                    return true;
+                }
+                break;
+            case XMLStreamConstants.CHARACTERS:
+                this.value = xmlEvent.asCharacters().getData();
+                break;
+            default:
+                throw new ParseException("Unexpected event received " + Utils.getXMLEventAsString(xmlEvent));
         }
         return false;
     }
@@ -118,11 +108,9 @@ public class AttributedString implements Parseable {
 
     /**
      * Gets the value of the value property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     *         {@link String }
      */
     public String getValue() {
         return value;
@@ -130,11 +118,9 @@ public class AttributedString implements Parseable {
 
     /**
      * Sets the value of the value property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setValue(String value) {
         this.value = value;
@@ -142,11 +128,9 @@ public class AttributedString implements Parseable {
 
     /**
      * Gets the value of the id property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     *         {@link String }
      */
     public String getId() {
         return id;
@@ -154,11 +138,9 @@ public class AttributedString implements Parseable {
 
     /**
      * Sets the value of the id property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setId(String value) {
         this.id = value;
@@ -166,17 +148,15 @@ public class AttributedString implements Parseable {
 
     /**
      * Gets a map that contains attributes that aren't bound to any typed property on this class.
-     * 
-     * <p>
-     * the map is keyed by the name of the attribute and 
+     * <p/>
+     * <p/>
+     * the map is keyed by the name of the attribute and
      * the value is the string value of the attribute.
-     * 
+     * <p/>
      * the map returned by this method is live, and you can add new attribute
      * by updating the map directly. Because of this design, there's no setter.
-     * 
-     * 
-     * @return
-     *     always non-null
+     *
+     * @return always non-null
      */
     public Map<QName, String> getOtherAttributes() {
         return otherAttributes;

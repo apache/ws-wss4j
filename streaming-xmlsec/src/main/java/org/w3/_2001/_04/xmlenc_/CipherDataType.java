@@ -25,9 +25,9 @@ import javax.xml.stream.events.XMLEvent;
 
 /**
  * <p>Java class for CipherDataType complex type.
- * 
+ * <p/>
  * <p>The following schema fragment specifies the expected content contained within this class.
- * 
+ * <p/>
  * <pre>
  * &lt;complexType name="CipherDataType">
  *   &lt;complexContent>
@@ -40,13 +40,11 @@ import javax.xml.stream.events.XMLEvent;
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
- * 
- * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "CipherDataType", propOrder = {
-    "cipherValue",
-    "cipherReference"
+        "cipherValue",
+        "cipherReference"
 })
 public class CipherDataType implements Parseable {
 
@@ -72,13 +70,13 @@ public class CipherDataType implements Parseable {
         }
 
         switch (xmlEvent.getEventType()) {
-             case XMLStreamConstants.START_ELEMENT:
-                 StartElement startElement = xmlEvent.asStartElement();
+            case XMLStreamConstants.START_ELEMENT:
+                StartElement startElement = xmlEvent.asStartElement();
 
-                 if (startElement.getName().equals(Constants.TAG_xenc_CipherValue)) {
-                     currentParseable = new Parseable() {
-                         public boolean parseXMLEvent(XMLEvent xmlEvent) throws ParseException {
-                             switch (xmlEvent.getEventType()) {
+                if (startElement.getName().equals(Constants.TAG_xenc_CipherValue)) {
+                    currentParseable = new Parseable() {
+                        public boolean parseXMLEvent(XMLEvent xmlEvent) throws ParseException {
+                            switch (xmlEvent.getEventType()) {
                                 case XMLStreamConstants.START_ELEMENT:
                                     StartElement startElement = xmlEvent.asStartElement();
                                     if (!startElement.getName().equals(Constants.TAG_xenc_CipherValue)) {
@@ -87,9 +85,9 @@ public class CipherDataType implements Parseable {
                                     break;
                                 case XMLStreamConstants.END_ELEMENT:
                                     EndElement endElement = xmlEvent.asEndElement();
-                                     if (endElement.getName().equals(Constants.TAG_xenc_CipherValue)) {
-                                         return true;
-                                     }
+                                    if (endElement.getName().equals(Constants.TAG_xenc_CipherValue)) {
+                                        return true;
+                                    }
                                     break;
                                 case XMLStreamConstants.CHARACTERS:
                                     //todo handle mutliple character events:
@@ -97,35 +95,34 @@ public class CipherDataType implements Parseable {
                                     break;
                                 default:
                                     throw new ParseException("Unexpected event received " + Utils.getXMLEventAsString(xmlEvent));
-                             }
-                             return false;
-                         }
+                            }
+                            return false;
+                        }
 
-                         public void validate() throws ParseException {
-                             if (cipherValue == null) {
-                                 throw new ParseException("CipherValue is missing");
-                             }
-                         }
-                     };
-                 }
-                 else {
-                     throw new ParseException("Unsupported Element: " + startElement.getName());
-                 }
+                        public void validate() throws ParseException {
+                            if (cipherValue == null) {
+                                throw new ParseException("CipherValue is missing");
+                            }
+                        }
+                    };
+                } else {
+                    throw new ParseException("Unsupported Element: " + startElement.getName());
+                }
 
-                 break;
-             case XMLStreamConstants.END_ELEMENT:
-                 currentParseable = null;
-                 EndElement endElement = xmlEvent.asEndElement();
-                 if (endElement.getName().equals(Constants.TAG_xenc_CipherData)) {
-                     return true;
-                 }
-                 break;
-             //possible ignorable withespace and comments
-             case XMLStreamConstants.CHARACTERS:
-             case XMLStreamConstants.COMMENT:
-                 break;
-             default:
-                 throw new ParseException("Unexpected event received " + Utils.getXMLEventAsString(xmlEvent));
+                break;
+            case XMLStreamConstants.END_ELEMENT:
+                currentParseable = null;
+                EndElement endElement = xmlEvent.asEndElement();
+                if (endElement.getName().equals(Constants.TAG_xenc_CipherData)) {
+                    return true;
+                }
+                break;
+            //possible ignorable withespace and comments
+            case XMLStreamConstants.CHARACTERS:
+            case XMLStreamConstants.COMMENT:
+                break;
+            default:
+                throw new ParseException("Unexpected event received " + Utils.getXMLEventAsString(xmlEvent));
         }
         return false;
     }
@@ -141,10 +138,9 @@ public class CipherDataType implements Parseable {
 
     /**
      * Gets the value of the cipherValue property.
-     * 
-     * @return
-     *     possible object is
-     *     byte[]
+     *
+     * @return possible object is
+     *         byte[]
      */
     public byte[] getCipherValue() {
         return cipherValue;
@@ -152,10 +148,9 @@ public class CipherDataType implements Parseable {
 
     /**
      * Sets the value of the cipherValue property.
-     * 
-     * @param value
-     *     allowed object is
-     *     byte[]
+     *
+     * @param value allowed object is
+     *              byte[]
      */
     public void setCipherValue(byte[] value) {
         this.cipherValue = ((byte[]) value);
@@ -163,11 +158,9 @@ public class CipherDataType implements Parseable {
 
     /**
      * Gets the value of the cipherReference property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link CipherReferenceType }
-     *     
+     *
+     * @return possible object is
+     *         {@link CipherReferenceType }
      */
     public CipherReferenceType getCipherReference() {
         return cipherReference;
@@ -175,11 +168,9 @@ public class CipherDataType implements Parseable {
 
     /**
      * Sets the value of the cipherReference property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link CipherReferenceType }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link CipherReferenceType }
      */
     public void setCipherReference(CipherReferenceType value) {
         this.cipherReference = value;

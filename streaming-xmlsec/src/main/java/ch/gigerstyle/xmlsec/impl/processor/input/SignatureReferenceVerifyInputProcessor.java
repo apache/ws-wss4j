@@ -1,10 +1,6 @@
 package ch.gigerstyle.xmlsec.impl.processor.input;
 
 import ch.gigerstyle.xmlsec.config.JCEAlgorithmMapper;
-import java.io.BufferedOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-
 import ch.gigerstyle.xmlsec.ext.*;
 import ch.gigerstyle.xmlsec.impl.transformer.canonicalizer.Canonicalizer20010315ExclOmitCommentsTransformer;
 import ch.gigerstyle.xmlsec.impl.util.DigestOutputStream;
@@ -17,10 +13,14 @@ import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
+import java.io.BufferedOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * User: giger
@@ -134,7 +134,7 @@ public class SignatureReferenceVerifyInputProcessor extends AbstractInputProcess
                 EndElement endElement = xmlEvent.asEndElement();
                 elementCounter--;
 
-                if (endElement.getName().equals(startElement) && elementCounter == 0) {                    
+                if (endElement.getName().equals(startElement) && elementCounter == 0) {
                     try {
                         bufferedDigestOutputStream.close();
                     } catch (IOException e) {
@@ -143,7 +143,7 @@ public class SignatureReferenceVerifyInputProcessor extends AbstractInputProcess
 
                     byte[] calculatedDigest = this.digestOutputStream.getDigestValue();
                     byte[] storedDigest = org.bouncycastle.util.encoders.Base64.decode(referenceType.getDigestValue());
-                    
+
                     if (logger.isDebugEnabled()) {
                         logger.debug("Calculated Digest: " + new String(org.bouncycastle.util.encoders.Base64.encode(calculatedDigest)));
                         logger.debug("Stored Digest: " + new String(org.bouncycastle.util.encoders.Base64.encode(storedDigest)));

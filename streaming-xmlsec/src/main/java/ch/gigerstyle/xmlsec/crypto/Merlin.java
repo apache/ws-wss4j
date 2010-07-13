@@ -19,10 +19,7 @@ package ch.gigerstyle.xmlsec.crypto;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.security.KeyStore;
 
 /**
  * Created by IntelliJ IDEA.
@@ -49,8 +46,8 @@ public class Merlin extends CryptoBase {
          * Load cacerts
          */
 
-    //todo:
-    /*
+        //todo:
+        /*
         String loadCacerts =
                 properties.getProperty(
                         "org.apache.ws.security.crypto.merlin.load.cacerts",
@@ -87,6 +84,7 @@ public class Merlin extends CryptoBase {
     }
 
     //todo remove?:
+
     public String getDefaultX509Alias() {
         return defaultX509Alias;
     }

@@ -52,8 +52,7 @@ public class BinarySecurityTokenInputProcessor extends AbstractInputProcessor im
             } catch (ParseException e) {
                 throw new XMLSecurityException(e);
             }
-        }
-        else if (xmlEvent.isStartElement()) {
+        } else if (xmlEvent.isStartElement()) {
             StartElement startElement = xmlEvent.asStartElement();
             if (startElement.getName().equals(Constants.TAG_wsse_BinarySecurityToken)) {
                 currentBinarySecurityTokenType = new BinarySecurityTokenType(startElement);

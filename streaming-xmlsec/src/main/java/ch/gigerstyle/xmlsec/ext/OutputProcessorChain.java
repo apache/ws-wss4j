@@ -36,7 +36,8 @@ public interface OutputProcessorChain extends ProcessorChain {
     /**
      * Creates a subchain starts with the outputProcessor + 1
      * Holding a reference to a subchain in a processor and access it in different methods is
-     * strictly forbidden. Abusing this rule leads to undefined state (Most probably to a ArrayIndexOutOfBounds exception)  
+     * strictly forbidden. Abusing this rule leads to undefined state (Most probably to a ArrayIndexOutOfBounds exception)
+     *
      * @param outputProcessor
      * @return
      * @throws XMLStreamException

@@ -181,7 +181,7 @@ public class WSSecurityException extends RemoteException {
     public javax.xml.namespace.QName getFaultCode() {
         Object ret = FAULT_CODE_MAP.get(new Integer(this.errorCode));
         if (ret != null) {
-            return (javax.xml.namespace.QName)ret;
+            return (javax.xml.namespace.QName) ret;
         }
         return null;
     }

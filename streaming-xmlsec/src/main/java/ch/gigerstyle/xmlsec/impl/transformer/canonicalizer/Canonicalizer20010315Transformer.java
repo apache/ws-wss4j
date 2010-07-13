@@ -36,23 +36,23 @@ import java.util.*;
  */
 public class Canonicalizer20010315Transformer implements Transformer {
 
-    private static final byte[] _END_PI = {'?','>'};
-   private static final byte[] _BEGIN_PI = {'<','?'};
-   private static final byte[] _END_COMM = {'-','-','>'};
-   private static final byte[] _BEGIN_COMM = {'<','!','-','-'};
-   private static final byte[] __XA_ = {'&','#','x','A',';'};
-   private static final byte[] __X9_ = {'&','#','x','9',';'};
-   private static final byte[] _QUOT_ = {'&','q','u','o','t',';'};
-   private static final byte[] __XD_ = {'&','#','x','D',';'};
-   private static final byte[] _GT_ = {'&','g','t',';'};
-   private static final byte[] _LT_ = {'&','l','t',';'};
-   private static final byte[] _END_TAG = {'<','/'};
-   private static final byte[] _AMP_ = {'&','a','m','p',';'};
-    final static byte[] equalsStr= {'=','\"'};
+    private static final byte[] _END_PI = {'?', '>'};
+    private static final byte[] _BEGIN_PI = {'<', '?'};
+    private static final byte[] _END_COMM = {'-', '-', '>'};
+    private static final byte[] _BEGIN_COMM = {'<', '!', '-', '-'};
+    private static final byte[] __XA_ = {'&', '#', 'x', 'A', ';'};
+    private static final byte[] __X9_ = {'&', '#', 'x', '9', ';'};
+    private static final byte[] _QUOT_ = {'&', 'q', 'u', 'o', 't', ';'};
+    private static final byte[] __XD_ = {'&', '#', 'x', 'D', ';'};
+    private static final byte[] _GT_ = {'&', 'g', 't', ';'};
+    private static final byte[] _LT_ = {'&', 'l', 't', ';'};
+    private static final byte[] _END_TAG = {'<', '/'};
+    private static final byte[] _AMP_ = {'&', 'a', 'm', 'p', ';'};
+    final static byte[] equalsStr = {'=', '\"'};
 
     static final int NODE_BEFORE_DOCUMENT_ELEMENT = -1;
-   static final int NODE_NOT_BEFORE_OR_AFTER_DOCUMENT_ELEMENT = 0;
-   static final int NODE_AFTER_DOCUMENT_ELEMENT = 1;
+    static final int NODE_NOT_BEFORE_OR_AFTER_DOCUMENT_ELEMENT = 0;
+    static final int NODE_AFTER_DOCUMENT_ELEMENT = 1;
 
     private Map cache = new HashMap();
 
@@ -60,7 +60,7 @@ public class Canonicalizer20010315Transformer implements Transformer {
 
     private boolean includeComments = false;
     private boolean exclusive = false;
-    private int documentLevel=NODE_BEFORE_DOCUMENT_ELEMENT;
+    private int documentLevel = NODE_BEFORE_DOCUMENT_ELEMENT;
 
     private QName rootElement = null;
 
@@ -79,25 +79,25 @@ public class Canonicalizer20010315Transformer implements Transformer {
 
     public static SortedSet prefixStr2Set(String inclusiveNamespaces) {
 
-      if ((inclusiveNamespaces == null) || (inclusiveNamespaces.length() == 0)) {
-         return null;
-      }
+        if ((inclusiveNamespaces == null) || (inclusiveNamespaces.length() == 0)) {
+            return null;
+        }
 
-      SortedSet prefixes = new TreeSet();
+        SortedSet prefixes = new TreeSet();
 
-      StringTokenizer st = new StringTokenizer(inclusiveNamespaces, " \t\r\n");
+        StringTokenizer st = new StringTokenizer(inclusiveNamespaces, " \t\r\n");
 
-      while (st.hasMoreTokens()) {
-         String prefix = st.nextToken();
+        while (st.hasMoreTokens()) {
+            String prefix = st.nextToken();
 
-         if (prefix.equals("#default")) {
-            prefixes.add("");
-         } else {
-            prefixes.add(prefix);
-         }
-      }
-      return prefixes;
-   }
+            if (prefix.equals("#default")) {
+                prefixes.add("");
+            } else {
+                prefixes.add(prefix);
+            }
+        }
+        return prefixes;
+    }
 
     public void transform(XMLEvent xmlEvent, OutputStream outputStream) throws XMLStreamException {
         try {
@@ -110,7 +110,7 @@ public class Canonicalizer20010315Transformer implements Transformer {
                         rootElement = startElement.getName();
                     }
 
-                    documentLevel=NODE_NOT_BEFORE_OR_AFTER_DOCUMENT_ELEMENT;
+                    documentLevel = NODE_NOT_BEFORE_OR_AFTER_DOCUMENT_ELEMENT;
 
                     outputStack.push(new ArrayList());
 
@@ -124,7 +124,7 @@ public class Canonicalizer20010315Transformer implements Transformer {
                     UtfHelpper.writeByte(name, outputStream, cache);
 
                     //todo check before cast
-                    XMLEventNS xmlEventNS = (XMLEventNS)xmlEvent;
+                    XMLEventNS xmlEventNS = (XMLEventNS) xmlEvent;
 
                     List<ComparableNamespace>[] namespaceList;
                     List<ComparableAttribute>[] xmlAttributeList;
@@ -133,13 +133,13 @@ public class Canonicalizer20010315Transformer implements Transformer {
 
                     if (!firstCall) {
                         //just current event is interesting
-                        namespaceList = new List[] { xmlEventNS.getNamespaceList()[0] };
-                        xmlAttributeList = new List[] { xmlEventNS.getAttributeList()[0] };
+                        namespaceList = new List[]{xmlEventNS.getNamespaceList()[0]};
+                        xmlAttributeList = new List[]{xmlEventNS.getAttributeList()[0]};
                     } else {
                         outputStack.peek().add(new ComparableNamespace(xmlEventFactory.createNamespace("")));
                         if (exclusive) {
-                            namespaceList = new List[] { xmlEventNS.getNamespaceList()[0] };
-                            xmlAttributeList = new List[] { xmlEventNS.getAttributeList()[0] };
+                            namespaceList = new List[]{xmlEventNS.getNamespaceList()[0]};
+                            xmlAttributeList = new List[]{xmlEventNS.getAttributeList()[0]};
                             /*
                             for (int i = 0; i < namespaceList.length; i++) {
                                 List<ComparableNamespace> comparableNamespaceList = namespaceList[i];
@@ -164,11 +164,11 @@ public class Canonicalizer20010315Transformer implements Transformer {
                                     //look for redefinition of prefix
                                     //todo if can be removed now?:
                                     if (comparableNamespace.getPrefix().equals(startElement.getName().getPrefix())
-                                        && !comparableNamespace.getNamespaceURI().equals(startElement.getName().getNamespaceURI())) {
+                                            && !comparableNamespace.getNamespaceURI().equals(startElement.getName().getNamespaceURI())) {
                                         continue;
                                     }
 
-                                    final ComparableNamespace found = (ComparableNamespace)outputStack.containsOnStack(comparableNamespace);
+                                    final ComparableNamespace found = (ComparableNamespace) outputStack.containsOnStack(comparableNamespace);
                                     if (found != null && comparableNamespace.getNamespaceURI().equals(found.getNamespaceURI())) {
                                         continue;
                                     }
@@ -178,8 +178,7 @@ public class Canonicalizer20010315Transformer implements Transformer {
                                             outputStack.peek().add(comparableNamespace);
                                             nsSet.add(comparableNamespace);
                                         }
-                                    }
-                                    else {
+                                    } else {
                                         nsSet.add(comparableNamespace);
                                         outputStack.peek().add(comparableNamespace);
                                     }
@@ -195,7 +194,7 @@ public class Canonicalizer20010315Transformer implements Transformer {
                         for (int j = 0; j < comparableNamespaces.size(); j++) {
                             ComparableNamespace comparableNamespace = comparableNamespaces.get(j);
 
-                            final ComparableNamespace found = (ComparableNamespace)outputStack.containsOnStack(comparableNamespace);
+                            final ComparableNamespace found = (ComparableNamespace) outputStack.containsOnStack(comparableNamespace);
                             /*
                             if ((found != null && found.isDefaultNamespaceDeclaration() == false)
                                     || (found != null && found.isDefaultNamespaceDeclaration() && found.getNamespaceURI().equals(comparableNamespace.getNamespaceURI()))) {
@@ -227,19 +226,18 @@ public class Canonicalizer20010315Transformer implements Transformer {
                                     continue;
                                 }
                             }
-                            
+
                             if (this.inclusiveNamespaces != null) {
                                 if (this.inclusiveNamespaces.contains(comparableNamespace.getPrefix())) {
                                     nsSet.add(comparableNamespace);
                                 }
-                            }
-                            else {
+                            } else {
                                 nsSet.add(comparableNamespace);
                             }
                             outputStack.peek().add(comparableNamespace);
                         }
                     }
-                    
+
                     Iterator<ComparableNamespace> namespaceIterator = nsSet.iterator();
                     while (namespaceIterator.hasNext()) {
                         ComparableNamespace namespace = namespaceIterator.next();
@@ -288,7 +286,7 @@ public class Canonicalizer20010315Transformer implements Transformer {
                     while (attributeIterator.hasNext()) {
                         ComparableAttribute attribute = attributeIterator.next();
 
-                       //outputAttrToWriter(attribute.getName().getPrefix() + ":" + attribute.getName().getLocalPart(), attribute.getValue(), outputStream, cache);
+                        //outputAttrToWriter(attribute.getName().getPrefix() + ":" + attribute.getName().getLocalPart(), attribute.getValue(), outputStream, cache);
 
                         String localPart = "";
                         if (attribute.getName().getPrefix() != null && attribute.getName().getPrefix().length() > 0) {
@@ -333,19 +331,19 @@ public class Canonicalizer20010315Transformer implements Transformer {
                     outputStream.write('>');
 
                     //We fineshed with this level, pop to the previous definitions.
-    //                    ns.outputNodePop();
+                    //                    ns.outputNodePop();
 
                     //hashMapStack.pop();
                     outputStack.pop();
                     //todo the size() test is probably enough 
                     if (outputStack.size() == 0 && endElement.getName().equals(rootElement)) {
-                        documentLevel=NODE_AFTER_DOCUMENT_ELEMENT;
+                        documentLevel = NODE_AFTER_DOCUMENT_ELEMENT;
                     }
 
                     break;
                 case XMLStreamConstants.PROCESSING_INSTRUCTION:
-                    xmlEventNS = (XMLEventNS)xmlEvent;
-                    outputPItoWriter(((ProcessingInstruction)xmlEventNS.getCurrentEvent()), outputStream, documentLevel);
+                    xmlEventNS = (XMLEventNS) xmlEvent;
+                    outputPItoWriter(((ProcessingInstruction) xmlEventNS.getCurrentEvent()), outputStream, documentLevel);
                     break;
                 case XMLStreamConstants.CHARACTERS:
                     if (documentLevel == NODE_NOT_BEFORE_OR_AFTER_DOCUMENT_ELEMENT) {
@@ -354,8 +352,8 @@ public class Canonicalizer20010315Transformer implements Transformer {
                     break;
                 case XMLStreamConstants.COMMENT:
                     if (includeComments) {
-                        xmlEventNS = (XMLEventNS)xmlEvent;
-                        outputCommentToWriter(((Comment)xmlEventNS.getCurrentEvent()), outputStream, documentLevel);
+                        xmlEventNS = (XMLEventNS) xmlEvent;
+                        outputCommentToWriter(((Comment) xmlEventNS.getCurrentEvent()), outputStream, documentLevel);
                     }
                     break;
                 case XMLStreamConstants.SPACE:
@@ -364,8 +362,8 @@ public class Canonicalizer20010315Transformer implements Transformer {
                     }
                     break;
                 case XMLStreamConstants.START_DOCUMENT:
-                    documentLevel=NODE_BEFORE_DOCUMENT_ELEMENT;
-    //                    ns.outputNodePush();
+                    documentLevel = NODE_BEFORE_DOCUMENT_ELEMENT;
+                    //                    ns.outputNodePush();
                     break;
                 case XMLStreamConstants.END_DOCUMENT:
                     break;
@@ -394,195 +392,199 @@ public class Canonicalizer20010315Transformer implements Transformer {
     }
 
     private static final void outputAttrToWriter(final String name, final String value, final OutputStream writer,
-			   	final Map cache) throws IOException {
-	      writer.write(' ');
-	      UtfHelpper.writeByte(name,writer,cache);
-	      writer.write(equalsStr);
-	      byte  []toWrite;
-	      final int length = value.length();
-	      int i=0;
-	      while (i < length) {
-	         char c = value.charAt(i++);
+                                                 final Map cache) throws IOException {
+        writer.write(' ');
+        UtfHelpper.writeByte(name, writer, cache);
+        writer.write(equalsStr);
+        byte[] toWrite;
+        final int length = value.length();
+        int i = 0;
+        while (i < length) {
+            char c = value.charAt(i++);
 
-	         switch (c) {
+            switch (c) {
 
-	         case '&' :
-	         	toWrite=_AMP_;
-	            break;
+                case '&':
+                    toWrite = _AMP_;
+                    break;
 
-	         case '<' :
-	         	toWrite=_LT_;
-	            break;
+                case '<':
+                    toWrite = _LT_;
+                    break;
 
-	         case '"' :
-	         	toWrite=_QUOT_;
-	            break;
+                case '"':
+                    toWrite = _QUOT_;
+                    break;
 
-	         case 0x09 :    // '\t'
-	         	toWrite=__X9_;
-	            break;
+                case 0x09:    // '\t'
+                    toWrite = __X9_;
+                    break;
 
-	         case 0x0A :    // '\n'
-	         	toWrite=__XA_;
-	            break;
+                case 0x0A:    // '\n'
+                    toWrite = __XA_;
+                    break;
 
-	         case 0x0D :    // '\r'
-	         	toWrite=__XD_;
-	            break;
+                case 0x0D:    // '\r'
+                    toWrite = __XD_;
+                    break;
 
-	         default :
-	        	if (c < 0x80 ) {
-	        		writer.write(c);
-	        	} else {
-	        		UtfHelpper.writeCharToUtf8(c,writer);
-	        	};
-	            continue;
-	         }
-	         writer.write(toWrite);
-	      }
+                default:
+                    if (c < 0x80) {
+                        writer.write(c);
+                    } else {
+                        UtfHelpper.writeCharToUtf8(c, writer);
+                    }
+                    ;
+                    continue;
+            }
+            writer.write(toWrite);
+        }
 
-	      writer.write('\"');
-	   }
-
-    /**
-	    * Outputs a Text of CDATA section to the internal Writer.
-	    *
-	    * @param text
-	    * @param writer writer where to write the things
-	    * @throws IOException
-	    */
-	   static final void outputTextToWriter(final String text, final OutputStream writer) throws IOException {
-	      final int length = text.length();
-	      byte []toWrite;
-	      for (int i = 0; i < length; i++) {
-	         char c = text.charAt(i);
-
-	         switch (c) {
-
-	         case '&' :
-	         	toWrite=_AMP_;
-	            break;
-
-	         case '<' :
-	         	toWrite=_LT_;
-	            break;
-
-	         case '>' :
-	         	toWrite=_GT_;
-	            break;
-
-	         case 0xD :
-	         	toWrite=__XD_;
-	            break;
-
-	         default :
-	        	 if (c < 0x80) {
-	        		 writer.write(c);
-	        	 } else {
-	        		 UtfHelpper.writeCharToUtf8(c,writer);
-	        	 };
-	            continue;
-	         }
-	         writer.write(toWrite);
-	      }
-	   }
+        writer.write('\"');
+    }
 
     /**
-	    * Outputs a PI to the internal Writer.
-	    *
-	    * @param currentPI
-	    * @param writer where to write the things
-	    * @throws IOException
-	    */
-	   static final void outputPItoWriter(ProcessingInstruction currentPI, OutputStream writer,int position) throws IOException {
+     * Outputs a Text of CDATA section to the internal Writer.
+     *
+     * @param text
+     * @param writer writer where to write the things
+     * @throws IOException
+     */
+    static final void outputTextToWriter(final String text, final OutputStream writer) throws IOException {
+        final int length = text.length();
+        byte[] toWrite;
+        for (int i = 0; i < length; i++) {
+            char c = text.charAt(i);
 
-	      if (position == NODE_AFTER_DOCUMENT_ELEMENT) {
-	        writer.write('\n');
-	      }
-	      writer.write(_BEGIN_PI);
+            switch (c) {
 
-	      final String target = currentPI.getTarget();
-	      int length = target.length();
+                case '&':
+                    toWrite = _AMP_;
+                    break;
 
-	      for (int i = 0; i < length; i++) {
-	      	 char c=target.charAt(i);
-	         if (c==0x0D) {
-	            writer.write(__XD_);
-	         } else {
-	        	 if (c < 0x80)  {
-	         		writer.write(c);
-	         	} else {
-	         		UtfHelpper.writeCharToUtf8(c,writer);
-	         	};
-	         }
-	      }
+                case '<':
+                    toWrite = _LT_;
+                    break;
 
-	      final String data = currentPI.getData();
+                case '>':
+                    toWrite = _GT_;
+                    break;
 
-	      length = data.length();
+                case 0xD:
+                    toWrite = __XD_;
+                    break;
 
-	      if (length > 0) {
-	         writer.write(' ');
-
-	         for (int i = 0; i < length; i++) {
-	         	char c=data.charAt(i);
-	            if (c==0x0D) {
-	               writer.write(__XD_);
-	            } else {
-	            	UtfHelpper.writeCharToUtf8(c,writer);
-	            }
-	         }
-	      }
-
-	      writer.write(_END_PI);
-	      if (position == NODE_BEFORE_DOCUMENT_ELEMENT) {
-	        writer.write('\n');
-	     }
-	   }
+                default:
+                    if (c < 0x80) {
+                        writer.write(c);
+                    } else {
+                        UtfHelpper.writeCharToUtf8(c, writer);
+                    }
+                    ;
+                    continue;
+            }
+            writer.write(toWrite);
+        }
+    }
 
     /**
-	    * Method outputCommentToWriter
-	    *
-	    * @param currentComment
-	    * @param writer writer where to write the things
-	    * @throws IOException
-	    */
-	   static final void outputCommentToWriter(Comment currentComment, OutputStream writer,int position) throws IOException {
-	   	  if (position == NODE_AFTER_DOCUMENT_ELEMENT) {
-	   		writer.write('\n');
-	   	  }
-	      writer.write(_BEGIN_COMM);
+     * Outputs a PI to the internal Writer.
+     *
+     * @param currentPI
+     * @param writer    where to write the things
+     * @throws IOException
+     */
+    static final void outputPItoWriter(ProcessingInstruction currentPI, OutputStream writer, int position) throws IOException {
 
-	      final String data = currentComment.getText();
-	      final int length = data.length();
+        if (position == NODE_AFTER_DOCUMENT_ELEMENT) {
+            writer.write('\n');
+        }
+        writer.write(_BEGIN_PI);
 
-	      for (int i = 0; i < length; i++) {
-	         char c=data.charAt(i);
-	         if (c==0x0D) {
-	            writer.write(__XD_);
-	         } else {
-	        	 if (c < 0x80)  {
-	         		writer.write(c);
-	         	} else {
-	         		UtfHelpper.writeCharToUtf8(c,writer);
-	         	};
-	         }
-	      }
+        final String target = currentPI.getTarget();
+        int length = target.length();
 
-	      writer.write(_END_COMM);
-	      if (position == NODE_BEFORE_DOCUMENT_ELEMENT) {
-			writer.write('\n');
-		 }
-	   }
+        for (int i = 0; i < length; i++) {
+            char c = target.charAt(i);
+            if (c == 0x0D) {
+                writer.write(__XD_);
+            } else {
+                if (c < 0x80) {
+                    writer.write(c);
+                } else {
+                    UtfHelpper.writeCharToUtf8(c, writer);
+                }
+                ;
+            }
+        }
+
+        final String data = currentPI.getData();
+
+        length = data.length();
+
+        if (length > 0) {
+            writer.write(' ');
+
+            for (int i = 0; i < length; i++) {
+                char c = data.charAt(i);
+                if (c == 0x0D) {
+                    writer.write(__XD_);
+                } else {
+                    UtfHelpper.writeCharToUtf8(c, writer);
+                }
+            }
+        }
+
+        writer.write(_END_PI);
+        if (position == NODE_BEFORE_DOCUMENT_ELEMENT) {
+            writer.write('\n');
+        }
+    }
+
+    /**
+     * Method outputCommentToWriter
+     *
+     * @param currentComment
+     * @param writer         writer where to write the things
+     * @throws IOException
+     */
+    static final void outputCommentToWriter(Comment currentComment, OutputStream writer, int position) throws IOException {
+        if (position == NODE_AFTER_DOCUMENT_ELEMENT) {
+            writer.write('\n');
+        }
+        writer.write(_BEGIN_COMM);
+
+        final String data = currentComment.getText();
+        final int length = data.length();
+
+        for (int i = 0; i < length; i++) {
+            char c = data.charAt(i);
+            if (c == 0x0D) {
+                writer.write(__XD_);
+            } else {
+                if (c < 0x80) {
+                    writer.write(c);
+                } else {
+                    UtfHelpper.writeCharToUtf8(c, writer);
+                }
+                ;
+            }
+        }
+
+        writer.write(_END_COMM);
+        if (position == NODE_BEFORE_DOCUMENT_ELEMENT) {
+            writer.write('\n');
+        }
+    }
 
     private boolean namespaceIsAbsolute(String namespaceValue) {
 
-      // assume empty namespaces are absolute
-      if (namespaceValue.length() == 0) {
-         return true;
-      }
-      return namespaceValue.indexOf(':')>0;
-   }
+        // assume empty namespaces are absolute
+        if (namespaceValue.length() == 0) {
+            return true;
+        }
+        return namespaceValue.indexOf(':') > 0;
+    }
 
 
     public static class C14NStack extends ArrayDeque<List> {

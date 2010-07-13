@@ -48,7 +48,7 @@ public class DigestOutputStream extends OutputStream {
     public void write(int arg0) {
         messageDigest.update((byte) arg0);
         if (log.isDebugEnabled()) {
-            stringBuffer.append(new String(new byte[]{(byte)arg0}));
+            stringBuffer.append(new String(new byte[]{(byte) arg0}));
         }
     }
 

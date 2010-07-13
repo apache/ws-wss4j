@@ -8,14 +8,13 @@
 
 package org.w3._2001._04.xmlenc_;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlID;
-import javax.xml.bind.annotation.XmlSchemaType;
-import javax.xml.bind.annotation.XmlSeeAlso;
-import javax.xml.bind.annotation.XmlType;
+import ch.gigerstyle.xmlsec.ext.Constants;
+import ch.gigerstyle.xmlsec.ext.ParseException;
+import ch.gigerstyle.xmlsec.ext.Parseable;
+import ch.gigerstyle.xmlsec.ext.Utils;
+import org.w3._2000._09.xmldsig_.KeyInfoType;
+
+import javax.xml.bind.annotation.*;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import javax.xml.namespace.QName;
@@ -24,21 +23,14 @@ import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
-
-import ch.gigerstyle.xmlsec.ext.Utils;
-import ch.gigerstyle.xmlsec.ext.Constants;
-import ch.gigerstyle.xmlsec.ext.ParseException;
-import ch.gigerstyle.xmlsec.ext.Parseable;
-import org.w3._2000._09.xmldsig_.KeyInfoType;
-
 import java.util.Iterator;
 
 
 /**
  * <p>Java class for EncryptedType complex type.
- * 
+ * <p/>
  * <p>The following schema fragment specifies the expected content contained within this class.
- * 
+ * <p/>
  * <pre>
  * &lt;complexType name="EncryptedType">
  *   &lt;complexContent>
@@ -57,19 +49,17 @@ import java.util.Iterator;
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
- * 
- * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "EncryptedType", propOrder = {
-    "encryptionMethod",
-    "keyInfo",
-    "cipherData",
-    "encryptionProperties"
+        "encryptionMethod",
+        "keyInfo",
+        "cipherData",
+        "encryptionProperties"
 })
 @XmlSeeAlso({
-    EncryptedKeyType.class,
-    EncryptedDataType.class
+        EncryptedKeyType.class,
+        EncryptedDataType.class
 })
 public abstract class EncryptedType implements Parseable {
 
@@ -129,52 +119,50 @@ public abstract class EncryptedType implements Parseable {
         }
 
         switch (xmlEvent.getEventType()) {
-             case XMLStreamConstants.START_ELEMENT:
-                 StartElement startElement = xmlEvent.asStartElement();
+            case XMLStreamConstants.START_ELEMENT:
+                StartElement startElement = xmlEvent.asStartElement();
 
-                 if (startElement.getName().equals(Constants.TAG_xenc_EncryptionMethod)) {
-                     currentParseable = this.encryptionMethod = new EncryptionMethodType(startElement);
-                 }
-                 else if (startElement.getName().equals(Constants.TAG_dsig_KeyInfo)) {
-                     currentParseable = this.keyInfo = new KeyInfoType(startElement);
-                 }
-                 else if (startElement.getName().equals(Constants.TAG_xenc_CipherData)) {
-                     currentParseable = this.cipherData = new CipherDataType(startElement);
-                 }
-                 else if (startElement.getName().equals(Constants.TAG_xenc_EncryptionProperties)) {
-                     //currentParseable = this.encryptionProperties = new EncryptionPropertiesType();
-                     currentParseable = new Parseable() {
-                         public boolean parseXMLEvent(XMLEvent xmlEvent) throws ParseException {
-                             switch (xmlEvent.getEventType()) {
-                                 case XMLStreamConstants.END_ELEMENT:
-                                     EndElement endElement = xmlEvent.asEndElement();
-                                     if (endElement.getName().equals(Constants.TAG_xenc_EncryptionProperties)) {
-                                         return true;
-                                     }
-                                     break;
-                             }
-                             return false;
-                         }
-                         public void validate() throws ParseException {
-                         }
-                     };
-                 }                 
-                 break;
-             case XMLStreamConstants.END_ELEMENT:
+                if (startElement.getName().equals(Constants.TAG_xenc_EncryptionMethod)) {
+                    currentParseable = this.encryptionMethod = new EncryptionMethodType(startElement);
+                } else if (startElement.getName().equals(Constants.TAG_dsig_KeyInfo)) {
+                    currentParseable = this.keyInfo = new KeyInfoType(startElement);
+                } else if (startElement.getName().equals(Constants.TAG_xenc_CipherData)) {
+                    currentParseable = this.cipherData = new CipherDataType(startElement);
+                } else if (startElement.getName().equals(Constants.TAG_xenc_EncryptionProperties)) {
+                    //currentParseable = this.encryptionProperties = new EncryptionPropertiesType();
+                    currentParseable = new Parseable() {
+                        public boolean parseXMLEvent(XMLEvent xmlEvent) throws ParseException {
+                            switch (xmlEvent.getEventType()) {
+                                case XMLStreamConstants.END_ELEMENT:
+                                    EndElement endElement = xmlEvent.asEndElement();
+                                    if (endElement.getName().equals(Constants.TAG_xenc_EncryptionProperties)) {
+                                        return true;
+                                    }
+                                    break;
+                            }
+                            return false;
+                        }
 
-                 currentParseable = null;
-                 EndElement endElement = xmlEvent.asEndElement();
-                 
-                 if (endElement.getName().equals(startElementName)) {
-                     return true;
-                 }
-                 break;
-             //possible ignorable withespace and comments
-             case XMLStreamConstants.CHARACTERS:
-             case XMLStreamConstants.COMMENT:
-                 break;
-             default:
-                 throw new ParseException("Unexpected event received " + Utils.getXMLEventAsString(xmlEvent));
+                        public void validate() throws ParseException {
+                        }
+                    };
+                }
+                break;
+            case XMLStreamConstants.END_ELEMENT:
+
+                currentParseable = null;
+                EndElement endElement = xmlEvent.asEndElement();
+
+                if (endElement.getName().equals(startElementName)) {
+                    return true;
+                }
+                break;
+            //possible ignorable withespace and comments
+            case XMLStreamConstants.CHARACTERS:
+            case XMLStreamConstants.COMMENT:
+                break;
+            default:
+                throw new ParseException("Unexpected event received " + Utils.getXMLEventAsString(xmlEvent));
         }
         return false;
     }
@@ -187,11 +175,9 @@ public abstract class EncryptedType implements Parseable {
 
     /**
      * Gets the value of the encryptionMethod property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link EncryptionMethodType }
-     *     
+     *
+     * @return possible object is
+     *         {@link EncryptionMethodType }
      */
     public EncryptionMethodType getEncryptionMethod() {
         return encryptionMethod;
@@ -199,11 +185,9 @@ public abstract class EncryptedType implements Parseable {
 
     /**
      * Sets the value of the encryptionMethod property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link EncryptionMethodType }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link EncryptionMethodType }
      */
     public void setEncryptionMethod(EncryptionMethodType value) {
         this.encryptionMethod = value;
@@ -211,11 +195,9 @@ public abstract class EncryptedType implements Parseable {
 
     /**
      * Gets the value of the keyInfo property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link KeyInfoType }
-     *     
+     *
+     * @return possible object is
+     *         {@link KeyInfoType }
      */
     public KeyInfoType getKeyInfo() {
         return keyInfo;
@@ -223,11 +205,9 @@ public abstract class EncryptedType implements Parseable {
 
     /**
      * Sets the value of the keyInfo property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link KeyInfoType }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link KeyInfoType }
      */
     public void setKeyInfo(KeyInfoType value) {
         this.keyInfo = value;
@@ -235,11 +215,9 @@ public abstract class EncryptedType implements Parseable {
 
     /**
      * Gets the value of the cipherData property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link CipherDataType }
-     *     
+     *
+     * @return possible object is
+     *         {@link CipherDataType }
      */
     public CipherDataType getCipherData() {
         return cipherData;
@@ -247,11 +225,9 @@ public abstract class EncryptedType implements Parseable {
 
     /**
      * Sets the value of the cipherData property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link CipherDataType }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link CipherDataType }
      */
     public void setCipherData(CipherDataType value) {
         this.cipherData = value;
@@ -259,11 +235,9 @@ public abstract class EncryptedType implements Parseable {
 
     /**
      * Gets the value of the encryptionProperties property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link EncryptionPropertiesType }
-     *     
+     *
+     * @return possible object is
+     *         {@link EncryptionPropertiesType }
      */
     public EncryptionPropertiesType getEncryptionProperties() {
         return encryptionProperties;
@@ -271,11 +245,9 @@ public abstract class EncryptedType implements Parseable {
 
     /**
      * Sets the value of the encryptionProperties property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link EncryptionPropertiesType }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link EncryptionPropertiesType }
      */
     public void setEncryptionProperties(EncryptionPropertiesType value) {
         this.encryptionProperties = value;
@@ -283,11 +255,9 @@ public abstract class EncryptedType implements Parseable {
 
     /**
      * Gets the value of the id property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     *         {@link String }
      */
     public String getId() {
         return id;
@@ -295,11 +265,9 @@ public abstract class EncryptedType implements Parseable {
 
     /**
      * Sets the value of the id property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setId(String value) {
         this.id = value;
@@ -307,11 +275,9 @@ public abstract class EncryptedType implements Parseable {
 
     /**
      * Gets the value of the type property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     *         {@link String }
      */
     public String getType() {
         return type;
@@ -319,11 +285,9 @@ public abstract class EncryptedType implements Parseable {
 
     /**
      * Sets the value of the type property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setType(String value) {
         this.type = value;
@@ -331,11 +295,9 @@ public abstract class EncryptedType implements Parseable {
 
     /**
      * Gets the value of the mimeType property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     *         {@link String }
      */
     public String getMimeType() {
         return mimeType;
@@ -343,11 +305,9 @@ public abstract class EncryptedType implements Parseable {
 
     /**
      * Sets the value of the mimeType property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setMimeType(String value) {
         this.mimeType = value;
@@ -355,11 +315,9 @@ public abstract class EncryptedType implements Parseable {
 
     /**
      * Gets the value of the encoding property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     *         {@link String }
      */
     public String getEncoding() {
         return encoding;
@@ -367,11 +325,9 @@ public abstract class EncryptedType implements Parseable {
 
     /**
      * Sets the value of the encoding property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setEncoding(String value) {
         this.encoding = value;

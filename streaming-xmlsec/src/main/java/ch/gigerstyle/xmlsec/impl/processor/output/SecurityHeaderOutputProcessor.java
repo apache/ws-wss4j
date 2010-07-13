@@ -60,11 +60,10 @@ public class SecurityHeaderOutputProcessor extends AbstractOutputProcessor {
                 newXMLEvent = Constants.xmlEventFactory.createEndElement(Constants.TAG_wsse_Security, namespaceIterator);
                 subOutputProcessorChain.processEvent(newXMLEvent);
                 subOutputProcessorChain.reset();
-                
+
                 outputProcessorChain.removeProcessor(this);
             }
-        }
-        else if (xmlEvent.isEndElement()) {
+        } else if (xmlEvent.isEndElement()) {
             EndElement endElement = xmlEvent.asEndElement();
 
         }

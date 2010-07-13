@@ -76,8 +76,7 @@ public class EncryptedKeyInputProcessor extends AbstractInputProcessor implement
             } catch (ParseException e) {
                 throw new XMLSecurityException(e);
             }
-        }
-        else if (xmlEvent.isStartElement()) {
+        } else if (xmlEvent.isStartElement()) {
             StartElement startElement = xmlEvent.asStartElement();
             if (startElement.getName().equals(Constants.TAG_xenc_EncryptedKey)) {
                 currentEncryptedKeyType = new EncryptedKeyType(startElement);

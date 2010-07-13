@@ -6,7 +6,7 @@ import org.apache.commons.logging.LogFactory;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.events.*;
+import javax.xml.stream.events.XMLEvent;
 import java.util.Map;
 
 /**
@@ -40,7 +40,7 @@ public abstract class AbstractOutputProcessor implements OutputProcessor {
     protected AbstractOutputProcessor(SecurityProperties securityProperties) throws XMLSecurityException {
         this.securityProperties = securityProperties;
     }
-    
+
     public abstract void processEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException;
 
     public void processNextEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException {
@@ -49,7 +49,7 @@ public abstract class AbstractOutputProcessor implements OutputProcessor {
         }
         processEvent(xmlEvent, outputProcessorChain, securityContext);
     }
-    
+
     public abstract void processHeaderEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException;
 
     public void processNextHeaderEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException {
@@ -63,7 +63,7 @@ public abstract class AbstractOutputProcessor implements OutputProcessor {
         outputProcessorChain.doFinal();
     }
 
-     public SecurityProperties getSecurityProperties() {
+    public SecurityProperties getSecurityProperties() {
         return securityProperties;
     }
 
@@ -76,7 +76,7 @@ public abstract class AbstractOutputProcessor implements OutputProcessor {
         outputAsHeaderEvent(outputProcessorChain, xmlEvent);
     }
 
-     public static void createStartElementAndOutputAsEvent(OutputProcessorChain outputProcessorChain, QName element, Map<QName, String> attributes) throws XMLStreamException, XMLSecurityException {
+    public static void createStartElementAndOutputAsEvent(OutputProcessorChain outputProcessorChain, QName element, Map<QName, String> attributes) throws XMLStreamException, XMLSecurityException {
         XMLEvent xmlEvent = outputProcessorChain.getSecurityContext().<XMLEventNSAllocator>get("XMLEventNSAllocator").createStartElement(element, attributes);
         outputAsEvent(outputProcessorChain, xmlEvent);
     }

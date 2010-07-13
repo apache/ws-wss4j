@@ -13,13 +13,7 @@ import ch.gigerstyle.xmlsec.ext.ParseException;
 import ch.gigerstyle.xmlsec.ext.Parseable;
 import ch.gigerstyle.xmlsec.ext.Utils;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlID;
-import javax.xml.bind.annotation.XmlSchemaType;
-import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.*;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import javax.xml.stream.XMLStreamConstants;
@@ -32,9 +26,9 @@ import java.util.Iterator;
 
 /**
  * <p>Java class for ReferenceType complex type.
- * 
+ * <p/>
  * <p>The following schema fragment specifies the expected content contained within this class.
- * 
+ * <p/>
  * <pre>
  * &lt;complexType name="ReferenceType">
  *   &lt;complexContent>
@@ -51,14 +45,12 @@ import java.util.Iterator;
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
- * 
- * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "ReferenceType", propOrder = {
-    "transforms",
-    "digestMethod",
-    "digestValue"
+        "transforms",
+        "digestMethod",
+        "digestValue"
 })
 public class ReferenceType implements Parseable {
 
@@ -80,7 +72,7 @@ public class ReferenceType implements Parseable {
     @XmlSchemaType(name = "anyURI")
     protected String type;
 
-    private boolean processed  = false;
+    private boolean processed = false;
 
     private Parseable currentParseable;
 
@@ -91,11 +83,9 @@ public class ReferenceType implements Parseable {
             if (attribute.getName().equals(Constants.ATT_NULL_Id)) {
                 CollapsedStringAdapter collapsedStringAdapter = new CollapsedStringAdapter();
                 this.id = collapsedStringAdapter.unmarshal(attribute.getValue());
-            }
-            else if (attribute.getName().equals(Constants.ATT_NULL_URI)) {
+            } else if (attribute.getName().equals(Constants.ATT_NULL_URI)) {
                 this.uri = Utils.dropReferenceMarker(attribute.getValue());
-            }
-            else if (attribute.getName().equals(Constants.ATT_NULL_Type)) {
+            } else if (attribute.getName().equals(Constants.ATT_NULL_Type)) {
                 this.type = attribute.getValue();
             }
         }
@@ -112,53 +102,50 @@ public class ReferenceType implements Parseable {
         }
 
         switch (xmlEvent.getEventType()) {
-             case XMLStreamConstants.START_ELEMENT:
-                 StartElement startElement = xmlEvent.asStartElement();
+            case XMLStreamConstants.START_ELEMENT:
+                StartElement startElement = xmlEvent.asStartElement();
 
-                 if (startElement.getName().equals(Constants.TAG_dsig_Transforms)) {
-                     currentParseable = this.transforms = new TransformsType(startElement);
-                 }
-                 else if (startElement.getName().equals(Constants.TAG_dsig_DigestMethod)) {
-                     currentParseable = this.digestMethod = new DigestMethodType(startElement);
-                 }
-                 else if (startElement.getName().equals(Constants.TAG_dsig_DigestValue)) {
-                     currentParseable = new Parseable() {
-                         public boolean parseXMLEvent(XMLEvent xmlEvent) throws ParseException {
-                             switch (xmlEvent.getEventType()) {
-                                 case XMLStreamConstants.START_ELEMENT:
-                                     StartElement startElement = xmlEvent.asStartElement();
-                                     throw new ParseException("Unsupported Element: " + startElement.getName());
-                                 case XMLStreamConstants.END_ELEMENT:
-                                     return true;
-                                 case XMLStreamConstants.CHARACTERS:
-                                     digestValue = xmlEvent.asCharacters().getData().getBytes();
-                                     break;
-                             }
-                             return false;
-                         }
+                if (startElement.getName().equals(Constants.TAG_dsig_Transforms)) {
+                    currentParseable = this.transforms = new TransformsType(startElement);
+                } else if (startElement.getName().equals(Constants.TAG_dsig_DigestMethod)) {
+                    currentParseable = this.digestMethod = new DigestMethodType(startElement);
+                } else if (startElement.getName().equals(Constants.TAG_dsig_DigestValue)) {
+                    currentParseable = new Parseable() {
+                        public boolean parseXMLEvent(XMLEvent xmlEvent) throws ParseException {
+                            switch (xmlEvent.getEventType()) {
+                                case XMLStreamConstants.START_ELEMENT:
+                                    StartElement startElement = xmlEvent.asStartElement();
+                                    throw new ParseException("Unsupported Element: " + startElement.getName());
+                                case XMLStreamConstants.END_ELEMENT:
+                                    return true;
+                                case XMLStreamConstants.CHARACTERS:
+                                    digestValue = xmlEvent.asCharacters().getData().getBytes();
+                                    break;
+                            }
+                            return false;
+                        }
 
-                         public void validate() throws ParseException {
-                         }
-                     };
-                 }
-                 else {
-                     throw new ParseException("Unsupported Element: " + startElement.getName());
-                 }
+                        public void validate() throws ParseException {
+                        }
+                    };
+                } else {
+                    throw new ParseException("Unsupported Element: " + startElement.getName());
+                }
 
-                 break;
-             case XMLStreamConstants.END_ELEMENT:
-                 currentParseable = null;
-                 EndElement endElement = xmlEvent.asEndElement();
-                 if (endElement.getName().equals(Constants.TAG_dsig_Reference)) {
-                     return true;
-                 }
-                 break;
-             //possible ignorable withespace and comments
-             case XMLStreamConstants.CHARACTERS:
-             case XMLStreamConstants.COMMENT:
-                 break;
-             default:
-                 throw new ParseException("Unexpected event received " + Utils.getXMLEventAsString(xmlEvent));
+                break;
+            case XMLStreamConstants.END_ELEMENT:
+                currentParseable = null;
+                EndElement endElement = xmlEvent.asEndElement();
+                if (endElement.getName().equals(Constants.TAG_dsig_Reference)) {
+                    return true;
+                }
+                break;
+            //possible ignorable withespace and comments
+            case XMLStreamConstants.CHARACTERS:
+            case XMLStreamConstants.COMMENT:
+                break;
+            default:
+                throw new ParseException("Unexpected event received " + Utils.getXMLEventAsString(xmlEvent));
         }
         return false;
     }
@@ -171,11 +158,9 @@ public class ReferenceType implements Parseable {
 
     /**
      * Gets the value of the transforms property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link TransformsType }
-     *     
+     *
+     * @return possible object is
+     *         {@link TransformsType }
      */
     public TransformsType getTransforms() {
         return transforms;
@@ -183,11 +168,9 @@ public class ReferenceType implements Parseable {
 
     /**
      * Sets the value of the transforms property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link TransformsType }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link TransformsType }
      */
     public void setTransforms(TransformsType value) {
         this.transforms = value;
@@ -195,11 +178,9 @@ public class ReferenceType implements Parseable {
 
     /**
      * Gets the value of the digestMethod property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link DigestMethodType }
-     *     
+     *
+     * @return possible object is
+     *         {@link DigestMethodType }
      */
     public DigestMethodType getDigestMethod() {
         return digestMethod;
@@ -207,11 +188,9 @@ public class ReferenceType implements Parseable {
 
     /**
      * Sets the value of the digestMethod property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link DigestMethodType }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link DigestMethodType }
      */
     public void setDigestMethod(DigestMethodType value) {
         this.digestMethod = value;
@@ -219,10 +198,9 @@ public class ReferenceType implements Parseable {
 
     /**
      * Gets the value of the digestValue property.
-     * 
-     * @return
-     *     possible object is
-     *     byte[]
+     *
+     * @return possible object is
+     *         byte[]
      */
     public byte[] getDigestValue() {
         return digestValue;
@@ -230,10 +208,9 @@ public class ReferenceType implements Parseable {
 
     /**
      * Sets the value of the digestValue property.
-     * 
-     * @param value
-     *     allowed object is
-     *     byte[]
+     *
+     * @param value allowed object is
+     *              byte[]
      */
     public void setDigestValue(byte[] value) {
         this.digestValue = ((byte[]) value);
@@ -241,11 +218,9 @@ public class ReferenceType implements Parseable {
 
     /**
      * Gets the value of the id property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     *         {@link String }
      */
     public String getId() {
         return id;
@@ -253,11 +228,9 @@ public class ReferenceType implements Parseable {
 
     /**
      * Sets the value of the id property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setId(String value) {
         this.id = value;
@@ -265,11 +238,9 @@ public class ReferenceType implements Parseable {
 
     /**
      * Gets the value of the uri property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     *         {@link String }
      */
     public String getURI() {
         return uri;
@@ -277,11 +248,9 @@ public class ReferenceType implements Parseable {
 
     /**
      * Sets the value of the uri property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setURI(String value) {
         this.uri = value;
@@ -289,11 +258,9 @@ public class ReferenceType implements Parseable {
 
     /**
      * Gets the value of the type property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     *         {@link String }
      */
     public String getType() {
         return type;
@@ -301,11 +268,9 @@ public class ReferenceType implements Parseable {
 
     /**
      * Sets the value of the type property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setType(String value) {
         this.type = value;

@@ -35,7 +35,7 @@ public class EncryptionPartDef {
         }
 
         public String getModifier() {
-            return this.modifier; 
+            return this.modifier;
         }
     }
 

@@ -40,7 +40,7 @@ public class Constants {
         xmlInputFactory.setEventAllocator(xmlEventAllocator);
     }
 
-    private Constants(){
+    private Constants() {
     }
 
     public static final String NS_XMLENC = "http://www.w3.org/2001/04/xmlenc#";
@@ -128,7 +128,7 @@ public class Constants {
     public static final String NS11_SOAPMESSAGE = "http://docs.oasis-open.org/wss/oasis-wss-soap-message-security-1.1";
 
     public static final String NS_X509TOKEN = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0";
-    
+
     public static final String NS_X509_V3_TYPE = NS_X509TOKEN + "#X509v3";
     public static final String NS_X509PKIPathv1 = NS_X509TOKEN + "#X509PKIPathv1";
     public static final String NS_X509SubjectKeyIdentifier = NS_X509TOKEN + "#X509SubjectKeyIdentifier";
