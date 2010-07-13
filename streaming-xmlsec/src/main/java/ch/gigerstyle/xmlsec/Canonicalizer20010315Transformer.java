@@ -1,8 +1,5 @@
 package ch.gigerstyle.xmlsec;
 
-import com.ctc.wstx.util.BaseNsContext;
-
-import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.XMLStreamConstants;
@@ -10,8 +7,6 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.*;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.*;
 
 /**
@@ -584,4 +579,23 @@ public class Canonicalizer20010315Transformer implements Transformer {
       }
       return namespaceValue.indexOf(':')>0;
    }
+
+
+    public static class C14NStack extends ArrayDeque<List> {
+
+        public Object containsOnStack(Object o) {
+            if (o == null) {
+                return null;
+            }
+            //Important: iteration order from head to tail!
+            Iterator<List> elementInterator = super.iterator();
+            while (elementInterator.hasNext()) {
+                List list = elementInterator.next();
+                if (list.contains(o)) {
+                    return list.get(list.indexOf(o));
+                }
+            }
+            return null;
+        }
+    }
 }
