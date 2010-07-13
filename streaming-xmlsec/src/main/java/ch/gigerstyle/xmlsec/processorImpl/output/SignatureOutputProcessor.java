@@ -4,6 +4,7 @@ import ch.gigerstyle.xmlsec.*;
 import ch.gigerstyle.xmlsec.DigestOutputStream;
 import ch.gigerstyle.xmlsec.config.JCEAlgorithmMapper;
 import ch.gigerstyle.xmlsec.crypto.WSSecurityException;
+import org.apache.commons.codec.binary.Base64;
 import org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_secext_1_0.BinarySecurityTokenType;
 
 import javax.security.auth.callback.Callback;
@@ -44,7 +45,6 @@ public class SignatureOutputProcessor extends AbstractOutputProcessor {
     private List<SecurePart> secureParts;
     private List<SignaturePartDef> signaturePartDefList = new ArrayList<SignaturePartDef>();
 
-    private boolean bstProcessorAdded = false;
     private InternalSignatureOutputProcessor activeInternalSignatureOutputProcessor = null;
 
     private boolean useSingleCert = true;
@@ -151,7 +151,7 @@ public class SignatureOutputProcessor extends AbstractOutputProcessor {
                     attributes.put(Constants.ATT_wsu_Id, referencedBinarySecurityTokenType.getId());
                     createStartElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_wsse_BinarySecurityToken, attributes);
                     try {
-                        createCharactersAndOutputAsHeaderEvent(subOutputProcessorChain, Base64.encode(x509Certificates[0].getEncoded()));
+                        createCharactersAndOutputAsHeaderEvent(subOutputProcessorChain, Base64.encodeBase64String(x509Certificates[0].getEncoded()));
                     } catch (CertificateEncodingException e) {
                         throw new XMLSecurityException(e);
                     }
@@ -237,7 +237,7 @@ public class SignatureOutputProcessor extends AbstractOutputProcessor {
                 createEndElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_dsig_SignedInfo);
                 subOutputProcessorChain.removeProcessor(signedInfoProcessor);
                 createStartElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_dsig_SignatureValue, null);
-                createCharactersAndOutputAsHeaderEvent(subOutputProcessorChain, Base64.encode(signedInfoProcessor.getSignatureValue()));
+                createCharactersAndOutputAsHeaderEvent(subOutputProcessorChain, Base64.encodeBase64String(signedInfoProcessor.getSignatureValue()));
                 createEndElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_dsig_SignatureValue);
 
                 attributes = new HashMap<QName, String>();
@@ -272,7 +272,7 @@ public class SignatureOutputProcessor extends AbstractOutputProcessor {
                     createStartElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_wsse_KeyIdentifier, attributes);
                     try {
                         byte data[] = getSecurityProperties().getSignatureCrypto().getSKIBytesFromCert(x509Certificates[0]);
-                        createCharactersAndOutputAsHeaderEvent(subOutputProcessorChain, Base64.encode(data));
+                        createCharactersAndOutputAsHeaderEvent(subOutputProcessorChain, Base64.encodeBase64String(data));
                     } catch (WSSecurityException e) {
                         throw new XMLSecurityException(e);
                     }
@@ -284,7 +284,7 @@ public class SignatureOutputProcessor extends AbstractOutputProcessor {
                     attributes.put(Constants.ATT_NULL_ValueType, Constants.NS_X509_V3_TYPE);
                     createStartElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_wsse_KeyIdentifier, attributes);
                     try {
-                        createCharactersAndOutputAsHeaderEvent(subOutputProcessorChain, Base64.encode(x509Certificates[0].getEncoded()));
+                        createCharactersAndOutputAsHeaderEvent(subOutputProcessorChain, Base64.encodeBase64String(x509Certificates[0].getEncoded()));
                     } catch (CertificateEncodingException e) {
                         throw new XMLSecurityException(e);
                     }
@@ -302,7 +302,7 @@ public class SignatureOutputProcessor extends AbstractOutputProcessor {
                         sha.update(x509Certificates[0].getEncoded());
                         byte[] data = sha.digest();
 
-                        createCharactersAndOutputAsHeaderEvent(subOutputProcessorChain, Base64.encode(data));
+                        createCharactersAndOutputAsHeaderEvent(subOutputProcessorChain, Base64.encodeBase64String(data));
                     } catch (CertificateEncodingException e) {
                         throw new XMLSecurityException(e);
                     } catch (NoSuchAlgorithmException e) {
@@ -332,9 +332,9 @@ public class SignatureOutputProcessor extends AbstractOutputProcessor {
                     createStartElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_wsse_BinarySecurityToken, attributes);
                     try {
                         if (useSingleCert) {
-                            createCharactersAndOutputAsHeaderEvent(subOutputProcessorChain, Base64.encode(x509Certificates[0].getEncoded()));
+                            createCharactersAndOutputAsHeaderEvent(subOutputProcessorChain, Base64.encodeBase64String(x509Certificates[0].getEncoded()));
                         } else {
-                            createCharactersAndOutputAsHeaderEvent(subOutputProcessorChain, Base64.encode(getSecurityProperties().getSignatureCrypto().getCertificateData(false, x509Certificates)));
+                            createCharactersAndOutputAsHeaderEvent(subOutputProcessorChain, Base64.encodeBase64String(getSecurityProperties().getSignatureCrypto().getCertificateData(false, x509Certificates)));
                         }
                     } catch (CertificateEncodingException e) {
                         throw new XMLSecurityException(e);

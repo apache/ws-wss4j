@@ -3,11 +3,11 @@ package ch.gigerstyle.xmlsec.processorImpl.output;
 import ch.gigerstyle.xmlsec.*;
 import ch.gigerstyle.xmlsec.config.JCEAlgorithmMapper;
 import ch.gigerstyle.xmlsec.crypto.WSSecurityException;
-import com.sun.mail.util.BASE64EncoderStream;
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.codec.binary.Base64OutputStream;
 import org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_secext_1_0.BinarySecurityTokenType;
 
 import javax.crypto.*;
-import javax.crypto.CipherOutputStream;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.Characters;
@@ -158,7 +158,7 @@ public class EncryptOutputProcessor extends AbstractOutputProcessor {
                     attributes.put(Constants.ATT_wsu_Id, referencedBinarySecurityTokenType.getId());
                     createStartElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_wsse_BinarySecurityToken, attributes);
                     try {
-                        createCharactersAndOutputAsHeaderEvent(subOutputProcessorChain, Base64.encode(x509Certificate.getEncoded()));
+                        createCharactersAndOutputAsHeaderEvent(subOutputProcessorChain, Base64.encodeBase64String(x509Certificate.getEncoded()));
                     } catch (CertificateEncodingException e) {
                         throw new XMLSecurityException(e);
                     }
@@ -200,7 +200,7 @@ public class EncryptOutputProcessor extends AbstractOutputProcessor {
                     createStartElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_wsse_KeyIdentifier, attributes);
                     try {
                         byte data[] = getSecurityProperties().getEncryptionCrypto().getSKIBytesFromCert(x509Certificate);
-                        createCharactersAndOutputAsHeaderEvent(subOutputProcessorChain, Base64.encode(data));
+                        createCharactersAndOutputAsHeaderEvent(subOutputProcessorChain, Base64.encodeBase64String(data));
                     } catch (WSSecurityException e) {
                         throw new XMLSecurityException(e);
                     }
@@ -212,7 +212,7 @@ public class EncryptOutputProcessor extends AbstractOutputProcessor {
                     attributes.put(Constants.ATT_NULL_ValueType, Constants.NS_X509_V3_TYPE);
                     createStartElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_wsse_KeyIdentifier, attributes);
                     try {
-                        createCharactersAndOutputAsHeaderEvent(subOutputProcessorChain, Base64.encode(x509Certificate.getEncoded()));
+                        createCharactersAndOutputAsHeaderEvent(subOutputProcessorChain, Base64.encodeBase64String(x509Certificate.getEncoded()));
                     } catch (CertificateEncodingException e) {
                         throw new XMLSecurityException(e);
                     }
@@ -230,7 +230,7 @@ public class EncryptOutputProcessor extends AbstractOutputProcessor {
                         sha.update(x509Certificate.getEncoded());
                         byte[] data = sha.digest();
 
-                        createCharactersAndOutputAsHeaderEvent(subOutputProcessorChain, Base64.encode(data));
+                        createCharactersAndOutputAsHeaderEvent(subOutputProcessorChain, Base64.encodeBase64String(data));
                     } catch (CertificateEncodingException e) {
                         throw new XMLSecurityException(e);
                     } catch (NoSuchAlgorithmException e) {
@@ -250,7 +250,7 @@ public class EncryptOutputProcessor extends AbstractOutputProcessor {
                     attributes.put(Constants.ATT_wsu_Id, certUri);
                     createStartElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_wsse_BinarySecurityToken, attributes);
                     try {
-                        createCharactersAndOutputAsHeaderEvent(subOutputProcessorChain, Base64.encode(x509Certificate.getEncoded()));
+                        createCharactersAndOutputAsHeaderEvent(subOutputProcessorChain, Base64.encodeBase64String(x509Certificate.getEncoded()));
                     } catch (CertificateEncodingException e) {
                         throw new XMLSecurityException(e);
                     }
@@ -374,7 +374,7 @@ public class EncryptOutputProcessor extends AbstractOutputProcessor {
             characterEventGeneratorOutputStream = new CharacterEventGeneratorOutputStream(xmlEventNSAllocator);
             //Base64EncoderStream calls write every 78byte (line breaks). So we have to buffer again to get optimal performance
             //todo play around to find optimal size
-            BASE64EncoderStream base64EncoderStream = new BASE64EncoderStream(new BufferedOutputStream(characterEventGeneratorOutputStream));
+            Base64OutputStream base64EncoderStream = new Base64OutputStream(new BufferedOutputStream(characterEventGeneratorOutputStream), true);
             base64EncoderStream.write(iv);
 
             CipherOutputStream cipherOutputStream = new CipherOutputStream(base64EncoderStream, symmetricCipher);

@@ -2,6 +2,7 @@ package ch.gigerstyle.xmlsec;
 
 import ch.gigerstyle.xmlsec.crypto.Crypto;
 import ch.gigerstyle.xmlsec.crypto.WSSecurityException;
+import org.apache.commons.codec.binary.Base64;
 import org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_secext_1_0.BinarySecurityTokenType;
 import org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_secext_1_0.KeyIdentifierType;
 import org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_secext_1_0.SecurityTokenReferenceType;
@@ -90,8 +91,7 @@ public class SecurityTokenFactory {
                     && uri.equals(securityTokenReferenceType.getReferenceType().getBinarySecurityTokenType().getId())) {
                 BinarySecurityTokenType binarySecurityTokenType = securityTokenReferenceType.getReferenceType().getBinarySecurityTokenType();
                 return getSecurityToken(binarySecurityTokenType, crypto, callbackHandler);
-            }
-            else {//referenced BST:
+            } else {//referenced BST:
                 //todo
                 //we have to search BST somewhere in the doc. First we will check for a BST already processed and
                 //stored in the context. Otherwise we will abort now.                
@@ -112,15 +112,13 @@ public class SecurityTokenFactory {
             throw new XMLSecurityException("Unsupported BST Encoding: " + binarySecurityTokenType.getEncodingType());
         }
 
-        byte[] securityTokenData = Base64.decode(binarySecurityTokenType.getValue());
+        byte[] securityTokenData = Base64.decodeBase64(binarySecurityTokenType.getValue());
 
         if (Constants.NS_X509_V3_TYPE.equals(binarySecurityTokenType.getValueType())) {
             return new X509_V3SecurityToken(crypto, callbackHandler, securityTokenData);
-        }
-        else if (Constants.NS_X509PKIPathv1.equals(binarySecurityTokenType.getValueType())) {
+        } else if (Constants.NS_X509PKIPathv1.equals(binarySecurityTokenType.getValueType())) {
             return new X509PKIPathv1SecurityToken(crypto, callbackHandler, securityTokenData);
-        }
-        else {
+        } else {
             throw new XMLSecurityException("unsupportedBinaryTokenType" + binarySecurityTokenType.getValueType());
         }
     }
@@ -193,6 +191,7 @@ public class SecurityTokenFactory {
             }
         }
         //todo return whole certpath for validation??
+
         protected X509Certificate getX509Certificate() throws WSSecurityException {
             if (this.x509Certificate == null) {
                 X509Certificate[] x509Certificates = getCrypto().getCertificates(getAlias());
