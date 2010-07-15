@@ -35,6 +35,7 @@ public class SecurityHeaderOutputProcessor extends AbstractOutputProcessor {
 
     public SecurityHeaderOutputProcessor(SecurityProperties securityProperties) throws XMLSecurityException {
         super(securityProperties);
+        setPhase(Constants.Phase.PREPROCESSING);
     }
 
     public void processEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException {

@@ -39,6 +39,7 @@ public class FinalOutputProcessor extends AbstractOutputProcessor {
     public FinalOutputProcessor(OutputStream outputStream, SecurityProperties securityProperties) throws XMLSecurityException {
         super(securityProperties);
         outputStreamWriter = new OutputStreamWriter(outputStream);
+        setPhase(Constants.Phase.POSTPROCESSING);
     }
 
     public void processEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException {

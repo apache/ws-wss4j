@@ -1,9 +1,8 @@
 package ch.gigerstyle.xmlsec.impl;
 
 import ch.gigerstyle.xmlsec.ext.*;
-import ch.gigerstyle.xmlsec.impl.processor.input.LogInputProcessor;
-import ch.gigerstyle.xmlsec.impl.processor.input.PipedInputProcessor;
-import ch.gigerstyle.xmlsec.impl.processor.input.SecurityHeaderInputProcessor;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.XMLEvent;
@@ -31,6 +30,8 @@ import java.util.List;
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 public class InputProcessorChainImpl implements InputProcessorChain {
+
+    protected static final transient Log log = LogFactory.getLog(InputProcessorChainImpl.class);
 
     List<InputProcessor> inputProcessors = new ArrayList<InputProcessor>();
     int pos = 0;
@@ -65,39 +66,89 @@ public class InputProcessorChainImpl implements InputProcessorChain {
         return this.xmlSecurityContext;
     }
 
-    public void addProcessor(InputProcessor inputProcessor) {
-        if (inputProcessor.getClass().getName().equals("ch.gigerstyle.xmlsec.impl.processor.input.DecryptInputProcessor$InternalDecryptProcessor")) {
-            int pos = this.inputProcessors.size() - 2;
-            boolean found = false;
-            for (int i = 0; i < inputProcessors.size(); i++) {
-                InputProcessor processor = inputProcessors.get(i);
-                if (processor.getClass().getName().equals("ch.gigerstyle.xmlsec.impl.processor.input.DecryptInputProcessor$InternalDecryptProcessor")) {
-                    //add decryption after other decryption processors...
-                    pos = i + 1;
+    public void addProcessor(InputProcessor newInputProcessor) {
+        int startPhaseIdx = 0;
+        int endPhaseIdx = inputProcessors.size();
+
+        Constants.Phase targetPhase = newInputProcessor.getPhase();
+
+        for (int i = inputProcessors.size() - 1; i >= 0; i--) {
+            InputProcessor inputProcessor = inputProcessors.get(i);
+            if (inputProcessor.getPhase().ordinal() < targetPhase.ordinal()) {
+                startPhaseIdx = i + 1;
+                break;
+            }
+        }
+        for (int i = startPhaseIdx; i < inputProcessors.size(); i++) {
+            InputProcessor inputProcessor = inputProcessors.get(i);
+            if (inputProcessor.getPhase().ordinal() > targetPhase.ordinal()) {
+                endPhaseIdx = i;
+                break;
+            }
+        }
+
+        //just look for the correct phase and append as last
+        if (newInputProcessor.getBeforeProcessors().isEmpty()
+                && newInputProcessor.getAfterProcessors().isEmpty()) {
+            inputProcessors.add(endPhaseIdx, newInputProcessor);
+        } else if (newInputProcessor.getBeforeProcessors().isEmpty()) {
+            int idxToInsert = endPhaseIdx;
+
+            for (int i = endPhaseIdx; i >= startPhaseIdx; i--) {
+                InputProcessor inputProcessor = inputProcessors.get(i);
+                if (newInputProcessor.getAfterProcessors().contains(inputProcessor.getClass().getName())) {
+                    idxToInsert = i + 1;
+                    break;
                 }
             }
-            if (!found) {
-                //search for main decryption processor
-                for (int i = 0; i < inputProcessors.size(); i++) {
-                    InputProcessor processor = inputProcessors.get(i);
-                    if (processor.getClass().getName().equals("ch.gigerstyle.xmlsec.impl.processor.input.DecryptInputProcessor")) {
-                        //add decryption after other decryption processors...
-                        pos = i + 1;
+            inputProcessors.add(idxToInsert, newInputProcessor);
+        } else if (newInputProcessor.getAfterProcessors().isEmpty()) {
+            int idxToInsert = startPhaseIdx;
+
+            for (int i = startPhaseIdx; i < endPhaseIdx; i++) {
+                InputProcessor inputProcessor = inputProcessors.get(i);
+                if (newInputProcessor.getBeforeProcessors().contains(inputProcessor.getClass().getName())) {
+                    idxToInsert = i;
+                    break;
+                }
+            }
+            inputProcessors.add(idxToInsert, newInputProcessor);
+        } else {
+            boolean found = false;
+            int idxToInsert = endPhaseIdx;
+
+            for (int i = startPhaseIdx; i < endPhaseIdx; i++) {
+                InputProcessor inputProcessor = inputProcessors.get(i);
+                if (newInputProcessor.getBeforeProcessors().contains(inputProcessor.getClass().getName())) {
+                    idxToInsert = i;
+                    found = true;
+                    break;
+                }
+            }
+            if (found) {
+                inputProcessors.add(idxToInsert, newInputProcessor);
+            } else {
+                for (int i = endPhaseIdx; i >= startPhaseIdx; i--) {
+                    InputProcessor inputProcessor = inputProcessors.get(i);
+                    if (newInputProcessor.getAfterProcessors().contains(inputProcessor.getClass().getName())) {
+                        idxToInsert = i + 1;
+                        break;
                     }
                 }
+                inputProcessors.add(idxToInsert, newInputProcessor);
             }
-            System.out.println("Adding internal enc proc at pos " + pos);
-            this.inputProcessors.add(pos, inputProcessor);
-        } else if (!inputProcessor.getClass().getName().equals(LogInputProcessor.class.getName())
-                && !inputProcessor.getClass().getName().equals(PipedInputProcessor.class.getName())
-                && !inputProcessor.getClass().getName().equals(SecurityHeaderInputProcessor.class.getName())) {
-            this.inputProcessors.add(this.inputProcessors.size() - 2, inputProcessor);
-        } else {
-            this.inputProcessors.add(inputProcessor);
+        }
+        if (log.isDebugEnabled()) {
+            log.debug("Added " + newInputProcessor.getClass().getName() + " to input chain: ");
+            for (int i = 0; i < inputProcessors.size(); i++) {
+                InputProcessor inputProcessor = inputProcessors.get(i);
+                log.debug("Name: " + inputProcessor.getClass().getName() + " phase: " + inputProcessor.getPhase());
+            }
         }
     }
 
     public void removeProcessor(InputProcessor inputProcessor) {
+        log.debug("Removing processor " + inputProcessor.getClass().getName() + " from input chain");
         if (this.inputProcessors.indexOf(inputProcessor) <= getPos()) {
             this.pos--;
         }

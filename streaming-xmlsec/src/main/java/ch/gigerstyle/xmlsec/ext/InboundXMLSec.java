@@ -71,7 +71,9 @@ public class InboundXMLSec {
                     processorChain.addProcessor(new SignatureInputProcessor(securityProperties));
                     processorChain.addProcessor(new TimestampInputProcessor(securityProperties));
                     */
-                    processorChain.addProcessor(new LogInputProcessor(securityProperties));
+                    if (log.isTraceEnabled()) {
+                        processorChain.addProcessor(new LogInputProcessor(securityProperties));
+                    }
                     processorChain.addProcessor(pipedInputProcessor);
 
                     while (xmlEventReader.hasNext()) {

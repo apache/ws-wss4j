@@ -32,6 +32,7 @@ public class PipedInputProcessor extends AbstractInputProcessor {
 
     public PipedInputProcessor(PipedXMLStreamReader pipedXMLStreamReader, SecurityProperties securityProperties) throws XMLStreamException {
         super(securityProperties);
+        setPhase(Constants.Phase.POSTPROCESSING);
         connect(pipedXMLStreamReader);
     }
 

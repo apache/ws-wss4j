@@ -49,6 +49,8 @@ public class SignatureReferenceVerifyInputProcessor extends AbstractInputProcess
     public SignatureReferenceVerifyInputProcessor(SignatureType signatureType, SecurityProperties securityProperties) {
         super(securityProperties);
         this.signatureType = signatureType;
+        this.getAfterProcessors().add(SignatureInputProcessor.class.getName());
+        this.getAfterProcessors().add(SignatureReferenceVerifyInputProcessor.class.getName());
     }
 
     public void processEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException {

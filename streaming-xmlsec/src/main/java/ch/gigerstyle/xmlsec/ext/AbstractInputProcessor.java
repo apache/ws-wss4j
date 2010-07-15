@@ -6,6 +6,8 @@ import org.apache.commons.logging.LogFactory;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.XMLEvent;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * User: giger
@@ -34,8 +36,36 @@ public abstract class AbstractInputProcessor implements InputProcessor {
     private SecurityProperties securityProperties;
     private QName lastStartElementName = new QName("", "");
 
+    private Constants.Phase phase = Constants.Phase.PROCESSING;
+    private Set<String> beforeProcessors = new HashSet<String>();
+    private Set<String> afterProcessors = new HashSet<String>();
+
     public AbstractInputProcessor(SecurityProperties securityProperties) {
         this.securityProperties = securityProperties;
+    }
+
+    public Constants.Phase getPhase() {
+        return phase;
+    }
+
+    public void setPhase(Constants.Phase phase) {
+        this.phase = phase;
+    }
+
+    public Set<String> getBeforeProcessors() {
+        return beforeProcessors;
+    }
+
+    public void setBeforeProcessors(Set<String> beforeProcessors) {
+        this.beforeProcessors = beforeProcessors;
+    }
+
+    public Set<String> getAfterProcessors() {
+        return afterProcessors;
+    }
+
+    public void setAfterProcessors(Set<String> afterProcessors) {
+        this.afterProcessors = afterProcessors;
     }
 
     public abstract void processEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException;

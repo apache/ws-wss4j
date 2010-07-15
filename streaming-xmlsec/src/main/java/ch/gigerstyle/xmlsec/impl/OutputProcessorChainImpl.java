@@ -1,6 +1,8 @@
 package ch.gigerstyle.xmlsec.impl;
 
 import ch.gigerstyle.xmlsec.ext.*;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.XMLEvent;
@@ -28,6 +30,8 @@ import java.util.List;
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 public class OutputProcessorChainImpl implements OutputProcessorChain {
+
+    protected static final transient Log log = LogFactory.getLog(OutputProcessorChainImpl.class);
 
     List<OutputProcessor> outputProcessors = new ArrayList<OutputProcessor>();
     int pos = 0;
@@ -62,48 +66,84 @@ public class OutputProcessorChainImpl implements OutputProcessorChain {
         return this.xmlSecurityContext;
     }
 
-    public void addProcessor(OutputProcessor outputProcessor) {
-        if (outputProcessor.getClass().getName().equals("ch.gigerstyle.xmlsec.impl.processor.output.EncryptOutputProcessor$InternalEncryptionOutputProcessor")) {
-            int pos = this.outputProcessors.size() - 1;
-            for (int i = 0; i < outputProcessors.size(); i++) {
-                OutputProcessor processor = outputProcessors.get(i);
-                if (processor.getClass().getName().equals("ch.gigerstyle.xmlsec.impl.processor.output.EncryptOutputProcessor$InternalEncryptionOutputProcessor")) {
-                    //add encrypption processor before other encryption processors...
-                    pos = i;
+    public void addProcessor(OutputProcessor newOutputProcessor) {
+        int startPhaseIdx = 0;
+        int endPhaseIdx = outputProcessors.size();
+
+        Constants.Phase targetPhase = newOutputProcessor.getPhase();
+
+        for (int i = outputProcessors.size() - 1; i >= 0; i--) {
+            OutputProcessor OutputProcessor = outputProcessors.get(i);
+            if (OutputProcessor.getPhase().ordinal() < targetPhase.ordinal()) {
+                startPhaseIdx = i + 1;
+                break;
+            }
+        }
+        for (int i = startPhaseIdx; i < outputProcessors.size(); i++) {
+            OutputProcessor OutputProcessor = outputProcessors.get(i);
+            if (OutputProcessor.getPhase().ordinal() > targetPhase.ordinal()) {
+                endPhaseIdx = i;
+                break;
+            }
+        }
+
+        //just look for the correct phase and append as last
+        if (newOutputProcessor.getBeforeProcessors().isEmpty()
+                && newOutputProcessor.getAfterProcessors().isEmpty()) {
+            outputProcessors.add(endPhaseIdx, newOutputProcessor);
+        } else if (newOutputProcessor.getBeforeProcessors().isEmpty()) {
+            int idxToInsert = endPhaseIdx;
+
+            for (int i = endPhaseIdx; i >= startPhaseIdx; i--) {
+                OutputProcessor OutputProcessor = outputProcessors.get(i);
+                if (newOutputProcessor.getAfterProcessors().contains(OutputProcessor.getClass().getName())) {
+                    idxToInsert = i + 1;
                     break;
                 }
             }
-            System.out.println("Adding internal enc proc at pos " + pos);
-            this.outputProcessors.add(pos, outputProcessor);
-        } else if (outputProcessor.getClass().getName().equals("ch.gigerstyle.xmlsec.impl.processor.output.SignatureOutputProcessor$InternalSignatureOutputProcessor")) {
-            int pos = this.outputProcessors.size() - 1;
-            for (int i = 0; i < outputProcessors.size(); i++) {
-                OutputProcessor processor = outputProcessors.get(i);
-                if (processor.getClass().getName().equals("ch.gigerstyle.xmlsec.impl.processor.output.SignatureOutputProcessor")) {
-                    //add encrypption processor before other encryption processors...
-                    pos = i + 1;
+            outputProcessors.add(idxToInsert, newOutputProcessor);
+        } else if (newOutputProcessor.getAfterProcessors().isEmpty()) {
+            int idxToInsert = startPhaseIdx;
+
+            for (int i = startPhaseIdx; i < endPhaseIdx; i++) {
+                OutputProcessor OutputProcessor = outputProcessors.get(i);
+                if (newOutputProcessor.getBeforeProcessors().contains(OutputProcessor.getClass().getName())) {
+                    idxToInsert = i;
                     break;
                 }
             }
-            this.outputProcessors.add(pos, outputProcessor);
-            System.out.println("Adding internal sig proc at pos " + pos);
-        } else if (outputProcessor.getClass().getName().equals("ch.gigerstyle.xmlsec.impl.processor.output.BinarySecurityTokenOutputProcessor")) {
-            this.outputProcessors.add(this.outputProcessors.size() - 1, outputProcessor);
-            System.out.println("Adding internal bst proc at pos " + (this.outputProcessors.size() - 1));
-        } else if (outputProcessor.getClass().getName().equals("ch.gigerstyle.xmlsec.impl.processor.output.SignatureOutputProcessor$SignedInfoProcessor")) {
-            int pos = this.outputProcessors.size() - 1;
-            for (int i = 0; i < outputProcessors.size(); i++) {
-                OutputProcessor processor = outputProcessors.get(i);
-                if (processor.getClass().getName().equals("ch.gigerstyle.xmlsec.impl.processor.output.SignatureOutputProcessor")) {
-                    //add encrypption processor before other encryption processors...
-                    pos = i + 1;
-                    break;
-                }
-            }
-            this.outputProcessors.add(pos, outputProcessor);
-            System.out.println("Adding internal sig-info proc at pos " + (this.outputProcessors.size() - 1));
+            outputProcessors.add(idxToInsert, newOutputProcessor);
         } else {
-            this.outputProcessors.add(outputProcessor);
+            boolean found = false;
+            int idxToInsert = endPhaseIdx;
+
+            for (int i = startPhaseIdx; i < endPhaseIdx; i++) {
+                OutputProcessor OutputProcessor = outputProcessors.get(i);
+                if (newOutputProcessor.getBeforeProcessors().contains(OutputProcessor.getClass().getName())) {
+                    idxToInsert = i;
+                    found = true;
+                    break;
+                }
+            }
+            if (found) {
+                outputProcessors.add(idxToInsert, newOutputProcessor);
+            } else {
+                for (int i = endPhaseIdx; i >= startPhaseIdx; i--) {
+                    OutputProcessor OutputProcessor = outputProcessors.get(i);
+                    if (newOutputProcessor.getAfterProcessors().contains(OutputProcessor.getClass().getName())) {
+                        idxToInsert = i + 1;
+                        break;
+                    }
+                }
+                outputProcessors.add(idxToInsert, newOutputProcessor);
+            }
+        }
+        if (log.isDebugEnabled()) {
+            log.debug("Added " + newOutputProcessor.getClass().getName() + " to output chain: ");
+            for (int i = 0; i < outputProcessors.size(); i++) {
+                OutputProcessor OutputProcessor = outputProcessors.get(i);
+                log.debug("Name: " + OutputProcessor.getClass().getName() + " phase: " + OutputProcessor.getPhase());
+            }
         }
     }
 

@@ -43,6 +43,12 @@ public class Constants {
     private Constants() {
     }
 
+    public enum Phase {
+        PREPROCESSING,
+        PROCESSING,
+        POSTPROCESSING,
+    }
+
     public static final String NS_XMLENC = "http://www.w3.org/2001/04/xmlenc#";
     public static final String NS_DSIG = "http://www.w3.org/2000/09/xmldsig#";
     public static final String NS_WSSE = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd";

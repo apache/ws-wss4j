@@ -34,6 +34,7 @@ public class SecurityHeaderInputProcessor extends AbstractInputProcessor {
 
     public SecurityHeaderInputProcessor(SecurityProperties securityProperties) {
         super(securityProperties);
+        setPhase(Constants.Phase.PREPROCESSING);
     }
 
     @Override

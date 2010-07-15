@@ -362,6 +362,8 @@ public class EncryptOutputProcessor extends AbstractOutputProcessor {
 
         InternalEncryptionOutputProcessor(SecurityProperties securityProperties, EncryptionPartDef encryptionPartDef, QName startElement, XMLEventNSAllocator xmlEventNSAllocator) throws XMLSecurityException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IOException {
             super(securityProperties);
+            this.getBeforeProcessors().add(InternalEncryptionOutputProcessor.class.getName());
+            this.getAfterProcessors().add(EncryptOutputProcessor.class.getName());
             this.xmlEventNSAllocator = xmlEventNSAllocator;
             this.encryptionPartDef = encryptionPartDef;
             this.startElement = startElement;

@@ -2,6 +2,7 @@ package ch.gigerstyle.xmlsec.ext;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.XMLEvent;
+import java.util.Set;
 
 /**
  * User: giger
@@ -25,9 +26,15 @@ import javax.xml.stream.events.XMLEvent;
  */
 public interface OutputProcessor {
 
-    public void processNextEvent(XMLEvent xmlEvent, OutputProcessorChain OutputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException;
+    Set<String> getBeforeProcessors();
 
-    public void processNextHeaderEvent(XMLEvent xmlEvent, OutputProcessorChain OutputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException;
+    Set<String> getAfterProcessors();
 
-    public void doFinal(OutputProcessorChain OutputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException;
+    Constants.Phase getPhase();
+
+    void processNextEvent(XMLEvent xmlEvent, OutputProcessorChain OutputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException;
+
+    void processNextHeaderEvent(XMLEvent xmlEvent, OutputProcessorChain OutputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException;
+
+    void doFinal(OutputProcessorChain OutputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException;
 }

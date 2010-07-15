@@ -169,6 +169,8 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
             super(securityProperties);
             this.encryptedDataType = encryptedDataType;
             this.startXMLElement = startXMLEvent;
+            this.getAfterProcessors().add(DecryptInputProcessor.class.getName());
+            this.getAfterProcessors().add(InternalDecryptProcessor.class.getName());
         }
 
         @Override

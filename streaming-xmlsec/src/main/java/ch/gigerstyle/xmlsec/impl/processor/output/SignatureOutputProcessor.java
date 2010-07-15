@@ -241,6 +241,7 @@ public class SignatureOutputProcessor extends AbstractOutputProcessor {
 
                 createEndElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_dsig_SignedInfo);
                 subOutputProcessorChain.removeProcessor(signedInfoProcessor);
+
                 createStartElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_dsig_SignatureValue, null);
                 createCharactersAndOutputAsHeaderEvent(subOutputProcessorChain, Base64.encodeBase64String(signedInfoProcessor.getSignatureValue()));
                 createEndElementAndOutputAsHeaderEvent(subOutputProcessorChain, Constants.TAG_dsig_SignatureValue);
@@ -413,6 +414,8 @@ public class SignatureOutputProcessor extends AbstractOutputProcessor {
 
         InternalSignatureOutputProcessor(SecurityProperties securityProperties, SignaturePartDef signaturePartDef, QName startElement) throws XMLSecurityException, NoSuchProviderException, NoSuchAlgorithmException {
             super(securityProperties);
+            this.getAfterProcessors().add(SignatureOutputProcessor.class.getName());
+            this.getBeforeProcessors().add(InternalSignatureOutputProcessor.class.getName());
             this.signaturePartDef = signaturePartDef;
             this.startElement = startElement;
 
@@ -471,6 +474,8 @@ public class SignatureOutputProcessor extends AbstractOutputProcessor {
 
         SignedInfoProcessor(SecurityProperties securityProperties, Signature signature) throws XMLSecurityException {
             super(securityProperties);
+            this.getAfterProcessors().add(SignatureOutputProcessor.class.getName());
+            this.getBeforeProcessors().add(InternalSignatureOutputProcessor.class.getName());
 
             signerOutputStream = new SignerOutputStream(signature);
             bufferedSignerOutputStream = new BufferedOutputStream(signerOutputStream);

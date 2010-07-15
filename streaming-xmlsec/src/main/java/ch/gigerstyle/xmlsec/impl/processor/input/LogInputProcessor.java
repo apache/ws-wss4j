@@ -29,6 +29,8 @@ public class LogInputProcessor extends AbstractInputProcessor {
 
     public LogInputProcessor(SecurityProperties securityProperties) {
         super(securityProperties);
+        setPhase(Constants.Phase.POSTPROCESSING);
+        this.getBeforeProcessors().add(PipedInputProcessor.class.getName());
     }
 
     public void processEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException {
