@@ -329,7 +329,6 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
                     } catch (IOException e) {
                         throw new XMLStreamException(e);
                     }
-                    inputProcessorChain.removeProcessor(this);
 
                     try {
                         while (receiverThread.isAlive()) {
@@ -339,6 +338,8 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
                     } catch (InterruptedException e) {
                         throw new XMLStreamException(e);
                     }
+
+                    inputProcessorChain.removeProcessor(this);
                 }
             } else if (xmlEvent.isCharacters()) {
                 try {
