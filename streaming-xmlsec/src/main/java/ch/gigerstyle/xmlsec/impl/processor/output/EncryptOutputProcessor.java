@@ -379,7 +379,7 @@ public class EncryptOutputProcessor extends AbstractOutputProcessor {
             characterEventGeneratorOutputStream = new CharacterEventGeneratorOutputStream(xmlEventNSAllocator);
             //Base64EncoderStream calls write every 78byte (line breaks). So we have to buffer again to get optimal performance
             //todo play around to find optimal size
-            Base64OutputStream base64EncoderStream = new Base64OutputStream(new BufferedOutputStream(characterEventGeneratorOutputStream), true);
+            Base64OutputStream base64EncoderStream = new Base64OutputStream(new BufferedOutputStream(characterEventGeneratorOutputStream), true, 76, new byte[]{'\n'});
             base64EncoderStream.write(iv);
 
             CipherOutputStream cipherOutputStream = new CipherOutputStream(base64EncoderStream, symmetricCipher);

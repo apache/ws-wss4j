@@ -110,6 +110,27 @@ public class InteroperabilityTest extends AbstractTestBase {
     }
 
     @Test
+    public void testInteroperabilityOutboundReverseOrder() throws Exception {
+
+        SecurityProperties securityProperties = new SecurityProperties();
+        securityProperties.setCallbackHandler(new CallbackHandlerImpl());
+        securityProperties.setEncryptionUser("receiver");
+        securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "1234567890".toCharArray());
+        securityProperties.setSignatureUser("transmitter");
+        securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "1234567890".toCharArray());
+        Constants.Action[] actions = new Constants.Action[]{Constants.Action.ENCRYPT, Constants.Action.SIGNATURE, Constants.Action.TIMESTAMP};
+        securityProperties.setOutAction(actions);
+
+        InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml");
+        ByteArrayOutputStream baos = doOutboundSecurity(securityProperties, sourceDocument);
+
+        System.out.println(new String(baos.toByteArray()));
+
+        String action = WSHandlerConstants.TIMESTAMP + " " + WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.ENCRYPT;
+        Document document = doInboundSecurityWithWSS4J(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action);
+    }
+
+    @Test
     public void testInteroperabilityOutboundSignature() throws Exception {
 
         SecurityProperties securityProperties = new SecurityProperties();

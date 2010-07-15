@@ -148,6 +148,7 @@ public class OutputProcessorChainImpl implements OutputProcessorChain {
     }
 
     public void removeProcessor(OutputProcessor outputProcessor) {
+        log.debug("Removing processor " + outputProcessor.getClass().getName() + " from output chain");
         if (this.outputProcessors.indexOf(outputProcessor) <= getPos()) {
             this.pos--;
         }
