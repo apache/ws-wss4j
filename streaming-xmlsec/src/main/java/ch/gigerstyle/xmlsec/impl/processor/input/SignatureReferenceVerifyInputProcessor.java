@@ -101,7 +101,7 @@ public class SignatureReferenceVerifyInputProcessor extends AbstractInputProcess
 
         public InternalSignatureReferenceVerifier(SecurityProperties securityProperties, ReferenceType referenceType, QName startElement) throws XMLSecurityException {
             super(securityProperties);
-
+            this.getAfterProcessors().add(SignatureReferenceVerifyInputProcessor.class.getName());
             this.startElement = startElement;
             this.referenceType = referenceType;
             try {
@@ -157,6 +157,7 @@ public class SignatureReferenceVerifyInputProcessor extends AbstractInputProcess
                     inputProcessorChain.removeProcessor(this);
                 }
             }
+            inputProcessorChain.processEvent(xmlEvent);
         }
     }
 }

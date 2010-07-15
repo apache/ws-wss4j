@@ -63,6 +63,33 @@ public class InteroperabilityTest extends AbstractTestBase {
         ));
     }
 
+    @Test(invocationCount = 1)
+    public void testInteroperabilityInboundReverseOrder() throws Exception {
+
+        InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml");
+
+        String action = WSHandlerConstants.ENCRYPT + " " + WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.TIMESTAMP;
+        Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, new Properties());
+
+        SecurityProperties securityProperties = new SecurityProperties();
+        securityProperties.setCallbackHandler(new CallbackHandlerImpl());
+        securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "1234567890".toCharArray());
+        securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "1234567890".toCharArray());
+
+        Document document = doInboundSecurity(securityProperties, new DOMStreamReader(securedDocument));
+
+        //read the whole stream:
+        Transformer transformer = TransformerFactory.newInstance().newTransformer();
+        transformer.transform(new DOMSource(document), new StreamResult(
+                new OutputStream() {
+                    @Override
+                    public void write(int b) throws IOException {
+                        // > /dev/null
+                    }
+                }
+        ));
+    }
+
     @Test
     public void testInteroperabilityOutbound() throws Exception {
 
