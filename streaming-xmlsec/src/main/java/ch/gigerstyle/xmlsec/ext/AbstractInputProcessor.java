@@ -56,16 +56,8 @@ public abstract class AbstractInputProcessor implements InputProcessor {
         return beforeProcessors;
     }
 
-    public void setBeforeProcessors(Set<String> beforeProcessors) {
-        this.beforeProcessors = beforeProcessors;
-    }
-
     public Set<String> getAfterProcessors() {
         return afterProcessors;
-    }
-
-    public void setAfterProcessors(Set<String> afterProcessors) {
-        this.afterProcessors = afterProcessors;
     }
 
     public abstract void processEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException;

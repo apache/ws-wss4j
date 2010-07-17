@@ -1,7 +1,6 @@
 package ch.gigerstyle.xmlsec.ext;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.events.XMLEvent;
 
 /**
  * User: giger
@@ -24,8 +23,6 @@ import javax.xml.stream.events.XMLEvent;
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 public interface OutputProcessorChain extends ProcessorChain {
-
-    public void processHeaderEvent(XMLEvent xmlEvent) throws XMLStreamException, XMLSecurityException;
 
     public SecurityContext getSecurityContext();
 

@@ -47,10 +47,14 @@ public class OutboundXMLSec {
                     processorChain.addProcessor(new TimestampOutputProcessor(securityProperties));
                     break;
                 case SIGNATURE:
-                    processorChain.addProcessor(new SignatureOutputProcessor(securityProperties));
+                    SignatureOutputProcessor signatureOutputProcessor = new SignatureOutputProcessor(securityProperties);
+                    processorChain.addProcessor(signatureOutputProcessor);
+                    processorChain.addProcessor(new SignatureEndingOutputProcessor(securityProperties, signatureOutputProcessor));
                     break;
                 case ENCRYPT:
-                    processorChain.addProcessor(new EncryptOutputProcessor(securityProperties));
+                    EncryptOutputProcessor encryptOutputProcessor = new EncryptOutputProcessor(securityProperties);
+                    processorChain.addProcessor(encryptOutputProcessor);
+                    processorChain.addProcessor(new EncryptEndingOutputProcessor(securityProperties, encryptOutputProcessor));
                     break;
             }
         }

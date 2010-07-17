@@ -1,6 +1,5 @@
 package ch.gigerstyle.xmlsec.impl;
 
-import ch.gigerstyle.xmlsec.ext.Constants;
 import ch.gigerstyle.xmlsec.ext.OutputProcessorChain;
 import ch.gigerstyle.xmlsec.ext.XMLSecurityException;
 
@@ -143,18 +142,8 @@ public class XMLSecurityStreamWriter implements XMLStreamWriter {
 
     public void close() throws XMLStreamException {
         try {
-            List<XMLEvent> cachedXMLEvents = outputProcessorChain.getSecurityContext().get(Constants.CACHED_EVENTS);
-            if (cachedXMLEvents != null) {
-                for (int i = 0; i < cachedXMLEvents.size(); i++) {
-                    XMLEvent xmlEvent = cachedXMLEvents.get(i);
-                    outputProcessorChain.reset();
-                    outputProcessorChain.processHeaderEvent(xmlEvent);
-                }
-            }
-
             outputProcessorChain.reset();
             outputProcessorChain.doFinal();
-
         } catch (XMLSecurityException e) {
             throw new XMLStreamException(e);
         }

@@ -37,7 +37,6 @@ public abstract class AbstractOutputProcessor implements OutputProcessor {
 
     protected SecurityProperties securityProperties;
     private QName lastStartElementName = new QName("", "");
-    private QName lastHeaderStartElementName = new QName("", "");
 
     private Constants.Phase phase = Constants.Phase.PROCESSING;
     private Set<String> beforeProcessors = new HashSet<String>();
@@ -59,16 +58,8 @@ public abstract class AbstractOutputProcessor implements OutputProcessor {
         return beforeProcessors;
     }
 
-    public void setBeforeProcessors(Set<String> beforeProcessors) {
-        this.beforeProcessors = beforeProcessors;
-    }
-
     public Set<String> getAfterProcessors() {
         return afterProcessors;
-    }
-
-    public void setAfterProcessors(Set<String> afterProcessors) {
-        this.afterProcessors = afterProcessors;
     }
 
     public abstract void processEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException;
@@ -78,15 +69,6 @@ public abstract class AbstractOutputProcessor implements OutputProcessor {
             lastStartElementName = xmlEvent.asStartElement().getName();
         }
         processEvent(xmlEvent, outputProcessorChain, securityContext);
-    }
-
-    public abstract void processHeaderEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException;
-
-    public void processNextHeaderEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException {
-        if (xmlEvent.isStartElement()) {
-            lastHeaderStartElementName = xmlEvent.asStartElement().getName();
-        }
-        processHeaderEvent(xmlEvent, outputProcessorChain, securityContext);
     }
 
     public void doFinal(OutputProcessorChain outputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException {
@@ -101,19 +83,9 @@ public abstract class AbstractOutputProcessor implements OutputProcessor {
         return lastStartElementName;
     }
 
-    public static void createStartElementAndOutputAsHeaderEvent(OutputProcessorChain outputProcessorChain, QName element, Map<QName, String> attributes) throws XMLStreamException, XMLSecurityException {
-        XMLEvent xmlEvent = outputProcessorChain.getSecurityContext().<XMLEventNSAllocator>get("XMLEventNSAllocator").createStartElement(element, attributes);
-        outputAsHeaderEvent(outputProcessorChain, xmlEvent);
-    }
-
     public static void createStartElementAndOutputAsEvent(OutputProcessorChain outputProcessorChain, QName element, Map<QName, String> attributes) throws XMLStreamException, XMLSecurityException {
         XMLEvent xmlEvent = outputProcessorChain.getSecurityContext().<XMLEventNSAllocator>get("XMLEventNSAllocator").createStartElement(element, attributes);
         outputAsEvent(outputProcessorChain, xmlEvent);
-    }
-
-    public static void createEndElementAndOutputAsHeaderEvent(OutputProcessorChain outputProcessorChain, QName element) throws XMLStreamException, XMLSecurityException {
-        final XMLEvent xmlEvent = outputProcessorChain.getSecurityContext().<XMLEventNSAllocator>get("XMLEventNSAllocator").createEndElement(element);
-        outputAsHeaderEvent(outputProcessorChain, xmlEvent);
     }
 
     public static void createEndElementAndOutputAsEvent(OutputProcessorChain outputProcessorChain, QName element) throws XMLStreamException, XMLSecurityException {
@@ -121,19 +93,9 @@ public abstract class AbstractOutputProcessor implements OutputProcessor {
         outputAsEvent(outputProcessorChain, xmlEvent);
     }
 
-    public static void createCharactersAndOutputAsHeaderEvent(OutputProcessorChain outputProcessorChain, String characters) throws XMLStreamException, XMLSecurityException {
-        final XMLEvent xmlEvent = outputProcessorChain.getSecurityContext().<XMLEventNSAllocator>get("XMLEventNSAllocator").createCharacters(characters);
-        outputAsHeaderEvent(outputProcessorChain, xmlEvent);
-    }
-
     public static void createCharactersAndOutputAsEvent(OutputProcessorChain outputProcessorChain, String characters) throws XMLStreamException, XMLSecurityException {
         final XMLEvent xmlEvent = outputProcessorChain.getSecurityContext().<XMLEventNSAllocator>get("XMLEventNSAllocator").createCharacters(characters);
         outputAsEvent(outputProcessorChain, xmlEvent);
-    }
-
-    public static void outputAsHeaderEvent(OutputProcessorChain outputProcessorChain, XMLEvent xmlEvent) throws XMLStreamException, XMLSecurityException {
-        outputProcessorChain.reset();
-        outputProcessorChain.processHeaderEvent(xmlEvent);
     }
 
     public static void outputAsEvent(OutputProcessorChain outputProcessorChain, XMLEvent xmlEvent) throws XMLStreamException, XMLSecurityException {

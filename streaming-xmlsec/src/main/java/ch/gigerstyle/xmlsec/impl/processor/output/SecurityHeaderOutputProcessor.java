@@ -3,7 +3,6 @@ package ch.gigerstyle.xmlsec.impl.processor.output;
 import ch.gigerstyle.xmlsec.ext.*;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.Namespace;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
@@ -64,14 +63,6 @@ public class SecurityHeaderOutputProcessor extends AbstractOutputProcessor {
 
                 outputProcessorChain.removeProcessor(this);
             }
-        } else if (xmlEvent.isEndElement()) {
-            EndElement endElement = xmlEvent.asEndElement();
-
         }
-    }
-
-    @Override
-    public void processHeaderEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException {
-        outputProcessorChain.processHeaderEvent(xmlEvent);
     }
 }

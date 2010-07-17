@@ -7,8 +7,6 @@ import javax.xml.stream.events.XMLEvent;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * User: giger
@@ -34,8 +32,6 @@ public class FinalOutputProcessor extends AbstractOutputProcessor {
 
     private OutputStreamWriter outputStreamWriter;
 
-    private List<XMLEvent> xmlEventList = new ArrayList<XMLEvent>();
-
     public FinalOutputProcessor(OutputStream outputStream, SecurityProperties securityProperties) throws XMLSecurityException {
         super(securityProperties);
         outputStreamWriter = new OutputStreamWriter(outputStream);
@@ -43,16 +39,6 @@ public class FinalOutputProcessor extends AbstractOutputProcessor {
     }
 
     public void processEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException {
-        //cache events
-        xmlEventList.add(xmlEvent);
-        if (securityContext.get(Constants.CACHED_EVENTS) == null) {
-            securityContext.put(Constants.CACHED_EVENTS, xmlEventList);
-        }
-    }
-
-    @Override
-    public void processHeaderEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException {
-        //todo write optimized xml...every element has its ns declaration... 
         xmlEvent.writeAsEncodedUnicode(outputStreamWriter);
     }
 

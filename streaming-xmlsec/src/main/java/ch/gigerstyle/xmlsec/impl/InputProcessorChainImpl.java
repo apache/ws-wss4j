@@ -94,7 +94,7 @@ public class InputProcessorChainImpl implements InputProcessorChain {
         } else if (newInputProcessor.getBeforeProcessors().isEmpty()) {
             int idxToInsert = endPhaseIdx;
 
-            for (int i = endPhaseIdx; i >= startPhaseIdx; i--) {
+            for (int i = endPhaseIdx - 1; i >= startPhaseIdx; i--) {
                 InputProcessor inputProcessor = inputProcessors.get(i);
                 if (newInputProcessor.getAfterProcessors().contains(inputProcessor.getClass().getName())) {
                     idxToInsert = i + 1;
@@ -128,7 +128,7 @@ public class InputProcessorChainImpl implements InputProcessorChain {
             if (found) {
                 inputProcessors.add(idxToInsert, newInputProcessor);
             } else {
-                for (int i = endPhaseIdx; i >= startPhaseIdx; i--) {
+                for (int i = endPhaseIdx - 1; i >= startPhaseIdx; i--) {
                     InputProcessor inputProcessor = inputProcessors.get(i);
                     if (newInputProcessor.getAfterProcessors().contains(inputProcessor.getClass().getName())) {
                         idxToInsert = i + 1;

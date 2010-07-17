@@ -82,9 +82,4 @@ public class TimestampOutputProcessor extends AbstractOutputProcessor {
             }
         }
     }
-
-    @Override
-    public void processHeaderEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException {
-        outputProcessorChain.processHeaderEvent(xmlEvent);
-    }
 }

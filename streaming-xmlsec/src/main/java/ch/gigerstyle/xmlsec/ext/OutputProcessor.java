@@ -34,7 +34,5 @@ public interface OutputProcessor {
 
     void processNextEvent(XMLEvent xmlEvent, OutputProcessorChain OutputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException;
 
-    void processNextHeaderEvent(XMLEvent xmlEvent, OutputProcessorChain OutputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException;
-
     void doFinal(OutputProcessorChain OutputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException;
 }

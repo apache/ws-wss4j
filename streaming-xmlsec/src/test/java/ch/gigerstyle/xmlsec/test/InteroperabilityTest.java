@@ -124,9 +124,7 @@ public class InteroperabilityTest extends AbstractTestBase {
         InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml");
         ByteArrayOutputStream baos = doOutboundSecurity(securityProperties, sourceDocument);
 
-        System.out.println(new String(baos.toByteArray()));
-
-        String action = WSHandlerConstants.TIMESTAMP + " " + WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.ENCRYPT;
+        String action = WSHandlerConstants.ENCRYPT + " " + WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.TIMESTAMP;
         Document document = doInboundSecurityWithWSS4J(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action);
     }
 
