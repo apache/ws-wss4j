@@ -53,8 +53,15 @@ public class UsernameTokenSignedAction implements Action {
 
         WSSecUsernameToken builder = new WSSecUsernameToken();
         builder.setWsConfig(reqData.getWssConfig());
-        builder.setPasswordType(reqData.getPwType());  // enhancement by Alberto Coletti
-        builder.setSecretKeyLength(reqData.getSecretKeyLength());
+        
+        if (reqData.isUseDerivedKey()) {
+            int iterations = reqData.getDerivedKeyIterations();
+            boolean useMac = reqData.isUseDerivedKeyForMAC();
+            builder.addDerivedKey(useMac, null, iterations);
+        } else {
+            builder.setPasswordType(reqData.getPwType());  // enhancement by Alberto Coletti
+            builder.setSecretKeyLength(reqData.getSecretKeyLength());
+        }
         
         builder.setUserInfo(reqData.getUsername(), password);
         builder.addCreated();
@@ -82,7 +89,12 @@ public class UsernameTokenSignedAction implements Action {
 
         sign.setUsernameToken(builder);
         sign.setKeyIdentifierType(WSConstants.UT_SIGNING);
-        sign.setSignatureAlgorithm(XMLSignature.ALGO_ID_MAC_HMAC_SHA1);
+
+        if (reqData.getSigAlgorithm() != null) {
+            sign.setSignatureAlgorithm(reqData.getSigAlgorithm());
+        } else {
+            sign.setSignatureAlgorithm(XMLSignature.ALGO_ID_MAC_HMAC_SHA1);
+        }
 
         sign.prepare(doc, null, reqData.getSecHeader());
 

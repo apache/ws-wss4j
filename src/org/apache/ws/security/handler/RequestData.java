@@ -24,6 +24,7 @@ import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.message.WSSecHeader;
+import org.apache.ws.security.message.token.UsernameToken;
 
 import java.util.Vector;
 import java.security.cert.X509Certificate;
@@ -61,6 +62,9 @@ public class RequestData {
     private WSSecHeader secHeader = null;
     private boolean encSymmetricEncryptionKey = true;
     private int secretKeyLength = WSConstants.WSE_DERIVED_KEY_LEN;
+    private boolean useDerivedKey = false;
+    private int derivedKeyIterations = UsernameToken.DEFAULT_ITERATION;
+    private boolean useDerivedKeyForMAC = true;
 
     public void clear() {
         soapConstants = null;
@@ -76,6 +80,9 @@ public class RequestData {
         encSymmetricEncryptionKey = true;
         secretKeyLength = WSConstants.WSE_DERIVED_KEY_LEN;
         signatureUser = null;
+        useDerivedKey = false;
+        derivedKeyIterations = UsernameToken.DEFAULT_ITERATION;
+        useDerivedKeyForMAC = true;
     }
 
     public Object getMsgContext() {
@@ -295,4 +302,53 @@ public class RequestData {
     public void setSecHeader(WSSecHeader secHeader) {
         this.secHeader = secHeader;
     }
+    
+    /**
+     * @param derivedKey Set whether to derive keys as per the 
+     *        UsernameTokenProfile 1.1 spec. Default is false.
+     */
+    public void setUseDerivedKey(boolean derivedKey) {
+        useDerivedKey = derivedKey;
+    }
+    
+    /**
+     * Return whether to derive keys as per the UsernameTokenProfile 
+     * 1.1 spec. Default is false.
+     */
+    public boolean isUseDerivedKey() {
+        return useDerivedKey;
+    }
+    
+    /**
+     * Set the derived key iterations. Default is 1000.
+     * @param iterations The number of iterations to use when deriving a key
+     */
+    public void setDerivedKeyIterations(int iterations) {
+        derivedKeyIterations = iterations;
+    }
+    
+    /**
+     * Get the derived key iterations.
+     * @return The number of iterations to use when deriving a key
+     */
+    public int getDerivedKeyIterations() {
+        return derivedKeyIterations;
+    }
+    
+    /**
+     * Whether to use the derived key for a MAC.
+     * @param useMac Whether to use the derived key for a MAC.
+     */
+    public void setUseDerivedKeyForMAC(boolean useMac) {
+        useDerivedKeyForMAC = useMac;
+    }
+    
+    /**
+     * Whether to use the derived key for a MAC.
+     * @return Whether to use the derived key for a MAC.
+     */
+    public boolean isUseDerivedKeyForMAC() {
+        return useDerivedKeyForMAC;
+    }
+    
 }

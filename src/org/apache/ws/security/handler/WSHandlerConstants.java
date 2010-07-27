@@ -602,6 +602,25 @@ public class WSHandlerConstants {
      * The default value is 16 bytes.
      */
     public static final String WSE_SECRET_KEY_LENGTH = "wseSecretKeyLength";
+    
+    /**
+     * This parameter sets whether to use UsernameToken Key Derivation, as defined 
+     * in the UsernameTokenProfile 1.1 specification. The default is false for
+     * backwards compatibility reasons, and defaults to WSE key derivation.
+     */
+    public static final String USE_DERIVED_KEY = "useDerivedKey";
+    
+    /**
+     * This parameter sets whether to use the Username Token derived key for a MAC
+     * or not. The default is true.
+     */
+    public static final String USE_DERIVED_KEY_FOR_MAC = "useDerivedKeyForMAC";
+    
+    /**
+     * This parameter sets the number of iterations to use when deriving a key
+     * from a Username Token. The default is 1000. 
+     */
+    public static final String DERIVED_KEY_ITERATIONS = "derivedKeyIterations";
 
     /**
      * The name of the crypto property file to use for SOAP Encryption.

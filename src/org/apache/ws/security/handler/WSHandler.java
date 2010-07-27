@@ -529,6 +529,24 @@ public abstract class WSHandler {
         if (add != null) {
             reqData.setUtElements(StringUtil.split(add, ' '));
         }
+        
+        String derived = getString(WSHandlerConstants.USE_DERIVED_KEY, mc);
+        boolean useDerivedKey = Boolean.parseBoolean(derived);
+        if (useDerivedKey) {
+            reqData.setUseDerivedKey(useDerivedKey);
+        }
+        
+        String derivedMAC = getString(WSHandlerConstants.USE_DERIVED_KEY, mc);
+        boolean useDerivedKeyForMAC = Boolean.parseBoolean(derivedMAC);
+        if (useDerivedKeyForMAC) {
+            reqData.setUseDerivedKeyForMAC(useDerivedKeyForMAC);
+        }
+        
+        String iterations = getString(WSHandlerConstants.DERIVED_KEY_ITERATIONS, mc);
+        if (iterations != null) {
+            int iIterations = Integer.parseInt(iterations);
+            reqData.setDerivedKeyIterations(iIterations);
+        }
     }
 
     protected void decodeSignatureParameter(RequestData reqData) 
