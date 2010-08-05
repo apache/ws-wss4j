@@ -111,6 +111,16 @@ public class PipedXMLStreamReader implements XMLStreamReader {
     }
 
     /**
+     * the writing thread must be set as early as possible
+     * because the writing thread can die before it wrote
+     * the first event. In this case the next() method loops
+     * endless because writeSide is still null. 
+     */
+    public void setWriteSide(Thread writeSide) {
+        this.writeSide = writeSide;
+    }
+
+    /**
      * Receives a XMLEvent.  This method will block if no input is
      * available.
      *
@@ -191,8 +201,8 @@ public class PipedXMLStreamReader implements XMLStreamReader {
             if (closedByWriter) {
                 /* closed by writer, return EOF */
                 throw new IllegalStateException("No more input available");
-            }
-            if ((writeSide != null) && (!writeSide.isAlive()) && (--trials < 0)) {
+            }            
+            else if ((writeSide != null) && (!writeSide.isAlive()) && (--trials < 0)) {
                 throw new XMLStreamException("Pipe broken");
             }
             /* might be a writer waiting */

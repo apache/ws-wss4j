@@ -59,11 +59,13 @@ public class InboundXMLSec {
 
                 try {
 
+                    pipedXMLStreamReader.setWriteSide(Thread.currentThread());
+
                     long start = System.currentTimeMillis();
 
                     InputProcessorChainImpl processorChain = new InputProcessorChainImpl();
 
-                    processorChain.addProcessor(new SecurityHeaderInputProcessor(securityProperties));
+                    processorChain.addProcessor(new SecurityHeaderInputProcessor(securityProperties, processorChain));
                     //todo dynamic add procs
                     /*processorChain.addProcessor(new EncryptedKeyInputProcessor(securityProperties));
                     processorChain.addProcessor(new ReferenceListInputProcessor(securityProperties));
@@ -71,10 +73,11 @@ public class InboundXMLSec {
                     processorChain.addProcessor(new SignatureInputProcessor(securityProperties));
                     processorChain.addProcessor(new TimestampInputProcessor(securityProperties));
                     */
+                    processorChain.addProcessor(pipedInputProcessor);
+
                     if (log.isTraceEnabled()) {
                         processorChain.addProcessor(new LogInputProcessor(securityProperties));
                     }
-                    processorChain.addProcessor(pipedInputProcessor);
 
                     while (xmlEventReader.hasNext()) {
                         processorChain.processEvent(xmlEventReader.nextEvent());
