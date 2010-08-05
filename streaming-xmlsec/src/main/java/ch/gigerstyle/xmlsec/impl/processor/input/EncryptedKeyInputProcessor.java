@@ -65,8 +65,8 @@ public class EncryptedKeyInputProcessor extends AbstractInputProcessor implement
     </xenc:EncryptedKey>
      */
 
-    public void processEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException {
-
+    @Override
+    public void processSecurityHeaderEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException {
         if (currentEncryptedKeyType != null) {
             try {
                 isFinishedcurrentEncryptedKey = currentEncryptedKeyType.parseXMLEvent(xmlEvent);
@@ -88,8 +88,6 @@ public class EncryptedKeyInputProcessor extends AbstractInputProcessor implement
             try {
                 String asyncEncAlgo = JCEAlgorithmMapper.translateURItoJCEID(currentEncryptedKeyType.getEncryptionMethod().getAlgorithm());
                 Cipher cipher = Cipher.getInstance(asyncEncAlgo, "BC");
-
-                String alias = null;
 
                 KeyInfoType keyInfoType = currentEncryptedKeyType.getKeyInfo();
                 SecurityToken securityToken = SecurityTokenFactory.newInstance().getSecurityToken(keyInfoType, getSecurityProperties().getDecryptionCrypto(), getSecurityProperties().getCallbackHandler(), securityContext);
@@ -127,6 +125,13 @@ public class EncryptedKeyInputProcessor extends AbstractInputProcessor implement
                 isFinishedcurrentEncryptedKey = false;
             }
         }
+
+        inputProcessorChain.processSecurityHeaderEvent(xmlEvent);
+    }
+
+    @Override
+    public void processEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException {
+        //this method should not be called (processor will be removed after processing header
         inputProcessorChain.processEvent(xmlEvent);
     }
 

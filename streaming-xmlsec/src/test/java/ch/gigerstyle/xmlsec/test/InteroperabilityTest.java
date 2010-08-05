@@ -6,11 +6,16 @@ import com.sun.xml.ws.streaming.DOMStreamReader;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.testng.annotations.Test;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpression;
 import java.io.*;
 import java.util.Properties;
 
@@ -42,7 +47,9 @@ public class InteroperabilityTest extends AbstractTestBase {
         InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml");
 
         String action = WSHandlerConstants.TIMESTAMP + " " + WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.ENCRYPT;
-        Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, new Properties());
+        Properties properties = new Properties();
+        properties.setProperty(WSHandlerConstants.SIGNATURE_PARTS, "{Element}{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd}Timestamp;{Element}{http://schemas.xmlsoap.org/soap/envelope/}Body;");
+        Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
 
         SecurityProperties securityProperties = new SecurityProperties();
         securityProperties.setCallbackHandler(new CallbackHandlerImpl());
@@ -147,4 +154,46 @@ public class InteroperabilityTest extends AbstractTestBase {
         Document document = doInboundSecurityWithWSS4J(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action);
     }
 
+    @Test(invocationCount = 1)
+    public void testInteroperabilityInboundSecurityHeaderTimestampOrder() throws Exception {
+
+        InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml");
+
+        String action = WSHandlerConstants.TIMESTAMP + " " + WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.ENCRYPT;
+        Properties properties = new Properties();
+        properties.setProperty(WSHandlerConstants.SIGNATURE_PARTS, "{Element}{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd}Timestamp;{Element}{http://schemas.xmlsoap.org/soap/envelope/}Body;");
+        properties.setProperty(WSHandlerConstants.ENCRYPTION_PARTS, "{Element}{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd}Timestamp;{Content}{http://schemas.xmlsoap.org/soap/envelope/}Body;");
+        Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
+
+        XPathExpression xPathExpression = getXPath("/env:Envelope/env:Header/wsse:Security/xenc:EncryptedData");
+        Element timeStamp = (Element) xPathExpression.evaluate(securedDocument, XPathConstants.NODE);
+        Element securityHeaderNode = (Element)timeStamp.getParentNode();
+        securityHeaderNode.removeChild(timeStamp);
+
+        xPathExpression = getXPath("/env:Envelope/env:Header/wsse:Security/dsig:Signature");
+        Element signature = (Element) xPathExpression.evaluate(securedDocument, XPathConstants.NODE);
+        
+        securityHeaderNode.insertBefore(timeStamp, signature);
+
+        Transformer transformer = TransformerFactory.newInstance().newTransformer();
+        //transformer.transform(new DOMSource(securedDocument), new StreamResult(System.out));
+
+        SecurityProperties securityProperties = new SecurityProperties();
+        securityProperties.setCallbackHandler(new CallbackHandlerImpl());
+        securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "1234567890".toCharArray());
+        securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "1234567890".toCharArray());
+
+        Document document = doInboundSecurity(securityProperties, new DOMStreamReader(securedDocument));
+
+        //read the whole stream:
+        //Transformer transformer = TransformerFactory.newInstance().newTransformer();
+        transformer.transform(new DOMSource(document), new StreamResult(
+                new OutputStream() {
+                    @Override
+                    public void write(int b) throws IOException {
+                        // > /dev/null
+                    }
+                }
+        ));
+    }
 }

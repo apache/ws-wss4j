@@ -4,6 +4,7 @@ import ch.gigerstyle.xmlsec.ext.*;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.XMLEvent;
+import java.io.StringWriter;
 
 /**
  * User: giger
@@ -33,13 +34,17 @@ public class LogInputProcessor extends AbstractInputProcessor {
         this.getBeforeProcessors().add(PipedInputProcessor.class.getName());
     }
 
+    @Override
+    public void processSecurityHeaderEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException {
+        inputProcessorChain.processSecurityHeaderEvent(xmlEvent);
+    }
+
+    @Override
     public void processEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException {
-        /*
-        System.out.println("Event: " + xmlEvent);
+        //System.out.println("Event: " + xmlEvent);
         StringWriter stringWriter = new StringWriter();
         xmlEvent.writeAsEncodedUnicode(stringWriter);
-        System.out.println(stringWriter.toString());
-        */
+        System.out.print(stringWriter.toString());
         inputProcessorChain.processEvent(xmlEvent);
     }
 }

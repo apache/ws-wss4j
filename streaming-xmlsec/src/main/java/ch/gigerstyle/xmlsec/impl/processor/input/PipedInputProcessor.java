@@ -33,6 +33,7 @@ public class PipedInputProcessor extends AbstractInputProcessor {
     public PipedInputProcessor(PipedXMLStreamReader pipedXMLStreamReader, SecurityProperties securityProperties) throws XMLStreamException {
         super(securityProperties);
         setPhase(Constants.Phase.POSTPROCESSING);
+        getAfterProcessors().add(SecurityHeaderInputProcessor.InternalSecurityHeaderProcessor.class.getName());
         connect(pipedXMLStreamReader);
     }
 
@@ -66,6 +67,12 @@ public class PipedInputProcessor extends AbstractInputProcessor {
         snk.connected = true;
     }
 
+    @Override
+    public void processSecurityHeaderEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException {
+        inputProcessorChain.processSecurityHeaderEvent(xmlEvent);
+    }
+
+    @Override
     public void processEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException {
         if (sink == null) {
             throw new XMLStreamException("Pipe not connected");
@@ -77,6 +84,7 @@ public class PipedInputProcessor extends AbstractInputProcessor {
         }
     }
 
+    @Override
     public void doFinal(InputProcessorChain inputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException {
         if (sink != null) {
             sink.receivedLast();

@@ -36,8 +36,8 @@ public class ReferenceListInputProcessor extends AbstractInputProcessor {
         super(securityProperties);
     }
 
-    public void processEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException {
-
+    @Override
+    public void processSecurityHeaderEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException {
         if (currentReferenceList != null) {
             try {
                 isFinishedcurrentReferenceList = currentReferenceList.parseXMLEvent(xmlEvent);
@@ -57,7 +57,7 @@ public class ReferenceListInputProcessor extends AbstractInputProcessor {
         if (currentReferenceList != null && isFinishedcurrentReferenceList) {
             try {
                 //todo the DecryptInputProcessor must be added earlier in the chain.
-                //todo probably directly after the EncryptedKeyInputProcessor and after other DecryptInputProcessor!  
+                //todo probably directly after the EncryptedKeyInputProcessor and after other DecryptInputProcessor!
                 inputProcessorChain.addProcessor(new DecryptInputProcessor(currentReferenceList, getSecurityProperties()));
             } finally {
                 inputProcessorChain.removeProcessor(this);
@@ -66,6 +66,12 @@ public class ReferenceListInputProcessor extends AbstractInputProcessor {
             }
         }
 
+        inputProcessorChain.processSecurityHeaderEvent(xmlEvent);        
+    }
+
+    @Override
+    public void processEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException {
+        //this method should not be called (processor will be removed after processing header
         inputProcessorChain.processEvent(xmlEvent);
     }
 }

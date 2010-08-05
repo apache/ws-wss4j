@@ -78,7 +78,17 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
     </xenc:EncryptedData>
      */
 
+    @Override
+    public void processSecurityHeaderEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException {
+        processEvent(xmlEvent, inputProcessorChain, securityContext, true);
+    }
+
+    @Override
     public void processEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException {
+        processEvent(xmlEvent, inputProcessorChain, securityContext, false);
+    }
+
+    private void processEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain, SecurityContext securityContext, boolean isHeaderEvent) throws XMLStreamException, XMLSecurityException {
 
         //todo overall null checks
 
@@ -103,7 +113,7 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
                     for (int i = 0; i < references.size(); i++) {
                         ReferenceType referenceType = references.get(i);
                         if (refId.getValue().equals(referenceType.getURI())) {
-                            logger.debug("Found encryption reference: " + refId.getValue() + "on element" + startElement.getName());
+                            logger.debug("Found encryption reference: " + refId.getValue() + " on element" + startElement.getName());
                             if (referenceType.isProcessed()) {
                                 throw new XMLSecurityException("duplicate id encountered!");
                             }
@@ -127,14 +137,22 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
                 currentEncryptedDataType = null;
                 isFinishedcurrentEncryptedDataType = false;
                 return;
-            } else if (endElement.getName().equals(Constants.TAG_xenc_CipherValue)) {
-                inputProcessorChain.processEvent(xmlEvent);
+            } else if (currentEncryptedDataType != null && endElement.getName().equals(Constants.TAG_xenc_CipherValue)) {
+                if (isHeaderEvent) {
+                    inputProcessorChain.processSecurityHeaderEvent(xmlEvent);
+                } else {
+                    inputProcessorChain.processEvent(xmlEvent);
+                }
                 isCipherValue = false;
             }
         }
 
         if (isCipherValue || currentEncryptedDataType == null) {
-            inputProcessorChain.processEvent(xmlEvent);
+            if (isHeaderEvent) {
+                inputProcessorChain.processSecurityHeaderEvent(xmlEvent);
+            } else {
+                inputProcessorChain.processEvent(xmlEvent);
+            }
         }
     }
 
@@ -174,7 +192,16 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
         }
 
         @Override
+        public void processSecurityHeaderEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException {
+            processEvent(xmlEvent, inputProcessorChain, securityContext, true);
+        }
+
+        @Override
         public void processEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException {
+            processEvent(xmlEvent, inputProcessorChain, securityContext, false);
+        }
+
+        private void processEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain, SecurityContext securityContext, final boolean isHeaderEvent) throws XMLStreamException, XMLSecurityException {
 
             //we need to initialize the cipher here because the iv is stored in the first few bytes in the cipher stream
             if (isFirstCall) {
@@ -234,7 +261,11 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
                                     xmlEventReader.close();
                                     break;
                                 }
-                                subInputProcessorChain.processEvent(decXmlEvent);
+                                if (isHeaderEvent) {
+                                    subInputProcessorChain.processSecurityHeaderEvent(decXmlEvent);
+                                } else {
+                                    subInputProcessorChain.processEvent(decXmlEvent);
+                                }
                                 subInputProcessorChain.reset();
                             }
                         } catch (Exception e) {

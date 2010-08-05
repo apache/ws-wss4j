@@ -50,11 +50,14 @@ public class StAX2DOM {
             switch (event) {
                 case XMLStreamConstants.START_ELEMENT:
                     startElement(doc, parent, reader, repairing, recordLoc);
-
+/*
                     if (parent instanceof Document) {
                         return;
                     }
+*/
                     break;
+                case XMLStreamConstants.END_DOCUMENT:
+                    return;
                 case XMLStreamConstants.END_ELEMENT:
                     return;
                 case XMLStreamConstants.NAMESPACE:

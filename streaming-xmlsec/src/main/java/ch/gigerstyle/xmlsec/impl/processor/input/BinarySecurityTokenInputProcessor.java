@@ -33,15 +33,15 @@ public class BinarySecurityTokenInputProcessor extends AbstractInputProcessor im
 
     //todo this processor is not usable multiple times! Enforce one time usage! Other processors have the same "problem"
     private BinarySecurityTokenType currentBinarySecurityTokenType;
-    private boolean isFinishedcurrentBinarySecurityToken = false;
-
-    private SecurityToken securityToken;
 
     public BinarySecurityTokenInputProcessor(SecurityProperties securityProperties) {
         super(securityProperties);
     }
 
-    public void processEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException {
+    @Override
+    public void processSecurityHeaderEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException {
+
+        boolean isFinishedcurrentBinarySecurityToken = false;
 
         if (currentBinarySecurityTokenType != null) {
             try {
@@ -69,7 +69,11 @@ public class BinarySecurityTokenInputProcessor extends AbstractInputProcessor im
                 isFinishedcurrentBinarySecurityToken = false;
             }
         }
+    }
 
+    @Override
+    public void processEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException {
+        //this method should not be called (processor will be removed after processing header
         inputProcessorChain.processEvent(xmlEvent);
     }
 

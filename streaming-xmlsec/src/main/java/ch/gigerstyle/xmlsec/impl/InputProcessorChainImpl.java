@@ -156,6 +156,10 @@ public class InputProcessorChainImpl implements InputProcessorChain {
         this.inputProcessors.remove(inputProcessor);
     }
 
+    public void processSecurityHeaderEvent(XMLEvent xmlEvent) throws XMLStreamException, XMLSecurityException {
+        inputProcessors.get(getPosAndIncrement()).processNextSecurityHeaderEvent(xmlEvent, this, xmlSecurityContext);
+    }
+
     public void processEvent(XMLEvent xmlEvent) throws XMLStreamException, XMLSecurityException {
         inputProcessors.get(getPosAndIncrement()).processNextEvent(xmlEvent, this, xmlSecurityContext);
     }

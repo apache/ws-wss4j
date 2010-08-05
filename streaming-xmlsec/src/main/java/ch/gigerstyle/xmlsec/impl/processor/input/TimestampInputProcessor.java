@@ -48,7 +48,8 @@ public class TimestampInputProcessor extends AbstractInputProcessor {
     </wsu:Timestamp>
      */
 
-    public void processEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException {
+    @Override
+    public void processSecurityHeaderEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException {
         //todo created and expires are optional
         if (currentTimestampType != null) {
             try {
@@ -99,6 +100,11 @@ public class TimestampInputProcessor extends AbstractInputProcessor {
             }
         }
 
+        inputProcessorChain.processSecurityHeaderEvent(xmlEvent);
+    }
+
+    public void processEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException {
+        //this method should not be called (processor will be removed after processing header
         inputProcessorChain.processEvent(xmlEvent);
     }
 }

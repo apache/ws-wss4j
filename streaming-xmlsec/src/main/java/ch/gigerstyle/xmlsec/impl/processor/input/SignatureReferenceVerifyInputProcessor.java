@@ -53,6 +53,12 @@ public class SignatureReferenceVerifyInputProcessor extends AbstractInputProcess
         this.getAfterProcessors().add(SignatureReferenceVerifyInputProcessor.class.getName());
     }
 
+    @Override
+    public void processSecurityHeaderEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException {
+        inputProcessorChain.processSecurityHeaderEvent(xmlEvent);
+    }
+
+    @Override
     public void processEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException {
         if (xmlEvent.isStartElement()) {
             StartElement startElement = xmlEvent.asStartElement();
@@ -63,7 +69,7 @@ public class SignatureReferenceVerifyInputProcessor extends AbstractInputProcess
                 for (int i = 0; i < references.size(); i++) {
                     ReferenceType referenceType = references.get(i);
                     if (refId.getValue().equals(referenceType.getURI())) {
-                        logger.debug("Found signature reference: " + refId.getValue() + "on element" + startElement.getName());
+                        logger.debug("Found signature reference: " + refId.getValue() + " on element" + startElement.getName());
                         if (referenceType.isProcessed()) {
                             throw new XMLSecurityException("duplicate id encountered!");
                         }
@@ -123,6 +129,12 @@ public class SignatureReferenceVerifyInputProcessor extends AbstractInputProcess
             transformers.add(new Canonicalizer20010315ExclOmitCommentsTransformer(null));
         }
 
+        @Override
+        public void processSecurityHeaderEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException {
+            inputProcessorChain.processSecurityHeaderEvent(xmlEvent);
+        }
+
+        @Override
         public void processEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException {
 
             for (int i = 0; i < transformers.size(); i++) {

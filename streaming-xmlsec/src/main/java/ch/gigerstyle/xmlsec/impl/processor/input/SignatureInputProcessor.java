@@ -87,7 +87,8 @@ public class SignatureInputProcessor extends AbstractInputProcessor {
     </ds:Signature>
      */
 
-    public void processEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException {
+    @Override
+    public void processSecurityHeaderEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException {
 
         if (currentSignatureType != null) {
             try {
@@ -142,9 +143,13 @@ public class SignatureInputProcessor extends AbstractInputProcessor {
             }
         }
 
-        inputProcessorChain.processEvent(xmlEvent);
+        inputProcessorChain.processSecurityHeaderEvent(xmlEvent);
     }
 
+    public void processEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException {
+        //this method should not be called (processor will be removed after processing header
+        inputProcessorChain.processEvent(xmlEvent);
+    }
 
     public static class SignatureVerifier {
 

@@ -60,6 +60,17 @@ public abstract class AbstractInputProcessor implements InputProcessor {
         return afterProcessors;
     }
 
+    public void processSecurityHeaderEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException {
+        inputProcessorChain.processSecurityHeaderEvent(xmlEvent);
+    }
+
+    public void processNextSecurityHeaderEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException {
+        if (xmlEvent.isStartElement()) {
+            lastStartElementName = xmlEvent.asStartElement().getName();
+        }
+        processSecurityHeaderEvent(xmlEvent, inputProcessorChain, securityContext);
+    }
+
     public abstract void processEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException;
 
     public void processNextEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException {
