@@ -6,6 +6,7 @@ import ch.gigerstyle.xmlsec.ext.*;
 import ch.gigerstyle.xmlsec.impl.SignaturePartDef;
 import ch.gigerstyle.xmlsec.impl.transformer.canonicalizer.Canonicalizer20010315ExclOmitCommentsTransformer;
 import ch.gigerstyle.xmlsec.impl.transformer.canonicalizer.Canonicalizer20010315Transformer;
+import ch.gigerstyle.xmlsec.impl.util.FiFoQueue;
 import ch.gigerstyle.xmlsec.impl.util.RFC2253Parser;
 import ch.gigerstyle.xmlsec.impl.util.SignerOutputStream;
 import org.apache.commons.codec.binary.Base64;
@@ -52,7 +53,8 @@ public class SignatureEndingOutputProcessor extends AbstractOutputProcessor {
     private boolean useSingleCert = true;
 
     //todo try to use a hint how much elements are expected from other processors? 
-    private List<XMLEvent> xmlEventBuffer = new ArrayList<XMLEvent>(100);
+    //private List<XMLEvent> xmlEventBuffer = new ArrayList<XMLEvent>(100);
+    private FiFoQueue<XMLEvent> xmlEventBuffer = new FiFoQueue<XMLEvent>();
 
     public SignatureEndingOutputProcessor(SecurityProperties securityProperties, SignatureOutputProcessor signatureOutputProcessor) throws XMLSecurityException {
         super(securityProperties);
@@ -63,7 +65,8 @@ public class SignatureEndingOutputProcessor extends AbstractOutputProcessor {
 
     @Override
     public void processEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException {
-        xmlEventBuffer.add(xmlEvent);
+        //xmlEventBuffer.add(xmlEvent);
+        xmlEventBuffer.enqueue(xmlEvent);
     }
 
     @Override
@@ -71,8 +74,8 @@ public class SignatureEndingOutputProcessor extends AbstractOutputProcessor {
 
         OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
 
-        while (xmlEventBuffer.size() > 0) {
-            XMLEvent xmlEvent = xmlEventBuffer.remove(0);
+        while (!xmlEventBuffer.isEmpty()) {
+            XMLEvent xmlEvent = xmlEventBuffer.dequeue();
             if (xmlEvent.isStartElement()) {
                 StartElement startElement = xmlEvent.asStartElement();
                 if (startElement.getName().equals(Constants.TAG_wsse_Security)) {

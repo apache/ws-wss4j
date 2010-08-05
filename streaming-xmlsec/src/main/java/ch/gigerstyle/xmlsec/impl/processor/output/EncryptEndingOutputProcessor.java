@@ -4,6 +4,7 @@ import ch.gigerstyle.xmlsec.config.JCEAlgorithmMapper;
 import ch.gigerstyle.xmlsec.crypto.WSSecurityException;
 import ch.gigerstyle.xmlsec.ext.*;
 import ch.gigerstyle.xmlsec.impl.EncryptionPartDef;
+import ch.gigerstyle.xmlsec.impl.util.FiFoQueue;
 import ch.gigerstyle.xmlsec.impl.util.RFC2253Parser;
 import org.apache.commons.codec.binary.Base64;
 import org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_secext_1_0.BinarySecurityTokenType;
@@ -50,7 +51,8 @@ public class EncryptEndingOutputProcessor extends AbstractOutputProcessor {
     private String symmetricKeyId;
     private List<EncryptionPartDef> encryptionPartDefList;
 
-    private List<XMLEvent> xmlEventBuffer = new ArrayList<XMLEvent>(100);
+    //private List<XMLEvent> xmlEventBuffer = new ArrayList<XMLEvent>(100);
+    private FiFoQueue<XMLEvent> xmlEventBuffer = new FiFoQueue<XMLEvent>();
 
     public EncryptEndingOutputProcessor(SecurityProperties securityProperties, EncryptOutputProcessor encryptOutputProcessor) throws XMLSecurityException {
         super(securityProperties);
@@ -62,7 +64,7 @@ public class EncryptEndingOutputProcessor extends AbstractOutputProcessor {
     }
 
     public void processEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException {
-        xmlEventBuffer.add(xmlEvent);
+        xmlEventBuffer.enqueue(xmlEvent);
     }
 
     @Override
@@ -70,8 +72,8 @@ public class EncryptEndingOutputProcessor extends AbstractOutputProcessor {
 
         OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
 
-        while (xmlEventBuffer.size() > 0) {
-            XMLEvent xmlEvent = xmlEventBuffer.remove(0);
+        while (!xmlEventBuffer.isEmpty()) {
+            XMLEvent xmlEvent = xmlEventBuffer.dequeue();
             if (xmlEvent.isStartElement()) {
                 StartElement startElement = xmlEvent.asStartElement();
                 if (startElement.getName().equals(Constants.TAG_wsse_Security)) {
