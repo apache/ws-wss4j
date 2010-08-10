@@ -124,7 +124,14 @@ public class TimestampType implements Parseable {
     }
 
     public void validate() throws ParseException {
-        if (created == null || expires == null) {
+        //I think this could be an interesting case
+        //the spec says both elements are optional.
+        //wss4j doesn't check if the Timestamp has child elements
+        //and just expects the Timestamp element itself (Timestamp-Action).
+        //this is not enough.
+        //Since we don't handle custom Timestamp elements, we force
+        //here the existence of either created or expires Element.
+        if (created == null && expires == null) {
             throw new ParseException("Element \"Created\"|\"Expires\" is missing");
         }
     }

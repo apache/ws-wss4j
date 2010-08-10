@@ -70,25 +70,43 @@ public class TimestampInputProcessor extends AbstractInputProcessor {
         if (currentTimestampType != null && isFinishedcurrentTimestamp) {
             try {
                 DatatypeFactory datatypeFactory = DatatypeFactory.newInstance();
-                XMLGregorianCalendar created = datatypeFactory.newXMLGregorianCalendar(currentTimestampType.getCreated().getValue());
-                XMLGregorianCalendar expires = datatypeFactory.newXMLGregorianCalendar(currentTimestampType.getExpires().getValue());
-
-                logger.debug("Timestamp created: " + created);
-                logger.debug("Timestamp expires: " + expires);
 
                 // Validate whether the security semantics have expired
-                Calendar exp = expires.toGregorianCalendar();
-                //todo strict timestamp
-                //if (exp != null && wssConfig.isTimeStampStrict()) {
+                Calendar crea = null;
+                if (currentTimestampType.getCreated() != null) {
+                    XMLGregorianCalendar created = datatypeFactory.newXMLGregorianCalendar(currentTimestampType.getCreated().getValue());
+                    logger.debug("Timestamp created: " + created);
+                    crea = created.toGregorianCalendar();
+                }
+
+                Calendar exp = null;
+                if (currentTimestampType.getExpires() != null) {
+                    XMLGregorianCalendar expires = datatypeFactory.newXMLGregorianCalendar(currentTimestampType.getExpires().getValue());
+                    logger.debug("Timestamp expires: " + expires);
+                    exp = expires.toGregorianCalendar();
+                }
+                
                 Calendar rightNow = Calendar.getInstance();
-                if (exp.before(rightNow)) {
+                Calendar ttl = Calendar.getInstance();
+                ttl.add(Calendar.SECOND, -getSecurityProperties().getTimestampTTL());
+                
+                if (exp != null && getSecurityProperties().isStrictTimestampCheck() && exp.before(rightNow)) {
                     logger.debug("Time now: " + datatypeFactory.newXMLGregorianCalendar(new GregorianCalendar()).toXMLFormat());
                     throw new XMLSecurityException("invalidTimestamp " +
                             "The security semantics of the message have expired");
                 }
-                //}
 
-                //todo more checks on timestamp e.g future created date?
+                if (crea != null && getSecurityProperties().isStrictTimestampCheck() && crea.before(ttl)) {
+                    logger.debug("Time now: " + datatypeFactory.newXMLGregorianCalendar(new GregorianCalendar()).toXMLFormat());
+                    throw new XMLSecurityException("invalidTimestampTTL " +
+                            "The security semantics of the message have expired");
+                }
+
+                if (crea != null && crea.after(rightNow)) {
+                    logger.debug("Time now: " + datatypeFactory.newXMLGregorianCalendar(new GregorianCalendar()).toXMLFormat());
+                    throw new XMLSecurityException("invalidTimestamp " +
+                            "The security semantics of the message is invalid");
+                }
 
             } catch (DatatypeConfigurationException e) {
                 throw new XMLSecurityException(e.getMessage(), e);

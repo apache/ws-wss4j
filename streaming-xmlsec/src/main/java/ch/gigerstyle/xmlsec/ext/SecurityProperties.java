@@ -285,7 +285,7 @@ public class SecurityProperties {
     }
 
 
-    private Integer timestampTTL;
+    private Integer timestampTTL = 300;
 
     public Integer getTimestampTTL() {
         return timestampTTL;
@@ -347,5 +347,15 @@ public class SecurityProperties {
         } catch (Exception e) {
             throw new XMLSecurityException("decryptionCrypto instanciation failed", e);
         }
+    }
+
+    private boolean strictTimestampCheck = true;
+
+    public boolean isStrictTimestampCheck() {
+        return strictTimestampCheck;
+    }
+
+    public void setStrictTimestampCheck(boolean strictTimestampCheck) {
+        this.strictTimestampCheck = strictTimestampCheck;
     }
 }
