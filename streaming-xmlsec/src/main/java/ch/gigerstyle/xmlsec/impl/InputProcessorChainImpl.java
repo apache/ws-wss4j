@@ -7,6 +7,7 @@ import org.apache.commons.logging.LogFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.XMLEvent;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -33,7 +34,7 @@ public class InputProcessorChainImpl implements InputProcessorChain {
 
     protected static final transient Log log = LogFactory.getLog(InputProcessorChainImpl.class);
 
-    List<InputProcessor> inputProcessors = new ArrayList<InputProcessor>();
+    List<InputProcessor> inputProcessors = Collections.synchronizedList(new ArrayList<InputProcessor>());
     int pos = 0;
 
     XMLSecurityContext xmlSecurityContext;

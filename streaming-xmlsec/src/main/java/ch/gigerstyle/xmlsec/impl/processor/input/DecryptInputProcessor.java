@@ -168,7 +168,9 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
         inputProcessorChain.doFinal();
     }
 
-    class InternalDecryptProcessor extends AbstractInputProcessor {
+    class InternalDecryptProcessor extends AbstractInputProcessor implements Thread.UncaughtExceptionHandler {
+
+        private Throwable thrownExceptionByReader = null;
 
         private Cipher symmetricCipher;
         private OutputStream bufferedOutputStream;
@@ -202,6 +204,8 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
         }
 
         private void processEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain, SecurityContext securityContext, final boolean isHeaderEvent) throws XMLStreamException, XMLSecurityException {
+
+            testAndThrowUncaughtException(this.thrownExceptionByReader);
 
             //we need to initialize the cipher here because the iv is stored in the first few bytes in the cipher stream
             if (isFirstCall) {
@@ -245,6 +249,8 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
                             //todo set encoding?:
                             XMLEventReader xmlEventReader = Constants.xmlInputFactory.createXMLEventReader(pipedInputStream);
 
+                            boolean processorAdded = false;
+
                             //todo rethinking about the while loops...
                             while (xmlEventReader.hasNext()) {
                                 XMLEvent decXmlEvent = xmlEventReader.nextEvent();
@@ -262,6 +268,12 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
                                     break;
                                 }
                                 if (isHeaderEvent) {
+                                    //atm we don't know where we stay in the document, so just try to find a processor for the first decrypted element.
+                                    //if we have more than one "root" element after the dummyStartElement we aren't at the toplevel in the security header.
+                                    if (!processorAdded && decXmlEvent.isStartElement()) {
+                                        processorAdded = true; //mark in every case as processed.
+                                        SecurityHeaderInputProcessor.engageProcessor(subInputProcessorChain, decXmlEvent.asStartElement(), getSecurityProperties());
+                                    }
                                     subInputProcessorChain.processSecurityHeaderEvent(decXmlEvent);
                                 } else {
                                     subInputProcessorChain.processEvent(decXmlEvent);
@@ -269,12 +281,14 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
                                 subInputProcessorChain.reset();
                             }
                         } catch (Exception e) {
-                            throw new RuntimeException(e);
+                            throw new UncheckedXMLSecurityException(e);
                         }
                     }
                 };
 
                 receiverThread = new Thread(runnable);
+                receiverThread.setName("decrypting thread");
+                receiverThread.setUncaughtExceptionHandler(this);
                 receiverThread.start();
 
                 try {
@@ -362,17 +376,19 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
                     }
 
                     try {
-                        while (receiverThread.isAlive()) {
-                            Thread.sleep(10);
-                        }
+                        receiverThread.join();
                         receiverThread = null;
+
+                        //here we have to check for a exception from the reader side. This
+                        //can happen this late when we have small parts encrypted, like timestamp 
+                        testAndThrowUncaughtException(this.thrownExceptionByReader);
                     } catch (InterruptedException e) {
                         throw new XMLStreamException(e);
                     }
 
                     inputProcessorChain.removeProcessor(this);
                 }
-            } else if (xmlEvent.isCharacters()) {
+            } else if (xmlEvent.isCharacters()) {                
                 try {
                     bufferedOutputStream.write(xmlEvent.asCharacters().getData().getBytes());
                 } catch (IOException e) {
@@ -380,6 +396,21 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
                 }
             } else {
                 throw new XMLSecurityException("Unexpected event: " + Utils.getXMLEventAsString(xmlEvent));
+            }
+        }
+
+        public void uncaughtException(Thread t, Throwable e) {
+            this.thrownExceptionByReader = e;
+        }
+
+        public void testAndThrowUncaughtException(Throwable t) throws XMLStreamException {
+            if (t != null) {
+                if (t instanceof UncheckedXMLSecurityException) {
+                    UncheckedXMLSecurityException uxse = (UncheckedXMLSecurityException) t;
+                    throw new XMLStreamException(uxse.getCause());
+                } else {
+                    throw new XMLStreamException(this.thrownExceptionByReader);
+                }
             }
         }
     }

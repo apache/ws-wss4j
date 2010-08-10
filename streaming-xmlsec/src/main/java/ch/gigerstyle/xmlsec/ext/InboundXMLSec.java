@@ -88,12 +88,15 @@ public class InboundXMLSec {
                     log.debug("Chain processing time: " + (System.currentTimeMillis() - start));
 
                 } catch (Exception e) {
-                    throw new RuntimeException(e);
+                    throw new UncheckedXMLSecurityException(e);
                 }
             }
         };
 
-        new Thread(runnable).start();
+        Thread thread = new Thread(runnable);
+        thread.setName("main security processing thread");
+        thread.setUncaughtExceptionHandler(pipedXMLStreamReader);
+        thread.start();
 
         return pipedXMLStreamReader;
     }

@@ -59,17 +59,7 @@ public class SecurityHeaderInputProcessor extends AbstractInputProcessor {
             }
 
             if (level == 2) {
-                if (startElement.getName().equals(Constants.TAG_wsse_BinarySecurityToken)) {
-                    inputProcessorChain.addProcessor(new BinarySecurityTokenInputProcessor(getSecurityProperties()));
-                } else if (startElement.getName().equals(Constants.TAG_xenc_EncryptedKey)) {
-                    inputProcessorChain.addProcessor(new EncryptedKeyInputProcessor(getSecurityProperties()));
-                } else if (startElement.getName().equals(Constants.TAG_dsig_Signature)) {
-                    inputProcessorChain.addProcessor(new SignatureInputProcessor(getSecurityProperties()));
-                } else if (startElement.getName().equals(Constants.TAG_wsu_Timestamp)) {
-                    inputProcessorChain.addProcessor(new TimestampInputProcessor(getSecurityProperties()));
-                } else if (startElement.getName().equals(Constants.TAG_xenc_ReferenceList)) {
-                    inputProcessorChain.addProcessor(new ReferenceListInputProcessor(getSecurityProperties()));
-                }
+                engageProcessor(inputProcessorChain, startElement, getSecurityProperties());
             }
         }
             
@@ -96,6 +86,21 @@ public class SecurityHeaderInputProcessor extends AbstractInputProcessor {
                 //remove this processor from chain now. the next events will go directly to the other processors
                 inputProcessorChain.removeProcessor(this);
             }
+        }
+    }
+
+    //todo move this method. DecryptProcessor should not have a dependency to this processor
+    public static void engageProcessor(InputProcessorChain inputProcessorChain, StartElement startElement, SecurityProperties securityProperties) {
+        if (startElement.getName().equals(Constants.TAG_wsse_BinarySecurityToken)) {
+            inputProcessorChain.addProcessor(new BinarySecurityTokenInputProcessor(securityProperties));
+        } else if (startElement.getName().equals(Constants.TAG_xenc_EncryptedKey)) {
+            inputProcessorChain.addProcessor(new EncryptedKeyInputProcessor(securityProperties));
+        } else if (startElement.getName().equals(Constants.TAG_dsig_Signature)) {
+            inputProcessorChain.addProcessor(new SignatureInputProcessor(securityProperties));
+        } else if (startElement.getName().equals(Constants.TAG_wsu_Timestamp)) {
+            inputProcessorChain.addProcessor(new TimestampInputProcessor(securityProperties));
+        } else if (startElement.getName().equals(Constants.TAG_xenc_ReferenceList)) {
+            inputProcessorChain.addProcessor(new ReferenceListInputProcessor(securityProperties));
         }
     }
 
