@@ -58,7 +58,7 @@ public class TestJAXRPCHandler extends TestCase {
         config.put("action", "UsernameToken");
         config.put("user", "Chris");
         config.put("passwordType", "PasswordText");
-        config.put("passwordCallbackClass", "org.apache.ws.axis.oasis.PWCallback1");
+        config.put("passwordCallbackClass", "org.apache.ws.axis.oasis.PWCallback1Out");
         invokeService (config, 1);
     }
     public void testScenario2() throws Exception {
@@ -72,7 +72,7 @@ public class TestJAXRPCHandler extends TestCase {
         config.put("encryptionPropFile", "wsstest.properties");
         config.put("encryptionKeyIdentifier", "SKIKeyIdentifier");
         config.put("encryptionUser", "bob");
-        config.put("passwordCallbackClass", "org.apache.ws.axis.oasis.PWCallback1");
+        config.put("passwordCallbackClass", "org.apache.ws.axis.oasis.PWCallback1Out");
         config.put("encryptionParts", "{Element}{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd}UsernameToken");  
         invokeService (config, 2);
     }
@@ -81,7 +81,7 @@ public class TestJAXRPCHandler extends TestCase {
         config.put("deployment", "client");
         config.put("action", "Signature Encrypt Timestamp");
         config.put("user", "alice");
-        config.put("passwordCallbackClass", "org.apache.ws.axis.oasis.PWCallback1");
+        config.put("passwordCallbackClass", "org.apache.ws.axis.oasis.PWCallback1Out");
         config.put("signatureKeyIdentifier", "DirectReference");
         config.put("signaturePropFile", "wsstest.properties");
         config.put("encryptionKeyIdentifier", "SKIKeyIdentifier");
@@ -93,12 +93,12 @@ public class TestJAXRPCHandler extends TestCase {
         config.put("deployment", "client");
         config.put("action", "Signature Encrypt Timestamp");
         config.put("user", "alice");
-        config.put("passwordCallbackClass", "org.apache.ws.axis.oasis.PWCallback1");
+        config.put("passwordCallbackClass", "org.apache.ws.axis.oasis.PWCallback1Out");
         config.put("signatureKeyIdentifier", "DirectReference");
         config.put("signaturePropFile", "wsstest.properties");
         config.put("encryptionKeyIdentifier", "EmbeddedKeyName");
         config.put("encryptionSymAlgorithm", "http://www.w3.org/2001/04/xmlenc#tripledes-cbc");
-        config.put("EmbeddedKeyCallbackClass", "org.apache.ws.axis.oasis.PWCallback1");
+        config.put("EmbeddedKeyCallbackClass", "org.apache.ws.axis.oasis.PWCallback1Out");
         config.put("EmbeddedKeyName", "SessionKey");
         invokeService (config, 4);
     }
@@ -111,7 +111,7 @@ public class TestJAXRPCHandler extends TestCase {
         config.put("deployment", "client");
         config.put("action", "Signature NoSerialization");
         config.put("user", "alice");
-        config.put("passwordCallbackClass", "org.apache.ws.axis.oasis.PWCallback1");
+        config.put("passwordCallbackClass", "org.apache.ws.axis.oasis.PWCallback1Out");
         config.put("signatureKeyIdentifier", "DirectReference");
         config.put("signaturePropFile", "wsstest.properties");
         config.put("signatureParts", "{}{http://xmlsoap.org/Ping}ticket");
@@ -122,7 +122,7 @@ public class TestJAXRPCHandler extends TestCase {
         config.put("deployment", "client");
         config.put("action", "Encrypt Signature Timestamp");
         config.put("user", "alice");
-        config.put("passwordCallbackClass", "org.apache.ws.axis.oasis.PWCallback1");
+        config.put("passwordCallbackClass", "org.apache.ws.axis.oasis.PWCallback1Out");
         config.put("signatureKeyIdentifier", "DirectReference");
         config.put("signaturePropFile", "wsstest.properties");
         config.put("encryptionKeyIdentifier", "SKIKeyIdentifier");
@@ -134,7 +134,7 @@ public class TestJAXRPCHandler extends TestCase {
         config.put("deployment", "client");
         config.put("action", "Signature Encrypt Timestamp");
         config.put("user", "alice");
-        config.put("passwordCallbackClass", "org.apache.ws.axis.oasis.PWCallback1");
+        config.put("passwordCallbackClass", "org.apache.ws.axis.oasis.PWCallback1Out");
         config.put("signatureKeyIdentifier", "DirectReference");
         config.put("signaturePropFile", "wsstest.properties");
         config.put("encryptionKeyIdentifier", "SKIKeyIdentifier");

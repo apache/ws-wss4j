@@ -24,12 +24,15 @@ import junit.framework.TestSuite;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
+import org.apache.ws.security.handler.RequestData;
+import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.message.WSSecHeader;
 import org.apache.ws.security.message.WSSecSignature;
 import org.apache.ws.security.message.WSSecUsernameToken;
@@ -171,6 +174,98 @@ public class TestWSSecurityUTSignature extends TestCase implements CallbackHandl
             assertTrue(ex.getErrorCode() == WSSecurityException.FAILED_AUTHENTICATION);
             // expected
         }
+    }
+    
+    /**
+     * Test using a UsernameToken derived key for signing a SOAP body via WSHandler
+     */
+    public void testHandlerSignature() throws Exception {
+        
+        final WSSConfig cfg = WSSConfig.getNewInstance();
+        RequestData reqData = new RequestData();
+        reqData.setWssConfig(cfg);
+        java.util.Map messageContext = new java.util.TreeMap();
+        messageContext.put(WSHandlerConstants.PW_CALLBACK_REF, this);
+        messageContext.put(WSHandlerConstants.USE_DERIVED_KEY, "true");
+        reqData.setMsgContext(messageContext);
+        reqData.setUsername("bob");
+        
+        final java.util.Vector actions = new java.util.Vector();
+        actions.add(new Integer(WSConstants.UT_SIGN));
+        
+        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
+        MyHandler handler = new MyHandler();
+        handler.send(
+            WSConstants.UT_SIGN, 
+            doc, 
+            reqData, 
+            actions,
+            true
+        );
+        
+        String outputString = 
+            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+        assertTrue(outputString.indexOf("wsse:Username") != -1);
+        assertTrue(outputString.indexOf("wsse:Password") == -1);
+        assertTrue(outputString.indexOf("wsse11:Salt") != -1);
+        assertTrue(outputString.indexOf("wsse11:Iteration") != -1);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(outputString);
+        }
+        
+        List results = verify(doc);
+        WSSecurityEngineResult actionResult =
+            WSSecurityUtil.fetchActionResult(results, WSConstants.UT_SIGN);
+        java.security.Principal principal = 
+            (java.security.Principal) actionResult.get(WSSecurityEngineResult.TAG_PRINCIPAL);
+        assertTrue(principal.getName().indexOf("bob") != -1);
+    }
+    
+    /**
+     * Test using a UsernameToken derived key for signing a SOAP body via WSHandler
+     */
+    public void testHandlerSignatureIterations() throws Exception {
+        
+        final WSSConfig cfg = WSSConfig.getNewInstance();
+        RequestData reqData = new RequestData();
+        reqData.setWssConfig(cfg);
+        java.util.Map messageContext = new java.util.TreeMap();
+        messageContext.put(WSHandlerConstants.PW_CALLBACK_REF, this);
+        messageContext.put(WSHandlerConstants.USE_DERIVED_KEY, "true");
+        messageContext.put(WSHandlerConstants.DERIVED_KEY_ITERATIONS, "1234");
+        reqData.setMsgContext(messageContext);
+        reqData.setUsername("bob");
+        
+        final java.util.Vector actions = new java.util.Vector();
+        actions.add(new Integer(WSConstants.UT_SIGN));
+        
+        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
+        MyHandler handler = new MyHandler();
+        handler.send(
+            WSConstants.UT_SIGN, 
+            doc, 
+            reqData, 
+            actions,
+            true
+        );
+        
+        String outputString = 
+            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+        assertTrue(outputString.indexOf("wsse:Username") != -1);
+        assertTrue(outputString.indexOf("wsse:Password") == -1);
+        assertTrue(outputString.indexOf("wsse11:Salt") != -1);
+        assertTrue(outputString.indexOf("wsse11:Iteration") != -1);
+        assertTrue(outputString.indexOf("1234") != -1);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(outputString);
+        }
+        
+        List results = verify(doc);
+        WSSecurityEngineResult actionResult =
+            WSSecurityUtil.fetchActionResult(results, WSConstants.UT_SIGN);
+        java.security.Principal principal = 
+            (java.security.Principal) actionResult.get(WSSecurityEngineResult.TAG_PRINCIPAL);
+        assertTrue(principal.getName().indexOf("bob") != -1);
     }
     
     /**

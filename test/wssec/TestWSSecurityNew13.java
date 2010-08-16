@@ -196,6 +196,7 @@ public class TestWSSecurityNew13 extends TestCase implements CallbackHandler {
         config.put("password", "verySecret");
         config.put(WSHandlerConstants.PASSWORD_TYPE, WSConstants.PW_TEXT);
         config.put(WSHandlerConstants.WSE_SECRET_KEY_LENGTH, "32");
+        config.put(WSHandlerConstants.USE_DERIVED_KEY, "false");
         reqData.setUsername("wernerd");
         reqData.setMsgContext(config);
         

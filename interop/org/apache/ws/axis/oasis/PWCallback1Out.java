@@ -32,7 +32,7 @@ import java.io.IOException;
 /**
  * Class PWCallback
  */
-public class PWCallback1 implements CallbackHandler {
+public class PWCallback1Out implements CallbackHandler {
 
     /** Field key */
     private static final byte[] key = {
@@ -65,28 +65,6 @@ public class PWCallback1 implements CallbackHandler {
             if (callbacks[i] instanceof WSPasswordCallback) {
                 WSPasswordCallback pc = (WSPasswordCallback) callbacks[i];
 
-                /*
-                 * This usage type is used only in case we received a
-                 * username token with a password of type PasswordText or
-                 * an unknown password type.
-                 * 
-                 * This case the WSPasswordCallback object contains the
-                 * identifier (aka username), the password we received, and
-                 * the password type string to identify the type.
-                 * 
-                 * Here we perform only a very simple check.
-                 */
-
-                if (pc.getUsage() == WSPasswordCallback.USERNAME_TOKEN_UNKNOWN) {
-                    if(pc.getIdentifier().equals("Ron") && pc.getPassword().equals("noR")) {
-                        return;
-                    }
-                    if (pc.getPassword().equals("sirhC")) {
-                        return;
-                    }
-                    throw new UnsupportedCallbackException(callbacks[i],
-                    "check failed");
-                }
 
                 /*
                  * here call a function/method to lookup the password for

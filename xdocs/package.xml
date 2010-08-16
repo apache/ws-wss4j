@@ -59,7 +59,7 @@ on the client (application) side.
     &lt;parameter name="user" value="werner"/&gt;
     &lt;parameter name="passwordType" value="PasswordText" /&gt;
     &lt;parameter name="passwordCallbackClass" 
-      value="org.apache.ws.axis.oasis.PWCallback1"/&gt;
+      value="org.apache.ws.axis.oasis.PWCallback1Out"/&gt;
    &lt;/handler&gt;
   &lt;/requestFlow&gt;
   &lt;/service&gt;

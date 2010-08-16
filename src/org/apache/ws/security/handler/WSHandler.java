@@ -527,6 +527,24 @@ public abstract class WSHandler {
         if (add != null) {
             reqData.setUtElements(StringUtil.split(add, ' '));
         }
+        
+        String derived = getString(WSHandlerConstants.USE_DERIVED_KEY, mc);
+        if (derived != null) {
+            boolean useDerivedKey = Boolean.parseBoolean(derived);
+            reqData.setUseDerivedKey(useDerivedKey);
+        }
+        
+        String derivedMAC = getString(WSHandlerConstants.USE_DERIVED_KEY, mc);
+        boolean useDerivedKeyForMAC = Boolean.parseBoolean(derivedMAC);
+        if (useDerivedKeyForMAC) {
+            reqData.setUseDerivedKeyForMAC(useDerivedKeyForMAC);
+        }
+        
+        String iterations = getString(WSHandlerConstants.DERIVED_KEY_ITERATIONS, mc);
+        if (iterations != null) {
+            int iIterations = Integer.parseInt(iterations);
+            reqData.setDerivedKeyIterations(iIterations);
+        }
     }
 
     protected void decodeSignatureParameter(RequestData reqData) 
@@ -882,8 +900,10 @@ public abstract class WSHandler {
 
         switch (doAction) {
         case WSConstants.UT:
-        case WSConstants.UT_SIGN:
             reason = WSPasswordCallback.USERNAME_TOKEN;
+            break;
+        case WSConstants.UT_SIGN:
+            reason = WSPasswordCallback.USERNAME_TOKEN_UNKNOWN;
             break;
         case WSConstants.SIGN:
             reason = WSPasswordCallback.SIGNATURE;
