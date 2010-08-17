@@ -45,7 +45,7 @@ import org.apache.ws.security.saml.SAMLIssuer;
 import org.apache.ws.security.saml.SAMLIssuerFactory;
 import org.apache.ws.security.saml.WSSecSignatureSAML;
 import org.apache.ws.security.util.WSSecurityUtil;
-import org.apache.xml.security.c14n.Canonicalizer;
+import org.apache.xml.security.algorithms.MessageDigestAlgorithm;
 import org.apache.xml.security.signature.XMLSignature;
 import org.opensaml.SAMLAssertion;
 import org.w3c.dom.Document;
@@ -161,16 +161,20 @@ public class TestWSSecuritySignatureParts extends TestCase implements CallbackHa
         WSSecurityEngineResult actionResult = 
             WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
         assertTrue(actionResult != null);
+        assertFalse(actionResult.isEmpty());
         final java.util.List refs =
             (java.util.List) actionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
-        assertTrue(actionResult != null && !actionResult.isEmpty());
+        
         WSDataRef wsDataRef = (WSDataRef)refs.get(0);
         String xpath = wsDataRef.getXpath();
         assertEquals("/soapenv:Envelope/soapenv:Header/foo:foobar", xpath);
         assertEquals(XMLSignature.ALGO_ID_SIGNATURE_RSA, wsDataRef.getAlgorithm());
         
+        assertEquals(MessageDigestAlgorithm.ALGO_ID_DIGEST_SHA1, wsDataRef.getDigestAlgorithm());
+        
         String sigMethod = (String)actionResult.get(WSSecurityEngineResult.TAG_SIGNATURE_METHOD);
         assertEquals(XMLSignature.ALGO_ID_SIGNATURE_RSA, sigMethod);
+        
         String c14nMethod = 
             (String)actionResult.get(WSSecurityEngineResult.TAG_CANONICALIZATION_METHOD);
         assertEquals(WSConstants.C14N_EXCL_OMIT_COMMENTS, c14nMethod);
@@ -230,9 +234,10 @@ public class TestWSSecuritySignatureParts extends TestCase implements CallbackHa
         WSSecurityEngineResult signActionResult = 
             WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
         assertTrue(signActionResult != null);
+        assertFalse(signActionResult.isEmpty());
         final java.util.List refs =
             (java.util.List) signActionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
-        assertTrue(signActionResult != null && !signActionResult.isEmpty());
+        
         WSDataRef wsDataRef = (WSDataRef)refs.get(0);
         String xpath = wsDataRef.getXpath();
         assertEquals("/soapenv:Envelope/soapenv:Header/wsse:Security/Assertion", xpath);

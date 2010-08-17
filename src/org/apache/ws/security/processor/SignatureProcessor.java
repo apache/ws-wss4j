@@ -544,6 +544,7 @@ public class SignatureProcessor implements Processor {
                         ref.setProtectedElement(se);
                         ref.setXpath(ReferenceListProcessor.getXPath(se));
                         ref.setAlgorithm(si.getSignatureMethodURI());
+                        ref.setDigestAlgorithm(siRef.getMessageDigestAlgorithm().getAlgorithmURI());
                         protectedElements.add(ref);
                         returnElements.add(WSSecurityUtil.getIDFromReference(uri));
                     } else {
