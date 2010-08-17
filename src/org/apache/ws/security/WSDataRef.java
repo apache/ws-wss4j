@@ -52,6 +52,12 @@ public class WSDataRef {
      */
     private String algorithm;
     
+    /**
+     * If this reference represents signed content, this field
+     * represents the digest algorithm applied to the content.
+     */
+    private String digestAlgorithm;
+    
     private boolean content;
     
     /**
@@ -153,6 +159,22 @@ public class WSDataRef {
      */
     public void setAlgorithm(String algo) {
         algorithm = algo;
+    }
+    
+    /**
+     * @return if this reference represents signed content, 
+     * the digest algorithm applied to the content.
+     */
+    public String getDigestAlgorithm() {
+        return this.digestAlgorithm;
+    }
+
+    /**
+     * @param digestAlgorithm if this reference represents 
+     * signed content, the digest algorithm applied to the content.
+     */
+    public void setDigestAlgorithm(String digestAlgorithm) {
+        this.digestAlgorithm = digestAlgorithm;
     }
 
 }
