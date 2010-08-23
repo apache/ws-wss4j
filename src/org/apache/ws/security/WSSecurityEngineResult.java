@@ -170,6 +170,13 @@ public class WSSecurityEngineResult extends java.util.HashMap {
     public static final Object TAG_ENCRYPTED_EPHEMERAL_KEY = "encrypted-ephemeral-key-bytes";
     
     /**
+     * Tag denoting the encrypted key transport algorithm.
+     *
+     * The value under this tag is of type String.
+     */
+    public static final Object TAG_ENCRYPTED_KEY_TRANSPORT_METHOD = "encrypted-key-transport-method";
+    
+    /**
      * Tag denoting the algorithm that was used to sign the message
      *
      * The value under this tag is of type String.

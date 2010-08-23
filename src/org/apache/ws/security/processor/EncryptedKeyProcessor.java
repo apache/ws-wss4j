@@ -62,6 +62,8 @@ public class EncryptedKeyProcessor implements Processor {
     
     private String encryptedKeyId = null;
     private X509Certificate cert = null;
+    
+    private String encryptedKeyTransportMethod = null;
 
     public void handleToken(
             Element elem, 
@@ -83,16 +85,20 @@ public class EncryptedKeyProcessor implements Processor {
         }
         ArrayList dataRefUris = handleEncryptedKey((Element) elem, cb, decCrypto);
         encryptedKeyId = elem.getAttributeNS(null, "Id");
+        
+        WSSecurityEngineResult result = new WSSecurityEngineResult(
+                    WSConstants.ENCR, 
+                    this.decryptedBytes,
+                    this.encryptedEphemeralKey,
+                    this.encryptedKeyId, 
+                    dataRefUris,
+                    cert);
+        
+        result.put(WSSecurityEngineResult.TAG_ENCRYPTED_KEY_TRANSPORT_METHOD, this.encryptedKeyTransportMethod);
+        
         returnResults.add(
             0, 
-            new WSSecurityEngineResult(
-                WSConstants.ENCR, 
-                this.decryptedBytes,
-                this.encryptedEphemeralKey,
-                this.encryptedKeyId, 
-                dataRefUris,
-                cert
-            )
+            result
         );
     }
 
@@ -132,14 +138,13 @@ public class EncryptedKeyProcessor implements Processor {
             (Element) WSSecurityUtil.getDirectChild(
                 (Node) xencEncryptedKey, "EncryptionMethod", WSConstants.ENC_NS
             );
-        String keyEncAlgo = null;
         if (tmpE != null) {
-            keyEncAlgo = ((Element) tmpE).getAttribute("Algorithm");
+            this.encryptedKeyTransportMethod = ((Element) tmpE).getAttribute("Algorithm");
         }
-        if (keyEncAlgo == null) {
+        if (this.encryptedKeyTransportMethod == null) {
             throw new WSSecurityException(WSSecurityException.UNSUPPORTED_ALGORITHM, "noEncAlgo");
         }
-        Cipher cipher = WSSecurityUtil.getCipherInstance(keyEncAlgo);
+        Cipher cipher = WSSecurityUtil.getCipherInstance(this.encryptedKeyTransportMethod);
         //
         // Well, we can decrypt the session (symmetric) key. Now lookup CipherValue, this is the 
         // value of the encrypted session key (session key usually is a symmetrical key that encrypts
