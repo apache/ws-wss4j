@@ -139,9 +139,13 @@ public class TestWSSecurityEncryptionParts extends TestCase implements CallbackH
         WSSecurityEngineResult actionResult = 
             WSSecurityUtil.fetchActionResult(results, WSConstants.ENCR);
         assertTrue(actionResult != null);
+        assertFalse(actionResult.isEmpty());
         final java.util.List refs =
             (java.util.List) actionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
-        assertTrue(actionResult != null && !actionResult.isEmpty());
+        
+        assertEquals(WSConstants.KEYTRANSPORT_RSA15, 
+                actionResult.get(WSSecurityEngineResult.TAG_ENCRYPTED_KEY_TRANSPORT_METHOD));
+        
         WSDataRef wsDataRef = (WSDataRef)refs.get(0);
         String xpath = wsDataRef.getXpath();
         assertEquals("/soapenv:Envelope/soapenv:Header/foo:foobar", xpath);
@@ -185,9 +189,13 @@ public class TestWSSecurityEncryptionParts extends TestCase implements CallbackH
         WSSecurityEngineResult actionResult =
                 WSSecurityUtil.fetchActionResult(results, WSConstants.ENCR);
         assertTrue(actionResult != null);
+        assertFalse(actionResult.isEmpty());
         final java.util.List refs =
             (java.util.List) actionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
-        assertTrue(actionResult != null && !actionResult.isEmpty());
+        
+        assertEquals(WSConstants.KEYTRANSPORT_RSA15, 
+                actionResult.get(WSSecurityEngineResult.TAG_ENCRYPTED_KEY_TRANSPORT_METHOD));
+        
         WSDataRef wsDataRef = (WSDataRef)refs.get(0);
         String xpath = wsDataRef.getXpath();
         assertEquals("/soapenv:Envelope/soapenv:Header/foo:foobar", xpath);

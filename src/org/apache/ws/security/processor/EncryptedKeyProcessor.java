@@ -64,6 +64,8 @@ public class EncryptedKeyProcessor implements Processor {
     
     private String encryptedKeyId = null;
     private X509Certificate[] certs;
+    
+    private String encryptedKeyTransportMethod = null;
 
     public void handleToken(
         Element elem, 
@@ -86,16 +88,21 @@ public class EncryptedKeyProcessor implements Processor {
         }
         List dataRefs = handleEncryptedKey(elem, cb, decCrypto, null);
         encryptedKeyId = elem.getAttribute("Id");
-        returnResults.add(
-            0, 
-            new WSSecurityEngineResult(
+        
+        WSSecurityEngineResult result = new WSSecurityEngineResult(
                 WSConstants.ENCR, 
                 decryptedBytes,
                 encryptedEphemeralKey,
                 encryptedKeyId, 
                 dataRefs,
                 certs
-            )
+            );
+        
+        result.put(WSSecurityEngineResult.TAG_ENCRYPTED_KEY_TRANSPORT_METHOD, this.encryptedKeyTransportMethod);
+        
+        returnResults.add(
+            0, 
+            result
         );
     }
 
@@ -129,8 +136,8 @@ public class EncryptedKeyProcessor implements Processor {
         // lookup xenc:EncryptionMethod, get the Algorithm attribute to determine
         // how the key was encrypted. Then check if we support the algorithm
         //
-        String keyEncAlgo = X509Util.getEncAlgo(xencEncryptedKey);
-        Cipher cipher = WSSecurityUtil.getCipherInstance(keyEncAlgo);
+        this.encryptedKeyTransportMethod = X509Util.getEncAlgo(xencEncryptedKey);
+        Cipher cipher = WSSecurityUtil.getCipherInstance(this.encryptedKeyTransportMethod);
         //
         // Now lookup CipherValue.
         //
