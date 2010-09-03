@@ -103,7 +103,9 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
             } catch (ParseException e) {
                 throw new XMLSecurityException(e);
             }
-        } else if (xmlEvent.isStartElement()) {
+        }
+
+        if (xmlEvent.isStartElement()) {
             StartElement startElement = xmlEvent.asStartElement();
 
             if (startElement.getName().equals(Constants.TAG_xenc_EncryptedData)) {
@@ -130,8 +132,7 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
                 return;
             }
         }
-
-        if (xmlEvent.isEndElement()) {
+        else if (xmlEvent.isEndElement()) {
             EndElement endElement = xmlEvent.asEndElement();
             if (endElement.getName().equals(Constants.TAG_xenc_EncryptedData)) {
                 currentEncryptedDataType = null;
