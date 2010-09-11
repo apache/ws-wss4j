@@ -531,13 +531,13 @@ public abstract class WSHandler {
         }
         
         String derived = getString(WSHandlerConstants.USE_DERIVED_KEY, mc);
-        boolean useDerivedKey = Boolean.parseBoolean(derived);
+        boolean useDerivedKey = Boolean.valueOf(derived).booleanValue();
         if (useDerivedKey) {
             reqData.setUseDerivedKey(useDerivedKey);
         }
         
         String derivedMAC = getString(WSHandlerConstants.USE_DERIVED_KEY, mc);
-        boolean useDerivedKeyForMAC = Boolean.parseBoolean(derivedMAC);
+        boolean useDerivedKeyForMAC = Boolean.valueOf(derivedMAC).booleanValue();
         if (useDerivedKeyForMAC) {
             reqData.setUseDerivedKeyForMAC(useDerivedKeyForMAC);
         }
@@ -654,7 +654,7 @@ public abstract class WSHandler {
         
         String encSymEncKey = getString(WSHandlerConstants.ENC_SYM_ENC_KEY, mc);
         if (encSymEncKey != null) {
-            boolean encSymEndKeyBoolean = Boolean.parseBoolean(encSymEncKey);
+            boolean encSymEndKeyBoolean = Boolean.valueOf(encSymEncKey).booleanValue();
             reqData.setEncryptSymmetricEncryptionKey(encSymEndKeyBoolean);
         }
 
