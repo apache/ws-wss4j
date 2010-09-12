@@ -190,6 +190,10 @@ public abstract class CryptoFactory {
     private static Crypto loadClass(String cryptoClassName, Map map, ClassLoader loader) {
         Class cryptogenClass = null;
         Crypto crypto = null;
+        
+        if (cryptoClassName != null) {
+            cryptoClassName = cryptoClassName.trim();
+        }
         try {
             // instruct the class loader to load the crypto implementation
             cryptogenClass = Loader.loadClass(loader, cryptoClassName);

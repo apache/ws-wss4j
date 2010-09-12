@@ -66,6 +66,9 @@ public abstract class AbstractCrypto extends CryptoBase {
             return;
         }
         String location = this.properties.getProperty("org.apache.ws.security.crypto.merlin.file");
+        if (location != null) {
+            location = location.trim();
+        }
         InputStream is = null;
         if (location != null) {
             java.net.URL url = Loader.getResource(loader, location);
@@ -98,16 +101,25 @@ public abstract class AbstractCrypto extends CryptoBase {
         try {
             String provider = 
                 properties.getProperty("org.apache.ws.security.crypto.merlin.keystore.provider");
+            if (provider != null) {
+                provider = provider.trim();
+            }
             String passwd = 
                 properties.getProperty(
                     "org.apache.ws.security.crypto.merlin.keystore.password", 
                     "security"
                 );
+            if (passwd != null) {
+                passwd = passwd.trim();
+            }
             String type = 
                 properties.getProperty(
                     "org.apache.ws.security.crypto.merlin.keystore.type", 
                     KeyStore.getDefaultType()
                 );
+            if (type != null) {
+                type = type.trim();
+            }
             this.keystore = load(is, passwd, provider, type);
         } finally {
             if (is != null) {
@@ -123,6 +135,9 @@ public abstract class AbstractCrypto extends CryptoBase {
                 "org.apache.ws.security.crypto.merlin.load.cacerts",
                 "true"
             );
+        if (loadCacerts != null) {
+            loadCacerts = loadCacerts.trim();
+        }
         if (Boolean.valueOf(loadCacerts).booleanValue()) {
             String cacertsPath = System.getProperty("java.home") + "/lib/security/cacerts";
             InputStream cacertsIs = new FileInputStream(cacertsPath);
@@ -132,6 +147,9 @@ public abstract class AbstractCrypto extends CryptoBase {
                         "org.apache.ws.security.crypto.merlin.cacerts.password", 
                         "changeit"
                     );
+                if (cacertsPasswd != null) {
+                    cacertsPasswd = cacertsPasswd.trim();
+                }
                 this.cacerts = load(cacertsIs, cacertsPasswd, null, KeyStore.getDefaultType());
                 if (doDebug) {
                     log.debug("CA certs have been loaded");
@@ -192,7 +210,12 @@ public abstract class AbstractCrypto extends CryptoBase {
         if (properties == null) {
             return null;
         }
-        return properties.getProperty("org.apache.ws.security.crypto.merlin.cert.provider");
+        String provider = 
+            properties.getProperty("org.apache.ws.security.crypto.merlin.cert.provider");
+        if (provider != null) {
+            provider = provider.trim();
+        }
+        return provider;
     }
 
     /**
@@ -208,6 +231,11 @@ public abstract class AbstractCrypto extends CryptoBase {
         if (properties == null) {
             return null;
         }
-        return properties.getProperty("org.apache.ws.security.crypto.merlin.keystore.alias");
+        String alias = 
+            properties.getProperty("org.apache.ws.security.crypto.merlin.keystore.alias");
+        if (alias != null) {
+            alias = alias.trim();
+        }
+        return alias;
     }
 }
