@@ -817,27 +817,35 @@ public abstract class WSHandler {
             RequestData reqData
     ) throws WSSecurityException {
         WSPasswordCallback pwCb = null;
-        CallbackHandler cbHandler = null;
-        String err = "provided null or empty password";
         Object mc = reqData.getMsgContext();
         String callback = getString(clsProp, mc);
-        if (callback != null) { // we have a password callback class
+        
+        if (callback != null) { 
+            // we have a password callback class
             pwCb = readPwViaCallbackClass(callback, username, doAction, reqData);
-            // Null passwords are not always a problem: if the callback was called to provide a username instead.
-        } else if ((cbHandler = (CallbackHandler) getProperty(mc, refProp)) != null) {
-            pwCb = performCallback(cbHandler, username, doAction);
         } else {
-            //
-            // If a callback isn't configured then try to get the password
-            // from the message context
-            //
-            String password = getPassword(mc);
-            if (password == null) {
-                throw new WSSecurityException("WSHandler: application " + err);
+            // Try to obtain a password callback class from the message context or handler options
+            CallbackHandler cbHandler = (CallbackHandler) getOption(refProp);
+            if (cbHandler == null) {
+                cbHandler = (CallbackHandler) getProperty(mc, refProp);
             }
-            pwCb = constructPasswordCallback(username, doAction);
-            pwCb.setPassword(password);
+            if (cbHandler != null) {
+                pwCb = performCallback(cbHandler, username, doAction);
+            } else {
+                //
+                // If a callback isn't configured then try to get the password
+                // from the message context
+                //
+                String password = getPassword(mc);
+                if (password == null) {
+                    String err = "provided null or empty password";
+                    throw new WSSecurityException("WSHandler: application " + err);
+                }
+                pwCb = constructPasswordCallback(username, doAction);
+                pwCb.setPassword(password);
+            }
         }
+        
         return pwCb;
     }
 
