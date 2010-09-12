@@ -23,15 +23,25 @@ import org.apache.ws.security.handler.WSHandler;
 import org.apache.ws.security.handler.RequestData;
 import org.w3c.dom.Document;
 
+import java.util.HashMap;
+import java.util.Map;
+
 
 /**
  * A trivial extension of the WSHandler type for use in unit-testing.
  */
 public class MyHandler extends WSHandler {
+    
+    private Map optionsMap = new HashMap();
 
     public Object 
     getOption(String key) {
-        return null;
+        return optionsMap.get(key);
+    }
+    
+    public void
+    setOption(String key, Object option) {
+        optionsMap.put(key, option);
     }
 
     public void 
