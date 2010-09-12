@@ -112,6 +112,9 @@ public abstract class AbstractCrypto extends CryptoBase {
         if (provider == null) {
             provider = properties.getProperty(OLD_CRYPTO_PROVIDER);
         }
+        if (provider != null) {
+            provider = provider.trim();
+        }
         //
         // Load the KeyStore
         //
@@ -120,11 +123,18 @@ public abstract class AbstractCrypto extends CryptoBase {
             keyStoreLocation = properties.getProperty(OLD_KEYSTORE_FILE);
         }
         if (keyStoreLocation != null) {
+            keyStoreLocation = keyStoreLocation.trim();
             InputStream is = loadInputStream(loader, keyStoreLocation);
 
             try {
                 String passwd = properties.getProperty(KEYSTORE_PASSWORD, "security");
+                if (passwd != null) {
+                    passwd = passwd.trim();
+                }
                 String type = properties.getProperty(KEYSTORE_TYPE, KeyStore.getDefaultType());
+                if (type != null) {
+                    type = type.trim();
+                }
                 keystore = load(is, passwd, provider, type);
                 if (doDebug) {
                     log.debug(
@@ -148,11 +158,18 @@ public abstract class AbstractCrypto extends CryptoBase {
         //
         String trustStoreLocation = properties.getProperty(TRUSTSTORE_FILE);
         if (trustStoreLocation != null) {
+            trustStoreLocation = trustStoreLocation.trim();
             InputStream is = loadInputStream(loader, trustStoreLocation);
 
             try {
                 String passwd = properties.getProperty(TRUSTSTORE_PASSWORD, "changeit");
+                if (passwd != null) {
+                    passwd.trim();
+                }
                 String type = properties.getProperty(TRUSTSTORE_TYPE, KeyStore.getDefaultType());
+                if (type != null) {
+                    type = type.trim();
+                }
                 truststore = load(is, passwd, provider, type);
                 if (doDebug) {
                     log.debug(
@@ -167,11 +184,20 @@ public abstract class AbstractCrypto extends CryptoBase {
             }
         } else {
             String loadCacerts = properties.getProperty(LOAD_CA_CERTS, "false");
+            if (loadCacerts != null) {
+                loadCacerts = loadCacerts.trim();
+            }
             if (Boolean.valueOf(loadCacerts).booleanValue()) {
                 String cacertsPath = System.getProperty("java.home") + "/lib/security/cacerts";
+                if (cacertsPath != null) {
+                    cacertsPath = cacertsPath.trim();
+                }
                 InputStream is = new FileInputStream(cacertsPath);
                 try {
                     String cacertsPasswd = properties.getProperty(TRUSTSTORE_PASSWORD, "changeit");
+                    if (cacertsPasswd != null) {
+                        cacertsPasswd = cacertsPasswd.trim();
+                    }
                     truststore = load(is, cacertsPasswd, null, KeyStore.getDefaultType());
                     if (doDebug) {
                         log.debug("CA certs have been loaded");
@@ -269,6 +295,9 @@ public abstract class AbstractCrypto extends CryptoBase {
         if (provider == null) {
             provider = properties.getProperty(OLD_CRYPTO_CERT_PROVIDER);
         }
+        if (provider != null) {
+            provider = provider.trim();
+        }
         return provider;
     }
     
@@ -285,6 +314,10 @@ public abstract class AbstractCrypto extends CryptoBase {
         if (properties == null) {
             return null;
         }
-        return properties.getProperty(KEYSTORE_ALIAS);
+        String alias = properties.getProperty(KEYSTORE_ALIAS);
+        if (alias != null) {
+            alias = alias.trim();
+        }
+        return alias;
     }
 }
