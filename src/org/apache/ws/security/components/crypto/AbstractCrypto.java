@@ -164,7 +164,7 @@ public abstract class AbstractCrypto extends CryptoBase {
             try {
                 String passwd = properties.getProperty(TRUSTSTORE_PASSWORD, "changeit");
                 if (passwd != null) {
-                    passwd.trim();
+                    passwd = passwd.trim();
                 }
                 String type = properties.getProperty(TRUSTSTORE_TYPE, KeyStore.getDefaultType());
                 if (type != null) {
