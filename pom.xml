@@ -149,6 +149,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-pmd-plugin</artifactId>
+                <version>2.5</version>
                 <configuration>
                     <linkXRef>false</linkXRef>
                     <failOnViolation>true</failOnViolation>
@@ -229,6 +230,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
+                    <version>2.6</version>
                     <configuration>
                         <reportFormat>brief</reportFormat>
                         <useFile>false</useFile>
@@ -243,6 +245,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-release-plugin</artifactId>
+                    <version>2.0</version>
                     <configuration>
                         <tagBase>
                             https://svn.apache.org/repos/asf/webservices/wss4j/tags/
@@ -252,6 +255,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
+                    <version>2.1</version>
                     <configuration>
                         <source>1.3</source>
                         <target>1.3</target>
@@ -263,6 +267,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-source-plugin</artifactId>
+                    <version>2.1.2</version>
                     <executions>
                         <execution>
                             <goals>
@@ -277,6 +282,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-javadoc-plugin</artifactId>
+                    <version>2.7</version>
                     <executions>
                         <execution>
                             <goals>
@@ -291,6 +297,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-assembly-plugin</artifactId>
+                    <version>2.1</version>
                     <configuration>
                         <descriptors>
                             <descriptor>assembly/bin.xml</descriptor>

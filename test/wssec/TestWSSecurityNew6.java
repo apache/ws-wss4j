@@ -229,8 +229,8 @@ public class TestWSSecurityNew6 extends TestCase implements CallbackHandler {
         assertNull(((WSDataRef) sigDataRefs.get(0))
                 .getProtectedElement().getAttributeNodeNS(WSConstants.WSU_NS, "Id"));
         
-        assertTrue(((WSDataRef) sigDataRefs.get(0)).getWsuId().contains(
-                ((WSDataRef) encDataRefs.get(0)).getWsuId()));
+        assertTrue(((WSDataRef) sigDataRefs.get(0)).getWsuId().indexOf(
+                ((WSDataRef) encDataRefs.get(0)).getWsuId()) != -1);
     }
     
     /**
