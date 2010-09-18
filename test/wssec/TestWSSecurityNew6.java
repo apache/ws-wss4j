@@ -24,14 +24,18 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.WSDataRef;
 import org.apache.ws.security.WSEncryptionPart;
 import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSecurityEngine;
+import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.message.WSSecEncrypt;
 import org.apache.ws.security.message.WSSecSignature;
 import org.apache.ws.security.message.WSSecHeader;
+import org.apache.ws.security.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 
 import javax.security.auth.callback.Callback;
@@ -125,6 +129,91 @@ public class TestWSSecurityNew6 extends TestCase implements CallbackHandler {
     
     
     /**
+     * Test that encrypts and then signs a WS-Security envelope (including the 
+     * encrypted element), then performs verification and decryption <p/>
+     * 
+     * @throws Exception
+     *             Thrown when there is any problem in signing, encryption,
+     *             decryption, or verification
+     */
+    public void testEncryptionElementSigning() throws Exception {
+        WSSecEncrypt encrypt = new WSSecEncrypt();
+        WSSecSignature sign = new WSSecSignature();
+        encrypt.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e");
+        sign.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+        LOG.info("Before Encryption....");
+        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
+
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+
+        List encParts = new Vector();
+        encParts.add(
+                new WSEncryptionPart(
+                        "add",
+                        "http://ws.apache.org/counter/counter_port_type",
+                        "Element"));
+        encrypt.setParts(encParts);
+        
+        Document encryptedDoc = encrypt.build(doc, crypto, secHeader);
+        
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("After Encryption....");
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(encryptedDoc);
+            LOG.debug(outputString);
+        }
+        
+        List sigParts = new Vector();
+        sigParts.add(
+                new WSEncryptionPart(
+                        WSConstants.ENC_DATA_LN,
+                        WSConstants.ENC_NS,
+                        "Element"));
+        sign.setParts(sigParts);
+        
+        Document encryptedSignedDoc = sign.build(encryptedDoc, crypto, secHeader);
+        
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("After Signing....");
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(encryptedSignedDoc);
+            LOG.debug(outputString);
+        }
+        
+        Vector results = verify(encryptedSignedDoc);
+        
+        Vector sigSecEngResults = new Vector();
+        WSSecurityUtil.fetchAllActionResults(results,
+                WSConstants.SIGN, sigSecEngResults);
+        
+        Vector encSecEngResults = new Vector();
+        WSSecurityUtil.fetchAllActionResults(results,
+                WSConstants.ENCR, encSecEngResults);
+        
+        assertEquals(1, sigSecEngResults.size());
+        assertEquals(1, encSecEngResults.size());
+        
+        List sigDataRefs = (List) ((WSSecurityEngineResult) sigSecEngResults.get(0))
+                .get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
+        
+        List encDataRefs = (List) ((WSSecurityEngineResult) encSecEngResults.get(0))
+                .get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
+        
+        assertNotNull(sigDataRefs);
+        assertNotNull(encDataRefs);
+        assertEquals(1, sigDataRefs.size());
+        assertEquals(1, encDataRefs.size());
+        
+        assertNull(((WSDataRef) sigDataRefs.get(0))
+                .getProtectedElement().getAttributeNodeNS(WSConstants.WSU_NS, "Id"));
+        
+        assertTrue(((WSDataRef) sigDataRefs.get(0)).getWsuId().contains(
+                ((WSDataRef) encDataRefs.get(0)).getWsuId()));
+    }
+    
+    
+    /**
      * Test that signs and then encrypts a WS-Security envelope, then performs
      * decryption and verification <p/>
      * 
@@ -191,16 +280,21 @@ public class TestWSSecurityNew6 extends TestCase implements CallbackHandler {
      * Verifies the soap envelope <p/>
      * 
      * @param envelope
+     *
+     * @return the <code>WSSecurityEngineResult</code>s from processing
+     *
      * @throws Exception
      *             Thrown when there is a problem in verification
      */
-    private void verify(Document doc) throws Exception {
-        secEngine.processSecurityHeader(doc, null, this, crypto);
+    private Vector verify(Document doc) throws Exception {
+        List resultList = secEngine.processSecurityHeader(doc, null, this, crypto);
         if (LOG.isDebugEnabled()) {
             String outputString = 
                 org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
             LOG.debug(outputString);
         }
+        
+        return new Vector(resultList);
     }
 
     public void handle(Callback[] callbacks) throws IOException,

@@ -41,7 +41,7 @@ import java.io.UnsupportedEncodingException;
  * @author Davanum Srinivas (dims@yahoo.com)
  * @author Werner Dittmann (werner@apache.org)
  */
-public abstract class WSSecDerivedKeyBase extends WSSecBase {
+public abstract class WSSecDerivedKeyBase extends WSSecSignatureBase {
     
     protected Document document;
     

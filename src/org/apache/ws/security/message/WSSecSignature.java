@@ -25,7 +25,6 @@ import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDocInfo;
 import org.apache.ws.security.WSDocInfoStore;
 import org.apache.ws.security.WSEncryptionPart;
-import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.message.token.BinarySecurity;
@@ -35,29 +34,23 @@ import org.apache.ws.security.message.token.PKIPathSecurity;
 import org.apache.ws.security.message.token.Reference;
 import org.apache.ws.security.message.token.SecurityTokenReference;
 import org.apache.ws.security.message.token.X509Security;
-import org.apache.ws.security.transform.STRApacheTransform;
 import org.apache.ws.security.util.Base64;
 import org.apache.ws.security.util.WSSecurityUtil;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
-import java.util.Collections;
 import java.util.List;
 import java.util.Vector;
 
 import javax.xml.crypto.XMLStructure;
 import javax.xml.crypto.dom.DOMStructure;
 import javax.xml.crypto.dsig.CanonicalizationMethod;
-import javax.xml.crypto.dsig.DigestMethod;
 import javax.xml.crypto.dsig.SignatureMethod;
 import javax.xml.crypto.dsig.SignedInfo;
-import javax.xml.crypto.dsig.Transform;
 import javax.xml.crypto.dsig.XMLSignature;
 import javax.xml.crypto.dsig.XMLSignatureFactory;
 import javax.xml.crypto.dsig.XMLSignContext;
@@ -67,7 +60,6 @@ import javax.xml.crypto.dsig.keyinfo.KeyInfoFactory;
 import javax.xml.crypto.dsig.keyinfo.KeyValue;
 import javax.xml.crypto.dsig.spec.C14NMethodParameterSpec;
 import javax.xml.crypto.dsig.spec.ExcC14NParameterSpec;
-import javax.xml.crypto.dsig.spec.TransformParameterSpec;
 
 
 /**
@@ -83,7 +75,7 @@ import javax.xml.crypto.dsig.spec.TransformParameterSpec;
  * @author Davanum Srinivas (dims@yahoo.com)
  * @author Werner Dittmann (werner@apache.org)
  */
-public class WSSecSignature extends WSSecBase {
+public class WSSecSignature extends WSSecSignatureBase {
 
     private static Log log = LogFactory.getLog(WSSecSignature.class.getName());
 
@@ -342,142 +334,6 @@ public class WSSecSignature extends WSSecBase {
 
     
     /**
-     * This method adds references to the Signature.
-     * 
-     * @param doc The parent document
-     * @param references The list of references to sign
-     * @param sig The XMLSignature object
-     * @param secHeader The Security Header
-     * @param wssConfig The WSSConfig
-     * @param digestAlgo The digest algorithm to use
-     * @throws WSSecurityException
-     */
-    public static List addReferencesToSign(
-        Document doc,
-        List references,
-        XMLSignatureFactory signatureFactory,
-        WSSecHeader secHeader,
-        WSSConfig wssConfig,
-        String digestAlgo
-    ) throws WSSecurityException {
-        Element envelope = doc.getDocumentElement();
-        
-        DigestMethod digestMethod;
-        try {
-            digestMethod = signatureFactory.newDigestMethod(digestAlgo, null);
-        } catch (Exception ex) {
-            log.error("", ex);
-            throw new WSSecurityException(
-                WSSecurityException.FAILED_SIGNATURE, "noXMLSig", null, ex
-            );
-        }
-        
-        List referenceList = new Vector();
-
-        for (int part = 0; part < references.size(); part++) {
-            WSEncryptionPart encPart = (WSEncryptionPart) references.get(part);
-
-            String idToSign = encPart.getId();
-            String elemName = encPart.getName();
-
-            //
-            // Set up the elements to sign. There is one reserved element
-            // names: "STRTransform": Setup the ds:Reference to use STR Transform
-            //
-            try {
-                if (idToSign != null && !"STRTransform".equals(elemName)) {
-                    Element toSignById = 
-                        WSSecurityUtil.findElementById(
-                            envelope, idToSign, WSConstants.WSU_NS, false
-                        );
-                    if (toSignById == null) {
-                        toSignById = 
-                            WSSecurityUtil.findElementById(
-                                envelope, idToSign, null, false
-                            );
-                    }
-                    TransformParameterSpec transformSpec = null;
-                    if (wssConfig.isWsiBSPCompliant()) {
-                        List prefixes = getInclusivePrefixes(toSignById);
-                        transformSpec = new ExcC14NParameterSpec(prefixes);
-                    }
-                    Transform transform =
-                        signatureFactory.newTransform(
-                            WSConstants.C14N_EXCL_OMIT_COMMENTS,
-                            transformSpec
-                        );
-                    javax.xml.crypto.dsig.Reference reference = 
-                        signatureFactory.newReference(
-                            "#" + idToSign, 
-                            digestMethod,
-                            Collections.singletonList(transform),
-                            null,
-                            null
-                        );
-                    referenceList.add(reference);
-                } else if (idToSign != null && elemName.equals("STRTransform")) {
-                    Element ctx = createSTRParameter(doc);
-                    
-                    XMLStructure structure = new DOMStructure(ctx);
-                    Transform transform =
-                        signatureFactory.newTransform(
-                            STRApacheTransform.TRANSFORM_URI,
-                            structure
-                        );
-                    
-                    javax.xml.crypto.dsig.Reference reference = 
-                        signatureFactory.newReference(
-                            "#" + idToSign, 
-                            digestMethod,
-                            Collections.singletonList(transform),
-                            null,
-                            null
-                        );
-                    referenceList.add(reference);
-                } else {
-                    String nmSpace = encPart.getNamespace();
-                    Element elementToSign = 
-                        (Element)WSSecurityUtil.findElement(envelope, elemName, nmSpace);
-                    if (elementToSign == null) {
-                        throw new WSSecurityException(
-                            WSSecurityException.FAILURE, 
-                            "noEncElement",
-                            new Object[] {nmSpace + ", " + elemName}
-                        );
-                    }
-                    TransformParameterSpec transformSpec = null;
-                    if (wssConfig.isWsiBSPCompliant()) {
-                        List prefixes = getInclusivePrefixes(elementToSign);
-                        transformSpec = new ExcC14NParameterSpec(prefixes);
-                    }
-                    Transform transform =
-                        signatureFactory.newTransform(
-                            WSConstants.C14N_EXCL_OMIT_COMMENTS,
-                            transformSpec
-                        );
-                    javax.xml.crypto.dsig.Reference reference = 
-                        signatureFactory.newReference(
-                            "#" + setWsuId(elementToSign, wssConfig), 
-                            digestMethod,
-                            Collections.singletonList(transform),
-                            null,
-                            null
-                        );
-                    referenceList.add(reference);
-                }
-            } catch (Exception ex) {
-                log.error("", ex);
-                throw new WSSecurityException(
-                    WSSecurityException.FAILED_SIGNATURE, "noXMLSig", null, ex
-                );
-            }
-        }
-        
-        return referenceList;
-    }
-    
-    
-    /**
      * Prepend the BinarySecurityToken to the elements already in the Security
      * header.
      * 
@@ -570,99 +426,6 @@ public class WSSecSignature extends WSSecBase {
             }
         }
 
-    }
-
-    
-    /**
-     * Set the wsu:Id on the element argument
-     */
-    public static String setWsuId(Element element, WSSConfig wssConfig) {
-        String id = element.getAttributeNS(WSConstants.WSU_NS, "Id");
-
-        if ((id == null) || (id.length() == 0)) {
-            id = wssConfig.getIdAllocator().createId("id-", element);
-            String prefix = 
-                WSSecurityUtil.setNamespace(element, WSConstants.WSU_NS, WSConstants.WSU_PREFIX);
-            element.setAttributeNS(WSConstants.WSU_NS, prefix + ":Id", id);
-        }
-        return id;
-    }
-    
-    /**
-     * Create an STRTransformationParameters element
-     */
-    public static Element createSTRParameter(Document doc) {
-        Element transformParam = 
-            doc.createElementNS(
-                WSConstants.WSSE_NS,
-                WSConstants.WSSE_PREFIX + ":TransformationParameters"
-            );
-
-        Element canonElem = 
-            doc.createElementNS(
-                WSConstants.SIG_NS,
-                WSConstants.SIG_PREFIX + ":CanonicalizationMethod"
-            );
-
-        canonElem.setAttributeNS(null, "Algorithm", WSConstants.C14N_EXCL_OMIT_COMMENTS);
-        transformParam.appendChild(canonElem);
-        return transformParam;
-    }
-
-    
-    /**
-     * Get the List of inclusive prefixes from the DOM Element argument 
-     */
-    public static List getInclusivePrefixes(Element target) {
-        return getInclusivePrefixes(target, true);
-    }
-    
-    
-    /**
-     * Get the List of inclusive prefixes from the DOM Element argument 
-     */
-    public static List getInclusivePrefixes(Element target, boolean excludeVisible) {
-        List result = new Vector();
-        Node parent = target;
-        while (!(Node.DOCUMENT_NODE == parent.getParentNode().getNodeType())) {
-            parent = parent.getParentNode();
-            NamedNodeMap attributes = parent.getAttributes();
-            for (int i = 0; i < attributes.getLength(); i++) {
-                Node attribute = attributes.item(i);
-                if (WSConstants.XMLNS_NS.equals(attribute.getNamespaceURI())) {
-                    if ("xmlns".equals(attribute.getNodeName())) {
-                        result.add("#default");
-                    } else {
-                        result.add(attribute.getLocalName());
-                    }
-                }
-            }
-        }
-
-        if (excludeVisible == true) {
-            NamedNodeMap attributes = target.getAttributes();
-            for (int i = 0; i < attributes.getLength(); i++) {
-                Node attribute = attributes.item(i);
-                if (WSConstants.XMLNS_NS.equals(attribute.getNamespaceURI())) {
-                    if ("xmlns".equals(attribute.getNodeName())) {
-                        result.remove("#default");
-                    } else {
-                        result.remove(attribute.getLocalName());
-                    }
-                }
-                if (attribute.getPrefix() != null) {
-                    result.remove(attribute.getPrefix());
-                }
-            }
-
-            if (target.getPrefix() == null) {
-                result.remove("#default");
-            } else {
-                result.remove(target.getPrefix());
-            }
-        }
-
-        return result;
     }
     
     

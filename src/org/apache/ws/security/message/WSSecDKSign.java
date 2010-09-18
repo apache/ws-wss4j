@@ -118,8 +118,7 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
         try {
             C14NMethodParameterSpec c14nSpec = null;
             if (wssConfig.isWsiBSPCompliant() && canonAlgo.equals(WSConstants.C14N_EXCL_OMIT_COMMENTS)) {
-                List prefixes = 
-                    WSSecSignature.getInclusivePrefixes(secHeader.getSecurityHeader(), false);
+                List prefixes = getInclusivePrefixes(secHeader.getSecurityHeader(), false);
                 c14nSpec = new ExcC14NParameterSpec(prefixes);
             }
             
@@ -160,7 +159,7 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
     public List addReferencesToSign(List references, WSSecHeader secHeader) 
         throws WSSecurityException {
         return 
-            WSSecSignature.addReferencesToSign(
+            addReferencesToSign(
                 document, 
                 references, 
                 signatureFactory, 

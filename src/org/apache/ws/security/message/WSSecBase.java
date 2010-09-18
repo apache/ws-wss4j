@@ -46,7 +46,7 @@ public class WSSecBase {
     protected boolean doDebug = false;
 
     protected WSSConfig wssConfig = WSSConfig.getDefaultWSConfig();
-
+    
     /**
      * Set which parts of the message to encrypt/sign. <p/>
      * 
@@ -118,11 +118,26 @@ public class WSSecBase {
     protected String setWsuId(Element bodyElement) {
         String id = bodyElement.getAttributeNS(WSConstants.WSU_NS, "Id");
 
+        String newAttrNs = WSConstants.WSU_NS;
+        String newAttrPrefix = WSConstants.WSU_PREFIX;
+
+        if ((id == null || id.length() == 0)
+            && WSConstants.ENC_NS.equals(bodyElement.getNamespaceURI())
+            && (WSConstants.ENC_DATA_LN.equals(bodyElement.getLocalName())
+                || WSConstants.ENC_KEY_LN.equals(bodyElement.getLocalName()))
+        ) {
+            // If it is an XML-Enc derived element, it may already have an ID,
+            // plus it is not schema valid to add an additional ID.
+            id = bodyElement.getAttribute("Id");
+            newAttrPrefix = WSConstants.ENC_PREFIX;
+            newAttrNs = WSConstants.ENC_NS;
+        }
+        
         if ((id == null) || (id.length() == 0)) {
             id = wssConfig.getIdAllocator().createId("id-", bodyElement);
             String prefix = 
-                WSSecurityUtil.setNamespace(bodyElement, WSConstants.WSU_NS, WSConstants.WSU_PREFIX);
-            bodyElement.setAttributeNS(WSConstants.WSU_NS, prefix + ":Id", id);
+                WSSecurityUtil.setNamespace(bodyElement, newAttrNs, newAttrPrefix);
+            bodyElement.setAttributeNS(newAttrNs, prefix + ":Id", id);
         }
         return id;
     }
@@ -143,4 +158,5 @@ public class WSSecBase {
         this.user = user;
         this.password = password;
     }
+    
 }
