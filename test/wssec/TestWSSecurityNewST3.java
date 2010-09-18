@@ -136,6 +136,55 @@ public class TestWSSecurityNewST3 extends TestCase implements CallbackHandler {
         assertTrue(receivedAssertion != null);
     }
     
+    /**
+     * Test that creates, sends and processes a signed SAML assertion containing
+     * only key material and not an entire X509Certificate.
+     */
+    public void testSAMLSignedKeyHolderSendKeyValue() throws Exception {
+        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
+        
+        SAMLIssuer saml = SAMLIssuerFactory.getInstance("saml4sendKeyValue.properties");
+        // Provide info to SAML issuer that it can construct a Holder-of-key
+        // SAML token.
+        saml.setInstanceDoc(doc);
+        saml.setUserCrypto(crypto);
+        saml.setUsername("16c73ab6-b892-458f-abf5-2f875f74882e");
+        SAMLAssertion assertion = saml.newAssertion();
+
+        WSSecSignatureSAML wsSign = new WSSecSignatureSAML();
+        wsSign.setDigestAlgo("http://www.w3.org/2001/04/xmlenc#sha256");
+        wsSign.setSignatureAlgorithm("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256");
+        wsSign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
+        wsSign.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+
+        LOG.info("Before SAMLSignedKeyHolder....");
+        
+        //
+        // set up for keyHolder
+        //
+        Document signedDoc = wsSign.build(doc, crypto, assertion, null, null, null, secHeader);
+        LOG.info("After SAMLSignedKeyHolder....");
+
+        String outputString = 
+            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Signed SAML message (key holder):");
+            LOG.debug(outputString);
+        }
+        assertTrue(outputString.indexOf("http://www.w3.org/2001/04/xmlenc#sha256") != -1);
+        assertTrue(outputString.indexOf("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256") != -1);
+        
+        List results = verify(signedDoc);
+        WSSecurityEngineResult actionResult =
+            WSSecurityUtil.fetchActionResult(results, WSConstants.ST_UNSIGNED);
+        SAMLAssertion receivedAssertion = 
+            (SAMLAssertion) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+        assertTrue(receivedAssertion != null);
+    }
+    
     
     /**
      * Test that creates, sends and processes an signed SAML assertion using a KeyIdentifier

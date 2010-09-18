@@ -21,6 +21,7 @@ package org.apache.ws.security.saml;
 
 import org.opensaml.SAMLAssertion;
 
+import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 
 /**
@@ -39,6 +40,11 @@ public class SAMLKeyInfo {
     private byte[] secret;
     
     /**
+     * The public key {e.g.: held in a ds:KeyInfo).
+     */
+    private PublicKey publicKey;
+    
+    /**
      * SAMLAssertion
      */
     SAMLAssertion assertion;
@@ -53,15 +59,24 @@ public class SAMLKeyInfo {
         this.assertion = assertions;
     }
     
+    public SAMLKeyInfo(SAMLAssertion assertions, PublicKey publicKey) {
+        this.publicKey = publicKey;
+        this.assertion = assertions;
+    }
+
     public X509Certificate[] getCerts() {
         return certs;
     }
+    
     public byte[] getSecret() {
         return secret;
+    }
+
+    public PublicKey getPublicKey() {
+        return this.publicKey;
     }
 
     public SAMLAssertion getAssertion() {
         return assertion;
     }
-    
 }

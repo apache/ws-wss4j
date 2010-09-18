@@ -49,6 +49,7 @@ import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.xml.namespace.QName;
 
+import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.util.Iterator;
 
@@ -148,6 +149,9 @@ public class SAMLUtil {
                                 certs[0] = cert;
                                 return new SAMLKeyInfo(assertion, certs);
                             }
+                        } else if (ki.containsKeyValue()) {
+                            PublicKey pk = ki.getPublicKey();
+                            return new SAMLKeyInfo(assertion, pk);
                         }
 
                     } catch (XMLSecurityException e3) {
