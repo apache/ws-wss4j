@@ -56,6 +56,7 @@ import org.opensaml.SAMLSubjectStatement;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.util.Iterator;
 import java.util.Set;
@@ -227,6 +228,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
         wsDocInfo = new WSDocInfo(doc);
 
         X509Certificate[] certs = null;
+        PublicKey publicKey = null;
 
         if (senderVouches) {
             certs = issuerCrypto.getCertificates(issuerKeyName);
@@ -261,6 +263,8 @@ public class WSSecSignatureSAML extends WSSecSignature {
                         certs = new X509Certificate[1];
                         certs[0] = cert;
                     }
+                }  else if (ki.containsKeyValue()) {
+                    publicKey = ki.getPublicKey();
                 }
                 // TODO: get alias name for cert, check against username set by
                 // caller
@@ -274,7 +278,8 @@ public class WSSecSignatureSAML extends WSSecSignature {
             }
             wsDocInfo.setCrypto(userCrypto);
         }
-        if (certs == null || certs.length <= 0) {
+        if ((certs == null || certs.length == 0 || certs[0] == null) 
+                && publicKey == null) {
             throw new WSSecurityException(
                 WSSecurityException.FAILURE,
                 "noCertsFound",
@@ -282,7 +287,14 @@ public class WSSecSignatureSAML extends WSSecSignature {
             );
         }
         if (sigAlgo == null) {
-            String pubKeyAlgo = certs[0].getPublicKey().getAlgorithm();
+            PublicKey key = null;
+            if (certs != null && certs[0] != null) {
+                key = certs[0].getPublicKey();
+            } else if (publicKey != null) {
+                key = publicKey;
+            }
+            
+            String pubKeyAlgo = key.getAlgorithm();
             log.debug("automatic sig algo detection: " + pubKeyAlgo);
             if (pubKeyAlgo.equalsIgnoreCase("DSA")) {
                 sigAlgo = XMLSignature.ALGO_ID_SIGNATURE_DSA;
@@ -347,7 +359,9 @@ public class WSSecSignatureSAML extends WSSecSignature {
         strUri = wssConfig.getIdAllocator().createSecureId("STRId-", secRef);
         secRef.setID(strUri);
 
-        certUri = wssConfig.getIdAllocator().createSecureId("CertId-", certs[0]);  
+        if (certs != null && certs.length != 0) {
+            certUri = wssConfig.getIdAllocator().createSecureId("CertId-", certs[0]);
+        }
 
         //
         // If the sender vouches, then we must sign the SAML token _and_ at

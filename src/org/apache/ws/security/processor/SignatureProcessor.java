@@ -349,6 +349,7 @@ public class SignatureProcessor implements Processor {
                     samlKi = SAMLUtil.getSAMLKeyInfo(samlp.getSamlTokenElement(), crypto, cb);
                     certs = samlKi.getCerts();
                     secretKey = samlKi.getSecret();
+                    publicKey = samlKi.getPublicKey();
                 }
             } else if (secRef.containsX509Data() || secRef.containsX509IssuerSerial()) {
                 certs = secRef.getX509IssuerSerial(crypto);
@@ -386,6 +387,7 @@ public class SignatureProcessor implements Processor {
                     samlKi = SAMLUtil.getSAMLKeyInfo(token, crypto, cb);
                     certs = samlKi.getCerts();
                     secretKey = samlKi.getSecret();
+                    publicKey = samlKi.getPublicKey();
                 } else {
                     certs = secRef.getKeyIdentifier(crypto);
                 }

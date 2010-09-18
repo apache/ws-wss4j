@@ -1,18 +1,20 @@
-/*
- * Copyright  2003-2004 The Apache Software Foundation.
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
  *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 
 package wssec;
@@ -33,6 +35,7 @@ import org.apache.axis.configuration.NullProvider;
 import org.apache.axis.message.SOAPEnvelope;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.ws.security.PublicKeyCallback;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSecurityEngine;
@@ -168,6 +171,57 @@ public class TestWSSecurityNewST3 extends TestCase implements CallbackHandler {
         assertTrue(receivedAssertion != null);
     }
     
+    /**
+     * Test that creates, sends and processes a signed SAML assertion containing
+     * only key material and not an entire X509Certificate.
+     */
+    public void testSAMLSignedKeyHolderSendKeyValue() throws Exception {
+        SOAPEnvelope unsignedEnvelope = message.getSOAPEnvelope();
+
+        Document doc = unsignedEnvelope.getAsDocument();
+        
+        SAMLIssuer saml = SAMLIssuerFactory.getInstance("saml4sendKeyValue.properties");
+        // Provide info to SAML issuer that it can construct a Holder-of-key
+        // SAML token.
+        saml.setInstanceDoc(doc);
+        saml.setUserCrypto(crypto);
+        saml.setUsername("16c73ab6-b892-458f-abf5-2f875f74882e");
+        SAMLAssertion assertion = saml.newAssertion();
+
+        WSSecSignatureSAML wsSign = new WSSecSignatureSAML();
+        wsSign.setDigestAlgo("http://www.w3.org/2001/04/xmlenc#sha256");
+        wsSign.setSignatureAlgorithm("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256");
+        wsSign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
+        wsSign.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+
+        LOG.info("Before SAMLSignedKeyHolder....");
+        
+        //
+        // set up for keyHolder
+        //
+        Document signedDoc = wsSign.build(doc, crypto, assertion, null, null, null, secHeader);
+        LOG.info("After SAMLSignedKeyHolder....");
+
+        String outputString = 
+            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Signed SAML message (key holder):");
+            LOG.debug(outputString);
+        }
+        assertTrue(outputString.indexOf("http://www.w3.org/2001/04/xmlenc#sha256") != -1);
+        assertTrue(outputString.indexOf("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256") != -1);
+        
+        Vector results = verify(signedDoc);
+        WSSecurityEngineResult actionResult =
+            WSSecurityUtil.fetchActionResult(results, WSConstants.ST_UNSIGNED);
+        SAMLAssertion receivedAssertion = 
+            (SAMLAssertion) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+        assertTrue(receivedAssertion != null);
+    }
+    
     
     /**
      * Test that creates, sends and processes an signed SAML assertion using a KeyIdentifier
@@ -243,6 +297,9 @@ public class TestWSSecurityNewST3 extends TestCase implements CallbackHandler {
                  * for Testing we supply a fixed name here.
                  */
                 pc.setPassword("security");
+            } else if (callbacks[i] instanceof PublicKeyCallback) {
+                PublicKeyCallback pkcb = (PublicKeyCallback) callbacks[i];
+                pkcb.setVerified(true);
             } else {
                 throw new UnsupportedCallbackException(callbacks[i], "Unrecognized Callback");
             }

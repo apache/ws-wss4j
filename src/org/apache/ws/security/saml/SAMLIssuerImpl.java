@@ -1,19 +1,22 @@
-/*
- * Copyright  2003-2004 The Apache Software Foundation.
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
  *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
+
 package org.apache.ws.security.saml;
 
 import org.apache.commons.logging.Log;
@@ -25,6 +28,8 @@ import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.keys.KeyInfo;
 import org.apache.xml.security.keys.content.X509Data;
+import org.apache.xml.security.keys.content.keyvalues.DSAKeyValue;
+import org.apache.xml.security.keys.content.keyvalues.RSAKeyValue;
 import org.apache.xml.security.signature.XMLSignature;
 import org.opensaml.SAMLAssertion;
 import org.opensaml.SAMLAuthenticationStatement;
@@ -35,6 +40,7 @@ import org.opensaml.SAMLSubject;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.Collection;
@@ -66,6 +72,14 @@ public class SAMLIssuerImpl implements SAMLIssuer {
     private String[] confirmationMethods = new String[1];
     private Crypto userCrypto = null;
     private String username = null;
+    
+    /**
+    * Flag indicating what format to put the subject's key material in when
+    * NOT using Sender Vouches as the confirmation method.  The default is
+    * to use ds:X509Data and include the entire certificate.  If this flag
+    * is set to true, a ds:KeyValue is used instead with just the key material.
+    */
+    private boolean sendKeyValue = false;
 
     /**
      * Constructor.
@@ -92,6 +106,12 @@ public class SAMLIssuerImpl implements SAMLIssuer {
                     properties.getProperty("org.apache.ws.security.saml.issuer.key.name");
             issuerKeyPassword =
                     properties.getProperty("org.apache.ws.security.saml.issuer.key.password");
+        }
+        
+        String sendKeyValueProp =
+            properties.getProperty("org.apache.ws.security.saml.issuer.sendKeyValue");
+        if (sendKeyValueProp != null) {
+            sendKeyValue = Boolean.valueOf(sendKeyValueProp).booleanValue();
         }
 
         if ("senderVouches"
@@ -167,9 +187,22 @@ public class SAMLIssuerImpl implements SAMLIssuer {
                 try {
                     X509Certificate[] certs =
                             userCrypto.getCertificates(username);
-                    X509Data certElem = new X509Data(instanceDoc);
-                    certElem.addCertificate(certs[0]);
-                    ki.add(certElem);
+                    if (sendKeyValue) {
+                        PublicKey key = certs[0].getPublicKey();
+                        String pubKeyAlgo = key.getAlgorithm();
+                        
+                        if ("DSA".equalsIgnoreCase(pubKeyAlgo)) {
+                            DSAKeyValue dsaKeyValue = new DSAKeyValue(instanceDoc, key);
+                            ki.add(dsaKeyValue);
+                        } else if ("RSA".equalsIgnoreCase(pubKeyAlgo)) {
+                            RSAKeyValue rsaKeyValue = new RSAKeyValue(instanceDoc, key);
+                            ki.add(rsaKeyValue);
+                        }
+                    } else {
+                        X509Data certElem = new X509Data(instanceDoc);
+                        certElem.addCertificate(certs[0]);
+                        ki.add(certElem);
+                    }
                 } catch (WSSecurityException ex) {
                     if (log.isDebugEnabled()) {
                         log.debug(ex.getMessage(), ex);
