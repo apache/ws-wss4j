@@ -5,6 +5,54 @@ for a given release.
 Portions of this report were generated using the ReleaseNotes facility
 in Jira.
 
+Release 1.5.9
+=============
+
+** Bug
+
+    * [WSS-205] - WSS4J Handler passes null to MessageContext.setProperty
+    * [WSS-206] - The way referncelist processing of SAML issued tokens doesn't work properly and need to extract necessary information to do algorithm validation
+    * [WSS-209] - NPE in AbstractCrypto.getCryptoProvider()
+    * [WSS-210] - NPE in CryptoBase.getAliasForX509Cert(Certificate cert) if Keystore does not contain a Certifcate entry for each alias
+    * [WSS-211] - WSS4J does not support ThumbprintSHA1 in DerivedKeyTokens
+    * [WSS-212] - Replace deprecated references to getSubject/IssuerDN
+    * [WSS-219] - empty/blank password not supported in username token. value read by wss4j is null instead of empty string
+    * [WSS-220] - WSHandler is using default configuration
+    * [WSS-221] - UUIDGenerator generates duplicate identifiers when used in a multi-threaded environment
+    * [WSS-222] - SignatureProcessor does not provide correct signature coverage results with STR Dereference Transform
+    * [WSS-223] - Incorrect xpath set on WSDataRef when decrypting an EncryptedHeader instance.
+    * [WSS-224] - SAMLTokenSignedAction and WSSecSignatureSAML do not honor signature algorithm or digest algorithm from WSSHandler configuration
+    * [WSS-225] - 'Unprintable' characters in Distinguished Name causing comparison failure
+    * [WSS-226] - Interoperability b/w Java consumer of .NET Web Service with WS-Security on WSE 2.0
+    * [WSS-227] - CryptoBase.getPrivateKey() unable to handle empty (null) passwords
+    * [WSS-234] - Comment as first element in document causes NPE
+    * [WSS-241] - WSS4j needs to export a version in it's Export-Package directive.
+    * [WSS-242] - Signing EncryptedData or EncryptedKey elements creates extraneous Id attributes
+    * [WSS-243] - Can't use Password Digest on Z/OS
+    * [WSS-244] - Loading of Signature and Encryption property files not trimming trailing whitespace - Leads to ClassNotFoundException
+    * [WSS-245] - WSHandlerConstants.PW_CALLBACK_REF isn't correctly searched for
+
+** Improvement
+
+    * [WSS-180] - Support symmetric signature/encryption via configuration
+    * [WSS-214] - SignatureProcessor is not reusing results from BinarySecurityTokenProcessor or DerivedKeyTokenProcessor
+    * [WSS-215] - SignatureProcessor is not reusing results from WSDocInfo for the Reference case.
+    * [WSS-216] - SignatureProcessor does not support directly referencing a SecurityContextToken
+    * [WSS-217] - Add ability to specify a reference to an absolute URI in the derived key functionality
+    * [WSS-233] - Allow configuration of UsernameTokenSpec 1.1 derived key functionality through WSHandler
+    * [WSS-236] - Provide signature digest algorithm in signature processor results.
+    * [WSS-237] - Provide key transport algorithm in encryption processor results
+    * [WSS-240] - Support KeyValue in SAML subject
+
+** New Feature
+
+    * [WSS-204] - Support validating SAML 2.0 tokens
+
+** Task
+
+    * [WSS-246] - Upgrade to BouncyCastle 1.45
+
+
 Release 1.5.8
 =============
 
