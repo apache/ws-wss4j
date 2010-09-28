@@ -84,10 +84,15 @@ Build Instructions:
           <equals arg1="${ant.java.version}" arg2="1.5"/>
         </condition>
 
+        <condition property="jdk16.present">
+          <equals arg1="${ant.java.version}" arg2="1.6"/>
+        </condition>
+
         <condition property="merlin.ok">
             <or>
                 <equals arg1="${ant.java.version}" arg2="1.4"/>
                 <equals arg1="${ant.java.version}" arg2="1.5"/>
+                <equals arg1="${ant.java.version}" arg2="1.6"/>
             </or>
         </condition>
 
