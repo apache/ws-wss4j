@@ -191,12 +191,12 @@ public class PipedXMLStreamReader implements XMLStreamReader, Thread.UncaughtExc
 
     public synchronized int next() throws XMLStreamException {
         if (!connected) {
-            throw new XMLStreamException("Pipe not connected");
+            throwSecurityException("Pipe not connected");
         } else if (closedByReader) {
-            throw new XMLStreamException("Pipe closed");
+            throwSecurityException("Pipe closed");
         } else if (writeSide != null && !writeSide.isAlive()
                 && !closedByWriter && (in < 0)) {
-            throw new XMLStreamException("Write end dead");
+            throwSecurityException("Write end dead");
         }
 
         readSide = Thread.currentThread();
@@ -204,7 +204,7 @@ public class PipedXMLStreamReader implements XMLStreamReader, Thread.UncaughtExc
         while (in < 0) {
             if (closedByWriter) {
                 /* closed by writer, return EOF */
-                throw new IllegalStateException("No more input available");
+                throwSecurityException("No more input available");
             }            
             else if ((writeSide != null) && (!writeSide.isAlive()) && (--trials < 0)) {
                 throwSecurityException("Pipe broken");
@@ -329,12 +329,12 @@ public class PipedXMLStreamReader implements XMLStreamReader, Thread.UncaughtExc
     public boolean hasNext() throws XMLStreamException {
 
         if (!connected) {
-            throw new XMLStreamException("Pipe not connected");
+            throwSecurityException("Pipe not connected");
         } else if (closedByReader) {
-            throw new XMLStreamException("Pipe closed");
+            throwSecurityException("Pipe closed");
         } else if (writeSide != null && !writeSide.isAlive()
                 && !closedByWriter && (in < 0)) {
-            throw new XMLStreamException("Write end dead");
+            throwSecurityException("Write end dead");
         }
 
         if (closedByWriter && in < 0) {

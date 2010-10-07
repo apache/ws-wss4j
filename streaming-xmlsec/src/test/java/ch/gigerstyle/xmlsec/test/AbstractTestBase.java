@@ -2,6 +2,7 @@ package ch.gigerstyle.xmlsec.test;
 
 import ch.gigerstyle.xmlsec.*;
 import ch.gigerstyle.xmlsec.ext.*;
+import ch.gigerstyle.xmlsec.securityEvent.SecurityEventListener;
 import ch.gigerstyle.xmlsec.test.utils.StAX2DOM;
 import ch.gigerstyle.xmlsec.test.utils.XmlReaderToWriter;
 import com.ctc.wstx.api.WstxInputProperties;
@@ -82,12 +83,20 @@ public abstract class AbstractTestBase {
     }
 
     public Document doInboundSecurity(SecurityProperties securityProperties, InputStream inputStream) throws XMLSecurityException, SecurityConfigurationException, XMLStreamException, ParserConfigurationException {
-        return  doInboundSecurity(securityProperties, xmlInputFactory.createXMLStreamReader(inputStream));
+        return  doInboundSecurity(securityProperties, xmlInputFactory.createXMLStreamReader(inputStream), null);
+    }
+
+    public Document doInboundSecurity(SecurityProperties securityProperties, InputStream inputStream, SecurityEventListener securityEventListener) throws XMLSecurityException, SecurityConfigurationException, XMLStreamException, ParserConfigurationException {
+        return  doInboundSecurity(securityProperties, xmlInputFactory.createXMLStreamReader(inputStream), securityEventListener);
     }
 
     public Document doInboundSecurity(SecurityProperties securityProperties, XMLStreamReader xmlStreamReader) throws XMLSecurityException, SecurityConfigurationException, XMLStreamException, ParserConfigurationException {
+        return doInboundSecurity(securityProperties, xmlStreamReader, null);
+    }
+
+    public Document doInboundSecurity(SecurityProperties securityProperties, XMLStreamReader xmlStreamReader, SecurityEventListener securityEventListener) throws XMLSecurityException, SecurityConfigurationException, XMLStreamException, ParserConfigurationException {
         InboundXMLSec xmlSec = XMLSec.getInboundXMLSec(securityProperties);
-        XMLStreamReader outXmlStreamReader = xmlSec.processInMessage(xmlStreamReader);
+        XMLStreamReader outXmlStreamReader = xmlSec.processInMessage(xmlStreamReader, securityEventListener);
         Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), outXmlStreamReader);
         return document;
     }
@@ -246,7 +255,7 @@ public abstract class AbstractTestBase {
         }
     }
 
-    class CallbackHandlerImpl implements CallbackHandler {
+    public class CallbackHandlerImpl implements CallbackHandler {
         public void handle(javax.security.auth.callback.Callback[] callbacks) throws IOException, UnsupportedCallbackException {
             WSPasswordCallback pc = (WSPasswordCallback) callbacks[0];
 

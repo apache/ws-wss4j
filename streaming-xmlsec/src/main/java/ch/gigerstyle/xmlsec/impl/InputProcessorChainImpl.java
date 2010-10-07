@@ -37,14 +37,10 @@ public class InputProcessorChainImpl implements InputProcessorChain {
     List<InputProcessor> inputProcessors = Collections.synchronizedList(new ArrayList<InputProcessor>());
     int pos = 0;
 
-    XMLSecurityContext xmlSecurityContext;
+    SecurityContext securityContext;
 
-    public InputProcessorChainImpl() {
-        xmlSecurityContext = new XMLSecurityContext();
-    }
-
-    public InputProcessorChainImpl(XMLSecurityContext xmlSecurityContext) {
-        this.xmlSecurityContext = xmlSecurityContext;
+    public InputProcessorChainImpl(SecurityContext securityContext) {
+        this.securityContext = securityContext;
     }
 
     public int getPos() {
@@ -64,7 +60,7 @@ public class InputProcessorChainImpl implements InputProcessorChain {
     }
 
     public SecurityContext getSecurityContext() {
-        return this.xmlSecurityContext;
+        return this.securityContext;
     }
 
     public void addProcessor(InputProcessor newInputProcessor) {
@@ -158,25 +154,25 @@ public class InputProcessorChainImpl implements InputProcessorChain {
     }
 
     public void processSecurityHeaderEvent(XMLEvent xmlEvent) throws XMLStreamException, XMLSecurityException {
-        inputProcessors.get(getPosAndIncrement()).processNextSecurityHeaderEvent(xmlEvent, this, xmlSecurityContext);
+        inputProcessors.get(getPosAndIncrement()).processNextSecurityHeaderEvent(xmlEvent, this, securityContext);
     }
 
     public void processEvent(XMLEvent xmlEvent) throws XMLStreamException, XMLSecurityException {
-        inputProcessors.get(getPosAndIncrement()).processNextEvent(xmlEvent, this, xmlSecurityContext);
+        inputProcessors.get(getPosAndIncrement()).processNextEvent(xmlEvent, this, securityContext);
     }
 
     public void doFinal() throws XMLStreamException, XMLSecurityException {
-        inputProcessors.get(getPosAndIncrement()).doFinal(this, xmlSecurityContext);
+        inputProcessors.get(getPosAndIncrement()).doFinal(this, securityContext);
     }
 
     public InputProcessorChain createSubChain(InputProcessor inputProcessor) throws XMLStreamException, XMLSecurityException {
-        return new InputProcessorSubChainImpl(xmlSecurityContext, inputProcessors.indexOf(inputProcessor) + 1, this.inputProcessors);
+        return new InputProcessorSubChainImpl(securityContext, inputProcessors.indexOf(inputProcessor) + 1, this.inputProcessors);
     }
 
     class InputProcessorSubChainImpl extends InputProcessorChainImpl {
         private int startPos;
 
-        InputProcessorSubChainImpl(XMLSecurityContext securityContext, int pos, List<InputProcessor> inputProcessors) {
+        InputProcessorSubChainImpl(SecurityContext securityContext, int pos, List<InputProcessor> inputProcessors) {
             super(securityContext);
             this.startPos = this.pos = pos;
             //we don't clone the list to get updates in the sublist too!

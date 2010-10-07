@@ -23,13 +23,24 @@ import java.security.PublicKey;
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
+
+/*
+  * Sometimes it isn't known (@see EncryptedKeyInputProcessor) which kind of Token(Asymmetric, Symmetric)
+  * we have at creation time. So we use a generic interface for both types.
+ */
 public interface SecurityToken {
 
-    public byte[] getSymmetricKey() throws XMLSecurityException;
+    public boolean isAsymmetric();
 
-    public Key getSecretKey() throws XMLSecurityException;
+    public Key getSecretKey(String algorithmURI) throws XMLSecurityException;
 
     public PublicKey getPublicKey() throws XMLSecurityException;
 
     public void verify() throws XMLSecurityException;
+
+    public SecurityToken getKeyWrappingToken();
+
+    public String getKeyWrappingTokenAlgorithm();
+
+    public Constants.KeyIdentifierType getKeyIdentifierType();
 }

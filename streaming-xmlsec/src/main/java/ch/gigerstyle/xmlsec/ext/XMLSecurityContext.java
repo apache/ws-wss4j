@@ -1,5 +1,8 @@
 package ch.gigerstyle.xmlsec.ext;
 
+import ch.gigerstyle.xmlsec.securityEvent.SecurityEvent;
+import ch.gigerstyle.xmlsec.securityEvent.SecurityEventListener;
+
 import java.util.*;
 
 /**
@@ -25,6 +28,8 @@ import java.util.*;
 public class XMLSecurityContext implements SecurityContext {
 
     private Map<String, SecurityTokenProvider> secretTokenProviders = new HashMap<String, SecurityTokenProvider>();
+
+    private SecurityEventListener securityEventListener;
 
     @SuppressWarnings("unchecked")
     private Map content = Collections.synchronizedMap(new HashMap());
@@ -63,5 +68,15 @@ public class XMLSecurityContext implements SecurityContext {
 
     public SecurityTokenProvider getSecurityTokenProvider(String id) {
         return secretTokenProviders.get(id);
+    }
+
+    public void setSecurityEventListener(SecurityEventListener securityEventListener) {
+        this.securityEventListener = securityEventListener;
+    }
+
+    public void registerSecurityEvent(SecurityEvent securityEvent) throws XMLSecurityException {
+        if (securityEventListener != null) {
+            securityEventListener.registerSecurityEvent(securityEvent);
+        }
     }
 }

@@ -1,5 +1,8 @@
 package ch.gigerstyle.xmlsec.ext;
 
+import ch.gigerstyle.xmlsec.securityEvent.SecurityEvent;
+import ch.gigerstyle.xmlsec.securityEvent.SecurityEventListener;
+
 import java.util.List;
 
 /**
@@ -35,4 +38,8 @@ public interface SecurityContext {
     public void registerSecurityTokenProvider(String id, SecurityTokenProvider securityTokenProvider);
 
     public SecurityTokenProvider getSecurityTokenProvider(String id);
+
+    public void setSecurityEventListener(SecurityEventListener securityEventListener);
+
+    public void registerSecurityEvent(SecurityEvent securityEvent) throws XMLSecurityException;
 }

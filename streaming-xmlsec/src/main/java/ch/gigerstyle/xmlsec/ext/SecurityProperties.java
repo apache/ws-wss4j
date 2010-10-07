@@ -32,6 +32,16 @@ import java.util.List;
  */
 public class SecurityProperties {
 
+    private List<InputProcessor> inputProcessorList = new ArrayList<InputProcessor>();
+
+    public void addInputProcessor(InputProcessor inputProcessor) {
+        this.inputProcessorList.add(inputProcessor);
+    }
+
+    public List<InputProcessor> getInputProcessorList() {
+        return inputProcessorList;
+    }
+
     private Class decryptionCryptoClass;
     private KeyStore decryptionKeyStore;
     private String decryptionDefaultAlias;

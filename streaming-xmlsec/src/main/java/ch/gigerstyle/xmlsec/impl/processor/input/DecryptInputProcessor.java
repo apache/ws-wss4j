@@ -4,6 +4,9 @@ import ch.gigerstyle.xmlsec.config.JCEAlgorithmMapper;
 import ch.gigerstyle.xmlsec.ext.*;
 import ch.gigerstyle.xmlsec.impl.SecurityTokenFactory;
 import ch.gigerstyle.xmlsec.impl.util.IVSplittingOutputStream;
+import ch.gigerstyle.xmlsec.securityEvent.AlgorithmSuiteSecurityEvent;
+import ch.gigerstyle.xmlsec.securityEvent.RecipientEncryptionTokenSecurityEvent;
+import ch.gigerstyle.xmlsec.securityEvent.SecurityEvent;
 import org.apache.commons.codec.binary.Base64OutputStream;
 import org.w3._2001._04.xmlenc_.EncryptedDataType;
 import org.w3._2001._04.xmlenc_.ReferenceList;
@@ -23,6 +26,7 @@ import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 import java.io.*;
+import java.security.Key;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.util.ArrayList;
@@ -217,10 +221,29 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
 
                 isFirstCall = false;
 
-                try {
-                    String syncEncAlgo = JCEAlgorithmMapper.translateURItoJCEID(encryptedDataType.getEncryptionMethod().getAlgorithm());
-                    symmetricCipher = Cipher.getInstance(syncEncAlgo, "BC");
+                final String algorithmURI = encryptedDataType.getEncryptionMethod().getAlgorithm();
 
+                SecurityToken securityToken = SecurityTokenFactory.newInstance().getSecurityToken(encryptedDataType.getKeyInfo(), getSecurityProperties().getDecryptionCrypto(), getSecurityProperties().getCallbackHandler(), securityContext);
+                RecipientEncryptionTokenSecurityEvent recipientEncryptionTokenSecurityEvent = new RecipientEncryptionTokenSecurityEvent(SecurityEvent.Event.RecipientEncryptionToken);
+                recipientEncryptionTokenSecurityEvent.setSecurityToken(securityToken);
+                securityContext.registerSecurityEvent(recipientEncryptionTokenSecurityEvent);
+
+                if (securityToken.getKeyWrappingToken() != null) {
+                    AlgorithmSuiteSecurityEvent algorithmSuiteSecurityEvent = new AlgorithmSuiteSecurityEvent(SecurityEvent.Event.AlgorithmSuite);
+                    algorithmSuiteSecurityEvent.setAlgorithmURI(securityToken.getKeyWrappingTokenAlgorithm());
+                    algorithmSuiteSecurityEvent.setUsage(
+                            securityToken.getKeyWrappingToken().isAsymmetric()
+                                    ? AlgorithmSuiteSecurityEvent.Usage.Asym_Key_Wrap
+                                    : AlgorithmSuiteSecurityEvent.Usage.Sym_Key_Wrap);
+                    securityContext.registerSecurityEvent(algorithmSuiteSecurityEvent);
+                }
+
+                Key secretKey = securityToken.getSecretKey(algorithmURI);
+
+                //we have to defer the initialization of the cipher until we can extract the IV...
+                try {
+                    String syncEncAlgo = JCEAlgorithmMapper.translateURItoJCEID(algorithmURI);
+                    symmetricCipher = Cipher.getInstance(syncEncAlgo, "BC");
                 } catch (NoSuchAlgorithmException e) {
                     throw new XMLSecurityException(e);
                 } catch (NoSuchProviderException e) {
@@ -228,6 +251,11 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
                 } catch (NoSuchPaddingException e) {
                     throw new XMLSecurityException(e);
                 }
+
+                AlgorithmSuiteSecurityEvent algorithmSuiteSecurityEvent = new AlgorithmSuiteSecurityEvent(SecurityEvent.Event.AlgorithmSuite);
+                algorithmSuiteSecurityEvent.setAlgorithmURI(algorithmURI);
+                algorithmSuiteSecurityEvent.setUsage(AlgorithmSuiteSecurityEvent.Usage.Enc);
+                securityContext.registerSecurityEvent(algorithmSuiteSecurityEvent);
 
                 final InputProcessorChain subInputProcessorChain = inputProcessorChain.createSubChain(this);
 
@@ -332,11 +360,6 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
                     //calling flush after every piece to prevent data salad...
                     tempBufferedWriter.flush();
 
-                    //we have to defer the initialization of the cipher until we can extract the IV...
-                    SecurityToken securityToken = SecurityTokenFactory.newInstance().getSecurityToken(encryptedDataType.getKeyInfo(), getSecurityProperties().getDecryptionCrypto(), getSecurityProperties().getCallbackHandler(), securityContext);
-                    String algoFamily = JCEAlgorithmMapper.getJCEKeyAlgorithmFromURI(encryptedDataType.getEncryptionMethod().getAlgorithm());
-                    SecretKey symmetricKey = new SecretKeySpec(securityToken.getSymmetricKey(), algoFamily);
-
                     IVSplittingOutputStream ivSplittingOutputStream = new IVSplittingOutputStream(
                             new CipherOutputStream(new FilterOutputStream(outputStream) {
                                 @Override
@@ -344,16 +367,17 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
                                     //we overwrite the close method and don't delegate close. Close must be done separately.
                                     //The reason behind this is the Base64DecoderStream which does the final on close() but after
                                     //that we have to write our dummy end tag
-                                    //but calling flush here seems to be fine
+                                    //just calling flush here, seems to be fine
                                     out.flush();
                                 }
                             }, symmetricCipher),
-                            symmetricCipher, symmetricKey);
+                            symmetricCipher, secretKey);
                     bufferedOutputStream = new BufferedOutputStream(new Base64OutputStream(ivSplittingOutputStream, false), 8192 * 5);
 
                     bufferedOutputStream.write(xmlEvent.asCharacters().getData().getBytes());
 
                 } catch (IOException e) {
+                    testAndThrowUncaughtException(thrownExceptionByReader);
                     throw new XMLStreamException(e);
                 }
             } else if (xmlEvent.isEndElement()) {
@@ -373,6 +397,7 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
                         //real close of the stream
                         tempBufferedWriter.close();
                     } catch (IOException e) {
+                        testAndThrowUncaughtException(thrownExceptionByReader);
                         throw new XMLStreamException(e);
                     }
 
@@ -393,6 +418,7 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
                 try {
                     bufferedOutputStream.write(xmlEvent.asCharacters().getData().getBytes());
                 } catch (IOException e) {
+                    testAndThrowUncaughtException(thrownExceptionByReader);
                     throw new XMLStreamException(e);
                 }
             } else {

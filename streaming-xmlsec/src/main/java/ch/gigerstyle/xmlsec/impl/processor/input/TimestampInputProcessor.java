@@ -1,6 +1,8 @@
 package ch.gigerstyle.xmlsec.impl.processor.input;
 
 import ch.gigerstyle.xmlsec.ext.*;
+import ch.gigerstyle.xmlsec.securityEvent.SecurityEvent;
+import ch.gigerstyle.xmlsec.securityEvent.TimestampSecurityEvent;
 import org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_utility_1_0.TimestampType;
 
 import javax.xml.datatype.DatatypeConfigurationException;
@@ -72,6 +74,7 @@ public class TimestampInputProcessor extends AbstractInputProcessor {
                 DatatypeFactory datatypeFactory = DatatypeFactory.newInstance();
 
                 // Validate whether the security semantics have expired
+                //created and expires is optional per spec. But we enforce the created element in the validation
                 Calendar crea = null;
                 if (currentTimestampType.getCreated() != null) {
                     XMLGregorianCalendar created = datatypeFactory.newXMLGregorianCalendar(currentTimestampType.getCreated().getValue());
@@ -107,6 +110,11 @@ public class TimestampInputProcessor extends AbstractInputProcessor {
                     throw new XMLSecurityException("invalidTimestamp " +
                             "The security semantics of the message is invalid");
                 }
+
+                TimestampSecurityEvent timestampSecurityEvent = new TimestampSecurityEvent(SecurityEvent.Event.Timestamp);
+                timestampSecurityEvent.setCreated(crea);
+                timestampSecurityEvent.setExpires(exp);
+                securityContext.registerSecurityEvent(timestampSecurityEvent);
 
             } catch (DatatypeConfigurationException e) {
                 throw new XMLSecurityException(e.getMessage(), e);

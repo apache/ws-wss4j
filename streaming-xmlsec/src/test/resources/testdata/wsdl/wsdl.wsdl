@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions
+        name="PlainService"
+        targetNamespace="http://www.example.net/WSDLService"
+        xmlns:tns="http://www.example.net/WSDLService"
+        xmlns:wsp12="http://schemas.xmlsoap.org/ws/2004/09/policy"
+        xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200802"
+        xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"
+        xmlns:xs="http://www.w3.org/2001/XMLSchema"
+        xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+        xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+        >
+
+    <wsdl:types>
+        <xs:schema>
+            <xs:import namespace="http://schemas.xmlsoap.org/wsdl/"
+                       schemaLocation="wsdl.xsd"/>
+        </xs:schema>
+    </wsdl:types>
+
+    <wsp12:Policy wsu:Id="MessagePolicy3">
+        <wsp12:ExactlyOne>
+            <wsp12:All>
+                <sp:AsymmetricBinding>
+                    <wsp12:Policy>
+                        <sp:InitiatorToken>
+                            <wsp12:Policy>
+                                <sp:X509Token
+                                        sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient">
+                                    <!--<sp:Issuer>wsa:EndpointReferenceType</sp:Issuer>-->
+                                    <sp:IssuerName>CN=test</sp:IssuerName>
+                                    <wsp12:Policy>
+                                        <!-- 9 WSS: SOAP Message Security Options
+                                        Optional and not implemented:-->
+                                        <!--<sp:RequireKeyIdentifierReference/> -->
+                                        <!--<sp:RequireIssuerSerialReference/>-->
+                                        <!--
+                                        <sp:RequireEmbeddedTokenReference/>
+                                        <sp:RequireThumbprintReference/>
+                                        -->
+                                        <sp:WssX509V3Token11/>
+                                        <!--
+                                      <sp:WssX509Pkcs7Token10/>
+                                      <sp:WssX509PkiPathV1Token10/>
+                                      <sp:WssX509V1Token11/>
+                                      <sp:WssX509V3Token11/>
+                                      <sp:WssX509Pkcs7Token11/>
+                                      <sp:WssX509PkiPathV1Token11/>
+                                      -->
+                                    </wsp12:Policy>
+                                </sp:X509Token>
+                            </wsp12:Policy>
+                        </sp:InitiatorToken>
+                        <sp:RecipientToken>
+                            <wsp12:Policy>
+                              <sp:X509Token sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient">
+                                  <sp:IssuerName>2.5.4.5=#130134,CN=RefApp Receiver,O=Swissdec,C=CH</sp:IssuerName>
+                                  <wsp12:Policy>
+                                      <!--
+                                      <sp:RequireIssuerSerialReference/>
+                                      -->
+                                      <sp:WssX509V3Token11/>
+                                  </wsp12:Policy>
+                              </sp:X509Token>
+                            </wsp12:Policy>
+                         </sp:RecipientToken>
+                        <sp:AlgorithmSuite>
+                            <wsp12:Policy>
+                                <sp:Basic256Rsa15/>
+                            </wsp12:Policy>
+                        </sp:AlgorithmSuite>
+                        <sp:Layout>
+                            <wsp12:Policy>
+                                <sp:Lax/>
+                            </wsp12:Policy>
+                        </sp:Layout>
+                        <sp:IncludeTimestamp/>
+                        <!--<sp:EncryptBeforeSigning/>-->
+                        <sp:EncryptSignature/>
+                        <sp:ProtectTokens/>
+                        <sp:OnlySignEntireHeadersAndBody/>
+                    </wsp12:Policy>
+                </sp:AsymmetricBinding>
+            </wsp12:All>
+            <wsp12:All>
+                <sp:AsymmetricBinding>
+                    <wsp12:Policy>
+                        <sp:RecipientToken>
+                            <wsp12:Policy>
+                              <sp:X509Token sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient">
+                                  <sp:IssuerName>2.5.4.5=#130134,CN=RefApp Receiver,O=Swissdec,C=CH</sp:IssuerName>
+                                  <wsp12:Policy>
+                                      <!--
+                                      <sp:RequireIssuerSerialReference/>
+                                      -->
+                                      <sp:WssX509V3Token11/>
+                                  </wsp12:Policy>
+                              </sp:X509Token>
+                            </wsp12:Policy>
+                         </sp:RecipientToken>
+                        <sp:AlgorithmSuite>
+                            <wsp12:Policy>
+                                <sp:Basic256/>
+                            </wsp12:Policy>
+                        </sp:AlgorithmSuite>
+                        <sp:IncludeTimestamp/>
+                    </wsp12:Policy>
+                </sp:AsymmetricBinding>
+            </wsp12:All>
+        </wsp12:ExactlyOne>
+    </wsp12:Policy>
+    <wsp12:Policy wsu:Id="MessagePolicy2">
+    </wsp12:Policy>
+    <wsp12:Policy wsu:Id="MessagePolicy1">
+    </wsp12:Policy>
+    <wsp12:Policy wsu:Id="PortTypePolicy">
+    </wsp12:Policy>
+    <wsp12:Policy wsu:Id="OperationPolicy2">
+    </wsp12:Policy>
+    <wsp12:Policy wsu:Id="InputPolicy2">
+    </wsp12:Policy>
+    <wsp12:Policy wsu:Id="OutputPolicy2">
+    </wsp12:Policy>
+    <wsp12:Policy wsu:Id="FaultPolicy2">
+    </wsp12:Policy>
+    <wsp12:Policy wsu:Id="BindingPolicy">
+    </wsp12:Policy>
+    <wsp12:Policy wsu:Id="OperationPolicy1">
+    </wsp12:Policy>
+    <wsp12:Policy wsu:Id="InputPolicy1">
+<!--        <wsp12:ExactlyOne>
+            <wsp12:All>
+                <sp:AsymmetricBinding>
+                    <wsp12:Policy>
+                        <sp:AlgorithmSuite>
+                            <wsp12:Policy>
+                                <sp:Basic256Rsa15/>
+                            </wsp12:Policy>
+                        </sp:AlgorithmSuite>
+                    </wsp12:Policy>
+                </sp:AsymmetricBinding>
+            </wsp12:All>
+        </wsp12:ExactlyOne>
+-->
+    </wsp12:Policy>
+    <wsp12:Policy wsu:Id="OutputPolicy1">
+    </wsp12:Policy>
+    <wsp12:Policy wsu:Id="FaultPolicy1">
+    </wsp12:Policy>
+    <wsp12:Policy wsu:Id="ServicePolicy">
+    </wsp12:Policy>
+    <wsp12:Policy wsu:Id="PortPolicy">
+    </wsp12:Policy>
+
+    <wsdl:message name="WsdlRequest">
+        <wsp12:PolicyReference URI="#MessagePolicy3"/>
+        <wsdl:part name="parameters" element="wsdl:definitions"/>
+    </wsdl:message>
+    <wsdl:message name="WsdlResponse">
+        <wsp12:PolicyReference URI="#MessagePolicy2"/>
+        <wsdl:part name="parameters" element="wsdl:definitions"/>
+    </wsdl:message>
+    <wsdl:message name="WsdlFault">
+        <wsp12:PolicyReference URI="#MessagePolicy1"/>
+        <wsdl:part name="parameters" element="wsdl:definitions"/>
+    </wsdl:message>
+
+    <wsdl:portType name="WsdlPort">
+        <wsp12:PolicyReference URI="#PortTypePolicy"/>
+        <wsdl:operation name="definitions">
+            <wsp12:PolicyReference URI="#OperationPolicy2"/>
+            <wsdl:input message="tns:WsdlRequest">
+                <!-- attaching policies is per wsdl.xsd not allowed here. But the spec
+                http://www.w3.org/TR/2007/REC-ws-policy-attach-20070904/#MessagePolicySubject
+                states it's possible... hmmm -->
+                <wsp12:PolicyReference URI="#InputPolicy2"/>
+            </wsdl:input>
+            <wsdl:output message="tns:WsdlResponse">
+                <wsp12:PolicyReference URI="#OutputPolicy2"/>
+            </wsdl:output>
+            <wsdl:fault name="WsdlFault" message="tns:WsdlFault">
+                <wsp12:PolicyReference URI="#FaultPolicy2"/>
+            </wsdl:fault>
+        </wsdl:operation>
+    </wsdl:portType>
+
+    <wsdl:binding name="WsdlSOAPBinding" type="tns:WsdlPort">
+        <wsp12:PolicyReference URI="#BindingPolicy"/>
+        <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
+        <wsdl:operation name="definitions">
+            <wsp12:PolicyReference URI="#OperationPolicy1"/>
+            <soap:operation soapAction="" style="document"/>
+            <wsdl:input>
+                <wsp12:PolicyReference URI="#InputPolicy1"/>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <wsp12:PolicyReference URI="#OutputPolicy1"/>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="WsdlFault">
+                <wsp12:PolicyReference URI="#FaultPolicy1"/>
+                <soap:fault name="WsdlFault" use="literal"/>
+            </wsdl:fault>
+        </wsdl:operation>
+    </wsdl:binding>
+
+    <wsdl:service name="WsdlService">
+        <wsp12:PolicyReference URI="#ServicePolicy"/>
+        <wsdl:port name="Wsdl" binding="tns:WsdlSOAPBinding">
+            <wsp12:PolicyReference URI="#PortPolicy"/>
+            <soap:address
+                    location="http://localhost:8080/WsdlService"/>
+        </wsdl:port>
+    </wsdl:service>
+</wsdl:definitions>
+        

@@ -142,8 +142,6 @@ public class Constants {
 
     public static final String SOAPMESSAGE_NS10_BASE64_ENCODING = NS10_SOAPMESSAGE + "#Base64Binary";
 
-    public static final String CACHED_EVENTS = "CACHED_EVENTS";
-
     public enum Action {
         TIMESTAMP,
         SIGNATURE,

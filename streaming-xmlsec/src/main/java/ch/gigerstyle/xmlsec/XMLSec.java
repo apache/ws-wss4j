@@ -121,6 +121,7 @@ public class XMLSec {
                         securityProperties.setEncryptionSymAlgorithm("http://www.w3.org/2001/04/xmlenc#aes256-cbc");
                     }
                     if (securityProperties.getEncryptionKeyTransportAlgorithm() == null) {
+                        //todo constants and rsa-oaep as default for aes
                         securityProperties.setEncryptionKeyTransportAlgorithm("http://www.w3.org/2001/04/xmlenc#rsa-1_5");
                     }
                     if (securityProperties.getEncryptionKeyIdentifierType() == null) {

@@ -11,10 +11,12 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
+import javax.crypto.spec.SecretKeySpec;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 import java.security.*;
+import java.util.Hashtable;
 
 /**
  * User: giger
@@ -36,12 +38,10 @@ import java.security.*;
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
-public class EncryptedKeyInputProcessor extends AbstractInputProcessor implements SecurityTokenProvider {
+public class EncryptedKeyInputProcessor extends AbstractInputProcessor {
 
     private EncryptedKeyType currentEncryptedKeyType;
     private boolean isFinishedcurrentEncryptedKey = false;
-
-    private byte[] secretToken;
 
     public EncryptedKeyInputProcessor(SecurityProperties securityProperties) {
         super(securityProperties);
@@ -86,18 +86,65 @@ public class EncryptedKeyInputProcessor extends AbstractInputProcessor implement
         if (currentEncryptedKeyType != null && isFinishedcurrentEncryptedKey) {
 
             try {
-                String asyncEncAlgo = JCEAlgorithmMapper.translateURItoJCEID(currentEncryptedKeyType.getEncryptionMethod().getAlgorithm());
+                final String algorithmURI = currentEncryptedKeyType.getEncryptionMethod().getAlgorithm();
+                String asyncEncAlgo = JCEAlgorithmMapper.translateURItoJCEID(algorithmURI);
                 Cipher cipher = Cipher.getInstance(asyncEncAlgo, "BC");
 
                 KeyInfoType keyInfoType = currentEncryptedKeyType.getKeyInfo();
-                SecurityToken securityToken = SecurityTokenFactory.newInstance().getSecurityToken(keyInfoType, getSecurityProperties().getDecryptionCrypto(), getSecurityProperties().getCallbackHandler(), securityContext);
-                cipher.init(Cipher.DECRYPT_MODE, securityToken.getSecretKey());
+                final SecurityToken securityToken = SecurityTokenFactory.newInstance().getSecurityToken(keyInfoType, getSecurityProperties().getDecryptionCrypto(), getSecurityProperties().getCallbackHandler(), securityContext);
+                cipher.init(Cipher.DECRYPT_MODE, securityToken.getSecretKey(algorithmURI));
 
                 byte[] encryptedEphemeralKey = org.bouncycastle.util.encoders.Base64.decode(currentEncryptedKeyType.getCipherData().getCipherValue());
-                secretToken = cipher.doFinal(encryptedEphemeralKey);
+                final byte[] secretToken = cipher.doFinal(encryptedEphemeralKey);
 
                 if (currentEncryptedKeyType.getId() != null) {
-                    securityContext.registerSecurityTokenProvider(currentEncryptedKeyType.getId(), this);
+
+                    SecurityTokenProvider securityTokenProvider = new SecurityTokenProvider() {
+
+                        public SecurityToken getSecurityToken(Crypto crypto) throws XMLSecurityException {
+                            
+                            return new SecurityToken() {
+
+                                private Hashtable<String, Key> keyTable = new Hashtable<String, Key>();
+
+                                public boolean isAsymmetric() {
+                                    return false;
+                                }
+
+                                public Key getSecretKey(String algorithmURI) throws XMLSecurityException {
+                                    if (keyTable.containsKey(algorithmURI)) {
+                                        return keyTable.get(algorithmURI);
+                                    } else {
+                                        String algoFamily = JCEAlgorithmMapper.getJCEKeyAlgorithmFromURI(algorithmURI);
+                                        Key key = new SecretKeySpec(secretToken, algoFamily);
+                                        keyTable.put(algorithmURI, key);
+                                        return key; 
+                                    }
+                                }
+
+                                public PublicKey getPublicKey() throws XMLSecurityException {
+                                    return null;
+                                }
+
+                                public void verify() throws XMLSecurityException {
+                                }
+
+                                public SecurityToken getKeyWrappingToken() {
+                                    return securityToken; 
+                                }
+
+                                public String getKeyWrappingTokenAlgorithm() {
+                                    return algorithmURI;
+                                }
+
+                                public Constants.KeyIdentifierType getKeyIdentifierType() {
+                                    return Constants.KeyIdentifierType.BST_EMBEDDED;
+                                }
+                            };
+                        }
+                    };
+
+                    securityContext.registerSecurityTokenProvider(currentEncryptedKeyType.getId(), securityTokenProvider);
                 }
 
                 if (currentEncryptedKeyType.getReferenceList() != null) {
@@ -133,25 +180,5 @@ public class EncryptedKeyInputProcessor extends AbstractInputProcessor implement
     public void processEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException {
         //this method should not be called (processor will be removed after processing header
         inputProcessorChain.processEvent(xmlEvent);
-    }
-
-    public SecurityToken getSecurityToken(Crypto crypto) throws XMLSecurityException {
-        return new SecurityToken() {
-
-            public byte[] getSymmetricKey() throws XMLSecurityException {
-                return secretToken;
-            }
-
-            public Key getSecretKey() throws XMLSecurityException {
-                return null;
-            }
-
-            public PublicKey getPublicKey() throws XMLSecurityException {
-                return null;
-            }
-
-            public void verify() throws XMLSecurityException {
-            }
-        };
     }
 }

@@ -7,6 +7,7 @@ import org.apache.commons.logging.LogFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.XMLEvent;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -33,17 +34,13 @@ public class OutputProcessorChainImpl implements OutputProcessorChain {
 
     protected static final transient Log log = LogFactory.getLog(OutputProcessorChainImpl.class);
 
-    List<OutputProcessor> outputProcessors = new ArrayList<OutputProcessor>();
+    List<OutputProcessor> outputProcessors = Collections.synchronizedList(new ArrayList<OutputProcessor>());
     int pos = 0;
 
-    XMLSecurityContext xmlSecurityContext;
+    SecurityContext securityContext;
 
-    public OutputProcessorChainImpl() {
-        xmlSecurityContext = new XMLSecurityContext();
-    }
-
-    public OutputProcessorChainImpl(XMLSecurityContext xmlSecurityContext) {
-        this.xmlSecurityContext = xmlSecurityContext;
+    public OutputProcessorChainImpl(SecurityContext securityContext) {
+        this.securityContext = securityContext;
     }
 
     public int getPos() {
@@ -63,7 +60,7 @@ public class OutputProcessorChainImpl implements OutputProcessorChain {
     }
 
     public SecurityContext getSecurityContext() {
-        return this.xmlSecurityContext;
+        return this.securityContext;
     }
 
     public void addProcessor(OutputProcessor newOutputProcessor) {
@@ -158,22 +155,22 @@ public class OutputProcessorChainImpl implements OutputProcessorChain {
     }
 
     public void processEvent(XMLEvent xmlEvent) throws XMLStreamException, XMLSecurityException {
-        outputProcessors.get(getPosAndIncrement()).processNextEvent(xmlEvent, this, xmlSecurityContext);
+        outputProcessors.get(getPosAndIncrement()).processNextEvent(xmlEvent, this, securityContext);
     }
 
     public void doFinal() throws XMLStreamException, XMLSecurityException {
-        outputProcessors.get(getPosAndIncrement()).doFinal(this, xmlSecurityContext);
+        outputProcessors.get(getPosAndIncrement()).doFinal(this, securityContext);
     }
 
     public OutputProcessorChain createSubChain(OutputProcessor outputProcessor) throws XMLStreamException, XMLSecurityException {
         //System.out.println("Creating subprocessor chain for proc " + outputProcessor.getClass().getName() + " at pos " + (outputProcessors.indexOf(outputProcessor) + 1));
-        return new OutputProcessorSubChainImpl(xmlSecurityContext, outputProcessors.indexOf(outputProcessor) + 1, this.outputProcessors);
+        return new OutputProcessorSubChainImpl(securityContext, outputProcessors.indexOf(outputProcessor) + 1, this.outputProcessors);
     }
 
     class OutputProcessorSubChainImpl extends OutputProcessorChainImpl {
         private int startPos;
 
-        OutputProcessorSubChainImpl(XMLSecurityContext securityContext, int pos, List<OutputProcessor> outputProcessors) {
+        OutputProcessorSubChainImpl(SecurityContext securityContext, int pos, List<OutputProcessor> outputProcessors) {
             super(securityContext);
             this.startPos = this.pos = pos;
             //we don't clone the list to get updates in the sublist too!

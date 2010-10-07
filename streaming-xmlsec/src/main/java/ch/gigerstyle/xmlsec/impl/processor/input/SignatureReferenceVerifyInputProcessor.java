@@ -4,6 +4,8 @@ import ch.gigerstyle.xmlsec.config.JCEAlgorithmMapper;
 import ch.gigerstyle.xmlsec.ext.*;
 import ch.gigerstyle.xmlsec.impl.transformer.canonicalizer.Canonicalizer20010315ExclOmitCommentsTransformer;
 import ch.gigerstyle.xmlsec.impl.util.DigestOutputStream;
+import ch.gigerstyle.xmlsec.securityEvent.SecurityEvent;
+import ch.gigerstyle.xmlsec.securityEvent.SignedElementSecurityEvent;
 import org.w3._2000._09.xmldsig_.ReferenceType;
 import org.w3._2000._09.xmldsig_.SignatureType;
 
@@ -75,6 +77,10 @@ public class SignatureReferenceVerifyInputProcessor extends AbstractInputProcess
                         }
                         inputProcessorChain.addProcessor(new InternalSignatureReferenceVerifier(getSecurityProperties(), referenceType, startElement.getName()));
                         referenceType.setProcessed(true);
+
+                        SignedElementSecurityEvent signedElementSecurityEvent = new SignedElementSecurityEvent(SecurityEvent.Event.SignedElement);
+                        signedElementSecurityEvent.setElement(startElement.getName());
+                        securityContext.registerSecurityEvent(signedElementSecurityEvent);
                     }
                 }
             }

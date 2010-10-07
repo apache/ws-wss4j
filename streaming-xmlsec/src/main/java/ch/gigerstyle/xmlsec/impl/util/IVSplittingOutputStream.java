@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
+import java.security.Key;
 
 /**
  * User: giger
@@ -37,9 +38,9 @@ public class IVSplittingOutputStream extends FilterOutputStream {
 
     private boolean isCipherInitialized = false;
     private Cipher cipher;
-    private SecretKey secretKey;
+    private Key secretKey;
 
-    public IVSplittingOutputStream(OutputStream out, Cipher cipher, SecretKey secretKey) {
+    public IVSplittingOutputStream(OutputStream out, Cipher cipher, Key secretKey) {
         super(out);
         ivLength = cipher.getBlockSize();
         iv = new byte[ivLength];

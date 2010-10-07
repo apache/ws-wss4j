@@ -5,12 +5,14 @@ import ch.gigerstyle.xmlsec.impl.processor.input.LogInputProcessor;
 import ch.gigerstyle.xmlsec.impl.processor.input.PipedInputProcessor;
 import ch.gigerstyle.xmlsec.impl.processor.input.PipedXMLStreamReader;
 import ch.gigerstyle.xmlsec.impl.processor.input.SecurityHeaderInputProcessor;
+import ch.gigerstyle.xmlsec.securityEvent.SecurityEventListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
+import java.util.List;
 
 /**
  * User: giger
@@ -43,15 +45,17 @@ public class InboundXMLSec {
     }
 
     public XMLStreamReader processInMessage(XMLStreamReader xmlStreamReader) throws XMLStreamException, XMLSecurityException {
-        return processInMessage(Constants.xmlInputFactory.createXMLEventReader(xmlStreamReader));
+        return this.processInMessage(xmlStreamReader, null);
     }
 
-    //todo this method should not be public we need our own xmlEventReader and not a foreign one... (XMLEventNS)
-
-    public XMLStreamReader processInMessage(final XMLEventReader xmlEventReader) throws XMLStreamException, XMLSecurityException {
-
+    public XMLStreamReader processInMessage(XMLStreamReader xmlStreamReader, SecurityEventListener securityEventListener) throws XMLStreamException, XMLSecurityException {
+        final XMLEventReader xmlEventReader = Constants.xmlInputFactory.createXMLEventReader(xmlStreamReader);
+        
         final PipedXMLStreamReader pipedXMLStreamReader = new PipedXMLStreamReader(10);
         final PipedInputProcessor pipedInputProcessor = new PipedInputProcessor(pipedXMLStreamReader, securityProperties);
+
+        final XMLSecurityContext xmlSecurityContext = new XMLSecurityContext();
+        xmlSecurityContext.setSecurityEventListener(securityEventListener);
 
         Runnable runnable = new Runnable() {
 
@@ -63,17 +67,16 @@ public class InboundXMLSec {
 
                     long start = System.currentTimeMillis();
 
-                    InputProcessorChainImpl processorChain = new InputProcessorChainImpl();
+                    InputProcessorChainImpl processorChain = new InputProcessorChainImpl(xmlSecurityContext);
 
                     processorChain.addProcessor(new SecurityHeaderInputProcessor(securityProperties, processorChain));
-                    //todo dynamic add procs
-                    /*processorChain.addProcessor(new EncryptedKeyInputProcessor(securityProperties));
-                    processorChain.addProcessor(new ReferenceListInputProcessor(securityProperties));
-                    processorChain.addProcessor(new BinarySecurityTokenInputProcessor(securityProperties));
-                    processorChain.addProcessor(new SignatureInputProcessor(securityProperties));
-                    processorChain.addProcessor(new TimestampInputProcessor(securityProperties));
-                    */
                     processorChain.addProcessor(pipedInputProcessor);
+
+                    List<InputProcessor> additionalInputProcessors = securityProperties.getInputProcessorList();
+                    for (int i = 0; i < additionalInputProcessors.size(); i++) {
+                        InputProcessor inputProcessor = additionalInputProcessors.get(i);
+                        processorChain.addProcessor(inputProcessor);
+                    }
 
                     if (log.isTraceEnabled()) {
                         processorChain.addProcessor(new LogInputProcessor(securityProperties));

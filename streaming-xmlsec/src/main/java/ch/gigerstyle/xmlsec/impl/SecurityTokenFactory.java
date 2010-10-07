@@ -1,5 +1,6 @@
 package ch.gigerstyle.xmlsec.impl;
 
+import ch.gigerstyle.xmlsec.config.JCEAlgorithmMapper;
 import ch.gigerstyle.xmlsec.crypto.Crypto;
 import ch.gigerstyle.xmlsec.crypto.WSSecurityException;
 import ch.gigerstyle.xmlsec.ext.*;
@@ -129,7 +130,7 @@ public class SecurityTokenFactory {
         private Crypto crypto;
         private CallbackHandler callbackHandler;
 
-        public AbstractSecurityToken(Crypto crypto, CallbackHandler callbackHandler) {
+        protected AbstractSecurityToken(Crypto crypto, CallbackHandler callbackHandler) {
             this.crypto = crypto;
             this.callbackHandler = callbackHandler;
         }
@@ -143,22 +144,24 @@ public class SecurityTokenFactory {
         }
     }
 
-    abstract class X509SecurityToken extends AbstractSecurityToken {
+    public abstract class X509SecurityToken extends AbstractSecurityToken {
         private X509Certificate x509Certificate = null;
 
         protected X509SecurityToken(Crypto crypto, CallbackHandler callbackHandler) {
             super(crypto, callbackHandler);
         }
 
-        public byte[] getSymmetricKey() throws XMLSecurityException {
-            return null;
+        public boolean isAsymmetric() {
+                return true;
         }
 
-        public Key getSecretKey() throws XMLSecurityException {
+        public Key getSecretKey(String algorithmURI) throws XMLSecurityException {
             try {
+                //todo overall caching...not just here
                 WSPasswordCallback pwCb = new WSPasswordCallback(getAlias(), WSPasswordCallback.DECRYPT);
                 Utils.doCallback(getCallbackHandler(), pwCb);
-                return getCrypto().getPrivateKey(getAlias(), pwCb.getPassword());
+                Key key = getCrypto().getPrivateKey(getAlias(), pwCb.getPassword());
+                return key;
             } catch (Exception e) {
                 throw new XMLSecurityException(e);
             }
@@ -191,9 +194,18 @@ public class SecurityTokenFactory {
                 throw new XMLSecurityException(e);
             }
         }
+
+        public SecurityToken getKeyWrappingToken() {
+            return null;
+        }
+
+        public String getKeyWrappingTokenAlgorithm() {
+            return null;
+        }
+
         //todo return whole certpath for validation??
 
-        protected X509Certificate getX509Certificate() throws WSSecurityException {
+        public X509Certificate getX509Certificate() throws WSSecurityException {
             if (this.x509Certificate == null) {
                 X509Certificate[] x509Certificates = getCrypto().getCertificates(getAlias());
                 if (x509Certificates.length == 0) {
@@ -222,6 +234,10 @@ public class SecurityTokenFactory {
             }
             return this.alias;
         }
+
+        public Constants.KeyIdentifierType getKeyIdentifierType() {
+            return Constants.KeyIdentifierType.THUMBPRINT_IDENTIFIER;
+        }
     }
 
     class X509SubjectKeyIdentifierSecurityToken extends X509SecurityToken {
@@ -238,6 +254,10 @@ public class SecurityTokenFactory {
                 this.alias = getCrypto().getAliasForX509Cert(binaryContent);
             }
             return this.alias;
+        }
+
+        public Constants.KeyIdentifierType getKeyIdentifierType() {
+            return Constants.KeyIdentifierType.SKI_KEY_IDENTIFIER;
         }
     }
 
@@ -262,8 +282,12 @@ public class SecurityTokenFactory {
         }
 
         @Override
-        protected X509Certificate getX509Certificate() throws WSSecurityException {
+        public X509Certificate getX509Certificate() throws WSSecurityException {
             return this.x509Certificate;
+        }
+
+        public Constants.KeyIdentifierType getKeyIdentifierType() {
+            return Constants.KeyIdentifierType.BST_EMBEDDED;
         }
     }
 
@@ -291,8 +315,12 @@ public class SecurityTokenFactory {
         }
 
         @Override
-        protected X509Certificate getX509Certificate() throws WSSecurityException {
+        public X509Certificate getX509Certificate() throws WSSecurityException {
             return this.x509Certificate;
+        }
+
+        public Constants.KeyIdentifierType getKeyIdentifierType() {
+            return Constants.KeyIdentifierType.BST_EMBEDDED;
         }
     }
 
@@ -310,6 +338,10 @@ public class SecurityTokenFactory {
                 this.alias = getCrypto().getAliasForX509Cert(x509DataType.getX509IssuerSerialType().getX509IssuerName(), x509DataType.getX509IssuerSerialType().getX509SerialNumber());
             }
             return this.alias;
+        }
+
+        public Constants.KeyIdentifierType getKeyIdentifierType() {
+            return Constants.KeyIdentifierType.ISSUER_SERIAL;
         }
     }
 }
