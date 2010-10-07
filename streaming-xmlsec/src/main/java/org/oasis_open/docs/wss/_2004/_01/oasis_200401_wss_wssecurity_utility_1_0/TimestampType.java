@@ -130,9 +130,9 @@ public class TimestampType implements Parseable {
         //and just expects the Timestamp element itself (Timestamp-Action).
         //this is not enough.
         //Since we don't handle custom Timestamp elements, we force
-        //here the existence of either created or expires Element.
-        if (created == null && expires == null) {
-            throw new ParseException("Element \"Created\"|\"Expires\" is missing");
+        //here the existence of the created Element.
+        if (created == null) {
+            throw new ParseException("Element \"Created\" is missing");
         }
     }
 
