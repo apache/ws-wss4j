@@ -34,8 +34,6 @@ import org.apache.ws.security.message.WSSecUsernameToken;
 import org.apache.ws.security.message.WSSecSignature;
 import org.apache.ws.security.message.WSSecHeader;
 
-import org.apache.xml.security.signature.XMLSignature;
-
 import org.w3c.dom.Document;
 
 import javax.security.auth.callback.Callback;
@@ -111,7 +109,7 @@ public class TestWSSecurityNew13 extends TestCase implements CallbackHandler {
         sign.setCustomTokenId(builder.getId());
         sign.setSecretKey(builder.getSecretKey());
         sign.setKeyIdentifierType(WSConstants.CUSTOM_SYMM_SIGNING);
-        sign.setSignatureAlgorithm(XMLSignature.ALGO_ID_MAC_HMAC_SHA1);
+        sign.setSignatureAlgorithm(WSConstants.HMAC_SHA1);
         
         LOG.info("Before signing with UT text....");
         sign.build(doc, null, secHeader);
@@ -151,7 +149,7 @@ public class TestWSSecurityNew13 extends TestCase implements CallbackHandler {
         sign.setCustomTokenId(builder.getId());
         sign.setSecretKey(builder.getSecretKey());
         sign.setKeyIdentifierType(WSConstants.CUSTOM_SYMM_SIGNING);
-        sign.setSignatureAlgorithm(XMLSignature.ALGO_ID_MAC_HMAC_SHA1);
+        sign.setSignatureAlgorithm(WSConstants.HMAC_SHA1);
         
         LOG.info("Before signing with UT text....");
         sign.build(doc, null, secHeader);
@@ -253,7 +251,7 @@ public class TestWSSecurityNew13 extends TestCase implements CallbackHandler {
         sign.setCustomTokenId(builder.getId());
         sign.setSecretKey(builder.getSecretKey());
         sign.setKeyIdentifierType(WSConstants.CUSTOM_SYMM_SIGNING);
-        sign.setSignatureAlgorithm(XMLSignature.ALGO_ID_MAC_HMAC_SHA1);
+        sign.setSignatureAlgorithm(WSConstants.HMAC_SHA1);
         
         LOG.info("Before signing with UT digest....");
         sign.build(doc, null, secHeader);

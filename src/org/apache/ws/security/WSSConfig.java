@@ -31,7 +31,6 @@ import org.apache.ws.security.processor.Processor;
 import org.apache.ws.security.transform.STRTransform;
 import org.apache.ws.security.util.Loader;
 import org.apache.ws.security.util.UUIDGenerator;
-import org.apache.xml.security.transforms.Transform;
 
 /**
  * WSSConfig <p/> Carries configuration data so the WSS4J spec compliance can be
@@ -299,20 +298,8 @@ public class WSSConfig {
                         java.security.Security.getProvider(xmlDSigName);
                     provider.put(
                         "TransformService." + STRTransform.TRANSFORM_URI,
-                        "org.apache.ws.security.transform.STRApacheTransform"
+                        "org.apache.ws.security.transform.STRTransform"
                     );
-                }
-            }
-            
-            Transform.init();
-            try {
-                Transform.register(
-                    STRTransform.TRANSFORM_URI,
-                    "org.apache.ws.security.transform.STRTransform"
-                );
-            } catch (Exception ex) {
-                if (log.isDebugEnabled()) {
-                    log.debug(ex.getMessage(), ex);
                 }
             }
             

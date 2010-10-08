@@ -38,7 +38,7 @@ import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.handler.WSHandlerResult;
 import org.apache.ws.security.util.WSSecurityUtil;
-import org.apache.xml.security.utils.XMLUtils;
+import org.apache.ws.security.util.XMLUtils;
 import org.w3c.dom.Document;
 
 import javax.security.auth.callback.CallbackHandler;

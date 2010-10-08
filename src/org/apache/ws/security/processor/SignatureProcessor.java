@@ -43,7 +43,7 @@ import org.apache.ws.security.message.token.UsernameToken;
 import org.apache.ws.security.message.token.X509Security;
 import org.apache.ws.security.saml.SAMLKeyInfo;
 import org.apache.ws.security.saml.SAMLUtil;
-import org.apache.ws.security.transform.STRApacheTransform;
+import org.apache.ws.security.transform.STRTransform;
 import org.apache.ws.security.transform.STRTransformUtil;
 import org.apache.ws.security.util.WSSecurityUtil;
 
@@ -167,10 +167,6 @@ public class SignatureProcessor implements Processor {
      * </li>
      * </ul>
      * 
-     * The methods checks is the certificate is valid and calls the
-     * {@link org.apache.xml.security.signature.XMLSignature#checkSignatureValue(X509Certificate) 
-     * verification} function.
-     *
      * @param elem        the XMLSignature DOM Element.
      * @param crypto      the object that implements the access to the keystore and the
      *                    handling of certificates.
@@ -809,7 +805,7 @@ public class SignatureProcessor implements Processor {
                     
                     Transform transform = (Transform)transformsList.get(j);
                     
-                    if (STRApacheTransform.TRANSFORM_URI.equals(transform.getAlgorithm())) {
+                    if (STRTransform.TRANSFORM_URI.equals(transform.getAlgorithm())) {
                         NodeSetData data = (NodeSetData)siRef.getDereferencedData();
                         if (data != null) {
                             java.util.Iterator iter = data.iterator();

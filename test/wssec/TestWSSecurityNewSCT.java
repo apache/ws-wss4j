@@ -43,7 +43,6 @@ import org.apache.ws.security.message.WSSecDKSign;
 import org.apache.ws.security.message.WSSecHeader;
 import org.apache.ws.security.message.WSSecSecurityContextToken;
 import org.apache.ws.security.message.WSSecSignature;
-import org.apache.xml.security.signature.XMLSignature;
 import org.w3c.dom.Document;
 
 /**
@@ -179,7 +178,7 @@ public class TestWSSecurityNewSCT extends TestCase implements CallbackHandler {
             // Derived key signature
             WSSecDKSign sigBuilder = new WSSecDKSign();
             sigBuilder.setExternalKey(tempSecret, tokenId);
-            sigBuilder.setSignatureAlgorithm(XMLSignature.ALGO_ID_MAC_HMAC_SHA1);
+            sigBuilder.setSignatureAlgorithm(WSConstants.HMAC_SHA1);
             sigBuilder.build(doc, secHeader);
             
             sctBuilder.prependSCTElementToHeader(doc, secHeader);
@@ -220,7 +219,7 @@ public class TestWSSecurityNewSCT extends TestCase implements CallbackHandler {
             WSSecDKSign sigBuilder = new WSSecDKSign();
             sigBuilder.setExternalKey(tempSecret, sctBuilder.getIdentifier());
             sigBuilder.setTokenIdDirectId(true);
-            sigBuilder.setSignatureAlgorithm(XMLSignature.ALGO_ID_MAC_HMAC_SHA1);
+            sigBuilder.setSignatureAlgorithm(WSConstants.HMAC_SHA1);
             sigBuilder.build(doc, secHeader);
             
             sctBuilder.prependSCTElementToHeader(doc, secHeader);
@@ -261,7 +260,7 @@ public class TestWSSecurityNewSCT extends TestCase implements CallbackHandler {
             // Derived key signature
             WSSecDKSign sigBuilder = new WSSecDKSign();
             sigBuilder.setExternalKey(tempSecret, tokenId);
-            sigBuilder.setSignatureAlgorithm(XMLSignature.ALGO_ID_MAC_HMAC_SHA1);
+            sigBuilder.setSignatureAlgorithm(WSConstants.HMAC_SHA1);
             sigBuilder.build(doc, secHeader);
 
             // Derived key encryption
@@ -311,7 +310,7 @@ public class TestWSSecurityNewSCT extends TestCase implements CallbackHandler {
             // Derived key signature
             WSSecDKSign sigBuilder = new WSSecDKSign();
             sigBuilder.setExternalKey(tempSecret, tokenId);
-            sigBuilder.setSignatureAlgorithm(XMLSignature.ALGO_ID_MAC_HMAC_SHA1);
+            sigBuilder.setSignatureAlgorithm(WSConstants.HMAC_SHA1);
             sigBuilder.build(doc, secHeader);
 
             sctBuilder.prependSCTElementToHeader(doc, secHeader);

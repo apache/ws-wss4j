@@ -21,11 +21,19 @@ package org.apache.ws.security.util;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.ws.security.WSConstants;
+import org.jcp.xml.dsig.internal.dom.DOMSubTreeData;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
 
+import javax.xml.crypto.NodeSetData;
+import javax.xml.crypto.OctetStreamData;
+import javax.xml.crypto.dsig.Transform;
+import javax.xml.crypto.dsig.TransformException;
+import javax.xml.crypto.dsig.XMLSignatureFactory;
+import javax.xml.crypto.dsig.spec.TransformParameterSpec;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
@@ -35,7 +43,11 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.io.IOException;
 import java.io.OutputStream;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.NoSuchAlgorithmException;
 
 public class XMLUtils {
     
@@ -103,4 +115,49 @@ public class XMLUtils {
     public static InputSource getInputSourceFromURI(String uri) {
         return new InputSource(uri);
     }
+    
+    /**
+     * Outputs a DOM tree to an {@link OutputStream}. <I>If an Exception is
+     * thrown during execution, it's StackTrace is output to System.out, but the
+     * Exception is not re-thrown.</I>
+     *
+     * @param contextNode root node of the DOM tree
+     * @param os the {@link OutputStream}
+     * @param addPreamble
+     */
+    public static void outputDOM(Node contextNode, OutputStream os, boolean addPreamble) {
+
+       try {
+          if (addPreamble) {
+             os.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n".getBytes());
+          }
+
+          XMLSignatureFactory signatureFactory = XMLSignatureFactory.getInstance("DOM");
+          Transform c14nTransform =
+              signatureFactory.newTransform(
+                  WSConstants.C14N_WITH_COMMENTS, (TransformParameterSpec)null
+              );
+          
+          NodeSetData transformData = new DOMSubTreeData(contextNode, false);
+          OctetStreamData transformedData = 
+              (OctetStreamData)c14nTransform.transform(transformData, null);
+          
+          InputStream in = transformedData.getOctetStream();
+          int nextChar;
+          while ((nextChar = in.read()) != -1) {
+              os.write(nextChar);
+          }
+          os.flush();
+          in.close();
+       } catch (IOException e) {
+           e.printStackTrace();
+       } catch (NoSuchAlgorithmException e) {
+           e.printStackTrace();
+       } catch (InvalidAlgorithmParameterException e) {
+           e.printStackTrace();
+       } catch (TransformException e) {
+           e.printStackTrace();
+       }
+    }
+    
 }

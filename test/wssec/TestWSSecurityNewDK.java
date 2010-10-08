@@ -32,7 +32,6 @@ import org.apache.ws.security.message.WSSecDKSign;
 import org.apache.ws.security.message.WSSecEncryptedKey;
 import org.apache.ws.security.message.WSSecHeader;
 import org.apache.ws.security.message.token.SecurityTokenReference;
-import org.apache.xml.security.signature.XMLSignature;
 import org.w3c.dom.Document;
 
 import javax.security.auth.callback.Callback;
@@ -176,7 +175,7 @@ public class TestWSSecurityNewDK extends TestCase implements CallbackHandler {
          //Derived key encryption
          WSSecDKSign sigBuilder = new WSSecDKSign();
          sigBuilder.setExternalKey(ek, tokenIdentifier);
-         sigBuilder.setSignatureAlgorithm(XMLSignature.ALGO_ID_MAC_HMAC_SHA1);
+         sigBuilder.setSignatureAlgorithm(WSConstants.HMAC_SHA1);
          /* Document signedDoc = */ sigBuilder.build(doc, secHeader);
          
          encrKeyBuilder.prependToHeader(secHeader);
@@ -211,7 +210,7 @@ public class TestWSSecurityNewDK extends TestCase implements CallbackHandler {
          WSSecDKSign sigBuilder = new WSSecDKSign();
          java.security.Key key = crypto.getPrivateKey("wss40", "security");
          sigBuilder.setExternalKey(key.getEncoded(), secToken.getElement());
-         sigBuilder.setSignatureAlgorithm(XMLSignature.ALGO_ID_MAC_HMAC_SHA1);
+         sigBuilder.setSignatureAlgorithm(WSConstants.HMAC_SHA1);
          sigBuilder.build(doc, secHeader);
          
          sigBuilder.prependDKElementToHeader(secHeader);
@@ -244,7 +243,7 @@ public class TestWSSecurityNewDK extends TestCase implements CallbackHandler {
          WSSecDKSign sigBuilder = new WSSecDKSign();
          java.security.Key key = crypto.getPrivateKey("wss40", "security");
          sigBuilder.setExternalKey(key.getEncoded(), secToken.getElement());
-         sigBuilder.setSignatureAlgorithm(XMLSignature.ALGO_ID_MAC_HMAC_SHA1);
+         sigBuilder.setSignatureAlgorithm(WSConstants.HMAC_SHA1);
          sigBuilder.build(doc, secHeader);
          
          sigBuilder.prependDKElementToHeader(secHeader);
@@ -277,7 +276,7 @@ public class TestWSSecurityNewDK extends TestCase implements CallbackHandler {
         //Derived key encryption
         WSSecDKSign sigBuilder = new WSSecDKSign();
         sigBuilder.setExternalKey(ek, tokenIdentifier);
-        sigBuilder.setSignatureAlgorithm(XMLSignature.ALGO_ID_MAC_HMAC_SHA1);
+        sigBuilder.setSignatureAlgorithm(WSConstants.HMAC_SHA1);
         LOG.info("Before HMAC-SHA1 signature");
         Document signedDoc = sigBuilder.build(doc, secHeader);
 
@@ -323,7 +322,7 @@ public class TestWSSecurityNewDK extends TestCase implements CallbackHandler {
          //Derived key signature
          WSSecDKSign sigBuilder = new WSSecDKSign();
          sigBuilder.setExternalKey(ek, tokenIdentifier);
-         sigBuilder.setSignatureAlgorithm(XMLSignature.ALGO_ID_MAC_HMAC_SHA1);
+         sigBuilder.setSignatureAlgorithm(WSConstants.HMAC_SHA1);
          LOG.info("Before HMAC-SHA1 signature");
          Document encryptedSignedDoc = sigBuilder.build(doc, secHeader);
          

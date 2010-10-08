@@ -64,6 +64,10 @@ do
     gpg --detach-sign --armor $i
     gpg --verify $i.asc
 done
+for i in *.jar *.zip
+do
+    md5sum $i > $i.md5
+done
 cd ${WSS4J_STAGE_ROOT}/maven/org/apache/ws/security/wss4j/${WSS4J_VERSION}
 for i in *
 do

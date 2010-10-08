@@ -21,11 +21,6 @@ package org.apache.ws.security;
 
 import javax.xml.namespace.QName;
 
-import org.apache.xml.security.c14n.Canonicalizer;
-import org.apache.xml.security.signature.XMLSignature;
-import org.apache.xml.security.utils.Constants;
-import org.apache.xml.security.utils.EncryptionConstants;
-
 /**
  * Constants in WS-Security spec.
  */
@@ -56,10 +51,10 @@ public class WSConstants {
     public static final String SAMLTOKEN_NS = 
         "http://docs.oasis-open.org/wss/oasis-wss-saml-token-profile-1.0";
 
-    public static final String SIG_NS = Constants.SignatureSpecNS;
-    public static final String ENC_NS = EncryptionConstants.EncryptionSpecNS;
-    public static final String XMLNS_NS = Constants.NamespaceSpecNS;
-    public static final String XML_NS = Constants.XML_LANG_SPACE_SpecNS;
+    public static final String SIG_NS = "http://www.w3.org/2000/09/xmldsig#";
+    public static final String ENC_NS = "http://www.w3.org/2001/04/xmlenc#";
+    public static final String XMLNS_NS = "http://www.w3.org/2000/xmlns/";
+    public static final String XML_NS = "http://www.w3.org/XML/1998/namespace";
     
     public static final String SAML_NS = "urn:oasis:names:tc:SAML:1.0:assertion";
     public static final String SAMLP_NS = "urn:oasis:names:tc:SAML:1.0:protocol";
@@ -80,29 +75,44 @@ public class WSConstants {
         "http://www.w3.org/2003/05/soap-envelope/role/ultimateReceiver";
     
     public static final String C14N_OMIT_COMMENTS = 
-        Canonicalizer.ALGO_ID_C14N_OMIT_COMMENTS;
+        "http://www.w3.org/TR/2001/REC-xml-c14n-20010315";
     public static final String C14N_WITH_COMMENTS = 
-        Canonicalizer.ALGO_ID_C14N_WITH_COMMENTS;
+        "http://www.w3.org/TR/2001/REC-xml-c14n-20010315#WithComments";
     public static final String C14N_EXCL_OMIT_COMMENTS = 
-        Canonicalizer.ALGO_ID_C14N_EXCL_OMIT_COMMENTS;
+        "http://www.w3.org/2001/10/xml-exc-c14n#";
     public static final String C14N_EXCL_WITH_COMMENTS = 
-        Canonicalizer.ALGO_ID_C14N_EXCL_WITH_COMMENTS;
+        "http://www.w3.org/2001/10/xml-exc-c14n#WithComments";
     
-    public static final String KEYTRANSPORT_RSA15 = EncryptionConstants.ALGO_ID_KEYTRANSPORT_RSA15;
-    public static final String KEYTRANSPORT_RSAOEP = EncryptionConstants.ALGO_ID_KEYTRANSPORT_RSAOAEP;
-    public static final String TRIPLE_DES = EncryptionConstants.ALGO_ID_BLOCKCIPHER_TRIPLEDES;
-    public static final String AES_128 = EncryptionConstants.ALGO_ID_BLOCKCIPHER_AES128;
-    public static final String AES_256 = EncryptionConstants.ALGO_ID_BLOCKCIPHER_AES256;
-    public static final String AES_192 = EncryptionConstants.ALGO_ID_BLOCKCIPHER_AES192;
-    public static final String DSA = XMLSignature.ALGO_ID_SIGNATURE_DSA;
-    public static final String RSA = XMLSignature.ALGO_ID_SIGNATURE_RSA;
-    public static final String RSA_SHA1 = XMLSignature.ALGO_ID_SIGNATURE_RSA_SHA1;
-    public static final String SHA1 = Constants.ALGO_ID_DIGEST_SHA1;
-    public static final String HMAC_SHA1 = XMLSignature.ALGO_ID_MAC_HMAC_SHA1;
-    public static final String HMAC_SHA256 = XMLSignature.ALGO_ID_MAC_HMAC_SHA256;
-    public static final String HMAC_SHA384 = XMLSignature.ALGO_ID_MAC_HMAC_SHA384;
-    public static final String HMAC_SHA512 = XMLSignature.ALGO_ID_MAC_HMAC_SHA512;
-    public static final String HMAC_MD5 = XMLSignature.ALGO_ID_MAC_HMAC_NOT_RECOMMENDED_MD5;
+    public static final String KEYTRANSPORT_RSA15 = 
+        "http://www.w3.org/2001/04/xmlenc#rsa-1_5";
+    public static final String KEYTRANSPORT_RSAOEP = 
+        "http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p";
+    public static final String TRIPLE_DES = 
+        "http://www.w3.org/2001/04/xmlenc#tripledes-cbc";
+    public static final String AES_128 = 
+        "http://www.w3.org/2001/04/xmlenc#aes128-cbc";
+    public static final String AES_256 = 
+        "http://www.w3.org/2001/04/xmlenc#aes256-cbc";
+    public static final String AES_192 = 
+        "http://www.w3.org/2001/04/xmlenc#aes192-cbc";
+    public static final String DSA = 
+        "http://www.w3.org/2000/09/xmldsig#dsa-sha1";
+    public static final String RSA = 
+        "http://www.w3.org/2000/09/xmldsig#rsa-sha1";
+    public static final String RSA_SHA1 = 
+        "http://www.w3.org/2000/09/xmldsig#rsa-sha1";
+    public static final String SHA1 = 
+        "http://www.w3.org/2000/09/xmldsig#sha1";
+    public static final String HMAC_SHA1 = 
+        "http://www.w3.org/2000/09/xmldsig#hmac-sha1";
+    public static final String HMAC_SHA256 = 
+        "http://www.w3.org/2001/04/xmldsig-more#hmac-sha256";
+    public static final String HMAC_SHA384 = 
+        "http://www.w3.org/2001/04/xmldsig-more#hmac-sha384";
+    public static final String HMAC_SHA512 = 
+        "http://www.w3.org/2001/04/xmldsig-more#hmac-sha512";
+    public static final String HMAC_MD5 = 
+        "http://www.w3.org/2001/04/xmldsig-more#hmac-md5";
     
     public static final String WST_NS = "http://schemas.xmlsoap.org/ws/2005/02/trust";
     public final static String WSC_SCT = "http://schemas.xmlsoap.org/ws/2005/02/sc/sct";

@@ -32,9 +32,6 @@ import org.apache.ws.security.message.WSSecSignature;
 import org.apache.ws.security.message.WSSecHeader;
 import org.w3c.dom.Document;
 
-import org.apache.xml.security.signature.XMLSignature;
-
-
 /**
  * WS-Security Test Case for SubjectKeyIdentifier.
  * 
@@ -92,7 +89,7 @@ public class TestWSSecurityNew12 extends TestCase {
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("wss40DSA", "security");
         builder.setKeyIdentifierType(WSConstants.SKI_KEY_IDENTIFIER);
-        builder.setSignatureAlgorithm(XMLSignature.ALGO_ID_SIGNATURE_DSA);
+        builder.setSignatureAlgorithm(WSConstants.DSA);
         
         LOG.info("Before SigningDSA_SKIDirect....");
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);

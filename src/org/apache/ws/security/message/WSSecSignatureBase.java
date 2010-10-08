@@ -25,7 +25,7 @@ import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSEncryptionPart;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.transform.STRApacheTransform;
+import org.apache.ws.security.transform.STRTransform;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -132,7 +132,7 @@ public class WSSecSignatureBase extends WSSecBase {
                     XMLStructure structure = new DOMStructure(ctx);
                     Transform transform =
                         signatureFactory.newTransform(
-                            STRApacheTransform.TRANSFORM_URI,
+                            STRTransform.TRANSFORM_URI,
                             structure
                         );
                     

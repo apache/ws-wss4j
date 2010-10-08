@@ -37,7 +37,6 @@ import org.apache.ws.security.message.WSSecHeader;
 import org.apache.ws.security.message.WSSecSignature;
 import org.apache.ws.security.message.WSSecUsernameToken;
 import org.apache.ws.security.util.WSSecurityUtil;
-import org.apache.xml.security.signature.XMLSignature;
 import org.w3c.dom.Document;
 
 import javax.security.auth.callback.Callback;
@@ -113,7 +112,7 @@ public class TestWSSecurityUTSignature extends TestCase implements CallbackHandl
         sign.setCustomTokenId(builder.getId());
         sign.setSecretKey(builder.getSecretKey());
         sign.setKeyIdentifierType(WSConstants.CUSTOM_SYMM_SIGNING);
-        sign.setSignatureAlgorithm(XMLSignature.ALGO_ID_MAC_HMAC_SHA1);
+        sign.setSignatureAlgorithm(WSConstants.HMAC_SHA1);
         
         Document signedDoc = sign.build(doc, null, secHeader);
         builder.prependToHeader(secHeader);
@@ -156,7 +155,7 @@ public class TestWSSecurityUTSignature extends TestCase implements CallbackHandl
         sign.setCustomTokenId(builder.getId());
         sign.setSecretKey(builder.getSecretKey());
         sign.setKeyIdentifierType(WSConstants.CUSTOM_SYMM_SIGNING);
-        sign.setSignatureAlgorithm(XMLSignature.ALGO_ID_MAC_HMAC_SHA1);
+        sign.setSignatureAlgorithm(WSConstants.HMAC_SHA1);
         
         Document signedDoc = sign.build(doc, null, secHeader);
         builder.prependToHeader(secHeader);
