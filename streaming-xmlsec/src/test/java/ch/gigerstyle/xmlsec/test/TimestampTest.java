@@ -374,12 +374,18 @@ public class TimestampTest extends AbstractTestBase {
             InboundXMLSec xmlSec = XMLSec.getInboundXMLSec(securityProperties);
             XMLStreamReader xmlStreamReader = xmlSec.processInMessage(new DOMStreamReader(securedDocument));
 
-            Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
-
-            //header element must still be there
-            NodeList nodeList = document.getElementsByTagNameNS(Constants.TAG_wsu_Timestamp.getNamespaceURI(), Constants.TAG_wsu_Timestamp.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 1);
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), Constants.TAG_wsse_Security.getLocalPart());
+            try {
+                Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
+                Assert.fail("Expected XMLStreamException");
+            } catch (XMLStreamException e) {
+                Throwable throwable = e.getCause();
+                Assert.assertNotNull(throwable);
+                Assert.assertTrue(throwable instanceof XMLSecurityException);
+                throwable = throwable.getCause();
+                Assert.assertNotNull(throwable);
+                Assert.assertTrue(throwable instanceof ParseException);
+                Assert.assertEquals(throwable.getMessage(), "Element \"Created\" is missing");
+            }
         }
     }
 
@@ -461,7 +467,7 @@ public class TimestampTest extends AbstractTestBase {
                 throwable = throwable.getCause();
                 Assert.assertNotNull(throwable);
                 Assert.assertTrue(throwable instanceof ParseException);
-                Assert.assertEquals(throwable.getMessage(), "Element \"Created\"|\"Expires\" is missing");
+                Assert.assertEquals(throwable.getMessage(), "Element \"Created\" is missing");
             }
         }
     }
