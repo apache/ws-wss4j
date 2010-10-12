@@ -79,4 +79,32 @@ public class XMLSecurityContext implements SecurityContext {
             securityEventListener.registerSecurityEvent(securityEvent);
         }
     }
+
+    private int actualEncryptedContentCounter = 0;
+
+    public synchronized void setIsInEncryptedContent() {
+        this.actualEncryptedContentCounter++;
+    }
+
+    public synchronized void unsetIsInEncryptedContent() {
+        this.actualEncryptedContentCounter--;
+    }
+
+    public boolean isInEncryptedContent() {
+        return this.actualEncryptedContentCounter > 0;
+    }
+
+    private int actualSignedContent = 0;
+
+    public synchronized void setIsInSignedContent() {
+        this.actualSignedContent++;
+    }
+
+    public synchronized void unsetIsInSignedContent() {
+        this.actualSignedContent--;
+    }
+
+    public boolean isInSignedContent() {
+        return this.actualSignedContent > 0;
+    }
 }

@@ -22,14 +22,14 @@ import javax.xml.namespace.QName;
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
-public class SignedElementSecurityEvent extends SecurityEvent {
+public class SignedPartSecurityEvent extends SecurityEvent {
 
     //todo xpath or something unique
     //todo message signature or supporting sig
     private QName element;
     private boolean notSigned;
 
-    public SignedElementSecurityEvent(Event securityEventType, boolean notSigned) {
+    public SignedPartSecurityEvent(Event securityEventType, boolean notSigned) {
         super(securityEventType);
         this.notSigned = notSigned;
     }

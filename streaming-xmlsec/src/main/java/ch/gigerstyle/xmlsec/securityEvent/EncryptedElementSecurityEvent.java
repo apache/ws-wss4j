@@ -22,16 +22,15 @@ import javax.xml.namespace.QName;
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
-public class SignedElementSecurityEvent extends SecurityEvent {
+public class EncryptedElementSecurityEvent extends SecurityEvent {
 
     //todo xpath or something unique
-    //todo message signature or supporting sig
     private QName element;
-    private boolean notSigned;
+    private boolean notEncrypted; //if true this element is not encrypted.
 
-    public SignedElementSecurityEvent(Event securityEventType, boolean notSigned) {
+    public EncryptedElementSecurityEvent(Event securityEventType, boolean notEncrypted) {
         super(securityEventType);
-        this.notSigned = notSigned;
+        this.notEncrypted = notEncrypted;
     }
 
     public QName getElement() {
@@ -42,11 +41,11 @@ public class SignedElementSecurityEvent extends SecurityEvent {
         this.element = element;
     }
 
-    public boolean isNotSigned() {
-        return notSigned;
+    public boolean isNotEncrypted() {
+        return notEncrypted;
     }
 
-    public void setNotSigned(boolean notSigned) {
-        this.notSigned = notSigned;
+    public void setNotEncrypted(boolean notEncrypted) {
+        this.notEncrypted = notEncrypted;
     }
 }

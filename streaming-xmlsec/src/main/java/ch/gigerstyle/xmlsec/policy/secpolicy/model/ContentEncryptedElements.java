@@ -17,6 +17,9 @@
 package ch.gigerstyle.xmlsec.policy.secpolicy.model;
 
 import ch.gigerstyle.xmlsec.policy.assertionStates.AssertionState;
+import ch.gigerstyle.xmlsec.policy.assertionStates.ContentEncryptedElementAssertionState;
+import ch.gigerstyle.xmlsec.policy.assertionStates.EncryptedElementAssertionState;
+import ch.gigerstyle.xmlsec.policy.assertionStates.SignedElementAssertionState;
 import ch.gigerstyle.xmlsec.policy.secpolicy.SP12Constants;
 import ch.gigerstyle.xmlsec.policy.secpolicy.SPConstants;
 import ch.gigerstyle.xmlsec.securityEvent.SecurityEvent;
@@ -127,23 +130,31 @@ public class ContentEncryptedElements extends AbstractSecurityAssertion {
 
     @Override
     public SecurityEvent.Event[] getResponsibleAssertionEvents() {
-        //todo
-        return new SecurityEvent.Event[0];
+        return new SecurityEvent.Event[]{SecurityEvent.Event.ContentEncrypted};
     }
 
     @Override
     public void getAssertions(Map<SecurityEvent.Event, Collection<AssertionState>> assertionStateMap) {
-        //todo
+        Collection<AssertionState> encryptedElementAssertionStates = assertionStateMap.get(SecurityEvent.Event.ContentEncrypted);
+        encryptedElementAssertionStates.add(new ContentEncryptedElementAssertionState(this, true, getQNamesFromXPath()));
     }
 
-    /*
-    @Override
-    public void assertPolicy(SecurityEvent securityEvent) throws PolicyViolationException {
+    private List<QName> getQNamesFromXPath() {
+        List<QName> qNames = new ArrayList<QName>(xPathExpressions.size());
+        for (int i = 0; i < xPathExpressions.size(); i++) {
+            String s = (String) xPathExpressions.get(i);
+            String prefix;
+            String localName;
+            if (s.contains(":")) {
+                int idx = s.indexOf(":");
+                prefix = s.substring(0, idx);
+                localName = s.substring(idx + 1);
+            } else {
+                prefix = "";
+                localName = s;
+            }
+            qNames.add(new QName((String)declaredNamespaces.get(prefix), localName));
+        }
+        return qNames;
     }
-
-    @Override
-    public boolean isAsserted() {
-        return true;
-    }
-    */
 }

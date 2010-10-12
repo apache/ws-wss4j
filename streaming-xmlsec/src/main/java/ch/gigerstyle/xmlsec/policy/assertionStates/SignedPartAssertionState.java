@@ -2,11 +2,9 @@ package ch.gigerstyle.xmlsec.policy.assertionStates;
 
 import ch.gigerstyle.xmlsec.policy.secpolicy.model.AbstractSecurityAssertion;
 import ch.gigerstyle.xmlsec.securityEvent.SecurityEvent;
-import ch.gigerstyle.xmlsec.securityEvent.SignedElementSecurityEvent;
+import ch.gigerstyle.xmlsec.securityEvent.SignedPartSecurityEvent;
 
 import javax.xml.namespace.QName;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -29,11 +27,11 @@ import java.util.List;
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
-public class SignedElementAssertionState extends AssertionState {
+public class SignedPartAssertionState extends AssertionState {
 
     private List<QName> elements;
 
-    public SignedElementAssertionState(AbstractSecurityAssertion assertion, boolean asserted, List<QName> elements) {
+    public SignedPartAssertionState(AbstractSecurityAssertion assertion, boolean asserted, List<QName> elements) {
         super(assertion, asserted);
         this.elements = elements;
     }
@@ -43,14 +41,15 @@ public class SignedElementAssertionState extends AssertionState {
         //here we add just one AssertionState for all Parts to get a fail-fast behavior
         //when we add multiple AssertionStates some of them return true, becauce they don't match
         //as a result the policy is temporary satisfied for the current event and can only be falsified at last
-        SignedElementSecurityEvent signedElementSecurityEvent = (SignedElementSecurityEvent) securityEvent;
+        SignedPartSecurityEvent signedPartSecurityEvent = (SignedPartSecurityEvent) securityEvent;
         for (int i = 0; i < elements.size(); i++) {
             QName qName = elements.get(i);
-            if (qName.equals(signedElementSecurityEvent.getElement())) {
-                if (signedElementSecurityEvent.isNotSigned()) {
+            if (qName.equals(signedPartSecurityEvent.getElement())
+                    || (qName.getLocalPart().equals("*") && qName.getNamespaceURI().equals(signedPartSecurityEvent.getElement().getNamespaceURI()))) {
+                if (signedPartSecurityEvent.isNotSigned()) {
                     //an element must be signed but isn't
                     setAsserted(false);
-                    setErrorMessage("Element " + signedElementSecurityEvent.getElement() + " must be signed");
+                    setErrorMessage("Element " + signedPartSecurityEvent.getElement() + " must be signed");
                     return false;
                 } else {
                     setAsserted(true);

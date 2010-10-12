@@ -14,10 +14,7 @@ import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.impl.llom.factory.OMXMLBuilderFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.neethi.Policy;
-import org.apache.neethi.PolicyComponent;
-import org.apache.neethi.PolicyEngine;
-import org.apache.neethi.PolicyOperator;
+import org.apache.neethi.*;
 import org.apache.neethi.builders.AssertionBuilder;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -336,8 +333,6 @@ public class PolicyEnforcer implements SecurityEventListener {
             throw new WSSPolicyException(e.getMessage(), e);
         }
         */
-        //todo initialize an empty collection for every event type at start?
-        //advantage is that we don't have to check for NPE's and probably a little bit faster runtime
         Collection<AssertionState> assertionStates = assertionStateMap.get(securityEvent.getSecurityEventType());
         if (assertionStates != null && assertionStates.size() > 0) {
             int notAssertedCount = 0;
@@ -413,15 +408,20 @@ public class PolicyEnforcer implements SecurityEventListener {
 
         if (policyComponent instanceof PolicyOperator) {
             PolicyOperator policyOperator = (PolicyOperator) policyComponent;
+            boolean isExactlyOne = policyOperator instanceof ExactlyOne;
             List<PolicyComponent> policyComponents = policyOperator.getPolicyComponents();
+
+            boolean isAsserted = false;
             for (int i = 0; i < policyComponents.size(); i++) {
                 PolicyComponent curPolicyComponent = policyComponents.get(i);
-                boolean isAsserted = verifyPolicy(curPolicyComponent);
-                if (isAsserted) {
+                isAsserted = verifyPolicy(curPolicyComponent);
+                if (isExactlyOne && isAsserted) {
                     return true; //a satisfied alternative is found
+                } else if (!isExactlyOne && !isAsserted) {
+                    return false;
                 }
             }
-            return false;
+            return isAsserted;
         } else if (policyComponent instanceof AbstractSecurityAssertion) {
             AbstractSecurityAssertion abstractSecurityAssertion = (AbstractSecurityAssertion) policyComponent;
             return abstractSecurityAssertion.isAsserted(assertionStateMap);
@@ -430,7 +430,8 @@ public class PolicyEnforcer implements SecurityEventListener {
         }
     }
 
-    public void registerSecurityEvent(SecurityEvent securityEvent) throws XMLSecurityException {
+    //multiple threads can call this method concurrently -> synchronize access
+    public synchronized void registerSecurityEvent(SecurityEvent securityEvent) throws XMLSecurityException {
         System.out.println("Security Event: " + securityEvent);
         if (operationPolicyFound) {
             verifyPolicy(securityEvent);
@@ -452,7 +453,7 @@ public class PolicyEnforcer implements SecurityEventListener {
                 securityEventQueue.enqueue(securityEvent);
             }
         }
-    }
+    }    
 
     public void doFinal() throws PolicyViolationException {
         try {

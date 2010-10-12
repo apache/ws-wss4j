@@ -1,6 +1,9 @@
 package ch.gigerstyle.xmlsec.impl;
 
 import java.security.Key;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * User: giger
@@ -36,6 +39,18 @@ public class EncryptionPartDef {
 
         public String getModifier() {
             return this.modifier;
+        }
+
+        private static final Map<String, Modifier> modifierMap = new HashMap<String, Modifier>();
+
+        static {
+            for (Modifier modifier : EnumSet.allOf(Modifier.class)) {
+                modifierMap.put(modifier.getModifier(), modifier);
+            }
+        }
+
+        public static Modifier getModifier(String modifier) {
+            return modifierMap.get(modifier); 
         }
     }
 

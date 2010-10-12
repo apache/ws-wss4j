@@ -20,10 +20,14 @@ import ch.gigerstyle.xmlsec.ext.Constants;
 import ch.gigerstyle.xmlsec.policy.assertionStates.AssertionState;
 import ch.gigerstyle.xmlsec.policy.assertionStates.IncludeTimeStampAssertionState;
 import ch.gigerstyle.xmlsec.policy.assertionStates.SignedElementAssertionState;
+import ch.gigerstyle.xmlsec.policy.assertionStates.SignedPartAssertionState;
 import ch.gigerstyle.xmlsec.policy.secpolicy.SPConstants;
 import ch.gigerstyle.xmlsec.securityEvent.SecurityEvent;
 
+import javax.xml.namespace.QName;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 public abstract class Binding extends AbstractSecurityAssertion implements AlgorithmWrapper {
@@ -126,8 +130,10 @@ public abstract class Binding extends AbstractSecurityAssertion implements Algor
         if (isIncludeTimestamp()) {
             timestampAssertionStates.add(new IncludeTimeStampAssertionState(this, false));
 
-            Collection<AssertionState> signedElementAssertionStates = assertionStateMap.get(SecurityEvent.Event.SignedElement);
-            signedElementAssertionStates.add(new SignedElementAssertionState(this, false, Constants.TAG_wsu_Timestamp));
+            Collection<AssertionState> signedPartsAssertionStates = assertionStateMap.get(SecurityEvent.Event.SignedPart);
+            List<QName> qNames = new ArrayList<QName>();
+            qNames.add(Constants.TAG_wsu_Timestamp);
+            signedPartsAssertionStates.add(new SignedPartAssertionState(this, false, qNames));
         } else {
             timestampAssertionStates.add(new IncludeTimeStampAssertionState(this, true));
         }
@@ -151,69 +157,4 @@ public abstract class Binding extends AbstractSecurityAssertion implements Algor
         }
         return isAsserted;
     }
-
-    /*
-    private boolean timestampIsPresent = false;
-    private boolean timestampIsProtected = false;
-
-    @Override
-    public void assertPolicy(SecurityEvent securityEvent) throws PolicyViolationException {
-        //ws-securitypolicy-1.3-spec: 6.2 [Timestamp] Property
-
-        switch (securityEvent.getSecurityEventType()) {
-            case Timestamp:
-                if (isIncludeTimestamp()) {
-                    timestampIsPresent = true;
-                } else {
-                    throw new PolicyViolationException("Timestamp must not be present");
-                }
-                break;
-
-            case SignedElement:
-                SignedElementSecurityEvent signedElementSecurityEvent = (SignedElementSecurityEvent) securityEvent;
-                if (signedElementSecurityEvent.getElement().equals(Constants.TAG_wsu_Timestamp)) {
-                    timestampIsProtected = true;
-                }
-                break;
-        }
-
-        if (getAlgorithmSuite() != null) {
-            getAlgorithmSuite().assertPolicy(securityEvent);
-        }
-        if (getLayout() != null) {
-            getLayout().assertPolicy(securityEvent);
-        }
-        if (getSignedSupportingToken() != null) {
-            getSignedSupportingToken().assertPolicy(securityEvent);
-        }
-        if (getSignedEndorsingSupportingTokens() != null) {
-            getSignedEndorsingSupportingTokens().assertPolicy(securityEvent);
-        }
-    }
-
-    @Override
-    public boolean isAsserted() {
-
-        boolean isAsserted = true;
-
-        if (isIncludeTimestamp() && (!timestampIsPresent || !timestampIsProtected)) {
-            isAsserted &= false;
-        }
-
-        if (getAlgorithmSuite() != null) {
-            isAsserted &= getAlgorithmSuite().isAsserted();
-        }
-        if (getLayout() != null) {
-            isAsserted &= getLayout().isAsserted();
-        }
-        if (getSignedSupportingToken() != null) {
-            isAsserted &= getSignedSupportingToken().isAsserted();
-        }
-        if (getSignedEndorsingSupportingTokens() != null) {
-            isAsserted &= getSignedEndorsingSupportingTokens().isAsserted();
-        }
-
-        return isAsserted;
-    }
-    */
 }

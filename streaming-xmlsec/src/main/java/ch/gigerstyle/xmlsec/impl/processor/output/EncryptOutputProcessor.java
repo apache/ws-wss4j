@@ -226,6 +226,8 @@ public class EncryptOutputProcessor extends AbstractOutputProcessor {
             Map<QName, String> attributes = new HashMap<QName, String>();
             attributes.put(Constants.ATT_NULL_Id, encryptionPartDef.getEncRefId());
             attributes.put(Constants.ATT_NULL_Type, encryptionPartDef.getModifier().getModifier());
+            //todo WSS 1.0 says that encrypted header elements should wrap this in an EncryptedHeader Element
+            //todo and copies attributes like actor mustUnderstand etc to it!
             createStartElementAndOutputAsEvent(outputProcessorChain, Constants.TAG_xenc_EncryptedData, attributes);
 
             attributes = new HashMap<QName, String>();

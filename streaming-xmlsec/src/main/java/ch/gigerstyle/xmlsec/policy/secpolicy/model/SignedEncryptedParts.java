@@ -16,7 +16,8 @@
 
 package ch.gigerstyle.xmlsec.policy.secpolicy.model;
 
-import ch.gigerstyle.xmlsec.policy.assertionStates.AssertionState;
+import ch.gigerstyle.xmlsec.ext.Constants;
+import ch.gigerstyle.xmlsec.policy.assertionStates.*;
 import ch.gigerstyle.xmlsec.policy.secpolicy.SPConstants;
 import ch.gigerstyle.xmlsec.securityEvent.SecurityEvent;
 import org.apache.neethi.PolicyComponent;
@@ -24,10 +25,7 @@ import org.apache.neethi.PolicyComponent;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 
 public class SignedEncryptedParts extends AbstractSecurityAssertion {
 
@@ -80,7 +78,7 @@ public class SignedEncryptedParts extends AbstractSecurityAssertion {
     }
 
     /**
-     * @param headers The headers to set.
+     * @param header The headers to set.
      */
     public void addHeader(Header header) {
         this.headers.add(header);
@@ -153,22 +151,45 @@ public class SignedEncryptedParts extends AbstractSecurityAssertion {
 
     @Override
     public SecurityEvent.Event[] getResponsibleAssertionEvents() {
-        //todo
-        return new SecurityEvent.Event[0];
+        if (isSignedParts()) {
+            return new SecurityEvent.Event[]{SecurityEvent.Event.SignedPart};
+        } else {
+            return new SecurityEvent.Event[]{SecurityEvent.Event.EncryptedPart};
+        }
     }
 
     @Override
     public void getAssertions(Map<SecurityEvent.Event, Collection<AssertionState>> assertionStateMap) {
-        //todo
-    }
-    /*
-    @Override
-    public void assertPolicy(SecurityEvent securityEvent) throws PolicyViolationException {
+        //here we add just one AssertionState for all Parts to get a fail-fast behavior
+        //when we add multiple AssertionStates some of them return true, becauce they don't match
+        //as a result the policy is temporary satisfied for the current event and can only be falsified at last 
+        if (isSignedParts()) {
+            Collection<AssertionState> signedPartsAssertionStates = assertionStateMap.get(SecurityEvent.Event.SignedPart);
+            List<QName> qNames = getQNamesFromHeaders();
+            if (isBody()) {
+                qNames.add(Constants.TAG_soap11_Body);
+            }
+            signedPartsAssertionStates.add(new SignedPartAssertionState(this, true, qNames));
+        } else {
+            Collection<AssertionState> encryptedPartsAssertionStates = assertionStateMap.get(SecurityEvent.Event.EncryptedPart);
+            List<QName> qNames = getQNamesFromHeaders();
+            if (isBody()) {
+                qNames.add(Constants.TAG_soap11_Body);
+            }
+            encryptedPartsAssertionStates.add(new EncryptedPartAssertionState(this, true, qNames));
+        }
     }
 
-    @Override
-    public boolean isAsserted() {
-        return true;
+    private List<QName> getQNamesFromHeaders() {
+        List<QName> qNames = new ArrayList<QName>(headers.size());
+        for (int i = 0; i < headers.size(); i++) {
+            Header header = (Header) headers.get(i);
+            String localName = header.getName();
+            if (localName == null) {
+                localName = "*";
+            }
+            qNames.add(new QName(header.getNamespace(), localName));
+        }
+        return qNames;
     }
-    */
 }

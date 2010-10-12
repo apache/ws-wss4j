@@ -124,7 +124,7 @@ public class SignedInfoType implements Parseable {
     }
 
     public void validate() throws ParseException {
-        if (canonicalizationMethod == null || signatureMethod == null || reference.size() == 0) {
+        if (canonicalizationMethod == null || signatureMethod == null || getReference().size() == 0) {
             throw new ParseException("Element \"CanonicalizationMethod\"|\"SignatureMethod\"|\"Reference\" is missing");
         }
     }

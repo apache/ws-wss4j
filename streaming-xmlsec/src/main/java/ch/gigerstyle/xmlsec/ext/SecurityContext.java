@@ -42,4 +42,16 @@ public interface SecurityContext {
     public void setSecurityEventListener(SecurityEventListener securityEventListener);
 
     public void registerSecurityEvent(SecurityEvent securityEvent) throws XMLSecurityException;
+
+    public void setIsInEncryptedContent();
+
+    public void unsetIsInEncryptedContent();
+
+    public boolean isInEncryptedContent();
+
+    public void setIsInSignedContent();
+
+    public void unsetIsInSignedContent();
+
+    public boolean isInSignedContent();
 }

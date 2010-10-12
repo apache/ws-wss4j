@@ -17,6 +17,8 @@
 package ch.gigerstyle.xmlsec.policy.secpolicy.model;
 
 import ch.gigerstyle.xmlsec.policy.assertionStates.AssertionState;
+import ch.gigerstyle.xmlsec.policy.assertionStates.EncryptedElementAssertionState;
+import ch.gigerstyle.xmlsec.policy.assertionStates.SignedElementAssertionState;
 import ch.gigerstyle.xmlsec.policy.secpolicy.SPConstants;
 import ch.gigerstyle.xmlsec.securityEvent.SecurityEvent;
 import org.apache.neethi.PolicyComponent;
@@ -38,10 +40,10 @@ public class SignedEncryptedElements extends AbstractSecurityAssertion {
      * Just a flag to identify whether this holds sign element info or encr
      * elements info
      */
-    private boolean signedElemets;
+    private boolean signedElements;
 
     public SignedEncryptedElements(boolean signedElements, SPConstants spConstants) {
-        this.signedElemets = signedElements;
+        this.signedElements = signedElements;
         setVersion(spConstants);
     }
 
@@ -71,10 +73,10 @@ public class SignedEncryptedElements extends AbstractSecurityAssertion {
     }
 
     /**
-     * @return Returns the signedElemets.
+     * @return Returns the signedElements.
      */
-    public boolean isSignedElemets() {
-        return signedElemets;
+    public boolean isSignedElements() {
+        return signedElements;
     }
 
     public HashMap getDeclaredNamespaces() {
@@ -132,7 +134,7 @@ public class SignedEncryptedElements extends AbstractSecurityAssertion {
     }
 
     public QName getName() {
-        if (signedElemets) {
+        if (signedElements) {
             return spConstants.getSignedElements();
         }
         return spConstants.getEncryptedElements();
@@ -144,22 +146,40 @@ public class SignedEncryptedElements extends AbstractSecurityAssertion {
 
     @Override
     public SecurityEvent.Event[] getResponsibleAssertionEvents() {
-        //todo
-        return new SecurityEvent.Event[0];
+        if (isSignedElements()) {
+            return new SecurityEvent.Event[]{SecurityEvent.Event.SignedElement};
+        } else {
+            return new SecurityEvent.Event[]{SecurityEvent.Event.EncryptedElement};
+        }
     }
 
     @Override
     public void getAssertions(Map<SecurityEvent.Event, Collection<AssertionState>> assertionStateMap) {
-        //todo
-    }
-    /*
-    @Override
-    public void assertPolicy(SecurityEvent securityEvent) throws PolicyViolationException {
+        if (isSignedElements()) {
+            Collection<AssertionState> signedElementAssertionStates = assertionStateMap.get(SecurityEvent.Event.SignedElement);
+            signedElementAssertionStates.add(new SignedElementAssertionState(this, true, getQNamesFromXPath()));
+        } else {
+            Collection<AssertionState> encryptedElementAssertionStates = assertionStateMap.get(SecurityEvent.Event.EncryptedElement);
+            encryptedElementAssertionStates.add(new EncryptedElementAssertionState(this, true, getQNamesFromXPath()));
+        }
     }
 
-    @Override
-    public boolean isAsserted() {
-        return true;
+    private List<QName> getQNamesFromXPath() {
+        List<QName> qNames = new ArrayList<QName>(xPathExpressions.size());
+        for (int i = 0; i < xPathExpressions.size(); i++) {
+            String s = (String) xPathExpressions.get(i);
+            String prefix;
+            String localName;
+            if (s.contains(":")) {
+                int idx = s.indexOf(":");
+                prefix = s.substring(0, idx);
+                localName = s.substring(idx + 1);
+            } else {
+                prefix = "";
+                localName = s;
+            }
+            qNames.add(new QName((String)declaredNamespaces.get(prefix), localName));
+        }
+        return qNames;
     }
-    */
 }

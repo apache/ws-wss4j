@@ -89,6 +89,8 @@ public abstract class AbstractInputProcessor implements InputProcessor {
     }
 
     public QName getLastStartElementName() {
+        //todo this semantics of lastStartElement is not correct. e.g. the lastStartElement
+        // in the document is set until the end of the document. we need a stack! 
         return lastStartElementName;
     }
 }

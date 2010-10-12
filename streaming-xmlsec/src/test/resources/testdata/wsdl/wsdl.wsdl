@@ -81,31 +81,54 @@
                         <sp:OnlySignEntireHeadersAndBody/>
                     </wsp12:Policy>
                 </sp:AsymmetricBinding>
+                <sp:SignedParts>
+                    <sp:Header Name="Header1" Namespace="..."/>
+                    <sp:Header Namespace="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"/>
+                    <sp:Body/>
+                </sp:SignedParts>
+                <sp:SignedElements>
+                    <sp:XPath xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">wsu:Created</sp:XPath>
+                </sp:SignedElements>
+                <sp:EncryptedParts>
+                    <sp:Header Name="Header2" Namespace="..."/>
+                    <sp:Header Namespace="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"/>
+                </sp:EncryptedParts>
+                <sp:EncryptedElements>
+                    <sp:XPath xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">wsu:Created</sp:XPath>
+                </sp:EncryptedElements>
+                <sp:ContentEncryptedElements>
+                    <sp:XPath xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">wsu:Expires</sp:XPath>
+                </sp:ContentEncryptedElements>
             </wsp12:All>
             <wsp12:All>
                 <sp:AsymmetricBinding>
                     <wsp12:Policy>
-                        <sp:RecipientToken>
-                            <wsp12:Policy>
-                              <sp:X509Token sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient">
-                                  <sp:IssuerName>2.5.4.5=#130134,CN=RefApp Receiver,O=Swissdec,C=CH</sp:IssuerName>
-                                  <wsp12:Policy>
-                                      <!--
-                                      <sp:RequireIssuerSerialReference/>
-                                      -->
-                                      <sp:WssX509V3Token11/>
-                                  </wsp12:Policy>
-                              </sp:X509Token>
-                            </wsp12:Policy>
-                         </sp:RecipientToken>
                         <sp:AlgorithmSuite>
                             <wsp12:Policy>
-                                <sp:Basic256/>
+                                <sp:Basic256Rsa15/>
                             </wsp12:Policy>
                         </sp:AlgorithmSuite>
-                        <sp:IncludeTimestamp/>
+                        <!--<sp:IncludeTimestamp/>-->
                     </wsp12:Policy>
                 </sp:AsymmetricBinding>
+                <sp:SignedParts>
+                    <sp:Header Name="Header1" Namespace="..."/>
+                    <sp:Header Namespace="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsds"/>
+                </sp:SignedParts>
+                <sp:SignedElements>
+                    <sp:XPath xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">wsu:Create</sp:XPath>
+                </sp:SignedElements>
+                <sp:EncryptedParts>
+                    <sp:Header Name="Header2" Namespace="..."/>
+                    <sp:Header Namespace="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsds"/>
+                    <sp:Body/>
+                </sp:EncryptedParts>
+                <sp:EncryptedElements>
+                    <sp:XPath xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">wsu:Create</sp:XPath>
+                </sp:EncryptedElements>
+                <sp:ContentEncryptedElements>
+                    <sp:XPath xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">wsu:Expire</sp:XPath>
+                </sp:ContentEncryptedElements>
             </wsp12:All>
         </wsp12:ExactlyOne>
     </wsp12:Policy>
@@ -128,20 +151,6 @@
     <wsp12:Policy wsu:Id="OperationPolicy1">
     </wsp12:Policy>
     <wsp12:Policy wsu:Id="InputPolicy1">
-<!--        <wsp12:ExactlyOne>
-            <wsp12:All>
-                <sp:AsymmetricBinding>
-                    <wsp12:Policy>
-                        <sp:AlgorithmSuite>
-                            <wsp12:Policy>
-                                <sp:Basic256Rsa15/>
-                            </wsp12:Policy>
-                        </sp:AlgorithmSuite>
-                    </wsp12:Policy>
-                </sp:AsymmetricBinding>
-            </wsp12:All>
-        </wsp12:ExactlyOne>
--->
     </wsp12:Policy>
     <wsp12:Policy wsu:Id="OutputPolicy1">
     </wsp12:Policy>
