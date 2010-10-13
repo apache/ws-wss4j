@@ -34,33 +34,43 @@ public class OutputProcessorChainImpl implements OutputProcessorChain {
 
     protected static final transient Log log = LogFactory.getLog(OutputProcessorChainImpl.class);
 
-    List<OutputProcessor> outputProcessors = Collections.synchronizedList(new ArrayList<OutputProcessor>());
-    int pos = 0;
+    private List<OutputProcessor> outputProcessors = Collections.synchronizedList(new ArrayList<OutputProcessor>());
+    private int startPos = 0;
+    private int curPos = 0;
 
-    SecurityContext securityContext;
+    private SecurityContext securityContext;
 
     public OutputProcessorChainImpl(SecurityContext securityContext) {
+        this(securityContext, 0);
+    }
+
+    public OutputProcessorChainImpl(SecurityContext securityContext, int startPos) {
         this.securityContext = securityContext;
+        this.curPos = this.startPos = startPos;
     }
 
-    public int getPos() {
-        return pos;
+    public int getCurPos() {
+        return curPos;
     }
 
-    public void setPos(int pos) {
-        this.pos = pos;
+    public void setCurPos(int curPos) {
+        this.curPos = curPos;
     }
 
     public int getPosAndIncrement() {
-        return this.pos++;
+        return this.curPos++;
     }
 
     public void reset() {
-        setPos(0);
+        setCurPos(startPos);
     }
 
     public SecurityContext getSecurityContext() {
         return this.securityContext;
+    }
+
+    private void setOutputProcessors(List<OutputProcessor> outputProcessors) {
+        this.outputProcessors = outputProcessors;
     }
 
     public void addProcessor(OutputProcessor newOutputProcessor) {
@@ -146,11 +156,9 @@ public class OutputProcessorChainImpl implements OutputProcessorChain {
 
     public void removeProcessor(OutputProcessor outputProcessor) {
         log.debug("Removing processor " + outputProcessor.getClass().getName() + " from output chain");
-        if (this.outputProcessors.indexOf(outputProcessor) <= getPos()) {
-            this.pos--;
+        if (this.outputProcessors.indexOf(outputProcessor) <= getCurPos()) {
+            this.curPos--;
         }
-
-        //System.out.println("Removing proc " + outputProcessor.getClass().getName() + " from pos " + outputProcessors.indexOf(outputProcessor));
         this.outputProcessors.remove(outputProcessor);
     }
 
@@ -163,22 +171,9 @@ public class OutputProcessorChainImpl implements OutputProcessorChain {
     }
 
     public OutputProcessorChain createSubChain(OutputProcessor outputProcessor) throws XMLStreamException, XMLSecurityException {
-        //System.out.println("Creating subprocessor chain for proc " + outputProcessor.getClass().getName() + " at pos " + (outputProcessors.indexOf(outputProcessor) + 1));
-        return new OutputProcessorSubChainImpl(securityContext, outputProcessors.indexOf(outputProcessor) + 1, this.outputProcessors);
-    }
-
-    class OutputProcessorSubChainImpl extends OutputProcessorChainImpl {
-        private int startPos;
-
-        OutputProcessorSubChainImpl(SecurityContext securityContext, int pos, List<OutputProcessor> outputProcessors) {
-            super(securityContext);
-            this.startPos = this.pos = pos;
-            //we don't clone the list to get updates in the sublist too!
-            this.outputProcessors = outputProcessors;
-        }
-
-        public void reset() {
-            this.pos = startPos;
-        }
+        //we don't clone the processor-list to get updates in the sublist too!
+        OutputProcessorChainImpl outputProcessorChain = new OutputProcessorChainImpl(securityContext, outputProcessors.indexOf(outputProcessor) + 1);
+        outputProcessorChain.setOutputProcessors(this.outputProcessors);
+        return outputProcessorChain;
     }
 }
