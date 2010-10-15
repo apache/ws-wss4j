@@ -41,8 +41,6 @@ import org.apache.ws.security.message.token.X509Security;
 import org.apache.ws.security.util.UUIDGenerator;
 import org.apache.ws.security.util.WSSecurityUtil;
 
-import org.apache.xml.security.keys.KeyInfo;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Text;
@@ -247,7 +245,6 @@ public class WSSecEncryptedKey extends WSSecBase {
         }
         encryptedKeyElement.setAttributeNS(null, "Id", encKeyId);
 
-        KeyInfo keyInfo = new KeyInfo(document);
         SecurityTokenReference secToken = new SecurityTokenReference(document);
 
         switch (keyIdentifierType) {
@@ -296,11 +293,14 @@ public class WSSecEncryptedKey extends WSSecBase {
         default:
             throw new WSSecurityException(WSSecurityException.FAILURE, "unsupportedKeyId");
         }
-        keyInfo.addUnknownElement(secToken.getElement());
-        Element keyInfoElement = keyInfo.getElement();
+        Element keyInfoElement = 
+            document.createElementNS(
+                WSConstants.SIG_NS, WSConstants.SIG_PREFIX + ":" + WSConstants.KEYINFO_LN
+            );
         keyInfoElement.setAttributeNS(
             WSConstants.XMLNS_NS, "xmlns:" + WSConstants.SIG_PREFIX, WSConstants.SIG_NS
         );
+        keyInfoElement.appendChild(secToken.getElement());
         encryptedKeyElement.appendChild(keyInfoElement);
 
         Element xencCipherValue = createCipherValue(document, encryptedKeyElement);

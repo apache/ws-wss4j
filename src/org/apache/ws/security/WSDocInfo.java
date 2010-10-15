@@ -49,6 +49,7 @@ public class WSDocInfo {
     List bstList = null;
     Element assertion = null;
     List processors = null;
+    List securityTokenReferences = null;
 
     public WSDocInfo(Document doc) {
         //
@@ -60,6 +61,35 @@ public class WSDocInfo {
         // will not work. 
         //
         this.doc = doc.getDocumentElement().getOwnerDocument();
+    }
+    
+    /**
+     * Set a SecurityTokenReference element.
+     */
+    public void setSecurityTokenReference(Element securityTokenRef) {
+        if (securityTokenReferences == null) {
+            securityTokenReferences = new Vector();
+        }
+        securityTokenReferences.add(securityTokenRef);
+    }
+    
+    /**
+     * Get a SecurityTokenReference for the given (wsu) Id
+     *
+     * @param uri is the relative uri (starts with #) of the id
+     * @return the STR element or null if nothing found
+     */
+    public Element getSecurityTokenReference(String uri) {
+        if (securityTokenReferences != null) {
+            for (Iterator iter = securityTokenReferences.iterator(); iter.hasNext();) {
+                Element elem = (Element)iter.next();
+                String cId = elem.getAttributeNS(WSConstants.WSU_NS, "Id");
+                if (uri.equals(cId)) {
+                    return elem;
+                }
+            }
+        }
+        return null;
     }
 
     /**

@@ -55,7 +55,10 @@ import javax.xml.crypto.dsig.SignedInfo;
 import javax.xml.crypto.dsig.XMLSignContext;
 import javax.xml.crypto.dsig.XMLSignatureFactory;
 import javax.xml.crypto.dsig.dom.DOMSignContext;
+import javax.xml.crypto.dsig.keyinfo.KeyInfo;
 import javax.xml.crypto.dsig.keyinfo.KeyInfoFactory;
+import javax.xml.crypto.dsig.keyinfo.KeyValue;
+import javax.xml.crypto.dsig.keyinfo.X509Data;
 import javax.xml.crypto.dsig.spec.C14NMethodParameterSpec;
 import javax.xml.crypto.dsig.spec.ExcC14NParameterSpec;
 
@@ -70,6 +73,8 @@ public class WSSecSignatureSAML extends WSSecSignature {
     private Crypto issuerCrypto = null;
     private String issuerKeyName = null;
     private String issuerKeyPW = null;
+    
+    private KeyInfoFactory keyInfoFactory = KeyInfoFactory.getInstance("DOM");
 
     /**
      * Constructor.
@@ -260,22 +265,26 @@ public class WSSecSignatureSAML extends WSSecSignature {
             }
             Element e = samlSubj.getKeyInfo();
             try {
-                org.apache.xml.security.keys.KeyInfo ki = 
-                    new org.apache.xml.security.keys.KeyInfo(e, null);
+                XMLStructure keyInfoStructure = new DOMStructure(e);
+                KeyInfo keyInfo = keyInfoFactory.unmarshalKeyInfo(keyInfoStructure);
+                List list = keyInfo.getContent();
 
-                if (ki.containsX509Data()) {
-                    org.apache.xml.security.keys.content.X509Data data = ki.itemX509Data(0);
-                    org.apache.xml.security.keys.content.x509.XMLX509Certificate certElem = null;
-                    if (data != null && data.containsCertificate()) {
-                        certElem = data.itemCertificate(0);
+                for (int i = 0; i < list.size(); i++) {
+                    XMLStructure xmlStructure = (XMLStructure) list.get(i);
+                    if (xmlStructure instanceof KeyValue) {
+                        publicKey = ((KeyValue)xmlStructure).getPublicKey();
+                        break;
+                    } else if (xmlStructure instanceof X509Data) {
+                        List x509Data = ((X509Data)xmlStructure).getContent();
+                        for (int j = 0; j < x509Data.size(); j++) {
+                            Object x509obj = x509Data.get(j);
+                            if (x509obj instanceof X509Certificate) {
+                                certs = new X509Certificate[1];
+                                certs[0] = (X509Certificate)x509obj;
+                                break;
+                            }
+                        }
                     }
-                    if (certElem != null) {
-                        X509Certificate cert = certElem.getX509Certificate();
-                        certs = new X509Certificate[1];
-                        certs[0] = cert;
-                    }
-                } else if (ki.containsKeyValue()) {
-                    publicKey = ki.getPublicKey();
                 }
                 // TODO: get alias name for cert, check against username set by
                 // caller
@@ -376,6 +385,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
                     ref.setValueType(WSConstants.WSS_SAML_KI_VALUE_TYPE);
                     secRefSaml.setReference(ref);
                 }
+                wsDocInfo.setSecurityTokenReference(secRefSaml.getElement());
             }
         } catch (Exception ex) {
             throw new WSSecurityException(
@@ -427,6 +437,8 @@ public class WSSecSignatureSAML extends WSSecSignature {
             }
         }
         XMLStructure structure = new DOMStructure(secRef.getElement());
+        wsDocInfo.setSecurityTokenReference(secRef.getElement());
+
         keyInfo = 
             keyInfoFactory.newKeyInfo(
                 java.util.Collections.singletonList(structure), keyInfoUri

@@ -35,6 +35,7 @@ import org.w3c.dom.Document;
 import java.util.List;
 import java.util.Vector;
 
+import javax.xml.crypto.URIDereferencer;
 import javax.xml.crypto.XMLStructure;
 import javax.xml.crypto.dom.DOMStructure;
 import javax.xml.crypto.dsig.CanonicalizationMethod;
@@ -215,6 +216,9 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
                     WSConstants.C14N_EXCL_OMIT_COMMENTS_PREFIX
                 );
             }
+            URIDereferencer dereferencer = new DOMURIDereferencer();
+            ((DOMURIDereferencer)dereferencer).setWsDocInfo(wsDocInfo);
+            signContext.setURIDereferencer(new DOMURIDereferencer());
             sig.sign(signContext);
             
             signatureValue = sig.getSignatureValue().getValue();

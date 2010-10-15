@@ -20,7 +20,9 @@
 package org.apache.ws.security.message.token;
 
 import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.util.DOM2Writer;
+import org.apache.ws.security.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -30,6 +32,22 @@ import org.w3c.dom.Node;
  */
 public final class DOMX509Data {
     private final Element element;
+    private DOMX509IssuerSerial x509IssuerSerial;
+    
+    /**
+     * Constructor.
+     */
+    public DOMX509Data(Element x509DataElement) throws WSSecurityException {
+        element = x509DataElement;
+        //
+        // Parse X509IssuerSerial child
+        //
+        Element issuerSerialElement = 
+            WSSecurityUtil.getDirectChildElement(
+                element, WSConstants.X509_ISSUER_SERIAL_LN, WSConstants.SIG_NS
+            );
+        x509IssuerSerial = new DOMX509IssuerSerial(issuerSerialElement);
+    }
 
     /**
      * Constructor.
@@ -43,6 +61,22 @@ public final class DOMX509Data {
         element.appendChild(domIssuerSerial.getElement());
     }
     
+    /**
+     * Return true if this X509Data element contains a X509IssuerSerial element
+     */
+    public boolean containsIssuerSerial() {
+        if (x509IssuerSerial == null) {
+            return false;
+        }
+        return true;
+    }
+    
+    /**
+     * Return a DOMX509IssuerSerial object in this X509Data structure
+     */
+    public DOMX509IssuerSerial getIssuerSerial() {
+        return x509IssuerSerial;
+    }
 
     /**
      * return the dom element.

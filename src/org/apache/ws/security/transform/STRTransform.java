@@ -28,7 +28,6 @@ import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.xml.security.signature.XMLSignatureInput;
 
 import org.jcp.xml.dsig.internal.dom.ApacheData;
-import org.jcp.xml.dsig.internal.dom.ApacheOctetStreamData;
 import org.jcp.xml.dsig.internal.dom.DOMSubTreeData;
 import org.jcp.xml.dsig.internal.dom.DOMUtils;
 
@@ -219,7 +218,7 @@ public class STRTransform extends TransformService {
                 output.updateOutputStream(os);
                 return null;
             }
-            return new ApacheOctetStreamData(output);
+            return new OctetStreamData(output.getOctetStream());
         } catch (Exception ex) {
             throw new TransformException(ex);
         }

@@ -35,6 +35,7 @@ import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.WSUsernameTokenPrincipal;
 import org.apache.ws.security.components.crypto.Crypto;
+import org.apache.ws.security.message.DOMURIDereferencer;
 import org.apache.ws.security.message.token.BinarySecurity;
 import org.apache.ws.security.message.token.DerivedKeyToken;
 import org.apache.ws.security.message.token.PKIPathSecurity;
@@ -57,6 +58,7 @@ import javax.security.auth.callback.CallbackHandler;
 
 import javax.xml.crypto.MarshalException;
 import javax.xml.crypto.NodeSetData;
+import javax.xml.crypto.URIDereferencer;
 import javax.xml.crypto.XMLStructure;
 import javax.xml.crypto.dom.DOMStructure;
 import javax.xml.crypto.dsig.Reference;
@@ -390,6 +392,9 @@ public class SignatureProcessor implements Processor {
         }
         XMLValidateContext context = new DOMValidateContext(key, elem);
         context.setProperty("javax.xml.crypto.dsig.cacheReference", Boolean.TRUE);
+        URIDereferencer dereferencer = new DOMURIDereferencer();
+        ((DOMURIDereferencer)dereferencer).setWsDocInfo(wsDocInfo);
+        context.setURIDereferencer(new DOMURIDereferencer());
         try {
             XMLSignature xmlSignature = signatureFactory.unmarshalXMLSignature(context);
             boolean signatureOk = xmlSignature.validate(context);

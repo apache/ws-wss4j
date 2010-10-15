@@ -152,6 +152,8 @@ public class WSConstants {
     public static final String X509_SERIAL_NUMBER_LN = "X509SerialNumber";
     public static final String X509_DATA_LN = "X509Data";
     public static final String X509_CERT_LN = "X509Certificate";
+    public static final String KEYINFO_LN = "KeyInfo";
+    public static final String KEYVALUE_LN = "KeyValue";
     
     public static final String ELEM_ENVELOPE = "Envelope";
     public static final String ELEM_HEADER = "Header";

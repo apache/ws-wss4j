@@ -22,15 +22,10 @@ package org.apache.ws.security.saml;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
-import org.apache.xml.security.exceptions.XMLSecurityException;
-import org.apache.xml.security.keys.KeyInfo;
-import org.apache.xml.security.keys.content.X509Data;
-import org.apache.xml.security.keys.content.keyvalues.DSAKeyValue;
-import org.apache.xml.security.keys.content.keyvalues.RSAKeyValue;
-import org.apache.xml.security.signature.XMLSignature;
 import org.opensaml.SAMLAssertion;
 import org.opensaml.SAMLAuthenticationStatement;
 import org.opensaml.SAMLException;
@@ -40,12 +35,21 @@ import org.opensaml.SAMLSubject;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import java.security.KeyException;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Properties;
+
+import javax.xml.crypto.MarshalException;
+import javax.xml.crypto.XMLStructure;
+import javax.xml.crypto.dom.DOMStructure;
+import javax.xml.crypto.dsig.keyinfo.KeyInfo;
+import javax.xml.crypto.dsig.keyinfo.KeyInfoFactory;
+import javax.xml.crypto.dsig.keyinfo.KeyValue;
+import javax.xml.crypto.dsig.keyinfo.X509Data;
 
 /**
  * Builds a WS SAML Assertion and inserts it into the SOAP Envelope. Refer to
@@ -72,6 +76,9 @@ public class SAMLIssuerImpl implements SAMLIssuer {
     private String[] confirmationMethods = new String[1];
     private Crypto userCrypto = null;
     private String username = null;
+    
+    private KeyInfoFactory keyInfoFactory = KeyInfoFactory.getInstance("DOM");
+    private WSSConfig wssConfig = WSSConfig.getDefaultWSConfig();
     
     /**
      * Flag indicating what format to put the subject's key material in when
@@ -183,53 +190,60 @@ public class SAMLIssuerImpl implements SAMLIssuer {
                             Arrays.asList(statements));
 
             if (!senderVouches) {
-                KeyInfo ki = new KeyInfo(instanceDoc);
+                KeyInfo keyInfo = null;
                 try {
                     X509Certificate[] certs =
                             userCrypto.getCertificates(username);
+                    String keyInfoUri = 
+                        wssConfig.getIdAllocator().createSecureId("KI-", keyInfo);
                     if (sendKeyValue) {
                         PublicKey key = certs[0].getPublicKey();
-                        String pubKeyAlgo = key.getAlgorithm();
-                        
-                        if ("DSA".equalsIgnoreCase(pubKeyAlgo)) {
-                            DSAKeyValue dsaKeyValue = new DSAKeyValue(instanceDoc, key);
-                            ki.add(dsaKeyValue);
-                        } else if ("RSA".equalsIgnoreCase(pubKeyAlgo)) {
-                            RSAKeyValue rsaKeyValue = new RSAKeyValue(instanceDoc, key);
-                            ki.add(rsaKeyValue);
-                        }
+                        KeyValue keyValue = keyInfoFactory.newKeyValue(key);
+                        keyInfo = 
+                            keyInfoFactory.newKeyInfo(
+                                java.util.Collections.singletonList(keyValue), keyInfoUri
+                            );
                     } else {
-                        X509Data certElem = new X509Data(instanceDoc);
-                        certElem.addCertificate(certs[0]);
-                        ki.add(certElem);
+                        X509Data x509Data = 
+                            keyInfoFactory.newX509Data(java.util.Collections.singletonList(certs[0]));
+                        keyInfo = 
+                            keyInfoFactory.newKeyInfo(
+                                java.util.Collections.singletonList(x509Data), keyInfoUri
+                            );
                     }
+                    
+                    Element keyInfoParent = instanceDoc.createElement("KeyInfoParent");
+                    XMLStructure structure = new DOMStructure(keyInfoParent);
+                    keyInfo.marshal(structure, null);
+                    Element keyInfoElement = (Element)keyInfoParent.getFirstChild();
+                    subject.setKeyInfo(keyInfoElement);
                 } catch (WSSecurityException ex) {
                     if (log.isDebugEnabled()) {
                         log.debug(ex.getMessage(), ex);
                     }
                     return null;
-                } catch (XMLSecurityException ex) {
+                } catch (MarshalException ex) {
+                    if (log.isDebugEnabled()) {
+                        log.debug(ex.getMessage(), ex);
+                    }
+                    return null;
+                } catch (KeyException ex) {
                     if (log.isDebugEnabled()) {
                         log.debug(ex.getMessage(), ex);
                     }
                     return null;
                 }
-                Element keyInfoElement = ki.getElement();
-                keyInfoElement.setAttributeNS(WSConstants.XMLNS_NS, "xmlns:"
-                        + WSConstants.SIG_PREFIX, WSConstants.SIG_NS);
-
-                subject.setKeyInfo(ki);
                 // prepare to sign the SAML token
                 try {
                     X509Certificate[] issuerCerts =
                             issuerCrypto.getCertificates(issuerKeyName);
 
-                    String sigAlgo = XMLSignature.ALGO_ID_SIGNATURE_RSA;
+                    String sigAlgo = WSConstants.RSA_SHA1;
                     String pubKeyAlgo =
                             issuerCerts[0].getPublicKey().getAlgorithm();
                     log.debug("automatic sig algo detection: " + pubKeyAlgo);
                     if (pubKeyAlgo.equalsIgnoreCase("DSA")) {
-                        sigAlgo = XMLSignature.ALGO_ID_SIGNATURE_DSA;
+                        sigAlgo = WSConstants.DSA;
                     }
                     java.security.Key issuerPK =
                             issuerCrypto.getPrivateKey(issuerKeyName,

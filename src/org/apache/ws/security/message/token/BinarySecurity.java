@@ -159,16 +159,16 @@ public class BinarySecurity {
      */
     public byte[] getToken() {
         Node node = element.getFirstChild();
-        StringBuffer buffer = new StringBuffer();
+        StringBuilder builder = new StringBuilder();
         while (node != null) {
             if (Node.TEXT_NODE == node.getNodeType()) {
-                buffer.append(((Text)node).getData());
+                builder.append(((Text)node).getData());
             }
             node = node.getNextSibling();
         }
                 
         try {
-            return Base64.decode(buffer.toString());
+            return Base64.decode(builder.toString());
         } catch (Exception ex) {
             if (LOG.isDebugEnabled()) {
                 LOG.debug(ex.getMessage(), ex);

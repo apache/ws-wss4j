@@ -46,6 +46,7 @@ import java.security.cert.X509Certificate;
 import java.util.List;
 import java.util.Vector;
 
+import javax.xml.crypto.URIDereferencer;
 import javax.xml.crypto.XMLStructure;
 import javax.xml.crypto.dom.DOMStructure;
 import javax.xml.crypto.dsig.CanonicalizationMethod;
@@ -246,6 +247,7 @@ public class WSSecSignature extends WSSecSignatureBase {
         }
         if (keyIdentifierType != WSConstants.KEY_VALUE) {
             XMLStructure structure = new DOMStructure(secRef.getElement());
+            wsDocInfo.setSecurityTokenReference(secRef.getElement());
             keyInfo = 
                 keyInfoFactory.newKeyInfo(
                     java.util.Collections.singletonList(structure), keyInfoUri
@@ -412,6 +414,9 @@ public class WSSecSignature extends WSSecSignatureBase {
                     WSConstants.C14N_EXCL_OMIT_COMMENTS_PREFIX
                 );
             }
+            URIDereferencer dereferencer = new DOMURIDereferencer();
+            ((DOMURIDereferencer)dereferencer).setWsDocInfo(wsDocInfo);
+            signContext.setURIDereferencer(new DOMURIDereferencer());
             sig.sign(signContext);
             
             signatureValue = sig.getSignatureValue().getValue();

@@ -29,10 +29,6 @@ import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.processor.EncryptedKeyProcessor;
 import org.apache.ws.security.util.Base64;
 import org.apache.ws.security.util.WSSecurityUtil;
-import org.apache.xml.security.exceptions.XMLSecurityException;
-import org.apache.xml.security.keys.KeyInfo;
-import org.apache.xml.security.keys.content.X509Data;
-import org.apache.xml.security.keys.content.x509.XMLX509Certificate;
 import org.opensaml.SAMLAssertion;
 import org.opensaml.SAMLAttributeStatement;
 import org.opensaml.SAMLAuthenticationStatement;
@@ -47,11 +43,18 @@ import org.w3c.dom.Text;
 
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
+import javax.xml.crypto.XMLStructure;
+import javax.xml.crypto.dom.DOMStructure;
+import javax.xml.crypto.dsig.keyinfo.KeyInfo;
+import javax.xml.crypto.dsig.keyinfo.KeyInfoFactory;
+import javax.xml.crypto.dsig.keyinfo.KeyValue;
+import javax.xml.crypto.dsig.keyinfo.X509Data;
 import javax.xml.namespace.QName;
 
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * Utility methods for SAML stuff
@@ -134,32 +137,35 @@ public class SAMLUtil {
 
                     Element e = samlSubj.getKeyInfo();
                     X509Certificate[] certs = null;
+                    KeyInfoFactory keyInfoFactory = KeyInfoFactory.getInstance("DOM");
+                    XMLStructure keyInfoStructure = new DOMStructure(e);
+                    
                     try {
-                        KeyInfo ki = new KeyInfo(e, null);
-
-                        if (ki.containsX509Data()) {
-                            X509Data data = ki.itemX509Data(0);
-                            XMLX509Certificate certElem = null;
-                            if (data != null && data.containsCertificate()) {
-                                certElem = data.itemCertificate(0);
+                        KeyInfo keyInfo = keyInfoFactory.unmarshalKeyInfo(keyInfoStructure);
+                        List list = keyInfo.getContent();
+    
+                        for (int i = 0; i < list.size(); i++) {
+                            XMLStructure xmlStructure = (XMLStructure) list.get(i);
+                            if (xmlStructure instanceof KeyValue) {
+                                PublicKey publicKey = ((KeyValue)xmlStructure).getPublicKey();
+                                return new SAMLKeyInfo(assertion, publicKey);
+                            } else if (xmlStructure instanceof X509Data) {
+                                List x509Data = ((X509Data)xmlStructure).getContent();
+                                for (int j = 0; j < x509Data.size(); j++) {
+                                    Object x509obj = x509Data.get(j);
+                                    if (x509obj instanceof X509Certificate) {
+                                        certs = new X509Certificate[1];
+                                        certs[0] = (X509Certificate)x509obj;
+                                        return new SAMLKeyInfo(assertion, certs);
+                                    }
+                                }
                             }
-                            if (certElem != null) {
-                                X509Certificate cert = certElem.getX509Certificate();
-                                certs = new X509Certificate[1];
-                                certs[0] = cert;
-                                return new SAMLKeyInfo(assertion, certs);
-                            }
-                        } else if (ki.containsKeyValue()) {
-                            PublicKey pk = ki.getPublicKey();
-                            return new SAMLKeyInfo(assertion, pk);
                         }
-
-                    } catch (XMLSecurityException e3) {
+                    } catch (Exception ex) {
                         throw new WSSecurityException(WSSecurityException.FAILURE,
                                 "invalidSAMLsecurity",
-                                new Object[]{"cannot get certificate (key holder)"}, e3);
+                                new Object[]{"cannot get certificate or key "}, ex);
                     }
-                    
                 } else {
                     throw new WSSecurityException(WSSecurityException.FAILURE,
                             "invalidSAMLsecurity",
@@ -227,27 +233,34 @@ public class SAMLUtil {
 //        }
         Element e = samlSubj.getKeyInfo();
         X509Certificate[] certs = null;
+        KeyInfoFactory keyInfoFactory = KeyInfoFactory.getInstance("DOM");
+        XMLStructure keyInfoStructure = new DOMStructure(e);
+        
         try {
-            KeyInfo ki = new KeyInfo(e, null);
+            KeyInfo keyInfo = keyInfoFactory.unmarshalKeyInfo(keyInfoStructure);
+            List list = keyInfo.getContent();
 
-            if (ki.containsX509Data()) {
-                X509Data data = ki.itemX509Data(0);
-                XMLX509Certificate certElem = null;
-                if (data != null && data.containsCertificate()) {
-                    certElem = data.itemCertificate(0);
-                }
-                if (certElem != null) {
-                    X509Certificate cert = certElem.getX509Certificate();
-                    certs = new X509Certificate[1];
-                    certs[0] = cert;
+            for (int i = 0; i < list.size(); i++) {
+                XMLStructure xmlStructure = (XMLStructure) list.get(i);
+                if (xmlStructure instanceof X509Data) {
+                    List x509Data = ((X509Data)xmlStructure).getContent();
+                    for (int j = 0; j < x509Data.size(); j++) {
+                        Object x509obj = x509Data.get(j);
+                        if (x509obj instanceof X509Certificate) {
+                            certs = new X509Certificate[1];
+                            certs[0] = (X509Certificate)x509obj;
+                            break;
+                        }
+                    }
                 }
             }
             // TODO: get alias name for cert, check against username set by caller
-        } catch (XMLSecurityException e3) {
+        } catch (Exception ex) {
             throw new WSSecurityException(WSSecurityException.FAILURE,
                     "invalidSAMLsecurity",
-                    new Object[]{"cannot get certificate (key holder)"}, e3);
+                    new Object[]{"cannot get certificate or key "}, ex);
         }
+        
         return certs;
     }
 
