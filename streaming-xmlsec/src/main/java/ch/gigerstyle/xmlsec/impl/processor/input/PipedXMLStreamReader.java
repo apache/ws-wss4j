@@ -1,7 +1,6 @@
 package ch.gigerstyle.xmlsec.impl.processor.input;
 
 import ch.gigerstyle.xmlsec.ext.UncheckedXMLSecurityException;
-import ch.gigerstyle.xmlsec.ext.XMLSecurityException;
 import com.ctc.wstx.cfg.ErrorConsts;
 
 import javax.xml.namespace.NamespaceContext;
@@ -118,7 +117,7 @@ public class PipedXMLStreamReader implements XMLStreamReader, Thread.UncaughtExc
      * the writing thread must be set as early as possible
      * because the writing thread can die before it wrote
      * the first event. In this case the next() method loops
-     * endless because writeSide is still null. 
+     * endless because writeSide is still null.
      */
     public void setWriteSide(Thread writeSide) {
         this.writeSide = writeSide;
@@ -205,8 +204,7 @@ public class PipedXMLStreamReader implements XMLStreamReader, Thread.UncaughtExc
             if (closedByWriter) {
                 /* closed by writer, return EOF */
                 throwSecurityException("No more input available");
-            }            
-            else if ((writeSide != null) && (!writeSide.isAlive()) && (--trials < 0)) {
+            } else if ((writeSide != null) && (!writeSide.isAlive()) && (--trials < 0)) {
                 throwSecurityException("Pipe broken");
             }
             /* might be a writer waiting */
@@ -802,14 +800,13 @@ public class PipedXMLStreamReader implements XMLStreamReader, Thread.UncaughtExc
     private void throwSecurityException(String message) throws XMLStreamException {
         if (this.thrownExceptionByWriter != null) {
             if (this.thrownExceptionByWriter instanceof UncheckedXMLSecurityException) {
-                UncheckedXMLSecurityException uxse = (UncheckedXMLSecurityException)this.thrownExceptionByWriter;
+                UncheckedXMLSecurityException uxse = (UncheckedXMLSecurityException) this.thrownExceptionByWriter;
                 if (uxse.getCause() instanceof XMLStreamException) {
-                    throw (XMLStreamException)uxse.getCause();
+                    throw (XMLStreamException) uxse.getCause();
                 } else {
                     throw new XMLStreamException(uxse.getCause());
                 }
-            }
-            else {
+            } else {
                 throw new XMLStreamException(this.thrownExceptionByWriter);
             }
         } else {

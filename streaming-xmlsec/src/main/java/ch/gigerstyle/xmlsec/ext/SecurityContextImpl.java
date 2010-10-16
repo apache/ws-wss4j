@@ -25,7 +25,7 @@ import java.util.*;
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
-public class XMLSecurityContext implements SecurityContext {
+public class SecurityContextImpl implements SecurityContext {
 
     private Map<String, SecurityTokenProvider> secretTokenProviders = new HashMap<String, SecurityTokenProvider>();
 

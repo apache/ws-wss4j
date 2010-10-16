@@ -39,7 +39,7 @@ public class BinarySecurityTokenInputProcessor extends AbstractInputProcessor im
     }
 
     @Override
-    public void processSecurityHeaderEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException {
+    public void processSecurityHeaderEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
 
         boolean isFinishedcurrentBinarySecurityToken = false;
 
@@ -62,7 +62,7 @@ public class BinarySecurityTokenInputProcessor extends AbstractInputProcessor im
         if (currentBinarySecurityTokenType != null && isFinishedcurrentBinarySecurityToken) {
             try {
                 if (currentBinarySecurityTokenType.getId() != null) {
-                    securityContext.registerSecurityTokenProvider(currentBinarySecurityTokenType.getId(), this);
+                    inputProcessorChain.getSecurityContext().registerSecurityTokenProvider(currentBinarySecurityTokenType.getId(), this);
                 }
             } finally {
                 inputProcessorChain.removeProcessor(this);
@@ -72,7 +72,7 @@ public class BinarySecurityTokenInputProcessor extends AbstractInputProcessor im
     }
 
     @Override
-    public void processEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException {
+    public void processEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
         //this method should not be called (processor will be removed after processing header
         inputProcessorChain.processEvent(xmlEvent);
     }

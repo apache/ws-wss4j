@@ -100,9 +100,11 @@ public class CipherDataType implements Parseable {
                         }
 
                         public void validate() throws ParseException {
+                            /*
                             if (cipherValue == null) {
                                 throw new ParseException("CipherValue is missing");
                             }
+                            */
                         }
                     };
                 } else {

@@ -34,7 +34,6 @@ public abstract class AbstractInputProcessor implements InputProcessor {
     protected final transient Log logger = LogFactory.getLog(this.getClass());
 
     private SecurityProperties securityProperties;
-    private QName lastStartElementName = new QName("", "");
 
     private Constants.Phase phase = Constants.Phase.PROCESSING;
     private Set<String> beforeProcessors = new HashSet<String>();
@@ -60,24 +59,18 @@ public abstract class AbstractInputProcessor implements InputProcessor {
         return afterProcessors;
     }
 
-    public void processSecurityHeaderEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException {
+    public void processSecurityHeaderEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
         inputProcessorChain.processSecurityHeaderEvent(xmlEvent);
     }
 
-    public void processNextSecurityHeaderEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException {
-        processSecurityHeaderEvent(xmlEvent, inputProcessorChain, securityContext);
-        if (xmlEvent.isStartElement()) {
-            lastStartElementName = xmlEvent.asStartElement().getName();
-        }
+    public void processNextSecurityHeaderEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
+        processSecurityHeaderEvent(xmlEvent, inputProcessorChain);
     }
 
-    public abstract void processEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException;
+    public abstract void processEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException;
 
-    public void processNextEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException {
-        processEvent(xmlEvent, inputProcessorChain, securityContext);
-        if (xmlEvent.isStartElement()) {
-            lastStartElementName = xmlEvent.asStartElement().getName();
-        }
+    public void processNextEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
+        processEvent(xmlEvent, inputProcessorChain);
     }
 
     public void doFinal(InputProcessorChain inputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException {
@@ -86,11 +79,5 @@ public abstract class AbstractInputProcessor implements InputProcessor {
 
     public SecurityProperties getSecurityProperties() {
         return securityProperties;
-    }
-
-    public QName getLastStartElementName() {
-        //todo this semantics of lastStartElement is not correct. e.g. the lastStartElement
-        // in the document is set until the end of the document. we need a stack! 
-        return lastStartElementName;
     }
 }

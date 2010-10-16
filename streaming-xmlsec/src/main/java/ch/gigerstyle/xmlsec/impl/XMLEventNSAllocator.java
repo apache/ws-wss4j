@@ -218,10 +218,6 @@ public class XMLEventNSAllocator implements XMLEventAllocator {
         nsStack.push(comparableNamespaceList);
         attrStack.push(comparableAttributeList);
         //todo we have a little problem;-) every call to createStartElement methods must have an equivalent call to createEndElement to hold the stack small and correct!!   
-        /*
-        System.out.println("NS Size: " + nsStack.size());
-        System.out.println("Attr Size: " + attrStack.size());
-        */
         return new XMLEventNS(Constants.xmlEventFactory.createStartElement(element, attributeList.iterator(), namespaceList.iterator()), nsStack.toArray(new List[nsStack.size()]), attrStack.toArray(new List[attrStack.size()]));
     }
 

@@ -37,7 +37,7 @@ public class ReferenceListInputProcessor extends AbstractInputProcessor {
     }
 
     @Override
-    public void processSecurityHeaderEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException {
+    public void processSecurityHeaderEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
         if (currentReferenceList != null) {
             try {
                 isFinishedcurrentReferenceList = currentReferenceList.parseXMLEvent(xmlEvent);
@@ -66,11 +66,11 @@ public class ReferenceListInputProcessor extends AbstractInputProcessor {
             }
         }
 
-        inputProcessorChain.processSecurityHeaderEvent(xmlEvent);        
+        inputProcessorChain.processSecurityHeaderEvent(xmlEvent);
     }
 
     @Override
-    public void processEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException {
+    public void processEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
         //this method should not be called (processor will be removed after processing header
         inputProcessorChain.processEvent(xmlEvent);
     }

@@ -68,12 +68,12 @@ public class PipedInputProcessor extends AbstractInputProcessor {
     }
 
     @Override
-    public void processSecurityHeaderEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException {
+    public void processSecurityHeaderEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
         inputProcessorChain.processSecurityHeaderEvent(xmlEvent);
     }
 
     @Override
-    public void processEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException {
+    public void processEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
         if (sink == null) {
             throw new XMLStreamException("Pipe not connected");
         }

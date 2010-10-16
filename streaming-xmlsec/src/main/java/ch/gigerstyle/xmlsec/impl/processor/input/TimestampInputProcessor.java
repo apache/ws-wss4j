@@ -51,7 +51,7 @@ public class TimestampInputProcessor extends AbstractInputProcessor {
      */
 
     @Override
-    public void processSecurityHeaderEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException {
+    public void processSecurityHeaderEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
         //todo created and expires are optional
         if (currentTimestampType != null) {
             try {
@@ -88,11 +88,11 @@ public class TimestampInputProcessor extends AbstractInputProcessor {
                     logger.debug("Timestamp expires: " + expires);
                     exp = expires.toGregorianCalendar();
                 }
-                
+
                 Calendar rightNow = Calendar.getInstance();
                 Calendar ttl = Calendar.getInstance();
                 ttl.add(Calendar.SECOND, -getSecurityProperties().getTimestampTTL());
-                
+
                 if (exp != null && getSecurityProperties().isStrictTimestampCheck() && exp.before(rightNow)) {
                     logger.debug("Time now: " + datatypeFactory.newXMLGregorianCalendar(new GregorianCalendar()).toXMLFormat());
                     throw new XMLSecurityException("invalidTimestamp " +
@@ -114,7 +114,7 @@ public class TimestampInputProcessor extends AbstractInputProcessor {
                 TimestampSecurityEvent timestampSecurityEvent = new TimestampSecurityEvent(SecurityEvent.Event.Timestamp);
                 timestampSecurityEvent.setCreated(crea);
                 timestampSecurityEvent.setExpires(exp);
-                securityContext.registerSecurityEvent(timestampSecurityEvent);
+                inputProcessorChain.getSecurityContext().registerSecurityEvent(timestampSecurityEvent);
 
             } catch (DatatypeConfigurationException e) {
                 throw new XMLSecurityException(e.getMessage(), e);
@@ -129,7 +129,7 @@ public class TimestampInputProcessor extends AbstractInputProcessor {
         inputProcessorChain.processSecurityHeaderEvent(xmlEvent);
     }
 
-    public void processEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException {
+    public void processEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
         //this method should not be called (processor will be removed after processing header
         inputProcessorChain.processEvent(xmlEvent);
     }

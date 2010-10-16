@@ -79,21 +79,21 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
      */
 
     @Override
-    public void processSecurityHeaderEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException {
-        processEvent(xmlEvent, inputProcessorChain, securityContext, true);
+    public void processSecurityHeaderEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
+        processEvent(xmlEvent, inputProcessorChain, true);
     }
 
     @Override
-    public void processEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException {
-        processEvent(xmlEvent, inputProcessorChain, securityContext, false);
+    public void processEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
+        processEvent(xmlEvent, inputProcessorChain, false);
     }
 
-    private void processEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain, SecurityContext securityContext, boolean isSecurityHeaderEvent) throws XMLStreamException, XMLSecurityException {
+    private void processEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain, boolean isSecurityHeaderEvent) throws XMLStreamException, XMLSecurityException {
 
         //todo overall null checks
 
-        //lastStartElement is also set for characterEvents so we dont handle the whole CipherValue subtree here
-        if (currentEncryptedDataType != null && !(getLastStartElementName().equals(Constants.TAG_xenc_CipherValue))) {
+        //dont handle the whole CipherValue subtree here
+        if (currentEncryptedDataType != null && !(Constants.TAG_xenc_CipherValue.equals(inputProcessorChain.getDocumentContext().getParentElement(xmlEvent.getEventType())))) {
             try {
                 isFinishedcurrentEncryptedDataType = currentEncryptedDataType.parseXMLEvent(xmlEvent);
                 //todo validation will never be called because we abort early (see above if condition)
@@ -122,20 +122,23 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
                             currentEncryptedDataType = new EncryptedDataType(startElement);
 
                             referenceType.setProcessed(true);
-                            securityContext.setIsInEncryptedContent();
+                            inputProcessorChain.getSecurityContext().setIsInEncryptedContent();
 
                             //only fire here ContentEncryptedElementEvents
                             //the other ones will be fired later, because we don't know the encrypted element name yet
                             if (EncryptionPartDef.Modifier.Content.getModifier().equals(currentEncryptedDataType.getType())) {
-                                if (Constants.TAG_soap11_Body.equals(getLastStartElementName())) {
+                                QName parentElement = inputProcessorChain.getDocumentContext().getParentElement(xmlEvent.getEventType());
+                                if (inputProcessorChain.getDocumentContext().getDocumentLevel() == 3
+                                        && inputProcessorChain.getDocumentContext().isInSOAPBody()
+                                        && Constants.TAG_soap11_Body.equals(parentElement)) {
                                     //soap:body content encryption counts as EncryptedPart
                                     EncryptedPartSecurityEvent encryptedPartSecurityEvent = new EncryptedPartSecurityEvent(SecurityEvent.Event.EncryptedPart, false);
-                                    encryptedPartSecurityEvent.setElement(getLastStartElementName());
-                                    securityContext.registerSecurityEvent(encryptedPartSecurityEvent);
+                                    encryptedPartSecurityEvent.setElement(parentElement);
+                                    inputProcessorChain.getSecurityContext().registerSecurityEvent(encryptedPartSecurityEvent);
                                 } else {
                                     ContentEncryptedElementSecurityEvent contentEncryptedElementSecurityEvent = new ContentEncryptedElementSecurityEvent(SecurityEvent.Event.ContentEncrypted, false);
-                                    contentEncryptedElementSecurityEvent.setElement(getLastStartElementName());
-                                    securityContext.registerSecurityEvent(contentEncryptedElementSecurityEvent);
+                                    contentEncryptedElementSecurityEvent.setElement(parentElement);
+                                    inputProcessorChain.getSecurityContext().registerSecurityEvent(contentEncryptedElementSecurityEvent);
                                 }
                             }
                         }
@@ -147,13 +150,12 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
                 isCipherValue = true;
                 return;
             }
-        }
-        else if (xmlEvent.isEndElement()) {
+        } else if (xmlEvent.isEndElement()) {
             EndElement endElement = xmlEvent.asEndElement();
             if (endElement.getName().equals(Constants.TAG_xenc_EncryptedData)) {
                 currentEncryptedDataType = null;
                 isFinishedcurrentEncryptedDataType = false;
-                securityContext.unsetIsInEncryptedContent();
+                inputProcessorChain.getSecurityContext().unsetIsInEncryptedContent();
                 return;
             } else if (currentEncryptedDataType != null && endElement.getName().equals(Constants.TAG_xenc_CipherValue)) {
                 if (isSecurityHeaderEvent) {
@@ -212,16 +214,16 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
         }
 
         @Override
-        public void processSecurityHeaderEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException {
-            processEvent(xmlEvent, inputProcessorChain, securityContext, true);
+        public void processSecurityHeaderEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
+            processEvent(xmlEvent, inputProcessorChain, true);
         }
 
         @Override
-        public void processEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException {
-            processEvent(xmlEvent, inputProcessorChain, securityContext, false);
+        public void processEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
+            processEvent(xmlEvent, inputProcessorChain, false);
         }
 
-        private void processEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain, final SecurityContext securityContext, final boolean isSecurityHeaderEvent) throws XMLStreamException, XMLSecurityException {
+        private void processEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain, final boolean isSecurityHeaderEvent) throws XMLStreamException, XMLSecurityException {
 
             testAndThrowUncaughtException(this.thrownExceptionByReader);
 
@@ -236,10 +238,10 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
 
                 final String algorithmURI = encryptedDataType.getEncryptionMethod().getAlgorithm();
 
-                SecurityToken securityToken = SecurityTokenFactory.newInstance().getSecurityToken(encryptedDataType.getKeyInfo(), getSecurityProperties().getDecryptionCrypto(), getSecurityProperties().getCallbackHandler(), securityContext);
+                SecurityToken securityToken = SecurityTokenFactory.newInstance().getSecurityToken(encryptedDataType.getKeyInfo(), getSecurityProperties().getDecryptionCrypto(), getSecurityProperties().getCallbackHandler(), inputProcessorChain.getSecurityContext());
                 RecipientEncryptionTokenSecurityEvent recipientEncryptionTokenSecurityEvent = new RecipientEncryptionTokenSecurityEvent(SecurityEvent.Event.RecipientEncryptionToken);
                 recipientEncryptionTokenSecurityEvent.setSecurityToken(securityToken);
-                securityContext.registerSecurityEvent(recipientEncryptionTokenSecurityEvent);
+                inputProcessorChain.getSecurityContext().registerSecurityEvent(recipientEncryptionTokenSecurityEvent);
 
                 if (securityToken.getKeyWrappingToken() != null) {
                     AlgorithmSuiteSecurityEvent algorithmSuiteSecurityEvent = new AlgorithmSuiteSecurityEvent(SecurityEvent.Event.AlgorithmSuite);
@@ -248,7 +250,7 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
                             securityToken.getKeyWrappingToken().isAsymmetric()
                                     ? AlgorithmSuiteSecurityEvent.Usage.Asym_Key_Wrap
                                     : AlgorithmSuiteSecurityEvent.Usage.Sym_Key_Wrap);
-                    securityContext.registerSecurityEvent(algorithmSuiteSecurityEvent);
+                    inputProcessorChain.getSecurityContext().registerSecurityEvent(algorithmSuiteSecurityEvent);
                 }
 
                 Key secretKey = securityToken.getSecretKey(algorithmURI);
@@ -268,9 +270,14 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
                 AlgorithmSuiteSecurityEvent algorithmSuiteSecurityEvent = new AlgorithmSuiteSecurityEvent(SecurityEvent.Event.AlgorithmSuite);
                 algorithmSuiteSecurityEvent.setAlgorithmURI(algorithmURI);
                 algorithmSuiteSecurityEvent.setUsage(AlgorithmSuiteSecurityEvent.Usage.Enc);
-                securityContext.registerSecurityEvent(algorithmSuiteSecurityEvent);
+                inputProcessorChain.getSecurityContext().registerSecurityEvent(algorithmSuiteSecurityEvent);
 
                 final InputProcessorChain subInputProcessorChain = inputProcessorChain.createSubChain(this);
+
+                List<QName> path = subInputProcessorChain.getDocumentContext().getPath();
+                path.remove(path.size() - 1);//CipherValue
+                path.remove(path.size() - 1);//CipherData
+                path.remove(path.size() - 1);//remove EncryptedData Element
 
                 //we have to use a threaded Piped-In/Out Stream. We don't know where we are in the decrypted xml stream
                 //and therefore the XMLStreamReader can block on calling next/hasNext.
@@ -316,27 +323,28 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
                                 if (!rootElementProcessed && decXmlEvent.isStartElement()) {
 
                                     //fire a SecurityEvent:
-                                    //if (level == 2 && isInSoapHeader) {//todo this is not correct. It is only a header event when we are at top level in the soap header
+                                    if (subInputProcessorChain.getDocumentContext().getDocumentLevel() == 3 && subInputProcessorChain.getDocumentContext().isInSOAPHeader()) {
+                                        //todo this is not correct. It is only a header event when we are at top level in the soap header
                                         //todo an encrypted top-level soap-header element counts as EncryptedPartSecurityEvent
                                         //todo these if-else statements here must be designed with care
                                         //todo we need the infrastructure to detect where we are in the document.
                                         //todo This can be useful below to handle encrypted header elements like timestamps
                                         //todo and also for policy verification elsewhere
-                                        //EncryptedPartSecurityEvent encryptedPartSecurityEvent = new EncryptedPartSecurityEvent(SecurityEvent.Event.EncryptedPart);
-                                        //encryptedPartSecurityEvent.setElement(decXmlEvent.asStartElement().getName());
-                                        //securityContext.registerSecurityEvent(encryptedPartSecurityEvent);
-                                    //} else {
+                                        EncryptedPartSecurityEvent encryptedPartSecurityEvent = new EncryptedPartSecurityEvent(SecurityEvent.Event.EncryptedPart, false);
+                                        encryptedPartSecurityEvent.setElement(decXmlEvent.asStartElement().getName());
+                                        subInputProcessorChain.getSecurityContext().registerSecurityEvent(encryptedPartSecurityEvent);
+                                    } else {
                                         EncryptedElementSecurityEvent encryptedElementSecurityEvent = new EncryptedElementSecurityEvent(SecurityEvent.Event.EncryptedElement, false);
                                         encryptedElementSecurityEvent.setElement(decXmlEvent.asStartElement().getName());
-                                        securityContext.registerSecurityEvent(encryptedElementSecurityEvent);
-                                    //}
+                                        subInputProcessorChain.getSecurityContext().registerSecurityEvent(encryptedElementSecurityEvent);
+                                    }
 
                                     if (isSecurityHeaderEvent) {
                                         //atm we don't know where we stay in the document, so just try to find a processor for the first decrypted element.
                                         //if we have more than one "root" element after the dummyStartElement we aren't at the toplevel in the security header.
                                         SecurityHeaderInputProcessor.engageProcessor(subInputProcessorChain, decXmlEvent.asStartElement(), getSecurityProperties());
                                     }
-                                    
+
                                     rootElementProcessed = true;
                                 }
 
@@ -452,7 +460,7 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
 
                     inputProcessorChain.removeProcessor(this);
                 }
-            } else if (xmlEvent.isCharacters()) {                
+            } else if (xmlEvent.isCharacters()) {
                 try {
                     bufferedOutputStream.write(xmlEvent.asCharacters().getData().getBytes());
                 } catch (IOException e) {

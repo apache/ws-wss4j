@@ -92,6 +92,7 @@
                 <sp:EncryptedParts>
                     <sp:Header Name="Header2" Namespace="..."/>
                     <sp:Header Namespace="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"/>
+                    <sp:Body/>
                 </sp:EncryptedParts>
                 <sp:EncryptedElements>
                     <sp:XPath xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">wsu:Created</sp:XPath>
@@ -108,7 +109,7 @@
                                 <sp:Basic256Rsa15/>
                             </wsp12:Policy>
                         </sp:AlgorithmSuite>
-                        <!--<sp:IncludeTimestamp/>-->
+                        <sp:IncludeTimestamp/>
                     </wsp12:Policy>
                 </sp:AsymmetricBinding>
                 <sp:SignedParts>
@@ -116,7 +117,7 @@
                     <sp:Header Namespace="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsds"/>
                 </sp:SignedParts>
                 <sp:SignedElements>
-                    <sp:XPath xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">wsu:Create</sp:XPath>
+                    <sp:XPath xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">wsu:Created</sp:XPath>
                 </sp:SignedElements>
                 <sp:EncryptedParts>
                     <sp:Header Name="Header2" Namespace="..."/>
@@ -124,10 +125,10 @@
                     <sp:Body/>
                 </sp:EncryptedParts>
                 <sp:EncryptedElements>
-                    <sp:XPath xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">wsu:Create</sp:XPath>
+                    <sp:XPath xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">wsu:Created</sp:XPath>
                 </sp:EncryptedElements>
                 <sp:ContentEncryptedElements>
-                    <sp:XPath xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">wsu:Expire</sp:XPath>
+                    <sp:XPath xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">wsu:Expires</sp:XPath>
                 </sp:ContentEncryptedElements>
             </wsp12:All>
         </wsp12:ExactlyOne>

@@ -31,6 +31,8 @@ public interface InputProcessorChain extends ProcessorChain {
 
     public SecurityContext getSecurityContext();
 
+    public DocumentContext getDocumentContext();
+
     public InputProcessorChain createSubChain(InputProcessor inputProcessor) throws XMLStreamException, XMLSecurityException;
 
     public void processSecurityHeaderEvent(XMLEvent xmlEvent) throws XMLStreamException, XMLSecurityException;

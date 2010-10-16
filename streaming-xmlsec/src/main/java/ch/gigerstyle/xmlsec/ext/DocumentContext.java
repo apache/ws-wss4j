@@ -1,13 +1,12 @@
 package ch.gigerstyle.xmlsec.ext;
 
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.events.XMLEvent;
-import java.util.Set;
+import javax.xml.namespace.QName;
+import java.util.List;
 
 /**
  * User: giger
- * Date: May 30, 2010
- * Time: 7:54:21 PM
+ * Date: Oct 13, 2010
+ * Time: 8:02:25 PM
  * Copyright 2010 Marc Giger gigerstyle@gmx.ch
  * <p/>
  * This program is free software; you can redistribute it and/or modify it
@@ -24,17 +23,19 @@ import java.util.Set;
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
-public interface InputProcessor {
+public interface DocumentContext {
 
-    Set<String> getBeforeProcessors();
+    public List<QName> getPath();
 
-    Set<String> getAfterProcessors();
+    public QName getParentElement(int eventType);
 
-    Constants.Phase getPhase();
+    public boolean isInSOAPHeader();
 
-    void processNextSecurityHeaderEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException;
+    public boolean isInSOAPBody();
 
-    void processNextEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException;
+    public int getDocumentLevel();
 
-    void doFinal(InputProcessorChain inputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException;
+    public boolean isInSecurityHeader();
+
+    public void setInSecurityHeader(boolean inSecurityHeader);
 }

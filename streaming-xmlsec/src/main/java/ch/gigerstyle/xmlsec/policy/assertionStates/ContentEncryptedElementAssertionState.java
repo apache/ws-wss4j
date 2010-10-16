@@ -44,7 +44,7 @@ public class ContentEncryptedElementAssertionState extends AssertionState {
         ContentEncryptedElementSecurityEvent contentEncryptedElementSecurityEvent = (ContentEncryptedElementSecurityEvent) securityEvent;
         for (int i = 0; i < elements.size(); i++) {
             QName qName = elements.get(i);
-            if (elements.equals(contentEncryptedElementSecurityEvent.getElement())) {
+            if (qName.equals(contentEncryptedElementSecurityEvent.getElement())) {
                 if (contentEncryptedElementSecurityEvent.isNotEncrypted()) {
                     //an element must be encrypted but isn't
                     setAsserted(false);

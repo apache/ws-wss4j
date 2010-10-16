@@ -1,7 +1,7 @@
 package ch.gigerstyle.xmlsec.policy;
 
 import ch.gigerstyle.xmlsec.ext.*;
-import ch.gigerstyle.xmlsec.impl.processor.input.PipedInputProcessor;
+import ch.gigerstyle.xmlsec.impl.processor.input.SecurityHeaderInputProcessor;
 import ch.gigerstyle.xmlsec.securityEvent.*;
 
 import javax.xml.stream.XMLStreamException;
@@ -36,14 +36,26 @@ public class PolicyInputProcessor extends AbstractInputProcessor {
     public PolicyInputProcessor(PolicyEnforcer policyEnforcer, SecurityProperties securityProperties) {
         super(securityProperties);
         this.setPhase(Constants.Phase.POSTPROCESSING);
-        this.getBeforeProcessors().add(PipedInputProcessor.class.getName());
+        this.getBeforeProcessors().add(SecurityHeaderInputProcessor.InternalSecurityHeaderProcessor.class.getName());
         this.policyEnforcer = policyEnforcer;
     }
 
     @Override
-    public void processEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException {
+    public void processSecurityHeaderEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
+
+        //test if non encrypted element not have to be encrypted per policy
+        if (!inputProcessorChain.getSecurityContext().isInEncryptedContent() && inputProcessorChain.getDocumentContext().isInSecurityHeader()) {
+            testEncryptionPolicy(xmlEvent, inputProcessorChain);
+        }
+        super.processSecurityHeaderEvent(xmlEvent, inputProcessorChain);
+    }
+
+    @Override
+    public void processEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
         if (xmlEvent.isStartElement()) {
-            if (getLastStartElementName().equals(Constants.TAG_soap11_Body)) {
+            if (inputProcessorChain.getDocumentContext().getDocumentLevel() == 3 && inputProcessorChain.getDocumentContext().isInSOAPBody()
+                    && Constants.TAG_soap11_Body.equals(inputProcessorChain.getDocumentContext().getParentElement(xmlEvent.getEventType()))) {
+
                 OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent(SecurityEvent.Event.Operation);
                 operationSecurityEvent.setOperation(xmlEvent.asStartElement().getName());
                 policyEnforcer.registerSecurityEvent(operationSecurityEvent);
@@ -54,58 +66,63 @@ public class PolicyInputProcessor extends AbstractInputProcessor {
             return;
         }
 
-        //the following events are only interesting for policy verification. So call directly the policyEnforcer for these
         //test if non encrypted element not have to be encrypted per policy
-        if (!securityContext.isInEncryptedContent()) {
+        if (!inputProcessorChain.getSecurityContext().isInEncryptedContent() && !inputProcessorChain.getDocumentContext().isInSecurityHeader()) {
+            testEncryptionPolicy(xmlEvent, inputProcessorChain);
+        }
+
+        //test if non signed element not have to be signed per policy
+        if (!inputProcessorChain.getSecurityContext().isInSignedContent()) {
             if (xmlEvent.isStartElement()) {
-                //this could be a Element encryption...
+
+                if (inputProcessorChain.getDocumentContext().getDocumentLevel() == 3 && inputProcessorChain.getDocumentContext().isInSOAPHeader()) {
+                    SignedPartSecurityEvent signedPartSecurityEvent = new SignedPartSecurityEvent(SecurityEvent.Event.SignedPart, true);
+                    signedPartSecurityEvent.setElement(xmlEvent.asStartElement().getName());
+                    policyEnforcer.registerSecurityEvent(signedPartSecurityEvent);
+                } else if (inputProcessorChain.getDocumentContext().getDocumentLevel() == 2 && inputProcessorChain.getDocumentContext().isInSOAPBody()) {
+                    SignedPartSecurityEvent signedPartSecurityEvent = new SignedPartSecurityEvent(SecurityEvent.Event.SignedPart, true);
+                    signedPartSecurityEvent.setElement(xmlEvent.asStartElement().getName());
+                    policyEnforcer.registerSecurityEvent(signedPartSecurityEvent);
+                } else if (inputProcessorChain.getDocumentContext().getDocumentLevel() > 3) {
+                    SignedElementSecurityEvent signedElementSecurityEvent = new SignedElementSecurityEvent(SecurityEvent.Event.SignedElement, true);
+                    signedElementSecurityEvent.setElement(xmlEvent.asStartElement().getName());
+                    policyEnforcer.registerSecurityEvent(signedElementSecurityEvent);
+                }
+            }
+        }
+
+        inputProcessorChain.processEvent(xmlEvent);
+    }
+
+    private void testEncryptionPolicy(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain) throws XMLSecurityException {
+        //the following events are only interesting for policy verification. So call directly the policyEnforcer for these
+        if (xmlEvent.isStartElement()) {
+
+            if (inputProcessorChain.getDocumentContext().getDocumentLevel() == 3 && inputProcessorChain.getDocumentContext().isInSOAPHeader()) {
+                EncryptedPartSecurityEvent encryptedPartSecurityEvent = new EncryptedPartSecurityEvent(SecurityEvent.Event.EncryptedPart, true);
+                encryptedPartSecurityEvent.setElement(xmlEvent.asStartElement().getName());
+                policyEnforcer.registerSecurityEvent(encryptedPartSecurityEvent);
+            } else if (inputProcessorChain.getDocumentContext().getDocumentLevel() == 2 && inputProcessorChain.getDocumentContext().isInSOAPBody()) {
+                EncryptedPartSecurityEvent encryptedPartSecurityEvent = new EncryptedPartSecurityEvent(SecurityEvent.Event.EncryptedPart, true);
+                encryptedPartSecurityEvent.setElement(xmlEvent.asStartElement().getName());
+                policyEnforcer.registerSecurityEvent(encryptedPartSecurityEvent);
+            } else if (inputProcessorChain.getDocumentContext().getDocumentLevel() > 3) {
                 EncryptedElementSecurityEvent encryptedElementSecurityEvent = new EncryptedElementSecurityEvent(SecurityEvent.Event.EncryptedElement, true);
                 encryptedElementSecurityEvent.setElement(xmlEvent.asStartElement().getName());
                 policyEnforcer.registerSecurityEvent(encryptedElementSecurityEvent);
 
                 //... or it could be a contentEncryption too...
                 ContentEncryptedElementSecurityEvent contentEncryptedElementSecurityEvent = new ContentEncryptedElementSecurityEvent(SecurityEvent.Event.ContentEncrypted, true);
-                contentEncryptedElementSecurityEvent.setElement(getLastStartElementName());
-                policyEnforcer.registerSecurityEvent(contentEncryptedElementSecurityEvent);
-
-                //todo special case EncryptedPart
-                //if (xmlEvent.isStartElement && (level == 2 || (level == 1 && xmlEvent.asStartElement.getName.equals(Constants.TAG_soap_Body))) {
-                //remove this if, the one above if is more correct
-                if (xmlEvent.asStartElement().getName().equals(Constants.TAG_soap11_Body)) {
-                    EncryptedPartSecurityEvent encryptedPartSecurityEvent = new EncryptedPartSecurityEvent(SecurityEvent.Event.EncryptedPart, true);
-                    encryptedPartSecurityEvent.setElement(xmlEvent.asStartElement().getName());
-                    policyEnforcer.registerSecurityEvent(encryptedPartSecurityEvent);
-                }
-                //}
-
-            } else if (xmlEvent.isCharacters() || xmlEvent.isEntityReference() || xmlEvent.isProcessingInstruction()) {
-                //can only be a content encryption
-                ContentEncryptedElementSecurityEvent contentEncryptedElementSecurityEvent = new ContentEncryptedElementSecurityEvent(SecurityEvent.Event.ContentEncrypted, true);
-                contentEncryptedElementSecurityEvent.setElement(getLastStartElementName());
+                contentEncryptedElementSecurityEvent.setElement(inputProcessorChain.getDocumentContext().getParentElement(xmlEvent.getEventType()));
                 policyEnforcer.registerSecurityEvent(contentEncryptedElementSecurityEvent);
             }
+
+        } else if (xmlEvent.isCharacters() || xmlEvent.isEntityReference() || xmlEvent.isProcessingInstruction()) {
+            //can only be a content encryption
+            ContentEncryptedElementSecurityEvent contentEncryptedElementSecurityEvent = new ContentEncryptedElementSecurityEvent(SecurityEvent.Event.ContentEncrypted, true);
+            contentEncryptedElementSecurityEvent.setElement(inputProcessorChain.getDocumentContext().getParentElement(xmlEvent.getEventType()));
+            policyEnforcer.registerSecurityEvent(contentEncryptedElementSecurityEvent);
         }
-
-        //test if non signed element not have to be signed per policy
-        if (!securityContext.isInSignedContent()) {
-            if (xmlEvent.isStartElement()) {
-                SignedElementSecurityEvent signedElementSecurityEvent = new SignedElementSecurityEvent(SecurityEvent.Event.SignedElement, true);
-                signedElementSecurityEvent.setElement(xmlEvent.asStartElement().getName());
-                policyEnforcer.registerSecurityEvent(signedElementSecurityEvent);
-
-                //todo special case SignedPart
-                //if (xmlEvent.isStartElement && (level == 2 || (level == 1 && xmlEvent.asStartElement.getName.equals(Constants.TAG_soap_Body))) {
-                //remove this if, the one above if is more correct
-                if (xmlEvent.asStartElement().getName().equals(Constants.TAG_soap11_Body)) {
-                    SignedPartSecurityEvent signedPartSecurityEvent = new SignedPartSecurityEvent(SecurityEvent.Event.SignedPart, true);
-                    signedPartSecurityEvent.setElement(xmlEvent.asStartElement().getName());
-                    policyEnforcer.registerSecurityEvent(signedPartSecurityEvent);
-                }
-                //}
-            }
-        }
-
-        inputProcessorChain.processEvent(xmlEvent);
     }
 
     @Override

@@ -2,14 +2,11 @@ package ch.gigerstyle.xmlsec.impl.processor.input;
 
 import ch.gigerstyle.xmlsec.ext.*;
 import ch.gigerstyle.xmlsec.impl.util.FiFoQueue;
-import org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_secext_1_0.SecurityHeaderType;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * User: giger
@@ -37,6 +34,7 @@ public class SecurityHeaderInputProcessor extends AbstractInputProcessor {
     private boolean isInSecurityHeader = false;
     private FiFoQueue<XMLEvent> xmlEventList = new FiFoQueue<XMLEvent>();
     private InternalSecurityHeaderProcessor internalSecurityHeaderProcessor;
+    private int countOfEventsToResponsibleSecurityHeader = 0;
 
     public SecurityHeaderInputProcessor(SecurityProperties securityProperties, InputProcessorChain inputProcessorChain) {
         super(securityProperties);
@@ -47,11 +45,14 @@ public class SecurityHeaderInputProcessor extends AbstractInputProcessor {
     }
 
     @Override
-    public void processEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException {
+    public void processEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
+
+        //todo multiple security headers, actors etc
 
         if (xmlEvent.isStartElement()) {
             StartElement startElement = xmlEvent.asStartElement();
             if (startElement.getName().equals(Constants.TAG_wsse_Security)) {
+                inputProcessorChain.getDocumentContext().setInSecurityHeader(true);
                 isInSecurityHeader = true;
             }
             if (isInSecurityHeader) {
@@ -62,8 +63,13 @@ public class SecurityHeaderInputProcessor extends AbstractInputProcessor {
                 engageProcessor(inputProcessorChain, startElement, getSecurityProperties());
             }
         }
-            
-        inputProcessorChain.processSecurityHeaderEvent(xmlEvent);
+
+        if (isInSecurityHeader) {
+            inputProcessorChain.processSecurityHeaderEvent(xmlEvent);
+        } else {
+            xmlEventList.enqueue(xmlEvent);
+            countOfEventsToResponsibleSecurityHeader++;
+        }
 
         if (xmlEvent.isEndElement()) {
             if (isInSecurityHeader) {
@@ -72,17 +78,27 @@ public class SecurityHeaderInputProcessor extends AbstractInputProcessor {
             EndElement endElement = xmlEvent.asEndElement();
             if (endElement.getName().equals(Constants.TAG_wsse_Security) && level == 0) {
                 isInSecurityHeader = false;
-
+                inputProcessorChain.getDocumentContext().setInSecurityHeader(false);
                 inputProcessorChain.removeProcessor(internalSecurityHeaderProcessor);
 
-                InputProcessorChain subInputProcessorChain = inputProcessorChain.createSubChain(this);                
+                InputProcessorChain subInputProcessorChain = inputProcessorChain.createSubChain(this);
+                //since we are replaying the whole envelope strip the path:
+                subInputProcessorChain.getDocumentContext().getPath().clear();
                 //replay all events in "normal" processing chain
+                int eventCount = 0;
                 while (!xmlEventList.isEmpty()) {
                     XMLEvent event = xmlEventList.dequeue();
+                    if (eventCount == countOfEventsToResponsibleSecurityHeader) {
+                        subInputProcessorChain.getDocumentContext().setInSecurityHeader(true);
+                    }
                     subInputProcessorChain.reset();
                     subInputProcessorChain.processEvent(event);
+                    eventCount++;
                 }
-        
+
+                countOfEventsToResponsibleSecurityHeader = 0;
+                subInputProcessorChain.getDocumentContext().setInSecurityHeader(false);
+
                 //remove this processor from chain now. the next events will go directly to the other processors
                 inputProcessorChain.removeProcessor(this);
             }
@@ -90,6 +106,7 @@ public class SecurityHeaderInputProcessor extends AbstractInputProcessor {
     }
 
     //todo move this method. DecryptProcessor should not have a dependency to this processor
+
     public static void engageProcessor(InputProcessorChain inputProcessorChain, StartElement startElement, SecurityProperties securityProperties) {
         if (startElement.getName().equals(Constants.TAG_wsse_BinarySecurityToken)) {
             inputProcessorChain.addProcessor(new BinarySecurityTokenInputProcessor(securityProperties));
@@ -104,7 +121,7 @@ public class SecurityHeaderInputProcessor extends AbstractInputProcessor {
         }
     }
 
-    class InternalSecurityHeaderProcessor extends AbstractInputProcessor {
+    public class InternalSecurityHeaderProcessor extends AbstractInputProcessor {
 
         InternalSecurityHeaderProcessor(SecurityProperties securityProperties) {
             super(securityProperties);
@@ -113,12 +130,12 @@ public class SecurityHeaderInputProcessor extends AbstractInputProcessor {
         }
 
         @Override
-        public void processSecurityHeaderEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException {
+        public void processSecurityHeaderEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
             xmlEventList.enqueue(xmlEvent);
         }
 
         @Override
-        public void processEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException {
+        public void processEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
             //should never be called because we remove this processor before
             inputProcessorChain.processEvent(xmlEvent);
         }

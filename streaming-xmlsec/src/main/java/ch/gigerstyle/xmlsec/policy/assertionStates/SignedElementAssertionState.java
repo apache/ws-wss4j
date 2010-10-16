@@ -5,8 +5,6 @@ import ch.gigerstyle.xmlsec.securityEvent.SecurityEvent;
 import ch.gigerstyle.xmlsec.securityEvent.SignedElementSecurityEvent;
 
 import javax.xml.namespace.QName;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 
 /**

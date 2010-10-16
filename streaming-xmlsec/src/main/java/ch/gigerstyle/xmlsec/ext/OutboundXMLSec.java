@@ -37,9 +37,9 @@ public class OutboundXMLSec {
 
     public XMLStreamWriter processOutMessage(OutputStream outputStream) throws XMLSecurityException {
 
-        final XMLSecurityContext xmlSecurityContext = new XMLSecurityContext();
+        final SecurityContextImpl securityContextImpl = new SecurityContextImpl();
 
-        OutputProcessorChainImpl processorChain = new OutputProcessorChainImpl(xmlSecurityContext);
+        OutputProcessorChainImpl processorChain = new OutputProcessorChainImpl(securityContextImpl);
         processorChain.addProcessor(new SecurityHeaderOutputProcessor(securityProperties));
 
         for (int i = 0; i < securityProperties.getOutAction().length; i++) {

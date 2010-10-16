@@ -4,6 +4,7 @@ import ch.gigerstyle.xmlsec.ext.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.XMLEvent;
 import java.util.ArrayList;
@@ -39,14 +40,20 @@ public class InputProcessorChainImpl implements InputProcessorChain {
     private int curPos = 0;
 
     private SecurityContext securityContext;
+    private DocumentContextImpl documentContext;
 
     public InputProcessorChainImpl(SecurityContext securityContext) {
         this(securityContext, 0);
     }
 
     public InputProcessorChainImpl(SecurityContext securityContext, int startPos) {
+        this(securityContext, new DocumentContextImpl(), startPos);
+    }
+
+    protected InputProcessorChainImpl(SecurityContext securityContext, DocumentContextImpl documentContextImpl, int startPos) {
         this.securityContext = securityContext;
         this.curPos = this.startPos = startPos;
+        documentContext = documentContextImpl;
     }
 
     public int getCurPos() {
@@ -67,6 +74,10 @@ public class InputProcessorChainImpl implements InputProcessorChain {
 
     public SecurityContext getSecurityContext() {
         return this.securityContext;
+    }
+
+    public DocumentContext getDocumentContext() {
+        return this.documentContext;
     }
 
     private void setInputProcessors(List<InputProcessor> inputProcessors) {
@@ -163,13 +174,25 @@ public class InputProcessorChainImpl implements InputProcessorChain {
     }
 
     public void processSecurityHeaderEvent(XMLEvent xmlEvent) throws XMLStreamException, XMLSecurityException {
-        inputProcessors.get(getPosAndIncrement()).processNextSecurityHeaderEvent(xmlEvent, this, securityContext);
+        if (startPos == curPos) {
+            if (xmlEvent.isStartElement()) {
+                documentContext.addPathElement(xmlEvent.asStartElement().getName());
+            } else if (xmlEvent.isEndElement()) {
+                documentContext.removePathElement();
+            }
+        }
+        inputProcessors.get(getPosAndIncrement()).processNextSecurityHeaderEvent(xmlEvent, this);
     }
 
     public void processEvent(XMLEvent xmlEvent) throws XMLStreamException, XMLSecurityException {
-        //document context for holding level, where we stay in the doc, attribute stack, ns-stack etc?
-        //todo , documentContext
-        inputProcessors.get(getPosAndIncrement()).processNextEvent(xmlEvent, this, securityContext);
+        if (startPos == curPos) {
+            if (xmlEvent.isStartElement()) {
+                documentContext.addPathElement(xmlEvent.asStartElement().getName());
+            } else if (xmlEvent.isEndElement()) {
+                documentContext.removePathElement();
+            }
+        }
+        inputProcessors.get(getPosAndIncrement()).processNextEvent(xmlEvent, this);
     }
 
     public void doFinal() throws XMLStreamException, XMLSecurityException {
@@ -178,7 +201,7 @@ public class InputProcessorChainImpl implements InputProcessorChain {
 
     public InputProcessorChain createSubChain(InputProcessor inputProcessor) throws XMLStreamException, XMLSecurityException {
         //we don't clone the processor-list to get updates in the sublist too!
-        InputProcessorChainImpl inputProcessorChain = new InputProcessorChainImpl(securityContext, inputProcessors.indexOf(inputProcessor) + 1);
+        InputProcessorChainImpl inputProcessorChain = new InputProcessorChainImpl(securityContext, documentContext.clone(), inputProcessors.indexOf(inputProcessor) + 1);
         inputProcessorChain.setInputProcessors(this.inputProcessors);
         return inputProcessorChain;
     }

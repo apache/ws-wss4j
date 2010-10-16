@@ -88,7 +88,7 @@ public class SignatureInputProcessor extends AbstractInputProcessor {
      */
 
     @Override
-    public void processSecurityHeaderEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException {
+    public void processSecurityHeaderEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
 
         if (currentSignatureType != null) {
             try {
@@ -126,7 +126,7 @@ public class SignatureInputProcessor extends AbstractInputProcessor {
             try {
                 //todo reparse SignedInfo when custom canonicalization method is used
                 //verify SignedInfo
-                SignatureVerifier signatureVerifier = new SignatureVerifier(currentSignatureType, securityContext, getSecurityProperties());
+                SignatureVerifier signatureVerifier = new SignatureVerifier(currentSignatureType, inputProcessorChain.getSecurityContext(), getSecurityProperties());
                 for (int i = 0; i < signedInfoXMLEvents.size(); i++) {
                     XMLEvent signedInfoEvent = signedInfoXMLEvents.get(i);
                     signatureVerifier.processEvent(signedInfoEvent);
@@ -146,7 +146,7 @@ public class SignatureInputProcessor extends AbstractInputProcessor {
         inputProcessorChain.processSecurityHeaderEvent(xmlEvent);
     }
 
-    public void processEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException {
+    public void processEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
         //this method should not be called (processor will be removed after processing header
         inputProcessorChain.processEvent(xmlEvent);
     }

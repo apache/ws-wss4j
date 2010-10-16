@@ -54,8 +54,8 @@ public class InboundXMLSec {
         final PipedXMLStreamReader pipedXMLStreamReader = new PipedXMLStreamReader(10);
         final PipedInputProcessor pipedInputProcessor = new PipedInputProcessor(pipedXMLStreamReader, securityProperties);
 
-        final XMLSecurityContext xmlSecurityContext = new XMLSecurityContext();
-        xmlSecurityContext.setSecurityEventListener(securityEventListener);
+        final SecurityContextImpl securityContextImpl = new SecurityContextImpl();
+        securityContextImpl.setSecurityEventListener(securityEventListener);
 
         Runnable runnable = new Runnable() {
 
@@ -67,7 +67,7 @@ public class InboundXMLSec {
 
                     long start = System.currentTimeMillis();
 
-                    InputProcessorChainImpl processorChain = new InputProcessorChainImpl(xmlSecurityContext);
+                    InputProcessorChainImpl processorChain = new InputProcessorChainImpl(securityContextImpl);
 
                     processorChain.addProcessor(new SecurityHeaderInputProcessor(securityProperties, processorChain));
                     processorChain.addProcessor(pipedInputProcessor);

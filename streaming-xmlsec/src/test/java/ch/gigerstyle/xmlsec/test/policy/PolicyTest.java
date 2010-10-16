@@ -41,7 +41,8 @@ import java.io.*;
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
-public class PolicyTest extends AbstractTestBase {
+public class
+        PolicyTest extends AbstractTestBase {
 
     @Test
     public void testAsymmetricBindingIncludeTimestampPolicy() throws Exception {
@@ -55,6 +56,10 @@ public class PolicyTest extends AbstractTestBase {
 
         outSecurityProperties.addSignaturePart(new SecurePart(Constants.TAG_wsu_Timestamp.getLocalPart(), Constants.TAG_wsu_Timestamp.getNamespaceURI(), "Element"));
         outSecurityProperties.addSignaturePart(new SecurePart(Constants.TAG_soap11_Body.getLocalPart(), Constants.TAG_soap11_Body.getNamespaceURI(), "Element"));
+        //outSecurityProperties.addEncryptionSecurePart(new SecurePart(Constants.TAG_wsu_Timestamp.getLocalPart(), Constants.TAG_wsu_Timestamp.getNamespaceURI(), "Element"));
+        outSecurityProperties.addEncryptionSecurePart(new SecurePart(Constants.TAG_wsu_Created.getLocalPart(), Constants.TAG_wsu_Created.getNamespaceURI(), "Element"));
+        outSecurityProperties.addEncryptionSecurePart(new SecurePart(Constants.TAG_wsu_Expires.getLocalPart(), Constants.TAG_wsu_Expires.getNamespaceURI(), "Content"));
+        outSecurityProperties.addEncryptionSecurePart(new SecurePart(Constants.TAG_soap11_Body.getLocalPart(), Constants.TAG_soap11_Body.getNamespaceURI(), "Element"));
         Constants.Action[] actions = new Constants.Action[]{Constants.Action.TIMESTAMP, Constants.Action.SIGNATURE, Constants.Action.ENCRYPT};
         outSecurityProperties.setOutAction(actions);
 

@@ -35,13 +35,12 @@ public class LogInputProcessor extends AbstractInputProcessor {
     }
 
     @Override
-    public void processSecurityHeaderEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException {
+    public void processSecurityHeaderEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
         inputProcessorChain.processSecurityHeaderEvent(xmlEvent);
     }
 
     @Override
-    public void processEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException {
-        //System.out.println("Event: " + xmlEvent);
+    public void processEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
         StringWriter stringWriter = new StringWriter();
         xmlEvent.writeAsEncodedUnicode(stringWriter);
         System.out.print(stringWriter.toString());

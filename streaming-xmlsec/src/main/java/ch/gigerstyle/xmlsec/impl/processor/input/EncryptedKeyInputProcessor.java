@@ -66,7 +66,7 @@ public class EncryptedKeyInputProcessor extends AbstractInputProcessor {
      */
 
     @Override
-    public void processSecurityHeaderEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException {
+    public void processSecurityHeaderEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
         if (currentEncryptedKeyType != null) {
             try {
                 isFinishedcurrentEncryptedKey = currentEncryptedKeyType.parseXMLEvent(xmlEvent);
@@ -91,7 +91,7 @@ public class EncryptedKeyInputProcessor extends AbstractInputProcessor {
                 Cipher cipher = Cipher.getInstance(asyncEncAlgo, "BC");
 
                 KeyInfoType keyInfoType = currentEncryptedKeyType.getKeyInfo();
-                final SecurityToken securityToken = SecurityTokenFactory.newInstance().getSecurityToken(keyInfoType, getSecurityProperties().getDecryptionCrypto(), getSecurityProperties().getCallbackHandler(), securityContext);
+                final SecurityToken securityToken = SecurityTokenFactory.newInstance().getSecurityToken(keyInfoType, getSecurityProperties().getDecryptionCrypto(), getSecurityProperties().getCallbackHandler(), inputProcessorChain.getSecurityContext());
                 cipher.init(Cipher.DECRYPT_MODE, securityToken.getSecretKey(algorithmURI));
 
                 byte[] encryptedEphemeralKey = org.bouncycastle.util.encoders.Base64.decode(currentEncryptedKeyType.getCipherData().getCipherValue());
@@ -102,7 +102,7 @@ public class EncryptedKeyInputProcessor extends AbstractInputProcessor {
                     SecurityTokenProvider securityTokenProvider = new SecurityTokenProvider() {
 
                         public SecurityToken getSecurityToken(Crypto crypto) throws XMLSecurityException {
-                            
+
                             return new SecurityToken() {
 
                                 private Hashtable<String, Key> keyTable = new Hashtable<String, Key>();
@@ -118,7 +118,7 @@ public class EncryptedKeyInputProcessor extends AbstractInputProcessor {
                                         String algoFamily = JCEAlgorithmMapper.getJCEKeyAlgorithmFromURI(algorithmURI);
                                         Key key = new SecretKeySpec(secretToken, algoFamily);
                                         keyTable.put(algorithmURI, key);
-                                        return key; 
+                                        return key;
                                     }
                                 }
 
@@ -130,7 +130,7 @@ public class EncryptedKeyInputProcessor extends AbstractInputProcessor {
                                 }
 
                                 public SecurityToken getKeyWrappingToken() {
-                                    return securityToken; 
+                                    return securityToken;
                                 }
 
                                 public String getKeyWrappingTokenAlgorithm() {
@@ -144,7 +144,7 @@ public class EncryptedKeyInputProcessor extends AbstractInputProcessor {
                         }
                     };
 
-                    securityContext.registerSecurityTokenProvider(currentEncryptedKeyType.getId(), securityTokenProvider);
+                    inputProcessorChain.getSecurityContext().registerSecurityTokenProvider(currentEncryptedKeyType.getId(), securityTokenProvider);
                 }
 
                 if (currentEncryptedKeyType.getReferenceList() != null) {
@@ -177,7 +177,7 @@ public class EncryptedKeyInputProcessor extends AbstractInputProcessor {
     }
 
     @Override
-    public void processEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException {
+    public void processEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
         //this method should not be called (processor will be removed after processing header
         inputProcessorChain.processEvent(xmlEvent);
     }

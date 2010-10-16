@@ -425,12 +425,15 @@ public class PolicyEnforcer implements SecurityEventListener {
         } else if (policyComponent instanceof AbstractSecurityAssertion) {
             AbstractSecurityAssertion abstractSecurityAssertion = (AbstractSecurityAssertion) policyComponent;
             return abstractSecurityAssertion.isAsserted(assertionStateMap);
+        } else if (policyComponent == null) {
+            throw new WSSPolicyException("Policy not found");
         } else {
             throw new WSSPolicyException("Unknown PolicyComponent: " + policyComponent + " " + policyComponent.getType());
         }
     }
 
     //multiple threads can call this method concurrently -> synchronize access
+
     public synchronized void registerSecurityEvent(SecurityEvent securityEvent) throws XMLSecurityException {
         System.out.println("Security Event: " + securityEvent);
         if (operationPolicyFound) {
@@ -453,7 +456,7 @@ public class PolicyEnforcer implements SecurityEventListener {
                 securityEventQueue.enqueue(securityEvent);
             }
         }
-    }    
+    }
 
     public void doFinal() throws PolicyViolationException {
         try {

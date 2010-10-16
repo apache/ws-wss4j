@@ -28,28 +28,48 @@ public class FiFoQueue<T> {
     public FiFoQueue() {
     }
 
-    // Put a new elemnt in the queue
+    public FiFoNode<T> getHead() {
+        return head;
+    }
+
+    public FiFoNode<T> getTail() {
+        return tail;
+    }
+
+    // Put a new element in the queue
 
     public void enqueue(T element) {
-        FiFoNode newNode = new FiFoNode();
-        newNode.value = element;
+        FiFoNode<T> newTail = new FiFoNode();
+        newTail.value = element;
 
-        if (tail != null) {
-            tail.next = newNode;
+        if (tail == null) {
+            head = tail = newTail;
+            return;
         }
-        tail = newNode;
 
-        if (head == null) {
-            head = newNode;
-        }
+        newTail.prev = tail;
+        tail.next = newTail;
+        tail = newTail;
     }
+
+    /* head      prev <-> next     tail
+    |---------------------------------|
+    | 0 | 1 | 2 | 3 | 4 | 5 | 6 | ... |
+    |_________________________________|
+    first                         last                          
+     */
 
     // Get the element from the queue that is in front
 
     public T dequeue() {
-        FiFoNode temp = head;
+        FiFoNode<T> oldhead = head;
         head = head.next;
-        return temp.value;
+        if (head != null) {
+            head.prev = null;
+        } else {
+            tail = head = null;
+        }
+        return oldhead.value;
     }
 
     // Check if the queue is empty
@@ -64,11 +84,24 @@ public class FiFoQueue<T> {
         head = tail = null;
     }
 
-    class FiFoNode {
+    public class FiFoNode<T> {
         FiFoNode next;
+        FiFoNode prev;
         T value;
 
         FiFoNode() {
+        }
+
+        public FiFoNode<T> getNext() {
+            return next;
+        }
+
+        public FiFoNode<T> getPrev() {
+            return prev;
+        }
+
+        public T getValue() {
+            return value;
         }
     }
 }

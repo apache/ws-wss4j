@@ -56,12 +56,12 @@ public class SignatureReferenceVerifyInputProcessor extends AbstractInputProcess
     }
 
     @Override
-    public void processSecurityHeaderEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException {
+    public void processSecurityHeaderEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
         inputProcessorChain.processSecurityHeaderEvent(xmlEvent);
     }
 
     @Override
-    public void processEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException {
+    public void processEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
         if (xmlEvent.isStartElement()) {
             StartElement startElement = xmlEvent.asStartElement();
 
@@ -77,22 +77,22 @@ public class SignatureReferenceVerifyInputProcessor extends AbstractInputProcess
                         }
                         inputProcessorChain.addProcessor(new InternalSignatureReferenceVerifier(getSecurityProperties(), referenceType, startElement.getName()));
                         referenceType.setProcessed(true);
-                        securityContext.setIsInSignedContent();
+                        inputProcessorChain.getSecurityContext().setIsInSignedContent();
 
                         //fire a SecurityEvent:
                         //if (level == 2 && isInSoapHeader) {//todo this is not correct. It is only a header event when we are at top level in the soap header
-                            //todo an encrypted top-level soap-header element counts as EncryptedPartSecurityEvent
-                            //todo these if-else statements here must be designed with care
-                            //todo we need the infrastructure to detect where we are in the document.
-                            //todo This can be useful below to handle encrypted header elements like timestamps
-                            //todo and also for policy verification elsewhere
-                            //SignedPartSecurityEvent signedPartSecurityEvent = new SignedPartSecurityEvent(SecurityEvent.Event.SignedPart);
-                            //signedPartSecurityEvent.setElement(startElement.getName());
-                            //securityContext.registerSecurityEvent(signedPartSecurityEvent);
+                        //todo an encrypted top-level soap-header element counts as EncryptedPartSecurityEvent
+                        //todo these if-else statements here must be designed with care
+                        //todo we need the infrastructure to detect where we are in the document.
+                        //todo This can be useful below to handle encrypted header elements like timestamps
+                        //todo and also for policy verification elsewhere
+                        //SignedPartSecurityEvent signedPartSecurityEvent = new SignedPartSecurityEvent(SecurityEvent.Event.SignedPart);
+                        //signedPartSecurityEvent.setElement(startElement.getName());
+                        //securityContext.registerSecurityEvent(signedPartSecurityEvent);
                         //} else {                            
-                            SignedElementSecurityEvent signedElementSecurityEvent = new SignedElementSecurityEvent(SecurityEvent.Event.SignedElement, false);
-                            signedElementSecurityEvent.setElement(startElement.getName());
-                            securityContext.registerSecurityEvent(signedElementSecurityEvent);
+                        SignedElementSecurityEvent signedElementSecurityEvent = new SignedElementSecurityEvent(SecurityEvent.Event.SignedElement, false);
+                        signedElementSecurityEvent.setElement(startElement.getName());
+                        inputProcessorChain.getSecurityContext().registerSecurityEvent(signedElementSecurityEvent);
                         //}
                     }
                 }
@@ -149,12 +149,12 @@ public class SignatureReferenceVerifyInputProcessor extends AbstractInputProcess
         }
 
         @Override
-        public void processSecurityHeaderEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException {
+        public void processSecurityHeaderEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
             inputProcessorChain.processSecurityHeaderEvent(xmlEvent);
         }
 
         @Override
-        public void processEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException {
+        public void processEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
 
             for (int i = 0; i < transformers.size(); i++) {
                 Transformer transformer = transformers.get(i);
@@ -186,7 +186,7 @@ public class SignatureReferenceVerifyInputProcessor extends AbstractInputProcess
                         throw new XMLSecurityException("Digest verification failed");
                     }
                     inputProcessorChain.removeProcessor(this);
-                    securityContext.unsetIsInSignedContent();
+                    inputProcessorChain.getSecurityContext().unsetIsInSignedContent();
                 }
             }
             inputProcessorChain.processEvent(xmlEvent);
