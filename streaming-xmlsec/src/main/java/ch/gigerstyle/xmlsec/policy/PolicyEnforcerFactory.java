@@ -140,7 +140,7 @@ public class PolicyEnforcerFactory {
                     OperationPolicy operationPolicy = new OperationPolicy(operation.getName());
                     operationPolicyList.add(operationPolicy);
 
-                    List<ExtensibilityElement> extensibilityElements = operation.getExtensibilityElements();
+                    List<ExtensibilityElement> extensibilityElements = bindingOperation.getExtensibilityElements();
                     for (int j = 0; j < extensibilityElements.size(); j++) {
                         ExtensibilityElement extensibilityElement = extensibilityElements.get(j);
                         if (extensibilityElement instanceof SOAPOperation) {
