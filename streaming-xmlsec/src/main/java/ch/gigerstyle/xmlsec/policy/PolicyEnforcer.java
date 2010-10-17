@@ -11,6 +11,7 @@ import ch.gigerstyle.xmlsec.securityEvent.SecurityEventListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.neethi.ExactlyOne;
+import org.apache.neethi.Policy;
 import org.apache.neethi.PolicyComponent;
 import org.apache.neethi.PolicyOperator;
 
@@ -37,7 +38,7 @@ import java.util.*;
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 public class PolicyEnforcer implements SecurityEventListener {
-
+    //todo exceptions! don't leak informations!!
     protected static final transient Log log = LogFactory.getLog(PolicyEnforcer.class);
 
     private List<OperationPolicy> operationPolicies;
@@ -52,7 +53,9 @@ public class PolicyEnforcer implements SecurityEventListener {
 
         if (soapAction != null && !soapAction.equals("")) {
             effectivePolicy = findPolicyBySOAPAction(operationPolicies, soapAction);
-            buildAssertionStateMap(effectivePolicy.getPolicy(), assertionStateMap);
+            if (effectivePolicy != null) {
+                buildAssertionStateMap(effectivePolicy.getPolicy(), assertionStateMap);
+            }
         }
     }
 
@@ -186,6 +189,11 @@ public class PolicyEnforcer implements SecurityEventListener {
 
             if (securityEvent.getSecurityEventType().equals(SecurityEvent.Event.Operation)) {
                 effectivePolicy = findPolicyBySOAPOperationName(operationPolicies, ((OperationSecurityEvent) securityEvent).getOperation().getLocalPart());
+                if (effectivePolicy == null) {
+                    //no policy to the operation given
+                    effectivePolicy = new OperationPolicy("NoPolicyFoundForOperation");
+                    effectivePolicy.setPolicy(new Policy());
+                }
                 buildAssertionStateMap(effectivePolicy.getPolicy(), assertionStateMap);
 
                 while (!securityEventQueue.isEmpty()) {
