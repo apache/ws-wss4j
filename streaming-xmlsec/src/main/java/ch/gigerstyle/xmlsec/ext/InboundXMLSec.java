@@ -44,6 +44,14 @@ public class InboundXMLSec {
         this.securityProperties = securityProperties;
     }
 
+    /**
+     * Warning:
+     * configure your xmlStreamReader correctly. Otherwise you can create a security hole.
+     * At minimum configure the following properties:
+     * xmlInputFactory.setProperty(XMLInputFactory.SUPPORT_DTD, false);
+     * xmlInputFactory.setProperty(XMLInputFactory.IS_COALESCING, false);
+     * xmlInputFactory.setProperty(WstxInputProperties.P_MIN_TEXT_SEGMENT, new Integer(8192));  
+     */
     public XMLStreamReader processInMessage(XMLStreamReader xmlStreamReader) throws XMLStreamException, XMLSecurityException {
         return this.processInMessage(xmlStreamReader, null);
     }
