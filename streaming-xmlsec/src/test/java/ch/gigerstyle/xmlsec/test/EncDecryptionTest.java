@@ -144,7 +144,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             securityProperties.setOutAction(actions);
             securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "1234567890".toCharArray());
             securityProperties.setEncryptionUser("receiver");
-            securityProperties.addEncryptionSecurePart(new SecurePart("complexType", "http://www.w3.org/1999/XMLSchema", "Content"));
+            securityProperties.addEncryptionPart(new SecurePart("complexType", "http://www.w3.org/1999/XMLSchema", "Content"));
 
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml");
             baos = doOutboundSecurity(securityProperties, sourceDocument);
@@ -227,7 +227,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             securityProperties.setOutAction(actions);
             securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "1234567890".toCharArray());
             securityProperties.setEncryptionUser("receiver");
-            securityProperties.addEncryptionSecurePart(new SecurePart("complexType", "http://www.w3.org/1999/XMLSchema", "Element"));
+            securityProperties.addEncryptionPart(new SecurePart("complexType", "http://www.w3.org/1999/XMLSchema", "Element"));
 
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml");
 

@@ -162,7 +162,7 @@ public class SecurityProperties {
         }
     }
 
-    public void addEncryptionSecurePart(SecurePart securePart) {
+    public void addEncryptionPart(SecurePart securePart) {
         encryptionParts.add(securePart);
     }
 

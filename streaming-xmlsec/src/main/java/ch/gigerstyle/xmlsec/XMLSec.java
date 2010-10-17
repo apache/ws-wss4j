@@ -115,7 +115,7 @@ public class XMLSec {
                         throw new SecurityConfigurationException("NoEncryptionUser");
                     }
                     if (securityProperties.getEncryptionSecureParts().isEmpty()) {
-                        securityProperties.addEncryptionSecurePart(new SecurePart("Body", "http://schemas.xmlsoap.org/soap/envelope/", "Content"));
+                        securityProperties.addEncryptionPart(new SecurePart("Body", "http://schemas.xmlsoap.org/soap/envelope/", "Content"));
                     }
                     if (securityProperties.getEncryptionSymAlgorithm() == null) {
                         securityProperties.setEncryptionSymAlgorithm("http://www.w3.org/2001/04/xmlenc#aes256-cbc");
