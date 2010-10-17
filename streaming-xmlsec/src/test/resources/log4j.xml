@@ -25,7 +25,7 @@
         <level value="INFO"/>
     </logger>
     <logger name="ch.gigerstyle.xmlsec.impl.InputProcessorChainImpl">
-        <level value="DEBUG"/>
+        <level value="INFO"/>
     </logger>
     <logger name="ch.gigerstyle.xmlsec.impl.OutputProcessorChainImpl">
         <level value="INFO"/>

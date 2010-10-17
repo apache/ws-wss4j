@@ -66,7 +66,7 @@
                          </sp:RecipientToken>
                         <sp:AlgorithmSuite>
                             <wsp12:Policy>
-                                <sp:Basic256Rsa15/>
+                                <sp:Basic256/>
                             </wsp12:Policy>
                         </sp:AlgorithmSuite>
                         <sp:Layout>
@@ -92,7 +92,6 @@
                 <sp:EncryptedParts>
                     <sp:Header Name="Header2" Namespace="..."/>
                     <sp:Header Namespace="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"/>
-                    <sp:Body/>
                 </sp:EncryptedParts>
                 <sp:EncryptedElements>
                     <sp:XPath xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">wsu:Created</sp:XPath>

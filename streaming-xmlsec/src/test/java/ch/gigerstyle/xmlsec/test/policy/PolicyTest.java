@@ -1,6 +1,5 @@
 package ch.gigerstyle.xmlsec.test.policy;
 
-import ch.gigerstyle.xmlsec.XMLSec;
 import ch.gigerstyle.xmlsec.ext.Constants;
 import ch.gigerstyle.xmlsec.ext.SecurePart;
 import ch.gigerstyle.xmlsec.ext.SecurityProperties;
@@ -8,10 +7,6 @@ import ch.gigerstyle.xmlsec.policy.PolicyEnforcer;
 import ch.gigerstyle.xmlsec.policy.PolicyEnforcerFactory;
 import ch.gigerstyle.xmlsec.policy.PolicyInputProcessor;
 import ch.gigerstyle.xmlsec.test.AbstractTestBase;
-import com.sun.xml.ws.streaming.DOMStreamReader;
-import org.apache.neethi.Policy;
-import org.apache.neethi.PolicyEngine;
-import org.apache.ws.security.handler.WSHandlerConstants;
 import org.testng.annotations.Test;
 import org.w3c.dom.Document;
 
@@ -41,8 +36,7 @@ import java.io.*;
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
-public class
-        PolicyTest extends AbstractTestBase {
+public class PolicyTest extends AbstractTestBase {
 
     @Test
     public void testAsymmetricBindingIncludeTimestampPolicy() throws Exception {
