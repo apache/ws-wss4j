@@ -4,7 +4,6 @@ import ch.gigerstyle.xmlsec.ext.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.XMLEvent;
 import java.util.ArrayList;
@@ -174,25 +173,33 @@ public class InputProcessorChainImpl implements InputProcessorChain {
     }
 
     public void processSecurityHeaderEvent(XMLEvent xmlEvent) throws XMLStreamException, XMLSecurityException {
+        boolean removeEndElement = false;
         if (startPos == curPos) {
             if (xmlEvent.isStartElement()) {
                 documentContext.addPathElement(xmlEvent.asStartElement().getName());
             } else if (xmlEvent.isEndElement()) {
-                documentContext.removePathElement();
+                removeEndElement = true;
             }
         }
         inputProcessors.get(getPosAndIncrement()).processNextSecurityHeaderEvent(xmlEvent, this);
+        if (removeEndElement) {
+            documentContext.removePathElement();
+        }
     }
 
     public void processEvent(XMLEvent xmlEvent) throws XMLStreamException, XMLSecurityException {
+        boolean removeEndElement = false;
         if (startPos == curPos) {
             if (xmlEvent.isStartElement()) {
                 documentContext.addPathElement(xmlEvent.asStartElement().getName());
             } else if (xmlEvent.isEndElement()) {
-                documentContext.removePathElement();
+                removeEndElement = true;
             }
         }
         inputProcessors.get(getPosAndIncrement()).processNextEvent(xmlEvent, this);
+        if (removeEndElement) {
+            documentContext.removePathElement();
+        }
     }
 
     public void doFinal() throws XMLStreamException, XMLSecurityException {

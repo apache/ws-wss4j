@@ -52,7 +52,7 @@ public class DocumentContextImpl implements DocumentContext {
     }
 
     public QName getParentElement(int eventType) {
-        if (eventType == XMLStreamConstants.START_ELEMENT) {
+        if (eventType == XMLStreamConstants.START_ELEMENT || eventType == XMLStreamConstants.END_ELEMENT) {
             if (path.size() >= 2) {
                 return path.get(path.size() - 2);
             } else {
@@ -95,6 +95,7 @@ public class DocumentContextImpl implements DocumentContext {
         List<QName> subPath = new ArrayList<QName>();
         subPath.addAll(path);
         documentContext.setPath(subPath);
+        documentContext.setInSecurityHeader(isInSecurityHeader());
         return documentContext; 
     }
 }

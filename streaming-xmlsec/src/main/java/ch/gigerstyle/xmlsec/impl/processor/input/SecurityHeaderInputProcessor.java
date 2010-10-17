@@ -30,8 +30,6 @@ import javax.xml.stream.events.XMLEvent;
  */
 public class SecurityHeaderInputProcessor extends AbstractInputProcessor {
 
-    private int level = 0;
-    private boolean isInSecurityHeader = false;
     private FiFoQueue<XMLEvent> xmlEventList = new FiFoQueue<XMLEvent>();
     private InternalSecurityHeaderProcessor internalSecurityHeaderProcessor;
     private int countOfEventsToResponsibleSecurityHeader = 0;
@@ -51,20 +49,18 @@ public class SecurityHeaderInputProcessor extends AbstractInputProcessor {
 
         if (xmlEvent.isStartElement()) {
             StartElement startElement = xmlEvent.asStartElement();
-            if (startElement.getName().equals(Constants.TAG_wsse_Security)) {
+            if (inputProcessorChain.getDocumentContext().getDocumentLevel() == 3
+                    && inputProcessorChain.getDocumentContext().isInSOAPHeader()
+                    && startElement.getName().equals(Constants.TAG_wsse_Security)) {
                 inputProcessorChain.getDocumentContext().setInSecurityHeader(true);
-                isInSecurityHeader = true;
             }
-            if (isInSecurityHeader) {
-                level++;
-            }
-
-            if (level == 2) {
+            if (inputProcessorChain.getDocumentContext().getDocumentLevel() == 4
+                    && inputProcessorChain.getDocumentContext().isInSecurityHeader()) {
                 engageProcessor(inputProcessorChain, startElement, getSecurityProperties());
             }
         }
 
-        if (isInSecurityHeader) {
+        if (inputProcessorChain.getDocumentContext().isInSecurityHeader()) {
             inputProcessorChain.processSecurityHeaderEvent(xmlEvent);
         } else {
             xmlEventList.enqueue(xmlEvent);
@@ -72,12 +68,9 @@ public class SecurityHeaderInputProcessor extends AbstractInputProcessor {
         }
 
         if (xmlEvent.isEndElement()) {
-            if (isInSecurityHeader) {
-                level--;
-            }
             EndElement endElement = xmlEvent.asEndElement();
-            if (endElement.getName().equals(Constants.TAG_wsse_Security) && level == 0) {
-                isInSecurityHeader = false;
+            if (inputProcessorChain.getDocumentContext().getDocumentLevel() == 3
+                    && endElement.getName().equals(Constants.TAG_wsse_Security)) {
                 inputProcessorChain.getDocumentContext().setInSecurityHeader(false);
                 inputProcessorChain.removeProcessor(internalSecurityHeaderProcessor);
 
@@ -106,6 +99,7 @@ public class SecurityHeaderInputProcessor extends AbstractInputProcessor {
     }
 
     //todo move this method. DecryptProcessor should not have a dependency to this processor
+    //this must be configurable in a xml file. Create a class that looks up the responsible processor
 
     public static void engageProcessor(InputProcessorChain inputProcessorChain, StartElement startElement, SecurityProperties securityProperties) {
         if (startElement.getName().equals(Constants.TAG_wsse_BinarySecurityToken)) {

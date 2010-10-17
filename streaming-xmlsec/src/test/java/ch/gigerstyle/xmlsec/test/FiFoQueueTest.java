@@ -41,7 +41,6 @@ public class FiFoQueueTest {
         for (int i = 0; i < 10; i++) {
             Integer j = fiFoQueue.dequeue();
             Assert.assertEquals(j, (Integer)i);
-            System.out.println(j);
         }
 
         Assert.assertTrue(fiFoQueue.isEmpty());

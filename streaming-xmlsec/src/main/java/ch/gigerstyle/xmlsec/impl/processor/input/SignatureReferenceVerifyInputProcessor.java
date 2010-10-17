@@ -56,11 +56,6 @@ public class SignatureReferenceVerifyInputProcessor extends AbstractInputProcess
     }
 
     @Override
-    public void processSecurityHeaderEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
-        inputProcessorChain.processSecurityHeaderEvent(xmlEvent);
-    }
-
-    @Override
     public void processEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
         if (xmlEvent.isStartElement()) {
             StartElement startElement = xmlEvent.asStartElement();
