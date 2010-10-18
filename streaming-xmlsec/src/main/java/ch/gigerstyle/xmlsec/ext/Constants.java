@@ -1,12 +1,7 @@
 package ch.gigerstyle.xmlsec.ext;
 
-import ch.gigerstyle.xmlsec.impl.XMLEventNSAllocator;
-
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLEventFactory;
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLOutputFactory;
-import javax.xml.stream.util.XMLEventAllocator;
 
 /**
  * User: giger
@@ -29,16 +24,10 @@ import javax.xml.stream.util.XMLEventAllocator;
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 public class Constants {
-    public static final XMLInputFactory xmlInputFactory = XMLInputFactory.newFactory();
-    public static final XMLOutputFactory xmlOutputFactory = XMLOutputFactory.newFactory();
 
     public static final XMLEventFactory xmlEventFactory = XMLEventFactory.newFactory();
-
-    protected static final XMLEventAllocator xmlEventAllocator = new XMLEventNSAllocator();
-
-    static {
-        xmlInputFactory.setEventAllocator(xmlEventAllocator);
-    }
+    public static final String XMLEVENT_NS_ALLOCATOR = "XMLEventNSAllocator";
+    public static final String XMLINPUTFACTORY = "XMLInputFactory";
 
     private Constants() {
     }

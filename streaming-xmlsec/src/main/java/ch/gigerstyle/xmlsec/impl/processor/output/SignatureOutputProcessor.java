@@ -86,7 +86,7 @@ public class SignatureOutputProcessor extends AbstractOutputProcessor {
                                     Namespace namespace = namespaceIterator.next();
                                     namespaceList.add(namespace);
                                 }
-                                namespaceList.add(securityContext.<XMLEventNSAllocator>get("XMLEventNSAllocator").createNamespace(Constants.ATT_wsu_Id.getPrefix(), Constants.ATT_wsu_Id.getNamespaceURI()));
+                                namespaceList.add(securityContext.<XMLEventNSAllocator>get(Constants.XMLEVENT_NS_ALLOCATOR).createNamespace(Constants.ATT_wsu_Id.getPrefix(), Constants.ATT_wsu_Id.getNamespaceURI()));
 
                                 List<Attribute> attributeList = new ArrayList<Attribute>();
                                 Iterator<Attribute> attributeIterator = startElement.getAttributes();
@@ -94,10 +94,10 @@ public class SignatureOutputProcessor extends AbstractOutputProcessor {
                                     Attribute attribute = attributeIterator.next();
                                     attributeList.add(attribute);
                                 }
-                                attributeList.add(securityContext.<XMLEventNSAllocator>get("XMLEventNSAllocator").createAttribute(Constants.ATT_wsu_Id, signaturePartDef.getSigRefId()));
+                                attributeList.add(securityContext.<XMLEventNSAllocator>get(Constants.XMLEVENT_NS_ALLOCATOR).createAttribute(Constants.ATT_wsu_Id, signaturePartDef.getSigRefId()));
                                 //todo this event should probably be allocated directly and not with our allocator to hold the stack consistent
                                 //or also generate the matching endElement...
-                                xmlEvent = securityContext.<XMLEventNSAllocator>get("XMLEventNSAllocator").createStartElement(startElement.getName(), namespaceList, attributeList);
+                                xmlEvent = securityContext.<XMLEventNSAllocator>get(Constants.XMLEVENT_NS_ALLOCATOR).createStartElement(startElement.getName(), namespaceList, attributeList);
 
                             } catch (NoSuchAlgorithmException e) {
                                 throw new XMLSecurityException(e.getMessage(), e);

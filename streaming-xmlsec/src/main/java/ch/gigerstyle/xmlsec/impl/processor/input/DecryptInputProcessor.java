@@ -16,6 +16,7 @@ import javax.crypto.CipherOutputStream;
 import javax.crypto.NoSuchPaddingException;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLEventReader;
+import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.EndElement;
@@ -296,7 +297,11 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
 
                         try {
                             //todo set encoding?:
-                            XMLEventReader xmlEventReader = Constants.xmlInputFactory.createXMLEventReader(pipedInputStream);
+
+                            //todo an possible exception here is not propagated!
+                            XMLEventReader xmlEventReader =
+                                    subInputProcessorChain.getSecurityContext().<XMLInputFactory>get(
+                                            Constants.XMLINPUTFACTORY).createXMLEventReader(pipedInputStream);
 
                             EncryptionPartDef.Modifier encryptionModifier = EncryptionPartDef.Modifier.getModifier(encryptedDataType.getType());
 

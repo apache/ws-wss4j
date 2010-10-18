@@ -1,6 +1,7 @@
 package ch.gigerstyle.xmlsec.ext;
 
 import ch.gigerstyle.xmlsec.impl.InputProcessorChainImpl;
+import ch.gigerstyle.xmlsec.impl.XMLEventNSAllocator;
 import ch.gigerstyle.xmlsec.impl.processor.input.LogInputProcessor;
 import ch.gigerstyle.xmlsec.impl.processor.input.PipedInputProcessor;
 import ch.gigerstyle.xmlsec.impl.processor.input.PipedXMLStreamReader;
@@ -10,6 +11,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import javax.xml.stream.XMLEventReader;
+import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import java.util.List;
@@ -50,20 +52,24 @@ public class InboundXMLSec {
      * At minimum configure the following properties:
      * xmlInputFactory.setProperty(XMLInputFactory.SUPPORT_DTD, false);
      * xmlInputFactory.setProperty(XMLInputFactory.IS_COALESCING, false);
-     * xmlInputFactory.setProperty(WstxInputProperties.P_MIN_TEXT_SEGMENT, new Integer(8192));  
+     * xmlInputFactory.setProperty(WstxInputProperties.P_MIN_TEXT_SEGMENT, new Integer(8192));
      */
     public XMLStreamReader processInMessage(XMLStreamReader xmlStreamReader) throws XMLStreamException, XMLSecurityException {
         return this.processInMessage(xmlStreamReader, null);
     }
 
     public XMLStreamReader processInMessage(XMLStreamReader xmlStreamReader, SecurityEventListener securityEventListener) throws XMLStreamException, XMLSecurityException {
-        final XMLEventReader xmlEventReader = Constants.xmlInputFactory.createXMLEventReader(xmlStreamReader);
-        
-        final PipedXMLStreamReader pipedXMLStreamReader = new PipedXMLStreamReader(10);
-        final PipedInputProcessor pipedInputProcessor = new PipedInputProcessor(pipedXMLStreamReader, securityProperties);
 
         final SecurityContextImpl securityContextImpl = new SecurityContextImpl();
         securityContextImpl.setSecurityEventListener(securityEventListener);
+
+        final XMLInputFactory xmlInputFactory = XMLInputFactory.newFactory();
+        xmlInputFactory.setEventAllocator(new XMLEventNSAllocator());
+        securityContextImpl.put(Constants.XMLINPUTFACTORY, xmlInputFactory);
+        final XMLEventReader xmlEventReader = xmlInputFactory.createXMLEventReader(xmlStreamReader);
+
+        final PipedXMLStreamReader pipedXMLStreamReader = new PipedXMLStreamReader(10);
+        final PipedInputProcessor pipedInputProcessor = new PipedInputProcessor(pipedXMLStreamReader, securityProperties);
 
         Runnable runnable = new Runnable() {
 

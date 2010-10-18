@@ -42,18 +42,25 @@ public class XMLEventNSAllocator implements XMLEventAllocator {
 
     private XMLEventAllocator xmlEventAllocator = DefaultEventAllocator.getDefaultInstance();
 
-    private Deque<List<ComparableNamespace>> nsStack = new ArrayDeque<List<ComparableNamespace>>();
-    private Deque<List<ComparableAttribute>> attrStack = new ArrayDeque<List<ComparableAttribute>>();
+    private ArrayDeque<List<ComparableNamespace>> nsStack = new ArrayDeque<List<ComparableNamespace>>(10);
+    private ArrayDeque<List<ComparableAttribute>> attrStack = new ArrayDeque<List<ComparableAttribute>>(10);
+
+    public XMLEventNSAllocator() {        
+    }
+
+    private XMLEventNSAllocator(ArrayDeque<List<ComparableNamespace>> nsStack, ArrayDeque<List<ComparableAttribute>> attrStack) {
+        this.nsStack = nsStack;
+        this.attrStack = attrStack;
+    }
 
     public XMLEventAllocator newInstance() {
-        //always return the same instance, so that the stacks are preserved!
-        return this;
+        return new XMLEventNSAllocator(nsStack.clone(), attrStack.clone());
     }
 
     public XMLEvent allocate(XMLStreamReader reader) throws XMLStreamException {
         if (reader.getEventType() == XMLStreamConstants.START_ELEMENT) {
 
-            List<ComparableNamespace> namespaceList = new ArrayList<ComparableNamespace>();
+            List<ComparableNamespace> namespaceList = new ArrayList<ComparableNamespace>(reader.getNamespaceCount());
             for (int i = 0; i < reader.getNamespaceCount(); i++) {
                 Namespace namespace;
                 if (reader.getNamespacePrefix(i) == null) {
@@ -65,7 +72,7 @@ public class XMLEventNSAllocator implements XMLEventAllocator {
                 namespaceList.add(comparableNamespace);
             }
 
-            List<ComparableAttribute> attributeList = new ArrayList<ComparableAttribute>();
+            List<ComparableAttribute> attributeList = new ArrayList<ComparableAttribute>(reader.getAttributeCount());
             for (int i = 0; i < reader.getAttributeCount(); i++) {
                 QName attrName = reader.getAttributeName(i);
                 if (!"xml".equals(attrName.getPrefix())) {

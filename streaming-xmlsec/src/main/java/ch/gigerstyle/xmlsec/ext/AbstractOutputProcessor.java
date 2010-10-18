@@ -84,17 +84,17 @@ public abstract class AbstractOutputProcessor implements OutputProcessor {
     }
 
     public static void createStartElementAndOutputAsEvent(OutputProcessorChain outputProcessorChain, QName element, Map<QName, String> attributes) throws XMLStreamException, XMLSecurityException {
-        XMLEvent xmlEvent = outputProcessorChain.getSecurityContext().<XMLEventNSAllocator>get("XMLEventNSAllocator").createStartElement(element, attributes);
+        XMLEvent xmlEvent = outputProcessorChain.getSecurityContext().<XMLEventNSAllocator>get(Constants.XMLEVENT_NS_ALLOCATOR).createStartElement(element, attributes);
         outputAsEvent(outputProcessorChain, xmlEvent);
     }
 
     public static void createEndElementAndOutputAsEvent(OutputProcessorChain outputProcessorChain, QName element) throws XMLStreamException, XMLSecurityException {
-        final XMLEvent xmlEvent = outputProcessorChain.getSecurityContext().<XMLEventNSAllocator>get("XMLEventNSAllocator").createEndElement(element);
+        final XMLEvent xmlEvent = outputProcessorChain.getSecurityContext().<XMLEventNSAllocator>get(Constants.XMLEVENT_NS_ALLOCATOR).createEndElement(element);
         outputAsEvent(outputProcessorChain, xmlEvent);
     }
 
     public static void createCharactersAndOutputAsEvent(OutputProcessorChain outputProcessorChain, String characters) throws XMLStreamException, XMLSecurityException {
-        final XMLEvent xmlEvent = outputProcessorChain.getSecurityContext().<XMLEventNSAllocator>get("XMLEventNSAllocator").createCharacters(characters);
+        final XMLEvent xmlEvent = outputProcessorChain.getSecurityContext().<XMLEventNSAllocator>get(Constants.XMLEVENT_NS_ALLOCATOR).createCharacters(characters);
         outputAsEvent(outputProcessorChain, xmlEvent);
     }
 

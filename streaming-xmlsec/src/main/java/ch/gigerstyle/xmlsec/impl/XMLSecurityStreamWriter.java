@@ -1,5 +1,6 @@
 package ch.gigerstyle.xmlsec.impl;
 
+import ch.gigerstyle.xmlsec.ext.Constants;
 import ch.gigerstyle.xmlsec.ext.OutputProcessorChain;
 import ch.gigerstyle.xmlsec.ext.XMLSecurityException;
 
@@ -42,7 +43,7 @@ public class XMLSecurityStreamWriter implements XMLStreamWriter {
 
     public XMLSecurityStreamWriter(OutputProcessorChain outputProcessorChain) {
         this.outputProcessorChain = outputProcessorChain;
-        this.outputProcessorChain.getSecurityContext().put("XMLEventNSAllocator", xmlEventNSAllocator);
+        this.outputProcessorChain.getSecurityContext().put(Constants.XMLEVENT_NS_ALLOCATOR, xmlEventNSAllocator);
     }
 
     private void chainProcessEvent(XMLEvent xmlEvent) throws XMLStreamException {

@@ -102,7 +102,7 @@ public class EncryptOutputProcessor extends AbstractOutputProcessor {
                                 encryptionPartDef.setKeyId(symmetricKeyId);//EncKeyId-1483925398
                                 encryptionPartDef.setSymmetricKey(symmetricKey);
                                 encryptionPartDefList.add(encryptionPartDef);
-                                internalEncryptionOutputProcessor = new InternalEncryptionOutputProcessor(getSecurityProperties(), encryptionPartDef, startElement.getName(), securityContext.<XMLEventNSAllocator>get("XMLEventNSAllocator"));
+                                internalEncryptionOutputProcessor = new InternalEncryptionOutputProcessor(getSecurityProperties(), encryptionPartDef, startElement.getName(), securityContext.<XMLEventNSAllocator>get(Constants.XMLEVENT_NS_ALLOCATOR));
                             } catch (NoSuchAlgorithmException e) {
                                 throw new XMLSecurityException(e.getMessage(), e);
                             } catch (NoSuchPaddingException e) {
