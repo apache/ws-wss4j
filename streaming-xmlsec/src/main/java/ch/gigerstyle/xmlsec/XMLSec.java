@@ -122,7 +122,10 @@ public class XMLSec {
                     }
                     if (securityProperties.getEncryptionKeyTransportAlgorithm() == null) {
                         //todo constants and rsa-oaep as default for aes
-                        securityProperties.setEncryptionKeyTransportAlgorithm("http://www.w3.org/2001/04/xmlenc#rsa-1_5");
+                        //@see http://www.w3.org/TR/2002/REC-xmlenc-core-20021210/Overview.html#rsa-1_5 :
+                        //"RSA-OAEP is RECOMMENDED for the transport of AES keys"
+                        //@see http://www.w3.org/TR/2002/REC-xmlenc-core-20021210/Overview.html#rsa-oaep-mgf1p
+                        securityProperties.setEncryptionKeyTransportAlgorithm("http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p");
                     }
                     if (securityProperties.getEncryptionKeyIdentifierType() == null) {
                         securityProperties.setEncryptionKeyIdentifierType(Constants.KeyIdentifierType.ISSUER_SERIAL);
