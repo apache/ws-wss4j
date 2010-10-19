@@ -32,7 +32,7 @@ public interface OutputProcessor {
 
     Constants.Phase getPhase();
 
-    void processNextEvent(XMLEvent xmlEvent, OutputProcessorChain OutputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException;
+    void processNextEvent(XMLEvent xmlEvent, OutputProcessorChain OutputProcessorChain) throws XMLStreamException, XMLSecurityException;
 
-    void doFinal(OutputProcessorChain OutputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException;
+    void doFinal(OutputProcessorChain OutputProcessorChain) throws XMLStreamException, XMLSecurityException;
 }

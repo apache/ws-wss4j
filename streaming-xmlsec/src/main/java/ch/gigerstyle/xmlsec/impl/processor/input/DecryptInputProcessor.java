@@ -178,7 +178,7 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
     }
 
     @Override
-    public void doFinal(InputProcessorChain inputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException {
+    public void doFinal(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
         List<ReferenceType> references = referenceList.getDataReferenceOrKeyReference();
         for (int i = 0; i < references.size(); i++) {
             ReferenceType referenceType = references.get(i);

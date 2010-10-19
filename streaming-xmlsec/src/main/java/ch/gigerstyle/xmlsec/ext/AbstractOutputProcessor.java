@@ -61,13 +61,13 @@ public abstract class AbstractOutputProcessor implements OutputProcessor {
         return afterProcessors;
     }
 
-    public abstract void processEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException;
+    public abstract void processEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException;
 
-    public void processNextEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException {
-        processEvent(xmlEvent, outputProcessorChain, securityContext);
+    public void processNextEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException {
+        processEvent(xmlEvent, outputProcessorChain);
     }
 
-    public void doFinal(OutputProcessorChain outputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException {
+    public void doFinal(OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException {
         outputProcessorChain.doFinal();
     }
 

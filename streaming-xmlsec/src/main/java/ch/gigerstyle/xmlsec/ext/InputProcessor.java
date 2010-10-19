@@ -36,5 +36,5 @@ public interface InputProcessor {
 
     void processNextEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException;
 
-    void doFinal(InputProcessorChain inputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException;
+    void doFinal(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException;
 }

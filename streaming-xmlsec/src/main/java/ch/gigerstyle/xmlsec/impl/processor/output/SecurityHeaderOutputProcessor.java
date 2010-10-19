@@ -3,12 +3,8 @@ package ch.gigerstyle.xmlsec.impl.processor.output;
 import ch.gigerstyle.xmlsec.ext.*;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.events.Namespace;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 
 /**
  * User: giger
@@ -37,7 +33,7 @@ public class SecurityHeaderOutputProcessor extends AbstractOutputProcessor {
         setPhase(Constants.Phase.PREPROCESSING);
     }
 
-    public void processEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException {
+    public void processEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException {
 
         outputProcessorChain.processEvent(xmlEvent);
 

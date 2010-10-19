@@ -24,7 +24,10 @@ import java.io.OutputStream;
 import java.security.*;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 /**
  * User: giger
@@ -64,13 +67,13 @@ public class SignatureEndingOutputProcessor extends AbstractOutputProcessor {
     }
 
     @Override
-    public void processEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException {
+    public void processEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException {
         //xmlEventBuffer.add(xmlEvent);
         xmlEventBuffer.enqueue(xmlEvent);
     }
 
     @Override
-    public void doFinal(OutputProcessorChain outputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException {
+    public void doFinal(OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException {
 
         OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
 
@@ -392,7 +395,7 @@ public class SignatureEndingOutputProcessor extends AbstractOutputProcessor {
         }
 
         @Override
-        public void processEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException {
+        public void processEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException {
             canonicalizer20010315Transformer.transform(xmlEvent, bufferedSignerOutputStream);
             outputProcessorChain.processEvent(xmlEvent);
         }

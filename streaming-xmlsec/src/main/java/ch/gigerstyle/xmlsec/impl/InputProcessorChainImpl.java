@@ -203,7 +203,7 @@ public class InputProcessorChainImpl implements InputProcessorChain {
     }
 
     public void doFinal() throws XMLStreamException, XMLSecurityException {
-        inputProcessors.get(getPosAndIncrement()).doFinal(this, securityContext);
+        inputProcessors.get(getPosAndIncrement()).doFinal(this);
     }
 
     public InputProcessorChain createSubChain(InputProcessor inputProcessor) throws XMLStreamException, XMLSecurityException {

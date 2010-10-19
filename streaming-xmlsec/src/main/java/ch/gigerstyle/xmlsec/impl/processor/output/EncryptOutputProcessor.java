@@ -80,7 +80,7 @@ public class EncryptOutputProcessor extends AbstractOutputProcessor {
         return encryptionPartDefList;
     }
 
-    public void processEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException {
+    public void processEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException {
 
         if (xmlEvent.isStartElement()) {
             StartElement startElement = xmlEvent.asStartElement();
@@ -102,7 +102,7 @@ public class EncryptOutputProcessor extends AbstractOutputProcessor {
                                 encryptionPartDef.setKeyId(symmetricKeyId);//EncKeyId-1483925398
                                 encryptionPartDef.setSymmetricKey(symmetricKey);
                                 encryptionPartDefList.add(encryptionPartDef);
-                                internalEncryptionOutputProcessor = new InternalEncryptionOutputProcessor(getSecurityProperties(), encryptionPartDef, startElement.getName(), securityContext.<XMLEventNSAllocator>get(Constants.XMLEVENT_NS_ALLOCATOR));
+                                internalEncryptionOutputProcessor = new InternalEncryptionOutputProcessor(getSecurityProperties(), encryptionPartDef, startElement.getName(), outputProcessorChain.getSecurityContext().<XMLEventNSAllocator>get(Constants.XMLEVENT_NS_ALLOCATOR));
                             } catch (NoSuchAlgorithmException e) {
                                 throw new XMLSecurityException(e.getMessage(), e);
                             } catch (NoSuchPaddingException e) {
@@ -162,7 +162,7 @@ public class EncryptOutputProcessor extends AbstractOutputProcessor {
             streamWriter = new BufferedWriter(new OutputStreamWriter(cipherOutputStream), symmetricCipher.getBlockSize() * 2); //todo encoding?
         }
 
-        public void processEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException {
+        public void processEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException {
 
             if (xmlEvent.isStartElement()) {
 

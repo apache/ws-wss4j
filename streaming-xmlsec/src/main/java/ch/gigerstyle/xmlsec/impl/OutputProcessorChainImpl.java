@@ -163,11 +163,11 @@ public class OutputProcessorChainImpl implements OutputProcessorChain {
     }
 
     public void processEvent(XMLEvent xmlEvent) throws XMLStreamException, XMLSecurityException {
-        outputProcessors.get(getPosAndIncrement()).processNextEvent(xmlEvent, this, securityContext);
+        outputProcessors.get(getPosAndIncrement()).processNextEvent(xmlEvent, this);
     }
 
     public void doFinal() throws XMLStreamException, XMLSecurityException {
-        outputProcessors.get(getPosAndIncrement()).doFinal(this, securityContext);
+        outputProcessors.get(getPosAndIncrement()).doFinal(this);
     }
 
     public OutputProcessorChain createSubChain(OutputProcessor outputProcessor) throws XMLStreamException, XMLSecurityException {

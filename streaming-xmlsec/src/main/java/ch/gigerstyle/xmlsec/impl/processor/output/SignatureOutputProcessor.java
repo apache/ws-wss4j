@@ -57,7 +57,7 @@ public class SignatureOutputProcessor extends AbstractOutputProcessor {
     }
 
     @Override
-    public void processEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException {
+    public void processEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException {
         if (xmlEvent.isStartElement()) {
             StartElement startElement = xmlEvent.asStartElement();
 
@@ -85,7 +85,7 @@ public class SignatureOutputProcessor extends AbstractOutputProcessor {
                                     Namespace namespace = namespaceIterator.next();
                                     namespaceList.add(namespace);
                                 }
-                                namespaceList.add(securityContext.<XMLEventNSAllocator>get(Constants.XMLEVENT_NS_ALLOCATOR).createNamespace(Constants.ATT_wsu_Id.getPrefix(), Constants.ATT_wsu_Id.getNamespaceURI()));
+                                namespaceList.add(outputProcessorChain.getSecurityContext().<XMLEventNSAllocator>get(Constants.XMLEVENT_NS_ALLOCATOR).createNamespace(Constants.ATT_wsu_Id.getPrefix(), Constants.ATT_wsu_Id.getNamespaceURI()));
 
                                 List<Attribute> attributeList = new ArrayList<Attribute>();
                                 Iterator<Attribute> attributeIterator = startElement.getAttributes();
@@ -93,9 +93,9 @@ public class SignatureOutputProcessor extends AbstractOutputProcessor {
                                     Attribute attribute = attributeIterator.next();
                                     attributeList.add(attribute);
                                 }
-                                attributeList.add(securityContext.<XMLEventNSAllocator>get(Constants.XMLEVENT_NS_ALLOCATOR).createAttribute(Constants.ATT_wsu_Id, signaturePartDef.getSigRefId()));
+                                attributeList.add(outputProcessorChain.getSecurityContext().<XMLEventNSAllocator>get(Constants.XMLEVENT_NS_ALLOCATOR).createAttribute(Constants.ATT_wsu_Id, signaturePartDef.getSigRefId()));
                                 //todo the NSStack should be corrected...
-                                xmlEvent = securityContext.<XMLEventNSAllocator>get(Constants.XMLEVENT_NS_ALLOCATOR).createStartElement(startElement.getName(), namespaceList, attributeList);
+                                xmlEvent = outputProcessorChain.getSecurityContext().<XMLEventNSAllocator>get(Constants.XMLEVENT_NS_ALLOCATOR).createStartElement(startElement.getName(), namespaceList, attributeList);
 
                             } catch (NoSuchAlgorithmException e) {
                                 throw new XMLSecurityException(e.getMessage(), e);
@@ -141,7 +141,7 @@ public class SignatureOutputProcessor extends AbstractOutputProcessor {
         }
 
         @Override
-        public void processEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException {
+        public void processEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException {
 
             for (int i = 0; i < transformers.size(); i++) {
                 Transformer transformer = transformers.get(i);
@@ -169,7 +169,7 @@ public class SignatureOutputProcessor extends AbstractOutputProcessor {
                     //from now on signature is possible again
                     activeInternalSignatureOutputProcessor = null;
                     //todo the NSStack should be corrected...
-                    xmlEvent = securityContext.<XMLEventNSAllocator>get(Constants.XMLEVENT_NS_ALLOCATOR).createEndElement(startElement);
+                    xmlEvent = outputProcessorChain.getSecurityContext().<XMLEventNSAllocator>get(Constants.XMLEVENT_NS_ALLOCATOR).createEndElement(startElement);
                 }
             }
             outputProcessorChain.processEvent(xmlEvent);

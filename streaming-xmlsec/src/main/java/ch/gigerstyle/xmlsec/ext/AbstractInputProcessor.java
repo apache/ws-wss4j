@@ -3,7 +3,6 @@ package ch.gigerstyle.xmlsec.ext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.XMLEvent;
 import java.util.HashSet;
@@ -73,7 +72,7 @@ public abstract class AbstractInputProcessor implements InputProcessor {
         processEvent(xmlEvent, inputProcessorChain);
     }
 
-    public void doFinal(InputProcessorChain inputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException {
+    public void doFinal(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
         inputProcessorChain.doFinal();
     }
 

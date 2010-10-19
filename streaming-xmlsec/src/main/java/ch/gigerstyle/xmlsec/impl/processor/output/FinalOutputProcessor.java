@@ -38,11 +38,11 @@ public class FinalOutputProcessor extends AbstractOutputProcessor {
         setPhase(Constants.Phase.POSTPROCESSING);
     }
 
-    public void processEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException {
+    public void processEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException {
         xmlEvent.writeAsEncodedUnicode(outputStreamWriter);
     }
 
-    public void doFinal(OutputProcessorChain outputProcessorChain, SecurityContext securityContext) throws XMLSecurityException {
+    public void doFinal(OutputProcessorChain outputProcessorChain) throws XMLSecurityException {
         try {
             outputStreamWriter.flush();
         } catch (IOException e) {

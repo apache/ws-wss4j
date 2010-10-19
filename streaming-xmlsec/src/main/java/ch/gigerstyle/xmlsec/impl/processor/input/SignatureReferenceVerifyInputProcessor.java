@@ -98,7 +98,7 @@ public class SignatureReferenceVerifyInputProcessor extends AbstractInputProcess
     }
 
     @Override
-    public void doFinal(InputProcessorChain inputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException {
+    public void doFinal(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
         List<ReferenceType> references = signatureType.getSignedInfo().getReference();
         for (int i = 0; i < references.size(); i++) {
             ReferenceType referenceType = references.get(i);

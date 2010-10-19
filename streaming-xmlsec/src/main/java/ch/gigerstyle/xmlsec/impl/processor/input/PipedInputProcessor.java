@@ -85,7 +85,7 @@ public class PipedInputProcessor extends AbstractInputProcessor {
     }
 
     @Override
-    public void doFinal(InputProcessorChain inputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException {
+    public void doFinal(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
         if (sink != null) {
             sink.receivedLast();
         }

@@ -38,7 +38,7 @@ public class TimestampOutputProcessor extends AbstractOutputProcessor {
     }
 
     @Override
-    public void processEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException {
+    public void processEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException {
         outputProcessorChain.processEvent(xmlEvent);
 
         if (xmlEvent.isStartElement()) {
