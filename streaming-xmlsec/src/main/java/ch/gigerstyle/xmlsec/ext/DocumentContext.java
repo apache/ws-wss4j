@@ -38,4 +38,16 @@ public interface DocumentContext {
     public boolean isInSecurityHeader();
 
     public void setInSecurityHeader(boolean inSecurityHeader);
+
+    public void setIsInEncryptedContent();
+
+    public void unsetIsInEncryptedContent();
+
+    public boolean isInEncryptedContent();
+
+    public void setIsInSignedContent();
+
+    public void unsetIsInSignedContent();
+
+    public boolean isInSignedContent();
 }

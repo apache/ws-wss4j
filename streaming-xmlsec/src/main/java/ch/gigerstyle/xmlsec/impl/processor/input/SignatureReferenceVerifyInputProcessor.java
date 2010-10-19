@@ -72,7 +72,7 @@ public class SignatureReferenceVerifyInputProcessor extends AbstractInputProcess
                         }
                         inputProcessorChain.addProcessor(new InternalSignatureReferenceVerifier(getSecurityProperties(), referenceType, startElement.getName()));
                         referenceType.setProcessed(true);
-                        inputProcessorChain.getSecurityContext().setIsInSignedContent();
+                        inputProcessorChain.getDocumentContext().setIsInSignedContent();
 
                         //fire a SecurityEvent:
                         //if (level == 2 && isInSoapHeader) {//todo this is not correct. It is only a header event when we are at top level in the soap header
@@ -181,7 +181,7 @@ public class SignatureReferenceVerifyInputProcessor extends AbstractInputProcess
                         throw new XMLSecurityException("Digest verification failed");
                     }
                     inputProcessorChain.removeProcessor(this);
-                    inputProcessorChain.getSecurityContext().unsetIsInSignedContent();
+                    inputProcessorChain.getDocumentContext().unsetIsInSignedContent();
                 }
             }
             inputProcessorChain.processEvent(xmlEvent);

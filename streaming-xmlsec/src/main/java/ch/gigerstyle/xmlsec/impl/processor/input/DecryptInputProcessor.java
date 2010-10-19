@@ -123,7 +123,7 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
                             currentEncryptedDataType = new EncryptedDataType(startElement);
 
                             referenceType.setProcessed(true);
-                            inputProcessorChain.getSecurityContext().setIsInEncryptedContent();
+                            inputProcessorChain.getDocumentContext().setIsInEncryptedContent();
 
                             //only fire here ContentEncryptedElementEvents
                             //the other ones will be fired later, because we don't know the encrypted element name yet
@@ -156,7 +156,7 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
             if (endElement.getName().equals(Constants.TAG_xenc_EncryptedData)) {
                 currentEncryptedDataType = null;
                 isFinishedcurrentEncryptedDataType = false;
-                inputProcessorChain.getSecurityContext().unsetIsInEncryptedContent();
+                inputProcessorChain.getDocumentContext().unsetIsInEncryptedContent();
                 return;
             } else if (currentEncryptedDataType != null && endElement.getName().equals(Constants.TAG_xenc_CipherValue)) {
                 if (isSecurityHeaderEvent) {

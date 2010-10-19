@@ -44,7 +44,7 @@ public class PolicyInputProcessor extends AbstractInputProcessor {
     public void processSecurityHeaderEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
 
         //test if non encrypted element not have to be encrypted per policy
-        if (!inputProcessorChain.getSecurityContext().isInEncryptedContent() && inputProcessorChain.getDocumentContext().isInSecurityHeader()) {
+        if (!inputProcessorChain.getDocumentContext().isInEncryptedContent() && inputProcessorChain.getDocumentContext().isInSecurityHeader()) {
             testEncryptionPolicy(xmlEvent, inputProcessorChain);
         }
         super.processSecurityHeaderEvent(xmlEvent, inputProcessorChain);
@@ -67,12 +67,12 @@ public class PolicyInputProcessor extends AbstractInputProcessor {
         }
 
         //test if non encrypted element not have to be encrypted per policy
-        if (!inputProcessorChain.getSecurityContext().isInEncryptedContent() && !inputProcessorChain.getDocumentContext().isInSecurityHeader()) {
+        if (!inputProcessorChain.getDocumentContext().isInEncryptedContent() && !inputProcessorChain.getDocumentContext().isInSecurityHeader()) {
             testEncryptionPolicy(xmlEvent, inputProcessorChain);
         }
 
         //test if non signed element not have to be signed per policy
-        if (!inputProcessorChain.getSecurityContext().isInSignedContent()) {
+        if (!inputProcessorChain.getDocumentContext().isInSignedContent()) {
             if (xmlEvent.isStartElement()) {
 
                 if (inputProcessorChain.getDocumentContext().getDocumentLevel() == 3 && inputProcessorChain.getDocumentContext().isInSOAPHeader()) {

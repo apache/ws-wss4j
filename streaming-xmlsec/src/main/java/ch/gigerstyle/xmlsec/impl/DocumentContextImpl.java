@@ -2,7 +2,6 @@ package ch.gigerstyle.xmlsec.impl;
 
 import ch.gigerstyle.xmlsec.ext.Constants;
 import ch.gigerstyle.xmlsec.ext.DocumentContext;
-import ch.gigerstyle.xmlsec.impl.util.FiFoQueue;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamConstants;
@@ -89,6 +88,34 @@ public class DocumentContextImpl implements DocumentContext {
         this.inSecurityHeader = inSecurityHeader;
     }
 
+    private int actualEncryptedContentCounter = 0;
+
+    public synchronized void setIsInEncryptedContent() {
+        this.actualEncryptedContentCounter++;
+    }
+
+    public synchronized void unsetIsInEncryptedContent() {
+        this.actualEncryptedContentCounter--;
+    }
+
+    public boolean isInEncryptedContent() {
+        return this.actualEncryptedContentCounter > 0;
+    }
+
+    private int actualSignedContentCounter = 0;
+
+    public synchronized void setIsInSignedContent() {
+        this.actualSignedContentCounter++;
+    }
+
+    public synchronized void unsetIsInSignedContent() {
+        this.actualSignedContentCounter--;
+    }
+
+    public boolean isInSignedContent() {
+        return this.actualSignedContentCounter > 0;
+    }
+
     @Override
     protected DocumentContextImpl clone() {
         DocumentContextImpl documentContext = new DocumentContextImpl();
@@ -96,6 +123,8 @@ public class DocumentContextImpl implements DocumentContext {
         subPath.addAll(path);
         documentContext.setPath(subPath);
         documentContext.setInSecurityHeader(isInSecurityHeader());
-        return documentContext; 
+        documentContext.actualEncryptedContentCounter = this.actualEncryptedContentCounter;
+        documentContext.actualSignedContentCounter = this.actualSignedContentCounter;
+        return documentContext;
     }
 }
