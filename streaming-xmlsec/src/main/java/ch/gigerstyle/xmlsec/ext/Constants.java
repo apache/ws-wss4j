@@ -1,7 +1,6 @@
 package ch.gigerstyle.xmlsec.ext;
 
 import javax.xml.namespace.QName;
-import javax.xml.stream.XMLEventFactory;
 
 /**
  * User: giger
@@ -25,7 +24,6 @@ import javax.xml.stream.XMLEventFactory;
  */
 public class Constants {
 
-    public static final XMLEventFactory xmlEventFactory = XMLEventFactory.newFactory();
     public static final String XMLEVENT_NS_ALLOCATOR = "XMLEventNSAllocator";
     public static final String XMLINPUTFACTORY = "XMLInputFactory";
 

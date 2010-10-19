@@ -54,6 +54,8 @@ public class Canonicalizer20010315Transformer implements Transformer {
     static final int NODE_NOT_BEFORE_OR_AFTER_DOCUMENT_ELEMENT = 0;
     static final int NODE_AFTER_DOCUMENT_ELEMENT = 1;
 
+    private static final XMLEventFactory xmlEventFactory = XMLEventFactory.newFactory();
+
     private Map cache = new HashMap();
 
     private C14NStack outputStack = new C14NStack();
@@ -68,8 +70,6 @@ public class Canonicalizer20010315Transformer implements Transformer {
     //private List outPutted = new ArrayList();
 
     SortedSet inclusiveNamespaces = null;
-
-    private XMLEventFactory xmlEventFactory = XMLEventFactory.newFactory();
 
     public Canonicalizer20010315Transformer(String inclusiveNamespaces, boolean includeComments, boolean exclusive) {
         this.includeComments = includeComments;
@@ -136,7 +136,7 @@ public class Canonicalizer20010315Transformer implements Transformer {
                         namespaceList = new List[]{xmlEventNS.getNamespaceList()[0]};
                         xmlAttributeList = new List[]{xmlEventNS.getAttributeList()[0]};
                     } else {
-                        outputStack.peek().add(new ComparableNamespace(xmlEventFactory.createNamespace("")));
+                        outputStack.peek().add(new ComparableNamespace(""));
                         if (exclusive) {
                             namespaceList = new List[]{xmlEventNS.getNamespaceList()[0]};
                             xmlAttributeList = new List[]{xmlEventNS.getAttributeList()[0]};
@@ -279,7 +279,7 @@ public class Canonicalizer20010315Transformer implements Transformer {
                             continue;
                         }
 
-                        attrSet.add(new ComparableAttribute(attribute));
+                        attrSet.add(new ComparableAttribute(attribute.getName(), attribute.getValue()));
                     }
 
                     Iterator<ComparableAttribute> attributeIterator = attrSet.iterator();

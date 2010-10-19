@@ -75,8 +75,7 @@ public class SignatureOutputProcessor extends AbstractOutputProcessor {
                                 SignaturePartDef signaturePartDef = new SignaturePartDef();
                                 signaturePartDef.setModifier(SignaturePartDef.Modifier.valueOf(securePart.getModifier()));
                                 signaturePartDef.setSigRefId("id-" + UUID.randomUUID().toString());//"EncDataId-1612925417"
-                                //signaturePartDef.setKeyId("#" + symmetricKeyId);//#EncKeyId-1483925398
-                                //signaturePartDef.setSymmetricKey(symmetricKey);
+
                                 signaturePartDefList.add(signaturePartDef);
                                 internalSignatureOutputProcessor = new InternalSignatureOutputProcessor(getSecurityProperties(), signaturePartDef, startElement.getName());
 
@@ -95,8 +94,7 @@ public class SignatureOutputProcessor extends AbstractOutputProcessor {
                                     attributeList.add(attribute);
                                 }
                                 attributeList.add(securityContext.<XMLEventNSAllocator>get(Constants.XMLEVENT_NS_ALLOCATOR).createAttribute(Constants.ATT_wsu_Id, signaturePartDef.getSigRefId()));
-                                //todo this event should probably be allocated directly and not with our allocator to hold the stack consistent
-                                //or also generate the matching endElement...
+                                //todo the NSStack should be corrected...
                                 xmlEvent = securityContext.<XMLEventNSAllocator>get(Constants.XMLEVENT_NS_ALLOCATOR).createStartElement(startElement.getName(), namespaceList, attributeList);
 
                             } catch (NoSuchAlgorithmException e) {
@@ -170,6 +168,8 @@ public class SignatureOutputProcessor extends AbstractOutputProcessor {
                     outputProcessorChain.removeProcessor(this);
                     //from now on signature is possible again
                     activeInternalSignatureOutputProcessor = null;
+                    //todo the NSStack should be corrected...
+                    xmlEvent = securityContext.<XMLEventNSAllocator>get(Constants.XMLEVENT_NS_ALLOCATOR).createEndElement(startElement);
                 }
             }
             outputProcessorChain.processEvent(xmlEvent);

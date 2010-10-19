@@ -51,7 +51,6 @@ public class EncryptEndingOutputProcessor extends AbstractOutputProcessor {
     private String symmetricKeyId;
     private List<EncryptionPartDef> encryptionPartDefList;
 
-    //private List<XMLEvent> xmlEventBuffer = new ArrayList<XMLEvent>(100);
     private FiFoQueue<XMLEvent> xmlEventBuffer = new FiFoQueue<XMLEvent>();
 
     public EncryptEndingOutputProcessor(SecurityProperties securityProperties, EncryptOutputProcessor encryptOutputProcessor) throws XMLSecurityException {

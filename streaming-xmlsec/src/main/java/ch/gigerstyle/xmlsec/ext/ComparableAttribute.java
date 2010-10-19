@@ -1,7 +1,13 @@
 package ch.gigerstyle.xmlsec.ext;
 
 import javax.xml.namespace.QName;
+import javax.xml.stream.Location;
+import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.Attribute;
+import javax.xml.stream.events.Characters;
+import javax.xml.stream.events.EndElement;
+import javax.xml.stream.events.StartElement;
+import java.io.Writer;
 
 /**
  * User: giger
@@ -23,16 +29,14 @@ import javax.xml.stream.events.Attribute;
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
-public class ComparableAttribute implements Comparable<ComparableAttribute> {
+public class ComparableAttribute implements Attribute, Comparable<ComparableAttribute> {
 
-    private Attribute attribute;
+    private QName name;
+    private String value;
 
-    public ComparableAttribute(Attribute attribute) {
-        this.attribute = attribute;
-    }
-
-    public Attribute getAttribute() {
-        return attribute;
+    public ComparableAttribute(QName name, String value) {
+        this.name = name;
+        this.value = value;
     }
 
     public int compareTo(ComparableAttribute o) {
@@ -60,10 +64,82 @@ public class ComparableAttribute implements Comparable<ComparableAttribute> {
     }
 
     public QName getName() {
-        return attribute.getName();
+        return name;
     }
 
     public String getValue() {
-        return attribute.getValue();
+        return value;
+    }
+
+    public String getDTDType() {
+        return "CDATA";
+    }
+
+    public boolean isSpecified() {
+        return true;
+    }
+
+    public int getEventType() {
+        return ATTRIBUTE;
+    }
+
+    public Location getLocation() {
+        return null;
+    }
+
+    public boolean isStartElement() {
+        return false;
+    }
+
+    public boolean isAttribute() {
+        return true;
+    }
+
+    public boolean isNamespace() {
+        return false;
+    }
+
+    public boolean isEndElement() {
+        return false;
+    }
+
+    public boolean isEntityReference() {
+        return false;
+    }
+
+    public boolean isProcessingInstruction() {
+        return false;
+    }
+
+    public boolean isCharacters() {
+        return false;
+    }
+
+    public boolean isStartDocument() {
+        return false;
+    }
+
+    public boolean isEndDocument() {
+        return false;
+    }
+
+    public StartElement asStartElement() {
+        return null;
+    }
+
+    public EndElement asEndElement() {
+        return null;
+    }
+
+    public Characters asCharacters() {
+        return null;
+    }
+
+    public QName getSchemaType() {
+        return null;
+    }
+
+    public void writeAsEncodedUnicode(Writer writer) throws XMLStreamException {
+        throw new UnsupportedOperationException("writeAsEncodedUnicode not implemented");
     }
 }

@@ -36,7 +36,6 @@ public abstract class AbstractOutputProcessor implements OutputProcessor {
     protected final transient Log logger = LogFactory.getLog(this.getClass());
 
     protected SecurityProperties securityProperties;
-    private QName lastStartElementName = new QName("", "");
 
     private Constants.Phase phase = Constants.Phase.PROCESSING;
     private Set<String> beforeProcessors = new HashSet<String>();
@@ -65,9 +64,6 @@ public abstract class AbstractOutputProcessor implements OutputProcessor {
     public abstract void processEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException;
 
     public void processNextEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain, SecurityContext securityContext) throws XMLStreamException, XMLSecurityException {
-        if (xmlEvent.isStartElement()) {
-            lastStartElementName = xmlEvent.asStartElement().getName();
-        }
         processEvent(xmlEvent, outputProcessorChain, securityContext);
     }
 
@@ -77,10 +73,6 @@ public abstract class AbstractOutputProcessor implements OutputProcessor {
 
     public SecurityProperties getSecurityProperties() {
         return securityProperties;
-    }
-
-    public QName getLastStartElementName() {
-        return lastStartElementName;
     }
 
     public static void createStartElementAndOutputAsEvent(OutputProcessorChain outputProcessorChain, QName element, Map<QName, String> attributes) throws XMLStreamException, XMLSecurityException {

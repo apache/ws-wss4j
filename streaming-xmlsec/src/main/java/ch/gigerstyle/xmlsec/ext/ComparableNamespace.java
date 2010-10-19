@@ -1,6 +1,13 @@
 package ch.gigerstyle.xmlsec.ext;
 
+import javax.xml.namespace.QName;
+import javax.xml.stream.Location;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.events.Characters;
+import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.Namespace;
+import javax.xml.stream.events.StartElement;
+import java.io.Writer;
 
 /**
  * User: giger
@@ -22,28 +29,30 @@ import javax.xml.stream.events.Namespace;
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
-public class ComparableNamespace implements Comparable<ComparableNamespace> {
+public class ComparableNamespace implements Namespace, Comparable<ComparableNamespace> {
 
-    private Namespace namespace;
+    private String prefix;
+    private String uri;
 
-    public ComparableNamespace(Namespace namespace) {
-        this.namespace = namespace;
+    public ComparableNamespace(String uri) {
+        this.uri = uri;
+        this.prefix = "";
     }
 
-    public Namespace getNamespace() {
-        return namespace;
+    public ComparableNamespace(String prefix, String uri) {
+        if (prefix != null) {
+            this.prefix = prefix;
+        } else {
+            this.prefix = "";
+        }
+        this.uri = uri;
     }
 
     public int compareTo(ComparableNamespace o) {
         //An element's namespace nodes are sorted lexicographically by local name
         //(the default namespace node, if one exists, has no local name and is therefore lexicographically least).
         int prefixCompare = this.getPrefix().compareTo(o.getPrefix());
-//        if (prefixCompare != 0) {
         return prefixCompare;
-/*        } else {
-            return this.getNamespaceURI().compareTo(o.getNamespaceURI());
-        }
-        */
     }
 
     @Override
@@ -52,42 +61,111 @@ public class ComparableNamespace implements Comparable<ComparableNamespace> {
             return false;
         }
         ComparableNamespace comparableNamespace = (ComparableNamespace) obj;
-        /*
-        if (comparableNamespace.getPrefix().length() == 0 && this.getPrefix().length() == 0) {
-            return comparableNamespace.getNamespaceURI().equals(this.getNamespaceURI());
-        }
-        else */
+
         if (comparableNamespace.getPrefix().equals(this.getPrefix())) {
-            //&& comparableNamespace.getNamespaceURI().equals(this.getNamespaceURI())) {
             //just test for prefix to get the last prefix definition on the stack and let overwrite it 
             return true;
         }
-        /*
-        else if (("".equals(comparableNamespace.getPrefix()) && comparableNamespace.getNamespaceURI().equals(this.getNamespaceURI()))
-                || ("".equals(this.getPrefix()) && comparableNamespace.getNamespaceURI().equals(this.getNamespaceURI()))) {
-            return true;
-        }
-        */
         return false;
     }
 
-    public String getPrefix() {
-        return namespace.getPrefix();
+    public QName getName() {
+        return null;
+    }
+
+    public String getValue() {
+        return null;
     }
 
     public String getNamespaceURI() {
-        return namespace.getNamespaceURI();
+        return uri;
+    }
+
+    public String getPrefix() {
+        return prefix;
     }
 
     public boolean isDefaultNamespaceDeclaration() {
-        return namespace.isDefaultNamespaceDeclaration();
+        return (prefix.length() == 0);
+    }
+
+    public String getDTDType() {
+        return "CDATA";
+    }
+
+    public boolean isSpecified() {
+        return true;
+    }
+
+    public int getEventType() {
+        return NAMESPACE;
+    }
+
+    public Location getLocation() {
+        return null;
+    }
+
+    public boolean isStartElement() {
+        return false;
+    }
+
+    public boolean isAttribute() {
+        return true;
+    }
+
+    public boolean isNamespace() {
+        return true;
+    }
+
+    public boolean isEndElement() {
+        return false;
+    }
+
+    public boolean isEntityReference() {
+        return false;
+    }
+
+    public boolean isProcessingInstruction() {
+        return false;
+    }
+
+    public boolean isCharacters() {
+        return false;
+    }
+
+    public boolean isStartDocument() {
+        return false;
+    }
+
+    public boolean isEndDocument() {
+        return false;
+    }
+
+    public StartElement asStartElement() {
+        return null;
+    }
+
+    public EndElement asEndElement() {
+        return null;
+    }
+
+    public Characters asCharacters() {
+        return null;
+    }
+
+    public QName getSchemaType() {
+        return null;
+    }
+
+    public void writeAsEncodedUnicode(Writer writer) throws XMLStreamException {
+        throw new UnsupportedOperationException("writeAsEncodedUnicode not implemented");
     }
 
     @Override
     public String toString() {
-        if (namespace.getPrefix() == null || namespace.getPrefix().length() == 0) {
-            return "xmlns=\"" + namespace.getNamespaceURI() + "\"";
+        if (getPrefix() == null || getPrefix().length() == 0) {
+            return "xmlns=\"" + getNamespaceURI() + "\"";
         }
-        return "xmlns:" + namespace.getPrefix() + "=\"" + namespace.getNamespaceURI() + "\"";
+        return "xmlns:" + getPrefix() + "=\"" + getNamespaceURI() + "\"";
     }
 }
