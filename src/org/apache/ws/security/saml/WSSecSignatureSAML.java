@@ -27,6 +27,7 @@ import org.apache.ws.security.WSDocInfoStore;
 import org.apache.ws.security.WSEncryptionPart;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
+import org.apache.ws.security.message.DOMURIDereferencer;
 import org.apache.ws.security.message.WSSecHeader;
 import org.apache.ws.security.message.WSSecSignature;
 import org.apache.ws.security.message.token.Reference;
@@ -48,6 +49,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
+import javax.xml.crypto.URIDereferencer;
 import javax.xml.crypto.XMLStructure;
 import javax.xml.crypto.dom.DOMStructure;
 import javax.xml.crypto.dsig.SignatureMethod;
@@ -527,6 +529,9 @@ public class WSSecSignatureSAML extends WSSecSignature {
                     WSConstants.C14N_EXCL_OMIT_COMMENTS_PREFIX
                 );
             }
+            URIDereferencer dereferencer = new DOMURIDereferencer();
+            ((DOMURIDereferencer)dereferencer).setWsDocInfo(wsDocInfo);
+            signContext.setURIDereferencer(new DOMURIDereferencer());
             sig.sign(signContext);
             
             signatureValue = sig.getSignatureValue().getValue();

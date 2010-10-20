@@ -28,7 +28,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.action.Action;
 import org.apache.ws.security.processor.Processor;
-import org.apache.ws.security.transform.STRTransform;
 import org.apache.ws.security.util.Loader;
 import org.apache.ws.security.util.UUIDGenerator;
 
@@ -291,16 +290,8 @@ public class WSSConfig {
             org.apache.xml.security.Init.init();
             if (addJceProviders) {
                 addJceProvider("BC", "org.bouncycastle.jce.provider.BouncyCastleProvider");
-                String xmlDSigName = 
-                    addJceProvider("XMLDSig", "org.jcp.xml.dsig.internal.dom.XMLDSigRI");
-                if (xmlDSigName != null) {
-                    java.security.Provider provider =
-                        java.security.Security.getProvider(xmlDSigName);
-                    provider.put(
-                        "TransformService." + STRTransform.TRANSFORM_URI,
-                        "org.apache.ws.security.transform.STRTransform"
-                    );
-                }
+                addJceProvider("XMLDSig", "org.jcp.xml.dsig.internal.dom.XMLDSigRI");
+                addJceProvider("STRTransform", "org.apache.ws.security.transform.STRTransformProvider");
             }
             
             staticallyInitialized = true;
