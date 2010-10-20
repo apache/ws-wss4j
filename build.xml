@@ -71,15 +71,6 @@ Build Instructions:
         <property name="build.junit.xml" value="${build.doc.xml}/junit"/>
         <property name="build.junit.html" value="${build.doc.html}/junit"/>
 
-
-        <condition property="jdk13.present">
-          <equals arg1="${ant.java.version}" arg2="1.3"/>
-        </condition>
-
-        <condition property="jdk14.present">
-          <equals arg1="${ant.java.version}" arg2="1.4"/>
-        </condition>
-
         <condition property="jdk15.present">
           <equals arg1="${ant.java.version}" arg2="1.5"/>
         </condition>
@@ -90,7 +81,6 @@ Build Instructions:
 
         <condition property="merlin.ok">
             <or>
-                <equals arg1="${ant.java.version}" arg2="1.4"/>
                 <equals arg1="${ant.java.version}" arg2="1.5"/>
                 <equals arg1="${ant.java.version}" arg2="1.6"/>
             </or>
@@ -110,8 +100,6 @@ Build Instructions:
         <path id="classpath.libraries" description="3rd party libs">
             <fileset dir="${dir.libs}">
                 <include name="**/*.jar"/>
-                <exclude name="**/bcprov-jdk15-*.jar" unless="jdk15.present"/>
-                <exclude name="**/bcprov-jdk13-*.jar" if="jdk15.present" />
                 <!-- <pathelement path="${java.class.path}"/> -->
             </fileset>
             <fileset dir="${dir.endorsed.libs}">
@@ -276,9 +264,8 @@ org.apache.ws.axis.security.util
         <echo level="debug">
         --- Flags (Note: If the {property name} is displayed,
                    then the component is not present)
-        jdk13.present=${jdk13.present}
-        jdk14.present=${jdk14.present}
         jdk15.present=${jdk15.present}
+        jdk16.present=${jdk16.present}
         bc.present=${bc.present}
         </echo>
 
@@ -352,10 +339,9 @@ org.apache.ws.axis.security.util
 
     <target name="compile.library" depends="prepare-src">
         <!-- Compile the java code from ${dir.src} into ${build.classes} -->
-        <javac srcdir="${dir.src}" destdir="${build.classes}" debug="on" source="1.3" target="1.3">
+        <javac srcdir="${dir.src}" destdir="${build.classes}" debug="on" source="1.4" target="1.4" includeAntRuntime="false">
             <classpath refid="classpath.library"/>
             <exclude name="**/Merlin.java" unless="merlin.ok"/>
-            <exclude name="**/sandbox/**/*.java" if="jdk13.present" />
         </javac>
         <!-- Copy Property files -->
         <copy todir="${build.classes}">
@@ -370,14 +356,13 @@ org.apache.ws.axis.security.util
         depends="compile.interops"
         if="junit.present">
 
-        <javac srcdir="${dir.test}" destdir="${build.classes}" debug="on" source="1.3" target="1.3">
+        <javac srcdir="${dir.test}" destdir="${build.classes}" debug="on" source="1.4" target="1.4" includeAntRuntime="false">
             <classpath refid="classpath.test"/>
-<!--            <exclude name="**/secconv/**/*.java"/> -->
         </javac>
 
         <mkdir dir="${build.work}"/>
 
-        <javac srcdir="${build.work}" destdir="${build.classes}" debug="on" source="1.3" target="1.3">
+        <javac srcdir="${build.work}" destdir="${build.classes}" debug="on" source="1.4" target="1.4" includeAntRuntime="false">
             <classpath refid="classpath.test"/>
         </javac>
 
@@ -396,7 +381,7 @@ org.apache.ws.axis.security.util
         <javac srcdir="${dir.samples}"
             debug="on"
             source="1.4"
-            destdir="${build.classes}" target="1.4">
+            destdir="${build.classes}" target="1.4" includeAntRuntime="false">
             <classpath refid="classpath.library"/>
         </javac>
         <copy todir="${build.classes}">
@@ -423,7 +408,7 @@ org.apache.ws.axis.security.util
             httpStopTarget="stop-functional-test-http-server"/>
     </target>
 
-    <target name="start-functional-test-http-server" if="junit.present">
+    <target name="start-functional-test-http-server" depends="init" if="junit.present">
         <echo message="Starting http server."/>
         <java classname="org.apache.axis.transport.http.SimpleAxisServer" 
           fork="yes" dir="${build.dir}">
@@ -432,7 +417,7 @@ org.apache.ws.axis.security.util
         </java>
     </target>
 
-    <target name="stop-functional-test-http-server" if="junit.present">
+    <target name="stop-functional-test-http-server" depends="init" if="junit.present">
         <echo message="Stopping http server."/>
         <java classname="org.apache.axis.client.AdminClient" fork="yes">
             <classpath refid="classpath.library"/>
@@ -647,7 +632,7 @@ org.apache.ws.axis.security.util
         <antcall target="undeployWSDD" />
     </target>
     
-    <target name="deployWSDD">
+    <target name="deployWSDD" depends="init">
       <path id="deploy_xml_files">
       <fileset dir="${build.work}">
         <include name="**/deploy.wsdd"/>

@@ -38,7 +38,7 @@ import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.handler.WSHandlerResult;
 import org.apache.ws.security.util.WSSecurityUtil;
-import org.apache.ws.security.util.XMLUtils;
+import org.apache.xml.security.utils.XMLUtils;
 import org.w3c.dom.Document;
 
 import javax.security.auth.callback.CallbackHandler;
@@ -115,8 +115,7 @@ public class WSDoAllReceiver extends WSDoAllHandler {
                 doc = sm.getSOAPEnvelope().getAsDocument();
                 if (doDebug) {
                     log.debug("Received SOAP request: ");
-                    log.debug(org.apache.axis.utils.XMLUtils
-                            .PrettyDocumentToString(doc));
+                    log.debug(org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc));
                 }
             } catch (Exception ex) {
                 if (doDebug) {
@@ -210,8 +209,7 @@ public class WSDoAllReceiver extends WSDoAllHandler {
             sPart.setCurrentMessage(os.toByteArray(), SOAPPart.FORM_BYTES);
             if (doDebug) {
                 log.debug("Processed received SOAP request");
-                log.debug(org.apache.axis.utils.XMLUtils
-                        .PrettyDocumentToString(doc));
+                log.debug(org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc));
             }
             if (tlog.isDebugEnabled()) {
                 t3 = System.currentTimeMillis();

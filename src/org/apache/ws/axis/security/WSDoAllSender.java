@@ -31,7 +31,7 @@ import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.util.WSSecurityUtil;
-import org.apache.ws.security.util.XMLUtils;
+import org.apache.xml.security.utils.XMLUtils;
 import org.w3c.dom.Document;
 
 import java.io.ByteArrayOutputStream;

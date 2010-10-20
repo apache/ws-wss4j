@@ -83,9 +83,10 @@
           </fileset>
         </copy>
         <javac srcdir="${dir.work}" 
-                destdir="${dir.classes}"
-                source="1.4"
-               debug="true">
+               destdir="${dir.classes}"
+               source="1.4"
+               debug="true"
+               includeAntRuntime="false">
           <classpath refid="classpath.libraries" />
           <include name="${server}/*.java" />
           <include name="${client}/*.java" />
