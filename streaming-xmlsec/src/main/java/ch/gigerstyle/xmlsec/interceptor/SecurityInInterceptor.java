@@ -1,5 +1,22 @@
 package ch.gigerstyle.xmlsec.interceptor;
 
+import ch.gigerstyle.xmlsec.XMLSec;
+import ch.gigerstyle.xmlsec.ext.Constants;
+import ch.gigerstyle.xmlsec.ext.InboundXMLSec;
+import ch.gigerstyle.xmlsec.ext.SecurityProperties;
+import ch.gigerstyle.xmlsec.ext.XMLSecurityException;
+import org.apache.cxf.binding.soap.SoapFault;
+import org.apache.cxf.binding.soap.SoapMessage;
+import org.apache.cxf.binding.soap.interceptor.AbstractSoapInterceptor;
+import org.apache.cxf.interceptor.Fault;
+import org.apache.cxf.interceptor.StaxInInterceptor;
+
+import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * User: giger
  * Date: May 13, 2010
@@ -20,5 +37,41 @@ package ch.gigerstyle.xmlsec.interceptor;
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
-public class SecurityInInterceptor {
+public class SecurityInInterceptor extends AbstractSoapInterceptor {
+
+    private static final Set<QName> HEADERS = new HashSet<QName>();
+
+    static {
+        HEADERS.add(Constants.TAG_wsse_Security);
+        HEADERS.add(Constants.TAG_xenc_EncryptedData);
+    }
+
+    private InboundXMLSec inboundXMLSec;
+
+    public SecurityInInterceptor(String p, SecurityProperties securityProperties) throws Exception {
+        super(p);
+        getAfter().add(StaxInInterceptor.class.getName());
+
+        inboundXMLSec = XMLSec.getInboundXMLSec(securityProperties);
+    }
+
+    public void handleMessage(SoapMessage soapMessage) throws Fault {
+
+        XMLStreamReader xmlReader = soapMessage.getContent(XMLStreamReader.class);
+        XMLStreamReader newXmlStreamReader = null;
+
+        try {
+            newXmlStreamReader = inboundXMLSec.processInMessage(xmlReader);
+            soapMessage.setContent(XMLStreamReader.class, newXmlStreamReader);
+            //todo correct faults per WSS-spec
+        } catch (XMLSecurityException e) {
+            throw new SoapFault("Invalid security", soapMessage.getVersion().getSender());
+        } catch (XMLStreamException e) {
+            throw new SoapFault("Invalid security", soapMessage.getVersion().getReceiver());
+        }
+    }
+
+    public Set<QName> getUnderstoodHeaders() {
+        return HEADERS;
+    }
 }
