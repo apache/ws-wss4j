@@ -1,5 +1,14 @@
 package ch.gigerstyle.xmlsec.test;
 
+import ch.gigerstyle.xmlsec.impl.util.IVSplittingOutputStream;
+import org.testng.Assert;
+import org.testng.annotations.Test;
+
+import javax.crypto.Cipher;
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
+import java.io.ByteArrayOutputStream;
+
 /**
  * User: giger
  * Date: Jul 11, 2010
@@ -21,7 +30,7 @@ package ch.gigerstyle.xmlsec.test;
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 public class IVSplittingOutputStreamTest {
-    /*
+
     private final String testString = "Within this class we test if the IVSplittingOutputStream works correctly under different conditions";
 
     @Test
@@ -29,11 +38,16 @@ public class IVSplittingOutputStreamTest {
 
         int ivSize = 16;
 
+        KeyGenerator keyGenerator = KeyGenerator.getInstance("AES");
+        keyGenerator.init(128);
+        SecretKey secretKey = keyGenerator.generateKey();
+        Cipher cipher = Cipher.getInstance("AES/CBC/ISO10126Padding");
+
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        IVSplittingOutputStream ivSplittingOutputStream = new IVSplittingOutputStream(byteArrayOutputStream, ivSize);
+        IVSplittingOutputStream ivSplittingOutputStream = new IVSplittingOutputStream(byteArrayOutputStream, cipher, secretKey);
         byte[] testBytes = testString.getBytes();
         for (int i = 0; i < testBytes.length; i++) {
-            ivSplittingOutputStream.write(testBytes[i]);            
+            ivSplittingOutputStream.write(testBytes[i]);
         }
         ivSplittingOutputStream.close();
 
@@ -48,8 +62,13 @@ public class IVSplittingOutputStreamTest {
 
         int ivSize = 16;
 
+        KeyGenerator keyGenerator = KeyGenerator.getInstance("AES");
+        keyGenerator.init(128);
+        SecretKey secretKey = keyGenerator.generateKey();
+        Cipher cipher = Cipher.getInstance("AES/CBC/ISO10126Padding");
+
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        IVSplittingOutputStream ivSplittingOutputStream = new IVSplittingOutputStream(byteArrayOutputStream, ivSize);
+        IVSplittingOutputStream ivSplittingOutputStream = new IVSplittingOutputStream(byteArrayOutputStream, cipher, secretKey);
         ivSplittingOutputStream.write(testString.getBytes());
         ivSplittingOutputStream.close();
 
@@ -64,12 +83,17 @@ public class IVSplittingOutputStreamTest {
 
         int ivSize = 16;
 
+        KeyGenerator keyGenerator = KeyGenerator.getInstance("AES");
+        keyGenerator.init(128);
+        SecretKey secretKey = keyGenerator.generateKey();
+        Cipher cipher = Cipher.getInstance("AES/CBC/ISO10126Padding");
+
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        IVSplittingOutputStream ivSplittingOutputStream = new IVSplittingOutputStream(byteArrayOutputStream, ivSize);
+        IVSplittingOutputStream ivSplittingOutputStream = new IVSplittingOutputStream(byteArrayOutputStream, cipher, secretKey);
 
         byte[] testBytes = testString.getBytes();
-        for (int i = 0; i < testBytes.length - 4; i+=4) {
-            ivSplittingOutputStream.write(testBytes, i, 4);            
+        for (int i = 0; i < testBytes.length - 4; i += 4) {
+            ivSplittingOutputStream.write(testBytes, i, 4);
         }
         //write last part
         ivSplittingOutputStream.write(testBytes, testBytes.length - testBytes.length % 4, testBytes.length % 4);
@@ -80,5 +104,4 @@ public class IVSplittingOutputStreamTest {
         Assert.assertEquals(new String(ivSplittingOutputStream.getIv()) + new String(byteArrayOutputStream.toByteArray()), testString);
         Assert.assertTrue(ivSplittingOutputStream.isIVComplete());
     }
-    */
 }

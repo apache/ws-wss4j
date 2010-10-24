@@ -88,9 +88,6 @@ public class IVSplittingOutputStream extends FilterOutputStream {
     @Override
     public void write(byte[] b, int off, int len) throws IOException {
         if (pos >= ivLength) {
-            if (!isCipherInitialized) {
-                initializeCipher();
-            }
             out.write(b, off, len);
             return;
         }
