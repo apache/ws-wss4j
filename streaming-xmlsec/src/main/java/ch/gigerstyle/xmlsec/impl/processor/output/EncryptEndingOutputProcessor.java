@@ -104,7 +104,7 @@ public class EncryptEndingOutputProcessor extends AbstractOutputProcessor {
             try {
                 X509Certificate[] certs = getSecurityProperties().getEncryptionCrypto().getCertificates(getSecurityProperties().getEncryptionUser());
                 if (certs == null || certs.length <= 0) {
-                    throw new XMLSecurityException("noUserCertsFound" + " encryption");
+                    throw new XMLSecurityException("noUserCertsFound for encryption for user " + getSecurityProperties().getEncryptionUser());
                 }
                 x509Certificate = certs[0];
             } catch (WSSecurityException e) {
