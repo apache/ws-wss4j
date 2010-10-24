@@ -14,6 +14,7 @@ import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.events.XMLEvent;
 import java.util.List;
 
 /**
@@ -68,7 +69,7 @@ public class InboundXMLSec {
         securityContextImpl.put(Constants.XMLINPUTFACTORY, xmlInputFactory);
         final XMLEventReader xmlEventReader = xmlInputFactory.createXMLEventReader(xmlStreamReader);
 
-        final PipedXMLStreamReader pipedXMLStreamReader = new PipedXMLStreamReader(10);
+        final PipedXMLStreamReader pipedXMLStreamReader = new PipedXMLStreamReader(20);
         final PipedInputProcessor pipedInputProcessor = new PipedInputProcessor(pipedXMLStreamReader, securityProperties);
 
         Runnable runnable = new Runnable() {
@@ -97,7 +98,11 @@ public class InboundXMLSec {
                     }
 
                     while (xmlEventReader.hasNext()) {
-                        processorChain.processEvent(xmlEventReader.nextEvent());
+                        XMLEvent xmlEvent = xmlEventReader.nextEvent();
+                        if (xmlEvent.isStartDocument() || xmlEvent.isEndDocument()) {
+                            continue;
+                        }
+                        processorChain.processEvent(xmlEvent);
                         processorChain.reset();
                     }
                     processorChain.doFinal();
