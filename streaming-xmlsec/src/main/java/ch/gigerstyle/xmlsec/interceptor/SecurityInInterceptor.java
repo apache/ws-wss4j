@@ -57,11 +57,11 @@ public class SecurityInInterceptor extends AbstractSoapInterceptor {
 
     public void handleMessage(SoapMessage soapMessage) throws Fault {
 
-        XMLStreamReader xmlReader = soapMessage.getContent(XMLStreamReader.class);
+        XMLStreamReader originalXmlStreamReader = soapMessage.getContent(XMLStreamReader.class);
         XMLStreamReader newXmlStreamReader = null;
 
         try {
-            newXmlStreamReader = inboundXMLSec.processInMessage(xmlReader);
+            newXmlStreamReader = inboundXMLSec.processInMessage(originalXmlStreamReader);
             soapMessage.setContent(XMLStreamReader.class, newXmlStreamReader);
             //todo correct faults per WSS-spec
         } catch (XMLSecurityException e) {
