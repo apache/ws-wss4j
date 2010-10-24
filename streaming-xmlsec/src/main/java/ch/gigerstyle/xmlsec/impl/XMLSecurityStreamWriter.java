@@ -75,6 +75,7 @@ public class XMLSecurityStreamWriter implements XMLStreamWriter {
     }
 
     public void writeStartElement(String localName) throws XMLStreamException {
+        outputOpenStartElement();
         QName qName;
         if (localName.contains(":")) {
             String[] splittedName = localName.split(":");
@@ -89,6 +90,7 @@ public class XMLSecurityStreamWriter implements XMLStreamWriter {
     }
 
     public void writeStartElement(String namespaceURI, String localName) throws XMLStreamException {
+        outputOpenStartElement();
         QName qName;
         if (localName.contains(":")) {
             String[] splittedName = localName.split(":");
@@ -103,6 +105,7 @@ public class XMLSecurityStreamWriter implements XMLStreamWriter {
     }
 
     public void writeStartElement(String prefix, String localName, String namespaceURI) throws XMLStreamException {
+        outputOpenStartElement();
         QName qName = new QName(namespaceURI, localName, prefix);
         startElementStack.push(qName);
         openStartElement = qName;
