@@ -210,7 +210,7 @@ public class PipedXMLStreamReader implements XMLStreamReader, Thread.UncaughtExc
             /* might be a writer waiting */
             notifyAll();
             try {
-                wait(10);
+                wait(100);
             } catch (InterruptedException ex) {
                 throw new XMLStreamException(ex);
             }
@@ -530,11 +530,16 @@ public class PipedXMLStreamReader implements XMLStreamReader, Thread.UncaughtExc
 
     public int getNamespaceCount() {
         XMLEvent xmlEvent = getCurrentEvent();
-        if (xmlEvent.getEventType() != START_ELEMENT) {
-            throw new IllegalStateException(ErrorConsts.ERR_STATE_NOT_STELEM);
+        if (xmlEvent.getEventType() != START_ELEMENT && xmlEvent.getEventType() != END_ELEMENT) {
+            throw new IllegalStateException(ErrorConsts.ERR_STATE_NOT_ELEM);
         }
         int count = 0;
-        Iterator<Namespace> namespaceIterator = xmlEvent.asStartElement().getNamespaces();
+        Iterator<Namespace> namespaceIterator;
+        if (xmlEvent.getEventType() == START_ELEMENT) {
+            namespaceIterator = xmlEvent.asStartElement().getNamespaces();
+        } else {
+            namespaceIterator = xmlEvent.asEndElement().getNamespaces();
+        }
         while (namespaceIterator.hasNext()) {
             namespaceIterator.next();
             count++;
@@ -544,11 +549,16 @@ public class PipedXMLStreamReader implements XMLStreamReader, Thread.UncaughtExc
 
     public String getNamespacePrefix(int index) {
         XMLEvent xmlEvent = getCurrentEvent();
-        if (xmlEvent.getEventType() != START_ELEMENT) {
-            throw new IllegalStateException(ErrorConsts.ERR_STATE_NOT_STELEM);
+        if (xmlEvent.getEventType() != START_ELEMENT && xmlEvent.getEventType() != END_ELEMENT) {
+            throw new IllegalStateException(ErrorConsts.ERR_STATE_NOT_ELEM);
         }
         int count = 0;
-        Iterator<Namespace> namespaceIterator = xmlEvent.asStartElement().getNamespaces();
+        Iterator<Namespace> namespaceIterator;
+        if (xmlEvent.getEventType() == START_ELEMENT) {
+            namespaceIterator = xmlEvent.asStartElement().getNamespaces();
+        } else {
+            namespaceIterator = xmlEvent.asEndElement().getNamespaces();
+        }
         while (namespaceIterator.hasNext()) {
             Namespace namespace = namespaceIterator.next();
             if (count == index) {
