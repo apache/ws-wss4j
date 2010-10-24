@@ -28,6 +28,8 @@ import javax.xml.stream.events.XMLEvent;
  */
 public class SecurityHeaderOutputProcessor extends AbstractOutputProcessor {
 
+    private int level = 0;
+
     public SecurityHeaderOutputProcessor(SecurityProperties securityProperties) throws XMLSecurityException {
         super(securityProperties);
         setPhase(Constants.Phase.PREPROCESSING);
@@ -35,21 +37,59 @@ public class SecurityHeaderOutputProcessor extends AbstractOutputProcessor {
 
     public void processEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException {
 
-        outputProcessorChain.processEvent(xmlEvent);
+        //todo test first occuring element must be soap-envelope?
+
+        boolean eventHandled = false;
 
         if (xmlEvent.isStartElement()) {
+            level++;
             StartElement startElement = xmlEvent.asStartElement();
 
-            if (startElement.getName().equals(Constants.TAG_soap11_Header)) {
-                OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
+            if (level == 2 && startElement.getName().equals(Constants.TAG_soap11_Header)) {
+                //output current soap-header event
+                outputProcessorChain.processEvent(xmlEvent);
 
+                //create subchain and output securityHeader
+                OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
                 createStartElementAndOutputAsEvent(subOutputProcessorChain, Constants.TAG_wsse_Security, null);
                 subOutputProcessorChain.reset();
                 createEndElementAndOutputAsEvent(subOutputProcessorChain, Constants.TAG_wsse_Security);
                 subOutputProcessorChain.reset();
 
+                //remove this processor. its no longer needed.
                 outputProcessorChain.removeProcessor(this);
+
+                eventHandled = true;
+            } else if (level == 2 && startElement.getName().equals(Constants.TAG_soap11_Body)) {
+                //hmm it seems we don't have a soap header in the current document
+                //so output one and add securityHeader
+
+                //create subchain and output soap-header and securityHeader
+                OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
+                //todo can the reset() methods moved to createXY methods?
+                createStartElementAndOutputAsEvent(subOutputProcessorChain, Constants.TAG_soap11_Header, null);
+                subOutputProcessorChain.reset();
+                createStartElementAndOutputAsEvent(subOutputProcessorChain, Constants.TAG_wsse_Security, null);
+                subOutputProcessorChain.reset();
+                createEndElementAndOutputAsEvent(subOutputProcessorChain, Constants.TAG_wsse_Security);
+                subOutputProcessorChain.reset();
+                createEndElementAndOutputAsEvent(subOutputProcessorChain, Constants.TAG_soap11_Header);
+                subOutputProcessorChain.reset();
+
+                //output current soap-header event
+                outputProcessorChain.processEvent(xmlEvent);
+
+                //remove this processor. its no longer needed.
+                outputProcessorChain.removeProcessor(this);
+
+                eventHandled = true;
             }
+        } else if (xmlEvent.isEndElement()) {
+            level--;
+        }
+
+        if (!eventHandled) {
+            outputProcessorChain.processEvent(xmlEvent);
         }
     }
 }
