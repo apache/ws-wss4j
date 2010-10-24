@@ -50,7 +50,8 @@ import java.util.UUID;
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
-public class DecryptInputProcessor extends AbstractInputProcessor {
+public class
+        DecryptInputProcessor extends AbstractInputProcessor {
 
     private ReferenceList referenceList;
 
@@ -194,8 +195,8 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
         private Throwable thrownExceptionByReader = null;
 
         private Cipher symmetricCipher;
-        private OutputStream bufferedOutputStream;
-        private OutputStream outputStream;
+        private OutputStream decryptOutputStream;
+        private OutputStream pipedOutputStream;
         private boolean isFirstCall = true;
         private EncryptedDataType encryptedDataType;
         private XMLEventNS startXMLElement;
@@ -285,8 +286,7 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
                 final PipedInputStream pipedInputStream = new PipedInputStream();
 
                 try {
-                    //outputStream = new LogOutputStream(new PipedOutputStream(pipedInputStream));
-                    outputStream = new PipedOutputStream(pipedInputStream);
+                    pipedOutputStream = new PipedOutputStream(pipedInputStream);
                 } catch (IOException e) {
                     throw new XMLStreamException(e);
                 }
@@ -369,7 +369,7 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
 
                     //temporary writer for direct writing plaintext data
                     //todo encoding?:
-                    BufferedWriter tempBufferedWriter = new BufferedWriter(new OutputStreamWriter(outputStream));
+                    BufferedWriter tempBufferedWriter = new BufferedWriter(new OutputStreamWriter(pipedOutputStream));
 
                     tempBufferedWriter.write('<');
                     tempBufferedWriter.write(dummyStartElementName.getPrefix());
@@ -406,7 +406,7 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
                     tempBufferedWriter.flush();
 
                     IVSplittingOutputStream ivSplittingOutputStream = new IVSplittingOutputStream(
-                            new CipherOutputStream(new FilterOutputStream(outputStream) {
+                            new CipherOutputStream(new FilterOutputStream(pipedOutputStream) {
                                 @Override
                                 public void close() throws IOException {
                                     //we overwrite the close method and don't delegate close. Close must be done separately.
@@ -417,9 +417,11 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
                                 }
                             }, symmetricCipher),
                             symmetricCipher, secretKey);
-                    bufferedOutputStream = new BufferedOutputStream(new Base64OutputStream(ivSplittingOutputStream, false), 8192 * 5);
+                    //buffering seems not to help
+                    //bufferedOutputStream = new BufferedOutputStream(new Base64OutputStream(ivSplittingOutputStream, false), 8192 * 5);
+                    decryptOutputStream = new Base64OutputStream(ivSplittingOutputStream, false);
 
-                    bufferedOutputStream.write(xmlEvent.asCharacters().getData().getBytes());
+                    decryptOutputStream.write(xmlEvent.asCharacters().getData().getBytes());
 
                 } catch (IOException e) {
                     testAndThrowUncaughtException(thrownExceptionByReader);
@@ -430,10 +432,10 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
                 if (endElement.getName().equals(Constants.TAG_xenc_CipherValue)) {
                     try {
                         //flush decrypted data to xmlstreamreader
-                        bufferedOutputStream.close(); //close to get Cipher.doFinal() called
+                        decryptOutputStream.close(); //close to get Cipher.doFinal() called
 
                         //todo encoding?:
-                        BufferedWriter tempBufferedWriter = new BufferedWriter(new OutputStreamWriter(outputStream));
+                        BufferedWriter tempBufferedWriter = new BufferedWriter(new OutputStreamWriter(pipedOutputStream));
                         tempBufferedWriter.write("</");
                         tempBufferedWriter.write(dummyStartElementName.getPrefix());
                         tempBufferedWriter.write(':');
@@ -461,7 +463,7 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
                 }
             } else if (xmlEvent.isCharacters()) {
                 try {
-                    bufferedOutputStream.write(xmlEvent.asCharacters().getData().getBytes());
+                    decryptOutputStream.write(xmlEvent.asCharacters().getData().getBytes());
                 } catch (IOException e) {
                     testAndThrowUncaughtException(thrownExceptionByReader);
                     throw new XMLStreamException(e);
