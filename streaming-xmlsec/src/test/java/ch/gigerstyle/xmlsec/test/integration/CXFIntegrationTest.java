@@ -4,6 +4,7 @@ import ch.gigerstyle.xmlsec.test.WSS4JCallbackHandlerImpl;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor;
 import org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor;
 import org.apache.hello_world_soap_http.Greeter;
 import org.apache.hello_world_soap_http.SOAPService;
@@ -49,9 +50,17 @@ public class CXFIntegrationTest {
             wss4JOutInterceptor.setProperty(WSHandlerConstants.USER, "transmitter");
             wss4JOutInterceptor.setProperty(WSHandlerConstants.ENCRYPTION_USER, "receiver");
             wss4JOutInterceptor.setProperty(WSHandlerConstants.PW_CALLBACK_CLASS, WSS4JCallbackHandlerImpl.class.getName());
-            wss4JOutInterceptor.setProperty(WSHandlerConstants.SIG_PROP_FILE, "integration/crypto.properties");
-            wss4JOutInterceptor.setProperty(WSHandlerConstants.ENC_PROP_FILE, "integration/crypto.properties");
+            wss4JOutInterceptor.setProperty(WSHandlerConstants.SIG_PROP_FILE, "integration/transmitter-crypto.properties");
+            wss4JOutInterceptor.setProperty(WSHandlerConstants.ENC_PROP_FILE, "integration/transmitter-crypto.properties");
             client.getOutInterceptors().add(wss4JOutInterceptor);
+
+            WSS4JInInterceptor wss4JInInterceptor = new WSS4JInInterceptor();
+            wss4JInInterceptor.setProperty(WSHandlerConstants.ACTION, "Encrypt");
+            wss4JInInterceptor.setProperty(WSHandlerConstants.PW_CALLBACK_CLASS, WSS4JCallbackHandlerImpl.class.getName());
+            wss4JInInterceptor.setProperty(WSHandlerConstants.SIG_PROP_FILE, "integration/transmitter-crypto.properties");
+            wss4JInInterceptor.setProperty(WSHandlerConstants.DEC_PROP_FILE, "integration/transmitter-crypto.properties");
+            client.getInInterceptors().add(wss4JInInterceptor);
+            
             greeterStream.greetMe("Cold start");
         }
 
@@ -65,9 +74,17 @@ public class CXFIntegrationTest {
             wss4JOutInterceptor.setProperty(WSHandlerConstants.USER, "transmitter");
             wss4JOutInterceptor.setProperty(WSHandlerConstants.ENCRYPTION_USER, "receiver");
             wss4JOutInterceptor.setProperty(WSHandlerConstants.PW_CALLBACK_CLASS, WSS4JCallbackHandlerImpl.class.getName());
-            wss4JOutInterceptor.setProperty(WSHandlerConstants.SIG_PROP_FILE, "integration/crypto.properties");
-            wss4JOutInterceptor.setProperty(WSHandlerConstants.ENC_PROP_FILE, "integration/crypto.properties");
+            wss4JOutInterceptor.setProperty(WSHandlerConstants.SIG_PROP_FILE, "integration/transmitter-crypto.properties");
+            wss4JOutInterceptor.setProperty(WSHandlerConstants.ENC_PROP_FILE, "integration/transmitter-crypto.properties");
             client.getOutInterceptors().add(wss4JOutInterceptor);
+
+            WSS4JInInterceptor wss4JInInterceptor = new WSS4JInInterceptor();
+            wss4JInInterceptor.setProperty(WSHandlerConstants.ACTION, "Encrypt");
+            wss4JInInterceptor.setProperty(WSHandlerConstants.PW_CALLBACK_CLASS, WSS4JCallbackHandlerImpl.class.getName());
+            wss4JInInterceptor.setProperty(WSHandlerConstants.SIG_PROP_FILE, "integration/transmitter-crypto.properties");
+            wss4JInInterceptor.setProperty(WSHandlerConstants.DEC_PROP_FILE, "integration/transmitter-crypto.properties");
+            client.getInInterceptors().add(wss4JInInterceptor);
+
             client.getRequestContext().put(Message.ENDPOINT_ADDRESS, "http://localhost:9001/GreeterServiceWSS4J");
             greeterWSS4J.greetMe("Cold start");
         }
@@ -87,8 +104,8 @@ public class CXFIntegrationTest {
         System.out.flush();
     }
 
-    //@Test(invocationCount = 100, threadPoolSize = 10, dependsOnMethods = {"startTiming", "testCXFWSS4J"})
-    @Test(invocationCount = 100, threadPoolSize = 10, dependsOnMethods = {"startTiming"})
+    @Test(invocationCount = 100, threadPoolSize = 10, dependsOnMethods = {"startTiming", "testCXFWSS4J"})
+    //@Test(invocationCount = 1, threadPoolSize = 10)
     public void testCXF() throws Exception {
         String resp = greeterStream.greetMe("Hey Stream Service. It's me, the client. Nice to meet you...");
         //System.out.println(resp);
