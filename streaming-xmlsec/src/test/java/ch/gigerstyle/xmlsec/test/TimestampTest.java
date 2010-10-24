@@ -4,7 +4,7 @@ import ch.gigerstyle.xmlsec.XMLSec;
 import ch.gigerstyle.xmlsec.ext.*;
 import ch.gigerstyle.xmlsec.test.utils.StAX2DOM;
 import ch.gigerstyle.xmlsec.test.utils.XmlReaderToWriter;
-import com.sun.xml.ws.streaming.DOMStreamReader;
+import org.apache.cxf.staxutils.W3CDOMStreamReader;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -106,7 +106,7 @@ public class TimestampTest extends AbstractTestBase {
         {
             SecurityProperties securityProperties = new SecurityProperties();
             InboundXMLSec xmlSec = XMLSec.getInboundXMLSec(securityProperties);
-            XMLStreamReader xmlStreamReader = xmlSec.processInMessage(new DOMStreamReader(securedDocument));
+            XMLStreamReader xmlStreamReader = xmlSec.processInMessage(new W3CDOMStreamReader(securedDocument));
 
             Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
 
@@ -183,7 +183,7 @@ public class TimestampTest extends AbstractTestBase {
         {
             SecurityProperties securityProperties = new SecurityProperties();
             InboundXMLSec xmlSec = XMLSec.getInboundXMLSec(securityProperties);
-            XMLStreamReader xmlStreamReader = xmlSec.processInMessage(new DOMStreamReader(securedDocument));
+            XMLStreamReader xmlStreamReader = xmlSec.processInMessage(new W3CDOMStreamReader(securedDocument));
 
             try {
                 Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
@@ -221,7 +221,7 @@ public class TimestampTest extends AbstractTestBase {
             securityProperties.setCallbackHandler(new CallbackHandlerImpl());
             securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "1234567890".toCharArray());
             InboundXMLSec xmlSec = XMLSec.getInboundXMLSec(securityProperties);
-            XMLStreamReader xmlStreamReader = xmlSec.processInMessage(new DOMStreamReader(securedDocument));
+            XMLStreamReader xmlStreamReader = xmlSec.processInMessage(new W3CDOMStreamReader(securedDocument));
 
             try {
                 Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
@@ -270,7 +270,7 @@ public class TimestampTest extends AbstractTestBase {
         {
             SecurityProperties securityProperties = new SecurityProperties();
             InboundXMLSec xmlSec = XMLSec.getInboundXMLSec(securityProperties);
-            XMLStreamReader xmlStreamReader = xmlSec.processInMessage(new DOMStreamReader(securedDocument));
+            XMLStreamReader xmlStreamReader = xmlSec.processInMessage(new W3CDOMStreamReader(securedDocument));
 
             try {
                 Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
@@ -306,7 +306,7 @@ public class TimestampTest extends AbstractTestBase {
             SecurityProperties securityProperties = new SecurityProperties();
             securityProperties.setStrictTimestampCheck(false);
             InboundXMLSec xmlSec = XMLSec.getInboundXMLSec(securityProperties);
-            XMLStreamReader xmlStreamReader = xmlSec.processInMessage(new DOMStreamReader(securedDocument));
+            XMLStreamReader xmlStreamReader = xmlSec.processInMessage(new W3CDOMStreamReader(securedDocument));
 
             Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
         }
@@ -335,7 +335,7 @@ public class TimestampTest extends AbstractTestBase {
             SecurityProperties securityProperties = new SecurityProperties();
             securityProperties.setTimestampTTL(1);
             InboundXMLSec xmlSec = XMLSec.getInboundXMLSec(securityProperties);
-            XMLStreamReader xmlStreamReader = xmlSec.processInMessage(new DOMStreamReader(securedDocument));
+            XMLStreamReader xmlStreamReader = xmlSec.processInMessage(new W3CDOMStreamReader(securedDocument));
 
             try {
                 Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
@@ -372,7 +372,7 @@ public class TimestampTest extends AbstractTestBase {
         {
             SecurityProperties securityProperties = new SecurityProperties();
             InboundXMLSec xmlSec = XMLSec.getInboundXMLSec(securityProperties);
-            XMLStreamReader xmlStreamReader = xmlSec.processInMessage(new DOMStreamReader(securedDocument));
+            XMLStreamReader xmlStreamReader = xmlSec.processInMessage(new W3CDOMStreamReader(securedDocument));
 
             try {
                 Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
@@ -413,7 +413,7 @@ public class TimestampTest extends AbstractTestBase {
         {
             SecurityProperties securityProperties = new SecurityProperties();
             InboundXMLSec xmlSec = XMLSec.getInboundXMLSec(securityProperties);
-            XMLStreamReader xmlStreamReader = xmlSec.processInMessage(new DOMStreamReader(securedDocument));
+            XMLStreamReader xmlStreamReader = xmlSec.processInMessage(new W3CDOMStreamReader(securedDocument));
 
             Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
 
@@ -455,7 +455,7 @@ public class TimestampTest extends AbstractTestBase {
         {
             SecurityProperties securityProperties = new SecurityProperties();
             InboundXMLSec xmlSec = XMLSec.getInboundXMLSec(securityProperties);
-            XMLStreamReader xmlStreamReader = xmlSec.processInMessage(new DOMStreamReader(securedDocument));
+            XMLStreamReader xmlStreamReader = xmlSec.processInMessage(new W3CDOMStreamReader(securedDocument));
 
             try {
                 Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);

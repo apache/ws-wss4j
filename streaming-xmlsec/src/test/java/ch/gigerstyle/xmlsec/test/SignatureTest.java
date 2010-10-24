@@ -4,7 +4,7 @@ import ch.gigerstyle.xmlsec.*;
 import ch.gigerstyle.xmlsec.ext.*;
 import ch.gigerstyle.xmlsec.test.utils.StAX2DOM;
 import ch.gigerstyle.xmlsec.test.utils.XmlReaderToWriter;
-import com.sun.xml.ws.streaming.DOMStreamReader;
+import org.apache.cxf.staxutils.W3CDOMStreamReader;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -105,7 +105,7 @@ public class SignatureTest extends AbstractTestBase {
             SecurityProperties securityProperties = new SecurityProperties();
             securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "1234567890".toCharArray());
             InboundXMLSec xmlSec = XMLSec.getInboundXMLSec(securityProperties);
-            XMLStreamReader xmlStreamReader = xmlSec.processInMessage(new DOMStreamReader(securedDocument));
+            XMLStreamReader xmlStreamReader = xmlSec.processInMessage(new W3CDOMStreamReader(securedDocument));
 
             Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
 
@@ -183,7 +183,7 @@ public class SignatureTest extends AbstractTestBase {
             SecurityProperties securityProperties = new SecurityProperties();
             securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "1234567890".toCharArray());
             InboundXMLSec xmlSec = XMLSec.getInboundXMLSec(securityProperties);
-            XMLStreamReader xmlStreamReader = xmlSec.processInMessage(new DOMStreamReader(securedDocument));
+            XMLStreamReader xmlStreamReader = xmlSec.processInMessage(new W3CDOMStreamReader(securedDocument));
 
             Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
 
@@ -260,7 +260,7 @@ public class SignatureTest extends AbstractTestBase {
             SecurityProperties securityProperties = new SecurityProperties();
             securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "1234567890".toCharArray());
             InboundXMLSec xmlSec = XMLSec.getInboundXMLSec(securityProperties);
-            XMLStreamReader xmlStreamReader = xmlSec.processInMessage(new DOMStreamReader(securedDocument));
+            XMLStreamReader xmlStreamReader = xmlSec.processInMessage(new W3CDOMStreamReader(securedDocument));
 
             Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
 
@@ -283,7 +283,7 @@ public class SignatureTest extends AbstractTestBase {
             securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "1234567890".toCharArray());
             securityProperties.setSignatureUser("transmitter");
             securityProperties.setSignatureKeyIdentifierType(Constants.KeyIdentifierType.BST_DIRECT_REFERENCE);
-            securityProperties.setCallbackHandler(new CallbackHandlerImpl());
+            securityProperties.setCallbackHandler(new ch.gigerstyle.xmlsec.test.CallbackHandlerImpl());
 
             OutboundXMLSec xmlSecOut = XMLSec.getOutboundXMLSec(securityProperties);
             XMLStreamWriter xmlStreamWriter = xmlSecOut.processOutMessage(baos);
@@ -338,7 +338,7 @@ public class SignatureTest extends AbstractTestBase {
             SecurityProperties securityProperties = new SecurityProperties();
             securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "1234567890".toCharArray());
             InboundXMLSec xmlSec = XMLSec.getInboundXMLSec(securityProperties);
-            XMLStreamReader xmlStreamReader = xmlSec.processInMessage(new DOMStreamReader(securedDocument));
+            XMLStreamReader xmlStreamReader = xmlSec.processInMessage(new W3CDOMStreamReader(securedDocument));
 
             Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
 
@@ -361,7 +361,7 @@ public class SignatureTest extends AbstractTestBase {
             securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "1234567890".toCharArray());
             securityProperties.setSignatureUser("transmitter");
             securityProperties.setSignatureKeyIdentifierType(Constants.KeyIdentifierType.BST_EMBEDDED);
-            securityProperties.setCallbackHandler(new CallbackHandlerImpl());
+            securityProperties.setCallbackHandler(new ch.gigerstyle.xmlsec.test.CallbackHandlerImpl());
 
             OutboundXMLSec xmlSecOut = XMLSec.getOutboundXMLSec(securityProperties);
             XMLStreamWriter xmlStreamWriter = xmlSecOut.processOutMessage(baos);
@@ -415,7 +415,7 @@ public class SignatureTest extends AbstractTestBase {
             securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "1234567890".toCharArray());
             securityProperties.setSignatureUser("transmitter");
             securityProperties.setSignatureKeyIdentifierType(Constants.KeyIdentifierType.X509_KEY_IDENTIFIER);
-            securityProperties.setCallbackHandler(new CallbackHandlerImpl());
+            securityProperties.setCallbackHandler(new ch.gigerstyle.xmlsec.test.CallbackHandlerImpl());
 
             OutboundXMLSec xmlSecOut = XMLSec.getOutboundXMLSec(securityProperties);
             XMLStreamWriter xmlStreamWriter = xmlSecOut.processOutMessage(baos);
@@ -470,7 +470,7 @@ public class SignatureTest extends AbstractTestBase {
             SecurityProperties securityProperties = new SecurityProperties();
             securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "1234567890".toCharArray());
             InboundXMLSec xmlSec = XMLSec.getInboundXMLSec(securityProperties);
-            XMLStreamReader xmlStreamReader = xmlSec.processInMessage(new DOMStreamReader(securedDocument));
+            XMLStreamReader xmlStreamReader = xmlSec.processInMessage(new W3CDOMStreamReader(securedDocument));
 
             Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
 
@@ -493,7 +493,7 @@ public class SignatureTest extends AbstractTestBase {
             securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "1234567890".toCharArray());
             securityProperties.setSignatureUser("transmitter");
             securityProperties.setSignatureKeyIdentifierType(Constants.KeyIdentifierType.SKI_KEY_IDENTIFIER);
-            securityProperties.setCallbackHandler(new CallbackHandlerImpl());
+            securityProperties.setCallbackHandler(new ch.gigerstyle.xmlsec.test.CallbackHandlerImpl());
 
             OutboundXMLSec xmlSecOut = XMLSec.getOutboundXMLSec(securityProperties);
             XMLStreamWriter xmlStreamWriter = xmlSecOut.processOutMessage(baos);
@@ -548,7 +548,7 @@ public class SignatureTest extends AbstractTestBase {
             SecurityProperties securityProperties = new SecurityProperties();
             securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "1234567890".toCharArray());
             InboundXMLSec xmlSec = XMLSec.getInboundXMLSec(securityProperties);
-            XMLStreamReader xmlStreamReader = xmlSec.processInMessage(new DOMStreamReader(securedDocument));
+            XMLStreamReader xmlStreamReader = xmlSec.processInMessage(new W3CDOMStreamReader(securedDocument));
 
             Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
 
@@ -570,7 +570,7 @@ public class SignatureTest extends AbstractTestBase {
             securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "1234567890".toCharArray());
             securityProperties.setSignatureUser("transmitter");
             securityProperties.setSignatureKeyIdentifierType(Constants.KeyIdentifierType.THUMBPRINT_IDENTIFIER);
-            securityProperties.setCallbackHandler(new CallbackHandlerImpl());
+            securityProperties.setCallbackHandler(new ch.gigerstyle.xmlsec.test.CallbackHandlerImpl());
 
             OutboundXMLSec xmlSecOut = XMLSec.getOutboundXMLSec(securityProperties);
             XMLStreamWriter xmlStreamWriter = xmlSecOut.processOutMessage(baos);
@@ -625,7 +625,7 @@ public class SignatureTest extends AbstractTestBase {
             SecurityProperties securityProperties = new SecurityProperties();
             securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "1234567890".toCharArray());
             InboundXMLSec xmlSec = XMLSec.getInboundXMLSec(securityProperties);
-            XMLStreamReader xmlStreamReader = xmlSec.processInMessage(new DOMStreamReader(securedDocument));
+            XMLStreamReader xmlStreamReader = xmlSec.processInMessage(new W3CDOMStreamReader(securedDocument));
 
             Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
 

@@ -2,18 +2,16 @@ package ch.gigerstyle.xmlsec.test;
 
 import ch.gigerstyle.xmlsec.ext.Constants;
 import ch.gigerstyle.xmlsec.ext.SecurityProperties;
-import com.sun.xml.ws.streaming.DOMStreamReader;
+import org.apache.cxf.staxutils.W3CDOMStreamReader;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.testng.annotations.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.stream.StreamSource;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import java.io.*;
@@ -56,7 +54,7 @@ public class InteroperabilityTest extends AbstractTestBase {
         securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "1234567890".toCharArray());
         securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "1234567890".toCharArray());
 
-        Document document = doInboundSecurity(securityProperties, new DOMStreamReader(securedDocument));
+        Document document = doInboundSecurity(securityProperties, new W3CDOMStreamReader(securedDocument));
 
         //read the whole stream:
         Transformer transformer = TransformerFactory.newInstance().newTransformer();
@@ -83,7 +81,7 @@ public class InteroperabilityTest extends AbstractTestBase {
         securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "1234567890".toCharArray());
         securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "1234567890".toCharArray());
 
-        Document document = doInboundSecurity(securityProperties, new DOMStreamReader(securedDocument));
+        Document document = doInboundSecurity(securityProperties, new W3CDOMStreamReader(securedDocument));
 
         //read the whole stream:
         Transformer transformer = TransformerFactory.newInstance().newTransformer();
@@ -183,7 +181,7 @@ public class InteroperabilityTest extends AbstractTestBase {
         securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "1234567890".toCharArray());
         securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "1234567890".toCharArray());
 
-        Document document = doInboundSecurity(securityProperties, new DOMStreamReader(securedDocument));
+        Document document = doInboundSecurity(securityProperties, new W3CDOMStreamReader(securedDocument));
 
         //read the whole stream:
         //Transformer transformer = TransformerFactory.newInstance().newTransformer();

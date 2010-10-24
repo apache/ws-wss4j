@@ -1,0 +1,103 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:beans="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:sec="http://cxf.apache.org/configuration/security"
+       xmlns:http="http://cxf.apache.org/transports/http/configuration"
+       xmlns:httpj="http://cxf.apache.org/transports/http-jetty/configuration"
+       xmlns:jaxws="http://cxf.apache.org/jaxws"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+       http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd
+       http://cxf.apache.org/transports/http/configuration http://cxf.apache.org/schemas/configuration/http-conf.xsd
+       http://cxf.apache.org/transports/http-jetty/configuration http://cxf.apache.org/schemas/configuration/http-jetty.xsd
+       http://cxf.apache.org/configuration/security http://cxf.apache.org/schemas/configuration/security.xsd">
+
+    <import resource="classpath:META-INF/cxf/cxf.xml"/>
+    <import resource="classpath:META-INF/cxf/cxf-extension-soap.xml"/>
+    <import resource="classpath:META-INF/cxf/cxf-servlet.xml"/>
+    <import resource="classpath:META-INF/cxf/cxf-extension-http.xml"/>
+    <import resource="classpath:META-INF/cxf/cxf-extension-http-jetty.xml"/>
+
+    <bean id="greeterServiceImpl" class="ch.gigerstyle.xmlsec.test.integration.GreeterServiceImpl">
+    </bean>
+
+    <jaxws:endpoint id="greeterService" implementor="#greeterServiceImpl"
+                    address="http://localhost:9001/GreeterService">
+        <jaxws:inInterceptors>
+            <ref bean="securityInInterceptor"/>
+        </jaxws:inInterceptors>
+    </jaxws:endpoint>
+
+    <bean name="securityInInterceptor" class="ch.gigerstyle.xmlsec.interceptor.SecurityInInterceptor">
+        <constructor-arg index="0" value="post-stream"/>
+        <constructor-arg index="1" ref="securityProperties"/>
+    </bean>
+
+    <bean name="securityProperties" class="ch.gigerstyle.xmlsec.ext.SecurityProperties">
+        <property name="callbackHandler" ref="callbackHandler"/>
+    </bean>
+
+    <bean class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+        <property name="targetObject" ref="securityProperties"/>
+        <property name="targetMethod" value="loadDecryptionKeystore"/>
+        <property name="arguments">
+            <list>
+                <value>classpath:receiver.jks</value>
+                <value>1234567890</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+        <property name="targetObject" ref="securityProperties"/>
+        <property name="targetMethod" value="loadSignatureVerificationKeystore"/>
+        <property name="arguments">
+            <list>
+                <value>classpath:receiver.jks</value>
+                <value>1234567890</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean name="callbackHandler" class="ch.gigerstyle.xmlsec.test.CallbackHandlerImpl">
+    </bean>
+
+
+    <jaxws:endpoint id="greeterServiceWSS4J" implementor="#greeterServiceImpl"
+                    address="http://localhost:9001/GreeterServiceWSS4J">
+        <jaxws:inInterceptors>
+            <ref bean="wss4jInInterceptor"/>
+        </jaxws:inInterceptors>
+    </jaxws:endpoint>
+    
+    <bean name="wss4jInInterceptor" class="org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor">
+        <property name="properties">
+            <map>
+                <entry key="action" value="Encrypt"/>
+                <entry key="passwordCallbackRef" value-ref="passwordCallbackHandlerWSS4J"/>
+                <entry key="decryptionPropFile" value="integration/crypto.properties"/>
+                <entry key="signaturePropFile" value="integration/crypto.properties"/>
+            </map>
+        </property>
+    </bean>
+
+    <bean name="passwordCallbackHandlerWSS4J" class="ch.gigerstyle.xmlsec.test.WSS4JCallbackHandlerImpl">
+    </bean>
+
+    <httpj:engine-factory bus="cxf">
+        <httpj:engine port="9001">
+            <httpj:threadingParameters minThreads="50"
+                                       maxThreads="200"/>
+            <!--      <httpj:connector>
+                    <beans:bean class="org.mortbay.jetty.bio.SocketConnector">
+                       <beans:property name="port" value="9001" />
+                    </beans:bean>
+                  </httpj:connector>
+            -->
+            <httpj:handlers>
+                <beans:bean class="org.mortbay.jetty.handler.DefaultHandler"/>
+            </httpj:handlers>
+            <httpj:sessionSupport>false</httpj:sessionSupport>
+        </httpj:engine>
+    </httpj:engine-factory>
+</beans>

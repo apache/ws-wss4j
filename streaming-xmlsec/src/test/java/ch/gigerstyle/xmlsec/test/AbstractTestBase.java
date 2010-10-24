@@ -1,6 +1,6 @@
 package ch.gigerstyle.xmlsec.test;
 
-import ch.gigerstyle.xmlsec.*;
+import ch.gigerstyle.xmlsec.XMLSec;
 import ch.gigerstyle.xmlsec.ext.*;
 import ch.gigerstyle.xmlsec.securityEvent.SecurityEventListener;
 import ch.gigerstyle.xmlsec.test.utils.StAX2DOM;
@@ -17,10 +17,9 @@ import org.apache.ws.security.handler.WSHandlerResult;
 import org.apache.ws.security.handler.WSS4JHandler;
 import org.apache.ws.security.message.token.Timestamp;
 import org.apache.ws.security.util.WSSecurityUtil;
-import org.w3c.dom.*;
+import org.w3c.dom.Document;
 
 import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -29,7 +28,10 @@ import javax.xml.rpc.handler.HandlerInfo;
 import javax.xml.rpc.handler.MessageContext;
 import javax.xml.rpc.handler.soap.SOAPMessageContext;
 import javax.xml.soap.*;
-import javax.xml.stream.*;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamSource;
@@ -38,7 +40,6 @@ import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.security.cert.X509Certificate;
 import java.util.*;
@@ -83,11 +84,11 @@ public abstract class AbstractTestBase {
     }
 
     public Document doInboundSecurity(SecurityProperties securityProperties, InputStream inputStream) throws XMLSecurityException, SecurityConfigurationException, XMLStreamException, ParserConfigurationException {
-        return  doInboundSecurity(securityProperties, xmlInputFactory.createXMLStreamReader(inputStream), null);
+        return doInboundSecurity(securityProperties, xmlInputFactory.createXMLStreamReader(inputStream), null);
     }
 
     public Document doInboundSecurity(SecurityProperties securityProperties, InputStream inputStream, SecurityEventListener securityEventListener) throws XMLSecurityException, SecurityConfigurationException, XMLStreamException, ParserConfigurationException {
-        return  doInboundSecurity(securityProperties, xmlInputFactory.createXMLStreamReader(inputStream), securityEventListener);
+        return doInboundSecurity(securityProperties, xmlInputFactory.createXMLStreamReader(inputStream), securityEventListener);
     }
 
     public Document doInboundSecurity(SecurityProperties securityProperties, XMLStreamReader xmlStreamReader) throws XMLSecurityException, SecurityConfigurationException, XMLStreamException, ParserConfigurationException {
@@ -243,30 +244,6 @@ public abstract class AbstractTestBase {
         return messageContext;
     }
 
-     class WSS4JCallbackHandlerImpl implements CallbackHandler {
-        public void handle(javax.security.auth.callback.Callback[] callbacks) throws IOException, UnsupportedCallbackException {
-            org.apache.ws.security.WSPasswordCallback pc = (org.apache.ws.security.WSPasswordCallback) callbacks[0];
-
-            if (pc.getUsage() == org.apache.ws.security.WSPasswordCallback.DECRYPT || pc.getUsage() == org.apache.ws.security.WSPasswordCallback.SIGNATURE) {
-                pc.setPassword("refApp9876");
-            } else {
-                throw new UnsupportedCallbackException(pc, "Unrecognized CallbackHandlerImpl");
-            }
-        }
-    }
-
-    public class CallbackHandlerImpl implements CallbackHandler {
-        public void handle(javax.security.auth.callback.Callback[] callbacks) throws IOException, UnsupportedCallbackException {
-            WSPasswordCallback pc = (WSPasswordCallback) callbacks[0];
-
-            if (pc.getUsage() == WSPasswordCallback.DECRYPT || pc.getUsage() == WSPasswordCallback.SIGNATURE) {
-                pc.setPassword("refApp9876");
-            } else {
-                throw new UnsupportedCallbackException(pc, "Unrecognized CallbackHandlerImpl");
-            }
-        }
-    }
-
     protected XPathExpression getXPath(String expression) throws XPathExpressionException {
         XPathFactory xPathFactory = XPathFactory.newInstance();
         XPath xPath = xPathFactory.newXPath();
@@ -320,22 +297,22 @@ public abstract class AbstractTestBase {
         @Override
         public boolean doReceiver(MessageContext mc, RequestData reqData, boolean isRequest) throws WSSecurityException {
             Vector actions = new Vector();
-        String action = (String) getOption(WSHandlerConstants.RECEIVE + '.' + WSHandlerConstants.ACTION);
-        if (action == null) {
-            action = (String) getOption(WSHandlerConstants.ACTION);
+            String action = (String) getOption(WSHandlerConstants.RECEIVE + '.' + WSHandlerConstants.ACTION);
             if (action == null) {
-                action = (String) mc.getProperty(WSHandlerConstants.ACTION);
+                action = (String) getOption(WSHandlerConstants.ACTION);
+                if (action == null) {
+                    action = (String) mc.getProperty(WSHandlerConstants.ACTION);
+                }
             }
-        }
-        if (action == null) {
-            throw new JAXRPCException("WSS4JHandler: No action defined");
-        }
-        int doAction = WSSecurityUtil.decodeAction(action, actions);
+            if (action == null) {
+                throw new JAXRPCException("WSS4JHandler: No action defined");
+            }
+            int doAction = WSSecurityUtil.decodeAction(action, actions);
 
-        String actor = (String) getOption(WSHandlerConstants.ACTOR);
+            String actor = (String) getOption(WSHandlerConstants.ACTOR);
 
-        SOAPMessage message = ((SOAPMessageContext)mc).getMessage();
-        //SOAPPart sPart = message.getSOAPPart();
+            SOAPMessage message = ((SOAPMessageContext) mc).getMessage();
+            //SOAPPart sPart = message.getSOAPPart();
 
             Document doc = null;
             try {
@@ -357,66 +334,66 @@ public abstract class AbstractTestBase {
                     ex);
         }
         */
-        /*
-        * Check if it's a fault. Don't process faults.
-        *
-        */
-        org.apache.ws.security.SOAPConstants soapConstants =
-                WSSecurityUtil.getSOAPConstants(doc.getDocumentElement());
-        if (WSSecurityUtil
-                .findElement(doc.getDocumentElement(),
-                        "Fault",
-                        soapConstants.getEnvelopeURI())
-                != null) {
-            return false;
-        }
-
-        /*
-        * To check a UsernameToken or to decrypt an encrypted message we need
-        * a password.
-        */
-        CallbackHandler cbHandler = null;
-        if ((doAction & (WSConstants.ENCR | WSConstants.UT)) != 0) {
-            cbHandler = getPasswordCB(reqData);
-        }
-
-        /*
-        * Get and check the Signature specific parameters first because they
-        * may be used for encryption too.
-        */
-        doReceiverAction(doAction, reqData);
-
-        Vector wsResult = null;
-        try {
-            wsResult =
-                    secEngine.processSecurityHeader(doc,
-                            actor,
-                            cbHandler,
-                            reqData.getSigCrypto(),
-                            reqData.getDecCrypto());
-        } catch (WSSecurityException ex) {
-            if (doDebug) {
-                log.debug(ex.getMessage(), ex);
+            /*
+            * Check if it's a fault. Don't process faults.
+            *
+            */
+            org.apache.ws.security.SOAPConstants soapConstants =
+                    WSSecurityUtil.getSOAPConstants(doc.getDocumentElement());
+            if (WSSecurityUtil
+                    .findElement(doc.getDocumentElement(),
+                            "Fault",
+                            soapConstants.getEnvelopeURI())
+                    != null) {
+                return false;
             }
-            throw new JAXRPCException("WSS4JHandler: security processing failed",
-                    ex);
-        }
-        if (wsResult == null) {         // no security header found
-            if (doAction == WSConstants.NO_SECURITY) {
-                return true;
-            } else {
-                throw new JAXRPCException("WSS4JHandler: Request does not contain required Security header");
-            }
-        }
-        if (reqData.getWssConfig().isEnableSignatureConfirmation() && !isRequest) {
-            checkSignatureConfirmation(reqData, wsResult);
-        }
 
-        /*
-        * If we had some security processing, get the original
-        * SOAP part of Axis' message and replace it with new SOAP
-        * part. This new part may contain decrypted elements.
-        */
+            /*
+            * To check a UsernameToken or to decrypt an encrypted message we need
+            * a password.
+            */
+            CallbackHandler cbHandler = null;
+            if ((doAction & (WSConstants.ENCR | WSConstants.UT)) != 0) {
+                cbHandler = getPasswordCB(reqData);
+            }
+
+            /*
+            * Get and check the Signature specific parameters first because they
+            * may be used for encryption too.
+            */
+            doReceiverAction(doAction, reqData);
+
+            Vector wsResult = null;
+            try {
+                wsResult =
+                        secEngine.processSecurityHeader(doc,
+                                actor,
+                                cbHandler,
+                                reqData.getSigCrypto(),
+                                reqData.getDecCrypto());
+            } catch (WSSecurityException ex) {
+                if (doDebug) {
+                    log.debug(ex.getMessage(), ex);
+                }
+                throw new JAXRPCException("WSS4JHandler: security processing failed",
+                        ex);
+            }
+            if (wsResult == null) {         // no security header found
+                if (doAction == WSConstants.NO_SECURITY) {
+                    return true;
+                } else {
+                    throw new JAXRPCException("WSS4JHandler: Request does not contain required Security header");
+                }
+            }
+            if (reqData.getWssConfig().isEnableSignatureConfirmation() && !isRequest) {
+                checkSignatureConfirmation(reqData, wsResult);
+            }
+
+            /*
+            * If we had some security processing, get the original
+            * SOAP part of Axis' message and replace it with new SOAP
+            * part. This new part may contain decrypted elements.
+            */
 
             /* hmmmmmmmmmmmm ?????
         ByteArrayOutputStream os = new ByteArrayOutputStream();
@@ -434,31 +411,31 @@ public abstract class AbstractTestBase {
 
         */
 
-        if (doDebug) {
-            log.debug("Processed received SOAP request");
-        }
-
-        /*
-        * After setting the new current message, probably modified because
-        * of decryption, we need to locate the security header. That is,
-        * we force Axis (with getSOAPEnvelope()) to parse the string, build
-        * the new header. Then we examine, look up the security header
-        * and set the header as processed.
-        *
-        * Please note: find all header elements that contain the same
-        * actor that was given to processSecurityHeader(). Then
-        * check if there is a security header with this actor.
-        */
-
-        SOAPHeader sHeader = null;
-        try {
-            sHeader = message.getSOAPPart().getEnvelope().getHeader();
-        } catch (Exception ex) {
             if (doDebug) {
-                log.debug(ex.getMessage(), ex);
+                log.debug("Processed received SOAP request");
             }
-            throw new JAXRPCException("WSS4JHandler: cannot get SOAP header after security processing", ex);
-        }
+
+            /*
+            * After setting the new current message, probably modified because
+            * of decryption, we need to locate the security header. That is,
+            * we force Axis (with getSOAPEnvelope()) to parse the string, build
+            * the new header. Then we examine, look up the security header
+            * and set the header as processed.
+            *
+            * Please note: find all header elements that contain the same
+            * actor that was given to processSecurityHeader(). Then
+            * check if there is a security header with this actor.
+            */
+
+            SOAPHeader sHeader = null;
+            try {
+                sHeader = message.getSOAPPart().getEnvelope().getHeader();
+            } catch (Exception ex) {
+                if (doDebug) {
+                    log.debug(ex.getMessage(), ex);
+                }
+                throw new JAXRPCException("WSS4JHandler: cannot get SOAP header after security processing", ex);
+            }
 /*
         Iterator headers = sHeader.examineHeaderElements(actor);
 
@@ -472,81 +449,81 @@ public abstract class AbstractTestBase {
             }
         }
   */
-        /* JAXRPC conversion changes */
+            /* JAXRPC conversion changes */
 //        headerElement.setMustUnderstand(false); // is this sufficient?
 
-        /*
-        * Now we can check the certificate used to sign the message.
-        * In the following implementation the certificate is only trusted
-        * if either it itself or the certificate of the issuer is installed
-        * in the keystore.
-        *
-        * Note: the method verifyTrust(X509Certificate) allows custom
-        * implementations with other validation algorithms for subclasses.
-        */
+            /*
+            * Now we can check the certificate used to sign the message.
+            * In the following implementation the certificate is only trusted
+            * if either it itself or the certificate of the issuer is installed
+            * in the keystore.
+            *
+            * Note: the method verifyTrust(X509Certificate) allows custom
+            * implementations with other validation algorithms for subclasses.
+            */
 
-        // Extract the signature action result from the action vector
+            // Extract the signature action result from the action vector
 
-        WSSecurityEngineResult actionResult = WSSecurityUtil.fetchActionResult(wsResult, WSConstants.SIGN);
+            WSSecurityEngineResult actionResult = WSSecurityUtil.fetchActionResult(wsResult, WSConstants.SIGN);
 
-        if (actionResult != null) {
-            X509Certificate returnCert =
-                (X509Certificate)actionResult.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE);
+            if (actionResult != null) {
+                X509Certificate returnCert =
+                        (X509Certificate) actionResult.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE);
 
-            if (returnCert != null && !verifyTrust(returnCert, reqData)) {
-                throw new JAXRPCException("WSS4JHandler: The certificate used for the signature is not trusted");
+                if (returnCert != null && !verifyTrust(returnCert, reqData)) {
+                    throw new JAXRPCException("WSS4JHandler: The certificate used for the signature is not trusted");
+                }
             }
-        }
 
-        /*
-        * Perform further checks on the timestamp that was transmitted in the header.
-        * In the following implementation the timestamp is valid if it was
-        * created after (now-ttl), where ttl is set on server side, not by the client.
-        *
-        * Note: the method verifyTimestamp(Timestamp) allows custom
-        * implementations with other validation algorithms for subclasses.
-        */
+            /*
+            * Perform further checks on the timestamp that was transmitted in the header.
+            * In the following implementation the timestamp is valid if it was
+            * created after (now-ttl), where ttl is set on server side, not by the client.
+            *
+            * Note: the method verifyTimestamp(Timestamp) allows custom
+            * implementations with other validation algorithms for subclasses.
+            */
 
-        // Extract the timestamp action result from the action vector
-        actionResult = WSSecurityUtil.fetchActionResult(wsResult, WSConstants.TS);
+            // Extract the timestamp action result from the action vector
+            actionResult = WSSecurityUtil.fetchActionResult(wsResult, WSConstants.TS);
 
-        if (actionResult != null) {
-            Timestamp timestamp =
-                (Timestamp)actionResult.get(WSSecurityEngineResult.TAG_TIMESTAMP);
+            if (actionResult != null) {
+                Timestamp timestamp =
+                        (Timestamp) actionResult.get(WSSecurityEngineResult.TAG_TIMESTAMP);
 
-            if (timestamp != null && reqData.getWssConfig().isTimeStampStrict()
-                && !verifyTimestamp(timestamp, decodeTimeToLive(reqData))) {
-                throw new JAXRPCException("WSS4JHandler: The timestamp could not be validated");
+                if (timestamp != null && reqData.getWssConfig().isTimeStampStrict()
+                        && !verifyTimestamp(timestamp, decodeTimeToLive(reqData))) {
+                    throw new JAXRPCException("WSS4JHandler: The timestamp could not be validated");
+                }
             }
-        }
 
-        /*
-        * now check the security actions: do they match, in right order?
-        */
-        if (!checkReceiverResults(wsResult, actions)) {
-            throw new JAXRPCException("WSS4JHandler: security processing failed (actions mismatch)");
-        }
+            /*
+            * now check the security actions: do they match, in right order?
+            */
+            if (!checkReceiverResults(wsResult, actions)) {
+                throw new JAXRPCException("WSS4JHandler: security processing failed (actions mismatch)");
+            }
 
-        /*
-        * All ok up to this point. Now construct and setup the
-        * security result structure. The service may fetch this
-        * and check it.
-        */
-        Vector results = null;
-        if ((results = (Vector) mc.getProperty(WSHandlerConstants.RECV_RESULTS))
-                == null) {
-            results = new Vector();
-            mc.setProperty(WSHandlerConstants.RECV_RESULTS, results);
-        }
-        WSHandlerResult rResult =
-                new WSHandlerResult(actor,
-                        wsResult);
-        results.add(0, rResult);
-        if (doDebug) {
-            log.debug("WSS4JHandler: exit invoke()");
-        }
+            /*
+            * All ok up to this point. Now construct and setup the
+            * security result structure. The service may fetch this
+            * and check it.
+            */
+            Vector results = null;
+            if ((results = (Vector) mc.getProperty(WSHandlerConstants.RECV_RESULTS))
+                    == null) {
+                results = new Vector();
+                mc.setProperty(WSHandlerConstants.RECV_RESULTS, results);
+            }
+            WSHandlerResult rResult =
+                    new WSHandlerResult(actor,
+                            wsResult);
+            results.add(0, rResult);
+            if (doDebug) {
+                log.debug("WSS4JHandler: exit invoke()");
+            }
 
-        return true;
+            return true;
         }
     }
 }
