@@ -58,6 +58,9 @@ public class SecurityHeaderInputProcessor extends AbstractInputProcessor {
                     && inputProcessorChain.getDocumentContext().isInSecurityHeader()) {
                 engageProcessor(inputProcessorChain, startElement, getSecurityProperties());
             }
+            if (startElement.getName().equals(Constants.TAG_soap11_Body) && !xmlEventList.isEmpty()) {
+                throw new XMLSecurityException("No Security");
+            }
         }
 
         if (inputProcessorChain.getDocumentContext().isInSecurityHeader()) {
