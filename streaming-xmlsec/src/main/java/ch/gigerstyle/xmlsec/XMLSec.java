@@ -121,7 +121,6 @@ public class XMLSec {
                         securityProperties.setEncryptionSymAlgorithm("http://www.w3.org/2001/04/xmlenc#aes256-cbc");
                     }
                     if (securityProperties.getEncryptionKeyTransportAlgorithm() == null) {
-                        //todo constants and rsa-oaep as default for aes
                         //@see http://www.w3.org/TR/2002/REC-xmlenc-core-20021210/Overview.html#rsa-1_5 :
                         //"RSA-OAEP is RECOMMENDED for the transport of AES keys"
                         //@see http://www.w3.org/TR/2002/REC-xmlenc-core-20021210/Overview.html#rsa-oaep-mgf1p
