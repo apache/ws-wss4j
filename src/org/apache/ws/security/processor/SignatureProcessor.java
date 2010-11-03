@@ -211,16 +211,19 @@ public class SignatureProcessor implements Processor {
                 );
             if (strElement == null) {
                 try {
+                    //
+                    // Look for a KeyValue object
+                    //
                     keyValue = getKeyValue(keyInfoElement);
                 } catch (javax.xml.crypto.MarshalException ex) {
                     throw new WSSecurityException(WSSecurityException.FAILED_CHECK, null, null, ex);
                 } 
 
                 if (keyValue != null) {
-                    //
-                    // Look for a KeyValue object
-                    //
                     try {
+                        //
+                        // Look for a Public Key in Key Value
+                        //
                         publicKey = keyValue.getPublicKey();
                         principal = validatePublicKey(cb, publicKey);
                     } catch (java.security.KeyException ex) {

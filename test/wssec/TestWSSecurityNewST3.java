@@ -76,7 +76,6 @@ public class TestWSSecurityNewST3 extends TestCase implements CallbackHandler {
      */
     public TestWSSecurityNewST3(String name) {
         super(name);
-        secEngine.getWssConfig();
     }
 
     /**

@@ -77,8 +77,9 @@ public class SAMLIssuerImpl implements SAMLIssuer {
     private Crypto userCrypto = null;
     private String username = null;
     
-    private KeyInfoFactory keyInfoFactory = KeyInfoFactory.getInstance("DOM");
     private WSSConfig wssConfig = WSSConfig.getDefaultWSConfig();
+    
+    private KeyInfoFactory keyInfoFactory = KeyInfoFactory.getInstance("DOM");
     
     /**
      * Flag indicating what format to put the subject's key material in when

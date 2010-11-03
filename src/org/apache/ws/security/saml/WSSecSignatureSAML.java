@@ -147,6 +147,12 @@ public class WSSecSignatureSAML extends WSSecSignature {
 
         prependSAMLElementsToHeader(secHeader);
 
+        if (senderVouches) {
+            computeSignature(referenceList, secHeader, secRefSaml.getElement());
+        } else {
+            computeSignature(referenceList, secHeader, samlToken);
+        }
+        
         //
         // if we have a BST prepend it in front of the Signature according to
         // strict layout rules.
@@ -154,8 +160,6 @@ public class WSSecSignatureSAML extends WSSecSignature {
         if (bstToken != null) {
             prependBSTElementToHeader(secHeader);
         }
-        
-        computeSignature(referenceList, secHeader, samlToken);
 
         return doc;
     }
@@ -489,7 +493,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
      * 
      * @throws WSSecurityException
      */
-    public void computeSignature(List referenceList, WSSecHeader secHeader, Element assertion) 
+    public void computeSignature(List referenceList, WSSecHeader secHeader, Element siblingElement) 
         throws WSSecurityException {
         boolean remove = WSDocInfoStore.store(wsDocInfo);
         try {
@@ -516,9 +520,9 @@ public class WSSecSignatureSAML extends WSSecSignature {
             // Prepend the signature element to the security header (after the assertion)
             //
             XMLSignContext signContext = null;
-            if (assertion != null && assertion.getNextSibling() != null) {
+            if (siblingElement != null && siblingElement.getNextSibling() != null) {
                 signContext = 
-                    new DOMSignContext(key, securityHeaderElement, assertion.getNextSibling());
+                    new DOMSignContext(key, securityHeaderElement, siblingElement.getNextSibling());
             } else {
                 signContext = new DOMSignContext(key, securityHeaderElement);
             }
