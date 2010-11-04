@@ -19,13 +19,17 @@
 
 package org.apache.ws.security.transform;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDocInfo;
 import org.apache.ws.security.WSDocInfoStore;
 import org.apache.ws.security.message.token.SecurityTokenReference;
 import org.apache.ws.security.util.WSSecurityUtil;
 
+import org.apache.xml.security.c14n.Canonicalizer;
 import org.apache.xml.security.signature.XMLSignatureInput;
+import org.apache.xml.security.utils.XMLUtils;
 
 import org.jcp.xml.dsig.internal.dom.ApacheData;
 import org.jcp.xml.dsig.internal.dom.DOMSubTreeData;
@@ -34,6 +38,7 @@ import org.jcp.xml.dsig.internal.dom.DOMUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.spec.AlgorithmParameterSpec;
@@ -65,6 +70,10 @@ public class STRTransform extends TransformService {
     private Element transformElement;
     
     private XMLSignatureFactory signatureFactory = XMLSignatureFactory.getInstance("DOM");
+    
+    private static Log log = LogFactory.getLog(STRTransform.class.getName());
+
+    private static boolean doDebug = false;
     
     public final AlgorithmParameterSpec getParameterSpec() {
         return params;
@@ -120,6 +129,7 @@ public class STRTransform extends TransformService {
     
     private Data transformIt(Data data, XMLCryptoContext xc, OutputStream os) 
         throws TransformException {
+        doDebug = log.isDebugEnabled();
         // 
         // First step: Get the required c14n argument and get the specified
         // Canonicalizer
@@ -174,8 +184,14 @@ public class STRTransform extends TransformService {
             // element.
             //
             SecurityTokenReference secRef = new SecurityTokenReference(str);
+            
+            Canonicalizer canon = Canonicalizer.getInstance(canonAlgo);
+
+            ByteArrayOutputStream bos = null;
+            byte[] buf = null;
+            
             //
-            // Third and fourth step are performed by derefenceSTR()
+            // Third and fourth step are performed by dereferenceSTR()
             //
             Document doc = str.getOwnerDocument();
             WSDocInfo wsDocInfo = WSDocInfoStore.lookup(doc);
@@ -185,6 +201,63 @@ public class STRTransform extends TransformService {
 
             Element dereferencedToken = 
                 STRTransformUtil.dereferenceSTR(doc, secRef, wsDocInfo);
+            
+            //
+            // C14n with specified algorithm. According to WSS Specification.
+            //
+            buf = canon.canonicalizeSubtree(dereferencedToken, "#default");
+            if (doDebug) {
+                bos = new ByteArrayOutputStream(buf.length);
+                bos.write(buf, 0, buf.length);
+                log.debug("after c14n: " + bos.toString());
+            }
+
+            //
+            // Alert: Hacks ahead According to WSS spec an Apex node must
+            // contain a default namespace. If none is availabe in the first
+            // node of the c14n output (this is the apex element) then we do
+            // some editing to insert an empty default namespace
+            // 
+            // TODO: Rework theses hacks after c14n was updated and can be
+            // instructed to insert empty default namespace if required
+            //
+            // If the problem with c14n method is solved then just do:
+            // return new XMLSignatureInput(buf);
+            
+            // start of HACK
+            StringBuffer bf = new StringBuffer(new String(buf));
+            String bf1 = bf.toString();
+
+            //
+            // Find start and end of first element <....>, this is the Apex node
+            //
+            int gt = bf1.indexOf(">");
+            //
+            // Lookup the default namespace
+            //
+            int idx = bf1.indexOf("xmlns=");
+            //
+            // If none found or if it is outside of this (Apex) element look for
+            // first blank in, insert default namespace there (this is the
+            // correct place according to c14n specification)
+            //
+            if (idx < 0 || idx > gt) {
+                idx = bf1.indexOf(" ");
+                bf.insert(idx + 1, "xmlns=\"\" ");
+                bf1 = bf.toString();
+            }
+            if (doDebug) {
+                log.debug("last result: ");
+                log.debug(bf1);
+            }
+            XMLSignatureInput output = new XMLSignatureInput(bf1.getBytes());
+            if (os != null) {
+                output.updateOutputStream(os);
+                return null;
+            }
+            return new OctetStreamData(output.getOctetStream());
+            
+            /*
             //
             // According to WSS spec an Apex node must contain a default namespace.
             // 
@@ -219,6 +292,7 @@ public class STRTransform extends TransformService {
                 return null;
             }
             return new OctetStreamData(output.getOctetStream());
+            */
         } catch (Exception ex) {
             throw new TransformException(ex);
         }

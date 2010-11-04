@@ -105,6 +105,7 @@ public class WSSecSignature extends WSSecSignatureBase {
     private String customTokenId;
     private String digestAlgo = WSConstants.SHA1;
     private X509Certificate useThisCert = null;
+    private Element securityHeader = null;
 
    
     /**
@@ -133,6 +134,7 @@ public class WSSecSignature extends WSSecSignatureBase {
         document = doc;
         wsDocInfo = new WSDocInfo(doc);
         wsDocInfo.setCrypto(cr);
+        securityHeader = secHeader.getSecurityHeader();
         
         //
         // At first get the security token (certificate) according to the parameters.
@@ -158,6 +160,10 @@ public class WSSecSignature extends WSSecSignatureBase {
         secRef = new SecurityTokenReference(doc);
         strUri = wssConfig.getIdAllocator().createSecureId("STR-", secRef);
         secRef.setID(strUri);
+        
+        //
+        // Get an initialized XMLSignature element.
+        //
         
         //
         // Prepare and setup the token references for this Signature
@@ -301,7 +307,7 @@ public class WSSecSignature extends WSSecSignatureBase {
 
         List referenceList = addReferencesToSign(parts, secHeader);
 
-        computeSignature(referenceList, secHeader);
+        computeSignature(referenceList);
         
         //
         // if we have a BST prepend it in front of the Signature according to
@@ -334,6 +340,19 @@ public class WSSecSignature extends WSSecSignatureBase {
             );
     }
 
+    /**
+     * Returns the SignatureElement.
+     * The method can be called any time after <code>prepare()</code>.
+     * @return The DOM Element of the signature.
+     */
+    public Element getSignatureElement() {
+        return
+            WSSecurityUtil.getDirectChildElement(
+                securityHeader,
+                WSConstants.SIG_LN,
+                WSConstants.SIG_NS
+            );
+    }
     
     /**
      * Prepend the BinarySecurityToken to the elements already in the Security
@@ -364,6 +383,20 @@ public class WSSecSignature extends WSSecSignatureBase {
         bstToken = null;
     }
     
+    /**
+     * Compute the Signature over the references.
+     * 
+     * After references are set this method computes the Signature for them.
+     * This method can be called any time after the references were set. See
+     * <code>addReferencesToSign()</code>.
+     * 
+     * @throws WSSecurityException
+     */
+    public void computeSignature(
+        List referenceList 
+    ) throws WSSecurityException {
+        computeSignature(referenceList, true, null);
+    }
     
     /**
      * Compute the Signature over the references.
@@ -374,8 +407,11 @@ public class WSSecSignature extends WSSecSignatureBase {
      * 
      * @throws WSSecurityException
      */
-    public void computeSignature(List referenceList, WSSecHeader secHeader) 
-        throws WSSecurityException {
+    public void computeSignature(
+        List referenceList, 
+        boolean prepend,
+        Element siblingElement
+    ) throws WSSecurityException {
         boolean remove = WSDocInfoStore.store(wsDocInfo);
         try {
             java.security.Key key;
@@ -396,17 +432,23 @@ public class WSSecSignature extends WSSecSignatureBase {
                     wssConfig.getIdAllocator().createId("SIG-", null),
                     null);
             
-            org.w3c.dom.Element securityHeaderElement = secHeader.getSecurityHeader();
             //
-            // Prepend the signature element to the security header
+            // Figure out where to insert the signature element
             //
             XMLSignContext signContext = null;
-            if (securityHeaderElement.hasChildNodes()) {
-                org.w3c.dom.Node firstChild = securityHeaderElement.getFirstChild();
-                signContext = new DOMSignContext(key, securityHeaderElement, firstChild);
+            if (prepend) {
+                if (siblingElement == null) {
+                    siblingElement = (Element)securityHeader.getFirstChild();
+                }
+                if (siblingElement == null) {
+                    signContext = new DOMSignContext(key, securityHeader);
+                } else {
+                    signContext = new DOMSignContext(key, securityHeader, siblingElement);
+                }
             } else {
-                signContext = new DOMSignContext(key, securityHeaderElement);
+                signContext = new DOMSignContext(key, securityHeader);
             }
+            
             signContext.putNamespacePrefix(WSConstants.SIG_NS, WSConstants.SIG_PREFIX);
             if (WSConstants.C14N_EXCL_OMIT_COMMENTS.equals(canonAlgo)) {
                 signContext.putNamespacePrefix(

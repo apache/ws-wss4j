@@ -456,6 +456,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
             //
             String xencEncryptedDataId = 
                 config.getIdAllocator().createId("ED-", elementToEncrypt);
+            encPart.setEncId(xencEncryptedDataId);
             try {
                 if (modifier.equals("Header")) {
                     Element elem = 

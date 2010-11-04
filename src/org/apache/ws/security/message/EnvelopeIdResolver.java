@@ -142,7 +142,7 @@ public class EnvelopeIdResolver extends ResourceResolverSpi {
                 }
                 if (cId == null) {
                     throw new ResourceResolverException("generic.EmptyMessage",
-                            new Object[]{"Id not found"},
+                            new Object[]{"Id: " + id + " not found"},
                             uri,
                             BaseURI);
                 }

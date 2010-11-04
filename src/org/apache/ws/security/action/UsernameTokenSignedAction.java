@@ -124,7 +124,7 @@ public class UsernameTokenSignedAction implements Action {
         List referenceList = sign.addReferencesToSign(parts, reqData.getSecHeader());
 
         try {
-            sign.computeSignature(referenceList, reqData.getSecHeader());
+            sign.computeSignature(referenceList);
             reqData.getSignatureValues().add(sign.getSignatureValue());
         } catch (WSSecurityException e) {
             throw new WSSecurityException(
