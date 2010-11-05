@@ -29,7 +29,7 @@ import org.apache.ws.security.util.WSSecurityUtil;
 
 import org.apache.xml.security.c14n.Canonicalizer;
 import org.apache.xml.security.signature.XMLSignatureInput;
-import org.apache.xml.security.utils.XMLUtils;
+//import org.apache.xml.security.utils.XMLUtils;
 
 import org.jcp.xml.dsig.internal.dom.ApacheData;
 import org.jcp.xml.dsig.internal.dom.DOMSubTreeData;
@@ -45,15 +45,15 @@ import java.security.spec.AlgorithmParameterSpec;
 
 import javax.xml.crypto.Data;
 import javax.xml.crypto.MarshalException;
-import javax.xml.crypto.NodeSetData;
+//import javax.xml.crypto.NodeSetData;
 import javax.xml.crypto.OctetStreamData;
 import javax.xml.crypto.XMLCryptoContext;
 import javax.xml.crypto.XMLStructure;
 import javax.xml.crypto.dom.DOMCryptoContext;
-import javax.xml.crypto.dsig.Transform;
+//import javax.xml.crypto.dsig.Transform;
 import javax.xml.crypto.dsig.TransformException;
 import javax.xml.crypto.dsig.TransformService;
-import javax.xml.crypto.dsig.XMLSignatureFactory;
+//import javax.xml.crypto.dsig.XMLSignatureFactory;
 import javax.xml.crypto.dsig.spec.TransformParameterSpec;
 
 
@@ -69,7 +69,7 @@ public class STRTransform extends TransformService {
     
     private Element transformElement;
     
-    private XMLSignatureFactory signatureFactory = XMLSignatureFactory.getInstance("DOM");
+    // private XMLSignatureFactory signatureFactory = XMLSignatureFactory.getInstance("DOM");
     
     private static Log log = LogFactory.getLog(STRTransform.class.getName());
 
@@ -146,10 +146,12 @@ public class STRTransform extends TransformService {
             canonAlgo = canonElem.getAttribute("Algorithm");
         }
         try {
+            /*
             Transform c14nTransform =
                 signatureFactory.newTransform(
                     canonAlgo, (TransformParameterSpec)null
                 );
+                */
             
             //
             // Get the input (node) to transform. Currently we support only an
@@ -190,6 +192,7 @@ public class STRTransform extends TransformService {
             ByteArrayOutputStream bos = null;
             byte[] buf = null;
             
+            xc.getBaseURI();
             //
             // Third and fourth step are performed by dereferenceSTR()
             //
