@@ -38,6 +38,7 @@ import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.message.WSSecUsernameToken;
 import org.apache.ws.security.message.WSSecHeader;
+import org.apache.ws.security.message.token.UsernameToken;
 import org.apache.ws.security.util.Base64;
 import org.w3c.dom.Document;
 
@@ -48,6 +49,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.MessageDigest;
+import java.util.Arrays;
 
 
 /**
@@ -171,6 +173,51 @@ public class TestWSSecurityNew5 extends TestCase implements CallbackHandler {
         }
         LOG.info("After adding UsernameToken PW Digest....");
         verify(signedDoc);
+    }
+    
+    /**
+     * Test for encoded passwords.
+     */
+    public void testUsernameTokenWithEncodedPasswordBaseline() throws Exception {
+        String password = "password";
+        // The SHA-1 of the password is known as a password equivalent in the UsernameToken specification.
+        byte[] passwordHash = MessageDigest.getInstance("SHA-1").digest(password.getBytes("UTF-8"));
+
+        String nonce = "0x7bXAPZVn40AdCD0Xbt0g==";
+        String created = "2010-06-28T15:16:37Z";
+        String expectedPasswordDigest = "C0rena/6gKpRZ9ATj+e6ss5sAbQ=";
+        String actualPasswordDigest = UsernameToken.doPasswordDigest(nonce, created, passwordHash);
+        assertEquals("the password digest is not as expected", expectedPasswordDigest, actualPasswordDigest);
+    }
+    
+    /**
+     * Test that adds a UserNameToken with password Digest to a WS-Security envelope
+     */
+    public void testUsernameTokenWithEncodedPassword() throws Exception {
+        WSSecUsernameToken builder = new WSSecUsernameToken();
+        builder.setPasswordsAreEncoded(true);
+        builder.setUserInfo("wernerd", Base64.encode(MessageDigest.getInstance("SHA-1").digest("verySecret".getBytes("UTF-8"))));
+        LOG.info("Before adding UsernameToken PW Digest....");
+        Document doc = unsignedEnvelope.getAsDocument();
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        Document signedDoc = builder.build(doc, secHeader);
+
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Message with UserNameToken PW Digest:");
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+            LOG.debug(outputString);
+        }
+        LOG.info("After adding UsernameToken PW Digest....");
+
+        boolean passwordsAreEnabledOrig = WSSecurityEngine.getInstance().getWssConfig().getPasswordsAreEncoded();
+        try {
+            WSSecurityEngine.getInstance().getWssConfig().setPasswordsAreEncoded(true);
+            verify(signedDoc);
+        } finally {
+            WSSecurityEngine.getInstance().getWssConfig().setPasswordsAreEncoded(passwordsAreEnabledOrig);
+        }
     }
     
     /**
@@ -633,26 +680,53 @@ public class TestWSSecurityNew5 extends TestCase implements CallbackHandler {
         for (int i = 0; i < callbacks.length; i++) {
             if (callbacks[i] instanceof WSPasswordCallback) {
                 WSPasswordCallback pc = (WSPasswordCallback) callbacks[i];
+                boolean passwordsAreEncoded = WSSecurityEngine.getInstance().getWssConfig().getPasswordsAreEncoded();
                 if (pc.getUsage() == WSPasswordCallback.USERNAME_TOKEN
                     && "wernerd".equals(pc.getIdentifier())) {
-                    pc.setPassword("verySecret");
+                    if (passwordsAreEncoded) {
+                        // "hGqoUreBgahTJblQ3DbJIkE6uNs=" is the Base64 encoded SHA-1 hash of "verySecret".
+                        pc.setPassword("hGqoUreBgahTJblQ3DbJIkE6uNs=");
+                    } else {
+                        pc.setPassword("verySecret");
+                    }
                 } else if (pc.getUsage() == WSPasswordCallback.USERNAME_TOKEN
                     && "emptyuser".equals(pc.getIdentifier())) {
-                    pc.setPassword("");
+                    if (passwordsAreEncoded) {
+                        // "2jmj7l5rSw0yVb/vlWAYkK/YBwk=" is the Base64 encoded SHA-1 hash of "".
+                        pc.setPassword("2jmj7l5rSw0yVb/vlWAYkK/YBwk=");
+                    } else {
+                        pc.setPassword("");
+                    }
                 }  
                 else if (
                     pc.getUsage() == WSPasswordCallback.USERNAME_TOKEN_UNKNOWN
                 ) {
-                    if ("wernerd".equals(pc.getIdentifier())
-                        && "verySecret".equals(pc.getPassword())) {
-                        return;
-                    } else if ("customUser".equals(pc.getIdentifier())) {
-                        return;
-                    } else if ("wernerd".equals(pc.getIdentifier())
-                            && "".equals(pc.getPassword())) {
-                        return;
+                    if (passwordsAreEncoded) {
+                        if ("wernerd".equals(pc.getIdentifier())
+                            && "hGqoUreBgahTJblQ3DbJIkE6uNs=".equals(pc.getPassword())) {
+                            // "hGqoUreBgahTJblQ3DbJIkE6uNs=" is the Base64 encoded SHA-1 hash of "verySecret".
+                            return;
+                        } else if ("customUser".equals(pc.getIdentifier())) {
+                            return;
+                        } else if ("wernerd".equals(pc.getIdentifier())
+                                && "2jmj7l5rSw0yVb/vlWAYkK/YBwk=".equals(pc.getPassword())) {
+                            // "2jmj7l5rSw0yVb/vlWAYkK/YBwk=" is the Base64 encoded SHA-1 hash of "".
+                            return;
+                        } else {
+                            throw new IOException("Authentication failed");
+                        }
                     } else {
-                        throw new IOException("Authentication failed");
+                        if ("wernerd".equals(pc.getIdentifier())
+                            && "verySecret".equals(pc.getPassword())) {
+                            return;
+                        } else if ("customUser".equals(pc.getIdentifier())) {
+                            return;
+                        } else if ("wernerd".equals(pc.getIdentifier())
+                                && "".equals(pc.getPassword())) {
+                            return;
+                        } else {
+                            throw new IOException("Authentication failed");
+                        }
                     }
                 }
             } else {

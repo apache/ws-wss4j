@@ -30,6 +30,7 @@ import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.WSUsernameTokenPrincipal;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.message.token.UsernameToken;
+import org.apache.ws.security.util.Base64;
 import org.w3c.dom.Element;
 
 import javax.security.auth.callback.Callback;
@@ -46,6 +47,7 @@ public class UsernameTokenProcessor implements Processor {
     private UsernameToken ut;
     private boolean handleCustomPasswordTypes;
     private boolean allowNamespaceQualifiedPasswordTypes;
+    private boolean passwordsAreEncoded;
     
     public void handleToken(Element elem, Crypto crypto, Crypto decCrypto, CallbackHandler cb, 
         WSDocInfo wsDocInfo, Vector returnResults, WSSConfig wsc) throws WSSecurityException {
@@ -54,6 +56,7 @@ public class UsernameTokenProcessor implements Processor {
         }
         handleCustomPasswordTypes = wsc.getHandleCustomPasswordTypes();
         allowNamespaceQualifiedPasswordTypes = wsc.getAllowNamespaceQualifiedPasswordTypes();
+        passwordsAreEncoded = wsc.getPasswordsAreEncoded();
         
         Principal lastPrincipalFound = handleUsernameToken((Element) elem, cb);
         returnResults.add(
@@ -91,6 +94,7 @@ public class UsernameTokenProcessor implements Processor {
         // Parse the UsernameToken element
         //
         ut = new UsernameToken(token, allowNamespaceQualifiedPasswordTypes);
+        ut.setPasswordsAreEncoded(passwordsAreEncoded);
         String user = ut.getName();
         String password = ut.getPassword();
         String nonce = ut.getNonce();
@@ -140,7 +144,12 @@ public class UsernameTokenProcessor implements Processor {
                 }
                 throw new WSSecurityException(WSSecurityException.FAILED_AUTHENTICATION);
             }
-            String passDigest = UsernameToken.doPasswordDigest(nonce, createdTime, origPassword);
+            String passDigest;
+            if (passwordsAreEncoded) {
+                passDigest = UsernameToken.doPasswordDigest(nonce, createdTime, Base64.decode(origPassword));
+            } else {
+                passDigest = UsernameToken.doPasswordDigest(nonce, createdTime, origPassword);
+            }
             if (!passDigest.equals(password)) {
                 throw new WSSecurityException(WSSecurityException.FAILED_AUTHENTICATION);
             }
@@ -210,6 +219,10 @@ public class UsernameTokenProcessor implements Processor {
         }
         byte[] saltValue = ut.getSalt();
         int iteration = ut.getIteration();
-        return UsernameToken.generateDerivedKey(password, saltValue, iteration);
+        if (passwordsAreEncoded) {
+            return UsernameToken.generateDerivedKey(Base64.decode(password), saltValue, iteration);
+        } else {
+            return UsernameToken.generateDerivedKey(password, saltValue, iteration);
+        }
     }
 }

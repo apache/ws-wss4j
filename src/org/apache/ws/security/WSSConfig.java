@@ -212,6 +212,18 @@ public class WSSConfig {
      */
     protected int secretKeyLength = WSConstants.WSE_DERIVED_KEY_LEN;
     
+    /**
+     * Whether the password should be treated as a binary value.  This
+     * is needed to properly handle password equivalence for UsernameToken
+     * passwords.  Binary passwords are Base64 encoded so they can be
+     * treated as strings in most places, but when the password digest
+     * is calculated or a key is derived from the password, the password
+     * will be Base64 decoded before being used. This is most useful for
+     * hashed passwords as password equivalents.
+     *
+     * See https://issues.apache.org/jira/browse/WSS-239
+     */
+    protected boolean passwordsAreEncoded = false;
     
     /**
      * The default wsu:Id allocator is a simple "start at 1 and increment up"
@@ -443,6 +455,21 @@ public class WSSConfig {
      */
     public int getSecretKeyLength() {
         return secretKeyLength;
+    }
+    
+    /**
+     * @param passwordsAreEncoded
+     * whether passwords are encoded
+     */
+    public void setPasswordsAreEncoded(boolean passwordsAreEncoded) {
+        this.passwordsAreEncoded = passwordsAreEncoded;
+    }
+    
+    /**
+     * @return whether passwords are encoded
+     */
+    public boolean getPasswordsAreEncoded() {
+        return passwordsAreEncoded;
     }
     
     /**

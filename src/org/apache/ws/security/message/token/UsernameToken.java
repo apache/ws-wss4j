@@ -73,6 +73,7 @@ public class UsernameToken {
     protected String passwordType = null;
     protected boolean hashed = true;
     private String rawPassword;        // enhancement by Alberto Coletti
+    private boolean passwordsAreEncoded = false;
     
     static {
         try {
@@ -453,7 +454,11 @@ public class UsernameToken {
                 node.setData(pwd);
                 elementPassword.setAttributeNS(null, "Type", WSConstants.PASSWORD_TEXT);
             } else {
-                node.setData(doPasswordDigest(getNonce(), getCreated(), pwd));
+                if (passwordsAreEncoded) {
+                    node.setData(doPasswordDigest(getNonce(), getCreated(), Base64.decode(pwd)));
+                } else {
+                    node.setData(doPasswordDigest(getNonce(), getCreated(), pwd));
+                }
                 elementPassword.setAttributeNS(null, "Type", WSConstants.PASSWORD_DIGEST);
             }
         } catch (Exception e) {
@@ -479,12 +484,26 @@ public class UsernameToken {
         return rawPassword;
     }
     
-    public static String doPasswordDigest(String nonce, String created, String password) {
+    /**
+     * @param passwordsAreEncoded whether passwords are encoded
+     */
+    public void setPasswordsAreEncoded(boolean passwordsAreEncoded) {
+        this.passwordsAreEncoded = passwordsAreEncoded;
+    }
+    
+    /**
+     * @return whether passwords are encoded
+     */
+    public boolean getPasswordsAreEncoded() {
+        return passwordsAreEncoded;
+    }
+    
+    public static String doPasswordDigest(String nonce, String created, byte[] password) {
         String passwdDigest = null;
         try {
             byte[] b1 = nonce != null ? Base64.decode(nonce) : new byte[0];
             byte[] b2 = created != null ? created.getBytes("UTF-8") : new byte[0];
-            byte[] b3 = password.getBytes("UTF-8");
+            byte[] b3 = password;
             byte[] b4 = new byte[b1.length + b2.length + b3.length];
             int offset = 0;
             System.arraycopy(b1, 0, b4, offset, b1.length);
@@ -499,6 +518,18 @@ public class UsernameToken {
             sha.reset();
             sha.update(b4);
             passwdDigest = Base64.encode(sha.digest());
+        } catch (Exception e) {
+            if (DO_DEBUG) {
+                LOG.debug(e.getMessage(), e);
+            }
+        }
+        return passwdDigest;
+    }
+
+    public static String doPasswordDigest(String nonce, String created, String password) {
+        String passwdDigest = null;
+        try {
+            passwdDigest = doPasswordDigest(nonce, created, password.getBytes("UTF-8"));
         } catch (Exception e) {
             if (DO_DEBUG) {
                 LOG.debug(e.getMessage(), e);
@@ -613,7 +644,12 @@ public class UsernameToken {
         byte[] key = null;
         try {
             Mac mac = Mac.getInstance("HMACSHA1");
-            byte[] password = rawPassword.getBytes("UTF-8"); // enhancement by Alberto Coletti
+            byte[] password;
+            if (passwordsAreEncoded) {
+                password = Base64.decode(rawPassword);
+            } else {
+                password = rawPassword.getBytes("UTF-8"); // enhancement by Alberto Coletti
+            }
             byte[] label = labelString.getBytes("UTF-8");
             byte[] nonce = Base64.decode(getNonce());
             byte[] created = getCreated().getBytes("UTF-8");
@@ -647,7 +683,7 @@ public class UsernameToken {
         return key;
     }
     
-  
+    
     /**
      * This static method generates a derived key as defined in WSS Username
      * Token Profile.
@@ -660,26 +696,17 @@ public class UsernameToken {
      * @throws WSSecurityException
      */
     public static byte[] generateDerivedKey(
-        String password, 
+        byte[] password, 
         byte[] salt, 
         int iteration
     ) throws WSSecurityException {
         if (iteration == 0) {
             iteration = DEFAULT_ITERATION;
         }
-        byte[] pwBytes = null;
-        try {
-            pwBytes = password.getBytes("UTF-8");
-        } catch (final java.io.UnsupportedEncodingException e) {
-            if (DO_DEBUG) {
-                LOG.debug(e.getMessage(), e);
-            }
-            throw new WSSecurityException("Unable to convert password to UTF-8", e);
-        }
 
-        byte[] pwSalt = new byte[salt.length + pwBytes.length];
-        System.arraycopy(pwBytes, 0, pwSalt, 0, pwBytes.length);
-        System.arraycopy(salt, 0, pwSalt, pwBytes.length, salt.length);
+        byte[] pwSalt = new byte[salt.length + password.length];
+        System.arraycopy(password, 0, pwSalt, 0, password.length);
+        System.arraycopy(salt, 0, pwSalt, password.length, salt.length);
 
         MessageDigest sha = null;
         try {
@@ -707,6 +734,32 @@ public class UsernameToken {
         return K;
     }
     
+    /**
+     * This static method generates a derived key as defined in WSS Username
+     * Token Profile.
+     * 
+     * @param password The password to include in the key generation
+     * @param salt The Salt value
+     * @param iteration The Iteration value. If zero (0) is given the method uses the
+     *                  default value
+     * @return Returns the derived key a byte array
+     * @throws WSSecurityException
+     */
+    public static byte[] generateDerivedKey(
+        String password, 
+        byte[] salt, 
+        int iteration
+    ) throws WSSecurityException {
+        try {
+            return generateDerivedKey(password.getBytes("UTF-8"), salt, iteration);
+        } catch (final java.io.UnsupportedEncodingException e) {
+            if (DO_DEBUG) {
+                LOG.debug(e.getMessage(), e);
+            }
+            throw new WSSecurityException("Unable to convert password to UTF-8", e);
+        }
+    }
+    
     
     /**
      * This method gets a derived key as defined in WSS Username Token Profile.
@@ -717,7 +770,11 @@ public class UsernameToken {
     public byte[] getDerivedKey() throws WSSecurityException {
         int iteration = getIteration();
         byte[] salt = getSalt();
-        return generateDerivedKey(rawPassword, salt, iteration);
+        if (passwordsAreEncoded) {
+            return generateDerivedKey(Base64.decode(rawPassword), salt, iteration);
+        } else {
+            return generateDerivedKey(rawPassword, salt, iteration);
+        }
     }
     
     /**

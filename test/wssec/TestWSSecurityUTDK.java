@@ -41,6 +41,7 @@ import org.apache.ws.security.message.WSSecDKSign;
 import org.apache.ws.security.message.WSSecHeader;
 import org.apache.ws.security.message.WSSecUsernameToken;
 import org.apache.ws.security.message.token.UsernameToken;
+import org.apache.ws.security.util.Base64;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.xml.security.signature.XMLSignature;
 import org.w3c.dom.Document;
@@ -53,6 +54,8 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import java.security.MessageDigest;
+import java.util.Arrays;
 import java.util.Vector;
 
 /**
@@ -163,8 +166,25 @@ public class TestWSSecurityUTDK extends TestCase implements CallbackHandler {
         byte[] derivedKey = UsernameToken.generateDerivedKey("security", salt, 500);
         assertTrue(derivedKey.length == 20);
         
+        // "c2VjdXJpdHk=" is the Base64 encoding of "security"
+        derivedKey = UsernameToken.generateDerivedKey(Base64.decode("c2VjdXJpdHk="), salt, 500);
+        assertTrue(derivedKey.length == 20);
     }
-    
+
+    /**
+     * Test for encoded passwords.
+     */
+    public void testDerivedKeyWithEncodedPasswordBaseline() throws Exception {
+        String password = "password";
+        // The SHA-1 of the password is known as a password equivalent in the UsernameToken specification.
+        byte[] passwordHash = MessageDigest.getInstance("SHA-1").digest(password.getBytes("UTF-8"));
+
+        byte[] salt = Base64.decode("LKpycbfgRzwDnBz6kkhAAQ==");
+        int iteration = 1049;
+        byte[] expectedDerivedKey = Base64.decode("C7Ll/OY4TECb6hZuMMiX/5hzszo=");
+        byte[] derivedKey = UsernameToken.generateDerivedKey(passwordHash, salt, iteration);
+        assertTrue("the derived key is not as expected", Arrays.equals(expectedDerivedKey, derivedKey));
+    }
 
     /**
      * Test using a UsernameToken derived key for encrypting a SOAP body
@@ -206,6 +226,55 @@ public class TestWSSecurityUTDK extends TestCase implements CallbackHandler {
         }
         
         verify(encryptedDoc);
+    }
+    
+    /**
+     * Test using a UsernameToken derived key for encrypting a SOAP body
+     */
+    public void testDerivedKeyEncryptionWithEncodedPassword() throws Exception {
+        Document doc = unsignedEnvelope.getAsDocument();
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        
+        WSSecUsernameToken builder = new WSSecUsernameToken();
+        builder.setPasswordsAreEncoded(true);
+        builder.setUserInfo("bob", Base64.encode(MessageDigest.getInstance("SHA-1").digest("security".getBytes("UTF-8"))));
+        builder.addDerivedKey(false, null, 1000);
+        builder.prepare(doc);
+        
+        byte[] derivedKey = builder.getDerivedKey();
+        assertTrue(derivedKey.length == 20);
+        
+        String tokenIdentifier = builder.getId();
+        
+        //
+        // Derived key encryption
+        //
+        WSSecDKEncrypt encrBuilder = new WSSecDKEncrypt();
+        encrBuilder.setSymmetricEncAlgorithm(WSConstants.AES_128);
+        encrBuilder.setExternalKey(derivedKey, tokenIdentifier);
+        Document encryptedDoc = encrBuilder.build(doc, secHeader);
+        
+        builder.prependToHeader(secHeader);
+        
+        String outputString = 
+            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(encryptedDoc);
+        assertTrue(outputString.indexOf("wsse:Username") != -1);
+        assertTrue(outputString.indexOf("wsse:Password") == -1);
+        assertTrue(outputString.indexOf("wsse11:Salt") != -1);
+        assertTrue(outputString.indexOf("wsse11:Iteration") != -1);
+        assertTrue(outputString.indexOf("testMethod") == -1);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(outputString);
+        }
+        
+        boolean passwordsAreEnabledOrig = WSSecurityEngine.getInstance().getWssConfig().getPasswordsAreEncoded();
+        try {
+            WSSecurityEngine.getInstance().getWssConfig().setPasswordsAreEncoded(true);
+            verify(encryptedDoc);
+        } finally {
+            WSSecurityEngine.getInstance().getWssConfig().setPasswordsAreEncoded(passwordsAreEnabledOrig);
+        }
     }
     
     /**
@@ -355,6 +424,60 @@ public class TestWSSecurityUTDK extends TestCase implements CallbackHandler {
     }
     
     /**
+     * Test using a UsernameToken derived key for signing a SOAP body
+     */
+    public void testDerivedKeySignatureWithEncodedPassword() throws Exception {
+        Document doc = unsignedEnvelope.getAsDocument();
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        
+        WSSecUsernameToken builder = new WSSecUsernameToken();
+        builder.setPasswordsAreEncoded(true);
+        builder.setUserInfo("bob", Base64.encode(MessageDigest.getInstance("SHA-1").digest("security".getBytes("UTF-8"))));
+        builder.addDerivedKey(true, null, 1000);
+        builder.prepare(doc);
+        
+        byte[] derivedKey = builder.getDerivedKey();
+        assertTrue(derivedKey.length == 20);
+        
+        String tokenIdentifier = builder.getId();
+        
+        //
+        // Derived key signature
+        //
+        WSSecDKSign sigBuilder = new WSSecDKSign();
+        sigBuilder.setExternalKey(derivedKey, tokenIdentifier);
+        sigBuilder.setSignatureAlgorithm(XMLSignature.ALGO_ID_MAC_HMAC_SHA1);
+        Document signedDoc = sigBuilder.build(doc, secHeader);
+        
+        builder.prependToHeader(secHeader);
+        
+        String outputString = 
+            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+        assertTrue(outputString.indexOf("wsse:Username") != -1);
+        assertTrue(outputString.indexOf("wsse:Password") == -1);
+        assertTrue(outputString.indexOf("wsse11:Salt") != -1);
+        assertTrue(outputString.indexOf("wsse11:Iteration") != -1);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(outputString);
+        }
+        
+        boolean passwordsAreEnabledOrig = WSSecurityEngine.getInstance().getWssConfig().getPasswordsAreEncoded();
+        try {
+            WSSecurityEngine.getInstance().getWssConfig().setPasswordsAreEncoded(true);
+            Vector results = verify(signedDoc);
+            WSSecurityEngineResult actionResult =
+                WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
+            java.security.Principal principal = 
+                (java.security.Principal) actionResult.get(WSSecurityEngineResult.TAG_PRINCIPAL);
+            //System.out.println(principal.getName());
+            assertTrue(principal.getName().indexOf("derivedKey") != -1);
+        } finally {
+            WSSecurityEngine.getInstance().getWssConfig().setPasswordsAreEncoded(passwordsAreEnabledOrig);
+        }
+    }
+    
+    /**
      * Test using a UsernameToken derived key for signing a SOAP body. In this test the
      * derived key is modified before signature, and so signature verification should
      * fail.
@@ -462,7 +585,12 @@ public class TestWSSecurityUTDK extends TestCase implements CallbackHandler {
                 WSPasswordCallback pc = (WSPasswordCallback) callbacks[i];
                 if (pc.getUsage() == WSPasswordCallback.USERNAME_TOKEN_UNKNOWN
                     && "bob".equals(pc.getIdentifier())) {
-                    pc.setPassword("security");
+                    if (WSSecurityEngine.getInstance().getWssConfig().getPasswordsAreEncoded()) {
+                        // "jux7xGGAjguKKHg9C+waOiLrCCE=" is the Base64 encoded SHA-1 hash of "security".
+                        pc.setPassword("jux7xGGAjguKKHg9C+waOiLrCCE=");
+                    } else {
+                        pc.setPassword("security");
+                    }
                 } else {
                     throw new IOException("Authentication failed");
                 }

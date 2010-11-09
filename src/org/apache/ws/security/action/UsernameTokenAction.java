@@ -43,6 +43,7 @@ public class UsernameTokenAction implements Action {
         WSSecUsernameToken builder = new WSSecUsernameToken();
         builder.setWsConfig(reqData.getWssConfig());
         builder.setPasswordType(reqData.getPwType());
+        builder.setPasswordsAreEncoded(reqData.getWssConfig().getPasswordsAreEncoded());
         builder.setUserInfo(providedUsername, password);
 
         if (reqData.getUtElements() != null && reqData.getUtElements().length > 0) {
