@@ -801,6 +801,18 @@ public class WSHandlerConstants {
     public static final String TIMESTAMP_STRICT = "timestampStrict";
     
     /**
+     * Set the value of this parameter to true to treat passwords as binary values
+     * for Username Tokens.
+     * 
+     * This is needed to properly handle password equivalence for UsernameToken
+     * passwords.  Binary passwords are Base64 encoded so they can be treated as 
+     * strings in most places, but when the password digest is calculated or a key
+     * is derived from the password, the password will be Base64 decoded before 
+     * being used. This is most useful for hashed passwords as password equivalents.
+     */
+    public static final String USE_ENCODED_PASSWORDS = "useEncodedPasswords";
+    
+    /**
      * Define the parameter values to set the key identifier types. These are:
      * <ul>
      * <li><code>DirectReference</code> for {@link WSConstants#BST_DIRECT_REFERENCE}

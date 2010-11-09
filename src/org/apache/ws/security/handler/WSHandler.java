@@ -97,6 +97,7 @@ public abstract class WSHandler {
         wssConfig.setEnableSignatureConfirmation(
             enableSigConf || ((doAction & WSConstants.SC) != 0)
         );
+        wssConfig.setPasswordsAreEncoded(decodeUseEncodedPasswords(reqData));
 
         wssConfig.setPrecisionInMilliSeconds(
             decodeTimestampPrecision(reqData)
@@ -257,6 +258,7 @@ public abstract class WSHandler {
         wssConfig.setTimeStampStrict(decodeTimestampStrict(reqData));
         wssConfig.setTimeStampTTL(decodeTimeToLive(reqData));
         wssConfig.setHandleCustomPasswordTypes(decodeCustomPasswordTypes(reqData));
+        wssConfig.setPasswordsAreEncoded(decodeUseEncodedPasswords(reqData));
         wssConfig.setAllowNamespaceQualifiedPasswordTypes(
             decodeNamespaceQualifiedPasswordTypes(reqData)
         );
@@ -758,6 +760,28 @@ public abstract class WSHandler {
 
         throw new WSSecurityException(
             "WSHandler: illegal handleCustomPasswordTypes parameter"
+        );
+    }
+    
+    protected boolean decodeUseEncodedPasswords(RequestData reqData) 
+        throws WSSecurityException {
+        String value = getString(
+            WSHandlerConstants.USE_ENCODED_PASSWORDS,
+            reqData.getMsgContext()
+        );
+    
+        if (value == null) {
+            return false;
+        }
+        if ("0".equals(value) || "false".equals(value)) {
+            return false;
+        } 
+        if ("1".equals(value) || "true".equals(value)) {
+            return true;
+        }
+    
+        throw new WSSecurityException(
+            "WSHandler: illegal useEncodedPasswords parameter"
         );
     }
     
