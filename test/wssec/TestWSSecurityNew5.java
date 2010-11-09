@@ -691,42 +691,21 @@ public class TestWSSecurityNew5 extends TestCase implements CallbackHandler {
                     }
                 } else if (pc.getUsage() == WSPasswordCallback.USERNAME_TOKEN
                     && "emptyuser".equals(pc.getIdentifier())) {
-                    if (passwordsAreEncoded) {
-                        // "2jmj7l5rSw0yVb/vlWAYkK/YBwk=" is the Base64 encoded SHA-1 hash of "".
-                        pc.setPassword("2jmj7l5rSw0yVb/vlWAYkK/YBwk=");
-                    } else {
-                        pc.setPassword("");
-                    }
+                    pc.setPassword("");
                 }  
                 else if (
                     pc.getUsage() == WSPasswordCallback.USERNAME_TOKEN_UNKNOWN
                 ) {
-                    if (passwordsAreEncoded) {
-                        if ("wernerd".equals(pc.getIdentifier())
-                            && "hGqoUreBgahTJblQ3DbJIkE6uNs=".equals(pc.getPassword())) {
-                            // "hGqoUreBgahTJblQ3DbJIkE6uNs=" is the Base64 encoded SHA-1 hash of "verySecret".
-                            return;
-                        } else if ("customUser".equals(pc.getIdentifier())) {
-                            return;
-                        } else if ("wernerd".equals(pc.getIdentifier())
-                                && "2jmj7l5rSw0yVb/vlWAYkK/YBwk=".equals(pc.getPassword())) {
-                            // "2jmj7l5rSw0yVb/vlWAYkK/YBwk=" is the Base64 encoded SHA-1 hash of "".
-                            return;
-                        } else {
-                            throw new IOException("Authentication failed");
-                        }
+                    if ("wernerd".equals(pc.getIdentifier())
+                        && "verySecret".equals(pc.getPassword())) {
+                        return;
+                    } else if ("customUser".equals(pc.getIdentifier())) {
+                        return;
+                    } else if ("wernerd".equals(pc.getIdentifier())
+                        && "".equals(pc.getPassword())) {
+                        return;
                     } else {
-                        if ("wernerd".equals(pc.getIdentifier())
-                            && "verySecret".equals(pc.getPassword())) {
-                            return;
-                        } else if ("customUser".equals(pc.getIdentifier())) {
-                            return;
-                        } else if ("wernerd".equals(pc.getIdentifier())
-                                && "".equals(pc.getPassword())) {
-                            return;
-                        } else {
-                            throw new IOException("Authentication failed");
-                        }
+                        throw new IOException("Authentication failed");
                     }
                 }
             } else {
