@@ -75,6 +75,7 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
     
     private KeyInfoFactory keyInfoFactory = KeyInfoFactory.getInstance("DOM");
     private XMLSignatureFactory signatureFactory = XMLSignatureFactory.getInstance("DOM");
+    private XMLSignature sig;
     private KeyInfo keyInfo;
     private CanonicalizationMethod c14nMethod;
     private Element securityHeader = null;
@@ -119,6 +120,7 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
         super.prepare(doc);
         wsDocInfo = new WSDocInfo(doc);
         securityHeader = secHeader.getSecurityHeader();
+        sig = null;
         
         try {
             C14NMethodParameterSpec c14nSpec = null;
@@ -225,8 +227,7 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
             SignedInfo signedInfo = 
                 signatureFactory.newSignedInfo(c14nMethod, signatureMethod, referenceList);
             
-            XMLSignature sig = 
-                signatureFactory.newXMLSignature(
+            sig = signatureFactory.newXMLSignature(
                     signedInfo, 
                     keyInfo,
                     null,
@@ -296,6 +297,18 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
      */
     public String getSignatureAlgorithm() {
         return sigAlgo;
+    }
+    
+    /**
+     * Returns the the value of wsu:Id attribute of the Signature element.
+     * 
+     * @return Return the wsu:Id of this token or null if the signature has not been generated.
+     */
+    public String getSignatureId() {
+        if (sig == null) {
+            return null;
+        }
+        return sig.getId();
     }
     
     /**
