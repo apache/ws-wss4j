@@ -107,6 +107,44 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
         }
     }
 
+    @Test
+    public void testRecursiveKeyReferencesDOS2() throws Exception {
+        InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml");
+
+        String action = WSHandlerConstants.TIMESTAMP + " " + WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.ENCRYPT;
+        Properties properties = new Properties();
+        properties.setProperty(WSHandlerConstants.SIGNATURE_PARTS, "{Element}{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd}Timestamp;{Element}{http://schemas.xmlsoap.org/soap/envelope/}Body;");
+        Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
+
+        XPathExpression xPathExpression = getXPath("/env:Envelope/env:Header/wsse:Security/xenc:EncryptedKey");
+        Element encryptedKeyElement = (Element) xPathExpression.evaluate(securedDocument, XPathConstants.NODE);
+        encryptedKeyElement.removeAttribute("Id");
+        encryptedKeyElement.setAttribute("Id", "2");
+
+        xPathExpression = getXPath(".//dsig:X509Data");
+        Element keyIdentifierElement = (Element) xPathExpression.evaluate(encryptedKeyElement, XPathConstants.NODE);
+        Element securityTokenReferenceElement = (Element) keyIdentifierElement.getParentNode();
+        securityTokenReferenceElement.removeChild(keyIdentifierElement);
+        //wsse:Reference xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd" URI="#EncKeyId-1483925398"/>
+        Element referenceElement = securedDocument.createElementNS(Constants.TAG_wsse_Reference.getNamespaceURI(), Constants.TAG_wsse_Reference.getLocalPart());
+        referenceElement.setAttribute("URI", "#1");
+        securityTokenReferenceElement.appendChild(referenceElement);
+
+        Element clonedEncryptedElement = (Element) encryptedKeyElement.cloneNode(true);
+        clonedEncryptedElement.removeAttribute("Id");
+        clonedEncryptedElement.setAttribute("Id", "1");
+
+        xPathExpression = getXPath(".//wsse:Reference");
+        Element newReferenceElement = (Element) xPathExpression.evaluate(clonedEncryptedElement, XPathConstants.NODE);
+        newReferenceElement.removeAttribute("URI");
+        newReferenceElement.setAttribute("URI", "#2");
+
+        Element securityHeaderNode = (Element) encryptedKeyElement.getParentNode();
+        securityHeaderNode.insertBefore(clonedEncryptedElement, encryptedKeyElement);
+
+        doInboundSecurityWithWSS4J(securedDocument, WSHandlerConstants.ENCRYPT);
+    }
+
     /**
      * Tests what happens when an soapAction from an other operation is provided.
      * Can the policy framework be bypassed?
@@ -216,6 +254,8 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
         XPathExpression xPathExpression = getXPath("//@URI");
         Attr uri = (Attr) xPathExpression.evaluate(securedDocument, XPathConstants.NODE);
         uri.setNodeValue("http://www.kernel.org/pub/linux/kernel/v2.6/linux-2.6.23.tar.gz");
+
+        doInboundSecurityWithWSS4J(securedDocument, WSHandlerConstants.TIMESTAMP + " " + WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.ENCRYPT);
 
         SecurityProperties inSecurityProperties = new SecurityProperties();
         inSecurityProperties.setCallbackHandler(new CallbackHandlerImpl());

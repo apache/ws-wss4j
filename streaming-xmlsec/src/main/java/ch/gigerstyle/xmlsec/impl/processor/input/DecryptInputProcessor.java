@@ -50,8 +50,7 @@ import java.util.UUID;
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
-public class
-        DecryptInputProcessor extends AbstractInputProcessor {
+public class DecryptInputProcessor extends AbstractInputProcessor {
 
     private ReferenceList referenceList;
 
@@ -93,6 +92,9 @@ public class
     private void processEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain, boolean isSecurityHeaderEvent) throws XMLStreamException, XMLSecurityException {
 
         //todo overall null checks
+
+        //todo this self made parsing is ugly as hell. An idea would be to use JAXB with a custom WS-Security schema.
+        //todo the schema would have only the declared the elements which we are supporting. Other
 
         //dont handle the whole CipherValue subtree here
         if (currentEncryptedDataType != null && !(Constants.TAG_xenc_CipherValue.equals(inputProcessorChain.getDocumentContext().getParentElement(xmlEvent.getEventType())))) {
@@ -291,6 +293,7 @@ public class
                     throw new XMLStreamException(e);
                 }
 
+                //todo refactor do not use an anonymous class
                 Runnable runnable = new Runnable() {
 
                     public void run() {
