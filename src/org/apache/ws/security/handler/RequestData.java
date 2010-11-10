@@ -66,6 +66,7 @@ public class RequestData {
     private boolean useDerivedKey = true;
     private int derivedKeyIterations = UsernameToken.DEFAULT_ITERATION;
     private boolean useDerivedKeyForMAC = true;
+    private boolean useSingleCert = true;
 
     public void clear() {
         soapConstants = null;
@@ -84,6 +85,7 @@ public class RequestData {
         useDerivedKey = true;
         derivedKeyIterations = UsernameToken.DEFAULT_ITERATION;
         useDerivedKeyForMAC = true;
+        useSingleCert = true;
     }
 
     public Object getMsgContext() {
@@ -351,6 +353,24 @@ public class RequestData {
      */
     public boolean isUseDerivedKeyForMAC() {
         return useDerivedKeyForMAC;
+    }
+    
+    /**
+     * Whether to use a single certificate or a whole certificate chain when
+     * constructing a BinarySecurityToken used for direct reference in Signature.
+     * @param useSingleCert true if only to use a single certificate
+     */
+    public void setUseSingleCert(boolean useSingleCert) {
+        this.useSingleCert = useSingleCert;
+    }
+    
+    /**
+     * Whether to use a single certificate or a whole certificate chain when
+     * constructing a BinarySecurityToken used for direct reference in Signature.
+     * @return whether to use a single certificate
+     */
+    public boolean isUseSingleCert() {
+        return useSingleCert;
     }
     
 }

@@ -25,12 +25,15 @@ import junit.framework.TestSuite;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSPasswordCallback;
+import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
+import org.apache.ws.security.handler.RequestData;
+import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.message.WSSecSignature;
 import org.apache.ws.security.message.WSSecHeader;
 import org.apache.ws.security.util.WSSecurityUtil;
@@ -108,7 +111,6 @@ public class TestWSSecurityWSS40 extends TestCase implements CallbackHandler {
         return new TestSuite(TestWSSecurityWSS40.class);
     }
 
-    
     /**
      * Test signing a SOAP message using a BST.
      */
@@ -137,6 +139,40 @@ public class TestWSSecurityWSS40 extends TestCase implements CallbackHandler {
         X509Certificate cert = 
             (X509Certificate)result.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE);
         assertTrue (cert != null);
+    }
+    
+    public void testBSTCertChain() throws Exception {
+        Crypto clientCrypto = CryptoFactory.getInstance("wss40_client.properties");
+        WSSecSignature sign = new WSSecSignature();
+        sign.setUserInfo("Client_CertChain", "password");
+        sign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
+        sign.setUseSingleCertificate(false);
+       
+        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
+        
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        Document signedDoc = sign.build(doc, clientCrypto, secHeader);
+                
+        if (LOG.isDebugEnabled()) {
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+            LOG.debug("BST CA Cert");
+            LOG.debug(outputString);
+        }
+        //
+        // Verify the signature
+        //
+        Crypto serverCrypto = CryptoFactory.getInstance("wss40_server.properties");
+        List results = verify(signedDoc, serverCrypto);
+        WSSecurityEngineResult result = 
+            WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
+        X509Certificate cert = 
+            (X509Certificate)result.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE);
+        assertTrue (cert != null);
+        X509Certificate[] certs = 
+            (X509Certificate[])result.get(WSSecurityEngineResult.TAG_X509_CERTIFICATES);
+        assertTrue (certs != null && certs.length == 2);
     }
     
     /**
@@ -170,6 +206,9 @@ public class TestWSSecurityWSS40 extends TestCase implements CallbackHandler {
         X509Certificate cert = 
             (X509Certificate)result.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE);
         assertTrue (cert != null);
+        X509Certificate[] certs = 
+            (X509Certificate[])result.get(WSSecurityEngineResult.TAG_X509_CERTIFICATES);
+        assertTrue (certs != null && certs.length == 2);
     }
     
     
@@ -235,6 +274,48 @@ public class TestWSSecurityWSS40 extends TestCase implements CallbackHandler {
         } catch (WSSecurityException ex) {
             // expected
         }
+    }
+    
+    /**
+     * A test for "SignatureAction does not set DigestAlgorithm on WSSecSignature instance"
+     */
+    public void testMultipleCertsWSHandler() throws Exception {
+        final WSSConfig cfg = WSSConfig.getNewInstance();
+        final int action = WSConstants.SIGN;
+        final RequestData reqData = new RequestData();
+        reqData.setWssConfig(cfg);
+        reqData.setUsername("wss40");
+        java.util.Map config = new java.util.TreeMap();
+        config.put(WSHandlerConstants.SIG_PROP_FILE, "wss40.properties");
+        config.put("password", "security");
+        config.put(WSHandlerConstants.SIG_KEY_ID, "DirectReference");
+        config.put(WSHandlerConstants.USE_SINGLE_CERTIFICATE, "false");
+        reqData.setMsgContext(config);
+        
+        final java.util.Vector actions = new java.util.Vector();
+        actions.add(new Integer(action));
+        final Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
+        MyHandler handler = new MyHandler();
+        handler.send(
+            action, 
+            doc, 
+            reqData, 
+            actions,
+            true
+        );
+        
+        //
+        // Verify the signature
+        //
+        List results = verify(doc, cryptoCA);
+        WSSecurityEngineResult result = 
+            WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
+        X509Certificate cert = 
+            (X509Certificate)result.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE);
+        assertTrue (cert != null);
+        X509Certificate[] certs = 
+            (X509Certificate[])result.get(WSSecurityEngineResult.TAG_X509_CERTIFICATES);
+        assertTrue (certs != null && certs.length == 2);
     }
     
     

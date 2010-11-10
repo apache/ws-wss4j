@@ -51,6 +51,7 @@ public class SignatureAction implements Action {
         }
 
         wsSign.setUserInfo(reqData.getSignatureUser(), pwcb.getPassword());
+        wsSign.setUseSingleCertificate(reqData.isUseSingleCert());
         if (reqData.getSignatureParts().size() > 0) {
             wsSign.setParts(reqData.getSignatureParts());
         }

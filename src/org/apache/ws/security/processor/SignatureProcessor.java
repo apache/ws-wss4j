@@ -194,6 +194,7 @@ public class SignatureProcessor implements Processor {
         PublicKey publicKey = null;
         Principal principal = null;
         KeyValue keyValue = null;
+        boolean validateCertificateChain = false;
         
         Element keyInfoElement = 
             WSSecurityUtil.getDirectChildElement(
@@ -256,7 +257,9 @@ public class SignatureProcessor implements Processor {
                         QName el = new QName(token.getNamespaceURI(), token.getLocalName());
                         if (el.equals(WSSecurityEngine.BINARY_TOKEN)) {
                             certs = getCertificatesTokenReference(token, crypto);
-                            principal = validateCertificates(certs, crypto);
+                            if (certs != null && certs.length > 1) {
+                                validateCertificateChain = true;
+                            }
                         } else if (el.equals(WSSecurityEngine.SAML_TOKEN)) {
                             if (crypto == null) {
                                 throw new WSSecurityException(
@@ -265,7 +268,6 @@ public class SignatureProcessor implements Processor {
                             }
                             SAMLKeyInfo samlKi = SAMLUtil.getSAMLKeyInfo(token, crypto, cb);
                             certs = samlKi.getCerts();
-                            validateCertificates(certs, crypto);
                             secretKey = samlKi.getSecret();
                             principal = createPrincipalFromSAMLKeyInfo(samlKi);
                         } else if (el.equals(WSSecurityEngine.ENCRYPTED_KEY)){
@@ -295,7 +297,9 @@ public class SignatureProcessor implements Processor {
                         principal = ut.createPrincipal();
                     } else if (processor instanceof BinarySecurityTokenProcessor) {
                         certs = ((BinarySecurityTokenProcessor)processor).getCertificates();
-                        principal = validateCertificates(certs, crypto);
+                        if (certs != null && certs.length > 1) {
+                            validateCertificateChain = true;
+                        }
                     } else if (processor instanceof EncryptedKeyProcessor) {
                         EncryptedKeyProcessor encryptedKeyProcessor = 
                             (EncryptedKeyProcessor)processor;
@@ -327,14 +331,12 @@ public class SignatureProcessor implements Processor {
                         SAMLKeyInfo samlKi = 
                             SAMLUtil.getSAMLKeyInfo(samlp.getSamlTokenElement(), crypto, cb);
                         certs = samlKi.getCerts();
-                        validateCertificates(certs, crypto);
                         secretKey = samlKi.getSecret();
                         publicKey = samlKi.getPublicKey();
                         principal = createPrincipalFromSAMLKeyInfo(samlKi);
                     }
                 } else if (secRef.containsX509Data() || secRef.containsX509IssuerSerial()) {
                     certs = secRef.getX509IssuerSerial(crypto);
-                    principal = validateCertificates(certs, crypto);
                 } else if (secRef.containsKeyIdentifier()) {
                     if (secRef.getKeyIdentifierValueType().equals(SecurityTokenReference.ENC_KEY_SHA1_URI)) {
                         String id = secRef.getKeyIdentifierValue();
@@ -351,13 +353,11 @@ public class SignatureProcessor implements Processor {
                         }
                         SAMLKeyInfo samlKi = SAMLUtil.getSAMLKeyInfo(token, crypto, cb);
                         certs = samlKi.getCerts();
-                        validateCertificates(certs, crypto);
                         secretKey = samlKi.getSecret();
                         publicKey = samlKi.getPublicKey();
                         principal = createPrincipalFromSAMLKeyInfo(samlKi);
                     } else {
                         certs = secRef.getKeyIdentifier(crypto);
-                        principal = validateCertificates(certs, crypto);
                     }
                 } else {
                     throw new WSSecurityException(
@@ -378,6 +378,25 @@ public class SignatureProcessor implements Processor {
             && secretKey == null
             && publicKey == null) {
             throw new WSSecurityException(WSSecurityException.FAILED_CHECK);
+        }
+        
+        //
+        // Validate certificates and verify trust
+        //
+        validateCertificates(certs);
+        if (certs != null) {
+            if (principal == null) {
+                principal = certs[0].getSubjectX500Principal();
+            }
+            boolean trust = false;
+            if (!validateCertificateChain || certs.length == 1) {
+                trust = verifyTrust(certs[0], crypto);
+            } else if (validateCertificateChain && certs.length > 1) {
+                trust = verifyTrust(certs, crypto);
+            }
+            if (!trust) {
+                throw new WSSecurityException(WSSecurityException.FAILED_CHECK);
+            }
         }
 
         //
@@ -442,15 +461,12 @@ public class SignatureProcessor implements Processor {
     
     
     /**
-     * Validate an array of certificates by checking the validity of each cert, and verifying trust
+     * Validate an array of certificates by checking the validity of each cert
      * @param certsToValidate The array of certificates to validate
-     * @param crypto The crypto object representing the keystore
-     * @return A principal representing the first element in the array (if it exists)
      * @throws WSSecurityException
      */
-    public static Principal validateCertificates(
-        X509Certificate[] certsToValidate,
-        Crypto crypto
+    public static void validateCertificates(
+        X509Certificate[] certsToValidate
     ) throws WSSecurityException {
         if (certsToValidate != null && certsToValidate.length > 0) {
             try {
@@ -466,12 +482,7 @@ public class SignatureProcessor implements Processor {
                     WSSecurityException.FAILED_CHECK, "invalidCert", null, e
                 );
             }
-            if (!verifyTrust(certsToValidate[0], crypto)) {
-                throw new WSSecurityException(WSSecurityException.FAILED_CHECK);
-            }
-            return certsToValidate[0].getSubjectX500Principal();
         }
-        return null;
     }
     
     
@@ -570,7 +581,7 @@ public class SignatureProcessor implements Processor {
                 x509certs[j + 1] = certs[j];
             }
 
-            ///
+            //
             // Use the validation method from the crypto to check whether the subjects' 
             // certificate was really signed by the issuer stated in the certificate
             //
@@ -593,6 +604,43 @@ public class SignatureProcessor implements Processor {
         }
         return false;
     }
+    
+
+    /**
+     * Evaluate whether the given certificate chain should be trusted.
+     * 
+     * @param certificates the certificate chain that should be validated against the keystore
+     * @return true if the certificate chain is trusted, false if not
+     * @throws WSSecurityException
+     */
+    public static boolean verifyTrust(X509Certificate[] certificates, Crypto crypto) 
+        throws WSSecurityException {
+        String subjectString = certificates[0].getSubjectX500Principal().getName();
+        //
+        // Use the validation method from the crypto to check whether the subjects' 
+        // certificate was really signed by the issuer stated in the certificate
+        //
+        if (certificates != null && certificates.length > 1
+            && crypto.validateCertPath(certificates)) {
+            if (log.isDebugEnabled()) {
+                log.debug(
+                    "Certificate path has been verified for certificate with subject " 
+                    + subjectString
+                );
+            }
+            return true;
+        }
+        
+        if (log.isDebugEnabled()) {
+            log.debug(
+                "Certificate path could not be verified for certificate with subject " 
+                + subjectString
+            );
+        }
+            
+        return false;
+    }
+    
     
     
     /**

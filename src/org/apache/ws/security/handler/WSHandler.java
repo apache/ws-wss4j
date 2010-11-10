@@ -597,6 +597,9 @@ public abstract class WSHandler {
             int iSecretKeyLength = Integer.parseInt(secretKeyLength);
             reqData.setSecretKeyLength(iSecretKeyLength);
         }
+        
+        boolean useSingleCert = decodeUseSingleCertificate(reqData);
+        reqData.setUseSingleCert(useSingleCert);
     }
 
     protected void decodeEncryptionParameter(RequestData reqData) 
@@ -824,6 +827,26 @@ public abstract class WSHandler {
 
         throw new WSSecurityException(
             "WSHandler: illegal timestampStrict parameter"
+        );
+    }
+    
+    protected boolean decodeUseSingleCertificate(RequestData reqData) 
+        throws WSSecurityException {
+        String useSingleCert = 
+            getString(WSHandlerConstants.USE_SINGLE_CERTIFICATE, reqData.getMsgContext());
+    
+        if (useSingleCert == null) {
+            return true;
+        }
+        if ("0".equals(useSingleCert) || "false".equals(useSingleCert)) {
+            return false;
+        } 
+        if ("1".equals(useSingleCert) || "true".equals(useSingleCert)) {
+            return true;
+        }
+    
+        throw new WSSecurityException(
+            "WSHandler: illegal useSingleCert parameter"
         );
     }
 
