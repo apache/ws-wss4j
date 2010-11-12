@@ -127,7 +127,7 @@ public class TestWSSecurityUTSignature extends TestCase implements CallbackHandl
             LOG.debug(outputString);
         }
         
-        List results = verify(signedDoc);
+        List<WSSecurityEngineResult> results = verify(signedDoc);
         WSSecurityEngineResult actionResult =
             WSSecurityUtil.fetchActionResult(results, WSConstants.UT_SIGN);
         java.security.Principal principal = 
@@ -183,13 +183,13 @@ public class TestWSSecurityUTSignature extends TestCase implements CallbackHandl
         final WSSConfig cfg = WSSConfig.getNewInstance();
         RequestData reqData = new RequestData();
         reqData.setWssConfig(cfg);
-        java.util.Map messageContext = new java.util.TreeMap();
+        java.util.Map<String, Object> messageContext = new java.util.TreeMap<String, Object>();
         messageContext.put(WSHandlerConstants.PW_CALLBACK_REF, this);
         messageContext.put(WSHandlerConstants.USE_DERIVED_KEY, "true");
         reqData.setMsgContext(messageContext);
         reqData.setUsername("bob");
         
-        final java.util.Vector actions = new java.util.Vector();
+        final java.util.List<Integer> actions = new java.util.Vector<Integer>();
         actions.add(new Integer(WSConstants.UT_SIGN));
         
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
@@ -212,7 +212,7 @@ public class TestWSSecurityUTSignature extends TestCase implements CallbackHandl
             LOG.debug(outputString);
         }
         
-        List results = verify(doc);
+        List<WSSecurityEngineResult> results = verify(doc);
         WSSecurityEngineResult actionResult =
             WSSecurityUtil.fetchActionResult(results, WSConstants.UT_SIGN);
         java.security.Principal principal = 
@@ -228,14 +228,14 @@ public class TestWSSecurityUTSignature extends TestCase implements CallbackHandl
         final WSSConfig cfg = WSSConfig.getNewInstance();
         RequestData reqData = new RequestData();
         reqData.setWssConfig(cfg);
-        java.util.Map messageContext = new java.util.TreeMap();
+        java.util.Map<String, Object> messageContext = new java.util.TreeMap<String, Object>();
         messageContext.put(WSHandlerConstants.PW_CALLBACK_REF, this);
         messageContext.put(WSHandlerConstants.USE_DERIVED_KEY, "true");
         messageContext.put(WSHandlerConstants.DERIVED_KEY_ITERATIONS, "1234");
         reqData.setMsgContext(messageContext);
         reqData.setUsername("bob");
         
-        final java.util.Vector actions = new java.util.Vector();
+        final java.util.List<Integer> actions = new java.util.Vector<Integer>();
         actions.add(new Integer(WSConstants.UT_SIGN));
         
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
@@ -259,7 +259,7 @@ public class TestWSSecurityUTSignature extends TestCase implements CallbackHandl
             LOG.debug(outputString);
         }
         
-        List results = verify(doc);
+        List<WSSecurityEngineResult> results = verify(doc);
         WSSecurityEngineResult actionResult =
             WSSecurityUtil.fetchActionResult(results, WSConstants.UT_SIGN);
         java.security.Principal principal = 
@@ -273,7 +273,7 @@ public class TestWSSecurityUTSignature extends TestCase implements CallbackHandl
      * @param env soap envelope
      * @throws java.lang.Exception Thrown when there is a problem in verification
      */
-    private List verify(Document doc) throws Exception {
+    private List<WSSecurityEngineResult> verify(Document doc) throws Exception {
         return secEngine.processSecurityHeader(doc, null, this, crypto);
     }
     

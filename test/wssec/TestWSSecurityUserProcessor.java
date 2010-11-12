@@ -27,6 +27,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSConfig;
+import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
@@ -116,11 +117,10 @@ public class TestWSSecurityUserProcessor extends TestCase {
         );
         final WSSecurityEngine engine = new WSSecurityEngine();
         engine.setWssConfig(cfg);
-        final List results = 
+        final List<WSSecurityEngineResult> results = 
             engine.processSecurityHeader(doc, null, null, crypto);
         boolean found = false;
-        for (final java.util.Iterator pos = results.iterator();  pos.hasNext(); ) {
-            final java.util.Map result = (java.util.Map) pos.next();
+        for (WSSecurityEngineResult result : results) {
             Object obj = result.get("foo");
             if (obj != null) {
                 if (obj.getClass().getName().equals(p)) {
@@ -163,11 +163,10 @@ public class TestWSSecurityUserProcessor extends TestCase {
         );
         final WSSecurityEngine engine = new WSSecurityEngine();
         engine.setWssConfig(cfg);
-        final List results = 
+        final List<WSSecurityEngineResult> results = 
             engine.processSecurityHeader(doc, null, null, crypto);
         boolean found = false;
-        for (final java.util.Iterator pos = results.iterator();  pos.hasNext(); ) {
-            final java.util.Map result = (java.util.Map) pos.next();
+        for (WSSecurityEngineResult result : results) {
             Object obj = result.get("foo");
             if (obj != null) {
                 if (obj.getClass().getName().equals(wssec.MyProcessor.class.getName())) {
@@ -191,7 +190,7 @@ public class TestWSSecurityUserProcessor extends TestCase {
         final RequestData reqData = new RequestData();
         reqData.setWssConfig(cfg);
         
-        final List actions = new Vector();
+        final List<Integer> actions = new Vector<Integer>();
         actions.add(new Integer(action));
         final Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         MyHandler handler = new MyHandler();
@@ -220,7 +219,7 @@ public class TestWSSecurityUserProcessor extends TestCase {
         final RequestData reqData = new RequestData();
         reqData.setWssConfig(cfg);
         
-        final List actions = new Vector();
+        final List<Integer> actions = new Vector<Integer>();
         actions.add(new Integer(action));
         final Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         MyHandler handler = new MyHandler();
@@ -248,7 +247,7 @@ public class TestWSSecurityUserProcessor extends TestCase {
         
         String actionString = 
             WSHandlerConstants.TIMESTAMP + " " + new Integer(customAction).toString();
-        List actionList = new Vector();
+        List<Integer> actionList = new Vector<Integer>();
         //
         // This parsing will fail as it doesn't know what the custom action is
         //

@@ -121,7 +121,7 @@ public class TestWSSecurityNewST2 extends TestCase implements CallbackHandler {
             LOG.debug(outputString);
         }
         
-        List results = verify(signedDoc);
+        List<WSSecurityEngineResult> results = verify(signedDoc);
         WSSecurityEngineResult actionResult =
             WSSecurityUtil.fetchActionResult(results, WSConstants.ST_UNSIGNED);
         SAMLAssertion receivedAssertion = 
@@ -163,7 +163,7 @@ public class TestWSSecurityNewST2 extends TestCase implements CallbackHandler {
             LOG.debug(outputString);
         }
         
-        List results = verify(signedDoc);
+        List<WSSecurityEngineResult> results = verify(signedDoc);
         WSSecurityEngineResult actionResult =
             WSSecurityUtil.fetchActionResult(results, WSConstants.ST_UNSIGNED);
         SAMLAssertion receivedAssertion = 
@@ -206,7 +206,7 @@ public class TestWSSecurityNewST2 extends TestCase implements CallbackHandler {
             LOG.debug(outputString);
         }
         
-        List results = verify(signedDoc);
+        List<WSSecurityEngineResult> results = verify(signedDoc);
         WSSecurityEngineResult actionResult =
             WSSecurityUtil.fetchActionResult(results, WSConstants.ST_UNSIGNED);
         SAMLAssertion receivedAssertion = 
@@ -246,8 +246,7 @@ public class TestWSSecurityNewST2 extends TestCase implements CallbackHandler {
         final WSSConfig cfg = WSSConfig.getNewInstance();
         final RequestData reqData = new RequestData();
         reqData.setWssConfig(cfg);
-        reqData.setMsgContext(new java.util.TreeMap());
-        java.util.Map msgContext = new java.util.HashMap();
+        java.util.Map<String, Object> msgContext = new java.util.HashMap<String, Object>();
         msgContext.put(WSHandlerConstants.SIG_PROP_FILE, "crypto.properties");
         reqData.setMsgContext(msgContext);
         
@@ -280,8 +279,9 @@ public class TestWSSecurityNewST2 extends TestCase implements CallbackHandler {
      * @param doc
      * @throws Exception Thrown when there is a problem in verification
      */
-    private List verify(Document doc) throws Exception {
-        List results = secEngine.processSecurityHeader(doc, null, this, crypto);
+    private List<WSSecurityEngineResult> verify(Document doc) throws Exception {
+        List<WSSecurityEngineResult> results = 
+            secEngine.processSecurityHeader(doc, null, this, crypto);
         String outputString = 
             org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
         assertTrue(outputString.indexOf("LogTestService2") > 0 ? true : false);

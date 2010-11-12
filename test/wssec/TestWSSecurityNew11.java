@@ -98,7 +98,7 @@ public class TestWSSecurityNew11 extends TestCase {
         builder.setUserInfo("wss40", "security");
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         SOAPConstants soapConstants = WSSecurityUtil.getSOAPConstants(doc.getDocumentElement());
-        List parts = new Vector();
+        List<WSEncryptionPart> parts = new Vector<WSEncryptionPart>();
         
         //
         // Set up to sign body and use STRTransform to sign
@@ -147,7 +147,7 @@ public class TestWSSecurityNew11 extends TestCase {
         builder.setUserInfo("wss40", "security");
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         SOAPConstants soapConstants = WSSecurityUtil.getSOAPConstants(doc.getDocumentElement());
-        List parts = new Vector();
+        List<WSEncryptionPart> parts = new Vector<WSEncryptionPart>();
         
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
@@ -206,7 +206,7 @@ public class TestWSSecurityNew11 extends TestCase {
         
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         SOAPConstants soapConstants = WSSecurityUtil.getSOAPConstants(doc.getDocumentElement());
-        List parts = new Vector();
+        List<WSEncryptionPart> parts = new Vector<WSEncryptionPart>();
         
         //
         // Set up to sign body and use STRTransform to sign
@@ -259,7 +259,7 @@ public class TestWSSecurityNew11 extends TestCase {
         builder.setUserInfo("wss40", "security");
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         SOAPConstants soapConstants = WSSecurityUtil.getSOAPConstants(doc.getDocumentElement());
-        List parts = new Vector();
+        List<WSEncryptionPart> parts = new Vector<WSEncryptionPart>();
         
         //
         // Set up to sign body and use STRTransform to sign

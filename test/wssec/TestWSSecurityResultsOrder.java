@@ -58,7 +58,7 @@ public class TestWSSecurityResultsOrder extends TestCase {
     testOrder() throws Exception {
         MyHandler handler = new MyHandler();
         
-        java.util.List results = new java.util.Vector();
+        java.util.List<WSSecurityEngineResult> results = new java.util.Vector<WSSecurityEngineResult>();
         results.add(
             new WSSecurityEngineResult(WSConstants.UT, (Object)null)
         );
@@ -72,7 +72,7 @@ public class TestWSSecurityResultsOrder extends TestCase {
             new WSSecurityEngineResult(WSConstants.SIGN, (Object)null)
         );
         
-        java.util.List actions = new java.util.Vector();
+        java.util.List<Integer> actions = new java.util.Vector<Integer>();
         actions.add(new Integer(WSConstants.UT));
         actions.add(new Integer(WSConstants.TS));
         actions.add(new Integer(WSConstants.SIGN));
@@ -87,7 +87,7 @@ public class TestWSSecurityResultsOrder extends TestCase {
     testReverseOrder() throws Exception {
         MyHandler handler = new MyHandler();
         
-        java.util.List results = new java.util.Vector();
+        java.util.List<WSSecurityEngineResult> results = new java.util.Vector<WSSecurityEngineResult>();
         results.add(
             new WSSecurityEngineResult(WSConstants.SIGN, (Object)null)
         );
@@ -101,7 +101,7 @@ public class TestWSSecurityResultsOrder extends TestCase {
             new WSSecurityEngineResult(WSConstants.UT, (Object)null)
         );
         
-        java.util.List actions = new java.util.Vector();
+        java.util.List<Integer> actions = new java.util.Vector<Integer>();
         actions.add(new Integer(WSConstants.UT));
         actions.add(new Integer(WSConstants.TS));
         actions.add(new Integer(WSConstants.SIGN));
@@ -117,7 +117,8 @@ public class TestWSSecurityResultsOrder extends TestCase {
     testMixedOrder() throws Exception {
         MyHandler handler = new MyHandler();
         
-        java.util.List results = new java.util.Vector();
+        java.util.List<WSSecurityEngineResult> results = 
+            new java.util.Vector<WSSecurityEngineResult>();
         results.add(
             new WSSecurityEngineResult(WSConstants.TS, (Object)null)
         );
@@ -131,7 +132,7 @@ public class TestWSSecurityResultsOrder extends TestCase {
             new WSSecurityEngineResult(WSConstants.UT, (Object)null)
         );
         
-        java.util.List actions = new java.util.Vector();
+        java.util.List<Integer> actions = new java.util.Vector<Integer>();
         actions.add(new Integer(WSConstants.UT));
         actions.add(new Integer(WSConstants.TS));
         actions.add(new Integer(WSConstants.SIGN));
@@ -147,7 +148,8 @@ public class TestWSSecurityResultsOrder extends TestCase {
     testMixedOrder2() throws Exception {
         MyHandler handler = new MyHandler();
         
-        java.util.List results = new java.util.Vector();
+        java.util.List<WSSecurityEngineResult> results = 
+            new java.util.Vector<WSSecurityEngineResult>();
         results.add(
             new WSSecurityEngineResult(WSConstants.TS, (Object)null)
         );
@@ -161,7 +163,7 @@ public class TestWSSecurityResultsOrder extends TestCase {
             new WSSecurityEngineResult(WSConstants.UT, (Object)null)
         );
         
-        java.util.List actions = new java.util.Vector();
+        java.util.List<Integer> actions = new java.util.Vector<Integer>();
         actions.add(new Integer(WSConstants.SIGN));
         actions.add(new Integer(WSConstants.UT));
         actions.add(new Integer(WSConstants.TS));
@@ -176,7 +178,8 @@ public class TestWSSecurityResultsOrder extends TestCase {
     testMissingResult() throws Exception {
         MyHandler handler = new MyHandler();
         
-        java.util.List results = new java.util.Vector();
+        java.util.List<WSSecurityEngineResult> results = 
+            new java.util.Vector<WSSecurityEngineResult>();
         results.add(
             new WSSecurityEngineResult(WSConstants.UT, (Object)null)
         );
@@ -187,7 +190,7 @@ public class TestWSSecurityResultsOrder extends TestCase {
             new WSSecurityEngineResult(WSConstants.SC, (Object)null)
         );
         
-        java.util.List actions = new java.util.Vector();
+        java.util.List<Integer> actions = new java.util.Vector<Integer>();
         actions.add(new Integer(WSConstants.TS));
         actions.add(new Integer(WSConstants.UT));
         actions.add(new Integer(WSConstants.SIGN));
@@ -202,7 +205,8 @@ public class TestWSSecurityResultsOrder extends TestCase {
     testMissingAction() throws Exception {
         MyHandler handler = new MyHandler();
         
-        java.util.List results = new java.util.Vector();
+        java.util.List<WSSecurityEngineResult> results = 
+            new java.util.Vector<WSSecurityEngineResult>();
         results.add(
             new WSSecurityEngineResult(WSConstants.UT, (Object)null)
         );
@@ -216,7 +220,7 @@ public class TestWSSecurityResultsOrder extends TestCase {
             new WSSecurityEngineResult(WSConstants.SC, (Object)null)
         );
         
-        java.util.List actions = new java.util.Vector();
+        java.util.List<Integer> actions = new java.util.Vector<Integer>();
         actions.add(new Integer(WSConstants.TS));
         actions.add(new Integer(WSConstants.UT));
         
@@ -230,9 +234,10 @@ public class TestWSSecurityResultsOrder extends TestCase {
     testNoResult() throws Exception {
         MyHandler handler = new MyHandler();
         
-        java.util.List results = new java.util.Vector();
+        java.util.List<WSSecurityEngineResult> results = 
+            new java.util.Vector<WSSecurityEngineResult>();
         
-        java.util.List actions = new java.util.Vector();
+        java.util.List<Integer> actions = new java.util.Vector<Integer>();
         actions.add(new Integer(WSConstants.TS));
         
         assertFalse (handler.checkResults(results, actions));
@@ -245,12 +250,13 @@ public class TestWSSecurityResultsOrder extends TestCase {
     testNoAction() throws Exception {
         MyHandler handler = new MyHandler();
         
-        java.util.List results = new java.util.Vector();
+        java.util.List<WSSecurityEngineResult> results = 
+            new java.util.Vector<WSSecurityEngineResult>();
         results.add(
             new WSSecurityEngineResult(WSConstants.TS, (Object)null)
         );
         
-        java.util.List actions = new java.util.Vector();
+        java.util.List<Integer> actions = new java.util.Vector<Integer>();
         
         assertFalse (handler.checkResults(results, actions));
         assertFalse (handler.checkResultsAnyOrder(results, actions));
@@ -262,7 +268,8 @@ public class TestWSSecurityResultsOrder extends TestCase {
     testMultipleIdenticalResults() throws Exception {
         MyHandler handler = new MyHandler();
         
-        java.util.List results = new java.util.Vector();
+        java.util.List<WSSecurityEngineResult> results = 
+            new java.util.Vector<WSSecurityEngineResult>();
         results.add(
             new WSSecurityEngineResult(WSConstants.ENCR, (Object)null)
         );
@@ -273,7 +280,7 @@ public class TestWSSecurityResultsOrder extends TestCase {
             new WSSecurityEngineResult(WSConstants.ENCR, (Object)null)
         );
         
-        java.util.List actions = new java.util.Vector();
+        java.util.List<Integer> actions = new java.util.Vector<Integer>();
         actions.add(new Integer(WSConstants.ENCR));
         actions.add(new Integer(WSConstants.UT));
         actions.add(new Integer(WSConstants.UT));

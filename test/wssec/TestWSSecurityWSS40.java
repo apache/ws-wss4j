@@ -133,7 +133,7 @@ public class TestWSSecurityWSS40 extends TestCase implements CallbackHandler {
         //
         // Verify the signature
         //
-        List results = verify(signedDoc, cryptoCA);
+        List<WSSecurityEngineResult> results = verify(signedDoc, cryptoCA);
         WSSecurityEngineResult result = 
             WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
         X509Certificate cert = 
@@ -164,7 +164,7 @@ public class TestWSSecurityWSS40 extends TestCase implements CallbackHandler {
         // Verify the signature
         //
         Crypto serverCrypto = CryptoFactory.getInstance("wss40_server.properties");
-        List results = verify(signedDoc, serverCrypto);
+        List<WSSecurityEngineResult> results = verify(signedDoc, serverCrypto);
         WSSecurityEngineResult result = 
             WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
         X509Certificate cert = 
@@ -200,7 +200,7 @@ public class TestWSSecurityWSS40 extends TestCase implements CallbackHandler {
         //
         // Verify the signature
         //
-        List results = verify(signedDoc, cryptoCA);
+        List<WSSecurityEngineResult> results = verify(signedDoc, cryptoCA);
         WSSecurityEngineResult result = 
             WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
         X509Certificate cert = 
@@ -285,14 +285,14 @@ public class TestWSSecurityWSS40 extends TestCase implements CallbackHandler {
         final RequestData reqData = new RequestData();
         reqData.setWssConfig(cfg);
         reqData.setUsername("wss40");
-        java.util.Map config = new java.util.TreeMap();
+        java.util.Map<String, String> config = new java.util.TreeMap<String, String>();
         config.put(WSHandlerConstants.SIG_PROP_FILE, "wss40.properties");
         config.put("password", "security");
         config.put(WSHandlerConstants.SIG_KEY_ID, "DirectReference");
         config.put(WSHandlerConstants.USE_SINGLE_CERTIFICATE, "false");
         reqData.setMsgContext(config);
         
-        final java.util.Vector actions = new java.util.Vector();
+        final java.util.List<Integer> actions = new java.util.Vector<Integer>();
         actions.add(new Integer(action));
         final Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         MyHandler handler = new MyHandler();
@@ -307,7 +307,7 @@ public class TestWSSecurityWSS40 extends TestCase implements CallbackHandler {
         //
         // Verify the signature
         //
-        List results = verify(doc, cryptoCA);
+        List<WSSecurityEngineResult> results = verify(doc, cryptoCA);
         WSSecurityEngineResult result = 
             WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
         X509Certificate cert = 
@@ -326,8 +326,9 @@ public class TestWSSecurityWSS40 extends TestCase implements CallbackHandler {
      * @param doc 
      * @throws Exception Thrown when there is a problem in verification
      */
-    private List verify(Document doc, Crypto crypto) throws WSSecurityException {
-        List results = secEngine.processSecurityHeader(
+    private List<WSSecurityEngineResult> 
+    verify(Document doc, Crypto crypto) throws WSSecurityException {
+        List<WSSecurityEngineResult> results = secEngine.processSecurityHeader(
             doc, null, this, crypto
         );
         if (LOG.isDebugEnabled()) {

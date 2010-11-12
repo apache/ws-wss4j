@@ -91,6 +91,7 @@ public class TestWSSecurityEncryptionParts extends TestCase implements CallbackH
     /**
      * Test encrypting a custom SOAP header
      */
+    @SuppressWarnings("unchecked")
     public void testSOAPHeader() throws Exception {
         WSSecEncrypt encrypt = new WSSecEncrypt();
         encrypt.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
@@ -100,7 +101,7 @@ public class TestWSSecurityEncryptionParts extends TestCase implements CallbackH
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
-        List parts = new Vector();
+        List<WSEncryptionPart> parts = new Vector<WSEncryptionPart>();
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "foobar",
@@ -117,7 +118,7 @@ public class TestWSSecurityEncryptionParts extends TestCase implements CallbackH
             LOG.debug(outputString);
         }
         
-        List results = verify(encryptedDoc);
+        List<WSSecurityEngineResult> results = verify(encryptedDoc);
         
         QName name = new QName("urn:foo.bar", "foobar");
         WSSecurityUtil.checkAllElementsProtected(results, WSConstants.ENCR, new QName[]{name});
@@ -140,8 +141,8 @@ public class TestWSSecurityEncryptionParts extends TestCase implements CallbackH
             WSSecurityUtil.fetchActionResult(results, WSConstants.ENCR);
         assertTrue(actionResult != null);
         assertFalse(actionResult.isEmpty());
-        final java.util.List refs =
-            (java.util.List) actionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
+        final java.util.List<WSDataRef> refs =
+            (java.util.List<WSDataRef>) actionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
         
         assertEquals(WSConstants.KEYTRANSPORT_RSA15, 
                 actionResult.get(WSSecurityEngineResult.TAG_ENCRYPTED_KEY_TRANSPORT_METHOD));
@@ -156,6 +157,7 @@ public class TestWSSecurityEncryptionParts extends TestCase implements CallbackH
     /**
      * Test encrypting a custom SOAP header using wsse11:EncryptedHeader
      */
+    @SuppressWarnings("unchecked")
     public void testSOAPEncryptedHeader() throws Exception {
         WSSecEncrypt encrypt = new WSSecEncrypt();
         encrypt.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
@@ -165,7 +167,7 @@ public class TestWSSecurityEncryptionParts extends TestCase implements CallbackH
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
-        List parts = new Vector();
+        List<WSEncryptionPart> parts = new Vector<WSEncryptionPart>();
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "foobar",
@@ -184,14 +186,14 @@ public class TestWSSecurityEncryptionParts extends TestCase implements CallbackH
         assertTrue(outputString.indexOf("wsse11:EncryptedHeader") != -1);
         assertTrue(outputString.indexOf("foo:foobar") == -1);
         
-        List results = verify(encryptedDoc);
+        List<WSSecurityEngineResult> results = verify(encryptedDoc);
         
         WSSecurityEngineResult actionResult =
                 WSSecurityUtil.fetchActionResult(results, WSConstants.ENCR);
         assertTrue(actionResult != null);
         assertFalse(actionResult.isEmpty());
-        final java.util.List refs =
-            (java.util.List) actionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
+        final java.util.List<WSDataRef> refs =
+            (java.util.List<WSDataRef>) actionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
         
         assertEquals(WSConstants.KEYTRANSPORT_RSA15, 
                 actionResult.get(WSSecurityEngineResult.TAG_ENCRYPTED_KEY_TRANSPORT_METHOD));
@@ -214,7 +216,7 @@ public class TestWSSecurityEncryptionParts extends TestCase implements CallbackH
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
-        List parts = new Vector();
+        List<WSEncryptionPart> parts = new Vector<WSEncryptionPart>();
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "foobar2",
@@ -245,7 +247,7 @@ public class TestWSSecurityEncryptionParts extends TestCase implements CallbackH
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
-        List parts = new Vector();
+        List<WSEncryptionPart> parts = new Vector<WSEncryptionPart>();
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "foobar",
@@ -277,7 +279,7 @@ public class TestWSSecurityEncryptionParts extends TestCase implements CallbackH
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
-        List parts = new Vector();
+        List<WSEncryptionPart> parts = new Vector<WSEncryptionPart>();
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 soapConstants.getBodyQName().getLocalPart(),    // define the body
@@ -300,7 +302,7 @@ public class TestWSSecurityEncryptionParts extends TestCase implements CallbackH
             LOG.debug(outputString);
         }
         
-        List results = verify(encryptedDoc);
+        List<WSSecurityEngineResult> results = verify(encryptedDoc);
         
         QName fooName = new QName("urn:foo.bar", "foobar");
         QName bodyName = new QName(soapConstants.getEnvelopeURI(), "Body");
@@ -346,8 +348,9 @@ public class TestWSSecurityEncryptionParts extends TestCase implements CallbackH
      * @param doc 
      * @throws Exception Thrown when there is a problem in verification
      */
-    private List verify(Document doc) throws Exception {
-        List results = secEngine.processSecurityHeader(doc, null, this, null, crypto);
+    private List<WSSecurityEngineResult> verify(Document doc) throws Exception {
+        List<WSSecurityEngineResult> results = 
+            secEngine.processSecurityHeader(doc, null, this, null, crypto);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Verified and decrypted message:");
             String outputString = 

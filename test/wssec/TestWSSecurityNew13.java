@@ -190,7 +190,7 @@ public class TestWSSecurityNew13 extends TestCase implements CallbackHandler {
         
         RequestData reqData = new RequestData();
         reqData.setWssConfig(WSSConfig.getNewInstance());
-        java.util.Map config = new java.util.TreeMap();
+        java.util.Map<String, Object> config = new java.util.TreeMap<String, Object>();
         config.put("password", "verySecret");
         config.put(WSHandlerConstants.PASSWORD_TYPE, WSConstants.PW_TEXT);
         config.put(WSHandlerConstants.WSE_SECRET_KEY_LENGTH, "32");
@@ -198,7 +198,7 @@ public class TestWSSecurityNew13 extends TestCase implements CallbackHandler {
         reqData.setUsername("wernerd");
         reqData.setMsgContext(config);
         
-        java.util.Vector actions = new java.util.Vector();
+        java.util.List<Integer> actions = new java.util.Vector<Integer>();
         actions.add(new Integer(WSConstants.UT_SIGN));
         
         handler.send(WSConstants.UT_SIGN, doc, reqData, actions, true);

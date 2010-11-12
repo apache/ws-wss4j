@@ -21,7 +21,8 @@ package wssec;
 
 import java.io.IOException;
 import java.security.SecureRandom;
-import java.util.Hashtable;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
@@ -72,7 +73,7 @@ public class TestWSSecurityNewSCT extends TestCase implements CallbackHandler {
     /**
      * Table of secrets indexed by the sct identifiers
      */
-    private Hashtable secrets = new Hashtable();
+    private Map<String, byte[]> secrets = new HashMap<String, byte[]>();
 
     /**
      * @param arg0

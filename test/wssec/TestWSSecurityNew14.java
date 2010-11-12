@@ -294,14 +294,14 @@ public class TestWSSecurityNew14 extends TestCase implements CallbackHandler {
         final WSSConfig cfg = WSSConfig.getNewInstance();
         final RequestData reqData = new RequestData();
         reqData.setWssConfig(cfg);
-        java.util.Map messageContext = new java.util.TreeMap();
+        java.util.Map<String, Object> messageContext = new java.util.TreeMap<String, Object>();
         messageContext.put(WSHandlerConstants.ENC_SYM_ENC_KEY, "false");
         messageContext.put(WSHandlerConstants.ENC_KEY_ID, "EncryptedKeySHA1");
         messageContext.put(WSHandlerConstants.PW_CALLBACK_REF, this);
         reqData.setMsgContext(messageContext);
         reqData.setUsername("");
         
-        final java.util.Vector actions = new java.util.Vector();
+        final java.util.List<Integer> actions = new java.util.Vector<Integer>();
         actions.add(new Integer(WSConstants.ENCR));
         final Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         MyHandler handler = new MyHandler();

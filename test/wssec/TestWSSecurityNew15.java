@@ -127,7 +127,7 @@ public class TestWSSecurityNew15 extends TestCase implements CallbackHandler {
          */
         SOAPConstants soapConstants = WSSecurityUtil.getSOAPConstants(doc
                 .getDocumentElement());
-        Vector parts = new Vector();
+        java.util.List<WSEncryptionPart> parts = new Vector<WSEncryptionPart>();
         WSEncryptionPart encP = new WSEncryptionPart(soapConstants
                 .getBodyQName().getLocalPart(), soapConstants.getEnvelopeURI(),
                 "Content");

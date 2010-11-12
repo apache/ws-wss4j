@@ -136,6 +136,7 @@ public class TestWSSecurityNew6 extends TestCase implements CallbackHandler {
      *             Thrown when there is any problem in signing, encryption,
      *             decryption, or verification
      */
+    @SuppressWarnings("unchecked")
     public void testEncryptionElementSigning() throws Exception {
         WSSecEncrypt encrypt = new WSSecEncrypt();
         WSSecSignature sign = new WSSecSignature();
@@ -147,7 +148,7 @@ public class TestWSSecurityNew6 extends TestCase implements CallbackHandler {
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
 
-        List encParts = new Vector();
+        List<WSEncryptionPart> encParts = new Vector<WSEncryptionPart>();
         encParts.add(
                 new WSEncryptionPart(
                         "add",
@@ -164,7 +165,7 @@ public class TestWSSecurityNew6 extends TestCase implements CallbackHandler {
             LOG.debug(outputString);
         }
         
-        List sigParts = new Vector();
+        List<WSEncryptionPart> sigParts = new Vector<WSEncryptionPart>();
         sigParts.add(
                 new WSEncryptionPart(
                         WSConstants.ENC_DATA_LN,
@@ -181,24 +182,26 @@ public class TestWSSecurityNew6 extends TestCase implements CallbackHandler {
             LOG.debug(outputString);
         }
         
-        Vector results = verify(encryptedSignedDoc);
+        List<WSSecurityEngineResult> results = verify(encryptedSignedDoc);
         
-        Vector sigSecEngResults = new Vector();
-        WSSecurityUtil.fetchAllActionResults(results,
-                WSConstants.SIGN, sigSecEngResults);
+        List<WSSecurityEngineResult> sigSecEngResults = new Vector<WSSecurityEngineResult>();
+        WSSecurityUtil.fetchAllActionResults(results, WSConstants.SIGN, sigSecEngResults);
         
-        Vector encSecEngResults = new Vector();
-        WSSecurityUtil.fetchAllActionResults(results,
-                WSConstants.ENCR, encSecEngResults);
+        List<WSSecurityEngineResult> encSecEngResults = new Vector<WSSecurityEngineResult>();
+        WSSecurityUtil.fetchAllActionResults(results, WSConstants.ENCR, encSecEngResults);
         
         assertEquals(1, sigSecEngResults.size());
         assertEquals(1, encSecEngResults.size());
         
-        List sigDataRefs = (List) ((WSSecurityEngineResult) sigSecEngResults.get(0))
-                .get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
+        List<WSDataRef> sigDataRefs = 
+            (List<WSDataRef>)(sigSecEngResults.get(0)).get(
+                WSSecurityEngineResult.TAG_DATA_REF_URIS
+            );
         
-        List encDataRefs = (List) ((WSSecurityEngineResult) encSecEngResults.get(0))
-                .get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
+        List<WSDataRef> encDataRefs = 
+            (List<WSDataRef>)(encSecEngResults.get(0)).get(
+                WSSecurityEngineResult.TAG_DATA_REF_URIS
+            );
         
         assertNotNull(sigDataRefs);
         assertNotNull(encDataRefs);
@@ -252,7 +255,7 @@ public class TestWSSecurityNew6 extends TestCase implements CallbackHandler {
         LOG.info("Before Encryption....");
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         
-        List parts = new Vector();
+        List<WSEncryptionPart> parts = new Vector<WSEncryptionPart>();
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "add",
@@ -286,15 +289,16 @@ public class TestWSSecurityNew6 extends TestCase implements CallbackHandler {
      * @throws Exception
      *             Thrown when there is a problem in verification
      */
-    private Vector verify(Document doc) throws Exception {
-        List resultList = secEngine.processSecurityHeader(doc, null, this, crypto);
+    private List<WSSecurityEngineResult> verify(Document doc) throws Exception {
+        List<WSSecurityEngineResult> resultList = 
+            secEngine.processSecurityHeader(doc, null, this, crypto);
         if (LOG.isDebugEnabled()) {
             String outputString = 
                 org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
             LOG.debug(outputString);
         }
         
-        return new Vector(resultList);
+        return resultList;
     }
 
     public void handle(Callback[] callbacks) throws IOException,

@@ -139,7 +139,7 @@ public class TestWSSecurityKerberosTokenProfile extends TestCase implements Call
         sign.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         sign.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
         
-        Vector parts = new Vector();
+        java.util.List<WSEncryptionPart> parts = new Vector<WSEncryptionPart>();
         WSEncryptionPart encP =
             new WSEncryptionPart(bst.getID());
         parts.add(encP);
@@ -181,7 +181,7 @@ public class TestWSSecurityKerberosTokenProfile extends TestCase implements Call
         sign.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         sign.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
         
-        Vector parts = new Vector();
+        java.util.List<WSEncryptionPart> parts = new Vector<WSEncryptionPart>();
         parts.add(new WSEncryptionPart(bst.getID()));
         parts.add(new WSEncryptionPart(timestamp.getId()));
         sign.setParts(parts);

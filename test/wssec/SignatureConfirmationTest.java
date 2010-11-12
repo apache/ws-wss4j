@@ -89,17 +89,18 @@ public class SignatureConfirmationTest extends TestCase implements CallbackHandl
     /**
      * Test to see that a signature is saved correctly on the outbound request.
      */
+    @SuppressWarnings("unchecked")
     public void
     testRequestSavedSignature() throws Exception {
         final RequestData reqData = new RequestData();
-        java.util.Map msgContext = new java.util.TreeMap();
+        java.util.Map<String, Object> msgContext = new java.util.TreeMap<String, Object>();
         msgContext.put(WSHandlerConstants.ENABLE_SIGNATURE_CONFIRMATION, "true");
         msgContext.put(WSHandlerConstants.SIG_PROP_FILE, "crypto.properties");
         msgContext.put("password", "security");
         reqData.setMsgContext(msgContext);
         reqData.setUsername("16c73ab6-b892-458f-abf5-2f875f74882e");
         
-        final java.util.Vector actions = new java.util.Vector();
+        final java.util.List<Integer> actions = new java.util.Vector<Integer>();
         actions.add(new Integer(WSConstants.SIGN));
         final Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         MyHandler handler = new MyHandler();
@@ -113,8 +114,9 @@ public class SignatureConfirmationTest extends TestCase implements CallbackHandl
             LOG.debug(outputString);
         }
 
-        msgContext = (java.util.Map)reqData.getMsgContext();
-        List savedSignatures = (List)msgContext.get(WSHandlerConstants.SEND_SIGV);
+        msgContext = (java.util.Map<String, Object>)reqData.getMsgContext();
+        List<byte[]> savedSignatures = 
+            (List<byte[]>)msgContext.get(WSHandlerConstants.SEND_SIGV);
         assertTrue(savedSignatures != null && savedSignatures.size() == 1);
         byte[] signatureValue = (byte[])savedSignatures.get(0);
         assertTrue(signatureValue != null && signatureValue.length > 0);
@@ -125,17 +127,18 @@ public class SignatureConfirmationTest extends TestCase implements CallbackHandl
      * Test to see that a signature is not saved on the outbound request if
      * enable signature confirmation is false.
      */
+    @SuppressWarnings("unchecked")
     public void
     testRequestNotSavedSignature() throws Exception {
         final RequestData reqData = new RequestData();
-        java.util.Map msgContext = new java.util.TreeMap();
+        java.util.Map<String, Object> msgContext = new java.util.TreeMap<String, Object>();
         msgContext.put(WSHandlerConstants.ENABLE_SIGNATURE_CONFIRMATION, "false");
         msgContext.put(WSHandlerConstants.SIG_PROP_FILE, "crypto.properties");
         msgContext.put("password", "security");
         reqData.setMsgContext(msgContext);
         reqData.setUsername("16c73ab6-b892-458f-abf5-2f875f74882e");
         
-        final java.util.Vector actions = new java.util.Vector();
+        final java.util.List<Integer> actions = new java.util.Vector<Integer>();
         actions.add(new Integer(WSConstants.SIGN));
         final Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         MyHandler handler = new MyHandler();
@@ -149,8 +152,9 @@ public class SignatureConfirmationTest extends TestCase implements CallbackHandl
             LOG.debug(outputString);
         }
 
-        msgContext = (java.util.Map)reqData.getMsgContext();
-        List savedSignatures = (List)msgContext.get(WSHandlerConstants.SEND_SIGV);
+        msgContext = (java.util.Map<String, Object>)reqData.getMsgContext();
+        List<byte[]> savedSignatures = 
+            (List<byte[]>)msgContext.get(WSHandlerConstants.SEND_SIGV);
         assertTrue(savedSignatures == null);
     }
     
@@ -159,17 +163,18 @@ public class SignatureConfirmationTest extends TestCase implements CallbackHandl
      * Test to see that a signature confirmation response is correctly sent on receiving
      * a signed message.
      */
+    @SuppressWarnings("unchecked")
     public void
     testSignatureConfirmationResponse() throws Exception {
         final RequestData reqData = new RequestData();
-        java.util.Map msgContext = new java.util.TreeMap();
+        java.util.Map<String, Object> msgContext = new java.util.TreeMap<String, Object>();
         msgContext.put(WSHandlerConstants.ENABLE_SIGNATURE_CONFIRMATION, "true");
         msgContext.put(WSHandlerConstants.SIG_PROP_FILE, "crypto.properties");
         msgContext.put("password", "security");
         reqData.setMsgContext(msgContext);
         reqData.setUsername("16c73ab6-b892-458f-abf5-2f875f74882e");
         
-        final java.util.Vector actions = new java.util.Vector();
+        final java.util.List<Integer> actions = new java.util.Vector<Integer>();
         actions.add(new Integer(WSConstants.SIGN));
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         MyHandler handler = new MyHandler();
@@ -183,8 +188,9 @@ public class SignatureConfirmationTest extends TestCase implements CallbackHandl
             LOG.debug(outputString);
         }
 
-        msgContext = (java.util.Map)reqData.getMsgContext();
-        List savedSignatures = (List)msgContext.get(WSHandlerConstants.SEND_SIGV);
+        msgContext = (java.util.Map<String, Object>)reqData.getMsgContext();
+        List<byte[]> savedSignatures = 
+            (List<byte[]>)msgContext.get(WSHandlerConstants.SEND_SIGV);
         assertTrue(savedSignatures != null && savedSignatures.size() == 1);
         byte[] signatureValue = (byte[])savedSignatures.get(0);
         assertTrue(signatureValue != null && signatureValue.length > 0);
@@ -192,12 +198,12 @@ public class SignatureConfirmationTest extends TestCase implements CallbackHandl
         //
         // Verify the inbound request, and create a response with a Signature Confirmation
         //
-        List results = verify(doc);
+        List<WSSecurityEngineResult> results = verify(doc);
         actions.clear();
         doc = SOAPUtil.toSOAPPart(SOAPMSG);
-        msgContext = (java.util.Map)reqData.getMsgContext();
+        msgContext = (java.util.Map<String, Object>)reqData.getMsgContext();
         WSHandlerResult handlerResult = new WSHandlerResult(null, results);
-        List receivedResults = new Vector();
+        List<WSHandlerResult> receivedResults = new Vector<WSHandlerResult>();
         receivedResults.add(handlerResult);
         msgContext.put(WSHandlerConstants.RECV_RESULTS, receivedResults);
         handler.send(
@@ -217,17 +223,18 @@ public class SignatureConfirmationTest extends TestCase implements CallbackHandl
     /**
      * Test to see that a signature confirmation response is correctly processed.
      */
+    @SuppressWarnings("unchecked")
     public void
     testSignatureConfirmationProcessing() throws Exception {
         final RequestData reqData = new RequestData();
-        java.util.Map msgContext = new java.util.TreeMap();
+        java.util.Map<String, Object> msgContext = new java.util.TreeMap<String, Object>();
         msgContext.put(WSHandlerConstants.ENABLE_SIGNATURE_CONFIRMATION, "true");
         msgContext.put(WSHandlerConstants.SIG_PROP_FILE, "crypto.properties");
         msgContext.put("password", "security");
         reqData.setMsgContext(msgContext);
         reqData.setUsername("16c73ab6-b892-458f-abf5-2f875f74882e");
         
-        final java.util.Vector actions = new java.util.Vector();
+        final java.util.List<Integer> actions = new java.util.Vector<Integer>();
         actions.add(new Integer(WSConstants.SIGN));
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         MyHandler handler = new MyHandler();
@@ -244,12 +251,12 @@ public class SignatureConfirmationTest extends TestCase implements CallbackHandl
         //
         // Verify the inbound request, and create a response with a Signature Confirmation
         //
-        List results = verify(doc);
+        List<WSSecurityEngineResult> results = verify(doc);
         actions.clear();
         doc = SOAPUtil.toSOAPPart(SOAPMSG);
-        msgContext = (java.util.Map)reqData.getMsgContext();
+        msgContext = (java.util.Map<String, Object>)reqData.getMsgContext();
         WSHandlerResult handlerResult = new WSHandlerResult(null, results);
-        List receivedResults = new Vector();
+        List<WSHandlerResult> receivedResults = new Vector<WSHandlerResult>();
         receivedResults.add(handlerResult);
         msgContext.put(WSHandlerConstants.RECV_RESULTS, receivedResults);
         handler.send(
@@ -281,8 +288,9 @@ public class SignatureConfirmationTest extends TestCase implements CallbackHandl
      * @param doc 
      * @throws Exception Thrown when there is a problem in verification
      */
-    private List verify(Document doc) throws Exception {
-        List results = secEngine.processSecurityHeader(doc, null, this, crypto);
+    private List<WSSecurityEngineResult> verify(Document doc) throws Exception {
+        List<WSSecurityEngineResult> results = 
+            secEngine.processSecurityHeader(doc, null, this, crypto);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Verfied and decrypted message:");
             String outputString = 

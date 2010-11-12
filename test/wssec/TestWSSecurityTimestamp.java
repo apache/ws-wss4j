@@ -100,7 +100,7 @@ public class TestWSSecurityTimestamp extends TestCase {
         //
         // Do some processing
         //
-        List wsResult = verify(createdDoc, WSSConfig.getNewInstance());
+        List<WSSecurityEngineResult> wsResult = verify(createdDoc, WSSConfig.getNewInstance());
         WSSecurityEngineResult actionResult = 
             WSSecurityUtil.fetchActionResult(wsResult, WSConstants.TS);
         assertTrue(actionResult != null);
@@ -133,7 +133,7 @@ public class TestWSSecurityTimestamp extends TestCase {
         //
         // Do some processing
         //
-        List wsResult = verify(createdDoc, WSSConfig.getNewInstance());
+        List<WSSecurityEngineResult> wsResult = verify(createdDoc, WSSConfig.getNewInstance());
         WSSecurityEngineResult actionResult = 
             WSSecurityUtil.fetchActionResult(wsResult, WSConstants.TS);
         assertTrue(actionResult != null);
@@ -212,7 +212,9 @@ public class TestWSSecurityTimestamp extends TestCase {
      * @param wssConfig
      * @throws java.lang.Exception Thrown when there is a problem in verification
      */
-    private List verify(Document doc, WSSConfig wssConfig) throws Exception {
+    private List<WSSecurityEngineResult> verify(
+        Document doc, WSSConfig wssConfig
+    ) throws Exception {
         secEngine.setWssConfig(wssConfig);
         return secEngine.processSecurityHeader(doc, null, null, null);
     }

@@ -149,7 +149,7 @@ public class TestWSSecurityNew18 extends TestCase {
      * Ensure that we can load a custom crypto implementation using a Map
      */
     public void testCustomCrypto() {
-        java.util.Map tmp = new java.util.TreeMap();
+        java.util.Map<String, Object> tmp = new java.util.TreeMap<String, Object>();
         Crypto crypto = CryptoFactory.getInstance(
             "wssec.CustomCrypto",
             tmp
@@ -170,7 +170,7 @@ public class TestWSSecurityNew18 extends TestCase {
         final RequestData reqData = new RequestData();
         reqData.setWssConfig(cfg);
         reqData.setUsername("16c73ab6-b892-458f-abf5-2f875f74882e");
-        java.util.Map config = new java.util.TreeMap();
+        java.util.Map<String, Object> config = new java.util.TreeMap<String, Object>();
         config.put(WSHandlerConstants.SIG_PROP_FILE, "crypto.properties");
         config.put("password", "security");
         config.put(
@@ -183,7 +183,7 @@ public class TestWSSecurityNew18 extends TestCase {
         );
         reqData.setMsgContext(config);
         
-        final java.util.Vector actions = new java.util.Vector();
+        final java.util.List<Integer> actions = new java.util.Vector<Integer>();
         actions.add(new Integer(action));
         final Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         MyHandler handler = new MyHandler();

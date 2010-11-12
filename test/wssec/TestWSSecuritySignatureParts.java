@@ -93,6 +93,7 @@ public class TestWSSecuritySignatureParts extends TestCase implements CallbackHa
     /**
      * Test signing a custom SOAP header
      */
+    @SuppressWarnings("unchecked")
     public void testSOAPHeader() throws Exception {
         WSSecSignature sign = new WSSecSignature();
         sign.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
@@ -103,7 +104,7 @@ public class TestWSSecuritySignatureParts extends TestCase implements CallbackHa
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
-        List parts = new Vector();
+        List<WSEncryptionPart> parts = new Vector<WSEncryptionPart>();
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "foobar",
@@ -120,7 +121,7 @@ public class TestWSSecuritySignatureParts extends TestCase implements CallbackHa
             LOG.debug(outputString);
         }
         
-        List results = verify(signedDoc);
+        List<WSSecurityEngineResult> results = verify(signedDoc);
         
         QName name = new QName("urn:foo.bar", "foobar");
         WSSecurityUtil.checkAllElementsProtected(results, WSConstants.SIGN, new QName[]{name});
@@ -143,8 +144,8 @@ public class TestWSSecuritySignatureParts extends TestCase implements CallbackHa
             WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
         assertTrue(actionResult != null);
         assertFalse(actionResult.isEmpty());
-        final java.util.List refs =
-            (java.util.List) actionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
+        final List<WSDataRef> refs =
+            (List<WSDataRef>) actionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
         
         WSDataRef wsDataRef = (WSDataRef)refs.get(0);
         String xpath = wsDataRef.getXpath();
@@ -164,6 +165,7 @@ public class TestWSSecuritySignatureParts extends TestCase implements CallbackHa
     /**
      * Test signing of a header through a STR Dereference Transform
      */
+    @SuppressWarnings("unchecked")
     public void testSOAPHeaderSTRTransform() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         
@@ -182,7 +184,7 @@ public class TestWSSecuritySignatureParts extends TestCase implements CallbackHa
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
-        List parts = new Vector();
+        List<WSEncryptionPart> parts = new Vector<WSEncryptionPart>();
         WSEncryptionPart encP =
             new WSEncryptionPart("STRTransform", "", "Element");
         parts.add(encP);
@@ -203,7 +205,7 @@ public class TestWSSecuritySignatureParts extends TestCase implements CallbackHa
             LOG.debug(outputString);
         }
         
-        List results = verify(signedDoc);
+        List<WSSecurityEngineResult> results = verify(signedDoc);
         WSSecurityEngineResult stUnsignedActionResult =
             WSSecurityUtil.fetchActionResult(results, WSConstants.ST_UNSIGNED);
         SAMLAssertion receivedAssertion = 
@@ -214,8 +216,8 @@ public class TestWSSecuritySignatureParts extends TestCase implements CallbackHa
             WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
         assertTrue(signActionResult != null);
         assertFalse(signActionResult.isEmpty());
-        final java.util.List refs =
-            (java.util.List) signActionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
+        final List<WSDataRef> refs =
+            (List<WSDataRef>) signActionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
         
         WSDataRef wsDataRef = (WSDataRef)refs.get(0);
         String xpath = wsDataRef.getXpath();
@@ -235,7 +237,7 @@ public class TestWSSecuritySignatureParts extends TestCase implements CallbackHa
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
-        List parts = new Vector();
+        List<WSEncryptionPart> parts = new Vector<WSEncryptionPart>();
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "foobar2",
@@ -265,7 +267,7 @@ public class TestWSSecuritySignatureParts extends TestCase implements CallbackHa
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
-        List parts = new Vector();
+        List<WSEncryptionPart> parts = new Vector<WSEncryptionPart>();
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "foobar",
@@ -297,7 +299,7 @@ public class TestWSSecuritySignatureParts extends TestCase implements CallbackHa
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
-        List parts = new Vector();
+        List<WSEncryptionPart> parts = new Vector<WSEncryptionPart>();
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 soapConstants.getBodyQName().getLocalPart(),    // define the body
@@ -320,7 +322,7 @@ public class TestWSSecuritySignatureParts extends TestCase implements CallbackHa
             LOG.debug(outputString);
         }
         
-        List results = verify(signedDoc);
+        List<WSSecurityEngineResult> results = verify(signedDoc);
         
         QName fooName = new QName("urn:foo.bar", "foobar");
         QName bodyName = new QName(soapConstants.getEnvelopeURI(), "Body");
@@ -367,8 +369,9 @@ public class TestWSSecuritySignatureParts extends TestCase implements CallbackHa
      * @param doc 
      * @throws Exception Thrown when there is a problem in verification
      */
-    private List verify(Document doc) throws Exception {
-        List results = secEngine.processSecurityHeader(doc, null, this, crypto);
+    private List<WSSecurityEngineResult> verify(Document doc) throws Exception {
+        List<WSSecurityEngineResult> results = 
+            secEngine.processSecurityHeader(doc, null, this, crypto);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Verfied and decrypted message:");
             String outputString = 

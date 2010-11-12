@@ -641,13 +641,13 @@ public class TestWSSecurityNew5 extends TestCase implements CallbackHandler {
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         
         RequestData reqData = new RequestData();
-        java.util.Map config = new java.util.TreeMap();
+        java.util.Map<String, Object> config = new java.util.TreeMap<String, Object>();
         config.put("password", "verySecret");
         config.put(WSHandlerConstants.PASSWORD_TYPE, WSConstants.PW_TEXT);
         reqData.setUsername("wernerd");
         reqData.setMsgContext(config);
         
-        java.util.Vector actions = new java.util.Vector();
+        java.util.List<Integer> actions = new java.util.Vector<Integer>();
         actions.add(new Integer(WSConstants.UT));
         
         handler.send(WSConstants.UT, doc, reqData, actions, true);
@@ -668,13 +668,13 @@ public class TestWSSecurityNew5 extends TestCase implements CallbackHandler {
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         
         RequestData reqData = new RequestData();
-        java.util.Map config = new java.util.TreeMap();
+        java.util.Map<String, Object> config = new java.util.TreeMap<String, Object>();
         config.put(WSHandlerConstants.PASSWORD_TYPE, WSConstants.PW_TEXT);
         config.put(WSHandlerConstants.PW_CALLBACK_REF, this);
         reqData.setUsername("emptyuser");
         reqData.setMsgContext(config);
         
-        java.util.Vector actions = new java.util.Vector();
+        java.util.List<Integer> actions = new java.util.Vector<Integer>();
         actions.add(new Integer(WSConstants.UT));
         
         handler.send(WSConstants.UT, doc, reqData, actions, true);

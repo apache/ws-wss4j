@@ -19,6 +19,7 @@
 
 package wssec;
 
+import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.handler.WSHandler;
 import org.apache.ws.security.handler.RequestData;
 import org.w3c.dom.Document;
@@ -32,7 +33,7 @@ import java.util.Map;
  */
 public class MyHandler extends WSHandler {
     
-    private Map optionsMap = new HashMap();
+    private Map<String, Object> optionsMap = new HashMap<String, Object>();
 
     public Object 
     getOption(String key) {
@@ -44,19 +45,20 @@ public class MyHandler extends WSHandler {
         optionsMap.put(key, option);
     }
 
+    @SuppressWarnings("unchecked")
     public void 
     setProperty(
         Object ctx, 
         String key, 
         Object value
     ) {
-        ((java.util.Map)ctx).put(key, value);
+        ((java.util.Map<String, Object>)ctx).put(key, value);
     }
 
     public Object 
     getProperty(Object ctx, String key) {
-        if (ctx instanceof java.util.Map) {
-            return ((java.util.Map)ctx).get(key);
+        if (ctx instanceof java.util.Map<?,?>) {
+            return ((java.util.Map<?,?>)ctx).get(key);
         }
         return null;
     }
@@ -67,8 +69,8 @@ public class MyHandler extends WSHandler {
 
     public String 
     getPassword(Object msgContext) {
-        if (msgContext instanceof java.util.Map) {
-            return (String)((java.util.Map)msgContext).get("password");
+        if (msgContext instanceof java.util.Map<?,?>) {
+            return (String)((java.util.Map<?,?>)msgContext).get("password");
         }
         return null;
     }
@@ -77,7 +79,7 @@ public class MyHandler extends WSHandler {
         int action, 
         Document doc,
         RequestData reqData, 
-        java.util.List actions,
+        java.util.List<Integer> actions,
         boolean request
     ) throws org.apache.ws.security.WSSecurityException {
         doSenderAction(
@@ -101,21 +103,21 @@ public class MyHandler extends WSHandler {
 
     public void signatureConfirmation(
         RequestData requestData,
-        java.util.List results
+        java.util.List<WSSecurityEngineResult> results
     ) throws org.apache.ws.security.WSSecurityException {
         checkSignatureConfirmation(requestData, results);
     }
     
     public boolean checkResults(
-        java.util.List results,
-        java.util.List actions
+        java.util.List<WSSecurityEngineResult> results,
+        java.util.List<Integer> actions
     ) throws org.apache.ws.security.WSSecurityException {
         return checkReceiverResults(results, actions);
     }
 
     public boolean checkResultsAnyOrder(
-        java.util.List results,
-        java.util.List actions
+        java.util.List<WSSecurityEngineResult> results,
+        java.util.List<Integer> actions
     ) throws org.apache.ws.security.WSSecurityException {
         return checkReceiverResultsAnyOrder(results, actions);
     }

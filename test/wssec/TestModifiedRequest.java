@@ -28,7 +28,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSEncryptionPart;
 import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSecurityEngine;
-// import org.apache.ws.security.WSSecurityEngineResult;
+import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.message.WSSecSignature;
@@ -98,7 +98,7 @@ public class TestModifiedRequest extends TestCase implements CallbackHandler {
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
-        List parts = new Vector();
+        List<WSEncryptionPart> parts = new Vector<WSEncryptionPart>();
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "value",
@@ -227,7 +227,7 @@ public class TestModifiedRequest extends TestCase implements CallbackHandler {
      * @param env soap envelope
      * @throws java.lang.Exception Thrown when there is a problem in verification
      */
-    private List verify(Document doc) throws Exception {
+    private List<WSSecurityEngineResult>  verify(Document doc) throws Exception {
         return secEngine.processSecurityHeader(doc, null, this, crypto);
     }
 

@@ -127,7 +127,7 @@ public class TestWSSecurityNew2 extends TestCase implements CallbackHandler {
          */
         builder.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
         builder.setSymmetricEncAlgorithm(WSConstants.AES_128);
-        Vector parts = new Vector();
+        java.util.List<WSEncryptionPart> parts = new Vector<WSEncryptionPart>();
         WSEncryptionPart encP =
             new WSEncryptionPart("testMethod", "uri:LogTestService2", "Element");
         parts.add(encP);
@@ -192,11 +192,12 @@ public class TestWSSecurityNew2 extends TestCase implements CallbackHandler {
      * @param envelope 
      * @throws Exception Thrown when there is a problem in verification
      */
+    @SuppressWarnings("unchecked")
     private void verify(
         Document doc,
         javax.xml.namespace.QName expectedEncryptedElement
     ) throws Exception {
-        final java.util.List results = 
+        final java.util.List<WSSecurityEngineResult> results = 
             secEngine.processSecurityHeader(doc, null, this, null, crypto);
         String outputString = 
             org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
@@ -210,17 +211,18 @@ public class TestWSSecurityNew2 extends TestCase implements CallbackHandler {
         // (as a QName)
         //
         boolean encrypted = false;
-        for (java.util.Iterator ipos = results.iterator(); ipos.hasNext();) {
-            final java.util.Map result = (java.util.Map) ipos.next();
+        for (java.util.Iterator<WSSecurityEngineResult> ipos = results.iterator(); 
+            ipos.hasNext();) {
+            final WSSecurityEngineResult result = ipos.next();
             final Integer action = (Integer) result.get(WSSecurityEngineResult.TAG_ACTION);
             assertNotNull(action);
             if ((action.intValue() & WSConstants.ENCR) != 0) {
-                final java.util.List refs =
-                    (java.util.List) result.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
+                final java.util.List<WSDataRef> refs =
+                    (java.util.List<WSDataRef>) result.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
                 assertNotNull(refs);
                 encrypted = true;
-                for (java.util.Iterator jpos = refs.iterator(); jpos.hasNext();) {
-                    final WSDataRef ref = (WSDataRef) jpos.next();
+                for (java.util.Iterator<WSDataRef> jpos = refs.iterator(); jpos.hasNext();) {
+                    final WSDataRef ref = jpos.next();
                     assertNotNull(ref);
                     assertNotNull(ref.getName());
                     assertEquals(

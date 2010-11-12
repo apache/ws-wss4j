@@ -92,14 +92,14 @@ public class TestWSSecurityWSS245 extends TestCase {
         reqData.setWssConfig(cfg);
         reqData.setUsername("bob");
         reqData.setPwType(WSConstants.PASSWORD_TEXT);
-        java.util.Map messageContext = new java.util.TreeMap();
+        java.util.Map<String, Object> messageContext = new java.util.TreeMap<String, Object>();
         messageContext.put(
             WSHandlerConstants.PW_CALLBACK_REF, 
             new MyCallbackHandler()
         );
         reqData.setMsgContext(messageContext);
         
-        final java.util.Vector actions = new java.util.Vector();
+        final java.util.List<Integer> actions = new java.util.Vector<Integer>();
         actions.add(new Integer(WSConstants.UT));
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         MyHandler handler = new MyHandler();
@@ -133,9 +133,9 @@ public class TestWSSecurityWSS245 extends TestCase {
         reqData.setWssConfig(cfg);
         reqData.setUsername("bob");
         reqData.setPwType(WSConstants.PASSWORD_TEXT);
-        reqData.setMsgContext(new java.util.TreeMap());
+        reqData.setMsgContext(new java.util.TreeMap<String, String>());
         
-        final java.util.Vector actions = new java.util.Vector();
+        final java.util.List<Integer> actions = new java.util.Vector<Integer>();
         actions.add(new Integer(WSConstants.UT));
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         MyHandler handler = new MyHandler();

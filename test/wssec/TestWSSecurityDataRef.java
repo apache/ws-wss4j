@@ -120,7 +120,7 @@ public class TestWSSecurityDataRef extends TestCase implements CallbackHandler {
         /*
          * Set up the parts structure to encrypt the body
          */
-        List parts = new Vector();
+        List<WSEncryptionPart> parts = new Vector<WSEncryptionPart>();
         WSEncryptionPart encP = new WSEncryptionPart("testMethod", "uri:LogTestService2",
                 "Element");
         parts.add(encP);
@@ -155,14 +155,15 @@ public class TestWSSecurityDataRef extends TestCase implements CallbackHandler {
      * @throws Exception
      *             Thrown when there is a problem in verification
      */
+    @SuppressWarnings("unchecked")
     private void checkDataRef(Document doc) throws Exception {
         
         // Retrieve the wsResults List 
-        List wsResults = secEngine.processSecurityHeader(doc, null, this, crypto);
+        List<WSSecurityEngineResult> wsResults = 
+            secEngine.processSecurityHeader(doc, null, this, crypto);
         boolean found = false;
                 
         for (int i = 0; i < wsResults.size(); i++) {
-            
             WSSecurityEngineResult wsSecEngineResult = 
                 (WSSecurityEngineResult)wsResults.get(i);           
             int action = ((java.lang.Integer) 
@@ -172,8 +173,8 @@ public class TestWSSecurityDataRef extends TestCase implements CallbackHandler {
             if (action != WSConstants.ENCR) {
                 continue;
             }
-            List dataRefs = (List)wsSecEngineResult
-                .get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
+            List<WSDataRef> dataRefs = 
+                (List<WSDataRef>)wsSecEngineResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
             
             //We want check only the DATA_REF_URIS 
             if (dataRefs != null && dataRefs.size() > 0) {

@@ -268,7 +268,7 @@ public class TestWSSecurityNew3 extends TestCase implements CallbackHandler {
         timestamp.setTimeToLive(300);
         Document createdDoc = timestamp.build(doc, secHeader);
         
-        List parts = new Vector();
+        List<WSEncryptionPart> parts = new Vector<WSEncryptionPart>();
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "Timestamp",

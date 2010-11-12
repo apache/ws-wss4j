@@ -378,7 +378,7 @@ public class TestWSSecurityUTDK extends TestCase implements CallbackHandler {
             LOG.debug(outputString);
         }
         
-        List results = verify(signedDoc);
+        List<WSSecurityEngineResult> results = verify(signedDoc);
         WSSecurityEngineResult actionResult =
             WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
         java.security.Principal principal = 
@@ -429,7 +429,7 @@ public class TestWSSecurityUTDK extends TestCase implements CallbackHandler {
         boolean passwordsAreEnabledOrig = WSSecurityEngine.getInstance().getWssConfig().getPasswordsAreEncoded();
         try {
             WSSecurityEngine.getInstance().getWssConfig().setPasswordsAreEncoded(true);
-            List results = verify(signedDoc);
+            List<WSSecurityEngineResult> results = verify(signedDoc);
             WSSecurityEngineResult actionResult =
                 WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
             java.security.Principal principal = 
@@ -537,7 +537,7 @@ public class TestWSSecurityUTDK extends TestCase implements CallbackHandler {
      * @param env soap envelope
      * @throws java.lang.Exception Thrown when there is a problem in verification
      */
-    private List verify(Document doc) throws Exception {
+    private List<WSSecurityEngineResult> verify(Document doc) throws Exception {
         return secEngine.processSecurityHeader(doc, null, this, crypto);
     }
     

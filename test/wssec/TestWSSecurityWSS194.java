@@ -36,6 +36,7 @@ import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngine;
+import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.handler.WSHandlerConstants;
@@ -95,7 +96,7 @@ public class TestWSSecurityWSS194 extends TestCase implements CallbackHandler {
         reqData.setWssConfig(cfg);
         reqData.setUsername("alice");
         reqData.setPwType(WSConstants.PASSWORD_TEXT);
-        java.util.Map messageContext = new java.util.TreeMap();
+        java.util.Map<String, Object> messageContext = new java.util.TreeMap<String, Object>();
         messageContext.put(
             WSHandlerConstants.PW_CALLBACK_REF, 
             this
@@ -109,7 +110,7 @@ public class TestWSSecurityWSS194 extends TestCase implements CallbackHandler {
         messageContext.put(WSHandlerConstants.SIG_KEY_ID, "DirectReference");
         reqData.setMsgContext(messageContext);
         
-        final java.util.List actions = new java.util.Vector();
+        final java.util.List<Integer> actions = new java.util.Vector<Integer>();
         actions.add(new Integer(WSConstants.UT));
         actions.add(new Integer(WSConstants.SIGN));
         final Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
@@ -141,8 +142,8 @@ public class TestWSSecurityWSS194 extends TestCase implements CallbackHandler {
      * @param doc 
      * @throws Exception Thrown when there is a problem in verification
      */
-    private List verify(Document doc) throws Exception {
-        List results = 
+    private List<WSSecurityEngineResult> verify(Document doc) throws Exception {
+        List<WSSecurityEngineResult> results = 
             secEngine.processSecurityHeader(
                 doc, null, this, CryptoFactory.getInstance("wss40CA.properties")
             );

@@ -128,7 +128,7 @@ public class TestWSSecurityNewST3 extends TestCase implements CallbackHandler {
         assertTrue(outputString.indexOf("http://www.w3.org/2001/04/xmlenc#sha256") != -1);
         assertTrue(outputString.indexOf("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256") != -1);
         
-        List results = verify(signedDoc);
+        List<WSSecurityEngineResult> results = verify(signedDoc);
         WSSecurityEngineResult actionResult =
             WSSecurityUtil.fetchActionResult(results, WSConstants.ST_UNSIGNED);
         SAMLAssertion receivedAssertion = 
@@ -177,7 +177,7 @@ public class TestWSSecurityNewST3 extends TestCase implements CallbackHandler {
         assertTrue(outputString.indexOf("http://www.w3.org/2001/04/xmlenc#sha256") != -1);
         assertTrue(outputString.indexOf("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256") != -1);
         
-        List results = verify(signedDoc);
+        List<WSSecurityEngineResult> results = verify(signedDoc);
         WSSecurityEngineResult actionResult =
             WSSecurityUtil.fetchActionResult(results, WSConstants.ST_UNSIGNED);
         SAMLAssertion receivedAssertion = 
@@ -223,7 +223,7 @@ public class TestWSSecurityNewST3 extends TestCase implements CallbackHandler {
             LOG.debug(outputString);
         }
         
-        List results = verify(signedDoc);
+        List<WSSecurityEngineResult> results = verify(signedDoc);
         WSSecurityEngineResult actionResult =
             WSSecurityUtil.fetchActionResult(results, WSConstants.ST_UNSIGNED);
         SAMLAssertion receivedAssertion = 
@@ -238,8 +238,9 @@ public class TestWSSecurityNewST3 extends TestCase implements CallbackHandler {
      * @param envelope 
      * @throws Exception Thrown when there is a problem in verification
      */
-    private List verify(Document doc) throws Exception {
-        List results = secEngine.processSecurityHeader(doc, null, this, crypto);
+    private List<WSSecurityEngineResult> verify(Document doc) throws Exception {
+        List<WSSecurityEngineResult> results = 
+            secEngine.processSecurityHeader(doc, null, this, crypto);
         String outputString = 
             org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
         assertTrue(outputString.indexOf("LogTestService2") > 0 ? true : false);

@@ -23,11 +23,11 @@ import org.apache.ws.security.components.crypto.CryptoBase;
 
 public class CustomCrypto extends CryptoBase {
     
-    java.util.Map config = null;
+    java.util.Map<String, Object> config = null;
     
     public
     CustomCrypto(
-        java.util.Map config,
+        java.util.Map<String, Object> config,
         java.lang.ClassLoader loader
     ) {
         this.config = config;

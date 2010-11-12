@@ -137,7 +137,7 @@ public class TestWSSecurityNew extends TestCase {
      * Ensure that we can load a custom crypto implementation using a Map
      */
     public void testCustomCrypto() {
-        java.util.Map tmp = new java.util.TreeMap();
+        java.util.Map<String, Object> tmp = new java.util.TreeMap<String, Object>();
         Crypto crypto = CryptoFactory.getInstance(
             "wssec.CustomCrypto",
             tmp

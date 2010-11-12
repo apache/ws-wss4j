@@ -107,7 +107,7 @@ public class SignatureKeyValueTest extends TestCase implements CallbackHandler {
         }
         assertTrue(outputString.indexOf("RSAKeyValue") != -1);
         
-        final List results = verify(signedDoc);
+        final List<WSSecurityEngineResult> results = verify(signedDoc);
         WSSecurityEngineResult actionResult = 
             WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
         assertTrue(actionResult != null);
@@ -172,7 +172,7 @@ public class SignatureKeyValueTest extends TestCase implements CallbackHandler {
         }
         assertTrue(outputString.indexOf("DSAKeyValue") != -1);
         
-        final List results = verify(signedDoc);
+        final List<WSSecurityEngineResult> results = verify(signedDoc);
         WSSecurityEngineResult actionResult = 
             WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
         assertTrue(actionResult != null);
@@ -193,7 +193,7 @@ public class SignatureKeyValueTest extends TestCase implements CallbackHandler {
      * @param env soap envelope
      * @throws java.lang.Exception Thrown when there is a problem in verification
      */
-    private List verify(Document doc) throws Exception {
+    private List<WSSecurityEngineResult> verify(Document doc) throws Exception {
         return secEngine.processSecurityHeader(doc, null, this, null);
     }
     
