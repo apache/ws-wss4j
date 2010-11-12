@@ -56,51 +56,6 @@
         </mailingList>
     </mailingLists>
     <inceptionYear>2004</inceptionYear>
-    <!-- who the developers are for the project -->
-    <developers>
-        <developer>
-            <name>Davanum Srinivas</name>
-            <id>dims</id>
-            <email>dims@yahoo.com</email>
-            <organization></organization>
-        </developer>
-        <developer>
-            <name>Werner Dittmann</name>
-            <id>werner</id>
-            <email>werner@apache.org</email>
-            <organization></organization>
-        </developer>
-        <developer>
-            <name>Ias</name>
-            <id>ias</id>
-            <email>ias@apache.org</email>
-            <organization></organization>
-        </developer>
-        <developer>
-            <name>Ruchith Fernando</name>
-            <id>ruchithf</id>
-            <email>ruchithf@apache.org</email>
-            <organization></organization>
-        </developer>
-        <developer>
-            <name>Fred Dushin</name>
-            <id>fadushin</id>
-            <email>fadushin@apache.org</email>
-            <organization></organization>
-        </developer>
-        <developer>
-            <name>Colm O hEigeartaigh</name>
-            <id>coheigea</id>
-            <email>coheigea@apache.org</email>
-            <organization></organization>
-        </developer>
-        <developer>
-            <name>Nandana Mihindukulasooriya</name>
-            <id>nandana</id>
-            <email>nandana@apache.org</email>
-            <organization></organization>
-        </developer>
-    </developers>
     <licenses>
         <license>
             <name>The Apache Software License, Version 2.0</name>
@@ -153,6 +108,7 @@
                     <failOnViolation>true</failOnViolation>
                     <verbose>true</verbose>
                     <includeTests>false</includeTests>
+                    <targetJdk>1.5</targetJdk>
                     <excludes>
                         <exclude>**/Merlin.java, **/CryptoBase.java, **/SAMLIssuerImpl.java, **/DOM2Writer.java
                         </exclude>
@@ -255,8 +211,8 @@
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>2.3.2</version>
                     <configuration>
-                        <source>1.4</source>
-                        <target>1.4</target>
+                        <source>1.5</source>
+                        <target>1.5</target>
                         <testExcludes>
                             <exclude>interop/**/*</exclude>
                         </testExcludes>

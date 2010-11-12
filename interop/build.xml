@@ -84,7 +84,7 @@
         </copy>
         <javac srcdir="${dir.work}" 
                destdir="${dir.classes}"
-               source="1.4"
+               source="1.5"
                debug="true"
                includeAntRuntime="false">
           <classpath refid="classpath.libraries" />

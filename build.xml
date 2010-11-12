@@ -339,7 +339,7 @@ org.apache.ws.axis.security.util
 
     <target name="compile.library" depends="prepare-src">
         <!-- Compile the java code from ${dir.src} into ${build.classes} -->
-        <javac srcdir="${dir.src}" destdir="${build.classes}" debug="on" source="1.4" target="1.4" includeAntRuntime="false">
+        <javac srcdir="${dir.src}" destdir="${build.classes}" debug="on" source="1.5" target="1.5" includeAntRuntime="false">
             <classpath refid="classpath.library"/>
             <exclude name="**/Merlin.java" unless="merlin.ok"/>
         </javac>
@@ -356,13 +356,13 @@ org.apache.ws.axis.security.util
         depends="compile.interops"
         if="junit.present">
 
-        <javac srcdir="${dir.test}" destdir="${build.classes}" debug="on" source="1.4" target="1.4" includeAntRuntime="false">
+        <javac srcdir="${dir.test}" destdir="${build.classes}" debug="on" source="1.5" target="1.5" includeAntRuntime="false">
             <classpath refid="classpath.test"/>
         </javac>
 
         <mkdir dir="${build.work}"/>
 
-        <javac srcdir="${build.work}" destdir="${build.classes}" debug="on" source="1.4" target="1.4" includeAntRuntime="false">
+        <javac srcdir="${build.work}" destdir="${build.classes}" debug="on" source="1.5" target="1.5" includeAntRuntime="false">
             <classpath refid="classpath.test"/>
         </javac>
 
@@ -380,8 +380,8 @@ org.apache.ws.axis.security.util
         <!-- Compile the java code from ${dir.src} into ${build.classes} -->
         <javac srcdir="${dir.samples}"
             debug="on"
-            source="1.4"
-            destdir="${build.classes}" target="1.4" includeAntRuntime="false">
+            source="1.5"
+            destdir="${build.classes}" target="1.5" includeAntRuntime="false">
             <classpath refid="classpath.library"/>
         </javac>
         <copy todir="${build.classes}">
