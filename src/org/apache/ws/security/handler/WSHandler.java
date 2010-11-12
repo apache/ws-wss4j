@@ -599,6 +599,9 @@ public abstract class WSHandler {
             int iSecretKeyLength = Integer.parseInt(secretKeyLength);
             reqData.setSecretKeyLength(iSecretKeyLength);
         }
+        
+        boolean useSingleCert = decodeUseSingleCertificate(reqData);
+        reqData.setUseSingleCert(useSingleCert);
     }
 
     protected void decodeEncryptionParameter(RequestData reqData) 
@@ -826,6 +829,26 @@ public abstract class WSHandler {
 
         throw new WSSecurityException(
             "WSHandler: illegal timestampStrict parameter"
+        );
+    }
+    
+    protected boolean decodeUseSingleCertificate(RequestData reqData) 
+        throws WSSecurityException {
+        String useSingleCert = 
+            getString(WSHandlerConstants.USE_SINGLE_CERTIFICATE, reqData.getMsgContext());
+    
+        if (useSingleCert == null) {
+            return true;
+        }
+        if ("0".equals(useSingleCert) || "false".equals(useSingleCert)) {
+            return false;
+        } 
+        if ("1".equals(useSingleCert) || "true".equals(useSingleCert)) {
+            return true;
+        }
+    
+        throw new WSSecurityException(
+            "WSHandler: illegal useSingleCert parameter"
         );
     }
 
@@ -1312,6 +1335,54 @@ public abstract class WSHandler {
                 + "certificate with subject " + subjectString
             );
         }
+        return false;
+    }
+    
+    /**
+     * Evaluate whether the given certificate chain should be trusted.
+     * 
+     * @param certificates the certificate chain that should be validated against the keystore
+     * @return true if the certificate chain is trusted, false if not
+     * @throws WSSecurityException
+     */
+    protected boolean verifyTrust(X509Certificate[] certificates, RequestData reqData) 
+        throws WSSecurityException {
+        
+        // If no certificate was transmitted, do not trust the signature
+        if (certificates == null) {
+            return false;
+        }
+        
+        String subjectString = certificates[0].getSubjectX500Principal().getName();
+        //
+        // Use the validation method from the crypto to check whether the subjects' 
+        // certificate was really signed by the issuer stated in the certificate
+        //
+        try {
+            if (certificates != null && certificates.length > 1
+                && reqData.getSigCrypto().validateCertPath(certificates)) {
+                if (log.isDebugEnabled()) {
+                    log.debug(
+                        "Certificate path has been verified for certificate with subject " 
+                        + subjectString
+                    );
+                }
+                return true;
+            }
+        } catch (WSSecurityException ex) {
+            throw new WSSecurityException(
+                "WSHandler: Certificate path verification failed for certificate "
+                + "with subject " + subjectString, ex
+            );
+        }
+        
+        if (log.isDebugEnabled()) {
+            log.debug(
+                "Certificate path could not be verified for certificate with subject " 
+                + subjectString
+            );
+        }
+            
         return false;
     }
 

@@ -118,18 +118,17 @@ public class WSDocInfo {
      */
     public Element getBst(String uri) {
         String id = uri.substring(1);
-        Element elem = null;
 
         if (bst != null) {
             for (Enumeration e = bst.elements(); e.hasMoreElements();) {
-                elem = (Element) e.nextElement();
-                String cId = elem.getAttribute("Id");
+                Element elem = (Element) e.nextElement();
+                String cId = elem.getAttributeNS(WSConstants.WSU_NS, "Id");
                 if (id.equals(cId)) {
-                    break;
+                    return elem;
                 }
             }
         }
-        return elem;
+        return null;
     }
 
     /**

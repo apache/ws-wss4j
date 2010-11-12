@@ -596,6 +596,13 @@ public class WSHandlerConstants {
     public static final String SIGNATURE_PARTS = "signatureParts";
     
     /**
+     * This parameter sets whether to use a single certificate or a whole certificate
+     * chain when constructing a BinarySecurityToken used for direct reference in
+     * signature. The default is true, meaning that only a single certificate is used.
+     */
+    public static final String USE_SINGLE_CERTIFICATE = "useSingleCertificate";
+    
+    /**
      * This parameter sets the length of the secret (derived) key to use for the
      * WSE UT_SIGN functionality.
      * 

@@ -19,10 +19,12 @@
 
 package wssec;
 
+import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.handler.WSHandler;
 import org.apache.ws.security.handler.RequestData;
 import org.w3c.dom.Document;
 
+import java.security.cert.X509Certificate;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -119,6 +121,14 @@ public class MyHandler extends WSHandler {
     ) throws org.apache.ws.security.WSSecurityException {
         return checkReceiverResultsAnyOrder(results, actions);
     }
+    
+    public boolean verifyTrust(
+        X509Certificate[] certificates, 
+        RequestData reqData
+    ) throws WSSecurityException {
+        return super.verifyTrust(certificates, reqData);
+    }
+    
     
     
 }

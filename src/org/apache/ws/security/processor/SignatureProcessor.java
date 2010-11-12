@@ -80,6 +80,8 @@ public class SignatureProcessor implements Processor {
     
     private String signatureId;
     
+    private X509Certificate[] certificates;
+    
     private int secretKeyLength = WSConstants.WSE_DERIVED_KEY_LEN;
     
     private String signatureMethod;
@@ -106,6 +108,7 @@ public class SignatureProcessor implements Processor {
         Principal lastPrincipalFound = null;
         secretKeyLength = wsc.getSecretKeyLength();
         signatureMethod = c14nMethod = null;
+        certificates = null;
         
         try {
             lastPrincipalFound = 
@@ -137,6 +140,7 @@ public class SignatureProcessor implements Processor {
                     returnElements, protectedElements, signatureValue[0]);
             result.put(WSSecurityEngineResult.TAG_SIGNATURE_METHOD, signatureMethod);
             result.put(WSSecurityEngineResult.TAG_CANONICALIZATION_METHOD, c14nMethod);
+            result.put(WSSecurityEngineResult.TAG_X509_CERTIFICATES, certificates);
             returnResults.add(
                 0, 
                 result
@@ -213,7 +217,6 @@ public class SignatureProcessor implements Processor {
 
         sig.addResourceResolver(EnvelopeIdResolver.getInstance());
 
-        X509Certificate[] certs = null;
         KeyInfo info = sig.getKeyInfo();
         byte[] secretKey = null;
         UsernameToken ut = null;
@@ -221,6 +224,8 @@ public class SignatureProcessor implements Processor {
         SAMLKeyInfo samlKi = null;
         String customTokenId = null;
         java.security.PublicKey publicKey = null;
+        X509Certificate[] certs = null;
+        boolean validateCertificateChain = false;
         
         if (info != null && info.containsKeyValue()) {
             try {
@@ -262,6 +267,9 @@ public class SignatureProcessor implements Processor {
                     QName el = new QName(token.getNamespaceURI(), token.getLocalName());
                     if (el.equals(WSSecurityEngine.binaryToken)) {
                         certs = getCertificatesTokenReference(token, crypto);
+                        if (certs != null && certs.length > 1) {
+                            validateCertificateChain = true;
+                        }
                     } else if (el.equals(WSSecurityEngine.SAML_TOKEN)) {
                         if (crypto == null) {
                             throw new WSSecurityException(
@@ -321,6 +329,9 @@ public class SignatureProcessor implements Processor {
                     }
                 } else if (processor instanceof BinarySecurityTokenProcessor) {
                     certs = ((BinarySecurityTokenProcessor)processor).getCertificates();
+                    if (certs != null && certs.length > 1) {
+                        validateCertificateChain = true;
+                    }
                 } else if (processor instanceof EncryptedKeyProcessor) {
                     EncryptedKeyProcessor ekProcessor = (EncryptedKeyProcessor)processor;
                     secretKey = ekProcessor.getDecryptedBytes();
@@ -420,7 +431,9 @@ public class SignatureProcessor implements Processor {
         }
         if (certs != null) {
             try {
-                certs[0].checkValidity();
+                for (int i = 0; i < certs.length; i++) {
+                    certs[i].checkValidity();
+                }
             } catch (CertificateExpiredException e) {
                 throw new WSSecurityException(
                     WSSecurityException.FAILED_CHECK, "invalidCert", null, e
@@ -564,6 +577,9 @@ public class SignatureProcessor implements Processor {
                 
                 if (certs != null) {
                     returnCert[0] = certs[0];
+                    if (validateCertificateChain) {
+                        certificates = certs;
+                    }
                     return certs[0].getSubjectX500Principal();
                 } else if (publicKey != null) {
                     return new PublicKeyPrincipal(publicKey);
