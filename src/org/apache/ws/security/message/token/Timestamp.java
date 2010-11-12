@@ -51,7 +51,7 @@ public class Timestamp {
     private final static Log LOG = LogFactory.getLog(Timestamp.class.getName());
 
     protected Element element = null;
-    protected List customElements = null;
+    protected List<Element> customElements = null;
     protected Date createdDate;
     protected Date expiresDate;
     
@@ -65,7 +65,7 @@ public class Timestamp {
     public Timestamp(Element timestampElement) throws WSSecurityException {
 
         element = timestampElement;
-        customElements = new Vector();
+        customElements = new Vector<Element>();
 
         String strCreated = null;
         String strExpires = null;
@@ -134,7 +134,7 @@ public class Timestamp {
      */
     public Timestamp(boolean milliseconds, Document doc, int ttl) {
 
-        customElements = new Vector();
+        customElements = new Vector<Element>();
         element = 
             doc.createElementNS(
                 WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + WSConstants.TIMESTAMP_TOKEN_LN
@@ -237,7 +237,7 @@ public class Timestamp {
      *
      * @return the list containing the custom elements.
      */
-    public List getCustomElements() {
+    public List<Element> getCustomElements() {
         return customElements;
     }
     

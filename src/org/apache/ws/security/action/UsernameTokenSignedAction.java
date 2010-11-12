@@ -108,7 +108,7 @@ public class UsernameTokenSignedAction implements Action {
         // sign.prependToHeader(reqData.getSecHeader());
         // builder.prependToHeader(reqData.getSecHeader());
 
-        List parts = null;
+        List<WSEncryptionPart> parts = null;
         if (reqData.getSignatureParts().size() > 0) {
             parts = reqData.getSignatureParts();
         } else {
@@ -116,12 +116,13 @@ public class UsernameTokenSignedAction implements Action {
             if (soapConstants == null) {
                 soapConstants = WSSecurityUtil.getSOAPConstants(doc.getDocumentElement());
             }
-            parts = new Vector();
+            parts = new Vector<WSEncryptionPart>();
             WSEncryptionPart encP = 
                 new WSEncryptionPart(WSConstants.ELEM_BODY, soapConstants.getEnvelopeURI(), "Content");
             parts.add(encP);
         }
-        List referenceList = sign.addReferencesToSign(parts, reqData.getSecHeader());
+        List<javax.xml.crypto.dsig.Reference> referenceList = 
+            sign.addReferencesToSign(parts, reqData.getSecHeader());
 
         try {
             sign.computeSignature(referenceList);

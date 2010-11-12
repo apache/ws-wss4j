@@ -20,8 +20,8 @@
 package org.apache.ws.security.message.token;
 
 import java.security.Principal;
-import java.util.Enumeration;
-import java.util.Hashtable;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.xml.namespace.QName;
 
@@ -219,7 +219,7 @@ public class DerivedKeyToken {
      * @param nonce Value of the Properties/Nonce element
      */
     public void setProperties(String name, String label, String nonce) {
-        Hashtable table = new Hashtable(3);
+        Map<String, String> table = new HashMap<String, String>();
         table.put("Name", name);
         table.put("Label", label);
         table.put("Nonce", nonce);
@@ -230,28 +230,27 @@ public class DerivedKeyToken {
      * If there are other types of properties other than Name, Label and Nonce
      * This is provided for extensibility purposes
      *
-     * @param properties The properties and values in a hashtable
+     * @param properties The properties and values in a Map
      */
-    public void setProperties(Hashtable properties) {
-        Enumeration keys = properties.keys();
-        while (keys.hasMoreElements()) {
-            String propertyName = (String) keys.nextElement(); //Get the property name
+    public void setProperties(Map<String, String> properties) {
+        for (String key : properties.keySet()) {
+            String propertyName = properties.get(key); //Get the property name
             //Check whether this property is already there
             //If so change the value
             Node node = 
                 WSSecurityUtil.findElement(elementProperties, propertyName, ns);
             if (node != null && Node.ELEMENT_NODE == node.getNodeType()) { //If the node is not null
                 Text node1 = getFirstNode((Element) node);
-                node1.setData((String) properties.get(propertyName));
+                node1.setData(properties.get(propertyName));
             } else {
-                addProperty(propertyName, (String) properties.get(propertyName));
+                addProperty(propertyName, properties.get(propertyName));
             }
         }
     }
 
-    public Hashtable getProperties() {
+    public Map<String, String> getProperties() {
         if (elementProperties != null) {
-            Hashtable table = new Hashtable();
+            Map<String, String> table = new HashMap<String, String>();
             Node node = elementProperties.getFirstChild();
             while (node != null) {
                 if (Node.ELEMENT_NODE == node.getNodeType()) {

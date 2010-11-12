@@ -21,6 +21,7 @@ package org.apache.ws.security.processor;
 
 import org.apache.ws.security.WSDocInfo;
 import org.apache.ws.security.WSSConfig;
+import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.w3c.dom.Element;
@@ -36,7 +37,7 @@ public interface Processor {
         Crypto decCrypto,
         CallbackHandler cb, 
         WSDocInfo wsDocInfo, 
-        List returnResults,
+        List<WSSecurityEngineResult> returnResults,
         WSSConfig config
     ) throws WSSecurityException;
     

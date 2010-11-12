@@ -53,9 +53,9 @@ public class WSSConfig {
     /**
      * The default collection of actions supported by the toolkit.
      */
-    private static final Map DEFAULT_ACTIONS;
+    private static final Map<Integer, String> DEFAULT_ACTIONS;
     static {
-        final Map tmp = new HashMap();
+        final Map<Integer, String> tmp = new HashMap<Integer, String>();
         try {
             tmp.put(
                 new Integer(WSConstants.UT),
@@ -105,9 +105,9 @@ public class WSSConfig {
     /**
      * The default collection of processors supported by the toolkit
      */
-    private static final Map DEFAULT_PROCESSORS;
+    private static final Map<QName, String> DEFAULT_PROCESSORS;
     static {
-        final Map tmp = new HashMap();
+        final Map<QName, String> tmp = new HashMap<QName, String>();
         try {
             tmp.put(
                 WSSecurityEngine.SAML_TOKEN,
@@ -257,7 +257,7 @@ public class WSSConfig {
     };
     protected WsuIdAllocator idAllocator = DEFAULT_ID_ALLOCATOR;
     
-    protected java.util.Map jceProvider = new HashMap(10);
+    protected Map<String, String> jceProvider = new HashMap<String, String>();
 
     /**
      * The known actions. This map is of the form <Integer, String> or <Integer, Action>. 
@@ -630,7 +630,7 @@ public class WSSConfig {
             String newName = null;
             try {
                 if (Security.getProvider(name) == null) {
-                    Class c = Loader.loadClass(className, false);
+                    Class<?> c = Loader.loadClass(className, false);
                     Provider[] provs = Security.getProviders();
                     Provider newProvider = (Provider)c.newInstance();
                     //
@@ -693,7 +693,7 @@ public class WSSConfig {
             String newName = null;
             try {
                 if (Security.getProvider(name) == null) {
-                    Class c = Loader.loadClass(className, false);
+                    Class<?> c = Loader.loadClass(className, false);
                     Provider newProvider = (Provider)c.newInstance();
                     int ret = Security.addProvider(newProvider);
                     if (log.isDebugEnabled()) {

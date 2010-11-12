@@ -66,7 +66,7 @@ public class SecurityContextTokenProcessor implements Processor {
         Crypto decCrypto,
         CallbackHandler cb, 
         WSDocInfo wsDocInfo, 
-        List returnResults,
+        List<WSSecurityEngineResult> returnResults,
         WSSConfig config
     ) throws WSSecurityException {
         SecurityContextToken sct = new SecurityContextToken(elem);

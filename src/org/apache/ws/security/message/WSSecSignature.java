@@ -144,7 +144,8 @@ public class WSSecSignature extends WSSecSignatureBase {
         try {
             C14NMethodParameterSpec c14nSpec = null;
             if (wssConfig.isWsiBSPCompliant() && canonAlgo.equals(WSConstants.C14N_EXCL_OMIT_COMMENTS)) {
-                List prefixes = getInclusivePrefixes(secHeader.getSecurityHeader(), false);
+                List<String> prefixes = 
+                    getInclusivePrefixes(secHeader.getSecurityHeader(), false);
                 c14nSpec = new ExcC14NParameterSpec(prefixes);
             }
             
@@ -287,7 +288,7 @@ public class WSSecSignature extends WSSecSignatureBase {
 
         prepare(doc, cr, secHeader);
         if (parts == null) {
-            parts = new Vector();
+            parts = new Vector<WSEncryptionPart>();
             String soapNamespace = WSSecurityUtil.getSOAPNamespace(doc.getDocumentElement());
             WSEncryptionPart encP = 
                 new WSEncryptionPart(
@@ -297,15 +298,15 @@ public class WSSecSignature extends WSSecSignatureBase {
                 );
             parts.add(encP);
         } else {
-            for (int i = 0; i < parts.size(); i++) {
-                WSEncryptionPart part = (WSEncryptionPart)parts.get(i);
+            for (WSEncryptionPart part : parts) {
                 if ("STRTransform".equals(part.getName()) && part.getId() == null) {
                     part.setId(strUri);
                 }
             }
         }
 
-        List referenceList = addReferencesToSign(parts, secHeader);
+        List<javax.xml.crypto.dsig.Reference> referenceList = 
+            addReferencesToSign(parts, secHeader);
 
         computeSignature(referenceList);
         
@@ -328,7 +329,10 @@ public class WSSecSignature extends WSSecSignatureBase {
      * @param secHeader The Security Header
      * @throws WSSecurityException
      */
-    public List addReferencesToSign(List references, WSSecHeader secHeader) throws WSSecurityException {
+    public List<javax.xml.crypto.dsig.Reference> addReferencesToSign(
+        List<WSEncryptionPart> references, 
+        WSSecHeader secHeader
+    ) throws WSSecurityException {
         return 
             addReferencesToSign(
                 document, 
@@ -393,7 +397,7 @@ public class WSSecSignature extends WSSecSignatureBase {
      * @throws WSSecurityException
      */
     public void computeSignature(
-        List referenceList 
+        List<javax.xml.crypto.dsig.Reference> referenceList 
     ) throws WSSecurityException {
         computeSignature(referenceList, true, null);
     }
@@ -408,7 +412,7 @@ public class WSSecSignature extends WSSecSignatureBase {
      * @throws WSSecurityException
      */
     public void computeSignature(
-        List referenceList, 
+        List<javax.xml.crypto.dsig.Reference> referenceList, 
         boolean prepend,
         Element siblingElement
     ) throws WSSecurityException {

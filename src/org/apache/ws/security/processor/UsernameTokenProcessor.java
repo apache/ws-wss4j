@@ -50,7 +50,7 @@ public class UsernameTokenProcessor implements Processor {
     private boolean passwordsAreEncoded;
     
     public void handleToken(Element elem, Crypto crypto, Crypto decCrypto, CallbackHandler cb, 
-        WSDocInfo wsDocInfo, List returnResults, WSSConfig wsc) throws WSSecurityException {
+        WSDocInfo wsDocInfo, List<WSSecurityEngineResult> returnResults, WSSConfig wsc) throws WSSecurityException {
         if (log.isDebugEnabled()) {
             log.debug("Found UsernameToken list element");
         }

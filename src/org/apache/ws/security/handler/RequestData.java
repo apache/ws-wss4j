@@ -21,6 +21,7 @@ package org.apache.ws.security.handler;
 
 import org.apache.ws.security.SOAPConstants;
 import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.WSEncryptionPart;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.message.WSSecHeader;
@@ -48,18 +49,18 @@ public class RequestData {
     private int sigKeyId = 0;
     private String sigAlgorithm = null;
     private String signatureDigestAlgorithm = null;
-    private List signatureParts = new Vector();
+    private List<WSEncryptionPart> signatureParts = new Vector<WSEncryptionPart>();
     private Crypto encCrypto = null;
     private int encKeyId = 0;
     private String encSymmAlgo = null;
     private String encKeyTransport = null;
     private String encUser = null;
     private String signatureUser = null;
-    private List encryptParts = new Vector();
+    private List<WSEncryptionPart> encryptParts = new Vector<WSEncryptionPart>();
     private X509Certificate encCert = null;
     private int timeToLive = 300;   // Timestamp: time in seconds between creation and expiry
     private WSSConfig wssConfig = null;
-    private List signatureValues = new Vector();
+    private List<byte[]> signatureValues = new Vector<byte[]>();
     private WSSecHeader secHeader = null;
     private boolean encSymmetricEncryptionKey = true;
     private int secretKeyLength = WSConstants.WSE_DERIVED_KEY_LEN;
@@ -200,7 +201,7 @@ public class RequestData {
         this.signatureDigestAlgorithm = sigDigestAlgorithm;
     }
 
-    public List getSignatureParts() {
+    public List<WSEncryptionPart> getSignatureParts() {
         return signatureParts;
     }
     
@@ -252,7 +253,7 @@ public class RequestData {
         this.encUser = encUser;
     }
 
-    public List getEncryptParts() {
+    public List<WSEncryptionPart> getEncryptParts() {
         return encryptParts;
     }
 
@@ -289,7 +290,7 @@ public class RequestData {
     /**
      * @return Returns the list of stored signature values.
      */
-    public List getSignatureValues() {
+    public List<byte[]> getSignatureValues() {
         return signatureValues;
     }
 

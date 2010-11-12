@@ -264,7 +264,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
         }
         
         if (parts == null) {
-            parts = new Vector();
+            parts = new Vector<WSEncryptionPart>();
             String soapNamespace = WSSecurityUtil.getSOAPNamespace(envelope);
             WSEncryptionPart encP = 
                 new WSEncryptionPart(
@@ -317,11 +317,11 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
      * @return Returns the updated <code>xenc:Reference</code> element
      * @throws WSSecurityException
      */
-    public Element encryptForRef(Element dataRef, List references)
+    public Element encryptForRef(Element dataRef, List<WSEncryptionPart> references)
         throws WSSecurityException {
 
         KeyInfo keyInfo = createKeyInfo();
-        List encDataRefs = 
+        List<String> encDataRefs = 
             doEncryption(document, wssConfig, keyInfo, symmetricKey, symEncAlgo, references);
         if (dataRef == null) {
             dataRef = 
@@ -345,7 +345,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
     /**
      * @deprecated Use encryptForRef(dataRef, references) instead
      */
-    public Element encryptForInternalRef(Element dataRef, List references)
+    public Element encryptForInternalRef(Element dataRef, List<WSEncryptionPart> references)
         throws WSSecurityException {
         return encryptForRef(dataRef, references);
     }
@@ -353,7 +353,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
     /**
      * @deprecated Use encryptForRef(dataRef, references) instead
      */
-    public Element encryptForExternalRef(Element dataRef, List references)
+    public Element encryptForExternalRef(Element dataRef, List<WSEncryptionPart> references)
         throws WSSecurityException {
         return encryptForRef(dataRef, references);
     }
@@ -397,13 +397,13 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
      * @return a List of references to EncryptedData elements
      * @throws WSSecurityException
      */
-    public static List doEncryption(
+    public static List<String> doEncryption(
         Document doc,
         WSSConfig config,
         KeyInfo keyInfo,
         SecretKey secretKey,
         String encryptionAlgorithm,
-        List references
+        List<WSEncryptionPart> references
     ) throws WSSecurityException {
 
         XMLCipher xmlCipher = null;
@@ -415,9 +415,9 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
             );
         }
 
-        List encDataRef = new Vector();
+        List<String> encDataRef = new Vector<String>();
         for (int part = 0; part < references.size(); part++) {
-            WSEncryptionPart encPart = (WSEncryptionPart) references.get(part);
+            WSEncryptionPart encPart = references.get(part);
 
             String idToEnc = encPart.getId();
             String elemName = encPart.getName();
@@ -599,10 +599,9 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
     public static Element createDataRefList(
         Document doc,
         Element referenceList, 
-        List encDataRefs
+        List<String> encDataRefs
     ) {
-        for (int i = 0; i < encDataRefs.size(); i++) {
-            String dataReferenceUri = (String) encDataRefs.get(i);
+        for (String dataReferenceUri : encDataRefs) {
             Element dataReference = 
                 doc.createElementNS(
                     WSConstants.ENC_NS, WSConstants.ENC_PREFIX + ":DataReference"

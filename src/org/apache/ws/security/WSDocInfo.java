@@ -39,17 +39,16 @@ import org.apache.ws.security.processor.Processor;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
 public class WSDocInfo {
     Document doc = null;
     Crypto crypto = null;
-    List bstList = null;
+    List<Element> bstList = null;
     Element assertion = null;
-    List processors = null;
-    List securityTokenReferences = null;
+    List<Processor> processors = null;
+    List<Element> securityTokenReferences = null;
 
     public WSDocInfo(Document doc) {
         //
@@ -68,7 +67,7 @@ public class WSDocInfo {
      */
     public void setSecurityTokenReference(Element securityTokenRef) {
         if (securityTokenReferences == null) {
-            securityTokenReferences = new Vector();
+            securityTokenReferences = new Vector<Element>();
         }
         securityTokenReferences.add(securityTokenRef);
     }
@@ -81,8 +80,7 @@ public class WSDocInfo {
      */
     public Element getSecurityTokenReference(String uri) {
         if (securityTokenReferences != null) {
-            for (Iterator iter = securityTokenReferences.iterator(); iter.hasNext();) {
-                Element elem = (Element)iter.next();
+            for (Element elem : securityTokenReferences) {
                 String cId = elem.getAttributeNS(WSConstants.WSU_NS, "Id");
                 if (uri.equals(cId)) {
                     return elem;
@@ -120,18 +118,15 @@ public class WSDocInfo {
         if (id.charAt(0) == '#') {
             id = id.substring(1);
         }
-        Element elem = null;
-
         if (bstList != null) {
-            for (Iterator iter = bstList.iterator(); iter.hasNext();) {
-                elem = (Element) iter.next();
-                String cId = elem.getAttribute("Id");
+            for (Element elem : bstList) {
+                String cId = elem.getAttributeNS(WSConstants.WSU_NS, "Id");
                 if (id.equals(cId)) {
-                    break;
+                    return elem;
                 }
             }
         }
-        return elem;
+        return null;
     }
 
     /**
@@ -145,10 +140,8 @@ public class WSDocInfo {
             return null;
         }
 
-        Processor p = null;
         if (processors != null) {
-            for (Iterator iter = processors.iterator(); iter.hasNext();) {
-                p = (Processor) iter.next();
+            for (Processor p : processors) {
                 String cId = p.getId();
                 if (id.equals(cId)) {
                     return p;
@@ -165,7 +158,7 @@ public class WSDocInfo {
      */
     public void setProcessor(Processor p) {
         if (processors == null) {
-            processors = new Vector();
+            processors = new Vector<Processor>();
         }
         processors.add(p);
     }
@@ -190,7 +183,7 @@ public class WSDocInfo {
      */
     public void setBst(Element elem) {
         if (bstList == null) {
-            bstList = new Vector();
+            bstList = new Vector<Element>();
         }
         bstList.add(elem);
     }

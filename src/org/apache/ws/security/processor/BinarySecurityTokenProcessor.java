@@ -77,7 +77,7 @@ public class BinarySecurityTokenProcessor implements Processor {
         Crypto decCrypto,
         CallbackHandler cb, 
         WSDocInfo wsDocInfo, 
-        List returnResults,
+        List<WSSecurityEngineResult> returnResults,
         WSSConfig config
     ) throws WSSecurityException {
         if (crypto == null) {

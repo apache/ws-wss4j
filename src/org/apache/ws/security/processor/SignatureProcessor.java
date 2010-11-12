@@ -107,14 +107,14 @@ public class SignatureProcessor implements Processor {
         Crypto decCrypto, 
         CallbackHandler cb, 
         WSDocInfo wsDocInfo, 
-        List returnResults, 
+        List<WSSecurityEngineResult> returnResults, 
         WSSConfig wsc
     ) throws WSSecurityException {
         if (log.isDebugEnabled()) {
             log.debug("Found signature element");
         }
         boolean remove = WSDocInfoStore.store(wsDocInfo);
-        List protectedRefs = new java.util.Vector();
+        List<WSDataRef> protectedRefs = new java.util.Vector<WSDataRef>();
         Principal lastPrincipalFound = null;
         certs = null;
         signatureValue = null;
@@ -182,7 +182,7 @@ public class SignatureProcessor implements Processor {
     protected Principal verifyXMLSignature(
         Element elem,
         Crypto crypto,
-        List protectedRefs,
+        List<WSDataRef> protectedRefs,
         CallbackHandler cb,
         WSDocInfo wsDocInfo
     ) throws WSSecurityException {
@@ -437,7 +437,7 @@ public class SignatureProcessor implements Processor {
                     boolean signatureValidationCheck = 
                         xmlSignature.getSignatureValue().validate(context);
                     log.debug("Signature Validation check: " + signatureValidationCheck);
-                    java.util.Iterator referenceIterator = 
+                    java.util.Iterator<?> referenceIterator = 
                         xmlSignature.getSignedInfo().getReferences().iterator();
                     while (referenceIterator.hasNext()) {
                         Reference reference = (Reference)referenceIterator.next();
@@ -789,7 +789,7 @@ public class SignatureProcessor implements Processor {
     ) throws MarshalException {
         XMLStructure keyInfoStructure = new DOMStructure(keyInfoElement);
         KeyInfo keyInfo = keyInfoFactory.unmarshalKeyInfo(keyInfoStructure);
-        List list = keyInfo.getContent();
+        List<?> list = keyInfo.getContent();
 
         for (int i = 0; i < list.size(); i++) {
             XMLStructure xmlStructure = (XMLStructure) list.get(i);
@@ -841,13 +841,13 @@ public class SignatureProcessor implements Processor {
      * @return A list of protected references
      * @throws WSSecurityException
      */
-    private List buildProtectedRefs(
+    private List<WSDataRef> buildProtectedRefs(
         Document doc,
         SignedInfo signedInfo,
         WSDocInfo wsDocInfo,
-        List protectedRefs
+        List<WSDataRef> protectedRefs
     ) throws WSSecurityException {
-        List referencesList = signedInfo.getReferences();
+        List<?> referencesList = signedInfo.getReferences();
         for (int i = 0; i < referencesList.size(); i++) {
             Reference siRef = (Reference)referencesList.get(i);
             String uri = siRef.getURI();
@@ -855,7 +855,7 @@ public class SignatureProcessor implements Processor {
             if (!"".equals(uri)) {
                 Element se = null;
                 
-                List transformsList = siRef.getTransforms();
+                List<?> transformsList = siRef.getTransforms();
                 
                 for (int j = 0; j < transformsList.size(); j++) {
                     
@@ -864,7 +864,7 @@ public class SignatureProcessor implements Processor {
                     if (STRTransform.TRANSFORM_URI.equals(transform.getAlgorithm())) {
                         NodeSetData data = (NodeSetData)siRef.getDereferencedData();
                         if (data != null) {
-                            java.util.Iterator iter = data.iterator();
+                            java.util.Iterator<?> iter = data.iterator();
                             
                             Node securityTokenReference = null;
                             while (iter.hasNext()) {

@@ -20,6 +20,7 @@
 package org.apache.ws.security.message;
 
 import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.WSEncryptionPart;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.w3c.dom.Document;
@@ -41,7 +42,7 @@ public class WSSecBase {
 
     protected int keyIdentifierType = WSConstants.ISSUER_SERIAL;
 
-    protected List parts = null;
+    protected List<WSEncryptionPart> parts = null;
 
     protected boolean doDebug = false;
 
@@ -52,7 +53,7 @@ public class WSSecBase {
      * 
      * @param parts The list containing the WSEncryptionPart objects
      */
-    public void setParts(List parts) {
+    public void setParts(List<WSEncryptionPart> parts) {
         this.parts = parts;
     }
 

@@ -102,7 +102,7 @@ public class SAMLUtil {
         if (key != null) {
             return new SAMLKeyInfo(assertion, key);
         } else {
-            Iterator statements = assertion.getStatements();
+            Iterator<?> statements = assertion.getStatements();
             while (statements.hasNext()) {
                 SAMLStatement stmt = (SAMLStatement) statements.next();
                 if (stmt instanceof SAMLAttributeStatement) {
@@ -142,7 +142,7 @@ public class SAMLUtil {
                     
                     try {
                         KeyInfo keyInfo = keyInfoFactory.unmarshalKeyInfo(keyInfoStructure);
-                        List list = keyInfo.getContent();
+                        List<?> list = keyInfo.getContent();
     
                         for (int i = 0; i < list.size(); i++) {
                             XMLStructure xmlStructure = (XMLStructure) list.get(i);
@@ -150,7 +150,7 @@ public class SAMLUtil {
                                 PublicKey publicKey = ((KeyValue)xmlStructure).getPublicKey();
                                 return new SAMLKeyInfo(assertion, publicKey);
                             } else if (xmlStructure instanceof X509Data) {
-                                List x509Data = ((X509Data)xmlStructure).getContent();
+                                List<?> x509Data = ((X509Data)xmlStructure).getContent();
                                 for (int j = 0; j < x509Data.size(); j++) {
                                     Object x509obj = x509Data.get(j);
                                     if (x509obj instanceof X509Certificate) {
@@ -205,7 +205,7 @@ public class SAMLUtil {
                     "invalidSAMLToken", new Object[]{"for Signature (cannot parse)"}, e);
         }
         SAMLSubjectStatement samlSubjS = null;
-        Iterator it = assertion.getStatements();
+        Iterator<?> it = assertion.getStatements();
         while (it.hasNext()) {
             SAMLObject so = (SAMLObject) it.next();
             if (so instanceof SAMLSubjectStatement) {
@@ -238,12 +238,12 @@ public class SAMLUtil {
         
         try {
             KeyInfo keyInfo = keyInfoFactory.unmarshalKeyInfo(keyInfoStructure);
-            List list = keyInfo.getContent();
+            List<?> list = keyInfo.getContent();
 
             for (int i = 0; i < list.size(); i++) {
                 XMLStructure xmlStructure = (XMLStructure) list.get(i);
                 if (xmlStructure instanceof X509Data) {
-                    List x509Data = ((X509Data)xmlStructure).getContent();
+                    List<?> x509Data = ((X509Data)xmlStructure).getContent();
                     for (int j = 0; j < x509Data.size(); j++) {
                         Object x509obj = x509Data.get(j);
                         if (x509obj instanceof X509Certificate) {

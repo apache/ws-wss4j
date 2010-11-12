@@ -87,7 +87,7 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
         prepare(doc, secHeader);
         String soapNamespace = WSSecurityUtil.getSOAPNamespace(doc.getDocumentElement());
         if (parts == null) {
-            parts = new Vector();
+            parts = new Vector<WSEncryptionPart>();
             WSEncryptionPart encP = 
                 new WSEncryptionPart(
                     WSConstants.ELEM_BODY,
@@ -96,15 +96,15 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
                 );
             parts.add(encP);
         } else {
-            for (int i = 0; i < parts.size(); i++) {
-                WSEncryptionPart part = (WSEncryptionPart)parts.get(i);
+            for (WSEncryptionPart part : parts) {
                 if ("STRTransform".equals(part.getName()) && part.getId() == null) {
                     part.setId(strUri);
                 }
             }
         }
         
-        List referenceList = addReferencesToSign(parts, secHeader);
+        List<javax.xml.crypto.dsig.Reference> referenceList = 
+            addReferencesToSign(parts, secHeader);
         computeSignature(referenceList);
         
         //
@@ -125,7 +125,8 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
         try {
             C14NMethodParameterSpec c14nSpec = null;
             if (wssConfig.isWsiBSPCompliant() && canonAlgo.equals(WSConstants.C14N_EXCL_OMIT_COMMENTS)) {
-                List prefixes = getInclusivePrefixes(secHeader.getSecurityHeader(), false);
+                List<String> prefixes = 
+                    getInclusivePrefixes(secHeader.getSecurityHeader(), false);
                 c14nSpec = new ExcC14NParameterSpec(prefixes);
             }
             
@@ -176,8 +177,10 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
      * @param secHeader The Security Header
      * @throws WSSecurityException
      */
-    public List addReferencesToSign(List references, WSSecHeader secHeader) 
-        throws WSSecurityException {
+    public List<javax.xml.crypto.dsig.Reference> addReferencesToSign(
+        List<WSEncryptionPart> references, 
+        WSSecHeader secHeader
+    ) throws WSSecurityException {
         return 
             addReferencesToSign(
                 document, 
@@ -199,7 +202,7 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
      * @throws WSSecurityException
      */
     public void computeSignature(
-        List referenceList
+        List<javax.xml.crypto.dsig.Reference> referenceList
     ) throws WSSecurityException {
         computeSignature(referenceList, true, null);
     }
@@ -214,7 +217,7 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
      * @throws WSSecurityException
      */
     public void computeSignature(
-        List referenceList, 
+        List<javax.xml.crypto.dsig.Reference> referenceList, 
         boolean prepend,
         Element siblingElement
     ) throws WSSecurityException {

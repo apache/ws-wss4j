@@ -102,7 +102,7 @@ public class WSSecurityUtil {
         //
         // get all wsse:Security nodes
         //
-        List securityHeaderList = 
+        List<Node> securityHeaderList = 
             getDirectChildElements(
                 soapHeaderElement, 
                 WSConstants.WSSE_LN, 
@@ -181,12 +181,12 @@ public class WSSecurityUtil {
      * @param namespace the namespace of the children to get
      * @return the list of nodes or <code>null</code> if not such nodes are found
      */
-    public static List getDirectChildElements(
+    public static List<Node> getDirectChildElements(
         Node fNode, 
         String localName,
         String namespace
     ) {
-        List children = new Vector();
+        List<Node> children = new Vector<Node>();
         for (
             Node currentChild = fNode.getFirstChild(); 
             currentChild != null; 
@@ -767,16 +767,16 @@ public class WSSecurityUtil {
      * @return The last result fetched from the result list, null if the result
      *         could not be found
      */
-    public static WSSecurityEngineResult fetchActionResult(List resultList, int action) {
-
+    public static WSSecurityEngineResult fetchActionResult(
+        List<WSSecurityEngineResult> resultList, 
+        int action
+    ) {
         WSSecurityEngineResult returnResult = null;
         
-        for (int i = 0; i < resultList.size(); i++) {
+        for (WSSecurityEngineResult result : resultList) {
             //
             // Check the result of every action whether it matches the given action
             //
-            WSSecurityEngineResult result = 
-                (WSSecurityEngineResult) resultList.get(i);
             int resultAction = 
                 ((java.lang.Integer)result.get(WSSecurityEngineResult.TAG_ACTION)).intValue();
             if (resultAction == action) {
@@ -797,17 +797,15 @@ public class WSSecurityUtil {
      * @return The result fetched from the result list, null if the result
      *         could not be found
      */
-    public static List fetchAllActionResults(
-        List resultList,
+    public static List<WSSecurityEngineResult> fetchAllActionResults(
+        List<WSSecurityEngineResult> resultList,
         int action, 
-        List actionResultList
+        List<WSSecurityEngineResult> actionResultList
     ) {
-        for (int i = 0; i < resultList.size(); i++) {
+        for (WSSecurityEngineResult result : resultList) {
             //
             // Check the result of every action whether it matches the given action
             //
-            WSSecurityEngineResult result = 
-                (WSSecurityEngineResult) resultList.get(i);
             int resultAction = 
                 ((java.lang.Integer)result.get(WSSecurityEngineResult.TAG_ACTION)).intValue();
             if (resultAction == action) {
@@ -817,7 +815,10 @@ public class WSSecurityUtil {
         return actionResultList;
     }
 
-    public static int decodeAction(String action, List actions) throws WSSecurityException {
+    public static int decodeAction(
+        String action, 
+        List<Integer> actions
+    ) throws WSSecurityException {
 
         int doAction = 0;
         if (action == null) {
@@ -875,7 +876,7 @@ public class WSSecurityUtil {
      */
     public static int decodeAction(
         String action, 
-        List actions,
+        List<Integer> actions,
         WSSConfig wssConfig
     ) throws WSSecurityException {
 
@@ -995,8 +996,9 @@ public class WSSecurityUtil {
      * @param action The action that is required (e.g. WSConstants.SIGN)
      * @param requiredParts An array of QNames that correspond to the required elements
      */
+    @SuppressWarnings("unchecked")
     public static void checkAllElementsProtected(
-        List results,
+        List<WSSecurityEngineResult> results,
         int action,
         QName[] requiredParts
     ) throws WSSecurityException {
@@ -1006,18 +1008,18 @@ public class WSSecurityUtil {
                 QName requiredPart = requiredParts[i];
                 
                 boolean found = false;
-                for (Iterator iter = results.iterator(); iter.hasNext() && !found;) {
-                    WSSecurityEngineResult result = (WSSecurityEngineResult)iter.next();
+                for (Iterator<WSSecurityEngineResult> iter = results.iterator(); 
+                    iter.hasNext() && !found;) {
+                    WSSecurityEngineResult result = iter.next();
                     int resultAction = 
                         ((java.lang.Integer)result.get(WSSecurityEngineResult.TAG_ACTION)).intValue();
                     if (resultAction != action) {
                         continue;
                     }
-                    java.util.List refList = 
-                        (java.util.List)result.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
+                    List<WSDataRef> refList = 
+                        (List<WSDataRef>)result.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
                     if (refList != null) {
-                        for (int k = 0; k < refList.size(); k++) {
-                            WSDataRef dataRef = (WSDataRef)refList.get(k);
+                        for (WSDataRef dataRef : refList) {
                             if (dataRef.getName().equals(requiredPart)) {
                                 found = true;
                                 break;
@@ -1045,6 +1047,7 @@ public class WSSecurityUtil {
      * @param requiredIDs the list of wsu:Id values that must be covered
      * @throws WSSecurityException if any required element is not included
      */
+    @SuppressWarnings("unchecked")
     public static void checkSignsAllElements(
         WSSecurityEngineResult resultItem, 
         String[] requiredIDs
@@ -1055,8 +1058,8 @@ public class WSSecurityUtil {
             throw new IllegalArgumentException("Not a SIGN result");
         }
 
-        java.util.List signedElemsRefList = 
-            (java.util.List)resultItem.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
+        List<WSDataRef> signedElemsRefList = 
+            (List<WSDataRef>)resultItem.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
         if (signedElemsRefList == null) {
             throw new WSSecurityException(
                 "WSSecurityEngineResult does not contain any references to signed elements"
@@ -1144,18 +1147,17 @@ public class WSSecurityUtil {
     /**
      * @return  a list of child Nodes
      */
-    public static java.util.List
+    public static List<Node>
     listChildren(
         final Node parent
     ) {
-        if (parent == null) {
-            return java.util.Collections.EMPTY_LIST;
-        }
-        final java.util.List ret = new java.util.Vector();
-        Node node = parent.getFirstChild();
-        while (node != null) {
-            ret.add(node);
-            node = node.getNextSibling();
+        final List<Node> ret = new Vector<Node>();
+        if (parent != null) {
+            Node node = parent.getFirstChild();
+            while (node != null) {
+                ret.add(node);
+                node = node.getNextSibling();
+            }
         }
         return ret;
     }
@@ -1163,33 +1165,33 @@ public class WSSecurityUtil {
     /**
      * @return a list of Nodes in b that are not in a 
      */
-    public static java.util.List
+    public static List<Node>
     newNodes(
-        final java.util.List a,
-        final java.util.List b
+        final List<Node> a,
+        final List<Node> b
     ) {
         if (a.size() == 0) {
             return b;
         }
+        final List<Node> ret = new Vector<Node>();
         if (b.size() == 0) {
-            return java.util.Collections.EMPTY_LIST;
+            return ret;
         }
-        final java.util.List ret = new java.util.Vector();
         for (
-            final java.util.Iterator bpos = b.iterator();
+            final Iterator<Node> bpos = b.iterator();
             bpos.hasNext();
         ) {
-            final Node bnode = (Node) bpos.next();
-            final java.lang.String bns = bnode.getNamespaceURI();
-            final java.lang.String bln = bnode.getLocalName();
+            final Node bnode = bpos.next();
+            final String bns = bnode.getNamespaceURI();
+            final String bln = bnode.getLocalName();
             boolean found = false;
             for (
-                final java.util.Iterator apos = a.iterator();
+                final Iterator<Node> apos = a.iterator();
                 apos.hasNext() && !found;
             ) {
-                final Node anode = (Node) apos.next();
-                final java.lang.String ans = anode.getNamespaceURI();
-                final java.lang.String aln = anode.getLocalName();
+                final Node anode = apos.next();
+                final String ans = anode.getNamespaceURI();
+                final String aln = anode.getLocalName();
                 final boolean nsmatch =
                     ans == null
                     ? ((bns == null) ? true : false)

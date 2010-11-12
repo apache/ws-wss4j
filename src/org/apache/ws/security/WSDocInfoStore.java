@@ -30,14 +30,15 @@ package org.apache.ws.security;
  * @author Werner Dittmann (Werner.Dittmann@apache.org)
  */
 
-import java.util.Hashtable;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.w3c.dom.Document;
 
 public class WSDocInfoStore {
 
-    private static final Map STORAGE = new Hashtable(10);
+    private static final Map<Document, WSDocInfo> STORAGE = 
+        new ConcurrentHashMap<Document, WSDocInfo>();
 
     public static WSDocInfo lookup(Document doc) {
         return (WSDocInfo) STORAGE.get(doc);

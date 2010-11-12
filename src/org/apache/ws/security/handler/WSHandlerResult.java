@@ -20,20 +20,21 @@
 package org.apache.ws.security.handler;
 
 import java.util.List;
+import org.apache.ws.security.WSSecurityEngineResult;
 
 /**
  * @author Werner Dittmann (Werner.Dittmann@Siemens.com)
  */
 public class WSHandlerResult {
     private String actor;
-    private List wsSecurityResults;
+    private List<WSSecurityEngineResult> wsSecurityResults;
 
     /**
      * constructor
      * @param actor
      * @param wsResults
      */ 
-    public WSHandlerResult(String actor, List results) {
+    public WSHandlerResult(String actor, List<WSSecurityEngineResult> results) {
         this.actor = actor;
         this.wsSecurityResults = results;
     }
@@ -48,9 +49,9 @@ public class WSHandlerResult {
 
     /**
      * gets the the security results
-     * @return list
+     * @return the the security results
      */
-    public List getResults() {
+    public List<WSSecurityEngineResult> getResults() {
         return wsSecurityResults;
     }
 }

@@ -73,7 +73,7 @@ public class EncryptedKeyProcessor implements Processor {
         Crypto decCrypto, 
         CallbackHandler cb, 
         WSDocInfo wsDocInfo,
-        List returnResults, 
+        List<WSSecurityEngineResult> returnResults, 
         WSSConfig wsc
     ) throws WSSecurityException {
         if (log.isDebugEnabled()) {
@@ -86,7 +86,7 @@ public class EncryptedKeyProcessor implements Processor {
         if (cb == null) {
             throw new WSSecurityException(WSSecurityException.FAILURE, "noCallback");
         }
-        List dataRefs = handleEncryptedKey(elem, cb, decCrypto, null);
+        List<WSDataRef> dataRefs = handleEncryptedKey(elem, cb, decCrypto, null);
         encryptedKeyId = elem.getAttribute("Id");
         
         WSSecurityEngineResult result = new WSSecurityEngineResult(
@@ -106,7 +106,7 @@ public class EncryptedKeyProcessor implements Processor {
         );
     }
 
-    public List handleEncryptedKey(
+    public List<WSDataRef> handleEncryptedKey(
         Element xencEncryptedKey,
         CallbackHandler cb, 
         Crypto crypto
@@ -114,14 +114,14 @@ public class EncryptedKeyProcessor implements Processor {
         return handleEncryptedKey(xencEncryptedKey, cb, crypto, null);
     }
 
-    public List handleEncryptedKey(
+    public List<WSDataRef> handleEncryptedKey(
         Element xencEncryptedKey,
         PrivateKey privatekey
     ) throws WSSecurityException {
         return handleEncryptedKey(xencEncryptedKey, null, null, privatekey);
     }
 
-    public List handleEncryptedKey(
+    public List<WSDataRef> handleEncryptedKey(
         Element xencEncryptedKey,
         CallbackHandler cb, 
         Crypto crypto, 
@@ -188,7 +188,7 @@ public class EncryptedKeyProcessor implements Processor {
             WSSecurityUtil.getDirectChildElement(
                 xencEncryptedKey, "ReferenceList", WSConstants.ENC_NS
             );
-        List dataRefs = new Vector();
+        List<WSDataRef> dataRefs = new Vector<WSDataRef>();
         if (refList != null) {
             for (Node node = refList.getFirstChild();
                 node != null; 

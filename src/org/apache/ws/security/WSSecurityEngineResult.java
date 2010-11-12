@@ -31,39 +31,35 @@ import java.util.List;
 /**
  * @author Werner Dittmann (Werner.Dittmann@t-online.de)
  */
-public class WSSecurityEngineResult extends java.util.HashMap {
+public class WSSecurityEngineResult extends java.util.HashMap<String, Object> {
 
     /**
      * Tag denoting the cryptographic operation performed
      *
      * The value under this tag is of type java.lang.Integer
      */
-    public static final java.lang.String TAG_ACTION =
-        "action";
+    public static final String TAG_ACTION = "action";
 
     /**
      * Tag denoting the security principal found, if applicable.
      *
      * The value under this tag is of type java.security.Principal.
      */
-    public static final java.lang.String TAG_PRINCIPAL =
-        "principal";
+    public static final String TAG_PRINCIPAL = "principal";
 
     /**
      * Tag denoting the X.509 certificate found, if applicable.
      *
      * The value under this tag is of type java.security.cert.X509Certificate.
      */
-    public static final java.lang.String TAG_X509_CERTIFICATE =
-        "x509-certificate";
+    public static final String TAG_X509_CERTIFICATE = "x509-certificate";
 
     /**
      * Tag denoting the SAML Assertion found, if applicable.
      *
      * The value under this tag is of type org.opensaml.SAMLAssertion.
      */
-    public static final java.lang.String TAG_SAML_ASSERTION =
-        "saml-assertion";
+    public static final String TAG_SAML_ASSERTION = "saml-assertion";
 
     /**
      * Tag denoting the timestamp found, if applicable.
@@ -71,16 +67,14 @@ public class WSSecurityEngineResult extends java.util.HashMap {
      * The value under this tag is of type
      * org.apache.ws.security.message.token.Timestamp.
      */
-    public static final java.lang.String TAG_TIMESTAMP =
-        "timestamp";
+    public static final String TAG_TIMESTAMP = "timestamp";
 
     /**
      * Tag denoting the signature value of a signed element, if applicable.
      *
      * The value under this tag is of type byte[].
      */
-    public static final java.lang.String TAG_SIGNATURE_VALUE =
-        "signature-value";
+    public static final String TAG_SIGNATURE_VALUE = "signature-value";
 
     /**
      * Tag denoting the signature confirmation of a signed element,
@@ -89,8 +83,7 @@ public class WSSecurityEngineResult extends java.util.HashMap {
      * The value under this tag is of type
      * org.apache.ws.security.message.token.SignatureConfirmation.
      */
-    public static final java.lang.String TAG_SIGNATURE_CONFIRMATION =
-        "signature-confirmation";
+    public static final java.lang.String TAG_SIGNATURE_CONFIRMATION = "signature-confirmation";
 
     /**
      * Tag denoting references to the DOM elements that have been
@@ -98,76 +91,70 @@ public class WSSecurityEngineResult extends java.util.HashMap {
      *
      * The value under this tag is of type SecurityContextToken.
      */
-    public static final java.lang.String TAG_SECURITY_CONTEXT_TOKEN =
-        "security-context-token";
+    public static final String TAG_SECURITY_CONTEXT_TOKEN = "security-context-token";
 
     /**
      * Tag denoting a reference to the decrypted key
      *
      * The value under this tag is of type byte[].
      */
-    public static final java.lang.String TAG_DECRYPTED_KEY =
-        "decrypted-key";
+    public static final String TAG_DECRYPTED_KEY = "decrypted-key";
 
     /**
      * Tag denoting references to the encrypted key id.
      *
      * The value under this tag is of type String.
      */
-    public static final java.lang.String TAG_ENCRYPTED_KEY_ID =
-        "encrypted-key-id";
+    public static final String TAG_ENCRYPTED_KEY_ID = "encrypted-key-id";
 
     /**
      * Tag denoting references to a List of Data ref URIs.
      *
      * The value under this tag is of type List.
      */
-    public static final java.lang.String TAG_DATA_REF_URIS =
-        "data-ref-uris";
+    public static final String TAG_DATA_REF_URIS = "data-ref-uris";
 
     /**
      * Tag denoting the X.509 certificate chain found, if applicable.
      *
      * The value under this tag is of type java.security.cert.X509Certificate[].
      */
-    public static final java.lang.String TAG_X509_CERTIFICATES =
-        "x509-certificates";
+    public static final String TAG_X509_CERTIFICATES = "x509-certificates";
 
     /**
      * Tag denoting the X.509 certificate found, if applicable.
      *
      * The value under this tag is of type java.security.cert.X509Certificate.
      */
-    public static final java.lang.String TAG_BINARY_SECURITY_TOKEN =
-        "binary-security-token";
+    public static final String TAG_BINARY_SECURITY_TOKEN = "binary-security-token";
 
     /**
      * Tag denoting the encrypted key bytes
      *
      * The value under this tag is a byte array 
      */
-    public static final Object TAG_ENCRYPTED_EPHEMERAL_KEY = "encrypted-ephemeral-key-bytes";
+    public static final String TAG_ENCRYPTED_EPHEMERAL_KEY = "encrypted-ephemeral-key-bytes";
     
     /**
      * Tag denoting the encrypted key transport algorithm.
      *
      * The value under this tag is of type String.
      */
-    public static final Object TAG_ENCRYPTED_KEY_TRANSPORT_METHOD = "encrypted-key-transport-method";
+    public static final String TAG_ENCRYPTED_KEY_TRANSPORT_METHOD = "encrypted-key-transport-method";
     
     /**
      * Tag denoting the algorithm that was used to sign the message
      *
      * The value under this tag is of type String.
      */
-    public static final Object TAG_SIGNATURE_METHOD = "signature-method";
+    public static final String TAG_SIGNATURE_METHOD = "signature-method";
 
     /**
      * Tag denoting the algorithm that was used to do canonicalization
      *
      * The value under this tag is of type String.
      */
-    public static final Object TAG_CANONICALIZATION_METHOD = "canonicalization-method";
+    public static final String TAG_CANONICALIZATION_METHOD = "canonicalization-method";
 
     public WSSecurityEngineResult(
         int act, 
@@ -197,7 +184,7 @@ public class WSSecurityEngineResult extends java.util.HashMap {
         int act,
         Principal princ,
         X509Certificate[] certs,
-        List dataRefs,
+        List<WSDataRef> dataRefs,
         byte[] sv
     ) {
         this(act, princ, certs, sv);
@@ -209,7 +196,7 @@ public class WSSecurityEngineResult extends java.util.HashMap {
         byte[] decryptedKey, 
         byte[] encryptedKeyBytes,
         String encyptedKeyId, 
-        List dataRefUris
+        List<WSDataRef> dataRefUris
     ) {
         put(TAG_ACTION, new Integer(act));
         put(TAG_DECRYPTED_KEY, decryptedKey);
@@ -223,7 +210,7 @@ public class WSSecurityEngineResult extends java.util.HashMap {
         byte[] decryptedKey, 
         byte[] encryptedKeyBytes,
         String encyptedKeyId, 
-        List dataRefUris,
+        List<WSDataRef> dataRefUris,
         X509Certificate[] certs
     ) {
         put(TAG_ACTION, new Integer(act));
@@ -237,7 +224,7 @@ public class WSSecurityEngineResult extends java.util.HashMap {
         }
     }
     
-    public WSSecurityEngineResult(int act, List dataRefUris) {
+    public WSSecurityEngineResult(int act, List<WSDataRef> dataRefUris) {
         put(TAG_ACTION, new Integer(act));
         put(TAG_DATA_REF_URIS, dataRefUris);
     }

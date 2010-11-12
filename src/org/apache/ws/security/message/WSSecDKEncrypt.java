@@ -61,7 +61,7 @@ public class WSSecDKEncrypt extends WSSecDerivedKeyBase {
                 
         String soapNamespace = WSSecurityUtil.getSOAPNamespace(envelope);
         if (parts == null) {
-            parts = new Vector();
+            parts = new Vector<WSEncryptionPart>();
             WSEncryptionPart encP = 
                 new WSEncryptionPart(
                     WSConstants.ELEM_BODY, 
@@ -97,13 +97,13 @@ public class WSSecDKEncrypt extends WSSecDerivedKeyBase {
      * @return Returns the updated <code>xenc:Reference</code> element
      * @throws WSSecurityException
      */
-    public Element encryptForExternalRef(Element dataRef, List references)
+    public Element encryptForExternalRef(Element dataRef, List<WSEncryptionPart> references)
         throws WSSecurityException {
         
         KeyInfo keyInfo = createKeyInfo();
         SecretKey key = WSSecurityUtil.prepareSecretKey(symEncAlgo, derivedKeyBytes);
 
-        List encDataRefs = 
+        List<String> encDataRefs = 
             WSSecEncrypt.doEncryption(document, wssConfig, keyInfo, key, symEncAlgo, references);
         if (dataRef == null) {
             dataRef = 

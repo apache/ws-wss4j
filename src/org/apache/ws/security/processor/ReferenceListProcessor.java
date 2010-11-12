@@ -60,7 +60,7 @@ public class ReferenceListProcessor implements Processor {
         Crypto decCrypto,
         CallbackHandler cb, 
         WSDocInfo wdi, 
-        List returnResults,
+        List<WSSecurityEngineResult> returnResults,
         WSSConfig wsc
     ) throws WSSecurityException {
         debug = log.isDebugEnabled();
@@ -70,7 +70,7 @@ public class ReferenceListProcessor implements Processor {
         if (cb == null) {
             throw new WSSecurityException(WSSecurityException.FAILURE, "noCallback");
         }
-        List dataRefs = handleReferenceList(elem, cb, decCrypto, wdi);
+        List<WSDataRef> dataRefs = handleReferenceList(elem, cb, decCrypto, wdi);
         returnResults.add(
             0,
             new WSSecurityEngineResult(WSConstants.ENCR, dataRefs)
@@ -85,13 +85,13 @@ public class ReferenceListProcessor implements Processor {
      * @param cb the callback handler to get the key for a key name stored if
      *           <code>KeyInfo</code> inside the encrypted data elements
      */
-    private List handleReferenceList(
+    private List<WSDataRef> handleReferenceList(
         Element elem, 
         CallbackHandler cb,
         Crypto crypto,
         WSDocInfo wdi
     ) throws WSSecurityException {
-        List dataRefs = new Vector();
+        List<WSDataRef> dataRefs = new Vector<WSDataRef>();
         for (Node node = elem.getFirstChild(); 
             node != null; 
             node = node.getNextSibling()

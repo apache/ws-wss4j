@@ -119,13 +119,12 @@ public class WSSecSignatureSAML extends WSSecSignature {
 
         String soapNamespace = WSSecurityUtil.getSOAPNamespace(doc.getDocumentElement());
         if (parts == null) {
-            parts = new Vector();
+            parts = new Vector<WSEncryptionPart>();
             WSEncryptionPart encP = 
                 new WSEncryptionPart(WSConstants.ELEM_BODY, soapNamespace, "Content");
             parts.add(encP);
         } else {
-            for (int i = 0; i < parts.size(); i++) {
-                WSEncryptionPart part = (WSEncryptionPart)parts.get(i);
+            for (WSEncryptionPart part : parts) {
                 if ("STRTransform".equals(part.getName()) && part.getId() == null) {
                     part.setId(strUri);
                 }
@@ -143,7 +142,8 @@ public class WSSecSignatureSAML extends WSSecSignature {
             parts.add(encP);
         }
         
-        List referenceList = addReferencesToSign(parts, secHeader);
+        List<javax.xml.crypto.dsig.Reference> referenceList = 
+            addReferencesToSign(parts, secHeader);
 
         prependSAMLElementsToHeader(secHeader);
 
@@ -217,7 +217,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
         // thats if "senderVouches" is true.
         //
         SAMLSubjectStatement samlSubjS = null;
-        Iterator it = assertion.getStatements();
+        Iterator<?> it = assertion.getStatements();
         while (it.hasNext()) {
             SAMLObject so = (SAMLObject) it.next();
             if (so instanceof SAMLSubjectStatement) {
@@ -273,7 +273,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
             try {
                 XMLStructure keyInfoStructure = new DOMStructure(e);
                 KeyInfo keyInfo = keyInfoFactory.unmarshalKeyInfo(keyInfoStructure);
-                List list = keyInfo.getContent();
+                List<?> list = keyInfo.getContent();
 
                 for (int i = 0; i < list.size(); i++) {
                     XMLStructure xmlStructure = (XMLStructure) list.get(i);
@@ -281,7 +281,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
                         publicKey = ((KeyValue)xmlStructure).getPublicKey();
                         break;
                     } else if (xmlStructure instanceof X509Data) {
-                        List x509Data = ((X509Data)xmlStructure).getContent();
+                        List<?> x509Data = ((X509Data)xmlStructure).getContent();
                         for (int j = 0; j < x509Data.size(); j++) {
                             Object x509obj = x509Data.get(j);
                             if (x509obj instanceof X509Certificate) {
@@ -342,7 +342,8 @@ public class WSSecSignatureSAML extends WSSecSignature {
         try {
             C14NMethodParameterSpec c14nSpec = null;
             if (wssConfig.isWsiBSPCompliant() && canonAlgo.equals(WSConstants.C14N_EXCL_OMIT_COMMENTS)) {
-                List prefixes = getInclusivePrefixes(secHeader.getSecurityHeader(), false);
+                List<String> prefixes = 
+                    getInclusivePrefixes(secHeader.getSecurityHeader(), false);
                 c14nSpec = new ExcC14NParameterSpec(prefixes);
             }
             
@@ -493,8 +494,11 @@ public class WSSecSignatureSAML extends WSSecSignature {
      * 
      * @throws WSSecurityException
      */
-    public void computeSignature(List referenceList, WSSecHeader secHeader, Element siblingElement) 
-        throws WSSecurityException {
+    public void computeSignature(
+        List<javax.xml.crypto.dsig.Reference> referenceList, 
+        WSSecHeader secHeader, 
+        Element siblingElement
+    ) throws WSSecurityException {
         boolean remove = WSDocInfoStore.store(wsDocInfo);
         try {
             java.security.Key key;

@@ -39,14 +39,17 @@ import java.util.Vector;
 public class SignatureConfirmationAction implements Action {
     protected static Log log = LogFactory.getLog(WSHandler.class.getName());
 
+    @SuppressWarnings("unchecked")
     public void execute(WSHandler handler, int actionToDo, Document doc, RequestData reqData)
             throws WSSecurityException {
         if (log.isDebugEnabled()) {
             log.debug("Perform Signature confirmation");
         }
 
-        List results = 
-            (List) handler.getProperty(reqData.getMsgContext(), WSHandlerConstants.RECV_RESULTS);
+        List<WSHandlerResult> results = 
+            (List<WSHandlerResult>) handler.getProperty(
+                reqData.getMsgContext(), WSHandlerConstants.RECV_RESULTS
+            );
         if (results == null) {
             return;
         }
@@ -54,10 +57,9 @@ public class SignatureConfirmationAction implements Action {
         // Loop over all the (signature) results gathered by all the processors, and store
         // them in a list.
         //
-        List signatureActions = new Vector();
-        for (int i = 0; i < results.size(); i++) {
-            WSHandlerResult wshResult = (WSHandlerResult) results.get(i);
-            List resultList = wshResult.getResults();
+        List<WSSecurityEngineResult> signatureActions = new Vector<WSSecurityEngineResult>();
+        for (WSHandlerResult wshResult : results) {
+            List<WSSecurityEngineResult> resultList = wshResult.getResults();
 
             WSSecurityUtil.fetchAllActionResults(
                 resultList, WSConstants.SIGN, signatureActions
@@ -73,7 +75,7 @@ public class SignatureConfirmationAction implements Action {
         // prepare a SignatureConfirmation token
         //
         WSSecSignatureConfirmation wsc = new WSSecSignatureConfirmation();
-        List signatureParts = reqData.getSignatureParts();
+        List<WSEncryptionPart> signatureParts = reqData.getSignatureParts();
         if (signatureActions.size() > 0) {
             if (log.isDebugEnabled()) {
                 log.debug("Signature Confirmation: number of Signature results: "

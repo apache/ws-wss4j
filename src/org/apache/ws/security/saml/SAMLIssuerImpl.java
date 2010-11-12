@@ -167,7 +167,7 @@ public class SAMLIssuerImpl implements SAMLIssuer {
                         SAMLAuthenticationStatement.AuthenticationMethod_Password;
             }
             Date authInstant = new Date();
-            Collection bindings = null;
+            Collection<?> bindings = null;
 
             SAMLSubject subject =
                     new SAMLSubject(nameId,

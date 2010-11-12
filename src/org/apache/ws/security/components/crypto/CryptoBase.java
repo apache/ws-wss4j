@@ -75,16 +75,17 @@ public abstract class CryptoBase implements Crypto {
     public static final String NAME_CONSTRAINTS_OID = "2.5.29.30";
     
     private static Log log = LogFactory.getLog(CryptoBase.class);
-    private static final Constructor BC_509CLASS_CONS;
+    private static final Constructor<?> BC_509CLASS_CONS;
 
-    protected static Map certFactMap = new HashMap();
+    protected static Map<String, CertificateFactory> certFactMap = 
+        new HashMap<String, CertificateFactory>();
     protected KeyStore keystore = null;
     protected KeyStore truststore = null;
     
     static {
-        Constructor cons = null;
+        Constructor<?> cons = null;
         try {
-            Class c = Class.forName("org.bouncycastle.asn1.x509.X509Name");
+            Class<?> c = Class.forName("org.bouncycastle.asn1.x509.X509Name");
             cons = c.getConstructor(new Class[] {String.class});
         } catch (Exception e) {
             //ignore
@@ -240,7 +241,7 @@ public abstract class CryptoBase implements Crypto {
     }
     
     protected static String createKeyStoreErrorMessage(KeyStore keystore) throws KeyStoreException {
-        Enumeration aliases = keystore.aliases();
+        Enumeration<String> aliases = keystore.aliases();
         StringBuffer sb = new StringBuffer(keystore.size() * 7);
         boolean firstAlias = true;
         while (aliases.hasMoreElements()) {
@@ -257,9 +258,9 @@ public abstract class CryptoBase implements Crypto {
         return msg;
     }
 
-    protected List splitAndTrim(String inString) {
+    protected List<String> splitAndTrim(String inString) {
         X509NameTokenizer nmTokens = new X509NameTokenizer(inString);
-        List vr = new Vector();
+        List<String> vr = new Vector<String>();
 
         while (nmTokens.hasMoreTokens()) {
             vr.add(nmTokens.nextToken());
@@ -317,8 +318,8 @@ public abstract class CryptoBase implements Crypto {
         }
 
         try {
-            for (Enumeration e = keystore.aliases(); e.hasMoreElements();) {
-                String alias = (String) e.nextElement();
+            for (Enumeration<String> e = keystore.aliases(); e.hasMoreElements();) {
+                String alias = e.nextElement();
                 Certificate[] certs = keystore.getCertificateChain(alias);
                 if (certs == null || certs.length == 0) {
                     // no cert chain, so lets check if getCertificate gives us a result.
@@ -382,8 +383,8 @@ public abstract class CryptoBase implements Crypto {
         }
 
         try {
-            for (Enumeration e = keystore.aliases(); e.hasMoreElements();) {
-                String alias = (String) e.nextElement();
+            for (Enumeration<String> e = keystore.aliases(); e.hasMoreElements();) {
+                String alias = e.nextElement();
                 Certificate[] certs = keystore.getCertificateChain(alias);
                 if (certs == null || certs.length == 0) {
                     // no cert chain, so lets check if getCertificate gives us a result.
@@ -468,8 +469,8 @@ public abstract class CryptoBase implements Crypto {
             return null;
         }
         try {
-            for (Enumeration e = keystore.aliases(); e.hasMoreElements();) {
-                String alias = (String) e.nextElement();
+            for (Enumeration<String> e = keystore.aliases(); e.hasMoreElements();) {
+                String alias = e.nextElement();
                 Certificate[] certs = keystore.getCertificateChain(alias);
                 if (certs == null || certs.length == 0) {
                     // no cert chain, so lets check if getCertificate gives us a  result.
@@ -515,8 +516,8 @@ public abstract class CryptoBase implements Crypto {
             // if (alias != null) {
             //     return alias;
             // }
-            for (Enumeration e = keystore.aliases(); e.hasMoreElements();) {
-                String alias = (String) e.nextElement();
+            for (Enumeration<String> e = keystore.aliases(); e.hasMoreElements();) {
+                String alias = e.nextElement();
                 Certificate retrievedCert = keystore.getCertificate(alias);
                 if (retrievedCert != null && retrievedCert.equals(cert)) {
                     return alias;
@@ -609,8 +610,8 @@ public abstract class CryptoBase implements Crypto {
             );
         }
         try {
-            for (Enumeration e = keystore.aliases(); e.hasMoreElements();) {
-                String alias = (String) e.nextElement();
+            for (Enumeration<String> e = keystore.aliases(); e.hasMoreElements();) {
+                String alias = e.nextElement();
                 Certificate[] certs = keystore.getCertificateChain(alias);
                 if (certs == null || certs.length == 0) {
                     // no cert chain, so lets check if getCertificate gives us a  result.
@@ -746,7 +747,7 @@ public abstract class CryptoBase implements Crypto {
         } catch (java.lang.IllegalArgumentException ex) {
             subject = createBCX509Name(subjectDN);
         }
-        List aliases = null;
+        List<String> aliases = null;
         if (keystore != null) {
             aliases = getAliases(subject, keystore);
         }
@@ -811,10 +812,10 @@ public abstract class CryptoBase implements Crypto {
                 null, e
             );
         }
-        List l = path.getCertificates();
+        List<?> l = path.getCertificates();
         X509Certificate[] certs = new X509Certificate[l.size()];
         int i = 0;
-        for (Iterator iterator = l.iterator(); iterator.hasNext(); ) {
+        for (Iterator<?> iterator = l.iterator(); iterator.hasNext(); ) {
             certs[i++] = (X509Certificate) iterator.next();
         }
         return certs;
@@ -834,14 +835,14 @@ public abstract class CryptoBase implements Crypto {
     ) throws org.apache.ws.security.WSSecurityException {
         try {
             // Generate cert path
-            List certList = Arrays.asList(certs);
+            List<X509Certificate> certList = Arrays.asList(certs);
             CertPath path = getCertificateFactory().generateCertPath(certList);
 
-            Set set = new HashSet();
+            Set<TrustAnchor> set = new HashSet<TrustAnchor>();
             if (truststore != null) {
-                Enumeration truststoreAliases = truststore.aliases();
+                Enumeration<String> truststoreAliases = truststore.aliases();
                 while (truststoreAliases.hasMoreElements()) {
-                    String alias = (String) truststoreAliases.nextElement();
+                    String alias = truststoreAliases.nextElement();
                     X509Certificate cert = 
                         (X509Certificate) truststore.getCertificate(alias);
                     if (cert != null) {
@@ -854,9 +855,9 @@ public abstract class CryptoBase implements Crypto {
 
             // Add certificates from the keystore
             if (keystore != null) {
-                Enumeration aliases = keystore.aliases();
+                Enumeration<String> aliases = keystore.aliases();
                 while (aliases.hasMoreElements()) {
-                    String alias = (String) aliases.nextElement();
+                    String alias = aliases.nextElement();
                     X509Certificate cert = 
                         (X509Certificate) keystore.getCertificate(alias);
                     if (cert != null) {
@@ -933,15 +934,15 @@ public abstract class CryptoBase implements Crypto {
      * @return A list of aliases
      * @throws WSSecurityException
      */
-    private List getAliases(Object subjectRDN, KeyStore store) 
+    private List<String> getAliases(Object subjectRDN, KeyStore store) 
         throws WSSecurityException {
         // Store the aliases found
-        List aliases = new Vector();
+        List<String> aliases = new Vector<String>();
         Certificate cert = null;
         
         try {
-            for (Enumeration e = store.aliases(); e.hasMoreElements();) {
-                String alias = (String) e.nextElement();
+            for (Enumeration<String> e = store.aliases(); e.hasMoreElements();) {
+                String alias = e.nextElement();
 
                 Certificate[] certs = store.getCertificateChain(alias);
                 if (certs == null || certs.length == 0) {

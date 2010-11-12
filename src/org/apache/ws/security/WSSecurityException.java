@@ -23,6 +23,7 @@ import java.rmi.RemoteException;
 import java.text.MessageFormat;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
+import javax.xml.namespace.QName;
 
 /**
  * Exception class for WS-Security.
@@ -50,7 +51,8 @@ public class WSSecurityException extends RemoteException {
      * any parsing of the error code. Note that there are no mappings for "FAILURE", 
      * "FAILED_ENCRYPTION" and "FAILED_SIGNATURE" as these are not standard error messages.
      */
-    private static final java.util.Map FAULT_CODE_MAP = new java.util.HashMap();
+    private static final java.util.Map<Integer, QName> FAULT_CODE_MAP = 
+        new java.util.HashMap<Integer, QName>();
 
     static {
         try {

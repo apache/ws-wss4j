@@ -23,6 +23,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.SOAPConstants;
 import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.xml.security.utils.XMLUtils;
@@ -188,7 +189,7 @@ public class WSS4JHandler extends WSHandler implements Handler {
         /*
         * Get the action first.
         */
-        List actions = new Vector();
+        List<Integer> actions = new Vector<Integer>();
         String action = (String) getOption(WSHandlerConstants.SEND + '.' + WSHandlerConstants.ACTION);
         if (action == null) {
             action = (String) getOption(WSHandlerConstants.ACTION);
@@ -328,9 +329,10 @@ public class WSS4JHandler extends WSHandler implements Handler {
      * @return true on successful processing
      * @throws WSSecurityException
      */
+    @SuppressWarnings("unchecked")
     public boolean doReceiver(MessageContext mc, RequestData reqData, boolean isRequest) throws WSSecurityException {
 
-        List actions = new Vector();
+        List<Integer> actions = new Vector<Integer>();
         String action = (String) getOption(WSHandlerConstants.RECEIVE + '.' + WSHandlerConstants.ACTION);
         if (action == null) {
             action = (String) getOption(WSHandlerConstants.ACTION);
@@ -385,7 +387,7 @@ public class WSS4JHandler extends WSHandler implements Handler {
         * may be used for encryption too.
         */
         doReceiverAction(doAction, reqData);
-        List wsResult = null;
+        List<WSSecurityEngineResult> wsResult = null;
         try {
             wsResult =
                     secEngine.processSecurityHeader(doc,
@@ -456,7 +458,7 @@ public class WSS4JHandler extends WSHandler implements Handler {
             throw new JAXRPCException("WSS4JHandler: cannot get SOAP header after security processing", ex);
         }
 
-        Iterator headers = sHeader.examineHeaderElements(actor);
+        Iterator<?> headers = sHeader.examineHeaderElements(actor);
 
         SOAPHeaderElement headerElement = null;
         while (headers.hasNext()) {
@@ -483,10 +485,10 @@ public class WSS4JHandler extends WSHandler implements Handler {
         * security result structure. The service may fetch this
         * and check it.
         */
-        List results = null;
-        if ((results = (List) mc.getProperty(WSHandlerConstants.RECV_RESULTS))
+        List<WSHandlerResult> results = null;
+        if ((results = (List<WSHandlerResult>) mc.getProperty(WSHandlerConstants.RECV_RESULTS))
                 == null) {
-            results = new Vector();
+            results = new Vector<WSHandlerResult>();
             mc.setProperty(WSHandlerConstants.RECV_RESULTS, results);
         }
         WSHandlerResult rResult =

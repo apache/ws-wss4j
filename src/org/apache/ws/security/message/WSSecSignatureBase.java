@@ -63,9 +63,9 @@ public class WSSecSignatureBase extends WSSecBase {
      * @param digestAlgo The digest algorithm to use
      * @throws WSSecurityException
      */
-    public List addReferencesToSign(
+    public List<javax.xml.crypto.dsig.Reference> addReferencesToSign(
         Document doc,
-        List references,
+        List<WSEncryptionPart> references,
         XMLSignatureFactory signatureFactory,
         WSSecHeader secHeader,
         WSSConfig wssConfig,
@@ -83,11 +83,10 @@ public class WSSecSignatureBase extends WSSecBase {
             );
         }
         
-        List referenceList = new Vector();
+        List<javax.xml.crypto.dsig.Reference> referenceList = 
+            new Vector<javax.xml.crypto.dsig.Reference>();
 
-        for (int part = 0; part < references.size(); part++) {
-            WSEncryptionPart encPart = (WSEncryptionPart) references.get(part);
-
+        for (WSEncryptionPart encPart : references) {
             String idToSign = encPart.getId();
             String elemName = encPart.getName();
 
@@ -109,7 +108,7 @@ public class WSSecSignatureBase extends WSSecBase {
                     }
                     TransformParameterSpec transformSpec = null;
                     if (wssConfig.isWsiBSPCompliant()) {
-                        List prefixes = getInclusivePrefixes(toSignById);
+                        List<String> prefixes = getInclusivePrefixes(toSignById);
                         transformSpec = new ExcC14NParameterSpec(prefixes);
                     }
                     Transform transform =
@@ -158,7 +157,7 @@ public class WSSecSignatureBase extends WSSecBase {
                     }
                     TransformParameterSpec transformSpec = null;
                     if (wssConfig.isWsiBSPCompliant()) {
-                        List prefixes = getInclusivePrefixes(elementToSign);
+                        List<String> prefixes = getInclusivePrefixes(elementToSign);
                         transformSpec = new ExcC14NParameterSpec(prefixes);
                     }
                     Transform transform =
@@ -190,7 +189,7 @@ public class WSSecSignatureBase extends WSSecBase {
     /**
      * Get the List of inclusive prefixes from the DOM Element argument 
      */
-    public List getInclusivePrefixes(Element target) {
+    public List<String> getInclusivePrefixes(Element target) {
         return getInclusivePrefixes(target, true);
     }
     
@@ -198,8 +197,8 @@ public class WSSecSignatureBase extends WSSecBase {
     /**
      * Get the List of inclusive prefixes from the DOM Element argument 
      */
-    public List getInclusivePrefixes(Element target, boolean excludeVisible) {
-        List result = new Vector();
+    public List<String> getInclusivePrefixes(Element target, boolean excludeVisible) {
+        List<String> result = new Vector<String>();
         Node parent = target;
         while (!(Node.DOCUMENT_NODE == parent.getParentNode().getNodeType())) {
             parent = parent.getParentNode();

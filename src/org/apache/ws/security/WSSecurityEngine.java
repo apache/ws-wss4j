@@ -184,7 +184,7 @@ public class WSSecurityEngine {
      * @see WSSecurityEngine#processSecurityHeader(Element securityHeader, CallbackHandler cb,
      * Crypto sigCrypto, Crypto decCrypto)
      */
-    public List processSecurityHeader(
+    public List<WSSecurityEngineResult> processSecurityHeader(
         Document doc,
         String actor,
         CallbackHandler cb,
@@ -215,7 +215,7 @@ public class WSSecurityEngine {
      * @see WSSecurityEngine#processSecurityHeader(
      * Element securityHeader, CallbackHandler cb, Crypto sigCrypto, Crypto decCrypto)
      */
-    public List processSecurityHeader(
+    public List<WSSecurityEngineResult> processSecurityHeader(
         Document doc,
         String actor,
         CallbackHandler cb,
@@ -230,7 +230,7 @@ public class WSSecurityEngine {
         if (actor == null) {
             actor = "";
         }
-        List wsResult = null;
+        List<WSSecurityEngineResult> wsResult = null;
         Element elem = WSSecurityUtil.getSecurityHeader(doc, actor);
         if (elem != null) {
             if (doDebug) {
@@ -280,7 +280,7 @@ public class WSSecurityEngine {
      *         was performed.
      * @throws WSSecurityException
      */
-    protected List processSecurityHeader(
+    protected List<WSSecurityEngineResult> processSecurityHeader(
         Element securityHeader,
         CallbackHandler cb,
         Crypto sigCrypto,
@@ -302,7 +302,7 @@ public class WSSecurityEngine {
         if (tlog.isDebugEnabled()) {
             t1 = System.currentTimeMillis();
         }
-        List returnResults = new Vector();
+        List<WSSecurityEngineResult> returnResults = new Vector<WSSecurityEngineResult>();
         final WSSConfig cfg = getWssConfig();
         Node node = securityHeader.getFirstChild();
         while (node != null) {

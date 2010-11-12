@@ -20,8 +20,8 @@
 package org.apache.ws.security.handler;
 
 import org.apache.ws.security.WSConstants;
-import java.util.Hashtable;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * This class defines the names, actions, and other string for the deployment
@@ -434,7 +434,7 @@ public class WSHandlerConstants {
      * The WSDoAllReceiver handler stores a result <code>Vector</code>
      * in this property.
      * <p/>
-     * The vector contains <code>WSDoAllReceiverResult</code> objects
+     * The vector contains <code>WSHandlerResult</code> objects
      * for each chained WSDoAllReceiver handler.
      */
     public static final String RECV_RESULTS = "RECV_RESULTS";
@@ -839,7 +839,8 @@ public class WSHandlerConstants {
      * </ul>
      * See {@link #SIG_KEY_ID} {@link #ENC_KEY_ID}.
      */
-    public static Map keyIdentifier = new Hashtable();
+    public static Map<String, Integer> keyIdentifier = 
+        new ConcurrentHashMap<String, Integer>();
 
     static {
         keyIdentifier.put("DirectReference",
