@@ -56,7 +56,14 @@ public class SignatureReferenceVerifyInputProcessor extends AbstractInputProcess
     }
 
     @Override
-    public void processEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
+    public XMLEvent processNextHeaderEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
+        return inputProcessorChain.processHeaderEvent();
+    }
+
+    @Override
+    public XMLEvent processNextEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
+        XMLEvent xmlEvent = inputProcessorChain.processEvent();
+
         if (xmlEvent.isStartElement()) {
             StartElement startElement = xmlEvent.asStartElement();
 
@@ -70,7 +77,10 @@ public class SignatureReferenceVerifyInputProcessor extends AbstractInputProcess
                         if (referenceType.isProcessed()) {
                             throw new XMLSecurityException("duplicate id encountered!");
                         }
-                        inputProcessorChain.addProcessor(new InternalSignatureReferenceVerifier(getSecurityProperties(), referenceType, startElement.getName()));
+                        InternalSignatureReferenceVerifier internalSignatureReferenceVerifier =
+                                new InternalSignatureReferenceVerifier(getSecurityProperties(), referenceType, startElement.getName());
+                        internalSignatureReferenceVerifier.processEvent(xmlEvent, inputProcessorChain);
+                        inputProcessorChain.addProcessor(internalSignatureReferenceVerifier);
                         referenceType.setProcessed(true);
                         inputProcessorChain.getDocumentContext().setIsInSignedContent();
 
@@ -94,7 +104,7 @@ public class SignatureReferenceVerifyInputProcessor extends AbstractInputProcess
             }
         }
 
-        inputProcessorChain.processEvent(xmlEvent);
+        return xmlEvent;
     }
 
     @Override
@@ -144,13 +154,18 @@ public class SignatureReferenceVerifyInputProcessor extends AbstractInputProcess
         }
 
         @Override
-        public void processSecurityHeaderEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
-            inputProcessorChain.processSecurityHeaderEvent(xmlEvent);
+        public XMLEvent processNextHeaderEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
+            return inputProcessorChain.processHeaderEvent();
         }
 
         @Override
-        public void processEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
+        public XMLEvent processNextEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
+            XMLEvent xmlEvent = inputProcessorChain.processEvent();
+            processEvent(xmlEvent, inputProcessorChain);
+            return xmlEvent;
+        }
 
+        protected void processEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
             for (int i = 0; i < transformers.size(); i++) {
                 Transformer transformer = transformers.get(i);
                 transformer.transform(xmlEvent, this.bufferedDigestOutputStream);
@@ -184,7 +199,6 @@ public class SignatureReferenceVerifyInputProcessor extends AbstractInputProcess
                     inputProcessorChain.getDocumentContext().unsetIsInSignedContent();
                 }
             }
-            inputProcessorChain.processEvent(xmlEvent);
         }
     }
 }

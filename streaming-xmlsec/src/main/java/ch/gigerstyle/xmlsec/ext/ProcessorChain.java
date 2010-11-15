@@ -27,7 +27,5 @@ public interface ProcessorChain {
 
     public void reset();
 
-    public void processEvent(XMLEvent xmlEvent) throws XMLStreamException, XMLSecurityException;
-
     public void doFinal() throws XMLStreamException, XMLSecurityException;
 }

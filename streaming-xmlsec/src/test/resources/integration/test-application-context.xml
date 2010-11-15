@@ -22,6 +22,7 @@
     </bean>
 
     <jaxws:endpoint id="greeterService" implementor="#greeterServiceImpl"
+                    wsdlLocation="classpath:integration/helloWorld.wsdl"                    
                     address="http://localhost:9001/GreeterService">
         <jaxws:inInterceptors>
             <ref bean="securityInInterceptor"/>
@@ -51,6 +52,7 @@
             </list>
         </property>
         <property name="encryptionUser" value="transmitter"/>
+        <property name="skipDocumentEvents" value="true"/>
     </bean>
 
     <!-- set decryptionKeystore in securityProperties -->
@@ -106,6 +108,7 @@
 
 
     <jaxws:endpoint id="greeterServiceWSS4J" implementor="#greeterServiceImpl"
+                    wsdlLocation="classpath:integration/helloWorld.wsdl"
                     address="http://localhost:9001/GreeterServiceWSS4J">
         <jaxws:inInterceptors>
             <ref bean="wss4jInInterceptor"/>

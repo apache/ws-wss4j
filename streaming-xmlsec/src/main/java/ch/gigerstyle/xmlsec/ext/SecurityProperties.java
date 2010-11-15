@@ -368,4 +368,14 @@ public class SecurityProperties {
     public void setStrictTimestampCheck(boolean strictTimestampCheck) {
         this.strictTimestampCheck = strictTimestampCheck;
     }
+
+    private boolean skipDocumentEvents = false;
+
+    public boolean isSkipDocumentEvents() {
+        return skipDocumentEvents;
+    }
+
+    public void setSkipDocumentEvents(boolean skipDocumentEvents) {
+        this.skipDocumentEvents = skipDocumentEvents;
+    }
 }

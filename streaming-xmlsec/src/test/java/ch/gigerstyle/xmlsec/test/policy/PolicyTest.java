@@ -8,6 +8,7 @@ import ch.gigerstyle.xmlsec.policy.PolicyEnforcerFactory;
 import ch.gigerstyle.xmlsec.policy.PolicyInputProcessor;
 import ch.gigerstyle.xmlsec.test.AbstractTestBase;
 import ch.gigerstyle.xmlsec.test.CallbackHandlerImpl;
+import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.w3c.dom.Document;
 
@@ -54,7 +55,7 @@ public class PolicyTest extends AbstractTestBase {
         //outSecurityProperties.addEncryptionPart(new SecurePart(Constants.TAG_wsu_Timestamp.getLocalPart(), Constants.TAG_wsu_Timestamp.getNamespaceURI(), "Element"));
         outSecurityProperties.addEncryptionPart(new SecurePart(Constants.TAG_wsu_Created.getLocalPart(), Constants.TAG_wsu_Created.getNamespaceURI(), "Element"));
         outSecurityProperties.addEncryptionPart(new SecurePart(Constants.TAG_wsu_Expires.getLocalPart(), Constants.TAG_wsu_Expires.getNamespaceURI(), "Content"));
-        outSecurityProperties.addEncryptionPart(new SecurePart(Constants.TAG_soap11_Body.getLocalPart(), Constants.TAG_soap11_Body.getNamespaceURI(), "Element"));
+        outSecurityProperties.addEncryptionPart(new SecurePart(Constants.TAG_soap11_Body.getLocalPart(), Constants.TAG_soap11_Body.getNamespaceURI(), "Content"));
         Constants.Action[] actions = new Constants.Action[]{Constants.Action.TIMESTAMP, Constants.Action.SIGNATURE, Constants.Action.ENCRYPT};
         outSecurityProperties.setOutAction(actions);
 
@@ -83,13 +84,5 @@ public class PolicyTest extends AbstractTestBase {
                     }
                 }
         ));
-    }
-
-    @Test
-    public void testPolicyParsing() throws Exception {
-        //Policy policy = PolicyEngine.getPolicy(this.getClass().getClassLoader().getResourceAsStream("testdata/policy/policy1.xml"));
-        //System.out.println(policy);
-
-        //PolicyEnforcer policyEnforcer = new PolicyEnforcer(this.getClass().getClassLoader().getResource("testdata/wsdl/wsdl.wsdl"), null);
     }
 }

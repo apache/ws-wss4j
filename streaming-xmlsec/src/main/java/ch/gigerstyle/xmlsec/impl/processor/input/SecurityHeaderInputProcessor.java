@@ -31,74 +31,78 @@ import javax.xml.stream.events.XMLEvent;
 public class SecurityHeaderInputProcessor extends AbstractInputProcessor {
 
     private FiFoQueue<XMLEvent> xmlEventList = new FiFoQueue<XMLEvent>();
-    private InternalSecurityHeaderProcessor internalSecurityHeaderProcessor;
+    private int eventCount = 0;
     private int countOfEventsToResponsibleSecurityHeader = 0;
 
-    public SecurityHeaderInputProcessor(SecurityProperties securityProperties, InputProcessorChain inputProcessorChain) {
+    public SecurityHeaderInputProcessor(SecurityProperties securityProperties) {
         super(securityProperties);
-        setPhase(Constants.Phase.PREPROCESSING);
-
-        internalSecurityHeaderProcessor = new InternalSecurityHeaderProcessor(securityProperties);
-        inputProcessorChain.addProcessor(internalSecurityHeaderProcessor);
+        setPhase(Constants.Phase.POSTPROCESSING);
     }
 
     @Override
-    public void processEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
+    public XMLEvent processNextHeaderEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
+        return null;
+    }
 
-        //todo multiple security headers, actors etc
+    @Override
+    public XMLEvent processNextEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
 
-        if (xmlEvent.isStartElement()) {
-            StartElement startElement = xmlEvent.asStartElement();
-            if (inputProcessorChain.getDocumentContext().getDocumentLevel() == 3
-                    && inputProcessorChain.getDocumentContext().isInSOAPHeader()
-                    && startElement.getName().equals(Constants.TAG_wsse_Security)) {
-                inputProcessorChain.getDocumentContext().setInSecurityHeader(true);
-            }
-            if (inputProcessorChain.getDocumentContext().getDocumentLevel() == 4
-                    && inputProcessorChain.getDocumentContext().isInSecurityHeader()) {
-                engageProcessor(inputProcessorChain, startElement, getSecurityProperties());
-            }
-            if (startElement.getName().equals(Constants.TAG_soap11_Body) && !xmlEventList.isEmpty()) {
-                throw new XMLSecurityException("No Security");
-            }
-        }
+        InputProcessorChain subInputProcessorChain = inputProcessorChain.createSubChain(this);
+        InternalSecurityHeaderBufferProcessor internalSecurityHeaderBufferProcessor = new InternalSecurityHeaderBufferProcessor(getSecurityProperties());
+        subInputProcessorChain.addProcessor(internalSecurityHeaderBufferProcessor);
 
-        if (inputProcessorChain.getDocumentContext().isInSecurityHeader()) {
-            inputProcessorChain.processSecurityHeaderEvent(xmlEvent);
-        } else {
-            xmlEventList.enqueue(xmlEvent);
-            countOfEventsToResponsibleSecurityHeader++;
-        }
+        XMLEvent xmlEvent;
+        do {
+            subInputProcessorChain.reset();
+            xmlEvent = subInputProcessorChain.processHeaderEvent();
 
-        if (xmlEvent.isEndElement()) {
-            EndElement endElement = xmlEvent.asEndElement();
-            if (inputProcessorChain.getDocumentContext().getDocumentLevel() == 3
-                    && endElement.getName().equals(Constants.TAG_wsse_Security)) {
-                inputProcessorChain.getDocumentContext().setInSecurityHeader(false);
-                inputProcessorChain.removeProcessor(internalSecurityHeaderProcessor);
+            eventCount++;
 
-                InputProcessorChain subInputProcessorChain = inputProcessorChain.createSubChain(this);
-                //since we are replaying the whole envelope strip the path:
-                subInputProcessorChain.getDocumentContext().getPath().clear();
-                //replay all events in "normal" processing chain
-                int eventCount = 0;
-                while (!xmlEventList.isEmpty()) {
-                    XMLEvent event = xmlEventList.dequeue();
-                    if (eventCount == countOfEventsToResponsibleSecurityHeader) {
-                        subInputProcessorChain.getDocumentContext().setInSecurityHeader(true);
-                    }
-                    subInputProcessorChain.reset();
-                    subInputProcessorChain.processEvent(event);
-                    eventCount++;
+            if (xmlEvent.isStartElement()) {
+                StartElement startElement = xmlEvent.asStartElement();
+                if (subInputProcessorChain.getDocumentContext().getDocumentLevel() == 3
+                        && subInputProcessorChain.getDocumentContext().isInSOAPHeader()
+                        && startElement.getName().equals(Constants.TAG_wsse_Security)) {
+
+                    subInputProcessorChain.getDocumentContext().setInSecurityHeader(true);
+                    //minus one because the first event will be deqeued when finished security header. @see below
+                    countOfEventsToResponsibleSecurityHeader = eventCount - 1;
+
+                } else if (subInputProcessorChain.getDocumentContext().getDocumentLevel() == 4
+                        && subInputProcessorChain.getDocumentContext().isInSecurityHeader()) {
+
+                    engageProcessor(subInputProcessorChain, startElement, getSecurityProperties());
                 }
-
-                countOfEventsToResponsibleSecurityHeader = 0;
-                subInputProcessorChain.getDocumentContext().setInSecurityHeader(false);
-
-                //remove this processor from chain now. the next events will go directly to the other processors
-                inputProcessorChain.removeProcessor(this);
             }
-        }
+
+            if (xmlEvent.isEndElement()) {
+                EndElement endElement = xmlEvent.asEndElement();
+                if (subInputProcessorChain.getDocumentContext().getDocumentLevel() == 2
+                        && endElement.getName().equals(Constants.TAG_wsse_Security)) {
+
+                    subInputProcessorChain.getDocumentContext().setInSecurityHeader(false);
+                    subInputProcessorChain.removeProcessor(internalSecurityHeaderBufferProcessor);
+                    subInputProcessorChain.addProcessor(
+                            new InternalSecurityHeaderReplayProcessor(getSecurityProperties(),
+                                    countOfEventsToResponsibleSecurityHeader,
+                                    //minus one because the first event will be deqeued when finished security header. @see below
+                                    eventCount - 1));
+
+                    //since we are replaying the whole envelope strip the path:
+                    subInputProcessorChain.getDocumentContext().getPath().clear();
+                    //remove this processor from chain now. the next events will go directly to the other processors
+                    subInputProcessorChain.removeProcessor(this);
+
+                    countOfEventsToResponsibleSecurityHeader = 0;
+
+                    //return first event now;
+                    return xmlEventList.dequeue();
+                }
+            }
+
+        } while (!(xmlEvent.isStartElement() && xmlEvent.asStartElement().equals(Constants.TAG_soap11_Body)));
+
+        throw new XMLSecurityException("No Security");
     }
 
     //todo move this method. DecryptProcessor should not have a dependency to this processor
@@ -106,35 +110,85 @@ public class SecurityHeaderInputProcessor extends AbstractInputProcessor {
 
     public static void engageProcessor(InputProcessorChain inputProcessorChain, StartElement startElement, SecurityProperties securityProperties) {
         if (startElement.getName().equals(Constants.TAG_wsse_BinarySecurityToken)) {
-            inputProcessorChain.addProcessor(new BinarySecurityTokenInputProcessor(securityProperties));
+            inputProcessorChain.addProcessor(new BinarySecurityTokenInputProcessor(securityProperties, startElement));
         } else if (startElement.getName().equals(Constants.TAG_xenc_EncryptedKey)) {
-            inputProcessorChain.addProcessor(new EncryptedKeyInputProcessor(securityProperties));
+            inputProcessorChain.addProcessor(new EncryptedKeyInputProcessor(securityProperties, startElement));
         } else if (startElement.getName().equals(Constants.TAG_dsig_Signature)) {
-            inputProcessorChain.addProcessor(new SignatureInputProcessor(securityProperties));
+            inputProcessorChain.addProcessor(new SignatureInputProcessor(securityProperties, startElement));
         } else if (startElement.getName().equals(Constants.TAG_wsu_Timestamp)) {
-            inputProcessorChain.addProcessor(new TimestampInputProcessor(securityProperties));
+            inputProcessorChain.addProcessor(new TimestampInputProcessor(securityProperties, startElement));
         } else if (startElement.getName().equals(Constants.TAG_xenc_ReferenceList)) {
-            inputProcessorChain.addProcessor(new ReferenceListInputProcessor(securityProperties));
+            inputProcessorChain.addProcessor(new ReferenceListInputProcessor(securityProperties, startElement));
         }
     }
 
-    public class InternalSecurityHeaderProcessor extends AbstractInputProcessor {
+    public class InternalSecurityHeaderBufferProcessor extends AbstractInputProcessor {
 
-        InternalSecurityHeaderProcessor(SecurityProperties securityProperties) {
+        InternalSecurityHeaderBufferProcessor(SecurityProperties securityProperties) {
             super(securityProperties);
             setPhase(Constants.Phase.POSTPROCESSING);
-            getBeforeProcessors().add(PipedInputProcessor.class.getName());
+            getBeforeProcessors().add(SecurityHeaderInputProcessor.class.getName());
         }
 
         @Override
-        public void processSecurityHeaderEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
+        public XMLEvent processNextHeaderEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
+            XMLEvent xmlEvent = inputProcessorChain.processHeaderEvent();
             xmlEventList.enqueue(xmlEvent);
+            return xmlEvent;
         }
 
         @Override
-        public void processEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
+        public XMLEvent processNextEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
             //should never be called because we remove this processor before
-            inputProcessorChain.processEvent(xmlEvent);
+            return null;
+        }
+    }
+
+    public class InternalSecurityHeaderReplayProcessor extends AbstractInputProcessor {
+
+        private int countOfEventsToResponsibleSecurityHeader = 0;
+        private int countOfEventsUntilEndOfResponsibleSecurityHeader = 0;
+        private int eventCount = 0;
+
+        public InternalSecurityHeaderReplayProcessor(SecurityProperties securityProperties, int countOfEventsToResponsibleSecurityHeader, int countOfEventsUntilEndOfResponsibleSecurityHeader) {
+            super(securityProperties);
+            setPhase(Constants.Phase.PREPROCESSING);
+            getBeforeProcessors().add(SecurityHeaderInputProcessor.class.getName());
+            getAfterProcessors().add(XMLStreamReaderInputProcessor.class.getName());
+            this.countOfEventsToResponsibleSecurityHeader = countOfEventsToResponsibleSecurityHeader;
+            this.countOfEventsUntilEndOfResponsibleSecurityHeader = countOfEventsUntilEndOfResponsibleSecurityHeader;
+        }
+
+        @Override
+        public XMLEvent processNextHeaderEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
+            return null;
+        }
+
+        @Override
+        public XMLEvent processNextEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
+
+            if (!xmlEventList.isEmpty()) {
+                eventCount++;
+
+                if (eventCount == countOfEventsToResponsibleSecurityHeader) {
+                    inputProcessorChain.getDocumentContext().setInSecurityHeader(true);
+                }
+                if (eventCount == countOfEventsUntilEndOfResponsibleSecurityHeader) {
+                    inputProcessorChain.getDocumentContext().setInSecurityHeader(false);
+                }
+
+                XMLEvent xmlEvent = xmlEventList.dequeue();
+                if (xmlEvent.isStartElement()) {
+                    inputProcessorChain.getDocumentContext().addPathElement(xmlEvent.asStartElement().getName());
+                } else if (xmlEvent.isEndElement()) {
+                    inputProcessorChain.getDocumentContext().removePathElement();
+                }
+                return xmlEvent;
+
+            } else {
+                inputProcessorChain.removeProcessor(this);
+                return inputProcessorChain.processEvent();
+            }
         }
     }
 }

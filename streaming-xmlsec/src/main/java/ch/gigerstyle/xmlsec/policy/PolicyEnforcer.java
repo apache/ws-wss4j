@@ -117,6 +117,15 @@ public class PolicyEnforcer implements SecurityEventListener {
                     notAssertedCount++;
                 }
             }
+            //todo hmm this is not correct:
+            //if you have e.g. an IncludeTimeStamp (which must be signed per policy-spec) and a signedElement assertion
+            //and one of them is asserted, we will always return true. We have to do somehow an additional
+            //check if some of the assertions in assertionStates belongs to the same alternative.
+            //Sample: the following policy will always return true when one of them is fullfilled:
+            //<sp:IncludeTimestamp/>
+            //<sp:SignedElements>
+            //<sp:XPath xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">wsu:Created</sp:XPath>
+            //</sp:SignedElements>
             if (notAssertedCount == assertionStates.size()) {
                 logFailedAssertions();
                 throw new WSSPolicyException("No policy alternative could be satisfied");

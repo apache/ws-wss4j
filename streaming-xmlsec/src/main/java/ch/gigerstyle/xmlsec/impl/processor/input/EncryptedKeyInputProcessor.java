@@ -41,10 +41,10 @@ import java.util.Hashtable;
 public class EncryptedKeyInputProcessor extends AbstractInputProcessor {
 
     private EncryptedKeyType currentEncryptedKeyType;
-    private boolean isFinishedcurrentEncryptedKey = false;
 
-    public EncryptedKeyInputProcessor(SecurityProperties securityProperties) {
+    public EncryptedKeyInputProcessor(SecurityProperties securityProperties, StartElement startElement) {
         super(securityProperties);
+        currentEncryptedKeyType = new EncryptedKeyType(startElement);
     }
 
     /*
@@ -66,7 +66,11 @@ public class EncryptedKeyInputProcessor extends AbstractInputProcessor {
      */
 
     @Override
-    public void processSecurityHeaderEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
+    public XMLEvent processNextHeaderEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
+        XMLEvent xmlEvent = inputProcessorChain.processHeaderEvent();
+
+        boolean isFinishedcurrentEncryptedKey = false;
+
         if (currentEncryptedKeyType != null) {
             try {
                 isFinishedcurrentEncryptedKey = currentEncryptedKeyType.parseXMLEvent(xmlEvent);
@@ -75,11 +79,6 @@ public class EncryptedKeyInputProcessor extends AbstractInputProcessor {
                 }
             } catch (ParseException e) {
                 throw new XMLSecurityException(e);
-            }
-        } else if (xmlEvent.isStartElement()) {
-            StartElement startElement = xmlEvent.asStartElement();
-            if (startElement.getName().equals(Constants.TAG_xenc_EncryptedKey)) {
-                currentEncryptedKeyType = new EncryptedKeyType(startElement);
             }
         }
 
@@ -169,16 +168,15 @@ public class EncryptedKeyInputProcessor extends AbstractInputProcessor {
             finally {
                 inputProcessorChain.removeProcessor(this);
                 currentEncryptedKeyType = null;
-                isFinishedcurrentEncryptedKey = false;
             }
         }
 
-        inputProcessorChain.processSecurityHeaderEvent(xmlEvent);
+        return xmlEvent;
     }
 
     @Override
-    public void processEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
+    public XMLEvent processNextEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
         //this method should not be called (processor will be removed after processing header
-        inputProcessorChain.processEvent(xmlEvent);
+        return null;
     }
 }

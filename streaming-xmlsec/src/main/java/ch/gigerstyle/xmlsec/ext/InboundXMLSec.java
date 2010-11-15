@@ -1,11 +1,10 @@
 package ch.gigerstyle.xmlsec.ext;
 
+import ch.gigerstyle.xmlsec.impl.DocumentContextImpl;
 import ch.gigerstyle.xmlsec.impl.InputProcessorChainImpl;
 import ch.gigerstyle.xmlsec.impl.XMLEventNSAllocator;
-import ch.gigerstyle.xmlsec.impl.processor.input.LogInputProcessor;
-import ch.gigerstyle.xmlsec.impl.processor.input.PipedInputProcessor;
-import ch.gigerstyle.xmlsec.impl.processor.input.PipedXMLStreamReader;
-import ch.gigerstyle.xmlsec.impl.processor.input.SecurityHeaderInputProcessor;
+import ch.gigerstyle.xmlsec.impl.XMLSecurityStreamReader;
+import ch.gigerstyle.xmlsec.impl.processor.input.*;
 import ch.gigerstyle.xmlsec.securityEvent.SecurityEventListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -69,57 +68,22 @@ public class InboundXMLSec {
         securityContextImpl.put(Constants.XMLINPUTFACTORY, xmlInputFactory);
         final XMLEventReader xmlEventReader = xmlInputFactory.createXMLEventReader(xmlStreamReader);
 
-        final PipedXMLStreamReader pipedXMLStreamReader = new PipedXMLStreamReader(20);
-        final PipedInputProcessor pipedInputProcessor = new PipedInputProcessor(pipedXMLStreamReader, securityProperties);
+        DocumentContextImpl documentContext = new DocumentContextImpl();
+        documentContext.setEncoding(xmlStreamReader.getEncoding() != null ? xmlStreamReader.getEncoding() : "UTF-8");
+        InputProcessorChainImpl inputProcessorChain = new InputProcessorChainImpl(securityContextImpl, documentContext);
+        inputProcessorChain.addProcessor(new XMLStreamReaderInputProcessor(securityProperties, xmlEventReader));
+        inputProcessorChain.addProcessor(new SecurityHeaderInputProcessor(securityProperties));
 
-        Runnable runnable = new Runnable() {
+        if (log.isTraceEnabled()) {
+            inputProcessorChain.addProcessor(new LogInputProcessor(securityProperties));
+        }
 
-            public void run() {
+        List<InputProcessor> additionalInputProcessors = securityProperties.getInputProcessorList();
+        for (int i = 0; i < additionalInputProcessors.size(); i++) {
+            InputProcessor inputProcessor = additionalInputProcessors.get(i);
+            inputProcessorChain.addProcessor(inputProcessor);
+        }
 
-                try {
-
-                    pipedXMLStreamReader.setWriteSide(Thread.currentThread());
-
-                    long start = System.currentTimeMillis();
-
-                    InputProcessorChainImpl processorChain = new InputProcessorChainImpl(securityContextImpl);
-
-                    processorChain.addProcessor(new SecurityHeaderInputProcessor(securityProperties, processorChain));
-                    processorChain.addProcessor(pipedInputProcessor);
-
-                    List<InputProcessor> additionalInputProcessors = securityProperties.getInputProcessorList();
-                    for (int i = 0; i < additionalInputProcessors.size(); i++) {
-                        InputProcessor inputProcessor = additionalInputProcessors.get(i);
-                        processorChain.addProcessor(inputProcessor);
-                    }
-
-                    if (log.isTraceEnabled()) {
-                        processorChain.addProcessor(new LogInputProcessor(securityProperties));
-                    }
-
-                    while (xmlEventReader.hasNext()) {
-                        XMLEvent xmlEvent = xmlEventReader.nextEvent();
-                        if (xmlEvent.isStartDocument() || xmlEvent.isEndDocument()) {
-                            continue;
-                        }
-                        processorChain.processEvent(xmlEvent);
-                        processorChain.reset();
-                    }
-                    processorChain.doFinal();
-
-                    log.debug("Chain processing time: " + (System.currentTimeMillis() - start));
-
-                } catch (Exception e) {
-                    throw new UncheckedXMLSecurityException(e);
-                }
-            }
-        };
-
-        Thread thread = new Thread(runnable);
-        thread.setName("main security processing thread");
-        thread.setUncaughtExceptionHandler(pipedXMLStreamReader);
-        thread.start();
-
-        return pipedXMLStreamReader;
+        return new XMLSecurityStreamReader(inputProcessorChain, securityProperties);
     }
 }

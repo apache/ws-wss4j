@@ -10,7 +10,8 @@ import org.apache.hello_world_soap_http.Greeter;
 import org.apache.hello_world_soap_http.SOAPService;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-import org.testng.annotations.*;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 /**
  * User: giger
@@ -60,7 +61,7 @@ public class CXFIntegrationTest {
             wss4JInInterceptor.setProperty(WSHandlerConstants.SIG_PROP_FILE, "integration/transmitter-crypto.properties");
             wss4JInInterceptor.setProperty(WSHandlerConstants.DEC_PROP_FILE, "integration/transmitter-crypto.properties");
             client.getInInterceptors().add(wss4JInInterceptor);
-            
+
             greeterStream.greetMe("Cold start");
         }
 

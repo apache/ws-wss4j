@@ -58,6 +58,7 @@ public abstract class AbstractInputProcessor implements InputProcessor {
         return afterProcessors;
     }
 
+    /*
     public void processSecurityHeaderEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
         inputProcessorChain.processSecurityHeaderEvent(xmlEvent);
     }
@@ -65,12 +66,17 @@ public abstract class AbstractInputProcessor implements InputProcessor {
     public void processNextSecurityHeaderEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
         processSecurityHeaderEvent(xmlEvent, inputProcessorChain);
     }
+    */
 
-    public abstract void processEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException;
+    public abstract XMLEvent processNextHeaderEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException;
 
-    public void processNextEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
+    //public abstract void processEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException;
+
+    /*public void processNextEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
         processEvent(xmlEvent, inputProcessorChain);
     }
+      */
+    public abstract XMLEvent processNextEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException;
 
     public void doFinal(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
         inputProcessorChain.doFinal();

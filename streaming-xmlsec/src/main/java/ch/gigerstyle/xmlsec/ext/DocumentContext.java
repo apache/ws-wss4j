@@ -25,6 +25,12 @@ import java.util.List;
  */
 public interface DocumentContext {
 
+    public String getEncoding();
+
+    public void addPathElement(QName qName);
+
+    public QName removePathElement();
+
     public List<QName> getPath();
 
     public QName getParentElement(int eventType);

@@ -17,9 +17,9 @@ import javax.crypto.NoSuchPaddingException;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.Attribute;
-import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 import java.io.*;
@@ -53,10 +53,7 @@ import java.util.UUID;
 public class DecryptInputProcessor extends AbstractInputProcessor {
 
     private ReferenceList referenceList;
-
     private EncryptedDataType currentEncryptedDataType;
-    private boolean isFinishedcurrentEncryptedDataType = false;
-    private boolean isCipherValue = false;
 
     public DecryptInputProcessor(ReferenceList referenceList, SecurityProperties securityProperties) {
         super(securityProperties);
@@ -80,34 +77,20 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
      */
 
     @Override
-    public void processSecurityHeaderEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
-        processEvent(xmlEvent, inputProcessorChain, true);
+    public XMLEvent processNextHeaderEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
+        XMLEvent xmlEvent = inputProcessorChain.processHeaderEvent();
+        return processEvent(xmlEvent, inputProcessorChain, true);
     }
 
     @Override
-    public void processEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
-        processEvent(xmlEvent, inputProcessorChain, false);
+    public XMLEvent processNextEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
+        XMLEvent xmlEvent = inputProcessorChain.processEvent();
+        return processEvent(xmlEvent, inputProcessorChain, false);
     }
 
-    private void processEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain, boolean isSecurityHeaderEvent) throws XMLStreamException, XMLSecurityException {
+    private XMLEvent processEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain, boolean isSecurityHeaderEvent) throws XMLStreamException, XMLSecurityException {
 
         //todo overall null checks
-
-        //todo this self made parsing is ugly as hell. An idea would be to use JAXB with a custom WS-Security schema.
-        //todo the schema would have only the declared the elements which we are supporting. Other
-
-        //dont handle the whole CipherValue subtree here
-        if (currentEncryptedDataType != null && !(Constants.TAG_xenc_CipherValue.equals(inputProcessorChain.getDocumentContext().getParentElement(xmlEvent.getEventType())))) {
-            try {
-                isFinishedcurrentEncryptedDataType = currentEncryptedDataType.parseXMLEvent(xmlEvent);
-                //todo validation will never be called because we abort early (see above if condition)
-                if (isFinishedcurrentEncryptedDataType) {
-                    currentEncryptedDataType.validate();
-                }
-            } catch (ParseException e) {
-                throw new XMLSecurityException(e);
-            }
-        }
 
         if (xmlEvent.isStartElement()) {
             StartElement startElement = xmlEvent.asStartElement();
@@ -126,6 +109,7 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
                             currentEncryptedDataType = new EncryptedDataType(startElement);
 
                             referenceType.setProcessed(true);
+                            //todo move in decryptThread?
                             inputProcessorChain.getDocumentContext().setIsInEncryptedContent();
 
                             //only fire here ContentEncryptedElementEvents
@@ -136,48 +120,70 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
                                         && inputProcessorChain.getDocumentContext().isInSOAPBody()
                                         && Constants.TAG_soap11_Body.equals(parentElement)) {
                                     //soap:body content encryption counts as EncryptedPart
-                                    EncryptedPartSecurityEvent encryptedPartSecurityEvent = new EncryptedPartSecurityEvent(SecurityEvent.Event.EncryptedPart, false);
+                                    EncryptedPartSecurityEvent encryptedPartSecurityEvent =
+                                            new EncryptedPartSecurityEvent(SecurityEvent.Event.EncryptedPart, false);
                                     encryptedPartSecurityEvent.setElement(parentElement);
                                     inputProcessorChain.getSecurityContext().registerSecurityEvent(encryptedPartSecurityEvent);
                                 } else {
-                                    ContentEncryptedElementSecurityEvent contentEncryptedElementSecurityEvent = new ContentEncryptedElementSecurityEvent(SecurityEvent.Event.ContentEncrypted, false);
+                                    ContentEncryptedElementSecurityEvent contentEncryptedElementSecurityEvent =
+                                            new ContentEncryptedElementSecurityEvent(SecurityEvent.Event.ContentEncrypted, false);
                                     contentEncryptedElementSecurityEvent.setElement(parentElement);
                                     inputProcessorChain.getSecurityContext().registerSecurityEvent(contentEncryptedElementSecurityEvent);
                                 }
                             }
+
+                            InputProcessorChain subInputProcessorChain = inputProcessorChain.createSubChain(this);
+
+                            XMLEvent encryptedDataXMLEvent;
+                            do {
+                                subInputProcessorChain.reset();
+                                if (isSecurityHeaderEvent) {
+                                    encryptedDataXMLEvent = subInputProcessorChain.processHeaderEvent();
+                                } else {
+                                    encryptedDataXMLEvent = subInputProcessorChain.processEvent();
+                                }
+
+                                //todo this self made parsing is ugly as hell. An idea would be to use JAXB with a custom WS-Security schema.
+                                //todo the schema would have only the declared the elements which we are supporting.
+                                try {
+                                    currentEncryptedDataType.parseXMLEvent(encryptedDataXMLEvent);
+                                } catch (ParseException e) {
+                                    throw new XMLSecurityException(e);
+                                }
+                            }
+                            while (!(encryptedDataXMLEvent.isStartElement() && encryptedDataXMLEvent.asStartElement().getName().equals(Constants.TAG_xenc_CipherValue)));
+
+                            try {
+                                currentEncryptedDataType.validate();
+                            } catch (ParseException e) {
+                                throw new XMLSecurityException(e);
+                            }
+
+                            DecryptionThread decryptionThread = new DecryptionThread(subInputProcessorChain, isSecurityHeaderEvent,
+                                    currentEncryptedDataType, (XMLEventNS) xmlEvent);
+
+                            Thread receiverThread = new Thread(decryptionThread);
+                            receiverThread.setName("decrypting thread");
+                            receiverThread.start();
+
+                            inputProcessorChain.getDocumentContext().removePathElement();
+
+                            DecryptedEventReaderInputProcessor decryptedEventReaderInputProcessor = decryptionThread.getDecryptedStreamInputProcessor();
+                            receiverThread.setUncaughtExceptionHandler(decryptedEventReaderInputProcessor);
+                            inputProcessorChain.addProcessor(decryptedEventReaderInputProcessor);
+                            if (isSecurityHeaderEvent) {
+                                return decryptedEventReaderInputProcessor.processNextHeaderEvent(inputProcessorChain);
+                            } else {
+                                return decryptedEventReaderInputProcessor.processNextEvent(inputProcessorChain);
+                            }
                         }
                     }
                 }
-            } else if (currentEncryptedDataType != null && startElement.getName().equals(Constants.TAG_xenc_CipherValue)) {
-                InternalDecryptProcessor internalDecryptProcessor = new InternalDecryptProcessor(getSecurityProperties(), (XMLEventNS) xmlEvent, currentEncryptedDataType);
-                inputProcessorChain.addProcessor(internalDecryptProcessor);
-                isCipherValue = true;
-                return;
             }
-        } else if (xmlEvent.isEndElement()) {
-            EndElement endElement = xmlEvent.asEndElement();
-            if (endElement.getName().equals(Constants.TAG_xenc_EncryptedData)) {
-                currentEncryptedDataType = null;
-                isFinishedcurrentEncryptedDataType = false;
-                inputProcessorChain.getDocumentContext().unsetIsInEncryptedContent();
-                return;
-            } else if (currentEncryptedDataType != null && endElement.getName().equals(Constants.TAG_xenc_CipherValue)) {
-                if (isSecurityHeaderEvent) {
-                    inputProcessorChain.processSecurityHeaderEvent(xmlEvent);
-                } else {
-                    inputProcessorChain.processEvent(xmlEvent);
-                }
-                isCipherValue = false;
-            }
+        } else if (xmlEvent.isEndElement() && currentEncryptedDataType != null) {
+            currentEncryptedDataType = null;            
         }
-
-        if (isCipherValue || currentEncryptedDataType == null) {
-            if (isSecurityHeaderEvent) {
-                inputProcessorChain.processSecurityHeaderEvent(xmlEvent);
-            } else {
-                inputProcessorChain.processEvent(xmlEvent);
-            }
-        }
+        return xmlEvent;
     }
 
     @Override
@@ -192,58 +198,191 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
         inputProcessorChain.doFinal();
     }
 
-    class InternalDecryptProcessor extends AbstractInputProcessor implements Thread.UncaughtExceptionHandler {
+    class DecryptedEventReaderInputProcessor extends AbstractInputProcessor implements Thread.UncaughtExceptionHandler {
 
-        private Throwable thrownExceptionByReader = null;
+        private XMLEventReader xmlEventReader;
+        private QName wrapperElementName;
+        private EncryptionPartDef.Modifier encryptionModifier;
+        private int documentLevel = 0;
 
-        private Cipher symmetricCipher;
-        private OutputStream decryptOutputStream;
-        private OutputStream pipedOutputStream;
-        private boolean isFirstCall = true;
+        private boolean rootElementProcessed;
+
+        DecryptedEventReaderInputProcessor(SecurityProperties securityProperties, XMLEventReader xmlEventReader,
+                                           QName wrapperElementName, EncryptionPartDef.Modifier encryptionModifier) {
+            super(securityProperties);
+            getAfterProcessors().add(DecryptInputProcessor.class.getName());
+            getAfterProcessors().add(DecryptedEventReaderInputProcessor.class.getName());
+            this.xmlEventReader = xmlEventReader;
+            this.wrapperElementName = wrapperElementName;
+            this.encryptionModifier = encryptionModifier;
+            rootElementProcessed = encryptionModifier != EncryptionPartDef.Modifier.Element;
+        }
+
+        @Override
+        public XMLEvent processNextHeaderEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
+            return processEvent(inputProcessorChain, true);
+        }
+
+        @Override
+        public XMLEvent processNextEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
+            return processEvent(inputProcessorChain, false);
+        }
+
+        private XMLEvent processEvent(InputProcessorChain inputProcessorChain, boolean headerEvent) throws XMLStreamException, XMLSecurityException {
+
+            testAndThrowUncaughtException();
+            XMLEvent xmlEvent = xmlEventReader.nextEvent();
+
+            //wrapper element skipping logic
+            if (xmlEvent.isStartElement()) {
+                documentLevel++;
+
+                inputProcessorChain.getDocumentContext().addPathElement(xmlEvent.asStartElement().getName());
+
+                if (!rootElementProcessed) {
+                    //fire a SecurityEvent:
+                    if (inputProcessorChain.getDocumentContext().getDocumentLevel() == 3
+                            && inputProcessorChain.getDocumentContext().isInSOAPHeader()) {
+                        EncryptedPartSecurityEvent encryptedPartSecurityEvent =
+                                new EncryptedPartSecurityEvent(SecurityEvent.Event.EncryptedPart, false);
+                        encryptedPartSecurityEvent.setElement(xmlEvent.asStartElement().getName());
+                        inputProcessorChain.getSecurityContext().registerSecurityEvent(encryptedPartSecurityEvent);
+                    } else {
+                        EncryptedElementSecurityEvent encryptedElementSecurityEvent =
+                                new EncryptedElementSecurityEvent(SecurityEvent.Event.EncryptedElement, false);
+                        encryptedElementSecurityEvent.setElement(xmlEvent.asStartElement().getName());
+                        inputProcessorChain.getSecurityContext().registerSecurityEvent(encryptedElementSecurityEvent);
+                    }
+
+                    rootElementProcessed = true;
+                }
+
+            } else if (xmlEvent.isEndElement()) {
+
+                if (xmlEvent.isEndElement() && xmlEvent.asEndElement().getName().equals(wrapperElementName)) {
+                    //correct path and skip EndElements:
+                    InputProcessorChain subInputProcessorChain = inputProcessorChain.createSubChain(this);
+                    subInputProcessorChain.getDocumentContext().addPathElement(Constants.TAG_xenc_EncryptedData);
+                    subInputProcessorChain.getDocumentContext().addPathElement(Constants.TAG_xenc_CipherData);
+
+                    XMLEvent endEvent;
+                    do {
+                        subInputProcessorChain.reset();
+                        if (headerEvent) {
+                            endEvent = subInputProcessorChain.processHeaderEvent();
+                        } else {
+                            endEvent = subInputProcessorChain.processEvent();
+                        }
+                    }
+                    while (!(endEvent.isEndElement() && endEvent.asEndElement().getName().equals(Constants.TAG_xenc_EncryptedData)));
+
+                    inputProcessorChain.removeProcessor(this);
+                    inputProcessorChain.getDocumentContext().unsetIsInEncryptedContent();
+                    
+                    //...fetch the next (unencrypted) event
+                    if (headerEvent) {
+                        xmlEvent = inputProcessorChain.processHeaderEvent();
+                    } else {
+                        xmlEvent = inputProcessorChain.processEvent();
+                    }
+                }
+
+                if (documentLevel > 0) {
+                    inputProcessorChain.getDocumentContext().removePathElement();
+                }
+
+                documentLevel--;
+            }
+
+            return xmlEvent;
+        }
+
+        private Throwable thrownException;
+
+        public void uncaughtException(Thread t, Throwable e) {
+            this.thrownException = e;
+        }
+
+        public void testAndThrowUncaughtException() throws XMLStreamException {
+            if (this.thrownException != null) {
+                if (this.thrownException instanceof UncheckedXMLSecurityException) {
+                    UncheckedXMLSecurityException uxse = (UncheckedXMLSecurityException) this.thrownException;
+                    throw new XMLStreamException(uxse.getCause());
+                } else {
+                    throw new XMLStreamException(this.thrownException.getCause());
+                }
+            }
+        }
+    }
+
+    class DecryptionThread implements Runnable {
+
+        private InputProcessorChain inputProcessorChain;
+        private boolean header;
         private EncryptedDataType encryptedDataType;
         private XMLEventNS startXMLElement;
-        private Thread receiverThread;
+        private PipedOutputStream pipedOutputStream;
+        private PipedInputStream pipedInputStream;
 
         //todo static final init or better: hardcoded:
         //use a unique prefix; the prefix must start with a letter by spec!:
-        private String uuid = "a" + UUID.randomUUID().toString().replaceAll("-", "");
-        private final QName dummyStartElementName = new QName("http://dummy", "dummy", uuid);
+        private final String uuid = "a" + UUID.randomUUID().toString().replaceAll("-", "");
+        private final QName wrapperElementName = new QName("http://dummy", "dummy", uuid);
 
-        InternalDecryptProcessor(SecurityProperties securityProperties, XMLEventNS startXMLEvent, EncryptedDataType encryptedDataType) throws XMLSecurityException, XMLStreamException {
-            super(securityProperties);
+        public DecryptionThread(InputProcessorChain inputProcessorChain, boolean header,
+                                EncryptedDataType encryptedDataType, XMLEventNS startXMLElement) throws XMLStreamException {
+
+            this.inputProcessorChain = inputProcessorChain;
+            this.header = header;
             this.encryptedDataType = encryptedDataType;
-            this.startXMLElement = startXMLEvent;
-            this.getAfterProcessors().add(DecryptInputProcessor.class.getName());
-            this.getAfterProcessors().add(InternalDecryptProcessor.class.getName());
+            this.startXMLElement = startXMLElement;
+
+            pipedInputStream = new PipedInputStream(8192);
+            try {
+                pipedOutputStream = new PipedOutputStream(pipedInputStream);
+            } catch (IOException e) {
+                throw new XMLStreamException(e);
+            }
         }
 
-        @Override
-        public void processSecurityHeaderEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
-            processEvent(xmlEvent, inputProcessorChain, true);
+        public DecryptedEventReaderInputProcessor getDecryptedStreamInputProcessor() throws XMLStreamException {
+
+            //todo set encoding?:
+            XMLEventReader xmlEventReader =
+                    inputProcessorChain.getSecurityContext().<XMLInputFactory>get(
+                            Constants.XMLINPUTFACTORY).createXMLEventReader(pipedInputStream,
+                            inputProcessorChain.getDocumentContext().getEncoding());
+
+            //go forward to wrapper element
+            XMLEvent xmlEvent;
+            do {
+                xmlEvent = xmlEventReader.nextEvent();
+            }
+            while (!(xmlEvent.isStartElement() && xmlEvent.asStartElement().getName().equals(wrapperElementName)));
+
+            return new DecryptedEventReaderInputProcessor(getSecurityProperties(), xmlEventReader, wrapperElementName,
+                    EncryptionPartDef.Modifier.getModifier(encryptedDataType.getType()));
         }
 
-        @Override
-        public void processEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
-            processEvent(xmlEvent, inputProcessorChain, false);
+        private XMLEvent processNextEvent() throws XMLSecurityException, XMLStreamException {
+            inputProcessorChain.reset();
+            if (header) {
+                return inputProcessorChain.processHeaderEvent();
+            } else {
+                return inputProcessorChain.processEvent();
+            }
         }
 
-        private void processEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain, final boolean isSecurityHeaderEvent) throws XMLStreamException, XMLSecurityException {
+        public void run() {
 
-            testAndThrowUncaughtException(this.thrownExceptionByReader);
-
-            //we need to initialize the cipher here because the iv is stored in the first few bytes in the cipher stream
-            if (isFirstCall) {
-
-                if (xmlEvent.asCharacters().isIgnorableWhiteSpace()) {
-                    return;
-                }
-
-                isFirstCall = false;
-
+            try {
                 final String algorithmURI = encryptedDataType.getEncryptionMethod().getAlgorithm();
 
-                SecurityToken securityToken = SecurityTokenFactory.newInstance().getSecurityToken(encryptedDataType.getKeyInfo(), getSecurityProperties().getDecryptionCrypto(), getSecurityProperties().getCallbackHandler(), inputProcessorChain.getSecurityContext());
-                RecipientEncryptionTokenSecurityEvent recipientEncryptionTokenSecurityEvent = new RecipientEncryptionTokenSecurityEvent(SecurityEvent.Event.RecipientEncryptionToken);
+                SecurityToken securityToken = SecurityTokenFactory.newInstance().getSecurityToken(
+                        encryptedDataType.getKeyInfo(), getSecurityProperties().getDecryptionCrypto(),
+                        getSecurityProperties().getCallbackHandler(), inputProcessorChain.getSecurityContext());
+                RecipientEncryptionTokenSecurityEvent recipientEncryptionTokenSecurityEvent =
+                        new RecipientEncryptionTokenSecurityEvent(SecurityEvent.Event.RecipientEncryptionToken);
                 recipientEncryptionTokenSecurityEvent.setSecurityToken(securityToken);
                 inputProcessorChain.getSecurityContext().registerSecurityEvent(recipientEncryptionTokenSecurityEvent);
 
@@ -259,6 +398,7 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
 
                 Key secretKey = securityToken.getSecretKey(algorithmURI);
 
+                Cipher symmetricCipher;
                 //we have to defer the initialization of the cipher until we can extract the IV...
                 try {
                     String syncEncAlgo = JCEAlgorithmMapper.translateURItoJCEID(algorithmURI);
@@ -276,218 +416,93 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
                 algorithmSuiteSecurityEvent.setUsage(AlgorithmSuiteSecurityEvent.Usage.Enc);
                 inputProcessorChain.getSecurityContext().registerSecurityEvent(algorithmSuiteSecurityEvent);
 
-                final InputProcessorChain subInputProcessorChain = inputProcessorChain.createSubChain(this);
+                //temporary writer for direct writing plaintext data
+                BufferedWriter tempBufferedWriter = new BufferedWriter(
+                        new OutputStreamWriter(
+                                pipedOutputStream,
+                                inputProcessorChain.getDocumentContext().getEncoding()
+                        )
+                );
 
-                List<QName> path = subInputProcessorChain.getDocumentContext().getPath();
-                path.remove(path.size() - 1);//CipherValue
-                path.remove(path.size() - 1);//CipherData
-                path.remove(path.size() - 1);//remove EncryptedData Element
+                tempBufferedWriter.write('<');
+                tempBufferedWriter.write(wrapperElementName.getPrefix());
+                tempBufferedWriter.write(':');
+                tempBufferedWriter.write(wrapperElementName.getLocalPart());
+                tempBufferedWriter.write(' ');
+                tempBufferedWriter.write("xmlns:");
+                tempBufferedWriter.write(wrapperElementName.getPrefix());
+                tempBufferedWriter.write("=\"");
+                tempBufferedWriter.write(wrapperElementName.getNamespaceURI());
+                tempBufferedWriter.write('\"');
 
-                //we have to use a threaded Piped-In/Out Stream. We don't know where we are in the decrypted xml stream
-                //and therefore the XMLStreamReader can block on calling next/hasNext.
-                final PipedInputStream pipedInputStream = new PipedInputStream();
-
-                try {
-                    pipedOutputStream = new PipedOutputStream(pipedInputStream);
-                } catch (IOException e) {
-                    throw new XMLStreamException(e);
-                }
-
-                //todo refactor do not use an anonymous class
-                Runnable runnable = new Runnable() {
-
-                    public void run() {
-
-                        try {
-                            //todo set encoding?:
-
-                            //todo an possible exception here is not propagated!
-                            XMLEventReader xmlEventReader =
-                                    subInputProcessorChain.getSecurityContext().<XMLInputFactory>get(
-                                            Constants.XMLINPUTFACTORY).createXMLEventReader(pipedInputStream);
-
-                            EncryptionPartDef.Modifier encryptionModifier = EncryptionPartDef.Modifier.getModifier(encryptedDataType.getType());
-
-                            boolean rootElementProcessed = encryptionModifier == EncryptionPartDef.Modifier.Element ? false : true;
-
-                            XMLEvent decXmlEvent = null;
-                            //move to first event after our dummy element:
-                            while (xmlEventReader.hasNext()) {
-                                decXmlEvent = xmlEventReader.nextEvent();
-                                if (decXmlEvent.isStartElement() && decXmlEvent.asStartElement().getName().equals(dummyStartElementName)) {
-                                    break;
-                                }
-                            }
-
-                            while (xmlEventReader.hasNext()) {
-
-                                decXmlEvent = xmlEventReader.nextEvent();
-
-                                if (decXmlEvent.isEndElement() && decXmlEvent.asEndElement().getName().equals(dummyStartElementName)) {
-                                    xmlEventReader.close();
-                                    break;
-                                }
-
-                                if (!rootElementProcessed && decXmlEvent.isStartElement()) {
-
-                                    //fire a SecurityEvent:
-                                    if (subInputProcessorChain.getDocumentContext().getDocumentLevel() == 3 && subInputProcessorChain.getDocumentContext().isInSOAPHeader()) {
-                                        EncryptedPartSecurityEvent encryptedPartSecurityEvent = new EncryptedPartSecurityEvent(SecurityEvent.Event.EncryptedPart, false);
-                                        encryptedPartSecurityEvent.setElement(decXmlEvent.asStartElement().getName());
-                                        subInputProcessorChain.getSecurityContext().registerSecurityEvent(encryptedPartSecurityEvent);
-                                    } else {
-                                        EncryptedElementSecurityEvent encryptedElementSecurityEvent = new EncryptedElementSecurityEvent(SecurityEvent.Event.EncryptedElement, false);
-                                        encryptedElementSecurityEvent.setElement(decXmlEvent.asStartElement().getName());
-                                        subInputProcessorChain.getSecurityContext().registerSecurityEvent(encryptedElementSecurityEvent);
-                                    }
-
-                                    if (isSecurityHeaderEvent) {
-                                        //atm we don't know where we stay in the document, so just try to find a processor for the first decrypted element.
-                                        //if we have more than one "root" element after the dummyStartElement we aren't at the toplevel in the security header.
-                                        SecurityHeaderInputProcessor.engageProcessor(subInputProcessorChain, decXmlEvent.asStartElement(), getSecurityProperties());
-                                    }
-
-                                    rootElementProcessed = true;
-                                }
-
-                                if (isSecurityHeaderEvent) {
-                                    subInputProcessorChain.processSecurityHeaderEvent(decXmlEvent);
-                                } else {
-                                    subInputProcessorChain.processEvent(decXmlEvent);
-                                }
-                                subInputProcessorChain.reset();
-                            }
-                        } catch (Exception e) {
-                            throw new UncheckedXMLSecurityException(e);
+                //apply all namespaces from current scope to get a valid documentfragment:
+                List<ComparableNamespace> comparableNamespacesToApply = new ArrayList<ComparableNamespace>();
+                List<ComparableNamespace>[] comparableNamespaceList = startXMLElement.getNamespaceList();
+                for (int i = 0; i < comparableNamespaceList.length; i++) {
+                    List<ComparableNamespace> comparableNamespaces = comparableNamespaceList[i];
+                    for (int j = 0; j < comparableNamespaces.size(); j++) {
+                        ComparableNamespace comparableNamespace = comparableNamespaces.get(j);
+                        if (!comparableNamespacesToApply.contains(comparableNamespace)) {
+                            comparableNamespacesToApply.add(comparableNamespace);
                         }
                     }
-                };
-
-                receiverThread = new Thread(runnable);
-                receiverThread.setName("decrypting thread");
-                receiverThread.setUncaughtExceptionHandler(this);
-                receiverThread.start();
-
-                try {
-
-                    //temporary writer for direct writing plaintext data
-                    //todo encoding?:
-                    BufferedWriter tempBufferedWriter = new BufferedWriter(new OutputStreamWriter(pipedOutputStream));
-
-                    tempBufferedWriter.write('<');
-                    tempBufferedWriter.write(dummyStartElementName.getPrefix());
-                    tempBufferedWriter.write(':');
-                    tempBufferedWriter.write(dummyStartElementName.getLocalPart());
+                }
+                for (int i = 0; i < comparableNamespacesToApply.size(); i++) {
+                    ComparableNamespace comparableNamespace = comparableNamespacesToApply.get(i);
                     tempBufferedWriter.write(' ');
-                    tempBufferedWriter.write("xmlns:");
-                    tempBufferedWriter.write(dummyStartElementName.getPrefix());
-                    tempBufferedWriter.write("=\"");
-                    tempBufferedWriter.write(dummyStartElementName.getNamespaceURI());
-                    tempBufferedWriter.write("\"");
+                    tempBufferedWriter.write(comparableNamespace.toString());
+                }
 
-                    //apply all namespaces from current scope to get a valid documentfragment:
-                    List<ComparableNamespace> comparableNamespacesToApply = new ArrayList<ComparableNamespace>();
-                    List<ComparableNamespace>[] comparableNamespaceList = startXMLElement.getNamespaceList();
-                    for (int i = 0; i < comparableNamespaceList.length; i++) {
-                        List<ComparableNamespace> comparableNamespaces = comparableNamespaceList[i];
-                        for (int j = 0; j < comparableNamespaces.size(); j++) {
-                            ComparableNamespace comparableNamespace = comparableNamespaces.get(j);
-                            if (!comparableNamespacesToApply.contains(comparableNamespace)) {
-                                comparableNamespacesToApply.add(comparableNamespace);
+                tempBufferedWriter.write('>');
+                //calling flush after every piece to prevent data salad...
+                tempBufferedWriter.flush();
+
+                IVSplittingOutputStream ivSplittingOutputStream = new IVSplittingOutputStream(
+                        new CipherOutputStream(new FilterOutputStream(pipedOutputStream) {
+                            @Override
+                            public void close() throws IOException {
+                                //we overwrite the close method and don't delegate close. Close must be done separately.
+                                //The reason behind this is the Base64DecoderStream which does the final on close() but after
+                                //that we have to write our dummy end tag
+                                //just calling flush here, seems to be fine
+                                out.flush();
                             }
-                        }
+                        }, symmetricCipher),
+                        symmetricCipher, secretKey);
+                //buffering seems not to help
+                //bufferedOutputStream = new BufferedOutputStream(new Base64OutputStream(ivSplittingOutputStream, false), 8192 * 5);
+                OutputStream decryptOutputStream = new Base64OutputStream(ivSplittingOutputStream, false);
+
+                boolean finished = false;
+                while (!finished) {
+                    XMLEvent xmlEvent = processNextEvent();
+
+                    switch (xmlEvent.getEventType()) {
+                        case XMLStreamConstants.END_ELEMENT:
+                            //this must be the CipherValue EndElement.
+                            finished = true;
+                            break;
+                        case XMLStreamConstants.CHARACTERS:
+                            decryptOutputStream.write(xmlEvent.asCharacters().getData().getBytes(inputProcessorChain.getDocumentContext().getEncoding()));
+                            break;
+                        default:
+                            throw new XMLSecurityException("Unexpected event: " + Utils.getXMLEventAsString(xmlEvent));
                     }
-                    for (int i = 0; i < comparableNamespacesToApply.size(); i++) {
-                        ComparableNamespace comparableNamespace = comparableNamespacesToApply.get(i);
-                        tempBufferedWriter.write(' ');
-                        //todo encoding?:
-                        tempBufferedWriter.write(comparableNamespace.toString());
-                    }
-
-                    tempBufferedWriter.write(">");
-                    //calling flush after every piece to prevent data salad...
-                    tempBufferedWriter.flush();
-
-                    IVSplittingOutputStream ivSplittingOutputStream = new IVSplittingOutputStream(
-                            new CipherOutputStream(new FilterOutputStream(pipedOutputStream) {
-                                @Override
-                                public void close() throws IOException {
-                                    //we overwrite the close method and don't delegate close. Close must be done separately.
-                                    //The reason behind this is the Base64DecoderStream which does the final on close() but after
-                                    //that we have to write our dummy end tag
-                                    //just calling flush here, seems to be fine
-                                    out.flush();
-                                }
-                            }, symmetricCipher),
-                            symmetricCipher, secretKey);
-                    //buffering seems not to help
-                    //bufferedOutputStream = new BufferedOutputStream(new Base64OutputStream(ivSplittingOutputStream, false), 8192 * 5);
-                    decryptOutputStream = new Base64OutputStream(ivSplittingOutputStream, false);
-
-                    decryptOutputStream.write(xmlEvent.asCharacters().getData().getBytes());
-
-                } catch (IOException e) {
-                    testAndThrowUncaughtException(thrownExceptionByReader);
-                    throw new XMLStreamException(e);
                 }
-            } else if (xmlEvent.isEndElement()) {
-                EndElement endElement = xmlEvent.asEndElement();
-                if (endElement.getName().equals(Constants.TAG_xenc_CipherValue)) {
-                    try {
-                        //flush decrypted data to xmlstreamreader
-                        decryptOutputStream.close(); //close to get Cipher.doFinal() called
 
-                        //todo encoding?:
-                        BufferedWriter tempBufferedWriter = new BufferedWriter(new OutputStreamWriter(pipedOutputStream));
-                        tempBufferedWriter.write("</");
-                        tempBufferedWriter.write(dummyStartElementName.getPrefix());
-                        tempBufferedWriter.write(':');
-                        tempBufferedWriter.write(dummyStartElementName.getLocalPart());
-                        tempBufferedWriter.write('>');
-                        //real close of the stream
-                        tempBufferedWriter.close();
-                    } catch (IOException e) {
-                        testAndThrowUncaughtException(thrownExceptionByReader);
-                        throw new XMLStreamException(e);
-                    }
+                //close to get Cipher.doFinal() called
+                decryptOutputStream.close();
 
-                    try {
-                        receiverThread.join();
-                        receiverThread = null;
+                tempBufferedWriter.write("</");
+                tempBufferedWriter.write(wrapperElementName.getPrefix());
+                tempBufferedWriter.write(':');
+                tempBufferedWriter.write(wrapperElementName.getLocalPart());
+                tempBufferedWriter.write('>');
+                //real close of the stream
+                tempBufferedWriter.close();
 
-                        //here we have to check for a exception from the reader side. This
-                        //can happen this late when we have small parts encrypted, like timestamp 
-                        testAndThrowUncaughtException(this.thrownExceptionByReader);
-                    } catch (InterruptedException e) {
-                        throw new XMLStreamException(e);
-                    }
-
-                    inputProcessorChain.removeProcessor(this);
-                }
-            } else if (xmlEvent.isCharacters()) {
-                try {
-                    decryptOutputStream.write(xmlEvent.asCharacters().getData().getBytes());
-                } catch (IOException e) {
-                    testAndThrowUncaughtException(thrownExceptionByReader);
-                    throw new XMLStreamException(e);
-                }
-            } else {
-                throw new XMLSecurityException("Unexpected event: " + Utils.getXMLEventAsString(xmlEvent));
-            }
-        }
-
-        public void uncaughtException(Thread t, Throwable e) {
-            this.thrownExceptionByReader = e;
-        }
-
-        public void testAndThrowUncaughtException(Throwable t) throws XMLStreamException {
-            if (t != null) {
-                if (t instanceof UncheckedXMLSecurityException) {
-                    UncheckedXMLSecurityException uxse = (UncheckedXMLSecurityException) t;
-                    throw new XMLStreamException(uxse.getCause());
-                } else {
-                    throw new XMLStreamException(this.thrownExceptionByReader);
-                }
+            } catch (Exception e) {
+                throw new UncheckedXMLSecurityException(e);
             }
         }
     }

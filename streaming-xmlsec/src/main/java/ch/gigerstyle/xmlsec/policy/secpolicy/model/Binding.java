@@ -130,10 +130,10 @@ public abstract class Binding extends AbstractSecurityAssertion implements Algor
         if (isIncludeTimestamp()) {
             timestampAssertionStates.add(new IncludeTimeStampAssertionState(this, false));
 
-            Collection<AssertionState> signedPartsAssertionStates = assertionStateMap.get(SecurityEvent.Event.SignedPart);
+            Collection<AssertionState> signedElementAssertionStates = assertionStateMap.get(SecurityEvent.Event.SignedElement);
             List<QName> qNames = new ArrayList<QName>();
             qNames.add(Constants.TAG_wsu_Timestamp);
-            signedPartsAssertionStates.add(new SignedPartAssertionState(this, false, qNames));
+            signedElementAssertionStates.add(new SignedElementAssertionState(this, false, qNames));
         } else {
             timestampAssertionStates.add(new IncludeTimeStampAssertionState(this, true));
         }

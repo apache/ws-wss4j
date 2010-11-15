@@ -31,27 +31,27 @@ public class PolicyInputProcessor extends AbstractInputProcessor {
 
     private PolicyEnforcer policyEnforcer;
 
-    private XMLEvent deferredXMLEvent;
-
     public PolicyInputProcessor(PolicyEnforcer policyEnforcer, SecurityProperties securityProperties) {
         super(securityProperties);
         this.setPhase(Constants.Phase.POSTPROCESSING);
-        this.getBeforeProcessors().add(SecurityHeaderInputProcessor.InternalSecurityHeaderProcessor.class.getName());
+        this.getBeforeProcessors().add(SecurityHeaderInputProcessor.class.getName());
         this.policyEnforcer = policyEnforcer;
     }
 
     @Override
-    public void processSecurityHeaderEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
-
+    public XMLEvent processNextHeaderEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
+        XMLEvent xmlEvent = inputProcessorChain.processHeaderEvent();
         //test if non encrypted element not have to be encrypted per policy
         if (!inputProcessorChain.getDocumentContext().isInEncryptedContent() && inputProcessorChain.getDocumentContext().isInSecurityHeader()) {
             testEncryptionPolicy(xmlEvent, inputProcessorChain);
         }
-        super.processSecurityHeaderEvent(xmlEvent, inputProcessorChain);
+        return xmlEvent;
     }
 
     @Override
-    public void processEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
+    public XMLEvent processNextEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
+        XMLEvent xmlEvent = inputProcessorChain.processEvent();
+
         if (xmlEvent.isStartElement()) {
             if (inputProcessorChain.getDocumentContext().getDocumentLevel() == 3 && inputProcessorChain.getDocumentContext().isInSOAPBody()
                     && Constants.TAG_soap11_Body.equals(inputProcessorChain.getDocumentContext().getParentElement(xmlEvent.getEventType()))) {
@@ -60,10 +60,13 @@ public class PolicyInputProcessor extends AbstractInputProcessor {
                 operationSecurityEvent.setOperation(xmlEvent.asStartElement().getName());
                 policyEnforcer.registerSecurityEvent(operationSecurityEvent);
             }
-        } else if (xmlEvent.isEndElement() && xmlEvent.asEndElement().getName().equals(Constants.TAG_soap11_Envelope)) {
-            //hold the last XMLEvent back until the policy is verified
-            deferredXMLEvent = xmlEvent;
-            return;
+        } else if (inputProcessorChain.getDocumentContext().getDocumentLevel() == 1
+                && xmlEvent.isEndElement() && xmlEvent.asEndElement().getName().equals(Constants.TAG_soap11_Envelope)) {
+            try {
+                policyEnforcer.doFinal();
+            } catch (PolicyViolationException e) {
+                throw new XMLSecurityException(e);
+            }
         }
 
         //test if non encrypted element not have to be encrypted per policy
@@ -90,8 +93,7 @@ public class PolicyInputProcessor extends AbstractInputProcessor {
                 }
             }
         }
-
-        inputProcessorChain.processEvent(xmlEvent);
+        return xmlEvent;
     }
 
     private void testEncryptionPolicy(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain) throws XMLSecurityException {
@@ -102,9 +104,9 @@ public class PolicyInputProcessor extends AbstractInputProcessor {
                 EncryptedPartSecurityEvent encryptedPartSecurityEvent = new EncryptedPartSecurityEvent(SecurityEvent.Event.EncryptedPart, true);
                 encryptedPartSecurityEvent.setElement(xmlEvent.asStartElement().getName());
                 policyEnforcer.registerSecurityEvent(encryptedPartSecurityEvent);
-            } else if (inputProcessorChain.getDocumentContext().getDocumentLevel() == 2 && inputProcessorChain.getDocumentContext().isInSOAPBody()) {
+            } else if (inputProcessorChain.getDocumentContext().getDocumentLevel() == 3 && inputProcessorChain.getDocumentContext().isInSOAPBody()) {
                 EncryptedPartSecurityEvent encryptedPartSecurityEvent = new EncryptedPartSecurityEvent(SecurityEvent.Event.EncryptedPart, true);
-                encryptedPartSecurityEvent.setElement(xmlEvent.asStartElement().getName());
+                encryptedPartSecurityEvent.setElement(inputProcessorChain.getDocumentContext().getParentElement(xmlEvent.getEventType()));
                 policyEnforcer.registerSecurityEvent(encryptedPartSecurityEvent);
             } else if (inputProcessorChain.getDocumentContext().getDocumentLevel() > 3) {
                 EncryptedElementSecurityEvent encryptedElementSecurityEvent = new EncryptedElementSecurityEvent(SecurityEvent.Event.EncryptedElement, true);
@@ -123,18 +125,5 @@ public class PolicyInputProcessor extends AbstractInputProcessor {
             contentEncryptedElementSecurityEvent.setElement(inputProcessorChain.getDocumentContext().getParentElement(xmlEvent.getEventType()));
             policyEnforcer.registerSecurityEvent(contentEncryptedElementSecurityEvent);
         }
-    }
-
-    @Override
-    public void doFinal(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
-        try {
-            policyEnforcer.doFinal();
-        } catch (PolicyViolationException e) {
-            throw new XMLSecurityException(e);
-        }
-        //if the policy verifies we can push now the last element. 
-        inputProcessorChain.processEvent(deferredXMLEvent);
-        inputProcessorChain.reset();
-        inputProcessorChain.doFinal();
     }
 }

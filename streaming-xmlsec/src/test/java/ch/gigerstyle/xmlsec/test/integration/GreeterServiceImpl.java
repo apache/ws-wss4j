@@ -4,6 +4,7 @@ import org.apache.hello_world_soap_http.Greeter;
 import org.apache.hello_world_soap_http.PingMeFault;
 
 import javax.jws.WebParam;
+import javax.jws.WebService;
 
 /**
  * User: giger
@@ -25,6 +26,7 @@ import javax.jws.WebParam;
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
+@WebService(targetNamespace = "http://apache.org/hello_world_soap_http", serviceName = "SOAPService", endpointInterface = "org.apache.hello_world_soap_http.Greeter")
 public class GreeterServiceImpl implements Greeter {
 
     public void pingMe() throws PingMeFault {

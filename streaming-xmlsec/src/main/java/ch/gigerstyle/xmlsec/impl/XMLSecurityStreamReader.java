@@ -1,21 +1,24 @@
-package ch.gigerstyle.xmlsec.impl.processor.input;
+package ch.gigerstyle.xmlsec.impl;
 
-import ch.gigerstyle.xmlsec.ext.UncheckedXMLSecurityException;
+import ch.gigerstyle.xmlsec.ext.InputProcessorChain;
+import ch.gigerstyle.xmlsec.ext.SecurityProperties;
+import ch.gigerstyle.xmlsec.ext.XMLEventNS;
+import ch.gigerstyle.xmlsec.ext.XMLSecurityException;
 import com.ctc.wstx.cfg.ErrorConsts;
 
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.namespace.QName;
 import javax.xml.stream.Location;
+import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.events.*;
-import java.io.IOException;
 import java.util.Iterator;
 
 /**
  * User: giger
- * Date: May 27, 2010
- * Time: 6:55:43 PM
+ * Date: Nov 9, 2010
+ * Time: 6:39:07 PM
  * Copyright 2010 Marc Giger gigerstyle@gmx.ch
  * <p/>
  * This program is free software; you can redistribute it and/or modify it
@@ -32,200 +35,33 @@ import java.util.Iterator;
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
-public class PipedXMLStreamReader implements XMLStreamReader, Thread.UncaughtExceptionHandler {
+public class XMLSecurityStreamReader implements XMLStreamReader {
 
-    private Throwable thrownExceptionByWriter = null;
+    private SecurityProperties securityProperties;
+    private InputProcessorChain inputProcessorChain;
+    private XMLEvent currentEvent;
 
-    volatile boolean closedByWriter = false;
-    volatile boolean closedByReader = false;
-    boolean connected = false;
-
-    /* REMIND: identification of the read and write sides needs to be
-       more sophisticated.  Either using thread groups (but what about
-       pipes within a thread?) or using finalization (but it may be a
-       long time until the next GC). */
-    Thread readSide;
-    Thread writeSide;
-
-    private static final int DEFAULT_PIPE_SIZE = 100;
-
-    /**
-     * The default size of the pipe's circular input buffer.
-     */
-    // This used to be a constant before the pipe size was allowed
-    // to change. This field will continue to be maintained
-    // for backward compatibility.
-    protected static final int PIPE_SIZE = DEFAULT_PIPE_SIZE;
-
-    /**
-     * The circular buffer into which incoming data is placed.
-     */
-    protected XMLEvent buffer[];
-
-    /**
-     * The index of the position in the circular buffer at which the
-     * next byte of data will be stored when received from the connected
-     * piped output stream. <code>in&lt;0</code> implies the buffer is empty,
-     * <code>in==out</code> implies the buffer is full
-     */
-    protected int in = -1;
-
-    /**
-     * The index of the position in the circular buffer at which the next
-     * byte of data will be read by this piped input stream.
-     */
-    protected int out = 0;
-
-    private XMLEvent currentEvent = null;
-
-    /**
-     * Creates a <code>PipedInputStream</code> so
-     * that it is not yet PipedInputProcessor
-     * connected}.
-     * It must be {@linkplain java.io.PipedOutputStream#connect(
-     *java.io.PipedInputStream) connected} to a
-     * <code>PipedOutputStream</code> before being used.
-     */
-    public PipedXMLStreamReader() {
-        initPipe(DEFAULT_PIPE_SIZE);
+    public XMLSecurityStreamReader(InputProcessorChain inputProcessorChain, SecurityProperties securityProperties) {
+        this.inputProcessorChain = inputProcessorChain;
+        this.securityProperties = securityProperties;
     }
-
-    /**
-     * Creates a <code>PipedInputStream</code> so that it is not yet
-     * PipedInputProcessor connected and
-     * uses the specified pipe size for the pipe's buffer.
-     * It must be {@linkplain java.io.PipedOutputStream#connect(
-     *java.io.PipedInputStream)
-     * connected} to a <code>PipedOutputStream</code> before being used.
-     *
-     * @param pipeSize the size of the pipe's buffer.
-     * @throws IllegalArgumentException if <code>pipeSize <= 0</code>.
-     * @since 1.6
-     */
-    public PipedXMLStreamReader(int pipeSize) {
-        initPipe(pipeSize);
-    }
-
-    private void initPipe(int pipeSize) {
-        if (pipeSize <= 0) {
-            throw new IllegalArgumentException("Pipe Size <= 0");
-        }
-        buffer = new XMLEvent[pipeSize];
-    }
-
-    /**
-     * the writing thread must be set as early as possible
-     * because the writing thread can die before it wrote
-     * the first event. In this case the next() method loops
-     * endless because writeSide is still null.
-     */
-    public void setWriteSide(Thread writeSide) {
-        this.writeSide = writeSide;
-    }
-
-    /**
-     * Receives a XMLEvent.  This method will block if no input is
-     * available.
-     *
-     * @throws java.io.IOException If the pipe is <a href=#BROKEN> <code>broken</code></a>,
-     *                             PipedInputProcessor unconnected,
-     *                             closed, or if an I/O error occurs.
-     */
-    protected synchronized void receive(XMLEvent xmlEvent) throws IOException {
-        checkStateForReceive();
-        //the first calling thread is the thread which must also call receivedLast()
-        //this is the contract of this class!
-        if (writeSide == null) {
-            writeSide = Thread.currentThread();
-        }
-        if (in == out)
-            awaitSpace();
-        if (in < 0) {
-            in = 0;
-            out = 0;
-        }
-        buffer[in++] = xmlEvent;
-        if (in >= buffer.length) {
-            in = 0;
-        }
-    }
-
-    private void checkStateForReceive() throws IOException {
-        if (!connected) {
-            throw new IOException("Pipe not connected");
-        } else if (closedByWriter || closedByReader) {
-            throw new IOException("Pipe closed");
-        } else if (readSide != null && !readSide.isAlive()) {
-            throw new IOException("Read end dead");
-        }
-    }
-
-    private void awaitSpace() throws IOException {
-        while (in == out) {
-            checkStateForReceive();
-
-            /* full: kick any waiting readers */
-            notifyAll();
-            try {
-                wait(10);
-            } catch (InterruptedException ex) {
-                throw new java.io.InterruptedIOException();
-            }
-        }
-    }
-
-    /**
-     * Notifies all waiting threads that the last byte of data has been
-     * received.
-     */
-    synchronized void receivedLast() {
-        closedByWriter = true;
-        notifyAll();
-    }
-
 
     public Object getProperty(String name) throws IllegalArgumentException {
-        return null;
+        return null; 
     }
 
-    public synchronized int next() throws XMLStreamException {
-        if (!connected) {
-            throwSecurityException("Pipe not connected");
-        } else if (closedByReader) {
-            throwSecurityException("Pipe closed");
-        } else if (writeSide != null && !writeSide.isAlive()
-                && !closedByWriter && (in < 0)) {
-            throwSecurityException("Write end dead");
-        }
-
-        readSide = Thread.currentThread();
-        int trials = 2;
-        while (in < 0) {
-            if (closedByWriter) {
-                /* closed by writer, return EOF */
-                throwSecurityException("No more input available");
-            } else if ((writeSide != null) && (!writeSide.isAlive()) && (--trials < 0)) {
-                throwSecurityException("Pipe broken");
+    public int next() throws XMLStreamException {
+        try {
+            inputProcessorChain.reset();
+            currentEvent =  ((XMLEventNS)inputProcessorChain.processEvent()).getCurrentEvent();
+            if ((currentEvent.getEventType() == START_DOCUMENT)
+                    && securityProperties.isSkipDocumentEvents()) {
+                currentEvent =  ((XMLEventNS)inputProcessorChain.processEvent()).getCurrentEvent();
             }
-            /* might be a writer waiting */
-            notifyAll();
-            try {
-                wait(100);
-            } catch (InterruptedException ex) {
-                throw new XMLStreamException(ex);
-            }
+        } catch (XMLSecurityException e) {
+            throw new XMLStreamException(e);
         }
-        currentEvent = buffer[out++];
-        int ret = currentEvent.getEventType();
-        if (out >= buffer.length) {
-            out = 0;
-        }
-        if (in == out) {
-            /* now empty */
-            in = -1;
-        }
-
-        return ret;
+        return getCurrentEvent().getEventType();
     }
 
     private XMLEvent getCurrentEvent() {
@@ -325,26 +161,18 @@ public class PipedXMLStreamReader implements XMLStreamReader, Thread.UncaughtExc
     }
 
     public boolean hasNext() throws XMLStreamException {
-
-        if (!connected) {
-            throwSecurityException("Pipe not connected");
-        } else if (closedByReader) {
-            throwSecurityException("Pipe closed");
-        } else if (writeSide != null && !writeSide.isAlive()
-                && !closedByWriter && (in < 0)) {
-            throwSecurityException("Write end dead");
-        }
-
-        if (closedByWriter && in < 0) {
+        if (currentEvent != null && currentEvent.getEventType() == END_DOCUMENT) {
             return false;
         }
         return true;
     }
 
     public void close() throws XMLStreamException {
-        closedByReader = true;
-        synchronized (this) {
-            in = -1;
+        try {
+            inputProcessorChain.reset();
+            inputProcessorChain.doFinal();
+        } catch (XMLSecurityException e) {
+            throw new XMLStreamException(e);
         }
     }
 
@@ -805,26 +633,5 @@ public class PipedXMLStreamReader implements XMLStreamReader, Thread.UncaughtExc
             throw new IllegalStateException(ErrorConsts.ERR_STATE_NOT_PI);
         }
         return ((ProcessingInstruction) xmlEvent).getData();
-    }
-
-    private void throwSecurityException(String message) throws XMLStreamException {
-        if (this.thrownExceptionByWriter != null) {
-            if (this.thrownExceptionByWriter instanceof UncheckedXMLSecurityException) {
-                UncheckedXMLSecurityException uxse = (UncheckedXMLSecurityException) this.thrownExceptionByWriter;
-                if (uxse.getCause() instanceof XMLStreamException) {
-                    throw (XMLStreamException) uxse.getCause();
-                } else {
-                    throw new XMLStreamException(uxse.getCause());
-                }
-            } else {
-                throw new XMLStreamException(this.thrownExceptionByWriter);
-            }
-        } else {
-            throw new XMLStreamException(message);
-        }
-    }
-
-    public void uncaughtException(Thread t, Throwable e) {
-        thrownExceptionByWriter = e;
     }
 }

@@ -31,15 +31,16 @@ import javax.xml.stream.events.XMLEvent;
  */
 public class BinarySecurityTokenInputProcessor extends AbstractInputProcessor implements SecurityTokenProvider {
 
-    //todo this processor is not usable multiple times! Enforce one time usage! Other processors have the same "problem"
     private BinarySecurityTokenType currentBinarySecurityTokenType;
 
-    public BinarySecurityTokenInputProcessor(SecurityProperties securityProperties) {
+    public BinarySecurityTokenInputProcessor(SecurityProperties securityProperties, StartElement startElement) {
         super(securityProperties);
+        currentBinarySecurityTokenType = new BinarySecurityTokenType(startElement);
     }
 
     @Override
-    public void processSecurityHeaderEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
+    public XMLEvent processNextHeaderEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
+        XMLEvent xmlEvent = inputProcessorChain.processHeaderEvent();
 
         boolean isFinishedcurrentBinarySecurityToken = false;
 
@@ -52,11 +53,6 @@ public class BinarySecurityTokenInputProcessor extends AbstractInputProcessor im
             } catch (ParseException e) {
                 throw new XMLSecurityException(e);
             }
-        } else if (xmlEvent.isStartElement()) {
-            StartElement startElement = xmlEvent.asStartElement();
-            if (startElement.getName().equals(Constants.TAG_wsse_BinarySecurityToken)) {
-                currentBinarySecurityTokenType = new BinarySecurityTokenType(startElement);
-            }
         }
 
         if (currentBinarySecurityTokenType != null && isFinishedcurrentBinarySecurityToken) {
@@ -66,15 +62,16 @@ public class BinarySecurityTokenInputProcessor extends AbstractInputProcessor im
                 }
             } finally {
                 inputProcessorChain.removeProcessor(this);
-                isFinishedcurrentBinarySecurityToken = false;
             }
         }
+
+        return xmlEvent;
     }
 
     @Override
-    public void processEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
+    public XMLEvent processNextEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
         //this method should not be called (processor will be removed after processing header
-        inputProcessorChain.processEvent(xmlEvent);
+        return null;
     }
 
     public SecurityToken getSecurityToken(Crypto crypto) throws XMLSecurityException {

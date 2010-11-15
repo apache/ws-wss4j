@@ -30,14 +30,18 @@ import javax.xml.stream.events.XMLEvent;
 public class ReferenceListInputProcessor extends AbstractInputProcessor {
 
     private ReferenceList currentReferenceList;
-    private boolean isFinishedcurrentReferenceList = false;
 
-    public ReferenceListInputProcessor(SecurityProperties securityProperties) {
+    public ReferenceListInputProcessor(SecurityProperties securityProperties, StartElement startElement) {
         super(securityProperties);
+        currentReferenceList = new ReferenceList(startElement);
     }
 
     @Override
-    public void processSecurityHeaderEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
+    public XMLEvent processNextHeaderEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
+        XMLEvent xmlEvent = inputProcessorChain.processHeaderEvent();
+
+        boolean isFinishedcurrentReferenceList = false;
+
         if (currentReferenceList != null) {
             try {
                 isFinishedcurrentReferenceList = currentReferenceList.parseXMLEvent(xmlEvent);
@@ -47,17 +51,10 @@ public class ReferenceListInputProcessor extends AbstractInputProcessor {
             } catch (ParseException e) {
                 throw new XMLSecurityException(e);
             }
-        } else if (xmlEvent.isStartElement()) {
-            StartElement startElement = xmlEvent.asStartElement();
-            if (startElement.getName().equals(Constants.TAG_xenc_ReferenceList)) {
-                currentReferenceList = new ReferenceList(startElement);
-            }
         }
 
         if (currentReferenceList != null && isFinishedcurrentReferenceList) {
             try {
-                //todo the DecryptInputProcessor must be added earlier in the chain.
-                //todo probably directly after the EncryptedKeyInputProcessor and after other DecryptInputProcessor!
                 inputProcessorChain.addProcessor(new DecryptInputProcessor(currentReferenceList, getSecurityProperties()));
             } finally {
                 inputProcessorChain.removeProcessor(this);
@@ -65,13 +62,12 @@ public class ReferenceListInputProcessor extends AbstractInputProcessor {
                 isFinishedcurrentReferenceList = false;
             }
         }
-
-        inputProcessorChain.processSecurityHeaderEvent(xmlEvent);
+        return xmlEvent;
     }
 
     @Override
-    public void processEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
+    public XMLEvent processNextEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
         //this method should not be called (processor will be removed after processing header
-        inputProcessorChain.processEvent(xmlEvent);
+        return null;
     }
 }

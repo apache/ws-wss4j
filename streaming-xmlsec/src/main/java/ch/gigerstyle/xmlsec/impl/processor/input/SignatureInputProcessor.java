@@ -45,13 +45,13 @@ import java.util.List;
 public class SignatureInputProcessor extends AbstractInputProcessor {
 
     private SignatureType currentSignatureType;
-    private boolean isFinishedcurrentSignatureType;
 
     private boolean recordSignedInfo = false;
     private List<XMLEvent> signedInfoXMLEvents = new ArrayList<XMLEvent>();
 
-    public SignatureInputProcessor(SecurityProperties securityProperties) {
+    public SignatureInputProcessor(SecurityProperties securityProperties, StartElement startElement) {
         super(securityProperties);
+        currentSignatureType = new SignatureType(startElement);
     }
 
 /*
@@ -88,7 +88,10 @@ public class SignatureInputProcessor extends AbstractInputProcessor {
      */
 
     @Override
-    public void processSecurityHeaderEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
+    public XMLEvent processNextHeaderEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
+        XMLEvent xmlEvent = inputProcessorChain.processHeaderEvent();
+
+        boolean isFinishedcurrentSignatureType = false;
 
         if (currentSignatureType != null) {
             try {
@@ -104,9 +107,7 @@ public class SignatureInputProcessor extends AbstractInputProcessor {
         if (xmlEvent.isStartElement()) {
             StartElement startElement = xmlEvent.asStartElement();
 
-            if (startElement.getName().equals(Constants.TAG_dsig_Signature)) {
-                currentSignatureType = new SignatureType(startElement);
-            } else if (currentSignatureType != null && startElement.getName().equals(Constants.TAG_dsig_SignedInfo)) {
+            if (currentSignatureType != null && startElement.getName().equals(Constants.TAG_dsig_SignedInfo)) {
                 recordSignedInfo = true;
             }
         } else if (currentSignatureType != null && xmlEvent.isEndElement()) {
@@ -143,12 +144,13 @@ public class SignatureInputProcessor extends AbstractInputProcessor {
             }
         }
 
-        inputProcessorChain.processSecurityHeaderEvent(xmlEvent);
+        return xmlEvent;
     }
 
-    public void processEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
-        //this method should not be called (processor will be removed after processing header
-        inputProcessorChain.processEvent(xmlEvent);
+    @Override
+    public XMLEvent processNextEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
+        //this method should not be called (processor will be removed after processing header)
+        return null;
     }
 
     public static class SignatureVerifier {

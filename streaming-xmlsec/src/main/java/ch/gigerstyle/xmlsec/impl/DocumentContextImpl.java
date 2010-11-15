@@ -31,14 +31,22 @@ import java.util.List;
 public class DocumentContextImpl implements DocumentContext {
 
     private static final QName nullElement = new QName("", "");
-
     private List<QName> path = new ArrayList<QName>(10);
+    private String encoding;
 
-    protected void addPathElement(QName qName) {
+    public String getEncoding() {
+        return encoding;
+    }
+
+    public void setEncoding(String encoding) {
+        this.encoding = encoding;
+    }
+
+    public void addPathElement(QName qName) {
         path.add(qName);
     }
 
-    protected QName removePathElement() {
+    public QName removePathElement() {
         return path.remove(path.size() - 1);
     }
 
@@ -120,7 +128,8 @@ public class DocumentContextImpl implements DocumentContext {
     protected DocumentContextImpl clone() {
         DocumentContextImpl documentContext = new DocumentContextImpl();
         List<QName> subPath = new ArrayList<QName>();
-        subPath.addAll(path);
+        subPath.addAll(this.path);
+        documentContext.setEncoding(this.encoding);
         documentContext.setPath(subPath);
         documentContext.setInSecurityHeader(isInSecurityHeader());
         documentContext.actualEncryptedContentCounter = this.actualEncryptedContentCounter;

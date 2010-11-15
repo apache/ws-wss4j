@@ -49,6 +49,10 @@ public class InputProcessorChainImpl implements InputProcessorChain {
         this(securityContext, new DocumentContextImpl(), startPos);
     }
 
+    public InputProcessorChainImpl(SecurityContext securityContext, DocumentContextImpl documentContext) {
+        this(securityContext, documentContext, 0);
+    }
+
     protected InputProcessorChainImpl(SecurityContext securityContext, DocumentContextImpl documentContextImpl, int startPos) {
         this.securityContext = securityContext;
         this.curPos = this.startPos = startPos;
@@ -172,43 +176,22 @@ public class InputProcessorChainImpl implements InputProcessorChain {
         this.inputProcessors.remove(inputProcessor);
     }
 
-    public void processSecurityHeaderEvent(XMLEvent xmlEvent) throws XMLStreamException, XMLSecurityException {
-        boolean removeEndElement = false;
-        if (startPos == curPos) {
-            if (xmlEvent.isStartElement()) {
-                documentContext.addPathElement(xmlEvent.asStartElement().getName());
-            } else if (xmlEvent.isEndElement()) {
-                removeEndElement = true;
-            }
-        }
-        inputProcessors.get(getPosAndIncrement()).processNextSecurityHeaderEvent(xmlEvent, this);
-        if (removeEndElement) {
-            documentContext.removePathElement();
-        }
+    public XMLEvent processHeaderEvent() throws XMLStreamException, XMLSecurityException {
+        return inputProcessors.get(inputProcessors.size() - getPosAndIncrement() - 1).processNextHeaderEvent(this);
     }
 
-    public void processEvent(XMLEvent xmlEvent) throws XMLStreamException, XMLSecurityException {
-        boolean removeEndElement = false;
-        if (startPos == curPos) {
-            if (xmlEvent.isStartElement()) {
-                documentContext.addPathElement(xmlEvent.asStartElement().getName());
-            } else if (xmlEvent.isEndElement()) {
-                removeEndElement = true;
-            }
-        }
-        inputProcessors.get(getPosAndIncrement()).processNextEvent(xmlEvent, this);
-        if (removeEndElement) {
-            documentContext.removePathElement();
-        }
+    public XMLEvent processEvent() throws XMLStreamException, XMLSecurityException {
+        return inputProcessors.get(inputProcessors.size() - getPosAndIncrement() - 1).processNextEvent(this);
     }
 
     public void doFinal() throws XMLStreamException, XMLSecurityException {
-        inputProcessors.get(getPosAndIncrement()).doFinal(this);
+        inputProcessors.get(inputProcessors.size() - getPosAndIncrement() - 1).doFinal(this);
     }
 
     public InputProcessorChain createSubChain(InputProcessor inputProcessor) throws XMLStreamException, XMLSecurityException {
         //we don't clone the processor-list to get updates in the sublist too!
-        InputProcessorChainImpl inputProcessorChain = new InputProcessorChainImpl(securityContext, documentContext.clone(), inputProcessors.indexOf(inputProcessor) + 1);
+        InputProcessorChainImpl inputProcessorChain = new InputProcessorChainImpl(securityContext, documentContext.clone(),
+                inputProcessors.size() - inputProcessors.indexOf(inputProcessor));
         inputProcessorChain.setInputProcessors(this.inputProcessors);
         return inputProcessorChain;
     }

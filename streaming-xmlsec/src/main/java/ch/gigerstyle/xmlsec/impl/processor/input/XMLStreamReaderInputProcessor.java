@@ -2,14 +2,14 @@ package ch.gigerstyle.xmlsec.impl.processor.input;
 
 import ch.gigerstyle.xmlsec.ext.*;
 
+import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.XMLEvent;
-import java.io.StringWriter;
 
 /**
  * User: giger
- * Date: May 14, 2010
- * Time: 12:24:56 PM
+ * Date: Nov 9, 2010
+ * Time: 7:01:33 PM
  * Copyright 2010 Marc Giger gigerstyle@gmx.ch
  * <p/>
  * This program is free software; you can redistribute it and/or modify it
@@ -26,25 +26,40 @@ import java.io.StringWriter;
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
-public class LogInputProcessor extends AbstractInputProcessor {
+public class XMLStreamReaderInputProcessor extends AbstractInputProcessor {
 
-    public LogInputProcessor(SecurityProperties securityProperties) {
+    private XMLEventReader xmlEventReader;
+
+    public XMLStreamReaderInputProcessor(SecurityProperties securityProperties, XMLEventReader xmlEventReader) {
         super(securityProperties);
-        setPhase(Constants.Phase.POSTPROCESSING);
-        this.getAfterProcessors().add(SecurityHeaderInputProcessor.class.getName());
+        setPhase(Constants.Phase.PREPROCESSING);
+        this.xmlEventReader = xmlEventReader;
     }
 
     @Override
     public XMLEvent processNextHeaderEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
-        return inputProcessorChain.processHeaderEvent();
+        XMLEvent xmlEvent = xmlEventReader.nextEvent();
+        if (xmlEvent.isStartElement()) {
+            inputProcessorChain.getDocumentContext().addPathElement(xmlEvent.asStartElement().getName());
+        } else if (xmlEvent.isEndElement()) {
+            inputProcessorChain.getDocumentContext().removePathElement();
+        }
+        return xmlEvent;
     }
 
     @Override
     public XMLEvent processNextEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
-        XMLEvent xmlEvent = inputProcessorChain.processEvent();
-        StringWriter stringWriter = new StringWriter();
-        xmlEvent.writeAsEncodedUnicode(stringWriter);
-        logger.trace(stringWriter.toString());
+        XMLEvent xmlEvent = xmlEventReader.nextEvent();
+        if (xmlEvent.isStartElement()) {
+            inputProcessorChain.getDocumentContext().addPathElement(xmlEvent.asStartElement().getName());
+        } else if (xmlEvent.isEndElement()) {
+            inputProcessorChain.getDocumentContext().removePathElement();
+        }
         return xmlEvent;
+    }
+
+    @Override
+    public void doFinal(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
+        //nothing to-do. Also don't call super.doFinal() we are the last processor
     }
 }

@@ -21,6 +21,12 @@
     <logger name="ch.gigerstyle.xmlsec">
         <level value="INFO"/>
     </logger>
+    <logger name="ch.gigerstyle.xmlsec.impl.util">
+        <level value="INFO"/>
+    </logger>
+    <logger name="org.apache.xml.security.utils.DigesterOutputStream">
+        <level value="INFO"/>
+    </logger>
     <logger name="org.apache.xml">
         <level value="INFO"/>
     </logger>

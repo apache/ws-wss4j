@@ -35,12 +35,12 @@ import java.util.GregorianCalendar;
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 public class TimestampInputProcessor extends AbstractInputProcessor {
-
+    //todo only one timestamp is allowed per security-header @see spec
     private TimestampType currentTimestampType;
-    private boolean isFinishedcurrentTimestamp = false;
 
-    public TimestampInputProcessor(SecurityProperties securityProperties) {
+    public TimestampInputProcessor(SecurityProperties securityProperties, StartElement startElement) {
         super(securityProperties);
+        currentTimestampType = new TimestampType(startElement);
     }
 
     /*
@@ -51,8 +51,11 @@ public class TimestampInputProcessor extends AbstractInputProcessor {
      */
 
     @Override
-    public void processSecurityHeaderEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
-        //todo created and expires are optional
+    public XMLEvent processNextHeaderEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
+        XMLEvent xmlEvent = inputProcessorChain.processHeaderEvent();
+
+        boolean isFinishedcurrentTimestamp = false;
+
         if (currentTimestampType != null) {
             try {
                 isFinishedcurrentTimestamp = currentTimestampType.parseXMLEvent(xmlEvent);
@@ -61,11 +64,6 @@ public class TimestampInputProcessor extends AbstractInputProcessor {
                 }
             } catch (ParseException e) {
                 throw new XMLSecurityException(e);
-            }
-        } else if (xmlEvent.isStartElement()) {
-            StartElement startElement = xmlEvent.asStartElement();
-            if (startElement.getName().equals(Constants.TAG_wsu_Timestamp)) {
-                currentTimestampType = new TimestampType(startElement);
             }
         }
 
@@ -125,12 +123,12 @@ public class TimestampInputProcessor extends AbstractInputProcessor {
                 isFinishedcurrentTimestamp = false;
             }
         }
-
-        inputProcessorChain.processSecurityHeaderEvent(xmlEvent);
+        return xmlEvent;
     }
 
-    public void processEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
+    @Override
+    public XMLEvent processNextEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
         //this method should not be called (processor will be removed after processing header
-        inputProcessorChain.processEvent(xmlEvent);
+        return null;
     }
 }
