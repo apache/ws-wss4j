@@ -41,8 +41,8 @@ import java.security.NoSuchAlgorithmException;
 import java.security.Principal;
 import java.security.SecureRandom;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.text.DateFormat;
-import java.util.Calendar;
 import java.util.TimeZone;
 
 /**
@@ -294,12 +294,12 @@ public class UsernameToken {
             zulu = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
             zulu.setTimeZone(TimeZone.getTimeZone("UTC"));
         }
-        Calendar rightNow = Calendar.getInstance();
         elementCreated = 
             doc.createElementNS(
                 WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + WSConstants.CREATED_LN
             );
-        elementCreated.appendChild(doc.createTextNode(zulu.format(rightNow.getTime())));
+        Date currentTime = new Date();
+        elementCreated.appendChild(doc.createTextNode(zulu.format(currentTime)));
         element.appendChild(elementCreated);
     }
 

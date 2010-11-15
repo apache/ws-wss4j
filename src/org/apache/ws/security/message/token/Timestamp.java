@@ -34,7 +34,6 @@ import org.w3c.dom.Text;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.text.DateFormat;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
@@ -103,7 +102,7 @@ public class Timestamp {
         DateFormat zulu = new XmlSchemaDateFormat();
         try {
             if (LOG.isDebugEnabled()) {
-                LOG.debug("Current time: " + zulu.format(Calendar.getInstance().getTime()));
+                LOG.debug("Current time: " + zulu.format(new Date()));
             }
             if (strCreated != null) {
                 createdDate = zulu.parse(strCreated);
@@ -147,20 +146,16 @@ public class Timestamp {
             zulu = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
             zulu.setTimeZone(TimeZone.getTimeZone("UTC"));
         }
-        Calendar calendar = getCurrentTime();
-
         Element elementCreated =
             doc.createElementNS(
                 WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + WSConstants.CREATED_LN
             );
-        createdDate = calendar.getTime();
+        createdDate = new Date();
         elementCreated.appendChild(doc.createTextNode(zulu.format(createdDate)));
         element.appendChild(elementCreated);
         if (ttl != 0) {
-            long currentTime = calendar.getTimeInMillis();
-            currentTime += ttl * 1000;
-            calendar.setTimeInMillis(currentTime);
-            expiresDate = calendar.getTime();
+            expiresDate = new Date();
+            expiresDate.setTime(createdDate.getTime() + (ttl * 1000));
 
             Element elementExpires =
                 doc.createElementNS(
@@ -179,15 +174,6 @@ public class Timestamp {
         WSSecurityUtil.setNamespace(element, WSConstants.WSU_NS, WSConstants.WSU_PREFIX);
     }
 
-    /**
-     * Get the current time
-     * 
-     * @return calendar the current time
-     */
-    protected Calendar getCurrentTime() {
-        return Calendar.getInstance();
-    }
-    
     /**
      * Returns the dom element of this <code>Timestamp</code> object.
      *
@@ -262,8 +248,8 @@ public class Timestamp {
      */
     public boolean isExpired() {
         if (expiresDate != null) {
-            Calendar rightNow = Calendar.getInstance();
-            return expiresDate.before(rightNow.getTime());
+            Date rightNow = new Date();
+            return expiresDate.before(rightNow);
         }
         return false;
     }
@@ -281,13 +267,12 @@ public class Timestamp {
         int timeToLive
     ) {
         // Calculate the time that is allowed for the message to travel
-        Calendar validCreation = Calendar.getInstance();
-        long currentTime = validCreation.getTime().getTime();
-        currentTime -= timeToLive * 1000;
-        validCreation.setTime(new Date(currentTime));
+        Date validCreation = new Date();
+        long currentTime = validCreation.getTime() - timeToLive * 1000;
+        validCreation.setTime(currentTime);
 
         // Validate the time it took the message to travel
-        if (createdDate != null && createdDate.before(validCreation.getTime())) {
+        if (createdDate != null && createdDate.before(validCreation)) {
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Validation of Timestamp: The message was created too long ago");
             }

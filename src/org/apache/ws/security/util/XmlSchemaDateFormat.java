@@ -45,10 +45,6 @@ public class XmlSchemaDateFormat extends DateFormat {
     private static Log log = LogFactory.getLog(XmlSchemaDateFormat.class);
 
     /**
-     * Message retriever.
-     */
-    //   private static final MessageRetriever MSG = ResourceKeys.MSG;
-    /**
      * DateFormat for Zulu (UTC) form of an XML Schema dateTime string.
      */
     private static final DateFormat DATEFORMAT_XSD_ZULU = new SimpleDateFormat(
