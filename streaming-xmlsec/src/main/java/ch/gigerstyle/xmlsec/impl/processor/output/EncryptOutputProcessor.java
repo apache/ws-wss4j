@@ -47,7 +47,7 @@ public class EncryptOutputProcessor extends AbstractOutputProcessor {
     private List<SecurePart> secureParts;
     private Key symmetricKey;
     private String symmetricKeyId = "EncKeyId-" + UUID.randomUUID().toString();
-    private List<EncryptionPartDef> encryptionPartDefList = new ArrayList<EncryptionPartDef>();
+    private List<EncryptionPartDef> encryptionPartDefList = new LinkedList<EncryptionPartDef>();
 
     private InternalEncryptionOutputProcessor activeInternalEncryptionOutputProcessor = null;
 
@@ -87,8 +87,9 @@ public class EncryptOutputProcessor extends AbstractOutputProcessor {
 
             //avoid double encryption when child elements matches too
             if (activeInternalEncryptionOutputProcessor == null) {
-                for (int i = 0; i < secureParts.size(); i++) {
-                    SecurePart securePart = secureParts.get(i);
+                Iterator<SecurePart> securePartIterator = secureParts.iterator();
+                while (securePartIterator.hasNext()) {
+                    SecurePart securePart = securePartIterator.next();
                     if (securePart.getId() == null) {
                         if (startElement.getName().getLocalPart().equals(securePart.getName())
                                 && startElement.getName().getNamespaceURI().equals(securePart.getNamespace())) {

@@ -57,8 +57,8 @@ public class XMLSecurityStreamWriter implements XMLStreamWriter {
 
     private Deque<QName> startElementStack = new ArrayDeque<QName>();
     private QName openStartElement = null;
-    private List<Attribute> currentAttributes = new ArrayList<Attribute>();
-    private List<Namespace> currentNamespaces = new ArrayList<Namespace>();
+    private List<Attribute> currentAttributes = new LinkedList<Attribute>();
+    private List<Namespace> currentNamespaces = new LinkedList<Namespace>();
 
     private void outputOpenStartElement() throws XMLStreamException {
         if (openStartElement != null) {

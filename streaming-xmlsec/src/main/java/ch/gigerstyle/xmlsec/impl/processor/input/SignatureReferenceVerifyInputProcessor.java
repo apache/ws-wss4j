@@ -21,7 +21,8 @@ import java.io.OutputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
-import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -122,7 +123,7 @@ public class SignatureReferenceVerifyInputProcessor extends AbstractInputProcess
     class InternalSignatureReferenceVerifier extends AbstractInputProcessor {
         private ReferenceType referenceType;
 
-        private List<Transformer> transformers = new ArrayList<Transformer>();
+        private List<Transformer> transformers = new LinkedList<Transformer>();
         private DigestOutputStream digestOutputStream;
         private OutputStream bufferedDigestOutputStream;
         //todo: startElement still needed?? Is elementCounter not enough? Test overall code
@@ -166,8 +167,9 @@ public class SignatureReferenceVerifyInputProcessor extends AbstractInputProcess
         }
 
         protected void processEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
-            for (int i = 0; i < transformers.size(); i++) {
-                Transformer transformer = transformers.get(i);
+            Iterator<Transformer> transformerIterator = transformers.iterator();
+            while (transformerIterator.hasNext()) {
+                Transformer transformer = transformerIterator.next();
                 transformer.transform(xmlEvent, this.bufferedDigestOutputStream);
             }
 

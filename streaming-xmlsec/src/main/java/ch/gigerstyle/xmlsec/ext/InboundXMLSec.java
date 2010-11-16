@@ -4,7 +4,9 @@ import ch.gigerstyle.xmlsec.impl.DocumentContextImpl;
 import ch.gigerstyle.xmlsec.impl.InputProcessorChainImpl;
 import ch.gigerstyle.xmlsec.impl.XMLEventNSAllocator;
 import ch.gigerstyle.xmlsec.impl.XMLSecurityStreamReader;
-import ch.gigerstyle.xmlsec.impl.processor.input.*;
+import ch.gigerstyle.xmlsec.impl.processor.input.LogInputProcessor;
+import ch.gigerstyle.xmlsec.impl.processor.input.SecurityHeaderInputProcessor;
+import ch.gigerstyle.xmlsec.impl.processor.input.XMLStreamReaderInputProcessor;
 import ch.gigerstyle.xmlsec.securityEvent.SecurityEventListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -13,7 +15,7 @@ import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
-import javax.xml.stream.events.XMLEvent;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -79,8 +81,9 @@ public class InboundXMLSec {
         }
 
         List<InputProcessor> additionalInputProcessors = securityProperties.getInputProcessorList();
-        for (int i = 0; i < additionalInputProcessors.size(); i++) {
-            InputProcessor inputProcessor = additionalInputProcessors.get(i);
+        Iterator<InputProcessor> inputProcessorIterator = additionalInputProcessors.iterator();
+        while (inputProcessorIterator.hasNext()) {
+            InputProcessor inputProcessor = inputProcessorIterator.next();
             inputProcessorChain.addProcessor(inputProcessor);
         }
 

@@ -5,6 +5,7 @@ import ch.gigerstyle.xmlsec.ext.*;
 import ch.gigerstyle.xmlsec.impl.EncryptionPartDef;
 import ch.gigerstyle.xmlsec.impl.SecurityTokenFactory;
 import ch.gigerstyle.xmlsec.impl.util.IVSplittingOutputStream;
+import ch.gigerstyle.xmlsec.impl.util.ReplaceableOuputStream;
 import ch.gigerstyle.xmlsec.securityEvent.*;
 import org.apache.commons.codec.binary.Base64OutputStream;
 import org.w3._2001._04.xmlenc_.EncryptedDataType;
@@ -26,7 +27,8 @@ import java.io.*;
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
-import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
@@ -99,8 +101,9 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
                 Attribute refId = startElement.getAttributeByName(Constants.ATT_NULL_Id);
                 if (refId != null) {
                     List<ReferenceType> references = referenceList.getDataReferenceOrKeyReference();
-                    for (int i = 0; i < references.size(); i++) {
-                        ReferenceType referenceType = references.get(i);
+                    Iterator<ReferenceType> referenceTypeIterator = references.iterator();
+                    while (referenceTypeIterator.hasNext()) {
+                        ReferenceType referenceType = referenceTypeIterator.next();
                         if (refId.getValue().equals(referenceType.getURI())) {
                             logger.debug("Found encryption reference: " + refId.getValue() + " on element" + startElement.getName());
                             if (referenceType.isProcessed()) {
@@ -181,7 +184,7 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
                 }
             }
         } else if (xmlEvent.isEndElement() && currentEncryptedDataType != null) {
-            currentEncryptedDataType = null;            
+            currentEncryptedDataType = null;
         }
         return xmlEvent;
     }
@@ -189,8 +192,9 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
     @Override
     public void doFinal(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
         List<ReferenceType> references = referenceList.getDataReferenceOrKeyReference();
-        for (int i = 0; i < references.size(); i++) {
-            ReferenceType referenceType = references.get(i);
+        Iterator<ReferenceType> referenceTypeIterator = references.iterator();
+        while (referenceTypeIterator.hasNext()) {
+            ReferenceType referenceType = referenceTypeIterator.next();
             if (!referenceType.isProcessed()) {
                 throw new XMLSecurityException("Some encryption references where not processed... Probably security header ordering problem?");
             }
@@ -278,7 +282,7 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
 
                     inputProcessorChain.removeProcessor(this);
                     inputProcessorChain.getDocumentContext().unsetIsInEncryptedContent();
-                    
+
                     //...fetch the next (unencrypted) event
                     if (headerEvent) {
                         xmlEvent = inputProcessorChain.processHeaderEvent();
@@ -337,7 +341,8 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
             this.encryptedDataType = encryptedDataType;
             this.startXMLElement = startXMLElement;
 
-            pipedInputStream = new PipedInputStream(8192);
+            //5 * 8192 seems to be a fine value
+            pipedInputStream = new PipedInputStream(40960);
             try {
                 pipedOutputStream = new PipedOutputStream(pipedInputStream);
             } catch (IOException e) {
@@ -436,19 +441,21 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
                 tempBufferedWriter.write('\"');
 
                 //apply all namespaces from current scope to get a valid documentfragment:
-                List<ComparableNamespace> comparableNamespacesToApply = new ArrayList<ComparableNamespace>();
+                List<ComparableNamespace> comparableNamespacesToApply = new LinkedList<ComparableNamespace>();
                 List<ComparableNamespace>[] comparableNamespaceList = startXMLElement.getNamespaceList();
                 for (int i = 0; i < comparableNamespaceList.length; i++) {
                     List<ComparableNamespace> comparableNamespaces = comparableNamespaceList[i];
-                    for (int j = 0; j < comparableNamespaces.size(); j++) {
-                        ComparableNamespace comparableNamespace = comparableNamespaces.get(j);
+                    Iterator<ComparableNamespace> comparableNamespaceIterator = comparableNamespaces.iterator();
+                    while (comparableNamespaceIterator.hasNext()) {
+                        ComparableNamespace comparableNamespace = comparableNamespaceIterator.next();
                         if (!comparableNamespacesToApply.contains(comparableNamespace)) {
                             comparableNamespacesToApply.add(comparableNamespace);
                         }
                     }
                 }
-                for (int i = 0; i < comparableNamespacesToApply.size(); i++) {
-                    ComparableNamespace comparableNamespace = comparableNamespacesToApply.get(i);
+                Iterator<ComparableNamespace> comparableNamespaceIterator = comparableNamespacesToApply.iterator();
+                while (comparableNamespaceIterator.hasNext()) {
+                    ComparableNamespace comparableNamespace = comparableNamespaceIterator.next();
                     tempBufferedWriter.write(' ');
                     tempBufferedWriter.write(comparableNamespace.toString());
                 }
@@ -471,7 +478,9 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
                         symmetricCipher, secretKey);
                 //buffering seems not to help
                 //bufferedOutputStream = new BufferedOutputStream(new Base64OutputStream(ivSplittingOutputStream, false), 8192 * 5);
-                OutputStream decryptOutputStream = new Base64OutputStream(ivSplittingOutputStream, false);
+                ReplaceableOuputStream replaceableOuputStream = new ReplaceableOuputStream(ivSplittingOutputStream);
+                OutputStream decryptOutputStream = new Base64OutputStream(replaceableOuputStream, false);
+                ivSplittingOutputStream.setParentOutputStream(replaceableOuputStream);
 
                 boolean finished = false;
                 while (!finished) {

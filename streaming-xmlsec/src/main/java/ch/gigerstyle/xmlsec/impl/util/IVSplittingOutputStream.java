@@ -1,7 +1,6 @@
 package ch.gigerstyle.xmlsec.impl.util;
 
 import javax.crypto.Cipher;
-import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 import java.io.FilterOutputStream;
 import java.io.IOException;
@@ -31,6 +30,8 @@ import java.security.Key;
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 public class IVSplittingOutputStream extends FilterOutputStream {
+
+    private ReplaceableOuputStream replaceableOuputStream;
 
     private byte[] iv;
     private int ivLength;
@@ -71,10 +72,9 @@ public class IVSplittingOutputStream extends FilterOutputStream {
     @Override
     public void write(int b) throws IOException {
         if (pos >= ivLength) {
-            if (!isCipherInitialized) {
-                initializeCipher();
-            }
+            initializeCipher();
             out.write(b);
+            replaceableOuputStream.setNewOutputStream(out);
             return;
         }
         iv[pos++] = (byte) b;
@@ -87,11 +87,6 @@ public class IVSplittingOutputStream extends FilterOutputStream {
 
     @Override
     public void write(byte[] b, int off, int len) throws IOException {
-        if (pos >= ivLength) {
-            out.write(b, off, len);
-            return;
-        }
-
         int missingBytes = ivLength - pos;
         if (missingBytes > len) {
             System.arraycopy(b, off, iv, pos, len);
@@ -99,10 +94,13 @@ public class IVSplittingOutputStream extends FilterOutputStream {
         } else {
             System.arraycopy(b, off, iv, pos, missingBytes);
             pos += missingBytes;
-            if (!isCipherInitialized) {
-                initializeCipher();
-            }
+            initializeCipher();
             out.write(b, off + missingBytes, len - missingBytes);
+            replaceableOuputStream.setNewOutputStream(out);
         }
+    }
+
+    public void setParentOutputStream(ReplaceableOuputStream replaceableOuputStream) {
+        this.replaceableOuputStream = replaceableOuputStream;
     }
 }

@@ -1,12 +1,13 @@
 package ch.gigerstyle.xmlsec.impl.processor.input;
 
 import ch.gigerstyle.xmlsec.ext.*;
-import ch.gigerstyle.xmlsec.impl.util.FiFoQueue;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
+import java.io.PrintWriter;
+import java.util.ArrayDeque;
 
 /**
  * User: giger
@@ -30,7 +31,7 @@ import javax.xml.stream.events.XMLEvent;
  */
 public class SecurityHeaderInputProcessor extends AbstractInputProcessor {
 
-    private FiFoQueue<XMLEvent> xmlEventList = new FiFoQueue<XMLEvent>();
+    private ArrayDeque<XMLEvent> xmlEventList = new ArrayDeque<XMLEvent>();
     private int eventCount = 0;
     private int countOfEventsToResponsibleSecurityHeader = 0;
 
@@ -96,11 +97,11 @@ public class SecurityHeaderInputProcessor extends AbstractInputProcessor {
                     countOfEventsToResponsibleSecurityHeader = 0;
 
                     //return first event now;
-                    return xmlEventList.dequeue();
+                    return xmlEventList.pollLast();
                 }
             }
 
-        } while (!(xmlEvent.isStartElement() && xmlEvent.asStartElement().equals(Constants.TAG_soap11_Body)));
+        } while (!(xmlEvent.isStartElement() && xmlEvent.asStartElement().getName().equals(Constants.TAG_soap11_Body)));
 
         throw new XMLSecurityException("No Security");
     }
@@ -133,7 +134,7 @@ public class SecurityHeaderInputProcessor extends AbstractInputProcessor {
         @Override
         public XMLEvent processNextHeaderEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
             XMLEvent xmlEvent = inputProcessorChain.processHeaderEvent();
-            xmlEventList.enqueue(xmlEvent);
+            xmlEventList.push(xmlEvent);
             return xmlEvent;
         }
 
@@ -177,7 +178,9 @@ public class SecurityHeaderInputProcessor extends AbstractInputProcessor {
                     inputProcessorChain.getDocumentContext().setInSecurityHeader(false);
                 }
 
-                XMLEvent xmlEvent = xmlEventList.dequeue();
+                XMLEvent xmlEvent = xmlEventList.pollLast();
+                xmlEvent.writeAsEncodedUnicode(new PrintWriter(System.out));
+                System.out.flush();
                 if (xmlEvent.isStartElement()) {
                     inputProcessorChain.getDocumentContext().addPathElement(xmlEvent.asStartElement().getName());
                 } else if (xmlEvent.isEndElement()) {

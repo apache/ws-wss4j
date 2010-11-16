@@ -1,6 +1,7 @@
 package ch.gigerstyle.xmlsec.test;
 
 import ch.gigerstyle.xmlsec.impl.util.IVSplittingOutputStream;
+import ch.gigerstyle.xmlsec.impl.util.ReplaceableOuputStream;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -45,11 +46,13 @@ public class IVSplittingOutputStreamTest {
 
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         IVSplittingOutputStream ivSplittingOutputStream = new IVSplittingOutputStream(byteArrayOutputStream, cipher, secretKey);
+        ReplaceableOuputStream replaceableOuputStream = new ReplaceableOuputStream(ivSplittingOutputStream);
+        ivSplittingOutputStream.setParentOutputStream(replaceableOuputStream);
         byte[] testBytes = testString.getBytes();
         for (int i = 0; i < testBytes.length; i++) {
-            ivSplittingOutputStream.write(testBytes[i]);
+            replaceableOuputStream.write(testBytes[i]);
         }
-        ivSplittingOutputStream.close();
+        replaceableOuputStream.close();
 
         Assert.assertEquals(new String(ivSplittingOutputStream.getIv()), testString.substring(0, ivSize));
         Assert.assertEquals(new String(byteArrayOutputStream.toByteArray()), testString.substring(ivSize));
@@ -69,8 +72,10 @@ public class IVSplittingOutputStreamTest {
 
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         IVSplittingOutputStream ivSplittingOutputStream = new IVSplittingOutputStream(byteArrayOutputStream, cipher, secretKey);
-        ivSplittingOutputStream.write(testString.getBytes());
-        ivSplittingOutputStream.close();
+        ReplaceableOuputStream replaceableOuputStream = new ReplaceableOuputStream(ivSplittingOutputStream);
+        ivSplittingOutputStream.setParentOutputStream(replaceableOuputStream);
+        replaceableOuputStream.write(testString.getBytes());
+        replaceableOuputStream.close();
 
         Assert.assertEquals(new String(ivSplittingOutputStream.getIv()), testString.substring(0, ivSize));
         Assert.assertEquals(new String(byteArrayOutputStream.toByteArray()), testString.substring(ivSize));
@@ -90,14 +95,16 @@ public class IVSplittingOutputStreamTest {
 
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         IVSplittingOutputStream ivSplittingOutputStream = new IVSplittingOutputStream(byteArrayOutputStream, cipher, secretKey);
+        ReplaceableOuputStream replaceableOuputStream = new ReplaceableOuputStream(ivSplittingOutputStream);
+        ivSplittingOutputStream.setParentOutputStream(replaceableOuputStream);
 
         byte[] testBytes = testString.getBytes();
         for (int i = 0; i < testBytes.length - 4; i += 4) {
-            ivSplittingOutputStream.write(testBytes, i, 4);
+            replaceableOuputStream.write(testBytes, i, 4);
         }
         //write last part
-        ivSplittingOutputStream.write(testBytes, testBytes.length - testBytes.length % 4, testBytes.length % 4);
-        ivSplittingOutputStream.close();
+        replaceableOuputStream.write(testBytes, testBytes.length - testBytes.length % 4, testBytes.length % 4);
+        replaceableOuputStream.close();
 
         Assert.assertEquals(new String(ivSplittingOutputStream.getIv()), testString.substring(0, ivSize));
         Assert.assertEquals(new String(byteArrayOutputStream.toByteArray()), testString.substring(ivSize));

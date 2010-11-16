@@ -6,7 +6,6 @@ import ch.gigerstyle.xmlsec.ext.*;
 import ch.gigerstyle.xmlsec.impl.SignaturePartDef;
 import ch.gigerstyle.xmlsec.impl.transformer.canonicalizer.Canonicalizer20010315ExclOmitCommentsTransformer;
 import ch.gigerstyle.xmlsec.impl.transformer.canonicalizer.Canonicalizer20010315Transformer;
-import ch.gigerstyle.xmlsec.impl.util.FiFoQueue;
 import ch.gigerstyle.xmlsec.impl.util.RFC2253Parser;
 import ch.gigerstyle.xmlsec.impl.util.SignerOutputStream;
 import org.apache.commons.codec.binary.Base64;
@@ -24,10 +23,7 @@ import java.io.OutputStream;
 import java.security.*;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * User: giger
@@ -57,7 +53,7 @@ public class SignatureEndingOutputProcessor extends AbstractOutputProcessor {
 
     //todo try to use a hint how much elements are expected from other processors? 
     //private List<XMLEvent> xmlEventBuffer = new ArrayList<XMLEvent>(100);
-    private FiFoQueue<XMLEvent> xmlEventBuffer = new FiFoQueue<XMLEvent>();
+    private ArrayDeque<XMLEvent> xmlEventBuffer = new ArrayDeque<XMLEvent>();
 
     public SignatureEndingOutputProcessor(SecurityProperties securityProperties, SignatureOutputProcessor signatureOutputProcessor) throws XMLSecurityException {
         super(securityProperties);
@@ -68,8 +64,7 @@ public class SignatureEndingOutputProcessor extends AbstractOutputProcessor {
 
     @Override
     public void processEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException {
-        //xmlEventBuffer.add(xmlEvent);
-        xmlEventBuffer.enqueue(xmlEvent);
+        xmlEventBuffer.push(xmlEvent);
     }
 
     @Override
@@ -77,8 +72,9 @@ public class SignatureEndingOutputProcessor extends AbstractOutputProcessor {
 
         OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
 
-        while (!xmlEventBuffer.isEmpty()) {
-            XMLEvent xmlEvent = xmlEventBuffer.dequeue();
+        Iterator<XMLEvent> xmlEventIterator = xmlEventBuffer.descendingIterator();
+        while (xmlEventIterator.hasNext()) {
+            XMLEvent xmlEvent = xmlEventIterator.next();
             if (xmlEvent.isStartElement()) {
                 StartElement startElement = xmlEvent.asStartElement();
                 if (startElement.getName().equals(Constants.TAG_wsse_Security)) {
@@ -185,8 +181,9 @@ public class SignatureEndingOutputProcessor extends AbstractOutputProcessor {
         createStartElementAndOutputAsEvent(subOutputProcessorChain, Constants.TAG_dsig_SignatureMethod, attributes);
         createEndElementAndOutputAsEvent(subOutputProcessorChain, Constants.TAG_dsig_SignatureMethod);
 
-        for (int i = 0; i < signaturePartDefList.size(); i++) {
-            SignaturePartDef signaturePartDef = signaturePartDefList.get(i);
+        Iterator<SignaturePartDef> signaturePartDefIterator = signaturePartDefList.iterator();
+        while (signaturePartDefIterator.hasNext()) {
+            SignaturePartDef signaturePartDef = signaturePartDefIterator.next();
             attributes = new HashMap<QName, String>();
             attributes.put(Constants.ATT_NULL_URI, "#" + signaturePartDef.getSigRefId());
             createStartElementAndOutputAsEvent(subOutputProcessorChain, Constants.TAG_dsig_Reference, attributes);

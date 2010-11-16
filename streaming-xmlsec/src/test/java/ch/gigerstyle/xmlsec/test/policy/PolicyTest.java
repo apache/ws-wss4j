@@ -8,7 +8,6 @@ import ch.gigerstyle.xmlsec.policy.PolicyEnforcerFactory;
 import ch.gigerstyle.xmlsec.policy.PolicyInputProcessor;
 import ch.gigerstyle.xmlsec.test.AbstractTestBase;
 import ch.gigerstyle.xmlsec.test.CallbackHandlerImpl;
-import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.w3c.dom.Document;
 

@@ -4,7 +4,6 @@ import ch.gigerstyle.xmlsec.config.JCEAlgorithmMapper;
 import ch.gigerstyle.xmlsec.crypto.WSSecurityException;
 import ch.gigerstyle.xmlsec.ext.*;
 import ch.gigerstyle.xmlsec.impl.EncryptionPartDef;
-import ch.gigerstyle.xmlsec.impl.util.FiFoQueue;
 import ch.gigerstyle.xmlsec.impl.util.RFC2253Parser;
 import org.apache.commons.codec.binary.Base64;
 import org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_secext_1_0.BinarySecurityTokenType;
@@ -23,10 +22,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * User: giger
@@ -54,7 +50,7 @@ public class EncryptEndingOutputProcessor extends AbstractOutputProcessor {
     private String symmetricKeyId;
     private List<EncryptionPartDef> encryptionPartDefList;
 
-    private FiFoQueue<XMLEvent> xmlEventBuffer = new FiFoQueue<XMLEvent>();
+    private ArrayDeque<XMLEvent> xmlEventBuffer = new ArrayDeque<XMLEvent>();
 
     public EncryptEndingOutputProcessor(SecurityProperties securityProperties, EncryptOutputProcessor encryptOutputProcessor) throws XMLSecurityException {
         super(securityProperties);
@@ -66,7 +62,7 @@ public class EncryptEndingOutputProcessor extends AbstractOutputProcessor {
     }
 
     public void processEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException {
-        xmlEventBuffer.enqueue(xmlEvent);
+        xmlEventBuffer.push(xmlEvent);
     }
 
     @Override
@@ -74,8 +70,9 @@ public class EncryptEndingOutputProcessor extends AbstractOutputProcessor {
 
         OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
 
-        while (!xmlEventBuffer.isEmpty()) {
-            XMLEvent xmlEvent = xmlEventBuffer.dequeue();
+        Iterator<XMLEvent> xmlEventIterator = xmlEventBuffer.descendingIterator();
+        while (xmlEventIterator.hasNext()) {
+            XMLEvent xmlEvent = xmlEventIterator.next();
             if (xmlEvent.isStartElement()) {
                 StartElement startElement = xmlEvent.asStartElement();
                 if (startElement.getName().equals(Constants.TAG_wsse_Security)) {
@@ -274,8 +271,9 @@ public class EncryptEndingOutputProcessor extends AbstractOutputProcessor {
 
         createStartElementAndOutputAsEvent(subOutputProcessorChain, Constants.TAG_xenc_ReferenceList, null);
 
-        for (int i = 0; i < encryptionPartDefList.size(); i++) {
-            EncryptionPartDef encryptionPartDef = encryptionPartDefList.get(i);
+        Iterator<EncryptionPartDef> encryptionPartDefIterator = encryptionPartDefList.iterator();
+        while (encryptionPartDefIterator.hasNext()) {
+            EncryptionPartDef encryptionPartDef = encryptionPartDefIterator.next();
 
             attributes = new HashMap<QName, String>();
             attributes.put(Constants.ATT_NULL_URI, "#" + encryptionPartDef.getEncRefId());

@@ -1,7 +1,6 @@
 package ch.gigerstyle.xmlsec.policy;
 
 import ch.gigerstyle.xmlsec.ext.XMLSecurityException;
-import ch.gigerstyle.xmlsec.impl.util.FiFoQueue;
 import ch.gigerstyle.xmlsec.policy.assertionStates.AssertionState;
 import ch.gigerstyle.xmlsec.policy.secpolicy.WSSPolicyException;
 import ch.gigerstyle.xmlsec.policy.secpolicy.model.AbstractSecurityAssertion;
@@ -45,7 +44,7 @@ public class PolicyEnforcer implements SecurityEventListener {
     private OperationPolicy effectivePolicy;
     private Map<SecurityEvent.Event, Collection<AssertionState>> assertionStateMap;
 
-    private FiFoQueue<SecurityEvent> securityEventQueue = new FiFoQueue<SecurityEvent>();
+    private ArrayDeque<SecurityEvent> securityEventQueue = new ArrayDeque<SecurityEvent>();
 
     public PolicyEnforcer(List<OperationPolicy> operationPolicies, String soapAction) throws WSSPolicyException {
         this.operationPolicies = operationPolicies;
@@ -205,14 +204,15 @@ public class PolicyEnforcer implements SecurityEventListener {
                 }
                 buildAssertionStateMap(effectivePolicy.getPolicy(), assertionStateMap);
 
-                while (!securityEventQueue.isEmpty()) {
-                    SecurityEvent prevSecurityEvent = securityEventQueue.dequeue();
+                Iterator<SecurityEvent> securityEventIterator = securityEventQueue.descendingIterator();
+                while (securityEventIterator.hasNext()) {
+                    SecurityEvent prevSecurityEvent = securityEventIterator.next();
                     verifyPolicy(prevSecurityEvent);
                 }
 
             } else {
                 //queue event until policy is resolved
-                securityEventQueue.enqueue(securityEvent);
+                securityEventQueue.push(securityEvent);
             }
         }
     }

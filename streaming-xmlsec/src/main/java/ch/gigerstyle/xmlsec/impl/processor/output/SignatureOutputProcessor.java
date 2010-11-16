@@ -15,10 +15,7 @@ import java.io.OutputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * User: giger
@@ -43,7 +40,7 @@ import java.util.UUID;
 public class SignatureOutputProcessor extends AbstractOutputProcessor {
 
     private List<SecurePart> secureParts;
-    private List<SignaturePartDef> signaturePartDefList = new ArrayList<SignaturePartDef>();
+    private List<SignaturePartDef> signaturePartDefList = new LinkedList<SignaturePartDef>();
 
     private InternalSignatureOutputProcessor activeInternalSignatureOutputProcessor = null;
 
@@ -63,8 +60,9 @@ public class SignatureOutputProcessor extends AbstractOutputProcessor {
 
             //avoid double signature when child elements matches too
             if (activeInternalSignatureOutputProcessor == null) {
-                for (int i = 0; i < secureParts.size(); i++) {
-                    SecurePart securePart = secureParts.get(i);
+                Iterator<SecurePart> securePartIterator = secureParts.iterator();
+                while (securePartIterator.hasNext()) {
+                    SecurePart securePart = securePartIterator.next();
                     if (securePart.getId() == null) {
                         if (startElement.getName().getLocalPart().equals(securePart.getName())
                                 && startElement.getName().getNamespaceURI().equals(securePart.getNamespace())) {
@@ -122,7 +120,7 @@ public class SignatureOutputProcessor extends AbstractOutputProcessor {
 
         private OutputStream bufferedDigestOutputStream;
         private ch.gigerstyle.xmlsec.impl.util.DigestOutputStream digestOutputStream;
-        private List<Transformer> transformers = new ArrayList<Transformer>();
+        private List<Transformer> transformers = new LinkedList<Transformer>();
 
         InternalSignatureOutputProcessor(SecurityProperties securityProperties, SignaturePartDef signaturePartDef, QName startElement) throws XMLSecurityException, NoSuchProviderException, NoSuchAlgorithmException {
             super(securityProperties);
@@ -143,8 +141,9 @@ public class SignatureOutputProcessor extends AbstractOutputProcessor {
         @Override
         public void processEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException {
 
-            for (int i = 0; i < transformers.size(); i++) {
-                Transformer transformer = transformers.get(i);
+            Iterator<Transformer> transformerIterator = transformers.iterator();
+            while (transformerIterator.hasNext()) {
+                Transformer transformer = transformerIterator.next();
                 transformer.transform(xmlEvent, this.bufferedDigestOutputStream);
             }
 

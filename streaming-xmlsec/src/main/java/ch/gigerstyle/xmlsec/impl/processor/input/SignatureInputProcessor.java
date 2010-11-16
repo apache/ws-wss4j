@@ -19,7 +19,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.security.*;
 import java.security.cert.CertificateException;
-import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -47,7 +48,7 @@ public class SignatureInputProcessor extends AbstractInputProcessor {
     private SignatureType currentSignatureType;
 
     private boolean recordSignedInfo = false;
-    private List<XMLEvent> signedInfoXMLEvents = new ArrayList<XMLEvent>();
+    private List<XMLEvent> signedInfoXMLEvents = new LinkedList<XMLEvent>();
 
     public SignatureInputProcessor(SecurityProperties securityProperties, StartElement startElement) {
         super(securityProperties);
@@ -128,8 +129,9 @@ public class SignatureInputProcessor extends AbstractInputProcessor {
                 //todo reparse SignedInfo when custom canonicalization method is used
                 //verify SignedInfo
                 SignatureVerifier signatureVerifier = new SignatureVerifier(currentSignatureType, inputProcessorChain.getSecurityContext(), getSecurityProperties());
-                for (int i = 0; i < signedInfoXMLEvents.size(); i++) {
-                    XMLEvent signedInfoEvent = signedInfoXMLEvents.get(i);
+                Iterator<XMLEvent> xmlEventIterator = signedInfoXMLEvents.iterator();
+                while (xmlEventIterator.hasNext()) {
+                    XMLEvent signedInfoEvent = xmlEventIterator.next();
                     signatureVerifier.processEvent(signedInfoEvent);
                 }
                 signatureVerifier.doFinal();

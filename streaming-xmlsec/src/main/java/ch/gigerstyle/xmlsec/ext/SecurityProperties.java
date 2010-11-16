@@ -7,7 +7,7 @@ import javax.security.auth.callback.CallbackHandler;
 import java.net.URL;
 import java.security.KeyStore;
 import java.security.cert.X509Certificate;
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -32,7 +32,7 @@ import java.util.List;
  */
 public class SecurityProperties {
 
-    private List<InputProcessor> inputProcessorList = new ArrayList<InputProcessor>();
+    private List<InputProcessor> inputProcessorList = new LinkedList<InputProcessor>();
 
     public void addInputProcessor(InputProcessor inputProcessor) {
         this.inputProcessorList.add(inputProcessor);
@@ -125,7 +125,7 @@ public class SecurityProperties {
     private Constants.KeyIdentifierType encryptionKeyIdentifierType;
     private String encryptionSymAlgorithm;
     private String encryptionKeyTransportAlgorithm;
-    private List<SecurePart> encryptionParts = new ArrayList<SecurePart>();
+    private List<SecurePart> encryptionParts = new LinkedList<SecurePart>();
 
     public KeyStore getEncryptionKeyStore() {
         return encryptionKeyStore;
@@ -210,7 +210,7 @@ public class SecurityProperties {
         this.encryptionKeyIdentifierType = encryptionKeyIdentifierType;
     }
 
-    private List<SecurePart> signatureParts = new ArrayList<SecurePart>();
+    private List<SecurePart> signatureParts = new LinkedList<SecurePart>();
     private String signatureAlgorithm;
     private String signatureDigestAlgorithm;
     private String signatureCanonicalizationAlgorithm;

@@ -64,7 +64,7 @@ public class XMLEventNSAllocator implements XMLEventAllocator {
     public XMLEvent allocate(XMLStreamReader reader) throws XMLStreamException {
         if (reader.getEventType() == XMLStreamConstants.START_ELEMENT) {
 
-            List<ComparableNamespace> namespaceList = new ArrayList<ComparableNamespace>(reader.getNamespaceCount());
+            List<ComparableNamespace> namespaceList = new LinkedList<ComparableNamespace>();
             for (int i = 0; i < reader.getNamespaceCount(); i++) {
                 ComparableNamespace namespace;
                 if (reader.getNamespacePrefix(i) == null) {
@@ -75,7 +75,7 @@ public class XMLEventNSAllocator implements XMLEventAllocator {
                 namespaceList.add(namespace);
             }
 
-            List<ComparableAttribute> attributeList = new ArrayList<ComparableAttribute>(reader.getAttributeCount());
+            List<ComparableAttribute> attributeList = new LinkedList<ComparableAttribute>();
             for (int i = 0; i < reader.getAttributeCount(); i++) {
                 QName attrName = reader.getAttributeName(i);
                 if (!"xml".equals(attrName.getPrefix())) {
@@ -120,18 +120,18 @@ public class XMLEventNSAllocator implements XMLEventAllocator {
 
     public XMLEvent createStartElement(QName element, Map<QName, String> attributes) throws XMLStreamException {
 
-        List<String> prefixList = new ArrayList<String>(1);
+        List<String> prefixList = new LinkedList<String>();
         prefixList.add(element.getPrefix());
 
-        List<Namespace> namespaceList = new ArrayList<Namespace>(1);
+        List<Namespace> namespaceList = new LinkedList<Namespace>();
         ComparableNamespace curElementNamespace = new ComparableNamespace(element.getPrefix(), element.getNamespaceURI());
         namespaceList.add(curElementNamespace);
 
-        List<ComparableNamespace> comparableNamespaceList = new ArrayList<ComparableNamespace>(1);
+        List<ComparableNamespace> comparableNamespaceList = new LinkedList<ComparableNamespace>();
         comparableNamespaceList.add(curElementNamespace);
 
-        List<Attribute> attributeList = new ArrayList<Attribute>();
-        List<ComparableAttribute> comparableAttributeList = new ArrayList<ComparableAttribute>();
+        List<Attribute> attributeList = new LinkedList<Attribute>();
+        List<ComparableAttribute> comparableAttributeList = new LinkedList<ComparableAttribute>();
 
         if (attributes != null) {
             Iterator<Map.Entry<QName, String>> attributesEntrySet = attributes.entrySet().iterator();
@@ -168,18 +168,19 @@ public class XMLEventNSAllocator implements XMLEventAllocator {
 
     public XMLEvent createStartElement(QName element, List<Namespace> namespaces, List<Attribute> attributes) throws XMLStreamException {
 
-        List<String> prefixList = new ArrayList<String>(1);
+        List<String> prefixList = new LinkedList<String>();
         prefixList.add(element.getPrefix());
 
-        List<Namespace> namespaceList = new ArrayList<Namespace>(1);
-        List<ComparableNamespace> comparableNamespaceList = new ArrayList<ComparableNamespace>(1);
+        List<Namespace> namespaceList = new LinkedList<Namespace>();
+        List<ComparableNamespace> comparableNamespaceList = new LinkedList<ComparableNamespace>();
 
         ComparableNamespace curElementNamespace = new ComparableNamespace(element.getPrefix(), element.getNamespaceURI());
         namespaceList.add(curElementNamespace);
         comparableNamespaceList.add(curElementNamespace);
 
-        for (int i = 0; i < namespaces.size(); i++) {
-            Namespace namespace = namespaces.get(i);
+        Iterator<Namespace> namespaceIterator = namespaces.iterator();
+        while (namespaceIterator.hasNext()) {
+            Namespace namespace = namespaceIterator.next();
             String prefix = namespace.getPrefix();
 
             /*
@@ -199,10 +200,12 @@ public class XMLEventNSAllocator implements XMLEventAllocator {
             }
         }
 
-        List<Attribute> attributeList = new ArrayList<Attribute>(attributes.size());
-        List<ComparableAttribute> comparableAttributeList = new ArrayList<ComparableAttribute>(attributes.size());
-        for (int i = 0; i < attributes.size(); i++) {
-            Attribute attribute = attributes.get(i);
+        List<Attribute> attributeList = new LinkedList<Attribute>();
+        List<ComparableAttribute> comparableAttributeList = new LinkedList<ComparableAttribute>();
+
+        Iterator<Attribute> attributeIterator = attributes.iterator();
+        while (attributeIterator.hasNext()) {
+            Attribute attribute = attributeIterator.next();
             attributeList.add(attribute);
             comparableAttributeList.add(new ComparableAttribute(attribute.getName(), attribute.getValue()));
             String prefix = attribute.getName().getPrefix();
@@ -231,7 +234,7 @@ public class XMLEventNSAllocator implements XMLEventAllocator {
     }
 
     public XMLEvent createEndElement(QName element) {
-        List<Namespace> namespaceList = new ArrayList<Namespace>(1);
+        List<Namespace> namespaceList = new LinkedList<Namespace>();
         namespaceList.add(xmlEventFactory.createNamespace(element.getPrefix(), element.getNamespaceURI()));
 
         XMLEventNS xmlEventNS = new XMLEventNS(xmlEventFactory.createEndElement(element, namespaceList.iterator()), nsStack.toArray(new List[nsStack.size()]), attrStack.toArray(new List[attrStack.size()]));
