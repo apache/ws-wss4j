@@ -29,6 +29,9 @@ import org.apache.ws.security.WSDocInfo;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.message.token.SecurityTokenReference;
 import org.apache.ws.security.message.token.X509Security;
+import org.apache.ws.security.processor.BinarySecurityTokenProcessor;
+import org.apache.ws.security.processor.Processor;
+import org.apache.ws.security.processor.SAMLTokenProcessor;
 import org.apache.ws.security.util.Base64;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.w3c.dom.Document;
@@ -58,33 +61,30 @@ public class STRTransformUtil {
     public static Element dereferenceSTR(Document doc,
             SecurityTokenReference secRef, WSDocInfo wsDocInfo) throws WSSecurityException
     {
-        
-        // NOTE: Here step numbers refer to the overall step in the complete processing
-        // of the STRTransform.  See STRTransform for the lead up to these steps.
-        //
-        // Third step: locate the security token referenced by the STR element.
-        // Either the Token is contained in the document as a
-        // BinarySecurityToken or stored in some key storage.
-        // 
-        // Fourth step: after security token was located, prepare it. If its
-        // reference via a direct reference, i.e. a relative URI that references
-        // the BST directly in the message then just return that element.
-        // Otherwise wrap the located token in a newly created BST element as
-        // described in WSS Specification.
-        // 
-        //
-        Element tokElement = null;
-    
         //
         // First case: direct reference, according to chap 7.2 of OASIS WS
         // specification (main document). Only in this case return a true
-        // reference to the BST. Copying is done by the caller.
+        // reference to the BST or Assertion. Copying is done by the caller.
         //
         if (secRef.containsReference()) {
             if (log.isDebugEnabled()) {
                 log.debug("STR: Reference");
             }
-            tokElement = secRef.getTokenElement(doc, wsDocInfo, null);
+            org.apache.ws.security.message.token.Reference ref = secRef.getReference();
+            
+            String uri = ref.getURI();
+            if (uri.charAt(0) == '#') {
+                uri = uri.substring(1);
+            }
+            Processor processor = wsDocInfo.getProcessor(uri);
+            
+            if (processor == null) {
+                return secRef.getTokenElement(doc, wsDocInfo, null);
+            } else if (processor instanceof BinarySecurityTokenProcessor) {
+                return ((BinarySecurityTokenProcessor)processor).getToken().getElement();
+            } else if (processor instanceof SAMLTokenProcessor) {
+                return ((SAMLTokenProcessor)processor).getSamlTokenElement();
+            }
         }
         //
         // second case: IssuerSerial, lookup in keystore, wrap in BST according
@@ -94,14 +94,12 @@ public class STRTransformUtil {
             if (log.isDebugEnabled()) {
                 log.debug("STR: IssuerSerial");
             }
-            X509Certificate cert = null;
             X509Certificate[] certs = 
                 secRef.getX509IssuerSerial(wsDocInfo.getCrypto());
             if (certs == null || certs.length == 0 || certs[0] == null) {
                 throw new WSSecurityException(WSSecurityException.FAILED_CHECK);
             }
-            cert = certs[0];
-            tokElement = createBSTX509(doc, cert, secRef.getElement());
+            return createBSTX509(doc, certs[0], secRef.getElement());
         }
         //
         // third case: KeyIdentifier. For SKI, lookup in keystore, wrap in
@@ -113,21 +111,19 @@ public class STRTransformUtil {
                 log.debug("STR: KeyIdentifier");
             }
             if (WSConstants.WSS_SAML_KI_VALUE_TYPE.equals(secRef.getKeyIdentifierValueType())) {
-                tokElement = secRef.getKeyIdentifierTokenElement(doc, wsDocInfo, null);
+                return secRef.getKeyIdentifierTokenElement(doc, wsDocInfo, null);
             } else {
-                X509Certificate cert = null;
                 X509Certificate[] certs = secRef.getKeyIdentifier(wsDocInfo.getCrypto());
                 if (certs == null || certs.length == 0 || certs[0] == null) {
                     throw new WSSecurityException(WSSecurityException.FAILED_CHECK);
                 }
-                cert = certs[0];
-                tokElement = createBSTX509(doc, cert, secRef.getElement());
+                return createBSTX509(doc, certs[0], secRef.getElement());
             }
         }
-        return tokElement;
+        return null;
     }
     
-    protected static Element createBSTX509(Document doc, X509Certificate cert, Element secRefE) 
+    public static Element createBSTX509(Document doc, X509Certificate cert, Element secRefE) 
         throws WSSecurityException {
         byte data[];
         try {

@@ -104,13 +104,13 @@ public class EnvelopeIdResolver extends ResourceResolverSpi {
          */
          
         /*
-         * First check to see if the element that we require is a SecurityTokenReference
-         * that is stored in WSDocInfo.
+         * First check to see if the element that we require is a SecurityTokenReference, or a
+         * previously processed Security Token that is stored in WSDocInfo.
          */
         String id = uriNodeValue.substring(1);
         Element selectedElem = null;
         if (wsDocInfo != null) {
-            selectedElem = wsDocInfo.getSecurityTokenReference(id);
+            selectedElem = wsDocInfo.getTokenElement(id);
         }
         
         /*

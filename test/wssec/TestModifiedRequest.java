@@ -24,7 +24,7 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-// import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSEncryptionPart;
 import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSecurityEngine;
@@ -33,7 +33,7 @@ import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.message.WSSecSignature;
 import org.apache.ws.security.message.WSSecHeader;
-// import org.apache.ws.security.util.WSSecurityUtil;
+import org.apache.ws.security.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 
 import javax.security.auth.callback.Callback;
@@ -143,6 +143,7 @@ public class TestModifiedRequest extends TestCase implements CallbackHandler {
      * original element is changed. The wsu:Id value of the original element is also
      * changed. Signature verification will pass, so we need to check that wsu:Id's.
      * TODO - failing after JSR105 move
+     */
     public void testMovedElementChangedId() throws Exception {
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
@@ -151,7 +152,7 @@ public class TestModifiedRequest extends TestCase implements CallbackHandler {
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
-        List parts = new Vector();
+        List<WSEncryptionPart> parts = new Vector<WSEncryptionPart>();
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "value",
@@ -190,7 +191,8 @@ public class TestModifiedRequest extends TestCase implements CallbackHandler {
         // Now we check that the wsu:Id of the element we want signed corresponds to the
         // wsu:Id that was actually signed...again, this should pass
         //
-        List results = verify(signedDoc);
+        List<WSSecurityEngineResult> results = verify(signedDoc);
+        
         WSSecurityEngineResult actionResult = 
             WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
         WSSecurityUtil.checkSignsAllElements(actionResult, new String[]{savedId});
@@ -217,7 +219,6 @@ public class TestModifiedRequest extends TestCase implements CallbackHandler {
             // expected
         }
     }
-    */
 
 
     /**

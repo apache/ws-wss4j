@@ -24,7 +24,9 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDocInfo;
 import org.apache.ws.security.WSDocInfoStore;
+import org.apache.ws.security.message.token.PKIPathSecurity;
 import org.apache.ws.security.message.token.SecurityTokenReference;
+import org.apache.ws.security.message.token.X509Security;
 import org.apache.ws.security.util.WSSecurityUtil;
 
 import org.apache.xml.security.c14n.Canonicalizer;
@@ -204,6 +206,22 @@ public class STRTransform extends TransformService {
 
             Element dereferencedToken = 
                 STRTransformUtil.dereferenceSTR(doc, secRef, wsDocInfo);
+            
+            if (dereferencedToken != null) {
+                String type = dereferencedToken.getAttribute("ValueType");
+                if ((X509Security.X509_V3_TYPE.equals(type) 
+                    || PKIPathSecurity.getType().equals(type))) {
+                    //
+                    // Add the WSSE/WSU namespaces to the element for C14n
+                    //
+                    WSSecurityUtil.setNamespace(
+                        dereferencedToken, WSConstants.WSSE_NS, WSConstants.WSSE_PREFIX
+                    );
+                    WSSecurityUtil.setNamespace(
+                        dereferencedToken, WSConstants.WSU_NS, WSConstants.WSU_PREFIX
+                    );
+                }
+            }
             
             //
             // C14n with specified algorithm. According to WSS Specification.

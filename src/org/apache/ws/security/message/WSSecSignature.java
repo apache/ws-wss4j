@@ -183,7 +183,7 @@ public class WSSecSignature extends WSSecSignatureBase {
             ref.setValueType(bstToken.getValueType());
             secRef.setReference(ref);
             bstToken.setID(certUri);
-            wsDocInfo.setBst(bstToken.getElement());
+            wsDocInfo.addTokenElement(bstToken.getElement());
             break;
 
         case WSConstants.ISSUER_SERIAL:
@@ -254,7 +254,7 @@ public class WSSecSignature extends WSSecSignatureBase {
         }
         if (keyIdentifierType != WSConstants.KEY_VALUE) {
             XMLStructure structure = new DOMStructure(secRef.getElement());
-            wsDocInfo.setSecurityTokenReference(secRef.getElement());
+            wsDocInfo.addTokenElement(secRef.getElement());
             keyInfo = 
                 keyInfoFactory.newKeyInfo(
                     java.util.Collections.singletonList(structure), keyInfoUri
@@ -462,7 +462,7 @@ public class WSSecSignature extends WSSecSignatureBase {
             }
             URIDereferencer dereferencer = new DOMURIDereferencer();
             ((DOMURIDereferencer)dereferencer).setWsDocInfo(wsDocInfo);
-            signContext.setURIDereferencer(new DOMURIDereferencer());
+            signContext.setURIDereferencer(dereferencer);
             sig.sign(signContext);
             
             signatureValue = sig.getSignatureValue().getValue();

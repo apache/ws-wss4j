@@ -226,61 +226,48 @@ public class SecurityTokenReference {
         String uri,
         String type
     ) {
-        Element tokElement = null;
         String id = uri;
         if (id.charAt(0) == '#') {
             id = id.substring(1);
         }
         //
-        // If the type is a SAMLAssertionID then find the SAML assertion - first check
-        // if it has been previously processed, else search the header for it
+        // If the token type is a SAML Token or BinarySecurityToken, try to find it from the
+        // WSDocInfo instance first, to avoid searching the DOM element for it
         //
         String assertionStr = WSConstants.WSS_SAML_NS + WSConstants.ASSERTION_LN;
-        if (WSConstants.WSS_SAML_KI_VALUE_TYPE.equals(type)
-            || assertionStr.equals(type)) {
-            Element sa = docInfo.getAssertion();
-            if (sa != null) {
-                String saID = sa.getAttribute("AssertionID");
-                if (doDebug) {
-                    log.debug("SAML token ID: " + saID);
-                }
-                if (saID.equals(id)) {
-                    tokElement = sa;
-                }
-            }
-            if (tokElement == null) {
-                Element assertion = 
-                    WSSecurityUtil.findSAMLAssertionElementById(
-                        doc.getDocumentElement(),
-                        id
-                    );
-                if (assertion != null) {
-                    tokElement = assertion;
-                }
+        if (docInfo != null &&
+            (WSConstants.WSS_SAML_KI_VALUE_TYPE.equals(type)
+            || assertionStr.equals(type)
+            || X509Security.X509_V3_TYPE.equals(type) 
+            || PKIPathSecurity.getType().equals(type))) {
+            Element token = docInfo.getTokenElement(id);
+            if (token != null) {
+                return token;
             }
         }
         
         //
-        // If the type is a BinarySecurityToken then check to see if it's available in
-        // the WSDocInfo
+        // Try to find a SAML Assertion by searching the DOM tree
         //
-        if (docInfo != null && 
-            (X509Security.X509_V3_TYPE.equals(type) || PKIPathSecurity.getType().equals(type))) {
-            Element bst = docInfo.getBst(uri);
-            if (bst != null) {
-                //
-                // Add the WSSE/WSU namespaces to the element for C14n
-                //
-                WSSecurityUtil.setNamespace(bst, WSConstants.WSSE_NS, WSConstants.WSSE_PREFIX);
-                WSSecurityUtil.setNamespace(bst, WSConstants.WSU_NS, WSConstants.WSU_PREFIX);
-                return bst;
+        if (WSConstants.WSS_SAML_KI_VALUE_TYPE.equals(type) || assertionStr.equals(type)) {
+            Element assertion = 
+                WSSecurityUtil.findSAMLAssertionElementById(
+                    doc.getDocumentElement(),
+                    id
+                );
+            if (assertion != null) {
+                if (doDebug) {
+                    log.debug("SAML token ID: " + assertion.getAttribute("AssertionID"));
+                }
+                docInfo.addTokenElement(assertion);
+                return assertion;
             }
         }
         
         // 
         // Try to find a custom token
         //
-        if (tokElement == null && WSConstants.WSC_SCT.equals(type) && cb != null) {
+        if (WSConstants.WSC_SCT.equals(type) && cb != null) {
             //try to find a custom token
             WSPasswordCallback pwcb = 
                 new WSPasswordCallback(id, WSPasswordCallback.CUSTOM_TOKEN);
@@ -288,7 +275,7 @@ public class SecurityTokenReference {
                 cb.handle(new Callback[]{pwcb});
                 Element assertionElem = pwcb.getCustomToken();
                 if (assertionElem != null) {
-                    tokElement = (Element)doc.importNode(assertionElem, true);
+                    return (Element)doc.importNode(assertionElem, true);
                 }
             } catch (Exception e) {
                 log.debug(e.getMessage(), e);
@@ -297,15 +284,11 @@ public class SecurityTokenReference {
         }
         
         //
-        // Finally try to find the element by its Id
+        // Finally try to find the element by its (wsu) Id
         //
+        Element tokElement = WSSecurityUtil.getElementByWsuId(doc, uri);
         if (tokElement == null) {
-            tokElement = WSSecurityUtil.getElementByWsuId(doc, uri);
-            
-            // In some scenarios id is used rather than wsu:Id
-            if (tokElement == null) {
-                tokElement = WSSecurityUtil.getElementByGenId(doc, uri);
-            }
+            tokElement = WSSecurityUtil.getElementByGenId(doc, uri);
         }
         
         return tokElement;

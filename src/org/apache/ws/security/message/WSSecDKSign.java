@@ -263,7 +263,7 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
             }
             URIDereferencer dereferencer = new DOMURIDereferencer();
             ((DOMURIDereferencer)dereferencer).setWsDocInfo(wsDocInfo);
-            signContext.setURIDereferencer(new DOMURIDereferencer());
+            signContext.setURIDereferencer(dereferencer);
             sig.sign(signContext);
             
             signatureValue = sig.getSignatureValue().getValue();

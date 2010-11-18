@@ -45,10 +45,8 @@ import java.util.Vector;
 public class WSDocInfo {
     Document doc = null;
     Crypto crypto = null;
-    List<Element> bstList = null;
-    Element assertion = null;
+    List<Element> tokenList = null;
     List<Processor> processors = null;
-    List<Element> securityTokenReferences = null;
 
     public WSDocInfo(Document doc) {
         //
@@ -63,65 +61,51 @@ public class WSDocInfo {
     }
     
     /**
-     * Set a SecurityTokenReference element.
-     */
-    public void setSecurityTokenReference(Element securityTokenRef) {
-        if (securityTokenReferences == null) {
-            securityTokenReferences = new Vector<Element>();
-        }
-        securityTokenReferences.add(securityTokenRef);
-    }
-    
-    /**
-     * Get a SecurityTokenReference for the given (wsu) Id
-     *
-     * @param uri is the relative uri (starts with #) of the id
-     * @return the STR element or null if nothing found
-     */
-    public Element getSecurityTokenReference(String uri) {
-        if (securityTokenReferences != null) {
-            for (Element elem : securityTokenReferences) {
-                String cId = elem.getAttributeNS(WSConstants.WSU_NS, "Id");
-                if (uri.equals(cId)) {
-                    return elem;
-                }
-            }
-        }
-        return null;
-    }
-
-    /**
      * Clears the info data except the hash code
      */
     public void clear() {
         crypto = null;
-        assertion = null;
-        if (bstList != null && bstList.size() > 0) {
-            bstList.clear();
+        if (tokenList != null && tokenList.size() > 0) {
+            tokenList.clear();
         }
         if (processors != null && processors.size() > 0) {
             processors.clear();
         }
         
-        bstList = null;
+        tokenList = null;
         processors = null;
     }
-
+    
     /**
-     * Get a BinarySecurityToken for the given Id
-     *
-     * @param uri is the relative uri (starts with #) of the id
-     * @return the BST element or null if nothing found
+     * @param elem is the token element to store
      */
-    public Element getBst(String uri) {
+    public void addTokenElement(Element elem) {
+        if (tokenList == null) {
+            tokenList = new Vector<Element>();
+        }
+        tokenList.add(elem);
+    }
+    
+    /**
+     * Get a token Element for the given Id. The Id can be either a wsu:Id or a 
+     * SAML AssertionID/ID.
+     * TODO think about if it is better to restrict the default Id to wsu:Id?
+     * @param uri is the (relative) uri of the id
+     * @return the token element or null if nothing found
+     */
+    public Element getTokenElement(String uri) {
         String id = uri;
-        if (id.charAt(0) == '#') {
+        if (id == null) {
+            return null;
+        } else if (id.charAt(0) == '#') {
             id = id.substring(1);
         }
-        if (bstList != null) {
-            for (Element elem : bstList) {
+        if (tokenList != null) {
+            for (Element elem : tokenList) {
                 String cId = elem.getAttributeNS(WSConstants.WSU_NS, "Id");
-                if (id.equals(cId)) {
+                String samlId = elem.getAttribute("AssertionID");
+                String samlId2 = elem.getAttribute("ID");
+                if (id.equals(cId) || id.equals(samlId) || id.equals(samlId2)) {
                     return elem;
                 }
             }
@@ -179,16 +163,6 @@ public class WSDocInfo {
     }
 
     /**
-     * @param elem is the BinarySecurityToken to store
-     */
-    public void setBst(Element elem) {
-        if (bstList == null) {
-            bstList = new Vector<Element>();
-        }
-        bstList.add(elem);
-    }
-
-    /**
      * @param crypto is the signature crypto class used to
      *               process signature/verify
      */
@@ -196,17 +170,4 @@ public class WSDocInfo {
         this.crypto = crypto;
     }
 
-    /**
-     * @return Returns the assertion.
-     */
-    public Element getAssertion() {
-        return assertion;
-    }
-
-    /**
-     * @param assertion The assertion to set.
-     */
-    public void setAssertion(Element assertion) {
-        this.assertion = assertion;
-    }
 }

@@ -310,7 +310,7 @@ public class SignatureProcessor implements Processor {
                             (SecurityContextTokenProcessor)processor;
                         secretKey = sctProcessor.getSecret();
                         principal = new CustomTokenPrincipal(sctProcessor.getIdentifier());
-                    }  else if (processor instanceof DerivedKeyTokenProcessor) {
+                    } else if (processor instanceof DerivedKeyTokenProcessor) {
                         DerivedKeyTokenProcessor dktProcessor = 
                             (DerivedKeyTokenProcessor) processor;
                         DerivedKeyToken dkt = dktProcessor.getDerivedKeyToken();
@@ -321,7 +321,7 @@ public class SignatureProcessor implements Processor {
                         }
                         secretKey = dktProcessor.getKeyBytes(keyLength);
                         principal = dkt.createPrincipal();
-                    }  else if (processor instanceof SAMLTokenProcessor) {
+                    } else if (processor instanceof SAMLTokenProcessor) {
                         if (crypto == null) {
                             throw new WSSecurityException(
                                 WSSecurityException.FAILURE, "noSigCryptoFile"
@@ -416,7 +416,7 @@ public class SignatureProcessor implements Processor {
         context.setProperty("javax.xml.crypto.dsig.cacheReference", Boolean.TRUE);
         URIDereferencer dereferencer = new DOMURIDereferencer();
         ((DOMURIDereferencer)dereferencer).setWsDocInfo(wsDocInfo);
-        context.setURIDereferencer(new DOMURIDereferencer());
+        context.setURIDereferencer(dereferencer);
         try {
             XMLSignature xmlSignature = signatureFactory.unmarshalXMLSignature(context);
             boolean signatureOk = xmlSignature.validate(context);

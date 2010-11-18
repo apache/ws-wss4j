@@ -392,7 +392,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
                     ref.setValueType(WSConstants.WSS_SAML_KI_VALUE_TYPE);
                     secRefSaml.setReference(ref);
                 }
-                wsDocInfo.setSecurityTokenReference(secRefSaml.getElement());
+                wsDocInfo.addTokenElement(secRefSaml.getElement());
             }
         } catch (Exception ex) {
             throw new WSSecurityException(
@@ -408,7 +408,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
                 bstToken = new X509Security(doc);
                 ((X509Security) bstToken).setX509Certificate(certs[0]);
                 bstToken.setID(certUri);
-                wsDocInfo.setBst(bstToken.getElement());
+                wsDocInfo.addTokenElement(bstToken.getElement());
                 ref.setValueType(bstToken.getValueType());
                 secRef.setReference(ref);
                 break;
@@ -444,7 +444,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
             }
         }
         XMLStructure structure = new DOMStructure(secRef.getElement());
-        wsDocInfo.setSecurityTokenReference(secRef.getElement());
+        wsDocInfo.addTokenElement(secRef.getElement());
 
         keyInfo = 
             keyInfoFactory.newKeyInfo(
@@ -458,7 +458,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
                 WSSecurityException.FAILED_SIGNATURE, "noSAMLdoc", null, e2
             );
         }
-        wsDocInfo.setAssertion(samlToken);
+        wsDocInfo.addTokenElement(samlToken);
     }
 
     /**
@@ -539,7 +539,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
             }
             URIDereferencer dereferencer = new DOMURIDereferencer();
             ((DOMURIDereferencer)dereferencer).setWsDocInfo(wsDocInfo);
-            signContext.setURIDereferencer(new DOMURIDereferencer());
+            signContext.setURIDereferencer(dereferencer);
             sig.sign(signContext);
             
             signatureValue = sig.getSignatureValue().getValue();

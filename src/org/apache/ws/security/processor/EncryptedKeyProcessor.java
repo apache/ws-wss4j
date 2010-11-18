@@ -66,6 +66,8 @@ public class EncryptedKeyProcessor implements Processor {
     private X509Certificate[] certs;
     
     private String encryptedKeyTransportMethod = null;
+    
+    private WSDocInfo docInfo = null;
 
     public void handleToken(
         Element elem, 
@@ -86,6 +88,7 @@ public class EncryptedKeyProcessor implements Processor {
         if (cb == null) {
             throw new WSSecurityException(WSSecurityException.FAILURE, "noCallback");
         }
+        docInfo = wsDocInfo;
         List<WSDataRef> dataRefs = handleEncryptedKey(elem, cb, decCrypto, null);
         encryptedKeyId = elem.getAttribute("Id");
         
@@ -98,7 +101,10 @@ public class EncryptedKeyProcessor implements Processor {
                 certs
             );
         
-        result.put(WSSecurityEngineResult.TAG_ENCRYPTED_KEY_TRANSPORT_METHOD, this.encryptedKeyTransportMethod);
+        result.put(
+            WSSecurityEngineResult.TAG_ENCRYPTED_KEY_TRANSPORT_METHOD, 
+            this.encryptedKeyTransportMethod
+        );
         
         returnResults.add(
             0, 
@@ -381,43 +387,59 @@ public class EncryptedKeyProcessor implements Processor {
                 log.debug("KeyIdentifier Alias: " + alias);
             }
         } else if (secRef.containsReference()) {
-            Element bstElement = secRef.getTokenElement(doc, null, cb);
-
-            // at this point ... check token type: Binary
-            QName el = 
-                new QName(bstElement.getNamespaceURI(), bstElement.getLocalName());
-            if (el.equals(WSSecurityEngine.BINARY_TOKEN)) {
-                X509Security token = new X509Security(bstElement);
-                String value = bstElement.getAttribute(WSSecurityEngine.VALUE_TYPE);
-                if (!X509Security.X509_V3_TYPE.equals(value) || (token == null)) {
+            if (docInfo != null) {
+                String uri = secRef.getReference().getURI();
+                if (uri.charAt(0) == '#') {
+                    uri = uri.substring(1);
+                }
+                Processor processor = docInfo.getProcessor(uri);
+                if (processor instanceof BinarySecurityTokenProcessor) {
+                    certs = ((BinarySecurityTokenProcessor)processor).getCertificates();
+                } else if (processor != null) {
                     throw new WSSecurityException(
                         WSSecurityException.UNSUPPORTED_SECURITY_TOKEN,
                         "unsupportedBinaryTokenType",
-                        new Object[] {"for decryption (BST)"}
+                        null
                     );
                 }
-                certs = new X509Certificate[]{token.getX509Certificate(crypto)};
-                if (certs[0] == null) {
+            }
+            if (certs == null) {
+                Element bstElement = secRef.getTokenElement(doc, null, cb);
+    
+                // at this point ... check token type: Binary
+                QName el = new QName(bstElement.getNamespaceURI(), bstElement.getLocalName());
+                if (el.equals(WSSecurityEngine.BINARY_TOKEN)) {
+                    X509Security token = new X509Security(bstElement);
+                    if (token == null) {
+                        throw new WSSecurityException(
+                            WSSecurityException.UNSUPPORTED_SECURITY_TOKEN,
+                            "unsupportedBinaryTokenType",
+                            new Object[] {"for decryption (BST)"}
+                        );
+                    }
+                    certs = new X509Certificate[]{token.getX509Certificate(crypto)};
+                } else {
                     throw new WSSecurityException(
-                        WSSecurityException.FAILURE,
-                        "noCertsFound", 
-                        new Object[] {"decryption"}
+                        WSSecurityException.UNSUPPORTED_SECURITY_TOKEN,
+                        "unsupportedBinaryTokenType",
+                        null
                     );
                 }
-                //
-                // Here we have the certificate. Now find the alias for it. Needed to identify
-                // the private key associated with this certificate
-                //
-                alias = crypto.getAliasForX509Cert(certs[0]);
-                if (log.isDebugEnabled()) {
-                    log.debug("BST Alias: " + alias);
-                }
-            } else {
+            }
+            if (certs == null || certs[0] == null) {
                 throw new WSSecurityException(
-                    WSSecurityException.UNSUPPORTED_SECURITY_TOKEN,
-                    "unsupportedBinaryTokenType",
-                    null
+                    WSSecurityException.FAILURE,
+                    "noCertsFound", 
+                    new Object[] {"decryption"}
                 );
+            }
+            //
+            // Here we have the certificate. Now find the alias for it. Needed to identify
+            // the private key associated with this certificate
+            //
+            alias = crypto.getAliasForX509Cert(certs[0]);
+            if (log.isDebugEnabled()) {
+                log.debug("BST Alias: " + alias);
             }
             //
             // The following code is somewhat strange: the called crypto method gets

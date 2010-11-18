@@ -54,7 +54,7 @@ public class SAMLTokenProcessor implements Processor {
         }
         SAMLAssertion assertion = handleSAMLToken(elem);
         id = assertion.getId();
-        wsDocInfo.setAssertion(elem);
+        wsDocInfo.addTokenElement(elem);
         returnResults.add(
             0,
             new WSSecurityEngineResult(WSConstants.ST_UNSIGNED, assertion)
