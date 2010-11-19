@@ -101,7 +101,7 @@ public class UsernameTokenProcessor implements Processor {
         String pwType = ut.getPasswordType();
         if (log.isDebugEnabled()) {
             log.debug("UsernameToken user " + user);
-            log.debug("UsernameToken password " + password);
+            log.debug("UsernameToken password type " + pwType);
         }
         //
         // If the UsernameToken is hashed or plaintext, then retrieve the password from the
@@ -130,9 +130,6 @@ public class UsernameTokenProcessor implements Processor {
                 );
             }
             String origPassword = pwCb.getPassword();
-            if (log.isDebugEnabled()) {
-                log.debug("UsernameToken callback password " + origPassword);
-            }
             if (origPassword == null) {
                 if (log.isDebugEnabled()) {
                     log.debug("Callback supplied no password for: " + user);

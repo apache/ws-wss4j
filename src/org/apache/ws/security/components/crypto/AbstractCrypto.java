@@ -222,8 +222,6 @@ public abstract class AbstractCrypto extends CryptoBase {
             java.net.URL url = Loader.getResource(loader, location);
             if (url != null) {
                 is = url.openStream();
-            } else {
-                is = new java.io.FileInputStream(location);
             }
     
             //
