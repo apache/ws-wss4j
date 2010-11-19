@@ -39,6 +39,7 @@ public class FinalOutputProcessor extends AbstractOutputProcessor {
     }
 
     public void processEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException {
+        //todo optimize writeouts
         xmlEvent.writeAsEncodedUnicode(outputStreamWriter);
     }
 

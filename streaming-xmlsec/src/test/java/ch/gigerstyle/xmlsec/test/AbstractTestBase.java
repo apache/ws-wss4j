@@ -154,7 +154,7 @@ public abstract class AbstractTestBase {
     }
 
     protected Document doInboundSecurityWithWSS4J(Document document, String action) throws Exception {
-        WSS4JHandler wss4JHandler = new CustomWSS4JHandler();
+        CustomWSS4JHandler wss4JHandler = new CustomWSS4JHandler();
         HandlerInfo handlerInfo = new HandlerInfo();
         wss4JHandler.init(handlerInfo);
         MessageContext messageContext = getMessageContext(document);
@@ -186,7 +186,7 @@ public abstract class AbstractTestBase {
         requestData.setMsgContext(messageContext);
         wss4JHandler.doReceiver(messageContext, requestData, false);
 
-        return (Document) messageContext.getProperty(WSHandlerConstants.SND_SECURITY);
+        return ((SOAPMessage) messageContext.getProperty(WSHandlerConstants.SND_SECURITY)).getSOAPHeader().getOwnerDocument();
     }
 
     private MessageContext getMessageContext(InputStream inputStream) {
@@ -227,6 +227,7 @@ public abstract class AbstractTestBase {
                     MessageFactory messageFactory = MessageFactory.newInstance(SOAPConstants.SOAP_1_1_PROTOCOL);
                     SOAPMessage soapMessage = messageFactory.createMessage();
                     soapMessage.getSOAPPart().setContent(inSource);
+                    setProperty(WSHandlerConstants.SND_SECURITY, soapMessage);
                     return soapMessage;
                 } catch (Exception e) {
                     throw new RuntimeException(e);
