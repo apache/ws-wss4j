@@ -52,6 +52,7 @@ public class Init {
             } catch (Exception e) {
                 throw new XMLSecurityException(e.getMessage(), e);
             }
+            initialized = true;
         }
     }
 }
