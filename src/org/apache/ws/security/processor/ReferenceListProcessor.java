@@ -312,10 +312,20 @@ public class ReferenceListProcessor implements Processor {
                 id = id.substring(1);
             }
             Processor p = wsDocInfo.getProcessor(id);
-            if (!(p instanceof EncryptedKeyProcessor
-                || p instanceof DerivedKeyTokenProcessor 
-                || p instanceof SAMLTokenProcessor)
-            ) {
+            if (p instanceof EncryptedKeyProcessor) {
+                EncryptedKeyProcessor ekp = (EncryptedKeyProcessor) p;
+                decryptedData = ekp.getDecryptedBytes();
+            } else if (p instanceof DerivedKeyTokenProcessor) {
+                DerivedKeyTokenProcessor dkp = (DerivedKeyTokenProcessor) p;
+                decryptedData = dkp.getKeyBytes(WSSecurityUtil.getKeyLength(algorithm));
+            } else if (p instanceof SAMLTokenProcessor) {
+                SAMLTokenProcessor samlp = (SAMLTokenProcessor) p;
+                SAMLKeyInfo keyInfo = 
+                    SAMLUtil.getSAMLKeyInfo(samlp.getSamlTokenElement(), crypto, cb);
+                // TODO Handle malformed SAML tokens where they don't have the 
+                // secret in them
+                decryptedData = keyInfo.getSecret();
+            } else {
                 // Try custom token
                 WSPasswordCallback pwcb = new WSPasswordCallback(id, WSPasswordCallback.CUSTOM_TOKEN);
                 try {
@@ -337,42 +347,44 @@ public class ReferenceListProcessor implements Processor {
                     );
                 }
             }
-            if (p instanceof EncryptedKeyProcessor) {
-                EncryptedKeyProcessor ekp = (EncryptedKeyProcessor) p;
-                decryptedData = ekp.getDecryptedBytes();
-            } else if (p instanceof DerivedKeyTokenProcessor) {
-                DerivedKeyTokenProcessor dkp = (DerivedKeyTokenProcessor) p;
-                decryptedData = dkp.getKeyBytes(WSSecurityUtil.getKeyLength(algorithm));
-            } else if (p instanceof SAMLTokenProcessor) {
-                SAMLTokenProcessor samlp = (SAMLTokenProcessor) p;
-                SAMLKeyInfo keyInfo = 
-                    SAMLUtil.getSAMLKeyInfo(samlp.getSamlTokenElement(), crypto, cb);
+        } else if (secRef.containsKeyIdentifier()) {
+            if (WSConstants.WSS_SAML_KI_VALUE_TYPE.equals(secRef.getKeyIdentifierValueType())) { 
+                Element token = 
+                    secRef.getKeyIdentifierTokenElement(secRefToken.getOwnerDocument(), wsDocInfo, cb);
+                
+                if (crypto == null) {
+                    throw new WSSecurityException(
+                        WSSecurityException.FAILURE, "noSigCryptoFile"
+                    );
+                }
+                SAMLKeyInfo keyInfo = SAMLUtil.getSAMLKeyInfo(token, crypto, cb);
                 // TODO Handle malformed SAML tokens where they don't have the 
                 // secret in them
                 decryptedData = keyInfo.getSecret();
+            } else {
+                String sha = secRef.getKeyIdentifierValue();
+                
+                WSPasswordCallback pwcb = 
+                    new WSPasswordCallback(
+                        secRef.getKeyIdentifierValue(),
+                        null,
+                        secRef.getKeyIdentifierValueType(),
+                        WSPasswordCallback.ENCRYPTED_KEY_TOKEN
+                    );
+                
+                try {
+                    Callback[] callbacks = new Callback[]{pwcb};
+                    cb.handle(callbacks);
+                } catch (Exception e) {
+                    throw new WSSecurityException(
+                        WSSecurityException.FAILURE,
+                        "noPassword", 
+                        new Object[] {sha}, 
+                        e
+                    );
+                }
+                decryptedData = pwcb.getKey();
             }
-        } else if (secRef.containsKeyIdentifier()){
-            String sha = secRef.getKeyIdentifierValue();
-            WSPasswordCallback pwcb = 
-                new WSPasswordCallback(
-                    secRef.getKeyIdentifierValue(),
-                    null,
-                    secRef.getKeyIdentifierValueType(),
-                    WSPasswordCallback.ENCRYPTED_KEY_TOKEN
-                );
-            
-            try {
-                Callback[] callbacks = new Callback[]{pwcb};
-                cb.handle(callbacks);
-            } catch (Exception e) {
-                throw new WSSecurityException(
-                    WSSecurityException.FAILURE,
-                    "noPassword", 
-                    new Object[] {sha}, 
-                    e
-                );
-            }
-            decryptedData = pwcb.getKey();
         } else {
             throw new WSSecurityException(WSSecurityException.FAILED_CHECK, "noReference");
         }

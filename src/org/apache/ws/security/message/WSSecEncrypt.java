@@ -89,7 +89,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
      * Custom reference value
      */
     private String customReferenceValue;
-    
+
     /**
      * ValueType for the encrypted key reference
      */
@@ -520,16 +520,23 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
             if (keyInfo == null) {
                 keyInfo = new KeyInfo(document);
                 SecurityTokenReference secToken = new SecurityTokenReference(document);
-                Reference ref = new Reference(document);
-                if (encKeyIdDirectId) {
-                    ref.setURI(encKeyId);
+                
+                if (useKeyIdentifier && 
+                        SecurityTokenReference.SAML_ID_URI.equals(customReferenceValue)) {
+                    secToken.setSAMLKeyIdentifier((encKeyIdDirectId ? "":"#") + encKeyId);
                 } else {
-                    ref.setURI("#" + encKeyId);                    
+                   Reference ref = new Reference(document);
+                   if (encKeyIdDirectId) {
+                       ref.setURI(encKeyId);
+                   } else {
+                       ref.setURI("#" + encKeyId);                    
+                   }
+                   if (encKeyValueType != null) {
+                       ref.setValueType(encKeyValueType);
+                   }
+                   secToken.setReference(ref);
                 }
-                if (encKeyValueType != null) {
-                    ref.setValueType(encKeyValueType);
-                }
-                secToken.setReference(ref);
+                
                 keyInfo.addUnknownElement(secToken.getElement());
                 Element keyInfoElement = keyInfo.getElement();
                 keyInfoElement.setAttributeNS(
@@ -774,11 +781,11 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
     public boolean isEncryptSymmKey() {
         return encryptSymmKey;
     }
-
+    
     public void setEncryptSymmKey(boolean encryptSymmKey) {
         this.encryptSymmKey = encryptSymmKey;
     }
-
+    
     private String getSHA1(byte[] input) throws WSSecurityException {
         try {
             MessageDigest sha = null;
@@ -794,7 +801,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
             );
         }
     }
-
+    
     public void setCustomReferenceValue(String customReferenceValue) {
         this.customReferenceValue = customReferenceValue;
     }

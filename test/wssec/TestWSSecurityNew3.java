@@ -250,7 +250,7 @@ public class TestWSSecurityNew3 extends TestCase implements CallbackHandler {
                  * e.g.: pc.setPassword(passStore.getPassword(pc.getIdentfifier))
                  * for Testing we supply a fixed name here.
                  */
-                pc.setPassword("password");
+                pc.setPassword("security");
             } else {
                 throw new UnsupportedCallbackException(callbacks[i], "Unrecognized Callback");
             }

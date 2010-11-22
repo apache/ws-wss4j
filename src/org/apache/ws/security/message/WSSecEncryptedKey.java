@@ -96,6 +96,16 @@ public class WSSecEncryptedKey extends WSSecBase {
     protected String encKeyId = null;
 
     /**
+     * Custom token value
+     */
+    protected String customEKTokenValueType;
+    
+    /**
+     * Custom token id
+     */
+    protected String customEKTokenId;
+    
+    /**
      * BinarySecurityToken to be included in the case where BST_DIRECT_REFERENCE
      * is used to refer to the asymmetric encryption cert
      */
@@ -288,6 +298,10 @@ public class WSSecEncryptedKey extends WSSecBase {
             ref.setValueType(bstToken.getValueType());
             secToken.setReference(ref);
             break;
+            
+        case WSConstants.CUSTOM_KEY_IDENTIFIER:
+            secToken.setKeyIdentifier(customEKTokenValueType, customEKTokenId);
+            break;           
 
         default:
             throw new WSSecurityException(WSSecurityException.FAILURE, "unsupportedKeyId");
@@ -533,4 +547,11 @@ public class WSSecEncryptedKey extends WSSecBase {
         return encryptedEphemeralKey;
     }
     
+    public void setCustomEKTokenValueType(String customEKTokenValueType) {
+        this.customEKTokenValueType = customEKTokenValueType;
+    }
+
+    public void setCustomEKTokenId(String customEKTokenId) {
+        this.customEKTokenId = customEKTokenId;
+    }
 }
