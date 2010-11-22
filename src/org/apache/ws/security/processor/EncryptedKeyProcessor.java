@@ -32,6 +32,8 @@ import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.message.token.SecurityTokenReference;
 import org.apache.ws.security.message.token.X509Security;
+import org.apache.ws.security.saml.SAMLKeyInfo;
+import org.apache.ws.security.saml.SAMLUtil;
 import org.apache.ws.security.util.Base64;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.w3c.dom.Document;
@@ -369,7 +371,20 @@ public class EncryptedKeyProcessor implements Processor {
         // This method is _not_ recommended by OASIS WS-S specification, X509 profile
         //
         else if (secRef.containsKeyIdentifier()) {
-            certs = secRef.getKeyIdentifier(crypto);
+            if (WSConstants.WSS_SAML_KI_VALUE_TYPE.equals(secRef.getKeyIdentifierValueType())) { 
+                Element token = 
+                    secRef.getKeyIdentifierTokenElement(doc, docInfo, cb);
+                
+                if (crypto == null) {
+                    throw new WSSecurityException(
+                        WSSecurityException.FAILURE, "noSigCryptoFile"
+                    );
+                }
+                SAMLKeyInfo samlKi = SAMLUtil.getSAMLKeyInfo(token, crypto, cb);
+                certs = samlKi.getCerts();
+            } else {
+                certs = secRef.getKeyIdentifier(crypto);
+            }
             if (certs == null || certs.length < 1 || certs[0] == null) {
                 throw new WSSecurityException(
                     WSSecurityException.FAILURE,

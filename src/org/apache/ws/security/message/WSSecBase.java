@@ -78,7 +78,7 @@ public class WSSecBase {
     }
 
     /**
-     * Gets the value of the <code>keyIdentifyerType</code>.
+     * Gets the value of the <code>keyIdentifierType</code>.
      * 
      * @return The <code>keyIdentifyerType</code>.
      * @see WSConstants#ISSUER_SERIAL

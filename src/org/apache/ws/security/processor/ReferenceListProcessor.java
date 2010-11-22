@@ -349,27 +349,42 @@ public class ReferenceListProcessor implements Processor {
                 }
             }
         } else if (secRef.containsKeyIdentifier()){
-            String keyIdentifierValue = secRef.getKeyIdentifierValue();
-            WSPasswordCallback pwcb = 
-                new WSPasswordCallback(
-                    keyIdentifierValue,
-                    null,
-                    secRef.getKeyIdentifierValueType(),
-                    WSPasswordCallback.ENCRYPTED_KEY_TOKEN
-                );
-            
-            try {
-                Callback[] callbacks = new Callback[]{pwcb};
-                cb.handle(callbacks);
-            } catch (Exception e) {
-                throw new WSSecurityException(
-                    WSSecurityException.FAILURE,
-                    "noPassword", 
-                    new Object[] {keyIdentifierValue}, 
-                    e
-                );
+            if (WSConstants.WSS_SAML_KI_VALUE_TYPE.equals(secRef.getKeyIdentifierValueType())) { 
+                Element token = 
+                    secRef.getKeyIdentifierTokenElement(secRefToken.getOwnerDocument(), wsDocInfo, cb);
+                
+                if (crypto == null) {
+                    throw new WSSecurityException(
+                        WSSecurityException.FAILURE, "noSigCryptoFile"
+                    );
+                }
+                SAMLKeyInfo keyInfo = SAMLUtil.getSAMLKeyInfo(token, crypto, cb);
+                // TODO Handle malformed SAML tokens where they don't have the 
+                // secret in them
+                decryptedData = keyInfo.getSecret();
+            } else {
+                String keyIdentifierValue = secRef.getKeyIdentifierValue();
+                WSPasswordCallback pwcb = 
+                    new WSPasswordCallback(
+                        keyIdentifierValue,
+                        null,
+                        secRef.getKeyIdentifierValueType(),
+                        WSPasswordCallback.ENCRYPTED_KEY_TOKEN
+                    );
+                
+                try {
+                    Callback[] callbacks = new Callback[]{pwcb};
+                    cb.handle(callbacks);
+                } catch (Exception e) {
+                    throw new WSSecurityException(
+                        WSSecurityException.FAILURE,
+                        "noPassword", 
+                        new Object[] {keyIdentifierValue}, 
+                        e
+                    );
+                }
+                decryptedData = pwcb.getKey();
             }
-            decryptedData = pwcb.getKey();
         } else {
             throw new WSSecurityException(WSSecurityException.FAILED_CHECK, "noReference");
         }

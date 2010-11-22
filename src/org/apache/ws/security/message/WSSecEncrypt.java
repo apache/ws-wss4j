@@ -85,7 +85,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
      * Custom reference value
      */
     private String customReferenceValue;
-    
+
     /**
      * True if the encKeyId is a direct reference to a key identifier instead of a URI to a key
      */
@@ -531,6 +531,9 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
             keyInfo.addUnknownElement(secToken.getElement());
         } else if (keyIdentifierType == WSConstants.EMBEDDED_KEYNAME) {
             keyInfo.addKeyName(embeddedKeyName == null ? user : embeddedKeyName);
+        } else if (SecurityTokenReference.SAML_ID_URI.equals(customReferenceValue)) {
+            SecurityTokenReference secToken = new SecurityTokenReference(document);
+            secToken.setSAMLKeyIdentifier((encKeyIdDirectId ? "":"#") + encKeyId);
         } else if (securityTokenReference != null) {
             Element tmpE = securityTokenReference.getElement();
             tmpE.setAttributeNS(
@@ -640,11 +643,11 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
     public boolean isEncryptSymmKey() {
         return encryptSymmKey;
     }
-
+    
     public void setEncryptSymmKey(boolean encryptSymmKey) {
         this.encryptSymmKey = encryptSymmKey;
     }
-
+    
     private String getSHA1(byte[] input) throws WSSecurityException {
         try {
             MessageDigest sha = WSSecurityUtil.resolveMessageDigest();
@@ -659,7 +662,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
             );
         }
     }
-
+    
     public void setCustomReferenceValue(String customReferenceValue) {
         this.customReferenceValue = customReferenceValue;
     }
