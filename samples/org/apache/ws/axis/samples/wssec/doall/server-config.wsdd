@@ -31,7 +31,7 @@
     <parameter name="action" value="Signature Encrypt"/>
     <!-- <parameter name="action" value="Encrypt"/> -->
     <parameter name="signaturePropFile" value="crypto.properties" />
-    <!-- <parameter name="decryptionPropFile" value="crypto.properties" /> -->
+    <parameter name="decryptionPropFile" value="crypto.properties" />
    </handler>
   </requestFlow>
   <responseFlow>
@@ -43,7 +43,7 @@
     <!-- <parameter name="action" value="Signature Encrypt"/> -->
     <!-- <parameter name="action" value="Encrypt"/> -->
     <parameter name="signaturePropFile" value="crypto.properties" />
-    <!-- <parameter name="encryptionPropFile" value="crypto.properties" /> -->
+    <parameter name="encryptionPropFile" value="crypto.properties" />
     <parameter name="signatureKeyIdentifier" value="DirectReference" />
     <parameter name="encryptionKeyIdentifier" value="X509KeyIdentifier" />
    </handler>

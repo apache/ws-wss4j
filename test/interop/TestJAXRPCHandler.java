@@ -84,6 +84,8 @@ public class TestJAXRPCHandler extends TestCase {
         config.put("passwordCallbackClass", "org.apache.ws.axis.oasis.PWCallback1Out");
         config.put("signatureKeyIdentifier", "DirectReference");
         config.put("signaturePropFile", "wsstest.properties");
+        config.put("encryptionPropFile", "wsstest.properties");
+        config.put("decryptionPropFile", "wsstest.properties");
         config.put("encryptionKeyIdentifier", "SKIKeyIdentifier");
         config.put("encryptionUser", "bob");
         invokeService (config, 3);
@@ -96,6 +98,7 @@ public class TestJAXRPCHandler extends TestCase {
         config.put("passwordCallbackClass", "org.apache.ws.axis.oasis.PWCallback1Out");
         config.put("signatureKeyIdentifier", "DirectReference");
         config.put("signaturePropFile", "wsstest.properties");
+        config.put("encryptionPropFile", "wsstest.properties");
         config.put("encryptionKeyIdentifier", "EmbeddedKeyName");
         config.put("encryptionSymAlgorithm", "http://www.w3.org/2001/04/xmlenc#tripledes-cbc");
         config.put("EmbeddedKeyCallbackClass", "org.apache.ws.axis.oasis.PWCallback1Out");
@@ -125,6 +128,8 @@ public class TestJAXRPCHandler extends TestCase {
         config.put("passwordCallbackClass", "org.apache.ws.axis.oasis.PWCallback1Out");
         config.put("signatureKeyIdentifier", "DirectReference");
         config.put("signaturePropFile", "wsstest.properties");
+        config.put("encryptionPropFile", "wsstest.properties");
+        config.put("decryptionPropFile", "wsstest.properties");
         config.put("encryptionKeyIdentifier", "SKIKeyIdentifier");
         config.put("encryptionUser", "bob");
         invokeService (config, 6);
@@ -140,6 +145,7 @@ public class TestJAXRPCHandler extends TestCase {
         config.put("encryptionKeyIdentifier", "SKIKeyIdentifier");
         config.put("encryptionUser", "bob");
         config.put("encryptionPropFile", "wsstest.properties");
+        config.put("decryptionPropFile", "wsstest.properties");
         config.put("signatureParts", "{}{http://schemas.xmlsoap.org/soap/envelope/}Body;STRTransform");
         invokeService (config, 7);
     }

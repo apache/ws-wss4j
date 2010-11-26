@@ -496,11 +496,6 @@ public abstract class WSHandler {
                     }
                 }
             }
-        } else if (reqData.getSigCrypto() != null) {
-            //
-            // Default to the signature crypto
-            //
-            crypto = reqData.getSigCrypto();
         }
         
         return crypto;
@@ -694,7 +689,7 @@ public abstract class WSHandler {
         RequestData reqData
     ) throws WSSecurityException {
         return decodeBooleanConfigValue(
-            reqData, WSHandlerConstants.ENABLE_SIGNATURE_CONFIRMATION, true
+            reqData, WSHandlerConstants.ENABLE_SIGNATURE_CONFIRMATION, false
         );
     }
     
@@ -1004,11 +999,6 @@ public abstract class WSHandler {
                     }
                 }
             }
-        } else if (reqData.getSigCrypto() != null) {
-            //
-            // Default to the signature crypto
-            //
-            crypto = reqData.getSigCrypto();
         }
         
         return crypto;

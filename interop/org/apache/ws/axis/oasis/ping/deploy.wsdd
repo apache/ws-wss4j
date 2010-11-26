@@ -158,6 +158,7 @@
     <parameter name="passwordCallbackClass" value="org.apache.ws.axis.oasis.PWCallback1In"/>
     <parameter name="action" value="Signature Encrypt Timestamp"/>
     <parameter name="signaturePropFile" value="wsstest.properties" />
+    <parameter name="decryptionPropFile" value="wsstest.properties" />
    </handler>
   </requestFlow>
   <responseFlow>
@@ -169,6 +170,7 @@
       value="org.apache.ws.axis.oasis.PWCallback1Out"/>
     <parameter name="signatureKeyIdentifier" value="DirectReference" />
     <parameter name="signaturePropFile" value="wsstest.properties" />
+    <parameter name="encryptionPropFile" value="wsstest.properties" />
     <parameter name="encryptionKeyIdentifier" value="SKIKeyIdentifier" />
     <parameter name="encryptionSymAlgorithm" value="http://www.w3.org/2001/04/xmlenc#tripledes-cbc" />    
     <!-- Use the Client's cert/key to encrypt the response -->
@@ -275,6 +277,7 @@
    <handler type="java:org.apache.ws.axis.security.WSDoAllReceiver">
     <parameter name="passwordCallbackClass" value="org.apache.ws.axis.oasis.PWCallback1In"/>
     <parameter name="action" value="Encrypt Signature Timestamp"/>
+    <parameter name="decryptionPropFile" value="wsstest.properties" />
     <parameter name="signaturePropFile" value="wsstest.properties" />
    </handler>
   </requestFlow>
@@ -287,6 +290,7 @@
       value="org.apache.ws.axis.oasis.PWCallback1Out"/>
     <parameter name="signatureKeyIdentifier" value="SKIKeyIdentifier" />
     <parameter name="signaturePropFile" value="wsstest.properties" />
+    <parameter name="encryptionPropFile" value="wsstest.properties" />
     <parameter name="encryptionKeyIdentifier" value="DirectReference" />
     <parameter name="encryptionSymAlgorithm" value="http://www.w3.org/2001/04/xmlenc#tripledes-cbc" />    
     <!-- Use the Client's cert/key to encrypt the response -->
