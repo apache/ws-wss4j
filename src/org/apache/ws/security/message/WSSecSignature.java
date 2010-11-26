@@ -664,6 +664,22 @@ public class WSSecSignature extends WSSecSignatureBase {
         }
         return null;
     }
+    
+    /**
+     * @return the URI associated with the SecurityTokenReference
+     * (must be called after {@link #prepare(Document, Crypto, WSSecHeader)}
+     */
+    public String getSecurityTokenReferenceURI() {
+        return strUri;
+    }
+    
+    /**
+     * @return the SecurityTokenReference (must be called after 
+     * {@link #prepare(Document, Crypto, WSSecHeader)}
+     */
+    public SecurityTokenReference getSecurityTokenReference() {
+        return secRef;
+    }
 
     private String getSHA1(byte[] input) throws WSSecurityException {
         try {

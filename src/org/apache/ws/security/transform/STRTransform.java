@@ -31,7 +31,6 @@ import org.apache.ws.security.util.WSSecurityUtil;
 
 import org.apache.xml.security.c14n.Canonicalizer;
 import org.apache.xml.security.signature.XMLSignatureInput;
-//import org.apache.xml.security.utils.XMLUtils;
 
 import org.jcp.xml.dsig.internal.dom.ApacheData;
 import org.jcp.xml.dsig.internal.dom.DOMSubTreeData;
@@ -47,15 +46,12 @@ import java.security.spec.AlgorithmParameterSpec;
 
 import javax.xml.crypto.Data;
 import javax.xml.crypto.MarshalException;
-//import javax.xml.crypto.NodeSetData;
 import javax.xml.crypto.OctetStreamData;
 import javax.xml.crypto.XMLCryptoContext;
 import javax.xml.crypto.XMLStructure;
 import javax.xml.crypto.dom.DOMCryptoContext;
-//import javax.xml.crypto.dsig.Transform;
 import javax.xml.crypto.dsig.TransformException;
 import javax.xml.crypto.dsig.TransformService;
-//import javax.xml.crypto.dsig.XMLSignatureFactory;
 import javax.xml.crypto.dsig.spec.TransformParameterSpec;
 
 
@@ -70,8 +66,6 @@ public class STRTransform extends TransformService {
     private TransformParameterSpec params;
     
     private Element transformElement;
-    
-    // private XMLSignatureFactory signatureFactory = XMLSignatureFactory.getInstance("DOM");
     
     private static Log log = LogFactory.getLog(STRTransform.class.getName());
 
@@ -147,14 +141,8 @@ public class STRTransform extends TransformService {
                 );
             canonAlgo = canonElem.getAttribute("Algorithm");
         }
+        xc.getDefaultNamespacePrefix();
         try {
-            /*
-            Transform c14nTransform =
-                signatureFactory.newTransform(
-                    canonAlgo, (TransformParameterSpec)null
-                );
-                */
-            
             //
             // Get the input (node) to transform. Currently we support only an
             // Element as input format. If other formats are required we must
@@ -194,7 +182,6 @@ public class STRTransform extends TransformService {
             ByteArrayOutputStream bos = null;
             byte[] buf = null;
             
-            xc.getBaseURI();
             //
             // Third and fourth step are performed by dereferenceSTR()
             //
@@ -246,7 +233,7 @@ public class STRTransform extends TransformService {
             // return new XMLSignatureInput(buf);
             
             // start of HACK
-            StringBuffer bf = new StringBuffer(new String(buf));
+            StringBuilder bf = new StringBuilder(new String(buf));
             String bf1 = bf.toString();
 
             //
@@ -277,43 +264,6 @@ public class STRTransform extends TransformService {
                 return null;
             }
             return new OctetStreamData(output.getOctetStream());
-            
-            /*
-            //
-            // According to WSS spec an Apex node must contain a default namespace.
-            // 
-            boolean changedNamespace = false;
-            if (!dereferencedToken.hasAttribute("xmlns")) {
-                dereferencedToken.setAttribute("xmlns", "");
-                changedNamespace = true;
-            }
-            
-            //
-            // C14n with specified algorithm. According to WSS Specification.
-            //
-            boolean excludeComments = false;
-            if (WSConstants.C14N_EXCL_OMIT_COMMENTS.equals(canonAlgo)
-                || WSConstants.C14N_OMIT_COMMENTS.equals(canonAlgo)) {
-                excludeComments = true;
-            }
-            NodeSetData transformData = new DOMSubTreeData(dereferencedToken, excludeComments);
-            OctetStreamData transformedData = 
-                (OctetStreamData)c14nTransform.transform(transformData, xc);
-            
-            //
-            // If a default namespace has been added, then remove it from the element
-            //
-            if (changedNamespace) {
-                dereferencedToken.removeAttribute("xmlns");
-            }
-            
-            XMLSignatureInput output = new XMLSignatureInput(transformedData.getOctetStream());
-            if (os != null) {
-                output.updateOutputStream(os);
-                return null;
-            }
-            return new OctetStreamData(output.getOctetStream());
-            */
         } catch (Exception ex) {
             throw new TransformException(ex);
         }
