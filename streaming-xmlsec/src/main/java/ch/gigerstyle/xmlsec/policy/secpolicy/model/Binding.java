@@ -20,7 +20,6 @@ import ch.gigerstyle.xmlsec.ext.Constants;
 import ch.gigerstyle.xmlsec.policy.assertionStates.AssertionState;
 import ch.gigerstyle.xmlsec.policy.assertionStates.IncludeTimeStampAssertionState;
 import ch.gigerstyle.xmlsec.policy.assertionStates.SignedElementAssertionState;
-import ch.gigerstyle.xmlsec.policy.assertionStates.SignedPartAssertionState;
 import ch.gigerstyle.xmlsec.policy.secpolicy.SPConstants;
 import ch.gigerstyle.xmlsec.securityEvent.SecurityEvent;
 

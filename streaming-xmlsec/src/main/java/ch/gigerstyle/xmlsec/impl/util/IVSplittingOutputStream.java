@@ -37,7 +37,6 @@ public class IVSplittingOutputStream extends FilterOutputStream {
     private int ivLength;
     private int pos = 0;
 
-    private boolean isCipherInitialized = false;
     private Cipher cipher;
     private Key secretKey;
 
@@ -66,7 +65,6 @@ public class IVSplittingOutputStream extends FilterOutputStream {
         } catch (InvalidAlgorithmParameterException e) {
             throw new IOException(e);
         }
-        isCipherInitialized = true;
     }
 
     @Override

@@ -9,7 +9,6 @@ import com.ctc.wstx.cfg.ErrorConsts;
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.namespace.QName;
 import javax.xml.stream.Location;
-import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.events.*;
@@ -47,16 +46,16 @@ public class XMLSecurityStreamReader implements XMLStreamReader {
     }
 
     public Object getProperty(String name) throws IllegalArgumentException {
-        return null; 
+        return null;
     }
 
     public int next() throws XMLStreamException {
         try {
             inputProcessorChain.reset();
-            currentEvent =  ((XMLEventNS)inputProcessorChain.processEvent()).getCurrentEvent();
+            currentEvent = ((XMLEventNS) inputProcessorChain.processEvent()).getCurrentEvent();
             if ((currentEvent.getEventType() == START_DOCUMENT)
                     && securityProperties.isSkipDocumentEvents()) {
-                currentEvent =  ((XMLEventNS)inputProcessorChain.processEvent()).getCurrentEvent();
+                currentEvent = ((XMLEventNS) inputProcessorChain.processEvent()).getCurrentEvent();
             }
         } catch (XMLSecurityException e) {
             throw new XMLStreamException(e);

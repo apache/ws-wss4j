@@ -6,7 +6,6 @@ import ch.gigerstyle.xmlsec.ext.Transformer;
 import ch.gigerstyle.xmlsec.ext.XMLEventNS;
 
 import javax.xml.namespace.QName;
-import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.*;
@@ -53,8 +52,6 @@ public class Canonicalizer20010315Transformer implements Transformer {
     static final int NODE_BEFORE_DOCUMENT_ELEMENT = -1;
     static final int NODE_NOT_BEFORE_OR_AFTER_DOCUMENT_ELEMENT = 0;
     static final int NODE_AFTER_DOCUMENT_ELEMENT = 1;
-
-    private static final XMLEventFactory xmlEventFactory = XMLEventFactory.newFactory();
 
     private Map cache = new HashMap();
 
@@ -433,8 +430,7 @@ public class Canonicalizer20010315Transformer implements Transformer {
                         writer.write(c);
                     } else {
                         UtfHelpper.writeCharToUtf8(c, writer);
-                    }
-                    ;
+                    }                    
                     continue;
             }
             writer.write(toWrite);
@@ -479,8 +475,7 @@ public class Canonicalizer20010315Transformer implements Transformer {
                         writer.write(c);
                     } else {
                         UtfHelpper.writeCharToUtf8(c, writer);
-                    }
-                    ;
+                    }                    
                     continue;
             }
             writer.write(toWrite);
@@ -513,8 +508,7 @@ public class Canonicalizer20010315Transformer implements Transformer {
                     writer.write(c);
                 } else {
                     UtfHelpper.writeCharToUtf8(c, writer);
-                }
-                ;
+                }                
             }
         }
 
@@ -567,7 +561,6 @@ public class Canonicalizer20010315Transformer implements Transformer {
                 } else {
                     UtfHelpper.writeCharToUtf8(c, writer);
                 }
-                ;
             }
         }
 

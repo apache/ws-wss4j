@@ -1,6 +1,5 @@
 package ch.gigerstyle.xmlsec.impl;
 
-import ch.gigerstyle.xmlsec.config.JCEAlgorithmMapper;
 import ch.gigerstyle.xmlsec.crypto.Crypto;
 import ch.gigerstyle.xmlsec.crypto.WSSecurityException;
 import ch.gigerstyle.xmlsec.ext.*;
@@ -152,7 +151,7 @@ public class SecurityTokenFactory {
         }
 
         public boolean isAsymmetric() {
-                return true;
+            return true;
         }
 
         public Key getSecretKey(String algorithmURI) throws XMLSecurityException {

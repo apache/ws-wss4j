@@ -1,7 +1,6 @@
 package ch.gigerstyle.xmlsec.ext;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.events.XMLEvent;
 
 /**
  * User: giger

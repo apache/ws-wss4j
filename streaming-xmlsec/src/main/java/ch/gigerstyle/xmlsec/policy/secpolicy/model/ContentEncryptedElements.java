@@ -18,8 +18,6 @@ package ch.gigerstyle.xmlsec.policy.secpolicy.model;
 
 import ch.gigerstyle.xmlsec.policy.assertionStates.AssertionState;
 import ch.gigerstyle.xmlsec.policy.assertionStates.ContentEncryptedElementAssertionState;
-import ch.gigerstyle.xmlsec.policy.assertionStates.EncryptedElementAssertionState;
-import ch.gigerstyle.xmlsec.policy.assertionStates.SignedElementAssertionState;
 import ch.gigerstyle.xmlsec.policy.secpolicy.SP12Constants;
 import ch.gigerstyle.xmlsec.policy.secpolicy.SPConstants;
 import ch.gigerstyle.xmlsec.securityEvent.SecurityEvent;
@@ -153,7 +151,7 @@ public class ContentEncryptedElements extends AbstractSecurityAssertion {
                 prefix = "";
                 localName = s;
             }
-            qNames.add(new QName((String)declaredNamespaces.get(prefix), localName));
+            qNames.add(new QName((String) declaredNamespaces.get(prefix), localName));
         }
         return qNames;
     }
