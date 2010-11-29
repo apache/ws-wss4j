@@ -24,7 +24,7 @@
     <artifactId>wss4j</artifactId>
     <packaging>bundle</packaging>
     <name>WSS4J</name>
-    <version>1.5.10-SNAPSHOT</version>
+    <version>1.5.11-SNAPSHOT</version>
     <description>
         Apache WSS4J is an implementation of the Web Services Security
         (WS-Security) being developed at OASIS Web Services Security TC.
@@ -180,14 +180,14 @@
                         <Implementation-Title>Apache WSS4J</Implementation-Title>
                         <Implementation-Vendor>The Apache Software Foundation</Implementation-Vendor>
                         <Implementation-Vendor-Id>org.apache</Implementation-Vendor-Id>
-                        <Implementation-Version>${pom.version}</Implementation-Version>
+                        <Implementation-Version>${project.version}</Implementation-Version>
                         <Specification-Title>Apache WSS4J</Specification-Title>
                         <Specification-Vendor>The Apache Software Foundation</Specification-Vendor>
-                        <Specification-Version>${pom.version}</Specification-Version>
+                        <Specification-Version>${project.version}</Specification-Version>
 
                         <Export-Package>
-                              org.apache.ws.security.*;version="${pom.version}",
-                              org.apache.ws.axis.security.*;version="${pom.version}",
+                              org.apache.ws.security.*;version="${project.version}",
+                              org.apache.ws.axis.security.*;version="${project.version}",
                         </Export-Package>
                         <Import-Package>
                               !org.apache.ws.security.*,
