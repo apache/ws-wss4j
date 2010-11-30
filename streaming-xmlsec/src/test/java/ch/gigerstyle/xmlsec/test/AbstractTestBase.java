@@ -186,7 +186,7 @@ public abstract class AbstractTestBase {
         requestData.setMsgContext(messageContext);
         wss4JHandler.doReceiver(messageContext, requestData, false);
 
-        return ((SOAPMessage) messageContext.getProperty(WSHandlerConstants.SND_SECURITY)).getSOAPHeader().getOwnerDocument();
+        return (Document)messageContext.getProperty(WSHandlerConstants.SND_SECURITY);
     }
 
     private MessageContext getMessageContext(InputStream inputStream) {
@@ -227,7 +227,7 @@ public abstract class AbstractTestBase {
                     MessageFactory messageFactory = MessageFactory.newInstance(SOAPConstants.SOAP_1_1_PROTOCOL);
                     SOAPMessage soapMessage = messageFactory.createMessage();
                     soapMessage.getSOAPPart().setContent(inSource);
-                    setProperty(WSHandlerConstants.SND_SECURITY, soapMessage);
+                    setProperty(WSHandlerConstants.SND_SECURITY, soapMessage.getSOAPHeader().getOwnerDocument());
                     return soapMessage;
                 } catch (Exception e) {
                     throw new RuntimeException(e);
