@@ -192,6 +192,12 @@ public class WSSConfig {
     protected boolean timeStampStrict = true;
     
     /**
+     * If this value is not null, then username token handling will throw an 
+     * exception if the password type of the Username Token does not match this value
+     */
+    protected String requiredPasswordType = null;
+    
+    /**
      * The time in seconds between creation and expiry for a Timestamp. The default
      * is 300 seconds (5 minutes).
      */
@@ -436,6 +442,21 @@ public class WSSConfig {
      */
     public void setTimeStampStrict(boolean timeStampStrict) {
         this.timeStampStrict = timeStampStrict;
+    }
+    
+    /**
+     * @return the required password type when processing a UsernameToken
+     */
+    public String getRequiredPasswordType() {
+        return requiredPasswordType;
+    }
+
+    /**
+     * @param requiredPasswordType The required password type when processing
+     * a Username Token.
+     */
+    public void setRequiredPasswordType(String requiredPasswordType) {
+        this.requiredPasswordType = requiredPasswordType;
     }
     
     /**

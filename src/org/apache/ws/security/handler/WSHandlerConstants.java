@@ -499,6 +499,15 @@ public class WSHandlerConstants {
     public static final String HANDLE_CUSTOM_PASSWORD_TYPES = "handleCustomPasswordTypes";
     
     /**
+     * Set the value of this parameter to true to enable strict Username Token password type
+     * handling (default is false).
+     * 
+     * If this parameter is set to true, it throws an exception if the password type of 
+     * the Username Token does not match that of the configured PASSWORD_TYPE parameter.
+     */
+    public static final String PASSWORD_TYPE_STRICT = "passwordTypeStrict";
+    
+    /**
      * This variable controls whether (wsse) namespace qualified password types are
      * accepted when processing UsernameTokens.
      * 

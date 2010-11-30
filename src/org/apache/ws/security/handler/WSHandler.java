@@ -242,8 +242,6 @@ public abstract class WSHandler {
         }
     }
 
-
-
     protected void doReceiverAction(int doAction, RequestData reqData)
         throws WSSecurityException {
 
@@ -256,6 +254,10 @@ public abstract class WSHandler {
             enableSigConf || ((doAction & WSConstants.SC) != 0)
         );
         wssConfig.setTimeStampStrict(decodeTimestampStrict(reqData));
+        if (decodePasswordTypeStrict(reqData)) {
+            String passwordType = decodePasswordType(reqData);
+            wssConfig.setRequiredPasswordType(passwordType);
+        }
         wssConfig.setTimeStampTTL(decodeTimeToLive(reqData));
         wssConfig.setHandleCustomPasswordTypes(decodeCustomPasswordTypes(reqData));
         wssConfig.setPasswordsAreEncoded(decodeUseEncodedPasswords(reqData));
@@ -504,7 +506,7 @@ public abstract class WSHandler {
     protected void decodeUTParameter(RequestData reqData) 
         throws WSSecurityException {
         Object mc = reqData.getMsgContext();
-
+        
         String type = getString(WSHandlerConstants.PASSWORD_TYPE, mc);
         if (type != null) {
             if (WSConstants.PW_TEXT.equals(type)) {
@@ -512,13 +514,12 @@ public abstract class WSHandler {
             } else if (WSConstants.PW_DIGEST.equals(type)) {
                 reqData.setPwType(WSConstants.PASSWORD_DIGEST);
             } else if (WSConstants.PW_NONE.equals(type)) {
-                // No password requested.
                 reqData.setPwType(null);
             } else {
                 throw new WSSecurityException("Unknown password type encoding: " + type);
             }
         }
-
+        
         String add = getString(WSHandlerConstants.ADD_UT_ELEMENTS, mc);
         if (add != null) {
             reqData.setUtElements(StringUtil.split(add, ' '));
@@ -678,6 +679,18 @@ public abstract class WSHandler {
         return ttl_i;
     }
     
+    protected String decodePasswordType(RequestData reqData) throws WSSecurityException {
+        String type = getString(WSHandlerConstants.PASSWORD_TYPE, reqData.getMsgContext());
+        if (type != null) {
+            if (WSConstants.PW_TEXT.equals(type)) {
+                return WSConstants.PASSWORD_TEXT;
+            } else if (WSConstants.PW_DIGEST.equals(type)) {
+                return WSConstants.PASSWORD_DIGEST;
+            }
+        }
+        return null;
+    }
+    
     protected boolean decodeMustUnderstand(RequestData reqData) 
         throws WSSecurityException {
         return decodeBooleanConfigValue(
@@ -727,6 +740,13 @@ public abstract class WSHandler {
         throws WSSecurityException {
         return decodeBooleanConfigValue(
             reqData, WSHandlerConstants.TIMESTAMP_STRICT, true
+        );
+    }
+    
+    protected boolean decodePasswordTypeStrict(RequestData reqData) 
+        throws WSSecurityException {
+        return decodeBooleanConfigValue(
+            reqData, WSHandlerConstants.PASSWORD_TYPE_STRICT, false
         );
     }
     

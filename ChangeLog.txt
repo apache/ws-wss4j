@@ -5,6 +5,21 @@ for a given release.
 Portions of this report were generated using the ReleaseNotes facility
 in Jira.
 
+Release 1.5.10
+=============
+
+** Bug
+
+    * [WSS-40] - WSSecurityEngine does not support chained certificates
+
+** Improvement
+
+    * [WSS-238] - Switch to wsse:KeyIdentifier instead of wsse:Reference for SAML references within SOAP:body EncryptedData elements.
+    * [WSS-239] - Need ability to handle password "equivalent" between WSPasswordCallback and UsernameToken when it's binary data
+    * [WSS-247] - Upgrade to XML Security 1.4.4
+    * [WSS-253] - UsernameTokenProcessor logs the password to the log
+
+
 Release 1.5.9
 =============
 

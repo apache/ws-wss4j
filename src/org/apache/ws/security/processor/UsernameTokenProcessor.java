@@ -48,6 +48,7 @@ public class UsernameTokenProcessor implements Processor {
     private boolean handleCustomPasswordTypes;
     private boolean allowNamespaceQualifiedPasswordTypes;
     private boolean passwordsAreEncoded;
+    private WSSConfig wssConfig;
     
     public void handleToken(Element elem, Crypto crypto, Crypto decCrypto, CallbackHandler cb, 
         WSDocInfo wsDocInfo, List<WSSecurityEngineResult> returnResults, WSSConfig wsc) throws WSSecurityException {
@@ -57,6 +58,7 @@ public class UsernameTokenProcessor implements Processor {
         handleCustomPasswordTypes = wsc.getHandleCustomPasswordTypes();
         allowNamespaceQualifiedPasswordTypes = wsc.getAllowNamespaceQualifiedPasswordTypes();
         passwordsAreEncoded = wsc.getPasswordsAreEncoded();
+        wssConfig = wsc;
         
         Principal lastPrincipalFound = handleUsernameToken(elem, cb);
         returnResults.add(
@@ -102,6 +104,15 @@ public class UsernameTokenProcessor implements Processor {
         if (log.isDebugEnabled()) {
             log.debug("UsernameToken user " + user);
             log.debug("UsernameToken password type " + pwType);
+        }
+        
+        String requiredPasswordType = wssConfig.getRequiredPasswordType();
+        if (requiredPasswordType != null && !requiredPasswordType.equals(pwType)) {
+            if (log.isDebugEnabled()) {
+                log.debug("Authentication failed as the received password type does not " 
+                    + "match the required password type of: " + requiredPasswordType);
+            }
+            throw new WSSecurityException(WSSecurityException.FAILED_AUTHENTICATION);
         }
         //
         // If the UsernameToken is hashed or plaintext, then retrieve the password from the
