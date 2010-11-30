@@ -142,7 +142,6 @@ public class TestModifiedRequest extends TestCase implements CallbackHandler {
      * so that the signed "value" element is put in the header, and the value of the
      * original element is changed. The wsu:Id value of the original element is also
      * changed. Signature verification will pass, so we need to check that wsu:Id's.
-     * TODO - failing after JSR105 move
      */
     public void testMovedElementChangedId() throws Exception {
         WSSecSignature builder = new WSSecSignature();

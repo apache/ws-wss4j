@@ -73,7 +73,7 @@ public class UUIDGenerator {
         } catch (UnknownHostException e) {
             sid = Thread.currentThread().getName();
         }
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append(sid);
         sb.append(":");
         sb.append(Long.toString(rand));
@@ -88,7 +88,7 @@ public class UUIDGenerator {
         }
         md5.update(sb.toString().getBytes());
         byte[] array = md5.digest();
-        StringBuffer sb2 = new StringBuffer();
+        StringBuilder sb2 = new StringBuilder();
         for (int j = 0; j < array.length; ++j) {
             int b = array[j] & 0xFF;
             sb2.append(Integer.toHexString(b));

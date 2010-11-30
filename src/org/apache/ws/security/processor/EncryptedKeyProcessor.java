@@ -235,7 +235,7 @@ public class EncryptedKeyProcessor implements Processor {
      * @throws WSSecurityException
      */
     public static byte[] getDecodedBase64EncodedData(Element element) throws WSSecurityException {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         Node node = element.getFirstChild();
         while (node != null) {
             if (Node.TEXT_NODE == node.getNodeType()) {

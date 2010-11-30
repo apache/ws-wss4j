@@ -242,7 +242,7 @@ public abstract class CryptoBase implements Crypto {
     
     protected static String createKeyStoreErrorMessage(KeyStore keystore) throws KeyStoreException {
         Enumeration<String> aliases = keystore.aliases();
-        StringBuffer sb = new StringBuffer(keystore.size() * 7);
+        StringBuilder sb = new StringBuilder(keystore.size() * 7);
         boolean firstAlias = true;
         while (aliases.hasMoreElements()) {
             if (!firstAlias) {

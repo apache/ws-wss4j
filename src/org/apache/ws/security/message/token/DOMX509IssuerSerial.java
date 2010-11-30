@@ -129,7 +129,7 @@ public final class DOMX509IssuerSerial {
     
     private String getChildText(Node parentNode) {
         Node node = parentNode.getFirstChild();
-        StringBuffer buffer = new StringBuffer();
+        StringBuilder buffer = new StringBuilder();
         while (node != null) {
             if (Node.TEXT_NODE == node.getNodeType()) {
                 buffer.append(((Text)node).getData());
