@@ -1,6 +1,7 @@
 package ch.gigerstyle.xmlsec.impl.util;
 
 import java.io.FilterOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
 
 /**
@@ -31,5 +32,20 @@ public class ReplaceableOuputStream extends FilterOutputStream {
 
     public void setNewOutputStream(OutputStream outputStream) {
         this.out = outputStream;
+    }
+
+    @Override
+    public void write(int b) throws IOException {
+        out.write(b);
+    }
+
+    @Override
+    public void write(byte[] b) throws IOException {
+        out.write(b);
+    }
+
+    @Override
+    public void write(byte[] b, int off, int len) throws IOException {
+        out.write(b, off, len);
     }
 }

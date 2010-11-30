@@ -466,6 +466,22 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
 
                 IVSplittingOutputStream ivSplittingOutputStream = new IVSplittingOutputStream(
                         new CipherOutputStream(new FilterOutputStream(pipedOutputStream) {
+
+                            @Override
+                            public void write(int b) throws IOException {
+                                out.write(b);
+                            }
+
+                            @Override
+                            public void write(byte[] b) throws IOException {
+                                out.write(b);
+                            }
+
+                            @Override
+                            public void write(byte[] b, int off, int len) throws IOException {
+                                out.write(b, off, len);
+                            }
+
                             @Override
                             public void close() throws IOException {
                                 //we overwrite the close method and don't delegate close. Close must be done separately.
