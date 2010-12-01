@@ -2,7 +2,7 @@ package ch.gigerstyle.xmlsec.test;
 
 import ch.gigerstyle.xmlsec.ext.Constants;
 import ch.gigerstyle.xmlsec.ext.SecurityProperties;
-import org.apache.cxf.staxutils.W3CDOMStreamReader;
+import ch.gigerstyle.xmlsec.test.utils.CustomW3CDOMStreamReader;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.testng.annotations.Test;
 import org.w3c.dom.Document;
@@ -54,7 +54,7 @@ public class InteroperabilityTest extends AbstractTestBase {
         securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "1234567890".toCharArray());
         securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "1234567890".toCharArray());
 
-        Document document = doInboundSecurity(securityProperties, new W3CDOMStreamReader(securedDocument));
+        Document document = doInboundSecurity(securityProperties, new CustomW3CDOMStreamReader(securedDocument));
 
         //read the whole stream:
         Transformer transformer = TransformerFactory.newInstance().newTransformer();
@@ -81,7 +81,7 @@ public class InteroperabilityTest extends AbstractTestBase {
         securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "1234567890".toCharArray());
         securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "1234567890".toCharArray());
 
-        Document document = doInboundSecurity(securityProperties, new W3CDOMStreamReader(securedDocument));
+        Document document = doInboundSecurity(securityProperties, new CustomW3CDOMStreamReader(securedDocument));
 
         //read the whole stream:
         Transformer transformer = TransformerFactory.newInstance().newTransformer();
@@ -165,12 +165,12 @@ public class InteroperabilityTest extends AbstractTestBase {
 
         XPathExpression xPathExpression = getXPath("/env:Envelope/env:Header/wsse:Security/xenc:EncryptedData");
         Element timeStamp = (Element) xPathExpression.evaluate(securedDocument, XPathConstants.NODE);
-        Element securityHeaderNode = (Element)timeStamp.getParentNode();
+        Element securityHeaderNode = (Element) timeStamp.getParentNode();
         securityHeaderNode.removeChild(timeStamp);
 
         xPathExpression = getXPath("/env:Envelope/env:Header/wsse:Security/dsig:Signature");
         Element signature = (Element) xPathExpression.evaluate(securedDocument, XPathConstants.NODE);
-        
+
         securityHeaderNode.insertBefore(timeStamp, signature);
 
         Transformer transformer = TransformerFactory.newInstance().newTransformer();
@@ -181,7 +181,7 @@ public class InteroperabilityTest extends AbstractTestBase {
         securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "1234567890".toCharArray());
         securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "1234567890".toCharArray());
 
-        Document document = doInboundSecurity(securityProperties, new W3CDOMStreamReader(securedDocument));
+        Document document = doInboundSecurity(securityProperties, new CustomW3CDOMStreamReader(securedDocument));
 
         //read the whole stream:
         //Transformer transformer = TransformerFactory.newInstance().newTransformer();

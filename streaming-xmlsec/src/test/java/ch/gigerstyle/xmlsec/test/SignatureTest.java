@@ -1,10 +1,10 @@
 package ch.gigerstyle.xmlsec.test;
 
-import ch.gigerstyle.xmlsec.*;
+import ch.gigerstyle.xmlsec.XMLSec;
 import ch.gigerstyle.xmlsec.ext.*;
+import ch.gigerstyle.xmlsec.test.utils.CustomW3CDOMStreamReader;
 import ch.gigerstyle.xmlsec.test.utils.StAX2DOM;
 import ch.gigerstyle.xmlsec.test.utils.XmlReaderToWriter;
-import org.apache.cxf.staxutils.W3CDOMStreamReader;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -105,7 +105,7 @@ public class SignatureTest extends AbstractTestBase {
             SecurityProperties securityProperties = new SecurityProperties();
             securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "1234567890".toCharArray());
             InboundXMLSec xmlSec = XMLSec.getInboundXMLSec(securityProperties);
-            XMLStreamReader xmlStreamReader = xmlSec.processInMessage(new W3CDOMStreamReader(securedDocument));
+            XMLStreamReader xmlStreamReader = xmlSec.processInMessage(new CustomW3CDOMStreamReader(securedDocument));
 
             Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
 
@@ -183,7 +183,7 @@ public class SignatureTest extends AbstractTestBase {
             SecurityProperties securityProperties = new SecurityProperties();
             securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "1234567890".toCharArray());
             InboundXMLSec xmlSec = XMLSec.getInboundXMLSec(securityProperties);
-            XMLStreamReader xmlStreamReader = xmlSec.processInMessage(new W3CDOMStreamReader(securedDocument));
+            XMLStreamReader xmlStreamReader = xmlSec.processInMessage(new CustomW3CDOMStreamReader(securedDocument));
 
             Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
 
@@ -260,7 +260,7 @@ public class SignatureTest extends AbstractTestBase {
             SecurityProperties securityProperties = new SecurityProperties();
             securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "1234567890".toCharArray());
             InboundXMLSec xmlSec = XMLSec.getInboundXMLSec(securityProperties);
-            XMLStreamReader xmlStreamReader = xmlSec.processInMessage(new W3CDOMStreamReader(securedDocument));
+            XMLStreamReader xmlStreamReader = xmlSec.processInMessage(new CustomW3CDOMStreamReader(securedDocument));
 
             Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
 
@@ -338,7 +338,7 @@ public class SignatureTest extends AbstractTestBase {
             SecurityProperties securityProperties = new SecurityProperties();
             securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "1234567890".toCharArray());
             InboundXMLSec xmlSec = XMLSec.getInboundXMLSec(securityProperties);
-            XMLStreamReader xmlStreamReader = xmlSec.processInMessage(new W3CDOMStreamReader(securedDocument));
+            XMLStreamReader xmlStreamReader = xmlSec.processInMessage(new CustomW3CDOMStreamReader(securedDocument));
 
             Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
 
@@ -470,7 +470,7 @@ public class SignatureTest extends AbstractTestBase {
             SecurityProperties securityProperties = new SecurityProperties();
             securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "1234567890".toCharArray());
             InboundXMLSec xmlSec = XMLSec.getInboundXMLSec(securityProperties);
-            XMLStreamReader xmlStreamReader = xmlSec.processInMessage(new W3CDOMStreamReader(securedDocument));
+            XMLStreamReader xmlStreamReader = xmlSec.processInMessage(new CustomW3CDOMStreamReader(securedDocument));
 
             Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
 
@@ -548,7 +548,7 @@ public class SignatureTest extends AbstractTestBase {
             SecurityProperties securityProperties = new SecurityProperties();
             securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "1234567890".toCharArray());
             InboundXMLSec xmlSec = XMLSec.getInboundXMLSec(securityProperties);
-            XMLStreamReader xmlStreamReader = xmlSec.processInMessage(new W3CDOMStreamReader(securedDocument));
+            XMLStreamReader xmlStreamReader = xmlSec.processInMessage(new CustomW3CDOMStreamReader(securedDocument));
 
             Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
 
@@ -625,7 +625,7 @@ public class SignatureTest extends AbstractTestBase {
             SecurityProperties securityProperties = new SecurityProperties();
             securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "1234567890".toCharArray());
             InboundXMLSec xmlSec = XMLSec.getInboundXMLSec(securityProperties);
-            XMLStreamReader xmlStreamReader = xmlSec.processInMessage(new W3CDOMStreamReader(securedDocument));
+            XMLStreamReader xmlStreamReader = xmlSec.processInMessage(new CustomW3CDOMStreamReader(securedDocument));
 
             Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
 

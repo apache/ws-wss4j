@@ -8,7 +8,7 @@ import ch.gigerstyle.xmlsec.policy.PolicyEnforcer;
 import ch.gigerstyle.xmlsec.policy.PolicyEnforcerFactory;
 import ch.gigerstyle.xmlsec.policy.PolicyInputProcessor;
 import ch.gigerstyle.xmlsec.policy.secpolicy.WSSPolicyException;
-import org.apache.cxf.staxutils.W3CDOMStreamReader;
+import ch.gigerstyle.xmlsec.test.utils.CustomW3CDOMStreamReader;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -92,7 +92,7 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
         securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "1234567890".toCharArray());
 
         try {
-            Document document = doInboundSecurity(securityProperties, new W3CDOMStreamReader(securedDocument));
+            Document document = doInboundSecurity(securityProperties, new CustomW3CDOMStreamReader(securedDocument));
             Assert.fail("Expected XMLStreamException");
         } catch (XMLStreamException e) {
             Throwable throwable = e.getCause();
@@ -223,7 +223,7 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
         inSecurityProperties.addInputProcessor(new PolicyInputProcessor(policyEnforcer, null));
 
         try {
-            Document document = doInboundSecurity(inSecurityProperties, new W3CDOMStreamReader(securedDocument), policyEnforcer);
+            Document document = doInboundSecurity(inSecurityProperties, new CustomW3CDOMStreamReader(securedDocument), policyEnforcer);
             Assert.fail("Expected XMLStreamException");
         } catch (XMLStreamException e) {
             Throwable throwable = e.getCause();
@@ -262,7 +262,7 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
         inSecurityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "1234567890".toCharArray());
 
         try {
-            Document document = doInboundSecurity(inSecurityProperties, new W3CDOMStreamReader(securedDocument));
+            Document document = doInboundSecurity(inSecurityProperties, new CustomW3CDOMStreamReader(securedDocument));
             Assert.fail("Expected XMLStreamException");
         } catch (XMLStreamException e) {
             Throwable throwable = e.getCause();

@@ -3,7 +3,7 @@ package ch.gigerstyle.xmlsec.test;
 import ch.gigerstyle.xmlsec.ext.Constants;
 import ch.gigerstyle.xmlsec.ext.SecurePart;
 import ch.gigerstyle.xmlsec.ext.SecurityProperties;
-import org.apache.cxf.staxutils.W3CDOMStreamReader;
+import ch.gigerstyle.xmlsec.test.utils.CustomW3CDOMStreamReader;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -121,7 +121,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             SecurityProperties securityProperties = new SecurityProperties();
             securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "1234567890".toCharArray());
             securityProperties.setCallbackHandler(new CallbackHandlerImpl());
-            Document document = doInboundSecurity(securityProperties, new W3CDOMStreamReader(securedDocument));
+            Document document = doInboundSecurity(securityProperties, new CustomW3CDOMStreamReader(securedDocument));
 
             //header element must still be there
             NodeList nodeList = document.getElementsByTagNameNS(Constants.TAG_xenc_EncryptedKey.getNamespaceURI(), Constants.TAG_xenc_EncryptedKey.getLocalPart());
@@ -204,7 +204,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             SecurityProperties securityProperties = new SecurityProperties();
             securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "1234567890".toCharArray());
             securityProperties.setCallbackHandler(new CallbackHandlerImpl());
-            Document document = doInboundSecurity(securityProperties, new W3CDOMStreamReader(securedDocument));
+            Document document = doInboundSecurity(securityProperties, new CustomW3CDOMStreamReader(securedDocument));
 
             //header element must still be there
             NodeList nodeList = document.getElementsByTagNameNS(Constants.TAG_xenc_EncryptedKey.getNamespaceURI(), Constants.TAG_xenc_EncryptedKey.getLocalPart());
@@ -276,7 +276,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             SecurityProperties securityProperties = new SecurityProperties();
             securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "1234567890".toCharArray());
             securityProperties.setCallbackHandler(new ch.gigerstyle.xmlsec.test.CallbackHandlerImpl());
-            Document document = doInboundSecurity(securityProperties, new W3CDOMStreamReader(securedDocument));
+            Document document = doInboundSecurity(securityProperties, new CustomW3CDOMStreamReader(securedDocument));
 
             //header element must still be there
             NodeList nodeList = document.getElementsByTagNameNS(Constants.TAG_xenc_EncryptedKey.getNamespaceURI(), Constants.TAG_xenc_EncryptedKey.getLocalPart());
@@ -408,7 +408,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             SecurityProperties securityProperties = new SecurityProperties();
             securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "1234567890".toCharArray());
             securityProperties.setCallbackHandler(new ch.gigerstyle.xmlsec.test.CallbackHandlerImpl());
-            Document document = doInboundSecurity(securityProperties, new W3CDOMStreamReader(securedDocument));
+            Document document = doInboundSecurity(securityProperties, new CustomW3CDOMStreamReader(securedDocument));
 
             //header element must still be there
             NodeList nodeList = document.getElementsByTagNameNS(Constants.TAG_xenc_EncryptedKey.getNamespaceURI(), Constants.TAG_xenc_EncryptedKey.getLocalPart());
@@ -481,7 +481,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             SecurityProperties securityProperties = new SecurityProperties();
             securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "1234567890".toCharArray());
             securityProperties.setCallbackHandler(new ch.gigerstyle.xmlsec.test.CallbackHandlerImpl());
-            Document document = doInboundSecurity(securityProperties, new W3CDOMStreamReader(securedDocument));
+            Document document = doInboundSecurity(securityProperties, new CustomW3CDOMStreamReader(securedDocument));
 
             //header element must still be there
             NodeList nodeList = document.getElementsByTagNameNS(Constants.TAG_xenc_EncryptedKey.getNamespaceURI(), Constants.TAG_xenc_EncryptedKey.getLocalPart());
@@ -602,7 +602,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             SecurityProperties securityProperties = new SecurityProperties();
             securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "1234567890".toCharArray());
             securityProperties.setCallbackHandler(new ch.gigerstyle.xmlsec.test.CallbackHandlerImpl());
-            Document document = doInboundSecurity(securityProperties, new W3CDOMStreamReader(securedDocument));
+            Document document = doInboundSecurity(securityProperties, new CustomW3CDOMStreamReader(securedDocument));
 
             //header element must still be there
             NodeList nodeList = document.getElementsByTagNameNS(Constants.TAG_xenc_EncryptedKey.getNamespaceURI(), Constants.TAG_xenc_EncryptedKey.getLocalPart());
@@ -675,7 +675,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             SecurityProperties securityProperties = new SecurityProperties();
             securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "1234567890".toCharArray());
             securityProperties.setCallbackHandler(new ch.gigerstyle.xmlsec.test.CallbackHandlerImpl());
-            Document document = doInboundSecurity(securityProperties, new W3CDOMStreamReader(securedDocument));
+            Document document = doInboundSecurity(securityProperties, new CustomW3CDOMStreamReader(securedDocument));
 
             //header element must still be there
             NodeList nodeList = document.getElementsByTagNameNS(Constants.TAG_xenc_EncryptedKey.getNamespaceURI(), Constants.TAG_xenc_EncryptedKey.getLocalPart());
@@ -748,7 +748,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             SecurityProperties securityProperties = new SecurityProperties();
             securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "1234567890".toCharArray());
             securityProperties.setCallbackHandler(new ch.gigerstyle.xmlsec.test.CallbackHandlerImpl());
-            Document document = doInboundSecurity(securityProperties, new W3CDOMStreamReader(securedDocument));
+            Document document = doInboundSecurity(securityProperties, new CustomW3CDOMStreamReader(securedDocument));
 
             //header element must still be there
             NodeList nodeList = document.getElementsByTagNameNS(Constants.TAG_xenc_EncryptedKey.getNamespaceURI(), Constants.TAG_xenc_EncryptedKey.getLocalPart());
