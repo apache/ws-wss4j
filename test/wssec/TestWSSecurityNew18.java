@@ -183,7 +183,7 @@ public class TestWSSecurityNew18 extends TestCase {
         );
         reqData.setMsgContext(config);
         
-        final java.util.List<Integer> actions = new java.util.Vector<Integer>();
+        final java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
         actions.add(new Integer(action));
         final Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         MyHandler handler = new MyHandler();

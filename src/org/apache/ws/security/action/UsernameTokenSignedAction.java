@@ -19,8 +19,8 @@
 
 package org.apache.ws.security.action;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 
 import org.apache.ws.security.SOAPConstants;
 import org.apache.ws.security.WSConstants;
@@ -116,7 +116,7 @@ public class UsernameTokenSignedAction implements Action {
             if (soapConstants == null) {
                 soapConstants = WSSecurityUtil.getSOAPConstants(doc.getDocumentElement());
             }
-            parts = new Vector<WSEncryptionPart>();
+            parts = new ArrayList<WSEncryptionPart>();
             WSEncryptionPart encP = 
                 new WSEncryptionPart(WSConstants.ELEM_BODY, soapConstants.getEnvelopeURI(), "Content");
             parts.add(encP);

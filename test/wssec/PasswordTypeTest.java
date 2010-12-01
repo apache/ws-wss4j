@@ -190,7 +190,7 @@ public class PasswordTypeTest extends TestCase implements CallbackHandler {
         reqData.setUsername("wernerd");
         reqData.setMsgContext(config);
         
-        java.util.List<Integer> actions = new java.util.Vector<Integer>();
+        java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
         actions.add(new Integer(WSConstants.UT));
         
         handler.send(WSConstants.UT, doc, reqData, actions, true);

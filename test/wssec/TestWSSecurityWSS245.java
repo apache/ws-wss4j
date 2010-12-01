@@ -99,7 +99,7 @@ public class TestWSSecurityWSS245 extends TestCase {
         );
         reqData.setMsgContext(messageContext);
         
-        final java.util.List<Integer> actions = new java.util.Vector<Integer>();
+        final java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
         actions.add(new Integer(WSConstants.UT));
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         MyHandler handler = new MyHandler();
@@ -135,7 +135,7 @@ public class TestWSSecurityWSS245 extends TestCase {
         reqData.setPwType(WSConstants.PASSWORD_TEXT);
         reqData.setMsgContext(new java.util.TreeMap<String, String>());
         
-        final java.util.List<Integer> actions = new java.util.Vector<Integer>();
+        final java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
         actions.add(new Integer(WSConstants.UT));
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         MyHandler handler = new MyHandler();

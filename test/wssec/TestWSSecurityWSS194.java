@@ -110,7 +110,7 @@ public class TestWSSecurityWSS194 extends TestCase implements CallbackHandler {
         messageContext.put(WSHandlerConstants.SIG_KEY_ID, "DirectReference");
         reqData.setMsgContext(messageContext);
         
-        final java.util.List<Integer> actions = new java.util.Vector<Integer>();
+        final java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
         actions.add(new Integer(WSConstants.UT));
         actions.add(new Integer(WSConstants.SIGN));
         final Document doc = SOAPUtil.toSOAPPart(SOAPMSG);

@@ -46,8 +46,8 @@ import javax.crypto.SecretKey;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 
 /**
  * Encrypts a parts of a message according to WS Specification, X509 profile,
@@ -259,7 +259,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
         }
         
         if (parts == null) {
-            parts = new Vector<WSEncryptionPart>();
+            parts = new ArrayList<WSEncryptionPart>();
             String soapNamespace = WSSecurityUtil.getSOAPNamespace(envelope);
             WSEncryptionPart encP = 
                 new WSEncryptionPart(
@@ -410,7 +410,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
             );
         }
 
-        List<String> encDataRef = new Vector<String>();
+        List<String> encDataRef = new ArrayList<String>();
         for (int part = 0; part < references.size(); part++) {
             WSEncryptionPart encPart = references.get(part);
 

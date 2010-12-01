@@ -39,7 +39,7 @@ import org.w3c.dom.Document;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Vector;
+import java.util.ArrayList;
 
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
@@ -100,7 +100,7 @@ public class SignatureConfirmationTest extends TestCase implements CallbackHandl
         reqData.setMsgContext(msgContext);
         reqData.setUsername("16c73ab6-b892-458f-abf5-2f875f74882e");
         
-        final java.util.List<Integer> actions = new java.util.Vector<Integer>();
+        final java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
         actions.add(new Integer(WSConstants.SIGN));
         final Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         MyHandler handler = new MyHandler();
@@ -138,7 +138,7 @@ public class SignatureConfirmationTest extends TestCase implements CallbackHandl
         reqData.setMsgContext(msgContext);
         reqData.setUsername("16c73ab6-b892-458f-abf5-2f875f74882e");
         
-        final java.util.List<Integer> actions = new java.util.Vector<Integer>();
+        final java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
         actions.add(new Integer(WSConstants.SIGN));
         final Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         MyHandler handler = new MyHandler();
@@ -174,7 +174,7 @@ public class SignatureConfirmationTest extends TestCase implements CallbackHandl
         reqData.setMsgContext(msgContext);
         reqData.setUsername("16c73ab6-b892-458f-abf5-2f875f74882e");
         
-        final java.util.List<Integer> actions = new java.util.Vector<Integer>();
+        final java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
         actions.add(new Integer(WSConstants.SIGN));
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         MyHandler handler = new MyHandler();
@@ -203,7 +203,7 @@ public class SignatureConfirmationTest extends TestCase implements CallbackHandl
         doc = SOAPUtil.toSOAPPart(SOAPMSG);
         msgContext = (java.util.Map<String, Object>)reqData.getMsgContext();
         WSHandlerResult handlerResult = new WSHandlerResult(null, results);
-        List<WSHandlerResult> receivedResults = new Vector<WSHandlerResult>();
+        List<WSHandlerResult> receivedResults = new ArrayList<WSHandlerResult>();
         receivedResults.add(handlerResult);
         msgContext.put(WSHandlerConstants.RECV_RESULTS, receivedResults);
         handler.send(
@@ -234,7 +234,7 @@ public class SignatureConfirmationTest extends TestCase implements CallbackHandl
         reqData.setMsgContext(msgContext);
         reqData.setUsername("16c73ab6-b892-458f-abf5-2f875f74882e");
         
-        final java.util.List<Integer> actions = new java.util.Vector<Integer>();
+        final java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
         actions.add(new Integer(WSConstants.SIGN));
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         MyHandler handler = new MyHandler();
@@ -256,7 +256,7 @@ public class SignatureConfirmationTest extends TestCase implements CallbackHandl
         doc = SOAPUtil.toSOAPPart(SOAPMSG);
         msgContext = (java.util.Map<String, Object>)reqData.getMsgContext();
         WSHandlerResult handlerResult = new WSHandlerResult(null, results);
-        List<WSHandlerResult> receivedResults = new Vector<WSHandlerResult>();
+        List<WSHandlerResult> receivedResults = new ArrayList<WSHandlerResult>();
         receivedResults.add(handlerResult);
         msgContext.put(WSHandlerConstants.RECV_RESULTS, receivedResults);
         handler.send(

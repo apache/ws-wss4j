@@ -106,13 +106,15 @@ public class UsernameTokenProcessor implements Processor {
             log.debug("UsernameToken password type " + pwType);
         }
         
-        String requiredPasswordType = wssConfig.getRequiredPasswordType();
-        if (requiredPasswordType != null && !requiredPasswordType.equals(pwType)) {
-            if (log.isDebugEnabled()) {
-                log.debug("Authentication failed as the received password type does not " 
-                    + "match the required password type of: " + requiredPasswordType);
+        if (wssConfig != null) {
+            String requiredPasswordType = wssConfig.getRequiredPasswordType();
+            if (requiredPasswordType != null && !requiredPasswordType.equals(pwType)) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Authentication failed as the received password type does not " 
+                        + "match the required password type of: " + requiredPasswordType);
+                }
+                throw new WSSecurityException(WSSecurityException.FAILED_AUTHENTICATION);
             }
-            throw new WSSecurityException(WSSecurityException.FAILED_AUTHENTICATION);
         }
         //
         // If the UsernameToken is hashed or plaintext, then retrieve the password from the

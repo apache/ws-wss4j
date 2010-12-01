@@ -39,7 +39,7 @@ import org.apache.ws.security.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 
 import java.util.List;
-import java.util.Vector;
+import java.util.ArrayList;
 
 
 /**
@@ -190,7 +190,7 @@ public class TestWSSecurityUserProcessor extends TestCase {
         final RequestData reqData = new RequestData();
         reqData.setWssConfig(cfg);
         
-        final List<Integer> actions = new Vector<Integer>();
+        final List<Integer> actions = new ArrayList<Integer>();
         actions.add(new Integer(action));
         final Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         MyHandler handler = new MyHandler();
@@ -219,7 +219,7 @@ public class TestWSSecurityUserProcessor extends TestCase {
         final RequestData reqData = new RequestData();
         reqData.setWssConfig(cfg);
         
-        final List<Integer> actions = new Vector<Integer>();
+        final List<Integer> actions = new ArrayList<Integer>();
         actions.add(new Integer(action));
         final Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         MyHandler handler = new MyHandler();
@@ -247,7 +247,7 @@ public class TestWSSecurityUserProcessor extends TestCase {
         
         String actionString = 
             WSHandlerConstants.TIMESTAMP + " " + new Integer(customAction).toString();
-        List<Integer> actionList = new Vector<Integer>();
+        List<Integer> actionList = new ArrayList<Integer>();
         //
         // This parsing will fail as it doesn't know what the custom action is
         //

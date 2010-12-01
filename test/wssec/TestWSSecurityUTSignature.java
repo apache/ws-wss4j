@@ -189,7 +189,7 @@ public class TestWSSecurityUTSignature extends TestCase implements CallbackHandl
         reqData.setMsgContext(messageContext);
         reqData.setUsername("bob");
         
-        final java.util.List<Integer> actions = new java.util.Vector<Integer>();
+        final java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
         actions.add(new Integer(WSConstants.UT_SIGN));
         
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
@@ -235,7 +235,7 @@ public class TestWSSecurityUTSignature extends TestCase implements CallbackHandl
         reqData.setMsgContext(messageContext);
         reqData.setUsername("bob");
         
-        final java.util.List<Integer> actions = new java.util.Vector<Integer>();
+        final java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
         actions.add(new Integer(WSConstants.UT_SIGN));
         
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);

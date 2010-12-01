@@ -33,8 +33,8 @@ import org.w3c.dom.Node;
 import javax.security.auth.callback.CallbackHandler;
 import javax.xml.namespace.QName;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 
 /**
  * WS-Security Engine.
@@ -302,7 +302,7 @@ public class WSSecurityEngine {
         if (tlog.isDebugEnabled()) {
             t1 = System.currentTimeMillis();
         }
-        List<WSSecurityEngineResult> returnResults = new Vector<WSSecurityEngineResult>();
+        List<WSSecurityEngineResult> returnResults = new ArrayList<WSSecurityEngineResult>();
         final WSSConfig cfg = getWssConfig();
         Node node = securityHeader.getFirstChild();
         while (node != null) {

@@ -45,9 +45,9 @@ import org.w3c.dom.Element;
 
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Vector;
 
 import javax.xml.crypto.URIDereferencer;
 import javax.xml.crypto.XMLStructure;
@@ -119,7 +119,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
 
         String soapNamespace = WSSecurityUtil.getSOAPNamespace(doc.getDocumentElement());
         if (parts == null) {
-            parts = new Vector<WSEncryptionPart>();
+            parts = new ArrayList<WSEncryptionPart>();
             WSEncryptionPart encP = 
                 new WSEncryptionPart(WSConstants.ELEM_BODY, soapNamespace, "Content");
             parts.add(encP);

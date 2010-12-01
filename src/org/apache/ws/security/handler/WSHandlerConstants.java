@@ -431,10 +431,10 @@ public class WSHandlerConstants {
     public final static String SIG_PROP_REF_ID = "SignaturePropRefId";
     
     /**
-     * The WSDoAllReceiver handler stores a result <code>Vector</code>
+     * The WSDoAllReceiver handler stores a result <code>List</code>
      * in this property.
      * <p/>
-     * The vector contains <code>WSHandlerResult</code> objects
+     * The list contains <code>WSHandlerResult</code> objects
      * for each chained WSDoAllReceiver handler.
      */
     public static final String RECV_RESULTS = "RECV_RESULTS";

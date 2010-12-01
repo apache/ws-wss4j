@@ -21,7 +21,7 @@ package wssec;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Vector;
+import java.util.ArrayList;
 
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
@@ -121,7 +121,7 @@ public class TestWSSecurityDataRef1 extends TestCase implements CallbackHandler 
         /*
          * Set up the parts structure to encrypt the body
          */
-        List<WSEncryptionPart> parts = new Vector<WSEncryptionPart>();
+        List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
         WSEncryptionPart encP = new WSEncryptionPart("testMethod", "uri:LogTestService2",
                 "Element");
         parts.add(encP);

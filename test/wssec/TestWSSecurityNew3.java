@@ -41,7 +41,7 @@ import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
 import java.io.IOException;
 import java.util.List;
-import java.util.Vector;
+import java.util.ArrayList;
 
 /**
  * WS-Security Test Case
@@ -268,7 +268,7 @@ public class TestWSSecurityNew3 extends TestCase implements CallbackHandler {
         timestamp.setTimeToLive(300);
         Document createdDoc = timestamp.build(doc, secHeader);
         
-        List<WSEncryptionPart> parts = new Vector<WSEncryptionPart>();
+        List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "Timestamp",

@@ -53,7 +53,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
-import java.util.Vector;
+import java.util.ArrayList;
 
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
@@ -153,7 +153,7 @@ public class TestWSSecuritySAMLKeyIdentifier extends TestCase implements Callbac
         builder.setCustomEKTokenId(assertion.getId());
         
         builder.prepare(doc, hokCrypto);
-        List<WSEncryptionPart> parts = new Vector<WSEncryptionPart>();
+        List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
         WSEncryptionPart encP = new WSEncryptionPart("testMethod", "uri:LogTestService2", "Element");
         parts.add(encP);
         Element refElement = builder.encryptForRef(null, parts);

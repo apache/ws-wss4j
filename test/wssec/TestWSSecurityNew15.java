@@ -42,7 +42,7 @@ import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
 import java.io.IOException;
 
-import java.util.Vector;
+import java.util.ArrayList;
 
 /**
  * Test that encrypt and decrypt a WS-Security envelope.
@@ -127,7 +127,7 @@ public class TestWSSecurityNew15 extends TestCase implements CallbackHandler {
          */
         SOAPConstants soapConstants = WSSecurityUtil.getSOAPConstants(doc
                 .getDocumentElement());
-        java.util.List<WSEncryptionPart> parts = new Vector<WSEncryptionPart>();
+        java.util.List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
         WSEncryptionPart encP = new WSEncryptionPart(soapConstants
                 .getBodyQName().getLocalPart(), soapConstants.getEnvelopeURI(),
                 "Content");

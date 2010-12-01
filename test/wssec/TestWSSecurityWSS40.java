@@ -292,7 +292,7 @@ public class TestWSSecurityWSS40 extends TestCase implements CallbackHandler {
         config.put(WSHandlerConstants.USE_SINGLE_CERTIFICATE, "false");
         reqData.setMsgContext(config);
         
-        final java.util.List<Integer> actions = new java.util.Vector<Integer>();
+        final java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
         actions.add(new Integer(action));
         final Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         MyHandler handler = new MyHandler();

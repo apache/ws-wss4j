@@ -34,8 +34,8 @@ import org.apache.ws.security.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 
 import javax.xml.crypto.URIDereferencer;
 import javax.xml.crypto.XMLStructure;
@@ -87,7 +87,7 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
         prepare(doc, secHeader);
         String soapNamespace = WSSecurityUtil.getSOAPNamespace(doc.getDocumentElement());
         if (parts == null) {
-            parts = new Vector<WSEncryptionPart>();
+            parts = new ArrayList<WSEncryptionPart>();
             WSEncryptionPart encP = 
                 new WSEncryptionPart(
                     WSConstants.ELEM_BODY,

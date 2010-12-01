@@ -50,7 +50,6 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Vector;
 
 public class WSDoAllReceiver extends WSDoAllHandler {
 
@@ -87,7 +86,7 @@ public class WSDoAllReceiver extends WSDoAllHandler {
         try {
             reqData.setMsgContext(msgContext);
 
-            List actions = new Vector();
+            List actions = new ArrayList();
             String action = null;
             if ((action = (String) getOption(WSHandlerConstants.ACTION)) == null) {
                 action = (String) msgContext
@@ -283,7 +282,7 @@ public class WSDoAllReceiver extends WSDoAllHandler {
             List results = null;
             if ((results = (List) msgContext
                     .getProperty(WSHandlerConstants.RECV_RESULTS)) == null) {
-                results = new Vector();
+                results = new ArrayList();
                 msgContext
                         .setProperty(WSHandlerConstants.RECV_RESULTS, results);
             }

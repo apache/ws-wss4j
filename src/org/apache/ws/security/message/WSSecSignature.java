@@ -43,8 +43,8 @@ import org.w3c.dom.Element;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 
 import javax.xml.crypto.URIDereferencer;
 import javax.xml.crypto.XMLStructure;
@@ -288,7 +288,7 @@ public class WSSecSignature extends WSSecSignatureBase {
 
         prepare(doc, cr, secHeader);
         if (parts == null) {
-            parts = new Vector<WSEncryptionPart>();
+            parts = new ArrayList<WSEncryptionPart>();
             String soapNamespace = WSSecurityUtil.getSOAPNamespace(doc.getDocumentElement());
             WSEncryptionPart encP = 
                 new WSEncryptionPart(

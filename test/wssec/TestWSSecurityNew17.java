@@ -230,7 +230,7 @@ public class TestWSSecurityNew17 extends TestCase implements CallbackHandler {
         reqData.setMsgContext(messageContext);
         reqData.setUsername("");
         
-        final java.util.List<Integer> actions = new java.util.Vector<Integer>();
+        final java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
         actions.add(new Integer(WSConstants.SIGN));
         final Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         MyHandler handler = new MyHandler();

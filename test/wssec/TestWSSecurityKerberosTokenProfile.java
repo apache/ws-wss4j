@@ -42,7 +42,7 @@ import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
 import java.io.IOException;
-import java.util.Vector;
+import java.util.ArrayList;
 
 /**
  * This is a test for the Kerberos Token Profile 1.1
@@ -139,7 +139,7 @@ public class TestWSSecurityKerberosTokenProfile extends TestCase implements Call
         sign.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         sign.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
         
-        java.util.List<WSEncryptionPart> parts = new Vector<WSEncryptionPart>();
+        java.util.List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
         WSEncryptionPart encP =
             new WSEncryptionPart(bst.getID());
         parts.add(encP);
@@ -181,7 +181,7 @@ public class TestWSSecurityKerberosTokenProfile extends TestCase implements Call
         sign.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         sign.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
         
-        java.util.List<WSEncryptionPart> parts = new Vector<WSEncryptionPart>();
+        java.util.List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
         parts.add(new WSEncryptionPart(bst.getID()));
         parts.add(new WSEncryptionPart(timestamp.getId()));
         sign.setParts(parts);

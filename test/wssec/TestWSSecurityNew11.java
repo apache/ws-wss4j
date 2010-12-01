@@ -37,7 +37,7 @@ import org.apache.ws.security.message.WSSecTimestamp;
 import org.w3c.dom.Document;
 
 import java.util.List;
-import java.util.Vector;
+import java.util.ArrayList;
 
 /**
  * WS-Security Test Case
@@ -98,7 +98,7 @@ public class TestWSSecurityNew11 extends TestCase {
         builder.setUserInfo("wss40", "security");
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         SOAPConstants soapConstants = WSSecurityUtil.getSOAPConstants(doc.getDocumentElement());
-        List<WSEncryptionPart> parts = new Vector<WSEncryptionPart>();
+        List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
         
         //
         // Set up to sign body and use STRTransform to sign
@@ -147,7 +147,7 @@ public class TestWSSecurityNew11 extends TestCase {
         builder.setUserInfo("wss40", "security");
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         SOAPConstants soapConstants = WSSecurityUtil.getSOAPConstants(doc.getDocumentElement());
-        List<WSEncryptionPart> parts = new Vector<WSEncryptionPart>();
+        List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
         
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
@@ -206,7 +206,7 @@ public class TestWSSecurityNew11 extends TestCase {
         
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         SOAPConstants soapConstants = WSSecurityUtil.getSOAPConstants(doc.getDocumentElement());
-        List<WSEncryptionPart> parts = new Vector<WSEncryptionPart>();
+        List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
         
         //
         // Set up to sign body and use STRTransform to sign
@@ -259,7 +259,7 @@ public class TestWSSecurityNew11 extends TestCase {
         builder.setUserInfo("wss40", "security");
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         SOAPConstants soapConstants = WSSecurityUtil.getSOAPConstants(doc.getDocumentElement());
-        List<WSEncryptionPart> parts = new Vector<WSEncryptionPart>();
+        List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
         
         //
         // Set up to sign body and use STRTransform to sign

@@ -53,8 +53,8 @@ import javax.xml.namespace.QName;
 import java.io.IOException;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 
 public class EncryptedKeyProcessor implements Processor {
     private static Log log = LogFactory.getLog(EncryptedKeyProcessor.class.getName());
@@ -196,7 +196,7 @@ public class EncryptedKeyProcessor implements Processor {
             WSSecurityUtil.getDirectChildElement(
                 xencEncryptedKey, "ReferenceList", WSConstants.ENC_NS
             );
-        List<WSDataRef> dataRefs = new Vector<WSDataRef>();
+        List<WSDataRef> dataRefs = new ArrayList<WSDataRef>();
         if (refList != null) {
             for (Node node = refList.getFirstChild();
                 node != null; 

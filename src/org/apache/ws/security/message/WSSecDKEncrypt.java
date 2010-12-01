@@ -33,8 +33,8 @@ import org.w3c.dom.Node;
 
 import javax.crypto.SecretKey;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 
 /**
  * Encrypts and signs parts of a message with derived keys derived from a
@@ -61,7 +61,7 @@ public class WSSecDKEncrypt extends WSSecDerivedKeyBase {
                 
         String soapNamespace = WSSecurityUtil.getSOAPNamespace(envelope);
         if (parts == null) {
-            parts = new Vector<WSEncryptionPart>();
+            parts = new ArrayList<WSEncryptionPart>();
             WSEncryptionPart encP = 
                 new WSEncryptionPart(
                     WSConstants.ELEM_BODY, 

@@ -34,10 +34,10 @@ import org.w3c.dom.Text;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.text.DateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
-import java.util.Vector;
 
 /**
  * Timestamp according to SOAP Message Security 1.0,
@@ -64,7 +64,7 @@ public class Timestamp {
     public Timestamp(Element timestampElement) throws WSSecurityException {
 
         element = timestampElement;
-        customElements = new Vector<Element>();
+        customElements = new ArrayList<Element>();
 
         String strCreated = null;
         String strExpires = null;
@@ -133,7 +133,7 @@ public class Timestamp {
      */
     public Timestamp(boolean milliseconds, Document doc, int ttl) {
 
-        customElements = new Vector<Element>();
+        customElements = new ArrayList<Element>();
         element = 
             doc.createElementNS(
                 WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + WSConstants.TIMESTAMP_TOKEN_LN

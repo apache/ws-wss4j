@@ -219,7 +219,7 @@ public interface Crypto {
      * <p/>
      *
      * @param subjectDN The DN of subject to look for in the keystore
-     * @return Vector with all alias of certificates with the same DN as given in the parameters
+     * @return An array with all alias of certificates with the same DN as given in the parameters
      * @throws WSSecurityException
      */
     public String[] getAliasesForDN(String subjectDN) throws WSSecurityException;

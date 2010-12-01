@@ -49,8 +49,8 @@ public class PingBindingImpl
         MessageContext msgContext = MessageContext.getCurrentContext();
         Message reqMsg = msgContext.getRequestMessage();
 
-        Vector results = 
-            (Vector) msgContext.getProperty(WSHandlerConstants.RECV_RESULTS);
+        List results = 
+            (List) msgContext.getProperty(WSHandlerConstants.RECV_RESULTS);
         if (results == null) {
             System.out.println("No security results!!");
         }

@@ -123,7 +123,7 @@ public class TestWSSecurityGetPassword extends TestCase {
         messageContext.put("password", "securityPassword");
         reqData.setMsgContext(messageContext);
         
-        final java.util.List<Integer> actions = new java.util.Vector<Integer>();
+        final java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
         actions.add(new Integer(WSConstants.UT));
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         MyHandler handler = new MyHandler();
@@ -164,7 +164,7 @@ public class TestWSSecurityGetPassword extends TestCase {
         );
         reqData.setMsgContext(messageContext);
         
-        final java.util.List<Integer> actions = new java.util.Vector<Integer>();
+        final java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
         actions.add(new Integer(WSConstants.UT));
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         MyHandler handler = new MyHandler();

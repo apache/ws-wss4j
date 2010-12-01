@@ -46,7 +46,7 @@ import javax.xml.namespace.QName;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Vector;
+import java.util.ArrayList;
 
 /**
  * This is some unit tests for encryption using encryption using parts. Note that the "soapMsg" below
@@ -101,7 +101,7 @@ public class TestWSSecurityEncryptionParts extends TestCase implements CallbackH
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
-        List<WSEncryptionPart> parts = new Vector<WSEncryptionPart>();
+        List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "foobar",
@@ -167,7 +167,7 @@ public class TestWSSecurityEncryptionParts extends TestCase implements CallbackH
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
-        List<WSEncryptionPart> parts = new Vector<WSEncryptionPart>();
+        List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "foobar",
@@ -216,7 +216,7 @@ public class TestWSSecurityEncryptionParts extends TestCase implements CallbackH
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
-        List<WSEncryptionPart> parts = new Vector<WSEncryptionPart>();
+        List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "foobar2",
@@ -247,7 +247,7 @@ public class TestWSSecurityEncryptionParts extends TestCase implements CallbackH
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
-        List<WSEncryptionPart> parts = new Vector<WSEncryptionPart>();
+        List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "foobar",
@@ -279,7 +279,7 @@ public class TestWSSecurityEncryptionParts extends TestCase implements CallbackH
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
-        List<WSEncryptionPart> parts = new Vector<WSEncryptionPart>();
+        List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 soapConstants.getBodyQName().getLocalPart(),    // define the body

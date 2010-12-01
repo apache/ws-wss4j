@@ -114,7 +114,7 @@ public class SignatureProcessor implements Processor {
             log.debug("Found signature element");
         }
         boolean remove = WSDocInfoStore.store(wsDocInfo);
-        List<WSDataRef> protectedRefs = new java.util.Vector<WSDataRef>();
+        List<WSDataRef> protectedRefs = new java.util.ArrayList<WSDataRef>();
         Principal lastPrincipalFound = null;
         certs = null;
         signatureValue = null;

@@ -32,9 +32,9 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Vector;
 
 import javax.xml.crypto.XMLStructure;
 import javax.xml.crypto.dom.DOMStructure;
@@ -84,7 +84,7 @@ public class WSSecSignatureBase extends WSSecBase {
         }
         
         List<javax.xml.crypto.dsig.Reference> referenceList = 
-            new Vector<javax.xml.crypto.dsig.Reference>();
+            new ArrayList<javax.xml.crypto.dsig.Reference>();
 
         for (WSEncryptionPart encPart : references) {
             String idToSign = encPart.getId();
@@ -198,7 +198,7 @@ public class WSSecSignatureBase extends WSSecBase {
      * Get the List of inclusive prefixes from the DOM Element argument 
      */
     public List<String> getInclusivePrefixes(Element target, boolean excludeVisible) {
-        List<String> result = new Vector<String>();
+        List<String> result = new ArrayList<String>();
         Node parent = target;
         while (!(Node.DOCUMENT_NODE == parent.getParentNode().getNodeType())) {
             parent = parent.getParentNode();

@@ -36,8 +36,8 @@ import org.w3c.dom.Document;
 
 import java.io.ByteArrayOutputStream;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 
 /**
  * @author Werner Dittmann (werner@apache.org)
@@ -80,7 +80,7 @@ public class WSDoAllSender extends WSDoAllHandler {
             /*
              * Get the action first.
              */
-            List actions = new Vector();
+            List actions = new ArrayList();
             String action = getString(WSHandlerConstants.ACTION, mc);
             if (action == null) {
                 throw new AxisFault("WSDoAllSender: No action defined");

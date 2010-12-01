@@ -45,10 +45,10 @@ import javax.security.auth.callback.CallbackHandler;
 
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 
 
@@ -233,7 +233,7 @@ public abstract class WSHandler {
             List<byte[]> savedSignatures = 
                 (List<byte[]>)getProperty(reqData.getMsgContext(), WSHandlerConstants.SEND_SIGV);
             if (savedSignatures == null) {
-                savedSignatures = new Vector<byte[]>();
+                savedSignatures = new ArrayList<byte[]>();
                 setProperty(
                     reqData.getMsgContext(), WSHandlerConstants.SEND_SIGV, savedSignatures
                 );
@@ -311,7 +311,7 @@ public abstract class WSHandler {
     protected boolean checkReceiverResultsAnyOrder(
         List<WSSecurityEngineResult> wsResult, List<Integer> actions
     ) {
-        List<Integer> recordedActions = new Vector<Integer>(actions.size());
+        List<Integer> recordedActions = new ArrayList<Integer>(actions.size());
         for (Integer action : actions) {
             recordedActions.add(action);
         }
@@ -353,7 +353,7 @@ public abstract class WSHandler {
         // the current run of receiver (we can have more than one run: if we
         // have several security header blocks with different actors/roles)
         //
-        List<WSSecurityEngineResult> sigConf = new Vector<WSSecurityEngineResult>();
+        List<WSSecurityEngineResult> sigConf = new ArrayList<WSSecurityEngineResult>();
         WSSecurityUtil.fetchAllActionResults(resultList, WSConstants.SC, sigConf);
         //
         // now loop over all SignatureConfirmation results and check:

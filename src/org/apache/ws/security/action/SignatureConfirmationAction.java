@@ -33,8 +33,8 @@ import org.apache.ws.security.message.WSSecSignatureConfirmation;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 
 public class SignatureConfirmationAction implements Action {
     protected static Log log = LogFactory.getLog(WSHandler.class.getName());
@@ -57,7 +57,7 @@ public class SignatureConfirmationAction implements Action {
         // Loop over all the (signature) results gathered by all the processors, and store
         // them in a list.
         //
-        List<WSSecurityEngineResult> signatureActions = new Vector<WSSecurityEngineResult>();
+        List<WSSecurityEngineResult> signatureActions = new ArrayList<WSSecurityEngineResult>();
         for (WSHandlerResult wshResult : results) {
             List<WSSecurityEngineResult> resultList = wshResult.getResults();
 

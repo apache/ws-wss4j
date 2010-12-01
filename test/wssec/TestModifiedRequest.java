@@ -41,7 +41,7 @@ import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
 import java.io.IOException;
 import java.util.List;
-import java.util.Vector;
+import java.util.ArrayList;
 
 /**
  * This class tests the modification of requests to see if signature verification fails.
@@ -98,7 +98,7 @@ public class TestModifiedRequest extends TestCase implements CallbackHandler {
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
-        List<WSEncryptionPart> parts = new Vector<WSEncryptionPart>();
+        List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "value",
@@ -151,7 +151,7 @@ public class TestModifiedRequest extends TestCase implements CallbackHandler {
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
-        List<WSEncryptionPart> parts = new Vector<WSEncryptionPart>();
+        List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "value",

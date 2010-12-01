@@ -27,8 +27,8 @@ import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.message.WSSecHeader;
 import org.apache.ws.security.message.token.UsernameToken;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 import java.security.cert.X509Certificate;
 
 /**
@@ -49,18 +49,18 @@ public class RequestData {
     private int sigKeyId = 0;
     private String sigAlgorithm = null;
     private String signatureDigestAlgorithm = null;
-    private List<WSEncryptionPart> signatureParts = new Vector<WSEncryptionPart>();
+    private List<WSEncryptionPart> signatureParts = new ArrayList<WSEncryptionPart>();
     private Crypto encCrypto = null;
     private int encKeyId = 0;
     private String encSymmAlgo = null;
     private String encKeyTransport = null;
     private String encUser = null;
     private String signatureUser = null;
-    private List<WSEncryptionPart> encryptParts = new Vector<WSEncryptionPart>();
+    private List<WSEncryptionPart> encryptParts = new ArrayList<WSEncryptionPart>();
     private X509Certificate encCert = null;
     private int timeToLive = 300;   // Timestamp: time in seconds between creation and expiry
     private WSSConfig wssConfig = null;
-    private List<byte[]> signatureValues = new Vector<byte[]>();
+    private List<byte[]> signatureValues = new ArrayList<byte[]>();
     private WSSecHeader secHeader = null;
     private boolean encSymmetricEncryptionKey = true;
     private int secretKeyLength = WSConstants.WSE_DERIVED_KEY_LEN;

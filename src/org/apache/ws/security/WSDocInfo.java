@@ -39,8 +39,8 @@ import org.apache.ws.security.processor.Processor;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 
 public class WSDocInfo {
     Document doc = null;
@@ -81,7 +81,7 @@ public class WSDocInfo {
      */
     public void addTokenElement(Element elem) {
         if (tokenList == null) {
-            tokenList = new Vector<Element>();
+            tokenList = new ArrayList<Element>();
         }
         tokenList.add(elem);
     }
@@ -142,7 +142,7 @@ public class WSDocInfo {
      */
     public void setProcessor(Processor p) {
         if (processors == null) {
-            processors = new Vector<Processor>();
+            processors = new ArrayList<Processor>();
         }
         processors.add(p);
     }

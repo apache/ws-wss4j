@@ -43,7 +43,7 @@ import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
 import java.io.IOException;
 import java.util.List;
-import java.util.Vector;
+import java.util.ArrayList;
 
 /**
  * WS-Security Test Case <p/>
@@ -148,7 +148,7 @@ public class TestWSSecurityNew6 extends TestCase implements CallbackHandler {
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
 
-        List<WSEncryptionPart> encParts = new Vector<WSEncryptionPart>();
+        List<WSEncryptionPart> encParts = new ArrayList<WSEncryptionPart>();
         encParts.add(
                 new WSEncryptionPart(
                         "add",
@@ -165,7 +165,7 @@ public class TestWSSecurityNew6 extends TestCase implements CallbackHandler {
             LOG.debug(outputString);
         }
         
-        List<WSEncryptionPart> sigParts = new Vector<WSEncryptionPart>();
+        List<WSEncryptionPart> sigParts = new ArrayList<WSEncryptionPart>();
         sigParts.add(
                 new WSEncryptionPart(
                         WSConstants.ENC_DATA_LN,
@@ -184,10 +184,10 @@ public class TestWSSecurityNew6 extends TestCase implements CallbackHandler {
         
         List<WSSecurityEngineResult> results = verify(encryptedSignedDoc);
         
-        List<WSSecurityEngineResult> sigSecEngResults = new Vector<WSSecurityEngineResult>();
+        List<WSSecurityEngineResult> sigSecEngResults = new ArrayList<WSSecurityEngineResult>();
         WSSecurityUtil.fetchAllActionResults(results, WSConstants.SIGN, sigSecEngResults);
         
-        List<WSSecurityEngineResult> encSecEngResults = new Vector<WSSecurityEngineResult>();
+        List<WSSecurityEngineResult> encSecEngResults = new ArrayList<WSSecurityEngineResult>();
         WSSecurityUtil.fetchAllActionResults(results, WSConstants.ENCR, encSecEngResults);
         
         assertEquals(1, sigSecEngResults.size());
@@ -255,7 +255,7 @@ public class TestWSSecurityNew6 extends TestCase implements CallbackHandler {
         LOG.info("Before Encryption....");
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         
-        List<WSEncryptionPart> parts = new Vector<WSEncryptionPart>();
+        List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "add",

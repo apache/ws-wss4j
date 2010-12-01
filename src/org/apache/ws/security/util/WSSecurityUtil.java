@@ -47,9 +47,9 @@ import javax.xml.namespace.QName;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Vector;
 
 /**
  * WS-Security Utility methods. <p/>
@@ -186,7 +186,7 @@ public class WSSecurityUtil {
         String localName,
         String namespace
     ) {
-        List<Node> children = new Vector<Node>();
+        List<Node> children = new ArrayList<Node>();
         for (
             Node currentChild = fNode.getFirstChild(); 
             currentChild != null; 
@@ -1151,7 +1151,7 @@ public class WSSecurityUtil {
     listChildren(
         final Node parent
     ) {
-        final List<Node> ret = new Vector<Node>();
+        final List<Node> ret = new ArrayList<Node>();
         if (parent != null) {
             Node node = parent.getFirstChild();
             while (node != null) {
@@ -1173,7 +1173,7 @@ public class WSSecurityUtil {
         if (a.size() == 0) {
             return b;
         }
-        final List<Node> ret = new Vector<Node>();
+        final List<Node> ret = new ArrayList<Node>();
         if (b.size() == 0) {
             return ret;
         }

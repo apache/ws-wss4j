@@ -41,7 +41,7 @@ import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
 import java.io.IOException;
 
-import java.util.Vector;
+import java.util.ArrayList;
 
 /**
  * WS-Security Test Case
@@ -127,7 +127,7 @@ public class TestWSSecurityNew2 extends TestCase implements CallbackHandler {
          */
         builder.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
         builder.setSymmetricEncAlgorithm(WSConstants.AES_128);
-        java.util.List<WSEncryptionPart> parts = new Vector<WSEncryptionPart>();
+        java.util.List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
         WSEncryptionPart encP =
             new WSEncryptionPart("testMethod", "uri:LogTestService2", "Element");
         parts.add(encP);

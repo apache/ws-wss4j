@@ -198,7 +198,7 @@ public class TestWSSecurityNew13 extends TestCase implements CallbackHandler {
         reqData.setUsername("wernerd");
         reqData.setMsgContext(config);
         
-        java.util.List<Integer> actions = new java.util.Vector<Integer>();
+        java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
         actions.add(new Integer(WSConstants.UT_SIGN));
         
         handler.send(WSConstants.UT_SIGN, doc, reqData, actions, true);

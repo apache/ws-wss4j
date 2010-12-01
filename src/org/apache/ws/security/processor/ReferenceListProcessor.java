@@ -19,8 +19,8 @@
 
 package org.apache.ws.security.processor;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 
 import javax.crypto.SecretKey;
 import javax.security.auth.callback.Callback;
@@ -91,7 +91,7 @@ public class ReferenceListProcessor implements Processor {
         Crypto crypto,
         WSDocInfo wdi
     ) throws WSSecurityException {
-        List<WSDataRef> dataRefs = new Vector<WSDataRef>();
+        List<WSDataRef> dataRefs = new ArrayList<WSDataRef>();
         for (Node node = elem.getFirstChild(); 
             node != null; 
             node = node.getNextSibling()

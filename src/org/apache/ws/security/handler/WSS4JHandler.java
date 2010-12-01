@@ -50,9 +50,9 @@ import javax.xml.transform.stream.StreamSource;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Vector;
 
 /**
  * Merged and converted the the axis handlers WSDoAllReceiver and WSDoAllSender
@@ -189,7 +189,7 @@ public class WSS4JHandler extends WSHandler implements Handler {
         /*
         * Get the action first.
         */
-        List<Integer> actions = new Vector<Integer>();
+        List<Integer> actions = new ArrayList<Integer>();
         String action = (String) getOption(WSHandlerConstants.SEND + '.' + WSHandlerConstants.ACTION);
         if (action == null) {
             action = (String) getOption(WSHandlerConstants.ACTION);
@@ -332,7 +332,7 @@ public class WSS4JHandler extends WSHandler implements Handler {
     @SuppressWarnings("unchecked")
     public boolean doReceiver(MessageContext mc, RequestData reqData, boolean isRequest) throws WSSecurityException {
 
-        List<Integer> actions = new Vector<Integer>();
+        List<Integer> actions = new ArrayList<Integer>();
         String action = (String) getOption(WSHandlerConstants.RECEIVE + '.' + WSHandlerConstants.ACTION);
         if (action == null) {
             action = (String) getOption(WSHandlerConstants.ACTION);
@@ -488,7 +488,7 @@ public class WSS4JHandler extends WSHandler implements Handler {
         List<WSHandlerResult> results = null;
         if ((results = (List<WSHandlerResult>) mc.getProperty(WSHandlerConstants.RECV_RESULTS))
                 == null) {
-            results = new Vector<WSHandlerResult>();
+            results = new ArrayList<WSHandlerResult>();
             mc.setProperty(WSHandlerConstants.RECV_RESULTS, results);
         }
         WSHandlerResult rResult =

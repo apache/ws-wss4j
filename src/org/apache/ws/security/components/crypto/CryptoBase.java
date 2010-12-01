@@ -47,6 +47,7 @@ import java.security.cert.TrustAnchor;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.RSAPublicKey;
 import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -54,7 +55,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Vector;
 import javax.security.auth.x500.X500Principal;
 
 /**
@@ -260,7 +260,7 @@ public abstract class CryptoBase implements Crypto {
 
     protected List<String> splitAndTrim(String inString) {
         X509NameTokenizer nmTokens = new X509NameTokenizer(inString);
-        List<String> vr = new Vector<String>();
+        List<String> vr = new ArrayList<String>();
 
         while (nmTokens.hasMoreTokens()) {
             vr.add(nmTokens.nextToken());
@@ -937,7 +937,7 @@ public abstract class CryptoBase implements Crypto {
     private List<String> getAliases(Object subjectRDN, KeyStore store) 
         throws WSSecurityException {
         // Store the aliases found
-        List<String> aliases = new Vector<String>();
+        List<String> aliases = new ArrayList<String>();
         Certificate cert = null;
         
         try {
