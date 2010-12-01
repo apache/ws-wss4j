@@ -4,11 +4,11 @@ import ch.gigerstyle.xmlsec.ext.InputProcessorChain;
 import ch.gigerstyle.xmlsec.ext.SecurityProperties;
 import ch.gigerstyle.xmlsec.ext.XMLEventNS;
 import ch.gigerstyle.xmlsec.ext.XMLSecurityException;
-import com.ctc.wstx.cfg.ErrorConsts;
 
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.namespace.QName;
 import javax.xml.stream.Location;
+import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.events.*;
@@ -40,12 +40,19 @@ public class XMLSecurityStreamReader implements XMLStreamReader {
     private InputProcessorChain inputProcessorChain;
     private XMLEvent currentEvent;
 
+    private static final String ERR_STATE_NOT_ELEM = "Current state not START_ELEMENT or END_ELEMENT";
+    private static final String ERR_STATE_NOT_STELEM = "Current state not START_ELEMENT";
+    private static final String ERR_STATE_NOT_PI = "Current state not PROCESSING_INSTRUCTION";
+
     public XMLSecurityStreamReader(InputProcessorChain inputProcessorChain, SecurityProperties securityProperties) {
         this.inputProcessorChain = inputProcessorChain;
         this.securityProperties = securityProperties;
     }
 
     public Object getProperty(String name) throws IllegalArgumentException {
+        if (XMLInputFactory.IS_NAMESPACE_AWARE.equals(name)) {
+            return true;
+        }
         return null;
     }
 
@@ -179,7 +186,7 @@ public class XMLSecurityStreamReader implements XMLStreamReader {
         XMLEvent xmlEvent = getCurrentEvent();
 
         if (xmlEvent.getEventType() != START_ELEMENT && xmlEvent.getEventType() != END_ELEMENT) {
-            throw new IllegalStateException(ErrorConsts.ERR_STATE_NOT_ELEM);
+            throw new IllegalStateException(ERR_STATE_NOT_ELEM);
         }
 
         if (xmlEvent.isStartElement()) {
@@ -213,7 +220,7 @@ public class XMLSecurityStreamReader implements XMLStreamReader {
     public String getAttributeValue(String namespaceURI, String localName) {
         XMLEvent xmlEvent = getCurrentEvent();
         if (xmlEvent.getEventType() != START_ELEMENT) {
-            throw new IllegalStateException(ErrorConsts.ERR_STATE_NOT_STELEM);
+            throw new IllegalStateException(ERR_STATE_NOT_STELEM);
         }
         Attribute attribute = xmlEvent.asStartElement().getAttributeByName(new QName(namespaceURI, localName));
         if (attribute != null) {
@@ -225,7 +232,7 @@ public class XMLSecurityStreamReader implements XMLStreamReader {
     public int getAttributeCount() {
         XMLEvent xmlEvent = getCurrentEvent();
         if (xmlEvent.getEventType() != START_ELEMENT) {
-            throw new IllegalStateException(ErrorConsts.ERR_STATE_NOT_STELEM);
+            throw new IllegalStateException(ERR_STATE_NOT_STELEM);
         }
         int count = 0;
         Iterator<Attribute> attributeIterator = xmlEvent.asStartElement().getAttributes();
@@ -239,7 +246,7 @@ public class XMLSecurityStreamReader implements XMLStreamReader {
     public QName getAttributeName(int index) {
         XMLEvent xmlEvent = getCurrentEvent();
         if (xmlEvent.getEventType() != START_ELEMENT) {
-            throw new IllegalStateException(ErrorConsts.ERR_STATE_NOT_STELEM);
+            throw new IllegalStateException(ERR_STATE_NOT_STELEM);
         }
         int count = 0;
         Iterator<Attribute> attributeIterator = xmlEvent.asStartElement().getAttributes();
@@ -256,7 +263,7 @@ public class XMLSecurityStreamReader implements XMLStreamReader {
     public String getAttributeNamespace(int index) {
         XMLEvent xmlEvent = getCurrentEvent();
         if (xmlEvent.getEventType() != START_ELEMENT) {
-            throw new IllegalStateException(ErrorConsts.ERR_STATE_NOT_STELEM);
+            throw new IllegalStateException(ERR_STATE_NOT_STELEM);
         }
         int count = 0;
         Iterator<Attribute> attributeIterator = xmlEvent.asStartElement().getAttributes();
@@ -273,7 +280,7 @@ public class XMLSecurityStreamReader implements XMLStreamReader {
     public String getAttributeLocalName(int index) {
         XMLEvent xmlEvent = getCurrentEvent();
         if (xmlEvent.getEventType() != START_ELEMENT) {
-            throw new IllegalStateException(ErrorConsts.ERR_STATE_NOT_STELEM);
+            throw new IllegalStateException(ERR_STATE_NOT_STELEM);
         }
         int count = 0;
         Iterator<Attribute> attributeIterator = xmlEvent.asStartElement().getAttributes();
@@ -290,7 +297,7 @@ public class XMLSecurityStreamReader implements XMLStreamReader {
     public String getAttributePrefix(int index) {
         XMLEvent xmlEvent = getCurrentEvent();
         if (xmlEvent.getEventType() != START_ELEMENT) {
-            throw new IllegalStateException(ErrorConsts.ERR_STATE_NOT_STELEM);
+            throw new IllegalStateException(ERR_STATE_NOT_STELEM);
         }
         int count = 0;
         Iterator<Attribute> attributeIterator = xmlEvent.asStartElement().getAttributes();
@@ -307,7 +314,7 @@ public class XMLSecurityStreamReader implements XMLStreamReader {
     public String getAttributeType(int index) {
         XMLEvent xmlEvent = getCurrentEvent();
         if (xmlEvent.getEventType() != START_ELEMENT) {
-            throw new IllegalStateException(ErrorConsts.ERR_STATE_NOT_STELEM);
+            throw new IllegalStateException(ERR_STATE_NOT_STELEM);
         }
         int count = 0;
         Iterator<Attribute> attributeIterator = xmlEvent.asStartElement().getAttributes();
@@ -324,7 +331,7 @@ public class XMLSecurityStreamReader implements XMLStreamReader {
     public String getAttributeValue(int index) {
         XMLEvent xmlEvent = getCurrentEvent();
         if (xmlEvent.getEventType() != START_ELEMENT) {
-            throw new IllegalStateException(ErrorConsts.ERR_STATE_NOT_STELEM);
+            throw new IllegalStateException(ERR_STATE_NOT_STELEM);
         }
         int count = 0;
         Iterator<Attribute> attributeIterator = xmlEvent.asStartElement().getAttributes();
@@ -341,7 +348,7 @@ public class XMLSecurityStreamReader implements XMLStreamReader {
     public boolean isAttributeSpecified(int index) {
         XMLEvent xmlEvent = getCurrentEvent();
         if (xmlEvent.getEventType() != START_ELEMENT) {
-            throw new IllegalStateException(ErrorConsts.ERR_STATE_NOT_STELEM);
+            throw new IllegalStateException(ERR_STATE_NOT_STELEM);
         }
         int count = 0;
         Iterator<Attribute> attributeIterator = xmlEvent.asStartElement().getAttributes();
@@ -358,7 +365,7 @@ public class XMLSecurityStreamReader implements XMLStreamReader {
     public int getNamespaceCount() {
         XMLEvent xmlEvent = getCurrentEvent();
         if (xmlEvent.getEventType() != START_ELEMENT && xmlEvent.getEventType() != END_ELEMENT) {
-            throw new IllegalStateException(ErrorConsts.ERR_STATE_NOT_ELEM);
+            throw new IllegalStateException(ERR_STATE_NOT_ELEM);
         }
         int count = 0;
         Iterator<Namespace> namespaceIterator;
@@ -377,7 +384,7 @@ public class XMLSecurityStreamReader implements XMLStreamReader {
     public String getNamespacePrefix(int index) {
         XMLEvent xmlEvent = getCurrentEvent();
         if (xmlEvent.getEventType() != START_ELEMENT && xmlEvent.getEventType() != END_ELEMENT) {
-            throw new IllegalStateException(ErrorConsts.ERR_STATE_NOT_ELEM);
+            throw new IllegalStateException(ERR_STATE_NOT_ELEM);
         }
         int count = 0;
         Iterator<Namespace> namespaceIterator;
@@ -399,7 +406,7 @@ public class XMLSecurityStreamReader implements XMLStreamReader {
     public String getNamespaceURI(int index) {
         XMLEvent xmlEvent = getCurrentEvent();
         if (xmlEvent.getEventType() != START_ELEMENT) {
-            throw new IllegalStateException(ErrorConsts.ERR_STATE_NOT_STELEM);
+            throw new IllegalStateException(ERR_STATE_NOT_STELEM);
         }
         int count = 0;
         Iterator<Namespace> namespaceIterator = xmlEvent.asStartElement().getNamespaces();
@@ -416,7 +423,7 @@ public class XMLSecurityStreamReader implements XMLStreamReader {
     public NamespaceContext getNamespaceContext() {
         XMLEvent xmlEvent = getCurrentEvent();
         if (xmlEvent.getEventType() != START_ELEMENT) {
-            throw new IllegalStateException(ErrorConsts.ERR_STATE_NOT_STELEM);
+            throw new IllegalStateException(ERR_STATE_NOT_STELEM);
         }
         return xmlEvent.asStartElement().getNamespaceContext();
     }
@@ -549,7 +556,7 @@ public class XMLSecurityStreamReader implements XMLStreamReader {
     public QName getName() {
         XMLEvent xmlEvent = getCurrentEvent();
         if (xmlEvent.getEventType() != START_ELEMENT && xmlEvent.getEventType() != END_ELEMENT) {
-            throw new IllegalStateException(ErrorConsts.ERR_STATE_NOT_ELEM);
+            throw new IllegalStateException(ERR_STATE_NOT_ELEM);
         }
         if (xmlEvent.isStartElement()) {
             return xmlEvent.asStartElement().getName();
@@ -561,7 +568,7 @@ public class XMLSecurityStreamReader implements XMLStreamReader {
     public String getLocalName() {
         XMLEvent xmlEvent = getCurrentEvent();
         if (xmlEvent.getEventType() != START_ELEMENT && xmlEvent.getEventType() != END_ELEMENT) {
-            throw new IllegalStateException(ErrorConsts.ERR_STATE_NOT_ELEM);
+            throw new IllegalStateException(ERR_STATE_NOT_ELEM);
         }
         if (xmlEvent.isStartElement()) {
             return xmlEvent.asStartElement().getName().getLocalPart();
@@ -581,7 +588,7 @@ public class XMLSecurityStreamReader implements XMLStreamReader {
     public String getNamespaceURI() {
         XMLEvent xmlEvent = getCurrentEvent();
         if (xmlEvent.getEventType() != START_ELEMENT && xmlEvent.getEventType() != END_ELEMENT) {
-            throw new IllegalStateException(ErrorConsts.ERR_STATE_NOT_ELEM);
+            throw new IllegalStateException(ERR_STATE_NOT_ELEM);
         }
         if (xmlEvent.isStartElement()) {
             return xmlEvent.asStartElement().getName().getNamespaceURI();
@@ -593,7 +600,7 @@ public class XMLSecurityStreamReader implements XMLStreamReader {
     public String getPrefix() {
         XMLEvent xmlEvent = getCurrentEvent();
         if (xmlEvent.getEventType() != START_ELEMENT && xmlEvent.getEventType() != END_ELEMENT) {
-            throw new IllegalStateException(ErrorConsts.ERR_STATE_NOT_ELEM);
+            throw new IllegalStateException(ERR_STATE_NOT_ELEM);
         }
         if (xmlEvent.isStartElement()) {
             return xmlEvent.asStartElement().getName().getPrefix();
@@ -621,7 +628,7 @@ public class XMLSecurityStreamReader implements XMLStreamReader {
     public String getPITarget() {
         XMLEvent xmlEvent = getCurrentEvent();
         if (xmlEvent.getEventType() != PROCESSING_INSTRUCTION) {
-            throw new IllegalStateException(ErrorConsts.ERR_STATE_NOT_PI);
+            throw new IllegalStateException(ERR_STATE_NOT_PI);
         }
         return ((ProcessingInstruction) xmlEvent).getTarget();
     }
@@ -629,7 +636,7 @@ public class XMLSecurityStreamReader implements XMLStreamReader {
     public String getPIData() {
         XMLEvent xmlEvent = getCurrentEvent();
         if (xmlEvent.getEventType() != PROCESSING_INSTRUCTION) {
-            throw new IllegalStateException(ErrorConsts.ERR_STATE_NOT_PI);
+            throw new IllegalStateException(ERR_STATE_NOT_PI);
         }
         return ((ProcessingInstruction) xmlEvent).getData();
     }
