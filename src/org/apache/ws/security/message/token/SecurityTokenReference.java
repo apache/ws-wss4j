@@ -39,8 +39,6 @@ import javax.xml.namespace.QName;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 
@@ -360,26 +358,23 @@ public class SecurityTokenReference {
      */
     public void setKeyIdentifierThumb(X509Certificate cert) throws WSSecurityException {
         Document doc = element.getOwnerDocument();
-        MessageDigest sha = null;
+        byte[] encodedCert = null;
         try {
-            sha = WSSecurityUtil.resolveMessageDigest();
-        } catch (NoSuchAlgorithmException e1) {
-            throw new WSSecurityException(
-                WSSecurityException.FAILURE, "noSHA1availabe", null, e1
-            );
-        }
-        sha.reset();
-        try {
-            sha.update(cert.getEncoded());
+            encodedCert = cert.getEncoded();
         } catch (CertificateEncodingException e1) {
             throw new WSSecurityException(
                 WSSecurityException.SECURITY_TOKEN_UNAVAILABLE, "encodeError", null, e1
             );
         }
-        byte[] data = sha.digest();
-
-        org.w3c.dom.Text text = doc.createTextNode(Base64.encode(data));
-        createKeyIdentifier(doc, THUMB_URI, text, true);
+        try {
+            byte[] encodedBytes = WSSecurityUtil.generateDigest(encodedCert);
+            org.w3c.dom.Text text = doc.createTextNode(Base64.encode(encodedBytes));
+            createKeyIdentifier(doc, THUMB_URI, text, true);
+        } catch (WSSecurityException e1) {
+            throw new WSSecurityException(
+                WSSecurityException.FAILURE, "noSHA1availabe", null, e1
+            );
+        }
     }
     
 

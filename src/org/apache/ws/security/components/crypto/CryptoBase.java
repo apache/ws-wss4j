@@ -602,8 +602,7 @@ public abstract class CryptoBase implements Crypto {
         }
 
         try {
-            sha = WSSecurityUtil.resolveMessageDigest();
-            sha.reset();
+            sha = MessageDigest.getInstance("SHA1");
         } catch (NoSuchAlgorithmException e) {
             throw new WSSecurityException(
                 WSSecurityException.FAILURE, "noSHA1availabe", null, e
@@ -689,19 +688,15 @@ public abstract class CryptoBase implements Crypto {
             // remove 22-byte algorithm ID and header
             byte[] value = new byte[encoded.length - 22];
             System.arraycopy(encoded, 22, value, 0, value.length);
-            MessageDigest sha;
             try {
-                sha = WSSecurityUtil.resolveMessageDigest();
-            } catch (NoSuchAlgorithmException ex) {
+                return WSSecurityUtil.generateDigest(value);
+            } catch (WSSecurityException ex) {
                 throw new WSSecurityException(
                     WSSecurityException.UNSUPPORTED_SECURITY_TOKEN, "noSKIHandling",
                     new Object[]{"Wrong certificate version (<3) and no SHA1 message digest availabe"},
                     ex
                 );
             }
-            sha.reset();
-            sha.update(value);
-            return sha.digest();
         }
 
         //

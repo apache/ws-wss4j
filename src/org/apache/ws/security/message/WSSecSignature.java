@@ -40,8 +40,6 @@ import org.apache.ws.security.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
@@ -211,7 +209,8 @@ public class WSSecSignature extends WSSecSignatureBase {
             if (encrKeySha1value != null) {
                 secRef.setKeyIdentifierEncKeySHA1(encrKeySha1value);
             } else {
-                secRef.setKeyIdentifierEncKeySHA1(getSHA1(secretKey));
+                byte[] digestBytes = WSSecurityUtil.generateDigest(secretKey);
+                secRef.setKeyIdentifierEncKeySHA1(Base64.encode(digestBytes));
             }
             break;
 
@@ -681,22 +680,6 @@ public class WSSecSignature extends WSSecSignatureBase {
         return secRef;
     }
 
-    private String getSHA1(byte[] input) throws WSSecurityException {
-        try {
-            MessageDigest sha = WSSecurityUtil.resolveMessageDigest();
-            sha.reset();
-            sha.update(input);
-            byte[] data = sha.digest();
-            
-            return Base64.encode(data);
-        } catch (NoSuchAlgorithmException e) {
-            throw new WSSecurityException(
-                WSSecurityException.UNSUPPORTED_ALGORITHM, null, null, e
-            );
-        }
-    }
-    
-    
     /**
      * Set up the X509 Certificate(s) for signing.
      */

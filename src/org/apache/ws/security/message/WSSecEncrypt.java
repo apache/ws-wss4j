@@ -43,7 +43,6 @@ import org.w3c.dom.NamedNodeMap;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 
-import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -526,7 +525,8 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
             if (customReferenceValue != null) {
                 secToken.setKeyIdentifierEncKeySHA1(customReferenceValue);
             } else {
-                secToken.setKeyIdentifierEncKeySHA1(getSHA1(encryptedEphemeralKey));
+                byte[] encodedBytes = WSSecurityUtil.generateDigest(encryptedEphemeralKey);
+                secToken.setKeyIdentifierEncKeySHA1(Base64.encode(encodedBytes));
             }
             keyInfo.addUnknownElement(secToken.getElement());
         } else if (keyIdentifierType == WSConstants.EMBEDDED_KEYNAME) {
@@ -646,21 +646,6 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
     
     public void setEncryptSymmKey(boolean encryptSymmKey) {
         this.encryptSymmKey = encryptSymmKey;
-    }
-    
-    private String getSHA1(byte[] input) throws WSSecurityException {
-        try {
-            MessageDigest sha = WSSecurityUtil.resolveMessageDigest();
-            sha.reset();
-            sha.update(input);
-            byte[] data = sha.digest();
-            
-            return Base64.encode(data);
-        } catch (NoSuchAlgorithmException e) {
-            throw new WSSecurityException(
-                WSSecurityException.UNSUPPORTED_ALGORITHM, null, null, e
-            );
-        }
     }
     
     public void setCustomReferenceValue(String customReferenceValue) {

@@ -66,13 +66,11 @@ public class WSSecurityUtil {
      * overhead.
      */
     private static SecureRandom random = null;
-    private static String randomAlgorithm = null;
     
     /**
      * A cached MessageDigest object
      */
     private static MessageDigest digest = null;
-    private static String digestAlgorithm = null;
     
     /**
      * Returns the first WS-Security header element for a given actor. Only one
@@ -968,23 +966,44 @@ public class WSSecurityUtil {
     }
 
     /**
-     * Generate a nonce of the given length
+     * Generate a nonce of the given length using the SHA1PRNG algorithm. The SecureRandom
+     * instance that backs this method is cached for efficiency.
      * 
      * @return a nonce of the given length
-     * @throws Exception
+     * @throws WSSecurityException
      */
-    public static byte[] generateNonce(int length) throws WSSecurityException {
-        try {            
-            final SecureRandom r = resolveSecureRandom();
-            if (r == null) {
-                throw new WSSecurityException("Random generator is not initialized.");
+    public static synchronized byte[] generateNonce(int length) throws WSSecurityException {
+        try {
+            if (random == null) {
+                random = SecureRandom.getInstance("SHA1PRNG");
+                random.setSeed(System.currentTimeMillis());
             }
-            byte[] temp = new byte[length];            
-            r.nextBytes(temp);
+            byte[] temp = new byte[length];
+            random.nextBytes(temp);
             return temp;
+        } catch (Exception ex) {
+            throw new WSSecurityException(
+                "Error in generating nonce of length " + length, ex
+            );
+        }
+    }
+    
+    /**
+     * Generate a (SHA1) digest of the input bytes. The MessageDigest instance that backs this
+     * method is cached for efficiency.  
+     * @param inputBytes the bytes to digest
+     * @return the digest of the input bytes
+     * @throws WSSecurityException
+     */
+    public static synchronized byte[] generateDigest(byte[] inputBytes) throws WSSecurityException {
+        try {
+            if (digest == null) {
+                digest = MessageDigest.getInstance("SHA-1");
+            }
+            return digest.digest(inputBytes);
         } catch (Exception e) {
             throw new WSSecurityException(
-                "Error in generating nonce of length " + length, e
+                "Error in generating digest", e
             );
         }
     }
@@ -1091,58 +1110,6 @@ public class WSSecurityUtil {
         log.debug("All required elements are signed");
     }
     
-    /**
-     * @return      a SecureRandom instance initialized with the "SHA1PRNG"
-     *              algorithm identifier
-     */
-    public static SecureRandom
-    resolveSecureRandom() throws NoSuchAlgorithmException {
-        return resolveSecureRandom("SHA1PRNG");
-    }
-    
-    /**
-     * @param       algorithm
-     *              
-     * @return      a SecureRandom instance initialized with the identifier
-     *              specified in algorithm
-     */
-    public synchronized static SecureRandom
-    resolveSecureRandom(
-        final String algorithm
-    ) throws NoSuchAlgorithmException {
-        if (random == null || !algorithm.equals(randomAlgorithm)) {
-            random = SecureRandom.getInstance(algorithm);
-            randomAlgorithm = algorithm;
-            random.setSeed(System.currentTimeMillis());
-        }
-        return random;
-    }
-    
-    /**
-     * @return      a MessageDigest instance initialized with the "SHA-1"
-     *              algorithm identifier
-     */
-    public static MessageDigest
-    resolveMessageDigest() throws NoSuchAlgorithmException {
-        return resolveMessageDigest("SHA-1");
-    }
-    
-    /**
-     * @param       algorithm
-     *              
-     * @return      a MessageDigest instance initialized with the identifier
-     *              specified in algorithm
-     */
-    public synchronized static MessageDigest
-    resolveMessageDigest(
-        final String algorithm
-    ) throws NoSuchAlgorithmException {
-        if (digest == null || !algorithm.equals(digestAlgorithm)) {
-            digest = MessageDigest.getInstance(algorithm);
-            digestAlgorithm = algorithm;
-        }
-        return digest;
-    }
     
     /**
      * @return  a list of child Nodes

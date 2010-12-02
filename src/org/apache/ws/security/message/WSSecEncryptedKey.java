@@ -20,7 +20,6 @@
 package org.apache.ws.security.message;
 
 import java.security.InvalidKeyException;
-import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
 
 import javax.crypto.BadPaddingException;
@@ -330,11 +329,8 @@ public class WSSecEncryptedKey extends WSSecBase {
      * @throws WSSecurityException
      */
     protected byte[] generateEphemeralKey() throws WSSecurityException {
-        try {     
-            final SecureRandom r = WSSecurityUtil.resolveSecureRandom();
-            byte[] temp = new byte[this.keySize / 8];
-            r.nextBytes(temp);
-            return temp;
+        try {
+            return WSSecurityUtil.generateNonce(this.keySize / 8);
         } catch (Exception e) {
             throw new WSSecurityException("Error in creating the ephemeral key", e);
         }

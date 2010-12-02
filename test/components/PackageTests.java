@@ -37,7 +37,6 @@ public class PackageTests extends TestCase {
         suite.addTestSuite(TestMerlin.class);
         suite.addTestSuite(TestX509NameTokenizer.class);
         suite.addTestSuite(TestReference.class);
-        suite.addTestSuite(TestWSSecurityUtil.class);
         return suite;
     }
 

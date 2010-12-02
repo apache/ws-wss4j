@@ -39,7 +39,6 @@ import javax.xml.namespace.QName;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.Principal;
-import java.security.SecureRandom;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.text.DateFormat;
@@ -63,7 +62,6 @@ public class UsernameToken {
     
     private static final Log LOG = LogFactory.getLog(UsernameToken.class.getName());
     private static final boolean DO_DEBUG = LOG.isDebugEnabled();
-    private static SecureRandom random;
 
     protected Element element = null;
     protected Element elementUsername = null;
@@ -76,16 +74,6 @@ public class UsernameToken {
     protected boolean hashed = true;
     private String rawPassword;        // enhancement by Alberto Coletti
     private boolean passwordsAreEncoded = false;
-    
-    static {
-        try {
-            random = WSSecurityUtil.resolveSecureRandom();
-        } catch (NoSuchAlgorithmException e) {
-            if (DO_DEBUG) {
-                LOG.debug(e.getMessage(), e);
-            }
-        }
-    }
     
     /**
      * Constructs a <code>UsernameToken</code> object and parses the
@@ -272,8 +260,13 @@ public class UsernameToken {
         if (elementNonce != null) {
             return;
         }
-        byte[] nonceValue = new byte[16];
-        random.nextBytes(nonceValue);
+        byte[] nonceValue = null;
+        try {
+            nonceValue = WSSecurityUtil.generateNonce(16);
+        } catch (WSSecurityException ex) {
+            LOG.debug(ex.getMessage(), ex);
+            return;
+        }
         elementNonce = doc.createElementNS(WSConstants.WSSE_NS, "wsse:" + WSConstants.NONCE_LN);
         elementNonce.appendChild(doc.createTextNode(Base64.encode(nonceValue)));
         elementNonce.setAttributeNS(null, "EncodingType", BASE64_ENCODING);
@@ -530,10 +523,8 @@ public class UsernameToken {
 
             System.arraycopy(b3, 0, b4, offset, b3.length);
             
-            MessageDigest sha = WSSecurityUtil.resolveMessageDigest();
-            sha.reset();
-            sha.update(b4);
-            passwdDigest = Base64.encode(sha.digest());
+            byte[] digestBytes = WSSecurityUtil.generateDigest(b4);
+            passwdDigest = Base64.encode(digestBytes);
         } catch (Exception e) {
             if (DO_DEBUG) {
                 LOG.debug(e.getMessage(), e);
@@ -724,7 +715,7 @@ public class UsernameToken {
 
         MessageDigest sha = null;
         try {
-            sha = WSSecurityUtil.resolveMessageDigest();
+            sha = MessageDigest.getInstance("SHA1");
         } catch (NoSuchAlgorithmException e) {
             if (DO_DEBUG) {
                 LOG.debug(e.getMessage(), e);
@@ -733,8 +724,6 @@ public class UsernameToken {
                 WSSecurityException.FAILURE, "noSHA1availabe", null, e
             );
         }
-        sha.reset();
-
         //
         // Make the first hash round with start value
         //
@@ -825,8 +814,13 @@ public class UsernameToken {
      * @return Returns the 128 bit salt value as byte array
      */
     public static byte[] generateSalt(boolean useForMac) {
-        byte[] saltValue = new byte[16];
-        random.nextBytes(saltValue);
+        byte[] saltValue = null;
+        try {
+            saltValue = WSSecurityUtil.generateNonce(16);
+        } catch (WSSecurityException ex) {
+            LOG.debug(ex.getMessage(), ex);
+            return null;
+        }
         if (useForMac) {
             saltValue[15] = 0x01;
         } else {
