@@ -57,7 +57,7 @@ public class WSSecSignatureBase extends WSSecBase {
      * 
      * @param doc The parent document
      * @param references The list of references to sign
-     * @param sig The XMLSignature object
+     * @param signatureFactory The XMLSignature object
      * @param secHeader The Security Header
      * @param wssConfig The WSSConfig
      * @param digestAlgo The digest algorithm to use

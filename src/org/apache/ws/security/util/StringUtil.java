@@ -95,7 +95,7 @@ public class StringUtil {
         if (len == 0) {
             return EMPTY_STRING_ARRAY;
         }
-        List list = new ArrayList();
+        List<String> list = new ArrayList<String>();
         int i = 0, start = 0;
         boolean match = false;
         while (i < len) {

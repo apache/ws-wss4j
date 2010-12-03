@@ -297,7 +297,7 @@ public class WSConstants {
      * <p/>
      * Please refer to WS Security SOAP Message security 1.1 specification, 
      * chapter 7.3. Note that this is a NON-STANDARD method. The standard way to refer to
-     * an X.509 Certificate via a KeyIdentifier is to use {@link SKI_KEY_IDENTIFIER}
+     * an X.509 Certificate via a KeyIdentifier is to use {@link #SKI_KEY_IDENTIFIER}
      */
     public static final int X509_KEY_IDENTIFIER = 3;
     

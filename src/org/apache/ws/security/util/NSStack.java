@@ -23,6 +23,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * The abstraction this class provides is a push down stack of variable
@@ -110,9 +111,9 @@ public class NSStack {
     /**
      * Return a copy of the current frame.  Returns null if none are present.
      */
-    public ArrayList cloneFrame() {
+    public List<Mapping> cloneFrame() {
         if (stack[top] == null) return null;
-        ArrayList clone = new ArrayList();
+        List<Mapping> clone = new ArrayList<Mapping>();
         for (Mapping map = topOfFrame(); map != null; map = next()) {
             clone.add(map);
         }

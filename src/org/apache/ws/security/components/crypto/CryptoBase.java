@@ -193,7 +193,7 @@ public abstract class CryptoBase implements Crypto {
     /**
      * Load a X509Certificate from the input stream.
      *
-     * @param The <code>InputStream</code> containing the X509Certificate
+     * @param in The <code>InputStream</code> containing the X509Certificate
      * @return An X509 certificate
      * @throws org.apache.ws.security.WSSecurityException
      *

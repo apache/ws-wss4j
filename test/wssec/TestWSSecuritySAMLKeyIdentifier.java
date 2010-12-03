@@ -25,11 +25,6 @@ import org.apache.ws.security.saml.SAMLIssuerFactory;
 import org.apache.ws.security.saml.SAMLIssuer;
 import org.apache.ws.security.util.WSSecurityUtil;
 
-import org.apache.axis.Message;
-import org.apache.axis.MessageContext;
-import org.apache.axis.client.AxisClient;
-import org.apache.axis.configuration.NullProvider;
-import org.apache.axis.message.SOAPEnvelope;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
@@ -49,9 +44,7 @@ import org.w3c.dom.Node;
 
 import org.opensaml.SAMLAssertion;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -71,15 +64,13 @@ public class TestWSSecuritySAMLKeyIdentifier extends TestCase implements Callbac
         + "<SOAP-ENV:Envelope "
         +   "xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" "
         +   "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" "
-        +   "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" 
+        +   "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">"
         +   "<SOAP-ENV:Body>" 
         +      "<ns1:testMethod xmlns:ns1=\"uri:LogTestService2\"></ns1:testMethod>" 
         +   "</SOAP-ENV:Body>" 
         + "</SOAP-ENV:Envelope>";
 
     private WSSecurityEngine secEngine = new WSSecurityEngine();
-    private MessageContext msgContext;
-    private Message message;
 
     /**
      * TestWSSecurity constructor
@@ -100,39 +91,13 @@ public class TestWSSecuritySAMLKeyIdentifier extends TestCase implements Callbac
     }
 
     /**
-     * Setup method
-     * 
-     * @throws Exception Thrown when there is a problem in setup
-     */
-    protected void setUp() throws Exception {
-        AxisClient tmpEngine = new AxisClient(new NullProvider());
-        msgContext = new MessageContext(tmpEngine);
-        message = getSOAPMessage();
-    }
-
-    /**
-     * Constructs a soap envelope
-     * 
-     * @return soap envelope
-     * @throws Exception if there is any problem constructing the soap envelope
-     */
-    protected Message getSOAPMessage() throws Exception {
-        InputStream in = new ByteArrayInputStream(SOAPMSG.getBytes());
-        Message msg = new Message(in);
-        msg.setMessageContext(msgContext);
-        return msg;
-    }
-
-    /**
      * The body of the SOAP request is encrypted using a secret key, which is in turn encrypted
      * using the certificate embedded in the SAML assertion and referenced using a Key Identifier.
      */
     public void testSAMLEncryptedKey() throws Exception {
-        SOAPEnvelope unsignedEnvelope = message.getSOAPEnvelope();
-        
         // Create a SAML assertion
         SAMLIssuer saml = SAMLIssuerFactory.getInstance("saml4.properties");
-        Document doc = unsignedEnvelope.getAsDocument();
+        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         saml.setInstanceDoc(doc);
         Crypto hokCrypto = CryptoFactory.getInstance("crypto.properties");
         saml.setUserCrypto(hokCrypto);

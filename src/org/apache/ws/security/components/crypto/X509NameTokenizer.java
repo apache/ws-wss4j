@@ -31,7 +31,7 @@ import org.apache.xml.security.utils.RFC2253Parser;
  */
 public class X509NameTokenizer {
 
-    private final java.util.List tokens = new ArrayList();
+    private final java.util.List<String> tokens = new ArrayList<String>();
     private int index = 0;
 
     public X509NameTokenizer(String dn) {

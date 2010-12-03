@@ -521,7 +521,7 @@ public class SecurityTokenReference {
     /**
      * Sets the X509Data.
      *
-     * @param ref the {@link DOMX509Data} to put into this
+     * @param domX509Data the {@link DOMX509Data} to put into this
      *            SecurityTokenReference
      */
     public void setX509Data(DOMX509Data domX509Data) {

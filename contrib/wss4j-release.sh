@@ -51,7 +51,7 @@ cp -r dist/* ${WSS4J_STAGE_ROOT}/dist
 # Build and stage through maven; copy the Jartifact built by Maven to the dist
 #
 mvn clean || exit 1
-mvn -Prelease,jdk14 install || exit 1
+mvn -Prelease,jdk15 install || exit 1
 mkdir -p ${WSS4J_STAGE_ROOT}/maven/org/apache/ws/security/wss4j/
 cp -r ${M2_REPO}/org/apache/ws/security/wss4j/${WSS4J_VERSION} ${WSS4J_STAGE_ROOT}/maven/org/apache/ws/security/wss4j
 cp -f ${M2_REPO}/org/apache/ws/security/wss4j/${WSS4J_VERSION}/wss4j-${WSS4J_VERSION}.jar ${WSS4J_STAGE_ROOT}/dist

@@ -1102,7 +1102,7 @@ public abstract class WSHandler {
      * @return true if the certificate is trusted, false if not (AxisFault is thrown for exceptions
      * during CertPathValidation)
      * @throws WSSecurityException
-     * @deprecated Trust is verified on signature certificates in the SignatureProcessor by default
+     * @Deprecated Trust is verified on signature certificates in the SignatureProcessor by default
      */
     protected boolean verifyTrust(X509Certificate cert, RequestData reqData) 
         throws WSSecurityException {
@@ -1126,7 +1126,7 @@ public abstract class WSHandler {
      * @param timeToLive
      *            the limit on the receivers' side, that the timestamp is validated against
      * @return true if the timestamp is before (now-timeToLive), false otherwise
-     * @deprecated TTL validation is now done by default in the TimestampProcessor
+     * @Deprecated TTL validation is now done by default in the TimestampProcessor
      * @throws WSSecurityException
      */
     protected boolean verifyTimestamp(Timestamp timestamp, int timeToLive) throws WSSecurityException {

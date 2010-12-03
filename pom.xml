@@ -42,13 +42,13 @@
     <mailingLists>
         <mailingList>
             <name>WSS4J Developer List</name>
-            <subscribe>wss4j-dev-subscribe@ws.apache.org</subscribe>
+            <subscribe>dev-subscribe@ws.apache.org</subscribe>
             <unsubscribe>
-                wss4j-dev-unsubscribe@ws.apache.org
+                dev-unsubscribe@ws.apache.org
             </unsubscribe>
-            <post>wss4j-dev@ws.apache.org</post>
+            <post>dev@ws.apache.org</post>
             <archive>
-                http://mail-archives.apache.org/mod_mbox/ws-wss4j-dev/
+                http://mail-archives.apache.org/mod_mbox/ws-dev/
             </archive>
             <otherArchives>
                 <otherArchive>http://www.nabble.com/WSS4J-f2398.html</otherArchive>
@@ -140,12 +140,10 @@
                         <Specification-Version>${project.version}</Specification-Version>
 
                         <Export-Package>
-                              org.apache.ws.security.*;version="${project.version}",
-                              org.apache.ws.axis.security.*;version="${project.version}",
+                              org.apache.ws.security.*;version="${project.version}"
                         </Export-Package>
                         <Import-Package>
                               !org.apache.ws.security.*,
-                              !org.apache.ws.axis.security.*,
                               javax.xml.crypto.*,
                               org.apache.xml.security.*,
                               org.bouncycastle.*;resolution:=optional,
@@ -248,19 +246,6 @@
                         <attach>true</attach>
                     </configuration>
                 </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-assembly-plugin</artifactId>
-                    <version>2.1</version>
-                    <configuration>
-                        <descriptors>
-                            <descriptor>assembly/bin.xml</descriptor>
-                            <descriptor>assembly/src.xml</descriptor>
-                        </descriptors>
-                        <tarLongFileMode>gnu</tarLongFileMode>
-                    </configuration>
-                </plugin>
-  
             </plugins>
         </pluginManagement>
         
@@ -319,7 +304,7 @@
                 <dependency>
                     <groupId>org.bouncycastle</groupId>
                     <artifactId>bcprov-jdk15</artifactId>
-                    <version>${bcprov.jdk15.version}</version>
+                    <version>${bcprov.version}</version>
                     <scope>test</scope>
                 </dependency>
             </dependencies>
@@ -333,7 +318,7 @@
                 <dependency>
                     <groupId>org.bouncycastle</groupId>
                     <artifactId>bcprov-jdk16</artifactId>
-                    <version>${bcprov.jdk16.version}</version>
+                    <version>${bcprov.version}</version>
                     <scope>test</scope>
                 </dependency>
             </dependencies>
@@ -357,12 +342,10 @@
         <xmlsec.version>1.4.4</xmlsec.version>
         <opensaml.version>1.1</opensaml.version>
         <xml.apis.version>1.3.04</xml.apis.version>
-        <bcprov.jdk15.version>1.45</bcprov.jdk15.version>
-        <bcprov.jdk16.version>1.45</bcprov.jdk16.version>
+        <bcprov.version>1.45</bcprov.version>
         <commons.logging.version>1.1</commons.logging.version>
         <xalan.version>2.7.1</xalan.version>
         <xerces.version>2.9.1</xerces.version>
-        <axis.version>1.4</axis.version>
         <junit.version>3.8.1</junit.version>
     </properties>
     
@@ -378,18 +361,6 @@
             <artifactId>xmlsec</artifactId>
             <version>${xmlsec.version}</version>
             <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>commons-discovery</groupId>
-            <artifactId>commons-discovery</artifactId>
-            <version>0.2</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>commons-codec</groupId>
-            <artifactId>commons-codec</artifactId>
-            <version>1.3</version>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -422,27 +393,9 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.apache.axis</groupId>
-            <artifactId>axis</artifactId>
-            <version>${axis.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.axis</groupId>
-            <artifactId>axis-ant</artifactId>
-            <version>${axis.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.axis</groupId>
-            <artifactId>axis-jaxrpc</artifactId>
-            <version>${axis.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.axis</groupId>
-            <artifactId>axis-saaj</artifactId>
-            <version>${axis.version}</version>
+            <groupId>commons-codec</groupId>
+            <artifactId>commons-codec</artifactId>
+            <version>1.3</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>

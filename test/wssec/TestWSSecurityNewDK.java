@@ -205,7 +205,6 @@ public class TestWSSecurityNewDK extends TestCase implements CallbackHandler {
          SecurityTokenReference secToken = new SecurityTokenReference(doc);
          X509Certificate[] certs = crypto.getCertificates("wss40");
          secToken.setKeyIdentifierThumb(certs[0]);
-         secToken.getElement();
          
          WSSecDKSign sigBuilder = new WSSecDKSign();
          java.security.Key key = crypto.getPrivateKey("wss40", "security");
@@ -238,7 +237,6 @@ public class TestWSSecurityNewDK extends TestCase implements CallbackHandler {
          SecurityTokenReference secToken = new SecurityTokenReference(doc);
          X509Certificate[] certs = crypto.getCertificates("wss40");
          secToken.setKeyIdentifierSKI(certs[0], crypto);
-         secToken.getElement();
          
          WSSecDKSign sigBuilder = new WSSecDKSign();
          java.security.Key key = crypto.getPrivateKey("wss40", "security");

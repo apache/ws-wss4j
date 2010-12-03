@@ -32,7 +32,7 @@ public class WSHandlerResult {
     /**
      * constructor
      * @param actor
-     * @param wsResults
+     * @param results
      */ 
     public WSHandlerResult(String actor, List<WSSecurityEngineResult> results) {
         this.actor = actor;

@@ -337,7 +337,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
     }
 
     /**
-     * @deprecated Use encryptForRef(dataRef, references) instead
+     * @Deprecated Use encryptForRef(dataRef, references) instead
      */
     public Element encryptForInternalRef(Element dataRef, List<WSEncryptionPart> references)
         throws WSSecurityException {
@@ -345,7 +345,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
     }
 
     /**
-     * @deprecated Use encryptForRef(dataRef, references) instead
+     * @Deprecated Use encryptForRef(dataRef, references) instead
      */
     public Element encryptForExternalRef(Element dataRef, List<WSEncryptionPart> references)
         throws WSSecurityException {
@@ -424,7 +424,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
             if (idToEnc != null) {
                 elementToEncrypt = 
                     WSSecurityUtil.findElementById(
-                            doc.getDocumentElement(), idToEnc, WSConstants.WSU_NS, false
+                        doc.getDocumentElement(), idToEnc, WSConstants.WSU_NS, false
                     );
                 if (elementToEncrypt == null) {
                     elementToEncrypt = 
@@ -434,7 +434,9 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
                 }
             } else {
                 elementToEncrypt = 
-                    (Element) WSSecurityUtil.findElement(doc, elemName, nmSpace);
+                    (Element) WSSecurityUtil.findElement(
+                        doc.getDocumentElement(), elemName, nmSpace
+                    );
             }
             if (elementToEncrypt == null) {
                 throw new WSSecurityException(
