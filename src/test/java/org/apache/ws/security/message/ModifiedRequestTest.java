@@ -17,11 +17,8 @@
  * under the License.
  */
 
-package wssec;
+package org.apache.ws.security.message;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
@@ -29,6 +26,7 @@ import org.apache.ws.security.WSEncryptionPart;
 import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSSecurityEngineResult;
+import org.apache.ws.security.common.SOAPUtil;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.message.WSSecSignature;
@@ -46,8 +44,8 @@ import java.util.ArrayList;
 /**
  * This class tests the modification of requests to see if signature verification fails.
  */
-public class TestModifiedRequest extends TestCase implements CallbackHandler {
-    private static final Log LOG = LogFactory.getLog(TestModifiedRequest.class);
+public class ModifiedRequestTest extends org.junit.Assert implements CallbackHandler {
+    private static final Log LOG = LogFactory.getLog(ModifiedRequestTest.class);
     private static final String SOAPMSG = 
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" 
         + "<SOAP-ENV:Envelope "
@@ -65,31 +63,12 @@ public class TestModifiedRequest extends TestCase implements CallbackHandler {
     private Crypto crypto = CryptoFactory.getInstance();
 
     /**
-     * TestWSSecurity constructor
-     * <p/>
-     * 
-     * @param name name of the test
-     */
-    public TestModifiedRequest(String name) {
-        super(name);
-    }
-
-    /**
-     * JUnit suite
-     * <p/>
-     * 
-     * @return a junit test suite
-     */
-    public static Test suite() {
-        return new TestSuite(TestModifiedRequest.class);
-    }
-    
-    /**
      * Test that signs a SOAP body element "value". The SOAP request is then modified
      * so that the signed "value" element is put in the header, and the value of the
      * original element is changed. This test will fail as the request will contain
      * multiple elements with the same wsu:Id.
      */
+    @org.junit.Test
     public void testMovedElement() throws Exception {
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
@@ -143,6 +122,7 @@ public class TestModifiedRequest extends TestCase implements CallbackHandler {
      * original element is changed. The wsu:Id value of the original element is also
      * changed. Signature verification will pass, so we need to check that wsu:Id's.
      */
+    @org.junit.Test
     public void testMovedElementChangedId() throws Exception {
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");

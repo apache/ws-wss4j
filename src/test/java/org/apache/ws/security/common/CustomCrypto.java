@@ -17,29 +17,38 @@
  * under the License.
  */
 
-package wssec;
+package org.apache.ws.security.common;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
+import org.apache.ws.security.components.crypto.CryptoBase;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-
-public class SOAPUtil {
+public class CustomCrypto extends CryptoBase {
     
-    private static DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+    java.util.Map<String, Object> config = null;
     
-    static {
-        factory.setNamespaceAware(true);
+    public
+    CustomCrypto(
+        java.util.Map<String, Object> config,
+        java.lang.ClassLoader loader
+    ) {
+        this.config = config;
     }
-    
-    /**
-     * Convert an SOAP Envelope as a String to a org.w3c.dom.Document.
-     */
-    public static org.w3c.dom.Document toSOAPPart(String xml) throws Exception {
-        InputStream in = new ByteArrayInputStream(xml.getBytes());
-        DocumentBuilder builder = factory.newDocumentBuilder();
-        return builder.parse(in);
+
+    //
+    // org.apache.ws.security.components.crypto.Crypto implementation
+    //
+
+    public String 
+    getDefaultX509Alias() {
+        return null;
     }
-    
+
+    //
+    // org.apache.ws.security.components.crypto.AbstractCryptoBase
+    // implementation
+    //
+
+    protected String
+    getCryptoProvider() {
+        return null;
+    }
 }

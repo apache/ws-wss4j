@@ -17,11 +17,8 @@
  * under the License.
  */
 
-package wssec;
+package org.apache.ws.security.message;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSSecurityException;
@@ -29,6 +26,8 @@ import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSConfig;
+import org.apache.ws.security.common.CustomHandler;
+import org.apache.ws.security.common.SOAPUtil;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.message.WSSecUsernameToken;
@@ -44,7 +43,7 @@ import java.io.IOException;
  * This is a test for processing a Username Token to enforce either a plaintext or digest
  * password type. See WSS-255.
  */
-public class PasswordTypeTest extends TestCase implements CallbackHandler {
+public class PasswordTypeTest extends org.junit.Assert implements CallbackHandler {
     private static final Log LOG = LogFactory.getLog(PasswordTypeTest.class);
     private static final String SOAPMSG = 
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" 
@@ -60,27 +59,9 @@ public class PasswordTypeTest extends TestCase implements CallbackHandler {
         + "</SOAP-ENV:Envelope>";
 
     /**
-     * TestWSSecurity constructor
-     * 
-     * @param name name of the test
-     */
-    public PasswordTypeTest(String name) {
-        super(name);
-    }
-
-    /**
-     * JUnit suite
-     * 
-     * @return a junit test suite
-     */
-    public static Test suite() {
-        return new TestSuite(PasswordTypeTest.class);
-    }
-
-
-    /**
      * Test that adds a UserNameToken with password Digest to a WS-Security envelope
      */
+    @org.junit.Test
     public void testPasswordDigest() throws Exception {
         WSSecUsernameToken builder = new WSSecUsernameToken();
         builder.setUserInfo("wernerd", "verySecret");
@@ -129,6 +110,7 @@ public class PasswordTypeTest extends TestCase implements CallbackHandler {
     /**
      * Test that adds a UserNameToken with password text to a WS-Security envelope
      */
+    @org.junit.Test
     public void testUsernameTokenText() throws Exception {
         WSSecUsernameToken builder = new WSSecUsernameToken();
         builder.setPasswordType(WSConstants.PASSWORD_TEXT);
@@ -179,8 +161,9 @@ public class PasswordTypeTest extends TestCase implements CallbackHandler {
     /**
      * Test that adds a UserNameToken via WSHandler
      */
+    @org.junit.Test
     public void testUsernameTokenWSHandler() throws Exception {
-        MyHandler handler = new MyHandler();
+        CustomHandler handler = new CustomHandler();
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         
         RequestData reqData = new RequestData();

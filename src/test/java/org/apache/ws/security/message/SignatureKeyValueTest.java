@@ -17,11 +17,8 @@
  * under the License.
  */
 
-package wssec;
+package org.apache.ws.security.message;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.PublicKeyCallback;
@@ -29,6 +26,7 @@ import org.apache.ws.security.PublicKeyPrincipal;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSSecurityEngineResult;
+import org.apache.ws.security.common.SOAPUtil;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.message.WSSecSignature;
@@ -48,7 +46,7 @@ import javax.security.auth.callback.UnsupportedCallbackException;
  * a ds:KeyInfo/ds:KeyValue element. Although this isn't strictly recommended for use in
  * WS-Security, it's necessary to support it for WCF interop.
  */
-public class SignatureKeyValueTest extends TestCase implements CallbackHandler {
+public class SignatureKeyValueTest extends org.junit.Assert implements CallbackHandler {
     private static final Log LOG = LogFactory.getLog(SignatureKeyValueTest.class);
     private static final String SOAPMSG = 
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" 
@@ -67,30 +65,14 @@ public class SignatureKeyValueTest extends TestCase implements CallbackHandler {
     private Crypto crypto = CryptoFactory.getInstance("wss40.properties");
     private java.security.KeyStore keyStore = null;
 
-    /**
-     * TestWSSecurity constructor
-     * <p/>
-     * 
-     * @param name name of the test
-     */
-    public SignatureKeyValueTest(String name) {
-        super(name);
+    public SignatureKeyValueTest() {
         keyStore = crypto.getKeyStore();
-    }
-
-    /**
-     * JUnit suite
-     * <p/>
-     * 
-     * @return a junit test suite
-     */
-    public static Test suite() {
-        return new TestSuite(SignatureKeyValueTest.class);
     }
 
     /**
      * Successful RSAKeyValue test.
      */
+    @org.junit.Test
     public void testRSAKeyValue() throws Exception {
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("wss40", "security");
@@ -126,6 +108,7 @@ public class SignatureKeyValueTest extends TestCase implements CallbackHandler {
      * Failed RSAKeyValue test, where a message is signed using a key-pair which doesn't
      * correspond to the public key in the "trust"-store.
      */
+    @org.junit.Test
     public void testBadRSAKeyValue() throws Exception {
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("wss86", "security");
@@ -156,6 +139,7 @@ public class SignatureKeyValueTest extends TestCase implements CallbackHandler {
     /**
      * Successful DSAKeyValue test.
      */
+    @org.junit.Test
     public void testDSAKeyValue() throws Exception {
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("wss40DSA", "security");

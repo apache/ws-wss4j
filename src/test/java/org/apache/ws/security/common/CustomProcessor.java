@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package wssec;
+package org.apache.ws.security.common;
 
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.message.token.SecurityContextToken;
@@ -29,9 +29,9 @@ import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
 
 /**
- * a custom processor that inserts itself into the results vector
+ * a custom processor that inserts itself into the results list
  */
-public class MyProcessor implements Processor {
+public class CustomProcessor implements Processor {
     
     public final void 
     handleToken(

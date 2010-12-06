@@ -17,12 +17,10 @@
  * under the License.
  */
 
-package wssec;
+package org.apache.ws.security.message;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
 import org.apache.ws.security.WSSecurityException;
+import org.apache.ws.security.common.SOAPUtil;
 import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.message.WSSecEncrypt;
 import org.apache.ws.security.message.WSSecSignature;
@@ -34,7 +32,7 @@ import org.w3c.dom.Document;
  * This class tests for error messages that apply to certificates, e.g. when a bad
  * "username" is used for encryption or signature. See WSS-137.
  */
-public class TestWSSecurityCertError extends TestCase {
+public class CertErrorTest extends org.junit.Assert {
     private static final String SOAPMSG = 
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" 
         + "<SOAP-ENV:Envelope "
@@ -50,29 +48,9 @@ public class TestWSSecurityCertError extends TestCase {
     
 
     /**
-     * TestWSSecurity constructor
-     * <p/>
-     * 
-     * @param name name of the test
-     */
-    public TestWSSecurityCertError(String name) {
-        super(name);
-    }
-
-    /**
-     * JUnit suite
-     * <p/>
-     * 
-     * @return a junit test suite
-     */
-    public static Test suite() {
-        return new TestSuite(TestWSSecurityNew3.class);
-    }
-
-
-    /**
      * Test for when a bad certificate is used for Signature
      */
+    @org.junit.Test
     public void testX509Signature() throws Exception {
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("bob", "security");
@@ -91,6 +69,7 @@ public class TestWSSecurityCertError extends TestCase {
     /**
      * Test for when a bad certificate is used for Encryption
      */
+    @org.junit.Test
     public void testEncryption() throws Exception {
         WSSecEncrypt builder = new WSSecEncrypt();
         builder.setUserInfo("alice");

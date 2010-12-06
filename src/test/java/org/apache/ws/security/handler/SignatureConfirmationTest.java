@@ -17,17 +17,16 @@
  * under the License.
  */
 
-package wssec;
+package org.apache.ws.security.handler;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSSecurityEngineResult;
+import org.apache.ws.security.common.CustomHandler;
+import org.apache.ws.security.common.SOAPUtil;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.handler.RequestData;
@@ -49,7 +48,7 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 /**
  * A set of test-cases for SignatureConfirmation.
  */
-public class SignatureConfirmationTest extends TestCase implements CallbackHandler {
+public class SignatureConfirmationTest extends org.junit.Assert implements CallbackHandler {
     private static final Log LOG = LogFactory.getLog(SignatureConfirmationTest.class);
     private static final String SOAPMSG = 
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" 
@@ -68,28 +67,10 @@ public class SignatureConfirmationTest extends TestCase implements CallbackHandl
     private Crypto crypto = CryptoFactory.getInstance();
 
     /**
-     * TestWSSecurity constructor
-     * 
-     * @param name name of the test
-     */
-    public SignatureConfirmationTest(String name) {
-        super(name);
-    }
-
-    /**
-     * JUnit suite
-     * 
-     * @return a junit test suite
-     */
-    public static Test suite() {
-        return new TestSuite(SignatureConfirmationTest.class);
-    }
-
-    
-    /**
      * Test to see that a signature is saved correctly on the outbound request.
      */
     @SuppressWarnings("unchecked")
+    @org.junit.Test
     public void
     testRequestSavedSignature() throws Exception {
         final RequestData reqData = new RequestData();
@@ -103,7 +84,7 @@ public class SignatureConfirmationTest extends TestCase implements CallbackHandl
         final java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
         actions.add(new Integer(WSConstants.SIGN));
         final Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
-        MyHandler handler = new MyHandler();
+        CustomHandler handler = new CustomHandler();
         handler.send(
             WSConstants.SIGN, doc, reqData, actions, true
         );
@@ -128,6 +109,7 @@ public class SignatureConfirmationTest extends TestCase implements CallbackHandl
      * enable signature confirmation is false.
      */
     @SuppressWarnings("unchecked")
+    @org.junit.Test
     public void
     testRequestNotSavedSignature() throws Exception {
         final RequestData reqData = new RequestData();
@@ -141,7 +123,7 @@ public class SignatureConfirmationTest extends TestCase implements CallbackHandl
         final java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
         actions.add(new Integer(WSConstants.SIGN));
         final Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
-        MyHandler handler = new MyHandler();
+        CustomHandler handler = new CustomHandler();
         handler.send(
             WSConstants.SIGN, doc, reqData, actions, true
         );
@@ -164,6 +146,7 @@ public class SignatureConfirmationTest extends TestCase implements CallbackHandl
      * a signed message.
      */
     @SuppressWarnings("unchecked")
+    @org.junit.Test
     public void
     testSignatureConfirmationResponse() throws Exception {
         final RequestData reqData = new RequestData();
@@ -177,7 +160,7 @@ public class SignatureConfirmationTest extends TestCase implements CallbackHandl
         final java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
         actions.add(new Integer(WSConstants.SIGN));
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
-        MyHandler handler = new MyHandler();
+        CustomHandler handler = new CustomHandler();
         handler.send(
             WSConstants.SIGN, doc, reqData, actions, true
         );
@@ -224,6 +207,7 @@ public class SignatureConfirmationTest extends TestCase implements CallbackHandl
      * Test to see that a signature confirmation response is correctly processed.
      */
     @SuppressWarnings("unchecked")
+    @org.junit.Test
     public void
     testSignatureConfirmationProcessing() throws Exception {
         final RequestData reqData = new RequestData();
@@ -237,7 +221,7 @@ public class SignatureConfirmationTest extends TestCase implements CallbackHandl
         final java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
         actions.add(new Integer(WSConstants.SIGN));
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
-        MyHandler handler = new MyHandler();
+        CustomHandler handler = new CustomHandler();
         handler.send(
             WSConstants.SIGN, doc, reqData, actions, true
         );
