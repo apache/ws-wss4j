@@ -19,6 +19,8 @@
 
 package org.apache.ws.security.components.crypto;
 
+import org.apache.ws.security.common.CustomCrypto;
+
 /**
  * Created by IntelliJ IDEA.
  * User: srida01
@@ -26,7 +28,7 @@ package org.apache.ws.security.components.crypto;
  * Time: 10:50:05 AM
  * To change this template use File | Settings | File Templates.
  */
-public class MerlinTest extends org.junit.Assert {
+public class CryptoTest extends org.junit.Assert {
     
     @org.junit.Test
     public void testCrypto() {
@@ -39,6 +41,34 @@ public class MerlinTest extends org.junit.Assert {
         throws Exception {
         Crypto crypto = new NullPropertiesCrypto();
         assertTrue(crypto != null);
+    }
+    
+    /**
+     * Ensure that we can load a custom crypto implementation using a Map
+     */
+    @org.junit.Test
+    public void testCustomCrypto() {
+        java.util.Map<String, Object> tmp = new java.util.TreeMap<String, Object>();
+        Crypto crypto = CryptoFactory.getInstance(
+            "org.apache.ws.security.common.CustomCrypto",
+            tmp
+        );
+        assertNotNull(crypto);
+        assertTrue(crypto instanceof CustomCrypto);
+        CustomCrypto custom = (CustomCrypto)crypto;
+        assertSame(tmp, custom.getConfig());
+    }
+    
+    /**
+     * Test for WSS-149 - "AbstractCrypto requires org.apache.ws.security.crypto.merlin.file
+     * to be set and point to an existing file"
+     */
+    @org.junit.Test
+    public void testNoKeyStoreFile() {
+        Crypto crypto = CryptoFactory.getInstance(
+            "nofile.properties"
+        );
+        assertNotNull(crypto);
     }
     
     /**

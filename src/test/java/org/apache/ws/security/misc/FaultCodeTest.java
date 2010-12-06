@@ -17,15 +17,13 @@
  * under the License.
  */
 
-package wssec;
+package org.apache.ws.security.misc;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSecurityEngine;
+import org.apache.ws.security.common.SOAPUtil;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.message.WSSecEncrypt;
@@ -48,7 +46,7 @@ import java.io.IOException;
  * WS-Security Test Case for fault codes. The SOAP Message Security specification 1.1 defines
  * standard fault codes and fault strings for error propagation.
  */
-public class TestWSSecurityFaultCodes extends TestCase implements CallbackHandler {
+public class FaultCodeTest extends org.junit.Assert implements CallbackHandler {
     private static final String SOAPMSG = 
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" 
         + "<SOAP-ENV:Envelope "
@@ -66,30 +64,10 @@ public class TestWSSecurityFaultCodes extends TestCase implements CallbackHandle
     private Crypto crypto = CryptoFactory.getInstance();
 
     /**
-     * TestWSSecurity constructor
-     * <p/>
-     * 
-     * @param name name of the test
-     */
-    public TestWSSecurityFaultCodes(String name) {
-        super(name);
-    }
-
-    /**
-     * JUnit suite
-     * <p/>
-     * 
-     * @return a junit test suite
-     */
-    public static Test suite() {
-        return new TestSuite(TestWSSecurityFaultCodes.class);
-    }
-
-    
-    /**
      * Test for the wsse:FailedCheck faultcode. This will fail due to a bad password in
      * the callback handler.
      */
+    @org.junit.Test
     public void testFailedCheck() throws Exception {
         WSSecEncrypt builder = new WSSecEncrypt();
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
@@ -113,6 +91,7 @@ public class TestWSSecurityFaultCodes extends TestCase implements CallbackHandle
      * Test for the wsse:UnsupportedAlgorithm faultcode. This will fail due to the argument
      * passed to getCipherInstance.
      */
+    @org.junit.Test
     public void testUnsupportedAlgorithm() throws Exception {
         try {
             WSSecurityUtil.getCipherInstance("Bad Algorithm");
@@ -130,6 +109,7 @@ public class TestWSSecurityFaultCodes extends TestCase implements CallbackHandle
      * Test for the wsse:SecurityTokenUnavailable faultcode. This will fail due to the 
      * argument to loadCertificate.
      */
+    @org.junit.Test
     public void testSecurityTokenUnavailable() throws Exception {
         try {
             crypto.loadCertificate(new java.io.ByteArrayInputStream(new byte[]{}));
@@ -146,6 +126,7 @@ public class TestWSSecurityFaultCodes extends TestCase implements CallbackHandle
      * Test for the wsse:MessageExpired faultcode. This will fail due to the argument
      * passed to setTimeToLive.
      */
+    @org.junit.Test
     public void testMessageExpired() throws Exception {
         WSSecTimestamp builder = new WSSecTimestamp();
         builder.setTimeToLive(-1);
@@ -170,6 +151,7 @@ public class TestWSSecurityFaultCodes extends TestCase implements CallbackHandle
      * Test for the wsse:FailedAuthentication faultcode. This will fail due to a bad password in
      * the callback handler.
      */
+    @org.junit.Test
     public void testFailedAuthentication() throws Exception {
         WSSecUsernameToken builder = new WSSecUsernameToken();
         builder.addCreated();
@@ -196,6 +178,7 @@ public class TestWSSecurityFaultCodes extends TestCase implements CallbackHandle
      * Test for the wsse:InvalidSecurityToken faultcode. This will fail due to the fact
      * that a null username is used.
      */
+    @org.junit.Test
     public void testInvalidSecurityToken() throws Exception {
         WSSecUsernameToken builder = new WSSecUsernameToken();
         builder.addCreated();
@@ -221,6 +204,7 @@ public class TestWSSecurityFaultCodes extends TestCase implements CallbackHandle
     /**
      * Test for the wsse:InvalidSecurity faultcode. 
      */
+    @org.junit.Test
     public void testInvalidSecurity() throws Exception {
         try {
             new Reference((org.w3c.dom.Element)null);

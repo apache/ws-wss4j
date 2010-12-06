@@ -17,40 +17,40 @@
  * under the License.
  */
 
-package wssec;
+package org.apache.ws.security.message;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSEncryptionPart;
-import org.apache.ws.security.WSPasswordCallback;
-import org.apache.ws.security.WSSecurityEngine;
-import org.apache.ws.security.WSSConfig;
-import org.apache.ws.security.components.crypto.Crypto;
-import org.apache.ws.security.components.crypto.CryptoFactory;
-import org.apache.ws.security.message.WSSecSignature;
-import org.apache.ws.security.message.WSSecHeader;
-import org.apache.ws.security.message.WSSecTimestamp;
-import org.w3c.dom.Document;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
-import java.io.IOException;
-import java.util.List;
-import java.util.ArrayList;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.ws.security.WSEncryptionPart;
+import org.apache.ws.security.WSPasswordCallback;
+import org.apache.ws.security.WSSConfig;
+import org.apache.ws.security.WSSecurityEngine;
+import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.common.CustomHandler;
+import org.apache.ws.security.common.SOAPUtil;
+import org.apache.ws.security.components.crypto.Crypto;
+import org.apache.ws.security.components.crypto.CryptoFactory;
+import org.apache.ws.security.handler.RequestData;
+import org.apache.ws.security.handler.WSHandlerConstants;
+import org.w3c.dom.Document;
+
 
 /**
- * WS-Security Test Case
- * <p/>
+ * A set of test-cases for signing and verifying SOAP requests.
  * 
  * @author Davanum Srinivas (dims@yahoo.com)
+ * @author Werner Dittmann (Werner.Dittmann@siemens.com)
  */
-public class TestWSSecurityNew3 extends TestCase implements CallbackHandler {
-    private static final Log LOG = LogFactory.getLog(TestWSSecurityNew3.class);
+public class SignatureTest extends org.junit.Assert implements CallbackHandler {
+    private static final Log LOG = LogFactory.getLog(SignatureTest.class);
     private static final String SOAPMSG = 
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" 
         + "<SOAP-ENV:Envelope "
@@ -68,32 +68,58 @@ public class TestWSSecurityNew3 extends TestCase implements CallbackHandler {
     private Crypto crypto = CryptoFactory.getInstance();
 
     /**
-     * TestWSSecurity constructor
+     * The test uses the Issuer Serial key identifier type.
      * <p/>
      * 
-     * @param name name of the test
+     * @throws java.lang.Exception Thrown when there is any problem in signing or verification
      */
-    public TestWSSecurityNew3(String name) {
-        super(name);
+    @org.junit.Test
+    public void testX509SignatureIS() throws Exception {
+        WSSecSignature builder = new WSSecSignature();
+        builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+        builder.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
+        LOG.info("Before Signing IS....");
+        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        Document signedDoc = builder.build(doc, crypto, secHeader);
+
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Signed message with IssuerSerial key identifier:");
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+            LOG.debug(outputString);
+        }
+        LOG.info("After Signing IS....");
+        verify(signedDoc);
     }
+    
 
     /**
-     * JUnit suite
+     * Test that signs (twice) and verifies a WS-Security envelope.
      * <p/>
      * 
-     * @return a junit test suite
+     * @throws java.lang.Exception Thrown when there is any problem in signing or verification
      */
-    public static Test suite() {
-        return new TestSuite(TestWSSecurityNew3.class);
+    @org.junit.Test
+    public void testDoubleX509SignatureIS() throws Exception {
+        WSSecSignature builder = new WSSecSignature();
+        builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        Document signedDoc = builder.build(doc, crypto, secHeader);
+        Document signedDoc1 = builder.build(signedDoc, crypto, secHeader);
+        verify(signedDoc1);
     }
-
-
+    
     /**
      * Test that signs and verifies a WS-Security envelope
      * <p/>
      * 
      * @throws java.lang.Exception Thrown when there is any problem in signing or verification
      */
+    @org.junit.Test
     public void testIssuerSerialSignature() throws Exception {
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
@@ -119,6 +145,7 @@ public class TestWSSecurityNew3 extends TestCase implements CallbackHandler {
      * 
      * @throws java.lang.Exception Thrown when there is any problem in signing or verification
      */
+    @org.junit.Test
     public void testSignatureInclusiveC14N() throws Exception {
         WSSecSignature builder = new WSSecSignature();
         builder.setSigCanonicalization(WSConstants.C14N_OMIT_COMMENTS);
@@ -145,6 +172,7 @@ public class TestWSSecurityNew3 extends TestCase implements CallbackHandler {
      * 
      * @throws java.lang.Exception Thrown when there is any problem in signing or verification
      */
+    @org.junit.Test
     public void testSignatureInclusivePrefixes() throws Exception {
         WSSConfig wssConfig = WSSConfig.getNewInstance();
         wssConfig.setWsiBSPCompliant(true);
@@ -173,6 +201,7 @@ public class TestWSSecurityNew3 extends TestCase implements CallbackHandler {
      * 
      * @throws java.lang.Exception Thrown when there is any problem in signing or verification
      */
+    @org.junit.Test
     public void testBSTSignature() throws Exception {
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
@@ -199,6 +228,7 @@ public class TestWSSecurityNew3 extends TestCase implements CallbackHandler {
      * 
      * @throws java.lang.Exception Thrown when there is any problem in signing or verification
      */
+    @org.junit.Test
     public void testBSTPKIPathSignature() throws Exception {
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("wss40", "security");
@@ -228,6 +258,7 @@ public class TestWSSecurityNew3 extends TestCase implements CallbackHandler {
      * 
      * @throws java.lang.Exception Thrown when there is any problem in signing or verification
      */
+    @org.junit.Test
     public void testX509Signature() throws Exception {
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
@@ -248,6 +279,59 @@ public class TestWSSecurityNew3 extends TestCase implements CallbackHandler {
         verify(signedDoc);
     }
     
+    /**
+     * Test that signs and verifies a WS-Security envelope.
+     * The test uses the ThumbprintSHA1 key identifier type. 
+     * <p/>
+     * 
+     * @throws java.lang.Exception Thrown when there is any problem in signing or verification
+     */
+    @org.junit.Test
+    public void testX509SignatureThumb() throws Exception {
+        WSSecSignature builder = new WSSecSignature();
+        builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+        builder.setKeyIdentifierType(WSConstants.THUMBPRINT_IDENTIFIER);
+        LOG.info("Before Signing ThumbprintSHA1....");
+        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
+        
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+
+        Document signedDoc = builder.build(doc, crypto, secHeader);
+
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Signed message with ThumbprintSHA1 key identifier:");
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+            LOG.debug(outputString);
+        }
+        LOG.info("After Signing ThumbprintSHA1....");
+        verify(signedDoc);
+    }
+
+    
+    /**
+     * Test that signs (twice) and verifies a WS-Security envelope.
+     * The test uses the ThumbprintSHA1 key identifier type.
+     * <p/>
+     * 
+     * @throws java.lang.Exception Thrown when there is any problem in signing or verification
+     */
+    @org.junit.Test
+    public void testDoubleX509SignatureThumb() throws Exception {
+        WSSecSignature builder = new WSSecSignature();
+        builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+        builder.setKeyIdentifierType(WSConstants.THUMBPRINT_IDENTIFIER);
+        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
+        
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+
+        Document signedDoc = builder.build(doc, crypto, secHeader);
+        Document signedDoc1 = builder.build(signedDoc, crypto, secHeader);
+        verify(signedDoc1);
+    }
+    
     
     /**
      * Test that signs and verifies a Timestamp. The request is then modified so that the
@@ -256,6 +340,7 @@ public class TestWSSecurityNew3 extends TestCase implements CallbackHandler {
      * 
      * @throws java.lang.Exception Thrown when there is any problem in signing or verification
      */
+    @org.junit.Test
     public void testValidModifiedSignature() throws Exception {
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
@@ -294,18 +379,130 @@ public class TestWSSecurityNew3 extends TestCase implements CallbackHandler {
         
         verify(signedDoc);
     }
+    
+    /**
+     * Sign using a different digest algorithm (SHA-256).
+     * <p/>
+     * 
+     * @throws java.lang.Exception Thrown when there is any problem in signing or verification
+     */
+    @org.junit.Test
+    public void testX509SignatureSha256() throws Exception {
+        WSSecSignature builder = new WSSecSignature();
+        builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+        builder.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
+        builder.setSignatureAlgorithm("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256");
+        builder.setDigestAlgo("http://www.w3.org/2001/04/xmlenc#sha256");
+        LOG.info("Before Signing IS....");
+        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        Document signedDoc = builder.build(doc, crypto, secHeader);
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Signed message with IssuerSerial key identifier:");
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+            LOG.debug(outputString);
+        }
+        LOG.info("After Signing IS....");
+        verify(signedDoc);
+    }
+    
+    /**
+     * A test for "SignatureAction does not set DigestAlgorithm on WSSecSignature instance"
+     */
+    @org.junit.Test
+    public void
+    testWSS170() throws Exception {
+        final WSSConfig cfg = WSSConfig.getNewInstance();
+        final int action = WSConstants.SIGN;
+        final RequestData reqData = new RequestData();
+        reqData.setWssConfig(cfg);
+        reqData.setUsername("16c73ab6-b892-458f-abf5-2f875f74882e");
+        java.util.Map<String, Object> config = new java.util.TreeMap<String, Object>();
+        config.put(WSHandlerConstants.SIG_PROP_FILE, "crypto.properties");
+        config.put("password", "security");
+        config.put(
+            WSHandlerConstants.SIG_ALGO, 
+            "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"
+        );
+        config.put(
+            WSHandlerConstants.SIG_DIGEST_ALGO, 
+            "http://www.w3.org/2001/04/xmlenc#sha256"
+        );
+        reqData.setMsgContext(config);
+        
+        final java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
+        actions.add(new Integer(action));
+        final Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
+        CustomHandler handler = new CustomHandler();
+        handler.send(
+            action, 
+            doc, 
+            reqData, 
+            actions,
+            true
+        );
+        String outputString = 
+            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Signed message:");
+            LOG.debug(outputString);
+        }
+        assertTrue(
+            outputString.indexOf("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256") != -1
+        );
+        assertTrue(
+            outputString.indexOf("http://www.w3.org/2001/04/xmlenc#sha256") != -1
+        );
+        
+        verify(doc);
+    }
+    
+    /**
+     * This is a test for WSS-234 - 
+     * "When a document contains a comment as its first child element, 
+     * wss4j will not find the SOAP body." 
+     */
+    @org.junit.Test
+    public void testWSS234() throws Exception {
+        WSSecSignature builder = new WSSecSignature();
+        builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+        LOG.info("Before Signing....");
+        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        Document signedDoc = builder.build(doc, crypto, secHeader);
+        
+        // Add a comment node as the first node element
+        org.w3c.dom.Node firstChild = signedDoc.getFirstChild();
+        org.w3c.dom.Node newNode = signedDoc.removeChild(firstChild);
+        org.w3c.dom.Node commentNode = signedDoc.createComment("This is a comment");
+        signedDoc.appendChild(commentNode);
+        signedDoc.appendChild(newNode);
+
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("After Signing....");
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+            LOG.debug(outputString);
+        }
+        
+        verify(signedDoc);
+    }
 
     /**
-     * Verifies the soap envelope
-     * <p/>
+     * Verifies the soap envelope.
+     * This method verifies all the signature generated. 
      * 
      * @param env soap envelope
      * @throws java.lang.Exception Thrown when there is a problem in verification
      */
     private void verify(Document doc) throws Exception {
-        secEngine.processSecurityHeader(doc, null, this, crypto, null);
+        secEngine.processSecurityHeader(doc, null, null, crypto);
     }
+    
 
     public void handle(Callback[] callbacks)
         throws IOException, UnsupportedCallbackException {
@@ -324,4 +521,5 @@ public class TestWSSecurityNew3 extends TestCase implements CallbackHandler {
             }
         }
     }
+    
 }

@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package wssec;
+package org.apache.ws.security.processor;
 
 import java.io.IOException;
 import java.util.List;
@@ -27,10 +27,6 @@ import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
@@ -39,6 +35,7 @@ import org.apache.ws.security.WSEncryptionPart;
 import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSSecurityEngineResult;
+import org.apache.ws.security.common.SOAPUtil;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.message.WSSecEncrypt;
@@ -48,20 +45,19 @@ import org.w3c.dom.Element;
 
 /**
  * Test that checks for correct WSDataRef which should be returned by 
- * <code>org.apache.ws.security.processor.ReferenceListProcessor</code> 
+ * <code>org.apache.ws.security.processor.EncryptedKeyProcessor</code> 
  * 
  * This test uses the RSA_15 algorithm to transport (wrap) the symmetric key.
  * The test case creates a ReferenceList element that references EncryptedData
- * elements. The ReferencesList element is put into the Security header, not
- * as child of the EncryptedKey. The EncryptedData elements contain a KeyInfo
- * that references the EncryptedKey via a STR/Reference structure.
+ * elements. The ReferencesList element is put into the EncryptedKey. The 
+ * EncryptedData elements contain a KeyInfo that references the EncryptedKey via 
+ * a STR/Reference structure.
  * 
  * WSDataRef object must contain the correct QName of the decrypted element. 
  * 
- * 
  */
-public class TestWSSecurityDataRef extends TestCase implements CallbackHandler {
-    private static final Log LOG = LogFactory.getLog(TestWSSecurityDataRef.class);
+public class EncryptedKeyDataRefTest extends org.junit.Assert implements CallbackHandler {
+    private static final Log LOG = LogFactory.getLog(EncryptedKeyDataRefTest.class);
     private static final String SOAPMSG = 
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" 
         + "<SOAP-ENV:Envelope "
@@ -72,37 +68,19 @@ public class TestWSSecurityDataRef extends TestCase implements CallbackHandler {
         +      "<ns1:testMethod xmlns:ns1=\"uri:LogTestService2\"></ns1:testMethod>" 
         +   "</SOAP-ENV:Body>" 
         + "</SOAP-ENV:Envelope>";
-    
+
     private WSSecurityEngine secEngine = new WSSecurityEngine();
     private Crypto crypto = CryptoFactory.getInstance("wss40.properties");
 
     /**
-     * TestWSSecurityDataRef constructor <p/>
-     * 
-     * @param name
-     *            name of the test
-     */
-    public TestWSSecurityDataRef(String name) {
-        super(name);
-    }
-
-    /**
-     * JUnit suite <p/>
-     * 
-     * @return a junit test suite
-     */
-    public static Test suite() {
-        return new TestSuite( TestWSSecurityDataRef.class);
-    }
-
-    /**
-     * Test that check for correct WSDataRef object from ReferenceList Processor 
+     * Test that check for correct WSDataRef object from EncryptedKey Processor 
      * 
      * 
      * @throws Exception
      *             Thrown when there is an error in encryption or decryption
      */
-    public void testDataRefReferenceListProcessor() throws Exception {
+    @org.junit.Test
+    public void testDataRefEncryptedKeyProcessor() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         WSSecEncrypt builder = new WSSecEncrypt();
         builder.setUserInfo("wss40");
@@ -127,12 +105,16 @@ public class TestWSSecurityDataRef extends TestCase implements CallbackHandler {
 
         /*
          * Encrypt the element (testMethod), create EncryptedData elements that reference
-         * the EncryptedKey, and get a ReferenceList that can be put into the
-         * Security header. Be sure that the ReferenceList is after the
-         * EncryptedKey element in the Security header (strict layout)
+         * the EncryptedKey, and get a ReferenceList that can be put into the EncryptedKey
+         * itself as a child.
          */
         Element refs = builder.encryptForRef(null, parts);
-        builder.addExternalRefElement(refs, secHeader);
+        
+        /*
+         * We use this method because we want the reference list to be inside the 
+         * EncryptedKey element
+         */
+        builder.addInternalRefElement(refs);
 
         /*
          * now add (prepend) the EncryptedKey element, then a
@@ -173,8 +155,8 @@ public class TestWSSecurityDataRef extends TestCase implements CallbackHandler {
             if (action != WSConstants.ENCR) {
                 continue;
             }
-            List<WSDataRef> dataRefs = 
-                (List<WSDataRef>)wsSecEngineResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
+            List<WSDataRef> dataRefs = (List<WSDataRef>)wsSecEngineResult
+                .get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
             
             //We want check only the DATA_REF_URIS 
             if (dataRefs != null && dataRefs.size() > 0) {

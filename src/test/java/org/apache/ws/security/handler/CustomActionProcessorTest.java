@@ -17,11 +17,8 @@
  * under the License.
  */
 
-package wssec;
+package org.apache.ws.security.handler;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSSecurityEngine;
@@ -29,6 +26,10 @@ import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
+import org.apache.ws.security.common.CustomAction;
+import org.apache.ws.security.common.CustomHandler;
+import org.apache.ws.security.common.CustomProcessor;
+import org.apache.ws.security.common.SOAPUtil;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.handler.RequestData;
@@ -43,11 +44,10 @@ import java.util.ArrayList;
 
 
 /**
- * WS-Security Test Case
- * <p/>
+ * A test for adding custom actions/processors etc.
  */
-public class TestWSSecurityUserProcessor extends TestCase {
-    private static final Log LOG = LogFactory.getLog(TestWSSecurityUserProcessor.class);
+public class CustomActionProcessorTest extends org.junit.Assert {
+    private static final Log LOG = LogFactory.getLog(CustomActionProcessorTest.class);
     private static final String SOAPMSG = 
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" 
         + "<SOAP-ENV:Envelope "
@@ -64,30 +64,10 @@ public class TestWSSecurityUserProcessor extends TestCase {
     private Crypto crypto = CryptoFactory.getInstance();
 
     /**
-     * TestWSSecurity constructor
-     * <p/>
-     * 
-     * @param name name of the test
-     */
-    public TestWSSecurityUserProcessor(String name) {
-        super(name);
-    }
-
-    /**
-     * JUnit suite
-     * <p/>
-     * 
-     * @return a junit test suite
-     */
-    public static Test suite() {
-        return new TestSuite(TestWSSecurityUserProcessor.class);
-    }
-
-
-    /**
      * Test to see that a custom processor configured through a 
      * WSSConfig instance is called
      */
+    @org.junit.Test
     public void 
     testCustomUserProcessor() throws Exception {
         WSSecSignature builder = new WSSecSignature();
@@ -110,7 +90,7 @@ public class TestWSSecurityUserProcessor extends TestCase {
         // Check to make sure we can install/replace and use our own processor
         //
         WSSConfig cfg = WSSConfig.getNewInstance();
-        String p = "wssec.MyProcessor";
+        String p = "org.apache.ws.security.common.CustomProcessor";
         cfg.setProcessor(
             WSSecurityEngine.SIGNATURE,
             p
@@ -128,13 +108,14 @@ public class TestWSSecurityUserProcessor extends TestCase {
                 }
             }
         }
-        assertTrue("Unable to find result from MyProcessor", found);
+        assertTrue("Unable to find result from CustomProcessor", found);
     }
     
     /**
      * Test to see that a custom processor (object) configured through a 
      * WSSConfig instance is called
      */
+    @org.junit.Test
     public void 
     testCustomUserProcessorObject() throws Exception {
         WSSecSignature builder = new WSSecSignature();
@@ -159,7 +140,7 @@ public class TestWSSecurityUserProcessor extends TestCase {
         WSSConfig cfg = WSSConfig.getNewInstance();
         cfg.setProcessor(
             WSSecurityEngine.SIGNATURE,
-            new wssec.MyProcessor()
+            new CustomProcessor()
         );
         final WSSecurityEngine engine = new WSSecurityEngine();
         engine.setWssConfig(cfg);
@@ -169,31 +150,32 @@ public class TestWSSecurityUserProcessor extends TestCase {
         for (WSSecurityEngineResult result : results) {
             Object obj = result.get("foo");
             if (obj != null) {
-                if (obj.getClass().getName().equals(wssec.MyProcessor.class.getName())) {
+                if (obj.getClass().getName().equals(CustomProcessor.class.getName())) {
                     found = true;
                 }
             }
         }
-        assertTrue("Unable to find result from MyProcessor", found);
+        assertTrue("Unable to find result from CustomProcessor", found);
     }
     
     /**
      * Test to see that a custom action configured through a
      * WSSConfig instance is called
      */
+    @org.junit.Test
     public void
     testCustomAction() throws Exception {
         
         final WSSConfig cfg = WSSConfig.getNewInstance();
         final int action = 0xDEADF000;
-        cfg.setAction(action, "wssec.MyAction");
+        cfg.setAction(action, "org.apache.ws.security.common.CustomAction");
         final RequestData reqData = new RequestData();
         reqData.setWssConfig(cfg);
         
         final List<Integer> actions = new ArrayList<Integer>();
         actions.add(new Integer(action));
         final Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
-        MyHandler handler = new MyHandler();
+        CustomHandler handler = new CustomHandler();
         reqData.setMsgContext("bread");
         assertEquals(reqData.getMsgContext(), "bread");
         handler.send(
@@ -210,19 +192,20 @@ public class TestWSSecurityUserProcessor extends TestCase {
      * Test to see that a custom action object configured through a
      * WSSConfig instance is called
      */
+    @org.junit.Test
     public void
     testCustomActionObject() throws Exception {
         
         final WSSConfig cfg = WSSConfig.getNewInstance();
         final int action = 0xDEADF000;
-        cfg.setAction(action, new wssec.MyAction());
+        cfg.setAction(action, new CustomAction());
         final RequestData reqData = new RequestData();
         reqData.setWssConfig(cfg);
         
         final List<Integer> actions = new ArrayList<Integer>();
         actions.add(new Integer(action));
         final Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
-        MyHandler handler = new MyHandler();
+        CustomHandler handler = new CustomHandler();
         reqData.setMsgContext("bread");
         assertEquals(reqData.getMsgContext(), "bread");
         handler.send(
@@ -239,6 +222,7 @@ public class TestWSSecurityUserProcessor extends TestCase {
      * Test to see that a custom action can be configured via WSSecurityUtil.decodeAction.
      * A standard Timestamp action is also configured.
      */
+    @org.junit.Test
     public void
     testDecodeCustomAction() throws Exception {
         
@@ -286,14 +270,14 @@ public class TestWSSecurityUserProcessor extends TestCase {
         //
         // This parsing should pass as WSSConfig has been configured with the custom action
         //
-        cfg.setAction(customAction, "wssec.MyAction");
+        cfg.setAction(customAction, "org.apache.ws.security.common.CustomAction");
         int actions = WSSecurityUtil.decodeAction(actionString, actionList, cfg);
         
         final RequestData reqData = new RequestData();
         reqData.setWssConfig(cfg);
         
         final Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
-        MyHandler handler = new MyHandler();
+        CustomHandler handler = new CustomHandler();
         reqData.setMsgContext("bread");
         assertEquals(reqData.getMsgContext(), "bread");
         handler.send(

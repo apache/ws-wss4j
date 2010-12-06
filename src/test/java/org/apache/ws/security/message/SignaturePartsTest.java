@@ -17,11 +17,8 @@
  * under the License.
  */
 
-package wssec;
+package org.apache.ws.security.message;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.SOAPConstants;
@@ -32,6 +29,7 @@ import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
+import org.apache.ws.security.common.SOAPUtil;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.message.WSSecSignature;
@@ -55,8 +53,8 @@ import javax.xml.namespace.QName;
  * This is some unit tests for signing using signature parts. Note that the "soapMsg" below
  * has a custom header added.
  */
-public class TestWSSecuritySignatureParts extends TestCase implements CallbackHandler {
-    private static final Log LOG = LogFactory.getLog(TestWSSecuritySignatureParts.class);
+public class SignaturePartsTest extends org.junit.Assert implements CallbackHandler {
+    private static final Log LOG = LogFactory.getLog(SignaturePartsTest.class);
     private static final String SOAPMSG = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
             "<soapenv:Envelope xmlns:foo=\"urn:foo.bar\" xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" +
             "   <soapenv:Header>" +
@@ -71,29 +69,10 @@ public class TestWSSecuritySignatureParts extends TestCase implements CallbackHa
     private Crypto crypto = CryptoFactory.getInstance();
 
     /**
-     * TestWSSecurity constructor
-     * <p/>
-     * 
-     * @param name name of the test
-     */
-    public TestWSSecuritySignatureParts(String name) {
-        super(name);
-    }
-
-    /**
-     * JUnit suite
-     * <p/>
-     * 
-     * @return a junit test suite
-     */
-    public static Test suite() {
-        return new TestSuite(TestWSSecuritySignatureParts.class);
-    }
-
-    /**
      * Test signing a custom SOAP header
      */
     @SuppressWarnings("unchecked")
+    @org.junit.Test
     public void testSOAPHeader() throws Exception {
         WSSecSignature sign = new WSSecSignature();
         sign.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
@@ -166,6 +145,7 @@ public class TestWSSecuritySignatureParts extends TestCase implements CallbackHa
      * Test signing of a header through a STR Dereference Transform
      */
     @SuppressWarnings("unchecked")
+    @org.junit.Test
     public void testSOAPHeaderSTRTransform() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         
@@ -227,6 +207,7 @@ public class TestWSSecuritySignatureParts extends TestCase implements CallbackHa
     /**
      * Test signing a custom SOAP header with a bad localname
      */
+    @org.junit.Test
     public void testBadLocalname() throws Exception {
         WSSecSignature sign = new WSSecSignature();
         sign.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
@@ -257,6 +238,7 @@ public class TestWSSecuritySignatureParts extends TestCase implements CallbackHa
     /**
      * Test signing a custom SOAP header with a bad namespace
      */
+    @org.junit.Test
     public void testBadNamespace() throws Exception {
         WSSecSignature sign = new WSSecSignature();
         sign.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
@@ -287,6 +269,7 @@ public class TestWSSecuritySignatureParts extends TestCase implements CallbackHa
     /**
      * Test signing a custom SOAP header and the SOAP body
      */
+    @org.junit.Test
     public void testSOAPHeaderAndBody() throws Exception {
         WSSecSignature sign = new WSSecSignature();
         sign.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");

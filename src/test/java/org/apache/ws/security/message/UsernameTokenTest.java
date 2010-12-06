@@ -17,11 +17,8 @@
  * under the License.
  */
 
-package wssec;
+package org.apache.ws.security.message;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSSecurityException;
@@ -29,10 +26,10 @@ import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSConfig;
+import org.apache.ws.security.common.CustomHandler;
+import org.apache.ws.security.common.SOAPUtil;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.handler.WSHandlerConstants;
-import org.apache.ws.security.message.WSSecUsernameToken;
-import org.apache.ws.security.message.WSSecHeader;
 import org.apache.ws.security.message.token.UsernameToken;
 import org.apache.ws.security.util.Base64;
 import org.w3c.dom.Document;
@@ -48,8 +45,8 @@ import java.security.MessageDigest;
  * 
  * @author Davanum Srinivas (dims@yahoo.com)
  */
-public class TestWSSecurityNew5 extends TestCase implements CallbackHandler {
-    private static final Log LOG = LogFactory.getLog(TestWSSecurityNew5.class);
+public class UsernameTokenTest extends org.junit.Assert implements CallbackHandler {
+    private static final Log LOG = LogFactory.getLog(UsernameTokenTest.class);
     private static final String SOAPMSG = 
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" 
         + "<SOAP-ENV:Envelope "
@@ -117,27 +114,9 @@ public class TestWSSecurityNew5 extends TestCase implements CallbackHandler {
     private WSSecurityEngine secEngine = new WSSecurityEngine();
 
     /**
-     * TestWSSecurity constructor
-     * 
-     * @param name name of the test
-     */
-    public TestWSSecurityNew5(String name) {
-        super(name);
-    }
-
-    /**
-     * JUnit suite
-     * 
-     * @return a junit test suite
-     */
-    public static Test suite() {
-        return new TestSuite(TestWSSecurityNew5.class);
-    }
-
-
-    /**
      * Test that adds a UserNameToken with password Digest to a WS-Security envelope
      */
+    @org.junit.Test
     public void testUsernameTokenDigest() throws Exception {
         WSSecUsernameToken builder = new WSSecUsernameToken();
         builder.setUserInfo("wernerd", "verySecret");
@@ -160,6 +139,7 @@ public class TestWSSecurityNew5 extends TestCase implements CallbackHandler {
     /**
      * Test for encoded passwords.
      */
+    @org.junit.Test
     public void testUsernameTokenWithEncodedPasswordBaseline() throws Exception {
         String password = "password";
         // The SHA-1 of the password is known as a password equivalent in the UsernameToken specification.
@@ -175,6 +155,7 @@ public class TestWSSecurityNew5 extends TestCase implements CallbackHandler {
     /**
      * Test that adds a UserNameToken with password Digest to a WS-Security envelope
      */
+    @org.junit.Test
     public void testUsernameTokenWithEncodedPassword() throws Exception {
         WSSecUsernameToken builder = new WSSecUsernameToken();
         builder.setPasswordsAreEncoded(true);
@@ -206,6 +187,7 @@ public class TestWSSecurityNew5 extends TestCase implements CallbackHandler {
      * Test that a bad username with password digest does not leak whether the username
      * is valid or not - see WSS-141.
      */
+    @org.junit.Test
     public void testUsernameTokenBadUsername() throws Exception {
         WSSecUsernameToken builder = new WSSecUsernameToken();
         builder.setUserInfo("badusername", "verySecret");
@@ -236,6 +218,7 @@ public class TestWSSecurityNew5 extends TestCase implements CallbackHandler {
     /**
      * Test that adds a UserNameToken with a bad password Digest to a WS-Security envelope
      */
+    @org.junit.Test
     public void testUsernameTokenBadDigest() throws Exception {
         WSSecUsernameToken builder = new WSSecUsernameToken();
         builder.setUserInfo("wernerd", "verySecre");
@@ -264,6 +247,7 @@ public class TestWSSecurityNew5 extends TestCase implements CallbackHandler {
     /**
      * Test that adds a UserNameToken with password text to a WS-Security envelope
      */
+    @org.junit.Test
     public void testUsernameTokenText() throws Exception {
         WSSecUsernameToken builder = new WSSecUsernameToken();
         builder.setPasswordType(WSConstants.PASSWORD_TEXT);
@@ -287,6 +271,7 @@ public class TestWSSecurityNew5 extends TestCase implements CallbackHandler {
      * Test that adds a UserNameToken with a digested password but with type of
      * password test.
      */
+    @org.junit.Test
     public void testUsernameTokenDigestText() throws Exception {
         WSSecUsernameToken builder = new WSSecUsernameToken();
         builder.setPasswordType(WSConstants.PASSWORD_TEXT);
@@ -313,6 +298,7 @@ public class TestWSSecurityNew5 extends TestCase implements CallbackHandler {
     /**
      * Test that adds a UserNameToken with (bad) password text to a WS-Security envelope
      */
+    @org.junit.Test
     public void testUsernameTokenBadText() throws Exception {
         WSSecUsernameToken builder = new WSSecUsernameToken();
         builder.setPasswordType(WSConstants.PASSWORD_TEXT);
@@ -346,6 +332,7 @@ public class TestWSSecurityNew5 extends TestCase implements CallbackHandler {
      * The 1.1 spec states that the password type is optional and defaults to password text, 
      * and so we should handle an incoming Username Token accordingly.
      */
+    @org.junit.Test
     public void testUsernameTokenNoPasswordType() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUTMSG);
         if (LOG.isDebugEnabled()) {
@@ -361,6 +348,7 @@ public class TestWSSecurityNew5 extends TestCase implements CallbackHandler {
      * See WSS-185 - https://issues.apache.org/jira/browse/WSS-185
      * "NullPointerException on empty UsernameToken"
      */
+    @org.junit.Test
     public void testUsernameTokenNoUser() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUTNOUSERMSG);
         if (LOG.isDebugEnabled()) {
@@ -380,6 +368,7 @@ public class TestWSSecurityNew5 extends TestCase implements CallbackHandler {
     /**
      * Test that adds a UserNameToken with no password
      */
+    @org.junit.Test
     public void testUsernameTokenNoPassword() throws Exception {
         WSSecUsernameToken builder = new WSSecUsernameToken();
         builder.setPasswordType(null);
@@ -406,6 +395,7 @@ public class TestWSSecurityNew5 extends TestCase implements CallbackHandler {
     /**
      * Test that adds a UserNameToken with an empty password
      */
+    @org.junit.Test
     public void testUsernameTokenEmptyPassword() throws Exception {
         WSSecUsernameToken builder = new WSSecUsernameToken();
         builder.setPasswordType(WSConstants.PASSWORD_TEXT);
@@ -426,6 +416,7 @@ public class TestWSSecurityNew5 extends TestCase implements CallbackHandler {
     /**
      * Test that processes a UserNameToken with an empty password
      */
+    @org.junit.Test
     public void testEmptyPasswordProcessing() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(EMPTY_PASSWORD_MSG);
         if (LOG.isDebugEnabled()) {
@@ -442,6 +433,7 @@ public class TestWSSecurityNew5 extends TestCase implements CallbackHandler {
      * Test with a null token type. This will fail as the default is to reject custom
      * token types.
      */
+    @org.junit.Test
     public void testUsernameTokenCustomFail() throws Exception {
         WSSecUsernameToken builder = new WSSecUsernameToken();
         builder.setPasswordType(null);
@@ -471,6 +463,7 @@ public class TestWSSecurityNew5 extends TestCase implements CallbackHandler {
      * Test with a non-standard token type. This will fail as the default is to reject custom
      * token types.
      */
+    @org.junit.Test
     public void testUsernameTokenCustomFail2() throws Exception {
         WSSecUsernameToken builder = new WSSecUsernameToken();
         builder.setPasswordType("RandomType");
@@ -500,6 +493,7 @@ public class TestWSSecurityNew5 extends TestCase implements CallbackHandler {
      * Test with a non-standard password type. This will pass as the WSSConfig is configured to 
      * handle custom token types.
      */
+    @org.junit.Test
     public void testUsernameTokenCustomPass() throws Exception {
         WSSecUsernameToken builder = new WSSecUsernameToken();
         builder.setPasswordType("RandomType");
@@ -538,6 +532,7 @@ public class TestWSSecurityNew5 extends TestCase implements CallbackHandler {
      * http://issues.apache.org/jira/browse/WSS-66
      * "Possible security hole when PasswordDigest is used by client."
      */
+    @org.junit.Test
     public void testNullNonce() throws Exception {
         WSSecUsernameToken builder = new WSSecUsernameToken();
         builder.setPasswordType(WSConstants.PASSWORD_DIGEST);
@@ -580,6 +575,7 @@ public class TestWSSecurityNew5 extends TestCase implements CallbackHandler {
      * http://issues.apache.org/jira/browse/WSS-66
      * "Possible security hole when PasswordDigest is used by client."
      */
+    @org.junit.Test
     public void testNullCreated() throws Exception {
         WSSecUsernameToken builder = new WSSecUsernameToken();
         builder.setPasswordType(WSConstants.PASSWORD_DIGEST);
@@ -620,6 +616,7 @@ public class TestWSSecurityNew5 extends TestCase implements CallbackHandler {
     /**
      * Test that verifies an EncodingType is set for the nonce. See WSS-169.
      */
+    @org.junit.Test
     public void testUsernameTokenNonceEncodingType() throws Exception {
         WSSecUsernameToken builder = new WSSecUsernameToken();
         builder.setUserInfo("wernerd", "verySecret");
@@ -637,7 +634,7 @@ public class TestWSSecurityNew5 extends TestCase implements CallbackHandler {
      * Test that adds a UserNameToken via WSHandler
      */
     public void testUsernameTokenWSHandler() throws Exception {
-        MyHandler handler = new MyHandler();
+        CustomHandler handler = new CustomHandler();
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         
         RequestData reqData = new RequestData();
@@ -663,8 +660,9 @@ public class TestWSSecurityNew5 extends TestCase implements CallbackHandler {
     /**
      * Test that adds a UserNameToken with an empty password via WSHandler
      */
+    @org.junit.Test
     public void testUsernameTokenWSHandlerEmptyPassword() throws Exception {
-        MyHandler handler = new MyHandler();
+        CustomHandler handler = new CustomHandler();
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         
         RequestData reqData = new RequestData();

@@ -17,11 +17,8 @@
  * under the License.
  */
 
-package wssec;
+package org.apache.ws.security.message.token;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSEncryptionPart;
@@ -29,6 +26,7 @@ import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.common.SOAPUtil;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.message.WSSecSignature;
@@ -47,8 +45,8 @@ import java.util.ArrayList;
 /**
  * This is a test for the Kerberos Token Profile 1.1
  */
-public class TestWSSecurityKerberosTokenProfile extends TestCase implements CallbackHandler {
-    private static final Log LOG = LogFactory.getLog(TestWSSecurityKerberosTokenProfile.class);
+public class BSTKerberosTest extends org.junit.Assert implements CallbackHandler {
+    private static final Log LOG = LogFactory.getLog(BSTKerberosTest.class);
     private static final String AP_REQ = 
         "http://docs.oasis-open.org/wss/oasis-wss-kerberos-token-profile-1.1#Kerberosv5_AP_REQ";
     private static final String BASE64_NS = 
@@ -70,29 +68,9 @@ public class TestWSSecurityKerberosTokenProfile extends TestCase implements Call
     private Crypto crypto = CryptoFactory.getInstance();
 
     /**
-     * TestWSSecurity constructor
-     * <p/>
-     * 
-     * @param name name of the test
-     */
-    public TestWSSecurityKerberosTokenProfile(String name) {
-        super(name);
-    }
-
-    /**
-     * JUnit suite
-     * <p/>
-     * 
-     * @return a junit test suite
-     */
-    public static Test suite() {
-        return new TestSuite(TestWSSecurityKerberosTokenProfile.class);
-    }
-
-
-    /**
      * A unit test for creating BinarySecurityTokens
      */
+    @org.junit.Test
     public void testCreateBinarySecurityToken() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         WSSConfig.getNewInstance();
@@ -121,6 +99,7 @@ public class TestWSSecurityKerberosTokenProfile extends TestCase implements Call
     /**
      * A test for signing a Kerberos BST
      */
+    @org.junit.Test
     public void testSignBST() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         WSSConfig.getNewInstance();
@@ -159,6 +138,7 @@ public class TestWSSecurityKerberosTokenProfile extends TestCase implements Call
     /**
      * A test for signing a Kerberos BST as well as a Timestamp
      */
+    @org.junit.Test
     public void testSignBSTTimestamp() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         WSSConfig.getNewInstance();

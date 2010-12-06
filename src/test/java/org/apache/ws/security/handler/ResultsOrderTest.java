@@ -17,46 +17,26 @@
  * under the License.
  */
 
-package wssec;
+package org.apache.ws.security.handler;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSecurityEngineResult;
+
+import org.apache.ws.security.common.CustomHandler;
 
 
 /**
  * This is a test for WSS-147. A "checkReceiverResultsAnyOrder" method is added to WSHandler
  * which applications can use if they want.
  */
-public class TestWSSecurityResultsOrder extends TestCase {
+public class ResultsOrderTest extends org.junit.Assert {
 
     /**
-     * TestWSSecurity constructor
-     * <p/>
-     * 
-     * @param name name of the test
      */
-    public TestWSSecurityResultsOrder(String name) {
-        super(name);
-    }
-
-    /**
-     * JUnit suite
-     * <p/>
-     * 
-     * @return a junit test suite
-     */
-    public static Test suite() {
-        return new TestSuite(TestWSSecurityResultsOrder.class);
-    }
-    
-    /**
-     */
+    @org.junit.Test
     public void 
     testOrder() throws Exception {
-        MyHandler handler = new MyHandler();
+        CustomHandler handler = new CustomHandler();
         
         java.util.List<WSSecurityEngineResult> results = new java.util.ArrayList<WSSecurityEngineResult>();
         results.add(
@@ -83,9 +63,10 @@ public class TestWSSecurityResultsOrder extends TestCase {
 
     /**
      */
+    @org.junit.Test
     public void 
     testReverseOrder() throws Exception {
-        MyHandler handler = new MyHandler();
+        CustomHandler handler = new CustomHandler();
         
         java.util.List<WSSecurityEngineResult> results = new java.util.ArrayList<WSSecurityEngineResult>();
         results.add(
@@ -113,9 +94,10 @@ public class TestWSSecurityResultsOrder extends TestCase {
     
     /**
      */
+    @org.junit.Test
     public void 
     testMixedOrder() throws Exception {
-        MyHandler handler = new MyHandler();
+        CustomHandler handler = new CustomHandler();
         
         java.util.List<WSSecurityEngineResult> results = 
             new java.util.ArrayList<WSSecurityEngineResult>();
@@ -144,9 +126,10 @@ public class TestWSSecurityResultsOrder extends TestCase {
     
     /**
      */
+    @org.junit.Test
     public void 
     testMixedOrder2() throws Exception {
-        MyHandler handler = new MyHandler();
+        CustomHandler handler = new CustomHandler();
         
         java.util.List<WSSecurityEngineResult> results = 
             new java.util.ArrayList<WSSecurityEngineResult>();
@@ -174,9 +157,10 @@ public class TestWSSecurityResultsOrder extends TestCase {
     
     /**
      */
+    @org.junit.Test
     public void 
     testMissingResult() throws Exception {
-        MyHandler handler = new MyHandler();
+        CustomHandler handler = new CustomHandler();
         
         java.util.List<WSSecurityEngineResult> results = 
             new java.util.ArrayList<WSSecurityEngineResult>();
@@ -201,9 +185,10 @@ public class TestWSSecurityResultsOrder extends TestCase {
     
     /**
      */
+    @org.junit.Test
     public void 
     testMissingAction() throws Exception {
-        MyHandler handler = new MyHandler();
+        CustomHandler handler = new CustomHandler();
         
         java.util.List<WSSecurityEngineResult> results = 
             new java.util.ArrayList<WSSecurityEngineResult>();
@@ -230,9 +215,10 @@ public class TestWSSecurityResultsOrder extends TestCase {
     
     /**
      */
+    @org.junit.Test
     public void 
     testNoResult() throws Exception {
-        MyHandler handler = new MyHandler();
+        CustomHandler handler = new CustomHandler();
         
         java.util.List<WSSecurityEngineResult> results = 
             new java.util.ArrayList<WSSecurityEngineResult>();
@@ -246,9 +232,10 @@ public class TestWSSecurityResultsOrder extends TestCase {
     
     /**
      */
+    @org.junit.Test
     public void 
     testNoAction() throws Exception {
-        MyHandler handler = new MyHandler();
+        CustomHandler handler = new CustomHandler();
         
         java.util.List<WSSecurityEngineResult> results = 
             new java.util.ArrayList<WSSecurityEngineResult>();
@@ -264,9 +251,10 @@ public class TestWSSecurityResultsOrder extends TestCase {
     
     /**
      */
+    @org.junit.Test
     public void 
     testMultipleIdenticalResults() throws Exception {
-        MyHandler handler = new MyHandler();
+        CustomHandler handler = new CustomHandler();
         
         java.util.List<WSSecurityEngineResult> results = 
             new java.util.ArrayList<WSSecurityEngineResult>();

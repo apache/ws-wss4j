@@ -17,22 +17,18 @@
  * under the License.
  */
 
-package wssec;
+package org.apache.ws.security.message;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.ws.security.WSSecurityEngine;
-import org.apache.ws.security.message.WSSecHeader;
-import org.apache.ws.security.message.WSSecTimestamp;
+import org.apache.ws.security.common.SOAPUtil;
 import org.apache.ws.security.message.token.Timestamp;
+import org.apache.ws.security.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 
 import java.util.List;
@@ -40,8 +36,8 @@ import java.util.List;
 /**
  * WS-Security Test Case for Timestamps.
  */
-public class TestWSSecurityTimestamp extends TestCase {
-    private static final Log LOG = LogFactory.getLog(TestWSSecurityTimestamp.class);
+public class TimestampTest extends org.junit.Assert {
+    private static final Log LOG = LogFactory.getLog(TimestampTest.class);
     private static final String SOAPMSG = 
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" 
         + "<SOAP-ENV:Envelope "
@@ -58,29 +54,9 @@ public class TestWSSecurityTimestamp extends TestCase {
     private WSSecurityEngine secEngine = new WSSecurityEngine();
 
     /**
-     * TestWSSecurity constructor
-     * <p/>
-     * 
-     * @param name name of the test
-     */
-    public TestWSSecurityTimestamp(String name) {
-        super(name);
-    }
-
-    /**
-     * JUnit suite
-     * <p/>
-     * 
-     * @return a junit test suite
-     */
-    public static Test suite() {
-        return new TestSuite(TestWSSecurityTimestamp.class);
-    }
-
-    
-    /**
      * This is a test for processing a valid Timestamp.
      */
+    @org.junit.Test
     public void testValidTimestamp() throws Exception {
 
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
@@ -114,6 +90,7 @@ public class TestWSSecurityTimestamp extends TestCase {
     /**
      * This is a test for processing a valid Timestamp with no expires element
      */
+    @org.junit.Test
     public void testValidTimestampNoExpires() throws Exception {
 
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
@@ -147,6 +124,7 @@ public class TestWSSecurityTimestamp extends TestCase {
     /**
      * This is a test for processing an expired Timestamp.
      */
+    @org.junit.Test
     public void testExpiredTimestamp() throws Exception {
 
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
@@ -176,6 +154,7 @@ public class TestWSSecurityTimestamp extends TestCase {
      * This is a test for processing an "old" Timestamp, i.e. one with a "Created" element that is
      * out of date
      */
+    @org.junit.Test
     public void testOldTimestamp() throws Exception {
         
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);

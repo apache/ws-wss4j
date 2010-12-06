@@ -17,11 +17,8 @@
  * under the License.
  */
 
-package wssec;
+package org.apache.ws.security.message;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.SOAPConstants;
@@ -29,24 +26,22 @@ import org.apache.ws.security.WSEncryptionPart;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.ws.security.WSSecurityEngine;
+import org.apache.ws.security.common.SOAPUtil;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
-import org.apache.ws.security.message.WSSecSignature;
-import org.apache.ws.security.message.WSSecHeader;
-import org.apache.ws.security.message.WSSecTimestamp;
 import org.w3c.dom.Document;
 
 import java.util.List;
 import java.util.ArrayList;
 
 /**
- * WS-Security Test Case
- * <p/>
+ * WS-Security Test Case for signature creation/validation using the
+ * SecurityTokenReference transform.
  * 
  * @author Davanum Srinivas (dims@yahoo.com)
  */
-public class TestWSSecurityNew11 extends TestCase {
-    private static final Log LOG = LogFactory.getLog(TestWSSecurityNew11.class);
+public class STRSignatureTest extends org.junit.Assert {
+    private static final Log LOG = LogFactory.getLog(STRSignatureTest.class);
     private static final String SOAPMSG = 
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" 
         + "<SOAP-ENV:Envelope "
@@ -64,27 +59,6 @@ public class TestWSSecurityNew11 extends TestCase {
     private Crypto crypto = CryptoFactory.getInstance("wss40.properties");
 
     /**
-     * TestWSSecurity constructor
-     * <p/>
-     * 
-     * @param name name of the test
-     */
-    public TestWSSecurityNew11(String name) {
-        super(name);
-    }
-
-    /**
-     * JUnit suite
-     * <p/>
-     * 
-     * @return a junit test suite
-     */
-    public static Test suite() {
-        return new TestSuite(TestWSSecurityNew11.class);
-    }
-
-
-    /**
      * Test that signs and verifies a WS-Security envelope.
      * This test uses the direct reference key identifier (certificate included
      * as a BinarySecurityToken (BST) in the message). The test signs the message
@@ -93,6 +67,7 @@ public class TestWSSecurityNew11 extends TestCase {
      * 
      * @throws java.lang.Exception Thrown when there is any problem in signing or verification
      */
+    @org.junit.Test
     public void testX509SignatureDirectSTR() throws Exception {
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("wss40", "security");
@@ -142,6 +117,7 @@ public class TestWSSecurityNew11 extends TestCase {
      * "Error when making a signature when containing a WSSecTimestamp"
      * A timestamp is added to the document and signed.
      */
+    @org.junit.Test
     public void testWSS96() throws Exception {
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("wss40", "security");
@@ -200,6 +176,7 @@ public class TestWSSecurityNew11 extends TestCase {
      * 
      * @throws java.lang.Exception Thrown when there is any problem in signing or verification
      */
+    @org.junit.Test
     public void testX509SignatureISSTR() throws Exception {
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("wss40", "security");
@@ -254,6 +231,7 @@ public class TestWSSecurityNew11 extends TestCase {
      * 
      * @throws java.lang.Exception Thrown when there is any problem in signing or verification
      */
+    @org.junit.Test
     public void testX509SignatureSKISTR() throws Exception {
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("wss40", "security");

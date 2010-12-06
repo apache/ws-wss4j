@@ -17,15 +17,13 @@
  * under the License.
  */
 
-package wssec;
+package org.apache.ws.security.message;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.common.SOAPUtil;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.message.WSSecSignature;
@@ -38,8 +36,8 @@ import org.w3c.dom.Document;
  * @author Davanum Srinivas (dims@yahoo.com)
  * @author Werner Dittmann (Werner.Dittmann@siemens.com)
  */
-public class TestWSSecurityNew12 extends TestCase {
-    private static final Log LOG = LogFactory.getLog(TestWSSecurityNew12.class);
+public class SKISignatureTest extends org.junit.Assert {
+    private static final Log LOG = LogFactory.getLog(SKISignatureTest.class);
     private static final String SOAPMSG = 
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" 
         + "<SOAP-ENV:Envelope "
@@ -57,27 +55,6 @@ public class TestWSSecurityNew12 extends TestCase {
     private Crypto crypto = CryptoFactory.getInstance("wss40.properties");
 
     /**
-     * TestWSSecurity constructor
-     * <p/>
-     * 
-     * @param name name of the test
-     */
-    public TestWSSecurityNew12(String name) {
-        super(name);
-    }
-
-    /**
-     * JUnit suite
-     * <p/>
-     * 
-     * @return a junit test suite
-     */
-    public static Test suite() {
-        return new TestSuite(TestWSSecurityNew12.class);
-    }
-
-
-    /**
      * Test that signs and verifies a WS-Security envelope using SubjectKeyIdentifier.
      * This test uses the SubjectKeyIdentifier to identify the certificate. It
      * uses the Direct version, that is it embeds the certificate in the message.
@@ -85,6 +62,7 @@ public class TestWSSecurityNew12 extends TestCase {
      * 
      * @throws java.lang.Exception Thrown when there is any problem in signing or verification
      */
+    @org.junit.Test
     public void testX509SignatureDSA_SKI() throws Exception {
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("wss40DSA", "security");
@@ -119,6 +97,7 @@ public class TestWSSecurityNew12 extends TestCase {
      * 
      * @throws java.lang.Exception Thrown when there is any problem in signing or verification
      */
+    @org.junit.Test
     public void testX509SignatureDSA_Autodetect() throws Exception {
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("wss40DSA", "security");
@@ -152,6 +131,7 @@ public class TestWSSecurityNew12 extends TestCase {
      * 
      * @throws java.lang.Exception Thrown when there is any problem in signing or verification
      */
+    @org.junit.Test
     public void testX509SignatureRSA_Autodetect() throws Exception {
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("wss40", "security");

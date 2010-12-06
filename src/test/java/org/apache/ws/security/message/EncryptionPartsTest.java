@@ -17,11 +17,8 @@
  * under the License.
  */
 
-package wssec;
+package org.apache.ws.security.message;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.SOAPConstants;
@@ -32,10 +29,9 @@ import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
+import org.apache.ws.security.common.SOAPUtil;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
-import org.apache.ws.security.message.WSSecEncrypt;
-import org.apache.ws.security.message.WSSecHeader;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 
@@ -52,8 +48,8 @@ import java.util.ArrayList;
  * This is some unit tests for encryption using encryption using parts. Note that the "soapMsg" below
  * has a custom header added.
  */
-public class TestWSSecurityEncryptionParts extends TestCase implements CallbackHandler {
-    private static final Log LOG = LogFactory.getLog(TestWSSecurityEncryptionParts.class);
+public class EncryptionPartsTest extends org.junit.Assert implements CallbackHandler {
+    private static final Log LOG = LogFactory.getLog(EncryptionPartsTest.class);
     private static final String SOAPMSG = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
             "<soapenv:Envelope xmlns:foo=\"urn:foo.bar\" xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" +
             "   <soapenv:Header>" +
@@ -68,30 +64,10 @@ public class TestWSSecurityEncryptionParts extends TestCase implements CallbackH
     private Crypto crypto = CryptoFactory.getInstance();
 
     /**
-     * TestWSSecurity constructor
-     * <p/>
-     * 
-     * @param name name of the test
-     */
-    public TestWSSecurityEncryptionParts(String name) {
-        super(name);
-    }
-
-    /**
-     * JUnit suite
-     * <p/>
-     * 
-     * @return a junit test suite
-     */
-    public static Test suite() {
-        return new TestSuite(TestWSSecurityEncryptionParts.class);
-    }
-
-
-    /**
      * Test encrypting a custom SOAP header
      */
     @SuppressWarnings("unchecked")
+    @org.junit.Test
     public void testSOAPHeader() throws Exception {
         WSSecEncrypt encrypt = new WSSecEncrypt();
         encrypt.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
@@ -158,6 +134,7 @@ public class TestWSSecurityEncryptionParts extends TestCase implements CallbackH
      * Test encrypting a custom SOAP header using wsse11:EncryptedHeader
      */
     @SuppressWarnings("unchecked")
+    @org.junit.Test
     public void testSOAPEncryptedHeader() throws Exception {
         WSSecEncrypt encrypt = new WSSecEncrypt();
         encrypt.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
@@ -206,6 +183,7 @@ public class TestWSSecurityEncryptionParts extends TestCase implements CallbackH
     /**
      * Test encrypting a custom SOAP header with a bad localname
      */
+    @org.junit.Test
     public void testBadLocalname() throws Exception {
         WSSecEncrypt encrypt = new WSSecEncrypt();
         encrypt.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
@@ -237,6 +215,7 @@ public class TestWSSecurityEncryptionParts extends TestCase implements CallbackH
     /**
      * Test encrypting a custom SOAP header with a bad namespace
      */
+    @org.junit.Test
     public void testBadNamespace() throws Exception {
         WSSecEncrypt encrypt = new WSSecEncrypt();
         encrypt.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
@@ -268,6 +247,7 @@ public class TestWSSecurityEncryptionParts extends TestCase implements CallbackH
     /**
      * Test signing a custom SOAP header and the SOAP body
      */
+    @org.junit.Test
     public void testSOAPHeaderAndBody() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         SOAPConstants soapConstants = 

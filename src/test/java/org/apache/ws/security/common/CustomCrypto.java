@@ -23,7 +23,7 @@ import org.apache.ws.security.components.crypto.CryptoBase;
 
 public class CustomCrypto extends CryptoBase {
     
-    java.util.Map<String, Object> config = null;
+    private java.util.Map<String, Object> config = null;
     
     public
     CustomCrypto(
@@ -33,22 +33,16 @@ public class CustomCrypto extends CryptoBase {
         this.config = config;
     }
 
-    //
-    // org.apache.ws.security.components.crypto.Crypto implementation
-    //
-
     public String 
     getDefaultX509Alias() {
         return null;
     }
 
-    //
-    // org.apache.ws.security.components.crypto.AbstractCryptoBase
-    // implementation
-    //
-
-    protected String
-    getCryptoProvider() {
+    public String getCryptoProvider() {
         return null;
+    }
+    
+    public java.util.Map<String, Object> getConfig() {
+        return config;
     }
 }

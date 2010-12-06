@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package wssec;
+package org.apache.ws.security.message;
 
 import java.io.IOException;
 
@@ -28,10 +28,6 @@ import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.xml.crypto.dsig.SignatureMethod;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
@@ -40,6 +36,8 @@ import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
+import org.apache.ws.security.common.CustomHandler;
+import org.apache.ws.security.common.SOAPUtil;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.message.WSSecEncrypt;
@@ -54,8 +52,8 @@ import org.w3c.dom.Document;
  * Demonstrates that Signature Crypto object can have null values when 
  * calling processSecurityHeader method of WSSecurityEngine.
  */
-public class TestWSSecurityNew17 extends TestCase implements CallbackHandler {
-    private static final Log LOG = LogFactory.getLog(TestWSSecurityNew17.class);
+public class SymmetricSignatureTest extends org.junit.Assert implements CallbackHandler {
+    private static final Log LOG = LogFactory.getLog(SymmetricSignatureTest.class);
     private static final String SOAPMSG = 
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" 
         + "<SOAP-ENV:Envelope "
@@ -74,32 +72,13 @@ public class TestWSSecurityNew17 extends TestCase implements CallbackHandler {
     private byte[] keyData;
 
     /**
-     * TestWSSecurity constructor
-     * <p/>
-     * 
-     * @param name name of the test
-     */
-    public TestWSSecurityNew17(String name) {
-        super(name);
-    }
-
-    /**
-     * JUnit suite
-     * <p/>
-     * 
-     * @return a junit test suite
-     */
-    public static Test suite() {
-        return new TestSuite(TestWSSecurityNew17.class);
-    }
-
-    /**
      * Setup method
      * <p/>
      * 
      * @throws Exception Thrown when there is a problem in setup
      */
-    protected void setUp() throws Exception {
+    @org.junit.Before
+    public void setUp() throws Exception {
         KeyGenerator keyGen = KeyGenerator.getInstance("AES");
         keyGen.init(128);
         SecretKey key = keyGen.generateKey();
@@ -109,6 +88,7 @@ public class TestWSSecurityNew17 extends TestCase implements CallbackHandler {
     /**
      * Test signing a message body using a symmetric key with EncryptedKeySHA1
      */
+    @org.junit.Test
     public void testSymmetricSignatureSHA1() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         
@@ -137,6 +117,7 @@ public class TestWSSecurityNew17 extends TestCase implements CallbackHandler {
      * Test signing a message body using a symmetric key with Direct Reference to an
      * EncryptedKey
      */
+    @org.junit.Test
     public void testSymmetricSignatureDR() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         
@@ -175,6 +156,7 @@ public class TestWSSecurityNew17 extends TestCase implements CallbackHandler {
      * @throws Exception Thrown when there is any problem in signing, encryption,
      *                   decryption, or verification
      */
+    @org.junit.Test
     public void testEncryptedKeySignature() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         LOG.info("Before Sign/Encryption....");
@@ -219,6 +201,7 @@ public class TestWSSecurityNew17 extends TestCase implements CallbackHandler {
      * Test signing a message body using a symmetric key with EncryptedKeySHA1. 
      * The request is generated using WSHandler, instead of coding it.
      */
+    @org.junit.Test
     public void testSymmetricSignatureSHA1Handler() throws Exception {
         final WSSConfig cfg = WSSConfig.getNewInstance();
         RequestData reqData = new RequestData();
@@ -233,7 +216,7 @@ public class TestWSSecurityNew17 extends TestCase implements CallbackHandler {
         final java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
         actions.add(new Integer(WSConstants.SIGN));
         final Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
-        MyHandler handler = new MyHandler();
+        CustomHandler handler = new CustomHandler();
         handler.send(
             WSConstants.SIGN, 
             doc, 

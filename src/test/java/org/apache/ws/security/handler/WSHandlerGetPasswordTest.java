@@ -17,19 +17,15 @@
  * under the License.
  */
 
-package wssec;
+package org.apache.ws.security.handler;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSConfig;
-import org.apache.ws.security.handler.WSHandler;
-import org.apache.ws.security.handler.RequestData;
-import org.apache.ws.security.handler.WSHandlerConstants;
+import org.apache.ws.security.common.CustomHandler;
+import org.apache.ws.security.common.SOAPUtil;
 import org.w3c.dom.Document;
 
 import java.io.IOException;
@@ -38,13 +34,12 @@ import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
 
-
 /**
  * WS-Security Test Case for the getPassword method in WSHandler.
  * <p/>
  */
-public class TestWSSecurityGetPassword extends TestCase {
-    private static final Log LOG = LogFactory.getLog(TestWSSecurityGetPassword.class);
+public class WSHandlerGetPasswordTest extends org.junit.Assert {
+    private static final Log LOG = LogFactory.getLog(WSHandlerGetPasswordTest.class);
     private static final String SOAPMSG = 
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" 
         + "<SOAP-ENV:Envelope "
@@ -59,30 +54,10 @@ public class TestWSSecurityGetPassword extends TestCase {
         + "</SOAP-ENV:Envelope>";
 
     /**
-     * TestWSSecurity constructor
-     * <p/>
-     * 
-     * @param name name of the test
-     */
-    public TestWSSecurityGetPassword(String name) {
-        super(name);
-    }
-
-    /**
-     * JUnit suite
-     * <p/>
-     * 
-     * @return a junit test suite
-     */
-    public static Test suite() {
-        return new TestSuite(TestWSSecurityGetPassword.class);
-    }
-
-
-    /**
      * A unit test for {@link WSHandler#getPassword(String, int, String, String, RequestData)},
      * where the password is obtained from the Message Context.
      */
+    @org.junit.Test
     public void
     testGetPasswordRequestContextUnit() throws Exception {
         
@@ -93,7 +68,7 @@ public class TestWSSecurityGetPassword extends TestCase {
         messageContext.put("password", "securityPassword");
         reqData.setMsgContext(messageContext);
         
-        WSHandler handler = new MyHandler();
+        WSHandler handler = new CustomHandler();
         WSPasswordCallback callback = 
             handler.getPassword(
                 "bob", 
@@ -111,6 +86,7 @@ public class TestWSSecurityGetPassword extends TestCase {
      * A WSHandler test for {@link WSHandler#getPassword(String, int, String, String, RequestData)},
      * where the password is obtained from the Message Context.
      */
+    @org.junit.Test
     public void
     testGetPasswordRequestContext() throws Exception {
         
@@ -126,7 +102,7 @@ public class TestWSSecurityGetPassword extends TestCase {
         final java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
         actions.add(new Integer(WSConstants.UT));
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
-        MyHandler handler = new MyHandler();
+        CustomHandler handler = new CustomHandler();
         handler.send(
             WSConstants.UT, 
             doc, 
@@ -149,6 +125,7 @@ public class TestWSSecurityGetPassword extends TestCase {
      * where the password is obtained from a Callback Handler, which is placed on the 
      * Message Context using a reference.
      */
+    @org.junit.Test
     public void
     testGetPasswordCallbackHandlerRef() throws Exception {
         
@@ -167,7 +144,7 @@ public class TestWSSecurityGetPassword extends TestCase {
         final java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
         actions.add(new Integer(WSConstants.UT));
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
-        MyHandler handler = new MyHandler();
+        CustomHandler handler = new CustomHandler();
         handler.send(
             WSConstants.UT, 
             doc, 
@@ -186,7 +163,6 @@ public class TestWSSecurityGetPassword extends TestCase {
     }
     
 
-    
     public static class MyCallbackHandler implements CallbackHandler {
         public void handle(Callback[] callbacks)
             throws IOException, UnsupportedCallbackException {
