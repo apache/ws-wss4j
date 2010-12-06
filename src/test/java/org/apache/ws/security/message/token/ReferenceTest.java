@@ -17,19 +17,14 @@
  * under the License.
  */
 
-package components;
-
-import junit.framework.TestCase;
-import junit.framework.Test;
-import junit.framework.TestSuite;
+package org.apache.ws.security.message.token;
 
 import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.message.token.Reference;
 
 /**
  * unit test for the Reference type
  */
-public class TestReference extends TestCase {
+public class ReferenceTest extends org.junit.Assert {
 
     private static final String 
     TEST_REFERENCE_TEMPLATE = 
@@ -52,15 +47,7 @@ public class TestReference extends TestCase {
         ;
 
 
-    public TestReference(String name) {
-        super(name);
-    }
-
-    public static Test suite() {
-        return new TestSuite(TestReference.class);
-    }
-    
-    
+    @org.junit.Test
     public void
     testConstructor() throws Exception {
         //
@@ -103,6 +90,7 @@ public class TestReference extends TestCase {
         );
     }
     
+    @org.junit.Test
     public void
     testAccessors() throws Exception {
         final Reference ref = new Reference(

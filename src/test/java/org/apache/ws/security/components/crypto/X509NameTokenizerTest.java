@@ -17,26 +17,14 @@
  * under the License.
  */
 
-package components;
-
-import junit.framework.TestCase;
-import junit.framework.Test;
-import junit.framework.TestSuite;
-import org.apache.ws.security.components.crypto.X509NameTokenizer;
+package org.apache.ws.security.components.crypto;
 
 /**
  *
  */
-public class TestX509NameTokenizer extends TestCase {
+public class X509NameTokenizerTest extends org.junit.Assert {
 
-    public TestX509NameTokenizer(String name) {
-        super(name);
-    }
-
-    public static Test suite() {
-        return new TestSuite(TestX509NameTokenizer.class);
-    }
-
+    @org.junit.Test
     public void 
     testEmptyX509NameTokenizer() {
         checkEmpty(new X509NameTokenizer(""));
@@ -44,6 +32,7 @@ public class TestX509NameTokenizer extends TestCase {
         checkEmpty(new X509NameTokenizer(" \t \n  \r\n"));
     }
     
+    @org.junit.Test
     public void 
     testWellFormedX509NameTokenizer() {
         checkTokenizer(
