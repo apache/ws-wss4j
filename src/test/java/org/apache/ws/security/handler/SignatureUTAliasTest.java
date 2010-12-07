@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package wssec;
+package org.apache.ws.security.handler;
 
 import java.io.IOException;
 import java.util.List;
@@ -26,10 +26,6 @@ import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
@@ -37,6 +33,8 @@ import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSSecurityEngineResult;
+import org.apache.ws.security.common.CustomHandler;
+import org.apache.ws.security.common.SOAPUtil;
 import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.handler.WSHandlerConstants;
@@ -47,9 +45,8 @@ import org.w3c.dom.Document;
  * This is a test for WSS-194 - "Support overriding KeyStore alias for signature so that it can
  * be different than user name used for UsernameToken".
  */
-public class TestWSSecurityWSS194 extends TestCase implements CallbackHandler {
-    
-    private static final Log LOG = LogFactory.getLog(TestWSSecurityWSS194.class);
+public class SignatureUTAliasTest extends org.junit.Assert implements CallbackHandler {
+    private static final Log LOG = LogFactory.getLog(SignatureUTAliasTest.class);
     private static final String SOAPMSG = 
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" 
         + "<SOAP-ENV:Envelope "
@@ -65,30 +62,11 @@ public class TestWSSecurityWSS194 extends TestCase implements CallbackHandler {
     private WSSecurityEngine secEngine = new WSSecurityEngine();
 
     /**
-     * TestWSSecurity constructor
-     * <p/>
-     * 
-     * @param name name of the test
-     */
-    public TestWSSecurityWSS194(String name) {
-        super(name);
-    }
-
-    /**
-     * JUnit suite
-     * <p/>
-     * 
-     * @return a junit test suite
-     */
-    public static Test suite() {
-        return new TestSuite(TestWSSecurityWSS194.class);
-    }
-    
-    /**
      * Test involving adding a Username Token to a SOAP message and signing it, where the
      * private key for signature is extracted from the KeyStore using a different username/alias
      * to the UsernameToken. 
      */
+    @org.junit.Test
     public void 
     testUsernameTokenSignatureHandler() throws Exception {
         final WSSConfig cfg = WSSConfig.getNewInstance();
@@ -114,7 +92,7 @@ public class TestWSSecurityWSS194 extends TestCase implements CallbackHandler {
         actions.add(new Integer(WSConstants.UT));
         actions.add(new Integer(WSConstants.SIGN));
         final Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
-        MyHandler handler = new MyHandler();
+        CustomHandler handler = new CustomHandler();
         handler.send(
             WSConstants.UT | WSConstants.SIGN, 
             doc, 

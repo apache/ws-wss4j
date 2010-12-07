@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package wssec;
+package org.apache.ws.security.message;
 
 import java.io.IOException;
 import java.security.SecureRandom;
@@ -29,32 +29,24 @@ import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.xml.crypto.dsig.SignatureMethod;
 
-import junit.framework.TestCase;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSecurityEngine;
+import org.apache.ws.security.common.SOAPUtil;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.conversation.ConversationConstants;
-import org.apache.ws.security.message.WSSecDKEncrypt;
-import org.apache.ws.security.message.WSSecDKSign;
-import org.apache.ws.security.message.WSSecHeader;
-import org.apache.ws.security.message.WSSecSecurityContextToken;
-import org.apache.ws.security.message.WSSecSignature;
 import org.w3c.dom.Document;
 
 /**
- * Testcase to test WSSecSecurityContextToken
- * 
- * @see org.apache.ws.security.message.WSSecSecurityContextToken
+ * A set of tests for SecurityContextTokens.
  * 
  * @author Ruchith Fernando (ruchith.fernando@gmail.com)
  */
-public class TestWSSecurityNewSCT extends TestCase implements CallbackHandler {
-    private static final Log LOG = LogFactory.getLog(TestWSSecurityNewSCT.class);
+public class SecurityContextTokenTest extends org.junit.Assert implements CallbackHandler {
+    private static final Log LOG = LogFactory.getLog(SecurityContextTokenTest.class);
 
     private static final String SOAPMSG = 
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" 
@@ -75,14 +67,8 @@ public class TestWSSecurityNewSCT extends TestCase implements CallbackHandler {
      */
     private Map<String, byte[]> secrets = new HashMap<String, byte[]>();
 
-    /**
-     * @param arg0
-     */
-    public TestWSSecurityNewSCT(String arg0) {
-        super(arg0);
-    }
 
-
+    @org.junit.Test
     public void testBuild() {
         try {
             Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
@@ -120,6 +106,7 @@ public class TestWSSecurityNewSCT extends TestCase implements CallbackHandler {
      * Test encryption using a derived key which is based on a secret associated
      * with a security context token
      */
+    @org.junit.Test
     public void testSCTDKTEncrypt() {
         try {
             Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
@@ -158,6 +145,7 @@ public class TestWSSecurityNewSCT extends TestCase implements CallbackHandler {
         }
     }
 
+    @org.junit.Test
     public void testSCTKDKTSign() {
         try {
             Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
@@ -200,6 +188,7 @@ public class TestWSSecurityNewSCT extends TestCase implements CallbackHandler {
      * Test for WSS-217:
      * "Add ability to specify a reference to an absolute URI in the derived key functionality".
      */
+    @org.junit.Test
     public void testSCTKDKTSignAbsolute() {
         try {
             Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
@@ -239,7 +228,7 @@ public class TestWSSecurityNewSCT extends TestCase implements CallbackHandler {
         }
     }
 
-    
+    @org.junit.Test
     public void testSCTKDKTSignEncrypt() {
         try {
             Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
@@ -284,6 +273,7 @@ public class TestWSSecurityNewSCT extends TestCase implements CallbackHandler {
         }
     }
 
+    @org.junit.Test
     public void testSCTKDKTEncryptSign() {
         try {
             Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
@@ -333,6 +323,7 @@ public class TestWSSecurityNewSCT extends TestCase implements CallbackHandler {
      * rather than using a DerivedKeyToken to point to a SecurityContextToken.
      * See WSS-216 - https://issues.apache.org/jira/browse/WSS-216
      */
+    @org.junit.Test
     public void testSCTSign() {
         try {
             Document doc = SOAPUtil.toSOAPPart(SOAPMSG);

@@ -17,16 +17,14 @@
  * under the License.
  */
 
-package wssec;
+package org.apache.ws.security.message;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.common.SOAPUtil;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.message.WSSecSignature;
@@ -42,8 +40,8 @@ import java.io.IOException;
  * This is a test for WSS-60 - "Problems when SOAP envelope namespace prefix is null"
  * http://issues.apache.org/jira/browse/WSS-60
  */
-public class TestWSSecurityWSS60 extends TestCase implements CallbackHandler {
-    private static final Log LOG = LogFactory.getLog(TestWSSecurityWSS60.class);
+public class NoSoapPrefixSignatureTest extends org.junit.Assert implements CallbackHandler {
+    private static final Log LOG = LogFactory.getLog(NoSoapPrefixSignatureTest.class);
     private static final String SOAPMSG = 
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" 
         + "<Envelope "
@@ -61,29 +59,9 @@ public class TestWSSecurityWSS60 extends TestCase implements CallbackHandler {
     private Crypto crypto = CryptoFactory.getInstance();
 
     /**
-     * TestWSSecurity constructor
-     * <p/>
-     * 
-     * @param name name of the test
-     */
-    public TestWSSecurityWSS60(String name) {
-        super(name);
-    }
-
-    /**
-     * JUnit suite
-     * <p/>
-     * 
-     * @return a junit test suite
-     */
-    public static Test suite() {
-        return new TestSuite(TestWSSecurityWSS60.class);
-    }
-
-
-    /**
      * Test signing a SOAP message that has no SOAP namespace prefix
      */
+    @org.junit.Test
     public void testNoSOAPNamespacePrefix() throws Exception {
         WSSecSignature sign = new WSSecSignature();
         sign.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");

@@ -46,11 +46,7 @@ import java.util.List;
 public class WSSecurityEngine {
     public static final String VALUE_TYPE = "ValueType";
     private static Log log = LogFactory.getLog(WSSecurityEngine.class.getName());
-    private static Log tlog =
-            LogFactory.getLog("org.apache.ws.security.TIME");
 
-    private static WSSecurityEngine engine = new WSSecurityEngine();
-    
     /**
      * The WSSConfig instance used by this SecurityEngine to
      * find Processors for processing security headers
@@ -132,23 +128,14 @@ public class WSSecurityEngine {
         new QName(ConversationConstants.WSC_NS_05_12, ConversationConstants.SECURITY_CONTEXT_TOKEN_LN);
     
     /**
-     * Get a singleton instance of security engine.
-     * <p/>
-     *
-     * @return ws-security engine.
-     */
-    public static WSSecurityEngine getInstance() {
-        return engine;
-    }
-    
-    /**
-     * @return      the WSSConfig object set on this instance, or
-     *              the statically defined one, if the instance-level
-     *              config object is null.
+     * @return      the WSSConfig object set on this instance
      */
     public final WSSConfig
     getWssConfig() {
-        return (wssConfig == null) ? WSSConfig.getDefaultWSConfig() : wssConfig;
+        if (wssConfig == null) {
+            wssConfig = WSSConfig.getNewInstance();
+        }
+        return wssConfig;
     }
     
     /**
@@ -286,11 +273,6 @@ public class WSSecurityEngine {
         Crypto sigCrypto,
         Crypto decCrypto
     ) throws WSSecurityException {
-
-        long t0 = 0, t1 = 0, t2 = 0;
-        if (tlog.isDebugEnabled()) {
-            t0 = System.currentTimeMillis();
-        }
         //
         // Gather some info about the document to process and store
         // it for retrieval. Store the implementation of signature crypto
@@ -299,9 +281,6 @@ public class WSSecurityEngine {
         WSDocInfo wsDocInfo = new WSDocInfo(securityHeader.getOwnerDocument());
         wsDocInfo.setCrypto(sigCrypto);
 
-        if (tlog.isDebugEnabled()) {
-            t1 = System.currentTimeMillis();
-        }
         List<WSSecurityEngineResult> returnResults = new ArrayList<WSSecurityEngineResult>();
         final WSSConfig cfg = getWssConfig();
         Node node = securityHeader.getFirstChild();
@@ -331,13 +310,6 @@ public class WSSecurityEngine {
                 }
             }
             node = node.getNextSibling();
-        }
-        if (tlog.isDebugEnabled()) {
-            t2 = System.currentTimeMillis();
-            tlog.debug(
-                "processHeader: total " + (t2 - t0) + ", prepare " + (t1 - t0) 
-                + ", handle " + (t2 - t1)
-            );
         }
         return returnResults;
     }

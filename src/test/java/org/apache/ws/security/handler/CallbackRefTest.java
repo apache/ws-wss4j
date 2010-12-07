@@ -17,19 +17,15 @@
  * under the License.
  */
 
-package wssec;
+package org.apache.ws.security.handler;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSConfig;
-import org.apache.ws.security.handler.WSHandler;
-import org.apache.ws.security.handler.RequestData;
-import org.apache.ws.security.handler.WSHandlerConstants;
+import org.apache.ws.security.common.CustomHandler;
+import org.apache.ws.security.common.SOAPUtil;
 import org.w3c.dom.Document;
 
 import java.io.IOException;
@@ -44,8 +40,8 @@ import javax.security.auth.callback.UnsupportedCallbackException;
  *
  * https://issues.apache.org/jira/browse/WSS-245
  */
-public class TestWSSecurityWSS245 extends TestCase {
-    private static final Log LOG = LogFactory.getLog(TestWSSecurityWSS245.class);
+public class CallbackRefTest extends org.junit.Assert {
+    private static final Log LOG = LogFactory.getLog(CallbackRefTest.class);
     private static final String SOAPMSG = 
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" 
         + "<SOAP-ENV:Envelope "
@@ -60,30 +56,11 @@ public class TestWSSecurityWSS245 extends TestCase {
         + "</SOAP-ENV:Envelope>";
 
     /**
-     * TestWSSecurity constructor
-     * <p/>
-     * 
-     * @param name name of the test
-     */
-    public TestWSSecurityWSS245(String name) {
-        super(name);
-    }
-
-    /**
-     * JUnit suite
-     * <p/>
-     * 
-     * @return a junit test suite
-     */
-    public static Test suite() {
-        return new TestSuite(TestWSSecurityWSS245.class);
-    }
-
-    /**
      * A test for {@link WSHandler#getPassword(String, int, String, String, RequestData)},
      * where the password is obtained from a Callback Handler, which is placed on the 
      * Message Context using a reference.
      */
+    @org.junit.Test
     public void
     testMessageContextRef() throws Exception {
         
@@ -102,7 +79,7 @@ public class TestWSSecurityWSS245 extends TestCase {
         final java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
         actions.add(new Integer(WSConstants.UT));
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
-        MyHandler handler = new MyHandler();
+        CustomHandler handler = new CustomHandler();
         handler.send(
             WSConstants.UT, 
             doc, 
@@ -125,6 +102,7 @@ public class TestWSSecurityWSS245 extends TestCase {
      * where the password is obtained from a Callback Handler, which is obtained from the
      * handler options using a ref.
      */
+    @org.junit.Test
     public void
     testHandlerOptionRef() throws Exception {
         
@@ -138,7 +116,7 @@ public class TestWSSecurityWSS245 extends TestCase {
         final java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
         actions.add(new Integer(WSConstants.UT));
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
-        MyHandler handler = new MyHandler();
+        CustomHandler handler = new CustomHandler();
         handler.setOption(WSHandlerConstants.PW_CALLBACK_REF, new MyCallbackHandler());
         handler.send(
             WSConstants.UT, 

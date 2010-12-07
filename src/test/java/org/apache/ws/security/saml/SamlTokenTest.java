@@ -17,11 +17,7 @@
  * under the License.
  */
 
-package wssec;
-
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+package org.apache.ws.security.saml;
 
 import org.apache.ws.security.saml.SAMLIssuerFactory;
 import org.apache.ws.security.saml.SAMLIssuer;
@@ -32,6 +28,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSSecurityEngineResult;
+import org.apache.ws.security.common.SOAPUtil;
 import org.apache.ws.security.message.WSSecHeader;
 import org.apache.ws.security.message.WSSecSAMLToken;
 import org.w3c.dom.Document;
@@ -45,8 +42,8 @@ import java.util.List;
  * 
  * @author Davanum Srinivas (dims@yahoo.com)
  */
-public class TestWSSecurityNewST1 extends TestCase {
-    private static final Log LOG = LogFactory.getLog(TestWSSecurityNewST1.class);
+public class SamlTokenTest extends org.junit.Assert {
+    private static final Log LOG = LogFactory.getLog(SamlTokenTest.class);
     private static final String SOAPMSG = 
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" 
         + "<SOAP-ENV:Envelope "
@@ -61,26 +58,9 @@ public class TestWSSecurityNewST1 extends TestCase {
     private WSSecurityEngine secEngine = new WSSecurityEngine();
 
     /**
-     * TestWSSecurity constructor
-     * 
-     * @param name name of the test
-     */
-    public TestWSSecurityNewST1(String name) {
-        super(name);
-    }
-
-    /**
-     * JUnit suite
-     * 
-     * @return a junit test suite
-     */
-    public static Test suite() {
-        return new TestSuite(TestWSSecurityNewST1.class);
-    }
-
-    /**
      * Test that creates, sends and processes an unsigned SAML assertion.
      */
+    @org.junit.Test
     public void testSAMLUnsignedSenderVouches() throws Exception {
         SAMLIssuer saml = SAMLIssuerFactory.getInstance("saml.properties");
 

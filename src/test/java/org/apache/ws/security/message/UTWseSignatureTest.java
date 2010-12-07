@@ -17,22 +17,18 @@
  * under the License.
  */
 
-package wssec;
+package org.apache.ws.security.message;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.common.CustomHandler;
+import org.apache.ws.security.common.SOAPUtil;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.handler.WSHandlerConstants;
-import org.apache.ws.security.message.WSSecUsernameToken;
-import org.apache.ws.security.message.WSSecSignature;
-import org.apache.ws.security.message.WSSecHeader;
 
 import org.w3c.dom.Document;
 
@@ -43,13 +39,12 @@ import java.io.IOException;
 
 
 /**
- * WS-Security Test Case
- * <p/>
+ * This a test for deriving a key from a Username Token using a non-standard (WSE) implementation.
  * 
  * @author Werner Dittmann (Wern.erDittmann@siemens.com)
  */
-public class TestWSSecurityNew13 extends TestCase implements CallbackHandler {
-    private static final Log LOG = LogFactory.getLog(TestWSSecurityNew13.class);
+public class UTWseSignatureTest extends org.junit.Assert implements CallbackHandler {
+    private static final Log LOG = LogFactory.getLog(UTWseSignatureTest.class);
     private static final String SOAPMSG = 
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" 
         + "<SOAP-ENV:Envelope "
@@ -66,31 +61,12 @@ public class TestWSSecurityNew13 extends TestCase implements CallbackHandler {
     private WSSecurityEngine secEngine = new WSSecurityEngine();
 
     /**
-     * TestWSSecurity constructor
-     * <p/>
-     * 
-     * @param name name of the test
-     */
-    public TestWSSecurityNew13(String name) {
-        super(name);
-    }
-
-    /**
-     * JUnit suite
-     * <p/>
-     * 
-     * @return a junit test suite
-     */
-    public static Test suite() {
-        return new TestSuite(TestWSSecurityNew13.class);
-    }
-
-    /**
      * Test the specific signing method that use UsernameToken values
      * <p/>
      * 
      * @throws java.lang.Exception Thrown when there is any problem in signing or verification
      */
+    @org.junit.Test
     public void testUsernameTokenSigning() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
 
@@ -130,6 +106,7 @@ public class TestWSSecurityNew13 extends TestCase implements CallbackHandler {
      * Test the specific signing method that use UsernameToken values
      * Test that uses a 32 byte key length for the secret key, instead of the default 16 bytes.
      */
+    @org.junit.Test
     public void testWSS226() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
 
@@ -184,8 +161,9 @@ public class TestWSSecurityNew13 extends TestCase implements CallbackHandler {
      * Test that uses a 32 byte key length for the secret key, instead of the default 16 bytes.
      * This test configures the key length via WSHandler.
      */
+    @org.junit.Test
     public void testWSS226Handler() throws Exception {
-        MyHandler handler = new MyHandler();
+        CustomHandler handler = new CustomHandler();
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         
         RequestData reqData = new RequestData();
@@ -233,6 +211,7 @@ public class TestWSSecurityNew13 extends TestCase implements CallbackHandler {
      * 
      * @throws java.lang.Exception Thrown when there is any problem in signing or verification
      */
+    @org.junit.Test
     public void testUsernameTokenSigningDigest() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
 

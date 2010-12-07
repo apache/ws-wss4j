@@ -62,7 +62,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public abstract class WSHandler {
     private static Log log = LogFactory.getLog(WSHandler.class.getName());
-    protected WSSecurityEngine secEngine = WSSecurityEngine.getInstance();
+    protected WSSecurityEngine secEngine = new WSSecurityEngine();
     protected Map<String, Crypto> cryptos = new ConcurrentHashMap<String, Crypto>();
 
     private boolean doDebug = log.isDebugEnabled();

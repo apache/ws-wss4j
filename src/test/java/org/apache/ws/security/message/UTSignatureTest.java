@@ -16,11 +16,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package wssec;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+package org.apache.ws.security.message;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
@@ -29,13 +27,12 @@ import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSecurityEngine;
+import org.apache.ws.security.common.CustomHandler;
+import org.apache.ws.security.common.SOAPUtil;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.handler.WSHandlerConstants;
-import org.apache.ws.security.message.WSSecHeader;
-import org.apache.ws.security.message.WSSecSignature;
-import org.apache.ws.security.message.WSSecUsernameToken;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 
@@ -50,13 +47,13 @@ import java.util.List;
 /**
  * WS-Security Test Case for UsernameToken Key Derivation, as defined in the 
  * UsernameTokenProfile 1.1 specification. The derived keys are used for signature.
- * Note that this functionality is different to the TestWSSecurityUTDK test case,
+ * Note that this functionality is different to the UTDerivedKeyTest test case,
  * which uses the derived key in conjunction with wsc:DerivedKeyToken. It's also
- * different to TestWSSecurityNew13, which derives a key for signature using a 
+ * different to UTWseSignatureTest, which derives a key for signature using a 
  * non-standard implementation.
  */
-public class TestWSSecurityUTSignature extends TestCase implements CallbackHandler {
-    private static final Log LOG = LogFactory.getLog(TestWSSecurityUTSignature.class);
+public class UTSignatureTest extends org.junit.Assert implements CallbackHandler {
+    private static final Log LOG = LogFactory.getLog(UTSignatureTest.class);
     private static final String SOAPMSG = 
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" 
         + "<SOAP-ENV:Envelope "
@@ -74,29 +71,9 @@ public class TestWSSecurityUTSignature extends TestCase implements CallbackHandl
     private Crypto crypto = CryptoFactory.getInstance();
 
     /**
-     * TestWSSecurity constructor
-     * <p/>
-     * 
-     * @param name name of the test
-     */
-    public TestWSSecurityUTSignature(String name) {
-        super(name);
-    }
-
-    /**
-     * JUnit suite
-     * <p/>
-     * 
-     * @return a junit test suite
-     */
-    public static Test suite() {
-        return new TestSuite(TestWSSecurityUTSignature.class);
-    }
-
-
-    /**
      * Test using a UsernameToken derived key for signing a SOAP body
      */
+    @org.junit.Test
     public void testSignature() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         WSSecHeader secHeader = new WSSecHeader();
@@ -140,6 +117,7 @@ public class TestWSSecurityUTSignature extends TestCase implements CallbackHandl
      * Test using a UsernameToken derived key for signing a SOAP body. In this test the
      * user is "alice" rather than "bob", and so signature verification should fail.
      */
+    @org.junit.Test
     public void testBadUserSignature() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         WSSecHeader secHeader = new WSSecHeader();
@@ -178,6 +156,7 @@ public class TestWSSecurityUTSignature extends TestCase implements CallbackHandl
     /**
      * Test using a UsernameToken derived key for signing a SOAP body via WSHandler
      */
+    @org.junit.Test
     public void testHandlerSignature() throws Exception {
         
         final WSSConfig cfg = WSSConfig.getNewInstance();
@@ -193,7 +172,7 @@ public class TestWSSecurityUTSignature extends TestCase implements CallbackHandl
         actions.add(new Integer(WSConstants.UT_SIGN));
         
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
-        MyHandler handler = new MyHandler();
+        CustomHandler handler = new CustomHandler();
         handler.send(
             WSConstants.UT_SIGN, 
             doc, 
@@ -223,6 +202,7 @@ public class TestWSSecurityUTSignature extends TestCase implements CallbackHandl
     /**
      * Test using a UsernameToken derived key for signing a SOAP body via WSHandler
      */
+    @org.junit.Test
     public void testHandlerSignatureIterations() throws Exception {
         
         final WSSConfig cfg = WSSConfig.getNewInstance();
@@ -239,7 +219,7 @@ public class TestWSSecurityUTSignature extends TestCase implements CallbackHandl
         actions.add(new Integer(WSConstants.UT_SIGN));
         
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
-        MyHandler handler = new MyHandler();
+        CustomHandler handler = new CustomHandler();
         handler.send(
             WSConstants.UT_SIGN, 
             doc, 

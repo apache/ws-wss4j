@@ -16,11 +16,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package wssec;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+package org.apache.ws.security.message;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
@@ -28,12 +26,10 @@ import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSecurityEngine;
+import org.apache.ws.security.common.EncodedPasswordCallbackHandler;
+import org.apache.ws.security.common.SOAPUtil;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
-import org.apache.ws.security.message.WSSecDKEncrypt;
-import org.apache.ws.security.message.WSSecDKSign;
-import org.apache.ws.security.message.WSSecHeader;
-import org.apache.ws.security.message.WSSecUsernameToken;
 import org.apache.ws.security.message.token.UsernameToken;
 import org.apache.ws.security.util.Base64;
 import org.apache.ws.security.util.WSSecurityUtil;
@@ -54,8 +50,8 @@ import java.util.List;
  * UsernameTokenProfile 1.1 specification. The derived keys are used to encrypt
  * and sign, as per wsc:DerivedKeyToken.
  */
-public class TestWSSecurityUTDK extends TestCase implements CallbackHandler {
-    private static final Log LOG = LogFactory.getLog(TestWSSecurityUTDK.class);
+public class UTDerivedKeyTest extends org.junit.Assert implements CallbackHandler {
+    private static final Log LOG = LogFactory.getLog(UTDerivedKeyTest.class);
     private static final String SOAPMSG = 
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" 
         + "<SOAP-ENV:Envelope "
@@ -73,29 +69,9 @@ public class TestWSSecurityUTDK extends TestCase implements CallbackHandler {
     private Crypto crypto = CryptoFactory.getInstance();
 
     /**
-     * TestWSSecurity constructor
-     * <p/>
-     * 
-     * @param name name of the test
-     */
-    public TestWSSecurityUTDK(String name) {
-        super(name);
-    }
-
-    /**
-     * JUnit suite
-     * <p/>
-     * 
-     * @return a junit test suite
-     */
-    public static Test suite() {
-        return new TestSuite(TestWSSecurityUTDK.class);
-    }
-
-
-    /**
      * Unit test for the UsernameToken derived key functionality 
      */
+    @org.junit.Test
     public void testUsernameTokenUnit() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         WSSecHeader secHeader = new WSSecHeader();
@@ -138,6 +114,7 @@ public class TestWSSecurityUTDK extends TestCase implements CallbackHandler {
     /**
      * Test for encoded passwords.
      */
+    @org.junit.Test
     public void testDerivedKeyWithEncodedPasswordBaseline() throws Exception {
         String password = "password";
         // The SHA-1 of the password is known as a password equivalent in the UsernameToken specification.
@@ -153,6 +130,7 @@ public class TestWSSecurityUTDK extends TestCase implements CallbackHandler {
     /**
      * Test using a UsernameToken derived key for encrypting a SOAP body
      */
+    @org.junit.Test
     public void testDerivedKeyEncryption() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         WSSecHeader secHeader = new WSSecHeader();
@@ -195,6 +173,7 @@ public class TestWSSecurityUTDK extends TestCase implements CallbackHandler {
     /**
      * Test using a UsernameToken derived key for encrypting a SOAP body
      */
+    @org.junit.Test
     public void testDerivedKeyEncryptionWithEncodedPassword() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         WSSecHeader secHeader = new WSSecHeader();
@@ -208,7 +187,6 @@ public class TestWSSecurityUTDK extends TestCase implements CallbackHandler {
         
         byte[] derivedKey = builder.getDerivedKey();
         assertTrue(derivedKey.length == 20);
-        
         String tokenIdentifier = builder.getId();
         
         //
@@ -232,19 +210,18 @@ public class TestWSSecurityUTDK extends TestCase implements CallbackHandler {
             LOG.debug(outputString);
         }
         
-        boolean passwordsAreEnabledOrig = WSSecurityEngine.getInstance().getWssConfig().getPasswordsAreEncoded();
-        try {
-            WSSecurityEngine.getInstance().getWssConfig().setPasswordsAreEncoded(true);
-            verify(encryptedDoc);
-        } finally {
-            WSSecurityEngine.getInstance().getWssConfig().setPasswordsAreEncoded(passwordsAreEnabledOrig);
-        }
+        WSSecurityEngine newEngine = new WSSecurityEngine();
+        newEngine.getWssConfig().setPasswordsAreEncoded(true);
+        newEngine.processSecurityHeader(
+            encryptedDoc, null, new EncodedPasswordCallbackHandler(), null
+        );
     }
     
     /**
      * Test using a UsernameToken derived key for encrypting a SOAP body. In this test the
      * derived key is modified before encryption, and so decryption should fail.
      */
+    @org.junit.Test
     public void testDerivedKeyChangedEncryption() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         WSSecHeader secHeader = new WSSecHeader();
@@ -295,6 +272,7 @@ public class TestWSSecurityUTDK extends TestCase implements CallbackHandler {
      * Test using a UsernameToken derived key for encrypting a SOAP body. In this test the
      * user is "alice" rather than "bob", and so decryption should fail.
      */
+    @org.junit.Test
     public void testDerivedKeyBadUserEncryption() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         WSSecHeader secHeader = new WSSecHeader();
@@ -343,6 +321,7 @@ public class TestWSSecurityUTDK extends TestCase implements CallbackHandler {
     /**
      * Test using a UsernameToken derived key for signing a SOAP body
      */
+    @org.junit.Test
     public void testDerivedKeySignature() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         WSSecHeader secHeader = new WSSecHeader();
@@ -390,6 +369,7 @@ public class TestWSSecurityUTDK extends TestCase implements CallbackHandler {
     /**
      * Test using a UsernameToken derived key for signing a SOAP body
      */
+    @org.junit.Test
     public void testDerivedKeySignatureWithEncodedPassword() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         WSSecHeader secHeader = new WSSecHeader();
@@ -426,19 +406,17 @@ public class TestWSSecurityUTDK extends TestCase implements CallbackHandler {
             LOG.debug(outputString);
         }
         
-        boolean passwordsAreEnabledOrig = WSSecurityEngine.getInstance().getWssConfig().getPasswordsAreEncoded();
-        try {
-            WSSecurityEngine.getInstance().getWssConfig().setPasswordsAreEncoded(true);
-            List<WSSecurityEngineResult> results = verify(signedDoc);
-            WSSecurityEngineResult actionResult =
-                WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
-            java.security.Principal principal = 
-                (java.security.Principal) actionResult.get(WSSecurityEngineResult.TAG_PRINCIPAL);
-            // System.out.println(principal.getName());
-            assertTrue(principal.getName().indexOf("DK") != -1);
-        } finally {
-            WSSecurityEngine.getInstance().getWssConfig().setPasswordsAreEncoded(passwordsAreEnabledOrig);
-        }
+        WSSecurityEngine newEngine = new WSSecurityEngine();
+        newEngine.getWssConfig().setPasswordsAreEncoded(true);
+        List<WSSecurityEngineResult> results =  newEngine.processSecurityHeader(
+            signedDoc, null, new EncodedPasswordCallbackHandler(), null
+        );
+        WSSecurityEngineResult actionResult =
+            WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
+        java.security.Principal principal = 
+            (java.security.Principal) actionResult.get(WSSecurityEngineResult.TAG_PRINCIPAL);
+        // System.out.println(principal.getName());
+        assertTrue(principal.getName().indexOf("DK") != -1);
     }
     
     /**
@@ -446,6 +424,7 @@ public class TestWSSecurityUTDK extends TestCase implements CallbackHandler {
      * derived key is modified before signature, and so signature verification should
      * fail.
      */
+    @org.junit.Test
     public void testDerivedKeyChangedSignature() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         WSSecHeader secHeader = new WSSecHeader();
@@ -491,6 +470,7 @@ public class TestWSSecurityUTDK extends TestCase implements CallbackHandler {
      * Test using a UsernameToken derived key for signing a SOAP body. In this test the
      * user is "alice" rather than "bob", and so signature verification should fail.
      */
+    @org.junit.Test
     public void testDerivedKeyBadUserSignature() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         WSSecHeader secHeader = new WSSecHeader();
@@ -549,12 +529,7 @@ public class TestWSSecurityUTDK extends TestCase implements CallbackHandler {
                 WSPasswordCallback pc = (WSPasswordCallback) callbacks[i];
                 if (pc.getUsage() == WSPasswordCallback.USERNAME_TOKEN_UNKNOWN
                     && "bob".equals(pc.getIdentifier())) {
-                    if (WSSecurityEngine.getInstance().getWssConfig().getPasswordsAreEncoded()) {
-                        // "jux7xGGAjguKKHg9C+waOiLrCCE=" is the Base64 encoded SHA-1 hash of "security".
-                        pc.setPassword("jux7xGGAjguKKHg9C+waOiLrCCE=");
-                    } else {
-                        pc.setPassword("security");
-                    }
+                    pc.setPassword("security");
                 } else {
                     throw new IOException("Authentication failed");
                 }

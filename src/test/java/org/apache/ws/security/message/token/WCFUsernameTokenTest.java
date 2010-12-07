@@ -17,11 +17,8 @@
  * under the License.
  */
 
-package wssec;
+package org.apache.ws.security.message.token;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSSecurityException;
@@ -29,6 +26,7 @@ import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSConfig;
+import org.apache.ws.security.common.SOAPUtil;
 import org.w3c.dom.Document;
 
 import javax.security.auth.callback.Callback;
@@ -43,8 +41,8 @@ import java.io.IOException;
  * The issue is that WCF generated Username Tokens where the password type is namespace
  * qualified (incorrectly). WSS-199 added the ability to process these Username Tokens.
  */
-public class TestWSSecurityWSS199 extends TestCase implements CallbackHandler {
-    private static final Log LOG = LogFactory.getLog(TestWSSecurityWSS199.class);
+public class WCFUsernameTokenTest extends org.junit.Assert implements CallbackHandler {
+    private static final Log LOG = LogFactory.getLog(WCFUsernameTokenTest.class);
     private static final String SOAPUTMSG = 
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" 
         + "<SOAP-ENV:Envelope xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" "
@@ -66,28 +64,10 @@ public class TestWSSecurityWSS199 extends TestCase implements CallbackHandler {
     private WSSecurityEngine secEngine = new WSSecurityEngine();
 
     /**
-     * TestWSSecurity constructor
-     * 
-     * @param name name of the test
-     */
-    public TestWSSecurityWSS199(String name) {
-        super(name);
-    }
-
-    /**
-     * JUnit suite
-     * 
-     * @return a junit test suite
-     */
-    public static Test suite() {
-        return new TestSuite(TestWSSecurityWSS199.class);
-    }
-
-
-    /**
      * Test that adds a UserNameToken with a namespace qualified type. This should fail
      * as WSS4J rejects these tokens by default.
      */
+    @org.junit.Test
     public void testNamespaceQualifiedTypeRejected() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUTMSG);
 
@@ -110,6 +90,7 @@ public class TestWSSecurityWSS199 extends TestCase implements CallbackHandler {
      * Test that adds a UserNameToken with a namespace qualified type. This should pass
      * as WSS4J has been configured to accept these tokens.
      */
+    @org.junit.Test
     public void testNamespaceQualifiedTypeAccepted() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUTMSG);
 

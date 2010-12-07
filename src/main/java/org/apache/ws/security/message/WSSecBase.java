@@ -46,7 +46,7 @@ public class WSSecBase {
 
     protected boolean doDebug = false;
 
-    protected WSSConfig wssConfig = WSSConfig.getDefaultWSConfig();
+    protected WSSConfig wssConfig = WSSConfig.getNewInstance();
     
     /**
      * Set which parts of the message to encrypt/sign. <p/>

@@ -30,7 +30,7 @@ Build Instructions:
         <!--<property name='product.version.level' value='0'/>-->
         <property name='product.version.qualifier' value='-SNAPSHOT'/>
         <property name='product.version' value='${product.version.major}.${product.version.minor}${product.version.qualifier}'/>
-        <property name="year" value="2008"/>
+        <property name="year" value="2010"/>
         <property name="copyright" value="Copyright &#169; ${year} Apache WSS4J Project. All Rights Reserved."/>
 
         <!-- Give user a chance to override without editing this file
@@ -42,9 +42,9 @@ Build Instructions:
         <property name="dir.dist" value="./dist"/>
         <property name="dir.libs" value="./lib"/>
         <property name="dir.endorsed.libs" value="./endorsed"/>
-        <property name="dir.src" value="./src"/>
-        <property name="dir.test" value="./test"/>
-        <property name="dir.keys" value="./keys"/>
+        <property name="dir.src" value="./src/main"/>
+        <property name="dir.test" value="./src/test"/>
+        <property name="dir.keys" value="./src/test/resources/keys"/>
 
         <property name="build.dir" value="./build"/>
         <property name="build.classes" value="${build.dir}/classes"/>
@@ -109,7 +109,8 @@ Build Instructions:
         <path id="classpath.test">
             <!-- classpath for test is librarypath plus junit -->
             <path refid="classpath.library"/>
-<!--            <pathelement path="${java.class.path}"/> -->
+            <pathelement path="${build.classes}/resources"/>
+            <pathelement path="${build.classes}/resources/keys"/>
         </path>
 
         <path id="classpath.test.jar">
@@ -127,10 +128,6 @@ Build Instructions:
         <patternset id="srcFiles">
          <!-- for some strange reasons, I can't use ${src} but must use src -->
             <include name="src/**/*"/>
-        </patternset>
-
-        <patternset id="srcUnitTestsFiles">
-            <include name="test/**/*"/>
         </patternset>
 
         <property name="javadoc.packages"
@@ -207,7 +204,7 @@ org.apache.ws.security.util
         <mkdir dir="${build.dir}/test-reports"/>
 
         <available property="junit.present" 
-                classname="junit.framework.TestCase">
+                classname="org.junit.Assert">
             <!-- check whether JUnit is available -->
             <classpath refid="classpath.test"/>
         </available>
@@ -323,8 +320,7 @@ org.apache.ws.security.util
             <formatter type="xml"/>
             <batchtest todir="${build.dir}/test-reports">
                 <fileset dir="${build.classes}">
-                    <include name="**/wssec/PackageTests.class"/>
-                    <include name="**/components/PackageTests.class"/>
+                    <include name="**/*Test.class"/>
                 </fileset>
             </batchtest>
         </junit>

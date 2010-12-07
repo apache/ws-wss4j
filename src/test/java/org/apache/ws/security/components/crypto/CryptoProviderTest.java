@@ -17,21 +17,17 @@
  * under the License.
  */
 
-package wssec;
+package org.apache.ws.security.components.crypto;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.components.crypto.Crypto;
-import org.apache.ws.security.components.crypto.CryptoFactory;
+import org.apache.ws.security.common.SOAPUtil;
 import org.apache.ws.security.message.WSSecEncrypt;
-import org.apache.ws.security.message.WSSecSignature;
 import org.apache.ws.security.message.WSSecHeader;
+import org.apache.ws.security.message.WSSecSignature;
 import org.w3c.dom.Document;
 
 import javax.security.auth.callback.Callback;
@@ -54,8 +50,8 @@ import java.security.cert.X509Certificate;
  * -dname "1.2.840.113549.1.9.1=#16125765726e6572406578616d706c652e636f6d,CN=Werner,
  * OU=WSS4J,O=Apache,L=Munich,ST=Bayern,C=DE"
  */
-public class TestWSSecurityWSS86 extends TestCase implements CallbackHandler {
-    private static final Log LOG = LogFactory.getLog(TestWSSecurityWSS86.class);
+public class CryptoProviderTest extends org.junit.Assert implements CallbackHandler {
+    private static final Log LOG = LogFactory.getLog(CryptoProviderTest.class);
     private static final String SOAPMSG = 
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" 
         + "<SOAP-ENV:Envelope "
@@ -71,32 +67,15 @@ public class TestWSSecurityWSS86 extends TestCase implements CallbackHandler {
     private WSSecurityEngine secEngine = new WSSecurityEngine();
     private Crypto crypto;
 
-    /**
-     * TestWSSecurity constructor
-     * <p/>
-     * 
-     * @param name name of the test
-     */
-    public TestWSSecurityWSS86(String name) {
-        super(name);
+    public CryptoProviderTest() {
         secEngine.getWssConfig(); //make sure BC gets registered
         crypto = CryptoFactory.getInstance("wss86.properties");
     }
 
     /**
-     * JUnit suite
-     * <p/>
-     * 
-     * @return a junit test suite
-     */
-    public static Test suite() {
-        return new TestSuite(TestWSSecurityWSS86.class);
-    }
-
-    
-    /**
      * A unit test...
      */
+    @org.junit.Test
     public void testGetAliasWithReversedDN() throws Exception {
         String issuer = "C=DE,ST=Bayern,L=Munich,O=Apache,OU=WSS4J,CN=Werner,E=Werner@example.com";
         
@@ -110,6 +89,7 @@ public class TestWSSecurityWSS86 extends TestCase implements CallbackHandler {
     /**
      * Test signing a SOAP message using a cert with an OID
      */
+    @org.junit.Test
     public void testSignatureOID() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         WSSecSignature sign = new WSSecSignature();
@@ -132,6 +112,7 @@ public class TestWSSecurityWSS86 extends TestCase implements CallbackHandler {
      * Test loading a certificate using BouncyCastle, and using it to encrypt a message, but
      * decrypt the message using the Java Keystore provider
      */
+    @org.junit.Test
     public void testInterop() throws Exception {
         // 
         // This cert corresponds to the cert in wss86.keystore
@@ -182,6 +163,7 @@ public class TestWSSecurityWSS86 extends TestCase implements CallbackHandler {
      * decrypt the message using the Java Keystore provider. In this case though the cert doesn't
      * correspond with the cert in wss86.keystore.
      */
+    @org.junit.Test
     public void testBadInterop() throws Exception {
         byte[] certBytes = 
             org.apache.ws.security.util.Base64.decode(

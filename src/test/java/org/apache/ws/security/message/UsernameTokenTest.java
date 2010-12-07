@@ -27,6 +27,7 @@ import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.common.CustomHandler;
+import org.apache.ws.security.common.EncodedPasswordCallbackHandler;
 import org.apache.ws.security.common.SOAPUtil;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.handler.WSHandlerConstants;
@@ -174,13 +175,9 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         }
         LOG.info("After adding UsernameToken PW Digest....");
 
-        boolean passwordsAreEnabledOrig = WSSecurityEngine.getInstance().getWssConfig().getPasswordsAreEncoded();
-        try {
-            WSSecurityEngine.getInstance().getWssConfig().setPasswordsAreEncoded(true);
-            verify(signedDoc);
-        } finally {
-            WSSecurityEngine.getInstance().getWssConfig().setPasswordsAreEncoded(passwordsAreEnabledOrig);
-        }
+        WSSecurityEngine newEngine = new WSSecurityEngine();
+        newEngine.getWssConfig().setPasswordsAreEncoded(true);
+        newEngine.processSecurityHeader(signedDoc, null, new EncodedPasswordCallbackHandler(), null);
     }
     
     /**
@@ -696,21 +693,15 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         secEngine.processSecurityHeader(doc, null, this, null);
         LOG.info("After verifying UsernameToken....");
     }
-
+    
     public void handle(Callback[] callbacks)
         throws IOException, UnsupportedCallbackException {
         for (int i = 0; i < callbacks.length; i++) {
             if (callbacks[i] instanceof WSPasswordCallback) {
                 WSPasswordCallback pc = (WSPasswordCallback) callbacks[i];
-                boolean passwordsAreEncoded = WSSecurityEngine.getInstance().getWssConfig().getPasswordsAreEncoded();
                 if (pc.getUsage() == WSPasswordCallback.USERNAME_TOKEN
                     && "wernerd".equals(pc.getIdentifier())) {
-                    if (passwordsAreEncoded) {
-                        // "hGqoUreBgahTJblQ3DbJIkE6uNs=" is the Base64 encoded SHA-1 hash of "verySecret".
-                        pc.setPassword("hGqoUreBgahTJblQ3DbJIkE6uNs=");
-                    } else {
-                        pc.setPassword("verySecret");
-                    }
+                    pc.setPassword("verySecret");
                 } else if (pc.getUsage() == WSPasswordCallback.USERNAME_TOKEN
                     && "emptyuser".equals(pc.getIdentifier())) {
                     pc.setPassword("");

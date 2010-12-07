@@ -50,6 +50,8 @@ public class SecurityContextToken {
      */
     protected Element elementIdentifier = null;
     
+    private WSSConfig wssConfig = WSSConfig.getNewInstance();
+    
     /**
      * Constructor to create the SCT
      *
@@ -91,7 +93,7 @@ public class SecurityContextToken {
         
         elementIdentifier.appendChild(doc.createTextNode(uuid));
         
-        setID(WSSConfig.getDefaultWSConfig().getIdAllocator().createSecureId("sctId-", element));
+        setID(wssConfig.getIdAllocator().createSecureId("sctId-", element));
     }
 
     /**

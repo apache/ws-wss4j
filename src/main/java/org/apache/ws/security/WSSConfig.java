@@ -169,8 +169,6 @@ public class WSSConfig {
         DEFAULT_PROCESSORS = java.util.Collections.unmodifiableMap(tmp);
     }
 
-    protected static WSSConfig defaultConfig = null;
-
     protected boolean wsiBSPCompliant = false;
 
     /**
@@ -335,17 +333,6 @@ public class WSSConfig {
         return new WSSConfig();
     }
 
-    /**
-     * returns a static WSConfig instance that is configured with the latest
-     * OASIS WS-Security settings.
-     */
-    public static WSSConfig getDefaultWSConfig() {
-        if (defaultConfig == null) {
-            defaultConfig = getNewInstance();
-        }
-        return defaultConfig;
-    }
-    
     /**
      * Checks if we are in WS-I Basic Security Profile compliance mode
      * 
