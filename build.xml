@@ -42,9 +42,10 @@ Build Instructions:
         <property name="dir.dist" value="./dist"/>
         <property name="dir.libs" value="./lib"/>
         <property name="dir.endorsed.libs" value="./endorsed"/>
-        <property name="dir.src" value="./src/main"/>
-        <property name="dir.test" value="./src/test"/>
-        <property name="dir.keys" value="./src/test/resources/keys"/>
+        <property name="dir.src.java" value="./src/main/java"/>
+        <property name="dir.src.resources" value="./src/main/resources"/>
+        <property name="dir.test.java" value="./src/test/java"/>
+        <property name="dir.test.resources" value="./src/test/resources"/>
 
         <property name="build.dir" value="./build"/>
         <property name="build.classes" value="${build.dir}/classes"/>
@@ -119,16 +120,6 @@ Build Instructions:
             <pathelement path="${build.dir}/${jar.library}"/>
             <pathelement path="${build.dir}/${jar.tests}"/>
         </path>
-
-        <patternset id="distFiles">
-            <include name="build.xml"/>
-            <include name="LICENSE.txt"/>
-        </patternset>
-
-        <patternset id="srcFiles">
-         <!-- for some strange reasons, I can't use ${src} but must use src -->
-            <include name="src/**/*"/>
-        </patternset>
 
         <property name="javadoc.packages"
             value="
@@ -235,7 +226,7 @@ org.apache.ws.security.util
         <!-- create directories -->
         <mkdir dir="${build.classes}"/>
         <copy todir="${build.classes}">
-            <fileset dir="${dir.src}">
+            <fileset dir="${dir.src.java}">
                 <include name="META-INF/*"/>
             </fileset>
         </copy>
@@ -253,8 +244,8 @@ org.apache.ws.security.util
             classpathref="classpath.test">
             <!-- additionalparam="-breakiterator"-->
             <sourcepath>
-                <pathelement location="${dir.src}"/>
-                <pathelement location="${dir.test}"/>
+                <pathelement location="${dir.src.java}"/>
+                <pathelement location="${dir.test.java}"/>
             </sourcepath>
         </javadoc>
     </target>
@@ -282,14 +273,14 @@ org.apache.ws.security.util
 
     <target name="compile.library" depends="prepare-src">
         <!-- Compile the java code from ${dir.src} into ${build.classes} -->
-        <javac srcdir="${dir.src}" destdir="${build.classes}" debug="on" source="1.5" target="1.5" includeAntRuntime="false">
+        <javac srcdir="${dir.src.java}" destdir="${build.classes}" debug="on" source="1.5" target="1.5" includeAntRuntime="false">
             <classpath refid="classpath.library"/>
             <!--<compilerarg value="-Xlint"/>-->
             <exclude name="**/Merlin.java" unless="merlin.ok"/>
         </javac>
         <!-- Copy Property files -->
         <copy todir="${build.classes}">
-            <fileset dir="${dir.src}">
+            <fileset dir="${dir.src.resources}">
                 <include name="**/*.properties"/>
             </fileset>
         </copy>
@@ -297,13 +288,13 @@ org.apache.ws.security.util
 
     <target name="compile.tests" if="junit.present">
 
-        <javac srcdir="${dir.test}" destdir="${build.classes}" debug="on" source="1.5" target="1.5" includeAntRuntime="false">
+        <javac srcdir="${dir.test.java}" destdir="${build.classes}" debug="on" source="1.5" target="1.5" includeAntRuntime="false">
             <classpath refid="classpath.test"/>
         </javac>
 
         <!-- Copy Property files -->
         <copy todir="${build.classes}">
-            <fileset dir="${dir.test}" includes="**/*.properties"/>
+            <fileset dir="${dir.test.resources}" includes="**/*"/>
         </copy>
     </target>
 

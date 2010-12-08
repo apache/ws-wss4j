@@ -24,21 +24,19 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDataRef;
 import org.apache.ws.security.WSEncryptionPart;
-import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSSecurityEngineResult;
+import org.apache.ws.security.common.KeystoreCallbackHandler;
 import org.apache.ws.security.common.SOAPUtil;
+import org.apache.ws.security.common.SecretKeyCallbackHandler;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 
-import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.xml.crypto.dsig.SignatureMethod;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -47,7 +45,7 @@ import java.util.ArrayList;
  * 
  * @author Davanum Srinivas (dims@yahoo.com)
  */
-public class SignatureEncryptionTest extends org.junit.Assert implements CallbackHandler {
+public class SignatureEncryptionTest extends org.junit.Assert {
     private static final Log LOG = LogFactory.getLog(SignatureEncryptionTest.class);
     private static final String SOAPMSG = 
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" 
@@ -63,6 +61,7 @@ public class SignatureEncryptionTest extends org.junit.Assert implements Callbac
         + "</SOAP-ENV:Envelope>";
 
     private WSSecurityEngine secEngine = new WSSecurityEngine();
+    private CallbackHandler callbackHandler = new KeystoreCallbackHandler();
     private Crypto crypto = CryptoFactory.getInstance();
     
     private static final byte[] key = {
@@ -347,7 +346,15 @@ public class SignatureEncryptionTest extends org.junit.Assert implements Callbac
             LOG.debug(outputString);
         }
         LOG.info("After Encryption....");
-        verify(encryptedSignedDoc);
+        
+        SecretKeyCallbackHandler secretKeyCallbackHandler = new SecretKeyCallbackHandler();
+        secretKeyCallbackHandler.setOutboundSecret(key);
+        secEngine.processSecurityHeader(doc, null, secretKeyCallbackHandler, crypto);
+        if (LOG.isDebugEnabled()) {
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+            LOG.debug(outputString);
+        }
     }
     
     /**
@@ -410,7 +417,7 @@ public class SignatureEncryptionTest extends org.junit.Assert implements Callbac
      */
     private List<WSSecurityEngineResult> verify(Document doc) throws Exception {
         List<WSSecurityEngineResult> resultList = 
-            secEngine.processSecurityHeader(doc, null, this, crypto);
+            secEngine.processSecurityHeader(doc, null, callbackHandler, crypto);
         if (LOG.isDebugEnabled()) {
             String outputString = 
                 org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
@@ -420,20 +427,4 @@ public class SignatureEncryptionTest extends org.junit.Assert implements Callbac
         return resultList;
     }
 
-    public void handle(Callback[] callbacks) throws IOException,
-        UnsupportedCallbackException {
-        for (int i = 0; i < callbacks.length; i++) {
-            if (callbacks[i] instanceof WSPasswordCallback) {
-                WSPasswordCallback pc = (WSPasswordCallback) callbacks[i];
-                if (pc.getUsage() == WSPasswordCallback.KEY_NAME) {
-                    pc.setKey(key);
-                } else {
-                    pc.setPassword("security");
-                }
-            } else {
-                throw new UnsupportedCallbackException(callbacks[i],
-                        "Unrecognized Callback");
-            }
-        }
-    }
 }

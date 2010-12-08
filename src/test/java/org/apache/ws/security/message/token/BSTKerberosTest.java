@@ -22,10 +22,10 @@ package org.apache.ws.security.message.token;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSEncryptionPart;
-import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.common.KeystoreCallbackHandler;
 import org.apache.ws.security.common.SOAPUtil;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
@@ -36,16 +36,13 @@ import org.apache.ws.security.message.token.BinarySecurity;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 
-import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.callback.UnsupportedCallbackException;
-import java.io.IOException;
 import java.util.ArrayList;
 
 /**
  * This is a test for the Kerberos Token Profile 1.1
  */
-public class BSTKerberosTest extends org.junit.Assert implements CallbackHandler {
+public class BSTKerberosTest extends org.junit.Assert {
     private static final Log LOG = LogFactory.getLog(BSTKerberosTest.class);
     private static final String AP_REQ = 
         "http://docs.oasis-open.org/wss/oasis-wss-kerberos-token-profile-1.1#Kerberosv5_AP_REQ";
@@ -65,6 +62,7 @@ public class BSTKerberosTest extends org.junit.Assert implements CallbackHandler
         + "</SOAP-ENV:Envelope>";
     
     private WSSecurityEngine secEngine = new WSSecurityEngine();
+    private CallbackHandler callbackHandler = new KeystoreCallbackHandler();
     private Crypto crypto = CryptoFactory.getInstance();
 
     /**
@@ -185,7 +183,7 @@ public class BSTKerberosTest extends org.junit.Assert implements CallbackHandler
      * @throws Exception Thrown when there is a problem in verification
      */
     private void verify(Document doc) throws Exception {
-        secEngine.processSecurityHeader(doc, null, this, crypto);
+        secEngine.processSecurityHeader(doc, null, callbackHandler, crypto);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Verfied and decrypted message:");
             String outputString = 
@@ -194,21 +192,4 @@ public class BSTKerberosTest extends org.junit.Assert implements CallbackHandler
         }
     }
 
-    public void handle(Callback[] callbacks)
-        throws IOException, UnsupportedCallbackException {
-        for (int i = 0; i < callbacks.length; i++) {
-            if (callbacks[i] instanceof WSPasswordCallback) {
-                WSPasswordCallback pc = (WSPasswordCallback) callbacks[i];
-                /*
-                 * here call a function/method to lookup the password for
-                 * the given identifier (e.g. a user name or keystore alias)
-                 * e.g.: pc.setPassword(passStore.getPassword(pc.getIdentfifier))
-                 * for Testing we supply a fixed name here.
-                 */
-                pc.setPassword("security");
-            } else {
-                throw new UnsupportedCallbackException(callbacks[i], "Unrecognized Callback");
-            }
-        }
-    }
 }

@@ -24,7 +24,6 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.SOAPConstants;
 import org.apache.ws.security.WSDataRef;
 import org.apache.ws.security.WSEncryptionPart;
-import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSecurityEngineResult;
@@ -41,10 +40,6 @@ import org.apache.ws.security.util.WSSecurityUtil;
 import org.opensaml.SAMLAssertion;
 import org.w3c.dom.Document;
 
-import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.callback.UnsupportedCallbackException;
-import java.io.IOException;
 import java.util.List;
 import java.util.ArrayList;
 import javax.xml.namespace.QName;
@@ -53,7 +48,7 @@ import javax.xml.namespace.QName;
  * This is some unit tests for signing using signature parts. Note that the "soapMsg" below
  * has a custom header added.
  */
-public class SignaturePartsTest extends org.junit.Assert implements CallbackHandler {
+public class SignaturePartsTest extends org.junit.Assert {
     private static final Log LOG = LogFactory.getLog(SignaturePartsTest.class);
     private static final String SOAPMSG = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
             "<soapenv:Envelope xmlns:foo=\"urn:foo.bar\" xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" +
@@ -354,7 +349,7 @@ public class SignaturePartsTest extends org.junit.Assert implements CallbackHand
      */
     private List<WSSecurityEngineResult> verify(Document doc) throws Exception {
         List<WSSecurityEngineResult> results = 
-            secEngine.processSecurityHeader(doc, null, this, crypto);
+            secEngine.processSecurityHeader(doc, null, null, crypto);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Verfied and decrypted message:");
             String outputString = 
@@ -364,21 +359,4 @@ public class SignaturePartsTest extends org.junit.Assert implements CallbackHand
         return results;
     }
 
-    public void handle(Callback[] callbacks)
-            throws IOException, UnsupportedCallbackException {
-        for (int i = 0; i < callbacks.length; i++) {
-            if (callbacks[i] instanceof WSPasswordCallback) {
-                WSPasswordCallback pc = (WSPasswordCallback) callbacks[i];
-                /*
-                 * here call a function/method to lookup the password for
-                 * the given identifier (e.g. a user name or keystore alias)
-                 * e.g.: pc.setPassword(passStore.getPassword(pc.getIdentfifier))
-                 * for Testing we supply a fixed name here.
-                 */
-                pc.setPassword("security");
-            } else {
-                throw new UnsupportedCallbackException(callbacks[i], "Unrecognized Callback");
-            }
-        }
-    }
 }

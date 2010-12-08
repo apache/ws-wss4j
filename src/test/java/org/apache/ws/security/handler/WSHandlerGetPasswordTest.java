@@ -26,13 +26,10 @@ import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.common.CustomHandler;
 import org.apache.ws.security.common.SOAPUtil;
+import org.apache.ws.security.common.UsernamePasswordCallbackHandler;
 import org.w3c.dom.Document;
 
-import java.io.IOException;
-
-import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.callback.UnsupportedCallbackException;
 
 /**
  * WS-Security Test Case for the getPassword method in WSHandler.
@@ -52,6 +49,8 @@ public class WSHandlerGetPasswordTest extends org.junit.Assert {
         +       "</add>" 
         +   "</SOAP-ENV:Body>" 
         + "</SOAP-ENV:Envelope>";
+    
+    private CallbackHandler callbackHandler = new UsernamePasswordCallbackHandler();
 
     /**
      * A unit test for {@link WSHandler#getPassword(String, int, String, String, RequestData)},
@@ -71,13 +70,13 @@ public class WSHandlerGetPasswordTest extends org.junit.Assert {
         WSHandler handler = new CustomHandler();
         WSPasswordCallback callback = 
             handler.getPassword(
-                "bob", 
+                "alice", 
                 WSConstants.UT, 
                 "SomeCallbackTag", 
                 "SomeCallbackRef",
                 reqData
             );
-        assertTrue("bob".equals(callback.getIdentifier()));
+        assertTrue("alice".equals(callback.getIdentifier()));
         assertTrue("securityPassword".equals(callback.getPassword()));
         assertTrue(WSPasswordCallback.USERNAME_TOKEN == callback.getUsage());
     }
@@ -93,7 +92,7 @@ public class WSHandlerGetPasswordTest extends org.junit.Assert {
         final WSSConfig cfg = WSSConfig.getNewInstance();
         final RequestData reqData = new RequestData();
         reqData.setWssConfig(cfg);
-        reqData.setUsername("bob");
+        reqData.setUsername("alice");
         reqData.setPwType(WSConstants.PASSWORD_TEXT);
         java.util.Map<String, Object> messageContext = new java.util.TreeMap<String, Object>();
         messageContext.put("password", "securityPassword");
@@ -116,7 +115,7 @@ public class WSHandlerGetPasswordTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }
-        assertTrue(outputString.indexOf("bob") != -1);
+        assertTrue(outputString.indexOf("alice") != -1);
         assertTrue(outputString.indexOf("securityPassword") != -1);
     }
     
@@ -132,12 +131,12 @@ public class WSHandlerGetPasswordTest extends org.junit.Assert {
         final WSSConfig cfg = WSSConfig.getNewInstance();
         final RequestData reqData = new RequestData();
         reqData.setWssConfig(cfg);
-        reqData.setUsername("bob");
+        reqData.setUsername("alice");
         reqData.setPwType(WSConstants.PASSWORD_TEXT);
         java.util.Map<String, Object> messageContext = new java.util.TreeMap<String, Object>();
         messageContext.put(
             WSHandlerConstants.PW_CALLBACK_REF, 
-            new MyCallbackHandler()
+            callbackHandler
         );
         reqData.setMsgContext(messageContext);
         
@@ -158,25 +157,8 @@ public class WSHandlerGetPasswordTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }
-        assertTrue(outputString.indexOf("bob") != -1);
+        assertTrue(outputString.indexOf("alice") != -1);
         assertTrue(outputString.indexOf("securityPassword") != -1);
-    }
-    
-
-    public static class MyCallbackHandler implements CallbackHandler {
-        public void handle(Callback[] callbacks)
-            throws IOException, UnsupportedCallbackException {
-            for (int i = 0; i < callbacks.length; i++) {
-                if (callbacks[i] instanceof WSPasswordCallback) {
-                    WSPasswordCallback pc = (WSPasswordCallback) callbacks[i];
-                    if (pc.getIdentifier() == "bob") {
-                        pc.setPassword("securityPassword");
-                    }
-                } else {
-                    throw new UnsupportedCallbackException(callbacks[i], "Unrecognized Callback");
-                }
-            }
-        }
     }
     
 }

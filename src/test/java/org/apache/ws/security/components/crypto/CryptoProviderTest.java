@@ -21,19 +21,16 @@ package org.apache.ws.security.components.crypto;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.common.KeystoreCallbackHandler;
 import org.apache.ws.security.common.SOAPUtil;
 import org.apache.ws.security.message.WSSecEncrypt;
 import org.apache.ws.security.message.WSSecHeader;
 import org.apache.ws.security.message.WSSecSignature;
 import org.w3c.dom.Document;
 
-import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.callback.UnsupportedCallbackException;
-import java.io.IOException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 
@@ -50,7 +47,7 @@ import java.security.cert.X509Certificate;
  * -dname "1.2.840.113549.1.9.1=#16125765726e6572406578616d706c652e636f6d,CN=Werner,
  * OU=WSS4J,O=Apache,L=Munich,ST=Bayern,C=DE"
  */
-public class CryptoProviderTest extends org.junit.Assert implements CallbackHandler {
+public class CryptoProviderTest extends org.junit.Assert {
     private static final Log LOG = LogFactory.getLog(CryptoProviderTest.class);
     private static final String SOAPMSG = 
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" 
@@ -65,6 +62,7 @@ public class CryptoProviderTest extends org.junit.Assert implements CallbackHand
         +   "</SOAP-ENV:Body>" 
         + "</SOAP-ENV:Envelope>";
     private WSSecurityEngine secEngine = new WSSecurityEngine();
+    private CallbackHandler callbackHandler = new KeystoreCallbackHandler();
     private Crypto crypto;
 
     public CryptoProviderTest() {
@@ -220,7 +218,7 @@ public class CryptoProviderTest extends org.junit.Assert implements CallbackHand
      * @throws Exception Thrown when there is a problem in verification
      */
     private void verify(Document doc) throws Exception {
-        secEngine.processSecurityHeader(doc, null, this, crypto);
+        secEngine.processSecurityHeader(doc, null, callbackHandler, crypto);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Verfied and decrypted message:");
             String outputString = 
@@ -229,21 +227,4 @@ public class CryptoProviderTest extends org.junit.Assert implements CallbackHand
         }
     }
 
-    public void handle(Callback[] callbacks)
-        throws IOException, UnsupportedCallbackException {
-        for (int i = 0; i < callbacks.length; i++) {
-            if (callbacks[i] instanceof WSPasswordCallback) {
-                WSPasswordCallback pc = (WSPasswordCallback) callbacks[i];
-                /*
-                 * here call a function/method to lookup the password for
-                 * the given identifier (e.g. a user name or keystore alias)
-                 * e.g.: pc.setPassword(passStore.getPassword(pc.getIdentfifier))
-                 * for Testing we supply a fixed name here.
-                 */
-                pc.setPassword("security");
-            } else {
-                throw new UnsupportedCallbackException(callbacks[i], "Unrecognized Callback");
-            }
-        }
-    }
 }

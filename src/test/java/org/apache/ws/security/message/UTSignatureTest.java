@@ -25,10 +25,10 @@ import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.common.CustomHandler;
 import org.apache.ws.security.common.SOAPUtil;
+import org.apache.ws.security.common.UsernamePasswordCallbackHandler;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.handler.RequestData;
@@ -36,11 +36,7 @@ import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 
-import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.callback.UnsupportedCallbackException;
-
-import java.io.IOException;
 
 import java.util.List;
 
@@ -52,7 +48,7 @@ import java.util.List;
  * different to UTWseSignatureTest, which derives a key for signature using a 
  * non-standard implementation.
  */
-public class UTSignatureTest extends org.junit.Assert implements CallbackHandler {
+public class UTSignatureTest extends org.junit.Assert {
     private static final Log LOG = LogFactory.getLog(UTSignatureTest.class);
     private static final String SOAPMSG = 
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" 
@@ -68,6 +64,7 @@ public class UTSignatureTest extends org.junit.Assert implements CallbackHandler
         + "</SOAP-ENV:Envelope>";
 
     private WSSecurityEngine secEngine = new WSSecurityEngine();
+    private CallbackHandler callbackHandler = new UsernamePasswordCallbackHandler();
     private Crypto crypto = CryptoFactory.getInstance();
 
     /**
@@ -115,7 +112,7 @@ public class UTSignatureTest extends org.junit.Assert implements CallbackHandler
     
     /**
      * Test using a UsernameToken derived key for signing a SOAP body. In this test the
-     * user is "alice" rather than "bob", and so signature verification should fail.
+     * user is "colm" rather than "bob", and so signature verification should fail.
      */
     @org.junit.Test
     public void testBadUserSignature() throws Exception {
@@ -124,7 +121,7 @@ public class UTSignatureTest extends org.junit.Assert implements CallbackHandler
         secHeader.insertSecurityHeader(doc);
         
         WSSecUsernameToken builder = new WSSecUsernameToken();
-        builder.setUserInfo("alice", "security");
+        builder.setUserInfo("colm", "security");
         builder.addDerivedKey(true, null, 1000);
         builder.prepare(doc);
         
@@ -163,7 +160,7 @@ public class UTSignatureTest extends org.junit.Assert implements CallbackHandler
         RequestData reqData = new RequestData();
         reqData.setWssConfig(cfg);
         java.util.Map<String, Object> messageContext = new java.util.TreeMap<String, Object>();
-        messageContext.put(WSHandlerConstants.PW_CALLBACK_REF, this);
+        messageContext.put(WSHandlerConstants.PW_CALLBACK_REF, callbackHandler);
         messageContext.put(WSHandlerConstants.USE_DERIVED_KEY, "true");
         reqData.setMsgContext(messageContext);
         reqData.setUsername("bob");
@@ -209,7 +206,7 @@ public class UTSignatureTest extends org.junit.Assert implements CallbackHandler
         RequestData reqData = new RequestData();
         reqData.setWssConfig(cfg);
         java.util.Map<String, Object> messageContext = new java.util.TreeMap<String, Object>();
-        messageContext.put(WSHandlerConstants.PW_CALLBACK_REF, this);
+        messageContext.put(WSHandlerConstants.PW_CALLBACK_REF, callbackHandler);
         messageContext.put(WSHandlerConstants.USE_DERIVED_KEY, "true");
         messageContext.put(WSHandlerConstants.DERIVED_KEY_ITERATIONS, "1234");
         reqData.setMsgContext(messageContext);
@@ -254,25 +251,7 @@ public class UTSignatureTest extends org.junit.Assert implements CallbackHandler
      * @throws java.lang.Exception Thrown when there is a problem in verification
      */
     private List<WSSecurityEngineResult> verify(Document doc) throws Exception {
-        return secEngine.processSecurityHeader(doc, null, this, crypto);
-    }
-    
-    
-    public void handle(Callback[] callbacks)
-        throws IOException, UnsupportedCallbackException {
-        for (int i = 0; i < callbacks.length; i++) {
-            if (callbacks[i] instanceof WSPasswordCallback) {
-                WSPasswordCallback pc = (WSPasswordCallback) callbacks[i];
-                if (pc.getUsage() == WSPasswordCallback.USERNAME_TOKEN_UNKNOWN
-                    && "bob".equals(pc.getIdentifier())) {
-                    pc.setPassword("security");
-                } else {
-                    throw new IOException("Authentication failed");
-                }
-            } else {
-                throw new UnsupportedCallbackException(callbacks[i], "Unrecognized Callback");
-            }
-        }
+        return secEngine.processSecurityHeader(doc, null, callbackHandler, crypto);
     }
 
 }

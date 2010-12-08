@@ -19,22 +19,19 @@
 
 package org.apache.ws.security.processor;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.ArrayList;
 
-import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.callback.UnsupportedCallbackException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDataRef;
 import org.apache.ws.security.WSEncryptionPart;
-import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSSecurityEngineResult;
+import org.apache.ws.security.common.KeystoreCallbackHandler;
 import org.apache.ws.security.common.SOAPUtil;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
@@ -56,7 +53,7 @@ import org.w3c.dom.Element;
  * WSDataRef object must contain the correct QName of the decrypted element. 
  * 
  */
-public class ReferenceListDataRefTest extends org.junit.Assert implements CallbackHandler {
+public class ReferenceListDataRefTest extends org.junit.Assert {
     private static final Log LOG = LogFactory.getLog(ReferenceListDataRefTest.class);
     private static final String SOAPMSG = 
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" 
@@ -70,6 +67,7 @@ public class ReferenceListDataRefTest extends org.junit.Assert implements Callba
         + "</SOAP-ENV:Envelope>";
     
     private WSSecurityEngine secEngine = new WSSecurityEngine();
+    private CallbackHandler callbackHandler = new KeystoreCallbackHandler();
     private Crypto crypto = CryptoFactory.getInstance("wss40.properties");
 
     /**
@@ -138,7 +136,7 @@ public class ReferenceListDataRefTest extends org.junit.Assert implements Callba
         
         // Retrieve the wsResults List 
         List<WSSecurityEngineResult> wsResults = 
-            secEngine.processSecurityHeader(doc, null, this, crypto);
+            secEngine.processSecurityHeader(doc, null, callbackHandler, crypto);
         boolean found = false;
                 
         for (int i = 0; i < wsResults.size(); i++) {
@@ -186,22 +184,4 @@ public class ReferenceListDataRefTest extends org.junit.Assert implements Callba
         
     }
 
-    public void handle(Callback[] callbacks) throws IOException,
-            UnsupportedCallbackException {
-        for (int i = 0; i < callbacks.length; i++) {
-            if (callbacks[i] instanceof WSPasswordCallback) {
-                WSPasswordCallback pc = (WSPasswordCallback) callbacks[i];
-                /*
-                 * here call a function/method to lookup the password for the
-                 * given identifier (e.g. a user name or keystore alias) e.g.:
-                 * pc.setPassword(passStore.getPassword(pc.getIdentfifier)) for
-                 * Testing we supply a fixed name here.
-                 */
-                pc.setPassword("security");
-            } else {
-                throw new UnsupportedCallbackException(callbacks[i],
-                        "Unrecognized Callback");
-            }
-        }
-    }
 }

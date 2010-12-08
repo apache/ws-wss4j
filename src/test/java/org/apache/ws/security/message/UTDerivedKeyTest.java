@@ -24,10 +24,10 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.common.EncodedPasswordCallbackHandler;
 import org.apache.ws.security.common.SOAPUtil;
+import org.apache.ws.security.common.UsernamePasswordCallbackHandler;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.message.token.UsernameToken;
@@ -35,11 +35,7 @@ import org.apache.ws.security.util.Base64;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 
-import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.callback.UnsupportedCallbackException;
-
-import java.io.IOException;
 
 import java.security.MessageDigest;
 import java.util.Arrays;
@@ -50,7 +46,7 @@ import java.util.List;
  * UsernameTokenProfile 1.1 specification. The derived keys are used to encrypt
  * and sign, as per wsc:DerivedKeyToken.
  */
-public class UTDerivedKeyTest extends org.junit.Assert implements CallbackHandler {
+public class UTDerivedKeyTest extends org.junit.Assert {
     private static final Log LOG = LogFactory.getLog(UTDerivedKeyTest.class);
     private static final String SOAPMSG = 
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" 
@@ -66,6 +62,7 @@ public class UTDerivedKeyTest extends org.junit.Assert implements CallbackHandle
         + "</SOAP-ENV:Envelope>";
 
     private WSSecurityEngine secEngine = new WSSecurityEngine();
+    private CallbackHandler callbackHandler = new UsernamePasswordCallbackHandler();
     private Crypto crypto = CryptoFactory.getInstance();
 
     /**
@@ -270,7 +267,7 @@ public class UTDerivedKeyTest extends org.junit.Assert implements CallbackHandle
     
     /**
      * Test using a UsernameToken derived key for encrypting a SOAP body. In this test the
-     * user is "alice" rather than "bob", and so decryption should fail.
+     * user is "colm" rather than "bob", and so decryption should fail.
      */
     @org.junit.Test
     public void testDerivedKeyBadUserEncryption() throws Exception {
@@ -279,7 +276,7 @@ public class UTDerivedKeyTest extends org.junit.Assert implements CallbackHandle
         secHeader.insertSecurityHeader(doc);
         
         WSSecUsernameToken builder = new WSSecUsernameToken();
-        builder.setUserInfo("alice", "security");
+        builder.setUserInfo("colm", "security");
         builder.addDerivedKey(false, null, 1000);
         builder.prepare(doc);
         
@@ -468,7 +465,7 @@ public class UTDerivedKeyTest extends org.junit.Assert implements CallbackHandle
     
     /**
      * Test using a UsernameToken derived key for signing a SOAP body. In this test the
-     * user is "alice" rather than "bob", and so signature verification should fail.
+     * user is "colm" rather than "bob", and so signature verification should fail.
      */
     @org.junit.Test
     public void testDerivedKeyBadUserSignature() throws Exception {
@@ -477,7 +474,7 @@ public class UTDerivedKeyTest extends org.junit.Assert implements CallbackHandle
         secHeader.insertSecurityHeader(doc);
         
         WSSecUsernameToken builder = new WSSecUsernameToken();
-        builder.setUserInfo("alice", "security");
+        builder.setUserInfo("colm", "security");
         builder.addDerivedKey(true, null, 1000);
         builder.prepare(doc);
         
@@ -518,25 +515,7 @@ public class UTDerivedKeyTest extends org.junit.Assert implements CallbackHandle
      * @throws java.lang.Exception Thrown when there is a problem in verification
      */
     private List<WSSecurityEngineResult> verify(Document doc) throws Exception {
-        return secEngine.processSecurityHeader(doc, null, this, crypto);
-    }
-    
-    
-    public void handle(Callback[] callbacks)
-        throws IOException, UnsupportedCallbackException {
-        for (int i = 0; i < callbacks.length; i++) {
-            if (callbacks[i] instanceof WSPasswordCallback) {
-                WSPasswordCallback pc = (WSPasswordCallback) callbacks[i];
-                if (pc.getUsage() == WSPasswordCallback.USERNAME_TOKEN_UNKNOWN
-                    && "bob".equals(pc.getIdentifier())) {
-                    pc.setPassword("security");
-                } else {
-                    throw new IOException("Authentication failed");
-                }
-            } else {
-                throw new UnsupportedCallbackException(callbacks[i], "Unrecognized Callback");
-            }
-        }
+        return secEngine.processSecurityHeader(doc, null, callbackHandler, crypto);
     }
 
 }

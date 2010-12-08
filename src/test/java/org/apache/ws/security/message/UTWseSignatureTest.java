@@ -21,21 +21,18 @@ package org.apache.ws.security.message;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.common.CustomHandler;
 import org.apache.ws.security.common.SOAPUtil;
+import org.apache.ws.security.common.UsernamePasswordCallbackHandler;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.handler.WSHandlerConstants;
 
 import org.w3c.dom.Document;
 
-import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.callback.UnsupportedCallbackException;
-import java.io.IOException;
 
 
 /**
@@ -43,7 +40,7 @@ import java.io.IOException;
  * 
  * @author Werner Dittmann (Wern.erDittmann@siemens.com)
  */
-public class UTWseSignatureTest extends org.junit.Assert implements CallbackHandler {
+public class UTWseSignatureTest extends org.junit.Assert {
     private static final Log LOG = LogFactory.getLog(UTWseSignatureTest.class);
     private static final String SOAPMSG = 
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" 
@@ -59,6 +56,7 @@ public class UTWseSignatureTest extends org.junit.Assert implements CallbackHand
         + "</SOAP-ENV:Envelope>";
     
     private WSSecurityEngine secEngine = new WSSecurityEngine();
+    private CallbackHandler callbackHandler = new UsernamePasswordCallbackHandler();
 
     /**
      * Test the specific signing method that use UsernameToken values
@@ -144,7 +142,7 @@ public class UTWseSignatureTest extends org.junit.Assert implements CallbackHand
         // It should fail on the default key length of 16...
         //
         try {
-            secEngine.processSecurityHeader(doc, null, this, null);
+            secEngine.processSecurityHeader(doc, null, callbackHandler, null);
             fail ("An error was expected on verifying the signature");
         } catch (Exception ex) {
             // expected
@@ -154,7 +152,7 @@ public class UTWseSignatureTest extends org.junit.Assert implements CallbackHand
         WSSConfig wssConfig = WSSConfig.getNewInstance();
         wssConfig.setSecretKeyLength(32);
         wss226SecurityEngine.setWssConfig(wssConfig);
-        wss226SecurityEngine.processSecurityHeader(doc, null, this, null);
+        wss226SecurityEngine.processSecurityHeader(doc, null, callbackHandler, null);
     }
     
     /**
@@ -192,7 +190,7 @@ public class UTWseSignatureTest extends org.junit.Assert implements CallbackHand
         // It should fail on the default key length of 16...
         //
         try {
-            secEngine.processSecurityHeader(doc, null, this, null);
+            secEngine.processSecurityHeader(doc, null, callbackHandler, null);
             fail ("An error was expected on verifying the signature");
         } catch (Exception ex) {
             // expected
@@ -202,7 +200,7 @@ public class UTWseSignatureTest extends org.junit.Assert implements CallbackHand
         
         WSSecurityEngine wss226SecurityEngine = new WSSecurityEngine();
         wss226SecurityEngine.setWssConfig(reqData.getWssConfig());
-        wss226SecurityEngine.processSecurityHeader(doc, null, this, null);
+        wss226SecurityEngine.processSecurityHeader(doc, null, callbackHandler, null);
     }
     
     /**
@@ -256,25 +254,8 @@ public class UTWseSignatureTest extends org.junit.Assert implements CallbackHand
      */
     private void verify(Document doc) throws Exception {
         LOG.info("Before verifying UsernameToken....");
-        secEngine.processSecurityHeader(doc, null, this, null);
+        secEngine.processSecurityHeader(doc, null, callbackHandler, null);
         LOG.info("After verifying UsernameToken....");
     }
 
-    public void handle(Callback[] callbacks)
-        throws IOException, UnsupportedCallbackException {
-        for (int i = 0; i < callbacks.length; i++) {
-            if (callbacks[i] instanceof WSPasswordCallback) {
-                WSPasswordCallback pc = (WSPasswordCallback) callbacks[i];
-                /*
-                 * here call a function/method to lookup the password for
-                 * the given identifier (e.g. a user name or keystore alias)
-                 * e.g.: pc.setPassword(passStore.getPassword(pc.getIdentfifier))
-                 * for Testing we supply a fixed name here.
-                 */
-                pc.setPassword("verySecret");
-            } else {
-                throw new UnsupportedCallbackException(callbacks[i], "Unrecognized Callback");
-            }
-        }
-    }
 }

@@ -19,21 +19,15 @@
 
 package org.apache.ws.security.message;
 
-import java.io.IOException;
 import java.security.SecureRandom;
-import java.util.HashMap;
-import java.util.Map;
 
-import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.xml.crypto.dsig.SignatureMethod;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSecurityEngine;
+import org.apache.ws.security.common.SecretKeyCallbackHandler;
 import org.apache.ws.security.common.SOAPUtil;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
@@ -45,7 +39,7 @@ import org.w3c.dom.Document;
  * 
  * @author Ruchith Fernando (ruchith.fernando@gmail.com)
  */
-public class SecurityContextTokenTest extends org.junit.Assert implements CallbackHandler {
+public class SecurityContextTokenTest extends org.junit.Assert {
     private static final Log LOG = LogFactory.getLog(SecurityContextTokenTest.class);
 
     private static final String SOAPMSG = 
@@ -60,12 +54,8 @@ public class SecurityContextTokenTest extends org.junit.Assert implements Callba
         + "</SOAP-ENV:Envelope>";
 
     private WSSecurityEngine secEngine = new WSSecurityEngine();
+    private SecretKeyCallbackHandler callbackHandler = new SecretKeyCallbackHandler();
     private Crypto crypto = CryptoFactory.getInstance("wss40.properties");
-
-    /**
-     * Table of secrets indexed by the sct identifiers
-     */
-    private Map<String, byte[]> secrets = new HashMap<String, byte[]>();
 
 
     @org.junit.Test
@@ -121,7 +111,7 @@ public class SecurityContextTokenTest extends org.junit.Assert implements Callba
             random.nextBytes(tempSecret);
 
             // Store the secret
-            this.secrets.put(sctBuilder.getIdentifier(), tempSecret);
+            callbackHandler.addSecretKey(sctBuilder.getIdentifier(), tempSecret);
 
             String tokenId = sctBuilder.getSctId();
 
@@ -160,7 +150,7 @@ public class SecurityContextTokenTest extends org.junit.Assert implements Callba
             random.nextBytes(tempSecret);
 
             // Store the secret
-            this.secrets.put(sctBuilder.getIdentifier(), tempSecret);
+            callbackHandler.addSecretKey(sctBuilder.getIdentifier(), tempSecret);
 
             String tokenId = sctBuilder.getSctId();
 
@@ -203,7 +193,7 @@ public class SecurityContextTokenTest extends org.junit.Assert implements Callba
             random.nextBytes(tempSecret);
 
             // Store the secret
-            this.secrets.put(sctBuilder.getIdentifier(), tempSecret);
+            callbackHandler.addSecretKey(sctBuilder.getIdentifier(), tempSecret);
 
             // Derived key signature
             WSSecDKSign sigBuilder = new WSSecDKSign();
@@ -243,7 +233,7 @@ public class SecurityContextTokenTest extends org.junit.Assert implements Callba
             random.nextBytes(tempSecret);
 
             // Store the secret
-            this.secrets.put(sctBuilder.getIdentifier(), tempSecret);
+            callbackHandler.addSecretKey(sctBuilder.getIdentifier(), tempSecret);
 
             String tokenId = sctBuilder.getSctId();
 
@@ -288,7 +278,7 @@ public class SecurityContextTokenTest extends org.junit.Assert implements Callba
             random.nextBytes(tempSecret);
 
             // Store the secret
-            this.secrets.put(sctBuilder.getIdentifier(), tempSecret);
+            callbackHandler.addSecretKey(sctBuilder.getIdentifier(), tempSecret);
 
             String tokenId = sctBuilder.getSctId();
 
@@ -338,7 +328,7 @@ public class SecurityContextTokenTest extends org.junit.Assert implements Callba
             random.nextBytes(tempSecret);
 
             // Store the secret
-            this.secrets.put(sctBuilder.getIdentifier(), tempSecret);
+            callbackHandler.addSecretKey(sctBuilder.getIdentifier(), tempSecret);
 
             String tokenId = sctBuilder.getSctId();
 
@@ -374,25 +364,11 @@ public class SecurityContextTokenTest extends org.junit.Assert implements Callba
      *             Thrown when there is a problem in verification
      */
     private void verify(Document doc) throws Exception {
-        secEngine.processSecurityHeader(doc, null, this, crypto);
+        secEngine.processSecurityHeader(doc, null, callbackHandler, crypto);
         String outputString = 
             org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
         assertTrue(outputString.indexOf("LogTestService2") > 0 ? true : false);
     }
 
-
-    public void handle(Callback[] callbacks) throws IOException,
-        UnsupportedCallbackException {
-        for (int i = 0; i < callbacks.length; i++) {
-            if (callbacks[i] instanceof WSPasswordCallback) {
-                WSPasswordCallback pc = (WSPasswordCallback) callbacks[i];
-                byte[] secret = (byte[]) this.secrets.get(pc.getIdentifier());
-                pc.setKey(secret);
-            } else {
-                throw new UnsupportedCallbackException(callbacks[i],
-                        "Unrecognized Callback");
-            }
-        }
-    }
 
 }

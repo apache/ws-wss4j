@@ -21,30 +21,25 @@ package org.apache.ws.security.message;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.ws.security.PublicKeyCallback;
 import org.apache.ws.security.PublicKeyPrincipal;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSSecurityEngineResult;
+import org.apache.ws.security.common.PublicKeyCallbackHandler;
 import org.apache.ws.security.common.SOAPUtil;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 
-import java.io.IOException;
 import java.util.List;
-
-import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.callback.UnsupportedCallbackException;
 
 /**
  * This class tests signing where the the public key is transmitted in the message via
  * a ds:KeyInfo/ds:KeyValue element. Although this isn't strictly recommended for use in
  * WS-Security, it's necessary to support it for WCF interop.
  */
-public class SignatureKeyValueTest extends org.junit.Assert implements CallbackHandler {
+public class SignatureKeyValueTest extends org.junit.Assert {
     private static final Log LOG = LogFactory.getLog(SignatureKeyValueTest.class);
     private static final String SOAPMSG = 
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" 
@@ -61,10 +56,10 @@ public class SignatureKeyValueTest extends org.junit.Assert implements CallbackH
     
     private WSSecurityEngine secEngine = new WSSecurityEngine();
     private Crypto crypto = CryptoFactory.getInstance("wss40.properties");
-    private java.security.KeyStore keyStore = null;
+    private PublicKeyCallbackHandler callbackHandler = new PublicKeyCallbackHandler();
 
     public SignatureKeyValueTest() {
-        keyStore = crypto.getKeyStore();
+        callbackHandler.setKeyStore(crypto.getKeyStore());
     }
 
     /**
@@ -176,22 +171,7 @@ public class SignatureKeyValueTest extends org.junit.Assert implements CallbackH
      * @throws java.lang.Exception Thrown when there is a problem in verification
      */
     private List<WSSecurityEngineResult> verify(Document doc) throws Exception {
-        return secEngine.processSecurityHeader(doc, null, this, null);
+        return secEngine.processSecurityHeader(doc, null, callbackHandler, null);
     }
     
-    public void handle(Callback[] callbacks) 
-        throws IOException, UnsupportedCallbackException {
-        for (int i = 0; i < callbacks.length; i++) {
-            if (callbacks[i] instanceof PublicKeyCallback) {
-                PublicKeyCallback pc = (PublicKeyCallback) callbacks[i];
-                java.security.PublicKey publicKey = pc.getPublicKey();
-                if (publicKey == null || !pc.verifyTrust(keyStore)) {
-                    throw new IOException("Authentication of public key failed");
-                }
-            } else {
-                throw new UnsupportedCallbackException(callbacks[i], "Unrecognized Callback");
-            }
-        }
-    }
-
 }

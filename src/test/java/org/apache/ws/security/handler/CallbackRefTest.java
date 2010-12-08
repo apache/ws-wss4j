@@ -21,19 +21,14 @@ package org.apache.ws.security.handler;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.common.CustomHandler;
 import org.apache.ws.security.common.SOAPUtil;
+import org.apache.ws.security.common.UsernamePasswordCallbackHandler;
 import org.w3c.dom.Document;
 
-import java.io.IOException;
-
-import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.callback.UnsupportedCallbackException;
-
 
 /**
  * Test case for WSS-245 - "WSHandlerConstants.PW_CALLBACK_REF isn't correctly searched for"
@@ -55,6 +50,8 @@ public class CallbackRefTest extends org.junit.Assert {
         +   "</SOAP-ENV:Body>" 
         + "</SOAP-ENV:Envelope>";
 
+    private CallbackHandler callbackHandler = new UsernamePasswordCallbackHandler();
+    
     /**
      * A test for {@link WSHandler#getPassword(String, int, String, String, RequestData)},
      * where the password is obtained from a Callback Handler, which is placed on the 
@@ -67,12 +64,12 @@ public class CallbackRefTest extends org.junit.Assert {
         final WSSConfig cfg = WSSConfig.getNewInstance();
         final RequestData reqData = new RequestData();
         reqData.setWssConfig(cfg);
-        reqData.setUsername("bob");
+        reqData.setUsername("alice");
         reqData.setPwType(WSConstants.PASSWORD_TEXT);
         java.util.Map<String, Object> messageContext = new java.util.TreeMap<String, Object>();
         messageContext.put(
             WSHandlerConstants.PW_CALLBACK_REF, 
-            new MyCallbackHandler()
+            callbackHandler
         );
         reqData.setMsgContext(messageContext);
         
@@ -93,7 +90,7 @@ public class CallbackRefTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }
-        assertTrue(outputString.indexOf("bob") != -1);
+        assertTrue(outputString.indexOf("alice") != -1);
         assertTrue(outputString.indexOf("securityPassword") != -1);
     }
     
@@ -109,7 +106,7 @@ public class CallbackRefTest extends org.junit.Assert {
         final WSSConfig cfg = WSSConfig.getNewInstance();
         final RequestData reqData = new RequestData();
         reqData.setWssConfig(cfg);
-        reqData.setUsername("bob");
+        reqData.setUsername("alice");
         reqData.setPwType(WSConstants.PASSWORD_TEXT);
         reqData.setMsgContext(new java.util.TreeMap<String, String>());
         
@@ -117,7 +114,7 @@ public class CallbackRefTest extends org.junit.Assert {
         actions.add(new Integer(WSConstants.UT));
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         CustomHandler handler = new CustomHandler();
-        handler.setOption(WSHandlerConstants.PW_CALLBACK_REF, new MyCallbackHandler());
+        handler.setOption(WSHandlerConstants.PW_CALLBACK_REF, callbackHandler);
         handler.send(
             WSConstants.UT, 
             doc, 
@@ -131,24 +128,8 @@ public class CallbackRefTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }
-        assertTrue(outputString.indexOf("bob") != -1);
+        assertTrue(outputString.indexOf("alice") != -1);
         assertTrue(outputString.indexOf("securityPassword") != -1);
-    }
-    
-    public static class MyCallbackHandler implements CallbackHandler {
-        public void handle(Callback[] callbacks)
-            throws IOException, UnsupportedCallbackException {
-            for (int i = 0; i < callbacks.length; i++) {
-                if (callbacks[i] instanceof WSPasswordCallback) {
-                    WSPasswordCallback pc = (WSPasswordCallback) callbacks[i];
-                    if (pc.getIdentifier() == "bob") {
-                        pc.setPassword("securityPassword");
-                    }
-                } else {
-                    throw new UnsupportedCallbackException(callbacks[i], "Unrecognized Callback");
-                }
-            }
-        }
     }
     
 }

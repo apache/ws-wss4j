@@ -19,22 +19,19 @@
 
 package org.apache.ws.security.message;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.callback.UnsupportedCallbackException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSEncryptionPart;
-import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.common.CustomHandler;
+import org.apache.ws.security.common.KeystoreCallbackHandler;
 import org.apache.ws.security.common.SOAPUtil;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
@@ -49,7 +46,7 @@ import org.w3c.dom.Document;
  * @author Davanum Srinivas (dims@yahoo.com)
  * @author Werner Dittmann (Werner.Dittmann@siemens.com)
  */
-public class SignatureTest extends org.junit.Assert implements CallbackHandler {
+public class SignatureTest extends org.junit.Assert {
     private static final Log LOG = LogFactory.getLog(SignatureTest.class);
     private static final String SOAPMSG = 
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" 
@@ -65,6 +62,7 @@ public class SignatureTest extends org.junit.Assert implements CallbackHandler {
         + "</SOAP-ENV:Envelope>";
     
     private WSSecurityEngine secEngine = new WSSecurityEngine();
+    private CallbackHandler callbackHandler = new KeystoreCallbackHandler();
     private Crypto crypto = CryptoFactory.getInstance();
 
     /**
@@ -249,7 +247,7 @@ public class SignatureTest extends org.junit.Assert implements CallbackHandler {
             LOG.debug(outputString);
         }
         
-        secEngine.processSecurityHeader(doc, null, this, pkiCrypto, null);
+        secEngine.processSecurityHeader(doc, null, callbackHandler, pkiCrypto, null);
     }
     
     /**
@@ -502,24 +500,5 @@ public class SignatureTest extends org.junit.Assert implements CallbackHandler {
     private void verify(Document doc) throws Exception {
         secEngine.processSecurityHeader(doc, null, null, crypto);
     }
-    
 
-    public void handle(Callback[] callbacks)
-        throws IOException, UnsupportedCallbackException {
-        for (int i = 0; i < callbacks.length; i++) {
-            if (callbacks[i] instanceof WSPasswordCallback) {
-                WSPasswordCallback pc = (WSPasswordCallback) callbacks[i];
-                /*
-                 * here call a function/method to lookup the password for
-                 * the given identifier (e.g. a user name or keystore alias)
-                 * e.g.: pc.setPassword(passStore.getPassword(pc.getIdentfifier))
-                 * for Testing we supply a fixed name here.
-                 */
-                pc.setPassword("security");
-            } else {
-                throw new UnsupportedCallbackException(callbacks[i], "Unrecognized Callback");
-            }
-        }
-    }
-    
 }

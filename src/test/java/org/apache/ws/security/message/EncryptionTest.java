@@ -23,28 +23,27 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.SOAPConstants;
 import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSEncryptionPart;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSDataRef;
 import org.apache.ws.security.common.CustomHandler;
+import org.apache.ws.security.common.KeystoreCallbackHandler;
+import org.apache.ws.security.common.SecretKeyCallbackHandler;
 import org.apache.ws.security.common.SOAPUtil;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.handler.WSHandlerConstants;
+import org.apache.ws.security.util.Base64;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
-import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.callback.UnsupportedCallbackException;
-import java.io.IOException;
 
 import java.util.ArrayList;
 
@@ -54,7 +53,7 @@ import java.util.ArrayList;
  * @author Davanum Srinivas (dims@yahoo.com)
  * @author Werner Dittmann (werner@apache.org)
  */
-public class EncryptionTest extends org.junit.Assert implements CallbackHandler {
+public class EncryptionTest extends org.junit.Assert {
     private static final Log LOG = LogFactory.getLog(EncryptionTest.class);
     private static final String SOAPMSG = 
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" 
@@ -74,6 +73,8 @@ public class EncryptionTest extends org.junit.Assert implements CallbackHandler 
 
     private WSSecurityEngine secEngine = new WSSecurityEngine();
     private Crypto crypto = CryptoFactory.getInstance("wss40.properties");
+    private CallbackHandler keystoreCallbackHandler = new KeystoreCallbackHandler();
+    private SecretKeyCallbackHandler secretKeyCallbackHandler = new SecretKeyCallbackHandler();
     private byte[] keyData;
     private SecretKey key;
     
@@ -118,7 +119,7 @@ public class EncryptionTest extends org.junit.Assert implements CallbackHandler 
             LOG.debug(outputString);
         }
         assertTrue(outputString.indexOf("LogTestService2") == -1 ? true : false);
-        verify(encryptedDoc, SOAP_BODY);
+        verify(encryptedDoc, keystoreCallbackHandler, SOAP_BODY);
 
         /*
          * second run, same Junit set up, but change encryption method, 
@@ -148,6 +149,7 @@ public class EncryptionTest extends org.junit.Assert implements CallbackHandler 
         assertTrue(outputString.indexOf("LogTestService2") == -1 ? true : false);
         verify(
             encryptedDoc,
+            keystoreCallbackHandler,
             new javax.xml.namespace.QName(
                 "uri:LogTestService2",
                 "testMethod"
@@ -183,7 +185,7 @@ public class EncryptionTest extends org.junit.Assert implements CallbackHandler 
             LOG.debug(outputString);
         }
         assertTrue(outputString.indexOf("LogTestService2") == -1 ? true : false);
-        verify(encryptedDoc, SOAP_BODY);
+        verify(encryptedDoc, keystoreCallbackHandler, SOAP_BODY);
 
     }
     
@@ -224,7 +226,7 @@ public class EncryptionTest extends org.junit.Assert implements CallbackHandler 
         }
 
         LOG.info("After Encryption....");
-        verify(encryptedEncryptedDoc, encCrypto);
+        verify(encryptedEncryptedDoc, encCrypto, keystoreCallbackHandler);
     }
     
     /**
@@ -256,7 +258,7 @@ public class EncryptionTest extends org.junit.Assert implements CallbackHandler 
         assertTrue(outputString.indexOf("#ThumbprintSHA1") != -1);
     
         LOG.info("After Encrypting ThumbprintSHA1....");
-        verify(encryptedDoc, encCrypto);
+        verify(encryptedDoc, encCrypto, keystoreCallbackHandler);
     }
     
     /**
@@ -288,7 +290,7 @@ public class EncryptionTest extends org.junit.Assert implements CallbackHandler 
         assertTrue(outputString.indexOf("#EncryptedKeySHA1") != -1);
      
         LOG.info("After Encrypting EncryptedKeySHA1....");
-        verify(encryptedDoc, encCrypto);
+        verify(encryptedDoc, encCrypto, keystoreCallbackHandler);
     }
     
     /**
@@ -307,8 +309,12 @@ public class EncryptionTest extends org.junit.Assert implements CallbackHandler 
         LOG.info("Before Encrypting EncryptedKeySHA1....");
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);        
+        secHeader.insertSecurityHeader(doc);
         Document encryptedDoc = builder.build(doc, crypto, secHeader);
+        
+        byte[] encodedBytes = WSSecurityUtil.generateDigest(keyData);
+        String identifier = Base64.encode(encodedBytes);
+        secretKeyCallbackHandler.addSecretKey(identifier, keyData);
      
         String outputString = 
             org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(encryptedDoc);
@@ -319,7 +325,7 @@ public class EncryptionTest extends org.junit.Assert implements CallbackHandler 
         assertTrue(outputString.indexOf("#EncryptedKeySHA1") != -1);
      
         LOG.info("After Encrypting EncryptedKeySHA1....");
-        verify(encryptedDoc, (Crypto)null);
+        verify(encryptedDoc, (Crypto)null, secretKeyCallbackHandler);
     }
     
     /**
@@ -340,6 +346,10 @@ public class EncryptionTest extends org.junit.Assert implements CallbackHandler 
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);        
         Document encryptedDoc = builder.build(doc, crypto, secHeader);
+        
+        byte[] encodedBytes = WSSecurityUtil.generateDigest(keyData);
+        String identifier = Base64.encode(encodedBytes);
+        secretKeyCallbackHandler.addSecretKey(identifier, keyData);
      
         String outputString = 
             org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(encryptedDoc);
@@ -350,7 +360,7 @@ public class EncryptionTest extends org.junit.Assert implements CallbackHandler 
         assertTrue(outputString.indexOf("#EncryptedKeySHA1") != -1);
      
         LOG.info("After Encrypting EncryptedKeySHA1....");
-        verify(encryptedDoc, crypto);
+        verify(encryptedDoc, crypto, secretKeyCallbackHandler);
     }
     
     
@@ -369,7 +379,8 @@ public class EncryptionTest extends org.junit.Assert implements CallbackHandler 
         java.util.Map<String, Object> messageContext = new java.util.TreeMap<String, Object>();
         messageContext.put(WSHandlerConstants.ENC_SYM_ENC_KEY, "false");
         messageContext.put(WSHandlerConstants.ENC_KEY_ID, "EncryptedKeySHA1");
-        messageContext.put(WSHandlerConstants.PW_CALLBACK_REF, this);
+        secretKeyCallbackHandler.setOutboundSecret(keyData);
+        messageContext.put(WSHandlerConstants.PW_CALLBACK_REF, secretKeyCallbackHandler);
         reqData.setMsgContext(messageContext);
         reqData.setUsername("");
         
@@ -391,7 +402,7 @@ public class EncryptionTest extends org.junit.Assert implements CallbackHandler 
             LOG.debug(outputString);
         }
         
-        verify(doc, (Crypto)null);
+        verify(doc, (Crypto)null, secretKeyCallbackHandler);
     }
     
     /**
@@ -460,7 +471,7 @@ public class EncryptionTest extends org.junit.Assert implements CallbackHandler 
         }
         assertTrue(outputString.indexOf("LogTestService2") == -1 ? true
                 : false);
-        verify(encryptedDoc, crypto);
+        verify(encryptedDoc, crypto, keystoreCallbackHandler);
         
         outputString = 
             org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(encryptedDoc);
@@ -476,8 +487,10 @@ public class EncryptionTest extends org.junit.Assert implements CallbackHandler 
      * @throws Exception
      *             Thrown when there is a problem in verification
      */
-    private void verify(Document doc, Crypto decCrypto) throws Exception {
-        secEngine.processSecurityHeader(doc, null, this, decCrypto);
+    private void verify(
+        Document doc, Crypto decCrypto, CallbackHandler handler
+    ) throws Exception {
+        secEngine.processSecurityHeader(doc, null, handler, decCrypto);
         if (LOG.isDebugEnabled()) {
             String outputString = 
                 org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
@@ -495,10 +508,11 @@ public class EncryptionTest extends org.junit.Assert implements CallbackHandler 
     @SuppressWarnings("unchecked")
     private void verify(
         Document doc,
+        CallbackHandler handler,
         javax.xml.namespace.QName expectedEncryptedElement
     ) throws Exception {
         final java.util.List<WSSecurityEngineResult> results = 
-            secEngine.processSecurityHeader(doc, null, this, null, crypto);
+            secEngine.processSecurityHeader(doc, null, handler, null, crypto);
         String outputString = 
             org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
         if (LOG.isDebugEnabled()) {
@@ -544,22 +558,4 @@ public class EncryptionTest extends org.junit.Assert implements CallbackHandler 
         assertTrue(encrypted);
     }
 
-    public void handle(Callback[] callbacks)
-        throws IOException, UnsupportedCallbackException {
-        for (int i = 0; i < callbacks.length; i++) {
-            if (callbacks[i] instanceof WSPasswordCallback) {
-                WSPasswordCallback pc = (WSPasswordCallback) callbacks[i];
-                /*
-                 * here call a function/method to lookup the password for
-                 * the given identifier (e.g. a user name or keystore alias)
-                 * e.g.: pc.setPassword(passStore.getPassword(pc.getIdentfifier))
-                 * for Testing we supply a fixed name here.
-                 */
-                pc.setPassword("security");
-                pc.setKey(keyData);
-            } else {
-                throw new UnsupportedCallbackException(callbacks[i], "Unrecognized Callback");
-            }
-        }
-    }
 }

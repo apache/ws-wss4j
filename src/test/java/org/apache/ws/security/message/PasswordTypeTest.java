@@ -22,26 +22,23 @@ package org.apache.ws.security.message;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.common.CustomHandler;
 import org.apache.ws.security.common.SOAPUtil;
+import org.apache.ws.security.common.UsernamePasswordCallbackHandler;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.w3c.dom.Document;
 
-import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.callback.UnsupportedCallbackException;
-import java.io.IOException;
 
 /**
  * This is a test for processing a Username Token to enforce either a plaintext or digest
  * password type. See WSS-255.
  */
-public class PasswordTypeTest extends org.junit.Assert implements CallbackHandler {
+public class PasswordTypeTest extends org.junit.Assert {
     private static final Log LOG = LogFactory.getLog(PasswordTypeTest.class);
     private static final String SOAPMSG = 
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" 
@@ -55,6 +52,8 @@ public class PasswordTypeTest extends org.junit.Assert implements CallbackHandle
         +       "</add>" 
         +   "</SOAP-ENV:Body>" 
         + "</SOAP-ENV:Envelope>";
+    
+    private CallbackHandler callbackHandler = new UsernamePasswordCallbackHandler();
 
     /**
      * Test that adds a UserNameToken with password Digest to a WS-Security envelope
@@ -82,14 +81,14 @@ public class PasswordTypeTest extends org.junit.Assert implements CallbackHandle
         //
         wssConfig.setRequiredPasswordType(WSConstants.PASSWORD_DIGEST);
         secEngine.setWssConfig(wssConfig);
-        secEngine.processSecurityHeader(doc, null, this, null);
+        secEngine.processSecurityHeader(doc, null, callbackHandler, null);
         
         //
         // It should pass with null
         //
         wssConfig.setRequiredPasswordType(null);
         secEngine.setWssConfig(wssConfig);
-        secEngine.processSecurityHeader(doc, null, this, null);
+        secEngine.processSecurityHeader(doc, null, callbackHandler, null);
         
         //
         // It should fail with PASSWORD_TEXT
@@ -97,7 +96,7 @@ public class PasswordTypeTest extends org.junit.Assert implements CallbackHandle
         try {
             wssConfig.setRequiredPasswordType(WSConstants.PASSWORD_TEXT);
             secEngine.setWssConfig(wssConfig);
-            secEngine.processSecurityHeader(doc, null, this, null);
+            secEngine.processSecurityHeader(doc, null, callbackHandler, null);
             fail("Expected failure on the wrong password type");
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == WSSecurityException.FAILED_AUTHENTICATION);
@@ -132,14 +131,14 @@ public class PasswordTypeTest extends org.junit.Assert implements CallbackHandle
         //
         wssConfig.setRequiredPasswordType(WSConstants.PASSWORD_TEXT);
         secEngine.setWssConfig(wssConfig);
-        secEngine.processSecurityHeader(doc, null, this, null);
+        secEngine.processSecurityHeader(doc, null, callbackHandler, null);
         
         //
         // It should pass with null
         //
         wssConfig.setRequiredPasswordType(null);
         secEngine.setWssConfig(wssConfig);
-        secEngine.processSecurityHeader(doc, null, this, null);
+        secEngine.processSecurityHeader(doc, null, callbackHandler, null);
         
         //
         // It should fail with PASSWORD_DIGEST
@@ -147,7 +146,7 @@ public class PasswordTypeTest extends org.junit.Assert implements CallbackHandle
         try {
             wssConfig.setRequiredPasswordType(WSConstants.PASSWORD_DIGEST);
             secEngine.setWssConfig(wssConfig);
-            secEngine.processSecurityHeader(doc, null, this, null);
+            secEngine.processSecurityHeader(doc, null, callbackHandler, null);
             fail("Expected failure on the wrong password type");
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == WSSecurityException.FAILED_AUTHENTICATION);
@@ -192,7 +191,7 @@ public class PasswordTypeTest extends org.junit.Assert implements CallbackHandle
         handler.receive(WSConstants.UT, reqData);
         WSSecurityEngine secEngine = new WSSecurityEngine();
         secEngine.setWssConfig(reqData.getWssConfig());
-        secEngine.processSecurityHeader(doc, null, this, null);
+        secEngine.processSecurityHeader(doc, null, callbackHandler, null);
         
         //
         // It should fail on strict password type processing
@@ -201,28 +200,11 @@ public class PasswordTypeTest extends org.junit.Assert implements CallbackHandle
         reqData.setMsgContext(config);
         handler.receive(WSConstants.UT, reqData);
         try {
-            secEngine.processSecurityHeader(doc, null, this, null);
+            secEngine.processSecurityHeader(doc, null, callbackHandler, null);
             fail("Expected failure on the wrong password type");
         } catch (WSSecurityException ex) {
             // expected
         }
     }
-    
 
-    public void handle(Callback[] callbacks)
-        throws IOException, UnsupportedCallbackException {
-        for (int i = 0; i < callbacks.length; i++) {
-            if (callbacks[i] instanceof WSPasswordCallback) {
-                WSPasswordCallback pc = (WSPasswordCallback) callbacks[i];
-                if (pc.getUsage() == WSPasswordCallback.USERNAME_TOKEN
-                    && "wernerd".equals(pc.getIdentifier())) {
-                    pc.setPassword("verySecret");
-                } else {
-                    throw new IOException("Authentication failed");
-                }
-            } else {
-                throw new UnsupportedCallbackException(callbacks[i], "Unrecognized Callback");
-            }
-        }
-    }
 }

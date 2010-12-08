@@ -28,6 +28,7 @@ import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.common.CustomHandler;
 import org.apache.ws.security.common.EncodedPasswordCallbackHandler;
+import org.apache.ws.security.common.UsernamePasswordCallbackHandler;
 import org.apache.ws.security.common.SOAPUtil;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.handler.WSHandlerConstants;
@@ -113,6 +114,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         + "</SOAP-ENV:Body>\r\n       \r\n" + "</SOAP-ENV:Envelope>";
     
     private WSSecurityEngine secEngine = new WSSecurityEngine();
+    private CallbackHandler callbackHandler = new UsernamePasswordCallbackHandler();
 
     /**
      * Test that adds a UserNameToken with password Digest to a WS-Security envelope
@@ -369,7 +371,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
     public void testUsernameTokenNoPassword() throws Exception {
         WSSecUsernameToken builder = new WSSecUsernameToken();
         builder.setPasswordType(null);
-        builder.setUserInfo("wernerd", null);
+        builder.setUserInfo("nopassuser", null);
         LOG.info("Before adding UsernameToken with no password....");
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         WSSecHeader secHeader = new WSSecHeader();
@@ -407,7 +409,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
                 org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
-        verify(signedDoc);
+        secEngine.processSecurityHeader(doc, null, this, null);
     }
     
     /**
@@ -423,7 +425,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
             LOG.debug(outputString);
         }
         
-        verify(doc);
+        secEngine.processSecurityHeader(doc, null, this, null);
     }
     
     /**
@@ -448,7 +450,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
             LOG.debug(outputString);
         }
         try {
-            verify(signedDoc);
+            secEngine.processSecurityHeader(signedDoc, null, this, null);
             throw new Exception("Custom token types are not permitted");
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == WSSecurityException.FAILED_AUTHENTICATION);
@@ -478,7 +480,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
             LOG.debug(outputString);
         }
         try {
-            verify(signedDoc);
+            secEngine.processSecurityHeader(signedDoc, null, this, null);
             throw new Exception("Custom token types are not permitted");
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == WSSecurityException.FAILED_AUTHENTICATION);
@@ -514,7 +516,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         WSSConfig cfg = WSSConfig.getNewInstance();
         cfg.setHandleCustomPasswordTypes(true);
         secEngine.setWssConfig(cfg);
-        verify(signedDoc);
+        secEngine.processSecurityHeader(signedDoc, null, this, null);
         
         //
         // Go back to default for other tests
@@ -690,19 +692,19 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
      */
     private void verify(Document doc) throws Exception {
         LOG.info("Before verifying UsernameToken....");
-        secEngine.processSecurityHeader(doc, null, this, null);
+        secEngine.processSecurityHeader(doc, null, callbackHandler, null);
         LOG.info("After verifying UsernameToken....");
     }
     
+    /**
+     * A CallbackHandler for some (mostly insecure) scenarios.
+     */
     public void handle(Callback[] callbacks)
         throws IOException, UnsupportedCallbackException {
         for (int i = 0; i < callbacks.length; i++) {
             if (callbacks[i] instanceof WSPasswordCallback) {
                 WSPasswordCallback pc = (WSPasswordCallback) callbacks[i];
                 if (pc.getUsage() == WSPasswordCallback.USERNAME_TOKEN
-                    && "wernerd".equals(pc.getIdentifier())) {
-                    pc.setPassword("verySecret");
-                } else if (pc.getUsage() == WSPasswordCallback.USERNAME_TOKEN
                     && "emptyuser".equals(pc.getIdentifier())) {
                     pc.setPassword("");
                 } else if (

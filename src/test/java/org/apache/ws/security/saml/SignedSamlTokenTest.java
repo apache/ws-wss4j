@@ -25,11 +25,11 @@ import org.apache.ws.security.saml.SAMLIssuer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.common.CustomHandler;
+import org.apache.ws.security.common.KeystoreCallbackHandler;
 import org.apache.ws.security.common.SOAPUtil;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
@@ -41,10 +41,7 @@ import org.w3c.dom.Document;
 
 import org.opensaml.SAMLAssertion;
 
-import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.callback.UnsupportedCallbackException;
-import java.io.IOException;
 import java.util.List;
 
 /**
@@ -52,7 +49,7 @@ import java.util.List;
  * 
  * @author Davanum Srinivas (dims@yahoo.com)
  */
-public class SignedSamlTokenTest extends org.junit.Assert implements CallbackHandler {
+public class SignedSamlTokenTest extends org.junit.Assert {
     private static final Log LOG = LogFactory.getLog(SignedSamlTokenTest.class);
     private static final String SOAPMSG = 
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" 
@@ -66,6 +63,7 @@ public class SignedSamlTokenTest extends org.junit.Assert implements CallbackHan
         + "</SOAP-ENV:Envelope>";
 
     private WSSecurityEngine secEngine = new WSSecurityEngine();
+    private CallbackHandler callbackHandler = new KeystoreCallbackHandler();
     private Crypto crypto = CryptoFactory.getInstance("crypto.properties");
 
     /**
@@ -237,7 +235,7 @@ public class SignedSamlTokenTest extends org.junit.Assert implements CallbackHan
         handler.receive(WSConstants.ST_SIGNED, reqData);
         
         secEngine.processSecurityHeader(
-            signedDoc, null, this, reqData.getSigCrypto(), reqData.getDecCrypto()
+            signedDoc, null, callbackHandler, reqData.getSigCrypto(), reqData.getDecCrypto()
         );
         
         //
@@ -410,29 +408,11 @@ public class SignedSamlTokenTest extends org.junit.Assert implements CallbackHan
      */
     private List<WSSecurityEngineResult> verify(Document doc) throws Exception {
         List<WSSecurityEngineResult> results = 
-            secEngine.processSecurityHeader(doc, null, this, crypto);
+            secEngine.processSecurityHeader(doc, null, callbackHandler, crypto);
         String outputString = 
             org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
         assertTrue(outputString.indexOf("LogTestService2") > 0 ? true : false);
         return results;
     }
 
-    public void handle(Callback[] callbacks)
-        throws IOException, UnsupportedCallbackException {
-        for (int i = 0; i < callbacks.length; i++) {
-            if (callbacks[i] instanceof WSPasswordCallback) {
-                WSPasswordCallback pc = (WSPasswordCallback) callbacks[i];
-                /*
-                 * here call a function/method to lookup the password for
-                 * the given identifier (e.g. a user name or keystore alias)
-                 * e.g.: pc.setPassword(passStore.getPassword(pc.getIdentfifier))
-                 * for Testing we supply a fixed name here.
-                 */
-                pc.setPassword("security");
-            } else {
-                throw new UnsupportedCallbackException(callbacks[i], "Unrecognized Callback");
-            }
-        }
-    }
-    
 }

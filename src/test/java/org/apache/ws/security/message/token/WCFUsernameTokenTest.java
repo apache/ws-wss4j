@@ -22,17 +22,13 @@ package org.apache.ws.security.message.token;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSecurityEngine;
-import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.common.SOAPUtil;
+import org.apache.ws.security.common.UsernamePasswordCallbackHandler;
 import org.w3c.dom.Document;
 
-import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.callback.UnsupportedCallbackException;
-import java.io.IOException;
 
 
 /**
@@ -41,7 +37,7 @@ import java.io.IOException;
  * The issue is that WCF generated Username Tokens where the password type is namespace
  * qualified (incorrectly). WSS-199 added the ability to process these Username Tokens.
  */
-public class WCFUsernameTokenTest extends org.junit.Assert implements CallbackHandler {
+public class WCFUsernameTokenTest extends org.junit.Assert {
     private static final Log LOG = LogFactory.getLog(WCFUsernameTokenTest.class);
     private static final String SOAPUTMSG = 
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" 
@@ -62,6 +58,7 @@ public class WCFUsernameTokenTest extends org.junit.Assert implements CallbackHa
         + "</SOAP-ENV:Body>\r\n       \r\n" + "</SOAP-ENV:Envelope>";
     
     private WSSecurityEngine secEngine = new WSSecurityEngine();
+    private CallbackHandler callbackHandler = new UsernamePasswordCallbackHandler();
 
     /**
      * Test that adds a UserNameToken with a namespace qualified type. This should fail
@@ -115,27 +112,8 @@ public class WCFUsernameTokenTest extends org.junit.Assert implements CallbackHa
      */
     private void verify(Document doc) throws Exception {
         LOG.info("Before verifying UsernameToken....");
-        secEngine.processSecurityHeader(doc, null, this, null);
+        secEngine.processSecurityHeader(doc, null, callbackHandler, null);
         LOG.info("After verifying UsernameToken....");
     }
 
-    public void handle(Callback[] callbacks)
-        throws IOException, UnsupportedCallbackException {
-        for (int i = 0; i < callbacks.length; i++) {
-            if (callbacks[i] instanceof WSPasswordCallback) {
-                WSPasswordCallback pc = (WSPasswordCallback) callbacks[i];
-                assertEquals(pc.getPasswordType(), WSConstants.PASSWORD_TEXT);
-                if (pc.getUsage() == WSPasswordCallback.USERNAME_TOKEN
-                    && "wernerd".equals(pc.getIdentifier())) {
-                    pc.setPassword("verySecret");
-                } else if (
-                    pc.getUsage() == WSPasswordCallback.USERNAME_TOKEN_UNKNOWN
-                ) {
-                    throw new IOException("Authentication failed");
-                }
-            } else {
-                throw new UnsupportedCallbackException(callbacks[i], "Unrecognized Callback");
-            }
-        }
-    }
 }
