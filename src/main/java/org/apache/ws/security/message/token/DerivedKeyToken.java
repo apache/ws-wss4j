@@ -493,13 +493,11 @@ public class DerivedKeyToken {
     /**
      * Set the derivation algorithm of this derived key token.
      *
-     * @param algo the value for the <code>wsu:Algorithm</code> attribute of this
+     * @param algo the value for the <code>Algorithm</code> attribute of this
      *             DerivedKeyToken
      */
     public void setAlgorithm(String algo) {
-        element.setAttributeNS(
-            ns, ConversationConstants.WSC_PREFIX + ":Algorithm", algo
-        );
+        element.setAttributeNS(ns, "Algorithm", algo);
     }
 
 }
