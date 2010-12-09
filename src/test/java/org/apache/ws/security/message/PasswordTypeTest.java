@@ -40,19 +40,6 @@ import javax.security.auth.callback.CallbackHandler;
  */
 public class PasswordTypeTest extends org.junit.Assert {
     private static final Log LOG = LogFactory.getLog(PasswordTypeTest.class);
-    private static final String SOAPMSG = 
-        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" 
-        + "<SOAP-ENV:Envelope "
-        +   "xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" "
-        +   "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" "
-        +   "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" 
-        +   "<SOAP-ENV:Body>" 
-        +       "<add xmlns=\"http://ws.apache.org/counter/counter_port_type\">" 
-        +           "<value xmlns=\"\">15</value>" 
-        +       "</add>" 
-        +   "</SOAP-ENV:Body>" 
-        + "</SOAP-ENV:Envelope>";
-    
     private CallbackHandler callbackHandler = new UsernamePasswordCallbackHandler();
 
     /**
@@ -62,7 +49,7 @@ public class PasswordTypeTest extends org.junit.Assert {
     public void testPasswordDigest() throws Exception {
         WSSecUsernameToken builder = new WSSecUsernameToken();
         builder.setUserInfo("wernerd", "verySecret");
-        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         Document signedDoc = builder.build(doc, secHeader);
@@ -112,7 +99,7 @@ public class PasswordTypeTest extends org.junit.Assert {
         WSSecUsernameToken builder = new WSSecUsernameToken();
         builder.setPasswordType(WSConstants.PASSWORD_TEXT);
         builder.setUserInfo("wernerd", "verySecret");
-        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         Document signedDoc = builder.build(doc, secHeader);
@@ -161,7 +148,7 @@ public class PasswordTypeTest extends org.junit.Assert {
     @org.junit.Test
     public void testUsernameTokenWSHandler() throws Exception {
         CustomHandler handler = new CustomHandler();
-        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         
         RequestData reqData = new RequestData();
         java.util.Map<String, Object> config = new java.util.TreeMap<String, Object>();

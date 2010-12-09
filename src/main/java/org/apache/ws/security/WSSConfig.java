@@ -326,8 +326,6 @@ public class WSSConfig {
     
     /**
      * @return a new WSSConfig instance configured with the default values
-     *         (values identical to
-     *         {@link #getDefaultWSConfig getDefaultWSConfig()})
      */
     public static WSSConfig getNewInstance() {
         return new WSSConfig();

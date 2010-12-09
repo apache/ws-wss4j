@@ -38,19 +38,6 @@ import java.util.List;
  */
 public class TimestampTest extends org.junit.Assert {
     private static final Log LOG = LogFactory.getLog(TimestampTest.class);
-    private static final String SOAPMSG = 
-        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" 
-        + "<SOAP-ENV:Envelope "
-        +   "xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" "
-        +   "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" "
-        +   "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" 
-        +   "<SOAP-ENV:Body>" 
-        +       "<add xmlns=\"http://ws.apache.org/counter/counter_port_type\">" 
-        +           "<value xmlns=\"\">15</value>" 
-        +       "</add>" 
-        +   "</SOAP-ENV:Body>" 
-        + "</SOAP-ENV:Envelope>";
-    
     private WSSecurityEngine secEngine = new WSSecurityEngine();
 
     /**
@@ -59,7 +46,7 @@ public class TimestampTest extends org.junit.Assert {
     @org.junit.Test
     public void testValidTimestamp() throws Exception {
 
-        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
@@ -93,7 +80,7 @@ public class TimestampTest extends org.junit.Assert {
     @org.junit.Test
     public void testValidTimestampNoExpires() throws Exception {
 
-        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
@@ -127,7 +114,7 @@ public class TimestampTest extends org.junit.Assert {
     @org.junit.Test
     public void testExpiredTimestamp() throws Exception {
 
-        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
@@ -157,7 +144,7 @@ public class TimestampTest extends org.junit.Assert {
     @org.junit.Test
     public void testOldTimestamp() throws Exception {
         
-        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         

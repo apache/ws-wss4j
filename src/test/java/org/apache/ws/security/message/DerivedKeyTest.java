@@ -39,17 +39,6 @@ import java.security.cert.X509Certificate;
  */
 public class DerivedKeyTest extends org.junit.Assert {
     private static final Log LOG = LogFactory.getLog(DerivedKeyTest.class);
-    private static final String SOAPMSG = 
-        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" 
-        + "<SOAP-ENV:Envelope "
-        +   "xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" "
-        +   "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" "
-        +   "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" 
-        +   "<SOAP-ENV:Body>" 
-        +      "<ns1:testMethod xmlns:ns1=\"uri:LogTestService2\"></ns1:testMethod>" 
-        +   "</SOAP-ENV:Body>" 
-        + "</SOAP-ENV:Envelope>";
-
     private WSSecurityEngine secEngine = new WSSecurityEngine();
     private CallbackHandler callbackHandler = new KeystoreCallbackHandler();
     private Crypto crypto = CryptoFactory.getInstance("wss40.properties");
@@ -61,7 +50,7 @@ public class DerivedKeyTest extends org.junit.Assert {
      */
     @org.junit.Test
     public void testEncryptionDecryptionTRIPLEDES() throws Exception {
-        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
 
@@ -99,7 +88,7 @@ public class DerivedKeyTest extends org.junit.Assert {
      */
     @org.junit.Test
     public void testEncryptionDecryptionAES128() throws Exception {
-        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
 
@@ -133,7 +122,7 @@ public class DerivedKeyTest extends org.junit.Assert {
      
     @org.junit.Test
     public void testSignature() throws Exception {
-        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
 
@@ -174,7 +163,7 @@ public class DerivedKeyTest extends org.junit.Assert {
      */
     @org.junit.Test
     public void testSignatureThumbprintSHA1() throws Exception {
-        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
 
@@ -207,7 +196,7 @@ public class DerivedKeyTest extends org.junit.Assert {
      */
     @org.junit.Test
     public void testSignatureSKI() throws Exception {
-        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
 
@@ -234,7 +223,7 @@ public class DerivedKeyTest extends org.junit.Assert {
 
     @org.junit.Test
     public void testSignatureEncrypt() throws Exception {
-        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
 
@@ -275,7 +264,7 @@ public class DerivedKeyTest extends org.junit.Assert {
 
     @org.junit.Test
     public void testEncryptSignature() throws Exception {
-        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
 
@@ -326,7 +315,7 @@ public class DerivedKeyTest extends org.junit.Assert {
         secEngine.processSecurityHeader(doc, null, callbackHandler, crypto);
         String outputString = 
             org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
-        assertTrue(outputString.indexOf("LogTestService2") > 0 ? true : false);
+        assertTrue(outputString.indexOf("counter_port_type") > 0 ? true : false);
     }
 
 }

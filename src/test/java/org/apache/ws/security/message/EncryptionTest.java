@@ -55,16 +55,6 @@ import java.util.ArrayList;
  */
 public class EncryptionTest extends org.junit.Assert {
     private static final Log LOG = LogFactory.getLog(EncryptionTest.class);
-    private static final String SOAPMSG = 
-        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" 
-        + "<SOAP-ENV:Envelope "
-        +   "xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" "
-        +   "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" "
-        +   "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" 
-        +   "<SOAP-ENV:Body>" 
-        +      "<ns1:testMethod xmlns:ns1=\"uri:LogTestService2\"></ns1:testMethod>" 
-        +   "</SOAP-ENV:Body>" 
-        + "</SOAP-ENV:Envelope>";
     private static final javax.xml.namespace.QName SOAP_BODY =
         new javax.xml.namespace.QName(
             WSConstants.URI_SOAP11_ENV,
@@ -105,7 +95,7 @@ public class EncryptionTest extends org.junit.Assert {
         builder.setUserInfo("wss40");
         builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
         builder.setSymmetricEncAlgorithm(WSConstants.TRIPLE_DES);
-        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         LOG.info("Before Encryption Triple DES....");
@@ -118,7 +108,7 @@ public class EncryptionTest extends org.junit.Assert {
             LOG.debug("Encrypted message, RSA-15 keytransport, 3DES:");
             LOG.debug(outputString);
         }
-        assertTrue(outputString.indexOf("LogTestService2") == -1 ? true : false);
+        assertTrue(outputString.indexOf("counter_port_type") == -1 ? true : false);
         verify(encryptedDoc, keystoreCallbackHandler, SOAP_BODY);
 
         /*
@@ -130,11 +120,13 @@ public class EncryptionTest extends org.junit.Assert {
         builder.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
         builder.setSymmetricEncAlgorithm(WSConstants.AES_128);
         java.util.List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
-        WSEncryptionPart encP =
-            new WSEncryptionPart("testMethod", "uri:LogTestService2", "Element");
+        WSEncryptionPart encP = 
+            new WSEncryptionPart(
+                "add", "http://ws.apache.org/counter/counter_port_type", "Element"
+            );
         parts.add(encP);
         builder.setParts(parts);
-        doc = SOAPUtil.toSOAPPart(SOAPMSG);
+        doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);        
         LOG.info("Before Encryption AES 128/RSA-15....");
@@ -146,13 +138,13 @@ public class EncryptionTest extends org.junit.Assert {
             LOG.debug("Encrypted message, RSA-15 keytransport, AES 128:");
             LOG.debug(outputString);
         }
-        assertTrue(outputString.indexOf("LogTestService2") == -1 ? true : false);
+        assertTrue(outputString.indexOf("counter_port_type") == -1 ? true : false);
         verify(
             encryptedDoc,
             keystoreCallbackHandler,
             new javax.xml.namespace.QName(
-                "uri:LogTestService2",
-                "testMethod"
+                "http://ws.apache.org/counter/counter_port_type",
+                "add"
             )
         );
     }
@@ -171,7 +163,7 @@ public class EncryptionTest extends org.junit.Assert {
         builder.setUserInfo("wss40");
         builder.setKeyIdentifierType(WSConstants.X509_KEY_IDENTIFIER);
         builder.setKeyEnc(WSConstants.KEYTRANSPORT_RSAOEP);
-        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);        
         LOG.info("Before Encryption Triple DES/RSA-OAEP....");
@@ -184,7 +176,7 @@ public class EncryptionTest extends org.junit.Assert {
             LOG.debug("Encrypted message, RSA-OAEP keytransport, 3DES:");
             LOG.debug(outputString);
         }
-        assertTrue(outputString.indexOf("LogTestService2") == -1 ? true : false);
+        assertTrue(outputString.indexOf("counter_port_type") == -1 ? true : false);
         verify(encryptedDoc, keystoreCallbackHandler, SOAP_BODY);
 
     }
@@ -203,7 +195,7 @@ public class EncryptionTest extends org.junit.Assert {
         WSSecEncrypt encrypt = new WSSecEncrypt();
         encrypt.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e");
         LOG.info("Before Encryption....");
-        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
 
@@ -244,7 +236,7 @@ public class EncryptionTest extends org.junit.Assert {
         builder.setKeyIdentifierType(WSConstants.THUMBPRINT_IDENTIFIER);
         
         LOG.info("Before Encrypting ThumbprintSHA1....");
-        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);        
         Document encryptedDoc = builder.build(doc, encCrypto, secHeader);
@@ -276,7 +268,7 @@ public class EncryptionTest extends org.junit.Assert {
         builder.setKeyIdentifierType(WSConstants.ENCRYPTED_KEY_SHA1_IDENTIFIER);
      
         LOG.info("Before Encrypting EncryptedKeySHA1....");
-        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);        
         Document encryptedDoc = builder.build(doc, encCrypto, secHeader);
@@ -307,7 +299,7 @@ public class EncryptionTest extends org.junit.Assert {
         builder.setEncryptSymmKey(false);
         
         LOG.info("Before Encrypting EncryptedKeySHA1....");
-        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         Document encryptedDoc = builder.build(doc, crypto, secHeader);
@@ -342,7 +334,7 @@ public class EncryptionTest extends org.junit.Assert {
         builder.setEncryptSymmKey(false);
         
         LOG.info("Before Encrypting EncryptedKeySHA1....");
-        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);        
         Document encryptedDoc = builder.build(doc, crypto, secHeader);
@@ -386,7 +378,7 @@ public class EncryptionTest extends org.junit.Assert {
         
         final java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
         actions.add(new Integer(WSConstants.ENCR));
-        final Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
+        final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
         handler.send(
             WSConstants.ENCR, 
@@ -422,7 +414,7 @@ public class EncryptionTest extends org.junit.Assert {
         builder.setUserInfo("wss40");
         builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
         builder.setSymmetricEncAlgorithm(WSConstants.TRIPLE_DES);
-        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         LOG.info("Before Encryption Triple DES....");
@@ -469,13 +461,13 @@ public class EncryptionTest extends org.junit.Assert {
             LOG.debug("Encrypted message, RSA-15 keytransport, 3DES:");
             LOG.debug(outputString);
         }
-        assertTrue(outputString.indexOf("LogTestService2") == -1 ? true
+        assertTrue(outputString.indexOf("counter_port_type") == -1 ? true
                 : false);
         verify(encryptedDoc, crypto, keystoreCallbackHandler);
         
         outputString = 
             org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(encryptedDoc);
-        assertTrue(outputString.indexOf("LogTestService2") > 0 ? true
+        assertTrue(outputString.indexOf("counter_port_type") > 0 ? true
                 : false);
     }
 
@@ -518,7 +510,7 @@ public class EncryptionTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }
-        assertTrue(outputString.indexOf("LogTestService2") > 0 ? true : false);
+        assertTrue(outputString.indexOf("counter_port_type") > 0 ? true : false);
         //
         // walk through the results, and make sure there is an encryption
         // action, together with a reference to the decrypted element 

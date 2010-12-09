@@ -42,19 +42,6 @@ import java.util.ArrayList;
  */
 public class STRSignatureTest extends org.junit.Assert {
     private static final Log LOG = LogFactory.getLog(STRSignatureTest.class);
-    private static final String SOAPMSG = 
-        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" 
-        + "<SOAP-ENV:Envelope "
-        +   "xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" "
-        +   "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" "
-        +   "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" 
-        +   "<SOAP-ENV:Body>" 
-        +       "<add xmlns=\"http://ws.apache.org/counter/counter_port_type\">" 
-        +           "<value xmlns=\"\">15</value>" 
-        +       "</add>" 
-        +   "</SOAP-ENV:Body>" 
-        + "</SOAP-ENV:Envelope>";
-    
     private WSSecurityEngine secEngine = new WSSecurityEngine();
     private Crypto crypto = CryptoFactory.getInstance("wss40.properties");
 
@@ -71,7 +58,7 @@ public class STRSignatureTest extends org.junit.Assert {
     public void testX509SignatureDirectSTR() throws Exception {
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("wss40", "security");
-        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         SOAPConstants soapConstants = WSSecurityUtil.getSOAPConstants(doc.getDocumentElement());
         List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
         
@@ -121,7 +108,7 @@ public class STRSignatureTest extends org.junit.Assert {
     public void testWSS96() throws Exception {
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("wss40", "security");
-        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         SOAPConstants soapConstants = WSSecurityUtil.getSOAPConstants(doc.getDocumentElement());
         List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
         
@@ -181,7 +168,7 @@ public class STRSignatureTest extends org.junit.Assert {
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("wss40", "security");
         
-        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         SOAPConstants soapConstants = WSSecurityUtil.getSOAPConstants(doc.getDocumentElement());
         List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
         
@@ -235,7 +222,7 @@ public class STRSignatureTest extends org.junit.Assert {
     public void testX509SignatureSKISTR() throws Exception {
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("wss40", "security");
-        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         SOAPConstants soapConstants = WSSecurityUtil.getSOAPConstants(doc.getDocumentElement());
         List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
         

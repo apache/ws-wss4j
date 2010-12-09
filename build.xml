@@ -342,28 +342,7 @@ org.apache.ws.security.util
             />
     </target>
 
-    <target name="dist" depends="bindist, otherdist, srcdist"/>
-
-   <target name="bindist" depends="gump" 
-      description="Build zip file for distro">
-     <delete dir="${dir.dist}"/>
-     <mkdir dir="${dir.dist}"/>
-     <jar jarfile="${dir.dist}/${jar.library}"
-       basedir="${build.classes}"
-       includes="**/apache/**/security/**, META-INF/**"  />
-     <zip destfile=
-        "${dir.dist}/${product.shortname}-bin-${product.version}.zip">
-        <zipfileset prefix="wss4j" dir="."
-            includes="keys/**, test/**, 
-                ChangeLog.txt, LICENSE.txt, README.txt, NOTICE"/>
-        <zipfileset prefix="wss4j/classes" dir="${build.classes}"
-            includes=
-                "*.properties, wssec/**"/>
-        <zipfileset prefix="wss4j/doc/api" dir="${build.javadoc}"/>
-        <zipfileset fullpath="wss4j/${jar.library}" dir="${dir.dist}" 
-            includes="${jar.library}"/>
-      </zip>
-    </target>
+    <target name="dist" depends="otherdist, srcdist"/>
 
     <target name="otherdist" depends="init" 
              description="Build zip for required jars">

@@ -41,18 +41,6 @@ import org.w3c.dom.Document;
  */
 public class SecurityContextTokenTest extends org.junit.Assert {
     private static final Log LOG = LogFactory.getLog(SecurityContextTokenTest.class);
-
-    private static final String SOAPMSG = 
-        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" 
-        + "<SOAP-ENV:Envelope "
-        +   "xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" "
-        +   "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" "
-        +   "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" 
-        +   "<SOAP-ENV:Body>" 
-        +      "<ns1:testMethod xmlns:ns1=\"uri:LogTestService2\"></ns1:testMethod>" 
-        +   "</SOAP-ENV:Body>" 
-        + "</SOAP-ENV:Envelope>";
-
     private WSSecurityEngine secEngine = new WSSecurityEngine();
     private SecretKeyCallbackHandler callbackHandler = new SecretKeyCallbackHandler();
     private Crypto crypto = CryptoFactory.getInstance("wss40.properties");
@@ -61,7 +49,7 @@ public class SecurityContextTokenTest extends org.junit.Assert {
     @org.junit.Test
     public void testBuild() {
         try {
-            Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
+            Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
             WSSecHeader secHeader = new WSSecHeader();
             secHeader.insertSecurityHeader(doc);
 
@@ -99,7 +87,7 @@ public class SecurityContextTokenTest extends org.junit.Assert {
     @org.junit.Test
     public void testSCTDKTEncrypt() {
         try {
-            Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
+            Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
             WSSecHeader secHeader = new WSSecHeader();
             secHeader.insertSecurityHeader(doc);
 
@@ -138,7 +126,7 @@ public class SecurityContextTokenTest extends org.junit.Assert {
     @org.junit.Test
     public void testSCTKDKTSign() {
         try {
-            Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
+            Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
             WSSecHeader secHeader = new WSSecHeader();
             secHeader.insertSecurityHeader(doc);
 
@@ -181,7 +169,7 @@ public class SecurityContextTokenTest extends org.junit.Assert {
     @org.junit.Test
     public void testSCTKDKTSignAbsolute() {
         try {
-            Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
+            Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
             WSSecHeader secHeader = new WSSecHeader();
             secHeader.insertSecurityHeader(doc);
 
@@ -221,7 +209,7 @@ public class SecurityContextTokenTest extends org.junit.Assert {
     @org.junit.Test
     public void testSCTKDKTSignEncrypt() {
         try {
-            Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
+            Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
             WSSecHeader secHeader = new WSSecHeader();
             secHeader.insertSecurityHeader(doc);
 
@@ -266,7 +254,7 @@ public class SecurityContextTokenTest extends org.junit.Assert {
     @org.junit.Test
     public void testSCTKDKTEncryptSign() {
         try {
-            Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
+            Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
             WSSecHeader secHeader = new WSSecHeader();
             secHeader.insertSecurityHeader(doc);
 
@@ -316,7 +304,7 @@ public class SecurityContextTokenTest extends org.junit.Assert {
     @org.junit.Test
     public void testSCTSign() {
         try {
-            Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
+            Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
             WSSecHeader secHeader = new WSSecHeader();
             secHeader.insertSecurityHeader(doc);
 
@@ -367,7 +355,7 @@ public class SecurityContextTokenTest extends org.junit.Assert {
         secEngine.processSecurityHeader(doc, null, callbackHandler, crypto);
         String outputString = 
             org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
-        assertTrue(outputString.indexOf("LogTestService2") > 0 ? true : false);
+        assertTrue(outputString.indexOf("counter_port_type") > 0 ? true : false);
     }
 
 

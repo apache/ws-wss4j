@@ -37,24 +37,11 @@ import javax.security.auth.callback.CallbackHandler;
  */
 public class WSHandlerGetPasswordTest extends org.junit.Assert {
     private static final Log LOG = LogFactory.getLog(WSHandlerGetPasswordTest.class);
-    private static final String SOAPMSG = 
-        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" 
-        + "<SOAP-ENV:Envelope "
-        +   "xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" "
-        +   "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" "
-        +   "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" 
-        +   "<SOAP-ENV:Body>" 
-        +       "<add xmlns=\"http://ws.apache.org/counter/counter_port_type\">" 
-        +           "<value xmlns=\"\">15</value>" 
-        +       "</add>" 
-        +   "</SOAP-ENV:Body>" 
-        + "</SOAP-ENV:Envelope>";
-    
     private CallbackHandler callbackHandler = new UsernamePasswordCallbackHandler();
 
     /**
-     * A unit test for {@link WSHandler#getPassword(String, int, String, String, RequestData)},
-     * where the password is obtained from the Message Context.
+     * A unit test for WSHandler.getPassword(...), where the password is obtained 
+     * from the Message Context.
      */
     @org.junit.Test
     public void
@@ -82,8 +69,8 @@ public class WSHandlerGetPasswordTest extends org.junit.Assert {
     }
     
     /**
-     * A WSHandler test for {@link WSHandler#getPassword(String, int, String, String, RequestData)},
-     * where the password is obtained from the Message Context.
+     * A WSHandler test for WSHandler.getPassword(...), where the password is obtained 
+     * from the Message Context.
      */
     @org.junit.Test
     public void
@@ -100,7 +87,7 @@ public class WSHandlerGetPasswordTest extends org.junit.Assert {
         
         final java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
         actions.add(new Integer(WSConstants.UT));
-        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
         handler.send(
             WSConstants.UT, 
@@ -120,9 +107,8 @@ public class WSHandlerGetPasswordTest extends org.junit.Assert {
     }
     
     /**
-     * A test for {@link WSHandler#getPassword(String, int, String, String, RequestData)},
-     * where the password is obtained from a Callback Handler, which is placed on the 
-     * Message Context using a reference.
+     * A test for WSHandler.getPassword(...), where the password is obtained from a 
+     * Callback Handler, which is placed on the Message Context using a reference.
      */
     @org.junit.Test
     public void
@@ -142,7 +128,7 @@ public class WSHandlerGetPasswordTest extends org.junit.Assert {
         
         final java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
         actions.add(new Integer(WSConstants.UT));
-        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
         handler.send(
             WSConstants.UT, 

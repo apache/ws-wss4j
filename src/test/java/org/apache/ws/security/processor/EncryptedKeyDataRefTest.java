@@ -55,17 +55,6 @@ import org.w3c.dom.Element;
  */
 public class EncryptedKeyDataRefTest extends org.junit.Assert {
     private static final Log LOG = LogFactory.getLog(EncryptedKeyDataRefTest.class);
-    private static final String SOAPMSG = 
-        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" 
-        + "<SOAP-ENV:Envelope "
-        +   "xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" "
-        +   "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" "
-        +   "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" 
-        +   "<SOAP-ENV:Body>" 
-        +      "<ns1:testMethod xmlns:ns1=\"uri:LogTestService2\"></ns1:testMethod>" 
-        +   "</SOAP-ENV:Body>" 
-        + "</SOAP-ENV:Envelope>";
-
     private WSSecurityEngine secEngine = new WSSecurityEngine();
     private CallbackHandler callbackHandler = new KeystoreCallbackHandler();
     private Crypto crypto = CryptoFactory.getInstance("wss40.properties");
@@ -79,7 +68,7 @@ public class EncryptedKeyDataRefTest extends org.junit.Assert {
      */
     @org.junit.Test
     public void testDataRefEncryptedKeyProcessor() throws Exception {
-        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecEncrypt builder = new WSSecEncrypt();
         builder.setUserInfo("wss40");
         builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
@@ -97,8 +86,10 @@ public class EncryptedKeyDataRefTest extends org.junit.Assert {
          * Set up the parts structure to encrypt the body
          */
         List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
-        WSEncryptionPart encP = new WSEncryptionPart("testMethod", "uri:LogTestService2",
-                "Element");
+        WSEncryptionPart encP = 
+            new WSEncryptionPart(
+                "add", "http://ws.apache.org/counter/counter_port_type", "Element"
+            );
         parts.add(encP);
 
         /*
@@ -167,8 +158,11 @@ public class EncryptedKeyDataRefTest extends org.junit.Assert {
                     WSDataRef dataRef = (WSDataRef) obj;
 
                     // Check whether QName is correctly set
-                    assertEquals("testMethod", dataRef.getName().getLocalPart());
-                    assertEquals("uri:LogTestService2", dataRef.getName().getNamespaceURI());
+                    assertEquals("add", dataRef.getName().getLocalPart());
+                    assertEquals(
+                        "http://ws.apache.org/counter/counter_port_type", 
+                        dataRef.getName().getNamespaceURI()
+                    );
 
                     // Check whether wsu:Id is set
                     assertNotNull(dataRef.getWsuId());

@@ -50,17 +50,6 @@ import javax.security.auth.callback.CallbackHandler;
  */
 public class SamlReferenceTest extends org.junit.Assert {
     private static final Log LOG = LogFactory.getLog(SamlReferenceTest.class);
-    private static final String SOAPMSG = 
-        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" 
-        + "<SOAP-ENV:Envelope "
-        +   "xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" "
-        +   "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" "
-        +   "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">"
-        +   "<SOAP-ENV:Body>" 
-        +      "<ns1:testMethod xmlns:ns1=\"uri:LogTestService2\"></ns1:testMethod>" 
-        +   "</SOAP-ENV:Body>" 
-        + "</SOAP-ENV:Envelope>";
-
     private WSSecurityEngine secEngine = new WSSecurityEngine();
     private CallbackHandler callbackHandler = new KeystoreCallbackHandler();
 
@@ -74,7 +63,7 @@ public class SamlReferenceTest extends org.junit.Assert {
     public void testSAMLEncryptedKey() throws Exception {
         // Create a SAML assertion
         SAMLIssuer saml = SAMLIssuerFactory.getInstance("saml4.properties");
-        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         saml.setInstanceDoc(doc);
         Crypto hokCrypto = CryptoFactory.getInstance("crypto.properties");
         saml.setUserCrypto(hokCrypto);
@@ -96,7 +85,10 @@ public class SamlReferenceTest extends org.junit.Assert {
         
         builder.prepare(doc, hokCrypto);
         List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
-        WSEncryptionPart encP = new WSEncryptionPart("testMethod", "uri:LogTestService2", "Element");
+        WSEncryptionPart encP = 
+            new WSEncryptionPart(
+                "add", "http://ws.apache.org/counter/counter_port_type", "Element"
+            );
         parts.add(encP);
         Element refElement = builder.encryptForRef(null, parts);
         builder.addInternalRefElement(refElement);
@@ -129,7 +121,7 @@ public class SamlReferenceTest extends org.junit.Assert {
      */
     @org.junit.Test
     public void testKeyIdentifier() throws Exception {
-        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
@@ -182,7 +174,7 @@ public class SamlReferenceTest extends org.junit.Assert {
             secEngine.processSecurityHeader(doc, null, callbackHandler, verifyCrypto);
         String outputString = 
             org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
-        assertTrue(outputString.indexOf("LogTestService2") > 0 ? true : false);
+        assertTrue(outputString.indexOf("counter_port_type") > 0 ? true : false);
         return results;
     }
     

@@ -48,19 +48,6 @@ import java.util.ArrayList;
  */
 public class CustomActionProcessorTest extends org.junit.Assert {
     private static final Log LOG = LogFactory.getLog(CustomActionProcessorTest.class);
-    private static final String SOAPMSG = 
-        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" 
-        + "<SOAP-ENV:Envelope "
-        +   "xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" "
-        +   "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" "
-        +   "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" 
-        +   "<SOAP-ENV:Body>" 
-        +       "<add xmlns=\"http://ws.apache.org/counter/counter_port_type\">" 
-        +           "<value xmlns=\"\">15</value>" 
-        +       "</add>" 
-        +   "</SOAP-ENV:Body>" 
-        + "</SOAP-ENV:Envelope>";
-
     private Crypto crypto = CryptoFactory.getInstance();
 
     /**
@@ -74,7 +61,7 @@ public class CustomActionProcessorTest extends org.junit.Assert {
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         builder.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
         LOG.info("Before Signing IS....");
-        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         Document signedDoc = builder.build(doc, crypto, secHeader);
@@ -122,7 +109,7 @@ public class CustomActionProcessorTest extends org.junit.Assert {
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         builder.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
         LOG.info("Before Signing IS....");
-        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         Document signedDoc = builder.build(doc, crypto, secHeader);
@@ -174,7 +161,7 @@ public class CustomActionProcessorTest extends org.junit.Assert {
         
         final List<Integer> actions = new ArrayList<Integer>();
         actions.add(new Integer(action));
-        final Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
+        final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
         reqData.setMsgContext("bread");
         assertEquals(reqData.getMsgContext(), "bread");
@@ -204,7 +191,7 @@ public class CustomActionProcessorTest extends org.junit.Assert {
         
         final List<Integer> actions = new ArrayList<Integer>();
         actions.add(new Integer(action));
-        final Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
+        final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
         reqData.setMsgContext("bread");
         assertEquals(reqData.getMsgContext(), "bread");
@@ -276,7 +263,7 @@ public class CustomActionProcessorTest extends org.junit.Assert {
         final RequestData reqData = new RequestData();
         reqData.setWssConfig(cfg);
         
-        final Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
+        final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
         reqData.setMsgContext("bread");
         assertEquals(reqData.getMsgContext(), "bread");

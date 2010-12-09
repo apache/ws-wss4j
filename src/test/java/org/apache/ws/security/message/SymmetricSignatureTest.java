@@ -58,19 +58,6 @@ import org.w3c.dom.Document;
  */
 public class SymmetricSignatureTest extends org.junit.Assert implements CallbackHandler {
     private static final Log LOG = LogFactory.getLog(SymmetricSignatureTest.class);
-    private static final String SOAPMSG = 
-        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" 
-        + "<SOAP-ENV:Envelope "
-        +   "xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" "
-        +   "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" "
-        +   "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" 
-        +   "<SOAP-ENV:Body>" 
-        +       "<add xmlns=\"http://ws.apache.org/counter/counter_port_type\">" 
-        +           "<value xmlns=\"\">15</value>" 
-        +       "</add>" 
-        +   "</SOAP-ENV:Body>" 
-        + "</SOAP-ENV:Envelope>";
-
     private WSSecurityEngine secEngine = new WSSecurityEngine();
     private CallbackHandler callbackHandler = new KeystoreCallbackHandler();
     private SecretKeyCallbackHandler secretKeyCallbackHandler = new SecretKeyCallbackHandler();
@@ -96,7 +83,7 @@ public class SymmetricSignatureTest extends org.junit.Assert implements Callback
      */
     @org.junit.Test
     public void testSymmetricSignatureSHA1() throws Exception {
-        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
@@ -129,7 +116,7 @@ public class SymmetricSignatureTest extends org.junit.Assert implements Callback
      */
     @org.junit.Test
     public void testSymmetricSignatureDR() throws Exception {
-        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
@@ -168,7 +155,7 @@ public class SymmetricSignatureTest extends org.junit.Assert implements Callback
      */
     @org.junit.Test
     public void testEncryptedKeySignature() throws Exception {
-        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         LOG.info("Before Sign/Encryption....");
         
         WSSecHeader secHeader = new WSSecHeader();
@@ -225,7 +212,7 @@ public class SymmetricSignatureTest extends org.junit.Assert implements Callback
         
         final java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
         actions.add(new Integer(WSConstants.SIGN));
-        final Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
+        final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
         handler.send(
             WSConstants.SIGN, 

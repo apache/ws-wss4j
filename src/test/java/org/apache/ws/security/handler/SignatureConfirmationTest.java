@@ -43,19 +43,6 @@ import javax.security.auth.callback.CallbackHandler;
  */
 public class SignatureConfirmationTest extends org.junit.Assert {
     private static final Log LOG = LogFactory.getLog(SignatureConfirmationTest.class);
-    private static final String SOAPMSG = 
-        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" 
-        + "<SOAP-ENV:Envelope "
-        +   "xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" "
-        +   "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" "
-        +   "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" 
-        +   "<SOAP-ENV:Body>" 
-        +       "<add xmlns=\"http://ws.apache.org/counter/counter_port_type\">" 
-        +           "<value xmlns=\"\">15</value>" 
-        +       "</add>" 
-        +   "</SOAP-ENV:Body>" 
-        + "</SOAP-ENV:Envelope>";
-
     private WSSecurityEngine secEngine = new WSSecurityEngine();
     private CallbackHandler callbackHandler = new KeystoreCallbackHandler();
     private Crypto crypto = CryptoFactory.getInstance();
@@ -77,7 +64,7 @@ public class SignatureConfirmationTest extends org.junit.Assert {
         
         final java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
         actions.add(new Integer(WSConstants.SIGN));
-        final Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
+        final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
         handler.send(
             WSConstants.SIGN, doc, reqData, actions, true
@@ -116,7 +103,7 @@ public class SignatureConfirmationTest extends org.junit.Assert {
         
         final java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
         actions.add(new Integer(WSConstants.SIGN));
-        final Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
+        final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
         handler.send(
             WSConstants.SIGN, doc, reqData, actions, true
@@ -153,7 +140,7 @@ public class SignatureConfirmationTest extends org.junit.Assert {
         
         final java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
         actions.add(new Integer(WSConstants.SIGN));
-        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
         handler.send(
             WSConstants.SIGN, doc, reqData, actions, true
@@ -177,7 +164,7 @@ public class SignatureConfirmationTest extends org.junit.Assert {
         //
         List<WSSecurityEngineResult> results = verify(doc);
         actions.clear();
-        doc = SOAPUtil.toSOAPPart(SOAPMSG);
+        doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         msgContext = (java.util.Map<String, Object>)reqData.getMsgContext();
         WSHandlerResult handlerResult = new WSHandlerResult(null, results);
         List<WSHandlerResult> receivedResults = new ArrayList<WSHandlerResult>();
@@ -214,7 +201,7 @@ public class SignatureConfirmationTest extends org.junit.Assert {
         
         final java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
         actions.add(new Integer(WSConstants.SIGN));
-        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
         handler.send(
             WSConstants.SIGN, doc, reqData, actions, true
@@ -231,7 +218,7 @@ public class SignatureConfirmationTest extends org.junit.Assert {
         //
         List<WSSecurityEngineResult> results = verify(doc);
         actions.clear();
-        doc = SOAPUtil.toSOAPPart(SOAPMSG);
+        doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         msgContext = (java.util.Map<String, Object>)reqData.getMsgContext();
         WSHandlerResult handlerResult = new WSHandlerResult(null, results);
         List<WSHandlerResult> receivedResults = new ArrayList<WSHandlerResult>();

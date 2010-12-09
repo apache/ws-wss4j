@@ -49,18 +49,6 @@ import java.security.cert.X509Certificate;
  */
 public class CryptoProviderTest extends org.junit.Assert {
     private static final Log LOG = LogFactory.getLog(CryptoProviderTest.class);
-    private static final String SOAPMSG = 
-        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" 
-        + "<SOAP-ENV:Envelope "
-        +   "xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" "
-        +   "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" "
-        +   "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" 
-        +   "<SOAP-ENV:Body>" 
-        +       "<add xmlns=\"http://ws.apache.org/counter/counter_port_type\">" 
-        +           "<value xmlns=\"\">15</value>" 
-        +       "</add>" 
-        +   "</SOAP-ENV:Body>" 
-        + "</SOAP-ENV:Envelope>";
     private WSSecurityEngine secEngine = new WSSecurityEngine();
     private CallbackHandler callbackHandler = new KeystoreCallbackHandler();
     private Crypto crypto;
@@ -89,7 +77,7 @@ public class CryptoProviderTest extends org.junit.Assert {
      */
     @org.junit.Test
     public void testSignatureOID() throws Exception {
-        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecSignature sign = new WSSecSignature();
         sign.setUserInfo("wss86", "security");
         sign.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
@@ -141,7 +129,7 @@ public class CryptoProviderTest extends org.junit.Assert {
 
         WSSecEncrypt encrypt = new WSSecEncrypt();
         encrypt.setUseThisCert(cert);
-        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         Document encryptedDoc = encrypt.build(doc, crypto, secHeader);
@@ -190,7 +178,7 @@ public class CryptoProviderTest extends org.junit.Assert {
 
         WSSecEncrypt encrypt = new WSSecEncrypt();
         encrypt.setUseThisCert(cert);
-        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         Document encryptedDoc = encrypt.build(doc, crypto, secHeader);

@@ -38,19 +38,6 @@ import org.w3c.dom.Document;
  */
 public class SKISignatureTest extends org.junit.Assert {
     private static final Log LOG = LogFactory.getLog(SKISignatureTest.class);
-    private static final String SOAPMSG = 
-        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" 
-        + "<SOAP-ENV:Envelope "
-        +   "xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" "
-        +   "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" "
-        +   "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" 
-        +   "<SOAP-ENV:Body>" 
-        +       "<add xmlns=\"http://ws.apache.org/counter/counter_port_type\">" 
-        +           "<value xmlns=\"\">15</value>" 
-        +       "</add>" 
-        +   "</SOAP-ENV:Body>" 
-        + "</SOAP-ENV:Envelope>";
-    
     private WSSecurityEngine secEngine = new WSSecurityEngine();
     private Crypto crypto = CryptoFactory.getInstance("wss40.properties");
 
@@ -70,7 +57,7 @@ public class SKISignatureTest extends org.junit.Assert {
         builder.setSignatureAlgorithm(WSConstants.DSA);
         
         LOG.info("Before SigningDSA_SKIDirect....");
-        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
@@ -104,7 +91,7 @@ public class SKISignatureTest extends org.junit.Assert {
         builder.setKeyIdentifierType(WSConstants.SKI_KEY_IDENTIFIER);
         
         LOG.info("Before SigningDSA_Autodetect....");
-        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
@@ -138,7 +125,7 @@ public class SKISignatureTest extends org.junit.Assert {
         builder.setKeyIdentifierType(WSConstants.SKI_KEY_IDENTIFIER);
         
         LOG.info("Before SigningRSA_Autodetect....");
-        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
