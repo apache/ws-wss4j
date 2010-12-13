@@ -155,7 +155,7 @@ public class SecurityHeaderInputProcessor extends AbstractInputProcessor {
             super(securityProperties);
             setPhase(Constants.Phase.PREPROCESSING);
             getBeforeProcessors().add(SecurityHeaderInputProcessor.class.getName());
-            getAfterProcessors().add(XMLStreamReaderInputProcessor.class.getName());
+            getAfterProcessors().add(XMLEventReaderInputProcessor.class.getName());
             this.countOfEventsToResponsibleSecurityHeader = countOfEventsToResponsibleSecurityHeader;
             this.countOfEventsUntilEndOfResponsibleSecurityHeader = countOfEventsUntilEndOfResponsibleSecurityHeader;
         }

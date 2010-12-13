@@ -26,11 +26,11 @@ import javax.xml.stream.events.XMLEvent;
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
-public class XMLStreamReaderInputProcessor extends AbstractInputProcessor {
+public class XMLEventReaderInputProcessor extends AbstractInputProcessor {
 
     private XMLEventReader xmlEventReader;
 
-    public XMLStreamReaderInputProcessor(SecurityProperties securityProperties, XMLEventReader xmlEventReader) {
+    public XMLEventReaderInputProcessor(SecurityProperties securityProperties, XMLEventReader xmlEventReader) {
         super(securityProperties);
         setPhase(Constants.Phase.PREPROCESSING);
         this.xmlEventReader = xmlEventReader;

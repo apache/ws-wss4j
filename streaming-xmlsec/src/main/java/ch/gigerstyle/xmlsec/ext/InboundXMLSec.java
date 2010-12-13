@@ -6,7 +6,7 @@ import ch.gigerstyle.xmlsec.impl.XMLEventNSAllocator;
 import ch.gigerstyle.xmlsec.impl.XMLSecurityStreamReader;
 import ch.gigerstyle.xmlsec.impl.processor.input.LogInputProcessor;
 import ch.gigerstyle.xmlsec.impl.processor.input.SecurityHeaderInputProcessor;
-import ch.gigerstyle.xmlsec.impl.processor.input.XMLStreamReaderInputProcessor;
+import ch.gigerstyle.xmlsec.impl.processor.input.XMLEventReaderInputProcessor;
 import ch.gigerstyle.xmlsec.securityEvent.SecurityEventListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -73,7 +73,7 @@ public class InboundXMLSec {
         DocumentContextImpl documentContext = new DocumentContextImpl();
         documentContext.setEncoding(xmlStreamReader.getEncoding() != null ? xmlStreamReader.getEncoding() : "UTF-8");
         InputProcessorChainImpl inputProcessorChain = new InputProcessorChainImpl(securityContextImpl, documentContext);
-        inputProcessorChain.addProcessor(new XMLStreamReaderInputProcessor(securityProperties, xmlEventReader));
+        inputProcessorChain.addProcessor(new XMLEventReaderInputProcessor(securityProperties, xmlEventReader));
         inputProcessorChain.addProcessor(new SecurityHeaderInputProcessor(securityProperties));
 
         if (log.isTraceEnabled()) {
