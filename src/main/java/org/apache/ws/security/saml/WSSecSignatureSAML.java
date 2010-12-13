@@ -23,7 +23,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDocInfo;
-import org.apache.ws.security.WSDocInfoStore;
 import org.apache.ws.security.WSEncryptionPart;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
@@ -33,6 +32,7 @@ import org.apache.ws.security.message.WSSecSignature;
 import org.apache.ws.security.message.token.Reference;
 import org.apache.ws.security.message.token.SecurityTokenReference;
 import org.apache.ws.security.message.token.X509Security;
+import org.apache.ws.security.transform.STRTransform;
 import org.apache.ws.security.util.WSSecurityUtil;
 
 import org.opensaml.SAMLAssertion;
@@ -499,7 +499,6 @@ public class WSSecSignatureSAML extends WSSecSignature {
         WSSecHeader secHeader, 
         Element siblingElement
     ) throws WSSecurityException {
-        boolean remove = WSDocInfoStore.store(wsDocInfo);
         try {
             java.security.Key key;
             if (senderVouches) {
@@ -537,6 +536,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
                     WSConstants.C14N_EXCL_OMIT_COMMENTS_PREFIX
                 );
             }
+            signContext.setProperty(STRTransform.TRANSFORM_WS_DOC_INFO, wsDocInfo);
             URIDereferencer dereferencer = new DOMURIDereferencer();
             ((DOMURIDereferencer)dereferencer).setWsDocInfo(wsDocInfo);
             signContext.setURIDereferencer(dereferencer);
@@ -548,12 +548,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
             throw new WSSecurityException(
                 WSSecurityException.FAILED_SIGNATURE, null, null, ex
             );
-        } finally {
-            if (remove) {
-                WSDocInfoStore.delete(wsDocInfo);
-            }
         }
-
     }
 
     

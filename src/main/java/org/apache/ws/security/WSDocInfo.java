@@ -20,17 +20,16 @@
 package org.apache.ws.security;
 
 /**
- * WSDocInfo holds information about the document to process. Together
- * with the WSDocInfoStore it provides a method to store and access document
- * information about BinarySecurityToken, used Crypto, and others.
- * </p>
+ * WSDocInfo holds information about the document to process. It provides a 
+ * method to store and access document information about BinarySecurityToken, 
+ * used Crypto, and others.
+ * 
  * Using the Document's hash a caller can identify a document and get
  * the stored information that me be necessary to process the document.
  * The main usage for this is (are) the transformation functions that
  * are called during Signature/Verification process. 
  * 
  * @author Werner Dittmann (Werner.Dittmann@siemens.com)
- *
  */
 
 import org.apache.ws.security.components.crypto.Crypto;
@@ -53,9 +52,6 @@ public class WSDocInfo {
         // This is a bit of a hack. When the Document is a SAAJ SOAPPart instance, it may
         // be that the "owner" document of any child elements is an internal Document, rather
         // than the SOAPPart. This is the case for the SUN SAAJ implementation.
-        // This causes problems with STRTransform, as:
-        // WSDocInfoStore.lookup(transformObject.getDocument())
-        // will not work. 
         //
         this.doc = doc.getDocumentElement().getOwnerDocument();
     }

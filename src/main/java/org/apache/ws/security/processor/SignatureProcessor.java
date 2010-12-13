@@ -27,7 +27,6 @@ import org.apache.ws.security.PublicKeyPrincipal;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDataRef;
 import org.apache.ws.security.WSDocInfo;
-import org.apache.ws.security.WSDocInfoStore;
 import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngine;
@@ -113,7 +112,6 @@ public class SignatureProcessor implements Processor {
         if (log.isDebugEnabled()) {
             log.debug("Found signature element");
         }
-        boolean remove = WSDocInfoStore.store(wsDocInfo);
         List<WSDataRef> protectedRefs = new java.util.ArrayList<WSDataRef>();
         Principal lastPrincipalFound = null;
         certs = null;
@@ -128,10 +126,6 @@ public class SignatureProcessor implements Processor {
                 );
         } catch (WSSecurityException ex) {
             throw ex;
-        } finally {
-            if (remove) {
-                WSDocInfoStore.delete(wsDocInfo);
-            }
         }
         int actionPerformed = WSConstants.SIGN;
         if (lastPrincipalFound instanceof WSUsernameTokenPrincipal) {
@@ -417,6 +411,7 @@ public class SignatureProcessor implements Processor {
         URIDereferencer dereferencer = new DOMURIDereferencer();
         ((DOMURIDereferencer)dereferencer).setWsDocInfo(wsDocInfo);
         context.setURIDereferencer(dereferencer);
+        context.setProperty(STRTransform.TRANSFORM_WS_DOC_INFO, wsDocInfo);
         try {
             XMLSignature xmlSignature = signatureFactory.unmarshalXMLSignature(context);
             boolean signatureOk = xmlSignature.validate(context);

@@ -23,7 +23,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDocInfo;
-import org.apache.ws.security.WSDocInfoStore;
 import org.apache.ws.security.message.token.PKIPathSecurity;
 import org.apache.ws.security.message.token.SecurityTokenReference;
 import org.apache.ws.security.message.token.X509Security;
@@ -62,6 +61,8 @@ public class STRTransform extends TransformService {
 
     public static final String TRANSFORM_URI = 
         "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#STR-Transform";
+    
+    public static final String TRANSFORM_WS_DOC_INFO = "transform_ws_doc_info";
 
     private TransformParameterSpec params;
     
@@ -141,7 +142,6 @@ public class STRTransform extends TransformService {
                 );
             canonAlgo = canonElem.getAttribute("Algorithm");
         }
-        xc.getDefaultNamespacePrefix();
         try {
             //
             // Get the input (node) to transform. Currently we support only an
@@ -185,12 +185,12 @@ public class STRTransform extends TransformService {
             //
             // Third and fourth step are performed by dereferenceSTR()
             //
-            Document doc = str.getOwnerDocument();
-            WSDocInfo wsDocInfo = WSDocInfoStore.lookup(doc);
+            WSDocInfo wsDocInfo = (WSDocInfo)xc.getProperty(TRANSFORM_WS_DOC_INFO);
             if (wsDocInfo == null) {
                 throw new TransformException("no WSDocInfo found");
             }
 
+            Document doc = str.getOwnerDocument();
             Element dereferencedToken = 
                 STRTransformUtil.dereferenceSTR(doc, secRef, wsDocInfo);
             

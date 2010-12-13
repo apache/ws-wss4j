@@ -23,7 +23,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDocInfo;
-import org.apache.ws.security.WSDocInfoStore;
 import org.apache.ws.security.WSEncryptionPart;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.conversation.ConversationException;
@@ -221,7 +220,6 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
         boolean prepend,
         Element siblingElement
     ) throws WSSecurityException {
-        boolean remove = WSDocInfoStore.store(wsDocInfo);
         try {
             java.security.Key key = 
                 WSSecurityUtil.prepareSecretKey(sigAlgo, derivedKeyBytes);
@@ -272,10 +270,6 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
             throw new WSSecurityException(
                 WSSecurityException.FAILED_SIGNATURE, null, null, ex
             );
-        } finally {
-            if (remove) {
-                WSDocInfoStore.delete(wsDocInfo);
-            }
         }
     }
     
