@@ -353,6 +353,7 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
         public DecryptedEventReaderInputProcessor getDecryptedStreamInputProcessor() throws XMLStreamException {
 
             //todo set encoding?:
+            //todo spec says (4.2): "The cleartext octet sequence obtained in step 3 is interpreted as UTF-8 encoded character data."
             XMLEventReader xmlEventReader =
                     inputProcessorChain.getSecurityContext().<XMLInputFactory>get(
                             Constants.XMLINPUTFACTORY).createXMLEventReader(pipedInputStream,
