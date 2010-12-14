@@ -412,40 +412,19 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
         List<String> encDataRef = new ArrayList<String>();
         for (int part = 0; part < references.size(); part++) {
             WSEncryptionPart encPart = references.get(part);
-
-            String idToEnc = encPart.getId();
-            String elemName = encPart.getName();
-            String nmSpace = encPart.getNamespace();
-            String modifier = encPart.getEncModifier();
             //
             // Get the data to encrypt.
             //
-            Element elementToEncrypt = null;
-            if (idToEnc != null) {
-                elementToEncrypt = 
-                    WSSecurityUtil.findElementById(
-                        doc.getDocumentElement(), idToEnc, WSConstants.WSU_NS, false
-                    );
-                if (elementToEncrypt == null) {
-                    elementToEncrypt = 
-                        WSSecurityUtil.findElementById(
-                            doc.getDocumentElement(), idToEnc, null, false
-                        );
-                }
-            } else {
-                elementToEncrypt = 
-                    (Element) WSSecurityUtil.findElement(
-                        doc.getDocumentElement(), elemName, nmSpace
-                    );
-            }
+            Element elementToEncrypt = WSSecurityUtil.findElement(encPart, doc, false);
             if (elementToEncrypt == null) {
                 throw new WSSecurityException(
                     WSSecurityException.FAILURE,
                     "noEncElement", 
-                    new Object[] {"{" + nmSpace + "}" + elemName}
+                    new Object[] {"{" + encPart.getNamespace() + "}" + encPart.getName()}
                 );
             }
 
+            String modifier = encPart.getEncModifier();
             boolean content = modifier.equals("Content") ? true : false;
             //
             // Encrypt data, and set necessary attributes in xenc:EncryptedData

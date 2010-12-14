@@ -92,8 +92,7 @@ public class DOMURIDereferencer implements URIDereferencer {
             // Try to resolve the element directly using the EnvelopeIdResolver first
             //
             XMLSignatureInput in = null;
-            EnvelopeIdResolver envelopeResolver = 
-                (EnvelopeIdResolver)EnvelopeIdResolver.getInstance();
+            EnvelopeIdResolver envelopeResolver = new EnvelopeIdResolver();
             if (envelopeResolver.engineCanResolve(uriAttr, baseURI)) {
                 envelopeResolver.setWsDocInfo(wsDocInfo);
                 in = envelopeResolver.engineResolve(uriAttr, baseURI);

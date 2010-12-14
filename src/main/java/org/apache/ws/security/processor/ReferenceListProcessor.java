@@ -179,10 +179,8 @@ public class ReferenceListProcessor implements Processor {
         Document doc,
         String dataRefURI
     ) throws WSSecurityException {
-        Element encryptedDataElement = WSSecurityUtil.getElementByGenId(doc, dataRefURI);
-        if (encryptedDataElement == null) {            
-            encryptedDataElement = WSSecurityUtil.getElementByWsuId(doc, dataRefURI);
-        }
+        Element encryptedDataElement = 
+            WSSecurityUtil.findElementById(doc.getDocumentElement(), dataRefURI, true);
         if (encryptedDataElement == null) {
             throw new WSSecurityException(
                 WSSecurityException.INVALID_SECURITY, "dataRef", new Object[] {dataRefURI}

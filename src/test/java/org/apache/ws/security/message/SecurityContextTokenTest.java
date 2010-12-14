@@ -19,8 +19,6 @@
 
 package org.apache.ws.security.message;
 
-import java.security.SecureRandom;
-
 import javax.xml.crypto.dsig.SignatureMethod;
 
 import org.apache.commons.logging.Log;
@@ -32,6 +30,7 @@ import org.apache.ws.security.common.SOAPUtil;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.conversation.ConversationConstants;
+import org.apache.ws.security.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 
 /**
@@ -94,9 +93,7 @@ public class SecurityContextTokenTest extends org.junit.Assert {
             WSSecSecurityContextToken sctBuilder = new WSSecSecurityContextToken();
             sctBuilder.prepare(doc, crypto);
 
-            SecureRandom random = SecureRandom.getInstance("SHA1PRNG");
-            byte[] tempSecret = new byte[16];
-            random.nextBytes(tempSecret);
+            byte[] tempSecret = WSSecurityUtil.generateNonce(16);
 
             // Store the secret
             callbackHandler.addSecretKey(sctBuilder.getIdentifier(), tempSecret);
@@ -133,9 +130,7 @@ public class SecurityContextTokenTest extends org.junit.Assert {
             WSSecSecurityContextToken sctBuilder = new WSSecSecurityContextToken();
             sctBuilder.prepare(doc, crypto);
 
-            SecureRandom random = SecureRandom.getInstance("SHA1PRNG");
-            byte[] tempSecret = new byte[16];
-            random.nextBytes(tempSecret);
+            byte[] tempSecret = WSSecurityUtil.generateNonce(16);
 
             // Store the secret
             callbackHandler.addSecretKey(sctBuilder.getIdentifier(), tempSecret);
@@ -176,9 +171,7 @@ public class SecurityContextTokenTest extends org.junit.Assert {
             WSSecSecurityContextToken sctBuilder = new WSSecSecurityContextToken();
             sctBuilder.prepare(doc, crypto);
 
-            SecureRandom random = SecureRandom.getInstance("SHA1PRNG");
-            byte[] tempSecret = new byte[16];
-            random.nextBytes(tempSecret);
+            byte[] tempSecret = WSSecurityUtil.generateNonce(16);
 
             // Store the secret
             callbackHandler.addSecretKey(sctBuilder.getIdentifier(), tempSecret);
@@ -216,9 +209,7 @@ public class SecurityContextTokenTest extends org.junit.Assert {
             WSSecSecurityContextToken sctBuilder = new WSSecSecurityContextToken();
             sctBuilder.prepare(doc, crypto);
 
-            SecureRandom random = SecureRandom.getInstance("SHA1PRNG");
-            byte[] tempSecret = new byte[16];
-            random.nextBytes(tempSecret);
+            byte[] tempSecret = WSSecurityUtil.generateNonce(16);
 
             // Store the secret
             callbackHandler.addSecretKey(sctBuilder.getIdentifier(), tempSecret);
@@ -261,9 +252,7 @@ public class SecurityContextTokenTest extends org.junit.Assert {
             WSSecSecurityContextToken sctBuilder = new WSSecSecurityContextToken();
             sctBuilder.prepare(doc, crypto);
 
-            SecureRandom random = SecureRandom.getInstance("SHA1PRNG");
-            byte[] tempSecret = new byte[16];
-            random.nextBytes(tempSecret);
+            byte[] tempSecret = WSSecurityUtil.generateNonce(16);
 
             // Store the secret
             callbackHandler.addSecretKey(sctBuilder.getIdentifier(), tempSecret);
@@ -311,9 +300,7 @@ public class SecurityContextTokenTest extends org.junit.Assert {
             WSSecSecurityContextToken sctBuilder = new WSSecSecurityContextToken();
             sctBuilder.prepare(doc, crypto);
 
-            SecureRandom random = SecureRandom.getInstance("SHA1PRNG");
-            byte[] tempSecret = new byte[16];
-            random.nextBytes(tempSecret);
+            byte[] tempSecret = WSSecurityUtil.generateNonce(16);
 
             // Store the secret
             callbackHandler.addSecretKey(sctBuilder.getIdentifier(), tempSecret);

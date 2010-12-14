@@ -95,46 +95,31 @@ public class WSSecSignatureBase extends WSSecBase {
             // names: "STRTransform": Setup the ds:Reference to use STR Transform
             //
             try {
-                if (idToSign != null && !"STRTransform".equals(elemName)) {
-                    Element toSignById = 
-                        WSSecurityUtil.findElementById(
-                            envelope, idToSign, WSConstants.WSU_NS, false
-                        );
-                    if (toSignById == null) {
-                        toSignById = 
-                            WSSecurityUtil.findElementById(
-                                envelope, idToSign, null, false
+                if (idToSign != null) {
+                    Transform transform = null;
+                    if ("STRTransform".equals(elemName)) {
+                        Element ctx = createSTRParameter(doc);
+                        
+                        XMLStructure structure = new DOMStructure(ctx);
+                        transform =
+                            signatureFactory.newTransform(
+                                STRTransform.TRANSFORM_URI,
+                                structure
+                            );
+                    } else {
+                        TransformParameterSpec transformSpec = null;
+                        if (wssConfig.isWsiBSPCompliant()) {
+                            Element toSignById = 
+                                WSSecurityUtil.findElementById(envelope, idToSign, false);
+                            List<String> prefixes = getInclusivePrefixes(toSignById);
+                            transformSpec = new ExcC14NParameterSpec(prefixes);
+                        }
+                        transform =
+                            signatureFactory.newTransform(
+                                WSConstants.C14N_EXCL_OMIT_COMMENTS,
+                                transformSpec
                             );
                     }
-                    TransformParameterSpec transformSpec = null;
-                    if (wssConfig.isWsiBSPCompliant()) {
-                        List<String> prefixes = getInclusivePrefixes(toSignById);
-                        transformSpec = new ExcC14NParameterSpec(prefixes);
-                    }
-                    Transform transform =
-                        signatureFactory.newTransform(
-                            WSConstants.C14N_EXCL_OMIT_COMMENTS,
-                            transformSpec
-                        );
-                    javax.xml.crypto.dsig.Reference reference = 
-                        signatureFactory.newReference(
-                            "#" + idToSign, 
-                            digestMethod,
-                            Collections.singletonList(transform),
-                            null,
-                            null
-                        );
-                    referenceList.add(reference);
-                } else if (idToSign != null && elemName.equals("STRTransform")) {
-                    Element ctx = createSTRParameter(doc);
-                    
-                    XMLStructure structure = new DOMStructure(ctx);
-                    Transform transform =
-                        signatureFactory.newTransform(
-                            STRTransform.TRANSFORM_URI,
-                            structure
-                        );
-                    
                     javax.xml.crypto.dsig.Reference reference = 
                         signatureFactory.newReference(
                             "#" + idToSign, 
@@ -147,7 +132,7 @@ public class WSSecSignatureBase extends WSSecBase {
                 } else {
                     String nmSpace = encPart.getNamespace();
                     Element elementToSign = 
-                        (Element)WSSecurityUtil.findElement(envelope, elemName, nmSpace);
+                        WSSecurityUtil.findElement(encPart, doc, false);
                     if (elementToSign == null) {
                         throw new WSSecurityException(
                             WSSecurityException.FAILURE, 

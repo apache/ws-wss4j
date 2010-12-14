@@ -284,12 +284,7 @@ public class SecurityTokenReference {
         //
         // Finally try to find the element by its (wsu) Id
         //
-        Element tokElement = WSSecurityUtil.getElementByWsuId(doc, uri);
-        if (tokElement == null) {
-            tokElement = WSSecurityUtil.getElementByGenId(doc, uri);
-        }
-        
-        return tokElement;
+        return WSSecurityUtil.findElementById(doc.getDocumentElement(), uri, true);
     }
 
 

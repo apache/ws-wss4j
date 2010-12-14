@@ -880,10 +880,10 @@ public class SignatureProcessor implements Processor {
                 }
                 
                 if (se == null) {
-                    se = WSSecurityUtil.getElementByWsuId(doc, uri);
-                }
-                if (se == null) {
-                    se = WSSecurityUtil.getElementByGenId(doc, uri);
+                    se = 
+                        WSSecurityUtil.findElementById(
+                            doc.getDocumentElement(), uri, false
+                        );
                 }
                 if (se == null) {
                     throw new WSSecurityException(WSSecurityException.FAILED_CHECK);

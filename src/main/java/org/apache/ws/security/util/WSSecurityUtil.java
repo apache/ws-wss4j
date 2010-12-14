@@ -26,6 +26,7 @@ import org.apache.ws.security.SOAP12Constants;
 import org.apache.ws.security.SOAPConstants;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDataRef;
+import org.apache.ws.security.WSEncryptionPart;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.WSSConfig;
@@ -213,14 +214,49 @@ public class WSSecurityUtil {
         //
         Element docElement = doc.getDocumentElement();
         String ns = docElement.getNamespaceURI();
-        String bodyNamespace = WSConstants.URI_SOAP11_ENV;
-        if (WSConstants.URI_SOAP12_ENV.equals(ns)) {
-            bodyNamespace = ns;
-        }
-        
-        return getDirectChildElement(docElement, WSConstants.ELEM_BODY, bodyNamespace);
+        return getDirectChildElement(docElement, WSConstants.ELEM_BODY, ns);
     }
     
+    
+    /**
+     * Find the DOM Element in the SOAP Envelope that is referenced by the 
+     * WSEncryptionPart argument. The "Id" is used before the Element localname/namespace.
+     * 
+     * @param part The WSEncryptionPart object corresponding to the DOM Element we want
+     * @param doc The owning document
+     * @param checkMultipleElements Whether to check for multiple elements or not
+     * @return the DOM Element in the SOAP Envelope that is found
+     */
+    public static Element findElement(
+        WSEncryptionPart part, Document doc, boolean checkMultipleElements
+    ) {
+        String id = part.getId();
+        String elemName = part.getName();
+        String nmSpace = part.getNamespace();
+        
+        // Try to find the SOAP body first
+        Element bodyElement = WSSecurityUtil.findBodyElement(doc);
+        if (bodyElement != null) {
+            if (id != null) {
+                String cId = bodyElement.getAttributeNS(WSConstants.WSU_NS, "Id");
+                if (cId.equals(id)) {
+                    return bodyElement;
+                }
+            } else {
+                if (WSConstants.ELEM_BODY.equals(elemName) &&
+                    bodyElement.getNamespaceURI().equals(nmSpace)) {
+                    return bodyElement;
+                }
+            }
+        }
+        
+        if (id != null) {
+            return WSSecurityUtil.findElementById(doc.getDocumentElement(), id, checkMultipleElements);
+        } else {
+            return
+                (Element) WSSecurityUtil.findElement(doc.getDocumentElement(), elemName, nmSpace);
+        }
+    }
 
     /**
      * Returns the first element that matches <code>name</code> and
@@ -344,9 +380,9 @@ public class WSSecurityUtil {
 
     /**
      * Returns the single element that contains an Id with value
-     * <code>uri</code> and <code>namespace</code>. <p/> This is a
-     * replacement for a XPath Id lookup with the given namespace. It's somewhat
-     * faster than XPath, and we do not deal with prefixes, just with the real
+     * <code>uri</code> and <code>namespace</code>. The Id can be either a wsu:Id or an Id
+     * with no namespace. This is a replacement for a XPath Id lookup with the given namespace. 
+     * It's somewhat faster than XPath, and we do not deal with prefixes, just with the real
      * namespace URI
      * 
      * If checkMultipleElements is true and there are multiple elements, we log a 
@@ -354,14 +390,13 @@ public class WSSecurityUtil {
      * 
      * @param startNode Where to start the search
      * @param value Value of the Id attribute
-     * @param namespace Namespace URI of the Id
      * @param checkMultipleElements If true then go through the entire tree and return 
      *        null if there are multiple elements with the same Id
      * @return The found element if there was exactly one match, or
      *         <code>null</code> otherwise
      */
     public static Element findElementById(
-        Node startNode, String value, String namespace, boolean checkMultipleElements
+        Node startNode, String value, boolean checkMultipleElements
     ) {
         //
         // Replace the formerly recursive implementation with a depth-first-loop lookup
@@ -369,13 +404,18 @@ public class WSSecurityUtil {
         Node startParent = startNode.getParentNode();
         Node processedNode = null;
         Element foundElement = null;
+        String id = getIDFromReference(value);
 
         while (startNode != null) {
             // start node processing at this point
             if (startNode.getNodeType() == Node.ELEMENT_NODE) {
                 Element se = (Element) startNode;
-                String attributeNS = se.getAttributeNS(namespace, "Id");
-                if (!"".equals(attributeNS) && value.equals(attributeNS)) {
+                // Try the wsu:Id first
+                String attributeNS = se.getAttributeNS(WSConstants.WSU_NS, "Id");
+                if ("".equals(attributeNS) || !id.equals(attributeNS)) {
+                    attributeNS = se.getAttributeNS(null, "Id");
+                }
+                if (!"".equals(attributeNS) && id.equals(attributeNS)) {
                     if (!checkMultipleElements) {
                         return se;
                     } else if (foundElement == null) {
@@ -526,40 +566,6 @@ public class WSSecurityUtil {
         return prefix + ":" + qname.getLocalPart();
     }
 
-    /* up to here */
-
-    /**
-     * Search for an element given its wsu:id. <p/>
-     * 
-     * @param doc the DOM document (SOAP request)
-     * @param id the Id of the element
-     * @return the found element or null if no element with the Id exists
-     */
-    public static Element getElementByWsuId(Document doc, String id) {
-        return getElementByWsuId(doc, id, true);
-    }
-
-    /**
-     * Search for an element given its wsu:id. <p/>
-     * 
-     * @param doc the DOM document (SOAP request)
-     * @param id the Id of the element
-     * @param checkMultipleElements If true then returns null if there are multiple
-     *        elements with the same id
-     * @return the found element or null if no element with the Id exists
-     */
-    public static Element getElementByWsuId(
-        Document doc, String id, boolean checkMultipleElements
-    ) {
-        if (id == null) {
-            return null;
-        }
-        id = getIDFromReference(id);
-        return WSSecurityUtil.findElementById(
-            doc.getDocumentElement(), id, WSConstants.WSU_NS, checkMultipleElements
-        );
-    }
-    
     /**
      * Turn a reference (eg "#5") into an ID (eg "5").
      * 
@@ -578,39 +584,6 @@ public class WSSecurityUtil {
         return id;
     }
     
-    /**
-     * Search for an element given its generic id. <p/>
-     * 
-     * @param doc the DOM document (SOAP request)
-     * @param id the Id of the element
-     * @return the found element or null if no element with the Id exists
-     */
-    public static Element getElementByGenId(Document doc, String id) {
-        return getElementByGenId(doc, id, true);
-    }
-    
-    /**
-     * Search for an element given its generic id. <p/>
-     * 
-     * @param doc the DOM document (SOAP request)
-     * @param id the Id of the element
-     * @param checkMultipleElements If true then returns null if there are multiple
-     *        elements with the same id
-     * 
-     * @return the found element or null if no element with the Id exists
-     */
-    public static Element getElementByGenId(
-        Document doc, String id, boolean checkMultipleElements
-    ) {
-        if (id == null) {
-            return null;
-        }
-        id = getIDFromReference(id);
-        return WSSecurityUtil.findElementById(
-            doc.getDocumentElement(), id, null, checkMultipleElements
-        );
-    }
-
     /**
      * create a new element in the same namespace <p/>
      * 

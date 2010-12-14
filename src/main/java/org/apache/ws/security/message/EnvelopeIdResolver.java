@@ -21,15 +21,13 @@ package org.apache.ws.security.message;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDocInfo;
+import org.apache.ws.security.WSEncryptionPart;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.xml.security.signature.XMLSignatureInput;
 import org.apache.xml.security.utils.resolver.ResourceResolverException;
 import org.apache.xml.security.utils.resolver.ResourceResolverSpi;
-import org.apache.xml.utils.URI;
 import org.w3c.dom.Attr;
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 /**
@@ -43,28 +41,10 @@ public class EnvelopeIdResolver extends ResourceResolverSpi {
     private static Log log =
             LogFactory.getLog(EnvelopeIdResolver.class.getName());
     
-    private static EnvelopeIdResolver resolver = null;
-
     private boolean doDebug = false;
     
     private WSDocInfo wsDocInfo;
     
-    /**
-     * Singleton instance of the resolver.
-     * <p/>
-     *
-     * @return TODO
-     */
-    public synchronized static ResourceResolverSpi getInstance() {
-        if (resolver == null) {
-            resolver = new EnvelopeIdResolver();
-        }
-        return resolver;
-    }
-
-    private EnvelopeIdResolver() {
-    }
-
     /**
      * @param docInfo The WSDocInfo object to be used for resolving elements
      */
@@ -87,76 +67,33 @@ public class EnvelopeIdResolver extends ResourceResolverSpi {
         doDebug = log.isDebugEnabled();
 
         String uriNodeValue = uri.getNodeValue();
-
         if (doDebug) {
             log.debug("enter engineResolve, look for: " + uriNodeValue);
         }
 
-        Document doc = uri.getOwnerDocument();
-
-        /*
-         * URI="#chapter1"
-         * Identifies a node-set containing the element with ID attribute
-         * value 'chapter1' of the XML resource containing the signature.
-         * XML Signature (and its applications) modify this node-set to
-         * include the element plus all descendants including namespaces and
-         * attributes -- but not comments.
-         */
-         
-        /*
-         * First check to see if the element that we require is a SecurityTokenReference, or a
-         * previously processed Security Token that is stored in WSDocInfo.
-         */
+        //
+        // First check to see if the element that we require is a SecurityTokenReference, or a
+        // previously processed Security Token that is stored in WSDocInfo.
+        //
         String id = uriNodeValue.substring(1);
         Element selectedElem = null;
         if (wsDocInfo != null) {
             selectedElem = wsDocInfo.getTokenElement(id);
         }
         
-        /*
-         * Then lookup the SOAP Body element (processed by default) and
-         * check if it contains a matching Id
-         */
         if (selectedElem == null) {
-            selectedElem = WSSecurityUtil.findBodyElement(doc);
+            WSEncryptionPart part = new WSEncryptionPart(id);
+            selectedElem = WSSecurityUtil.findElement(part, uri.getOwnerDocument(), true);
             if (selectedElem == null) {
                 throw new ResourceResolverException("generic.EmptyMessage",
-                        new Object[]{"Body element not found"},
+                        new Object[]{"Id: " + id + " not found"},
                         uri,
                         BaseURI);
-            }
-            String cId = selectedElem.getAttributeNS(WSConstants.WSU_NS, "Id");
-
-            /*
-             * If Body Id match fails, look for a generic Id (without a namespace)
-             * that matches the URI. If that lookup fails, try to get a namespace
-             * qualified Id that matches the URI.
-             */
-            if (!id.equals(cId)) {
-                cId = null;
-                
-                if ((selectedElem = WSSecurityUtil.getElementByWsuId(doc, uriNodeValue)) != null) {
-                    cId = selectedElem.getAttributeNS(WSConstants.WSU_NS, "Id");
-                } else if ((selectedElem = WSSecurityUtil.getElementByGenId(doc, uriNodeValue)) != null) {
-                    cId = selectedElem.getAttribute("Id");
-                }
-                if (cId == null) {
-                    throw new ResourceResolverException("generic.EmptyMessage",
-                            new Object[]{"Id: " + id + " not found"},
-                            uri,
-                            BaseURI);
-                }
             }
         }
 
         XMLSignatureInput result = new XMLSignatureInput(selectedElem);
         result.setMIMEType("text/xml");
-        try {
-            URI uriNew = new URI(new URI(BaseURI), uri.getNodeValue());
-            result.setSourceURI(uriNew.toString());
-        } catch (URI.MalformedURIException ex) {
-            result.setSourceURI(BaseURI);
-        }
         if (doDebug) {
             log.debug("exit engineResolve, result: " + result);
         }
