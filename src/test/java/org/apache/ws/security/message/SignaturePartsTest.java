@@ -39,6 +39,7 @@ import org.apache.ws.security.saml.WSSecSignatureSAML;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.opensaml.SAMLAssertion;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -337,6 +338,50 @@ public class SignaturePartsTest extends org.junit.Assert {
         } catch (WSSecurityException ex) {
             // expected
         }
+    }
+    
+    
+    /**
+     * Test getting a DOM Element from WSEncryptionPart directly
+     */
+    @org.junit.Test
+    public void testSignaturePartDOMElement() throws Exception {
+        WSSecSignature sign = new WSSecSignature();
+        sign.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+        sign.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
+
+        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
+        SOAPConstants soapConstants = 
+            WSSecurityUtil.getSOAPConstants(doc.getDocumentElement());
+
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        
+        List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
+        // Give wrong names to make sure it's picking up the element
+        WSEncryptionPart encP =
+            new WSEncryptionPart(
+                "Incorrect Localname",
+                "Incorrect N/S",
+                "");
+        Element bodyElement = WSSecurityUtil.findBodyElement(doc);
+        assert bodyElement != null && "Body".equals(bodyElement.getLocalName());
+        encP.setElement(bodyElement);
+        parts.add(encP);
+        sign.setParts(parts);
+        
+        Document signedDoc = sign.build(doc, crypto, secHeader);
+        
+        if (LOG.isDebugEnabled()) {
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+            LOG.debug(outputString);
+        }
+        
+        List<WSSecurityEngineResult> results = verify(signedDoc);
+        
+        QName bodyName = new QName(soapConstants.getEnvelopeURI(), "Body");
+        WSSecurityUtil.checkAllElementsProtected(results, WSConstants.SIGN, new QName[]{bodyName});
     }
     
 

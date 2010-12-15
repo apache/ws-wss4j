@@ -19,6 +19,8 @@
 
 package org.apache.ws.security;
 
+import org.w3c.dom.Element;
+
 /**
  * @author Werner Dittmann (Werner.Dittmann@siemens.com)
  */
@@ -29,6 +31,7 @@ public class WSEncryptionPart {
     private String encModifier;
     private String encId;
     private String id;
+    private Element element;
     
     /**
      * An xpath expression pointing to the data element
@@ -152,6 +155,22 @@ public class WSEncryptionPart {
      */
     public void setXpath(String xpath) {
         this.xpath = xpath;
+    }
+    
+    /**
+     * Set the DOM Element corresponding to this EncryptionPart
+     * @param element the DOM Element corresponding to this EncryptionPart
+     */
+    public void setElement(Element element) {
+        this.element = element;
+    }
+    
+    /**
+     * Get the DOM Element corresponding to this EncryptionPart
+     * @return the DOM Element corresponding to this EncryptionPart
+     */
+    public Element getElement() {
+        return element;
     }
     
 }

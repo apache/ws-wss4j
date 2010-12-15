@@ -335,7 +335,8 @@ public class WSSecSignature extends WSSecSignatureBase {
         return 
             addReferencesToSign(
                 document, 
-                references, 
+                references,
+                wsDocInfo,
                 signatureFactory, 
                 secHeader, 
                 wssConfig, 

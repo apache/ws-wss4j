@@ -34,6 +34,7 @@ import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 import javax.security.auth.callback.CallbackHandler;
 import javax.xml.namespace.QName;
@@ -318,6 +319,50 @@ public class EncryptionPartsTest extends org.junit.Assert {
             // expected
         }
     }
+    
+    
+    /**
+     * Test getting a DOM Element from WSEncryptionPart directly
+     */
+    @org.junit.Test
+    public void testEncryptionPartDOMElement() throws Exception {
+        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
+        SOAPConstants soapConstants = 
+            WSSecurityUtil.getSOAPConstants(doc.getDocumentElement());
+        WSSecEncrypt encrypt = new WSSecEncrypt();
+        encrypt.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+        encrypt.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
+
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        
+        List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
+        // Give wrong names to make sure it's picking up the element
+        WSEncryptionPart encP =
+            new WSEncryptionPart(
+                "Incorrect Localname",
+                "Incorrect N/S",
+                "");
+        Element bodyElement = WSSecurityUtil.findBodyElement(doc);
+        assert bodyElement != null && "Body".equals(bodyElement.getLocalName());
+        encP.setElement(bodyElement);
+        parts.add(encP);
+        encrypt.setParts(parts);
+        
+        Document encryptedDoc = encrypt.build(doc, crypto, secHeader);
+        
+        if (LOG.isDebugEnabled()) {
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(encryptedDoc);
+            LOG.debug(outputString);
+        }
+        
+        List<WSSecurityEngineResult> results = verify(encryptedDoc);
+        
+        QName bodyName = new QName(soapConstants.getEnvelopeURI(), "Body");
+        WSSecurityUtil.checkAllElementsProtected(results, WSConstants.ENCR, new QName[]{bodyName});
+    }
+    
 
     /**
      * Verifies the soap envelope

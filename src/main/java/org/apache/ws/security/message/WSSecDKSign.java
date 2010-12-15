@@ -148,6 +148,7 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
         secRef.setReference(refUt);
         
         XMLStructure structure = new DOMStructure(secRef.getElement());
+        wsDocInfo.addTokenElement(secRef.getElement());
         keyInfo = 
             keyInfoFactory.newKeyInfo(
                 java.util.Collections.singletonList(structure), keyInfoUri
@@ -183,7 +184,8 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
         return 
             addReferencesToSign(
                 document, 
-                references, 
+                references,
+                wsDocInfo,
                 signatureFactory, 
                 secHeader, 
                 wssConfig, 

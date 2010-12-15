@@ -45,6 +45,7 @@ public class WSDocInfo {
     Document doc = null;
     Crypto crypto = null;
     List<Element> tokenList = null;
+    List<Element> elementList = null;
     List<Processor> processors = null;
 
     public WSDocInfo(Document doc) {
@@ -57,7 +58,7 @@ public class WSDocInfo {
     }
     
     /**
-     * Clears the info data except the hash code
+     * Clears the data stored in this object
      */
     public void clear() {
         crypto = null;
@@ -67,12 +68,20 @@ public class WSDocInfo {
         if (processors != null && processors.size() > 0) {
             processors.clear();
         }
+        if (elementList != null && elementList.size() > 0) {
+            elementList.clear();
+        }
         
         tokenList = null;
         processors = null;
+        elementList = null;
     }
     
     /**
+     * Store a token element for later retrieval. The token element is one of:
+     *  - SecurityTokenReference element
+     *  - BinarySecurityToken element
+     *  - SAML Assertion element
      * @param elem is the token element to store
      */
     public void addTokenElement(Element elem) {
@@ -103,6 +112,42 @@ public class WSDocInfo {
                 String samlId2 = elem.getAttribute("ID");
                 if (id.equals(cId) || id.equals(samlId) || id.equals(samlId2)) {
                     return elem;
+                }
+            }
+        }
+        return null;
+    }
+    
+    /**
+     * Store a protection element for later retrieval. 
+     * @param element is the protection element to store
+     */
+    public void addProtectionElement(Element element) {
+        if (elementList == null) {
+            elementList = new ArrayList<Element>();
+        }
+        elementList.add(element);
+    }
+    
+    /**
+     * Get a protection element for the given (wsu) Id.
+     * @param uri is the (relative) uri of the id
+     * @return the protection element or null if nothing found
+     */
+    public Element getProtectionElement(String uri) {
+        String id = uri;
+        if (id == null) {
+            return null;
+        } else if (id.charAt(0) == '#') {
+            id = id.substring(1);
+        }
+        if (elementList != null) {
+            for (Element element : elementList) {
+                if (element != null) {
+                    String cId = element.getAttributeNS(WSConstants.WSU_NS, "Id");
+                    if (id.equals(cId)) {
+                        return element;
+                    }
                 }
             }
         }

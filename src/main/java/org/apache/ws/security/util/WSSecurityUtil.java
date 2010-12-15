@@ -230,11 +230,15 @@ public class WSSecurityUtil {
     public static Element findElement(
         WSEncryptionPart part, Document doc, boolean checkMultipleElements
     ) {
+        // See if the DOM Element is stored in the WSEncryptionPart first
+        if (part.getElement() != null) {
+            return part.getElement();
+        }
+        
+        // Next try to find the SOAP body
         String id = part.getId();
         String elemName = part.getName();
         String nmSpace = part.getNamespace();
-        
-        // Try to find the SOAP body first
         Element bodyElement = WSSecurityUtil.findBodyElement(doc);
         if (bodyElement != null) {
             if (id != null) {

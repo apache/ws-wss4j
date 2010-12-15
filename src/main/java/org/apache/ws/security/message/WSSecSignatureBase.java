@@ -22,6 +22,7 @@ package org.apache.ws.security.message;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.WSDocInfo;
 import org.apache.ws.security.WSEncryptionPart;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityException;
@@ -57,6 +58,7 @@ public class WSSecSignatureBase extends WSSecBase {
      * 
      * @param doc The parent document
      * @param references The list of references to sign
+     * @param wsDocInfo The WSDocInfo object to store protection elements in
      * @param signatureFactory The XMLSignature object
      * @param secHeader The Security Header
      * @param wssConfig The WSSConfig
@@ -66,6 +68,7 @@ public class WSSecSignatureBase extends WSSecBase {
     public List<javax.xml.crypto.dsig.Reference> addReferencesToSign(
         Document doc,
         List<WSEncryptionPart> references,
+        WSDocInfo wsDocInfo,
         XMLSignatureFactory signatureFactory,
         WSSecHeader secHeader,
         WSSConfig wssConfig,
@@ -89,6 +92,7 @@ public class WSSecSignatureBase extends WSSecBase {
         for (WSEncryptionPart encPart : references) {
             String idToSign = encPart.getId();
             String elemName = encPart.getName();
+            Element element = encPart.getElement();
 
             //
             // Set up the elements to sign. There is one reserved element
@@ -109,8 +113,12 @@ public class WSSecSignatureBase extends WSSecBase {
                     } else {
                         TransformParameterSpec transformSpec = null;
                         if (wssConfig.isWsiBSPCompliant()) {
-                            Element toSignById = 
-                                WSSecurityUtil.findElementById(envelope, idToSign, false);
+                            Element toSignById = element;
+                            if (toSignById == null) {
+                                toSignById = 
+                                    WSSecurityUtil.findElementById(envelope, idToSign, false);
+                                wsDocInfo.addProtectionElement(toSignById);
+                            }
                             List<String> prefixes = getInclusivePrefixes(toSignById);
                             transformSpec = new ExcC14NParameterSpec(prefixes);
                         }
@@ -119,6 +127,9 @@ public class WSSecSignatureBase extends WSSecBase {
                                 WSConstants.C14N_EXCL_OMIT_COMMENTS,
                                 transformSpec
                             );
+                    }
+                    if (element != null) {
+                        wsDocInfo.addProtectionElement(element);
                     }
                     javax.xml.crypto.dsig.Reference reference = 
                         signatureFactory.newReference(
@@ -131,15 +142,18 @@ public class WSSecSignatureBase extends WSSecBase {
                     referenceList.add(reference);
                 } else {
                     String nmSpace = encPart.getNamespace();
-                    Element elementToSign = 
-                        WSSecurityUtil.findElement(encPart, doc, false);
+                    Element elementToSign = element;
                     if (elementToSign == null) {
-                        throw new WSSecurityException(
-                            WSSecurityException.FAILURE, 
-                            "noEncElement",
-                            new Object[] {nmSpace + ", " + elemName}
-                        );
+                        elementToSign = WSSecurityUtil.findElement(encPart, doc, false);
+                        if (elementToSign == null) {
+                            throw new WSSecurityException(
+                                WSSecurityException.FAILURE, 
+                                "noEncElement",
+                                new Object[] {nmSpace + ", " + elemName}
+                            );
+                        }
                     }
+                    wsDocInfo.addProtectionElement(elementToSign);
                     TransformParameterSpec transformSpec = null;
                     if (wssConfig.isWsiBSPCompliant()) {
                         List<String> prefixes = getInclusivePrefixes(elementToSign);
