@@ -61,7 +61,7 @@ public class WSSecDKEncrypt extends WSSecDerivedKeyBase {
                 
         String soapNamespace = WSSecurityUtil.getSOAPNamespace(envelope);
         if (parts == null) {
-            parts = new ArrayList<WSEncryptionPart>();
+            parts = new ArrayList<WSEncryptionPart>(1);
             WSEncryptionPart encP = 
                 new WSEncryptionPart(
                     WSConstants.ELEM_BODY, 

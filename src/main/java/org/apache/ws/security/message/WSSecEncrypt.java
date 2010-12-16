@@ -258,7 +258,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
         }
         
         if (parts == null) {
-            parts = new ArrayList<WSEncryptionPart>();
+            parts = new ArrayList<WSEncryptionPart>(1);
             String soapNamespace = WSSecurityUtil.getSOAPNamespace(envelope);
             WSEncryptionPart encP = 
                 new WSEncryptionPart(

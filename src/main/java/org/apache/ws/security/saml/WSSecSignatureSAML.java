@@ -119,7 +119,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
 
         String soapNamespace = WSSecurityUtil.getSOAPNamespace(doc.getDocumentElement());
         if (parts == null) {
-            parts = new ArrayList<WSEncryptionPart>();
+            parts = new ArrayList<WSEncryptionPart>(1);
             WSEncryptionPart encP = 
                 new WSEncryptionPart(WSConstants.ELEM_BODY, soapNamespace, "Content");
             parts.add(encP);

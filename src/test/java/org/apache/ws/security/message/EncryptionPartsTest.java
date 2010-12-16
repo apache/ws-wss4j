@@ -351,12 +351,12 @@ public class EncryptionPartsTest extends org.junit.Assert {
         
         Document encryptedDoc = encrypt.build(doc, crypto, secHeader);
         
+        String outputString = 
+            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(encryptedDoc);
         if (LOG.isDebugEnabled()) {
-            String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(encryptedDoc);
             LOG.debug(outputString);
         }
-        
+        assertTrue (!outputString.contains("testMethod"));
         List<WSSecurityEngineResult> results = verify(encryptedDoc);
         
         QName bodyName = new QName(soapConstants.getEnvelopeURI(), "Body");
