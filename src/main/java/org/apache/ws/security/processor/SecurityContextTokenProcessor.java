@@ -33,8 +33,8 @@ import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
 
-import java.io.IOException;
 import java.util.List;
+import java.io.IOException;
 
 /**
  * The processor to process <code>wsc:SecurityContextToken</code>.
@@ -43,41 +43,24 @@ import java.util.List;
  */
 public class SecurityContextTokenProcessor implements Processor {
 
-    /**
-     * The <code>wsi:ID</code> of the <code>wsc:SecurityContextToken</code>
-     * element.
-     */
-    private String sctId;
-
-    /**
-     * The secret associated with the <code>wsc:SecurityContextToken</code>.
-     */
-    private byte[] secret;
-
-    /**
-     * The <code>wsc:Identifier</code> of the
-     * <code>wsc:SecurityContextToken</code> element.
-     */
-    private String identifier;
-
-    public void handleToken(
+    public List<WSSecurityEngineResult> handleToken(
         Element elem, 
         Crypto crypto, 
         Crypto decCrypto,
         CallbackHandler cb, 
         WSDocInfo wsDocInfo, 
-        List<WSSecurityEngineResult> returnResults,
         WSSConfig config
     ) throws WSSecurityException {
         SecurityContextToken sct = new SecurityContextToken(elem);
-        identifier = sct.getIdentifier();
-        secret = getSecret(cb, sct);
-        sctId = sct.getID();
+        byte[] secret = getSecret(cb, sct);
         
-        returnResults.add(
-            0, 
-            new WSSecurityEngineResult(WSConstants.SCT, sct)
-        );
+        WSSecurityEngineResult result =
+            new WSSecurityEngineResult(WSConstants.SCT, sct);
+        wsDocInfo.addTokenElement(elem);
+        result.put(WSSecurityEngineResult.TAG_ID, sct.getID());
+        result.put(WSSecurityEngineResult.TAG_SECRET, secret);
+        wsDocInfo.addResult(result);
+        return java.util.Collections.singletonList(result);
     }
 
     /**
@@ -118,27 +101,6 @@ public class SecurityContextTokenProcessor implements Processor {
         }
 
         return callback.getKey();
-    }
-
-    /**
-     * Return the id of the 
-     */
-    public String getId() {
-        return sctId;
-    }
-
-    /**
-     * @return Returns the identifier.
-     */
-    public String getIdentifier() {
-        return identifier;
-    }
-
-    /**
-     * @return Returns the secret.
-     */
-    public byte[] getSecret() {
-        return secret;
     }
 
 }

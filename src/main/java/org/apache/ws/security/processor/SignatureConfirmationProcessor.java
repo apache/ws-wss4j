@@ -30,21 +30,18 @@ import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.message.token.SignatureConfirmation;
 import org.w3c.dom.Element;
 
-import javax.security.auth.callback.CallbackHandler;
 import java.util.List;
+import javax.security.auth.callback.CallbackHandler;
 
 public class SignatureConfirmationProcessor implements Processor {
     private static Log log = LogFactory.getLog(SignatureConfirmationProcessor.class.getName());
 
-    private String scId;
-    
-    public void handleToken(
+    public List<WSSecurityEngineResult> handleToken(
         Element elem, 
         Crypto crypto, 
         Crypto decCrypto, 
         CallbackHandler cb, 
         WSDocInfo wsDocInfo, 
-        List<WSSecurityEngineResult> returnResults, 
         WSSConfig wsc
     ) throws WSSecurityException {
         if (log.isDebugEnabled()) {
@@ -54,14 +51,11 @@ public class SignatureConfirmationProcessor implements Processor {
         // Decode SignatureConfirmation, just store in result
         //
         SignatureConfirmation sigConf = new SignatureConfirmation(elem);
-        returnResults.add(
-            0, 
-            new WSSecurityEngineResult(WSConstants.SC, sigConf)
-        );
-        scId = sigConf.getID();
+        WSSecurityEngineResult result = 
+            new WSSecurityEngineResult(WSConstants.SC, sigConf);
+        result.put(WSSecurityEngineResult.TAG_ID, sigConf.getID());
+        wsDocInfo.addResult(result);
+        return java.util.Collections.singletonList(result);
     }
     
-    public String getId() {
-        return scId;
-    }    
 }

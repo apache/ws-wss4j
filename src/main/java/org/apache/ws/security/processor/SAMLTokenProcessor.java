@@ -31,36 +31,31 @@ import org.opensaml.SAMLAssertion;
 import org.opensaml.SAMLException;
 import org.w3c.dom.Element;
 
-import javax.security.auth.callback.CallbackHandler;
 import java.util.List;
+import javax.security.auth.callback.CallbackHandler;
 
 public class SAMLTokenProcessor implements Processor {
     private static Log log = LogFactory.getLog(SAMLTokenProcessor.class.getName());
     
-    private String id;
-    private Element samlTokenElement;
-
-    public void handleToken(
+    public List<WSSecurityEngineResult> handleToken(
         Element elem, 
         Crypto crypto,
         Crypto decCrypto, 
         CallbackHandler cb, 
         WSDocInfo wsDocInfo, 
-        List<WSSecurityEngineResult> returnResults, 
         WSSConfig wsc
     ) throws WSSecurityException {
         if (log.isDebugEnabled()) {
             log.debug("Found SAML Assertion element");
         }
         SAMLAssertion assertion = handleSAMLToken(elem);
-        id = assertion.getId();
         wsDocInfo.addTokenElement(elem);
-        returnResults.add(
-            0,
-            new WSSecurityEngineResult(WSConstants.ST_UNSIGNED, assertion)
-        );
-        samlTokenElement = elem;
-
+        WSSecurityEngineResult result = 
+            new WSSecurityEngineResult(WSConstants.ST_UNSIGNED, assertion);
+        String id = assertion.getId();
+        result.put(WSSecurityEngineResult.TAG_ID, id);
+        wsDocInfo.addResult(result);
+        return java.util.Collections.singletonList(result);
     }
 
     public SAMLAssertion handleSAMLToken(Element token) throws WSSecurityException {
@@ -81,17 +76,6 @@ public class SAMLTokenProcessor implements Processor {
             throw new WSSecurityException(WSSecurityException.FAILED_AUTHENTICATION);
         }
         return assertion;
-    }
-
-    /**
-     * Return the id of the SAML token
-     */
-    public String getId() {
-        return id;
-    }
-
-    public Element getSamlTokenElement() {
-        return samlTokenElement;
     }
 
 }

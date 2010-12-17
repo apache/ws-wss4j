@@ -29,9 +29,6 @@ import org.apache.ws.security.WSDocInfo;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.message.token.SecurityTokenReference;
 import org.apache.ws.security.message.token.X509Security;
-import org.apache.ws.security.processor.BinarySecurityTokenProcessor;
-import org.apache.ws.security.processor.Processor;
-import org.apache.ws.security.processor.SAMLTokenProcessor;
 import org.apache.ws.security.util.Base64;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.w3c.dom.Document;
@@ -70,21 +67,7 @@ public class STRTransformUtil {
             if (log.isDebugEnabled()) {
                 log.debug("STR: Reference");
             }
-            org.apache.ws.security.message.token.Reference ref = secRef.getReference();
-            
-            String uri = ref.getURI();
-            if (uri.charAt(0) == '#') {
-                uri = uri.substring(1);
-            }
-            Processor processor = wsDocInfo.getProcessor(uri);
-            
-            if (processor == null) {
-                return secRef.getTokenElement(doc, wsDocInfo, null);
-            } else if (processor instanceof BinarySecurityTokenProcessor) {
-                return ((BinarySecurityTokenProcessor)processor).getToken().getElement();
-            } else if (processor instanceof SAMLTokenProcessor) {
-                return ((SAMLTokenProcessor)processor).getSamlTokenElement();
-            }
+            return secRef.getTokenElement(doc, wsDocInfo, null);
         }
         //
         // second case: IssuerSerial, lookup in keystore, wrap in BST according

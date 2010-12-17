@@ -32,6 +32,9 @@ import org.apache.ws.security.WSDerivedKeyTokenPrincipal;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.conversation.ConversationConstants;
 import org.apache.ws.security.conversation.ConversationException;
+import org.apache.ws.security.conversation.dkalgo.AlgoFactory;
+import org.apache.ws.security.conversation.dkalgo.DerivationAlgorithm;
+import org.apache.ws.security.util.Base64;
 import org.apache.ws.security.util.DOM2Writer;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.w3c.dom.Document;
@@ -498,6 +501,42 @@ public class DerivedKeyToken {
      */
     public void setAlgorithm(String algo) {
         element.setAttributeNS(ns, "Algorithm", algo);
+    }
+    
+    /**
+     * Derive a key from this DerivedKeyToken instance
+     * @param length
+     * @param secret
+     * @throws WSSecurityException
+     */
+    public byte[] deriveKey(int length, byte[] secret) throws WSSecurityException {
+        try {
+            DerivationAlgorithm algo = AlgoFactory.getInstance(getAlgorithm());
+            byte[] labelBytes = null;
+            String label = getLabel();
+            if (label == null || label.length() == 0) {
+                labelBytes = 
+                    (ConversationConstants.DEFAULT_LABEL 
+                        + ConversationConstants.DEFAULT_LABEL).getBytes("UTF-8");
+            } else {
+                labelBytes = label.getBytes("UTF-8");
+            }
+            
+            byte[] nonce = Base64.decode(getNonce());
+            byte[] seed = new byte[labelBytes.length + nonce.length];
+            System.arraycopy(labelBytes, 0, seed, 0, labelBytes.length);
+            System.arraycopy(nonce, 0, seed, labelBytes.length, nonce.length);
+            
+            if (length <= 0) {
+                length = getLength();
+            }
+            return algo.createKey(secret, seed, getOffset(), length);
+            
+        } catch (Exception e) {
+            throw new WSSecurityException(
+                WSSecurityException.FAILURE, null, null, e
+            );
+        }
     }
 
 }

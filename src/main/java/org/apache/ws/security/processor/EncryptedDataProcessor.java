@@ -44,17 +44,12 @@ import java.util.List;
  */
 public class EncryptedDataProcessor implements Processor {
     
-    public String getId() {
-        return null;
-    }
-
-    public void handleToken(
+    public List<WSSecurityEngineResult> handleToken(
         Element elem, 
         Crypto crypto, 
         Crypto decCrypto,
         CallbackHandler cb, 
         WSDocInfo wsDocInfo, 
-        List<WSSecurityEngineResult> returnResults,
         WSSConfig config
     ) throws WSSecurityException {
         Element kiElem = 
@@ -75,10 +70,11 @@ public class EncryptedDataProcessor implements Processor {
             );
         }
         EncryptedKeyProcessor encrKeyProc = new EncryptedKeyProcessor();
-        encrKeyProc.handleToken(
-            encryptedKeyElement, crypto, decCrypto, cb, wsDocInfo, returnResults, config
+        List<WSSecurityEngineResult> encrKeyResults = encrKeyProc.handleToken(
+            encryptedKeyElement, crypto, decCrypto, cb, wsDocInfo, config
         );
-        byte[] symmKey = encrKeyProc.getDecryptedBytes();
+        byte[] symmKey = 
+            (byte[])encrKeyResults.get(0).get(WSSecurityEngineResult.TAG_DECRYPTED_KEY);
         String encAlgo = X509Util.getEncAlgo(elem);
         SecretKey key = WSSecurityUtil.prepareSecretKey(encAlgo, symmKey);
         
@@ -113,12 +109,14 @@ public class EncryptedDataProcessor implements Processor {
             QName el = new QName(decryptedElem.getNamespaceURI(), decryptedElem.getLocalName());
             Processor proc = config.getProcessor(el);
             if (proc != null) {
-                proc.handleToken(
-                    decryptedElem, crypto, decCrypto, cb, wsDocInfo, returnResults, config
-                );
-                wsDocInfo.setProcessor(proc);
+                List<WSSecurityEngineResult> results = 
+                    proc.handleToken(
+                        decryptedElem, crypto, decCrypto, cb, wsDocInfo, config
+                    );
+                encrKeyResults.addAll(0, results);
             }
         }
+        return encrKeyResults;
     }
 
 }

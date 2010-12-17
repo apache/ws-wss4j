@@ -44,7 +44,6 @@ import java.util.List;
  * @author Werner Dittmann (Werner.Dittmann@t-online.de).
  */
 public class WSSecurityEngine {
-    public static final String VALUE_TYPE = "ValueType";
     private static Log log = LogFactory.getLog(WSSecurityEngine.class.getName());
 
     /**
@@ -294,8 +293,9 @@ public class WSSecurityEngine {
                 // information about the processed token
                 //
                 if (p != null) {
-                    p.handleToken((Element) node, sigCrypto, decCrypto, cb, wsDocInfo, returnResults, cfg);
-                    wsDocInfo.setProcessor(p);
+                    List<WSSecurityEngineResult> results = 
+                        p.handleToken((Element) node, sigCrypto, decCrypto, cb, wsDocInfo, cfg);
+                    returnResults.addAll(0, results);
                 } else {
                     //
                     // Add check for a BinarySecurityToken, add info to WSDocInfo. If BST is

@@ -26,15 +26,12 @@ import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
-import org.apache.ws.security.conversation.ConversationConstants;
-import org.apache.ws.security.conversation.dkalgo.AlgoFactory;
-import org.apache.ws.security.conversation.dkalgo.DerivationAlgorithm;
 import org.apache.ws.security.message.token.DerivedKeyToken;
 import org.apache.ws.security.message.token.Reference;
 import org.apache.ws.security.message.token.SecurityTokenReference;
+import org.apache.ws.security.message.token.UsernameToken;
 import org.apache.ws.security.saml.SAMLKeyInfo;
 import org.apache.ws.security.saml.SAMLUtil;
-import org.apache.ws.security.util.Base64;
 import org.w3c.dom.Element;
 
 import javax.security.auth.callback.Callback;
@@ -52,82 +49,47 @@ import java.util.List;
  */
 public class DerivedKeyTokenProcessor implements Processor {
 
-    private String id;
-    private byte[] keyBytes;
-    private DerivedKeyToken dkt;
-    
-    private byte[] secret;
-    private int length;
-    private int offset;
-    private byte[] nonce;
-    private String label;
-    private String algorithm;
-    
-    public void handleToken(
+    public List<WSSecurityEngineResult> handleToken(
         Element elem, 
         Crypto crypto, 
         Crypto decCrypto,
         CallbackHandler cb, 
         WSDocInfo wsDocInfo, 
-        List<WSSecurityEngineResult> returnResults,
         WSSConfig config
     ) throws WSSecurityException {
         
         // Deserialize the DKT
-        dkt = new DerivedKeyToken(elem);
-        extractSecret(wsDocInfo, dkt, cb, crypto);
+        DerivedKeyToken dkt = new DerivedKeyToken(elem);
+        byte[] secret = extractSecret(wsDocInfo, dkt, cb, crypto);
         
         String tempNonce = dkt.getNonce();
         if (tempNonce == null) {
             throw new WSSecurityException("Missing wsc:Nonce value");
         }
-        nonce = Base64.decode(tempNonce);
-        length = dkt.getLength();
-        label = dkt.getLabel();
-        algorithm = dkt.getAlgorithm();
-        id = dkt.getID();
+        int length = dkt.getLength();
         if (length > 0) {
-            deriveKey();
-            returnResults.add(
-                0, 
+            byte[] keyBytes = dkt.deriveKey(length, secret);
+            WSSecurityEngineResult result =
                 new WSSecurityEngineResult(
-                    WSConstants.DKT, secret, keyBytes, id, null
-                )
-            );
+                    WSConstants.DKT, null, keyBytes, null
+                );
+            wsDocInfo.addTokenElement(elem);
+            result.put(WSSecurityEngineResult.TAG_ID, dkt.getID());
+            result.put(WSSecurityEngineResult.TAG_DERIVED_KEY_TOKEN, dkt);
+            result.put(WSSecurityEngineResult.TAG_SECRET, secret);
+            wsDocInfo.addResult(result);
+            return java.util.Collections.singletonList(result);
         }
-    }
-
-    private void deriveKey() throws WSSecurityException{
-        try {
-            DerivationAlgorithm algo = AlgoFactory.getInstance(algorithm);
-            byte[] labelBytes = null;
-            if (label == null || label.length() == 0) {
-                labelBytes = 
-                    (ConversationConstants.DEFAULT_LABEL 
-                        + ConversationConstants.DEFAULT_LABEL).getBytes("UTF-8");
-            } else {
-                labelBytes = label.getBytes("UTF-8");
-            }
-            
-            byte[] seed = new byte[labelBytes.length + nonce.length];
-            System.arraycopy(labelBytes, 0, seed, 0, labelBytes.length);
-            System.arraycopy(nonce, 0, seed, labelBytes.length, nonce.length);
-            
-            keyBytes = algo.createKey(secret, seed, offset, length);
-            
-        } catch (Exception e) {
-            throw new WSSecurityException(
-                WSSecurityException.FAILURE, null, null, e
-            );
-        }
+        return new java.util.ArrayList<WSSecurityEngineResult>(0);
     }
 
     /**
      * @param wsDocInfo
      * @param dkt
+     * @return the secret, as an array of bytes
      * @throws WSSecurityException
      */
-    private void extractSecret(
+    private byte[] extractSecret(
         WSDocInfo wsDocInfo, 
         DerivedKeyToken dkt, 
         CallbackHandler cb, 
@@ -135,50 +97,57 @@ public class DerivedKeyTokenProcessor implements Processor {
     ) throws WSSecurityException {
         SecurityTokenReference str = dkt.getSecurityTokenReference();
         if (str != null) {
-            Processor processor;
             String uri = null;
             String keyIdentifierValueType = null;
             String keyIdentifierValue = null;
             
+            WSSecurityEngineResult result = null;
             if (str.containsReference()) {
                 Reference ref = str.getReference();
-                
                 uri = ref.getURI();
                 if (uri.charAt(0) == '#') {
                     uri = uri.substring(1);
                 }
-                processor = wsDocInfo.getProcessor(uri);
+                result = wsDocInfo.getResult(uri);
             } else {
                 // Contains key identifier
                 keyIdentifierValue = str.getKeyIdentifierValue();
                 keyIdentifierValueType = str.getKeyIdentifierValueType();
-                processor = wsDocInfo.getProcessor(keyIdentifierValue);
+                result = wsDocInfo.getResult(keyIdentifierValue);
             }
             
-            if (processor == null && uri != null) {
+            if (result != null) {
+                int action = ((Integer)result.get(WSSecurityEngineResult.TAG_ACTION)).intValue();
+                if (WSConstants.UT == action) {
+                    UsernameToken usernameToken = 
+                        (UsernameToken)result.get(WSSecurityEngineResult.TAG_USERNAME_TOKEN);
+                    return usernameToken.getDerivedKey();
+                } else if (WSConstants.ENCR == action) {
+                    return (byte[])result.get(WSSecurityEngineResult.TAG_DECRYPTED_KEY);
+                } else if (WSConstants.SCT == action) {
+                    return (byte[])result.get(WSSecurityEngineResult.TAG_SECRET);
+                } else if (WSConstants.ST_UNSIGNED == action) {
+                    Element samlElement = wsDocInfo.getTokenElement(uri);
+                    SAMLKeyInfo keyInfo = 
+                        SAMLUtil.getSAMLKeyInfo(samlElement, crypto, cb);
+                    // TODO Handle malformed SAML tokens where they don't have the 
+                    // secret in them
+                    return keyInfo.getSecret();
+                } else {
+                    throw new WSSecurityException(
+                        WSSecurityException.FAILED_CHECK, "unsupportedKeyId"
+                    );
+                }
+            } else if (result == null && uri != null) {
                 // Now use the callback and get it
-                secret = getSecret(cb, uri);
-            } else if (processor == null && keyIdentifierValue != null
-                && keyIdentifierValueType != null) {
+                return getSecret(cb, uri);
+            } else if (keyIdentifierValue != null && keyIdentifierValueType != null) {
                 X509Certificate[] certs = str.getKeyIdentifier(crypto);
                 if (certs == null || certs.length < 1 || certs[0] == null) {
-                    this.secret = this.getSecret(cb, keyIdentifierValue, keyIdentifierValueType); 
+                    return this.getSecret(cb, keyIdentifierValue, keyIdentifierValueType); 
                 } else {
-                    this.secret = this.getSecret(cb, crypto, certs);
+                    return this.getSecret(cb, crypto, certs);
                 }
-            } else if (processor instanceof UsernameTokenProcessor) {
-                secret = ((UsernameTokenProcessor) processor).getDerivedKey(cb);
-            } else if (processor instanceof EncryptedKeyProcessor) {
-                secret = ((EncryptedKeyProcessor) processor).getDecryptedBytes();
-            } else if (processor instanceof SecurityContextTokenProcessor) {
-                secret = ((SecurityContextTokenProcessor) processor).getSecret();
-            } else if (processor instanceof SAMLTokenProcessor) {
-                SAMLTokenProcessor samlp = (SAMLTokenProcessor) processor;
-                SAMLKeyInfo keyInfo = 
-                    SAMLUtil.getSAMLKeyInfo(samlp.getSamlTokenElement(), crypto, cb);
-                // TODO Handle malformed SAML tokens where they don't have the 
-                // secret in them
-                secret = keyInfo.getSecret();
             } else {
                 throw new WSSecurityException(
                     WSSecurityException.FAILED_CHECK, "unsupportedKeyId"
@@ -238,14 +207,14 @@ public class DerivedKeyTokenProcessor implements Processor {
             throw new WSSecurityException(
                 WSSecurityException.FAILURE, 
                 "noKey",
-                new Object[] {id}, 
+                new Object[] {keyIdentifierValue}, 
                 e
             );
         } catch (UnsupportedCallbackException e) {
             throw new WSSecurityException(
                 WSSecurityException.FAILURE, 
                 "noKey",
-                new Object[] {id}, 
+                new Object[] {keyIdentifierValue}, 
                 e
             );
         }
@@ -300,38 +269,6 @@ public class DerivedKeyTokenProcessor implements Processor {
             throw new WSSecurityException(WSSecurityException.FAILED_CHECK, null, null, e);
         }
     }
-    
-    
-    /**
-     * Returns the wsu:Id of the DerivedKeyToken
-     * @see org.apache.ws.security.processor.Processor#getId()
-     */
-    public String getId() {
-        return id;
-    }
 
-    /**
-     * @return Returns the keyBytes.
-     */
-    public byte[] getKeyBytes() {
-        return keyBytes;
-    }
-    
-    /**
-     * Get the derived key bytes for a given length
-     * @return Returns the keyBytes.
-     */
-    public byte[] getKeyBytes(int len) throws WSSecurityException {
-        length = len;
-        deriveKey();
-        return keyBytes;
-    }
-    
-    /**
-     * Return the DerivedKeyToken object
-     */
-    public DerivedKeyToken getDerivedKeyToken() {
-        return dkt;
-    }
 
 }

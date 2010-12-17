@@ -22,8 +22,10 @@ package org.apache.ws.security.saml;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.WSDocInfo;
 import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSecurityEngine;
+import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.processor.EncryptedKeyProcessor;
@@ -116,9 +118,14 @@ public class SAMLUtil {
                             QName el = new QName(node.getNamespaceURI(), node.getLocalName());
                             if (el.equals(WSSecurityEngine.ENCRYPTED_KEY)) {
                                 EncryptedKeyProcessor proc = new EncryptedKeyProcessor();
-                                proc.handleEncryptedKey((Element)node, cb, crypto, null);
-                                
-                                return new SAMLKeyInfo(assertion, proc.getDecryptedBytes());
+                                WSDocInfo docInfo = new WSDocInfo(node.getOwnerDocument());
+                                List<WSSecurityEngineResult> result =
+                                    proc.handleToken((Element)node, null, crypto, cb, docInfo, null);
+                                byte[] secret = 
+                                    (byte[])result.get(0).get(
+                                        WSSecurityEngineResult.TAG_DECRYPTED_KEY
+                                    );
+                                return new SAMLKeyInfo(assertion, secret);
                             } else if (el.equals(new QName(WSConstants.WST_NS, "BinarySecret"))) {
                                 Text txt = (Text)node.getFirstChild();
                                 return new SAMLKeyInfo(assertion, Base64.decode(txt.getData()));

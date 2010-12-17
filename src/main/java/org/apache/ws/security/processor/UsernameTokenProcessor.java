@@ -37,35 +37,34 @@ import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
 import java.io.IOException;
-import java.security.Principal;
 import java.util.List;
 
 public class UsernameTokenProcessor implements Processor {
     private static Log log = LogFactory.getLog(UsernameTokenProcessor.class.getName());
 
-    private String utId;
-    private UsernameToken ut;
-    private boolean handleCustomPasswordTypes;
-    private boolean allowNamespaceQualifiedPasswordTypes;
-    private boolean passwordsAreEncoded;
-    private WSSConfig wssConfig;
-    
-    public void handleToken(Element elem, Crypto crypto, Crypto decCrypto, CallbackHandler cb, 
-        WSDocInfo wsDocInfo, List<WSSecurityEngineResult> returnResults, WSSConfig wsc) throws WSSecurityException {
+    public List<WSSecurityEngineResult> handleToken(
+        Element elem, Crypto crypto, Crypto decCrypto, CallbackHandler cb, 
+        WSDocInfo wsDocInfo, WSSConfig wsc
+    ) throws WSSecurityException {
         if (log.isDebugEnabled()) {
             log.debug("Found UsernameToken list element");
         }
-        handleCustomPasswordTypes = wsc.getHandleCustomPasswordTypes();
-        allowNamespaceQualifiedPasswordTypes = wsc.getAllowNamespaceQualifiedPasswordTypes();
-        passwordsAreEncoded = wsc.getPasswordsAreEncoded();
-        wssConfig = wsc;
         
-        Principal lastPrincipalFound = handleUsernameToken(elem, cb);
-        returnResults.add(
-            0, 
-            new WSSecurityEngineResult(WSConstants.UT, lastPrincipalFound, null, null, null)
-        );
-        utId = ut.getID();
+        UsernameToken token = handleUsernameToken(elem, cb, wsc);
+        
+        WSUsernameTokenPrincipal principal = 
+            new WSUsernameTokenPrincipal(token.getName(), token.isHashed());
+        principal.setNonce(token.getNonce());
+        principal.setPassword(token.getPassword());
+        principal.setCreatedTime(token.getCreated());
+        principal.setPasswordType(token.getPasswordType());
+        
+        WSSecurityEngineResult result = 
+            new WSSecurityEngineResult(WSConstants.UT, token, principal);
+        result.put(WSSecurityEngineResult.TAG_ID, token.getID());
+        wsDocInfo.addTokenElement(elem);
+        wsDocInfo.addResult(result);
+        return java.util.Collections.singletonList(result);
     }
 
     /**
@@ -82,19 +81,34 @@ public class UsernameTokenProcessor implements Processor {
      *
      * @param token the DOM element that contains the UsernameToken
      * @param cb    the reference to the callback object
-     * @return WSUsernameTokenPrincipal that contain data that an application
-     *         may use to further validate the password/user combination.
+     * @param wssConfig The WSSConfig object from which to obtain configuration
+     * @return UsernameToken the UsernameToken object that was parsed
      * @throws WSSecurityException
      */
-    public WSUsernameTokenPrincipal handleUsernameToken(Element token, CallbackHandler cb) 
-        throws WSSecurityException {
+    public UsernameToken 
+    handleUsernameToken(
+        Element token, 
+        CallbackHandler cb,
+        WSSConfig wssConfig
+    ) throws WSSecurityException {
         if (cb == null) {
             throw new WSSecurityException(WSSecurityException.FAILURE, "noCallback");
         }
+        boolean handleCustomPasswordTypes = false;
+        boolean allowNamespaceQualifiedPasswordTypes = false;
+        boolean passwordsAreEncoded = false;
+        
+        if (wssConfig != null) {
+            handleCustomPasswordTypes = wssConfig.getHandleCustomPasswordTypes();
+            allowNamespaceQualifiedPasswordTypes = 
+                wssConfig.getAllowNamespaceQualifiedPasswordTypes();
+            passwordsAreEncoded = wssConfig.getPasswordsAreEncoded();
+        }
+        
         //
         // Parse the UsernameToken element
         //
-        ut = new UsernameToken(token, allowNamespaceQualifiedPasswordTypes);
+        UsernameToken ut = new UsernameToken(token, allowNamespaceQualifiedPasswordTypes);
         ut.setPasswordsAreEncoded(passwordsAreEncoded);
         String user = ut.getName();
         String password = ut.getPassword();
@@ -194,42 +208,8 @@ public class UsernameTokenProcessor implements Processor {
             String origPassword = pwCb.getPassword();
             ut.setRawPassword(origPassword);
         }
-        WSUsernameTokenPrincipal principal = new WSUsernameTokenPrincipal(user, ut.isHashed());
-        principal.setNonce(nonce);
-        principal.setPassword(password);
-        principal.setCreatedTime(createdTime);
-        principal.setPasswordType(pwType);
 
-        return principal;
-    }
-
-    /* (non-Javadoc)
-     * @see org.apache.ws.security.processor.Processor#getId()
-     */
-    public String getId() {
-        return utId;
-    }
-
-    /**
-     * Get the processed UsernameToken.
-     * 
-     * @return the ut
-     */
-    public UsernameToken getUt() {
         return ut;
-    }    
-    
-    public byte[] getDerivedKey(CallbackHandler cb) throws WSSecurityException {
-        String password = ut.getRawPassword();
-        if (password == null) {
-            password = "";
-        }
-        byte[] saltValue = ut.getSalt();
-        int iteration = ut.getIteration();
-        if (passwordsAreEncoded) {
-            return UsernameToken.generateDerivedKey(Base64.decode(password), saltValue, iteration);
-        } else {
-            return UsernameToken.generateDerivedKey(password, saltValue, iteration);
-        }
     }
+
 }

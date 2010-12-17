@@ -36,6 +36,7 @@ import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
+import org.apache.ws.security.message.token.DerivedKeyToken;
 import org.apache.ws.security.message.token.Reference;
 import org.apache.ws.security.message.token.SecurityTokenReference;
 import org.apache.ws.security.saml.SAMLKeyInfo;
@@ -52,29 +53,25 @@ public class ReferenceListProcessor implements Processor {
     private static Log log = 
         LogFactory.getLog(ReferenceListProcessor.class.getName());
 
-    private boolean debug = false;
-
-    public void handleToken(
+    public List<WSSecurityEngineResult> handleToken(
         Element elem, 
         Crypto crypto, 
         Crypto decCrypto,
         CallbackHandler cb, 
-        WSDocInfo wdi, 
-        List<WSSecurityEngineResult> returnResults,
+        WSDocInfo wsDocInfo, 
         WSSConfig wsc
     ) throws WSSecurityException {
-        debug = log.isDebugEnabled();
-        if (debug) {
+        if (log.isDebugEnabled()) {
             log.debug("Found reference list element");
         }
         if (cb == null) {
             throw new WSSecurityException(WSSecurityException.FAILURE, "noCallback");
         }
-        List<WSDataRef> dataRefs = handleReferenceList(elem, cb, decCrypto, wdi);
-        returnResults.add(
-            0,
-            new WSSecurityEngineResult(WSConstants.ENCR, dataRefs)
-        );
+        List<WSDataRef> dataRefs = handleReferenceList(elem, cb, decCrypto, wsDocInfo);
+        WSSecurityEngineResult result = 
+            new WSSecurityEngineResult(WSConstants.ENCR, dataRefs);
+        wsDocInfo.addResult(result);
+        return java.util.Collections.singletonList(result);
     }
 
     /**
@@ -89,7 +86,7 @@ public class ReferenceListProcessor implements Processor {
         Element elem, 
         CallbackHandler cb,
         Crypto crypto,
-        WSDocInfo wdi
+        WSDocInfo wsDocInfo
     ) throws WSSecurityException {
         List<WSDataRef> dataRefs = new ArrayList<WSDataRef>();
         for (Node node = elem.getFirstChild(); 
@@ -104,7 +101,7 @@ public class ReferenceListProcessor implements Processor {
                     dataRefURI = dataRefURI.substring(1);
                 }
                 WSDataRef dataRef = 
-                    decryptDataRefEmbedded(elem.getOwnerDocument(), dataRefURI, cb, crypto, wdi);
+                    decryptDataRefEmbedded(elem.getOwnerDocument(), dataRefURI, cb, crypto, wsDocInfo);
                 dataRefs.add(dataRef);
             }
         }
@@ -121,7 +118,7 @@ public class ReferenceListProcessor implements Processor {
         String dataRefURI, 
         CallbackHandler cb, 
         Crypto crypto,
-        WSDocInfo wdi
+        WSDocInfo wsDocInfo
     ) throws WSSecurityException {
         if (log.isDebugEnabled()) {
             log.debug("Found data reference: " + dataRefURI);
@@ -154,7 +151,7 @@ public class ReferenceListProcessor implements Processor {
             symmetricKey = X509Util.getSharedKey(keyInfoElement, symEncAlgo, cb);
         } else {
             symmetricKey = 
-                getKeyFromSecurityTokenReference(secRefToken, symEncAlgo, crypto, cb, wdi);
+                getKeyFromSecurityTokenReference(secRefToken, symEncAlgo, crypto, cb, wsDocInfo);
         }
         
         return 
@@ -308,21 +305,27 @@ public class ReferenceListProcessor implements Processor {
             if (id.charAt(0) == '#') {
                 id = id.substring(1);
             }
-            Processor p = wsDocInfo.getProcessor(id);
-            
-            if (p instanceof EncryptedKeyProcessor) {
-                EncryptedKeyProcessor ekp = (EncryptedKeyProcessor) p;
-                decryptedData = ekp.getDecryptedBytes();
-            } else if (p instanceof DerivedKeyTokenProcessor) {
-                DerivedKeyTokenProcessor dkp = (DerivedKeyTokenProcessor) p;
-                decryptedData = dkp.getKeyBytes(WSSecurityUtil.getKeyLength(algorithm));
-            } else if (p instanceof SAMLTokenProcessor) {
-                SAMLTokenProcessor samlp = (SAMLTokenProcessor) p;
-                SAMLKeyInfo keyInfo = 
-                    SAMLUtil.getSAMLKeyInfo(samlp.getSamlTokenElement(), crypto, cb);
-                // TODO Handle malformed SAML tokens where they don't have the 
-                // secret in them
-                decryptedData = keyInfo.getSecret();
+            WSSecurityEngineResult result = wsDocInfo.getResult(id);
+            if (result != null) {
+                int action = ((Integer)result.get(WSSecurityEngineResult.TAG_ACTION)).intValue();
+                if (WSConstants.ENCR == action) {
+                    decryptedData = (byte[])result.get(WSSecurityEngineResult.TAG_DECRYPTED_KEY);
+                } else if (WSConstants.DKT == action) {
+                    DerivedKeyToken dkt = 
+                        (DerivedKeyToken)result.get(WSSecurityEngineResult.TAG_DERIVED_KEY_TOKEN);
+                    byte[] secret = 
+                        (byte[])result.get(WSSecurityEngineResult.TAG_SECRET);
+                    decryptedData = dkt.deriveKey(WSSecurityUtil.getKeyLength(algorithm), secret);
+                } else if (WSConstants.ST_UNSIGNED == action) {
+                    Element samlElement = wsDocInfo.getTokenElement(id);
+                    SAMLKeyInfo keyInfo = 
+                        SAMLUtil.getSAMLKeyInfo(samlElement, crypto, cb);
+                    // TODO Handle malformed SAML tokens where they don't have the 
+                    // secret in them
+                    decryptedData = keyInfo.getSecret();
+                } else if (WSConstants.SCT == action) {
+                    decryptedData = (byte[])result.get(WSSecurityEngineResult.TAG_SECRET);
+                }
             } else {
                 // Try custom token
                 WSPasswordCallback pwcb = 

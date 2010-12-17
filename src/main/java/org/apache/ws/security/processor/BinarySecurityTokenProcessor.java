@@ -30,11 +30,9 @@ import org.apache.ws.security.message.token.PKIPathSecurity;
 import org.apache.ws.security.message.token.X509Security;
 import org.w3c.dom.Element;
 
-import javax.security.auth.callback.CallbackHandler;
-
 import java.security.cert.X509Certificate;
 import java.util.List;
-
+import javax.security.auth.callback.CallbackHandler;
 
 /**
  * Processor implementation to handle wsse:BinarySecurityToken elements
@@ -42,73 +40,50 @@ import java.util.List;
 public class BinarySecurityTokenProcessor implements Processor {
 
     /**
-     * Token Id
-     */
-    private String id;
-    
-    /**
-     * Token type
-     */
-    private String type;
-    
-    /**
-     * Certificates carried in this token
-     */
-    private X509Certificate[] certificates;
-    
-    /**
-     * Token object representing the token
-     */
-    private BinarySecurity token;
-    
-    /**
      * {@inheritDoc}
      */
-    public String getId() {
-        return id;
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
-    public void handleToken(
+    public List<WSSecurityEngineResult> handleToken(
         Element elem, 
         Crypto crypto, 
         Crypto decCrypto,
         CallbackHandler cb, 
-        WSDocInfo wsDocInfo, 
-        List<WSSecurityEngineResult> returnResults,
+        WSDocInfo wsDocInfo,
         WSSConfig config
     ) throws WSSecurityException {
+        
+        BinarySecurity token = createSecurityToken(elem);
+        X509Certificate[] certs = null;
         if (crypto == null) {
-            getCertificatesTokenReference(elem, decCrypto);
+            certs = getCertificatesTokenReference(token, decCrypto);
         } else {
-            getCertificatesTokenReference(elem, crypto);
+            certs = getCertificatesTokenReference(token, crypto);
         }
-        returnResults.add(
-            0, 
-            new WSSecurityEngineResult(WSConstants.BST, token, certificates)
-        );
-        id = elem.getAttributeNS(WSConstants.WSU_NS, "Id");
+        WSSecurityEngineResult result = 
+            new WSSecurityEngineResult(WSConstants.BST, token, certs);
+        wsDocInfo.addTokenElement(elem);
+        String id = elem.getAttributeNS(WSConstants.WSU_NS, "Id");
+        result.put(WSSecurityEngineResult.TAG_ID, id);
+        wsDocInfo.addResult(result);
+        return java.util.Collections.singletonList(result);
     }
     
     /**
      * Extracts the certificate(s) from the Binary Security token reference.
      *
-     * @param elem The element containing the binary security token. This is
-     *             either X509 certificate(s) or a PKIPath. Any other token type
-     *             is ignored.
+     * @param token The BinarySecurity instance corrresponding to either X509Security or 
+     *              PKIPathSecurity
+     * @return The X509Certificates associated with this reference
      * @throws WSSecurityException
      */
-    private void getCertificatesTokenReference(Element elem, Crypto crypto)
+    private X509Certificate[] getCertificatesTokenReference(BinarySecurity token, Crypto crypto)
         throws WSSecurityException {
-        createSecurityToken(elem);
         if (token instanceof PKIPathSecurity) {
-            certificates = ((PKIPathSecurity) token).getX509Certificates(crypto);
+            return ((PKIPathSecurity) token).getX509Certificates(crypto);
         } else if (token instanceof X509Security) {
             X509Certificate cert = ((X509Security) token).getX509Certificate(crypto);
-            certificates = new X509Certificate[]{cert};
+            return new X509Certificate[]{cert};
         }
+        return null;
     }
 
     /**
@@ -116,11 +91,12 @@ public class BinarySecurityTokenProcessor implements Processor {
      *
      * @param element The XML element that contains either a <code>BinarySecurityToken
      *                </code> or a <code>PKIPath</code> element.
+     * @return a BinarySecurity token element
      * @throws WSSecurityException
      */
-    private void createSecurityToken(Element element) throws WSSecurityException {
-        
-        type = element.getAttribute("ValueType");
+    private BinarySecurity createSecurityToken(Element element) throws WSSecurityException {
+        String type = element.getAttribute("ValueType");
+        BinarySecurity token = null;
         if (X509Security.X509_V3_TYPE.equals(type)) {
             token = new X509Security(element);
         } else if (PKIPathSecurity.getType().equals(type)) {
@@ -128,17 +104,6 @@ public class BinarySecurityTokenProcessor implements Processor {
         } else {
             token = new BinarySecurity(element);
         }
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public X509Certificate[] getCertificates() {
-        return certificates;
-    }
-
-    public BinarySecurity getToken() {
         return token;
     }
 

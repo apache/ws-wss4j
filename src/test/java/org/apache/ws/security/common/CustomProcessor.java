@@ -33,14 +33,13 @@ import org.apache.ws.security.WSSecurityException;
  */
 public class CustomProcessor implements Processor {
     
-    public final void 
+    public final java.util.List<WSSecurityEngineResult> 
     handleToken(
         final org.w3c.dom.Element elem, 
         final Crypto crypto, 
         final Crypto decCrypto,
         final javax.security.auth.callback.CallbackHandler cb, 
         final WSDocInfo wsDocInfo, 
-        final java.util.List<WSSecurityEngineResult> returnResults,
         final WSSConfig config
     ) throws WSSecurityException {
         final WSSecurityEngineResult result = 
@@ -49,10 +48,6 @@ public class CustomProcessor implements Processor {
                 (SecurityContextToken) null
             );
         result.put("foo", this);
-        returnResults.add(result);
-    }
-
-    public final String getId() {
-        return getClass().getName();
+        return java.util.Collections.singletonList(result);
     }
 }

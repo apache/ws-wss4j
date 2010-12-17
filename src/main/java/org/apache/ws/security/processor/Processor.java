@@ -26,25 +26,18 @@ import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.w3c.dom.Element;
 
-import javax.security.auth.callback.CallbackHandler;
 import java.util.List;
+import javax.security.auth.callback.CallbackHandler;
 
 public interface Processor {
     
-    public void handleToken(
+    public List<WSSecurityEngineResult> handleToken(
         Element elem, 
         Crypto crypto, 
         Crypto decCrypto,
         CallbackHandler cb, 
         WSDocInfo wsDocInfo, 
-        List<WSSecurityEngineResult> returnResults,
         WSSConfig config
     ) throws WSSecurityException;
     
-    /**
-     * Get the Id of the processor.
-     * 
-     * @return The Id string
-     */
-    public String getId();
 }

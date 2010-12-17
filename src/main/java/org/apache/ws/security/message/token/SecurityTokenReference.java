@@ -232,12 +232,7 @@ public class SecurityTokenReference {
         // If the token type is a SAML Token or BinarySecurityToken, try to find it from the
         // WSDocInfo instance first, to avoid searching the DOM element for it
         //
-        String assertionStr = WSConstants.WSS_SAML_NS + WSConstants.ASSERTION_LN;
-        if (docInfo != null &&
-            (WSConstants.WSS_SAML_KI_VALUE_TYPE.equals(type)
-            || assertionStr.equals(type)
-            || X509Security.X509_V3_TYPE.equals(type) 
-            || PKIPathSecurity.getType().equals(type))) {
+        if (docInfo != null) {
             Element token = docInfo.getTokenElement(id);
             if (token != null) {
                 return token;
@@ -247,6 +242,7 @@ public class SecurityTokenReference {
         //
         // Try to find a SAML Assertion by searching the DOM tree
         //
+        String assertionStr = WSConstants.WSS_SAML_NS + WSConstants.ASSERTION_LN;
         if (WSConstants.WSS_SAML_KI_VALUE_TYPE.equals(type) || assertionStr.equals(type)) {
             Element assertion = 
                 WSSecurityUtil.findSAMLAssertionElementById(

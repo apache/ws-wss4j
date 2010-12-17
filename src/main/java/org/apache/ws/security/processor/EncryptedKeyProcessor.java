@@ -58,100 +58,36 @@ import java.util.List;
 
 public class EncryptedKeyProcessor implements Processor {
     private static Log log = LogFactory.getLog(EncryptedKeyProcessor.class.getName());
-    private static Log tlog =
-            LogFactory.getLog("org.apache.ws.security.TIME");
-    private byte[] encryptedEphemeralKey;
     
-    private byte[] decryptedBytes = null;
-    
-    private String encryptedKeyId = null;
-    private X509Certificate[] certs;
-    
-    private String encryptedKeyTransportMethod = null;
-    
-    private WSDocInfo docInfo = null;
-
-    public void handleToken(
+    public List<WSSecurityEngineResult> handleToken(
         Element elem, 
         Crypto crypto, 
         Crypto decCrypto, 
         CallbackHandler cb, 
         WSDocInfo wsDocInfo,
-        List<WSSecurityEngineResult> returnResults, 
         WSSConfig wsc
     ) throws WSSecurityException {
         if (log.isDebugEnabled()) {
             log.debug("Found encrypted key element");
         }
-        certs = null;
         if (decCrypto == null) {
             throw new WSSecurityException(WSSecurityException.FAILURE, "noDecCryptoFile");
         }
         if (cb == null) {
             throw new WSSecurityException(WSSecurityException.FAILURE, "noCallback");
         }
-        docInfo = wsDocInfo;
-        List<WSDataRef> dataRefs = handleEncryptedKey(elem, cb, decCrypto, null);
-        encryptedKeyId = elem.getAttribute("Id");
-        
-        WSSecurityEngineResult result = new WSSecurityEngineResult(
-                WSConstants.ENCR, 
-                decryptedBytes,
-                encryptedEphemeralKey,
-                encryptedKeyId, 
-                dataRefs,
-                certs
-            );
-        
-        result.put(
-            WSSecurityEngineResult.TAG_ENCRYPTED_KEY_TRANSPORT_METHOD, 
-            this.encryptedKeyTransportMethod
-        );
-        
-        returnResults.add(
-            0, 
-            result
-        );
-    }
-
-    public List<WSDataRef> handleEncryptedKey(
-        Element xencEncryptedKey,
-        CallbackHandler cb, 
-        Crypto crypto
-    ) throws WSSecurityException {
-        return handleEncryptedKey(xencEncryptedKey, cb, crypto, null);
-    }
-
-    public List<WSDataRef> handleEncryptedKey(
-        Element xencEncryptedKey,
-        PrivateKey privatekey
-    ) throws WSSecurityException {
-        return handleEncryptedKey(xencEncryptedKey, null, null, privatekey);
-    }
-
-    public List<WSDataRef> handleEncryptedKey(
-        Element xencEncryptedKey,
-        CallbackHandler cb, 
-        Crypto crypto, 
-        PrivateKey privateKey
-    ) throws WSSecurityException {
-        long t0 = 0, t1 = 0, t2 = 0;
-        if (tlog.isDebugEnabled()) {
-            t0 = System.currentTimeMillis();
-        }
-        Document doc = xencEncryptedKey.getOwnerDocument();
         //
         // lookup xenc:EncryptionMethod, get the Algorithm attribute to determine
         // how the key was encrypted. Then check if we support the algorithm
         //
-        this.encryptedKeyTransportMethod = X509Util.getEncAlgo(xencEncryptedKey);
-        Cipher cipher = WSSecurityUtil.getCipherInstance(this.encryptedKeyTransportMethod);
+        String encryptedKeyTransportMethod = X509Util.getEncAlgo(elem);
+        Cipher cipher = WSSecurityUtil.getCipherInstance(encryptedKeyTransportMethod);
         //
         // Now lookup CipherValue.
         //
         Element tmpE = 
             WSSecurityUtil.getDirectChildElement(
-                xencEncryptedKey, "CipherData", WSConstants.ENC_NS
+                elem, "CipherData", WSConstants.ENC_NS
             );
         Element xencCipherValue = null;
         if (tmpE != null) {
@@ -161,17 +97,20 @@ public class EncryptedKeyProcessor implements Processor {
         if (xencCipherValue == null) {
             throw new WSSecurityException(WSSecurityException.INVALID_SECURITY, "noCipher");
         }
-
-        if (privateKey == null) {
-            privateKey = getPrivateKeyFromKeyInfo(xencEncryptedKey, crypto, doc, cb);
-        }
+        
+        String alias = 
+            getAliasFromEncryptedKey(elem, decCrypto, elem.getOwnerDocument(), cb, wsDocInfo);
+        PrivateKey privateKey = getPrivateKeyFromKeyInfo(decCrypto, cb, alias);
+        X509Certificate[] certs = decCrypto.getCertificates(alias);
 
         try {
             cipher.init(Cipher.DECRYPT_MODE, privateKey);
         } catch (Exception ex) {
             throw new WSSecurityException(WSSecurityException.FAILED_CHECK, null, null, ex);
         }
-
+        
+        byte[] encryptedEphemeralKey = null;
+        byte[] decryptedBytes = null;
         try {
             encryptedEphemeralKey = getDecodedBase64EncodedData(xencCipherValue);
             decryptedBytes = cipher.doFinal(encryptedEphemeralKey);
@@ -183,48 +122,22 @@ public class EncryptedKeyProcessor implements Processor {
             throw new WSSecurityException(WSSecurityException.FAILED_CHECK, null, null, ex);
         }
 
-        if (tlog.isDebugEnabled()) {
-            t1 = System.currentTimeMillis();
-        }
-        //
-        // At this point we have the decrypted session (symmetric) key. According
-        // to W3C XML-Enc this key is used to decrypt _any_ references contained in
-        // the reference list
-        // Now lookup the references that are encrypted with this key
-        //
-        Element refList = 
-            WSSecurityUtil.getDirectChildElement(
-                xencEncryptedKey, "ReferenceList", WSConstants.ENC_NS
-            );
-        List<WSDataRef> dataRefs = new ArrayList<WSDataRef>();
-        if (refList != null) {
-            for (Node node = refList.getFirstChild();
-                node != null; 
-                node = node.getNextSibling()
-            ) {
-                if (Node.ELEMENT_NODE == node.getNodeType()
-                    && WSConstants.ENC_NS.equals(node.getNamespaceURI())
-                    && "DataReference".equals(node.getLocalName())) {
-                    String dataRefURI = ((Element) node).getAttribute("URI");
-                    if (dataRefURI.charAt(0) == '#') {
-                        dataRefURI = dataRefURI.substring(1);
-                    }
-                    WSDataRef dataRef = decryptDataRef(doc, dataRefURI, decryptedBytes);
-                    dataRefs.add(dataRef);
-                }
-            }
-            return dataRefs;
-        }
-
-        if (tlog.isDebugEnabled()) {
-            t2 = System.currentTimeMillis();
-            tlog.debug(
-                "XMLDecrypt: total= " + (t2 - t0) + ", get-sym-key= " + (t1 - t0) 
-                + ", decrypt= " + (t2 - t1)
-            );
-        }
+        List<WSDataRef> dataRefs = decryptDataRefs(elem.getOwnerDocument(), elem, decryptedBytes);
         
-        return null;
+        WSSecurityEngineResult result = new WSSecurityEngineResult(
+                WSConstants.ENCR, 
+                decryptedBytes,
+                encryptedEphemeralKey,
+                dataRefs,
+                certs
+            );
+        result.put(
+            WSSecurityEngineResult.TAG_ENCRYPTED_KEY_TRANSPORT_METHOD, 
+            encryptedKeyTransportMethod
+        );
+        result.put(WSSecurityEngineResult.TAG_ID, elem.getAttribute("Id"));
+        wsDocInfo.addResult(result);
+        return java.util.Collections.singletonList(result);
     }
 
     /**
@@ -248,14 +161,15 @@ public class EncryptedKeyProcessor implements Processor {
     }
     
     /**
-     * @return the private key corresponding to the public key reference in the 
+     * @return the alias corresponding to the public key reference in the 
      * EncryptedKey Element
      */
-    private PrivateKey getPrivateKeyFromKeyInfo(
+    private String getAliasFromEncryptedKey(
         Element xencEncryptedKey,
         Crypto crypto,
         Document doc,
-        CallbackHandler cb
+        CallbackHandler cb,
+        WSDocInfo wsDocInfo
     ) throws WSSecurityException {
         Element keyInfo = 
             WSSecurityUtil.getDirectChildElement(
@@ -263,12 +177,24 @@ public class EncryptedKeyProcessor implements Processor {
             );
         String alias = null;
         if (keyInfo != null) {
-            alias = getAliasFromKeyInfo(keyInfo, crypto, doc, cb);
+            alias = getAliasFromKeyInfo(keyInfo, crypto, doc, cb, wsDocInfo);
         } else if (crypto.getDefaultX509Alias() != null) {
             alias = crypto.getDefaultX509Alias();
         } else {
             throw new WSSecurityException(WSSecurityException.INVALID_SECURITY, "noKeyinfo");
         }
+        return alias;
+    }
+    
+    /**
+     * @return the private key corresponding to the public key reference in the 
+     * EncryptedKey Element
+     */
+    private PrivateKey getPrivateKeyFromKeyInfo(
+        Crypto crypto,
+        CallbackHandler cb,
+        String alias
+    ) throws WSSecurityException {
         //
         // If the alias is null then throw an Exception, as the private key doesn't exist
         // in our key store
@@ -326,7 +252,8 @@ public class EncryptedKeyProcessor implements Processor {
         Element keyInfo,
         Crypto crypto,
         Document doc,
-        CallbackHandler cb
+        CallbackHandler cb,
+        WSDocInfo wsDocInfo
     ) throws WSSecurityException {
         Element secRefToken = 
             WSSecurityUtil.getDirectChildElement(
@@ -351,6 +278,7 @@ public class EncryptedKeyProcessor implements Processor {
         // Try to handle all of them :-).
         //
         String alias = null;
+        X509Certificate[] certs = null;
         //
         // handle X509IssuerSerial here. First check if all elements are available,
         // get the appropriate data, check if all data is available.
@@ -373,7 +301,7 @@ public class EncryptedKeyProcessor implements Processor {
         else if (secRef.containsKeyIdentifier()) {
             if (WSConstants.WSS_SAML_KI_VALUE_TYPE.equals(secRef.getKeyIdentifierValueType())) { 
                 Element token = 
-                    secRef.getKeyIdentifierTokenElement(doc, docInfo, cb);
+                    secRef.getKeyIdentifierTokenElement(doc, wsDocInfo, cb);
                 
                 if (crypto == null) {
                     throw new WSSecurityException(
@@ -402,20 +330,24 @@ public class EncryptedKeyProcessor implements Processor {
                 log.debug("KeyIdentifier Alias: " + alias);
             }
         } else if (secRef.containsReference()) {
-            if (docInfo != null) {
+            if (wsDocInfo != null) {
                 String uri = secRef.getReference().getURI();
-                if (uri.charAt(0) == '#') {
-                    uri = uri.substring(1);
-                }
-                Processor processor = docInfo.getProcessor(uri);
-                if (processor instanceof BinarySecurityTokenProcessor) {
-                    certs = ((BinarySecurityTokenProcessor)processor).getCertificates();
-                } else if (processor != null) {
-                    throw new WSSecurityException(
-                        WSSecurityException.UNSUPPORTED_SECURITY_TOKEN,
-                        "unsupportedBinaryTokenType",
-                        null
-                    );
+                WSSecurityEngineResult result = wsDocInfo.getResult(uri);
+                
+                if (result != null) {
+                    int action = ((Integer)result.get(WSSecurityEngineResult.TAG_ACTION)).intValue();
+                    if (WSConstants.BST == action) {
+                        certs = 
+                            (X509Certificate[])result.get(
+                                WSSecurityEngineResult.TAG_X509_CERTIFICATES
+                            );
+                    } else {
+                        throw new WSSecurityException(
+                            WSSecurityException.UNSUPPORTED_SECURITY_TOKEN,
+                            "unsupportedBinaryTokenType",
+                            null
+                        );
+                    }
                 }
             }
             if (certs == null) {
@@ -476,6 +408,45 @@ public class EncryptedKeyProcessor implements Processor {
         }
         return alias;
     }
+    
+    /**
+     * Decrypt all data references
+     */
+    private List<WSDataRef> decryptDataRefs(
+        Document doc, Element xencEncryptedKey, byte[] decryptedBytes
+    ) throws WSSecurityException {
+        //
+        // At this point we have the decrypted session (symmetric) key. According
+        // to W3C XML-Enc this key is used to decrypt _any_ references contained in
+        // the reference list
+        // Now lookup the references that are encrypted with this key
+        //
+        Element refList = 
+            WSSecurityUtil.getDirectChildElement(
+                    xencEncryptedKey, "ReferenceList", WSConstants.ENC_NS
+            );
+        List<WSDataRef> dataRefs = new ArrayList<WSDataRef>();
+        if (refList != null) {
+            for (Node node = refList.getFirstChild();
+            node != null; 
+            node = node.getNextSibling()
+            ) {
+                if (Node.ELEMENT_NODE == node.getNodeType()
+                        && WSConstants.ENC_NS.equals(node.getNamespaceURI())
+                        && "DataReference".equals(node.getLocalName())) {
+                    String dataRefURI = ((Element) node).getAttribute("URI");
+                    if (dataRefURI.charAt(0) == '#') {
+                        dataRefURI = dataRefURI.substring(1);
+                    }
+                    WSDataRef dataRef = decryptDataRef(doc, dataRefURI, decryptedBytes);
+                    dataRefs.add(dataRef);
+                }
+            }
+            return dataRefs;
+        }
+
+        return null;
+    }
 
     /**
      * Decrypt an EncryptedData element referenced by dataRefURI
@@ -503,33 +474,6 @@ public class EncryptedKeyProcessor implements Processor {
         return ReferenceListProcessor.decryptEncryptedData(
             doc, dataRefURI, encryptedDataElement, symmetricKey, symEncAlgo
         );
-    }
-    
-    
-    /**
-     * Get the Id of the encrypted key element.
-     * 
-     * @return The Id string
-     */
-    public String getId() {
-        return encryptedKeyId;
-    }
-    
-    /**
-     * Get the decrypted key.
-     * 
-     * The encrypted key element contains an encrypted session key. The
-     * security functions use the session key to encrypt contents of the message
-     * with symmetrical encryption methods.
-     *  
-     * @return The decrypted key.
-     */
-    public byte[] getDecryptedBytes() {
-        return decryptedBytes;
-    }
-
-    public byte[] getEncryptedEphemeralKey() {
-        return encryptedEphemeralKey;
     }
   
 }

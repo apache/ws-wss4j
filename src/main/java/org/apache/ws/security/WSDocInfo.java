@@ -33,7 +33,6 @@ package org.apache.ws.security;
  */
 
 import org.apache.ws.security.components.crypto.Crypto;
-import org.apache.ws.security.processor.Processor;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -46,7 +45,7 @@ public class WSDocInfo {
     Crypto crypto = null;
     List<Element> tokenList = null;
     List<Element> elementList = null;
-    List<Processor> processors = null;
+    List<WSSecurityEngineResult> resultsList = null;
 
     public WSDocInfo(Document doc) {
         //
@@ -65,16 +64,16 @@ public class WSDocInfo {
         if (tokenList != null && tokenList.size() > 0) {
             tokenList.clear();
         }
-        if (processors != null && processors.size() > 0) {
-            processors.clear();
-        }
         if (elementList != null && elementList.size() > 0) {
             elementList.clear();
         }
+        if (resultsList != null && resultsList.size() > 0) {
+            resultsList.clear();
+        }
         
         tokenList = null;
-        processors = null;
         elementList = null;
+        resultsList = null;
     }
     
     /**
@@ -82,6 +81,9 @@ public class WSDocInfo {
      *  - SecurityTokenReference element
      *  - BinarySecurityToken element
      *  - SAML Assertion element
+     *  - SecurityContextToken element
+     *  - UsernameToken element
+     *  - DerivedKeyToken element
      * @param elem is the token element to store
      */
     public void addTokenElement(Element elem) {
@@ -153,41 +155,43 @@ public class WSDocInfo {
         }
         return null;
     }
-
+    
     /**
-     * Get a Processor for the given Id
-     *
-     * @param id is the Id to look for
-     * @return the Security processor identified with this Id or null if nothing found
+     * Store a WSSecurityEngineResult for later retrieval. 
+     * @param result is the WSSecurityEngineResult to store
      */
-    public Processor getProcessor(String id) {
+    public void addResult(WSSecurityEngineResult result) {
+        if (resultsList == null) {
+            resultsList = new ArrayList<WSSecurityEngineResult>();
+        }
+        resultsList.add(result);
+    }
+    
+    /**
+     * Get a WSSecurityEngineResult for the given Id.
+     * @param uri is the (relative) uri of the id
+     * @return the WSSecurityEngineResult or null if nothing found
+     */
+    public WSSecurityEngineResult getResult(String uri) {
+        String id = uri;
         if (id == null) {
             return null;
+        } else if (id.charAt(0) == '#') {
+            id = id.substring(1);
         }
-
-        if (processors != null) {
-            for (Processor p : processors) {
-                String cId = p.getId();
-                if (id.equals(cId)) {
-                    return p;
+        if (resultsList != null) {
+            for (WSSecurityEngineResult result : resultsList) {
+                if (result != null) {
+                    String cId = (String)result.get(WSSecurityEngineResult.TAG_ID);
+                    if (id.equals(cId)) {
+                        return result;
+                    }
                 }
             }
         }
         return null;
     }
-    
-    /**
-     * Store a Processor for later access.
-     * 
-     * @param p is the Processor to store
-     */
-    public void setProcessor(Processor p) {
-        if (processors == null) {
-            processors = new ArrayList<Processor>();
-        }
-        processors.add(p);
-    }
-    
+
     /**
      * @return the signature crypto class used to process
      *         the signature/verify
