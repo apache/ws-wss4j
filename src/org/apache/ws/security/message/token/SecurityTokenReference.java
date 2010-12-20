@@ -251,7 +251,8 @@ public class SecurityTokenReference {
         // 
         // Try to find a custom token
         //
-        if (tokElement == null && WSConstants.WSC_SCT.equals(type) && cb != null) {
+        if (tokElement == null && cb != null && (WSConstants.WSC_SCT.equals(type) ||
+            WSConstants.WSS_SAML_KI_VALUE_TYPE.equals(type) || assertionStr.equals(type))) {
             //try to find a custom token
             WSPasswordCallback pwcb = 
                 new WSPasswordCallback(id, WSPasswordCallback.CUSTOM_TOKEN);
