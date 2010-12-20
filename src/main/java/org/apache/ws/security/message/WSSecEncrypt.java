@@ -499,7 +499,6 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
     private KeyInfo createKeyInfo() throws WSSecurityException {
 
         KeyInfo keyInfo = new KeyInfo(document);
-
         if (keyIdentifierType == WSConstants.ENCRYPTED_KEY_SHA1_IDENTIFIER) {
             SecurityTokenReference secToken = new SecurityTokenReference(document);
             secToken.addWSSENamespace();
@@ -515,6 +514,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
         } else if (SecurityTokenReference.SAML_ID_URI.equals(customReferenceValue)) {
             SecurityTokenReference secToken = new SecurityTokenReference(document);
             secToken.setSAMLKeyIdentifier((encKeyIdDirectId ? "":"#") + encKeyId);
+            keyInfo.addUnknownElement(secToken.getElement());
         } else if (securityTokenReference != null) {
             Element tmpE = securityTokenReference.getElement();
             tmpE.setAttributeNS(
