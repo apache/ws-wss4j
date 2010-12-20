@@ -189,6 +189,15 @@ public class DerivedKeyToken {
     }
     
     /**
+     * Returns the SecurityTokenReference element of the derived key token
+     *
+     * @return the Security Token Reference element of the derived key token
+     */
+    public Element getSecurityTokenReferenceElement() {
+        return elementSecurityTokenReference;
+    }
+    
+    /**
      * This adds a property into
      * /DerivedKeyToken/Properties
      *

@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.crypto.SecretKey;
-import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 
 import org.apache.commons.logging.Log;
@@ -31,16 +30,12 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDataRef;
 import org.apache.ws.security.WSDocInfo;
-import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
-import org.apache.ws.security.message.token.DerivedKeyToken;
-import org.apache.ws.security.message.token.Reference;
-import org.apache.ws.security.message.token.SecurityTokenReference;
-import org.apache.ws.security.saml.SAMLKeyInfo;
-import org.apache.ws.security.saml.SAMLUtil;
+import org.apache.ws.security.str.STRParser;
+import org.apache.ws.security.str.SecurityTokenRefSTRParser;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.xml.security.encryption.XMLCipher;
 import org.apache.xml.security.encryption.XMLEncryptionException;
@@ -70,6 +65,7 @@ public class ReferenceListProcessor implements Processor {
         List<WSDataRef> dataRefs = handleReferenceList(elem, cb, decCrypto, wsDocInfo);
         WSSecurityEngineResult result = 
             new WSSecurityEngineResult(WSConstants.ENCR, dataRefs);
+        wsDocInfo.addTokenElement(elem);
         wsDocInfo.addResult(result);
         return java.util.Collections.singletonList(result);
     }
@@ -150,8 +146,12 @@ public class ReferenceListProcessor implements Processor {
         if (secRefToken == null) {
             symmetricKey = X509Util.getSharedKey(keyInfoElement, symEncAlgo, cb);
         } else {
-            symmetricKey = 
-                getKeyFromSecurityTokenReference(secRefToken, symEncAlgo, crypto, cb, wsDocInfo);
+            STRParser strParser = new SecurityTokenRefSTRParser();
+            strParser.parseSecurityTokenReference(
+                secRefToken, symEncAlgo, crypto, cb, wsDocInfo, null
+            );
+            byte[] secretKey = strParser.getSecretKey();
+            symmetricKey = WSSecurityUtil.prepareSecretKey(symEncAlgo, secretKey);
         }
         
         return 
@@ -266,132 +266,6 @@ public class ReferenceListProcessor implements Processor {
         return null;
     }
 
-    /**
-     * Retrieves a secret key (session key) from a already parsed EncryptedKey
-     * element
-     * 
-     * This method takes a security token reference (STR) element and checks if
-     * it contains a Reference element. Then it gets the vale of the URI
-     * attribute of the Reference and uses the retrieved value to lookup an
-     * EncrypteKey element to get the decrypted session key bytes. Using the
-     * algorithm parameter these bytes are converted into a secret key.
-     * 
-     * This method requires that the EncryptedKey element is already available,
-     * thus requires a strict layout of the security header. This method
-     * supports EncryptedKey elements within the same message.
-     * 
-     * @param secRefToken The element containing the STR
-     * @param algorithm A string that identifies the symmetric decryption algorithm
-     * @param crypto Crypto instance to obtain key
-     * @param cb Callback handler to obtain the key passwords
-     * @return The secret key for the specified algorithm
-     * @throws WSSecurityException
-     */
-    private SecretKey getKeyFromSecurityTokenReference(
-        Element secRefToken, 
-        String algorithm,
-        Crypto crypto, 
-        CallbackHandler cb,
-        WSDocInfo wsDocInfo
-    ) throws WSSecurityException {
-
-        SecurityTokenReference secRef = new SecurityTokenReference(secRefToken);
-        byte[] decryptedData = null;
-
-        if (secRef.containsReference()) {
-            Reference reference = secRef.getReference();
-            String uri = reference.getURI();
-            String id = uri;
-            if (id.charAt(0) == '#') {
-                id = id.substring(1);
-            }
-            WSSecurityEngineResult result = wsDocInfo.getResult(id);
-            if (result != null) {
-                int action = ((Integer)result.get(WSSecurityEngineResult.TAG_ACTION)).intValue();
-                if (WSConstants.ENCR == action) {
-                    decryptedData = (byte[])result.get(WSSecurityEngineResult.TAG_DECRYPTED_KEY);
-                } else if (WSConstants.DKT == action) {
-                    DerivedKeyToken dkt = 
-                        (DerivedKeyToken)result.get(WSSecurityEngineResult.TAG_DERIVED_KEY_TOKEN);
-                    byte[] secret = 
-                        (byte[])result.get(WSSecurityEngineResult.TAG_SECRET);
-                    decryptedData = dkt.deriveKey(WSSecurityUtil.getKeyLength(algorithm), secret);
-                } else if (WSConstants.ST_UNSIGNED == action) {
-                    Element samlElement = wsDocInfo.getTokenElement(id);
-                    SAMLKeyInfo keyInfo = 
-                        SAMLUtil.getSAMLKeyInfo(samlElement, crypto, cb);
-                    // TODO Handle malformed SAML tokens where they don't have the 
-                    // secret in them
-                    decryptedData = keyInfo.getSecret();
-                } else if (WSConstants.SCT == action) {
-                    decryptedData = (byte[])result.get(WSSecurityEngineResult.TAG_SECRET);
-                }
-            } else {
-                // Try custom token
-                WSPasswordCallback pwcb = 
-                    new WSPasswordCallback(id, WSPasswordCallback.CUSTOM_TOKEN);
-                try {
-                    Callback[] callbacks = new Callback[]{pwcb};
-                    cb.handle(callbacks);
-                } catch (Exception e) {
-                    throw new WSSecurityException(
-                        WSSecurityException.FAILURE,
-                        "noPassword", 
-                        new Object[] {id}, 
-                        e
-                    );
-                }
-                decryptedData = pwcb.getKey();
-                
-                if (decryptedData == null) {
-                    throw new WSSecurityException(
-                        WSSecurityException.FAILED_CHECK, "unsupportedKeyId"
-                    );
-                }
-            }
-        } else if (secRef.containsKeyIdentifier()){
-            if (WSConstants.WSS_SAML_KI_VALUE_TYPE.equals(secRef.getKeyIdentifierValueType())) { 
-                Element token = 
-                    secRef.getKeyIdentifierTokenElement(secRefToken.getOwnerDocument(), wsDocInfo, cb);
-                
-                if (crypto == null) {
-                    throw new WSSecurityException(
-                        WSSecurityException.FAILURE, "noSigCryptoFile"
-                    );
-                }
-                SAMLKeyInfo keyInfo = SAMLUtil.getSAMLKeyInfo(token, crypto, cb);
-                // TODO Handle malformed SAML tokens where they don't have the 
-                // secret in them
-                decryptedData = keyInfo.getSecret();
-            } else {
-                String keyIdentifierValue = secRef.getKeyIdentifierValue();
-                WSPasswordCallback pwcb = 
-                    new WSPasswordCallback(
-                        keyIdentifierValue,
-                        null,
-                        secRef.getKeyIdentifierValueType(),
-                        WSPasswordCallback.ENCRYPTED_KEY_TOKEN
-                    );
-                
-                try {
-                    Callback[] callbacks = new Callback[]{pwcb};
-                    cb.handle(callbacks);
-                } catch (Exception e) {
-                    throw new WSSecurityException(
-                        WSSecurityException.FAILURE,
-                        "noPassword", 
-                        new Object[] {keyIdentifierValue}, 
-                        e
-                    );
-                }
-                decryptedData = pwcb.getKey();
-            }
-        } else {
-            throw new WSSecurityException(WSSecurityException.FAILED_CHECK, "noReference");
-        }
-        return WSSecurityUtil.prepareSecretKey(algorithm, decryptedData);
-    }
-    
     
     /**
      * @param decryptedNode the decrypted node

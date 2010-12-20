@@ -84,6 +84,7 @@ public class WSDocInfo {
      *  - SecurityContextToken element
      *  - UsernameToken element
      *  - DerivedKeyToken element
+     *  - Timestamp element
      * @param elem is the token element to store
      */
     public void addTokenElement(Element elem) {

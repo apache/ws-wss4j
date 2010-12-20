@@ -55,6 +55,7 @@ public class TimestampProcessor implements Processor {
         WSSecurityEngineResult result = 
             new WSSecurityEngineResult(WSConstants.TS, timestamp);
         result.put(WSSecurityEngineResult.TAG_ID, timestamp.getID());
+        wsDocInfo.addTokenElement(elem);
         wsDocInfo.addResult(result);
         return java.util.Collections.singletonList(result);
     }

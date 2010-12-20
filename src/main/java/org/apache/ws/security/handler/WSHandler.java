@@ -34,7 +34,6 @@ import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.message.WSSecHeader;
 import org.apache.ws.security.message.token.SignatureConfirmation;
 import org.apache.ws.security.message.token.Timestamp;
-import org.apache.ws.security.processor.SignatureProcessor;
 import org.apache.ws.security.util.Loader;
 import org.apache.ws.security.util.StringUtil;
 import org.apache.ws.security.util.WSSecurityUtil;
@@ -1087,29 +1086,6 @@ public abstract class WSHandler {
         return cbHandler;
     }
 
-    /**
-     * Evaluate whether a given certificate should be trusted.
-     * Hook to allow subclasses to implement custom validation methods however they see fit.
-     * <p/>
-     * Policy used in this implementation:
-     * 1. Search the keystore for the transmitted certificate
-     * 2. Search the keystore for a connection to the transmitted certificate
-     * (that is, search for certificate(s) of the issuer of the transmitted certificate
-     * 3. Verify the trust path for those certificates found because the search for the issuer 
-     * might be fooled by a phony DN (String!)
-     *
-     * @param cert the certificate that should be validated against the keystore
-     * @return true if the certificate is trusted, false if not (AxisFault is thrown for exceptions
-     * during CertPathValidation)
-     * @throws WSSecurityException
-     * @Deprecated Trust is verified on signature certificates in the SignatureProcessor by default
-     */
-    protected boolean verifyTrust(X509Certificate cert, RequestData reqData) 
-        throws WSSecurityException {
-        return SignatureProcessor.verifyTrust(cert, reqData.getSigCrypto());
-    }
-    
-    
     /**
      * Evaluate whether a timestamp is considered valid on the receivers' side. Hook to
      * allow subclasses to implement custom validation methods however they see fit.

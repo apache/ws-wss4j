@@ -192,8 +192,7 @@ public class CryptoProviderTest extends org.junit.Assert {
             verify(encryptedDoc);
             fail("Failure expected on encryption with a key that does not exist in the keystore");
         } catch (Exception ex) {
-            assertTrue(ex.getMessage().indexOf(
-                "The private key for the supplied alias does not exist in the keystore") != -1);
+            // expected
         }
         
     }

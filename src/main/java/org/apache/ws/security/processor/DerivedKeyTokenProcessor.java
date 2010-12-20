@@ -21,25 +21,17 @@ package org.apache.ws.security.processor;
 
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDocInfo;
-import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.message.token.DerivedKeyToken;
-import org.apache.ws.security.message.token.Reference;
-import org.apache.ws.security.message.token.SecurityTokenReference;
-import org.apache.ws.security.message.token.UsernameToken;
-import org.apache.ws.security.saml.SAMLKeyInfo;
-import org.apache.ws.security.saml.SAMLUtil;
+import org.apache.ws.security.str.DerivedKeyTokenSTRParser;
+import org.apache.ws.security.str.STRParser;
 import org.w3c.dom.Element;
 
-import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.callback.UnsupportedCallbackException;
 
-import java.io.IOException;
-import java.security.cert.X509Certificate;
 import java.util.List;
 
 /**
@@ -60,7 +52,17 @@ public class DerivedKeyTokenProcessor implements Processor {
         
         // Deserialize the DKT
         DerivedKeyToken dkt = new DerivedKeyToken(elem);
-        byte[] secret = extractSecret(wsDocInfo, dkt, cb, crypto);
+        byte[] secret = null;
+        Element secRefElement = dkt.getSecurityTokenReferenceElement();
+        if (secRefElement != null) {
+            STRParser strParser = new DerivedKeyTokenSTRParser();
+            strParser.parseSecurityTokenReference(
+                secRefElement, null, crypto, cb, wsDocInfo, null
+            );
+            secret = strParser.getSecretKey();
+        } else {
+            throw new WSSecurityException(WSSecurityException.FAILED_CHECK, "noReference");
+        }
         
         String tempNonce = dkt.getNonce();
         if (tempNonce == null) {
@@ -81,193 +83,6 @@ public class DerivedKeyTokenProcessor implements Processor {
             return java.util.Collections.singletonList(result);
         }
         return new java.util.ArrayList<WSSecurityEngineResult>(0);
-    }
-
-    /**
-     * @param wsDocInfo
-     * @param dkt
-     * @return the secret, as an array of bytes
-     * @throws WSSecurityException
-     */
-    private byte[] extractSecret(
-        WSDocInfo wsDocInfo, 
-        DerivedKeyToken dkt, 
-        CallbackHandler cb, 
-        Crypto crypto
-    ) throws WSSecurityException {
-        SecurityTokenReference str = dkt.getSecurityTokenReference();
-        if (str != null) {
-            String uri = null;
-            String keyIdentifierValueType = null;
-            String keyIdentifierValue = null;
-            
-            WSSecurityEngineResult result = null;
-            if (str.containsReference()) {
-                Reference ref = str.getReference();
-                uri = ref.getURI();
-                if (uri.charAt(0) == '#') {
-                    uri = uri.substring(1);
-                }
-                result = wsDocInfo.getResult(uri);
-            } else {
-                // Contains key identifier
-                keyIdentifierValue = str.getKeyIdentifierValue();
-                keyIdentifierValueType = str.getKeyIdentifierValueType();
-                result = wsDocInfo.getResult(keyIdentifierValue);
-            }
-            
-            if (result != null) {
-                int action = ((Integer)result.get(WSSecurityEngineResult.TAG_ACTION)).intValue();
-                if (WSConstants.UT == action) {
-                    UsernameToken usernameToken = 
-                        (UsernameToken)result.get(WSSecurityEngineResult.TAG_USERNAME_TOKEN);
-                    return usernameToken.getDerivedKey();
-                } else if (WSConstants.ENCR == action) {
-                    return (byte[])result.get(WSSecurityEngineResult.TAG_DECRYPTED_KEY);
-                } else if (WSConstants.SCT == action) {
-                    return (byte[])result.get(WSSecurityEngineResult.TAG_SECRET);
-                } else if (WSConstants.ST_UNSIGNED == action) {
-                    Element samlElement = wsDocInfo.getTokenElement(uri);
-                    SAMLKeyInfo keyInfo = 
-                        SAMLUtil.getSAMLKeyInfo(samlElement, crypto, cb);
-                    // TODO Handle malformed SAML tokens where they don't have the 
-                    // secret in them
-                    return keyInfo.getSecret();
-                } else {
-                    throw new WSSecurityException(
-                        WSSecurityException.FAILED_CHECK, "unsupportedKeyId"
-                    );
-                }
-            } else if (result == null && uri != null) {
-                // Now use the callback and get it
-                return getSecret(cb, uri);
-            } else if (keyIdentifierValue != null && keyIdentifierValueType != null) {
-                X509Certificate[] certs = str.getKeyIdentifier(crypto);
-                if (certs == null || certs.length < 1 || certs[0] == null) {
-                    return this.getSecret(cb, keyIdentifierValue, keyIdentifierValueType); 
-                } else {
-                    return this.getSecret(cb, crypto, certs);
-                }
-            } else {
-                throw new WSSecurityException(
-                    WSSecurityException.FAILED_CHECK, "unsupportedKeyId"
-                );
-            }
-        } else {
-            throw new WSSecurityException(WSSecurityException.FAILED_CHECK, "noReference");
-        }
-    }
-
-    private byte[] getSecret(CallbackHandler cb, String id) throws WSSecurityException {
-        if (cb == null) {
-            throw new WSSecurityException(WSSecurityException.FAILURE, "noCallback");
-        }
-
-        WSPasswordCallback callback = 
-            new WSPasswordCallback(id, WSPasswordCallback.SECURITY_CONTEXT_TOKEN);
-        try {
-            Callback[] callbacks = new Callback[]{callback};
-            cb.handle(callbacks);
-        } catch (IOException e) {
-            throw new WSSecurityException(
-                WSSecurityException.FAILURE, 
-                "noKey",
-                new Object[] {id}, 
-                e
-            );
-        } catch (UnsupportedCallbackException e) {
-            throw new WSSecurityException(
-                WSSecurityException.FAILURE,
-                "noKey",
-                new Object[] {id}, 
-                e
-            );
-        }
-
-        return callback.getKey();
-    }
-    
-    private byte[] getSecret(
-        CallbackHandler cb, 
-        String keyIdentifierValue, 
-        String keyIdentifierType
-    ) throws WSSecurityException {
-        if (cb == null) {
-            throw new WSSecurityException(WSSecurityException.FAILURE, "noCallback");
-        }
-        
-        WSPasswordCallback pwcb = 
-            new WSPasswordCallback(
-                keyIdentifierValue, null, keyIdentifierType, WSPasswordCallback.ENCRYPTED_KEY_TOKEN
-            );
-        try {
-            Callback[] callbacks = new Callback[]{pwcb};
-            cb.handle(callbacks);
-        } catch (IOException e) {
-            throw new WSSecurityException(
-                WSSecurityException.FAILURE, 
-                "noKey",
-                new Object[] {keyIdentifierValue}, 
-                e
-            );
-        } catch (UnsupportedCallbackException e) {
-            throw new WSSecurityException(
-                WSSecurityException.FAILURE, 
-                "noKey",
-                new Object[] {keyIdentifierValue}, 
-                e
-            );
-        }
-            
-        return pwcb.getKey();
-    }
-    
-    private byte[] getSecret(
-        CallbackHandler cb,
-        Crypto crypto,
-        X509Certificate certs[]
-    ) throws WSSecurityException {
-        if (cb == null) {
-            throw new WSSecurityException(WSSecurityException.FAILURE, "noCallback");
-        }
-
-        String alias = crypto.getAliasForX509Cert(certs[0]);
-
-        WSPasswordCallback pwCb = 
-            new WSPasswordCallback(alias, WSPasswordCallback.DECRYPT);
-        try {
-            Callback[] callbacks = new Callback[]{pwCb};
-            cb.handle(callbacks);
-        } catch (IOException e) {
-            throw new WSSecurityException(
-                WSSecurityException.FAILURE,
-                "noPassword",
-                new Object[]{alias}, 
-                e
-            );
-        } catch (UnsupportedCallbackException e) {
-            throw new WSSecurityException(
-                WSSecurityException.FAILURE,
-                "noPassword",
-                new Object[]{alias}, 
-                e
-            );
-        }
-
-        String password = pwCb.getPassword();
-        if (password == null) {
-            throw new WSSecurityException(
-                WSSecurityException.FAILURE, "noPassword", new Object[]{alias}
-            );
-        }
-
-        java.security.Key privateKey;
-        try {
-            privateKey = crypto.getPrivateKey(alias, password);
-            return privateKey.getEncoded();
-        } catch (Exception e) {
-            throw new WSSecurityException(WSSecurityException.FAILED_CHECK, null, null, e);
-        }
     }
 
 
