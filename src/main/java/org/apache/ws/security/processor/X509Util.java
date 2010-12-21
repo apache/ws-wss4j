@@ -27,6 +27,7 @@ import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import org.w3c.dom.Text;
 
 import javax.crypto.SecretKey;
 import javax.security.auth.callback.Callback;
@@ -78,13 +79,18 @@ public class X509Util {
                 keyInfoElem, "KeyName", WSConstants.SIG_NS
             );
         if (keyNmElem != null) {
-            keyNmElem.normalize();
-            Node tmpN = keyNmElem.getFirstChild();
-            if (tmpN != null && tmpN.getNodeType() == Node.TEXT_NODE) {
-                keyName = tmpN.getNodeValue();
+            
+            Node node = keyNmElem.getFirstChild();
+            StringBuilder builder = new StringBuilder();
+            while (node != null) {
+                if (Node.TEXT_NODE == node.getNodeType()) {
+                    builder.append(((Text)node).getData());
+                }
+                node = node.getNextSibling();
             }
+            keyName = builder.toString();
         }
-        if (keyName == null) {
+        if (keyName == null || keyName.length() <= 0) {
             throw new WSSecurityException(WSSecurityException.INVALID_SECURITY, "noKeyname");
         }
         WSPasswordCallback pwCb = new WSPasswordCallback(keyName, WSPasswordCallback.KEY_NAME);

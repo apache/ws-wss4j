@@ -19,13 +19,10 @@
 
 package org.apache.ws.security.str;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.CustomTokenPrincipal;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDocInfo;
 import org.apache.ws.security.WSPasswordCallback;
-import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
@@ -44,21 +41,32 @@ import org.apache.ws.security.util.WSSecurityUtil;
 import org.opensaml.SAMLAssertion;
 import org.w3c.dom.Element;
 
-import java.math.BigInteger;
 import java.security.Principal;
 import java.security.PublicKey;
-import java.security.cert.CertificateExpiredException;
-import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
 import java.util.List;
+import java.util.Map;
 
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.xml.namespace.QName;
 
+/**
+ * This implementation of STRParser is for parsing a SecurityTokenReference element, found in the
+ * KeyInfo element associated with a Signature element.
+ */
 public class SignatureSTRParser implements STRParser {
     
-    private static final Log LOG = LogFactory.getLog(SignatureSTRParser.class.getName());
+    /**
+     * The Signature method. This is used when deriving a key to use for verifying the signature.
+     */
+    public static final String SIGNATURE_METHOD = "signature_method";
+    
+    /**
+     * The secret key length. This is used when deriving a key from a Username token for the
+     * non-standard WSE implementation.
+     */
+    public static final String SECRET_KEY_LENGTH = "secret_key_length";
     
     private X509Certificate[] certs;
     
@@ -68,19 +76,23 @@ public class SignatureSTRParser implements STRParser {
     
     private Principal principal;
     
-    private boolean validateCertChain;
-    
-    private Crypto crypto;
-    
+    /**
+     * Parse a SecurityTokenReference element and extract credentials.
+     * 
+     * @param strElement The SecurityTokenReference element
+     * @param crypto The crypto instance used to extract credentials
+     * @param cb The CallbackHandler instance to supply passwords
+     * @param wsDocInfo The WSDocInfo object to access previous processing results
+     * @param parameters A set of implementation-specific parameters
+     * @throws WSSecurityException
+     */
     public void parseSecurityTokenReference(
         Element strElement,
-        String algorithm,
         Crypto crypto,
         CallbackHandler cb,
         WSDocInfo wsDocInfo,
-        WSSConfig wssConfig
+        Map<String, Object> parameters
     ) throws WSSecurityException {
-        this.crypto = crypto;
         SecurityTokenReference secRef = new SecurityTokenReference(strElement);
         //
         // Here we get some information about the document that is being
@@ -101,9 +113,6 @@ public class SignatureSTRParser implements STRParser {
                 QName el = new QName(token.getNamespaceURI(), token.getLocalName());
                 if (el.equals(WSSecurityEngine.BINARY_TOKEN)) {
                     certs = getCertificatesTokenReference(token, crypto);
-                    if (certs != null && certs.length > 1) {
-                        validateCertChain = true;
-                    }
                 } else if (el.equals(WSSecurityEngine.SAML_TOKEN)) {
                     if (crypto == null) {
                         throw new WSSecurityException(
@@ -111,7 +120,10 @@ public class SignatureSTRParser implements STRParser {
                         );
                     }
                     SAMLKeyInfo samlKi = SAMLUtil.getSAMLKeyInfo(token, crypto, cb);
-                    certs = samlKi.getCerts();
+                    X509Certificate[] foundCerts = samlKi.getCerts();
+                    if (foundCerts != null) {
+                        certs = new X509Certificate[]{foundCerts[0]};
+                    }
                     secretKey = samlKi.getSecret();
                     principal = createPrincipalFromSAMLKeyInfo(samlKi);
                 } else if (el.equals(WSSecurityEngine.ENCRYPTED_KEY)){
@@ -139,15 +151,13 @@ public class SignatureSTRParser implements STRParser {
                     if (usernameToken.isDerivedKey()) {
                         secretKey = usernameToken.getDerivedKey();
                     } else {
-                        secretKey = usernameToken.getSecretKey(wssConfig.getSecretKeyLength());
+                        int keyLength = ((Integer)parameters.get(SECRET_KEY_LENGTH)).intValue();
+                        secretKey = usernameToken.getSecretKey(keyLength);
                     }
                     principal = usernameToken.createPrincipal();
                 } else if (WSConstants.BST == action) {
                     certs = 
                         (X509Certificate[])result.get(WSSecurityEngineResult.TAG_X509_CERTIFICATES);
-                    if (certs != null && certs.length > 1) {
-                        validateCertChain = true;
-                    }
                 } else if (WSConstants.ENCR == action) {
                     secretKey = (byte[])result.get(WSSecurityEngineResult.TAG_DECRYPTED_KEY);
                     String id = (String)result.get(WSSecurityEngineResult.TAG_ID);
@@ -164,6 +174,7 @@ public class SignatureSTRParser implements STRParser {
                         (DerivedKeyToken)result.get(WSSecurityEngineResult.TAG_DERIVED_KEY_TOKEN);
                     int keyLength = dkt.getLength();
                     if (keyLength <= 0) {
+                        String algorithm = (String)parameters.get(SIGNATURE_METHOD);
                         keyLength = WSSecurityUtil.getKeyLength(algorithm);
                     }
                     byte[] secret = (byte[])result.get(WSSecurityEngineResult.TAG_SECRET);
@@ -178,14 +189,20 @@ public class SignatureSTRParser implements STRParser {
                     Element samlElement = wsDocInfo.getTokenElement(uri);
                     SAMLKeyInfo keyInfo = 
                         SAMLUtil.getSAMLKeyInfo(samlElement, crypto, cb);
-                    certs = keyInfo.getCerts();
+                    X509Certificate[] foundCerts = keyInfo.getCerts();
+                    if (foundCerts != null) {
+                        certs = new X509Certificate[]{foundCerts[0]};
+                    }
                     secretKey = keyInfo.getSecret();
                     publicKey = keyInfo.getPublicKey();
                     principal = createPrincipalFromSAMLKeyInfo(keyInfo);
                 }
             }
         } else if (secRef.containsX509Data() || secRef.containsX509IssuerSerial()) {
-            certs = secRef.getX509IssuerSerial(crypto);
+            X509Certificate[] foundCerts = secRef.getX509IssuerSerial(crypto);
+            if (foundCerts != null) {
+                certs = new X509Certificate[]{foundCerts[0]};
+            }
         } else if (secRef.containsKeyIdentifier()) {
             if (secRef.getKeyIdentifierValueType().equals(SecurityTokenReference.ENC_KEY_SHA1_URI)) {
                 String id = secRef.getKeyIdentifierValue();
@@ -201,12 +218,18 @@ public class SignatureSTRParser implements STRParser {
                     );
                 }
                 SAMLKeyInfo samlKi = SAMLUtil.getSAMLKeyInfo(token, crypto, cb);
-                certs = samlKi.getCerts();
+                X509Certificate[] foundCerts = samlKi.getCerts();
+                if (foundCerts != null) {
+                    certs = new X509Certificate[]{foundCerts[0]};
+                }
                 secretKey = samlKi.getSecret();
                 publicKey = samlKi.getPublicKey();
                 principal = createPrincipalFromSAMLKeyInfo(samlKi);
             } else {
-                certs = secRef.getKeyIdentifier(crypto);
+                X509Certificate[] foundCerts = secRef.getKeyIdentifier(crypto);
+                if (foundCerts != null) {
+                    certs = new X509Certificate[]{foundCerts[0]};
+                }
             }
         } else {
             throw new WSSecurityException(
@@ -215,224 +238,42 @@ public class SignatureSTRParser implements STRParser {
                     new Object[]{strElement.toString()}
             );
         }
-    }
-    
-    public void validateCredentials() throws WSSecurityException {
-        //
-        // Validate certificates and verify trust
-        //
-        validateCertificates(certs);
-        if (certs != null) {
-            if (principal == null) {
-                principal = certs[0].getSubjectX500Principal();
-            }
-            boolean trust = false;
-            if (!validateCertChain || certs.length == 1) {
-                trust = verifyTrust(certs[0], crypto);
-            } else if (validateCertChain && certs.length > 1) {
-                trust = verifyTrust(certs, crypto);
-            }
-            if (!trust) {
-                throw new WSSecurityException(WSSecurityException.FAILED_CHECK);
-            }
+        
+        if (certs != null && principal == null) {
+            principal = certs[0].getSubjectX500Principal();
         }
     }
     
+    /**
+     * Get the X509Certificates associated with this SecurityTokenReference
+     * @return the X509Certificates associated with this SecurityTokenReference
+     */
     public X509Certificate[] getCertificates() {
         return certs;
     }
     
+    /**
+     * Get the Principal associated with this SecurityTokenReference
+     * @return the Principal associated with this SecurityTokenReference
+     */
     public Principal getPrincipal() {
         return principal;
     }
     
+    /**
+     * Get the PublicKey associated with this SecurityTokenReference
+     * @return the PublicKey associated with this SecurityTokenReference
+     */
     public PublicKey getPublicKey() {
         return publicKey;
     }
     
+    /**
+     * Get the Secret Key associated with this SecurityTokenReference
+     * @return the Secret Key associated with this SecurityTokenReference
+     */
     public byte[] getSecretKey() {
         return secretKey;
-    }
-    
-    /**
-     * Validate an array of certificates by checking the validity of each cert
-     * @param certsToValidate The array of certificates to validate
-     * @throws WSSecurityException
-     */
-    private static void validateCertificates(
-        X509Certificate[] certsToValidate
-    ) throws WSSecurityException {
-        if (certsToValidate != null && certsToValidate.length > 0) {
-            try {
-                for (int i = 0; i < certsToValidate.length; i++) {
-                    certsToValidate[i].checkValidity();
-                }
-            } catch (CertificateExpiredException e) {
-                throw new WSSecurityException(
-                    WSSecurityException.FAILED_CHECK, "invalidCert", null, e
-                );
-            } catch (CertificateNotYetValidException e) {
-                throw new WSSecurityException(
-                    WSSecurityException.FAILED_CHECK, "invalidCert", null, e
-                );
-            }
-        }
-    }
-    
-    
-    /**
-     * Evaluate whether a given certificate should be trusted.
-     * 
-     * Policy used in this implementation:
-     * 1. Search the keystore for the transmitted certificate
-     * 2. Search the keystore for a connection to the transmitted certificate
-     * (that is, search for certificate(s) of the issuer of the transmitted certificate
-     * 3. Verify the trust path for those certificates found because the search for the issuer 
-     * might be fooled by a phony DN (String!)
-     *
-     * @param cert the certificate that should be validated against the keystore
-     * @return true if the certificate is trusted, false if not
-     * @throws WSSecurityException
-     */
-    private static boolean verifyTrust(X509Certificate cert, Crypto crypto) 
-        throws WSSecurityException {
-
-        // If no certificate was transmitted, do not trust the signature
-        if (cert == null) {
-            return false;
-        }
-
-        String subjectString = cert.getSubjectX500Principal().getName();
-        String issuerString = cert.getIssuerX500Principal().getName();
-        BigInteger issuerSerial = cert.getSerialNumber();
-
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Transmitted certificate has subject " + subjectString);
-            LOG.debug(
-                "Transmitted certificate has issuer " + issuerString + " (serial " 
-                + issuerSerial + ")"
-            );
-        }
-
-        //
-        // FIRST step - Search the keystore for the transmitted certificate
-        //
-        if (crypto.isCertificateInKeyStore(cert)) {
-            return true;
-        }
-
-        //
-        // SECOND step - Search for the issuer of the transmitted certificate in the 
-        // keystore or the truststore
-        //
-        String[] aliases = crypto.getAliasesForDN(issuerString);
-
-        // If the alias has not been found, the issuer is not in the keystore/truststore
-        // As a direct result, do not trust the transmitted certificate
-        if (aliases == null || aliases.length < 1) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug(
-                    "No aliases found in keystore for issuer " + issuerString 
-                    + " of certificate for " + subjectString
-                );
-            }
-            return false;
-        }
-
-        //
-        // THIRD step
-        // Check the certificate trust path for every alias of the issuer found in the 
-        // keystore/truststore
-        //
-        for (int i = 0; i < aliases.length; i++) {
-            String alias = aliases[i];
-
-            if (LOG.isDebugEnabled()) {
-                LOG.debug(
-                    "Preparing to validate certificate path with alias " + alias 
-                    + " for issuer " + issuerString
-                );
-            }
-
-            // Retrieve the certificate(s) for the alias from the keystore/truststore
-            X509Certificate[] certs = crypto.getCertificates(alias);
-
-            // If no certificates have been found, there has to be an error:
-            // The keystore/truststore can find an alias but no certificate(s)
-            if (certs == null || certs.length < 1) {
-                throw new WSSecurityException(
-                    "Could not get certificates for alias " + alias
-                );
-            }
-
-            //
-            // Form a certificate chain from the transmitted certificate
-            // and the certificate(s) of the issuer from the keystore/truststore
-            //
-            X509Certificate[] x509certs = new X509Certificate[certs.length + 1];
-            x509certs[0] = cert;
-            for (int j = 0; j < certs.length; j++) {
-                x509certs[j + 1] = certs[j];
-            }
-
-            //
-            // Use the validation method from the crypto to check whether the subjects' 
-            // certificate was really signed by the issuer stated in the certificate
-            //
-            if (crypto.validateCertPath(x509certs)) {
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug(
-                        "Certificate path has been verified for certificate with subject " 
-                        + subjectString
-                    );
-                }
-                return true;
-            }
-        }
-
-        if (LOG.isDebugEnabled()) {
-            LOG.debug(
-                "Certificate path could not be verified for certificate with subject " 
-                + subjectString
-            );
-        }
-        return false;
-    }
-    
-
-    /**
-     * Evaluate whether the given certificate chain should be trusted.
-     * 
-     * @param certificates the certificate chain that should be validated against the keystore
-     * @return true if the certificate chain is trusted, false if not
-     * @throws WSSecurityException
-     */
-    private static boolean verifyTrust(X509Certificate[] certificates, Crypto crypto) 
-        throws WSSecurityException {
-        String subjectString = certificates[0].getSubjectX500Principal().getName();
-        //
-        // Use the validation method from the crypto to check whether the subjects' 
-        // certificate was really signed by the issuer stated in the certificate
-        //
-        if (certificates != null && certificates.length > 1
-            && crypto.validateCertPath(certificates)) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug(
-                    "Certificate path has been verified for certificate with subject " 
-                    + subjectString
-                );
-            }
-            return true;
-        }
-        
-        if (LOG.isDebugEnabled()) {
-            LOG.debug(
-                "Certificate path could not be verified for certificate with subject " 
-                + subjectString
-            );
-        }
-            
-        return false;
     }
     
     
@@ -536,7 +377,6 @@ public class SignatureSTRParser implements STRParser {
 
         return pwcb.getKey();
     }
-    
     
     /**
      * Get the Secret Key from a CallbackHandler for the Encrypted Key SHA1 case.

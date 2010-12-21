@@ -23,7 +23,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDocInfo;
-import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
@@ -37,31 +36,43 @@ import org.w3c.dom.Element;
 import java.security.Principal;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
+import java.util.Map;
 
 import javax.security.auth.callback.CallbackHandler;
 import javax.xml.namespace.QName;
 
+/**
+ * This implementation of STRParser is for parsing a SecurityTokenReference element, found in the
+ * KeyInfo element associated with an EncryptedKey element
+ */
 public class EncryptedKeySTRParser implements STRParser {
     
     private static final Log LOG = LogFactory.getLog(EncryptedKeySTRParser.class.getName());
     
     private X509Certificate[] certs;
     
+    /**
+     * Parse a SecurityTokenReference element and extract credentials.
+     * 
+     * @param strElement The SecurityTokenReference element
+     * @param crypto The crypto instance used to extract credentials
+     * @param cb The CallbackHandler instance to supply passwords
+     * @param wsDocInfo The WSDocInfo object to access previous processing results
+     * @param parameters A set of implementation-specific parameters
+     * @throws WSSecurityException
+     */
     public void parseSecurityTokenReference(
         Element strElement,
-        String algorithm,
         Crypto crypto,
         CallbackHandler cb,
         WSDocInfo wsDocInfo,
-        WSSConfig wssConfig
+        Map<String, Object> parameters
     ) throws WSSecurityException {
         SecurityTokenReference secRef = new SecurityTokenReference(strElement);
         //
-        // handle X509IssuerSerial here. First check if all elements are available,
+        // Handle X509IssuerSerial here. First check if all elements are available,
         // get the appropriate data, check if all data is available.
-        // If all is ok up to that point, look up the certificate alias according
-        // to issuer name and serial number.
-        // This method is recommended by OASIS WS-S specification, X509 profile
+        // Then look up the certificate alias according to issuer name and serial number.
         //
         if (secRef.containsX509Data() || secRef.containsX509IssuerSerial()) {
             String alias = secRef.getX509IssuerSerialAlias(crypto);
@@ -149,23 +160,34 @@ public class EncryptedKeySTRParser implements STRParser {
         }
     }
     
-    
-    public void validateCredentials() throws WSSecurityException {
-        //
-    }
-    
+    /**
+     * Get the X509Certificates associated with this SecurityTokenReference
+     * @return the X509Certificates associated with this SecurityTokenReference
+     */
     public X509Certificate[] getCertificates() {
         return certs;
     }
     
+    /**
+     * Get the Principal associated with this SecurityTokenReference
+     * @return the Principal associated with this SecurityTokenReference
+     */
     public Principal getPrincipal() {
         return null;
     }
     
+    /**
+     * Get the PublicKey associated with this SecurityTokenReference
+     * @return the PublicKey associated with this SecurityTokenReference
+     */
     public PublicKey getPublicKey() {
         return null;
     }
     
+    /**
+     * Get the Secret Key associated with this SecurityTokenReference
+     * @return the Secret Key associated with this SecurityTokenReference
+     */
     public byte[] getSecretKey() {
         return null;
     }

@@ -20,7 +20,9 @@
 package org.apache.ws.security.processor;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.crypto.SecretKey;
 import javax.security.auth.callback.CallbackHandler;
@@ -147,8 +149,10 @@ public class ReferenceListProcessor implements Processor {
             symmetricKey = X509Util.getSharedKey(keyInfoElement, symEncAlgo, cb);
         } else {
             STRParser strParser = new SecurityTokenRefSTRParser();
+            Map<String, Object> parameters = new HashMap<String, Object>();
+            parameters.put(SecurityTokenRefSTRParser.SIGNATURE_METHOD, symEncAlgo);
             strParser.parseSecurityTokenReference(
-                secRefToken, symEncAlgo, crypto, cb, wsDocInfo, null
+                secRefToken, crypto, cb, wsDocInfo, parameters
             );
             byte[] secretKey = strParser.getSecretKey();
             symmetricKey = WSSecurityUtil.prepareSecretKey(symEncAlgo, secretKey);

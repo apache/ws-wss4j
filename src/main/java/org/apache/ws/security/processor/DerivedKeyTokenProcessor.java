@@ -57,7 +57,7 @@ public class DerivedKeyTokenProcessor implements Processor {
         if (secRefElement != null) {
             STRParser strParser = new DerivedKeyTokenSTRParser();
             strParser.parseSecurityTokenReference(
-                secRefElement, null, crypto, cb, wsDocInfo, null
+                secRefElement, crypto, cb, wsDocInfo, null
             );
             secret = strParser.getSecretKey();
         } else {

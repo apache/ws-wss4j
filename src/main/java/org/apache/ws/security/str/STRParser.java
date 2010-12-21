@@ -20,7 +20,6 @@
 package org.apache.ws.security.str;
 
 import org.apache.ws.security.WSDocInfo;
-import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.w3c.dom.Element;
@@ -28,27 +27,55 @@ import org.w3c.dom.Element;
 import java.security.Principal;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
+import java.util.Map;
 import javax.security.auth.callback.CallbackHandler;
 
+/**
+ * This interface describes a pluggable way of extracting credentials from SecurityTokenReference
+ * elements. The implementations are used by various processors.
+ */
 public interface STRParser {
     
+    /**
+     * Parse a SecurityTokenReference element and extract credentials.
+     * 
+     * @param strElement The SecurityTokenReference element
+     * @param crypto The crypto instance used to extract credentials
+     * @param cb The CallbackHandler instance to supply passwords
+     * @param wsDocInfo The WSDocInfo object to access previous processing results
+     * @param parameters A set of implementation-specific parameters
+     * @throws WSSecurityException
+     */
     public void parseSecurityTokenReference(
         Element strElement,
-        String algorithm,
         Crypto crypto,
         CallbackHandler cb,
         WSDocInfo wsDocInfo,
-        WSSConfig wssConfig
+        Map<String, Object> parameters
     ) throws WSSecurityException;
     
-    public void validateCredentials() throws WSSecurityException;
-    
+    /**
+     * Get the X509Certificates associated with this SecurityTokenReference
+     * @return the X509Certificates associated with this SecurityTokenReference
+     */
     public X509Certificate[] getCertificates();
     
+    /**
+     * Get the Principal associated with this SecurityTokenReference
+     * @return the Principal associated with this SecurityTokenReference
+     */
     public Principal getPrincipal();
     
+    /**
+     * Get the PublicKey associated with this SecurityTokenReference
+     * @return the PublicKey associated with this SecurityTokenReference
+     */
     public PublicKey getPublicKey();
     
+    /**
+     * Get the Secret Key associated with this SecurityTokenReference
+     * @return the Secret Key associated with this SecurityTokenReference
+     */
     public byte[] getSecretKey();
     
 }

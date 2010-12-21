@@ -62,14 +62,19 @@ import javax.xml.crypto.dsig.keyinfo.KeyInfo;
 import javax.xml.crypto.dsig.keyinfo.KeyInfoFactory;
 import javax.xml.crypto.dsig.keyinfo.KeyValue;
 
+import java.math.BigInteger;
 import java.security.Key;
 import java.security.PublicKey;
 import java.security.Principal;
+import java.security.cert.CertificateExpiredException;
+import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class SignatureProcessor implements Processor {
-    private static Log log = LogFactory.getLog(SignatureProcessor.class.getName());
+    private static Log LOG = LogFactory.getLog(SignatureProcessor.class.getName());
     
     private XMLSignatureFactory signatureFactory = XMLSignatureFactory.getInstance("DOM");
     
@@ -83,8 +88,8 @@ public class SignatureProcessor implements Processor {
         WSDocInfo wsDocInfo, 
         WSSConfig wsc
     ) throws WSSecurityException {
-        if (log.isDebugEnabled()) {
-            log.debug("Found signature element");
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Found signature element");
         }
         Element keyInfoElement = 
             WSSecurityUtil.getDirectChildElement(
@@ -112,14 +117,19 @@ public class SignatureProcessor implements Processor {
                 principal = validatePublicKey(cb, publicKey);
             } else {
                 STRParser strParser = new SignatureSTRParser();
-                strParser.parseSecurityTokenReference(
-                    strElement, signatureMethod, crypto, cb, wsDocInfo, wsc
+                Map<String, Object> parameters = new HashMap<String, Object>();
+                parameters.put(SignatureSTRParser.SIGNATURE_METHOD, signatureMethod);
+                parameters.put(
+                    SignatureSTRParser.SECRET_KEY_LENGTH, new Integer(wsc.getSecretKeyLength())
                 );
-                strParser.validateCredentials();
+                strParser.parseSecurityTokenReference(
+                    strElement, crypto, cb, wsDocInfo, parameters
+                );
                 principal = strParser.getPrincipal();
                 certs = strParser.getCertificates();
                 publicKey = strParser.getPublicKey();
                 secretKey = strParser.getSecretKey();
+                validateCredentials(certs, crypto);
             }
         }
         
@@ -178,6 +188,214 @@ public class SignatureProcessor implements Processor {
         }
     }
     
+    /**
+     * Validate the credentials that were extracted from the SecurityTokenReference
+     * TODO move into Validator
+     * @throws WSSecurityException if the credentials are invalid
+     */
+    private void validateCredentials(
+        X509Certificate[] certs,
+        Crypto crypto
+    ) throws WSSecurityException {
+        //
+        // Validate certificates and verify trust
+        //
+        validateCertificates(certs);
+        if (certs != null) {
+            boolean trust = false;
+            if (certs.length == 1) {
+                trust = verifyTrust(certs[0], crypto);
+            } else if (certs.length > 1) {
+                trust = verifyTrust(certs, crypto);
+            }
+            if (!trust) {
+                throw new WSSecurityException(WSSecurityException.FAILED_CHECK);
+            }
+        }
+    }
+    
+    /**
+     * Validate an array of certificates by checking the validity of each cert
+     * @param certsToValidate The array of certificates to validate
+     * @throws WSSecurityException
+     */
+    private static void validateCertificates(
+        X509Certificate[] certsToValidate
+    ) throws WSSecurityException {
+        if (certsToValidate != null && certsToValidate.length > 0) {
+            try {
+                for (int i = 0; i < certsToValidate.length; i++) {
+                    certsToValidate[i].checkValidity();
+                }
+            } catch (CertificateExpiredException e) {
+                throw new WSSecurityException(
+                    WSSecurityException.FAILED_CHECK, "invalidCert", null, e
+                );
+            } catch (CertificateNotYetValidException e) {
+                throw new WSSecurityException(
+                    WSSecurityException.FAILED_CHECK, "invalidCert", null, e
+                );
+            }
+        }
+    }
+    
+    
+    /**
+     * Evaluate whether a given certificate should be trusted.
+     * 
+     * Policy used in this implementation:
+     * 1. Search the keystore for the transmitted certificate
+     * 2. Search the keystore for a connection to the transmitted certificate
+     * (that is, search for certificate(s) of the issuer of the transmitted certificate
+     * 3. Verify the trust path for those certificates found because the search for the issuer 
+     * might be fooled by a phony DN (String!)
+     *
+     * @param cert the certificate that should be validated against the keystore
+     * @return true if the certificate is trusted, false if not
+     * @throws WSSecurityException
+     */
+    private static boolean verifyTrust(X509Certificate cert, Crypto crypto) 
+        throws WSSecurityException {
+
+        // If no certificate was transmitted, do not trust the signature
+        if (cert == null) {
+            return false;
+        }
+
+        String subjectString = cert.getSubjectX500Principal().getName();
+        String issuerString = cert.getIssuerX500Principal().getName();
+        BigInteger issuerSerial = cert.getSerialNumber();
+
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Transmitted certificate has subject " + subjectString);
+            LOG.debug(
+                "Transmitted certificate has issuer " + issuerString + " (serial " 
+                + issuerSerial + ")"
+            );
+        }
+
+        //
+        // FIRST step - Search the keystore for the transmitted certificate
+        //
+        if (crypto.isCertificateInKeyStore(cert)) {
+            return true;
+        }
+
+        //
+        // SECOND step - Search for the issuer of the transmitted certificate in the 
+        // keystore or the truststore
+        //
+        String[] aliases = crypto.getAliasesForDN(issuerString);
+
+        // If the alias has not been found, the issuer is not in the keystore/truststore
+        // As a direct result, do not trust the transmitted certificate
+        if (aliases == null || aliases.length < 1) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug(
+                    "No aliases found in keystore for issuer " + issuerString 
+                    + " of certificate for " + subjectString
+                );
+            }
+            return false;
+        }
+
+        //
+        // THIRD step
+        // Check the certificate trust path for every alias of the issuer found in the 
+        // keystore/truststore
+        //
+        for (int i = 0; i < aliases.length; i++) {
+            String alias = aliases[i];
+
+            if (LOG.isDebugEnabled()) {
+                LOG.debug(
+                    "Preparing to validate certificate path with alias " + alias 
+                    + " for issuer " + issuerString
+                );
+            }
+
+            // Retrieve the certificate(s) for the alias from the keystore/truststore
+            X509Certificate[] certs = crypto.getCertificates(alias);
+
+            // If no certificates have been found, there has to be an error:
+            // The keystore/truststore can find an alias but no certificate(s)
+            if (certs == null || certs.length < 1) {
+                throw new WSSecurityException(
+                    "Could not get certificates for alias " + alias
+                );
+            }
+
+            //
+            // Form a certificate chain from the transmitted certificate
+            // and the certificate(s) of the issuer from the keystore/truststore
+            //
+            X509Certificate[] x509certs = new X509Certificate[certs.length + 1];
+            x509certs[0] = cert;
+            for (int j = 0; j < certs.length; j++) {
+                x509certs[j + 1] = certs[j];
+            }
+
+            //
+            // Use the validation method from the crypto to check whether the subjects' 
+            // certificate was really signed by the issuer stated in the certificate
+            //
+            if (crypto.validateCertPath(x509certs)) {
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug(
+                        "Certificate path has been verified for certificate with subject " 
+                        + subjectString
+                    );
+                }
+                return true;
+            }
+        }
+
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(
+                "Certificate path could not be verified for certificate with subject " 
+                + subjectString
+            );
+        }
+        return false;
+    }
+    
+
+    /**
+     * Evaluate whether the given certificate chain should be trusted.
+     * 
+     * @param certificates the certificate chain that should be validated against the keystore
+     * @return true if the certificate chain is trusted, false if not
+     * @throws WSSecurityException
+     */
+    private static boolean verifyTrust(X509Certificate[] certificates, Crypto crypto) 
+        throws WSSecurityException {
+        String subjectString = certificates[0].getSubjectX500Principal().getName();
+        //
+        // Use the validation method from the crypto to check whether the subjects' 
+        // certificate was really signed by the issuer stated in the certificate
+        //
+        if (certificates != null && certificates.length > 1
+            && crypto.validateCertPath(certificates)) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug(
+                    "Certificate path has been verified for certificate with subject " 
+                    + subjectString
+                );
+            }
+            return true;
+        }
+        
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(
+                "Certificate path could not be verified for certificate with subject " 
+                + subjectString
+            );
+        }
+            
+        return false;
+    }
+    
+    
     private PublicKey parseKeyValue(
         Element keyInfoElement
     ) throws WSSecurityException {
@@ -198,7 +416,7 @@ public class SignatureProcessor implements Processor {
                 //
                 return keyValue.getPublicKey();
             } catch (java.security.KeyException ex) {
-                log.error(ex.getMessage(), ex);
+                LOG.error(ex.getMessage(), ex);
                 throw new WSSecurityException(WSSecurityException.FAILED_CHECK, null, null, ex);
             }     
         } else {
@@ -297,8 +515,8 @@ public class SignatureProcessor implements Processor {
         String signatureMethod,
         WSDocInfo wsDocInfo
     ) throws WSSecurityException {
-        if (log.isDebugEnabled()) {
-            log.debug("Verify XML Signature");
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Verify XML Signature");
         }
         
         //
@@ -329,11 +547,11 @@ public class SignatureProcessor implements Processor {
                 //
                 // Log the exact signature error
                 //
-                if (log.isDebugEnabled()) {
-                    log.debug("XML Signature verification has failed");
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("XML Signature verification has failed");
                     boolean signatureValidationCheck = 
                         xmlSignature.getSignatureValue().validate(context);
-                    log.debug("Signature Validation check: " + signatureValidationCheck);
+                    LOG.debug("Signature Validation check: " + signatureValidationCheck);
                     java.util.Iterator<?> referenceIterator = 
                         xmlSignature.getSignedInfo().getReferences().iterator();
                     while (referenceIterator.hasNext()) {
@@ -343,7 +561,7 @@ public class SignatureProcessor implements Processor {
                         if (id == null) {
                             id = reference.getURI();
                         }
-                        log.debug("Reference " + id + " check: " + referenceValidationCheck);
+                        LOG.debug("Reference " + id + " check: " + referenceValidationCheck);
                     }
                 }
                 
