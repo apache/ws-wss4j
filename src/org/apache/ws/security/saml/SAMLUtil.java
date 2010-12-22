@@ -34,6 +34,7 @@ import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.keys.KeyInfo;
 import org.apache.xml.security.keys.content.X509Data;
 import org.apache.xml.security.keys.content.x509.XMLX509Certificate;
+import org.apache.xml.security.keys.content.x509.XMLX509IssuerSerial;
 import org.opensaml.SAMLAssertion;
 import org.opensaml.SAMLAttributeStatement;
 import org.opensaml.SAMLAuthenticationStatement;
@@ -145,14 +146,21 @@ public class SAMLUtil {
 
                         if (ki.containsX509Data()) {
                             X509Data data = ki.itemX509Data(0);
-                            XMLX509Certificate certElem = null;
                             if (data != null && data.containsCertificate()) {
-                                certElem = data.itemCertificate(0);
-                            }
-                            if (certElem != null) {
-                                X509Certificate cert = certElem.getX509Certificate();
-                                certs = new X509Certificate[1];
-                                certs[0] = cert;
+                                XMLX509Certificate certElem = data.itemCertificate(0);
+                                if (certElem != null) {
+                                    X509Certificate cert = certElem.getX509Certificate();
+                                    certs = new X509Certificate[1];
+                                    certs[0] = cert;
+                                    return new SAMLKeyInfo(assertion, certs);
+                                }
+                            } else if (data != null && data.containsIssuerSerial()) {
+                                XMLX509IssuerSerial issuerSerial = data.itemIssuerSerial(0);
+                                String alias = 
+                                    crypto.getAliasForX509Cert(
+                                        issuerSerial.getIssuerName(), issuerSerial.getSerialNumber()
+                                    );
+                                certs = crypto.getCertificates(alias);
                                 return new SAMLKeyInfo(assertion, certs);
                             }
                         } else if (ki.containsKeyValue()) {

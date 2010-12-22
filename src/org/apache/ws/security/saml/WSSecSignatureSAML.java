@@ -41,6 +41,7 @@ import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.keys.KeyInfo;
 import org.apache.xml.security.keys.content.X509Data;
 import org.apache.xml.security.keys.content.x509.XMLX509Certificate;
+import org.apache.xml.security.keys.content.x509.XMLX509IssuerSerial;
 import org.apache.xml.security.signature.XMLSignature;
 import org.apache.xml.security.signature.XMLSignatureException;
 import org.apache.xml.security.transforms.TransformationException;
@@ -254,14 +255,20 @@ public class WSSecSignatureSAML extends WSSecSignature {
 
                 if (ki.containsX509Data()) {
                     X509Data data = ki.itemX509Data(0);
-                    XMLX509Certificate certElem = null;
                     if (data != null && data.containsCertificate()) {
-                        certElem = data.itemCertificate(0);
-                    }
-                    if (certElem != null) {
-                        X509Certificate cert = certElem.getX509Certificate();
-                        certs = new X509Certificate[1];
-                        certs[0] = cert;
+                        XMLX509Certificate certElem = data.itemCertificate(0);
+                        if (certElem != null) {
+                            X509Certificate cert = certElem.getX509Certificate();
+                            certs = new X509Certificate[1];
+                            certs[0] = cert;
+                        }
+                    } else if (data != null && data.containsIssuerSerial()) {
+                        XMLX509IssuerSerial issuerSerial = data.itemIssuerSerial(0);
+                        String alias = 
+                            userCrypto.getAliasForX509Cert(
+                                issuerSerial.getIssuerName(), issuerSerial.getSerialNumber()
+                            );
+                        certs = userCrypto.getCertificates(alias);
                     }
                 }  else if (ki.containsKeyValue()) {
                     publicKey = ki.getPublicKey();
