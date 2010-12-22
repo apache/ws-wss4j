@@ -53,46 +53,41 @@ public class WSSConfig {
     /**
      * The default collection of actions supported by the toolkit.
      */
-    private static final Map<Integer, String> DEFAULT_ACTIONS;
+    private static final Map<Integer, Class<?>> DEFAULT_ACTIONS;
     static {
-        final Map<Integer, String> tmp = new HashMap<Integer, String>();
+        final Map<Integer, Class<?>> tmp = new HashMap<Integer, Class<?>>();
         try {
             tmp.put(
                 new Integer(WSConstants.UT),
-                org.apache.ws.security.action.UsernameTokenAction.class.getName()
+                org.apache.ws.security.action.UsernameTokenAction.class
             );
             tmp.put(
                 new Integer(WSConstants.ENCR),
-                org.apache.ws.security.action.EncryptionAction.class.getName()
+                org.apache.ws.security.action.EncryptionAction.class
             );
             tmp.put(
                 new Integer(WSConstants.SIGN),
-                org.apache.ws.security.action.SignatureAction.class.getName()
+                org.apache.ws.security.action.SignatureAction.class
             );
-            //
-            // Note that all actions/processors with dependencies on opensaml are
-            // registered as Strings. This is so that applications that do not use
-            // saml do not have to have the opensaml jar available.
-            //
             tmp.put(
                 new Integer(WSConstants.ST_SIGNED),
-                "org.apache.ws.security.action.SAMLTokenSignedAction"
+                org.apache.ws.security.action.SAMLTokenSignedAction.class
             );
             tmp.put(
                 new Integer(WSConstants.ST_UNSIGNED),
-                "org.apache.ws.security.action.SAMLTokenUnsignedAction"
+                org.apache.ws.security.action.SAMLTokenUnsignedAction.class
             );
             tmp.put(
                 new Integer(WSConstants.TS),
-                org.apache.ws.security.action.TimestampAction.class.getName()
+                org.apache.ws.security.action.TimestampAction.class
             );
             tmp.put(
                 new Integer(WSConstants.UT_SIGN),
-                org.apache.ws.security.action.UsernameTokenSignedAction.class.getName()
+                org.apache.ws.security.action.UsernameTokenSignedAction.class
             );
             tmp.put(
                 new Integer(WSConstants.SC),
-                org.apache.ws.security.action.SignatureConfirmationAction.class.getName()
+                org.apache.ws.security.action.SignatureConfirmationAction.class
             );
         } catch (final Throwable t) {
             if (log.isDebugEnabled()) {
@@ -105,41 +100,41 @@ public class WSSConfig {
     /**
      * The default collection of processors supported by the toolkit
      */
-    private static final Map<QName, String> DEFAULT_PROCESSORS;
+    private static final Map<QName, Class<?>> DEFAULT_PROCESSORS;
     static {
-        final Map<QName, String> tmp = new HashMap<QName, String>();
+        final Map<QName, Class<?>> tmp = new HashMap<QName, Class<?>>();
         try {
             tmp.put(
                 WSSecurityEngine.SAML_TOKEN,
-                "org.apache.ws.security.processor.SAMLTokenProcessor"
+                org.apache.ws.security.processor.SAMLTokenProcessor.class
             );
             tmp.put(
                 WSSecurityEngine.ENCRYPTED_KEY,
-                org.apache.ws.security.processor.EncryptedKeyProcessor.class.getName()
+                org.apache.ws.security.processor.EncryptedKeyProcessor.class
             );
             tmp.put(
                 WSSecurityEngine.SIGNATURE,
-                org.apache.ws.security.processor.SignatureProcessor.class.getName()
+                org.apache.ws.security.processor.SignatureProcessor.class
             );
             tmp.put(
                 WSSecurityEngine.TIMESTAMP,
-                org.apache.ws.security.processor.TimestampProcessor.class.getName()
+                org.apache.ws.security.processor.TimestampProcessor.class
             );
             tmp.put(
                 WSSecurityEngine.USERNAME_TOKEN,
-                org.apache.ws.security.processor.UsernameTokenProcessor.class.getName()
+                org.apache.ws.security.processor.UsernameTokenProcessor.class
             );
             tmp.put(
                 WSSecurityEngine.REFERENCE_LIST,
-                org.apache.ws.security.processor.ReferenceListProcessor.class.getName()
+                org.apache.ws.security.processor.ReferenceListProcessor.class
             );
             tmp.put(
                 WSSecurityEngine.SIGNATURE_CONFIRMATION,
-                org.apache.ws.security.processor.SignatureConfirmationProcessor.class.getName()
+                org.apache.ws.security.processor.SignatureConfirmationProcessor.class
             );
             tmp.put(
                 WSSecurityEngine.DERIVED_KEY_TOKEN_05_02,
-                org.apache.ws.security.processor.DerivedKeyTokenProcessor.class.getName()
+                org.apache.ws.security.processor.DerivedKeyTokenProcessor.class
             );
             tmp.put(
                 WSSecurityEngine.DERIVED_KEY_TOKEN_05_12,
@@ -147,7 +142,7 @@ public class WSSConfig {
             );
             tmp.put(
                 WSSecurityEngine.SECURITY_CONTEXT_TOKEN_05_02,
-                org.apache.ws.security.processor.SecurityContextTokenProcessor.class.getName()
+                org.apache.ws.security.processor.SecurityContextTokenProcessor.class
             );
             tmp.put(
                 WSSecurityEngine.SECURITY_CONTEXT_TOKEN_05_12,
@@ -155,11 +150,11 @@ public class WSSConfig {
             );
             tmp.put(
                 WSSecurityEngine.BINARY_TOKEN,
-                org.apache.ws.security.processor.BinarySecurityTokenProcessor.class.getName()
+                org.apache.ws.security.processor.BinarySecurityTokenProcessor.class
             );
             tmp.put(
                 WSSecurityEngine.ENCRYPTED_DATA,
-                org.apache.ws.security.processor.EncryptedDataProcessor.class.getName()
+                org.apache.ws.security.processor.EncryptedDataProcessor.class
             );
         } catch (final Throwable t) {
             if (log.isDebugEnabled()) {
@@ -264,18 +259,22 @@ public class WSSConfig {
     protected Map<String, String> jceProvider = new HashMap<String, String>();
 
     /**
-     * The known actions. This map is of the form <Integer, String> or <Integer, Action>. 
+     * The known actions. This map is of the form <Integer, Class<?>> or 
+     * <Integer, Action>. 
      * The known actions are initialized from a set of defaults,
      * but the list may be modified via the setAction operations.
      */
-    private final Map actionMap = new HashMap(DEFAULT_ACTIONS);
+    private final Map<Integer, Object> actionMap = 
+        new HashMap<Integer, Object>(DEFAULT_ACTIONS);
 
     /**
-     * The known processors. This map is of the form <String, String> or <String,Processor>.
+     * The known processors. This map is of the form <QName, Class<?>> or
+     * <QName, Processor>.
      * The known processors are initialized from a set of defaults,
      * but the list may be modified via the setProcessor operations.
      */
-    private final Map processorMap = new HashMap(DEFAULT_PROCESSORS);
+    private final Map<QName, Object> processorMap = 
+        new HashMap<QName, Object>(DEFAULT_PROCESSORS);
     
     /**
      * a static boolean flag that determines whether default JCE providers
@@ -498,19 +497,22 @@ public class WSSConfig {
     public void setIdAllocator(WsuIdAllocator idAllocator) {
         this.idAllocator = idAllocator;
     }
-
+    
     /**
-     * Associate an action name with a specific action code.
+     * Associate an action instance with a specific action code.
      *
      * This operation allows applications to supply their own
      * actions for well-known operations.
+     * 
+     * Please note that the Action object does NOT get class-loaded per invocation, and so
+     * it is up to the implementing class to ensure that it is thread-safe.
      */
-    public String setAction(int code, String action) {
-        Object previousAction = actionMap.put(new Integer(code), action);
-        if (previousAction instanceof String) {
-            return (String)previousAction;
-        } else if (previousAction instanceof Action){
-            return previousAction.getClass().getName();
+    public Class<?> setAction(int code, Action action) {
+        Object result = actionMap.put(new Integer(code), action);
+        if (result instanceof Class<?>) {
+            return (Class<?>)result;
+        } else if (result instanceof Action) {
+            return result.getClass();
         }
         return null;
     }
@@ -521,12 +523,12 @@ public class WSSConfig {
      * This operation allows applications to supply their own
      * actions for well-known operations.
      */
-    public String setAction(int code, Action action) {
-        Object previousAction = actionMap.put(new Integer(code), action);
-        if (previousAction instanceof String) {
-            return (String)previousAction;
-        } else if (previousAction instanceof Action){
-            return previousAction.getClass().getName();
+    public Class<?> setAction(int code, Class<?> clazz) {
+        Object result = actionMap.put(new Integer(code), clazz);
+        if (result instanceof Class<?>) {
+            return (Class<?>)result;
+        } else if (result instanceof Action) {
+            return result.getClass();
         }
         return null;
     }
@@ -539,23 +541,39 @@ public class WSSConfig {
      * @throws WSSecurityException
      */
     public Action getAction(int action) throws WSSecurityException {
-        Integer key = new Integer(action);
-        final Object actionObject = actionMap.get(key);
+        final Object actionObject = actionMap.get(new Integer(action));
         
-        if (actionObject instanceof String) {
-            final String name = (String)actionObject;
+        if (actionObject instanceof Class<?>) {
             try {
-                return (Action) Loader.loadClass(name).newInstance();
+                return (Action)((Class<?>)actionObject).newInstance();
             } catch (Throwable t) {
                 if (log.isDebugEnabled()) {
                     log.debug(t.getMessage(), t);
                 }
                 throw new WSSecurityException(WSSecurityException.FAILURE,
-                        "unableToLoadClass", new Object[] { name }, t);
+                        "unableToLoadClass", new Object[] { ((Class<?>)actionObject).getName() }, t);
             }
         } else if (actionObject instanceof Action) {
             return (Action)actionObject;
-        } 
+        }
+        return null;
+    }
+    
+    /**
+     * Associate a SOAP processor name with a specified SOAP Security header
+     * element QName.  Processors registered under this QName will be
+     * called when processing header elements with the specified type.
+     * 
+     * Please note that the Processor object does NOT get class-loaded per invocation, and so
+     * it is up to the implementing class to ensure that it is thread-safe.
+     */
+    public Class<?> setProcessor(QName el, Processor processor) {
+        Object result = processorMap.put(el, processor);
+        if (result instanceof Class<?>) {
+            return (Class<?>)result;
+        } else if (result instanceof Processor) {
+            return result.getClass();
+        }
         return null;
     }
     
@@ -564,31 +582,16 @@ public class WSSConfig {
      * element QName.  Processors registered under this QName will be
      * called when processing header elements with the specified type.
      */
-    public String setProcessor(QName el, String name) {
-        Object previousProcessor = processorMap.put(el, name);
-        if (previousProcessor instanceof String) {
-            return (String)previousProcessor;
-        } else if (previousProcessor instanceof Processor){
-            return previousProcessor.getClass().getName();
+    public Class<?> setProcessor(QName el, Class<?> clazz) {
+        Object result = processorMap.put(el, clazz);
+        if (result instanceof Class<?>) {
+            return (Class<?>)result;
+        } else if (result instanceof Processor) {
+            return result.getClass();
         }
         return null;
     }
     
-    /**
-     * Associate a SOAP processor instance with a specified SOAP Security header
-     * element QName.  Processors registered under this QName will be
-     * called when processing header elements with the specified type.
-     */
-    public String setProcessor(QName el, Processor processor) {
-        Object previousProcessor = processorMap.put(el, processor);
-        if (previousProcessor instanceof String) {
-            return (String)previousProcessor;
-        } else if (previousProcessor instanceof Processor){
-            return previousProcessor.getClass().getName();
-        }
-        return null;
-    }
-
     /**
      * @return      the SOAP processor associated with the specified
      *              QName.  The QName is intended to refer to an element
@@ -598,20 +601,20 @@ public class WSSConfig {
      */
     public Processor getProcessor(QName el) throws WSSecurityException {
         final Object processorObject = processorMap.get(el);
-        if (processorObject instanceof String) {
-            final String name = (String)processorObject;
+        
+        if (processorObject instanceof Class<?>) {
             try {
-                return (Processor) Loader.loadClass(name).newInstance();
+                return (Processor)((Class<?>)processorObject).newInstance();
             } catch (Throwable t) {
                 if (log.isDebugEnabled()) {
                     log.debug(t.getMessage(), t);
                 }
                 throw new WSSecurityException(WSSecurityException.FAILURE,
-                        "unableToLoadClass", new Object[] { name }, t);
+                        "unableToLoadClass", new Object[] { ((Class<?>)processorObject).getName() }, t);
             }
         } else if (processorObject instanceof Processor) {
             return (Processor)processorObject;
-        } 
+        }
         return null;
     }
 

@@ -370,6 +370,12 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
+            <groupId>org.opensaml</groupId>
+            <artifactId>opensaml</artifactId>
+            <version>${opensaml.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>${junit.version}</version>
@@ -391,12 +397,6 @@
             <groupId>xml-apis</groupId>
             <artifactId>xml-apis</artifactId>
             <version>${xml.apis.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.opensaml</groupId>
-            <artifactId>opensaml</artifactId>
-            <version>${opensaml.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>

@@ -80,7 +80,7 @@ public class CustomActionProcessorTest extends org.junit.Assert {
         String p = "org.apache.ws.security.common.CustomProcessor";
         cfg.setProcessor(
             WSSecurityEngine.SIGNATURE,
-            p
+            org.apache.ws.security.common.CustomProcessor.class
         );
         final WSSecurityEngine engine = new WSSecurityEngine();
         engine.setWssConfig(cfg);
@@ -127,7 +127,7 @@ public class CustomActionProcessorTest extends org.junit.Assert {
         WSSConfig cfg = WSSConfig.getNewInstance();
         cfg.setProcessor(
             WSSecurityEngine.SIGNATURE,
-            new CustomProcessor()
+            CustomProcessor.class
         );
         final WSSecurityEngine engine = new WSSecurityEngine();
         engine.setWssConfig(cfg);
@@ -155,7 +155,7 @@ public class CustomActionProcessorTest extends org.junit.Assert {
         
         final WSSConfig cfg = WSSConfig.getNewInstance();
         final int action = 0xDEADF000;
-        cfg.setAction(action, "org.apache.ws.security.common.CustomAction");
+        cfg.setAction(action, org.apache.ws.security.common.CustomAction.class);
         final RequestData reqData = new RequestData();
         reqData.setWssConfig(cfg);
         
@@ -185,7 +185,7 @@ public class CustomActionProcessorTest extends org.junit.Assert {
         
         final WSSConfig cfg = WSSConfig.getNewInstance();
         final int action = 0xDEADF000;
-        cfg.setAction(action, new CustomAction());
+        cfg.setAction(action, CustomAction.class);
         final RequestData reqData = new RequestData();
         reqData.setWssConfig(cfg);
         
@@ -257,7 +257,7 @@ public class CustomActionProcessorTest extends org.junit.Assert {
         //
         // This parsing should pass as WSSConfig has been configured with the custom action
         //
-        cfg.setAction(customAction, "org.apache.ws.security.common.CustomAction");
+        cfg.setAction(customAction, org.apache.ws.security.common.CustomAction.class);
         int actions = WSSecurityUtil.decodeAction(actionString, actionList, cfg);
         
         final RequestData reqData = new RequestData();
