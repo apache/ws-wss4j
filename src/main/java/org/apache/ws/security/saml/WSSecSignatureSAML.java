@@ -61,6 +61,7 @@ import javax.xml.crypto.dsig.keyinfo.KeyInfo;
 import javax.xml.crypto.dsig.keyinfo.KeyInfoFactory;
 import javax.xml.crypto.dsig.keyinfo.KeyValue;
 import javax.xml.crypto.dsig.keyinfo.X509Data;
+import javax.xml.crypto.dsig.keyinfo.X509IssuerSerial;
 import javax.xml.crypto.dsig.spec.C14NMethodParameterSpec;
 import javax.xml.crypto.dsig.spec.ExcC14NParameterSpec;
 
@@ -287,6 +288,14 @@ public class WSSecSignatureSAML extends WSSecSignature {
                             if (x509obj instanceof X509Certificate) {
                                 certs = new X509Certificate[1];
                                 certs[0] = (X509Certificate)x509obj;
+                                break;
+                            } else if (x509obj instanceof X509IssuerSerial) {
+                                String alias = 
+                                    userCrypto.getAliasForX509Cert(
+                                        ((X509IssuerSerial)x509obj).getIssuerName(), 
+                                        ((X509IssuerSerial)x509obj).getSerialNumber()
+                                    );
+                                certs = userCrypto.getCertificates(alias);
                                 break;
                             }
                         }
