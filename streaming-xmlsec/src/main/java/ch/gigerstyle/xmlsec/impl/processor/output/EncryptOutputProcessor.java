@@ -4,6 +4,7 @@ import ch.gigerstyle.xmlsec.config.JCEAlgorithmMapper;
 import ch.gigerstyle.xmlsec.ext.*;
 import ch.gigerstyle.xmlsec.impl.EncryptionPartDef;
 import ch.gigerstyle.xmlsec.impl.XMLEventNSAllocator;
+import ch.gigerstyle.xmlsec.impl.util.TrimmerOutputStream;
 import org.apache.commons.codec.binary.Base64OutputStream;
 
 import javax.crypto.Cipher;
@@ -11,12 +12,17 @@ import javax.crypto.CipherOutputStream;
 import javax.crypto.KeyGenerator;
 import javax.crypto.NoSuchPaddingException;
 import javax.xml.namespace.QName;
+import javax.xml.stream.XMLEventFactory;
+import javax.xml.stream.XMLEventWriter;
+import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.Characters;
 import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
-import java.io.*;
+import java.io.BufferedOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
@@ -131,12 +137,17 @@ public class EncryptOutputProcessor extends AbstractOutputProcessor {
         XMLEventNSAllocator xmlEventNSAllocator;
         private EncryptionPartDef encryptionPartDef;
         private CharacterEventGeneratorOutputStream characterEventGeneratorOutputStream;
-        private Writer streamWriter;
+        //private Writer streamWriter;
+        private XMLEventWriter xmlEventWriter;
+        private OutputStream cipherOutputStream;
 
         private QName startElement;
         private int elementCounter = 0;
 
-        InternalEncryptionOutputProcessor(SecurityProperties securityProperties, EncryptionPartDef encryptionPartDef, QName startElement, XMLEventNSAllocator xmlEventNSAllocator) throws XMLSecurityException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IOException {
+        InternalEncryptionOutputProcessor(SecurityProperties securityProperties, EncryptionPartDef encryptionPartDef,
+                                          QName startElement, XMLEventNSAllocator xmlEventNSAllocator)
+                throws XMLSecurityException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IOException, XMLStreamException {
+
             super(securityProperties);
             this.getBeforeProcessors().add(EncryptEndingOutputProcessor.class.getName());
             this.getBeforeProcessors().add(InternalEncryptionOutputProcessor.class.getName());
@@ -159,8 +170,13 @@ public class EncryptOutputProcessor extends AbstractOutputProcessor {
             Base64OutputStream base64EncoderStream = new Base64OutputStream(new BufferedOutputStream(characterEventGeneratorOutputStream), true, 76, new byte[]{'\n'});
             base64EncoderStream.write(iv);
 
-            CipherOutputStream cipherOutputStream = new CipherOutputStream(base64EncoderStream, symmetricCipher);
-            streamWriter = new BufferedWriter(new OutputStreamWriter(cipherOutputStream), symmetricCipher.getBlockSize() * 2); //todo encoding?
+            cipherOutputStream = new TrimmerOutputStream(new CipherOutputStream(base64EncoderStream, symmetricCipher), 8192, 3, 4);
+
+            XMLOutputFactory xmlOutputFactory = XMLOutputFactory.newInstance();
+            xmlOutputFactory.setProperty(XMLOutputFactory.IS_REPAIRING_NAMESPACES, true);
+            //todo encoding?
+            xmlEventWriter = xmlOutputFactory.createXMLEventWriter(cipherOutputStream);
+            xmlEventWriter.add(XMLEventFactory.newFactory().createStartElement(new QName("a"), null, null));
         }
 
         public void processEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException {
@@ -220,7 +236,7 @@ public class EncryptOutputProcessor extends AbstractOutputProcessor {
         }
 
         private void encryptEvent(XMLEvent xmlEvent) throws XMLStreamException {
-            xmlEvent.writeAsEncodedUnicode(streamWriter);
+            xmlEventWriter.add(xmlEvent);
         }
 
         private void processEventInternal(OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException {
@@ -272,10 +288,12 @@ public class EncryptOutputProcessor extends AbstractOutputProcessor {
         private void doFinalInternal(OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException {
 
             try {
-                streamWriter.close();
+                xmlEventWriter.close();
+                cipherOutputStream.close();
             } catch (IOException e) {
                 throw new XMLStreamException(e);
             }
+
             Iterator<Characters> charactersIterator = characterEventGeneratorOutputStream.getCharactersBuffer().iterator();
             while (charactersIterator.hasNext()) {
                 Characters characters = charactersIterator.next();

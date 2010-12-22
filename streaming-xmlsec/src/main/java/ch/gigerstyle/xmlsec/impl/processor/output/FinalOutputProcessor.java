@@ -2,11 +2,11 @@ package ch.gigerstyle.xmlsec.impl.processor.output;
 
 import ch.gigerstyle.xmlsec.ext.*;
 
+import javax.xml.stream.XMLEventWriter;
+import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.XMLEvent;
-import java.io.IOException;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 
 /**
  * User: giger
@@ -30,23 +30,31 @@ import java.io.OutputStreamWriter;
  */
 public class FinalOutputProcessor extends AbstractOutputProcessor {
 
-    private OutputStreamWriter outputStreamWriter;
+    private XMLEventWriter xmlEventWriter;
+    private static final XMLOutputFactory xmlOutputFactory = XMLOutputFactory.newInstance();
+
+    static {
+        xmlOutputFactory.setProperty(XMLOutputFactory.IS_REPAIRING_NAMESPACES, true);
+    }
 
     public FinalOutputProcessor(OutputStream outputStream, SecurityProperties securityProperties) throws XMLSecurityException {
         super(securityProperties);
-        outputStreamWriter = new OutputStreamWriter(outputStream);
         setPhase(Constants.Phase.POSTPROCESSING);
+        try {
+            xmlEventWriter = xmlOutputFactory.createXMLEventWriter(outputStream, "UTF-8");
+        } catch (XMLStreamException e) {
+            throw new XMLSecurityException(e);
+        }
     }
 
     public void processEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException {
-        //todo optimize writeouts
-        xmlEvent.writeAsEncodedUnicode(outputStreamWriter);
+        xmlEventWriter.add(xmlEvent);
     }
 
     public void doFinal(OutputProcessorChain outputProcessorChain) throws XMLSecurityException {
         try {
-            outputStreamWriter.flush();
-        } catch (IOException e) {
+            xmlEventWriter.flush();
+        } catch (XMLStreamException e) {
             throw new XMLSecurityException(e.getMessage(), e);
         }
     }

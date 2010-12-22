@@ -80,7 +80,7 @@ public abstract class AbstractTestBase {
         documentBuilderFactory.setIgnoringElementContentWhitespace(false);
         xmlInputFactory.setProperty(XMLInputFactory.IS_COALESCING, false);
         xmlInputFactory.setProperty(XMLInputFactory.SUPPORT_DTD, false);
-        xmlInputFactory.setProperty(WstxInputProperties.P_MIN_TEXT_SEGMENT, new Integer(8192));
+        xmlInputFactory.setProperty(WstxInputProperties.P_MIN_TEXT_SEGMENT, new Integer(5 * 8192));
     }
 
     public Document doInboundSecurity(SecurityProperties securityProperties, InputStream inputStream) throws XMLSecurityException, SecurityConfigurationException, XMLStreamException, ParserConfigurationException {
@@ -154,6 +154,11 @@ public abstract class AbstractTestBase {
     }
 
     protected Document doInboundSecurityWithWSS4J(Document document, String action) throws Exception {
+        MessageContext messageContext = doInboundSecurityWithWSS4J_1(document, action);
+        return ((Document) messageContext.getProperty(WSHandlerConstants.SND_SECURITY));
+    }
+
+    protected MessageContext doInboundSecurityWithWSS4J_1(Document document, String action) throws Exception {
         CustomWSS4JHandler wss4JHandler = new CustomWSS4JHandler();
         HandlerInfo handlerInfo = new HandlerInfo();
         wss4JHandler.init(handlerInfo);
@@ -186,7 +191,7 @@ public abstract class AbstractTestBase {
         requestData.setMsgContext(messageContext);
         wss4JHandler.doReceiver(messageContext, requestData, false);
 
-        return (Document)messageContext.getProperty(WSHandlerConstants.SND_SECURITY);
+        return messageContext;
     }
 
     private MessageContext getMessageContext(InputStream inputStream) {
