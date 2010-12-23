@@ -28,6 +28,9 @@ import javax.xml.stream.XMLStreamWriter;
 import java.util.Collection;
 import java.util.Map;
 
+/**
+ * class lent from apache rampart
+ */
 public class AlgorithmSuite extends AbstractConfigurableSecurityAssertion {
 
     private String algoSuiteString;

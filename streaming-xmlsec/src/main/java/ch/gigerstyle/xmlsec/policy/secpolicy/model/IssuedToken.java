@@ -30,6 +30,10 @@ import java.util.Map;
 /**
  * Model bean for the IssuedToken assertion.
  */
+
+/**
+ * class lent from apache rampart
+ */
 public class IssuedToken extends Token {
 
     private OMElement issuerEpr;

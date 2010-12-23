@@ -26,6 +26,9 @@ import javax.xml.stream.XMLStreamWriter;
 import java.util.Collection;
 import java.util.Map;
 
+/**
+ * class lent from apache rampart
+ */
 public class EncryptionToken extends AbstractSecurityAssertion implements TokenWrapper {
 
     private Token encryptionToken;

@@ -30,6 +30,10 @@ import java.util.Map;
 /**
  * Model class of SecurityContextToken assertion
  */
+
+/**
+ * class lent from apache rampart
+ */
 public class SecurityContextToken extends Token {
 
     boolean requireExternalUriRef;

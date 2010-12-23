@@ -32,6 +32,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * class lent from apache rampart
+ */
 public class AsymmetricBinding extends SymmetricAsymmetricBindingBase {
 
     private InitiatorToken initiatorToken;

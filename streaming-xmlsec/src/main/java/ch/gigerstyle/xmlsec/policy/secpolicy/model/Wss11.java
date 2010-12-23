@@ -22,6 +22,9 @@ import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
+/**
+ * class lent from apache rampart
+ */
 public class Wss11 extends Wss10 {
 
     private boolean MustSupportRefThumbprint;

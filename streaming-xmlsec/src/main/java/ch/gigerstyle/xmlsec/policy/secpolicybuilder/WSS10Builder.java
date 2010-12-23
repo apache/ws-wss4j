@@ -28,7 +28,9 @@ import javax.xml.namespace.QName;
 import java.util.Iterator;
 import java.util.List;
 
-
+/**
+ * class lent from apache rampart
+ */
 public class WSS10Builder implements AssertionBuilder {
 
     private static final QName[] KNOWN_ELEMENTS = new QName[]{

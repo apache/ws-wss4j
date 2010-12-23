@@ -26,6 +26,10 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 
 /**
+ * class lent from apache wss4j
+ */
+
+/**
  * Crypto.
  * <p/>
  *

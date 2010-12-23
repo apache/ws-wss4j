@@ -28,6 +28,9 @@ import java.util.Collection;
 import java.util.Map;
 
 
+/**
+ * class lent from apache rampart
+ */
 public class TransportToken extends AbstractSecurityAssertion implements TokenWrapper {
 
     private Token transportToken;

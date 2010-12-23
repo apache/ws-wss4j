@@ -27,6 +27,9 @@ import javax.xml.stream.XMLStreamWriter;
 import java.util.Collection;
 import java.util.Map;
 
+/**
+ * class lent from apache rampart
+ */
 public class Wss10 extends AbstractSecurityAssertion {
 
     private boolean mustSupportRefKeyIdentifier;

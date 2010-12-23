@@ -26,6 +26,9 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import java.util.*;
 
+/**
+ * class lent from apache rampart
+ */
 public class RequiredElements extends AbstractSecurityAssertion {
 
     private ArrayList xPathExpressions = new ArrayList();

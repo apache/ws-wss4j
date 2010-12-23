@@ -30,6 +30,9 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 
+/**
+ * class lent from apache rampart
+ */
 public class RequiredParts extends AbstractSecurityAssertion {
 
     private ArrayList headers = new ArrayList();

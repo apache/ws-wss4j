@@ -30,6 +30,10 @@ import java.util.Map;
 /**
  * @author Ruchith Fernando (ruchith.fernando@gmail.com)
  */
+
+/**
+ * class lent from apache rampart
+ */
 public class HttpsToken extends Token {
 
     public HttpsToken(SPConstants spConstants) {

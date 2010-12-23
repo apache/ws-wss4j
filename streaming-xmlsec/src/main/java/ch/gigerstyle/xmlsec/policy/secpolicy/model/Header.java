@@ -16,6 +16,9 @@
 
 package ch.gigerstyle.xmlsec.policy.secpolicy.model;
 
+/**
+ * class lent from apache rampart
+ */
 public class Header {
 
     private String name;

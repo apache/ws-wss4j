@@ -17,7 +17,9 @@
 package ch.gigerstyle.xmlsec.policy.secpolicy.model;
 
 import ch.gigerstyle.xmlsec.ext.Constants;
-import ch.gigerstyle.xmlsec.policy.assertionStates.*;
+import ch.gigerstyle.xmlsec.policy.assertionStates.AssertionState;
+import ch.gigerstyle.xmlsec.policy.assertionStates.EncryptedPartAssertionState;
+import ch.gigerstyle.xmlsec.policy.assertionStates.SignedPartAssertionState;
 import ch.gigerstyle.xmlsec.policy.secpolicy.SPConstants;
 import ch.gigerstyle.xmlsec.securityEvent.SecurityEvent;
 import org.apache.neethi.PolicyComponent;
@@ -27,6 +29,9 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import java.util.*;
 
+/**
+ * class lent from apache rampart
+ */
 public class SignedEncryptedParts extends AbstractSecurityAssertion {
 
     private boolean body;

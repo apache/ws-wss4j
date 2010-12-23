@@ -23,6 +23,9 @@ import ch.gigerstyle.xmlsec.securityEvent.SecurityEvent;
 import java.util.Collection;
 import java.util.Map;
 
+/**
+ * class lent from apache rampart
+ */
 public abstract class Token extends AbstractSecurityAssertion {
 
     /**

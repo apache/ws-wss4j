@@ -31,6 +31,10 @@ import java.util.Map;
 /**
  * Model bean to capture Trust10 assertion info
  */
+
+/**
+ * class lent from apache rampart
+ */
 public class Trust13 extends AbstractSecurityAssertion {
 
     private boolean mustSupportClientChallenge;

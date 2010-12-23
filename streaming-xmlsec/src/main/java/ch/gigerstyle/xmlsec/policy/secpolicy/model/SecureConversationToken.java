@@ -28,6 +28,10 @@ import javax.xml.stream.XMLStreamWriter;
 /**
  * Model class of SecureConversationToken assertion
  */
+
+/**
+ * class lent from apache rampart
+ */
 public class SecureConversationToken extends SecurityContextToken {
 
     private Policy bootstrapPolicy;

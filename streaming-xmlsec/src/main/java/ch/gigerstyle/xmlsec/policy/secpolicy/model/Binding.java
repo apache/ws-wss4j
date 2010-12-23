@@ -29,6 +29,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * class lent from apache rampart
+ */
 public abstract class Binding extends AbstractSecurityAssertion implements AlgorithmWrapper {
 
     private AlgorithmSuite algorithmSuite;

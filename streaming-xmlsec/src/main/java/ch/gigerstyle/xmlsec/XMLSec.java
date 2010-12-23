@@ -1,3 +1,17 @@
+/**
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package ch.gigerstyle.xmlsec;
 
 import ch.gigerstyle.xmlsec.config.Init;
@@ -7,44 +21,37 @@ import java.security.Provider;
 import java.security.Security;
 
 /**
- * User: giger
- * Date: May 13, 2010
- * Time: 2:01:16 PM
- * Copyright 2010 Marc Giger gigerstyle@gmx.ch
- * <p/>
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the
- * Free Software Foundation; either version 2, or (at your option) any
- * later version.
- * <p/>
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * <p/>
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ * This is the central class of the streaming webservice-security framework.<br/>
+ * Instances of the inbound and outbound security streams can be retrieved
+ * with this class.
+ *
+ * @author $Author$
+ * @version $Revision$ $Date$
  */
 public class XMLSec {
 
     //todo overall AccessController.doPrivileged
-
     //todo replace overall "BC" with getProvider somewhere
 
     static {
-
         try {
             Class c = XMLSec.class.getClassLoader().loadClass("org.bouncycastle.jce.provider.BouncyCastleProvider");
             if (null == Security.getProvider("BC")) {
                 int i = Security.addProvider((Provider) c.newInstance());
             }
         } catch (Throwable e) {
-            //todo: exception is not allowed here...
             throw new RuntimeException("Adding BouncyCastle provider failed", e);
         }
     }
 
+    /**
+     * Creates and configures an outbound streaming security engine
+     *
+     * @param securityProperties The user-defined security configuration
+     * @return A new OutboundXMLSec
+     * @throws XMLSecurityException           if the initialisation failed
+     * @throws SecurityConfigurationException if the configuration is invalid
+     */
     public static OutboundXMLSec getOutboundXMLSec(SecurityProperties securityProperties) throws XMLSecurityException, SecurityConfigurationException {
         if (securityProperties == null) {
             throw new XMLSecurityException("SecurityProperties must not be null!");
@@ -56,6 +63,14 @@ public class XMLSec {
         return new OutboundXMLSec(securityProperties);
     }
 
+    /**
+     * Creates and configures an inbound streaming security engine
+     *
+     * @param securityProperties The user-defined security configuration
+     * @return A new InboundXMLSec
+     * @throws XMLSecurityException           if the initialisation failed
+     * @throws SecurityConfigurationException if the configuration is invalid
+     */
     public static InboundXMLSec getInboundXMLSec(SecurityProperties securityProperties) throws XMLSecurityException, SecurityConfigurationException {
         if (securityProperties == null) {
             throw new XMLSecurityException("SecurityProperties must not be null!");
@@ -67,6 +82,13 @@ public class XMLSec {
         return new InboundXMLSec(securityProperties);
     }
 
+    /**
+     * Validates the user supplied configuration and applies default values as apropriate for the outbound security engine
+     *
+     * @param securityProperties The configuration to validate
+     * @return The validated configuration
+     * @throws SecurityConfigurationException if the configuration is invalid
+     */
     public static SecurityProperties validateAndApplyDefaultsToOutboundSecurityProperties(SecurityProperties securityProperties) throws SecurityConfigurationException {
         if (securityProperties.getOutAction() == null) {
             throw new SecurityConfigurationException("NoOutputAction");
@@ -136,6 +158,13 @@ public class XMLSec {
         return securityProperties;
     }
 
+    /**
+     * Validates the user supplied configuration and applies default values as apropriate for the inbound security engine
+     *
+     * @param securityProperties The configuration to validate
+     * @return The validated configuration
+     * @throws SecurityConfigurationException if the configuration is invalid
+     */
     public static SecurityProperties validateAndApplyDefaultsToInboundSecurityProperties(SecurityProperties securityProperties) throws SecurityConfigurationException {
         //todo clone securityProperties
         return securityProperties;

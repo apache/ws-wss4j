@@ -23,6 +23,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Mapping between JCE id and xmlsec uri's for algorithms
+ * Class lent from apache santuario (xmlsec)
+ */
 public class JCEAlgorithmMapper {
 
     private static Map<String, String> uriToJCEName;

@@ -21,6 +21,9 @@ import org.w3c.dom.Element;
 
 import javax.security.auth.callback.Callback;
 
+/**
+ * class lent from apache wss4j
+ */
 
 /**
  * Simple class to provide a password callback mechanism.

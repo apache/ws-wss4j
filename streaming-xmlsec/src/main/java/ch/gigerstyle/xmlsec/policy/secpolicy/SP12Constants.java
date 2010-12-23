@@ -2,6 +2,9 @@ package ch.gigerstyle.xmlsec.policy.secpolicy;
 
 import javax.xml.namespace.QName;
 
+/**
+ * class lent from apache cxf
+ */
 public final class SP12Constants extends SPConstants {
 
     public static final SP12Constants INSTANCE = new SP12Constants();

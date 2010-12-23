@@ -29,6 +29,9 @@ import javax.xml.stream.XMLStreamWriter;
 import java.util.Iterator;
 import java.util.List;
 
+/**
+ * class lent from apache rampart
+ */
 public class SymmetricBinding extends SymmetricAsymmetricBindingBase {
 
     private EncryptionToken encryptionToken;

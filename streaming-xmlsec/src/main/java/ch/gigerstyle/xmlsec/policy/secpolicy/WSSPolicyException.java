@@ -18,6 +18,9 @@ package ch.gigerstyle.xmlsec.policy.secpolicy;
 
 import ch.gigerstyle.xmlsec.ext.XMLSecurityException;
 
+/**
+ * class lent from apache cxf
+ */
 public class WSSPolicyException extends XMLSecurityException {
 
     private static final long serialVersionUID = 5904800255533588133L;

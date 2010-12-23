@@ -28,6 +28,9 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import java.util.*;
 
+/**
+ * class lent from apache rampart
+ */
 public class SignedEncryptedElements extends AbstractSecurityAssertion {
 
     private ArrayList xPathExpressions = new ArrayList();
@@ -178,7 +181,7 @@ public class SignedEncryptedElements extends AbstractSecurityAssertion {
                 prefix = "";
                 localName = s;
             }
-            qNames.add(new QName((String)declaredNamespaces.get(prefix), localName));
+            qNames.add(new QName((String) declaredNamespaces.get(prefix), localName));
         }
         return qNames;
     }

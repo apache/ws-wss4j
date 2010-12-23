@@ -25,6 +25,9 @@ import org.apache.neethi.builders.AssertionBuilder;
 
 import javax.xml.namespace.QName;
 
+/**
+ * class lent from apache rampart
+ */
 public class SecurityContextTokenBuilder implements AssertionBuilder {
 
     private static final QName[] KNOWN_ELEMENTS = new QName[]{

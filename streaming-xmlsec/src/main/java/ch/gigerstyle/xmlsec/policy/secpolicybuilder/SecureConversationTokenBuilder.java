@@ -27,7 +27,9 @@ import org.apache.neethi.builders.AssertionBuilder;
 
 import javax.xml.namespace.QName;
 
-
+/**
+ * class lent from apache rampart
+ */
 public class SecureConversationTokenBuilder implements AssertionBuilder {
 
     private static final QName[] KNOWN_ELEMENTS = new QName[]{

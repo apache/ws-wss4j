@@ -27,6 +27,9 @@ import javax.xml.stream.XMLStreamWriter;
 import java.util.Collection;
 import java.util.Map;
 
+/**
+ * class lent from apache rampart
+ */
 public class UsernameToken extends Token {
 
     private boolean useUTProfile10 = false;

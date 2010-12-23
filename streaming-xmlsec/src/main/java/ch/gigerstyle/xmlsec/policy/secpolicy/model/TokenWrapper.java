@@ -16,6 +16,9 @@
 
 package ch.gigerstyle.xmlsec.policy.secpolicy.model;
 
+/**
+ * class lent from apache rampart
+ */
 public interface TokenWrapper {
 
     public void setToken(Token tok);

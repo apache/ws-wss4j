@@ -2,6 +2,9 @@ package ch.gigerstyle.xmlsec.policy.secpolicy;
 
 import javax.xml.namespace.QName;
 
+/**
+ * class lent from apache cxf
+ */
 public final class SP11Constants extends SPConstants {
 
     private SP11Constants() {

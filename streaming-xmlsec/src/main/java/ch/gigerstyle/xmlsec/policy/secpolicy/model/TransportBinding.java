@@ -30,6 +30,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+/**
+ * class lent from apache rampart
+ */
 public class TransportBinding extends Binding {
 
     private TransportToken transportToken;

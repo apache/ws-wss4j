@@ -22,6 +22,10 @@ import org.apache.commons.logging.LogFactory;
 import java.io.IOException;
 
 /**
+ * class lent from apache wss4j
+ */
+
+/**
  * Created by IntelliJ IDEA.
  * User: dims
  * Date: Sep 15, 2005

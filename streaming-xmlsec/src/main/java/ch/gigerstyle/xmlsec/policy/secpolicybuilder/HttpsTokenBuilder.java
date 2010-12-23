@@ -29,6 +29,9 @@ import javax.xml.namespace.QName;
 import java.util.Iterator;
 import java.util.List;
 
+/**
+ * class lent from apache rampart
+ */
 
 /**
  * This is a standard assertion builder implementation for the https token

@@ -31,6 +31,10 @@ import java.security.interfaces.RSAPublicKey;
 import java.util.*;
 
 /**
+ * class lent from apache wss4j
+ */
+
+/**
  * Created by IntelliJ IDEA.
  * User: dims
  * Date: Sep 15, 2005

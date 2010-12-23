@@ -20,9 +20,12 @@ package ch.gigerstyle.xmlsec.impl.util;
 import java.io.IOException;
 import java.io.StringReader;
 
+/**
+ * class lent from apache santuario
+ */
 
 /**
- * @author $Author: mullan $
+ * @author $Author$
  */
 public class RFC2253Parser {
 

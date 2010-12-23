@@ -23,6 +23,10 @@ import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
 /**
+ * class lent from apache wss4j
+ */
+
+/**
  * Exception class for WS-Security.
  * <p/>
  *

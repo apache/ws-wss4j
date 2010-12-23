@@ -20,6 +20,9 @@ import org.apache.neethi.Assertion;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * class lent from apache rampart
+ */
 public abstract class AbstractConfigurableSecurityAssertion extends AbstractSecurityAssertion {
 
     protected ArrayList configurations = null;

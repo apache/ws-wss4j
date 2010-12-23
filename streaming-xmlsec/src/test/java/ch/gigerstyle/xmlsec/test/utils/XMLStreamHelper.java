@@ -28,10 +28,14 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 /**
+ * class lent from apache cxf
+ */
+
+/**
  * Utility methods for working with an XMLStreamWriter. Maybe push this back into
  * stax-utils project.
  *
- * @version $Revision: 1.16 $
+ * @version $Revision$
  */
 public class XMLStreamHelper implements XMLStreamConstants {
     private static Attributes emptyAttributes = new AttributesImpl();

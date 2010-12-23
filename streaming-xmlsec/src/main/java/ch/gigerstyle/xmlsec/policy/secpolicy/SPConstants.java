@@ -18,6 +18,9 @@ package ch.gigerstyle.xmlsec.policy.secpolicy;
 
 import javax.xml.namespace.QName;
 
+/**
+ * class lent from apache cxf
+ */
 public abstract class SPConstants {
 
     public static final String P_NS = "http://schemas.xmlsoap.org/ws/2004/09/policy";

@@ -30,7 +30,9 @@ import org.apache.neethi.builders.AssertionBuilder;
 import javax.xml.namespace.QName;
 import java.util.Iterator;
 
-
+/**
+ * class lent from apache rampart
+ */
 public class ContentEncryptedElementsBuilder implements AssertionBuilder {
 
     private static final QName[] KNOWN_ELEMENTS = new QName[]{
