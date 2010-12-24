@@ -29,8 +29,12 @@ import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.common.SOAPUtil;
 import org.apache.ws.security.message.token.Timestamp;
 import org.apache.ws.security.util.WSSecurityUtil;
+import org.apache.ws.security.util.XmlSchemaDateFormat;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
+import java.text.DateFormat;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -168,6 +172,108 @@ public class TimestampTest extends org.junit.Assert {
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == WSSecurityException.MESSAGE_EXPIRED); 
         }  
+    }
+    
+    
+    /**
+     * This is a test for processing an Timestamp where the "Created" element is in the future.
+     * This Timestamp should be rejected.
+     */
+    @org.junit.Test
+    public void testFutureCreated() throws Exception {
+        
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        
+        Element timestampElement = 
+            doc.createElementNS(
+                WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + WSConstants.TIMESTAMP_TOKEN_LN
+            );
+
+        DateFormat zulu = new XmlSchemaDateFormat();
+        Element elementCreated =
+            doc.createElementNS(
+                WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + WSConstants.CREATED_LN
+            );
+        Date createdDate = new Date();
+        long currentTime = createdDate.getTime() + 300000;
+        createdDate.setTime(currentTime);
+        elementCreated.appendChild(doc.createTextNode(zulu.format(createdDate)));
+        timestampElement.appendChild(elementCreated);
+
+        secHeader.getSecurityHeader().appendChild(timestampElement);
+        
+        if (LOG.isDebugEnabled()) {
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+            LOG.debug(outputString);
+        }
+        //
+        // Do some processing
+        //
+        try {
+            verify(doc, WSSConfig.getNewInstance());
+            fail("The timestamp validation should have failed");
+        } catch (WSSecurityException ex) {
+            assertTrue(ex.getErrorCode() == WSSecurityException.MESSAGE_EXPIRED); 
+        }
+    }
+    
+    
+    /**
+     * This is a test for processing an Timestamp where the "Created" element is greater than
+     * the expiration time.
+     */
+    @org.junit.Test
+    public void testExpiresBeforeCreated() throws Exception {
+        
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        
+        Element timestampElement = 
+            doc.createElementNS(
+                WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + WSConstants.TIMESTAMP_TOKEN_LN
+            );
+
+        DateFormat zulu = new XmlSchemaDateFormat();
+        Element elementCreated =
+            doc.createElementNS(
+                WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + WSConstants.CREATED_LN
+            );
+        Date createdDate = new Date();
+        long currentTime = createdDate.getTime() + 300000;
+        createdDate.setTime(currentTime);
+        elementCreated.appendChild(doc.createTextNode(zulu.format(createdDate)));
+        timestampElement.appendChild(elementCreated);
+        
+        Date expiresDate = new Date();
+        expiresDate.setTime(expiresDate.getTime() -300000);
+
+        Element elementExpires =
+            doc.createElementNS(
+                WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + WSConstants.EXPIRES_LN
+            );
+        elementExpires.appendChild(doc.createTextNode(zulu.format(expiresDate)));
+        timestampElement.appendChild(elementExpires);
+
+        secHeader.getSecurityHeader().appendChild(timestampElement);
+        
+        if (LOG.isDebugEnabled()) {
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+            LOG.debug(outputString);
+        }
+        //
+        // Do some processing
+        //
+        try {
+            verify(doc, WSSConfig.getNewInstance());
+            fail("The timestamp validation should have failed");
+        } catch (WSSecurityException ex) {
+            assertTrue(ex.getErrorCode() == WSSecurityException.MESSAGE_EXPIRED); 
+        }
     }
     
 

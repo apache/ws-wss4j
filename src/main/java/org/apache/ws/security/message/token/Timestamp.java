@@ -257,7 +257,7 @@ public class Timestamp {
     
     /**
      * Return true if the "Created" value is before the current time minus the timeToLive
-     * argument.
+     * argument, and if the Created value is not "in the future".
      * 
      * @param timeToLive
      *            the limit on the receivers' side, that the timestamp is validated against
@@ -266,8 +266,16 @@ public class Timestamp {
     public boolean verifyCreated(
         int timeToLive
     ) {
-        // Calculate the time that is allowed for the message to travel
         Date validCreation = new Date();
+        // Check to see if the created time is in the future
+        if (createdDate != null && createdDate.after(validCreation)) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Validation of Timestamp: The message was created in the future!");
+            }
+            return false;
+        }
+        
+        // Calculate the time that is allowed for the message to travel
         long currentTime = validCreation.getTime() - timeToLive * 1000;
         validCreation.setTime(currentTime);
 
