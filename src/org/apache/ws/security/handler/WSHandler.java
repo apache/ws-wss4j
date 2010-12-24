@@ -1408,6 +1408,13 @@ public abstract class WSHandler {
 
         // Calculate the time that is allowed for the message to travel
         Calendar validCreation = Calendar.getInstance();
+        Calendar cre = timestamp.getCreated();
+        if (cre != null && cre.after(validCreation)) {
+            if (doDebug) {
+                log.debug("Validation of Timestamp: The message was created in the future!");
+            }
+            return false;
+        }
         long currentTime = validCreation.getTime().getTime();
         currentTime -= timeToLive * 1000;
         validCreation.setTime(new Date(currentTime));
@@ -1427,7 +1434,6 @@ public abstract class WSHandler {
         // Validate the time it took the message to travel
         // if (timestamp.getCreated().before(validCreation) ||
         // !timestamp.getCreated().equals(validCreation)) {
-        Calendar cre = timestamp.getCreated();
         if (cre != null && !cre.after(validCreation)) {
             if (doDebug) {
                 log.debug("Validation of Timestamp: The message was created too long ago");

@@ -33,15 +33,19 @@ import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.util.WSSecurityUtil;
+import org.apache.ws.security.util.XmlSchemaDateFormat;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.handler.WSHandler;
 import org.apache.ws.security.message.WSSecHeader;
 import org.apache.ws.security.message.WSSecTimestamp;
 import org.apache.ws.security.message.token.Timestamp;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.text.DateFormat;
+import java.util.Date;
 import java.util.Vector;
 
 /**
@@ -258,7 +262,59 @@ public class TestWSSecurityTimestamp extends TestCase {
         }     
     }
     
+    /**
+     * This is a test for processing an Timestamp where the "Created" element is in the future.
+     * This Timestamp should be rejected.
+     */
+    public void testFutureCreated() throws Exception {
+        
+        Document doc = unsignedEnvelope.getAsDocument();
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        
+        Element timestampElement = 
+            doc.createElementNS(
+                WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + WSConstants.TIMESTAMP_TOKEN_LN
+            );
 
+        DateFormat zulu = new XmlSchemaDateFormat();
+        Element elementCreated =
+            doc.createElementNS(
+                WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + WSConstants.CREATED_LN
+            );
+        Date createdDate = new Date();
+        long currentTime = createdDate.getTime() + 300000;
+        createdDate.setTime(currentTime);
+        elementCreated.appendChild(doc.createTextNode(zulu.format(createdDate)));
+        timestampElement.appendChild(elementCreated);
+
+        secHeader.getSecurityHeader().appendChild(timestampElement);
+        
+        if (LOG.isDebugEnabled()) {
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+            LOG.debug(outputString);
+        }
+        
+        //
+        // Do some processing
+        //
+        Vector wsResult = verify(doc);
+        WSSecurityEngineResult actionResult = 
+            WSSecurityUtil.fetchActionResult(wsResult, WSConstants.TS);
+        assertTrue(actionResult != null);
+        
+        Timestamp receivedTimestamp = 
+            (Timestamp)actionResult.get(WSSecurityEngineResult.TAG_TIMESTAMP);
+        assertTrue(receivedTimestamp != null);
+        
+        MyHandler myHandler = new MyHandler();
+        if (myHandler.publicVerifyTimestamp(receivedTimestamp, 300)) {
+            fail("The timestamp validation should have failed");
+        }
+    }
+    
+    
     /**
      * Verifies the soap envelope
      * 
