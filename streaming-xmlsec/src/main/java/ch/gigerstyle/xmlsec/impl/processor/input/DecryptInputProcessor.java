@@ -165,12 +165,12 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
 
                             Thread receiverThread = new Thread(decryptionThread);
                             receiverThread.setName("decrypting thread");
+                            receiverThread.start();
 
                             inputProcessorChain.getDocumentContext().removePathElement();
 
                             DecryptedEventReaderInputProcessor decryptedEventReaderInputProcessor = decryptionThread.getDecryptedStreamInputProcessor();
                             receiverThread.setUncaughtExceptionHandler(decryptedEventReaderInputProcessor);
-                            receiverThread.start();
                             inputProcessorChain.addProcessor(decryptedEventReaderInputProcessor);
                             if (isSecurityHeaderEvent) {
                                 return decryptedEventReaderInputProcessor.processNextHeaderEvent(inputProcessorChain);
