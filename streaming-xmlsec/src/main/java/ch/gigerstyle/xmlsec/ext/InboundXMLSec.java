@@ -51,6 +51,7 @@ public class InboundXMLSec {
      * configure your xmlStreamReader correctly. Otherwise you can create a security hole.
      * At minimum configure the following properties:
      * xmlInputFactory.setProperty(XMLInputFactory.SUPPORT_DTD, false);
+     * xmlInputFactory.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, false);
      * xmlInputFactory.setProperty(XMLInputFactory.IS_COALESCING, false);
      * xmlInputFactory.setProperty(WstxInputProperties.P_MIN_TEXT_SEGMENT, new Integer(8192));
      */
@@ -64,6 +65,8 @@ public class InboundXMLSec {
         securityContextImpl.setSecurityEventListener(securityEventListener);
 
         final XMLInputFactory xmlInputFactory = XMLInputFactory.newFactory();
+        xmlInputFactory.setProperty(XMLInputFactory.SUPPORT_DTD, false);
+        xmlInputFactory.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, false);
         xmlInputFactory.setEventAllocator(new XMLEventNSAllocator());
         securityContextImpl.put(Constants.XMLINPUTFACTORY, xmlInputFactory);
         final XMLEventReader xmlEventReader = xmlInputFactory.createXMLEventReader(xmlStreamReader);

@@ -102,6 +102,7 @@ public class PolicyEnforcerFactory {
         return policyEnforcerFactory;
     }
 
+    //todo enforce uniqueness of operation names to prevent SOAPAction spoofing.
     private void parseWsdl(URL wsdlUrl) throws WSSPolicyException {
         try {
             WSDLFactory wsdlFactory = WSDLFactory.newInstance();
