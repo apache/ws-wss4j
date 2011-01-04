@@ -4,9 +4,16 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>xmlsec-stream</groupId>
-    <artifactId>xmlsec-stream</artifactId>
+    <groupId>ch.swssf</groupId>
+    <artifactId>swssf</artifactId>
     <version>1.0</version>
+    <name>Streaming-WebService-Security-Framework</name>
+    <developers>
+        <developer>
+            <name>Marc Giger</name>
+            <email>gigerstyle@gmx.ch</email>            
+        </developer>
+    </developers>
 
     <dependencyManagement>
         <dependencies>

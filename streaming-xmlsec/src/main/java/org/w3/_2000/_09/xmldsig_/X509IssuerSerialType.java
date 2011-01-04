@@ -8,10 +8,10 @@
 
 package org.w3._2000._09.xmldsig_;
 
-import ch.gigerstyle.xmlsec.ext.Constants;
-import ch.gigerstyle.xmlsec.ext.ParseException;
-import ch.gigerstyle.xmlsec.ext.Parseable;
-import ch.gigerstyle.xmlsec.ext.Utils;
+import org.swssf.ext.Constants;
+import org.swssf.ext.ParseException;
+import org.swssf.ext.Parseable;
+import org.swssf.ext.Utils;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;

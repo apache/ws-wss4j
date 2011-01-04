@@ -18,10 +18,10 @@
         <appender-ref ref="FILE"/>
         <appender-ref ref="STDOUT"/>
     </root>
-    <logger name="ch.gigerstyle.xmlsec">
+    <logger name="org.swssf.xmlsec">
         <level value="INFO"/>
     </logger>
-    <logger name="ch.gigerstyle.xmlsec.impl.util">
+    <logger name="org.swssf.impl.util">
         <level value="INFO"/>
     </logger>
     <logger name="org.apache.xml.security.utils.DigesterOutputStream">
@@ -30,10 +30,10 @@
     <logger name="org.apache.xml">
         <level value="INFO"/>
     </logger>
-    <logger name="ch.gigerstyle.xmlsec.impl.InputProcessorChainImpl">
+    <logger name="org.swssf.impl.InputProcessorChainImpl">
         <level value="INFO"/>
     </logger>
-    <logger name="ch.gigerstyle.xmlsec.impl.OutputProcessorChainImpl">
+    <logger name="org.swssf.impl.OutputProcessorChainImpl">
         <level value="INFO"/>
     </logger>
 </log4j:configuration>

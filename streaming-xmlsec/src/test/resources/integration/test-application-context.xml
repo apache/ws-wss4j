@@ -18,7 +18,7 @@
     <import resource="classpath:META-INF/cxf/cxf-extension-http.xml"/>
     <import resource="classpath:META-INF/cxf/cxf-extension-http-jetty.xml"/>
 
-    <bean id="greeterServiceImpl" class="ch.gigerstyle.xmlsec.test.integration.GreeterServiceImpl">
+    <bean id="greeterServiceImpl" class="org.swssf.test.integration.GreeterServiceImpl">
     </bean>
 
     <jaxws:endpoint id="greeterService" implementor="#greeterServiceImpl"
@@ -32,17 +32,17 @@
         </jaxws:outInterceptors>
     </jaxws:endpoint>
 
-    <bean name="securityInInterceptor" class="ch.gigerstyle.xmlsec.interceptor.SecurityInInterceptor">
+    <bean name="securityInInterceptor" class="org.swssf.interceptor.SecurityInInterceptor">
         <constructor-arg index="0" value="post-stream"/>
         <constructor-arg index="1" ref="securityProperties"/>
     </bean>
 
-    <bean name="securityOutInterceptor" class="ch.gigerstyle.xmlsec.interceptor.SecurityOutInterceptor">
+    <bean name="securityOutInterceptor" class="org.swssf.interceptor.SecurityOutInterceptor">
         <constructor-arg index="0" value="pre-stream"/>
         <constructor-arg index="1" ref="securityProperties"/>
     </bean>
 
-    <bean name="securityProperties" class="ch.gigerstyle.xmlsec.ext.SecurityProperties">
+    <bean name="securityProperties" class="org.swssf.ext.SecurityProperties">
         <property name="callbackHandler" ref="callbackHandler"/>
         <property name="outAction">
             <list>
@@ -103,7 +103,7 @@
         </property>
     </bean>
 
-    <bean name="callbackHandler" class="ch.gigerstyle.xmlsec.test.CallbackHandlerImpl">
+    <bean name="callbackHandler" class="org.swssf.test.CallbackHandlerImpl">
     </bean>
 
 
@@ -142,7 +142,7 @@
         </property>
     </bean>
 
-    <bean name="passwordCallbackHandlerWSS4J" class="ch.gigerstyle.xmlsec.test.WSS4JCallbackHandlerImpl">
+    <bean name="passwordCallbackHandlerWSS4J" class="org.swssf.test.WSS4JCallbackHandlerImpl">
     </bean>
 
     <httpj:engine-factory bus="cxf">
