@@ -54,7 +54,7 @@
                         <sp:RecipientToken>
                             <wsp12:Policy>
                               <sp:X509Token sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient">
-                                  <sp:IssuerName>2.5.4.5=#130134,CN=RefApp Receiver,O=Swissdec,C=CH</sp:IssuerName>
+                                  <sp:IssuerName>CN=receiver,OU=swssf,C=CH</sp:IssuerName>
                                   <wsp12:Policy>
                                       <!--
                                       <sp:RequireIssuerSerialReference/>

@@ -31,7 +31,7 @@ public class CallbackHandlerImpl implements CallbackHandler {
         WSPasswordCallback pc = (WSPasswordCallback) callbacks[0];
 
         if (pc.getUsage() == WSPasswordCallback.DECRYPT || pc.getUsage() == WSPasswordCallback.SIGNATURE) {
-            pc.setPassword("refApp9876");
+            pc.setPassword("default");
         } else {
             throw new UnsupportedCallbackException(pc, "Unrecognized CallbackHandlerImpl");
         }

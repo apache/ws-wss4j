@@ -198,6 +198,11 @@
                 <configuration>
                     <groups>${test.groups}</groups>
                     <argLine>-Xmx2000m</argLine>
+                    <excludes>
+                        <exclude>**/ProfilingTest.java</exclude>
+                        <exclude>**/PerformanceMemoryTest.java</exclude>
+                        <exclude>**/PerformanceTimingTest.java</exclude>
+                    </excludes>
                 </configuration>
             </plugin>
             <plugin>

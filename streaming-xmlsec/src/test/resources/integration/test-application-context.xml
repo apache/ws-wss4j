@@ -62,7 +62,7 @@
         <property name="arguments">
             <list>
                 <value>classpath:receiver.jks</value>
-                <value>1234567890</value>
+                <value>default</value>
             </list>
         </property>
     </bean>
@@ -74,7 +74,7 @@
         <property name="arguments">
             <list>
                 <value>classpath:receiver.jks</value>
-                <value>1234567890</value>
+                <value>default</value>
             </list>
         </property>
     </bean>
@@ -86,7 +86,7 @@
         <property name="arguments">
             <list>
                 <value>classpath:transmitter.jks</value>
-                <value>1234567890</value>
+                <value>default</value>
             </list>
         </property>
     </bean>
@@ -98,7 +98,7 @@
         <property name="arguments">
             <list>
                 <value>classpath:transmitter.jks</value>
-                <value>1234567890</value>
+                <value>default</value>
             </list>
         </property>
     </bean>

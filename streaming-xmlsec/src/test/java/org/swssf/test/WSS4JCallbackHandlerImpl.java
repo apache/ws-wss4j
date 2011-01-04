@@ -27,7 +27,7 @@ public class WSS4JCallbackHandlerImpl implements CallbackHandler {
         org.apache.ws.security.WSPasswordCallback pc = (org.apache.ws.security.WSPasswordCallback) callbacks[0];
 
         if (pc.getUsage() == org.apache.ws.security.WSPasswordCallback.DECRYPT || pc.getUsage() == org.apache.ws.security.WSPasswordCallback.SIGNATURE) {
-            pc.setPassword("refApp9876");
+            pc.setPassword("default");
         } else {
             throw new UnsupportedCallbackException(pc, "Unrecognized CallbackHandlerImpl");
         }

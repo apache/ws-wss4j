@@ -120,20 +120,20 @@ public abstract class AbstractTestBase {
         Properties sigProperties = new Properties();
         sigProperties.setProperty("org.apache.ws.security.crypto.provider", "org.apache.ws.security.components.crypto.Merlin");
         sigProperties.setProperty("org.apache.ws.security.crypto.merlin.file", "transmitter.jks");
-        //sigProperties.setProperty("org.apache.ws.security.crypto.merlin.alias.password", "refApp9876");
-        sigProperties.setProperty("org.apache.ws.security.crypto.merlin.keystore.password", "1234567890");
+        //sigProperties.setProperty("org.apache.ws.security.crypto.merlin.alias.password", "default");
+        sigProperties.setProperty("org.apache.ws.security.crypto.merlin.keystore.password", "default");
         //sigProperties.setProperty("org.apache.ws.security.crypto.merlin.keystore.alias", "transmitter");
-        wss4JHandler.setPassword(messageContext, "refApp9876");
+        wss4JHandler.setPassword(messageContext, "default");
         messageContext.setProperty(WSHandlerConstants.SIG_PROP_REF_ID, "" + sigProperties.hashCode());
         messageContext.setProperty("" + sigProperties.hashCode(), sigProperties);
 
         Properties encProperties = new Properties();
         encProperties.setProperty("org.apache.ws.security.crypto.provider", "org.apache.ws.security.components.crypto.Merlin");
         encProperties.setProperty("org.apache.ws.security.crypto.merlin.file", "transmitter.jks");
-        //sigProperties.setProperty("org.apache.ws.security.crypto.merlin.alias.password", "refApp9876");
-        encProperties.setProperty("org.apache.ws.security.crypto.merlin.keystore.password", "1234567890");
+        //sigProperties.setProperty("org.apache.ws.security.crypto.merlin.alias.password", "default");
+        encProperties.setProperty("org.apache.ws.security.crypto.merlin.keystore.password", "default");
         //sigProperties.setProperty("org.apache.ws.security.crypto.merlin.keystore.alias", "transmitter");
-        wss4JHandler.setPassword(messageContext, "refApp9876");
+        wss4JHandler.setPassword(messageContext, "default");
         messageContext.setProperty(WSHandlerConstants.ENCRYPTION_USER, "receiver");
         messageContext.setProperty(WSHandlerConstants.ENC_PROP_REF_ID, "" + encProperties.hashCode());
         messageContext.setProperty("" + encProperties.hashCode(), encProperties);
@@ -167,10 +167,10 @@ public abstract class AbstractTestBase {
         Properties sigProperties = new Properties();
         sigProperties.setProperty("org.apache.ws.security.crypto.provider", "org.apache.ws.security.components.crypto.Merlin");
         sigProperties.setProperty("org.apache.ws.security.crypto.merlin.file", "receiver.jks");
-        //sigProperties.setProperty("org.apache.ws.security.crypto.merlin.alias.password", "refApp9876");
-        sigProperties.setProperty("org.apache.ws.security.crypto.merlin.keystore.password", "1234567890");
+        //sigProperties.setProperty("org.apache.ws.security.crypto.merlin.alias.password", "default");
+        sigProperties.setProperty("org.apache.ws.security.crypto.merlin.keystore.password", "default");
         //sigProperties.setProperty("org.apache.ws.security.crypto.merlin.keystore.alias", "transmitter");
-        wss4JHandler.setPassword(messageContext, "refApp9876");
+        wss4JHandler.setPassword(messageContext, "default");
         messageContext.setProperty(WSHandlerConstants.SIG_PROP_REF_ID, "" + sigProperties.hashCode());
         messageContext.setProperty("" + sigProperties.hashCode(), sigProperties);
         messageContext.setProperty(WSHandlerConstants.PW_CALLBACK_REF, new WSS4JCallbackHandlerImpl());
@@ -178,10 +178,10 @@ public abstract class AbstractTestBase {
         Properties decProperties = new Properties();
         decProperties.setProperty("org.apache.ws.security.crypto.provider", "org.apache.ws.security.components.crypto.Merlin");
         decProperties.setProperty("org.apache.ws.security.crypto.merlin.file", "receiver.jks");
-        //sigProperties.setProperty("org.apache.ws.security.crypto.merlin.alias.password", "refApp9876");
-        decProperties.setProperty("org.apache.ws.security.crypto.merlin.keystore.password", "1234567890");
+        //sigProperties.setProperty("org.apache.ws.security.crypto.merlin.alias.password", "default");
+        decProperties.setProperty("org.apache.ws.security.crypto.merlin.keystore.password", "default");
         //sigProperties.setProperty("org.apache.ws.security.crypto.merlin.keystore.alias", "transmitter");
-        wss4JHandler.setPassword(messageContext, "refApp9876");
+        wss4JHandler.setPassword(messageContext, "default");
         messageContext.setProperty(WSHandlerConstants.DEC_PROP_REF_ID, "" + decProperties.hashCode());
         messageContext.setProperty("" + decProperties.hashCode(), decProperties);
 

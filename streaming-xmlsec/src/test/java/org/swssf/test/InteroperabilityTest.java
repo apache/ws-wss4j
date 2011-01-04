@@ -49,8 +49,8 @@ public class InteroperabilityTest extends AbstractTestBase {
 
         SecurityProperties securityProperties = new SecurityProperties();
         securityProperties.setCallbackHandler(new CallbackHandlerImpl());
-        securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "1234567890".toCharArray());
-        securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "1234567890".toCharArray());
+        securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+        securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
 
         Document document = doInboundSecurity(securityProperties, new CustomW3CDOMStreamReader(securedDocument));
 
@@ -76,8 +76,8 @@ public class InteroperabilityTest extends AbstractTestBase {
 
         SecurityProperties securityProperties = new SecurityProperties();
         securityProperties.setCallbackHandler(new CallbackHandlerImpl());
-        securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "1234567890".toCharArray());
-        securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "1234567890".toCharArray());
+        securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+        securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
 
         Document document = doInboundSecurity(securityProperties, new CustomW3CDOMStreamReader(securedDocument));
 
@@ -99,9 +99,9 @@ public class InteroperabilityTest extends AbstractTestBase {
         SecurityProperties securityProperties = new SecurityProperties();
         securityProperties.setCallbackHandler(new CallbackHandlerImpl());
         securityProperties.setEncryptionUser("receiver");
-        securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "1234567890".toCharArray());
+        securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
         securityProperties.setSignatureUser("transmitter");
-        securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "1234567890".toCharArray());
+        securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
         Constants.Action[] actions = new Constants.Action[]{Constants.Action.TIMESTAMP, Constants.Action.SIGNATURE, Constants.Action.ENCRYPT};
         securityProperties.setOutAction(actions);
 
@@ -118,9 +118,9 @@ public class InteroperabilityTest extends AbstractTestBase {
         SecurityProperties securityProperties = new SecurityProperties();
         securityProperties.setCallbackHandler(new CallbackHandlerImpl());
         securityProperties.setEncryptionUser("receiver");
-        securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "1234567890".toCharArray());
+        securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
         securityProperties.setSignatureUser("transmitter");
-        securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "1234567890".toCharArray());
+        securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
         Constants.Action[] actions = new Constants.Action[]{Constants.Action.ENCRYPT, Constants.Action.SIGNATURE, Constants.Action.TIMESTAMP};
         securityProperties.setOutAction(actions);
 
@@ -137,9 +137,9 @@ public class InteroperabilityTest extends AbstractTestBase {
         SecurityProperties securityProperties = new SecurityProperties();
         securityProperties.setCallbackHandler(new CallbackHandlerImpl());
         securityProperties.setEncryptionUser("receiver");
-        securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "1234567890".toCharArray());
+        securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
         securityProperties.setSignatureUser("transmitter");
-        securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "1234567890".toCharArray());
+        securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
         Constants.Action[] actions = new Constants.Action[]{Constants.Action.SIGNATURE};
         securityProperties.setOutAction(actions);
 
@@ -176,8 +176,8 @@ public class InteroperabilityTest extends AbstractTestBase {
 
         SecurityProperties securityProperties = new SecurityProperties();
         securityProperties.setCallbackHandler(new CallbackHandlerImpl());
-        securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "1234567890".toCharArray());
-        securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "1234567890".toCharArray());
+        securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+        securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
 
         Document document = doInboundSecurity(securityProperties, new CustomW3CDOMStreamReader(securedDocument));
 

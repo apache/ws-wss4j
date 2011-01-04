@@ -53,7 +53,7 @@ public class SignatureTest extends AbstractTestBase {
             SecurityProperties securityProperties = new SecurityProperties();
             Constants.Action[] actions = new Constants.Action[]{Constants.Action.SIGNATURE};
             securityProperties.setOutAction(actions);
-            securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "1234567890".toCharArray());
+            securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setSignatureUser("transmitter");
             securityProperties.setCallbackHandler(new CallbackHandlerImpl());
 
@@ -101,7 +101,7 @@ public class SignatureTest extends AbstractTestBase {
         //done signature; now test sig-verification:
         {
             SecurityProperties securityProperties = new SecurityProperties();
-            securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "1234567890".toCharArray());
+            securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
             InboundXMLSec xmlSec = WSSec.getInboundXMLSec(securityProperties);
             XMLStreamReader xmlStreamReader = xmlSec.processInMessage(new CustomW3CDOMStreamReader(securedDocument));
 
@@ -122,7 +122,7 @@ public class SignatureTest extends AbstractTestBase {
             SecurityProperties securityProperties = new SecurityProperties();
             Constants.Action[] actions = new Constants.Action[]{Constants.Action.SIGNATURE};
             securityProperties.setOutAction(actions);
-            securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "1234567890".toCharArray());
+            securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setSignatureUser("transmitter");
             securityProperties.addSignaturePart(new SecurePart("complexType", "http://www.w3.org/1999/XMLSchema", "Element"));
             securityProperties.setCallbackHandler(new CallbackHandlerImpl());
@@ -179,7 +179,7 @@ public class SignatureTest extends AbstractTestBase {
         //done signature; now test sig-verification:
         {
             SecurityProperties securityProperties = new SecurityProperties();
-            securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "1234567890".toCharArray());
+            securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
             InboundXMLSec xmlSec = WSSec.getInboundXMLSec(securityProperties);
             XMLStreamReader xmlStreamReader = xmlSec.processInMessage(new CustomW3CDOMStreamReader(securedDocument));
 
@@ -200,7 +200,7 @@ public class SignatureTest extends AbstractTestBase {
             SecurityProperties securityProperties = new SecurityProperties();
             Constants.Action[] actions = new Constants.Action[]{Constants.Action.SIGNATURE};
             securityProperties.setOutAction(actions);
-            securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "1234567890".toCharArray());
+            securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setSignatureUser("transmitter");
             securityProperties.setSignatureKeyIdentifierType(Constants.KeyIdentifierType.ISSUER_SERIAL);
             securityProperties.setCallbackHandler(new CallbackHandlerImpl());
@@ -256,7 +256,7 @@ public class SignatureTest extends AbstractTestBase {
         //done signature; now test sig-verification:
         {
             SecurityProperties securityProperties = new SecurityProperties();
-            securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "1234567890".toCharArray());
+            securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
             InboundXMLSec xmlSec = WSSec.getInboundXMLSec(securityProperties);
             XMLStreamReader xmlStreamReader = xmlSec.processInMessage(new CustomW3CDOMStreamReader(securedDocument));
 
@@ -278,7 +278,7 @@ public class SignatureTest extends AbstractTestBase {
             SecurityProperties securityProperties = new SecurityProperties();
             Constants.Action[] actions = new Constants.Action[]{Constants.Action.SIGNATURE};
             securityProperties.setOutAction(actions);
-            securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "1234567890".toCharArray());
+            securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setSignatureUser("transmitter");
             securityProperties.setSignatureKeyIdentifierType(Constants.KeyIdentifierType.BST_DIRECT_REFERENCE);
             securityProperties.setCallbackHandler(new org.swssf.test.CallbackHandlerImpl());
@@ -334,7 +334,7 @@ public class SignatureTest extends AbstractTestBase {
         //done signature; now test sig-verification:
         {
             SecurityProperties securityProperties = new SecurityProperties();
-            securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "1234567890".toCharArray());
+            securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
             InboundXMLSec xmlSec = WSSec.getInboundXMLSec(securityProperties);
             XMLStreamReader xmlStreamReader = xmlSec.processInMessage(new CustomW3CDOMStreamReader(securedDocument));
 
@@ -356,7 +356,7 @@ public class SignatureTest extends AbstractTestBase {
             SecurityProperties securityProperties = new SecurityProperties();
             Constants.Action[] actions = new Constants.Action[]{Constants.Action.SIGNATURE};
             securityProperties.setOutAction(actions);
-            securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "1234567890".toCharArray());
+            securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setSignatureUser("transmitter");
             securityProperties.setSignatureKeyIdentifierType(Constants.KeyIdentifierType.BST_EMBEDDED);
             securityProperties.setCallbackHandler(new org.swssf.test.CallbackHandlerImpl());
@@ -388,7 +388,7 @@ public class SignatureTest extends AbstractTestBase {
         //done signature; now test sig-verification:
         {
             SecurityProperties securityProperties = new SecurityProperties();
-            securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "1234567890".toCharArray());
+            securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
             InboundXMLSec xmlSec = WSSec.getInboundXMLSec(securityProperties);
             XMLStreamReader xmlStreamReader = xmlSec.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
@@ -410,7 +410,7 @@ public class SignatureTest extends AbstractTestBase {
             SecurityProperties securityProperties = new SecurityProperties();
             Constants.Action[] actions = new Constants.Action[]{Constants.Action.SIGNATURE};
             securityProperties.setOutAction(actions);
-            securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "1234567890".toCharArray());
+            securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setSignatureUser("transmitter");
             securityProperties.setSignatureKeyIdentifierType(Constants.KeyIdentifierType.X509_KEY_IDENTIFIER);
             securityProperties.setCallbackHandler(new org.swssf.test.CallbackHandlerImpl());
@@ -466,7 +466,7 @@ public class SignatureTest extends AbstractTestBase {
         //done signature; now test sig-verification:
         {
             SecurityProperties securityProperties = new SecurityProperties();
-            securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "1234567890".toCharArray());
+            securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
             InboundXMLSec xmlSec = WSSec.getInboundXMLSec(securityProperties);
             XMLStreamReader xmlStreamReader = xmlSec.processInMessage(new CustomW3CDOMStreamReader(securedDocument));
 
@@ -488,7 +488,7 @@ public class SignatureTest extends AbstractTestBase {
             SecurityProperties securityProperties = new SecurityProperties();
             Constants.Action[] actions = new Constants.Action[]{Constants.Action.SIGNATURE};
             securityProperties.setOutAction(actions);
-            securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "1234567890".toCharArray());
+            securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setSignatureUser("transmitter");
             securityProperties.setSignatureKeyIdentifierType(Constants.KeyIdentifierType.SKI_KEY_IDENTIFIER);
             securityProperties.setCallbackHandler(new org.swssf.test.CallbackHandlerImpl());
@@ -544,7 +544,7 @@ public class SignatureTest extends AbstractTestBase {
         //done signature; now test sig-verification:
         {
             SecurityProperties securityProperties = new SecurityProperties();
-            securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "1234567890".toCharArray());
+            securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
             InboundXMLSec xmlSec = WSSec.getInboundXMLSec(securityProperties);
             XMLStreamReader xmlStreamReader = xmlSec.processInMessage(new CustomW3CDOMStreamReader(securedDocument));
 
@@ -565,7 +565,7 @@ public class SignatureTest extends AbstractTestBase {
             SecurityProperties securityProperties = new SecurityProperties();
             Constants.Action[] actions = new Constants.Action[]{Constants.Action.SIGNATURE};
             securityProperties.setOutAction(actions);
-            securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "1234567890".toCharArray());
+            securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setSignatureUser("transmitter");
             securityProperties.setSignatureKeyIdentifierType(Constants.KeyIdentifierType.THUMBPRINT_IDENTIFIER);
             securityProperties.setCallbackHandler(new org.swssf.test.CallbackHandlerImpl());
@@ -621,7 +621,7 @@ public class SignatureTest extends AbstractTestBase {
         //done signature; now test sig-verification:
         {
             SecurityProperties securityProperties = new SecurityProperties();
-            securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "1234567890".toCharArray());
+            securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
             InboundXMLSec xmlSec = WSSec.getInboundXMLSec(securityProperties);
             XMLStreamReader xmlStreamReader = xmlSec.processInMessage(new CustomW3CDOMStreamReader(securedDocument));
 

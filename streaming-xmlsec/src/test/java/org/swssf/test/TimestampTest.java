@@ -217,7 +217,7 @@ public class TimestampTest extends AbstractTestBase {
         {
             SecurityProperties securityProperties = new SecurityProperties();
             securityProperties.setCallbackHandler(new CallbackHandlerImpl());
-            securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "1234567890".toCharArray());
+            securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
             InboundXMLSec xmlSec = WSSec.getInboundXMLSec(securityProperties);
             XMLStreamReader xmlStreamReader = xmlSec.processInMessage(new CustomW3CDOMStreamReader(securedDocument));
 

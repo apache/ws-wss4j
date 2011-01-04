@@ -42,7 +42,7 @@ public class OutputChainTest extends AbstractTestBase {
         SecurityProperties securityProperties = new SecurityProperties();
         Constants.Action[] actions = new Constants.Action[]{Constants.Action.ENCRYPT};
         securityProperties.setOutAction(actions);
-        securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "1234567890".toCharArray());
+        securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
         securityProperties.setEncryptionUser("receiver");
 
         OutboundXMLSec xmlSec = WSSec.getOutboundXMLSec(securityProperties);
@@ -84,7 +84,7 @@ public class OutputChainTest extends AbstractTestBase {
         SecurityProperties securityProperties = new SecurityProperties();
         Constants.Action[] actions = new Constants.Action[]{Constants.Action.SIGNATURE};
         securityProperties.setOutAction(actions);
-        securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("receiver.jks"), "1234567890".toCharArray());
+        securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
         securityProperties.setSignatureUser("receiver");
         securityProperties.setCallbackHandler(new CallbackHandlerImpl());
 

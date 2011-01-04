@@ -86,8 +86,8 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
 
         SecurityProperties securityProperties = new SecurityProperties();
         securityProperties.setCallbackHandler(new CallbackHandlerImpl());
-        securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "1234567890".toCharArray());
-        securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "1234567890".toCharArray());
+        securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+        securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
 
         try {
             Document document = doInboundSecurity(securityProperties, new CustomW3CDOMStreamReader(securedDocument));
@@ -155,9 +155,9 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
         SecurityProperties outSecurityProperties = new SecurityProperties();
         outSecurityProperties.setCallbackHandler(new CallbackHandlerImpl());
         outSecurityProperties.setEncryptionUser("receiver");
-        outSecurityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "1234567890".toCharArray());
+        outSecurityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
         outSecurityProperties.setSignatureUser("transmitter");
-        outSecurityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "1234567890".toCharArray());
+        outSecurityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
 
         outSecurityProperties.addSignaturePart(new SecurePart(Constants.TAG_wsu_Timestamp.getLocalPart(), Constants.TAG_wsu_Timestamp.getNamespaceURI(), "Element"));
         outSecurityProperties.addSignaturePart(new SecurePart(Constants.TAG_soap11_Body.getLocalPart(), Constants.TAG_soap11_Body.getNamespaceURI(), "Element"));
@@ -171,8 +171,8 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
 
         SecurityProperties inSecurityProperties = new SecurityProperties();
         inSecurityProperties.setCallbackHandler(new CallbackHandlerImpl());
-        inSecurityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "1234567890".toCharArray());
-        inSecurityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "1234567890".toCharArray());
+        inSecurityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+        inSecurityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
 
         PolicyEnforcerFactory policyEnforcerFactory = PolicyEnforcerFactory.newInstance(this.getClass().getClassLoader().getResource("testdata/wsdl/actionSpoofing.wsdl"));
         PolicyEnforcer policyEnforcer = policyEnforcerFactory.newPolicyEnforcer("emptyPolicy");
@@ -213,8 +213,8 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
 
         SecurityProperties inSecurityProperties = new SecurityProperties();
         inSecurityProperties.setCallbackHandler(new CallbackHandlerImpl());
-        inSecurityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "1234567890".toCharArray());
-        inSecurityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "1234567890".toCharArray());
+        inSecurityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+        inSecurityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
 
         PolicyEnforcerFactory policyEnforcerFactory = PolicyEnforcerFactory.newInstance(this.getClass().getClassLoader().getResource("testdata/wsdl/actionSpoofing.wsdl"));
         PolicyEnforcer policyEnforcer = policyEnforcerFactory.newPolicyEnforcer("goodPolicy");
@@ -256,8 +256,8 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
 
         SecurityProperties inSecurityProperties = new SecurityProperties();
         inSecurityProperties.setCallbackHandler(new CallbackHandlerImpl());
-        inSecurityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "1234567890".toCharArray());
-        inSecurityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "1234567890".toCharArray());
+        inSecurityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+        inSecurityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
 
         try {
             Document document = doInboundSecurity(inSecurityProperties, new CustomW3CDOMStreamReader(securedDocument));
@@ -316,8 +316,8 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
 
         SecurityProperties inSecurityProperties = new SecurityProperties();
         inSecurityProperties.setCallbackHandler(new CallbackHandlerImpl());
-        inSecurityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "1234567890".toCharArray());
-        inSecurityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "1234567890".toCharArray());
+        inSecurityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
+        inSecurityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
 
         try {
             Document document = doInboundSecurity(inSecurityProperties, new ByteArrayInputStream(soap.getBytes()));

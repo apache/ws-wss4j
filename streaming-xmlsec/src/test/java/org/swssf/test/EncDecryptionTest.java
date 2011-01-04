@@ -54,7 +54,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             SecurityProperties securityProperties = new SecurityProperties();
             Constants.Action[] actions = new Constants.Action[]{Constants.Action.ENCRYPT};
             securityProperties.setOutAction(actions);
-            securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "1234567890".toCharArray());
+            securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
             securityProperties.setEncryptionUser("receiver");
 
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml");
@@ -117,7 +117,7 @@ public class EncDecryptionTest extends AbstractTestBase {
         //test streaming decryption
         {
             SecurityProperties securityProperties = new SecurityProperties();
-            securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "1234567890".toCharArray());
+            securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
             securityProperties.setCallbackHandler(new CallbackHandlerImpl());
             Document document = doInboundSecurity(securityProperties, new CustomW3CDOMStreamReader(securedDocument));
 
@@ -140,7 +140,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             SecurityProperties securityProperties = new SecurityProperties();
             Constants.Action[] actions = new Constants.Action[]{Constants.Action.ENCRYPT};
             securityProperties.setOutAction(actions);
-            securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "1234567890".toCharArray());
+            securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
             securityProperties.setEncryptionUser("receiver");
             securityProperties.addEncryptionPart(new SecurePart("complexType", "http://www.w3.org/1999/XMLSchema", "Content"));
 
@@ -200,7 +200,7 @@ public class EncDecryptionTest extends AbstractTestBase {
         //test streaming decryption
         {
             SecurityProperties securityProperties = new SecurityProperties();
-            securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "1234567890".toCharArray());
+            securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
             securityProperties.setCallbackHandler(new CallbackHandlerImpl());
             Document document = doInboundSecurity(securityProperties, new CustomW3CDOMStreamReader(securedDocument));
 
@@ -223,7 +223,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             SecurityProperties securityProperties = new SecurityProperties();
             Constants.Action[] actions = new Constants.Action[]{Constants.Action.ENCRYPT};
             securityProperties.setOutAction(actions);
-            securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "1234567890".toCharArray());
+            securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
             securityProperties.setEncryptionUser("receiver");
             securityProperties.addEncryptionPart(new SecurePart("complexType", "http://www.w3.org/1999/XMLSchema", "Element"));
 
@@ -272,7 +272,7 @@ public class EncDecryptionTest extends AbstractTestBase {
         //done encryption; now test decryption:
         {
             SecurityProperties securityProperties = new SecurityProperties();
-            securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "1234567890".toCharArray());
+            securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
             securityProperties.setCallbackHandler(new org.swssf.test.CallbackHandlerImpl());
             Document document = doInboundSecurity(securityProperties, new CustomW3CDOMStreamReader(securedDocument));
 
@@ -297,7 +297,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             securityProperties.setOutAction(actions);
 
             KeyStore keyStore = KeyStore.getInstance("jks");
-            keyStore.load(this.getClass().getClassLoader().getResourceAsStream("receiver.jks"), "1234567890".toCharArray());
+            keyStore.load(this.getClass().getClassLoader().getResourceAsStream("receiver.jks"), "default".toCharArray());
             securityProperties.setEncryptionUseThisCertificate((X509Certificate) keyStore.getCertificate("receiver"));
 
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml");
@@ -331,7 +331,7 @@ public class EncDecryptionTest extends AbstractTestBase {
         //done encryption; now test decryption:
         {
             SecurityProperties securityProperties = new SecurityProperties();
-            securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "1234567890".toCharArray());
+            securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
             securityProperties.setCallbackHandler(new org.swssf.test.CallbackHandlerImpl());
             Document document = doInboundSecurity(securityProperties, new ByteArrayInputStream(baos.toByteArray()));
 
@@ -354,7 +354,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             SecurityProperties securityProperties = new SecurityProperties();
             Constants.Action[] actions = new Constants.Action[]{Constants.Action.ENCRYPT};
             securityProperties.setOutAction(actions);
-            securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "1234567890".toCharArray());
+            securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
             securityProperties.setEncryptionUser("receiver");
             securityProperties.setEncryptionKeyIdentifierType(Constants.KeyIdentifierType.ISSUER_SERIAL);
 
@@ -404,7 +404,7 @@ public class EncDecryptionTest extends AbstractTestBase {
         //done encryption; now test decryption:
         {
             SecurityProperties securityProperties = new SecurityProperties();
-            securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "1234567890".toCharArray());
+            securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
             securityProperties.setCallbackHandler(new org.swssf.test.CallbackHandlerImpl());
             Document document = doInboundSecurity(securityProperties, new CustomW3CDOMStreamReader(securedDocument));
 
@@ -427,7 +427,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             SecurityProperties securityProperties = new SecurityProperties();
             Constants.Action[] actions = new Constants.Action[]{Constants.Action.ENCRYPT};
             securityProperties.setOutAction(actions);
-            securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "1234567890".toCharArray());
+            securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
             securityProperties.setEncryptionUser("receiver");
             securityProperties.setEncryptionKeyIdentifierType(Constants.KeyIdentifierType.BST_DIRECT_REFERENCE);
 
@@ -477,7 +477,7 @@ public class EncDecryptionTest extends AbstractTestBase {
         //done encryption; now test decryption:
         {
             SecurityProperties securityProperties = new SecurityProperties();
-            securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "1234567890".toCharArray());
+            securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
             securityProperties.setCallbackHandler(new org.swssf.test.CallbackHandlerImpl());
             Document document = doInboundSecurity(securityProperties, new CustomW3CDOMStreamReader(securedDocument));
 
@@ -500,7 +500,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             SecurityProperties securityProperties = new SecurityProperties();
             Constants.Action[] actions = new Constants.Action[]{Constants.Action.ENCRYPT};
             securityProperties.setOutAction(actions);
-            securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "1234567890".toCharArray());
+            securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
             securityProperties.setEncryptionUser("receiver");
             securityProperties.setEncryptionKeyIdentifierType(Constants.KeyIdentifierType.BST_EMBEDDED);
 
@@ -526,7 +526,7 @@ public class EncDecryptionTest extends AbstractTestBase {
         //done encryption; now test decryption:
         {
             SecurityProperties securityProperties = new SecurityProperties();
-            securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "1234567890".toCharArray());
+            securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
             securityProperties.setCallbackHandler(new org.swssf.test.CallbackHandlerImpl());
             Document document = doInboundSecurity(securityProperties, new ByteArrayInputStream(baos.toByteArray()));
 
@@ -549,7 +549,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             SecurityProperties securityProperties = new SecurityProperties();
             Constants.Action[] actions = new Constants.Action[]{Constants.Action.ENCRYPT};
             securityProperties.setOutAction(actions);
-            securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "1234567890".toCharArray());
+            securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
             securityProperties.setEncryptionUser("receiver");
             securityProperties.setEncryptionKeyIdentifierType(Constants.KeyIdentifierType.X509_KEY_IDENTIFIER);
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml");
@@ -598,7 +598,7 @@ public class EncDecryptionTest extends AbstractTestBase {
         //done encryption; now test decryption:
         {
             SecurityProperties securityProperties = new SecurityProperties();
-            securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "1234567890".toCharArray());
+            securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
             securityProperties.setCallbackHandler(new org.swssf.test.CallbackHandlerImpl());
             Document document = doInboundSecurity(securityProperties, new CustomW3CDOMStreamReader(securedDocument));
 
@@ -621,7 +621,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             SecurityProperties securityProperties = new SecurityProperties();
             Constants.Action[] actions = new Constants.Action[]{Constants.Action.ENCRYPT};
             securityProperties.setOutAction(actions);
-            securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "1234567890".toCharArray());
+            securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
             securityProperties.setEncryptionUser("receiver");
             securityProperties.setEncryptionKeyIdentifierType(Constants.KeyIdentifierType.SKI_KEY_IDENTIFIER);
 
@@ -671,7 +671,7 @@ public class EncDecryptionTest extends AbstractTestBase {
         //done encryption; now test decryption:
         {
             SecurityProperties securityProperties = new SecurityProperties();
-            securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "1234567890".toCharArray());
+            securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
             securityProperties.setCallbackHandler(new org.swssf.test.CallbackHandlerImpl());
             Document document = doInboundSecurity(securityProperties, new CustomW3CDOMStreamReader(securedDocument));
 
@@ -694,7 +694,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             SecurityProperties securityProperties = new SecurityProperties();
             Constants.Action[] actions = new Constants.Action[]{Constants.Action.ENCRYPT};
             securityProperties.setOutAction(actions);
-            securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "1234567890".toCharArray());
+            securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
             securityProperties.setEncryptionUser("receiver");
             securityProperties.setEncryptionKeyIdentifierType(Constants.KeyIdentifierType.THUMBPRINT_IDENTIFIER);
 
@@ -744,7 +744,7 @@ public class EncDecryptionTest extends AbstractTestBase {
         //done encryption; now test decryption:
         {
             SecurityProperties securityProperties = new SecurityProperties();
-            securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "1234567890".toCharArray());
+            securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
             securityProperties.setCallbackHandler(new org.swssf.test.CallbackHandlerImpl());
             Document document = doInboundSecurity(securityProperties, new CustomW3CDOMStreamReader(securedDocument));
 
@@ -767,7 +767,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             SecurityProperties securityProperties = new SecurityProperties();
             Constants.Action[] actions = new Constants.Action[]{Constants.Action.ENCRYPT};
             securityProperties.setOutAction(actions);
-            securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "1234567890".toCharArray());
+            securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
             securityProperties.setEncryptionUser("receiver");
             securityProperties.setEncryptionKeyIdentifierType(Constants.KeyIdentifierType.ISSUER_SERIAL);
 
@@ -800,7 +800,7 @@ public class EncDecryptionTest extends AbstractTestBase {
         //done encryption; now test decryption:
         {
             SecurityProperties securityProperties = new SecurityProperties();
-            securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "1234567890".toCharArray());
+            securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
             securityProperties.setCallbackHandler(new org.swssf.test.CallbackHandlerImpl());
             Document document = doInboundSecurity(securityProperties, new ByteArrayInputStream(baos.toByteArray()));
 

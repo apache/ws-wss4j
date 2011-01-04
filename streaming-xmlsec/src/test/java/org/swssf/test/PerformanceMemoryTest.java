@@ -53,9 +53,9 @@ public class PerformanceMemoryTest extends AbstractTestBase {
         SecurityProperties securityProperties = new SecurityProperties();
         securityProperties.setCallbackHandler(new CallbackHandlerImpl());
         securityProperties.setEncryptionUser("receiver");
-        securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "1234567890".toCharArray());
+        securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
         securityProperties.setSignatureUser("transmitter");
-        securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "1234567890".toCharArray());
+        securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
         Constants.Action[] actions = new Constants.Action[]{Constants.Action.ENCRYPT};
         securityProperties.setOutAction(actions);
         securityProperties.setTimestampTTL(60 * 60 * 24 * 7); //a week for testing:)
@@ -363,7 +363,7 @@ public class PerformanceMemoryTest extends AbstractTestBase {
 
     private int doStreamingInSecurity(File input) throws Exception {
         SecurityProperties inSecurityProperties = new SecurityProperties();
-        inSecurityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "1234567890".toCharArray());
+        inSecurityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
         inSecurityProperties.setCallbackHandler(new CallbackHandlerImpl());
 
         InboundXMLSec xmlSec = WSSec.getInboundXMLSec(inSecurityProperties);
