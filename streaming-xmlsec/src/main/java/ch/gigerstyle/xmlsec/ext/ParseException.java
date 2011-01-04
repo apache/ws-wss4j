@@ -15,6 +15,8 @@
 package ch.gigerstyle.xmlsec.ext;
 
 /**
+ * Exception for the self made XML parsing.
+ * This self made parsing is ugly and will be replaced in future.
  * @author $Author$
  * @version $Revision$ $Date$
  */

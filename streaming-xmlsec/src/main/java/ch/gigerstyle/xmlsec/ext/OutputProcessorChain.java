@@ -18,28 +18,47 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.XMLEvent;
 
 /**
+ * The OutputProcessorChain manages the OutputProcessors and controls the XMLEvent flow
  * @author $Author$
  * @version $Revision$ $Date$
  */
 public interface OutputProcessorChain extends ProcessorChain {
 
-    public SecurityContext getSecurityContext();
-
+    /**
+     * Adds an OutputProcessor to the chain. The place where it
+     * will be applied can be controlled through the Phase,
+     * getBeforeProcessors and getAfterProcessors. @see Interface OutputProcessor
+     * @param outputProcessor The OutputProcessor which should be placed in the chain
+     */
     public void addProcessor(OutputProcessor outputProcessor);
 
+    /**
+     * Removes the specified OutputProcessor from this chain.
+     * @param outputProcessor to remove
+     */
     public void removeProcessor(OutputProcessor outputProcessor);
 
     /**
-     * Creates a subchain starts with the outputProcessor + 1
-     * Holding a reference to a subchain in a processor and access it in different methods is
-     * strictly forbidden. Abusing this rule leads to undefined state (Most probably to a ArrayIndexOutOfBounds exception)
-     *
-     * @param outputProcessor
-     * @return
-     * @throws XMLStreamException
-     * @throws XMLSecurityException
+     * The actual processed document's security context
+     * @return The SecurityContext
+     */
+    public SecurityContext getSecurityContext();
+
+    /**
+     * Create a new SubChain. The XMLEvents will be only be processed from the given OutputProcessor to the end.
+     * All earlier OutputProcessors don't get these events. In other words the chain will be splitted in two parts.
+     * @param outputProcessor The OutputProcessor position the XMLEvents should be processed over this SubChain.
+     * @return A new OutputProcessorChain
+     * @throws XMLStreamException thrown when a streaming error occurs
+     * @throws XMLSecurityException thrown when a Security failure occurs
      */
     public OutputProcessorChain createSubChain(OutputProcessor outputProcessor) throws XMLStreamException, XMLSecurityException;
 
+    /**
+     * Forwards the XMLEvent to the next processor in the chain.
+     * @param xmlEvent The XMLEvent which should be forwarded to the next processor
+     * @throws XMLStreamException thrown when a streaming error occurs
+     * @throws XMLSecurityException thrown when a Security failure occurs
+     */
     public void processEvent(XMLEvent xmlEvent) throws XMLStreamException, XMLSecurityException;
 }

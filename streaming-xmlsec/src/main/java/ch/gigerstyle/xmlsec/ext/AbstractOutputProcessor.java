@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
+ * An abstract OutputProcessor class for reusabilty
  * @author $Author$
  * @version $Revision$ $Date$
  */

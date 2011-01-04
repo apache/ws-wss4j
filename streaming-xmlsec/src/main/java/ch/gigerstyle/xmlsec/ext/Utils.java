@@ -29,6 +29,11 @@ public class Utils {
     private Utils() {
     }
 
+    /**
+     * Returns the Id reference without the leading #
+     * @param reference The reference on which to drop the #
+     * @return The reference without a leading # 
+     */
     public static String dropReferenceMarker(String reference) {
         if (reference.startsWith("#")) {
             return reference.substring(1);
@@ -36,6 +41,11 @@ public class Utils {
         return reference;
     }
 
+    /**
+     * Returns the XMLEvent type in String form
+     * @param xmlEvent
+     * @return The XMLEvent type as string representation
+     */
     public static String getXMLEventAsString(XMLEvent xmlEvent) {
         int eventType = xmlEvent.getEventType();
 
@@ -65,6 +75,12 @@ public class Utils {
         }
     }
 
+    /**
+     * Executes the Callback handling. Typically used to fetch passwords 
+     * @param callbackHandler
+     * @param callback
+     * @throws XMLSecurityException if the callback couldn't be executed
+     */
     public static void doCallback(CallbackHandler callbackHandler, Callback callback) throws XMLSecurityException {
         try {
             Callback[] callbacks = new Callback[]{callback};

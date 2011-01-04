@@ -20,6 +20,7 @@ import ch.gigerstyle.xmlsec.securityEvent.SecurityEventListener;
 import java.util.List;
 
 /**
+ * The document security context
  * @author $Author$
  * @version $Revision$ $Date$
  */
@@ -33,11 +34,30 @@ public interface SecurityContext {
 
     public <T> List<T> getAsList(Class key);
 
+    /**
+     * Register a new SecurityTokenProvider.
+     * @param id A unique id
+     * @param securityTokenProvider The actual SecurityTokenProvider to register.
+     */
     public void registerSecurityTokenProvider(String id, SecurityTokenProvider securityTokenProvider);
 
+    /**
+     * Returns a registered SecurityTokenProvider with the given id or null if not found
+     * @param id The SecurityTokenProvider's id
+     * @return The SecurityTokenProvider
+     */
     public SecurityTokenProvider getSecurityTokenProvider(String id);
 
+    /**
+     * Registers a SecurityEventListener to receive Security-Events
+     * @param securityEventListener The SecurityEventListener 
+     */
     public void setSecurityEventListener(SecurityEventListener securityEventListener);
 
+    /**
+     * Registers a SecurityEvent which will be forwarded to the registered SecurityEventListener  
+     * @param securityEvent The security event for the SecurityEventListener
+     * @throws XMLSecurityException when the event will not be accepted (e.g. policy-violation)
+     */
     public void registerSecurityEvent(SecurityEvent securityEvent) throws XMLSecurityException;
 }

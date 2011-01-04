@@ -29,6 +29,7 @@ import javax.xml.stream.events.XMLEvent;
 import java.util.*;
 
 /**
+ * Custom XMLStreamWriter to map XMLStreamWriter method calls into XMLEvent's
  * @author $Author$
  * @version $Revision$ $Date$
  */

@@ -35,6 +35,8 @@ import java.util.*;
 /**
  * todo this class needs some love...
  *
+ * An extended XMLEventAllocator to collect namespaces and C14N relevant attributes
+ *
  * @author $Author$
  * @version $Revision$ $Date$
  */

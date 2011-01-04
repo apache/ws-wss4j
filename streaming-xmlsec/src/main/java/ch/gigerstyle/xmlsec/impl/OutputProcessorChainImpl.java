@@ -25,6 +25,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
+ * Implementation of a OutputProcessorChain
  * @author $Author$
  * @version $Revision$ $Date$
  */

@@ -18,6 +18,8 @@ import java.security.Key;
 import java.security.PublicKey;
 
 /**
+ * This class represents the different token types which can occur in WS-Security
+ *
  * Sometimes it isn't known (@see EncryptedKeyInputProcessor) which kind of Token(Asymmetric, Symmetric)
  * we have at creation time. So we use a generic interface for both types.
  *
@@ -26,17 +28,48 @@ import java.security.PublicKey;
  */
 public interface SecurityToken {
 
+    /**
+     * Returns the token type
+     * @return true if asymmetric token, false if symmetric token
+     */
     public boolean isAsymmetric();
 
+    /**
+     * Returns the secret key
+     * @param algorithmURI for the requested key
+     * @return The requested key for the specified algorithmURI, or null if no matching key is found
+     * @throws XMLSecurityException if the key can't be loaded
+     */
     public Key getSecretKey(String algorithmURI) throws XMLSecurityException;
 
+    /**
+     * Returns the public key if one exist for this token type
+     * @return The Public-Key for asymmetric algorithms
+     * @throws XMLSecurityException if the key can't be loaded
+     */
     public PublicKey getPublicKey() throws XMLSecurityException;
 
+    /**
+     * Verifies the key if applicable
+     * @throws XMLSecurityException if the key couldn't be verified or the key isn't valid
+     */
     public void verify() throws XMLSecurityException;
 
+    /**
+     * Returns the key wrapping token
+     * @return The wrapping SecurityToken
+     */
     public SecurityToken getKeyWrappingToken();
 
+    /**
+     * Returns the Key wrapping token's algorithm
+     * @return the KeyWrappingToken algorithm
+     */
     public String getKeyWrappingTokenAlgorithm();
 
+    /**
+     * Returns the KeyIdentifierType
+     * @return the KeyIdentifierType
+     */
     public Constants.KeyIdentifierType getKeyIdentifierType();
 }

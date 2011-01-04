@@ -22,6 +22,7 @@ import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 
 /**
+ * Prozessor for the ReferenceList XML Structure 
  * @author $Author$
  * @version $Revision$ $Date$
  */
@@ -38,6 +39,8 @@ public class ReferenceListInputProcessor extends AbstractInputProcessor {
     public XMLEvent processNextHeaderEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
         XMLEvent xmlEvent = inputProcessorChain.processHeaderEvent();
 
+        //parse the ReferenceList XML Structure
+        //this is ugly and will be replaced with a better implementation
         boolean isFinishedcurrentReferenceList = false;
 
         if (currentReferenceList != null) {
@@ -53,6 +56,7 @@ public class ReferenceListInputProcessor extends AbstractInputProcessor {
 
         if (currentReferenceList != null && isFinishedcurrentReferenceList) {
             try {
+                //instantiate a new DecryptInputProcessor and add it to the chain
                 inputProcessorChain.addProcessor(new DecryptInputProcessor(currentReferenceList, getSecurityProperties()));
             } finally {
                 inputProcessorChain.removeProcessor(this);

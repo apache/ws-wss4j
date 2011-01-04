@@ -23,6 +23,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
+ * An abstract InputProcessor class for reusabilty
  * @author $Author$
  * @version $Revision$ $Date$
  */

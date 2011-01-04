@@ -17,12 +17,21 @@ package ch.gigerstyle.xmlsec.ext;
 import javax.xml.stream.XMLStreamException;
 
 /**
+ * Basic interface for Output- and Input-Processor chains 
  * @author $Author$
  * @version $Revision$ $Date$
  */
 public interface ProcessorChain {
 
+    /**
+     * resets the chain so that the next event will go again to the first processor in the chain.
+     */
     public void reset();
 
+    /**
+     * Will finally be called when the whole document is processed
+     * @throws XMLStreamException thrown when a streaming error occurs
+     * @throws XMLSecurityException thrown when a Security failure occurs
+     */
     public void doFinal() throws XMLStreamException, XMLSecurityException;
 }

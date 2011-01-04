@@ -25,6 +25,7 @@ import java.io.Writer;
 import java.util.List;
 
 /**
+ * A Customized XMLEvent class to provide all Namespaces and Attributes from the current scope
  * @author $Author$
  * @version $Revision$ $Date$
  */
@@ -40,10 +41,18 @@ public class XMLEventNS implements XMLEvent {
         this.attributeList = attributeList;
     }
 
+    /**
+     * Returns all Namespaces in the current scope
+     * @return The Namespaces as List
+     */
     public List<ComparableNamespace>[] getNamespaceList() {
         return namespaceList;
     }
 
+    /**
+     * Returns all C14N relevant Attributes in the current scope
+     * @return The Attributes as List
+     */
     public List<ComparableAttribute>[] getAttributeList() {
         return attributeList;
     }

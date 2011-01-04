@@ -22,6 +22,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.XMLEvent;
 
 /**
+ * Processor to generate SecurityEvents regarding not secured elements
  * @author $Author$
  * @version $Revision$ $Date$
  */

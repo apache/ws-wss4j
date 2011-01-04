@@ -15,6 +15,7 @@
 package ch.gigerstyle.xmlsec.policy;
 
 /**
+ * Exception for PolicyViolation 
  * @author $Author$
  * @version $Revision$ $Date$
  */

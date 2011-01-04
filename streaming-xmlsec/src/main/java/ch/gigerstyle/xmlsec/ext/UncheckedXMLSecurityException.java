@@ -15,6 +15,7 @@
 package ch.gigerstyle.xmlsec.ext;
 
 /**
+ * Unchecked Exception to mark uncaught-exceptions in threads
  * @author $Author$
  * @version $Revision$ $Date$
  */

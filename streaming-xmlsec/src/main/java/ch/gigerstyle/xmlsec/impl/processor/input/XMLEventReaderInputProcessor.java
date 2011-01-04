@@ -21,6 +21,8 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.XMLEvent;
 
 /**
+ * The XMLEventReaderInputProcessor reads requested XMLEvents from the original XMLEventReader
+ * and returns them to the requestor  
  * @author $Author$
  * @version $Revision$ $Date$
  */

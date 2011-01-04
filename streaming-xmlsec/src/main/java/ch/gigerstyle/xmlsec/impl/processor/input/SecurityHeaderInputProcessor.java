@@ -24,6 +24,8 @@ import java.io.PrintWriter;
 import java.util.ArrayDeque;
 
 /**
+ * Processor for the Security-Header XML Structure.
+ * This processor instantiates more processors on demand 
  * @author $Author$
  * @version $Revision$ $Date$
  */
@@ -46,6 +48,7 @@ public class SecurityHeaderInputProcessor extends AbstractInputProcessor {
     @Override
     public XMLEvent processNextEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
 
+        //buffer all events until the end of the security header
         InputProcessorChain subInputProcessorChain = inputProcessorChain.createSubChain(this);
         InternalSecurityHeaderBufferProcessor internalSecurityHeaderBufferProcessor = new InternalSecurityHeaderBufferProcessor(getSecurityProperties());
         subInputProcessorChain.addProcessor(internalSecurityHeaderBufferProcessor);
@@ -69,7 +72,8 @@ public class SecurityHeaderInputProcessor extends AbstractInputProcessor {
 
                 } else if (subInputProcessorChain.getDocumentContext().getDocumentLevel() == 4
                         && subInputProcessorChain.getDocumentContext().isInSecurityHeader()) {
-
+                    //we are in the security header and the depth is +1, so every child
+                    //element should have a responsible processor:
                     engageProcessor(subInputProcessorChain, startElement, getSecurityProperties());
                 }
             }
@@ -100,7 +104,7 @@ public class SecurityHeaderInputProcessor extends AbstractInputProcessor {
             }
 
         } while (!(xmlEvent.isStartElement() && xmlEvent.asStartElement().getName().equals(Constants.TAG_soap11_Body)));
-
+        //if we reach this state we didn't find a security header
         throw new XMLSecurityException("No Security");
     }
 
@@ -121,6 +125,9 @@ public class SecurityHeaderInputProcessor extends AbstractInputProcessor {
         }
     }
 
+    /**
+     * Temporary Processor to buffer all events until the end of the security header
+     */
     public class InternalSecurityHeaderBufferProcessor extends AbstractInputProcessor {
 
         InternalSecurityHeaderBufferProcessor(SecurityProperties securityProperties) {
@@ -143,6 +150,9 @@ public class SecurityHeaderInputProcessor extends AbstractInputProcessor {
         }
     }
 
+    /**
+     * Temporary processor to replay the buffered events
+     */
     public class InternalSecurityHeaderReplayProcessor extends AbstractInputProcessor {
 
         private int countOfEventsToResponsibleSecurityHeader = 0;
@@ -177,8 +187,6 @@ public class SecurityHeaderInputProcessor extends AbstractInputProcessor {
                 }
 
                 XMLEvent xmlEvent = xmlEventList.pollLast();
-                xmlEvent.writeAsEncodedUnicode(new PrintWriter(System.out));
-                System.out.flush();
                 if (xmlEvent.isStartElement()) {
                     inputProcessorChain.getDocumentContext().addPathElement(xmlEvent.asStartElement().getName());
                 } else if (xmlEvent.isEndElement()) {

@@ -31,6 +31,8 @@ import org.apache.neethi.PolicyOperator;
 import java.util.*;
 
 /**
+ * The PolicyEnforcer verifies the Policy assertions
+ * The Assertion will be validated in realtime as far as possible
  * @author $Author$
  * @version $Revision$ $Date$
  */
@@ -102,6 +104,11 @@ public class PolicyEnforcer implements SecurityEventListener {
         }
     }
 
+    /**
+     * tries to verify a SecurityEvent in realtime.
+     * @param securityEvent
+     * @throws WSSPolicyException
+     */
     private void verifyPolicy(SecurityEvent securityEvent) throws WSSPolicyException {
 
         Collection<AssertionState> assertionStates = assertionStateMap.get(securityEvent.getSecurityEventType());
@@ -130,6 +137,11 @@ public class PolicyEnforcer implements SecurityEventListener {
         }
     }
 
+    /**
+     * verifies the whole policy to try to find a satisfied alternative
+     * @throws WSSPolicyException throws when the policy is invalid
+     * @throws PolicyViolationException thrown when no alternative could be satisifed
+     */
     private void verifyPolicy() throws WSSPolicyException, PolicyViolationException {
         boolean isAsserted = verifyPolicy(effectivePolicy.getPolicy());
         if (!isAsserted) {
@@ -148,6 +160,7 @@ public class PolicyEnforcer implements SecurityEventListener {
             boolean isAsserted = false;
             for (int i = 0; i < policyComponents.size(); i++) {
                 PolicyComponent curPolicyComponent = policyComponents.get(i);
+                //recursive call until a satistfied alternative is found
                 isAsserted = verifyPolicy(curPolicyComponent);
                 if (isExactlyOne && isAsserted) {
                     return true; //a satisfied alternative is found
@@ -180,7 +193,6 @@ public class PolicyEnforcer implements SecurityEventListener {
     }
 
     //multiple threads can call this method concurrently -> synchronize access
-
     public synchronized void registerSecurityEvent(SecurityEvent securityEvent) throws XMLSecurityException {
 
         if (effectivePolicy != null) {
@@ -215,6 +227,10 @@ public class PolicyEnforcer implements SecurityEventListener {
         }
     }
 
+    /**
+     * the final Policy validation to find a satisfied alternative 
+     * @throws PolicyViolationException if no alternative could be satisfied
+     */
     public void doFinal() throws PolicyViolationException {
         try {
             verifyPolicy();

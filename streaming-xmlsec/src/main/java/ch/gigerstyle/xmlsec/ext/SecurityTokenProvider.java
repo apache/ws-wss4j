@@ -17,10 +17,17 @@ package ch.gigerstyle.xmlsec.ext;
 import ch.gigerstyle.xmlsec.crypto.Crypto;
 
 /**
+ * A SecurityTokenProvider is a object which provides a Token for cryptographic operations
  * @author $Author$
  * @version $Revision$ $Date$
  */
 public interface SecurityTokenProvider {
 
+    /**
+     * Returns the represented SecurityToken of this object
+     * @param crypto The Crypto to use to restore the Token
+     * @return The SecurityToken
+     * @throws XMLSecurityException if the token couldn't be loaded
+     */
     public SecurityToken getSecurityToken(Crypto crypto) throws XMLSecurityException;
 }

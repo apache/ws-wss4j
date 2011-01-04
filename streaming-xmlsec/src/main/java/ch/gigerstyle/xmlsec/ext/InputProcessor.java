@@ -19,24 +19,53 @@ import javax.xml.stream.events.XMLEvent;
 import java.util.Set;
 
 /**
+ * This is the Interface which every InputProcessor must implement.
  * @author $Author$
  * @version $Revision$ $Date$
  */
 public interface InputProcessor {
 
+    /**
+     * This InputProcessor will be added before the processors in this set
+     * @return The set with the named InputProcessors
+     */
     Set<String> getBeforeProcessors();
 
+    /**
+     * This InputProcessor will be added after the processors in this set
+     * @return The set with the named InputProcessors
+     */
     Set<String> getAfterProcessors();
 
+    /**
+     * The Phase in which this InputProcessor should be applied
+     * @return The Phase
+     */
     Constants.Phase getPhase();
 
-    //void processNextSecurityHeaderEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException;
-
-    //void processNextEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException;
-
+    /**
+     * Will be called from the framework when the next security-header XMLEvent is requested
+     * @param inputProcessorChain
+     * @return The next XMLEvent
+     * @throws XMLStreamException thrown when a streaming error occurs
+     * @throws XMLSecurityException thrown when a Security failure occurs                                    
+     */
     XMLEvent processNextHeaderEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException;
 
+    /**
+     * Will be called from the framework when the next XMLEvent is requested
+     * @param inputProcessorChain
+     * @return The next XMLEvent
+     * @throws XMLStreamException thrown when a streaming error occurs
+     * @throws XMLSecurityException thrown when a Security failure occurs
+     */
     XMLEvent processNextEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException;
 
+    /**
+     * Will be called when the whole document is processed. 
+     * @param inputProcessorChain
+     * @throws XMLStreamException thrown when a streaming error occurs
+     * @throws XMLSecurityException thrown when a Security failure occurs
+     */
     void doFinal(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException;
 }

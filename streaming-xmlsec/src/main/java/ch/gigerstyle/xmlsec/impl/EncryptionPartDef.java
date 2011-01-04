@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * EncryptionPartDef holds information about parts to be encrypt 
  * @author $Author$
  * @version $Revision$ $Date$
  */

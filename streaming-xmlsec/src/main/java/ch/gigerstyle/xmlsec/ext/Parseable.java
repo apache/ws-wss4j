@@ -17,17 +17,22 @@ package ch.gigerstyle.xmlsec.ext;
 import javax.xml.stream.events.XMLEvent;
 
 /**
+ * Parseable interface to parse and validate xml
  * @author $Author$
  * @version $Revision$ $Date$
  */
 public interface Parseable {
 
     /**
-     * @param xmlEvent
+     * @param xmlEvent The XMLEvent to parse
      * @return true when current Element is finished
-     * @throws ParseException
+     * @throws ParseException in the case of an unexpected element
      */
     public boolean parseXMLEvent(XMLEvent xmlEvent) throws ParseException;
 
+    /**
+     * Validates the XML-Object structure
+     * @throws ParseException thrown when the the object-structure is invalid
+     */
     public void validate() throws ParseException;
 }

@@ -33,6 +33,7 @@ import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
 
 /**
+ * Factory to create SecurityToken Objects from keys in XML
  * @author $Author$
  * @version $Revision$ $Date$
  */

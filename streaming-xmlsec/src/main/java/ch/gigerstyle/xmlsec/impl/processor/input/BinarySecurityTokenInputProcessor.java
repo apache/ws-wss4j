@@ -24,6 +24,7 @@ import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 
 /**
+ * Prozessor for the BinarySecurityToken XML Structure
  * @author $Author$
  * @version $Revision$ $Date$
  */
@@ -40,6 +41,8 @@ public class BinarySecurityTokenInputProcessor extends AbstractInputProcessor im
     public XMLEvent processNextHeaderEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
         XMLEvent xmlEvent = inputProcessorChain.processHeaderEvent();
 
+        //parse the BinarySecurityToken XML Structure
+        //this is ugly and will be replaced with a better implementation
         boolean isFinishedcurrentBinarySecurityToken = false;
 
         if (currentBinarySecurityTokenType != null) {
@@ -53,6 +56,7 @@ public class BinarySecurityTokenInputProcessor extends AbstractInputProcessor im
             }
         }
 
+        //register the SecurityToken when finished parsing
         if (currentBinarySecurityTokenType != null && isFinishedcurrentBinarySecurityToken) {
             try {
                 if (currentBinarySecurityTokenType.getId() != null) {

@@ -17,6 +17,7 @@ package ch.gigerstyle.xmlsec.impl;
 import java.security.Key;
 
 /**
+ * SignaturePartDef holds information about parts to be signed 
  * @author $Author$
  * @version $Revision$ $Date$
  */

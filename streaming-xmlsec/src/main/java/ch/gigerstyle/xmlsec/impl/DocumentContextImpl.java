@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * A concrete DocumentContext Implementation
  * @author $Author$
  * @version $Revision$ $Date$
  */

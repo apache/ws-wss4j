@@ -25,6 +25,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
+ * Main configuration class to supply keys etc.
+ * This class is subject to change in the future.
+ * Probably we will allow to configure the framework per WSDL
  * @author $Author$
  * @version $Revision$ $Date$
  */
@@ -32,10 +35,18 @@ public class SecurityProperties {
 
     private List<InputProcessor> inputProcessorList = new LinkedList<InputProcessor>();
 
+    /**
+     * Add an additional, non standard, InputProcessor to the chain
+     * @param inputProcessor The InputProcessor to add
+     */
     public void addInputProcessor(InputProcessor inputProcessor) {
         this.inputProcessorList.add(inputProcessor);
     }
 
+    /**
+     * Returns the currently registered additional InputProcessors
+     * @return the List with the InputProcessors
+     */
     public List<InputProcessor> getInputProcessorList() {
         return inputProcessorList;
     }
@@ -66,26 +77,49 @@ public class SecurityProperties {
         return decryptionAliasPassword;
     }
 
+    /**
+     * Returns the decryption keystore
+     * @return A keystore for decryption operation
+     */
     public KeyStore getDecryptionKeyStore() {
         return decryptionKeyStore;
     }
 
+    /**
+     * loads a java keystore from the given url for decrypt operations
+     * @param url The URL to the keystore
+     * @param keyStorePassword The keyStorePassword
+     * @throws Exception thrown if something goes wrong while loading the keystore
+     */
     public void loadDecryptionKeystore(URL url, char[] keyStorePassword) throws Exception {
         KeyStore keyStore = KeyStore.getInstance("jks");
         keyStore.load(url.openStream(), keyStorePassword);
         this.decryptionKeyStore = keyStore;
     }
 
+    /**
+     * Returns the decryption crypto class
+     * @return
+     */
     public Class getDecryptionCryptoClass() {
         return decryptionCryptoClass;
     }
 
+    /**
+     * Sets a custom decryption class
+     * @param decryptionCryptoClass
+     */
     public void setDecryptionCryptoClass(Class decryptionCryptoClass) {
         this.decryptionCryptoClass = decryptionCryptoClass;
     }
 
     //todo caching?
 
+    /**
+     * returns the decryptionCrypto for the key-management
+     * @return A Crypto instance
+     * @throws XMLSecurityException thrown if something goes wrong
+     */
     public Crypto getDecryptionCrypto() throws XMLSecurityException {
 
         if (this.getDecryptionKeyStore() == null) {
@@ -106,10 +140,18 @@ public class SecurityProperties {
         }
     }
 
+    /**
+     * returns the password callback handler
+     * @return
+     */
     public CallbackHandler getCallbackHandler() {
         return callbackHandler;
     }
 
+    /**
+     * sets the password callback handler
+     * @param callbackHandler
+     */
     public void setCallbackHandler(CallbackHandler callbackHandler) {
         this.callbackHandler = callbackHandler;
     }
@@ -125,26 +167,49 @@ public class SecurityProperties {
     private String encryptionKeyTransportAlgorithm;
     private List<SecurePart> encryptionParts = new LinkedList<SecurePart>();
 
+    /**
+     * Returns the encryption keystore
+     * @return A keystore for encryption operation
+     */
     public KeyStore getEncryptionKeyStore() {
         return encryptionKeyStore;
     }
 
+    /**
+     * loads a java keystore from the given url for encrypt operations
+     * @param url The URL to the keystore
+     * @param keyStorePassword The keyStorePassword
+     * @throws Exception thrown if something goes wrong while loading the keystore
+     */
     public void loadEncryptionKeystore(URL url, char[] keyStorePassword) throws Exception {
         KeyStore keyStore = KeyStore.getInstance("jks");
         keyStore.load(url.openStream(), keyStorePassword);
         this.encryptionKeyStore = keyStore;
     }
 
+    /**
+     * Returns the encryption crypto class
+     * @return
+     */
     public Class getEncryptionCryptoClass() {
         return encryptionCryptoClass;
     }
 
+    /**
+     * Sets a custom encryption class
+     * @param encryptionCryptoClass
+     */
     public void setEncryptionCryptoClass(Class encryptionCryptoClass) {
         this.encryptionCryptoClass = encryptionCryptoClass;
     }
 
     //todo caching?
 
+    /**
+     * returns the encryptionCrypto for the key-management
+     * @return A Crypto instance
+     * @throws XMLSecurityException thrown if something goes wrong
+     */
     public Crypto getEncryptionCrypto() throws XMLSecurityException {
         Class encryptionCryptoClass = ch.gigerstyle.xmlsec.crypto.Merlin.class;
         if (this.getEncryptionCryptoClass() != null) {
@@ -160,26 +225,50 @@ public class SecurityProperties {
         }
     }
 
+    /**
+     * Adds a part which must be encrypted by the framework 
+     * @param securePart
+     */
     public void addEncryptionPart(SecurePart securePart) {
         encryptionParts.add(securePart);
     }
 
+    /**
+     * Returns the encryption parts which are actually set
+     * @return A List of SecurePart's
+     */
     public List<SecurePart> getEncryptionSecureParts() {
         return encryptionParts;
     }
 
+    /**
+     * Returns the Encryption-Algo 
+     * @return the Encryption-Algo as String 
+     */
     public String getEncryptionSymAlgorithm() {
         return encryptionSymAlgorithm;
     }
 
+    /**
+     * Specifies the encryption algorithm
+     * @param encryptionSymAlgorithm The algo to use for encryption
+     */
     public void setEncryptionSymAlgorithm(String encryptionSymAlgorithm) {
         this.encryptionSymAlgorithm = encryptionSymAlgorithm;
     }
 
+    /**
+     * Returns the encryption key transport algorithm
+     * @return the key transport algorithm as string
+     */
     public String getEncryptionKeyTransportAlgorithm() {
         return encryptionKeyTransportAlgorithm;
     }
 
+    /**
+     * Specifies the encryption key transport algorithm 
+     * @param encryptionKeyTransportAlgorithm the encryption key transport algorithm as string 
+     */
     public void setEncryptionKeyTransportAlgorithm(String encryptionKeyTransportAlgorithm) {
         this.encryptionKeyTransportAlgorithm = encryptionKeyTransportAlgorithm;
     }
@@ -192,18 +281,34 @@ public class SecurityProperties {
         this.encryptionUseThisCertificate = encryptionUseThisCertificate;
     }
 
+    /**
+     * Returns the alias for the encryption key in the keystore
+     * @return the alias for the encryption key in the keystore as string
+     */
     public String getEncryptionUser() {
         return encryptionUser;
     }
 
+    /**
+     * Specifies the the alias for the encryption key in the keystore
+     * @param encryptionUser the the alias for the encryption key in the keystore as string
+     */
     public void setEncryptionUser(String encryptionUser) {
         this.encryptionUser = encryptionUser;
     }
 
+    /**
+     * returns the KeyIdentifierType which will be used in the secured document
+     * @return The KeyIdentifierType
+     */
     public Constants.KeyIdentifierType getEncryptionKeyIdentifierType() {
         return encryptionKeyIdentifierType;
     }
 
+    /**
+     * Specifies the KeyIdentifierType to use in the secured document
+     * @param encryptionKeyIdentifierType
+     */
     public void setEncryptionKeyIdentifierType(Constants.KeyIdentifierType encryptionKeyIdentifierType) {
         this.encryptionKeyIdentifierType = encryptionKeyIdentifierType;
     }
@@ -303,10 +408,18 @@ public class SecurityProperties {
         this.timestampTTL = timestampTTL;
     }
 
+    /**
+     * Returns the actual set actions
+     * @return The Actions in applied order
+     */
     public Constants.Action[] getOutAction() {
         return outAction;
     }
 
+    /**
+     * Specifies how to secure the document eg. Timestamp, Signature, Encrypt 
+     * @param outAction
+     */
     public void setOutAction(Constants.Action[] outAction) {
         this.outAction = outAction;
     }
@@ -369,10 +482,18 @@ public class SecurityProperties {
 
     private boolean skipDocumentEvents = false;
 
+    /**
+     * Returns if the framework is skipping document-events
+     * @return true if document-events will be skipped, false otherwise
+     */
     public boolean isSkipDocumentEvents() {
         return skipDocumentEvents;
     }
 
+    /**
+     * specifies if the framework should forward Document-Events or not
+     * @param skipDocumentEvents set to true when document events should be discarded, false otherwise
+     */
     public void setSkipDocumentEvents(boolean skipDocumentEvents) {
         this.skipDocumentEvents = skipDocumentEvents;
     }

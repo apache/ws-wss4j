@@ -18,6 +18,7 @@ import javax.xml.namespace.QName;
 import java.util.List;
 
 /**
+ * This class holds per document, context informations 
  * @author $Author$
  * @version $Revision$ $Date$
  */
@@ -84,7 +85,7 @@ public interface DocumentContext {
     /**
      * Specifies that we are now in the security header
      *
-     * @param inSecurityHeader
+     * @param inSecurityHeader set to true when we entering the security header, false otherwise
      */
     public void setInSecurityHeader(boolean inSecurityHeader);
 

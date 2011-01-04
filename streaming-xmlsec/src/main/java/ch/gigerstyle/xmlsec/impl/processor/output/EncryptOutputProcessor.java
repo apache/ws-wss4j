@@ -42,7 +42,7 @@ import java.security.Key;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
-/**
+/** Processor to encrypt XML structures
  * @author $Author$
  * @version $Revision$ $Date$
  */
@@ -59,6 +59,7 @@ public class EncryptOutputProcessor extends AbstractOutputProcessor {
         super(securityProperties);
         secureParts = securityProperties.getEncryptionSecureParts();
 
+        //prepare the symmetric session key for all encryption parts
         String keyAlgorithm = JCEAlgorithmMapper.getJCEKeyAlgorithmFromURI(securityProperties.getEncryptionSymAlgorithm());
         int keyLength = JCEAlgorithmMapper.getKeyLengthFromURI(securityProperties.getEncryptionSymAlgorithm());
         KeyGenerator keyGen = null;
@@ -91,6 +92,7 @@ public class EncryptOutputProcessor extends AbstractOutputProcessor {
 
             //avoid double encryption when child elements matches too
             if (activeInternalEncryptionOutputProcessor == null) {
+                //find an element which matches a user configured securePart
                 Iterator<SecurePart> securePartIterator = secureParts.iterator();
                 while (securePartIterator.hasNext()) {
                     SecurePart securePart = securePartIterator.next();
@@ -130,6 +132,9 @@ public class EncryptOutputProcessor extends AbstractOutputProcessor {
         outputProcessorChain.processEvent(xmlEvent);
     }
 
+    /**
+     * Processor which handles the effective enryption of the data
+     */
     class InternalEncryptionOutputProcessor extends AbstractOutputProcessor {
 
         XMLEventNSAllocator xmlEventNSAllocator;
@@ -154,6 +159,7 @@ public class EncryptOutputProcessor extends AbstractOutputProcessor {
             this.encryptionPartDef = encryptionPartDef;
             this.startElement = startElement;
 
+            //initialize the cipher
             String jceAlgorithm = JCEAlgorithmMapper.translateURItoJCEID(securityProperties.getEncryptionSymAlgorithm());
             Cipher symmetricCipher = Cipher.getInstance(jceAlgorithm);
 
@@ -168,12 +174,15 @@ public class EncryptOutputProcessor extends AbstractOutputProcessor {
             Base64OutputStream base64EncoderStream = new Base64OutputStream(new BufferedOutputStream(characterEventGeneratorOutputStream), true, 76, new byte[]{'\n'});
             base64EncoderStream.write(iv);
 
+            //the trimmer output stream is needed to strip away the dummy wrapping element which must be added 
             cipherOutputStream = new TrimmerOutputStream(new CipherOutputStream(base64EncoderStream, symmetricCipher), 8192, 3, 4);
 
+            //we create a new StAX writer for optimized namespace writing.
             XMLOutputFactory xmlOutputFactory = XMLOutputFactory.newInstance();
             xmlOutputFactory.setProperty(XMLOutputFactory.IS_REPAIRING_NAMESPACES, true);
             //todo encoding?
             xmlEventWriter = xmlOutputFactory.createXMLEventWriter(cipherOutputStream);
+            //we have to output a fake element to workaround text-only encryption:
             xmlEventWriter.add(XMLEventFactory.newFactory().createStartElement(new QName("a"), null, null));
         }
 
@@ -184,11 +193,15 @@ public class EncryptOutputProcessor extends AbstractOutputProcessor {
                 StartElement startElement = xmlEvent.asStartElement();
 
                 if (startElement.getName().equals(this.startElement) && elementCounter == 0) {
+                    //if the user selected element encryption we have to encrypt the current element-event...
                     if (encryptionPartDef.getModifier() == EncryptionPartDef.Modifier.Element) {
                         OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
                         processEventInternal(subOutputProcessorChain);
+                        //encrypt the current element event
                         encryptEvent(xmlEvent);
-                    } else if (encryptionPartDef.getModifier() == EncryptionPartDef.Modifier.Content) {
+
+                    } //...the user selected content encryption, so we let pass this event as usual  
+                    else if (encryptionPartDef.getModifier() == EncryptionPartDef.Modifier.Content) {
                         OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
                         outputAsEvent(subOutputProcessorChain, xmlEvent);
                         processEventInternal(subOutputProcessorChain);
@@ -221,8 +234,11 @@ public class EncryptOutputProcessor extends AbstractOutputProcessor {
                     encryptEvent(xmlEvent);
                 }
             } else {
+                //not an interesting start nor an interesting end element
+                //so encrypt this
                 encryptEvent(xmlEvent);
 
+                //push all buffered encrypted character events through the chain
                 OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
                 Iterator<Characters> charactersIterator = characterEventGeneratorOutputStream.getCharactersBuffer().iterator();
                 while (charactersIterator.hasNext()) {
@@ -237,6 +253,9 @@ public class EncryptOutputProcessor extends AbstractOutputProcessor {
             xmlEventWriter.add(xmlEvent);
         }
 
+        /**
+         * Creates the Data structure around the cipher data
+         */
         private void processEventInternal(OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException {
             Map<QName, String> attributes = new HashMap<QName, String>();
             attributes.put(Constants.ATT_NULL_Id, encryptionPartDef.getEncRefId());
@@ -286,12 +305,15 @@ public class EncryptOutputProcessor extends AbstractOutputProcessor {
         private void doFinalInternal(OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException {
 
             try {
+                //close the event writer to flush all outstanding events to the encrypt stream
                 xmlEventWriter.close();
+                //call close to force a cipher.doFinal()
                 cipherOutputStream.close();
             } catch (IOException e) {
                 throw new XMLStreamException(e);
             }
 
+            //push all buffered encrypted character events through the chain
             Iterator<Characters> charactersIterator = characterEventGeneratorOutputStream.getCharactersBuffer().iterator();
             while (charactersIterator.hasNext()) {
                 Characters characters = charactersIterator.next();
@@ -305,6 +327,9 @@ public class EncryptOutputProcessor extends AbstractOutputProcessor {
         }
     }
 
+    /**
+     * Creates Character-XMLEvents from the byte stream
+     */
     class CharacterEventGeneratorOutputStream extends OutputStream {
 
         private List<Characters> charactersBuffer = new Vector<Characters>();

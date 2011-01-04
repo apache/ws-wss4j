@@ -17,6 +17,7 @@ package ch.gigerstyle.xmlsec.ext;
 import javax.xml.namespace.QName;
 
 /**
+ * Constants for global use
  * @author $Author$
  * @version $Revision$ $Date$
  */

@@ -29,6 +29,8 @@ import javax.xml.stream.events.*;
 import java.util.Iterator;
 
 /**
+ * A custom implementation of a XMLStreamReader to get back from the XMLEventReader world
+ * to XMLStreamReader 
  * @author $Author$
  * @version $Revision$ $Date$
  */

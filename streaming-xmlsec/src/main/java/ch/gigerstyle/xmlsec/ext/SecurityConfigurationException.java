@@ -15,6 +15,7 @@
 package ch.gigerstyle.xmlsec.ext;
 
 /**
+ * Exception when configuration errors are detected
  * @author $Author$
  * @version $Revision$ $Date$
  */

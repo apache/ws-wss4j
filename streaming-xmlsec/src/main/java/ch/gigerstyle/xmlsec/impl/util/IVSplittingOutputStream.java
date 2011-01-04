@@ -24,6 +24,9 @@ import java.security.InvalidKeyException;
 import java.security.Key;
 
 /**
+ * IV splitting from the first few bytes in the stream.
+ * When the iv is completely received the cipher will be initialized
+ * and this output stream will be removed from chain of output streams
  * @author $Author$
  * @version $Revision$ $Date$
  */

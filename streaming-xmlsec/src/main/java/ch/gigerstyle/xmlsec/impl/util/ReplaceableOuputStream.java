@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 /**
+ * A OutputStream which allows to replace another chained output-stream
  * @author $Author$
  * @version $Revision$ $Date$
  */

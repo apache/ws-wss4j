@@ -23,6 +23,8 @@ import javax.xml.stream.events.XMLEvent;
 import java.io.OutputStream;
 
 /**
+ * Processor which outputs the XMLEvents to an outputStream
+ * This Processor can be extended to allow to write to a StAX writer instead of directly to an output stream 
  * @author $Author$
  * @version $Revision$ $Date$
  */

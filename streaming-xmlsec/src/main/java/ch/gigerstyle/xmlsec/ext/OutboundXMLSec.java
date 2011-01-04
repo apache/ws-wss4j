@@ -22,6 +22,8 @@ import javax.xml.stream.XMLStreamWriter;
 import java.io.OutputStream;
 
 /**
+ * Outbound Streaming-WebService-Security
+ * An instance of this class can be retrieved over the XMLSec class 
  * @author $Author$
  * @version $Revision$ $Date$
  */
@@ -33,6 +35,13 @@ public class OutboundXMLSec {
         this.securityProperties = securityProperties;
     }
 
+    /**
+     * This method is the entry point for the incoming security-engine.
+     * Hand over the original XMLStreamReader and use the returned one for further processing
+     * @param outputStream The original outputStream
+     * @return A new XMLStreamWriter which does transparently the security processing.
+     * @throws XMLSecurityException thrown when a Security failure occurs
+     */
     public XMLStreamWriter processOutMessage(OutputStream outputStream) throws XMLSecurityException {
 
         final SecurityContextImpl securityContextImpl = new SecurityContextImpl();

@@ -33,6 +33,7 @@ import java.security.*;
 import java.util.Hashtable;
 
 /**
+ * Prozessor for the EncryptedKey XML Structure
  * @author $Author$
  * @version $Revision$ $Date$
  */
@@ -67,6 +68,8 @@ public class EncryptedKeyInputProcessor extends AbstractInputProcessor {
     public XMLEvent processNextHeaderEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
         XMLEvent xmlEvent = inputProcessorChain.processHeaderEvent();
 
+        //parse the EncryptedKey XML Structure
+        //this is ugly and will be replaced with a better implementation
         boolean isFinishedcurrentEncryptedKey = false;
 
         if (currentEncryptedKeyType != null) {
@@ -81,7 +84,7 @@ public class EncryptedKeyInputProcessor extends AbstractInputProcessor {
         }
 
         if (currentEncryptedKeyType != null && isFinishedcurrentEncryptedKey) {
-
+            //decrypt the containing token and register it as a new SecurityToken:
             try {
                 final String algorithmURI = currentEncryptedKeyType.getEncryptionMethod().getAlgorithm();
                 String asyncEncAlgo = JCEAlgorithmMapper.translateURItoJCEID(algorithmURI);
@@ -140,10 +143,12 @@ public class EncryptedKeyInputProcessor extends AbstractInputProcessor {
                             };
                         }
                     };
-
+                    //register the key token for decryption:
                     inputProcessorChain.getSecurityContext().registerSecurityTokenProvider(currentEncryptedKeyType.getId(), securityTokenProvider);
                 }
 
+                //if this EncryptedKey structure contains a reference list, instantiate a new DecryptInputProcessor
+                //and add it to the chain
                 if (currentEncryptedKeyType.getReferenceList() != null) {
                     inputProcessorChain.addProcessor(new DecryptInputProcessor(currentEncryptedKeyType.getReferenceList(), getSecurityProperties()));
                 }

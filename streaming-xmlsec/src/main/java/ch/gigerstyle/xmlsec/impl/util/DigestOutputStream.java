@@ -21,6 +21,7 @@ import java.io.OutputStream;
 import java.security.MessageDigest;
 
 /**
+ * A Streaming based message-digest implementation
  * @author $Author$
  * @version $Revision$ $Date$
  */

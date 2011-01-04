@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 /**
+ * Trimms the start and the end of a stream 
  * @author $Author$
  * @version $Revision$ $Date$
  */

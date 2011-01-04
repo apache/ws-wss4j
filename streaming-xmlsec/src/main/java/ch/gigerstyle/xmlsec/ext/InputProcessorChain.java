@@ -18,24 +18,61 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.XMLEvent;
 
 /**
+ * The InputProcessorChain manages the InputProcessors and controls the XMLEvent flow
  * @author $Author$
  * @version $Revision$ $Date$
  */
 public interface InputProcessorChain extends ProcessorChain {
 
+    /**
+     * Adds an InputProcessor to the chain. The place where it
+     * will be applied can be controlled through the Phase,
+     * getBeforeProcessors and getAfterProcessors. @see Interface InputProcessor
+     * @param inputProcessor The InputProcessor which should be placed in the chain
+     */
     public void addProcessor(InputProcessor inputProcessor);
 
+    /**
+     * Removes the specified InputProcessor from this chain.
+     * @param inputProcessor to remove
+     */
     public void removeProcessor(InputProcessor inputProcessor);
 
+    /**
+     * The actual processed document's security context
+     * @return The SecurityContext
+     */
     public SecurityContext getSecurityContext();
 
+    /**
+     * The actual processed document's document context 
+     * @return The DocumentContext 
+     */
     public DocumentContext getDocumentContext();
 
+    /**
+     * Create a new SubChain. The XMLEvents will be only be processed from the given InputProcessor to the end.
+     * All earlier InputProcessors don't get these events. In other words the chain will be splitted in two parts.  
+     * @param inputProcessor The InputProcessor position the XMLEvents should be processed over this SubChain.
+     * @return A new InputProcessorChain
+     * @throws XMLStreamException thrown when a streaming error occurs
+     * @throws XMLSecurityException thrown when a Security failure occurs
+     */
     public InputProcessorChain createSubChain(InputProcessor inputProcessor) throws XMLStreamException, XMLSecurityException;
 
-    //public void processSecurityHeaderEvent(XMLEvent xmlEvent) throws XMLStreamException, XMLSecurityException;
-
+    /**
+     * Requests the next security header XMLEvent from the next processor in the chain.
+     * @return The next XMLEvent from the previous processor
+     * @throws XMLStreamException thrown when a streaming error occurs
+     * @throws XMLSecurityException thrown when a Security failure occurs
+     */
     public XMLEvent processHeaderEvent() throws XMLStreamException, XMLSecurityException;
 
+    /**
+     * Requests the next XMLEvent from the next processor in the chain.
+     * @return The next XMLEvent from the previous processor
+     * @throws XMLStreamException thrown when a streaming error occurs
+     * @throws XMLSecurityException thrown when a Security failure occurs
+     */
     public XMLEvent processEvent() throws XMLStreamException, XMLSecurityException;
 }

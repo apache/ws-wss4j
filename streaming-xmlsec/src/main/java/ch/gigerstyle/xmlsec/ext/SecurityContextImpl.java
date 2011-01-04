@@ -20,6 +20,7 @@ import ch.gigerstyle.xmlsec.securityEvent.SecurityEventListener;
 import java.util.*;
 
 /**
+ * Concrete security context implementation
  * @author $Author$
  * @version $Revision$ $Date$
  */

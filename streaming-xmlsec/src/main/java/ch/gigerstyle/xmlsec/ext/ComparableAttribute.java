@@ -24,6 +24,7 @@ import javax.xml.stream.events.StartElement;
 import java.io.Writer;
 
 /**
+ * Class to let XML-Attributes be comparable how it is requested by C14N 
  * @author $Author$
  * @version $Revision$ $Date$
  */

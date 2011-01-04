@@ -33,6 +33,8 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
+ * Inbound Streaming-WebService-Security
+ * An instance of this class can be retrieved over the XMLSec class 
  * @author $Author$
  * @version $Revision$ $Date$
  */
@@ -54,11 +56,35 @@ public class InboundXMLSec {
      * xmlInputFactory.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, false);
      * xmlInputFactory.setProperty(XMLInputFactory.IS_COALESCING, false);
      * xmlInputFactory.setProperty(WstxInputProperties.P_MIN_TEXT_SEGMENT, new Integer(8192));
+     *
+     * This method is the entry point for the incoming security-engine.
+     * Hand over the original XMLStreamReader and use the returned one for further processing
+     * @param xmlStreamReader The original XMLStreamReader
+     * @return A new XMLStreamReader which does transparently the security processing.
+     * @throws XMLStreamException thrown when a streaming error occurs
+     * @throws XMLSecurityException thrown when a Security failure occurs
      */
     public XMLStreamReader processInMessage(XMLStreamReader xmlStreamReader) throws XMLStreamException, XMLSecurityException {
         return this.processInMessage(xmlStreamReader, null);
     }
 
+    /**
+     * Warning:
+     * configure your xmlStreamReader correctly. Otherwise you can create a security hole.
+     * At minimum configure the following properties:
+     * xmlInputFactory.setProperty(XMLInputFactory.SUPPORT_DTD, false);
+     * xmlInputFactory.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, false);
+     * xmlInputFactory.setProperty(XMLInputFactory.IS_COALESCING, false);
+     * xmlInputFactory.setProperty(WstxInputProperties.P_MIN_TEXT_SEGMENT, new Integer(8192));
+     *
+     * This method is the entry point for the incoming security-engine.
+     * Hand over the original XMLStreamReader and use the returned one for further processing
+     * @param xmlStreamReader The original XMLStreamReader
+     * @param securityEventListener A SecurityEventListener to receive security-relevant events.
+     * @return A new XMLStreamReader which does transparently the security processing.
+     * @throws XMLStreamException thrown when a streaming error occurs
+     * @throws XMLSecurityException thrown when a Security failure occurs
+     */
     public XMLStreamReader processInMessage(XMLStreamReader xmlStreamReader, SecurityEventListener securityEventListener) throws XMLStreamException, XMLSecurityException {
 
         final SecurityContextImpl securityContextImpl = new SecurityContextImpl();

@@ -38,7 +38,8 @@ import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.*;
 
-/**
+/** Processor buffers encrypted XMLEvents, builds the EncryptedKey Security-Header,
+ * and forwards then the buffered events.
  * @author $Author$
  * @version $Revision$ $Date$
  */
@@ -68,6 +69,9 @@ public class EncryptEndingOutputProcessor extends AbstractOutputProcessor {
 
         OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
 
+        //forward all buffered XMLEvents until the Security Header event occurs,
+        //then build the EncryptedKey Header,
+        //flush the rest of the buffer:
         Iterator<XMLEvent> xmlEventIterator = xmlEventBuffer.descendingIterator();
         while (xmlEventIterator.hasNext()) {
             XMLEvent xmlEvent = xmlEventIterator.next();
@@ -76,6 +80,7 @@ public class EncryptEndingOutputProcessor extends AbstractOutputProcessor {
                 if (startElement.getName().equals(Constants.TAG_wsse_Security)) {
                     subOutputProcessorChain.reset();
                     subOutputProcessorChain.processEvent(xmlEvent);
+                    //call processHeaderEvent() to build the EncryptedKey Header
                     processHeaderEvent(subOutputProcessorChain);
                     continue;
                 }
@@ -92,6 +97,7 @@ public class EncryptEndingOutputProcessor extends AbstractOutputProcessor {
 
         OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
 
+        //fetch the Certificate with the public key for symmetric session key encryption:
         X509Certificate x509Certificate;
         if (getSecurityProperties().getEncryptionUseThisCertificate() != null) {
             x509Certificate = getSecurityProperties().getEncryptionUseThisCertificate();
@@ -107,6 +113,7 @@ public class EncryptEndingOutputProcessor extends AbstractOutputProcessor {
             }
         }
 
+        //the following if-else section builds the key references
         String certUri = "CertId-" + UUID.randomUUID().toString();
         BinarySecurityTokenType referencedBinarySecurityTokenType = null;
         if (getSecurityProperties().getEncryptionKeyIdentifierType() == Constants.KeyIdentifierType.BST_DIRECT_REFERENCE) {
@@ -237,6 +244,7 @@ public class EncryptEndingOutputProcessor extends AbstractOutputProcessor {
         createStartElementAndOutputAsEvent(subOutputProcessorChain, Constants.TAG_xenc_CipherValue, null);
 
         try {
+            //encrypt the symmetric session key with the public key from the receiver:
             String jceid = JCEAlgorithmMapper.translateURItoJCEID(getSecurityProperties().getEncryptionKeyTransportAlgorithm());
             Cipher cipher = Cipher.getInstance(jceid);
             cipher.init(Cipher.ENCRYPT_MODE, x509Certificate);
@@ -247,7 +255,6 @@ public class EncryptEndingOutputProcessor extends AbstractOutputProcessor {
             if (blockSize > 0 && blockSize < ephemeralKey.length) {
                 throw new XMLSecurityException("unsupportedKeyTransp" + " public key algorithm too weak to encrypt symmetric key");
             }
-
             byte[] encryptedEphemeralKey = cipher.doFinal(ephemeralKey);
 
             createCharactersAndOutputAsEvent(subOutputProcessorChain, new String(org.bouncycastle.util.encoders.Base64.encode(encryptedEphemeralKey)));
@@ -269,6 +276,7 @@ public class EncryptEndingOutputProcessor extends AbstractOutputProcessor {
 
         createStartElementAndOutputAsEvent(subOutputProcessorChain, Constants.TAG_xenc_ReferenceList, null);
 
+        //output the references to the encrypted data:
         Iterator<EncryptionPartDef> encryptionPartDefIterator = encryptionPartDefList.iterator();
         while (encryptionPartDefIterator.hasNext()) {
             EncryptionPartDef encryptionPartDef = encryptionPartDefIterator.next();

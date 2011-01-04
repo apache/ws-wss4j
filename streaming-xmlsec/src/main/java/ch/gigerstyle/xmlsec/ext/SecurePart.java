@@ -15,6 +15,7 @@
 package ch.gigerstyle.xmlsec.ext;
 
 /**
+ * Class to describe which and how an element must be secured
  * @author $Author$
  * @version $Revision$ $Date$
  */
@@ -38,6 +39,10 @@ public class SecurePart {
         this.id = id;
     }
 
+    /**
+     * The name of the element to be secured
+     * @return The Element-Local-Name
+     */
     public String getName() {
         return name;
     }
@@ -46,6 +51,10 @@ public class SecurePart {
         this.name = name;
     }
 
+    /**
+     * The namespace of the element to be secured
+     * @return The Element Namespace
+     */
     public String getNamespace() {
         return namespace;
     }
@@ -54,6 +63,10 @@ public class SecurePart {
         this.namespace = namespace;
     }
 
+    /**
+     * The Modifier: Element or Content
+     * @return The String "Element" or "Content"
+     */
     public String getModifier() {
         return modifier;
     }
@@ -62,6 +75,10 @@ public class SecurePart {
         this.modifier = modifier;
     }
 
+    /**
+     * The id of the Element
+     * @return The id
+     */
     public String getId() {
         return id;
     }

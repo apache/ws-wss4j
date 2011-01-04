@@ -21,6 +21,7 @@ import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 
 /**
+ * Processor to build the Security Header structure
  * @author $Author$
  * @version $Revision$ $Date$
  */
