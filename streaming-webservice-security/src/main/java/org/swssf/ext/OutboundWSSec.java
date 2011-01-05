@@ -27,11 +27,11 @@ import java.io.OutputStream;
  * @author $Author: giger $
  * @version $Revision: 281 $ $Date: 2011-01-04 21:15:27 +0100 (Tue, 04 Jan 2011) $
  */
-public class OutboundXMLSec {
+public class OutboundWSSec {
 
     private SecurityProperties securityProperties;
 
-    public OutboundXMLSec(SecurityProperties securityProperties) {
+    public OutboundWSSec(SecurityProperties securityProperties) {
         this.securityProperties = securityProperties;
     }
 
@@ -40,9 +40,9 @@ public class OutboundXMLSec {
      * Hand over the original XMLStreamReader and use the returned one for further processing
      * @param outputStream The original outputStream
      * @return A new XMLStreamWriter which does transparently the security processing.
-     * @throws XMLSecurityException thrown when a Security failure occurs
+     * @throws WSSecurityException thrown when a Security failure occurs
      */
-    public XMLStreamWriter processOutMessage(OutputStream outputStream) throws XMLSecurityException {
+    public XMLStreamWriter processOutMessage(OutputStream outputStream) throws WSSecurityException {
 
         final SecurityContextImpl securityContextImpl = new SecurityContextImpl();
 

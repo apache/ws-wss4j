@@ -15,21 +15,20 @@
 package org.swssf.ext;
 
 /**
- * Unchecked Exception to mark uncaught-exceptions in threads
  * @author $Author: giger $
- * @version $Revision: 281 $ $Date: 2011-01-04 21:15:27 +0100 (Tue, 04 Jan 2011) $
+ * @version $Revision: 272 $ $Date: 2010-12-23 14:30:56 +0100 (Thu, 23 Dec 2010) $
  */
-public class UncheckedXMLSecurityException extends RuntimeException {
+public class WSSecurityException extends Exception {
 
-    public UncheckedXMLSecurityException(String message) {
+    public WSSecurityException(String message) {
         super(message);
     }
 
-    public UncheckedXMLSecurityException(String message, Throwable cause) {
+    public WSSecurityException(String message, Throwable cause) {
         super(message, cause);
     }
 
-    public UncheckedXMLSecurityException(Throwable cause) {
+    public WSSecurityException(Throwable cause) {
         super(cause);
     }
 }

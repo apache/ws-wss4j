@@ -38,13 +38,13 @@ import java.util.List;
  * @author $Author: giger $
  * @version $Revision: 281 $ $Date: 2011-01-04 21:15:27 +0100 (Tue, 04 Jan 2011) $
  */
-public class InboundXMLSec {
+public class InboundWSSec {
 
-    protected static final transient Log log = LogFactory.getLog(InboundXMLSec.class);
+    protected static final transient Log log = LogFactory.getLog(InboundWSSec.class);
 
     private SecurityProperties securityProperties;
 
-    public InboundXMLSec(SecurityProperties securityProperties) {
+    public InboundWSSec(SecurityProperties securityProperties) {
         this.securityProperties = securityProperties;
     }
 
@@ -62,9 +62,9 @@ public class InboundXMLSec {
      * @param xmlStreamReader The original XMLStreamReader
      * @return A new XMLStreamReader which does transparently the security processing.
      * @throws XMLStreamException thrown when a streaming error occurs
-     * @throws XMLSecurityException thrown when a Security failure occurs
+     * @throws WSSecurityException thrown when a Security failure occurs
      */
-    public XMLStreamReader processInMessage(XMLStreamReader xmlStreamReader) throws XMLStreamException, XMLSecurityException {
+    public XMLStreamReader processInMessage(XMLStreamReader xmlStreamReader) throws XMLStreamException, WSSecurityException {
         return this.processInMessage(xmlStreamReader, null);
     }
 
@@ -83,9 +83,9 @@ public class InboundXMLSec {
      * @param securityEventListener A SecurityEventListener to receive security-relevant events.
      * @return A new XMLStreamReader which does transparently the security processing.
      * @throws XMLStreamException thrown when a streaming error occurs
-     * @throws XMLSecurityException thrown when a Security failure occurs
+     * @throws WSSecurityException thrown when a Security failure occurs
      */
-    public XMLStreamReader processInMessage(XMLStreamReader xmlStreamReader, SecurityEventListener securityEventListener) throws XMLStreamException, XMLSecurityException {
+    public XMLStreamReader processInMessage(XMLStreamReader xmlStreamReader, SecurityEventListener securityEventListener) throws XMLStreamException, WSSecurityException {
 
         final SecurityContextImpl securityContextImpl = new SecurityContextImpl();
         securityContextImpl.setSecurityEventListener(securityEventListener);
