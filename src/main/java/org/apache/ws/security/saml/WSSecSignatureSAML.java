@@ -32,21 +32,20 @@ import org.apache.ws.security.message.WSSecSignature;
 import org.apache.ws.security.message.token.Reference;
 import org.apache.ws.security.message.token.SecurityTokenReference;
 import org.apache.ws.security.message.token.X509Security;
+import org.apache.ws.security.saml.ext.AssertionWrapper;
+import org.apache.ws.security.saml.ext.OpenSAMLUtil;
 import org.apache.ws.security.transform.STRTransform;
 import org.apache.ws.security.util.WSSecurityUtil;
 
-import org.opensaml.SAMLAssertion;
-import org.opensaml.SAMLException;
-import org.opensaml.SAMLObject;
-import org.opensaml.SAMLSubject;
-import org.opensaml.SAMLSubjectStatement;
+import org.opensaml.xml.io.MarshallingException;
+import org.opensaml.xml.signature.SignatureException;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.xml.crypto.URIDereferencer;
@@ -57,11 +56,7 @@ import javax.xml.crypto.dsig.SignedInfo;
 import javax.xml.crypto.dsig.XMLSignContext;
 import javax.xml.crypto.dsig.XMLSignatureFactory;
 import javax.xml.crypto.dsig.dom.DOMSignContext;
-import javax.xml.crypto.dsig.keyinfo.KeyInfo;
 import javax.xml.crypto.dsig.keyinfo.KeyInfoFactory;
-import javax.xml.crypto.dsig.keyinfo.KeyValue;
-import javax.xml.crypto.dsig.keyinfo.X509Data;
-import javax.xml.crypto.dsig.keyinfo.X509IssuerSerial;
 import javax.xml.crypto.dsig.spec.C14NMethodParameterSpec;
 import javax.xml.crypto.dsig.spec.ExcC14NParameterSpec;
 
@@ -112,7 +107,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
      * @throws org.apache.ws.security.WSSecurityException
      */
     public Document build(
-        Document doc, Crypto uCrypto, SAMLAssertion assertion, 
+        Document doc, Crypto uCrypto, AssertionWrapper assertion, 
         Crypto iCrypto, String iKeyName, String iKeyPW, WSSecHeader secHeader
     ) throws WSSecurityException {
 
@@ -194,7 +189,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
      * @throws WSSecurityException
      */
     public void prepare(
-        Document doc, Crypto uCrypto, SAMLAssertion assertion, Crypto iCrypto, 
+        Document doc, Crypto uCrypto, AssertionWrapper assertion, Crypto iCrypto, 
         String iKeyName, String iKeyPW, WSSecHeader secHeader
     ) throws WSSecurityException {
 
@@ -217,30 +212,12 @@ public class WSSecSignatureSAML extends WSSecSignature {
         // (includes Subject), then get the _first_ confirmation method only
         // thats if "senderVouches" is true.
         //
-        SAMLSubjectStatement samlSubjS = null;
-        Iterator<?> it = assertion.getStatements();
-        while (it.hasNext()) {
-            SAMLObject so = (SAMLObject) it.next();
-            if (so instanceof SAMLSubjectStatement) {
-                samlSubjS = (SAMLSubjectStatement) so;
-                break;
-            }
-        }
-        SAMLSubject samlSubj = null;
-        if (samlSubjS != null) {
-            samlSubj = samlSubjS.getSubject();
-        }
-        if (samlSubj == null) {
-            throw new WSSecurityException(WSSecurityException.FAILURE,
-                    "invalidSAMLToken", new Object[] { "for Signature" });
-        }
-
         String confirmMethod = null;
-        it = samlSubj.getConfirmationMethods();
-        if (it.hasNext()) {
-            confirmMethod = (String) it.next();
+        List<String> methods = assertion.getConfirmationMethods();
+        if (methods != null && methods.size() > 0) {
+            confirmMethod = methods.get(0);
         }
-        if (SAMLSubject.CONF_SENDER_VOUCHES.equals(confirmMethod)) {
+        if (OpenSAMLUtil.isMethodSenderVouches(confirmMethod)) {
             senderVouches = true;
         }
         //
@@ -270,47 +247,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
                     new Object[] { "for SAML Signature (Key Holder)" }
                 );
             }
-            Element e = samlSubj.getKeyInfo();
-            try {
-                XMLStructure keyInfoStructure = new DOMStructure(e);
-                KeyInfo keyInfo = keyInfoFactory.unmarshalKeyInfo(keyInfoStructure);
-                List<?> list = keyInfo.getContent();
-
-                for (int i = 0; i < list.size(); i++) {
-                    XMLStructure xmlStructure = (XMLStructure) list.get(i);
-                    if (xmlStructure instanceof KeyValue) {
-                        publicKey = ((KeyValue)xmlStructure).getPublicKey();
-                        break;
-                    } else if (xmlStructure instanceof X509Data) {
-                        List<?> x509Data = ((X509Data)xmlStructure).getContent();
-                        for (int j = 0; j < x509Data.size(); j++) {
-                            Object x509obj = x509Data.get(j);
-                            if (x509obj instanceof X509Certificate) {
-                                certs = new X509Certificate[1];
-                                certs[0] = (X509Certificate)x509obj;
-                                break;
-                            } else if (x509obj instanceof X509IssuerSerial) {
-                                String alias = 
-                                    userCrypto.getAliasForX509Cert(
-                                        ((X509IssuerSerial)x509obj).getIssuerName(), 
-                                        ((X509IssuerSerial)x509obj).getSerialNumber()
-                                    );
-                                certs = userCrypto.getCertificates(alias);
-                                break;
-                            }
-                        }
-                    }
-                }
-                // TODO: get alias name for cert, check against username set by
-                // caller
-            } catch (Exception e3) {
-                throw new WSSecurityException(
-                    WSSecurityException.FAILURE,
-                    "invalidSAMLsecurity",
-                    new Object[] { "cannot get certificate (key holder)" },
-                    e3
-                );
-            }
+            certs = userCrypto.getCertificates(user);
             wsDocInfo.setCrypto(userCrypto);
         }
         if ((certs == null || certs.length == 0 || certs[0] == null) 
@@ -389,8 +326,14 @@ public class WSSecSignatureSAML extends WSSecSignature {
 
                 if (WSConstants.X509_KEY_IDENTIFIER == keyIdentifierType) {
                     Element keyId = doc.createElementNS(WSConstants.WSSE_NS, "wsse:KeyIdentifier");
+                    String valueType = null;
+                    if (assertion.getSaml1() != null) {
+                        valueType = WSConstants.WSS_SAML_KI_VALUE_TYPE;
+                    } else if (assertion.getSaml2() != null) {
+                        valueType = WSConstants.WSS_SAML2_KI_VALUE_TYPE;
+                    }
                     keyId.setAttributeNS(
-                        null, "ValueType", WSConstants.WSS_SAML_KI_VALUE_TYPE
+                        null, "ValueType", valueType
                     );
                     keyId.appendChild(doc.createTextNode(assertion.getId()));
                     Element elem = secRefSaml.getElement();
@@ -398,7 +341,11 @@ public class WSSecSignatureSAML extends WSSecSignature {
                 } else {
                     Reference ref = new Reference(doc);
                     ref.setURI("#" + assertion.getId());
-                    ref.setValueType(WSConstants.WSS_SAML_KI_VALUE_TYPE);
+                    if (assertion.getSaml1() != null) {
+                        ref.setValueType(WSConstants.WSS_SAML_KI_VALUE_TYPE);
+                    } else if (assertion.getSaml2() != null) {
+                        ref.setValueType(WSConstants.WSS_SAML2_KI_VALUE_TYPE);
+                    }
                     secRefSaml.setReference(ref);
                 }
                 wsDocInfo.addTokenElement(secRefSaml.getElement());
@@ -434,14 +381,24 @@ public class WSSecSignatureSAML extends WSSecSignature {
             case WSConstants.BST_DIRECT_REFERENCE:
                 Reference ref = new Reference(doc);
                 ref.setURI("#" + assertion.getId());
-                ref.setValueType(WSConstants.WSS_SAML_KI_VALUE_TYPE);
+                if (assertion.getSaml1() != null) {
+                    ref.setValueType(WSConstants.WSS_SAML_KI_VALUE_TYPE);
+                } else if (assertion.getSaml2() != null) {
+                    ref.setValueType(WSConstants.WSS_SAML2_KI_VALUE_TYPE);
+                }
                 secRef.setReference(ref);
                 break;
                 
             case WSConstants.X509_KEY_IDENTIFIER :
                 Element keyId = doc.createElementNS(WSConstants.WSSE_NS, "wsse:KeyIdentifier");
+                String valueType = null;
+                if (assertion.getSaml1() != null) {
+                    valueType = WSConstants.WSS_SAML_KI_VALUE_TYPE;
+                } else if (assertion.getSaml2() != null) {
+                    valueType = WSConstants.WSS_SAML2_KI_VALUE_TYPE;
+                }
                 keyId.setAttributeNS(
-                    null, "ValueType", WSConstants.WSS_SAML_KI_VALUE_TYPE
+                    null, "ValueType", valueType
                 );
                 keyId.appendChild(doc.createTextNode(assertion.getId()));
                 Element elem = secRef.getElement();
@@ -462,9 +419,13 @@ public class WSSecSignatureSAML extends WSSecSignature {
 
         try {
             samlToken = (Element) assertion.toDOM(doc);
-        } catch (SAMLException e2) {
+        } catch (MarshallingException ex) {
             throw new WSSecurityException(
-                WSSecurityException.FAILED_SIGNATURE, "noSAMLdoc", null, e2
+                WSSecurityException.FAILED_SIGNATURE, "noSAMLdoc", null, ex
+            );
+        }  catch (SignatureException ex) {
+            throw new WSSecurityException(
+                WSSecurityException.FAILED_SIGNATURE, "noSAMLdoc", null, ex
             );
         }
         wsDocInfo.addTokenElement(samlToken);

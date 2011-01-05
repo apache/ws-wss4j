@@ -96,10 +96,16 @@ public class WSSecurityEngine {
     public static final QName REFERENCE_LIST = 
         new QName(WSConstants.ENC_NS, WSConstants.REF_LIST_LN);
     /**
-     * <code>saml:Assertion</code> as defined by SAML specification
+     * <code>saml:Assertion</code> as defined by SAML v1.1 specification
      */
     public static final QName SAML_TOKEN = 
         new QName(WSConstants.SAML_NS, WSConstants.ASSERTION_LN);
+    
+    /**
+     * <code>saml:Assertion</code> as defined by SAML v2.0 specification
+     */
+    public static final QName SAML2_TOKEN = 
+        new QName(WSConstants.SAML2_NS, WSConstants.ASSERTION_LN);
 
     /**
      * <code>wsc:DerivedKeyToken</code> as defined by WS-SecureConversation specification

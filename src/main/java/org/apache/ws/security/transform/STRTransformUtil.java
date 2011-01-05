@@ -93,7 +93,8 @@ public class STRTransformUtil {
             if (log.isDebugEnabled()) {
                 log.debug("STR: KeyIdentifier");
             }
-            if (WSConstants.WSS_SAML_KI_VALUE_TYPE.equals(secRef.getKeyIdentifierValueType())) {
+            if (WSConstants.WSS_SAML_KI_VALUE_TYPE.equals(secRef.getKeyIdentifierValueType())
+                || WSConstants.WSS_SAML2_KI_VALUE_TYPE.equals(secRef.getKeyIdentifierValueType())) {
                 return secRef.getKeyIdentifierTokenElement(doc, wsDocInfo, null);
             } else {
                 X509Certificate[] certs = secRef.getKeyIdentifier(wsDocInfo.getCrypto());

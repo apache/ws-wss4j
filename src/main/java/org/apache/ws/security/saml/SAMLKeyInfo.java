@@ -19,7 +19,7 @@
 
 package org.apache.ws.security.saml;
 
-import org.opensaml.SAMLAssertion;
+import org.apache.ws.security.saml.ext.AssertionWrapper;
 
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
@@ -45,23 +45,23 @@ public class SAMLKeyInfo {
     private PublicKey publicKey;
     
     /**
-     * SAMLAssertion
+     * SAMLAssertion wrapper
      */
-    SAMLAssertion assertion;
+    AssertionWrapper assertion;
     
-    public SAMLKeyInfo(SAMLAssertion assertions, X509Certificate[] certs) {
+    public SAMLKeyInfo(AssertionWrapper assertion, X509Certificate[] certs) {
         this.certs = certs;
-        this.assertion = assertions;
+        this.assertion = assertion;
     }
     
-    public SAMLKeyInfo(SAMLAssertion assertions, byte[] secret) {
+    public SAMLKeyInfo(AssertionWrapper assertion, byte[] secret) {
         this.secret = secret;
-        this.assertion = assertions;
+        this.assertion = assertion;
     }
     
-    public SAMLKeyInfo(SAMLAssertion assertions, PublicKey publicKey) {
+    public SAMLKeyInfo(AssertionWrapper assertion, PublicKey publicKey) {
         this.publicKey = publicKey;
-        this.assertion = assertions;
+        this.assertion = assertion;
     }
 
     public X509Certificate[] getCerts() {
@@ -76,7 +76,7 @@ public class SAMLKeyInfo {
         return this.publicKey;
     }
 
-    public SAMLAssertion getAssertion() {
+    public AssertionWrapper getAssertion() {
         return assertion;
     }
 }

@@ -58,8 +58,12 @@ public class WSConstants {
     
     public static final String SAML_NS = "urn:oasis:names:tc:SAML:1.0:assertion";
     public static final String SAMLP_NS = "urn:oasis:names:tc:SAML:1.0:protocol";
+    public static final String SAML2_NS = "urn:oasis:names:tc:SAML:2.0:assertion";
+    public static final String SAMLP2_NS = "urn:oasis:names:tc:SAML:2.0:protocol";
     public static final String WSS_SAML_NS = 
         "http://docs.oasis-open.org/wss/oasis-wss-saml-token-profile-1.0#";
+    public static final String WSS_SAML_NS11 = 
+        "http://docs.oasis-open.org/wss/oasis-wss-saml-token-profile-1.1#";
     
     public static final String URI_SOAP11_ENV =
         "http://schemas.xmlsoap.org/soap/envelope/";
@@ -123,6 +127,7 @@ public class WSConstants {
     public static final String WSSE_LN = "Security";
     public static final String THUMBPRINT ="ThumbprintSHA1";
     public static final String SAML_ASSERTION_ID = "SAMLAssertionID";
+    public static final String SAML2_ASSERTION_ID = "SAMLID";
     public static final String ENC_KEY_VALUE_TYPE = "EncryptedKey";
     public static final String ENC_KEY_SHA1_URI = "EncryptedKeySHA1";
     public static final String SIG_LN = "Signature";
@@ -142,7 +147,6 @@ public class WSConstants {
     public static final String SALT_LN = "Salt";
     public static final String ITERATION_LN = "Iteration";
     public static final String ASSERTION_LN = "Assertion";
-    public static final String WSS_SAML_ASSERTION = "SAMLAssertion-1.1";
     public static final String PW_DIGEST = "PasswordDigest";
     public static final String PW_TEXT = "PasswordText";
     public static final String PW_NONE = "PasswordNone";
@@ -231,6 +235,7 @@ public class WSConstants {
     // Misc
     //
     public static final String WSS_SAML_KI_VALUE_TYPE = WSS_SAML_NS + SAML_ASSERTION_ID;
+    public static final String WSS_SAML2_KI_VALUE_TYPE = WSS_SAML_NS11 + SAML2_ASSERTION_ID;
     public static final String PASSWORD_DIGEST = USERNAMETOKEN_NS + "#PasswordDigest";
     public static final String PASSWORD_TEXT = USERNAMETOKEN_NS + "#PasswordText";
 

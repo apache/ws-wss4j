@@ -56,8 +56,6 @@ public class SecurityTokenReference {
         WSConstants.X509TOKEN_NS + "#X509SubjectKeyIdentifier";
     public static final String THUMB_URI = 
         WSConstants.SOAPMESSAGE_NS11 + "#" + WSConstants.THUMBPRINT;
-    public static final String SAML_ID_URI = 
-        WSConstants.SAMLTOKEN_NS + "#" + WSConstants.SAML_ASSERTION_ID;
     public static final String ENC_KEY_SHA1_URI = 
         WSConstants.SOAPMESSAGE_NS11 + "#" + WSConstants.ENC_KEY_SHA1_URI;
     private static Log log =
@@ -242,8 +240,8 @@ public class SecurityTokenReference {
         //
         // Try to find a SAML Assertion by searching the DOM tree
         //
-        String assertionStr = WSConstants.WSS_SAML_NS + WSConstants.ASSERTION_LN;
-        if (WSConstants.WSS_SAML_KI_VALUE_TYPE.equals(type) || assertionStr.equals(type)) {
+        if (WSConstants.WSS_SAML_KI_VALUE_TYPE.equals(type) 
+            || WSConstants.WSS_SAML2_KI_VALUE_TYPE.equals(type)) {
             Element assertion = 
                 WSSecurityUtil.findSAMLAssertionElementById(
                     doc.getDocumentElement(),
@@ -261,8 +259,9 @@ public class SecurityTokenReference {
         // 
         // Try to find a custom token
         //
-        if (cb != null && (WSConstants.WSC_SCT.equals(type) ||
-            WSConstants.WSS_SAML_KI_VALUE_TYPE.equals(type) || assertionStr.equals(type))) {
+        if (cb != null && (WSConstants.WSC_SCT.equals(type))
+            || WSConstants.WSS_SAML_KI_VALUE_TYPE.equals(type) 
+            || WSConstants.WSS_SAML2_KI_VALUE_TYPE.equals(type)) {
             //try to find a custom token
             WSPasswordCallback pwcb = 
                 new WSPasswordCallback(id, WSPasswordCallback.CUSTOM_TOKEN);
@@ -369,17 +368,12 @@ public class SecurityTokenReference {
         }
     }
     
-
     public void setKeyIdentifierEncKeySHA1(String value) throws WSSecurityException {
         Document doc = element.getOwnerDocument();
         org.w3c.dom.Text text = doc.createTextNode(value);
         createKeyIdentifier(doc, ENC_KEY_SHA1_URI, text, true);
     }
     
-    public void setSAMLKeyIdentifier(String keyIdVal) throws WSSecurityException {
-        Document doc = element.getOwnerDocument();
-        createKeyIdentifier(doc, SAML_ID_URI, doc.createTextNode(keyIdVal), false);
-    }
     public void setKeyIdentifier(String valueType, String keyIdVal) throws WSSecurityException {
         Document doc = element.getOwnerDocument();
         createKeyIdentifier(doc, valueType, doc.createTextNode(keyIdVal), false);

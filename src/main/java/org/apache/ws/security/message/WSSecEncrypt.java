@@ -511,9 +511,12 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
             keyInfo.addUnknownElement(secToken.getElement());
         } else if (keyIdentifierType == WSConstants.EMBEDDED_KEYNAME) {
             keyInfo.addKeyName(embeddedKeyName == null ? user : embeddedKeyName);
-        } else if (SecurityTokenReference.SAML_ID_URI.equals(customReferenceValue)) {
+            // TODO Support SAML2 here
+        } else if (WSConstants.WSS_SAML_KI_VALUE_TYPE.equals(customReferenceValue)) {
             SecurityTokenReference secToken = new SecurityTokenReference(document);
-            secToken.setSAMLKeyIdentifier((encKeyIdDirectId ? "":"#") + encKeyId);
+            secToken.setKeyIdentifier(
+                WSConstants.WSS_SAML_KI_VALUE_TYPE, (encKeyIdDirectId ? "":"#") + encKeyId
+            );
             keyInfo.addUnknownElement(secToken.getElement());
         } else if (securityTokenReference != null) {
             Element tmpE = securityTokenReference.getElement();

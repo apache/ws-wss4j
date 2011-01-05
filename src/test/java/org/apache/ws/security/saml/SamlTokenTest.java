@@ -31,9 +31,8 @@ import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.common.SOAPUtil;
 import org.apache.ws.security.message.WSSecHeader;
 import org.apache.ws.security.message.WSSecSAMLToken;
+import org.apache.ws.security.saml.ext.AssertionWrapper;
 import org.w3c.dom.Document;
-
-import org.opensaml.SAMLAssertion;
 
 import java.util.List;
 
@@ -53,7 +52,7 @@ public class SamlTokenTest extends org.junit.Assert {
     public void testSAMLUnsignedSenderVouches() throws Exception {
         SAMLIssuer saml = SAMLIssuerFactory.getInstance("saml.properties");
 
-        SAMLAssertion assertion = saml.newAssertion();
+        AssertionWrapper assertion = saml.newAssertion();
 
         WSSecSAMLToken wsSign = new WSSecSAMLToken();
 
@@ -75,8 +74,8 @@ public class SamlTokenTest extends org.junit.Assert {
         List<WSSecurityEngineResult> results = verify(unsignedDoc);
         WSSecurityEngineResult actionResult =
             WSSecurityUtil.fetchActionResult(results, WSConstants.ST_UNSIGNED);
-        SAMLAssertion receivedAssertion = 
-            (SAMLAssertion) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+        AssertionWrapper receivedAssertion = 
+            (AssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(receivedAssertion != null);
     }
 

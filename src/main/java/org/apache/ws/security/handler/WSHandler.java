@@ -139,7 +139,7 @@ public abstract class WSHandler {
             decodeSignatureParameter(reqData);
         }
         /*
-         * If we need to handle signed SAML token then we may need the
+         * If we need to handle zsigned SAML token then we may need the
          * Signature parameters. The handle procedure loads the signature crypto
          * file on demand, thus don't do it here.
          */
@@ -270,7 +270,8 @@ public abstract class WSHandler {
             decodeSignatureParameter2(reqData);
         }
         
-        if ((doAction & WSConstants.ST_SIGNED) == WSConstants.ST_SIGNED) {
+        if (((doAction & WSConstants.ST_SIGNED) == WSConstants.ST_SIGNED)
+            || ((doAction & WSConstants.ST_UNSIGNED) == WSConstants.ST_UNSIGNED)) {
             decodeSignatureParameter2(reqData);
         }
         

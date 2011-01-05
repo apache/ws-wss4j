@@ -90,7 +90,8 @@ public class EncryptedKeySTRParser implements STRParser {
         // This method is _not_ recommended by OASIS WS-S specification, X509 profile
         //
         else if (secRef.containsKeyIdentifier()) {
-            if (WSConstants.WSS_SAML_KI_VALUE_TYPE.equals(secRef.getKeyIdentifierValueType())) { 
+            if (WSConstants.WSS_SAML_KI_VALUE_TYPE.equals(secRef.getKeyIdentifierValueType())
+                || WSConstants.WSS_SAML2_KI_VALUE_TYPE.equals(secRef.getKeyIdentifierValueType())) { 
                 Element token = 
                     secRef.getKeyIdentifierTokenElement(strElement.getOwnerDocument(), wsDocInfo, cb);
                 

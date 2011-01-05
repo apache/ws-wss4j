@@ -21,9 +21,13 @@ package org.apache.ws.security.message;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import org.apache.ws.security.saml.ext.AssertionWrapper;
 import org.apache.ws.security.util.WSSecurityUtil;
-import org.opensaml.SAMLAssertion;
-import org.opensaml.SAMLException;
+
+import org.opensaml.xml.io.MarshallingException;
+import org.opensaml.xml.signature.SignatureException;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -39,7 +43,7 @@ public class WSSecSAMLToken extends WSSecBase {
     
     private Document document = null;
     
-    private SAMLAssertion saml = null;
+    private AssertionWrapper saml = null;
 
     /**
      * Creates a SAML token.
@@ -53,7 +57,7 @@ public class WSSecSAMLToken extends WSSecBase {
      * @param doc
      *            The SOAP envelope as W3C document
      */
-    public void prepare(Document doc, SAMLAssertion assertion) {
+    public void prepare(Document doc, AssertionWrapper assertion) {
         document = doc;
         saml = assertion;
     }
@@ -73,7 +77,9 @@ public class WSSecSAMLToken extends WSSecBase {
         try {
             Element element = (Element) saml.toDOM(document);
             WSSecurityUtil.prependChildElement(secHeader.getSecurityHeader(), element);
-        } catch (SAMLException ex) {
+        } catch (SignatureException ex) {
+            throw new RuntimeException(ex.toString(), ex);
+        } catch (MarshallingException ex) {
             throw new RuntimeException(ex.toString(), ex);
         }
     }
@@ -103,7 +109,7 @@ public class WSSecSAMLToken extends WSSecBase {
      * @param assertion TODO
      * @return Document with UsernameToken added
      */
-    public Document build(Document doc, SAMLAssertion assertion, WSSecHeader secHeader) {
+    public Document build(Document doc, AssertionWrapper assertion, WSSecHeader secHeader) {
         log.debug("Begin add SAMLAssertion token...");
         
         prepare(doc, assertion);

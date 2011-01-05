@@ -109,6 +109,10 @@ public class WSSConfig {
                 org.apache.ws.security.processor.SAMLTokenProcessor.class
             );
             tmp.put(
+                WSSecurityEngine.SAML2_TOKEN,
+                org.apache.ws.security.processor.SAMLTokenProcessor.class
+            );
+            tmp.put(
                 WSSecurityEngine.ENCRYPTED_KEY,
                 org.apache.ws.security.processor.EncryptedKeyProcessor.class
             );

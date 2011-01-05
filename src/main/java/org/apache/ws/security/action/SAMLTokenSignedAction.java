@@ -21,6 +21,7 @@ package org.apache.ws.security.action;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.handler.RequestData;
@@ -29,7 +30,8 @@ import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.saml.SAMLIssuer;
 import org.apache.ws.security.saml.SAMLIssuerFactory;
 import org.apache.ws.security.saml.WSSecSignatureSAML;
-import org.opensaml.SAMLAssertion;
+import org.apache.ws.security.saml.ext.AssertionWrapper;
+
 import org.w3c.dom.Document;
 
 public class SAMLTokenSignedAction implements Action {
@@ -54,11 +56,9 @@ public class SAMLTokenSignedAction implements Action {
         }
 
         SAMLIssuer saml = loadSamlIssuer(handler, reqData);
-        saml.setUsername(reqData.getUsername());
-        saml.setUserCrypto(crypto);
         saml.setInstanceDoc(doc);
 
-        SAMLAssertion assertion = saml.newAssertion();
+        AssertionWrapper assertion = saml.newAssertion();
         if (assertion == null) {
             throw new WSSecurityException("WSHandler: Signed SAML: no SAML token received");
         }

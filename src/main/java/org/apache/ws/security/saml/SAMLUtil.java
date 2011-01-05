@@ -21,6 +21,7 @@ package org.apache.ws.security.saml;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDocInfo;
 import org.apache.ws.security.WSPasswordCallback;
@@ -29,16 +30,18 @@ import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.processor.EncryptedKeyProcessor;
+import org.apache.ws.security.saml.ext.AssertionWrapper;
 import org.apache.ws.security.util.Base64;
 import org.apache.ws.security.util.WSSecurityUtil;
-import org.opensaml.SAMLAssertion;
-import org.opensaml.SAMLAttributeStatement;
-import org.opensaml.SAMLAuthenticationStatement;
-import org.opensaml.SAMLException;
-import org.opensaml.SAMLObject;
-import org.opensaml.SAMLStatement;
-import org.opensaml.SAMLSubject;
-import org.opensaml.SAMLSubjectStatement;
+
+import org.opensaml.common.SAMLObject;
+import org.opensaml.saml1.core.AttributeStatement;
+import org.opensaml.saml1.core.AuthenticationStatement;
+import org.opensaml.saml1.core.Statement;
+import org.opensaml.saml1.core.Subject;
+import org.opensaml.saml1.core.SubjectStatement;
+import org.opensaml.xml.io.UnmarshallingException;
+
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.Text;
@@ -65,28 +68,26 @@ import java.util.List;
 public class SAMLUtil {
     private static Log log = LogFactory.getLog(SAMLUtil.class.getName());
 
-    
-    
     /**
-     * Extract certificates or the key available in the SAMLAssertion
+     * Extract certificates or the key available in the AssertionWrapper
      * @param elem
      * @return the SAML Key Info
      * @throws WSSecurityException
      */
     public static SAMLKeyInfo getSAMLKeyInfo(Element elem, Crypto crypto,
             CallbackHandler cb) throws WSSecurityException {
-        SAMLAssertion assertion;
+        AssertionWrapper assertion;
         try {
-            assertion = new SAMLAssertion(elem);
+            assertion = new AssertionWrapper(elem);
             return getSAMLKeyInfo(assertion, crypto, cb);
-        } catch (SAMLException e) {
+        } catch (UnmarshallingException e) {
             throw new WSSecurityException(WSSecurityException.FAILURE,
                     "invalidSAMLToken", new Object[]{"for Signature (cannot parse)"}, e);
         }
 
     }
     
-    public static SAMLKeyInfo getSAMLKeyInfo(SAMLAssertion assertion, Crypto crypto,
+    public static SAMLKeyInfo getSAMLKeyInfo(AssertionWrapper assertion, Crypto crypto,
             CallbackHandler cb) throws WSSecurityException {
         
         //First ask the cb whether it can provide the secret
@@ -105,14 +106,16 @@ public class SAMLUtil {
         if (key != null) {
             return new SAMLKeyInfo(assertion, key);
         } else {
-            Iterator<?> statements = assertion.getStatements();
+            // WARNING!  THIS IS HARD CODED TO SAML v1.1
+            org.opensaml.saml1.core.Assertion saml11Assertion = assertion.getSaml1();
+            Iterator<?> statements = saml11Assertion.getStatements().iterator();
             while (statements.hasNext()) {
-                SAMLStatement stmt = (SAMLStatement) statements.next();
-                if (stmt instanceof SAMLAttributeStatement) {
-                    SAMLAttributeStatement attrStmt = (SAMLAttributeStatement) stmt;
-                    SAMLSubject samlSubject = attrStmt.getSubject();
-                    Element kiElem = samlSubject.getKeyInfo();
-                    
+                Statement stmt = (Statement) statements.next();
+                if (stmt instanceof AttributeStatement) {
+                    AttributeStatement attrStmt = (AttributeStatement) stmt;
+                    Subject samlSubject = attrStmt.getSubject();
+                    Element kiElem = samlSubject.getSubjectConfirmation().getKeyInfo().getDOM();
+
                     Node node = kiElem.getFirstChild();
                     while (node != null) {
                         if (Node.ELEMENT_NODE == node.getNodeType()) {
@@ -134,16 +137,15 @@ public class SAMLUtil {
                         }
                         node = node.getNextSibling();
                     }
-
-                } else if (stmt instanceof SAMLAuthenticationStatement) {
-                    SAMLAuthenticationStatement authStmt = (SAMLAuthenticationStatement)stmt;
-                    SAMLSubject samlSubj = authStmt.getSubject(); 
+                } else if (stmt instanceof AuthenticationStatement) {
+                    AuthenticationStatement authStmt = (AuthenticationStatement) stmt;
+                    Subject samlSubj = authStmt.getSubject();
                     if (samlSubj == null) {
                         throw new WSSecurityException(WSSecurityException.FAILURE,
                                 "invalidSAMLToken", new Object[]{"for Signature (no Subject)"});
                     }
 
-                    Element e = samlSubj.getKeyInfo();
+                    Element e = samlSubj.getSubjectConfirmation().getKeyInfo().getDOM();
                     X509Certificate[] certs = null;
                     KeyInfoFactory keyInfoFactory = KeyInfoFactory.getInstance("DOM");
                     XMLStructure keyInfoStructure = new DOMStructure(e);
@@ -207,29 +209,32 @@ public class SAMLUtil {
      */
     public static X509Certificate[] getCertificatesFromSAML(Element elem)
             throws WSSecurityException {
-
         /*
          * Get some information about the SAML token content. This controls how
          * to deal with the whole stuff. First get the Authentication statement
          * (includes Subject), then get the _first_ confirmation method only.
          */
-        SAMLAssertion assertion;
+        AssertionWrapper assertion;
         try {
-            assertion = new SAMLAssertion(elem);
-        } catch (SAMLException e) {
+            assertion = new AssertionWrapper(elem);
+        } catch (UnmarshallingException e) {
             throw new WSSecurityException(WSSecurityException.FAILURE,
                     "invalidSAMLToken", new Object[]{"for Signature (cannot parse)"}, e);
         }
-        SAMLSubjectStatement samlSubjS = null;
-        Iterator<?> it = assertion.getStatements();
+        SubjectStatement samlSubjS = null;
+
+        // WARNING!  THIS IS HARD CODED TO SAML v1.1
+        org.opensaml.saml1.core.Assertion saml11Assertion = assertion.getSaml1();
+
+        Iterator it = saml11Assertion.getStatements().iterator();
         while (it.hasNext()) {
             SAMLObject so = (SAMLObject) it.next();
-            if (so instanceof SAMLSubjectStatement) {
-                samlSubjS = (SAMLSubjectStatement) so;
+            if (so instanceof SubjectStatement) {
+                samlSubjS = (SubjectStatement) so;
                 break;
             }
         }
-        SAMLSubject samlSubj = null;
+        Subject samlSubj = null;
         if (samlSubjS != null) {
             samlSubj = samlSubjS.getSubject();
         }
@@ -247,7 +252,8 @@ public class SAMLUtil {
 //        if (SAMLSubject.CONF_SENDER_VOUCHES.equals(confirmMethod)) {
 //            senderVouches = true;
 //        }
-        Element e = samlSubj.getKeyInfo();
+        
+        Element e = samlSubj.getSubjectConfirmation().getKeyInfo().getDOM();
         X509Certificate[] certs = null;
         KeyInfoFactory keyInfoFactory = KeyInfoFactory.getInstance("DOM");
         XMLStructure keyInfoStructure = new DOMStructure(e);
@@ -279,17 +285,21 @@ public class SAMLUtil {
         
         return certs;
     }
-
-    public static String getAssertionId(Element envelope, String elemName, String nmSpace) throws WSSecurityException {
+    
+    public static String getAssertionId(
+        Element envelope, 
+        String elemName, 
+        String nmSpace
+    ) throws WSSecurityException {
         String id;
         // Make the AssertionID the wsu:Id and the signature reference the same
-        SAMLAssertion assertion;
+        AssertionWrapper assertion;
 
-        Element assertionElement = (Element) WSSecurityUtil
-                .findElement(envelope, elemName, nmSpace);
+        Element assertionElement = 
+            (Element)WSSecurityUtil.findElement(envelope, elemName, nmSpace);
 
         try {
-            assertion = new SAMLAssertion(assertionElement);
+            assertion = new AssertionWrapper(assertionElement);
             id = assertion.getId();
         } catch (Exception e1) {
             log.error(e1);
@@ -299,5 +309,5 @@ public class SAMLUtil {
         }
         return id;
     }
-
+    
 }

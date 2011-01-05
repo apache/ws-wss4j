@@ -19,8 +19,9 @@
 
 package org.apache.ws.security.saml;
 
+import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
-import org.opensaml.SAMLAssertion;
+import org.apache.ws.security.saml.ext.AssertionWrapper;
 import org.w3c.dom.Document;
 
 /**
@@ -33,23 +34,14 @@ import org.w3c.dom.Document;
 public interface SAMLIssuer {
 
     /**
-     * Creates a new <code>SAMLAssertion</code>.
+     * Creates a new <code>AssertionWrapper</code>.
      * <p/>
-     * A complete <code>SAMLAssertion</code> is constructed.
+     * A complete <code>AssertionWrapper</code> is constructed.
      *
-     * @return SAMLAssertion
+     * @return AssertionWrapper
+     * @throws WSSecurityException
      */
-    public SAMLAssertion newAssertion();
-
-    /**
-     * @param userCrypto The userCrypto to set.
-     */
-    public void setUserCrypto(Crypto userCrypto);
-
-    /**
-     * @param username The username to set.
-     */
-    public void setUsername(String username);
+    public AssertionWrapper newAssertion() throws WSSecurityException;
 
     /**
      * @return Returns the issuerCrypto.

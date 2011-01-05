@@ -37,8 +37,8 @@ import org.apache.ws.security.message.token.X509Security;
 import org.apache.ws.security.processor.EncryptedKeyProcessor;
 import org.apache.ws.security.saml.SAMLKeyInfo;
 import org.apache.ws.security.saml.SAMLUtil;
+import org.apache.ws.security.saml.ext.AssertionWrapper;
 import org.apache.ws.security.util.WSSecurityUtil;
-import org.opensaml.SAMLAssertion;
 import org.w3c.dom.Element;
 
 import java.security.Principal;
@@ -113,7 +113,8 @@ public class SignatureSTRParser implements STRParser {
                 QName el = new QName(token.getNamespaceURI(), token.getLocalName());
                 if (el.equals(WSSecurityEngine.BINARY_TOKEN)) {
                     certs = getCertificatesTokenReference(token, crypto);
-                } else if (el.equals(WSSecurityEngine.SAML_TOKEN)) {
+                } else if (el.equals(WSSecurityEngine.SAML_TOKEN) 
+                    || el.equals(WSSecurityEngine.SAML2_TOKEN)) {
                     if (crypto == null) {
                         throw new WSSecurityException(
                                 WSSecurityException.FAILURE, "noSigCryptoFile"
@@ -208,7 +209,8 @@ public class SignatureSTRParser implements STRParser {
                 String id = secRef.getKeyIdentifierValue();
                 secretKey = getSecretKeyFromEncKeySHA1KI(id, cb);
                 principal = new CustomTokenPrincipal(id);
-            } else if (WSConstants.WSS_SAML_KI_VALUE_TYPE.equals(secRef.getKeyIdentifierValueType())) { 
+            } else if (WSConstants.WSS_SAML_KI_VALUE_TYPE.equals(secRef.getKeyIdentifierValueType())
+                || WSConstants.WSS_SAML2_KI_VALUE_TYPE.equals(secRef.getKeyIdentifierValueType())) { 
                 Element token = 
                     secRef.getKeyIdentifierTokenElement(strElement.getOwnerDocument(), wsDocInfo, cb);
 
@@ -340,7 +342,7 @@ public class SignatureSTRParser implements STRParser {
         if (samlCerts != null && samlCerts.length > 0) {
             principal = samlCerts[0].getSubjectX500Principal();
         } else {
-            final SAMLAssertion assertion = samlKeyInfo.getAssertion();
+            final AssertionWrapper assertion = samlKeyInfo.getAssertion();
             principal = new CustomTokenPrincipal(assertion.getId());
             ((CustomTokenPrincipal)principal).setTokenObject(assertion);
         }
