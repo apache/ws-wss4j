@@ -175,19 +175,19 @@ public class InputProcessorChainImpl implements InputProcessorChain {
         this.inputProcessors.remove(inputProcessor);
     }
 
-    public XMLEvent processHeaderEvent() throws XMLStreamException, XMLSecurityException {
+    public XMLEvent processHeaderEvent() throws XMLStreamException, WSSecurityException {
         return inputProcessors.get(inputProcessors.size() - getPosAndIncrement() - 1).processNextHeaderEvent(this);
     }
 
-    public XMLEvent processEvent() throws XMLStreamException, XMLSecurityException {
+    public XMLEvent processEvent() throws XMLStreamException, WSSecurityException {
         return inputProcessors.get(inputProcessors.size() - getPosAndIncrement() - 1).processNextEvent(this);
     }
 
-    public void doFinal() throws XMLStreamException, XMLSecurityException {
+    public void doFinal() throws XMLStreamException, WSSecurityException {
         inputProcessors.get(inputProcessors.size() - getPosAndIncrement() - 1).doFinal(this);
     }
 
-    public InputProcessorChain createSubChain(InputProcessor inputProcessor) throws XMLStreamException, XMLSecurityException {
+    public InputProcessorChain createSubChain(InputProcessor inputProcessor) throws XMLStreamException, WSSecurityException {
         //we don't clone the processor-list to get updates in the sublist too!
         InputProcessorChainImpl inputProcessorChain = new InputProcessorChainImpl(securityContext, documentContext.clone(),
                 inputProcessors.size() - inputProcessors.indexOf(inputProcessor));

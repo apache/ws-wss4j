@@ -48,24 +48,24 @@ public interface InputProcessor {
      * @param inputProcessorChain
      * @return The next XMLEvent
      * @throws XMLStreamException thrown when a streaming error occurs
-     * @throws XMLSecurityException thrown when a Security failure occurs                                    
+     * @throws WSSecurityException thrown when a Security failure occurs
      */
-    XMLEvent processNextHeaderEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException;
+    XMLEvent processNextHeaderEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, WSSecurityException;
 
     /**
      * Will be called from the framework when the next XMLEvent is requested
      * @param inputProcessorChain
      * @return The next XMLEvent
      * @throws XMLStreamException thrown when a streaming error occurs
-     * @throws XMLSecurityException thrown when a Security failure occurs
+     * @throws WSSecurityException thrown when a Security failure occurs
      */
-    XMLEvent processNextEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException;
+    XMLEvent processNextEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, WSSecurityException;
 
     /**
      * Will be called when the whole document is processed. 
      * @param inputProcessorChain
      * @throws XMLStreamException thrown when a streaming error occurs
-     * @throws XMLSecurityException thrown when a Security failure occurs
+     * @throws WSSecurityException thrown when a Security failure occurs
      */
-    void doFinal(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException;
+    void doFinal(InputProcessorChain inputProcessorChain) throws XMLStreamException, WSSecurityException;
 }

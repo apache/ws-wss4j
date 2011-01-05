@@ -24,7 +24,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSecurityEngineResult;
-import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.handler.WSHandlerResult;
@@ -81,36 +80,36 @@ public abstract class AbstractTestBase {
         xmlInputFactory.setProperty(WstxInputProperties.P_MIN_TEXT_SEGMENT, new Integer(5 * 8192));
     }
 
-    public Document doInboundSecurity(SecurityProperties securityProperties, InputStream inputStream) throws XMLSecurityException, SecurityConfigurationException, XMLStreamException, ParserConfigurationException {
+    public Document doInboundSecurity(SecurityProperties securityProperties, InputStream inputStream) throws WSSecurityException, SecurityConfigurationException, XMLStreamException, ParserConfigurationException {
         return doInboundSecurity(securityProperties, xmlInputFactory.createXMLStreamReader(inputStream), null);
     }
 
-    public Document doInboundSecurity(SecurityProperties securityProperties, InputStream inputStream, SecurityEventListener securityEventListener) throws XMLSecurityException, SecurityConfigurationException, XMLStreamException, ParserConfigurationException {
+    public Document doInboundSecurity(SecurityProperties securityProperties, InputStream inputStream, SecurityEventListener securityEventListener) throws WSSecurityException, SecurityConfigurationException, XMLStreamException, ParserConfigurationException {
         return doInboundSecurity(securityProperties, xmlInputFactory.createXMLStreamReader(inputStream), securityEventListener);
     }
 
-    public Document doInboundSecurity(SecurityProperties securityProperties, XMLStreamReader xmlStreamReader) throws XMLSecurityException, SecurityConfigurationException, XMLStreamException, ParserConfigurationException {
+    public Document doInboundSecurity(SecurityProperties securityProperties, XMLStreamReader xmlStreamReader) throws WSSecurityException, SecurityConfigurationException, XMLStreamException, ParserConfigurationException {
         return doInboundSecurity(securityProperties, xmlStreamReader, null);
     }
 
-    public Document doInboundSecurity(SecurityProperties securityProperties, XMLStreamReader xmlStreamReader, SecurityEventListener securityEventListener) throws XMLSecurityException, SecurityConfigurationException, XMLStreamException, ParserConfigurationException {
-        InboundXMLSec xmlSec = WSSec.getInboundXMLSec(securityProperties);
-        XMLStreamReader outXmlStreamReader = xmlSec.processInMessage(xmlStreamReader, securityEventListener);
+    public Document doInboundSecurity(SecurityProperties securityProperties, XMLStreamReader xmlStreamReader, SecurityEventListener securityEventListener) throws WSSecurityException, SecurityConfigurationException, XMLStreamException, ParserConfigurationException {
+        InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
+        XMLStreamReader outXmlStreamReader = wsSecIn.processInMessage(xmlStreamReader, securityEventListener);
         Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), outXmlStreamReader);
         return document;
     }
 
     protected ByteArrayOutputStream doOutboundSecurity(SecurityProperties securityProperties, InputStream sourceDocument) throws Exception {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        OutboundXMLSec xmlSecOut = WSSec.getOutboundXMLSec(securityProperties);
-        XMLStreamWriter xmlStreamWriter = xmlSecOut.processOutMessage(baos);
+        OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
+        XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos);
         XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(sourceDocument);
         XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
         xmlStreamWriter.close();
         return baos;
     }
 
-    protected Document doOutboundSecurityWithWSS4J(InputStream sourceDocument, String action, Properties properties) throws WSSecurityException {
+    protected Document doOutboundSecurityWithWSS4J(InputStream sourceDocument, String action, Properties properties) throws org.apache.ws.security.WSSecurityException {
         WSS4JHandler wss4JHandler = new WSS4JHandler();
         HandlerInfo handlerInfo = new HandlerInfo();
         wss4JHandler.init(handlerInfo);
@@ -299,7 +298,7 @@ public abstract class AbstractTestBase {
         private final boolean doDebug = log.isDebugEnabled();
 
         @Override
-        public boolean doReceiver(MessageContext mc, RequestData reqData, boolean isRequest) throws WSSecurityException {
+        public boolean doReceiver(MessageContext mc, RequestData reqData, boolean isRequest) throws org.apache.ws.security.WSSecurityException {
             Vector actions = new Vector();
             String action = (String) getOption(WSHandlerConstants.RECEIVE + '.' + WSHandlerConstants.ACTION);
             if (action == null) {
@@ -375,7 +374,7 @@ public abstract class AbstractTestBase {
                                 cbHandler,
                                 reqData.getSigCrypto(),
                                 reqData.getDecCrypto());
-            } catch (WSSecurityException ex) {
+            } catch (org.apache.ws.security.WSSecurityException ex) {
                 if (doDebug) {
                     log.debug(ex.getMessage(), ex);
                 }

@@ -49,7 +49,7 @@ public class TimestampInputProcessor extends AbstractInputProcessor {
      */
 
     @Override
-    public XMLEvent processNextHeaderEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
+    public XMLEvent processNextHeaderEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, WSSecurityException {
         XMLEvent xmlEvent = inputProcessorChain.processHeaderEvent();
 
         boolean isFinishedcurrentTimestamp = false;
@@ -61,7 +61,7 @@ public class TimestampInputProcessor extends AbstractInputProcessor {
                     currentTimestampType.validate();
                 }
             } catch (ParseException e) {
-                throw new XMLSecurityException(e);
+                throw new WSSecurityException(e);
             }
         }
 
@@ -91,19 +91,19 @@ public class TimestampInputProcessor extends AbstractInputProcessor {
 
                 if (exp != null && getSecurityProperties().isStrictTimestampCheck() && exp.before(rightNow)) {
                     logger.debug("Time now: " + datatypeFactory.newXMLGregorianCalendar(new GregorianCalendar()).toXMLFormat());
-                    throw new XMLSecurityException("invalidTimestamp " +
+                    throw new WSSecurityException("invalidTimestamp " +
                             "The security semantics of the message have expired");
                 }
 
                 if (crea != null && getSecurityProperties().isStrictTimestampCheck() && crea.before(ttl)) {
                     logger.debug("Time now: " + datatypeFactory.newXMLGregorianCalendar(new GregorianCalendar()).toXMLFormat());
-                    throw new XMLSecurityException("invalidTimestampTTL " +
+                    throw new WSSecurityException("invalidTimestampTTL " +
                             "The security semantics of the message have expired");
                 }
 
                 if (crea != null && crea.after(rightNow)) {
                     logger.debug("Time now: " + datatypeFactory.newXMLGregorianCalendar(new GregorianCalendar()).toXMLFormat());
-                    throw new XMLSecurityException("invalidTimestamp " +
+                    throw new WSSecurityException("invalidTimestamp " +
                             "The security semantics of the message is invalid");
                 }
 
@@ -113,7 +113,7 @@ public class TimestampInputProcessor extends AbstractInputProcessor {
                 inputProcessorChain.getSecurityContext().registerSecurityEvent(timestampSecurityEvent);
 
             } catch (DatatypeConfigurationException e) {
-                throw new XMLSecurityException(e.getMessage(), e);
+                throw new WSSecurityException(e.getMessage(), e);
             }
             finally {
                 inputProcessorChain.removeProcessor(this);
@@ -125,7 +125,7 @@ public class TimestampInputProcessor extends AbstractInputProcessor {
     }
 
     @Override
-    public XMLEvent processNextEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
+    public XMLEvent processNextEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, WSSecurityException {
         //this method should not be called (processor will be removed after processing header
         return null;
     }

@@ -16,7 +16,7 @@ package org.swssf.impl;
 
 import org.swssf.ext.Constants;
 import org.swssf.ext.OutputProcessorChain;
-import org.swssf.ext.XMLSecurityException;
+import org.swssf.ext.WSSecurityException;
 
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.namespace.QName;
@@ -49,7 +49,7 @@ public class XMLSecurityStreamWriter implements XMLStreamWriter {
         try {
             outputProcessorChain.reset();
             outputProcessorChain.processEvent(xmlEvent);
-        } catch (XMLSecurityException e) {
+        } catch (WSSecurityException e) {
             throw new XMLStreamException(e);
         }
     }
@@ -147,7 +147,7 @@ public class XMLSecurityStreamWriter implements XMLStreamWriter {
         try {
             outputProcessorChain.reset();
             outputProcessorChain.doFinal();
-        } catch (XMLSecurityException e) {
+        } catch (WSSecurityException e) {
             throw new XMLStreamException(e);
         }
     }

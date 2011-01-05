@@ -55,12 +55,12 @@ public class SignatureReferenceVerifyInputProcessor extends AbstractInputProcess
     }
 
     @Override
-    public XMLEvent processNextHeaderEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
+    public XMLEvent processNextHeaderEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, WSSecurityException {
         return inputProcessorChain.processHeaderEvent();
     }
 
     @Override
-    public XMLEvent processNextEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
+    public XMLEvent processNextEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, WSSecurityException {
         XMLEvent xmlEvent = inputProcessorChain.processEvent();
 
         if (xmlEvent.isStartElement()) {
@@ -74,7 +74,7 @@ public class SignatureReferenceVerifyInputProcessor extends AbstractInputProcess
                     if (refId.getValue().equals(referenceType.getURI())) {
                         logger.debug("Found signature reference: " + refId.getValue() + " on element" + startElement.getName());
                         if (referenceType.isProcessed()) {
-                            throw new XMLSecurityException("duplicate id encountered!");
+                            throw new WSSecurityException("duplicate id encountered!");
                         }
                         InternalSignatureReferenceVerifier internalSignatureReferenceVerifier =
                                 new InternalSignatureReferenceVerifier(getSecurityProperties(), referenceType, startElement.getName());
@@ -107,12 +107,12 @@ public class SignatureReferenceVerifyInputProcessor extends AbstractInputProcess
     }
 
     @Override
-    public void doFinal(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
+    public void doFinal(InputProcessorChain inputProcessorChain) throws XMLStreamException, WSSecurityException {
         List<ReferenceType> references = signatureType.getSignedInfo().getReference();
         for (int i = 0; i < references.size(); i++) {
             ReferenceType referenceType = references.get(i);
             if (!referenceType.isProcessed()) {
-                throw new XMLSecurityException("Some signature references where not processed... Probably security header ordering problem?");
+                throw new WSSecurityException("Some signature references where not processed... Probably security header ordering problem?");
             }
         }
         inputProcessorChain.doFinal();
@@ -128,7 +128,7 @@ public class SignatureReferenceVerifyInputProcessor extends AbstractInputProcess
         private QName startElement;
         private int elementCounter = 0;
 
-        public InternalSignatureReferenceVerifier(SecurityProperties securityProperties, ReferenceType referenceType, QName startElement) throws XMLSecurityException {
+        public InternalSignatureReferenceVerifier(SecurityProperties securityProperties, ReferenceType referenceType, QName startElement) throws WSSecurityException {
             super(securityProperties);
             this.getAfterProcessors().add(SignatureReferenceVerifyInputProcessor.class.getName());
             this.startElement = startElement;
@@ -137,7 +137,7 @@ public class SignatureReferenceVerifyInputProcessor extends AbstractInputProcess
                 createMessageDigest();
                 buildTransformerChain();
             } catch (Exception e) {
-                throw new XMLSecurityException(e.getMessage(), e);
+                throw new WSSecurityException(e.getMessage(), e);
             }
         }
 
@@ -153,18 +153,18 @@ public class SignatureReferenceVerifyInputProcessor extends AbstractInputProcess
         }
 
         @Override
-        public XMLEvent processNextHeaderEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
+        public XMLEvent processNextHeaderEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, WSSecurityException {
             return inputProcessorChain.processHeaderEvent();
         }
 
         @Override
-        public XMLEvent processNextEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
+        public XMLEvent processNextEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, WSSecurityException {
             XMLEvent xmlEvent = inputProcessorChain.processEvent();
             processEvent(xmlEvent, inputProcessorChain);
             return xmlEvent;
         }
 
-        protected void processEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
+        protected void processEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain) throws XMLStreamException, WSSecurityException {
             Iterator<Transformer> transformerIterator = transformers.iterator();
             while (transformerIterator.hasNext()) {
                 Transformer transformer = transformerIterator.next();
@@ -181,7 +181,7 @@ public class SignatureReferenceVerifyInputProcessor extends AbstractInputProcess
                     try {
                         bufferedDigestOutputStream.close();
                     } catch (IOException e) {
-                        throw new XMLSecurityException(e);
+                        throw new WSSecurityException(e);
                     }
 
                     byte[] calculatedDigest = this.digestOutputStream.getDigestValue();
@@ -193,7 +193,7 @@ public class SignatureReferenceVerifyInputProcessor extends AbstractInputProcess
                     }
 
                     if (!MessageDigest.isEqual(storedDigest, calculatedDigest)) {
-                        throw new XMLSecurityException("Digest verification failed");
+                        throw new WSSecurityException("Digest verification failed");
                     }
                     inputProcessorChain.removeProcessor(this);
                     inputProcessorChain.getDocumentContext().unsetIsInSignedContent();

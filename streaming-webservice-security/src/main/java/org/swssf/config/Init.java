@@ -14,7 +14,7 @@
  */
 package org.swssf.config;
 
-import org.swssf.ext.XMLSecurityException;
+import org.swssf.ext.WSSecurityException;
 import org.xmlsecurity.ns.configuration.ConfigurationType;
 
 import javax.xml.XMLConstants;
@@ -38,7 +38,7 @@ public class Init {
 
     @SuppressWarnings("unchecked")
     //todo init from url
-    public synchronized static void init(URL url) throws XMLSecurityException {
+    public synchronized static void init(URL url) throws WSSecurityException {
         if (!initialized) {
             try {
                 JAXBContext jaxbContext = JAXBContext.newInstance("org.xmlsecurity.ns.configuration");
@@ -51,7 +51,7 @@ public class Init {
                 JCEAlgorithmMapper.init(configurationTypeJAXBElement.getValue().getJCEAlgorithmMappings());
 
             } catch (Exception e) {
-                throw new XMLSecurityException(e.getMessage(), e);
+                throw new WSSecurityException(e.getMessage(), e);
             }
             initialized = true;
         }

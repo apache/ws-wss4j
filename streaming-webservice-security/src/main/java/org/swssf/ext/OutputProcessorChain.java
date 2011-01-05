@@ -50,15 +50,15 @@ public interface OutputProcessorChain extends ProcessorChain {
      * @param outputProcessor The OutputProcessor position the XMLEvents should be processed over this SubChain.
      * @return A new OutputProcessorChain
      * @throws XMLStreamException thrown when a streaming error occurs
-     * @throws XMLSecurityException thrown when a Security failure occurs
+     * @throws WSSecurityException thrown when a Security failure occurs
      */
-    public OutputProcessorChain createSubChain(OutputProcessor outputProcessor) throws XMLStreamException, XMLSecurityException;
+    public OutputProcessorChain createSubChain(OutputProcessor outputProcessor) throws XMLStreamException, WSSecurityException;
 
     /**
      * Forwards the XMLEvent to the next processor in the chain.
      * @param xmlEvent The XMLEvent which should be forwarded to the next processor
      * @throws XMLStreamException thrown when a streaming error occurs
-     * @throws XMLSecurityException thrown when a Security failure occurs
+     * @throws WSSecurityException thrown when a Security failure occurs
      */
-    public void processEvent(XMLEvent xmlEvent) throws XMLStreamException, XMLSecurityException;
+    public void processEvent(XMLEvent xmlEvent) throws XMLStreamException, WSSecurityException;
 }

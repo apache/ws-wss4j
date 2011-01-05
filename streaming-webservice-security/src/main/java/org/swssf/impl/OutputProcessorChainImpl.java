@@ -161,15 +161,15 @@ public class OutputProcessorChainImpl implements OutputProcessorChain {
         this.outputProcessors.remove(outputProcessor);
     }
 
-    public void processEvent(XMLEvent xmlEvent) throws XMLStreamException, XMLSecurityException {
+    public void processEvent(XMLEvent xmlEvent) throws XMLStreamException, WSSecurityException {
         outputProcessors.get(getPosAndIncrement()).processNextEvent(xmlEvent, this);
     }
 
-    public void doFinal() throws XMLStreamException, XMLSecurityException {
+    public void doFinal() throws XMLStreamException, WSSecurityException {
         outputProcessors.get(getPosAndIncrement()).doFinal(this);
     }
 
-    public OutputProcessorChain createSubChain(OutputProcessor outputProcessor) throws XMLStreamException, XMLSecurityException {
+    public OutputProcessorChain createSubChain(OutputProcessor outputProcessor) throws XMLStreamException, WSSecurityException {
         //we don't clone the processor-list to get updates in the sublist too!
         OutputProcessorChainImpl outputProcessorChain = new OutputProcessorChainImpl(securityContext, outputProcessors.indexOf(outputProcessor) + 1);
         outputProcessorChain.setOutputProcessors(this.outputProcessors);

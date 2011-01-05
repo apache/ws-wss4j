@@ -56,23 +56,23 @@ public interface InputProcessorChain extends ProcessorChain {
      * @param inputProcessor The InputProcessor position the XMLEvents should be processed over this SubChain.
      * @return A new InputProcessorChain
      * @throws XMLStreamException thrown when a streaming error occurs
-     * @throws XMLSecurityException thrown when a Security failure occurs
+     * @throws WSSecurityException thrown when a Security failure occurs
      */
-    public InputProcessorChain createSubChain(InputProcessor inputProcessor) throws XMLStreamException, XMLSecurityException;
+    public InputProcessorChain createSubChain(InputProcessor inputProcessor) throws XMLStreamException, WSSecurityException;
 
     /**
      * Requests the next security header XMLEvent from the next processor in the chain.
      * @return The next XMLEvent from the previous processor
      * @throws XMLStreamException thrown when a streaming error occurs
-     * @throws XMLSecurityException thrown when a Security failure occurs
+     * @throws WSSecurityException thrown when a Security failure occurs
      */
-    public XMLEvent processHeaderEvent() throws XMLStreamException, XMLSecurityException;
+    public XMLEvent processHeaderEvent() throws XMLStreamException, WSSecurityException;
 
     /**
      * Requests the next XMLEvent from the next processor in the chain.
      * @return The next XMLEvent from the previous processor
      * @throws XMLStreamException thrown when a streaming error occurs
-     * @throws XMLSecurityException thrown when a Security failure occurs
+     * @throws WSSecurityException thrown when a Security failure occurs
      */
-    public XMLEvent processEvent() throws XMLStreamException, XMLSecurityException;
+    public XMLEvent processEvent() throws XMLStreamException, WSSecurityException;
 }

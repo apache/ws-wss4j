@@ -16,12 +16,12 @@
 
 package org.swssf.policy.secpolicy;
 
-import org.swssf.ext.XMLSecurityException;
+import org.swssf.ext.WSSecurityException;
 
 /**
  * class lent from apache cxf
  */
-public class WSSPolicyException extends XMLSecurityException {
+public class WSSPolicyException extends WSSecurityException {
 
     private static final long serialVersionUID = 5904800255533588133L;
 

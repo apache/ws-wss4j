@@ -40,12 +40,12 @@ public class SecurityHeaderInputProcessor extends AbstractInputProcessor {
     }
 
     @Override
-    public XMLEvent processNextHeaderEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
+    public XMLEvent processNextHeaderEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, WSSecurityException {
         return null;
     }
 
     @Override
-    public XMLEvent processNextEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
+    public XMLEvent processNextEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, WSSecurityException {
 
         //buffer all events until the end of the security header
         InputProcessorChain subInputProcessorChain = inputProcessorChain.createSubChain(this);
@@ -104,7 +104,7 @@ public class SecurityHeaderInputProcessor extends AbstractInputProcessor {
 
         } while (!(xmlEvent.isStartElement() && xmlEvent.asStartElement().getName().equals(Constants.TAG_soap11_Body)));
         //if we reach this state we didn't find a security header
-        throw new XMLSecurityException("No Security");
+        throw new WSSecurityException("No Security");
     }
 
     //todo move this method. DecryptProcessor should not have a dependency to this processor
@@ -136,14 +136,14 @@ public class SecurityHeaderInputProcessor extends AbstractInputProcessor {
         }
 
         @Override
-        public XMLEvent processNextHeaderEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
+        public XMLEvent processNextHeaderEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, WSSecurityException {
             XMLEvent xmlEvent = inputProcessorChain.processHeaderEvent();
             xmlEventList.push(xmlEvent);
             return xmlEvent;
         }
 
         @Override
-        public XMLEvent processNextEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
+        public XMLEvent processNextEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, WSSecurityException {
             //should never be called because we remove this processor before
             return null;
         }
@@ -168,12 +168,12 @@ public class SecurityHeaderInputProcessor extends AbstractInputProcessor {
         }
 
         @Override
-        public XMLEvent processNextHeaderEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
+        public XMLEvent processNextHeaderEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, WSSecurityException {
             return null;
         }
 
         @Override
-        public XMLEvent processNextEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
+        public XMLEvent processNextEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, WSSecurityException {
 
             if (!xmlEventList.isEmpty()) {
                 eventCount++;

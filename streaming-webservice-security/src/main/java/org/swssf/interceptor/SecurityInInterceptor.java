@@ -16,9 +16,9 @@ package org.swssf.interceptor;
 
 import org.swssf.WSSec;
 import org.swssf.ext.Constants;
-import org.swssf.ext.InboundXMLSec;
+import org.swssf.ext.InboundWSSec;
 import org.swssf.ext.SecurityProperties;
-import org.swssf.ext.XMLSecurityException;
+import org.swssf.ext.WSSecurityException;
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.interceptor.AbstractSoapInterceptor;
@@ -44,13 +44,13 @@ public class SecurityInInterceptor extends AbstractSoapInterceptor {
         HEADERS.add(Constants.TAG_xenc_EncryptedData);
     }
 
-    private InboundXMLSec inboundXMLSec;
+    private InboundWSSec inboundWSSec;
 
     public SecurityInInterceptor(String p, SecurityProperties securityProperties) throws Exception {
         super(p);
         getAfter().add(StaxInInterceptor.class.getName());
 
-        inboundXMLSec = WSSec.getInboundXMLSec(securityProperties);
+        inboundWSSec = WSSec.getInboundWSSec(securityProperties);
     }
 
     public void handleMessage(SoapMessage soapMessage) throws Fault {
@@ -59,10 +59,10 @@ public class SecurityInInterceptor extends AbstractSoapInterceptor {
         XMLStreamReader newXmlStreamReader = null;
 
         try {
-            newXmlStreamReader = inboundXMLSec.processInMessage(originalXmlStreamReader);
+            newXmlStreamReader = inboundWSSec.processInMessage(originalXmlStreamReader);
             soapMessage.setContent(XMLStreamReader.class, newXmlStreamReader);
             //todo correct faults per WSS-spec
-        } catch (XMLSecurityException e) {
+        } catch (WSSecurityException e) {
             throw new SoapFault("Invalid security", soapMessage.getVersion().getSender());
         } catch (XMLStreamException e) {
             throw new SoapFault("Invalid security", soapMessage.getVersion().getReceiver());

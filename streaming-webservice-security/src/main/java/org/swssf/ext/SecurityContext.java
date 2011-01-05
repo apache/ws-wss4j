@@ -57,7 +57,7 @@ public interface SecurityContext {
     /**
      * Registers a SecurityEvent which will be forwarded to the registered SecurityEventListener  
      * @param securityEvent The security event for the SecurityEventListener
-     * @throws XMLSecurityException when the event will not be accepted (e.g. policy-violation)
+     * @throws WSSecurityException when the event will not be accepted (e.g. policy-violation)
      */
-    public void registerSecurityEvent(SecurityEvent securityEvent) throws XMLSecurityException;
+    public void registerSecurityEvent(SecurityEvent securityEvent) throws WSSecurityException;
 }

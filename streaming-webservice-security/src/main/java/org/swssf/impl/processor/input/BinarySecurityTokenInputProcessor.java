@@ -38,7 +38,7 @@ public class BinarySecurityTokenInputProcessor extends AbstractInputProcessor im
     }
 
     @Override
-    public XMLEvent processNextHeaderEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
+    public XMLEvent processNextHeaderEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, WSSecurityException {
         XMLEvent xmlEvent = inputProcessorChain.processHeaderEvent();
 
         //parse the BinarySecurityToken XML Structure
@@ -52,7 +52,7 @@ public class BinarySecurityTokenInputProcessor extends AbstractInputProcessor im
                     currentBinarySecurityTokenType.validate();
                 }
             } catch (ParseException e) {
-                throw new XMLSecurityException(e);
+                throw new WSSecurityException(e);
             }
         }
 
@@ -71,12 +71,12 @@ public class BinarySecurityTokenInputProcessor extends AbstractInputProcessor im
     }
 
     @Override
-    public XMLEvent processNextEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
+    public XMLEvent processNextEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, WSSecurityException {
         //this method should not be called (processor will be removed after processing header
         return null;
     }
 
-    public SecurityToken getSecurityToken(Crypto crypto) throws XMLSecurityException {
+    public SecurityToken getSecurityToken(Crypto crypto) throws WSSecurityException {
         return SecurityTokenFactory.newInstance().getSecurityToken(currentBinarySecurityTokenType, crypto, getSecurityProperties().getCallbackHandler());
     }
 }

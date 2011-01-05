@@ -15,9 +15,9 @@
 package org.swssf.interceptor;
 
 import org.swssf.WSSec;
-import org.swssf.ext.OutboundXMLSec;
+import org.swssf.ext.OutboundWSSec;
 import org.swssf.ext.SecurityProperties;
-import org.swssf.ext.XMLSecurityException;
+import org.swssf.ext.WSSecurityException;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.interceptor.AbstractSoapInterceptor;
 import org.apache.cxf.interceptor.AbstractOutDatabindingInterceptor;
@@ -43,13 +43,13 @@ public class SecurityOutInterceptor extends AbstractSoapInterceptor {
     public static final SecurityOutInterceptorEndingInterceptor ENDING = new SecurityOutInterceptorEndingInterceptor();
     public static final String OUTPUT_STREAM_HOLDER = SecurityOutInterceptor.class.getName() + ".outputstream";
     public static final String FORCE_START_DOCUMENT = "org.apache.cxf.stax.force-start-document";
-    private OutboundXMLSec outboundXMLSec;
+    private OutboundWSSec outboundWSSec;
 
     public SecurityOutInterceptor(String p, SecurityProperties securityProperties) throws Exception {
         super(p);
         getBefore().add(StaxOutInterceptor.class.getName());
 
-        outboundXMLSec = WSSec.getOutboundXMLSec(securityProperties);
+        outboundWSSec = WSSec.getOutboundWSSec(securityProperties);
     }
 
     public void handleMessage(SoapMessage soapMessage) throws Fault {
@@ -61,9 +61,9 @@ public class SecurityOutInterceptor extends AbstractSoapInterceptor {
         XMLStreamWriter newXMLStreamWriter;
         //todo encoding
         try {
-            newXMLStreamWriter = outboundXMLSec.processOutMessage(os);
+            newXMLStreamWriter = outboundWSSec.processOutMessage(os);
             soapMessage.setContent(XMLStreamWriter.class, newXMLStreamWriter);
-        } catch (XMLSecurityException e) {
+        } catch (WSSecurityException e) {
             throw new Fault(e);
         }
 

@@ -16,8 +16,8 @@ package org.swssf.impl;
 
 import org.swssf.ext.InputProcessorChain;
 import org.swssf.ext.SecurityProperties;
+import org.swssf.ext.WSSecurityException;
 import org.swssf.ext.XMLEventNS;
-import org.swssf.ext.XMLSecurityException;
 
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.namespace.QName;
@@ -64,7 +64,7 @@ public class XMLSecurityStreamReader implements XMLStreamReader {
                     && securityProperties.isSkipDocumentEvents()) {
                 currentEvent = ((XMLEventNS) inputProcessorChain.processEvent()).getCurrentEvent();
             }
-        } catch (XMLSecurityException e) {
+        } catch (WSSecurityException e) {
             throw new XMLStreamException(e);
         }
         return getCurrentEvent().getEventType();
@@ -177,7 +177,7 @@ public class XMLSecurityStreamReader implements XMLStreamReader {
         try {
             inputProcessorChain.reset();
             inputProcessorChain.doFinal();
-        } catch (XMLSecurityException e) {
+        } catch (WSSecurityException e) {
             throw new XMLStreamException(e);
         }
     }

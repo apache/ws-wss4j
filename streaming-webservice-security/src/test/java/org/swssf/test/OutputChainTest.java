@@ -16,7 +16,7 @@ package org.swssf.test;
 
 import org.swssf.WSSec;
 import org.swssf.ext.Constants;
-import org.swssf.ext.OutboundXMLSec;
+import org.swssf.ext.OutboundWSSec;
 import org.swssf.ext.SecurityProperties;
 import org.swssf.test.utils.XmlReaderToWriter;
 import org.testng.Assert;
@@ -45,9 +45,9 @@ public class OutputChainTest extends AbstractTestBase {
         securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
         securityProperties.setEncryptionUser("receiver");
 
-        OutboundXMLSec xmlSec = WSSec.getOutboundXMLSec(securityProperties);
+        OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        XMLStreamWriter xmlStreamWriter = xmlSec.processOutMessage(baos);
+        XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos);
         XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml"));
         XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
         xmlStreamWriter.close();
@@ -88,9 +88,9 @@ public class OutputChainTest extends AbstractTestBase {
         securityProperties.setSignatureUser("receiver");
         securityProperties.setCallbackHandler(new CallbackHandlerImpl());
 
-        OutboundXMLSec xmlSec = WSSec.getOutboundXMLSec(securityProperties);
+        OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        XMLStreamWriter xmlStreamWriter = xmlSec.processOutMessage(baos);
+        XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos);
         XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml"));
         XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
         xmlStreamWriter.close();
@@ -120,9 +120,9 @@ public class OutputChainTest extends AbstractTestBase {
         Constants.Action[] actions = new Constants.Action[]{Constants.Action.TIMESTAMP};
         securityProperties.setOutAction(actions);
 
-        OutboundXMLSec xmlSec = WSSec.getOutboundXMLSec(securityProperties);
+        OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        XMLStreamWriter xmlStreamWriter = xmlSec.processOutMessage(baos);
+        XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos);
         XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml"));
         XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
         xmlStreamWriter.close();

@@ -65,7 +65,7 @@ public class EncryptedKeyInputProcessor extends AbstractInputProcessor {
      */
 
     @Override
-    public XMLEvent processNextHeaderEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
+    public XMLEvent processNextHeaderEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, WSSecurityException {
         XMLEvent xmlEvent = inputProcessorChain.processHeaderEvent();
 
         //parse the EncryptedKey XML Structure
@@ -79,7 +79,7 @@ public class EncryptedKeyInputProcessor extends AbstractInputProcessor {
                     currentEncryptedKeyType.validate();
                 }
             } catch (ParseException e) {
-                throw new XMLSecurityException(e);
+                throw new WSSecurityException(e);
             }
         }
 
@@ -101,7 +101,7 @@ public class EncryptedKeyInputProcessor extends AbstractInputProcessor {
 
                     SecurityTokenProvider securityTokenProvider = new SecurityTokenProvider() {
 
-                        public SecurityToken getSecurityToken(Crypto crypto) throws XMLSecurityException {
+                        public SecurityToken getSecurityToken(Crypto crypto) throws WSSecurityException {
 
                             return new SecurityToken() {
 
@@ -111,7 +111,7 @@ public class EncryptedKeyInputProcessor extends AbstractInputProcessor {
                                     return false;
                                 }
 
-                                public Key getSecretKey(String algorithmURI) throws XMLSecurityException {
+                                public Key getSecretKey(String algorithmURI) throws WSSecurityException {
                                     if (keyTable.containsKey(algorithmURI)) {
                                         return keyTable.get(algorithmURI);
                                     } else {
@@ -122,11 +122,11 @@ public class EncryptedKeyInputProcessor extends AbstractInputProcessor {
                                     }
                                 }
 
-                                public PublicKey getPublicKey() throws XMLSecurityException {
+                                public PublicKey getPublicKey() throws WSSecurityException {
                                     return null;
                                 }
 
-                                public void verify() throws XMLSecurityException {
+                                public void verify() throws WSSecurityException {
                                 }
 
                                 public SecurityToken getKeyWrappingToken() {
@@ -154,19 +154,19 @@ public class EncryptedKeyInputProcessor extends AbstractInputProcessor {
                 }
 
             } catch (NoSuchPaddingException e) {
-                throw new XMLSecurityException(e);
+                throw new WSSecurityException(e);
             } catch (NoSuchAlgorithmException e) {
-                throw new XMLSecurityException(e);
+                throw new WSSecurityException(e);
             } catch (BadPaddingException e) {
-                throw new XMLSecurityException(e);
+                throw new WSSecurityException(e);
             } catch (IllegalBlockSizeException e) {
-                throw new XMLSecurityException(e);
+                throw new WSSecurityException(e);
             } catch (NoSuchProviderException e) {
-                throw new XMLSecurityException(e);
+                throw new WSSecurityException(e);
             } catch (InvalidKeyException e) {
-                throw new XMLSecurityException(e);
+                throw new WSSecurityException(e);
             } catch (Exception e) {
-                throw new XMLSecurityException(e);
+                throw new WSSecurityException(e);
             }
             finally {
                 inputProcessorChain.removeProcessor(this);
@@ -178,7 +178,7 @@ public class EncryptedKeyInputProcessor extends AbstractInputProcessor {
     }
 
     @Override
-    public XMLEvent processNextEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
+    public XMLEvent processNextEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, WSSecurityException {
         //this method should not be called (processor will be removed after processing header
         return null;
     }

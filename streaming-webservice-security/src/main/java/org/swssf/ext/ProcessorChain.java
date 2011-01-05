@@ -31,7 +31,7 @@ public interface ProcessorChain {
     /**
      * Will finally be called when the whole document is processed
      * @throws XMLStreamException thrown when a streaming error occurs
-     * @throws XMLSecurityException thrown when a Security failure occurs
+     * @throws WSSecurityException thrown when a Security failure occurs
      */
-    public void doFinal() throws XMLStreamException, XMLSecurityException;
+    public void doFinal() throws XMLStreamException, WSSecurityException;
 }

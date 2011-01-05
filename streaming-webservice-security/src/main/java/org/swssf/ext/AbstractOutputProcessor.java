@@ -40,7 +40,7 @@ public abstract class AbstractOutputProcessor implements OutputProcessor {
     private Set<String> beforeProcessors = new HashSet<String>();
     private Set<String> afterProcessors = new HashSet<String>();
 
-    protected AbstractOutputProcessor(SecurityProperties securityProperties) throws XMLSecurityException {
+    protected AbstractOutputProcessor(SecurityProperties securityProperties) throws WSSecurityException {
         this.securityProperties = securityProperties;
     }
 
@@ -60,13 +60,13 @@ public abstract class AbstractOutputProcessor implements OutputProcessor {
         return afterProcessors;
     }
 
-    public abstract void processEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException;
+    public abstract void processEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain) throws XMLStreamException, WSSecurityException;
 
-    public void processNextEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException {
+    public void processNextEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain) throws XMLStreamException, WSSecurityException {
         processEvent(xmlEvent, outputProcessorChain);
     }
 
-    public void doFinal(OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException {
+    public void doFinal(OutputProcessorChain outputProcessorChain) throws XMLStreamException, WSSecurityException {
         outputProcessorChain.doFinal();
     }
 
@@ -74,22 +74,22 @@ public abstract class AbstractOutputProcessor implements OutputProcessor {
         return securityProperties;
     }
 
-    public static void createStartElementAndOutputAsEvent(OutputProcessorChain outputProcessorChain, QName element, Map<QName, String> attributes) throws XMLStreamException, XMLSecurityException {
+    public static void createStartElementAndOutputAsEvent(OutputProcessorChain outputProcessorChain, QName element, Map<QName, String> attributes) throws XMLStreamException, WSSecurityException {
         XMLEvent xmlEvent = outputProcessorChain.getSecurityContext().<XMLEventNSAllocator>get(Constants.XMLEVENT_NS_ALLOCATOR).createStartElement(element, attributes);
         outputAsEvent(outputProcessorChain, xmlEvent);
     }
 
-    public static void createEndElementAndOutputAsEvent(OutputProcessorChain outputProcessorChain, QName element) throws XMLStreamException, XMLSecurityException {
+    public static void createEndElementAndOutputAsEvent(OutputProcessorChain outputProcessorChain, QName element) throws XMLStreamException, WSSecurityException {
         final XMLEvent xmlEvent = outputProcessorChain.getSecurityContext().<XMLEventNSAllocator>get(Constants.XMLEVENT_NS_ALLOCATOR).createEndElement(element);
         outputAsEvent(outputProcessorChain, xmlEvent);
     }
 
-    public static void createCharactersAndOutputAsEvent(OutputProcessorChain outputProcessorChain, String characters) throws XMLStreamException, XMLSecurityException {
+    public static void createCharactersAndOutputAsEvent(OutputProcessorChain outputProcessorChain, String characters) throws XMLStreamException, WSSecurityException {
         final XMLEvent xmlEvent = outputProcessorChain.getSecurityContext().<XMLEventNSAllocator>get(Constants.XMLEVENT_NS_ALLOCATOR).createCharacters(characters);
         outputAsEvent(outputProcessorChain, xmlEvent);
     }
 
-    public static void outputAsEvent(OutputProcessorChain outputProcessorChain, XMLEvent xmlEvent) throws XMLStreamException, XMLSecurityException {
+    public static void outputAsEvent(OutputProcessorChain outputProcessorChain, XMLEvent xmlEvent) throws XMLStreamException, WSSecurityException {
         outputProcessorChain.reset();
         outputProcessorChain.processEvent(xmlEvent);
     }

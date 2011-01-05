@@ -73,7 +73,7 @@ public class SecurityContextImpl implements SecurityContext {
         this.securityEventListener = securityEventListener;
     }
 
-    public void registerSecurityEvent(SecurityEvent securityEvent) throws XMLSecurityException {
+    public void registerSecurityEvent(SecurityEvent securityEvent) throws WSSecurityException {
         if (securityEventListener != null) {
             securityEventListener.registerSecurityEvent(securityEvent);
         }

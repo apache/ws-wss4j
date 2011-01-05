@@ -6,7 +6,7 @@
 package org.swssf.test;
 
 import org.swssf.WSSec;
-import org.swssf.ext.InboundXMLSec;
+import org.swssf.ext.InboundWSSec;
 import org.swssf.ext.SecurityProperties;
 import org.swssf.test.utils.XmlReaderToWriter;
 import org.testng.annotations.Test;
@@ -48,7 +48,7 @@ public class ProfilingTest extends AbstractTestBase {
         securityProperties.setTimestampTTL(60 * 60 * 24 * 7); //a week for testing:)
 
         InputStream sourceDocument = new BufferedInputStream(new FileInputStream("ICHAGCompany-3000.xml"));
-        OutboundXMLSec xmlSecOut = WSSec.getOutboundXMLSec(securityProperties);
+        OutboundWSSec xmlSecOut = WSSec.getOutboundWSSec(securityProperties);
         XMLStreamWriter xmlStreamWriter = xmlSecOut.processOutMessage(new FileOutputStream("ICHAGCompany-3000-sig-enc.xml"));
         XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(sourceDocument);
         XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
@@ -109,8 +109,8 @@ public class ProfilingTest extends AbstractTestBase {
         securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
         securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
 
-        InboundXMLSec xmlSec = WSSec.getInboundXMLSec(securityProperties);
-        XMLStreamReader outXmlStreamReader = xmlSec.processInMessage(xmlInputFactory.createXMLStreamReader(sourceDocument));
+        InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
+        XMLStreamReader outXmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(sourceDocument));
 
         XMLOutputFactory xmlOutputFactory = XMLOutputFactory.newFactory();
         XmlReaderToWriter.writeAll(outXmlStreamReader, xmlOutputFactory.createXMLStreamWriter(new OutputStream() {
@@ -178,7 +178,7 @@ public class ProfilingTest extends AbstractTestBase {
         securityProperties.setTimestampTTL(60 * 60 * 24 * 7); //a week for testing:)
 
         InputStream sourceDocument = new BufferedInputStream(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml"));
-        OutboundXMLSec xmlSecOut = WSSec.getOutboundXMLSec(securityProperties);
+        OutboundWSSec xmlSecOut = WSSec.getOutboundWSSec(securityProperties);
         XMLStreamWriter xmlStreamWriter = xmlSecOut.processOutMessage(new FileOutputStream("plain-soap-sig-enc.xml"));
         XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(sourceDocument);
         XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
@@ -196,7 +196,7 @@ public class ProfilingTest extends AbstractTestBase {
         securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
         securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
 
-        InboundXMLSec xmlSec = WSSec.getInboundXMLSec(securityProperties);
+        InboundWSSec xmlSec = WSSec.getInboundWSSec(securityProperties);
         XMLStreamReader outXmlStreamReader = xmlSec.processInMessage(xmlInputFactory.createXMLStreamReader(sourceDocument));
 
         XMLOutputFactory xmlOutputFactory = XMLOutputFactory.newFactory();

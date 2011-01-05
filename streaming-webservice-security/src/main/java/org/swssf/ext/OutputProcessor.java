@@ -48,15 +48,15 @@ public interface OutputProcessor {
      * @param xmlEvent The next XMLEvent to process
      * @param outputProcessorChain
      * @throws XMLStreamException thrown when a streaming error occurs
-     * @throws XMLSecurityException thrown when a Security failure occurs
+     * @throws WSSecurityException thrown when a Security failure occurs
      */
-    void processNextEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException;
+    void processNextEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain) throws XMLStreamException, WSSecurityException;
 
     /**
      * Will be called when the whole document is processed.
      * @param outputProcessorChain
      * @throws XMLStreamException thrown when a streaming error occurs
-     * @throws XMLSecurityException thrown when a Security failure occurs
+     * @throws WSSecurityException thrown when a Security failure occurs
      */
-    void doFinal(OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException;
+    void doFinal(OutputProcessorChain outputProcessorChain) throws XMLStreamException, WSSecurityException;
 }

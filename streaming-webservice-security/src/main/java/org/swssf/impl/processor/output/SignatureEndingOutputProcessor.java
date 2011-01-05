@@ -15,7 +15,6 @@
 package org.swssf.impl.processor.output;
 
 import org.swssf.config.JCEAlgorithmMapper;
-import org.swssf.crypto.WSSecurityException;
 import org.swssf.ext.*;
 import org.swssf.impl.SignaturePartDef;
 import org.swssf.impl.transformer.canonicalizer.Canonicalizer20010315ExclOmitCommentsTransformer;
@@ -53,7 +52,7 @@ public class SignatureEndingOutputProcessor extends AbstractOutputProcessor {
     //private List<XMLEvent> xmlEventBuffer = new ArrayList<XMLEvent>(100);
     private ArrayDeque<XMLEvent> xmlEventBuffer = new ArrayDeque<XMLEvent>();
 
-    public SignatureEndingOutputProcessor(SecurityProperties securityProperties, SignatureOutputProcessor signatureOutputProcessor) throws XMLSecurityException {
+    public SignatureEndingOutputProcessor(SecurityProperties securityProperties, SignatureOutputProcessor signatureOutputProcessor) throws WSSecurityException {
         super(securityProperties);
         this.getAfterProcessors().add(SignatureOutputProcessor.class.getName());
         signaturePartDefList = signatureOutputProcessor.getSignaturePartDefList();
@@ -61,12 +60,12 @@ public class SignatureEndingOutputProcessor extends AbstractOutputProcessor {
     }
 
     @Override
-    public void processEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException {
+    public void processEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain) throws XMLStreamException, WSSecurityException {
         xmlEventBuffer.push(xmlEvent);
     }
 
     @Override
-    public void doFinal(OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException {
+    public void doFinal(OutputProcessorChain outputProcessorChain) throws XMLStreamException, WSSecurityException {
 
         OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
 
@@ -90,7 +89,7 @@ public class SignatureEndingOutputProcessor extends AbstractOutputProcessor {
         subOutputProcessorChain.removeProcessor(this);
     }
 
-    private void processHeaderEvent(OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException {
+    private void processHeaderEvent(OutputProcessorChain outputProcessorChain) throws XMLStreamException, WSSecurityException {
 
         OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
 
@@ -99,11 +98,11 @@ public class SignatureEndingOutputProcessor extends AbstractOutputProcessor {
         X509Certificate[] x509Certificates;
         try {
             x509Certificates = getSecurityProperties().getSignatureCrypto().getCertificates(alias);
-        } catch (WSSecurityException e) {
-            throw new XMLSecurityException(e);
+        } catch (org.swssf.crypto.WSSecurityException e) {
+            throw new WSSecurityException(e);
         }
         if (x509Certificates == null || x509Certificates.length == 0) {
-            throw new XMLSecurityException("noUserCertsFound");
+            throw new WSSecurityException("noUserCertsFound");
         }
 
         String certUri = "CertId-" + UUID.randomUUID().toString();
@@ -122,7 +121,7 @@ public class SignatureEndingOutputProcessor extends AbstractOutputProcessor {
             try {
                 createCharactersAndOutputAsEvent(subOutputProcessorChain, Base64.encodeBase64String(x509Certificates[0].getEncoded()));
             } catch (CertificateEncodingException e) {
-                throw new XMLSecurityException(e);
+                throw new WSSecurityException(e);
             }
             createEndElementAndOutputAsEvent(subOutputProcessorChain, Constants.TAG_wsse_BinarySecurityToken);
         }
@@ -136,13 +135,13 @@ public class SignatureEndingOutputProcessor extends AbstractOutputProcessor {
             Callback[] callbacks = new Callback[]{pwCb};
             getSecurityProperties().getCallbackHandler().handle(callbacks);
         } catch (IOException e) {
-            throw new XMLSecurityException("noPassword " + alias, e);
+            throw new WSSecurityException("noPassword " + alias, e);
         } catch (UnsupportedCallbackException e) {
-            throw new XMLSecurityException("noPassword " + alias, e);
+            throw new WSSecurityException("noPassword " + alias, e);
         }
         String password = pwCb.getPassword();
         if (password == null) {
-            throw new XMLSecurityException("noPassword " + alias);
+            throw new WSSecurityException("noPassword " + alias);
         }
 
         String signatureAlgorithm = JCEAlgorithmMapper.translateURItoJCEID(getSecurityProperties().getSignatureAlgorithm());
@@ -150,9 +149,9 @@ public class SignatureEndingOutputProcessor extends AbstractOutputProcessor {
         try {
             signature = Signature.getInstance(signatureAlgorithm, "BC");
         } catch (NoSuchAlgorithmException e) {
-            throw new XMLSecurityException(e);
+            throw new WSSecurityException(e);
         } catch (NoSuchProviderException e) {
-            throw new XMLSecurityException(e);
+            throw new WSSecurityException(e);
         }
 
         try {
@@ -161,7 +160,7 @@ public class SignatureEndingOutputProcessor extends AbstractOutputProcessor {
                             alias,
                             password));
         } catch (Exception e) {
-            throw new XMLSecurityException(e);
+            throw new WSSecurityException(e);
         }
 
         SignedInfoProcessor signedInfoProcessor = new SignedInfoProcessor(getSecurityProperties(), signature);
@@ -234,7 +233,7 @@ public class SignatureEndingOutputProcessor extends AbstractOutputProcessor {
         } else if (getSecurityProperties().getSignatureKeyIdentifierType() == Constants.KeyIdentifierType.SKI_KEY_IDENTIFIER) {
             // As per the 1.1 specification, SKI can only be used for a V3 certificate
             if (x509Certificates[0].getVersion() != 3) {
-                throw new XMLSecurityException("invalidCertForSKI");
+                throw new WSSecurityException("invalidCertForSKI");
             }
 
             attributes = new HashMap<QName, String>();
@@ -244,8 +243,8 @@ public class SignatureEndingOutputProcessor extends AbstractOutputProcessor {
             try {
                 byte data[] = getSecurityProperties().getSignatureCrypto().getSKIBytesFromCert(x509Certificates[0]);
                 createCharactersAndOutputAsEvent(subOutputProcessorChain, Base64.encodeBase64String(data));
-            } catch (WSSecurityException e) {
-                throw new XMLSecurityException(e);
+            } catch (org.swssf.crypto.WSSecurityException e) {
+                throw new WSSecurityException(e);
             }
             createEndElementAndOutputAsEvent(subOutputProcessorChain, Constants.TAG_wsse_KeyIdentifier);
         } else if (getSecurityProperties().getSignatureKeyIdentifierType() == Constants.KeyIdentifierType.X509_KEY_IDENTIFIER) {
@@ -257,7 +256,7 @@ public class SignatureEndingOutputProcessor extends AbstractOutputProcessor {
             try {
                 createCharactersAndOutputAsEvent(subOutputProcessorChain, Base64.encodeBase64String(x509Certificates[0].getEncoded()));
             } catch (CertificateEncodingException e) {
-                throw new XMLSecurityException(e);
+                throw new WSSecurityException(e);
             }
             createEndElementAndOutputAsEvent(subOutputProcessorChain, Constants.TAG_wsse_KeyIdentifier);
         } else if (getSecurityProperties().getSignatureKeyIdentifierType() == Constants.KeyIdentifierType.THUMBPRINT_IDENTIFIER) {
@@ -275,9 +274,9 @@ public class SignatureEndingOutputProcessor extends AbstractOutputProcessor {
 
                 createCharactersAndOutputAsEvent(subOutputProcessorChain, Base64.encodeBase64String(data));
             } catch (CertificateEncodingException e) {
-                throw new XMLSecurityException(e);
+                throw new WSSecurityException(e);
             } catch (NoSuchAlgorithmException e) {
-                throw new XMLSecurityException(e);
+                throw new WSSecurityException(e);
             }
             createEndElementAndOutputAsEvent(subOutputProcessorChain, Constants.TAG_wsse_KeyIdentifier);
         } else if (getSecurityProperties().getSignatureKeyIdentifierType() == Constants.KeyIdentifierType.BST_EMBEDDED) {
@@ -308,9 +307,9 @@ public class SignatureEndingOutputProcessor extends AbstractOutputProcessor {
                     createCharactersAndOutputAsEvent(subOutputProcessorChain, Base64.encodeBase64String(getSecurityProperties().getSignatureCrypto().getCertificateData(false, x509Certificates)));
                 }
             } catch (CertificateEncodingException e) {
-                throw new XMLSecurityException(e);
-            } catch (WSSecurityException e) {
-                throw new XMLSecurityException(e);
+                throw new WSSecurityException(e);
+            } catch (org.swssf.crypto.WSSecurityException e) {
+                throw new WSSecurityException(e);
             }
             createEndElementAndOutputAsEvent(subOutputProcessorChain, Constants.TAG_wsse_BinarySecurityToken);
             createEndElementAndOutputAsEvent(subOutputProcessorChain, Constants.TAG_wsse_Reference);
@@ -322,7 +321,7 @@ public class SignatureEndingOutputProcessor extends AbstractOutputProcessor {
             createStartElementAndOutputAsEvent(subOutputProcessorChain, Constants.TAG_wsse_Reference, attributes);
             createEndElementAndOutputAsEvent(subOutputProcessorChain, Constants.TAG_wsse_Reference);
         } else {
-            throw new XMLSecurityException("Unsupported SecurityToken: " + getSecurityProperties().getSignatureKeyIdentifierType().name());
+            throw new WSSecurityException("Unsupported SecurityToken: " + getSecurityProperties().getSignatureKeyIdentifierType().name());
         }
 
         createEndElementAndOutputAsEvent(subOutputProcessorChain, Constants.TAG_wsse_SecurityTokenReference);
@@ -369,7 +368,7 @@ public class SignatureEndingOutputProcessor extends AbstractOutputProcessor {
         private OutputStream bufferedSignerOutputStream;
         private Canonicalizer20010315Transformer canonicalizer20010315Transformer;
 
-        SignedInfoProcessor(SecurityProperties securityProperties, Signature signature) throws XMLSecurityException {
+        SignedInfoProcessor(SecurityProperties securityProperties, Signature signature) throws WSSecurityException {
             super(securityProperties);
             this.getAfterProcessors().add(SignatureEndingOutputProcessor.class.getName());
 
@@ -378,19 +377,19 @@ public class SignatureEndingOutputProcessor extends AbstractOutputProcessor {
             canonicalizer20010315Transformer = new Canonicalizer20010315ExclOmitCommentsTransformer(null);
         }
 
-        public byte[] getSignatureValue() throws XMLSecurityException {
+        public byte[] getSignatureValue() throws WSSecurityException {
             try {
                 bufferedSignerOutputStream.close();
                 return signerOutputStream.sign();
             } catch (SignatureException e) {
-                throw new XMLSecurityException(e);
+                throw new WSSecurityException(e);
             } catch (IOException e) {
-                throw new XMLSecurityException(e);
+                throw new WSSecurityException(e);
             }
         }
 
         @Override
-        public void processEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException {
+        public void processEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain) throws XMLStreamException, WSSecurityException {
             canonicalizer20010315Transformer.transform(xmlEvent, bufferedSignerOutputStream);
             outputProcessorChain.processEvent(xmlEvent);
         }

@@ -42,7 +42,7 @@ public class SignatureOutputProcessor extends AbstractOutputProcessor {
 
     private InternalSignatureOutputProcessor activeInternalSignatureOutputProcessor = null;
 
-    public SignatureOutputProcessor(SecurityProperties securityProperties) throws XMLSecurityException {
+    public SignatureOutputProcessor(SecurityProperties securityProperties) throws WSSecurityException {
         super(securityProperties);
         secureParts = securityProperties.getSignatureSecureParts();
     }
@@ -52,7 +52,7 @@ public class SignatureOutputProcessor extends AbstractOutputProcessor {
     }
 
     @Override
-    public void processEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException {
+    public void processEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain) throws XMLStreamException, WSSecurityException {
         if (xmlEvent.isStartElement()) {
             StartElement startElement = xmlEvent.asStartElement();
 
@@ -94,9 +94,9 @@ public class SignatureOutputProcessor extends AbstractOutputProcessor {
                                 xmlEvent = outputProcessorChain.getSecurityContext().<XMLEventNSAllocator>get(Constants.XMLEVENT_NS_ALLOCATOR).createStartElement(startElement.getName(), namespaceList, attributeList);
 
                             } catch (NoSuchAlgorithmException e) {
-                                throw new XMLSecurityException(e.getMessage(), e);
+                                throw new WSSecurityException(e.getMessage(), e);
                             } catch (NoSuchProviderException e) {
-                                throw new XMLSecurityException(e.getMessage(), e);
+                                throw new WSSecurityException(e.getMessage(), e);
                             }
 
                             activeInternalSignatureOutputProcessor = internalSignatureOutputProcessor;
@@ -120,7 +120,7 @@ public class SignatureOutputProcessor extends AbstractOutputProcessor {
         private org.swssf.impl.util.DigestOutputStream digestOutputStream;
         private List<Transformer> transformers = new LinkedList<Transformer>();
 
-        InternalSignatureOutputProcessor(SecurityProperties securityProperties, SignaturePartDef signaturePartDef, QName startElement) throws XMLSecurityException, NoSuchProviderException, NoSuchAlgorithmException {
+        InternalSignatureOutputProcessor(SecurityProperties securityProperties, SignaturePartDef signaturePartDef, QName startElement) throws WSSecurityException, NoSuchProviderException, NoSuchAlgorithmException {
             super(securityProperties);
             this.getAfterProcessors().add(SignatureOutputProcessor.class.getName());
             this.getBeforeProcessors().add(SignatureEndingOutputProcessor.class.getName());
@@ -137,7 +137,7 @@ public class SignatureOutputProcessor extends AbstractOutputProcessor {
         }
 
         @Override
-        public void processEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException {
+        public void processEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain) throws XMLStreamException, WSSecurityException {
 
             Iterator<Transformer> transformerIterator = transformers.iterator();
             while (transformerIterator.hasNext()) {
@@ -156,7 +156,7 @@ public class SignatureOutputProcessor extends AbstractOutputProcessor {
                     try {
                         bufferedDigestOutputStream.close();
                     } catch (IOException e) {
-                        throw new XMLSecurityException(e);
+                        throw new WSSecurityException(e);
                     }
                     String calculatedDigest = new String(org.bouncycastle.util.encoders.Base64.encode(this.digestOutputStream.getDigestValue()));
                     logger.debug("Calculated Digest: " + calculatedDigest);

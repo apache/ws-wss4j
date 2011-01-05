@@ -87,7 +87,7 @@ public class SignatureInputProcessor extends AbstractInputProcessor {
      */
 
     @Override
-    public XMLEvent processNextHeaderEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
+    public XMLEvent processNextHeaderEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, WSSecurityException {
         XMLEvent xmlEvent = inputProcessorChain.processHeaderEvent();
 
         boolean isFinishedcurrentSignatureType = false;
@@ -99,7 +99,7 @@ public class SignatureInputProcessor extends AbstractInputProcessor {
                     currentSignatureType.validate();
                 }
             } catch (ParseException e) {
-                throw new XMLSecurityException(e);
+                throw new WSSecurityException(e);
             }
         }
 
@@ -148,7 +148,7 @@ public class SignatureInputProcessor extends AbstractInputProcessor {
     }
 
     @Override
-    public XMLEvent processNextEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
+    public XMLEvent processNextEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, WSSecurityException {
         //this method should not be called (processor will be removed after processing header)
         return null;
     }
@@ -163,7 +163,7 @@ public class SignatureInputProcessor extends AbstractInputProcessor {
         private OutputStream bufferedSignerOutputStream;
         private Canonicalizer20010315Transformer canonicalizer20010315Transformer = new Canonicalizer20010315ExclOmitCommentsTransformer(null);
 
-        public SignatureVerifier(SignatureType signatureType, SecurityContext securityContext, SecurityProperties securityProperties) throws XMLSecurityException {
+        public SignatureVerifier(SignatureType signatureType, SecurityContext securityContext, SecurityProperties securityProperties) throws WSSecurityException {
             this.signatureType = signatureType;
             this.securityContext = securityContext;
             this.securityProperties = securityProperties;
@@ -171,11 +171,11 @@ public class SignatureInputProcessor extends AbstractInputProcessor {
             try {
                 createSignatureAlgorithm();
             } catch (Exception e) {
-                throw new XMLSecurityException(e.getMessage(), e);
+                throw new WSSecurityException(e.getMessage(), e);
             }
         }
 
-        private void createSignatureAlgorithm() throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, CertificateException, XMLSecurityException {
+        private void createSignatureAlgorithm() throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, CertificateException, WSSecurityException {
             String signatureAlgorithm = JCEAlgorithmMapper.translateURItoJCEID(signatureType.getSignedInfo().getSignatureMethod().getAlgorithm());
             Signature signature = Signature.getInstance(signatureAlgorithm, "BC");
 
@@ -192,16 +192,16 @@ public class SignatureInputProcessor extends AbstractInputProcessor {
             canonicalizer20010315Transformer.transform(xmlEvent, bufferedSignerOutputStream);
         }
 
-        public void doFinal() throws XMLSecurityException {
+        public void doFinal() throws WSSecurityException {
             try {
                 bufferedSignerOutputStream.close();
                 if (!signerOutputStream.verify(Base64.decode(signatureType.getSignatureValue().getValue()))) {
-                    throw new XMLSecurityException("Signature verification failed");
+                    throw new WSSecurityException("Signature verification failed");
                 }
             } catch (SignatureException e) {
-                throw new XMLSecurityException(e);
+                throw new WSSecurityException(e);
             } catch (IOException e) {
-                throw new XMLSecurityException(e);
+                throw new WSSecurityException(e);
             }
         }
     }

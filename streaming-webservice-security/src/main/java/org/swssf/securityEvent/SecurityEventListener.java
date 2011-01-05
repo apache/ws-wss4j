@@ -14,7 +14,7 @@
  */
 package org.swssf.securityEvent;
 
-import org.swssf.ext.XMLSecurityException;
+import org.swssf.ext.WSSecurityException;
 
 /**
  * @author $Author: giger $
@@ -22,5 +22,5 @@ import org.swssf.ext.XMLSecurityException;
  */
 public interface SecurityEventListener {
 
-    public void registerSecurityEvent(SecurityEvent securityEvent) throws XMLSecurityException;
+    public void registerSecurityEvent(SecurityEvent securityEvent) throws WSSecurityException;
 }

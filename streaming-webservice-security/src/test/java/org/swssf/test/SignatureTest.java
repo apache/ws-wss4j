@@ -57,8 +57,8 @@ public class SignatureTest extends AbstractTestBase {
             securityProperties.setSignatureUser("transmitter");
             securityProperties.setCallbackHandler(new CallbackHandlerImpl());
 
-            OutboundXMLSec xmlSecOut = WSSec.getOutboundXMLSec(securityProperties);
-            XMLStreamWriter xmlStreamWriter = xmlSecOut.processOutMessage(baos);
+            OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
+            XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos);
             XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml"));
             XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
             xmlStreamWriter.close();
@@ -102,8 +102,8 @@ public class SignatureTest extends AbstractTestBase {
         {
             SecurityProperties securityProperties = new SecurityProperties();
             securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
-            InboundXMLSec xmlSec = WSSec.getInboundXMLSec(securityProperties);
-            XMLStreamReader xmlStreamReader = xmlSec.processInMessage(new CustomW3CDOMStreamReader(securedDocument));
+            InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
+            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(new CustomW3CDOMStreamReader(securedDocument));
 
             Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
 
@@ -127,8 +127,8 @@ public class SignatureTest extends AbstractTestBase {
             securityProperties.addSignaturePart(new SecurePart("complexType", "http://www.w3.org/1999/XMLSchema", "Element"));
             securityProperties.setCallbackHandler(new CallbackHandlerImpl());
 
-            OutboundXMLSec xmlSecOut = WSSec.getOutboundXMLSec(securityProperties);
-            XMLStreamWriter xmlStreamWriter = xmlSecOut.processOutMessage(baos);
+            OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
+            XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos);
             XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml"));
             XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
             xmlStreamWriter.close();
@@ -180,8 +180,8 @@ public class SignatureTest extends AbstractTestBase {
         {
             SecurityProperties securityProperties = new SecurityProperties();
             securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
-            InboundXMLSec xmlSec = WSSec.getInboundXMLSec(securityProperties);
-            XMLStreamReader xmlStreamReader = xmlSec.processInMessage(new CustomW3CDOMStreamReader(securedDocument));
+            InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
+            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(new CustomW3CDOMStreamReader(securedDocument));
 
             Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
 
@@ -205,8 +205,8 @@ public class SignatureTest extends AbstractTestBase {
             securityProperties.setSignatureKeyIdentifierType(Constants.KeyIdentifierType.ISSUER_SERIAL);
             securityProperties.setCallbackHandler(new CallbackHandlerImpl());
 
-            OutboundXMLSec xmlSecOut = WSSec.getOutboundXMLSec(securityProperties);
-            XMLStreamWriter xmlStreamWriter = xmlSecOut.processOutMessage(baos);
+            OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
+            XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos);
             XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml"));
             XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
             xmlStreamWriter.close();
@@ -257,8 +257,8 @@ public class SignatureTest extends AbstractTestBase {
         {
             SecurityProperties securityProperties = new SecurityProperties();
             securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
-            InboundXMLSec xmlSec = WSSec.getInboundXMLSec(securityProperties);
-            XMLStreamReader xmlStreamReader = xmlSec.processInMessage(new CustomW3CDOMStreamReader(securedDocument));
+            InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
+            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(new CustomW3CDOMStreamReader(securedDocument));
 
             Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
 
@@ -283,8 +283,8 @@ public class SignatureTest extends AbstractTestBase {
             securityProperties.setSignatureKeyIdentifierType(Constants.KeyIdentifierType.BST_DIRECT_REFERENCE);
             securityProperties.setCallbackHandler(new org.swssf.test.CallbackHandlerImpl());
 
-            OutboundXMLSec xmlSecOut = WSSec.getOutboundXMLSec(securityProperties);
-            XMLStreamWriter xmlStreamWriter = xmlSecOut.processOutMessage(baos);
+            OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
+            XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos);
             XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml"));
             XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
             xmlStreamWriter.close();
@@ -335,8 +335,8 @@ public class SignatureTest extends AbstractTestBase {
         {
             SecurityProperties securityProperties = new SecurityProperties();
             securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
-            InboundXMLSec xmlSec = WSSec.getInboundXMLSec(securityProperties);
-            XMLStreamReader xmlStreamReader = xmlSec.processInMessage(new CustomW3CDOMStreamReader(securedDocument));
+            InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
+            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(new CustomW3CDOMStreamReader(securedDocument));
 
             Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
 
@@ -361,8 +361,8 @@ public class SignatureTest extends AbstractTestBase {
             securityProperties.setSignatureKeyIdentifierType(Constants.KeyIdentifierType.BST_EMBEDDED);
             securityProperties.setCallbackHandler(new org.swssf.test.CallbackHandlerImpl());
 
-            OutboundXMLSec xmlSecOut = WSSec.getOutboundXMLSec(securityProperties);
-            XMLStreamWriter xmlStreamWriter = xmlSecOut.processOutMessage(baos);
+            OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
+            XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos);
             XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml"));
             XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
             xmlStreamWriter.close();
@@ -389,8 +389,8 @@ public class SignatureTest extends AbstractTestBase {
         {
             SecurityProperties securityProperties = new SecurityProperties();
             securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
-            InboundXMLSec xmlSec = WSSec.getInboundXMLSec(securityProperties);
-            XMLStreamReader xmlStreamReader = xmlSec.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
+            InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
+            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
             Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
 
@@ -415,8 +415,8 @@ public class SignatureTest extends AbstractTestBase {
             securityProperties.setSignatureKeyIdentifierType(Constants.KeyIdentifierType.X509_KEY_IDENTIFIER);
             securityProperties.setCallbackHandler(new org.swssf.test.CallbackHandlerImpl());
 
-            OutboundXMLSec xmlSecOut = WSSec.getOutboundXMLSec(securityProperties);
-            XMLStreamWriter xmlStreamWriter = xmlSecOut.processOutMessage(baos);
+            OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
+            XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos);
             XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml"));
             XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
             xmlStreamWriter.close();
@@ -467,8 +467,8 @@ public class SignatureTest extends AbstractTestBase {
         {
             SecurityProperties securityProperties = new SecurityProperties();
             securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
-            InboundXMLSec xmlSec = WSSec.getInboundXMLSec(securityProperties);
-            XMLStreamReader xmlStreamReader = xmlSec.processInMessage(new CustomW3CDOMStreamReader(securedDocument));
+            InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
+            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(new CustomW3CDOMStreamReader(securedDocument));
 
             Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
 
@@ -493,8 +493,8 @@ public class SignatureTest extends AbstractTestBase {
             securityProperties.setSignatureKeyIdentifierType(Constants.KeyIdentifierType.SKI_KEY_IDENTIFIER);
             securityProperties.setCallbackHandler(new org.swssf.test.CallbackHandlerImpl());
 
-            OutboundXMLSec xmlSecOut = WSSec.getOutboundXMLSec(securityProperties);
-            XMLStreamWriter xmlStreamWriter = xmlSecOut.processOutMessage(baos);
+            OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
+            XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos);
             XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml"));
             XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
             xmlStreamWriter.close();
@@ -545,8 +545,8 @@ public class SignatureTest extends AbstractTestBase {
         {
             SecurityProperties securityProperties = new SecurityProperties();
             securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
-            InboundXMLSec xmlSec = WSSec.getInboundXMLSec(securityProperties);
-            XMLStreamReader xmlStreamReader = xmlSec.processInMessage(new CustomW3CDOMStreamReader(securedDocument));
+            InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
+            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(new CustomW3CDOMStreamReader(securedDocument));
 
             Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
 
@@ -570,8 +570,8 @@ public class SignatureTest extends AbstractTestBase {
             securityProperties.setSignatureKeyIdentifierType(Constants.KeyIdentifierType.THUMBPRINT_IDENTIFIER);
             securityProperties.setCallbackHandler(new org.swssf.test.CallbackHandlerImpl());
 
-            OutboundXMLSec xmlSecOut = WSSec.getOutboundXMLSec(securityProperties);
-            XMLStreamWriter xmlStreamWriter = xmlSecOut.processOutMessage(baos);
+            OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
+            XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos);
             XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml"));
             XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
             xmlStreamWriter.close();
@@ -622,8 +622,8 @@ public class SignatureTest extends AbstractTestBase {
         {
             SecurityProperties securityProperties = new SecurityProperties();
             securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
-            InboundXMLSec xmlSec = WSSec.getInboundXMLSec(securityProperties);
-            XMLStreamReader xmlStreamReader = xmlSec.processInMessage(new CustomW3CDOMStreamReader(securedDocument));
+            InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
+            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(new CustomW3CDOMStreamReader(securedDocument));
 
             Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
 

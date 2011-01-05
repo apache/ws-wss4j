@@ -78,18 +78,18 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
      */
 
     @Override
-    public XMLEvent processNextHeaderEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
+    public XMLEvent processNextHeaderEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, WSSecurityException {
         XMLEvent xmlEvent = inputProcessorChain.processHeaderEvent();
         return processEvent(xmlEvent, inputProcessorChain, true);
     }
 
     @Override
-    public XMLEvent processNextEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
+    public XMLEvent processNextEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, WSSecurityException {
         XMLEvent xmlEvent = inputProcessorChain.processEvent();
         return processEvent(xmlEvent, inputProcessorChain, false);
     }
 
-    private XMLEvent processEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain, boolean isSecurityHeaderEvent) throws XMLStreamException, XMLSecurityException {
+    private XMLEvent processEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain, boolean isSecurityHeaderEvent) throws XMLStreamException, WSSecurityException {
 
         //todo overall null checks
 
@@ -108,7 +108,7 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
                             logger.debug("Found encryption reference: " + refId.getValue() + " on element" + startElement.getName());
                             //duplicate id's are forbidden
                             if (referenceType.isProcessed()) {
-                                throw new XMLSecurityException("duplicate id encountered!");
+                                throw new WSSecurityException("duplicate id encountered!");
                             }
                             currentEncryptedDataType = new EncryptedDataType(startElement);
 
@@ -154,7 +154,7 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
                                 try {
                                     currentEncryptedDataType.parseXMLEvent(encryptedDataXMLEvent);
                                 } catch (ParseException e) {
-                                    throw new XMLSecurityException(e);
+                                    throw new WSSecurityException(e);
                                 }
                             }
                             while (!(encryptedDataXMLEvent.isStartElement() && encryptedDataXMLEvent.asStartElement().getName().equals(Constants.TAG_xenc_CipherValue)));
@@ -162,7 +162,7 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
                             try {
                                 currentEncryptedDataType.validate();
                             } catch (ParseException e) {
-                                throw new XMLSecurityException(e);
+                                throw new WSSecurityException(e);
                             }
 
                             //create a new Thread for streaming decryption
@@ -199,14 +199,14 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
     }
 
     @Override
-    public void doFinal(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
+    public void doFinal(InputProcessorChain inputProcessorChain) throws XMLStreamException, WSSecurityException {
         //here we check if all references where processed.
         List<ReferenceType> references = referenceList.getDataReferenceOrKeyReference();
         Iterator<ReferenceType> referenceTypeIterator = references.iterator();
         while (referenceTypeIterator.hasNext()) {
             ReferenceType referenceType = referenceTypeIterator.next();
             if (!referenceType.isProcessed()) {
-                throw new XMLSecurityException("Some encryption references where not processed... Probably security header ordering problem?");
+                throw new WSSecurityException("Some encryption references where not processed... Probably security header ordering problem?");
             }
         }
         inputProcessorChain.doFinal();
@@ -237,16 +237,16 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
         }
 
         @Override
-        public XMLEvent processNextHeaderEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
+        public XMLEvent processNextHeaderEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, WSSecurityException {
             return processEvent(inputProcessorChain, true);
         }
 
         @Override
-        public XMLEvent processNextEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
+        public XMLEvent processNextEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, WSSecurityException {
             return processEvent(inputProcessorChain, false);
         }
 
-        private XMLEvent processEvent(InputProcessorChain inputProcessorChain, boolean headerEvent) throws XMLStreamException, XMLSecurityException {
+        private XMLEvent processEvent(InputProcessorChain inputProcessorChain, boolean headerEvent) throws XMLStreamException, WSSecurityException {
             //did a execption occur during decryption in the decryption thread?
             testAndThrowUncaughtException();
             //here we request the next XMLEvent from the decryption thread
@@ -326,8 +326,8 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
 
         public void testAndThrowUncaughtException() throws XMLStreamException {
             if (this.thrownException != null) {
-                if (this.thrownException instanceof UncheckedXMLSecurityException) {
-                    UncheckedXMLSecurityException uxse = (UncheckedXMLSecurityException) this.thrownException;
+                if (this.thrownException instanceof UncheckedWSSecurityException) {
+                    UncheckedWSSecurityException uxse = (UncheckedWSSecurityException) this.thrownException;
                     throw new XMLStreamException(uxse.getCause());
                 } else {
                     throw new XMLStreamException(this.thrownException.getCause());
@@ -395,7 +395,7 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
                     EncryptionPartDef.Modifier.getModifier(encryptedDataType.getType()));
         }
 
-        private XMLEvent processNextEvent() throws XMLSecurityException, XMLStreamException {
+        private XMLEvent processNextEvent() throws WSSecurityException, XMLStreamException {
             inputProcessorChain.reset();
             if (header) {
                 return inputProcessorChain.processHeaderEvent();
@@ -438,11 +438,11 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
                     symmetricCipher = Cipher.getInstance(syncEncAlgo, "BC");
                     //we have to defer the initialization of the cipher until we can extract the IV...
                 } catch (NoSuchAlgorithmException e) {
-                    throw new XMLSecurityException(e);
+                    throw new WSSecurityException(e);
                 } catch (NoSuchProviderException e) {
-                    throw new XMLSecurityException(e);
+                    throw new WSSecurityException(e);
                 } catch (NoSuchPaddingException e) {
-                    throw new XMLSecurityException(e);
+                    throw new WSSecurityException(e);
                 }
 
                 //fire an AlgorithmSuiteSecurityEvent 
@@ -543,7 +543,7 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
                             decryptOutputStream.write(xmlEvent.asCharacters().getData().getBytes(inputProcessorChain.getDocumentContext().getEncoding()));
                             break;
                         default:
-                            throw new XMLSecurityException("Unexpected event: " + Utils.getXMLEventAsString(xmlEvent));
+                            throw new WSSecurityException("Unexpected event: " + Utils.getXMLEventAsString(xmlEvent));
                     }
                 }
 
@@ -560,7 +560,7 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
                 tempBufferedWriter.close();
 
             } catch (Exception e) {
-                throw new UncheckedXMLSecurityException(e);
+                throw new UncheckedWSSecurityException(e);
             }
         }
     }

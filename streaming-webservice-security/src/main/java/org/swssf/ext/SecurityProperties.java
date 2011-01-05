@@ -118,12 +118,12 @@ public class SecurityProperties {
     /**
      * returns the decryptionCrypto for the key-management
      * @return A Crypto instance
-     * @throws XMLSecurityException thrown if something goes wrong
+     * @throws WSSecurityException thrown if something goes wrong
      */
-    public Crypto getDecryptionCrypto() throws XMLSecurityException {
+    public Crypto getDecryptionCrypto() throws WSSecurityException {
 
         if (this.getDecryptionKeyStore() == null) {
-            throw new XMLSecurityException(new SecurityConfigurationException("Decryption KeyStore is not set"));
+            throw new WSSecurityException(new SecurityConfigurationException("Decryption KeyStore is not set"));
         }
 
         Class decryptionCryptoClass = org.swssf.crypto.Merlin.class;
@@ -136,7 +136,7 @@ public class SecurityProperties {
             decryptionCrypto.setKeyStore(this.getDecryptionKeyStore());
             return decryptionCrypto;
         } catch (Exception e) {
-            throw new XMLSecurityException("decryptionCrypto instanciation failed", e);
+            throw new WSSecurityException("decryptionCrypto instanciation failed", e);
         }
     }
 
@@ -208,9 +208,9 @@ public class SecurityProperties {
     /**
      * returns the encryptionCrypto for the key-management
      * @return A Crypto instance
-     * @throws XMLSecurityException thrown if something goes wrong
+     * @throws WSSecurityException thrown if something goes wrong
      */
-    public Crypto getEncryptionCrypto() throws XMLSecurityException {
+    public Crypto getEncryptionCrypto() throws WSSecurityException {
         Class encryptionCryptoClass = org.swssf.crypto.Merlin.class;
         if (this.getEncryptionCryptoClass() != null) {
             encryptionCryptoClass = this.getEncryptionCryptoClass();
@@ -221,7 +221,7 @@ public class SecurityProperties {
             encryptionCrypto.setKeyStore(this.getEncryptionKeyStore());
             return encryptionCrypto;
         } catch (Exception e) {
-            throw new XMLSecurityException("decryptionCrypto instanciation failed", e);
+            throw new WSSecurityException("decryptionCrypto instanciation failed", e);
         }
     }
 
@@ -374,7 +374,7 @@ public class SecurityProperties {
 
     //todo caching?
 
-    public Crypto getSignatureCrypto() throws XMLSecurityException {
+    public Crypto getSignatureCrypto() throws WSSecurityException {
         Class signatureCryptoClass = org.swssf.crypto.Merlin.class;
         if (this.getDecryptionCryptoClass() != null) {
             signatureCryptoClass = this.getSignatureCryptoClass();
@@ -385,7 +385,7 @@ public class SecurityProperties {
             signatureCrypto.setKeyStore(this.getSignatureKeyStore());
             return signatureCrypto;
         } catch (Exception e) {
-            throw new XMLSecurityException("signatureCrypto instanciation failed", e);
+            throw new WSSecurityException("signatureCrypto instanciation failed", e);
         }
     }
 
@@ -455,7 +455,7 @@ public class SecurityProperties {
 
     //todo caching?
 
-    public Crypto getSignatureVerificationCrypto() throws XMLSecurityException {
+    public Crypto getSignatureVerificationCrypto() throws WSSecurityException {
         Class signatureVerificationCryptoClass = org.swssf.crypto.Merlin.class;
         if (this.getSignatureVerificationCryptoClass() != null) {
             signatureVerificationCryptoClass = this.getSignatureVerificationCryptoClass();
@@ -466,7 +466,7 @@ public class SecurityProperties {
             signatureVerificationCrypto.setKeyStore(this.getSignatureVerificationKeyStore());
             return signatureVerificationCrypto;
         } catch (Exception e) {
-            throw new XMLSecurityException("decryptionCrypto instanciation failed", e);
+            throw new WSSecurityException("decryptionCrypto instanciation failed", e);
         }
     }
 

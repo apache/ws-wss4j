@@ -37,25 +37,25 @@ public class FinalOutputProcessor extends AbstractOutputProcessor {
         xmlOutputFactory.setProperty(XMLOutputFactory.IS_REPAIRING_NAMESPACES, true);
     }
 
-    public FinalOutputProcessor(OutputStream outputStream, SecurityProperties securityProperties) throws XMLSecurityException {
+    public FinalOutputProcessor(OutputStream outputStream, SecurityProperties securityProperties) throws WSSecurityException {
         super(securityProperties);
         setPhase(Constants.Phase.POSTPROCESSING);
         try {
             xmlEventWriter = xmlOutputFactory.createXMLEventWriter(outputStream, "UTF-8");
         } catch (XMLStreamException e) {
-            throw new XMLSecurityException(e);
+            throw new WSSecurityException(e);
         }
     }
 
-    public void processEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException {
+    public void processEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain) throws XMLStreamException, WSSecurityException {
         xmlEventWriter.add(xmlEvent);
     }
 
-    public void doFinal(OutputProcessorChain outputProcessorChain) throws XMLSecurityException {
+    public void doFinal(OutputProcessorChain outputProcessorChain) throws WSSecurityException {
         try {
             xmlEventWriter.flush();
         } catch (XMLStreamException e) {
-            throw new XMLSecurityException(e.getMessage(), e);
+            throw new WSSecurityException(e.getMessage(), e);
         }
     }
 }

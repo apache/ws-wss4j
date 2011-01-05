@@ -17,7 +17,7 @@ package org.swssf.test;
 import org.swssf.ext.Constants;
 import org.swssf.ext.SecurePart;
 import org.swssf.ext.SecurityProperties;
-import org.swssf.ext.XMLSecurityException;
+import org.swssf.ext.WSSecurityException;
 import org.swssf.policy.PolicyEnforcer;
 import org.swssf.policy.PolicyEnforcerFactory;
 import org.swssf.policy.PolicyInputProcessor;
@@ -95,10 +95,10 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
         } catch (XMLStreamException e) {
             Throwable throwable = e.getCause();
             Assert.assertNotNull(throwable);
-            Assert.assertTrue(throwable instanceof XMLSecurityException);
+            Assert.assertTrue(throwable instanceof WSSecurityException);
             throwable = throwable.getCause();
             Assert.assertNotNull(throwable);
-            Assert.assertTrue(throwable instanceof XMLSecurityException);
+            Assert.assertTrue(throwable instanceof WSSecurityException);
             //we expect a "No SecurityToken found" since WSS says that a token must be declared before use.
             //the declare before use is in the nature of streaming xml-security and therefore expected
             Assert.assertEquals(throwable.getMessage(), "No SecurityToken found");
@@ -184,7 +184,7 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
         } catch (XMLStreamException e) {
             Throwable throwable = e.getCause();
             Assert.assertNotNull(throwable);
-            Assert.assertTrue(throwable instanceof XMLSecurityException);
+            Assert.assertTrue(throwable instanceof WSSecurityException);
             Assert.assertEquals(throwable.getMessage(), "SOAPAction does not match with the current Operation");
         }
     }
@@ -265,7 +265,7 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
         } catch (XMLStreamException e) {
             Throwable throwable = e.getCause();
             Assert.assertNotNull(throwable);
-            Assert.assertTrue(throwable instanceof XMLSecurityException);
+            Assert.assertTrue(throwable instanceof WSSecurityException);
             Assert.assertEquals(throwable.getMessage(), "Digest verification failed");
         }
     }
@@ -278,7 +278,7 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
 
     /*
     ** This test cannot be done here. We rely on the correct settings of the
-    * XMLStreamReader which is taken over us. @see InboundXMLSec#processInMessage
+    * XMLStreamReader which is taken over us. @see InboundWSSec#processInMessage
 
     @Test
     public void test_DosAttackWithRecursiveEntity() throws Exception {
@@ -327,7 +327,7 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
             e.printStackTrace();
             Throwable throwable = e.getCause();
             Assert.assertNotNull(throwable);
-            Assert.assertTrue(throwable instanceof XMLSecurityException);
+            Assert.assertTrue(throwable instanceof WSSecurityException);
             throwable = throwable.getCause();
             Assert.assertNotNull(throwable);
             Assert.assertTrue(throwable instanceof PolicyViolationException);

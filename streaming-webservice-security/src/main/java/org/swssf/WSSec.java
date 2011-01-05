@@ -48,38 +48,38 @@ public class WSSec {
      * Creates and configures an outbound streaming security engine
      *
      * @param securityProperties The user-defined security configuration
-     * @return A new OutboundXMLSec
-     * @throws XMLSecurityException           if the initialisation failed
+     * @return A new OutboundWSSec
+     * @throws org.swssf.ext.WSSecurityException           if the initialisation failed
      * @throws SecurityConfigurationException if the configuration is invalid
      */
-    public static OutboundXMLSec getOutboundXMLSec(SecurityProperties securityProperties) throws XMLSecurityException, SecurityConfigurationException {
+    public static OutboundWSSec getOutboundWSSec(SecurityProperties securityProperties) throws WSSecurityException, SecurityConfigurationException {
         if (securityProperties == null) {
-            throw new XMLSecurityException("SecurityProperties must not be null!");
+            throw new WSSecurityException("SecurityProperties must not be null!");
         }
 
         Init.init(null);
 
         securityProperties = validateAndApplyDefaultsToOutboundSecurityProperties(securityProperties);
-        return new OutboundXMLSec(securityProperties);
+        return new OutboundWSSec(securityProperties);
     }
 
     /**
      * Creates and configures an inbound streaming security engine
      *
      * @param securityProperties The user-defined security configuration
-     * @return A new InboundXMLSec
-     * @throws XMLSecurityException           if the initialisation failed
+     * @return A new InboundWSSec
+     * @throws org.swssf.ext.WSSecurityException           if the initialisation failed
      * @throws SecurityConfigurationException if the configuration is invalid
      */
-    public static InboundXMLSec getInboundXMLSec(SecurityProperties securityProperties) throws XMLSecurityException, SecurityConfigurationException {
+    public static InboundWSSec getInboundWSSec(SecurityProperties securityProperties) throws WSSecurityException, SecurityConfigurationException {
         if (securityProperties == null) {
-            throw new XMLSecurityException("SecurityProperties must not be null!");
+            throw new WSSecurityException("SecurityProperties must not be null!");
         }
 
         Init.init(null);
 
         securityProperties = validateAndApplyDefaultsToInboundSecurityProperties(securityProperties);
-        return new InboundXMLSec(securityProperties);
+        return new InboundWSSec(securityProperties);
     }
 
     /**

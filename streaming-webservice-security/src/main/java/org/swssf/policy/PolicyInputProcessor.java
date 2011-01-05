@@ -38,7 +38,7 @@ public class PolicyInputProcessor extends AbstractInputProcessor {
     }
 
     @Override
-    public XMLEvent processNextHeaderEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
+    public XMLEvent processNextHeaderEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, WSSecurityException {
         XMLEvent xmlEvent = inputProcessorChain.processHeaderEvent();
         //test if non encrypted element not have to be encrypted per policy
         if (!inputProcessorChain.getDocumentContext().isInEncryptedContent() && inputProcessorChain.getDocumentContext().isInSecurityHeader()) {
@@ -48,7 +48,7 @@ public class PolicyInputProcessor extends AbstractInputProcessor {
     }
 
     @Override
-    public XMLEvent processNextEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
+    public XMLEvent processNextEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, WSSecurityException {
         XMLEvent xmlEvent = inputProcessorChain.processEvent();
 
         if (xmlEvent.isStartElement()) {
@@ -64,7 +64,7 @@ public class PolicyInputProcessor extends AbstractInputProcessor {
             try {
                 policyEnforcer.doFinal();
             } catch (PolicyViolationException e) {
-                throw new XMLSecurityException(e);
+                throw new WSSecurityException(e);
             }
         }
 
@@ -95,7 +95,7 @@ public class PolicyInputProcessor extends AbstractInputProcessor {
         return xmlEvent;
     }
 
-    private void testEncryptionPolicy(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain) throws XMLSecurityException {
+    private void testEncryptionPolicy(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain) throws WSSecurityException {
         //the following events are only interesting for policy verification. So call directly the policyEnforcer for these
         if (xmlEvent.isStartElement()) {
 

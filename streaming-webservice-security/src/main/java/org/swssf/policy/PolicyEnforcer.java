@@ -14,7 +14,7 @@
  */
 package org.swssf.policy;
 
-import org.swssf.ext.XMLSecurityException;
+import org.swssf.ext.WSSecurityException;
 import org.swssf.policy.assertionStates.AssertionState;
 import org.swssf.policy.secpolicy.WSSPolicyException;
 import org.swssf.policy.secpolicy.model.AbstractSecurityAssertion;
@@ -193,7 +193,7 @@ public class PolicyEnforcer implements SecurityEventListener {
     }
 
     //multiple threads can call this method concurrently -> synchronize access
-    public synchronized void registerSecurityEvent(SecurityEvent securityEvent) throws XMLSecurityException {
+    public synchronized void registerSecurityEvent(SecurityEvent securityEvent) throws WSSecurityException {
 
         if (effectivePolicy != null) {
             //soap-action spoofing detection

@@ -79,16 +79,16 @@ public class Utils {
      * Executes the Callback handling. Typically used to fetch passwords 
      * @param callbackHandler
      * @param callback
-     * @throws XMLSecurityException if the callback couldn't be executed
+     * @throws WSSecurityException if the callback couldn't be executed
      */
-    public static void doCallback(CallbackHandler callbackHandler, Callback callback) throws XMLSecurityException {
+    public static void doCallback(CallbackHandler callbackHandler, Callback callback) throws WSSecurityException {
         try {
             Callback[] callbacks = new Callback[]{callback};
             callbackHandler.handle(callbacks);
         } catch (IOException e) {
-            throw new XMLSecurityException(e);
+            throw new WSSecurityException(e);
         } catch (UnsupportedCallbackException e) {
-            throw new XMLSecurityException(e);
+            throw new WSSecurityException(e);
         }
     }
 }

@@ -37,7 +37,7 @@ public class XMLEventReaderInputProcessor extends AbstractInputProcessor {
     }
 
     @Override
-    public XMLEvent processNextHeaderEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
+    public XMLEvent processNextHeaderEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, WSSecurityException {
         XMLEvent xmlEvent = xmlEventReader.nextEvent();
         if (xmlEvent.isStartElement()) {
             inputProcessorChain.getDocumentContext().addPathElement(xmlEvent.asStartElement().getName());
@@ -48,7 +48,7 @@ public class XMLEventReaderInputProcessor extends AbstractInputProcessor {
     }
 
     @Override
-    public XMLEvent processNextEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
+    public XMLEvent processNextEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, WSSecurityException {
         XMLEvent xmlEvent = xmlEventReader.nextEvent();
         if (xmlEvent.isStartElement()) {
             inputProcessorChain.getDocumentContext().addPathElement(xmlEvent.asStartElement().getName());
@@ -59,7 +59,7 @@ public class XMLEventReaderInputProcessor extends AbstractInputProcessor {
     }
 
     @Override
-    public void doFinal(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
+    public void doFinal(InputProcessorChain inputProcessorChain) throws XMLStreamException, WSSecurityException {
         //nothing to-do. Also don't call super.doFinal() we are the last processor
     }
 }

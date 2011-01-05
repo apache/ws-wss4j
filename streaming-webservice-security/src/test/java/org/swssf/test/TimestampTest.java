@@ -52,8 +52,8 @@ public class TimestampTest extends AbstractTestBase {
             Constants.Action[] actions = new Constants.Action[]{Constants.Action.TIMESTAMP};
             securityProperties.setOutAction(actions);
 
-            OutboundXMLSec xmlSecOut = WSSec.getOutboundXMLSec(securityProperties);
-            XMLStreamWriter xmlStreamWriter = xmlSecOut.processOutMessage(baos);
+            OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
+            XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos);
             XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml"));
             XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
             xmlStreamWriter.close();
@@ -103,8 +103,8 @@ public class TimestampTest extends AbstractTestBase {
         //done timestamp; now test timestamp-verification:
         {
             SecurityProperties securityProperties = new SecurityProperties();
-            InboundXMLSec xmlSec = WSSec.getInboundXMLSec(securityProperties);
-            XMLStreamReader xmlStreamReader = xmlSec.processInMessage(new CustomW3CDOMStreamReader(securedDocument));
+            InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
+            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(new CustomW3CDOMStreamReader(securedDocument));
 
             Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
 
@@ -125,8 +125,8 @@ public class TimestampTest extends AbstractTestBase {
             securityProperties.setOutAction(actions);
             securityProperties.setTimestampTTL(3600);
 
-            OutboundXMLSec xmlSecOut = WSSec.getOutboundXMLSec(securityProperties);
-            XMLStreamWriter xmlStreamWriter = xmlSecOut.processOutMessage(baos);
+            OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
+            XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos);
             XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml"));
             XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
             xmlStreamWriter.close();
@@ -180,15 +180,15 @@ public class TimestampTest extends AbstractTestBase {
         //done timestamp; now test timestamp-verification:
         {
             SecurityProperties securityProperties = new SecurityProperties();
-            InboundXMLSec xmlSec = WSSec.getInboundXMLSec(securityProperties);
-            XMLStreamReader xmlStreamReader = xmlSec.processInMessage(new CustomW3CDOMStreamReader(securedDocument));
+            InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
+            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(new CustomW3CDOMStreamReader(securedDocument));
 
             try {
                 Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
                 Assert.fail("Expected XMLStreamException");
             } catch (XMLStreamException e) {
                 Assert.assertNotNull(e.getCause());
-                Assert.assertTrue(e.getCause() instanceof XMLSecurityException);
+                Assert.assertTrue(e.getCause() instanceof WSSecurityException);
                 Assert.assertEquals(e.getCause().getMessage(), "invalidTimestamp The security semantics of the message have expired");
             }
         }
@@ -218,15 +218,15 @@ public class TimestampTest extends AbstractTestBase {
             SecurityProperties securityProperties = new SecurityProperties();
             securityProperties.setCallbackHandler(new CallbackHandlerImpl());
             securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
-            InboundXMLSec xmlSec = WSSec.getInboundXMLSec(securityProperties);
-            XMLStreamReader xmlStreamReader = xmlSec.processInMessage(new CustomW3CDOMStreamReader(securedDocument));
+            InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
+            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(new CustomW3CDOMStreamReader(securedDocument));
 
             try {
                 Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
                 Assert.fail("Expected XMLStreamException");
             } catch (XMLStreamException e) {
                 Assert.assertNotNull(e.getCause());
-                Assert.assertTrue(e.getCause() instanceof XMLSecurityException);
+                Assert.assertTrue(e.getCause() instanceof WSSecurityException);
                 Assert.assertEquals(e.getCause().getMessage(), "invalidTimestamp The security semantics of the message have expired");
             }
         }
@@ -267,15 +267,15 @@ public class TimestampTest extends AbstractTestBase {
         //done timestamp; now test timestamp-verification:
         {
             SecurityProperties securityProperties = new SecurityProperties();
-            InboundXMLSec xmlSec = WSSec.getInboundXMLSec(securityProperties);
-            XMLStreamReader xmlStreamReader = xmlSec.processInMessage(new CustomW3CDOMStreamReader(securedDocument));
+            InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
+            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(new CustomW3CDOMStreamReader(securedDocument));
 
             try {
                 Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
                 Assert.fail("Expected XMLStreamException");
             } catch (XMLStreamException e) {
                 Assert.assertNotNull(e.getCause());
-                Assert.assertTrue(e.getCause() instanceof XMLSecurityException);
+                Assert.assertTrue(e.getCause() instanceof WSSecurityException);
                 Assert.assertEquals(e.getCause().getMessage(), "invalidTimestamp The security semantics of the message is invalid");
             }
         }
@@ -303,8 +303,8 @@ public class TimestampTest extends AbstractTestBase {
         {
             SecurityProperties securityProperties = new SecurityProperties();
             securityProperties.setStrictTimestampCheck(false);
-            InboundXMLSec xmlSec = WSSec.getInboundXMLSec(securityProperties);
-            XMLStreamReader xmlStreamReader = xmlSec.processInMessage(new CustomW3CDOMStreamReader(securedDocument));
+            InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
+            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(new CustomW3CDOMStreamReader(securedDocument));
 
             Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
         }
@@ -332,15 +332,15 @@ public class TimestampTest extends AbstractTestBase {
         {
             SecurityProperties securityProperties = new SecurityProperties();
             securityProperties.setTimestampTTL(1);
-            InboundXMLSec xmlSec = WSSec.getInboundXMLSec(securityProperties);
-            XMLStreamReader xmlStreamReader = xmlSec.processInMessage(new CustomW3CDOMStreamReader(securedDocument));
+            InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
+            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(new CustomW3CDOMStreamReader(securedDocument));
 
             try {
                 Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
                 Assert.fail("Expected XMLStreamException");
             } catch (XMLStreamException e) {
                 Assert.assertNotNull(e.getCause());
-                Assert.assertTrue(e.getCause() instanceof XMLSecurityException);
+                Assert.assertTrue(e.getCause() instanceof WSSecurityException);
                 Assert.assertEquals(e.getCause().getMessage(), "invalidTimestampTTL The security semantics of the message have expired");
             }
         }
@@ -369,8 +369,8 @@ public class TimestampTest extends AbstractTestBase {
         //done timestamp; now test timestamp-verification:
         {
             SecurityProperties securityProperties = new SecurityProperties();
-            InboundXMLSec xmlSec = WSSec.getInboundXMLSec(securityProperties);
-            XMLStreamReader xmlStreamReader = xmlSec.processInMessage(new CustomW3CDOMStreamReader(securedDocument));
+            InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
+            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(new CustomW3CDOMStreamReader(securedDocument));
 
             try {
                 Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
@@ -378,7 +378,7 @@ public class TimestampTest extends AbstractTestBase {
             } catch (XMLStreamException e) {
                 Throwable throwable = e.getCause();
                 Assert.assertNotNull(throwable);
-                Assert.assertTrue(throwable instanceof XMLSecurityException);
+                Assert.assertTrue(throwable instanceof WSSecurityException);
                 throwable = throwable.getCause();
                 Assert.assertNotNull(throwable);
                 Assert.assertTrue(throwable instanceof ParseException);
@@ -410,8 +410,8 @@ public class TimestampTest extends AbstractTestBase {
         //done timestamp; now test timestamp-verification:
         {
             SecurityProperties securityProperties = new SecurityProperties();
-            InboundXMLSec xmlSec = WSSec.getInboundXMLSec(securityProperties);
-            XMLStreamReader xmlStreamReader = xmlSec.processInMessage(new CustomW3CDOMStreamReader(securedDocument));
+            InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
+            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(new CustomW3CDOMStreamReader(securedDocument));
 
             Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
 
@@ -452,8 +452,8 @@ public class TimestampTest extends AbstractTestBase {
         //done timestamp; now test timestamp-verification:
         {
             SecurityProperties securityProperties = new SecurityProperties();
-            InboundXMLSec xmlSec = WSSec.getInboundXMLSec(securityProperties);
-            XMLStreamReader xmlStreamReader = xmlSec.processInMessage(new CustomW3CDOMStreamReader(securedDocument));
+            InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
+            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(new CustomW3CDOMStreamReader(securedDocument));
 
             try {
                 Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
@@ -461,7 +461,7 @@ public class TimestampTest extends AbstractTestBase {
             } catch (XMLStreamException e) {
                 Throwable throwable = e.getCause();
                 Assert.assertNotNull(throwable);
-                Assert.assertTrue(throwable instanceof XMLSecurityException);
+                Assert.assertTrue(throwable instanceof WSSecurityException);
                 throwable = throwable.getCause();
                 Assert.assertNotNull(throwable);
                 Assert.assertTrue(throwable instanceof ParseException);

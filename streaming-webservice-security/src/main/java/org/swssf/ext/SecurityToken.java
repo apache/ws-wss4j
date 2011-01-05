@@ -38,22 +38,22 @@ public interface SecurityToken {
      * Returns the secret key
      * @param algorithmURI for the requested key
      * @return The requested key for the specified algorithmURI, or null if no matching key is found
-     * @throws XMLSecurityException if the key can't be loaded
+     * @throws WSSecurityException if the key can't be loaded
      */
-    public Key getSecretKey(String algorithmURI) throws XMLSecurityException;
+    public Key getSecretKey(String algorithmURI) throws WSSecurityException;
 
     /**
      * Returns the public key if one exist for this token type
      * @return The Public-Key for asymmetric algorithms
-     * @throws XMLSecurityException if the key can't be loaded
+     * @throws WSSecurityException if the key can't be loaded
      */
-    public PublicKey getPublicKey() throws XMLSecurityException;
+    public PublicKey getPublicKey() throws WSSecurityException;
 
     /**
      * Verifies the key if applicable
-     * @throws XMLSecurityException if the key couldn't be verified or the key isn't valid
+     * @throws WSSecurityException if the key couldn't be verified or the key isn't valid
      */
-    public void verify() throws XMLSecurityException;
+    public void verify() throws WSSecurityException;
 
     /**
      * Returns the key wrapping token

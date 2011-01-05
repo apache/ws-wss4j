@@ -16,8 +16,8 @@ package org.swssf.test;
 
 import org.swssf.WSSec;
 import org.swssf.ext.Constants;
-import org.swssf.ext.InboundXMLSec;
-import org.swssf.ext.OutboundXMLSec;
+import org.swssf.ext.InboundWSSec;
+import org.swssf.ext.OutboundWSSec;
 import org.swssf.ext.SecurityProperties;
 import org.swssf.test.utils.XmlReaderToWriter;
 import org.apache.cxf.staxutils.W3CDOMStreamReader;
@@ -61,9 +61,9 @@ public class PerformanceMemoryTest extends AbstractTestBase {
         securityProperties.setTimestampTTL(60 * 60 * 24 * 7); //a week for testing:)
 
         InputStream sourceDocument = new BufferedInputStream(new FileInputStream(source));
-        OutboundXMLSec xmlSecOut = WSSec.getOutboundXMLSec(securityProperties);
+        OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
 
-        XMLStreamWriter xmlStreamWriter = xmlSecOut.processOutMessage(new FileOutputStream(output));
+        XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(new FileOutputStream(output));
         XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(sourceDocument);
         XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
         xmlStreamWriter.close();
@@ -366,9 +366,9 @@ public class PerformanceMemoryTest extends AbstractTestBase {
         inSecurityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
         inSecurityProperties.setCallbackHandler(new CallbackHandlerImpl());
 
-        InboundXMLSec xmlSec = WSSec.getInboundXMLSec(inSecurityProperties);
+        InboundWSSec wsSecIn = WSSec.getInboundWSSec(inSecurityProperties);
         FileInputStream fileInputStream = new FileInputStream(input);
-        XMLStreamReader outXmlStreamReader = xmlSec.processInMessage(xmlInputFactory.createXMLStreamReader(fileInputStream));
+        XMLStreamReader outXmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(fileInputStream));
 
         int tagCount = 0;
         while (outXmlStreamReader.hasNext()) {

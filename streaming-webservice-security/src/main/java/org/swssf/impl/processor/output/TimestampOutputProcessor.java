@@ -31,12 +31,12 @@ import java.util.GregorianCalendar;
  */
 public class TimestampOutputProcessor extends AbstractOutputProcessor {
 
-    public TimestampOutputProcessor(SecurityProperties securityProperties) throws XMLSecurityException {
+    public TimestampOutputProcessor(SecurityProperties securityProperties) throws WSSecurityException {
         super(securityProperties);
     }
 
     @Override
-    public void processEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException {
+    public void processEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain) throws XMLStreamException, WSSecurityException {
         outputProcessorChain.processEvent(xmlEvent);
 
         if (xmlEvent.isStartElement()) {
@@ -61,7 +61,7 @@ public class TimestampOutputProcessor extends AbstractOutputProcessor {
                     createEndElementAndOutputAsEvent(subOutputProcessorChain, Constants.TAG_wsu_Expires);
                     createEndElementAndOutputAsEvent(subOutputProcessorChain, Constants.TAG_wsu_Timestamp);
                 } catch (DatatypeConfigurationException e) {
-                    throw new XMLSecurityException(e);
+                    throw new WSSecurityException(e);
                 }
 
                 outputProcessorChain.removeProcessor(this);

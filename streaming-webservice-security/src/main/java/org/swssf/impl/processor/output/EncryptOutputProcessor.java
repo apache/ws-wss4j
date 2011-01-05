@@ -55,7 +55,7 @@ public class EncryptOutputProcessor extends AbstractOutputProcessor {
 
     private InternalEncryptionOutputProcessor activeInternalEncryptionOutputProcessor = null;
 
-    public EncryptOutputProcessor(SecurityProperties securityProperties) throws XMLSecurityException {
+    public EncryptOutputProcessor(SecurityProperties securityProperties) throws WSSecurityException {
         super(securityProperties);
         secureParts = securityProperties.getEncryptionSecureParts();
 
@@ -66,7 +66,7 @@ public class EncryptOutputProcessor extends AbstractOutputProcessor {
         try {
             keyGen = KeyGenerator.getInstance(keyAlgorithm);
         } catch (NoSuchAlgorithmException e) {
-            throw new XMLSecurityException(e);
+            throw new WSSecurityException(e);
         }
         keyGen.init(keyLength);
 
@@ -85,7 +85,7 @@ public class EncryptOutputProcessor extends AbstractOutputProcessor {
         return encryptionPartDefList;
     }
 
-    public void processEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException {
+    public void processEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain) throws XMLStreamException, WSSecurityException {
 
         if (xmlEvent.isStartElement()) {
             StartElement startElement = xmlEvent.asStartElement();
@@ -111,13 +111,13 @@ public class EncryptOutputProcessor extends AbstractOutputProcessor {
                                 encryptionPartDefList.add(encryptionPartDef);
                                 internalEncryptionOutputProcessor = new InternalEncryptionOutputProcessor(getSecurityProperties(), encryptionPartDef, startElement.getName(), outputProcessorChain.getSecurityContext().<XMLEventNSAllocator>get(Constants.XMLEVENT_NS_ALLOCATOR));
                             } catch (NoSuchAlgorithmException e) {
-                                throw new XMLSecurityException(e.getMessage(), e);
+                                throw new WSSecurityException(e.getMessage(), e);
                             } catch (NoSuchPaddingException e) {
-                                throw new XMLSecurityException(e.getMessage(), e);
+                                throw new WSSecurityException(e.getMessage(), e);
                             } catch (InvalidKeyException e) {
-                                throw new XMLSecurityException(e.getMessage(), e);
+                                throw new WSSecurityException(e.getMessage(), e);
                             } catch (IOException e) {
-                                throw new XMLSecurityException(e.getMessage(), e);
+                                throw new WSSecurityException(e.getMessage(), e);
                             }
 
                             activeInternalEncryptionOutputProcessor = internalEncryptionOutputProcessor;
@@ -149,7 +149,7 @@ public class EncryptOutputProcessor extends AbstractOutputProcessor {
 
         InternalEncryptionOutputProcessor(SecurityProperties securityProperties, EncryptionPartDef encryptionPartDef,
                                           QName startElement, XMLEventNSAllocator xmlEventNSAllocator)
-                throws XMLSecurityException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IOException, XMLStreamException {
+                throws WSSecurityException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IOException, XMLStreamException {
 
             super(securityProperties);
             this.getBeforeProcessors().add(EncryptEndingOutputProcessor.class.getName());
@@ -186,7 +186,7 @@ public class EncryptOutputProcessor extends AbstractOutputProcessor {
             xmlEventWriter.add(XMLEventFactory.newFactory().createStartElement(new QName("a"), null, null));
         }
 
-        public void processEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException {
+        public void processEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain) throws XMLStreamException, WSSecurityException {
 
             if (xmlEvent.isStartElement()) {
 
@@ -256,7 +256,7 @@ public class EncryptOutputProcessor extends AbstractOutputProcessor {
         /**
          * Creates the Data structure around the cipher data
          */
-        private void processEventInternal(OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException {
+        private void processEventInternal(OutputProcessorChain outputProcessorChain) throws XMLStreamException, WSSecurityException {
             Map<QName, String> attributes = new HashMap<QName, String>();
             attributes.put(Constants.ATT_NULL_Id, encryptionPartDef.getEncRefId());
             attributes.put(Constants.ATT_NULL_Type, encryptionPartDef.getModifier().getModifier());
@@ -302,7 +302,7 @@ public class EncryptOutputProcessor extends AbstractOutputProcessor {
             // outputProcessorChain.processHeaderEvent(xmlEvent);
         }
 
-        private void doFinalInternal(OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException {
+        private void doFinalInternal(OutputProcessorChain outputProcessorChain) throws XMLStreamException, WSSecurityException {
 
             try {
                 //close the event writer to flush all outstanding events to the encrypt stream

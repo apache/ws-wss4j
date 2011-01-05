@@ -27,7 +27,7 @@ public interface SecurityTokenProvider {
      * Returns the represented SecurityToken of this object
      * @param crypto The Crypto to use to restore the Token
      * @return The SecurityToken
-     * @throws XMLSecurityException if the token couldn't be loaded
+     * @throws WSSecurityException if the token couldn't be loaded
      */
-    public SecurityToken getSecurityToken(Crypto crypto) throws XMLSecurityException;
+    public SecurityToken getSecurityToken(Crypto crypto) throws WSSecurityException;
 }

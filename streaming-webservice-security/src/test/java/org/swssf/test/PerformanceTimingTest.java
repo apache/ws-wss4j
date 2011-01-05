@@ -16,7 +16,7 @@ package org.swssf.test;
 
 import org.swssf.WSSec;
 import org.swssf.ext.Constants;
-import org.swssf.ext.OutboundXMLSec;
+import org.swssf.ext.OutboundWSSec;
 import org.swssf.ext.SecurePart;
 import org.swssf.ext.SecurityProperties;
 import org.swssf.test.utils.XmlReaderToWriter;
@@ -58,9 +58,9 @@ public class PerformanceTimingTest extends AbstractTestBase {
         securityProperties.setTimestampTTL(60 * 60 * 24 * 7); //a week for testing:)
 
         InputStream sourceDocument = new BufferedInputStream(new FileInputStream(source));
-        OutboundXMLSec xmlSecOut = WSSec.getOutboundXMLSec(securityProperties);
+        OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
 
-        XMLStreamWriter xmlStreamWriter = xmlSecOut.processOutMessage(new FileOutputStream(output));
+        XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(new FileOutputStream(output));
         XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(sourceDocument);
         XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
         xmlStreamWriter.close();
@@ -306,7 +306,7 @@ public class PerformanceTimingTest extends AbstractTestBase {
             policyEnforcer = policyEnforcerFactory.newPolicyEnforcer(null);
             inSecurityProperties.addInputProcessor(new PolicyInputProcessor(policyEnforcer, null));
         }
-        InboundXMLSec xmlSec = WSSec.getInboundXMLSec(inSecurityProperties);
+        InboundWSSec xmlSec = WSSec.getInboundWSSec(inSecurityProperties);
         FileInputStream fileInputStream = new FileInputStream(input);
         XMLStreamReader outXmlStreamReader = xmlSec.processInMessage(xmlInputFactory.createXMLStreamReader(fileInputStream), policyEnforcer);
 

@@ -29,12 +29,12 @@ public class SecurityHeaderOutputProcessor extends AbstractOutputProcessor {
 
     private int level = 0;
 
-    public SecurityHeaderOutputProcessor(SecurityProperties securityProperties) throws XMLSecurityException {
+    public SecurityHeaderOutputProcessor(SecurityProperties securityProperties) throws WSSecurityException {
         super(securityProperties);
         setPhase(Constants.Phase.PREPROCESSING);
     }
 
-    public void processEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException {
+    public void processEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain) throws XMLStreamException, WSSecurityException {
 
         //todo test first occuring element must be soap-envelope?
 
