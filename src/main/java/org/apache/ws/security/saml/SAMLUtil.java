@@ -145,10 +145,12 @@ public class SAMLUtil {
                                 "invalidSAMLToken", new Object[]{"for Signature (no Subject)"});
                     }
 
-                    Element e = samlSubj.getSubjectConfirmation().getKeyInfo().getDOM();
+                    Element sub = samlSubj.getSubjectConfirmation().getDOM();
+                    Element keyInfoElement = 
+                        WSSecurityUtil.getDirectChildElement(sub, "KeyInfo", WSConstants.SIG_NS);
                     X509Certificate[] certs = null;
                     KeyInfoFactory keyInfoFactory = KeyInfoFactory.getInstance("DOM");
-                    XMLStructure keyInfoStructure = new DOMStructure(e);
+                    XMLStructure keyInfoStructure = new DOMStructure(keyInfoElement);
                     
                     try {
                         KeyInfo keyInfo = keyInfoFactory.unmarshalKeyInfo(keyInfoStructure);

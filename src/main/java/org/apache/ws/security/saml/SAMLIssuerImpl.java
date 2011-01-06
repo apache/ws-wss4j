@@ -79,10 +79,6 @@ public class SAMLIssuerImpl implements SAMLIssuer {
     private String issuerKeyPassword = null;
     private String issuerKeyName = null;
 
-    private boolean senderVouches = true;
-
-    private String[] confirmationMethods = new String[1];
-    
     private WSSConfig wssConfig = WSSConfig.getNewInstance();
     
     private String samlVersion = null;
@@ -94,6 +90,11 @@ public class SAMLIssuerImpl implements SAMLIssuer {
      * is set to true, a ds:KeyValue is used instead with just the key material.
      */
     private boolean sendKeyValue = false;
+    
+    /**
+     * This boolean controls whether the assertion is to be signed or not
+     */
+    private boolean signAssertion = false;
 
     /**
      * Constructor.
@@ -128,35 +129,13 @@ public class SAMLIssuerImpl implements SAMLIssuer {
             sendKeyValue = Boolean.valueOf(sendKeyValueProp).booleanValue();
         }
         
-        samlVersion = properties.getProperty("org.apache.ws.security.saml.version");
-
-        String confMethod = properties.getProperty("org.apache.ws.security.saml.confirmationMethod");
-        if ("senderVouches".equals(confMethod)) {
-            if ("1.1".equalsIgnoreCase(samlVersion)) {
-                confirmationMethods[0] = SAML1Constants.CONF_SENDER_VOUCHES;
-            } else if ("2.0".equalsIgnoreCase(samlVersion)) {
-                confirmationMethods[0] = SAML2Constants.SBJ_CONFIRMATION_SENDER_VOUCHES;
-            } else {
-                // Default to SAML 1.1
-                confirmationMethods[0] = SAML1Constants.CONF_SENDER_VOUCHES;
-            }
-        } else if ("keyHolder".equals(confMethod)) {
-            if ("1.1".equalsIgnoreCase(samlVersion)) {
-                confirmationMethods[0] = SAML1Constants.CONF_HOLDER_KEY;
-                senderVouches = false;
-            } else if ("2.0".equalsIgnoreCase(samlVersion)) {
-                confirmationMethods[0] = SAML2Constants.SBJ_CONFIRMATION_HOLDER_OF_KEY;
-            } else {
-                // Default to SAML 1.1
-                confirmationMethods[0] = SAML1Constants.CONF_HOLDER_KEY;
-                senderVouches = false;
-            }
-        } else {
-            // throw something here - this is a mandatory property
-            throw new IllegalStateException(
-                "No value provided in saml configuration for confirmation method"
-            );
+        String signAssertionProp =
+            properties.getProperty("org.apache.ws.security.saml.issuer.signAssertion");
+        if (signAssertionProp != null) {
+            signAssertion = Boolean.valueOf(signAssertionProp).booleanValue();
         }
+        
+        samlVersion = properties.getProperty("org.apache.ws.security.saml.version");
     }
 
     /**
@@ -195,7 +174,7 @@ public class SAMLIssuerImpl implements SAMLIssuer {
 
         sa = new AssertionWrapper(samlParms);
         
-        if (!senderVouches) {
+        if (signAssertion) {
             //
             // Create the signature
             //
@@ -274,13 +253,6 @@ public class SAMLIssuerImpl implements SAMLIssuer {
      */
     public String getIssuerKeyPassword() {
         return issuerKeyPassword;
-    }
-
-    /**
-     * @return Returns the senderVouches.
-     */
-    public boolean isSenderVouches() {
-        return senderVouches;
     }
 
     /**

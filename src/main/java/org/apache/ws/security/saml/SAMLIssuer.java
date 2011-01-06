@@ -59,11 +59,6 @@ public interface SAMLIssuer {
     public String getIssuerKeyPassword();
 
     /**
-     * @return Returns the senderVouches.
-     */
-    public boolean isSenderVouches();
-
-    /**
      * @param instanceDoc The instanceDoc to set.
      */
     public void setInstanceDoc(Document instanceDoc);

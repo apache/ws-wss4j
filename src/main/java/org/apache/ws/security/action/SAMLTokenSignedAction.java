@@ -62,27 +62,18 @@ public class SAMLTokenSignedAction implements Action {
         if (assertion == null) {
             throw new WSSecurityException("WSHandler: Signed SAML: no SAML token received");
         }
-        String issuerKeyName = null;
-        String issuerKeyPW = null;
-        Crypto issuerCrypto = null;
 
         WSSecSignatureSAML wsSign = new WSSecSignatureSAML();
         wsSign.setWsConfig(reqData.getWssConfig());
 
-        String password = null;
-        if (saml.isSenderVouches()) {
-            issuerKeyName = saml.getIssuerKeyName();
-            issuerKeyPW = saml.getIssuerKeyPassword();
-            issuerCrypto = saml.getIssuerCrypto();
-        } else {
-            password =
-                    handler.getPassword(reqData.getUsername(),
-                            actionToDo,
-                            WSHandlerConstants.PW_CALLBACK_CLASS,
-                            WSHandlerConstants.PW_CALLBACK_REF, reqData)
-                            .getPassword();
-            wsSign.setUserInfo(reqData.getUsername(), password);
-        }
+        String password =
+            handler.getPassword(reqData.getUsername(),
+                                actionToDo,
+                                WSHandlerConstants.PW_CALLBACK_CLASS,
+                                WSHandlerConstants.PW_CALLBACK_REF, reqData)
+                                .getPassword();
+        wsSign.setUserInfo(reqData.getUsername(), password);
+        
         if (reqData.getSigKeyId() != 0) {
             wsSign.setKeyIdentifierType(reqData.getSigKeyId());
         }
@@ -108,9 +99,9 @@ public class SAMLTokenSignedAction implements Action {
                     doc,
                     crypto,
                     assertion,
-                    issuerCrypto,
-                    issuerKeyName,
-                    issuerKeyPW,
+                    saml.getIssuerCrypto(),
+                    saml.getIssuerKeyName(),
+                    saml.getIssuerKeyPassword(),
                     reqData.getSecHeader());
             reqData.getSignatureValues().add(wsSign.getSignatureValue());
         } catch (WSSecurityException e) {

@@ -142,11 +142,10 @@ public class SignaturePartsTest extends org.junit.Assert {
      */
     @SuppressWarnings("unchecked")
     @org.junit.Test
-    @org.junit.Ignore
     public void testSOAPHeaderSTRTransform() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         
-        SAMLIssuer saml = SAMLIssuerFactory.getInstance("saml4.properties");
+        SAMLIssuer saml = SAMLIssuerFactory.getInstance("saml_hok.properties");
         // Provide info to SAML issuer that it can construct a Holder-of-key
         // SAML token.
         saml.setInstanceDoc(doc);
@@ -196,7 +195,7 @@ public class SignaturePartsTest extends org.junit.Assert {
         
         WSDataRef wsDataRef = (WSDataRef)refs.get(0);
         String xpath = wsDataRef.getXpath();
-        assertEquals("/soapenv:Envelope/soapenv:Header/wsse:Security/Assertion", xpath);
+        assertEquals("/soapenv:Envelope/soapenv:Header/wsse:Security/saml:Assertion", xpath);
     }
     
     /**

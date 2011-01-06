@@ -19,6 +19,8 @@
 
 package org.apache.ws.security.saml.ext.bean;
 
+import java.security.cert.X509Certificate;
+
 
 /**
  * Class SubjectBean represents a SAML subject (can be used to create
@@ -30,6 +32,8 @@ public class SubjectBean {
     private String subjectName;
     private String subjectNameQualifier;
     private String subjectConfirmationMethod;
+    private X509Certificate subjectCert;
+    private boolean useSendKeyValue;
 
     /**
      * Constructor SubjectBean creates a new SubjectBean instance.
@@ -110,6 +114,42 @@ public class SubjectBean {
     public void setSubjectConfirmationMethod(String subjectConfirmationMethod) {
         this.subjectConfirmationMethod = subjectConfirmationMethod;
     }
+    
+    /**
+     * Method getSubjectCert returns the subjectCert of this SubjectBean object.
+     *
+     * @return the subjectCert (type X509Certificate) of this SubjectBean object.
+     */
+    public X509Certificate getSubjectCert() {
+        return subjectCert;
+    }
+
+    /**
+     * Method setSubjectCert sets the subjectCert of this SubjectBean object.
+     *
+     * @param subjectCert the subjectCert of this SubjectBean object.
+     */
+    public void setSubjectCert(X509Certificate subjectCert) {
+        this.subjectCert = subjectCert;
+    }
+    
+    /**
+     * Method isUseSendKeyValue returns the useSendKeyValue of this SubjectBean object.
+     *
+     * @return the useSendKeyValue (type boolean) of this SubjectBean object.
+     */
+    public boolean isUseSendKeyValue() {
+        return useSendKeyValue;
+    }
+
+    /**
+     * Method setUseSendKeyValue sets the useSendKeyValue of this SubjectBean object.
+     *
+     * @param useSendKeyValue the useSendKeyValue of this SubjectBean object.
+     */
+    public void setUseSendKeyValue(boolean useSendKeyValue) {
+        this.useSendKeyValue = useSendKeyValue;
+    }
 
     /**
      * Method equals ...
@@ -126,7 +166,9 @@ public class SubjectBean {
 
         if (!subjectName.equals(that.subjectName)) return false;
         if (!subjectNameQualifier.equals(that.subjectNameQualifier)) return false;
-        if (!subjectConfirmationMethod.equals(that.subjectConfirmationMethod)) return false; 
+        if (!subjectConfirmationMethod.equals(that.subjectConfirmationMethod)) return false;
+        if (subjectCert != null && !subjectCert.equals(that.subjectCert)) return false;
+        if (useSendKeyValue != that.useSendKeyValue) return false;
 
         return true;
     }
@@ -140,6 +182,8 @@ public class SubjectBean {
         int result = subjectName.hashCode();
         result = 31 * result + subjectNameQualifier.hashCode();
         result = 31 * result + subjectConfirmationMethod.hashCode();
+        result = 31 * result + subjectCert.hashCode();
+        result = 31 * result + Boolean.valueOf(useSendKeyValue).hashCode();
         return result;
     }
 }

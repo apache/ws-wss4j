@@ -59,7 +59,7 @@ public class SignedSamlTokenTest extends org.junit.Assert {
      */
     @org.junit.Test
     public void testSAMLSignedSenderVouches() throws Exception {
-        SAMLIssuer saml = SAMLIssuerFactory.getInstance("saml.properties");
+        SAMLIssuer saml = SAMLIssuerFactory.getInstance("saml_sv.properties");
 
         AssertionWrapper assertion = saml.newAssertion();
 
@@ -102,7 +102,7 @@ public class SignedSamlTokenTest extends org.junit.Assert {
      */
     @org.junit.Test
     public void testSAMLSignedSenderVouchesKeyIdentifier() throws Exception {
-        SAMLIssuer saml = SAMLIssuerFactory.getInstance("saml.properties");
+        SAMLIssuer saml = SAMLIssuerFactory.getInstance("saml_sv.properties");
 
         AssertionWrapper assertion = saml.newAssertion();
 
@@ -141,13 +141,13 @@ public class SignedSamlTokenTest extends org.junit.Assert {
     
     /**
      * Test the default issuer class as specified in SAMLIssuerFactory. The configuration
-     * file "saml3.properties" has no "org.apache.ws.security.saml.issuerClass" property,
-     * and so the default value is used (A bad value was previously used for the default
-     * value).
+     * file "saml3.saml_sv_noissuer.properties" has no "org.apache.ws.security.saml.issuerClass"
+     * property, and so the default value is used (A bad value was previously used for the
+     * default value).
      */
     @org.junit.Test
     public void testDefaultIssuerClass() throws Exception {
-        SAMLIssuer saml = SAMLIssuerFactory.getInstance("saml3.properties");
+        SAMLIssuer saml = SAMLIssuerFactory.getInstance("saml_sv_noissuer.properties");
 
         AssertionWrapper assertion = saml.newAssertion();
 
@@ -191,7 +191,7 @@ public class SignedSamlTokenTest extends org.junit.Assert {
      */
     @org.junit.Test
     public void testWSS62() throws Exception {
-        SAMLIssuer saml = SAMLIssuerFactory.getInstance("saml.properties");
+        SAMLIssuer saml = SAMLIssuerFactory.getInstance("saml_sv.properties");
 
         AssertionWrapper assertion = saml.newAssertion();
 
@@ -245,11 +245,10 @@ public class SignedSamlTokenTest extends org.junit.Assert {
      * Test that creates, sends and processes an signed SAML assertion.
      */
     @org.junit.Test
-    @org.junit.Ignore
     public void testSAMLSignedKeyHolder() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         
-        SAMLIssuer saml = SAMLIssuerFactory.getInstance("saml4.properties");
+        SAMLIssuer saml = SAMLIssuerFactory.getInstance("saml_hok.properties");
         // Provide info to SAML issuer that it can construct a Holder-of-key
         // SAML token.
         saml.setInstanceDoc(doc);
@@ -294,11 +293,10 @@ public class SignedSamlTokenTest extends org.junit.Assert {
      * only key material and not an entire X509Certificate.
      */
     @org.junit.Test
-    @org.junit.Ignore
     public void testSAMLSignedKeyHolderSendKeyValue() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         
-        SAMLIssuer saml = SAMLIssuerFactory.getInstance("saml4sendKeyValue.properties");
+        SAMLIssuer saml = SAMLIssuerFactory.getInstance("saml_hok_keyvalue.properties");
         // Provide info to SAML issuer that it can construct a Holder-of-key
         // SAML token.
         saml.setInstanceDoc(doc);
@@ -329,6 +327,8 @@ public class SignedSamlTokenTest extends org.junit.Assert {
         }
         assertTrue(outputString.indexOf("http://www.w3.org/2001/04/xmlenc#sha256") != -1);
         assertTrue(outputString.indexOf("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256") != -1);
+        assertTrue(outputString.indexOf("KeyValue") != -1);
+        assertTrue(outputString.indexOf("X509Certificate") == -1);
         
         List<WSSecurityEngineResult> results = verify(signedDoc);
         WSSecurityEngineResult actionResult =
@@ -344,11 +344,10 @@ public class SignedSamlTokenTest extends org.junit.Assert {
      * instead of direct reference.
      */
     @org.junit.Test
-    @org.junit.Ignore
     public void testSAMLSignedKeyHolderKeyIdentifier() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         
-        SAMLIssuer saml = SAMLIssuerFactory.getInstance("saml4.properties");
+        SAMLIssuer saml = SAMLIssuerFactory.getInstance("saml_hok.properties");
         // Provide info to SAML issuer that it can construct a Holder-of-key
         // SAML token.
         saml.setInstanceDoc(doc);

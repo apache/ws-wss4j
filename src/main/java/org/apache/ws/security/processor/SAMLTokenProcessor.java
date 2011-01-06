@@ -28,8 +28,10 @@ import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.saml.ext.AssertionWrapper;
+import org.apache.ws.security.util.DOM2Writer;
 
 import org.opensaml.xml.io.UnmarshallingException;
+import org.opensaml.xml.validation.ValidationException;
 
 import org.w3c.dom.Element;
 
@@ -65,13 +67,19 @@ public class SAMLTokenProcessor implements Processor {
         AssertionWrapper assertion = null;
         try {
             assertion = new AssertionWrapper(token);
+            assertion.verify();
             result = true;
             if (log.isDebugEnabled()) {
                 log.debug("SAML Assertion issuer " + assertion.getIssuerString());
+                log.debug(DOM2Writer.nodeToString(token));
             }
         } catch (UnmarshallingException e) {
             throw new WSSecurityException(
                 WSSecurityException.FAILURE, "invalidSAMLsecurity", null, e
+            );
+        } catch (ValidationException e) {
+            throw new WSSecurityException(
+                 WSSecurityException.FAILURE, "invalidSAMLsecurity", null, e
             );
         }
         if (!result) {

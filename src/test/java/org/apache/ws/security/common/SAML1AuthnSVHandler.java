@@ -31,15 +31,15 @@ import java.io.IOException;
 import java.util.Collections;
 
 /**
- * A Callback Handler implementation for the case of finding a password to access a 
- * cert/private key in a keystore.
+ * A Callback Handler implementation for a SAML 1.1 authentication assertion using
+ * Sender Vouches.
  */
-public class SAMLAuthnSenderVouchesHandler implements CallbackHandler {
+public class SAML1AuthnSVHandler implements CallbackHandler {
     
     private String subjectName = "uid=joe,ou=people,ou=saml-demo,o=example.com";
     private String subjectQualifier = "www.example.com";
     
-    public SAMLAuthnSenderVouchesHandler() {
+    public SAML1AuthnSVHandler() {
     }
     
     public void handle(Callback[] callbacks)

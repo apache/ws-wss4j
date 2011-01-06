@@ -50,7 +50,7 @@ public class SamlTokenTest extends org.junit.Assert {
      */
     @org.junit.Test
     public void testSAMLUnsignedSenderVouches() throws Exception {
-        SAMLIssuer saml = SAMLIssuerFactory.getInstance("saml.properties");
+        SAMLIssuer saml = SAMLIssuerFactory.getInstance("saml_sv.properties");
 
         AssertionWrapper assertion = saml.newAssertion();
 

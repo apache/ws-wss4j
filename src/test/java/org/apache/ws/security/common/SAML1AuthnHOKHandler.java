@@ -19,6 +19,9 @@
 
 package org.apache.ws.security.common;
 
+import org.apache.ws.security.WSSecurityException;
+import org.apache.ws.security.components.crypto.Crypto;
+import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.saml.ext.SAMLCallback;
 import org.apache.ws.security.saml.ext.bean.AuthenticationStatementBean;
 import org.apache.ws.security.saml.ext.bean.SubjectBean;
@@ -28,18 +31,22 @@ import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
 import java.io.IOException;
+import java.security.cert.X509Certificate;
 import java.util.Collections;
 
 /**
- * A Callback Handler implementation for the case of finding a password to access a 
- * cert/private key in a keystore.
+ * A Callback Handler implementation for a SAML 1.1 authentication assertion using
+ * Holder of Key.
  */
-public class SAMLAuthnHolderOfKeyHandler implements CallbackHandler {
+public class SAML1AuthnHOKHandler implements CallbackHandler {
     
     private String subjectName = "uid=joe,ou=people,ou=saml-demo,o=example.com";
     private String subjectQualifier = "www.example.com";
+    private X509Certificate[] certs;
     
-    public SAMLAuthnHolderOfKeyHandler() {
+    public SAML1AuthnHOKHandler() throws WSSecurityException {
+        Crypto crypto = CryptoFactory.getInstance("crypto.properties");
+        certs = crypto.getCertificates("16c73ab6-b892-458f-abf5-2f875f74882e");
     }
     
     public void handle(Callback[] callbacks)
@@ -51,6 +58,7 @@ public class SAMLAuthnHolderOfKeyHandler implements CallbackHandler {
                     new SubjectBean(
                         subjectName, subjectQualifier, SAML1Constants.CONF_HOLDER_KEY
                     );
+                subjectBean.setSubjectCert(certs[0]);
                 AuthenticationStatementBean authBean = new AuthenticationStatementBean();
                 authBean.setSubject(subjectBean);
                 authBean.setAuthenticationMethod("Password");

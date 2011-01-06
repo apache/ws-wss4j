@@ -22,6 +22,7 @@ package org.apache.ws.security.saml.ext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.saml.ext.builder.SAML1ComponentBuilder;
 import org.apache.ws.security.saml.ext.builder.SAML2ComponentBuilder;
 import org.apache.ws.security.saml.ext.builder.SAML2Constants;
@@ -97,6 +98,11 @@ public class AssertionWrapper {
      * environment that should be included in the generated SAML statements.
      */
     private CallbackHandler samlCallbackHandler = null;
+    
+    /**
+     * The Assertion as a DOM element
+     */
+    private Element assertionElement;
 
     /**
      * Constructor AssertionWrapper creates a new AssertionWrapper instance.
@@ -106,6 +112,7 @@ public class AssertionWrapper {
      */
     public AssertionWrapper(Element element) throws UnmarshallingException {
         this(OpenSAMLUtil.fromDom(element));
+        assertionElement = element;
     }
 
     /**
@@ -158,7 +165,7 @@ public class AssertionWrapper {
      *
      * @param parms of type SAMLParms
      */
-    public AssertionWrapper(SAMLParms parms) {
+    public AssertionWrapper(SAMLParms parms) throws WSSecurityException {
         OpenSAMLUtil.initSamlEngine();
         // Set the SAML version
         if (parms.getSamlVersion().equalsIgnoreCase("1.1")) {
@@ -198,42 +205,48 @@ public class AssertionWrapper {
             // Build a SAML v1.1 assertion
             saml1 = SAML1ComponentBuilder.createSamlv1Assertion(parms.getIssuer());
 
-            // Process the SAML authentication statement(s)
-            List<AuthenticationStatement> authenticationStatements = 
-                SAML1ComponentBuilder.createSamlv1AuthenticationStatement(
-                    samlCallbacks[0].getAuthenticationStatementData()
+            try {
+                // Process the SAML authentication statement(s)
+                List<AuthenticationStatement> authenticationStatements = 
+                    SAML1ComponentBuilder.createSamlv1AuthenticationStatement(
+                        samlCallbacks[0].getAuthenticationStatementData()
+                    );
+    
+                // Process the SAML attribute statement(s)            
+                List<org.opensaml.saml1.core.AttributeStatement> attributeStatements =
+                        SAML1ComponentBuilder.createSamlv1AttributeStatement(
+                            samlCallbacks[0].getAttributeStatementData()
+                        );
+    
+                // Process the SAML authorization decision statement(s)
+                List<org.opensaml.saml1.core.AuthorizationDecisionStatement> authDecisionStatements =
+                        SAML1ComponentBuilder.createSamlv1AuthorizationDecisionStatement(
+                            samlCallbacks[0].getAuthDecisionStatementData()
+                        );
+    
+                // Build the complete assertion
+                org.opensaml.saml1.core.Conditions conditions = 
+                    SAML1ComponentBuilder.createSamlv1Conditions(samlCallbacks[0].getConditions());
+                saml1.setConditions(conditions);
+    
+                // Add the SAML authentication statement(s) (if any)
+                for (AuthenticationStatement authnStatement : authenticationStatements) {
+                    saml1.getAuthenticationStatements().add(authnStatement);
+                }
+    
+                // Add the SAML attribute statement(s) (if any)
+                for (org.opensaml.saml1.core.AttributeStatement attrStatement : attributeStatements) {
+                    saml1.getAttributeStatements().add(attrStatement);
+                }
+    
+                // Add the SAML authorization decision statement(s) (if any)
+                for (AuthorizationDecisionStatement authzStatement : authDecisionStatements) {
+                    saml1.getAuthorizationDecisionStatements().add(authzStatement);
+                }
+            } catch (org.opensaml.xml.security.SecurityException ex) {
+                throw new WSSecurityException(
+                    "Error generating KeyInfo from signing credential", ex
                 );
-
-            // Process the SAML attribute statement(s)            
-            List<org.opensaml.saml1.core.AttributeStatement> attributeStatements =
-                    SAML1ComponentBuilder.createSamlv1AttributeStatement(
-                        samlCallbacks[0].getAttributeStatementData()
-                    );
-
-            // Process the SAML authorization decision statement(s)
-            List<org.opensaml.saml1.core.AuthorizationDecisionStatement> authDecisionStatements =
-                    SAML1ComponentBuilder.createSamlv1AuthorizationDecisionStatement(
-                        samlCallbacks[0].getAuthDecisionStatementData()
-                    );
-
-            // Build the complete assertion
-            org.opensaml.saml1.core.Conditions conditions = 
-                SAML1ComponentBuilder.createSamlv1Conditions(samlCallbacks[0].getConditions());
-            saml1.setConditions(conditions);
-
-            // Add the SAML authentication statement(s) (if any)
-            for (AuthenticationStatement authnStatement : authenticationStatements) {
-                saml1.getAuthenticationStatements().add(authnStatement);
-            }
-
-            // Add the SAML attribute statement(s) (if any)
-            for (org.opensaml.saml1.core.AttributeStatement attrStatement : attributeStatements) {
-                saml1.getAttributeStatements().add(attrStatement);
-            }
-
-            // Add the SAML authorization decision statement(s) (if any)
-            for (AuthorizationDecisionStatement authzStatement : authDecisionStatements) {
-                saml1.getAuthorizationDecisionStatements().add(authzStatement);
             }
 
             // Set the OpenSaml2 XMLObject instance
@@ -538,6 +551,14 @@ public class AssertionWrapper {
      */
     public void setSamlCallbackHandler(CallbackHandler samlCallbackHandler) {
         this.samlCallbackHandler = samlCallbackHandler;
+    }
+    
+    /**
+     * Get the Assertion as a DOM Element.
+     * @return the assertion as a DOM Element
+     */
+    public Element getElement() {
+        return assertionElement;
     }
 
 }

@@ -51,7 +51,11 @@ import org.opensaml.saml1.core.SubjectConfirmation;
 import org.opensaml.xml.XMLObjectBuilderFactory;
 import org.opensaml.xml.schema.XSString;
 import org.opensaml.xml.schema.impl.XSStringBuilder;
+import org.opensaml.xml.security.x509.BasicX509Credential;
+import org.opensaml.xml.security.x509.X509KeyInfoGeneratorFactory;
+import org.opensaml.xml.signature.KeyInfo;
 
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -129,7 +133,8 @@ public class SAML1ComponentBuilder {
      * @param subjectBean A SubjectBean instance
      * @return A Saml 1.1 subject
      */
-    public static Subject createSaml1v1Subject(SubjectBean subjectBean) {
+    public static Subject createSaml1v1Subject(SubjectBean subjectBean) 
+        throws org.opensaml.xml.security.SecurityException {
         if (subjectV1Builder == null) {
             subjectV1Builder = (SAMLObjectBuilder<Subject>) 
                 builderFactory.getBuilder(Subject.DEFAULT_ELEMENT_NAME);
@@ -165,10 +170,34 @@ public class SAML1ComponentBuilder {
         
         confirmationMethod.setConfirmationMethod(confirmationMethodStr);
         subjectConfirmation.getConfirmationMethods().add(confirmationMethod);
+        KeyInfo keyInfo = 
+            createKeyInfo(subjectBean.getSubjectCert(), subjectBean.isUseSendKeyValue());
+        subjectConfirmation.setKeyInfo(keyInfo);
         subject.setNameIdentifier(nameIdentifier);
         subject.setSubjectConfirmation(subjectConfirmation);
         
         return subject;
+    }
+    
+    /**
+     * Create an Opensaml KeyInfo object from the parameters
+     * @param cert the Certificate to insert in the KeyInfo object
+     * @param useSendKeyValue Whether to use a KeyValue or not
+     * @return the KeyInfo object
+     * @throws org.opensaml.xml.security.SecurityException
+     */
+    public static KeyInfo createKeyInfo(X509Certificate cert, boolean useSendKeyValue) 
+        throws org.opensaml.xml.security.SecurityException {
+        BasicX509Credential keyInfoCredential = new BasicX509Credential();
+        keyInfoCredential.setEntityCertificate(cert);
+
+        X509KeyInfoGeneratorFactory kiFactory = new X509KeyInfoGeneratorFactory();
+        if (useSendKeyValue) {
+            kiFactory.setEmitPublicKeyValue(true);
+        } else {
+            kiFactory.setEmitEntityCertificate(true);
+        }
+        return kiFactory.newInstance().generate(keyInfoCredential);
     }
 
     /**
@@ -216,7 +245,7 @@ public class SAML1ComponentBuilder {
      */
     public static List<AuthenticationStatement> createSamlv1AuthenticationStatement(
         List<AuthenticationStatementBean> authBeans
-    ) {
+    ) throws org.opensaml.xml.security.SecurityException {
         List<AuthenticationStatement> authenticationStatements = 
             new ArrayList<AuthenticationStatement>();
         
@@ -280,7 +309,7 @@ public class SAML1ComponentBuilder {
      */
     public static List<AttributeStatement> createSamlv1AttributeStatement(
         List<AttributeStatementBean> attributeData
-    ) {
+    ) throws org.opensaml.xml.security.SecurityException {
         if (attributeStatementV1Builder == null) {
             attributeStatementV1Builder = (SAMLObjectBuilder<AttributeStatement>) 
                 builderFactory.getBuilder(AttributeStatement.DEFAULT_ELEMENT_NAME);
@@ -356,7 +385,8 @@ public class SAML1ComponentBuilder {
      * @return a list of SAML 1.1 Authorization Decision Statement(s)
      */
     public static List<AuthorizationDecisionStatement> createSamlv1AuthorizationDecisionStatement(
-            List<AuthDecisionStatementBean> decisionData) {
+            List<AuthDecisionStatementBean> decisionData) 
+        throws org.opensaml.xml.security.SecurityException {
         List<AuthorizationDecisionStatement> authDecisionStatements = new ArrayList();
         if (authorizationDecisionStatementV1Builder == null) {
             authorizationDecisionStatementV1Builder = 

@@ -59,10 +59,9 @@ public class SamlReferenceTest extends org.junit.Assert {
      * SAML tokens
      */
     @org.junit.Test
-    @org.junit.Ignore
     public void testSAMLEncryptedKey() throws Exception {
         // Create a SAML assertion
-        SAMLIssuer saml = SAMLIssuerFactory.getInstance("saml4.properties");
+        SAMLIssuer saml = SAMLIssuerFactory.getInstance("saml_hok.properties");
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         saml.setInstanceDoc(doc);
         Crypto hokCrypto = CryptoFactory.getInstance("crypto.properties");
@@ -123,7 +122,7 @@ public class SamlReferenceTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
-        SAMLIssuer saml = SAMLIssuerFactory.getInstance("saml.properties");
+        SAMLIssuer saml = SAMLIssuerFactory.getInstance("saml_sv.properties");
         AssertionWrapper assertion = saml.newAssertion();
         String issuerKeyName = saml.getIssuerKeyName();
         String issuerKeyPW = saml.getIssuerKeyPassword();
