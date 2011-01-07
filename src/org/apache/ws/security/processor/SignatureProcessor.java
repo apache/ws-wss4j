@@ -613,10 +613,13 @@ public class SignatureProcessor implements Processor {
                     final SAMLAssertion assertion = samlKi.getAssertion();
                     CustomTokenPrincipal principal = new CustomTokenPrincipal(assertion.getId());
                     principal.setTokenObject(assertion);
+                    principal.setSecretKey(secretKey);
                     return principal;
                 } else if (secretKey != null) {
                     // This is the custom key scenario
-                    return new CustomTokenPrincipal(customTokenId);
+                    CustomTokenPrincipal principal = new CustomTokenPrincipal(customTokenId);
+                    principal.setSecretKey(secretKey);
+                    return principal;
                 } else {
                     throw new WSSecurityException("Cannot determine principal");
                 }

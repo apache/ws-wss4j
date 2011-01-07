@@ -29,6 +29,7 @@ public class CustomTokenPrincipal implements Principal, Serializable {
     private Element tokenElement;
     private String name;
     private Object tokenObject;
+    private byte[] secretKey;
     
     public Object getTokenObject() {
         return tokenObject;
@@ -52,6 +53,14 @@ public class CustomTokenPrincipal implements Principal, Serializable {
 
     public void setTokenElement(Element tokenElement) {
         this.tokenElement = tokenElement;
+    }
+    
+    public void setSecretKey(byte[] secretKey) {
+        this.secretKey = secretKey;
+    }
+    
+    public byte[] getSecretKey() {
+        return secretKey;
     }
 
 }
