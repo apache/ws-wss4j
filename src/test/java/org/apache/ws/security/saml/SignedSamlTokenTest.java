@@ -382,6 +382,55 @@ public class SignedSamlTokenTest extends org.junit.Assert {
             (AssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(receivedAssertion != null);
     }
+    
+    /**
+     * Test that creates a signed SAML Assertion using HOK, but then modifies the assertion.
+     * The signature verification should then fail.
+     */
+    @org.junit.Test
+    public void testSAMLSignedKeyHolderKeyModified() throws Exception {
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        
+        SAMLIssuer saml = SAMLIssuerFactory.getInstance("saml_hok.properties");
+        // Provide info to SAML issuer that it can construct a Holder-of-key
+        // SAML token.
+        saml.setInstanceDoc(doc);
+        AssertionWrapper assertion = saml.newAssertion();
+
+        WSSecSignatureSAML wsSign = new WSSecSignatureSAML();
+        wsSign.setKeyIdentifierType(WSConstants.X509_KEY_IDENTIFIER);
+        wsSign.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+
+        Document signedDoc = wsSign.build(doc, crypto, assertion, null, null, null, secHeader);
+        
+        //
+        // Modify the assertion
+        //
+        org.w3c.dom.Element envelope = signedDoc.getDocumentElement();
+        org.w3c.dom.NodeList list = 
+            envelope.getElementsByTagNameNS(WSConstants.SAML_NS, "Assertion");
+        org.w3c.dom.Element assertionElement = (org.w3c.dom.Element)list.item(0);
+        assertionElement.setAttributeNS(null, "MinorVersion", "5");
+        
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Signed (modified) SAML message (key holder):");
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+            LOG.debug(outputString);
+        }
+        
+        List<WSSecurityEngineResult> results = verify(signedDoc);
+        /*
+        WSSecurityEngineResult actionResult =
+            WSSecurityUtil.fetchActionResult(results, WSConstants.ST_UNSIGNED);
+        AssertionWrapper receivedAssertion = 
+            (AssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+        assertTrue(receivedAssertion != null);
+        */
+    }
 
     
     /**

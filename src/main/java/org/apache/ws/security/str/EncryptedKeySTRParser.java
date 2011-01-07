@@ -91,16 +91,11 @@ public class EncryptedKeySTRParser implements STRParser {
         //
         else if (secRef.containsKeyIdentifier()) {
             if (WSConstants.WSS_SAML_KI_VALUE_TYPE.equals(secRef.getKeyIdentifierValueType())
-                || WSConstants.WSS_SAML2_KI_VALUE_TYPE.equals(secRef.getKeyIdentifierValueType())) { 
-                Element token = 
-                    secRef.getKeyIdentifierTokenElement(strElement.getOwnerDocument(), wsDocInfo, cb);
-                
-                if (crypto == null) {
-                    throw new WSSecurityException(
-                        WSSecurityException.FAILURE, "noSigCryptoFile"
+                || WSConstants.WSS_SAML2_KI_VALUE_TYPE.equals(secRef.getKeyIdentifierValueType())) {
+                SAMLKeyInfo samlKi = 
+                    SAMLUtil.getSamlKeyInfoFromKeyIdentifier(
+                        secRef, strElement, crypto, cb, wsDocInfo
                     );
-                }
-                SAMLKeyInfo samlKi = SAMLUtil.getSAMLKeyInfo(token, crypto, cb);
                 certs = samlKi.getCerts();
             } else {
                 certs = secRef.getKeyIdentifier(crypto);

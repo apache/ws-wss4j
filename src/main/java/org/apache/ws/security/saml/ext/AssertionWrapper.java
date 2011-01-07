@@ -143,6 +143,7 @@ public class AssertionWrapper {
      */
     public AssertionWrapper(XMLObject xmlObject) {
         this.xmlObject = xmlObject;
+        OpenSAMLUtil.initSamlEngine();
         if (xmlObject instanceof org.opensaml.saml1.core.Assertion) {
             this.saml1 = (org.opensaml.saml1.core.Assertion) xmlObject;
             samlVersion = SAMLVersion.VERSION_11;
@@ -506,6 +507,12 @@ public class AssertionWrapper {
         }
         if (sig != null) {
             validator.validate(sig);
+            
+            // TODO validate signature
+            //BasicX509Credential credential = new BasicX509Credential();
+            //credential.setEntityCertificate(certificate);
+            //SignatureValidator sigValidator = new SignatureValidator(credential);
+            //sigValidator.validate(signature); 
         } else {
             log.debug("AssertionWrapper: no signature to validate");
         }

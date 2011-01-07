@@ -30,6 +30,7 @@ import org.apache.ws.security.message.token.SecurityTokenReference;
 import org.apache.ws.security.message.token.UsernameToken;
 import org.apache.ws.security.saml.SAMLKeyInfo;
 import org.apache.ws.security.saml.SAMLUtil;
+import org.apache.ws.security.saml.ext.AssertionWrapper;
 import org.w3c.dom.Element;
 
 import java.io.IOException;
@@ -99,9 +100,10 @@ public class DerivedKeyTokenSTRParser implements STRParser {
             } else if (WSConstants.SCT == action) {
                 secretKey = (byte[])result.get(WSSecurityEngineResult.TAG_SECRET);
             } else if (WSConstants.ST_UNSIGNED == action) {
-                Element samlElement = wsDocInfo.getTokenElement(uri);
+                AssertionWrapper assertion = 
+                    (AssertionWrapper)result.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
                 SAMLKeyInfo keyInfo = 
-                    SAMLUtil.getSAMLKeyInfo(samlElement, crypto, cb);
+                    SAMLUtil.getSAMLKeyInfo(assertion, crypto, cb);
                 // TODO Handle malformed SAML tokens where they don't have the 
                 // secret in them
                 secretKey = keyInfo.getSecret();

@@ -205,6 +205,18 @@ public class WSSecSignatureSAML extends WSSecSignature {
         
         keyInfoFactory = KeyInfoFactory.getInstance("DOM");
         signatureFactory = XMLSignatureFactory.getInstance("DOM");
+        
+        try {
+            samlToken = (Element) assertion.toDOM(doc);
+        } catch (MarshallingException ex) {
+            throw new WSSecurityException(
+                WSSecurityException.FAILED_SIGNATURE, "noSAMLdoc", null, ex
+            );
+        }  catch (SignatureException ex) {
+            throw new WSSecurityException(
+                WSSecurityException.FAILED_SIGNATURE, "noSAMLdoc", null, ex
+            );
+        }
 
         //
         // Get some information about the SAML token content. This controls how
@@ -236,8 +248,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
         //
         // in case of key holder: - get the user's certificate that _must_ be
         // included in the SAML token. To ensure the cert integrity the SAML
-        // token must be signed (by the issuer). Just check if its signed, but
-        // don't verify this SAML token's signature here (maybe later).
+        // token must be signed (by the issuer).
         //
         else {
             if (userCrypto == null || !assertion.isSigned()) {
@@ -247,7 +258,9 @@ public class WSSecSignatureSAML extends WSSecSignature {
                     new Object[] { "for SAML Signature (Key Holder)" }
                 );
             }
-            certs = userCrypto.getCertificates(user);
+            SAMLKeyInfo samlKeyInfo = SAMLUtil.getSAMLKeyInfo(assertion, userCrypto, null);
+            publicKey = samlKeyInfo.getPublicKey();
+            certs = samlKeyInfo.getCerts();
             wsDocInfo.setCrypto(userCrypto);
         }
         if ((certs == null || certs.length == 0 || certs[0] == null) 
@@ -417,17 +430,6 @@ public class WSSecSignatureSAML extends WSSecSignature {
                 java.util.Collections.singletonList(structure), keyInfoUri
             );
 
-        try {
-            samlToken = (Element) assertion.toDOM(doc);
-        } catch (MarshallingException ex) {
-            throw new WSSecurityException(
-                WSSecurityException.FAILED_SIGNATURE, "noSAMLdoc", null, ex
-            );
-        }  catch (SignatureException ex) {
-            throw new WSSecurityException(
-                WSSecurityException.FAILED_SIGNATURE, "noSAMLdoc", null, ex
-            );
-        }
         wsDocInfo.addTokenElement(samlToken);
     }
 

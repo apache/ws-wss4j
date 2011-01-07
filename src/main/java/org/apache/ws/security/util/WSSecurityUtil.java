@@ -157,6 +157,9 @@ public class WSSecurityUtil {
         String localName,
         String namespace
     ) {
+        if (parentNode == null) {
+            return null;
+        }
         for (
             Node currentChild = parentNode.getFirstChild(); 
             currentChild != null; 

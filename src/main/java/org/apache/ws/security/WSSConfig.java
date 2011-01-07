@@ -260,7 +260,7 @@ public class WSSConfig {
     };
     protected WsuIdAllocator idAllocator = DEFAULT_ID_ALLOCATOR;
     
-    protected Map<String, String> jceProvider = new HashMap<String, String>();
+    protected static Map<String, String> jceProvider = new HashMap<String, String>();
 
     /**
      * The known actions. This map is of the form <Integer, Class<?>> or 
@@ -307,7 +307,7 @@ public class WSSConfig {
         addJceProviders = value;
     }
     
-    private synchronized void
+    private static synchronized void
     staticInit() {
         if (!staticallyInitialized) {
             org.apache.xml.security.Init.init();
@@ -638,7 +638,7 @@ public class WSSConfig {
      * 
      * @return Returns the actual name of the provider that was loaded
      */
-    public String addJceProvider(String name, String className) {
+    public static String addJceProvider(String name, String className) {
         if (jceProvider.get(name) == null) {
             String newName = null;
             try {
@@ -701,7 +701,7 @@ public class WSSConfig {
      * 
      * @return Returns the actual name of the provider that was loaded
      */
-    public String appendJceProvider(String name, String className) {
+    public static String appendJceProvider(String name, String className) {
         if (jceProvider.get(name) == null) {
             String newName = null;
             try {

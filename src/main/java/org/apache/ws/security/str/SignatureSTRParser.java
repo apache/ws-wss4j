@@ -184,7 +184,7 @@ public class SignatureSTRParser implements STRParser {
                 } else if (WSConstants.ST_UNSIGNED == action) {
                     if (crypto == null) {
                         throw new WSSecurityException(
-                                WSSecurityException.FAILURE, "noSigCryptoFile"
+                            WSSecurityException.FAILURE, "noSigCryptoFile"
                         );
                     }
                     AssertionWrapper assertion = 
@@ -211,16 +211,11 @@ public class SignatureSTRParser implements STRParser {
                 secretKey = getSecretKeyFromEncKeySHA1KI(id, cb);
                 principal = new CustomTokenPrincipal(id);
             } else if (WSConstants.WSS_SAML_KI_VALUE_TYPE.equals(secRef.getKeyIdentifierValueType())
-                || WSConstants.WSS_SAML2_KI_VALUE_TYPE.equals(secRef.getKeyIdentifierValueType())) { 
-                Element token = 
-                    secRef.getKeyIdentifierTokenElement(strElement.getOwnerDocument(), wsDocInfo, cb);
-
-                if (crypto == null) {
-                    throw new WSSecurityException(
-                            WSSecurityException.FAILURE, "noSigCryptoFile"
+                || WSConstants.WSS_SAML2_KI_VALUE_TYPE.equals(secRef.getKeyIdentifierValueType())) {
+                SAMLKeyInfo samlKi = 
+                    SAMLUtil.getSamlKeyInfoFromKeyIdentifier(
+                        secRef, strElement, crypto, cb, wsDocInfo
                     );
-                }
-                SAMLKeyInfo samlKi = SAMLUtil.getSAMLKeyInfo(token, crypto, cb);
                 X509Certificate[] foundCerts = samlKi.getCerts();
                 if (foundCerts != null) {
                     certs = new X509Certificate[]{foundCerts[0]};
@@ -412,6 +407,5 @@ public class SignatureSTRParser implements STRParser {
         }
         return pwcb.getKey();
     }
-    
     
 }

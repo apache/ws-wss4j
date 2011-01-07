@@ -30,6 +30,7 @@ import org.apache.ws.security.message.token.Reference;
 import org.apache.ws.security.message.token.SecurityTokenReference;
 import org.apache.ws.security.saml.SAMLKeyInfo;
 import org.apache.ws.security.saml.SAMLUtil;
+import org.apache.ws.security.saml.ext.AssertionWrapper;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.w3c.dom.Element;
 
@@ -94,9 +95,10 @@ public class SecurityTokenRefSTRParser implements STRParser {
                     String algorithm = (String)parameters.get(SIGNATURE_METHOD);
                     secretKey = dkt.deriveKey(WSSecurityUtil.getKeyLength(algorithm), secret);
                 } else if (WSConstants.ST_UNSIGNED == action) {
-                    Element samlElement = wsDocInfo.getTokenElement(id);
+                    AssertionWrapper assertion = 
+                        (AssertionWrapper)result.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
                     SAMLKeyInfo keyInfo = 
-                        SAMLUtil.getSAMLKeyInfo(samlElement, crypto, cb);
+                        SAMLUtil.getSAMLKeyInfo(assertion, crypto, cb);
                     // TODO Handle malformed SAML tokens where they don't have the 
                     // secret in them
                     secretKey = keyInfo.getSecret();
@@ -129,18 +131,13 @@ public class SecurityTokenRefSTRParser implements STRParser {
         } else if (secRef.containsKeyIdentifier()){
             if (WSConstants.WSS_SAML_KI_VALUE_TYPE.equals(secRef.getKeyIdentifierValueType())
                 || WSConstants.WSS_SAML2_KI_VALUE_TYPE.equals(secRef.getKeyIdentifierValueType())) { 
-                Element token = 
-                    secRef.getKeyIdentifierTokenElement(strElement.getOwnerDocument(), wsDocInfo, cb);
-
-                if (crypto == null) {
-                    throw new WSSecurityException(
-                            WSSecurityException.FAILURE, "noSigCryptoFile"
+                SAMLKeyInfo samlKi = 
+                    SAMLUtil.getSamlKeyInfoFromKeyIdentifier(
+                        secRef, strElement, crypto, cb, wsDocInfo
                     );
-                }
-                SAMLKeyInfo keyInfo = SAMLUtil.getSAMLKeyInfo(token, crypto, cb);
                 // TODO Handle malformed SAML tokens where they don't have the 
                 // secret in them
-                secretKey = keyInfo.getSecret();
+                secretKey = samlKi.getSecret();
             } else {
                 String keyIdentifierValue = secRef.getKeyIdentifierValue();
                 WSPasswordCallback pwcb = 
