@@ -163,6 +163,7 @@ public class SignatureProcessor implements Processor {
         result.put(WSSecurityEngineResult.TAG_SIGNATURE_METHOD, signatureMethod);
         result.put(WSSecurityEngineResult.TAG_CANONICALIZATION_METHOD, c14nMethod);
         result.put(WSSecurityEngineResult.TAG_ID, elem.getAttribute("Id"));
+        result.put(WSSecurityEngineResult.TAG_SECRET, secretKey);
         wsDocInfo.addResult(result);
         return java.util.Collections.singletonList(result);
     }

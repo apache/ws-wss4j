@@ -74,7 +74,7 @@ public class EncryptedDataProcessor implements Processor {
             encryptedKeyElement, crypto, decCrypto, cb, wsDocInfo, config
         );
         byte[] symmKey = 
-            (byte[])encrKeyResults.get(0).get(WSSecurityEngineResult.TAG_DECRYPTED_KEY);
+            (byte[])encrKeyResults.get(0).get(WSSecurityEngineResult.TAG_SECRET);
         String encAlgo = X509Util.getEncAlgo(elem);
         SecretKey key = WSSecurityUtil.prepareSecretKey(encAlgo, symmKey);
         

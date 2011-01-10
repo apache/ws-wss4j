@@ -23,16 +23,18 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSecurityEngine;
+import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.common.KeystoreCallbackHandler;
 import org.apache.ws.security.common.SOAPUtil;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.message.token.SecurityTokenReference;
+import org.apache.ws.security.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 
-import javax.security.auth.callback.CallbackHandler;
-
 import java.security.cert.X509Certificate;
+import java.util.List;
+import javax.security.auth.callback.CallbackHandler;
 
 /**
  * A set of tests for using a derived key for encryption/signature.
@@ -151,7 +153,13 @@ public class DerivedKeyTest extends org.junit.Assert {
                 org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
             LOG.debug(outputString);
         }
-        verify(doc);
+        List<WSSecurityEngineResult> results = verify(doc);
+        
+        WSSecurityEngineResult actionResult = 
+            WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
+        assertTrue(actionResult != null);
+        assertFalse(actionResult.isEmpty());
+        assertTrue(actionResult.get(WSSecurityEngineResult.TAG_SECRET) != null);
     }
 
 
@@ -185,7 +193,13 @@ public class DerivedKeyTest extends org.junit.Assert {
                 org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
             LOG.debug(outputString);
         }
-        verify(doc);
+        List<WSSecurityEngineResult> results = verify(doc);
+        
+        WSSecurityEngineResult actionResult = 
+            WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
+        assertTrue(actionResult != null);
+        assertFalse(actionResult.isEmpty());
+        assertTrue(actionResult.get(WSSecurityEngineResult.TAG_SECRET) != null);
     }
 
 
@@ -218,7 +232,13 @@ public class DerivedKeyTest extends org.junit.Assert {
                 org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
             LOG.debug(outputString);
         }
-        verify(doc);
+        List<WSSecurityEngineResult> results = verify(doc);
+        
+        WSSecurityEngineResult actionResult = 
+            WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
+        assertTrue(actionResult != null);
+        assertFalse(actionResult.isEmpty());
+        assertTrue(actionResult.get(WSSecurityEngineResult.TAG_SECRET) != null);
     }
 
     @org.junit.Test
@@ -311,11 +331,14 @@ public class DerivedKeyTest extends org.junit.Assert {
      * @param envelope 
      * @throws Exception Thrown when there is a problem in verification
      */
-    private void verify(Document doc) throws Exception {
-        secEngine.processSecurityHeader(doc, null, callbackHandler, crypto);
+    private List<WSSecurityEngineResult> verify(Document doc) throws Exception {
+        List<WSSecurityEngineResult> results = 
+            secEngine.processSecurityHeader(doc, null, callbackHandler, crypto);
         String outputString = 
             org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
         assertTrue(outputString.indexOf("counter_port_type") > 0 ? true : false);
+        
+        return results;
     }
 
 }

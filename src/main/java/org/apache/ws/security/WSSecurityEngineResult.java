@@ -124,13 +124,6 @@ public class WSSecurityEngineResult extends java.util.HashMap<String, Object> {
      */
     public static final String TAG_SECRET = "secret";
     
-    /**
-     * Tag denoting a reference to the decrypted key
-     *
-     * The value under this tag is of type byte[].
-     */
-    public static final String TAG_DECRYPTED_KEY = "decrypted-key";
-    
     //
     // General tags
     //
@@ -224,7 +217,7 @@ public class WSSecurityEngineResult extends java.util.HashMap<String, Object> {
         List<WSDataRef> dataRefUris
     ) {
         put(TAG_ACTION, new Integer(act));
-        put(TAG_DECRYPTED_KEY, decryptedKey);
+        put(TAG_SECRET, decryptedKey);
         put(TAG_ENCRYPTED_EPHEMERAL_KEY, encryptedKeyBytes);
         put(TAG_DATA_REF_URIS, dataRefUris);
     }
@@ -237,7 +230,7 @@ public class WSSecurityEngineResult extends java.util.HashMap<String, Object> {
         X509Certificate[] certs
     ) {
         put(TAG_ACTION, new Integer(act));
-        put(TAG_DECRYPTED_KEY, decryptedKey);
+        put(TAG_SECRET, decryptedKey);
         put(TAG_ENCRYPTED_EPHEMERAL_KEY, encryptedKeyBytes);
         put(TAG_DATA_REF_URIS, dataRefUris);
         put(TAG_X509_CERTIFICATES, certs);

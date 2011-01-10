@@ -86,7 +86,7 @@ public class SecurityTokenRefSTRParser implements STRParser {
             if (result != null) {
                 int action = ((Integer)result.get(WSSecurityEngineResult.TAG_ACTION)).intValue();
                 if (WSConstants.ENCR == action) {
-                    secretKey = (byte[])result.get(WSSecurityEngineResult.TAG_DECRYPTED_KEY);
+                    secretKey = (byte[])result.get(WSSecurityEngineResult.TAG_SECRET);
                 } else if (WSConstants.DKT == action) {
                     DerivedKeyToken dkt = 
                         (DerivedKeyToken)result.get(WSSecurityEngineResult.TAG_DERIVED_KEY_TOKEN);

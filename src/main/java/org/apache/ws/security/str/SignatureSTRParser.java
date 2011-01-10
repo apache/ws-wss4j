@@ -135,7 +135,7 @@ public class SignatureSTRParser implements STRParser {
                         proc.handleToken(token, null, crypto, cb, docInfo, null);
                     secretKey = 
                         (byte[])encrResult.get(0).get(
-                                WSSecurityEngineResult.TAG_DECRYPTED_KEY
+                            WSSecurityEngineResult.TAG_SECRET
                         );
                     principal = new CustomTokenPrincipal(token.getAttribute("Id"));
                 } else {
@@ -160,7 +160,7 @@ public class SignatureSTRParser implements STRParser {
                     certs = 
                         (X509Certificate[])result.get(WSSecurityEngineResult.TAG_X509_CERTIFICATES);
                 } else if (WSConstants.ENCR == action) {
-                    secretKey = (byte[])result.get(WSSecurityEngineResult.TAG_DECRYPTED_KEY);
+                    secretKey = (byte[])result.get(WSSecurityEngineResult.TAG_SECRET);
                     String id = (String)result.get(WSSecurityEngineResult.TAG_ID);
                     principal = new CustomTokenPrincipal(id);
                 } else if (WSConstants.SCT == action) {

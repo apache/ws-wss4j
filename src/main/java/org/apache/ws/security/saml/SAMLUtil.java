@@ -185,7 +185,7 @@ public class SAMLUtil {
                                 proc.handleToken((Element)node, null, crypto, cb, docInfo, null);
                             byte[] secret = 
                                 (byte[])result.get(0).get(
-                                    WSSecurityEngineResult.TAG_DECRYPTED_KEY
+                                    WSSecurityEngineResult.TAG_SECRET
                                 );
                             return new SAMLKeyInfo(assertion, secret);
                         } else if (el.equals(new QName(WSConstants.WST_NS, "BinarySecret"))) {
