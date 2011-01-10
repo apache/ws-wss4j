@@ -30,6 +30,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSecurityEngine;
+import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.message.WSSecDKEncrypt;
@@ -37,6 +38,7 @@ import org.apache.ws.security.message.WSSecDKSign;
 import org.apache.ws.security.message.WSSecEncryptedKey;
 import org.apache.ws.security.message.WSSecHeader;
 import org.apache.ws.security.message.token.SecurityTokenReference;
+import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.xml.security.signature.XMLSignature;
 import org.w3c.dom.Document;
 
@@ -48,6 +50,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.cert.X509Certificate;
+import java.util.Vector;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
@@ -225,7 +228,15 @@ public class TestWSSecurityNewDK extends TestCase implements CallbackHandler {
                  org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
              LOG.debug(outputString);
          }
-         verify(doc);
+         
+         Vector results = verify(doc);
+         
+         WSSecurityEngineResult actionResult = 
+             WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
+         assertTrue(actionResult != null);
+         assertFalse(actionResult.isEmpty());
+         
+         assertTrue(actionResult.get(WSSecurityEngineResult.TAG_DECRYPTED_KEY) != null);
      }
      
      
@@ -260,7 +271,15 @@ public class TestWSSecurityNewDK extends TestCase implements CallbackHandler {
                  org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
              LOG.debug(outputString);
          }
-         verify(doc);
+         
+         Vector results = verify(doc);
+         
+         WSSecurityEngineResult actionResult = 
+             WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
+         assertTrue(actionResult != null);
+         assertFalse(actionResult.isEmpty());
+         
+         assertTrue(actionResult.get(WSSecurityEngineResult.TAG_DECRYPTED_KEY) != null);
      }
      
      
@@ -294,7 +313,15 @@ public class TestWSSecurityNewDK extends TestCase implements CallbackHandler {
                  org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
              LOG.debug(outputString);
          }
-         verify(doc);
+         
+         Vector results = verify(doc);
+         
+         WSSecurityEngineResult actionResult = 
+             WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
+         assertTrue(actionResult != null);
+         assertFalse(actionResult.isEmpty());
+         
+         assertTrue(actionResult.get(WSSecurityEngineResult.TAG_DECRYPTED_KEY) != null);
      }
      
      
@@ -388,11 +415,12 @@ public class TestWSSecurityNewDK extends TestCase implements CallbackHandler {
      * @param envelope 
      * @throws Exception Thrown when there is a problem in verification
      */
-    private void verify(Document doc) throws Exception {
-        secEngine.processSecurityHeader(doc, null, this, crypto);
+    private Vector verify(Document doc) throws Exception {
+        Vector results = secEngine.processSecurityHeader(doc, null, this, crypto);
         String outputString = 
             org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
         assertTrue(outputString.indexOf("LogTestService2") > 0 ? true : false);
+        return results;
     }
     
     public void handle(Callback[] callbacks)

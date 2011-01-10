@@ -82,6 +82,8 @@ public class SignatureProcessor implements Processor {
     
     private X509Certificate[] certificates;
     
+    private byte[] secretKey;
+    
     private int secretKeyLength = WSConstants.WSE_DERIVED_KEY_LEN;
     
     private String signatureMethod;
@@ -124,12 +126,20 @@ public class SignatureProcessor implements Processor {
                 WSDocInfoStore.delete(wsDocInfo);
             }
         }
+        byte[] storedKey = null;
+        if (secretKey != null && secretKey.length > 0) {
+            storedKey = new byte[secretKey.length];
+            for (int i = 0; i < secretKey.length; i++) {
+                storedKey[i] = secretKey[i];
+            }
+        }
         if (lastPrincipalFound instanceof WSUsernameTokenPrincipal) {
             WSSecurityEngineResult result = new WSSecurityEngineResult(
                     WSConstants.UT_SIGN, lastPrincipalFound, null,
                     returnElements, protectedElements, signatureValue[0]);
             result.put(WSSecurityEngineResult.TAG_SIGNATURE_METHOD, signatureMethod);
             result.put(WSSecurityEngineResult.TAG_CANONICALIZATION_METHOD, c14nMethod);
+            result.put(WSSecurityEngineResult.TAG_DECRYPTED_KEY, storedKey);
             returnResults.add(
                 0, 
                 result
@@ -141,12 +151,14 @@ public class SignatureProcessor implements Processor {
             result.put(WSSecurityEngineResult.TAG_SIGNATURE_METHOD, signatureMethod);
             result.put(WSSecurityEngineResult.TAG_CANONICALIZATION_METHOD, c14nMethod);
             result.put(WSSecurityEngineResult.TAG_X509_CERTIFICATES, certificates);
+            result.put(WSSecurityEngineResult.TAG_DECRYPTED_KEY, storedKey);
             returnResults.add(
                 0, 
                 result
             );
         }
         signatureId = elem.getAttributeNS(null, "Id");
+        secretKey = null;
     }
 
     /**
@@ -218,7 +230,6 @@ public class SignatureProcessor implements Processor {
         sig.addResourceResolver(EnvelopeIdResolver.getInstance());
 
         KeyInfo info = sig.getKeyInfo();
-        byte[] secretKey = null;
         UsernameToken ut = null;
         DerivedKeyToken dkt = null;
         SAMLKeyInfo samlKi = null;
@@ -613,12 +624,10 @@ public class SignatureProcessor implements Processor {
                     final SAMLAssertion assertion = samlKi.getAssertion();
                     CustomTokenPrincipal principal = new CustomTokenPrincipal(assertion.getId());
                     principal.setTokenObject(assertion);
-                    principal.setSecretKey(secretKey);
                     return principal;
                 } else if (secretKey != null) {
                     // This is the custom key scenario
                     CustomTokenPrincipal principal = new CustomTokenPrincipal(customTokenId);
-                    principal.setSecretKey(secretKey);
                     return principal;
                 } else {
                     throw new WSSecurityException("Cannot determine principal");
