@@ -49,6 +49,10 @@ public class SAMLKeyInfo {
      */
     AssertionWrapper assertion;
     
+    public SAMLKeyInfo() {
+        //
+    }
+    
     public SAMLKeyInfo(AssertionWrapper assertion, X509Certificate[] certs) {
         this.certs = certs;
         this.assertion = assertion;
@@ -68,15 +72,31 @@ public class SAMLKeyInfo {
         return certs;
     }
     
+    public void setCerts(X509Certificate[] certs) {
+        this.certs = certs;
+    }
+    
     public byte[] getSecret() {
         return secret;
+    }
+    
+    public void setSecret(byte[] secret) {
+        this.secret = secret;
     }
 
     public PublicKey getPublicKey() {
         return this.publicKey;
     }
+    
+    public void setPublicKey(PublicKey publicKey) {
+        this.publicKey = publicKey;
+    }
 
     public AssertionWrapper getAssertion() {
         return assertion;
+    }
+    
+    public void setAssertion(AssertionWrapper assertion) {
+        this.assertion = assertion;
     }
 }

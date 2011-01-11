@@ -146,9 +146,6 @@ public class SignaturePartsTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         
         SAMLIssuer saml = SAMLIssuerFactory.getInstance("saml_hok.properties");
-        // Provide info to SAML issuer that it can construct a Holder-of-key
-        // SAML token.
-        saml.setInstanceDoc(doc);
         AssertionWrapper assertion = saml.newAssertion();
 
         WSSecSignatureSAML wsSign = new WSSecSignatureSAML();

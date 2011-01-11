@@ -120,7 +120,7 @@ public class SignatureSTRParser implements STRParser {
                                 WSSecurityException.FAILURE, "noSigCryptoFile"
                         );
                     }
-                    SAMLKeyInfo samlKi = SAMLUtil.getSAMLKeyInfo(token, crypto, cb);
+                    SAMLKeyInfo samlKi = SAMLUtil.getCredentialFromSubject(token, crypto, cb);
                     X509Certificate[] foundCerts = samlKi.getCerts();
                     if (foundCerts != null) {
                         certs = new X509Certificate[]{foundCerts[0]};
@@ -190,7 +190,7 @@ public class SignatureSTRParser implements STRParser {
                     AssertionWrapper assertion = 
                         (AssertionWrapper)result.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
                     SAMLKeyInfo keyInfo = 
-                        SAMLUtil.getSAMLKeyInfo(assertion, crypto, cb);
+                        SAMLUtil.getCredentialFromSubject(assertion, crypto, cb);
                     X509Certificate[] foundCerts = keyInfo.getCerts();
                     if (foundCerts != null) {
                         certs = new X509Certificate[]{foundCerts[0]};

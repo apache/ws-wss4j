@@ -22,11 +22,9 @@ package org.apache.ws.security.message;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.saml.ext.AssertionWrapper;
 import org.apache.ws.security.util.WSSecurityUtil;
-
-import org.opensaml.xml.io.MarshallingException;
-import org.opensaml.xml.signature.SignatureException;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -77,9 +75,7 @@ public class WSSecSAMLToken extends WSSecBase {
         try {
             Element element = (Element) saml.toDOM(document);
             WSSecurityUtil.prependChildElement(secHeader.getSecurityHeader(), element);
-        } catch (SignatureException ex) {
-            throw new RuntimeException(ex.toString(), ex);
-        } catch (MarshallingException ex) {
+        } catch (WSSecurityException ex) {
             throw new RuntimeException(ex.toString(), ex);
         }
     }

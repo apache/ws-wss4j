@@ -21,8 +21,6 @@ package org.apache.ws.security.saml;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
@@ -30,8 +28,6 @@ import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.saml.ext.AssertionWrapper;
 import org.apache.ws.security.saml.ext.OpenSAMLUtil;
 import org.apache.ws.security.saml.ext.SAMLParms;
-import org.apache.ws.security.saml.ext.builder.SAML1Constants;
-import org.apache.ws.security.saml.ext.builder.SAML2Constants;
 import org.apache.ws.security.util.Loader;
 
 import org.opensaml.xml.security.x509.BasicX509Credential;
@@ -40,24 +36,12 @@ import org.opensaml.xml.signature.KeyInfo;
 import org.opensaml.xml.signature.Signature;
 import org.opensaml.xml.signature.SignatureConstants;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-
-import java.security.KeyException;
 import java.security.PrivateKey;
-import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.Date;
 import java.util.Properties;
 
 import javax.security.auth.callback.CallbackHandler;
-import javax.xml.crypto.MarshalException;
-import javax.xml.crypto.XMLStructure;
-import javax.xml.crypto.dom.DOMStructure;
-import javax.xml.crypto.dsig.keyinfo.KeyValue;
-import javax.xml.crypto.dsig.keyinfo.X509Data;
 
 /**
  * Builds a WS SAML Assertion and inserts it into the SOAP Envelope. Refer to
@@ -70,17 +54,13 @@ public class SAMLIssuerImpl implements SAMLIssuer {
     private static final Log log = LogFactory.getLog(SAMLIssuerImpl.class.getName());
 
     private AssertionWrapper sa = null;
-
-    private Document instanceDoc = null;
-
+    
     private Properties properties = null;
 
     private Crypto issuerCrypto = null;
     private String issuerKeyPassword = null;
     private String issuerKeyName = null;
 
-    private WSSConfig wssConfig = WSSConfig.getNewInstance();
-    
     private String samlVersion = null;
     
     /**
@@ -255,10 +235,4 @@ public class SAMLIssuerImpl implements SAMLIssuer {
         return issuerKeyPassword;
     }
 
-    /**
-     * @param instanceDoc The instanceDoc to set.
-     */
-    public void setInstanceDoc(Document instanceDoc) {
-        this.instanceDoc = instanceDoc;
-    }
 }

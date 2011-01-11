@@ -23,6 +23,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.apache.ws.security.WSSecurityException;
+import org.apache.ws.security.components.crypto.Crypto;
+import org.apache.ws.security.saml.SAMLKeyInfo;
+import org.apache.ws.security.saml.SAMLUtil;
 import org.apache.ws.security.saml.ext.builder.SAML1ComponentBuilder;
 import org.apache.ws.security.saml.ext.builder.SAML2ComponentBuilder;
 import org.apache.ws.security.saml.ext.builder.SAML2Constants;
@@ -44,10 +47,10 @@ import org.opensaml.saml2.core.Issuer;
 import org.opensaml.saml2.core.NameID;
 import org.opensaml.security.SAMLSignatureProfileValidator;
 import org.opensaml.xml.XMLObject;
-import org.opensaml.xml.io.MarshallingException;
-import org.opensaml.xml.io.UnmarshallingException;
+import org.opensaml.xml.security.x509.BasicX509Credential;
+import org.opensaml.xml.signature.KeyInfo;
 import org.opensaml.xml.signature.Signature;
-import org.opensaml.xml.signature.SignatureException;
+import org.opensaml.xml.signature.SignatureValidator;
 import org.opensaml.xml.validation.ValidationException;
 
 import org.w3c.dom.Document;
@@ -55,6 +58,7 @@ import org.w3c.dom.Element;
 
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -110,7 +114,7 @@ public class AssertionWrapper {
      * @param element of type Element
      * @throws UnmarshallingException when
      */
-    public AssertionWrapper(Element element) throws UnmarshallingException {
+    public AssertionWrapper(Element element) throws WSSecurityException {
         this(OpenSAMLUtil.fromDom(element));
         assertionElement = element;
     }
@@ -355,10 +359,8 @@ public class AssertionWrapper {
      *
      * @param doc of type Document
      * @return Element
-     * @throws MarshallingException when
-     * @throws SignatureException   when
      */
-    public Element toDOM(Document doc) throws MarshallingException, SignatureException {
+    public Element toDOM(Document doc) throws WSSecurityException {
         return OpenSAMLUtil.toDom(xmlObject, doc);
     }
 
@@ -366,11 +368,8 @@ public class AssertionWrapper {
      * Method assertionToString ...
      *
      * @return String
-     * @throws MarshallingException when
-     * @throws SignatureException   when
-     * @throws IOException          when
      */
-    public String assertionToString() throws MarshallingException, SignatureException {
+    public String assertionToString() throws WSSecurityException {
         Element element = toDOM(null);
         return DOM2Writer.nodeToString(element);
     }
@@ -497,8 +496,7 @@ public class AssertionWrapper {
      *
      * @throws ValidationException
      */
-    public void verify() throws ValidationException {
-        SAMLSignatureProfileValidator validator = new SAMLSignatureProfileValidator();
+    public void verify(Crypto crypto) throws WSSecurityException {
         Signature sig = null;
         if (saml2 != null && saml2.getSignature() != null) {
             sig = saml2.getSignature();
@@ -506,17 +504,44 @@ public class AssertionWrapper {
             sig = saml1.getSignature();
         }
         if (sig != null) {
-            validator.validate(sig);
+            KeyInfo keyInfo = sig.getKeyInfo();
+            SAMLKeyInfo samlKeyInfo = 
+                SAMLUtil.getCredentialFromKeyInfo(keyInfo.getDOM(), crypto, null);
+            if (samlKeyInfo == null) {
+                throw new WSSecurityException(
+                    WSSecurityException.FAILURE, "invalidSAMLsecurity",
+                    new Object[]{"cannot get certificate or key"}
+                );
+            }
+            SAMLSignatureProfileValidator validator = new SAMLSignatureProfileValidator();
+            try {
+                validator.validate(sig);
+            } catch (ValidationException ex) {
+                throw new WSSecurityException("SAML signature validation failed", ex);
+            }
             
-            // TODO validate signature
-            //BasicX509Credential credential = new BasicX509Credential();
-            //credential.setEntityCertificate(certificate);
-            //SignatureValidator sigValidator = new SignatureValidator(credential);
-            //sigValidator.validate(signature); 
+            BasicX509Credential credential = new BasicX509Credential();
+            if (samlKeyInfo.getCerts() != null) {
+                credential.setEntityCertificate(samlKeyInfo.getCerts()[0]);
+            } else if (samlKeyInfo.getPublicKey() != null) {
+                credential.setPublicKey(samlKeyInfo.getPublicKey());
+            } else {
+                throw new WSSecurityException(
+                    WSSecurityException.FAILURE, "invalidSAMLsecurity",
+                    new Object[]{"cannot get certificate or key"}
+                );
+            }
+            SignatureValidator sigValidator = new SignatureValidator(credential);
+            try {
+                sigValidator.validate(sig);
+            } catch (ValidationException ex) {
+                throw new WSSecurityException("SAML signature validation failed", ex);
+            }
         } else {
             log.debug("AssertionWrapper: no signature to validate");
         }
     }
+    
 
     /**
      * Method getSamlVersion returns the samlVersion of this AssertionWrapper object.

@@ -103,7 +103,7 @@ public class DerivedKeyTokenSTRParser implements STRParser {
                 AssertionWrapper assertion = 
                     (AssertionWrapper)result.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
                 SAMLKeyInfo keyInfo = 
-                    SAMLUtil.getSAMLKeyInfo(assertion, crypto, cb);
+                    SAMLUtil.getCredentialFromSubject(assertion, crypto, cb);
                 // TODO Handle malformed SAML tokens where they don't have the 
                 // secret in them
                 secretKey = keyInfo.getSecret();

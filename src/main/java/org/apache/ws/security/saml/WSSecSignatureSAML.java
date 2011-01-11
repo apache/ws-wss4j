@@ -37,9 +37,6 @@ import org.apache.ws.security.saml.ext.OpenSAMLUtil;
 import org.apache.ws.security.transform.STRTransform;
 import org.apache.ws.security.util.WSSecurityUtil;
 
-import org.opensaml.xml.io.MarshallingException;
-import org.opensaml.xml.signature.SignatureException;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -206,17 +203,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
         keyInfoFactory = KeyInfoFactory.getInstance("DOM");
         signatureFactory = XMLSignatureFactory.getInstance("DOM");
         
-        try {
-            samlToken = (Element) assertion.toDOM(doc);
-        } catch (MarshallingException ex) {
-            throw new WSSecurityException(
-                WSSecurityException.FAILED_SIGNATURE, "noSAMLdoc", null, ex
-            );
-        }  catch (SignatureException ex) {
-            throw new WSSecurityException(
-                WSSecurityException.FAILED_SIGNATURE, "noSAMLdoc", null, ex
-            );
-        }
+        samlToken = (Element) assertion.toDOM(doc);
 
         //
         // Get some information about the SAML token content. This controls how
@@ -258,7 +245,8 @@ public class WSSecSignatureSAML extends WSSecSignature {
                     new Object[] { "for SAML Signature (Key Holder)" }
                 );
             }
-            SAMLKeyInfo samlKeyInfo = SAMLUtil.getSAMLKeyInfo(assertion, userCrypto, null);
+            SAMLKeyInfo samlKeyInfo = 
+                SAMLUtil.getCredentialFromSubject(assertion, userCrypto, null);
             publicKey = samlKeyInfo.getPublicKey();
             certs = samlKeyInfo.getCerts();
             wsDocInfo.setCrypto(userCrypto);

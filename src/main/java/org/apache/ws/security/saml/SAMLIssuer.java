@@ -22,7 +22,6 @@ package org.apache.ws.security.saml;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.saml.ext.AssertionWrapper;
-import org.w3c.dom.Document;
 
 /**
  * Builds a WS SAML Assertion and inserts it into the SOAP Envelope.
@@ -30,7 +29,6 @@ import org.w3c.dom.Document;
  *
  * @author Davanum Srinivas (dims@yahoo.com).
  */
-
 public interface SAMLIssuer {
 
     /**
@@ -58,8 +56,4 @@ public interface SAMLIssuer {
      */
     public String getIssuerKeyPassword();
 
-    /**
-     * @param instanceDoc The instanceDoc to set.
-     */
-    public void setInstanceDoc(Document instanceDoc);
 }

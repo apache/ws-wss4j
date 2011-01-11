@@ -120,8 +120,7 @@
                     <verbose>true</verbose>
                     <targetJdk>1.5</targetJdk>
                     <excludes>
-                        <exclude>**/Merlin.java, **/CryptoBase.java, **/SAMLIssuerImpl.java, **/DOM2Writer.java
-                        </exclude>
+                        <exclude>**/CryptoBase.java, **/DOM2Writer.java</exclude>
                     </excludes>
                 </configuration>
                 <executions>

@@ -30,9 +30,6 @@ import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.saml.ext.AssertionWrapper;
 import org.apache.ws.security.util.DOM2Writer;
 
-import org.opensaml.xml.io.UnmarshallingException;
-import org.opensaml.xml.validation.ValidationException;
-
 import org.w3c.dom.Element;
 
 import java.util.List;
@@ -52,7 +49,7 @@ public class SAMLTokenProcessor implements Processor {
         if (log.isDebugEnabled()) {
             log.debug("Found SAML Assertion element");
         }
-        AssertionWrapper assertion = handleSAMLToken(elem);
+        AssertionWrapper assertion = handleSAMLToken(elem, crypto);
         wsDocInfo.addTokenElement(elem);
         WSSecurityEngineResult result = 
             new WSSecurityEngineResult(WSConstants.ST_UNSIGNED, assertion);
@@ -62,28 +59,15 @@ public class SAMLTokenProcessor implements Processor {
         return java.util.Collections.singletonList(result);
     }
 
-    public AssertionWrapper handleSAMLToken(Element token) throws WSSecurityException {
-        boolean result = false;
-        AssertionWrapper assertion = null;
-        try {
-            assertion = new AssertionWrapper(token);
-            assertion.verify();
-            result = true;
-            if (log.isDebugEnabled()) {
-                log.debug("SAML Assertion issuer " + assertion.getIssuerString());
-                log.debug(DOM2Writer.nodeToString(token));
-            }
-        } catch (UnmarshallingException e) {
-            throw new WSSecurityException(
-                WSSecurityException.FAILURE, "invalidSAMLsecurity", null, e
-            );
-        } catch (ValidationException e) {
-            throw new WSSecurityException(
-                 WSSecurityException.FAILURE, "invalidSAMLsecurity", null, e
-            );
-        }
-        if (!result) {
-            throw new WSSecurityException(WSSecurityException.FAILED_AUTHENTICATION);
+    public AssertionWrapper handleSAMLToken(
+        Element token, 
+        Crypto crypto
+    ) throws WSSecurityException {
+        AssertionWrapper assertion = new AssertionWrapper(token);
+        assertion.verify(crypto);
+        if (log.isDebugEnabled()) {
+            log.debug("SAML Assertion issuer " + assertion.getIssuerString());
+            log.debug(DOM2Writer.nodeToString(token));
         }
         return assertion;
     }

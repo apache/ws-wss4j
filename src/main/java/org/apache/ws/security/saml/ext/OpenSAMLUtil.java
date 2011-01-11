@@ -78,9 +78,14 @@ public class OpenSAMLUtil {
      * @return XMLObject
      * @throws UnmarshallingException
      */
-    public static XMLObject fromDom(Element root) throws UnmarshallingException {
+    public static XMLObject fromDom(Element root) throws WSSecurityException {
         Unmarshaller unmarshaller = unmarshallerFactory.getUnmarshaller(root);
-        XMLObject xmlObject = unmarshaller.unmarshall(root);
+        XMLObject xmlObject = null;
+        try {
+            xmlObject = unmarshaller.unmarshall(root);
+        } catch (UnmarshallingException ex) {
+            throw new WSSecurityException("Error unmarshalling a SAML assertion", ex);
+        }
 
         if (xmlObject instanceof org.opensaml.saml1.core.Assertion) {
             log.debug("OpenSAMLUtil: found SAML 1 Assertion");
@@ -105,9 +110,14 @@ public class OpenSAMLUtil {
     public static Element toDom(
         XMLObject xmlObject, 
         Document doc
-    ) throws MarshallingException, SignatureException {
+    ) throws WSSecurityException {
         Marshaller marshaller = marshallerFactory.getMarshaller(xmlObject);
-        Element element = marshaller.marshall(xmlObject);
+        Element element = null;
+        try {
+            element = marshaller.marshall(xmlObject);
+        } catch (MarshallingException ex) {
+            throw new WSSecurityException("Error marshalling a SAML assertion", ex);
+        }
 
         // Sign the assertion if the signature element is present.
         if (xmlObject instanceof org.opensaml.saml2.core.Assertion) {
@@ -115,14 +125,22 @@ public class OpenSAMLUtil {
             // if there is a signature, but it hasn't already been signed
             if (saml2.getSignature() != null) {
                 log.debug("Signing SAML v2.0 assertion...");
-                Signer.signObject(saml2.getSignature());
+                try {
+                    Signer.signObject(saml2.getSignature());
+                } catch (SignatureException ex) {
+                    throw new WSSecurityException("Error signing a SAML assertion", ex);
+                }
             }
         } else if (xmlObject instanceof org.opensaml.saml1.core.Assertion) {
             org.opensaml.saml1.core.Assertion saml1 = (org.opensaml.saml1.core.Assertion) xmlObject;
             // if there is a signature, but it hasn't already been signed
             if (saml1.getSignature() != null) {
                 log.debug("Signing SAML v1.1 assertion...");
-                Signer.signObject(saml1.getSignature());
+                try {
+                    Signer.signObject(saml1.getSignature());
+                } catch (SignatureException ex) {
+                    throw new WSSecurityException("Error signing a SAML assertion", ex);
+                }
             }
         }
 

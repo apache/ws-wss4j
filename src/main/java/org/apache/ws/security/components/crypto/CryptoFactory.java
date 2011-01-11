@@ -170,7 +170,7 @@ public abstract class CryptoFactory {
      * @return
      */
     private static Crypto loadClass(String cryptoClassName, Map map, ClassLoader loader) {
-        Class cryptogenClass = null;
+        Class<?> cryptogenClass = null;
         Crypto crypto = null;
         
         if (cryptoClassName != null) {
@@ -184,17 +184,17 @@ public abstract class CryptoFactory {
         }
         log.debug("Using Crypto Engine [" + cryptoClassName + "]");
         try {
-            Class[] classes = null;
+            Class<?>[] classes = null;
             //
             // for backwards compat
             //
             if (map instanceof Properties) {
-                classes = new Class[]{Properties.class,ClassLoader.class};
+                classes = new Class[]{Properties.class, ClassLoader.class};
             } else {
-                classes = new Class[]{Map.class,ClassLoader.class};
+                classes = new Class[]{Map.class, ClassLoader.class};
             }
-            Constructor c = cryptogenClass.getConstructor(classes);
-            crypto = (Crypto) c.newInstance(new Object[]{map,loader});
+            Constructor<?> c = cryptogenClass.getConstructor(classes);
+            crypto = (Crypto) c.newInstance(new Object[] {map, loader});
             return crypto;
         } catch (java.lang.Exception e) {
             if (log.isDebugEnabled()) {
@@ -212,6 +212,7 @@ public abstract class CryptoFactory {
             }
         }
     }
+    
     /**
      * Gets the properties for crypto.
      * The functions loads the property file via

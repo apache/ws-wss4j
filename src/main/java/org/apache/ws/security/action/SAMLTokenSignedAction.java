@@ -56,7 +56,6 @@ public class SAMLTokenSignedAction implements Action {
         }
 
         SAMLIssuer saml = loadSamlIssuer(handler, reqData);
-        saml.setInstanceDoc(doc);
 
         AssertionWrapper assertion = saml.newAssertion();
         if (assertion == null) {

@@ -28,6 +28,7 @@ import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSSecurityEngineResult;
+import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.common.CustomHandler;
 import org.apache.ws.security.common.KeystoreCallbackHandler;
 import org.apache.ws.security.common.SOAPUtil;
@@ -42,6 +43,9 @@ import org.w3c.dom.Document;
 
 import javax.security.auth.callback.CallbackHandler;
 import java.util.List;
+
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
 /**
  * Test-case for sending and processing an signed SAML Assertion.
@@ -249,9 +253,6 @@ public class SignedSamlTokenTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         
         SAMLIssuer saml = SAMLIssuerFactory.getInstance("saml_hok.properties");
-        // Provide info to SAML issuer that it can construct a Holder-of-key
-        // SAML token.
-        saml.setInstanceDoc(doc);
         AssertionWrapper assertion = saml.newAssertion();
 
         WSSecSignatureSAML wsSign = new WSSecSignatureSAML();
@@ -297,9 +298,6 @@ public class SignedSamlTokenTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         
         SAMLIssuer saml = SAMLIssuerFactory.getInstance("saml_hok_keyvalue.properties");
-        // Provide info to SAML issuer that it can construct a Holder-of-key
-        // SAML token.
-        saml.setInstanceDoc(doc);
         AssertionWrapper assertion = saml.newAssertion();
 
         WSSecSignatureSAML wsSign = new WSSecSignatureSAML();
@@ -348,9 +346,6 @@ public class SignedSamlTokenTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         
         SAMLIssuer saml = SAMLIssuerFactory.getInstance("saml_hok.properties");
-        // Provide info to SAML issuer that it can construct a Holder-of-key
-        // SAML token.
-        saml.setInstanceDoc(doc);
         AssertionWrapper assertion = saml.newAssertion();
 
         WSSecSignatureSAML wsSign = new WSSecSignatureSAML();
@@ -384,17 +379,16 @@ public class SignedSamlTokenTest extends org.junit.Assert {
     }
     
     /**
-     * Test that creates a signed SAML Assertion using HOK, but then modifies the assertion.
-     * The signature verification should then fail.
+     * Test that creates a signed SAML Assertion using HOK, but then modifies the signature
+     * object by replacing the enveloped transform with the exclusive c14n transform. 
+     * The signature validation should then fail - the enveloped transform is mandatory for
+     * a signed assertion.
      */
     @org.junit.Test
-    public void testSAMLSignedKeyHolderKeyModified() throws Exception {
+    public void testSAMLSignedKeyHolderSigModified() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         
         SAMLIssuer saml = SAMLIssuerFactory.getInstance("saml_hok.properties");
-        // Provide info to SAML issuer that it can construct a Holder-of-key
-        // SAML token.
-        saml.setInstanceDoc(doc);
         AssertionWrapper assertion = saml.newAssertion();
 
         WSSecSignatureSAML wsSign = new WSSecSignatureSAML();
@@ -409,10 +403,56 @@ public class SignedSamlTokenTest extends org.junit.Assert {
         //
         // Modify the assertion
         //
-        org.w3c.dom.Element envelope = signedDoc.getDocumentElement();
-        org.w3c.dom.NodeList list = 
-            envelope.getElementsByTagNameNS(WSConstants.SAML_NS, "Assertion");
-        org.w3c.dom.Element assertionElement = (org.w3c.dom.Element)list.item(0);
+        Element envelope = signedDoc.getDocumentElement();
+        NodeList list = envelope.getElementsByTagNameNS(WSConstants.SAML_NS, "Assertion");
+        Element assertionElement = (org.w3c.dom.Element)list.item(0);
+        list = assertionElement.getElementsByTagNameNS(WSConstants.SIG_NS, "Signature");
+        Element sigElement = (org.w3c.dom.Element)list.item(0);
+        list = sigElement.getElementsByTagNameNS(WSConstants.SIG_NS, "Transform");
+        Element transformElement = (org.w3c.dom.Element)list.item(0);
+        transformElement.setAttributeNS(null, "Algorithm", WSConstants.C14N_EXCL_OMIT_COMMENTS);
+        
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Signed (modified) SAML message (key holder):");
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+            LOG.debug(outputString);
+        }
+        
+        try {
+            verify(signedDoc);
+            fail("Expected failure on a modified signature");
+        } catch (WSSecurityException ex) {
+            // expected
+        }
+    }
+    
+    /**
+     * Test that creates a signed SAML Assertion using HOK, but then modifies the assertion.
+     * The signature verification should then fail.
+     */
+    @org.junit.Test
+    public void testSAMLSignedKeyHolderKeyModified() throws Exception {
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        
+        SAMLIssuer saml = SAMLIssuerFactory.getInstance("saml_hok.properties");
+        AssertionWrapper assertion = saml.newAssertion();
+
+        WSSecSignatureSAML wsSign = new WSSecSignatureSAML();
+        wsSign.setKeyIdentifierType(WSConstants.X509_KEY_IDENTIFIER);
+        wsSign.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+
+        Document signedDoc = wsSign.build(doc, crypto, assertion, null, null, null, secHeader);
+        
+        //
+        // Modify the assertion
+        //
+        Element envelope = signedDoc.getDocumentElement();
+        NodeList list = envelope.getElementsByTagNameNS(WSConstants.SAML_NS, "Assertion");
+        Element assertionElement = (org.w3c.dom.Element)list.item(0);
         assertionElement.setAttributeNS(null, "MinorVersion", "5");
         
         if (LOG.isDebugEnabled()) {
@@ -422,14 +462,12 @@ public class SignedSamlTokenTest extends org.junit.Assert {
             LOG.debug(outputString);
         }
         
-        List<WSSecurityEngineResult> results = verify(signedDoc);
-        /*
-        WSSecurityEngineResult actionResult =
-            WSSecurityUtil.fetchActionResult(results, WSConstants.ST_UNSIGNED);
-        AssertionWrapper receivedAssertion = 
-            (AssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-        assertTrue(receivedAssertion != null);
-        */
+        try {
+            verify(signedDoc);
+            fail("Expected failure on a modified signature");
+        } catch (WSSecurityException ex) {
+            // expected
+        }
     }
 
     

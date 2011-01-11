@@ -31,7 +31,6 @@ import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.message.WSSecEncrypt;
 import org.apache.ws.security.message.WSSecHeader;
-import org.apache.ws.security.message.token.SecurityTokenReference;
 import org.apache.ws.security.saml.ext.AssertionWrapper;
 import org.apache.ws.security.util.WSSecurityUtil;
 
@@ -63,7 +62,6 @@ public class SamlReferenceTest extends org.junit.Assert {
         // Create a SAML assertion
         SAMLIssuer saml = SAMLIssuerFactory.getInstance("saml_hok.properties");
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        saml.setInstanceDoc(doc);
         Crypto hokCrypto = CryptoFactory.getInstance("crypto.properties");
         AssertionWrapper assertion = saml.newAssertion();
         Node assertionNode = assertion.toDOM(doc);
