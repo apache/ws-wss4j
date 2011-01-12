@@ -5,6 +5,21 @@ for a given release.
 Portions of this report were generated using the ReleaseNotes facility
 in Jira.
 
+Release 1.5.11
+=============
+
+Bug
+
+    * [WSS-258] - Newer version of SecureConversation not recognised for derived key algorithm
+    * [WSS-260] - WSS4J can't process a STR to a SAML Assertion that is not in the SOAP message
+    * [WSS-261] - Rampart failing to extract keyinfo from SAML assertion
+    * [WSS-262] - WSS4J accepts Timestamps that are "Created" in the future
+
+Improvement
+
+    * [WSS-263] - Store secret key from signature processor
+
+
 Release 1.5.10
 =============
 
