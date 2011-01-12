@@ -28,7 +28,6 @@ import org.apache.ws.security.saml.SAMLKeyInfo;
 import org.apache.ws.security.saml.SAMLUtil;
 import org.apache.ws.security.saml.ext.builder.SAML1ComponentBuilder;
 import org.apache.ws.security.saml.ext.builder.SAML2ComponentBuilder;
-import org.apache.ws.security.saml.ext.builder.SAML2Constants;
 
 import org.apache.ws.security.util.DOM2Writer;
 import org.apache.ws.security.util.UUIDGenerator;
@@ -44,7 +43,6 @@ import org.opensaml.saml1.core.SubjectStatement;
 import org.opensaml.saml2.core.AuthnStatement;
 import org.opensaml.saml2.core.AuthzDecisionStatement;
 import org.opensaml.saml2.core.Issuer;
-import org.opensaml.saml2.core.NameID;
 import org.opensaml.security.SAMLSignatureProfileValidator;
 import org.opensaml.xml.XMLObject;
 import org.opensaml.xml.security.x509.BasicX509Credential;
@@ -261,7 +259,6 @@ public class AssertionWrapper {
             // Build a SAML v2.0 assertion
             saml2 = SAML2ComponentBuilder.createAssertion();
             Issuer issuer = SAML2ComponentBuilder.createIssuer(parms.getIssuer());
-            NameID nameID = SAML2ComponentBuilder.createNameID(samlCallbacks[0].getSubject());
 
             // Authn Statement(s)
             List<AuthnStatement> authnStatements = 
@@ -284,13 +281,15 @@ public class AssertionWrapper {
             // Build the SAML v2.0 assertion
             saml2.setIssuer(issuer);
             
-            org.opensaml.saml2.core.SubjectConfirmation subjectConfirmation = 
-                SAML2ComponentBuilder.createSubjectConfirmation(
-                    SAML2Constants.SBJ_CONFIRMATION_SENDER_VOUCHES
+            try {
+                org.opensaml.saml2.core.Subject subject = 
+                    SAML2ComponentBuilder.createSaml2Subject(samlCallbacks[0].getSubject());
+                saml2.setSubject(subject);
+            } catch (org.opensaml.xml.security.SecurityException ex) {
+                throw new WSSecurityException(
+                    "Error generating KeyInfo from signing credential", ex
                 );
-            org.opensaml.saml2.core.Subject subject = 
-                SAML2ComponentBuilder.createSubject(nameID, subjectConfirmation);
-            saml2.setSubject(subject);
+            }
             
             org.opensaml.saml2.core.Conditions conditions = 
                 SAML2ComponentBuilder.createConditions(samlCallbacks[0].getConditions());

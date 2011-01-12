@@ -48,6 +48,7 @@ import org.opensaml.saml2.core.AuthzDecisionStatement;
 import org.opensaml.saml2.core.Conditions;
 import org.opensaml.saml2.core.DecisionTypeEnumeration;
 import org.opensaml.saml2.core.Issuer;
+import org.opensaml.saml2.core.KeyInfoConfirmationDataType;
 import org.opensaml.saml2.core.NameID;
 import org.opensaml.saml2.core.Subject;
 import org.opensaml.saml2.core.SubjectConfirmation;
@@ -56,7 +57,11 @@ import org.opensaml.saml2.core.SubjectConfirmationData;
 import org.opensaml.xml.XMLObjectBuilderFactory;
 import org.opensaml.xml.schema.XSString;
 import org.opensaml.xml.schema.impl.XSStringBuilder;
+import org.opensaml.xml.security.x509.BasicX509Credential;
+import org.opensaml.xml.security.x509.X509KeyInfoGeneratorFactory;
+import org.opensaml.xml.signature.KeyInfo;
 
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -81,6 +86,8 @@ public class SAML2ComponentBuilder {
     private static SAMLObjectBuilder<Conditions> conditionsBuilder;
     
     private static SAMLObjectBuilder<SubjectConfirmationData> subjectConfirmationDataBuilder;
+    
+    private static SAMLObjectBuilder<KeyInfoConfirmationDataType> keyInfoConfirmationDataBuilder;
     
     private static SAMLObjectBuilder<AuthnStatement> authnStatementBuilder;
     
@@ -209,24 +216,6 @@ public class SAML2ComponentBuilder {
     }
 
     /**
-     * Create a Subject.
-     *
-     * @param nameID of type NameID
-     * @param subjectConfirmation of type SubjectConfirmation
-     * @return a Subject
-     */
-    public static Subject createSubject(NameID nameID, SubjectConfirmation subjectConfirmation) {
-        if (subjectBuilder == null) {
-            subjectBuilder = (SAMLObjectBuilder<Subject>) 
-                builderFactory.getBuilder(Subject.DEFAULT_ELEMENT_NAME);
-        }
-        Subject subject = subjectBuilder.buildObject();
-        subject.setNameID(nameID);
-        subject.getSubjectConfirmations().add(subjectConfirmation);
-        return subject;
-    }
-
-    /**
      * Create SAML 2 Authentication Statement(s).
      *
      * @param authBeans A list of AuthenticationStatementBean instances
@@ -314,6 +303,46 @@ public class SAML2ComponentBuilder {
     }
 
     /**
+     * Create a Subject.
+     *
+     * @param nameID of type NameID
+     * @param subjectConfirmation of type SubjectConfirmation
+     * @return a Subject
+     */
+    public static Subject createSaml2Subject(SubjectBean subjectBean) 
+        throws org.opensaml.xml.security.SecurityException {
+        if (subjectBuilder == null) {
+            subjectBuilder = (SAMLObjectBuilder<Subject>) 
+                builderFactory.getBuilder(Subject.DEFAULT_ELEMENT_NAME);
+        }
+        Subject subject = subjectBuilder.buildObject();
+        
+        NameID nameID = SAML2ComponentBuilder.createNameID(subjectBean);
+        subject.setNameID(nameID);
+        
+        SubjectConfirmationData subjectConfData = 
+            SAML2ComponentBuilder.createSubjectConfirmationData(
+                null, 
+                null, 
+                null, 
+                subjectBean.getSubjectCert(), 
+                subjectBean.isUseSendKeyValue()
+            );
+        
+        String confirmationMethodStr = subjectBean.getSubjectConfirmationMethod();
+        if (confirmationMethodStr == null) {
+            confirmationMethodStr = SAML1Constants.CONF_SENDER_VOUCHES;
+        }
+        SubjectConfirmation subjectConfirmation = 
+            SAML2ComponentBuilder.createSubjectConfirmation(
+                confirmationMethodStr, subjectConfData
+            );
+        
+        subject.getSubjectConfirmations().add(subjectConfirmation);
+        return subject;
+    }
+    
+    /**
      * Create a SubjectConfirmationData object
      *
      * @param inResponseTo of type String
@@ -324,18 +353,63 @@ public class SAML2ComponentBuilder {
     public static SubjectConfirmationData createSubjectConfirmationData(
         String inResponseTo, 
         String recipient, 
-        DateTime notOnOrAfter
-    ) {
-        if (subjectConfirmationDataBuilder == null) {
-            subjectConfirmationDataBuilder = (SAMLObjectBuilder<SubjectConfirmationData>) 
-                builderFactory.getBuilder(SubjectConfirmationData.DEFAULT_ELEMENT_NAME);
+        DateTime notOnOrAfter,
+        X509Certificate cert,
+        boolean useSendKeyValue
+    ) throws org.opensaml.xml.security.SecurityException {
+        SubjectConfirmationData subjectConfirmationData = null;
+        KeyInfo keyInfo = null;
+        if (cert == null) {
+            if (subjectConfirmationDataBuilder == null) {
+                subjectConfirmationDataBuilder = (SAMLObjectBuilder<SubjectConfirmationData>) 
+                    builderFactory.getBuilder(SubjectConfirmationData.DEFAULT_ELEMENT_NAME);
+            }
+            subjectConfirmationData = subjectConfirmationDataBuilder.buildObject();
+        } else {
+            if (keyInfoConfirmationDataBuilder == null) {
+                keyInfoConfirmationDataBuilder = (SAMLObjectBuilder<KeyInfoConfirmationDataType>) 
+                    builderFactory.getBuilder(KeyInfoConfirmationDataType.DEFAULT_ELEMENT_NAME);
+            }
+            subjectConfirmationData = keyInfoConfirmationDataBuilder.buildObject();
+            keyInfo = createKeyInfo(cert, useSendKeyValue);
         }
-        SubjectConfirmationData subjectConfirmationData = 
-            subjectConfirmationDataBuilder.buildObject();
-        subjectConfirmationData.setInResponseTo(inResponseTo);
-        subjectConfirmationData.setRecipient(recipient);
-        subjectConfirmationData.setNotOnOrAfter(notOnOrAfter);
+        
+        if (inResponseTo != null) {
+            subjectConfirmationData.setInResponseTo(inResponseTo);
+        }
+        if (recipient != null) {
+            subjectConfirmationData.setRecipient(recipient);
+        }
+        if (notOnOrAfter != null) {
+            subjectConfirmationData.setNotOnOrAfter(notOnOrAfter);
+        }
+        
+        if (keyInfo != null) {
+            ((KeyInfoConfirmationDataType)subjectConfirmationData).getKeyInfos().add(keyInfo);
+        }
+        
         return subjectConfirmationData;
+    }
+    
+    /**
+     * Create an Opensaml KeyInfo object from the parameters
+     * @param cert the Certificate to insert in the KeyInfo object
+     * @param useSendKeyValue Whether to use a KeyValue or not
+     * @return the KeyInfo object
+     * @throws org.opensaml.xml.security.SecurityException
+     */
+    public static KeyInfo createKeyInfo(X509Certificate cert, boolean useSendKeyValue) 
+        throws org.opensaml.xml.security.SecurityException {
+        BasicX509Credential keyInfoCredential = new BasicX509Credential();
+        keyInfoCredential.setEntityCertificate(cert);
+
+        X509KeyInfoGeneratorFactory kiFactory = new X509KeyInfoGeneratorFactory();
+        if (useSendKeyValue) {
+            kiFactory.setEmitPublicKeyValue(true);
+        } else {
+            kiFactory.setEmitEntityCertificate(true);
+        }
+        return kiFactory.newInstance().generate(keyInfoCredential);
     }
 
     /**
@@ -346,9 +420,13 @@ public class SAML2ComponentBuilder {
      *   urn:oasis:names:tc:SAML:2.0:cm:bearer
      *
      * @param method of type String
+     * @param subjectConfirmationData of type SubjectConfirmationData
      * @return a SubjectConfirmation object
      */
-    public static SubjectConfirmation createSubjectConfirmation(String method) {
+    public static SubjectConfirmation createSubjectConfirmation(
+        String method,
+        SubjectConfirmationData subjectConfirmationData
+    ) {
         if (subjectConfirmationBuilder == null) {
             subjectConfirmationBuilder = (SAMLObjectBuilder<SubjectConfirmation>) 
                 builderFactory.getBuilder(SubjectConfirmation.DEFAULT_ELEMENT_NAME);
@@ -356,6 +434,7 @@ public class SAML2ComponentBuilder {
         
         SubjectConfirmation subjectConfirmation = subjectConfirmationBuilder.buildObject();
         subjectConfirmation.setMethod(method);
+        subjectConfirmation.setSubjectConfirmationData(subjectConfirmationData);
         return subjectConfirmation;
     }
 
