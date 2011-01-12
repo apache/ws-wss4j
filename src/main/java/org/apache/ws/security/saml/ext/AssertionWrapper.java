@@ -113,7 +113,22 @@ public class AssertionWrapper {
      * @throws UnmarshallingException when
      */
     public AssertionWrapper(Element element) throws WSSecurityException {
-        this(OpenSAMLUtil.fromDom(element));
+        OpenSAMLUtil.initSamlEngine();
+        
+        this.xmlObject = OpenSAMLUtil.fromDom(element);
+        if (xmlObject instanceof org.opensaml.saml1.core.Assertion) {
+            this.saml1 = (org.opensaml.saml1.core.Assertion) xmlObject;
+            samlVersion = SAMLVersion.VERSION_11;
+        } else if (xmlObject instanceof org.opensaml.saml2.core.Assertion) {
+            this.saml2 = (org.opensaml.saml2.core.Assertion) xmlObject;
+            samlVersion = SAMLVersion.VERSION_20;
+        } else {
+            log.error(
+                "AssertionWrapper: found unexpected type " 
+                + (xmlObject != null ? xmlObject.getClass().getName() : xmlObject)
+            );
+        }
+        
         assertionElement = element;
     }
 
@@ -123,7 +138,7 @@ public class AssertionWrapper {
      * @param saml2 of type Assertion
      */
     public AssertionWrapper(org.opensaml.saml2.core.Assertion saml2) {
-        this((XMLObject) saml2);
+        this((XMLObject)saml2);
     }
 
     /**
@@ -132,7 +147,7 @@ public class AssertionWrapper {
      * @param saml1 of type Assertion
      */
     public AssertionWrapper(org.opensaml.saml1.core.Assertion saml1) {
-        this((XMLObject) saml1);
+        this((XMLObject)saml1);
     }
 
     /**
@@ -144,8 +159,9 @@ public class AssertionWrapper {
      * @param xmlObject of type XMLObject
      */
     public AssertionWrapper(XMLObject xmlObject) {
-        this.xmlObject = xmlObject;
         OpenSAMLUtil.initSamlEngine();
+        
+        this.xmlObject = xmlObject;
         if (xmlObject instanceof org.opensaml.saml1.core.Assertion) {
             this.saml1 = (org.opensaml.saml1.core.Assertion) xmlObject;
             samlVersion = SAMLVersion.VERSION_11;
@@ -170,6 +186,7 @@ public class AssertionWrapper {
      */
     public AssertionWrapper(SAMLParms parms) throws WSSecurityException {
         OpenSAMLUtil.initSamlEngine();
+        
         // Set the SAML version
         if (parms.getSamlVersion().equalsIgnoreCase("1.1")) {
             samlVersion = SAMLVersion.VERSION_11;
