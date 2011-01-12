@@ -122,20 +122,17 @@ public class SamlReferenceTest extends org.junit.Assert {
         
         SAMLIssuer saml = SAMLIssuerFactory.getInstance("saml_sv.properties");
         AssertionWrapper assertion = saml.newAssertion();
-        String issuerKeyName = saml.getIssuerKeyName();
-        String issuerKeyPW = saml.getIssuerKeyPassword();
-        Crypto issuerCrypto = saml.getIssuerCrypto();
+        Crypto crypto = CryptoFactory.getInstance("crypto.properties");
         WSSecSignatureSAML wsSign = new WSSecSignatureSAML();
         wsSign.setKeyIdentifierType(WSConstants.X509_KEY_IDENTIFIER);
         Document samlDoc = 
-            wsSign.build(doc, null, assertion, issuerCrypto, 
-                issuerKeyName, issuerKeyPW, secHeader
+            wsSign.build(doc, null, assertion, crypto, 
+                "16c73ab6-b892-458f-abf5-2f875f74882e", "security", secHeader
             );
         
         WSSecEncrypt builder = new WSSecEncrypt();
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e");
         builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
-        Crypto crypto = CryptoFactory.getInstance("crypto.properties");
         Document encryptedDoc = builder.build(samlDoc, crypto, secHeader);
         
         //

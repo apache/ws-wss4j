@@ -53,15 +53,16 @@ public class SAMLIssuerImpl implements SAMLIssuer {
 
     private static final Log log = LogFactory.getLog(SAMLIssuerImpl.class.getName());
 
-    private AssertionWrapper sa = null;
-    
     private Properties properties = null;
+    
+    private CallbackHandler callbackHandler = null;
 
+    private String issuer;
     private Crypto issuerCrypto = null;
     private String issuerKeyPassword = null;
     private String issuerKeyName = null;
 
-    private String samlVersion = null;
+    private String samlVersion = "1.1";
     
     /**
      * Flag indicating what format to put the subject's key material in when
@@ -104,7 +105,7 @@ public class SAMLIssuerImpl implements SAMLIssuer {
         }
         
         String sendKeyValueProp =
-                properties.getProperty("org.apache.ws.security.saml.issuer.sendKeyValue");
+            properties.getProperty("org.apache.ws.security.saml.issuer.sendKeyValue");
         if (sendKeyValueProp != null) {
             sendKeyValue = Boolean.valueOf(sendKeyValueProp).booleanValue();
         }
@@ -115,7 +116,15 @@ public class SAMLIssuerImpl implements SAMLIssuer {
             signAssertion = Boolean.valueOf(signAssertionProp).booleanValue();
         }
         
-        samlVersion = properties.getProperty("org.apache.ws.security.saml.version");
+        String samlVersionProp = properties.getProperty("org.apache.ws.security.saml.version");
+        if (samlVersionProp != null) {
+            samlVersion = samlVersionProp;
+        }
+        
+        String issuerProp = properties.getProperty("org.apache.ws.security.saml.issuer");
+        if (issuerProp != null) {
+            issuer = issuerProp;
+        }
     }
 
     /**
@@ -130,29 +139,31 @@ public class SAMLIssuerImpl implements SAMLIssuer {
           + samlVersion + " token"
         );
 
-        String issuer = properties.getProperty("org.apache.ws.security.saml.issuer");
-        String samlCallbackClassname = 
-            properties.getProperty("org.apache.ws.security.saml.callback");
-        Class<?> callbackClass = null;
-        try {
-            callbackClass = Loader.loadClass(samlCallbackClassname);
-        } catch (ClassNotFoundException ex) {
-            throw new WSSecurityException(ex.getMessage(), ex);
+        if (callbackHandler == null) {
+            try {
+                String samlCallbackClassname = 
+                    properties.getProperty("org.apache.ws.security.saml.callback");
+                Class<?> callbackClass = null;
+                try {
+                    callbackClass = Loader.loadClass(samlCallbackClassname);
+                } catch (ClassNotFoundException ex) {
+                    throw new WSSecurityException(ex.getMessage(), ex);
+                }
+                callbackHandler = (CallbackHandler)callbackClass.newInstance();
+            } catch (InstantiationException ex) {
+                throw new WSSecurityException(ex.getMessage(), ex);
+            } catch (IllegalAccessException ex) {
+                throw new WSSecurityException(ex.getMessage(), ex);
+            }
         }
-
+            
         // Create a new SAMLParms with all of the information from the properties file.
         SAMLParms samlParms = new SAMLParms();
         samlParms.setIssuer(issuer);
         samlParms.setSamlVersion(samlVersion);
-        try {
-            samlParms.setCallbackHandler((CallbackHandler)callbackClass.newInstance());
-        } catch (InstantiationException ex) {
-            throw new WSSecurityException(ex.getMessage(), ex);
-        } catch (IllegalAccessException ex) {
-            throw new WSSecurityException(ex.getMessage(), ex);
-        }
+        samlParms.setCallbackHandler(callbackHandler);
 
-        sa = new AssertionWrapper(samlParms);
+        AssertionWrapper sa = new AssertionWrapper(samlParms);
         
         if (signAssertion) {
             //
@@ -215,17 +226,121 @@ public class SAMLIssuerImpl implements SAMLIssuer {
     }
     
     /**
+     * Set whether to send the key value or whether to include the entire cert.
+     * @param sendKeyValue whether to send the key value.
+     */
+    public void setSendKeyValue(boolean sendKeyValue) {
+        this.sendKeyValue = sendKeyValue;
+    }
+    
+    /**
+     * Get whether to send the key value or whether to include the entire cert.
+     * @return whether to send the key value
+     */
+    public boolean isSendKeyValue() {
+        return sendKeyValue;
+    }
+    
+    /**
+     * Set whether to sign the assertion or not.
+     * @param signAssertion whether to sign the assertion or not.
+     */
+    public void setSignAssertion(boolean signAssertion) {
+        this.signAssertion = signAssertion;
+    }
+
+    /**
+     * Get whether to sign the assertion or not
+     * @return whether to sign the assertion or not
+     */
+    public boolean isSignAssertion() {
+        return signAssertion;
+    }
+    
+    /**
+     * Set the SAML version
+     * @param version the SAML version
+     */
+    public void setSamlVersion(String version) {
+        samlVersion = version;
+    }
+    
+    /**
+     * Get the SAML version
+     * @return the SAML version
+     */
+    public String getSamlVersion() {
+        return samlVersion;
+    }
+    
+    /**
+     * Set the CallbackHandler to use
+     * @param callbackHandler the CallbackHandler to use
+     */
+    public void setCallbackHandler(CallbackHandler callbackHandler) {
+        this.callbackHandler = callbackHandler;
+    }
+    
+    /**
+     * Get the CallbackHandler in use
+     * @return the CallbackHandler in use
+     */
+    public CallbackHandler getCallbackHandler() {
+        return callbackHandler;
+    }
+    
+    /**
+     * Set the issuer crypto
+     * @param issuerCrypto the issuer crypto
+     */
+    public void setIssuerCrypto(Crypto issuerCrypto) {
+        this.issuerCrypto = issuerCrypto;
+    }
+    
+    /**
      * @return Returns the issuerCrypto.
      */
     public Crypto getIssuerCrypto() {
         return issuerCrypto;
     }
+    
+    /**
+     * Set the issuer name
+     * @param issuer the issuer name
+     */
+    public void setIssuerName(String issuer) {
+        this.issuer = issuer;
+    }
+    
+    /**
+     * Get the issuer name
+     * @return the issuer name
+     */
+    public String getIssuerName() {
+        return issuer;
+    }
 
+    /**
+     * Set the issuer key name
+     * @param issuerKeyName the issuer key name
+     */
+    public void setIssuerKeyName(String issuerKeyName) {
+        this.issuerKeyName = issuerKeyName;
+    }
+    
     /**
      * @return Returns the issuerKeyName.
      */
     public String getIssuerKeyName() {
         return issuerKeyName;
+    }
+    
+    /**
+     * Set the issuer key password
+     * @param issuerKeyPassword the issuerKeyPassword.
+     */
+    public void setIssuerKeyPassword(String issuerKeyPassword) {
+        this.issuerKeyPassword = issuerKeyPassword;
     }
 
     /**

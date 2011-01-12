@@ -64,12 +64,8 @@ public class SignedSamlTokenTest extends org.junit.Assert {
     @org.junit.Test
     public void testSAMLSignedSenderVouches() throws Exception {
         SAMLIssuer saml = SAMLIssuerFactory.getInstance("saml_sv.properties");
-
         AssertionWrapper assertion = saml.newAssertion();
 
-        String issuerKeyName = saml.getIssuerKeyName();
-        String issuerKeyPW = saml.getIssuerKeyPassword();
-        Crypto issuerCrypto = saml.getIssuerCrypto();
         WSSecSignatureSAML wsSign = new WSSecSignatureSAML();
         wsSign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
         
@@ -81,7 +77,10 @@ public class SignedSamlTokenTest extends org.junit.Assert {
         secHeader.insertSecurityHeader(doc);
         
         Document signedDoc = 
-            wsSign.build(doc, null, assertion, issuerCrypto, issuerKeyName, issuerKeyPW, secHeader);
+            wsSign.build(
+                doc, null, assertion, crypto, "16c73ab6-b892-458f-abf5-2f875f74882e", 
+                "security", secHeader
+            );
         LOG.info("After SAMLSignedSenderVouches....");
 
         if (LOG.isDebugEnabled()) {
@@ -107,12 +106,8 @@ public class SignedSamlTokenTest extends org.junit.Assert {
     @org.junit.Test
     public void testSAMLSignedSenderVouchesKeyIdentifier() throws Exception {
         SAMLIssuer saml = SAMLIssuerFactory.getInstance("saml_sv.properties");
-
         AssertionWrapper assertion = saml.newAssertion();
 
-        String issuerKeyName = saml.getIssuerKeyName();
-        String issuerKeyPW = saml.getIssuerKeyPassword();
-        Crypto issuerCrypto = saml.getIssuerCrypto();
         WSSecSignatureSAML wsSign = new WSSecSignatureSAML();
         wsSign.setKeyIdentifierType(WSConstants.X509_KEY_IDENTIFIER);
         
@@ -124,7 +119,10 @@ public class SignedSamlTokenTest extends org.junit.Assert {
         secHeader.insertSecurityHeader(doc);
         
         Document signedDoc = 
-            wsSign.build(doc, null, assertion, issuerCrypto, issuerKeyName, issuerKeyPW, secHeader);
+            wsSign.build(
+                doc, null, assertion, crypto, "16c73ab6-b892-458f-abf5-2f875f74882e", 
+                "security", secHeader
+            );
         LOG.info("After SAMLSignedSenderVouches....");
 
         if (LOG.isDebugEnabled()) {
@@ -152,12 +150,8 @@ public class SignedSamlTokenTest extends org.junit.Assert {
     @org.junit.Test
     public void testDefaultIssuerClass() throws Exception {
         SAMLIssuer saml = SAMLIssuerFactory.getInstance("saml_sv_noissuer.properties");
-
         AssertionWrapper assertion = saml.newAssertion();
 
-        String issuerKeyName = saml.getIssuerKeyName();
-        String issuerKeyPW = saml.getIssuerKeyPassword();
-        Crypto issuerCrypto = saml.getIssuerCrypto();
         WSSecSignatureSAML wsSign = new WSSecSignatureSAML();
         wsSign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
         
@@ -168,7 +162,11 @@ public class SignedSamlTokenTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
-        Document signedDoc = wsSign.build(doc, null, assertion, issuerCrypto, issuerKeyName, issuerKeyPW, secHeader);
+        Document signedDoc = 
+            wsSign.build(
+                 doc, null, assertion, crypto, "16c73ab6-b892-458f-abf5-2f875f74882e", 
+                 "security", secHeader
+             );
         LOG.info("After SAMLSignedSenderVouches....");
 
         if (LOG.isDebugEnabled()) {
@@ -196,12 +194,8 @@ public class SignedSamlTokenTest extends org.junit.Assert {
     @org.junit.Test
     public void testWSS62() throws Exception {
         SAMLIssuer saml = SAMLIssuerFactory.getInstance("saml_sv.properties");
-
         AssertionWrapper assertion = saml.newAssertion();
 
-        String issuerKeyName = saml.getIssuerKeyName();
-        String issuerKeyPW = saml.getIssuerKeyPassword();
-        Crypto issuerCrypto = saml.getIssuerCrypto();
         WSSecSignatureSAML wsSign = new WSSecSignatureSAML();
         wsSign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
 
@@ -211,8 +205,10 @@ public class SignedSamlTokenTest extends org.junit.Assert {
         secHeader.insertSecurityHeader(doc);
         
         Document signedDoc = 
-            wsSign.build(doc, null, assertion, issuerCrypto, issuerKeyName, issuerKeyPW, secHeader);
-        
+            wsSign.build(
+                doc, null, assertion, crypto, "16c73ab6-b892-458f-abf5-2f875f74882e", 
+                "security", secHeader
+            );
         //
         // Now verify it but first call Handler#doReceiverAction
         //

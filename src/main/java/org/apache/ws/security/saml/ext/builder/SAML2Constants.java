@@ -59,15 +59,15 @@ public class SAML2Constants {
     // SUBJECT CONFIRMATION
     //
     
-    public static final String SBJ_CONFIRMATION_HOLDER_OF_KEY = 
+    public static final String CONF_BEARER = 
+        "urn:oasis:names:tc:SAML:2.0:cm:bearer";
+    
+    public static final String CONF_HOLDER_KEY = 
         "urn:oasis:names:tc:SAML:2.0:cm:holder-of-key";
     
-    public static final String SBJ_CONFIRMATION_SENDER_VOUCHES = 
+    public static final String CONF_SENDER_VOUCHES = 
         "urn:oasis:names:tc:SAML:2.0:cm:sender-vouches";
     
-    public static final String SBJ_CONFIRMATION_BEARER = 
-        "urn:oasis:names:tc:SAML:2.0:cm:bearer";
-
     //
     // AUTH CONTEXT CLASS REF
     //

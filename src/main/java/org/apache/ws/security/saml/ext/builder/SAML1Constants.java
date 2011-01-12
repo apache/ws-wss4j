@@ -51,17 +51,20 @@ public class SAML1Constants {
     /**
      * Assertion Bearer Confirmation Method Identifier
      */
-    public final static String CONF_BEARER = "urn:oasis:names:tc:SAML:1.0:cm:bearer";
+    public final static String CONF_BEARER = 
+        "urn:oasis:names:tc:SAML:1.0:cm:bearer";
 
     /**
      * Holder of Key Confirmation Method Identifier
      */
-    public final static String CONF_HOLDER_KEY = "urn:oasis:names:tc:SAML:1.0:cm:holder-of-key";
+    public final static String CONF_HOLDER_KEY = 
+        "urn:oasis:names:tc:SAML:1.0:cm:holder-of-key";
 
     /**
      * Sender Vouches Confirmation Method Identifier
      */
-    public final static String CONF_SENDER_VOUCHES = "urn:oasis:names:tc:SAML:1.0:cm:sender-vouches";
+    public final static String CONF_SENDER_VOUCHES = 
+        "urn:oasis:names:tc:SAML:1.0:cm:sender-vouches";
 
     //
     // AUTH METHOD
