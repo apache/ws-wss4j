@@ -24,6 +24,7 @@ import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.saml.ext.SAMLCallback;
 import org.apache.ws.security.saml.ext.bean.AuthenticationStatementBean;
+import org.apache.ws.security.saml.ext.bean.KeyInfoBean;
 import org.apache.ws.security.saml.ext.bean.SubjectBean;
 import org.apache.ws.security.saml.ext.builder.SAML1Constants;
 
@@ -45,8 +46,8 @@ public class SAML1AuthnHOKHandler implements CallbackHandler {
     private X509Certificate[] certs;
     
     public SAML1AuthnHOKHandler() throws WSSecurityException {
-        Crypto crypto = CryptoFactory.getInstance("crypto.properties");
-        certs = crypto.getCertificates("16c73ab6-b892-458f-abf5-2f875f74882e");
+        Crypto crypto = CryptoFactory.getInstance("wss40.properties");
+        certs = crypto.getCertificates("wss40");
     }
     
     public void handle(Callback[] callbacks)
@@ -58,7 +59,9 @@ public class SAML1AuthnHOKHandler implements CallbackHandler {
                     new SubjectBean(
                         subjectName, subjectQualifier, SAML1Constants.CONF_HOLDER_KEY
                     );
-                subjectBean.setSubjectCert(certs[0]);
+                KeyInfoBean keyInfo = new KeyInfoBean();
+                keyInfo.setCertificate(certs[0]);
+                subjectBean.setKeyInfo(keyInfo);
                 AuthenticationStatementBean authBean = new AuthenticationStatementBean();
                 authBean.setSubject(subjectBean);
                 authBean.setAuthenticationMethod("Password");

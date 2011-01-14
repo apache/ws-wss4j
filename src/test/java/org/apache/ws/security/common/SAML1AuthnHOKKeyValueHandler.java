@@ -24,7 +24,9 @@ import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.saml.ext.SAMLCallback;
 import org.apache.ws.security.saml.ext.bean.AuthenticationStatementBean;
+import org.apache.ws.security.saml.ext.bean.KeyInfoBean;
 import org.apache.ws.security.saml.ext.bean.SubjectBean;
+import org.apache.ws.security.saml.ext.bean.KeyInfoBean.CERT_IDENTIFIER;
 import org.apache.ws.security.saml.ext.builder.SAML1Constants;
 
 import javax.security.auth.callback.Callback;
@@ -58,8 +60,10 @@ public class SAML1AuthnHOKKeyValueHandler implements CallbackHandler {
                     new SubjectBean(
                         subjectName, subjectQualifier, SAML1Constants.CONF_HOLDER_KEY
                     );
-                subjectBean.setSubjectCert(certs[0]);
-                subjectBean.setUseSendKeyValue(true);
+                KeyInfoBean keyInfo = new KeyInfoBean();
+                keyInfo.setCertificate(certs[0]);
+                keyInfo.setCertIdentifer(CERT_IDENTIFIER.KEY_VALUE);
+                subjectBean.setKeyInfo(keyInfo);
                 AuthenticationStatementBean authBean = new AuthenticationStatementBean();
                 authBean.setSubject(subjectBean);
                 authBean.setAuthenticationMethod("Password");

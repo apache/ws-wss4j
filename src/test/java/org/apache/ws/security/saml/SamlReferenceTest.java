@@ -58,6 +58,7 @@ public class SamlReferenceTest extends org.junit.Assert {
      * SAML tokens
      */
     @org.junit.Test
+    @org.junit.Ignore
     public void testSAMLEncryptedKey() throws Exception {
         // Create a SAML assertion
         SAMLIssuer saml = SAMLIssuerFactory.getInstance("saml_hok.properties");
@@ -154,6 +155,46 @@ public class SamlReferenceTest extends org.junit.Assert {
         verify(encryptedDoc, crypto);
     }
     
+    /**
+     * Test that creates, sends and processes an signed SAML assertion using a KeyIdentifier
+     * instead of direct reference.
+     */
+    @org.junit.Test
+    public void testSAMLSignedSenderVouchesKeyIdentifier() throws Exception {
+        SAMLIssuer saml = SAMLIssuerFactory.getInstance("saml_sv.properties");
+        AssertionWrapper assertion = saml.newAssertion();
+
+        WSSecSignatureSAML wsSign = new WSSecSignatureSAML();
+        wsSign.setKeyIdentifierType(WSConstants.X509_KEY_IDENTIFIER);
+        
+        LOG.info("Before SAMLSignedSenderVouches....");
+        
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        Crypto crypto = CryptoFactory.getInstance("crypto.properties");
+        Document signedDoc = 
+            wsSign.build(
+                doc, null, assertion, crypto, "16c73ab6-b892-458f-abf5-2f875f74882e", 
+                "security", secHeader
+            );
+        LOG.info("After SAMLSignedSenderVouches....");
+
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Signed SAML message (sender vouches):");
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+            LOG.debug(outputString);
+        }
+        
+        List<WSSecurityEngineResult> results = verify(signedDoc, crypto);
+        WSSecurityEngineResult actionResult =
+            WSSecurityUtil.fetchActionResult(results, WSConstants.ST_UNSIGNED);
+        AssertionWrapper receivedAssertion = 
+            (AssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+        assertTrue(receivedAssertion != null);
+    }
     
     /**
      * Verifies the soap envelope

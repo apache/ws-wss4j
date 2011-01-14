@@ -142,6 +142,7 @@ public class SignaturePartsTest extends org.junit.Assert {
      */
     @SuppressWarnings("unchecked")
     @org.junit.Test
+    @org.junit.Ignore
     public void testSOAPHeaderSTRTransform() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         

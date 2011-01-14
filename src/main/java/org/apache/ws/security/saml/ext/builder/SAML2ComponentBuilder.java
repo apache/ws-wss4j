@@ -19,6 +19,7 @@
 
 package org.apache.ws.security.saml.ext.builder;
 
+import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.saml.ext.OpenSAMLUtil;
 import org.apache.ws.security.saml.ext.bean.ActionBean;
 import org.apache.ws.security.saml.ext.bean.AttributeBean;
@@ -26,6 +27,7 @@ import org.apache.ws.security.saml.ext.bean.AttributeStatementBean;
 import org.apache.ws.security.saml.ext.bean.AuthDecisionStatementBean;
 import org.apache.ws.security.saml.ext.bean.AuthenticationStatementBean;
 import org.apache.ws.security.saml.ext.bean.ConditionsBean;
+import org.apache.ws.security.saml.ext.bean.KeyInfoBean;
 import org.apache.ws.security.saml.ext.bean.SubjectBean;
 import org.apache.ws.security.util.UUIDGenerator;
 
@@ -57,11 +59,8 @@ import org.opensaml.saml2.core.SubjectConfirmationData;
 import org.opensaml.xml.XMLObjectBuilderFactory;
 import org.opensaml.xml.schema.XSString;
 import org.opensaml.xml.schema.impl.XSStringBuilder;
-import org.opensaml.xml.security.x509.BasicX509Credential;
-import org.opensaml.xml.security.x509.X509KeyInfoGeneratorFactory;
 import org.opensaml.xml.signature.KeyInfo;
 
-import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -310,7 +309,7 @@ public class SAML2ComponentBuilder {
      * @return a Subject
      */
     public static Subject createSaml2Subject(SubjectBean subjectBean) 
-        throws org.opensaml.xml.security.SecurityException {
+        throws org.opensaml.xml.security.SecurityException, WSSecurityException {
         if (subjectBuilder == null) {
             subjectBuilder = (SAMLObjectBuilder<Subject>) 
                 builderFactory.getBuilder(Subject.DEFAULT_ELEMENT_NAME);
@@ -325,13 +324,12 @@ public class SAML2ComponentBuilder {
                 null, 
                 null, 
                 null, 
-                subjectBean.getSubjectCert(), 
-                subjectBean.isUseSendKeyValue()
+                subjectBean.getKeyInfo() 
             );
         
         String confirmationMethodStr = subjectBean.getSubjectConfirmationMethod();
         if (confirmationMethodStr == null) {
-            confirmationMethodStr = SAML1Constants.CONF_SENDER_VOUCHES;
+            confirmationMethodStr = SAML2Constants.CONF_SENDER_VOUCHES;
         }
         SubjectConfirmation subjectConfirmation = 
             SAML2ComponentBuilder.createSubjectConfirmation(
@@ -348,18 +346,18 @@ public class SAML2ComponentBuilder {
      * @param inResponseTo of type String
      * @param recipient    of type String
      * @param notOnOrAfter of type DateTime
+     * @param keyInfoBean of type KeyInfoBean
      * @return a SubjectConfirmationData object
      */
     public static SubjectConfirmationData createSubjectConfirmationData(
         String inResponseTo, 
         String recipient, 
         DateTime notOnOrAfter,
-        X509Certificate cert,
-        boolean useSendKeyValue
-    ) throws org.opensaml.xml.security.SecurityException {
+        KeyInfoBean keyInfoBean
+    ) throws org.opensaml.xml.security.SecurityException, WSSecurityException {
         SubjectConfirmationData subjectConfirmationData = null;
         KeyInfo keyInfo = null;
-        if (cert == null) {
+        if (keyInfoBean == null) {
             if (subjectConfirmationDataBuilder == null) {
                 subjectConfirmationDataBuilder = (SAMLObjectBuilder<SubjectConfirmationData>) 
                     builderFactory.getBuilder(SubjectConfirmationData.DEFAULT_ELEMENT_NAME);
@@ -368,10 +366,11 @@ public class SAML2ComponentBuilder {
         } else {
             if (keyInfoConfirmationDataBuilder == null) {
                 keyInfoConfirmationDataBuilder = (SAMLObjectBuilder<KeyInfoConfirmationDataType>) 
-                    builderFactory.getBuilder(KeyInfoConfirmationDataType.DEFAULT_ELEMENT_NAME);
+                    builderFactory.getBuilder(KeyInfoConfirmationDataType.TYPE_NAME);
             }
             subjectConfirmationData = keyInfoConfirmationDataBuilder.buildObject();
-            keyInfo = createKeyInfo(cert, useSendKeyValue);
+            keyInfo = SAML1ComponentBuilder.createKeyInfo(keyInfoBean);
+            ((KeyInfoConfirmationDataType)subjectConfirmationData).getKeyInfos().add(keyInfo);
         }
         
         if (inResponseTo != null) {
@@ -384,34 +383,9 @@ public class SAML2ComponentBuilder {
             subjectConfirmationData.setNotOnOrAfter(notOnOrAfter);
         }
         
-        if (keyInfo != null) {
-            ((KeyInfoConfirmationDataType)subjectConfirmationData).getKeyInfos().add(keyInfo);
-        }
-        
         return subjectConfirmationData;
     }
     
-    /**
-     * Create an Opensaml KeyInfo object from the parameters
-     * @param cert the Certificate to insert in the KeyInfo object
-     * @param useSendKeyValue Whether to use a KeyValue or not
-     * @return the KeyInfo object
-     * @throws org.opensaml.xml.security.SecurityException
-     */
-    public static KeyInfo createKeyInfo(X509Certificate cert, boolean useSendKeyValue) 
-        throws org.opensaml.xml.security.SecurityException {
-        BasicX509Credential keyInfoCredential = new BasicX509Credential();
-        keyInfoCredential.setEntityCertificate(cert);
-
-        X509KeyInfoGeneratorFactory kiFactory = new X509KeyInfoGeneratorFactory();
-        if (useSendKeyValue) {
-            kiFactory.setEmitPublicKeyValue(true);
-        } else {
-            kiFactory.setEmitEntityCertificate(true);
-        }
-        return kiFactory.newInstance().generate(keyInfoCredential);
-    }
-
     /**
      * Create a SubjectConfirmation object
      * One of the following subject confirmation methods MUST be used:
