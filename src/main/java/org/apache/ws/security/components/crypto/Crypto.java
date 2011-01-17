@@ -28,13 +28,94 @@ import java.security.cert.Certificate;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 
-/**
- * Crypto.
- * <p/>
- *
- * @author Davanum Srinivas (dims@yahoo.com).
- */
 public interface Crypto {
+    
+    //
+    // Accessor methods
+    //
+    
+    /**
+     * Retrieves the alias name of the default certificate which has been
+     * specified as a property. This should be the certificate that is used for
+     * signature and encryption. This alias corresponds to the certificate that
+     * should be used whenever KeyInfo is not present in a signed or
+     * an encrypted message. May return null.
+     *
+     * @return alias name of the default X509 certificate.
+     */
+    public String getDefaultX509Alias();
+    
+    /**
+     * Sets the alias name of the default certificate which has been
+     * specified as a property. This should be the certificate that is used for
+     * signature and encryption. This alias corresponds to the certificate that
+     * should be used whenever KeyInfo is not present in a signed or
+     * an encrypted message.
+     *
+     * @param alias name of the default X509 certificate.
+     */
+    public void setDefaultX509Alias(String alias);
+    
+    /**
+     * Get the crypto provider associated with this implementation
+     * @return the crypto provider
+     */
+    public String getCryptoProvider();
+    
+    /**
+     * Set the crypto provider associated with this implementation
+     * @param provider the crypto provider to set
+     */
+    public void setCryptoProvider(String provider);
+ 
+    /**
+     * Gets the Keystore that was loaded by the underlying implementation
+     *
+     * @return the Keystore
+     */
+    public KeyStore getKeyStore();
+    
+    /**
+     * Set the Keystore on this Crypto instance
+     *
+     * @param keyStore the Keystore to set
+     */
+    public void setKeyStore(KeyStore keyStore);
+    
+    /**
+     * Gets the trust store that was loaded by the underlying implementation
+     *
+     * @return the trust store
+     */
+    public KeyStore getTrustStore();
+    
+    /**
+     * Set the trust store on this Crypto instance
+     *
+     * @param trustStore the trust store to set
+     */
+    public void setTrustStore(KeyStore trustStore);
+    
+    /**
+     * Gets the CertificateFactory instantiated by the underlying implementation
+     *
+     * @return the CertificateFactory
+     * @throws WSSecurityException
+     */
+    public CertificateFactory getCertificateFactory() throws WSSecurityException;
+    
+    /**
+     * Sets the CertificateFactory instance on this Crypto instance
+     *
+     * @param provider the CertificateFactory provider name
+     * @param the CertificateFactory the CertificateFactory instance to set
+     */
+    public void setCertificateFactory(String provider, CertificateFactory certFactory);
+    
+    //
+    // Crypto functionality methods
+    //
+    
     /**
      * load a X509Certificate from the input stream.
      * <p/>
@@ -154,17 +235,6 @@ public interface Crypto {
     public String getAliasForX509Cert(byte[] skiBytes) throws WSSecurityException;
 
     /**
-     * Retrieves the alias name of the default certificate which has been
-     * specified as a property. This should be the certificate that is used for
-     * signature and encryption. This alias corresponds to the certificate that
-     * should be used whenever KeyInfo is not present in a signed or
-     * an encrypted message. May return null.
-     *
-     * @return alias name of the default X509 certificate.
-     */
-    public String getDefaultX509Alias();
-
-    /**
      * Reads the SubjectKeyIdentifier information from the certificate.
      * <p/>
      *
@@ -188,22 +258,7 @@ public interface Crypto {
      */
 
     public String getAliasForX509CertThumb(byte[] thumb) throws WSSecurityException;
- 
-    /**
-     * Gets the Keystore that was loaded by the underlying implementation
-     *
-     * @return the Keystore
-     */
-    public KeyStore getKeyStore();
-
-    /**
-     * Gets the CertificateFactory instantiated by the underlying implementation
-     *
-     * @return the CertificateFactory
-     * @throws WSSecurityException
-     */
-    public CertificateFactory getCertificateFactory() throws WSSecurityException;
-
+    
     /**
      * Uses the CertPath API to validate a given certificate chain
      * <p/>

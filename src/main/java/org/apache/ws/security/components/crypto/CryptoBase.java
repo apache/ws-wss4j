@@ -77,10 +77,12 @@ public abstract class CryptoBase implements Crypto {
     private static Log log = LogFactory.getLog(CryptoBase.class);
     private static final Constructor<?> BC_509CLASS_CONS;
 
-    protected static Map<String, CertificateFactory> certFactMap = 
+    protected Map<String, CertificateFactory> certFactMap = 
         new HashMap<String, CertificateFactory>();
     protected KeyStore keystore = null;
     protected KeyStore truststore = null;
+    protected String defaultAlias = null;
+    protected String cryptoProvider = null;
     
     static {
         Constructor<?> cons = null;
@@ -99,19 +101,103 @@ public abstract class CryptoBase implements Crypto {
     protected CryptoBase() {
     }
     
-    /**
-     * @return      a crypto provider name.  This operation should
-     *              return null if the default crypto provider should
-     *              be used.
-     */
-    protected abstract String getCryptoProvider();
-    
-    
     private String mapKeystoreProviderToCertProvider(String s) {
         if ("SunJSSE".equals(s)) {
             return "SUN";
         }
         return s;
+    }
+    
+    /**
+     * Get the crypto provider associated with this implementation
+     * @return the crypto provider
+     */
+    public String getCryptoProvider() {
+        return cryptoProvider;
+    }
+    
+    /**
+     * Set the crypto provider associated with this implementation
+     * @param provider the crypto provider to set
+     */
+    public void setCryptoProvider(String provider) {
+        cryptoProvider = provider;
+    }
+    
+    /**
+     * Gets the Keystore that was loaded
+     *
+     * @return the Keystore
+     */
+    public KeyStore getKeyStore() {
+        return keystore;
+    }
+    
+    /**
+     * Set the Keystore on this Crypto instance
+     *
+     * @param keyStore the Keystore to set
+     */
+    public void setKeyStore(KeyStore keyStore) {
+        keystore = keyStore;
+    }
+    
+    /**
+     * Gets the trust store that was loaded by the underlying implementation
+     *
+     * @return the trust store
+     */
+    public KeyStore getTrustStore() {
+        return truststore;
+    }
+    
+    /**
+     * Set the trust store on this Crypto instance
+     *
+     * @param trustStore the trust store to set
+     */
+    public void setTrustStore(KeyStore trustStore) {
+        truststore = trustStore;
+    }
+    
+    /**
+     * Retrieves the alias name of the default certificate which has been
+     * specified as a property. This should be the certificate that is used for
+     * signature and encryption. This alias corresponds to the certificate that
+     * should be used whenever KeyInfo is not present in a signed or
+     * an encrypted message. May return null.
+     *
+     * @return alias name of the default X509 certificate.
+     */
+    public String getDefaultX509Alias() {
+        return defaultAlias;
+    }
+    
+    /**
+     * Sets the alias name of the default certificate which has been
+     * specified as a property. This should be the certificate that is used for
+     * signature and encryption. This alias corresponds to the certificate that
+     * should be used whenever KeyInfo is not present in a signed or
+     * an encrypted message.
+     *
+     * @param alias name of the default X509 certificate.
+     */
+    public void setDefaultX509Alias(String alias) {
+        defaultAlias = alias;
+    }
+    
+    /**
+     * Sets the CertificateFactory instance on this Crypto instance
+     *
+     * @param provider the CertificateFactory provider name
+     * @param the CertificateFactory the CertificateFactory instance to set
+     */
+    public void setCertificateFactory(String provider, CertificateFactory certFactory) {
+        if (provider == null || provider.length() == 0) {
+            certFactMap.put(certFactory.getProvider().getName(), certFactory);
+        } else {
+            certFactMap.put(provider, certFactory);
+        }
     }
     
     /**
@@ -123,7 +209,7 @@ public abstract class CryptoBase implements Crypto {
      * @throws org.apache.ws.security.WSSecurityException
      *
      */
-    public synchronized CertificateFactory getCertificateFactory() throws WSSecurityException {
+    public CertificateFactory getCertificateFactory() throws WSSecurityException {
         String provider = getCryptoProvider();
         String keyStoreProvider = null;
         if (keystore != null) {
@@ -647,16 +733,6 @@ public abstract class CryptoBase implements Crypto {
     }
 
     /**
-     * A Hook for subclasses to set the keystore without having to
-     * load it from an <code>InputStream</code>.
-     *
-     * @param ks existing keystore
-     */
-    public void setKeyStore(KeyStore ks) {
-        keystore = ks;
-    }
-
-    /**
      * Reads the SubjectKeyIdentifier information from the certificate.
      * <p/>
      * If the the certificate does not contain a SKI extension then
@@ -709,10 +785,6 @@ public abstract class CryptoBase implements Crypto {
         return abyte0;
     }
 
-    public KeyStore getKeyStore() {
-        return keystore;
-    }
-    
     /**
      * Lookup X509 Certificates in the keystore according to a given DN of the subject of the 
      * certificate

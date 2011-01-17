@@ -19,15 +19,19 @@
 
 package org.apache.ws.security.components.crypto;
 
-import org.apache.ws.security.common.CustomCrypto;
+import java.io.InputStream;
+import java.security.KeyStore;
 
-/**
- * Created by IntelliJ IDEA.
- * User: srida01
- * Date: Apr 12, 2004
- * Time: 10:50:05 AM
- * To change this template use File | Settings | File Templates.
- */
+import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.WSSecurityEngine;
+import org.apache.ws.security.WSSecurityException;
+import org.apache.ws.security.common.CustomCrypto;
+import org.apache.ws.security.common.SOAPUtil;
+import org.apache.ws.security.message.WSSecHeader;
+import org.apache.ws.security.message.WSSecSignature;
+import org.apache.ws.security.util.Loader;
+import org.w3c.dom.Document;
+
 public class CryptoTest extends org.junit.Assert {
     
     @org.junit.Test
@@ -69,6 +73,53 @@ public class CryptoTest extends org.junit.Assert {
             "nofile.properties"
         );
         assertNotNull(crypto);
+    }
+    
+    /**
+     * Test that we can sign and verify a signature using dynamically loaded keystores/truststore
+     */
+    @org.junit.Test
+    public void testDynamicCrypto() throws Exception {
+        WSSecSignature builder = new WSSecSignature();
+        builder.setUserInfo("wss40", "security");
+        builder.setKeyIdentifierType(WSConstants.X509_KEY_IDENTIFIER);
+        
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        
+        // Load the keystore
+        Crypto crypto = new Merlin();
+        KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
+        ClassLoader loader = Loader.getClassLoader(CryptoTest.class);
+        InputStream input = AbstractCrypto.loadInputStream(loader, "keys/wss40.jks");
+        keyStore.load(input, "security".toCharArray());
+        crypto.setKeyStore(keyStore);
+        Document signedDoc = builder.build(doc, crypto, secHeader);
+
+        // Load the truststore
+        Crypto processCrypto = new Merlin();
+        KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
+        input = AbstractCrypto.loadInputStream(loader, "keys/wss40CA.jks");
+        trustStore.load(input, "security".toCharArray());
+        processCrypto.setTrustStore(trustStore);
+        
+        WSSecurityEngine secEngine = new WSSecurityEngine();
+        secEngine.processSecurityHeader(signedDoc, null, null, processCrypto);
+        
+        // Load a (bad) truststore
+        processCrypto = new Merlin();
+        trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
+        input = AbstractCrypto.loadInputStream(loader, "keys/wss40badca.jks");
+        trustStore.load(input, "security".toCharArray());
+        processCrypto.setTrustStore(trustStore);
+        
+        try {
+            secEngine.processSecurityHeader(signedDoc, null, null, processCrypto);
+            fail("Expected failure on a bad trust store");
+        } catch (WSSecurityException ex) {
+            // expected
+        }
     }
     
     /**

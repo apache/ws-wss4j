@@ -31,13 +31,6 @@ import java.security.KeyStore;
 import java.security.cert.CertificateFactory;
 import java.util.Properties;
 
-/**
- * Created by IntelliJ IDEA.
- * User: dims
- * Date: Sep 15, 2005
- * Time: 9:50:40 AM
- * To change this template use File | Settings | File Templates.
- */
 public abstract class AbstractCrypto extends CryptoBase {
     
     /*
@@ -86,23 +79,26 @@ public abstract class AbstractCrypto extends CryptoBase {
     protected static CertificateFactory certFact;
     protected Properties properties = null;
     
-    /**
-     * Constructor
-     *
-     * @param properties
-     */
-    public AbstractCrypto(Properties properties) throws CredentialException, IOException {
+    public AbstractCrypto() {
+        // default constructor
+    }
+    
+    public AbstractCrypto(Properties properties) 
+        throws CredentialException, IOException {
         this(properties, Loader.getClassLoader(AbstractCrypto.class));
     }
 
-    /**
-     * This allows providing a custom class loader to load the resources, etc
-     * @param properties
-     * @param loader
-     * @throws CredentialException
-     * @throws IOException
-     */
     public AbstractCrypto(Properties properties, ClassLoader loader) 
+        throws CredentialException, IOException {
+        loadProperties(properties, loader);
+    }
+    
+    public void loadProperties(Properties properties) 
+        throws CredentialException, IOException {
+        loadProperties(properties, Loader.getClassLoader(AbstractCrypto.class));
+    }
+    
+    public void loadProperties(Properties properties, ClassLoader loader) 
         throws CredentialException, IOException {
         if (properties == null) {
             return;
@@ -283,20 +279,23 @@ public abstract class AbstractCrypto extends CryptoBase {
         return ks;
     }
 
-    
-    protected String
+    public String
     getCryptoProvider() {
-        if (properties == null) {
-            return null;
+        if (cryptoProvider != null) {
+            return cryptoProvider;
+        } else {
+            if (properties == null) {
+                return null;
+            }
+            String provider = properties.getProperty(CRYPTO_PROVIDER);
+            if (provider == null) {
+                provider = properties.getProperty(OLD_CRYPTO_CERT_PROVIDER);
+            }
+            if (provider != null) {
+                provider = provider.trim();
+            }
+            return provider;
         }
-        String provider = properties.getProperty(CRYPTO_PROVIDER);
-        if (provider == null) {
-            provider = properties.getProperty(OLD_CRYPTO_CERT_PROVIDER);
-        }
-        if (provider != null) {
-            provider = provider.trim();
-        }
-        return provider;
     }
     
     /**
@@ -309,13 +308,17 @@ public abstract class AbstractCrypto extends CryptoBase {
      * @return alias name of the default X509 certificate
      */
     public String getDefaultX509Alias() {
-        if (properties == null) {
-            return null;
+        if (defaultAlias != null) {
+            return defaultAlias;
+        } else {
+            if (properties == null) {
+                return null;
+            }
+            String alias = properties.getProperty(KEYSTORE_ALIAS);
+            if (alias != null) {
+                alias = alias.trim();
+            }
+            return alias;
         }
-        String alias = properties.getProperty(KEYSTORE_ALIAS);
-        if (alias != null) {
-            alias = alias.trim();
-        }
-        return alias;
     }
 }

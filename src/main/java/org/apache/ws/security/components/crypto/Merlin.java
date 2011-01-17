@@ -22,20 +22,12 @@ package org.apache.ws.security.components.crypto;
 import java.io.IOException;
 import java.util.Properties;
 
-/**
- * JDK1.4 based implementation of Crypto (uses keystore). <p/>
- * 
- * @author Davanum Srinivas (dims@yahoo.com).
- */
 public class Merlin extends AbstractCrypto {
 
-    /**
-     * Constructor. <p/>
-     * 
-     * @param properties
-     * @throws CredentialException
-     * @throws IOException
-     */
+    public Merlin() {
+        // default constructor
+    }
+    
     public Merlin(Properties properties) throws CredentialException, IOException {
         super(properties);
     }
