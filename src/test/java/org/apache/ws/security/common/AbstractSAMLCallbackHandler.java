@@ -56,6 +56,7 @@ public abstract class AbstractSAMLCallbackHandler implements CallbackHandler {
     protected X509Certificate[] certs;
     protected Statement statement = Statement.AUTHN;
     protected CERT_IDENTIFIER certIdentifier = CERT_IDENTIFIER.X509_CERT;
+    protected byte[] ephemeralKey = null;
     
     public void setConfirmationMethod(String confMethod) {
         confirmationMethod = confMethod;
@@ -67,6 +68,10 @@ public abstract class AbstractSAMLCallbackHandler implements CallbackHandler {
     
     public void setCertIdentifier(CERT_IDENTIFIER certIdentifier) {
         this.certIdentifier = certIdentifier;
+    }
+    
+    public byte[] getEphemeralKey() {
+        return ephemeralKey;
     }
     
     /**
@@ -122,6 +127,7 @@ public abstract class AbstractSAMLCallbackHandler implements CallbackHandler {
             encrKey.setKeyIdentifierType(WSConstants.X509_KEY_IDENTIFIER);
             encrKey.setUseThisCert(certs[0]);
             encrKey.prepare(doc, null);
+            ephemeralKey = encrKey.getEphemeralKey();
             Element encryptedKeyElement = encrKey.getEncryptedKeyElement();
             
             // Append the EncryptedKey to a KeyInfo element

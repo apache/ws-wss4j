@@ -38,7 +38,6 @@ import org.opensaml.xml.signature.SignatureConstants;
 
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
-import java.util.Arrays;
 import java.util.Properties;
 
 import javax.security.auth.callback.CallbackHandler;
@@ -46,8 +45,6 @@ import javax.security.auth.callback.CallbackHandler;
 /**
  * Builds a WS SAML Assertion and inserts it into the SOAP Envelope. Refer to
  * the WS specification, SAML Token profile
- *
- * @author Davanum Srinivas (dims@yahoo.com).
  */
 public class SAMLIssuerImpl implements SAMLIssuer {
 
@@ -176,6 +173,12 @@ public class SAMLIssuerImpl implements SAMLIssuer {
             
             // prepare to sign the SAML token
             X509Certificate[] issuerCerts = issuerCrypto.getCertificates(issuerKeyName);
+            if (issuerCerts == null) {
+                throw new WSSecurityException(
+                    "No issuer certs were found to sign the SAML Assertion using issuer name: "
+                    + issuerKeyName
+                );
+            }
 
             String sigAlgo = SignatureConstants.ALGO_ID_SIGNATURE_RSA_SHA1;
             String pubKeyAlgo = issuerCerts[0].getPublicKey().getAlgorithm();
@@ -193,11 +196,7 @@ public class SAMLIssuerImpl implements SAMLIssuer {
             signature.setSignatureAlgorithm(sigAlgo);
 
             BasicX509Credential signingCredential = new BasicX509Credential();
-            if (issuerCerts.length == 1) {
-                signingCredential.setEntityCertificate(issuerCerts[0]);
-            } else {
-                signingCredential.setEntityCertificateChain(Arrays.asList(issuerCerts));
-            }
+            signingCredential.setEntityCertificate(issuerCerts[0]);
             signingCredential.setPrivateKey(privateKey);
             signingCredential.setEntityId(issuer);
 

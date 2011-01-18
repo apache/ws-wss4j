@@ -31,7 +31,7 @@ import org.w3c.dom.Element;
 public class KeyInfoBean {
     
     public enum CERT_IDENTIFIER {
-        X509_CERT, X509_SKI, X509_ISSUER_SERIAL, KEY_VALUE
+        X509_CERT, X509_ISSUER_SERIAL, KEY_VALUE
     }
     
     private X509Certificate cert;

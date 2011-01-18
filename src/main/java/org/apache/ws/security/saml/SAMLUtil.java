@@ -32,6 +32,7 @@ import org.apache.ws.security.saml.ext.AssertionWrapper;
 import org.apache.ws.security.util.Base64;
 import org.apache.ws.security.util.WSSecurityUtil;
 
+import org.opensaml.saml2.core.SubjectConfirmationData;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.Text;
@@ -234,11 +235,14 @@ public class SAMLUtil {
         List<org.opensaml.saml2.core.SubjectConfirmation> subjectConfList = 
             samlSubject.getSubjectConfirmations();
         for (org.opensaml.saml2.core.SubjectConfirmation subjectConfirmation : subjectConfList) {
-            Element sub = subjectConfirmation.getDOM();
-            
+            SubjectConfirmationData subjConfData = 
+                subjectConfirmation.getSubjectConfirmationData();
+            Element sub = subjConfData.getDOM();
             Element keyInfoElement = 
                 WSSecurityUtil.getDirectChildElement(sub, "KeyInfo", WSConstants.SIG_NS);
-            return getCredentialFromKeyInfo(keyInfoElement, crypto, cb);
+            if (keyInfoElement != null) {
+                return getCredentialFromKeyInfo(keyInfoElement, crypto, cb);
+            }
         }
 
         return null;
@@ -314,6 +318,12 @@ public class SAMLUtil {
                                     ((X509IssuerSerial)x509obj).getIssuerName(), 
                                     ((X509IssuerSerial)x509obj).getSerialNumber()
                                 );
+                            if (alias == null) {
+                                throw new WSSecurityException(
+                                    WSSecurityException.FAILURE, "invalidSAMLsecurity",
+                                    new Object[]{"cannot get certificate or key"}
+                                );
+                            }
                             certs = crypto.getCertificates(alias);
                             return new SAMLKeyInfo(null, certs);
                         }

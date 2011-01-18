@@ -245,14 +245,16 @@ public class WSSecSignatureSAML extends WSSecSignature {
                     new Object[] { "for SAML Signature (Key Holder)" }
                 );
             }
-            SAMLKeyInfo samlKeyInfo = 
-                SAMLUtil.getCredentialFromSubject(assertion, userCrypto, null);
-            publicKey = samlKeyInfo.getPublicKey();
-            certs = samlKeyInfo.getCerts();
-            wsDocInfo.setCrypto(userCrypto);
+            if (secretKey == null) {
+                SAMLKeyInfo samlKeyInfo = 
+                    SAMLUtil.getCredentialFromSubject(assertion, userCrypto, null);
+                publicKey = samlKeyInfo.getPublicKey();
+                certs = samlKeyInfo.getCerts();
+                wsDocInfo.setCrypto(userCrypto);
+            }
         }
         if ((certs == null || certs.length == 0 || certs[0] == null) 
-                && publicKey == null) {
+            && publicKey == null && secretKey == null) {
             throw new WSSecurityException(
                 WSSecurityException.FAILURE,
                 "noCertsFound",
@@ -463,6 +465,8 @@ public class WSSecSignatureSAML extends WSSecSignature {
             java.security.Key key;
             if (senderVouches) {
                 key = issuerCrypto.getPrivateKey(issuerKeyName, issuerKeyPW);
+            } else if (secretKey != null) {
+                key = WSSecurityUtil.prepareSecretKey(sigAlgo, secretKey);
             } else {
                 key = userCrypto.getPrivateKey(user, password);
             }

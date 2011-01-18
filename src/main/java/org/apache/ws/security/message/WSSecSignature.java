@@ -95,12 +95,12 @@ public class WSSecSignature extends WSSecSignatureBase {
     protected KeyInfo keyInfo;
     protected CanonicalizationMethod c14nMethod;
     protected XMLSignature sig;
-
-    private byte[] secretKey = null;
+    protected byte[] secretKey = null;
+    protected String customTokenValueType;
+    protected String customTokenId;
+    
     private String encrKeySha1value = null;
     private Crypto crypto = null;
-    private String customTokenValueType;
-    private String customTokenId;
     private String digestAlgo = WSConstants.SHA1;
     private X509Certificate useThisCert = null;
     private Element securityHeader = null;

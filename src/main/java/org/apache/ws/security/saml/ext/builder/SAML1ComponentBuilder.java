@@ -210,10 +210,6 @@ public class SAML1ComponentBuilder {
                     kiFactory.setEmitPublicKeyValue(true);
                     break;
                 }
-                case X509_SKI: {
-                    kiFactory.setEmitX509SKI(true);
-                    break;
-                }
                 case X509_ISSUER_SERIAL: {
                     kiFactory.setEmitX509IssuerSerial(true);
                 }
