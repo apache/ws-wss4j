@@ -28,19 +28,27 @@ import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
+import org.apache.ws.security.common.SAML1CallbackHandler;
 import org.apache.ws.security.common.SOAPUtil;
+import org.apache.ws.security.components.crypto.AbstractCrypto;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
+import org.apache.ws.security.components.crypto.Merlin;
 import org.apache.ws.security.message.WSSecSignature;
 import org.apache.ws.security.message.WSSecHeader;
 import org.apache.ws.security.saml.SAMLIssuer;
-import org.apache.ws.security.saml.SAMLIssuerFactory;
+import org.apache.ws.security.saml.SAMLIssuerImpl;
+import org.apache.ws.security.saml.SignedSamlTokenHOKTest;
 import org.apache.ws.security.saml.WSSecSignatureSAML;
 import org.apache.ws.security.saml.ext.AssertionWrapper;
+import org.apache.ws.security.saml.ext.builder.SAML1Constants;
+import org.apache.ws.security.util.Loader;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import java.io.InputStream;
+import java.security.KeyStore;
 import java.util.List;
 import java.util.ArrayList;
 import javax.xml.namespace.QName;
@@ -142,17 +150,34 @@ public class SignaturePartsTest extends org.junit.Assert {
      */
     @SuppressWarnings("unchecked")
     @org.junit.Test
-    @org.junit.Ignore
     public void testSOAPHeaderSTRTransform() throws Exception {
-        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
+        // Construct issuer and user crypto instances
+        Crypto issuerCrypto = new Merlin();
+        KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
+        ClassLoader loader = Loader.getClassLoader(SignedSamlTokenHOKTest.class);
+        InputStream input = AbstractCrypto.loadInputStream(loader, "keys/wss40_server.jks");
+        keyStore.load(input, "security".toCharArray());
+        issuerCrypto.setKeyStore(keyStore);
         
-        SAMLIssuer saml = SAMLIssuerFactory.getInstance("saml_hok.properties");
+        Crypto userCrypto = CryptoFactory.getInstance("wss40.properties");
+        
+        SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
+        callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
+        callbackHandler.setConfirmationMethod(SAML1Constants.CONF_HOLDER_KEY);
+        SAMLIssuer saml = new SAMLIssuerImpl();
+        saml.setIssuerName("www.example.com");
+        saml.setIssuerCrypto(issuerCrypto);
+        saml.setIssuerKeyName("wss40_server");
+        saml.setIssuerKeyPassword("security");
+        saml.setSignAssertion(true);
+        saml.setCallbackHandler(callbackHandler);
         AssertionWrapper assertion = saml.newAssertion();
 
         WSSecSignatureSAML wsSign = new WSSecSignatureSAML();
         wsSign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
-        wsSign.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+        wsSign.setUserInfo("wss40", "security");
         
+        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
@@ -162,13 +187,10 @@ public class SignaturePartsTest extends org.junit.Assert {
         parts.add(encP);
         wsSign.setParts(parts);
 
-        LOG.info("Before SAMLSignedKeyHolder....");
-        
         //
         // set up for keyHolder
         //
-        Document signedDoc = wsSign.build(doc, crypto, assertion, null, null, null, secHeader);
-        LOG.info("After SAMLSignedKeyHolder....");
+        Document signedDoc = wsSign.build(doc, userCrypto, assertion, null, null, null, secHeader);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed SAML message (key holder):");
@@ -177,12 +199,21 @@ public class SignaturePartsTest extends org.junit.Assert {
             LOG.debug(outputString);
         }
         
-        List<WSSecurityEngineResult> results = verify(signedDoc);
+        // Construct trust crypto instance
+        Crypto trustCrypto = new Merlin();
+        KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
+        input = AbstractCrypto.loadInputStream(loader, "keys/wss40CA.jks");
+        trustStore.load(input, "security".toCharArray());
+        trustCrypto.setTrustStore(trustStore);
+        
+        List<WSSecurityEngineResult> results = 
+            secEngine.processSecurityHeader(doc, null, null, trustCrypto);
         WSSecurityEngineResult stUnsignedActionResult =
             WSSecurityUtil.fetchActionResult(results, WSConstants.ST_UNSIGNED);
         AssertionWrapper receivedAssertion = 
             (AssertionWrapper) stUnsignedActionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(receivedAssertion != null);
+        assert receivedAssertion.isSigned();
         
         WSSecurityEngineResult signActionResult = 
             WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
@@ -193,7 +224,7 @@ public class SignaturePartsTest extends org.junit.Assert {
         
         WSDataRef wsDataRef = (WSDataRef)refs.get(0);
         String xpath = wsDataRef.getXpath();
-        assertEquals("/soapenv:Envelope/soapenv:Header/wsse:Security/saml:Assertion", xpath);
+        assertEquals("/soapenv:Envelope/soapenv:Header/wsse:Security/saml1:Assertion", xpath);
     }
     
     /**

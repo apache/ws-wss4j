@@ -28,7 +28,6 @@ import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDataRef;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSSecurityEngineResult;
-import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.common.KeystoreCallbackHandler;
 import org.apache.ws.security.common.SAML1CallbackHandler;
 import org.apache.ws.security.common.SAML2CallbackHandler;
@@ -38,7 +37,6 @@ import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.components.crypto.Merlin;
 import org.apache.ws.security.message.WSSecHeader;
-import org.apache.ws.security.message.WSSecSAMLToken;
 import org.apache.ws.security.saml.ext.AssertionWrapper;
 import org.apache.ws.security.saml.ext.bean.KeyInfoBean.CERT_IDENTIFIER;
 import org.apache.ws.security.saml.ext.builder.SAML1Constants;
@@ -52,9 +50,6 @@ import javax.security.auth.callback.CallbackHandler;
 import java.io.InputStream;
 import java.security.KeyStore;
 import java.util.List;
-
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 
 /**
  * Test-case for sending and processing a signed (holder-of-key) SAML Assertion. These tests
@@ -90,6 +85,7 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
      * Test that creates, sends and processes a signed SAML 1.1 authentication assertion.
      */
     @org.junit.Test
+    @SuppressWarnings("unchecked")
     public void testSAML1AuthnAssertion() throws Exception {
         SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
         callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
@@ -142,6 +138,10 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
         final List<WSDataRef> refs =
             (List<WSDataRef>) actionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
         assertTrue(refs.size() == 1);
+        
+        WSDataRef wsDataRef = (WSDataRef)refs.get(0);
+        String xpath = wsDataRef.getXpath();
+        assertEquals("/SOAP-ENV:Envelope/SOAP-ENV:Body", xpath);
     }
     
     /**
@@ -149,6 +149,7 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
      * the configuration is loaded from a properties file
      */
     @org.junit.Test
+    @SuppressWarnings("unchecked")
     public void testSAML1AuthnAssertionFromProperties() throws Exception {
         SAMLIssuer saml = SAMLIssuerFactory.getInstance("saml_hok.properties");
         AssertionWrapper assertion = saml.newAssertion();
@@ -192,6 +193,10 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
         final List<WSDataRef> refs =
             (List<WSDataRef>) actionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
         assertTrue(refs.size() == 1);
+        
+        WSDataRef wsDataRef = (WSDataRef)refs.get(0);
+        String xpath = wsDataRef.getXpath();
+        assertEquals("/SOAP-ENV:Envelope/SOAP-ENV:Body", xpath);
     }
     
     /**
@@ -251,6 +256,10 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
         final List<WSDataRef> refs =
             (List<WSDataRef>) actionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
         assertTrue(refs.size() == 1);
+        
+        WSDataRef wsDataRef = (WSDataRef)refs.get(0);
+        String xpath = wsDataRef.getXpath();
+        assertEquals("/SOAP-ENV:Envelope/SOAP-ENV:Body", xpath);
         */
     }
     
@@ -258,6 +267,7 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
      * Test that creates, sends and processes a signed SAML 2 authentication assertion.
      */
     @org.junit.Test
+    @SuppressWarnings("unchecked")
     public void testSAML2AuthnAssertion() throws Exception {
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
         callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
@@ -311,6 +321,10 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
         final List<WSDataRef> refs =
             (List<WSDataRef>) actionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
         assertTrue(refs.size() == 1);
+        
+        WSDataRef wsDataRef = (WSDataRef)refs.get(0);
+        String xpath = wsDataRef.getXpath();
+        assertEquals("/SOAP-ENV:Envelope/SOAP-ENV:Body", xpath);
     }
     
     /**
@@ -373,6 +387,10 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
         final List<WSDataRef> refs =
             (List<WSDataRef>) actionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
         assertTrue(refs.size() == 1);
+        
+        WSDataRef wsDataRef = (WSDataRef)refs.get(0);
+        String xpath = wsDataRef.getXpath();
+        assertEquals("/SOAP-ENV:Envelope/SOAP-ENV:Body", xpath);
         */
     }
     
@@ -381,6 +399,7 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
      * where the subject cert is referenced using IssuerSerial
      */
     @org.junit.Test
+    @SuppressWarnings("unchecked")
     public void testSAML1AuthnAssertionIssuerSerial() throws Exception {
         SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
         callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
@@ -431,6 +450,10 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
         final List<WSDataRef> refs =
             (List<WSDataRef>) actionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
         assertTrue(refs.size() == 1);
+        
+        WSDataRef wsDataRef = (WSDataRef)refs.get(0);
+        String xpath = wsDataRef.getXpath();
+        assertEquals("/SOAP-ENV:Envelope/SOAP-ENV:Body", xpath);
     }
     
     /**
@@ -438,6 +461,7 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
      * where the subject cert is referenced using a Key Value
      */
     @org.junit.Test
+    @SuppressWarnings("unchecked")
     public void testSAML1AuthnAssertionKeyValue() throws Exception {
         SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
         callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
@@ -489,6 +513,10 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
         final List<WSDataRef> refs =
             (List<WSDataRef>) actionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
         assertTrue(refs.size() == 1);
+        
+        WSDataRef wsDataRef = (WSDataRef)refs.get(0);
+        String xpath = wsDataRef.getXpath();
+        assertEquals("/SOAP-ENV:Envelope/SOAP-ENV:Body", xpath);
     }
     
     /**
@@ -496,6 +524,7 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
      * where the subject cert is referenced using a Key Value
      */
     @org.junit.Test
+    @SuppressWarnings("unchecked")
     public void testSAML2AuthnAssertionKeyValue() throws Exception {
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
         callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
@@ -547,106 +576,11 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
         final List<WSDataRef> refs =
             (List<WSDataRef>) actionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
         assertTrue(refs.size() == 1);
+        
+        WSDataRef wsDataRef = (WSDataRef)refs.get(0);
+        String xpath = wsDataRef.getXpath();
+        assertEquals("/SOAP-ENV:Envelope/SOAP-ENV:Body", xpath);
     }
-    
-    /**
-     * Test that creates a signed SAML Assertion using HOK, but then modifies the signature
-     * object by replacing the enveloped transform with the exclusive c14n transform. 
-     * The signature validation should then fail - the enveloped transform is mandatory for
-     * a signed assertion.
-     */
-    @org.junit.Test
-    @org.junit.Ignore
-    public void testSAMLSignedKeyHolderSigModified() throws Exception {
-        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        
-        SAMLIssuer saml = SAMLIssuerFactory.getInstance("saml_hok.properties");
-        AssertionWrapper assertion = saml.newAssertion();
-
-        WSSecSignatureSAML wsSign = new WSSecSignatureSAML();
-        wsSign.setKeyIdentifierType(WSConstants.X509_KEY_IDENTIFIER);
-        wsSign.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
-
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
-
-        Document signedDoc = wsSign.build(doc, userCrypto, assertion, null, null, null, secHeader);
-        
-        //
-        // Modify the assertion
-        //
-        Element envelope = signedDoc.getDocumentElement();
-        NodeList list = envelope.getElementsByTagNameNS(WSConstants.SAML_NS, "Assertion");
-        Element assertionElement = (org.w3c.dom.Element)list.item(0);
-        list = assertionElement.getElementsByTagNameNS(WSConstants.SIG_NS, "Signature");
-        Element sigElement = (org.w3c.dom.Element)list.item(0);
-        list = sigElement.getElementsByTagNameNS(WSConstants.SIG_NS, "Transform");
-        Element transformElement = (org.w3c.dom.Element)list.item(0);
-        transformElement.setAttributeNS(null, "Algorithm", WSConstants.C14N_EXCL_OMIT_COMMENTS);
-        
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Signed (modified) SAML message (key holder):");
-            String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
-            LOG.debug(outputString);
-        }
-        
-        /*
-        try {
-            verify(signedDoc);
-            fail("Expected failure on a modified signature");
-        } catch (WSSecurityException ex) {
-            // expected
-        }
-        */
-    }
-    
-    /**
-     * Test that creates a signed SAML Assertion using HOK, but then modifies the assertion.
-     * The signature verification should then fail.
-     */
-    @org.junit.Test
-    @org.junit.Ignore
-    public void testSAMLSignedKeyHolderKeyModified() throws Exception {
-        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        
-        SAMLIssuer saml = SAMLIssuerFactory.getInstance("saml_hok.properties");
-        AssertionWrapper assertion = saml.newAssertion();
-
-        WSSecSignatureSAML wsSign = new WSSecSignatureSAML();
-        wsSign.setKeyIdentifierType(WSConstants.X509_KEY_IDENTIFIER);
-        wsSign.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
-
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
-
-        Document signedDoc = wsSign.build(doc, userCrypto, assertion, null, null, null, secHeader);
-        
-        //
-        // Modify the assertion
-        //
-        Element envelope = signedDoc.getDocumentElement();
-        NodeList list = envelope.getElementsByTagNameNS(WSConstants.SAML_NS, "Assertion");
-        Element assertionElement = (org.w3c.dom.Element)list.item(0);
-        assertionElement.setAttributeNS(null, "MinorVersion", "5");
-        
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Signed (modified) SAML message (key holder):");
-            String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
-            LOG.debug(outputString);
-        }
-        
-        /*
-        try {
-            verify(signedDoc);
-            fail("Expected failure on a modified signature");
-        } catch (WSSecurityException ex) {
-            // expected
-        }
-        */
-    }
-
     
     /**
      * Verifies the soap envelope

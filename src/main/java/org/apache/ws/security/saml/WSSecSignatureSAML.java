@@ -68,6 +68,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
     private Crypto issuerCrypto = null;
     private String issuerKeyName = null;
     private String issuerKeyPW = null;
+    private boolean useDirectReferenceToAssertion = false;
     
     private KeyInfoFactory keyInfoFactory = KeyInfoFactory.getInstance("DOM");
 
@@ -312,7 +313,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
         if (certs != null && certs.length != 0) {
             certUri = wssConfig.getIdAllocator().createSecureId("CertId-", certs[0]);
         }
-
+        
         //
         // If the sender vouches, then we must sign the SAML token _and_ at
         // least one part of the message (usually the SOAP body). To do so we
@@ -327,7 +328,16 @@ public class WSSecSignatureSAML extends WSSecSignature {
                 secRefID = wssConfig.getIdAllocator().createSecureId("STRSAMLId-", secRefSaml);
                 secRefSaml.setID(secRefID);
 
-                if (WSConstants.X509_KEY_IDENTIFIER == keyIdentifierType) {
+                if (useDirectReferenceToAssertion) {
+                    Reference ref = new Reference(doc);
+                    ref.setURI("#" + assertion.getId());
+                    if (assertion.getSaml1() != null) {
+                        ref.setValueType(WSConstants.WSS_SAML_KI_VALUE_TYPE);
+                    } else if (assertion.getSaml2() != null) {
+                        ref.setValueType(WSConstants.WSS_SAML2_KI_VALUE_TYPE);
+                    }
+                    secRefSaml.setReference(ref);
+                } else {
                     Element keyId = doc.createElementNS(WSConstants.WSSE_NS, "wsse:KeyIdentifier");
                     String valueType = null;
                     if (assertion.getSaml1() != null) {
@@ -341,15 +351,6 @@ public class WSSecSignatureSAML extends WSSecSignature {
                     keyId.appendChild(doc.createTextNode(assertion.getId()));
                     Element elem = secRefSaml.getElement();
                     elem.appendChild(keyId);
-                } else {
-                    Reference ref = new Reference(doc);
-                    ref.setURI("#" + assertion.getId());
-                    if (assertion.getSaml1() != null) {
-                        ref.setValueType(WSConstants.WSS_SAML_KI_VALUE_TYPE);
-                    } else if (assertion.getSaml2() != null) {
-                        ref.setValueType(WSConstants.WSS_SAML2_KI_VALUE_TYPE);
-                    }
-                    secRefSaml.setReference(ref);
                 }
                 wsDocInfo.addTokenElement(secRefSaml.getElement());
             }
@@ -357,6 +358,15 @@ public class WSSecSignatureSAML extends WSSecSignature {
             throw new WSSecurityException(
                 WSSecurityException.FAILED_SIGNATURE, "noXMLSig", null, ex
             );
+        }
+        
+        //
+        // Test the keyIdentiferType - It must be a BST Direct Reference or an 
+        // X.509 Key Identifier
+        //
+        if (keyIdentifierType != WSConstants.X509_KEY_IDENTIFIER ||
+            keyIdentifierType != WSConstants.BST_DIRECT_REFERENCE) {
+            keyIdentifierType = WSConstants.X509_KEY_IDENTIFIER;
         }
 
         if (senderVouches) {
@@ -379,38 +389,29 @@ public class WSSecSignatureSAML extends WSSecSignature {
             default:
                 throw new WSSecurityException(WSSecurityException.FAILURE, "unsupportedKeyId");
             }
-        } else {
-            switch (keyIdentifierType) {
-            case WSConstants.BST_DIRECT_REFERENCE:
-                Reference ref = new Reference(doc);
-                ref.setURI("#" + assertion.getId());
-                if (assertion.getSaml1() != null) {
-                    ref.setValueType(WSConstants.WSS_SAML_KI_VALUE_TYPE);
-                } else if (assertion.getSaml2() != null) {
-                    ref.setValueType(WSConstants.WSS_SAML2_KI_VALUE_TYPE);
-                }
-                secRef.setReference(ref);
-                break;
-                
-            case WSConstants.X509_KEY_IDENTIFIER :
-                Element keyId = doc.createElementNS(WSConstants.WSSE_NS, "wsse:KeyIdentifier");
-                String valueType = null;
-                if (assertion.getSaml1() != null) {
-                    valueType = WSConstants.WSS_SAML_KI_VALUE_TYPE;
-                } else if (assertion.getSaml2() != null) {
-                    valueType = WSConstants.WSS_SAML2_KI_VALUE_TYPE;
-                }
-                keyId.setAttributeNS(
-                    null, "ValueType", valueType
-                );
-                keyId.appendChild(doc.createTextNode(assertion.getId()));
-                Element elem = secRef.getElement();
-                elem.appendChild(keyId);
-                break;
-
-            default:
-                throw new WSSecurityException(WSSecurityException.FAILURE, "unsupportedKeyId");
+        } else if (useDirectReferenceToAssertion) {
+            Reference ref = new Reference(doc);
+            ref.setURI("#" + assertion.getId());
+            if (assertion.getSaml1() != null) {
+                ref.setValueType(WSConstants.WSS_SAML_KI_VALUE_TYPE);
+            } else if (assertion.getSaml2() != null) {
+                ref.setValueType(WSConstants.WSS_SAML2_KI_VALUE_TYPE);
             }
+            secRef.setReference(ref);
+        } else {
+            Element keyId = doc.createElementNS(WSConstants.WSSE_NS, "wsse:KeyIdentifier");
+            String valueType = null;
+            if (assertion.getSaml1() != null) {
+                valueType = WSConstants.WSS_SAML_KI_VALUE_TYPE;
+            } else if (assertion.getSaml2() != null) {
+                valueType = WSConstants.WSS_SAML2_KI_VALUE_TYPE;
+            }
+            keyId.setAttributeNS(
+                null, "ValueType", valueType
+            );
+            keyId.appendChild(doc.createTextNode(assertion.getId()));
+            Element elem = secRef.getElement();
+            elem.appendChild(keyId);
         }
         XMLStructure structure = new DOMStructure(secRef.getElement());
         wsDocInfo.addTokenElement(secRef.getElement());
@@ -515,5 +516,23 @@ public class WSSecSignatureSAML extends WSSecSignature {
         }
     }
 
+    /**
+     * Return whether a Direct Reference is to be used to reference the assertion. The
+     * default is false.
+     * @return whether a Direct Reference is to be used to reference the assertion
+     */
+    public boolean isUseDirectReferenceToAssertion() {
+        return useDirectReferenceToAssertion;
+    }
+    
+    /**
+     * Set whether a Direct Reference is to be used to reference the assertion. The
+     * default is false.
+     * @param useDirectReferenceToAssertion whether a Direct Reference is to be used
+     *        to reference the assertion
+     */
+    public void setUseDirectReferenceToAssertion(boolean useDirectReferenceToAssertion) {
+        this.useDirectReferenceToAssertion = useDirectReferenceToAssertion;
+    }
     
 }

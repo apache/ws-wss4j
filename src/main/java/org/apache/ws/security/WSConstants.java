@@ -50,6 +50,8 @@ public class WSConstants {
         "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0";
     public static final String SAMLTOKEN_NS = 
         "http://docs.oasis-open.org/wss/oasis-wss-saml-token-profile-1.0";
+    public static final String SAMLTOKEN_NS11 = 
+        "http://docs.oasis-open.org/wss/oasis-wss-saml-token-profile-1.1";
 
     public static final String SIG_NS = "http://www.w3.org/2000/09/xmldsig#";
     public static final String ENC_NS = "http://www.w3.org/2001/04/xmlenc#";
@@ -60,10 +62,6 @@ public class WSConstants {
     public static final String SAMLP_NS = "urn:oasis:names:tc:SAML:1.0:protocol";
     public static final String SAML2_NS = "urn:oasis:names:tc:SAML:2.0:assertion";
     public static final String SAMLP2_NS = "urn:oasis:names:tc:SAML:2.0:protocol";
-    public static final String WSS_SAML_NS = 
-        "http://docs.oasis-open.org/wss/oasis-wss-saml-token-profile-1.0#";
-    public static final String WSS_SAML_NS11 = 
-        "http://docs.oasis-open.org/wss/oasis-wss-saml-token-profile-1.1#";
     
     public static final String URI_SOAP11_ENV =
         "http://schemas.xmlsoap.org/soap/envelope/";
@@ -234,8 +232,8 @@ public class WSConstants {
     //
     // Misc
     //
-    public static final String WSS_SAML_KI_VALUE_TYPE = WSS_SAML_NS + SAML_ASSERTION_ID;
-    public static final String WSS_SAML2_KI_VALUE_TYPE = WSS_SAML_NS11 + SAML2_ASSERTION_ID;
+    public static final String WSS_SAML_KI_VALUE_TYPE = SAMLTOKEN_NS + "#" + SAML_ASSERTION_ID;
+    public static final String WSS_SAML2_KI_VALUE_TYPE = SAMLTOKEN_NS11 + "#" + SAML2_ASSERTION_ID;
     public static final String PASSWORD_DIGEST = USERNAMETOKEN_NS + "#PasswordDigest";
     public static final String PASSWORD_TEXT = USERNAMETOKEN_NS + "#PasswordText";
 
