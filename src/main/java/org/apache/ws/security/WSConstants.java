@@ -156,6 +156,7 @@ public class WSConstants {
     public static final String X509_CERT_LN = "X509Certificate";
     public static final String KEYINFO_LN = "KeyInfo";
     public static final String KEYVALUE_LN = "KeyValue";
+    public static final String TOKEN_TYPE = "TokenType";
     
     public static final String ELEM_ENVELOPE = "Envelope";
     public static final String ELEM_HEADER = "Header";
@@ -234,6 +235,8 @@ public class WSConstants {
     //
     public static final String WSS_SAML_KI_VALUE_TYPE = SAMLTOKEN_NS + "#" + SAML_ASSERTION_ID;
     public static final String WSS_SAML2_KI_VALUE_TYPE = SAMLTOKEN_NS11 + "#" + SAML2_ASSERTION_ID;
+    public static final String WSS_SAML_TOKEN_TYPE = SAMLTOKEN_NS11 + "#SAMLV1.1";
+    public static final String WSS_SAML2_TOKEN_TYPE = SAMLTOKEN_NS11 + "#SAMLV2.0";
     public static final String PASSWORD_DIGEST = USERNAMETOKEN_NS + "#PasswordDigest";
     public static final String PASSWORD_TEXT = USERNAMETOKEN_NS + "#PasswordText";
 

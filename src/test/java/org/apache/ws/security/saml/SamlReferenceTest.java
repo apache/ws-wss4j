@@ -53,6 +53,8 @@ import javax.security.auth.callback.CallbackHandler;
 
 /**
  * Some tests for how SAML tokens are referenced.
+ * TODO - Add tests for references from an EncryptedData structure to a SAML Assertion when
+ * WSS-265 is fixed: https://issues.apache.org/jira/browse/WSS-265
  */
 public class SamlReferenceTest extends org.junit.Assert {
     private static final Log LOG = LogFactory.getLog(SamlReferenceTest.class);
@@ -107,14 +109,16 @@ public class SamlReferenceTest extends org.junit.Assert {
                 "security", secHeader
             );
 
+        String outputString = 
+            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed SAML message Key Identifier (sender vouches):");
-            String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
+        assert outputString.contains(WSConstants.WSS_SAML_KI_VALUE_TYPE);
+        assert outputString.contains(WSConstants.WSS_SAML_TOKEN_TYPE);
         
-        List<WSSecurityEngineResult> results = verify(signedDoc, crypto);
+        List<WSSecurityEngineResult> results = verify(signedDoc, crypto, null);
         WSSecurityEngineResult actionResult =
             WSSecurityUtil.fetchActionResult(results, WSConstants.ST_UNSIGNED);
         AssertionWrapper receivedAssertion = 
@@ -167,14 +171,16 @@ public class SamlReferenceTest extends org.junit.Assert {
                 "security", secHeader
             );
 
+        String outputString = 
+            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed SAML message Direct Reference (sender vouches):");
-            String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
+        assert outputString.contains(WSConstants.WSS_SAML_KI_VALUE_TYPE);
+        assert outputString.contains(WSConstants.WSS_SAML_TOKEN_TYPE);
         
-        List<WSSecurityEngineResult> results = verify(signedDoc, crypto);
+        List<WSSecurityEngineResult> results = verify(signedDoc, crypto, null);
         WSSecurityEngineResult actionResult =
             WSSecurityUtil.fetchActionResult(results, WSConstants.ST_UNSIGNED);
         AssertionWrapper receivedAssertion = 
@@ -231,15 +237,16 @@ public class SamlReferenceTest extends org.junit.Assert {
         Document signedDoc = 
             wsSign.build(doc, userCrypto, assertion, null, null, null, secHeader);
 
-
+        String outputString = 
+            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed SAML message Key Identifier (holder-of-key):");
-            String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
+        assert outputString.contains(WSConstants.WSS_SAML_KI_VALUE_TYPE);
+        assert outputString.contains(WSConstants.WSS_SAML_TOKEN_TYPE);
         
-        List<WSSecurityEngineResult> results = verify(signedDoc, trustCrypto);
+        List<WSSecurityEngineResult> results = verify(signedDoc, trustCrypto, null);
         WSSecurityEngineResult actionResult =
             WSSecurityUtil.fetchActionResult(results, WSConstants.ST_UNSIGNED);
         AssertionWrapper receivedAssertion = 
@@ -296,15 +303,16 @@ public class SamlReferenceTest extends org.junit.Assert {
         Document signedDoc = 
             wsSign.build(doc, userCrypto, assertion, null, null, null, secHeader);
 
-
+        String outputString = 
+            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed SAML message Direct Reference (holder-of-key):");
-            String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
+        assert outputString.contains(WSConstants.WSS_SAML_KI_VALUE_TYPE);
+        assert outputString.contains(WSConstants.WSS_SAML_TOKEN_TYPE);
         
-        List<WSSecurityEngineResult> results = verify(signedDoc, trustCrypto);
+        List<WSSecurityEngineResult> results = verify(signedDoc, trustCrypto, null);
         WSSecurityEngineResult actionResult =
             WSSecurityUtil.fetchActionResult(results, WSConstants.ST_UNSIGNED);
         AssertionWrapper receivedAssertion = 
@@ -370,40 +378,50 @@ public class SamlReferenceTest extends org.junit.Assert {
             LOG.debug("Encrypted message:");
             LOG.debug(outputString);
         }
+        assert outputString.contains(WSConstants.WSS_SAML_KI_VALUE_TYPE);
+        assert outputString.contains(WSConstants.WSS_SAML_TOKEN_TYPE);
         
-        verify(encryptedDoc, crypto);
+        verify(encryptedDoc, crypto, crypto);
     }
     
     
     /**
      * The body of the SOAP request is encrypted using a secret key, which is in turn encrypted
      * using the certificate embedded in the SAML assertion and referenced using a Key Identifier.
-     * This test checks that KeyIdentifier (and not Reference) elements are used to identify 
-     * SAML tokens
+     * This tests that we can process a KeyIdentifier to a SAML Assertion in the KeyInfo of an
+     * EncryptedKey.
      */
     @org.junit.Test
-    @org.junit.Ignore
-    public void testSAMLEncryptedKey() throws Exception {
+    @SuppressWarnings("unchecked")
+    public void testSAML1HOKEKKeyIdentifier() throws Exception {
         // Create a SAML assertion
-        SAMLIssuer saml = SAMLIssuerFactory.getInstance("saml_hok.properties");
-        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        Crypto hokCrypto = CryptoFactory.getInstance("crypto.properties");
+        SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
+        callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
+        callbackHandler.setConfirmationMethod(SAML1Constants.CONF_HOLDER_KEY);
+        SAMLIssuer saml = new SAMLIssuerImpl();
+        saml.setIssuerName("www.example.com");
+        saml.setIssuerCrypto(issuerCrypto);
+        saml.setIssuerKeyName("wss40_server");
+        saml.setIssuerKeyPassword("security");
+        saml.setSignAssertion(true);
+        saml.setCallbackHandler(callbackHandler);
         AssertionWrapper assertion = saml.newAssertion();
-        Node assertionNode = assertion.toDOM(doc);
-        
+
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader();
+        Node assertionNode = assertion.toDOM(doc);
         secHeader.insertSecurityHeader(doc);
         secHeader.getSecurityHeader().appendChild(assertionNode);
         
         // Encrypt the SOAP body
         WSSecEncrypt builder = new WSSecEncrypt();
-        builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e");
+        builder.setUserInfo("wss40");
         builder.setSymmetricEncAlgorithm(WSConstants.TRIPLE_DES);
         builder.setKeyIdentifierType(WSConstants.CUSTOM_KEY_IDENTIFIER);
         builder.setCustomEKTokenValueType(WSConstants.WSS_SAML_KI_VALUE_TYPE);
         builder.setCustomEKTokenId(assertion.getId());
+        builder.prepare(doc, userCrypto);
         
-        builder.prepare(doc, hokCrypto);
         List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
         WSEncryptionPart encP = 
             new WSEncryptionPart(
@@ -414,19 +432,114 @@ public class SamlReferenceTest extends org.junit.Assert {
         builder.addInternalRefElement(refElement);
         builder.appendToHeader(secHeader);
 
+        String outputString = 
+            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
         if (LOG.isDebugEnabled()) {
-            LOG.debug("Signed SAML message (HOK):");
-            String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+            LOG.debug("Encrypted SAML 1.1 message Key Identifier (holder-of-key):");
             LOG.debug(outputString);
         }
+        assert outputString.contains(WSConstants.WSS_SAML_KI_VALUE_TYPE);
+        assert outputString.contains(WSConstants.WSS_SAML_TOKEN_TYPE);
         
-        List<WSSecurityEngineResult> results = verify(doc, hokCrypto);
+        List<WSSecurityEngineResult> results = verify(doc, trustCrypto, userCrypto);
         WSSecurityEngineResult actionResult =
             WSSecurityUtil.fetchActionResult(results, WSConstants.ST_UNSIGNED);
         AssertionWrapper receivedAssertion = 
             (AssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(receivedAssertion != null);
+        assert receivedAssertion.isSigned();
+        
+        // Test we processed an encrypted element
+        actionResult = WSSecurityUtil.fetchActionResult(results, WSConstants.ENCR);
+        assertTrue(actionResult != null);
+        assertFalse(actionResult.isEmpty());
+        final List<WSDataRef> refs =
+            (List<WSDataRef>) actionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
+        assertTrue(refs.size() == 1);
+        
+        WSDataRef wsDataRef = (WSDataRef)refs.get(0);
+        String xpath = wsDataRef.getXpath();
+        assertEquals("/SOAP-ENV:Envelope/SOAP-ENV:Body/add", xpath);
+        
+    }
+    
+    /**
+     * The body of the SOAP request is encrypted using a secret key, which is in turn encrypted
+     * using the certificate embedded in the SAML assertion and referenced using Direct
+     * Reference. This method is not spec compliant and is included to make sure we can process 
+     * third-party Assertions referenced in this way. This tests that we can process a Direct
+     * Reference to a SAML Assertion in the KeyInfo of an EncryptedKey.
+     */
+    @org.junit.Test
+    @SuppressWarnings("unchecked")
+    public void testSAML1HOKEKDirectReference() throws Exception {
+        // Create a SAML assertion
+        SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
+        callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
+        callbackHandler.setConfirmationMethod(SAML1Constants.CONF_HOLDER_KEY);
+        SAMLIssuer saml = new SAMLIssuerImpl();
+        saml.setIssuerName("www.example.com");
+        saml.setIssuerCrypto(issuerCrypto);
+        saml.setIssuerKeyName("wss40_server");
+        saml.setIssuerKeyPassword("security");
+        saml.setSignAssertion(true);
+        saml.setCallbackHandler(callbackHandler);
+        AssertionWrapper assertion = saml.newAssertion();
+
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader();
+        Node assertionNode = assertion.toDOM(doc);
+        secHeader.insertSecurityHeader(doc);
+        secHeader.getSecurityHeader().appendChild(assertionNode);
+        
+        // Encrypt the SOAP body
+        WSSecEncrypt builder = new WSSecEncrypt();
+        builder.setUserInfo("wss40");
+        builder.setSymmetricEncAlgorithm(WSConstants.TRIPLE_DES);
+        builder.setKeyIdentifierType(WSConstants.CUSTOM_SYMM_SIGNING);
+        builder.setCustomEKTokenValueType(WSConstants.WSS_SAML_KI_VALUE_TYPE);
+        builder.setCustomEKTokenId(assertion.getId());
+        builder.prepare(doc, userCrypto);
+        
+        List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
+        WSEncryptionPart encP = 
+            new WSEncryptionPart(
+                "add", "http://ws.apache.org/counter/counter_port_type", "Element"
+            );
+        parts.add(encP);
+        Element refElement = builder.encryptForRef(null, parts);
+        builder.addInternalRefElement(refElement);
+        builder.appendToHeader(secHeader);
+
+        String outputString = 
+            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Encrypted SAML 1.1 message Direct Reference (holder-of-key):");
+            LOG.debug(outputString);
+        }
+        assert outputString.contains(WSConstants.WSS_SAML_KI_VALUE_TYPE);
+        assert outputString.contains(WSConstants.WSS_SAML_TOKEN_TYPE);
+        
+        List<WSSecurityEngineResult> results = verify(doc, trustCrypto, userCrypto);
+        WSSecurityEngineResult actionResult =
+            WSSecurityUtil.fetchActionResult(results, WSConstants.ST_UNSIGNED);
+        AssertionWrapper receivedAssertion = 
+            (AssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+        assertTrue(receivedAssertion != null);
+        assert receivedAssertion.isSigned();
+        
+        // Test we processed an encrypted element
+        actionResult = WSSecurityUtil.fetchActionResult(results, WSConstants.ENCR);
+        assertTrue(actionResult != null);
+        assertFalse(actionResult.isEmpty());
+        final List<WSDataRef> refs =
+            (List<WSDataRef>) actionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
+        assertTrue(refs.size() == 1);
+        
+        WSDataRef wsDataRef = (WSDataRef)refs.get(0);
+        String xpath = wsDataRef.getXpath();
+        assertEquals("/SOAP-ENV:Envelope/SOAP-ENV:Body/add", xpath);
+        
     }
     
     
@@ -436,9 +549,11 @@ public class SamlReferenceTest extends org.junit.Assert {
      * @param doc
      * @throws Exception Thrown when there is a problem in verification
      */
-    private List<WSSecurityEngineResult> verify(Document doc, Crypto verifyCrypto) throws Exception {
+    private List<WSSecurityEngineResult> verify(
+        Document doc, Crypto verifyCrypto, Crypto decCrypto
+    ) throws Exception {
         List<WSSecurityEngineResult> results = 
-            secEngine.processSecurityHeader(doc, null, callbackHandler, verifyCrypto);
+            secEngine.processSecurityHeader(doc, null, callbackHandler, verifyCrypto, decCrypto);
         String outputString = 
             org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
         assertTrue(outputString.indexOf("counter_port_type") > 0 ? true : false);

@@ -299,8 +299,37 @@ public class WSSecEncryptedKey extends WSSecBase {
             secToken.setReference(ref);
             break;
             
+        case WSConstants.CUSTOM_SYMM_SIGNING :
+            Reference refCust = new Reference(document);
+            refCust.setValueType(customEKTokenValueType);
+            refCust.setURI("#" + customEKTokenId);
+            secToken.setReference(refCust);
+            if (WSConstants.WSS_SAML_KI_VALUE_TYPE.equals(customEKTokenValueType)) {
+                secToken.addTokenType(WSConstants.WSS_SAML_TOKEN_TYPE);
+            } else if (WSConstants.WSS_SAML2_KI_VALUE_TYPE.equals(customEKTokenValueType)) {
+                secToken.addTokenType(WSConstants.WSS_SAML2_TOKEN_TYPE);
+            }
+            break;
+            
+        case WSConstants.CUSTOM_SYMM_SIGNING_DIRECT :
+            Reference refCustd = new Reference(document);
+            refCustd.setValueType(customEKTokenValueType);
+            refCustd.setURI(customEKTokenId);
+            secToken.setReference(refCustd);
+            if (WSConstants.WSS_SAML_KI_VALUE_TYPE.equals(customEKTokenValueType)) {
+                secToken.addTokenType(WSConstants.WSS_SAML_TOKEN_TYPE);
+            } else if (WSConstants.WSS_SAML2_KI_VALUE_TYPE.equals(customEKTokenValueType)) {
+                secToken.addTokenType(WSConstants.WSS_SAML2_TOKEN_TYPE);
+            }
+            break;
+            
         case WSConstants.CUSTOM_KEY_IDENTIFIER:
             secToken.setKeyIdentifier(customEKTokenValueType, customEKTokenId);
+            if (WSConstants.WSS_SAML_KI_VALUE_TYPE.equals(customEKTokenValueType)) {
+                secToken.addTokenType(WSConstants.WSS_SAML_TOKEN_TYPE);
+            } else if (WSConstants.WSS_SAML2_KI_VALUE_TYPE.equals(customEKTokenValueType)) {
+                secToken.addTokenType(WSConstants.WSS_SAML2_TOKEN_TYPE);
+            }
             break;           
 
         default:

@@ -31,6 +31,7 @@ import org.apache.ws.security.message.token.SecurityTokenReference;
 import org.apache.ws.security.message.token.X509Security;
 import org.apache.ws.security.saml.SAMLKeyInfo;
 import org.apache.ws.security.saml.SAMLUtil;
+import org.apache.ws.security.saml.ext.AssertionWrapper;
 import org.w3c.dom.Element;
 
 import java.security.Principal;
@@ -112,6 +113,12 @@ public class EncryptedKeySTRParser implements STRParser {
                             (X509Certificate[])result.get(
                                 WSSecurityEngineResult.TAG_X509_CERTIFICATES
                             );
+                    } else if (WSConstants.ST_UNSIGNED == action) {
+                        AssertionWrapper assertion = 
+                            (AssertionWrapper)result.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+                        SAMLKeyInfo keyInfo = 
+                            SAMLUtil.getCredentialFromSubject(assertion, crypto, cb);
+                        certs = keyInfo.getCerts();
                     } else {
                         throw new WSSecurityException(
                             WSSecurityException.UNSUPPORTED_SECURITY_TOKEN,
