@@ -393,6 +393,10 @@
                     <artifactId>bcprov-ext-jdk15</artifactId>
                 </exclusion>
                 <exclusion>
+                    <groupId>org.bouncycastle</groupId>
+                    <artifactId>bcprov-jdk15</artifactId>
+                </exclusion>
+                <exclusion>
                     <groupId>org.apache.commons.ssl</groupId>
                     <artifactId>not-yet-commons-ssl</artifactId>
                 </exclusion>
