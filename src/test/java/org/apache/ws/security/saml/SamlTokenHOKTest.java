@@ -87,7 +87,7 @@ public class SamlTokenHOKTest extends org.junit.Assert {
         
         List<WSSecurityEngineResult> results = verify(signedDoc);
         WSSecurityEngineResult actionResult =
-            WSSecurityUtil.fetchActionResult(results, WSConstants.ST_UNSIGNED);
+            WSSecurityUtil.fetchActionResult(results, WSConstants.ST_SIGNED);
         AssertionWrapper receivedAssertion = 
             (AssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(receivedAssertion != null);
@@ -120,7 +120,7 @@ public class SamlTokenHOKTest extends org.junit.Assert {
         
         List<WSSecurityEngineResult> results = verify(signedDoc);
         WSSecurityEngineResult actionResult =
-            WSSecurityUtil.fetchActionResult(results, WSConstants.ST_UNSIGNED);
+            WSSecurityUtil.fetchActionResult(results, WSConstants.ST_SIGNED);
         AssertionWrapper receivedAssertion = 
             (AssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(receivedAssertion != null);
@@ -161,7 +161,7 @@ public class SamlTokenHOKTest extends org.junit.Assert {
         
         List<WSSecurityEngineResult> results = verify(signedDoc);
         WSSecurityEngineResult actionResult =
-            WSSecurityUtil.fetchActionResult(results, WSConstants.ST_UNSIGNED);
+            WSSecurityUtil.fetchActionResult(results, WSConstants.ST_SIGNED);
         AssertionWrapper receivedAssertion = 
             (AssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(receivedAssertion != null);
@@ -203,7 +203,7 @@ public class SamlTokenHOKTest extends org.junit.Assert {
         
         List<WSSecurityEngineResult> results = verify(unsignedDoc);
         WSSecurityEngineResult actionResult =
-            WSSecurityUtil.fetchActionResult(results, WSConstants.ST_UNSIGNED);
+            WSSecurityUtil.fetchActionResult(results, WSConstants.ST_SIGNED);
         AssertionWrapper receivedAssertion = 
             (AssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(receivedAssertion != null);
@@ -245,7 +245,7 @@ public class SamlTokenHOKTest extends org.junit.Assert {
         
         List<WSSecurityEngineResult> results = verify(unsignedDoc);
         WSSecurityEngineResult actionResult =
-            WSSecurityUtil.fetchActionResult(results, WSConstants.ST_UNSIGNED);
+            WSSecurityUtil.fetchActionResult(results, WSConstants.ST_SIGNED);
         AssertionWrapper receivedAssertion = 
             (AssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(receivedAssertion != null);

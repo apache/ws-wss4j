@@ -209,7 +209,7 @@ public class SignaturePartsTest extends org.junit.Assert {
         List<WSSecurityEngineResult> results = 
             secEngine.processSecurityHeader(doc, null, null, trustCrypto);
         WSSecurityEngineResult stUnsignedActionResult =
-            WSSecurityUtil.fetchActionResult(results, WSConstants.ST_UNSIGNED);
+            WSSecurityUtil.fetchActionResult(results, WSConstants.ST_SIGNED);
         AssertionWrapper receivedAssertion = 
             (AssertionWrapper) stUnsignedActionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(receivedAssertion != null);

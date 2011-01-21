@@ -181,7 +181,7 @@ public class SignatureSTRParser implements STRParser {
                     byte[] secret = (byte[])result.get(WSSecurityEngineResult.TAG_SECRET);
                     secretKey = dkt.deriveKey(keyLength, secret); 
                     principal = dkt.createPrincipal();
-                } else if (WSConstants.ST_UNSIGNED == action) {
+                } else if (WSConstants.ST_UNSIGNED == action || WSConstants.ST_SIGNED == action) {
                     if (crypto == null) {
                         throw new WSSecurityException(
                             WSSecurityException.FAILURE, "noSigCryptoFile"

@@ -397,11 +397,6 @@ public class WSConstants {
     public static final int SIGN = 0x2; // Perform Signature
     public static final int ENCR = 0x4; // Perform Encryption
 
-    /*
-     * Attention: the signed/Unsigned types identify if WSS4J uses
-     * the SAML token for signature, signature key or not. It does
-     * not mean if the token contains an enveloped signature.
-     */
     public static final int ST_UNSIGNED = 0x8; // perform SAMLToken unsigned
     public static final int ST_SIGNED = 0x10; // perform SAMLToken signed
 

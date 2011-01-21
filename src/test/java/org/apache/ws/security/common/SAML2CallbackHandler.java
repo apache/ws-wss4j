@@ -59,7 +59,7 @@ public class SAML2CallbackHandler extends AbstractSAMLCallbackHandler {
                         KeyInfoBean keyInfo = createKeyInfo();
                         subjectBean.setKeyInfo(keyInfo);
                     } catch (Exception ex) {
-                        throw new IOException("Problem creating KeyInfo", ex);
+                        throw new IOException("Problem creating KeyInfo: " +  ex.getMessage());
                     }
                 }
                 callback.setSubject(subjectBean);

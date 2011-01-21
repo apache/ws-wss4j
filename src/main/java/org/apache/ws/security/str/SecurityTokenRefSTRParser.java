@@ -94,7 +94,7 @@ public class SecurityTokenRefSTRParser implements STRParser {
                         (byte[])result.get(WSSecurityEngineResult.TAG_SECRET);
                     String algorithm = (String)parameters.get(SIGNATURE_METHOD);
                     secretKey = dkt.deriveKey(WSSecurityUtil.getKeyLength(algorithm), secret);
-                } else if (WSConstants.ST_UNSIGNED == action) {
+                } else if (WSConstants.ST_UNSIGNED == action || WSConstants.ST_SIGNED == action) {
                     AssertionWrapper assertion = 
                         (AssertionWrapper)result.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
                     SAMLKeyInfo keyInfo = 

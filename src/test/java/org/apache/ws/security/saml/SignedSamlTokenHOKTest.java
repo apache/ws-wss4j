@@ -125,7 +125,7 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
         
         // Test we processed a SAML assertion
         WSSecurityEngineResult actionResult =
-            WSSecurityUtil.fetchActionResult(results, WSConstants.ST_UNSIGNED);
+            WSSecurityUtil.fetchActionResult(results, WSConstants.ST_SIGNED);
         AssertionWrapper receivedAssertion = 
             (AssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(receivedAssertion != null);
@@ -180,7 +180,7 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
         
         // Test we processed a SAML assertion
         WSSecurityEngineResult actionResult =
-            WSSecurityUtil.fetchActionResult(results, WSConstants.ST_UNSIGNED);
+            WSSecurityUtil.fetchActionResult(results, WSConstants.ST_SIGNED);
         AssertionWrapper receivedAssertion = 
             (AssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(receivedAssertion != null);
@@ -243,7 +243,7 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
         
         // Test we processed a SAML assertion
         WSSecurityEngineResult actionResult =
-            WSSecurityUtil.fetchActionResult(results, WSConstants.ST_UNSIGNED);
+            WSSecurityUtil.fetchActionResult(results, WSConstants.ST_SIGNED);
         AssertionWrapper receivedAssertion = 
             (AssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(receivedAssertion != null);
@@ -308,7 +308,7 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
         
         // Test we processed a SAML assertion
         WSSecurityEngineResult actionResult =
-            WSSecurityUtil.fetchActionResult(results, WSConstants.ST_UNSIGNED);
+            WSSecurityUtil.fetchActionResult(results, WSConstants.ST_SIGNED);
         AssertionWrapper receivedAssertion = 
             (AssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(receivedAssertion != null);
@@ -374,7 +374,7 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
         
         // Test we processed a SAML assertion
         WSSecurityEngineResult actionResult =
-            WSSecurityUtil.fetchActionResult(results, WSConstants.ST_UNSIGNED);
+            WSSecurityUtil.fetchActionResult(results, WSConstants.ST_SIGNED);
         AssertionWrapper receivedAssertion = 
             (AssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(receivedAssertion != null);
@@ -437,7 +437,7 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
         
         List<WSSecurityEngineResult> results = verify(signedDoc, userCrypto);
         WSSecurityEngineResult actionResult =
-            WSSecurityUtil.fetchActionResult(results, WSConstants.ST_UNSIGNED);
+            WSSecurityUtil.fetchActionResult(results, WSConstants.ST_SIGNED);
         AssertionWrapper receivedAssertion = 
             (AssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(receivedAssertion != null);
@@ -500,7 +500,7 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
         
         List<WSSecurityEngineResult> results = verify(signedDoc, userCrypto);
         WSSecurityEngineResult actionResult =
-            WSSecurityUtil.fetchActionResult(results, WSConstants.ST_UNSIGNED);
+            WSSecurityUtil.fetchActionResult(results, WSConstants.ST_SIGNED);
         AssertionWrapper receivedAssertion = 
             (AssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(receivedAssertion != null);
@@ -563,7 +563,7 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
         
         List<WSSecurityEngineResult> results = verify(signedDoc, userCrypto);
         WSSecurityEngineResult actionResult =
-            WSSecurityUtil.fetchActionResult(results, WSConstants.ST_UNSIGNED);
+            WSSecurityUtil.fetchActionResult(results, WSConstants.ST_SIGNED);
         AssertionWrapper receivedAssertion = 
             (AssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(receivedAssertion != null);

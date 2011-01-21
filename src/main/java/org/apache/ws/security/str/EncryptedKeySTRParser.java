@@ -113,7 +113,7 @@ public class EncryptedKeySTRParser implements STRParser {
                             (X509Certificate[])result.get(
                                 WSSecurityEngineResult.TAG_X509_CERTIFICATES
                             );
-                    } else if (WSConstants.ST_UNSIGNED == action) {
+                    } else if (WSConstants.ST_UNSIGNED == action || WSConstants.ST_SIGNED == action) {
                         AssertionWrapper assertion = 
                             (AssertionWrapper)result.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
                         SAMLKeyInfo keyInfo = 

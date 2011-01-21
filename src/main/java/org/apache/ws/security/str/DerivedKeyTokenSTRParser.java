@@ -99,7 +99,7 @@ public class DerivedKeyTokenSTRParser implements STRParser {
                 secretKey = (byte[])result.get(WSSecurityEngineResult.TAG_SECRET);
             } else if (WSConstants.SCT == action) {
                 secretKey = (byte[])result.get(WSSecurityEngineResult.TAG_SECRET);
-            } else if (WSConstants.ST_UNSIGNED == action) {
+            } else if (WSConstants.ST_UNSIGNED == action || WSConstants.ST_SIGNED == action) {
                 AssertionWrapper assertion = 
                     (AssertionWrapper)result.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
                 SAMLKeyInfo keyInfo = 

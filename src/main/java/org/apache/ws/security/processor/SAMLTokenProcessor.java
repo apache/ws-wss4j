@@ -51,8 +51,12 @@ public class SAMLTokenProcessor implements Processor {
         }
         AssertionWrapper assertion = handleSAMLToken(elem, crypto);
         wsDocInfo.addTokenElement(elem);
-        WSSecurityEngineResult result = 
-            new WSSecurityEngineResult(WSConstants.ST_UNSIGNED, assertion);
+        WSSecurityEngineResult result = null;
+        if (assertion.isSigned()) {
+            result = new WSSecurityEngineResult(WSConstants.ST_SIGNED, assertion);
+        } else {
+            result = new WSSecurityEngineResult(WSConstants.ST_UNSIGNED, assertion);
+        }
         String id = assertion.getId();
         result.put(WSSecurityEngineResult.TAG_ID, id);
         wsDocInfo.addResult(result);
@@ -64,7 +68,9 @@ public class SAMLTokenProcessor implements Processor {
         Crypto crypto
     ) throws WSSecurityException {
         AssertionWrapper assertion = new AssertionWrapper(token);
-        assertion.verify(crypto);
+        if (assertion.isSigned()) {
+            assertion.verify(crypto);
+        }
         if (log.isDebugEnabled()) {
             log.debug("SAML Assertion issuer " + assertion.getIssuerString());
             log.debug(DOM2Writer.nodeToString(token));
