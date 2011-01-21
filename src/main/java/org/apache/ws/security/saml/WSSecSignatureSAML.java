@@ -335,7 +335,6 @@ public class WSSecSignatureSAML extends WSSecSignature {
                         ref.setValueType(WSConstants.WSS_SAML_KI_VALUE_TYPE);
                         secRefSaml.addTokenType(WSConstants.WSS_SAML_TOKEN_TYPE);
                     } else if (assertion.getSaml2() != null) {
-                        ref.setValueType(WSConstants.WSS_SAML2_KI_VALUE_TYPE);
                         secRefSaml.addTokenType(WSConstants.WSS_SAML2_TOKEN_TYPE);
                     }
                     secRefSaml.setReference(ref);
@@ -400,7 +399,6 @@ public class WSSecSignatureSAML extends WSSecSignature {
                 ref.setValueType(WSConstants.WSS_SAML_KI_VALUE_TYPE);
                 secRef.addTokenType(WSConstants.WSS_SAML_TOKEN_TYPE);
             } else if (assertion.getSaml2() != null) {
-                ref.setValueType(WSConstants.WSS_SAML2_KI_VALUE_TYPE);
                 secRef.addTokenType(WSConstants.WSS_SAML2_TOKEN_TYPE);
             }
             secRef.setReference(ref);

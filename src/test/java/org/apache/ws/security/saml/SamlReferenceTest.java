@@ -28,6 +28,7 @@ import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.common.KeystoreCallbackHandler;
 import org.apache.ws.security.common.SAML1CallbackHandler;
+import org.apache.ws.security.common.SAML2CallbackHandler;
 import org.apache.ws.security.common.SOAPUtil;
 import org.apache.ws.security.components.crypto.AbstractCrypto;
 import org.apache.ws.security.components.crypto.Crypto;
@@ -37,6 +38,7 @@ import org.apache.ws.security.message.WSSecEncrypt;
 import org.apache.ws.security.message.WSSecHeader;
 import org.apache.ws.security.saml.ext.AssertionWrapper;
 import org.apache.ws.security.saml.ext.builder.SAML1Constants;
+import org.apache.ws.security.saml.ext.builder.SAML2Constants;
 import org.apache.ws.security.util.Loader;
 import org.apache.ws.security.util.WSSecurityUtil;
 
@@ -141,7 +143,7 @@ public class SamlReferenceTest extends org.junit.Assert {
         xpath = wsDataRef.getXpath();
         assertEquals("/SOAP-ENV:Envelope/SOAP-ENV:Header/wsse:Security/saml1:Assertion", xpath);
     }
-
+    
     /**
      * Test that creates, sends and processes an signed SAML 1.1 sender-vouches assertion,
      * where the SecurityTokenReference that points to the SAML Assertion uses a direct reference,
@@ -519,6 +521,418 @@ public class SamlReferenceTest extends org.junit.Assert {
         }
         assert outputString.contains(WSConstants.WSS_SAML_KI_VALUE_TYPE);
         assert outputString.contains(WSConstants.WSS_SAML_TOKEN_TYPE);
+        
+        List<WSSecurityEngineResult> results = verify(doc, trustCrypto, userCrypto);
+        WSSecurityEngineResult actionResult =
+            WSSecurityUtil.fetchActionResult(results, WSConstants.ST_UNSIGNED);
+        AssertionWrapper receivedAssertion = 
+            (AssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+        assertTrue(receivedAssertion != null);
+        assert receivedAssertion.isSigned();
+        
+        // Test we processed an encrypted element
+        actionResult = WSSecurityUtil.fetchActionResult(results, WSConstants.ENCR);
+        assertTrue(actionResult != null);
+        assertFalse(actionResult.isEmpty());
+        final List<WSDataRef> refs =
+            (List<WSDataRef>) actionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
+        assertTrue(refs.size() == 1);
+        
+        WSDataRef wsDataRef = (WSDataRef)refs.get(0);
+        String xpath = wsDataRef.getXpath();
+        assertEquals("/SOAP-ENV:Envelope/SOAP-ENV:Body/add", xpath);
+        
+    }
+    
+    /**
+     * Test that creates, sends and processes an signed SAML 2 sender-vouches assertion,
+     * where the SecurityTokenReference that points to the SAML Assertion uses a KeyIdentifier,
+     * and not a direct reference.
+     */
+    @org.junit.Test
+    @SuppressWarnings("unchecked")
+    public void testSAML2SVKeyIdentifier() throws Exception {
+        SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
+        callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
+        callbackHandler.setConfirmationMethod(SAML2Constants.CONF_SENDER_VOUCHES);
+        SAMLIssuer saml = new SAMLIssuerImpl();
+        saml.setIssuerName("www.example.com");
+        saml.setCallbackHandler(callbackHandler);
+        saml.setSamlVersion("2.0");
+        AssertionWrapper assertion = saml.newAssertion();
+        
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        
+        WSSecSignatureSAML wsSign = new WSSecSignatureSAML();
+        Document signedDoc = 
+            wsSign.build(
+                doc, null, assertion, crypto, "16c73ab6-b892-458f-abf5-2f875f74882e", 
+                "security", secHeader
+            );
+
+        String outputString = 
+            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Signed SAML2 message Key Identifier (sender vouches):");
+            LOG.debug(outputString);
+        }
+        assert outputString.contains(WSConstants.WSS_SAML2_KI_VALUE_TYPE);
+        assert outputString.contains(WSConstants.WSS_SAML2_TOKEN_TYPE);
+        
+        List<WSSecurityEngineResult> results = verify(signedDoc, crypto, null);
+        WSSecurityEngineResult actionResult =
+            WSSecurityUtil.fetchActionResult(results, WSConstants.ST_UNSIGNED);
+        AssertionWrapper receivedAssertion = 
+            (AssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+        assertTrue(receivedAssertion != null);
+        
+        // Test we processed a signature (SAML assertion + SOAP body)
+        actionResult = WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
+        assertTrue(actionResult != null);
+        assertFalse(actionResult.isEmpty());
+        final List<WSDataRef> refs =
+            (List<WSDataRef>) actionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
+        assertTrue(refs.size() == 2);
+        
+        WSDataRef wsDataRef = (WSDataRef)refs.get(0);
+        String xpath = wsDataRef.getXpath();
+        assertEquals("/SOAP-ENV:Envelope/SOAP-ENV:Body", xpath);
+        
+        wsDataRef = (WSDataRef)refs.get(1);
+        xpath = wsDataRef.getXpath();
+        assertEquals("/SOAP-ENV:Envelope/SOAP-ENV:Header/wsse:Security/saml2:Assertion", xpath);
+    }
+    
+    /**
+     * Test that creates, sends and processes an signed SAML 2 sender-vouches assertion,
+     * where the SecurityTokenReference that points to the SAML Assertion uses a direct reference,
+     * and not a KeyIdentifier. Unlike the SAML 1.1 case, this is spec-compliant.
+     */
+    @org.junit.Test
+    @SuppressWarnings("unchecked")
+    public void testSAML2SVDirectReference() throws Exception {
+    	SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
+        callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
+        callbackHandler.setConfirmationMethod(SAML2Constants.CONF_SENDER_VOUCHES);
+        SAMLIssuer saml = new SAMLIssuerImpl();
+        saml.setIssuerName("www.example.com");
+        saml.setCallbackHandler(callbackHandler);
+        saml.setSamlVersion("2.0");
+        AssertionWrapper assertion = saml.newAssertion();
+        
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        
+        WSSecSignatureSAML wsSign = new WSSecSignatureSAML();
+        wsSign.setUseDirectReferenceToAssertion(true);
+        Document signedDoc = 
+            wsSign.build(
+                doc, null, assertion, crypto, "16c73ab6-b892-458f-abf5-2f875f74882e", 
+                "security", secHeader
+            );
+
+        String outputString = 
+            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Signed SAML2 message Direct Reference (sender vouches):");
+            LOG.debug(outputString);
+        }
+        assert !outputString.contains(WSConstants.WSS_SAML2_KI_VALUE_TYPE);
+        assert outputString.contains(WSConstants.WSS_SAML2_TOKEN_TYPE);
+        
+        List<WSSecurityEngineResult> results = verify(signedDoc, crypto, null);
+        WSSecurityEngineResult actionResult =
+            WSSecurityUtil.fetchActionResult(results, WSConstants.ST_UNSIGNED);
+        AssertionWrapper receivedAssertion = 
+            (AssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+        assertTrue(receivedAssertion != null);
+        
+        // Test we processed a signature (SAML assertion + SOAP body)
+        actionResult = WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
+        assertTrue(actionResult != null);
+        assertFalse(actionResult.isEmpty());
+        final List<WSDataRef> refs =
+            (List<WSDataRef>) actionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
+        assertTrue(refs.size() == 2);
+        
+        WSDataRef wsDataRef = (WSDataRef)refs.get(0);
+        String xpath = wsDataRef.getXpath();
+        assertEquals("/SOAP-ENV:Envelope/SOAP-ENV:Body", xpath);
+        
+        wsDataRef = (WSDataRef)refs.get(1);
+        xpath = wsDataRef.getXpath();
+        assertEquals("/SOAP-ENV:Envelope/SOAP-ENV:Header/wsse:Security/saml2:Assertion", xpath);
+    }
+    
+    /**
+     * Test that creates, sends and processes an signed SAML 2 holder-of-key assertion,
+     * where the SecurityTokenReference that points to the SAML Assertion uses a KeyIdentifier,
+     * and not a direct reference. This tests that we can process a KeyIdentifier to a SAML
+     * Assertion in the KeyInfo of a Signature.
+     */
+    @org.junit.Test
+    @SuppressWarnings("unchecked")
+    public void testSAML2HOKKeyIdentifier() throws Exception {
+        SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
+        callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
+        callbackHandler.setConfirmationMethod(SAML2Constants.CONF_HOLDER_KEY);
+        SAMLIssuer saml = new SAMLIssuerImpl();
+        saml.setIssuerName("www.example.com");
+        saml.setIssuerCrypto(issuerCrypto);
+        saml.setIssuerKeyName("wss40_server");
+        saml.setIssuerKeyPassword("security");
+        saml.setSignAssertion(true);
+        saml.setSamlVersion("2.0");
+        saml.setCallbackHandler(callbackHandler);
+        AssertionWrapper assertion = saml.newAssertion();
+
+        WSSecSignatureSAML wsSign = new WSSecSignatureSAML();
+        wsSign.setUserInfo("wss40", "security");
+        wsSign.setDigestAlgo("http://www.w3.org/2001/04/xmlenc#sha256");
+        wsSign.setSignatureAlgorithm("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256");
+
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+
+        Document signedDoc = 
+            wsSign.build(doc, userCrypto, assertion, null, null, null, secHeader);
+
+        String outputString = 
+            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Signed SAML2 message Key Identifier (holder-of-key):");
+            LOG.debug(outputString);
+        }
+        assert outputString.contains(WSConstants.WSS_SAML2_KI_VALUE_TYPE);
+        assert outputString.contains(WSConstants.WSS_SAML2_TOKEN_TYPE);
+        
+        List<WSSecurityEngineResult> results = verify(signedDoc, trustCrypto, null);
+        WSSecurityEngineResult actionResult =
+            WSSecurityUtil.fetchActionResult(results, WSConstants.ST_UNSIGNED);
+        AssertionWrapper receivedAssertion = 
+            (AssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+        assertTrue(receivedAssertion != null);
+        assert receivedAssertion.isSigned();
+        
+        // Test we processed a signature (SOAP body)
+        actionResult = WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
+        assertTrue(actionResult != null);
+        assertFalse(actionResult.isEmpty());
+        final List<WSDataRef> refs =
+            (List<WSDataRef>) actionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
+        assertTrue(refs.size() == 1);
+        
+        WSDataRef wsDataRef = (WSDataRef)refs.get(0);
+        String xpath = wsDataRef.getXpath();
+        assertEquals("/SOAP-ENV:Envelope/SOAP-ENV:Body", xpath);
+    }
+    
+    
+    /**
+     * Test that creates, sends and processes an signed SAML 2 holder-of-key assertion,
+     * where the SecurityTokenReference that points to the SAML Assertion uses a direct reference,
+     * and not a KeyIdentifier. Unlike the SAML 1.1 case, this is spec-compliant. This tests that
+     * we can process a Direct Reference to a SAML Assertion in the KeyInfo of a Signature.
+     */
+    @org.junit.Test
+    @SuppressWarnings("unchecked")
+    public void testSAML2HOKDirectReference() throws Exception {
+        SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
+        callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
+        callbackHandler.setConfirmationMethod(SAML2Constants.CONF_HOLDER_KEY);
+        SAMLIssuer saml = new SAMLIssuerImpl();
+        saml.setIssuerName("www.example.com");
+        saml.setIssuerCrypto(issuerCrypto);
+        saml.setIssuerKeyName("wss40_server");
+        saml.setIssuerKeyPassword("security");
+        saml.setSignAssertion(true);
+        saml.setSamlVersion("2.0");
+        saml.setCallbackHandler(callbackHandler);
+        AssertionWrapper assertion = saml.newAssertion();
+
+        WSSecSignatureSAML wsSign = new WSSecSignatureSAML();
+        wsSign.setUserInfo("wss40", "security");
+        wsSign.setDigestAlgo("http://www.w3.org/2001/04/xmlenc#sha256");
+        wsSign.setSignatureAlgorithm("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256");
+        wsSign.setUseDirectReferenceToAssertion(true);
+        wsSign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
+
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+
+        Document signedDoc = 
+            wsSign.build(doc, userCrypto, assertion, null, null, null, secHeader);
+
+        String outputString = 
+            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Signed SAML2 message Direct Reference (holder-of-key):");
+            LOG.debug(outputString);
+        }
+        assert !outputString.contains(WSConstants.WSS_SAML2_KI_VALUE_TYPE);
+        assert outputString.contains(WSConstants.WSS_SAML2_TOKEN_TYPE);
+        
+        List<WSSecurityEngineResult> results = verify(signedDoc, trustCrypto, null);
+        WSSecurityEngineResult actionResult =
+            WSSecurityUtil.fetchActionResult(results, WSConstants.ST_UNSIGNED);
+        AssertionWrapper receivedAssertion = 
+            (AssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+        assertTrue(receivedAssertion != null);
+        assert receivedAssertion.isSigned();
+        
+        // Test we processed a signature (SOAP body)
+        actionResult = WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
+        assertTrue(actionResult != null);
+        assertFalse(actionResult.isEmpty());
+        final List<WSDataRef> refs =
+            (List<WSDataRef>) actionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
+        assertTrue(refs.size() == 1);
+        
+        WSDataRef wsDataRef = (WSDataRef)refs.get(0);
+        String xpath = wsDataRef.getXpath();
+        assertEquals("/SOAP-ENV:Envelope/SOAP-ENV:Body", xpath);
+    }
+    
+    /**
+     * The body of the SOAP request is encrypted using a secret key, which is in turn encrypted
+     * using the certificate embedded in the SAML assertion and referenced using a Key Identifier.
+     * This tests that we can process a KeyIdentifier to a SAML Assertion in the KeyInfo of an
+     * EncryptedKey.
+     */
+    @org.junit.Test
+    @SuppressWarnings("unchecked")
+    public void testSAML2HOKEKKeyIdentifier() throws Exception {
+        // Create a SAML assertion
+        SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
+        callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
+        callbackHandler.setConfirmationMethod(SAML2Constants.CONF_HOLDER_KEY);
+        SAMLIssuer saml = new SAMLIssuerImpl();
+        saml.setIssuerName("www.example.com");
+        saml.setIssuerCrypto(issuerCrypto);
+        saml.setIssuerKeyName("wss40_server");
+        saml.setIssuerKeyPassword("security");
+        saml.setSignAssertion(true);
+        saml.setSamlVersion("2.0");
+        saml.setCallbackHandler(callbackHandler);;
+        AssertionWrapper assertion = saml.newAssertion();
+
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader();
+        Node assertionNode = assertion.toDOM(doc);
+        secHeader.insertSecurityHeader(doc);
+        secHeader.getSecurityHeader().appendChild(assertionNode);
+        
+        // Encrypt the SOAP body
+        WSSecEncrypt builder = new WSSecEncrypt();
+        builder.setUserInfo("wss40");
+        builder.setSymmetricEncAlgorithm(WSConstants.TRIPLE_DES);
+        builder.setKeyIdentifierType(WSConstants.CUSTOM_KEY_IDENTIFIER);
+        builder.setCustomEKTokenValueType(WSConstants.WSS_SAML2_KI_VALUE_TYPE);
+        builder.setCustomEKTokenId(assertion.getId());
+        builder.prepare(doc, userCrypto);
+        
+        List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
+        WSEncryptionPart encP = 
+            new WSEncryptionPart(
+                "add", "http://ws.apache.org/counter/counter_port_type", "Element"
+            );
+        parts.add(encP);
+        Element refElement = builder.encryptForRef(null, parts);
+        builder.addInternalRefElement(refElement);
+        builder.appendToHeader(secHeader);
+
+        String outputString = 
+            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Encrypted SAML 2 message Key Identifier (holder-of-key):");
+            LOG.debug(outputString);
+        }
+        assert outputString.contains(WSConstants.WSS_SAML2_KI_VALUE_TYPE);
+        assert outputString.contains(WSConstants.WSS_SAML2_TOKEN_TYPE);
+        
+        List<WSSecurityEngineResult> results = verify(doc, trustCrypto, userCrypto);
+        WSSecurityEngineResult actionResult =
+            WSSecurityUtil.fetchActionResult(results, WSConstants.ST_UNSIGNED);
+        AssertionWrapper receivedAssertion = 
+            (AssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+        assertTrue(receivedAssertion != null);
+        assert receivedAssertion.isSigned();
+        
+        // Test we processed an encrypted element
+        actionResult = WSSecurityUtil.fetchActionResult(results, WSConstants.ENCR);
+        assertTrue(actionResult != null);
+        assertFalse(actionResult.isEmpty());
+        final List<WSDataRef> refs =
+            (List<WSDataRef>) actionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
+        assertTrue(refs.size() == 1);
+        
+        WSDataRef wsDataRef = (WSDataRef)refs.get(0);
+        String xpath = wsDataRef.getXpath();
+        assertEquals("/SOAP-ENV:Envelope/SOAP-ENV:Body/add", xpath);
+        
+    }
+    
+    /**
+     * The body of the SOAP request is encrypted using a secret key, which is in turn encrypted
+     * using the certificate embedded in the SAML assertion and referenced using Direct
+     * Reference. Unlike the SAML 1.1 case, this is spec-compliant. This tests that we can process
+     * a Direct Reference to a SAML Assertion in the KeyInfo of an EncryptedKey.
+     */
+    @org.junit.Test
+    @SuppressWarnings("unchecked")
+    public void testSAML2HOKEKDirectReference() throws Exception {
+        // Create a SAML assertion
+        SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
+        callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
+        callbackHandler.setConfirmationMethod(SAML2Constants.CONF_HOLDER_KEY);
+        SAMLIssuer saml = new SAMLIssuerImpl();
+        saml.setIssuerName("www.example.com");
+        saml.setIssuerCrypto(issuerCrypto);
+        saml.setIssuerKeyName("wss40_server");
+        saml.setIssuerKeyPassword("security");
+        saml.setSignAssertion(true);
+        saml.setSamlVersion("2.0");
+        saml.setCallbackHandler(callbackHandler);;
+        AssertionWrapper assertion = saml.newAssertion();
+
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader();
+        Node assertionNode = assertion.toDOM(doc);
+        secHeader.insertSecurityHeader(doc);
+        secHeader.getSecurityHeader().appendChild(assertionNode);
+        
+        // Encrypt the SOAP body
+        WSSecEncrypt builder = new WSSecEncrypt();
+        builder.setUserInfo("wss40");
+        builder.setSymmetricEncAlgorithm(WSConstants.TRIPLE_DES);
+        builder.setKeyIdentifierType(WSConstants.CUSTOM_SYMM_SIGNING);
+        builder.setCustomEKTokenValueType(WSConstants.WSS_SAML2_KI_VALUE_TYPE);
+        builder.setCustomEKTokenId(assertion.getId());
+        builder.prepare(doc, userCrypto);
+        
+        List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
+        WSEncryptionPart encP = 
+            new WSEncryptionPart(
+                "add", "http://ws.apache.org/counter/counter_port_type", "Element"
+            );
+        parts.add(encP);
+        Element refElement = builder.encryptForRef(null, parts);
+        builder.addInternalRefElement(refElement);
+        builder.appendToHeader(secHeader);
+
+        String outputString = 
+            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Encrypted SAML 2 message Direct Reference (holder-of-key):");
+            LOG.debug(outputString);
+        }
+        assert !outputString.contains(WSConstants.WSS_SAML2_KI_VALUE_TYPE);
+        assert outputString.contains(WSConstants.WSS_SAML2_TOKEN_TYPE);
         
         List<WSSecurityEngineResult> results = verify(doc, trustCrypto, userCrypto);
         WSSecurityEngineResult actionResult =
