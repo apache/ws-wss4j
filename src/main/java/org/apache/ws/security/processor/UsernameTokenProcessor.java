@@ -23,24 +23,24 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDocInfo;
-import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.WSUsernameTokenPrincipal;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.message.token.UsernameToken;
-import org.apache.ws.security.util.Base64;
+import org.apache.ws.security.validate.Credential;
+import org.apache.ws.security.validate.UsernameTokenValidator;
+import org.apache.ws.security.validate.Validator;
 import org.w3c.dom.Element;
 
-import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.callback.UnsupportedCallbackException;
-import java.io.IOException;
 import java.util.List;
 
 public class UsernameTokenProcessor implements Processor {
     private static Log log = LogFactory.getLog(UsernameTokenProcessor.class.getName());
+    
+    private Validator validator = new UsernameTokenValidator();
 
     public List<WSSecurityEngineResult> handleToken(
         Element elem, Crypto crypto, Crypto decCrypto, CallbackHandler cb, 
@@ -49,8 +49,10 @@ public class UsernameTokenProcessor implements Processor {
         if (log.isDebugEnabled()) {
             log.debug("Found UsernameToken list element");
         }
+        validator.setCallbackHandler(cb);
+        validator.setWSSConfig(wsc);
         
-        UsernameToken token = handleUsernameToken(elem, cb, wsc);
+        UsernameToken token = handleUsernameToken(elem, wsc);
         
         WSUsernameTokenPrincipal principal = 
             new WSUsernameTokenPrincipal(token.getName(), token.isHashed());
@@ -80,7 +82,6 @@ public class UsernameTokenProcessor implements Processor {
      * <code>USERNAME_TOKEN_UNKNOWN</code>.
      *
      * @param token the DOM element that contains the UsernameToken
-     * @param cb    the reference to the callback object
      * @param wssConfig The WSSConfig object from which to obtain configuration
      * @return UsernameToken the UsernameToken object that was parsed
      * @throws WSSecurityException
@@ -88,127 +89,22 @@ public class UsernameTokenProcessor implements Processor {
     public UsernameToken 
     handleUsernameToken(
         Element token, 
-        CallbackHandler cb,
         WSSConfig wssConfig
     ) throws WSSecurityException {
-        if (cb == null) {
-            throw new WSSecurityException(WSSecurityException.FAILURE, "noCallback");
-        }
-        boolean handleCustomPasswordTypes = false;
         boolean allowNamespaceQualifiedPasswordTypes = false;
-        boolean passwordsAreEncoded = false;
-        
         if (wssConfig != null) {
-            handleCustomPasswordTypes = wssConfig.getHandleCustomPasswordTypes();
             allowNamespaceQualifiedPasswordTypes = 
                 wssConfig.getAllowNamespaceQualifiedPasswordTypes();
-            passwordsAreEncoded = wssConfig.getPasswordsAreEncoded();
         }
         
         //
-        // Parse the UsernameToken element
+        // Parse and validate the UsernameToken element
         //
         UsernameToken ut = new UsernameToken(token, allowNamespaceQualifiedPasswordTypes);
-        ut.setPasswordsAreEncoded(passwordsAreEncoded);
-        String user = ut.getName();
-        String password = ut.getPassword();
-        String nonce = ut.getNonce();
-        String createdTime = ut.getCreated();
-        String pwType = ut.getPasswordType();
-        if (log.isDebugEnabled()) {
-            log.debug("UsernameToken user " + user);
-            log.debug("UsernameToken password type " + pwType);
-        }
+        Credential credential = new Credential();
+        credential.setUsernametoken(ut);
+        validator.validate(credential);
         
-        if (wssConfig != null) {
-            String requiredPasswordType = wssConfig.getRequiredPasswordType();
-            if (requiredPasswordType != null && !requiredPasswordType.equals(pwType)) {
-                if (log.isDebugEnabled()) {
-                    log.debug("Authentication failed as the received password type does not " 
-                        + "match the required password type of: " + requiredPasswordType);
-                }
-                throw new WSSecurityException(WSSecurityException.FAILED_AUTHENTICATION);
-            }
-        }
-        //
-        // If the UsernameToken is hashed or plaintext, then retrieve the password from the
-        // callback handler and compare directly. If the UsernameToken is of some unknown type,
-        // then delegate authentication to the callback handler
-        //
-        if (ut.isHashed() || WSConstants.PASSWORD_TEXT.equals(pwType) 
-            || (password != null && (pwType == null || "".equals(pwType.trim())))) {
-            WSPasswordCallback pwCb = 
-                new WSPasswordCallback(user, null, pwType, WSPasswordCallback.USERNAME_TOKEN);
-            try {
-                cb.handle(new Callback[]{pwCb});
-            } catch (IOException e) {
-                if (log.isDebugEnabled()) {
-                    log.debug(e);
-                }
-                throw new WSSecurityException(
-                    WSSecurityException.FAILED_AUTHENTICATION, null, null, e
-                );
-            } catch (UnsupportedCallbackException e) {
-                if (log.isDebugEnabled()) {
-                    log.debug(e);
-                }
-                throw new WSSecurityException(
-                    WSSecurityException.FAILED_AUTHENTICATION, null, null, e
-                );
-            }
-            String origPassword = pwCb.getPassword();
-            if (origPassword == null) {
-                if (log.isDebugEnabled()) {
-                    log.debug("Callback supplied no password for: " + user);
-                }
-                throw new WSSecurityException(WSSecurityException.FAILED_AUTHENTICATION);
-            }
-            if (ut.isHashed()) {
-                String passDigest;
-                if (passwordsAreEncoded) {
-                    passDigest = UsernameToken.doPasswordDigest(nonce, createdTime, Base64.decode(origPassword));
-                } else {
-                    passDigest = UsernameToken.doPasswordDigest(nonce, createdTime, origPassword);
-                }
-                if (!passDigest.equals(password)) {
-                    throw new WSSecurityException(WSSecurityException.FAILED_AUTHENTICATION);
-                }
-            } else {
-                if (!origPassword.equals(password)) {
-                    throw new WSSecurityException(WSSecurityException.FAILED_AUTHENTICATION);
-                }
-            }
-            ut.setRawPassword(origPassword);
-        } else {
-            if (pwType != null && !handleCustomPasswordTypes) {
-                if (log.isDebugEnabled()) {
-                    log.debug("Authentication failed as handleCustomUsernameTokenTypes is false");
-                }
-                throw new WSSecurityException(WSSecurityException.FAILED_AUTHENTICATION);
-            }
-            WSPasswordCallback pwCb = new WSPasswordCallback(user, password,
-                    pwType, WSPasswordCallback.USERNAME_TOKEN_UNKNOWN);
-            try {
-                cb.handle(new Callback[]{pwCb});
-            } catch (IOException e) {
-                if (log.isDebugEnabled()) {
-                    log.debug(e);
-                }
-                throw new WSSecurityException(
-                    WSSecurityException.FAILED_AUTHENTICATION, null, null, e
-                );
-            } catch (UnsupportedCallbackException e) {
-                if (log.isDebugEnabled()) {
-                    log.debug(e);
-                }
-                throw new WSSecurityException(
-                    WSSecurityException.FAILED_AUTHENTICATION, null, null, e
-                );
-            }
-            String origPassword = pwCb.getPassword();
-            ut.setRawPassword(origPassword);
-        }
-
         return ut;
     }
 

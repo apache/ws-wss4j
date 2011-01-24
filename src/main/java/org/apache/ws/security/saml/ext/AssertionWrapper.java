@@ -510,9 +510,10 @@ public class AssertionWrapper {
     /**
      * Verify the signature of this assertion
      *
+     * @return the SAMLKeyInfo structure containing the credentials used to verify the signature
      * @throws ValidationException
      */
-    public void verify(Crypto crypto) throws WSSecurityException {
+    public SAMLKeyInfo verify(Crypto crypto) throws WSSecurityException {
         Signature sig = null;
         if (saml2 != null && saml2.getSignature() != null) {
             sig = saml2.getSignature();
@@ -553,9 +554,11 @@ public class AssertionWrapper {
             } catch (ValidationException ex) {
                 throw new WSSecurityException("SAML signature validation failed", ex);
             }
+            return samlKeyInfo;
         } else {
             log.debug("AssertionWrapper: no signature to validate");
         }
+        return null;
     }
     
 

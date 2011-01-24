@@ -260,7 +260,7 @@ public class SamlTokenHOKTest extends org.junit.Assert {
      */
     private List<WSSecurityEngineResult> verify(Document doc) throws Exception {
         List<WSSecurityEngineResult> results = 
-            secEngine.processSecurityHeader(doc, null, null, null);
+            secEngine.processSecurityHeader(doc, null, null, crypto);
         String outputString = 
             org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
         assertTrue(outputString.indexOf("counter_port_type") > 0 ? true : false);

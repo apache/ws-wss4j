@@ -27,8 +27,12 @@ import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
+import org.apache.ws.security.saml.SAMLKeyInfo;
 import org.apache.ws.security.saml.ext.AssertionWrapper;
 import org.apache.ws.security.util.DOM2Writer;
+import org.apache.ws.security.validate.Credential;
+import org.apache.ws.security.validate.SignatureTrustValidator;
+import org.apache.ws.security.validate.Validator;
 
 import org.w3c.dom.Element;
 
@@ -37,6 +41,8 @@ import javax.security.auth.callback.CallbackHandler;
 
 public class SAMLTokenProcessor implements Processor {
     private static Log log = LogFactory.getLog(SAMLTokenProcessor.class.getName());
+    
+    private Validator validator = new SignatureTrustValidator();
     
     public List<WSSecurityEngineResult> handleToken(
         Element elem, 
@@ -69,12 +75,20 @@ public class SAMLTokenProcessor implements Processor {
     ) throws WSSecurityException {
         AssertionWrapper assertion = new AssertionWrapper(token);
         if (assertion.isSigned()) {
-            assertion.verify(crypto);
+            SAMLKeyInfo samlKeyInfo = assertion.verify(crypto);
+            
+            // Now verify trust on the signature credential
+            validator.setCrypto(crypto);
+            Credential credential = new Credential();
+            credential.setPublicKey(samlKeyInfo.getPublicKey());
+            credential.setCertificates(samlKeyInfo.getCerts());
+            validator.validate(credential);
         }
         if (log.isDebugEnabled()) {
             log.debug("SAML Assertion issuer " + assertion.getIssuerString());
             log.debug(DOM2Writer.nodeToString(token));
         }
+        
         return assertion;
     }
 

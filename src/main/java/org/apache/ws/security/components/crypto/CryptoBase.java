@@ -995,6 +995,71 @@ public abstract class CryptoBase implements Crypto {
     }
     
     /**
+     * Evaluate whether a given public key should be trusted.
+     * Essentially, this amounts to checking to see if there is a certificate in the keystore
+     * or truststore, whose public key matches the transmitted public key.
+     * @param publicKey The PublicKey to be evaluated
+     * @return whether the PublicKey parameter is trusted or not
+     */
+    public boolean verifyTrust(PublicKey publicKey) throws WSSecurityException {
+        //
+        // If the public key is null, do not trust the signature
+        //
+        if (publicKey == null) {
+            return false;
+        }
+        
+        //
+        // Search the keystore for the transmitted public key (direct trust)
+        //
+        boolean trust = findPublicKeyInKeyStore(publicKey, keystore);
+        if (trust) {
+            return true;
+        } else {
+            //
+            // Now search the truststore for the transmitted public key (direct trust)
+            //
+            trust = findPublicKeyInKeyStore(publicKey, truststore);
+            if (trust) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    /**
+     * Find the Public Key in a keystore. 
+     */
+    private boolean findPublicKeyInKeyStore(PublicKey publicKey, KeyStore keyStoreToSearch) {
+        try {
+            for (Enumeration<String> e = keyStoreToSearch.aliases(); e.hasMoreElements();) {
+                String alias = e.nextElement();
+                Certificate[] certs = keyStoreToSearch.getCertificateChain(alias);
+                Certificate cert;
+                if (certs == null || certs.length == 0) {
+                    // no cert chain, so lets check if getCertificate gives us a result.
+                    cert = keyStoreToSearch.getCertificate(alias);
+                    if (cert == null) {
+                        continue;
+                    }
+                } else {
+                    cert = certs[0];
+                }
+                if (!(cert instanceof X509Certificate)) {
+                    continue;
+                }
+                X509Certificate x509cert = (X509Certificate) cert;
+                if (publicKey.equals(x509cert.getPublicKey())) {
+                    return true;
+                }
+            }
+        } catch (KeyStoreException e) {
+            return false;
+        }
+        return false;
+    }
+    
+    /**
      * Get all of the aliases of the X500Principal argument in the supplied KeyStore
      * @param subjectRDN either an X500Principal or a BouncyCastle X509Name instance.
      * @param store The KeyStore

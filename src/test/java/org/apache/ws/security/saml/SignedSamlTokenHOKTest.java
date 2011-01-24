@@ -145,61 +145,6 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
     }
     
     /**
-     * Test that creates, sends and processes a signed SAML 1.1 authentication assertion, where
-     * the configuration is loaded from a properties file
-     */
-    @org.junit.Test
-    @SuppressWarnings("unchecked")
-    public void testSAML1AuthnAssertionFromProperties() throws Exception {
-        SAMLIssuer saml = SAMLIssuerFactory.getInstance("saml_hok.properties");
-        AssertionWrapper assertion = saml.newAssertion();
-
-        WSSecSignatureSAML wsSign = new WSSecSignatureSAML();
-        wsSign.setUserInfo("wss40", "security");
-        wsSign.setDigestAlgo("http://www.w3.org/2001/04/xmlenc#sha256");
-        wsSign.setSignatureAlgorithm("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256");
-        wsSign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
-
-        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
-
-        Document signedDoc = 
-            wsSign.build(doc, userCrypto, assertion, null, null, null, secHeader);
-
-        String outputString = 
-            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Signed SAML 1.1 Authn Assertion (key holder):");
-            LOG.debug(outputString);
-        }
-        assertTrue(outputString.indexOf("http://www.w3.org/2001/04/xmlenc#sha256") != -1);
-        assertTrue(outputString.indexOf("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256") != -1);
-        
-        List<WSSecurityEngineResult> results = verify(signedDoc, trustCrypto);
-        
-        // Test we processed a SAML assertion
-        WSSecurityEngineResult actionResult =
-            WSSecurityUtil.fetchActionResult(results, WSConstants.ST_SIGNED);
-        AssertionWrapper receivedAssertion = 
-            (AssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-        assertTrue(receivedAssertion != null);
-        assert receivedAssertion.isSigned();
-        
-        // Test we processed a signature (SOAP body)
-        actionResult = WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
-        assertTrue(actionResult != null);
-        assertFalse(actionResult.isEmpty());
-        final List<WSDataRef> refs =
-            (List<WSDataRef>) actionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
-        assertTrue(refs.size() == 1);
-        
-        WSDataRef wsDataRef = (WSDataRef)refs.get(0);
-        String xpath = wsDataRef.getXpath();
-        assertEquals("/SOAP-ENV:Envelope/SOAP-ENV:Body", xpath);
-    }
-    
-    /**
      * Test that creates, sends and processes a signed SAML 1.1 attribute assertion.
      */
     @org.junit.Test
@@ -473,7 +418,6 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
         saml.setIssuerKeyName("wss40_server");
         saml.setIssuerKeyPassword("security");
         saml.setSignAssertion(true);
-        // saml.setSamlVersion("2.0");
         saml.setCallbackHandler(callbackHandler);
         AssertionWrapper assertion = saml.newAssertion();
 

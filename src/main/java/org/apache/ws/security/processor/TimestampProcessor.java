@@ -28,6 +28,9 @@ import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.message.token.Timestamp;
+import org.apache.ws.security.validate.Credential;
+import org.apache.ws.security.validate.TimestampValidator;
+import org.apache.ws.security.validate.Validator;
 import org.w3c.dom.Element;
 
 import java.util.List;
@@ -35,6 +38,7 @@ import javax.security.auth.callback.CallbackHandler;
 
 public class TimestampProcessor implements Processor {
     private static Log log = LogFactory.getLog(TimestampProcessor.class.getName());
+    private Validator validator = new TimestampValidator();
 
     public List<WSSecurityEngineResult> handleToken(
         Element elem, 
@@ -51,7 +55,11 @@ public class TimestampProcessor implements Processor {
         // Decode Timestamp, add the found time (created/expiry) to result
         //
         Timestamp timestamp = new Timestamp(elem);
-        handleTimestamp(timestamp, wsc);
+        Credential credential = new Credential();
+        credential.setTimestamp(timestamp);
+        validator.setWSSConfig(wsc);
+        validator.validate(credential);
+        
         WSSecurityEngineResult result = 
             new WSSecurityEngineResult(WSConstants.TS, timestamp);
         result.put(WSSecurityEngineResult.TAG_ID, timestamp.getID());
@@ -60,23 +68,4 @@ public class TimestampProcessor implements Processor {
         return java.util.Collections.singletonList(result);
     }
 
-    private void handleTimestamp(
-        Timestamp timestamp, 
-        WSSConfig wssConfig
-    ) throws WSSecurityException {
-        if (log.isDebugEnabled()) {
-            log.debug("Preparing to verify the timestamp");
-        }
-
-        // Validate whether the security semantics have expired
-        if ((wssConfig.isTimeStampStrict() && timestamp.isExpired()) 
-            || !timestamp.verifyCreated(wssConfig.getTimeStampTTL())) {
-            throw new WSSecurityException(
-                WSSecurityException.MESSAGE_EXPIRED,
-                "invalidTimestamp",
-                new Object[] {"The security semantics of the message have expired"}
-            );
-        }
-    }
-    
 }

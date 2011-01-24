@@ -25,7 +25,6 @@ import org.apache.ws.security.PublicKeyPrincipal;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSSecurityEngineResult;
-import org.apache.ws.security.common.PublicKeyCallbackHandler;
 import org.apache.ws.security.common.SOAPUtil;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
@@ -43,11 +42,6 @@ public class SignatureKeyValueTest extends org.junit.Assert {
     private static final Log LOG = LogFactory.getLog(SignatureKeyValueTest.class);
     private WSSecurityEngine secEngine = new WSSecurityEngine();
     private Crypto crypto = CryptoFactory.getInstance("wss40.properties");
-    private PublicKeyCallbackHandler callbackHandler = new PublicKeyCallbackHandler();
-
-    public SignatureKeyValueTest() {
-        callbackHandler.setKeyStore(crypto.getKeyStore());
-    }
 
     /**
      * Successful RSAKeyValue test.
@@ -158,7 +152,7 @@ public class SignatureKeyValueTest extends org.junit.Assert {
      * @throws java.lang.Exception Thrown when there is a problem in verification
      */
     private List<WSSecurityEngineResult> verify(Document doc) throws Exception {
-        return secEngine.processSecurityHeader(doc, null, callbackHandler, null);
+        return secEngine.processSecurityHeader(doc, null, null, crypto);
     }
     
 }

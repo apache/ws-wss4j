@@ -24,6 +24,7 @@ import java.io.InputStream;
 import java.math.BigInteger;
 import java.security.KeyStore;
 import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
@@ -268,6 +269,15 @@ public interface Crypto {
      * @throws WSSecurityException
      */
     public boolean validateCertPath(X509Certificate[] certs) throws WSSecurityException;
+    
+    /**
+     * Evaluate whether a given public key should be trusted.
+     * Essentially, this amounts to checking to see if there is a certificate in the keystore
+     * or truststore, whose public key matches the transmitted public key.
+     * @param publicKey The PublicKey to be evaluated
+     * @return whether the PublicKey parameter is trusted or not
+     */
+    public boolean verifyTrust(PublicKey publicKey) throws WSSecurityException;
 
     /**
      * Lookup X509 Certificates in the keystore according to a given DN of the subject of the certificate

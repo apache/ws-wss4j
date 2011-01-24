@@ -47,15 +47,7 @@ public class KeystoreCallbackHandler implements CallbackHandler {
         for (int i = 0; i < callbacks.length; i++) {
             if (callbacks[i] instanceof WSPasswordCallback) {
                 WSPasswordCallback pc = (WSPasswordCallback) callbacks[i];
-                switch (pc.getUsage()) {
-                case WSPasswordCallback.CUSTOM_TOKEN:
-                case WSPasswordCallback.DECRYPT: {
-                    pc.setPassword(users.get(pc.getIdentifier()));
-                    break;
-                }
-                default:
-                    throw new IOException("Authentication failed");
-                }
+                pc.setPassword(users.get(pc.getIdentifier()));
             } else {
                 throw new UnsupportedCallbackException(callbacks[i], "Unrecognized Callback");
             }
