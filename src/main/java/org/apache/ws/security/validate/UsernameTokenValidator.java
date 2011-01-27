@@ -36,8 +36,8 @@ import org.apache.ws.security.message.token.UsernameToken;
 import org.apache.ws.security.util.Base64;
 
 /**
- * This interface describes a pluggable way of validating credentials that have been extracted
- * by the processors.
+ * This class validates a processed UsernameToken, extracted from the Credential passed to
+ * the validate method.
  */
 public class UsernameTokenValidator implements Validator {
     
@@ -46,24 +46,38 @@ public class UsernameTokenValidator implements Validator {
     private WSSConfig wssConfig;
     private CallbackHandler callbackHandler;
     
+    /**
+     * Validate the credential argument. It must contain a non-null UsernameToken. A 
+     * CallbackHandler implementation is also required to be set.
+     * 
+     * If the password type is either digest or plaintext, or if the password is not
+     * null and the password type is null or empty, it extracts a password from the 
+     * CallbackHandler and then compares the passwords appropriately.
+     * 
+     * If the password type is non-standard, or if the password is null, it delegates
+     * the authentication to the CallbackHandler.
+     * 
+     * @param credential the Credential to be validated
+     * @throws WSSecurityException on a failed validation
+     */
     public void validate(Credential credential) throws WSSecurityException {
-        if (credential == null) {
-            throw new WSSecurityException("Credential cannot be null");
-        }
-        if (wssConfig == null) {
-            throw new WSSecurityException("WSSConfig cannot be null");
+        if (credential == null || credential.getUsernametoken() == null) {
+            throw new WSSecurityException(WSSecurityException.FAILURE, "noCredential");
         }
         if (callbackHandler == null) {
             throw new WSSecurityException(WSSecurityException.FAILURE, "noCallback");
         }
         
-        boolean handleCustomPasswordTypes = wssConfig.getHandleCustomPasswordTypes();
-        boolean passwordsAreEncoded = wssConfig.getPasswordsAreEncoded();
+        boolean handleCustomPasswordTypes = false;
+        boolean passwordsAreEncoded = false;
+        String requiredPasswordType = null;
+        if (wssConfig != null) {
+            handleCustomPasswordTypes = wssConfig.getHandleCustomPasswordTypes();
+            passwordsAreEncoded = wssConfig.getPasswordsAreEncoded();
+            requiredPasswordType = wssConfig.getRequiredPasswordType();
+        }
         
         UsernameToken usernameToken = credential.getUsernametoken();
-        if (usernameToken == null) {
-            throw new WSSecurityException("Username Token cannot be null");
-        }
         usernameToken.setPasswordsAreEncoded(passwordsAreEncoded);
         
         String user = usernameToken.getName();
@@ -76,7 +90,6 @@ public class UsernameTokenValidator implements Validator {
             log.debug("UsernameToken password type " + pwType);
         }
         
-        String requiredPasswordType = wssConfig.getRequiredPasswordType();
         if (requiredPasswordType != null && !requiredPasswordType.equals(pwType)) {
             if (log.isDebugEnabled()) {
                 log.debug("Authentication failed as the received password type does not " 
@@ -84,7 +97,6 @@ public class UsernameTokenValidator implements Validator {
             }
             throw new WSSecurityException(WSSecurityException.FAILED_AUTHENTICATION);
         }
-        
         
         //
         // If the UsernameToken is hashed or plaintext, then retrieve the password from the
@@ -167,14 +179,29 @@ public class UsernameTokenValidator implements Validator {
         
     }
     
+    /**
+     * Set a WSSConfig instance used to extract configured options used to 
+     * validate credentials. This is optional for this implementation.
+     * @param wssConfig a WSSConfig instance
+     */
     public void setWSSConfig(WSSConfig wssConfig) {
         this.wssConfig = wssConfig;
     }
     
+    /**
+     * Set a Crypto instance used to validate credentials. This method is not currently
+     * used for this implementation.
+     * @param crypto a Crypto instance used to validate credentials
+     */
     public void setCrypto(Crypto crypto) {
         //
     }
     
+    /**
+     * Set a CallbackHandler instance used to validate credentials. This is required for
+     * this implementation.
+     * @param callbackHandler a CallbackHandler instance used to validate credentials
+     */
     public void setCallbackHandler(CallbackHandler callbackHandler) {
         this.callbackHandler = callbackHandler;
     }

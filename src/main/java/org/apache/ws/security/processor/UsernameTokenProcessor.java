@@ -70,16 +70,7 @@ public class UsernameTokenProcessor implements Processor {
     }
 
     /**
-     * Check the UsernameToken element. If the password type is plaintext or digested, 
-     * then retrieve a password from the callback handler and authenticate the UsernameToken
-     * here.
-     * <p/>
-     * If the password is any other yet unknown password type then delegate the password
-     * validation to the callback class. Note that for unknown password types an exception
-     * is thrown if WSSConfig.getHandleCustomPasswordTypes() is set to false (as it is 
-     * by default). The security engine hands over all necessary data to the callback class
-     * via the WSPasswordCallback object. The usage parameter of WSPasswordCallback is set to
-     * <code>USERNAME_TOKEN_UNKNOWN</code>.
+     * Check the UsernameToken element and validate it.
      *
      * @param token the DOM element that contains the UsernameToken
      * @param wssConfig The WSSConfig object from which to obtain configuration

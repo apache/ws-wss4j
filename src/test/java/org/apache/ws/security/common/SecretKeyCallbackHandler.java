@@ -55,8 +55,6 @@ public class SecretKeyCallbackHandler implements CallbackHandler {
                     pc.setKey(outboundSecret);
                     break;
                 }
-                default:
-                    throw new IOException("Authentication failed");
                 }
             } else {
                 throw new UnsupportedCallbackException(callbacks[i], "Unrecognized Callback");

@@ -60,8 +60,6 @@ public class UsernamePasswordCallbackHandler implements CallbackHandler {
                     }
                     break;
                 }
-                default:
-                    throw new IOException("Authentication failed");
                 }
             } else {
                 throw new UnsupportedCallbackException(callbacks[i], "Unrecognized Callback");

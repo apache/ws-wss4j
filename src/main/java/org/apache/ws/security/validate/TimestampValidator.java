@@ -27,28 +27,38 @@ import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.message.token.Timestamp;
 
 /**
- * This interface describes a pluggable way of validating credentials that have been extracted
- * by the processors.
+ * This class validates a processed Timestamp, extracted from the Credential passed to
+ * the validate method.
  */
 public class TimestampValidator implements Validator {
     
     private WSSConfig wssConfig;
     
+    /**
+     * Validate the credential argument. It must contain a non-null Timestamp.
+     * 
+     * @param credential the Credential to be validated
+     * @throws WSSecurityException on a failed validation
+     */
     public void validate(Credential credential) throws WSSecurityException {
-        if (credential == null) {
-            throw new WSSecurityException("Credential cannot be null");
-        }
-        Timestamp timeStamp = credential.getTimestamp();
-        if (timeStamp == null) {
-            throw new WSSecurityException(WSSecurityException.MESSAGE_EXPIRED, "invalidTimestamp");
+        if (credential == null || credential.getTimestamp() == null) {
+            throw new WSSecurityException(WSSecurityException.FAILURE, "noCredential");
         }
         if (wssConfig == null) {
             throw new WSSecurityException("WSSConfig cannot be null");
         }
         
+        boolean timeStampStrict = true;
+        int timeStampTTL = 300;
+        if (wssConfig != null) {
+            timeStampStrict = wssConfig.isTimeStampStrict();
+            timeStampTTL = wssConfig.getTimeStampTTL();
+        }
+        
+        Timestamp timeStamp = credential.getTimestamp();
         // Validate whether the security semantics have expired
-        if ((wssConfig.isTimeStampStrict() && timeStamp.isExpired()) 
-            || !timeStamp.verifyCreated(wssConfig.getTimeStampTTL())) {
+        if ((timeStampStrict && timeStamp.isExpired()) 
+            || !timeStamp.verifyCreated(timeStampTTL)) {
             throw new WSSecurityException(
                 WSSecurityException.MESSAGE_EXPIRED,
                 "invalidTimestamp",
@@ -57,14 +67,29 @@ public class TimestampValidator implements Validator {
         }
     }
     
+    /**
+     * Set a WSSConfig instance used to extract configured options used to 
+     * validate credentials. This is optional for this implementation.
+     * @param wssConfig a WSSConfig instance
+     */
     public void setWSSConfig(WSSConfig wssConfig) {
         this.wssConfig = wssConfig;
     }
     
+    /**
+     * Set a Crypto instance used to validate credentials. This method is not currently
+     * used for this implementation.
+     * @param crypto a Crypto instance used to validate credentials
+     */
     public void setCrypto(Crypto crypto) {
         //
     }
     
+    /**
+     * Set a CallbackHandler instance used to validate credentials. This method is not 
+     * currently used for this implementation.
+     * @param callbackHandler a CallbackHandler instance used to validate credentials
+     */
     public void setCallbackHandler(CallbackHandler callbackHandler) {
         //
     }

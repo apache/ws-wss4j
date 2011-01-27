@@ -31,12 +31,30 @@ import org.apache.ws.security.components.crypto.Crypto;
  */
 public interface Validator {
     
+    /**
+     * Validate the credential argument. 
+     * @param credential the Credential to be validated
+     * @throws WSSecurityException on a failed validation
+     */
     public void validate(Credential credential) throws WSSecurityException;
     
+    /**
+     * Set a Crypto instance used to validate credentials
+     * @param crypto a Crypto instance used to validate credentials
+     */
     public void setCrypto(Crypto crypto);
     
+    /**
+     * Set a CallbackHandler instance used to validate credentials
+     * @param callbackHandler a CallbackHandler instance used to validate credentials
+     */
     public void setCallbackHandler(CallbackHandler callbackHandler);
     
+    /**
+     * Set a WSSConfig instance used to extract configured options used to 
+     * validate credentials
+     * @param wssConfig a WSSConfig instance
+     */
     public void setWSSConfig(WSSConfig wssConfig);
     
 }

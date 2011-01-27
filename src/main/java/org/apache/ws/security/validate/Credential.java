@@ -26,7 +26,8 @@ import org.apache.ws.security.message.token.Timestamp;
 import org.apache.ws.security.message.token.UsernameToken;
 
 /**
- * This interface describes an abstract concept of a Credential to be validated.
+ * This class stores various Credential types that have to be validated by a Validator
+ * implementation.
  */
 public class Credential {
     
@@ -35,34 +36,66 @@ public class Credential {
     private Timestamp timestamp;
     private UsernameToken usernametoken;
     
+    /**
+     * Set a PublicKey to be validated
+     * @param publicKey a PublicKey to be validated
+     */
     public void setPublicKey(PublicKey publicKey) {
         this.publicKey = publicKey;
     }
     
+    /**
+     * Get a PublicKey to be validated
+     * @return a PublicKey to be validated
+     */
     public PublicKey getPublicKey() {
         return publicKey;
     }
     
+    /**
+     * Set an X509Certificate chain to be validated
+     * @param certs an X509Certificate chain to be validated
+     */
     public void setCertificates(X509Certificate[] certs) {
         this.certs = certs;
     }
     
+    /**
+     * Get an X509Certificate chain to be validated
+     * @return an X509Certificate chain to be validated
+     */
     public X509Certificate[] getCertificates() {
         return certs;
     }
     
+    /**
+     * Set a Timestamp to be validated
+     * @param timestamp a Timestamp to be validated
+     */
     public void setTimestamp(Timestamp timestamp) {
         this.timestamp = timestamp;
     }
     
+    /**
+     * Get a Timestamp to be validated
+     * @return a Timestamp to be validated
+     */
     public Timestamp getTimestamp() {
         return timestamp;
     }
     
+    /**
+     * Set a UsernameToken to be validated
+     * @param usernametoken a UsernameToken to be validated
+     */
     public void setUsernametoken(UsernameToken usernametoken) {
         this.usernametoken = usernametoken;
     }
     
+    /**
+     * Get a UsernameToken to be validated
+     * @return a UsernameToken to be validated
+     */
     public UsernameToken getUsernametoken() {
         return usernametoken;
     }

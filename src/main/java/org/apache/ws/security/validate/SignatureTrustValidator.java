@@ -34,22 +34,32 @@ import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
 
 /**
- * This interface describes a pluggable way of validating credentials that have been extracted
- * by the processors.
+ * This class verifies trust in a credential used to verify a signature, which is extracted
+ * from the Credential passed to the validate method.
  */
 public class SignatureTrustValidator implements Validator {
     
     private static Log LOG = LogFactory.getLog(SignatureTrustValidator.class.getName());
     private Crypto crypto;
     
+    /**
+     * Validate the credential argument. It must contain a non-null X509Certificate chain
+     * or a PublicKey. A Crypto implementation is also required to be set.
+     * 
+     * This implementation first attempts to verify trust on the certificate (chain). If
+     * this is not successful, then it will attempt to verify trust on the Public Key.
+     * 
+     * @param credential the Credential to be validated
+     * @throws WSSecurityException on a failed validation
+     */
     public void validate(Credential credential) throws WSSecurityException {
         if (credential == null) {
-            throw new WSSecurityException("Credential cannot be null");
+            throw new WSSecurityException(WSSecurityException.FAILURE, "noCredential");
         }
         X509Certificate[] certs = credential.getCertificates();
         PublicKey publicKey = credential.getPublicKey();
         if (crypto == null) {
-            throw new WSSecurityException("Crypto instance cannot be null");
+            throw new WSSecurityException(WSSecurityException.FAILURE, "noSigCryptoFile");
         }
         
         if (certs != null && certs.length > 0) {
@@ -70,17 +80,32 @@ public class SignatureTrustValidator implements Validator {
                 return;
             }
         }
-        throw new WSSecurityException(WSSecurityException.FAILED_AUTHENTICATION, null);
+        throw new WSSecurityException(WSSecurityException.FAILED_AUTHENTICATION);
     }
     
+    /**
+     * Set a WSSConfig instance used to extract configured options used to 
+     * validate credentials. This method is not currently used for this implementation.
+     * @param wssConfig a WSSConfig instance
+     */
     public void setWSSConfig(WSSConfig wssConfig) {
         //
     }
     
+    /**
+     * Set a Crypto instance used to validate credentials. This is required for this
+     * implementation.
+     * @param crypto a Crypto instance used to validate credentials
+     */
     public void setCrypto(Crypto crypto) {
         this.crypto = crypto;
     }
     
+    /**
+     * Set a CallbackHandler instance used to validate credentials. This method is not 
+     * currently used for this implementation.
+     * @param callbackHandler a CallbackHandler instance used to validate credentials
+     */
     public void setCallbackHandler(CallbackHandler callbackHandler) {
         //
     }

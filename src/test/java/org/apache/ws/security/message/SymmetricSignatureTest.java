@@ -137,6 +137,7 @@ public class SymmetricSignatureTest extends org.junit.Assert implements Callback
         );
 
         Document signedDoc = sign.build(doc, crypto, secHeader);
+        encrKey.prependToHeader(secHeader);
         
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed symmetric message DR:");
@@ -144,6 +145,8 @@ public class SymmetricSignatureTest extends org.junit.Assert implements Callback
                 org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
+        
+        verify(signedDoc);
     }
 
     /**
