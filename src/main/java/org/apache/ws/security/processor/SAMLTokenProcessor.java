@@ -55,7 +55,7 @@ public class SAMLTokenProcessor implements Processor {
         if (log.isDebugEnabled()) {
             log.debug("Found SAML Assertion element");
         }
-        AssertionWrapper assertion = handleSAMLToken(elem, crypto);
+        AssertionWrapper assertion = handleSAMLToken(elem, crypto, cb);
         wsDocInfo.addTokenElement(elem);
         WSSecurityEngineResult result = null;
         if (assertion.isSigned()) {
@@ -71,15 +71,18 @@ public class SAMLTokenProcessor implements Processor {
 
     public AssertionWrapper handleSAMLToken(
         Element token, 
-        Crypto crypto
+        Crypto crypto,
+        CallbackHandler cb
     ) throws WSSecurityException {
         AssertionWrapper assertion = new AssertionWrapper(token);
         if (assertion.isSigned()) {
-            SAMLKeyInfo samlKeyInfo = assertion.verify(crypto);
+            assertion.verifySignature(crypto);
+            assertion.parseHOKSubject(crypto, cb);
             
             // Now verify trust on the signature credential
             validator.setCrypto(crypto);
             Credential credential = new Credential();
+            SAMLKeyInfo samlKeyInfo = assertion.getSignatureKeyInfo();
             credential.setPublicKey(samlKeyInfo.getPublicKey());
             credential.setCertificates(samlKeyInfo.getCerts());
             validator.validate(credential);

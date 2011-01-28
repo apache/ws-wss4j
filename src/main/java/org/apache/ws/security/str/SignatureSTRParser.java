@@ -120,13 +120,14 @@ public class SignatureSTRParser implements STRParser {
                                 WSSecurityException.FAILURE, "noSigCryptoFile"
                         );
                     }
-                    SAMLKeyInfo samlKi = SAMLUtil.getCredentialFromSubject(token, crypto, cb);
+                    AssertionWrapper assertion = new AssertionWrapper(token);
+                    SAMLKeyInfo samlKi = SAMLUtil.getCredentialFromSubject(assertion, crypto, cb);
                     X509Certificate[] foundCerts = samlKi.getCerts();
                     if (foundCerts != null) {
                         certs = new X509Certificate[]{foundCerts[0]};
                     }
                     secretKey = samlKi.getSecret();
-                    principal = createPrincipalFromSAMLKeyInfo(samlKi);
+                    principal = createPrincipalFromSAMLKeyInfo(samlKi, assertion);
                 } else if (el.equals(WSSecurityEngine.ENCRYPTED_KEY)){
                     EncryptedKeyProcessor proc = 
                         new EncryptedKeyProcessor();
@@ -189,15 +190,14 @@ public class SignatureSTRParser implements STRParser {
                     }
                     AssertionWrapper assertion = 
                         (AssertionWrapper)result.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-                    SAMLKeyInfo keyInfo = 
-                        SAMLUtil.getCredentialFromSubject(assertion, crypto, cb);
+                    SAMLKeyInfo keyInfo = assertion.getSubjectKeyInfo();
                     X509Certificate[] foundCerts = keyInfo.getCerts();
                     if (foundCerts != null) {
                         certs = new X509Certificate[]{foundCerts[0]};
                     }
                     secretKey = keyInfo.getSecret();
                     publicKey = keyInfo.getPublicKey();
-                    principal = createPrincipalFromSAMLKeyInfo(keyInfo);
+                    principal = createPrincipalFromSAMLKeyInfo(keyInfo, assertion);
                 }
             }
         } else if (secRef.containsX509Data() || secRef.containsX509IssuerSerial()) {
@@ -212,17 +212,18 @@ public class SignatureSTRParser implements STRParser {
                 principal = new CustomTokenPrincipal(id);
             } else if (WSConstants.WSS_SAML_KI_VALUE_TYPE.equals(secRef.getKeyIdentifierValueType())
                 || WSConstants.WSS_SAML2_KI_VALUE_TYPE.equals(secRef.getKeyIdentifierValueType())) {
-                SAMLKeyInfo samlKi = 
-                    SAMLUtil.getSamlKeyInfoFromKeyIdentifier(
+                AssertionWrapper assertion = 
+                    SAMLUtil.getAssertionFromKeyIdentifier(
                         secRef, strElement, crypto, cb, wsDocInfo
                     );
+                SAMLKeyInfo samlKi = SAMLUtil.getCredentialFromSubject(assertion, crypto, cb);
                 X509Certificate[] foundCerts = samlKi.getCerts();
                 if (foundCerts != null) {
                     certs = new X509Certificate[]{foundCerts[0]};
                 }
                 secretKey = samlKi.getSecret();
                 publicKey = samlKi.getPublicKey();
-                principal = createPrincipalFromSAMLKeyInfo(samlKi);
+                principal = createPrincipalFromSAMLKeyInfo(samlKi, assertion);
             } else {
                 X509Certificate[] foundCerts = secRef.getKeyIdentifier(crypto);
                 if (foundCerts != null) {
@@ -328,17 +329,18 @@ public class SignatureSTRParser implements STRParser {
     /**
      * A method to create a Principal from a SAML KeyInfo
      * @param samlKeyInfo The SAML KeyInfo object
+     * @param assertion An AssertionWrapper object
      * @return A principal
      */
     private static Principal createPrincipalFromSAMLKeyInfo(
-        SAMLKeyInfo samlKeyInfo
+        SAMLKeyInfo samlKeyInfo,
+        AssertionWrapper assertion
     ) {
         X509Certificate[] samlCerts = samlKeyInfo.getCerts();
         Principal principal = null;
         if (samlCerts != null && samlCerts.length > 0) {
             principal = samlCerts[0].getSubjectX500Principal();
         } else {
-            final AssertionWrapper assertion = samlKeyInfo.getAssertion();
             principal = new CustomTokenPrincipal(assertion.getId());
             ((CustomTokenPrincipal)principal).setTokenObject(assertion);
         }

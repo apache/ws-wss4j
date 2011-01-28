@@ -196,6 +196,18 @@ public class OpenSAMLUtil {
             confirmMethod != null && confirmMethod.startsWith("urn:oasis:names:tc:SAML:") 
                 && confirmMethod.endsWith(":cm:sender-vouches");
     }
+    
+    /**
+     * Method isMethodHolderOfKey ...
+     *
+     * @param confirmMethod of type String
+     * @return boolean
+     */
+    public static boolean isMethodHolderOfKey(String confirmMethod) {
+        return 
+            confirmMethod != null && confirmMethod.startsWith("urn:oasis:names:tc:SAML:") 
+                && confirmMethod.endsWith(":cm:holder-of-key");
+    }
 
     /**
      * Validate the conditions

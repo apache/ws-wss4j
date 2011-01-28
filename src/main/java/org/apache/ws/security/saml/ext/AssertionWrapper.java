@@ -105,6 +105,16 @@ public class AssertionWrapper {
      * The Assertion as a DOM element
      */
     private Element assertionElement;
+    
+    /**
+     * The SAMLKeyInfo object associated with the Subject KeyInfo
+     */
+    private SAMLKeyInfo subjectKeyInfo;
+    
+    /**
+     * The SAMLKeyInfo object associated with the Signature on the Assertion
+     */
+    private SAMLKeyInfo signatureKeyInfo;
 
     /**
      * Constructor AssertionWrapper creates a new AssertionWrapper instance.
@@ -510,10 +520,9 @@ public class AssertionWrapper {
     /**
      * Verify the signature of this assertion
      *
-     * @return the SAMLKeyInfo structure containing the credentials used to verify the signature
      * @throws ValidationException
      */
-    public SAMLKeyInfo verify(Crypto crypto) throws WSSecurityException {
+    public void verifySignature(Crypto crypto) throws WSSecurityException {
         Signature sig = null;
         if (saml2 != null && saml2.getSignature() != null) {
             sig = saml2.getSignature();
@@ -554,11 +563,34 @@ public class AssertionWrapper {
             } catch (ValidationException ex) {
                 throw new WSSecurityException("SAML signature validation failed", ex);
             }
-            return samlKeyInfo;
+            signatureKeyInfo = samlKeyInfo;
         } else {
             log.debug("AssertionWrapper: no signature to validate");
         }
-        return null;
+    }
+    
+    /**
+     * This method ensures that the Subject contains a KeyInfo for the holder-of-key confirmation
+     * method, as required by the SAML Token spec. It then stores the SAMLKeyInfo object that
+     * has been obtained for future processing by the SignatureProcessor.
+     * @throws WSSecurityException
+     */
+    public void parseHOKSubject(Crypto crypto, CallbackHandler cb) throws WSSecurityException {
+        String confirmMethod = null;
+        List<String> methods = getConfirmationMethods();
+        if (methods != null && methods.size() > 0) {
+            confirmMethod = methods.get(0);
+        }
+        if (OpenSAMLUtil.isMethodHolderOfKey(confirmMethod)) {
+            if (saml1 != null) {
+                subjectKeyInfo = SAMLUtil.getCredentialFromSubject(saml1, crypto, cb);
+            } else if (saml2 != null) {
+                subjectKeyInfo = SAMLUtil.getCredentialFromSubject(saml2, crypto, cb);
+            }
+            if (subjectKeyInfo == null) {
+                throw new WSSecurityException(WSSecurityException.FAILURE, "noKeyInSAMLToken");
+            }
+        }
     }
     
 
@@ -610,6 +642,22 @@ public class AssertionWrapper {
      */
     public Element getElement() {
         return assertionElement;
+    }
+    
+    /**
+     * Get the SAMLKeyInfo associated with the signature of the assertion
+     * @return the SAMLKeyInfo associated with the signature of the assertion
+     */
+    public SAMLKeyInfo getSignatureKeyInfo() {
+        return signatureKeyInfo;
+    }
+    
+    /**
+     * Get the SAMLKeyInfo associated with the Subject KeyInfo
+     * @return the SAMLKeyInfo associated with the Subject KeyInfo
+     */
+    public SAMLKeyInfo getSubjectKeyInfo() {
+        return subjectKeyInfo;
     }
 
 }

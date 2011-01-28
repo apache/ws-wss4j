@@ -57,7 +57,7 @@ import java.util.List;
 public class SAMLUtil {
 
     /**
-     * Get a SAMLKeyInfo object from parsing a SecurityTokenReference that uses
+     * Get an AssertionWrapper object from parsing a SecurityTokenReference that uses
      * a KeyIdentifier that points to a SAML Assertion.
      * 
      * @param secRef the SecurityTokenReference to the SAML Assertion
@@ -65,10 +65,10 @@ public class SAMLUtil {
      * @param crypto The Crypto instance to use to obtain certificates
      * @param cb The CallbackHandler instance used for secret keys
      * @param wsDocInfo The WSDocInfo object that holds previous results
-     * @return a SAMLKeyInfo object
+     * @return an AssertionWrapper object
      * @throws WSSecurityException
      */
-    public static SAMLKeyInfo getSamlKeyInfoFromKeyIdentifier(
+    public static AssertionWrapper getAssertionFromKeyIdentifier(
         SecurityTokenReference secRef,
         Element strElement,
         Crypto crypto,
@@ -83,38 +83,14 @@ public class SAMLUtil {
         if (result != null) {
             assertion = 
                 (AssertionWrapper)result.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+            return assertion;
         } else {
             token = 
                 secRef.getKeyIdentifierTokenElement(
                     strElement.getOwnerDocument(), wsDocInfo, cb
                 );
+            return new AssertionWrapper(token);
         }
-
-        if (crypto == null) {
-            throw new WSSecurityException(
-                WSSecurityException.FAILURE, "noSigCryptoFile"
-            );
-        }
-        if (assertion == null) {
-            return SAMLUtil.getCredentialFromSubject(token, crypto, cb);
-        } else {
-            return SAMLUtil.getCredentialFromSubject(assertion, crypto, cb);
-        }
-    }
-    
-    /**
-     * Parse a SAML Assertion as a DOM element to obtain a SAMLKeyInfo object from
-     * the Subject of the assertion
-     * 
-     * @param elem The SAML Assertion as a DOM element
-     * @return a SAMLKeyInfo object
-     * @throws WSSecurityException
-     */
-    public static SAMLKeyInfo getCredentialFromSubject(
-        Element elem, Crypto crypto, CallbackHandler cb
-    ) throws WSSecurityException {
-        AssertionWrapper assertion = new AssertionWrapper(elem);
-        return getCredentialFromSubject(assertion, crypto, cb);
     }
     
     /**
@@ -130,38 +106,35 @@ public class SAMLUtil {
     public static SAMLKeyInfo getCredentialFromSubject(
         AssertionWrapper assertion, Crypto crypto, CallbackHandler cb
     ) throws WSSecurityException {
-        // First ask the cb whether it can provide the secret
+        if (assertion.getSaml1() != null) {
+            return getCredentialFromSubject(assertion.getSaml1(), crypto, cb);
+        } else {
+            return getCredentialFromSubject(assertion.getSaml2(), crypto, cb);
+        }
+    }
+    
+    /**
+     * Try to get the secret key from a CallbackHandler implementation
+     * @param cb a CallbackHandler implementation
+     * @return An array of bytes corresponding to the secret key (can be null)
+     * @throws WSSecurityException
+     */
+    private static byte[] getSecretKeyFromCallbackHandler(
+        String id,
+        CallbackHandler cb
+    ) throws WSSecurityException {
         if (cb != null) {
             WSPasswordCallback pwcb = 
-                new WSPasswordCallback(assertion.getId(), WSPasswordCallback.CUSTOM_TOKEN);
+                new WSPasswordCallback(id, WSPasswordCallback.CUSTOM_TOKEN);
             try {
                 cb.handle(new Callback[]{pwcb});
             } catch (Exception e1) {
                 throw new WSSecurityException(WSSecurityException.FAILURE, "noKey",
-                        new Object[] { assertion.getId() }, e1);
+                        new Object[] { id }, e1);
             }
-            byte[] key = pwcb.getKey();
-            if (key != null) {
-                return new SAMLKeyInfo(assertion, key);
-            }
+            return pwcb.getKey();
         }
-        
-        SAMLKeyInfo samlKeyInfo = null;
-        if (assertion.getSaml1() != null) {
-            samlKeyInfo = getCredentialFromSubject(assertion.getSaml1(), crypto, cb);
-        } else {
-            samlKeyInfo = getCredentialFromSubject(assertion.getSaml2(), crypto, cb);
-        }
-        
-        if (samlKeyInfo != null) {
-            samlKeyInfo.setAssertion(assertion);
-            return samlKeyInfo;
-        } else {
-            throw new WSSecurityException(
-                WSSecurityException.FAILURE, "invalidSAMLsecurity",
-                new Object[]{"cannot get certificate or key"}
-            );
-        }
+        return null;
     }
     
     /**
@@ -173,11 +146,17 @@ public class SAMLUtil {
      * @return The SAMLKeyInfo object obtained from the Subject
      * @throws WSSecurityException
      */
-    private static SAMLKeyInfo getCredentialFromSubject(
+    public static SAMLKeyInfo getCredentialFromSubject(
         org.opensaml.saml1.core.Assertion assertion,
         Crypto crypto,
         CallbackHandler cb
     ) throws WSSecurityException {
+        // First try to get the credential from a CallbackHandler
+        byte[] key = getSecretKeyFromCallbackHandler(assertion.getID(), cb);
+        if (key != null && key.length > 0) {
+            return new SAMLKeyInfo(key);
+        }
+        
         for (org.opensaml.saml1.core.Statement stmt : assertion.getStatements()) {
             org.opensaml.saml1.core.Subject samlSubject = null;
             if (stmt instanceof org.opensaml.saml1.core.AttributeStatement) {
@@ -205,7 +184,9 @@ public class SAMLUtil {
             Element sub = samlSubject.getSubjectConfirmation().getDOM();
             Element keyInfoElement = 
                 WSSecurityUtil.getDirectChildElement(sub, "KeyInfo", WSConstants.SIG_NS);
-            return getCredentialFromKeyInfo(keyInfoElement, crypto, cb);
+            if (keyInfoElement != null) {
+                return getCredentialFromKeyInfo(keyInfoElement, crypto, cb);
+            }
         }
 
         return null;
@@ -220,11 +201,17 @@ public class SAMLUtil {
      * @return The SAMLKeyInfo object obtained from the Subject
      * @throws WSSecurityException
      */
-    private static SAMLKeyInfo getCredentialFromSubject(
+    public static SAMLKeyInfo getCredentialFromSubject(
         org.opensaml.saml2.core.Assertion assertion,
         Crypto crypto,
         CallbackHandler cb
     ) throws WSSecurityException {
+        // First try to get the credential from a CallbackHandler
+        byte[] key = getSecretKeyFromCallbackHandler(assertion.getID(), cb);
+        if (key != null && key.length > 0) {
+            return new SAMLKeyInfo(key);
+        }
+        
         org.opensaml.saml2.core.Subject samlSubject = assertion.getSubject();
         if (samlSubject == null) {
             throw new WSSecurityException(
@@ -277,10 +264,10 @@ public class SAMLUtil {
                         (byte[])result.get(0).get(
                             WSSecurityEngineResult.TAG_SECRET
                         );
-                    return new SAMLKeyInfo(null, secret);
+                    return new SAMLKeyInfo(secret);
                 } else if (el.equals(new QName(WSConstants.WST_NS, "BinarySecret"))) {
                     Text txt = (Text)node.getFirstChild();
-                    return new SAMLKeyInfo(null, Base64.decode(txt.getData()));
+                    return new SAMLKeyInfo(Base64.decode(txt.getData()));
                 }
             }
             node = node.getNextSibling();
@@ -303,7 +290,7 @@ public class SAMLUtil {
                 XMLStructure xmlStructure = (XMLStructure) list.get(i);
                 if (xmlStructure instanceof KeyValue) {
                     PublicKey publicKey = ((KeyValue)xmlStructure).getPublicKey();
-                    return new SAMLKeyInfo(null, publicKey);
+                    return new SAMLKeyInfo(publicKey);
                 } else if (xmlStructure instanceof X509Data) {
                     List<?> x509Data = ((X509Data)xmlStructure).getContent();
                     for (int j = 0; j < x509Data.size(); j++) {
@@ -311,7 +298,7 @@ public class SAMLUtil {
                         if (x509obj instanceof X509Certificate) {
                             certs = new X509Certificate[1];
                             certs[0] = (X509Certificate)x509obj;
-                            return new SAMLKeyInfo(null, certs);
+                            return new SAMLKeyInfo(certs);
                         } else if (x509obj instanceof X509IssuerSerial) {
                             String alias = 
                                 crypto.getAliasForX509Cert(
@@ -325,7 +312,7 @@ public class SAMLUtil {
                                 );
                             }
                             certs = crypto.getCertificates(alias);
-                            return new SAMLKeyInfo(null, certs);
+                            return new SAMLKeyInfo(certs);
                         }
                     }
                 }

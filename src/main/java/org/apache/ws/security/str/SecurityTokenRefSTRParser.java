@@ -131,10 +131,11 @@ public class SecurityTokenRefSTRParser implements STRParser {
         } else if (secRef.containsKeyIdentifier()){
             if (WSConstants.WSS_SAML_KI_VALUE_TYPE.equals(secRef.getKeyIdentifierValueType())
                 || WSConstants.WSS_SAML2_KI_VALUE_TYPE.equals(secRef.getKeyIdentifierValueType())) { 
-                SAMLKeyInfo samlKi = 
-                    SAMLUtil.getSamlKeyInfoFromKeyIdentifier(
+                AssertionWrapper assertion = 
+                    SAMLUtil.getAssertionFromKeyIdentifier(
                         secRef, strElement, crypto, cb, wsDocInfo
                     );
+                SAMLKeyInfo samlKi = SAMLUtil.getCredentialFromSubject(assertion, crypto, cb);
                 // TODO Handle malformed SAML tokens where they don't have the 
                 // secret in them
                 secretKey = samlKi.getSecret();
