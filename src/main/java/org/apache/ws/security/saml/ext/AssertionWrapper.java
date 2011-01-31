@@ -570,7 +570,7 @@ public class AssertionWrapper {
     }
     
     /**
-     * This method ensures that the Subject contains a KeyInfo for the holder-of-key confirmation
+     * This method parse the KeyInfo of the Subject for the holder-of-key confirmation
      * method, as required by the SAML Token spec. It then stores the SAMLKeyInfo object that
      * has been obtained for future processing by the SignatureProcessor.
      * @throws WSSecurityException
@@ -586,9 +586,6 @@ public class AssertionWrapper {
                 subjectKeyInfo = SAMLUtil.getCredentialFromSubject(saml1, crypto, cb);
             } else if (saml2 != null) {
                 subjectKeyInfo = SAMLUtil.getCredentialFromSubject(saml2, crypto, cb);
-            }
-            if (subjectKeyInfo == null) {
-                throw new WSSecurityException(WSSecurityException.FAILURE, "noKeyInSAMLToken");
             }
         }
     }

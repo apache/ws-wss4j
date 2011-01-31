@@ -27,11 +27,10 @@ import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
-import org.apache.ws.security.saml.SAMLKeyInfo;
 import org.apache.ws.security.saml.ext.AssertionWrapper;
 import org.apache.ws.security.util.DOM2Writer;
 import org.apache.ws.security.validate.Credential;
-import org.apache.ws.security.validate.SignatureTrustValidator;
+import org.apache.ws.security.validate.SamlAssertionValidator;
 import org.apache.ws.security.validate.Validator;
 
 import org.w3c.dom.Element;
@@ -42,7 +41,7 @@ import javax.security.auth.callback.CallbackHandler;
 public class SAMLTokenProcessor implements Processor {
     private static Log log = LogFactory.getLog(SAMLTokenProcessor.class.getName());
     
-    private Validator validator = new SignatureTrustValidator();
+    private Validator validator = new SamlAssertionValidator();
     
     public List<WSSecurityEngineResult> handleToken(
         Element elem, 
@@ -77,16 +76,15 @@ public class SAMLTokenProcessor implements Processor {
         AssertionWrapper assertion = new AssertionWrapper(token);
         if (assertion.isSigned()) {
             assertion.verifySignature(crypto);
-            assertion.parseHOKSubject(crypto, cb);
-            
-            // Now verify trust on the signature credential
-            validator.setCrypto(crypto);
-            Credential credential = new Credential();
-            SAMLKeyInfo samlKeyInfo = assertion.getSignatureKeyInfo();
-            credential.setPublicKey(samlKeyInfo.getPublicKey());
-            credential.setCertificates(samlKeyInfo.getCerts());
-            validator.validate(credential);
         }
+            
+        // Now delegate the rest of the verification to the Validator
+        validator.setCrypto(crypto);
+        validator.setCallbackHandler(cb);
+        Credential credential = new Credential();
+        credential.setAssertion(assertion);
+        validator.validate(credential);
+        
         if (log.isDebugEnabled()) {
             log.debug("SAML Assertion issuer " + assertion.getIssuerString());
             log.debug(DOM2Writer.nodeToString(token));

@@ -40,7 +40,7 @@ import org.apache.ws.security.components.crypto.Crypto;
 public class SignatureTrustValidator implements Validator {
     
     private static Log LOG = LogFactory.getLog(SignatureTrustValidator.class.getName());
-    private Crypto crypto;
+    protected Crypto crypto;
     
     /**
      * Validate the credential argument. It must contain a non-null X509Certificate chain

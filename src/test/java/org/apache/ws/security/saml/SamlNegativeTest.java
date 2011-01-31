@@ -96,7 +96,6 @@ public class SamlNegativeTest extends org.junit.Assert {
      * should fail.
      */
     @org.junit.Test
-    @org.junit.Ignore
     public void testSAML2AuthnAssertionModified() throws Exception {
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
         callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
@@ -149,7 +148,6 @@ public class SamlNegativeTest extends org.junit.Assert {
      * a signed assertion.
      */
     @org.junit.Test
-    @org.junit.Ignore
     public void testSAML1SignedKeyHolderSigModified() throws Exception {
         SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
         callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
@@ -203,7 +201,6 @@ public class SamlNegativeTest extends org.junit.Assert {
      * The signature verification should then fail.
      */
     @org.junit.Test
-    @org.junit.Ignore
     public void testSAML2SignedKeyHolderKeyModified() throws Exception {
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
         callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
@@ -283,6 +280,94 @@ public class SamlNegativeTest extends org.junit.Assert {
         try {
             verify(signedDoc, trustCrypto);
             fail("Expected failure on a holder-of-key confirmation method with no KeyInfo");
+        } catch (WSSecurityException ex) {
+            // expected
+        }
+    }
+    
+    /**
+     * Test that creates a SAML 1.1 authentication assertion that uses holder-of-key, but is 
+     * not signed, and hence will fail processing.
+     */
+    @org.junit.Test
+    public void testHOKNotSigned() throws Exception {
+        SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
+        callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
+        callbackHandler.setConfirmationMethod(SAML1Constants.CONF_HOLDER_KEY);
+        SAMLIssuer saml = new SAMLIssuerImpl();
+        saml.setIssuerName("www.example.com");
+        saml.setIssuerCrypto(issuerCrypto);
+        saml.setIssuerKeyName("wss40_server");
+        saml.setIssuerKeyPassword("security");
+        // saml.setSignAssertion(true);
+        saml.setCallbackHandler(callbackHandler);
+        AssertionWrapper assertion = saml.newAssertion();
+
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+
+        WSSecSAMLToken wsSign = new WSSecSAMLToken();
+        Document signedDoc = wsSign.build(doc, assertion, secHeader);
+
+        String outputString = 
+            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("SAML 1.1 Authn Assertion (unsigned key holder):");
+            LOG.debug(outputString);
+        }
+        
+        try {
+            verify(signedDoc, trustCrypto);
+            fail("Expected failure on an unsigned assertion with holder-of-key confirmation method");
+        } catch (WSSecurityException ex) {
+            // expected
+        }
+    }
+    
+    /**
+     * Test that creates, sends and processes a signed SAML 2 authentication assertion, but it
+     * is rejected in processing as the signature on the assertion is not trusted.
+     */
+    @org.junit.Test
+    @SuppressWarnings("unchecked")
+    public void testSAML2TrustFailure() throws Exception {
+        SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
+        callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
+        callbackHandler.setConfirmationMethod(SAML2Constants.CONF_HOLDER_KEY);
+        SAMLIssuer saml = new SAMLIssuerImpl();
+        saml.setIssuerName("www.example.com");
+        saml.setIssuerCrypto(CryptoFactory.getInstance("crypto.properties"));
+        saml.setIssuerKeyName("16c73ab6-b892-458f-abf5-2f875f74882e");
+        saml.setIssuerKeyPassword("security");
+        saml.setSignAssertion(true);
+        saml.setSamlVersion("2.0");
+        saml.setCallbackHandler(callbackHandler);
+        AssertionWrapper assertion = saml.newAssertion();
+
+        WSSecSignatureSAML wsSign = new WSSecSignatureSAML();
+        wsSign.setUserInfo("wss40", "security");
+        wsSign.setDigestAlgo("http://www.w3.org/2001/04/xmlenc#sha256");
+        wsSign.setSignatureAlgorithm("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256");
+        wsSign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
+
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+
+        Document signedDoc = 
+            wsSign.build(doc, userCrypto, assertion, null, null, null, secHeader);
+
+        String outputString = 
+            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Untrusted signed SAML 2 Authn Assertion (key holder):");
+            LOG.debug(outputString);
+        }
+        
+        try {
+            verify(signedDoc, trustCrypto);
+            fail ("Failure expected on an untrusted signed assertion");
         } catch (WSSecurityException ex) {
             // expected
         }

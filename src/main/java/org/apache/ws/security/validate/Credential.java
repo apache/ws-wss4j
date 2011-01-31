@@ -24,6 +24,7 @@ import java.security.cert.X509Certificate;
 
 import org.apache.ws.security.message.token.Timestamp;
 import org.apache.ws.security.message.token.UsernameToken;
+import org.apache.ws.security.saml.ext.AssertionWrapper;
 
 /**
  * This class stores various Credential types that have to be validated by a Validator
@@ -35,6 +36,7 @@ public class Credential {
     private X509Certificate[] certs;
     private Timestamp timestamp;
     private UsernameToken usernametoken;
+    private AssertionWrapper assertion;
     
     /**
      * Set a PublicKey to be validated
@@ -98,6 +100,22 @@ public class Credential {
      */
     public UsernameToken getUsernametoken() {
         return usernametoken;
+    }
+    
+    /**
+     * Set an AssertionWrapper to be validated
+     * @param timestamp an AssertionWrapper to be validated
+     */
+    public void setAssertion(AssertionWrapper assertion) {
+        this.assertion = assertion;
+    }
+    
+    /**
+     * Get an AssertionWrapper to be validated
+     * @return an AssertionWrapper to be validated
+     */
+    public AssertionWrapper getAssertion() {
+        return assertion;
     }
     
 }
