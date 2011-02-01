@@ -36,22 +36,20 @@ public interface Crypto {
     //
     
     /**
-     * Retrieves the alias name of the default certificate which has been
-     * specified as a property. This should be the certificate that is used for
-     * signature and encryption. This alias corresponds to the certificate that
-     * should be used whenever KeyInfo is not present in a signed or
-     * an encrypted message. May return null.
+     * Retrieves the alias name of the default certificate. This should be the certificate 
+     * that is used for signature and encryption. This alias corresponds to the certificate 
+     * that should be used whenever KeyInfo is not present in a signed or an encrypted 
+     * message. May return null.
      *
      * @return alias name of the default X509 certificate.
      */
     public String getDefaultX509Alias();
     
     /**
-     * Sets the alias name of the default certificate which has been
-     * specified as a property. This should be the certificate that is used for
-     * signature and encryption. This alias corresponds to the certificate that
-     * should be used whenever KeyInfo is not present in a signed or
-     * an encrypted message.
+     * Sets the alias name of the default certificate. This should be the certificate 
+     * that is used for signature and encryption. This alias corresponds to the certificate 
+     * that should be used whenever KeyInfo is not present in a signed or an encrypted 
+     * message.
      *
      * @param alias name of the default X509 certificate.
      */
@@ -121,7 +119,7 @@ public interface Crypto {
      * load a X509Certificate from the input stream.
      * <p/>
      *
-     * @param in The <code>InputStream</code> array containing the X509 data
+     * @param in The <code>InputStream</code> containing the X509 data
      * @return An X509 certificate
      * @throws WSSecurityException
      */
@@ -200,9 +198,6 @@ public interface Crypto {
      *         See comment above
      *         <p/>
      *         See comment above
-     */
-    /*
-     * See comment above
      */
     public String getAliasForX509Cert(Certificate cert) throws WSSecurityException;
 

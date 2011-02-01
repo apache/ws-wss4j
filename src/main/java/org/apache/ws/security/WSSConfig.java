@@ -17,7 +17,6 @@
  * under the License.
  */
 
-
 package org.apache.ws.security;
 
 import java.security.Provider;
@@ -260,8 +259,6 @@ public class WSSConfig {
     };
     protected WsuIdAllocator idAllocator = DEFAULT_ID_ALLOCATOR;
     
-    protected static Map<String, String> jceProvider = new HashMap<String, String>();
-
     /**
      * The known actions. This map is of the form <Integer, Class<?>> or 
      * <Integer, Action>. 
@@ -300,8 +297,8 @@ public class WSSConfig {
      * Set the value of the internal addJceProviders flag.  This flag
      * turns on (or off) automatic registration of known JCE providers
      * that provide necessary cryptographic algorithms for use with WSS4J.
-     * By default, this flag is true, for backwards compatibility.  You may
-     * wish (or need) to initialize the JCE manually, e.g., in some JVMs.
+     * By default, this flag is true.  You may wish (or need) to initialize 
+     * the JCE manually, e.g., in some JVMs.
      */
     public static void setAddJceProviders(boolean value) {
         addJceProviders = value;
@@ -313,9 +310,9 @@ public class WSSConfig {
             org.apache.xml.security.Init.init();
             if (addJceProviders) {
                 addJceProvider("BC", "org.bouncycastle.jce.provider.BouncyCastleProvider");
-                appendJceProvider("XMLDSig", "org.jcp.xml.dsig.internal.dom.XMLDSigRI");
+                appendJceProvider("XMLDSig", new org.jcp.xml.dsig.internal.dom.XMLDSigRI());
                 appendJceProvider(
-                    "STRTransform", "org.apache.ws.security.transform.STRTransformProvider"
+                    "STRTransform", new org.apache.ws.security.transform.STRTransformProvider()
                 );
             }
             
@@ -638,52 +635,46 @@ public class WSSConfig {
      * 
      * @return Returns the actual name of the provider that was loaded
      */
+    @SuppressWarnings("unchecked")
     public static String addJceProvider(String name, String className) {
-        if (jceProvider.get(name) == null) {
-            String newName = null;
+        Provider currentProvider = Security.getProvider(name);
+        if (currentProvider == null) {
             try {
-                if (Security.getProvider(name) == null) {
-                    Class<?> c = Loader.loadClass(className, false);
-                    Provider[] provs = Security.getProviders();
-                    Provider newProvider = (Provider)c.newInstance();
-                    //
-                    // Install the provider after the SUN provider (see WSS-99)
-                    // Otherwise fall back to the old behaviour of inserting
-                    // the provider in position 2. For AIX, install it after
-                    // the IBMJCE provider.
-                    //
-                    int ret = 0;
-                    for (int i = 0; i < provs.length; i++) {
-                        if ("SUN".equals(provs[i].getName())
-                            || "IBMJCE".equals(provs[i].getName())) {
-                            ret = Security.insertProviderAt(newProvider, i + 2);
-                            break;
-                        }
+                Class<Provider> clazz = Loader.loadClass(className, false);
+                Provider provider = (Provider)clazz.newInstance();
+                //
+                // Install the provider after the SUN provider (see WSS-99)
+                // Otherwise fall back to the old behaviour of inserting
+                // the provider in position 2. For AIX, install it after
+                // the IBMJCE provider.
+                //
+                int ret = 0;
+                Provider[] provs = Security.getProviders();
+                for (int i = 0; i < provs.length; i++) {
+                    if ("SUN".equals(provs[i].getName())
+                        || "IBMJCE".equals(provs[i].getName())) {
+                        ret = Security.insertProviderAt(provider, i + 2);
+                        break;
                     }
-                    if (ret == 0) {
-                        ret = Security.insertProviderAt(newProvider, 2);
-                    }
-                    if (log.isDebugEnabled()) {
-                        log.debug(
-                            "The provider " + newProvider.getName() + " was added at position: " + ret
-                        );
-                    }
-                    newName = newProvider.getName();
-                } else {
-                    newName = name;
                 }
+                if (ret == 0) {
+                    ret = Security.insertProviderAt(provider, 2);
+                }
+                if (log.isDebugEnabled()) {
+                    log.debug(
+                        "The provider " + provider.getName() 
+                        + " was added at position: " + ret
+                    );
+                }
+                return provider.getName();
             } catch (Throwable t) {
                 if (log.isDebugEnabled()) {
                     log.debug("The provider " + name + " could not be added: " + t.getMessage(), t);
                 }
-                newName = null;
+                return null;
             }
-            if (newName != null) {
-                jceProvider.put(newName, className);
-            }
-            return newName;
         }
-        return name;
+        return currentProvider.getName();
     }
     
     
@@ -701,35 +692,65 @@ public class WSSConfig {
      * 
      * @return Returns the actual name of the provider that was loaded
      */
+    @SuppressWarnings("unchecked")
     public static String appendJceProvider(String name, String className) {
-        if (jceProvider.get(name) == null) {
-            String newName = null;
+        Provider currentProvider = Security.getProvider(name);
+        if (currentProvider == null) {
             try {
-                if (Security.getProvider(name) == null) {
-                    Class<?> c = Loader.loadClass(className, false);
-                    Provider newProvider = (Provider)c.newInstance();
-                    int ret = Security.addProvider(newProvider);
-                    if (log.isDebugEnabled()) {
-                        log.debug(
-                            "The provider " + newProvider.getName() + " was added at position: " + ret
-                        );
-                    }
-                    newName = newProvider.getName();
-                } else {
-                    newName = name;
+                Class<Provider> clazz = Loader.loadClass(className, false);
+                Provider provider = (Provider)clazz.newInstance();
+                
+                int ret = Security.addProvider(provider);
+                if (log.isDebugEnabled()) {
+                    log.debug(
+                        "The provider " + provider.getName() 
+                        + " was added at position: " + ret
+                    );
                 }
+                return provider.getName();
             } catch (Throwable t) {
                 if (log.isDebugEnabled()) {
                     log.debug("The provider " + name + " could not be added: " + t.getMessage(), t);
                 }
-                newName = null;
+                return null;
             }
-            if (newName != null) {
-                jceProvider.put(newName, className);
-            }
-            return newName;
         }
-        return name;
+        return currentProvider.getName();
+    }
+    
+    /**
+     * Add a new JCE security provider to use for WSS4J, of the specified name and class. Return
+     * either the name of the previously loaded provider, the name of the new loaded provider, or
+     * null if there's an exception in loading the provider. Append the provider to the provider
+     * list.
+     * 
+     * @param name
+     *            The name string of the provider (this may not be the real name of the provider)
+     * @param provider
+     *            A subclass of <code>java.security.Provider</code>
+     * 
+     * @return Returns the actual name of the provider that was loaded
+     */
+    public static String appendJceProvider(String name, Provider provider) {
+        Provider currentProvider = Security.getProvider(name);
+        if (currentProvider == null) {
+            try {
+                int ret = Security.addProvider(provider);
+                if (log.isDebugEnabled()) {
+                    log.debug(
+                        "The provider " + provider.getName() 
+                        + " was added at position: " + ret
+                    );
+                }
+                return provider.getName();
+            } catch (Throwable t) {
+                if (log.isDebugEnabled()) {
+                    log.debug("The provider " + name + " could not be added: " + t.getMessage(), t);
+                }
+                return null;
+            }
+        }
+        return currentProvider.getName();
     }
     
 }
