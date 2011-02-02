@@ -20,7 +20,6 @@
 package org.apache.ws.security.saml.ext.builder;
 
 import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.saml.ext.OpenSAMLUtil;
 import org.apache.ws.security.saml.ext.bean.ActionBean;
 import org.apache.ws.security.saml.ext.bean.AttributeBean;
 import org.apache.ws.security.saml.ext.bean.AttributeStatementBean;
@@ -115,6 +114,7 @@ public class SAML2ComponentBuilder {
      *
      * @return a SAML 2 assertion
      */
+    @SuppressWarnings("unchecked")
     public static Assertion createAssertion() {
         if (assertionBuilder == null) {
             assertionBuilder = (SAMLObjectBuilder<Assertion>) 
@@ -140,6 +140,7 @@ public class SAML2ComponentBuilder {
      * @param issuerValue of type String
      * @return an Issuer object
      */
+    @SuppressWarnings("unchecked")
     public static Issuer createIssuer(String issuerValue) {
         if (issuerBuilder == null) {
             issuerBuilder = (SAMLObjectBuilder<Issuer>) 
@@ -160,6 +161,7 @@ public class SAML2ComponentBuilder {
      * @param conditionsBean A ConditionsBean object
      * @return a Conditions object
      */
+    @SuppressWarnings("unchecked")
     public static Conditions createConditions(ConditionsBean conditionsBean) {
         if (conditionsBuilder == null) {
             conditionsBuilder = (SAMLObjectBuilder<Conditions>) 
@@ -180,7 +182,11 @@ public class SAML2ComponentBuilder {
         DateTime notAfter = conditionsBean.getNotAfter();
         
         if (notBefore != null && notAfter != null) {
-            OpenSAMLUtil.validateConditions(notBefore, notAfter);
+            if (notBefore.isAfter(notAfter)) {
+                throw new IllegalStateException(
+                    "The value of notBefore may not be after the value of notAfter"
+                );
+            }
             conditions.setNotBefore(notBefore);
             conditions.setNotOnOrAfter(notAfter);
         } else {
@@ -197,6 +203,7 @@ public class SAML2ComponentBuilder {
      * @param audienceURI of type String
      * @return an AudienceRestriction object
      */
+    @SuppressWarnings("unchecked")
     public static AudienceRestriction createAudienceRestriction(String audienceURI) {
         if (audienceRestrictionBuilder == null) {
             audienceRestrictionBuilder = (SAMLObjectBuilder<AudienceRestriction>) 
@@ -220,6 +227,7 @@ public class SAML2ComponentBuilder {
      * @param authBeans A list of AuthenticationStatementBean instances
      * @return SAML 2 Authentication Statement(s).
      */
+    @SuppressWarnings("unchecked")
     public static List<AuthnStatement> createAuthnStatement(
         List<AuthenticationStatementBean> authBeans
     ) {
@@ -308,6 +316,7 @@ public class SAML2ComponentBuilder {
      * @param subjectConfirmation of type SubjectConfirmation
      * @return a Subject
      */
+    @SuppressWarnings("unchecked")
     public static Subject createSaml2Subject(SubjectBean subjectBean) 
         throws org.opensaml.xml.security.SecurityException, WSSecurityException {
         if (subjectBuilder == null) {
@@ -349,6 +358,7 @@ public class SAML2ComponentBuilder {
      * @param keyInfoBean of type KeyInfoBean
      * @return a SubjectConfirmationData object
      */
+    @SuppressWarnings("unchecked")
     public static SubjectConfirmationData createSubjectConfirmationData(
         String inResponseTo, 
         String recipient, 
@@ -397,6 +407,7 @@ public class SAML2ComponentBuilder {
      * @param subjectConfirmationData of type SubjectConfirmationData
      * @return a SubjectConfirmation object
      */
+    @SuppressWarnings("unchecked")
     public static SubjectConfirmation createSubjectConfirmation(
         String method,
         SubjectConfirmationData subjectConfirmationData
@@ -427,6 +438,7 @@ public class SAML2ComponentBuilder {
      * @param subject A SubjectBean instance
      * @return NameID
      */
+    @SuppressWarnings("unchecked")
     public static NameID createNameID(SubjectBean subject) {
         if (nameIdBuilder == null) {
             nameIdBuilder = (SAMLObjectBuilder<NameID>) 
@@ -446,6 +458,7 @@ public class SAML2ComponentBuilder {
      * @param attributeData A list of AttributeStatementBean instances
      * @return SAML2 Attribute Statement(s)
      */
+    @SuppressWarnings("unchecked")
     public static List<AttributeStatement> createAttributeStatement(
         List<AttributeStatementBean> attributeData
     ) {
@@ -485,6 +498,7 @@ public class SAML2ComponentBuilder {
      * @param name of type String
      * @return an Attribute object
      */
+    @SuppressWarnings("unchecked")
     public static Attribute createAttribute(String friendlyName, String name) {
         if (attributeBuilder == null) {
             attributeBuilder = (SAMLObjectBuilder<Attribute>)
@@ -504,6 +518,7 @@ public class SAML2ComponentBuilder {
      * @param decisionData A list of AuthDecisionStatementBean instances
      * @return SAML2 AuthorizationDecisionStatement(s)
      */
+    @SuppressWarnings("unchecked")
     public static List<AuthzDecisionStatement> createAuthorizationDecisionStatement(
         List<AuthDecisionStatementBean> decisionData
     ) {
@@ -541,6 +556,7 @@ public class SAML2ComponentBuilder {
      * @param actionBean An ActionBean instance
      * @return an Action object
      */
+    @SuppressWarnings("unchecked")
     public static Action createSamlAction(ActionBean actionBean) {
         if (actionElementBuilder == null) {
             actionElementBuilder = (SAMLObjectBuilder<Action>)

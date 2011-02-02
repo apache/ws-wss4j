@@ -23,6 +23,7 @@ import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSecurityEngineResult;
 
 import org.apache.ws.security.common.CustomHandler;
+import org.apache.ws.security.message.token.Timestamp;
 
 
 /**
@@ -40,16 +41,16 @@ public class ResultsOrderTest extends org.junit.Assert {
         
         java.util.List<WSSecurityEngineResult> results = new java.util.ArrayList<WSSecurityEngineResult>();
         results.add(
-            new WSSecurityEngineResult(WSConstants.UT, (Object)null)
+            new WSSecurityEngineResult(WSConstants.UT, (Timestamp)null)
         );
         results.add(
-            new WSSecurityEngineResult(WSConstants.TS, (Object)null)
+            new WSSecurityEngineResult(WSConstants.TS, (Timestamp)null)
         );
         results.add(
-            new WSSecurityEngineResult(WSConstants.SC, (Object)null)
+            new WSSecurityEngineResult(WSConstants.SC, (Timestamp)null)
         );
         results.add(
-            new WSSecurityEngineResult(WSConstants.SIGN, (Object)null)
+            new WSSecurityEngineResult(WSConstants.SIGN, (Timestamp)null)
         );
         
         java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
@@ -70,16 +71,16 @@ public class ResultsOrderTest extends org.junit.Assert {
         
         java.util.List<WSSecurityEngineResult> results = new java.util.ArrayList<WSSecurityEngineResult>();
         results.add(
-            new WSSecurityEngineResult(WSConstants.SIGN, (Object)null)
+            new WSSecurityEngineResult(WSConstants.SIGN, (Timestamp)null)
         );
         results.add(
-            new WSSecurityEngineResult(WSConstants.SC, (Object)null)
+            new WSSecurityEngineResult(WSConstants.SC, (Timestamp)null)
         );
         results.add(
-            new WSSecurityEngineResult(WSConstants.TS, (Object)null)
+            new WSSecurityEngineResult(WSConstants.TS, (Timestamp)null)
         );
         results.add(
-            new WSSecurityEngineResult(WSConstants.UT, (Object)null)
+            new WSSecurityEngineResult(WSConstants.UT, (Timestamp)null)
         );
         
         java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
@@ -102,16 +103,16 @@ public class ResultsOrderTest extends org.junit.Assert {
         java.util.List<WSSecurityEngineResult> results = 
             new java.util.ArrayList<WSSecurityEngineResult>();
         results.add(
-            new WSSecurityEngineResult(WSConstants.TS, (Object)null)
+            new WSSecurityEngineResult(WSConstants.TS, (Timestamp)null)
         );
         results.add(
-            new WSSecurityEngineResult(WSConstants.SIGN, (Object)null)
+            new WSSecurityEngineResult(WSConstants.SIGN, (Timestamp)null)
         );
         results.add(
-            new WSSecurityEngineResult(WSConstants.SC, (Object)null)
+            new WSSecurityEngineResult(WSConstants.SC, (Timestamp)null)
         );
         results.add(
-            new WSSecurityEngineResult(WSConstants.UT, (Object)null)
+            new WSSecurityEngineResult(WSConstants.UT, (Timestamp)null)
         );
         
         java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
@@ -134,16 +135,16 @@ public class ResultsOrderTest extends org.junit.Assert {
         java.util.List<WSSecurityEngineResult> results = 
             new java.util.ArrayList<WSSecurityEngineResult>();
         results.add(
-            new WSSecurityEngineResult(WSConstants.TS, (Object)null)
+            new WSSecurityEngineResult(WSConstants.TS, (Timestamp)null)
         );
         results.add(
-            new WSSecurityEngineResult(WSConstants.SIGN, (Object)null)
+            new WSSecurityEngineResult(WSConstants.SIGN, (Timestamp)null)
         );
         results.add(
-            new WSSecurityEngineResult(WSConstants.SC, (Object)null)
+            new WSSecurityEngineResult(WSConstants.SC, (Timestamp)null)
         );
         results.add(
-            new WSSecurityEngineResult(WSConstants.UT, (Object)null)
+            new WSSecurityEngineResult(WSConstants.UT, (Timestamp)null)
         );
         
         java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
@@ -165,13 +166,13 @@ public class ResultsOrderTest extends org.junit.Assert {
         java.util.List<WSSecurityEngineResult> results = 
             new java.util.ArrayList<WSSecurityEngineResult>();
         results.add(
-            new WSSecurityEngineResult(WSConstants.UT, (Object)null)
+            new WSSecurityEngineResult(WSConstants.UT, (Timestamp)null)
         );
         results.add(
-            new WSSecurityEngineResult(WSConstants.TS, (Object)null)
+            new WSSecurityEngineResult(WSConstants.TS, (Timestamp)null)
         );
         results.add(
-            new WSSecurityEngineResult(WSConstants.SC, (Object)null)
+            new WSSecurityEngineResult(WSConstants.SC, (Timestamp)null)
         );
         
         java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
@@ -193,16 +194,16 @@ public class ResultsOrderTest extends org.junit.Assert {
         java.util.List<WSSecurityEngineResult> results = 
             new java.util.ArrayList<WSSecurityEngineResult>();
         results.add(
-            new WSSecurityEngineResult(WSConstants.UT, (Object)null)
+            new WSSecurityEngineResult(WSConstants.UT, (Timestamp)null)
         );
         results.add(
-            new WSSecurityEngineResult(WSConstants.TS, (Object)null)
+            new WSSecurityEngineResult(WSConstants.TS, (Timestamp)null)
         );
         results.add(
-            new WSSecurityEngineResult(WSConstants.SIGN, (Object)null)
+            new WSSecurityEngineResult(WSConstants.SIGN, (Timestamp)null)
         );
         results.add(
-            new WSSecurityEngineResult(WSConstants.SC, (Object)null)
+            new WSSecurityEngineResult(WSConstants.SC, (Timestamp)null)
         );
         
         java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
@@ -240,7 +241,7 @@ public class ResultsOrderTest extends org.junit.Assert {
         java.util.List<WSSecurityEngineResult> results = 
             new java.util.ArrayList<WSSecurityEngineResult>();
         results.add(
-            new WSSecurityEngineResult(WSConstants.TS, (Object)null)
+            new WSSecurityEngineResult(WSConstants.TS, (Timestamp)null)
         );
         
         java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
@@ -259,13 +260,13 @@ public class ResultsOrderTest extends org.junit.Assert {
         java.util.List<WSSecurityEngineResult> results = 
             new java.util.ArrayList<WSSecurityEngineResult>();
         results.add(
-            new WSSecurityEngineResult(WSConstants.ENCR, (Object)null)
+            new WSSecurityEngineResult(WSConstants.ENCR, (Timestamp)null)
         );
         results.add(
-            new WSSecurityEngineResult(WSConstants.UT, (Object)null)
+            new WSSecurityEngineResult(WSConstants.UT, (Timestamp)null)
         );
         results.add(
-            new WSSecurityEngineResult(WSConstants.ENCR, (Object)null)
+            new WSSecurityEngineResult(WSConstants.ENCR, (Timestamp)null)
         );
         
         java.util.List<Integer> actions = new java.util.ArrayList<Integer>();

@@ -48,7 +48,6 @@ public class AttributeBean {
      * @param attributeValues of type List<String>
      */
     public AttributeBean(String simpleName, String qualifiedName, List<String> attributeValues) {
-        this();
         this.simpleName = simpleName;
         this.qualifiedName = qualifiedName;
         this.attributeValues = attributeValues;
@@ -115,18 +114,39 @@ public class AttributeBean {
 
         AttributeBean that = (AttributeBean) o;
 
-        if (!attributeValues.equals(that.attributeValues)) return false;
-        if (!qualifiedName.equals(that.qualifiedName)) return false;
-        if (!simpleName.equals(that.simpleName)) return false;
+        if (attributeValues == null && that.attributeValues != null) {
+            return false;
+        } else if (attributeValues != null && !attributeValues.equals(that.attributeValues)) {
+            return false;
+        }
+        
+        if (qualifiedName == null && that.qualifiedName != null) {
+            return false;
+        } else if (qualifiedName != null && !qualifiedName.equals(that.qualifiedName)) {
+            return false;
+        }
+        
+        if (simpleName == null && that.simpleName != null) {
+            return false;
+        } else if (simpleName != null && !simpleName.equals(that.simpleName)) {
+            return false;
+        }
 
         return true;
     }
 
     @Override
     public int hashCode() {
-        int result = simpleName.hashCode();
-        result = 31 * result + qualifiedName.hashCode();
-        result = 31 * result + attributeValues.hashCode();
+        int result = 0;
+        if (simpleName != null) {
+            result = 31 * result + simpleName.hashCode();
+        }
+        if (qualifiedName != null) {
+            result = 31 * result + qualifiedName.hashCode();
+        }
+        if (attributeValues != null) {
+            result = 31 * result + attributeValues.hashCode();
+        }
         return result;
     }
 }

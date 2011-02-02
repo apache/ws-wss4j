@@ -19,7 +19,6 @@
 
 package org.apache.ws.security.saml;
 
-import org.apache.ws.security.saml.SAMLIssuerFactory;
 import org.apache.ws.security.saml.SAMLIssuer;
 
 import org.apache.commons.logging.Log;

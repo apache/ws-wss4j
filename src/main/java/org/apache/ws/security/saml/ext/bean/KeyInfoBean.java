@@ -130,24 +130,43 @@ public class KeyInfoBean {
 
         KeyInfoBean that = (KeyInfoBean) o;
 
-        if (cert != null && !cert.equals(that.cert)) return false;
         if (certIdentifier != that.certIdentifier) return false;
-        if (publicKey != null && !publicKey.equals(that.publicKey)) return false;
-        if (keyInfoElement != null && !keyInfoElement.equals(that.keyInfoElement)) return false;
+        if (cert == null && that.cert != null) {
+            return false;
+        } else if (cert != null && !cert.equals(that.cert)) {
+            return false;
+        }
+        
+        if (publicKey == null && that.publicKey != null) {
+            return false;
+        } else if (publicKey != null && !publicKey.equals(that.publicKey)) {
+            return false;
+        }
+        
+        if (keyInfoElement == null && that.keyInfoElement != null) {
+            return false;
+        } else if (keyInfoElement != null && !keyInfoElement.equals(that.keyInfoElement)) {
+            return false;
+        }
 
         return true;
     }
 
     /**
-     * Method hashCode ...
-     * @return int
+     * @return the hashCode of this object
      */
     @Override
     public int hashCode() {
-        int result = cert.hashCode();
-        result = 31 * result + certIdentifier.hashCode();
-        result = 31 * result + publicKey.hashCode();
-        result = 31 * result + keyInfoElement.hashCode();
+        int result = certIdentifier.hashCode();
+        if (cert != null) {
+            result = 31 * result + cert.hashCode();
+        }
+        if (publicKey != null) {
+            result = 31 * result + publicKey.hashCode();
+        }
+        if (keyInfoElement != null) {
+            result = 31 * result + keyInfoElement.hashCode();
+        }
         return result;
     }
 }

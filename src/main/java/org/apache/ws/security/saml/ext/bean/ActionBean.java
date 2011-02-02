@@ -92,4 +92,38 @@ public class ActionBean {
     public void setContents(String contents) {
         this.contents = contents;
     }
+    
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof ActionBean)) return false;
+
+        ActionBean that = (ActionBean) o;
+
+        if (contents == null && that.contents != null) {
+            return false;
+        } else if (contents != null && !contents.equals(that.contents)) {
+            return false;
+        }
+        
+        if (actionNamespace == null && that.actionNamespace != null) {
+            return false;
+        } else if (actionNamespace != null && !actionNamespace.equals(that.actionNamespace)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = 0;
+        if (contents != null) {
+            result = 31 * result + contents.hashCode();
+        }
+        if (actionNamespace != null) {
+            result = 31 * result + actionNamespace.hashCode();
+        }
+        return result;
+    }
 }

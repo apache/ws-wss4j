@@ -72,8 +72,7 @@ public abstract class SAMLIssuerFactory {
      *                      These properties are dependend on the SAMLIssuer implementatin
      * @return The SAMLIssuer implementation or null if no samlClassName was defined
      */
-    public static SAMLIssuer getInstance(String samlClassName,
-                                         Properties properties) {
+    public static SAMLIssuer getInstance(String samlClassName, Properties properties) {
         return loadClass(samlClassName, properties);
     }
 
@@ -99,15 +98,15 @@ public abstract class SAMLIssuerFactory {
         if ((samlClassName == null) || (samlClassName.length() == 0)) {
             properties = getProperties(propFilename);
             samlClassName =
-                    properties.getProperty("org.apache.ws.security.saml.issuerClass",
-                            defaultSAMLClassName);
+                    properties.getProperty(
+                        "org.apache.ws.security.saml.issuerClass", defaultSAMLClassName
+                    );
         }
         return loadClass(samlClassName, properties);
     }
 
-    private static SAMLIssuer loadClass(String samlClassName,
-                                        Properties properties) {
-        Class samlIssuerClass = null;
+    private static SAMLIssuer loadClass(String samlClassName, Properties properties) {
+        Class<?> samlIssuerClass = null;
         SAMLIssuer samlIssuer = null;
         try {
             // instruct the class loader to load the crypto implementation
@@ -120,10 +119,9 @@ public abstract class SAMLIssuerFactory {
         }
         log.info("Using Crypto Engine [" + samlClassName + "]");
         try {
-            Class[] classes = new Class[]{Properties.class};
-            Constructor c = samlIssuerClass.getConstructor(classes);
-            samlIssuer =
-                    (SAMLIssuer) c.newInstance(new Object[]{properties});
+            Class<?>[] classes = new Class<?>[]{Properties.class};
+            Constructor<?> c = samlIssuerClass.getConstructor(classes);
+            samlIssuer = (SAMLIssuer) c.newInstance(new Object[]{properties});
             return samlIssuer;
         } catch (java.lang.Exception ex) {
             if (log.isDebugEnabled()) {
@@ -160,8 +158,11 @@ public abstract class SAMLIssuerFactory {
             if (doDebug) {
                 log.debug("Cannot find SAML property file: " + propFilename, e);
             }
-            throw new RuntimeException("SAMLIssuerFactory: Cannot load properties: " + propFilename, e);
+            throw new RuntimeException(
+                "SAMLIssuerFactory: Cannot load properties: " + propFilename, e
+            );
         }
         return properties;
     }
+    
 }

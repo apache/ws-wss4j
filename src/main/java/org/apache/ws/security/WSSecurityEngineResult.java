@@ -24,6 +24,7 @@ import org.apache.ws.security.message.token.SecurityContextToken;
 import org.apache.ws.security.message.token.SignatureConfirmation;
 import org.apache.ws.security.message.token.Timestamp;
 import org.apache.ws.security.message.token.UsernameToken;
+import org.apache.ws.security.saml.ext.AssertionWrapper;
 
 import java.security.Principal;
 import java.security.cert.X509Certificate;
@@ -41,7 +42,7 @@ public class WSSecurityEngineResult extends java.util.HashMap<String, Object> {
     /**
      * Tag denoting the SAML Assertion found, if applicable.
      *
-     * The value under this tag is of type org.opensaml.SAMLAssertion.
+     * The value under this tag is of type AssertionWrapper.
      */
     public static final String TAG_SAML_ASSERTION = "saml-assertion";
     
@@ -177,7 +178,7 @@ public class WSSecurityEngineResult extends java.util.HashMap<String, Object> {
     
     public WSSecurityEngineResult(
         int act, 
-        Object ass
+        AssertionWrapper ass
     ) {
         put(TAG_ACTION, new Integer(act));
         put(TAG_SAML_ASSERTION, ass);

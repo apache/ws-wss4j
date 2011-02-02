@@ -73,15 +73,21 @@ public class AuthDecisionStatementBean {
      *
      * @param decision of type Decision
      * @param resource of type String
+     * @param subject of type SubjectBean
+     * @param evidence of type Object
      * @param actionBeans of type List<SamlAction>
      */
     public AuthDecisionStatementBean(
         Decision decision, 
         String resource, 
+        SubjectBean subject,
+        Object evidence,
         List<ActionBean> actionBeans
     ) {
         this.decision = decision;
         this.resource = resource;
+        this.subject = subject;
+        this.evidence = evidence;
         this.actionBeans = actionBeans;
     }
 
@@ -171,5 +177,55 @@ public class AuthDecisionStatementBean {
      */
     public void setSubject(SubjectBean subject) {
         this.subject = subject;
+    }
+    
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof AuthDecisionStatementBean)) return false;
+
+        AuthDecisionStatementBean that = (AuthDecisionStatementBean) o;
+
+        if (subject == null && that.subject != null) {
+            return false;
+        } else if (subject != null && !subject.equals(that.subject)) {
+            return false;
+        }
+        
+        if (decision == null && that.decision != null) {
+            return false;
+        } else if (decision != null && !decision.equals(that.decision)) {
+            return false;
+        }
+        
+        if (evidence == null && that.evidence != null) {
+            return false;
+        } else if (evidence != null && !evidence.equals(that.evidence)) {
+            return false;
+        }
+        
+        if (actionBeans == null && that.actionBeans != null) {
+            return false;
+        } else if (actionBeans != null && !actionBeans.equals(that.actionBeans)) {
+            return false;
+        }
+        
+        if (resource == null && that.resource != null) {
+            return false;
+        } else if (resource != null && !resource.equals(that.resource)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = subject != null ? subject.hashCode() : 0;
+        result = 31 * result + (decision != null ? decision.hashCode() : 0);
+        result = 31 * result + (evidence != null ? evidence.hashCode() : 0);
+        result = 31 * result + (actionBeans != null ? actionBeans.hashCode() : 0);
+        result = 31 * result + (resource != null ? resource.hashCode() : 0);
+        return result;
     }
 }

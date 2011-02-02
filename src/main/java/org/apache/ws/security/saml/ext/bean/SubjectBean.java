@@ -142,24 +142,53 @@ public class SubjectBean {
 
         SubjectBean that = (SubjectBean) o;
 
-        if (!subjectName.equals(that.subjectName)) return false;
-        if (!subjectNameQualifier.equals(that.subjectNameQualifier)) return false;
-        if (!subjectConfirmationMethod.equals(that.subjectConfirmationMethod)) return false;
-        if (keyInfo != null && !keyInfo.equals(that.keyInfo)) return false;
+        if (subjectName == null && that.subjectName != null) {
+            return false;
+        } else if (subjectName != null && !subjectName.equals(that.subjectName)) {
+            return false;
+        }
+        
+        if (subjectNameQualifier == null && that.subjectNameQualifier != null) {
+            return false;
+        } else if (subjectNameQualifier != null && 
+            !subjectNameQualifier.equals(that.subjectNameQualifier)) {
+            return false;
+        }
+        
+        if (subjectConfirmationMethod == null && that.subjectConfirmationMethod != null) {
+            return false;
+        } else if (subjectConfirmationMethod != null && 
+            !subjectConfirmationMethod.equals(that.subjectConfirmationMethod)) {
+            return false;
+        }
+        
+        if (keyInfo == null && that.keyInfo != null) {
+            return false;
+        } else if (keyInfo != null && !keyInfo.equals(that.keyInfo)) {
+            return false;
+        }
 
         return true;
     }
 
     /**
-     * Method hashCode ...
-     * @return int
+     * @return the hashcode of this object
      */
     @Override
     public int hashCode() {
-        int result = subjectName.hashCode();
-        result = 31 * result + subjectNameQualifier.hashCode();
-        result = 31 * result + subjectConfirmationMethod.hashCode();
-        result = 31 * result + keyInfo.hashCode();
+        int result = 0;
+        if (subjectName != null) {
+            result = subjectName.hashCode();
+        }
+        if (subjectNameQualifier != null) {
+            result = 31 * result + subjectNameQualifier.hashCode();
+        }
+        if (subjectConfirmationMethod != null) {
+            result = 31 * result + subjectConfirmationMethod.hashCode();
+        }
+        if (keyInfo != null) {
+            result = 31 * result + keyInfo.hashCode();
+        }
         return result;
     }
 }

@@ -103,6 +103,7 @@ public class SAML1ComponentBuilder {
      * @param issuer of type String
      * @return A SAML 1.1 assertion
      */
+    @SuppressWarnings("unchecked")
     public static Assertion createSamlv1Assertion(String issuer) {
         if (assertionV1Builder == null) {
             assertionV1Builder = (SAMLObjectBuilder<Assertion>) 
@@ -133,6 +134,7 @@ public class SAML1ComponentBuilder {
      * @param subjectBean A SubjectBean instance
      * @return A Saml 1.1 subject
      */
+    @SuppressWarnings("unchecked")
     public static Subject createSaml1v1Subject(SubjectBean subjectBean) 
         throws org.opensaml.xml.security.SecurityException, WSSecurityException {
         if (subjectV1Builder == null) {
@@ -224,6 +226,7 @@ public class SAML1ComponentBuilder {
      * @param conditionsBean A ConditionsBean object
      * @return a Conditions object
      */
+    @SuppressWarnings("unchecked")
     public static Conditions createSamlv1Conditions(ConditionsBean conditionsBean) {
         if (conditionsV1Builder == null) {
             conditionsV1Builder = (SAMLObjectBuilder<Conditions>) 
@@ -244,7 +247,11 @@ public class SAML1ComponentBuilder {
         DateTime notAfter = conditionsBean.getNotAfter();
         
         if (notBefore != null && notAfter != null) {
-            OpenSAMLUtil.validateConditions(notBefore, notAfter);
+            if (notBefore.isAfter(notAfter)) {
+                throw new IllegalStateException(
+                    "The value of notBefore may not be after the value of notAfter"
+                );
+            }
             conditions.setNotBefore(notBefore);
             conditions.setNotOnOrAfter(notAfter);
         } else {
@@ -261,6 +268,7 @@ public class SAML1ComponentBuilder {
      * @param authBeans A list of AuthenticationStatementBean objects
      * @return a list of SAML 1.1 authentication statement(s)
      */
+    @SuppressWarnings("unchecked")
     public static List<AuthenticationStatement> createSamlv1AuthenticationStatement(
         List<AuthenticationStatementBean> authBeans
     ) throws org.opensaml.xml.security.SecurityException, WSSecurityException {
@@ -325,6 +333,7 @@ public class SAML1ComponentBuilder {
      * @param attributeData A list of AttributeStatementBean instances
      * @return a list of SAML 1.1 attribute statement(s)
      */
+    @SuppressWarnings("unchecked")
     public static List<AttributeStatement> createSamlv1AttributeStatement(
         List<AttributeStatementBean> attributeData
     ) throws org.opensaml.xml.security.SecurityException, WSSecurityException {
@@ -368,6 +377,7 @@ public class SAML1ComponentBuilder {
      * @param values the Attribute Values
      * @return a SAML 1.1 attribute
      */
+    @SuppressWarnings("unchecked")
     public static Attribute createSamlv1Attribute(
         String attributeName, 
         String attributeUrn,
@@ -402,6 +412,7 @@ public class SAML1ComponentBuilder {
      * @param decisionData        of type Map
      * @return a list of SAML 1.1 Authorization Decision Statement(s)
      */
+    @SuppressWarnings("unchecked")
     public static List<AuthorizationDecisionStatement> createSamlv1AuthorizationDecisionStatement(
             List<AuthDecisionStatementBean> decisionData) 
         throws org.opensaml.xml.security.SecurityException, WSSecurityException {
@@ -441,6 +452,7 @@ public class SAML1ComponentBuilder {
      * @param actionBean of type SamlAction
      * @return an Action object
      */
+    @SuppressWarnings("unchecked")
     public static Action createSamlv1Action(ActionBean actionBean) {
         if (actionElementV1Builder == null) {
             actionElementV1Builder = (SAMLObjectBuilder<Action>)

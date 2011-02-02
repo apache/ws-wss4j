@@ -38,6 +38,19 @@ public class AttributeStatementBean {
     public AttributeStatementBean() {
         attributeBeans = new ArrayList<AttributeBean>();
     }
+    
+    /**
+     * Constructor SamlAttributeStatement creates a new SamlAttributeStatement instance.
+     * @param subject A new SubjectBean instance
+     * @param attributeBeans A list of Attributes
+     */
+    public AttributeStatementBean(
+        SubjectBean subject,
+        List<AttributeBean> attributeBeans
+    ) {
+        this.subject = subject;
+        this.attributeBeans = attributeBeans;
+    }
 
     /**
      * Method getSamlAttributes returns the samlAttributes of this SamlAttributeStatement object.
@@ -81,16 +94,25 @@ public class AttributeStatementBean {
 
         AttributeStatementBean that = (AttributeStatementBean) o;
 
-        if (!attributeBeans.equals(that.attributeBeans)) return false;
-        if (!subject.equals(that.subject)) return false;
+        if (attributeBeans == null && that.attributeBeans != null) {
+            return false;
+        } else if (attributeBeans != null && !attributeBeans.equals(that.attributeBeans)) {
+            return false;
+        }
+        
+        if (subject == null && that.subject != null) {
+            return false;
+        } else if (subject != null && !subject.equals(that.subject)) {
+            return false;
+        }
 
         return true;
     }
 
     @Override
     public int hashCode() {
-        int result = subject.hashCode();
-        result = 31 * result + attributeBeans.hashCode();
+        int result = subject != null ? subject.hashCode() : 0;
+        result = 31 * result + (attributeBeans != null ? attributeBeans.hashCode() : 0);
         return result;
     }
 }

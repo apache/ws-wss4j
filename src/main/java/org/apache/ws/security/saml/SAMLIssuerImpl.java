@@ -130,13 +130,14 @@ public class SAMLIssuerImpl implements SAMLIssuer {
      * @return a new AssertionWrapper.
      */
     public AssertionWrapper newAssertion() throws WSSecurityException {
-        
-        log.debug(
-          "Entering AssertionWrapper.newAssertion() ... creating SAML v" 
-          + samlVersion + " token"
-        );
+        if (log.isDebugEnabled()) {
+            log.debug(
+                "Entering AssertionWrapper.newAssertion() ... creating SAML v" 
+                + samlVersion + " token"
+            );
+        }
 
-        if (callbackHandler == null) {
+        if (callbackHandler == null && properties != null) {
             try {
                 String samlCallbackClassname = 
                     properties.getProperty("org.apache.ws.security.saml.callback");
@@ -182,7 +183,9 @@ public class SAMLIssuerImpl implements SAMLIssuer {
 
             String sigAlgo = SignatureConstants.ALGO_ID_SIGNATURE_RSA_SHA1;
             String pubKeyAlgo = issuerCerts[0].getPublicKey().getAlgorithm();
-            log.debug("automatic sig algo detection: " + pubKeyAlgo);
+            if (log.isDebugEnabled()) {
+                log.debug("automatic sig algo detection: " + pubKeyAlgo);
+            }
             if (pubKeyAlgo.equalsIgnoreCase("DSA")) {
                 sigAlgo = SignatureConstants.ALGO_ID_SIGNATURE_DSA;
             }

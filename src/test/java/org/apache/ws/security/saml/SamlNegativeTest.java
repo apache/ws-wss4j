@@ -24,7 +24,6 @@ import org.apache.ws.security.saml.SAMLIssuer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSDataRef;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
@@ -41,12 +40,10 @@ import org.apache.ws.security.message.WSSecHeader;
 import org.apache.ws.security.message.WSSecSAMLToken;
 import org.apache.ws.security.saml.ext.AssertionWrapper;
 import org.apache.ws.security.saml.ext.SAMLCallback;
-import org.apache.ws.security.saml.ext.bean.KeyInfoBean;
 import org.apache.ws.security.saml.ext.bean.SubjectBean;
 import org.apache.ws.security.saml.ext.builder.SAML1Constants;
 import org.apache.ws.security.saml.ext.builder.SAML2Constants;
 import org.apache.ws.security.util.Loader;
-import org.apache.ws.security.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 
 import javax.security.auth.callback.Callback;
@@ -330,7 +327,6 @@ public class SamlNegativeTest extends org.junit.Assert {
      * is rejected in processing as the signature on the assertion is not trusted.
      */
     @org.junit.Test
-    @SuppressWarnings("unchecked")
     public void testSAML2TrustFailure() throws Exception {
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
         callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);

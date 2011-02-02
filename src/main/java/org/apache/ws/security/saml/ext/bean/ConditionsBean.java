@@ -132,21 +132,34 @@ public class ConditionsBean {
         ConditionsBean that = (ConditionsBean) o;
 
         if (tokenPeriodMinutes != that.tokenPeriodMinutes) return false;
-        if (!notBefore.equals(that.notBefore)) return false;
-        if (!notAfter.equals(that.notAfter)) return false; 
+        
+        if (notBefore == null && that.notBefore != null) {
+            return false;
+        } else if (notBefore != null && !notBefore.equals(that.notBefore)) {
+            return false;
+        }
+        
+        if (notAfter == null && that.notAfter != null) {
+            return false;
+        } else if (notAfter != null && !notAfter.equals(that.notAfter)) {
+            return false; 
+        }
 
         return true;
     }
 
     /**
-     * Method hashCode ...
-     * @return int
+     * @return the hashcode of this object
      */
     @Override
     public int hashCode() {
         int result = tokenPeriodMinutes;
-        result = 31 * result + notBefore.hashCode();
-        result = 31 * result + notAfter.hashCode();
+        if (notBefore != null) {
+            result = 31 * result + notBefore.hashCode();
+        }
+        if (notAfter != null) {
+            result = 31 * result + notAfter.hashCode();
+        }
         return result;
     }
 }

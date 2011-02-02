@@ -23,11 +23,15 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSSecurityEngineResult;
+import org.apache.ws.security.common.CustomHandler;
 import org.apache.ws.security.common.SAML1CallbackHandler;
 import org.apache.ws.security.common.SAML2CallbackHandler;
 import org.apache.ws.security.common.SOAPUtil;
+import org.apache.ws.security.handler.RequestData;
+import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.message.WSSecHeader;
 import org.apache.ws.security.message.WSSecSAMLToken;
 import org.apache.ws.security.saml.SAMLIssuerFactory;
@@ -300,6 +304,48 @@ public class SamlTokenTest extends org.junit.Assert {
         assert !receivedAssertion.isSigned();
     }
 
+    /**
+     * This test checks that an unsigned SAML1 sender-vouches authentication assertion
+     * can be created by the WSHandler implementation 
+     */
+    @org.junit.Test
+    public void testSaml1Action() throws Exception {
+        final WSSConfig cfg = WSSConfig.getNewInstance();
+        final int action = WSConstants.ST_UNSIGNED;
+        final RequestData reqData = new RequestData();
+        reqData.setWssConfig(cfg);
+        java.util.Map<String, Object> config = new java.util.TreeMap<String, Object>();
+        config.put(WSHandlerConstants.SAML_PROP_FILE, "saml_sv.properties");
+        reqData.setMsgContext(config);
+        
+        final java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
+        actions.add(new Integer(action));
+        final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        CustomHandler handler = new CustomHandler();
+        handler.send(
+            action, 
+            doc, 
+            reqData, 
+            actions,
+            true
+        );
+        String outputString = 
+            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Unsigned SAML 1.1 authentication assertion via an Action:");
+            LOG.debug(outputString);
+        }
+        assertFalse (outputString.contains("Signature"));
+        
+        List<WSSecurityEngineResult> results = verify(doc);
+        WSSecurityEngineResult actionResult =
+            WSSecurityUtil.fetchActionResult(results, WSConstants.ST_UNSIGNED);
+        AssertionWrapper receivedAssertion = 
+            (AssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+        assertTrue(receivedAssertion != null);
+        assert !receivedAssertion.isSigned();
+    }
+    
     /**
      * Verifies the soap envelope
      * <p/>

@@ -34,6 +34,7 @@ import org.apache.ws.security.util.UUIDGenerator;
 
 import org.opensaml.common.SAMLVersion;
 import org.opensaml.common.SignableSAMLObject;
+import org.opensaml.saml1.core.AttributeStatement;
 import org.opensaml.saml1.core.AuthenticationStatement;
 import org.opensaml.saml1.core.AuthorizationDecisionStatement;
 import org.opensaml.saml1.core.ConfirmationMethod;
@@ -96,8 +97,8 @@ public class AssertionWrapper {
     /**
      * Fully qualified class name of the SAML callback handler implementation to use.
      * NOTE: Each application should provide a unique implementation of this 
-     * <code>Callback</code> that is able to extract any dynamic data from the local 
-     * environment that should be included in the generated SAML statements.
+     * <code>CallbackHandler</code> that is able to extract any dynamic data from the
+     * local environment that should be included in the generated SAML statements.
      */
     private CallbackHandler samlCallbackHandler = null;
     
@@ -241,38 +242,26 @@ public class AssertionWrapper {
                     SAML1ComponentBuilder.createSamlv1AuthenticationStatement(
                         samlCallbacks[0].getAuthenticationStatementData()
                     );
+                saml1.getAuthenticationStatements().addAll(authenticationStatements);
     
                 // Process the SAML attribute statement(s)            
-                List<org.opensaml.saml1.core.AttributeStatement> attributeStatements =
+                List<AttributeStatement> attributeStatements =
                         SAML1ComponentBuilder.createSamlv1AttributeStatement(
                             samlCallbacks[0].getAttributeStatementData()
                         );
+                saml1.getAttributeStatements().addAll(attributeStatements);
     
                 // Process the SAML authorization decision statement(s)
-                List<org.opensaml.saml1.core.AuthorizationDecisionStatement> authDecisionStatements =
+                List<AuthorizationDecisionStatement> authDecisionStatements =
                         SAML1ComponentBuilder.createSamlv1AuthorizationDecisionStatement(
                             samlCallbacks[0].getAuthDecisionStatementData()
                         );
+                saml1.getAuthorizationDecisionStatements().addAll(authDecisionStatements);
     
                 // Build the complete assertion
                 org.opensaml.saml1.core.Conditions conditions = 
                     SAML1ComponentBuilder.createSamlv1Conditions(samlCallbacks[0].getConditions());
                 saml1.setConditions(conditions);
-    
-                // Add the SAML authentication statement(s) (if any)
-                for (AuthenticationStatement authnStatement : authenticationStatements) {
-                    saml1.getAuthenticationStatements().add(authnStatement);
-                }
-    
-                // Add the SAML attribute statement(s) (if any)
-                for (org.opensaml.saml1.core.AttributeStatement attrStatement : attributeStatements) {
-                    saml1.getAttributeStatements().add(attrStatement);
-                }
-    
-                // Add the SAML authorization decision statement(s) (if any)
-                for (AuthorizationDecisionStatement authzStatement : authDecisionStatements) {
-                    saml1.getAuthorizationDecisionStatements().add(authzStatement);
-                }
             } catch (org.opensaml.xml.security.SecurityException ex) {
                 throw new WSSecurityException(
                     "Error generating KeyInfo from signing credential", ex
@@ -292,18 +281,21 @@ public class AssertionWrapper {
                 SAML2ComponentBuilder.createAuthnStatement(
                     samlCallbacks[0].getAuthenticationStatementData()
                 );
+            saml2.getAuthnStatements().addAll(authnStatements);
 
             // Attribute statement(s)
             List<org.opensaml.saml2.core.AttributeStatement> attributeStatements = 
                 SAML2ComponentBuilder.createAttributeStatement(
                     samlCallbacks[0].getAttributeStatementData()
                 );
+            saml2.getAttributeStatements().addAll(attributeStatements);
 
             // AuthzDecisionStatement(s)
             List<AuthzDecisionStatement> authDecisionStatements =
                     SAML2ComponentBuilder.createAuthorizationDecisionStatement(
                         samlCallbacks[0].getAuthDecisionStatementData()
                     );
+            saml2.getAuthzDecisionStatements().addAll(authDecisionStatements);
 
             // Build the SAML v2.0 assertion
             saml2.setIssuer(issuer);
@@ -321,21 +313,6 @@ public class AssertionWrapper {
             org.opensaml.saml2.core.Conditions conditions = 
                 SAML2ComponentBuilder.createConditions(samlCallbacks[0].getConditions());
             saml2.setConditions(conditions);
-
-            // Add the SAML authentication statemnt(s) (if any)
-            for (AuthnStatement authnStatement : authnStatements) {
-                saml2.getAuthnStatements().add(authnStatement);
-            }
-
-            // Add the SAML attribute statemnt(s) (if any)
-            for (org.opensaml.saml2.core.AttributeStatement attributeStatement : attributeStatements) {
-                saml2.getAttributeStatements().add(attributeStatement);
-            }
-
-            // Add the SAML authorization decision statemnt(s) (if any)
-            for (AuthzDecisionStatement authorizationDecisionStatement : authDecisionStatements) {
-                saml2.getAuthzDecisionStatements().add(authorizationDecisionStatement);
-            }
 
             // Set the OpenSaml2 XMLObject instance
             xmlObject = saml2;
@@ -599,7 +576,11 @@ public class AssertionWrapper {
     public SAMLVersion getSamlVersion() {
         if (samlVersion == null) {
             // Try to set the version.
-            log.debug("The SAML version was null in getSamlVersion(). Recomputing SAML version...");
+            if (log.isDebugEnabled()) {
+                log.debug(
+                    "The SAML version was null in getSamlVersion(). Recomputing SAML version..."
+                );
+            }
             if (saml1 != null && saml2 == null) {
                 samlVersion = SAMLVersion.VERSION_11;
             } else if (saml1 == null && saml2 != null) {
@@ -615,24 +596,6 @@ public class AssertionWrapper {
         return samlVersion;
     }
 
-    /**
-     * Method setSamlVersion sets the samlVersion of this AssertionWrapper object.
-     *
-     * @param samlVersion the samlVersion of this AssertionWrapper object.
-     */
-    public void setSamlVersion(SAMLVersion samlVersion) {
-        this.samlVersion = samlVersion;
-    }
-
-    /**
-     * Method setSamlCallbackHandler sets the samlCallbackHandler of this AssertionWrapper object.
-     *
-     * @param samlCallbackHandler the samlCallbackHandler of this AssertionWrapper object.
-     */
-    public void setSamlCallbackHandler(CallbackHandler samlCallbackHandler) {
-        this.samlCallbackHandler = samlCallbackHandler;
-    }
-    
     /**
      * Get the Assertion as a DOM Element.
      * @return the assertion as a DOM Element

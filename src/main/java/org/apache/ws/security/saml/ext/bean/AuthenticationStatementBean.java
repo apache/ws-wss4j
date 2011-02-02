@@ -111,11 +111,26 @@ public class AuthenticationStatementBean {
 
         AuthenticationStatementBean that = (AuthenticationStatementBean) o;
 
-        if (authenticationInstant != null ? !authenticationInstant.equals(that.authenticationInstant) : that.authenticationInstant != null)
+        if (authenticationInstant == null && that.authenticationInstant != null) {
             return false;
-        if (authenticationMethod != null ? !authenticationMethod.equals(that.authenticationMethod) : that.authenticationMethod != null)
+        } else if (authenticationInstant != null 
+            && !authenticationInstant.equals(that.authenticationInstant)) {
             return false;
-        if (subject != null ? !subject.equals(that.subject) : that.subject != null) return false;
+        }
+        
+        if (authenticationMethod == null && that.authenticationMethod != null) {
+            return false;
+        } else if (authenticationMethod != null 
+            && !authenticationMethod.equals(that.authenticationMethod)) {
+            return false;
+        }
+        
+        if (subject == null && that.subject != null) {
+            return false;
+        } else if (subject != null 
+            && !subject.equals(that.subject)) {
+            return false;
+        }
 
         return true;
     }
