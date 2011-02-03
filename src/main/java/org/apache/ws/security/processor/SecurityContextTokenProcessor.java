@@ -27,6 +27,7 @@ import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.message.token.SecurityContextToken;
+import org.apache.ws.security.validate.Validator;
 import org.w3c.dom.Element;
 
 import javax.security.auth.callback.Callback;
@@ -42,6 +43,14 @@ import java.io.IOException;
  * @author Ruchith Fernando (ruchith.fernando@gmail.com)
  */
 public class SecurityContextTokenProcessor implements Processor {
+    
+    /**
+     * Set a Validator implementation to validate the credential
+     * @param validator the Validator implementation to set
+     */
+    public void setValidator(Validator validator) {
+        // not used
+    }
 
     public List<WSSecurityEngineResult> handleToken(
         Element elem, 

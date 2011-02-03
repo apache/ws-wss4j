@@ -39,6 +39,7 @@ import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.str.STRParser;
 import org.apache.ws.security.str.SecurityTokenRefSTRParser;
 import org.apache.ws.security.util.WSSecurityUtil;
+import org.apache.ws.security.validate.Validator;
 import org.apache.xml.security.encryption.XMLCipher;
 import org.apache.xml.security.encryption.XMLEncryptionException;
 import org.w3c.dom.Attr;
@@ -49,6 +50,14 @@ import org.w3c.dom.Node;
 public class ReferenceListProcessor implements Processor {
     private static Log log = 
         LogFactory.getLog(ReferenceListProcessor.class.getName());
+    
+    /**
+     * Set a Validator implementation to validate the credential
+     * @param validator the Validator implementation to set
+     */
+    public void setValidator(Validator validator) {
+        // not used
+    }
 
     public List<WSSecurityEngineResult> handleToken(
         Element elem, 

@@ -79,6 +79,14 @@ public class SignatureProcessor implements Processor {
     private KeyInfoFactory keyInfoFactory = KeyInfoFactory.getInstance("DOM");
     private Validator validator = new SignatureTrustValidator();
     
+    /**
+     * Set a Validator implementation to validate the credential
+     * @param validator the Validator implementation to set
+     */
+    public void setValidator(Validator validator) {
+        this.validator = validator;
+    }
+    
     public List<WSSecurityEngineResult> handleToken(
         Element elem, 
         Crypto crypto, 

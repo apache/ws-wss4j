@@ -55,8 +55,6 @@ public class UsernamePasswordCallbackHandler implements CallbackHandler {
                     String password = users.get(pc.getIdentifier());
                     if (password != null) {
                         pc.setPassword(password);
-                    } else {
-                        throw new IOException("Authentication failed");
                     }
                     break;
                 }

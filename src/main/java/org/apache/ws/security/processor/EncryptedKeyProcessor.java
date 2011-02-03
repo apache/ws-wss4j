@@ -34,6 +34,7 @@ import org.apache.ws.security.str.EncryptedKeySTRParser;
 import org.apache.ws.security.str.STRParser;
 import org.apache.ws.security.util.Base64;
 import org.apache.ws.security.util.WSSecurityUtil;
+import org.apache.ws.security.validate.Validator;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -55,6 +56,14 @@ import java.util.List;
 
 public class EncryptedKeyProcessor implements Processor {
     private static Log log = LogFactory.getLog(EncryptedKeyProcessor.class.getName());
+    
+    /**
+     * Set a Validator implementation to validate the credential
+     * @param validator the Validator implementation to set
+     */
+    public void setValidator(Validator validator) {
+        // not used
+    }
     
     public List<WSSecurityEngineResult> handleToken(
         Element elem, 

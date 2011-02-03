@@ -32,6 +32,7 @@ import org.apache.ws.security.action.Action;
 import org.apache.ws.security.processor.Processor;
 import org.apache.ws.security.util.Loader;
 import org.apache.ws.security.util.UUIDGenerator;
+import org.apache.ws.security.validate.Validator;
 
 /**
  * WSSConfig <p/> Carries configuration data so the WSS4J spec compliance can be
@@ -166,6 +167,41 @@ public class WSSConfig {
         }
         DEFAULT_PROCESSORS = java.util.Collections.unmodifiableMap(tmp);
     }
+    
+    /**
+     * The default collection of validators supported by the toolkit
+     */
+    private static final Map<QName, Class<?>> DEFAULT_VALIDATORS;
+    static {
+        final Map<QName, Class<?>> tmp = new HashMap<QName, Class<?>>();
+        try {
+            tmp.put(
+                WSSecurityEngine.SAML_TOKEN,
+                org.apache.ws.security.validate.SamlAssertionValidator.class
+            );
+            tmp.put(
+                WSSecurityEngine.SAML2_TOKEN,
+                org.apache.ws.security.validate.SamlAssertionValidator.class
+            );
+            tmp.put(
+                WSSecurityEngine.SIGNATURE,
+                org.apache.ws.security.validate.SignatureTrustValidator.class
+            );
+            tmp.put(
+                WSSecurityEngine.TIMESTAMP,
+                org.apache.ws.security.validate.TimestampValidator.class
+            );
+            tmp.put(
+                WSSecurityEngine.USERNAME_TOKEN,
+                org.apache.ws.security.validate.UsernameTokenValidator.class
+            );
+        } catch (final Throwable t) {
+            if (log.isDebugEnabled()) {
+                log.debug(t.getMessage(), t);
+            }
+        }
+        DEFAULT_VALIDATORS = java.util.Collections.unmodifiableMap(tmp);
+    }
 
     protected boolean wsiBSPCompliant = false;
 
@@ -276,6 +312,15 @@ public class WSSConfig {
      */
     private final Map<QName, Object> processorMap = 
         new HashMap<QName, Object>(DEFAULT_PROCESSORS);
+    
+    /**
+     * The known validators. This map is of the form <QName, Class<?>> or
+     * <QName, Validator>.
+     * The known validators are initialized from a set of defaults,
+     * but the list may be modified via the setValidator operations.
+     */
+    private final Map<QName, Object> validatorMap = 
+        new HashMap<QName, Object>(DEFAULT_VALIDATORS);
     
     /**
      * a static boolean flag that determines whether default JCE providers
@@ -594,6 +639,65 @@ public class WSSConfig {
     }
     
     /**
+     * Associate a SOAP validator name with a specified SOAP Security header
+     * element QName.  Validators registered under this QName will be
+     * called when processing header elements with the specified type.
+     * 
+     * Please note that the Validator object does NOT get class-loaded per invocation, and so
+     * it is up to the implementing class to ensure that it is thread-safe.
+     */
+    public Class<?> setValidator(QName el, Validator validator) {
+        Object result = validatorMap.put(el, validator);
+        if (result instanceof Class<?>) {
+            return (Class<?>)result;
+        } else if (result instanceof Validator) {
+            return result.getClass();
+        }
+        return null;
+    }
+    
+    /**
+     * Associate a SOAP validator name with a specified SOAP Security header
+     * element QName.  validator registered under this QName will be
+     * called when processing header elements with the specified type.
+     */
+    public Class<?> setValidator(QName el, Class<?> clazz) {
+        Object result = validatorMap.put(el, clazz);
+        if (result instanceof Class<?>) {
+            return (Class<?>)result;
+        } else if (result instanceof Validator) {
+            return result.getClass();
+        }
+        return null;
+    }
+    
+    /**
+     * @return      the SOAP Validator associated with the specified
+     *              QName.  The QName is intended to refer to an element
+     *              in a SOAP security header.  This operation returns
+     *              null if there is no Validator associated with the 
+     *              specified QName.
+     */
+    public Validator getValidator(QName el) throws WSSecurityException {
+        final Object validatorObject = validatorMap.get(el);
+        
+        if (validatorObject instanceof Class<?>) {
+            try {
+                return (Validator)((Class<?>)validatorObject).newInstance();
+            } catch (Throwable t) {
+                if (log.isDebugEnabled()) {
+                    log.debug(t.getMessage(), t);
+                }
+                throw new WSSecurityException(WSSecurityException.FAILURE,
+                    "unableToLoadClass", new Object[] { ((Class<?>)validatorObject).getName() }, t);
+            }
+        } else if (validatorObject instanceof Validator) {
+            return (Validator)validatorObject;
+        }
+        return null;
+    }
+    
+    /**
      * @return      the SOAP processor associated with the specified
      *              QName.  The QName is intended to refer to an element
      *              in a SOAP security header.  This operation returns
@@ -605,7 +709,12 @@ public class WSSConfig {
         
         if (processorObject instanceof Class<?>) {
             try {
-                return (Processor)((Class<?>)processorObject).newInstance();
+                Processor processor = (Processor)((Class<?>)processorObject).newInstance();
+                Validator validator = getValidator(el);
+                if (validator != null) {
+                    processor.setValidator(validator);
+                }
+                return processor;
             } catch (Throwable t) {
                 if (log.isDebugEnabled()) {
                     log.debug(t.getMessage(), t);

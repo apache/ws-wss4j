@@ -146,10 +146,11 @@ public class SignatureSTRParser implements STRParser {
                 }
             } else {
                 int action = ((Integer)result.get(WSSecurityEngineResult.TAG_ACTION)).intValue();
-                if (WSConstants.UT == action) {
+                if (WSConstants.UT_UNKNOWN == action || WSConstants.UT == action) {
                     UsernameToken usernameToken = 
                         (UsernameToken)result.get(WSSecurityEngineResult.TAG_USERNAME_TOKEN);
 
+                    usernameToken.setRawPassword(cb);
                     if (usernameToken.isDerivedKey()) {
                         secretKey = usernameToken.getDerivedKey();
                     } else {

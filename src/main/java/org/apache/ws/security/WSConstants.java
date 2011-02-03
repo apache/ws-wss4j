@@ -409,6 +409,7 @@ public class WSConstants {
     public static final int SCT = 0x400; //SecurityContextToken
     public static final int DKT = 0x800; //DerivedKeyToken
     public static final int BST = 0x1000; //BinarySecurityToken
+    public static final int UT_UNKNOWN = 0x2000; // perform UsernameToken
 
     /**
      * Length of UsernameToken derived key used by .NET WSE to sign a message.

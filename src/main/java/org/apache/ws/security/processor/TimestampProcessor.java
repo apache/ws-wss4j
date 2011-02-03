@@ -39,6 +39,14 @@ import javax.security.auth.callback.CallbackHandler;
 public class TimestampProcessor implements Processor {
     private static Log log = LogFactory.getLog(TimestampProcessor.class.getName());
     private Validator validator = new TimestampValidator();
+    
+    /**
+     * Set a Validator implementation to validate the credential
+     * @param validator the Validator implementation to set
+     */
+    public void setValidator(Validator validator) {
+        this.validator = validator;
+    }
 
     public List<WSSecurityEngineResult> handleToken(
         Element elem, 

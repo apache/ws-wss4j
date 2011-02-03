@@ -41,6 +41,14 @@ public class UsernameTokenProcessor implements Processor {
     private static Log log = LogFactory.getLog(UsernameTokenProcessor.class.getName());
     
     private Validator validator = new UsernameTokenValidator();
+    
+    /**
+     * Set a Validator implementation to validate the credential
+     * @param validator the Validator implementation to set
+     */
+    public void setValidator(Validator validator) {
+        this.validator = validator;
+    }
 
     public List<WSSecurityEngineResult> handleToken(
         Element elem, Crypto crypto, Crypto decCrypto, CallbackHandler cb, 
@@ -61,8 +69,12 @@ public class UsernameTokenProcessor implements Processor {
         principal.setCreatedTime(token.getCreated());
         principal.setPasswordType(token.getPasswordType());
         
+        int action = WSConstants.UT;
+        if (token.getPassword() == null) { 
+            action = WSConstants.UT_UNKNOWN;
+        }
         WSSecurityEngineResult result = 
-            new WSSecurityEngineResult(WSConstants.UT, token, principal);
+            new WSSecurityEngineResult(action, token, principal);
         result.put(WSSecurityEngineResult.TAG_ID, token.getID());
         wsDocInfo.addTokenElement(elem);
         wsDocInfo.addResult(result);

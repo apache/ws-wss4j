@@ -43,6 +43,14 @@ public class SAMLTokenProcessor implements Processor {
     
     private Validator validator = new SamlAssertionValidator();
     
+    /**
+     * Set a Validator implementation to validate the credential
+     * @param validator the Validator implementation to set
+     */
+    public void setValidator(Validator validator) {
+        this.validator = validator;
+    }
+    
     public List<WSSecurityEngineResult> handleToken(
         Element elem, 
         Crypto crypto,

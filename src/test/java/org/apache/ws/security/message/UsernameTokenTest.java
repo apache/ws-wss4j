@@ -21,6 +21,7 @@ package org.apache.ws.security.message;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSecurityEngine;
@@ -34,6 +35,7 @@ import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.message.token.UsernameToken;
 import org.apache.ws.security.util.Base64;
+import org.apache.ws.security.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 
 import javax.security.auth.callback.Callback;
@@ -41,6 +43,7 @@ import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
 import java.io.IOException;
 import java.security.MessageDigest;
+import java.util.List;
 
 /**
  * WS-Security Test Case for UsernameTokens.
@@ -192,7 +195,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         LOG.info("After adding UsernameToken PW Digest....");
         try {
             verify(signedDoc);
-            throw new Exception("Failure expected on a bad username");
+            fail("Failure expected on a bad username");
         } catch (WSSecurityException ex) {
             String message = ex.getMessage();
             assertTrue(message.indexOf("badusername") == -1);
@@ -223,7 +226,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         LOG.info("After adding UsernameToken PW Digest....");
         try {
             verify(signedDoc);
-            throw new Exception("Failure expected on a bad password digest");
+            fail("Failure expected on a bad password digest");
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == WSSecurityException.FAILED_AUTHENTICATION);
             // expected
@@ -304,7 +307,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         
         try {
             verify(signedDoc);
-            throw new Exception("Failure expected on a bad password text");
+            fail("Failure expected on a bad password text");
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == WSSecurityException.FAILED_AUTHENTICATION);
             // expected
@@ -344,7 +347,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         }
         try {
             verify(doc);
-            throw new Exception("Failure expected on no password");
+            fail("Failure expected on no password");
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == WSSecurityException.FAILED_AUTHENTICATION);
             // expected
@@ -369,13 +372,13 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
                 org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
-        try {
-            verify(signedDoc);
-            throw new Exception("Failure expected on no password");
-        } catch (WSSecurityException ex) {
-            assertTrue(ex.getErrorCode() == WSSecurityException.FAILED_AUTHENTICATION);
-            // expected
-        }
+        
+        List<WSSecurityEngineResult> results = verify(signedDoc);
+        WSSecurityEngineResult actionResult =
+            WSSecurityUtil.fetchActionResult(results, WSConstants.UT_UNKNOWN);
+        UsernameToken receivedToken = 
+            (UsernameToken) actionResult.get(WSSecurityEngineResult.TAG_USERNAME_TOKEN);
+        assertTrue(receivedToken != null);
     }
     
     /**
@@ -416,44 +419,14 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
     }
     
     /**
-     * Test with a null token type. This will fail as the default is to reject custom
+     * Test with a non-standard token type. This will fail as the default is to reject custom
      * token types.
      */
     @org.junit.Test
     public void testUsernameTokenCustomFail() throws Exception {
         WSSecUsernameToken builder = new WSSecUsernameToken();
-        builder.setPasswordType(null);
-        builder.setUserInfo("wernerd", null);
-        
-        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
-        Document signedDoc = builder.build(doc, secHeader);
-        
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Message with UserNameToken PW Text:");
-            String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
-            LOG.debug(outputString);
-        }
-        try {
-            secEngine.processSecurityHeader(signedDoc, null, this, null);
-            throw new Exception("Custom token types are not permitted");
-        } catch (WSSecurityException ex) {
-            assertTrue(ex.getErrorCode() == WSSecurityException.FAILED_AUTHENTICATION);
-            // expected
-        }
-    }
-    
-    /**
-     * Test with a non-standard token type. This will fail as the default is to reject custom
-     * token types.
-     */
-    @org.junit.Test
-    public void testUsernameTokenCustomFail2() throws Exception {
-        WSSecUsernameToken builder = new WSSecUsernameToken();
         builder.setPasswordType("RandomType");
-        builder.setUserInfo("customUser", "randomPass");
+        builder.setUserInfo("wernerd", "verySecret");
         
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader();
@@ -468,7 +441,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         }
         try {
             secEngine.processSecurityHeader(signedDoc, null, this, null);
-            throw new Exception("Custom token types are not permitted");
+            fail("Custom token types are not permitted");
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == WSSecurityException.FAILED_AUTHENTICATION);
             // expected
@@ -483,7 +456,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
     public void testUsernameTokenCustomPass() throws Exception {
         WSSecUsernameToken builder = new WSSecUsernameToken();
         builder.setPasswordType("RandomType");
-        builder.setUserInfo("customUser", "randomPass");
+        builder.setUserInfo("wernerd", "verySecret");
 
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader();
@@ -503,7 +476,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         WSSConfig cfg = WSSConfig.getNewInstance();
         cfg.setHandleCustomPasswordTypes(true);
         secEngine.setWssConfig(cfg);
-        secEngine.processSecurityHeader(signedDoc, null, this, null);
+        verify(signedDoc);
         
         //
         // Go back to default for other tests
@@ -549,7 +522,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
             // Verification should fail as the password is bad
             //
             verify(utDoc);
-            throw new Exception("Expected failure due to a bad password");
+            fail("Expected failure due to a bad password");
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == WSSecurityException.FAILED_AUTHENTICATION);
             // expected
@@ -592,7 +565,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
             // Verification should fail as the password is bad
             //
             verify(utDoc);
-            throw new Exception("Expected failure due to a bad password");
+            fail("Expected failure due to a bad password");
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == WSSecurityException.FAILED_AUTHENTICATION);
             // expected
@@ -678,10 +651,8 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
      * @param env soap envelope
      * @throws java.lang.Exception Thrown when there is a problem in verification
      */
-    private void verify(Document doc) throws Exception {
-        LOG.info("Before verifying UsernameToken....");
-        secEngine.processSecurityHeader(doc, null, callbackHandler, null);
-        LOG.info("After verifying UsernameToken....");
+    private List<WSSecurityEngineResult> verify(Document doc) throws Exception {
+        return secEngine.processSecurityHeader(doc, null, callbackHandler, null);
     }
     
     /**

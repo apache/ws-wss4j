@@ -22,6 +22,7 @@ package org.apache.ws.security.message.token;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.WSUsernameTokenPrincipal;
 import org.apache.ws.security.util.DOM2Writer;
@@ -35,7 +36,12 @@ import org.w3c.dom.Text;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.CallbackHandler;
+import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.xml.namespace.QName;
+
+import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.Principal;
@@ -479,18 +485,31 @@ public class UsernameToken {
 
     /**
      * Set the raw (plain text) password used to compute secret key.
-     * 
-     * @param newRawPassword the raw password to set
      */
-    public void setRawPassword(String newRawPassword) {
-        rawPassword = newRawPassword;
-    }
-    
-    /**
-     * Get the raw (plain text) password used to compute secret key.
-     */
-    public String getRawPassword() {
-        return rawPassword;
+    public void setRawPassword(CallbackHandler callbackHandler) throws WSSecurityException {
+        WSPasswordCallback pwCb = 
+            new WSPasswordCallback(
+                getName(), getPassword(), getPasswordType(), 
+                WSPasswordCallback.USERNAME_TOKEN_UNKNOWN
+            );
+        try {
+            callbackHandler.handle(new Callback[]{pwCb});
+        } catch (IOException e) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug(e);
+            }
+            throw new WSSecurityException(
+                WSSecurityException.FAILED_AUTHENTICATION, null, null, e
+            );
+        } catch (UnsupportedCallbackException e) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug(e);
+            }
+            throw new WSSecurityException(
+                WSSecurityException.FAILED_AUTHENTICATION, null, null, e
+            );
+        }
+        rawPassword = pwCb.getPassword();
     }
     
     /**
@@ -672,7 +691,6 @@ public class UsernameToken {
             key = P_hash(password, seed, mac, keylen);
 
             if (LOG.isDebugEnabled()) {
-                LOG.debug("password   :" + Base64.encode(password));
                 LOG.debug("label      :" + Base64.encode(label));
                 LOG.debug("nonce      :" + Base64.encode(nonce));
                 LOG.debug("created    :" + Base64.encode(created));
@@ -771,6 +789,9 @@ public class UsernameToken {
      * @throws WSSecurityException
      */
     public byte[] getDerivedKey() throws WSSecurityException {
+        if (rawPassword == null) {
+            throw new WSSecurityException(WSSecurityException.FAILED_AUTHENTICATION);
+        }
         int iteration = getIteration();
         byte[] salt = getSalt();
         if (passwordsAreEncoded) {

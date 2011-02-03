@@ -91,9 +91,10 @@ public class DerivedKeyTokenSTRParser implements STRParser {
         
         if (result != null) {
             int action = ((Integer)result.get(WSSecurityEngineResult.TAG_ACTION)).intValue();
-            if (WSConstants.UT == action) {
+            if (WSConstants.UT_UNKNOWN == action || WSConstants.UT == action) {
                 UsernameToken usernameToken = 
                     (UsernameToken)result.get(WSSecurityEngineResult.TAG_USERNAME_TOKEN);
+                usernameToken.setRawPassword(cb);
                 secretKey = usernameToken.getDerivedKey();
             } else if (WSConstants.ENCR == action) {
                 secretKey = (byte[])result.get(WSSecurityEngineResult.TAG_SECRET);
