@@ -19,6 +19,7 @@
 package org.apache.ws.security.message;
 
 import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -103,7 +104,7 @@ public class WSSecHeader {
      * @return true if empty or if there is no security header
      *         false if non empty security header
      */
-    public boolean isEmpty(Document doc) {
+    public boolean isEmpty(Document doc) throws WSSecurityException {
         if (securityHeader == null) {            
             securityHeader = 
                 WSSecurityUtil.findWsseSecurityHeaderBlock(
@@ -127,7 +128,7 @@ public class WSSecHeader {
      * @param doc A SOAP envelope as <code>Document</code>
      * @return A <code>wsse:Security</code> element
      */
-    public Element insertSecurityHeader(Document doc) {
+    public Element insertSecurityHeader(Document doc) throws WSSecurityException {
         //
         // If there is already a security header in this instance just return it
         //
@@ -172,7 +173,7 @@ public class WSSecHeader {
         return securityHeader;
     }
     
-    public void removeSecurityHeader(Document doc) {
+    public void removeSecurityHeader(Document doc) throws WSSecurityException {
         if (securityHeader == null) {            
             securityHeader = 
                 WSSecurityUtil.findWsseSecurityHeaderBlock(

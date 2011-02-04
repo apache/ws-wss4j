@@ -1103,7 +1103,7 @@ public abstract class WSHandler {
      * @param timeToLive
      *            the limit on the receivers' side, that the timestamp is validated against
      * @return true if the timestamp is before (now-timeToLive), false otherwise
-     * @Deprecated TTL validation is now done by default in the TimestampProcessor
+     * @deprecated TTL validation is now done by default in the TimestampProcessor
      * @throws WSSecurityException
      */
     protected boolean verifyTimestamp(Timestamp timestamp, int timeToLive) throws WSSecurityException {
