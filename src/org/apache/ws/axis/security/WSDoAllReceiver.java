@@ -160,6 +160,7 @@ public class WSDoAllReceiver extends WSDoAllHandler {
                 t1 = System.currentTimeMillis();
             }        
 
+            secEngine.setWssConfig(reqData.getWssConfig()); 
             try {
                 wsResult = secEngine.processSecurityHeader(doc, actor,
                         cbHandler, reqData.getSigCrypto(), reqData.getDecCrypto());
