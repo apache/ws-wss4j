@@ -93,7 +93,7 @@ public class X509Util {
         if (keyName == null || keyName.length() <= 0) {
             throw new WSSecurityException(WSSecurityException.INVALID_SECURITY, "noKeyname");
         }
-        WSPasswordCallback pwCb = new WSPasswordCallback(keyName, WSPasswordCallback.KEY_NAME);
+        WSPasswordCallback pwCb = new WSPasswordCallback(keyName, WSPasswordCallback.SECRET_KEY);
         try {
             cb.handle(new Callback[]{pwCb});
         } catch (IOException e) {

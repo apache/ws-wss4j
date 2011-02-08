@@ -25,57 +25,84 @@ import javax.security.auth.callback.Callback;
 
 /**
  * Simple class to provide a password callback mechanism.
- * <p/>
+ *
  * It uses the JAAS authentication mechanisms and callback methods.
  * In addition to the identifier (user name) this class also provides
  * information what type of information the callback <code>handle</code>
  * method shall provide.
- * <p/>
- * The <code> WSPasswordCallback</code> class defines the following usage
- * codes:
- * <ul>
- * <li><code>UNKNOWN</code> - an unknown usage. Never used by the WSS4J
- * implementation and shall be treated as an error by the <code>handle
- * </code> method.</li>
- * <li><code>DECRYPT</code> - need a password to get the private key of
- * this identifier (username) from the keystore. WSS4J uses this private
- * key to decrypt the session (symmetric) key. Because the encryption
- * method uses the public key to encrypt the session key it needs no
- * password (a public key is usually not protected by a password).</li>
- * <li><code>USERNAME_TOKEN</code> - need the password to fill in or to
- * verify a <code>UsernameToken</code>.</li>
- * <li><code>SIGNATURE</code> - need the password to get the private key of
- * this identifier (username) from    the keystore. WSS4J uses this private
- * key to produce a signature. The signature verification uses the public
- * key to verify the signature.</li>
- * <li><code>KEY_NAME</code> - need the <i>key</i>, not the password,
- * associated with the identifier. WSS4J uses this key to encrypt or
- * decrypt parts of the SOAP request. Note, the key must match the
- * symmetric encryption/decryption algorithm specified (refer to
- * {@link org.apache.ws.security.handler.WSHandlerConstants#ENC_SYM_ALGO}).</li>
- * <li><code>USERNAME_TOKEN_UNKNOWN</code> - A not specified password type. 
- * In this case <b>only</b> the password variable is <b>set</b>. The callback
- * class now may check if the username and password match. If they don't match
- * the callback class must throw an exception. The exception can be a 
- * UnsupportedCallbackException or an IOException.</li>
- * <li><code>SECURITY_CONTEXT_TOKEN</code> - need the key to to be associated 
- * with a <code>wsc:SecurityContextToken</code>.</li>
- * </ul>
  *
  * @author Werner Dittmann (Werner.Dittmann@siemens.com).
  */
-
 public class WSPasswordCallback implements Callback {
 
+    /**
+     * An unknown usage. Never used by the WSS4J implementation and should be treated 
+     * as an error.
+     */
     public static final int UNKNOWN = 0;
+    
+    /**
+     * DECRYPT usage is used when the calling code needs a password to get the private key of
+     * this identifier (alias) from a keystore. This is only used for the inbound case of
+     * decrypting a session (symmetric) key, and not for the case of getting a private key to
+     * sign the message. The CallbackHandler must set the password via the setPassword(String) 
+     * method.
+     */
     public static final int DECRYPT = 1;
+    
+    /**
+     * USERNAME_TOKEN usage is used to obtain a password for either creating a Username Token,
+     * or for validating it. It is also used for the case of deriving a key from a Username Token.
+     * The CallbackHandler must set the password via the setPassword(String) method.
+     */
     public static final int USERNAME_TOKEN = 2;
+    
+    /**
+     * SIGNATURE usage is used on the outbound side only, to get a password to get the private
+     * key of this identifier (alias) from a keystore. The CallbackHandler must set the password 
+     * via the setPassword(String) method.
+     */
     public static final int SIGNATURE = 3;
+    
+    /**
+     * This identifier is deprecated and not used any more.
+     */
+    @Deprecated
     public static final int KEY_NAME = 4;
+    
+    /**
+     * This identifier is deprecated and not used any more.
+     */
+    @Deprecated
     public static final int USERNAME_TOKEN_UNKNOWN = 5;
-    public final static int SECURITY_CONTEXT_TOKEN = 6;
-    public final static int CUSTOM_TOKEN = 7;
-    public final static int ENCRYPTED_KEY_TOKEN = 8;
+    
+    /**
+     * SECURITY_CONTEXT_TOKEN usage is for the case of when we want the CallbackHandler to 
+     * supply the key associated with a SecurityContextToken. The CallbackHandler must set 
+     * the key via the setKey(byte[]) method.
+     */
+    public static final int SECURITY_CONTEXT_TOKEN = 6;
+    
+    /**
+     * CUSTOM_TOKEN usage is used for the case that we want the CallbackHandler to supply a
+     * token as a DOM Element. For example, this is used for the case of a reference to a 
+     * SAML Assertion or Security Context Token that is not in the message. The CallbackHandler 
+     * must set the token via the setCustomToken(Element) method.
+     */
+    public static final int CUSTOM_TOKEN = 7;
+    
+    /**
+     * This identifier is deprecated and not used any more.
+     */
+    @Deprecated
+    public static final int ENCRYPTED_KEY_TOKEN = 8;
+    
+    /**
+     * SECRET_KEY usage is used for the case that we want to obtain a secret key for encryption
+     * or signature on the outbound side, or for decryption or verification on the inbound side.
+     * The CallbackHandler must set the key via the setKey(byte[]) method.
+     */
+    public static final int SECRET_KEY = 9;
     
     private String identifier;
     private String password;
@@ -118,12 +145,7 @@ public class WSPasswordCallback implements Callback {
     }
     
     /**
-     * Extended callback interface allows for setting the username as well.
-     * Callback functions can change the identifier, this is intended in the usernametoken scenario
-     * where the usernametoken denotes the identity, but a fixed identity for signing is used
-     * The initial value is that from the configuration file. If this method is not called, the
-     * configured identity is used.
-     * 
+     * Set the identifier
      * @param ident The identity.
      */
     public void setIdentifier(String ident) {
@@ -179,28 +201,26 @@ public class WSPasswordCallback implements Callback {
     public int getUsage() {
         return usage;
     }
+    
     /**
-     * The password type is only relevant for usage <code>USERNAME_TOKEN</code>
-     * and <code>USERNAME_TOKEN_UNKNOWN</code>.
-     * 
-     * @return Returns the passwordType.
+     * @return Returns the type.
      */
-    public String getPasswordType() {
+    public String getType() {
         return type;
     }
 
     /**
-     * The key type is only relevant for usage <code>ENCRYPTED_KEY_TOKEN</code>
      * 
-     * @return Returns the type.
+     * @return the custom token
      */
-    public String getKeyType() {
-        return type;
-    }
     public Element getCustomToken() {
         return customToken;
     }
 
+    /**
+     * Set the custom token
+     * @param customToken
+     */
     public void setCustomToken(Element customToken) {
         this.customToken = customToken;
     }

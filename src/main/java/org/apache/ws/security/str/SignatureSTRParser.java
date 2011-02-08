@@ -128,6 +128,9 @@ public class SignatureSTRParser implements STRParser {
                     }
                     secretKey = samlKi.getSecret();
                     principal = createPrincipalFromSAMLKeyInfo(samlKi, assertion);
+                    if (secretKey != null && certs == null) {
+                        ((CustomTokenPrincipal)principal).setRequiresFurtherAuthentication(false);
+                    }
                 } else if (el.equals(WSSecurityEngine.ENCRYPTED_KEY)){
                     EncryptedKeyProcessor proc = 
                         new EncryptedKeyProcessor();
@@ -139,14 +142,15 @@ public class SignatureSTRParser implements STRParser {
                             WSSecurityEngineResult.TAG_SECRET
                         );
                     principal = new CustomTokenPrincipal(token.getAttribute("Id"));
+                    ((CustomTokenPrincipal)principal).setRequiresFurtherAuthentication(false);
                 } else {
                     String id = secRef.getReference().getURI();
-                    secretKey = getSecretKeyFromCustomToken(id, cb);
+                    secretKey = getSecretKeyFromToken(id, null, cb);
                     principal = new CustomTokenPrincipal(id);
                 }
             } else {
                 int action = ((Integer)result.get(WSSecurityEngineResult.TAG_ACTION)).intValue();
-                if (WSConstants.UT_UNKNOWN == action || WSConstants.UT == action) {
+                if (WSConstants.UT_NOPASSWORD == action || WSConstants.UT == action) {
                     UsernameToken usernameToken = 
                         (UsernameToken)result.get(WSSecurityEngineResult.TAG_USERNAME_TOKEN);
 
@@ -165,6 +169,7 @@ public class SignatureSTRParser implements STRParser {
                     secretKey = (byte[])result.get(WSSecurityEngineResult.TAG_SECRET);
                     String id = (String)result.get(WSSecurityEngineResult.TAG_ID);
                     principal = new CustomTokenPrincipal(id);
+                    ((CustomTokenPrincipal)principal).setRequiresFurtherAuthentication(false);
                 } else if (WSConstants.SCT == action) {
                     secretKey = (byte[])result.get(WSSecurityEngineResult.TAG_SECRET);
                     SecurityContextToken sct = 
@@ -199,6 +204,9 @@ public class SignatureSTRParser implements STRParser {
                     secretKey = keyInfo.getSecret();
                     publicKey = keyInfo.getPublicKey();
                     principal = createPrincipalFromSAMLKeyInfo(keyInfo, assertion);
+                    if (secretKey != null && certs == null && publicKey == null) {
+                        ((CustomTokenPrincipal)principal).setRequiresFurtherAuthentication(false);
+                    }
                 }
             }
         } else if (secRef.containsX509Data() || secRef.containsX509IssuerSerial()) {
@@ -209,7 +217,8 @@ public class SignatureSTRParser implements STRParser {
         } else if (secRef.containsKeyIdentifier()) {
             if (secRef.getKeyIdentifierValueType().equals(SecurityTokenReference.ENC_KEY_SHA1_URI)) {
                 String id = secRef.getKeyIdentifierValue();
-                secretKey = getSecretKeyFromEncKeySHA1KI(id, cb);
+                secretKey = 
+                    getSecretKeyFromToken(id, SecurityTokenReference.ENC_KEY_SHA1_URI, cb);
                 principal = new CustomTokenPrincipal(id);
             } else if (WSConstants.WSS_SAML_KI_VALUE_TYPE.equals(secRef.getKeyIdentifierValueType())
                 || WSConstants.WSS_SAML2_KI_VALUE_TYPE.equals(secRef.getKeyIdentifierValueType())) {
@@ -225,6 +234,9 @@ public class SignatureSTRParser implements STRParser {
                 secretKey = samlKi.getSecret();
                 publicKey = samlKi.getPublicKey();
                 principal = createPrincipalFromSAMLKeyInfo(samlKi, assertion);
+                if (secretKey != null && certs == null && publicKey == null) {
+                    ((CustomTokenPrincipal)principal).setRequiresFurtherAuthentication(false);
+                }
             } else {
                 X509Certificate[] foundCerts = secRef.getKeyIdentifier(crypto);
                 if (foundCerts != null) {
@@ -349,21 +361,23 @@ public class SignatureSTRParser implements STRParser {
     }
     
     /**
-     * Get the Secret Key from a CallbackHandler for a custom token
+     * Get the Secret Key from a CallbackHandler
      * @param id The id of the element
+     * @param type The type of the element (can be null)
      * @param cb The CallbackHandler object
      * @return A Secret Key
      * @throws WSSecurityException
      */
-    private byte[] getSecretKeyFromCustomToken(
+    private byte[] getSecretKeyFromToken(
         String id,
+        String type,
         CallbackHandler cb
     ) throws WSSecurityException {
         if (id.charAt(0) == '#') {
             id = id.substring(1);
         }
         WSPasswordCallback pwcb = 
-            new WSPasswordCallback(id, WSPasswordCallback.CUSTOM_TOKEN);
+            new WSPasswordCallback(id, null, type, WSPasswordCallback.SECRET_KEY);
         try {
             Callback[] callbacks = new Callback[]{pwcb};
             cb.handle(callbacks);
@@ -379,36 +393,5 @@ public class SignatureSTRParser implements STRParser {
         return pwcb.getKey();
     }
     
-    /**
-     * Get the Secret Key from a CallbackHandler for the Encrypted Key SHA1 case.
-     * @param id The id of the element
-     * @param cb The CallbackHandler object
-     * @return A Secret Key
-     * @throws WSSecurityException
-     */
-    private byte[] getSecretKeyFromEncKeySHA1KI(
-        String id,
-        CallbackHandler cb
-    ) throws WSSecurityException {
-        WSPasswordCallback pwcb = 
-            new WSPasswordCallback(
-                id,
-                null,
-                SecurityTokenReference.ENC_KEY_SHA1_URI,
-                WSPasswordCallback.ENCRYPTED_KEY_TOKEN
-            );
-        try {
-            Callback[] callbacks = new Callback[]{pwcb};
-            cb.handle(callbacks);
-        } catch (Exception e) {
-            throw new WSSecurityException(
-                WSSecurityException.FAILURE,
-                "noPassword", 
-                new Object[] {id}, 
-                e
-            );
-        }
-        return pwcb.getKey();
-    }
     
 }

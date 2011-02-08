@@ -490,7 +490,7 @@ public class UsernameToken {
         WSPasswordCallback pwCb = 
             new WSPasswordCallback(
                 getName(), getPassword(), getPasswordType(), 
-                WSPasswordCallback.USERNAME_TOKEN_UNKNOWN
+                WSPasswordCallback.USERNAME_TOKEN
             );
         try {
             callbackHandler.handle(new Callback[]{pwCb});

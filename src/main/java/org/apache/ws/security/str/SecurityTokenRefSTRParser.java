@@ -106,22 +106,8 @@ public class SecurityTokenRefSTRParser implements STRParser {
                     secretKey = (byte[])result.get(WSSecurityEngineResult.TAG_SECRET);
                 }
             } else {
-                // Try custom token
-                WSPasswordCallback pwcb = 
-                    new WSPasswordCallback(id, WSPasswordCallback.CUSTOM_TOKEN);
-                try {
-                    Callback[] callbacks = new Callback[]{pwcb};
-                    cb.handle(callbacks);
-                } catch (Exception e) {
-                    throw new WSSecurityException(
-                            WSSecurityException.FAILURE,
-                            "noPassword", 
-                            new Object[] {id}, 
-                            e
-                    );
-                }
-                secretKey = pwcb.getKey();
-
+                // Try asking the CallbackHandler for the secret key
+                secretKey = getSecretKeyFromToken(id, null, cb);
                 if (secretKey == null) {
                     throw new WSSecurityException(
                             WSSecurityException.FAILED_CHECK, "unsupportedKeyId"
@@ -140,27 +126,10 @@ public class SecurityTokenRefSTRParser implements STRParser {
                 // secret in them
                 secretKey = samlKi.getSecret();
             } else {
-                String keyIdentifierValue = secRef.getKeyIdentifierValue();
-                WSPasswordCallback pwcb = 
-                    new WSPasswordCallback(
-                            keyIdentifierValue,
-                            null,
-                            secRef.getKeyIdentifierValueType(),
-                            WSPasswordCallback.ENCRYPTED_KEY_TOKEN
+                secretKey = 
+                    getSecretKeyFromToken(
+                        secRef.getKeyIdentifierValue(), secRef.getKeyIdentifierValueType(), cb
                     );
-
-                try {
-                    Callback[] callbacks = new Callback[]{pwcb};
-                    cb.handle(callbacks);
-                } catch (Exception e) {
-                    throw new WSSecurityException(
-                            WSSecurityException.FAILURE,
-                            "noPassword", 
-                            new Object[] {keyIdentifierValue}, 
-                            e
-                    );
-                }
-                secretKey = pwcb.getKey();
             }
         } else {
             throw new WSSecurityException(WSSecurityException.FAILED_CHECK, "noReference");
@@ -199,5 +168,37 @@ public class SecurityTokenRefSTRParser implements STRParser {
         return secretKey;
     }
     
+    /**
+     * Get the Secret Key from a CallbackHandler
+     * @param id The id of the element
+     * @param type The type of the element (may be null)
+     * @param cb The CallbackHandler object
+     * @return A Secret Key
+     * @throws WSSecurityException
+     */
+    private byte[] getSecretKeyFromToken(
+        String id,
+        String type,
+        CallbackHandler cb
+    ) throws WSSecurityException {
+        if (id.charAt(0) == '#') {
+            id = id.substring(1);
+        }
+        WSPasswordCallback pwcb = 
+            new WSPasswordCallback(id, null, type, WSPasswordCallback.SECRET_KEY);
+        try {
+            Callback[] callbacks = new Callback[]{pwcb};
+            cb.handle(callbacks);
+        } catch (Exception e) {
+            throw new WSSecurityException(
+                WSSecurityException.FAILURE,
+                "noPassword", 
+                new Object[] {id}, 
+                e
+            );
+        }
+
+        return pwcb.getKey();
+    }
     
 }

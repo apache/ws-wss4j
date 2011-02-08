@@ -71,7 +71,7 @@ public class UsernameTokenProcessor implements Processor {
         
         int action = WSConstants.UT;
         if (token.getPassword() == null) { 
-            action = WSConstants.UT_UNKNOWN;
+            action = WSConstants.UT_NOPASSWORD;
         }
         WSSecurityEngineResult result = 
             new WSSecurityEngineResult(action, token, principal);

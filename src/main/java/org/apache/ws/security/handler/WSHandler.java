@@ -45,10 +45,10 @@ import javax.security.auth.callback.CallbackHandler;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.concurrent.ConcurrentHashMap;
 
 
 /**
@@ -62,7 +62,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public abstract class WSHandler {
     private static Log log = LogFactory.getLog(WSHandler.class.getName());
     protected WSSecurityEngine secEngine = new WSSecurityEngine();
-    protected Map<String, Crypto> cryptos = new ConcurrentHashMap<String, Crypto>();
+    protected Map<String, Crypto> cryptos = new HashMap<String, Crypto>();
 
     private boolean doDebug = log.isDebugEnabled();
 
@@ -557,7 +557,7 @@ public abstract class WSHandler {
         
         String keyId = getString(WSHandlerConstants.SIG_KEY_ID, mc);
         if (keyId != null) {
-            Integer id = (Integer) WSHandlerConstants.keyIdentifier.get(keyId);
+            Integer id = (Integer) WSHandlerConstants.getKeyIdentifier(keyId);
             if (id == null) {
                 throw new WSSecurityException(
                     "WSHandler: Signature: unknown key identification"
@@ -623,7 +623,7 @@ public abstract class WSHandler {
          */
         String encKeyId = getString(WSHandlerConstants.ENC_KEY_ID, mc);
         if (encKeyId != null) {
-            Integer id = (Integer) WSHandlerConstants.keyIdentifier.get(encKeyId);
+            Integer id = (Integer) WSHandlerConstants.getKeyIdentifier(encKeyId);
             if (id == null) {
                 throw new WSSecurityException(
                     "WSHandler: Encryption: unknown key identification"
@@ -883,16 +883,14 @@ public abstract class WSHandler {
 
         switch (doAction) {
         case WSConstants.UT:
-            reason = WSPasswordCallback.USERNAME_TOKEN;
-            break;
         case WSConstants.UT_SIGN:
-            reason = WSPasswordCallback.USERNAME_TOKEN_UNKNOWN;
+            reason = WSPasswordCallback.USERNAME_TOKEN;
             break;
         case WSConstants.SIGN:
             reason = WSPasswordCallback.SIGNATURE;
             break;
         case WSConstants.ENCR:
-            reason = WSPasswordCallback.KEY_NAME;
+            reason = WSPasswordCallback.SECRET_KEY;
             break;
         }
         return new WSPasswordCallback(username, reason);

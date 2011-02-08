@@ -19,6 +19,7 @@
 
 package org.apache.ws.security.validate;
 
+import java.security.Principal;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 
@@ -28,7 +29,8 @@ import org.apache.ws.security.saml.ext.AssertionWrapper;
 
 /**
  * This class stores various Credential types that have to be validated by a Validator
- * implementation.
+ * implementation. It also stores an optional Principal object which can provide context
+ * information to the validators.
  */
 public class Credential {
     
@@ -37,6 +39,7 @@ public class Credential {
     private Timestamp timestamp;
     private UsernameToken usernametoken;
     private AssertionWrapper assertion;
+    private Principal principal;
     
     /**
      * Set a PublicKey to be validated
@@ -116,6 +119,22 @@ public class Credential {
      */
     public AssertionWrapper getAssertion() {
         return assertion;
+    }
+    
+    /**
+     * Set the principal that supplies context information to the validators.
+     * @param principal the principal that supplies context information to the validators
+     */
+    public void setPrincipal(Principal principal) {
+        this.principal = principal;
+    }
+    
+    /**
+     * Get the principal
+     * @return the principal
+     */
+    public Principal getPrincipal() {
+        return principal;
     }
     
 }

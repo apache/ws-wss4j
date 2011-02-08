@@ -375,7 +375,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         
         List<WSSecurityEngineResult> results = verify(signedDoc);
         WSSecurityEngineResult actionResult =
-            WSSecurityUtil.fetchActionResult(results, WSConstants.UT_UNKNOWN);
+            WSSecurityUtil.fetchActionResult(results, WSConstants.UT_NOPASSWORD);
         UsernameToken receivedToken = 
             (UsernameToken) actionResult.get(WSSecurityEngineResult.TAG_USERNAME_TOKEN);
         assertTrue(receivedToken != null);
@@ -663,19 +663,14 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         for (int i = 0; i < callbacks.length; i++) {
             if (callbacks[i] instanceof WSPasswordCallback) {
                 WSPasswordCallback pc = (WSPasswordCallback) callbacks[i];
-                if (pc.getUsage() == WSPasswordCallback.USERNAME_TOKEN
-                    && "emptyuser".equals(pc.getIdentifier())) {
-                    pc.setPassword("");
-                } else if (
-                    pc.getUsage() == WSPasswordCallback.USERNAME_TOKEN_UNKNOWN
-                ) {
-                    if ("customUser".equals(pc.getIdentifier())) {
+                if (pc.getUsage() == WSPasswordCallback.USERNAME_TOKEN) {
+                    if ("emptyuser".equals(pc.getIdentifier())) {
+                        pc.setPassword("");
+                    } else if ("customUser".equals(pc.getIdentifier())) {
                         return;
                     } else if (null == pc.getIdentifier()) {
                         // Note that this is not secure! Just doing this to test a NPE
                         return;
-                    } else {
-                        throw new IOException("Authentication failed");
                     }
                 }
             } else {

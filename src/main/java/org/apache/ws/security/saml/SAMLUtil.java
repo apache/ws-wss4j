@@ -125,7 +125,7 @@ public class SAMLUtil {
     ) throws WSSecurityException {
         if (cb != null) {
             WSPasswordCallback pwcb = 
-                new WSPasswordCallback(id, WSPasswordCallback.CUSTOM_TOKEN);
+                new WSPasswordCallback(id, WSPasswordCallback.SECRET_KEY);
             try {
                 cb.handle(new Callback[]{pwcb});
             } catch (Exception e1) {

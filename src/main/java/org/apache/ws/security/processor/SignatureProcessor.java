@@ -126,8 +126,9 @@ public class SignatureProcessor implements Processor {
                 publicKey = parseKeyValue(keyInfoElement);
                 Credential credential = new Credential();
                 credential.setPublicKey(publicKey);
-                validator.validate(credential);
                 principal = new PublicKeyPrincipal(publicKey);
+                credential.setPrincipal(principal);
+                validator.validate(credential);
             } else {
                 STRParser strParser = new SignatureSTRParser();
                 Map<String, Object> parameters = new HashMap<String, Object>();
@@ -142,10 +143,12 @@ public class SignatureProcessor implements Processor {
                 certs = strParser.getCertificates();
                 publicKey = strParser.getPublicKey();
                 secretKey = strParser.getSecretKey();
-                if (certs != null || publicKey != null) {
-                    Credential credential = new Credential();
-                    credential.setPublicKey(publicKey);
-                    credential.setCertificates(certs);
+                
+                Credential credential = new Credential();
+                credential.setPublicKey(publicKey);
+                credential.setCertificates(certs);
+                credential.setPrincipal(principal);
+                if (publicKey != null || certs != null) {
                     validator.validate(credential);
                 }
             }

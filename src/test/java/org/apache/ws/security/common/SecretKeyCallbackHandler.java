@@ -45,14 +45,13 @@ public class SecretKeyCallbackHandler implements CallbackHandler {
             if (callbacks[i] instanceof WSPasswordCallback) {
                 WSPasswordCallback pc = (WSPasswordCallback) callbacks[i];
                 switch (pc.getUsage()) {
-                case WSPasswordCallback.ENCRYPTED_KEY_TOKEN:
+                case WSPasswordCallback.SECRET_KEY:
                 case WSPasswordCallback.SECURITY_CONTEXT_TOKEN: {
                     byte[] secret = (byte[]) this.secrets.get(pc.getIdentifier());
+                    if (secret == null) {
+                        secret = outboundSecret;
+                    }
                     pc.setKey(secret);
-                    break;
-                }
-                case WSPasswordCallback.KEY_NAME: {
-                    pc.setKey(outboundSecret);
                     break;
                 }
                 }

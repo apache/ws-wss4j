@@ -20,8 +20,9 @@
 package org.apache.ws.security.handler;
 
 import org.apache.ws.security.WSConstants;
+
+import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * This class defines the names, actions, and other string for the deployment
@@ -828,6 +829,13 @@ public class WSHandlerConstants {
      */
     public static final String USE_ENCODED_PASSWORDS = "useEncodedPasswords";
     
+    /*
+     * internally used property names to store values inside the message context
+     * that must have the same livetime as a message (request/response model).
+     */
+    public static final String SEND_SIGV = "_sendSignatureValues_";
+    public static final String SIG_CONF_DONE = "_sigConfDone_";
+    
     /**
      * Define the parameter values to set the key identifier types. These are:
      * <ul>
@@ -848,8 +856,7 @@ public class WSHandlerConstants {
      * </ul>
      * See {@link #SIG_KEY_ID} {@link #ENC_KEY_ID}.
      */
-    public static Map<String, Integer> keyIdentifier = 
-        new ConcurrentHashMap<String, Integer>();
+    private static Map<String, Integer> keyIdentifier = new HashMap<String, Integer>();
 
     static {
         keyIdentifier.put("DirectReference",
@@ -867,11 +874,14 @@ public class WSHandlerConstants {
         keyIdentifier.put("EncryptedKeySHA1",
                 new Integer(WSConstants.ENCRYPTED_KEY_SHA1_IDENTIFIER));
     }
-    /*
-     * internally used property names to store values inside the message context
-     * that must have the same livetime as a message (request/response model).
+    
+    /**
+     * Get the key identifier type corresponding to the parameter
+     * @param parameter
+     * @return the key identifier type corresponding to the parameter
      */
-    public static final String SEND_SIGV = "_sendSignatureValues_";
-    public static final String SIG_CONF_DONE = "_sigConfDone_";
+    public static Integer getKeyIdentifier(String parameter) {
+        return keyIdentifier.get(parameter);
+    }
 }
 
