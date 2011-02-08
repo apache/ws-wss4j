@@ -289,15 +289,33 @@ public class WSSecurityEngine {
         List<WSSecurityEngineResult> returnResults = new ArrayList<WSSecurityEngineResult>();
         final WSSConfig cfg = getWssConfig();
         Node node = securityHeader.getFirstChild();
+        
+        boolean foundTimestamp = false;
         while (node != null) {
             if (Node.ELEMENT_NODE == node.getNodeType()) {
                 QName el = new QName(node.getNamespaceURI(), node.getLocalName());
-                Processor p = cfg.getProcessor(el);
+                
+                // Check for multiple timestamps
+                if (wssConfig.isWsiBSPCompliant()) {
+                    if (foundTimestamp && el.equals(TIMESTAMP)) {
+                        if (doDebug) {
+                            log.debug(
+                                "Failure on processing multiple Timestamps as per the BSP"
+                            );
+                        }
+                        throw new WSSecurityException(
+                            WSSecurityException.INVALID_SECURITY_TOKEN, "invalidTimestamp"
+                        );
+                    } else if (el.equals(TIMESTAMP)) {
+                        foundTimestamp = true;
+                    }
+                }
                 //
                 // Call the processor for this token. After the processor returns, 
                 // store it for later retrieval. The token processor may store some
                 // information about the processed token
                 //
+                Processor p = cfg.getProcessor(el);
                 if (p != null) {
                     List<WSSecurityEngineResult> results = 
                         p.handleToken((Element) node, sigCrypto, decCrypto, cb, wsDocInfo, cfg);

@@ -62,7 +62,7 @@ public class TimestampProcessor implements Processor {
         //
         // Decode Timestamp, add the found time (created/expiry) to result
         //
-        Timestamp timestamp = new Timestamp(elem);
+        Timestamp timestamp = new Timestamp(elem, wsc.isWsiBSPCompliant());
         Credential credential = new Credential();
         credential.setTimestamp(timestamp);
         validator.setWSSConfig(wsc);

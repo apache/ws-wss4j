@@ -62,6 +62,18 @@ public class Timestamp {
      *        contains the timestamp data
      */
     public Timestamp(Element timestampElement) throws WSSecurityException {
+        this(timestampElement, true);
+    }
+    
+    /**
+     * Constructs a <code>Timestamp</code> object and parses the
+     * <code>wsu:Timestamp</code> element to initialize it.
+     *
+     * @param timestampElement the <code>wsu:Timestamp</code> element that
+     *        contains the timestamp data
+     * @param bspCompliant whether the Timestamp processing complies with the BSP spec
+     */
+    public Timestamp(Element timestampElement, boolean bspCompliant) throws WSSecurityException {
 
         element = timestampElement;
         customElements = new ArrayList<Element>();
@@ -78,8 +90,16 @@ public class Timestamp {
                 if (WSConstants.CREATED_LN.equals(currentChild.getLocalName()) &&
                         WSConstants.WSU_NS.equals(currentChild.getNamespaceURI())) {
                     if (strCreated == null) {
+                        String valueType = currentChildElement.getAttribute("ValueType");
+                        if (bspCompliant && valueType != null && !"".equals(valueType)) {
+                            // We can't have a ValueType attribute as per the BSP spec
+                            throw new WSSecurityException(
+                                WSSecurityException.INVALID_SECURITY, "invalidTimestamp"
+                            );
+                        }
                         strCreated = ((Text)currentChildElement.getFirstChild()).getData();
                     } else {
+                        // Test for multiple Created elements
                         throw new WSSecurityException(
                             WSSecurityException.INVALID_SECURITY, "invalidTimestamp"
                         );
@@ -87,19 +107,46 @@ public class Timestamp {
                 } else if (WSConstants.EXPIRES_LN.equals(currentChild.getLocalName()) &&
                         WSConstants.WSU_NS.equals(currentChild.getNamespaceURI())) {
                     if (strExpires == null) {
+                        String valueType = currentChildElement.getAttribute("ValueType");
+                        if (bspCompliant && valueType != null && !"".equals(valueType)) {
+                            // We can't have a ValueType attribute as per the BSP spec
+                            throw new WSSecurityException(
+                                WSSecurityException.INVALID_SECURITY, "invalidTimestamp"
+                            );
+                        }
                         strExpires = ((Text)currentChildElement.getFirstChild()).getData();
-                    } else {
+                    } else if (strExpires != null || (bspCompliant && strCreated == null)) {
+                        //
+                        // Created must appear before Expires, and we can't have multiple
+                        // Expires elements
+                        //
                         throw new WSSecurityException(
                             WSSecurityException.INVALID_SECURITY, "invalidTimestamp"
                         );                        
                     }
                 } else {
+                    if (bspCompliant) {
+                        throw new WSSecurityException(
+                            WSSecurityException.INVALID_SECURITY, "invalidTimestamp"
+                        );
+                    }
                     customElements.add(currentChildElement);
                 }
             }
         }
+        
+        // We must have a Created element
+        if (bspCompliant && strCreated == null) {
+            throw new WSSecurityException(
+                WSSecurityException.INVALID_SECURITY, "invalidTimestamp"
+            );  
+        }
 
+        // Parse the dates
         DateFormat zulu = new XmlSchemaDateFormat();
+        if (bspCompliant) {
+            zulu.setLenient(false);
+        }
         try {
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Current time: " + zulu.format(new Date()));

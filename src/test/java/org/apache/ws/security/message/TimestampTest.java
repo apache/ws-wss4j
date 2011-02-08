@@ -30,6 +30,7 @@ import org.apache.ws.security.common.SOAPUtil;
 import org.apache.ws.security.message.token.Timestamp;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.ws.security.util.XmlSchemaDateFormat;
+import org.apache.ws.security.validate.NoOpValidator;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -42,7 +43,6 @@ import java.util.List;
  */
 public class TimestampTest extends org.junit.Assert {
     private static final Log LOG = LogFactory.getLog(TimestampTest.class);
-    private WSSecurityEngine secEngine = new WSSecurityEngine();
 
     /**
      * This is a test for processing a valid Timestamp.
@@ -276,7 +276,399 @@ public class TimestampTest extends org.junit.Assert {
         }
     }
     
+    /**
+     * This is a test for processing multiple Timestamps in the security header
+     */
+    @org.junit.Test
+    public void testMultipleTimestamps() throws Exception {
 
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        
+        WSSecTimestamp timestamp = new WSSecTimestamp();
+        timestamp.setTimeToLive(300);
+        Document createdDoc = timestamp.build(doc, secHeader);
+        
+        timestamp = new WSSecTimestamp();
+        timestamp.setTimeToLive(60);
+        createdDoc = timestamp.build(doc, secHeader);
+
+        if (LOG.isDebugEnabled()) {
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(createdDoc);
+            LOG.debug(outputString);
+        }
+        
+        //
+        // Do some processing
+        //
+        WSSConfig wssConfig = WSSConfig.getNewInstance();
+        wssConfig.setWsiBSPCompliant(true);
+        try {
+            verify(createdDoc, wssConfig);
+            fail("Expected failure on multiple timestamps");
+        } catch (WSSecurityException ex) {
+            // expected
+        }
+        
+        // Turn off BSP compliance and the test should pass
+        wssConfig.setWsiBSPCompliant(false);
+        verify(createdDoc, WSSConfig.getNewInstance());
+    }
+    
+    /**
+     * This is a test for processing an Timestamp where it contains multiple "Created" elements.
+     * This Timestamp should be rejected.
+     */
+    @org.junit.Test
+    public void testMultipleCreated() throws Exception {
+        
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        
+        Element timestampElement = 
+            doc.createElementNS(
+                WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + WSConstants.TIMESTAMP_TOKEN_LN
+            );
+
+        DateFormat zulu = new XmlSchemaDateFormat();
+        Element elementCreated =
+            doc.createElementNS(
+                WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + WSConstants.CREATED_LN
+            );
+        Date createdDate = new Date();
+        long currentTime = createdDate.getTime() + 300000;
+        createdDate.setTime(currentTime);
+        elementCreated.appendChild(doc.createTextNode(zulu.format(createdDate)));
+        timestampElement.appendChild(elementCreated);
+        timestampElement.appendChild(elementCreated.cloneNode(true));
+
+        secHeader.getSecurityHeader().appendChild(timestampElement);
+        
+        if (LOG.isDebugEnabled()) {
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+            LOG.debug(outputString);
+        }
+        //
+        // Do some processing
+        //
+        try {
+            verify(doc, WSSConfig.getNewInstance());
+            fail("The timestamp validation should have failed on multiple Created elements");
+        } catch (WSSecurityException ex) {
+            // expected
+        }
+    }
+    
+    /**
+     * This is a test for processing an Timestamp where it contains no "Created" element.
+     * This Timestamp should be rejected.
+     */
+    @org.junit.Test
+    public void testNoCreated() throws Exception {
+        
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        
+        Element timestampElement = 
+            doc.createElementNS(
+                WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + WSConstants.TIMESTAMP_TOKEN_LN
+            );
+
+        DateFormat zulu = new XmlSchemaDateFormat();
+        Element elementCreated =
+            doc.createElementNS(
+                WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + WSConstants.EXPIRES_LN
+            );
+        Date createdDate = new Date();
+        long currentTime = createdDate.getTime() + 300000;
+        createdDate.setTime(currentTime);
+        elementCreated.appendChild(doc.createTextNode(zulu.format(createdDate)));
+        timestampElement.appendChild(elementCreated);
+
+        secHeader.getSecurityHeader().appendChild(timestampElement);
+        
+        if (LOG.isDebugEnabled()) {
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+            LOG.debug(outputString);
+        }
+        //
+        // Do some processing
+        //
+        WSSConfig wssConfig = WSSConfig.getNewInstance();
+        wssConfig.setWsiBSPCompliant(true);
+        try {
+            verify(doc, wssConfig);
+            fail("The timestamp validation should have failed on no Created element");
+        } catch (WSSecurityException ex) {
+            // expected
+        }
+    }
+    
+    /**
+     * This is a test for processing an Timestamp where it contains multiple "Expires" elements.
+     * This Timestamp should be rejected.
+     */
+    @org.junit.Test
+    public void testMultipleExpires() throws Exception {
+        
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        
+        Element timestampElement = 
+            doc.createElementNS(
+                WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + WSConstants.TIMESTAMP_TOKEN_LN
+            );
+
+        DateFormat zulu = new XmlSchemaDateFormat();
+        Element elementCreated =
+            doc.createElementNS(
+                WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + WSConstants.EXPIRES_LN
+            );
+        Date createdDate = new Date();
+        long currentTime = createdDate.getTime() + 300000;
+        createdDate.setTime(currentTime);
+        elementCreated.appendChild(doc.createTextNode(zulu.format(createdDate)));
+        timestampElement.appendChild(elementCreated);
+        timestampElement.appendChild(elementCreated.cloneNode(true));
+
+        secHeader.getSecurityHeader().appendChild(timestampElement);
+        
+        if (LOG.isDebugEnabled()) {
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+            LOG.debug(outputString);
+        }
+        //
+        // Do some processing
+        //
+        try {
+            verify(doc, WSSConfig.getNewInstance());
+            fail("The timestamp validation should have failed on multiple Expires elements");
+        } catch (WSSecurityException ex) {
+            // expected
+        }
+    }
+    
+    /**
+     * This is a test for processing an Timestamp where it contains an "Expires" element before
+     * the Created element. This Timestamp should be rejected as per the BSP spec.
+     */
+    @org.junit.Test
+    public void testExpiresInFrontOfCreated() throws Exception {
+        
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        
+        Element timestampElement = 
+            doc.createElementNS(
+                WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + WSConstants.TIMESTAMP_TOKEN_LN
+            );
+
+        DateFormat zulu = new XmlSchemaDateFormat();
+        Element elementCreated =
+            doc.createElementNS(
+                WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + WSConstants.EXPIRES_LN
+            );
+        Date createdDate = new Date();
+        long currentTime = createdDate.getTime() + 300000;
+        createdDate.setTime(currentTime);
+        elementCreated.appendChild(doc.createTextNode(zulu.format(createdDate)));
+        timestampElement.appendChild(elementCreated);
+        
+        Element elementExpires =
+            doc.createElementNS(
+                WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + WSConstants.CREATED_LN
+            );
+        elementExpires.appendChild(doc.createTextNode(zulu.format(createdDate)));
+        timestampElement.appendChild(elementExpires);
+
+        secHeader.getSecurityHeader().appendChild(timestampElement);
+        
+        if (LOG.isDebugEnabled()) {
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+            LOG.debug(outputString);
+        }
+        //
+        // Do some processing
+        //
+        WSSConfig wssConfig = WSSConfig.getNewInstance();
+        wssConfig.setWsiBSPCompliant(true);
+        try {
+            verify(doc, wssConfig);
+            fail("The timestamp validation should have failed");
+        } catch (WSSecurityException ex) {
+            // expected
+        }
+    }
+    
+    
+    /**
+     * This is a test for processing an Timestamp where it contains a Created element with
+     * seconds > 60. This should be rejected as per the BSP spec.
+     */
+    @org.junit.Test
+    public void testCreatedSeconds() throws Exception {
+        
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        
+        Element timestampElement = 
+            doc.createElementNS(
+                WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + WSConstants.TIMESTAMP_TOKEN_LN
+            );
+
+        Element elementCreated =
+            doc.createElementNS(
+                WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + WSConstants.CREATED_LN
+            );
+        elementCreated.appendChild(doc.createTextNode("2011-02-08T13:13:84.535Z"));
+        timestampElement.appendChild(elementCreated);
+
+        secHeader.getSecurityHeader().appendChild(timestampElement);
+        
+        if (LOG.isDebugEnabled()) {
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+            LOG.debug(outputString);
+        }
+        //
+        // Do some processing - disable the validator to make sure that the Timestamp processor
+        // is rejecting the Timestamp
+        //
+        WSSConfig wssConfig = WSSConfig.getNewInstance();
+        wssConfig.setWsiBSPCompliant(true);
+        wssConfig.setValidator(WSSecurityEngine.TIMESTAMP, new NoOpValidator());
+        try {
+            verify(doc, wssConfig);
+            fail("The timestamp validation should have failed");
+        } catch (WSSecurityException ex) {
+            assert ex.getMessage().contains("Unparseable date");
+        }
+    }
+    
+    
+    /**
+     * This is a test for processing an Timestamp where it contains a Created element with
+     * a ValueType. This should be rejected as per the BSP spec.
+     */
+    @org.junit.Test
+    public void testCreatedValueType() throws Exception {
+        
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        
+        Element timestampElement = 
+            doc.createElementNS(
+                WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + WSConstants.TIMESTAMP_TOKEN_LN
+            );
+
+        DateFormat zulu = new XmlSchemaDateFormat();
+        Element elementCreated =
+            doc.createElementNS(
+                WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + WSConstants.CREATED_LN
+            );
+        Date createdDate = new Date();
+        long currentTime = createdDate.getTime() + 300000;
+        createdDate.setTime(currentTime);
+        elementCreated.appendChild(doc.createTextNode(zulu.format(createdDate)));
+        elementCreated.setAttributeNS(null, "ValueType", WSConstants.WSS_SAML_KI_VALUE_TYPE);
+        timestampElement.appendChild(elementCreated);
+
+        secHeader.getSecurityHeader().appendChild(timestampElement);
+        
+        if (LOG.isDebugEnabled()) {
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+            LOG.debug(outputString);
+        }
+        //
+        // Do some processing
+        //
+        WSSConfig wssConfig = WSSConfig.getNewInstance();
+        wssConfig.setWsiBSPCompliant(true);
+        wssConfig.setValidator(WSSecurityEngine.TIMESTAMP, new NoOpValidator());
+        try {
+            verify(doc, wssConfig);
+            fail("The timestamp validation should have failed");
+        } catch (WSSecurityException ex) {
+            //
+        }
+        
+        // Now it should pass...
+        wssConfig.setWsiBSPCompliant(false);
+        verify(doc, wssConfig);
+    }
+    
+
+
+    /**
+     * This is a test for processing an Timestamp where it contains a CustomElement. This should
+     * be rejected as per the BSP spec.
+     */
+    @org.junit.Test
+    public void testCustomElement() throws Exception {
+        
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        
+        Element timestampElement = 
+            doc.createElementNS(
+                WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + WSConstants.TIMESTAMP_TOKEN_LN
+            );
+
+        DateFormat zulu = new XmlSchemaDateFormat();
+        Element elementCreated =
+            doc.createElementNS(
+                WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + WSConstants.EXPIRES_LN
+            );
+        Date createdDate = new Date();
+        long currentTime = createdDate.getTime() + 300000;
+        createdDate.setTime(currentTime);
+        elementCreated.appendChild(doc.createTextNode(zulu.format(createdDate)));
+        timestampElement.appendChild(elementCreated);
+        
+        Element elementCustom =
+            doc.createElementNS(
+                WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + "Custom"
+            );
+        timestampElement.appendChild(elementCustom);
+
+        secHeader.getSecurityHeader().appendChild(timestampElement);
+        
+        if (LOG.isDebugEnabled()) {
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+            LOG.debug(outputString);
+        }
+        //
+        // Do some processing
+        //
+        WSSConfig wssConfig = WSSConfig.getNewInstance();
+        wssConfig.setWsiBSPCompliant(true);
+        try {
+            verify(doc, wssConfig);
+            fail("The timestamp validation should have failed");
+        } catch (WSSecurityException ex) {
+            //
+        }
+        
+        // Now it should pass...
+        wssConfig.setWsiBSPCompliant(false);
+        verify(doc, wssConfig);
+    }
+    
     /**
      * Verifies the soap envelope
      * 
@@ -287,6 +679,7 @@ public class TimestampTest extends org.junit.Assert {
     private List<WSSecurityEngineResult> verify(
         Document doc, WSSConfig wssConfig
     ) throws Exception {
+        WSSecurityEngine secEngine = new WSSecurityEngine();
         secEngine.setWssConfig(wssConfig);
         return secEngine.processSecurityHeader(doc, null, null, null);
     }

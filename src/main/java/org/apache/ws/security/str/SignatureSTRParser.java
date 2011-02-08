@@ -128,9 +128,6 @@ public class SignatureSTRParser implements STRParser {
                     }
                     secretKey = samlKi.getSecret();
                     principal = createPrincipalFromSAMLKeyInfo(samlKi, assertion);
-                    if (secretKey != null && certs == null) {
-                        ((CustomTokenPrincipal)principal).setRequiresFurtherAuthentication(false);
-                    }
                 } else if (el.equals(WSSecurityEngine.ENCRYPTED_KEY)){
                     EncryptedKeyProcessor proc = 
                         new EncryptedKeyProcessor();
@@ -142,7 +139,6 @@ public class SignatureSTRParser implements STRParser {
                             WSSecurityEngineResult.TAG_SECRET
                         );
                     principal = new CustomTokenPrincipal(token.getAttribute("Id"));
-                    ((CustomTokenPrincipal)principal).setRequiresFurtherAuthentication(false);
                 } else {
                     String id = secRef.getReference().getURI();
                     secretKey = getSecretKeyFromToken(id, null, cb);
@@ -169,7 +165,6 @@ public class SignatureSTRParser implements STRParser {
                     secretKey = (byte[])result.get(WSSecurityEngineResult.TAG_SECRET);
                     String id = (String)result.get(WSSecurityEngineResult.TAG_ID);
                     principal = new CustomTokenPrincipal(id);
-                    ((CustomTokenPrincipal)principal).setRequiresFurtherAuthentication(false);
                 } else if (WSConstants.SCT == action) {
                     secretKey = (byte[])result.get(WSSecurityEngineResult.TAG_SECRET);
                     SecurityContextToken sct = 
@@ -204,9 +199,6 @@ public class SignatureSTRParser implements STRParser {
                     secretKey = keyInfo.getSecret();
                     publicKey = keyInfo.getPublicKey();
                     principal = createPrincipalFromSAMLKeyInfo(keyInfo, assertion);
-                    if (secretKey != null && certs == null && publicKey == null) {
-                        ((CustomTokenPrincipal)principal).setRequiresFurtherAuthentication(false);
-                    }
                 }
             }
         } else if (secRef.containsX509Data() || secRef.containsX509IssuerSerial()) {
@@ -234,9 +226,6 @@ public class SignatureSTRParser implements STRParser {
                 secretKey = samlKi.getSecret();
                 publicKey = samlKi.getPublicKey();
                 principal = createPrincipalFromSAMLKeyInfo(samlKi, assertion);
-                if (secretKey != null && certs == null && publicKey == null) {
-                    ((CustomTokenPrincipal)principal).setRequiresFurtherAuthentication(false);
-                }
             } else {
                 X509Certificate[] foundCerts = secRef.getKeyIdentifier(crypto);
                 if (foundCerts != null) {

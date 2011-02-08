@@ -29,7 +29,6 @@ public class CustomTokenPrincipal implements Principal, Serializable {
     private Element tokenElement;
     private String name;
     private Object tokenObject;
-    private boolean requiresFurtherAuthentication = false;
     
     public Object getTokenObject() {
         return tokenObject;
@@ -55,12 +54,4 @@ public class CustomTokenPrincipal implements Principal, Serializable {
         this.tokenElement = tokenElement;
     }
     
-    public void setRequiresFurtherAuthentication(boolean requiresFurtherAuthentication) {
-        this.requiresFurtherAuthentication = requiresFurtherAuthentication;
-    }
-    
-    public boolean isRequiresFurtherAuthentication() {
-        return requiresFurtherAuthentication;
-    }
-
 }

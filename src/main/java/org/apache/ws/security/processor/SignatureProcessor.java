@@ -144,11 +144,11 @@ public class SignatureProcessor implements Processor {
                 publicKey = strParser.getPublicKey();
                 secretKey = strParser.getSecretKey();
                 
-                Credential credential = new Credential();
-                credential.setPublicKey(publicKey);
-                credential.setCertificates(certs);
-                credential.setPrincipal(principal);
                 if (publicKey != null || certs != null) {
+                    Credential credential = new Credential();
+                    credential.setPublicKey(publicKey);
+                    credential.setCertificates(certs);
+                    credential.setPrincipal(principal);
                     validator.validate(credential);
                 }
             }

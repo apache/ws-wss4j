@@ -53,6 +53,11 @@ public class XmlSchemaDateFormat extends DateFormat {
     static {
         DATEFORMAT_XSD_ZULU.setTimeZone(TimeZone.getTimeZone("UTC"));
     }
+    
+    @Override
+    public void setLenient(boolean lenient) {
+        DATEFORMAT_XSD_ZULU.setLenient(lenient);
+    }
 
     /**
      * This method was snarfed from <tt>org.apache.axis.encoding.ser.CalendarDeserializer</tt>,
@@ -84,13 +89,9 @@ public class XmlSchemaDateFormat extends DateFormat {
             }
 
             // convert what we have validated so far
-            try {
-                synchronized (DATEFORMAT_XSD_ZULU) {
-                    date = DATEFORMAT_XSD_ZULU.parse((src == null) ? null
-                            : (src.substring(0, 19) + ".000Z"));
-                }
-            } catch (Exception e) {
-                throw new NumberFormatException(e.toString());
+            synchronized (DATEFORMAT_XSD_ZULU) {
+                date = DATEFORMAT_XSD_ZULU.parse((src == null) ? null
+                    : (src.substring(0, 19) + ".000Z"));
             }
 
             index = 19;
