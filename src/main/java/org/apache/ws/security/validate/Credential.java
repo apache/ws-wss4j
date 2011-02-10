@@ -23,6 +23,7 @@ import java.security.Principal;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 
+import org.apache.ws.security.message.token.BinarySecurity;
 import org.apache.ws.security.message.token.Timestamp;
 import org.apache.ws.security.message.token.UsernameToken;
 import org.apache.ws.security.saml.ext.AssertionWrapper;
@@ -38,6 +39,7 @@ public class Credential {
     private X509Certificate[] certs;
     private Timestamp timestamp;
     private UsernameToken usernametoken;
+    private BinarySecurity binarySecurityToken;
     private AssertionWrapper assertion;
     private Principal principal;
     
@@ -103,6 +105,22 @@ public class Credential {
      */
     public UsernameToken getUsernametoken() {
         return usernametoken;
+    }
+    
+    /**
+     * Set the BinarySecurityToken to be validated
+     * @param binarySecurityToken the BinarySecurityToken to be validated
+     */
+    public void setBinarySecurityToken(BinarySecurity binarySecurityToken) {
+        this.binarySecurityToken = binarySecurityToken;
+    }
+    
+    /**
+     * Get the BinarySecurityToken to be validated
+     * @return the BinarySecurityToken to be validated
+     */
+    public BinarySecurity getBinarySecurityToken() {
+        return binarySecurityToken;
     }
     
     /**

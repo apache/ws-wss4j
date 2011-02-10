@@ -28,6 +28,8 @@ import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.message.token.BinarySecurity;
 import org.apache.ws.security.message.token.PKIPathSecurity;
 import org.apache.ws.security.message.token.X509Security;
+import org.apache.ws.security.validate.Credential;
+import org.apache.ws.security.validate.NoOpValidator;
 import org.apache.ws.security.validate.Validator;
 import org.w3c.dom.Element;
 
@@ -40,12 +42,14 @@ import javax.security.auth.callback.CallbackHandler;
  */
 public class BinarySecurityTokenProcessor implements Processor {
     
+    private Validator validator = new NoOpValidator();
+    
     /**
      * Set a Validator implementation to validate the credential
      * @param validator the Validator implementation to set
      */
     public void setValidator(Validator validator) {
-        // not used
+        this.validator = validator;
     }
 
     /**
@@ -67,6 +71,12 @@ public class BinarySecurityTokenProcessor implements Processor {
         } else {
             certs = getCertificatesTokenReference(token, crypto);
         }
+        
+        // Hook to allow the user to validate the BinarySecurityToken
+        Credential credential = new Credential();
+        credential.setBinarySecurityToken(token);
+        validator.validate(credential);
+        
         WSSecurityEngineResult result = 
             new WSSecurityEngineResult(WSConstants.BST, token, certs);
         wsDocInfo.addTokenElement(elem);

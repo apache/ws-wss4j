@@ -22,9 +22,11 @@ package org.apache.ws.security.message.token;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSEncryptionPart;
-import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSSConfig;
+import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.WSSecurityEngineResult;
+import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.common.KeystoreCallbackHandler;
 import org.apache.ws.security.common.SOAPUtil;
 import org.apache.ws.security.components.crypto.Crypto;
@@ -34,10 +36,14 @@ import org.apache.ws.security.message.WSSecHeader;
 import org.apache.ws.security.message.WSSecTimestamp;
 import org.apache.ws.security.message.token.BinarySecurity;
 import org.apache.ws.security.util.WSSecurityUtil;
+import org.apache.ws.security.validate.Credential;
+import org.apache.ws.security.validate.Validator;
 import org.w3c.dom.Document;
 
 import javax.security.auth.callback.CallbackHandler;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * This is a test for the Kerberos Token Profile 1.1
@@ -58,7 +64,6 @@ public class BSTKerberosTest extends org.junit.Assert {
     @org.junit.Test
     public void testCreateBinarySecurityToken() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSConfig.getNewInstance();
 
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
@@ -87,7 +92,6 @@ public class BSTKerberosTest extends org.junit.Assert {
     @org.junit.Test
     public void testSignBST() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSConfig.getNewInstance();
 
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
@@ -126,7 +130,6 @@ public class BSTKerberosTest extends org.junit.Assert {
     @org.junit.Test
     public void testSignBSTTimestamp() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSConfig.getNewInstance();
 
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
@@ -163,20 +166,129 @@ public class BSTKerberosTest extends org.junit.Assert {
     }
     
     /**
+     * Test Validating a Kerberos BinarySecurityToken
+     */
+    @org.junit.Test
+    public void testProcessToken() throws Exception {
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        
+        BinarySecurity bst = new BinarySecurity(doc);
+        bst.setValueType(AP_REQ);
+        bst.setEncodingType(BASE64_NS);
+        bst.setToken("12345678".getBytes());
+        WSSecurityUtil.prependChildElement(secHeader.getSecurityHeader(), bst.getElement());
+        
+        if (LOG.isDebugEnabled()) {
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+            LOG.debug(outputString);
+        }
+        
+        List<WSSecurityEngineResult> results = verify(doc);
+        WSSecurityEngineResult actionResult =
+            WSSecurityUtil.fetchActionResult(results, WSConstants.BST);
+        BinarySecurity token =
+            (BinarySecurity)actionResult.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
+        assert token != null;
+        
+        assertTrue(AP_REQ.equals(token.getValueType()));
+        assertTrue(BASE64_NS.equals(token.getEncodingType()));
+        assertTrue(token.getToken() != null);
+    }
+    
+    /**
+     * Test Validating a Kerberos BinarySecurityToken using a custom Validator instance.
+     */
+    @org.junit.Test
+    public void testProcessTokenCustomValidator() throws Exception {
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        
+        BinarySecurity bst = new BinarySecurity(doc);
+        bst.setValueType(AP_REQ);
+        bst.setEncodingType(BASE64_NS);
+        bst.setToken("12345678".getBytes());
+        WSSecurityUtil.prependChildElement(secHeader.getSecurityHeader(), bst.getElement());
+        
+        if (LOG.isDebugEnabled()) {
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+            LOG.debug(outputString);
+        }
+        
+        WSSecurityEngine customEngine = new WSSecurityEngine();
+        WSSConfig wssConfig = WSSConfig.getNewInstance();
+        wssConfig.setValidator(WSSecurityEngine.BINARY_TOKEN, new KerberosValidator());
+        customEngine.setWssConfig(wssConfig);
+        customEngine.processSecurityHeader(doc, null, callbackHandler, crypto);
+        
+        bst.setToken("12345679".getBytes());
+        try {
+            customEngine.processSecurityHeader(doc, null, callbackHandler, crypto);
+            fail("Failure expected on a bad token");
+        } catch (WSSecurityException ex) {
+            // expected
+        }
+    }
+    
+    
+    /**
      * Verifies the soap envelope
      * <p/>
      * 
      * @param doc 
      * @throws Exception Thrown when there is a problem in verification
      */
-    private void verify(Document doc) throws Exception {
-        secEngine.processSecurityHeader(doc, null, callbackHandler, crypto);
+    private List<WSSecurityEngineResult> verify(Document doc) throws Exception {
+        List<WSSecurityEngineResult> results = 
+            secEngine.processSecurityHeader(doc, null, callbackHandler, crypto);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Verfied and decrypted message:");
             String outputString = 
                 org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
             LOG.debug(outputString);
         }
+        return results;
     }
 
+    
+    /**
+     * A dummy validator for a Kerberos BST token.
+     */
+    private static class KerberosValidator implements Validator {
+
+        public void validate(Credential credential) throws WSSecurityException {
+            BinarySecurity token = credential.getBinarySecurityToken();
+            if (token == null) {
+                throw new WSSecurityException(WSSecurityException.FAILURE);
+            }
+
+            if (!AP_REQ.equals(token.getValueType())) {
+                throw new WSSecurityException(WSSecurityException.FAILURE);
+            }
+            
+            byte[] tokenBytes = token.getToken();
+            if (!Arrays.equals(tokenBytes, "12345678".getBytes())) {
+                throw new WSSecurityException(WSSecurityException.FAILED_AUTHENTICATION);
+            }
+        }
+        
+        public void setCrypto(Crypto crypto) {
+            //
+        }
+        
+        public void setCallbackHandler(CallbackHandler callbackHandler) {
+            //
+        }
+        
+        public void setWSSConfig(WSSConfig wssConfig) {
+            //
+        }
+    }
+    
 }
