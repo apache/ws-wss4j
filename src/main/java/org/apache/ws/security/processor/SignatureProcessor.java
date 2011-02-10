@@ -93,7 +93,7 @@ public class SignatureProcessor implements Processor {
         Crypto decCrypto, 
         CallbackHandler cb, 
         WSDocInfo wsDocInfo, 
-        WSSConfig wsc
+        WSSConfig config
     ) throws WSSecurityException {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Found signature element");
@@ -131,10 +131,11 @@ public class SignatureProcessor implements Processor {
                 validator.validate(credential);
             } else {
                 STRParser strParser = new SignatureSTRParser();
+                strParser.setBspCompliant(config.isWsiBSPCompliant());
                 Map<String, Object> parameters = new HashMap<String, Object>();
                 parameters.put(SignatureSTRParser.SIGNATURE_METHOD, signatureMethod);
                 parameters.put(
-                    SignatureSTRParser.SECRET_KEY_LENGTH, new Integer(wsc.getSecretKeyLength())
+                    SignatureSTRParser.SECRET_KEY_LENGTH, new Integer(config.getSecretKeyLength())
                 );
                 strParser.parseSecurityTokenReference(
                     strElement, crypto, cb, wsDocInfo, parameters
@@ -170,7 +171,7 @@ public class SignatureProcessor implements Processor {
         String c14nMethod = xmlSignature.getSignedInfo().getCanonicalizationMethod().getAlgorithm();
         List<WSDataRef> dataRefs =  
             buildProtectedRefs(
-                elem.getOwnerDocument(), xmlSignature.getSignedInfo(), wsDocInfo
+                elem.getOwnerDocument(), xmlSignature.getSignedInfo(), config, wsDocInfo
             );
         
         int actionPerformed = WSConstants.SIGN;
@@ -394,6 +395,7 @@ public class SignatureProcessor implements Processor {
      * to caller
      * @param doc The owning document
      * @param signedInfo The SignedInfo object
+     * @param wssConfig A WSSConfig instance
      * @param protectedRefs A list of protected references
      * @return A list of protected references
      * @throws WSSecurityException
@@ -401,6 +403,7 @@ public class SignatureProcessor implements Processor {
     private List<WSDataRef> buildProtectedRefs(
         Document doc,
         SignedInfo signedInfo,
+        WSSConfig wssConfig,
         WSDocInfo wsDocInfo
     ) throws WSSecurityException {
         List<WSDataRef> protectedRefs = new java.util.ArrayList<WSDataRef>();
@@ -434,7 +437,10 @@ public class SignatureProcessor implements Processor {
                             
                             if (securityTokenReference != null) {
                                 SecurityTokenReference secTokenRef = 
-                                    new SecurityTokenReference((Element)securityTokenReference);
+                                    new SecurityTokenReference(
+                                        (Element)securityTokenReference,
+                                        wssConfig.isWsiBSPCompliant()
+                                    );
                                 se = STRTransformUtil.dereferenceSTR(doc, secTokenRef, wsDocInfo);
                             }
                         }

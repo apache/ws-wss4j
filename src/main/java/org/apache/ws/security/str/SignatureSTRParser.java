@@ -76,6 +76,16 @@ public class SignatureSTRParser implements STRParser {
     
     private Principal principal;
     
+    private boolean bspCompliant = true;
+    
+    /**
+     * Set whether we should process tokens according to the BSP spec
+     * @param bspCompliant whether we should process tokens according to the BSP spec
+     */
+    public void setBspCompliant(boolean bspCompliant) {
+        this.bspCompliant = bspCompliant;
+    }
+    
     /**
      * Parse a SecurityTokenReference element and extract credentials.
      * 
@@ -93,7 +103,7 @@ public class SignatureSTRParser implements STRParser {
         WSDocInfo wsDocInfo,
         Map<String, Object> parameters
     ) throws WSSecurityException {
-        SecurityTokenReference secRef = new SecurityTokenReference(strElement);
+        SecurityTokenReference secRef = new SecurityTokenReference(strElement, bspCompliant);
         //
         // Here we get some information about the document that is being
         // processed, in particular the crypto implementation, and already
@@ -115,11 +125,7 @@ public class SignatureSTRParser implements STRParser {
                     certs = getCertificatesTokenReference(token, crypto);
                 } else if (el.equals(WSSecurityEngine.SAML_TOKEN) 
                     || el.equals(WSSecurityEngine.SAML2_TOKEN)) {
-                    if (crypto == null) {
-                        throw new WSSecurityException(
-                                WSSecurityException.FAILURE, "noSigCryptoFile"
-                        );
-                    }
+
                     AssertionWrapper assertion = new AssertionWrapper(token);
                     SAMLKeyInfo samlKi = SAMLUtil.getCredentialFromSubject(assertion, crypto, cb);
                     X509Certificate[] foundCerts = samlKi.getCerts();
@@ -184,11 +190,7 @@ public class SignatureSTRParser implements STRParser {
                     secretKey = dkt.deriveKey(keyLength, secret); 
                     principal = dkt.createPrincipal();
                 } else if (WSConstants.ST_UNSIGNED == action || WSConstants.ST_SIGNED == action) {
-                    if (crypto == null) {
-                        throw new WSSecurityException(
-                            WSSecurityException.FAILURE, "noSigCryptoFile"
-                        );
-                    }
+
                     AssertionWrapper assertion = 
                         (AssertionWrapper)result.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
                     SAMLKeyInfo keyInfo = assertion.getSubjectKeyInfo();

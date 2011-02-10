@@ -71,7 +71,7 @@ public class EncryptedKeyProcessor implements Processor {
         Crypto decCrypto, 
         CallbackHandler cb, 
         WSDocInfo wsDocInfo,
-        WSSConfig wsc
+        WSSConfig config
     ) throws WSSecurityException {
         if (log.isDebugEnabled()) {
             log.debug("Found encrypted key element");
@@ -104,7 +104,7 @@ public class EncryptedKeyProcessor implements Processor {
             throw new WSSecurityException(WSSecurityException.INVALID_SECURITY, "noCipher");
         }
         
-        String alias = getAliasFromEncryptedKey(elem, decCrypto, cb, wsDocInfo);
+        String alias = getAliasFromEncryptedKey(elem, decCrypto, cb, wsDocInfo, config);
         PrivateKey privateKey = getPrivateKeyFromKeyInfo(decCrypto, cb, alias);
         X509Certificate[] certs = decCrypto.getCertificates(alias);
 
@@ -173,7 +173,8 @@ public class EncryptedKeyProcessor implements Processor {
         Element xencEncryptedKey,
         Crypto crypto,
         CallbackHandler cb,
-        WSDocInfo wsDocInfo
+        WSDocInfo wsDocInfo,
+        WSSConfig config
     ) throws WSSecurityException {
         Element keyInfo = 
             WSSecurityUtil.getDirectChildElement(
@@ -193,7 +194,9 @@ public class EncryptedKeyProcessor implements Processor {
                 );
             }
             STRParser strParser = new EncryptedKeySTRParser();
+            strParser.setBspCompliant(config.isWsiBSPCompliant());
             strParser.parseSecurityTokenReference(strElement, crypto, cb, wsDocInfo, null);
+            
             X509Certificate[] certs = strParser.getCertificates();
             if (certs == null || certs.length < 1 || certs[0] == null) {
                 throw new WSSecurityException(

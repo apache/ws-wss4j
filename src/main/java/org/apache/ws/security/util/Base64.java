@@ -172,7 +172,7 @@ public final class  Base64 {
     }
 
     /**
-     * Decodes Base64 data into octects
+     * Decodes Base64 data into octets
      *
      * @param encoded string containing Base64 data
      * @return Array containind decoded data.

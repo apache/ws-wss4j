@@ -37,6 +37,12 @@ import javax.security.auth.callback.CallbackHandler;
 public interface STRParser {
     
     /**
+     * Set whether we should process tokens according to the BSP spec
+     * @param bspCompliant whether we should process tokens according to the BSP spec
+     */
+    public void setBspCompliant(boolean bspCompliant);
+    
+    /**
      * Parse a SecurityTokenReference element and extract credentials.
      * 
      * @param strElement The SecurityTokenReference element

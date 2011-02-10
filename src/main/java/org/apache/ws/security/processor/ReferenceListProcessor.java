@@ -65,7 +65,7 @@ public class ReferenceListProcessor implements Processor {
         Crypto decCrypto,
         CallbackHandler cb, 
         WSDocInfo wsDocInfo, 
-        WSSConfig wsc
+        WSSConfig config
     ) throws WSSecurityException {
         if (log.isDebugEnabled()) {
             log.debug("Found reference list element");
@@ -73,7 +73,7 @@ public class ReferenceListProcessor implements Processor {
         if (cb == null) {
             throw new WSSecurityException(WSSecurityException.FAILURE, "noCallback");
         }
-        List<WSDataRef> dataRefs = handleReferenceList(elem, cb, decCrypto, wsDocInfo);
+        List<WSDataRef> dataRefs = handleReferenceList(elem, cb, decCrypto, wsDocInfo, config);
         WSSecurityEngineResult result = 
             new WSSecurityEngineResult(WSConstants.ENCR, dataRefs);
         wsDocInfo.addTokenElement(elem);
@@ -93,7 +93,8 @@ public class ReferenceListProcessor implements Processor {
         Element elem, 
         CallbackHandler cb,
         Crypto crypto,
-        WSDocInfo wsDocInfo
+        WSDocInfo wsDocInfo,
+        WSSConfig config
     ) throws WSSecurityException {
         List<WSDataRef> dataRefs = new ArrayList<WSDataRef>();
         for (Node node = elem.getFirstChild(); 
@@ -108,7 +109,8 @@ public class ReferenceListProcessor implements Processor {
                     dataRefURI = dataRefURI.substring(1);
                 }
                 WSDataRef dataRef = 
-                    decryptDataRefEmbedded(elem.getOwnerDocument(), dataRefURI, cb, crypto, wsDocInfo);
+                    decryptDataRefEmbedded(
+                        elem.getOwnerDocument(), dataRefURI, cb, crypto, wsDocInfo, config);
                 dataRefs.add(dataRef);
             }
         }
@@ -125,7 +127,8 @@ public class ReferenceListProcessor implements Processor {
         String dataRefURI, 
         CallbackHandler cb, 
         Crypto crypto,
-        WSDocInfo wsDocInfo
+        WSDocInfo wsDocInfo,
+        WSSConfig config
     ) throws WSSecurityException {
         if (log.isDebugEnabled()) {
             log.debug("Found data reference: " + dataRefURI);
@@ -158,6 +161,7 @@ public class ReferenceListProcessor implements Processor {
             symmetricKey = X509Util.getSharedKey(keyInfoElement, symEncAlgo, cb);
         } else {
             STRParser strParser = new SecurityTokenRefSTRParser();
+            strParser.setBspCompliant(config.isWsiBSPCompliant());
             Map<String, Object> parameters = new HashMap<String, Object>();
             parameters.put(SecurityTokenRefSTRParser.SIGNATURE_METHOD, symEncAlgo);
             strParser.parseSecurityTokenReference(

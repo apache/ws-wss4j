@@ -37,11 +37,11 @@ import javax.xml.namespace.QName;
 public class Reference {
     public static final QName TOKEN = new QName(WSConstants.WSSE_NS, "Reference");
     protected Element element = null;
-
+    
     /**
      * Constructor.
      * 
-     * @param elem 
+     * @param elem The Reference element
      * @throws WSSecurityException 
      */
     public Reference(Element elem) throws WSSecurityException {
@@ -53,6 +53,14 @@ public class Reference {
         if (!el.equals(TOKEN)) {
             throw new WSSecurityException(
                 WSSecurityException.FAILURE, "badElement", new Object[] {TOKEN, el}
+            );
+        }
+
+        String uri = getURI();
+        // Reference URI cannot be null or empty
+        if (uri == null || uri.isEmpty()) {
+            throw new WSSecurityException(
+                WSSecurityException.INVALID_SECURITY, "badReferenceURI"
             );
         }
     }
@@ -75,54 +83,54 @@ public class Reference {
     }
 
     /**
-     * get the dom element.
+     * Get the DOM element.
      * 
-     * @return TODO
+     * @return the DOM element
      */
     public Element getElement() {
         return element;
     }
 
     /**
-     * get the URI.
+     * Get the ValueType attribute.
      * 
-     * @return TODO
+     * @return the ValueType attribute
      */
     public String getValueType() {
         return element.getAttribute("ValueType");
     }
 
     /**
-     * get the URI.
+     * Get the URI.
      * 
-     * @return TODO
+     * @return the URI
      */
     public String getURI() {
         return element.getAttribute("URI");
     }
 
     /**
-     * set the Value type.
+     * Set the Value type.
      * 
-     * @param valueType
+     * @param valueType the ValueType attribute to set
      */
     public void setValueType(String valueType) {
         element.setAttributeNS(null, "ValueType", valueType);
     }
 
     /**
-     * set the URI.
+     * Set the URI.
      * 
-     * @param uri 
+     * @param uri the URI to set
      */
     public void setURI(String uri) {
         element.setAttributeNS(null, "URI", uri);
     }
 
     /**
-     * return the string representation.
+     * Return the string representation.
      * 
-     * @return TODO
+     * @return the string representation.
      */
     public String toString() {
         return DOM2Writer.nodeToString((Node)element);

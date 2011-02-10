@@ -51,6 +51,16 @@ public class DerivedKeyTokenSTRParser implements STRParser {
     
     private byte[] secretKey;
     
+    private boolean bspCompliant = true;
+    
+    /**
+     * Set whether we should process tokens according to the BSP spec
+     * @param bspCompliant whether we should process tokens according to the BSP spec
+     */
+    public void setBspCompliant(boolean bspCompliant) {
+        this.bspCompliant = bspCompliant;
+    }
+    
     /**
      * Parse a SecurityTokenReference element and extract credentials.
      * 
@@ -68,7 +78,7 @@ public class DerivedKeyTokenSTRParser implements STRParser {
         WSDocInfo wsDocInfo,
         Map<String, Object> parameters
     ) throws WSSecurityException {
-        SecurityTokenReference secRef = new SecurityTokenReference(strElement);
+        SecurityTokenReference secRef = new SecurityTokenReference(strElement, bspCompliant);
         
         String uri = null;
         String keyIdentifierValueType = null;

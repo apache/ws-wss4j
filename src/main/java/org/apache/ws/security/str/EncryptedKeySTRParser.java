@@ -52,6 +52,16 @@ public class EncryptedKeySTRParser implements STRParser {
     
     private X509Certificate[] certs;
     
+    private boolean bspCompliant = true;
+    
+    /**
+     * Set whether we should process tokens according to the BSP spec
+     * @param bspCompliant whether we should process tokens according to the BSP spec
+     */
+    public void setBspCompliant(boolean bspCompliant) {
+        this.bspCompliant = bspCompliant;
+    }
+    
     /**
      * Parse a SecurityTokenReference element and extract credentials.
      * 
@@ -69,7 +79,7 @@ public class EncryptedKeySTRParser implements STRParser {
         WSDocInfo wsDocInfo,
         Map<String, Object> parameters
     ) throws WSSecurityException {
-        SecurityTokenReference secRef = new SecurityTokenReference(strElement);
+        SecurityTokenReference secRef = new SecurityTokenReference(strElement, bspCompliant);
         //
         // Handle X509IssuerSerial here. First check if all elements are available,
         // get the appropriate data, check if all data is available.

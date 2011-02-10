@@ -157,6 +157,12 @@ public class SAMLUtil {
             return new SAMLKeyInfo(key);
         }
         
+        if (crypto == null) {
+            throw new WSSecurityException(
+                WSSecurityException.FAILURE, "noSigCryptoFile"
+            );
+        }
+        
         for (org.opensaml.saml1.core.Statement stmt : assertion.getStatements()) {
             org.opensaml.saml1.core.Subject samlSubject = null;
             if (stmt instanceof org.opensaml.saml1.core.AttributeStatement) {

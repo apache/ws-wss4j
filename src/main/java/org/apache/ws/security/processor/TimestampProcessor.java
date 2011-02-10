@@ -54,7 +54,7 @@ public class TimestampProcessor implements Processor {
         Crypto decCrypto, 
         CallbackHandler cb, 
         WSDocInfo wsDocInfo, 
-        WSSConfig wsc
+        WSSConfig config
     ) throws WSSecurityException {
         if (log.isDebugEnabled()) {
             log.debug("Found Timestamp list element");
@@ -62,10 +62,10 @@ public class TimestampProcessor implements Processor {
         //
         // Decode Timestamp, add the found time (created/expiry) to result
         //
-        Timestamp timestamp = new Timestamp(elem, wsc.isWsiBSPCompliant());
+        Timestamp timestamp = new Timestamp(elem, config.isWsiBSPCompliant());
         Credential credential = new Credential();
         credential.setTimestamp(timestamp);
-        validator.setWSSConfig(wsc);
+        validator.setWSSConfig(config);
         validator.validate(credential);
         
         WSSecurityEngineResult result = 

@@ -52,15 +52,15 @@ public class UsernameTokenProcessor implements Processor {
 
     public List<WSSecurityEngineResult> handleToken(
         Element elem, Crypto crypto, Crypto decCrypto, CallbackHandler cb, 
-        WSDocInfo wsDocInfo, WSSConfig wsc
+        WSDocInfo wsDocInfo, WSSConfig config
     ) throws WSSecurityException {
         if (log.isDebugEnabled()) {
             log.debug("Found UsernameToken list element");
         }
         validator.setCallbackHandler(cb);
-        validator.setWSSConfig(wsc);
+        validator.setWSSConfig(config);
         
-        UsernameToken token = handleUsernameToken(elem, wsc);
+        UsernameToken token = handleUsernameToken(elem, config);
         
         WSUsernameTokenPrincipal principal = 
             new WSUsernameTokenPrincipal(token.getName(), token.isHashed());

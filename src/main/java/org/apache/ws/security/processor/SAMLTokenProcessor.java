@@ -57,7 +57,7 @@ public class SAMLTokenProcessor implements Processor {
         Crypto decCrypto, 
         CallbackHandler cb, 
         WSDocInfo wsDocInfo, 
-        WSSConfig wsc
+        WSSConfig config
     ) throws WSSecurityException {
         if (log.isDebugEnabled()) {
             log.debug("Found SAML Assertion element");

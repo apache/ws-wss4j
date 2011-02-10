@@ -52,6 +52,8 @@ public class WSConstants {
         "http://docs.oasis-open.org/wss/oasis-wss-saml-token-profile-1.0";
     public static final String SAMLTOKEN_NS11 = 
         "http://docs.oasis-open.org/wss/oasis-wss-saml-token-profile-1.1";
+    public static final String KERBEROS_NS11 =
+        "http://docs.oasis-open.org/wss/oasis-wss-kerberos-token-profile-1.1"; 
 
     public static final String SIG_NS = "http://www.w3.org/2000/09/xmldsig#";
     public static final String ENC_NS = "http://www.w3.org/2001/04/xmlenc#";
@@ -237,6 +239,7 @@ public class WSConstants {
     public static final String WSS_SAML2_KI_VALUE_TYPE = SAMLTOKEN_NS11 + "#" + SAML2_ASSERTION_ID;
     public static final String WSS_SAML_TOKEN_TYPE = SAMLTOKEN_NS11 + "#SAMLV1.1";
     public static final String WSS_SAML2_TOKEN_TYPE = SAMLTOKEN_NS11 + "#SAMLV2.0";
+    public static final String WSS_ENC_KEY_VALUE_TYPE = SOAPMESSAGE_NS11 + "#" + ENC_KEY_VALUE_TYPE;
     public static final String PASSWORD_DIGEST = USERNAMETOKEN_NS + "#PasswordDigest";
     public static final String PASSWORD_TEXT = USERNAMETOKEN_NS + "#PasswordText";
 

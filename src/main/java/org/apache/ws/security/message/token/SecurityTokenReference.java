@@ -51,7 +51,6 @@ public class SecurityTokenReference {
     public static final String SECURITY_TOKEN_REFERENCE = "SecurityTokenReference";
     public static final QName STR_QNAME = 
         new QName(WSConstants.WSSE_NS, SECURITY_TOKEN_REFERENCE);
-    public static final String KEY_NAME = "KeyName";
     public static final String SKI_URI = 
         WSConstants.X509TOKEN_NS + "#X509SubjectKeyIdentifier";
     public static final String THUMB_URI = 
@@ -64,26 +63,55 @@ public class SecurityTokenReference {
     private DOMX509IssuerSerial issuerSerial = null;
     private byte[] skiBytes = null;
     private static boolean doDebug = false;
+    private Reference reference = null;
 
     /**
      * Constructor.
      *
-     * @param elem TODO
+     * @param elem A SecurityTokenReference element
      * @throws WSSecurityException
      */
     public SecurityTokenReference(Element elem) throws WSSecurityException {
+        this(elem, true);
+    }
+    
+    /**
+     * Constructor.
+     *
+     * @param elem A SecurityTokenReference element
+     * @param bspCompliant whether the SecurityTokenReference processing complies with the 
+     * BSP spec
+     * @throws WSSecurityException
+     */
+    public SecurityTokenReference(Element elem, boolean bspCompliant) throws WSSecurityException {
         doDebug = log.isDebugEnabled();
         element = elem;
         QName el = new QName(element.getNamespaceURI(), element.getLocalName());
         if (!STR_QNAME.equals(el)) {
             throw new WSSecurityException(WSSecurityException.FAILURE, "badElement", null);
         }
+        
+        if (bspCompliant) {
+            checkBSPCompliance();
+        }
+        if (containsReference()) {
+            Node node = element.getFirstChild();
+            while (node != null) {
+                if (Node.ELEMENT_NODE == node.getNodeType()
+                    && WSConstants.WSSE_NS.equals(node.getNamespaceURI())
+                    && "Reference".equals(node.getLocalName())) {
+                    reference = new Reference((Element)node);
+                    break;
+                }
+                node = node.getNextSibling();
+            }
+        }
     }
 
     /**
      * Constructor.
      *
-     * @param doc TODO
+     * @param doc The Document
      */
     public SecurityTokenReference(Document doc) {
         doDebug = log.isDebugEnabled();
@@ -131,6 +159,7 @@ public class SecurityTokenReference {
         } else {
             element.appendChild(ref.getElement());
         }
+        this.reference = ref;
     }
 
     /**
@@ -141,8 +170,7 @@ public class SecurityTokenReference {
      * @throws WSSecurityException
      */
     public Reference getReference() throws WSSecurityException {
-        Element elem = getFirstElement();
-        return new Reference(elem);
+        return reference;
     }
 
     /**
@@ -167,11 +195,6 @@ public class SecurityTokenReference {
         String uri = ref.getURI();
         if (doDebug) {
             log.debug("Token reference uri: " + uri);
-        }
-        if (uri == null) {
-            throw new WSSecurityException(
-                WSSecurityException.INVALID_SECURITY, "badReferenceURI"
-            );
         }
         
         Element tokElement = findTokenElement(doc, docInfo, cb, uri, ref.getValueType());
@@ -408,7 +431,6 @@ public class SecurityTokenReference {
         }
     }
 
-    
     /**
      * get the first child element.
      *
@@ -483,7 +505,6 @@ public class SecurityTokenReference {
         return null;
     }
     
-
     public String getX509SKIAlias(Crypto crypto) throws WSSecurityException {
         if (skiBytes == null) {
             skiBytes = getSKIBytes();
@@ -608,7 +629,7 @@ public class SecurityTokenReference {
     /**
      * Method containsReference
      *
-     * @return true if the <code>SecurtityTokenReference</code> contains
+     * @return true if the <code>SecurityTokenReference</code> contains
      *         a <code>wsse:Reference</code> element
      */
     public boolean containsReference() {
@@ -619,7 +640,7 @@ public class SecurityTokenReference {
      * Method lengthReference.
      *
      * @return number of <code>wsse:Reference</code> elements in
-     *         the <code>SecurtityTokenReference</code>
+     *         the <code>SecurityTokenReference</code>
      */
     public int lengthReference() {
         return length(WSConstants.WSSE_NS, "Reference");
@@ -628,7 +649,7 @@ public class SecurityTokenReference {
     /**
      * Method containsX509IssuerSerial
      *
-     * @return true if the <code>SecurtityTokenReference</code> contains
+     * @return true if the <code>SecurityTokenReference</code> contains
      *         a <code>ds:IssuerSerial</code> element
      */
     public boolean containsX509IssuerSerial() {
@@ -638,7 +659,7 @@ public class SecurityTokenReference {
     /**
      * Method containsX509Data
      *
-     * @return true if the <code>SecurtityTokenReference</code> contains
+     * @return true if the <code>SecurityTokenReference</code> contains
      *         a <code>ds:X509Data</code> element
      */
     public boolean containsX509Data() {
@@ -649,7 +670,7 @@ public class SecurityTokenReference {
      * Method lengthX509IssuerSerial.
      *
      * @return number of <code>ds:IssuerSerial</code> elements in
-     *         the <code>SecurtityTokenReference</code>
+     *         the <code>SecurityTokenReference</code>
      */
     public int lengthX509IssuerSerial() {
         return length(WSConstants.SIG_NS, WSConstants.X509_ISSUER_SERIAL_LN);
@@ -659,7 +680,7 @@ public class SecurityTokenReference {
      * Method lengthX509Data.
      *
      * @return number of <code>ds:IssuerSerial</code> elements in
-     *         the <code>SecurtityTokenReference</code>
+     *         the <code>SecurityTokenReference</code>
      */
     public int lengthX509Data() {
         return length(WSConstants.SIG_NS, WSConstants.X509_DATA_LN);
@@ -668,18 +689,18 @@ public class SecurityTokenReference {
     /**
      * Method containsKeyIdentifier.
      *
-     * @return true if the <code>SecurtityTokenReference</code> contains
+     * @return true if the <code>SecurityTokenReference</code> contains
      *         a <code>wsse:KeyIdentifier</code> element
      */
     public boolean containsKeyIdentifier() {
         return lengthKeyIdentifier() > 0;
     }
-
+    
     /**
      * Method lengthKeyIdentifier.
      *
      * @return number of <code>wsse:KeyIdentifier</code> elements in
-     *         the <code>SecurtityTokenReference</code>
+     *         the <code>SecurityTokenReference</code>
      */
     public int lengthKeyIdentifier() {
         return length(WSConstants.WSSE_NS, "KeyIdentifier");
@@ -712,9 +733,9 @@ public class SecurityTokenReference {
     }
 
     /**
-     * get the dom element.
+     * Get the DOM element.
      *
-     * @return TODO
+     * @return the DOM element
      */
     public Element getElement() {
         return element;
@@ -732,9 +753,84 @@ public class SecurityTokenReference {
     /**
      * return the string representation.
      *
-     * @return TODO
+     * @return a representation of this SecurityTokenReference element as a String
      */
     public String toString() {
         return DOM2Writer.nodeToString((Node) element);
+    }
+    
+    /**
+     * A method to check that the SecurityTokenReference is compliant with the BSP spec.
+     * @throws WSSecurityException
+     */
+    private void checkBSPCompliance() throws WSSecurityException {
+        // We can only have one token reference
+        int result = 0;
+        Node node = element.getFirstChild();
+        Element child = null;
+        while (node != null) {
+            if (Node.ELEMENT_NODE == node.getNodeType()) {
+                result++;
+                child = (Element)node;
+            }
+            node = node.getNextSibling();
+        }
+        if (result != 1) {
+            throw new WSSecurityException(
+                WSSecurityException.INVALID_SECURITY, "invalidDataRef"
+            );
+        }
+        
+        if ("KeyIdentifier".equals(child.getLocalName()) 
+            && WSConstants.WSSE_NS.equals(child.getNamespaceURI())) {
+            
+            String valueType = getKeyIdentifierValueType();
+            // ValueType cannot be null
+            if (valueType == null || valueType.isEmpty()) {
+                throw new WSSecurityException(
+                    WSSecurityException.INVALID_SECURITY, "invalidValueType"
+                );
+            }
+            String encodingType = getFirstElement().getAttribute("EncodingType");
+            // Encoding Type must be equal to Base64Binary if it's specified
+            if (encodingType != null && !encodingType.isEmpty() 
+                && !BinarySecurity.BASE64_ENCODING.equals(encodingType)) {
+                throw new WSSecurityException(
+                    WSSecurityException.INVALID_SECURITY, 
+                    "badEncodingType", 
+                    new Object[] {encodingType}
+                );
+            }
+            // Encoding type must be specified other than for a SAML Assertion
+            if (!WSConstants.WSS_SAML_KI_VALUE_TYPE.equals(valueType) 
+                && !WSConstants.WSS_SAML2_KI_VALUE_TYPE.equals(valueType)
+                && (encodingType == null || encodingType.isEmpty())) {
+                throw new WSSecurityException(
+                    WSSecurityException.INVALID_SECURITY, "noEncodingType"
+                );
+            }
+        } else if ("Embedded".equals(child.getLocalName())) {
+            result = 0;
+            node = child.getFirstChild();
+            while (node != null) {
+                if (Node.ELEMENT_NODE == node.getNodeType()) {
+                    result++;
+                    // We cannot have a SecurityTokenReference child element
+                    if ("SecurityTokenReference".equals(node.getLocalName())
+                        && WSConstants.WSSE_NS.equals(node.getNamespaceURI())) {
+                        throw new WSSecurityException(
+                            WSSecurityException.INVALID_SECURITY, "invalidEmbeddedRef"
+                        );
+                    }
+                }
+                node = node.getNextSibling();
+            }
+            // We can only have one embedded child
+            if (result != 1) {
+                throw new WSSecurityException(
+                    WSSecurityException.INVALID_SECURITY, "invalidEmbeddedRef"
+                );
+            }
+        }
     }
 }
