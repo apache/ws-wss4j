@@ -64,7 +64,7 @@ cp -r ${M2_REPO}/org/apache/ws/security/wss4j/${WSS4J_VERSION} ${WSS4J_STAGE_ROO
 #    gpg --detach-sign --armor $i
 #    gpg --verify $i.asc
 #done
-for i in *.jar *.zip
+#for i in *.jar *.zip
 #do
 #    md5sum $i > $i.md5
 #done
