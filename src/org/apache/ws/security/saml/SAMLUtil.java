@@ -102,6 +102,11 @@ public class SAMLUtil {
         if (key != null) {
             return new SAMLKeyInfo(assertion, key);
         } else {
+            if (crypto == null) {
+                throw new WSSecurityException(
+                    WSSecurityException.FAILURE, "noSigCryptoFile"
+                );
+            }
             Iterator statements = assertion.getStatements();
             while (statements.hasNext()) {
                 SAMLStatement stmt = (SAMLStatement) statements.next();

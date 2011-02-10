@@ -282,11 +282,6 @@ public class SignatureProcessor implements Processor {
                             validateCertificateChain = true;
                         }
                     } else if (el.equals(WSSecurityEngine.SAML_TOKEN)) {
-                        if (crypto == null) {
-                            throw new WSSecurityException(
-                                    WSSecurityException.FAILURE, "noSigCryptoFile"
-                            );
-                        }
                         samlKi = SAMLUtil.getSAMLKeyInfo(token, crypto, cb);
                         certs = samlKi.getCerts();
                         secretKey = samlKi.getSecret();
@@ -362,11 +357,6 @@ public class SignatureProcessor implements Processor {
                     
                     secretKey = dktProcessor.getKeyBytes(keyLength);
                 } else if (processor instanceof SAMLTokenProcessor) {
-                    if (crypto == null) {
-                        throw new WSSecurityException(
-                            WSSecurityException.FAILURE, "noSigCryptoFile"
-                        );
-                    }
                     SAMLTokenProcessor samlp = (SAMLTokenProcessor) processor;
                     samlKi = SAMLUtil.getSAMLKeyInfo(samlp.getSamlTokenElement(), crypto, cb);
                     certs = samlKi.getCerts();
@@ -401,11 +391,6 @@ public class SignatureProcessor implements Processor {
                     Element token = 
                         secRef.getKeyIdentifierTokenElement(elem.getOwnerDocument(), wsDocInfo, cb);
                     
-                    if (crypto == null) {
-                        throw new WSSecurityException(
-                            WSSecurityException.FAILURE, "noSigCryptoFile"
-                        );
-                    }
                     samlKi = SAMLUtil.getSAMLKeyInfo(token, crypto, cb);
                     certs = samlKi.getCerts();
                     secretKey = samlKi.getSecret();
