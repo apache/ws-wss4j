@@ -786,14 +786,14 @@ public class SecurityTokenReference {
             
             String valueType = getKeyIdentifierValueType();
             // ValueType cannot be null
-            if (valueType == null || valueType.isEmpty()) {
+            if (valueType == null || "".equals(valueType)) {
                 throw new WSSecurityException(
                     WSSecurityException.INVALID_SECURITY, "invalidValueType"
                 );
             }
             String encodingType = getFirstElement().getAttribute("EncodingType");
             // Encoding Type must be equal to Base64Binary if it's specified
-            if (encodingType != null && !encodingType.isEmpty() 
+            if (encodingType != null && !"".equals(encodingType)
                 && !BinarySecurity.BASE64_ENCODING.equals(encodingType)) {
                 throw new WSSecurityException(
                     WSSecurityException.INVALID_SECURITY, 
@@ -804,7 +804,7 @@ public class SecurityTokenReference {
             // Encoding type must be specified other than for a SAML Assertion
             if (!WSConstants.WSS_SAML_KI_VALUE_TYPE.equals(valueType) 
                 && !WSConstants.WSS_SAML2_KI_VALUE_TYPE.equals(valueType)
-                && (encodingType == null || encodingType.isEmpty())) {
+                && (encodingType == null || "".equals(encodingType))) {
                 throw new WSSecurityException(
                     WSSecurityException.INVALID_SECURITY, "noEncodingType"
                 );

@@ -58,7 +58,7 @@ public class Reference {
 
         String uri = getURI();
         // Reference URI cannot be null or empty
-        if (uri == null || uri.isEmpty()) {
+        if (uri == null || "".equals(uri)) {
             throw new WSSecurityException(
                 WSSecurityException.INVALID_SECURITY, "badReferenceURI"
             );
