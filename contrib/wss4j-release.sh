@@ -38,15 +38,15 @@ fi
 # set up the staging area
 #
 rm -rf ${WSS4J_STAGE_ROOT}
-mkdir -p ${WSS4J_STAGE_ROOT}/dist
+#mkdir -p ${WSS4J_STAGE_ROOT}/dist
 mkdir -p ${WSS4J_STAGE_ROOT}/maven/org/apache/ws/security/wss4j/${WSS4J_VERSION}
 #
 # Build and stage the distribution using ant
 #
-cd ${WSS4J_SRC_ROOT}
-ant clean
-ant dist || exit 1
-cp -r dist/* ${WSS4J_STAGE_ROOT}/dist
+#cd ${WSS4J_SRC_ROOT}
+#ant clean
+#ant dist || exit 1
+#cp -r dist/* ${WSS4J_STAGE_ROOT}/dist
 #
 # Build and stage through maven; copy the Jartifact built by Maven to the dist
 #
@@ -54,20 +54,20 @@ mvn clean || exit 1
 mvn -Prelease,jdk15 install || exit 1
 mkdir -p ${WSS4J_STAGE_ROOT}/maven/org/apache/ws/security/wss4j/
 cp -r ${M2_REPO}/org/apache/ws/security/wss4j/${WSS4J_VERSION} ${WSS4J_STAGE_ROOT}/maven/org/apache/ws/security/wss4j
-cp -f ${M2_REPO}/org/apache/ws/security/wss4j/${WSS4J_VERSION}/wss4j-${WSS4J_VERSION}.jar ${WSS4J_STAGE_ROOT}/dist
+#cp -f ${M2_REPO}/org/apache/ws/security/wss4j/${WSS4J_VERSION}/wss4j-${WSS4J_VERSION}.jar ${WSS4J_STAGE_ROOT}/dist
 #
 # Sign and hash the release bits
 #
-cd ${WSS4J_STAGE_ROOT}/dist
-for i in *
-do
-    gpg --detach-sign --armor $i
-    gpg --verify $i.asc
-done
+#cd ${WSS4J_STAGE_ROOT}/dist
+#for i in *
+#do
+#    gpg --detach-sign --armor $i
+#    gpg --verify $i.asc
+#done
 for i in *.jar *.zip
-do
-    md5sum $i > $i.md5
-done
+#do
+#    md5sum $i > $i.md5
+#done
 cd ${WSS4J_STAGE_ROOT}/maven/org/apache/ws/security/wss4j/${WSS4J_VERSION}
 for i in *
 do
@@ -81,7 +81,7 @@ done
 #
 # Build the web site
 #
-cd ${WSS4J_SRC_ROOT}
-mvn site || exit 1
-cp -r target/site ${WSS4J_STAGE_ROOT}/site
+#cd ${WSS4J_SRC_ROOT}
+#mvn site || exit 1
+#cp -r target/site ${WSS4J_STAGE_ROOT}/site
 
