@@ -433,10 +433,7 @@ public abstract class WSHandler {
         if (sigPropFile != null) {
             crypto = (Crypto) cryptos.get(sigPropFile);
             if (crypto == null) {
-                crypto = 
-                    CryptoFactory.getInstance(
-                        sigPropFile, this.getClassLoader(reqData.getMsgContext())
-                    );
+                crypto = loadCryptoFromPropertiesFile(sigPropFile, reqData);
                 cryptos.put(sigPropFile, crypto);
             }
         } else if (getString(WSHandlerConstants.SIG_PROP_REF_ID, reqData.getMsgContext()) != null) {
@@ -459,6 +456,20 @@ public abstract class WSHandler {
         
         return crypto;
     }
+    
+    /**
+     * A hook to allow subclass to load Crypto instances from property files in a different
+     * way.
+     * @param propFilename The property file name
+     * @param reqData The RequestData object
+     * @return A Crypto instance that has been loaded
+     */
+    protected Crypto loadCryptoFromPropertiesFile(String propFilename, RequestData reqData) {
+        return 
+            CryptoFactory.getInstance(
+                propFilename, this.getClassLoader(reqData.getMsgContext())
+            );
+    }
 
     /**
      * Hook to allow subclasses to load their Encryption Crypto however they
@@ -476,10 +487,7 @@ public abstract class WSHandler {
         if (encPropFile != null) {
             crypto = (Crypto) cryptos.get(encPropFile);
             if (crypto == null) {
-                crypto = 
-                    CryptoFactory.getInstance(
-                        encPropFile, this.getClassLoader(reqData.getMsgContext())
-                    );
+                crypto = loadCryptoFromPropertiesFile(encPropFile, reqData);
                 cryptos.put(encPropFile, crypto);
             }
         } else if (getString(WSHandlerConstants.ENC_PROP_REF_ID, reqData.getMsgContext()) != null) {
@@ -995,10 +1003,7 @@ public abstract class WSHandler {
         if (decPropFile != null) {
             crypto = (Crypto) cryptos.get(decPropFile);
             if (crypto == null) {
-                crypto = 
-                    CryptoFactory.getInstance(
-                        decPropFile, this.getClassLoader(reqData.getMsgContext())
-                    );
+                crypto = loadCryptoFromPropertiesFile(decPropFile, reqData);
                 cryptos.put(decPropFile, crypto);
             }
         } else if (getString(WSHandlerConstants.DEC_PROP_REF_ID, reqData.getMsgContext()) != null) {
