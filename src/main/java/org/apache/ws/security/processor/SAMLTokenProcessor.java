@@ -62,7 +62,7 @@ public class SAMLTokenProcessor implements Processor {
         if (log.isDebugEnabled()) {
             log.debug("Found SAML Assertion element");
         }
-        AssertionWrapper assertion = handleSAMLToken(elem, crypto, cb);
+        AssertionWrapper assertion = handleSAMLToken(elem, crypto, cb, config);
         wsDocInfo.addTokenElement(elem);
         WSSecurityEngineResult result = null;
         if (assertion.isSigned()) {
@@ -79,16 +79,18 @@ public class SAMLTokenProcessor implements Processor {
     public AssertionWrapper handleSAMLToken(
         Element token, 
         Crypto crypto,
-        CallbackHandler cb
+        CallbackHandler cb,
+        WSSConfig config
     ) throws WSSecurityException {
         AssertionWrapper assertion = new AssertionWrapper(token);
         if (assertion.isSigned()) {
-            assertion.verifySignature(crypto);
+            assertion.verifySignature(crypto, config);
         }
             
         // Now delegate the rest of the verification to the Validator
         validator.setCrypto(crypto);
         validator.setCallbackHandler(cb);
+        validator.setWSSConfig(config);
         Credential credential = new Credential();
         credential.setAssertion(assertion);
         validator.validate(credential);

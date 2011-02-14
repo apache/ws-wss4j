@@ -108,7 +108,7 @@ public class SecurityTokenRefSTRParser implements STRParser {
                     AssertionWrapper assertion = 
                         (AssertionWrapper)result.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
                     SAMLKeyInfo keyInfo = 
-                        SAMLUtil.getCredentialFromSubject(assertion, crypto, cb);
+                        SAMLUtil.getCredentialFromSubject(assertion, crypto, cb, bspCompliant);
                     // TODO Handle malformed SAML tokens where they don't have the 
                     // secret in them
                     secretKey = keyInfo.getSecret();
@@ -131,7 +131,8 @@ public class SecurityTokenRefSTRParser implements STRParser {
                     SAMLUtil.getAssertionFromKeyIdentifier(
                         secRef, strElement, crypto, cb, wsDocInfo
                     );
-                SAMLKeyInfo samlKi = SAMLUtil.getCredentialFromSubject(assertion, crypto, cb);
+                SAMLKeyInfo samlKi = 
+                    SAMLUtil.getCredentialFromSubject(assertion, crypto, cb, bspCompliant);
                 // TODO Handle malformed SAML tokens where they don't have the 
                 // secret in them
                 secretKey = samlKi.getSecret();

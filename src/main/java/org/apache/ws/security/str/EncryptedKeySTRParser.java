@@ -107,7 +107,8 @@ public class EncryptedKeySTRParser implements STRParser {
                     SAMLUtil.getAssertionFromKeyIdentifier(
                         secRef, strElement, crypto, cb, wsDocInfo
                     );
-                SAMLKeyInfo samlKi = SAMLUtil.getCredentialFromSubject(assertion, crypto, cb);
+                SAMLKeyInfo samlKi = 
+                    SAMLUtil.getCredentialFromSubject(assertion, crypto, cb, bspCompliant);
                 certs = samlKi.getCerts();
             } else {
                 certs = secRef.getKeyIdentifier(crypto);
@@ -128,7 +129,7 @@ public class EncryptedKeySTRParser implements STRParser {
                         AssertionWrapper assertion = 
                             (AssertionWrapper)result.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
                         SAMLKeyInfo keyInfo = 
-                            SAMLUtil.getCredentialFromSubject(assertion, crypto, cb);
+                            SAMLUtil.getCredentialFromSubject(assertion, crypto, cb, bspCompliant);
                         certs = keyInfo.getCerts();
                     } else {
                         throw new WSSecurityException(

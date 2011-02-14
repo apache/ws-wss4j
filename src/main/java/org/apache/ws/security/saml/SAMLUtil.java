@@ -22,6 +22,7 @@ package org.apache.ws.security.saml;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDocInfo;
 import org.apache.ws.security.WSPasswordCallback;
+import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
@@ -101,15 +102,19 @@ public class SAMLUtil {
      * @param crypto The Crypto instance to use to obtain certificates
      * @param cb The CallbackHandler instance used for secret keys
      * @return a SAMLKeyInfo object
+     * @param bspCompliant Whether to process tokens in compliance with the BSP spec or not
      * @throws WSSecurityException
      */
     public static SAMLKeyInfo getCredentialFromSubject(
-        AssertionWrapper assertion, Crypto crypto, CallbackHandler cb
+        AssertionWrapper assertion, 
+        Crypto crypto, 
+        CallbackHandler cb,
+        boolean bspCompliant
     ) throws WSSecurityException {
         if (assertion.getSaml1() != null) {
-            return getCredentialFromSubject(assertion.getSaml1(), crypto, cb);
+            return getCredentialFromSubject(assertion.getSaml1(), crypto, cb, bspCompliant);
         } else {
-            return getCredentialFromSubject(assertion.getSaml2(), crypto, cb);
+            return getCredentialFromSubject(assertion.getSaml2(), crypto, cb, bspCompliant);
         }
     }
     
@@ -143,13 +148,15 @@ public class SAMLUtil {
      * @param assertion The SAML 1.1 assertion
      * @param crypto The crypto instance used to get the credential
      * @param cb The CallbackHandler used for secret keys
+     * @param bspCompliant Whether to process tokens in compliance with the BSP spec or not
      * @return The SAMLKeyInfo object obtained from the Subject
      * @throws WSSecurityException
      */
     public static SAMLKeyInfo getCredentialFromSubject(
         org.opensaml.saml1.core.Assertion assertion,
         Crypto crypto,
-        CallbackHandler cb
+        CallbackHandler cb,
+        boolean bspCompliant
     ) throws WSSecurityException {
         // First try to get the credential from a CallbackHandler
         byte[] key = getSecretKeyFromCallbackHandler(assertion.getID(), cb);
@@ -191,7 +198,7 @@ public class SAMLUtil {
             Element keyInfoElement = 
                 WSSecurityUtil.getDirectChildElement(sub, "KeyInfo", WSConstants.SIG_NS);
             if (keyInfoElement != null) {
-                return getCredentialFromKeyInfo(keyInfoElement, crypto, cb);
+                return getCredentialFromKeyInfo(keyInfoElement, crypto, cb, bspCompliant);
             }
         }
 
@@ -204,13 +211,15 @@ public class SAMLUtil {
      * @param assertion The SAML 2 assertion
      * @param crypto The crypto instance used to get the credential
      * @param cb The CallbackHandler used for secret keys
+     * @param bspCompliant Whether to process tokens in compliance with the BSP spec or not
      * @return The SAMLKeyInfo object obtained from the Subject
      * @throws WSSecurityException
      */
     public static SAMLKeyInfo getCredentialFromSubject(
         org.opensaml.saml2.core.Assertion assertion,
         Crypto crypto,
-        CallbackHandler cb
+        CallbackHandler cb,
+        boolean bspCompliant
     ) throws WSSecurityException {
         // First try to get the credential from a CallbackHandler
         byte[] key = getSecretKeyFromCallbackHandler(assertion.getID(), cb);
@@ -234,7 +243,7 @@ public class SAMLUtil {
             Element keyInfoElement = 
                 WSSecurityUtil.getDirectChildElement(sub, "KeyInfo", WSConstants.SIG_NS);
             if (keyInfoElement != null) {
-                return getCredentialFromKeyInfo(keyInfoElement, crypto, cb);
+                return getCredentialFromKeyInfo(keyInfoElement, crypto, cb, bspCompliant);
             }
         }
 
@@ -246,13 +255,15 @@ public class SAMLUtil {
      * KeyInfo (DOM Element) argument.
      * @param keyInfoElement The KeyInfo as a DOM Element
      * @param crypto The crypto instance
+     * @param bspCompliant Whether to process tokens in compliance with the BSP spec or not
      * @return The credential (as a SAMLKeyInfo object)
      * @throws WSSecurityException
      */
     public static SAMLKeyInfo getCredentialFromKeyInfo(
         Element keyInfoElement,
         Crypto crypto,
-        CallbackHandler cb
+        CallbackHandler cb,
+        boolean bspCompliant
     ) throws WSSecurityException {
         //
         // First try to find an EncryptedKey or a BinarySecret via DOM
@@ -264,8 +275,10 @@ public class SAMLUtil {
                 if (el.equals(WSSecurityEngine.ENCRYPTED_KEY)) {
                     EncryptedKeyProcessor proc = new EncryptedKeyProcessor();
                     WSDocInfo docInfo = new WSDocInfo(node.getOwnerDocument());
+                    WSSConfig config = WSSConfig.getNewInstance();
+                    config.setWsiBSPCompliant(bspCompliant);
                     List<WSSecurityEngineResult> result =
-                        proc.handleToken((Element)node, null, crypto, cb, docInfo, null);
+                        proc.handleToken((Element)node, null, crypto, cb, docInfo, config);
                     byte[] secret = 
                         (byte[])result.get(0).get(
                             WSSecurityEngineResult.TAG_SECRET

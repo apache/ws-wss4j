@@ -248,7 +248,9 @@ public class WSSecSignatureSAML extends WSSecSignature {
             }
             if (secretKey == null) {
                 SAMLKeyInfo samlKeyInfo = 
-                    SAMLUtil.getCredentialFromSubject(assertion, userCrypto, null);
+                    SAMLUtil.getCredentialFromSubject(
+                        assertion, userCrypto, null, wssConfig.isWsiBSPCompliant()
+                    );
                 publicKey = samlKeyInfo.getPublicKey();
                 certs = samlKeyInfo.getCerts();
                 wsDocInfo.setCrypto(userCrypto);

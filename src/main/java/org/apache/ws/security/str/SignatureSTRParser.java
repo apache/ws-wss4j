@@ -127,7 +127,8 @@ public class SignatureSTRParser implements STRParser {
                     || el.equals(WSSecurityEngine.SAML2_TOKEN)) {
 
                     AssertionWrapper assertion = new AssertionWrapper(token);
-                    SAMLKeyInfo samlKi = SAMLUtil.getCredentialFromSubject(assertion, crypto, cb);
+                    SAMLKeyInfo samlKi = 
+                        SAMLUtil.getCredentialFromSubject(assertion, crypto, cb, bspCompliant);
                     X509Certificate[] foundCerts = samlKi.getCerts();
                     if (foundCerts != null) {
                         certs = new X509Certificate[]{foundCerts[0]};
@@ -220,7 +221,7 @@ public class SignatureSTRParser implements STRParser {
                     SAMLUtil.getAssertionFromKeyIdentifier(
                         secRef, strElement, crypto, cb, wsDocInfo
                     );
-                SAMLKeyInfo samlKi = SAMLUtil.getCredentialFromSubject(assertion, crypto, cb);
+                SAMLKeyInfo samlKi = SAMLUtil.getCredentialFromSubject(assertion, crypto, cb, bspCompliant);
                 X509Certificate[] foundCerts = samlKi.getCerts();
                 if (foundCerts != null) {
                     certs = new X509Certificate[]{foundCerts[0]};
