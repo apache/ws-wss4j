@@ -194,12 +194,12 @@ public class WSSecurityUtil {
      * @param namespace the namespace of the children to get
      * @return the list of nodes or <code>null</code> if not such nodes are found
      */
-    public static List<Node> getDirectChildElements(
+    public static List<Element> getDirectChildElements(
         Node fNode, 
         String localName,
         String namespace
     ) {
-        List<Node> children = new ArrayList<Node>();
+        List<Element> children = new ArrayList<Element>();
         for (
             Node currentChild = fNode.getFirstChild(); 
             currentChild != null; 
@@ -208,7 +208,7 @@ public class WSSecurityUtil {
             if (Node.ELEMENT_NODE == currentChild.getNodeType()
                 && localName.equals(currentChild.getLocalName())
                 && namespace.equals(currentChild.getNamespaceURI())) {
-                children.add(currentChild);
+                children.add((Element)currentChild);
             }
         }
         return children;

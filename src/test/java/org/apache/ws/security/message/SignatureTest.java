@@ -30,6 +30,7 @@ import org.apache.ws.security.WSEncryptionPart;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.common.CustomHandler;
 import org.apache.ws.security.common.KeystoreCallbackHandler;
 import org.apache.ws.security.common.SOAPUtil;
@@ -150,6 +151,18 @@ public class SignatureTest extends org.junit.Assert {
         }
         
         verify(signedDoc);
+        
+        // Now turn on BSP spec compliance
+        WSSecurityEngine newEngine = new WSSecurityEngine();
+        WSSConfig config = WSSConfig.getNewInstance();
+        config.setWsiBSPCompliant(true);
+        newEngine.setWssConfig(config);
+        try {
+            newEngine.processSecurityHeader(doc, null, null, crypto);
+            fail("Failure expected on a bad c14n algorithm");
+        } catch (WSSecurityException ex) {
+            assert ex.getMessage().contains("bad canonicalization algorithm");
+        }
     }
     
     /**

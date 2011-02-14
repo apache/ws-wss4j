@@ -116,13 +116,25 @@ public class SignatureProcessor implements Processor {
             certs = getDefaultCerts(crypto);
             principal = certs[0].getSubjectX500Principal();
         } else {
-            Element strElement = 
-                WSSecurityUtil.getDirectChildElement(
+            List<Element> strElements = 
+                WSSecurityUtil.getDirectChildElements(
                     keyInfoElement,
                     SecurityTokenReference.SECURITY_TOKEN_REFERENCE,
                     WSConstants.WSSE_NS
                 );
-            if (strElement == null) {
+            if (config.isWsiBSPCompliant()) {
+                if (strElements.isEmpty()) {
+                    throw new WSSecurityException(
+                        WSSecurityException.INVALID_SECURITY, "noSecurityTokenReference"
+                    );
+                } else if (strElements.size() > 1) {
+                    throw new WSSecurityException(
+                        WSSecurityException.INVALID_SECURITY, "badSecurityTokenReference"
+                    );
+                }
+            }
+                
+            if (strElements.isEmpty()) {
                 publicKey = parseKeyValue(keyInfoElement);
                 Credential credential = new Credential();
                 credential.setPublicKey(publicKey);
@@ -138,7 +150,7 @@ public class SignatureProcessor implements Processor {
                     SignatureSTRParser.SECRET_KEY_LENGTH, new Integer(config.getSecretKeyLength())
                 );
                 strParser.parseSecurityTokenReference(
-                    strElement, crypto, cb, wsDocInfo, parameters
+                    strElements.get(0), crypto, cb, wsDocInfo, parameters
                 );
                 principal = strParser.getPrincipal();
                 certs = strParser.getCertificates();
@@ -169,6 +181,12 @@ public class SignatureProcessor implements Processor {
             verifyXMLSignature(elem, certs, publicKey, secretKey, signatureMethod, wsDocInfo);
         byte[] signatureValue = xmlSignature.getSignatureValue().getValue();
         String c14nMethod = xmlSignature.getSignedInfo().getCanonicalizationMethod().getAlgorithm();
+        // The c14n algorithm must be as specified by the BSP spec
+        if (config.isWsiBSPCompliant() && !WSConstants.C14N_EXCL_OMIT_COMMENTS.equals(c14nMethod)) {
+            throw new WSSecurityException(
+                WSSecurityException.INVALID_SECURITY, "badC14nAlgo"
+            );
+        }
         List<WSDataRef> dataRefs =  
             buildProtectedRefs(
                 elem.getOwnerDocument(), xmlSignature.getSignedInfo(), config, wsDocInfo

@@ -22,16 +22,21 @@ package org.apache.ws.security.handler;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSSecurityEngineResult;
+import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.common.CustomHandler;
 import org.apache.ws.security.common.KeystoreCallbackHandler;
 import org.apache.ws.security.common.SOAPUtil;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
+import org.apache.ws.security.message.WSSecHeader;
+import org.apache.ws.security.message.token.SignatureConfirmation;
 import org.apache.ws.security.util.Base64;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -243,6 +248,45 @@ public class SignatureConfirmationTest extends org.junit.Assert {
         assertTrue(scResult != null);
         assertTrue(scResult.get(WSSecurityEngineResult.TAG_SIGNATURE_CONFIRMATION) != null);
         handler.signatureConfirmation(reqData, results);
+    }
+    
+    
+    /**
+     * Test to see that a signature confirmation response that does not contain a wsu:Id fails
+     * the BSP compliance is enabled.
+     */
+    @org.junit.Test
+    public void
+    testWsuId() throws Exception {
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        
+        byte[] randomBytes = WSSecurityUtil.generateNonce(20);
+        SignatureConfirmation sigConf = new SignatureConfirmation(doc, randomBytes);
+        Element sigConfElement = sigConf.getElement();
+        secHeader.getSecurityHeader().appendChild(sigConfElement);
+        
+        if (LOG.isDebugEnabled()) {
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+            LOG.debug(outputString);
+        }
+        
+        // Verify the results
+        verify(doc);
+        
+        // Now turn on BSP spec compliance
+        WSSecurityEngine newEngine = new WSSecurityEngine();
+        WSSConfig config = WSSConfig.getNewInstance();
+        config.setWsiBSPCompliant(true);
+        newEngine.setWssConfig(config);
+        try {
+            newEngine.processSecurityHeader(doc, null, callbackHandler, crypto);
+            fail("Failure expected on a request with no wsu:Id");
+        } catch (WSSecurityException ex) {
+            assert ex.getMessage().contains("wsu:Id");
+        }
     }
     
     
