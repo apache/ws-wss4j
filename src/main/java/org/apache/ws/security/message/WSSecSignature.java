@@ -216,20 +216,39 @@ public class WSSecSignature extends WSSecSignatureBase {
 
         case WSConstants.CUSTOM_SYMM_SIGNING :
             Reference refCust = new Reference(document);
-            refCust.setValueType(customTokenValueType);
+            if (WSConstants.WSS_SAML_KI_VALUE_TYPE.equals(customTokenValueType)) {
+                secRef.addTokenType(WSConstants.WSS_SAML_TOKEN_TYPE);
+                refCust.setValueType(customTokenValueType);
+            } else if (WSConstants.WSS_SAML2_KI_VALUE_TYPE.equals(customTokenValueType)) {
+                secRef.addTokenType(WSConstants.WSS_SAML2_TOKEN_TYPE);
+            } else {
+                refCust.setValueType(customTokenValueType);
+            }
             refCust.setURI("#" + customTokenId);
             secRef.setReference(refCust);
             break;
 
         case WSConstants.CUSTOM_SYMM_SIGNING_DIRECT :
             Reference refCustd = new Reference(document);
-            refCustd.setValueType(customTokenValueType);
+            if (WSConstants.WSS_SAML_KI_VALUE_TYPE.equals(customTokenValueType)) {
+                secRef.addTokenType(WSConstants.WSS_SAML_TOKEN_TYPE);
+                refCustd.setValueType(customTokenValueType);
+            } else if (WSConstants.WSS_SAML2_KI_VALUE_TYPE.equals(customTokenValueType)) {
+                secRef.addTokenType(WSConstants.WSS_SAML2_TOKEN_TYPE);
+            } else {
+                refCustd.setValueType(customTokenValueType);
+            }
             refCustd.setURI(customTokenId);
             secRef.setReference(refCustd);
             break;
             
         case WSConstants.CUSTOM_KEY_IDENTIFIER:
             secRef.setKeyIdentifier(customTokenValueType, customTokenId);
+            if (WSConstants.WSS_SAML_KI_VALUE_TYPE.equals(customTokenValueType)) {
+                secRef.addTokenType(WSConstants.WSS_SAML_TOKEN_TYPE);
+            } else if (WSConstants.WSS_SAML2_KI_VALUE_TYPE.equals(customTokenValueType)) {
+                secRef.addTokenType(WSConstants.WSS_SAML2_TOKEN_TYPE);
+            }
             break;
             
         case WSConstants.KEY_VALUE:

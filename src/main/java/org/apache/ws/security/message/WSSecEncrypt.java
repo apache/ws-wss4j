@@ -513,12 +513,14 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
             keyInfo.addKeyName(embeddedKeyName == null ? user : embeddedKeyName);
         } else if (WSConstants.WSS_SAML_KI_VALUE_TYPE.equals(customReferenceValue)) {
             SecurityTokenReference secToken = new SecurityTokenReference(document);
+            secToken.addTokenType(WSConstants.WSS_SAML_TOKEN_TYPE);
             secToken.setKeyIdentifier(
                 WSConstants.WSS_SAML_KI_VALUE_TYPE, (encKeyIdDirectId ? "":"#") + encKeyId
             );
             keyInfo.addUnknownElement(secToken.getElement());
         } else if (WSConstants.WSS_SAML2_KI_VALUE_TYPE.equals(customReferenceValue)) {
             SecurityTokenReference secToken = new SecurityTokenReference(document);
+            secToken.addTokenType(WSConstants.WSS_SAML2_TOKEN_TYPE);
             secToken.setKeyIdentifier(
                 WSConstants.WSS_SAML2_KI_VALUE_TYPE, (encKeyIdDirectId ? "":"#") + encKeyId
             );
