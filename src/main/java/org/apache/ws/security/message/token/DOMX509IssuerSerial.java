@@ -22,14 +22,13 @@ package org.apache.ws.security.message.token;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.util.DOM2Writer;
 import org.apache.ws.security.util.WSSecurityUtil;
+import org.apache.xml.security.utils.RFC2253Parser;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.Text;
 
 import java.math.BigInteger;
-
-import javax.security.auth.x500.X500Principal;
 
 /**
  * An X.509 Issuer Serial token.
@@ -69,8 +68,7 @@ public final class DOMX509IssuerSerial {
         if (serialNumber == null) {
             throw new NullPointerException("The serialNumber cannot be null");
         }
-        new X500Principal(issuer);
-        this.issuer = issuer;
+        this.issuer = RFC2253Parser.normalize(issuer);
         this.serialNumber = serialNumber;
         
         element = 
@@ -82,7 +80,7 @@ public final class DOMX509IssuerSerial {
             doc.createElementNS(
                 WSConstants.SIG_NS, WSConstants.SIG_PREFIX + ":" + WSConstants.X509_ISSUER_NAME_LN
             );
-        issuerNameElement.appendChild(doc.createTextNode(issuer));
+        issuerNameElement.appendChild(doc.createTextNode(this.issuer));
         element.appendChild(issuerNameElement);
         
         Element serialNumberElement = 
