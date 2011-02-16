@@ -28,6 +28,7 @@ import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSEncryptionPart;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSDataRef;
+import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.common.CustomHandler;
 import org.apache.ws.security.common.KeystoreCallbackHandler;
 import org.apache.ws.security.common.SecretKeyCallbackHandler;
@@ -469,6 +470,75 @@ public class EncryptionTest extends org.junit.Assert {
             org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(encryptedDoc);
         assertTrue(outputString.indexOf("counter_port_type") > 0 ? true
                 : false);
+    }
+    
+    
+    @org.junit.Test
+    public void testBadAttribute() throws Exception {
+        WSSecEncrypt builder = new WSSecEncrypt();
+        builder.setUserInfo("wss40");
+        builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
+        builder.setSymmetricEncAlgorithm(WSConstants.TRIPLE_DES);
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+
+        /*
+         * Prepare the Encrypt object with the token, setup data structure
+         */
+        builder.prepare(doc, crypto);
+
+        /*
+         * Set up the parts structure to encrypt the body
+         */
+        SOAPConstants soapConstants = WSSecurityUtil.getSOAPConstants(doc
+                .getDocumentElement());
+        java.util.List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
+        WSEncryptionPart encP = new WSEncryptionPart(soapConstants
+                .getBodyQName().getLocalPart(), soapConstants.getEnvelopeURI(),
+                "Content");
+        parts.add(encP);
+
+        /*
+         * Encrypt the parts (Body), create EncryptedData elements that reference
+         * the EncryptedKey, and get a ReferenceList that can be put into the
+         * Security header. Be sure that the ReferenceList is after the
+         * EncryptedKey element in the Security header (strict layout)
+         */
+        Element refs = builder.encryptForRef(null, parts);
+        builder.addExternalRefElement(refs, secHeader);
+
+        /*
+         * now add (prepend) the EncryptedKey element, then a
+         * BinarySecurityToken if one was setup during prepare
+         */
+        Element encryptedKeyElement = builder.getEncryptedKeyElement();
+        encryptedKeyElement.setAttributeNS(null, "Type", "SomeType");
+        WSSecurityUtil.prependChildElement(secHeader.getSecurityHeader(), encryptedKeyElement);
+
+        builder.prependBSTElementToHeader(secHeader);
+
+        Document encryptedDoc = doc;
+
+        String outputString = 
+            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(encryptedDoc);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(outputString);
+        }
+        
+        WSSecurityEngine newEngine = new WSSecurityEngine();
+        newEngine.processSecurityHeader(encryptedDoc, null, keystoreCallbackHandler, crypto);
+        
+        // Now turn on BSP compliance
+        WSSConfig wssConfig = WSSConfig.getNewInstance();
+        wssConfig.setWsiBSPCompliant(true);
+        newEngine.setWssConfig(wssConfig);
+        try {
+            newEngine.processSecurityHeader(encryptedDoc, null, keystoreCallbackHandler, crypto);
+            fail("Failure expected on a bad attribute type");
+        } catch (WSSecurityException ex) {
+            assert ex.getMessage().contains("bad attribute");
+        }
     }
 
     

@@ -82,11 +82,19 @@ public class EncryptedKeyProcessor implements Processor {
         if (cb == null) {
             throw new WSSecurityException(WSSecurityException.FAILURE, "noCallback");
         }
+        if (config.isWsiBSPCompliant()) {
+            checkBSPCompliance(elem);
+        }
         //
         // lookup xenc:EncryptionMethod, get the Algorithm attribute to determine
         // how the key was encrypted. Then check if we support the algorithm
         //
         String encryptedKeyTransportMethod = X509Util.getEncAlgo(elem);
+        if (encryptedKeyTransportMethod == null) {
+            throw new WSSecurityException(
+                WSSecurityException.UNSUPPORTED_ALGORITHM, "noEncAlgo"
+            );
+        }
         Cipher cipher = WSSecurityUtil.getCipherInstance(encryptedKeyTransportMethod);
         //
         // Now lookup CipherValue.
@@ -340,6 +348,37 @@ public class EncryptedKeyProcessor implements Processor {
         return ReferenceListProcessor.decryptEncryptedData(
             doc, dataRefURI, encryptedDataElement, symmetricKey, symEncAlgo
         );
+    }
+    
+    /**
+     * A method to check that the EncryptedKey is compliant with the BSP spec.
+     * @throws WSSecurityException
+     */
+    private void checkBSPCompliance(Element elem) throws WSSecurityException {
+        String attribute = elem.getAttribute("Type");
+        if (attribute != null && !"".equals(attribute)) {
+            throw new WSSecurityException(
+                WSSecurityException.FAILED_CHECK, "badAttribute", new Object[]{attribute}
+            );
+        }
+        attribute = elem.getAttribute("MimeType");
+        if (attribute != null && !"".equals(attribute)) {
+            throw new WSSecurityException(
+                WSSecurityException.FAILED_CHECK, "badAttribute", new Object[]{attribute}
+            );
+        }
+        attribute = elem.getAttribute("Encoding");
+        if (attribute != null && !"".equals(attribute)) {
+            throw new WSSecurityException(
+                WSSecurityException.FAILED_CHECK, "badAttribute", new Object[]{attribute}
+            );
+        }
+        attribute = elem.getAttribute("Recipient");
+        if (attribute != null && !"".equals(attribute)) {
+            throw new WSSecurityException(
+                WSSecurityException.FAILED_CHECK, "badAttribute", new Object[]{attribute}
+            );
+        }
     }
   
 }

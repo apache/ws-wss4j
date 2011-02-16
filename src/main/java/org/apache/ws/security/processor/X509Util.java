@@ -56,7 +56,7 @@ public class X509Util {
         String symEncAlgo = null;
         if (tmpE != null) {
             symEncAlgo = tmpE.getAttribute("Algorithm");
-            if (symEncAlgo == null) {
+            if (symEncAlgo == null || "".equals(symEncAlgo)) {
                 throw new WSSecurityException(
                     WSSecurityException.UNSUPPORTED_ALGORITHM, "noEncAlgo"
                 );
