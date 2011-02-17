@@ -51,6 +51,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.Properties;
+import java.util.TimeZone;
 import java.util.Vector;
 
 
@@ -1408,6 +1409,7 @@ public abstract class WSHandler {
 
         // Calculate the time that is allowed for the message to travel
         Calendar validCreation = Calendar.getInstance();
+        validCreation.setTimeZone(TimeZone.getTimeZone("UTC")); 
         Calendar cre = timestamp.getCreated();
         if (cre != null && cre.after(validCreation)) {
             if (doDebug) {
