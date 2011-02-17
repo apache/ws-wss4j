@@ -169,6 +169,7 @@ public class WSUsernameTokenPrincipal implements Principal, java.io.Serializable
      * @return true if the specified Object is equal equal to this
      *         <code>WSUsernameTokenPrincipal</code>.
      */
+    @Override
     public boolean equals(Object o) {
         if (o == null) {
             return false;
@@ -180,10 +181,27 @@ public class WSUsernameTokenPrincipal implements Principal, java.io.Serializable
             return false;
         }
         WSUsernameTokenPrincipal that = (WSUsernameTokenPrincipal) o;
-        if (this.getName().equals(that.getName())) {
-            return true;
+        if (this.digest != that.digest) {
+            return false;
         }
-        return false;
+        if (this.name == null ? that.name != null : !this.name.equals(that.name)) {
+            return false;
+        }
+        if (this.nonce == null ? that.nonce != null : !this.nonce.equals(that.nonce)) {
+            return false;
+        }
+        if (this.password == null ? that.password != null : !this.password.equals(that.password)) {
+            return false;
+        }
+        if (this.createdTime == null ? that.createdTime != null 
+            : !this.createdTime.equals(that.createdTime)) {
+            return false;
+        }
+        if (this.passwordType == null ? that.passwordType != null 
+            : !this.passwordType.equals(that.passwordType)) {
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -191,8 +209,17 @@ public class WSUsernameTokenPrincipal implements Principal, java.io.Serializable
      *
      * @return a hash code for this <code>WSUsernameTokenPrincipal</code>.
      */
+    @Override
     public int hashCode() {
-        return this.hashCode();
+        int hashcode = 17;
+        hashcode = 31 * hashcode + (digest ? 1 : 0);
+        hashcode = 31 * hashcode + (name == null ? 0 : name.hashCode());
+        hashcode = 31 * hashcode + (nonce == null ? 0 : nonce.hashCode());
+        hashcode = 31 * hashcode + (password == null ? 0 : password.hashCode());
+        hashcode = 31 * hashcode + (createdTime == null ? 0 : createdTime.hashCode());
+        hashcode = 31 * hashcode + (passwordType == null ? 0 : passwordType.hashCode());
+        
+        return hashcode;
     }
     
 }
