@@ -415,8 +415,8 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
             //
             // Get the data to encrypt.
             //
-            Element elementToEncrypt = WSSecurityUtil.findElement(encPart, doc, false);
-            if (elementToEncrypt == null) {
+            List<Element> elementsToEncrypt = WSSecurityUtil.findElements(encPart, doc);
+            if (elementsToEncrypt == null || elementsToEncrypt.size() == 0) {
                 throw new WSSecurityException(
                     WSSecurityException.FAILURE,
                     "noEncElement", 
@@ -425,73 +425,99 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
             }
 
             String modifier = encPart.getEncModifier();
-            boolean content = modifier.equals("Content") ? true : false;
-            //
-            // Encrypt data, and set necessary attributes in xenc:EncryptedData
-            //
-            String xencEncryptedDataId = 
-                config.getIdAllocator().createId("ED-", elementToEncrypt);
-            encPart.setEncId(xencEncryptedDataId);
-            try {
-                if (modifier.equals("Header")) {
-                    Element elem = 
-                        doc.createElementNS(
-                            WSConstants.WSSE11_NS, "wsse11:" + WSConstants.ENCRYPTED_HEADER
-                        );
-                    WSSecurityUtil.setNamespace(elem, WSConstants.WSSE11_NS, WSConstants.WSSE11_PREFIX);
-                    String wsuPrefix = 
-                        WSSecurityUtil.setNamespace(elem, WSConstants.WSU_NS, WSConstants.WSU_PREFIX);
-                    elem.setAttributeNS(
-                        WSConstants.WSU_NS, wsuPrefix + ":Id", 
-                        config.getIdAllocator().createId("EH-", elementToEncrypt)
-                    );
-                    //
-                    // Add the EncryptedHeader node to the element to be encrypted's parent
-                    // (i.e. the SOAP header). Add the element to be encrypted to the Encrypted
-                    // Header node as well
-                    //
-                    elementToEncrypt.getParentNode().appendChild(elem);
-                    elementToEncrypt = 
-                        (Element)elementToEncrypt.getParentNode().removeChild(elementToEncrypt);
-                    elementToEncrypt = (Element)elem.appendChild(elementToEncrypt);
-                    
-                    NamedNodeMap map = elementToEncrypt.getAttributes();
-                    for (int i = 0 ; i < map.getLength() ; i++) {
-                        Attr attr = (Attr)map.item(i);
-                        if (attr.getNamespaceURI().equals(WSConstants.URI_SOAP11_ENV)
-                            || attr.getNamespaceURI().equals(WSConstants.URI_SOAP12_ENV)) {                         
-                            String soapEnvPrefix = 
-                                WSSecurityUtil.setNamespace(
-                                    elem, attr.getNamespaceURI(), WSConstants.DEFAULT_SOAP_PREFIX
-                                );
-                            elem.setAttributeNS(
-                                attr.getNamespaceURI(), 
-                                soapEnvPrefix + ":" + attr.getLocalName(), 
-                                attr.getValue()
-                            );
-                        }
-                    }
-                }
-                
-                xmlCipher.init(XMLCipher.ENCRYPT_MODE, secretKey);
-                EncryptedData encData = xmlCipher.getEncryptedData();
-                encData.setId(xencEncryptedDataId);
-                encData.setKeyInfo(keyInfo);
-                xmlCipher.doFinal(doc, elementToEncrypt, content);
-                
-                if (part != (references.size() - 1)) {
-                    keyInfo = new KeyInfo((Element) keyInfo.getElement().cloneNode(true), null);
-                }
-            } catch (Exception ex) {
-                throw new WSSecurityException(
-                    WSSecurityException.FAILED_ENCRYPTION, null, null, ex
-                );
+            for (Element elementToEncrypt : elementsToEncrypt) {
+                String id = 
+                    encryptElement(doc, elementToEncrypt, modifier, config, xmlCipher, 
+                                secretKey, keyInfo);
+                encPart.setEncId(id);
+                encDataRef.add("#" + id);
             }
-            encDataRef.add("#" + xencEncryptedDataId);
+                
+            if (part != (references.size() - 1)) {
+                try {
+                    keyInfo = new KeyInfo((Element) keyInfo.getElement().cloneNode(true), null);
+                } catch (Exception ex) {
+                    throw new WSSecurityException(
+                        WSSecurityException.FAILED_ENCRYPTION, null, null, ex
+                    );
+                }
+            }
         }
         return encDataRef;
     }
     
+    /**
+     * Encrypt an element.
+     */
+    private static String encryptElement(
+        Document doc,
+        Element elementToEncrypt,
+        String modifier,
+        WSSConfig config,
+        XMLCipher xmlCipher,
+        SecretKey secretKey,
+        KeyInfo keyInfo
+    ) throws WSSecurityException {
+
+        boolean content = modifier.equals("Content") ? true : false;
+        //
+        // Encrypt data, and set necessary attributes in xenc:EncryptedData
+        //
+        String xencEncryptedDataId = 
+            config.getIdAllocator().createId("ED-", elementToEncrypt);
+        try {
+            if (modifier.equals("Header")) {
+                Element elem = 
+                    doc.createElementNS(
+                        WSConstants.WSSE11_NS, "wsse11:" + WSConstants.ENCRYPTED_HEADER
+                    );
+                WSSecurityUtil.setNamespace(elem, WSConstants.WSSE11_NS, WSConstants.WSSE11_PREFIX);
+                String wsuPrefix = 
+                    WSSecurityUtil.setNamespace(elem, WSConstants.WSU_NS, WSConstants.WSU_PREFIX);
+                elem.setAttributeNS(
+                    WSConstants.WSU_NS, wsuPrefix + ":Id", 
+                    config.getIdAllocator().createId("EH-", elementToEncrypt)
+                );
+                //
+                // Add the EncryptedHeader node to the element to be encrypted's parent
+                // (i.e. the SOAP header). Add the element to be encrypted to the Encrypted
+                // Header node as well
+                //
+                elementToEncrypt.getParentNode().appendChild(elem);
+                elementToEncrypt = 
+                    (Element)elementToEncrypt.getParentNode().removeChild(elementToEncrypt);
+                elementToEncrypt = (Element)elem.appendChild(elementToEncrypt);
+                
+                NamedNodeMap map = elementToEncrypt.getAttributes();
+                for (int i = 0 ; i < map.getLength() ; i++) {
+                    Attr attr = (Attr)map.item(i);
+                    if (attr.getNamespaceURI().equals(WSConstants.URI_SOAP11_ENV)
+                        || attr.getNamespaceURI().equals(WSConstants.URI_SOAP12_ENV)) {                         
+                        String soapEnvPrefix = 
+                            WSSecurityUtil.setNamespace(
+                                elem, attr.getNamespaceURI(), WSConstants.DEFAULT_SOAP_PREFIX
+                            );
+                        elem.setAttributeNS(
+                            attr.getNamespaceURI(), 
+                            soapEnvPrefix + ":" + attr.getLocalName(), 
+                            attr.getValue()
+                        );
+                    }
+                }
+            }
+            
+            xmlCipher.init(XMLCipher.ENCRYPT_MODE, secretKey);
+            EncryptedData encData = xmlCipher.getEncryptedData();
+            encData.setId(xencEncryptedDataId);
+            encData.setKeyInfo(keyInfo);
+            xmlCipher.doFinal(doc, elementToEncrypt, content);
+            return xencEncryptedDataId;
+        } catch (Exception ex) {
+            throw new WSSecurityException(
+                WSSecurityException.FAILED_ENCRYPTION, null, null, ex
+            );
+        }
+    }
     
     /**
      * Create a KeyInfo object

@@ -57,6 +57,16 @@ public class EncryptionPartsTest extends org.junit.Assert {
             "      <ns1:testMethod xmlns:ns1=\"http://axis/service/security/test6/LogTestService8\"></ns1:testMethod>" +
             "   </soapenv:Body>" +
             "</soapenv:Envelope>";
+    private static final String SOAPMSG_MULTIPLE = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+        "<soapenv:Envelope xmlns:foo=\"urn:foo.bar\" xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" +
+        "   <soapenv:Header>" +
+        "       <foo:foobar>baz</foo:foobar>" + 
+        "   </soapenv:Header>" +
+        "   <soapenv:Body>" +
+        "      <ns1:testMethod xmlns:ns1=\"http://axis/service/security/test6/LogTestService8\">asf1</ns1:testMethod>" +
+        "      <ns1:testMethod xmlns:ns1=\"http://axis/service/security/test6/LogTestService8\">asf2</ns1:testMethod>" +
+        "   </soapenv:Body>" +
+        "</soapenv:Envelope>";
 
     private WSSecurityEngine secEngine = new WSSecurityEngine();
     private CallbackHandler callbackHandler = new KeystoreCallbackHandler();
@@ -244,7 +254,7 @@ public class EncryptionPartsTest extends org.junit.Assert {
     
     
     /**
-     * Test signing a custom SOAP header and the SOAP body
+     * Test encrypting a custom SOAP header and the SOAP body
      */
     @org.junit.Test
     public void testSOAPHeaderAndBody() throws Exception {
@@ -361,6 +371,45 @@ public class EncryptionPartsTest extends org.junit.Assert {
         
         QName bodyName = new QName(soapConstants.getEnvelopeURI(), "Body");
         WSSecurityUtil.checkAllElementsProtected(results, WSConstants.ENCR, new QName[]{bodyName});
+    }
+    
+    /**
+     * Test encrypting two SOAP Body elements with the same QName.
+     */
+    @org.junit.Test
+    public void testMultipleElements() throws Exception {
+        Document doc = SOAPUtil.toSOAPPart(SOAPMSG_MULTIPLE);
+        WSSecEncrypt encrypt = new WSSecEncrypt();
+        encrypt.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+        encrypt.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
+
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        
+        List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
+        WSEncryptionPart encP =
+            new WSEncryptionPart(
+                "testMethod",
+                "http://axis/service/security/test6/LogTestService8",
+                "");
+        parts.add(encP);
+        encrypt.setParts(parts);
+        
+        Document encryptedDoc = encrypt.build(doc, crypto, secHeader);
+        
+        String outputString = 
+            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(encryptedDoc);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(outputString);
+        }
+        assert !outputString.contains("testMethod");
+        
+        verify(encryptedDoc);
+        
+        outputString = 
+            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(encryptedDoc);
+        assert outputString.contains("asf1");
+        assert outputString.contains("asf2");
     }
     
 

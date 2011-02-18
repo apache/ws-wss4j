@@ -142,37 +142,41 @@ public class WSSecSignatureBase extends WSSecBase {
                     referenceList.add(reference);
                 } else {
                     String nmSpace = encPart.getNamespace();
-                    Element elementToSign = element;
-                    if (elementToSign == null) {
-                        elementToSign = WSSecurityUtil.findElement(encPart, doc, false);
-                        if (elementToSign == null) {
-                            throw new WSSecurityException(
-                                WSSecurityException.FAILURE, 
-                                "noEncElement",
-                                new Object[] {nmSpace + ", " + elemName}
-                            );
+                    List<Element> elementsToSign = null;
+                    if (element != null) {
+                        elementsToSign = Collections.singletonList(element);
+                    } else {
+                        elementsToSign = WSSecurityUtil.findElements(encPart, doc);
+                    }
+                    if (elementsToSign == null || elementsToSign.size() == 0) {
+                        throw new WSSecurityException(
+                            WSSecurityException.FAILURE, 
+                            "noEncElement",
+                            new Object[] {nmSpace + ", " + elemName}
+                        );
+                    }
+                    for (Element elementToSign : elementsToSign) {
+                        wsDocInfo.addProtectionElement(elementToSign);
+                        TransformParameterSpec transformSpec = null;
+                        if (wssConfig.isWsiBSPCompliant()) {
+                            List<String> prefixes = getInclusivePrefixes(elementToSign);
+                            transformSpec = new ExcC14NParameterSpec(prefixes);
                         }
+                        Transform transform =
+                            signatureFactory.newTransform(
+                                WSConstants.C14N_EXCL_OMIT_COMMENTS,
+                                transformSpec
+                            );
+                        javax.xml.crypto.dsig.Reference reference = 
+                            signatureFactory.newReference(
+                                "#" + setWsuId(elementToSign), 
+                                digestMethod,
+                                Collections.singletonList(transform),
+                                null,
+                                null
+                            );
+                        referenceList.add(reference);
                     }
-                    wsDocInfo.addProtectionElement(elementToSign);
-                    TransformParameterSpec transformSpec = null;
-                    if (wssConfig.isWsiBSPCompliant()) {
-                        List<String> prefixes = getInclusivePrefixes(elementToSign);
-                        transformSpec = new ExcC14NParameterSpec(prefixes);
-                    }
-                    Transform transform =
-                        signatureFactory.newTransform(
-                            WSConstants.C14N_EXCL_OMIT_COMMENTS,
-                            transformSpec
-                        );
-                    javax.xml.crypto.dsig.Reference reference = 
-                        signatureFactory.newReference(
-                            "#" + setWsuId(elementToSign), 
-                            digestMethod,
-                            Collections.singletonList(transform),
-                            null,
-                            null
-                        );
-                    referenceList.add(reference);
                 }
             } catch (Exception ex) {
                 log.error("", ex);

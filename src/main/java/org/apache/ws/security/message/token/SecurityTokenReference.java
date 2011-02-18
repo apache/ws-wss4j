@@ -617,7 +617,7 @@ public class SecurityTokenReference {
         }
         if (WSConstants.X509_DATA_LN.equals(elem.getLocalName())) {
             elem = 
-                (Element)WSSecurityUtil.findElement(
+                WSSecurityUtil.findElement(
                     elem, WSConstants.X509_ISSUER_SERIAL_LN, WSConstants.SIG_NS
                 );
         }

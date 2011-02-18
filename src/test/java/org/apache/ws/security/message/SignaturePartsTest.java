@@ -68,6 +68,16 @@ public class SignaturePartsTest extends org.junit.Assert {
             "      <ns1:testMethod xmlns:ns1=\"http://axis/service/security/test6/LogTestService8\"></ns1:testMethod>" +
             "   </soapenv:Body>" +
             "</soapenv:Envelope>";
+    private static final String SOAPMSG_MULTIPLE = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+        "<soapenv:Envelope xmlns:foo=\"urn:foo.bar\" xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" +
+        "   <soapenv:Header>" +
+        "       <foo:foobar>baz</foo:foobar>" + 
+        "   </soapenv:Header>" +
+        "   <soapenv:Body>" +
+        "      <ns1:testMethod xmlns:ns1=\"http://axis/service/security/test6/LogTestService8\">asf1</ns1:testMethod>" +
+        "      <ns1:testMethod xmlns:ns1=\"http://axis/service/security/test6/LogTestService8\">asf2</ns1:testMethod>" +
+        "   </soapenv:Body>" +
+        "</soapenv:Envelope>";
 
     private WSSecurityEngine secEngine = new WSSecurityEngine();
     private Crypto crypto = CryptoFactory.getInstance();
@@ -409,6 +419,39 @@ public class SignaturePartsTest extends org.junit.Assert {
         
         QName bodyName = new QName(soapConstants.getEnvelopeURI(), "Body");
         WSSecurityUtil.checkAllElementsProtected(results, WSConstants.SIGN, new QName[]{bodyName});
+    }
+    
+    /**
+     * Test signing two SOAP Body elements with the same QName.
+     */
+    @org.junit.Test
+    public void testMultipleElements() throws Exception {
+        Document doc = SOAPUtil.toSOAPPart(SOAPMSG_MULTIPLE);
+        WSSecSignature sign = new WSSecSignature();
+        sign.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+        sign.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
+
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        
+        List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
+        WSEncryptionPart encP =
+            new WSEncryptionPart(
+                "testMethod",
+                "http://axis/service/security/test6/LogTestService8",
+                "");
+        parts.add(encP);
+        sign.setParts(parts);
+        
+        Document signedDoc = sign.build(doc, crypto, secHeader);
+        
+        String outputString = 
+            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(outputString);
+        }
+        
+        verify(signedDoc);
     }
     
 

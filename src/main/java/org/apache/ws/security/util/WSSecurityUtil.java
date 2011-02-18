@@ -49,6 +49,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -236,17 +237,17 @@ public class WSSecurityUtil {
      * Find the DOM Element in the SOAP Envelope that is referenced by the 
      * WSEncryptionPart argument. The "Id" is used before the Element localname/namespace.
      * 
-     * @param part The WSEncryptionPart object corresponding to the DOM Element we want
+     * @param part The WSEncryptionPart object corresponding to the DOM Element(s) we want
      * @param doc The owning document
      * @param checkMultipleElements Whether to check for multiple elements or not
      * @return the DOM Element in the SOAP Envelope that is found
      */
-    public static Element findElement(
-        WSEncryptionPart part, Document doc, boolean checkMultipleElements
+    public static List<Element> findElements(
+        WSEncryptionPart part, Document doc
     ) {
         // See if the DOM Element is stored in the WSEncryptionPart first
         if (part.getElement() != null) {
-            return part.getElement();
+            return Collections.singletonList(part.getElement());
         }
         
         // Next try to find the SOAP body
@@ -258,24 +259,26 @@ public class WSSecurityUtil {
             if (id != null) {
                 String cId = bodyElement.getAttributeNS(WSConstants.WSU_NS, "Id");
                 if (cId.equals(id)) {
-                    return bodyElement;
+                    return Collections.singletonList(bodyElement);
                 }
             } else {
                 if (WSConstants.ELEM_BODY.equals(elemName) &&
                     bodyElement.getNamespaceURI().equals(nmSpace)) {
-                    return bodyElement;
+                    return Collections.singletonList(bodyElement);
                 }
             }
         }
         
         if (id != null) {
-            return WSSecurityUtil.findElementById(doc.getDocumentElement(), id, checkMultipleElements);
+            Element element =
+                WSSecurityUtil.findElementById(doc.getDocumentElement(), id, false);
+            return Collections.singletonList(element);
         } else {
             return
-                (Element) WSSecurityUtil.findElement(doc.getDocumentElement(), elemName, nmSpace);
+                WSSecurityUtil.findElements(doc.getDocumentElement(), elemName, nmSpace);
         }
     }
-
+    
     /**
      * Returns the first element that matches <code>name</code> and
      * <code>namespace</code>. <p/> This is a replacement for a XPath lookup
@@ -287,7 +290,7 @@ public class WSSecurityUtil {
      * @param namespace Namespace URI of the element
      * @return The found element or <code>null</code>
      */
-    public static Node findElement(Node startNode, String name, String namespace) {
+    public static Element findElement(Node startNode, String name, String namespace) {
         //
         // Replace the formerly recursive implementation with a depth-first-loop
         // lookup
@@ -304,12 +307,12 @@ public class WSSecurityUtil {
                 && startNode.getLocalName().equals(name)) {
                 String ns = startNode.getNamespaceURI();
                 if (ns != null && ns.equals(namespace)) {
-                    return startNode;
+                    return (Element)startNode;
                 }
 
                 if ((namespace == null || namespace.length() == 0)
                     && (ns == null || ns.length() == 0)) {
-                    return startNode;
+                    return (Element)startNode;
                 }
             }
             processedNode = startNode;
@@ -334,6 +337,64 @@ public class WSSecurityUtil {
         return null;
     }
     
+    /**
+     * Returns all elements that match <code>name</code> and <code>namespace</code>. 
+     * <p/> This is a replacement for a XPath lookup
+     * <code>//name</code> with the given namespace. It's somewhat faster than
+     * XPath, and we do not deal with prefixes, just with the real namespace URI
+     * 
+     * @param startNode Where to start the search
+     * @param name Local name of the element
+     * @param namespace Namespace URI of the element
+     * @return The found elements (or an empty list)
+     */
+    public static List<Element> findElements(Node startNode, String name, String namespace) {
+        //
+        // Replace the formerly recursive implementation with a depth-first-loop
+        // lookup
+        //
+        if (startNode == null) {
+            return null;
+        }
+        Node startParent = startNode.getParentNode();
+        Node processedNode = null;
+
+        List<Element> foundNodes = new ArrayList<Element>();
+        while (startNode != null) {
+            // start node processing at this point
+            if (startNode.getNodeType() == Node.ELEMENT_NODE
+                && startNode.getLocalName().equals(name)) {
+                String ns = startNode.getNamespaceURI();
+                if (ns != null && ns.equals(namespace)) {
+                    foundNodes.add((Element)startNode);
+                }
+
+                if ((namespace == null || namespace.length() == 0)
+                    && (ns == null || ns.length() == 0)) {
+                    foundNodes.add((Element)startNode);
+                }
+            }
+            processedNode = startNode;
+            startNode = startNode.getFirstChild();
+
+            // no child, this node is done.
+            if (startNode == null) {
+                // close node processing, get sibling
+                startNode = processedNode.getNextSibling();
+            }
+            // no more siblings, get parent, all children
+            // of parent are processed.
+            while (startNode == null) {
+                processedNode = processedNode.getParentNode();
+                if (processedNode == startParent) {
+                    return foundNodes;
+                }
+                // close parent node processing (processed node now)
+                startNode = processedNode.getNextSibling();
+            }
+        }
+        return foundNodes;
+    }
     
     /**
      * Returns the single SAMLAssertion element that contains an AssertionID/ID that

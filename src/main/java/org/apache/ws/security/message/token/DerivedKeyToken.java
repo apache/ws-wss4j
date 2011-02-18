@@ -249,10 +249,10 @@ public class DerivedKeyToken {
             String propertyName = properties.get(key); //Get the property name
             //Check whether this property is already there
             //If so change the value
-            Node node = 
+            Element node = 
                 WSSecurityUtil.findElement(elementProperties, propertyName, ns);
-            if (node != null && Node.ELEMENT_NODE == node.getNodeType()) { //If the node is not null
-                Text node1 = getFirstNode((Element) node);
+            if (node != null) { //If the node is not null
+                Text node1 = getFirstNode(node);
                 node1.setData(properties.get(propertyName));
             } else {
                 addProperty(propertyName, properties.get(propertyName));

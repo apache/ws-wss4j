@@ -21,8 +21,8 @@ package org.apache.ws.security.message;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDocInfo;
-import org.apache.ws.security.WSEncryptionPart;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.xml.security.signature.XMLSignatureInput;
 import org.apache.xml.security.utils.resolver.ResourceResolverException;
@@ -88,9 +88,18 @@ public class EnvelopeIdResolver extends ResourceResolverSpi {
             selectedElem = wsDocInfo.getTokenElement(id);
         }
         
-        if (selectedElem == null) {
-            WSEncryptionPart part = new WSEncryptionPart(id);
-            selectedElem = WSSecurityUtil.findElement(part, uri.getOwnerDocument(), true);
+        if (selectedElem == null && (id != null || "".equals(id))) {
+            Element bodyElement = WSSecurityUtil.findBodyElement(uri.getOwnerDocument());
+            String cId = bodyElement.getAttributeNS(WSConstants.WSU_NS, "Id");
+            if (cId.equals(id)) {
+                 selectedElem = bodyElement;
+            } else {
+                selectedElem=
+                    WSSecurityUtil.findElementById(
+                        uri.getOwnerDocument().getDocumentElement(), id, true
+                    );
+            }
+            
             if (selectedElem == null) {
                 throw new ResourceResolverException("generic.EmptyMessage",
                         new Object[]{"Id: " + id + " not found"},
