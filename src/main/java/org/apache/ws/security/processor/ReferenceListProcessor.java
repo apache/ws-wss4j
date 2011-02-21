@@ -36,6 +36,7 @@ import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
+import org.apache.ws.security.message.token.SecurityTokenReference;
 import org.apache.ws.security.str.STRParser;
 import org.apache.ws.security.str.SecurityTokenRefSTRParser;
 import org.apache.ws.security.util.WSSecurityUtil;
@@ -145,8 +146,13 @@ public class ReferenceListProcessor implements Processor {
             (Element)WSSecurityUtil.getDirectChildElement(
                 encryptedDataElement, "KeyInfo", WSConstants.SIG_NS
             );
+        // KeyInfo cannot be null
         if (keyInfoElement == null) {
             throw new WSSecurityException(WSSecurityException.INVALID_SECURITY, "noKeyinfo");
+        }
+        // Check BSP compliance
+        if (config.isWsiBSPCompliant()) {
+            checkBSPCompliance(keyInfoElement, symEncAlgo);
         }
         //
         // Try to get a security reference token, if none found try to get a
@@ -176,8 +182,57 @@ public class ReferenceListProcessor implements Processor {
                 doc, dataRefURI, encryptedDataElement, symmetricKey, symEncAlgo
             );
     }
-
     
+    /**
+     * Check for BSP compliance
+     * @param keyInfoElement The KeyInfo element child
+     * @param encAlgo The encryption algorithm
+     * @throws WSSecurityException
+     */
+    private static void checkBSPCompliance(
+        Element keyInfoElement, 
+        String encAlgo
+    ) throws WSSecurityException {
+        // We can only have one token reference
+        int result = 0;
+        Node node = keyInfoElement.getFirstChild();
+        Element child = null;
+        while (node != null) {
+            if (Node.ELEMENT_NODE == node.getNodeType()) {
+                result++;
+                child = (Element)node;
+            }
+            node = node.getNextSibling();
+        }
+        if (result != 1) {
+            throw new WSSecurityException(
+                WSSecurityException.INVALID_SECURITY, "invalidDataRef"
+            );
+        }
+        
+        if (!WSConstants.WSSE_NS.equals(child.getNamespaceURI()) || 
+            !SecurityTokenReference.SECURITY_TOKEN_REFERENCE.equals(child.getLocalName())) {
+            throw new WSSecurityException(
+                WSSecurityException.INVALID_SECURITY, "noSecTokRef"
+            );
+        }
+        
+        // EncryptionAlgorithm cannot be null
+        if (encAlgo == null) {
+            throw new WSSecurityException(
+                WSSecurityException.UNSUPPORTED_ALGORITHM, "noEncAlgo"
+            );
+        }
+        // EncryptionAlgorithm must be 3DES, or AES128, or AES256
+        if (!WSConstants.TRIPLE_DES.equals(encAlgo)
+            && !WSConstants.AES_128.equals(encAlgo)
+            && !WSConstants.AES_256.equals(encAlgo)) {
+            throw new WSSecurityException(
+                WSSecurityException.INVALID_SECURITY, "badEncAlgo", new Object[]{encAlgo}
+            );
+        }
+    }
+
     /**
      * Look up the encrypted data. First try Id="someURI". If no such Id then try 
      * wsu:Id="someURI".

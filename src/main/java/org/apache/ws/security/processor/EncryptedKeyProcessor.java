@@ -82,9 +82,6 @@ public class EncryptedKeyProcessor implements Processor {
         if (cb == null) {
             throw new WSSecurityException(WSSecurityException.FAILURE, "noCallback");
         }
-        if (config.isWsiBSPCompliant()) {
-            checkBSPCompliance(elem);
-        }
         //
         // lookup xenc:EncryptionMethod, get the Algorithm attribute to determine
         // how the key was encrypted. Then check if we support the algorithm
@@ -94,6 +91,9 @@ public class EncryptedKeyProcessor implements Processor {
             throw new WSSecurityException(
                 WSSecurityException.UNSUPPORTED_ALGORITHM, "noEncAlgo"
             );
+        }
+        if (config.isWsiBSPCompliant()) {
+            checkBSPCompliance(elem, encryptedKeyTransportMethod);
         }
         Cipher cipher = WSSecurityUtil.getCipherInstance(encryptedKeyTransportMethod);
         //
@@ -152,7 +152,7 @@ public class EncryptedKeyProcessor implements Processor {
         wsDocInfo.addResult(result);
         return java.util.Collections.singletonList(result);
     }
-
+    
     /**
      * Method getDecodedBase64EncodedData
      *
@@ -190,12 +190,30 @@ public class EncryptedKeyProcessor implements Processor {
             );
         String alias = null;
         if (keyInfo != null) {
-            Element strElement = 
-                WSSecurityUtil.getDirectChildElement(
-                    keyInfo,
-                    SecurityTokenReference.SECURITY_TOKEN_REFERENCE,
-                    WSConstants.WSSE_NS
-                );
+            Element strElement = null;
+            if (config.isWsiBSPCompliant()) {
+                int result = 0;
+                Node node = keyInfo.getFirstChild();
+                while (node != null) {
+                    if (Node.ELEMENT_NODE == node.getNodeType()) {
+                        result++;
+                        strElement = (Element)node;
+                    }
+                    node = node.getNextSibling();
+                }
+                if (result != 1) {
+                    throw new WSSecurityException(
+                        WSSecurityException.INVALID_SECURITY, "invalidDataRef"
+                    );
+                }
+            } else {
+                 strElement = 
+                    WSSecurityUtil.getDirectChildElement(
+                        keyInfo,
+                        SecurityTokenReference.SECURITY_TOKEN_REFERENCE,
+                        WSConstants.WSSE_NS
+                    );
+            }
             if (strElement == null) {
                 throw new WSSecurityException(
                     WSSecurityException.INVALID_SECURITY, "noSecTokRef"
@@ -216,7 +234,7 @@ public class EncryptedKeyProcessor implements Processor {
                 );
             }
             alias = crypto.getAliasForX509Cert(certs[0]);
-        } else if (crypto.getDefaultX509Alias() != null) {
+        } else if (!config.isWsiBSPCompliant() && crypto.getDefaultX509Alias() != null) {
             alias = crypto.getDefaultX509Alias();
         } else {
             throw new WSSecurityException(WSSecurityException.INVALID_SECURITY, "noKeyinfo");
@@ -354,7 +372,7 @@ public class EncryptedKeyProcessor implements Processor {
      * A method to check that the EncryptedKey is compliant with the BSP spec.
      * @throws WSSecurityException
      */
-    private void checkBSPCompliance(Element elem) throws WSSecurityException {
+    private void checkBSPCompliance(Element elem, String encAlgo) throws WSSecurityException {
         String attribute = elem.getAttribute("Type");
         if (attribute != null && !"".equals(attribute)) {
             throw new WSSecurityException(
@@ -377,6 +395,14 @@ public class EncryptedKeyProcessor implements Processor {
         if (attribute != null && !"".equals(attribute)) {
             throw new WSSecurityException(
                 WSSecurityException.FAILED_CHECK, "badAttribute", new Object[]{attribute}
+            );
+        }
+        
+        // EncryptionAlgorithm must be RSA15, or RSAOEP.
+        if (!WSConstants.KEYTRANSPORT_RSA15.equals(encAlgo)
+            && !WSConstants.KEYTRANSPORT_RSAOEP.equals(encAlgo)) {
+            throw new WSSecurityException(
+                WSSecurityException.INVALID_SECURITY, "badEncAlgo", new Object[]{encAlgo}
             );
         }
     }

@@ -80,6 +80,9 @@ public class EncryptionTest extends org.junit.Assert {
         keyGen.init(128);
         key = keyGen.generateKey();
         keyData = key.getEncoded();
+        WSSConfig wssConfig = WSSConfig.getNewInstance();
+        wssConfig.setWsiBSPCompliant(true);
+        secEngine.setWssConfig(wssConfig);
     }
 
     /**
