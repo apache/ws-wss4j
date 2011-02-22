@@ -41,7 +41,7 @@ public class CryptoTest extends org.junit.Assert {
     }
 
     @org.junit.Test
-    public void testAbstractCryptoWithNullProperties() 
+    public void testMerlinWithNullProperties() 
         throws Exception {
         Crypto crypto = new NullPropertiesCrypto();
         assertTrue(crypto != null);
@@ -64,7 +64,7 @@ public class CryptoTest extends org.junit.Assert {
     }
     
     /**
-     * Test for WSS-149 - "AbstractCrypto requires org.apache.ws.security.crypto.merlin.file
+     * Test for WSS-149 - "Merlin requires org.apache.ws.security.crypto.merlin.file
      * to be set and point to an existing file"
      */
     @org.junit.Test
@@ -92,7 +92,7 @@ public class CryptoTest extends org.junit.Assert {
         Crypto crypto = new Merlin();
         KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
         ClassLoader loader = Loader.getClassLoader(CryptoTest.class);
-        InputStream input = AbstractCrypto.loadInputStream(loader, "keys/wss40.jks");
+        InputStream input = Merlin.loadInputStream(loader, "keys/wss40.jks");
         keyStore.load(input, "security".toCharArray());
         crypto.setKeyStore(keyStore);
         Document signedDoc = builder.build(doc, crypto, secHeader);
@@ -100,7 +100,7 @@ public class CryptoTest extends org.junit.Assert {
         // Load the truststore
         Crypto processCrypto = new Merlin();
         KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
-        input = AbstractCrypto.loadInputStream(loader, "keys/wss40CA.jks");
+        input = Merlin.loadInputStream(loader, "keys/wss40CA.jks");
         trustStore.load(input, "security".toCharArray());
         processCrypto.setTrustStore(trustStore);
         
@@ -110,7 +110,7 @@ public class CryptoTest extends org.junit.Assert {
         // Load a (bad) truststore
         processCrypto = new Merlin();
         trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
-        input = AbstractCrypto.loadInputStream(loader, "keys/wss40badca.jks");
+        input = Merlin.loadInputStream(loader, "keys/wss40badca.jks");
         trustStore.load(input, "security".toCharArray());
         processCrypto.setTrustStore(trustStore);
         
@@ -123,10 +123,10 @@ public class CryptoTest extends org.junit.Assert {
     }
     
     /**
-     * WSS-102 -- ensure AbstractCrypto will null properties
+     * WSS-102 -- ensure Merlin will null properties
      * can be instantiated
      */
-    private static class NullPropertiesCrypto extends AbstractCrypto {
+    private static class NullPropertiesCrypto extends Merlin {
         public NullPropertiesCrypto() 
             throws Exception {
             super((java.util.Properties) null);

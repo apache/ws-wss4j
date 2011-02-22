@@ -57,13 +57,6 @@ import java.util.Map;
 import java.util.Set;
 import javax.security.auth.x500.X500Principal;
 
-/**
- * Created by IntelliJ IDEA.
- * User: dims
- * Date: Sep 15, 2005
- * Time: 9:50:40 AM
- * To change this template use File | Settings | File Templates.
- */
 public abstract class CryptoBase implements Crypto {
     public static final String SKI_OID = "2.5.29.14";
     /**
@@ -192,7 +185,7 @@ public abstract class CryptoBase implements Crypto {
      * @param provider the CertificateFactory provider name
      * @param the CertificateFactory the CertificateFactory instance to set
      */
-    public void setCertificateFactory(String provider, CertificateFactory certFactory) {
+    protected void setCertificateFactory(String provider, CertificateFactory certFactory) {
         if (provider == null || provider.length() == 0) {
             certFactMap.put(certFactory.getProvider().getName(), certFactory);
         } else {
@@ -209,7 +202,7 @@ public abstract class CryptoBase implements Crypto {
      * @throws org.apache.ws.security.WSSecurityException
      *
      */
-    public CertificateFactory getCertificateFactory() throws WSSecurityException {
+    protected CertificateFactory getCertificateFactory() throws WSSecurityException {
         String provider = getCryptoProvider();
         String keyStoreProvider = null;
         if (keystore != null) {
@@ -355,7 +348,7 @@ public abstract class CryptoBase implements Crypto {
         return vr;
     }
     
-    private Object createBCX509Name(String s) {
+    protected Object createBCX509Name(String s) {
         if (BC_509CLASS_CONS != null) {
              try {
                  return BC_509CLASS_CONS.newInstance(new Object[] {s});
@@ -499,41 +492,6 @@ public abstract class CryptoBase implements Crypto {
         return null;
     }
     
-    
-    /**
-     * Check to see if the certificate argument is in the keystore
-     * @param cert The certificate to check
-     * @return true if cert is in the keystore
-     * @throws WSSecurityException
-     */
-    public boolean isCertificateInKeyStore(X509Certificate cert) throws WSSecurityException {
-        String issuerString = cert.getIssuerX500Principal().getName();
-        BigInteger issuerSerial = cert.getSerialNumber();
-        
-        X509Certificate foundCert = getX509Certificate(issuerString, issuerSerial);
-
-        //
-        // If a certificate has been found, the certificates must be compared
-        // to ensure against phony DNs (compare encoded form including signature)
-        //
-        if (foundCert != null && foundCert.equals(cert)) {
-            if (log.isDebugEnabled()) {
-                log.debug(
-                    "Direct trust for certificate with " + cert.getSubjectX500Principal().getName()
-                );
-            }
-            return true;
-        }
-        if (log.isDebugEnabled()) {
-            log.debug(
-                "No alias found for subject from issuer with " + issuerString 
-                + " (serial " + issuerSerial + ")"
-            );
-        }
-        return false;
-    }
-    
-
     /**
      * Lookup a X509 Certificate in the keystore according to a given
      * SubjectKeyIdentifier.
@@ -786,18 +744,17 @@ public abstract class CryptoBase implements Crypto {
     }
 
     /**
-     * Lookup X509 Certificates in the keystore according to a given DN of the subject of the 
+     * Lookup Certificate (chains) in the keystore according to a given DN of the subject of the 
      * certificate
      * <p/>
      * The search gets all alias names of the keystore and gets the certificate (chain)
      * for each alias. Then the DN of the certificate is compared with the parameters.
      *
      * @param subjectDN The DN of subject to look for in the keystore
-     * @return Array with all alias of certificates with the same DN as given in the parameters
+     * @return Array with all certificate (chains) with the same DN as given in the parameters
      * @throws org.apache.ws.security.WSSecurityException
-     *
      */
-    public String[] getAliasesForDN(String subjectDN) throws WSSecurityException {
+    public List<Certificate[]> getCertificatesForDN(String subjectDN) throws WSSecurityException {
 
         //
         // Convert the subject DN to a java X500Principal object first. This is to ensure
@@ -814,23 +771,17 @@ public abstract class CryptoBase implements Crypto {
         } catch (java.lang.IllegalArgumentException ex) {
             subject = createBCX509Name(subjectDN);
         }
-        List<String> aliases = null;
+        List<Certificate[]> certList = null;
         if (keystore != null) {
-            aliases = getAliases(subject, keystore);
+            certList = getCertificates(subject, keystore);
         }
 
         //If we can't find the issuer in the keystore then look at the truststore
-        if ((aliases == null || aliases.size() == 0) && truststore != null) {
-            aliases = getAliases(subject, truststore);
+        if ((certList == null || certList.size() == 0) && truststore != null) {
+            certList = getCertificates(subject, truststore);
         }
         
-        // Convert the vector into an array
-        String[] result = new String[aliases.size()];
-        for (int i = 0; i < aliases.size(); i++) {
-            result[i] = (String) aliases.get(i);
-        }
-
-        return result;
+        return certList;
     }
     
     /**
@@ -1060,22 +1011,21 @@ public abstract class CryptoBase implements Crypto {
     }
     
     /**
-     * Get all of the aliases of the X500Principal argument in the supplied KeyStore
+     * Get a List of Certificate (chains) of the X500Principal argument in the supplied KeyStore 
      * @param subjectRDN either an X500Principal or a BouncyCastle X509Name instance.
      * @param store The KeyStore
-     * @return A list of aliases
+     * @return A list of Certificate (chains)
      * @throws WSSecurityException
      */
-    private List<String> getAliases(Object subjectRDN, KeyStore store) 
+    private List<Certificate[]> getCertificates(Object subjectRDN, KeyStore store) 
         throws WSSecurityException {
-        // Store the aliases found
-        List<String> aliases = new ArrayList<String>();
-        Certificate cert = null;
+        // Store the certs found
+        List<Certificate[]> certList = new ArrayList<Certificate[]>();
         
         try {
             for (Enumeration<String> e = store.aliases(); e.hasMoreElements();) {
                 String alias = e.nextElement();
-
+                Certificate cert = null;
                 Certificate[] certs = store.getCertificateChain(alias);
                 if (certs == null || certs.length == 0) {
                     // no cert chain, so lets check if getCertificate gives us a  result.
@@ -1092,7 +1042,11 @@ public abstract class CryptoBase implements Crypto {
                     Object certName = createBCX509Name(foundRDN.getName());
 
                     if (subjectRDN.equals(certName)) {
-                        aliases.add(alias);
+                        if (certs == null) {
+                            certList.add(new Certificate[]{cert});
+                        } else {
+                            certList.add(certs);
+                        }
                     }
                 }
             }
@@ -1101,6 +1055,6 @@ public abstract class CryptoBase implements Crypto {
                 WSSecurityException.FAILURE, "keystore", null, e
             );
         }
-        return aliases;
+        return certList;
     }
 }

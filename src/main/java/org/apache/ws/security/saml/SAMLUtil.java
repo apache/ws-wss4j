@@ -164,12 +164,6 @@ public class SAMLUtil {
             return new SAMLKeyInfo(key);
         }
         
-        if (crypto == null) {
-            throw new WSSecurityException(
-                WSSecurityException.FAILURE, "noSigCryptoFile"
-            );
-        }
-        
         for (org.opensaml.saml1.core.Statement stmt : assertion.getStatements()) {
             org.opensaml.saml1.core.Subject samlSubject = null;
             if (stmt instanceof org.opensaml.saml1.core.AttributeStatement) {
@@ -319,6 +313,11 @@ public class SAMLUtil {
                             certs[0] = (X509Certificate)x509obj;
                             return new SAMLKeyInfo(certs);
                         } else if (x509obj instanceof X509IssuerSerial) {
+                            if (crypto == null) {
+                                throw new WSSecurityException(
+                                    WSSecurityException.FAILURE, "noSigCryptoFile"
+                                );
+                            }
                             String alias = 
                                 crypto.getAliasForX509Cert(
                                     ((X509IssuerSerial)x509obj).getIssuerName(), 

@@ -32,7 +32,6 @@ import org.apache.ws.security.common.KeystoreCallbackHandler;
 import org.apache.ws.security.common.SAML1CallbackHandler;
 import org.apache.ws.security.common.SAML2CallbackHandler;
 import org.apache.ws.security.common.SOAPUtil;
-import org.apache.ws.security.components.crypto.AbstractCrypto;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.components.crypto.Merlin;
@@ -75,14 +74,14 @@ public class SamlNegativeTest extends org.junit.Assert {
         issuerCrypto = new Merlin();
         KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
         ClassLoader loader = Loader.getClassLoader(SamlNegativeTest.class);
-        InputStream input = AbstractCrypto.loadInputStream(loader, "keys/wss40_server.jks");
+        InputStream input = Merlin.loadInputStream(loader, "keys/wss40_server.jks");
         keyStore.load(input, "security".toCharArray());
         issuerCrypto.setKeyStore(keyStore);
         
         // Load the server truststore
         trustCrypto = new Merlin();
         KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
-        input = AbstractCrypto.loadInputStream(loader, "keys/wss40CA.jks");
+        input = Merlin.loadInputStream(loader, "keys/wss40CA.jks");
         trustStore.load(input, "security".toCharArray());
         trustCrypto.setTrustStore(trustStore);
     }

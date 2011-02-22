@@ -272,7 +272,7 @@ public class WSSecurityEngine {
      *         was performed.
      * @throws WSSecurityException
      */
-    protected List<WSSecurityEngineResult> processSecurityHeader(
+    public List<WSSecurityEngineResult> processSecurityHeader(
         Element securityHeader,
         CallbackHandler cb,
         Crypto sigCrypto,

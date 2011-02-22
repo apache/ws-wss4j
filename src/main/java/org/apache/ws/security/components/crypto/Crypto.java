@@ -26,8 +26,8 @@ import java.security.KeyStore;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.cert.Certificate;
-import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+import java.util.List;
 
 public interface Crypto {
     
@@ -95,22 +95,6 @@ public interface Crypto {
      */
     public void setTrustStore(KeyStore trustStore);
     
-    /**
-     * Gets the CertificateFactory instantiated by the underlying implementation
-     *
-     * @return the CertificateFactory
-     * @throws WSSecurityException
-     */
-    public CertificateFactory getCertificateFactory() throws WSSecurityException;
-    
-    /**
-     * Sets the CertificateFactory instance on this Crypto instance
-     *
-     * @param provider the CertificateFactory provider name
-     * @param the CertificateFactory the CertificateFactory instance to set
-     */
-    public void setCertificateFactory(String provider, CertificateFactory certFactory);
-    
     //
     // Crypto functionality methods
     //
@@ -147,6 +131,16 @@ public interface Crypto {
         throws WSSecurityException;
 
     /**
+     * Lookup X509 Certificates in the keystore according to a given DN of the subject of the certificate
+     * <p/>
+     *
+     * @param subjectDN The DN of subject to look for in the keystore
+     * @return An array with all certificates with the same DN as given in the parameters
+     * @throws WSSecurityException
+     */
+    public List<Certificate[]> getCertificatesForDN(String subjectDN) throws WSSecurityException;
+    
+    /**
      * Get a byte array given an array of X509 certificates.
      * <p/>
      *
@@ -168,14 +162,6 @@ public interface Crypto {
     public PrivateKey getPrivateKey(String alias, String password) throws Exception;
     
     /**
-     * Check to see if the certificate argument is in the keystore
-     * @param cert The certificate to check
-     * @return true if cert is in the keystore
-     * @throws WSSecurityException
-     */
-    public boolean isCertificateInKeyStore(X509Certificate cert) throws WSSecurityException;
-
-    /**
      * get the list of certificates for a given alias. This method
      * reads a new certificate chain and overwrites a previously
      * stored certificate chain.
@@ -186,7 +172,7 @@ public interface Crypto {
      *         null if this alias does not exist in the keystore
      */
     public X509Certificate[] getCertificates(String alias) throws WSSecurityException;
-
+    
     /**
      * Return a X509 Certificate alias in the keystore according to a given Certificate
      * <p/>
@@ -274,13 +260,4 @@ public interface Crypto {
      */
     public boolean verifyTrust(PublicKey publicKey) throws WSSecurityException;
 
-    /**
-     * Lookup X509 Certificates in the keystore according to a given DN of the subject of the certificate
-     * <p/>
-     *
-     * @param subjectDN The DN of subject to look for in the keystore
-     * @return An array with all alias of certificates with the same DN as given in the parameters
-     * @throws WSSecurityException
-     */
-    public String[] getAliasesForDN(String subjectDN) throws WSSecurityException;
 }

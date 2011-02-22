@@ -59,20 +59,6 @@ public class CryptoProviderTest extends org.junit.Assert {
     }
 
     /**
-     * A unit test...
-     */
-    @org.junit.Test
-    public void testGetAliasWithReversedDN() throws Exception {
-        String issuer = "C=DE,ST=Bayern,L=Munich,O=Apache,OU=WSS4J,CN=Werner,E=Werner@example.com";
-        
-        String alias = crypto.getAliasForX509Cert(issuer, new java.math.BigInteger("1237819491"));
-        assertNotNull("Alias not found using a reversed DN", alias);
-        
-        String[] aliases = crypto.getAliasesForDN(issuer);
-        assertNotNull("Alias not found using a reversed DN", aliases[0]);
-    }
-    
-    /**
      * Test signing a SOAP message using a cert with an OID
      */
     @org.junit.Test

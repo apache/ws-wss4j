@@ -30,7 +30,6 @@ import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.common.SAML1CallbackHandler;
 import org.apache.ws.security.common.SOAPUtil;
-import org.apache.ws.security.components.crypto.AbstractCrypto;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.components.crypto.Merlin;
@@ -165,7 +164,7 @@ public class SignaturePartsTest extends org.junit.Assert {
         Crypto issuerCrypto = new Merlin();
         KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
         ClassLoader loader = Loader.getClassLoader(SignedSamlTokenHOKTest.class);
-        InputStream input = AbstractCrypto.loadInputStream(loader, "keys/wss40_server.jks");
+        InputStream input = Merlin.loadInputStream(loader, "keys/wss40_server.jks");
         keyStore.load(input, "security".toCharArray());
         issuerCrypto.setKeyStore(keyStore);
         
@@ -212,7 +211,7 @@ public class SignaturePartsTest extends org.junit.Assert {
         // Construct trust crypto instance
         Crypto trustCrypto = new Merlin();
         KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
-        input = AbstractCrypto.loadInputStream(loader, "keys/wss40CA.jks");
+        input = Merlin.loadInputStream(loader, "keys/wss40CA.jks");
         trustStore.load(input, "security".toCharArray());
         trustCrypto.setTrustStore(trustStore);
         

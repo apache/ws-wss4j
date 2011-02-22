@@ -21,9 +21,11 @@ package org.apache.ws.security.validate;
 
 import java.math.BigInteger;
 import java.security.PublicKey;
+import java.security.cert.Certificate;
 import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
+import java.util.List;
 
 import javax.security.auth.callback.CallbackHandler;
 
@@ -162,7 +164,7 @@ public class SignatureTrustValidator implements Validator {
         //
         // FIRST step - Search the keystore for the transmitted certificate
         //
-        if (crypto.isCertificateInKeyStore(cert)) {
+        if (isCertificateInKeyStore(crypto, cert)) {
             return true;
         }
 
@@ -170,14 +172,14 @@ public class SignatureTrustValidator implements Validator {
         // SECOND step - Search for the issuer of the transmitted certificate in the 
         // keystore or the truststore
         //
-        String[] aliases = crypto.getAliasesForDN(issuerString);
+        List<Certificate[]> foundCerts = crypto.getCertificatesForDN(issuerString);
 
-        // If the alias has not been found, the issuer is not in the keystore/truststore
+        // If the certs have not been found, the issuer is not in the keystore/truststore
         // As a direct result, do not trust the transmitted certificate
-        if (aliases == null || aliases.length < 1) {
+        if (foundCerts == null || foundCerts.size() < 1) {
             if (LOG.isDebugEnabled()) {
                 LOG.debug(
-                    "No aliases found in keystore for issuer " + issuerString 
+                    "No certs found in keystore for issuer " + issuerString 
                     + " of certificate for " + subjectString
                 );
             }
@@ -186,38 +188,23 @@ public class SignatureTrustValidator implements Validator {
 
         //
         // THIRD step
-        // Check the certificate trust path for every alias of the issuer found in the 
+        // Check the certificate trust path for every cert of the issuer found in the 
         // keystore/truststore
         //
-        for (int i = 0; i < aliases.length; i++) {
-            String alias = aliases[i];
-
-            if (LOG.isDebugEnabled()) {
-                LOG.debug(
-                    "Preparing to validate certificate path with alias " + alias 
-                    + " for issuer " + issuerString
-                );
-            }
-
-            // Retrieve the certificate(s) for the alias from the keystore/truststore
-            X509Certificate[] certs = crypto.getCertificates(alias);
-
-            // If no certificates have been found, there has to be an error:
-            // The keystore/truststore can find an alias but no certificate(s)
-            if (certs == null || certs.length < 1) {
-                throw new WSSecurityException(
-                    "Could not get certificates for alias " + alias
-                );
-            }
-
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(
+                "Preparing to validate certificate path for issuer " + issuerString
+            );
+        }
+        for (Certificate[] foundCertChain : foundCerts) {
             //
             // Form a certificate chain from the transmitted certificate
             // and the certificate(s) of the issuer from the keystore/truststore
             //
-            X509Certificate[] x509certs = new X509Certificate[certs.length + 1];
+            X509Certificate[] x509certs = new X509Certificate[foundCertChain.length + 1];
             x509certs[0] = cert;
-            for (int j = 0; j < certs.length; j++) {
-                x509certs[j + 1] = certs[j];
+            for (int j = 0; j < foundCertChain.length; j++) {
+                x509certs[j + 1] = (X509Certificate)foundCertChain[j];
             }
 
             //
@@ -239,6 +226,43 @@ public class SignatureTrustValidator implements Validator {
             LOG.debug(
                 "Certificate path could not be verified for certificate with subject " 
                 + subjectString
+            );
+        }
+        return false;
+    }
+    
+    /**
+     * Check to see if the certificate argument is in the keystore
+     * @param crypto The Crypto instance to use
+     * @param cert The certificate to check
+     * @return true if cert is in the keystore
+     * @throws WSSecurityException
+     */
+    private boolean isCertificateInKeyStore(
+        Crypto crypto,
+        X509Certificate cert
+    ) throws WSSecurityException {
+        String issuerString = cert.getIssuerX500Principal().getName();
+        BigInteger issuerSerial = cert.getSerialNumber();
+        
+        X509Certificate foundCert = crypto.getX509Certificate(issuerString, issuerSerial);
+
+        //
+        // If a certificate has been found, the certificates must be compared
+        // to ensure against phony DNs (compare encoded form including signature)
+        //
+        if (foundCert != null && foundCert.equals(cert)) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug(
+                    "Direct trust for certificate with " + cert.getSubjectX500Principal().getName()
+                );
+            }
+            return true;
+        }
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(
+                "No certificate found for subject from issuer with " + issuerString 
+                + " (serial " + issuerSerial + ")"
             );
         }
         return false;
