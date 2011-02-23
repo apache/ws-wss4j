@@ -94,7 +94,7 @@ public class CryptoTest extends org.junit.Assert {
         ClassLoader loader = Loader.getClassLoader(CryptoTest.class);
         InputStream input = Merlin.loadInputStream(loader, "keys/wss40.jks");
         keyStore.load(input, "security".toCharArray());
-        crypto.setKeyStore(keyStore);
+        ((Merlin)crypto).setKeyStore(keyStore);
         Document signedDoc = builder.build(doc, crypto, secHeader);
 
         // Load the truststore
@@ -102,7 +102,7 @@ public class CryptoTest extends org.junit.Assert {
         KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
         input = Merlin.loadInputStream(loader, "keys/wss40CA.jks");
         trustStore.load(input, "security".toCharArray());
-        processCrypto.setTrustStore(trustStore);
+        ((Merlin)processCrypto).setTrustStore(trustStore);
         
         WSSecurityEngine secEngine = new WSSecurityEngine();
         secEngine.processSecurityHeader(signedDoc, null, null, processCrypto);
@@ -112,7 +112,7 @@ public class CryptoTest extends org.junit.Assert {
         trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
         input = Merlin.loadInputStream(loader, "keys/wss40badca.jks");
         trustStore.load(input, "security".toCharArray());
-        processCrypto.setTrustStore(trustStore);
+        ((Merlin)processCrypto).setTrustStore(trustStore);
         
         try {
             secEngine.processSecurityHeader(signedDoc, null, null, processCrypto);

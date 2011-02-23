@@ -21,6 +21,7 @@ package org.apache.ws.security.common;
 
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
+import org.apache.ws.security.components.crypto.CryptoType;
 import org.apache.ws.security.saml.ext.SAMLCallback;
 import org.apache.ws.security.saml.ext.bean.KeyInfoBean;
 import org.apache.ws.security.saml.ext.bean.SubjectBean;
@@ -39,7 +40,9 @@ public class SAML1CallbackHandler extends AbstractSAMLCallbackHandler {
     
     public SAML1CallbackHandler() throws Exception {
         Crypto crypto = CryptoFactory.getInstance("wss40.properties");
-        certs = crypto.getCertificates("wss40");
+        CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
+        cryptoType.setAlias("wss40");
+        certs = crypto.getX509Certificates(cryptoType);
         
         subjectName = "uid=joe,ou=people,ou=saml-demo,o=example.com";
         subjectQualifier = "www.example.com";

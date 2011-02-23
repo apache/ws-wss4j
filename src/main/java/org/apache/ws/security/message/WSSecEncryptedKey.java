@@ -31,6 +31,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
+import org.apache.ws.security.components.crypto.CryptoType;
 import org.apache.ws.security.message.token.BinarySecurity;
 import org.apache.ws.security.message.token.DOMX509Data;
 import org.apache.ws.security.message.token.DOMX509IssuerSerial;
@@ -168,7 +169,9 @@ public class WSSecEncryptedKey extends WSSecBase {
         //
         X509Certificate remoteCert = useThisCert;
         if (remoteCert == null) {
-            X509Certificate[] certs = crypto.getCertificates(user);
+            CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
+            cryptoType.setAlias(user);
+            X509Certificate[] certs = crypto.getX509Certificates(cryptoType);
             if (certs == null || certs.length <= 0) {
                 throw new WSSecurityException(
                     WSSecurityException.FAILURE,

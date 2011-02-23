@@ -30,6 +30,7 @@ import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.WSUsernameTokenPrincipal;
 import org.apache.ws.security.components.crypto.Crypto;
+import org.apache.ws.security.components.crypto.CryptoType;
 import org.apache.ws.security.message.DOMURIDereferencer;
 import org.apache.ws.security.message.token.SecurityTokenReference;
 import org.apache.ws.security.str.STRParser;
@@ -220,8 +221,10 @@ public class SignatureProcessor implements Processor {
         if (crypto == null) {
             throw new WSSecurityException(WSSecurityException.FAILURE, "noSigCryptoFile");
         }
-        if (crypto.getDefaultX509Alias() != null) {
-            return crypto.getCertificates(crypto.getDefaultX509Alias());
+        if (crypto.getDefaultX509Identifier() != null) {
+            CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
+            cryptoType.setAlias(crypto.getDefaultX509Identifier());
+            return crypto.getX509Certificates(cryptoType);
         } else {
             throw new WSSecurityException(
                 WSSecurityException.INVALID_SECURITY, "unsupportedKeyInfo"

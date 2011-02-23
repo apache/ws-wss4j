@@ -33,7 +33,6 @@ import org.apache.ws.security.saml.SAMLUtil;
 import org.apache.ws.security.saml.ext.AssertionWrapper;
 import org.w3c.dom.Element;
 
-import java.io.IOException;
 import java.security.Principal;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
@@ -41,7 +40,6 @@ import java.util.Map;
 
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.callback.UnsupportedCallbackException;
 
 /**
  * This implementation of STRParser is for parsing a SecurityTokenReference element associated
@@ -136,7 +134,7 @@ public class DerivedKeyTokenSTRParser implements STRParser {
                         WSPasswordCallback.SECRET_KEY, cb
                    ); 
             } else {
-                secretKey = this.getSecret(cb, crypto, certs);
+                secretKey = crypto.getPrivateKey(certs[0], cb).getEncoded();
             }
         } else {
             throw new WSSecurityException(
@@ -209,54 +207,6 @@ public class DerivedKeyTokenSTRParser implements STRParser {
         }
 
         return pwcb.getKey();
-    }
-    
-    private byte[] getSecret(
-        CallbackHandler cb,
-        Crypto crypto,
-        X509Certificate certs[]
-    ) throws WSSecurityException {
-        if (cb == null) {
-            throw new WSSecurityException(WSSecurityException.FAILURE, "noCallback");
-        }
-
-        String alias = crypto.getAliasForX509Cert(certs[0]);
-
-        WSPasswordCallback pwCb = 
-            new WSPasswordCallback(alias, WSPasswordCallback.DECRYPT);
-        try {
-            Callback[] callbacks = new Callback[]{pwCb};
-            cb.handle(callbacks);
-        } catch (IOException e) {
-            throw new WSSecurityException(
-                WSSecurityException.FAILURE,
-                "noPassword",
-                new Object[]{alias}, 
-                e
-            );
-        } catch (UnsupportedCallbackException e) {
-            throw new WSSecurityException(
-                WSSecurityException.FAILURE,
-                "noPassword",
-                new Object[]{alias}, 
-                e
-            );
-        }
-
-        String password = pwCb.getPassword();
-        if (password == null) {
-            throw new WSSecurityException(
-                WSSecurityException.FAILURE, "noPassword", new Object[]{alias}
-            );
-        }
-
-        java.security.Key privateKey;
-        try {
-            privateKey = crypto.getPrivateKey(alias, password);
-            return privateKey.getEncoded();
-        } catch (Exception e) {
-            throw new WSSecurityException(WSSecurityException.FAILED_CHECK, null, null, e);
-        }
     }
     
 }

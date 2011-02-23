@@ -72,7 +72,7 @@ public class PKIPathSecurity extends BinarySecurity {
         if (data == null) {
             return null;
         }
-        return crypto.getX509Certificates(data);
+        return crypto.getCertificatesFromBytes(data);
     }
 
     /**
@@ -89,7 +89,7 @@ public class PKIPathSecurity extends BinarySecurity {
         if (certs == null) {
             throw new WSSecurityException(WSSecurityException.FAILURE, "noCert");
         }
-        byte[] data = crypto.getCertificateData(certs);
+        byte[] data = crypto.getBytesFromCertificates(certs);
         setToken(data);
     }
 

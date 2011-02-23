@@ -19,9 +19,9 @@
 
 package org.apache.ws.security.common;
 
-import org.apache.ws.security.components.crypto.CryptoBase;
+import org.apache.ws.security.components.crypto.Merlin;
 
-public class CustomCrypto extends CryptoBase {
+public class CustomCrypto extends Merlin {
     
     private java.util.Map<String, Object> config = null;
     

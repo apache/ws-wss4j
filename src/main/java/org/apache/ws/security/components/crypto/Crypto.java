@@ -21,39 +21,18 @@ package org.apache.ws.security.components.crypto;
 import org.apache.ws.security.WSSecurityException;
 
 import java.io.InputStream;
-import java.math.BigInteger;
-import java.security.KeyStore;
 import java.security.PrivateKey;
 import java.security.PublicKey;
-import java.security.cert.Certificate;
+import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
-import java.util.List;
+
+import javax.security.auth.callback.CallbackHandler;
 
 public interface Crypto {
     
     //
     // Accessor methods
     //
-    
-    /**
-     * Retrieves the alias name of the default certificate. This should be the certificate 
-     * that is used for signature and encryption. This alias corresponds to the certificate 
-     * that should be used whenever KeyInfo is not present in a signed or an encrypted 
-     * message. May return null.
-     *
-     * @return alias name of the default X509 certificate.
-     */
-    public String getDefaultX509Alias();
-    
-    /**
-     * Sets the alias name of the default certificate. This should be the certificate 
-     * that is used for signature and encryption. This alias corresponds to the certificate 
-     * that should be used whenever KeyInfo is not present in a signed or an encrypted 
-     * message.
-     *
-     * @param alias name of the default X509 certificate.
-     */
-    public void setDefaultX509Alias(String alias);
     
     /**
      * Get the crypto provider associated with this implementation
@@ -66,79 +45,71 @@ public interface Crypto {
      * @param provider the crypto provider to set
      */
     public void setCryptoProvider(String provider);
- 
-    /**
-     * Gets the Keystore that was loaded by the underlying implementation
-     *
-     * @return the Keystore
-     */
-    public KeyStore getKeyStore();
     
     /**
-     * Set the Keystore on this Crypto instance
+     * Retrieves the identifier name of the default certificate. This should be the certificate 
+     * that is used for signature and encryption. This identifier corresponds to the certificate 
+     * that should be used whenever KeyInfo is not present in a signed or an encrypted 
+     * message. May return null. The identifier is implementation specific, e.g. it could be the
+     * KeyStore alias.
      *
-     * @param keyStore the Keystore to set
+     * @return name of the default X509 certificate.
      */
-    public void setKeyStore(KeyStore keyStore);
+    public String getDefaultX509Identifier() throws WSSecurityException;
     
     /**
-     * Gets the trust store that was loaded by the underlying implementation
+     * Sets the identifier name of the default certificate. This should be the certificate 
+     * that is used for signature and encryption. This identifier corresponds to the certificate 
+     * that should be used whenever KeyInfo is not present in a signed or an encrypted 
+     * message. The identifier is implementation specific, e.g. it could be the KeyStore alias.
      *
-     * @return the trust store
+     * @param identifier name of the default X509 certificate.
      */
-    public KeyStore getTrustStore();
+    public void setDefaultX509Identifier(String identifier);
     
     /**
-     * Set the trust store on this Crypto instance
+     * Sets the CertificateFactory instance on this Crypto instance
      *
-     * @param trustStore the trust store to set
+     * @param provider the CertificateFactory provider name
+     * @param the CertificateFactory the CertificateFactory instance to set
      */
-    public void setTrustStore(KeyStore trustStore);
+    public void setCertificateFactory(String provider, CertificateFactory certFactory);
+    
+    /**
+     * Get the CertificateFactory instance on this Crypto instance
+     *
+     * @return Returns a <code>CertificateFactory</code> to construct
+     *         X509 certificates
+     * @throws org.apache.ws.security.WSSecurityException
+     */
+    public CertificateFactory getCertificateFactory() throws WSSecurityException;
     
     //
-    // Crypto functionality methods
+    // Base Crypto functionality methods
     //
     
     /**
-     * load a X509Certificate from the input stream.
-     * <p/>
+     * Load a X509Certificate from the input stream.
      *
      * @param in The <code>InputStream</code> containing the X509 data
      * @return An X509 certificate
      * @throws WSSecurityException
      */
-    X509Certificate loadCertificate(InputStream in) throws WSSecurityException;
-
-    /**
-     * Construct an array of X509Certificate's from the byte array.
-     *
-     * @param data    The <code>byte</code> array containing the X509 data
-     * @return An array of X509 certificates
-     * @throws WSSecurityException
-     */
-    X509Certificate[] getX509Certificates(byte[] data) throws WSSecurityException;
+    public X509Certificate loadCertificate(InputStream in) throws WSSecurityException;
     
     /**
-     * Lookup an X509 Certificate in the keystore according to a given serial number and
-     * the issuer of a Certificate.
-     * 
-     * @param issuer       The issuer's name for the certificate
-     * @param serialNumber The serial number of the certificate from the named issuer
-     * @return the X509 certificate that matches the serialNumber and issuer name
-     *         or null if no such certificate was found.
-     */
-    public X509Certificate getX509Certificate(String issuer, BigInteger serialNumber)
-        throws WSSecurityException;
-
-    /**
-     * Lookup X509 Certificates in the keystore according to a given DN of the subject of the certificate
+     * Reads the SubjectKeyIdentifier information from the certificate.
      * <p/>
+     * If the the certificate does not contain a SKI extension then
+     * try to compute the SKI according to RFC3280 using the
+     * SHA-1 hash value of the public key. The second method described
+     * in RFC3280 is not support. Also only RSA public keys are supported.
+     * If we cannot compute the SKI throw a WSSecurityException.
      *
-     * @param subjectDN The DN of subject to look for in the keystore
-     * @return An array with all certificates with the same DN as given in the parameters
-     * @throws WSSecurityException
+     * @param cert The certificate to read SKI
+     * @return The byte array containing the binary SKI data
      */
-    public List<Certificate[]> getCertificatesForDN(String subjectDN) throws WSSecurityException;
+    public byte[] getSKIBytesFromCert(X509Certificate cert) throws WSSecurityException;
     
     /**
      * Get a byte array given an array of X509 certificates.
@@ -148,113 +119,77 @@ public interface Crypto {
      * @return The byte array for the certificates
      * @throws WSSecurityException
      */
-    byte[] getCertificateData(X509Certificate[] certs) throws WSSecurityException;
+    public byte[] getBytesFromCertificates(X509Certificate[] certs) throws WSSecurityException;
 
     /**
-     * Gets the private key identified by <code>alias</> and <code>password</code>.
-     * <p/>
+     * Construct an array of X509Certificate's from the byte array.
      *
-     * @param alias    The alias (<code>KeyStore</code>) of the key owner
-     * @param password The password needed to access the private key
-     * @return The private key
-     * @throws Exception
+     * @param data The <code>byte</code> array containing the X509 data
+     * @return An array of X509 certificates
+     * @throws WSSecurityException
      */
-    public PrivateKey getPrivateKey(String alias, String password) throws Exception;
+    public X509Certificate[] getCertificatesFromBytes(byte[] data) throws WSSecurityException;
+    
+    //
+    // Implementation-specific Crypto functionality methods
+    //
     
     /**
-     * get the list of certificates for a given alias. This method
-     * reads a new certificate chain and overwrites a previously
-     * stored certificate chain.
-     * <p/>
-     *
-     * @param alias Lookup certificate chain for this alias
-     * @return Array of X509 certificates for this alias name, or
-     *         null if this alias does not exist in the keystore
-     */
-    public X509Certificate[] getCertificates(String alias) throws WSSecurityException;
-    
-    /**
-     * Return a X509 Certificate alias in the keystore according to a given Certificate
-     * <p/>
-     *
-     * @param cert The certificate to lookup
-     * @return alias name of the certificate that matches the given certificate
-     *         or null if no such certificate was found.
-     *         <p/>
-     *         See comment above
-     *         <p/>
-     *         See comment above
-     */
-    public String getAliasForX509Cert(Certificate cert) throws WSSecurityException;
-
-    /**
-     * Search a X509 Certificate in the keystore according to a given serial number and
-     * the issuer of a Certificate.
-     * <p/>
-     * The search gets all alias names of the keystore and gets the certificate chain
-     * for each alias. Then the SerialNumber and Issuer of each certificate of the chain
-     * is compared with the parameters.
-     *
-     * @param issuer       The issuer's name for the certificate
-     * @param serialNumber The serial number of the certificate from the named issuer
-     * @return alias name of the certificate that matches serialNumber and issuer name
-     *         or null if no such certificate was found.
-     */
-    public String getAliasForX509Cert(String issuer, BigInteger serialNumber) throws WSSecurityException;
-
-    /**
-     * Lookup a X509 Certificate in the keystore according to a given
-     * SubjectKeyIdentifier.
-     * <p/>
-     * The search gets all alias names of the keystore and gets the certificate chain
-     * or certificate for each alias. Then the SKI for each user certificate
-     * is compared with the SKI parameter.
-     *
-     * @param skiBytes The SKI info bytes
-     * @return alias name of the certificate that matches serialNumber and issuer name
-     *         or null if no such certificate was found.
-     */
-    public String getAliasForX509Cert(byte[] skiBytes) throws WSSecurityException;
-
-    /**
-     * Reads the SubjectKeyIdentifier information from the certificate.
-     * <p/>
-     *
-     * @param cert The certificate to read SKI
-     * @return The byte array containing the binary SKI data
-     */
-    public byte[] getSKIBytesFromCert(X509Certificate cert) throws WSSecurityException;
- 
-    /**
-     * Lookup a X509 Certificate in the keystore according to a given
-     * Thumbprint.
+     * Get an X509Certificate (chain) corresponding to the CryptoType argument. The supported
+     * types are as follows:
      * 
-     * The search gets all alias names of the keystore, then reads the certificate chain
-     * or certificate for each alias. Then the thumbprint for each user certificate
-     * is compared with the thumbprint parameter.
-     *
-     * @param thumb The SHA1 thumbprint info bytes
-     * @return alias name of the certificate that matches the thumbprint
-     *         or null if no such certificate was found.
-     * @throws WSSecurityException if problems during keystore handling or wrong certificate
+     * TYPE.ISSUER_SERIAL - A certificate (chain) is located by the issuer name and serial number
+     * TYPE.THUMBPRINT_SHA1 - A certificate (chain) is located by the SHA1 of the (root) cert
+     * TYPE.SKI_BYTES - A certificate (chain) is located by the SKI bytes of the (root) cert
+     * TYPE.SUBJECT_DN - A certificate (chain) is located by the Subject DN of the (root) cert
+     * TYPE.ALIAS - A certificate (chain) is located by an alias. This alias is implementation
+     * specific, for example - it could be a java KeyStore alias.
      */
-
-    public String getAliasForX509CertThumb(byte[] thumb) throws WSSecurityException;
+    public X509Certificate[] getX509Certificates(CryptoType cryptoType) throws WSSecurityException;
     
     /**
-     * Uses the CertPath API to validate a given certificate chain
-     * <p/>
+     * Get the implementation-specific identifier corresponding to the cert parameter, e.g. the
+     * identifier could be a KeyStore alias.
+     * @param cert The X509Certificate for which to search for an identifier
+     * @return the identifier corresponding to the cert parameter
+     * @throws WSSecurityException
+     */
+    public String getX509Identifier(X509Certificate cert) throws WSSecurityException;
+    
+    /**
+     * Gets the private key corresponding to the certificate.
+     *
+     * @param certificate The X509Certificate corresponding to the private key
+     * @param callbackHandler The callbackHandler needed to get the password
+     * @return The private key
+     */
+    public PrivateKey getPrivateKey(
+        X509Certificate certificate, CallbackHandler callbackHandler
+    ) throws WSSecurityException;
+       
+    /**
+     * Gets the private key corresponding to the identifier.
+     *
+     * @param identifier The implementation-specific identifier corresponding to the key
+     * @param password The password needed to get the key
+     * @return The private key
+     */
+    public PrivateKey getPrivateKey(
+        String identifier, String password
+    ) throws WSSecurityException;
+    
+    /**
+     * Evaluate whether a given certificate chain should be trusted.
      *
      * @param certs Certificate chain to validate
      * @return true if the certificate chain is valid, false otherwise
      * @throws WSSecurityException
      */
-    public boolean validateCertPath(X509Certificate[] certs) throws WSSecurityException;
+    public boolean verifyTrust(X509Certificate[] certs) throws WSSecurityException;
     
     /**
      * Evaluate whether a given public key should be trusted.
-     * Essentially, this amounts to checking to see if there is a certificate in the keystore
-     * or truststore, whose public key matches the transmitted public key.
+     * 
      * @param publicKey The PublicKey to be evaluated
      * @return whether the PublicKey parameter is trusted or not
      */

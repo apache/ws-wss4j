@@ -24,6 +24,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
+import org.apache.ws.security.components.crypto.CryptoType;
 
 import org.apache.ws.security.saml.ext.AssertionWrapper;
 import org.apache.ws.security.saml.ext.OpenSAMLUtil;
@@ -173,7 +174,9 @@ public class SAMLIssuerImpl implements SAMLIssuer {
             );
             
             // prepare to sign the SAML token
-            X509Certificate[] issuerCerts = issuerCrypto.getCertificates(issuerKeyName);
+            CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
+            cryptoType.setAlias(issuerKeyName);
+            X509Certificate[] issuerCerts = issuerCrypto.getX509Certificates(cryptoType);
             if (issuerCerts == null) {
                 throw new WSSecurityException(
                     "No issuer certs were found to sign the SAML Assertion using issuer name: "

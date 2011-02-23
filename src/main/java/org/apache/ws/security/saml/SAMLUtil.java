@@ -27,6 +27,7 @@ import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
+import org.apache.ws.security.components.crypto.CryptoType;
 import org.apache.ws.security.message.token.SecurityTokenReference;
 import org.apache.ws.security.processor.EncryptedKeyProcessor;
 import org.apache.ws.security.saml.ext.AssertionWrapper;
@@ -318,18 +319,18 @@ public class SAMLUtil {
                                     WSSecurityException.FAILURE, "noSigCryptoFile"
                                 );
                             }
-                            String alias = 
-                                crypto.getAliasForX509Cert(
-                                    ((X509IssuerSerial)x509obj).getIssuerName(), 
-                                    ((X509IssuerSerial)x509obj).getSerialNumber()
-                                );
-                            if (alias == null) {
+                            CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ISSUER_SERIAL);
+                            cryptoType.setIssuerSerial(
+                                ((X509IssuerSerial)x509obj).getIssuerName(), 
+                                ((X509IssuerSerial)x509obj).getSerialNumber()
+                            );
+                            certs = crypto.getX509Certificates(cryptoType);
+                            if (certs == null || certs.length < 1) {
                                 throw new WSSecurityException(
                                     WSSecurityException.FAILURE, "invalidSAMLsecurity",
                                     new Object[]{"cannot get certificate or key"}
                                 );
                             }
-                            certs = crypto.getCertificates(alias);
                             return new SAMLKeyInfo(certs);
                         }
                     }

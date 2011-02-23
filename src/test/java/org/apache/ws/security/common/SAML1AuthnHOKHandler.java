@@ -22,6 +22,7 @@ package org.apache.ws.security.common;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
+import org.apache.ws.security.components.crypto.CryptoType;
 import org.apache.ws.security.saml.ext.SAMLCallback;
 import org.apache.ws.security.saml.ext.bean.AuthenticationStatementBean;
 import org.apache.ws.security.saml.ext.bean.KeyInfoBean;
@@ -47,7 +48,9 @@ public class SAML1AuthnHOKHandler implements CallbackHandler {
     
     public SAML1AuthnHOKHandler() throws WSSecurityException {
         Crypto crypto = CryptoFactory.getInstance("wss40.properties");
-        certs = crypto.getCertificates("wss40");
+        CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
+        cryptoType.setAlias("wss40");
+        certs = crypto.getX509Certificates(cryptoType);
     }
     
     public void handle(Callback[] callbacks)

@@ -26,6 +26,7 @@ import org.apache.ws.security.WSEncryptionPart;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
+import org.apache.ws.security.components.crypto.CryptoType;
 import org.apache.ws.security.message.token.Reference;
 import org.apache.ws.security.message.token.SecurityTokenReference;
 import org.apache.ws.security.util.Base64;
@@ -199,7 +200,9 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
         if (encryptSymmKey) {
             X509Certificate remoteCert = useThisCert;
             if (remoteCert == null) {
-                X509Certificate[] certs = crypto.getCertificates(user);
+                CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
+                cryptoType.setAlias(user);
+                X509Certificate[] certs = crypto.getX509Certificates(cryptoType);
                 if (certs == null || certs.length <= 0) {
                     throw new WSSecurityException(
                         WSSecurityException.FAILURE,

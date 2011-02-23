@@ -73,14 +73,14 @@ public class SamlReferenceTest extends org.junit.Assert {
         ClassLoader loader = Loader.getClassLoader(SignedSamlTokenHOKTest.class);
         InputStream input = Merlin.loadInputStream(loader, "keys/wss40_server.jks");
         keyStore.load(input, "security".toCharArray());
-        issuerCrypto.setKeyStore(keyStore);
+        ((Merlin)issuerCrypto).setKeyStore(keyStore);
         
         // Load the server truststore
         trustCrypto = new Merlin();
         KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
         input = Merlin.loadInputStream(loader, "keys/wss40CA.jks");
         trustStore.load(input, "security".toCharArray());
-        trustCrypto.setTrustStore(trustStore);
+        ((Merlin)trustCrypto).setTrustStore(trustStore);
     }
     
     /**

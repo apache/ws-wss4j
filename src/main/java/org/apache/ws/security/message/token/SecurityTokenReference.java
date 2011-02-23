@@ -26,6 +26,7 @@ import org.apache.ws.security.WSDocInfo;
 import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
+import org.apache.ws.security.components.crypto.CryptoType;
 import org.apache.ws.security.util.DOM2Writer;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.ws.security.util.Base64;
@@ -457,7 +458,6 @@ public class SecurityTokenReference {
     public X509Certificate[] getKeyIdentifier(Crypto crypto) throws WSSecurityException {
         Element elem = getFirstElement();
         String value = elem.getAttribute("ValueType");
-        String alias = null;
 
         if (X509Security.X509_V3_TYPE.equals(value)) {
             X509Security token = new X509Security(elem);
@@ -466,7 +466,8 @@ public class SecurityTokenReference {
                 return new X509Certificate[]{cert};
             }
         } else if (SKI_URI.equals(value)) {
-            alias = getX509SKIAlias(crypto);
+            X509Certificate cert = getX509SKIAlias(crypto);
+            return new X509Certificate[]{cert};
         } else if (THUMB_URI.equals(value)) {
             Node node = getFirstElement().getFirstChild();
             if (node == null) {
@@ -474,13 +475,15 @@ public class SecurityTokenReference {
             }
             if (Node.TEXT_NODE == node.getNodeType()) {
                 byte[] thumb = Base64.decode(((Text) node).getData());
-                alias = crypto.getAliasForX509CertThumb(thumb);
+                CryptoType cryptoType = new CryptoType(CryptoType.TYPE.THUMBPRINT_SHA1);
+                cryptoType.setBytes(thumb);
+                X509Certificate[] certs = crypto.getX509Certificates(cryptoType);
+                if (certs != null) {
+                    return new X509Certificate[]{certs[0]};
+                }
             }
         }
         
-        if (alias != null) {
-            return crypto.getCertificates(alias);
-        }
         return null;
     }
     
@@ -505,18 +508,20 @@ public class SecurityTokenReference {
         return null;
     }
     
-    public String getX509SKIAlias(Crypto crypto) throws WSSecurityException {
+    public X509Certificate getX509SKIAlias(Crypto crypto) throws WSSecurityException {
         if (skiBytes == null) {
             skiBytes = getSKIBytes();
             if (skiBytes == null) {
                 return null;
             }
         }
-        String alias = crypto.getAliasForX509Cert(skiBytes);
-        if (doDebug) {
-            log.info("X509 SKI alias: " + alias);
+        CryptoType cryptoType = new CryptoType(CryptoType.TYPE.SKI_BYTES);
+        cryptoType.setBytes(skiBytes);
+        X509Certificate[] certs = crypto.getX509Certificates(cryptoType);
+        if (certs != null) {
+            return certs[0];
         }
-        return alias;
+        return null;
     }
 
     public byte[] getSKIBytes() {
@@ -578,33 +583,15 @@ public class SecurityTokenReference {
      * @return a certificate array or null if nothing found
      */
     public X509Certificate[] getX509IssuerSerial(Crypto crypto) throws WSSecurityException {
-        String alias = getX509IssuerSerialAlias(crypto);
-        if (alias != null) {
-            return crypto.getCertificates(alias);
-        }
-        return null;
-    }
-
-    /**
-     * Gets the alias name of the certificate identified with X509 issuerSerial data.
-     * The keystore identifies the certificate and the key with this alias name.
-     *
-     * @return the alias name for the certificate or null if nothing found
-     */
-    public String getX509IssuerSerialAlias(Crypto crypto) throws WSSecurityException {
         if (issuerSerial == null) {
             issuerSerial = getIssuerSerial();
             if (issuerSerial == null) {
                 return null;
             }
         }
-
-        String alias = 
-            crypto.getAliasForX509Cert(issuerSerial.getIssuer(), issuerSerial.getSerialNumber());
-        if (doDebug) {
-            log.debug("X509IssuerSerial alias: " + alias);
-        }
-        return alias;
+        CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ISSUER_SERIAL);
+        cryptoType.setIssuerSerial(issuerSerial.getIssuer(), issuerSerial.getSerialNumber());
+        return crypto.getX509Certificates(cryptoType);
     }
 
     private DOMX509IssuerSerial getIssuerSerial() throws WSSecurityException {

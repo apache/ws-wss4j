@@ -21,11 +21,9 @@ package org.apache.ws.security.validate;
 
 import java.math.BigInteger;
 import java.security.PublicKey;
-import java.security.cert.Certificate;
 import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
-import java.util.List;
 
 import javax.security.auth.callback.CallbackHandler;
 
@@ -34,6 +32,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
+import org.apache.ws.security.components.crypto.CryptoType;
 
 /**
  * This class verifies trust in a credential used to verify a signature, which is extracted
@@ -169,14 +168,16 @@ public class SignatureTrustValidator implements Validator {
         }
 
         //
-        // SECOND step - Search for the issuer of the transmitted certificate in the 
+        // SECOND step - Search for the issuer cert (chain) of the transmitted certificate in the 
         // keystore or the truststore
         //
-        List<Certificate[]> foundCerts = crypto.getCertificatesForDN(issuerString);
+        CryptoType cryptoType = new CryptoType(CryptoType.TYPE.SUBJECT_DN);
+        cryptoType.setSubjectDN(issuerString);
+        X509Certificate[] foundCerts = crypto.getX509Certificates(cryptoType);
 
         // If the certs have not been found, the issuer is not in the keystore/truststore
         // As a direct result, do not trust the transmitted certificate
-        if (foundCerts == null || foundCerts.size() < 1) {
+        if (foundCerts == null || foundCerts.length < 1) {
             if (LOG.isDebugEnabled()) {
                 LOG.debug(
                     "No certs found in keystore for issuer " + issuerString 
@@ -188,38 +189,35 @@ public class SignatureTrustValidator implements Validator {
 
         //
         // THIRD step
-        // Check the certificate trust path for every cert of the issuer found in the 
-        // keystore/truststore
+        // Check the certificate trust path for the issuer cert chain
         //
         if (LOG.isDebugEnabled()) {
             LOG.debug(
                 "Preparing to validate certificate path for issuer " + issuerString
             );
         }
-        for (Certificate[] foundCertChain : foundCerts) {
-            //
-            // Form a certificate chain from the transmitted certificate
-            // and the certificate(s) of the issuer from the keystore/truststore
-            //
-            X509Certificate[] x509certs = new X509Certificate[foundCertChain.length + 1];
-            x509certs[0] = cert;
-            for (int j = 0; j < foundCertChain.length; j++) {
-                x509certs[j + 1] = (X509Certificate)foundCertChain[j];
-            }
+        //
+        // Form a certificate chain from the transmitted certificate
+        // and the certificate(s) of the issuer from the keystore/truststore
+        //
+        X509Certificate[] x509certs = new X509Certificate[foundCerts.length + 1];
+        x509certs[0] = cert;
+        for (int j = 0; j < foundCerts.length; j++) {
+            x509certs[j + 1] = (X509Certificate)foundCerts[j];
+        }
 
-            //
-            // Use the validation method from the crypto to check whether the subjects' 
-            // certificate was really signed by the issuer stated in the certificate
-            //
-            if (crypto.validateCertPath(x509certs)) {
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug(
-                        "Certificate path has been verified for certificate with subject " 
-                        + subjectString
-                    );
-                }
-                return true;
+        //
+        // Use the validation method from the crypto to check whether the subjects' 
+        // certificate was really signed by the issuer stated in the certificate
+        //
+        if (crypto.verifyTrust(x509certs)) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug(
+                    "Certificate path has been verified for certificate with subject " 
+                     + subjectString
+                );
             }
+            return true;
         }
 
         if (LOG.isDebugEnabled()) {
@@ -245,13 +243,15 @@ public class SignatureTrustValidator implements Validator {
         String issuerString = cert.getIssuerX500Principal().getName();
         BigInteger issuerSerial = cert.getSerialNumber();
         
-        X509Certificate foundCert = crypto.getX509Certificate(issuerString, issuerSerial);
+        CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ISSUER_SERIAL);
+        cryptoType.setIssuerSerial(issuerString, issuerSerial);
+        X509Certificate[] foundCerts = crypto.getX509Certificates(cryptoType);
 
         //
         // If a certificate has been found, the certificates must be compared
         // to ensure against phony DNs (compare encoded form including signature)
         //
-        if (foundCert != null && foundCert.equals(cert)) {
+        if (foundCerts != null && foundCerts[0] != null && foundCerts[0].equals(cert)) {
             if (LOG.isDebugEnabled()) {
                 LOG.debug(
                     "Direct trust for certificate with " + cert.getSubjectX500Principal().getName()
@@ -282,7 +282,7 @@ public class SignatureTrustValidator implements Validator {
         // certificate was really signed by the issuer stated in the certificate
         //
         if (certificates != null && certificates.length > 1
-            && crypto.validateCertPath(certificates)) {
+            && crypto.verifyTrust(certificates)) {
             if (LOG.isDebugEnabled()) {
                 LOG.debug(
                     "Certificate path has been verified for certificate with subject " 

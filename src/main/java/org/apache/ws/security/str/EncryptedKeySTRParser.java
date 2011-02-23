@@ -86,13 +86,7 @@ public class EncryptedKeySTRParser implements STRParser {
         // Then look up the certificate alias according to issuer name and serial number.
         //
         if (secRef.containsX509Data() || secRef.containsX509IssuerSerial()) {
-            String alias = secRef.getX509IssuerSerialAlias(crypto);
-            if (alias != null) {
-                certs = crypto.getCertificates(alias);
-            }
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("X509IssuerSerial alias: " + alias);
-            }
+            certs = secRef.getX509IssuerSerial(crypto);
         }
         //
         // If wsse:KeyIdentifier found, then the public key of the attached cert was used to

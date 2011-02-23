@@ -26,6 +26,7 @@ import org.apache.ws.security.WSDocInfo;
 import org.apache.ws.security.WSEncryptionPart;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
+import org.apache.ws.security.components.crypto.CryptoType;
 import org.apache.ws.security.message.token.BinarySecurity;
 import org.apache.ws.security.message.token.DOMX509Data;
 import org.apache.ws.security.message.token.DOMX509IssuerSerial;
@@ -705,7 +706,9 @@ public class WSSecSignature extends WSSecSignatureBase {
             || keyIdentifierType == WSConstants.ENCRYPTED_KEY_SHA1_IDENTIFIER
             || keyIdentifierType == WSConstants.CUSTOM_KEY_IDENTIFIER)) {
             if (useThisCert == null) {
-                certs = crypto.getCertificates(user);
+                CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
+                cryptoType.setAlias(user);
+                certs = crypto.getX509Certificates(cryptoType);
             } else {
                 certs = new X509Certificate[] {useThisCert};
             }

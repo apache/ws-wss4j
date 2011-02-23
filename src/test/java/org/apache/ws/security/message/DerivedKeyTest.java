@@ -28,6 +28,7 @@ import org.apache.ws.security.common.KeystoreCallbackHandler;
 import org.apache.ws.security.common.SOAPUtil;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
+import org.apache.ws.security.components.crypto.CryptoType;
 import org.apache.ws.security.message.token.SecurityTokenReference;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.w3c.dom.Document;
@@ -176,7 +177,9 @@ public class DerivedKeyTest extends org.junit.Assert {
         secHeader.insertSecurityHeader(doc);
 
         SecurityTokenReference secToken = new SecurityTokenReference(doc);
-        X509Certificate[] certs = crypto.getCertificates("wss40");
+        CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
+        cryptoType.setAlias("wss40");
+        X509Certificate[] certs = crypto.getX509Certificates(cryptoType);
         secToken.setKeyIdentifierThumb(certs[0]);
 
         WSSecDKSign sigBuilder = new WSSecDKSign();
@@ -215,7 +218,9 @@ public class DerivedKeyTest extends org.junit.Assert {
         secHeader.insertSecurityHeader(doc);
 
         SecurityTokenReference secToken = new SecurityTokenReference(doc);
-        X509Certificate[] certs = crypto.getCertificates("wss40");
+        CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
+        cryptoType.setAlias("wss40");
+        X509Certificate[] certs = crypto.getX509Certificates(cryptoType);
         secToken.setKeyIdentifierSKI(certs[0], crypto);
 
         WSSecDKSign sigBuilder = new WSSecDKSign();

@@ -34,6 +34,7 @@ import org.apache.ws.security.common.SAML2CallbackHandler;
 import org.apache.ws.security.common.SOAPUtil;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
+import org.apache.ws.security.components.crypto.CryptoType;
 import org.apache.ws.security.components.crypto.Merlin;
 import org.apache.ws.security.message.WSSecHeader;
 import org.apache.ws.security.message.WSSecSAMLToken;
@@ -76,14 +77,14 @@ public class SamlNegativeTest extends org.junit.Assert {
         ClassLoader loader = Loader.getClassLoader(SamlNegativeTest.class);
         InputStream input = Merlin.loadInputStream(loader, "keys/wss40_server.jks");
         keyStore.load(input, "security".toCharArray());
-        issuerCrypto.setKeyStore(keyStore);
+        ((Merlin)issuerCrypto).setKeyStore(keyStore);
         
         // Load the server truststore
         trustCrypto = new Merlin();
         KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
         input = Merlin.loadInputStream(loader, "keys/wss40CA.jks");
         trustStore.load(input, "security".toCharArray());
-        trustCrypto.setTrustStore(trustStore);
+        ((Merlin)trustCrypto).setTrustStore(trustStore);
     }
     
     /**
@@ -393,7 +394,9 @@ public class SamlNegativeTest extends org.junit.Assert {
         
         public SAML1HOKNoKeyInfoCallbackHandler() throws Exception {
             Crypto crypto = CryptoFactory.getInstance("wss40.properties");
-            certs = crypto.getCertificates("wss40");
+            CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
+            cryptoType.setAlias("wss40");
+            certs = crypto.getX509Certificates(cryptoType);
             
             subjectName = "uid=joe,ou=people,ou=saml-demo,o=example.com";
             subjectQualifier = "www.example.com";

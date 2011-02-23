@@ -26,6 +26,7 @@ import org.apache.ws.security.WSDocInfo;
 import org.apache.ws.security.WSEncryptionPart;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
+import org.apache.ws.security.components.crypto.CryptoType;
 import org.apache.ws.security.message.DOMURIDereferencer;
 import org.apache.ws.security.message.WSSecHeader;
 import org.apache.ws.security.message.WSSecSignature;
@@ -230,7 +231,9 @@ public class WSSecSignatureSAML extends WSSecSignature {
         PublicKey publicKey = null;
 
         if (senderVouches) {
-            certs = issuerCrypto.getCertificates(issuerKeyName);
+            CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
+            cryptoType.setAlias(issuerKeyName);
+            certs = issuerCrypto.getX509Certificates(cryptoType);
             wsDocInfo.setCrypto(issuerCrypto);
         }
         //

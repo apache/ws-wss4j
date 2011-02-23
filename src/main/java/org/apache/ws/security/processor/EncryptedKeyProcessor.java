@@ -24,11 +24,11 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDataRef;
 import org.apache.ws.security.WSDocInfo;
-import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
+import org.apache.ws.security.components.crypto.CryptoType;
 import org.apache.ws.security.message.token.SecurityTokenReference;
 import org.apache.ws.security.str.EncryptedKeySTRParser;
 import org.apache.ws.security.str.STRParser;
@@ -44,11 +44,8 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.SecretKey;
-import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.callback.UnsupportedCallbackException;
 
-import java.io.IOException;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -112,11 +109,11 @@ public class EncryptedKeyProcessor implements Processor {
             throw new WSSecurityException(WSSecurityException.INVALID_SECURITY, "noCipher");
         }
         
-        String alias = getAliasFromEncryptedKey(elem, decCrypto, cb, wsDocInfo, config);
-        PrivateKey privateKey = getPrivateKeyFromKeyInfo(decCrypto, cb, alias);
-        X509Certificate[] certs = decCrypto.getCertificates(alias);
+        X509Certificate[] certs = 
+            getCertificatesFromEncryptedKey(elem, decCrypto, cb, wsDocInfo, config);
 
         try {
+            PrivateKey privateKey = decCrypto.getPrivateKey(certs[0], cb);
             cipher.init(Cipher.DECRYPT_MODE, privateKey);
         } catch (Exception ex) {
             throw new WSSecurityException(WSSecurityException.FAILED_CHECK, null, null, ex);
@@ -174,10 +171,10 @@ public class EncryptedKeyProcessor implements Processor {
     }
     
     /**
-     * @return the alias corresponding to the public key reference in the 
+     * @return the Certificate(s) corresponding to the public key reference in the 
      * EncryptedKey Element
      */
-    private String getAliasFromEncryptedKey(
+    private X509Certificate[] getCertificatesFromEncryptedKey(
         Element xencEncryptedKey,
         Crypto crypto,
         CallbackHandler cb,
@@ -188,7 +185,6 @@ public class EncryptedKeyProcessor implements Processor {
             WSSecurityUtil.getDirectChildElement(
                 xencEncryptedKey, "KeyInfo", WSConstants.SIG_NS
             );
-        String alias = null;
         if (keyInfo != null) {
             Element strElement = null;
             if (config.isWsiBSPCompliant()) {
@@ -233,73 +229,24 @@ public class EncryptedKeyProcessor implements Processor {
                     new Object[] {"decryption (KeyId)"}
                 );
             }
-            alias = crypto.getAliasForX509Cert(certs[0]);
-        } else if (!config.isWsiBSPCompliant() && crypto.getDefaultX509Alias() != null) {
-            alias = crypto.getDefaultX509Alias();
+            return certs;
+        } else if (!config.isWsiBSPCompliant() && crypto.getDefaultX509Identifier() != null) {
+            String alias = crypto.getDefaultX509Identifier();
+            CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
+            cryptoType.setAlias(alias);
+            X509Certificate[] certs = crypto.getX509Certificates(cryptoType);
+            if (certs == null || certs.length < 1 || certs[0] == null) {
+                throw new WSSecurityException(
+                    WSSecurityException.FAILURE,
+                    "noCertsFound", 
+                    new Object[] {"decryption (KeyId)"}
+                );
+            }
+            return certs;
         } else {
             throw new WSSecurityException(WSSecurityException.INVALID_SECURITY, "noKeyinfo");
         }
-        return alias;
     }
-    
-    /**
-     * @return the private key corresponding to the public key reference in the 
-     * EncryptedKey Element
-     */
-    private PrivateKey getPrivateKeyFromKeyInfo(
-        Crypto crypto,
-        CallbackHandler cb,
-        String alias
-    ) throws WSSecurityException {
-        //
-        // If the alias is null then throw an Exception, as the private key doesn't exist
-        // in our key store
-        //
-        if (alias == null) {
-            throw new WSSecurityException(WSSecurityException.FAILED_CHECK, "noPrivateKey");
-        }
-        //
-        // At this point we have all information necessary to decrypt the session
-        // key:
-        // - the Cipher object intialized with the correct methods
-        // - The data that holds the encrypted session key
-        // - the alias name for the private key
-        //
-        // Now use the callback here to get password that enables
-        // us to read the private key
-        //
-        WSPasswordCallback pwCb = new WSPasswordCallback(alias, WSPasswordCallback.DECRYPT);
-        try {
-            cb.handle(new Callback[]{pwCb});
-        } catch (IOException e) {
-            throw new WSSecurityException(
-                WSSecurityException.FAILURE,
-                "noPassword",
-                new Object[]{alias}, 
-                e
-            );
-        } catch (UnsupportedCallbackException e) {
-            throw new WSSecurityException(
-                WSSecurityException.FAILURE,
-                "noPassword",
-                new Object[]{alias}, 
-                e
-            );
-        }
-        String password = pwCb.getPassword();
-        if (password == null) {
-            throw new WSSecurityException(
-                WSSecurityException.FAILURE, "noPassword", new Object[]{alias}
-            );
-        }
-
-        try {
-            return crypto.getPrivateKey(alias, password);
-        } catch (Exception e) {
-            throw new WSSecurityException(WSSecurityException.FAILED_CHECK, null, null, e);
-        }
-    }
-    
     
     /**
      * Decrypt all data references
