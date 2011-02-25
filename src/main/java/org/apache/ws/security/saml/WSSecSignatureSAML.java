@@ -252,7 +252,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
             if (secretKey == null) {
                 SAMLKeyInfo samlKeyInfo = 
                     SAMLUtil.getCredentialFromSubject(
-                        assertion, userCrypto, null, wssConfig.isWsiBSPCompliant()
+                        assertion, userCrypto, null, wsDocInfo, wssConfig.isWsiBSPCompliant()
                     );
                 publicKey = samlKeyInfo.getPublicKey();
                 certs = samlKeyInfo.getCerts();
@@ -513,6 +513,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
                 );
             }
             signContext.setProperty(STRTransform.TRANSFORM_WS_DOC_INFO, wsDocInfo);
+            wsDocInfo.setCallbackLookup(callbackLookup);
             URIDereferencer dereferencer = new DOMURIDereferencer();
             ((DOMURIDereferencer)dereferencer).setWsDocInfo(wsDocInfo);
             signContext.setURIDereferencer(dereferencer);

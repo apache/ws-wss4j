@@ -21,9 +21,8 @@ package org.apache.ws.security.message;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDocInfo;
-import org.apache.ws.security.util.WSSecurityUtil;
+import org.apache.ws.security.WSSecurityException;
 import org.apache.xml.security.signature.XMLSignatureInput;
 import org.apache.xml.security.utils.resolver.ResourceResolverException;
 import org.apache.xml.security.utils.resolver.ResourceResolverSpi;
@@ -51,7 +50,7 @@ public class EnvelopeIdResolver extends ResourceResolverSpi {
     public void setWsDocInfo(WSDocInfo docInfo) {
         wsDocInfo = docInfo;
     }
-
+    
     /**
      * This is the workhorse method used to resolve resources.
      * <p/>
@@ -89,17 +88,21 @@ public class EnvelopeIdResolver extends ResourceResolverSpi {
         }
         
         if (selectedElem == null && (id != null || "".equals(id))) {
-            Element bodyElement = WSSecurityUtil.findBodyElement(uri.getOwnerDocument());
-            String cId = bodyElement.getAttributeNS(WSConstants.WSU_NS, "Id");
-            if (cId.equals(id)) {
-                 selectedElem = bodyElement;
-            } else {
-                selectedElem=
-                    WSSecurityUtil.findElementById(
-                        uri.getOwnerDocument().getDocumentElement(), id, true
-                    );
+            CallbackLookup callbackLookup = null;
+            if (wsDocInfo != null) {
+                callbackLookup = wsDocInfo.getCallbackLookup();
             }
-            
+            if (callbackLookup == null) {
+                callbackLookup = new DOMCallbackLookup(uri.getOwnerDocument());
+            }
+            try {
+                selectedElem = callbackLookup.getElement(id, true);
+            } catch (WSSecurityException ex) {
+                throw new ResourceResolverException(
+                    ex.getMessage(), new Object[]{"Id: " + id + " not found"},
+                    uri, BaseURI
+                );
+            }
             if (selectedElem == null) {
                 throw new ResourceResolverException("generic.EmptyMessage",
                         new Object[]{"Id: " + id + " not found"},

@@ -31,7 +31,9 @@ import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.WSUsernameTokenPrincipal;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoType;
+import org.apache.ws.security.message.DOMCallbackLookup;
 import org.apache.ws.security.message.DOMURIDereferencer;
+import org.apache.ws.security.message.CallbackLookup;
 import org.apache.ws.security.message.token.SecurityTokenReference;
 import org.apache.ws.security.str.STRParser;
 import org.apache.ws.security.str.SignatureSTRParser;
@@ -112,7 +114,6 @@ public class SignatureProcessor implements Processor {
         String signatureMethod = getSignatureMethod(elem);
 
         validator.setCrypto(crypto);
-        
         if (keyInfoElement == null) {
             certs = getDefaultCerts(crypto);
             principal = certs[0].getSubjectX500Principal();
@@ -469,10 +470,11 @@ public class SignatureProcessor implements Processor {
                 }
                 
                 if (se == null) {
-                    se = 
-                        WSSecurityUtil.findElementById(
-                            doc.getDocumentElement(), uri, false
-                        );
+                    CallbackLookup callbackLookup = wsDocInfo.getCallbackLookup();
+                    if (callbackLookup == null) {
+                        callbackLookup = new DOMCallbackLookup(doc);
+                    }
+                    se = callbackLookup.getElement(uri, false);
                 }
                 if (se == null) {
                     throw new WSSecurityException(WSSecurityException.FAILED_CHECK);

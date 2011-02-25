@@ -27,6 +27,8 @@ import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoType;
+import org.apache.ws.security.message.CallbackLookup;
+import org.apache.ws.security.message.DOMCallbackLookup;
 import org.apache.ws.security.util.DOM2Writer;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.ws.security.util.Base64;
@@ -186,19 +188,23 @@ public class SecurityTokenReference {
      *            element. This could be different from the document
      *            that contains the SecurityTokenReference (STR). See
      *            STRTransform.derefenceBST() method
+     * @param docInfo A WSDocInfo object containing previous results
+     * @param cb A CallbackHandler object to obtain tokens that are not in the message
      * @return Element containing the signing token, must be a BinarySecurityToken
      * @throws WSSecurityException When either no <code>Reference</code> element, or the found
      *                   reference contains no URI, or the referenced signing not found.
      */
-    public Element getTokenElement(Document doc, WSDocInfo docInfo, CallbackHandler cb)
-        throws WSSecurityException {
+    public Element getTokenElement(
+        Document doc, WSDocInfo docInfo, CallbackHandler cb
+    ) throws WSSecurityException {
         Reference ref = getReference();
         String uri = ref.getURI();
         if (doDebug) {
             log.debug("Token reference uri: " + uri);
         }
         
-        Element tokElement = findTokenElement(doc, docInfo, cb, uri, ref.getValueType());
+        Element tokElement = 
+            findTokenElement(doc, docInfo, cb, uri, ref.getValueType());
         
         if (tokElement == null) {
             throw new WSSecurityException(
@@ -223,6 +229,8 @@ public class SecurityTokenReference {
      *            element. This could be different from the document
      *            that contains the SecurityTokenReference (STR). See
      *            STRTransform.derefenceBST() method
+     * @param docInfo A WSDocInfo object containing previous results
+     * @param cb A CallbackHandler object to obtain tokens that are not in the message
      * @return Element containing the signing token
      */
     public Element getKeyIdentifierTokenElement(
@@ -258,7 +266,7 @@ public class SecurityTokenReference {
         CallbackHandler cb,
         String uri,
         String type
-    ) {
+    ) throws WSSecurityException {
         String id = uri;
         if (id.charAt(0) == '#') {
             id = id.substring(1);
@@ -317,7 +325,11 @@ public class SecurityTokenReference {
         //
         // Finally try to find the element by its (wsu) Id
         //
-        return WSSecurityUtil.findElementById(doc.getDocumentElement(), uri, true);
+        CallbackLookup callbackLookup = docInfo.getCallbackLookup();
+        if (callbackLookup == null) {
+            callbackLookup = new DOMCallbackLookup(doc);
+        }
+        return callbackLookup.getElement(uri, true);
     }
 
 

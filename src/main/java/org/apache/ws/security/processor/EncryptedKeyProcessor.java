@@ -132,7 +132,8 @@ public class EncryptedKeyProcessor implements Processor {
             throw new WSSecurityException(WSSecurityException.FAILED_CHECK, null, null, ex);
         }
 
-        List<WSDataRef> dataRefs = decryptDataRefs(elem.getOwnerDocument(), elem, decryptedBytes);
+        List<WSDataRef> dataRefs = 
+            decryptDataRefs(elem.getOwnerDocument(), elem, wsDocInfo, decryptedBytes);
         
         WSSecurityEngineResult result = new WSSecurityEngineResult(
                 WSConstants.ENCR, 
@@ -252,7 +253,7 @@ public class EncryptedKeyProcessor implements Processor {
      * Decrypt all data references
      */
     private List<WSDataRef> decryptDataRefs(
-        Document doc, Element xencEncryptedKey, byte[] decryptedBytes
+        Document doc, Element xencEncryptedKey, WSDocInfo docInfo, byte[] decryptedBytes
     ) throws WSSecurityException {
         //
         // At this point we have the decrypted session (symmetric) key. According
@@ -277,7 +278,7 @@ public class EncryptedKeyProcessor implements Processor {
                     if (dataRefURI.charAt(0) == '#') {
                         dataRefURI = dataRefURI.substring(1);
                     }
-                    WSDataRef dataRef = decryptDataRef(doc, dataRefURI, decryptedBytes);
+                    WSDataRef dataRef = decryptDataRef(doc, dataRefURI, docInfo, decryptedBytes);
                     dataRefs.add(dataRef);
                 }
             }
@@ -293,6 +294,7 @@ public class EncryptedKeyProcessor implements Processor {
     private WSDataRef decryptDataRef(
         Document doc, 
         String dataRefURI, 
+        WSDocInfo docInfo,
         byte[] decryptedData
     ) throws WSSecurityException {
         if (log.isDebugEnabled()) {
@@ -302,7 +304,7 @@ public class EncryptedKeyProcessor implements Processor {
         // Find the encrypted data element referenced by dataRefURI
         //
         Element encryptedDataElement = 
-            ReferenceListProcessor.findEncryptedDataElement(doc, dataRefURI);
+            ReferenceListProcessor.findEncryptedDataElement(doc, docInfo, dataRefURI);
         //
         // Prepare the SecretKey object to decrypt EncryptedData
         //

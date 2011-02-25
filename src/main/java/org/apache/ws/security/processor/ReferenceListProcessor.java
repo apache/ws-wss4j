@@ -36,6 +36,8 @@ import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
+import org.apache.ws.security.message.CallbackLookup;
+import org.apache.ws.security.message.DOMCallbackLookup;
 import org.apache.ws.security.message.token.SecurityTokenReference;
 import org.apache.ws.security.str.STRParser;
 import org.apache.ws.security.str.SecurityTokenRefSTRParser;
@@ -59,7 +61,7 @@ public class ReferenceListProcessor implements Processor {
     public void setValidator(Validator validator) {
         // not used
     }
-
+    
     public List<WSSecurityEngineResult> handleToken(
         Element elem, 
         Crypto crypto, 
@@ -137,7 +139,7 @@ public class ReferenceListProcessor implements Processor {
         //
         // Find the encrypted data element referenced by dataRefURI
         //
-        Element encryptedDataElement = findEncryptedDataElement(doc, dataRefURI);
+        Element encryptedDataElement = findEncryptedDataElement(doc, wsDocInfo, dataRefURI);
         //
         // Prepare the SecretKey object to decrypt EncryptedData
         //
@@ -238,6 +240,7 @@ public class ReferenceListProcessor implements Processor {
      * wsu:Id="someURI".
      * 
      * @param doc The document in which to find EncryptedData
+     * @param wsDocInfo The WSDocInfo object to use
      * @param dataRefURI The URI of EncryptedData
      * @return The EncryptedData element
      * @throws WSSecurityException if the EncryptedData element referenced by dataRefURI is 
@@ -246,10 +249,15 @@ public class ReferenceListProcessor implements Processor {
     public static Element
     findEncryptedDataElement(
         Document doc,
+        WSDocInfo wsDocInfo,
         String dataRefURI
     ) throws WSSecurityException {
+        CallbackLookup callbackLookup = wsDocInfo.getCallbackLookup();
+        if (callbackLookup == null) {
+            callbackLookup = new DOMCallbackLookup(doc);
+        }
         Element encryptedDataElement = 
-            WSSecurityUtil.findElementById(doc.getDocumentElement(), dataRefURI, true);
+            callbackLookup.getElement(dataRefURI, true);
         if (encryptedDataElement == null) {
             throw new WSSecurityException(
                 WSSecurityException.INVALID_SECURITY, "dataRef", new Object[] {dataRefURI}

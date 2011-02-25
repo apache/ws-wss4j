@@ -28,6 +28,7 @@ import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.saml.ext.AssertionWrapper;
+import org.apache.ws.security.saml.ext.OpenSAMLUtil;
 import org.apache.ws.security.util.DOM2Writer;
 import org.apache.ws.security.validate.Credential;
 import org.apache.ws.security.validate.SamlAssertionValidator;
@@ -62,7 +63,7 @@ public class SAMLTokenProcessor implements Processor {
         if (log.isDebugEnabled()) {
             log.debug("Found SAML Assertion element");
         }
-        AssertionWrapper assertion = handleSAMLToken(elem, crypto, cb, config);
+        AssertionWrapper assertion = handleSAMLToken(elem, crypto, cb, wsDocInfo, config);
         wsDocInfo.addTokenElement(elem);
         WSSecurityEngineResult result = null;
         if (assertion.isSigned()) {
@@ -80,11 +81,22 @@ public class SAMLTokenProcessor implements Processor {
         Element token, 
         Crypto crypto,
         CallbackHandler cb,
+        WSDocInfo docInfo,
         WSSConfig config
     ) throws WSSecurityException {
         AssertionWrapper assertion = new AssertionWrapper(token);
         if (assertion.isSigned()) {
-            assertion.verifySignature(crypto, config);
+            assertion.verifySignature(crypto, docInfo, config);
+        }
+        
+        // Check HOK requirements
+        String confirmMethod = null;
+        List<String> methods = assertion.getConfirmationMethods();
+        if (methods != null && methods.size() > 0) {
+            confirmMethod = methods.get(0);
+        }
+        if (OpenSAMLUtil.isMethodHolderOfKey(confirmMethod)) {
+            assertion.parseHOKSubject(crypto, cb, docInfo, config);
         }
             
         // Now delegate the rest of the verification to the Validator

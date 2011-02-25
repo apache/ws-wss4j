@@ -21,9 +21,6 @@ package org.apache.ws.security.validate;
 
 import java.util.List;
 
-import javax.security.auth.callback.CallbackHandler;
-
-import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.saml.SAMLKeyInfo;
 import org.apache.ws.security.saml.ext.AssertionWrapper;
@@ -37,9 +34,6 @@ import org.apache.ws.security.saml.ext.OpenSAMLUtil;
  * and verifies that the Assertion is signed as well for holder-of-key. 
  */
 public class SamlAssertionValidator extends SignatureTrustValidator {
-    
-    private CallbackHandler callbackHandler;
-    private WSSConfig wssConfig;
     
     /**
      * Validate the credential argument. It must contain a non-null AssertionWrapper. 
@@ -61,8 +55,6 @@ public class SamlAssertionValidator extends SignatureTrustValidator {
             confirmMethod = methods.get(0);
         }
         if (OpenSAMLUtil.isMethodHolderOfKey(confirmMethod)) {
-            // The Subject KeyInfo must not be null (and must be successfully parsed)
-            assertion.parseHOKSubject(crypto, callbackHandler, wssConfig);
             if (assertion.getSubjectKeyInfo() == null) {
                 throw new WSSecurityException(WSSecurityException.FAILURE, "noKeyInSAMLToken");
             }
@@ -80,25 +72,6 @@ public class SamlAssertionValidator extends SignatureTrustValidator {
             trustCredential.setCertificates(samlKeyInfo.getCerts());
             super.validate(trustCredential);
         }
-    }
-    
-    /**
-     * Set a CallbackHandler instance used to validate credentials.
-     * @param callbackHandler a CallbackHandler instance used to validate credentials
-     */
-    @Override
-    public void setCallbackHandler(CallbackHandler callbackHandler) {
-        this.callbackHandler = callbackHandler;
-    }
-    
-    /**
-     * Set a WSSConfig instance used to extract configured options used to 
-     * validate credentials. 
-     * @param wssConfig a WSSConfig instance
-     */
-    @Override
-    public void setWSSConfig(WSSConfig wssConfig) {
-        this.wssConfig = wssConfig;
     }
     
 }

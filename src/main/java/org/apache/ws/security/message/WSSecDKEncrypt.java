@@ -104,7 +104,9 @@ public class WSSecDKEncrypt extends WSSecDerivedKeyBase {
         SecretKey key = WSSecurityUtil.prepareSecretKey(symEncAlgo, derivedKeyBytes);
 
         List<String> encDataRefs = 
-            WSSecEncrypt.doEncryption(document, wssConfig, keyInfo, key, symEncAlgo, references);
+            WSSecEncrypt.doEncryption(
+                document, wssConfig, keyInfo, key, symEncAlgo, references, callbackLookup
+            );
         if (dataRef == null) {
             dataRef = 
                 document.createElementNS(

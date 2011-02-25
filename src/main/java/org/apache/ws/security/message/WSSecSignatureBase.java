@@ -52,7 +52,7 @@ import javax.xml.crypto.dsig.spec.TransformParameterSpec;
 public class WSSecSignatureBase extends WSSecBase {
     
     private static Log log = LogFactory.getLog(WSSecSignatureBase.class.getName());
-
+    
     /**
      * This method adds references to the Signature.
      * 
@@ -74,8 +74,6 @@ public class WSSecSignatureBase extends WSSecBase {
         WSSConfig wssConfig,
         String digestAlgo
     ) throws WSSecurityException {
-        Element envelope = doc.getDocumentElement();
-        
         DigestMethod digestMethod;
         try {
             digestMethod = signatureFactory.newDigestMethod(digestAlgo, null);
@@ -115,8 +113,10 @@ public class WSSecSignatureBase extends WSSecBase {
                         if (wssConfig.isWsiBSPCompliant()) {
                             Element toSignById = element;
                             if (toSignById == null) {
-                                toSignById = 
-                                    WSSecurityUtil.findElementById(envelope, idToSign, false);
+                                if (callbackLookup == null) {
+                                    callbackLookup = new DOMCallbackLookup(doc);
+                                }
+                                toSignById = callbackLookup.getElement(idToSign, false);
                                 wsDocInfo.addProtectionElement(toSignById);
                             }
                             List<String> prefixes = getInclusivePrefixes(toSignById);
@@ -146,7 +146,11 @@ public class WSSecSignatureBase extends WSSecBase {
                     if (element != null) {
                         elementsToSign = Collections.singletonList(element);
                     } else {
-                        elementsToSign = WSSecurityUtil.findElements(encPart, doc);
+                        if (callbackLookup == null) {
+                            callbackLookup = new DOMCallbackLookup(doc);
+                        }
+                        elementsToSign = 
+                            WSSecurityUtil.findElements(encPart, callbackLookup, doc);
                     }
                     if (elementsToSign == null || elementsToSign.size() == 0) {
                         throw new WSSecurityException(

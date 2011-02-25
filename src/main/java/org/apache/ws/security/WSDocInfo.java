@@ -33,6 +33,7 @@ package org.apache.ws.security;
  */
 
 import org.apache.ws.security.components.crypto.Crypto;
+import org.apache.ws.security.message.CallbackLookup;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -41,11 +42,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class WSDocInfo {
-    Document doc = null;
-    Crypto crypto = null;
-    List<Element> tokenList = null;
-    List<Element> elementList = null;
-    List<WSSecurityEngineResult> resultsList = null;
+    private Document doc = null;
+    private Crypto crypto = null;
+    private List<Element> tokenList = null;
+    private List<Element> elementList = null;
+    private List<WSSecurityEngineResult> resultsList = null;
+    private CallbackLookup callbackLookup = null;
 
     public WSDocInfo(Document doc) {
         //
@@ -214,6 +216,20 @@ public class WSDocInfo {
      */
     public void setCrypto(Crypto crypto) {
         this.crypto = crypto;
+    }
+    
+    /**
+     * @param callbackLookup The CallbackLookup object to retrieve elements
+     */
+    public void setCallbackLookup(CallbackLookup callbackLookup) {
+        this.callbackLookup = callbackLookup;
+    }
+    
+    /**
+     * @return the CallbackLookup object to retrieve elements
+     */
+    public CallbackLookup getCallbackLookup() {
+        return callbackLookup;
     }
 
 }

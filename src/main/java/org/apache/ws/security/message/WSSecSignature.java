@@ -408,11 +408,13 @@ public class WSSecSignature extends WSSecSignatureBase {
     }
     
     /**
-     * Compute the Signature over the references.
+     * Compute the Signature over the references. The signature element will be 
+     * prepended to the security header.
      * 
-     * After references are set this method computes the Signature for them.
      * This method can be called any time after the references were set. See
      * <code>addReferencesToSign()</code>.
+     * 
+     * @param referenceList The list of references to sign
      * 
      * @throws WSSecurityException
      */
@@ -425,9 +427,12 @@ public class WSSecSignature extends WSSecSignatureBase {
     /**
      * Compute the Signature over the references.
      * 
-     * After references are set this method computes the Signature for them.
      * This method can be called any time after the references were set. See
      * <code>addReferencesToSign()</code>.
+     * 
+     * @param referenceList The list of references to sign
+     * @param prepend Whether to prepend the signature element to the security header
+     * @param siblingElement If prepending, then prepend before this sibling Element
      * 
      * @throws WSSecurityException
      */
@@ -480,6 +485,7 @@ public class WSSecSignature extends WSSecSignatureBase {
                 );
             }
             signContext.setProperty(STRTransform.TRANSFORM_WS_DOC_INFO, wsDocInfo);
+            wsDocInfo.setCallbackLookup(callbackLookup);
             URIDereferencer dereferencer = new DOMURIDereferencer();
             ((DOMURIDereferencer)dereferencer).setWsDocInfo(wsDocInfo);
             signContext.setURIDereferencer(dereferencer);
@@ -545,7 +551,7 @@ public class WSSecSignature extends WSSecSignatureBase {
      * Set the canonicalization method to use.
      * 
      * If the canonicalization method is not set then the recommended Exclusive
-     * XML Canonicalization is used by default Refer to WSConstants which
+     * XML Canonicalization is used by default. Refer to WSConstants which
      * algorithms are supported.
      * 
      * @param algo Is the name of the signature algorithm

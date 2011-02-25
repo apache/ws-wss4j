@@ -48,6 +48,15 @@ public class WSSecBase {
 
     protected WSSConfig wssConfig = WSSConfig.getNewInstance();
     
+    protected CallbackLookup callbackLookup;
+    
+    /**
+     * @param callbackLookup The CallbackLookup object to retrieve elements
+     */
+    public void setCallbackLookup(CallbackLookup callbackLookup) {
+        this.callbackLookup = callbackLookup;
+    }
+    
     /**
      * Set which parts of the message to encrypt/sign. <p/>
      * 

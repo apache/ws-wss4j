@@ -23,6 +23,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.conversation.ConversationConstants;
+import org.apache.ws.security.message.CallbackLookup;
 import org.apache.ws.security.message.token.UsernameToken;
 import org.apache.ws.security.processor.Processor;
 import org.apache.ws.security.util.WSSecurityUtil;
@@ -52,6 +53,7 @@ public class WSSecurityEngine {
      */
     private WSSConfig wssConfig = null;
     private boolean doDebug = false;
+    private CallbackLookup callbackLookup = null;
     /**
      * <code>wsse:BinarySecurityToken</code> as defined by WS Security specification
      */
@@ -154,6 +156,22 @@ public class WSSecurityEngine {
         WSSConfig ret = wssConfig;
         wssConfig = cfg;
         return ret;
+    }
+    
+    /**
+     * Set the CallbackLookup object to use to locate elements
+     * @param callbackLookup the CallbackLookup object to use to locate elements
+     */
+    public void setCallbackLookup(CallbackLookup callbackLookup) {
+        this.callbackLookup = callbackLookup;
+    }
+    
+    /**
+     * Get the CallbackLookup object to use to locate elements
+     * @return the CallbackLookup object to use to locate elements
+     */
+    public CallbackLookup getCallbackLookup() {
+        return callbackLookup;
     }
     
     /**
@@ -284,6 +302,7 @@ public class WSSecurityEngine {
         // (no need for encryption --- yet)
         //
         WSDocInfo wsDocInfo = new WSDocInfo(securityHeader.getOwnerDocument());
+        wsDocInfo.setCallbackLookup(callbackLookup);
         wsDocInfo.setCrypto(sigCrypto);
 
         List<WSSecurityEngineResult> returnResults = new ArrayList<WSSecurityEngineResult>();

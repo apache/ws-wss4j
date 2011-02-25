@@ -319,7 +319,9 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
 
         KeyInfo keyInfo = createKeyInfo();
         List<String> encDataRefs = 
-            doEncryption(document, wssConfig, keyInfo, symmetricKey, symEncAlgo, references);
+            doEncryption(
+                document, wssConfig, keyInfo, symmetricKey, symEncAlgo, references, callbackLookup
+            );
         if (dataRef == null) {
             dataRef = 
                 document.createElementNS(
@@ -400,7 +402,8 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
         KeyInfo keyInfo,
         SecretKey secretKey,
         String encryptionAlgorithm,
-        List<WSEncryptionPart> references
+        List<WSEncryptionPart> references,
+        CallbackLookup callbackLookup
     ) throws WSSecurityException {
 
         XMLCipher xmlCipher = null;
@@ -418,7 +421,11 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
             //
             // Get the data to encrypt.
             //
-            List<Element> elementsToEncrypt = WSSecurityUtil.findElements(encPart, doc);
+            if (callbackLookup == null) {
+                callbackLookup = new DOMCallbackLookup(doc);
+            }
+            List<Element> elementsToEncrypt = 
+                WSSecurityUtil.findElements(encPart, callbackLookup, doc);
             if (elementsToEncrypt == null || elementsToEncrypt.size() == 0) {
                 throw new WSSecurityException(
                     WSSecurityException.FAILURE,

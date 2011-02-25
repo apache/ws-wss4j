@@ -31,6 +31,7 @@ import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.handler.WSHandlerConstants;
+import org.apache.ws.security.message.CallbackLookup;
 import org.apache.xml.security.algorithms.JCEMapper;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
@@ -238,13 +239,14 @@ public class WSSecurityUtil {
      * WSEncryptionPart argument. The "Id" is used before the Element localname/namespace.
      * 
      * @param part The WSEncryptionPart object corresponding to the DOM Element(s) we want
+     * @param callbackLookup The CallbackLookup object used to find Elements
      * @param doc The owning document
      * @param checkMultipleElements Whether to check for multiple elements or not
      * @return the DOM Element in the SOAP Envelope that is found
      */
     public static List<Element> findElements(
-        WSEncryptionPart part, Document doc
-    ) {
+        WSEncryptionPart part, CallbackLookup callbackLookup, Document doc
+    ) throws WSSecurityException {
         // See if the DOM Element is stored in the WSEncryptionPart first
         if (part.getElement() != null) {
             return Collections.singletonList(part.getElement());
@@ -252,31 +254,12 @@ public class WSSecurityUtil {
         
         // Next try to find the SOAP body
         String id = part.getId();
-        String elemName = part.getName();
-        String nmSpace = part.getNamespace();
-        Element bodyElement = WSSecurityUtil.findBodyElement(doc);
-        if (bodyElement != null) {
-            if (id != null) {
-                String cId = bodyElement.getAttributeNS(WSConstants.WSU_NS, "Id");
-                if (cId.equals(id)) {
-                    return Collections.singletonList(bodyElement);
-                }
-            } else {
-                if (WSConstants.ELEM_BODY.equals(elemName) &&
-                    bodyElement.getNamespaceURI().equals(nmSpace)) {
-                    return Collections.singletonList(bodyElement);
-                }
-            }
-        }
-        
         if (id != null) {
-            Element element =
-                WSSecurityUtil.findElementById(doc.getDocumentElement(), id, false);
-            return Collections.singletonList(element);
-        } else {
-            return
-                WSSecurityUtil.findElements(doc.getDocumentElement(), elemName, nmSpace);
+            Element foundElement = callbackLookup.getElement(id, false);
+            return Collections.singletonList(foundElement);
         }
+        // Otherwise just lookup all elements with the localname/namespace
+        return callbackLookup.getElements(part.getName(), part.getNamespace());
     }
     
     /**
