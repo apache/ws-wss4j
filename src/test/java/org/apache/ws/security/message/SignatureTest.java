@@ -490,6 +490,49 @@ public class SignatureTest extends org.junit.Assert {
         
         verify(signedDoc);
     }
+    
+    /**
+     * Test that signs and verifies a Timestamp. The Signature element is appended to the security
+     * header, and so appears after the Timestamp element.
+     */
+    @org.junit.Test
+    public void testSignedTimestamp() throws Exception {
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        
+        WSSecTimestamp timestamp = new WSSecTimestamp();
+        timestamp.setTimeToLive(300);
+        Document createdDoc = timestamp.build(doc, secHeader);
+        
+        List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
+        WSEncryptionPart encP =
+            new WSEncryptionPart(
+                "Timestamp",
+                WSConstants.WSU_NS,
+                "");
+        parts.add(encP);
+        
+        WSSecSignature builder = new WSSecSignature();
+        builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+        builder.setParts(parts);
+        
+        builder.prepare(createdDoc, crypto, secHeader);
+        
+        List<javax.xml.crypto.dsig.Reference> referenceList = 
+            builder.addReferencesToSign(parts, secHeader);
+
+        builder.computeSignature(referenceList, false, null);
+        
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("After Signing....");
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+            LOG.debug(outputString);
+        }
+        
+        verify(doc);
+    }
 
     /**
      * Verifies the soap envelope.
