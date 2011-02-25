@@ -136,7 +136,7 @@ public class EncryptedKeySTRParser implements STRParser {
             }
             if (certs == null) {
                 Element bstElement = 
-                    secRef.getTokenElement(strElement.getOwnerDocument(), null, cb);
+                    secRef.getTokenElement(strElement.getOwnerDocument(), wsDocInfo, cb);
     
                 // at this point ... check token type: Binary
                 QName el = new QName(bstElement.getNamespaceURI(), bstElement.getLocalName());
