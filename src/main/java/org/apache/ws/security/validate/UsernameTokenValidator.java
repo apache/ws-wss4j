@@ -59,7 +59,7 @@ public class UsernameTokenValidator implements Validator {
      * @param credential the Credential to be validated
      * @throws WSSecurityException on a failed validation
      */
-    public void validate(Credential credential) throws WSSecurityException {
+    public Credential validate(Credential credential) throws WSSecurityException {
         if (credential == null || credential.getUsernametoken() == null) {
             throw new WSSecurityException(WSSecurityException.FAILURE, "noCredential");
         }
@@ -112,6 +112,7 @@ public class UsernameTokenValidator implements Validator {
         } else {
             verifyUnknownPassword(usernameToken);
         }
+        return credential;
     }
     
     /**

@@ -29,9 +29,9 @@ import org.apache.ws.security.message.token.UsernameToken;
 import org.apache.ws.security.saml.ext.AssertionWrapper;
 
 /**
- * This class stores various Credential types that have to be validated by a Validator
- * implementation. It also stores an optional Principal object which can provide context
- * information to the validators.
+ * This class stores various Credential types that can be validated and/or returned by a
+ * Validator implementation. It also stores an optional Principal object which can provide 
+ * context information to the validators.
  */
 public class Credential {
     

@@ -53,7 +53,7 @@ public class SignatureTrustValidator implements Validator {
      * @param credential the Credential to be validated
      * @throws WSSecurityException on a failed validation
      */
-    public void validate(Credential credential) throws WSSecurityException {
+    public Credential validate(Credential credential) throws WSSecurityException {
         if (credential == null) {
             throw new WSSecurityException(WSSecurityException.FAILURE, "noCredential");
         }
@@ -72,13 +72,13 @@ public class SignatureTrustValidator implements Validator {
                 trust = verifyTrustInCerts(certs);
             }
             if (trust) {
-                return;
+                return credential;
             }
         }
         if (publicKey != null) {
             boolean trust = validatePublicKey(publicKey);
             if (trust) {
-                return;
+                return credential;
             }
         }
         throw new WSSecurityException(WSSecurityException.FAILED_AUTHENTICATION);

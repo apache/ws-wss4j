@@ -262,7 +262,7 @@ public class BSTKerberosTest extends org.junit.Assert {
      */
     private static class KerberosValidator implements Validator {
 
-        public void validate(Credential credential) throws WSSecurityException {
+        public Credential validate(Credential credential) throws WSSecurityException {
             BinarySecurity token = credential.getBinarySecurityToken();
             if (token == null) {
                 throw new WSSecurityException(WSSecurityException.FAILURE);
@@ -276,6 +276,7 @@ public class BSTKerberosTest extends org.junit.Assert {
             if (!Arrays.equals(tokenBytes, "12345678".getBytes())) {
                 throw new WSSecurityException(WSSecurityException.FAILED_AUTHENTICATION);
             }
+            return credential;
         }
         
         public void setCrypto(Crypto crypto) {

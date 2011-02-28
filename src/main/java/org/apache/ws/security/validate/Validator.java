@@ -32,11 +32,15 @@ import org.apache.ws.security.components.crypto.Crypto;
 public interface Validator {
     
     /**
-     * Validate the credential argument. 
+     * Validate the credential argument. This method returns a Credential instance that
+     * represents the validated credential. This instance can be the same as the instance
+     * that was validated, or it can represent some transformation of the initial Credential
+     * instance.
      * @param credential the Credential to be validated
+     * @return a validated Credential
      * @throws WSSecurityException on a failed validation
      */
-    public void validate(Credential credential) throws WSSecurityException;
+    public Credential validate(Credential credential) throws WSSecurityException;
     
     /**
      * Set a Crypto instance used to validate credentials

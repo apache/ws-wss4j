@@ -42,7 +42,7 @@ public class SamlAssertionValidator extends SignatureTrustValidator {
      * @param credential the Credential to be validated
      * @throws WSSecurityException on a failed validation
      */
-    public void validate(Credential credential) throws WSSecurityException {
+    public Credential validate(Credential credential) throws WSSecurityException {
         if (credential == null || credential.getAssertion() == null) {
             throw new WSSecurityException(WSSecurityException.FAILURE, "noCredential");
         }
@@ -72,6 +72,7 @@ public class SamlAssertionValidator extends SignatureTrustValidator {
             trustCredential.setCertificates(samlKeyInfo.getCerts());
             super.validate(trustCredential);
         }
+        return credential;
     }
     
 }

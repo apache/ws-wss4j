@@ -40,7 +40,7 @@ public class TimestampValidator implements Validator {
      * @param credential the Credential to be validated
      * @throws WSSecurityException on a failed validation
      */
-    public void validate(Credential credential) throws WSSecurityException {
+    public Credential validate(Credential credential) throws WSSecurityException {
         if (credential == null || credential.getTimestamp() == null) {
             throw new WSSecurityException(WSSecurityException.FAILURE, "noCredential");
         }
@@ -65,6 +65,7 @@ public class TimestampValidator implements Validator {
                 new Object[] {"The security semantics of the message have expired"}
             );
         }
+        return credential;
     }
     
     /**
