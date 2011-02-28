@@ -64,7 +64,7 @@ public class BinarySecurityTokenProcessor implements Processor {
         WSSConfig config
     ) throws WSSecurityException {
         
-        BinarySecurity token = createSecurityToken(elem);
+        BinarySecurity token = createSecurityToken(elem, config);
         X509Certificate[] certs = null;
         if (crypto == null) {
             certs = getCertificatesTokenReference(token, decCrypto);
@@ -110,18 +110,22 @@ public class BinarySecurityTokenProcessor implements Processor {
      *
      * @param element The XML element that contains either a <code>BinarySecurityToken
      *                </code> or a <code>PKIPath</code> element.
+     * @param config A WSSConfig instance
      * @return a BinarySecurity token element
      * @throws WSSecurityException
      */
-    private BinarySecurity createSecurityToken(Element element) throws WSSecurityException {
+    private BinarySecurity createSecurityToken(
+        Element element,
+        WSSConfig config
+    ) throws WSSecurityException {
         String type = element.getAttribute("ValueType");
         BinarySecurity token = null;
         if (X509Security.X509_V3_TYPE.equals(type)) {
-            token = new X509Security(element);
+            token = new X509Security(element, config.isWsiBSPCompliant());
         } else if (PKIPathSecurity.getType().equals(type)) {
-            token = new PKIPathSecurity(element);
+            token = new PKIPathSecurity(element, config.isWsiBSPCompliant());
         } else {
-            token = new BinarySecurity(element);
+            token = new BinarySecurity(element, config.isWsiBSPCompliant());
         }
         return token;
     }

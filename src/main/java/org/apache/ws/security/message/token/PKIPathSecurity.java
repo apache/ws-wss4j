@@ -33,20 +33,32 @@ import java.security.cert.X509Certificate;
  * @author Davanum Srinivas (dims@yahoo.com).
  */
 public class PKIPathSecurity extends BinarySecurity {
-    private static final String type = WSConstants.X509TOKEN_NS + "#X509PKIPathv1";
+    private static final String PKI_TYPE = WSConstants.X509TOKEN_NS + "#X509PKIPathv1";
 
     /**
      * Constructor.
      *
+     * @param elem The PKIPath element to process
      * @throws WSSecurityException
      */
     public PKIPathSecurity(Element elem) throws WSSecurityException {
-        super(elem);
-        if (!getValueType().equals(type)) {
+        this(elem, true);
+    }
+    
+    /**
+     * Constructor.
+     * 
+     * @param elem The PKIPath element to process
+     * @param bspCompliant Whether the token is processed according to the BSP spec
+     * @throws WSSecurityException
+     */
+    public PKIPathSecurity(Element elem, boolean bspCompliant) throws WSSecurityException {
+        super(elem, bspCompliant);
+        if (bspCompliant && !PKI_TYPE.equals(getValueType())) {
             throw new WSSecurityException(
                 WSSecurityException.INVALID_SECURITY_TOKEN,
                 "invalidValueType",
-                new Object[]{type, getValueType()}
+                new Object[]{PKI_TYPE, getValueType()}
             );
         }
     }
@@ -56,7 +68,7 @@ public class PKIPathSecurity extends BinarySecurity {
      */
     public PKIPathSecurity(Document doc) {
         super(doc);
-        setValueType(type);
+        setValueType(PKI_TYPE);
     }
 
     /**
@@ -94,6 +106,6 @@ public class PKIPathSecurity extends BinarySecurity {
     }
 
     public static String getType() {
-        return type;
+        return PKI_TYPE;
     }
 }

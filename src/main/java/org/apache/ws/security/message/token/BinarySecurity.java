@@ -49,42 +49,45 @@ public class BinarySecurity {
     /**
      * Constructor.
      * 
-     * @param elem 
+     * @param elem The BinarySecurityToken element to process
      * @throws WSSecurityException 
      */
     public BinarySecurity(Element elem) throws WSSecurityException {
+        this(elem, true);
+    }
+
+    /**
+     * Constructor.
+     * @param elem The BinarySecurityToken element to process
+     * @param bspCompliant whether the processing conforms to the BSP spec
+     * @throws WSSecurityException
+     */
+    public BinarySecurity(Element elem, boolean bspCompliant) throws WSSecurityException {
         element = elem;
         QName el = new QName(element.getNamespaceURI(), element.getLocalName());
         if (!(el.equals(TOKEN_BST) || el.equals(TOKEN_KI))) {
             throw new WSSecurityException(
                 WSSecurityException.INVALID_SECURITY_TOKEN, 
-                "badTokenType",
+                "unhandledToken",
                 new Object[] {el}
             );
         }
         String encoding = getEncodingType();
-        //
-        // if the Element is a BinarySecurityToken then
-        //     encoding may be null -> default is Base64
-        //     if encoding is not null and not empty it must be Base64
-        // else
-        //     this is a keyidentifier element
-        //     must contain an encoding attribute which must be Base64
-        //     in this case
-        //
-        if (el.equals(TOKEN_BST)) {
-            if (encoding != null && encoding.length() > 0 && !encoding.equals(BASE64_ENCODING)) {
-                throw new WSSecurityException(
-                    WSSecurityException.INVALID_SECURITY_TOKEN,
-                    "badEncoding", 
-                    new Object[] {encoding}
-                );
-            }
-        } else if (el.equals(TOKEN_KI) && !BASE64_ENCODING.equals(encoding)) {
+        if (bspCompliant && !BASE64_ENCODING.equals(encoding)) {
+            // The EncodingType attribute must be specified, and must be equal to Base64Binary
             throw new WSSecurityException(
                 WSSecurityException.INVALID_SECURITY_TOKEN,
                 "badEncoding", 
                 new Object[] {encoding}
+            );
+        }
+        
+        String valueType = getValueType();
+        if (bspCompliant && (valueType == null || "".equals(valueType))) {
+            throw new WSSecurityException(
+                WSSecurityException.INVALID_SECURITY_TOKEN,
+                "invalidValueType",
+                new Object[]{valueType}
             );
         }
     }

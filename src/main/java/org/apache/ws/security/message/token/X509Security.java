@@ -53,9 +53,21 @@ public class X509Security extends BinarySecurity {
      * @throws WSSecurityException
      */
     public X509Security(Element elem) throws WSSecurityException {
-        super(elem);
+        this(elem, true);
+    }
+    
+    /**
+     * This constructor creates a new X509 certificate object and initializes
+     * it from the data contained in the element.
+     *
+     * @param elem the element containing the X509 certificate data
+     * @param bspCompliant Whether the token is processed according to the BSP spec
+     * @throws WSSecurityException
+     */
+    public X509Security(Element elem, boolean bspCompliant) throws WSSecurityException {
+        super(elem, bspCompliant);
         String valueType = getValueType();
-        if (!valueType.equals(X509_V3_TYPE)) {
+        if (bspCompliant && !X509_V3_TYPE.equals(valueType)) {
             throw new WSSecurityException(
                 WSSecurityException.INVALID_SECURITY_TOKEN, 
                 "invalidValueType", 
