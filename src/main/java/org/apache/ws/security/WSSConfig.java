@@ -199,7 +199,7 @@ public class WSSConfig {
         DEFAULT_VALIDATORS = java.util.Collections.unmodifiableMap(tmp);
     }
 
-    protected boolean wsiBSPCompliant = false;
+    protected boolean wsiBSPCompliant = true;
 
     /**
      * Set the timestamp precision mode. If set to <code>true</code> then use

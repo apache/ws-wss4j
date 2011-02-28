@@ -23,6 +23,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.PublicKeyPrincipal;
 import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.common.SOAPUtil;
@@ -40,7 +41,6 @@ import java.util.List;
  */
 public class SignatureKeyValueTest extends org.junit.Assert {
     private static final Log LOG = LogFactory.getLog(SignatureKeyValueTest.class);
-    private WSSecurityEngine secEngine = new WSSecurityEngine();
     private Crypto crypto = CryptoFactory.getInstance("wss40.properties");
 
     /**
@@ -63,7 +63,13 @@ public class SignatureKeyValueTest extends org.junit.Assert {
         }
         assertTrue(outputString.indexOf("RSAKeyValue") != -1);
         
-        final List<WSSecurityEngineResult> results = verify(signedDoc);
+        WSSecurityEngine secEngine = new WSSecurityEngine();
+        WSSConfig config = WSSConfig.getNewInstance();
+        config.setWsiBSPCompliant(false);
+        secEngine.setWssConfig(config);
+        final List<WSSecurityEngineResult> results = 
+            secEngine.processSecurityHeader(signedDoc, null, null, crypto);
+
         WSSecurityEngineResult actionResult = 
             WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
         assertTrue(actionResult != null);
@@ -101,7 +107,11 @@ public class SignatureKeyValueTest extends org.junit.Assert {
         assertTrue(outputString.indexOf("RSAKeyValue") != -1);
         
         try {
-            verify(signedDoc);
+            WSSecurityEngine secEngine = new WSSecurityEngine();
+            WSSConfig config = WSSConfig.getNewInstance();
+            config.setWsiBSPCompliant(false);
+            secEngine.setWssConfig(config);
+            secEngine.processSecurityHeader(signedDoc, null, null, crypto);
             fail("Failure expected on bad public key");
         } catch (Exception ex) {
             // expected
@@ -130,7 +140,13 @@ public class SignatureKeyValueTest extends org.junit.Assert {
         }
         assertTrue(outputString.indexOf("DSAKeyValue") != -1);
         
-        final List<WSSecurityEngineResult> results = verify(signedDoc);
+        WSSecurityEngine secEngine = new WSSecurityEngine();
+        WSSConfig config = WSSConfig.getNewInstance();
+        config.setWsiBSPCompliant(false);
+        secEngine.setWssConfig(config);
+        final List<WSSecurityEngineResult> results = 
+            secEngine.processSecurityHeader(signedDoc, null, null, crypto);
+        
         WSSecurityEngineResult actionResult = 
             WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
         assertTrue(actionResult != null);
@@ -141,18 +157,6 @@ public class SignatureKeyValueTest extends org.junit.Assert {
         java.security.PublicKey publicKey = 
             ((PublicKeyPrincipal)principal).getPublicKey();
         assertTrue(publicKey instanceof java.security.interfaces.DSAPublicKey);
-    }
-
-
-    /**
-     * Verifies the soap envelope
-     * <p/>
-     * 
-     * @param env soap envelope
-     * @throws java.lang.Exception Thrown when there is a problem in verification
-     */
-    private List<WSSecurityEngineResult> verify(Document doc) throws Exception {
-        return secEngine.processSecurityHeader(doc, null, null, crypto);
     }
     
 }

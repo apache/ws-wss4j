@@ -314,7 +314,7 @@ public class TimestampTest extends org.junit.Assert {
         
         // Turn off BSP compliance and the test should pass
         wssConfig.setWsiBSPCompliant(false);
-        verify(createdDoc, WSSConfig.getNewInstance());
+        verify(createdDoc, wssConfig);
     }
     
     /**

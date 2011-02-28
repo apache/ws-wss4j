@@ -24,6 +24,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDataRef;
 import org.apache.ws.security.WSEncryptionPart;
+import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.common.KeystoreCallbackHandler;
@@ -349,7 +350,11 @@ public class SignatureEncryptionTest extends org.junit.Assert {
         
         SecretKeyCallbackHandler secretKeyCallbackHandler = new SecretKeyCallbackHandler();
         secretKeyCallbackHandler.setOutboundSecret(key);
-        secEngine.processSecurityHeader(doc, null, secretKeyCallbackHandler, crypto);
+        WSSecurityEngine engine = new WSSecurityEngine();
+        WSSConfig config = WSSConfig.getNewInstance();
+        config.setWsiBSPCompliant(false);
+        engine.setWssConfig(config);
+        engine.processSecurityHeader(doc, null, secretKeyCallbackHandler, crypto);
         if (LOG.isDebugEnabled()) {
             String outputString = 
                 org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);

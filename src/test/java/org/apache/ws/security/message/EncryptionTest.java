@@ -529,11 +529,14 @@ public class EncryptionTest extends org.junit.Assert {
             LOG.debug(outputString);
         }
         
+        // Turn off BSP compliance
         WSSecurityEngine newEngine = new WSSecurityEngine();
+        WSSConfig wssConfig = WSSConfig.getNewInstance();
+        wssConfig.setWsiBSPCompliant(false);
+        newEngine.setWssConfig(wssConfig);
         newEngine.processSecurityHeader(encryptedDoc, null, keystoreCallbackHandler, crypto);
         
         // Now turn on BSP compliance
-        WSSConfig wssConfig = WSSConfig.getNewInstance();
         wssConfig.setWsiBSPCompliant(true);
         newEngine.setWssConfig(wssConfig);
         try {

@@ -274,11 +274,15 @@ public class SignatureConfirmationTest extends org.junit.Assert {
         }
         
         // Verify the results
-        verify(doc);
         
-        // Now turn on BSP spec compliance
+        // Turn off BSP spec compliance
         WSSecurityEngine newEngine = new WSSecurityEngine();
         WSSConfig config = WSSConfig.getNewInstance();
+        config.setWsiBSPCompliant(false);
+        newEngine.setWssConfig(config);
+        newEngine.processSecurityHeader(doc, null, callbackHandler, crypto);
+        
+        // Now turn on BSP spec compliance
         config.setWsiBSPCompliant(true);
         newEngine.setWssConfig(config);
         try {
