@@ -156,7 +156,7 @@ public class WSHandlerConstants {
      * <p/>
      * If the parameter has the value <code>1</code>
      * or <code>true</code> the <code>mustUnderstand</code> is set.
-     * The values <code>0</code> or <code>false</code> supress the
+     * The values <code>0</code> or <code>false</code> suppress the
      * flag.
      * <p/>
      * The application may set this parameter using the following method:
@@ -172,6 +172,23 @@ public class WSHandlerConstants {
      * about the parameter name (<code>"mustUnderstand"</code>).
      */
     public static final String MUST_UNDERSTAND = "mustUnderstand";
+    
+    /**
+     * Sets the <code>isBSPCompliant</code> flag.
+     * <p/>
+     * If the parameter has the value <code>1</code>
+     * or <code>true</code> the <code>isBSPCompliant</code> is set.
+     * The values <code>0</code> or <code>false</code> suppress the
+     * flag.
+     * <p/>
+     * The application may set this parameter using the following method:
+     * <pre>
+     * call.setProperty(WSHandlerConstants.IS_BSP_COMPLIANT, "false");
+     * </pre>
+     * The default setting is <code>true</code>
+     * <p/>
+     */
+    public static final String IS_BSP_COMPLIANT = "isBSPCompliant";
 
     /**
      * The user's name. It is used differently by the WS Security functions.

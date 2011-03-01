@@ -264,6 +264,7 @@ public abstract class WSHandler {
             decodeNamespaceQualifiedPasswordTypes(reqData)
         );
         wssConfig.setSecretKeyLength(reqData.getSecretKeyLength());
+        wssConfig.setWsiBSPCompliant(decodeBSPCompliance(reqData));
         reqData.setWssConfig(wssConfig);
 
         if ((doAction & WSConstants.SIGN) == WSConstants.SIGN) {
@@ -685,6 +686,13 @@ public abstract class WSHandler {
             ttl_i = reqData.getTimeToLive();
         }
         return ttl_i;
+    }
+    
+    protected boolean decodeBSPCompliance(RequestData reqData)
+        throws WSSecurityException {
+        return decodeBooleanConfigValue(
+            reqData, WSHandlerConstants.IS_BSP_COMPLIANT, true
+        );
     }
     
     protected String decodePasswordType(RequestData reqData) throws WSSecurityException {
