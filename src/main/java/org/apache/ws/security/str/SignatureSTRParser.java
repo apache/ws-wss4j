@@ -134,7 +134,7 @@ public class SignatureSTRParser implements STRParser {
                         certs = new X509Certificate[]{foundCerts[0]};
                     }
                     secretKey = samlKi.getSecret();
-                    principal = createPrincipalFromSAMLKeyInfo(samlKi, assertion);
+                    principal = createPrincipalFromSAML(assertion);
                 } else if (el.equals(WSSecurityEngine.ENCRYPTED_KEY)){
                     EncryptedKeyProcessor proc = 
                         new EncryptedKeyProcessor();
@@ -201,7 +201,7 @@ public class SignatureSTRParser implements STRParser {
                     }
                     secretKey = keyInfo.getSecret();
                     publicKey = keyInfo.getPublicKey();
-                    principal = createPrincipalFromSAMLKeyInfo(keyInfo, assertion);
+                    principal = createPrincipalFromSAML(assertion);
                 }
             }
         } else if (secRef.containsX509Data() || secRef.containsX509IssuerSerial()) {
@@ -229,7 +229,7 @@ public class SignatureSTRParser implements STRParser {
                 }
                 secretKey = samlKi.getSecret();
                 publicKey = samlKi.getPublicKey();
-                principal = createPrincipalFromSAMLKeyInfo(samlKi, assertion);
+                principal = createPrincipalFromSAML(assertion);
             } else {
                 X509Certificate[] foundCerts = secRef.getKeyIdentifier(crypto);
                 if (foundCerts != null) {
@@ -333,23 +333,15 @@ public class SignatureSTRParser implements STRParser {
     }
     
     /**
-     * A method to create a Principal from a SAML KeyInfo
-     * @param samlKeyInfo The SAML KeyInfo object
+     * A method to create a Principal from a SAML Assertion
      * @param assertion An AssertionWrapper object
      * @return A principal
      */
-    private static Principal createPrincipalFromSAMLKeyInfo(
-        SAMLKeyInfo samlKeyInfo,
+    private static Principal createPrincipalFromSAML(
         AssertionWrapper assertion
     ) {
-        X509Certificate[] samlCerts = samlKeyInfo.getCerts();
-        Principal principal = null;
-        if (samlCerts != null && samlCerts.length > 0) {
-            principal = samlCerts[0].getSubjectX500Principal();
-        } else {
-            principal = new CustomTokenPrincipal(assertion.getId());
-            ((CustomTokenPrincipal)principal).setTokenObject(assertion);
-        }
+        Principal principal = new CustomTokenPrincipal(assertion.getId());
+        ((CustomTokenPrincipal)principal).setTokenObject(assertion);
         return principal;
     }
     
