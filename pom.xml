@@ -41,7 +41,7 @@
     </issueManagement>
     <mailingLists>
         <mailingList>
-            <name>WSS4J Developer List</name>
+            <name>Apache Web Services Developer List</name>
             <subscribe>dev-subscribe@ws.apache.org</subscribe>
             <unsubscribe>
                 dev-unsubscribe@ws.apache.org
@@ -50,9 +50,17 @@
             <archive>
                 http://mail-archives.apache.org/mod_mbox/ws-dev/
             </archive>
-            <otherArchives>
-                <otherArchive>http://www.nabble.com/WSS4J-f2398.html</otherArchive>
-            </otherArchives>
+        </mailingList>
+        <mailingList>
+            <name>Apache Web Services Users List</name>
+            <subscribe>users-subscribe@ws.apache.org</subscribe>
+            <unsubscribe>
+                users-unsubscribe@ws.apache.org
+            </unsubscribe>
+            <post>users@ws.apache.org</post>
+            <archive>
+                http://mail-archives.apache.org/mod_mbox/ws-users/
+            </archive>
         </mailingList>
     </mailingLists>
     <inceptionYear>2004</inceptionYear>
@@ -505,7 +513,6 @@
                             <report>issue-tracking</report>
                             <report>license</report>
                             <report>mailing-list</report>
-                            <report>project-team</report>
                             <report>scm</report>
                         </reports>
                     </reportSet>
