@@ -242,6 +242,8 @@ public class WSConstants {
     public static final String WSS_ENC_KEY_VALUE_TYPE = SOAPMESSAGE_NS11 + "#" + ENC_KEY_VALUE_TYPE;
     public static final String PASSWORD_DIGEST = USERNAMETOKEN_NS + "#PasswordDigest";
     public static final String PASSWORD_TEXT = USERNAMETOKEN_NS + "#PasswordText";
+    public static final String WSS_USERNAME_TOKEN_VALUE_TYPE = 
+        USERNAMETOKEN_NS + "#" + USERNAME_TOKEN_LN;
 
     public static final String[] URIS_SOAP_ENV = {
         URI_SOAP11_ENV,

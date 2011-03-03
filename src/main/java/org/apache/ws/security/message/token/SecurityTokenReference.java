@@ -424,8 +424,13 @@ public class SecurityTokenReference {
     }
     
     public void setKeyIdentifier(String valueType, String keyIdVal) throws WSSecurityException {
+        setKeyIdentifier(valueType, keyIdVal, false);
+    }
+    
+    public void setKeyIdentifier(String valueType, String keyIdVal, boolean base64) 
+        throws WSSecurityException {
         Document doc = element.getOwnerDocument();
-        createKeyIdentifier(doc, valueType, doc.createTextNode(keyIdVal), false);
+        createKeyIdentifier(doc, valueType, doc.createTextNode(keyIdVal), base64);
     }
 
     private void createKeyIdentifier(Document doc, String uri, Node node, boolean base64) {

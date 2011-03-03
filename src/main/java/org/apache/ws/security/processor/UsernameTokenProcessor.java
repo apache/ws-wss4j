@@ -95,15 +95,18 @@ public class UsernameTokenProcessor implements Processor {
         WSSConfig wssConfig
     ) throws WSSecurityException {
         boolean allowNamespaceQualifiedPasswordTypes = false;
+        boolean bspCompliant = true;
         if (wssConfig != null) {
             allowNamespaceQualifiedPasswordTypes = 
                 wssConfig.getAllowNamespaceQualifiedPasswordTypes();
+            bspCompliant = wssConfig.isWsiBSPCompliant();
         }
         
         //
         // Parse and validate the UsernameToken element
         //
-        UsernameToken ut = new UsernameToken(token, allowNamespaceQualifiedPasswordTypes);
+        UsernameToken ut = 
+            new UsernameToken(token, allowNamespaceQualifiedPasswordTypes, bspCompliant);
         Credential credential = new Credential();
         credential.setUsernametoken(ut);
         validator.validate(credential);

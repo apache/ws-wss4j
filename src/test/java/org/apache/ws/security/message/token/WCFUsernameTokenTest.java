@@ -59,6 +59,12 @@ public class WCFUsernameTokenTest extends org.junit.Assert {
     
     private WSSecurityEngine secEngine = new WSSecurityEngine();
     private CallbackHandler callbackHandler = new UsernamePasswordCallbackHandler();
+    
+    public WCFUsernameTokenTest() {
+        WSSConfig config = WSSConfig.getNewInstance();
+        config.setWsiBSPCompliant(false);
+        secEngine.setWssConfig(config);
+    }
 
     /**
      * Test that adds a UserNameToken with a namespace qualified type. This should fail

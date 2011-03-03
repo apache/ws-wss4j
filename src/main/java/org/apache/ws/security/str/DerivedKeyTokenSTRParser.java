@@ -100,6 +100,9 @@ public class DerivedKeyTokenSTRParser implements STRParser {
         if (result != null) {
             int action = ((Integer)result.get(WSSecurityEngineResult.TAG_ACTION)).intValue();
             if (WSConstants.UT_NOPASSWORD == action || WSConstants.UT == action) {
+                if (bspCompliant) {
+                    checkUTBSPCompliance(secRef);
+                }
                 UsernameToken usernameToken = 
                     (UsernameToken)result.get(WSSecurityEngineResult.TAG_USERNAME_TOKEN);
                 usernameToken.setRawPassword(cb);
@@ -175,6 +178,30 @@ public class DerivedKeyTokenSTRParser implements STRParser {
         return secretKey;
     }
 
+    /**
+     * Check the BSP compliance for a reference to a UsernameToken
+     * @param secRef the SecurityTokenReference element
+     * @throws WSSecurityException
+     */
+    private void checkUTBSPCompliance(SecurityTokenReference secRef) throws WSSecurityException {
+        if (!secRef.containsReference()) {
+            // BSP does not permit using a KeyIdentifier to refer to a U/T
+            throw new WSSecurityException(
+                WSSecurityException.FAILED_CHECK, "unsupportedKeyId"
+            );
+        }
+        String valueType = secRef.getReference().getValueType();
+        
+        if (!WSConstants.WSS_USERNAME_TOKEN_VALUE_TYPE.equals(valueType)) {
+            // BSP says the Reference must have a ValueType of UsernameToken
+            throw new WSSecurityException(
+                WSSecurityException.INVALID_SECURITY,
+                "invalidValueType", 
+                new Object[]{valueType}
+            );
+        }
+    }
+    
     /**
      * Get the Secret Key from a CallbackHandler
      * @param id The id of the element

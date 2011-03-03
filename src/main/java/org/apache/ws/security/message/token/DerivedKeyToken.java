@@ -111,9 +111,7 @@ public class DerivedKeyToken {
         if (!(el.equals(ConversationConstants.DERIVED_KEY_TOKEN_QNAME_05_02) ||
             el.equals(ConversationConstants.DERIVED_KEY_TOKEN_QNAME_05_12))) {
             throw new WSSecurityException(
-                WSSecurityException.INVALID_SECURITY_TOKEN,
-                "badTokenType00", 
-                new Object[]{el}
+                WSSecurityException.INVALID_SECURITY_TOKEN
             );
         }
         elementSecurityTokenReference = 

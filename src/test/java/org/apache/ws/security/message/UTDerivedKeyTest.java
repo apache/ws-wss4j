@@ -22,6 +22,7 @@ package org.apache.ws.security.message;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.WSSecurityEngine;
@@ -30,6 +31,7 @@ import org.apache.ws.security.common.SOAPUtil;
 import org.apache.ws.security.common.UsernamePasswordCallbackHandler;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
+import org.apache.ws.security.message.token.SecurityTokenReference;
 import org.apache.ws.security.message.token.UsernameToken;
 import org.apache.ws.security.util.Base64;
 import org.apache.ws.security.util.WSSecurityUtil;
@@ -136,6 +138,7 @@ public class UTDerivedKeyTest extends org.junit.Assert {
         WSSecDKEncrypt encrBuilder = new WSSecDKEncrypt();
         encrBuilder.setSymmetricEncAlgorithm(WSConstants.AES_128);
         encrBuilder.setExternalKey(derivedKey, tokenIdentifier);
+        encrBuilder.setCustomValueType(WSConstants.WSS_USERNAME_TOKEN_VALUE_TYPE);
         Document encryptedDoc = encrBuilder.build(doc, secHeader);
         
         builder.prependToHeader(secHeader);
@@ -179,6 +182,7 @@ public class UTDerivedKeyTest extends org.junit.Assert {
         WSSecDKEncrypt encrBuilder = new WSSecDKEncrypt();
         encrBuilder.setSymmetricEncAlgorithm(WSConstants.AES_128);
         encrBuilder.setExternalKey(derivedKey, tokenIdentifier);
+        encrBuilder.setCustomValueType(WSConstants.WSS_USERNAME_TOKEN_VALUE_TYPE);
         Document encryptedDoc = encrBuilder.build(doc, secHeader);
         
         builder.prependToHeader(secHeader);
@@ -232,6 +236,7 @@ public class UTDerivedKeyTest extends org.junit.Assert {
         WSSecDKEncrypt encrBuilder = new WSSecDKEncrypt();
         encrBuilder.setSymmetricEncAlgorithm(WSConstants.AES_128);
         encrBuilder.setExternalKey(derivedKey, tokenIdentifier);
+        encrBuilder.setCustomValueType(WSConstants.WSS_USERNAME_TOKEN_VALUE_TYPE);
         Document encryptedDoc = encrBuilder.build(doc, secHeader);
         
         builder.prependToHeader(secHeader);
@@ -282,6 +287,7 @@ public class UTDerivedKeyTest extends org.junit.Assert {
         WSSecDKEncrypt encrBuilder = new WSSecDKEncrypt();
         encrBuilder.setSymmetricEncAlgorithm(WSConstants.AES_128);
         encrBuilder.setExternalKey(derivedKey, tokenIdentifier);
+        encrBuilder.setCustomValueType(WSConstants.WSS_USERNAME_TOKEN_VALUE_TYPE);
         Document encryptedDoc = encrBuilder.build(doc, secHeader);
         
         builder.prependToHeader(secHeader);
@@ -331,6 +337,7 @@ public class UTDerivedKeyTest extends org.junit.Assert {
         WSSecDKSign sigBuilder = new WSSecDKSign();
         sigBuilder.setExternalKey(derivedKey, tokenIdentifier);
         sigBuilder.setSignatureAlgorithm(WSConstants.HMAC_SHA1);
+        sigBuilder.setCustomValueType(WSConstants.WSS_USERNAME_TOKEN_VALUE_TYPE);
         Document signedDoc = sigBuilder.build(doc, secHeader);
         
         builder.prependToHeader(secHeader);
@@ -380,6 +387,7 @@ public class UTDerivedKeyTest extends org.junit.Assert {
         WSSecDKSign sigBuilder = new WSSecDKSign();
         sigBuilder.setExternalKey(derivedKey, tokenIdentifier);
         sigBuilder.setSignatureAlgorithm(WSConstants.HMAC_SHA1);
+        sigBuilder.setCustomValueType(WSConstants.WSS_USERNAME_TOKEN_VALUE_TYPE);
         Document signedDoc = sigBuilder.build(doc, secHeader);
         
         builder.prependToHeader(secHeader);
@@ -435,6 +443,7 @@ public class UTDerivedKeyTest extends org.junit.Assert {
         WSSecDKSign sigBuilder = new WSSecDKSign();
         sigBuilder.setExternalKey(derivedKey, tokenIdentifier);
         sigBuilder.setSignatureAlgorithm(WSConstants.HMAC_SHA1);
+        sigBuilder.setCustomValueType(WSConstants.WSS_USERNAME_TOKEN_VALUE_TYPE);
         Document signedDoc = sigBuilder.build(doc, secHeader);
         
         builder.prependToHeader(secHeader);
@@ -480,6 +489,7 @@ public class UTDerivedKeyTest extends org.junit.Assert {
         WSSecDKSign sigBuilder = new WSSecDKSign();
         sigBuilder.setExternalKey(derivedKey, tokenIdentifier);
         sigBuilder.setSignatureAlgorithm(WSConstants.HMAC_SHA1);
+        sigBuilder.setCustomValueType(WSConstants.WSS_USERNAME_TOKEN_VALUE_TYPE);
         Document signedDoc = sigBuilder.build(doc, secHeader);
         
         builder.prependToHeader(secHeader);
@@ -498,6 +508,285 @@ public class UTDerivedKeyTest extends org.junit.Assert {
             // expected
         }
     }
+    
+    /**
+     * Unit test for creating a Username Token with no salt element that is used for
+     * deriving a key for encryption.
+     */
+    @org.junit.Test
+    public void testNoSaltEncryption() throws Exception {
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        
+        UsernameToken usernameToken = new UsernameToken(true, doc, null);
+        usernameToken.setName("bob");
+        WSSConfig config = WSSConfig.getNewInstance();
+        usernameToken.setID(config.getIdAllocator().createId("UsernameToken-", usernameToken));
+        
+        byte[] salt = UsernameToken.generateSalt(false);
+        usernameToken.addIteration(doc, 1000);
+        
+        byte[] derivedKey = UsernameToken.generateDerivedKey("security", salt, 1000);
+        
+        //
+        // Derived key encryption
+        //
+        WSSecDKEncrypt encrBuilder = new WSSecDKEncrypt();
+        encrBuilder.setSymmetricEncAlgorithm(WSConstants.AES_128);
+        encrBuilder.setExternalKey(derivedKey, usernameToken.getID());
+        encrBuilder.setCustomValueType(WSConstants.WSS_USERNAME_TOKEN_VALUE_TYPE);
+        Document encryptedDoc = encrBuilder.build(doc, secHeader);
+        
+        WSSecurityUtil.prependChildElement(
+            secHeader.getSecurityHeader(), usernameToken.getElement()
+        );
+        
+        String outputString = 
+            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+        assertTrue(outputString.indexOf("wsse:Username") != -1);
+        assertTrue(outputString.indexOf("wsse:Password") == -1);
+        assertTrue(outputString.indexOf("wsse11:Salt") == -1);
+        assertTrue(outputString.indexOf("wsse11:Iteration") != -1);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(outputString);
+        }
+        
+        try {
+            verify(encryptedDoc);
+            fail("Failure expected on no salt element");
+        } catch (WSSecurityException ex) {
+            // expected
+        }
+    }
+    
+    /**
+     * Unit test for creating a Username Token with no iteration element that is used for
+     * deriving a key for encryption.
+     */
+    @org.junit.Test
+    public void testNoIterationEncryption() throws Exception {
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        
+        UsernameToken usernameToken = new UsernameToken(true, doc, null);
+        usernameToken.setName("bob");
+        WSSConfig config = WSSConfig.getNewInstance();
+        usernameToken.setID(config.getIdAllocator().createId("UsernameToken-", usernameToken));
+        
+        byte[] salt = usernameToken.addSalt(doc, null, false);
+        byte[] derivedKey = UsernameToken.generateDerivedKey("security", salt, 1000);
+        
+        //
+        // Derived key encryption
+        //
+        WSSecDKEncrypt encrBuilder = new WSSecDKEncrypt();
+        encrBuilder.setSymmetricEncAlgorithm(WSConstants.AES_128);
+        encrBuilder.setExternalKey(derivedKey, usernameToken.getID());
+        encrBuilder.setCustomValueType(WSConstants.WSS_USERNAME_TOKEN_VALUE_TYPE);
+        Document encryptedDoc = encrBuilder.build(doc, secHeader);
+        
+        WSSecurityUtil.prependChildElement(
+            secHeader.getSecurityHeader(), usernameToken.getElement()
+        );
+        
+        String outputString = 
+            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+        assertTrue(outputString.indexOf("wsse:Username") != -1);
+        assertTrue(outputString.indexOf("wsse:Password") == -1);
+        assertTrue(outputString.indexOf("wsse11:Salt") != -1);
+        assertTrue(outputString.indexOf("wsse11:Iteration") == -1);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(outputString);
+        }
+        
+        try {
+            verify(encryptedDoc);
+            fail("Failure expected on no iteration element");
+        } catch (WSSecurityException ex) {
+            // expected
+        }
+    }
+    
+    /**
+     * Unit test for creating a Username Token with an iteration value < 1000 that is used for
+     * deriving a key for encryption.
+     */
+    @org.junit.Test
+    public void testLowIterationEncryption() throws Exception {
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        
+        UsernameToken usernameToken = new UsernameToken(true, doc, null);
+        usernameToken.setName("bob");
+        WSSConfig config = WSSConfig.getNewInstance();
+        usernameToken.setID(config.getIdAllocator().createId("UsernameToken-", usernameToken));
+        
+        usernameToken.addIteration(doc, 500);
+        byte[] salt = usernameToken.addSalt(doc, null, false);
+        byte[] derivedKey = UsernameToken.generateDerivedKey("security", salt, 500);
+        
+        //
+        // Derived key encryption
+        //
+        WSSecDKEncrypt encrBuilder = new WSSecDKEncrypt();
+        encrBuilder.setSymmetricEncAlgorithm(WSConstants.AES_128);
+        encrBuilder.setExternalKey(derivedKey, usernameToken.getID());
+        encrBuilder.setCustomValueType(WSConstants.WSS_USERNAME_TOKEN_VALUE_TYPE);
+        Document encryptedDoc = encrBuilder.build(doc, secHeader);
+        
+        WSSecurityUtil.prependChildElement(
+            secHeader.getSecurityHeader(), usernameToken.getElement()
+        );
+        
+        String outputString = 
+            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+        assertTrue(outputString.indexOf("wsse:Username") != -1);
+        assertTrue(outputString.indexOf("wsse:Password") == -1);
+        assertTrue(outputString.indexOf("wsse11:Salt") != -1);
+        assertTrue(outputString.indexOf("wsse11:Iteration") != -1);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(outputString);
+        }
+        
+        try {
+            verify(encryptedDoc);
+            fail("Failure expected on a low iteration value");
+        } catch (WSSecurityException ex) {
+            // expected
+        }
+        
+        // Turn off BSP compliance and it should work
+        config.setWsiBSPCompliant(false);
+        WSSecurityEngine newEngine = new WSSecurityEngine();
+        newEngine.setWssConfig(config);
+        newEngine.processSecurityHeader(doc, null, callbackHandler, crypto);
+    }
+
+    
+    /**
+     * Test using a UsernameToken derived key for encrypting a SOAP body. The Reference to the
+     * UsernameToken contains a non-standard value type, which is rejected when BSP compliance
+     * is turned on.
+     */
+    @org.junit.Test
+    public void testBadValueType() throws Exception {
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        
+        WSSecUsernameToken builder = new WSSecUsernameToken();
+        builder.setUserInfo("bob", "security");
+        builder.addDerivedKey(false, null, 1000);
+        builder.prepare(doc);
+        
+        byte[] derivedKey = builder.getDerivedKey();
+        assertTrue(derivedKey.length == 20);
+        
+        String tokenIdentifier = builder.getId();
+        
+        //
+        // Derived key encryption
+        //
+        WSSecDKEncrypt encrBuilder = new WSSecDKEncrypt();
+        encrBuilder.setSymmetricEncAlgorithm(WSConstants.AES_128);
+        encrBuilder.setExternalKey(derivedKey, tokenIdentifier);
+        encrBuilder.setCustomValueType(WSConstants.WSS_SAML_TOKEN_TYPE);
+        Document encryptedDoc = encrBuilder.build(doc, secHeader);
+        
+        builder.prependToHeader(secHeader);
+        
+        String outputString = 
+            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(encryptedDoc);
+        assertTrue(outputString.indexOf("wsse:Username") != -1);
+        assertTrue(outputString.indexOf("wsse:Password") == -1);
+        assertTrue(outputString.indexOf("wsse11:Salt") != -1);
+        assertTrue(outputString.indexOf("wsse11:Iteration") != -1);
+        assertTrue(outputString.indexOf("testMethod") == -1);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(outputString);
+        }
+        
+        try {
+            verify(encryptedDoc);
+            fail("Failure expected on a bad value type");
+        } catch (WSSecurityException ex) {
+            // expected
+        }
+        
+        // Turn off BSP compliance and it should work
+        WSSConfig config = WSSConfig.getNewInstance();
+        config.setWsiBSPCompliant(false);
+        WSSecurityEngine newEngine = new WSSecurityEngine();
+        newEngine.setWssConfig(config);
+        newEngine.processSecurityHeader(doc, null, callbackHandler, crypto);
+    }
+
+    
+    /**
+     * Test using a UsernameToken derived key for encrypting a SOAP body. A KeyIdentifier is
+     * used to refer to the UsernameToken, which is forbidden by the BSP.
+     */
+    @org.junit.Test
+    public void testKeyIdentifier() throws Exception {
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        
+        WSSecUsernameToken builder = new WSSecUsernameToken();
+        builder.setUserInfo("bob", "security");
+        builder.addDerivedKey(false, null, 1000);
+        builder.prepare(doc);
+        
+        byte[] derivedKey = builder.getDerivedKey();
+        assertTrue(derivedKey.length == 20);
+        
+        String tokenIdentifier = builder.getId();
+        
+        //
+        // Derived key encryption
+        //
+        WSSecDKEncrypt encrBuilder = new WSSecDKEncrypt();
+        encrBuilder.setSymmetricEncAlgorithm(WSConstants.AES_128);
+        
+        SecurityTokenReference strEncKey = new SecurityTokenReference(doc);
+        strEncKey.setKeyIdentifier(
+            WSConstants.WSS_USERNAME_TOKEN_VALUE_TYPE, tokenIdentifier, true
+        );
+        encrBuilder.setExternalKey(derivedKey, strEncKey.getElement());
+        
+        Document encryptedDoc = encrBuilder.build(doc, secHeader);
+        
+        builder.prependToHeader(secHeader);
+        
+        String outputString = 
+            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(encryptedDoc);
+        assertTrue(outputString.indexOf("wsse:Username") != -1);
+        assertTrue(outputString.indexOf("wsse:Password") == -1);
+        assertTrue(outputString.indexOf("wsse11:Salt") != -1);
+        assertTrue(outputString.indexOf("wsse11:Iteration") != -1);
+        assertTrue(outputString.indexOf("testMethod") == -1);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(outputString);
+        }
+        
+        try {
+            verify(encryptedDoc);
+            fail("Failure expected on a key identifier");
+        } catch (WSSecurityException ex) {
+            // expected
+        }
+        
+        // Turn off BSP compliance and it should work
+        WSSConfig config = WSSConfig.getNewInstance();
+        config.setWsiBSPCompliant(false);
+        WSSecurityEngine newEngine = new WSSecurityEngine();
+        newEngine.setWssConfig(config);
+        newEngine.processSecurityHeader(doc, null, callbackHandler, crypto);
+    }
+
     
     /**
      * Verifies the soap envelope.

@@ -47,6 +47,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.Principal;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.text.DateFormat;
 import java.util.TimeZone;
 
@@ -80,6 +81,7 @@ public class UsernameToken {
     protected boolean hashed = true;
     private String rawPassword;        // enhancement by Alberto Coletti
     private boolean passwordsAreEncoded = false;
+    private boolean bspCompliantDerivedKey = true;
     
     /**
      * Constructs a <code>UsernameToken</code> object and parses the
@@ -90,7 +92,7 @@ public class UsernameToken {
      * @throws WSSecurityException
      */
     public UsernameToken(Element elem) throws WSSecurityException {
-        this (elem, false);
+        this (elem, false, true);
     }
 
     /**
@@ -101,19 +103,20 @@ public class UsernameToken {
      *             the UsernameToken data
      * @param allowNamespaceQualifiedPasswordTypes whether to allow (wsse)
      *        namespace qualified password types or not (for interop with WCF)
+     * @param bspCompliant whether the UsernameToken processing complies with the BSP spec
      * @throws WSSecurityException
      */
     public UsernameToken(
         Element elem, 
-        boolean allowNamespaceQualifiedPasswordTypes
+        boolean allowNamespaceQualifiedPasswordTypes,
+        boolean bspCompliant
     ) throws WSSecurityException {
         element = elem;
         QName el = new QName(element.getNamespaceURI(), element.getLocalName());
         if (!el.equals(TOKEN)) {
             throw new WSSecurityException(
                 WSSecurityException.INVALID_SECURITY_TOKEN,
-                "badTokenType00", 
-                new Object[] {el}
+                "badUsernameToken"
             );
         }
         elementUsername = 
@@ -143,10 +146,14 @@ public class UsernameToken {
         if (elementUsername == null) {
             throw new WSSecurityException(
                 WSSecurityException.INVALID_SECURITY_TOKEN,
-                "badTokenType01", 
-                new Object[] {el}
+                "badUsernameToken"
             );
         }
+        
+        if (bspCompliant) {
+            checkBSPCompliance();
+        }
+        
         hashed = false;
         if (elementSalt != null) {
             //
@@ -157,12 +164,12 @@ public class UsernameToken {
             if (elementPassword != null || elementIteration == null) {
                 throw new WSSecurityException(
                     WSSecurityException.INVALID_SECURITY_TOKEN,
-                    "badTokenType01", 
-                    new Object[] {el}
+                    "badUsernameToken"
                 );
             }
             return;
         }
+        
         if (elementPassword != null) {
             if (elementPassword.hasAttribute(WSConstants.PASSWORD_TYPE_ATTR)) {
                 passwordType = elementPassword.getAttribute(WSConstants.PASSWORD_TYPE_ATTR);
@@ -177,8 +184,7 @@ public class UsernameToken {
                 } else {
                     throw new WSSecurityException(
                         WSSecurityException.INVALID_SECURITY_TOKEN,
-                        "badTokenType01", 
-                        new Object[] {el}
+                        "badUsernameToken"
                     );
                 }
             }
@@ -189,8 +195,7 @@ public class UsernameToken {
             if (elementNonce == null || elementCreated == null) {
                 throw new WSSecurityException(
                     WSSecurityException.INVALID_SECURITY_TOKEN,
-                    "badTokenType01", 
-                    new Object[] {el}
+                    "badUsernameToken"
                 );
             }
         }
@@ -789,7 +794,8 @@ public class UsernameToken {
      * @throws WSSecurityException
      */
     public byte[] getDerivedKey() throws WSSecurityException {
-        if (rawPassword == null) {
+        if (rawPassword == null || !bspCompliantDerivedKey) {
+            LOG.debug("The raw password was null or the Username Token is not BSP compliant");
             throw new WSSecurityException(WSSecurityException.FAILED_AUTHENTICATION);
         }
         int iteration = getIteration();
@@ -898,5 +904,97 @@ public class UsernameToken {
      */
     private static int min(int a, int b) {
         return (a > b) ? b : a;
+    }
+    
+    /**
+     * A method to check that the UsernameToken is compliant with the BSP spec.
+     * @throws WSSecurityException
+     */
+    private void checkBSPCompliance() throws WSSecurityException {
+        List<Element> passwordElements = 
+            WSSecurityUtil.getDirectChildElements(
+                element, WSConstants.PASSWORD_LN, WSConstants.WSSE_NS
+            );
+        // We can only have one password element
+        if (passwordElements.size() > 1) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("The Username Token had more than one password element");
+            }
+            throw new WSSecurityException(
+                WSSecurityException.INVALID_SECURITY_TOKEN, "badUsernameToken"
+            );
+        }
+        
+        // We must have a password type
+        if (passwordElements.size() == 1) {
+            Element passwordChild = passwordElements.get(0);
+            String type = passwordChild.getAttributeNS(null, WSConstants.PASSWORD_TYPE_ATTR);
+            if (type == null || "".equals(type)) {
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("The Username Token password does not have a Type attribute");
+                }
+                throw new WSSecurityException(
+                    WSSecurityException.INVALID_SECURITY_TOKEN, "badUsernameToken"
+                );
+            }
+        }
+        
+        if (elementSalt == null) {
+            // We must have a salt element to use this token for a derived key
+            bspCompliantDerivedKey = false;
+        }
+        if (elementIteration == null) {
+            // we must have an iteration element to use this token for a derived key
+            bspCompliantDerivedKey = false;
+        } else {
+            String iter = nodeString(elementIteration);
+            if (iter == null || Integer.parseInt(iter) < 1000) {
+                bspCompliantDerivedKey = false;
+            }
+        }
+        
+        List<Element> createdElements = 
+            WSSecurityUtil.getDirectChildElements(
+                element, WSConstants.CREATED_LN, WSConstants.WSU_NS
+            );
+        // We can only have one created element
+        if (createdElements.size() > 1) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("The Username Token has more than one created element");
+            }
+            throw new WSSecurityException(
+                WSSecurityException.INVALID_SECURITY_TOKEN, "badUsernameToken"
+            );
+        }
+        
+        List<Element> nonceElements = 
+            WSSecurityUtil.getDirectChildElements(
+                element, WSConstants.NONCE_LN, WSConstants.WSSE_NS
+            );
+        // We can only have one nonce element
+        if (nonceElements.size() > 1) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("The Username Token has more than one nonce element");
+            }
+            throw new WSSecurityException(
+                WSSecurityException.INVALID_SECURITY_TOKEN, "badUsernameToken"
+            );
+        }
+        
+        if (nonceElements.size() == 1) {
+            Element nonce = nonceElements.get(0);
+            String encodingType = nonce.getAttribute("EncodingType");
+            // Encoding Type must be equal to Base64Binary
+            if (encodingType == null || "".equals(encodingType)
+                || !BinarySecurity.BASE64_ENCODING.equals(encodingType)) {
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("The Username Token's nonce element has a bad encoding type");
+                }
+                throw new WSSecurityException(
+                    WSSecurityException.INVALID_SECURITY_TOKEN, 
+                    "badUsernameToken" 
+                );
+            }
+        }
     }
 }

@@ -154,6 +154,15 @@ public class SignatureSTRParser implements STRParser {
             } else {
                 int action = ((Integer)result.get(WSSecurityEngineResult.TAG_ACTION)).intValue();
                 if (WSConstants.UT_NOPASSWORD == action || WSConstants.UT == action) {
+                    String valueType = ref.getValueType();
+                    if (bspCompliant && !WSConstants.WSS_USERNAME_TOKEN_VALUE_TYPE.equals(valueType)) {
+                        // BSP says the Reference must have a ValueType of UsernameToken
+                        throw new WSSecurityException(
+                            WSSecurityException.INVALID_SECURITY,
+                            "invalidValueType", 
+                            new Object[]{valueType}
+                        );
+                    }
                     UsernameToken usernameToken = 
                         (UsernameToken)result.get(WSSecurityEngineResult.TAG_USERNAME_TOKEN);
 

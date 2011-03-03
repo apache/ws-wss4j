@@ -78,7 +78,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         + "xmlns:wsse=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd\">"
         + "<wsse:UsernameToken wsu:Id=\"UsernameToken-29477163\" xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">"
         + "<wsse:Username></wsse:Username>"
-        + "<wsse:Password></wsse:Password>"
+        + "<wsse:Password Type=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText\"></wsse:Password>"
         + "</wsse:UsernameToken></wsse:Security></SOAP-ENV:Header>"
         + "<SOAP-ENV:Body>" 
         + "<add xmlns=\"http://ws.apache.org/counter/counter_port_type\">" 
@@ -329,7 +329,18 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
                 org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
             LOG.debug(outputString);
         }
-        verify(doc);
+        
+        WSSecurityEngine newEngine = new WSSecurityEngine();
+        try {
+            newEngine.processSecurityHeader(doc, null, callbackHandler, null);
+            fail("Expected failure as it is not BSP compliant");
+        } catch (WSSecurityException ex) {
+            // expected
+        }
+        WSSConfig config = WSSConfig.getNewInstance();
+        config.setWsiBSPCompliant(false);
+        newEngine.setWssConfig(config);
+        newEngine.processSecurityHeader(doc, null, callbackHandler, null);
     }
     
     /**

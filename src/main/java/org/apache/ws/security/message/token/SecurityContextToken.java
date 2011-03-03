@@ -133,11 +133,7 @@ public class SecurityContextToken {
         if (!(el.equals(ConversationConstants.SECURITY_CTX_TOKEN_QNAME_05_02) ||
             el.equals(ConversationConstants.SECURITY_CTX_TOKEN_QNAME_05_12))
         ) {
-            throw new WSSecurityException(
-                WSSecurityException.INVALID_SECURITY_TOKEN, 
-                "badTokenType00",
-                new Object[]{el}
-            );
+            throw new WSSecurityException(WSSecurityException.INVALID_SECURITY_TOKEN);
         }
 
         elementIdentifier = 
