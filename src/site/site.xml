@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<project name="Apache WSS4J">
+  <bannerLeft>
+    <name>Apache WSS4J</name>
+    <src>http://maven.apache.org/images/apache-maven-project.png</src>
+    <href>http://maven.apache.org/</href>
+  </bannerLeft>
+  <bannerRight>
+    <src>http://maven.apache.org/images/maven-small.gif</src>
+  </bannerRight>
+  <body>
+    <menu name="Apache WSS4J">
+      <item name="Introduction" href="index.html"/>
+      <item name="Download" href="download.html"/>
+    </menu>
+
+    <menu ref="reports"/>
+
+  </body>
+</project>
+

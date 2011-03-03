@@ -125,10 +125,7 @@ public class WSHandlerConstants {
     /**
      * The actor name of the <code>wsse:Security</code> header.
      * <p/>
-     * If this parameter is omitted, the actor name is not set. Please
-     * refer to {@link org.apache.axis.Constants#ATTR_ACTOR} and {@link org.apache.axis.Constants#ATTR_ROLE}
-     * about the parameter names. They are set to <code>"actor"</code>
-     * and <code>"role"</code> respectively.
+     * If this parameter is omitted, the actor name is not set.
      * <p/>
      * The value of the actor or role has to match the receiver's setting
      * or may contain standard values.
@@ -139,9 +136,6 @@ public class WSHandlerConstants {
      * </pre>
      * However, the parameter in the WSDD deployment file overwrites the
      * property setting (deployment setting overwrites application setting).
-     *
-     * @see org.apache.axis.Constants#URI_SOAP11_NEXT_ACTOR
-     * @see org.apache.axis.Constants#URI_SOAP12_NEXT_ROLE
      */
     public static final String ACTOR = "actor";
 
@@ -168,8 +162,6 @@ public class WSHandlerConstants {
      * <p/>
      * The default setting is <code>true</code>
      * <p/>
-     * Please refer to {@link org.apache.axis.Constants#ATTR_MUST_UNDERSTAND}
-     * about the parameter name (<code>"mustUnderstand"</code>).
      */
     public static final String MUST_UNDERSTAND = "mustUnderstand";
     

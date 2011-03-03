@@ -125,7 +125,7 @@ public class Credential {
     
     /**
      * Set an AssertionWrapper to be validated
-     * @param timestamp an AssertionWrapper to be validated
+     * @param assertion an AssertionWrapper to be validated
      */
     public void setAssertion(AssertionWrapper assertion) {
         this.assertion = assertion;

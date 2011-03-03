@@ -312,8 +312,7 @@ public class SAML2ComponentBuilder {
     /**
      * Create a Subject.
      *
-     * @param nameID of type NameID
-     * @param subjectConfirmation of type SubjectConfirmation
+     * @param subjectBean of type SubjectBean
      * @return a Subject
      */
     @SuppressWarnings("unchecked")

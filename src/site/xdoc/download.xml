@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<document>
+<properties>
+<title>Apache WSS4J</title>
+</properties>
+<body>
+<section name="Downloading Apache WSS4J">
+<p style="margin-left: 40px;">
+You can download the latest version of WSS4J at the following URL:<br/>
+<a href="http://www.apache.org/dyn/closer.cgi/ws/wss4j/">
+http://www.apache.org/dyn/closer.cgi/ws/wss4j/</a>
+</p>
+<p style="margin-left: 40px;">
+The latest release of WSS4J is version 1.5.10.
+</p>
+</section>
+            
+</body>
+</document>

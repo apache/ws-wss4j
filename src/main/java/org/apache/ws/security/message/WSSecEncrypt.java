@@ -342,7 +342,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
     }
 
     /**
-     * @Deprecated Use encryptForRef(dataRef, references) instead
+     * @deprecated Use encryptForRef(dataRef, references) instead
      */
     public Element encryptForInternalRef(Element dataRef, List<WSEncryptionPart> references)
         throws WSSecurityException {
@@ -350,7 +350,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
     }
 
     /**
-     * @Deprecated Use encryptForRef(dataRef, references) instead
+     * @deprecated Use encryptForRef(dataRef, references) instead
      */
     public Element encryptForExternalRef(Element dataRef, List<WSEncryptionPart> references)
         throws WSSecurityException {

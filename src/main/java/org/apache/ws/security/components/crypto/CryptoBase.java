@@ -123,7 +123,7 @@ public abstract class CryptoBase implements Crypto {
      * Sets the CertificateFactory instance on this Crypto instance
      *
      * @param provider the CertificateFactory provider name
-     * @param the CertificateFactory the CertificateFactory instance to set
+     * @param certFactory the CertificateFactory the CertificateFactory instance to set
      */
     public void setCertificateFactory(String provider, CertificateFactory certFactory) {
         if (provider == null || provider.length() == 0) {

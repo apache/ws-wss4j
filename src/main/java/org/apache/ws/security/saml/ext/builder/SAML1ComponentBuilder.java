@@ -408,8 +408,7 @@ public class SAML1ComponentBuilder {
     /**
      * Create SAML 1.1 Authorization Decision Statement(s)
      *
-     * @param authDecisionSubject of type Subject
-     * @param decisionData        of type Map
+     * @param decisionData        of type List<AuthDecisionStatementBean>
      * @return a list of SAML 1.1 Authorization Decision Statement(s)
      */
     @SuppressWarnings("unchecked")

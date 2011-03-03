@@ -241,7 +241,6 @@ public class WSSecurityUtil {
      * @param part The WSEncryptionPart object corresponding to the DOM Element(s) we want
      * @param callbackLookup The CallbackLookup object used to find Elements
      * @param doc The owning document
-     * @param checkMultipleElements Whether to check for multiple elements or not
      * @return the DOM Element in the SOAP Envelope that is found
      */
     public static List<Element> findElements(

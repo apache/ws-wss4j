@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<document>
+<properties>
+<title>Apache WSS4J</title>
+</properties>
+<body>
+<section name="Apache WSS4J - Web Services Security for Java">
+<p style="margin-left: 40px;"> 
+The <b>Apache WSS4J</b> project is aimed at providing implementation of the primary security 
+standards for Web Services, namely the OASIS Web Services Security (WS-Security) specifications from 
+the <a href="http://www.oasis-open.org/committees/tc_home.php?wg_abbrev=wss">OASIS Web Services 
+Security TC</a>. WSS4J implements the following Web Services Security specs:
+</p>
+<ul style="margin-left: 40px;">
+<li>
+<a href="http://docs.oasis-open.org/wss/v1.1/wss-v1.1-spec-os-SOAPMessageSecurity.pdf">
+SOAP Message Security 1.1</a>
+</li>
+<li>
+<a href="http://docs.oasis-open.org/wss/v1.1/wss-v1.1-spec-os-UsernameTokenProfile.pdf">Username
+Token Profile 1.1</a>
+</li>
+<li>
+<a href="http://docs.oasis-open.org/wss/v1.1/wss-v1.1-spec-os-x509TokenProfile.pdf">X.509
+Certificate Token Profile 1.1</a>
+</li>
+<li>
+<a href="http://docs.oasis-open.org/wss/v1.1/wss-v1.1-spec-os-SAMLTokenProfile.pdf">SAML Token
+Profile 1.1</a>
+</li>
+<li>
+<a href="http://www.ws-i.org/Profiles/BasicSecurityProfile-1.1.html">Basic Security Profile 1.1</a>
+</li>
+</ul>
+
+</section>
+
+</body>
+</document>
