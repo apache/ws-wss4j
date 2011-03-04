@@ -70,6 +70,10 @@ public abstract class AbstractSAMLCallbackHandler implements CallbackHandler {
         this.certIdentifier = certIdentifier;
     }
     
+    public void setCerts(X509Certificate[] certs) {
+        this.certs = certs;
+    }
+    
     public byte[] getEphemeralKey() {
         return ephemeralKey;
     }

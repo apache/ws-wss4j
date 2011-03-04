@@ -39,10 +39,12 @@ import java.io.IOException;
 public class SAML1CallbackHandler extends AbstractSAMLCallbackHandler {
     
     public SAML1CallbackHandler() throws Exception {
-        Crypto crypto = CryptoFactory.getInstance("wss40.properties");
-        CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
-        cryptoType.setAlias("wss40");
-        certs = crypto.getX509Certificates(cryptoType);
+        if (certs == null) {
+            Crypto crypto = CryptoFactory.getInstance("wss40.properties");
+            CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
+            cryptoType.setAlias("wss40");
+            certs = crypto.getX509Certificates(cryptoType);
+        }
         
         subjectName = "uid=joe,ou=people,ou=saml-demo,o=example.com";
         subjectQualifier = "www.example.com";

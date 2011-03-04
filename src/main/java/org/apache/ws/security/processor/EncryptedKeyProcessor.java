@@ -217,10 +217,7 @@ public class EncryptedKeyProcessor implements Processor {
                 );
             }
             STRParser strParser = new EncryptedKeySTRParser();
-            if (config != null) {
-                strParser.setBspCompliant(config.isWsiBSPCompliant());
-            }
-            strParser.parseSecurityTokenReference(strElement, crypto, cb, wsDocInfo, null);
+            strParser.parseSecurityTokenReference(strElement, crypto, cb, wsDocInfo, config, null);
             
             X509Certificate[] certs = strParser.getCertificates();
             if (certs == null || certs.length < 1 || certs[0] == null) {

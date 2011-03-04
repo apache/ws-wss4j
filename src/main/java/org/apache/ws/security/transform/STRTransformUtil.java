@@ -95,7 +95,7 @@ public class STRTransformUtil {
             }
             if (WSConstants.WSS_SAML_KI_VALUE_TYPE.equals(secRef.getKeyIdentifierValueType())
                 || WSConstants.WSS_SAML2_KI_VALUE_TYPE.equals(secRef.getKeyIdentifierValueType())) {
-                return secRef.getKeyIdentifierTokenElement(doc, wsDocInfo, null);
+                return secRef.getTokenElement(doc, wsDocInfo, null);
             } else {
                 X509Certificate[] certs = secRef.getKeyIdentifier(wsDocInfo.getCrypto());
                 if (certs == null || certs.length == 0 || certs[0] == null) {

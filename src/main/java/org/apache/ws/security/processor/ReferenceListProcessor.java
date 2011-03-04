@@ -169,11 +169,10 @@ public class ReferenceListProcessor implements Processor {
             symmetricKey = X509Util.getSharedKey(keyInfoElement, symEncAlgo, cb);
         } else {
             STRParser strParser = new SecurityTokenRefSTRParser();
-            strParser.setBspCompliant(config.isWsiBSPCompliant());
             Map<String, Object> parameters = new HashMap<String, Object>();
             parameters.put(SecurityTokenRefSTRParser.SIGNATURE_METHOD, symEncAlgo);
             strParser.parseSecurityTokenReference(
-                secRefToken, crypto, cb, wsDocInfo, parameters
+                secRefToken, crypto, cb, wsDocInfo, config, parameters
             );
             byte[] secretKey = strParser.getSecretKey();
             symmetricKey = WSSecurityUtil.prepareSecretKey(symEncAlgo, secretKey);

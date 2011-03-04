@@ -182,6 +182,8 @@ public class SecurityTokenReference {
      * 
      * The method gets the URI attribute of the {@link Reference} contained in
      * the {@link SecurityTokenReference} and tries to find the referenced
+     * Element in the document. Alternatively, it gets the value of the KeyIdentifier 
+     * contained in the {@link SecurityTokenReference} and tries to find the referenced
      * Element in the document.
      *
      * @param doc the document that contains the binary security token
@@ -191,20 +193,36 @@ public class SecurityTokenReference {
      * @param docInfo A WSDocInfo object containing previous results
      * @param cb A CallbackHandler object to obtain tokens that are not in the message
      * @return Element containing the signing token, must be a BinarySecurityToken
-     * @throws WSSecurityException When either no <code>Reference</code> element, or the found
-     *                   reference contains no URI, or the referenced signing not found.
+     * @throws WSSecurityException if the referenced element is not found.
      */
     public Element getTokenElement(
         Document doc, WSDocInfo docInfo, CallbackHandler cb
     ) throws WSSecurityException {
         Reference ref = getReference();
-        String uri = ref.getURI();
+        String uri = null;
+        String valueType = null;
+        if (ref != null) {
+            uri = ref.getURI();
+            valueType = ref.getValueType();
+        } else {
+            uri = getKeyIdentifierValue();
+            valueType = getKeyIdentifierValueType();
+        }
         if (doDebug) {
             log.debug("Token reference uri: " + uri);
         }
         
+        if (uri == null) {
+            throw new WSSecurityException(
+                WSSecurityException.INVALID_SECURITY, "badReferenceURI"
+            );
+        }
+        
         Element tokElement = 
-            findTokenElement(doc, docInfo, cb, uri, ref.getValueType());
+            findProcessedTokenElement(doc, docInfo, cb, uri, valueType);
+        if (tokElement == null) {
+            tokElement = findUnprocessedTokenElement(doc, docInfo, cb, uri, valueType);
+        }
         
         if (tokElement == null) {
             throw new WSSecurityException(
@@ -216,51 +234,18 @@ public class SecurityTokenReference {
         return tokElement;
     }
     
-    
     /**
-     * Gets the signing token element, which may be a <code>BinarySecurityToken
-     * </code> or a SAML token.
-     * 
-     * The method gets the value of the KeyIdentifier contained in
-     * the {@link SecurityTokenReference} and tries to find the referenced
-     * Element in the document.
-     *
-     * @param doc the document that contains the binary security token
-     *            element. This could be different from the document
-     *            that contains the SecurityTokenReference (STR). See
-     *            STRTransform.derefenceBST() method
-     * @param docInfo A WSDocInfo object containing previous results
-     * @param cb A CallbackHandler object to obtain tokens that are not in the message
-     * @return Element containing the signing token
+     * Find a token that has not been processed already - in other words, it searches for
+     * the element, rather than trying to access previous results to find the element
+     * @param doc Parent Document
+     * @param docInfo WSDocInfo instance
+     * @param cb CallbackHandler instance
+     * @param uri URI of the element
+     * @param type Type of the element
+     * @return A DOM element
+     * @throws WSSecurityException
      */
-    public Element getKeyIdentifierTokenElement(
-        Document doc, WSDocInfo docInfo, CallbackHandler cb
-    ) throws WSSecurityException {
-        String value = getKeyIdentifierValue();
-        String type = getKeyIdentifierValueType();
-        if (doDebug) {
-            log.debug("Token reference uri: " + value);
-        }
-        if (value == null) {
-            throw new WSSecurityException(
-                WSSecurityException.INVALID_SECURITY, "badReferenceURI"
-            );
-        }
-        
-        Element tokElement = findTokenElement(doc, docInfo, cb, value, type);
-        
-        if (tokElement == null) {
-            throw new WSSecurityException(
-                WSSecurityException.SECURITY_TOKEN_UNAVAILABLE,
-                "noToken",
-                new Object[]{value}
-            );
-        }
-        return tokElement;
-    }
-    
-    
-    private Element findTokenElement(
+    public Element findUnprocessedTokenElement(
         Document doc,
         WSDocInfo docInfo,
         CallbackHandler cb,
@@ -271,17 +256,6 @@ public class SecurityTokenReference {
         if (id.charAt(0) == '#') {
             id = id.substring(1);
         }
-        //
-        // If the token type is a SAML Token or BinarySecurityToken, try to find it from the
-        // WSDocInfo instance first, to avoid searching the DOM element for it
-        //
-        if (docInfo != null) {
-            Element token = docInfo.getTokenElement(id);
-            if (token != null) {
-                return token;
-            }
-        }
-        
         //
         // Try to find a SAML Assertion by searching the DOM tree
         //
@@ -301,6 +275,48 @@ public class SecurityTokenReference {
             }
         }
         
+        //
+        // Try to find the element by its (wsu) Id
+        //
+        CallbackLookup callbackLookup = docInfo.getCallbackLookup();
+        if (callbackLookup == null) {
+            callbackLookup = new DOMCallbackLookup(doc);
+        }
+        return callbackLookup.getElement(uri, true);
+    }
+    
+    /**
+     * Find a token that has been processed already - in other words, it access previous
+     * results to find the element, rather than conducting a general search
+     * @param doc Parent Document
+     * @param docInfo WSDocInfo instance
+     * @param cb CallbackHandler instance
+     * @param uri URI of the element
+     * @param type Type of the element
+     * @return A DOM element
+     * @throws WSSecurityException
+     */
+    public Element findProcessedTokenElement(
+        Document doc,
+        WSDocInfo docInfo,
+        CallbackHandler cb,
+        String uri,
+        String type
+    ) throws WSSecurityException {
+        String id = uri;
+        if (id.charAt(0) == '#') {
+            id = id.substring(1);
+        }
+        //
+        // Try to find it from the WSDocInfo instance first
+        //
+        if (docInfo != null) {
+            Element token = docInfo.getTokenElement(id);
+            if (token != null) {
+                return token;
+            }
+        }
+
         // 
         // Try to find a custom token
         //
@@ -321,15 +337,7 @@ public class SecurityTokenReference {
                 // Consume this failure
             }
         }
-        
-        //
-        // Finally try to find the element by its (wsu) Id
-        //
-        CallbackLookup callbackLookup = docInfo.getCallbackLookup();
-        if (callbackLookup == null) {
-            callbackLookup = new DOMCallbackLookup(doc);
-        }
-        return callbackLookup.getElement(uri, true);
+        return null;
     }
 
 

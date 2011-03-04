@@ -23,6 +23,7 @@ import org.apache.ws.security.CustomTokenPrincipal;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDocInfo;
 import org.apache.ws.security.WSPasswordCallback;
+import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
@@ -34,10 +35,11 @@ import org.apache.ws.security.message.token.SecurityContextToken;
 import org.apache.ws.security.message.token.SecurityTokenReference;
 import org.apache.ws.security.message.token.UsernameToken;
 import org.apache.ws.security.message.token.X509Security;
-import org.apache.ws.security.processor.EncryptedKeyProcessor;
+import org.apache.ws.security.processor.Processor;
 import org.apache.ws.security.saml.SAMLKeyInfo;
 import org.apache.ws.security.saml.SAMLUtil;
 import org.apache.ws.security.saml.ext.AssertionWrapper;
+import org.apache.ws.security.saml.ext.OpenSAMLUtil;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.w3c.dom.Element;
 
@@ -76,16 +78,6 @@ public class SignatureSTRParser implements STRParser {
     
     private Principal principal;
     
-    private boolean bspCompliant = true;
-    
-    /**
-     * Set whether we should process tokens according to the BSP spec
-     * @param bspCompliant whether we should process tokens according to the BSP spec
-     */
-    public void setBspCompliant(boolean bspCompliant) {
-        this.bspCompliant = bspCompliant;
-    }
-    
     /**
      * Parse a SecurityTokenReference element and extract credentials.
      * 
@@ -93,6 +85,7 @@ public class SignatureSTRParser implements STRParser {
      * @param crypto The crypto instance used to extract credentials
      * @param cb The CallbackHandler instance to supply passwords
      * @param wsDocInfo The WSDocInfo object to access previous processing results
+     * @param config The WSSConfig object used to access configuration
      * @param parameters A set of implementation-specific parameters
      * @throws WSSecurityException
      */
@@ -101,8 +94,13 @@ public class SignatureSTRParser implements STRParser {
         Crypto crypto,
         CallbackHandler cb,
         WSDocInfo wsDocInfo,
+        WSSConfig config,
         Map<String, Object> parameters
     ) throws WSSecurityException {
+        boolean bspCompliant = true;
+        if (config != null) {
+            bspCompliant = config.isWsiBSPCompliant();
+        }
         SecurityTokenReference secRef = new SecurityTokenReference(strElement, bspCompliant);
         //
         // Here we get some information about the document that is being
@@ -125,22 +123,37 @@ public class SignatureSTRParser implements STRParser {
                     certs = getCertificatesTokenReference(token, crypto);
                 } else if (el.equals(WSSecurityEngine.SAML_TOKEN) 
                     || el.equals(WSSecurityEngine.SAML2_TOKEN)) {
-
-                    AssertionWrapper assertion = new AssertionWrapper(token);
-                    SAMLKeyInfo samlKi = 
-                        SAMLUtil.getCredentialFromSubject(assertion, crypto, cb, wsDocInfo, bspCompliant);
-                    X509Certificate[] foundCerts = samlKi.getCerts();
+                    Processor proc = config.getProcessor(WSSecurityEngine.SAML_TOKEN);
+                    //
+                    // Just check to see whether the token was processed or not
+                    //
+                    Element processedToken = 
+                        secRef.findProcessedTokenElement(
+                            strElement.getOwnerDocument(), wsDocInfo, cb, uri, ref.getValueType()
+                        );
+                    AssertionWrapper assertion = null;
+                    if (processedToken == null) {
+                        List<WSSecurityEngineResult> samlResult =
+                            proc.handleToken(token, null, crypto, cb, wsDocInfo, config);
+                        assertion = 
+                            (AssertionWrapper)samlResult.get(0).get(
+                                WSSecurityEngineResult.TAG_SAML_ASSERTION
+                            );
+                    } else {
+                        assertion = new AssertionWrapper(processedToken);
+                        assertion.parseHOKSubject(crypto, cb, wsDocInfo, config);
+                    }
+                    SAMLKeyInfo keyInfo = assertion.getSubjectKeyInfo();
+                    X509Certificate[] foundCerts = keyInfo.getCerts();
                     if (foundCerts != null) {
                         certs = new X509Certificate[]{foundCerts[0]};
                     }
-                    secretKey = samlKi.getSecret();
+                    secretKey = keyInfo.getSecret();
                     principal = createPrincipalFromSAML(assertion);
-                } else if (el.equals(WSSecurityEngine.ENCRYPTED_KEY)){
-                    EncryptedKeyProcessor proc = 
-                        new EncryptedKeyProcessor();
-                    WSDocInfo docInfo = new WSDocInfo(token.getOwnerDocument());
+                } else if (el.equals(WSSecurityEngine.ENCRYPTED_KEY)) {
+                    Processor proc = config.getProcessor(WSSecurityEngine.ENCRYPTED_KEY);
                     List<WSSecurityEngineResult> encrResult =
-                        proc.handleToken(token, null, crypto, cb, docInfo, null);
+                        proc.handleToken(token, null, crypto, cb, wsDocInfo, config);
                     secretKey = 
                         (byte[])encrResult.get(0).get(
                             WSSecurityEngineResult.TAG_SECRET
@@ -228,7 +241,7 @@ public class SignatureSTRParser implements STRParser {
                 || WSConstants.WSS_SAML2_KI_VALUE_TYPE.equals(secRef.getKeyIdentifierValueType())) {
                 AssertionWrapper assertion = 
                     SAMLUtil.getAssertionFromKeyIdentifier(
-                        secRef, strElement, crypto, cb, wsDocInfo
+                        secRef, strElement, crypto, cb, wsDocInfo, config
                     );
                 SAMLKeyInfo samlKi = 
                     SAMLUtil.getCredentialFromSubject(assertion, crypto, cb, wsDocInfo, bspCompliant);
@@ -351,6 +364,14 @@ public class SignatureSTRParser implements STRParser {
     ) {
         Principal principal = new CustomTokenPrincipal(assertion.getId());
         ((CustomTokenPrincipal)principal).setTokenObject(assertion);
+        String confirmMethod = null;
+        List<String> methods = assertion.getConfirmationMethods();
+        if (methods != null && methods.size() > 0) {
+            confirmMethod = methods.get(0);
+        }
+        if (OpenSAMLUtil.isMethodHolderOfKey(confirmMethod) && assertion.isSigned()) {
+            ((CustomTokenPrincipal)principal).setIsTrusted(true);
+        }
         return principal;
     }
     

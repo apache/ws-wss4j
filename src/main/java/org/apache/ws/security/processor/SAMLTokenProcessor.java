@@ -28,7 +28,6 @@ import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.saml.ext.AssertionWrapper;
-import org.apache.ws.security.saml.ext.OpenSAMLUtil;
 import org.apache.ws.security.util.DOM2Writer;
 import org.apache.ws.security.validate.Credential;
 import org.apache.ws.security.validate.SamlAssertionValidator;
@@ -88,16 +87,8 @@ public class SAMLTokenProcessor implements Processor {
         if (assertion.isSigned()) {
             assertion.verifySignature(crypto, docInfo, config);
         }
-        
-        // Check HOK requirements
-        String confirmMethod = null;
-        List<String> methods = assertion.getConfirmationMethods();
-        if (methods != null && methods.size() > 0) {
-            confirmMethod = methods.get(0);
-        }
-        if (OpenSAMLUtil.isMethodHolderOfKey(confirmMethod)) {
-            assertion.parseHOKSubject(crypto, cb, docInfo, config);
-        }
+        // Parse the HOK subject if it exists
+        assertion.parseHOKSubject(crypto, cb, docInfo, config);
             
         // Now delegate the rest of the verification to the Validator
         validator.setCrypto(crypto);

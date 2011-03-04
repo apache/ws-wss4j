@@ -30,6 +30,7 @@ import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoType;
 import org.apache.ws.security.message.token.SecurityTokenReference;
 import org.apache.ws.security.processor.EncryptedKeyProcessor;
+import org.apache.ws.security.processor.Processor;
 import org.apache.ws.security.saml.ext.AssertionWrapper;
 import org.apache.ws.security.util.Base64;
 import org.apache.ws.security.util.WSSecurityUtil;
@@ -67,6 +68,7 @@ public class SAMLUtil {
      * @param crypto The Crypto instance to use to obtain certificates
      * @param cb The CallbackHandler instance used for secret keys
      * @param wsDocInfo The WSDocInfo object that holds previous results
+     * @param config The WSSConfig object used to access configuration
      * @return an AssertionWrapper object
      * @throws WSSecurityException
      */
@@ -75,9 +77,11 @@ public class SAMLUtil {
         Element strElement,
         Crypto crypto,
         CallbackHandler cb,
-        WSDocInfo wsDocInfo
+        WSDocInfo wsDocInfo,
+        WSSConfig config
     ) throws WSSecurityException {
         String keyIdentifierValue = secRef.getKeyIdentifierValue();
+        String type = secRef.getKeyIdentifierValueType();
         WSSecurityEngineResult result = wsDocInfo.getResult(keyIdentifierValue);
 
         AssertionWrapper assertion = null;
@@ -88,10 +92,23 @@ public class SAMLUtil {
             return assertion;
         } else {
             token = 
-                secRef.getKeyIdentifierTokenElement(
-                    strElement.getOwnerDocument(), wsDocInfo, cb
+                secRef.findProcessedTokenElement(
+                    strElement.getOwnerDocument(), wsDocInfo, cb, keyIdentifierValue, type
                 );
-            return new AssertionWrapper(token);
+            if (token != null) {
+                return new AssertionWrapper(token);
+            }
+            token = 
+                secRef.findUnprocessedTokenElement(
+                    strElement.getOwnerDocument(), wsDocInfo, cb, keyIdentifierValue, type
+                );
+            Processor proc = config.getProcessor(WSSecurityEngine.SAML_TOKEN);
+            List<WSSecurityEngineResult> samlResult =
+                proc.handleToken(token, null, crypto, cb, wsDocInfo, config);
+            return 
+                (AssertionWrapper)samlResult.get(0).get(
+                    WSSecurityEngineResult.TAG_SAML_ASSERTION
+                );
         }
     }
     

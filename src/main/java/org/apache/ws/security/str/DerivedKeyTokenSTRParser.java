@@ -22,6 +22,7 @@ package org.apache.ws.security.str;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDocInfo;
 import org.apache.ws.security.WSPasswordCallback;
+import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
@@ -49,16 +50,6 @@ public class DerivedKeyTokenSTRParser implements STRParser {
     
     private byte[] secretKey;
     
-    private boolean bspCompliant = true;
-    
-    /**
-     * Set whether we should process tokens according to the BSP spec
-     * @param bspCompliant whether we should process tokens according to the BSP spec
-     */
-    public void setBspCompliant(boolean bspCompliant) {
-        this.bspCompliant = bspCompliant;
-    }
-    
     /**
      * Parse a SecurityTokenReference element and extract credentials.
      * 
@@ -66,6 +57,7 @@ public class DerivedKeyTokenSTRParser implements STRParser {
      * @param crypto The crypto instance used to extract credentials
      * @param cb The CallbackHandler instance to supply passwords
      * @param wsDocInfo The WSDocInfo object to access previous processing results
+     * @param config The WSSConfig object used to access configuration
      * @param parameters A set of implementation-specific parameters
      * @throws WSSecurityException
      */
@@ -74,8 +66,14 @@ public class DerivedKeyTokenSTRParser implements STRParser {
         Crypto crypto,
         CallbackHandler cb,
         WSDocInfo wsDocInfo,
+        WSSConfig config,
         Map<String, Object> parameters
     ) throws WSSecurityException {
+        boolean bspCompliant = true;
+        if (config != null) {
+            bspCompliant = config.isWsiBSPCompliant();
+        }
+        
         SecurityTokenReference secRef = new SecurityTokenReference(strElement, bspCompliant);
         
         String uri = null;

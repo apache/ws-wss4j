@@ -21,6 +21,7 @@ package org.apache.ws.security.processor;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.ws.security.CustomTokenPrincipal;
 import org.apache.ws.security.PublicKeyPrincipal;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDataRef;
@@ -145,21 +146,28 @@ public class SignatureProcessor implements Processor {
                 validator.validate(credential);
             } else {
                 STRParser strParser = new SignatureSTRParser();
-                strParser.setBspCompliant(config.isWsiBSPCompliant());
                 Map<String, Object> parameters = new HashMap<String, Object>();
                 parameters.put(SignatureSTRParser.SIGNATURE_METHOD, signatureMethod);
                 parameters.put(
                     SignatureSTRParser.SECRET_KEY_LENGTH, new Integer(config.getSecretKeyLength())
                 );
                 strParser.parseSecurityTokenReference(
-                    strElements.get(0), crypto, cb, wsDocInfo, parameters
+                    strElements.get(0), crypto, cb, wsDocInfo, config, parameters
                 );
                 principal = strParser.getPrincipal();
                 certs = strParser.getCertificates();
                 publicKey = strParser.getPublicKey();
                 secretKey = strParser.getSecretKey();
                 
-                if (publicKey != null || certs != null) {
+                boolean trusted = false;
+                // See if the certs come from a trusted SAML Assertion
+                if (principal instanceof CustomTokenPrincipal) {
+                    trusted = ((CustomTokenPrincipal)principal).isTrusted();
+                    if (LOG.isDebugEnabled()) {
+                        LOG.debug("Direct Trust for subject credential of a trusted SAML Assertion");
+                    }
+                }
+                if (!trusted && (publicKey != null || certs != null)) {
                     Credential credential = new Credential();
                     credential.setPublicKey(publicKey);
                     credential.setCertificates(certs);
@@ -193,6 +201,9 @@ public class SignatureProcessor implements Processor {
             buildProtectedRefs(
                 elem.getOwnerDocument(), xmlSignature.getSignedInfo(), config, wsDocInfo
             );
+        if (dataRefs.size() == 0) {
+            throw new WSSecurityException(WSSecurityException.FAILED_CHECK);
+        }
         
         int actionPerformed = WSConstants.SIGN;
         if (principal instanceof WSUsernameTokenPrincipal) {

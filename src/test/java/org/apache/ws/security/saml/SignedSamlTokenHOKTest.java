@@ -33,6 +33,7 @@ import org.apache.ws.security.common.SAML2CallbackHandler;
 import org.apache.ws.security.common.SOAPUtil;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
+import org.apache.ws.security.components.crypto.CryptoType;
 import org.apache.ws.security.components.crypto.Merlin;
 import org.apache.ws.security.message.WSSecHeader;
 import org.apache.ws.security.saml.ext.AssertionWrapper;
@@ -47,6 +48,7 @@ import javax.security.auth.callback.CallbackHandler;
 
 import java.io.InputStream;
 import java.security.KeyStore;
+import java.security.cert.X509Certificate;
 import java.util.List;
 
 /**
@@ -504,6 +506,75 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
         assert outputString.contains("KeyValue");
         
         List<WSSecurityEngineResult> results = verify(signedDoc, userCrypto);
+        WSSecurityEngineResult actionResult =
+            WSSecurityUtil.fetchActionResult(results, WSConstants.ST_SIGNED);
+        AssertionWrapper receivedAssertion = 
+            (AssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+        assertTrue(receivedAssertion != null);
+        assert receivedAssertion.isSigned();
+        
+        // Test we processed a signature (SOAP body)
+        actionResult = WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
+        assertTrue(actionResult != null);
+        assertFalse(actionResult.isEmpty());
+        final List<WSDataRef> refs =
+            (List<WSDataRef>) actionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
+        assertTrue(refs.size() == 1);
+        
+        WSDataRef wsDataRef = (WSDataRef)refs.get(0);
+        String xpath = wsDataRef.getXpath();
+        assertEquals("/SOAP-ENV:Envelope/SOAP-ENV:Body", xpath);
+    }
+    
+    /**
+     * Test that creates, sends and processes a signed SAML 1.1 authentication assertion.
+     * The difference is that we don't trust the user signature, but as we trust the
+     * signature of the issuer, we have (indirect) trust.
+     */
+    @org.junit.Test
+    @SuppressWarnings("unchecked")
+    public void testSAML1AuthnAssertionTrust() throws Exception {
+        SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
+        callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
+        callbackHandler.setConfirmationMethod(SAML1Constants.CONF_HOLDER_KEY);
+        Crypto crypto = CryptoFactory.getInstance("crypto.properties");
+        CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
+        cryptoType.setAlias("16c73ab6-b892-458f-abf5-2f875f74882e");
+        X509Certificate[] certs = crypto.getX509Certificates(cryptoType);
+        callbackHandler.setCerts(certs);
+        
+        SAMLIssuer saml = new SAMLIssuerImpl();
+        saml.setIssuerName("www.example.com");
+        saml.setIssuerCrypto(issuerCrypto);
+        saml.setIssuerKeyName("wss40_server");
+        saml.setIssuerKeyPassword("security");
+        saml.setSignAssertion(true);
+        saml.setCallbackHandler(callbackHandler);
+        AssertionWrapper assertion = saml.newAssertion();
+
+        WSSecSignatureSAML wsSign = new WSSecSignatureSAML();
+        wsSign.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+        wsSign.setDigestAlgo("http://www.w3.org/2001/04/xmlenc#sha256");
+        wsSign.setSignatureAlgorithm("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256");
+        wsSign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
+
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+
+        Document signedDoc = 
+            wsSign.build(doc, crypto, assertion, null, null, null, secHeader);
+
+        String outputString = 
+            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Signed SAML 1.1 Authn Assertion (key holder):");
+            LOG.debug(outputString);
+        }
+        
+        List<WSSecurityEngineResult> results = verify(signedDoc, trustCrypto);
+        
+        // Test we processed a SAML assertion
         WSSecurityEngineResult actionResult =
             WSSecurityUtil.fetchActionResult(results, WSConstants.ST_SIGNED);
         AssertionWrapper receivedAssertion = 

@@ -65,8 +65,7 @@ public class DerivedKeyTokenProcessor implements Processor {
         Element secRefElement = dkt.getSecurityTokenReferenceElement();
         if (secRefElement != null) {
             STRParser strParser = new DerivedKeyTokenSTRParser();
-            strParser.setBspCompliant(config.isWsiBSPCompliant());
-            strParser.parseSecurityTokenReference(secRefElement, crypto, cb, wsDocInfo, null);
+            strParser.parseSecurityTokenReference(secRefElement, crypto, cb, wsDocInfo, config, null);
             
             secret = strParser.getSecretKey();
         } else {
