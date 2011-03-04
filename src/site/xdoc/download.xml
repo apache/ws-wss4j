@@ -1,18 +1,41 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <document>
-<properties>
-<title>Apache WSS4J</title>
-</properties>
 <body>
-<section name="Downloading Apache WSS4J">
-<p style="margin-left: 40px;">
-You can download the latest version of WSS4J at the following URL:<br/>
-<a href="http://www.apache.org/dyn/closer.cgi/ws/wss4j/">
-http://www.apache.org/dyn/closer.cgi/ws/wss4j/</a>
+<section name="Obtain the Apache WSS4J distribution">
+<p> 
+The <b>Apache WSS4J&#0153;</b> project is aimed at providing implementation of the primary security 
+standards for Web Services.
 </p>
-<p style="margin-left: 40px;">
-The latest release of WSS4J is version 1.5.10.
+<subsection name="How to Download">
+<p>
+Use the links below to download a distribution of Apache WSS4J from one of our mirrors. 
+It is good practice to verify the integrity of the distribution files. Apache WSS4J releases are 
+available under the 
+<a href="http://www.apache.org/licenses/LICENSE-2.0">Apache License, Version 2.0</a> - see the 
+LICENSE.txt and NOTICE.txt files contained in each release artifact.
 </p>
+</subsection>
+<subsection name="Current official release (closest mirror site selected automatically)">
+<ul>
+<li>
+<p>
+The current "new" release is Apache WSS4J 1.6: 
+<a href="http://www.apache.org/dyn/closer.cgi/ws/wss4j/1_6"></a>
+</p>
+</li>
+<li>
+<p>
+The current "old" release is Apache WSS4J 1.5.11: 
+<a href="http://www.apache.org/dyn/closer.cgi/ws/wss4j/1_5_11"></a>
+</p>
+</li>
+</ul>
+</subsection>
+<subsection name="Archive of old releases">
+<p>
+Older releases are available in the <a href="http://archive.apache.org/dist/ws/wss4j/">archive</a>.
+</p>
+</subsection>
 </section>
             
 </body>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<document>
+<body>
+<section name="Using Apache WSS4J">
+<p>
+This page describes how to use Apache WSS4J, either in a standalone manner, or in conjunction with
+other software packages.
+</p>
+<subsection name="Standalone">
+<p>
+Apache WSS4J provides a set of APIs to implement WS-Security functionality on a SOAP message. It is
+possible to use these APIs directly in a standalone manner. The best way of finding out how to do
+this is to take a look at the test sources. For example: 
+</p>
+<ul>
+<li>
+<a href="xref-test/org/apache/ws/security/message/UsernameTokenTest.html">Username Token Test</a>
+</li>
+<li>
+<a href="xref-test/org/apache/ws/security/message/EncryptionTest.html">Encryption Test</a>
+</li>
+<li>
+<a href="xref-test/org/apache/ws/security/message/SignatureTest.html">Signature Test</a>
+</li>
+<li>
+<a href="xref-test/org/apache/ws/security/message/TimestampTest.html">Timestamp Test</a>
+</li>
+<li>
+<a href="xref-test/org/apache/ws/security/saml/SamlTokenTest.html">SAML Token Test</a>
+</li>
+</ul>
+</subsection>
+
+</section>            
+</body>
+</document>

@@ -1,17 +1,16 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <document>
-<properties>
-<title>Apache WSS4J</title>
-</properties>
 <body>
+
 <section name="Apache WSS4J - Web Services Security for Java">
-<p style="margin-left: 40px;"> 
-The <b>Apache WSS4J</b> project is aimed at providing implementation of the primary security 
+<subsection name="The Project">
+<p> 
+The <b>Apache WSS4J&#0153;</b> project is aimed at providing implementation of the primary security 
 standards for Web Services, namely the OASIS Web Services Security (WS-Security) specifications from 
 the <a href="http://www.oasis-open.org/committees/tc_home.php?wg_abbrev=wss">OASIS Web Services 
 Security TC</a>. WSS4J implements the following Web Services Security specs:
 </p>
-<ul style="margin-left: 40px;">
+<ul>
 <li>
 <a href="http://docs.oasis-open.org/wss/v1.1/wss-v1.1-spec-os-SOAPMessageSecurity.pdf">
 SOAP Message Security 1.1</a>
@@ -32,7 +31,35 @@ Profile 1.1</a>
 <a href="http://www.ws-i.org/Profiles/BasicSecurityProfile-1.1.html">Basic Security Profile 1.1</a>
 </li>
 </ul>
-
+<p> 
+Apache WSS4J, Apache, and the Apache feather logo are trademarks of The Apache Software 
+Foundation.
+</p>
+</subsection>
+<subsection name="News">
+<ul>
+<li>
+<p> <b>March 2011</b> - 
+The Apache WSS4J team are pleased to announce the release of version 1.6. This release is a major
+update to the 1.5.x releases.
+</p>
+<p>
+Please see the <a href="https://issues.apache.org/jira/browse/WSS/fixforversion/12313718">
+release notes</a> for more information.
+</p>
+</li>
+<li>
+<p> <b>January 2011</b> - 
+The Apache WSS4J team are pleased to announce the release of version 1.5.11. This release fixes some
+security bugs, and provides some fixes required for WS-Trust functionality.
+</p>
+<p>
+Please see the <a href="https://issues.apache.org/jira/browse/WSS/fixforversion/12315911">
+release notes</a> for more information.
+</p>
+</li>
+</ul>
+</subsection>
 </section>
 
 </body>
