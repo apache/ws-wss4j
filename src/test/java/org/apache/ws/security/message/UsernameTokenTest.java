@@ -657,6 +657,175 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
     }
     
     /**
+     * A test for sending multiple nonces in the UsernameToken
+     */
+    @org.junit.Test
+    public void testMultipleNonce() throws Exception {
+        WSSecUsernameToken builder = new WSSecUsernameToken();
+        builder.setPasswordType(WSConstants.PASSWORD_DIGEST);
+        builder.setUserInfo("wernerd", "verySecret");
+
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        Document utDoc = builder.build(doc, secHeader);
+        
+        //
+        // Manually find the Nonce node and duplicate it
+        //
+        org.w3c.dom.Element elem = builder.getUsernameTokenElement();
+        org.w3c.dom.NodeList list = elem.getElementsByTagNameNS(WSConstants.WSSE_NS, "Nonce");
+        org.w3c.dom.Node nonceNode = list.item(0);
+        org.w3c.dom.Node nonceCopy = nonceNode.cloneNode(true);
+        nonceNode.getParentNode().insertBefore(nonceCopy, nonceNode);
+        
+        if (LOG.isDebugEnabled()) {
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(utDoc);
+            LOG.debug(outputString);
+        };
+        
+        WSSecurityEngine newEngine = new WSSecurityEngine();
+        try {
+            newEngine.processSecurityHeader(doc, null, callbackHandler, null);
+            fail("Expected failure as it is not BSP compliant");
+        } catch (WSSecurityException ex) {
+            // expected
+        }
+        WSSConfig config = WSSConfig.getNewInstance();
+        config.setWsiBSPCompliant(false);
+        newEngine.setWssConfig(config);
+        newEngine.processSecurityHeader(doc, null, callbackHandler, null);
+    }
+    
+    /**
+     * A test for sending multiple Created elements in the UsernameToken
+     */
+    @org.junit.Test
+    public void testMultipleCreated() throws Exception {
+        WSSecUsernameToken builder = new WSSecUsernameToken();
+        builder.setPasswordType(WSConstants.PASSWORD_DIGEST);
+        builder.setUserInfo("wernerd", "verySecret");
+
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        Document utDoc = builder.build(doc, secHeader);
+        
+        //
+        // Manually find the Created node and duplicate it
+        //
+        org.w3c.dom.Element elem = builder.getUsernameTokenElement();
+        org.w3c.dom.NodeList list = elem.getElementsByTagNameNS(WSConstants.WSU_NS, "Created");
+        org.w3c.dom.Node createdNode = list.item(0);
+        org.w3c.dom.Node createdCopy = createdNode.cloneNode(true);
+        createdNode.getParentNode().insertBefore(createdCopy, createdNode);
+        
+        if (LOG.isDebugEnabled()) {
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(utDoc);
+            LOG.debug(outputString);
+        };
+        
+        WSSecurityEngine newEngine = new WSSecurityEngine();
+        try {
+            newEngine.processSecurityHeader(doc, null, callbackHandler, null);
+            fail("Expected failure as it is not BSP compliant");
+        } catch (WSSecurityException ex) {
+            // expected
+        }
+        WSSConfig config = WSSConfig.getNewInstance();
+        config.setWsiBSPCompliant(false);
+        newEngine.setWssConfig(config);
+        newEngine.processSecurityHeader(doc, null, callbackHandler, null);
+    }
+    
+    /**
+     * A test for sending multiple passwords in the UsernameToken
+     */
+    @org.junit.Test
+    public void testMultiplePassword() throws Exception {
+        WSSecUsernameToken builder = new WSSecUsernameToken();
+        builder.setPasswordType(WSConstants.PASSWORD_DIGEST);
+        builder.setUserInfo("wernerd", "verySecret");
+
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        Document utDoc = builder.build(doc, secHeader);
+        
+        //
+        // Manually find the Nonce node and duplicate it
+        //
+        org.w3c.dom.Element elem = builder.getUsernameTokenElement();
+        org.w3c.dom.NodeList list = elem.getElementsByTagNameNS(WSConstants.WSSE_NS, "Password");
+        org.w3c.dom.Node passwordNode = list.item(0);
+        org.w3c.dom.Node passwordCopy = passwordNode.cloneNode(true);
+        passwordNode.getParentNode().insertBefore(passwordCopy, passwordNode);
+        
+        if (LOG.isDebugEnabled()) {
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(utDoc);
+            LOG.debug(outputString);
+        };
+        
+        WSSecurityEngine newEngine = new WSSecurityEngine();
+        try {
+            newEngine.processSecurityHeader(doc, null, callbackHandler, null);
+            fail("Expected failure as it is not BSP compliant");
+        } catch (WSSecurityException ex) {
+            // expected
+        }
+        WSSConfig config = WSSConfig.getNewInstance();
+        config.setWsiBSPCompliant(false);
+        newEngine.setWssConfig(config);
+        newEngine.processSecurityHeader(doc, null, callbackHandler, null);
+    }
+    
+    /**
+     * A test for sending a nonce with a bad encoding type in the UsernameToken
+     */
+    @org.junit.Test
+    public void testNonceBadEncodingType() throws Exception {
+        WSSecUsernameToken builder = new WSSecUsernameToken();
+        builder.setPasswordType(WSConstants.PASSWORD_DIGEST);
+        builder.setUserInfo("wernerd", "verySecret");
+
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        Document utDoc = builder.build(doc, secHeader);
+        
+        //
+        // Manually find the Nonce node and duplicate it
+        //
+        org.w3c.dom.Element elem = builder.getUsernameTokenElement();
+        org.w3c.dom.NodeList list = elem.getElementsByTagNameNS(WSConstants.WSSE_NS, "Nonce");
+        org.w3c.dom.Node nonceNode = list.item(0);
+        ((org.w3c.dom.Element)nonceNode).setAttributeNS(
+            null, "EncodingType", "http://bad_encoding_type"
+        );
+        
+        if (LOG.isDebugEnabled()) {
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(utDoc);
+            LOG.debug(outputString);
+        };
+        
+        WSSecurityEngine newEngine = new WSSecurityEngine();
+        try {
+            newEngine.processSecurityHeader(doc, null, callbackHandler, null);
+            fail("Expected failure as it is not BSP compliant");
+        } catch (WSSecurityException ex) {
+            // expected
+        }
+        WSSConfig config = WSSConfig.getNewInstance();
+        config.setWsiBSPCompliant(false);
+        newEngine.setWssConfig(config);
+        newEngine.processSecurityHeader(doc, null, callbackHandler, null);
+    }
+    
+    /**
      * Verifies the soap envelope
      * 
      * @param env soap envelope
