@@ -104,6 +104,7 @@ public class SamlReferenceTest extends org.junit.Assert {
         secHeader.insertSecurityHeader(doc);
         
         WSSecSignatureSAML wsSign = new WSSecSignatureSAML();
+        wsSign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
         Document signedDoc = 
             wsSign.build(
                 doc, null, assertion, crypto, "16c73ab6-b892-458f-abf5-2f875f74882e", 
@@ -165,6 +166,7 @@ public class SamlReferenceTest extends org.junit.Assert {
         secHeader.insertSecurityHeader(doc);
         
         WSSecSignatureSAML wsSign = new WSSecSignatureSAML();
+        wsSign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
         wsSign.setUseDirectReferenceToAssertion(true);
         Document signedDoc = 
             wsSign.build(
@@ -353,7 +355,7 @@ public class SamlReferenceTest extends org.junit.Assert {
         AssertionWrapper assertion = saml.newAssertion();
         Crypto crypto = CryptoFactory.getInstance("crypto.properties");
         WSSecSignatureSAML wsSign = new WSSecSignatureSAML();
-        wsSign.setKeyIdentifierType(WSConstants.X509_KEY_IDENTIFIER);
+        wsSign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
         Document samlDoc = 
             wsSign.build(doc, null, assertion, crypto, 
                 "16c73ab6-b892-458f-abf5-2f875f74882e", "security", secHeader
@@ -565,6 +567,7 @@ public class SamlReferenceTest extends org.junit.Assert {
         secHeader.insertSecurityHeader(doc);
         
         WSSecSignatureSAML wsSign = new WSSecSignatureSAML();
+        wsSign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
         Document signedDoc = 
             wsSign.build(
                 doc, null, assertion, crypto, "16c73ab6-b892-458f-abf5-2f875f74882e", 
@@ -626,6 +629,7 @@ public class SamlReferenceTest extends org.junit.Assert {
         secHeader.insertSecurityHeader(doc);
         
         WSSecSignatureSAML wsSign = new WSSecSignatureSAML();
+        wsSign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
         wsSign.setUseDirectReferenceToAssertion(true);
         Document signedDoc = 
             wsSign.build(

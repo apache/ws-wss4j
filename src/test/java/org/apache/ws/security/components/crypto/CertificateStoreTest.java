@@ -21,6 +21,7 @@ package org.apache.ws.security.components.crypto;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSecurityEngineResult;
@@ -112,7 +113,13 @@ public class CertificateStoreTest extends org.junit.Assert {
         //
         // Verify the signature
         //
-        List<WSSecurityEngineResult> results = verify(signedDoc, receiverCrypto);
+        // Turn off BSP spec compliance
+        WSSecurityEngine newEngine = new WSSecurityEngine();
+        WSSConfig config = WSSConfig.getNewInstance();
+        config.setWsiBSPCompliant(false);
+        newEngine.setWssConfig(config);
+        List<WSSecurityEngineResult> results = 
+            newEngine.processSecurityHeader(signedDoc, null, keystoreCallbackHandler, receiverCrypto);
         WSSecurityEngineResult result = 
             WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
         X509Certificate cert = 

@@ -149,6 +149,16 @@ public class SecurityTokenReference {
             tokenType
         );
     }
+    
+    /**
+     * Get the wsse11:TokenType attribute of this SecurityTokenReference
+     * @return the value of the wsse11:TokenType attribute
+     */
+    public String getTokenType() {
+        return element.getAttributeNS(
+            WSConstants.WSSE11_NS, WSConstants.TOKEN_TYPE
+        );
+    }
 
     /**
      * set the reference.

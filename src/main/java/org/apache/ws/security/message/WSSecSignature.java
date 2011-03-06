@@ -175,6 +175,7 @@ public class WSSecSignature extends WSSecSignatureBase {
             if (!useSingleCert) {
                 bstToken = new PKIPathSecurity(document);
                 ((PKIPathSecurity) bstToken).setX509Certificates(certs, crypto);
+                secRef.addTokenType(PKIPathSecurity.PKI_TYPE);
             } else {
                 bstToken = new X509Security(document);
                 ((X509Security) bstToken).setX509Certificate(certs[0]);

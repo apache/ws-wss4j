@@ -82,7 +82,7 @@ public class CryptoTest extends org.junit.Assert {
     public void testDynamicCrypto() throws Exception {
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("wss40", "security");
-        builder.setKeyIdentifierType(WSConstants.X509_KEY_IDENTIFIER);
+        builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
         
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader();

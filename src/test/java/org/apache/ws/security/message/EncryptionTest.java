@@ -181,7 +181,23 @@ public class EncryptionTest extends org.junit.Assert {
             LOG.debug(outputString);
         }
         assertTrue(outputString.indexOf("counter_port_type") == -1 ? true : false);
-        verify(encryptedDoc, keystoreCallbackHandler, SOAP_BODY);
+        
+        // Turn off BSP spec compliance
+        WSSecurityEngine newEngine = new WSSecurityEngine();
+        WSSConfig config = WSSConfig.getNewInstance();
+        config.setWsiBSPCompliant(false);
+        newEngine.setWssConfig(config);
+        newEngine.processSecurityHeader(encryptedDoc, null, keystoreCallbackHandler, crypto);
+        
+        // Now turn on BSP spec compliance
+        config.setWsiBSPCompliant(true);
+        newEngine.setWssConfig(config);
+        try {
+            newEngine.processSecurityHeader(encryptedDoc, null, keystoreCallbackHandler, crypto);
+            fail("Failure expected on a bad ValueType attribute");
+        } catch (WSSecurityException ex) {
+            // expected
+        }
 
     }
     

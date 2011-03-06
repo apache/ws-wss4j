@@ -104,9 +104,13 @@ public class ValidatorTest extends org.junit.Assert {
         
         // The default behaviour is that trust verification will fail
         Crypto cryptoCA = CryptoFactory.getInstance("crypto.properties");
-        WSSConfig wssConfig = WSSConfig.getNewInstance();
+        // Turn off BSP spec compliance
+        WSSecurityEngine newEngine = new WSSecurityEngine();
+        WSSConfig config = WSSConfig.getNewInstance();
+        config.setWsiBSPCompliant(false);
+        newEngine.setWssConfig(config);
         try {
-            verify(signedDoc, wssConfig, null, cryptoCA);
+            newEngine.processSecurityHeader(signedDoc, null, null, cryptoCA);
             throw new Exception("Failure expected on issuer serial");
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == WSSecurityException.FAILED_AUTHENTICATION);
@@ -114,8 +118,9 @@ public class ValidatorTest extends org.junit.Assert {
         }
         
         // Now switch out the default signature validator
-        wssConfig.setValidator(WSSecurityEngine.SIGNATURE, NoOpValidator.class);
-        verify(signedDoc, wssConfig, null, cryptoCA);
+        config.setValidator(WSSecurityEngine.SIGNATURE, NoOpValidator.class);
+        newEngine.setWssConfig(config);
+        newEngine.processSecurityHeader(signedDoc, null, null, cryptoCA);
     }
     
     /**

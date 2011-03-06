@@ -33,7 +33,7 @@ import java.security.cert.X509Certificate;
  * @author Davanum Srinivas (dims@yahoo.com).
  */
 public class PKIPathSecurity extends BinarySecurity {
-    private static final String PKI_TYPE = WSConstants.X509TOKEN_NS + "#X509PKIPathv1";
+    public static final String PKI_TYPE = WSConstants.X509TOKEN_NS + "#X509PKIPathv1";
 
     /**
      * Constructor.
