@@ -55,8 +55,6 @@ public class SamlTokenHOKTest extends org.junit.Assert {
     private static final Log LOG = LogFactory.getLog(SamlTokenHOKTest.class);
     private WSSecurityEngine secEngine = new WSSecurityEngine();
     private Crypto crypto = CryptoFactory.getInstance("crypto.properties");
-    private CallbackHandler keystoreCallbackHandler = new KeystoreCallbackHandler();
-    private Crypto userCrypto = CryptoFactory.getInstance("wss40.properties");
 
     /**
      * Test that creates, sends and processes a signed SAML 1.1 authentication assertion.

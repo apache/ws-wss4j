@@ -844,11 +844,7 @@ public class Merlin extends CryptoBase {
                         Object certName = 
                             createBCX509Name(x509cert.getIssuerX500Principal().getName());
                         if (certName.equals(issuerRDN)) {
-                            if (certs == null) {
-                                return new Certificate[]{cert};
-                            } else {
-                                return certs;
-                            }
+                            return certs;
                         }
                     }
                 }
@@ -943,11 +939,7 @@ public class Merlin extends CryptoBase {
                     byte[] data = sha.digest();
 
                     if (Arrays.equals(data, thumbprint)) {
-                        if (certs == null) {
-                            return new Certificate[]{x509cert};
-                        } else {
-                            return certs;
-                        }
+                        return certs;
                     }
                 }
             }
@@ -1017,11 +1009,7 @@ public class Merlin extends CryptoBase {
                     X509Certificate x509cert = (X509Certificate) cert;
                     byte[] data = getSKIBytesFromCert(x509cert);
                     if (data.length == skiBytes.length && Arrays.equals(data, skiBytes)) {
-                        if (certs == null) {
-                            return new Certificate[]{x509cert};
-                        } else {
-                            return certs;
-                        }
+                        return certs;
                     }
                 }
             }
@@ -1186,11 +1174,7 @@ public class Merlin extends CryptoBase {
                     Object certName = createBCX509Name(foundRDN.getName());
 
                     if (subjectRDN.equals(certName)) {
-                        if (certs == null) {
-                            return new Certificate[]{cert};
-                        } else {
-                            return certs;
-                        }
+                        return certs;
                     }
                 }
             }
