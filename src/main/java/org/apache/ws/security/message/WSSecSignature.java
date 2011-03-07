@@ -214,6 +214,7 @@ public class WSSecSignature extends WSSecSignatureBase {
                 byte[] digestBytes = WSSecurityUtil.generateDigest(secretKey);
                 secRef.setKeyIdentifierEncKeySHA1(Base64.encode(digestBytes));
             }
+            secRef.addTokenType(WSConstants.WSS_ENC_KEY_VALUE_TYPE);
             break;
 
         case WSConstants.CUSTOM_SYMM_SIGNING :
@@ -223,6 +224,9 @@ public class WSSecSignature extends WSSecSignatureBase {
                 refCust.setValueType(customTokenValueType);
             } else if (WSConstants.WSS_SAML2_KI_VALUE_TYPE.equals(customTokenValueType)) {
                 secRef.addTokenType(WSConstants.WSS_SAML2_TOKEN_TYPE);
+            } else if (WSConstants.WSS_ENC_KEY_VALUE_TYPE.equals(customTokenValueType)) {
+                secRef.addTokenType(WSConstants.WSS_ENC_KEY_VALUE_TYPE);
+                refCust.setValueType(customTokenValueType);
             } else {
                 refCust.setValueType(customTokenValueType);
             }
@@ -237,6 +241,9 @@ public class WSSecSignature extends WSSecSignatureBase {
                 refCustd.setValueType(customTokenValueType);
             } else if (WSConstants.WSS_SAML2_KI_VALUE_TYPE.equals(customTokenValueType)) {
                 secRef.addTokenType(WSConstants.WSS_SAML2_TOKEN_TYPE);
+            } else if (WSConstants.WSS_ENC_KEY_VALUE_TYPE.equals(customTokenValueType)) {
+                secRef.addTokenType(WSConstants.WSS_ENC_KEY_VALUE_TYPE);
+                refCustd.setValueType(customTokenValueType);
             } else {
                 refCustd.setValueType(customTokenValueType);
             }
@@ -250,6 +257,10 @@ public class WSSecSignature extends WSSecSignatureBase {
                 secRef.addTokenType(WSConstants.WSS_SAML_TOKEN_TYPE);
             } else if (WSConstants.WSS_SAML2_KI_VALUE_TYPE.equals(customTokenValueType)) {
                 secRef.addTokenType(WSConstants.WSS_SAML2_TOKEN_TYPE);
+            } else if (WSConstants.WSS_ENC_KEY_VALUE_TYPE.equals(customTokenValueType)) {
+                secRef.addTokenType(WSConstants.WSS_ENC_KEY_VALUE_TYPE);
+            } else if (SecurityTokenReference.ENC_KEY_SHA1_URI.equals(customTokenValueType)) {
+                secRef.addTokenType(WSConstants.WSS_ENC_KEY_VALUE_TYPE);
             }
             break;
             

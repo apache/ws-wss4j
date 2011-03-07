@@ -393,6 +393,7 @@ public class SignatureEncryptionTest extends org.junit.Assert {
         sign.setKeyIdentifierType(WSConstants.CUSTOM_SYMM_SIGNING);
         sign.setCustomTokenId(encrKey.getId());
         sign.setSecretKey(encrKey.getEphemeralKey());
+        sign.setCustomTokenValueType(WSConstants.WSS_ENC_KEY_VALUE_TYPE);
         sign.setSignatureAlgorithm(SignatureMethod.HMAC_SHA1);
 
         Document signedDoc = sign.build(doc, crypto, secHeader);

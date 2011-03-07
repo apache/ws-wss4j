@@ -106,6 +106,9 @@ public class DerivedKeyTokenSTRParser implements STRParser {
                 usernameToken.setRawPassword(cb);
                 secretKey = usernameToken.getDerivedKey();
             } else if (WSConstants.ENCR == action) {
+                if (bspCompliant) {
+                    checkEncryptedKeyBSPCompliance(secRef);
+                }
                 secretKey = (byte[])result.get(WSSecurityEngineResult.TAG_SECRET);
             } else if (WSConstants.SCT == action) {
                 secretKey = (byte[])result.get(WSSecurityEngineResult.TAG_SECRET);
@@ -127,6 +130,10 @@ public class DerivedKeyTokenSTRParser implements STRParser {
             secretKey = 
                 getSecretKeyFromToken(uri, null, WSPasswordCallback.SECURITY_CONTEXT_TOKEN, cb);
         } else if (keyIdentifierValue != null && keyIdentifierValueType != null) {
+            if (bspCompliant 
+                && keyIdentifierValueType.equals(SecurityTokenReference.ENC_KEY_SHA1_URI)) {
+                checkEncryptedKeyBSPCompliance(secRef);
+            }
             X509Certificate[] certs = secRef.getKeyIdentifier(crypto);
             if (certs == null || certs.length < 1 || certs[0] == null) {
                 secretKey = 
@@ -232,6 +239,36 @@ public class DerivedKeyTokenSTRParser implements STRParser {
         }
 
         return pwcb.getKey();
+    }
+    
+    /**
+     * Check that the EncryptedKey referenced by the SecurityTokenReference argument 
+     * is BSP compliant.
+     * @param secRef The SecurityTokenReference to the BinarySecurityToken
+     * @throws WSSecurityException
+     */
+    private static void checkEncryptedKeyBSPCompliance(
+        SecurityTokenReference secRef
+    ) throws WSSecurityException {
+        if (secRef.containsKeyIdentifier()) {
+            String valueType = secRef.getKeyIdentifierValueType();
+            if (!SecurityTokenReference.ENC_KEY_SHA1_URI.equals(valueType)) {
+                throw new WSSecurityException(
+                    WSSecurityException.INVALID_SECURITY_TOKEN, 
+                    "invalidValueType", 
+                    new Object[]{valueType}
+                );
+            }
+        }
+        
+        String tokenType = secRef.getTokenType();
+        if (!WSConstants.WSS_ENC_KEY_VALUE_TYPE.equals(tokenType)) {
+            throw new WSSecurityException(
+                WSSecurityException.INVALID_SECURITY_TOKEN, 
+                "invalidTokenType", 
+                 new Object[]{tokenType}
+            );
+        }
     }
     
 }

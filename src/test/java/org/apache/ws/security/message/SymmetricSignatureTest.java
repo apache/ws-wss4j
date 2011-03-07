@@ -132,9 +132,7 @@ public class SymmetricSignatureTest extends org.junit.Assert implements Callback
         sign.setCustomTokenId(encrKey.getId());
         sign.setSecretKey(encrKey.getEphemeralKey());
         sign.setSignatureAlgorithm(SignatureMethod.HMAC_SHA1);
-        sign.setCustomTokenValueType(
-            WSConstants.SOAPMESSAGE_NS11 + "#" + WSConstants.ENC_KEY_VALUE_TYPE
-        );
+        sign.setCustomTokenValueType(WSConstants.WSS_ENC_KEY_VALUE_TYPE);
 
         Document signedDoc = sign.build(doc, crypto, secHeader);
         encrKey.prependToHeader(secHeader);
@@ -180,6 +178,7 @@ public class SymmetricSignatureTest extends org.junit.Assert implements Callback
         WSSecSignature sign = new WSSecSignature();
         sign.setKeyIdentifierType(WSConstants.CUSTOM_SYMM_SIGNING);
         sign.setCustomTokenId(encrKey.getId());
+        sign.setCustomTokenValueType(WSConstants.WSS_ENC_KEY_VALUE_TYPE);
         sign.setSecretKey(encrKey.getEphemeralKey());
         sign.setSignatureAlgorithm(SignatureMethod.HMAC_SHA1);
 

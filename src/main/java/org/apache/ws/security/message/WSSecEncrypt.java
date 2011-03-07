@@ -544,6 +544,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
                 byte[] encodedBytes = WSSecurityUtil.generateDigest(encryptedEphemeralKey);
                 secToken.setKeyIdentifierEncKeySHA1(Base64.encode(encodedBytes));
             }
+            secToken.addTokenType(WSConstants.WSS_ENC_KEY_VALUE_TYPE);
             keyInfo.addUnknownElement(secToken.getElement());
         } else if (keyIdentifierType == WSConstants.EMBEDDED_KEYNAME) {
             keyInfo.addKeyName(embeddedKeyName == null ? user : embeddedKeyName);
@@ -580,6 +581,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
                 ref.setValueType(customReferenceValue);
             }
             secToken.setReference(ref);
+            secToken.addTokenType(WSConstants.WSS_ENC_KEY_VALUE_TYPE);
             keyInfo.addUnknownElement(secToken.getElement());
         }
         Element keyInfoElement = keyInfo.getElement();

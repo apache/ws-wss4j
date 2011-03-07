@@ -19,6 +19,7 @@
 
 package org.apache.ws.security.message;
 
+import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.conversation.ConversationConstants;
 import org.apache.ws.security.conversation.ConversationException;
@@ -220,8 +221,11 @@ public abstract class WSSecDerivedKeyBase extends WSSecSignatureBase {
             } else {
                 ref.setURI("#" + tokenIdentifier);
             }
-            if (customValueType != null && customValueType.trim().length() > 0) {
+            if (customValueType != null && !"".equals(customValueType)) {
                 ref.setValueType(customValueType);
+            }
+            if (!WSConstants.WSS_USERNAME_TOKEN_VALUE_TYPE.equals(customValueType)) {
+                strEncKey.addTokenType(WSConstants.WSS_ENC_KEY_VALUE_TYPE);
             }
             strEncKey.setReference(ref);
             dkt.setSecurityTokenReference(strEncKey); 

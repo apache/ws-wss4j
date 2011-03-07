@@ -309,6 +309,9 @@ public class WSSecEncryptedKey extends WSSecBase {
                 refCust.setValueType(customEKTokenValueType);
             } else if (WSConstants.WSS_SAML2_KI_VALUE_TYPE.equals(customEKTokenValueType)) {
                 secToken.addTokenType(WSConstants.WSS_SAML2_TOKEN_TYPE);
+            } else if (WSConstants.WSS_ENC_KEY_VALUE_TYPE.equals(customEKTokenValueType)) {
+                secToken.addTokenType(WSConstants.WSS_ENC_KEY_VALUE_TYPE);
+                refCust.setValueType(customEKTokenValueType);
             } else {
                 refCust.setValueType(customEKTokenValueType);
             }
@@ -323,6 +326,9 @@ public class WSSecEncryptedKey extends WSSecBase {
                 refCustd.setValueType(customEKTokenValueType);
             } else if (WSConstants.WSS_SAML2_KI_VALUE_TYPE.equals(customEKTokenValueType)) {
                 secToken.addTokenType(WSConstants.WSS_SAML2_TOKEN_TYPE);
+            }  else if (WSConstants.WSS_ENC_KEY_VALUE_TYPE.equals(customEKTokenValueType)) {
+                secToken.addTokenType(WSConstants.WSS_ENC_KEY_VALUE_TYPE);
+                refCustd.setValueType(customEKTokenValueType);
             } else {
                 refCustd.setValueType(customEKTokenValueType);
             }
@@ -336,6 +342,10 @@ public class WSSecEncryptedKey extends WSSecBase {
                 secToken.addTokenType(WSConstants.WSS_SAML_TOKEN_TYPE);
             } else if (WSConstants.WSS_SAML2_KI_VALUE_TYPE.equals(customEKTokenValueType)) {
                 secToken.addTokenType(WSConstants.WSS_SAML2_TOKEN_TYPE);
+            } else if (WSConstants.WSS_ENC_KEY_VALUE_TYPE.equals(customEKTokenValueType)) {
+                secToken.addTokenType(WSConstants.WSS_ENC_KEY_VALUE_TYPE);
+            } else if (SecurityTokenReference.ENC_KEY_SHA1_URI.equals(customEKTokenValueType)) {
+                secToken.addTokenType(WSConstants.WSS_ENC_KEY_VALUE_TYPE);
             }
             break;           
 
