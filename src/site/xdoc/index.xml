@@ -8,7 +8,7 @@
 The <b>Apache WSS4J&#0153;</b> project is aimed at providing implementation of the primary security 
 standards for Web Services, namely the OASIS Web Services Security (WS-Security) specifications from 
 the <a href="http://www.oasis-open.org/committees/tc_home.php?wg_abbrev=wss">OASIS Web Services 
-Security TC</a>. WSS4J implements the following Web Services Security specs:
+Security TC</a>. WSS4J provides an implementation of the following WS-Security standards:
 </p>
 <ul>
 <li>

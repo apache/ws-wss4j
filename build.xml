@@ -342,15 +342,22 @@ org.apache.ws.security.util
             />
     </target>
 
-    <target name="dist" depends="otherdist, srcdist"/>
+    <target name="dist" depends="bindist, srcdist"/>
 
-    <target name="otherdist" depends="init" 
-             description="Build zip for required jars">
+    <!-- Note that this requires the jars to have been built by maven first -->
+    <target name="bindist" depends="init" 
+             description="Build binary zip for distro">
          <mkdir dir="${dir.dist}"/>
          <zip destfile=
-           "${dir.dist}/${product.shortname}-otherjars-${product.version}.zip">
-             <zipfileset prefix="wss4j" dir="."
-                 includes="lib/*.jar, endorsed/*.jar, LICENSE.txt, README.txt, NOTICE, legal/**"/>
+           "${dir.dist}/${product.shortname}-bin-${product.version}.zip">
+            <zipfileset prefix="wss4j-${product.version}" dir="."
+                includes="legal/** lib/** LICENSE.txt NOTICE "/>
+            <zipfileset prefix="wss4j-${product.version}/lib" dir="target/"
+                includes="wss4j-${product.version}.jar" />
+            <zipfileset prefix="wss4j-${product.version}/doc" dir="target/"
+                includes="wss4j-${product.version}-*.jar" />
+            <zipfileset prefix="wss4j-${product.version}/lib" dir="endorsed/"
+                includes="*.jar" />
          </zip>
      </target>  
     
@@ -359,21 +366,9 @@ org.apache.ws.security.util
         <mkdir dir="${dir.dist}"/>
         <zip destfile=
                  "${dir.dist}/${product.shortname}-src-${product.version}.zip">
-            <zipfileset prefix="wss4j" dir="."
-                includes="src/** keys/** test/** legal/** lib/** endorsed/** ChangeLog.txt LICENSE.txt README.txt NOTICE build.xml pom.xml ChangeLog.txt"/>
+            <zipfileset prefix="wss4j-${product.version}" dir="."
+                includes="src/** legal/** lib/** endorsed/** ChangeLog.txt LICENSE.txt NOTICE build.xml pom.xml"/>
         </zip>
-    </target>
-
-    <target name="fixcrlf"
-        description="Fixes CRLF">
-        <fixcrlf srcdir="."
-            eol="crlf"
-            includes="**/*.java"
-            />
-        <fixcrlf srcdir="."
-            eol="crlf"
-            includes="**/*.properties"
-            />
     </target>
 
 </project>

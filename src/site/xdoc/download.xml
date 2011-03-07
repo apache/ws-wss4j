@@ -3,8 +3,8 @@
 <body>
 <section name="Obtain the Apache WSS4J distribution">
 <p> 
-The <b>Apache WSS4J&#0153;</b> project is aimed at providing implementation of the primary security 
-standards for Web Services.
+The <b>Apache WSS4J&#0153;</b> project provides an implementation of the primary security standards 
+for Web Services.
 </p>
 <subsection name="How to Download">
 <p>
@@ -19,14 +19,36 @@ LICENSE.txt and NOTICE.txt files contained in each release artifact.
 <ul>
 <li>
 <p>
-The current "new" release is Apache WSS4J 1.6: 
-<a href="http://www.apache.org/dyn/closer.cgi/ws/wss4j/1_6"></a>
+The current "new" release is Apache WSS4J 1.6:
+</p>
+<p>
+<a href="http://www.apache.org/dyn/closer.cgi/ws/wss4j/1_6/wss4j-bin-1.6.zip">wss4j-bin-1.6.zip</a>
+(<a href="http://www.apache.org/dyn/closer.cgi/ws/wss4j/1_6/wss4j-bin-1.6.zip.md5">
+MD5</a>)
+(<a href="http://www.apache.org/dyn/closer.cgi/ws/wss4j/1_6/wss4j-bin-1.6.zip.asc">
+PGP</a>)
+</p>
+<p>
+<a href="http://www.apache.org/dyn/closer.cgi/ws/wss4j/1_6/wss4j-src-1.6.zip">wss4j-src-1.6.zip</a>
+(<a href="http://www.apache.org/dyn/closer.cgi/ws/wss4j/1_6/wss4j-src-1.6.zip.md5">
+MD5</a>)
+(<a href="http://www.apache.org/dyn/closer.cgi/ws/wss4j/1_6/wss4j-src-1.6.zip.asc">
+PGP</a>)
 </p>
 </li>
 <li>
 <p>
-The current "old" release is Apache WSS4J 1.5.11: 
-<a href="http://www.apache.org/dyn/closer.cgi/ws/wss4j/1_5_11"></a>
+The current "old" release is Apache WSS4J 1.5.11:
+</p>
+<p>
+<a href="http://www.apache.org/dyn/closer.cgi/ws/wss4j/1_5_11/wss4j-bin-1.5.11.zip">
+wss4j-bin-1.5.11.zip</a>
+(<a href="http://www.apache.org/dyn/closer.cgi/ws/wss4j/1_5_11/wss4j-bin-1.5.11.zip.asc">PGP</a>)
+</p>
+<p>
+<a href="http://www.apache.org/dyn/closer.cgi/ws/wss4j/1_5_11/wss4j-src-1.5.11.zip">
+wss4j-src-1.5.11.zip</a>
+(<a href="http://www.apache.org/dyn/closer.cgi/ws/wss4j/1_5_11/wss4j-src-1.5.11.zip.asc">PGP</a>)
 </p>
 </li>
 </ul>
