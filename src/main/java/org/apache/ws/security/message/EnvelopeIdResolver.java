@@ -96,7 +96,7 @@ public class EnvelopeIdResolver extends ResourceResolverSpi {
                 callbackLookup = new DOMCallbackLookup(uri.getOwnerDocument());
             }
             try {
-                selectedElem = callbackLookup.getElement(id, true);
+                selectedElem = callbackLookup.getElement(id, null, true);
             } catch (WSSecurityException ex) {
                 throw new ResourceResolverException(
                     ex.getMessage(), new Object[]{"Id: " + id + " not found"},

@@ -256,7 +256,7 @@ public class ReferenceListProcessor implements Processor {
             callbackLookup = new DOMCallbackLookup(doc);
         }
         Element encryptedDataElement = 
-            callbackLookup.getElement(dataRefURI, true);
+            callbackLookup.getElement(dataRefURI, null, true);
         if (encryptedDataElement == null) {
             throw new WSSecurityException(
                 WSSecurityException.INVALID_SECURITY, "dataRef", new Object[] {dataRefURI}

@@ -251,10 +251,10 @@ public class WSSecurityUtil {
             return Collections.singletonList(part.getElement());
         }
         
-        // Next try to find the SOAP body
+        // Next try to find the Element via its wsu:Id
         String id = part.getId();
         if (id != null) {
-            Element foundElement = callbackLookup.getElement(id, false);
+            Element foundElement = callbackLookup.getElement(id, null, false);
             return Collections.singletonList(foundElement);
         }
         // Otherwise just lookup all elements with the localname/namespace

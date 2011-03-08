@@ -30,16 +30,18 @@ import org.w3c.dom.Element;
 public interface CallbackLookup {
 
     /**
-     * Get the DOM element that corresponds to the given id. The Id can be a wsu:Id or else an
-     * Id attribute.
+     * Get the DOM element that corresponds to the given id and ValueType reference. The Id can 
+     * be a wsu:Id or else an Id attribute, or a SAML Id when the ValueType refers to a SAML
+     * Assertion.
      * @param id The id of the element to locate
+     * @param valueType The ValueType attribute of the element to locate (can be null)
      * @param checkMultipleElements If true then go through the entire tree and return 
      *        null if there are multiple elements with the same Id
      * @return the located element
      * @throws WSSecurityException
      */
     public Element getElement(
-        String id, boolean checkMultipleElements
+        String id, String valueType, boolean checkMultipleElements
     ) throws WSSecurityException;
     
     /**

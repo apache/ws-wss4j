@@ -116,7 +116,7 @@ public class WSSecSignatureBase extends WSSecBase {
                                 if (callbackLookup == null) {
                                     callbackLookup = new DOMCallbackLookup(doc);
                                 }
-                                toSignById = callbackLookup.getElement(idToSign, false);
+                                toSignById = callbackLookup.getElement(idToSign, null, false);
                                 wsDocInfo.addProtectionElement(toSignById);
                             }
                             List<String> prefixes = getInclusivePrefixes(toSignById);

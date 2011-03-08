@@ -485,7 +485,7 @@ public class SignatureProcessor implements Processor {
                     if (callbackLookup == null) {
                         callbackLookup = new DOMCallbackLookup(doc);
                     }
-                    se = callbackLookup.getElement(uri, false);
+                    se = callbackLookup.getElement(uri, null, false);
                 }
                 if (se == null) {
                     throw new WSSecurityException(WSSecurityException.FAILED_CHECK);

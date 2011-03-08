@@ -267,32 +267,13 @@ public class SecurityTokenReference {
             id = id.substring(1);
         }
         //
-        // Try to find a SAML Assertion by searching the DOM tree
-        //
-        if (WSConstants.WSS_SAML_KI_VALUE_TYPE.equals(type) 
-            || WSConstants.WSS_SAML2_KI_VALUE_TYPE.equals(type)) {
-            Element assertion = 
-                WSSecurityUtil.findSAMLAssertionElementById(
-                    doc.getDocumentElement(),
-                    id
-                );
-            if (assertion != null) {
-                if (doDebug) {
-                    log.debug("SAML token ID: " + assertion.getAttribute("AssertionID"));
-                }
-                docInfo.addTokenElement(assertion);
-                return assertion;
-            }
-        }
-        
-        //
-        // Try to find the element by its (wsu) Id
+        // Delegate finding the element to the CallbackLookup instance
         //
         CallbackLookup callbackLookup = docInfo.getCallbackLookup();
         if (callbackLookup == null) {
             callbackLookup = new DOMCallbackLookup(doc);
         }
-        return callbackLookup.getElement(uri, true);
+        return callbackLookup.getElement(uri, type, true);
     }
     
     /**
