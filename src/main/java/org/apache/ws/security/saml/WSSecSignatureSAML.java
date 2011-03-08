@@ -27,6 +27,7 @@ import org.apache.ws.security.WSEncryptionPart;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoType;
+import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.message.DOMURIDereferencer;
 import org.apache.ws.security.message.WSSecHeader;
 import org.apache.ws.security.message.WSSecSignature;
@@ -226,6 +227,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
         // retrieval
         //
         wsDocInfo = new WSDocInfo(doc);
+        
 
         X509Certificate[] certs = null;
         PublicKey publicKey = null;
@@ -250,9 +252,11 @@ public class WSSecSignatureSAML extends WSSecSignature {
                 );
             }
             if (secretKey == null) {
+                RequestData data = new RequestData();
+                data.setSigCrypto(userCrypto);
                 SAMLKeyInfo samlKeyInfo = 
                     SAMLUtil.getCredentialFromSubject(
-                        assertion, userCrypto, null, wsDocInfo, wssConfig.isWsiBSPCompliant()
+                        assertion, data, wsDocInfo, wssConfig.isWsiBSPCompliant()
                     );
                 publicKey = samlKeyInfo.getPublicKey();
                 certs = samlKeyInfo.getCerts();

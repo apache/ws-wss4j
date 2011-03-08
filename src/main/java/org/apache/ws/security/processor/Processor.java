@@ -20,31 +20,19 @@
 package org.apache.ws.security.processor;
 
 import org.apache.ws.security.WSDocInfo;
-import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.components.crypto.Crypto;
-import org.apache.ws.security.validate.Validator;
+import org.apache.ws.security.handler.RequestData;
 import org.w3c.dom.Element;
 
 import java.util.List;
-import javax.security.auth.callback.CallbackHandler;
 
 public interface Processor {
     
     public List<WSSecurityEngineResult> handleToken(
-        Element elem, 
-        Crypto crypto, 
-        Crypto decCrypto,
-        CallbackHandler cb, 
-        WSDocInfo wsDocInfo, 
-        WSSConfig config
+        Element elem,
+        RequestData request,
+        WSDocInfo wsDocInfo
     ) throws WSSecurityException;
-    
-    /**
-     * Set a Validator implementation to validate the credential
-     * @param validator the Validator implementation to set
-     */
-    public void setValidator(Validator validator);
     
 }

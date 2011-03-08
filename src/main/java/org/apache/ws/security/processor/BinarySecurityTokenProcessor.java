@@ -25,6 +25,7 @@ import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
+import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.message.token.BinarySecurity;
 import org.apache.ws.security.message.token.PKIPathSecurity;
 import org.apache.ws.security.message.token.X509Security;
@@ -35,47 +36,41 @@ import org.w3c.dom.Element;
 
 import java.security.cert.X509Certificate;
 import java.util.List;
-import javax.security.auth.callback.CallbackHandler;
+import javax.xml.namespace.QName;
 
 /**
  * Processor implementation to handle wsse:BinarySecurityToken elements
  */
 public class BinarySecurityTokenProcessor implements Processor {
     
-    private Validator validator = new NoOpValidator();
-    
-    /**
-     * Set a Validator implementation to validate the credential
-     * @param validator the Validator implementation to set
-     */
-    public void setValidator(Validator validator) {
-        this.validator = validator;
-    }
-
     /**
      * {@inheritDoc}
      */
     public List<WSSecurityEngineResult> handleToken(
         Element elem, 
-        Crypto crypto, 
-        Crypto decCrypto,
-        CallbackHandler cb, 
-        WSDocInfo wsDocInfo,
-        WSSConfig config
+        RequestData data,
+        WSDocInfo wsDocInfo
     ) throws WSSecurityException {
         
-        BinarySecurity token = createSecurityToken(elem, config);
+        BinarySecurity token = createSecurityToken(elem, data.getWssConfig());
         X509Certificate[] certs = null;
-        if (crypto == null) {
-            certs = getCertificatesTokenReference(token, decCrypto);
+        Validator validator = data.getValidator(new QName(elem.getNamespaceURI(),
+                                                          elem.getLocalName()));
+        
+        if (validator == null) {
+            validator = new NoOpValidator();
+        }
+        if (data.getSigCrypto() == null) {
+            certs = getCertificatesTokenReference(token, data.getDecCrypto());
         } else {
-            certs = getCertificatesTokenReference(token, crypto);
+            certs = getCertificatesTokenReference(token, data.getSigCrypto());
         }
         
         // Hook to allow the user to validate the BinarySecurityToken
         Credential credential = new Credential();
         credential.setBinarySecurityToken(token);
-        validator.validate(credential);
+        
+        validator.validate(credential, data);
         
         WSSecurityEngineResult result = 
             new WSSecurityEngineResult(WSConstants.BST, token, certs);

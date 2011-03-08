@@ -24,43 +24,32 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDocInfo;
 import org.apache.ws.security.WSSConfig;
+import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.WSUsernameTokenPrincipal;
-import org.apache.ws.security.components.crypto.Crypto;
+import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.message.token.UsernameToken;
 import org.apache.ws.security.validate.Credential;
 import org.apache.ws.security.validate.UsernameTokenValidator;
 import org.apache.ws.security.validate.Validator;
 import org.w3c.dom.Element;
 
-import javax.security.auth.callback.CallbackHandler;
 import java.util.List;
 
 public class UsernameTokenProcessor implements Processor {
     private static Log log = LogFactory.getLog(UsernameTokenProcessor.class.getName());
     
-    private Validator validator = new UsernameTokenValidator();
-    
-    /**
-     * Set a Validator implementation to validate the credential
-     * @param validator the Validator implementation to set
-     */
-    public void setValidator(Validator validator) {
-        this.validator = validator;
-    }
-
     public List<WSSecurityEngineResult> handleToken(
-        Element elem, Crypto crypto, Crypto decCrypto, CallbackHandler cb, 
-        WSDocInfo wsDocInfo, WSSConfig config
+        Element elem, 
+        RequestData data,
+        WSDocInfo wsDocInfo
     ) throws WSSecurityException {
         if (log.isDebugEnabled()) {
             log.debug("Found UsernameToken list element");
         }
-        validator.setCallbackHandler(cb);
-        validator.setWSSConfig(config);
         
-        UsernameToken token = handleUsernameToken(elem, config);
+        UsernameToken token = handleUsernameToken(elem, data);
         
         WSUsernameTokenPrincipal principal = 
             new WSUsernameTokenPrincipal(token.getName(), token.isHashed());
@@ -92,10 +81,11 @@ public class UsernameTokenProcessor implements Processor {
     public UsernameToken 
     handleUsernameToken(
         Element token, 
-        WSSConfig wssConfig
+        RequestData data
     ) throws WSSecurityException {
         boolean allowNamespaceQualifiedPasswordTypes = false;
         boolean bspCompliant = true;
+        WSSConfig wssConfig = data.getWssConfig();
         if (wssConfig != null) {
             allowNamespaceQualifiedPasswordTypes = 
                 wssConfig.getAllowNamespaceQualifiedPasswordTypes();
@@ -109,8 +99,12 @@ public class UsernameTokenProcessor implements Processor {
             new UsernameToken(token, allowNamespaceQualifiedPasswordTypes, bspCompliant);
         Credential credential = new Credential();
         credential.setUsernametoken(ut);
-        validator.validate(credential);
-        
+        Validator validator = data.getValidator(WSSecurityEngine.USERNAME_TOKEN);
+        if (validator == null) {
+            validator = new UsernameTokenValidator();
+        }
+        validator.validate(credential, data);
+
         return ut;
     }
 

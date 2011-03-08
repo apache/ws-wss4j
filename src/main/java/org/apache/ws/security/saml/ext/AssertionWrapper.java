@@ -23,9 +23,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.apache.ws.security.WSDocInfo;
-import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.components.crypto.Crypto;
+import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.saml.SAMLKeyInfo;
 import org.apache.ws.security.saml.SAMLUtil;
 import org.apache.ws.security.saml.ext.builder.SAML1ComponentBuilder;
@@ -502,7 +501,7 @@ public class AssertionWrapper {
      * @throws ValidationException
      */
     public void verifySignature(
-        Crypto crypto, WSDocInfo docInfo, WSSConfig config
+        RequestData data, WSDocInfo docInfo
     ) throws WSSecurityException {
         Signature sig = null;
         if (saml2 != null && saml2.getSignature() != null) {
@@ -514,7 +513,7 @@ public class AssertionWrapper {
             KeyInfo keyInfo = sig.getKeyInfo();
             SAMLKeyInfo samlKeyInfo = 
                 SAMLUtil.getCredentialFromKeyInfo(
-                    keyInfo.getDOM(), crypto, null, docInfo, config.isWsiBSPCompliant()
+                    keyInfo.getDOM(), data, docInfo, data.getWssConfig().isWsiBSPCompliant()
                 );
             if (samlKeyInfo == null) {
                 throw new WSSecurityException(
@@ -559,7 +558,7 @@ public class AssertionWrapper {
      * @throws WSSecurityException
      */
     public void parseHOKSubject(
-        Crypto crypto, CallbackHandler cb, WSDocInfo docInfo, WSSConfig config
+        RequestData data, WSDocInfo docInfo
     ) throws WSSecurityException {
         String confirmMethod = null;
         List<String> methods = getConfirmationMethods();
@@ -569,10 +568,12 @@ public class AssertionWrapper {
         if (OpenSAMLUtil.isMethodHolderOfKey(confirmMethod)) {
             if (saml1 != null) {
                 subjectKeyInfo = 
-                    SAMLUtil.getCredentialFromSubject(saml1, crypto, cb, docInfo, config.isWsiBSPCompliant());
+                    SAMLUtil.getCredentialFromSubject(saml1, data, docInfo, 
+                                                      data.getWssConfig().isWsiBSPCompliant());
             } else if (saml2 != null) {
                 subjectKeyInfo = 
-                    SAMLUtil.getCredentialFromSubject(saml2, crypto, cb, docInfo, config.isWsiBSPCompliant());
+                    SAMLUtil.getCredentialFromSubject(saml2, data, docInfo, 
+                                                      data.getWssConfig().isWsiBSPCompliant());
             }
         }
     }

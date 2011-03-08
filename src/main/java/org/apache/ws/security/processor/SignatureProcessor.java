@@ -27,11 +27,13 @@ import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDataRef;
 import org.apache.ws.security.WSDocInfo;
 import org.apache.ws.security.WSSConfig;
+import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.WSUsernameTokenPrincipal;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoType;
+import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.message.DOMCallbackLookup;
 import org.apache.ws.security.message.DOMURIDereferencer;
 import org.apache.ws.security.message.CallbackLookup;
@@ -49,7 +51,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import javax.security.auth.callback.CallbackHandler;
 
 import javax.xml.crypto.MarshalException;
 import javax.xml.crypto.NodeSetData;
@@ -81,23 +82,11 @@ public class SignatureProcessor implements Processor {
     private XMLSignatureFactory signatureFactory = XMLSignatureFactory.getInstance("DOM");
     
     private KeyInfoFactory keyInfoFactory = KeyInfoFactory.getInstance("DOM");
-    private Validator validator = new SignatureTrustValidator();
-    
-    /**
-     * Set a Validator implementation to validate the credential
-     * @param validator the Validator implementation to set
-     */
-    public void setValidator(Validator validator) {
-        this.validator = validator;
-    }
     
     public List<WSSecurityEngineResult> handleToken(
-        Element elem, 
-        Crypto crypto, 
-        Crypto decCrypto, 
-        CallbackHandler cb, 
-        WSDocInfo wsDocInfo, 
-        WSSConfig config
+        Element elem,
+        RequestData data,
+        WSDocInfo wsDocInfo 
     ) throws WSSecurityException {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Found signature element");
@@ -114,9 +103,12 @@ public class SignatureProcessor implements Processor {
         byte[] secretKey = null;
         String signatureMethod = getSignatureMethod(elem);
 
-        validator.setCrypto(crypto);
+        Validator validator = data.getValidator(WSSecurityEngine.SIGNATURE);
+        if (validator == null) {
+            validator = new SignatureTrustValidator();
+        }
         if (keyInfoElement == null) {
-            certs = getDefaultCerts(crypto);
+            certs = getDefaultCerts(data.getSigCrypto());
             principal = certs[0].getSubjectX500Principal();
         } else {
             List<Element> strElements = 
@@ -125,7 +117,7 @@ public class SignatureProcessor implements Processor {
                     SecurityTokenReference.SECURITY_TOKEN_REFERENCE,
                     WSConstants.WSSE_NS
                 );
-            if (config.isWsiBSPCompliant()) {
+            if (data.getWssConfig().isWsiBSPCompliant()) {
                 if (strElements.isEmpty()) {
                     throw new WSSecurityException(
                         WSSecurityException.INVALID_SECURITY, "noSecurityTokenReference"
@@ -143,16 +135,16 @@ public class SignatureProcessor implements Processor {
                 credential.setPublicKey(publicKey);
                 principal = new PublicKeyPrincipal(publicKey);
                 credential.setPrincipal(principal);
-                validator.validate(credential);
+                validator.validate(credential, data);
             } else {
                 STRParser strParser = new SignatureSTRParser();
                 Map<String, Object> parameters = new HashMap<String, Object>();
                 parameters.put(SignatureSTRParser.SIGNATURE_METHOD, signatureMethod);
                 parameters.put(
-                    SignatureSTRParser.SECRET_KEY_LENGTH, new Integer(config.getSecretKeyLength())
+                    SignatureSTRParser.SECRET_KEY_LENGTH, new Integer(data.getWssConfig().getSecretKeyLength())
                 );
                 strParser.parseSecurityTokenReference(
-                    strElements.get(0), crypto, cb, wsDocInfo, config, parameters
+                    strElements.get(0), data, wsDocInfo, parameters
                 );
                 principal = strParser.getPrincipal();
                 certs = strParser.getCertificates();
@@ -172,7 +164,7 @@ public class SignatureProcessor implements Processor {
                     credential.setPublicKey(publicKey);
                     credential.setCertificates(certs);
                     credential.setPrincipal(principal);
-                    validator.validate(credential);
+                    validator.validate(credential, data);
                 }
             }
         }
@@ -192,14 +184,15 @@ public class SignatureProcessor implements Processor {
         byte[] signatureValue = xmlSignature.getSignatureValue().getValue();
         String c14nMethod = xmlSignature.getSignedInfo().getCanonicalizationMethod().getAlgorithm();
         // The c14n algorithm must be as specified by the BSP spec
-        if (config.isWsiBSPCompliant() && !WSConstants.C14N_EXCL_OMIT_COMMENTS.equals(c14nMethod)) {
+        if (data.getWssConfig().isWsiBSPCompliant() 
+            && !WSConstants.C14N_EXCL_OMIT_COMMENTS.equals(c14nMethod)) {
             throw new WSSecurityException(
                 WSSecurityException.INVALID_SECURITY, "badC14nAlgo"
             );
         }
         List<WSDataRef> dataRefs =  
             buildProtectedRefs(
-                elem.getOwnerDocument(), xmlSignature.getSignedInfo(), config, wsDocInfo
+                elem.getOwnerDocument(), xmlSignature.getSignedInfo(), data.getWssConfig(), wsDocInfo
             );
         if (dataRefs.size() == 0) {
             throw new WSSecurityException(WSSecurityException.FAILED_CHECK);

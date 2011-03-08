@@ -21,17 +21,14 @@ package org.apache.ws.security.processor;
 
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDocInfo;
-import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.components.crypto.Crypto;
+import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.message.token.DerivedKeyToken;
 import org.apache.ws.security.str.DerivedKeyTokenSTRParser;
 import org.apache.ws.security.str.STRParser;
-import org.apache.ws.security.validate.Validator;
 import org.w3c.dom.Element;
 
-import javax.security.auth.callback.CallbackHandler;
 
 import java.util.List;
 
@@ -42,21 +39,10 @@ import java.util.List;
  */
 public class DerivedKeyTokenProcessor implements Processor {
     
-    /**
-     * Set a Validator implementation to validate the credential
-     * @param validator the Validator implementation to set
-     */
-    public void setValidator(Validator validator) {
-        // not used
-    }
-
     public List<WSSecurityEngineResult> handleToken(
         Element elem, 
-        Crypto crypto, 
-        Crypto decCrypto,
-        CallbackHandler cb, 
-        WSDocInfo wsDocInfo, 
-        WSSConfig config
+        RequestData data, 
+        WSDocInfo wsDocInfo
     ) throws WSSecurityException {
         
         // Deserialize the DKT
@@ -65,7 +51,9 @@ public class DerivedKeyTokenProcessor implements Processor {
         Element secRefElement = dkt.getSecurityTokenReferenceElement();
         if (secRefElement != null) {
             STRParser strParser = new DerivedKeyTokenSTRParser();
-            strParser.parseSecurityTokenReference(secRefElement, crypto, cb, wsDocInfo, config, null);
+            strParser.parseSecurityTokenReference(secRefElement, 
+                                                  data,
+                                                  wsDocInfo, null);
             
             secret = strParser.getSecretKey();
         } else {

@@ -21,6 +21,8 @@ package org.apache.ws.security;
 
 import org.w3c.dom.Element;
 
+import org.apache.ws.security.handler.RequestData;
+
 import javax.security.auth.callback.Callback;
 
 /**
@@ -110,6 +112,7 @@ public class WSPasswordCallback implements Callback {
     private int usage;
     private String type;
     private Element customToken;
+    private RequestData data;
     
     /**
      * Constructor.
@@ -118,7 +121,7 @@ public class WSPasswordCallback implements Callback {
      *           this identifier.
      */
     public WSPasswordCallback(String id, int usage) {
-        this(id, null, null, usage);
+        this(id, null, null, usage, null);
     }
 
     /**
@@ -127,11 +130,12 @@ public class WSPasswordCallback implements Callback {
      * @param id The application called back must supply the password for
      *           this identifier.
      */
-    public WSPasswordCallback(String id, String pw, String type, int usage) {
+    public WSPasswordCallback(String id, String pw, String type, int usage, RequestData data) {
         identifier = id;
         password = pw;
         this.type = type;
         this.usage = usage;
+        this.data = data;
     }
     
     /**
@@ -223,6 +227,15 @@ public class WSPasswordCallback implements Callback {
      */
     public void setCustomToken(Element customToken) {
         this.customToken = customToken;
+    }
+    
+    
+    /**
+     * Returns the RequestData associated with the request
+     * @return
+     */
+    public RequestData getRequestData() {
+        return data;
     }
 }
 

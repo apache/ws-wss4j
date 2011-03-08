@@ -36,8 +36,6 @@ import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.common.CustomHandler;
 import org.apache.ws.security.common.SOAPUtil;
 import org.apache.ws.security.components.crypto.CryptoFactory;
-import org.apache.ws.security.handler.RequestData;
-import org.apache.ws.security.handler.WSHandlerConstants;
 import org.w3c.dom.Document;
 
 

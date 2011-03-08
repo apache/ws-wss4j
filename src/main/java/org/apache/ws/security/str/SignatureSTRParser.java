@@ -23,11 +23,11 @@ import org.apache.ws.security.CustomTokenPrincipal;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDocInfo;
 import org.apache.ws.security.WSPasswordCallback;
-import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
+import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.message.token.BinarySecurity;
 import org.apache.ws.security.message.token.DerivedKeyToken;
 import org.apache.ws.security.message.token.PKIPathSecurity;
@@ -50,7 +50,6 @@ import java.util.List;
 import java.util.Map;
 
 import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.CallbackHandler;
 import javax.xml.namespace.QName;
 
 /**
@@ -91,15 +90,14 @@ public class SignatureSTRParser implements STRParser {
      */
     public void parseSecurityTokenReference(
         Element strElement,
-        Crypto crypto,
-        CallbackHandler cb,
+        RequestData data,
         WSDocInfo wsDocInfo,
-        WSSConfig config,
         Map<String, Object> parameters
     ) throws WSSecurityException {
         boolean bspCompliant = true;
-        if (config != null) {
-            bspCompliant = config.isWsiBSPCompliant();
+        Crypto crypto = data.getSigCrypto();
+        if (data.getWssConfig() != null) {
+            bspCompliant = data.getWssConfig().isWsiBSPCompliant();
         }
         SecurityTokenReference secRef = new SecurityTokenReference(strElement, bspCompliant);
         //
@@ -117,31 +115,32 @@ public class SignatureSTRParser implements STRParser {
             WSSecurityEngineResult result = wsDocInfo.getResult(uri);
             if (result == null) {
                 Element token = 
-                    secRef.getTokenElement(strElement.getOwnerDocument(), wsDocInfo, cb);
+                    secRef.getTokenElement(strElement.getOwnerDocument(), wsDocInfo, data.getCallbackHandler());
                 QName el = new QName(token.getNamespaceURI(), token.getLocalName());
                 if (el.equals(WSSecurityEngine.BINARY_TOKEN)) {
                     certs = getCertificatesTokenReference(secRef, token, crypto, bspCompliant);
                 } else if (el.equals(WSSecurityEngine.SAML_TOKEN) 
                     || el.equals(WSSecurityEngine.SAML2_TOKEN)) {
-                    Processor proc = config.getProcessor(WSSecurityEngine.SAML_TOKEN);
+                    Processor proc = data.getWssConfig().getProcessor(WSSecurityEngine.SAML_TOKEN);
                     //
                     // Just check to see whether the token was processed or not
                     //
                     Element processedToken = 
                         secRef.findProcessedTokenElement(
-                            strElement.getOwnerDocument(), wsDocInfo, cb, uri, ref.getValueType()
+                            strElement.getOwnerDocument(), wsDocInfo, 
+                            data.getCallbackHandler(), uri, ref.getValueType()
                         );
                     AssertionWrapper assertion = null;
                     if (processedToken == null) {
                         List<WSSecurityEngineResult> samlResult =
-                            proc.handleToken(token, null, crypto, cb, wsDocInfo, config);
+                            proc.handleToken(token, data, wsDocInfo);
                         assertion = 
                             (AssertionWrapper)samlResult.get(0).get(
                                 WSSecurityEngineResult.TAG_SAML_ASSERTION
                             );
                     } else {
                         assertion = new AssertionWrapper(processedToken);
-                        assertion.parseHOKSubject(crypto, cb, wsDocInfo, config);
+                        assertion.parseHOKSubject(data, wsDocInfo);
                     }
                     if (bspCompliant) {
                         BSPEnforcer.checkSamlTokenBSPCompliance(secRef, assertion);
@@ -157,9 +156,9 @@ public class SignatureSTRParser implements STRParser {
                     if (bspCompliant) {
                         BSPEnforcer.checkEncryptedKeyBSPCompliance(secRef);
                     }
-                    Processor proc = config.getProcessor(WSSecurityEngine.ENCRYPTED_KEY);
+                    Processor proc = data.getWssConfig().getProcessor(WSSecurityEngine.ENCRYPTED_KEY);
                     List<WSSecurityEngineResult> encrResult =
-                        proc.handleToken(token, null, crypto, cb, wsDocInfo, config);
+                        proc.handleToken(token, data, wsDocInfo);
                     secretKey = 
                         (byte[])encrResult.get(0).get(
                             WSSecurityEngineResult.TAG_SECRET
@@ -167,7 +166,7 @@ public class SignatureSTRParser implements STRParser {
                     principal = new CustomTokenPrincipal(token.getAttribute("Id"));
                 } else {
                     String id = secRef.getReference().getURI();
-                    secretKey = getSecretKeyFromToken(id, null, cb);
+                    secretKey = getSecretKeyFromToken(id, null, data);
                     principal = new CustomTokenPrincipal(id);
                 }
             } else {
@@ -179,7 +178,7 @@ public class SignatureSTRParser implements STRParser {
                     UsernameToken usernameToken = 
                         (UsernameToken)result.get(WSSecurityEngineResult.TAG_USERNAME_TOKEN);
 
-                    usernameToken.setRawPassword(cb);
+                    usernameToken.setRawPassword(data);
                     if (usernameToken.isDerivedKey()) {
                         secretKey = usernameToken.getDerivedKey();
                     } else {
@@ -250,19 +249,21 @@ public class SignatureSTRParser implements STRParser {
                 }
                 String id = secRef.getKeyIdentifierValue();
                 secretKey = 
-                    getSecretKeyFromToken(id, SecurityTokenReference.ENC_KEY_SHA1_URI, cb);
+                    getSecretKeyFromToken(id, SecurityTokenReference.ENC_KEY_SHA1_URI, 
+                                          data);
                 principal = new CustomTokenPrincipal(id);
             } else if (WSConstants.WSS_SAML_KI_VALUE_TYPE.equals(secRef.getKeyIdentifierValueType())
                 || WSConstants.WSS_SAML2_KI_VALUE_TYPE.equals(secRef.getKeyIdentifierValueType())) {
                 AssertionWrapper assertion = 
                     SAMLUtil.getAssertionFromKeyIdentifier(
-                        secRef, strElement, crypto, cb, wsDocInfo, config
+                        secRef, strElement, data, wsDocInfo
                     );
                 if (bspCompliant) {
                     BSPEnforcer.checkSamlTokenBSPCompliance(secRef, assertion);
                 }
                 SAMLKeyInfo samlKi = 
-                    SAMLUtil.getCredentialFromSubject(assertion, crypto, cb, wsDocInfo, bspCompliant);
+                    SAMLUtil.getCredentialFromSubject(assertion, data,
+                                                      wsDocInfo, bspCompliant);
                 X509Certificate[] foundCerts = samlKi.getCerts();
                 if (foundCerts != null) {
                     certs = new X509Certificate[]{foundCerts[0]};
@@ -413,16 +414,16 @@ public class SignatureSTRParser implements STRParser {
     private byte[] getSecretKeyFromToken(
         String id,
         String type,
-        CallbackHandler cb
+        RequestData data
     ) throws WSSecurityException {
         if (id.charAt(0) == '#') {
             id = id.substring(1);
         }
         WSPasswordCallback pwcb = 
-            new WSPasswordCallback(id, null, type, WSPasswordCallback.SECRET_KEY);
+            new WSPasswordCallback(id, null, type, WSPasswordCallback.SECRET_KEY, data);
         try {
             Callback[] callbacks = new Callback[]{pwcb};
-            cb.handle(callbacks);
+            data.getCallbackHandler().handle(callbacks);
         } catch (Exception e) {
             throw new WSSecurityException(
                 WSSecurityException.FAILURE,

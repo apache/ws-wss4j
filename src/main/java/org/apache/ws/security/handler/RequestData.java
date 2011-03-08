@@ -23,13 +23,18 @@ import org.apache.ws.security.SOAPConstants;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSEncryptionPart;
 import org.apache.ws.security.WSSConfig;
+import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.message.WSSecHeader;
 import org.apache.ws.security.message.token.UsernameToken;
+import org.apache.ws.security.validate.Validator;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.security.cert.X509Certificate;
+
+import javax.security.auth.callback.CallbackHandler;
+import javax.xml.namespace.QName;
 
 /**
  * This class holds per request data.
@@ -68,6 +73,7 @@ public class RequestData {
     private int derivedKeyIterations = UsernameToken.DEFAULT_ITERATION;
     private boolean useDerivedKeyForMAC = true;
     private boolean useSingleCert = true;
+    private CallbackHandler callback = null;
 
     public void clear() {
         soapConstants = null;
@@ -87,6 +93,7 @@ public class RequestData {
         derivedKeyIterations = UsernameToken.DEFAULT_ITERATION;
         useDerivedKeyForMAC = true;
         useSingleCert = true;
+        callback = null;
     }
 
     public Object getMsgContext() {
@@ -374,4 +381,24 @@ public class RequestData {
         return useSingleCert;
     }
     
+    
+    /**
+     * Sets the CallbackHandler used for this request
+     * @param cb
+     */
+    public void setCallbackHandler(CallbackHandler cb) { 
+        callback = cb;
+    }
+    
+    /**
+     * Returns the CallbackHandler used for this request.
+     * @return
+     */
+    public CallbackHandler getCallbackHandler() {
+        return callback;
+    }
+
+    public Validator getValidator(QName qName) throws WSSecurityException {
+        return wssConfig.getValidator(qName);
+    }
 }

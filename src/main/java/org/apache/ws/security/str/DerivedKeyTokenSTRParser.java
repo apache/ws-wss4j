@@ -26,6 +26,7 @@ import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
+import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.message.token.Reference;
 import org.apache.ws.security.message.token.SecurityTokenReference;
 import org.apache.ws.security.message.token.UsernameToken;
@@ -40,7 +41,6 @@ import java.security.cert.X509Certificate;
 import java.util.Map;
 
 import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.CallbackHandler;
 
 /**
  * This implementation of STRParser is for parsing a SecurityTokenReference element associated
@@ -63,13 +63,14 @@ public class DerivedKeyTokenSTRParser implements STRParser {
      */
     public void parseSecurityTokenReference(
         Element strElement,
-        Crypto crypto,
-        CallbackHandler cb,
+        RequestData data,
         WSDocInfo wsDocInfo,
-        WSSConfig config,
         Map<String, Object> parameters
     ) throws WSSecurityException {
         boolean bspCompliant = true;
+        Crypto crypto = data.getDecCrypto();
+        WSSConfig config = data.getWssConfig();
+
         if (config != null) {
             bspCompliant = config.isWsiBSPCompliant();
         }
@@ -103,7 +104,7 @@ public class DerivedKeyTokenSTRParser implements STRParser {
                 }
                 UsernameToken usernameToken = 
                     (UsernameToken)result.get(WSSecurityEngineResult.TAG_USERNAME_TOKEN);
-                usernameToken.setRawPassword(cb);
+                usernameToken.setRawPassword(data);
                 secretKey = usernameToken.getDerivedKey();
             } else if (WSConstants.ENCR == action) {
                 if (bspCompliant) {
@@ -119,7 +120,8 @@ public class DerivedKeyTokenSTRParser implements STRParser {
                     BSPEnforcer.checkSamlTokenBSPCompliance(secRef, assertion);
                 }
                 SAMLKeyInfo keyInfo = 
-                    SAMLUtil.getCredentialFromSubject(assertion, crypto, cb, wsDocInfo, bspCompliant);
+                    SAMLUtil.getCredentialFromSubject(assertion, 
+                                                      data, wsDocInfo, bspCompliant);
                 // TODO Handle malformed SAML tokens where they don't have the 
                 // secret in them
                 secretKey = keyInfo.getSecret();
@@ -131,7 +133,8 @@ public class DerivedKeyTokenSTRParser implements STRParser {
         } else if (result == null && uri != null) {
             // Now use the callback and get it
             secretKey = 
-                getSecretKeyFromToken(uri, null, WSPasswordCallback.SECURITY_CONTEXT_TOKEN, cb);
+                getSecretKeyFromToken(uri, null, WSPasswordCallback.SECURITY_CONTEXT_TOKEN, 
+                                      data);
         } else if (keyIdentifierValue != null && keyIdentifierValueType != null) {
             if (bspCompliant 
                 && keyIdentifierValueType.equals(SecurityTokenReference.ENC_KEY_SHA1_URI)) {
@@ -142,10 +145,10 @@ public class DerivedKeyTokenSTRParser implements STRParser {
                 secretKey = 
                     this.getSecretKeyFromToken(
                         keyIdentifierValue, keyIdentifierValueType, 
-                        WSPasswordCallback.SECRET_KEY, cb
+                        WSPasswordCallback.SECRET_KEY, data
                    ); 
             } else {
-                secretKey = crypto.getPrivateKey(certs[0], cb).getEncoded();
+                secretKey = crypto.getPrivateKey(certs[0], data.getCallbackHandler()).getEncoded();
             }
         } else {
             throw new WSSecurityException(
@@ -198,16 +201,16 @@ public class DerivedKeyTokenSTRParser implements STRParser {
         String id,
         String type,
         int identifier,
-        CallbackHandler cb
+        RequestData data
     ) throws WSSecurityException {
         if (id.charAt(0) == '#') {
             id = id.substring(1);
         }
         WSPasswordCallback pwcb = 
-            new WSPasswordCallback(id, null, type, identifier);
+            new WSPasswordCallback(id, null, type, identifier, data);
         try {
             Callback[] callbacks = new Callback[]{pwcb};
-            cb.handle(callbacks);
+            data.getCallbackHandler().handle(callbacks);
         } catch (Exception e) {
             throw new WSSecurityException(
                 WSSecurityException.FAILURE,

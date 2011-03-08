@@ -22,6 +22,7 @@ package org.apache.ws.security.validate;
 import java.util.List;
 
 import org.apache.ws.security.WSSecurityException;
+import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.saml.SAMLKeyInfo;
 import org.apache.ws.security.saml.ext.AssertionWrapper;
 import org.apache.ws.security.saml.ext.OpenSAMLUtil;
@@ -40,9 +41,10 @@ public class SamlAssertionValidator extends SignatureTrustValidator {
      * A Crypto and a CallbackHandler implementation is also required to be set.
      * 
      * @param credential the Credential to be validated
+     * @param RequestData associated with the request
      * @throws WSSecurityException on a failed validation
      */
-    public Credential validate(Credential credential) throws WSSecurityException {
+    public Credential validate(Credential credential, RequestData data) throws WSSecurityException {
         if (credential == null || credential.getAssertion() == null) {
             throw new WSSecurityException(WSSecurityException.FAILURE, "noCredential");
         }
@@ -70,7 +72,7 @@ public class SamlAssertionValidator extends SignatureTrustValidator {
             SAMLKeyInfo samlKeyInfo = assertion.getSignatureKeyInfo();
             trustCredential.setPublicKey(samlKeyInfo.getPublicKey());
             trustCredential.setCertificates(samlKeyInfo.getCerts());
-            super.validate(trustCredential);
+            super.validate(trustCredential, data);
         }
         return credential;
     }

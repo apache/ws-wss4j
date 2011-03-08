@@ -25,6 +25,7 @@ import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.WSUsernameTokenPrincipal;
+import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.util.DOM2Writer;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.ws.security.util.XmlSchemaDateFormat;
@@ -37,7 +38,6 @@ import org.w3c.dom.Text;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.xml.namespace.QName;
 
@@ -491,14 +491,14 @@ public class UsernameToken {
     /**
      * Set the raw (plain text) password used to compute secret key.
      */
-    public void setRawPassword(CallbackHandler callbackHandler) throws WSSecurityException {
+    public void setRawPassword(RequestData data) throws WSSecurityException {
         WSPasswordCallback pwCb = 
             new WSPasswordCallback(
                 getName(), getPassword(), getPasswordType(), 
-                WSPasswordCallback.USERNAME_TOKEN
+                WSPasswordCallback.USERNAME_TOKEN, data
             );
         try {
-            callbackHandler.handle(new Callback[]{pwCb});
+            data.getCallbackHandler().handle(new Callback[]{pwCb});
         } catch (IOException e) {
             if (LOG.isDebugEnabled()) {
                 LOG.debug(e);

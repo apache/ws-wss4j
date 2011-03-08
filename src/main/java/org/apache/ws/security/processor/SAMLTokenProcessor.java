@@ -23,46 +23,31 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDocInfo;
-import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.components.crypto.Crypto;
+import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.saml.ext.AssertionWrapper;
 import org.apache.ws.security.util.DOM2Writer;
 import org.apache.ws.security.validate.Credential;
-import org.apache.ws.security.validate.SamlAssertionValidator;
 import org.apache.ws.security.validate.Validator;
 
 import org.w3c.dom.Element;
 
 import java.util.List;
-import javax.security.auth.callback.CallbackHandler;
+import javax.xml.namespace.QName;
 
 public class SAMLTokenProcessor implements Processor {
     private static Log log = LogFactory.getLog(SAMLTokenProcessor.class.getName());
     
-    private Validator validator = new SamlAssertionValidator();
-    
-    /**
-     * Set a Validator implementation to validate the credential
-     * @param validator the Validator implementation to set
-     */
-    public void setValidator(Validator validator) {
-        this.validator = validator;
-    }
-    
     public List<WSSecurityEngineResult> handleToken(
         Element elem, 
-        Crypto crypto,
-        Crypto decCrypto, 
-        CallbackHandler cb, 
-        WSDocInfo wsDocInfo, 
-        WSSConfig config
+        RequestData data, 
+        WSDocInfo wsDocInfo 
     ) throws WSSecurityException {
         if (log.isDebugEnabled()) {
             log.debug("Found SAML Assertion element");
         }
-        AssertionWrapper assertion = handleSAMLToken(elem, crypto, cb, wsDocInfo, config);
+        AssertionWrapper assertion = handleSAMLToken(elem, data, wsDocInfo);
         wsDocInfo.addTokenElement(elem);
         WSSecurityEngineResult result = null;
         if (assertion.isSigned()) {
@@ -78,25 +63,22 @@ public class SAMLTokenProcessor implements Processor {
 
     public AssertionWrapper handleSAMLToken(
         Element token, 
-        Crypto crypto,
-        CallbackHandler cb,
-        WSDocInfo docInfo,
-        WSSConfig config
+        RequestData data,
+        WSDocInfo docInfo
     ) throws WSSecurityException {
         AssertionWrapper assertion = new AssertionWrapper(token);
         if (assertion.isSigned()) {
-            assertion.verifySignature(crypto, docInfo, config);
+            assertion.verifySignature(data, docInfo);
         }
         // Parse the HOK subject if it exists
-        assertion.parseHOKSubject(crypto, cb, docInfo, config);
+        assertion.parseHOKSubject(data, docInfo);
             
         // Now delegate the rest of the verification to the Validator
-        validator.setCrypto(crypto);
-        validator.setCallbackHandler(cb);
-        validator.setWSSConfig(config);
+        Validator validator = data.getValidator(new QName(token.getNamespaceURI(),
+                                                          token.getLocalName()));
         Credential credential = new Credential();
         credential.setAssertion(assertion);
-        validator.validate(credential);
+        validator.validate(credential, data);
         
         if (log.isDebugEnabled()) {
             log.debug("SAML Assertion issuer " + assertion.getIssuerString());

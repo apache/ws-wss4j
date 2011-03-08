@@ -26,8 +26,6 @@ import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.common.SOAPUtil;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
-import org.apache.ws.security.message.WSSecSignature;
-import org.apache.ws.security.message.WSSecHeader;
 import org.w3c.dom.Document;
 
 /**

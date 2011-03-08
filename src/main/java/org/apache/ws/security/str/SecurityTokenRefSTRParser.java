@@ -25,7 +25,7 @@ import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.components.crypto.Crypto;
+import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.message.token.DerivedKeyToken;
 import org.apache.ws.security.message.token.Reference;
 import org.apache.ws.security.message.token.SecurityTokenReference;
@@ -41,7 +41,6 @@ import java.security.cert.X509Certificate;
 import java.util.Map;
 
 import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.CallbackHandler;
 
 /**
  * This implementation of STRParser is for parsing a SecurityTokenReference element, found in the
@@ -69,13 +68,12 @@ public class SecurityTokenRefSTRParser implements STRParser {
      */
     public void parseSecurityTokenReference(
         Element strElement,
-        Crypto crypto,
-        CallbackHandler cb,
+        RequestData data,
         WSDocInfo wsDocInfo,
-        WSSConfig config,
         Map<String, Object> parameters
     ) throws WSSecurityException {
         boolean bspCompliant = true;
+        WSSConfig config = data.getWssConfig();
         if (config != null) {
             bspCompliant = config.isWsiBSPCompliant();
         }
@@ -111,7 +109,8 @@ public class SecurityTokenRefSTRParser implements STRParser {
                         BSPEnforcer.checkSamlTokenBSPCompliance(secRef, assertion);
                     }
                     SAMLKeyInfo keyInfo = 
-                        SAMLUtil.getCredentialFromSubject(assertion, crypto, cb, wsDocInfo, bspCompliant);
+                        SAMLUtil.getCredentialFromSubject(assertion, 
+                                                          data, wsDocInfo, bspCompliant);
                     // TODO Handle malformed SAML tokens where they don't have the 
                     // secret in them
                     secretKey = keyInfo.getSecret();
@@ -120,7 +119,7 @@ public class SecurityTokenRefSTRParser implements STRParser {
                 }
             } else {
                 // Try asking the CallbackHandler for the secret key
-                secretKey = getSecretKeyFromToken(id, null, cb);
+                secretKey = getSecretKeyFromToken(id, null, data);
                 if (secretKey == null) {
                     throw new WSSecurityException(
                             WSSecurityException.FAILED_CHECK, "unsupportedKeyId"
@@ -133,13 +132,16 @@ public class SecurityTokenRefSTRParser implements STRParser {
                 || WSConstants.WSS_SAML2_KI_VALUE_TYPE.equals(valueType)) { 
                 AssertionWrapper assertion = 
                     SAMLUtil.getAssertionFromKeyIdentifier(
-                        secRef, strElement, crypto, cb, wsDocInfo, config
+                        secRef, strElement, 
+                        data, wsDocInfo
                     );
                 if (bspCompliant) {
                     BSPEnforcer.checkSamlTokenBSPCompliance(secRef, assertion);
                 }
                 SAMLKeyInfo samlKi = 
-                    SAMLUtil.getCredentialFromSubject(assertion, crypto, cb, wsDocInfo, bspCompliant);
+                    SAMLUtil.getCredentialFromSubject(assertion,
+                                                      data,
+                                                      wsDocInfo, bspCompliant);
                 // TODO Handle malformed SAML tokens where they don't have the 
                 // secret in them
                 secretKey = samlKi.getSecret();
@@ -149,8 +151,8 @@ public class SecurityTokenRefSTRParser implements STRParser {
                 } 
                 secretKey = 
                     getSecretKeyFromToken(
-                        secRef.getKeyIdentifierValue(), secRef.getKeyIdentifierValueType(), cb
-                    );
+                        secRef.getKeyIdentifierValue(), secRef.getKeyIdentifierValueType(), 
+                        data);
             }
         } else {
             throw new WSSecurityException(WSSecurityException.FAILED_CHECK, "noReference");
@@ -200,16 +202,16 @@ public class SecurityTokenRefSTRParser implements STRParser {
     private byte[] getSecretKeyFromToken(
         String id,
         String type,
-        CallbackHandler cb
+        RequestData data
     ) throws WSSecurityException {
         if (id.charAt(0) == '#') {
             id = id.substring(1);
         }
         WSPasswordCallback pwcb = 
-            new WSPasswordCallback(id, null, type, WSPasswordCallback.SECRET_KEY);
+            new WSPasswordCallback(id, null, type, WSPasswordCallback.SECRET_KEY, data);
         try {
             Callback[] callbacks = new Callback[]{pwcb};
-            cb.handle(callbacks);
+            data.getCallbackHandler().handle(callbacks);
         } catch (Exception e) {
             throw new WSSecurityException(
                 WSSecurityException.FAILURE,

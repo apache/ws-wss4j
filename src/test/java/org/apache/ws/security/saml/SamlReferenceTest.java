@@ -821,7 +821,7 @@ public class SamlReferenceTest extends org.junit.Assert {
         saml.setIssuerKeyPassword("security");
         saml.setSignAssertion(true);
         saml.setSamlVersion("2.0");
-        saml.setCallbackHandler(callbackHandler);;
+        saml.setCallbackHandler(callbackHandler);
         AssertionWrapper assertion = saml.newAssertion();
 
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
@@ -900,7 +900,7 @@ public class SamlReferenceTest extends org.junit.Assert {
         saml.setIssuerKeyPassword("security");
         saml.setSignAssertion(true);
         saml.setSamlVersion("2.0");
-        saml.setCallbackHandler(callbackHandler);;
+        saml.setCallbackHandler(callbackHandler);
         AssertionWrapper assertion = saml.newAssertion();
 
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);

@@ -23,6 +23,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.conversation.ConversationConstants;
+import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.message.CallbackLookup;
 import org.apache.ws.security.message.token.UsernameToken;
 import org.apache.ws.security.processor.Processor;
@@ -295,7 +296,64 @@ public class WSSecurityEngine {
         CallbackHandler cb,
         Crypto sigCrypto,
         Crypto decCrypto
-    ) throws WSSecurityException {
+    ) throws WSSecurityException { 
+        RequestData data = new RequestData();
+        data.setWssConfig(getWssConfig());
+        data.setDecCrypto(decCrypto);
+        data.setSigCrypto(sigCrypto);
+        data.setCallbackHandler(cb);
+        return processSecurityHeader(securityHeader, data);
+    }
+    
+    
+    /**
+     * Process the security header given the <code>wsse:Security</code> DOM
+     * Element. 
+     * 
+     * This function loops over all direct child elements of the
+     * <code>wsse:Security</code> header. If it finds a known element, it
+     * transfers control to the appropriate handling function. The method
+     * processes the known child elements in the same order as they appear in
+     * the <code>wsse:Security</code> element. This is in accordance to the WS
+     * Security specification. <p/>
+     * 
+     * Currently the functions can handle the following child elements:
+     * 
+     * <ul>
+     * <li>{@link #SIGNATURE <code>ds:Signature</code>}</li>
+     * <li>{@link #ENCRYPTED_KEY <code>xenc:EncryptedKey</code>}</li>
+     * <li>{@link #REFERENCE_LIST <code>xenc:ReferenceList</code>}</li>
+     * <li>{@link #USERNAME_TOKEN <code>wsse:UsernameToken</code>}</li>
+     * <li>{@link #TIMESTAMP <code>wsu:Timestamp</code>}</li>
+     * </ul>
+     *
+     * Note that additional child elements can be processed if appropriate
+     * Processors have been registered with the WSSCondig instance set
+     * on this class.
+     *
+     * @param securityHeader the <code>wsse:Security</code> header element
+     * @param requestData    the RequestData associated with the request.  It should
+     *                       be able to provide the callback handler, cryptos, etc...
+     *                       as needed by the processing
+     * @return a List of {@link WSSecurityEngineResult}. Each element in the
+     *         the List represents the result of a security action. The elements
+     *         are ordered according to the sequence of the security actions in the
+     *         wsse:Signature header. The List may be empty if no security processing
+     *         was performed.
+     * @throws WSSecurityException
+     */
+    public List<WSSecurityEngineResult> processSecurityHeader(
+        Element securityHeader,
+        RequestData requestData) throws WSSecurityException {
+        List<WSSecurityEngineResult> returnResults = new ArrayList<WSSecurityEngineResult>();
+        if (securityHeader == null) {
+            return returnResults;
+        }
+    
+        if (requestData.getWssConfig() == null) {
+            requestData.setWssConfig(getWssConfig());
+        }
+        
         //
         // Gather some info about the document to process and store
         // it for retrieval. Store the implementation of signature crypto
@@ -303,9 +361,8 @@ public class WSSecurityEngine {
         //
         WSDocInfo wsDocInfo = new WSDocInfo(securityHeader.getOwnerDocument());
         wsDocInfo.setCallbackLookup(callbackLookup);
-        wsDocInfo.setCrypto(sigCrypto);
+        wsDocInfo.setCrypto(requestData.getSigCrypto());
 
-        List<WSSecurityEngineResult> returnResults = new ArrayList<WSSecurityEngineResult>();
         final WSSConfig cfg = getWssConfig();
         Node node = securityHeader.getFirstChild();
         
@@ -337,7 +394,7 @@ public class WSSecurityEngine {
                 Processor p = cfg.getProcessor(el);
                 if (p != null) {
                     List<WSSecurityEngineResult> results = 
-                        p.handleToken((Element) node, sigCrypto, decCrypto, cb, wsDocInfo, cfg);
+                        p.handleToken((Element) node, requestData, wsDocInfo);
                     returnResults.addAll(0, results);
                 } else {
                     //

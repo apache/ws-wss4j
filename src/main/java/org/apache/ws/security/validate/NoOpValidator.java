@@ -19,11 +19,9 @@
 
 package org.apache.ws.security.validate;
 
-import javax.security.auth.callback.CallbackHandler;
 
-import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.components.crypto.Crypto;
+import org.apache.ws.security.handler.RequestData;
 
 /**
  * This class does not do any Validation at all.
@@ -34,37 +32,11 @@ public class NoOpValidator implements Validator {
      * Validate the credential argument. 
      * 
      * @param credential the Credential to be validated
+     * @param RequestData associated with the request
      * @throws WSSecurityException on a failed validation
      */
-    public Credential validate(Credential credential) throws WSSecurityException {
+    public Credential validate(Credential credential, RequestData data) throws WSSecurityException {
         return credential;
     }
     
-    /**
-     * Set a WSSConfig instance used to extract configured options used to 
-     * validate credentials. This method is not currently used for this implementation.
-     * @param wssConfig a WSSConfig instance
-     */
-    public void setWSSConfig(WSSConfig wssConfig) {
-        //
-    }
-    
-    /**
-     * Set a Crypto instance used to validate credentials. This method is not currently
-     * used for this implementation.
-     * @param crypto a Crypto instance used to validate credentials
-     */
-    public void setCrypto(Crypto crypto) {
-        //
-    }
-    
-    /**
-     * Set a CallbackHandler instance used to validate credentials. This method is not 
-     * currently used for this implementation.
-     * @param callbackHandler a CallbackHandler instance used to validate credentials
-     */
-    public void setCallbackHandler(CallbackHandler callbackHandler) {
-        //
-    }
-   
 }

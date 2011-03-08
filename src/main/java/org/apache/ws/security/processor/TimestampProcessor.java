@@ -24,9 +24,10 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDocInfo;
 import org.apache.ws.security.WSSConfig;
+import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.components.crypto.Crypto;
+import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.message.token.Timestamp;
 import org.apache.ws.security.validate.Credential;
 import org.apache.ws.security.validate.TimestampValidator;
@@ -34,27 +35,15 @@ import org.apache.ws.security.validate.Validator;
 import org.w3c.dom.Element;
 
 import java.util.List;
-import javax.security.auth.callback.CallbackHandler;
 
 public class TimestampProcessor implements Processor {
     private static Log log = LogFactory.getLog(TimestampProcessor.class.getName());
-    private Validator validator = new TimestampValidator();
     
-    /**
-     * Set a Validator implementation to validate the credential
-     * @param validator the Validator implementation to set
-     */
-    public void setValidator(Validator validator) {
-        this.validator = validator;
-    }
 
     public List<WSSecurityEngineResult> handleToken(
         Element elem, 
-        Crypto crypto, 
-        Crypto decCrypto, 
-        CallbackHandler cb, 
-        WSDocInfo wsDocInfo, 
-        WSSConfig config
+        RequestData data,
+        WSDocInfo wsDocInfo
     ) throws WSSecurityException {
         if (log.isDebugEnabled()) {
             log.debug("Found Timestamp list element");
@@ -62,11 +51,16 @@ public class TimestampProcessor implements Processor {
         //
         // Decode Timestamp, add the found time (created/expiry) to result
         //
+        WSSConfig config = data.getWssConfig();
         Timestamp timestamp = new Timestamp(elem, config.isWsiBSPCompliant());
         Credential credential = new Credential();
         credential.setTimestamp(timestamp);
-        validator.setWSSConfig(config);
-        validator.validate(credential);
+        
+        Validator validator = data.getValidator(WSSecurityEngine.TIMESTAMP);
+        if (validator == null) {
+            validator = new TimestampValidator();
+        }
+        validator.validate(credential, data);
         
         WSSecurityEngineResult result = 
             new WSSecurityEngineResult(WSConstants.TS, timestamp);

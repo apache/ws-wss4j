@@ -25,24 +25,21 @@ import java.util.List;
 import java.util.Map;
 
 import javax.crypto.SecretKey;
-import javax.security.auth.callback.CallbackHandler;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDataRef;
 import org.apache.ws.security.WSDocInfo;
-import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.components.crypto.Crypto;
+import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.message.CallbackLookup;
 import org.apache.ws.security.message.DOMCallbackLookup;
 import org.apache.ws.security.message.token.SecurityTokenReference;
 import org.apache.ws.security.str.STRParser;
 import org.apache.ws.security.str.SecurityTokenRefSTRParser;
 import org.apache.ws.security.util.WSSecurityUtil;
-import org.apache.ws.security.validate.Validator;
 import org.apache.xml.security.encryption.XMLCipher;
 import org.apache.xml.security.encryption.XMLEncryptionException;
 import org.w3c.dom.Attr;
@@ -54,29 +51,18 @@ public class ReferenceListProcessor implements Processor {
     private static Log log = 
         LogFactory.getLog(ReferenceListProcessor.class.getName());
     
-    /**
-     * Set a Validator implementation to validate the credential
-     * @param validator the Validator implementation to set
-     */
-    public void setValidator(Validator validator) {
-        // not used
-    }
-    
     public List<WSSecurityEngineResult> handleToken(
         Element elem, 
-        Crypto crypto, 
-        Crypto decCrypto,
-        CallbackHandler cb, 
-        WSDocInfo wsDocInfo, 
-        WSSConfig config
+        RequestData data, 
+        WSDocInfo wsDocInfo 
     ) throws WSSecurityException {
         if (log.isDebugEnabled()) {
             log.debug("Found reference list element");
         }
-        if (cb == null) {
+        if (data.getCallbackHandler() == null) {
             throw new WSSecurityException(WSSecurityException.FAILURE, "noCallback");
         }
-        List<WSDataRef> dataRefs = handleReferenceList(elem, cb, decCrypto, wsDocInfo, config);
+        List<WSDataRef> dataRefs = handleReferenceList(elem, data, wsDocInfo);
         WSSecurityEngineResult result = 
             new WSSecurityEngineResult(WSConstants.ENCR, dataRefs);
         wsDocInfo.addTokenElement(elem);
@@ -94,10 +80,8 @@ public class ReferenceListProcessor implements Processor {
      */
     private List<WSDataRef> handleReferenceList(
         Element elem, 
-        CallbackHandler cb,
-        Crypto crypto,
-        WSDocInfo wsDocInfo,
-        WSSConfig config
+        RequestData data,
+        WSDocInfo wsDocInfo
     ) throws WSSecurityException {
         List<WSDataRef> dataRefs = new ArrayList<WSDataRef>();
         for (Node node = elem.getFirstChild(); 
@@ -113,7 +97,7 @@ public class ReferenceListProcessor implements Processor {
                 }
                 WSDataRef dataRef = 
                     decryptDataRefEmbedded(
-                        elem.getOwnerDocument(), dataRefURI, cb, crypto, wsDocInfo, config);
+                        elem.getOwnerDocument(), dataRefURI, data, wsDocInfo);
                 dataRefs.add(dataRef);
             }
         }
@@ -128,10 +112,8 @@ public class ReferenceListProcessor implements Processor {
     private WSDataRef decryptDataRefEmbedded(
         Document doc, 
         String dataRefURI, 
-        CallbackHandler cb, 
-        Crypto crypto,
-        WSDocInfo wsDocInfo,
-        WSSConfig config
+        RequestData data,
+        WSDocInfo wsDocInfo
     ) throws WSSecurityException {
         if (log.isDebugEnabled()) {
             log.debug("Found data reference: " + dataRefURI);
@@ -153,7 +135,7 @@ public class ReferenceListProcessor implements Processor {
             throw new WSSecurityException(WSSecurityException.INVALID_SECURITY, "noKeyinfo");
         }
         // Check BSP compliance
-        if (config.isWsiBSPCompliant()) {
+        if (data.getWssConfig().isWsiBSPCompliant()) {
             checkBSPCompliance(keyInfoElement, symEncAlgo);
         }
         //
@@ -166,13 +148,14 @@ public class ReferenceListProcessor implements Processor {
             );
         SecretKey symmetricKey = null;
         if (secRefToken == null) {
-            symmetricKey = X509Util.getSharedKey(keyInfoElement, symEncAlgo, cb);
+            symmetricKey = X509Util.getSharedKey(keyInfoElement, symEncAlgo, data.getCallbackHandler());
         } else {
             STRParser strParser = new SecurityTokenRefSTRParser();
             Map<String, Object> parameters = new HashMap<String, Object>();
             parameters.put(SecurityTokenRefSTRParser.SIGNATURE_METHOD, symEncAlgo);
             strParser.parseSecurityTokenReference(
-                secRefToken, crypto, cb, wsDocInfo, config, parameters
+                secRefToken, data,
+                wsDocInfo, parameters
             );
             byte[] secretKey = strParser.getSecretKey();
             symmetricKey = WSSecurityUtil.prepareSecretKey(symEncAlgo, secretKey);

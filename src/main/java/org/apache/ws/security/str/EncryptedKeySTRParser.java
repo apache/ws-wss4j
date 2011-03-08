@@ -28,6 +28,7 @@ import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
+import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.message.token.BinarySecurity;
 import org.apache.ws.security.message.token.SecurityTokenReference;
 import org.apache.ws.security.message.token.X509Security;
@@ -41,7 +42,6 @@ import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.util.Map;
 
-import javax.security.auth.callback.CallbackHandler;
 import javax.xml.namespace.QName;
 
 /**
@@ -67,12 +67,12 @@ public class EncryptedKeySTRParser implements STRParser {
      */
     public void parseSecurityTokenReference(
         Element strElement,
-        Crypto crypto,
-        CallbackHandler cb,
+        RequestData data,
         WSDocInfo wsDocInfo,
-        WSSConfig config,
         Map<String, Object> parameters
     ) throws WSSecurityException {
+        Crypto crypto = data.getDecCrypto();
+        WSSConfig config = data.getWssConfig();
         boolean bspCompliant = true;
         if (config != null) {
             bspCompliant = config.isWsiBSPCompliant();
@@ -98,13 +98,14 @@ public class EncryptedKeySTRParser implements STRParser {
                 || WSConstants.WSS_SAML2_KI_VALUE_TYPE.equals(secRef.getKeyIdentifierValueType())) {
                 AssertionWrapper assertion = 
                     SAMLUtil.getAssertionFromKeyIdentifier(
-                        secRef, strElement, crypto, cb, wsDocInfo, config
+                        secRef, strElement, data, wsDocInfo
                     );
                 if (bspCompliant) {
                     BSPEnforcer.checkSamlTokenBSPCompliance(secRef, assertion);
                 }
                 SAMLKeyInfo samlKi = 
-                    SAMLUtil.getCredentialFromSubject(assertion, crypto, cb, wsDocInfo, bspCompliant);
+                    SAMLUtil.getCredentialFromSubject(assertion, 
+                                                      data, wsDocInfo, bspCompliant);
                 certs = samlKi.getCerts();
             } else {
                 if (bspCompliant) {
@@ -138,7 +139,9 @@ public class EncryptedKeySTRParser implements STRParser {
                             BSPEnforcer.checkSamlTokenBSPCompliance(secRef, assertion);
                         }
                         SAMLKeyInfo keyInfo = 
-                            SAMLUtil.getCredentialFromSubject(assertion, crypto, cb, wsDocInfo, bspCompliant);
+                            SAMLUtil.getCredentialFromSubject(assertion, 
+                                                              data,
+                                                              wsDocInfo, bspCompliant);
                         certs = keyInfo.getCerts();
                     } else {
                         throw new WSSecurityException(
@@ -151,7 +154,7 @@ public class EncryptedKeySTRParser implements STRParser {
             }
             if (certs == null) {
                 Element bstElement = 
-                    secRef.getTokenElement(strElement.getOwnerDocument(), wsDocInfo, cb);
+                    secRef.getTokenElement(strElement.getOwnerDocument(), wsDocInfo, data.getCallbackHandler());
     
                 // at this point ... check token type: Binary
                 QName el = new QName(bstElement.getNamespaceURI(), bstElement.getLocalName());

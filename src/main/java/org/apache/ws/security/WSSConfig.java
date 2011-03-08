@@ -705,12 +705,7 @@ public class WSSConfig {
         
         if (processorObject instanceof Class<?>) {
             try {
-                Processor processor = (Processor)((Class<?>)processorObject).newInstance();
-                Validator validator = getValidator(el);
-                if (validator != null) {
-                    processor.setValidator(validator);
-                }
-                return processor;
+                return (Processor)((Class<?>)processorObject).newInstance();
             } catch (Throwable t) {
                 if (log.isDebugEnabled()) {
                     log.debug(t.getMessage(), t);

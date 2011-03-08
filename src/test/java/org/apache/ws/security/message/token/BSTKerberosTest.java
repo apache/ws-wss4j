@@ -31,10 +31,10 @@ import org.apache.ws.security.common.KeystoreCallbackHandler;
 import org.apache.ws.security.common.SOAPUtil;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
+import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.message.WSSecSignature;
 import org.apache.ws.security.message.WSSecHeader;
 import org.apache.ws.security.message.WSSecTimestamp;
-import org.apache.ws.security.message.token.BinarySecurity;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.ws.security.validate.Credential;
 import org.apache.ws.security.validate.Validator;
@@ -262,7 +262,7 @@ public class BSTKerberosTest extends org.junit.Assert {
      */
     private static class KerberosValidator implements Validator {
 
-        public Credential validate(Credential credential) throws WSSecurityException {
+        public Credential validate(Credential credential, RequestData data) throws WSSecurityException {
             BinarySecurity token = credential.getBinarySecurityToken();
             if (token == null) {
                 throw new WSSecurityException(WSSecurityException.FAILURE);
@@ -279,17 +279,6 @@ public class BSTKerberosTest extends org.junit.Assert {
             return credential;
         }
         
-        public void setCrypto(Crypto crypto) {
-            //
-        }
-        
-        public void setCallbackHandler(CallbackHandler callbackHandler) {
-            //
-        }
-        
-        public void setWSSConfig(WSSConfig wssConfig) {
-            //
-        }
     }
     
 }

@@ -33,8 +33,6 @@ import org.apache.ws.security.common.SOAPUtil;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.components.crypto.Merlin;
-import org.apache.ws.security.message.WSSecSignature;
-import org.apache.ws.security.message.WSSecHeader;
 import org.apache.ws.security.saml.SAMLIssuer;
 import org.apache.ws.security.saml.SAMLIssuerImpl;
 import org.apache.ws.security.saml.SignedSamlTokenHOKTest;

@@ -22,7 +22,6 @@ package org.apache.ws.security.validate;
 import java.io.IOException;
 
 import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
 
 import org.apache.commons.logging.Log;
@@ -31,7 +30,7 @@ import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.components.crypto.Crypto;
+import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.message.token.UsernameToken;
 import org.apache.ws.security.util.Base64;
 
@@ -42,9 +41,6 @@ import org.apache.ws.security.util.Base64;
 public class UsernameTokenValidator implements Validator {
     
     private static Log log = LogFactory.getLog(UsernameTokenValidator.class.getName());
-    
-    protected WSSConfig wssConfig;
-    protected CallbackHandler callbackHandler;
     
     /**
      * Validate the credential argument. It must contain a non-null UsernameToken. A 
@@ -57,9 +53,10 @@ public class UsernameTokenValidator implements Validator {
      * of this type. 
      * 
      * @param credential the Credential to be validated
+     * @param RequestData associated with the request
      * @throws WSSecurityException on a failed validation
      */
-    public Credential validate(Credential credential) throws WSSecurityException {
+    public Credential validate(Credential credential, RequestData data) throws WSSecurityException {
         if (credential == null || credential.getUsernametoken() == null) {
             throw new WSSecurityException(WSSecurityException.FAILURE, "noCredential");
         }
@@ -67,6 +64,7 @@ public class UsernameTokenValidator implements Validator {
         boolean handleCustomPasswordTypes = false;
         boolean passwordsAreEncoded = false;
         String requiredPasswordType = null;
+        WSSConfig wssConfig = data.getWssConfig();
         if (wssConfig != null) {
             handleCustomPasswordTypes = wssConfig.getHandleCustomPasswordTypes();
             passwordsAreEncoded = wssConfig.getPasswordsAreEncoded();
@@ -97,10 +95,10 @@ public class UsernameTokenValidator implements Validator {
         //
         String password = usernameToken.getPassword();
         if (usernameToken.isHashed()) {
-            verifyDigestPassword(usernameToken);
+            verifyDigestPassword(usernameToken, data);
         } else if (WSConstants.PASSWORD_TEXT.equals(pwType)
             || (password != null && (pwType == null || "".equals(pwType.trim())))) {
-            verifyPlaintextPassword(usernameToken);
+            verifyPlaintextPassword(usernameToken, data);
         } else if (password != null) {
             if (!handleCustomPasswordTypes) {
                 if (log.isDebugEnabled()) {
@@ -108,38 +106,11 @@ public class UsernameTokenValidator implements Validator {
                 }
                 throw new WSSecurityException(WSSecurityException.FAILED_AUTHENTICATION);
             }
-            verifyCustomPassword(usernameToken);
+            verifyCustomPassword(usernameToken, data);
         } else {
-            verifyUnknownPassword(usernameToken);
+            verifyUnknownPassword(usernameToken, data);
         }
         return credential;
-    }
-    
-    /**
-     * Set a WSSConfig instance used to extract configured options used to 
-     * validate credentials. This is optional for this implementation.
-     * @param wssConfig a WSSConfig instance
-     */
-    public void setWSSConfig(WSSConfig wssConfig) {
-        this.wssConfig = wssConfig;
-    }
-    
-    /**
-     * Set a Crypto instance used to validate credentials. This method is not currently
-     * used for this implementation.
-     * @param crypto a Crypto instance used to validate credentials
-     */
-    public void setCrypto(Crypto crypto) {
-        //
-    }
-    
-    /**
-     * Set a CallbackHandler instance used to validate credentials. This is required for
-     * this implementation.
-     * @param callbackHandler a CallbackHandler instance used to validate credentials
-     */
-    public void setCallbackHandler(CallbackHandler callbackHandler) {
-        this.callbackHandler = callbackHandler;
     }
     
     /**
@@ -152,8 +123,9 @@ public class UsernameTokenValidator implements Validator {
      * @param usernameToken The UsernameToken instance to verify
      * @throws WSSecurityException on a failed authentication.
      */
-    protected void verifyCustomPassword(UsernameToken usernameToken) throws WSSecurityException {
-        verifyPlaintextPassword(usernameToken);
+    protected void verifyCustomPassword(UsernameToken usernameToken,
+                                        RequestData data) throws WSSecurityException {
+        verifyPlaintextPassword(usernameToken, data);
     }
     
     /**
@@ -166,8 +138,9 @@ public class UsernameTokenValidator implements Validator {
      * @param usernameToken The UsernameToken instance to verify
      * @throws WSSecurityException on a failed authentication.
      */
-    protected void verifyPlaintextPassword(UsernameToken usernameToken) throws WSSecurityException {
-        verifyDigestPassword(usernameToken);
+    protected void verifyPlaintextPassword(UsernameToken usernameToken,
+                                           RequestData data) throws WSSecurityException {
+        verifyDigestPassword(usernameToken, data);
     }
     
     /**
@@ -177,8 +150,9 @@ public class UsernameTokenValidator implements Validator {
      * @param usernameToken The UsernameToken instance to verify
      * @throws WSSecurityException on a failed authentication.
      */
-    protected void verifyDigestPassword(UsernameToken usernameToken) throws WSSecurityException {
-        if (callbackHandler == null) {
+    protected void verifyDigestPassword(UsernameToken usernameToken,
+                                        RequestData data) throws WSSecurityException {
+        if (data.getCallbackHandler() == null) {
             throw new WSSecurityException(WSSecurityException.FAILURE, "noCallback");
         }
         
@@ -190,9 +164,9 @@ public class UsernameTokenValidator implements Validator {
         boolean passwordsAreEncoded = usernameToken.getPasswordsAreEncoded();
         
         WSPasswordCallback pwCb = 
-            new WSPasswordCallback(user, null, pwType, WSPasswordCallback.USERNAME_TOKEN);
+            new WSPasswordCallback(user, null, pwType, WSPasswordCallback.USERNAME_TOKEN, data);
         try {
-            callbackHandler.handle(new Callback[]{pwCb});
+            data.getCallbackHandler().handle(new Callback[]{pwCb});
         } catch (IOException e) {
             if (log.isDebugEnabled()) {
                 log.debug(e);
@@ -238,7 +212,8 @@ public class UsernameTokenValidator implements Validator {
      * @param usernameToken The UsernameToken instance to verify
      * @throws WSSecurityException on a failed authentication.
      */
-    protected void verifyUnknownPassword(UsernameToken usernameToken) throws WSSecurityException {
+    protected void verifyUnknownPassword(UsernameToken usernameToken,
+                                         RequestData data) throws WSSecurityException {
         //
     }
    

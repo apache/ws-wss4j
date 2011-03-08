@@ -25,14 +25,13 @@ import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
 
-import javax.security.auth.callback.CallbackHandler;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoType;
+import org.apache.ws.security.handler.RequestData;
 
 /**
  * This class verifies trust in a credential used to verify a signature, which is extracted
@@ -41,7 +40,6 @@ import org.apache.ws.security.components.crypto.CryptoType;
 public class SignatureTrustValidator implements Validator {
     
     private static Log LOG = LogFactory.getLog(SignatureTrustValidator.class.getName());
-    protected Crypto crypto;
     
     /**
      * Validate the credential argument. It must contain a non-null X509Certificate chain
@@ -53,12 +51,13 @@ public class SignatureTrustValidator implements Validator {
      * @param credential the Credential to be validated
      * @throws WSSecurityException on a failed validation
      */
-    public Credential validate(Credential credential) throws WSSecurityException {
+    public Credential validate(Credential credential, RequestData data) throws WSSecurityException {
         if (credential == null) {
             throw new WSSecurityException(WSSecurityException.FAILURE, "noCredential");
         }
         X509Certificate[] certs = credential.getCertificates();
         PublicKey publicKey = credential.getPublicKey();
+        Crypto crypto = getCrypto(data);
         if (crypto == null) {
             throw new WSSecurityException(WSSecurityException.FAILURE, "noSigCryptoFile");
         }
@@ -67,50 +66,29 @@ public class SignatureTrustValidator implements Validator {
             validateCertificates(certs);
             boolean trust = false;
             if (certs.length == 1) {
-                trust = verifyTrustInCert(certs);
+                trust = verifyTrustInCert(certs, crypto);
             } else {
-                trust = verifyTrustInCerts(certs);
+                trust = verifyTrustInCerts(certs, crypto);
             }
             if (trust) {
                 return credential;
             }
         }
         if (publicKey != null) {
-            boolean trust = validatePublicKey(publicKey);
+            boolean trust = validatePublicKey(publicKey, crypto);
             if (trust) {
                 return credential;
             }
         }
         throw new WSSecurityException(WSSecurityException.FAILED_AUTHENTICATION);
     }
-    
-    /**
-     * Set a WSSConfig instance used to extract configured options used to 
-     * validate credentials. This method is not currently used for this implementation.
-     * @param wssConfig a WSSConfig instance
-     */
-    public void setWSSConfig(WSSConfig wssConfig) {
-        //
+
+
+    protected Crypto getCrypto(RequestData data) {
+        return data.getSigCrypto();
     }
-    
-    /**
-     * Set a Crypto instance used to validate credentials. This is required for this
-     * implementation.
-     * @param crypto a Crypto instance used to validate credentials
-     */
-    public void setCrypto(Crypto crypto) {
-        this.crypto = crypto;
-    }
-    
-    /**
-     * Set a CallbackHandler instance used to validate credentials. This method is not 
-     * currently used for this implementation.
-     * @param callbackHandler a CallbackHandler instance used to validate credentials
-     */
-    public void setCallbackHandler(CallbackHandler callbackHandler) {
-        //
-    }
-    
+
+
     /**
      * Validate the certificates by checking the validity of each cert
      * @throws WSSecurityException
@@ -145,7 +123,7 @@ public class SignatureTrustValidator implements Validator {
      * @return true if the certificate is trusted, false if not
      * @throws WSSecurityException
      */
-    private boolean verifyTrustInCert(X509Certificate[] certificates) throws WSSecurityException {
+    private boolean verifyTrustInCert(X509Certificate[] certificates, Crypto crypto) throws WSSecurityException {
         X509Certificate cert = certificates[0];
         
         String subjectString = cert.getSubjectX500Principal().getName();
@@ -275,7 +253,7 @@ public class SignatureTrustValidator implements Validator {
      * @return true if the certificate chain is trusted, false if not
      * @throws WSSecurityException
      */
-    private boolean verifyTrustInCerts(X509Certificate[] certificates) throws WSSecurityException {
+    private boolean verifyTrustInCerts(X509Certificate[] certificates, Crypto crypto) throws WSSecurityException {
         String subjectString = certificates[0].getSubjectX500Principal().getName();
         //
         // Use the validation method from the crypto to check whether the subjects' 
@@ -306,7 +284,7 @@ public class SignatureTrustValidator implements Validator {
      * Validate a public key
      * @throws WSSecurityException
      */
-    private boolean validatePublicKey(PublicKey publicKey) throws WSSecurityException {
+    private boolean validatePublicKey(PublicKey publicKey, Crypto crypto) throws WSSecurityException {
         return crypto.verifyTrust(publicKey);
     }
     

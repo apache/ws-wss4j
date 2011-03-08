@@ -24,17 +24,16 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDataRef;
 import org.apache.ws.security.WSDocInfo;
-import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoType;
+import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.message.token.SecurityTokenReference;
 import org.apache.ws.security.str.EncryptedKeySTRParser;
 import org.apache.ws.security.str.STRParser;
 import org.apache.ws.security.util.Base64;
 import org.apache.ws.security.util.WSSecurityUtil;
-import org.apache.ws.security.validate.Validator;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -44,7 +43,6 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.SecretKey;
-import javax.security.auth.callback.CallbackHandler;
 
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
@@ -54,29 +52,18 @@ import java.util.List;
 public class EncryptedKeyProcessor implements Processor {
     private static Log log = LogFactory.getLog(EncryptedKeyProcessor.class.getName());
     
-    /**
-     * Set a Validator implementation to validate the credential
-     * @param validator the Validator implementation to set
-     */
-    public void setValidator(Validator validator) {
-        // not used
-    }
-    
     public List<WSSecurityEngineResult> handleToken(
         Element elem, 
-        Crypto crypto, 
-        Crypto decCrypto, 
-        CallbackHandler cb, 
-        WSDocInfo wsDocInfo,
-        WSSConfig config
+        RequestData data,
+        WSDocInfo wsDocInfo
     ) throws WSSecurityException {
         if (log.isDebugEnabled()) {
             log.debug("Found encrypted key element");
         }
-        if (decCrypto == null) {
+        if (data.getDecCrypto() == null) {
             throw new WSSecurityException(WSSecurityException.FAILURE, "noDecCryptoFile");
         }
-        if (cb == null) {
+        if (data.getCallbackHandler() == null) {
             throw new WSSecurityException(WSSecurityException.FAILURE, "noCallback");
         }
         //
@@ -89,7 +76,7 @@ public class EncryptedKeyProcessor implements Processor {
                 WSSecurityException.UNSUPPORTED_ALGORITHM, "noEncAlgo"
             );
         }
-        if (config.isWsiBSPCompliant()) {
+        if (data.getWssConfig().isWsiBSPCompliant()) {
             checkBSPCompliance(elem, encryptedKeyTransportMethod);
         }
         Cipher cipher = WSSecurityUtil.getCipherInstance(encryptedKeyTransportMethod);
@@ -110,10 +97,13 @@ public class EncryptedKeyProcessor implements Processor {
         }
         
         X509Certificate[] certs = 
-            getCertificatesFromEncryptedKey(elem, decCrypto, cb, wsDocInfo, config);
+            getCertificatesFromEncryptedKey(elem,
+                                            data,
+                                            data.getDecCrypto(), 
+                                            wsDocInfo);
 
         try {
-            PrivateKey privateKey = decCrypto.getPrivateKey(certs[0], cb);
+            PrivateKey privateKey = data.getDecCrypto().getPrivateKey(certs[0], data.getCallbackHandler());
             cipher.init(Cipher.DECRYPT_MODE, privateKey);
         } catch (Exception ex) {
             throw new WSSecurityException(WSSecurityException.FAILED_CHECK, null, null, ex);
@@ -177,10 +167,9 @@ public class EncryptedKeyProcessor implements Processor {
      */
     private X509Certificate[] getCertificatesFromEncryptedKey(
         Element xencEncryptedKey,
+        RequestData data,
         Crypto crypto,
-        CallbackHandler cb,
-        WSDocInfo wsDocInfo,
-        WSSConfig config
+        WSDocInfo wsDocInfo
     ) throws WSSecurityException {
         Element keyInfo = 
             WSSecurityUtil.getDirectChildElement(
@@ -188,7 +177,7 @@ public class EncryptedKeyProcessor implements Processor {
             );
         if (keyInfo != null) {
             Element strElement = null;
-            if (config.isWsiBSPCompliant()) {
+            if (data.getWssConfig().isWsiBSPCompliant()) {
                 int result = 0;
                 Node node = keyInfo.getFirstChild();
                 while (node != null) {
@@ -217,7 +206,7 @@ public class EncryptedKeyProcessor implements Processor {
                 );
             }
             STRParser strParser = new EncryptedKeySTRParser();
-            strParser.parseSecurityTokenReference(strElement, crypto, cb, wsDocInfo, config, null);
+            strParser.parseSecurityTokenReference(strElement, data, wsDocInfo, null);
             
             X509Certificate[] certs = strParser.getCertificates();
             if (certs == null || certs.length < 1 || certs[0] == null) {
@@ -228,7 +217,8 @@ public class EncryptedKeyProcessor implements Processor {
                 );
             }
             return certs;
-        } else if (!config.isWsiBSPCompliant() && crypto.getDefaultX509Identifier() != null) {
+        } else if (!data.getWssConfig().isWsiBSPCompliant() 
+            && crypto.getDefaultX509Identifier() != null) {
             String alias = crypto.getDefaultX509Identifier();
             CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
             cryptoType.setAlias(alias);

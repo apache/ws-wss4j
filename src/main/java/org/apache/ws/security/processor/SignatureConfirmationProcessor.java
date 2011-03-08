@@ -23,35 +23,21 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDocInfo;
-import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.components.crypto.Crypto;
+import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.message.token.SignatureConfirmation;
-import org.apache.ws.security.validate.Validator;
 import org.w3c.dom.Element;
 
 import java.util.List;
-import javax.security.auth.callback.CallbackHandler;
 
 public class SignatureConfirmationProcessor implements Processor {
     private static Log log = LogFactory.getLog(SignatureConfirmationProcessor.class.getName());
     
-    /**
-     * Set a Validator implementation to validate the credential
-     * @param validator the Validator implementation to set
-     */
-    public void setValidator(Validator validator) {
-        // not used
-    }
-
     public List<WSSecurityEngineResult> handleToken(
         Element elem, 
-        Crypto crypto, 
-        Crypto decCrypto, 
-        CallbackHandler cb, 
-        WSDocInfo wsDocInfo, 
-        WSSConfig config
+        RequestData data,
+        WSDocInfo wsDocInfo 
     ) throws WSSecurityException {
         if (log.isDebugEnabled()) {
             log.debug("Found SignatureConfirmation list element");
@@ -62,7 +48,7 @@ public class SignatureConfirmationProcessor implements Processor {
         SignatureConfirmation sigConf = new SignatureConfirmation(elem);
         String id = sigConf.getID();
         // A wsu:Id is required as per the BSP spec
-        if (config.isWsiBSPCompliant() && (id == null || "".equals(id))) {
+        if (data.getWssConfig().isWsiBSPCompliant() && (id == null || "".equals(id))) {
             throw new WSSecurityException(
                 WSSecurityException.INVALID_SECURITY, 
                 "requiredElementNoID", 

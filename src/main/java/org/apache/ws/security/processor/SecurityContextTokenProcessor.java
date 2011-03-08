@@ -22,12 +22,10 @@ package org.apache.ws.security.processor;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDocInfo;
 import org.apache.ws.security.WSPasswordCallback;
-import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.components.crypto.Crypto;
+import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.message.token.SecurityContextToken;
-import org.apache.ws.security.validate.Validator;
 import org.w3c.dom.Element;
 
 import javax.security.auth.callback.Callback;
@@ -44,24 +42,13 @@ import java.io.IOException;
  */
 public class SecurityContextTokenProcessor implements Processor {
     
-    /**
-     * Set a Validator implementation to validate the credential
-     * @param validator the Validator implementation to set
-     */
-    public void setValidator(Validator validator) {
-        // not used
-    }
-
     public List<WSSecurityEngineResult> handleToken(
         Element elem, 
-        Crypto crypto, 
-        Crypto decCrypto,
-        CallbackHandler cb, 
-        WSDocInfo wsDocInfo, 
-        WSSConfig config
+        RequestData data,
+        WSDocInfo wsDocInfo 
     ) throws WSSecurityException {
         SecurityContextToken sct = new SecurityContextToken(elem);
-        byte[] secret = getSecret(cb, sct);
+        byte[] secret = getSecret(data.getCallbackHandler(), sct);
         
         WSSecurityEngineResult result =
             new WSSecurityEngineResult(WSConstants.SCT, sct);

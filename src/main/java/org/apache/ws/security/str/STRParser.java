@@ -20,16 +20,15 @@
 package org.apache.ws.security.str;
 
 import org.apache.ws.security.WSDocInfo;
-import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.components.crypto.Crypto;
+import org.apache.ws.security.handler.RequestData;
+
 import org.w3c.dom.Element;
 
 import java.security.Principal;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.util.Map;
-import javax.security.auth.callback.CallbackHandler;
 
 /**
  * This interface describes a pluggable way of extracting credentials from SecurityTokenReference
@@ -50,10 +49,8 @@ public interface STRParser {
      */
     public void parseSecurityTokenReference(
         Element strElement,
-        Crypto crypto,
-        CallbackHandler cb,
+        RequestData data,
         WSDocInfo wsDocInfo,
-        WSSConfig config,
         Map<String, Object> parameters
     ) throws WSSecurityException;
     

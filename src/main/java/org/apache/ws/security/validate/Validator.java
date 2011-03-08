@@ -19,11 +19,9 @@
 
 package org.apache.ws.security.validate;
 
-import javax.security.auth.callback.CallbackHandler;
 
-import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.components.crypto.Crypto;
+import org.apache.ws.security.handler.RequestData;
 
 /**
  * This interface describes a pluggable way of validating credentials that have been extracted
@@ -37,28 +35,11 @@ public interface Validator {
      * that was validated, or it can represent some transformation of the initial Credential
      * instance.
      * @param credential the Credential to be validated
+     * @param RequestData associated with the request
      * @return a validated Credential
      * @throws WSSecurityException on a failed validation
      */
-    public Credential validate(Credential credential) throws WSSecurityException;
+    public Credential validate(Credential credential, RequestData data) throws WSSecurityException;
     
-    /**
-     * Set a Crypto instance used to validate credentials
-     * @param crypto a Crypto instance used to validate credentials
-     */
-    public void setCrypto(Crypto crypto);
-    
-    /**
-     * Set a CallbackHandler instance used to validate credentials
-     * @param callbackHandler a CallbackHandler instance used to validate credentials
-     */
-    public void setCallbackHandler(CallbackHandler callbackHandler);
-    
-    /**
-     * Set a WSSConfig instance used to extract configured options used to 
-     * validate credentials
-     * @param wssConfig a WSSConfig instance
-     */
-    public void setWSSConfig(WSSConfig wssConfig);
     
 }

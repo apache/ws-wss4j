@@ -683,7 +683,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
             String outputString = 
                 org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(utDoc);
             LOG.debug(outputString);
-        };
+        }
         
         WSSecurityEngine newEngine = new WSSecurityEngine();
         try {
@@ -725,7 +725,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
             String outputString = 
                 org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(utDoc);
             LOG.debug(outputString);
-        };
+        }
         
         WSSecurityEngine newEngine = new WSSecurityEngine();
         try {
@@ -767,7 +767,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
             String outputString = 
                 org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(utDoc);
             LOG.debug(outputString);
-        };
+        }
         
         WSSecurityEngine newEngine = new WSSecurityEngine();
         try {
@@ -810,7 +810,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
             String outputString = 
                 org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(utDoc);
             LOG.debug(outputString);
-        };
+        }
         
         WSSecurityEngine newEngine = new WSSecurityEngine();
         try {
