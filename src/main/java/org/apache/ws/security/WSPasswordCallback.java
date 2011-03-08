@@ -123,7 +123,18 @@ public class WSPasswordCallback implements Callback {
     public WSPasswordCallback(String id, int usage) {
         this(id, null, null, usage, null);
     }
-
+    /**
+     * Constructor.
+     *
+     * @param id The application called back must supply the password for
+     *           this identifier.
+     */
+    public WSPasswordCallback(String id, String pw, String type, int usage) {
+        identifier = id;
+        password = pw;
+        this.type = type;
+        this.usage = usage;
+    }
     /**
      * Constructor.
      *
