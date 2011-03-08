@@ -399,6 +399,9 @@ public class RequestData {
     }
 
     public Validator getValidator(QName qName) throws WSSecurityException {
-        return wssConfig.getValidator(qName);
+        if (wssConfig != null)  {
+            return wssConfig.getValidator(qName);
+        }
+        return null;
     }
 }
