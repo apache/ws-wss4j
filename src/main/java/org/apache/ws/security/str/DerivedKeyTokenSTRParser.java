@@ -99,7 +99,7 @@ public class DerivedKeyTokenSTRParser implements STRParser {
             int action = ((Integer)result.get(WSSecurityEngineResult.TAG_ACTION)).intValue();
             if (WSConstants.UT_NOPASSWORD == action || WSConstants.UT == action) {
                 if (bspCompliant) {
-                    checkUTBSPCompliance(secRef);
+                    BSPEnforcer.checkUsernameTokenBSPCompliance(secRef);
                 }
                 UsernameToken usernameToken = 
                     (UsernameToken)result.get(WSSecurityEngineResult.TAG_USERNAME_TOKEN);
@@ -107,7 +107,7 @@ public class DerivedKeyTokenSTRParser implements STRParser {
                 secretKey = usernameToken.getDerivedKey();
             } else if (WSConstants.ENCR == action) {
                 if (bspCompliant) {
-                    checkEncryptedKeyBSPCompliance(secRef);
+                    BSPEnforcer.checkEncryptedKeyBSPCompliance(secRef);
                 }
                 secretKey = (byte[])result.get(WSSecurityEngineResult.TAG_SECRET);
             } else if (WSConstants.SCT == action) {
@@ -115,6 +115,9 @@ public class DerivedKeyTokenSTRParser implements STRParser {
             } else if (WSConstants.ST_UNSIGNED == action || WSConstants.ST_SIGNED == action) {
                 AssertionWrapper assertion = 
                     (AssertionWrapper)result.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+                if (bspCompliant) {
+                    BSPEnforcer.checkSamlTokenBSPCompliance(secRef, assertion);
+                }
                 SAMLKeyInfo keyInfo = 
                     SAMLUtil.getCredentialFromSubject(assertion, crypto, cb, wsDocInfo, bspCompliant);
                 // TODO Handle malformed SAML tokens where they don't have the 
@@ -132,7 +135,7 @@ public class DerivedKeyTokenSTRParser implements STRParser {
         } else if (keyIdentifierValue != null && keyIdentifierValueType != null) {
             if (bspCompliant 
                 && keyIdentifierValueType.equals(SecurityTokenReference.ENC_KEY_SHA1_URI)) {
-                checkEncryptedKeyBSPCompliance(secRef);
+                BSPEnforcer.checkEncryptedKeyBSPCompliance(secRef);
             }
             X509Certificate[] certs = secRef.getKeyIdentifier(crypto);
             if (certs == null || certs.length < 1 || certs[0] == null) {
@@ -184,30 +187,6 @@ public class DerivedKeyTokenSTRParser implements STRParser {
     }
 
     /**
-     * Check the BSP compliance for a reference to a UsernameToken
-     * @param secRef the SecurityTokenReference element
-     * @throws WSSecurityException
-     */
-    private void checkUTBSPCompliance(SecurityTokenReference secRef) throws WSSecurityException {
-        if (!secRef.containsReference()) {
-            // BSP does not permit using a KeyIdentifier to refer to a U/T
-            throw new WSSecurityException(
-                WSSecurityException.FAILED_CHECK, "unsupportedKeyId"
-            );
-        }
-        String valueType = secRef.getReference().getValueType();
-        
-        if (!WSConstants.WSS_USERNAME_TOKEN_VALUE_TYPE.equals(valueType)) {
-            // BSP says the Reference must have a ValueType of UsernameToken
-            throw new WSSecurityException(
-                WSSecurityException.INVALID_SECURITY,
-                "invalidValueType", 
-                new Object[]{valueType}
-            );
-        }
-    }
-    
-    /**
      * Get the Secret Key from a CallbackHandler
      * @param id The id of the element
      * @param type The type of the element (may be null)
@@ -239,36 +218,6 @@ public class DerivedKeyTokenSTRParser implements STRParser {
         }
 
         return pwcb.getKey();
-    }
-    
-    /**
-     * Check that the EncryptedKey referenced by the SecurityTokenReference argument 
-     * is BSP compliant.
-     * @param secRef The SecurityTokenReference to the BinarySecurityToken
-     * @throws WSSecurityException
-     */
-    private static void checkEncryptedKeyBSPCompliance(
-        SecurityTokenReference secRef
-    ) throws WSSecurityException {
-        if (secRef.containsKeyIdentifier()) {
-            String valueType = secRef.getKeyIdentifierValueType();
-            if (!SecurityTokenReference.ENC_KEY_SHA1_URI.equals(valueType)) {
-                throw new WSSecurityException(
-                    WSSecurityException.INVALID_SECURITY_TOKEN, 
-                    "invalidValueType", 
-                    new Object[]{valueType}
-                );
-            }
-        }
-        
-        String tokenType = secRef.getTokenType();
-        if (!WSConstants.WSS_ENC_KEY_VALUE_TYPE.equals(tokenType)) {
-            throw new WSSecurityException(
-                WSSecurityException.INVALID_SECURITY_TOKEN, 
-                "invalidTokenType", 
-                 new Object[]{tokenType}
-            );
-        }
     }
     
 }

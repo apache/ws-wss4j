@@ -543,6 +543,14 @@ public class SecurityTokenReference {
         return null;
     }
     
+    public String getKeyIdentifierEncodingType() {
+        if (containsKeyIdentifier()) {
+            Element elem = getFirstElement();
+            return elem.getAttribute("EncodingType");
+        } 
+        return null;
+    }
+    
     public X509Certificate getX509SKIAlias(Crypto crypto) throws WSSecurityException {
         if (skiBytes == null) {
             skiBytes = getSKIBytes();

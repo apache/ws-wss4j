@@ -29,7 +29,6 @@ import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.message.token.BinarySecurity;
-import org.apache.ws.security.message.token.PKIPathSecurity;
 import org.apache.ws.security.message.token.SecurityTokenReference;
 import org.apache.ws.security.message.token.X509Security;
 import org.apache.ws.security.saml.SAMLKeyInfo;
@@ -101,12 +100,15 @@ public class EncryptedKeySTRParser implements STRParser {
                     SAMLUtil.getAssertionFromKeyIdentifier(
                         secRef, strElement, crypto, cb, wsDocInfo, config
                     );
+                if (bspCompliant) {
+                    BSPEnforcer.checkSamlTokenBSPCompliance(secRef, assertion);
+                }
                 SAMLKeyInfo samlKi = 
                     SAMLUtil.getCredentialFromSubject(assertion, crypto, cb, wsDocInfo, bspCompliant);
                 certs = samlKi.getCerts();
             } else {
                 if (bspCompliant) {
-                    checkBinarySecurityBSPCompliance(secRef, null);
+                    BSPEnforcer.checkBinarySecurityBSPCompliance(secRef, null);
                 }
                 certs = secRef.getKeyIdentifier(crypto);
             }
@@ -123,7 +125,7 @@ public class EncryptedKeySTRParser implements STRParser {
                                 (BinarySecurity)result.get(
                                     WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN
                                 );
-                            checkBinarySecurityBSPCompliance(secRef, token);
+                            BSPEnforcer.checkBinarySecurityBSPCompliance(secRef, token);
                         }
                         certs = 
                             (X509Certificate[])result.get(
@@ -132,6 +134,9 @@ public class EncryptedKeySTRParser implements STRParser {
                     } else if (WSConstants.ST_UNSIGNED == action || WSConstants.ST_SIGNED == action) {
                         AssertionWrapper assertion = 
                             (AssertionWrapper)result.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+                        if (bspCompliant) {
+                            BSPEnforcer.checkSamlTokenBSPCompliance(secRef, assertion);
+                        }
                         SAMLKeyInfo keyInfo = 
                             SAMLUtil.getCredentialFromSubject(assertion, crypto, cb, wsDocInfo, bspCompliant);
                         certs = keyInfo.getCerts();
@@ -153,7 +158,7 @@ public class EncryptedKeySTRParser implements STRParser {
                 if (el.equals(WSSecurityEngine.BINARY_TOKEN)) {
                     X509Security token = new X509Security(bstElement);
                     if (bspCompliant) {
-                        checkBinarySecurityBSPCompliance(secRef, token);
+                        BSPEnforcer.checkBinarySecurityBSPCompliance(secRef, token);
                     }
                     certs = new X509Certificate[]{token.getX509Certificate(crypto)};
                 } else {
@@ -206,60 +211,5 @@ public class EncryptedKeySTRParser implements STRParser {
     public byte[] getSecretKey() {
         return null;
     }
-    
-    /**
-     * Check that the BinarySecurityToken referenced by the SecurityTokenReference argument 
-     * is BSP compliant.
-     * @param secRef The SecurityTokenReference to the BinarySecurityToken
-     * @param token The BinarySecurityToken
-     * @throws WSSecurityException
-     */
-    private static void checkBinarySecurityBSPCompliance(
-        SecurityTokenReference secRef,
-        BinarySecurity token
-    ) throws WSSecurityException {
-        if (secRef.containsReference()) {
-            // Check the ValueType attributes
-            String valueType = secRef.getReference().getValueType();
-            if ((token instanceof X509Security) && !X509Security.X509_V3_TYPE.equals(valueType)) {
-                throw new WSSecurityException(
-                    WSSecurityException.INVALID_SECURITY_TOKEN, 
-                    "invalidValueType", 
-                    new Object[]{valueType}
-                );
-            } else if ((token instanceof PKIPathSecurity) 
-                && (!PKIPathSecurity.PKI_TYPE.equals(valueType))) {
-                throw new WSSecurityException(
-                    WSSecurityException.INVALID_SECURITY_TOKEN, 
-                    "invalidValueType", 
-                    new Object[]{valueType}
-                );
-            }
-        } else if (secRef.containsKeyIdentifier()) {
-            String valueType = secRef.getKeyIdentifierValueType();
-            if (!SecurityTokenReference.SKI_URI.equals(valueType) 
-                && !SecurityTokenReference.THUMB_URI.equals(valueType)) {
-                throw new WSSecurityException(
-                    WSSecurityException.INVALID_SECURITY_TOKEN, 
-                    "invalidValueType", 
-                    new Object[]{valueType}
-                );
-            }
-        }
-        
-        
-        // Check TokenType attributes
-        if (token instanceof PKIPathSecurity) {
-            String tokenType = secRef.getTokenType();
-            if (!PKIPathSecurity.PKI_TYPE.equals(tokenType)) {
-                throw new WSSecurityException(
-                    WSSecurityException.INVALID_SECURITY_TOKEN, 
-                    "invalidTokenType", 
-                     new Object[]{tokenType}
-                );
-            }
-        }
-    }
-    
     
 }
