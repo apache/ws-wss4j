@@ -115,6 +115,7 @@ public abstract class WSHandler {
         reqData.setSoapConstants(
             WSSecurityUtil.getSOAPConstants(doc.getDocumentElement())
         );
+        wssConfig.setWsiBSPCompliant(decodeBSPCompliance(reqData));
         /*
          * Here we have action, username, password, and actor, mustUnderstand.
          * Now get the action specific parameters.
