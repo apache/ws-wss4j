@@ -30,7 +30,55 @@ this is to take a look at the test sources. For example:
 </li>
 </ul>
 </subsection>
-
+<subsection name="Apache CXF">
+<p>
+<a href="http://cxf.apache.org">Apache CXF</a> is an open-source web services stack. CXF uses 
+WSS4J to perform the core WS-Security functionality, and provides extended security functionality 
+based around the WS-SecurityPolicy, WS-SecureConversation and WS-Trust specifications. More
+information:
+</p>
+<ul>
+<li>
+<a href="http://cxf.apache.org/docs/ws-security.html">CXF WS-Security configuration</a>
+</li>
+<li>
+<a href="http://cxf.apache.org/docs/ws-secureconversation.html">CXF WS-SecureConversation 
+configuration</a>
+</li>
+<li>
+<a href="http://cxf.apache.org/docs/ws-securitypolicy.html">CXF WS-SecurityPolicy configuration</a>
+</li>
+<li>
+<a href="http://cxf.apache.org/docs/ws-trust.html">CXF WS-Trust configuration</a>
+</li>
+<li>
+<a href="http://cxf.apache.org/resources-and-articles.html">CXF Security articles</a>
+</li>
+</ul>
+</subsection>
+<subsection name="Apache Rampart">
+<p>
+<a href="http://axis.apache.org/axis2/java/rampart/">Apache Rampart</a> is the security module
+for the Axis2 web services stack. Rampart uses WSS4J to perform the core WS-Security functionality,
+and provides extended security functionality based around the WS-SecurityPolicy, 
+WS-SecureConversation and WS-Trust specifications. More information:
+</p>
+<ul>
+<li>
+<a href="http://axis.apache.org/axis2/java/rampart/developer-guide.html">Rampart developer guide</a>
+</li>
+<li>
+<a href="http://axis.apache.org/axis2/java/rampart/samples.html">Rampart samples</a>
+</li>
+<li>
+<a href="http://axis.apache.org/axis2/java/rampart/rampartconfig-guide.html">Rampart configuration
+guide</a>
+</li>
+<li>
+<a href="http://axis.apache.org/axis2/java/rampart/articles.html">Rampart articles</a>
+</li>
+</ul>
+</subsection>
 </section>            
 </body>
 </document>
