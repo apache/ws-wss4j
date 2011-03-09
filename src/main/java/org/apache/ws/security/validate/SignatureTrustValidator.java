@@ -49,6 +49,7 @@ public class SignatureTrustValidator implements Validator {
      * this is not successful, then it will attempt to verify trust on the Public Key.
      * 
      * @param credential the Credential to be validated
+     * @param data the RequestData associated with the request
      * @throws WSSecurityException on a failed validation
      */
     public Credential validate(Credential credential, RequestData data) throws WSSecurityException {

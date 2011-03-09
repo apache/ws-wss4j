@@ -81,10 +81,8 @@ public class SignatureSTRParser implements STRParser {
      * Parse a SecurityTokenReference element and extract credentials.
      * 
      * @param strElement The SecurityTokenReference element
-     * @param crypto The crypto instance used to extract credentials
-     * @param cb The CallbackHandler instance to supply passwords
+     * @param data the RequestData associated with the request
      * @param wsDocInfo The WSDocInfo object to access previous processing results
-     * @param config The WSSConfig object used to access configuration
      * @param parameters A set of implementation-specific parameters
      * @throws WSSecurityException
      */

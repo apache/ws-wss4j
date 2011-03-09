@@ -32,7 +32,7 @@ public class NoOpValidator implements Validator {
      * Validate the credential argument. 
      * 
      * @param credential the Credential to be validated
-     * @param RequestData associated with the request
+     * @param data the RequestData associated with the request
      * @throws WSSecurityException on a failed validation
      */
     public Credential validate(Credential credential, RequestData data) throws WSSecurityException {

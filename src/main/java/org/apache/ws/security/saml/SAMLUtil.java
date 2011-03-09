@@ -65,10 +65,8 @@ public class SAMLUtil {
      * 
      * @param secRef the SecurityTokenReference to the SAML Assertion
      * @param strElement The SecurityTokenReference DOM element
-     * @param crypto The Crypto instance to use to obtain certificates
-     * @param cb The CallbackHandler instance used for secret keys
+     * @param request The RequestData instance used to obtain configuration
      * @param wsDocInfo The WSDocInfo object that holds previous results
-     * @param config The WSSConfig object used to access configuration
      * @return an AssertionWrapper object
      * @throws WSSecurityException
      */
@@ -118,11 +116,10 @@ public class SAMLUtil {
      * the Subject of the assertion
      * 
      * @param assertion The SAML Assertion
-     * @param crypto The Crypto instance to use to obtain certificates
-     * @param cb The CallbackHandler instance used for secret keys
+     * @param data The RequestData instance used to obtain configuration
      * @param docInfo A WSDocInfo instance
-     * @return a SAMLKeyInfo object
      * @param bspCompliant Whether to process tokens in compliance with the BSP spec or not
+     * @return a SAMLKeyInfo object
      * @throws WSSecurityException
      */
     public static SAMLKeyInfo getCredentialFromSubject(
@@ -166,8 +163,7 @@ public class SAMLUtil {
      * Get the SAMLKeyInfo object corresponding to the credential stored in the Subject of a 
      * SAML 1.1 assertion
      * @param assertion The SAML 1.1 assertion
-     * @param crypto The crypto instance used to get the credential
-     * @param cb The CallbackHandler used for secret keys
+     * @param data The RequestData instance used to obtain configuration
      * @param docInfo A WSDocInfo instance
      * @param bspCompliant Whether to process tokens in compliance with the BSP spec or not
      * @return The SAMLKeyInfo object obtained from the Subject
@@ -224,8 +220,7 @@ public class SAMLUtil {
      * Get the SAMLKeyInfo object corresponding to the credential stored in the Subject of a 
      * SAML 2 assertion
      * @param assertion The SAML 2 assertion
-     * @param crypto The crypto instance used to get the credential
-     * @param cb The CallbackHandler used for secret keys
+     * @param data The RequestData instance used to obtain configuration
      * @param docInfo A WSDocInfo instance
      * @param bspCompliant Whether to process tokens in compliance with the BSP spec or not
      * @return The SAMLKeyInfo object obtained from the Subject
@@ -270,8 +265,7 @@ public class SAMLUtil {
      * This method returns a SAMLKeyInfo corresponding to the credential found in the
      * KeyInfo (DOM Element) argument.
      * @param keyInfoElement The KeyInfo as a DOM Element
-     * @param crypto The crypto instance
-     * @param cb The CallbackHandler used for secret keys
+     * @param data The RequestData instance used to obtain configuration
      * @param docInfo A WSDocInfo instance
      * @param bspCompliant Whether to process tokens in compliance with the BSP spec or not
      * @return The credential (as a SAMLKeyInfo object)

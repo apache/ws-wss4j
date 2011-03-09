@@ -243,7 +243,7 @@ public class WSPasswordCallback implements Callback {
     
     /**
      * Returns the RequestData associated with the request
-     * @return
+     * @return the RequestData associated with the request
      */
     public RequestData getRequestData() {
         return data;

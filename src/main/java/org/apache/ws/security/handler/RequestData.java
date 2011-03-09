@@ -392,12 +392,18 @@ public class RequestData {
     
     /**
      * Returns the CallbackHandler used for this request.
-     * @return
+     * @return the CallbackHandler used for this request.
      */
     public CallbackHandler getCallbackHandler() {
         return callback;
     }
 
+    /**
+     * Get the Validator instance corresponding to the QName
+     * @param qName the QName with which to find a Validator instance
+     * @return the Validator instance corresponding to the QName
+     * @throws WSSecurityException
+     */
     public Validator getValidator(QName qName) throws WSSecurityException {
         if (wssConfig != null)  {
             return wssConfig.getValidator(qName);

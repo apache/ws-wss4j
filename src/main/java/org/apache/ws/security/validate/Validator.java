@@ -35,7 +35,7 @@ public interface Validator {
      * that was validated, or it can represent some transformation of the initial Credential
      * instance.
      * @param credential the Credential to be validated
-     * @param RequestData associated with the request
+     * @param data the RequestData associated with the request
      * @return a validated Credential
      * @throws WSSecurityException on a failed validation
      */

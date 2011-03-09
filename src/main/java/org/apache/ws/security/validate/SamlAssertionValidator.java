@@ -41,7 +41,7 @@ public class SamlAssertionValidator extends SignatureTrustValidator {
      * A Crypto and a CallbackHandler implementation is also required to be set.
      * 
      * @param credential the Credential to be validated
-     * @param RequestData associated with the request
+     * @param data the RequestData associated with the request
      * @throws WSSecurityException on a failed validation
      */
     public Credential validate(Credential credential, RequestData data) throws WSSecurityException {

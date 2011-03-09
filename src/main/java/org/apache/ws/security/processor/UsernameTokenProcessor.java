@@ -74,7 +74,7 @@ public class UsernameTokenProcessor implements Processor {
      * Check the UsernameToken element and validate it.
      *
      * @param token the DOM element that contains the UsernameToken
-     * @param wssConfig The WSSConfig object from which to obtain configuration
+     * @param data The RequestData object from which to obtain configuration
      * @return UsernameToken the UsernameToken object that was parsed
      * @throws WSSecurityException
      */
