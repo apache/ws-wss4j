@@ -1,27 +1,24 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<document><properties><title>Axis Deployment Tutorial</title></properties><body><section name="Apache WSS4J"></section><section name="Axis Deployment Tutorial"></section><section name=""><subsection name="Contents"><ul>
-  <li>Introduction</li>
-  <li>Prerequisties</li>
-  <li>Steps</li>
-  <ul>
-    <li>Username Token<br></br>
-    </li>
-  </ul>
-</ul></subsection></section><section name=""><subsection name="Introduction"><div style="margin-left: 40px;">WSS4J can be used for securing web
+<document>
+<body>
+<section name="Axis1 Deployment Tutorial">
+<subsection name="Introduction">WSS4J 1.5.x can be used for securing web
 services deployed in virtually any application server, but it includes
-special support for Axis. WSS4J ships with handlers that can be used in
+special support for Axis. WSS4J 1.5.x ships with handlers that can be used in
 Axis-based web
 services for an easy integration. These handlers can be added to the
 service deployment
 descriptor (wsdd file) to add a WS-Security layer to the web service.
 This is a step by step tutorial for deploying a simple service with
 Username Token.<br></br>
-</div><br></br></subsection><subsection name="Prerequisties"><div style="margin-left: 40px;"><a href="http://ws.apache.org/axis/">Axis
+<br></br></subsection><subsection name="Prerequisites"><a href="http://ws.apache.org/axis/">Axis
 1.2</a> installed and configured on a <a href="http://jakarta.apache.org/tomcat/">Tomcat Server</a>.  This
 tutorial was performed on a Linux machine with Tomcat 5.5.4/Java 1.5.0,
 however, the setup should be similar on other application servers, or
 other operating systems (like Windows) unless we stated otherwise.<br></br>
-</div></subsection><subsection name="Steps"></subsection><subsection name="    Installing WSS4J"><div style="margin-left: 40px;">
+</subsection>
+<subsection name="Steps"></subsection>
+<subsection name="Installing WSS4J">
 <ol>
   <li>Download the WSS4J binaries or build it from sources<br></br>
   </li>
@@ -34,13 +31,11 @@ deployment/class loading turned on. Check the Axis Happiness Page
 Security (xmlsec.jar) is listed under the "Optional Components" section.</li>
 </ol>
 <h4>Creating the Service</h4>
-</div><ol>
-  <ol>
-    <li>This tutorial will secure the StockQuoteService which ships
+<ol>
+<li>This tutorial will secure the StockQuoteService which ships
 with Axis. Unless you have one already, create a deployment descriptor
 (deploy.wsdd) file with the following contents:</li>
-  </ol>
-</ol><div style="margin-left: 40px;">
+</ol>
 <ol start="2">
   <br></br>
   <span style="color: rgb(0, 0, 153);">&lt;deployment
@@ -60,7 +55,6 @@ name="scope" value="application"/&gt;</span><br style="color: rgb(0, 0, 153);"><
   <br></br>
   </span><li>deploy the service (using AxisAdmin):</li>
 </ol>
-</div><div style="margin-left: 40px;">
 <ol>
   <span style="color: rgb(0, 0, 153);">java
 org.apache.axis.client.AdminClient
@@ -129,7 +123,6 @@ If all went well, you should get the result:<br></br>
     <span style="color: rgb(0, 0, 153);"><br></br>
     </span></li>
 </ol>
-</div><div style="margin-left: 40px;">
 <h3>Username Token</h3>
 <h4>Configuring the Service<br></br>
 </h4>
@@ -390,4 +383,8 @@ password, or send the wrong username. The service should reject your
 requests.</li>
 </ol>
 <br></br>
-</div><br></br><br></br><div style="margin-left: 40px;"></div></subsection></section></body></document>
+<br></br><br></br>
+</subsection>
+</section>
+</body>
+</document>

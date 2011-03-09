@@ -19,7 +19,7 @@ LICENSE.txt and NOTICE.txt files contained in each release artifact.
 <ul>
 <li>
 <p>
-The current "new" release is Apache WSS4J 1.6:
+The current release is Apache WSS4J 1.6:
 </p>
 <p>
 <a href="http://www.apache.org/dyn/closer.cgi/ws/wss4j/1_6/wss4j-bin-1.6.zip">wss4j-bin-1.6.zip</a>
@@ -38,7 +38,7 @@ PGP</a>)
 </li>
 <li>
 <p>
-The current "old" release is Apache WSS4J 1.5.11:
+The current release of the older 1.5.x branch is Apache WSS4J 1.5.11:
 </p>
 <p>
 <a href="http://www.apache.org/dyn/closer.cgi/ws/wss4j/1_5_11/wss4j-bin-1.5.11.zip">

@@ -79,6 +79,24 @@ guide</a>
 </li>
 </ul>
 </subsection>
+<subsection name="Apache Axis 1">
+<p>
+The 1.5.x branch of WSS4J contains special support for 
+<a href="http://ws.apache.org/axis/">Apache Axis 1</a>, the open-source web services stack which has been
+replaced by Axis2. For some information about how to use WSS4J 1.5.x with Axis 1 see:
+</p>
+<ul>
+<li>
+<a href="axis.html">Axis deployment tutorial 1</a>
+</li>
+<li>
+<a href="package.html">Axis deployment tutorial 2</a>
+</li>
+</ul>
+<p>
+Please note that these deployment tutorials do not apply to WSS4J 1.6+, only WSS4J 1.5.x.
+</p>
+</subsection>
 </section>            
 </body>
 </document>
