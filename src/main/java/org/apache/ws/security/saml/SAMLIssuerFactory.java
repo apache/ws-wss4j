@@ -21,8 +21,10 @@ package org.apache.ws.security.saml;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.util.Loader;
 
+import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.net.URL;
 import java.util.Properties;
@@ -35,9 +37,7 @@ import java.util.Properties;
  */
 public abstract class SAMLIssuerFactory {
     private static final Log log = LogFactory.getLog(SAMLIssuerFactory.class);
-    private static final boolean doDebug = log.isDebugEnabled();
-    private static final String defaultSAMLClassName =
-            "org.apache.ws.security.saml.SAMLIssuerImpl";
+    private static final Class<?> defaultSAMLClass = org.apache.ws.security.saml.SAMLIssuerImpl.class;
 
     /**
      * getInstance
@@ -53,8 +53,9 @@ public abstract class SAMLIssuerFactory {
      * <p/>
      *
      * @return The SAMLIssuer implementation was defined
+     * @throws WSSecurityException if there is an error in loading the crypto properties
      */
-    public static SAMLIssuer getInstance() {
+    public static SAMLIssuer getInstance() throws WSSecurityException {
         return getInstance("saml.properties");
     }
 
@@ -62,24 +63,28 @@ public abstract class SAMLIssuerFactory {
      * getInstance
      * <p/>
      * Returns an instance of SAMLIssuer. The properties are handed over the the SAMLIssuer
-     * implementation. The porperties can be <code>null</code>. It is depenend on the
+     * implementation. The properties can be <code>null</code>. It is dependent on the
      * SAMLIssuer implementation how the initialization is done in this case.
      * <p/>
      *
-     * @param samlClassName This is the SAMLIssuer implementation class. No default is
+     * @param samlClass     This is the SAMLIssuer implementation class. No default is
      *                      provided here.
-     * @param properties    The Properties that are forwarded to the SAMLIssuer implementaion.
-     *                      These properties are dependend on the SAMLIssuer implementatin
+     * @param properties    The Properties that are forwarded to the SAMLIssuer implementation.
+     *                      These properties are dependent on the SAMLIssuer implementation
      * @return The SAMLIssuer implementation or null if no samlClassName was defined
+     * @throws WSSecurityException if there is an error in loading the crypto properties
      */
-    public static SAMLIssuer getInstance(String samlClassName, Properties properties) {
-        return loadClass(samlClassName, properties);
+    public static SAMLIssuer getInstance(
+        Class<?> samlClass,
+        Properties properties
+    ) throws WSSecurityException {
+        return loadClass(samlClass, properties);
     }
 
     /**
      * getInstance
      * <p/>
-     * Returns an instance of SAMLIssuer. This method uses the specifed filename
+     * Returns an instance of SAMLIssuer. This method uses the specified filename
      * to load a property file. This file shall use the property
      * <code>org.apache.ws.security.saml.issuerClass</code>
      * to define the classname of the SAMLIssuer implementation. The file
@@ -90,34 +95,39 @@ public abstract class SAMLIssuerFactory {
      *
      * @param propFilename The name of the property file to load
      * @return The SAMLIssuer implementation that was defined
+     * @throws WSSecurityException if there is an error in loading the crypto properties
      */
-    public static SAMLIssuer getInstance(String propFilename) {
-        Properties properties = null;
-        String samlClassName = null;
-
-        if ((samlClassName == null) || (samlClassName.length() == 0)) {
-            properties = getProperties(propFilename);
-            samlClassName =
-                    properties.getProperty(
-                        "org.apache.ws.security.saml.issuerClass", defaultSAMLClassName
-                    );
+    public static SAMLIssuer getInstance(String propFilename) throws WSSecurityException {
+        Properties properties = getProperties(propFilename);
+        String samlClassName = 
+            properties.getProperty("org.apache.ws.security.saml.issuerClass");
+        Class<?> samlIssuerClass = null;
+        if (samlClassName == null 
+            || samlClassName.equals("org.apache.ws.security.saml.SAMLIssuerImpl")) {
+            samlIssuerClass = defaultSAMLClass;
+        } else {
+            try {
+                // instruct the class loader to load the crypto implementation
+                samlIssuerClass = Loader.loadClass(samlClassName);
+            } catch (ClassNotFoundException ex) {
+                if (log.isDebugEnabled()) {
+                    log.debug(ex.getMessage(), ex);
+                }
+                throw new WSSecurityException(samlClassName + " Not Found", ex);
+            }
         }
-        return loadClass(samlClassName, properties);
+
+        return loadClass(samlIssuerClass, properties);
     }
 
-    private static SAMLIssuer loadClass(String samlClassName, Properties properties) {
-        Class<?> samlIssuerClass = null;
+    private static SAMLIssuer loadClass(
+        Class<?> samlIssuerClass, 
+        Properties properties
+    ) throws WSSecurityException {
         SAMLIssuer samlIssuer = null;
-        try {
-            // instruct the class loader to load the crypto implementation
-            samlIssuerClass = Loader.loadClass(samlClassName);
-        } catch (ClassNotFoundException ex) {
-            if (log.isDebugEnabled()) {
-                log.debug(ex.getMessage(), ex);
-            }
-            throw new RuntimeException(samlClassName + " Not Found", ex);
+        if (log.isDebugEnabled()) {
+            log.debug("Using Crypto Engine [" + samlIssuerClass + "]");
         }
-        log.info("Using Crypto Engine [" + samlClassName + "]");
         try {
             Class<?>[] classes = new Class<?>[]{Properties.class};
             Constructor<?> c = samlIssuerClass.getConstructor(classes);
@@ -127,16 +137,7 @@ public abstract class SAMLIssuerFactory {
             if (log.isDebugEnabled()) {
                 log.debug(ex.getMessage(), ex);
             }
-        }
-        try {
-            // try to instantiate the Crypto subclass
-            samlIssuer = (SAMLIssuer) samlIssuerClass.newInstance();
-            return samlIssuer;
-        } catch (java.lang.Exception ex) {
-            if (log.isDebugEnabled()) {
-                log.debug(ex.getMessage(), ex);
-            }
-            throw new RuntimeException(samlClassName + " cannot create instance", ex);
+            throw new WSSecurityException(samlIssuerClass.getName() + " cannot create instance", ex);
         }
     }
 
@@ -148,18 +149,28 @@ public abstract class SAMLIssuerFactory {
      *
      * @param propFilename the properties file to load
      * @return a <code>Properties</code> object loaded from the filename
+     * @throws WSSecurityException if there is an error in loading the crypto properties
      */
-    private static Properties getProperties(String propFilename) {
+    private static Properties getProperties(String propFilename) throws WSSecurityException {
         Properties properties = new Properties();
         try {
             URL url = Loader.getResource(propFilename);
-            properties.load(url.openStream());
-        } catch (Exception e) {
-            if (doDebug) {
-                log.debug("Cannot find SAML property file: " + propFilename, e);
+            if (url == null) {
+                throw new WSSecurityException(
+                    WSSecurityException.FAILURE, 
+                    "resourceNotFound",
+                    new Object[]{propFilename}
+                );
             }
-            throw new RuntimeException(
-                "SAMLIssuerFactory: Cannot load properties: " + propFilename, e
+            properties.load(url.openStream());
+        } catch (IOException e) {
+            if (log.isDebugEnabled()) {
+                log.debug("Cannot find resource: " + propFilename, e);
+            }
+            throw new WSSecurityException(
+                WSSecurityException.FAILURE, 
+                "resourceNotFound",
+                new Object[]{propFilename}
             );
         }
         return properties;

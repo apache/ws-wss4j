@@ -49,7 +49,11 @@ import java.util.List;
 public class SamlTokenHOKTest extends org.junit.Assert {
     private static final Log LOG = LogFactory.getLog(SamlTokenHOKTest.class);
     private WSSecurityEngine secEngine = new WSSecurityEngine();
-    private Crypto crypto = CryptoFactory.getInstance("crypto.properties");
+    private Crypto crypto = null;
+    
+    public SamlTokenHOKTest() throws Exception {
+        crypto = CryptoFactory.getInstance("crypto.properties");
+    }
 
     /**
      * Test that creates, sends and processes a signed SAML 1.1 authentication assertion.

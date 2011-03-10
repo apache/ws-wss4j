@@ -35,7 +35,11 @@ import org.w3c.dom.Document;
 public class NoSoapPrefixSignatureTest extends org.junit.Assert {
     private static final Log LOG = LogFactory.getLog(NoSoapPrefixSignatureTest.class);
     private WSSecurityEngine secEngine = new WSSecurityEngine();
-    private Crypto crypto = CryptoFactory.getInstance();
+    private Crypto crypto = null;
+    
+    public NoSoapPrefixSignatureTest() throws Exception {
+        crypto = CryptoFactory.getInstance();
+    }
 
     /**
      * Test signing a SOAP message that has no SOAP namespace prefix

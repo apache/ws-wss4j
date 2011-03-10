@@ -53,7 +53,7 @@ public class CryptoProviderTest extends org.junit.Assert {
     private CallbackHandler callbackHandler = new KeystoreCallbackHandler();
     private Crypto crypto;
 
-    public CryptoProviderTest() {
+    public CryptoProviderTest() throws Exception {
         secEngine.getWssConfig(); //make sure BC gets registered
         crypto = CryptoFactory.getInstance("wss86.properties");
     }

@@ -42,7 +42,11 @@ import java.util.List;
  */
 public class BinarySecurityTokenTest extends org.junit.Assert {
     private static final Log LOG = LogFactory.getLog(BinarySecurityTokenTest.class);
-    private Crypto crypto = CryptoFactory.getInstance("wss40.properties");
+    private Crypto crypto = null;
+    
+    public BinarySecurityTokenTest() throws Exception {
+        crypto = CryptoFactory.getInstance("wss40.properties");
+    }
 
     /**
      * A unit test for an X.509 BinarySecurityToken

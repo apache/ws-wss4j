@@ -56,7 +56,11 @@ public class BSTKerberosTest extends org.junit.Assert {
         WSConstants.SOAPMESSAGE_NS + "#Base64Binary";
     private WSSecurityEngine secEngine = new WSSecurityEngine();
     private CallbackHandler callbackHandler = new KeystoreCallbackHandler();
-    private Crypto crypto = CryptoFactory.getInstance();
+    private Crypto crypto = null;
+    
+    public BSTKerberosTest() throws Exception {
+        crypto = CryptoFactory.getInstance();
+    }
 
     /**
      * A unit test for creating BinarySecurityTokens

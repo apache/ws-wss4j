@@ -57,8 +57,12 @@ public class SymmetricSignatureTest extends org.junit.Assert implements Callback
     private WSSecurityEngine secEngine = new WSSecurityEngine();
     private CallbackHandler callbackHandler = new KeystoreCallbackHandler();
     private SecretKeyCallbackHandler secretKeyCallbackHandler = new SecretKeyCallbackHandler();
-    private Crypto crypto = CryptoFactory.getInstance();
     private byte[] keyData;
+    private Crypto crypto = null;
+    
+    public SymmetricSignatureTest() throws Exception {
+        crypto = CryptoFactory.getInstance();
+    }
 
     /**
      * Setup method

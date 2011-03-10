@@ -52,7 +52,11 @@ public class SignatureTest extends org.junit.Assert {
     
     private WSSecurityEngine secEngine = new WSSecurityEngine();
     private CallbackHandler callbackHandler = new KeystoreCallbackHandler();
-    private Crypto crypto = CryptoFactory.getInstance();
+    private Crypto crypto = null;
+    
+    public SignatureTest() throws Exception {
+        crypto = CryptoFactory.getInstance();
+    }
 
     /**
      * The test uses the Issuer Serial key identifier type.

@@ -44,7 +44,11 @@ public class DerivedKeyTest extends org.junit.Assert {
     private static final Log LOG = LogFactory.getLog(DerivedKeyTest.class);
     private WSSecurityEngine secEngine = new WSSecurityEngine();
     private CallbackHandler callbackHandler = new KeystoreCallbackHandler();
-    private Crypto crypto = CryptoFactory.getInstance("wss40.properties");
+    private Crypto crypto = null;
+    
+    public DerivedKeyTest() throws Exception {
+        crypto = CryptoFactory.getInstance("wss40.properties");
+    }
 
     /**
      * Test encryption using a DerivedKeyToken using TRIPLEDES

@@ -35,7 +35,7 @@ import org.w3c.dom.Document;
 public class CryptoTest extends org.junit.Assert {
     
     @org.junit.Test
-    public void testCrypto() {
+    public void testCrypto() throws Exception {
         Crypto crypto = CryptoFactory.getInstance();
         assertTrue(crypto != null);
     }
@@ -51,10 +51,10 @@ public class CryptoTest extends org.junit.Assert {
      * Ensure that we can load a custom crypto implementation using a Map
      */
     @org.junit.Test
-    public void testCustomCrypto() {
-        java.util.Map<String, Object> tmp = new java.util.TreeMap<String, Object>();
+    public void testCustomCrypto() throws Exception {
+        java.util.Map<Object, Object> tmp = new java.util.TreeMap<Object, Object>();
         Crypto crypto = CryptoFactory.getInstance(
-            "org.apache.ws.security.common.CustomCrypto",
+            org.apache.ws.security.common.CustomCrypto.class,
             tmp
         );
         assertNotNull(crypto);
@@ -68,7 +68,7 @@ public class CryptoTest extends org.junit.Assert {
      * to be set and point to an existing file"
      */
     @org.junit.Test
-    public void testNoKeyStoreFile() {
+    public void testNoKeyStoreFile() throws Exception {
         Crypto crypto = CryptoFactory.getInstance(
             "nofile.properties"
         );

@@ -81,7 +81,7 @@ public class SAMLIssuerImpl implements SAMLIssuer {
     public SAMLIssuerImpl() {
     }
 
-    public SAMLIssuerImpl(Properties prop) {
+    public SAMLIssuerImpl(Properties prop) throws WSSecurityException {
         /*
          * if no properties .. just return an instance, the rest will be done
          * later or this instance is just used to handle certificate

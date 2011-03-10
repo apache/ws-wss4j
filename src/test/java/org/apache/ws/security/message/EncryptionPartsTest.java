@@ -70,7 +70,11 @@ public class EncryptionPartsTest extends org.junit.Assert {
 
     private WSSecurityEngine secEngine = new WSSecurityEngine();
     private CallbackHandler callbackHandler = new KeystoreCallbackHandler();
-    private Crypto crypto = CryptoFactory.getInstance();
+    private Crypto crypto = null;
+    
+    public EncryptionPartsTest() throws Exception {
+        crypto = CryptoFactory.getInstance();
+    }
 
     /**
      * Test encrypting a custom SOAP header

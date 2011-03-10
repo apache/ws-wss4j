@@ -63,11 +63,15 @@ public class EncryptionTest extends org.junit.Assert {
         );
 
     private WSSecurityEngine secEngine = new WSSecurityEngine();
-    private Crypto crypto = CryptoFactory.getInstance("wss40.properties");
     private CallbackHandler keystoreCallbackHandler = new KeystoreCallbackHandler();
     private SecretKeyCallbackHandler secretKeyCallbackHandler = new SecretKeyCallbackHandler();
     private byte[] keyData;
     private SecretKey key;
+    private Crypto crypto = null;
+    
+    public EncryptionTest() throws Exception {
+        crypto = CryptoFactory.getInstance("wss40.properties");
+    }
     
     /**
      * Setup method

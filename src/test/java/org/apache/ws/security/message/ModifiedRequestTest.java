@@ -57,7 +57,11 @@ public class ModifiedRequestTest extends org.junit.Assert {
     
     private WSSecurityEngine secEngine = new WSSecurityEngine();
     private CallbackHandler callbackHandler = new KeystoreCallbackHandler();
-    private Crypto crypto = CryptoFactory.getInstance();
+    private Crypto crypto = null;
+    
+    public ModifiedRequestTest() throws Exception {
+        crypto = CryptoFactory.getInstance();
+    }
 
     /**
      * Test that signs a SOAP body element "value". The SOAP request is then modified

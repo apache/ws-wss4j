@@ -27,6 +27,7 @@ import org.apache.ws.security.WSDataRef;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSSecurityEngineResult;
+import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.common.CustomHandler;
 import org.apache.ws.security.common.KeystoreCallbackHandler;
 import org.apache.ws.security.common.SAML1CallbackHandler;
@@ -55,8 +56,12 @@ public class SamlTokenSVTest extends org.junit.Assert {
     private static final Log LOG = LogFactory.getLog(SamlTokenSVTest.class);
     private WSSecurityEngine secEngine = new WSSecurityEngine();
     private CallbackHandler callbackHandler = new KeystoreCallbackHandler();
-    private Crypto crypto = CryptoFactory.getInstance("crypto.properties");
-
+    private Crypto crypto = null;
+    
+    public SamlTokenSVTest() throws Exception {
+        crypto = CryptoFactory.getInstance("crypto.properties");
+    }
+    
     /**
      * Test that creates, sends and processes a signed SAML 1.1 authentication assertion.
      */
@@ -442,7 +447,7 @@ public class SamlTokenSVTest extends org.junit.Assert {
         try {
             handler.receive(WSConstants.ST_SIGNED, reqData);
             fail("Failure expected on a bad crypto properties file");
-        } catch (RuntimeException ex) {
+        } catch (WSSecurityException ex) {
             // expected
         }
     }

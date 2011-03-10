@@ -50,7 +50,11 @@ public class SignatureConfirmationTest extends org.junit.Assert {
     private static final Log LOG = LogFactory.getLog(SignatureConfirmationTest.class);
     private WSSecurityEngine secEngine = new WSSecurityEngine();
     private CallbackHandler callbackHandler = new KeystoreCallbackHandler();
-    private Crypto crypto = CryptoFactory.getInstance();
+    private Crypto crypto = null;
+    
+    public SignatureConfirmationTest() throws Exception {
+        crypto = CryptoFactory.getInstance();
+    }
 
     /**
      * Test to see that a signature is saved correctly on the outbound request.

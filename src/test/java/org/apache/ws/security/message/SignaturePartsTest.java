@@ -77,7 +77,11 @@ public class SignaturePartsTest extends org.junit.Assert {
         "</soapenv:Envelope>";
 
     private WSSecurityEngine secEngine = new WSSecurityEngine();
-    private Crypto crypto = CryptoFactory.getInstance();
+    private Crypto crypto = null;
+    
+    public SignaturePartsTest() throws Exception {
+        crypto = CryptoFactory.getInstance();
+    }
 
     /**
      * Test signing a custom SOAP header

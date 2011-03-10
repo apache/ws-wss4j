@@ -466,7 +466,10 @@ public abstract class WSHandler {
      * @param reqData The RequestData object
      * @return A Crypto instance that has been loaded
      */
-    protected Crypto loadCryptoFromPropertiesFile(String propFilename, RequestData reqData) {
+    protected Crypto loadCryptoFromPropertiesFile(
+        String propFilename, 
+        RequestData reqData
+    ) throws WSSecurityException {
         return 
             CryptoFactory.getInstance(
                 propFilename, this.getClassLoader(reqData.getMsgContext())

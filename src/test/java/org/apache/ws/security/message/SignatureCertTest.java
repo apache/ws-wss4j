@@ -70,8 +70,13 @@ import java.util.List;
 public class SignatureCertTest extends org.junit.Assert {
     private static final Log LOG = LogFactory.getLog(SignatureCertTest.class);
     private WSSecurityEngine secEngine = new WSSecurityEngine();
-    private Crypto crypto = CryptoFactory.getInstance("wss40.properties");
-    private Crypto cryptoCA = CryptoFactory.getInstance("wss40CA.properties");
+    private Crypto crypto = null;
+    private Crypto cryptoCA = null;
+    
+    public SignatureCertTest() throws Exception {
+        crypto = CryptoFactory.getInstance("wss40.properties");
+        cryptoCA = CryptoFactory.getInstance("wss40CA.properties");
+    }
 
     /**
      * Test signing a SOAP message using a BST.

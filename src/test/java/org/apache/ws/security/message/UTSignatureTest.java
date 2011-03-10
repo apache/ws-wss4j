@@ -52,7 +52,11 @@ public class UTSignatureTest extends org.junit.Assert {
     private static final Log LOG = LogFactory.getLog(UTSignatureTest.class);
     private WSSecurityEngine secEngine = new WSSecurityEngine();
     private CallbackHandler callbackHandler = new UsernamePasswordCallbackHandler();
-    private Crypto crypto = CryptoFactory.getInstance();
+    private Crypto crypto = null;
+    
+    public UTSignatureTest() throws Exception {
+        crypto = CryptoFactory.getInstance();
+    }
 
     /**
      * Test using a UsernameToken derived key for signing a SOAP body

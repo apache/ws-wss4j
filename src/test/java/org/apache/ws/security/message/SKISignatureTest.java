@@ -37,7 +37,11 @@ import org.w3c.dom.Document;
 public class SKISignatureTest extends org.junit.Assert {
     private static final Log LOG = LogFactory.getLog(SKISignatureTest.class);
     private WSSecurityEngine secEngine = new WSSecurityEngine();
-    private Crypto crypto = CryptoFactory.getInstance("wss40.properties");
+    private Crypto crypto = null;
+    
+    public SKISignatureTest() throws Exception {
+        crypto = CryptoFactory.getInstance("wss40.properties");
+    }
 
     /**
      * Test that signs and verifies a WS-Security envelope using SubjectKeyIdentifier.

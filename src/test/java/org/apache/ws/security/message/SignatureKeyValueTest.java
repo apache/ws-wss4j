@@ -41,7 +41,11 @@ import java.util.List;
  */
 public class SignatureKeyValueTest extends org.junit.Assert {
     private static final Log LOG = LogFactory.getLog(SignatureKeyValueTest.class);
-    private Crypto crypto = CryptoFactory.getInstance("wss40.properties");
+    private Crypto crypto = null;
+    
+    public SignatureKeyValueTest() throws Exception {
+        crypto = CryptoFactory.getInstance("wss40.properties");
+    }
 
     /**
      * Successful RSAKeyValue test.

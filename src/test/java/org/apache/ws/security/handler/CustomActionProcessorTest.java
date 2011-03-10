@@ -46,7 +46,11 @@ import java.util.ArrayList;
  */
 public class CustomActionProcessorTest extends org.junit.Assert {
     private static final Log LOG = LogFactory.getLog(CustomActionProcessorTest.class);
-    private Crypto crypto = CryptoFactory.getInstance();
+    private Crypto crypto = null;
+    
+    public CustomActionProcessorTest() throws Exception {
+        crypto = CryptoFactory.getInstance();
+    }
 
     /**
      * Test to see that a custom processor configured through a 

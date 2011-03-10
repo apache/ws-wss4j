@@ -21,8 +21,10 @@ package org.apache.ws.security.components.crypto;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.util.Loader;
 
+import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.net.URL;
 import java.util.Map;
@@ -36,7 +38,8 @@ import java.util.Properties;
  */
 public abstract class CryptoFactory {
     private static final Log log = LogFactory.getLog(CryptoFactory.class);
-    private static final String defaultCryptoClassName = "org.apache.ws.security.components.crypto.Merlin";
+    private static final Class<?> defaultCryptoClass = 
+        org.apache.ws.security.components.crypto.Merlin.class;
 
     /**
      * getInstance
@@ -52,8 +55,9 @@ public abstract class CryptoFactory {
      * <p/>
      *
      * @return The crypto implementation was defined
+     * @throws WSSecurityException if there is an error in loading the crypto properties
      */
-    public static Crypto getInstance() {
+    public static Crypto getInstance() throws WSSecurityException {
         return getInstance("crypto.properties");
     }
 
@@ -69,10 +73,10 @@ public abstract class CryptoFactory {
      *                        and the Crypto impl class name.
      *                        These properties are dependent on the crypto implementation
      * @return The cyrpto implementation or null if no cryptoClassName was defined
+     * @throws WSSecurityException if there is an error in loading the crypto properties
      */
-    public static Crypto getInstance(Properties properties) {
-        String cryptoClassName = properties.getProperty("org.apache.ws.security.crypto.provider");
-        return loadClass(cryptoClassName, properties);
+    public static Crypto getInstance(Properties properties) throws WSSecurityException {
+        return getInstance(properties, Loader.getClassLoader(CryptoFactory.class));
     }
 
     /**
@@ -89,10 +93,29 @@ public abstract class CryptoFactory {
      *                        These properties are dependent on the crypto implementation
      * @param classLoader   The class loader to use
      * @return The crypto implementation or null if no cryptoClassName was defined
+     * @throws WSSecurityException if there is an error in loading the crypto properties
      */
-    public static Crypto getInstance(Properties properties, ClassLoader classLoader) {
+    public static Crypto getInstance(
+        Properties properties, 
+        ClassLoader classLoader
+    ) throws WSSecurityException {
         String cryptoClassName = properties.getProperty("org.apache.ws.security.crypto.provider");
-        return loadClass(cryptoClassName, properties, classLoader);
+        Class<?> cryptoClass = null;
+        if (cryptoClassName == null 
+            || cryptoClassName.equals("org.apache.ws.security.components.crypto.Merlin")) {
+            cryptoClass = defaultCryptoClass;
+        } else {
+            try {
+                // instruct the class loader to load the crypto implementation
+                cryptoClass = Loader.loadClass(cryptoClassName);
+            } catch (ClassNotFoundException ex) {
+                if (log.isDebugEnabled()) {
+                    log.debug(ex.getMessage(), ex);
+                }
+                throw new WSSecurityException(cryptoClassName + " Not Found", ex);
+            }
+        }
+        return loadClass(cryptoClass, properties, classLoader);
     }
     
     /**
@@ -103,16 +126,20 @@ public abstract class CryptoFactory {
      * Crypto implementation how the initialization is done in this case.
      * <p/>
      *
-     * @param cryptoClassName This is the crypto implementation class. No default is
+     * @param cryptoClass     This is the crypto implementation class. No default is
      *                        provided here.
      * @param map             The Maps that is forwarded to the crypto implementation.
      *                        These contents of the map are dependent on the 
      *                        underlying crypto implementation specified in the 
      *                        cryptoClassName parameter.
      * @return The crypto implementation or null if no cryptoClassName was defined
+     * @throws WSSecurityException if there is an error in loading the crypto properties
      */
-    public static Crypto getInstance(String cryptoClassName, Map map) {
-        return loadClass(cryptoClassName, map);
+    public static Crypto getInstance(
+        Class<?> cryptoClass, 
+        Map<Object, Object> map
+    ) throws WSSecurityException {
+        return loadClass(cryptoClass, map, Loader.getClassLoader(CryptoFactory.class));
     }
 
     /**
@@ -129,121 +156,106 @@ public abstract class CryptoFactory {
      *
      * @param propFilename The name of the property file to load
      * @return The crypto implementation that was defined
+     * @throws WSSecurityException if there is an error in loading the crypto properties
      */
-    public static Crypto getInstance(String propFilename) {
-        Properties properties = null;
-        String cryptoClassName = null;
-
-        // cryptoClassName = System.getProperty("org.apache.ws.security.crypto.provider");
-        if ((cryptoClassName == null) || (cryptoClassName.length() == 0)) {
-            properties = getProperties(propFilename);
-            // use the default Crypto implementation
-            cryptoClassName = properties.getProperty("org.apache.ws.security.crypto.provider",
-                    defaultCryptoClassName);
-        }
-        return loadClass(cryptoClassName, properties);
+    public static Crypto getInstance(String propFilename) throws WSSecurityException {
+        return getInstance(propFilename, Loader.getClassLoader(CryptoFactory.class));
     }    
     
-    public static Crypto getInstance(String propFilename, ClassLoader customClassLoader) {
-        Properties properties = null;
-        String cryptoClassName = null;
-
-        // cryptoClassName = System.getProperty("org.apache.ws.security.crypto.provider");
-        if ((cryptoClassName == null) || (cryptoClassName.length() == 0)) {
-            properties = getProperties(propFilename,customClassLoader);
-            // use the default Crypto implementation
-            cryptoClassName = properties.getProperty("org.apache.ws.security.crypto.provider",
-                    defaultCryptoClassName);
-        }
-        return loadClass(cryptoClassName, properties, customClassLoader);
-    }
-
-    private static Crypto loadClass(String cryptoClassName, Map map) {
-        return loadClass(cryptoClassName, map, Loader.getClassLoader(CryptoFactory.class));
+    public static Crypto getInstance(
+        String propFilename, 
+        ClassLoader customClassLoader
+    ) throws WSSecurityException {
+        Properties properties = getProperties(propFilename, customClassLoader);
+        return getInstance(properties, customClassLoader);
     }
 
     /**
      * This allows loading the classes with a custom class loader  
-     * @param cryptoClassName
+     * @param cryptoClass
      * @param properties
      * @param loader
      * @return
+     * @throws WSSecurityException if there is an error in loading the crypto properties
      */
-    private static Crypto loadClass(String cryptoClassName, Map map, ClassLoader loader) {
-        Class<?> cryptogenClass = null;
-        Crypto crypto = null;
-        
-        if (cryptoClassName != null) {
-            cryptoClassName = cryptoClassName.trim();
+    private static Crypto loadClass(
+        Class<?> cryptoClass,
+        Map<Object, Object> map, 
+        ClassLoader loader
+    ) throws WSSecurityException {
+        if (log.isDebugEnabled()) {
+            log.debug("Using Crypto Engine [" + cryptoClass + "]");
         }
         try {
-            // instruct the class loader to load the crypto implementation
-            cryptogenClass = Loader.loadClass(loader, cryptoClassName);
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(cryptoClassName + " Not Found");
-        }
-        log.debug("Using Crypto Engine [" + cryptoClassName + "]");
-        try {
-            Class<?>[] classes = null;
-            //
-            // for backwards compat
-            //
-            if (map instanceof Properties) {
-                classes = new Class[]{Properties.class, ClassLoader.class};
-            } else {
-                classes = new Class[]{Map.class, ClassLoader.class};
-            }
-            Constructor<?> c = cryptogenClass.getConstructor(classes);
-            crypto = (Crypto) c.newInstance(new Object[] {map, loader});
-            return crypto;
+            Class<?>[] classes = new Class[]{Map.class, ClassLoader.class};
+            Constructor<?> c = cryptoClass.getConstructor(classes);
+            return (Crypto) c.newInstance(new Object[] {map, loader});
         } catch (java.lang.Exception e) {
             if (log.isDebugEnabled()) {
-                log.debug("Unable to instantiate (1): " + cryptoClassName, e);
+                log.debug("Unable to instantiate: " + cryptoClass.getName(), e);
             }
-            try {
-                // try to instantiate the Crypto subclass
-                crypto = (Crypto) cryptogenClass.newInstance();
-                return crypto;
-            } catch (java.lang.Exception e2) {
-                if (log.isDebugEnabled()) {
-                    log.debug("Unable to instantiate (2): " + cryptoClassName, e2);
-                }
-                throw new RuntimeException(cryptoClassName + " cannot create instance", e);
-            }
+            throw new WSSecurityException(cryptoClass + " cannot create instance", e);
         }
     }
     
     /**
-     * Gets the properties for crypto.
-     * The functions loads the property file via
-     * {@link Loader.getResource(String)}, thus the property file
-     * should be accessible via the classpath
-     *
-     * @param propFilename the properties file to load
-     * @return a <code>Properties</code> object loaded from the filename
+     * This allows loading the classes with a custom class loader  
+     * @param cryptoClass
+     * @param properties
+     * @param loader
+     * @return
+     * @throws WSSecurityException if there is an error in loading the crypto properties
      */
-    private static Properties getProperties(String propFilename) {
-        return getProperties(propFilename, Loader.getClassLoader(CryptoFactory.class));
+    private static Crypto loadClass(
+        Class<?> cryptoClass, 
+        Properties map, 
+        ClassLoader loader
+    ) throws WSSecurityException {
+        if (log.isDebugEnabled()) {
+            log.debug("Using Crypto Engine [" + cryptoClass + "]");
+        }
+        try {
+            Class<?>[] classes = new Class[]{Properties.class, ClassLoader.class};
+            Constructor<?> c = cryptoClass.getConstructor(classes);
+            return (Crypto) c.newInstance(new Object[] {map, loader});
+        } catch (java.lang.Exception e) {
+            if (log.isDebugEnabled()) {
+                log.debug("Unable to instantiate: " + cryptoClass.getName(), e);
+            }
+            throw new WSSecurityException(cryptoClass + " cannot create instance", e);
+        }
     }
-    
     
     /**
      * This allows loading the resources with a custom class loader
      * @param propFilename
      * @param loader
      * @return
+     * @throws WSSecurityException if there is an error in loading the crypto properties
      */
-    private static Properties getProperties(String propFilename, ClassLoader loader) {
+    private static Properties getProperties(
+        String propFilename, 
+        ClassLoader loader
+    ) throws WSSecurityException {
         Properties properties = new Properties();
         try {
             URL url = Loader.getResource(loader, propFilename);
-            properties.load(url.openStream());
-        } catch (Exception e) {
-            if (log.isDebugEnabled()) {
-                log.debug("Cannot find crypto property file: " + propFilename, e);
+            if (url == null) {
+                throw new WSSecurityException(
+                    WSSecurityException.FAILURE, 
+                    "resourceNotFound",
+                    new Object[]{propFilename}
+                );
             }
-            throw new RuntimeException(
-                "CryptoFactory: Cannot load properties: " + propFilename, e
+            properties.load(url.openStream());
+        } catch (IOException e) {
+            if (log.isDebugEnabled()) {
+                log.debug("Cannot find resource: " + propFilename, e);
+            }
+            throw new WSSecurityException(
+                WSSecurityException.FAILURE, 
+                "resourceNotFound",
+                new Object[]{propFilename}
             );
         }
         return properties;

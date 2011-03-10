@@ -52,7 +52,11 @@ public class UTDerivedKeyTest extends org.junit.Assert {
     private static final Log LOG = LogFactory.getLog(UTDerivedKeyTest.class);
     private WSSecurityEngine secEngine = new WSSecurityEngine();
     private CallbackHandler callbackHandler = new UsernamePasswordCallbackHandler();
-    private Crypto crypto = CryptoFactory.getInstance();
+    private Crypto crypto = null;
+    
+    public UTDerivedKeyTest() throws Exception {
+        crypto = CryptoFactory.getInstance();
+    }
 
     /**
      * Unit test for the UsernameToken derived key functionality 

@@ -57,7 +57,11 @@ public class EncryptedKeyDataRefTest extends org.junit.Assert {
     private static final Log LOG = LogFactory.getLog(EncryptedKeyDataRefTest.class);
     private WSSecurityEngine secEngine = new WSSecurityEngine();
     private CallbackHandler callbackHandler = new KeystoreCallbackHandler();
-    private Crypto crypto = CryptoFactory.getInstance("wss40.properties");
+    private Crypto crypto = null;
+    
+    public EncryptedKeyDataRefTest() throws Exception {
+        crypto = CryptoFactory.getInstance("wss40.properties");
+    }
 
     /**
      * Test that check for correct WSDataRef object from EncryptedKey Processor 

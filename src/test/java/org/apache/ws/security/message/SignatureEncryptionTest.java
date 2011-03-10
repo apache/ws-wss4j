@@ -63,7 +63,6 @@ public class SignatureEncryptionTest extends org.junit.Assert {
 
     private WSSecurityEngine secEngine = new WSSecurityEngine();
     private CallbackHandler callbackHandler = new KeystoreCallbackHandler();
-    private Crypto crypto = CryptoFactory.getInstance();
     
     private static final byte[] key = {
         (byte)0x31, (byte)0xfd,
@@ -79,6 +78,11 @@ public class SignatureEncryptionTest extends org.junit.Assert {
         (byte)0xc8, (byte)0x51,
         (byte)0x34, (byte)0x04,
     };
+    private Crypto crypto = null;
+    
+    public SignatureEncryptionTest() throws Exception {
+        crypto = CryptoFactory.getInstance();
+    }
 
     /**
      * Test that encrypts and then signs a WS-Security envelope, then performs

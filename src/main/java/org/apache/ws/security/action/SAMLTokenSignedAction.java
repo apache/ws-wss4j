@@ -107,8 +107,10 @@ public class SAMLTokenSignedAction implements Action {
         }
     }
 
-    protected SAMLIssuer loadSamlIssuer(WSHandler handler, 
-                    RequestData reqData) {
+    protected SAMLIssuer loadSamlIssuer(
+        WSHandler handler, 
+        RequestData reqData
+    ) throws WSSecurityException {
         String samlPropFile = 
             handler.getString(WSHandlerConstants.SAML_PROP_FILE,
                 reqData.getMsgContext());

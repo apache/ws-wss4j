@@ -48,7 +48,11 @@ import java.io.IOException;
  */
 public class FaultCodeTest extends org.junit.Assert implements CallbackHandler {
     private WSSecurityEngine secEngine = new WSSecurityEngine();
-    private Crypto crypto = CryptoFactory.getInstance();
+    private Crypto crypto = null;
+    
+    public FaultCodeTest() throws Exception {
+        crypto = CryptoFactory.getInstance();
+    }
 
     /**
      * Test for the wsse:FailedCheck faultcode. This will fail due to a bad password in
