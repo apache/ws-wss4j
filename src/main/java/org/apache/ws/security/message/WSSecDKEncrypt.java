@@ -21,6 +21,7 @@ package org.apache.ws.security.message;
 
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSEncryptionPart;
+import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.conversation.ConversationException;
 import org.apache.ws.security.message.token.Reference;
@@ -45,6 +46,13 @@ import java.util.List;
 public class WSSecDKEncrypt extends WSSecDerivedKeyBase {
 
     protected String symEncAlgo = WSConstants.AES_128;
+    
+    public WSSecDKEncrypt() {
+        super();
+    }
+    public WSSecDKEncrypt(WSSConfig config) {
+        super(config);
+    }
     
     public Document build(Document doc, WSSecHeader secHeader)
         throws WSSecurityException, ConversationException {
@@ -105,7 +113,7 @@ public class WSSecDKEncrypt extends WSSecDerivedKeyBase {
 
         List<String> encDataRefs = 
             WSSecEncrypt.doEncryption(
-                document, wssConfig, keyInfo, key, symEncAlgo, references, callbackLookup
+                document, getWsConfig(), keyInfo, key, symEncAlgo, references, callbackLookup
             );
         if (dataRef == null) {
             dataRef = 

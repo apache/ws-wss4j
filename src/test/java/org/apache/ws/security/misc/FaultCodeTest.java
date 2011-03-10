@@ -56,7 +56,7 @@ public class FaultCodeTest extends org.junit.Assert implements CallbackHandler {
      */
     @org.junit.Test
     public void testFailedCheck() throws Exception {
-        WSSecEncrypt builder = new WSSecEncrypt();
+        WSSecEncrypt builder = new WSSecEncrypt(secEngine.getWssConfig());
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
@@ -81,6 +81,7 @@ public class FaultCodeTest extends org.junit.Assert implements CallbackHandler {
     @org.junit.Test
     public void testUnsupportedAlgorithm() throws Exception {
         try {
+            secEngine.getWssConfig();
             WSSecurityUtil.getCipherInstance("Bad Algorithm");
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == 2);
@@ -99,6 +100,7 @@ public class FaultCodeTest extends org.junit.Assert implements CallbackHandler {
     @org.junit.Test
     public void testSecurityTokenUnavailable() throws Exception {
         try {
+            secEngine.getWssConfig();
             crypto.loadCertificate(new java.io.ByteArrayInputStream(new byte[]{}));
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == 7);
@@ -115,7 +117,7 @@ public class FaultCodeTest extends org.junit.Assert implements CallbackHandler {
      */
     @org.junit.Test
     public void testMessageExpired() throws Exception {
-        WSSecTimestamp builder = new WSSecTimestamp();
+        WSSecTimestamp builder = new WSSecTimestamp(secEngine.getWssConfig());
         builder.setTimeToLive(-1);
         
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
@@ -140,7 +142,7 @@ public class FaultCodeTest extends org.junit.Assert implements CallbackHandler {
      */
     @org.junit.Test
     public void testFailedAuthentication() throws Exception {
-        WSSecUsernameToken builder = new WSSecUsernameToken();
+        WSSecUsernameToken builder = new WSSecUsernameToken(secEngine.getWssConfig());
         builder.addCreated();
         builder.addNonce();
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
@@ -167,7 +169,7 @@ public class FaultCodeTest extends org.junit.Assert implements CallbackHandler {
      */
     @org.junit.Test
     public void testInvalidSecurityToken() throws Exception {
-        WSSecUsernameToken builder = new WSSecUsernameToken();
+        WSSecUsernameToken builder = new WSSecUsernameToken(secEngine.getWssConfig());
         builder.addCreated();
         builder.addNonce();
         builder.setUserInfo(null, "security");

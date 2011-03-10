@@ -20,6 +20,7 @@
 package org.apache.ws.security.message;
 
 import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.conversation.ConversationConstants;
 import org.apache.ws.security.conversation.ConversationException;
@@ -111,6 +112,15 @@ public abstract class WSSecDerivedKeyBase extends WSSecSignatureBase {
     protected int derivedKeyLength = -1;
     
     private String customValueType;
+    
+    
+    public WSSecDerivedKeyBase() {
+        super();
+    }
+    public WSSecDerivedKeyBase(WSSConfig config) {
+        super(config);
+    }
+
     
     /**
      * @param ephemeralKey The ephemeralKey to set.
@@ -204,7 +214,7 @@ public abstract class WSSecDerivedKeyBase extends WSSecSignatureBase {
         
         // Add the DKTs
         dkt = new DerivedKeyToken(wscVersion, document);
-        dktId = wssConfig.getIdAllocator().createId("DK-", dkt);
+        dktId = getWsConfig().getIdAllocator().createId("DK-", dkt);
         
         dkt.setOffset(offset);
         dkt.setLength(length);

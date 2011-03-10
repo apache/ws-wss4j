@@ -24,6 +24,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDocInfo;
 import org.apache.ws.security.WSEncryptionPart;
+import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.conversation.ConversationException;
 import org.apache.ws.security.message.token.Reference;
@@ -80,6 +81,13 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
     private Element securityHeader = null;
 
 
+    public WSSecDKSign() {
+        super();
+    }
+    public WSSecDKSign(WSSConfig config) {
+        super(config);
+    }
+    
     public Document build(Document doc, WSSecHeader secHeader)
         throws WSSecurityException, ConversationException {
         
@@ -123,7 +131,7 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
         
         try {
             C14NMethodParameterSpec c14nSpec = null;
-            if (wssConfig.isWsiBSPCompliant() && canonAlgo.equals(WSConstants.C14N_EXCL_OMIT_COMMENTS)) {
+            if (getWsConfig().isWsiBSPCompliant() && canonAlgo.equals(WSConstants.C14N_EXCL_OMIT_COMMENTS)) {
                 List<String> prefixes = 
                     getInclusivePrefixes(secHeader.getSecurityHeader(), false);
                 c14nSpec = new ExcC14NParameterSpec(prefixes);
@@ -137,10 +145,10 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
             );
         }
 
-        keyInfoUri = wssConfig.getIdAllocator().createSecureId("KI-", keyInfo);
+        keyInfoUri = getWsConfig().getIdAllocator().createSecureId("KI-", keyInfo);
         
         secRef = new SecurityTokenReference(doc);
-        strUri = wssConfig.getIdAllocator().createSecureId("STR-", secRef);
+        strUri = getWsConfig().getIdAllocator().createSecureId("STR-", secRef);
         secRef.setID(strUri);
         
         Reference refUt = new Reference(document);
@@ -188,7 +196,7 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
                 wsDocInfo,
                 signatureFactory, 
                 secHeader, 
-                wssConfig, 
+                getWsConfig(), 
                 digestAlgo
             );
     }
@@ -234,7 +242,7 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
                     signedInfo, 
                     keyInfo,
                     null,
-                    wssConfig.getIdAllocator().createId("SIG-", null),
+                    getWsConfig().getIdAllocator().createId("SIG-", null),
                     null);
             
             //

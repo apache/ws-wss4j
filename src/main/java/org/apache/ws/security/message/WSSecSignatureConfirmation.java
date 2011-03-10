@@ -21,6 +21,7 @@ package org.apache.ws.security.message;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.message.token.SignatureConfirmation;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.w3c.dom.Document;
@@ -39,6 +40,13 @@ public class WSSecSignatureConfirmation extends WSSecBase {
 
     byte[] signatureValue = null;
 
+    public WSSecSignatureConfirmation() {
+        super();
+    }
+    public WSSecSignatureConfirmation(WSSConfig config) {
+        super(config);
+    }
+    
     /**
      * Set the Signature value to store in this SignatureConfirmation.
      * 
@@ -60,7 +68,7 @@ public class WSSecSignatureConfirmation extends WSSecBase {
      */
     public void prepare(Document doc) {
         sc = new SignatureConfirmation(doc, signatureValue);
-        sc.setID(wssConfig.getIdAllocator().createId("SC-", sc));
+        sc.setID(getWsConfig().getIdAllocator().createId("SC-", sc));
     }
     
     /**

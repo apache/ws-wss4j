@@ -37,8 +37,7 @@ public class SignatureAction implements Action {
                 WSHandlerConstants.PW_CALLBACK_CLASS,
                 WSHandlerConstants.PW_CALLBACK_REF, reqData
             );
-        WSSecSignature wsSign = new WSSecSignature();
-        wsSign.setWsConfig(reqData.getWssConfig());
+        WSSecSignature wsSign = new WSSecSignature(reqData.getWssConfig());
 
         if (reqData.getSigKeyId() != 0) {
             wsSign.setKeyIdentifierType(reqData.getSigKeyId());

@@ -51,8 +51,7 @@ public class UsernameTokenSignedAction implements Action {
                 WSHandlerConstants.PW_CALLBACK_CLASS,
                 WSHandlerConstants.PW_CALLBACK_REF, reqData).getPassword();
 
-        WSSecUsernameToken builder = new WSSecUsernameToken();
-        builder.setWsConfig(reqData.getWssConfig());
+        WSSecUsernameToken builder = new WSSecUsernameToken(reqData.getWssConfig());
         
         if (reqData.isUseDerivedKey()) {
             int iterations = reqData.getDerivedKeyIterations();
@@ -84,8 +83,7 @@ public class UsernameTokenSignedAction implements Action {
         // after "prepare" the Signature XML element is ready and may prepend
         // this to the security header.
         
-        WSSecSignature sign = new WSSecSignature();
-        sign.setWsConfig(reqData.getWssConfig());
+        WSSecSignature sign = new WSSecSignature(reqData.getWssConfig());
         sign.setCustomTokenValueType(WSConstants.USERNAMETOKEN_NS + "#UsernameToken");
         sign.setCustomTokenId(builder.getId());
         sign.setSecretKey(builder.getSecretKey());

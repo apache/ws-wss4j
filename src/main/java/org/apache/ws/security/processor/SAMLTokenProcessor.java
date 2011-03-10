@@ -47,6 +47,7 @@ public class SAMLTokenProcessor implements Processor {
         if (log.isDebugEnabled()) {
             log.debug("Found SAML Assertion element");
         }
+        
         AssertionWrapper assertion = handleSAMLToken(elem, data, wsDocInfo);
         wsDocInfo.addTokenElement(elem);
         WSSecurityEngineResult result = null;

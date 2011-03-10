@@ -53,6 +53,13 @@ public class WSSecSignatureBase extends WSSecBase {
     
     private static Log log = LogFactory.getLog(WSSecSignatureBase.class.getName());
     
+    public WSSecSignatureBase() {
+        super();
+    }
+    public WSSecSignatureBase(WSSConfig config) {
+        super(config);
+    }
+    
     /**
      * This method adds references to the Signature.
      * 

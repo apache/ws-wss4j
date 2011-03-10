@@ -24,6 +24,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDocInfo;
 import org.apache.ws.security.WSEncryptionPart;
+import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoType;
@@ -78,6 +79,14 @@ public class WSSecSignatureSAML extends WSSecSignature {
      * Constructor.
      */
     public WSSecSignatureSAML() {
+        super();
+        doDebug = log.isDebugEnabled();
+    }
+    /**
+     * Constructor.
+     */
+    public WSSecSignatureSAML(WSSConfig config) {
+        super(config);
         doDebug = log.isDebugEnabled();
     }
 
@@ -254,9 +263,10 @@ public class WSSecSignatureSAML extends WSSecSignature {
             if (secretKey == null) {
                 RequestData data = new RequestData();
                 data.setSigCrypto(userCrypto);
+                data.setWssConfig(getWsConfig());
                 SAMLKeyInfo samlKeyInfo = 
                     SAMLUtil.getCredentialFromSubject(
-                        assertion, data, wsDocInfo, wssConfig.isWsiBSPCompliant()
+                        assertion, data, wsDocInfo, getWsConfig().isWsiBSPCompliant()
                     );
                 publicKey = samlKeyInfo.getPublicKey();
                 certs = samlKeyInfo.getCerts();
@@ -300,7 +310,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
         
         try {
             C14NMethodParameterSpec c14nSpec = null;
-            if (wssConfig.isWsiBSPCompliant() && canonAlgo.equals(WSConstants.C14N_EXCL_OMIT_COMMENTS)) {
+            if (getWsConfig().isWsiBSPCompliant() && canonAlgo.equals(WSConstants.C14N_EXCL_OMIT_COMMENTS)) {
                 List<String> prefixes = 
                     getInclusivePrefixes(secHeader.getSecurityHeader(), false);
                 c14nSpec = new ExcC14NParameterSpec(prefixes);
@@ -314,13 +324,13 @@ public class WSSecSignatureSAML extends WSSecSignature {
             );
         }
 
-        keyInfoUri = wssConfig.getIdAllocator().createSecureId("KeyId-", keyInfo);
+        keyInfoUri = getWsConfig().getIdAllocator().createSecureId("KeyId-", keyInfo);
         secRef = new SecurityTokenReference(doc);
-        strUri = wssConfig.getIdAllocator().createSecureId("STRId-", secRef);
+        strUri = getWsConfig().getIdAllocator().createSecureId("STRId-", secRef);
         secRef.setID(strUri);
         
         if (certs != null && certs.length != 0) {
-            certUri = wssConfig.getIdAllocator().createSecureId("CertId-", certs[0]);
+            certUri = getWsConfig().getIdAllocator().createSecureId("CertId-", certs[0]);
         }
         
         //
@@ -334,7 +344,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
         try {
             if (senderVouches) {
                 secRefSaml = new SecurityTokenReference(doc);
-                secRefID = wssConfig.getIdAllocator().createSecureId("STRSAMLId-", secRefSaml);
+                secRefID = getWsConfig().getIdAllocator().createSecureId("STRSAMLId-", secRefSaml);
                 secRefSaml.setID(secRefID);
 
                 if (useDirectReferenceToAssertion) {
@@ -495,7 +505,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
                     signedInfo, 
                     keyInfo,
                     null,
-                    wssConfig.getIdAllocator().createId("SIG-", null),
+                    getWsConfig().getIdAllocator().createId("SIG-", null),
                     null);
             
             org.w3c.dom.Element securityHeaderElement = secHeader.getSecurityHeader();

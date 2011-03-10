@@ -31,8 +31,7 @@ import org.w3c.dom.Document;
 public class EncryptionAction implements Action {
     public void execute(WSHandler handler, int actionToDo, Document doc, RequestData reqData)
             throws WSSecurityException {
-        WSSecEncrypt wsEncrypt = new WSSecEncrypt();
-        wsEncrypt.setWsConfig(reqData.getWssConfig());
+        WSSecEncrypt wsEncrypt = new WSSecEncrypt(reqData.getWssConfig());
 
         if (reqData.getEncKeyId() != 0) {
             wsEncrypt.setKeyIdentifierType(reqData.getEncKeyId());

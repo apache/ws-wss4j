@@ -90,7 +90,14 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
      * True if the encKeyId is a direct reference to a key identifier instead of a URI to a key
      */
     private boolean encKeyIdDirectId;
-
+ 
+    public WSSecEncrypt() {
+        super();
+    }
+    public WSSecEncrypt(WSSConfig config) {
+        super(config);
+    }
+    
     /**
      * Sets the key to use during embedded encryption.
      * 
@@ -173,7 +180,6 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
      * @throws WSSecurityException
      */
     public void prepare(Document doc, Crypto crypto) throws WSSecurityException {
-
         document = doc;
 
         //
@@ -320,7 +326,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
         KeyInfo keyInfo = createKeyInfo();
         List<String> encDataRefs = 
             doEncryption(
-                document, wssConfig, keyInfo, symmetricKey, symEncAlgo, references, callbackLookup
+                document, getWsConfig(), keyInfo, symmetricKey, symEncAlgo, references, callbackLookup
             );
         if (dataRef == null) {
             dataRef = 

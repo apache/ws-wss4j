@@ -93,7 +93,6 @@ public class SecurityTokenReference {
         if (!STR_QNAME.equals(el)) {
             throw new WSSecurityException(WSSecurityException.FAILURE, "badElement", null);
         }
-        
         if (bspCompliant) {
             checkBSPCompliance();
         }
@@ -791,7 +790,6 @@ public class SecurityTokenReference {
                 WSSecurityException.INVALID_SECURITY, "invalidDataRef"
             );
         }
-        
         if ("KeyIdentifier".equals(child.getLocalName()) 
             && WSConstants.WSSE_NS.equals(child.getNamespaceURI())) {
             

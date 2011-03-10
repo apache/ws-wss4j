@@ -62,8 +62,7 @@ public class SAMLTokenSignedAction implements Action {
             throw new WSSecurityException("WSHandler: Signed SAML: no SAML token received");
         }
 
-        WSSecSignatureSAML wsSign = new WSSecSignatureSAML();
-        wsSign.setWsConfig(reqData.getWssConfig());
+        WSSecSignatureSAML wsSign = new WSSecSignatureSAML(reqData.getWssConfig());
 
         String password =
             handler.getPassword(reqData.getUsername(),

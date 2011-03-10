@@ -372,7 +372,7 @@ public class WSSecurityEngine {
                 QName el = new QName(node.getNamespaceURI(), node.getLocalName());
                 
                 // Check for multiple timestamps
-                if (wssConfig.isWsiBSPCompliant()) {
+                if (requestData.getWssConfig().isWsiBSPCompliant()) {
                     if (foundTimestamp && el.equals(TIMESTAMP)) {
                         if (doDebug) {
                             log.debug(

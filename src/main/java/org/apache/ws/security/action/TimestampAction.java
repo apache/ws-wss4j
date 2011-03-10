@@ -32,8 +32,7 @@ public class TimestampAction implements Action {
         //
         // add the Timestamp to the SOAP Envelope
         //
-        WSSecTimestamp timeStampBuilder = new WSSecTimestamp();
-        timeStampBuilder.setWsConfig(reqData.getWssConfig());
+        WSSecTimestamp timeStampBuilder = new WSSecTimestamp(reqData.getWssConfig());
         timeStampBuilder.setTimeToLive(handler.decodeTimeToLive(reqData));
         timeStampBuilder.build(doc, reqData.getSecHeader());
     }

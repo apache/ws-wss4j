@@ -45,11 +45,17 @@ public class WSSecBase {
     protected List<WSEncryptionPart> parts = null;
 
     protected boolean doDebug = false;
-
-    protected WSSConfig wssConfig = WSSConfig.getNewInstance();
     
     protected CallbackLookup callbackLookup;
+
+    private WSSConfig wssConfig;
     
+    public WSSecBase() {
+    }
+    public WSSecBase(WSSConfig config) {
+        wssConfig = config;
+    }
+
     /**
      * @param callbackLookup The CallbackLookup object to retrieve elements
      */
@@ -106,6 +112,14 @@ public class WSSecBase {
     public void setWsConfig(WSSConfig wsConfig) {
         this.wssConfig = wsConfig;
     }
+    
+    public WSSConfig getWsConfig() {
+        if (wssConfig == null) {
+            wssConfig = WSSConfig.getNewInstance();
+        }
+        return wssConfig;
+    }
+     
 
     /**
      * Looks up or adds a body id. <p/> First try to locate the

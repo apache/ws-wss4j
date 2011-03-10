@@ -74,7 +74,7 @@ public class SignatureConfirmationAction implements Action {
         //
         // prepare a SignatureConfirmation token
         //
-        WSSecSignatureConfirmation wsc = new WSSecSignatureConfirmation();
+        WSSecSignatureConfirmation wsc = new WSSecSignatureConfirmation(reqData.getWssConfig());
         List<WSEncryptionPart> signatureParts = reqData.getSignatureParts();
         if (signatureActions.size() > 0) {
             if (log.isDebugEnabled()) {

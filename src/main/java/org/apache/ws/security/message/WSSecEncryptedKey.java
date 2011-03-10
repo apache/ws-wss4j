@@ -29,6 +29,7 @@ import javax.crypto.IllegalBlockSizeException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoType;
@@ -119,6 +120,13 @@ public class WSSecEncryptedKey extends WSSecBase {
      * Defaults to 128
      */
     protected int keySize = 128;
+    
+    public WSSecEncryptedKey() {
+        super();
+    }
+    public WSSecEncryptedKey(WSSConfig config) {
+        super(config);
+    }
 
     /**
      * Set the user name to get the encryption certificate.

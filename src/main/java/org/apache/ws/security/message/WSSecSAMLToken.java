@@ -22,6 +22,7 @@ package org.apache.ws.security.message;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.saml.ext.AssertionWrapper;
 import org.apache.ws.security.util.WSSecurityUtil;
@@ -43,6 +44,13 @@ public class WSSecSAMLToken extends WSSecBase {
     
     private AssertionWrapper saml = null;
 
+    public WSSecSAMLToken() {
+        super();
+    }
+    public WSSecSAMLToken(WSSConfig config) {
+        super(config);
+    }
+    
     /**
      * Creates a SAML token.
      * 

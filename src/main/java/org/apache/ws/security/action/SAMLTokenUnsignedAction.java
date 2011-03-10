@@ -31,8 +31,7 @@ public class SAMLTokenUnsignedAction extends SAMLTokenSignedAction {
 
     public void execute(WSHandler handler, int actionToDo, Document doc, RequestData reqData)
             throws WSSecurityException {
-        WSSecSAMLToken builder = new WSSecSAMLToken();
-        builder.setWsConfig(reqData.getWssConfig());
+        WSSecSAMLToken builder = new WSSecSAMLToken(reqData.getWssConfig());
 
         SAMLIssuer saml = loadSamlIssuer(handler, reqData);
         AssertionWrapper assertion = saml.newAssertion();

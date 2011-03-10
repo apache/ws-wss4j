@@ -43,8 +43,7 @@ public class UsernameTokenAction implements Action {
         String providedUsername = callbackData.getIdentifier();
         String password = callbackData.getPassword();
 
-        WSSecUsernameToken builder = new WSSecUsernameToken();
-        builder.setWsConfig(reqData.getWssConfig());
+        WSSecUsernameToken builder = new WSSecUsernameToken(reqData.getWssConfig());
         builder.setPasswordType(reqData.getPwType());
         builder.setPasswordsAreEncoded(reqData.getWssConfig().getPasswordsAreEncoded());
         builder.setUserInfo(providedUsername, password);

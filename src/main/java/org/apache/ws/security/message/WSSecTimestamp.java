@@ -21,6 +21,7 @@ package org.apache.ws.security.message;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.message.token.Timestamp;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.w3c.dom.Document;
@@ -40,7 +41,13 @@ public class WSSecTimestamp extends WSSecBase {
     private Timestamp ts = null;
 
     private int timeToLive = 300; // time between Created and Expires
-
+    
+    public WSSecTimestamp() {
+        super();
+    }
+    public WSSecTimestamp(WSSConfig config) {
+        super(config);
+    }
     /**
      * Set the time to live. This is the time difference in seconds between the
      * <code>Created</code> and the <code>Expires</code> in
@@ -63,8 +70,8 @@ public class WSSecTimestamp extends WSSecBase {
      * @param doc The SOAP envelope as W3C document
      */
     public void prepare(Document doc) {
-        ts = new Timestamp(wssConfig.isPrecisionInMilliSeconds(), doc, timeToLive);
-        String tsId = wssConfig.getIdAllocator().createId("TS-", ts);
+        ts = new Timestamp(getWsConfig().isPrecisionInMilliSeconds(), doc, timeToLive);
+        String tsId = getWsConfig().getIdAllocator().createId("TS-", ts);
         ts.setID(tsId);
     }
 
