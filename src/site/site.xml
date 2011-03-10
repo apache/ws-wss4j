@@ -13,6 +13,7 @@
       <item name="Home" href="index.html"/>
       <item name="Download" href="download.html"/>
       <item name="Using WSS4J" href="using.html"/>
+      <item name="WSS4J 1.6" href="wss4j16.html"/>
     </menu>
 
     <menu ref="reports"/>
