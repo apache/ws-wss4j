@@ -191,10 +191,9 @@ public class SAMLUtil {
                     (org.opensaml.saml1.core.AuthenticationStatement) stmt;
                 samlSubject = authStmt.getSubject();
             } else {
-                throw new WSSecurityException(
-                    WSSecurityException.FAILURE, "invalidSAMLsecurity",
-                    new Object[] {"cannot get certificate or key"}
-                );
+                org.opensaml.saml1.core.AuthorizationDecisionStatement authzStmt =
+                    (org.opensaml.saml1.core.AuthorizationDecisionStatement)stmt;
+                samlSubject = authzStmt.getSubject();
             }
             
             if (samlSubject == null) {
