@@ -382,15 +382,6 @@ public class WSSecSignatureSAML extends WSSecSignature {
             );
         }
         
-        //
-        // Test the keyIdentiferType - It must be a BST Direct Reference or an 
-        // X.509 Key Identifier
-        //
-        if (keyIdentifierType != WSConstants.X509_KEY_IDENTIFIER &&
-            keyIdentifierType != WSConstants.BST_DIRECT_REFERENCE) {
-            keyIdentifierType = WSConstants.X509_KEY_IDENTIFIER;
-        }
-
         if (senderVouches) {
             switch (keyIdentifierType) {
             case WSConstants.BST_DIRECT_REFERENCE:

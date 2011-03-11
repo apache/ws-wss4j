@@ -91,6 +91,9 @@ public class BinarySecurityTokenProcessor implements Processor {
      */
     private X509Certificate[] getCertificatesTokenReference(BinarySecurity token, Crypto crypto)
         throws WSSecurityException {
+        if (crypto == null) {
+            throw new WSSecurityException(WSSecurityException.FAILURE, "noSigCryptoFile");
+        }
         if (token instanceof PKIPathSecurity) {
             return ((PKIPathSecurity) token).getX509Certificates(crypto);
         } else if (token instanceof X509Security) {
