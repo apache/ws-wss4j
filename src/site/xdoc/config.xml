@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<document>
+<body>
+<section name="WSS4J configuration">
+<p>
+This page describes how to use configure Apache WSS4J. This page only applies to WSS4J 1.6, a lot of the
+properties have changed since WSS4J 1.5.x.
+</p>
+<subsection name="Crypto properties">
+<p>
+Apache WSS4J uses the Crypto interface to get keys and certificates for encryption/decryption, or for
+signature creation/verification. WSS4J ships with two implementations, a standard "Merlin" implementation,
+which is based around two JDK keystores for key retrieval and trust verification, as well as a 
+CertificateStore, which is based around a set of X509Certificates, for encryption/signature verification
+only. For more information on the Crypto implementations, go
+<a href="http://coheigea.blogspot.com/2011/02/wss4j-16-changes-to-crypto-interface.html">here</a>. 
+</p>
+<p>
+It is possible to instantiate the a Crypto implementation directly, but it can also be loaded
+via a properties file. For more information on the Merlin property values, go 
+<a href="http://coheigea.blogspot.com/2011/01/wss4j-16-crypto-property-change.html">here</a>. The 
+property values are summarised here:
+</p>
+<p>
+General properties:
+</p>
+<table name="General Properties">
+<tr>
+<th>Property name</th>
+<th>Property value</th>
+</tr>
+<tr>
+<td>org.apache.ws.security.crypto.provider</td>
+<td>WSS4J specific provider used to create Crypto instances. Defaults to: 
+"org.apache.ws.security.components.crypto.Merlin".</td>
+</tr>
+</table>
+<p>
+Keystore properties:
+</p>
+<table name="Merlin Keystore Properties">
+<tr>
+<th>Property name</th>
+<th>Property value</th>
+</tr>
+<tr>
+<td>org.apache.ws.security.crypto.merlin.crypto.provider</td>
+<td>The provider used to load keystores. Defaults to installed provider.</td>
+</tr>
+<tr>
+<td>org.apache.ws.security.crypto.merlin.keystore.file</td>
+<td>The location of the keystore</td>
+</tr>
+<tr>
+<td>org.apache.ws.security.crypto.merlin.keystore.password</td>
+<td>The password used to load the keystore. Falls back to: "security".</td>
+</tr>
+<tr>
+<td>org.apache.ws.security.crypto.merlin.keystore.type</td>
+<td>Type of keystore. Defaults to: java.security.KeyStore.getDefaultType())</td>
+</tr>
+<tr>
+<td>org.apache.ws.security.crypto.merlin.keystore.alias</td>
+<td>The default keystore alias to use, if none is specified.</td>
+</tr>
+</table>
+<p>
+TrustStore properties:
+</p>
+<table name="Merlin TrustStore properties">
+<tr>
+<th>Property name</th>
+<th>Property value</th>
+</tr>
+<tr>
+<td>org.apache.ws.security.crypto.merlin.load.cacerts</td>
+<td>whether to load the CA certs in ${java.home}/lib/security/cacerts or not (default is false)</td>
+</tr>
+<tr>
+<td>org.apache.ws.security.crypto.merlin.truststore.file</td>
+<td>The location of the truststore</td>
+</tr>
+<tr>
+<td>org.apache.ws.security.crypto.merlin.truststore.password </td>
+<td>The truststore password. Defaults to "changeit".</td>
+</tr>
+<tr>
+<td>org.apache.ws.security.crypto.merlin.truststore.type</td>
+<td>The truststore type. Defaults to: java.security.KeyStore.getDefaultType().</td>
+</tr>
+</table>
+ 
+</subsection>
+</section>            
+</body>
+</document>

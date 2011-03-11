@@ -14,6 +14,7 @@
       <item name="Download" href="download.html"/>
       <item name="Using WSS4J" href="using.html"/>
       <item name="WSS4J 1.6" href="wss4j16.html"/>
+      <item name="WSS4J configuration" href="config.html"/>
     </menu>
 
     <menu ref="reports"/>
