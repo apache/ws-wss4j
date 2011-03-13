@@ -156,6 +156,10 @@ public class WSSConfig {
                 WSSecurityEngine.BINARY_TOKEN,
                 org.apache.ws.security.processor.BinarySecurityTokenProcessor.class
             );
+            tmp.put(
+                WSSecurityEngine.ENCRYPTED_DATA,
+                org.apache.ws.security.processor.EncryptedDataProcessor.class
+            );
         } catch (final Throwable t) {
             if (log.isDebugEnabled()) {
                 log.debug(t.getMessage(), t);

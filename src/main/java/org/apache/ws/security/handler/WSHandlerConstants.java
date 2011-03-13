@@ -668,7 +668,7 @@ public class WSHandlerConstants {
     public static final String ENC_PROP_FILE = "encryptionPropFile";
     
     /**
-     * The key that hold the refernce of the 
+     * The key that hold the reference of the 
      * <code>java.util.Properties</code> object holding complete info about 
      * encryption Crypto implementation. This should contain all information 
      * that would contain in an equivalent .properties file which includes the 

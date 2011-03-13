@@ -368,6 +368,7 @@ public class WSSecurityEngine {
         
         boolean foundTimestamp = false;
         while (node != null) {
+            Node nextSibling = node.getNextSibling();
             if (Node.ELEMENT_NODE == node.getNodeType()) {
                 QName el = new QName(node.getNamespaceURI(), node.getLocalName());
                 
@@ -397,11 +398,6 @@ public class WSSecurityEngine {
                         p.handleToken((Element) node, requestData, wsDocInfo);
                     returnResults.addAll(0, results);
                 } else {
-                    //
-                    // Add check for a BinarySecurityToken, add info to WSDocInfo. If BST is
-                    // found before a Signature token this would speed up (at least a little
-                    // bit) the processing of STR Transform.
-                    //
                     if (doDebug) {
                         log.debug(
                             "Unknown Element: " + node.getLocalName() + " " + node.getNamespaceURI()
@@ -409,7 +405,17 @@ public class WSSecurityEngine {
                     }
                 }
             }
-            node = node.getNextSibling();
+            //
+            // If the next sibling is null and the stored next sibling is not null, then we have
+            // encountered an EncryptedData element which was decrypted, and so the next sibling
+            // of the current node is null. In that case, go on to the previously stored next
+            // sibling
+            //
+            if (node.getNextSibling() == null && nextSibling != null) {
+                node = nextSibling;
+            } else {
+                node = node.getNextSibling();
+            }
         }
         return returnResults;
     }
