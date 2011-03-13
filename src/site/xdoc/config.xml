@@ -16,8 +16,8 @@ only. For more information on the Crypto implementations, go
 <a href="http://coheigea.blogspot.com/2011/02/wss4j-16-changes-to-crypto-interface.html">here</a>. 
 </p>
 <p>
-It is possible to instantiate the a Crypto implementation directly, but it can also be loaded
-via a properties file. For more information on the Merlin property values, go 
+It is possible to instantiate a Crypto implementation directly, but it can also be loaded via a 
+properties file. For more information on the Merlin property values, go 
 <a href="http://coheigea.blogspot.com/2011/01/wss4j-16-crypto-property-change.html">here</a>. The 
 property values are summarised here:
 </p>
@@ -90,6 +90,56 @@ TrustStore properties:
 </tr>
 </table>
  
+</subsection>
+<subsection name="SAML properties">
+<p>
+Apache WSS4J uses the SAMLIssuer interface to configure the creation and signing of a SAML 
+Assertion. WSS4J ships with a default "SAMLIssuerImpl" implementation. It is possible to 
+instantiate a SAMLIssuer implementation directly, but it can also be loaded via a properties file.
+For more information on the SAMLIssuer property values, go 
+<a href="http://coheigea.blogspot.com/2011/03/wss4j-16-saml-property-changes.html">here</a>. The 
+property values are summarised here:
+</p>
+<table name="SAMLIssuer properties">
+<tr>
+<th>Property name</th>
+<th>Property value</th>
+</tr>
+<tr>
+<td>org.apache.ws.security.saml.issuerClass</td>
+<td>The SAML Issuer implementation (defaults to "org.apache.ws.security.saml.SAMLIssuerImpl").</td>
+</tr>
+<tr>
+<td>org.apache.ws.security.saml.issuer.cryptoProp.file</td>
+<td>The crypto properties file corresponding to the issuer crypto instance, if the assertion is to
+be signed.</td>
+</tr>
+<tr>
+<td>org.apache.ws.security.saml.issuer.key.name</td>
+<td>The KeyStore alias for the issuer key.</td>
+</tr>
+<tr>
+<td>org.apache.ws.security.saml.issuer.key.password</td>
+<td>The KeyStore password for the issuer key.</td>
+</tr>
+<tr>
+<td>org.apache.ws.security.saml.issuer</td>
+<td>The issuer name</td>
+</tr>
+<tr>
+<td>org.apache.ws.security.saml.issuer.sendKeyValue</td>
+<td>Whether to send the key value or the X509Certificate. Defaults to: "false".</td>
+</tr>
+<tr>
+<td>org.apache.ws.security.saml.issuer.signAssertion</td>
+<td>Whether the SAMLIssuer implementation will sign the assertion or not. Defaults to: 
+"false".</td>
+</tr>
+<tr>
+<td>org.apache.ws.security.saml.callback</td>
+<td>The name of the SAML CallbackHandler implementation used to populate the SAML Assertion.</td>
+</tr>
+</table>
 </subsection>
 </section>            
 </body>
