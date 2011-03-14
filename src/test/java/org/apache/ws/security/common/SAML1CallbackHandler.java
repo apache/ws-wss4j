@@ -26,6 +26,7 @@ import org.apache.ws.security.saml.ext.SAMLCallback;
 import org.apache.ws.security.saml.ext.bean.KeyInfoBean;
 import org.apache.ws.security.saml.ext.bean.SubjectBean;
 import org.apache.ws.security.saml.ext.builder.SAML1Constants;
+import org.opensaml.common.SAMLVersion;
 
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.UnsupportedCallbackException;
@@ -56,6 +57,7 @@ public class SAML1CallbackHandler extends AbstractSAMLCallbackHandler {
         for (int i = 0; i < callbacks.length; i++) {
             if (callbacks[i] instanceof SAMLCallback) {
                 SAMLCallback callback = (SAMLCallback) callbacks[i];
+                callback.setSamlVersion(SAMLVersion.VERSION_11);
                 SubjectBean subjectBean = 
                     new SubjectBean(
                         subjectName, subjectQualifier, confirmationMethod

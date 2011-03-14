@@ -31,7 +31,6 @@ import javax.security.auth.callback.CallbackHandler;
 public class SAMLParms {
     private String issuer;
     private CallbackHandler samlCallbackHandler;
-    private String samlVersion;
 
     /**
      * Method getIssuer returns the issuer of this SAMLParms object.
@@ -66,24 +65,6 @@ public class SAMLParms {
      */
     public void setCallbackHandler(CallbackHandler samlCallbackHandler) {
         this.samlCallbackHandler = samlCallbackHandler;
-    }
-
-    /**
-     * Method getSamlVersion returns the samlVersion of this SAMLParms object.
-     *
-     * @return the samlVersion (type String) of this SAMLParms object.
-     */
-    public String getSamlVersion() {
-        return samlVersion;
-    }
-
-    /**
-     * Method setSamlVersion sets the samlVersion of this SAMLParms object.
-     *
-     * @param samlVersion the samlVersion of this SAMLParms object.
-     */
-    public void setSamlVersion(String samlVersion) {
-        this.samlVersion = samlVersion;
     }
 
 }

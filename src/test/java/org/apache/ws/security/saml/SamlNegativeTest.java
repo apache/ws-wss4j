@@ -96,7 +96,6 @@ public class SamlNegativeTest extends org.junit.Assert {
         callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
         callbackHandler.setConfirmationMethod(SAML2Constants.CONF_SENDER_VOUCHES);
         SAMLIssuer saml = new SAMLIssuerImpl();
-        saml.setSamlVersion("2.0");
         saml.setIssuerName("www.example.com");
         saml.setCallbackHandler(callbackHandler);
         AssertionWrapper assertion = saml.newAssertion();
@@ -206,7 +205,6 @@ public class SamlNegativeTest extends org.junit.Assert {
         saml.setIssuerKeyName("wss40_server");
         saml.setIssuerKeyPassword("security");
         saml.setSignAssertion(true);
-        saml.setSamlVersion("2.0");
         saml.setCallbackHandler(callbackHandler);
         AssertionWrapper assertion = saml.newAssertion();
 
@@ -335,7 +333,6 @@ public class SamlNegativeTest extends org.junit.Assert {
         saml.setIssuerKeyName("16c73ab6-b892-458f-abf5-2f875f74882e");
         saml.setIssuerKeyPassword("security");
         saml.setSignAssertion(true);
-        saml.setSamlVersion("2.0");
         saml.setCallbackHandler(callbackHandler);
         AssertionWrapper assertion = saml.newAssertion();
 

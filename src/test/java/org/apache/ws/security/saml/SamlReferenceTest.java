@@ -559,7 +559,6 @@ public class SamlReferenceTest extends org.junit.Assert {
         SAMLIssuer saml = new SAMLIssuerImpl();
         saml.setIssuerName("www.example.com");
         saml.setCallbackHandler(callbackHandler);
-        saml.setSamlVersion("2.0");
         AssertionWrapper assertion = saml.newAssertion();
         
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
@@ -621,7 +620,6 @@ public class SamlReferenceTest extends org.junit.Assert {
         SAMLIssuer saml = new SAMLIssuerImpl();
         saml.setIssuerName("www.example.com");
         saml.setCallbackHandler(callbackHandler);
-        saml.setSamlVersion("2.0");
         AssertionWrapper assertion = saml.newAssertion();
         
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
@@ -688,7 +686,6 @@ public class SamlReferenceTest extends org.junit.Assert {
         saml.setIssuerKeyName("wss40_server");
         saml.setIssuerKeyPassword("security");
         saml.setSignAssertion(true);
-        saml.setSamlVersion("2.0");
         saml.setCallbackHandler(callbackHandler);
         AssertionWrapper assertion = saml.newAssertion();
 
@@ -753,7 +750,6 @@ public class SamlReferenceTest extends org.junit.Assert {
         saml.setIssuerKeyName("wss40_server");
         saml.setIssuerKeyPassword("security");
         saml.setSignAssertion(true);
-        saml.setSamlVersion("2.0");
         saml.setCallbackHandler(callbackHandler);
         AssertionWrapper assertion = saml.newAssertion();
 
@@ -820,7 +816,6 @@ public class SamlReferenceTest extends org.junit.Assert {
         saml.setIssuerKeyName("wss40_server");
         saml.setIssuerKeyPassword("security");
         saml.setSignAssertion(true);
-        saml.setSamlVersion("2.0");
         saml.setCallbackHandler(callbackHandler);
         AssertionWrapper assertion = saml.newAssertion();
 
@@ -899,7 +894,6 @@ public class SamlReferenceTest extends org.junit.Assert {
         saml.setIssuerKeyName("wss40_server");
         saml.setIssuerKeyPassword("security");
         saml.setSignAssertion(true);
-        saml.setSamlVersion("2.0");
         saml.setCallbackHandler(callbackHandler);
         AssertionWrapper assertion = saml.newAssertion();
 

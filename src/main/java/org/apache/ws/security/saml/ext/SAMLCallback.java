@@ -24,6 +24,7 @@ import org.apache.ws.security.saml.ext.bean.AuthDecisionStatementBean;
 import org.apache.ws.security.saml.ext.bean.AuthenticationStatementBean;
 import org.apache.ws.security.saml.ext.bean.ConditionsBean;
 import org.apache.ws.security.saml.ext.bean.SubjectBean;
+import org.opensaml.common.SAMLVersion;
 
 import javax.security.auth.callback.Callback;
 import java.util.ArrayList;
@@ -37,6 +38,11 @@ import java.util.List;
  * Created on May 18, 2009
  */
 public class SAMLCallback implements Callback {
+    
+    /**
+     * The SAML Version of the Assertion to create
+     */
+    private SAMLVersion samlVersion = SAMLVersion.VERSION_11;
     
     /**
      * SAML subject representation
@@ -174,5 +180,21 @@ public class SAMLCallback implements Callback {
      */
     public void setConditions(ConditionsBean conditions) {
         this.conditions = conditions;
+    }
+    
+    /**
+     * Set the SAMLVersion of the assertion to create
+     * @param samlVersion the SAMLVersion of the assertion to create
+     */
+    public void setSamlVersion(SAMLVersion samlVersion) {
+        this.samlVersion = samlVersion;
+    }
+    
+    /**
+     * Get the SAMLVersion of the assertion to create
+     * @return the SAMLVersion of the assertion to create
+     */
+    public SAMLVersion getSamlVersion() {
+        return samlVersion;
     }
 }

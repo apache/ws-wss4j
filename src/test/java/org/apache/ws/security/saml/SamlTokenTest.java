@@ -208,7 +208,6 @@ public class SamlTokenTest extends org.junit.Assert {
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
         callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
         SAMLIssuer saml = new SAMLIssuerImpl();
-        saml.setSamlVersion("2.0");
         saml.setIssuerName("www.example.com");
         saml.setCallbackHandler(callbackHandler);
         AssertionWrapper assertion = saml.newAssertion();
@@ -245,7 +244,6 @@ public class SamlTokenTest extends org.junit.Assert {
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
         callbackHandler.setStatement(SAML2CallbackHandler.Statement.ATTR);
         SAMLIssuer saml = new SAMLIssuerImpl();
-        saml.setSamlVersion("2.0");
         saml.setIssuerName("www.example.com");
         saml.setCallbackHandler(callbackHandler);
         AssertionWrapper assertion = saml.newAssertion();
@@ -282,7 +280,6 @@ public class SamlTokenTest extends org.junit.Assert {
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
         callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHZ);
         SAMLIssuer saml = new SAMLIssuerImpl();
-        saml.setSamlVersion("2.0");
         saml.setIssuerName("www.example.com");
         saml.setCallbackHandler(callbackHandler);
         AssertionWrapper assertion = saml.newAssertion();
@@ -401,7 +398,6 @@ public class SamlTokenTest extends org.junit.Assert {
         callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
         SAMLIssuer saml = new SAMLIssuerImpl();
         saml.setIssuerName("www.example2.com");
-        saml.setSamlVersion("2.0");
         saml.setCallbackHandler(callbackHandler);
         AssertionWrapper assertion = saml.newAssertion();
 

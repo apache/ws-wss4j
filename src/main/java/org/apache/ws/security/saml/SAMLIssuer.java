@@ -68,18 +68,6 @@ public interface SAMLIssuer {
     public boolean isSignAssertion();
     
     /**
-     * Set the SAML version
-     * @param version the SAML version
-     */
-    public void setSamlVersion(String version);
-    
-    /**
-     * Get the SAML version
-     * @return the SAML version
-     */
-    public String getSamlVersion();
-    
-    /**
      * Set the CallbackHandler to use
      * @param callbackHandler the CallbackHandler to use
      */

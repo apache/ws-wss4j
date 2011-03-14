@@ -60,8 +60,6 @@ public class SAMLIssuerImpl implements SAMLIssuer {
     private String issuerKeyPassword = null;
     private String issuerKeyName = null;
 
-    private String samlVersion = "1.1";
-    
     /**
      * Flag indicating what format to put the subject's key material in when
      * NOT using Sender Vouches as the confirmation method.  The default is
@@ -114,11 +112,6 @@ public class SAMLIssuerImpl implements SAMLIssuer {
             signAssertion = Boolean.valueOf(signAssertionProp).booleanValue();
         }
         
-        String samlVersionProp = properties.getProperty("org.apache.ws.security.saml.version");
-        if (samlVersionProp != null) {
-            samlVersion = samlVersionProp;
-        }
-        
         String issuerProp = properties.getProperty("org.apache.ws.security.saml.issuer");
         if (issuerProp != null) {
             issuer = issuerProp;
@@ -133,8 +126,7 @@ public class SAMLIssuerImpl implements SAMLIssuer {
     public AssertionWrapper newAssertion() throws WSSecurityException {
         if (log.isDebugEnabled()) {
             log.debug(
-                "Entering AssertionWrapper.newAssertion() ... creating SAML v" 
-                + samlVersion + " token"
+                "Entering AssertionWrapper.newAssertion() ... creating SAML token"
             );
         }
 
@@ -159,7 +151,6 @@ public class SAMLIssuerImpl implements SAMLIssuer {
         // Create a new SAMLParms with all of the information from the properties file.
         SAMLParms samlParms = new SAMLParms();
         samlParms.setIssuer(issuer);
-        samlParms.setSamlVersion(samlVersion);
         samlParms.setCallbackHandler(callbackHandler);
 
         AssertionWrapper sa = new AssertionWrapper(samlParms);
@@ -260,22 +251,6 @@ public class SAMLIssuerImpl implements SAMLIssuer {
      */
     public boolean isSignAssertion() {
         return signAssertion;
-    }
-    
-    /**
-     * Set the SAML version
-     * @param version the SAML version
-     */
-    public void setSamlVersion(String version) {
-        samlVersion = version;
-    }
-    
-    /**
-     * Get the SAML version
-     * @return the SAML version
-     */
-    public String getSamlVersion() {
-        return samlVersion;
     }
     
     /**

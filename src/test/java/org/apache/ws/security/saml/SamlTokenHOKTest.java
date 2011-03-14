@@ -192,7 +192,6 @@ public class SamlTokenHOKTest extends org.junit.Assert {
         saml.setIssuerKeyName("16c73ab6-b892-458f-abf5-2f875f74882e");
         saml.setIssuerKeyPassword("security");
         saml.setSignAssertion(true);
-        saml.setSamlVersion("2.0");
         saml.setCallbackHandler(callbackHandler);
         AssertionWrapper assertion = saml.newAssertion();
 
@@ -234,7 +233,6 @@ public class SamlTokenHOKTest extends org.junit.Assert {
         saml.setIssuerKeyName("16c73ab6-b892-458f-abf5-2f875f74882e");
         saml.setIssuerKeyPassword("security");
         saml.setSignAssertion(true);
-        saml.setSamlVersion("2.0");
         saml.setCallbackHandler(callbackHandler);
         AssertionWrapper assertion = saml.newAssertion();
 

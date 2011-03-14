@@ -245,7 +245,6 @@ public class SamlTokenSVTest extends org.junit.Assert {
         callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
         callbackHandler.setConfirmationMethod(SAML2Constants.CONF_SENDER_VOUCHES);
         SAMLIssuer saml = new SAMLIssuerImpl();
-        saml.setSamlVersion("2.0");
         saml.setIssuerName("www.example.com");
         saml.setCallbackHandler(callbackHandler);
         AssertionWrapper assertion = saml.newAssertion();
@@ -305,7 +304,6 @@ public class SamlTokenSVTest extends org.junit.Assert {
         callbackHandler.setStatement(SAML2CallbackHandler.Statement.ATTR);
         callbackHandler.setConfirmationMethod(SAML2Constants.CONF_SENDER_VOUCHES);
         SAMLIssuer saml = new SAMLIssuerImpl();
-        saml.setSamlVersion("2.0");
         saml.setIssuerName("www.example.com");
         saml.setCallbackHandler(callbackHandler);
         AssertionWrapper assertion = saml.newAssertion();

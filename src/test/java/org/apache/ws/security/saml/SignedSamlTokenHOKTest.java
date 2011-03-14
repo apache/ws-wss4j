@@ -221,7 +221,6 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
         saml.setIssuerKeyName("wss40_server");
         saml.setIssuerKeyPassword("security");
         saml.setSignAssertion(true);
-        saml.setSamlVersion("2.0");
         saml.setCallbackHandler(callbackHandler);
         AssertionWrapper assertion = saml.newAssertion();
 
@@ -284,7 +283,6 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
         saml.setIssuerKeyName("wss40_server");
         saml.setIssuerKeyPassword("security");
         saml.setSignAssertion(true);
-        saml.setSamlVersion("2.0");
         saml.setCallbackHandler(callbackHandler);
         AssertionWrapper assertion = saml.newAssertion();
         byte[] ephemeralKey = callbackHandler.getEphemeralKey();
@@ -478,7 +476,6 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
         saml.setIssuerKeyName("wss40_server");
         saml.setIssuerKeyPassword("security");
         saml.setSignAssertion(true);
-        saml.setSamlVersion("2.0");
         saml.setCallbackHandler(callbackHandler);
         AssertionWrapper assertion = saml.newAssertion();
 

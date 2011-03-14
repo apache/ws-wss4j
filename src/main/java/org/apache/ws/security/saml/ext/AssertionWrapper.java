@@ -199,16 +199,6 @@ public class AssertionWrapper {
     public AssertionWrapper(SAMLParms parms) throws WSSecurityException {
         OpenSAMLUtil.initSamlEngine();
         
-        // Set the SAML version
-        if (parms.getSamlVersion().equalsIgnoreCase("1.1")) {
-            samlVersion = SAMLVersion.VERSION_11;
-        } else if (parms.getSamlVersion().equalsIgnoreCase("2.0")) {
-            samlVersion = SAMLVersion.VERSION_20;
-        } else {
-            // Default to SAML v1.1
-            samlVersion = SAMLVersion.VERSION_11;
-        }
-
         //
         // Create the SAML callback that the handler will use to get the required data from the 
         // client application.
@@ -233,6 +223,7 @@ public class AssertionWrapper {
             );
         }
 
+        samlVersion = samlCallbacks[0].getSamlVersion();
         if (samlVersion.equals(SAMLVersion.VERSION_11)) {
             // Build a SAML v1.1 assertion
             saml1 = SAML1ComponentBuilder.createSamlv1Assertion(parms.getIssuer());
