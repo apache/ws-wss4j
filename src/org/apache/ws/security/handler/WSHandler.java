@@ -1406,18 +1406,49 @@ public abstract class WSHandler {
      * @throws WSSecurityException
      */
     protected boolean verifyTimestamp(Timestamp timestamp, int timeToLive) throws WSSecurityException {
-
+        return verifyTimestamp(timestamp, timeToLive, 0);
+    }
+    
+    /**
+     * Evaluate whether a timestamp is considered valid on the receivers' side. Hook to
+     * allow subclasses to implement custom validation methods however they see fit.
+     * 
+     * Policy used in this implementation:
+     * 
+     * 1. The receiver can set its own time to live (besides from that set on
+     * sender side)
+     * 
+     * 2. If the message was created before (now-ttl) the message is rejected
+     * 
+     * @param timestamp
+     *            the timestamp that is validated
+     * @param timeToLive
+     *            the limit on the receivers' side, that the timestamp is validated against
+     * @param futureTimeToLive
+     *            the value in seconds for the future validity of the Created time
+     * @return true if the timestamp is before (now-timeToLive), false otherwise
+     * @throws WSSecurityException
+     */
+    protected boolean verifyTimestamp(
+        Timestamp timestamp, 
+        int timeToLive, 
+        int futureTimeToLive
+    ) throws WSSecurityException {
         // Calculate the time that is allowed for the message to travel
         Calendar validCreation = Calendar.getInstance();
-        validCreation.setTimeZone(TimeZone.getTimeZone("UTC")); 
+        validCreation.setTimeZone(TimeZone.getTimeZone("UTC"));
+        long currentTime = validCreation.getTime().getTime();
+        
         Calendar cre = timestamp.getCreated();
+        if (futureTimeToLive > 0) {
+            validCreation.setTime(new Date(currentTime + futureTimeToLive * 1000));
+        }
         if (cre != null && cre.after(validCreation)) {
             if (doDebug) {
                 log.debug("Validation of Timestamp: The message was created in the future!");
             }
             return false;
         }
-        long currentTime = validCreation.getTime().getTime();
         currentTime -= timeToLive * 1000;
         validCreation.setTime(new Date(currentTime));
 

@@ -66,7 +66,6 @@ public class TestWSSecurityTimestamp extends TestCase {
         +   "</SOAP-ENV:Body>" 
         + "</SOAP-ENV:Envelope>";
     
-    private WSSecurityEngine secEngine = new WSSecurityEngine();
     private MessageContext msgContext;
     private SOAPEnvelope unsignedEnvelope;
 
@@ -264,7 +263,8 @@ public class TestWSSecurityTimestamp extends TestCase {
     
     /**
      * This is a test for processing an Timestamp where the "Created" element is in the future.
-     * This Timestamp should be rejected.
+     * This Timestamp should be rejected by default, and then accepted once the future 
+     * time-to-live configuration is enabled.
      */
     public void testFutureCreated() throws Exception {
         
@@ -283,7 +283,7 @@ public class TestWSSecurityTimestamp extends TestCase {
                 WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + WSConstants.CREATED_LN
             );
         Date createdDate = new Date();
-        long currentTime = createdDate.getTime() + 300000;
+        long currentTime = createdDate.getTime() + 30000;
         createdDate.setTime(currentTime);
         elementCreated.appendChild(doc.createTextNode(zulu.format(createdDate)));
         timestampElement.appendChild(elementCreated);
@@ -312,8 +312,8 @@ public class TestWSSecurityTimestamp extends TestCase {
         if (myHandler.publicVerifyTimestamp(receivedTimestamp, 300)) {
             fail("The timestamp validation should have failed");
         }
+        assertTrue(myHandler.publicVerifyTimestamp(receivedTimestamp, 300, 60));
     }
-    
     
     /**
      * Verifies the soap envelope
@@ -322,6 +322,7 @@ public class TestWSSecurityTimestamp extends TestCase {
      * @throws java.lang.Exception Thrown when there is a problem in verification
      */
     private Vector verify(Document doc) throws Exception {
+        WSSecurityEngine secEngine = new WSSecurityEngine();
         return secEngine.processSecurityHeader(doc, null, null, null);
     }
     
@@ -356,12 +357,20 @@ public class TestWSSecurityTimestamp extends TestCase {
         getPassword(Object msgContext) {
             return null;
         }
-
+        
         boolean publicVerifyTimestamp(
             Timestamp timestamp, 
             int ttl
         ) throws org.apache.ws.security.WSSecurityException {
             return verifyTimestamp(timestamp, ttl);
+        }
+
+        boolean publicVerifyTimestamp(
+            Timestamp timestamp, 
+            int ttl,
+            int futureTimeToLive
+        ) throws org.apache.ws.security.WSSecurityException {
+            return verifyTimestamp(timestamp, ttl, futureTimeToLive);
         }
     }
     
