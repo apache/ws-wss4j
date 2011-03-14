@@ -177,7 +177,8 @@ public class TimestampTest extends org.junit.Assert {
     
     /**
      * This is a test for processing an Timestamp where the "Created" element is in the future.
-     * This Timestamp should be rejected.
+     * This Timestamp should be rejected by default, and then accepted once the future 
+     * time-to-live configuration is enabled.
      */
     @org.junit.Test
     public void testFutureCreated() throws Exception {
@@ -197,7 +198,7 @@ public class TimestampTest extends org.junit.Assert {
                 WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + WSConstants.CREATED_LN
             );
         Date createdDate = new Date();
-        long currentTime = createdDate.getTime() + 300000;
+        long currentTime = createdDate.getTime() + 30000;
         createdDate.setTime(currentTime);
         elementCreated.appendChild(doc.createTextNode(zulu.format(createdDate)));
         timestampElement.appendChild(elementCreated);
@@ -212,12 +213,15 @@ public class TimestampTest extends org.junit.Assert {
         //
         // Do some processing
         //
+        WSSConfig config = WSSConfig.getNewInstance();
         try {
-            verify(doc, WSSConfig.getNewInstance());
+            verify(doc, config);
             fail("The timestamp validation should have failed");
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == WSSecurityException.MESSAGE_EXPIRED); 
         }
+        config.setTimeStampFutureTTL(60);
+        verify(doc, config);
     }
     
     

@@ -33,7 +33,6 @@ import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.message.WSSecHeader;
 import org.apache.ws.security.message.token.SignatureConfirmation;
-import org.apache.ws.security.message.token.Timestamp;
 import org.apache.ws.security.util.Loader;
 import org.apache.ws.security.util.StringUtil;
 import org.apache.ws.security.util.WSSecurityUtil;
@@ -256,6 +255,7 @@ public abstract class WSHandler {
             wssConfig.setRequiredPasswordType(passwordType);
         }
         wssConfig.setTimeStampTTL(decodeTimeToLive(reqData));
+        wssConfig.setTimeStampFutureTTL(decodeFutureTimeToLive(reqData));
         wssConfig.setHandleCustomPasswordTypes(decodeCustomPasswordTypes(reqData));
         wssConfig.setPasswordsAreEncoded(decodeUseEncodedPasswords(reqData));
         wssConfig.setAllowNamespaceQualifiedPasswordTypes(
@@ -671,18 +671,35 @@ public abstract class WSHandler {
     public int decodeTimeToLive(RequestData reqData) {
         String ttl = 
             getString(WSHandlerConstants.TTL_TIMESTAMP, reqData.getMsgContext());
-        int ttl_i = 0;
+        int ttlI = 0;
         if (ttl != null) {
             try {
-                ttl_i = Integer.parseInt(ttl);
+                ttlI = Integer.parseInt(ttl);
             } catch (NumberFormatException e) {
-                ttl_i = reqData.getTimeToLive();
+                ttlI = reqData.getTimeToLive();
             }
         }
-        if (ttl_i <= 0) {
-            ttl_i = reqData.getTimeToLive();
+        if (ttlI <= 0) {
+            ttlI = reqData.getTimeToLive();
         }
-        return ttl_i;
+        return ttlI;
+    }
+    
+    protected int decodeFutureTimeToLive(RequestData reqData) {
+        String ttl = 
+            getString(WSHandlerConstants.TTL_FUTURE_TIMESTAMP, reqData.getMsgContext());
+        if (ttl != null) {
+            try {
+                int ttlI = Integer.parseInt(ttl);
+                if (ttlI < 0) {
+                    return 0;
+                }
+                return ttlI;
+            } catch (NumberFormatException e) {
+                return 0;
+            }
+        }
+        return 0;
     }
     
     protected boolean decodeBSPCompliance(RequestData reqData)
@@ -1093,29 +1110,6 @@ public abstract class WSHandler {
             }
         }
         return cbHandler;
-    }
-
-    /**
-     * Evaluate whether a timestamp is considered valid on the receivers' side. Hook to
-     * allow subclasses to implement custom validation methods however they see fit.
-     * 
-     * Policy used in this implementation:
-     * 
-     * 1. The receiver can set its own time to live (besides from that set on
-     * sender side)
-     * 
-     * 2. If the message was created before (now-ttl) the message is rejected
-     * 
-     * @param timestamp
-     *            the timestamp that is validated
-     * @param timeToLive
-     *            the limit on the receivers' side, that the timestamp is validated against
-     * @return true if the timestamp is before (now-timeToLive), false otherwise
-     * @deprecated TTL validation is now done by default in the TimestampProcessor
-     * @throws WSSecurityException
-     */
-    protected boolean verifyTimestamp(Timestamp timestamp, int timeToLive) throws WSSecurityException {
-        return timestamp.verifyCreated(timeToLive);
     }
 
     /**

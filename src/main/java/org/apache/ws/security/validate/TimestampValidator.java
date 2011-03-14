@@ -48,15 +48,17 @@ public class TimestampValidator implements Validator {
         WSSConfig wssConfig = data.getWssConfig();
         boolean timeStampStrict = true;
         int timeStampTTL = 300;
+        int futureTimeToLive = 0;
         if (wssConfig != null) {
             timeStampStrict = wssConfig.isTimeStampStrict();
             timeStampTTL = wssConfig.getTimeStampTTL();
+            futureTimeToLive = wssConfig.getTimeStampFutureTTL();
         }
         
         Timestamp timeStamp = credential.getTimestamp();
         // Validate whether the security semantics have expired
         if ((timeStampStrict && timeStamp.isExpired()) 
-            || !timeStamp.verifyCreated(timeStampTTL)) {
+            || !timeStamp.verifyCreated(timeStampTTL, futureTimeToLive)) {
             throw new WSSecurityException(
                 WSSecurityException.MESSAGE_EXPIRED,
                 "invalidTimestamp",

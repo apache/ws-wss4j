@@ -236,6 +236,13 @@ public class WSSConfig {
     protected int timeStampTTL = 300;
     
     /**
+     * The time in seconds in the future within which the Created time of an incoming 
+     * Timestamp is valid. The default is 0 seconds, meaning that no future-dated
+     * timestamps are allowed.
+     */
+    protected int timeStampFutureTTL = 0;
+    
+    /**
      * This variable controls whether types other than PasswordDigest or PasswordText
      * are allowed when processing UsernameTokens. 
      * 
@@ -498,6 +505,20 @@ public class WSSConfig {
      */
     public void setTimeStampTTL(int timeStampTTL) {
         this.timeStampTTL = timeStampTTL;
+    }
+    
+    /**
+     * @return Returns the Future TTL of a Timestamp in seconds
+     */
+    public int getTimeStampFutureTTL() {
+        return timeStampFutureTTL;
+    }
+
+    /**
+     * @param timeStampFutureTTL he new value for timeStampFutureTTL
+     */
+    public void setTimeStampFutureTTL(int timeStampFutureTTL) {
+        this.timeStampFutureTTL = timeStampFutureTTL;
     }
     
     /**
