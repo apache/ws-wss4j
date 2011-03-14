@@ -71,16 +71,14 @@ public class Merlin extends CryptoBase {
      */
     public static final String OLD_KEYSTORE_FILE = 
         "org.apache.ws.security.crypto.merlin.file";
-    public static final String OLD_CRYPTO_PROVIDER = 
-        "org.apache.ws.security.crypto.merlin.keystore.provider";
-    public static final String OLD_CRYPTO_CERT_PROVIDER =
-        "org.apache.ws.security.crypto.merlin.cert.provider";
     
     /*
-     * Crypto provider
+     * Crypto providers
      */
-    public static final String CRYPTO_PROVIDER = 
-        "org.apache.ws.security.crypto.merlin.crypto.provider";
+    public static final String CRYPTO_KEYSTORE_PROVIDER = 
+        "org.apache.ws.security.crypto.merlin.keystore.provider";
+    public static final String CRYPTO_CERT_PROVIDER =
+        "org.apache.ws.security.crypto.merlin.cert.provider";
     
     /*
      * KeyStore configuration types
@@ -139,13 +137,16 @@ public class Merlin extends CryptoBase {
             return;
         }
         this.properties = properties;
-        String provider = properties.getProperty(CRYPTO_PROVIDER);
-        if (provider == null) {
-            provider = properties.getProperty(OLD_CRYPTO_PROVIDER);
-        }
+        //
+        // Load the provider(s)
+        //
+        String provider = properties.getProperty(CRYPTO_KEYSTORE_PROVIDER);
         if (provider != null) {
             provider = provider.trim();
-            cryptoProvider = provider;
+        }
+        String certProvider = properties.getProperty(CRYPTO_CERT_PROVIDER);
+        if (certProvider != null) {
+            setCryptoProvider(certProvider);
         }
         //
         // Load the KeyStore

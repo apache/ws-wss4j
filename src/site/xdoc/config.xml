@@ -34,6 +34,14 @@ General properties:
 <td>WSS4J specific provider used to create Crypto instances. Defaults to: 
 "org.apache.ws.security.components.crypto.Merlin".</td>
 </tr>
+<tr>
+<td>org.apache.ws.security.crypto.merlin.keystore.provider</td>
+<td>The provider used to load keystores. Defaults to installed provider.</td>
+</tr>
+<tr>
+<td>org.apache.ws.security.crypto.merlin.cert.provider</td>
+<td>The provider used to load certificates. Defaults to keystore provider.</td>
+</tr>
 </table>
 <p>
 Keystore properties:
@@ -42,10 +50,6 @@ Keystore properties:
 <tr>
 <th>Property name</th>
 <th>Property value</th>
-</tr>
-<tr>
-<td>org.apache.ws.security.crypto.merlin.crypto.provider</td>
-<td>The provider used to load keystores. Defaults to installed provider.</td>
 </tr>
 <tr>
 <td>org.apache.ws.security.crypto.merlin.keystore.file</td>

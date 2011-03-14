@@ -309,7 +309,6 @@ public class Timestamp {
      * @param timeToLive the value in seconds for the validity of the Created time
      * @param futureTimeToLive the value in seconds for the future validity of the Created time
      * @return true if the timestamp is before (now-timeToLive), false otherwise
-     * @param futureTimeToLive
      */
     public boolean verifyCreated(
         int timeToLive,
