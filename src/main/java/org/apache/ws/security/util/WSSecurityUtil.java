@@ -879,9 +879,6 @@ public class WSSecurityUtil {
             } else if (single[i].equals(WSHandlerConstants.TIMESTAMP)) {
                 doAction |= WSConstants.TS;
                 actions.add(new Integer(WSConstants.TS));
-            } else if (single[i].equals(WSHandlerConstants.NO_SERIALIZATION)) {
-                doAction |= WSConstants.NO_SERIALIZE;
-                actions.add(new Integer(WSConstants.NO_SERIALIZE));
             } else if (single[i].equals(WSHandlerConstants.SIGN_WITH_UT_KEY)) {
                 doAction |= WSConstants.UT_SIGN;
                 actions.add(new Integer(WSConstants.UT_SIGN));
@@ -939,9 +936,6 @@ public class WSSecurityUtil {
             } else if (single[i].equals(WSHandlerConstants.TIMESTAMP)) {
                 doAction |= WSConstants.TS;
                 actions.add(new Integer(WSConstants.TS));
-            } else if (single[i].equals(WSHandlerConstants.NO_SERIALIZATION)) {
-                doAction |= WSConstants.NO_SERIALIZE;
-                actions.add(new Integer(WSConstants.NO_SERIALIZE));
             } else if (single[i].equals(WSHandlerConstants.SIGN_WITH_UT_KEY)) {
                 doAction |= WSConstants.UT_SIGN;
                 actions.add(new Integer(WSConstants.UT_SIGN));

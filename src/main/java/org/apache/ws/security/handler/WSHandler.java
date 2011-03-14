@@ -199,9 +199,6 @@ public abstract class WSHandler {
             case WSConstants.UT_SIGN:
                 wssConfig.getAction(actionToDo).execute(this, actionToDo, doc, reqData);
                 break;
-            case WSConstants.NO_SERIALIZE:
-                reqData.setNoSerialization(true);
-                break;
                 //
                 // Handle any "custom" actions, similarly,
                 // but to preserve behavior from previous
@@ -279,10 +276,6 @@ public abstract class WSHandler {
         
         if ((doAction & WSConstants.ENCR) == WSConstants.ENCR) {
             decodeDecryptionParameter(reqData);
-        }
-        
-        if ((doAction & WSConstants.NO_SERIALIZE) == WSConstants.NO_SERIALIZE) {
-            reqData.setNoSerialization(true);
         }
     }
 

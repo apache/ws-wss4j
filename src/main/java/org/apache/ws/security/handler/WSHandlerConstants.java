@@ -26,63 +26,56 @@ import java.util.Map;
 
 /**
  * This class defines the names, actions, and other string for the deployment
- * data of the WSS handler. Both the Axis handler as well as the JAX-RPC handler
- * use this class.
+ * data of the WS handler.
  *  
  * @author Werner Dittmann (werner@apache.org)
  */
-
 public class WSHandlerConstants {
+    
+    //
+    // Action configuration tags
+    //
+    
     /**
-     * The action parameter. The
-     * handlers use the value of this parameter to determine how
-     * to process the SOAP Envelope. For example in a Axis WSDD file:
-     * <pre>
-     * &lt;handler type="java:org.apache.ws.axis.security.WSDoAllSender">
-     * &lt;parameter name="action" value="UsernameToken"/>
-     * ...
-     * </pre>
-     * orders the handler to attach a <code>UsernameToken</code> to the SOAP
-     * enevelope. It is a blank separated list of actions to perform.
+     * The action parameter. The handlers use the value of this parameter to determine how
+     * to process the SOAP Envelope. It is a blank separated list of actions to perform.
      * <p/>
      * The application may set this parameter using the following method:
      * <pre>
      * call.setProperty(WSHandlerConstants.ACTION, WSHandlerConstants.USERNAME_TOKEN);
      * </pre>
-     * However, the parameter in the WSDD deployment file overwrites the
-     * property setting (deployment setting overwrites application setting)
      */
     public static final String ACTION = "action";
-    public static final String SEND = "send";
-    public static final String RECEIVE = "receive";
 
     /**
-     * Perform nothing.
+     * Perform no action.
      */
     public static final String NO_SECURITY = "NoSecurity";
 
     /**
-     * Perform a UsernameToken identification only.
+     * Perform a UsernameToken action.
      */
     public static final String USERNAME_TOKEN = "UsernameToken";
 
     /**
-     * Perform a SAML Token identification.
+     * Perform an unsigned SAML Token action.
      */
     public static final String SAML_TOKEN_UNSIGNED = "SAMLTokenUnsigned";
+    
+    /**
+     * Perform a signed SAML Token action.
+     */
     public static final String SAML_TOKEN_SIGNED = "SAMLTokenSigned";
 
     /**
-     * Perform Signature.
-     * The signature specific parameters define how to sign, which keys
-     * to use, and so on
+     * Perform a Signature action. The signature specific parameters define how
+     * to sign, which keys to use, and so on.
      */
     public static final String SIGNATURE = "Signature";
 
     /**
-     * Perform Encryption.
-     * The encryption specific parameters define how to encrypt, which keys
-     * to use, and so on.
+     * Perform an Encryption action. The encryption specific parameters define how 
+     * to encrypt, which keys to use, and so on.
      */
     public static final String ENCRYPT = "Encrypt";
 
@@ -90,61 +83,24 @@ public class WSHandlerConstants {
      * Add a timestamp to the security header.
      */
     public static final String TIMESTAMP = "Timestamp";
-
+    
     /**
-     * Suppress the serialization of the SOAP message.
-     * <p/>
-     * Usually the handler serializes the processed SOAP message into a string
-     * and sets it into the Axis message context as new current message. To
-     * suppress this action, define this action. In this case the handler
-     * stores the processed SOAP message as <code>Document</code> in the
-     * Axis message context with the property name <code>SND_SECURITY</code>.
-     * <p/>
-     * A chained handler can retrieve the SOAP message and process it. The
-     * last handler in the chain must set the processed SOAP message as
-     * current message in Axis message context.
-     */
-    public static final String NO_SERIALIZATION = "NoSerialization";
-
-    /**
-     * Use this to use a specific signature mechanism for .Net.
-     * This signature mechanism uses data from the username token and
-     * a well defined constant string and constructs a signature
-     * key. 
+     * Use this to use a specific signature mechanism for .Net. This signature mechanism 
+     * uses data from the username token and  a well defined constant string and constructs
+     * a signature key. Please note that this action is NOT spec-compliant.
      */
     public static final String SIGN_WITH_UT_KEY = "UsernameTokenSignature";
-
+    
+    //
+    // Boolean configuration tags, e.g. the value should be "true" or "false".
+    //
+    
     /**
-     * This is an interal property name to support handler chaining.
-     * The Axis WSS4J handlers use this message context property to
-     * hand over the SOAP partially processed envelope document to
-     * the next WSS4J handler in the chain.
+     * Whether to enable signatureConfirmation or not. By default signatureConfirmation 
+     * is enabled.
      */
-    public static final String SND_SECURITY = "SND_SECURITY";
-
-    /**
-     * The actor name of the <code>wsse:Security</code> header.
-     * <p/>
-     * If this parameter is omitted, the actor name is not set.
-     * <p/>
-     * The value of the actor or role has to match the receiver's setting
-     * or may contain standard values.
-     * <p/>
-     * The application may set this parameter using the following method:
-     * <pre>
-     * call.setProperty(WSHandlerConstants.ACTOR, "ActorName");
-     * </pre>
-     * However, the parameter in the WSDD deployment file overwrites the
-     * property setting (deployment setting overwrites application setting).
-     */
-    public static final String ACTOR = "actor";
-
-    /**
-     * The role name of the <code>wsse:Security</code> header.
-     * This is used for SOAP 1.2. Refer also to {@link #ACTOR}.
-     */
-    public static final String ROLE = "role";
-
+    public static final String ENABLE_SIGNATURE_CONFIRMATION = "enableSignatureConfirmation";
+    
     /**
      * Sets the <code>mustUnderstand</code> flag.
      * <p/>
@@ -181,6 +137,107 @@ public class WSHandlerConstants {
      * <p/>
      */
     public static final String IS_BSP_COMPLIANT = "isBSPCompliant";
+    
+    /**
+     * This variable controls whether types other than PasswordDigest or PasswordText
+     * are allowed when processing UsernameTokens. 
+     * 
+     * By default this is set to false so that the user doesn't have to explicitly
+     * reject custom token types in the callback handler.
+     */
+    public static final String HANDLE_CUSTOM_PASSWORD_TYPES = "handleCustomPasswordTypes";
+    
+    /**
+     * Set the value of this parameter to true to enable strict Username Token password type
+     * handling (default is false).
+     * 
+     * If this parameter is set to true, it throws an exception if the password type of 
+     * the Username Token does not match that of the configured PASSWORD_TYPE parameter.
+     */
+    public static final String PASSWORD_TYPE_STRICT = "passwordTypeStrict";
+    
+    /**
+     * This variable controls whether (wsse) namespace qualified password types are
+     * accepted when processing UsernameTokens.
+     * 
+     * By default this is set to false.
+     */
+    public static final String ALLOW_NAMESPACE_QUALIFIED_PASSWORD_TYPES 
+        = "allowNamespaceQualifiedPasswordTypes";
+    
+    /**
+     * This parameter sets whether to use a single certificate or a whole certificate
+     * chain when constructing a BinarySecurityToken used for direct reference in
+     * signature. The default is true, meaning that only a single certificate is used.
+     */
+    public static final String USE_SINGLE_CERTIFICATE = "useSingleCertificate";
+    
+    /**
+     * This parameter sets whether to use UsernameToken Key Derivation, as defined 
+     * in the UsernameTokenProfile 1.1 specification. The default is true. If false,
+     * then it falls back to the old behaviour of WSE derived key functionality.
+     */
+    public static final String USE_DERIVED_KEY = "useDerivedKey";
+    
+    /**
+     * This parameter sets whether to use the Username Token derived key for a MAC
+     * or not. The default is true.
+     */
+    public static final String USE_DERIVED_KEY_FOR_MAC = "useDerivedKeyForMAC";
+    
+    /**
+     * Should timestamps have precision in milliseconds
+     */
+    public static final String TIMESTAMP_PRECISION = "precisionInMilliseconds";
+    
+    /**
+     * Set the value of this parameter to true to enable strict timestamp
+     * handling (default is true).
+     * 
+     * Strict Timestamp handling: throw an exception if a Timestamp contains
+     * an <code>Expires</code> element and the semantics of the request are
+     * expired, i.e. the current time at the receiver is past the expires time.
+     */
+    public static final String TIMESTAMP_STRICT = "timestampStrict";
+    
+    /**
+     * Set the value of this parameter to true to treat passwords as binary values
+     * for Username Tokens.
+     * 
+     * This is needed to properly handle password equivalence for UsernameToken
+     * passwords.  Binary passwords are Base64 encoded so they can be treated as 
+     * strings in most places, but when the password digest is calculated or a key
+     * is derived from the password, the password will be Base64 decoded before 
+     * being used. This is most useful for hashed passwords as password equivalents.
+     */
+    public static final String USE_ENCODED_PASSWORDS = "useEncodedPasswords";
+    
+    //
+    //
+    //
+
+    /**
+     * The actor name of the <code>wsse:Security</code> header.
+     * <p/>
+     * If this parameter is omitted, the actor name is not set.
+     * <p/>
+     * The value of the actor or role has to match the receiver's setting
+     * or may contain standard values.
+     * <p/>
+     * The application may set this parameter using the following method:
+     * <pre>
+     * call.setProperty(WSHandlerConstants.ACTOR, "ActorName");
+     * </pre>
+     * However, the parameter in the WSDD deployment file overwrites the
+     * property setting (deployment setting overwrites application setting).
+     */
+    public static final String ACTOR = "actor";
+
+    /**
+     * The role name of the <code>wsse:Security</code> header.
+     * This is used for SOAP 1.2. Refer also to {@link #ACTOR}.
+     */
+    public static final String ROLE = "role";
 
     /**
      * The user's name. It is used differently by the WS Security functions.
@@ -500,33 +557,6 @@ public class WSHandlerConstants {
     public static final String PASSWORD_TYPE = "passwordType";
     
     /**
-     * This variable controls whether types other than PasswordDigest or PasswordText
-     * are allowed when processing UsernameTokens. 
-     * 
-     * By default this is set to false so that the user doesn't have to explicitly
-     * reject custom token types in the callback handler.
-     */
-    public static final String HANDLE_CUSTOM_PASSWORD_TYPES = "handleCustomPasswordTypes";
-    
-    /**
-     * Set the value of this parameter to true to enable strict Username Token password type
-     * handling (default is false).
-     * 
-     * If this parameter is set to true, it throws an exception if the password type of 
-     * the Username Token does not match that of the configured PASSWORD_TYPE parameter.
-     */
-    public static final String PASSWORD_TYPE_STRICT = "passwordTypeStrict";
-    
-    /**
-     * This variable controls whether (wsse) namespace qualified password types are
-     * accepted when processing UsernameTokens.
-     * 
-     * By default this is set to false.
-     */
-    public static final String ALLOW_NAMESPACE_QUALIFIED_PASSWORD_TYPES 
-        = "allowNamespaceQualifiedPasswordTypes";
-
-    /**
      * Parameter to generate additional elements in <code>UsernameToken</code>.
      * <p/>
      * The value of this parameter is a list of element names that are added
@@ -615,32 +645,12 @@ public class WSHandlerConstants {
     public static final String SIGNATURE_PARTS = "signatureParts";
     
     /**
-     * This parameter sets whether to use a single certificate or a whole certificate
-     * chain when constructing a BinarySecurityToken used for direct reference in
-     * signature. The default is true, meaning that only a single certificate is used.
-     */
-    public static final String USE_SINGLE_CERTIFICATE = "useSingleCertificate";
-    
-    /**
      * This parameter sets the length of the secret (derived) key to use for the
      * WSE UT_SIGN functionality.
      * 
      * The default value is 16 bytes.
      */
     public static final String WSE_SECRET_KEY_LENGTH = "wseSecretKeyLength";
-    
-    /**
-     * This parameter sets whether to use UsernameToken Key Derivation, as defined 
-     * in the UsernameTokenProfile 1.1 specification. The default is true. If false,
-     * then it falls back to the old behaviour of WSE derived key functionality.
-     */
-    public static final String USE_DERIVED_KEY = "useDerivedKey";
-    
-    /**
-     * This parameter sets whether to use the Username Token derived key for a MAC
-     * or not. The default is true.
-     */
-    public static final String USE_DERIVED_KEY_FOR_MAC = "useDerivedKeyForMAC";
     
     /**
      * This parameter sets the number of iterations to use when deriving a key
@@ -805,39 +815,6 @@ public class WSHandlerConstants {
      */
     public static final String TTL_TIMESTAMP = "timeToLive";
 
-    /**
-     * Whether to enable signatureConfirmation or not
-     * By default signatureConfirmation is enabled
-     */
-    public static final String ENABLE_SIGNATURE_CONFIRMATION = "enableSignatureConfirmation";
-    
-    /**
-     * Should timestamps have precision in milliseconds
-     */
-    public static final String TIMESTAMP_PRECISION = "precisionInMilliseconds";
-    
-    /**
-     * Set the value of this parameter to true to enable strict timestamp
-     * handling (default is true).
-     * 
-     * Strict Timestamp handling: throw an exception if a Timestamp contains
-     * an <code>Expires</code> element and the semantics of the request are
-     * expired, i.e. the current time at the receiver is past the expires time.
-     */
-    public static final String TIMESTAMP_STRICT = "timestampStrict";
-    
-    /**
-     * Set the value of this parameter to true to treat passwords as binary values
-     * for Username Tokens.
-     * 
-     * This is needed to properly handle password equivalence for UsernameToken
-     * passwords.  Binary passwords are Base64 encoded so they can be treated as 
-     * strings in most places, but when the password digest is calculated or a key
-     * is derived from the password, the password will be Base64 decoded before 
-     * being used. This is most useful for hashed passwords as password equivalents.
-     */
-    public static final String USE_ENCODED_PASSWORDS = "useEncodedPasswords";
-    
     /*
      * internally used property names to store values inside the message context
      * that must have the same livetime as a message (request/response model).
