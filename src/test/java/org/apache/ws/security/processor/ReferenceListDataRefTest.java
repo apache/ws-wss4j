@@ -29,6 +29,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDataRef;
 import org.apache.ws.security.WSEncryptionPart;
+import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.common.KeystoreCallbackHandler;
@@ -61,6 +62,7 @@ public class ReferenceListDataRefTest extends org.junit.Assert {
     
     public ReferenceListDataRefTest() throws Exception {
         crypto = CryptoFactory.getInstance("wss40.properties");
+        WSSConfig.init();
     }
 
     /**

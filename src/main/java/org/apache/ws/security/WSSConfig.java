@@ -349,8 +349,7 @@ public class WSSConfig {
         addJceProviders = value;
     }
     
-    private static synchronized void
-    staticInit() {
+    public static synchronized void init() {
         if (!staticallyInitialized) {
             org.apache.xml.security.Init.init();
             if (addJceProviders) {
@@ -365,14 +364,11 @@ public class WSSConfig {
         }
     }
     
-    protected WSSConfig() {
-        staticInit();
-    }
-    
     /**
      * @return a new WSSConfig instance configured with the default values
      */
     public static WSSConfig getNewInstance() {
+        init();
         return new WSSConfig();
     }
 

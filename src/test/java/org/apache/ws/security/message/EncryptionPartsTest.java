@@ -24,6 +24,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.SOAPConstants;
 import org.apache.ws.security.WSDataRef;
 import org.apache.ws.security.WSEncryptionPart;
+import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSecurityEngineResult;
@@ -74,6 +75,7 @@ public class EncryptionPartsTest extends org.junit.Assert {
     
     public EncryptionPartsTest() throws Exception {
         crypto = CryptoFactory.getInstance();
+        WSSConfig.init();
     }
 
     /**

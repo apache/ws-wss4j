@@ -22,6 +22,7 @@ package org.apache.ws.security.message;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.common.KeystoreCallbackHandler;
@@ -48,6 +49,7 @@ public class DerivedKeyTest extends org.junit.Assert {
     
     public DerivedKeyTest() throws Exception {
         crypto = CryptoFactory.getInstance("wss40.properties");
+        WSSConfig.init();
     }
 
     /**

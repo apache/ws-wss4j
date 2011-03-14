@@ -19,6 +19,7 @@
 
 package org.apache.ws.security.message;
 
+import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.common.SOAPUtil;
 import org.apache.ws.security.components.crypto.CryptoFactory;
@@ -30,6 +31,10 @@ import org.w3c.dom.Document;
  * "username" is used for encryption or signature. See WSS-137.
  */
 public class CertErrorTest extends org.junit.Assert {
+    
+    public CertErrorTest() {
+        WSSConfig.init();
+    }
 
     /**
      * Test for when a bad certificate is used for Signature
