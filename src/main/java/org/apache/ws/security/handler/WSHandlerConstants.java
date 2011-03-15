@@ -329,6 +329,13 @@ public class WSHandlerConstants {
      * functions.
      */
     public static final String PW_CALLBACK_CLASS = "passwordCallbackClass";
+    
+    /**
+     * This tag refers to the SAML CallbackHandler implementation class used to construct
+     * SAML Assertions. The value of this tag must be the class name of a 
+     * {@link javax.security.auth.callback.CallbackHandler} instance.
+     */
+    public static final String SAML_CALLBACK_CLASS = "samlCallbackClass";
 
     /**
      * An application may set an object reference to an object that implements
@@ -345,6 +352,13 @@ public class WSHandlerConstants {
      * this property too. This may be useful on the server side.
      */
     public static final String PW_CALLBACK_REF = "passwordCallbackRef";
+    
+    /**
+     * This tag refers to the SAML CallbackHandler implementation object used to construct
+     * SAML Assertions. The value of this tag must be a
+     * {@link javax.security.auth.callback.CallbackHandler} instance.
+     */
+    public static final String SAML_CALLBACK_REF = "samlCallbackRef";
 
     /**
      * The user's name for encryption.

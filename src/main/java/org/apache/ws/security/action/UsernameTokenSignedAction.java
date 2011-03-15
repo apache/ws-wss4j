@@ -22,13 +22,15 @@ package org.apache.ws.security.action;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.security.auth.callback.CallbackHandler;
+
 import org.apache.ws.security.SOAPConstants;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSEncryptionPart;
+import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.handler.WSHandler;
-import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.message.WSSecUsernameToken;
 import org.apache.ws.security.message.WSSecSignature;
 import org.apache.ws.security.util.WSSecurityUtil;
@@ -46,10 +48,10 @@ import org.w3c.dom.Document;
 public class UsernameTokenSignedAction implements Action {
     public void execute(WSHandler handler, int actionToDo, Document doc, RequestData reqData)
             throws WSSecurityException {
-        String password = 
-            handler.getPassword(reqData.getUsername(), actionToDo,
-                WSHandlerConstants.PW_CALLBACK_CLASS,
-                WSHandlerConstants.PW_CALLBACK_REF, reqData).getPassword();
+        CallbackHandler callbackHandler = 
+            handler.getPasswordCallbackHandler(reqData);
+        WSPasswordCallback passwordCallback = 
+            handler.getPasswordCB(reqData.getUsername(), actionToDo, callbackHandler, reqData);
 
         WSSecUsernameToken builder = new WSSecUsernameToken(reqData.getWssConfig());
         
@@ -62,7 +64,7 @@ public class UsernameTokenSignedAction implements Action {
             builder.setSecretKeyLength(reqData.getSecretKeyLength());
         }
         
-        builder.setUserInfo(reqData.getUsername(), password);
+        builder.setUserInfo(reqData.getUsername(), passwordCallback.getPassword());
         builder.addCreated();
         builder.addNonce();
         builder.prepare(doc);

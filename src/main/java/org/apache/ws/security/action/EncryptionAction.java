@@ -19,6 +19,8 @@
 
 package org.apache.ws.security.action;
 
+import javax.security.auth.callback.CallbackHandler;
+
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSecurityException;
@@ -40,12 +42,15 @@ public class EncryptionAction implements Action {
             String encKeyName = handler.getString(WSHandlerConstants.ENC_KEY_NAME,
                     reqData.getMsgContext());
             wsEncrypt.setEmbeddedKeyName(encKeyName);
-            byte[] embeddedKey =
-                    handler.getPassword(reqData.getEncUser(),
-                            actionToDo,
-                            WSHandlerConstants.ENC_CALLBACK_CLASS,
-                            WSHandlerConstants.ENC_CALLBACK_REF, reqData)
-                            .getKey();
+            CallbackHandler callbackHandler = 
+                handler.getCallbackHandler(
+                    WSHandlerConstants.ENC_CALLBACK_CLASS,
+                    WSHandlerConstants.ENC_CALLBACK_REF, 
+                    reqData
+                );
+            WSPasswordCallback passwordCallback = 
+                handler.getPasswordCB(reqData.getEncUser(), actionToDo, callbackHandler, reqData);
+            byte[] embeddedKey = passwordCallback.getKey();
             wsEncrypt.setKey(embeddedKey);
             wsEncrypt.setDocument(doc);
         }
@@ -61,13 +66,11 @@ public class EncryptionAction implements Action {
             wsEncrypt.setParts(reqData.getEncryptParts());
         }
         if (!reqData.getEncryptSymmetricEncryptionKey()) {
-            WSPasswordCallback pwcb = 
-                handler.getPassword(reqData.getEncUser(),
-                    actionToDo,
-                    WSHandlerConstants.PW_CALLBACK_CLASS,
-                    WSHandlerConstants.PW_CALLBACK_REF, reqData
-                );
-            wsEncrypt.setEphemeralKey(pwcb.getKey());
+            CallbackHandler callbackHandler = 
+                handler.getPasswordCallbackHandler(reqData);
+            WSPasswordCallback passwordCallback = 
+                handler.getPasswordCB(reqData.getEncUser(), actionToDo, callbackHandler, reqData);
+            wsEncrypt.setEphemeralKey(passwordCallback.getKey());
             wsEncrypt.setEncryptSymmKey(reqData.getEncryptSymmetricEncryptionKey());
         }
         try {

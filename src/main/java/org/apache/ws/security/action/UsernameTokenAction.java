@@ -19,11 +19,12 @@
 
 package org.apache.ws.security.action;
 
+import javax.security.auth.callback.CallbackHandler;
+
 import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.handler.WSHandler;
-import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.message.WSSecUsernameToken;
 import org.w3c.dom.Document;
 
@@ -31,17 +32,12 @@ public class UsernameTokenAction implements Action {
     
     public void execute(WSHandler handler, int actionToDo, Document doc, RequestData reqData)
         throws WSSecurityException {
-
-        WSPasswordCallback callbackData = 
-            handler.getPassword(
-                reqData.getUsername(),
-                actionToDo,
-                WSHandlerConstants.PW_CALLBACK_CLASS,
-                WSHandlerConstants.PW_CALLBACK_REF, 
-                reqData
-            );
-        String providedUsername = callbackData.getIdentifier();
-        String password = callbackData.getPassword();
+        CallbackHandler callbackHandler = 
+            handler.getPasswordCallbackHandler(reqData);
+        WSPasswordCallback passwordCallback = 
+            handler.getPasswordCB(reqData.getUsername(), actionToDo, callbackHandler, reqData);
+        String providedUsername = passwordCallback.getIdentifier();
+        String password = passwordCallback.getPassword();
 
         WSSecUsernameToken builder = new WSSecUsernameToken(reqData.getWssConfig());
         builder.setPasswordType(reqData.getPwType());

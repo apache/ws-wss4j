@@ -19,9 +19,12 @@
 
 package org.apache.ws.security.action;
 
+import javax.security.auth.callback.CallbackHandler;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.handler.RequestData;
@@ -64,13 +67,11 @@ public class SAMLTokenSignedAction implements Action {
 
         WSSecSignatureSAML wsSign = new WSSecSignatureSAML(reqData.getWssConfig());
 
-        String password =
-            handler.getPassword(reqData.getUsername(),
-                                actionToDo,
-                                WSHandlerConstants.PW_CALLBACK_CLASS,
-                                WSHandlerConstants.PW_CALLBACK_REF, reqData)
-                                .getPassword();
-        wsSign.setUserInfo(reqData.getUsername(), password);
+        CallbackHandler callbackHandler = 
+            handler.getPasswordCallbackHandler(reqData);
+        WSPasswordCallback passwordCallback = 
+            handler.getPasswordCB(reqData.getUsername(), actionToDo, callbackHandler, reqData);
+        wsSign.setUserInfo(reqData.getUsername(), passwordCallback.getPassword());
         
         if (reqData.getSigKeyId() != 0) {
             wsSign.setKeyIdentifierType(reqData.getSigKeyId());
@@ -112,9 +113,18 @@ public class SAMLTokenSignedAction implements Action {
         RequestData reqData
     ) throws WSSecurityException {
         String samlPropFile = 
-            handler.getString(WSHandlerConstants.SAML_PROP_FILE,
-                reqData.getMsgContext());
-        return SAMLIssuerFactory.getInstance(samlPropFile);
+            handler.getString(WSHandlerConstants.SAML_PROP_FILE, reqData.getMsgContext());
+        SAMLIssuer samlIssuer = SAMLIssuerFactory.getInstance(samlPropFile);
+        CallbackHandler callbackHandler = 
+            handler.getCallbackHandler(
+                WSHandlerConstants.SAML_CALLBACK_CLASS,
+                WSHandlerConstants.SAML_CALLBACK_REF, 
+                reqData
+            );
+        if (callbackHandler != null) {
+            samlIssuer.setCallbackHandler(callbackHandler);
+        }
+        return samlIssuer;
     }
 
 }

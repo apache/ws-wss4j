@@ -809,93 +809,137 @@ public abstract class WSHandler {
     }
 
     /**
-     * Get a password to construct a UsernameToken or sign a message.
-     * <p/>
-     * Try all possible sources to get a password.
+     * Get a CallbackHandler instance. First try to get an instance via the 
+     * callbackHandlerRef on the message context. Failing that, try to load a new 
+     * instance of the CallbackHandler via the callbackHandlerClass argument.
+     * 
+     * @param callbackHandlerClass The class name of the CallbackHandler instance
+     * @param callbackHandlerRef The reference name of the CallbackHandler instance
+     * @param requestData The RequestData which supplies the message context
+     * @return a CallbackHandler instance
+     * @throws WSSecurityException
      */
-    public WSPasswordCallback getPassword(String username,
-            int doAction,
-            String clsProp,
-            String refProp,
-            RequestData reqData
+    public CallbackHandler getCallbackHandler(
+        String callbackHandlerClass,
+        String callbackHandlerRef,
+        RequestData requestData
     ) throws WSSecurityException {
-        WSPasswordCallback pwCb = null;
-        Object mc = reqData.getMsgContext();
-        String callback = getString(clsProp, mc);
-        
-        if (callback != null) { 
-            // we have a password callback class
-            pwCb = readPwViaCallbackClass(callback, username, doAction, reqData);
-        } else {
-            // Try to obtain a password callback class from the message context or handler options
-            CallbackHandler cbHandler = (CallbackHandler) getOption(refProp);
-            if (cbHandler == null) {
-                cbHandler = (CallbackHandler) getProperty(mc, refProp);
-            }
-            if (cbHandler != null) {
-                pwCb = performCallback(cbHandler, username, doAction);
-            } else {
-                //
-                // If a callback isn't configured then try to get the password
-                // from the message context
-                //
-                String password = getPassword(mc);
-                if (password == null) {
-                    String err = "provided null or empty password";
-                    throw new WSSecurityException("WSHandler: application " + err);
-                }
-                pwCb = constructPasswordCallback(username, doAction);
-                pwCb.setPassword(password);
+        Object mc = requestData.getMsgContext();
+        CallbackHandler cbHandler = (CallbackHandler) getOption(callbackHandlerRef);
+        if (cbHandler == null) {
+            cbHandler = (CallbackHandler) getProperty(mc, callbackHandlerRef);
+        }
+        if (cbHandler == null) {
+            String callback = getString(callbackHandlerClass, mc);
+            if (callback != null) {
+                cbHandler = loadCallbackHandler(callback, requestData);
             }
         }
-        
-        return pwCb;
+        return cbHandler;
     }
-
-    private WSPasswordCallback readPwViaCallbackClass(String callback,
-            String username,
-            int doAction,
-            RequestData requestData
+    
+    /**
+     * Get a CallbackHandler instance to obtain passwords.
+     * @param reqData The RequestData which supplies the message context
+     * @return the CallbackHandler instance to obtain passwords.
+     * @throws WSSecurityException
+     */
+    public CallbackHandler getPasswordCallbackHandler(RequestData reqData) 
+        throws WSSecurityException {
+        return 
+            getCallbackHandler(
+                WSHandlerConstants.PW_CALLBACK_CLASS,
+                WSHandlerConstants.PW_CALLBACK_REF,
+                reqData
+            );
+    }
+    
+    /**
+     * Load a CallbackHandler instance.
+     * @param callbackHandlerClass The class name of the CallbackHandler instance
+     * @param requestData The RequestData which supplies the message context
+     * @return a CallbackHandler instance
+     * @throws WSSecurityException
+     */
+    private CallbackHandler loadCallbackHandler(
+        String callbackHandlerClass,
+        RequestData requestData
     ) throws WSSecurityException {
 
         Class<?> cbClass = null;
         CallbackHandler cbHandler = null;
         try {
             cbClass = 
-                Loader.loadClass(getClassLoader(requestData.getMsgContext()), callback);
+                Loader.loadClass(getClassLoader(requestData.getMsgContext()), callbackHandlerClass);
         } catch (ClassNotFoundException e) {
             throw new WSSecurityException(
-                "WSHandler: cannot load password callback class: " + callback, e
+                "WSHandler: cannot load callback handler class: " + callbackHandlerClass, e
             );
         }
         try {
             cbHandler = (CallbackHandler) cbClass.newInstance();
         } catch (Exception e) {
             throw new WSSecurityException(
-                "WSHandler: cannot create instance of password callback: " + callback, e
+                "WSHandler: cannot create instance of callback handler: " + callbackHandlerClass, e
             );
         }
-        return performCallback(cbHandler, username, doAction);
+        return cbHandler;
+    }
+    
+    /**
+     * Get a password callback (WSPasswordCallback object) from a CallbackHandler instance
+     * @param username The username to supply to the CallbackHandler
+     * @param doAction The action to perform
+     * @param callbackHandler The CallbackHandler instance
+     * @param requestData The RequestData which supplies the message context
+     * @return the WSPasswordCallback object containing the password
+     * @throws WSSecurityException
+     */
+    public WSPasswordCallback getPasswordCB(
+         String username,
+         int doAction,
+         CallbackHandler callbackHandler,
+         RequestData requestData
+    ) throws WSSecurityException {
+        
+        if (callbackHandler != null) { 
+            return performPasswordCallback(callbackHandler, username, doAction);
+        } else {
+            //
+            // If a callback isn't configured then try to get the password
+            // from the message context
+            //
+            String password = getPassword(requestData.getMsgContext());
+            if (password == null) {
+                String err = "provided null or empty password";
+                throw new WSSecurityException("WSHandler: application " + err);
+            }
+            WSPasswordCallback pwCb = constructPasswordCallback(username, doAction);
+            pwCb.setPassword(password);
+            return pwCb;
+        }
     }
 
     /**
-     * Perform a callback to get a password.
-     * <p/>
-     * The called back function gets an indication why to provide a password:
-     * to produce a UsernameToken, Signature, or a password (key) for a given
-     * name.
+     * Perform a callback on a CallbackHandler instance
+     * @param cbHandler the CallbackHandler instance
+     * @param username The username to supply to the CallbackHandler
+     * @param doAction The action to perform
+     * @return a WSPasswordCallback instance
+     * @throws WSSecurityException
      */
-    private WSPasswordCallback performCallback(CallbackHandler cbHandler,
-            String username,
-            int doAction
+    private WSPasswordCallback performPasswordCallback(
+        CallbackHandler cbHandler,
+        String username,
+        int doAction
     ) throws WSSecurityException {
 
         WSPasswordCallback pwCb = constructPasswordCallback(username, doAction);
         Callback[] callbacks = new Callback[1];
         callbacks[0] = pwCb;
-        /*
-         * Call back the application to get the password
-         */
+        //
+        // Call back the application to get the password
+        //
         try {
             cbHandler.handle(callbacks);
         } catch (Exception e) {
@@ -904,9 +948,16 @@ public abstract class WSHandler {
         return pwCb;
     }
 
+    /**
+     * Construct a WSPasswordCallback instance
+     * @param username The username
+     * @param doAction The action to perform
+     * @return a WSPasswordCallback instance
+     * @throws WSSecurityException
+     */
     private WSPasswordCallback constructPasswordCallback(
-            String username,
-            int doAction
+        String username,
+        int doAction
     ) throws WSSecurityException {
 
         int reason = WSPasswordCallback.UNKNOWN;
@@ -1071,45 +1122,6 @@ public abstract class WSHandler {
          * than just changing the visibility
          * of this method to maintain parity with WSDoAllSender.
          */
-    }
-
-    /**
-     * Get the password callback class and get an instance
-     * <p/>
-     */
-    protected CallbackHandler getPasswordCB(RequestData reqData) 
-        throws WSSecurityException {
-
-        Object mc = reqData.getMsgContext();
-        CallbackHandler cbHandler = null;
-        String callback = getString(WSHandlerConstants.PW_CALLBACK_CLASS, mc);
-        if (callback != null) {
-            Class<?> cbClass = null;
-            try {
-                cbClass = 
-                    Loader.loadClass(getClassLoader(reqData.getMsgContext()), callback);
-            } catch (ClassNotFoundException e) {
-                throw new WSSecurityException(
-                    "WSHandler: cannot load password callback class: " + callback, e
-                );
-            }
-            try {
-                cbHandler = (CallbackHandler) cbClass.newInstance();
-            } catch (java.lang.Exception e) {
-                throw new WSSecurityException(
-                    "WSHandler: cannot create instance of password callback: " + callback, e
-                );
-            }
-        } else {
-            cbHandler = 
-                (CallbackHandler) getProperty(mc, WSHandlerConstants.PW_CALLBACK_REF);
-            if (cbHandler == null) {
-                throw new WSSecurityException(
-                    "WSHandler: no reference in callback property"
-                );
-            }
-        }
-        return cbHandler;
     }
 
     /**

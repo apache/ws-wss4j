@@ -19,24 +19,22 @@
 
 package org.apache.ws.security.action;
 
+import javax.security.auth.callback.CallbackHandler;
+
 import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.handler.WSHandler;
-import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.message.WSSecSignature;
 import org.w3c.dom.Document;
 
 public class SignatureAction implements Action {
     public void execute(WSHandler handler, int actionToDo, Document doc, RequestData reqData)
             throws WSSecurityException {
-        WSPasswordCallback pwcb =
-            handler.getPassword(
-                reqData.getSignatureUser(),
-                actionToDo,
-                WSHandlerConstants.PW_CALLBACK_CLASS,
-                WSHandlerConstants.PW_CALLBACK_REF, reqData
-            );
+        CallbackHandler callbackHandler = 
+            handler.getPasswordCallbackHandler(reqData);
+        WSPasswordCallback passwordCallback = 
+            handler.getPasswordCB(reqData.getSignatureUser(), actionToDo, callbackHandler, reqData);
         WSSecSignature wsSign = new WSSecSignature(reqData.getWssConfig());
 
         if (reqData.getSigKeyId() != 0) {
@@ -49,14 +47,14 @@ public class SignatureAction implements Action {
             wsSign.setDigestAlgo(reqData.getSigDigestAlgorithm());
         }
 
-        wsSign.setUserInfo(reqData.getSignatureUser(), pwcb.getPassword());
+        wsSign.setUserInfo(reqData.getSignatureUser(), passwordCallback.getPassword());
         wsSign.setUseSingleCertificate(reqData.isUseSingleCert());
         if (reqData.getSignatureParts().size() > 0) {
             wsSign.setParts(reqData.getSignatureParts());
         }
         
-        if (pwcb.getKey() != null) {
-            wsSign.setSecretKey(pwcb.getKey());
+        if (passwordCallback.getKey() != null) {
+            wsSign.setSecretKey(passwordCallback.getKey());
         }
 
         try {

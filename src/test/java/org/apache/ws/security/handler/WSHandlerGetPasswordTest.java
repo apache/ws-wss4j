@@ -55,14 +55,10 @@ public class WSHandlerGetPasswordTest extends org.junit.Assert {
         reqData.setMsgContext(messageContext);
         
         WSHandler handler = new CustomHandler();
+        CallbackHandler callbackHandler = 
+            handler.getCallbackHandler("SomeCallbackTag", "SomeCallbackRef", reqData);
         WSPasswordCallback callback = 
-            handler.getPassword(
-                "alice", 
-                WSConstants.UT, 
-                "SomeCallbackTag", 
-                "SomeCallbackRef",
-                reqData
-            );
+            handler.getPasswordCB("alice", WSConstants.UT, callbackHandler, reqData);
         assertTrue("alice".equals(callback.getIdentifier()));
         assertTrue("securityPassword".equals(callback.getPassword()));
         assertTrue(WSPasswordCallback.USERNAME_TOKEN == callback.getUsage());
