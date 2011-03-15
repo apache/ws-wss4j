@@ -212,7 +212,7 @@ public class WSSConfig {
      */
     protected boolean precisionInMilliSeconds = true;
 
-    protected boolean enableSignatureConfirmation = true;
+    protected boolean enableSignatureConfirmation = false;
 
     /**
      * If set to true then the timestamp handling will throw an exception if the

@@ -92,128 +92,7 @@ public class WSHandlerConstants {
     public static final String SIGN_WITH_UT_KEY = "UsernameTokenSignature";
     
     //
-    // Boolean configuration tags, e.g. the value should be "true" or "false".
-    //
-    
-    /**
-     * Whether to enable signatureConfirmation or not. By default signatureConfirmation 
-     * is enabled.
-     */
-    public static final String ENABLE_SIGNATURE_CONFIRMATION = "enableSignatureConfirmation";
-    
-    /**
-     * Sets the <code>mustUnderstand</code> flag.
-     * <p/>
-     * If the parameter has the value <code>1</code>
-     * or <code>true</code> the <code>mustUnderstand</code> is set.
-     * The values <code>0</code> or <code>false</code> suppress the
-     * flag.
-     * <p/>
-     * The application may set this parameter using the following method:
-     * <pre>
-     * call.setProperty(WSHandlerConstants.MUST_UNDERSTAND, "false");
-     * </pre>
-     * However, the parameter in the WSDD deployment file overwrites the
-     * property setting (deployment setting overwrites application setting).
-     * <p/>
-     * The default setting is <code>true</code>
-     * <p/>
-     */
-    public static final String MUST_UNDERSTAND = "mustUnderstand";
-    
-    /**
-     * Sets the <code>isBSPCompliant</code> flag.
-     * <p/>
-     * If the parameter has the value <code>1</code>
-     * or <code>true</code> the <code>isBSPCompliant</code> is set.
-     * The values <code>0</code> or <code>false</code> suppress the
-     * flag.
-     * <p/>
-     * The application may set this parameter using the following method:
-     * <pre>
-     * call.setProperty(WSHandlerConstants.IS_BSP_COMPLIANT, "false");
-     * </pre>
-     * The default setting is <code>true</code>
-     * <p/>
-     */
-    public static final String IS_BSP_COMPLIANT = "isBSPCompliant";
-    
-    /**
-     * This variable controls whether types other than PasswordDigest or PasswordText
-     * are allowed when processing UsernameTokens. 
-     * 
-     * By default this is set to false so that the user doesn't have to explicitly
-     * reject custom token types in the callback handler.
-     */
-    public static final String HANDLE_CUSTOM_PASSWORD_TYPES = "handleCustomPasswordTypes";
-    
-    /**
-     * Set the value of this parameter to true to enable strict Username Token password type
-     * handling (default is false).
-     * 
-     * If this parameter is set to true, it throws an exception if the password type of 
-     * the Username Token does not match that of the configured PASSWORD_TYPE parameter.
-     */
-    public static final String PASSWORD_TYPE_STRICT = "passwordTypeStrict";
-    
-    /**
-     * This variable controls whether (wsse) namespace qualified password types are
-     * accepted when processing UsernameTokens.
-     * 
-     * By default this is set to false.
-     */
-    public static final String ALLOW_NAMESPACE_QUALIFIED_PASSWORD_TYPES 
-        = "allowNamespaceQualifiedPasswordTypes";
-    
-    /**
-     * This parameter sets whether to use a single certificate or a whole certificate
-     * chain when constructing a BinarySecurityToken used for direct reference in
-     * signature. The default is true, meaning that only a single certificate is used.
-     */
-    public static final String USE_SINGLE_CERTIFICATE = "useSingleCertificate";
-    
-    /**
-     * This parameter sets whether to use UsernameToken Key Derivation, as defined 
-     * in the UsernameTokenProfile 1.1 specification. The default is true. If false,
-     * then it falls back to the old behaviour of WSE derived key functionality.
-     */
-    public static final String USE_DERIVED_KEY = "useDerivedKey";
-    
-    /**
-     * This parameter sets whether to use the Username Token derived key for a MAC
-     * or not. The default is true.
-     */
-    public static final String USE_DERIVED_KEY_FOR_MAC = "useDerivedKeyForMAC";
-    
-    /**
-     * Should timestamps have precision in milliseconds
-     */
-    public static final String TIMESTAMP_PRECISION = "precisionInMilliseconds";
-    
-    /**
-     * Set the value of this parameter to true to enable strict timestamp
-     * handling (default is true).
-     * 
-     * Strict Timestamp handling: throw an exception if a Timestamp contains
-     * an <code>Expires</code> element and the semantics of the request are
-     * expired, i.e. the current time at the receiver is past the expires time.
-     */
-    public static final String TIMESTAMP_STRICT = "timestampStrict";
-    
-    /**
-     * Set the value of this parameter to true to treat passwords as binary values
-     * for Username Tokens.
-     * 
-     * This is needed to properly handle password equivalence for UsernameToken
-     * passwords.  Binary passwords are Base64 encoded so they can be treated as 
-     * strings in most places, but when the password digest is calculated or a key
-     * is derived from the password, the password will be Base64 decoded before 
-     * being used. This is most useful for hashed passwords as password equivalents.
-     */
-    public static final String USE_ENCODED_PASSWORDS = "useEncodedPasswords";
-    
-    //
-    //
+    // Users and Role properties
     //
 
     /**
@@ -278,88 +157,7 @@ public class WSHandlerConstants {
      * the certificate verification of the signature certificate.
      */
     public static final String USER = "user";
-
-    /**
-     * The Axis WSS4J handlers provide several ways to get the password required
-     * to construct a username token or to sign a message.
-     * In addition the callback class may check if a username/password
-     * combination is valid. Refer to the documentation of 
-     * {@link org.apache.ws.security.WSPasswordCallback} for more information
-     * about this feature.
-     * <ul>
-     * <li> A class that implements a callback interface (see below). The
-     * handler loads this class and calls the callback method. This
-     * class must have a public default constructor with not parameters.
-     * </li>
-     * <li> The application (or a preceeding handler) sets a reference to an
-     * object that implements the callback interface
-     * </li>
-     * <li> The application sets the password directly using the
-     * <code>setPassword</code> function of the <code>Call</code>.
-     * </ul>
-     * The callback class or callback object shall implement specific password
-     * getter methods, for example reading a database or directory.
-     * <p/>
-     * The handler first checks if it can get a the password via a callback
-     * class. If that fails it checks if it can get the password from the
-     * object reference, if that also fails the handler tries the password
-     * property.
-     * <p/>
-     * The following parameter defines a class that implements a callback
-     * handler interface. The handler loads the class and calls the callback
-     * handler method to get the password. The callback
-     * class needs to implement the
-     * {@link javax.security.auth.callback.CallbackHandler} interface.
-     * <p/>
-     * The callback function
-     * {@link javax.security.auth.callback.CallbackHandler#handle(javax.security.auth.callback.Callback[])}
-     * gets an array of {@link org.apache.ws.security.WSPasswordCallback}
-     * objects. Only the first entry of the array is used. This object
-     * contains the username/keyname as identifier. The callback handler must
-     * set the password or key associated with this identifier before it returns.
-     * <p/>
-     * The application may set this parameter using the following method:
-     * <pre>
-     * call.setProperty(WSHandlerConstants.PW_CALLBACK_CLASS, "PWCallbackClass");
-     * </pre>
-     * However, the parameter in the WSDD deployment file overwrites the
-     * property setting (deployment setting overwrites application setting).
-     * <p/>
-     * Refer also to comment in {@link #USER} about HTTP authentication
-     * functions.
-     */
-    public static final String PW_CALLBACK_CLASS = "passwordCallbackClass";
     
-    /**
-     * This tag refers to the SAML CallbackHandler implementation class used to construct
-     * SAML Assertions. The value of this tag must be the class name of a 
-     * {@link javax.security.auth.callback.CallbackHandler} instance.
-     */
-    public static final String SAML_CALLBACK_CLASS = "samlCallbackClass";
-
-    /**
-     * An application may set an object reference to an object that implements
-     * the {@link javax.security.auth.callback.CallbackHandler} interface.
-     * Only the application can set this property using:
-     * <pre>
-     * call.setProperty(WSHandlerConstants.PW_CALLBACK_REF, anPWCallbackObject);
-     * </pre>
-     * Refer to {@link #PW_CALLBACK_CLASS} for further information about
-     * password callback handling and the priority of the different
-     * methods.
-     * <p/>
-     * Note: every handler that preceeds this handler in the chain can set
-     * this property too. This may be useful on the server side.
-     */
-    public static final String PW_CALLBACK_REF = "passwordCallbackRef";
-    
-    /**
-     * This tag refers to the SAML CallbackHandler implementation object used to construct
-     * SAML Assertions. The value of this tag must be a
-     * {@link javax.security.auth.callback.CallbackHandler} instance.
-     */
-    public static final String SAML_CALLBACK_REF = "samlCallbackRef";
-
     /**
      * The user's name for encryption.
      * <p/>
@@ -420,6 +218,92 @@ public class WSHandlerConstants {
      */
     public static final String USE_REQ_SIG_CERT = "useReqSigCert";
 
+    
+    //
+    // Callback class and property file properties
+    //
+
+    /**
+     * The Axis WSS4J handlers provide several ways to get the password required
+     * to construct a username token or to sign a message.
+     * In addition the callback class may check if a username/password
+     * combination is valid. Refer to the documentation of 
+     * {@link org.apache.ws.security.WSPasswordCallback} for more information
+     * about this feature.
+     * <ul>
+     * <li> A class that implements a callback interface (see below). The
+     * handler loads this class and calls the callback method. This
+     * class must have a public default constructor with not parameters.
+     * </li>
+     * <li> The application (or a preceeding handler) sets a reference to an
+     * object that implements the callback interface
+     * </li>
+     * <li> The application sets the password directly using the
+     * <code>setPassword</code> function of the <code>Call</code>.
+     * </ul>
+     * The callback class or callback object shall implement specific password
+     * getter methods, for example reading a database or directory.
+     * <p/>
+     * The handler first checks if it can get a the password via a callback
+     * class. If that fails it checks if it can get the password from the
+     * object reference, if that also fails the handler tries the password
+     * property.
+     * <p/>
+     * The following parameter defines a class that implements a callback
+     * handler interface. The handler loads the class and calls the callback
+     * handler method to get the password. The callback
+     * class needs to implement the
+     * {@link javax.security.auth.callback.CallbackHandler} interface.
+     * <p/>
+     * The callback function
+     * {@link javax.security.auth.callback.CallbackHandler#handle(javax.security.auth.callback.Callback[])}
+     * gets an array of {@link org.apache.ws.security.WSPasswordCallback}
+     * objects. Only the first entry of the array is used. This object
+     * contains the username/keyname as identifier. The callback handler must
+     * set the password or key associated with this identifier before it returns.
+     * <p/>
+     * The application may set this parameter using the following method:
+     * <pre>
+     * call.setProperty(WSHandlerConstants.PW_CALLBACK_CLASS, "PWCallbackClass");
+     * </pre>
+     * However, the parameter in the WSDD deployment file overwrites the
+     * property setting (deployment setting overwrites application setting).
+     * <p/>
+     * Refer also to comment in {@link #USER} about HTTP authentication
+     * functions.
+     */
+    public static final String PW_CALLBACK_CLASS = "passwordCallbackClass";
+    
+    /**
+     * An application may set an object reference to an object that implements
+     * the {@link javax.security.auth.callback.CallbackHandler} interface.
+     * Only the application can set this property using:
+     * <pre>
+     * call.setProperty(WSHandlerConstants.PW_CALLBACK_REF, anPWCallbackObject);
+     * </pre>
+     * Refer to {@link #PW_CALLBACK_CLASS} for further information about
+     * password callback handling and the priority of the different
+     * methods.
+     * <p/>
+     * Note: every handler that preceeds this handler in the chain can set
+     * this property too. This may be useful on the server side.
+     */
+    public static final String PW_CALLBACK_REF = "passwordCallbackRef";
+    
+    /**
+     * This tag refers to the SAML CallbackHandler implementation class used to construct
+     * SAML Assertions. The value of this tag must be the class name of a 
+     * {@link javax.security.auth.callback.CallbackHandler} instance.
+     */
+    public static final String SAML_CALLBACK_CLASS = "samlCallbackClass";
+    
+    /**
+     * This tag refers to the SAML CallbackHandler implementation object used to construct
+     * SAML Assertions. The value of this tag must be a
+     * {@link javax.security.auth.callback.CallbackHandler} instance.
+     */
+    public static final String SAML_CALLBACK_REF = "samlCallbackRef";
+
     /**
      * This parameter works in the same way as {@link #PW_CALLBACK_CLASS} but
      * the Axis WSS4J handler uses it to get the key associated with a key name.
@@ -431,12 +315,7 @@ public class WSHandlerConstants {
      * the Axis WSS4J handler uses it to get the key associated with a key name.
      */
     public static final String ENC_CALLBACK_REF = "EmbeddedKeyCallbackRef";
-
-    /**
-     * Text of the key name that needs to be sent
-     */
-    public static final String ENC_KEY_NAME = "EmbeddedKeyName";
-
+    
     /**
      * The name of the crypto property file to use for SOAP Signature.
      * <p/>
@@ -512,15 +391,6 @@ public class WSHandlerConstants {
     public final static String SIG_PROP_REF_ID = "SignaturePropRefId";
     
     /**
-     * The WSDoAllReceiver handler stores a result <code>List</code>
-     * in this property.
-     * <p/>
-     * The list contains <code>WSHandlerResult</code> objects
-     * for each chained WSDoAllReceiver handler.
-     */
-    public static final String RECV_RESULTS = "RECV_RESULTS";
-
-    /**
      * The name of the crypto propterty file to use for SOAP Decryption.
      * <p/>
      * Refer to documentation of {@link #SIG_PROP_FILE}.
@@ -551,6 +421,166 @@ public class WSHandlerConstants {
      * Refer to documentation of {@link #DEC_PROP_FILE}.
      */
     public final static String DEC_PROP_REF_ID = "decryptionPropRefId";
+    
+    /**
+     * The name of the crypto property file to use for SOAP Encryption.
+     * <p/>
+     * Refer to documentation of {@link #SIG_PROP_FILE}.
+     * <p/>
+     * The application may set this parameter using the following method:
+     * <pre>
+     * call.setProperty(WSHandlerConstants.ENC_PROP_FILE, "myCrypto.properties");
+     * </pre>
+     * However, the parameter in the WSDD deployment file overwrites the
+     * property setting (deployment setting overwrites application setting).
+     * <p/>
+     * If this parameter is not used, but the signature crypto property
+     * file is defined (combined Encryption/Signature action), then the
+     * encryption function uses signature property file. Otherwise the
+     * handler throws an <code>AxisFault</code>.
+     */
+    public static final String ENC_PROP_FILE = "encryptionPropFile";
+    
+    /**
+     * The key that hold the reference of the 
+     * <code>java.util.Properties</code> object holding complete info about 
+     * encryption Crypto implementation. This should contain all information 
+     * that would contain in an equivalent .properties file which includes the 
+     * Crypto implementation class name.
+     * 
+     * Refer to documentation of {@link #DEC_PROP_FILE}.
+     */
+    public final static String ENC_PROP_REF_ID = "encryptionPropRefId";
+    
+    /**
+     * The name of the SAML Issuer factory property file.
+     * The classloader loads this file. Therefore it must be accessible
+     * via the classpath.
+     */
+    public static final String SAML_PROP_FILE = "samlPropFile";
+    
+    //
+    // Boolean configuration tags, e.g. the value should be "true" or "false".
+    //
+    
+    /**
+     * Whether to enable signatureConfirmation or not. The default value is "false".
+     */
+    public static final String ENABLE_SIGNATURE_CONFIRMATION = "enableSignatureConfirmation";
+    
+    /**
+     * Whether to set the mustUnderstand flag on an outbound message or not. The default 
+     * setting is "true".
+     * <p/>
+     * The application may set this parameter using the following method:
+     * <pre>
+     * call.setProperty(WSHandlerConstants.MUST_UNDERSTAND, "false");
+     * </pre>
+     */
+    public static final String MUST_UNDERSTAND = "mustUnderstand";
+    
+    /**
+     * Whether to ensure compliance with the Basic Security Profile (BSP) 1.1 or not. The
+     * default value is "true".
+     * <p/>
+     * The application may set this parameter using the following method:
+     * <pre>
+     * call.setProperty(WSHandlerConstants.IS_BSP_COMPLIANT, "false");
+     * </pre>
+     */
+    public static final String IS_BSP_COMPLIANT = "isBSPCompliant";
+    
+    /**
+     * This variable controls whether types other than PasswordDigest or PasswordText
+     * are allowed when processing UsernameTokens. The default value is "false".
+     */
+    public static final String HANDLE_CUSTOM_PASSWORD_TYPES = "handleCustomPasswordTypes";
+    
+    /**
+     * Set the value of this parameter to true to enable strict Username Token password type
+     * handling. The default value is "false".
+     * 
+     * If this parameter is set to true, it throws an exception if the password type of 
+     * the Username Token does not match that of the configured PASSWORD_TYPE parameter.
+     */
+    public static final String PASSWORD_TYPE_STRICT = "passwordTypeStrict";
+    
+    /**
+     * This variable controls whether (wsse) namespace qualified password types are
+     * accepted when processing UsernameTokens. The default value is "false".
+     */
+    public static final String ALLOW_NAMESPACE_QUALIFIED_PASSWORD_TYPES 
+        = "allowNamespaceQualifiedPasswordTypes";
+    
+    /**
+     * Set the value of this parameter to true to treat passwords as binary values
+     * for Username Tokens. The default value is "false".
+     * 
+     * This is needed to properly handle password equivalence for UsernameToken
+     * passwords.  Binary passwords are Base64 encoded so they can be treated as 
+     * strings in most places, but when the password digest is calculated or a key
+     * is derived from the password, the password will be Base64 decoded before 
+     * being used. This is most useful for hashed passwords as password equivalents.
+     */
+    public static final String USE_ENCODED_PASSWORDS = "useEncodedPasswords";
+    
+    /**
+     * This parameter sets whether to use a single certificate or a whole certificate
+     * chain when constructing a BinarySecurityToken used for direct reference in
+     * signature. The default is "true", meaning that only a single certificate is used.
+     */
+    public static final String USE_SINGLE_CERTIFICATE = "useSingleCertificate";
+    
+    /**
+     * This parameter sets whether to use UsernameToken Key Derivation, as defined 
+     * in the UsernameTokenProfile 1.1 specification. The default is "true". If false,
+     * then it falls back to the old behaviour of WSE derived key functionality.
+     */
+    public static final String USE_DERIVED_KEY = "useDerivedKey";
+    
+    /**
+     * This parameter sets whether to use the Username Token derived key for a MAC
+     * or not. The default is "true".
+     */
+    public static final String USE_DERIVED_KEY_FOR_MAC = "useDerivedKeyForMAC";
+    
+    /**
+     * Set whether Timestamps have precision in milliseconds. This applies to the
+     * creation of Timestamps only. The default value is "true".
+     */
+    public static final String TIMESTAMP_PRECISION = "precisionInMilliseconds";
+    
+    /**
+     * Set the value of this parameter to true to enable strict timestamp
+     * handling. The default value is "true".
+     * 
+     * Strict Timestamp handling: throw an exception if a Timestamp contains
+     * an <code>Expires</code> element and the semantics of the request are
+     * expired, i.e. the current time at the receiver is past the expires time.
+     */
+    public static final String TIMESTAMP_STRICT = "timestampStrict";
+    
+    /**
+     * Defines whether to encrypt the symmetric encryption key or not. If true
+     * (the default), the symmetric key used for encryption is encrypted in turn,
+     * and inserted into the security header in an "EncryptedKey" structure. If
+     * set to false, no EncryptedKey structure is constructed.
+     * <p/>
+     * The application may set this parameter using the following method:
+     * <pre>
+     * call.setProperty(WSHandlerConstants.ENC_SYM_ENC_KEY, "false");
+     * </pre>
+     */
+    public static final String ENC_SYM_ENC_KEY = "encryptSymmetricEncryptionKey";
+
+    //
+    // (Non-boolean) Configuration parameters for the actions/processors
+    //
+    
+    /**
+     * Text of the key name that needs to be sent
+     */
+    public static final String ENC_KEY_NAME = "EmbeddedKeyName";
 
     /**
      * Specific parameter for UsernameToken action to define the encoding
@@ -673,37 +703,6 @@ public class WSHandlerConstants {
     public static final String DERIVED_KEY_ITERATIONS = "derivedKeyIterations";
 
     /**
-     * The name of the crypto property file to use for SOAP Encryption.
-     * <p/>
-     * Refer to documentation of {@link #SIG_PROP_FILE}.
-     * <p/>
-     * The application may set this parameter using the following method:
-     * <pre>
-     * call.setProperty(WSHandlerConstants.ENC_PROP_FILE, "myCrypto.properties");
-     * </pre>
-     * However, the parameter in the WSDD deployment file overwrites the
-     * property setting (deployment setting overwrites application setting).
-     * <p/>
-     * If this parameter is not used, but the signature crypto property
-     * file is defined (combined Encryption/Signature action), then the
-     * encryption function uses signature property file. Otherwise the
-     * handler throws an <code>AxisFault</code>.
-     */
-    public static final String ENC_PROP_FILE = "encryptionPropFile";
-    
-    /**
-     * The key that hold the reference of the 
-     * <code>java.util.Properties</code> object holding complete info about 
-     * encryption Crypto implementation. This should contain all information 
-     * that would contain in an equivalent .properties file which includes the 
-     * Crypto implementation class name.
-     * 
-     * Refer to documentation of {@link #DEC_PROP_FILE}.
-     */
-    public final static String ENC_PROP_REF_ID = "encryptionPropRefId";
-
-
-    /**
      * Defines which key identifier type to use. The WS-Security specifications
      * recommends to use the identifier type <code>IssuerSerial</code>. For
      * possible encryption key identifier types refer to
@@ -748,25 +747,8 @@ public class WSHandlerConstants {
      * However, the parameter in the WSDD deployment file overwrites the
      * property setting (deployment setting overwrites application setting).
      */
-    public static final String ENC_KEY_TRANSPORT =
-            "encryptionKeyTransportAlgorithm";
+    public static final String ENC_KEY_TRANSPORT = "encryptionKeyTransportAlgorithm";
     
-    /**
-     * Defines whether to encrypt the symmetric encryption key or not. If true
-     * (the default), the symmetric key used for encryption is encrypted in turn,
-     * and inserted into the security header in an "EncryptedKey" structure. If
-     * set to false, no EncryptedKey structure is constructed.
-     * <p/>
-     * The application may set this parameter using the following method:
-     * <pre>
-     * call.setProperty(WSHandlerConstants.ENC_SYM_ENC_KEY, "false");
-     * </pre>
-     * However, the parameter in the WSDD deployment file overwrites the
-     * property setting (deployment setting overwrites application setting).
-     */
-    public static final String ENC_SYM_ENC_KEY = "encryptSymmetricEncryptionKey";
-    
-
     /**
      * Parameter to define which parts of the request shall be encrypted.
      * <p/>
@@ -811,13 +793,6 @@ public class WSHandlerConstants {
     public static final String ENCRYPTION_PARTS = "encryptionParts";
 
     /**
-     * The name of the SAML Issuer factory property file.
-     * The classloader loads this file. Therefore it must be accessible
-     * via the classpath.
-     */
-    public static final String SAML_PROP_FILE = "samlPropFile";
-
-    /**
      * Time-To-Live is the time difference between creation and expiry time in
      * the WSS Timestamp.
      * The time-to-live in seconds. After this time the SOAP request is
@@ -838,14 +813,32 @@ public class WSHandlerConstants {
      * allowed.
      */
     public static final String TTL_FUTURE_TIMESTAMP = "futureTimeToLive";
-
-    /*
+    
+    //
+    // Internal storage constants
+    //
+    
+    /**
+     * The WSDoAllReceiver handler stores a result <code>List</code>
+     * in this property.
+     * <p/>
+     * The list contains <code>WSHandlerResult</code> objects
+     * for each chained WSDoAllReceiver handler.
+     */
+    public static final String RECV_RESULTS = "RECV_RESULTS";
+    
+    /**
      * internally used property names to store values inside the message context
-     * that must have the same livetime as a message (request/response model).
+     * that must have the same lifetime as a message (request/response model).
      */
     public static final String SEND_SIGV = "_sendSignatureValues_";
-    public static final String SIG_CONF_DONE = "_sigConfDone_";
     
+    /**
+     * 
+     */
+    public static final String SIG_CONF_DONE = "_sigConfDone_";
+
+
     /**
      * Define the parameter values to set the key identifier types. These are:
      * <ul>

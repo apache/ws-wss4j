@@ -173,8 +173,8 @@ public abstract class WSHandler {
          * SIGN action.
          */
         if (wssConfig.isEnableSignatureConfirmation() && !isRequest) {
-            String done = (String) 
-                getProperty(reqData.getMsgContext(), WSHandlerConstants.SIG_CONF_DONE);
+            String done = 
+                (String)getProperty(reqData.getMsgContext(), WSHandlerConstants.SIG_CONF_DONE);
             if (done == null) {
                 wssConfig.getAction(WSConstants.SC).execute(this, WSConstants.SC, doc, reqData);
             }

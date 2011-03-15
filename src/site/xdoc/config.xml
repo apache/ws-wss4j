@@ -161,49 +161,127 @@ The configuration tags for WSHandler Actions are summarised here:
 <th>Tag meaning</th>
 </tr>
 <tr>
-<td>WSHandlerConstants.ACTION</td>
+<td>ACTION</td>
 <td>action</td>
 <td>The action to perform, e.g. WSHandlerConstants.TIMESTAMP</td>
 </tr>
 <tr>
-<td>WSHandlerConstants.NO_SECURITY</td>
+<td>NO_SECURITY</td>
 <td>NoSecurity</td>
 <td>Do not perform any action, do nothing.</td>
 </tr>
 <tr>
-<td>WSHandlerConstants.USERNAME_TOKEN</td>
+<td>USERNAME_TOKEN</td>
 <td>UsernameToken</td>
 <td>Perform a UsernameToken action.</td>
 </tr>
 <tr>
-<td>WSHandlerConstants.SAML_TOKEN_UNSIGNED</td>
+<td>SAML_TOKEN_UNSIGNED</td>
 <td>SAMLTokenUnsigned</td>
 <td>Perform an unsigned SAML Token action.</td>
 </tr>
 <tr>
-<td>WSHandlerConstants.SAML_TOKEN_SIGNED</td>
+<td>SAML_TOKEN_SIGNED</td>
 <td>SAMLTokenSigned</td>
 <td>Perform a signed SAML Token action.</td>
 </tr>
 <tr>
-<td>WSHandlerConstants.SIGNATURE</td>
+<td>SIGNATURE</td>
 <td>Signature</td>
 <td>Perform a signature action.</td>
 </tr>
 <tr>
-<td>WSHandlerConstants.ENCRYPT</td>
+<td>ENCRYPT</td>
 <td>Encrypt</td>
 <td>Perform an encryption action.</td>
 </tr>
 <tr>
-<td>WSHandlerConstants.TIMESTAMP</td>
+<td>TIMESTAMP</td>
 <td>Timestamp</td>
 <td>Perform a Timestamp action.</td>
 </tr>
 <tr>
-<td>WSHandlerConstants.SIGN_WITH_UT_KEY</td>
+<td>SIGN_WITH_UT_KEY</td>
 <td>UsernameTokenSignature</td>
 <td>Perform a .NET specific signature using a Username Token action.</td>
+</tr>
+</table>
+<p>
+The configuration tags for WSHandler properties that are configured via a boolean parameter 
+(i.e. "true" or "false") are summarised here:
+</p>
+<table name="WSHandler boolean configuration tags">
+<tr>
+<th>Tag name</th>
+<th>Tag value</th>
+<th>Tag meaning</th>
+</tr>
+<tr>
+<td>ENABLE_SIGNATURE_CONFIRMATION</td>
+<td>enableSignatureConfirmation</td>
+<td>Whether to enable signature confirmation or not. Default is: "false".</td>
+</tr>
+<tr>
+<td>MUST_UNDERSTAND</td>
+<td>mustUnderstand</td>
+<td>Set the outbound MustUnderstand flag or not. Default is: "true".</td>
+</tr>
+<tr>
+<td>IS_BSP_COMPLIANT</td>
+<td>isBSPCompliant</td>
+<td>Whether to ensure compliance with the BSP 1.1 spec or not. Default is: "true".</td>
+</tr>
+<tr>
+<td>HANDLE_CUSTOM_PASSWORD_TYPES</td>
+<td>handleCustomPasswordTypes</td>
+<td>Whether to allow non-standard password types in a UsernameToken. Default is: "false".</td>
+</tr>
+<tr>
+<td>PASSWORD_TYPE_STRICT</td>
+<td>passwordTypeStrict</td>
+<td>Whether to enable strict Username Token password type handling. Default is: "false".</td>
+</tr>
+<tr>
+<td>ALLOW_NAMESPACE_QUALIFIED_PASSWORD_TYPES</td>
+<td>allowNamespaceQualifiedPasswordTypes</td>
+<td>Whether (wsse) namespace qualified password types are accepted when processing UsernameTokens. 
+Default is: "false".</td>
+</tr>
+<tr>
+<td>USE_ENCODED_PASSWORDS</td>
+<td>useEncodedPasswords</td>
+<td>Set whether to treat passwords as binary values for Username Tokens. Default is: "false".</td>
+</tr>
+<tr>
+<td>USE_SINGLE_CERTIFICATE</td>
+<td>useSingleCertificate</td>
+<td>Whether to use a single certificate or a whole certificate chain to construct a 
+BinarySecurityToken. Default is: "true".</td>
+</tr>
+<tr>
+<td>USE_DERIVED_KEY</td>
+<td>useDerivedKey</td>
+<td>Whether to use the standard UsernameToken Key Derivation algorithm. Default is: "true".</td>
+</tr>
+<tr>
+<td>USE_DERIVED_KEY_FOR_MAC</td>
+<td>useDerivedKeyForMAC</td>
+<td>Whether to use the Username Token derived key for a MAC. Default is: "true".</td>
+</tr>
+<tr>
+<td>TIMESTAMP_PRECISION</td>
+<td>precisionInMilliseconds</td>
+<td>Set whether outbound timestamps have precision in milliseconds. Default is: "true".</td>
+</tr>
+<tr>
+<td>TIMESTAMP_STRICT</td>
+<td>timestampStrict</td>
+<td>Set whether to enable strict Timestamp handling. Default is: "true".</td>
+</tr>
+<tr>
+<td>ENC_SYM_ENC_KEY</td>
+<td>encryptSymmetricEncryptionKey</td>
+<td>Set whether to encrypt the symmetric encryption key or not. Default is: "true".</td>
 </tr>
 </table>
 </subsection>
