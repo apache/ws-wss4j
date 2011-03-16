@@ -92,13 +92,12 @@ public class WSHandlerConstants {
     public static final String SIGN_WITH_UT_KEY = "UsernameTokenSignature";
     
     //
-    // Users and Role properties
+    // User properties
     //
 
     /**
-     * The actor name of the <code>wsse:Security</code> header.
-     * <p/>
-     * If this parameter is omitted, the actor name is not set.
+     * The actor or role name of the <code>wsse:Security</code> header. If this parameter 
+     * is omitted, the actor name is not set.
      * <p/>
      * The value of the actor or role has to match the receiver's setting
      * or may contain standard values.
@@ -107,19 +106,11 @@ public class WSHandlerConstants {
      * <pre>
      * call.setProperty(WSHandlerConstants.ACTOR, "ActorName");
      * </pre>
-     * However, the parameter in the WSDD deployment file overwrites the
-     * property setting (deployment setting overwrites application setting).
      */
     public static final String ACTOR = "actor";
 
     /**
-     * The role name of the <code>wsse:Security</code> header.
-     * This is used for SOAP 1.2. Refer also to {@link #ACTOR}.
-     */
-    public static final String ROLE = "role";
-
-    /**
-     * The user's name. It is used differently by the WS Security functions.
+     * The user's name. It is used differently by each of the WS-Security functions.
      * <ul>
      * <li>The <i>UsernameToken</i> function sets this name in the
      * <code>UsernameToken</code>.
@@ -133,36 +124,12 @@ public class WSHandlerConstants {
      * is not used.
      * </li>
      * </ul>
-     * It is also possible to set the user's name and the according password
-     * via the call function, for example:
-     * <pre>
-     * ...
-     * call.setUsername("name");
-     * call.setPassword("WSS4Java");
-     * ...
-     * </pre>
-     * The user parameter in the deployment descritor (WSDD) file overwrites
-     * the application's setting.
-     * </p>
-     * For an additional way to set the password refer to
-     * {@link #PW_CALLBACK_CLASS} and {@link #PW_CALLBACK_REF}.
-     * <p/>
-     * If the security functions uses the username from the message context, it
-     * clears the username from the message context
-     * after they copied it. This prevents sending of the username in the
-     * HTTP header.
-     * <p/>
-     * In this case the HTTP authentication mechansisms do <b>not</b> work
-     * anymore. User authentication shall be done via the username token or
-     * the certificate verification of the signature certificate.
      */
     public static final String USER = "user";
     
     /**
-     * The user's name for encryption.
-     * <p/>
-     * The encryption functions uses the public key of this user's certificate
-     * to encrypt the generated symmetric key.
+     * The user's name for encryption. The encryption functions use the public key of 
+     * this user's certificate to encrypt the generated symmetric key.
      * <p/>
      * If this parameter is not set, then the encryption
      * function falls back to the {@link #USER} parameter to get the
@@ -170,31 +137,17 @@ public class WSHandlerConstants {
      * <p/>
      * If <b>only</b> encryption of the SOAP body data is requested,
      * it is recommended to use this parameter to define the username.
-     * The application can then use the standard user and password
-     * functions (see example at {@link #USER} to enable HTTP authentication
-     * functions.
-     * <p/>
-     * Encryption only does not authenticate a user / sender, therefore it
-     * does not need a password.
-     * <p/>
-     * Placing the username of the encryption certificate in the WSDD is not
-     * a security risk, because the public key of that certificate is used
-     * only.
      * <p/>
      * The application may set this parameter using the following method:
      * <pre>
-     * call.setProperty(WSHandlerConstants.ENCYRPTION_USER, "encryptionUser");
+     * call.setProperty(WSHandlerConstants.ENCRYPTION_USER, "encryptionUser");
      * </pre>
-     * However, the parameter in the WSDD deployment file overwrites the
-     * property setting (deployment setting overwrites application setting).
      */
     public static final String ENCRYPTION_USER = "encryptionUser";
     
     /**
-     * The user's name for signature.
-     * <p/>
-     * This name is used as the alias name in the keystore to get user's
-     * certificate and private key to perform signing.
+     * The user's name for signature. This name is used as the alias name in the keystore 
+     * to get user's certificate and private key to perform signing.
      * <p/>
      * If this parameter is not set, then the signature
      * function falls back to the {@link #USER} parameter.
@@ -203,8 +156,6 @@ public class WSHandlerConstants {
      * <pre>
      * call.setProperty(WSHandlerConstants.SIGNATURE_USER, "signatureUser");
      * </pre>
-     * However, the parameter in the WSDD deployment file overwrites the
-     * property setting (deployment setting overwrites application setting).
      */
     public static final String SIGNATURE_USER = "signatureUser";
 

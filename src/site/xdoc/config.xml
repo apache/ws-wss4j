@@ -207,6 +207,42 @@ The configuration tags for WSHandler Actions are summarised here:
 </tr>
 </table>
 <p>
+The configuration tags for WSHandler user properties are summarised here:
+</p>
+<table name="WSHandler User configuration tags">
+<tr>
+<th>Tag name</th>
+<th>Tag value</th>
+<th>Tag meaning</th>
+</tr>
+<tr>
+<td>ACTOR</td>
+<td>"actor"</td>
+<td>The actor or role name of the wsse:Security header.</td>
+</tr>
+<tr>
+<td>USER</td>
+<td>"user"</td>
+<td>The user's name. Consult the Javadoc for an explanation of this property.</td>
+</tr>
+<tr>
+<td>ENCRYPTION_USER</td>
+<td>"encryptionUser"</td>
+<td>The user's name for encryption. Consult the Javadoc for an explanation of this property.</td>
+</tr>
+<tr>
+<td>SIGNATURE_USER</td>
+<td>"signatureUser"</td>
+<td>The user's name for signature. Consult the Javadoc for an explanation of this property.</td>
+</tr>
+<tr>
+<td>USE_REQ_SIG_CERT</td>
+<td>"useReqSigCert"</td>
+<td>A special value for ENCRYPTION_USER. Consult the Javadoc for an explanation of this
+property.</td>
+</tr>
+</table>
+<p>
 The configuration tags for WSHandler properties that are configured via a boolean parameter 
 (i.e. "true" or "false") are summarised here:
 </p>
