@@ -59,6 +59,7 @@ public class BSTKerberosTest extends org.junit.Assert {
     private Crypto crypto = null;
     
     public BSTKerberosTest() throws Exception {
+        WSSConfig.init();
         crypto = CryptoFactory.getInstance();
     }
 

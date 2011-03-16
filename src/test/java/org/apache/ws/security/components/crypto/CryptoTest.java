@@ -23,6 +23,7 @@ import java.io.InputStream;
 import java.security.KeyStore;
 
 import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.common.CustomCrypto;
@@ -33,6 +34,10 @@ import org.apache.ws.security.util.Loader;
 import org.w3c.dom.Document;
 
 public class CryptoTest extends org.junit.Assert {
+    
+    public CryptoTest() {
+        WSSConfig.init();
+    }
     
     @org.junit.Test
     public void testCrypto() throws Exception {

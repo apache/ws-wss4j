@@ -24,6 +24,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.SOAPConstants;
 import org.apache.ws.security.WSEncryptionPart;
 import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.common.SOAPUtil;
@@ -46,6 +47,7 @@ public class STRSignatureTest extends org.junit.Assert {
     private Crypto crypto = null;
     
     public STRSignatureTest() throws Exception {
+        WSSConfig.init();
         crypto = CryptoFactory.getInstance("wss40.properties");
     }
 

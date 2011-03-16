@@ -61,6 +61,7 @@ public class SymmetricSignatureTest extends org.junit.Assert implements Callback
     private Crypto crypto = null;
     
     public SymmetricSignatureTest() throws Exception {
+        WSSConfig.init();
         crypto = CryptoFactory.getInstance();
     }
 

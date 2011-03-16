@@ -21,6 +21,7 @@ package org.apache.ws.security.message;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.common.SOAPUtil;
@@ -40,6 +41,7 @@ public class SKISignatureTest extends org.junit.Assert {
     private Crypto crypto = null;
     
     public SKISignatureTest() throws Exception {
+        WSSConfig.init();
         crypto = CryptoFactory.getInstance("wss40.properties");
     }
 

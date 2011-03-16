@@ -49,6 +49,7 @@ public class CustomActionProcessorTest extends org.junit.Assert {
     private Crypto crypto = null;
     
     public CustomActionProcessorTest() throws Exception {
+        WSSConfig.init();
         crypto = CryptoFactory.getInstance();
     }
 

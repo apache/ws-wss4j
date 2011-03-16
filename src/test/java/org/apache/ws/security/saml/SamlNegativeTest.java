@@ -22,6 +22,7 @@ package org.apache.ws.security.saml;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
@@ -69,6 +70,7 @@ public class SamlNegativeTest extends org.junit.Assert {
     private Crypto userCrypto = CryptoFactory.getInstance("wss40.properties");
     
     public SamlNegativeTest() throws Exception {
+        WSSConfig.init();
         // Load the issuer keystore
         issuerCrypto = new Merlin();
         KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());

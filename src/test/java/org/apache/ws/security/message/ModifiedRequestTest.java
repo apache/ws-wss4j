@@ -23,6 +23,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSEncryptionPart;
+import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.common.KeystoreCallbackHandler;
@@ -60,6 +61,7 @@ public class ModifiedRequestTest extends org.junit.Assert {
     private Crypto crypto = null;
     
     public ModifiedRequestTest() throws Exception {
+        WSSConfig.init();
         crypto = CryptoFactory.getInstance();
     }
 

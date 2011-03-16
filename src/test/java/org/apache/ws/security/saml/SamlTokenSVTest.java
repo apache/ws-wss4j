@@ -59,6 +59,7 @@ public class SamlTokenSVTest extends org.junit.Assert {
     private Crypto crypto = null;
     
     public SamlTokenSVTest() throws Exception {
+        WSSConfig.init();
         crypto = CryptoFactory.getInstance("crypto.properties");
     }
     

@@ -54,6 +54,7 @@ public class CertificateStoreTest extends org.junit.Assert {
         cryptoType.setAlias("wss40");
         X509Certificate[] certs = senderCrypto.getX509Certificates(cryptoType);
         receiverCrypto = new CertificateStore(certs);
+        WSSConfig.init();
     }
 
     /**

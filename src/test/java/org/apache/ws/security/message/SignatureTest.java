@@ -55,6 +55,7 @@ public class SignatureTest extends org.junit.Assert {
     private Crypto crypto = null;
     
     public SignatureTest() throws Exception {
+        WSSConfig.init();
         crypto = CryptoFactory.getInstance();
     }
 

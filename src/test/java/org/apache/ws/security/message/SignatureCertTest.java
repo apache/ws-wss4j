@@ -74,6 +74,7 @@ public class SignatureCertTest extends org.junit.Assert {
     private Crypto cryptoCA = null;
     
     public SignatureCertTest() throws Exception {
+        WSSConfig.init();
         crypto = CryptoFactory.getInstance("wss40.properties");
         cryptoCA = CryptoFactory.getInstance("wss40CA.properties");
     }

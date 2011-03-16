@@ -44,6 +44,7 @@ public class SignatureKeyValueTest extends org.junit.Assert {
     private Crypto crypto = null;
     
     public SignatureKeyValueTest() throws Exception {
+        WSSConfig.init();
         crypto = CryptoFactory.getInstance("wss40.properties");
     }
 
