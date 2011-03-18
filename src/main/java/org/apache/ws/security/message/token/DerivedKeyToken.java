@@ -73,6 +73,7 @@ public class DerivedKeyToken {
     protected Element elementNonce = null;
     
     private String ns;
+    private boolean bspCompliant = true;
     
     /**
      * This will create an empty DerivedKeyToken
@@ -96,7 +97,7 @@ public class DerivedKeyToken {
             doc.createElementNS(ns, "wsc:" + ConversationConstants.DERIVED_KEY_TOKEN_LN);
         WSSecurityUtil.setNamespace(element, ns, ConversationConstants.WSC_PREFIX);
     }
-
+    
     /**
      * This will create a DerivedKeyToken object with the given DerivedKeyToken element
      *
@@ -104,8 +105,20 @@ public class DerivedKeyToken {
      * @throws WSSecurityException If the element is not a derived key token
      */
     public DerivedKeyToken(Element elem) throws WSSecurityException {
+        this(elem, true);
+    }
+
+    /**
+     * This will create a DerivedKeyToken object with the given DerivedKeyToken element
+     *
+     * @param elem The DerivedKeyToken DOM element
+     * @param bspCompliant whether the DerivedKeyToken processing complies with the BSP spec 
+     * @throws WSSecurityException If the element is not a derived key token
+     */
+    public DerivedKeyToken(Element elem, boolean bspCompliant) throws WSSecurityException {
         log.debug("DerivedKeyToken: created : element constructor");
         element = elem;
+        this.bspCompliant = bspCompliant;
         QName el = new QName(element.getNamespaceURI(), element.getLocalName());
         
         if (!(el.equals(ConversationConstants.DERIVED_KEY_TOKEN_QNAME_05_02) ||
@@ -181,7 +194,7 @@ public class DerivedKeyToken {
      */
     public SecurityTokenReference getSecurityTokenReference() throws WSSecurityException {
         if (elementSecurityTokenReference != null) {
-            return new SecurityTokenReference(elementSecurityTokenReference);
+            return new SecurityTokenReference(elementSecurityTokenReference, bspCompliant);
         }
         return null;
     }
@@ -293,7 +306,7 @@ public class DerivedKeyToken {
         if (elementLength != null) {
             return Integer.parseInt(getFirstNode(elementLength).getData());
         }
-        return -1;
+        return 32;
     }
 
     /**
@@ -324,7 +337,7 @@ public class DerivedKeyToken {
         if (elementOffset != null) {
             return Integer.parseInt(getFirstNode(elementOffset).getData());
         }
-        return -1;
+        return 0;
     }
 
     /**

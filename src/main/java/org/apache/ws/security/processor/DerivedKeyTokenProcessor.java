@@ -44,17 +44,15 @@ public class DerivedKeyTokenProcessor implements Processor {
         RequestData data, 
         WSDocInfo wsDocInfo
     ) throws WSSecurityException {
-        
         // Deserialize the DKT
-        DerivedKeyToken dkt = new DerivedKeyToken(elem);
+        DerivedKeyToken dkt = new DerivedKeyToken(elem, data.getWssConfig().isWsiBSPCompliant());
         byte[] secret = null;
         Element secRefElement = dkt.getSecurityTokenReferenceElement();
         if (secRefElement != null) {
             STRParser strParser = new DerivedKeyTokenSTRParser();
-            strParser.parseSecurityTokenReference(secRefElement, 
-                                                  data,
-                                                  wsDocInfo, null);
-            
+            strParser.parseSecurityTokenReference(
+                secRefElement, data, wsDocInfo, null
+            );
             secret = strParser.getSecretKey();
         } else {
             throw new WSSecurityException(WSSecurityException.FAILED_CHECK, "noReference");
@@ -65,20 +63,15 @@ public class DerivedKeyTokenProcessor implements Processor {
             throw new WSSecurityException("Missing wsc:Nonce value");
         }
         int length = dkt.getLength();
-        if (length > 0) {
-            byte[] keyBytes = dkt.deriveKey(length, secret);
-            WSSecurityEngineResult result =
-                new WSSecurityEngineResult(
-                    WSConstants.DKT, null, keyBytes, null
-                );
-            wsDocInfo.addTokenElement(elem);
-            result.put(WSSecurityEngineResult.TAG_ID, dkt.getID());
-            result.put(WSSecurityEngineResult.TAG_DERIVED_KEY_TOKEN, dkt);
-            result.put(WSSecurityEngineResult.TAG_SECRET, secret);
-            wsDocInfo.addResult(result);
-            return java.util.Collections.singletonList(result);
-        }
-        return new java.util.ArrayList<WSSecurityEngineResult>(0);
+        byte[] keyBytes = dkt.deriveKey(length, secret);
+        WSSecurityEngineResult result =
+            new WSSecurityEngineResult(WSConstants.DKT, null, keyBytes, null);
+        wsDocInfo.addTokenElement(elem);
+        result.put(WSSecurityEngineResult.TAG_ID, dkt.getID());
+        result.put(WSSecurityEngineResult.TAG_DERIVED_KEY_TOKEN, dkt);
+        result.put(WSSecurityEngineResult.TAG_SECRET, secret);
+        wsDocInfo.addResult(result);
+        return java.util.Collections.singletonList(result);
     }
 
 
