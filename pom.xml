@@ -413,7 +413,7 @@
                     <artifactId>bcprov-jdk15</artifactId>
                 </exclusion>
                 <exclusion>
-                    <groupId>org.apache.commons.ssl</groupId>
+                    <groupId>ca.juliusdavies</groupId>
                     <artifactId>not-yet-commons-ssl</artifactId>
                 </exclusion>
                 <exclusion>
@@ -421,23 +421,15 @@
                     <artifactId>jcip-annotations</artifactId>
                 </exclusion>
                 <exclusion>
-                    <groupId>org.apache.xerces</groupId>
-                    <artifactId>xml-apis</artifactId>
+                    <groupId>xml-resolver</groupId>
+                    <artifactId>xml-resolver</artifactId>
                 </exclusion>
                 <exclusion>
-                    <groupId>org.apache.xerces</groupId>
+                    <groupId>xerces</groupId>
                     <artifactId>xercesImpl</artifactId>
                 </exclusion>
                 <exclusion>
-                    <groupId>org.apache.xerces</groupId>
-                    <artifactId>resolver</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.xerces</groupId>
-                    <artifactId>serializer</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.xalan</groupId>
+                    <groupId>xalan</groupId>
                     <artifactId>xalan</artifactId>
                 </exclusion>
                 <exclusion>
@@ -452,13 +444,9 @@
                     <groupId>commons-lang</groupId>
                     <artifactId>commons-lang</artifactId>
                 </exclusion>
-                 <exclusion>
+                <exclusion>
                     <groupId>commons-collections</groupId>
                     <artifactId>commons-collections</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>jargs</groupId>
-                    <artifactId>jargs</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -536,21 +524,6 @@
         </plugins>
     </reporting>
     
-    <repositories>
-        <repository>
-            <id>shibboleth</id>
-            <name>Shibboleth Repository</name>
-            <url>http://shibboleth.internet2.edu/downloads/maven2/</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-        </repository>
-    </repositories>
-
-
     <distributionManagement>
         <repository>
             <id>apache-repo</id>
