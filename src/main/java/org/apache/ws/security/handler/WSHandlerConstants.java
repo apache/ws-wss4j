@@ -175,69 +175,31 @@ public class WSHandlerConstants {
     //
 
     /**
-     * The Axis WSS4J handlers provide several ways to get the password required
-     * to construct a username token or to sign a message.
-     * In addition the callback class may check if a username/password
-     * combination is valid. Refer to the documentation of 
-     * {@link org.apache.ws.security.WSPasswordCallback} for more information
-     * about this feature.
-     * <ul>
-     * <li> A class that implements a callback interface (see below). The
-     * handler loads this class and calls the callback method. This
-     * class must have a public default constructor with not parameters.
-     * </li>
-     * <li> The application (or a preceeding handler) sets a reference to an
-     * object that implements the callback interface
-     * </li>
-     * <li> The application sets the password directly using the
-     * <code>setPassword</code> function of the <code>Call</code>.
-     * </ul>
-     * The callback class or callback object shall implement specific password
-     * getter methods, for example reading a database or directory.
-     * <p/>
-     * The handler first checks if it can get a the password via a callback
-     * class. If that fails it checks if it can get the password from the
-     * object reference, if that also fails the handler tries the password
-     * property.
-     * <p/>
-     * The following parameter defines a class that implements a callback
-     * handler interface. The handler loads the class and calls the callback
-     * handler method to get the password. The callback
-     * class needs to implement the
-     * {@link javax.security.auth.callback.CallbackHandler} interface.
-     * <p/>
+     * This tag refers to the CallbackHandler implementation class used to obtain passwords. 
+     * The value of this tag must be the class name of a 
+     * {@link javax.security.auth.callback.CallbackHandler} instance.
+     * </p>
      * The callback function
-     * {@link javax.security.auth.callback.CallbackHandler#handle(javax.security.auth.callback.Callback[])}
-     * gets an array of {@link org.apache.ws.security.WSPasswordCallback}
-     * objects. Only the first entry of the array is used. This object
-     * contains the username/keyname as identifier. The callback handler must
-     * set the password or key associated with this identifier before it returns.
+     * {@link javax.security.auth.callback.CallbackHandler#handle(
+     * javax.security.auth.callback.Callback[])} gets an array of 
+     * {@link org.apache.ws.security.WSPasswordCallback} objects. Only the first entry of the 
+     * array is used. This object contains the username/keyname as identifier. The callback
+     * handler must set the password or key associated with this identifier before it returns.
      * <p/>
      * The application may set this parameter using the following method:
      * <pre>
      * call.setProperty(WSHandlerConstants.PW_CALLBACK_CLASS, "PWCallbackClass");
      * </pre>
-     * However, the parameter in the WSDD deployment file overwrites the
-     * property setting (deployment setting overwrites application setting).
-     * <p/>
-     * Refer also to comment in {@link #USER} about HTTP authentication
-     * functions.
      */
     public static final String PW_CALLBACK_CLASS = "passwordCallbackClass";
     
     /**
-     * An application may set an object reference to an object that implements
-     * the {@link javax.security.auth.callback.CallbackHandler} interface.
-     * Only the application can set this property using:
-     * <pre>
-     * call.setProperty(WSHandlerConstants.PW_CALLBACK_REF, anPWCallbackObject);
-     * </pre>
-     * Refer to {@link #PW_CALLBACK_CLASS} for further information about
-     * password callback handling and the priority of the different
-     * methods.
-     * <p/>
-     * Note: every handler that preceeds this handler in the chain can set
-     * this property too. This may be useful on the server side.
+     * This tag refers to the CallbackHandler implementation object used to obtain
+     * passwords. The value of this tag must be a
+     * {@link javax.security.auth.callback.CallbackHandler} instance.
+     * </p>
+     * Refer to {@link #PW_CALLBACK_CLASS} for further information about password callback 
+     * handling.
      */
     public static final String PW_CALLBACK_REF = "passwordCallbackRef";
     
@@ -256,22 +218,22 @@ public class WSHandlerConstants {
     public static final String SAML_CALLBACK_REF = "samlCallbackRef";
 
     /**
-     * This parameter works in the same way as {@link #PW_CALLBACK_CLASS} but
-     * the Axis WSS4J handler uses it to get the key associated with a key name.
+     * This tag refers to the CallbackHandler implementation class used to get the key
+     * associated with a key name. The value of this tag must be the class name of a 
+     * {@link javax.security.auth.callback.CallbackHandler} instance.
      */
     public static final String ENC_CALLBACK_CLASS = "EmbeddedKeyCallbackClass";
 
     /**
-     * This parameter works in the same way as {@link #PW_CALLBACK_REF} but
-     * the Axis WSS4J handler uses it to get the key associated with a key name.
+     * This tag refers to the  CallbackHandler implementation object used to get the key
+     * associated with a key name. The value of this tag must be a
+     * {@link javax.security.auth.callback.CallbackHandler} instance.
      */
     public static final String ENC_CALLBACK_REF = "EmbeddedKeyCallbackRef";
     
     /**
-     * The name of the crypto property file to use for SOAP Signature.
-     * <p/>
-     * The classloader loads this file. Therefore it must be accessible
-     * via the classpath.
+     * The path of the crypto property file to use for Signature. The classloader loads this 
+     * file. Therefore it must be accessible via the classpath.
      * <p/>
      * To locate the implementation of the
      * {@link org.apache.ws.security.components.crypto.Crypto Crypto}
@@ -285,49 +247,13 @@ public class WSHandlerConstants {
      * </pre>
      * The other contents of the property file depend on the implementation
      * of the {@link org.apache.ws.security.components.crypto.Crypto Crypto}
-     * interface implementation.
-     * <p/>
-     * The property file of the standard implementation
-     * {@link org.apache.ws.security.components.crypto.Merlin} uses
-     * the following properties:
-     * <pre>
-     * org.apache.ws.security.crypto.provider
-     * org.apache.ws.security.crypto.merlin.file
-     * org.apache.ws.security.crypto.merlin.keystore.type
-     * org.apache.ws.security.crypto.merlin.keystore.provider
-     * org.apache.ws.security.crypto.merlin.keystore.password
-     * org.apache.ws.security.crypto.merlin.keystore.alias
-     * org.apache.ws.security.crypto.merlin.cert.provider
-     * </pre>
-     * The entries are:
-     * <ul>
-     * <li> <code>org.apache.ws.security.crypto.provider</code> see
-     * description above
-     * </li>
-     * <li><code>org.apache.ws.security.crypto.merlin.file</code>
-     * The path to the keystore file. At first the classloader tries to load
-     * this file, if this fails the implementations performs a file system
-     * lookup.
-     * </li>
-     * <li><code>org.apache.ws.security.crypto.merlin.keystore.type</code>
-     * The keystore type, for example <code>JKS</code> for the Java key store.
-     * Other keystore type, such as <code>pkcs12</code> are also possible but depend
-     * on the actual <code>Crypto</code> implementation.
-     * </li>
-     * <li><code>org.apache.ws.security.crypto.merlin.keystore.password</code>
-     * The password to read the keystore. If this property is not set, then
-     * the <code>pwcallback</code>property must be defined.
-     * </li>
-     * </ul>
+     * interface. Please see the WSS4J website for more information on the Merlin property 
+     * tags and values.
+     * </p>
      * The application may set this parameter using the following method:
      * <pre>
      * call.setProperty(WSHandlerConstants.SIG_PROP_FILE, "myCrypto.properties");
      * </pre>
-     * However, the parameter in the WSDD deployment file overwrites the
-     * property setting (deployment setting overwrites application setting).
-     * <p/>
-     * If a property file is not set and a signature is requested,
-     * the handler throws an <code>AxisFault</code>.
      */
     public static final String SIG_PROP_FILE = "signaturePropFile";
 
