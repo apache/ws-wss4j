@@ -19,6 +19,7 @@ import org.swssf.impl.processor.input.SecurityHeaderInputProcessor;
 import org.swssf.securityEvent.*;
 
 import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 
 /**

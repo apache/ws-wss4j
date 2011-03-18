@@ -16,15 +16,18 @@ package org.swssf.impl.processor.input;
 
 import org.swssf.ext.*;
 
+import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 import java.util.ArrayDeque;
+import java.util.Deque;
 
 /**
  * Processor for the Security-Header XML Structure.
- * This processor instantiates more processors on demand 
+ * This processor instantiates more processors on demand
+ *
  * @author $Author: giger $
  * @version $Revision: 281 $ $Date: 2011-01-04 21:15:27 +0100 (Tue, 04 Jan 2011) $
  */
@@ -33,6 +36,7 @@ public class SecurityHeaderInputProcessor extends AbstractInputProcessor {
     private ArrayDeque<XMLEvent> xmlEventList = new ArrayDeque<XMLEvent>();
     private int eventCount = 0;
     private int countOfEventsToResponsibleSecurityHeader = 0;
+    private int startIndexForProcessor = 0;
 
     public SecurityHeaderInputProcessor(SecurityProperties securityProperties) {
         super(securityProperties);
@@ -71,9 +75,7 @@ public class SecurityHeaderInputProcessor extends AbstractInputProcessor {
 
                 } else if (subInputProcessorChain.getDocumentContext().getDocumentLevel() == 4
                         && subInputProcessorChain.getDocumentContext().isInSecurityHeader()) {
-                    //we are in the security header and the depth is +1, so every child
-                    //element should have a responsible processor:
-                    engageProcessor(subInputProcessorChain, startElement, getSecurityProperties());
+                    startIndexForProcessor = eventCount - 1;
                 }
             }
 
@@ -99,6 +101,11 @@ public class SecurityHeaderInputProcessor extends AbstractInputProcessor {
 
                     //return first event now;
                     return xmlEventList.pollLast();
+                } else if (subInputProcessorChain.getDocumentContext().getDocumentLevel() == 3
+                        && subInputProcessorChain.getDocumentContext().isInSecurityHeader()) {
+                    //we are in the security header and the depth is +1, so every child
+                    //element should have a responsible processor:
+                    engageSecurityHeaderHandler(subInputProcessorChain, getSecurityProperties(), xmlEventList, startIndexForProcessor, endElement.getName());
                 }
             }
 
@@ -110,17 +117,17 @@ public class SecurityHeaderInputProcessor extends AbstractInputProcessor {
     //todo move this method. DecryptProcessor should not have a dependency to this processor
     //this must be configurable in a xml file. Create a class that looks up the responsible processor
 
-    public static void engageProcessor(InputProcessorChain inputProcessorChain, StartElement startElement, SecurityProperties securityProperties) {
-        if (startElement.getName().equals(Constants.TAG_wsse_BinarySecurityToken)) {
-            inputProcessorChain.addProcessor(new BinarySecurityTokenInputProcessor(securityProperties, startElement));
-        } else if (startElement.getName().equals(Constants.TAG_xenc_EncryptedKey)) {
-            inputProcessorChain.addProcessor(new EncryptedKeyInputProcessor(securityProperties, startElement));
-        } else if (startElement.getName().equals(Constants.TAG_dsig_Signature)) {
-            inputProcessorChain.addProcessor(new SignatureInputProcessor(securityProperties, startElement));
-        } else if (startElement.getName().equals(Constants.TAG_wsu_Timestamp)) {
-            inputProcessorChain.addProcessor(new TimestampInputProcessor(securityProperties, startElement));
-        } else if (startElement.getName().equals(Constants.TAG_xenc_ReferenceList)) {
-            inputProcessorChain.addProcessor(new ReferenceListInputProcessor(securityProperties, startElement));
+    private static void engageSecurityHeaderHandler(InputProcessorChain inputProcessorChain, SecurityProperties securityProperties, Deque eventQueue, int index, QName elementName) throws WSSecurityException, XMLStreamException {
+        if (elementName.equals(Constants.TAG_wsse_BinarySecurityToken)) {
+            new BinarySecurityTokenInputHandler(inputProcessorChain, securityProperties, eventQueue, index);
+        } else if (elementName.equals(Constants.TAG_xenc_EncryptedKey)) {
+            new EncryptedKeyInputHandler(inputProcessorChain, securityProperties, eventQueue, index);
+        } else if (elementName.equals(Constants.TAG_dsig_Signature)) {
+            new SignatureInputHandler(inputProcessorChain, securityProperties, eventQueue, index);
+        } else if (elementName.equals(Constants.TAG_wsu_Timestamp)) {
+            new TimestampInputHandler(inputProcessorChain, securityProperties, eventQueue, index);
+        } else if (elementName.equals(Constants.TAG_xenc_ReferenceList)) {
+            new ReferenceListInputHandler(inputProcessorChain, securityProperties, eventQueue, index);
         }
     }
 

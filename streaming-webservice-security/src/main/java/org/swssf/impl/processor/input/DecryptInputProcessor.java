@@ -14,6 +14,7 @@
  */
 package org.swssf.impl.processor.input;
 
+import org.apache.commons.codec.binary.Base64OutputStream;
 import org.swssf.config.JCEAlgorithmMapper;
 import org.swssf.ext.*;
 import org.swssf.impl.EncryptionPartDef;
@@ -21,7 +22,6 @@ import org.swssf.impl.SecurityTokenFactory;
 import org.swssf.impl.util.IVSplittingOutputStream;
 import org.swssf.impl.util.ReplaceableOuputStream;
 import org.swssf.securityEvent.*;
-import org.apache.commons.codec.binary.Base64OutputStream;
 import org.w3._2001._04.xmlenc_.EncryptedDataType;
 import org.w3._2001._04.xmlenc_.ReferenceList;
 import org.w3._2001._04.xmlenc_.ReferenceType;
@@ -47,7 +47,8 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * Processor for decryption of EncryptedData XML structures  
+ * Processor for decryption of EncryptedData XML structures
+ *
  * @author $Author: giger $
  * @version $Revision: 281 $ $Date: 2011-01-04 21:15:27 +0100 (Tue, 04 Jan 2011) $
  */
@@ -55,6 +56,11 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
 
     private ReferenceList referenceList;
     private EncryptedDataType currentEncryptedDataType;
+
+    //todo static final init or better: hardcoded:
+    //use a unique prefix; the prefix must start with a letter by spec!:
+    private final String uuid = "a" + UUID.randomUUID().toString().replaceAll("-", "");
+    private final QName wrapperElementName = new QName("http://dummy", "dummy", uuid);
 
     public DecryptInputProcessor(ReferenceList referenceList, SecurityProperties securityProperties) {
         super(securityProperties);
@@ -81,6 +87,7 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
     public XMLEvent processNextHeaderEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, WSSecurityException {
         XMLEvent xmlEvent = inputProcessorChain.processHeaderEvent();
         return processEvent(xmlEvent, inputProcessorChain, true);
+        //return xmlEvent;
     }
 
     @Override
@@ -135,7 +142,7 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
                                     inputProcessorChain.getSecurityContext().registerSecurityEvent(contentEncryptedElementSecurityEvent);
                                 }
                             }
-                            
+
                             //the following logic reads the encryptedData structure and doesn't pass them further
                             //through the chain
                             InputProcessorChain subInputProcessorChain = inputProcessorChain.createSubChain(this);
@@ -171,6 +178,13 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
 
                             Thread receiverThread = new Thread(decryptionThread);
                             receiverThread.setName("decrypting thread");
+
+                            DecryptedEventReaderInputProcessor decryptedEventReaderInputProcessor = new DecryptedEventReaderInputProcessor(getSecurityProperties(),
+                                    EncryptionPartDef.Modifier.getModifier(currentEncryptedDataType.getType()));
+
+                            //when an exception in the decryption thread occurs, we want to forward them:
+                            receiverThread.setUncaughtExceptionHandler(decryptedEventReaderInputProcessor);
+
                             //we have to start the thread before we call decryptionThread.getDecryptedStreamInputProcessor().
                             //Otherwise we will end in a deadlock, because the StAX reader expects already data.
                             //@See some lines below: 
@@ -178,9 +192,22 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
 
                             inputProcessorChain.getDocumentContext().removePathElement();
 
-                            DecryptedEventReaderInputProcessor decryptedEventReaderInputProcessor = decryptionThread.getDecryptedStreamInputProcessor();
-                            //when an exception in the decryption thread occurs, we want to forward them:
-                            receiverThread.setUncaughtExceptionHandler(decryptedEventReaderInputProcessor);
+                            //todo set encoding?:
+                            //todo spec says (4.2): "The cleartext octet sequence obtained in step 3 is interpreted as UTF-8 encoded character data."
+                            XMLEventReader xmlEventReader =
+                                    inputProcessorChain.getSecurityContext().<XMLInputFactory>get(
+                                            Constants.XMLINPUTFACTORY).createXMLEventReader(decryptionThread.getPipedInputStream(),
+                                            inputProcessorChain.getDocumentContext().getEncoding());
+
+                            //forward to wrapper element
+                            XMLEvent tmpXmlEvent;
+                            do {
+                                tmpXmlEvent = xmlEventReader.nextEvent();
+                            }
+                            while (!(tmpXmlEvent.isStartElement() && tmpXmlEvent.asStartElement().getName().equals(wrapperElementName)));
+
+                            decryptedEventReaderInputProcessor.setXmlEventReader(xmlEventReader);
+
                             //add the new created EventReader processor to the chain.
                             inputProcessorChain.addProcessor(decryptedEventReaderInputProcessor);
                             if (isSecurityHeaderEvent) {
@@ -219,21 +246,21 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
     class DecryptedEventReaderInputProcessor extends AbstractInputProcessor implements Thread.UncaughtExceptionHandler {
 
         private XMLEventReader xmlEventReader;
-        private QName wrapperElementName;
         private EncryptionPartDef.Modifier encryptionModifier;
         private int documentLevel = 0;
 
         private boolean rootElementProcessed;
 
-        DecryptedEventReaderInputProcessor(SecurityProperties securityProperties, XMLEventReader xmlEventReader,
-                                           QName wrapperElementName, EncryptionPartDef.Modifier encryptionModifier) {
+        DecryptedEventReaderInputProcessor(SecurityProperties securityProperties, EncryptionPartDef.Modifier encryptionModifier) {
             super(securityProperties);
             getAfterProcessors().add(DecryptInputProcessor.class.getName());
             getAfterProcessors().add(DecryptedEventReaderInputProcessor.class.getName());
-            this.xmlEventReader = xmlEventReader;
-            this.wrapperElementName = wrapperElementName;
             this.encryptionModifier = encryptionModifier;
             rootElementProcessed = encryptionModifier != EncryptionPartDef.Modifier.Element;
+        }
+
+        public void setXmlEventReader(XMLEventReader xmlEventReader) {
+            this.xmlEventReader = xmlEventReader;
         }
 
         @Override
@@ -347,19 +374,59 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
         private XMLEventNS startXMLElement;
         private PipedOutputStream pipedOutputStream;
         private PipedInputStream pipedInputStream;
-
-        //todo static final init or better: hardcoded:
-        //use a unique prefix; the prefix must start with a letter by spec!:
-        private final String uuid = "a" + UUID.randomUUID().toString().replaceAll("-", "");
-        private final QName wrapperElementName = new QName("http://dummy", "dummy", uuid);
+        private Cipher symmetricCipher;
+        private Key secretKey;
 
         public DecryptionThread(InputProcessorChain inputProcessorChain, boolean header,
-                                EncryptedDataType encryptedDataType, XMLEventNS startXMLElement) throws XMLStreamException {
+                                EncryptedDataType encryptedDataType, XMLEventNS startXMLElement) throws XMLStreamException, WSSecurityException {
 
             this.inputProcessorChain = inputProcessorChain;
             this.header = header;
             this.encryptedDataType = encryptedDataType;
             this.startXMLElement = startXMLElement;
+
+            final String algorithmURI = encryptedDataType.getEncryptionMethod().getAlgorithm();
+
+            //retrieve the securityToken which must be used for decryption
+            SecurityToken securityToken = SecurityTokenFactory.newInstance().getSecurityToken(
+                    encryptedDataType.getKeyInfo(), getSecurityProperties().getDecryptionCrypto(),
+                    getSecurityProperties().getCallbackHandler(), inputProcessorChain.getSecurityContext());
+
+            //fire a RecipientSecurityTokenEvent
+            RecipientEncryptionTokenSecurityEvent recipientEncryptionTokenSecurityEvent =
+                    new RecipientEncryptionTokenSecurityEvent(SecurityEvent.Event.RecipientEncryptionToken);
+            recipientEncryptionTokenSecurityEvent.setSecurityToken(securityToken);
+            inputProcessorChain.getSecurityContext().registerSecurityEvent(recipientEncryptionTokenSecurityEvent);
+
+            if (securityToken.getKeyWrappingToken() != null) {
+                AlgorithmSuiteSecurityEvent algorithmSuiteSecurityEvent = new AlgorithmSuiteSecurityEvent(SecurityEvent.Event.AlgorithmSuite);
+                algorithmSuiteSecurityEvent.setAlgorithmURI(securityToken.getKeyWrappingTokenAlgorithm());
+                algorithmSuiteSecurityEvent.setUsage(
+                        securityToken.getKeyWrappingToken().isAsymmetric()
+                                ? AlgorithmSuiteSecurityEvent.Usage.Asym_Key_Wrap
+                                : AlgorithmSuiteSecurityEvent.Usage.Sym_Key_Wrap);
+                inputProcessorChain.getSecurityContext().registerSecurityEvent(algorithmSuiteSecurityEvent);
+            }
+
+            secretKey = securityToken.getSecretKey(algorithmURI);
+
+            try {
+                String syncEncAlgo = JCEAlgorithmMapper.translateURItoJCEID(algorithmURI);
+                symmetricCipher = Cipher.getInstance(syncEncAlgo, "BC");
+                //we have to defer the initialization of the cipher until we can extract the IV...
+            } catch (NoSuchAlgorithmException e) {
+                throw new WSSecurityException(e);
+            } catch (NoSuchProviderException e) {
+                throw new WSSecurityException(e);
+            } catch (NoSuchPaddingException e) {
+                throw new WSSecurityException(e);
+            }
+
+            //fire an AlgorithmSuiteSecurityEvent
+            AlgorithmSuiteSecurityEvent algorithmSuiteSecurityEvent = new AlgorithmSuiteSecurityEvent(SecurityEvent.Event.AlgorithmSuite);
+            algorithmSuiteSecurityEvent.setAlgorithmURI(algorithmURI);
+            algorithmSuiteSecurityEvent.setUsage(AlgorithmSuiteSecurityEvent.Usage.Enc);
+            inputProcessorChain.getSecurityContext().registerSecurityEvent(algorithmSuiteSecurityEvent);
 
             //prepare the piped streams and connect them:
             //5 * 8192 seems to be a fine value
@@ -371,28 +438,8 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
             }
         }
 
-        /**
-         * Creates a new Instance of a DecryptedEventReaderInputProcessor with a
-         * prepared stax reader from the pipe.
-         */
-        public DecryptedEventReaderInputProcessor getDecryptedStreamInputProcessor() throws XMLStreamException {
-
-            //todo set encoding?:
-            //todo spec says (4.2): "The cleartext octet sequence obtained in step 3 is interpreted as UTF-8 encoded character data."
-            XMLEventReader xmlEventReader =
-                    inputProcessorChain.getSecurityContext().<XMLInputFactory>get(
-                            Constants.XMLINPUTFACTORY).createXMLEventReader(pipedInputStream,
-                            inputProcessorChain.getDocumentContext().getEncoding());
-
-            //forward to wrapper element
-            XMLEvent xmlEvent;
-            do {
-                xmlEvent = xmlEventReader.nextEvent();
-            }
-            while (!(xmlEvent.isStartElement() && xmlEvent.asStartElement().getName().equals(wrapperElementName)));
-
-            return new DecryptedEventReaderInputProcessor(getSecurityProperties(), xmlEventReader, wrapperElementName,
-                    EncryptionPartDef.Modifier.getModifier(encryptedDataType.getType()));
+        public PipedInputStream getPipedInputStream() {
+            return pipedInputStream;
         }
 
         private XMLEvent processNextEvent() throws WSSecurityException, XMLStreamException {
@@ -407,50 +454,6 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
         public void run() {
 
             try {
-                final String algorithmURI = encryptedDataType.getEncryptionMethod().getAlgorithm();
-
-                //retrieve the securityToken which must be used for decryption 
-                SecurityToken securityToken = SecurityTokenFactory.newInstance().getSecurityToken(
-                        encryptedDataType.getKeyInfo(), getSecurityProperties().getDecryptionCrypto(),
-                        getSecurityProperties().getCallbackHandler(), inputProcessorChain.getSecurityContext());
-                
-                //fire a RecipientSecurityTokenEvent
-                RecipientEncryptionTokenSecurityEvent recipientEncryptionTokenSecurityEvent =
-                        new RecipientEncryptionTokenSecurityEvent(SecurityEvent.Event.RecipientEncryptionToken);
-                recipientEncryptionTokenSecurityEvent.setSecurityToken(securityToken);
-                inputProcessorChain.getSecurityContext().registerSecurityEvent(recipientEncryptionTokenSecurityEvent);
-
-                if (securityToken.getKeyWrappingToken() != null) {
-                    AlgorithmSuiteSecurityEvent algorithmSuiteSecurityEvent = new AlgorithmSuiteSecurityEvent(SecurityEvent.Event.AlgorithmSuite);
-                    algorithmSuiteSecurityEvent.setAlgorithmURI(securityToken.getKeyWrappingTokenAlgorithm());
-                    algorithmSuiteSecurityEvent.setUsage(
-                            securityToken.getKeyWrappingToken().isAsymmetric()
-                                    ? AlgorithmSuiteSecurityEvent.Usage.Asym_Key_Wrap
-                                    : AlgorithmSuiteSecurityEvent.Usage.Sym_Key_Wrap);
-                    inputProcessorChain.getSecurityContext().registerSecurityEvent(algorithmSuiteSecurityEvent);
-                }
-
-                Key secretKey = securityToken.getSecretKey(algorithmURI);
-
-                Cipher symmetricCipher;
-                try {
-                    String syncEncAlgo = JCEAlgorithmMapper.translateURItoJCEID(algorithmURI);
-                    symmetricCipher = Cipher.getInstance(syncEncAlgo, "BC");
-                    //we have to defer the initialization of the cipher until we can extract the IV...
-                } catch (NoSuchAlgorithmException e) {
-                    throw new WSSecurityException(e);
-                } catch (NoSuchProviderException e) {
-                    throw new WSSecurityException(e);
-                } catch (NoSuchPaddingException e) {
-                    throw new WSSecurityException(e);
-                }
-
-                //fire an AlgorithmSuiteSecurityEvent 
-                AlgorithmSuiteSecurityEvent algorithmSuiteSecurityEvent = new AlgorithmSuiteSecurityEvent(SecurityEvent.Event.AlgorithmSuite);
-                algorithmSuiteSecurityEvent.setAlgorithmURI(algorithmURI);
-                algorithmSuiteSecurityEvent.setUsage(AlgorithmSuiteSecurityEvent.Usage.Enc);
-                inputProcessorChain.getSecurityContext().registerSecurityEvent(algorithmSuiteSecurityEvent);
-
                 //temporary writer to write the dummy wrapper element with all namespaces in the current scope
                 BufferedWriter tempBufferedWriter = new BufferedWriter(
                         new OutputStreamWriter(
@@ -499,16 +502,19 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
 
                             @Override
                             public void write(int b) throws IOException {
+                                //System.out.println(new String(new byte[]{(byte)b}));
                                 out.write(b);
                             }
 
                             @Override
                             public void write(byte[] b) throws IOException {
+                                //System.out.println(new String(b));
                                 out.write(b);
                             }
 
                             @Override
                             public void write(byte[] b, int off, int len) throws IOException {
+                                //System.out.println(new String(b, off, len));
                                 out.write(b, off, len);
                             }
 
@@ -549,7 +555,7 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
 
                 //close to get Cipher.doFinal() called
                 decryptOutputStream.close();
-                
+
                 //close the dummy wrapper element:
                 tempBufferedWriter.write("</");
                 tempBufferedWriter.write(wrapperElementName.getPrefix());

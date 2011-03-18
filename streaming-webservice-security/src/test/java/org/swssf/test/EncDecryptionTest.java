@@ -493,6 +493,44 @@ public class EncDecryptionTest extends AbstractTestBase {
     }
 
     @Test
+    public void testEncDecryptionKeyIdentifierBinarySecurityTokenDirectReferenceAtTheEndOfTheSecurityHeaderInbound() throws Exception {
+
+        Document securedDocument;
+        {
+            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml");
+            String action = WSHandlerConstants.ENCRYPT;
+            Properties properties = new Properties();
+            properties.setProperty(WSHandlerConstants.ENC_KEY_ID, "DirectReference");
+            securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
+
+            //some test that we can really sure we get what we want from WSS4J
+            XPathExpression xPathExpression = getXPath("/env:Envelope/env:Header/wsse:Security/wsse:BinarySecurityToken");
+            Node node = (Node) xPathExpression.evaluate(securedDocument, XPathConstants.NODE);
+            Assert.assertNotNull(node);
+            Element parentElement = (Element)node.getParentNode();
+            parentElement.removeChild(node);
+            parentElement.appendChild(node);
+        }
+
+        //done encryption; now test decryption:
+        {
+            SecurityProperties securityProperties = new SecurityProperties();
+            securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+            securityProperties.setCallbackHandler(new org.swssf.test.CallbackHandlerImpl());
+            Document document = doInboundSecurity(securityProperties, new CustomW3CDOMStreamReader(securedDocument));
+
+            //header element must still be there
+            NodeList nodeList = document.getElementsByTagNameNS(Constants.TAG_xenc_EncryptedKey.getNamespaceURI(), Constants.TAG_xenc_EncryptedKey.getLocalPart());
+            Assert.assertEquals(nodeList.getLength(), 1);
+            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), Constants.TAG_wsse_Security.getLocalPart());
+
+            //no encrypted content
+            nodeList = document.getElementsByTagNameNS(Constants.TAG_xenc_EncryptedData.getNamespaceURI(), Constants.TAG_xenc_EncryptedData.getLocalPart());
+            Assert.assertEquals(nodeList.getLength(), 0);
+        }
+    }
+
+    @Test
     public void testEncDecryptionKeyIdentifierBinarySecurityTokenEmbedded() throws Exception {
 
         ByteArrayOutputStream baos;

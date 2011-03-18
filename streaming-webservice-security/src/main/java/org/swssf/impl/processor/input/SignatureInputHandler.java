@@ -14,18 +14,17 @@
  */
 package org.swssf.impl.processor.input;
 
+import org.bouncycastle.util.encoders.Base64;
 import org.swssf.config.JCEAlgorithmMapper;
 import org.swssf.ext.*;
 import org.swssf.impl.SecurityTokenFactory;
 import org.swssf.impl.transformer.canonicalizer.Canonicalizer20010315ExclOmitCommentsTransformer;
 import org.swssf.impl.transformer.canonicalizer.Canonicalizer20010315Transformer;
 import org.swssf.impl.util.SignerOutputStream;
-import org.bouncycastle.util.encoders.Base64;
 import org.w3._2000._09.xmldsig_.KeyInfoType;
 import org.w3._2000._09.xmldsig_.SignatureType;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 import java.io.BufferedOutputStream;
@@ -33,24 +32,56 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.security.*;
 import java.security.cert.CertificateException;
+import java.util.Deque;
 import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
 
 /**
  * @author $Author: giger $
  * @version $Revision: 272 $ $Date: 2010-12-23 14:30:56 +0100 (Thu, 23 Dec 2010) $
  */
-public class SignatureInputProcessor extends AbstractInputProcessor {
+public class SignatureInputHandler extends AbstractInputSecurityHeaderHandler {
 
-    private SignatureType currentSignatureType;
+    public SignatureInputHandler(InputProcessorChain inputProcessorChain, SecurityProperties securityProperties, Deque<XMLEvent> eventQueue, int index) throws WSSecurityException, XMLStreamException {
 
-    private boolean recordSignedInfo = false;
-    private List<XMLEvent> signedInfoXMLEvents = new LinkedList<XMLEvent>();
+        final SignatureType signatureType = (SignatureType) parseStructure(eventQueue, index);
+        verifySignedInfo(inputProcessorChain, securityProperties, signatureType, eventQueue, index);
+    }
 
-    public SignatureInputProcessor(SecurityProperties securityProperties, StartElement startElement) {
-        super(securityProperties);
-        currentSignatureType = new SignatureType(startElement);
+    @Override
+    protected Parseable getParseable(StartElement startElement) {
+        return new SignatureType(startElement);
+    }
+
+    private void verifySignedInfo(InputProcessorChain inputProcessorChain, SecurityProperties securityProperties, SignatureType signatureType, Deque<XMLEvent> eventDeque, int index) throws WSSecurityException, XMLStreamException {
+        //todo reparse SignedInfo when custom canonicalization method is used
+        //verify SignedInfo
+        SignatureVerifier signatureVerifier = new SignatureVerifier(signatureType, inputProcessorChain.getSecurityContext(), securityProperties);
+
+        Iterator<XMLEvent> iterator = eventDeque.descendingIterator();
+        //skip to <Signature> Element
+        int i = 0;
+        while (i < index) {
+            iterator.next();
+            i++;
+        }
+
+        boolean verifyElement = false;
+        while (iterator.hasNext()) {
+            XMLEvent xmlEvent = iterator.next();
+            if (xmlEvent.isStartElement() && xmlEvent.asStartElement().getName().equals(Constants.TAG_dsig_SignedInfo)) {
+                verifyElement = true;
+            } else if (xmlEvent.isEndElement() && xmlEvent.asEndElement().getName().equals(Constants.TAG_dsig_SignedInfo)) {
+                signatureVerifier.processEvent(xmlEvent);
+                break;
+            }
+            if (verifyElement) {
+                signatureVerifier.processEvent(xmlEvent);
+            }
+        }
+        signatureVerifier.doFinal();
+
+        //add processors to verify references
+        inputProcessorChain.addProcessor(new SignatureReferenceVerifyInputProcessor(signatureType, securityProperties));
     }
 
 /*
@@ -85,73 +116,6 @@ public class SignatureInputProcessor extends AbstractInputProcessor {
         </ds:KeyInfo>
     </ds:Signature>
      */
-
-    @Override
-    public XMLEvent processNextHeaderEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, WSSecurityException {
-        XMLEvent xmlEvent = inputProcessorChain.processHeaderEvent();
-
-        boolean isFinishedcurrentSignatureType = false;
-
-        if (currentSignatureType != null) {
-            try {
-                isFinishedcurrentSignatureType = currentSignatureType.parseXMLEvent(xmlEvent);
-                if (isFinishedcurrentSignatureType) {
-                    currentSignatureType.validate();
-                }
-            } catch (ParseException e) {
-                throw new WSSecurityException(e);
-            }
-        }
-
-        if (xmlEvent.isStartElement()) {
-            StartElement startElement = xmlEvent.asStartElement();
-
-            if (currentSignatureType != null && startElement.getName().equals(Constants.TAG_dsig_SignedInfo)) {
-                recordSignedInfo = true;
-            }
-        } else if (currentSignatureType != null && xmlEvent.isEndElement()) {
-            EndElement endElement = xmlEvent.asEndElement();
-
-            if (endElement.getName().equals(Constants.TAG_dsig_SignedInfo)) {
-                signedInfoXMLEvents.add(xmlEvent);
-                recordSignedInfo = false;
-            }
-        }
-
-        if (recordSignedInfo) {
-            signedInfoXMLEvents.add(xmlEvent);
-        }
-
-        if (currentSignatureType != null && isFinishedcurrentSignatureType) {
-            try {
-                //todo reparse SignedInfo when custom canonicalization method is used
-                //verify SignedInfo
-                SignatureVerifier signatureVerifier = new SignatureVerifier(currentSignatureType, inputProcessorChain.getSecurityContext(), getSecurityProperties());
-                Iterator<XMLEvent> xmlEventIterator = signedInfoXMLEvents.iterator();
-                while (xmlEventIterator.hasNext()) {
-                    XMLEvent signedInfoEvent = xmlEventIterator.next();
-                    signatureVerifier.processEvent(signedInfoEvent);
-                }
-                signatureVerifier.doFinal();
-
-                //add processors to verify references
-                inputProcessorChain.addProcessor(new SignatureReferenceVerifyInputProcessor(currentSignatureType, getSecurityProperties()));
-                currentSignatureType = null;
-            } finally {
-                inputProcessorChain.removeProcessor(this);
-                currentSignatureType = null;
-                isFinishedcurrentSignatureType = false;
-            }
-        }
-
-        return xmlEvent;
-    }
-
-    @Override
-    public XMLEvent processNextEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, WSSecurityException {
-        //this method should not be called (processor will be removed after processing header)
-        return null;
-    }
 
     public static class SignatureVerifier {
 
