@@ -117,7 +117,7 @@ public class SecurityTokenRefSTRParser implements STRParser {
                 }
             } else {
                 // Try asking the CallbackHandler for the secret key
-                secretKey = getSecretKeyFromToken(id, null, data);
+                secretKey = getSecretKeyFromToken(id, reference.getValueType(), data);
                 if (secretKey == null) {
                     throw new WSSecurityException(
                         WSSecurityException.FAILED_CHECK, "unsupportedKeyId", new Object[]{id}
