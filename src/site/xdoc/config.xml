@@ -274,18 +274,51 @@ summarised here:
 </tr>
 <tr>
 <td>ENC_CALLBACK_CLASS</td>
-<td>EmbeddedKeyCallbackClass</td>
+<td>embeddedKeyCallbackClass</td>
 <td>The CallbackHandler implementation class used to get the key associated with a key name.</td>
 </tr>
 <tr>
 <td>ENC_CALLBACK_REF</td>
-<td>EmbeddedKeyCallbackRef</td>
+<td>embeddedKeyCallbackRef</td>
 <td>The CallbackHandler implementation object used to get the key associated with a key name.</td>
 </tr>
 <tr>
 <td>SIG_PROP_FILE</td>
 <td>signaturePropFile</td>
 <td>The path of the crypto property file to use for Signature.</td>
+</tr>
+<tr>
+<td>SIG_PROP_REF_ID</td>
+<td>signaturePropRefId</td>
+<td>The String ID that is used to store a reference to the Crypto Properties object for Signature.
+</td>
+</tr>
+<tr>
+<td>DEC_PROP_FILE</td>
+<td>decryptionPropFile</td>
+<td>The path of the crypto property file to use for Decryption.</td>
+</tr>
+<tr>
+<td>DEC_PROP_REF_ID</td>
+<td>decryptionPropRefId</td>
+<td>The String ID that is used to store a reference to the Crypto Properties object for 
+decryption.</td>
+</tr>
+<tr>
+<td>ENC_PROP_FILE</td>
+<td>encryptionPropFile</td>
+<td>The path of the crypto property file to use for encryption.</td>
+</tr>
+<tr>
+<td>ENC_PROP_REF_ID</td>
+<td>encryptionPropRefId</td>
+<td>The String ID that is used to store a reference to the Crypto Properties object for 
+encryption.</td>
+</tr>
+<tr>
+<td>SAML_PROP_FILE</td>
+<td>samlPropFile</td>
+<td>The path of the property file to use for creating SAML Assertions.</td>
 </tr>
 </table>
 <p>

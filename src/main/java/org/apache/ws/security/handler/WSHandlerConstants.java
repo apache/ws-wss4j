@@ -222,14 +222,14 @@ public class WSHandlerConstants {
      * associated with a key name. The value of this tag must be the class name of a 
      * {@link javax.security.auth.callback.CallbackHandler} instance.
      */
-    public static final String ENC_CALLBACK_CLASS = "EmbeddedKeyCallbackClass";
+    public static final String ENC_CALLBACK_CLASS = "embeddedKeyCallbackClass";
 
     /**
      * This tag refers to the  CallbackHandler implementation object used to get the key
      * associated with a key name. The value of this tag must be a
      * {@link javax.security.auth.callback.CallbackHandler} instance.
      */
-    public static final String ENC_CALLBACK_REF = "EmbeddedKeyCallbackRef";
+    public static final String ENC_CALLBACK_REF = "embeddedKeyCallbackRef";
     
     /**
      * The path of the crypto property file to use for Signature. The classloader loads this 
@@ -259,73 +259,55 @@ public class WSHandlerConstants {
 
     /**
      * The key that holds the reference of the <code>java.util.Properties</code> 
-     * object holding complete info about signature Crypto implementation. 
+     * object holding complete information about the signature Crypto implementation. 
      * This should contain all information that would contain in an equivalent 
-     * .properties file which includes the Crypto implementation class name.
+     * properties file which includes the Crypto implementation class name.
      * 
      * Refer to documentation of {@link #SIG_PROP_FILE}.
      */
-    public final static String SIG_PROP_REF_ID = "SignaturePropRefId";
+    public final static String SIG_PROP_REF_ID = "signaturePropRefId";
     
     /**
-     * The name of the crypto propterty file to use for SOAP Decryption.
-     * <p/>
-     * Refer to documentation of {@link #SIG_PROP_FILE}.
-     * <p/>
-     * Refer to {@link #SIG_PROP_FILE} for a detail description
-     * about the format and how to use this property file.
+     * The path of the crypto property file to use for Decryption. The classloader loads this 
+     * file. Therefore it must be accessible via the classpath. Refer to documentation of 
+     * {@link #SIG_PROP_FILE} for more information about the contents of the Properties file.
      * <p/>
      * The application may set this parameter using the following method:
      * <pre>
      * call.setProperty(WSHandlerConstants.DEC_PROP_FILE, "myCrypto.properties");
      * </pre>
-     * However, the parameter in the WSDD deployment file overwrites the
-     * property setting (deployment setting overwrites application setting).
-     * <p/>
-     * If this parameter is not used, but the signature crypto property
-     * file is defined (combined Encryption/Signature action), then the
-     * encryption function uses that file. Otherwise the handler throws
-     * an <code>AxisFault</code>.
      */
     public static final String DEC_PROP_FILE = "decryptionPropFile";
     
     /**
-     * The key that hold the refernce of the <code>java.util.Properties</code> 
-     * object holding complete info about decryption Crypto implementation. This
-     * should contain all information that would contain in an equivalent 
-     * .properties file which includes the Crypto implementation class name.
+     * The key that hold the reference of the <code>java.util.Properties</code> 
+     * object holding complete information about the decryption Crypto implementation. 
+     * This should contain all information that would contain in an equivalent 
+     * properties file which includes the Crypto implementation class name.
      * 
      * Refer to documentation of {@link #DEC_PROP_FILE}.
      */
     public final static String DEC_PROP_REF_ID = "decryptionPropRefId";
     
     /**
-     * The name of the crypto property file to use for SOAP Encryption.
-     * <p/>
-     * Refer to documentation of {@link #SIG_PROP_FILE}.
+     * The path of the crypto property file to use for Encryption. The classloader loads this 
+     * file. Therefore it must be accessible via the classpath. Refer to documentation of 
+     * {@link #SIG_PROP_FILE} for more information about the contents of the Properties file.
      * <p/>
      * The application may set this parameter using the following method:
      * <pre>
      * call.setProperty(WSHandlerConstants.ENC_PROP_FILE, "myCrypto.properties");
      * </pre>
-     * However, the parameter in the WSDD deployment file overwrites the
-     * property setting (deployment setting overwrites application setting).
-     * <p/>
-     * If this parameter is not used, but the signature crypto property
-     * file is defined (combined Encryption/Signature action), then the
-     * encryption function uses signature property file. Otherwise the
-     * handler throws an <code>AxisFault</code>.
      */
     public static final String ENC_PROP_FILE = "encryptionPropFile";
     
     /**
-     * The key that hold the reference of the 
-     * <code>java.util.Properties</code> object holding complete info about 
-     * encryption Crypto implementation. This should contain all information 
-     * that would contain in an equivalent .properties file which includes the 
-     * Crypto implementation class name.
+     * The key that hold the reference of the <code>java.util.Properties</code> 
+     * object holding complete information about the encryption Crypto implementation. 
+     * This should contain all information that would contain in an equivalent 
+     * properties file which includes the Crypto implementation class name.
      * 
-     * Refer to documentation of {@link #DEC_PROP_FILE}.
+     * Refer to documentation of {@link #ENC_PROP_FILE}.
      */
     public final static String ENC_PROP_REF_ID = "encryptionPropRefId";
     

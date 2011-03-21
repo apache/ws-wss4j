@@ -135,7 +135,9 @@ public abstract class WSHandler {
          * may be used for encryption too.
          */
         if ((doAction & WSConstants.SIGN) == WSConstants.SIGN) {
-            reqData.setSigCrypto(loadSignatureCrypto(reqData));
+            if (reqData.getSigCrypto() == null) {
+                reqData.setSigCrypto(loadSignatureCrypto(reqData));
+            }
             decodeSignatureParameter(reqData);
         }
         /*
@@ -151,7 +153,9 @@ public abstract class WSHandler {
          * over signature parameters username and crypto instance.
          */
         if ((doAction & WSConstants.ENCR) == WSConstants.ENCR) {
-            reqData.setEncCrypto(loadEncryptionCrypto(reqData));
+            if (reqData.getEncCrypto() == null) {
+                reqData.setEncCrypto(loadEncryptionCrypto(reqData));
+            }
             decodeEncryptionParameter(reqData);
         }
         /*
@@ -412,103 +416,6 @@ public abstract class WSHandler {
         }
     }
     
-    /**
-     * Hook to allow subclasses to load their Signature Crypto however they see
-     * fit.
-     */
-    public Crypto loadSignatureCrypto(RequestData reqData) 
-        throws WSSecurityException {
-        Crypto crypto = null;
-        //
-        // Get crypto property file for signature. If none specified throw
-        // fault, otherwise get a crypto instance.
-        //
-        String sigPropFile = 
-            getString(WSHandlerConstants.SIG_PROP_FILE, reqData.getMsgContext());
-        if (sigPropFile != null) {
-            crypto = (Crypto) cryptos.get(sigPropFile);
-            if (crypto == null) {
-                crypto = loadCryptoFromPropertiesFile(sigPropFile, reqData);
-                cryptos.put(sigPropFile, crypto);
-            }
-        } else if (getString(WSHandlerConstants.SIG_PROP_REF_ID, reqData.getMsgContext()) != null) {
-            //
-            // If the property file is missing then look for the Properties object 
-            //
-            String refId = 
-                getString(WSHandlerConstants.SIG_PROP_REF_ID, reqData.getMsgContext());
-            if (refId != null) {
-                Object propObj = getProperty(reqData.getMsgContext(), refId);
-                if (propObj instanceof Properties) {
-                    crypto = (Crypto) cryptos.get(refId);
-                    if (crypto == null) {
-                        crypto = CryptoFactory.getInstance((Properties)propObj);
-                        cryptos.put(refId, crypto);
-                    }
-                }
-            }
-        }
-        
-        return crypto;
-    }
-    
-    /**
-     * A hook to allow subclass to load Crypto instances from property files in a different
-     * way.
-     * @param propFilename The property file name
-     * @param reqData The RequestData object
-     * @return A Crypto instance that has been loaded
-     */
-    protected Crypto loadCryptoFromPropertiesFile(
-        String propFilename, 
-        RequestData reqData
-    ) throws WSSecurityException {
-        return 
-            CryptoFactory.getInstance(
-                propFilename, this.getClassLoader(reqData.getMsgContext())
-            );
-    }
-
-    /**
-     * Hook to allow subclasses to load their Encryption Crypto however they
-     * see fit.
-     */
-    protected Crypto loadEncryptionCrypto(RequestData reqData) 
-        throws WSSecurityException {
-        Crypto crypto = null;
-        //
-        // Get encryption crypto property file. If non specified take crypto
-        // instance from signature, if that fails: throw fault
-        //
-        String encPropFile = 
-            getString(WSHandlerConstants.ENC_PROP_FILE, reqData.getMsgContext());
-        if (encPropFile != null) {
-            crypto = (Crypto) cryptos.get(encPropFile);
-            if (crypto == null) {
-                crypto = loadCryptoFromPropertiesFile(encPropFile, reqData);
-                cryptos.put(encPropFile, crypto);
-            }
-        } else if (getString(WSHandlerConstants.ENC_PROP_REF_ID, reqData.getMsgContext()) != null) {
-            //
-            // If the property file is missing then look for the Properties object 
-            //
-            String refId = 
-                getString(WSHandlerConstants.ENC_PROP_REF_ID, reqData.getMsgContext());
-            if (refId != null) {
-                Object propObj = getProperty(reqData.getMsgContext(), refId);
-                if (propObj instanceof Properties) {
-                    crypto = (Crypto) cryptos.get(refId);
-                    if (crypto == null) {
-                        crypto = CryptoFactory.getInstance((Properties)propObj);
-                        cryptos.put(refId, crypto);
-                    }
-                }
-            }
-        }
-        
-        return crypto;
-    }
-
     protected void decodeUTParameter(RequestData reqData) 
         throws WSSecurityException {
         Object mc = reqData.getMsgContext();
@@ -807,6 +714,118 @@ public abstract class WSHandler {
             "WSHandler: illegal " + configTag + " parameter"
         );
     }
+    
+    /**
+     * Hook to allow subclasses to load their Signature Crypto however they see
+     * fit. 
+     * 
+     * @param requestData the RequestData object
+     * @return a Crypto instance to use for Signature creation/verification
+     */
+    public Crypto loadSignatureCrypto(RequestData requestData) throws WSSecurityException {
+        return 
+            loadCrypto(
+                WSHandlerConstants.SIG_PROP_FILE,
+                WSHandlerConstants.SIG_PROP_REF_ID,
+                requestData
+            );
+    }
+    
+    /**
+     * Hook to allow subclasses to load their Decryption Crypto however they see
+     * fit. 
+     * 
+     * @param requestData the RequestData object
+     * @return a Crypto instance to use for Decryption creation/verification
+     */
+    protected Crypto loadDecryptionCrypto(RequestData requestData) throws WSSecurityException {
+        return 
+            loadCrypto(
+                WSHandlerConstants.DEC_PROP_FILE,
+                WSHandlerConstants.DEC_PROP_REF_ID,
+                requestData
+            );
+    }
+    
+    /**
+     * Hook to allow subclasses to load their Encryption Crypto however they see
+     * fit. 
+     * 
+     * @param requestData the RequestData object
+     * @return a Crypto instance to use for Encryption creation/verification
+     */
+    protected Crypto loadEncryptionCrypto(RequestData requestData) throws WSSecurityException {
+        return 
+            loadCrypto(
+                WSHandlerConstants.ENC_PROP_FILE,
+                WSHandlerConstants.ENC_PROP_REF_ID,
+                requestData
+            );
+    }
+    
+    /**
+     * Load a Crypto instance. Firstly, it tries to use the cryptoPropertyRefId tag to retrieve
+     * a Crypto object via a custom reference Id. Failing this, it tries to load the crypto 
+     * instance via the cryptoPropertyFile tag.
+     * 
+     * @param requestData the RequestData object
+     * @return a Crypto instance to use for Encryption creation/verification
+     */
+    protected Crypto loadCrypto(
+        String cryptoPropertyFile,
+        String cryptoPropertyRefId,
+        RequestData requestData
+    ) throws WSSecurityException {
+        Object mc = requestData.getMsgContext();
+        Crypto crypto = null;
+        
+        //
+        // Try the Property Ref Id first
+        //
+        String refId = getString(cryptoPropertyRefId, mc);
+        if (refId != null) {
+            Object propObj = getProperty(mc, refId);
+            if (propObj instanceof Properties) {
+                crypto = cryptos.get(refId);
+                if (crypto == null) {
+                    crypto = CryptoFactory.getInstance((Properties)propObj);
+                    cryptos.put(refId, crypto);
+                }
+            }
+        }
+        
+        //
+        // Now try loading the properties file
+        //
+        if (crypto == null) {
+            String propFile = getString(cryptoPropertyFile, mc);
+            if (propFile != null) {
+                crypto = cryptos.get(propFile);
+                if (crypto == null) {
+                    crypto = loadCryptoFromPropertiesFile(propFile, requestData);
+                    cryptos.put(propFile, crypto);
+                }
+            } 
+        }
+        return crypto;
+    }
+
+    /**
+     * A hook to allow subclass to load Crypto instances from property files in a different
+     * way.
+     * @param propFilename The property file name
+     * @param reqData The RequestData object
+     * @return A Crypto instance that has been loaded
+     */
+    protected Crypto loadCryptoFromPropertiesFile(
+        String propFilename, 
+        RequestData reqData
+    ) throws WSSecurityException {
+        return 
+            CryptoFactory.getInstance(
+                propFilename, this.getClassLoader(reqData.getMsgContext())
+            );
+    }
 
     /**
      * Get a CallbackHandler instance. First try to get an instance via the 
@@ -1063,51 +1082,11 @@ public abstract class WSHandler {
         }
     }
 
-    /**
-     * Hook to allow subclasses to load their Decryption Crypto however they 
-     * see fit.
-     */
-    protected Crypto loadDecryptionCrypto(RequestData reqData) 
-        throws WSSecurityException {
-
-        Crypto crypto = null;
-        String decPropFile = 
-            getString(WSHandlerConstants.DEC_PROP_FILE, reqData.getMsgContext());
-        if (decPropFile != null) {
-            crypto = (Crypto) cryptos.get(decPropFile);
-            if (crypto == null) {
-                crypto = loadCryptoFromPropertiesFile(decPropFile, reqData);
-                cryptos.put(decPropFile, crypto);
-            }
-        } else if (getString(WSHandlerConstants.DEC_PROP_REF_ID, reqData.getMsgContext()) != null) {
-            //
-            // If the property file is missing then look for the Properties object 
-            //
-            String refId = 
-                getString(WSHandlerConstants.DEC_PROP_REF_ID, reqData.getMsgContext());
-            if (refId != null) {
-                Object propObj = getProperty(reqData.getMsgContext(), refId);
-                if (propObj instanceof Properties) {
-                    crypto = (Crypto) cryptos.get(refId);
-                    if (crypto == null) {
-                        crypto = CryptoFactory.getInstance((Properties)propObj);
-                        cryptos.put(refId, crypto);
-                    }
-                }
-            }
-        }
-        
-        return crypto;
-    }
-
     protected void decodeSignatureParameter2(RequestData reqData) 
         throws WSSecurityException {
-        reqData.setSigCrypto(loadSignatureCrypto(reqData));
-        /* There are currently no other signature parameters that need 
-         * to be handled here, but we call the load crypto hook rather 
-         * than just changing the visibility
-         * of this method to maintain parity with WSDoAllSender.
-         */
+        if (reqData.getSigCrypto() == null) {
+            reqData.setSigCrypto(loadSignatureCrypto(reqData));
+        }
     }
 
     /*
@@ -1116,12 +1095,9 @@ public abstract class WSHandler {
      */
     protected void decodeDecryptionParameter(RequestData reqData) 
         throws WSSecurityException {
-        reqData.setDecCrypto(loadDecryptionCrypto(reqData));
-        /* There are currently no other decryption parameters that need 
-         * to be handled here, but we call the load crypto hook rather 
-         * than just changing the visibility
-         * of this method to maintain parity with WSDoAllSender.
-         */
+        if (reqData.getDecCrypto() == null) {
+            reqData.setDecCrypto(loadDecryptionCrypto(reqData));
+        }
     }
 
     /**

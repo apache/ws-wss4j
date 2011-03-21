@@ -27,7 +27,6 @@ import org.apache.ws.security.WSDataRef;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSSecurityEngineResult;
-import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.common.CustomHandler;
 import org.apache.ws.security.common.KeystoreCallbackHandler;
 import org.apache.ws.security.common.SAML1CallbackHandler;
@@ -435,20 +434,6 @@ public class SamlTokenSVTest extends org.junit.Assert {
         secEngine.processSecurityHeader(
             signedDoc, null, callbackHandler, reqData.getSigCrypto(), reqData.getDecCrypto()
         );
-        
-        //
-        // Negative test
-        //
-        msgContext.put(WSHandlerConstants.SIG_PROP_FILE, "crypto.properties.na");
-        reqData.setMsgContext(msgContext);
-        
-        handler = new CustomHandler();
-        try {
-            handler.receive(WSConstants.ST_SIGNED, reqData);
-            fail("Failure expected on a bad crypto properties file");
-        } catch (WSSecurityException ex) {
-            // expected
-        }
     }
     
     
