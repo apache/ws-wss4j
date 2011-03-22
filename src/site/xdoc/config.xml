@@ -399,6 +399,98 @@ BinarySecurityToken. Default is: "true".</td>
 <td>Set whether to encrypt the symmetric encryption key or not. Default is: "true".</td>
 </tr>
 </table>
+<p>
+The configuration tags for WSHandler properties that are configured via a non-boolean parameter 
+are summarised here:
+</p>
+<table name="WSHandler non-boolean configuration tags">
+<tr>
+<th>Tag name</th>
+<th>Tag value</th>
+<th>Tag meaning</th>
+</tr>
+<tr>
+<td>ENC_KEY_NAME</td>
+<td>embeddedKeyName</td>
+<td>The text of the key name to be sent in the KeyInfo for encryption</td>
+</tr>
+<tr>
+<td>PASSWORD_TYPE</td>
+<td>passwordType</td>
+<td>The encoding of the password for a Username Token. The default is WSConstants.PW_DIGEST.</td>
+</tr>
+<tr>
+<td>ADD_UT_ELEMENTS</td>
+<td>addUTElements</td>
+<td>Additional elements to add to a Username Token, i.e. "nonce" and "created".</td>
+</tr>
+<tr>
+<td>SIG_KEY_ID</td>
+<td>signatureKeyIdentifier</td>
+<td>The key identifier type to use for signature. The default is "IssuerSerial".</td>
+</tr>
+<tr>
+<td>SIG_ALGO</td>
+<td>signatureAlgorithm</td>
+<td>The signature algorithm to use. The default is set by the data in the certificate.
+</td>
+</tr>
+<tr>
+<td>SIG_DIGEST_ALGO</td>
+<td>signatureDigestAlgorithm</td>
+<td>The signature digest algorithm to use.  The default is SHA-1.</td>
+</tr>
+<tr>
+<td>SIGNATURE_PARTS</td>
+<td>signatureParts</td>
+<td>Parameter to define which parts of the request shall be signed. The SOAP body is signed
+by default.</td>
+</tr>
+<tr>
+<td>WSE_SECRET_KEY_LENGTH</td>
+<td>wseSecretKeyLength</td>
+<td>The length of the secret (derived) key to use for the WSE UT_SIGN functionality.</td>
+</tr>
+<tr>
+<td>DERIVED_KEY_ITERATIONS</td>
+<td>derivedKeyIterations</td>
+<td>The number of iterations to use when deriving a key from a Username Token. The default is 
+1000.</td>
+</tr>
+<tr>
+<td>ENC_KEY_ID</td>
+<td>encryptionKeyIdentifier</td>
+<td>The key identifier type to use for encryption. The default is "IssuerSerial".</td>
+</tr>
+<tr>
+<td>ENC_SYM_ALGO</td>
+<td>encryptionSymAlgorithm</td>
+<td>The symmetric encryption algorithm to use. The default is AES-128.</td>
+</tr>
+<tr>
+<td>ENC_KEY_TRANSPORT</td>
+<td>encryptionKeyTransportAlgorithm</td>
+<td>The algorithm to use to encrypt the generated symmetric key. The default is RSA-15.</td>
+</tr>
+<tr>
+<td>ENCRYPTION_PARTS</td>
+<td>encryptionParts</td>
+<td>Parameter to define which parts of the request shall be encrypted. The SOAP body is encrypted
+in "Content" mode by default.</td>
+</tr>
+<tr>
+<td>TTL_TIMESTAMP</td>
+<td>timeToLive</td>
+<td>The time difference between creation and expiry time in seconds in the WSS Timestamp. The 
+default is "300".</td>
+</tr>
+<tr>
+<td>TTL_FUTURE_TIMESTAMP</td>
+<td>futureTimeToLive</td>
+<td>The time in seconds in the future within which the Created time of an incoming Timestamp is 
+valid. The default is "0".</td>
+</tr>
+</table>
 </subsection>
 </section>            
 </body>

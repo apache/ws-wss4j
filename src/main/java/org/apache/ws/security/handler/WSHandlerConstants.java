@@ -437,9 +437,9 @@ public class WSHandlerConstants {
     //
     
     /**
-     * Text of the key name that needs to be sent
+     * Text of the embedded key name to be sent in the KeyInfo for encryption.
      */
-    public static final String ENC_KEY_NAME = "EmbeddedKeyName";
+    public static final String ENC_KEY_NAME = "embeddedKeyName";
 
     /**
      * Specific parameter for UsernameToken action to define the encoding
@@ -452,20 +452,18 @@ public class WSHandlerConstants {
      * <pre>
      * call.setProperty(WSHandlerConstants.PASSWORD_TYPE, WSConstants.PW_DIGEST);
      * </pre>
-     * However, the parameter in the WSDD deployment file overwrites the
-     * property setting (deployment setting overwrites application setting).
-     * <p/>
      * The default setting is PW_DIGEST.
      */
     public static final String PASSWORD_TYPE = "passwordType";
     
     /**
-     * Parameter to generate additional elements in <code>UsernameToken</code>.
+     * Parameter to generate additional elements (nonce and created) in a 
+     * <code>UsernameToken</code>.
      * <p/>
      * The value of this parameter is a list of element names that are added
      * to the UsernameToken. The names of the list a separated by spaces.
      * <p/>
-     * The list may containe the names <code>nonce</code> and
+     * The list may contain the names <code>nonce</code> and
      * <code>created</code> only. Use this option if the password type is
      * <code>passwordText</code> and the handler shall add the <code>Nonce</code>
      * and/or <code>Created</code> elements.
@@ -473,23 +471,22 @@ public class WSHandlerConstants {
     public static final String ADD_UT_ELEMENTS = "addUTElements";
 
     /**
-     * Defines which key identifier type to use. The WS-Security specifications
-     * recommends to use the identifier type <code>IssuerSerial</code>. For
-     * possible signature key identifier types refer to
-     * {@link #keyIdentifier}. For signature <code>IssuerSerial</code>
-     * and <code>DirectReference</code> are valid only.
+     * Defines which key identifier type to use for signature. The WS-Security specifications
+     * recommends to use the identifier type <code>IssuerSerial</code>. For possible signature 
+     * key identifier types refer to {@link #keyIdentifier}. 
+     * For signature <code>IssuerSerial</code> and <code>DirectReference</code> are valid only.
+     * The default is <code>IssuerSerial</code>.
      * <p/>
      * The application may set this parameter using the following method:
      * <pre>
      * call.setProperty(WSHandlerConstants.SIG_KEY_ID, "DirectReference");
      * </pre>
-     * However, the parameter in the WSDD deployment file overwrites the
-     * property setting (deployment setting overwrites application setting).
      */
     public static final String SIG_KEY_ID = "signatureKeyIdentifier";
 
     /**
-     * Defines which signature algorithm to use.
+     * Defines which signature algorithm to use. The default is set by the data in the 
+     * certificate.
      * <p/>
      * The application may set this parameter using the following method:
      * <pre>
@@ -498,13 +495,11 @@ public class WSHandlerConstants {
      *     "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"
      * );
      * </pre>
-     * However, the parameter in the WSDD deployment file overwrites the
-     * property setting (deployment setting overwrites application setting).
      */
     public static final String SIG_ALGO = "signatureAlgorithm";
     
     /**
-     * Defines which signature digest algorithm to use. 
+     * Defines which signature digest algorithm to use. The default is SHA-1.
      * <p/>
      * The application may set this parameter using the following method:
      * <pre>
@@ -512,8 +507,6 @@ public class WSHandlerConstants {
      *    WSHandlerConstants.SIG_DIGEST_ALGO, "http://www.w3.org/2001/04/xmlenc#sha256"
      * );
      * </pre>
-     * However, the parameter in the WSDD deployment file overwrites the
-     * property setting (deployment setting overwrites application setting).
      */
     public static final String SIG_DIGEST_ALGO = "signatureDigestAlgorithm";
 
@@ -524,18 +517,10 @@ public class WSHandlerConstants {
      * the format of the value string.
      * <p/>
      * If this parameter is not specified the handler signs the SOAP Body
-     * by default.
-     * <p/>
-     * The WS Security specifications define several formats to transfer the
-     * signature tokens (certificates) or  references to these tokens.
-     * Thus, the plain element name <code>Token</code>
-     * signs the token and takes care of the different format.
-     * <p/>
-     * To sign the SOAP body <b>and</b> the signature token the value of this
-     * parameter must contain:
+     * by default, i.e.:
      * <pre>
      * &lt;parameter name="signatureParts"
-     *   value="{}{http://schemas.xmlsoap.org/soap/envelope/}Body; Token" />
+     *   value="{}{http://schemas.xmlsoap.org/soap/envelope/}Body;" />
      * </pre>
      * To specify an element without a namespace use the string
      * <code>Null</code> as the namespace name (this is a case sensitive
@@ -562,7 +547,7 @@ public class WSHandlerConstants {
     public static final String DERIVED_KEY_ITERATIONS = "derivedKeyIterations";
 
     /**
-     * Defines which key identifier type to use. The WS-Security specifications
+     * Defines which key identifier type to use for encryption. The WS-Security specifications
      * recommends to use the identifier type <code>IssuerSerial</code>. For
      * possible encryption key identifier types refer to
      * {@link #keyIdentifier}. For encryption <code>IssuerSerial</code>,
@@ -574,8 +559,6 @@ public class WSHandlerConstants {
      * <pre>
      * call.setProperty(WSHandlerConstants.ENC_KEY_ID, "X509KeyIdentifier");
      * </pre>
-     * However, the parameter in the WSDD deployment file overwrites the
-     * property setting (deployment setting overwrites application setting).
      */
     public static final String ENC_KEY_ID = "encryptionKeyIdentifier";
 
@@ -590,8 +573,6 @@ public class WSHandlerConstants {
      * <pre>
      * call.setProperty(WSHandlerConstants.ENC_SYM_ALGO, WSConstants.AES_256);
      * </pre>
-     * However, the parameter in the WSDD deployment file overwrites the
-     * property setting (deployment setting overwrites application setting).
      */
     public static final String ENC_SYM_ALGO = "encryptionSymAlgorithm";
 
@@ -603,8 +584,6 @@ public class WSHandlerConstants {
      * <pre>
      * call.setProperty(WSHandlerConstants.ENC_KEY_TRANSPORT, "RSA15");
      * </pre>
-     * However, the parameter in the WSDD deployment file overwrites the
-     * property setting (deployment setting overwrites application setting).
      */
     public static final String ENC_KEY_TRANSPORT = "encryptionKeyTransportAlgorithm";
     
@@ -653,8 +632,7 @@ public class WSHandlerConstants {
 
     /**
      * Time-To-Live is the time difference between creation and expiry time in
-     * the WSS Timestamp.
-     * The time-to-live in seconds. After this time the SOAP request is
+     * seconds in the WSS Timestamp. After this time the SOAP request is
      * invalid (at least the security data shall be treated this way).
      * <p/>
      * If this parameter is not defined, contains a value less or equal
