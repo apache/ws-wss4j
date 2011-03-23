@@ -40,6 +40,11 @@ public class WSSecurityEngineResult extends java.util.HashMap<String, Object> {
     //
     
     /**
+     * 
+     */
+    private static final long serialVersionUID = 458604104267263765L;
+
+    /**
      * Tag denoting the SAML Assertion found, if applicable.
      *
      * The value under this tag is of type AssertionWrapper.

@@ -40,6 +40,11 @@ import org.apache.commons.logging.LogFactory;
  */
 public class XmlSchemaDateFormat extends DateFormat {
     /**
+     * 
+     */
+    private static final long serialVersionUID = 5152684993503882396L;
+
+    /**
      * Logger.
      */
     private static Log log = LogFactory.getLog(XmlSchemaDateFormat.class);

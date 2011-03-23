@@ -29,6 +29,10 @@ import java.security.PublicKey;
  */
 public class PublicKeyPrincipal implements Principal, Serializable {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -7662669773454821344L;
     private PublicKey publicKey;
 
     public PublicKeyPrincipal(PublicKey publicKey) {

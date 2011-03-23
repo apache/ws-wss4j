@@ -132,6 +132,7 @@ public class Loader {
      *
      * @return the class loader of the argument
      */
+    @SuppressWarnings("unchecked")
     public static ClassLoader getClassLoader(final Class clazz) {
         return AccessController.doPrivileged(new PrivilegedAction<ClassLoader>() {
             public ClassLoader run() {
@@ -149,6 +150,7 @@ public class Loader {
      * @return Class
      * @throws ClassNotFoundException
      */
+    @SuppressWarnings("unchecked")
     public static Class loadClass(ClassLoader loader, String clazz) throws ClassNotFoundException {
         try {
             if (loader != null) {
@@ -173,10 +175,12 @@ public class Loader {
      * @return TODO
      * @throws ClassNotFoundException
      */
+    @SuppressWarnings("unchecked")
     public static Class loadClass(String clazz) throws ClassNotFoundException {
         return loadClass(clazz, true);
     }
     
+    @SuppressWarnings("unchecked")
     public static Class loadClass(String clazz, boolean warn) throws ClassNotFoundException {
         try {
             ClassLoader tcl = getTCL(); 

@@ -22,6 +22,10 @@ package org.apache.ws.security.util;
 import java.io.Serializable;
 
 public class Mapping implements Serializable {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 4598721541118599293L;
     private String namespaceURI;
     private int namespaceHash;
 

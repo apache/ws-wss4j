@@ -32,6 +32,10 @@ import javax.xml.namespace.QName;
  * @author Davanum Srinivas (dims@yahoo.com).
  */
 public class WSSecurityException extends RemoteException {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -6676817793986149732L;
     public static final int FAILURE = 0;
     public static final int UNSUPPORTED_SECURITY_TOKEN = 1;
     public static final int UNSUPPORTED_ALGORITHM = 2;

@@ -28,6 +28,10 @@ import javax.xml.namespace.QName;
  * @author Andras Avar (andras.avar@nokia.com)
  */
 public class SOAP12Constants implements SOAPConstants {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 3784866613259361834L;
     private static QName headerQName = new QName(WSConstants.URI_SOAP12_ENV,
             WSConstants.ELEM_HEADER);
     private static QName bodyQName = new QName(WSConstants.URI_SOAP12_ENV,

@@ -26,7 +26,12 @@ import java.security.Provider;
  */
 public class STRTransformProvider extends Provider {
 
-   public STRTransformProvider() {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -9148982936620100249L;
+
+    public STRTransformProvider() {
        super("STRTransform", 1.6, "Security Token Reference Transform Provider");
        put(
            (String)"TransformService." + STRTransform.TRANSFORM_URI, 

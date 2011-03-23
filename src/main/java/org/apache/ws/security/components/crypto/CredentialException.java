@@ -30,6 +30,10 @@ import java.util.ResourceBundle;
  * @author Davanum Srinivas (dims@yahoo.com).
  */
 public class CredentialException extends Exception {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -7430772472861773930L;
     public static final int FAILURE = -1;
     public static final int EXPIRED = 1;
     public static final int DEFECTIVE = 2;

@@ -26,6 +26,10 @@ import java.security.Principal;
 
 public class CustomTokenPrincipal implements Principal, Serializable {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -7439821246832337774L;
     private Element tokenElement;
     private String name;
     private Object tokenObject;

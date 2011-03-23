@@ -491,6 +491,36 @@ default is "300".</td>
 valid. The default is "0".</td>
 </tr>
 </table>
+<p>
+The configuration values for setting the KeyIdentifiers for signature or encryption 
+are summarised here. See the Javadoc for SIG_KEY_ID and ENC_KEY_ID for more details:
+</p>
+<table name="WSHandler KeyIdentifier values">
+<tr>
+<th>Value</th>
+</tr>
+<tr>
+<td>DirectReference</td>
+</tr>
+<tr>
+<td>IssuerSerial</td>
+</tr>
+<tr>
+<td>X509KeyIdentifier</td>
+</tr>
+<tr>
+<td>SKIKeyIdentifier</td>
+</tr>
+<tr>
+<td>EmbeddedKeyName</td>
+</tr>
+<tr>
+<td>Thumbprint</td>
+</tr>
+<tr>
+<td>EncryptedKeySHA1</td>
+</tr>
+</table>
 </subsection>
 </section>            
 </body>

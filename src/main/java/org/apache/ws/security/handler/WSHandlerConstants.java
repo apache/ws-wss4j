@@ -656,11 +656,7 @@ public class WSHandlerConstants {
     //
     
     /**
-     * The WSDoAllReceiver handler stores a result <code>List</code>
-     * in this property.
-     * <p/>
-     * The list contains <code>WSHandlerResult</code> objects
-     * for each chained WSDoAllReceiver handler.
+     * The WSHandler stores a result <code>List</code> in this property.
      */
     public static final String RECV_RESULTS = "RECV_RESULTS";
     
