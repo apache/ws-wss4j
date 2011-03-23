@@ -38,7 +38,7 @@ import java.util.Properties;
  */
 public abstract class CryptoFactory {
     private static final Log log = LogFactory.getLog(CryptoFactory.class);
-    private static final Class<?> defaultCryptoClass = 
+    private static final Class<? extends Crypto> defaultCryptoClass = 
         org.apache.ws.security.components.crypto.Merlin.class;
 
     /**
@@ -100,14 +100,14 @@ public abstract class CryptoFactory {
         ClassLoader classLoader
     ) throws WSSecurityException {
         String cryptoClassName = properties.getProperty("org.apache.ws.security.crypto.provider");
-        Class<?> cryptoClass = null;
+        Class<? extends Crypto> cryptoClass = null;
         if (cryptoClassName == null 
             || cryptoClassName.equals("org.apache.ws.security.components.crypto.Merlin")) {
             cryptoClass = defaultCryptoClass;
         } else {
             try {
                 // instruct the class loader to load the crypto implementation
-                cryptoClass = Loader.loadClass(cryptoClassName);
+                cryptoClass = Loader.loadClass(cryptoClassName, Crypto.class);
             } catch (ClassNotFoundException ex) {
                 if (log.isDebugEnabled()) {
                     log.debug(ex.getMessage(), ex);
@@ -136,7 +136,7 @@ public abstract class CryptoFactory {
      * @throws WSSecurityException if there is an error in loading the crypto properties
      */
     public static Crypto getInstance(
-        Class<?> cryptoClass, 
+        Class<? extends Crypto> cryptoClass, 
         Map<Object, Object> map
     ) throws WSSecurityException {
         return loadClass(cryptoClass, map, Loader.getClassLoader(CryptoFactory.class));
@@ -179,7 +179,7 @@ public abstract class CryptoFactory {
      * @throws WSSecurityException if there is an error in loading the crypto properties
      */
     private static Crypto loadClass(
-        Class<?> cryptoClass,
+        Class<? extends Crypto> cryptoClass,
         Map<Object, Object> map, 
         ClassLoader loader
     ) throws WSSecurityException {
@@ -188,8 +188,8 @@ public abstract class CryptoFactory {
         }
         try {
             Class<?>[] classes = new Class[]{Map.class, ClassLoader.class};
-            Constructor<?> c = cryptoClass.getConstructor(classes);
-            return (Crypto) c.newInstance(new Object[] {map, loader});
+            Constructor<? extends Crypto> c = cryptoClass.getConstructor(classes);
+            return c.newInstance(new Object[] {map, loader});
         } catch (java.lang.Exception e) {
             if (log.isDebugEnabled()) {
                 log.debug("Unable to instantiate: " + cryptoClass.getName(), e);
@@ -207,7 +207,7 @@ public abstract class CryptoFactory {
      * @throws WSSecurityException if there is an error in loading the crypto properties
      */
     private static Crypto loadClass(
-        Class<?> cryptoClass, 
+        Class<? extends Crypto> cryptoClass, 
         Properties map, 
         ClassLoader loader
     ) throws WSSecurityException {
@@ -216,8 +216,8 @@ public abstract class CryptoFactory {
         }
         try {
             Class<?>[] classes = new Class[]{Properties.class, ClassLoader.class};
-            Constructor<?> c = cryptoClass.getConstructor(classes);
-            return (Crypto) c.newInstance(new Object[] {map, loader});
+            Constructor<? extends Crypto> c = cryptoClass.getConstructor(classes);
+            return c.newInstance(new Object[] {map, loader});
         } catch (java.lang.Exception e) {
             if (log.isDebugEnabled()) {
                 log.debug("Unable to instantiate: " + cryptoClass.getName(), e);

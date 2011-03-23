@@ -37,7 +37,8 @@ import java.util.Properties;
  */
 public abstract class SAMLIssuerFactory {
     private static final Log log = LogFactory.getLog(SAMLIssuerFactory.class);
-    private static final Class<?> defaultSAMLClass = org.apache.ws.security.saml.SAMLIssuerImpl.class;
+    private static final Class<? extends SAMLIssuer> defaultSAMLClass 
+        = org.apache.ws.security.saml.SAMLIssuerImpl.class;
 
     /**
      * getInstance
@@ -75,7 +76,7 @@ public abstract class SAMLIssuerFactory {
      * @throws WSSecurityException if there is an error in loading the crypto properties
      */
     public static SAMLIssuer getInstance(
-        Class<?> samlClass,
+        Class<? extends SAMLIssuer> samlClass,
         Properties properties
     ) throws WSSecurityException {
         return loadClass(samlClass, properties);
@@ -101,14 +102,14 @@ public abstract class SAMLIssuerFactory {
         Properties properties = getProperties(propFilename);
         String samlClassName = 
             properties.getProperty("org.apache.ws.security.saml.issuerClass");
-        Class<?> samlIssuerClass = null;
+        Class<? extends SAMLIssuer> samlIssuerClass = null;
         if (samlClassName == null 
             || samlClassName.equals("org.apache.ws.security.saml.SAMLIssuerImpl")) {
             samlIssuerClass = defaultSAMLClass;
         } else {
             try {
                 // instruct the class loader to load the crypto implementation
-                samlIssuerClass = Loader.loadClass(samlClassName);
+                samlIssuerClass = Loader.loadClass(samlClassName, SAMLIssuer.class);
             } catch (ClassNotFoundException ex) {
                 if (log.isDebugEnabled()) {
                     log.debug(ex.getMessage(), ex);
@@ -121,7 +122,7 @@ public abstract class SAMLIssuerFactory {
     }
 
     private static SAMLIssuer loadClass(
-        Class<?> samlIssuerClass, 
+        Class<? extends SAMLIssuer> samlIssuerClass, 
         Properties properties
     ) throws WSSecurityException {
         SAMLIssuer samlIssuer = null;
@@ -130,8 +131,8 @@ public abstract class SAMLIssuerFactory {
         }
         try {
             Class<?>[] classes = new Class<?>[]{Properties.class};
-            Constructor<?> c = samlIssuerClass.getConstructor(classes);
-            samlIssuer = (SAMLIssuer) c.newInstance(new Object[]{properties});
+            Constructor<? extends SAMLIssuer> c = samlIssuerClass.getConstructor(classes);
+            samlIssuer = c.newInstance(new Object[]{properties});
             return samlIssuer;
         } catch (java.lang.Exception ex) {
             if (log.isDebugEnabled()) {

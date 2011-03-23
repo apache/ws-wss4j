@@ -132,8 +132,7 @@ public class Loader {
      *
      * @return the class loader of the argument
      */
-    @SuppressWarnings("unchecked")
-    public static ClassLoader getClassLoader(final Class clazz) {
+    public static ClassLoader getClassLoader(final Class<?> clazz) {
         return AccessController.doPrivileged(new PrivilegedAction<ClassLoader>() {
             public ClassLoader run() {
                 return clazz.getClassLoader();
@@ -150,11 +149,10 @@ public class Loader {
      * @return Class
      * @throws ClassNotFoundException
      */
-    @SuppressWarnings("unchecked")
-    public static Class loadClass(ClassLoader loader, String clazz) throws ClassNotFoundException {
+    public static Class<?> loadClass(ClassLoader loader, String clazz) throws ClassNotFoundException {
         try {
             if (loader != null) {
-                Class c = loader.loadClass(clazz);
+                Class<?> c = loader.loadClass(clazz);
                 if (c != null) {
                     return c;
                 }
@@ -166,6 +164,31 @@ public class Loader {
     }
 
     /**
+     * Try the specified classloader and then fall back to the loadClass
+     * <p/>
+     *
+     * @param loader
+     * @param clazz
+     * @param type
+     * @return Class
+     * @throws ClassNotFoundException
+     */
+    public static <T> Class<? extends T> loadClass(ClassLoader loader, 
+                                      String clazz,
+                                      Class<T> type) throws ClassNotFoundException {
+        try {
+            if (loader != null) {
+                Class<?> c = loader.loadClass(clazz);
+                if (c != null) {
+                    return c.asSubclass(type);
+                }
+            }
+        } catch (Throwable e) {
+            log.warn(e.getMessage(), e);
+        }
+        return loadClass(clazz, true, type);
+    }
+    /**
      * If running under JDK 1.2 load the specified class using the
      * <code>Thread</code> <code>contextClassLoader</code> if that
      * fails try Class.forname.
@@ -175,18 +198,36 @@ public class Loader {
      * @return TODO
      * @throws ClassNotFoundException
      */
-    @SuppressWarnings("unchecked")
-    public static Class loadClass(String clazz) throws ClassNotFoundException {
+    public static Class<?> loadClass(String clazz) throws ClassNotFoundException {
         return loadClass(clazz, true);
     }
+    /**
+     * If running under JDK 1.2 load the specified class using the
+     * <code>Thread</code> <code>contextClassLoader</code> if that
+     * fails try Class.forname.
+     * <p/>
+     *
+     * @param clazz
+     * @param type  Type to cast it to
+     * @return TODO
+     * @throws ClassNotFoundException
+     */
+    public static <T> Class<? extends T> loadClass(String clazz, Class<T> type)
+        throws ClassNotFoundException {
+        return loadClass(clazz, true, type);
+    }
     
-    @SuppressWarnings("unchecked")
-    public static Class loadClass(String clazz, boolean warn) throws ClassNotFoundException {
+    public static <T> Class<? extends T> loadClass(String clazz, 
+                                                   boolean warn,
+                                                   Class<T> type) throws ClassNotFoundException {
+        return loadClass(clazz, warn).asSubclass(type);
+    }
+    public static Class<?> loadClass(String clazz, boolean warn) throws ClassNotFoundException {
         try {
             ClassLoader tcl = getTCL(); 
             
             if (tcl != null) {
-                Class c = tcl.loadClass(clazz);
+                Class<?> c = tcl.loadClass(clazz);
                 if (c != null) {
                     return c;
                 }

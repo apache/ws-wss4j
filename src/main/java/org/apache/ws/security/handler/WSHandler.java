@@ -885,11 +885,13 @@ public abstract class WSHandler {
         RequestData requestData
     ) throws WSSecurityException {
 
-        Class<?> cbClass = null;
+        Class<? extends CallbackHandler> cbClass = null;
         CallbackHandler cbHandler = null;
         try {
             cbClass = 
-                Loader.loadClass(getClassLoader(requestData.getMsgContext()), callbackHandlerClass);
+                Loader.loadClass(getClassLoader(requestData.getMsgContext()), 
+                                 callbackHandlerClass,
+                                 CallbackHandler.class);
         } catch (ClassNotFoundException e) {
             throw new WSSecurityException(
                 "WSHandler: cannot load callback handler class: " + callbackHandlerClass, e

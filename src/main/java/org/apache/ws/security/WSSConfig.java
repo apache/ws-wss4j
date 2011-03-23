@@ -756,13 +756,12 @@ public class WSSConfig {
      * 
      * @return Returns the actual name of the provider that was loaded
      */
-    @SuppressWarnings("unchecked")
     public static String addJceProvider(String name, String className) {
         Provider currentProvider = Security.getProvider(name);
         if (currentProvider == null) {
             try {
-                Class<Provider> clazz = Loader.loadClass(className, false);
-                Provider provider = (Provider)clazz.newInstance();
+                Class<? extends Provider> clazz = Loader.loadClass(className, false, Provider.class);
+                Provider provider = clazz.newInstance();
                 //
                 // Install the provider after the SUN provider (see WSS-99)
                 // Otherwise fall back to the old behaviour of inserting
@@ -813,13 +812,12 @@ public class WSSConfig {
      * 
      * @return Returns the actual name of the provider that was loaded
      */
-    @SuppressWarnings("unchecked")
     public static String appendJceProvider(String name, String className) {
         Provider currentProvider = Security.getProvider(name);
         if (currentProvider == null) {
             try {
-                Class<Provider> clazz = Loader.loadClass(className, false);
-                Provider provider = (Provider)clazz.newInstance();
+                Class<? extends Provider> clazz = Loader.loadClass(className, false, Provider.class);
+                Provider provider = clazz.newInstance();
                 
                 int ret = Security.addProvider(provider);
                 if (log.isDebugEnabled()) {

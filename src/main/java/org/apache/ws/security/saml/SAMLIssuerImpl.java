@@ -134,13 +134,13 @@ public class SAMLIssuerImpl implements SAMLIssuer {
             try {
                 String samlCallbackClassname = 
                     properties.getProperty("org.apache.ws.security.saml.callback");
-                Class<?> callbackClass = null;
+                Class<? extends CallbackHandler> callbackClass = null;
                 try {
-                    callbackClass = Loader.loadClass(samlCallbackClassname);
+                    callbackClass = Loader.loadClass(samlCallbackClassname, CallbackHandler.class);
                 } catch (ClassNotFoundException ex) {
                     throw new WSSecurityException(ex.getMessage(), ex);
                 }
-                callbackHandler = (CallbackHandler)callbackClass.newInstance();
+                callbackHandler = callbackClass.newInstance();
             } catch (InstantiationException ex) {
                 throw new WSSecurityException(ex.getMessage(), ex);
             } catch (IllegalAccessException ex) {
