@@ -37,7 +37,6 @@ public class Init {
     private static boolean initialized = false;
 
     @SuppressWarnings("unchecked")
-    //todo init from url
     public synchronized static void init(URL url) throws WSSecurityException {
         if (!initialized) {
             try {
@@ -46,13 +45,18 @@ public class Init {
                 SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
                 Schema schema = schemaFactory.newSchema(Init.class.getClassLoader().getResource("security-config.xsd"));
                 unmarshaller.setSchema(schema);
-                JAXBElement<ConfigurationType> configurationTypeJAXBElement = (JAXBElement<ConfigurationType>) unmarshaller.unmarshal(Init.class.getClassLoader().getResourceAsStream("security-config.xml"));
+                JAXBElement<ConfigurationType> configurationTypeJAXBElement;
+                if (url != null) {
+                    configurationTypeJAXBElement = (JAXBElement<ConfigurationType>) unmarshaller.unmarshal(url);
+                } else {
+                    configurationTypeJAXBElement = (JAXBElement<ConfigurationType>) unmarshaller.unmarshal(Init.class.getClassLoader().getResourceAsStream("security-config.xml"));
+                }
 
                 JCEAlgorithmMapper.init(configurationTypeJAXBElement.getValue().getJCEAlgorithmMappings());
                 SecurityHeaderHandlerMapper.init(configurationTypeJAXBElement.getValue().getSecurityHeaderHandlers());
 
             } catch (Exception e) {
-                throw new WSSecurityException(e.getMessage(), e);
+                throw new WSSecurityException(e);
             }
             initialized = true;
         }

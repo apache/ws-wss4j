@@ -9,6 +9,7 @@ package org.swssf.config;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.swssf.ext.Utils;
 import org.xmlsecurity.ns.configuration.HandlerType;
 import org.xmlsecurity.ns.configuration.SecurityHeaderHandlersType;
 
@@ -47,7 +48,7 @@ public class SecurityHeaderHandlerMapper {
             return null;
         }
         try {
-            return Thread.currentThread().getContextClassLoader().loadClass(javaClass);
+            return Utils.loadClass(javaClass);
         } catch (ClassNotFoundException e) {
             logger.warn("No handler for " + name + " found: " + e.getMessage());
         }

@@ -91,4 +91,8 @@ public class Utils {
             throw new WSSecurityException(e);
         }
     }
+
+    public static Class loadClass(String className) throws ClassNotFoundException {
+        return Thread.currentThread().getContextClassLoader().loadClass(className);
+    }
 }
