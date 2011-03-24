@@ -14,11 +14,11 @@
  */
 package org.swssf.test;
 
+import org.apache.ws.security.handler.WSHandlerConstants;
 import org.swssf.ext.Constants;
 import org.swssf.ext.SecurePart;
 import org.swssf.ext.SecurityProperties;
 import org.swssf.test.utils.CustomW3CDOMStreamReader;
-import org.apache.ws.security.handler.WSHandlerConstants;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.w3c.dom.Document;
@@ -253,6 +253,47 @@ public class EncDecryptionTest extends AbstractTestBase {
     }
 
     @Test
+    public void testEncDecryptionPartsHeaderOutbound() throws Exception {
+
+        ByteArrayOutputStream baos;
+        {
+            SecurityProperties securityProperties = new SecurityProperties();
+            Constants.Action[] actions = new Constants.Action[]{Constants.Action.ENCRYPT};
+            securityProperties.setOutAction(actions);
+            securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+            securityProperties.setEncryptionUser("receiver");
+            securityProperties.addEncryptionPart(new SecurePart("complexType", "http://www.w3.org/1999/XMLSchema", "Element"));
+            securityProperties.addEncryptionPart(new SecurePart("testEncryptedHeader", "http://www.example.com", "Element"));
+
+            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-encryptedHeader.xml");
+
+            baos = doOutboundSecurity(securityProperties, sourceDocument);
+
+            Document document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
+            NodeList nodeList = document.getElementsByTagNameNS(Constants.TAG_xenc_EncryptedKey.getNamespaceURI(), Constants.TAG_xenc_EncryptedKey.getLocalPart());
+            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), Constants.TAG_wsse_Security.getLocalPart());
+
+            nodeList = document.getElementsByTagNameNS(Constants.TAG_xenc_EncryptedData.getNamespaceURI(), Constants.TAG_xenc_EncryptedData.getLocalPart());
+            Assert.assertEquals(nodeList.getLength(), 27);
+
+            nodeList = document.getElementsByTagNameNS(Constants.TAG_xenc_DataReference.getNamespaceURI(), Constants.TAG_xenc_DataReference.getLocalPart());
+            Assert.assertEquals(nodeList.getLength(), 26);
+
+            nodeList = document.getElementsByTagNameNS("http://www.w3.org/1999/XMLSchema", "complexType");
+            Assert.assertEquals(nodeList.getLength(), 0);
+        }
+
+        //done encryption; now test decryption:
+        {
+            String action = WSHandlerConstants.ENCRYPT;
+            Document doc = doInboundSecurityWithWSS4J(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action);
+
+            //javax.xml.transform.Transformer transformer = TransformerFactory.newInstance().newTransformer();
+            //transformer.transform(new DOMSource(doc), new StreamResult(System.out));
+        }
+    }
+
+    @Test
     public void testEncDecryptionPartsElementInbound() throws Exception {
 
         Document securedDocument;
@@ -284,6 +325,46 @@ public class EncDecryptionTest extends AbstractTestBase {
             //no encrypted content
             nodeList = document.getElementsByTagNameNS(Constants.TAG_xenc_EncryptedData.getNamespaceURI(), Constants.TAG_xenc_EncryptedData.getLocalPart());
             Assert.assertEquals(nodeList.getLength(), 0);
+        }
+    }
+
+    @Test
+    public void testEncDecryptionPartsHeaderInbound() throws Exception {
+
+        Document securedDocument;
+        {
+            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-encryptedHeader.xml");
+            String action = WSHandlerConstants.ENCRYPT;
+            Properties properties = new Properties();
+            //wss4j just encrypts the first found element and not all!
+            properties.setProperty(WSHandlerConstants.ENCRYPTION_PARTS, "{Header}{http://www.example.com}testEncryptedHeader;");
+            securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
+
+            //some test that we can really sure we get what we want from WSS4J
+            NodeList nodeList = securedDocument.getElementsByTagNameNS(Constants.TAG_xenc_EncryptedKey.getNamespaceURI(), Constants.TAG_xenc_EncryptedKey.getLocalPart());
+            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), Constants.TAG_wsse_Security.getLocalPart());
+        }
+
+        //javax.xml.transform.Transformer transformer = TransformerFactory.newInstance().newTransformer();
+        //transformer.transform(new DOMSource(securedDocument), new StreamResult(System.out));
+
+        //done encryption; now test decryption:
+        {
+            SecurityProperties securityProperties = new SecurityProperties();
+            securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+            securityProperties.setCallbackHandler(new org.swssf.test.CallbackHandlerImpl());
+            Document document = doInboundSecurity(securityProperties, new CustomW3CDOMStreamReader(securedDocument));
+
+            //header element must still be there
+            NodeList nodeList = document.getElementsByTagNameNS(Constants.TAG_xenc_EncryptedKey.getNamespaceURI(), Constants.TAG_xenc_EncryptedKey.getLocalPart());
+            Assert.assertEquals(nodeList.getLength(), 1);
+            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), Constants.TAG_wsse_Security.getLocalPart());
+
+            //no encrypted content
+            nodeList = document.getElementsByTagNameNS(Constants.TAG_wsse11_EncryptedHeader.getNamespaceURI(), Constants.TAG_wsse11_EncryptedHeader.getLocalPart());
+            Assert.assertEquals(nodeList.getLength(), 1);
+
+            //transformer.transform(new DOMSource(document), new StreamResult(System.out));
         }
     }
 
@@ -507,7 +588,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             XPathExpression xPathExpression = getXPath("/env:Envelope/env:Header/wsse:Security/wsse:BinarySecurityToken");
             Node node = (Node) xPathExpression.evaluate(securedDocument, XPathConstants.NODE);
             Assert.assertNotNull(node);
-            Element parentElement = (Element)node.getParentNode();
+            Element parentElement = (Element) node.getParentNode();
             parentElement.removeChild(node);
             parentElement.appendChild(node);
         }

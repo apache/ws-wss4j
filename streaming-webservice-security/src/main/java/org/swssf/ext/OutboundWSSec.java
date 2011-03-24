@@ -14,6 +14,7 @@
  */
 package org.swssf.ext;
 
+import org.swssf.impl.DocumentContextImpl;
 import org.swssf.impl.OutputProcessorChainImpl;
 import org.swssf.impl.XMLSecurityStreamWriter;
 import org.swssf.impl.processor.output.*;
@@ -24,6 +25,7 @@ import java.io.OutputStream;
 /**
  * Outbound Streaming-WebService-Security
  * An instance of this class can be retrieved over the WSSec class
+ *
  * @author $Author: giger $
  * @version $Revision: 281 $ $Date: 2011-01-04 21:15:27 +0100 (Tue, 04 Jan 2011) $
  */
@@ -38,6 +40,7 @@ public class OutboundWSSec {
     /**
      * This method is the entry point for the incoming security-engine.
      * Hand over the original XMLStreamReader and use the returned one for further processing
+     *
      * @param outputStream The original outputStream
      * @return A new XMLStreamWriter which does transparently the security processing.
      * @throws WSSecurityException thrown when a Security failure occurs
@@ -46,7 +49,11 @@ public class OutboundWSSec {
 
         final SecurityContextImpl securityContextImpl = new SecurityContextImpl();
 
-        OutputProcessorChainImpl processorChain = new OutputProcessorChainImpl(securityContextImpl);
+        DocumentContextImpl documentContext = new DocumentContextImpl();
+        //todo encoding:
+        documentContext.setEncoding("UTF-8");
+
+        OutputProcessorChainImpl processorChain = new OutputProcessorChainImpl(securityContextImpl, documentContext);
         processorChain.addProcessor(new SecurityHeaderOutputProcessor(securityProperties));
 
         for (int i = 0; i < securityProperties.getOutAction().length; i++) {

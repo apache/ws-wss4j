@@ -30,6 +30,7 @@ import java.util.*;
 
 /**
  * Custom XMLStreamWriter to map XMLStreamWriter method calls into XMLEvent's
+ *
  * @author $Author: giger $
  * @version $Revision: 281 $ $Date: 2011-01-04 21:15:27 +0100 (Tue, 04 Jan 2011) $
  */
@@ -47,6 +48,11 @@ public class XMLSecurityStreamWriter implements XMLStreamWriter {
 
     private void chainProcessEvent(XMLEvent xmlEvent) throws XMLStreamException {
         try {
+            if (xmlEvent.isStartElement()) {
+                outputProcessorChain.getDocumentContext().addPathElement(xmlEvent.asStartElement().getName());
+            } else if (xmlEvent.isEndElement()) {
+                outputProcessorChain.getDocumentContext().removePathElement();
+            }
             outputProcessorChain.reset();
             outputProcessorChain.processEvent(xmlEvent);
         } catch (WSSecurityException e) {
@@ -61,7 +67,7 @@ public class XMLSecurityStreamWriter implements XMLStreamWriter {
 
     private void outputOpenStartElement() throws XMLStreamException {
         if (openStartElement != null) {
-            //extend XMLEventNSAllocator and delegate create* methods in AbstractOutput processors to it.
+            //todo extend XMLEventNSAllocator and delegate create* methods in AbstractOutput processors to it.
             //replace all create" methods calls in this class with an delegate to XMLEventNSAllocator
             //chainProcessEvent(xmlEventFactory.createStartElement(openStartElement, currentAttributes.iterator(), currentNamespaces.iterator()));
             //add namespace of current element to the list (important for C14N)

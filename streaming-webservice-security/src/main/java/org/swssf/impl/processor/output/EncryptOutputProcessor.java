@@ -14,12 +14,12 @@
  */
 package org.swssf.impl.processor.output;
 
+import org.apache.commons.codec.binary.Base64OutputStream;
 import org.swssf.config.JCEAlgorithmMapper;
 import org.swssf.ext.*;
 import org.swssf.impl.EncryptionPartDef;
 import org.swssf.impl.XMLEventNSAllocator;
 import org.swssf.impl.util.TrimmerOutputStream;
-import org.apache.commons.codec.binary.Base64OutputStream;
 
 import javax.crypto.Cipher;
 import javax.crypto.CipherOutputStream;
@@ -30,10 +30,7 @@ import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.XMLEventWriter;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.events.Characters;
-import javax.xml.stream.events.EndElement;
-import javax.xml.stream.events.StartElement;
-import javax.xml.stream.events.XMLEvent;
+import javax.xml.stream.events.*;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -42,7 +39,9 @@ import java.security.Key;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
-/** Processor to encrypt XML structures
+/**
+ * Processor to encrypt XML structures
+ *
  * @author $Author: giger $
  * @version $Revision: 281 $ $Date: 2011-01-04 21:15:27 +0100 (Tue, 04 Jan 2011) $
  */
@@ -109,7 +108,7 @@ public class EncryptOutputProcessor extends AbstractOutputProcessor {
                                 encryptionPartDef.setKeyId(symmetricKeyId);//EncKeyId-1483925398
                                 encryptionPartDef.setSymmetricKey(symmetricKey);
                                 encryptionPartDefList.add(encryptionPartDef);
-                                internalEncryptionOutputProcessor = new InternalEncryptionOutputProcessor(getSecurityProperties(), encryptionPartDef, startElement.getName(), outputProcessorChain.getSecurityContext().<XMLEventNSAllocator>get(Constants.XMLEVENT_NS_ALLOCATOR));
+                                internalEncryptionOutputProcessor = new InternalEncryptionOutputProcessor(getSecurityProperties(), encryptionPartDef, startElement, outputProcessorChain.getSecurityContext().<XMLEventNSAllocator>get(Constants.XMLEVENT_NS_ALLOCATOR));
                             } catch (NoSuchAlgorithmException e) {
                                 throw new WSSecurityException(e.getMessage(), e);
                             } catch (NoSuchPaddingException e) {
@@ -144,11 +143,12 @@ public class EncryptOutputProcessor extends AbstractOutputProcessor {
         private XMLEventWriter xmlEventWriter;
         private OutputStream cipherOutputStream;
 
-        private QName startElement;
+        private StartElement startElement;
         private int elementCounter = 0;
+        private boolean doEncryptedHeader = false;
 
         InternalEncryptionOutputProcessor(SecurityProperties securityProperties, EncryptionPartDef encryptionPartDef,
-                                          QName startElement, XMLEventNSAllocator xmlEventNSAllocator)
+                                          StartElement startElement, XMLEventNSAllocator xmlEventNSAllocator)
                 throws WSSecurityException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IOException, XMLStreamException {
 
             super(securityProperties);
@@ -192,7 +192,7 @@ public class EncryptOutputProcessor extends AbstractOutputProcessor {
 
                 StartElement startElement = xmlEvent.asStartElement();
 
-                if (startElement.getName().equals(this.startElement) && elementCounter == 0) {
+                if (startElement.getName().equals(this.startElement.getName()) && elementCounter == 0) {
                     //if the user selected element encryption we have to encrypt the current element-event...
                     if (encryptionPartDef.getModifier() == EncryptionPartDef.Modifier.Element) {
                         OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
@@ -217,7 +217,7 @@ public class EncryptOutputProcessor extends AbstractOutputProcessor {
 
                 EndElement endElement = xmlEvent.asEndElement();
 
-                if (endElement.getName().equals(this.startElement) && elementCounter == 0) {
+                if (endElement.getName().equals(this.startElement.getName()) && elementCounter == 0) {
                     OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
                     if (encryptionPartDef.getModifier() == EncryptionPartDef.Modifier.Element) {
                         encryptEvent(xmlEvent);
@@ -257,11 +257,30 @@ public class EncryptOutputProcessor extends AbstractOutputProcessor {
          * Creates the Data structure around the cipher data
          */
         private void processEventInternal(OutputProcessorChain outputProcessorChain) throws XMLStreamException, WSSecurityException {
-            Map<QName, String> attributes = new HashMap<QName, String>();
+            Map<QName, String> attributes = null;
+
+            //WSS 1.1 EncryptedHeader Element:
+            if (outputProcessorChain.getDocumentContext().getDocumentLevel() == 3
+                    && outputProcessorChain.getDocumentContext().isInSOAPHeader()) {
+                doEncryptedHeader = true;
+
+                attributes = new HashMap<QName, String>();
+
+                Iterator<Attribute> attributeIterator = this.startElement.getAttributes();
+                while (attributeIterator.hasNext()) {
+                    Attribute attribute = attributeIterator.next();
+                    if (!attribute.isNamespace() &&
+                            (Constants.NS_SOAP11.equals(attribute.getName().getNamespaceURI()) ||
+                                    Constants.NS_SOAP12.equals(attribute.getName().getNamespaceURI()))) {
+                        attributes.put(attribute.getName(), attribute.getValue());
+                    }
+                }
+                createStartElementAndOutputAsEvent(outputProcessorChain, Constants.TAG_wsse11_EncryptedHeader, attributes);
+            }
+
+            attributes = new HashMap<QName, String>();
             attributes.put(Constants.ATT_NULL_Id, encryptionPartDef.getEncRefId());
             attributes.put(Constants.ATT_NULL_Type, encryptionPartDef.getModifier().getModifier());
-            //todo WSS 1.0 says that encrypted header elements should wrap this in an EncryptedHeader Element
-            //todo and copies attributes like actor mustUnderstand etc to it!
             createStartElementAndOutputAsEvent(outputProcessorChain, Constants.TAG_xenc_EncryptedData, attributes);
 
             attributes = new HashMap<QName, String>();
@@ -324,6 +343,10 @@ public class EncryptOutputProcessor extends AbstractOutputProcessor {
             createEndElementAndOutputAsEvent(outputProcessorChain, Constants.TAG_xenc_CipherValue);
             createEndElementAndOutputAsEvent(outputProcessorChain, Constants.TAG_xenc_CipherData);
             createEndElementAndOutputAsEvent(outputProcessorChain, Constants.TAG_xenc_EncryptedData);
+
+            if (doEncryptedHeader) {
+                createEndElementAndOutputAsEvent(outputProcessorChain, Constants.TAG_wsse11_EncryptedHeader);
+            }
         }
     }
 

@@ -22,6 +22,7 @@ import javax.xml.stream.events.XMLEvent;
 
 /**
  * Processor to build the Security Header structure
+ *
  * @author $Author: giger $
  * @version $Revision: 281 $ $Date: 2011-01-04 21:15:27 +0100 (Tue, 04 Jan 2011) $
  */
@@ -51,9 +52,7 @@ public class SecurityHeaderOutputProcessor extends AbstractOutputProcessor {
                 //create subchain and output securityHeader
                 OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
                 createStartElementAndOutputAsEvent(subOutputProcessorChain, Constants.TAG_wsse_Security, null);
-                subOutputProcessorChain.reset();
                 createEndElementAndOutputAsEvent(subOutputProcessorChain, Constants.TAG_wsse_Security);
-                subOutputProcessorChain.reset();
 
                 //remove this processor. its no longer needed.
                 outputProcessorChain.removeProcessor(this);
@@ -65,15 +64,10 @@ public class SecurityHeaderOutputProcessor extends AbstractOutputProcessor {
 
                 //create subchain and output soap-header and securityHeader
                 OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
-                //todo can the reset() methods moved to createXY methods?
                 createStartElementAndOutputAsEvent(subOutputProcessorChain, Constants.TAG_soap11_Header, null);
-                subOutputProcessorChain.reset();
                 createStartElementAndOutputAsEvent(subOutputProcessorChain, Constants.TAG_wsse_Security, null);
-                subOutputProcessorChain.reset();
                 createEndElementAndOutputAsEvent(subOutputProcessorChain, Constants.TAG_wsse_Security);
-                subOutputProcessorChain.reset();
                 createEndElementAndOutputAsEvent(subOutputProcessorChain, Constants.TAG_soap11_Header);
-                subOutputProcessorChain.reset();
 
                 //output current soap-header event
                 outputProcessorChain.processEvent(xmlEvent);

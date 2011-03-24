@@ -18,6 +18,7 @@ import javax.xml.namespace.QName;
 
 /**
  * Constants for global use
+ *
  * @author $Author: giger $
  * @version $Revision: 281 $ $Date: 2011-01-04 21:15:27 +0100 (Tue, 04 Jan 2011) $
  */
@@ -38,8 +39,10 @@ public class Constants {
     public static final String NS_XMLENC = "http://www.w3.org/2001/04/xmlenc#";
     public static final String NS_DSIG = "http://www.w3.org/2000/09/xmldsig#";
     public static final String NS_WSSE = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd";
+    public static final String NS_WSSE11 = "http://docs.oasis-open.org/wss/oasis-wss-wssecurity-secext-1.1.xsd";
     public static final String NS_WSU = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd";
     public static final String NS_SOAP11 = "http://schemas.xmlsoap.org/soap/envelope/";
+    public static final String NS_SOAP12 = "http://www.w3.org/2003/05/soap-envelope";
 
     public static final String PREFIX_SOAPENV = "env";
     public static final QName TAG_soap11_Envelope = new QName(NS_SOAP11, "Envelope", PREFIX_SOAPENV);
@@ -86,6 +89,9 @@ public class Constants {
     public static final QName ATT_wsu_Id = new QName(NS_WSU, "Id", PREFIX_WSU);
 
     public static final QName TAG_xenc_EncryptedData = new QName(NS_XMLENC, "EncryptedData", PREFIX_XENC);
+
+    public static final String PREFIX_WSSE11 = "wsse11";
+    public static final QName TAG_wsse11_EncryptedHeader = new QName(NS_WSSE11, "EncryptedHeader", PREFIX_WSSE11);
 
     public static final QName TAG_dsig_Signature = new QName(NS_DSIG, "Signature", PREFIX_DSIG);
 

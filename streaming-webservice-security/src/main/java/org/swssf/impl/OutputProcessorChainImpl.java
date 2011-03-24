@@ -14,9 +14,9 @@
  */
 package org.swssf.impl;
 
-import org.swssf.ext.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.swssf.ext.*;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.XMLEvent;
@@ -26,6 +26,7 @@ import java.util.List;
 
 /**
  * Implementation of a OutputProcessorChain
+ *
  * @author $Author: giger $
  * @version $Revision: 281 $ $Date: 2011-01-04 21:15:27 +0100 (Tue, 04 Jan 2011) $
  */
@@ -38,14 +39,24 @@ public class OutputProcessorChainImpl implements OutputProcessorChain {
     private int curPos = 0;
 
     private SecurityContext securityContext;
+    private DocumentContextImpl documentContext;
 
     public OutputProcessorChainImpl(SecurityContext securityContext) {
         this(securityContext, 0);
     }
 
     public OutputProcessorChainImpl(SecurityContext securityContext, int startPos) {
+        this(securityContext, new DocumentContextImpl(), startPos);
+    }
+
+    public OutputProcessorChainImpl(SecurityContext securityContext, DocumentContextImpl documentContext) {
+        this(securityContext, documentContext, 0);
+    }
+
+    protected OutputProcessorChainImpl(SecurityContext securityContext, DocumentContextImpl documentContextImpl, int startPos) {
         this.securityContext = securityContext;
         this.curPos = this.startPos = startPos;
+        documentContext = documentContextImpl;
     }
 
     public int getCurPos() {
@@ -66,6 +77,10 @@ public class OutputProcessorChainImpl implements OutputProcessorChain {
 
     public SecurityContext getSecurityContext() {
         return this.securityContext;
+    }
+
+    public DocumentContext getDocumentContext() {
+        return this.documentContext;
     }
 
     private void setOutputProcessors(List<OutputProcessor> outputProcessors) {
@@ -171,7 +186,8 @@ public class OutputProcessorChainImpl implements OutputProcessorChain {
 
     public OutputProcessorChain createSubChain(OutputProcessor outputProcessor) throws XMLStreamException, WSSecurityException {
         //we don't clone the processor-list to get updates in the sublist too!
-        OutputProcessorChainImpl outputProcessorChain = new OutputProcessorChainImpl(securityContext, outputProcessors.indexOf(outputProcessor) + 1);
+        OutputProcessorChainImpl outputProcessorChain = new OutputProcessorChainImpl(securityContext, documentContext.clone(),
+                outputProcessors.indexOf(outputProcessor) + 1);
         outputProcessorChain.setOutputProcessors(this.outputProcessors);
         return outputProcessorChain;
     }
