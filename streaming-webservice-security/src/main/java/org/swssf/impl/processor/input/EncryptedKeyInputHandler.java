@@ -40,7 +40,7 @@ import java.util.Hashtable;
  */
 public class EncryptedKeyInputHandler extends AbstractInputSecurityHeaderHandler {
 
-    public EncryptedKeyInputHandler(final InputProcessorChain inputProcessorChain, final SecurityProperties securityProperties, Deque<XMLEvent> eventQueue, int index) throws WSSecurityException {
+    public EncryptedKeyInputHandler(final InputProcessorChain inputProcessorChain, final SecurityProperties securityProperties, Deque<XMLEvent> eventQueue, Integer index) throws WSSecurityException {
 
         final EncryptedKeyType encryptedKeyType = (EncryptedKeyType) parseStructure(eventQueue, index);
 

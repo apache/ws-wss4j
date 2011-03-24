@@ -35,7 +35,7 @@ import java.util.GregorianCalendar;
 public class TimestampInputHandler extends AbstractInputSecurityHeaderHandler {
     //todo only one timestamp is allowed per security-header @see spec
 
-    public TimestampInputHandler(InputProcessorChain inputProcessorChain, final SecurityProperties securityProperties, Deque<XMLEvent> eventQueue, int index) throws WSSecurityException {
+    public TimestampInputHandler(InputProcessorChain inputProcessorChain, final SecurityProperties securityProperties, Deque<XMLEvent> eventQueue, Integer index) throws WSSecurityException {
 
         final TimestampType timestampType = (TimestampType) parseStructure(eventQueue, index);
 

@@ -33,10 +33,13 @@ public class JCEAlgorithmMapper {
     private static Map<String, AlgorithmType> algorithmsMap;
     private static String providerName = null;
 
+    private JCEAlgorithmMapper() {
+    }
+
     protected static void init(JCEAlgorithmMappingsType jceAlgorithmMappingsType) throws Exception {
         List<AlgorithmType> algorithms = jceAlgorithmMappingsType.getAlgorithms().getAlgorithm();
-        uriToJCEName = new HashMap(algorithms.size());
-        algorithmsMap = new HashMap(algorithms.size());
+        uriToJCEName = new HashMap<String, String>(algorithms.size());
+        algorithmsMap = new HashMap<String, AlgorithmType>(algorithms.size());
 
         for (int i = 0; i < algorithms.size(); i++) {
             AlgorithmType algorithmType = algorithms.get(i);

@@ -31,7 +31,7 @@ import java.util.Deque;
  */
 public class BinarySecurityTokenInputHandler extends AbstractInputSecurityHeaderHandler {
 
-    public BinarySecurityTokenInputHandler(InputProcessorChain inputProcessorChain, final SecurityProperties securityProperties, Deque<XMLEvent> eventQueue, int index) throws WSSecurityException {
+    public BinarySecurityTokenInputHandler(InputProcessorChain inputProcessorChain, final SecurityProperties securityProperties, Deque<XMLEvent> eventQueue, Integer index) throws WSSecurityException {
 
         final BinarySecurityTokenType binarySecurityTokenType = (BinarySecurityTokenType) parseStructure(eventQueue, index);
 

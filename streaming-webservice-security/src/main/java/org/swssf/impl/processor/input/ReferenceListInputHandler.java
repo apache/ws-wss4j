@@ -29,7 +29,7 @@ import java.util.Deque;
  */
 public class ReferenceListInputHandler extends AbstractInputSecurityHeaderHandler {
 
-    public ReferenceListInputHandler(InputProcessorChain inputProcessorChain, final SecurityProperties securityProperties, Deque<XMLEvent> eventQueue, int index) throws WSSecurityException {
+    public ReferenceListInputHandler(InputProcessorChain inputProcessorChain, final SecurityProperties securityProperties, Deque<XMLEvent> eventQueue, Integer index) throws WSSecurityException {
 
         final ReferenceList referenceList = (ReferenceList) parseStructure(eventQueue, index);
 

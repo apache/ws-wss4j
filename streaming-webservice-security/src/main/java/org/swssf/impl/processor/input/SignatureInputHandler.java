@@ -41,7 +41,7 @@ import java.util.Iterator;
  */
 public class SignatureInputHandler extends AbstractInputSecurityHeaderHandler {
 
-    public SignatureInputHandler(InputProcessorChain inputProcessorChain, SecurityProperties securityProperties, Deque<XMLEvent> eventQueue, int index) throws WSSecurityException, XMLStreamException {
+    public SignatureInputHandler(InputProcessorChain inputProcessorChain, SecurityProperties securityProperties, Deque<XMLEvent> eventQueue, Integer index) throws WSSecurityException, XMLStreamException {
 
         final SignatureType signatureType = (SignatureType) parseStructure(eventQueue, index);
         verifySignedInfo(inputProcessorChain, securityProperties, signatureType, eventQueue, index);

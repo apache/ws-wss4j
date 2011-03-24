@@ -10,32 +10,9 @@
       <xs:element type="con:AlgorithmsType" name="Algorithms" xmlns:con="http://www.xmlsecurity.org/NS/configuration"/>
     </xs:sequence>
   </xs:complexType>
-  <xs:complexType name="KeyResolverType">
-    <xs:sequence>
-      <xs:element type="con:ResolverType" name="Resolver" maxOccurs="unbounded" minOccurs="0" xmlns:con="http://www.xmlsecurity.org/NS/configuration">
-        <xs:annotation>
-          <xs:documentation>This section contains a list of KeyResolvers that are available in
-           every KeyInfo object</xs:documentation>
-        </xs:annotation>
-      </xs:element>
-    </xs:sequence>
-  </xs:complexType>
   <xs:complexType name="CanonicalizationMethodsType">
     <xs:sequence>
       <xs:element type="con:CanonicalizationMethodType" name="CanonicalizationMethod" maxOccurs="unbounded" minOccurs="0" xmlns:con="http://www.xmlsecurity.org/NS/configuration"/>
-    </xs:sequence>
-  </xs:complexType>
-  <xs:complexType name="PrefixMappingsType">
-    <xs:sequence>
-      <xs:element type="con:PrefixMappingType" name="PrefixMapping" maxOccurs="unbounded" minOccurs="0" xmlns:con="http://www.xmlsecurity.org/NS/configuration">
-        <xs:annotation>
-          <xs:documentation>Many classes create Elements which are in a specific namespace;
-           here, the prefixes for these namespaces are defined. But this
-           can also be overwritten using the ElementProxy#setDefaultPrefix()
-           method. You can even set all prefixes to "" so that the corresponding
-           elements are created using the default namespace</xs:documentation>
-        </xs:annotation>
-      </xs:element>
     </xs:sequence>
   </xs:complexType>
   <xs:complexType name="CanonicalizationMethodType">
@@ -98,10 +75,14 @@
       </xs:element>
     </xs:sequence>
   </xs:complexType>
-  <xs:complexType name="KeyInfoType">
-    <xs:sequence>
-      <xs:element type="con:ContentHandlerType" name="ContentHandler" maxOccurs="unbounded" minOccurs="0" xmlns:con="http://www.xmlsecurity.org/NS/configuration"/>
-    </xs:sequence>
+  <xs:complexType name="HandlerType">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute type="xs:string" name="NAME" use="required"/>
+        <xs:attribute type="xs:string" name="URI" use="required"/>
+        <xs:attribute type="xs:string" name="JAVACLASS" use="required"/>
+      </xs:extension>
+    </xs:simpleContent>
   </xs:complexType>
   <xs:complexType name="ResourceBundleType">
     <xs:simpleContent>
@@ -112,14 +93,10 @@
       </xs:extension>
     </xs:simpleContent>
   </xs:complexType>
-  <xs:complexType name="ContentHandlerType">
-    <xs:simpleContent>
-      <xs:extension base="xs:string">
-        <xs:attribute type="xs:string" name="LOCALNAME" use="required"/>
-        <xs:attribute type="xs:string" name="NAMESPACE" use="required"/>
-        <xs:attribute type="xs:string" name="JAVACLASS" use="required"/>
-      </xs:extension>
-    </xs:simpleContent>
+  <xs:complexType name="SecurityHeaderHandlersType">
+    <xs:sequence>
+      <xs:element type="con:HandlerType" name="Handler" maxOccurs="unbounded" minOccurs="0" xmlns:con="http://www.xmlsecurity.org/NS/configuration"/>
+    </xs:sequence>
   </xs:complexType>
   <xs:complexType name="ResourceBundlesType">
     <xs:sequence>
@@ -130,29 +107,22 @@
   </xs:complexType>
   <xs:complexType name="ConfigurationType">
     <xs:sequence>
-      <xs:element type="con:CanonicalizationMethodsType" name="CanonicalizationMethods" xmlns:con="http://www.xmlsecurity.org/NS/configuration"/>
+      <xs:element type="con:SecurityHeaderHandlersType" name="SecurityHeaderHandlers" xmlns:con="http://www.xmlsecurity.org/NS/configuration"/>
+      <xs:element type="con:CanonicalizationMethodsType" name="CanonicalizationMethods" xmlns:con="http://www.xmlsecurity.org/NS/configuration">
+        <xs:annotation>
+          <xs:documentation>&lt;CanonicalizationMethod URI="http://www.w3.org/2006/12/xml-c14n11"
+                              JAVACLASS="org.swssf.impl.transformer.canonicalizer.Canonicalizer11_OmitComments"/>
+      &lt;CanonicalizationMethod URI="http://www.w3.org/2006/12/xml-c14n11#WithComments"
+                              JAVACLASS="org.swssf.impl.transformer.canonicalizer.Canonicalizer11_WithComments"/></xs:documentation>
+        </xs:annotation>
+      </xs:element>
       <xs:element type="con:TransformAlgorithmsType" name="TransformAlgorithms" xmlns:con="http://www.xmlsecurity.org/NS/configuration"/>
       <xs:element type="con:SignatureAlgorithmsType" name="SignatureAlgorithms" xmlns:con="http://www.xmlsecurity.org/NS/configuration"/>
       <xs:element type="con:JCEAlgorithmMappingsType" name="JCEAlgorithmMappings" xmlns:con="http://www.xmlsecurity.org/NS/configuration"/>
       <xs:element type="con:ResourceBundlesType" name="ResourceBundles" xmlns:con="http://www.xmlsecurity.org/NS/configuration"/>
       <xs:element type="con:ResourceResolversType" name="ResourceResolvers" xmlns:con="http://www.xmlsecurity.org/NS/configuration"/>
-      <xs:element type="con:KeyInfoType" name="KeyInfo" xmlns:con="http://www.xmlsecurity.org/NS/configuration">
-        <xs:annotation>
-          <xs:documentation>&lt;defaultLocale languageCode="en" countryCode="US" /></xs:documentation>
-        </xs:annotation>
-      </xs:element>
-      <xs:element type="con:KeyResolverType" name="KeyResolver" xmlns:con="http://www.xmlsecurity.org/NS/configuration"/>
-      <xs:element type="con:PrefixMappingsType" name="PrefixMappings" xmlns:con="http://www.xmlsecurity.org/NS/configuration"/>
     </xs:sequence>
     <xs:attribute type="xs:string" name="target"/>
-  </xs:complexType>
-  <xs:complexType name="PrefixMappingType">
-    <xs:simpleContent>
-      <xs:extension base="xs:string">
-        <xs:attribute type="xs:string" name="namespace" use="required"/>
-        <xs:attribute type="xs:string" name="prefix" use="required"/>
-      </xs:extension>
-    </xs:simpleContent>
   </xs:complexType>
   <xs:complexType name="AlgorithmsType">
     <xs:sequence>

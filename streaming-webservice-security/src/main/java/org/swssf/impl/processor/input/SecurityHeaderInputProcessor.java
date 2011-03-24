@@ -14,6 +14,9 @@
  */
 package org.swssf.impl.processor.input;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.swssf.config.SecurityHeaderHandlerMapper;
 import org.swssf.ext.*;
 
 import javax.xml.namespace.QName;
@@ -21,8 +24,9 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
-import java.util.ArrayDeque;
-import java.util.Deque;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.util.*;
 
 /**
  * Processor for the Security-Header XML Structure.
@@ -32,6 +36,8 @@ import java.util.Deque;
  * @version $Revision: 281 $ $Date: 2011-01-04 21:15:27 +0100 (Tue, 04 Jan 2011) $
  */
 public class SecurityHeaderInputProcessor extends AbstractInputProcessor {
+
+    protected static final transient Log logger = LogFactory.getLog(SecurityHeaderInputProcessor.class);
 
     private ArrayDeque<XMLEvent> xmlEventList = new ArrayDeque<XMLEvent>();
     private int eventCount = 0;
@@ -114,20 +120,77 @@ public class SecurityHeaderInputProcessor extends AbstractInputProcessor {
         throw new WSSecurityException("No Security");
     }
 
-    //todo move this method. DecryptProcessor should not have a dependency to this processor
-    //this must be configurable in a xml file. Create a class that looks up the responsible processor
+    private static void engageSecurityHeaderHandler(InputProcessorChain inputProcessorChain,
+                                                    SecurityProperties securityProperties,
+                                                    Deque eventQueue,
+                                                    Integer index,
+                                                    QName elementName)
+            throws WSSecurityException, XMLStreamException {
 
-    private static void engageSecurityHeaderHandler(InputProcessorChain inputProcessorChain, SecurityProperties securityProperties, Deque eventQueue, int index, QName elementName) throws WSSecurityException, XMLStreamException {
-        if (elementName.equals(Constants.TAG_wsse_BinarySecurityToken)) {
-            new BinarySecurityTokenInputHandler(inputProcessorChain, securityProperties, eventQueue, index);
-        } else if (elementName.equals(Constants.TAG_xenc_EncryptedKey)) {
-            new EncryptedKeyInputHandler(inputProcessorChain, securityProperties, eventQueue, index);
-        } else if (elementName.equals(Constants.TAG_dsig_Signature)) {
-            new SignatureInputHandler(inputProcessorChain, securityProperties, eventQueue, index);
-        } else if (elementName.equals(Constants.TAG_wsu_Timestamp)) {
-            new TimestampInputHandler(inputProcessorChain, securityProperties, eventQueue, index);
-        } else if (elementName.equals(Constants.TAG_xenc_ReferenceList)) {
-            new ReferenceListInputHandler(inputProcessorChain, securityProperties, eventQueue, index);
+        Class clazz = SecurityHeaderHandlerMapper.getSecurityHeaderHandler(elementName);
+        Constructor[] constructors = clazz.getConstructors();
+        Comparator<Constructor> comparator = new Comparator<Constructor>() {
+            public int compare(Constructor o1, Constructor o2) {
+                if (o1.getParameterTypes().length == o2.getParameterTypes().length) {
+                    return 0;
+                } else if (o1.getParameterTypes().length > o2.getParameterTypes().length) {
+                    return -1;
+                } else {
+                    return 1;
+                }
+            }
+        };
+
+        Arrays.sort(constructors, comparator);
+
+        for (int i = 0; i < constructors.length; i++) {
+            Constructor constructor = constructors[i];
+            Class[] parameterTypes = constructor.getParameterTypes();
+
+            boolean ok = true;
+            Object[] parameterObjects = new Object[parameterTypes.length];
+            for (int j = 0; j < parameterTypes.length; j++) {
+                Class parameterType = parameterTypes[j];
+                if (parameterType.isAssignableFrom(inputProcessorChain.getClass())) {
+                    parameterObjects[j] = inputProcessorChain;
+                }
+                else if (parameterType.isAssignableFrom(securityProperties.getClass())) {
+                    parameterObjects[j] = securityProperties;
+                }
+                else if (parameterType.isAssignableFrom(eventQueue.getClass())) {
+                    parameterObjects[j] = eventQueue;
+                }
+                else if (parameterType.isAssignableFrom(index.getClass())) {
+                    parameterObjects[j] = index;
+                }
+                else if (parameterType.isAssignableFrom(elementName.getClass())) {
+                    parameterObjects[j] = elementName;
+                }
+                else {
+                    ok = false;
+                    break;
+                }
+            }
+            if (ok) {
+                try {
+                    constructor.newInstance(parameterObjects);
+                } catch (InstantiationException e) {
+                    logger.warn(e);
+                } catch (IllegalAccessException e) {
+                    logger.warn(e);
+                } catch (InvocationTargetException e) {
+                    Throwable cause = e.getCause();
+                    if (cause instanceof WSSecurityException) {
+                        throw (WSSecurityException)cause;
+                    } else if (cause instanceof XMLStreamException) {
+                        throw (XMLStreamException)cause;
+                    } else {
+                        throw new RuntimeException(e.getCause());
+                    }
+                }
+                return;
+            }
+            logger.warn("No matching handler found for " + elementName);
         }
     }
 
