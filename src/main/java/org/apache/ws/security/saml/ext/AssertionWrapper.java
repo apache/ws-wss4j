@@ -24,6 +24,8 @@ import org.apache.commons.logging.LogFactory;
 
 import org.apache.ws.security.WSDocInfo;
 import org.apache.ws.security.WSSecurityException;
+import org.apache.ws.security.components.crypto.Crypto;
+import org.apache.ws.security.components.crypto.CryptoType;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.saml.SAMLKeyInfo;
 import org.apache.ws.security.saml.SAMLUtil;
@@ -48,8 +50,10 @@ import org.opensaml.saml2.core.Issuer;
 import org.opensaml.security.SAMLSignatureProfileValidator;
 import org.opensaml.xml.XMLObject;
 import org.opensaml.xml.security.x509.BasicX509Credential;
+import org.opensaml.xml.security.x509.X509KeyInfoGeneratorFactory;
 import org.opensaml.xml.signature.KeyInfo;
 import org.opensaml.xml.signature.Signature;
+import org.opensaml.xml.signature.SignatureConstants;
 import org.opensaml.xml.signature.SignatureValidator;
 import org.opensaml.xml.validation.ValidationException;
 
@@ -60,6 +64,8 @@ import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
 
 import java.io.IOException;
+import java.security.PrivateKey;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -224,9 +230,13 @@ public class AssertionWrapper {
         }
 
         samlVersion = samlCallbacks[0].getSamlVersion();
+        String issuer = samlCallbacks[0].getIssuer();
+        if (issuer == null && parms.getIssuer() != null) {
+            issuer = parms.getIssuer();
+        }
         if (samlVersion.equals(SAMLVersion.VERSION_11)) {
             // Build a SAML v1.1 assertion
-            saml1 = SAML1ComponentBuilder.createSamlv1Assertion(parms.getIssuer());
+            saml1 = SAML1ComponentBuilder.createSamlv1Assertion(issuer);
 
             try {
                 // Process the SAML authentication statement(s)
@@ -266,7 +276,7 @@ public class AssertionWrapper {
         } else if (samlVersion.equals(SAMLVersion.VERSION_20)) {
             // Build a SAML v2.0 assertion
             saml2 = SAML2ComponentBuilder.createAssertion();
-            Issuer issuer = SAML2ComponentBuilder.createIssuer(parms.getIssuer());
+            Issuer samlIssuer = SAML2ComponentBuilder.createIssuer(issuer);
 
             // Authn Statement(s)
             List<AuthnStatement> authnStatements = 
@@ -290,7 +300,7 @@ public class AssertionWrapper {
             saml2.getAuthzDecisionStatements().addAll(authDecisionStatements);
 
             // Build the SAML v2.0 assertion
-            saml2.setIssuer(issuer);
+            saml2.setIssuer(samlIssuer);
             
             try {
                 org.opensaml.saml2.core.Subject subject = 
@@ -484,6 +494,82 @@ public class AssertionWrapper {
         } else {
             log.error("Attempt to sign an unsignable object " + xmlObject.getClass().getName());
         }
+    }
+    
+    /**
+     * Create an enveloped signature on the assertion that has been created.
+     * 
+     * @param issuerKeyName the Issuer KeyName to use with the issuerCrypto argument
+     * @param issuerKeyPassword the Issuer Password to use with the issuerCrypto argument
+     * @param issuerCrypto the Issuer Crypto instance
+     * @param sendKeyValue whether to send the key value or not
+     * @throws WSSecurityException
+     */
+    public void signAssertion(
+        String issuerKeyName,
+        String issuerKeyPassword,
+        Crypto issuerCrypto,
+        boolean sendKeyValue
+    ) throws WSSecurityException {
+        //
+        // Create the signature
+        //
+        Signature signature = OpenSAMLUtil.buildSignature();
+        signature.setCanonicalizationAlgorithm(
+            SignatureConstants.ALGO_ID_C14N_EXCL_OMIT_COMMENTS
+        );
+        
+        // prepare to sign the SAML token
+        CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
+        cryptoType.setAlias(issuerKeyName);
+        X509Certificate[] issuerCerts = issuerCrypto.getX509Certificates(cryptoType);
+        if (issuerCerts == null) {
+            throw new WSSecurityException(
+                "No issuer certs were found to sign the SAML Assertion using issuer name: "
+                + issuerKeyName
+            );
+        }
+
+        String sigAlgo = SignatureConstants.ALGO_ID_SIGNATURE_RSA_SHA1;
+        String pubKeyAlgo = issuerCerts[0].getPublicKey().getAlgorithm();
+        if (log.isDebugEnabled()) {
+            log.debug("automatic sig algo detection: " + pubKeyAlgo);
+        }
+        if (pubKeyAlgo.equalsIgnoreCase("DSA")) {
+            sigAlgo = SignatureConstants.ALGO_ID_SIGNATURE_DSA;
+        }
+        PrivateKey privateKey = null;
+        try {
+            privateKey = issuerCrypto.getPrivateKey(issuerKeyName, issuerKeyPassword);
+        } catch (Exception ex) {
+            throw new WSSecurityException(ex.getMessage(), ex);
+        }
+
+        signature.setSignatureAlgorithm(sigAlgo);
+
+        BasicX509Credential signingCredential = new BasicX509Credential();
+        signingCredential.setEntityCertificate(issuerCerts[0]);
+        signingCredential.setPrivateKey(privateKey);
+
+        signature.setSigningCredential(signingCredential);
+
+        X509KeyInfoGeneratorFactory kiFactory = new X509KeyInfoGeneratorFactory();
+        if (sendKeyValue) {
+            kiFactory.setEmitPublicKeyValue(true);
+        } else {
+            kiFactory.setEmitEntityCertificate(true);
+        }
+        try {
+            KeyInfo keyInfo = kiFactory.newInstance().generate(signingCredential);
+            signature.setKeyInfo(keyInfo);
+        } catch (org.opensaml.xml.security.SecurityException ex) {
+            throw new WSSecurityException(
+                "Error generating KeyInfo from signing credential", ex
+            );
+        }
+
+        // add the signature to the assertion
+        setSignature(signature);
     }
 
     /**

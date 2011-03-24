@@ -37,6 +37,7 @@ import org.apache.ws.security.components.crypto.Merlin;
 import org.apache.ws.security.message.WSSecEncrypt;
 import org.apache.ws.security.message.WSSecHeader;
 import org.apache.ws.security.saml.ext.AssertionWrapper;
+import org.apache.ws.security.saml.ext.SAMLParms;
 import org.apache.ws.security.saml.ext.builder.SAML1Constants;
 import org.apache.ws.security.saml.ext.builder.SAML2Constants;
 import org.apache.ws.security.util.Loader;
@@ -96,10 +97,11 @@ public class SamlReferenceTest extends org.junit.Assert {
         SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
         callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
         callbackHandler.setConfirmationMethod(SAML1Constants.CONF_SENDER_VOUCHES);
-        SAMLIssuer saml = new SAMLIssuerImpl();
-        saml.setIssuerName("www.example.com");
-        saml.setCallbackHandler(callbackHandler);
-        AssertionWrapper assertion = saml.newAssertion();
+        callbackHandler.setIssuer("www.example.com");
+        
+        SAMLParms samlParms = new SAMLParms();
+        samlParms.setCallbackHandler(callbackHandler);
+        AssertionWrapper assertion = new AssertionWrapper(samlParms);
         
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader();
@@ -158,10 +160,11 @@ public class SamlReferenceTest extends org.junit.Assert {
         SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
         callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
         callbackHandler.setConfirmationMethod(SAML1Constants.CONF_SENDER_VOUCHES);
-        SAMLIssuer saml = new SAMLIssuerImpl();
-        saml.setIssuerName("www.example.com");
-        saml.setCallbackHandler(callbackHandler);
-        AssertionWrapper assertion = saml.newAssertion();
+        callbackHandler.setIssuer("www.example.com");
+        
+        SAMLParms samlParms = new SAMLParms();
+        samlParms.setCallbackHandler(callbackHandler);
+        AssertionWrapper assertion = new AssertionWrapper(samlParms);
         
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader();
@@ -221,14 +224,12 @@ public class SamlReferenceTest extends org.junit.Assert {
         SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
         callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
         callbackHandler.setConfirmationMethod(SAML1Constants.CONF_HOLDER_KEY);
-        SAMLIssuer saml = new SAMLIssuerImpl();
-        saml.setIssuerName("www.example.com");
-        saml.setIssuerCrypto(issuerCrypto);
-        saml.setIssuerKeyName("wss40_server");
-        saml.setIssuerKeyPassword("security");
-        saml.setSignAssertion(true);
-        saml.setCallbackHandler(callbackHandler);
-        AssertionWrapper assertion = saml.newAssertion();
+        callbackHandler.setIssuer("www.example.com");
+        
+        SAMLParms samlParms = new SAMLParms();
+        samlParms.setCallbackHandler(callbackHandler);
+        AssertionWrapper assertion = new AssertionWrapper(samlParms);
+        assertion.signAssertion("wss40_server", "security", issuerCrypto, false);
 
         WSSecSignatureSAML wsSign = new WSSecSignatureSAML();
         wsSign.setUserInfo("wss40", "security");
@@ -285,14 +286,12 @@ public class SamlReferenceTest extends org.junit.Assert {
         SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
         callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
         callbackHandler.setConfirmationMethod(SAML1Constants.CONF_HOLDER_KEY);
-        SAMLIssuer saml = new SAMLIssuerImpl();
-        saml.setIssuerName("www.example.com");
-        saml.setIssuerCrypto(issuerCrypto);
-        saml.setIssuerKeyName("wss40_server");
-        saml.setIssuerKeyPassword("security");
-        saml.setSignAssertion(true);
-        saml.setCallbackHandler(callbackHandler);
-        AssertionWrapper assertion = saml.newAssertion();
+        callbackHandler.setIssuer("www.example.com");
+        
+        SAMLParms samlParms = new SAMLParms();
+        samlParms.setCallbackHandler(callbackHandler);
+        AssertionWrapper assertion = new AssertionWrapper(samlParms);
+        assertion.signAssertion("wss40_server", "security", issuerCrypto, false);
 
         WSSecSignatureSAML wsSign = new WSSecSignatureSAML();
         wsSign.setUserInfo("wss40", "security");
@@ -403,14 +402,12 @@ public class SamlReferenceTest extends org.junit.Assert {
         SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
         callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
         callbackHandler.setConfirmationMethod(SAML1Constants.CONF_HOLDER_KEY);
-        SAMLIssuer saml = new SAMLIssuerImpl();
-        saml.setIssuerName("www.example.com");
-        saml.setIssuerCrypto(issuerCrypto);
-        saml.setIssuerKeyName("wss40_server");
-        saml.setIssuerKeyPassword("security");
-        saml.setSignAssertion(true);
-        saml.setCallbackHandler(callbackHandler);
-        AssertionWrapper assertion = saml.newAssertion();
+        callbackHandler.setIssuer("www.example.com");
+        
+        SAMLParms samlParms = new SAMLParms();
+        samlParms.setCallbackHandler(callbackHandler);
+        AssertionWrapper assertion = new AssertionWrapper(samlParms);
+        assertion.signAssertion("wss40_server", "security", issuerCrypto, false);
 
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader();
@@ -482,15 +479,12 @@ public class SamlReferenceTest extends org.junit.Assert {
         SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
         callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
         callbackHandler.setConfirmationMethod(SAML1Constants.CONF_HOLDER_KEY);
-        SAMLIssuer saml = new SAMLIssuerImpl();
-        saml.setIssuerName("www.example.com");
-        saml.setIssuerCrypto(issuerCrypto);
-        saml.setIssuerKeyName("wss40_server");
-        saml.setIssuerKeyPassword("security");
-        saml.setSignAssertion(true);
-        saml.setCallbackHandler(callbackHandler);
-        AssertionWrapper assertion = saml.newAssertion();
-
+        callbackHandler.setIssuer("www.example.com");
+        
+        SAMLParms samlParms = new SAMLParms();
+        samlParms.setCallbackHandler(callbackHandler);
+        AssertionWrapper assertion = new AssertionWrapper(samlParms);
+        assertion.signAssertion("wss40_server", "security", issuerCrypto, false);
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader();
         Node assertionNode = assertion.toDOM(doc);
@@ -558,10 +552,11 @@ public class SamlReferenceTest extends org.junit.Assert {
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
         callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
         callbackHandler.setConfirmationMethod(SAML2Constants.CONF_SENDER_VOUCHES);
-        SAMLIssuer saml = new SAMLIssuerImpl();
-        saml.setIssuerName("www.example.com");
-        saml.setCallbackHandler(callbackHandler);
-        AssertionWrapper assertion = saml.newAssertion();
+        callbackHandler.setIssuer("www.example.com");
+        
+        SAMLParms samlParms = new SAMLParms();
+        samlParms.setCallbackHandler(callbackHandler);
+        AssertionWrapper assertion = new AssertionWrapper(samlParms);
         
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader();
@@ -619,10 +614,11 @@ public class SamlReferenceTest extends org.junit.Assert {
     	SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
         callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
         callbackHandler.setConfirmationMethod(SAML2Constants.CONF_SENDER_VOUCHES);
-        SAMLIssuer saml = new SAMLIssuerImpl();
-        saml.setIssuerName("www.example.com");
-        saml.setCallbackHandler(callbackHandler);
-        AssertionWrapper assertion = saml.newAssertion();
+        callbackHandler.setIssuer("www.example.com");
+        
+        SAMLParms samlParms = new SAMLParms();
+        samlParms.setCallbackHandler(callbackHandler);
+        AssertionWrapper assertion = new AssertionWrapper(samlParms);
         
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader();
@@ -682,14 +678,12 @@ public class SamlReferenceTest extends org.junit.Assert {
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
         callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
         callbackHandler.setConfirmationMethod(SAML2Constants.CONF_HOLDER_KEY);
-        SAMLIssuer saml = new SAMLIssuerImpl();
-        saml.setIssuerName("www.example.com");
-        saml.setIssuerCrypto(issuerCrypto);
-        saml.setIssuerKeyName("wss40_server");
-        saml.setIssuerKeyPassword("security");
-        saml.setSignAssertion(true);
-        saml.setCallbackHandler(callbackHandler);
-        AssertionWrapper assertion = saml.newAssertion();
+        callbackHandler.setIssuer("www.example.com");
+        
+        SAMLParms samlParms = new SAMLParms();
+        samlParms.setCallbackHandler(callbackHandler);
+        AssertionWrapper assertion = new AssertionWrapper(samlParms);
+        assertion.signAssertion("wss40_server", "security", issuerCrypto, false);
 
         WSSecSignatureSAML wsSign = new WSSecSignatureSAML();
         wsSign.setUserInfo("wss40", "security");
@@ -746,14 +740,12 @@ public class SamlReferenceTest extends org.junit.Assert {
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
         callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
         callbackHandler.setConfirmationMethod(SAML2Constants.CONF_HOLDER_KEY);
-        SAMLIssuer saml = new SAMLIssuerImpl();
-        saml.setIssuerName("www.example.com");
-        saml.setIssuerCrypto(issuerCrypto);
-        saml.setIssuerKeyName("wss40_server");
-        saml.setIssuerKeyPassword("security");
-        saml.setSignAssertion(true);
-        saml.setCallbackHandler(callbackHandler);
-        AssertionWrapper assertion = saml.newAssertion();
+        callbackHandler.setIssuer("www.example.com");
+        
+        SAMLParms samlParms = new SAMLParms();
+        samlParms.setCallbackHandler(callbackHandler);
+        AssertionWrapper assertion = new AssertionWrapper(samlParms);
+        assertion.signAssertion("wss40_server", "security", issuerCrypto, false);
 
         WSSecSignatureSAML wsSign = new WSSecSignatureSAML();
         wsSign.setUserInfo("wss40", "security");
@@ -812,14 +804,12 @@ public class SamlReferenceTest extends org.junit.Assert {
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
         callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
         callbackHandler.setConfirmationMethod(SAML2Constants.CONF_HOLDER_KEY);
-        SAMLIssuer saml = new SAMLIssuerImpl();
-        saml.setIssuerName("www.example.com");
-        saml.setIssuerCrypto(issuerCrypto);
-        saml.setIssuerKeyName("wss40_server");
-        saml.setIssuerKeyPassword("security");
-        saml.setSignAssertion(true);
-        saml.setCallbackHandler(callbackHandler);
-        AssertionWrapper assertion = saml.newAssertion();
+        callbackHandler.setIssuer("www.example.com");
+        
+        SAMLParms samlParms = new SAMLParms();
+        samlParms.setCallbackHandler(callbackHandler);
+        AssertionWrapper assertion = new AssertionWrapper(samlParms);
+        assertion.signAssertion("wss40_server", "security", issuerCrypto, false);
 
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader();
@@ -890,14 +880,12 @@ public class SamlReferenceTest extends org.junit.Assert {
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
         callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
         callbackHandler.setConfirmationMethod(SAML2Constants.CONF_HOLDER_KEY);
-        SAMLIssuer saml = new SAMLIssuerImpl();
-        saml.setIssuerName("www.example.com");
-        saml.setIssuerCrypto(issuerCrypto);
-        saml.setIssuerKeyName("wss40_server");
-        saml.setIssuerKeyPassword("security");
-        saml.setSignAssertion(true);
-        saml.setCallbackHandler(callbackHandler);
-        AssertionWrapper assertion = saml.newAssertion();
+        callbackHandler.setIssuer("www.example.com");
+        
+        SAMLParms samlParms = new SAMLParms();
+        samlParms.setCallbackHandler(callbackHandler);
+        AssertionWrapper assertion = new AssertionWrapper(samlParms);
+        assertion.signAssertion("wss40_server", "security", issuerCrypto, false);
 
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader();

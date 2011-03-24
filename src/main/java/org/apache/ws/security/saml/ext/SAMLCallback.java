@@ -50,6 +50,11 @@ public class SAMLCallback implements Callback {
     private SubjectBean subject;
     
     /**
+     * The issuer of the Assertion
+     */
+    private String issuer;
+    
+    /**
      * SAML Conditions representation
      */
     private ConditionsBean conditions;
@@ -162,6 +167,24 @@ public class SAMLCallback implements Callback {
      */
     public void setSubject(SubjectBean subject) {
         this.subject = subject;
+    }
+    
+    /**
+     * Method getIssuer returns the issuer of this SAMLCallback object.
+     *
+     * @return the issuer of this SAMLCallback object.
+     */
+    public String getIssuer() {
+        return issuer;
+    }
+
+    /**
+     * Method setIssuer sets the issuer of this SAMLCallback object.
+     *
+     * @param issuer the issuer of this SAMLCallback object.
+     */
+    public void setIssuer(String issuer) {
+        this.issuer = issuer;
     }
     
     /**

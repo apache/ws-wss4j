@@ -37,6 +37,7 @@ import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.message.WSSecHeader;
 import org.apache.ws.security.message.WSSecSAMLToken;
 import org.apache.ws.security.saml.ext.AssertionWrapper;
+import org.apache.ws.security.saml.ext.SAMLParms;
 import org.apache.ws.security.util.WSSecurityUtil;
 
 import org.w3c.dom.Document;
@@ -66,10 +67,11 @@ public class SamlTokenTest extends org.junit.Assert {
     public void testSAML1AuthnAssertion() throws Exception {
         SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
         callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
-        SAMLIssuer saml = new SAMLIssuerImpl();
-        saml.setIssuerName("www.example.com");
-        saml.setCallbackHandler(callbackHandler);
-        AssertionWrapper assertion = saml.newAssertion();
+        callbackHandler.setIssuer("www.example.com");
+        
+        SAMLParms samlParms = new SAMLParms();
+        samlParms.setCallbackHandler(callbackHandler);
+        AssertionWrapper assertion = new AssertionWrapper(samlParms);
 
         WSSecSAMLToken wsSign = new WSSecSAMLToken();
 
@@ -135,10 +137,11 @@ public class SamlTokenTest extends org.junit.Assert {
     public void testSAML1AttrAssertion() throws Exception {
         SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
         callbackHandler.setStatement(SAML1CallbackHandler.Statement.ATTR);
-        SAMLIssuer saml = new SAMLIssuerImpl();
-        saml.setIssuerName("www.example.com");
-        saml.setCallbackHandler(callbackHandler);
-        AssertionWrapper assertion = saml.newAssertion();
+        callbackHandler.setIssuer("www.example.com");
+        
+        SAMLParms samlParms = new SAMLParms();
+        samlParms.setCallbackHandler(callbackHandler);
+        AssertionWrapper assertion = new AssertionWrapper(samlParms);
 
         WSSecSAMLToken wsSign = new WSSecSAMLToken();
 
@@ -171,10 +174,11 @@ public class SamlTokenTest extends org.junit.Assert {
     public void testSAML1AuthzAssertion() throws Exception {
         SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
         callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHZ);
-        SAMLIssuer saml = new SAMLIssuerImpl();
-        saml.setIssuerName("www.example.com");
-        saml.setCallbackHandler(callbackHandler);
-        AssertionWrapper assertion = saml.newAssertion();
+        callbackHandler.setIssuer("www.example.com");
+        
+        SAMLParms samlParms = new SAMLParms();
+        samlParms.setCallbackHandler(callbackHandler);
+        AssertionWrapper assertion = new AssertionWrapper(samlParms);
 
         WSSecSAMLToken wsSign = new WSSecSAMLToken();
 
@@ -207,10 +211,11 @@ public class SamlTokenTest extends org.junit.Assert {
     public void testSAML2AuthnAssertion() throws Exception {
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
         callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
-        SAMLIssuer saml = new SAMLIssuerImpl();
-        saml.setIssuerName("www.example.com");
-        saml.setCallbackHandler(callbackHandler);
-        AssertionWrapper assertion = saml.newAssertion();
+        callbackHandler.setIssuer("www.example.com");
+        
+        SAMLParms samlParms = new SAMLParms();
+        samlParms.setCallbackHandler(callbackHandler);
+        AssertionWrapper assertion = new AssertionWrapper(samlParms);
 
         WSSecSAMLToken wsSign = new WSSecSAMLToken();
 
@@ -243,10 +248,11 @@ public class SamlTokenTest extends org.junit.Assert {
     public void testSAML2AttrAssertion() throws Exception {
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
         callbackHandler.setStatement(SAML2CallbackHandler.Statement.ATTR);
-        SAMLIssuer saml = new SAMLIssuerImpl();
-        saml.setIssuerName("www.example.com");
-        saml.setCallbackHandler(callbackHandler);
-        AssertionWrapper assertion = saml.newAssertion();
+        callbackHandler.setIssuer("www.example.com");
+        
+        SAMLParms samlParms = new SAMLParms();
+        samlParms.setCallbackHandler(callbackHandler);
+        AssertionWrapper assertion = new AssertionWrapper(samlParms);
 
         WSSecSAMLToken wsSign = new WSSecSAMLToken();
 
@@ -279,10 +285,11 @@ public class SamlTokenTest extends org.junit.Assert {
     public void testSAML2AuthzAssertion() throws Exception {
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
         callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHZ);
-        SAMLIssuer saml = new SAMLIssuerImpl();
-        saml.setIssuerName("www.example.com");
-        saml.setCallbackHandler(callbackHandler);
-        AssertionWrapper assertion = saml.newAssertion();
+        callbackHandler.setIssuer("www.example.com");
+        
+        SAMLParms samlParms = new SAMLParms();
+        samlParms.setCallbackHandler(callbackHandler);
+        AssertionWrapper assertion = new AssertionWrapper(samlParms);
 
         WSSecSAMLToken wsSign = new WSSecSAMLToken();
 
@@ -359,10 +366,11 @@ public class SamlTokenTest extends org.junit.Assert {
     public void testSAML1AuthnBadIssuerAssertion() throws Exception {
         SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
         callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
-        SAMLIssuer saml = new SAMLIssuerImpl();
-        saml.setIssuerName("www.example2.com");
-        saml.setCallbackHandler(callbackHandler);
-        AssertionWrapper assertion = saml.newAssertion();
+        callbackHandler.setIssuer("www.example2.com");
+        
+        SAMLParms samlParms = new SAMLParms();
+        samlParms.setCallbackHandler(callbackHandler);
+        AssertionWrapper assertion = new AssertionWrapper(samlParms);
 
         WSSecSAMLToken wsSign = new WSSecSAMLToken();
 
@@ -396,10 +404,11 @@ public class SamlTokenTest extends org.junit.Assert {
     public void testSAML2AuthnBadIssuerAssertion() throws Exception {
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
         callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
-        SAMLIssuer saml = new SAMLIssuerImpl();
-        saml.setIssuerName("www.example2.com");
-        saml.setCallbackHandler(callbackHandler);
-        AssertionWrapper assertion = saml.newAssertion();
+        callbackHandler.setIssuer("www.example2.com");
+        
+        SAMLParms samlParms = new SAMLParms();
+        samlParms.setCallbackHandler(callbackHandler);
+        AssertionWrapper assertion = new AssertionWrapper(samlParms);
 
         WSSecSAMLToken wsSign = new WSSecSAMLToken();
 

@@ -24,21 +24,11 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
-import org.apache.ws.security.components.crypto.CryptoType;
 
 import org.apache.ws.security.saml.ext.AssertionWrapper;
-import org.apache.ws.security.saml.ext.OpenSAMLUtil;
 import org.apache.ws.security.saml.ext.SAMLParms;
 import org.apache.ws.security.util.Loader;
 
-import org.opensaml.xml.security.x509.BasicX509Credential;
-import org.opensaml.xml.security.x509.X509KeyInfoGeneratorFactory;
-import org.opensaml.xml.signature.KeyInfo;
-import org.opensaml.xml.signature.Signature;
-import org.opensaml.xml.signature.SignatureConstants;
-
-import java.security.PrivateKey;
-import java.security.cert.X509Certificate;
 import java.util.Properties;
 
 import javax.security.auth.callback.CallbackHandler;
@@ -154,68 +144,8 @@ public class SAMLIssuerImpl implements SAMLIssuer {
         samlParms.setCallbackHandler(callbackHandler);
 
         AssertionWrapper sa = new AssertionWrapper(samlParms);
-        
         if (signAssertion) {
-            //
-            // Create the signature
-            //
-            Signature signature = OpenSAMLUtil.buildSignature();
-            signature.setCanonicalizationAlgorithm(
-                SignatureConstants.ALGO_ID_C14N_EXCL_OMIT_COMMENTS
-            );
-            
-            // prepare to sign the SAML token
-            CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
-            cryptoType.setAlias(issuerKeyName);
-            X509Certificate[] issuerCerts = issuerCrypto.getX509Certificates(cryptoType);
-            if (issuerCerts == null) {
-                throw new WSSecurityException(
-                    "No issuer certs were found to sign the SAML Assertion using issuer name: "
-                    + issuerKeyName
-                );
-            }
-
-            String sigAlgo = SignatureConstants.ALGO_ID_SIGNATURE_RSA_SHA1;
-            String pubKeyAlgo = issuerCerts[0].getPublicKey().getAlgorithm();
-            if (log.isDebugEnabled()) {
-                log.debug("automatic sig algo detection: " + pubKeyAlgo);
-            }
-            if (pubKeyAlgo.equalsIgnoreCase("DSA")) {
-                sigAlgo = SignatureConstants.ALGO_ID_SIGNATURE_DSA;
-            }
-            PrivateKey privateKey = null;
-            try {
-                privateKey = issuerCrypto.getPrivateKey(issuerKeyName, issuerKeyPassword);
-            } catch (Exception ex) {
-                throw new WSSecurityException(ex.getMessage(), ex);
-            }
-
-            signature.setSignatureAlgorithm(sigAlgo);
-
-            BasicX509Credential signingCredential = new BasicX509Credential();
-            signingCredential.setEntityCertificate(issuerCerts[0]);
-            signingCredential.setPrivateKey(privateKey);
-            signingCredential.setEntityId(issuer);
-
-            signature.setSigningCredential(signingCredential);
-
-            X509KeyInfoGeneratorFactory kiFactory = new X509KeyInfoGeneratorFactory();
-            if (sendKeyValue) {
-                kiFactory.setEmitPublicKeyValue(true);
-            } else {
-                kiFactory.setEmitEntityCertificate(true);
-            }
-            try {
-                KeyInfo keyInfo = kiFactory.newInstance().generate(signingCredential);
-                signature.setKeyInfo(keyInfo);
-            } catch (org.opensaml.xml.security.SecurityException ex) {
-                throw new WSSecurityException(
-                    "Error generating KeyInfo from signing credential", ex
-                );
-            }
-
-            // add the signature to the assertion
-            sa.setSignature(signature);
+            sa.signAssertion(issuerKeyName, issuerKeyPassword, issuerCrypto, sendKeyValue);
         }
 
         return sa;

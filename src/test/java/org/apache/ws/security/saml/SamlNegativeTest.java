@@ -39,6 +39,7 @@ import org.apache.ws.security.message.WSSecHeader;
 import org.apache.ws.security.message.WSSecSAMLToken;
 import org.apache.ws.security.saml.ext.AssertionWrapper;
 import org.apache.ws.security.saml.ext.SAMLCallback;
+import org.apache.ws.security.saml.ext.SAMLParms;
 import org.apache.ws.security.saml.ext.bean.SubjectBean;
 import org.apache.ws.security.saml.ext.builder.SAML1Constants;
 import org.apache.ws.security.saml.ext.builder.SAML2Constants;
@@ -97,10 +98,11 @@ public class SamlNegativeTest extends org.junit.Assert {
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
         callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
         callbackHandler.setConfirmationMethod(SAML2Constants.CONF_SENDER_VOUCHES);
-        SAMLIssuer saml = new SAMLIssuerImpl();
-        saml.setIssuerName("www.example.com");
-        saml.setCallbackHandler(callbackHandler);
-        AssertionWrapper assertion = saml.newAssertion();
+        callbackHandler.setIssuer("www.example.com");
+        
+        SAMLParms samlParms = new SAMLParms();
+        samlParms.setCallbackHandler(callbackHandler);
+        AssertionWrapper assertion = new AssertionWrapper(samlParms);
 
         WSSecSignatureSAML wsSign = new WSSecSignatureSAML();
         wsSign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
@@ -148,14 +150,12 @@ public class SamlNegativeTest extends org.junit.Assert {
         SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
         callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
         callbackHandler.setConfirmationMethod(SAML1Constants.CONF_HOLDER_KEY);
-        SAMLIssuer saml = new SAMLIssuerImpl();
-        saml.setIssuerName("www.example.com");
-        saml.setIssuerCrypto(issuerCrypto);
-        saml.setIssuerKeyName("wss40_server");
-        saml.setIssuerKeyPassword("security");
-        saml.setSignAssertion(true);
-        saml.setCallbackHandler(callbackHandler);
-        AssertionWrapper assertion = saml.newAssertion();
+        callbackHandler.setIssuer("www.example.com");
+        
+        SAMLParms samlParms = new SAMLParms();
+        samlParms.setCallbackHandler(callbackHandler);
+        AssertionWrapper assertion = new AssertionWrapper(samlParms);
+        assertion.signAssertion("wss40_server", "security", issuerCrypto, false);
 
         WSSecSAMLToken wsSign = new WSSecSAMLToken();
 
@@ -201,14 +201,12 @@ public class SamlNegativeTest extends org.junit.Assert {
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
         callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
         callbackHandler.setConfirmationMethod(SAML2Constants.CONF_HOLDER_KEY);
-        SAMLIssuer saml = new SAMLIssuerImpl();
-        saml.setIssuerName("www.example.com");
-        saml.setIssuerCrypto(issuerCrypto);
-        saml.setIssuerKeyName("wss40_server");
-        saml.setIssuerKeyPassword("security");
-        saml.setSignAssertion(true);
-        saml.setCallbackHandler(callbackHandler);
-        AssertionWrapper assertion = saml.newAssertion();
+        callbackHandler.setIssuer("www.example.com");
+        
+        SAMLParms samlParms = new SAMLParms();
+        samlParms.setCallbackHandler(callbackHandler);
+        AssertionWrapper assertion = new AssertionWrapper(samlParms);
+        assertion.signAssertion("wss40_server", "security", issuerCrypto, false);
 
         WSSecSAMLToken wsSign = new WSSecSAMLToken();
 
@@ -249,14 +247,12 @@ public class SamlNegativeTest extends org.junit.Assert {
         SAML1HOKNoKeyInfoCallbackHandler callbackHandler = 
             new SAML1HOKNoKeyInfoCallbackHandler();
         callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
-        SAMLIssuer saml = new SAMLIssuerImpl();
-        saml.setIssuerName("www.example.com");
-        saml.setIssuerCrypto(issuerCrypto);
-        saml.setIssuerKeyName("wss40_server");
-        saml.setIssuerKeyPassword("security");
-        saml.setSignAssertion(true);
-        saml.setCallbackHandler(callbackHandler);
-        AssertionWrapper assertion = saml.newAssertion();
+        callbackHandler.setIssuer("www.example.com");
+        
+        SAMLParms samlParms = new SAMLParms();
+        samlParms.setCallbackHandler(callbackHandler);
+        AssertionWrapper assertion = new AssertionWrapper(samlParms);
+        assertion.signAssertion("wss40_server", "security", issuerCrypto, false);
 
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader();
@@ -329,14 +325,15 @@ public class SamlNegativeTest extends org.junit.Assert {
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
         callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
         callbackHandler.setConfirmationMethod(SAML2Constants.CONF_HOLDER_KEY);
-        SAMLIssuer saml = new SAMLIssuerImpl();
-        saml.setIssuerName("www.example.com");
-        saml.setIssuerCrypto(CryptoFactory.getInstance("crypto.properties"));
-        saml.setIssuerKeyName("16c73ab6-b892-458f-abf5-2f875f74882e");
-        saml.setIssuerKeyPassword("security");
-        saml.setSignAssertion(true);
-        saml.setCallbackHandler(callbackHandler);
-        AssertionWrapper assertion = saml.newAssertion();
+        callbackHandler.setIssuer("www.example.com");
+        
+        SAMLParms samlParms = new SAMLParms();
+        samlParms.setCallbackHandler(callbackHandler);
+        AssertionWrapper assertion = new AssertionWrapper(samlParms);
+        assertion.signAssertion(
+            "16c73ab6-b892-458f-abf5-2f875f74882e", "security", 
+            CryptoFactory.getInstance("crypto.properties"), false
+        );
 
         WSSecSignatureSAML wsSign = new WSSecSignatureSAML();
         wsSign.setUserInfo("wss40", "security");

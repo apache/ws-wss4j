@@ -38,6 +38,7 @@ import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.message.WSSecHeader;
 import org.apache.ws.security.saml.ext.AssertionWrapper;
+import org.apache.ws.security.saml.ext.SAMLParms;
 import org.apache.ws.security.saml.ext.builder.SAML1Constants;
 import org.apache.ws.security.saml.ext.builder.SAML2Constants;
 import org.apache.ws.security.util.WSSecurityUtil;
@@ -71,10 +72,11 @@ public class SamlTokenSVTest extends org.junit.Assert {
         SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
         callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
         callbackHandler.setConfirmationMethod(SAML1Constants.CONF_SENDER_VOUCHES);
-        SAMLIssuer saml = new SAMLIssuerImpl();
-        saml.setIssuerName("www.example.com");
-        saml.setCallbackHandler(callbackHandler);
-        AssertionWrapper assertion = saml.newAssertion();
+        callbackHandler.setIssuer("www.example.com");
+        
+        SAMLParms samlParms = new SAMLParms();
+        samlParms.setCallbackHandler(callbackHandler);
+        AssertionWrapper assertion = new AssertionWrapper(samlParms);
         
         WSSecSignatureSAML wsSign = new WSSecSignatureSAML();
         wsSign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
@@ -185,10 +187,11 @@ public class SamlTokenSVTest extends org.junit.Assert {
         SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
         callbackHandler.setStatement(SAML1CallbackHandler.Statement.ATTR);
         callbackHandler.setConfirmationMethod(SAML1Constants.CONF_SENDER_VOUCHES);
-        SAMLIssuer saml = new SAMLIssuerImpl();
-        saml.setIssuerName("www.example.com");
-        saml.setCallbackHandler(callbackHandler);
-        AssertionWrapper assertion = saml.newAssertion();
+        callbackHandler.setIssuer("www.example.com");
+        
+        SAMLParms samlParms = new SAMLParms();
+        samlParms.setCallbackHandler(callbackHandler);
+        AssertionWrapper assertion = new AssertionWrapper(samlParms);
 
         WSSecSignatureSAML wsSign = new WSSecSignatureSAML();
         wsSign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
@@ -244,11 +247,11 @@ public class SamlTokenSVTest extends org.junit.Assert {
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
         callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
         callbackHandler.setConfirmationMethod(SAML2Constants.CONF_SENDER_VOUCHES);
-        SAMLIssuer saml = new SAMLIssuerImpl();
-        saml.setIssuerName("www.example.com");
-        saml.setCallbackHandler(callbackHandler);
-        AssertionWrapper assertion = saml.newAssertion();
-
+        callbackHandler.setIssuer("www.example.com");
+        
+        SAMLParms samlParms = new SAMLParms();
+        samlParms.setCallbackHandler(callbackHandler);
+        AssertionWrapper assertion = new AssertionWrapper(samlParms);
         WSSecSignatureSAML wsSign = new WSSecSignatureSAML();
         wsSign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
         
@@ -303,10 +306,11 @@ public class SamlTokenSVTest extends org.junit.Assert {
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
         callbackHandler.setStatement(SAML2CallbackHandler.Statement.ATTR);
         callbackHandler.setConfirmationMethod(SAML2Constants.CONF_SENDER_VOUCHES);
-        SAMLIssuer saml = new SAMLIssuerImpl();
-        saml.setIssuerName("www.example.com");
-        saml.setCallbackHandler(callbackHandler);
-        AssertionWrapper assertion = saml.newAssertion();
+        callbackHandler.setIssuer("www.example.com");
+        
+        SAMLParms samlParms = new SAMLParms();
+        samlParms.setCallbackHandler(callbackHandler);
+        AssertionWrapper assertion = new AssertionWrapper(samlParms);
 
         WSSecSignatureSAML wsSign = new WSSecSignatureSAML();
         wsSign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
