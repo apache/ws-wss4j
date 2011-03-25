@@ -53,29 +53,7 @@ public class SecurityProperties {
 
     private Class decryptionCryptoClass;
     private KeyStore decryptionKeyStore;
-    private String decryptionDefaultAlias;
-    private char[] decryptionAliasPassword;
     private CallbackHandler callbackHandler;
-
-    //todo validate after WSSec instanciation
-
-    public void setDecryptionDefaultAlias(String decryptionDefaultAlias) {
-        this.decryptionDefaultAlias = decryptionDefaultAlias;
-    }
-
-    public void setDecryptionAliasPassword(char[] decryptionAliasPassword) {
-        this.decryptionAliasPassword = decryptionAliasPassword;
-    }
-
-    //used as fallback...
-
-    public String getDecryptionDefaultAlias() {
-        return decryptionDefaultAlias;
-    }
-
-    public char[] getDecryptionAliasPassword() {
-        return decryptionAliasPassword;
-    }
 
     /**
      * Returns the decryption keystore
@@ -113,7 +91,9 @@ public class SecurityProperties {
         this.decryptionCryptoClass = decryptionCryptoClass;
     }
 
-    //todo caching?
+    private Crypto cachedDecryptionCrypto;
+    private Class cachedDecryptionCryptoClass;
+    private KeyStore cachedDecryptionKeyStore;
 
     /**
      * returns the decryptionCrypto for the key-management
@@ -126,17 +106,28 @@ public class SecurityProperties {
             throw new WSSecurityException(new SecurityConfigurationException("Decryption KeyStore is not set"));
         }
 
+        if (this.getDecryptionCryptoClass() == cachedDecryptionCryptoClass
+                && this.getDecryptionKeyStore() == cachedDecryptionKeyStore) {
+            return cachedDecryptionCrypto;
+        }
+
         Class decryptionCryptoClass = org.swssf.crypto.Merlin.class;
         if (this.getDecryptionCryptoClass() != null) {
             decryptionCryptoClass = this.getDecryptionCryptoClass();
+            if (!decryptionCryptoClass.isAssignableFrom(CryptoBase.class)) {
+                throw new WSSecurityException("DecryptionCryptoClass must be a sub-class of CryptoBase");
+            }
         }
-        //todo test instance for CryptoBase class
+
         try {
             CryptoBase decryptionCrypto = (CryptoBase) decryptionCryptoClass.newInstance();
             decryptionCrypto.setKeyStore(this.getDecryptionKeyStore());
+            cachedDecryptionCrypto = decryptionCrypto;
+            cachedDecryptionCryptoClass = decryptionCryptoClass;
+            cachedDecryptionKeyStore = this.getDecryptionKeyStore();
             return decryptionCrypto;
         } catch (Exception e) {
-            throw new WSSecurityException("decryptionCrypto instanciation failed", e);
+            throw new WSSecurityException("DecryptionCrypto instantiation failed", e);
         }
     }
 
@@ -203,7 +194,9 @@ public class SecurityProperties {
         this.encryptionCryptoClass = encryptionCryptoClass;
     }
 
-    //todo caching?
+    private Crypto cachedEncryptionCrypto;
+    private Class cachedEncryptionCryptoClass;
+    private KeyStore cachedEncryptionKeyStore;
 
     /**
      * returns the encryptionCrypto for the key-management
@@ -211,17 +204,33 @@ public class SecurityProperties {
      * @throws WSSecurityException thrown if something goes wrong
      */
     public Crypto getEncryptionCrypto() throws WSSecurityException {
+
+        if (this.getEncryptionKeyStore() == null) {
+            throw new WSSecurityException(new SecurityConfigurationException("Encryption KeyStore is not set"));
+        }
+
+        if (this.getEncryptionCryptoClass() == cachedEncryptionCryptoClass
+                && this.getEncryptionKeyStore() == cachedEncryptionKeyStore) {
+            return cachedEncryptionCrypto;
+        }
+
         Class encryptionCryptoClass = org.swssf.crypto.Merlin.class;
         if (this.getEncryptionCryptoClass() != null) {
             encryptionCryptoClass = this.getEncryptionCryptoClass();
+            if (!CryptoBase.class.isAssignableFrom(encryptionCryptoClass)) {
+                throw new WSSecurityException("EncryptionCryptoClass must be a sub-class of CryptoBase");
+            }
         }
-        //todo test instance for CryptoBase class
+        
         try {
             CryptoBase encryptionCrypto = (CryptoBase) encryptionCryptoClass.newInstance();
             encryptionCrypto.setKeyStore(this.getEncryptionKeyStore());
+            cachedEncryptionCrypto = encryptionCrypto;
+            cachedEncryptionCryptoClass = encryptionCryptoClass;
+            cachedEncryptionKeyStore = this.getEncryptionKeyStore();
             return encryptionCrypto;
         } catch (Exception e) {
-            throw new WSSecurityException("decryptionCrypto instanciation failed", e);
+            throw new WSSecurityException("EncryptionCrypto instantiation failed", e);
         }
     }
 
@@ -372,20 +381,38 @@ public class SecurityProperties {
         this.signatureCryptoClass = signatureCryptoClass;
     }
 
-    //todo caching?
+    private Crypto cachedSignatureCrypto;
+    private Class cachedSignatureCryptoClass;
+    private KeyStore cachedSignatureKeyStore;
 
     public Crypto getSignatureCrypto() throws WSSecurityException {
-        Class signatureCryptoClass = org.swssf.crypto.Merlin.class;
-        if (this.getDecryptionCryptoClass() != null) {
-            signatureCryptoClass = this.getSignatureCryptoClass();
+
+        if (this.getSignatureKeyStore() == null) {
+            throw new WSSecurityException(new SecurityConfigurationException("Signature KeyStore is not set"));
         }
-        //todo test instance for CryptoBase class
+
+        if (this.getSignatureCryptoClass() == cachedSignatureCryptoClass
+                && this.getSignatureKeyStore() == cachedSignatureKeyStore) {
+            return cachedSignatureCrypto;
+        }
+
+        Class signatureCryptoClass = org.swssf.crypto.Merlin.class;
+        if (this.getSignatureCryptoClass() != null) {
+            signatureCryptoClass = this.getSignatureCryptoClass();
+            if (!CryptoBase.class.isAssignableFrom(signatureCryptoClass)) {
+                throw new WSSecurityException("SignatureCryptoClass must be a sub-class of CryptoBase");
+            }
+        }
+
         try {
             CryptoBase signatureCrypto = (CryptoBase) signatureCryptoClass.newInstance();
             signatureCrypto.setKeyStore(this.getSignatureKeyStore());
+            cachedSignatureCrypto = signatureCrypto;
+            cachedSignatureCryptoClass = signatureCryptoClass;
+            cachedSignatureKeyStore = this.getSignatureKeyStore();
             return signatureCrypto;
         } catch (Exception e) {
-            throw new WSSecurityException("signatureCrypto instanciation failed", e);
+            throw new WSSecurityException("SignatureCrypto instantiation failed", e);
         }
     }
 
@@ -446,27 +473,45 @@ public class SecurityProperties {
     }
 
     public Class getSignatureVerificationCryptoClass() {
-        return signatureVerificationCryptoClass;
+        if (signatureVerificationCryptoClass != null) {
+            return signatureVerificationCryptoClass;
+        }
+        return org.swssf.crypto.Merlin.class;
     }
 
     public void setSignatureVerificationCryptoClass(Class signatureVerificationCryptoClass) {
         this.signatureVerificationCryptoClass = signatureVerificationCryptoClass;
     }
 
-    //todo caching?
+    private Crypto cachedSignatureVerificationCrypto;
+    private Class cachedSignatureVerificationCryptoClass;
+    private KeyStore cachedSignatureVerificationKeyStore;
 
     public Crypto getSignatureVerificationCrypto() throws WSSecurityException {
-        Class signatureVerificationCryptoClass = org.swssf.crypto.Merlin.class;
-        if (this.getSignatureVerificationCryptoClass() != null) {
-            signatureVerificationCryptoClass = this.getSignatureVerificationCryptoClass();
+
+        if (this.getSignatureVerificationKeyStore() == null) {
+            throw new WSSecurityException(new SecurityConfigurationException("Signature verification KeyStore is not set"));
         }
-        //todo test instance for CryptoBase class
+
+        if (this.getSignatureVerificationCryptoClass() == cachedSignatureVerificationCryptoClass
+                && this.getSignatureVerificationKeyStore() == cachedSignatureVerificationKeyStore) {
+            return cachedSignatureVerificationCrypto;
+        }
+
+        Class signatureVerificationCryptoClass = this.getSignatureVerificationCryptoClass();
+        if (!CryptoBase.class.isAssignableFrom(signatureVerificationCryptoClass)) {
+            throw new WSSecurityException("SignatureVerificationCryptoClass must be a sub-class of CryptoBase");
+        }
+
         try {
             CryptoBase signatureVerificationCrypto = (CryptoBase) signatureVerificationCryptoClass.newInstance();
             signatureVerificationCrypto.setKeyStore(this.getSignatureVerificationKeyStore());
+            cachedSignatureVerificationCrypto = signatureVerificationCrypto;
+            cachedSignatureVerificationCryptoClass = signatureVerificationCryptoClass;
+            cachedSignatureVerificationKeyStore = this.getSignatureVerificationKeyStore();
             return signatureVerificationCrypto;
         } catch (Exception e) {
-            throw new WSSecurityException("decryptionCrypto instanciation failed", e);
+            throw new WSSecurityException("SignatureVerificationCrypto instantiation failed", e);
         }
     }
 
