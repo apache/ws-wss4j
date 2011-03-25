@@ -29,16 +29,6 @@ import java.io.StringReader;
  */
 public class RFC2253Parser {
 
-
-    /**
-     * {@link org.apache.commons.logging} logging facility
-     */
-    /* static org.apache.commons.logging.Log log =
-         org.apache.commons.logging.LogFactory.getLog(RFC2253Parser.class.getName());
-    */
-
-    static boolean _TOXML = true;
-
     /**
      * Method rfc2253toXMLdsig
      *
@@ -47,10 +37,8 @@ public class RFC2253Parser {
      */
     public static String rfc2253toXMLdsig(String dn) {
 
-        _TOXML = true;
-
         // Transform from RFC1779 to RFC2253
-        String normalized = normalize(dn);
+        String normalized = normalize(dn, true);
 
         return rfctoXML(normalized);
     }
@@ -63,10 +51,8 @@ public class RFC2253Parser {
      */
     public static String xmldsigtoRFC2253(String dn) {
 
-        _TOXML = false;
-
         // Transform from RFC1779 to RFC2253
-        String normalized = normalize(dn);
+        String normalized = normalize(dn, false);
 
         return xmltoRFC(normalized);
     }
@@ -77,7 +63,7 @@ public class RFC2253Parser {
      * @param dn
      * @return normalized string
      */
-    public static String normalize(String dn) {
+    public static String normalize(String dn, boolean toXML) {
 
         //if empty string
         if ((dn == null) || dn.equals("")) {
@@ -96,14 +82,14 @@ public class RFC2253Parser {
                 l += countQuotes(_DN, j, k);
 
                 if ((k > 0) && (_DN.charAt(k - 1) != '\\') && (l % 2) != 1) {
-                    sb.append(parseRDN(_DN.substring(i, k).trim()) + ",");
+                    sb.append(parseRDN(_DN.substring(i, k).trim(), toXML) + ",");
 
                     i = k + 1;
                     l = 0;
                 }
             }
 
-            sb.append(parseRDN(trim(_DN.substring(i))));
+            sb.append(parseRDN(trim(_DN.substring(i)), toXML));
 
             return sb.toString();
         } catch (IOException ex) {
@@ -118,7 +104,7 @@ public class RFC2253Parser {
      * @return normalized string
      * @throws java.io.IOException
      */
-    static String parseRDN(String str) throws IOException {
+    static String parseRDN(String str, boolean toXML) throws IOException {
 
         StringBuffer sb = new StringBuffer();
         int i = 0;
@@ -129,14 +115,14 @@ public class RFC2253Parser {
             l += countQuotes(str, j, k);
 
             if ((k > 0) && (str.charAt(k - 1) != '\\') && (l % 2) != 1) {
-                sb.append(parseATAV(trim(str.substring(i, k))) + "+");
+                sb.append(parseATAV(trim(str.substring(i, k)), toXML) + "+");
 
                 i = k + 1;
                 l = 0;
             }
         }
 
-        sb.append(parseATAV(trim(str.substring(i))));
+        sb.append(parseATAV(trim(str.substring(i)), toXML));
 
         return sb.toString();
     }
@@ -148,7 +134,7 @@ public class RFC2253Parser {
      * @return normalized string
      * @throws java.io.IOException
      */
-    static String parseATAV(String str) throws IOException {
+    static String parseATAV(String str, boolean toXML) throws IOException {
 
         int i = str.indexOf("=");
 
@@ -161,7 +147,7 @@ public class RFC2253Parser {
         if (attrType.charAt(0) >= '0' && attrType.charAt(0) <= '9') {
             attrValue = str.substring(i + 1);
         } else {
-            attrValue = normalizeV(str.substring(i + 1));
+            attrValue = normalizeV(str.substring(i + 1), toXML);
         }
 
         return attrType + "=" + attrValue;
@@ -192,7 +178,7 @@ public class RFC2253Parser {
      * @return normalized string
      * @throws java.io.IOException
      */
-    static String normalizeV(String str) throws IOException {
+    static String normalizeV(String str, boolean toXML) throws IOException {
 
         String value = trim(str);
 
@@ -218,7 +204,7 @@ public class RFC2253Parser {
             value = trim(sb.toString());
         }
 
-        if (_TOXML == true) {
+        if (toXML) {
             if (value.startsWith("#")) {
                 value = '\\' + value;
             }
@@ -488,89 +474,5 @@ public class RFC2253Parser {
         }
 
         return trimed;
-    }
-
-    //todo move tests to testclasses
-
-    /**
-     * Method main
-     *
-     * @param args
-     * @throws Exception
-     */
-    public static void main(String[] args) throws Exception {
-
-        testToXML("CN=\"Steve, Kille\",  O=Isode Limited, C=GB");
-        testToXML("CN=Steve Kille    ,   O=Isode Limited,C=GB");
-        testToXML("\\ OU=Sales+CN=J. Smith,O=Widget Inc.,C=US\\ \\ ");
-        testToXML("CN=L. Eagle,O=Sue\\, Grabbit and Runn,C=GB");
-        testToXML("CN=Before\\0DAfter,O=Test,C=GB");
-        testToXML("CN=\"L. Eagle,O=Sue, = + < > # ;Grabbit and Runn\",C=GB");
-        testToXML("1.3.6.1.4.1.1466.0=#04024869,O=Test,C=GB");
-
-        {
-            StringBuffer sb = new StringBuffer();
-
-            sb.append('L');
-            sb.append('u');
-            sb.append('\uc48d');
-            sb.append('i');
-            sb.append('\uc487');
-
-            String test7 = "SN=" + sb.toString();
-
-            testToXML(test7);
-        }
-
-        testToRFC("CN=\"Steve, Kille\",  O=Isode Limited, C=GB");
-        testToRFC("CN=Steve Kille    ,   O=Isode Limited,C=GB");
-        testToRFC("\\20OU=Sales+CN=J. Smith,O=Widget Inc.,C=US\\20\\20 ");
-        testToRFC("CN=L. Eagle,O=Sue\\, Grabbit and Runn,C=GB");
-        testToRFC("CN=Before\\12After,O=Test,C=GB");
-        testToRFC("CN=\"L. Eagle,O=Sue, = + < > # ;Grabbit and Runn\",C=GB");
-        testToRFC("1.3.6.1.4.1.1466.0=\\#04024869,O=Test,C=GB");
-
-        {
-            StringBuffer sb = new StringBuffer();
-
-            sb.append('L');
-            sb.append('u');
-            sb.append('\uc48d');
-            sb.append('i');
-            sb.append('\uc487');
-
-            String test7 = "SN=" + sb.toString();
-
-            testToRFC(test7);
-        }
-    }
-
-    /**
-     * Field i
-     */
-    static int counter = 0;
-
-    /**
-     * Method test
-     *
-     * @param st
-     */
-    static void testToXML(String st) {
-
-        System.out.println("start " + counter++ + ": " + st);
-        System.out.println("         " + rfc2253toXMLdsig(st));
-        System.out.println("");
-    }
-
-    /**
-     * Method testToRFC
-     *
-     * @param st
-     */
-    static void testToRFC(String st) {
-
-        System.out.println("start " + counter++ + ": " + st);
-        System.out.println("         " + xmldsigtoRFC2253(st));
-        System.out.println("");
     }
 }

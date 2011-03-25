@@ -51,7 +51,7 @@ public class TimestampOutputProcessor extends AbstractOutputProcessor {
                     XMLGregorianCalendar expires = datatypeFactory.newXMLGregorianCalendar(expiresCalendar);
 
                     OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
-                    //wsu:id will be added when signing...todo must there always be a wsu:id?
+                    //wsu:id is optional and will be added when signing...
                     createStartElementAndOutputAsEvent(subOutputProcessorChain, Constants.TAG_wsu_Timestamp, null);
                     createStartElementAndOutputAsEvent(subOutputProcessorChain, Constants.TAG_wsu_Created, null);
                     createCharactersAndOutputAsEvent(subOutputProcessorChain, created.toXMLFormat());

@@ -46,7 +46,7 @@ import java.util.*;
 public class SignatureEndingOutputProcessor extends AbstractOutputProcessor {
 
     private List<SignaturePartDef> signaturePartDefList;
-
+    //todo implement or remove?:
     private boolean useSingleCert = true;
 
     //todo try to use a hint how much elements are expected from other processors? 
@@ -223,7 +223,7 @@ public class SignatureEndingOutputProcessor extends AbstractOutputProcessor {
             createStartElementAndOutputAsEvent(subOutputProcessorChain, Constants.TAG_dsig_X509Data, null);
             createStartElementAndOutputAsEvent(subOutputProcessorChain, Constants.TAG_dsig_X509IssuerSerial, null);
             createStartElementAndOutputAsEvent(subOutputProcessorChain, Constants.TAG_dsig_X509IssuerName, null);
-            createCharactersAndOutputAsEvent(subOutputProcessorChain, RFC2253Parser.normalize(x509Certificates[0].getIssuerDN().getName()));
+            createCharactersAndOutputAsEvent(subOutputProcessorChain, RFC2253Parser.normalize(x509Certificates[0].getIssuerDN().getName(), true));
             createEndElementAndOutputAsEvent(subOutputProcessorChain, Constants.TAG_dsig_X509IssuerName);
             createStartElementAndOutputAsEvent(subOutputProcessorChain, Constants.TAG_dsig_X509SerialNumber, null);
             createCharactersAndOutputAsEvent(subOutputProcessorChain, x509Certificates[0].getSerialNumber().toString());
