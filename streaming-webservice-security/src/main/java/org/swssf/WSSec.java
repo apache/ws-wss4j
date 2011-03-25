@@ -30,7 +30,6 @@ import java.security.Security;
  */
 public class WSSec {
 
-    //todo overall AccessController.doPrivileged
     //todo replace overall "BC" with getProvider somewhere
 
     static {
