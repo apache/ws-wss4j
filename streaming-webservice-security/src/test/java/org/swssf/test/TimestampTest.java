@@ -53,7 +53,7 @@ public class TimestampTest extends AbstractTestBase {
             securityProperties.setOutAction(actions);
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
-            XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos);
+            XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8");
             XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml"));
             XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
             xmlStreamWriter.close();
@@ -126,7 +126,7 @@ public class TimestampTest extends AbstractTestBase {
             securityProperties.setTimestampTTL(3600);
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
-            XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos);
+            XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8");
             XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml"));
             XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
             xmlStreamWriter.close();

@@ -59,9 +59,8 @@ public class SecurityOutInterceptor extends AbstractSoapInterceptor {
         String encoding = getEncoding(soapMessage);
 
         XMLStreamWriter newXMLStreamWriter;
-        //todo encoding
         try {
-            newXMLStreamWriter = outboundWSSec.processOutMessage(os);
+            newXMLStreamWriter = outboundWSSec.processOutMessage(os, encoding);
             soapMessage.setContent(XMLStreamWriter.class, newXMLStreamWriter);
         } catch (WSSecurityException e) {
             throw new Fault(e);

@@ -37,11 +37,11 @@ public class FinalOutputProcessor extends AbstractOutputProcessor {
         xmlOutputFactory.setProperty(XMLOutputFactory.IS_REPAIRING_NAMESPACES, true);
     }
 
-    public FinalOutputProcessor(OutputStream outputStream, SecurityProperties securityProperties) throws WSSecurityException {
+    public FinalOutputProcessor(OutputStream outputStream, String encoding, SecurityProperties securityProperties) throws WSSecurityException {
         super(securityProperties);
         setPhase(Constants.Phase.POSTPROCESSING);
         try {
-            xmlEventWriter = xmlOutputFactory.createXMLEventWriter(outputStream, "UTF-8");
+            xmlEventWriter = xmlOutputFactory.createXMLEventWriter(outputStream, encoding);
         } catch (XMLStreamException e) {
             throw new WSSecurityException(e);
         }

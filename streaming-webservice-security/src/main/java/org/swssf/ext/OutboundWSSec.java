@@ -45,13 +45,12 @@ public class OutboundWSSec {
      * @return A new XMLStreamWriter which does transparently the security processing.
      * @throws WSSecurityException thrown when a Security failure occurs
      */
-    public XMLStreamWriter processOutMessage(OutputStream outputStream) throws WSSecurityException {
+    public XMLStreamWriter processOutMessage(OutputStream outputStream, String encoding) throws WSSecurityException {
 
         final SecurityContextImpl securityContextImpl = new SecurityContextImpl();
 
         DocumentContextImpl documentContext = new DocumentContextImpl();
-        //todo encoding:
-        documentContext.setEncoding("UTF-8");
+        documentContext.setEncoding(encoding);
 
         OutputProcessorChainImpl processorChain = new OutputProcessorChainImpl(securityContextImpl, documentContext);
         processorChain.addProcessor(new SecurityHeaderOutputProcessor(securityProperties));
@@ -75,7 +74,7 @@ public class OutboundWSSec {
             }
         }
 
-        processorChain.addProcessor(new FinalOutputProcessor(outputStream, securityProperties));
+        processorChain.addProcessor(new FinalOutputProcessor(outputStream, encoding, securityProperties));
         return new XMLSecurityStreamWriter(processorChain);
     }
 }

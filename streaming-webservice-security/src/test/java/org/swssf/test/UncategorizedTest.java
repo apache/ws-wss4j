@@ -16,7 +16,6 @@ import java.io.File;
 import java.net.URL;
 
 /**
- * TODO: class description
  *
  * @author $Author: $
  * @version $Revision: $ $Date: $

@@ -47,7 +47,7 @@ public class OutputChainTest extends AbstractTestBase {
 
         OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos);
+        XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8");
         XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml"));
         XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
         xmlStreamWriter.close();
@@ -90,7 +90,7 @@ public class OutputChainTest extends AbstractTestBase {
 
         OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos);
+        XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8");
         XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml"));
         XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
         xmlStreamWriter.close();
@@ -122,7 +122,7 @@ public class OutputChainTest extends AbstractTestBase {
 
         OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos);
+        XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8");
         XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml"));
         XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
         xmlStreamWriter.close();

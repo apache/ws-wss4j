@@ -63,7 +63,7 @@ public class PerformanceMemoryTest extends AbstractTestBase {
         InputStream sourceDocument = new BufferedInputStream(new FileInputStream(source));
         OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
 
-        XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(new FileOutputStream(output));
+        XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(new FileOutputStream(output), "UTF-8");
         XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(sourceDocument);
         XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
         xmlStreamWriter.close();

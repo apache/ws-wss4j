@@ -16,7 +16,7 @@ import java.util.Deque;
 import java.util.Iterator;
 
 /**
- * TODO: class description
+ * Abstract class for SecurityHeaderHandlers with parse logic for the xml structures
  *
  * @author $Author: $
  * @version $Revision: $ $Date: $

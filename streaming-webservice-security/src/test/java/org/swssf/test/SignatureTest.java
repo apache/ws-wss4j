@@ -58,7 +58,7 @@ public class SignatureTest extends AbstractTestBase {
             securityProperties.setCallbackHandler(new CallbackHandlerImpl());
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
-            XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos);
+            XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8");
             XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml"));
             XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
             xmlStreamWriter.close();
@@ -128,7 +128,7 @@ public class SignatureTest extends AbstractTestBase {
             securityProperties.setCallbackHandler(new CallbackHandlerImpl());
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
-            XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos);
+            XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8");
             XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml"));
             XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
             xmlStreamWriter.close();
@@ -206,7 +206,7 @@ public class SignatureTest extends AbstractTestBase {
             securityProperties.setCallbackHandler(new CallbackHandlerImpl());
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
-            XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos);
+            XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8");
             XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml"));
             XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
             xmlStreamWriter.close();
@@ -284,7 +284,7 @@ public class SignatureTest extends AbstractTestBase {
             securityProperties.setCallbackHandler(new org.swssf.test.CallbackHandlerImpl());
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
-            XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos);
+            XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8");
             XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml"));
             XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
             xmlStreamWriter.close();
@@ -362,7 +362,7 @@ public class SignatureTest extends AbstractTestBase {
             securityProperties.setCallbackHandler(new org.swssf.test.CallbackHandlerImpl());
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
-            XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos);
+            XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8");
             XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml"));
             XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
             xmlStreamWriter.close();
@@ -416,7 +416,7 @@ public class SignatureTest extends AbstractTestBase {
             securityProperties.setCallbackHandler(new org.swssf.test.CallbackHandlerImpl());
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
-            XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos);
+            XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8");
             XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml"));
             XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
             xmlStreamWriter.close();
@@ -494,7 +494,7 @@ public class SignatureTest extends AbstractTestBase {
             securityProperties.setCallbackHandler(new org.swssf.test.CallbackHandlerImpl());
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
-            XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos);
+            XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8");
             XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml"));
             XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
             xmlStreamWriter.close();
@@ -571,7 +571,7 @@ public class SignatureTest extends AbstractTestBase {
             securityProperties.setCallbackHandler(new org.swssf.test.CallbackHandlerImpl());
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
-            XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos);
+            XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8");
             XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml"));
             XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
             xmlStreamWriter.close();

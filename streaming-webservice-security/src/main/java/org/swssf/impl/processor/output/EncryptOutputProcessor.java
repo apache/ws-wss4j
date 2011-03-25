@@ -108,7 +108,14 @@ public class EncryptOutputProcessor extends AbstractOutputProcessor {
                                 encryptionPartDef.setKeyId(symmetricKeyId);//EncKeyId-1483925398
                                 encryptionPartDef.setSymmetricKey(symmetricKey);
                                 encryptionPartDefList.add(encryptionPartDef);
-                                internalEncryptionOutputProcessor = new InternalEncryptionOutputProcessor(getSecurityProperties(), encryptionPartDef, startElement, outputProcessorChain.getSecurityContext().<XMLEventNSAllocator>get(Constants.XMLEVENT_NS_ALLOCATOR));
+                                internalEncryptionOutputProcessor =
+                                        new InternalEncryptionOutputProcessor(
+                                                getSecurityProperties(),
+                                                encryptionPartDef,
+                                                startElement,
+                                                outputProcessorChain.getSecurityContext().<XMLEventNSAllocator>get(Constants.XMLEVENT_NS_ALLOCATOR),
+                                                outputProcessorChain.getDocumentContext().getEncoding()
+                                        );
                             } catch (NoSuchAlgorithmException e) {
                                 throw new WSSecurityException(e.getMessage(), e);
                             } catch (NoSuchPaddingException e) {
@@ -136,7 +143,7 @@ public class EncryptOutputProcessor extends AbstractOutputProcessor {
      */
     class InternalEncryptionOutputProcessor extends AbstractOutputProcessor {
 
-        XMLEventNSAllocator xmlEventNSAllocator;
+        private XMLEventNSAllocator xmlEventNSAllocator;
         private EncryptionPartDef encryptionPartDef;
         private CharacterEventGeneratorOutputStream characterEventGeneratorOutputStream;
         //private Writer streamWriter;
@@ -148,7 +155,7 @@ public class EncryptOutputProcessor extends AbstractOutputProcessor {
         private boolean doEncryptedHeader = false;
 
         InternalEncryptionOutputProcessor(SecurityProperties securityProperties, EncryptionPartDef encryptionPartDef,
-                                          StartElement startElement, XMLEventNSAllocator xmlEventNSAllocator)
+                                          StartElement startElement, XMLEventNSAllocator xmlEventNSAllocator, String encoding)
                 throws WSSecurityException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IOException, XMLStreamException {
 
             super(securityProperties);
@@ -168,7 +175,7 @@ public class EncryptOutputProcessor extends AbstractOutputProcessor {
             symmetricCipher.init(Cipher.ENCRYPT_MODE, encryptionPartDef.getSymmetricKey());
             byte[] iv = symmetricCipher.getIV();
 
-            characterEventGeneratorOutputStream = new CharacterEventGeneratorOutputStream(xmlEventNSAllocator);
+            characterEventGeneratorOutputStream = new CharacterEventGeneratorOutputStream(xmlEventNSAllocator, encoding);
             //Base64EncoderStream calls write every 78byte (line breaks). So we have to buffer again to get optimal performance
             //todo play around to find optimal size
             Base64OutputStream base64EncoderStream = new Base64OutputStream(new BufferedOutputStream(characterEventGeneratorOutputStream), true, 76, new byte[]{'\n'});
@@ -180,8 +187,8 @@ public class EncryptOutputProcessor extends AbstractOutputProcessor {
             //we create a new StAX writer for optimized namespace writing.
             XMLOutputFactory xmlOutputFactory = XMLOutputFactory.newInstance();
             xmlOutputFactory.setProperty(XMLOutputFactory.IS_REPAIRING_NAMESPACES, true);
-            //todo encoding?
-            xmlEventWriter = xmlOutputFactory.createXMLEventWriter(cipherOutputStream);
+            //spec says (4.2): "The cleartext octet sequence obtained in step 3 is interpreted as UTF-8 encoded character data."
+            xmlEventWriter = xmlOutputFactory.createXMLEventWriter(cipherOutputStream, "UTF-8");
             //we have to output a fake element to workaround text-only encryption:
             xmlEventWriter.add(XMLEventFactory.newFactory().createStartElement(new QName("a"), null, null));
         }
@@ -356,10 +363,12 @@ public class EncryptOutputProcessor extends AbstractOutputProcessor {
     class CharacterEventGeneratorOutputStream extends OutputStream {
 
         private List<Characters> charactersBuffer = new Vector<Characters>();
-        XMLEventNSAllocator xmlEventNSAllocator;
+        private XMLEventNSAllocator xmlEventNSAllocator;
+        private String encoding;
 
-        CharacterEventGeneratorOutputStream(XMLEventNSAllocator xmlEventNSAllocator) {
+        CharacterEventGeneratorOutputStream(XMLEventNSAllocator xmlEventNSAllocator, String encoding) {
             this.xmlEventNSAllocator = xmlEventNSAllocator;
+            this.encoding = encoding;
         }
 
         public List<Characters> getCharactersBuffer() {
@@ -368,17 +377,17 @@ public class EncryptOutputProcessor extends AbstractOutputProcessor {
 
         @Override
         public void write(int b) throws IOException {
-            charactersBuffer.add(xmlEventNSAllocator.createCharacters(new String(new byte[]{((byte) b)})).asCharacters());
+            charactersBuffer.add(xmlEventNSAllocator.createCharacters(new String(new byte[]{((byte) b)}, encoding)).asCharacters());
         }
 
         @Override
         public void write(byte[] b) throws IOException {
-            charactersBuffer.add(xmlEventNSAllocator.createCharacters(new String(b)).asCharacters());
+            charactersBuffer.add(xmlEventNSAllocator.createCharacters(new String(b, encoding)).asCharacters());
         }
 
         @Override
         public void write(byte[] b, int off, int len) throws IOException {
-            charactersBuffer.add(xmlEventNSAllocator.createCharacters(new String(b, off, len)).asCharacters());
+            charactersBuffer.add(xmlEventNSAllocator.createCharacters(new String(b, off, len, encoding)).asCharacters());
         }
     }
 }

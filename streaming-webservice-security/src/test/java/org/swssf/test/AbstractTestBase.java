@@ -102,7 +102,7 @@ public abstract class AbstractTestBase {
     protected ByteArrayOutputStream doOutboundSecurity(SecurityProperties securityProperties, InputStream sourceDocument) throws Exception {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
-        XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos);
+        XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8");
         XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(sourceDocument);
         XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
         xmlStreamWriter.close();

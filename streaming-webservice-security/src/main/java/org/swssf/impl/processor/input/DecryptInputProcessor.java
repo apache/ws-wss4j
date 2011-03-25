@@ -235,12 +235,11 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
 
                             inputProcessorChain.getDocumentContext().removePathElement();
 
-                            //todo set encoding?:
-                            //todo spec says (4.2): "The cleartext octet sequence obtained in step 3 is interpreted as UTF-8 encoded character data."
+                            //spec says (4.2): "The cleartext octet sequence obtained in step 3 is interpreted as UTF-8 encoded character data."
                             XMLEventReader xmlEventReader =
                                     inputProcessorChain.getSecurityContext().<XMLInputFactory>get(
                                             Constants.XMLINPUTFACTORY).createXMLEventReader(decryptionThread.getPipedInputStream(),
-                                            inputProcessorChain.getDocumentContext().getEncoding());
+                                            "UTF-8");
 
                             //forward to wrapper element
                             XMLEvent tmpXmlEvent;
@@ -518,10 +517,11 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
 
             try {
                 //temporary writer to write the dummy wrapper element with all namespaces in the current scope
+                //spec says (4.2): "The cleartext octet sequence obtained in step 3 is interpreted as UTF-8 encoded character data."
                 BufferedWriter tempBufferedWriter = new BufferedWriter(
                         new OutputStreamWriter(
                                 pipedOutputStream,
-                                inputProcessorChain.getDocumentContext().getEncoding()
+                                "UTF-8"
                         )
                 );
 
