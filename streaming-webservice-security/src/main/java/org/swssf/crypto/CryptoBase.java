@@ -83,7 +83,6 @@ public abstract class CryptoBase implements Crypto {
             try {
                 String cacertsPath = System.getProperty("java.home") + "/lib/security/cacerts";
                 cacertsIs = new FileInputStream(cacertsPath);
-                //todo security property?:
                 String cacertsPasswd = ConfigurationProperties.getProperty("CACertKeyStorePassword");
 
                 cacerts = KeyStore.getInstance(KeyStore.getDefaultType());

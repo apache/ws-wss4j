@@ -141,6 +141,7 @@ public class Constants {
     }
 
     public enum KeyIdentifierType {
+        NO_TOKEN,
         ISSUER_SERIAL,
         BST_DIRECT_REFERENCE,
         BST_EMBEDDED,

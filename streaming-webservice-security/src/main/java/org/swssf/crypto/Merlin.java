@@ -49,8 +49,6 @@ public class Merlin extends CryptoBase {
         return ConfigurationProperties.getProperty("CertProvider");
     }
 
-    //todo remove?:
-
     public String getDefaultX509Alias() {
         return ConfigurationProperties.getProperty("DefaultX509Alias");
     }
