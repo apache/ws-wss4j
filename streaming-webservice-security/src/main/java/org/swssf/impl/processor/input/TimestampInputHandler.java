@@ -33,9 +33,19 @@ import java.util.GregorianCalendar;
  * @version $Revision: 272 $ $Date: 2010-12-23 14:30:56 +0100 (Thu, 23 Dec 2010) $
  */
 public class TimestampInputHandler extends AbstractInputSecurityHeaderHandler {
-    //todo only one timestamp is allowed per security-header @see spec
 
-    public TimestampInputHandler(InputProcessorChain inputProcessorChain, final SecurityProperties securityProperties, Deque<XMLEvent> eventQueue, Integer index) throws WSSecurityException {
+    //Chapter 10 Security Timestamps: ...may only be present at most once per header (that is, per SOAP actor/role)
+    public TimestampInputHandler(InputProcessorChain inputProcessorChain,
+                                 final SecurityProperties securityProperties,
+                                 Deque<XMLEvent> eventQueue,
+                                 Integer index) throws WSSecurityException {
+
+        Boolean alreadyProcessed = inputProcessorChain.getSecurityContext().<Boolean>get(Constants.TIMESTAMP_PROCESSED);
+        if (Boolean.TRUE.equals(alreadyProcessed)) {
+            throw new WSSecurityException("Timestamp " +
+                        "Message contains two or more timestamps");
+        }
+        inputProcessorChain.getSecurityContext().put(Constants.TIMESTAMP_PROCESSED, Boolean.TRUE);
 
         final TimestampType timestampType = (TimestampType) parseStructure(eventQueue, index);
 

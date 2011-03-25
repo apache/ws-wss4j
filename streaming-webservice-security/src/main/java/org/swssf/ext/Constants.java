@@ -26,6 +26,7 @@ public class Constants {
 
     public static final String XMLEVENT_NS_ALLOCATOR = "XMLEventNSAllocator";
     public static final String XMLINPUTFACTORY = "XMLInputFactory";
+    public static final String TIMESTAMP_PROCESSED = "TimestampProcessed";
 
     private Constants() {
     }

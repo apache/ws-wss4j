@@ -146,7 +146,6 @@ public class SignatureInputHandler extends AbstractInputSecurityHeaderHandler {
 
             KeyInfoType keyInfoType = signatureType.getKeyInfo();
             SecurityToken securityToken = SecurityTokenFactory.newInstance().getSecurityToken(keyInfoType, securityProperties.getSignatureVerificationCrypto(), securityProperties.getCallbackHandler(), securityContext);
-            //todo test verify:
             securityToken.verify();
             signature.initVerify(securityToken.getPublicKey());
             signerOutputStream = new SignerOutputStream(signature);

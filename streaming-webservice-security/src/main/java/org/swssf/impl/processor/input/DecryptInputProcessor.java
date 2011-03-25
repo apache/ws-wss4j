@@ -54,8 +54,7 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
 
     private ReferenceList referenceList;
 
-    //todo static final init or better: hardcoded:
-    //use a unique prefix; the prefix must start with a letter by spec!:
+    //the prefix must start with a letter by spec!:
     private final String uuid = "a" + UUID.randomUUID().toString().replaceAll("-", "");
     private final QName wrapperElementName = new QName("http://dummy", "dummy", uuid);
 
@@ -163,7 +162,6 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
                             EncryptedDataType currentEncryptedDataType = new EncryptedDataType(startElement);
 
                             referenceType.setProcessed(true);
-                            //todo move in decryptThread?
                             inputProcessorChain.getDocumentContext().setIsInEncryptedContent();
 
                             //only fire here ContentEncryptedElementEvents

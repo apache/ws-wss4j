@@ -469,4 +469,41 @@ public class TimestampTest extends AbstractTestBase {
             }
         }
     }
+
+    @Test
+    public void testDoubleTimestamp() throws Exception {
+
+        Document securedDocument;
+        {
+            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml");
+            String action = WSHandlerConstants.TIMESTAMP;
+            securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, new Properties());
+
+            //some test that we can really sure we get what we want from WSS4J
+            NodeList nodeList = securedDocument.getElementsByTagNameNS(Constants.TAG_wsu_Timestamp.getNamespaceURI(), Constants.TAG_wsu_Timestamp.getLocalPart());
+            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), Constants.TAG_wsse_Security.getLocalPart());
+
+            Node parentNode = nodeList.item(0).getParentNode();
+            Node node = nodeList.item(0).cloneNode(true);
+            securedDocument.adoptNode(node);
+            parentNode.appendChild(node);
+        }
+
+        //done timestamp; now test timestamp-verification:
+        {
+            SecurityProperties securityProperties = new SecurityProperties();
+            InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
+            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(new CustomW3CDOMStreamReader(securedDocument));
+
+            try {
+                Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
+                Assert.fail("Expected XMLStreamException");
+            } catch (XMLStreamException e) {
+                Throwable throwable = e.getCause();
+                Assert.assertNotNull(throwable);
+                Assert.assertTrue(throwable instanceof WSSecurityException);
+                Assert.assertEquals(throwable.getMessage(), "Timestamp Message contains two or more timestamps");
+            }
+        }
+    }
 }

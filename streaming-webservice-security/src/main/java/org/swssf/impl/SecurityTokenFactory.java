@@ -180,6 +180,7 @@ public class SecurityTokenFactory {
             }
         }
 
+        //todo testing:
         public void verify() throws WSSecurityException {
             try {
                 X509Certificate x509Certificate = getX509Certificate();
